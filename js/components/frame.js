@@ -804,8 +804,10 @@ class Frame extends ImmutableComponent {
       contextMenus.onShowAutofillMenu(e.suggestions, e.rect, this.frame)
     })
     this.webview.addEventListener('hide-autofill-popup', (e) => {
-      // TODO(Anthony): conflict with contextmenu
-      // windowActions.setContextMenuDetail()
+      let webContents = this.webview.getWebContents()
+      if (webContents && webContents.isFocused()) {
+        windowActions.setContextMenuDetail()
+      }
     })
     this.webview.addEventListener('ipc-message', (e) => {
       let method = () => {}
