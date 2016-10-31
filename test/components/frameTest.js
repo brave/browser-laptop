@@ -105,14 +105,33 @@ describe('findbar', function () {
       .waitForElementFocus(urlInput)
   })
 
+  it('findbar text should be replaced and never appended', function * () {
+    yield this.app.client
+      .showFindbar()
+      .waitForElementFocus(findBarInput)
+      .setValue(findBarInput, 'test')
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then((val) => val === 'test')
+      })
+      .showFindbar(false)
+      .waitForVisible(findBarInput, 500, true)
+      .showFindbar()
+      .waitForVisible(findBarInput)
+      .waitForElementFocus(findBarInput)
+      .keys('x')
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then((val) => val === 'x')
+      })
+  })
+
   it('should remember the position across findbar showing', function * () {
     yield this.app.client
       .showFindbar()
       .waitForElementFocus(findBarInput)
       .setValue(findBarInput, 'test')
-       .waitUntil(function () {
-         return this.getValue(findBarInput).then((val) => val === 'test')
-       })
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then((val) => val === 'test')
+      })
       .waitForVisible(findBarMatches)
     let match = yield this.app.client.getText(findBarMatches)
     assert.equal(match, '1 of 2')

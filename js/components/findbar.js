@@ -16,6 +16,7 @@ class FindBar extends ImmutableComponent {
   constructor () {
     super()
     this.onBlur = this.onBlur.bind(this)
+    this.onInputFocus = this.onInputFocus.bind(this)
     this.onClear = this.onClear.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
     this.onChange = this.onChange.bind(this)
@@ -59,13 +60,16 @@ class FindBar extends ImmutableComponent {
    * Focus the find in page input and select the text
    */
   focus () {
-    const input = this.searchInput
-    input.focus()
-    input.select()
+    this.searchInput.focus()
+  }
+
+  select () {
+    this.searchInput.select()
   }
 
   componentDidMount () {
     this.focus()
+    windowActions.setFindbarSelected(false)
   }
 
   componentWillUpdate (nextProps) {
@@ -74,6 +78,7 @@ class FindBar extends ImmutableComponent {
 
   componentDidUpdate (prevProps) {
     if (this.props.selected) {
+      windowActions.setFindbarSelected(false)
       this.focus()
     }
     if (!this.props.findDetail || !prevProps.findDetail ||
@@ -99,6 +104,10 @@ class FindBar extends ImmutableComponent {
         }
         break
     }
+  }
+
+  onInputFocus () {
+    this.searchInput.select()
   }
 
   onBlur (e) {
@@ -192,6 +201,7 @@ class FindBar extends ImmutableComponent {
             spellCheck='false'
             ref={(node) => { this.searchInput = node }}
             value={inputValue}
+            onFocus={this.onInputFocus}
             onKeyDown={this.onKeyDown}
             onKeyUp={this.onChange} />
           <span className='searchStringContainerIcon fa fa-times findClear'
