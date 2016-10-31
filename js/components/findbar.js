@@ -78,8 +78,8 @@ class FindBar extends ImmutableComponent {
 
   componentDidUpdate (prevProps) {
     if (this.props.selected) {
-      windowActions.setFindbarSelected(false)
       this.focus()
+      windowActions.setFindbarSelected(false)
     }
     if (!this.props.findDetail || !prevProps.findDetail ||
         this.props.findDetail.get('searchString') !== prevProps.findDetail.get('searchString') ||
