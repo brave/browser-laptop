@@ -27,8 +27,9 @@ const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
 const Button = require('../components/button')
 const searchProviders = require('../data/searchProviders')
-const moment = require('moment')
 const punycode = require('punycode')
+const moment = require('moment')
+moment.locale(navigator.language)
 
 const adblock = appConfig.resourceNames.ADBLOCK
 const cookieblock = appConfig.resourceNames.COOKIEBLOCK
