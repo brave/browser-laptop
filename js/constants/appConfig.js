@@ -119,6 +119,9 @@ module.exports = {
     'bookmarks.toolbar.showOnlyFavicon': false,
     'payments.enabled': false,
     'payments.notifications': false,
+    // "Out of money, pls add" / "In 24h we'll pay publishers [Review]"
+    // After shown, set timestamp to next reconcile time - 1 day.
+    'payments.notification-reconcile-soon-timestamp': null,
     'payments.notificationTryPaymentsDismissed': false, // True if you dismiss the message or enable Payments
     'payments.contribution-amount': 5, // USD
     'privacy.autofill-enabled': true,
