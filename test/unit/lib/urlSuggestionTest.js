@@ -26,3 +26,38 @@ describe('suggestion', function () {
     assert.ok(suggestion.simpleDomainNameValue(siteComplex) === 0, 'complex site returns 0')
   })
 })
+
+const site1 = Immutable.Map({
+  location: 'http://www.foo.com/1',
+  count: 0,
+  lastAccessedTime: 0,
+  title: 'www.foo/com/1'
+})
+
+const site2 = Immutable.Map({
+  location: 'http://www.foo.com/2',
+  count: 0,
+  lastAccessedTime: 0,
+  title: 'www.foo/com/2'
+})
+
+const site3 = Immutable.Map({
+  location: 'http://www.foo.com/3',
+  count: 0,
+  lastAccessedTime: 0,
+  title: 'www.foo/com/3'
+})
+
+describe('suggestion', function () {
+  it('shows virtual history item', function () {
+    var history = Immutable.List([site1, site2, site3])
+    var virtual = suggestion.createVirtualHistoryItems(history)
+    assert.ok(virtual.length > 0, 'virtual location created')
+    assert.ok(virtual[0].get('location') === 'http://www.foo.com')
+    assert.ok(virtual[0].get('title') === 'www.foo.com')
+    assert.ok(virtual[0].get('lastAccessedTime') > 0)
+    history = Immutable.List([site1, site2])
+    virtual = suggestion.createVirtualHistoryItems(history)
+    assert.ok(virtual.length === 0, 'virtual location not created')
+  })
+})
