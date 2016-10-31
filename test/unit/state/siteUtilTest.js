@@ -470,6 +470,28 @@ describe('siteUtil', function () {
   describe('moveSite', function () {
   })
 
+  describe('updateSiteFavicon', function () {
+    it('updates the favicon for all matching entries', function () {
+      const siteDetail1 = Immutable.fromJS({
+        tags: [siteTags.BOOKMARK],
+        location: testUrl1,
+        title: 'bookmarked site'
+      })
+      const siteDetail2 = Immutable.fromJS({
+        tags: [],
+        location: testUrl1,
+        title: 'bookmarked site'
+      })
+      const sites = Immutable.fromJS([siteDetail1, siteDetail2])
+      const processedSites = siteUtil.updateSiteFavicon(sites, testUrl1, 'https://brave.com/favicon.ico')
+      const updatedSiteDetail1 = siteDetail1.set('favicon', 'https://brave.com/favicon.ico')
+      const updatedSiteDetail2 = siteDetail2.set('favicon', 'https://brave.com/favicon.ico')
+      const expectedSites = Immutable.fromJS([updatedSiteDetail1, updatedSiteDetail2])
+
+      assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+    })
+  })
+
   describe('getDetailFromFrame', function () {
     it('returns an Immutable object with all expected properties', function () {
       const frame = Immutable.fromJS({
