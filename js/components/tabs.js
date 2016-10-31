@@ -12,10 +12,6 @@ const windowStore = require('../stores/windowStore')
 const dragTypes = require('../constants/dragTypes')
 const cx = require('../lib/classSet')
 
-const settings = require('../constants/settings')
-const getSetting = require('../settings').getSetting
-const searchProviders = require('../data/searchProviders').providers
-
 const Button = require('./button')
 const Tab = require('./tab')
 const dnd = require('../dnd')
@@ -88,23 +84,7 @@ class Tabs extends ImmutableComponent {
   }
 
   newTab () {
-    const newTabMode = getSetting(settings.NEWTAB_MODE)
-    switch (newTabMode) {
-      case 'homePage':
-        windowActions.newFrame({location: getSetting(settings.HOMEPAGE)})
-        break
-      case 'defaultSearchEngine':
-        const defaultSearchEngine = getSetting(settings.DEFAULT_SEARCH_ENGINE)
-        let defaultSearchEngineSettings = searchProviders.filter(engine => {
-          return engine.name === defaultSearchEngine
-        })
-        windowActions.newFrame({location: defaultSearchEngineSettings[0].base})
-        break
-      case 'newTabPage':
-      default:
-        windowActions.newFrame()
-        break
-    }
+    windowActions.newFrame()
   }
 
   render () {

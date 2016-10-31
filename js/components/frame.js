@@ -33,7 +33,6 @@ const currentWindow = require('../../app/renderer/currentWindow')
 const windowStore = require('../stores/windowStore')
 const appStoreRenderer = require('../stores/appStoreRenderer')
 const siteSettings = require('../state/siteSettings')
-const addSiteDebounced = debounce((frame) => appActions.addSite(siteUtil.getDetailFromFrame(frame)), 1000)
 
 const WEBRTC_DEFAULT = 'default'
 const WEBRTC_DISABLE_NON_PROXY = 'disable_non_proxied_udp'
@@ -78,6 +77,10 @@ class Frame extends ImmutableComponent {
     return isIntermediateAboutPage(getBaseUrl(this.props.location))
   }
 
+  /**
+   * Send data critical for the given about page via IPC.
+   * The page receiving the data typically uses it in component state.
+   */
   updateAboutDetails () {
     let location = getBaseUrl(this.props.location)
     if (location === 'about:preferences') {
@@ -951,8 +954,7 @@ class Frame extends ImmutableComponent {
       const isError = this.props.aboutDetails && this.props.aboutDetails.get('errorCode')
       if (!this.props.isPrivate && this.props.provisionalLocation === this.props.location && (protocol === 'http:' || protocol === 'https:') && !isError && savePage) {
         // Register the site for recent history for navigation bar
-        addSiteDebounced(this.frame)
-        // appActions.addSite(siteUtil.getDetailFromFrame(this.frame))
+        appActions.addSite(siteUtil.getDetailFromFrame(this.frame))
       }
 
       const hack = siteHacks[parsedUrl.hostname]

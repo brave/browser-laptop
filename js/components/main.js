@@ -47,7 +47,6 @@ const WindowCaptionButtons = require('../../app/renderer/components/windowCaptio
 const CheckDefaultBrowserDialog = require('../../app/renderer/components/checkDefaultBrowserDialog')
 
 // Constants
-const config = require('../constants/config')
 const appConfig = require('../constants/appConfig')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
@@ -56,7 +55,7 @@ const dragTypes = require('../constants/dragTypes')
 const keyCodes = require('../../app/common/constants/keyCodes')
 const keyLocations = require('../../app/common/constants/keyLocations')
 const isWindows = process.platform === 'win32'
-const bookmarksToolbarMode = require('../../app/common/constants/bookmarksToolbarMode')
+const {bookmarksToolbarMode} = require('../../app/common/constants/settingsEnums')
 
 // State handling
 const basicAuthState = require('../../app/common/state/basicAuthState')
@@ -321,9 +320,8 @@ class Main extends ImmutableComponent {
         }
       }
       let openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS) === true || options.openInForeground
-      // let defaultUrl = newFrameUrl()
       const frameOpts = {
-        location: url || config.defaultUrl,
+        location: url,
         isPrivate: !!options.isPrivate,
         isPartitioned: !!options.isPartitioned,
         parentFrameKey: options.parentFrameKey

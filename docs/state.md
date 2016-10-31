@@ -161,7 +161,7 @@ AppStore
     // See defaults in js/constants/appConfig.js
     'general.startup-mode': string, // One of: lastTime, homePage, newTabPage
     'general.homepage': string, // URL of the user's homepage
-    'general.newtab-mode': string,  // One of: newTabPage, homePage, defaultSearchEngine
+    'general.newtab-mode-TEMP': string,  // One of: blank, newTabPage, homePage, defaultSearchEngine
     'general.show-home-button': boolean, // true if the home button should be shown
     'general.useragent.value': (undefined|string), // custom user agent value
     'general.downloads.default-save-path': string, // default path for saving files

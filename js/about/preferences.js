@@ -20,7 +20,8 @@ const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const coinbaseCountries = require('../constants/coinbaseCountries')
 const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
-const bookmarksToolbarMode = require('../../app/common/constants/bookmarksToolbarMode')
+const {startsWithOption, newTabMode, bookmarksToolbarMode} = require('../../app/common/constants/settingsEnums')
+
 const WidevineInfo = require('../../app/renderer/components/widevineInfo')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
@@ -646,9 +647,18 @@ class GeneralTab extends ImmutableComponent {
         <SettingItem dataL10nId='startsWith'>
           <select value={getSetting(settings.STARTUP_MODE, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.STARTUP_MODE)} >
-            <option data-l10n-id='startsWithOptionLastTime' value='lastTime' />
-            <option data-l10n-id='startsWithOptionHomePage' value='homePage' />
-            <option data-l10n-id='startsWithOptionNewTabPage' value='newTabPage' />
+            <option data-l10n-id='startsWithOptionLastTime' value={startsWithOption.WINDOWS_TABS_FROM_LAST_TIME} />
+            <option data-l10n-id='startsWithOptionHomePage' value={startsWithOption.HOMEPAGE} />
+            <option data-l10n-id='startsWithOptionNewTabPage' value={startsWithOption.NEW_TAB_PAGE} />
+          </select>
+        </SettingItem>
+        <SettingItem dataL10nId='newTabMode'>
+          <select value={getSetting(settings.NEWTAB_MODE, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.NEWTAB_MODE)} >
+            <option data-l10n-id='newTabBlank' value={newTabMode.BLANK} />
+            <option data-l10n-id='newTabNewTabPage' value={newTabMode.NEW_TAB_PAGE} />
+            <option data-l10n-id='newTabHomePage' value={newTabMode.HOMEPAGE} />
+            <option data-l10n-id='newTabDefaultSearchEngine' value={newTabMode.DEFAULT_SEARCH_ENGINE} />
           </select>
         </SettingItem>
         <SettingItem dataL10nId='myHomepage'>
@@ -674,14 +684,6 @@ class GeneralTab extends ImmutableComponent {
           <SettingCheckbox id='bookmarksBarSwitch' dataL10nId='bookmarkToolbar'
             prefKey={settings.SHOW_BOOKMARKS_TOOLBAR} settings={this.props.settings}
             onChangeSetting={this.props.onChangeSetting} />
-        </SettingItem>
-        <SettingItem dataL10nId='newTabMode'>
-          <select value={getSetting(settings.NEWTAB_MODE, this.props.settings)}
-            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.NEWTAB_MODE)} >
-            <option data-l10n-id='startsWithOptionNewTabPage' value='newTabPage' />
-            <option data-l10n-id='startsWithOptionHomePage' value='homePage' />
-            <option data-l10n-id='startsWithOptionDefaultSearchEngine' value='defaultSearchEngine' />
-          </select>
         </SettingItem>
         <SettingItem dataL10nId='selectedLanguage'>
           <select value={getSetting(settings.LANGUAGE, this.props.settings) || defaultLanguage}

@@ -30,6 +30,7 @@ module.exports = { "providers" :
     },
     {
       "name" : "GitHub",
+      "base" : "https://github.com/search",
       "image" : "https://assets-cdn.github.com/favicon.ico",
       "search" : "https://github.com/search?q={searchTerms}",
       "shortcut" : ":gh"
@@ -44,12 +45,14 @@ module.exports = { "providers" :
     },
     {
       "name" : "Stack Overflow",
+      "base" : "https://stackoverflow.com/search",
       "image" : "https://cdn.sstatic.net/sites/stackoverflow/img/favicon.ico",
       "search" : "https://stackoverflow.com/search?q={searchTerms}",
       "shortcut" : ":s"
     },
     {
       "name" : "Mozilla Developer Network (MDN)",
+      "base": "https://developer.mozilla.org/search",
       "image" : "https://developer.cdn.mozilla.net/static/img/favicon32.png",
       "search" : "https://developer.mozilla.org/search?q={searchTerms}",
       "shortcut" : ":m"
@@ -86,6 +89,7 @@ module.exports = { "providers" :
     },
     {
       "name" : "StartPage",
+      "base" : "https://www.startpage.com",
       "image" : "https://www.startpage.com/graphics/favicon/sp-favicon-16x16.png",
       "search" : "https://www.startpage.com/do/dsearch?query={searchTerms}&cat=web&pl=opensearch",
       "autocomplete": "https://www.startpage.com/cgi-bin/csuggest?query={searchTerms}&limit=10&format=json",

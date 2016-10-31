@@ -11,7 +11,6 @@ const appStoreRenderer = require('../stores/appStoreRenderer')
 const windowActions = require('../actions/windowActions')
 const Main = require('./main')
 const SiteTags = require('../constants/siteTags')
-const config = require('../constants/config')
 const cx = require('../lib/classSet')
 const {getPlatformStyles} = require('../../app/common/lib/platformUtil')
 
@@ -41,9 +40,7 @@ class Window extends React.Component {
   componentWillMount () {
     if (!this.props.initWindowState || this.props.initWindowState.frames.length === 0) {
       if (this.props.frames.length === 0) {
-        windowActions.newFrame({
-          location: config.defaultUrl
-        })
+        windowActions.newFrame()
       } else {
         this.props.frames.forEach((frame) => {
           windowActions.newFrame(frame)

@@ -2,7 +2,7 @@
 const settings = require('../../js/settings')
 const settingsConst = require('../../js/constants/settings')
 const {passwordManagers, extensionIds, displayNames} = require('../../js/constants/passwordManagers')
-const bookmarksToolbarMode = require('../../app/common/constants/bookmarksToolbarMode')
+const {bookmarksToolbarMode} = require('../../app/common/constants/settingsEnums')
 const appConfig = require('../../js/constants/appConfig')
 const Immutable = require('immutable')
 const assert = require('assert')
