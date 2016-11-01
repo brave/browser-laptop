@@ -7,14 +7,14 @@ const React = require('react')
 class Clock extends React.Component {
   constructor () {
     super()
-    this.state = {}
+    this.state = {
+      currentTime: this.currentTime
+    }
   }
   get currentTime () {
     const date = new Date()
     const timeOptions = {hour: '2-digit', minute: '2-digit'}
-    const currentTime = date.toLocaleTimeString([], timeOptions)
-
-    return currentTime
+    return date.toLocaleTimeString([], timeOptions)
   }
   updateClock () {
     this.setState({
@@ -30,4 +30,5 @@ class Clock extends React.Component {
     </div>
   }
 }
+
 module.exports = Clock

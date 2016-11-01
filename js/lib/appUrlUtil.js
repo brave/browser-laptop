@@ -148,3 +148,32 @@ function getHash (input) {
 }
 
 module.exports.navigatableTypes = ['http:', 'https:', 'about:', 'chrome:', 'chrome-extension:', 'file:', 'view-source:', 'ftp:']
+
+/**
+ * Determine the URL to use when creating a new tab
+ */
+module.exports.newFrameUrl = function () {
+  const {getSetting} = require('../settings')
+  const settings = require('../constants/settings')
+  const settingValue = getSetting(settings.NEWTAB_MODE)
+  const {newTabMode} = require('../../app/common/constants/settingsEnums')
+
+  switch (settingValue) {
+    case newTabMode.NEW_TAB_PAGE:
+      return 'about:newtab'
+
+    case newTabMode.HOMEPAGE:
+      return getSetting(settings.HOMEPAGE) || 'about:blank'
+
+    case newTabMode.DEFAULT_SEARCH_ENGINE:
+      const searchProviders = require('../data/searchProviders').providers
+      const defaultSearchEngine = getSetting(settings.DEFAULT_SEARCH_ENGINE)
+      const defaultSearchEngineSettings = searchProviders.filter(engine => {
+        return engine.name === defaultSearchEngine
+      })
+      return defaultSearchEngineSettings[0].base
+
+    default:
+      return 'about:blank'
+  }
+}

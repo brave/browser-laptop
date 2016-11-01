@@ -6,7 +6,7 @@ const appConfig = require('./constants/appConfig')
 const Immutable = require('immutable')
 const settings = require('./constants/settings')
 const {passwordManagers, defaultPasswordManager, extensionIds, displayNames} = require('./constants/passwordManagers')
-const bookmarksToolbarMode = require('../app/common/constants/bookmarksToolbarMode')
+const {bookmarksToolbarMode} = require('../app/common/constants/settingsEnums')
 
 const passwordManagerDefault = (settingKey, settingsCollection) => {
   const onePasswordEnabled = resolveValue(settings.ONE_PASSWORD_ENABLED, settingsCollection) === true

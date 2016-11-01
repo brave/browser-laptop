@@ -99,6 +99,7 @@ module.exports = {
     'general.language': null, // null means to use the OS lang
     'general.startup-mode': 'lastTime',
     'general.homepage': 'https://www.brave.com',
+    'general.newtab-mode-TEMP': 'blank',
     'general.show-home-button': false,
     'general.useragent.value': null, // Set at runtime
     'general.autohide-menu': true,

@@ -45,5 +45,13 @@ module.exports = {
   PDFJSExtensionId: 'jdbefljfgobbmcidnmpjamcbhnbphjnb',
   PocketExtensionId: 'niloccemoadcdkdjlinkgdfekeahmflj',
   widevineComponentId: 'oimompecagnajdejgnnjijobebaeigek',
-  coinbaseOrigin: 'https://buy.coinbase.com'
+  coinbaseOrigin: 'https://buy.coinbase.com',
+  newtab: {
+    fallbackImage: {
+      name: 'Bay Bridge',
+      source: 'img/newtab_stock_image.jpg',
+      author: 'Darrell Sano',
+      link: 'http://dksfoto.smugmug.com'
+    }
+  }
 }

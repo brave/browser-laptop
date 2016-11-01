@@ -18,7 +18,7 @@ const urlParse = require('url').parse
 const currentWindow = require('../../app/renderer/currentWindow')
 const {tabFromFrame} = require('../state/frameStateUtil')
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
-const {aboutUrls, getSourceAboutUrl, isIntermediateAboutPage, navigatableTypes} = require('../lib/appUrlUtil')
+const {aboutUrls, getSourceAboutUrl, isIntermediateAboutPage, navigatableTypes, newFrameUrl} = require('../lib/appUrlUtil')
 const Serializer = require('../dispatcher/serializer')
 
 let windowState = Immutable.fromJS({
@@ -163,8 +163,6 @@ const addToHistory = (frameProps) => {
 }
 
 const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
-  const frames = windowState.get('frames')
-
   if (frameOpts === undefined) {
     frameOpts = {}
   }
@@ -173,10 +171,13 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
   if (openInForeground === undefined) {
     openInForeground = true
   }
-  frameOpts.location = frameOpts.location || config.defaultUrl
+
+  // evaluate the location
+  frameOpts.location = frameOpts.location || newFrameUrl()
   if (frameOpts.location && UrlUtil.isURL(frameOpts.location)) {
     frameOpts.location = UrlUtil.getUrlFromInput(frameOpts.location)
   } else {
+    // location is a search
     const defaultURL = windowStore.getState().getIn(['searchDetail', 'searchURL'])
     if (defaultURL) {
       frameOpts.location = defaultURL
@@ -202,6 +203,7 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
 
   // Find the closest index to the current frame's index which has
   // a different ancestor frame key.
+  const frames = windowState.get('frames')
   if (insertionIndex === undefined) {
     insertionIndex = FrameStateUtil.findIndexForFrameKey(frames, frameOpts.parentFrameKey)
     if (insertionIndex === -1) {

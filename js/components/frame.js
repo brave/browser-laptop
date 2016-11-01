@@ -77,6 +77,10 @@ class Frame extends ImmutableComponent {
     return isIntermediateAboutPage(getBaseUrl(this.props.location))
   }
 
+  /**
+   * Send data critical for the given about page via IPC.
+   * The page receiving the data typically uses it in component state.
+   */
   updateAboutDetails () {
     let location = getBaseUrl(this.props.location)
     if (location === 'about:preferences') {
@@ -120,6 +124,13 @@ class Frame extends ImmutableComponent {
       }
     } else if (location === 'about:flash') {
       this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.braveryDefaults)
+    } else if (location === 'about:newtab') {
+      this.webview.send(messages.NEWTAB_DATA_UPDATED, {
+        trackedBlockersCount: this.props.trackedBlockersCount,
+        adblockCount: this.props.adblockCount,
+        httpsUpgradedCount: this.props.httpsUpgradedCount,
+        newTabDetail: this.props.newTabDetail.toJS()
+      })
     } else if (location === 'about:autofill') {
       const defaultSession = global.require('electron').remote.session.defaultSession
       if (this.props.autofillAddresses) {
