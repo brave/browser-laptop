@@ -25,7 +25,7 @@ const dndData = require('./dndData')
 const appStoreRenderer = require('./stores/appStoreRenderer')
 const ipc = global.require('electron').ipcRenderer
 const locale = require('../js/l10n')
-const {getSetting, getActivePasswordManager} = require('./settings')
+const {getSetting} = require('./settings')
 const settings = require('./constants/settings')
 const textUtils = require('./lib/text')
 const {isIntermediateAboutPage, isUrl} = require('./lib/appUrlUtil')
@@ -1092,74 +1092,86 @@ function mainTemplateInit (nodeProps, frame) {
     }
   })
 
-  const passwordManager = getActivePasswordManager()
-  if (passwordManager.get('extensionId')) {
-    template.push(
-      CommonMenu.separatorMenuItem,
-      {
-        label: passwordManager.get('displayName'),
-        click: (item, focusedWindow) => {
-          if (focusedWindow) {
-            ipc.send('chrome-browser-action-clicked', passwordManager.get('extensionId'), frame.get('tabId'), passwordManager.get('name'), nodeProps)
-          }
-        }
-      })
-  }
-
   const extensionContextMenus =
     extensionState.getContextMenusProperties(appStore.state)
-  if (extensionContextMenus.length) {
+  if (extensionContextMenus !== undefined &&
+    extensionContextMenus.length) {
     template.push(CommonMenu.separatorMenuItem)
+    let templateMap = {}
     extensionContextMenus.forEach((extensionContextMenu) => {
       let info = {}
       let contextsPassed = false
-      extensionContextMenu.properties.contexts.forEach((context) => {
-        if (isTextSelected && (context === 'selection' || context === 'all')) {
-          info['selectionText'] = nodeProps.selectionText
-          contextsPassed = true
-        } else if (isLink && (context === 'link' || context === 'all')) {
-          info['linkUrl'] = nodeProps.linkURL
-          contextsPassed = true
-        } else if (isImage && (context === 'image' || context === 'all')) {
-          info['mediaType'] = 'image'
-          contextsPassed = true
-        } else if (isInputField && (context === 'editable' || context === 'all')) {
-          info['editable'] = true
-          contextsPassed = true
-        } else if (nodeProps.pageURL && (context === 'page' || context === 'all')) {
-          info['pageUrl'] = nodeProps.pageURL
-          contextsPassed = true
-        } else if (isVideo && (context === 'video' || context === 'all')) {
-          info['mediaType'] = 'video'
-          contextsPassed = true
-        } else if (isAudio && (context === 'audio' || context === 'all')) {
-          info['mediaType'] = 'audio'
-          contextsPassed = true
-        } else if (nodeProps.frameURL && (context === 'frame' || context === 'all')) {
-          info['frameURL'] = nodeProps.frameURL
-          contextsPassed = true
-        }
-      })
+      if (extensionContextMenu.properties.contexts !== undefined &&
+        extensionContextMenu.properties.contexts.length) {
+        extensionContextMenu.properties.contexts.forEach((context) => {
+          if (isTextSelected && (context === 'selection' || context === 'all')) {
+            info['selectionText'] = nodeProps.selectionText
+            contextsPassed = true
+          } else if (isLink && (context === 'link' || context === 'all')) {
+            info['linkUrl'] = nodeProps.linkURL
+            contextsPassed = true
+          } else if (isImage && (context === 'image' || context === 'all')) {
+            info['mediaType'] = 'image'
+            contextsPassed = true
+          } else if (isInputField && (context === 'editable' || context === 'all')) {
+            info['editable'] = true
+            contextsPassed = true
+          } else if (nodeProps.pageURL && (context === 'page' || context === 'all')) {
+            info['pageUrl'] = nodeProps.pageURL
+            contextsPassed = true
+          } else if (isVideo && (context === 'video' || context === 'all')) {
+            info['mediaType'] = 'video'
+            contextsPassed = true
+          } else if (isAudio && (context === 'audio' || context === 'all')) {
+            info['mediaType'] = 'audio'
+            contextsPassed = true
+          } else if (nodeProps.frameURL && (context === 'frame' || context === 'all')) {
+            info['frameURL'] = nodeProps.frameURL
+            contextsPassed = true
+          }
+        })
+      }
       if (nodeProps.srcURL) {
         info['srcURL'] = nodeProps.srcURL
       }
       // TODO (Anthony): Browser Action context menu
-      if (extensionContextMenu.properties.contexts.length === 1 &&
+      if (extensionContextMenu.properties.contexts !== undefined &&
+        extensionContextMenu.properties.contexts.length === 1 &&
         extensionContextMenu.properties.contexts[0] === 'browser_action') {
         contextsPassed = false
       }
       if (contextsPassed) {
         info['menuItemId'] = extensionContextMenu.menuItemId
-        template.push(
-          {
-            label: extensionContextMenu.properties.title,
-            click: (item, focusedWindow) => {
-              if (focusedWindow) {
-                extensionActions.contextMenuClicked(
-                  extensionContextMenu.extensionId, frame.get('tabId'), info)
+        if (extensionContextMenu.properties.parentId) {
+          if (templateMap[extensionContextMenu.properties.parentId].submenu === undefined) {
+            templateMap[extensionContextMenu.properties.parentId].submenu = []
+          }
+          templateMap[extensionContextMenu.properties.parentId].submenu.push(
+            {
+              label: extensionContextMenu.properties.title,
+              click: (item, focusedWindow) => {
+                if (focusedWindow) {
+                  extensionActions.contextMenuClicked(
+                    extensionContextMenu.extensionId, frame.get('tabId'), info)
+                }
               }
-            }
-          })
+            })
+          const submenuLength = templateMap[extensionContextMenu.properties.parentId].submenu.length
+          templateMap[extensionContextMenu.menuItemId] =
+            templateMap[extensionContextMenu.properties.parentId].submenu[submenuLength - 1]
+        } else {
+          template.push(
+            {
+              label: extensionContextMenu.properties.title,
+              click: (item, focusedWindow) => {
+                if (focusedWindow) {
+                  extensionActions.contextMenuClicked(
+                    extensionContextMenu.extensionId, frame.get('tabId'), info)
+                }
+              }
+            })
+          templateMap[extensionContextMenu.menuItemId] = template[template.length - 1]
+        }
       }
     })
   }
