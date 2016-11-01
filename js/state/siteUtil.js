@@ -320,6 +320,36 @@ module.exports.getDetailFromFrame = function (frame, tag) {
 }
 
 /**
+ * Update the favicon URL for all entries in the sites list
+ * which match a given location. Currently, there should only be
+ * one match, but this will handle multiple.
+ *
+ * @param sites The application state's Immutable sites list
+ * @param location URL for the entry needing an update
+ * @param favicon favicon URL
+ */
+module.exports.updateSiteFavicon = function (sites, location, favicon) {
+  const matchingIndices = []
+
+  sites.filter((site, index) => {
+    if (site.get('location') === location) {
+      matchingIndices.push(index)
+      return true
+    }
+    return false
+  })
+
+  if (!matchingIndices.length) return sites
+
+  let updatedSites = sites
+  matchingIndices.forEach((index) => {
+    updatedSites = updatedSites.setIn([index, 'favicon'], favicon)
+  })
+
+  return updatedSites
+}
+
+/**
  * Converts a siteDetail to frameOpts format
  * @param {Object} siteDetail - A site detail as per app state
  * @return {Object} A frameOpts plain JS object, not ImmutableJS

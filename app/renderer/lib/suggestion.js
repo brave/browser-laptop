@@ -4,6 +4,8 @@
 
 const urlParser = require('url')
 const appConfig = require('../../../js/constants/appConfig')
+const _ = require('underscore')
+const Immutable = require('immutable')
 
 const sigmoid = (t) => {
   return 1 / (1 + Math.pow(Math.E, -t))
@@ -111,4 +113,65 @@ module.exports.normalizeLocation = (location) => {
   location = location.replace(/^http:\/\//, '')
   location = location.replace(/^https:\/\//, '')
   return location
+}
+
+/*
+ * return a site representing the simple location for a
+ * set of related sites without a history item for the
+ * simple location.
+ *
+ * This is used to show a history suggestion for something
+ * like www.google.com if it has not been visited but
+ * there are two or more locations with that prefix containing
+ * path info or parameters
+ *
+ * @param {Array[Object]} sites - array of similar sites
+ */
+var virtualSite = (sites) => {
+  // array of sites without paths or query params
+  var simple = sites.filter((parsed) => {
+    return (parsed.hash === null && parsed.search === null && parsed.query === null && parsed.pathname === '/')
+  })
+  // if there are no simple locations then we will build and return one
+  if (simple.length === 0) {
+    // we need to create a virtual history item
+    return Immutable.Map({
+      location: sites[0].protocol + '//' + sites[0].host,
+      count: 0,
+      title: sites[0].host,
+      lastAccessedTime: (new Date()).getTime()
+    })
+  } else {
+    return
+  }
+}
+
+/*
+ * Create an array of simple locations from history
+ * The simple locations will be the root domain for a location
+ * without parameters or path
+ *
+ * @param {ImmutableList[ImmutableMap]} - history
+ */
+module.exports.createVirtualHistoryItems = (historySites) => {
+  // parse each history item
+  var parsedHistorySites = historySites.map((site) => {
+    return urlParser.parse(site.get('location'))
+  }).toArray()
+  // group them by host
+  var grouped = _.groupBy(parsedHistorySites, (parsedSite) => {
+    return parsedSite.host || 'unknown'
+  })
+  // find groups with more than 2 of the same host
+  var multiGroupKeys = _.filter(_.keys(grouped), (k) => {
+    return grouped[k].length > 2
+  })
+  // potentially create virtual history items
+  var virtualHistorySites = _.map(multiGroupKeys, (location) => {
+    return virtualSite(grouped[location])
+  })
+  virtualHistorySites = _.filter(virtualHistorySites, (site) => {
+    return !!site
+  })
+  return virtualHistorySites
 }

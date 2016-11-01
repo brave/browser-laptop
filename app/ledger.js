@@ -105,8 +105,6 @@ let addFundsMessage
 let reconciliationMessage
 let notificationPaymentDoneMessage
 let notificationTryPaymentsMessage
-let suppressNotifications = false
-let reconciliationNotificationShown = false
 let notificationTimeout = null
 
 // TODO(bridiver) - create a better way to get setting changes
@@ -323,9 +321,9 @@ if (ipc) {
     if (message === addFundsMessage) {
       appActions.hideMessageBox(message)
       if (buttonIndex === 0) {
-        // Don't show notifications for the next 6 hours.
-        suppressNotifications = true
-        setTimeout(() => { suppressNotifications = false }, 6 * msecs.hour)
+        // "Later" -- wait 6 hours to re-show "reconciliation soon" notification.
+        const nextTime = ledgerInfo.reconcileStamp + 6 * msecs.hour
+        appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_RECONCILE_SOON_TIMESTAMP, nextTime)
       } else {
         // Open payments panel
         if (win) {
@@ -339,9 +337,6 @@ if (ipc) {
         win.webContents.send(messages.SHORTCUT_NEW_FRAME,
           'about:preferences#payments', { singleFrame: true })
       }
-      // If > 24 hours has passed, it might be time to show the reconciliation
-      // message again
-      setTimeout(() => { reconciliationNotificationShown = false }, 1 * msecs.day)
     } else if (message === notificationPaymentDoneMessage) {
       appActions.hideMessageBox(message)
     } else if (message === notificationTryPaymentsMessage) {
@@ -889,6 +884,7 @@ var ledgerInfo = {
   creating: false,
   created: false,
 
+  reconcileFrequency: undefined,
   reconcileStamp: undefined,
 
   transactions:
@@ -1194,6 +1190,7 @@ var getStateInfo = (state) => {
   ledgerInfo.created = !!state.properties.wallet
   ledgerInfo.creating = !ledgerInfo.created
 
+  ledgerInfo.reconcileFrequency = state.properties.days
   ledgerInfo.reconcileStamp = state.reconcileStamp
 
   if (info) {
@@ -1442,8 +1439,7 @@ var pathName = (name) => {
 
 const showNotifications = () => {
   if (getSetting(settings.PAYMENTS_ENABLED) &&
-      getSetting(settings.PAYMENTS_NOTIFICATIONS) &&
-      !suppressNotifications) {
+      getSetting(settings.PAYMENTS_NOTIFICATIONS)) {
     showEnabledNotifications()
   } else if (!getSetting(settings.PAYMENTS_ENABLED)) {
     showDisabledNotifications()
@@ -1500,22 +1496,33 @@ const showEnabledNotifications = () => {
           persist: false
         }
       })
-    } else if (!reconciliationNotificationShown) {
-      reconciliationMessage = reconciliationMessage || locale.translation('reconciliationNotification')
-      appActions.showMessageBox({
-        greeting: locale.translation('updateHello'),
-        message: reconciliationMessage,
-        buttons: [
-          {text: locale.translation('reviewSites'), className: 'primary'}
-        ],
-        options: {
-          style: 'greetingStyle',
-          persist: false
-        }
-      })
-      reconciliationNotificationShown = true
+    } else if (shouldShowNotificationReviewPublishers()) {
+      showNotificationReviewPublishers()
     }
   }
+}
+
+const shouldShowNotificationReviewPublishers = () => {
+  const nextTime = getSetting(settings.PAYMENTS_NOTIFICATION_RECONCILE_SOON_TIMESTAMP)
+  return !nextTime || (underscore.now() > nextTime)
+}
+
+const showNotificationReviewPublishers = () => {
+  const nextTime = ledgerInfo.reconcileStamp + (ledgerInfo.reconcileFrequency - 1) * msecs.day
+  appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_RECONCILE_SOON_TIMESTAMP, nextTime)
+
+  reconciliationMessage = reconciliationMessage || locale.translation('reconciliationNotification')
+  appActions.showMessageBox({
+    greeting: locale.translation('updateHello'),
+    message: reconciliationMessage,
+    buttons: [
+      {text: locale.translation('reviewSites'), className: 'primary'}
+    ],
+    options: {
+      style: 'greetingStyle',
+      persist: false
+    }
+  })
 }
 
 // Called from observeTransactions() when we see a new payment (transaction).

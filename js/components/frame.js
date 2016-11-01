@@ -996,7 +996,7 @@ class Frame extends ImmutableComponent {
 
     this.webview.addEventListener('did-navigate', (e) => {
       if (this.props.findbarShown) {
-        windowActions.setFindbarShown(this.frame, false)
+        this.props.onFindHide()
       }
 
       for (let message in this.notificationCallbacks) {

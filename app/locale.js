@@ -121,6 +121,7 @@ var rendererIdentifiers = function () {
     'clearCache',
     'clearHistory',
     'clearSiteData',
+    'clearBrowsingData',
     'recentlyClosed',
     'recentlyVisited',
     'bookmarks',

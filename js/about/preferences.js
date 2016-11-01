@@ -27,8 +27,9 @@ const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
 const Button = require('../components/button')
 const searchProviders = require('../data/searchProviders')
-const moment = require('moment')
 const punycode = require('punycode')
+const moment = require('moment')
+moment.locale(navigator.language)
 
 const adblock = appConfig.resourceNames.ADBLOCK
 const cookieblock = appConfig.resourceNames.COOKIEBLOCK
@@ -1527,7 +1528,7 @@ class SecurityTab extends ImmutableComponent {
         <Button l10nId='manageAutofillData' className='primaryButton manageAutofillDataButton'
           onClick={aboutActions.newFrame.bind(null, {
             location: 'about:autofill'
-          }, true)} />
+          }, true)} disabled={!getSetting(settings.AUTOFILL_ENABLED, this.props.settings)} />
       </SettingsList>
       <div className='sectionTitle' data-l10n-id='doNotTrackTitle' />
       <SettingsList>

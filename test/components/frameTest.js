@@ -33,9 +33,9 @@ describe('findbar', function () {
       .showFindbar()
       .waitForElementFocus(findBarInput)
       .setValue(findBarInput, 'test')
-       .waitUntil(function () {
-         return this.getValue(findBarInput).then((val) => val === 'test')
-       })
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then((val) => val === 'test')
+      })
       .waitForVisible(findBarMatches)
     let match = yield this.app.client.getText(findBarMatches)
     assert.equal(match, '1 of 2')
@@ -58,9 +58,9 @@ describe('findbar', function () {
       .showFindbar()
       .waitForElementFocus(findBarInput)
       .setValue(findBarInput, 'test')
-        .waitUntil(function () {
-          return this.getValue(findBarInput).then((val) => val === 'test')
-        })
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then((val) => val === 'test')
+      })
 
     // Clicking next goes to the next match
     yield this.app.client
@@ -74,9 +74,9 @@ describe('findbar', function () {
       .showFindbar()
       .waitForElementFocus(findBarInput)
       .setValue(findBarInput, 'test-not-found')
-       .waitUntil(function () {
-         return this.getValue(findBarInput).then((val) => val === 'test-not-found')
-       })
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then((val) => val === 'test-not-found')
+      })
       .waitForVisible(findBarMatches)
     let match = yield this.app.client.getText(findBarMatches)
     assert.equal(match, '0 matches')
@@ -105,14 +105,33 @@ describe('findbar', function () {
       .waitForElementFocus(urlInput)
   })
 
+  it('findbar text should be replaced and never appended', function * () {
+    yield this.app.client
+      .showFindbar()
+      .waitForElementFocus(findBarInput)
+      .setValue(findBarInput, 'test')
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then((val) => val === 'test')
+      })
+      .showFindbar(false)
+      .waitForVisible(findBarInput, 500, true)
+      .showFindbar()
+      .waitForVisible(findBarInput)
+      .waitForElementFocus(findBarInput)
+      .keys('x')
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then((val) => val === 'x')
+      })
+  })
+
   it('should remember the position across findbar showing', function * () {
     yield this.app.client
       .showFindbar()
       .waitForElementFocus(findBarInput)
       .setValue(findBarInput, 'test')
-       .waitUntil(function () {
-         return this.getValue(findBarInput).then((val) => val === 'test')
-       })
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then((val) => val === 'test')
+      })
       .waitForVisible(findBarMatches)
     let match = yield this.app.client.getText(findBarMatches)
     assert.equal(match, '1 of 2')
@@ -126,6 +145,39 @@ describe('findbar', function () {
       .waitForElementFocus(findBarInput)
     match = yield this.app.client.getText(findBarMatches)
     assert.equal(match, '2 of 2')
+  })
+
+  it('findbar input remembered but no active ordinals after navigation until RETURN key', function * () {
+    const url2 = Brave.server.url('find_in_page2.html')
+    yield this.app.client
+      .showFindbar()
+      .waitForElementFocus(findBarInput)
+      .setValue(findBarInput, 'Brad')
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then((val) => val === 'Brad')
+      })
+    let match = yield this.app.client.getText(findBarMatches)
+    assert.equal(match, '0 matches')
+
+    yield this.app.client
+      .waitForVisible(findBarMatches)
+      .tabByUrl(Brave.newTabUrl)
+      .url(url2)
+      .waitForUrl(url2)
+      .windowParentByUrl(url2)
+      .waitUntil(function () {
+        return this.getAttribute('webview[data-frame-key="1"]', 'src').then((src) => src === url2)
+      })
+      // No findbar
+      .waitForVisible(findBarInput, 500, true)
+      .showFindbar()
+      .waitForElementFocus(findBarInput)
+      // Matches shouldn't be shown until enter is pressed
+      .waitForVisible(findBarMatches, 500, true)
+      .keys(Brave.keys.RETURN)
+      .waitForVisible(findBarMatches)
+    match = yield this.app.client.getText(findBarMatches)
+    assert.equal(match, '1 of 1')
   })
 
   it('remembers findbar input when switching frames', function * () {

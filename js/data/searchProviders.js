@@ -79,7 +79,8 @@ module.exports = { "providers" :
     {
       "name" : "StartPage",
       "image" : "https://www.startpage.com/graphics/favicon/sp-favicon-16x16.png",
-      "search" : "https://startpage.com/do/dsearch?query={searchTerms}&cat=web&pl=opensearch",
+      "search" : "https://www.startpage.com/do/dsearch?query={searchTerms}&cat=web&pl=opensearch",
+      "autocomplete": "https://www.startpage.com/cgi-bin/csuggest?query={searchTerms}&limit=10&format=json",
       "shortcut" : ":sp"
     }
   ]
