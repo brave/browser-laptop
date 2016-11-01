@@ -159,11 +159,8 @@ module.exports.newFrameUrl = function () {
   const {newTabMode} = require('../../app/common/constants/settingsEnums')
 
   switch (settingValue) {
-    case newTabMode.NEW_TAB_PAGE:
-      return 'about:newtab'
-
     case newTabMode.HOMEPAGE:
-      return getSetting(settings.HOMEPAGE) || 'about:blank'
+      return getSetting(settings.HOMEPAGE) || 'about:newtab'
 
     case newTabMode.DEFAULT_SEARCH_ENGINE:
       const searchProviders = require('../data/searchProviders').providers
@@ -173,7 +170,8 @@ module.exports.newFrameUrl = function () {
       })
       return defaultSearchEngineSettings[0].base
 
+    case newTabMode.NEW_TAB_PAGE:
     default:
-      return 'about:blank'
+      return 'about:newtab'
   }
 }
