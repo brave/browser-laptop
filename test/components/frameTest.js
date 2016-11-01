@@ -124,6 +124,22 @@ describe('findbar', function () {
       })
   })
 
+  it('focus twice without hide selects text', function * () {
+    yield this.app.client
+      .showFindbar()
+      .waitForElementFocus(findBarInput)
+      .setValue(findBarInput, 'test')
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then((val) => val === 'test')
+      })
+      .showFindbar()
+      .waitForElementFocus(findBarInput)
+      .keys('x')
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then((val) => val === 'x')
+      })
+  })
+
   it('should remember the position across findbar showing', function * () {
     yield this.app.client
       .showFindbar()

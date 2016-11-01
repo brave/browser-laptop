@@ -79,6 +79,9 @@ class FindBar extends ImmutableComponent {
   componentDidUpdate (prevProps) {
     if (this.props.selected) {
       this.focus()
+      // Findbar might already be focused, so make sure select happens even if no
+      // onFocus event happens.
+      this.select()
       windowActions.setFindbarSelected(false)
     }
     if (!this.props.findDetail || !prevProps.findDetail ||
