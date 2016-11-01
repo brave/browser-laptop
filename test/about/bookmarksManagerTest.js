@@ -188,5 +188,16 @@ describe('about:bookmarks', function () {
         .keys(Brave.keys.SHIFT)
         .click('table.sortableTable td.title[data-sort="Brave"]')
     })
+    it('deselects everything if something other than a row is clicked', function * () {
+      yield this.app.client
+        .tabByUrl(aboutBookmarksUrl)
+        .loadUrl(aboutBookmarksUrl)
+        // Click one bookmark, to select it
+        .click('table.sortableTable td.title[data-sort="Brave"]')
+        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
+        // Click the header; this should dismiss and release selection
+        .click('table.sortableTable th')
+        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]', 5000, true)
+    })
   })
 })
