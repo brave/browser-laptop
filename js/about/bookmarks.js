@@ -62,6 +62,11 @@ class BookmarkFolderItem extends React.Component {
         true)
     }
   }
+  clearSelection () {
+    if (this.props.onClearSelection) {
+      this.props.onClearSelection()
+    }
+  }
   // NOTE: both folders AND bookmarks can be dropped here
   onDrop (e) {
     this.setState({
@@ -74,10 +79,12 @@ class BookmarkFolderItem extends React.Component {
         bookmarkData.forEach((bookmark) => {
           this.moveBookmark(e, bookmark)
         })
+        this.clearSelection()
         return
       }
 
       this.moveBookmark(e, bookmarkData)
+      this.clearSelection()
     }
   }
   render () {
@@ -137,6 +144,7 @@ class BookmarkFolderList extends ImmutableComponent {
       {
         this.props.isRoot
         ? <BookmarkFolderItem
+          onClearSelection={this.props.onClearSelection}
           search={this.props.search}
           selected={!this.props.search && this.props.selectedFolderId === 0}
           dataL10nId='bookmarksToolbar'
@@ -151,7 +159,9 @@ class BookmarkFolderList extends ImmutableComponent {
         this.props.bookmarkFolders.map((bookmarkFolder) =>
           this.props.isRoot && bookmarkFolder.get('parentFolderId') === -1
           ? null
-          : <BookmarkFolderItem bookmarkFolder={bookmarkFolder}
+          : <BookmarkFolderItem
+            onClearSelection={this.props.onClearSelection}
+            bookmarkFolder={bookmarkFolder}
             allBookmarkFolders={this.props.allBookmarkFolders}
             search={this.props.search}
             selected={!this.props.search && this.props.selectedFolderId === bookmarkFolder.get('folderId')}
@@ -161,6 +171,7 @@ class BookmarkFolderList extends ImmutableComponent {
       {
         this.props.isRoot
         ? <BookmarkFolderItem
+          onClearSelection={this.props.onClearSelection}
           search={this.props.search}
           selected={!this.props.search && this.props.selectedFolderId === -1}
           dataL10nId='otherBookmarks'
@@ -293,11 +304,16 @@ class BookmarksList extends ImmutableComponent {
         bookmarkData.forEach((bookmark) => {
           this.moveBookmark(e, bookmark, siteDetail)
         })
+        this.clearSelection()
         return
       }
 
       this.moveBookmark(e, bookmarkData, siteDetail)
+      this.clearSelection()
     }
+  }
+  clearSelection () {
+    this.refs.bookmarkTable.clearSelection()
   }
   render () {
     const props = !this.props.draggable ? {
@@ -312,6 +328,7 @@ class BookmarksList extends ImmutableComponent {
     }
     return <div>
       <SortableTable
+        ref='bookmarkTable'
         headings={[
           <BookmarkTitleHeader heading='Title' selectedFolderId={this.props.selectedFolderId} />,
           'Last Visited'
@@ -348,6 +365,8 @@ class AboutBookmarks extends React.Component {
     this.onClearSearchText = this.onClearSearchText.bind(this)
     this.importBrowserData = this.importBrowserData.bind(this)
     this.addBookmarkFolder = this.addBookmarkFolder.bind(this)
+    this.onClick = this.onClick.bind(this)
+    this.clearSelection = this.clearSelection.bind(this)
     this.state = {
       bookmarks: Immutable.List(),
       bookmarkFolders: Immutable.Map(),
@@ -377,6 +396,19 @@ class AboutBookmarks extends React.Component {
       search: ''
     })
   }
+  onClick (e) {
+    // Determine if click was on sortableTable
+    let targetElement = e.target
+    while (targetElement) {
+      if (targetElement.tagName === 'TBODY') {
+        return
+      }
+      targetElement = targetElement.parentNode
+    }
+
+    // Click was not a child element of sortableTable; clear selection
+    this.clearSelection()
+  }
   searchedBookmarks (searchTerm, bookmarks) {
     return bookmarks.filter((bookmark) => {
       const title = bookmark.get('customTitle') + bookmark.get('title') + bookmark.get('location')
@@ -395,6 +427,9 @@ class AboutBookmarks extends React.Component {
       tags: [siteTags.BOOKMARK_FOLDER]
     })
     aboutActions.showAddBookmarkFolder(newFolder)
+  }
+  clearSelection () {
+    this.refs.bookmarkList.clearSelection()
   }
   componentDidMount () {
     this.refs.bookmarkSearch.focus()
@@ -415,14 +450,16 @@ class AboutBookmarks extends React.Component {
         </div>
       </div>
 
-      <div className='siteDetailsPageContent'>
+      <div className='siteDetailsPageContent' onClick={this.onClick}>
         <div className='folderView'>
           <div className='columnHeader'>
             <span data-l10n-id='folders' />
             <span data-l10n-id='importBrowserData' className='fa fa-download clearBrowsingDataButton' onClick={this.importBrowserData} />
             <span data-l10n-id='addBookmarkFolder' className='addBookmarkFolder' onClick={this.addBookmarkFolder} />
           </div>
-          <BookmarkFolderList onChangeSelectedFolder={this.onChangeSelectedFolder}
+          <BookmarkFolderList
+            onClearSelection={this.clearSelection}
+            onChangeSelectedFolder={this.onChangeSelectedFolder}
             bookmarkFolders={this.state.bookmarkFolders.filter((bookmark) => bookmark.get('parentFolderId') === -1)}
             allBookmarkFolders={this.state.bookmarkFolders}
             isRoot
@@ -431,6 +468,7 @@ class AboutBookmarks extends React.Component {
         </div>
         <div className='organizeView'>
           <BookmarksList
+            ref='bookmarkList'
             bookmarks={
               this.state.search
               ? this.searchedBookmarks(this.state.search, this.state.bookmarks)
