@@ -67,7 +67,7 @@ module.exports.aboutUrls = new Immutable.Map({
   'about:flash': module.exports.getAppUrl('about-flash.html'),
   'about:error': module.exports.getAppUrl('about-error.html'),
   'about:autofill': module.exports.getAppUrl('about-autofill.html'),
-  'about:style': module.exports.getAppUrl('about-style.html')
+  'about:styles': module.exports.getAppUrl('about-styles.html')
 })
 
 module.exports.isIntermediateAboutPage = (location) =>
