@@ -655,7 +655,6 @@ class GeneralTab extends ImmutableComponent {
         <SettingItem dataL10nId='newTabMode'>
           <select value={getSetting(settings.NEWTAB_MODE, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.NEWTAB_MODE)} >
-            <option data-l10n-id='newTabBlank' value={newTabMode.BLANK} />
             <option data-l10n-id='newTabNewTabPage' value={newTabMode.NEW_TAB_PAGE} />
             <option data-l10n-id='newTabHomePage' value={newTabMode.HOMEPAGE} />
             <option data-l10n-id='newTabDefaultSearchEngine' value={newTabMode.DEFAULT_SEARCH_ENGINE} />

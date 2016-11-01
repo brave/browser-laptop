@@ -9,7 +9,6 @@ const startsWithOption = {
 }
 
 const newTabMode = {
-  BLANK: 'blank',
   NEW_TAB_PAGE: 'newTabPage',
   HOMEPAGE: 'homePage',
   DEFAULT_SEARCH_ENGINE: 'defaultSearchEngine'
