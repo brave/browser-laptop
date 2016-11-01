@@ -45,8 +45,8 @@ switch (getBaseUrl(getSourceAboutUrl(window.location.href))) {
   case 'about:history':
     element = require('./history')
     break
-  case 'about:style':
-    element = require('./style')
+  case 'about:styles':
+    element = require('./styles')
     break
   case 'about:autofill':
     element = require('./autofill')
