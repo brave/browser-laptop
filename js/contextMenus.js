@@ -119,6 +119,10 @@ function urlBarTemplateInit (searchDetail, activeFrame, e) {
   return items
 }
 
+function findBarTemplateInit () {
+  return getEditableItems(window.getSelection().toString())
+}
+
 function tabsToolbarTemplateInit (activeFrame, closestDestinationDetail, isParent) {
   const menu = [
     CommonMenu.bookmarksManagerMenuItem(),
@@ -1254,6 +1258,13 @@ function onUrlBarContextMenu (searchDetail, activeFrame, e) {
   inputMenu.destroy()
 }
 
+function onFindBarContextMenu (e) {
+  e.stopPropagation()
+  const findBarMenu = Menu.buildFromTemplate(findBarTemplateInit(e))
+  findBarMenu.popup(currentWindow)
+  findBarMenu.destroy()
+}
+
 function onSiteDetailContextMenu (siteDetail, activeFrame, e) {
   if (e) {
     e.stopPropagation()
@@ -1429,6 +1440,7 @@ module.exports = {
   onDownloadsToolbarContextMenu,
   onTabPageContextMenu,
   onUrlBarContextMenu,
+  onFindBarContextMenu,
   onSiteDetailContextMenu,
   onShowBookmarkFolderMenu,
   onShowUsernameMenu,

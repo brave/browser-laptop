@@ -10,6 +10,7 @@ const Button = require('./button')
 const SwitchControl = require('../components/switchControl')
 const windowActions = require('../actions/windowActions')
 const windowStore = require('../stores/windowStore')
+const contextMenus = require('../contextMenus')
 const {getTextColorForBackground} = require('../lib/color')
 
 class FindBar extends ImmutableComponent {
@@ -19,7 +20,8 @@ class FindBar extends ImmutableComponent {
     this.onInputFocus = this.onInputFocus.bind(this)
     this.onClear = this.onClear.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
-    this.onChange = this.onChange.bind(this)
+    this.onContextMenu = this.onContextMenu.bind(this)
+    this.onKeyUp = this.onKeyUp.bind(this)
     this.onFindPrev = this.onFindPrev.bind(this)
     this.onFindNext = this.onFindNext.bind(this)
     this.onCaseSensitivityChange = this.onCaseSensitivityChange.bind(this)
@@ -30,7 +32,7 @@ class FindBar extends ImmutableComponent {
     return windowStore.getFrame(this.props.frameKey)
   }
 
-  onChange (e) {
+  onKeyUp (e) {
     windowActions.setFindDetail(this.frame, Immutable.fromJS({
       searchString: e.target.value,
       caseSensitivity: this.isCaseSensitive
@@ -54,6 +56,15 @@ class FindBar extends ImmutableComponent {
 
   onFindPrev () {
     this.props.onFind(this.searchString, this.isCaseSensitive, false, this.props.findDetail.get('internalFindStatePresent'))
+  }
+
+  onContextMenu (e) {
+    // Without this timeout selection is not shown when right clicking in
+    // a word so the word replacement is kind of a surprise.  This is because
+    // our context menus are modal at the moment.  If we fix that we can
+    // remove this timeout.
+    setTimeout(() =>
+      contextMenus.onFindBarContextMenu(e), 10)
   }
 
   /**
@@ -110,7 +121,7 @@ class FindBar extends ImmutableComponent {
   }
 
   onInputFocus () {
-    this.searchInput.select()
+    this.select()
   }
 
   onBlur (e) {
@@ -202,11 +213,12 @@ class FindBar extends ImmutableComponent {
           <span className='searchStringContainerIcon fa fa-search' />
           <input type='text'
             spellCheck='false'
+            onContextMenu={this.onContextMenu}
             ref={(node) => { this.searchInput = node }}
             value={inputValue}
             onFocus={this.onInputFocus}
             onKeyDown={this.onKeyDown}
-            onKeyUp={this.onChange} />
+            onKeyUp={this.onKeyUp} />
           <span className='searchStringContainerIcon fa fa-times findClear'
             onClick={this.onClear} />
         </div>
