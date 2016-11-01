@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+@import "../animations.less";
 @import "./common.less";
 
 * {
@@ -15,7 +16,13 @@ strong, div, span, li, em, p, a {
 }
 
 body {
-  background: @darkGray;
+  background: #fff;
+}
+
+body, .dynamicBackground, .gradient {
+  opacity: 0;
+  animation: fadeIn 200ms;
+  animation-fill-mode: forwards;
 }
 
 main,
