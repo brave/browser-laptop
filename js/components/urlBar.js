@@ -112,59 +112,6 @@ class UrlBar extends ImmutableComponent {
       windowActions.setUrlBarActive(true)
     }
     switch (e.keyCode) {
-      case KeyCodes.ENTER:
-        windowActions.setUrlBarActive(false)
-        windowActions.setRenderUrlBarSuggestions(false)
-        this.restore()
-        e.preventDefault()
-
-        let location = this.props.urlbar.get('location')
-
-        if (location === null || location.length === 0) {
-          windowActions.setUrlBarSelected(true)
-        } else {
-          // Filter javascript URLs to prevent self-XSS
-          location = location.replace(/^(\s*javascript:)+/i, '')
-          const isLocationUrl = isUrl(location)
-          if (!isLocationUrl && e.ctrlKey) {
-            windowActions.loadUrl(this.activeFrame, `www.${location}.com`)
-          } else if (this.shouldRenderUrlBarSuggestions && (this.urlBarSuggestions.activeIndex > 0 || this.props.locationValueSuffix)) {
-            // Hack to make alt enter open a new tab for url bar suggestions when hitting enter on them.
-            const isDarwin = process.platform === 'darwin'
-            if (e.altKey) {
-              if (isDarwin) {
-                e.metaKey = true
-              } else {
-                e.ctrlKey = true
-              }
-            }
-            // TODO: We shouldn't be calling into urlBarSuggestions from the parent component at all
-            // load the selected suggestion
-            this.urlBarSuggestions.clickSelected(e)
-          } else {
-            let searchUrl = this.props.searchDetail.get('searchURL').replace('{searchTerms}', encodeURIComponent(location))
-            if (this.activateSearchEngine && this.searchSelectEntry !== null && !isLocationUrl) {
-              const replaceRE = new RegExp('^' + this.searchSelectEntry.shortcut + ' ', 'g')
-              location = location.replace(replaceRE, '')
-              searchUrl = this.searchSelectEntry.search.replace('{searchTerms}', encodeURIComponent(location))
-            }
-
-            location = isLocationUrl ? location : searchUrl
-            // do search.
-            if (e.altKey) {
-              windowActions.newFrame({ location }, true)
-            } else if (e.metaKey) {
-              windowActions.newFrame({ location }, !!e.shiftKey)
-            } else {
-              windowActions.loadUrl(this.activeFrame, location)
-            }
-          }
-          // this can't go through appActions for some reason
-          // or the whole window will reload on the first page request
-          this.updateDOMInputFocus(false)
-          this.clearSearchEngine()
-        }
-        break
       case KeyCodes.UP:
         if (this.shouldRenderUrlBarSuggestions) {
           // TODO: We shouldn't be calling into urlBarSuggestions from the parent component at all
@@ -274,7 +221,6 @@ class UrlBar extends ImmutableComponent {
       case KeyCodes.ESC:
         return
     }
-
     if (this.isSelected()) {
       windowActions.setUrlBarSelected(false)
     }
@@ -283,6 +229,56 @@ class UrlBar extends ImmutableComponent {
     this.detectSearchEngine(e.target.value)
     this.keyPressed = false
 
+    if (e.keyCode === KeyCodes.ENTER) {
+      let location = this.urlInput ? this.urlInput.value : this.props.urlbar.get('location')
+      windowActions.setUrlBarActive(false)
+
+      if (location === null || location.length === 0) {
+        windowActions.setUrlBarSelected(true)
+      } else {
+        // Filter javascript URLs to prevent self-XSS
+        location = location.replace(/^(\s*javascript:)+/i, '')
+        const isLocationUrl = isUrl(location)
+        if (!isLocationUrl && e.ctrlKey) {
+          windowActions.loadUrl(this.activeFrame, `www.${location}.com`)
+        } else if (this.shouldRenderUrlBarSuggestions && (this.urlBarSuggestions.activeIndex > 0 || this.props.locationValueSuffix)) {
+          // Hack to make alt enter open a new tab for url bar suggestions when hitting enter on them.
+          const isDarwin = process.platform === 'darwin'
+          if (e.altKey) {
+            if (isDarwin) {
+              e.metaKey = true
+            } else {
+              e.ctrlKey = true
+            }
+          }
+          // TODO: We shouldn't be calling into urlBarSuggestions from the parent component at all
+          // load the selected suggestion
+          this.urlBarSuggestions.clickSelected(e)
+        } else {
+          let searchUrl = this.props.searchDetail.get('searchURL').replace('{searchTerms}', encodeURIComponent(location))
+          if (this.activateSearchEngine && this.searchSelectEntry !== null && !isLocationUrl) {
+            const replaceRE = new RegExp('^' + this.searchSelectEntry.shortcut + ' ', 'g')
+            location = location.replace(replaceRE, '')
+            searchUrl = this.searchSelectEntry.search.replace('{searchTerms}', encodeURIComponent(location))
+          }
+
+          location = isLocationUrl ? location : searchUrl
+          // do search.
+          if (e.altKey) {
+            windowActions.newFrame({ location }, true)
+          } else if (e.metaKey) {
+            windowActions.newFrame({ location }, !!e.shiftKey)
+          } else {
+            windowActions.loadUrl(this.activeFrame, location)
+          }
+        }
+        // this can't go through appActions for some reason
+        // or the whole window will reload on the first page request
+        this.updateDOMInputFocus(false)
+        this.clearSearchEngine()
+      }
+      windowActions.setRenderUrlBarSuggestions(false)
+    }
     if ((e.target.value !== undefined) && e.target.value.length === 0) {
       windowActions.setRenderUrlBarSuggestions(false)
     }
