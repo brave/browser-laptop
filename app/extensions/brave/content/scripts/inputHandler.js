@@ -139,11 +139,6 @@ document.addEventListener('keydown', (e /*: Event*/) => {
         chrome.ipc.sendToHost('stop-load')
       }
       break
-    case KeyEvent.DOM_VK_BACK_SPACE:
-      if (!isEditable(document.activeElement)) {
-        e.shiftKey ?chrome.ipc.sendToHost('go-forward') :chrome.ipc.sendToHost('go-back')
-      }
-      break
     case KeyEvent.DOM_VK_LEFT:
       if (e.metaKey && !isEditable(document.activeElement) && isPlatformOSX()) {
         chrome.ipc.sendToHost('go-back')
