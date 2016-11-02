@@ -1530,6 +1530,8 @@ const showNotificationPaymentDone = (transactionContributionFiat) => {
   notificationPaymentDoneMessage = locale.translation('notificationPaymentDone')
     .replace(/{{\s*amount\s*}}/, transactionContributionFiat.amount)
     .replace(/{{\s*currency\s*}}/, transactionContributionFiat.currency)
+  // Hide the 'waiting for deposit' message box if it exists
+  appActions.hideMessageBox(addFundsMessage)
   appActions.showMessageBox({
     greeting: locale.translation('updateHello'),
     message: notificationPaymentDoneMessage,
