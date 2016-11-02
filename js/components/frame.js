@@ -994,7 +994,7 @@ class Frame extends ImmutableComponent {
         windowActions.loadUrl(this.frame, 'about:error')
         appActions.removeSite(siteUtil.getDetailFromFrame(this.frame))
       } else if (provisionLoadFailure) {
-        windowActions.setNavigated(this.webview.getURL(), this.props.frameKey, true)
+        windowActions.setNavigated(this.webview.getURL(), this.props.frameKey, true, this.frame.get('tabId'))
       }
     }
     this.webview.addEventListener('load-commit', (e) => {
@@ -1018,7 +1018,7 @@ class Frame extends ImmutableComponent {
       if (this.props.isActive && this.webview.canGoBack() && document.activeElement !== this.webview) {
         this.webview.focus()
       }
-      windowActions.setNavigated(e.url, this.props.frameKey, false)
+      windowActions.setNavigated(e.url, this.props.frameKey, false, this.frame.get('tabId'))
       // force temporary url display for tabnapping protection
       windowActions.setMouseInTitlebar(true)
 
@@ -1059,7 +1059,7 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('did-navigate-in-page', (e) => {
       if (e.isMainFrame) {
-        windowActions.setNavigated(e.url, this.props.frameKey, true)
+        windowActions.setNavigated(e.url, this.props.frameKey, true, this.frame.get('tabId'))
         loadEnd(true)
       }
     })

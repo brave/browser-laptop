@@ -97,13 +97,15 @@ const windowActions = {
    * @param {string} location - The URL of the page that was navigated to.
    * @param {number} key - The frame key to modify.
    * @param {boolean} isNavigatedInPage - true if it was a navigation within the same page.
+   * @param {number} tabId - the tab id
    */
-  setNavigated: function (location, key, isNavigatedInPage) {
+  setNavigated: function (location, key, isNavigatedInPage, tabId) {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_NAVIGATED,
       location,
       key,
-      isNavigatedInPage
+      isNavigatedInPage,
+      tabId
     })
   },
 
