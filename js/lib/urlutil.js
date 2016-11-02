@@ -109,7 +109,7 @@ const UrlUtil = {
     // for cases, pure string
     const case3Reg = /[\?\.\/\s:]/
     // for cases, data:uri, view-source:uri and about
-    const case4Reg = /^data:|view-source:|mailto:|about:|chrome-extension:.*/
+    const case4Reg = /^data:|view-source:|mailto:|about:|chrome-extension:|magnet:.*/
 
     let str = input.trim()
     let scheme = this.getScheme(str)
