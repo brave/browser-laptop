@@ -911,7 +911,17 @@ class Frame extends ImmutableComponent {
     }
 
     const loadStart = (e) => {
+      // We have two kinds of special URLs: magnet links and about pages
+      // When the user clicks on a magnet link, navigate to the corresponding local URL
+      // (The address bar will still show the magnet URL. See appUrlUtil.getSourceMagnetUrl.)
+      if (isSourceMagnetUrl(e.url)) {
+        var targetURL = getTargetMagnetUrl(e.url)
+        // Return right away. loadStart will be called again with targetURL
+        return windowActions.loadUrl(this.frame, targetURL)
+      }
+
       const parsedUrl = urlParse(e.url)
+
       // Instead of telling person to install Flash, ask them if they want to
       // run Flash if it's installed.
       if (e.isMainFrame && !e.isErrorPage && !e.isFrameSrcDoc) {
@@ -944,6 +954,7 @@ class Frame extends ImmutableComponent {
         this.webview.executeJavaScript('Navigator.prototype.__defineGetter__("doNotTrack", () => {return 1});')
       }
     }
+
     const loadEnd = (savePage) => {
       windowActions.onWebviewLoadEnd(
         this.frame,
@@ -974,6 +985,7 @@ class Frame extends ImmutableComponent {
         interceptFlash(false, undefined, hack.redirectURL)
       }
     }
+
     const loadFail = (e, provisionLoadFailure = false) => {
       if (isFrameError(e.errorCode)) {
         // temporary workaround for https://github.com/brave/browser-laptop/issues/1817
@@ -1004,6 +1016,7 @@ class Frame extends ImmutableComponent {
         windowActions.setNavigated(this.webview.getURL(), this.props.frameKey, true, this.frame.get('tabId'))
       }
     }
+
     this.webview.addEventListener('load-commit', (e) => {
       loadStart(e)
     })
@@ -1011,7 +1024,6 @@ class Frame extends ImmutableComponent {
       // XXX: loadstart probably does not need to be called twice anymore.
       loadStart(e)
     })
-
     this.webview.addEventListener('did-navigate', (e) => {
       if (this.props.findbarShown) {
         this.props.onFindHide()
