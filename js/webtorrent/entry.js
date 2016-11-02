@@ -8,11 +8,17 @@ var state = {
   errorMessage: ''
 }
 
+require('../../less/webtorrent.less')
+
 // Start downloading the torrent
 var client = new WebTorrent()
 window.client = client
 state.torrent = client.add(state.torrentId)
 client.on('error', onError)
+
+// Show a friendly window title
+updateTitle()
+state.torrent.on('metadata', updateTitle)
 
 // Show download progress
 setInterval(update, 1000)
@@ -34,26 +40,31 @@ function update () {
       <h1>{status}</h1>
       <h3>Progress: {(torrent.progress * 100).toFixed(1)}%</h3>
       <h3>Files</h3>
-      <ul>
+      <ul className='files'>
         {torrent.files.map((file, i) => {
-          var isSelected = i === state.selectedFileIndex
+          var className = i === state.selectedFileIndex ? 'selected' : ''
           return (
-            <li data-ix={i} class={isSelected && 'selected'} onClick={onClickFile}>
+            <li data-ix={i} className={className} onClick={onClickFile}>
               {file.name}
             </li>
           )
         })}
       </ul>
       <div id='fileContainer' />
-      <div class='error'>{state.errorMessage}</div>
+      <div className='error'>{state.errorMessage}</div>
     </div>
   )
   ReactDOM.render(elem, document.querySelector('#appContainer'))
 }
 
+function updateTitle () {
+  document.title = state.torrent.name || 'Downloading torrent...'
+}
+
 function onClickFile (e) {
-  if (state.selectedFileIndex === e.target.dataset.ix) return
-  state.selectedFileIndex = e.target.dataset.ix
+  var clickedIndex = Number(e.target.dataset.ix)
+  if (state.selectedFileIndex === clickedIndex) return
+  state.selectedFileIndex = clickedIndex
 
   update()
 
