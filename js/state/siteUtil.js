@@ -93,8 +93,15 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId) => {
     ? newSiteDetail.get('customTitle')
     : (newSiteDetail.get('customTitle') || oldSiteDetail && oldSiteDetail.get('customTitle'))
 
+  let lastAccessedTime
+  if (isBookmark(tag) || isBookmarkFolder(tag)) {
+    lastAccessedTime = newSiteDetail.get('lastAccessedTime') || 0
+  } else {
+    lastAccessedTime = newSiteDetail.get('lastAccessedTime') || new Date().getTime()
+  }
+
   let site = Immutable.fromJS({
-    lastAccessedTime: newSiteDetail.get('lastAccessedTime') || new Date().getTime(),
+    lastAccessedTime: lastAccessedTime,
     tags,
     title: newSiteDetail.get('title')
   })
