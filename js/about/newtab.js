@@ -113,20 +113,11 @@ class NewTabPage extends React.Component {
 
     // We need to know which sites are pinned first, so we can skip them while populating
     gridSites = gridSites.push.apply(pinnedTopSites, gridSites)
-
-    for (let i = 0; i < gridSites.size; i++) {
-      // skip pinnedTopSites while populating
-      if (!this.isPinned(i)) {
-        gridSites = gridSites.set(i, sites.first())
-        sites = sites.shift()
-      }
-    }
+    gridSites = gridSites.map((item, i) => item == null ? sites.get(i) : item)
 
     // Remove from grid all ignored sites
     gridSites = gridSites.filter((site) => ignoredTopSites.indexOf(site) === -1)
 
-    // Filter duplicated and remove null
-    gridSites = gridSites.toSet().toList()
     gridSites = gridSites.filter(site => site != null)
 
     return gridSites
