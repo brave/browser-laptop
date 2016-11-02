@@ -117,17 +117,31 @@ var aboutPages = {
   }
 }
 
+var webtorrentPage = {
+  name: 'webtorrent',
+  target: 'web',
+  entry: ['./js/webtorrent/entry.js'],
+  output: {
+    path: path.resolve(__dirname, 'app', 'extensions', 'brave', 'gen'),
+    filename: 'webtorrentPage.entry.js',
+    publicPath: './gen/'
+  }
+}
+
 module.exports = {
   development: [
     merge(app, development()),
-    merge(aboutPages, development())
+    merge(aboutPages, development()),
+    merge(webtorrentPage, development())
   ],
   production: [
     merge(app, production()),
-    merge(aboutPages, production())
+    merge(aboutPages, production()),
+    merge(webtorrentPage, production())
   ],
   test: [
     merge(app, production()),
-    merge(aboutPages, production())
+    merge(aboutPages, production()),
+    merge(webtorrentPage, production())
   ]
 }[env]

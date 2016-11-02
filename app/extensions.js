@@ -125,7 +125,7 @@ let generateBraveManifest = () => {
     'form-action': '\'none\'',
     'referrer': 'no-referrer',
     'style-src': '\'self\' \'unsafe-inline\'',
-    'img-src': '* data:',
+    'img-src': '* data: blob:',
     'frame-src': '\'self\' https://buy.coinbase.com'
   }
 
@@ -136,6 +136,12 @@ let generateBraveManifest = () => {
     cspDirectives['connect-src'] = '\'self\' http://' + devServer + ' ws://' + devServer
     cspDirectives['style-src'] = '\'self\' \'unsafe-inline\' http://' + devServer
   }
+
+  // TODO:
+  // * Move WebTorrent to its own renderer process, similar to the way it's done in
+  //   WebTorrent Desktop
+  // * Remove this CSP exception:
+  cspDirectives['connect-src'] = '*'
 
   var csp = ''
   for (var directive in cspDirectives) {
