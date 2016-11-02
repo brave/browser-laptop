@@ -58,7 +58,7 @@ const settings = {
   SEND_USAGE_STATISTICS: 'advanced.send-usage-statistics',
   ADBLOCK_CUSTOM_RULES: 'adblock.customRules',
   MINIMUM_VISIT_TIME: 'advanced.minimum-visit-time',
-  MINIMUM_VISTS: 'advanced.minimum-visits',
+  MINIMUM_VISITS: 'advanced.minimum-visits',
 
   // DEPRECATED settings
   // ########################

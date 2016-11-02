@@ -142,11 +142,11 @@ const doAction = (action) => {
         case settings.MINIMUM_VISIT_TIME:
           if (action.value <= 0) break
 
-          synopsis.options.minDuration = action.value
+          synopsis.options.minDuration = action.value * 1000
           updatePublisherInfo()
           break
 
-        case settings.MINIMUM_VISTS:
+        case settings.MINIMUM_VISITS:
           if (action.value <= 0) break
 
           synopsis.options.minPublisherVisits = action.value
@@ -562,7 +562,23 @@ var enable = (paymentsEnabled) => {
   synopsis = new (ledgerPublisher.Synopsis)()
   fs.readFile(pathName(synopsisPath), (err, data) => {
     var initSynopsis = () => {
+      var value
+
       // cf., the `Synopsis` constructor, https://github.com/brave/ledger-publisher/blob/master/index.js#L167
+      value = getSetting(settings.MINIMUM_VISIT_TIME)
+      if (!value) {
+        value = 8
+        appActions.changeSetting(settings.MINIMUM_VISIT_TIME, value)
+      }
+      if (value > 0) synopsis.options.minDuration = value * 1000
+
+      value = getSetting(settings.MINIMUM_VISITS)
+      if (!value) {
+        value = 5
+        appActions.changeSetting(settings.MINIMUM_VISITS, value)
+      }
+      if (value > 0) synopsis.options.minPublisherVisits = value
+
       if (process.env.NODE_ENV === 'test') {
         synopsis.options.minDuration = 0
         synopsis.options.minPublisherDuration = 0
