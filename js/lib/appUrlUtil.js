@@ -116,28 +116,48 @@ module.exports.isSourceAboutUrl = function (input) {
   return !!module.exports.getTargetAboutUrl(getBaseUrl(input))
 }
 
+/**
+ * Determines if the passed in string is the target of a source about: URL
+ * Example: isTargetAboutUrl('http://localhost:8000/about-blank/index.html') -> true
+ */
 module.exports.isTargetAboutUrl = function (input) {
   return !!module.exports.getSourceAboutUrl(getBaseUrl(input))
 }
 
-// TODO: document
-
+/**
+ * Gets a local URL that renders the given magnet:// URL
+ * Returns null if the input is not a magnet URL
+ * Example: getTargetMagnetUrl('magnet:?x=y') -> 'chrome-extension://<...>.html#magnet:?x=y'
+ */
 module.exports.getTargetMagnetUrl = function (input) {
   if (!input.startsWith('magnet:?')) return null
   const url = module.exports.getAppUrl('webtorrent.html')
   return url + '#' + input
 }
 
+/**
+ * Gets the magnet:// URL for a given local URL.
+ * Returns null if the input is not the local URL for a magnet link.
+ * Example: getSourceMagnetUrl('chrome-extension://<...>.html#magnet:?x=y') -> 'magnet:?x=y'
+ */
 module.exports.getSourceMagnetUrl = function (input) {
   const url = module.exports.getAppUrl('webtorrent.html')
   if (!input.startsWith(url)) return null
   return input.substring(input.indexOf('#') + 1)
 }
 
+/**
+ * Checks if the input looks like a magnet: URL
+ * Example: getSourceMagnetUrl('magnet:?x=y') -> true
+ */
 module.exports.isSourceMagnetUrl = function (input) {
   return !!module.exports.getTargetMagnetUrl(input)
 }
 
+/*
+ * Checks if the input looks like the local URL for a magnet link.
+ * Example: getSourceMagnetUrl('chrome-extension://<...>.html#magnet:?x=y') -> true
+ */
 module.exports.isTargetMagnetUrl = function (input) {
   return !!module.exports.getSourceMagnetUrl(input)
 }
