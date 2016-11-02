@@ -106,7 +106,8 @@ const getParentFolderId = (path, pathMap, sites, topLevelFolderId, nextFolderIdO
       customTitle: parentFolder,
       folderId: parentFolderId,
       parentFolderId: getParentFolderId(path, pathMap, sites, topLevelFolderId, nextFolderIdObject),
-      lastAccessedTime: (new Date()).getTime(),
+      lastAccessedTime: 0,
+      creationTime: (new Date()).getTime(),
       tags: [siteTags.BOOKMARK_FOLDER]
     }
     sites.push(folder)
@@ -126,7 +127,8 @@ importer.on('add-bookmarks', (e, bookmarks, topLevelFolder) => {
       customTitle: topLevelFolder,
       folderId: topLevelFolderId,
       parentFolderId: 0,
-      lastAccessedTime: (new Date()).getTime(),
+      lastAccessedTime: 0,
+      creationTime: (new Date()).getTime(),
       tags: [siteTags.BOOKMARK_FOLDER]
     })
   } else {
@@ -150,7 +152,8 @@ importer.on('add-bookmarks', (e, bookmarks, topLevelFolder) => {
         customTitle: bookmarks[i].title,
         folderId: folderId,
         parentFolderId: parentFolderId,
-        lastAccessedTime: bookmarks[i].creation_time * 1000,
+        lastAccessedTime: 0,
+        creationTime: bookmarks[i].creation_time * 1000,
         tags: [siteTags.BOOKMARK_FOLDER]
       }
       sites.push(folder)
@@ -160,7 +163,8 @@ importer.on('add-bookmarks', (e, bookmarks, topLevelFolder) => {
         customTitle: bookmarks[i].title,
         location: bookmarks[i].url,
         parentFolderId: parentFolderId,
-        lastAccessedTime: bookmarks[i].creation_time * 1000,
+        lastAccessedTime: 0,
+        creationTime: bookmarks[i].creation_time * 1000,
         tags: [siteTags.BOOKMARK]
       }
       sites.push(site)
