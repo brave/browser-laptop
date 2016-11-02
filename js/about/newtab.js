@@ -31,10 +31,36 @@ class NewTabPage extends React.Component {
     this.state = {
       showSiteRemovalNotification: false,
       backgroundImage: this.randomBackgroundImage,
-      imageLoadFailed: false
+      imageLoadFailed: false,
+      updatedStamp: undefined
     }
     ipc.on(messages.NEWTAB_DATA_UPDATED, (e, newTabData) => {
-      this.setState({ newTabData: Immutable.fromJS(newTabData || {}) })
+      this.sanitize(newTabData)
+    })
+  }
+  sanitize (newTabData) {
+    let sanitizedData = Immutable.fromJS(newTabData || {})
+    const updatedStamp = sanitizedData.getIn(['newTabDetail', 'updatedStamp'])
+
+    // Only update if the data has changed.
+    // console.log(updatedStamp + ']DATA_TS==LAST_TS[' + this.state.updatedStamp)
+    if (updatedStamp === this.state.updatedStamp) {
+      return
+    }
+
+    // Ensure top sites only has unique values
+    const pinnedTopSites = sanitizedData.getIn(['newTabDetail', 'pinnedTopSites'])
+    if (pinnedTopSites) {
+      const uniqueValues = pinnedTopSites.filter((element, index, list) => {
+        if (!element) return false
+        return index === list.findIndex((site) => site && site.get('location') === element.get('location'))
+      })
+      sanitizedData = sanitizedData.setIn(['newTabDetail', 'pinnedTopSites'], uniqueValues)
+    }
+
+    this.setState({
+      newTabData: sanitizedData,
+      updatedStamp: updatedStamp
     })
   }
 
@@ -87,20 +113,11 @@ class NewTabPage extends React.Component {
 
     // We need to know which sites are pinned first, so we can skip them while populating
     gridSites = gridSites.push.apply(pinnedTopSites, gridSites)
-
-    for (let i = 0; i < gridSites.size; i++) {
-      // skip pinnedTopSites while populating
-      if (!this.isPinned(i)) {
-        gridSites = gridSites.set(i, sites.first())
-        sites = sites.shift()
-      }
-    }
+    gridSites = gridSites.map((item, i) => item == null ? sites.get(i) : item)
 
     // Remove from grid all ignored sites
     gridSites = gridSites.filter((site) => ignoredTopSites.indexOf(site) === -1)
 
-    // Filter duplicated and remove null
-    gridSites = gridSites.toSet().toList()
     gridSites = gridSites.filter(site => site != null)
 
     return gridSites
@@ -171,7 +188,14 @@ class NewTabPage extends React.Component {
       newTabState.pinnedTopSites = pinnedTopSites
     }
     newTabState.sites = gridSites
-    aboutActions.setNewTabDetail(newTabState)
+
+    // Only update if there was an actual change
+    const stateDiff = Immutable.fromJS(newTabState)
+    const existingState = this.state.newTabData || Immutable.fromJS({})
+    const proposedState = existingState.mergeIn(['newTabDetail'], stateDiff)
+    if (!proposedState.isSubset(existingState)) {
+      aboutActions.setNewTabDetail(stateDiff)
+    }
   }
 
   onToggleBookmark (siteProps) {
@@ -278,7 +302,9 @@ class NewTabPage extends React.Component {
                     href={site.get('location')}
                     favicon={
                       site.get('favicon') == null
-                      ? site.get('title').charAt(0).toUpperCase()
+                      ? site.get('title')
+                        ? site.get('title').charAt(0).toUpperCase()
+                        : '?'
                       : <img src={site.get('favicon')} />
                     }
                     style={{backgroundColor: site.get('themeColor')}}
