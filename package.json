@@ -113,7 +113,8 @@
     "tldjs": "1.6.2",
     "tracking-protection": "1.1.x",
     "underscore": "1.8.3",
-    "url-loader": "^0.5.7"
+    "url-loader": "^0.5.7",
+    "webtorrent": "^0.97.2"
   },
   "devDependencies": {
     "asar": "^0.11.0",

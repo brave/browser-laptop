@@ -23,7 +23,7 @@ const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
 const config = require('../constants/config')
 const settings = require('../constants/settings')
-const {aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
+const {aboutUrls, isSourceMagnetUrl, getTargetMagnetUrl, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
 const {isFrameError} = require('../../app/common/lib/httpUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
@@ -319,7 +319,11 @@ class Frame extends ImmutableComponent {
     }
 
     if (!guestInstanceId || newSrc !== 'about:blank') {
-      this.webview.setAttribute('src', isSourceAboutUrl(newSrc) ? getTargetAboutUrl(newSrc) : newSrc)
+      let webviewSrc
+      if (isSourceAboutUrl(newSrc)) webviewSrc = getTargetAboutUrl(newSrc)
+      else if (isSourceMagnetUrl(newSrc)) webviewSrc = getTargetMagnetUrl(newSrc)
+      else webviewSrc = newSrc
+      this.webview.setAttribute('src', webviewSrc)
     }
 
     if (webviewAdded) {

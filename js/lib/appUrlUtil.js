@@ -116,12 +116,30 @@ module.exports.isSourceAboutUrl = function (input) {
   return !!module.exports.getTargetAboutUrl(getBaseUrl(input))
 }
 
-/**
- * Determines if the passed in string is the target of a source about: URL
- * Example: isTargetAboutUrl('http://localhost:8000/about-blank/index.html') -> true
- */
 module.exports.isTargetAboutUrl = function (input) {
   return !!module.exports.getSourceAboutUrl(getBaseUrl(input))
+}
+
+// TODO: document
+
+module.exports.getTargetMagnetUrl = function (input) {
+  if (!input.startsWith('magnet:?')) return null
+  const url = module.exports.getAppUrl('webtorrent.html')
+  return url + '#' + input
+}
+
+module.exports.getSourceMagnetUrl = function (input) {
+  const url = module.exports.getAppUrl('webtorrent.html')
+  if (!input.startsWith(url)) return null
+  return input.substring(input.indexOf('#') + 1)
+}
+
+module.exports.isSourceMagnetUrl = function (input) {
+  return !!module.exports.getTargetMagnetUrl(input)
+}
+
+module.exports.isTargetMagnetUrl = function (input) {
+  return !!module.exports.getSourceMagnetUrl(input)
 }
 
 /**
@@ -148,7 +166,7 @@ function getHash (input) {
   return (typeof input === 'string') ? input.split('#')[1] : ''
 }
 
-module.exports.navigatableTypes = ['http:', 'https:', 'about:', 'chrome:', 'chrome-extension:', 'file:', 'view-source:', 'ftp:']
+module.exports.navigatableTypes = ['http:', 'https:', 'about:', 'chrome:', 'chrome-extension:', 'file:', 'view-source:', 'ftp:', 'magnet:']
 
 /**
  * Determine the URL to use when creating a new tab

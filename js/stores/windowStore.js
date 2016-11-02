@@ -18,7 +18,7 @@ const urlParse = require('url').parse
 const currentWindow = require('../../app/renderer/currentWindow')
 const {tabFromFrame} = require('../state/frameStateUtil')
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
-const {aboutUrls, getSourceAboutUrl, isIntermediateAboutPage, navigatableTypes, newFrameUrl} = require('../lib/appUrlUtil')
+const {aboutUrls, getSourceAboutUrl, isIntermediateAboutPage, getSourceMagnetUrl, navigatableTypes, newFrameUrl} = require('../lib/appUrlUtil')
 const Serializer = require('../dispatcher/serializer')
 
 let windowState = Immutable.fromJS({
@@ -281,8 +281,8 @@ const doAction = (action) => {
         })
         updateNavBarInput(frame.get('location'), frameStatePath(action.key))
       } else {
-      // If the user is changing back to the original src and they already navigated away then we need to
-      // explicitly set a new location via webview.loadURL.
+        // If the user is changing back to the original src and they already navigated away then we need to
+        // explicitly set a new location via webview.loadURL.
         let activeShortcut
         if (frame.get('location') !== action.location &&
             frame.get('src') === action.location &&
@@ -308,7 +308,9 @@ const doAction = (action) => {
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), false)
       // For about: URLs, make sure we store the URL as about:something
       // and not what we map to.
-      action.location = getSourceAboutUrl(action.location) || action.location
+      action.location = getSourceAboutUrl(action.location) ||
+        getSourceMagnetUrl(action.location) ||
+        action.location
 
       if (UrlUtil.isURL(action.location)) {
         action.location = UrlUtil.getUrlFromInput(action.location)
