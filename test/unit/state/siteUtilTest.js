@@ -200,9 +200,9 @@ describe('siteUtil', function () {
           const expectedSites = Immutable.fromJS([bookmarkAllFields])
           assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
         })
-        it('sets default values for lastAccessedTime and tag when they are missing', function () {
+        it('sets 0 for lastAccessedTime if not specified', function () {
           const processedSites = siteUtil.addSite(emptySites, bookmarkMinFields, siteTags.BOOKMARK)
-          assert.equal(!!processedSites.getIn([0, 'lastAccessedTime']), true)
+          assert.equal(processedSites.getIn([0, 'lastAccessedTime']), 0)
           assert.deepEqual(processedSites.getIn([0, 'tags']).toJS(), [siteTags.BOOKMARK])
         })
       })
@@ -277,6 +277,13 @@ describe('siteUtil', function () {
           })
           const expectedSites = sites
           assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+        })
+      })
+      describe('when adding history', function () {
+        it('sets default values for lastAccessedTime and tag when they are missing', function () {
+          const processedSites = siteUtil.addSite(emptySites, bookmarkMinFields)
+          assert.equal(!!processedSites.getIn([0, 'lastAccessedTime']), true)
+          assert.deepEqual(processedSites.getIn([0, 'tags']).toJS(), [])
         })
       })
     })
