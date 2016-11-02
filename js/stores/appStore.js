@@ -431,6 +431,7 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_CHANGE_NEW_TAB_DETAIL:
       appState = appState.mergeIn(['about', 'newtab'], action.newTabPageDetail)
+      appState = appState.setIn(['about', 'newtab', 'updatedStamp'], new Date().getTime())
       break
     case AppConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size
@@ -448,10 +449,13 @@ const handleAppAction = (action) => {
       if (oldSiteSize !== appState.get('sites').size) {
         filterOutNonRecents()
       }
-      let newVisitedSites = appState.getIn(['about', 'newtab', 'sites'])
+      let newVisitedSites = appState.getIn(['about', 'newtab', 'sites']) || new Immutable.List()
       newVisitedSites = newVisitedSites.unshift(action.siteDetail)
       // Filter duplicated entries by its location
-      newVisitedSites = newVisitedSites.filter((set => site => !set.has(site.get('location')) && set.add(site.get('location')))(new Set()))
+      newVisitedSites = newVisitedSites.filter((element, index, list) => {
+        if (!element) return false
+        return index === list.findIndex((site) => site && site.get('location') === element.get('location'))
+      })
       newVisitedSites = newVisitedSites.take(18)
       // TODO: @cezaraugusto.
       // Sort should respect unshift and don't prioritize bookmarks
@@ -460,6 +464,7 @@ const handleAppAction = (action) => {
       // .sort(suggestion.sortByAccessCountWithAgeDecay)
 
       appState = appState.setIn(['about', 'newtab', 'sites'], siteUtil.addSite(newVisitedSites, action.siteDetail, action.tag, action.originalSiteDetail))
+      appState = appState.setIn(['about', 'newtab', 'updatedStamp'], new Date().getTime())
       break
     case AppConstants.APP_REMOVE_SITE:
       appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag))

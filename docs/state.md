@@ -224,7 +224,8 @@ AppStore
       gridLayoutSize: string, // 'small', 'medium', 'large'
       sites: [string], // List of sites to be used on gridLayout
       ignoredTopSites: [string], // List of ignored sites
-      pinnedTopSites: [string] // List of pinned sites
+      pinnedTopSites: [string], // List of pinned sites
+      updatedStamp: number // timestamp for when the data was last updated
     }
   },
   menu: {
