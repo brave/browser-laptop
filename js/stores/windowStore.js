@@ -384,6 +384,9 @@ const doAction = (action) => {
       })
       break
     case WindowConstants.WINDOW_SET_FINDBAR_SHOWN:
+      if (action.shown) {
+        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), false)
+      }
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         findbarShown: action.shown
       })
