@@ -48,7 +48,7 @@ Dispatches a message to the store to set the new URL.
 
 
 
-### setNavigated(location, key, isNavigatedInPage) 
+### setNavigated(location, key, isNavigatedInPage, tabId) 
 
 Dispatches a message to the store to let it know a page has been navigated.
 
@@ -59,6 +59,8 @@ Dispatches a message to the store to let it know a page has been navigated.
 **key**: `number`, The frame key to modify.
 
 **isNavigatedInPage**: `boolean`, true if it was a navigation within the same page.
+
+**tabId**: `number`, the tab id
 
 
 
