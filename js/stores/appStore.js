@@ -33,12 +33,12 @@ const path = require('path')
 const {channel} = require('../../app/channel')
 const os = require('os')
 const autofill = require('../../app/autofill')
-// const suggestion = require('../lib/suggestion')
 
 // state helpers
 const basicAuthState = require('../../app/common/state/basicAuthState')
 const extensionState = require('../../app/common/state/extensionState')
 const tabState = require('../../app/common/state/tabState')
+const newTabState = require('../../app/common/state/newTabState')
 const isDarwin = process.platform === 'darwin'
 const isWindows = process.platform === 'win32'
 
@@ -430,8 +430,7 @@ const handleAppAction = (action) => {
       appState = appState.set('passwords', new Immutable.List())
       break
     case AppConstants.APP_CHANGE_NEW_TAB_DETAIL:
-      appState = appState.mergeIn(['about', 'newtab'], action.newTabPageDetail)
-      appState = appState.setIn(['about', 'newtab', 'updatedStamp'], new Date().getTime())
+      appState = newTabState.mergeDetails(appState, action)
       break
     case AppConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size
@@ -449,30 +448,14 @@ const handleAppAction = (action) => {
       if (oldSiteSize !== appState.get('sites').size) {
         filterOutNonRecents()
       }
-      let newVisitedSites = appState.getIn(['about', 'newtab', 'sites']) || new Immutable.List()
-      newVisitedSites = newVisitedSites.unshift(action.siteDetail)
-      // Filter duplicated entries by its location
-      newVisitedSites = newVisitedSites.filter((element, index, list) => {
-        if (!element) return false
-        return index === list.findIndex((site) => site && site.get('location') === element.get('location'))
-      })
-      newVisitedSites = newVisitedSites.take(18)
-      // TODO: @cezaraugusto.
-      // Sort should respect unshift and don't prioritize bookmarks
-      // |
-      // V
-      // .sort(suggestion.sortByAccessCountWithAgeDecay)
-
-      appState = appState.setIn(['about', 'newtab', 'sites'], siteUtil.addSite(newVisitedSites, action.siteDetail, action.tag, action.originalSiteDetail))
-      appState = appState.setIn(['about', 'newtab', 'updatedStamp'], new Date().getTime())
+      appState = newTabState.addSite(appState, action)
       break
     case AppConstants.APP_REMOVE_SITE:
       appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag))
-      appState = appState.setIn(['about', 'newtab', 'sites'], siteUtil.removeSite(appState.getIn(['about', 'newtab', 'sites']), action.siteDetail, action.tag))
+      appState = newTabState.removeSite(appState, action)
       break
     case AppConstants.APP_MOVE_SITE:
       appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent, false))
-      appState = appState.setIn(['about', 'newtab', 'sites'], siteUtil.moveSite(appState.getIn(['about', 'newtab', 'sites']), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent, false))
       break
     case AppConstants.APP_MERGE_DOWNLOAD_DETAIL:
       if (action.downloadDetail) {
@@ -792,6 +775,7 @@ const handleAppAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_FAVICON:
       appState = appState.set('sites', siteUtil.updateSiteFavicon(appState.get('sites'), action.frameProps.get('location'), action.favicon))
+      appState = newTabState.updateSiteFavicon(appState, action)
       break
     case WindowConstants.WINDOW_SET_NAVIGATED:
       if (!action.isNavigatedInPage) {
