@@ -1,6 +1,4 @@
 (function () {
-  var queryString = window.location.search
-
   let webtorrentEntryPage = 'gen/webtorrentPage.entry.js'
 
   chrome.ipc.on('language', (e, detail) => {
