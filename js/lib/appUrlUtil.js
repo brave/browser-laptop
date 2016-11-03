@@ -125,25 +125,25 @@ module.exports.isTargetAboutUrl = function (input) {
 }
 
 /**
- * Gets a local URL that renders the given magnet:// URL
+ * Obtains the target URL associated with a magnet: source URL
  * Returns null if the input is not a magnet URL
- * Example: getTargetMagnetUrl('magnet:?x=y') -> 'chrome-extension://<...>.html#magnet:?x=y'
+ * Example: getTargetMagnetUrl('magnet:...') -> 'chrome-extension://<...>.html#magnet:...'
  */
 module.exports.getTargetMagnetUrl = function (input) {
-  if (!input.startsWith('magnet:?')) return null
+  if (!input.startsWith('magnet:')) return null
   const url = module.exports.getAppUrl('webtorrent.html')
-  return url + '#' + input
+  return [url, input].join('#')
 }
 
 /**
- * Gets the magnet:// URL for a given local URL.
+ * Obtains the source magnet: URL associated with a target URL
  * Returns null if the input is not the local URL for a magnet link.
- * Example: getSourceMagnetUrl('chrome-extension://<...>.html#magnet:?x=y') -> 'magnet:?x=y'
+ * Example: getSourceMagnetUrl('chrome-extension://<...>.html#magnet:...') -> 'magnet:...'
  */
 module.exports.getSourceMagnetUrl = function (input) {
-  const url = module.exports.getAppUrl('webtorrent.html')
-  if (!input.startsWith(url)) return null
-  return input.substring(input.indexOf('#') + 1)
+  if (getBaseUrl(input) !== module.exports.getAppUrl('webtorrent.html')) return null
+  const url = getHash(input)
+  return url
 }
 
 /**
