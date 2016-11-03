@@ -1,5 +1,21 @@
 const ReactDOM = require('react-dom')
-var WebTorrent = window.WebTorrent // require('webtorrent')
+
+/**
+ * TODO: Once WebTorrent is running in it's own process, replace the window
+ * globals with require() calls. Delete ext/webtorrent.min.js.
+ */
+const WebTorrent = window.WebTorrent // require('webtorrent')
+
+/**
+ * TODO: Replace hard-coded list of community trackers with latest list from
+ * create-torrent package, similar to how WebTorrent Desktop does it here:
+ * https://github.com/feross/webtorrent-desktop/blob/4bb2056bc9c1a421815b97d03ffed512575dfde0/src/renderer/webtorrent.js#L29-L31
+ */
+window.WEBTORRENT_ANNOUNCE = [
+  'wss://tracker.btorrent.xyz',
+  'wss://tracker.openwebtorrent.com',
+  'wss://tracker.fastcast.nz'
+]
 
 var state = {
   torrentId: window.location.hash.substring(1),
@@ -11,8 +27,7 @@ var state = {
 require('../../less/webtorrent.less')
 
 // Start downloading the torrent
-var client = new WebTorrent()
-window.client = client
+var client = window.client = new WebTorrent()
 state.torrent = client.add(state.torrentId)
 client.on('error', onError)
 
