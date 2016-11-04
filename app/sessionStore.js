@@ -25,6 +25,7 @@ const siteUtil = require('../js/state/siteUtil')
 const sessionStorageVersion = 1
 const filtering = require('./filtering')
 const autofill = require('./autofill')
+const {navigatableTypes} = require('../js/lib/appUrlUtil')
 // const tabState = require('./common/state/tabState')
 
 const getSetting = require('../js/settings').getSetting
@@ -478,4 +479,14 @@ module.exports.defaultAppState = () => {
     },
     defaultWindowParams: {}
   }
+}
+
+/**
+ * Determines if a protocol is handled.
+ * app.on('ready') must have been fired before this is called.
+ */
+module.exports.isProtocolHandled = (protocol) => {
+  protocol = (protocol || '').split(':')[0]
+  return navigatableTypes.includes(`${protocol}:`) ||
+      electron.session.defaultSession.protocol.isNavigatorProtocolHandled(protocol)
 }
