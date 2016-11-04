@@ -12,7 +12,7 @@ describe('findbar', function () {
     yield setup(this.app.client)
     const url = Brave.server.url('find_in_page.html')
     yield this.app.client
-      .tabByUrl(Brave.newTabUrl)
+      .tabByIndex(0)
       .url(url)
       .waitForUrl(url)
       .windowParentByUrl(url)
@@ -163,6 +163,30 @@ describe('findbar', function () {
     assert.equal(match, '2 of 2')
   })
 
+  it('typing while another frame is loading', function * () {
+    const url2 = Brave.server.url('find_in_page2.html')
+    yield this.app.client
+      .showFindbar()
+      .waitForElementFocus(findBarInput)
+      .ipcSend(messages.SHORTCUT_NEW_FRAME, url2, { openInForeground: false })
+      .setValue(findBarInput, 'test')
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then((val) => val === 'test')
+      })
+      .showFindbar()
+      .waitForElementFocus(findBarInput)
+      .keys('x')
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then((val) => val === 'x')
+      })
+      .keys('y')
+      .keys('z')
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then((val) => val === 'xyz')
+      })
+     .ipcSend(messages.SHORTCUT_CLOSE_FRAME, 2)
+  })
+
   it('findbar input remembered but no active ordinals after navigation until RETURN key', function * () {
     const url2 = Brave.server.url('find_in_page2.html')
     yield this.app.client
@@ -177,7 +201,7 @@ describe('findbar', function () {
 
     yield this.app.client
       .waitForVisible(findBarMatches)
-      .tabByUrl(Brave.newTabUrl)
+      .tabByIndex(0)
       .url(url2)
       .waitForUrl(url2)
       .windowParentByUrl(url2)
@@ -199,17 +223,18 @@ describe('findbar', function () {
   it('remembers findbar input when switching frames', function * () {
     const url = Brave.server.url('find_in_page.html')
     yield this.app.client
+      .tabByIndex(0)
+      .url(url)
+      .waitForUrl(url)
+      .windowParentByUrl(url)
       .showFindbar()
       .waitForElementFocus(findBarInput)
       .setValue(findBarInput, 'test')
-    yield this.app.client
       .ipcSend(messages.SHORTCUT_NEW_FRAME, url)
+      .waitForTabCount(2)
+      .tabByIndex(1)
+      .waitForUrl(url)
       .windowParentByUrl(url)
-      .waitUntil(function () {
-        return this.getAttribute('webview[data-frame-key="2"]', 'src').then((src) => src === url)
-      })
-      .waitForElementFocus('webview[data-frame-key="2"]')
-    yield this.app.client
       .showFindbar(true, 2)
       .waitForElementFocus(findBarInput)
       .setValue(findBarInput, 'abc')
