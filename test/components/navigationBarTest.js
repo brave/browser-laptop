@@ -100,7 +100,7 @@ describe('navigationBar', function () {
           .windowByUrl(Brave.browserWindowUrl)
           .waitUntil(function () {
             return this.getValue(urlInput).then((val) => {
-              return val === ''
+              return val === 'about:blank'
             })
           })
       })
