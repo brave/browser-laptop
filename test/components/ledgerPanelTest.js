@@ -5,6 +5,7 @@ const {urlInput, addFundsButton, paymentsStatus, paymentsWelcomePage, paymentsTa
 const assert = require('assert')
 
 const prefsUrl = 'about:preferences'
+const ledgerAPIWaitTimeout = 10000
 
 function * setup (client) {
   yield client
@@ -46,7 +47,7 @@ describe('Payments Panel', function () {
             return val.value.settings['payments.enabled'] === true &&
               val.value.settings['payments.notifications'] === true
           })
-        })
+        }, ledgerAPIWaitTimeout)
     })
 
     it('payments can be disabled', function * () {
@@ -64,8 +65,8 @@ describe('Payments Panel', function () {
             return val.value.settings['payments.enabled'] === true &&
               val.value.settings['payments.notifications'] === true
           })
-        })
-        .tabByUrl(prefsUrl)
+        }, ledgerAPIWaitTimeout)
+        .tabByIndex(0)
         .waitForVisible(walletSwitch)
         .click(walletSwitch)
         .windowByUrl(Brave.browserWindowUrl)
@@ -74,7 +75,7 @@ describe('Payments Panel', function () {
             return val.value.settings['payments.enabled'] === false &&
               val.value.settings['payments.notifications'] === false
           })
-        })
+        }, ledgerAPIWaitTimeout)
     })
 
     it('can create wallet', function * () {
@@ -93,7 +94,7 @@ describe('Payments Panel', function () {
           // Note: wallet creation may take a long time, so this test is likely
           // to time out.
           return this.getText(addFundsButton).then((val) => val.includes('Add funds'))
-        })
+        }, ledgerAPIWaitTimeout)
     })
   })
 })

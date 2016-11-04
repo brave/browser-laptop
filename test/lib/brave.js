@@ -192,7 +192,7 @@ var exports = {
             var newHandles = []
             for (var i = 0; i < urls.length; i++) {
               // ignore extension urls unless they are "about" pages
-              if (!(urls[i].startsWith('chrome-extension') && !urls[i].match(/about-.*\.html$/)) &&
+              if (!(urls[i].startsWith('chrome-extension') && !urls[i].match(/about-.*\.html(#.*)?$/)) &&
                   // ignore window urls
                   !urls[i].startsWith('file:')) {
                 newHandles.push(handles[i])
