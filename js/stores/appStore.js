@@ -793,6 +793,11 @@ const handleAppAction = (action) => {
     case WindowConstants.WINDOW_SET_FAVICON:
       appState = appState.set('sites', siteUtil.updateSiteFavicon(appState.get('sites'), action.frameProps.get('location'), action.favicon))
       break
+    case WindowConstants.WINDOW_SET_NAVIGATED:
+      if (!action.isNavigatedInPage) {
+        appState = extensionState.browserActionUpdated(appState, action)
+      }
+      break
     default:
   }
 
