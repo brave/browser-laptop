@@ -18,8 +18,9 @@ const removeDuplicateSites = (sites) => {
   })
 }
 
-const newTabState = {
+const aboutNewTabState = {
   mergeDetails: (state, props) => {
+    state = makeImmutable(state)
     if (!props) {
       return state
     }
@@ -29,6 +30,7 @@ const newTabState = {
   },
 
   addSite: (state, props) => {
+    state = makeImmutable(state)
     if (!props) {
       return state
     }
@@ -42,6 +44,10 @@ const newTabState = {
       return state
     }
 
+    // Remove tags since we've verified this is a bookmark/history item
+    // NOTE: siteUtil.removeSite won't delete the entry unless tags are missing
+    siteDetail = siteDetail.delete('tags')
+
     // Keep track of the last 18 visited sites
     let sites = state.getIn(['about', 'newtab', 'sites']) || new Immutable.List()
     sites = sites.unshift(siteDetail)
@@ -51,36 +57,44 @@ const newTabState = {
     // |
     // V
     // .sort(suggestion.sortByAccessCountWithAgeDecay)
-    sites = siteUtil.addSite(sites, siteDetail, props.tag, props.originalSiteDetail)
+    sites = siteUtil.addSite(sites, siteDetail, undefined, props.originalSiteDetail)
     state = state.setIn(['about', 'newtab', 'sites'], sites)
     return state.setIn(['about', 'newtab', 'updatedStamp'], new Date().getTime())
   },
 
   removeSite: (state, props) => {
+    state = makeImmutable(state)
     if (!props) {
       return state
     }
 
     // Only bookmarks and history items should be considered
-    if (excludeSiteDetail(props.siteDetail)) {
+    let siteDetail = makeImmutable(props.siteDetail)
+    if (excludeSiteDetail(siteDetail)) {
       return state
     }
 
+    // Remove tags since we've verified this is a bookmark/history item
+    // NOTE: siteUtil.removeSite won't delete the entry unless tags are missing
+    siteDetail = siteDetail.delete('tags')
+
     const sites = state.getIn(['about', 'newtab', 'sites'])
-    state = state.setIn(['about', 'newtab', 'sites'], siteUtil.removeSite(sites, props.siteDetail, props.tag))
+    state = state.setIn(['about', 'newtab', 'sites'], siteUtil.removeSite(sites, siteDetail, undefined))
     return state.setIn(['about', 'newtab', 'updatedStamp'], new Date().getTime())
   },
 
   updateSiteFavicon: (state, props) => {
-    if (!props) {
+    state = makeImmutable(state)
+    props = makeImmutable(props)
+    if (!props || !props.get('frameProps') || !props.getIn(['frameProps', 'location'])) {
       return state
     }
 
     const sites = state.getIn(['about', 'newtab', 'sites'])
-    const sitesWithFavicon = siteUtil.updateSiteFavicon(sites, props.frameProps.get('location'), props.favicon)
+    const sitesWithFavicon = siteUtil.updateSiteFavicon(sites, props.getIn(['frameProps', 'location']), props.get('favicon'))
     state = state.setIn(['about', 'newtab', 'sites'], sitesWithFavicon)
     return state.setIn(['about', 'newtab', 'updatedStamp'], new Date().getTime())
   }
 }
 
-module.exports = newTabState
+module.exports = aboutNewTabState
