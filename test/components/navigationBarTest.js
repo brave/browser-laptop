@@ -4,7 +4,7 @@ const Brave = require('../lib/brave')
 const config = require('../../js/constants/config')
 const {urlBarSuggestions, urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime,
   navigator, titleBar, urlbarIcon, bookmarksToolbar, navigatorNotBookmarked, navigatorBookmarked,
-  saveButton, allowRunInsecureContentButton, dismissAllowRunInsecureContentButton,
+  doneButton, allowRunInsecureContentButton, dismissAllowRunInsecureContentButton,
   denyRunInsecureContentButton, dismissDenyRunInsecureContentButton, activeTabTitle} = require('../lib/selectors')
 const urlParse = require('url').parse
 const assert = require('assert')
@@ -1169,8 +1169,8 @@ describe('navigationBar', function () {
         .waitForExist(navigatorNotBookmarked)
         .moveToObject(navigator)
         .click(navigatorNotBookmarked)
-        .waitForVisible(saveButton)
-        .click(saveButton)
+        .waitForVisible(doneButton)
+        .click(doneButton)
         .waitForExist(navigatorBookmarked)
     })
 
@@ -1196,8 +1196,8 @@ describe('navigationBar', function () {
         .windowParentByUrl(page2Url)
         .moveToObject(navigator)
         .click(navigatorNotBookmarked)
-        .waitForVisible(saveButton)
-        .click(saveButton)
+        .waitForVisible(doneButton)
+        .click(doneButton)
         .waitForExist(navigatorBookmarked)
 
       yield this.app.client.isExisting(bookmarksToolbar).should.eventually.be.false
