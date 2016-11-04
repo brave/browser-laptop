@@ -33,7 +33,7 @@ describe('component updater', function () {
         })
     })
     it('Google Widevine can be enabled and installed', function * () {
-      const allowButton = '[type="button"]+[type="button"]'
+      const installButton = '[data-l10n-id="installAndAllow"]'
       const url = Brave.server.url('drm.html')
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
@@ -43,8 +43,9 @@ describe('component updater', function () {
         .url(url)
         .waitForUrl(url)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist(allowButton)
-        .click(allowButton)
+        .waitForVisible(installButton)
+        .click(installButton)
+        .waitForResourceReady(appConfig.resourceNames.WIDEVINE)
         // TODO(bbondy): flashBlock.js should be less aggressive so we can detect this with the drm.html #output div.
     })
   })
