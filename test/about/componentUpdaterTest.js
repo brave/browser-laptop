@@ -33,6 +33,11 @@ describe('component updater', function () {
         })
     })
     it('Google Widevine can be enabled and installed', function * () {
+      const isLinux = process.platform === 'linux'
+      if (isLinux) {
+        this.skip()
+        return
+      }
       const installButton = '[data-l10n-id="installAndAllow"]'
       const url = Brave.server.url('drm.html')
       yield this.app.client
