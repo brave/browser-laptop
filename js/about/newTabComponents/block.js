@@ -80,19 +80,19 @@ class Block extends ImmutableComponent {
               className={cx({
                 topSitesActionBtn: true,
                 fa: true,
-                [starIcon]: true
+                [pinIcon]: true
               })}
-              onClick={onToggleBookmark}
-              data-l10n-id={isBookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
+              onClick={onPinnedTopSite}
+              data-l10n-id={isPinned ? 'pinTopSiteButton' : 'unpinTopSiteButton'}
             />
             <button
               className={cx({
                 topSitesActionBtn: true,
                 fa: true,
-                [pinIcon]: true
+                [starIcon]: true
               })}
-              onClick={onPinnedTopSite}
-              data-l10n-id={isPinned ? 'pinTopSiteButton' : 'unpinTopSiteButton'}
+              onClick={onToggleBookmark}
+              data-l10n-id={isBookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
             />
             <button
               className='topSitesActionBtn fa fa-close'

@@ -44,10 +44,6 @@ const aboutNewTabState = {
       return state
     }
 
-    // Remove tags since we've verified this is a bookmark/history item
-    // NOTE: siteUtil.removeSite won't delete the entry unless tags are missing
-    siteDetail = siteDetail.delete('tags')
-
     // Keep track of the last 18 visited sites
     let sites = state.getIn(['about', 'newtab', 'sites']) || new Immutable.List()
     sites = sites.unshift(siteDetail)
@@ -57,7 +53,7 @@ const aboutNewTabState = {
     // |
     // V
     // .sort(suggestion.sortByAccessCountWithAgeDecay)
-    sites = siteUtil.addSite(sites, siteDetail, undefined, props.originalSiteDetail)
+    sites = siteUtil.addSite(sites, siteDetail, props.tag, props.originalSiteDetail)
     state = state.setIn(['about', 'newtab', 'sites'], sites)
     return state.setIn(['about', 'newtab', 'updatedStamp'], new Date().getTime())
   },
@@ -74,9 +70,11 @@ const aboutNewTabState = {
       return state
     }
 
-    // Remove tags since we've verified this is a bookmark/history item
+    // Remove tags if this is a history item.
     // NOTE: siteUtil.removeSite won't delete the entry unless tags are missing
-    siteDetail = siteDetail.delete('tags')
+    if (siteDetail.get('tags') && siteDetail.get('tags').size === 0) {
+      siteDetail = siteDetail.delete('tags')
+    }
 
     const sites = state.getIn(['about', 'newtab', 'sites'])
     state = state.setIn(['about', 'newtab', 'sites'], siteUtil.removeSite(sites, siteDetail, undefined))
