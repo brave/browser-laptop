@@ -287,7 +287,7 @@ class LedgerTable extends ImmutableComponent {
         headings={['rank', 'publisher', 'include', 'views', 'timeSpent', 'percentage']}
         defaultHeading='rank'
         overrideDefaultStyle
-        columnClassNames={['alignRight', '', '', 'alignRight', 'alignRight', '']}
+        columnClassNames={['alignRight', '', '', 'alignRight', 'alignRight', 'alignRight']}
         rowClassNames={
           this.synopsis.map((item) =>
             this.enabledForSite(item) ? '' : 'paymentsDisabled').toJS()
