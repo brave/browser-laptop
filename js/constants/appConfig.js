@@ -149,7 +149,8 @@ module.exports = {
     'shutdown.clear-autocomplete-data': false,
     'shutdown.clear-autofill-data': false,
     'shutdown.clear-site-settings': false,
-    'extensions.pocket.enabled': false
+    'extensions.pocket.enabled': false,
+    'general.bookmarks-toolbar-mode': null
   },
   defaultFavicon: 'img/empty_favicon.png',
   uaExceptionHosts: [
