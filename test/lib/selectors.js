@@ -54,6 +54,7 @@ module.exports = {
   homepageInput: '[data-l10n-id="homepageInput"]',
   walletSwitch: '.enablePaymentsSwitch .switchBackground',
   addFundsButton: '.addFunds',
+  advancedSettings: '.advancedSettings',
   fundsSelectBox: '#fundsSelectBox',
   paymentsStatus: '#walletStatus',
   ledgerTable: '#ledgerTable',
