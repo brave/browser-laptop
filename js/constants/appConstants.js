@@ -60,7 +60,8 @@ const AppConstants = {
   APP_SET_MENUBAR_TEMPLATE: _,
   APP_UPDATE_ADBLOCK_DATAFILES: _,
   APP_UPDATE_ADBLOCK_CUSTOM_RULES: _,
-  APP_SUBMIT_FEEDBACK: _
+  APP_SUBMIT_FEEDBACK: _,
+  APP_RENDER_URL_TO_PDF: _
 }
 
 module.exports = mapValuesByKeys(AppConstants)

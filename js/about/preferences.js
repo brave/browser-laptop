@@ -563,8 +563,8 @@ class PaymentHistoryRow extends ImmutableComponent {
     return transactionsToCSVDataURL(this.transaction.toJS())
   }
 
-  generatePDF () {
-    ipc.send(messages.RENDER_URL_TO_PDF, this.htmlDataURL, this.receiptFileName)
+  renderPdf () {
+    aboutActions.renderUrlToPdf(this.htmlDataURL, this.receiptFileName)
   }
 
   render () {
@@ -574,7 +574,7 @@ class PaymentHistoryRow extends ImmutableComponent {
     return <tr>
       <td className='narrow' data-sort={this.timestamp}>{date}</td>
       <td className='wide' data-sort={this.satoshis}>{totalAmountStr}</td>
-      <td className='wide'><a onClick={this.generatePDF.bind(this)}>{this.receiptFileName}</a></td>
+      <td className='wide'><a onClick={this.renderPdf.bind(this)}>{this.receiptFileName}</a></td>
     </tr>
   }
 }
