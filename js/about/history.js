@@ -14,6 +14,8 @@ const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
 const Button = require('../components/button')
 const siteUtil = require('../state/siteUtil')
+const {makeImmutable} = require('../../app/common/state/immutableUtil')
+const historyUtil = require('../../app/common/lib/historyUtil')
 
 const ipc = window.chrome.ipc
 
@@ -57,6 +59,7 @@ class HistoryTimeCell extends ImmutableComponent {
 
 class HistoryDay extends ImmutableComponent {
   navigate (entry) {
+    entry = makeImmutable(entry)
     aboutActions.newFrame({
       location: entry.get('location'),
       partitionNumber: entry.get('partitionNumber')
@@ -79,7 +82,7 @@ class HistoryDay extends ImmutableComponent {
           urlutils.getHostname(entry.get('location'), true)
         ])}
         rowObjects={this.props.entries}
-        totalRowObjects={this.props.totalEntries}
+        totalRowObjects={this.props.totalEntries.toJS()}
         tableID={this.props.tableID}
         columnClassNames={['time', 'title', 'domain']}
         addHoverClass
@@ -93,53 +96,19 @@ class HistoryDay extends ImmutableComponent {
 }
 
 class GroupedHistoryList extends ImmutableComponent {
-  getDayString (locale, item) {
-    const lastAccessedTime = item.get('lastAccessedTime')
-    return lastAccessedTime
-      ? new Date(lastAccessedTime).toLocaleDateString(locale, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
-      : ''
-  }
-  groupEntriesByDay (locale) {
-    const reduced = this.props.history.reduce((previousValue, currentValue, currentIndex, array) => {
-      const result = currentIndex === 1 ? [] : previousValue
-      if (currentIndex === 1) {
-        const firstDate = this.getDayString(locale, currentValue)
-        result.push({date: firstDate, entries: [previousValue]})
-      }
-      const date = this.getDayString(locale, currentValue)
-      const dateIndex = result.findIndex((entryByDate) => entryByDate.date === date)
-      if (dateIndex !== -1) {
-        result[dateIndex].entries.push(currentValue)
-      } else {
-        result.push({date: date, entries: [currentValue]})
-      }
-      return result
-    })
-    if (reduced) {
-      return Array.isArray(reduced)
-        ? reduced
-        : [{date: this.getDayString(locale, reduced), entries: [reduced]}]
-    }
-    return []
-  }
-  totalEntries (entriesByDay) {
-    const result = []
-    entriesByDay.forEach((entry) => {
-      result.push(entry.entries)
-    })
-    return result
-  }
   render () {
     const defaultLanguage = this.props.languageCodes.find((lang) => lang.includes(navigator.language)) || 'en-US'
-    const userLanguage = getSetting(settings.LANGUAGE, this.props.settings)
-    const entriesByDay = this.groupEntriesByDay(userLanguage || defaultLanguage)
+    const userLanguage = getSetting(settings.LANGUAGE, this.props.settings) || defaultLanguage
+    const entriesByDay = historyUtil.groupEntriesByDay(this.props.history, userLanguage)
+    const totalEntries = historyUtil.totalEntries(entriesByDay)
     let index = 0
     return <list className='historyList'>
       {
         entriesByDay.map((groupedEntry) =>
-          <HistoryDay date={groupedEntry.date}
-            entries={groupedEntry.entries}
-            totalEntries={this.totalEntries(entriesByDay)}
+          <HistoryDay
+            date={groupedEntry.get('date')}
+            entries={groupedEntry.get('entries')}
+            totalEntries={totalEntries}
             tableID={index++}
             stateOwner={this.props.stateOwner}
           />)
@@ -189,11 +158,8 @@ class AboutHistory extends React.Component {
   }
   get historyDescendingOrder () {
     return this.state.history.filter((site) => siteUtil.isHistoryEntry(site))
-      .sort((left, right) => {
-        if (left.get('lastAccessedTime') < right.get('lastAccessedTime')) return 1
-        if (left.get('lastAccessedTime') > right.get('lastAccessedTime')) return -1
-        return 0
-      }).slice(-500)
+      .sort(historyUtil.sortTimeDescending)
+      .slice(-500)
   }
   clearBrowsingDataNow () {
     aboutActions.clearBrowsingDataNow({browserHistory: true})
