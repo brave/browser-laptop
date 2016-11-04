@@ -35,21 +35,20 @@ class NewTabPage extends React.Component {
       updatedStamp: undefined
     }
     ipc.on(messages.NEWTAB_DATA_UPDATED, (e, newTabData) => {
-      this.sanitize(newTabData)
-    })
-  }
-  sanitize (newTabData) {
-    let sanitizedData = Immutable.fromJS(newTabData || {})
-    const updatedStamp = sanitizedData.getIn(['newTabDetail', 'updatedStamp'])
+      const data = Immutable.fromJS(newTabData || {})
+      const updatedStamp = data.getIn(['newTabDetail', 'updatedStamp'])
 
-    // Only update if the data has changed.
-    if (updatedStamp === this.state.updatedStamp) {
-      return
-    }
+      // Only update if the data has changed.
+      if (typeof updatedStamp === 'number' &&
+          typeof this.state.updatedStamp === 'number' &&
+          updatedStamp === this.state.updatedStamp) {
+        return
+      }
 
-    this.setState({
-      newTabData: sanitizedData,
-      updatedStamp: updatedStamp
+      this.setState({
+        newTabData: data,
+        updatedStamp: updatedStamp
+      })
     })
   }
 
