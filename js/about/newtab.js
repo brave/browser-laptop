@@ -43,19 +43,8 @@ class NewTabPage extends React.Component {
     const updatedStamp = sanitizedData.getIn(['newTabDetail', 'updatedStamp'])
 
     // Only update if the data has changed.
-    // console.log(updatedStamp + ']DATA_TS==LAST_TS[' + this.state.updatedStamp)
     if (updatedStamp === this.state.updatedStamp) {
       return
-    }
-
-    // Ensure top sites only has unique values
-    const pinnedTopSites = sanitizedData.getIn(['newTabDetail', 'pinnedTopSites'])
-    if (pinnedTopSites) {
-      const uniqueValues = pinnedTopSites.filter((element, index, list) => {
-        if (!element) return false
-        return index === list.findIndex((site) => site && site.get('location') === element.get('location'))
-      })
-      sanitizedData = sanitizedData.setIn(['newTabDetail', 'pinnedTopSites'], uniqueValues)
     }
 
     this.setState({
@@ -82,7 +71,7 @@ class NewTabPage extends React.Component {
   }
 
   get pinnedTopSites () {
-    return this.state.newTabData.getIn(['newTabDetail', 'pinnedTopSites'])
+    return this.state.newTabData.getIn(['newTabDetail', 'pinnedTopSites']).setSize(18)
   }
 
   get ignoredTopSites () {
@@ -97,6 +86,10 @@ class NewTabPage extends React.Component {
     return this.pinnedTopSites.includes(siteProps)
   }
 
+  isIgnored (siteProps) {
+    return this.ignoredTopSites.includes(siteProps)
+  }
+
   isBookmarked (siteProps) {
     return siteUtil.isSiteBookmarked(this.topSites, siteProps)
   }
@@ -106,21 +99,23 @@ class NewTabPage extends React.Component {
    * in the grid, and the non pinned indexes are populated with newly accessed sites
    */
   get topSites () {
-    let gridSites = Immutable.List().setSize(18)
-    let sites = this.sites
-    const pinnedTopSites = this.pinnedTopSites.setSize(gridSites.size)
-    const ignoredTopSites = this.ignoredTopSites
+    const pinnedTopSites = this.pinnedTopSites
+    const sites = this.sites
+    let unpinnedTopSites = sites.filter((site) => !this.isPinned(site) ? site : null)
+    let gridSites
 
-    // We need to know which sites are pinned first, so we can skip them while populating
-    gridSites = gridSites.push.apply(pinnedTopSites, gridSites)
-    gridSites = gridSites.map((item, i) => item == null ? sites.get(i) : item)
+    const getUnpinned = () => {
+      const firstSite = unpinnedTopSites.first()
+      unpinnedTopSites = unpinnedTopSites.shift()
+      return firstSite
+    }
+
+    gridSites = pinnedTopSites.map(pinned => pinned || getUnpinned())
 
     // Remove from grid all ignored sites
-    gridSites = gridSites.filter((site) => ignoredTopSites.indexOf(site) === -1)
+    gridSites = gridSites.filter((site) => !this.isIgnored(site))
 
-    gridSites = gridSites.filter(site => site != null)
-
-    return gridSites
+    return gridSites.filter(site => site != null)
   }
 
   get gridLayout () {
@@ -210,7 +205,7 @@ class NewTabPage extends React.Component {
     const currentPositionIndex = gridSites.indexOf(currentPosition)
 
     // If pinned, leave it null. Otherwise stores site on ignoredTopSites list, retaining the same position
-    let pinnedTopSites = this.pinnedTopSites.setSize(18)
+    let pinnedTopSites = this.pinnedTopSites
     pinnedTopSites = pinnedTopSites.splice(currentPositionIndex, 1, this.isPinned(siteProps) ? null : siteProps)
 
     aboutActions.setNewTabDetail({pinnedTopSites: pinnedTopSites})
@@ -234,6 +229,7 @@ class NewTabPage extends React.Component {
   }
 
   onUndoIgnoredTopSite () {
+    // Remove last List's entry
     const ignoredTopSites = this.ignoredTopSites.splice(-1, 1)
     aboutActions.setNewTabDetail({ignoredTopSites: ignoredTopSites})
     this.hideSiteRemovalNotification()
