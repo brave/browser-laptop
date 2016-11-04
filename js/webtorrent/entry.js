@@ -1,4 +1,6 @@
 const ReactDOM = require('react-dom')
+const magnetURI = require('magnet-uri')
+const Button = require('../components/button')
 
 /**
  * TODO: Once WebTorrent is running in it's own process, replace the window
@@ -19,74 +21,138 @@ window.WEBTORRENT_ANNOUNCE = [
 
 var state = {
   torrentId: window.location.hash.substring(1),
+  torrent: null,
   progress: 0,
   files: [],
-  errorMessage: ''
+  dn: '',
+  errorMessage: '',
+  isFileLoaded: false
 }
 
 require('../../less/webtorrent.less')
 
 // Start downloading the torrent
 var client = window.client = new WebTorrent()
-state.torrent = client.add(state.torrentId)
 client.on('error', onError)
 
-// Show a friendly window title
-updateTitle()
-state.torrent.on('metadata', updateTitle)
-
 // Show download progress
-setInterval(update, 1000)
+setInterval(render, 1000)
+render()
 
-function update () {
+function start () {
+  state.torrent = client.add(state.torrentId)
+}
+
+function render () {
   var torrent = state.torrent
+  var id = state.torrentId
+
+  // TODO: right now, we only support magnet links as the torrentId
+  // Eventually, we need to support .torrent files as well, prob using parse-torrent
+  if (!state.magnetInfo && id.startsWith('magnet:?')) {
+    state.magnetInfo = magnetURI(id)
+  }
+  var magnetName = state.magnetInfo && state.magnetInfo.dn
+
+  var title
+  if (!torrent) {
+    title = magnetName || 'New torrent'
+  } else if (!torrent.name) {
+    title = magnetName || 'Loading torrent information...'
+  } else {
+    title = torrent.name
+  }
+  document.title = title
 
   var status
-  if (!torrent.infoHash) {
-    status = 'Loading torrent information...'
+  if (!state.torrent) {
+    status = (
+      <Button l10nId='startTorrent' className='primaryButton' onClick={start}>Start</Button>
+    )
   } else if (torrent.progress < 1) {
-    status = 'Downloading ' + (torrent.name || '...')
+    status = (
+      <span>Downloading: {(torrent.progress * 100).toFixed(1)}%</span>
+    )
   } else {
-    status = 'Done!'
+    status = (
+      <span>Complete: 100%</span>
+    )
+  }
+  status = (
+    <span className='status'>
+      {status}
+    </span>
+  )
+
+  var content
+  if (!state.torrent) {
+    content = (
+      <div className='content'>
+        <strong>Warning: </strong>
+        please ensure that you have legal rights to download and share this content before
+        clicking Start.
+      </div>
+    )
+  } else if (state.magnetInfo && state.magnetInfo.ix != null) {
+    content = (
+      <div className='content'>
+        <div id='fileContainer' />
+      </div>
+    )
+
+    var ix = Number(state.magnetInfo.ix)
+    if (torrent && torrent.files && torrent.files[ix] && !state.isFileLoaded) {
+      var file = state.torrent.files[ix]
+      file.appendTo(document.querySelector('#fileContainer'))
+      state.isFileLoaded = true
+    }
+  } else {
+    var fileElems = torrent.files.map((file, i) => {
+      return (
+        <li>
+          <a href={id + '&ix=' + i}>{file.name}</a>
+        </li>
+      )
+    })
+
+    var fileList
+    if (fileElems.length === 0) {
+      fileList = (<div>Loading...</div>)
+    } else {
+      fileList = (
+        <ul className='files'>
+          {fileElems}
+        </ul>
+      )
+    }
+
+    content = (
+      <div className='content'>
+        <h3>Files</h3>
+        {fileList}
+      </div>
+    )
   }
 
   var elem = (
     <div>
-      <h1>{status}</h1>
-      <h3>Progress: {(torrent.progress * 100).toFixed(1)}%</h3>
-      <h3>Files</h3>
-      <ul className='files'>
-        {torrent.files.map((file, i) => {
-          var className = i === state.selectedFileIndex ? 'selected' : ''
-          return (
-            <li data-ix={i} className={className} onClick={onClickFile}>
-              {file.name}
-            </li>
-          )
-        })}
-      </ul>
-      <div id='fileContainer' />
+      <h1>{title}</h1>
+      <div className='status-bar'>
+        {status}
+        <span className='button'>
+          <span className='fa fa-magnet' />
+          <span>Copy magnet link</span>
+        </span>
+        <span className='button'>
+          <span className='fa fa-file-o' />
+          <span>Save torrent file</span>
+        </span>
+      </div>
+      {content}
       <div className='error'>{state.errorMessage}</div>
     </div>
   )
   ReactDOM.render(elem, document.querySelector('#appContainer'))
-}
-
-function updateTitle () {
-  document.title = state.torrent.name || 'Downloading torrent...'
-}
-
-function onClickFile (e) {
-  var clickedIndex = Number(e.target.dataset.ix)
-  if (state.selectedFileIndex === clickedIndex) return
-  state.selectedFileIndex = clickedIndex
-
-  update()
-
-  var fileContainer = document.querySelector('#fileContainer')
-  fileContainer.innerHTML = ''
-  var file = state.torrent.files[state.selectedFileIndex]
-  file.appendTo(fileContainer)
 }
 
 function onError (err) {

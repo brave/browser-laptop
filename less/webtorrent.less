@@ -3,6 +3,8 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 @import "./variables.less";
+@import "./button.less";
+@import "../node_modules/font-awesome/css/font-awesome.css";
 
 .files {
   padding: 0;
@@ -19,4 +21,29 @@
 
 .error {
   color: @errorTextColor;
+}
+
+.status-bar {
+  margin-bottom: 20px;
+}
+
+.status {
+  display: inline-block;
+  width: 160px;
+  font-size: 1.17em;
+  font-weight: bold;
+}
+
+.button:not(:last-child) {
+  display: inline-block;
+  padding-right: 20px;
+}
+
+.fa {
+  display: inline-block;
+  width: 20px;
+}
+
+.content {
+  margin-top: 20px;
 }
