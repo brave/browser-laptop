@@ -512,8 +512,8 @@ const createMenu = () => {
     {
       label: locale.translation('bravery'),
       submenu: [
-        CommonMenu.braveryGlobalMenuItem(),
         CommonMenu.braverySiteMenuItem(),
+        CommonMenu.separatorMenuItem,
         CommonMenu.braveryPaymentsMenuItem()
       ]
     },
@@ -531,12 +531,10 @@ const createMenu = () => {
       submenu: [
         CommonMenu.aboutBraveMenuItem(),
         CommonMenu.separatorMenuItem,
-        CommonMenu.checkForUpdateMenuItem(),
-        CommonMenu.separatorMenuItem,
-        CommonMenu.importBrowserDataMenuItem(),
-        CommonMenu.separatorMenuItem,
         CommonMenu.preferencesMenuItem(),
         CommonMenu.separatorMenuItem,
+        CommonMenu.importBrowserDataMenuItem(),
+        CommonMenu.checkForUpdateMenuItem(),
         CommonMenu.submitFeedbackMenuItem(),
         CommonMenu.separatorMenuItem,
         {
