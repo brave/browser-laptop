@@ -19,7 +19,7 @@ describe('General Panel', function () {
       yield setup(this.app.client)
     })
 
-    it('homepage displays punycode', function * () {
+    it.skip('homepage displays punycode', function * () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(prefsUrl)
