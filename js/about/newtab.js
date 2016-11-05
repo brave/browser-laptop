@@ -15,6 +15,7 @@ const SiteRemovalNotification = require('./newTabComponents/siteRemovalNotificat
 const FooterInfo = require('./newTabComponents/footerInfo')
 const aboutActions = require('./aboutActions')
 const siteUtil = require('../state/siteUtil')
+const urlutils = require('../lib/urlutil')
 const siteTags = require('../constants/siteTags')
 const cx = require('../lib/classSet.js')
 const config = require('../constants/config')
@@ -264,6 +265,12 @@ class NewTabPage extends React.Component {
     const gridLayoutSize = this.gridLayoutSize
     const gridLayout = this.gridLayout
 
+    const getLetterFromUrl = (url) => {
+      const hostname = urlutils.getHostname(url.get('location'), true)
+      const name = url.get('title') || hostname || '?'
+      return name.charAt(0).toUpperCase()
+    }
+
     return <div className='dynamicBackground' style={this.state.backgroundImage.style}>
       {
         this.state.backgroundImage
@@ -297,9 +304,7 @@ class NewTabPage extends React.Component {
                     href={site.get('location')}
                     favicon={
                       site.get('favicon') == null
-                      ? site.get('title')
-                        ? site.get('title').charAt(0).toUpperCase()
-                        : '?'
+                      ? getLetterFromUrl(site)
                       : <img src={site.get('favicon')} />
                     }
                     style={{backgroundColor: site.get('themeColor')}}
