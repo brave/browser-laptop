@@ -10,7 +10,6 @@ const dialog = electron.dialog
 const BrowserWindow = electron.BrowserWindow
 const session = electron.session
 const Immutable = require('immutable')
-const {showImportWarning, showImportSuccess} = require('./aboutDialog')
 const siteUtil = require('../js/state/siteUtil')
 const AppStore = require('../js/stores/appStore')
 const siteTags = require('../js/constants/siteTags')
@@ -18,6 +17,8 @@ const appActions = require('../js/actions/appActions')
 const messages = require('../js/constants/messages')
 const settings = require('../js/constants/settings')
 const getSetting = require('../js/settings').getSetting
+const path = require('path')
+const locale = require('./locale')
 
 var isMergeFavorites = false
 var isImportingBookmarks = false
@@ -224,6 +225,34 @@ importer.on('add-cookies', (e, cookies) => {
     })
   }
 })
+
+const showImportWarning = function () {
+  // The timeout is in case there's a call just after the modal to hide the menu.
+  // showMessageBox is a modal and blocks everything otherwise, so menu would remain open
+  // while the dialog is displayed.
+  setTimeout(() => {
+    dialog.showMessageBox({
+      title: 'Brave',
+      message: `${locale.translation('closeFirefoxWarning')}`,
+      icon: path.join(__dirname, '..', 'app', 'extensions', 'brave', 'img', 'braveAbout.png'),
+      buttons: [locale.translation('closeFirefoxWarningOk')]
+    })
+  }, 50)
+}
+
+const showImportSuccess = function () {
+  // The timeout is in case there's a call just after the modal to hide the menu.
+  // showMessageBox is a modal and blocks everything otherwise, so menu would remain open
+  // while the dialog is displayed.
+  setTimeout(() => {
+    dialog.showMessageBox({
+      title: 'Brave',
+      message: `${locale.translation('importSuccess')}`,
+      icon: path.join(__dirname, '..', 'app', 'extensions', 'brave', 'img', 'braveAbout.png'),
+      buttons: [locale.translation('importSuccessOk')]
+    })
+  }, 50)
+}
 
 importer.on('show-warning-dialog', (e) => {
   showImportWarning()

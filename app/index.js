@@ -68,7 +68,6 @@ const HttpsEverywhere = require('./httpsEverywhere')
 const SiteHacks = require('./siteHacks')
 const CmdLine = require('./cmdLine')
 const UpdateStatus = require('../js/constants/updateStatus')
-const showAbout = require('./aboutDialog').showAbout
 const urlParse = require('url').parse
 const CryptoUtil = require('../js/lib/cryptoUtil')
 const keytar = require('keytar')
@@ -754,9 +753,6 @@ app.on('ready', () => {
       // This is fired by a menu entry (for now - will be scheduled)
       process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
       ipcMain.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
-
-      process.on(messages.SHOW_ABOUT, showAbout)
-      ipcMain.on(messages.SHOW_ABOUT, showAbout)
 
       // This is fired from a auto-update metadata call
       process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => {

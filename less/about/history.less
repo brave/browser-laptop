@@ -4,6 +4,20 @@
   min-width: 704px;
 
   .siteDetailsPageContent {
+    &.aboutAbout {
+      .sortableTable {
+        -webkit-user-select: text;
+        margin-left: @aboutPageSectionPadding;
+        width: 400px;
+        td {
+          cursor: auto;
+          padding-left: 8px;
+        }
+      }
+      ul {
+        margin-left: @aboutPageSectionPadding + @aboutPageSectionPadding;
+      }
+    }
     .sortableTable {
       -webkit-user-select: none;
       // Time visited
