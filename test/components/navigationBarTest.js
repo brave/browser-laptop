@@ -492,7 +492,7 @@ describe('navigationBar', function () {
           )
         })
     })
-    it.skip('Limit effect of running insecure content in private frame', function * () {
+    it('Limit effect of running insecure content in private frame', function * () {
       const page1Url = 'https://mixed-script.badssl.com/'
       yield this.app.client
         .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { isPrivate: true })
