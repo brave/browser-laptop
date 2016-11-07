@@ -122,7 +122,7 @@ var webtorrentPage = {
   target: 'web',
   entry: ['./js/webtorrent/entry.js'],
   output: {
-    path: path.resolve(__dirname, 'app', 'extensions', 'brave', 'gen'),
+    path: path.resolve(__dirname, 'app', 'extensions', 'torrent', 'gen'),
     filename: 'webtorrentPage.entry.js',
     publicPath: './gen/'
   }

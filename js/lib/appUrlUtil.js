@@ -19,14 +19,27 @@ module.exports.fileUrl = (str) => {
 }
 
 /**
- * Determines the path of a relative URL from the hosted app
+ * Gets the URL of a page hosted by the braveExtension or torrentExtension
+ * Returns 'chrome-extension://<...>'
  */
-module.exports.getAppUrl = function (relativeUrl) {
+module.exports.getBraveExtUrl = function (relativeUrl) {
   if (relativeUrl === undefined) {
     relativeUrl = ''
   }
 
   return 'chrome-extension://' + config.braveExtensionId + '/' + relativeUrl
+}
+
+/**
+ * Gets the URL of a page hosted by the torrentExtension
+ * Returns 'chrome-extension://<...>'
+ */
+const getTorrentExtUrl = function (relativeUrl) {
+  if (relativeUrl === undefined) {
+    relativeUrl = ''
+  }
+
+  return 'chrome-extension://' + config.torrentExtensionId + '/' + relativeUrl
 }
 
 module.exports.getExtensionsPath = function (extensionDir) {
@@ -36,39 +49,40 @@ module.exports.getExtensionsPath = function (extensionDir) {
     : path.join(__dirname, '..', '..', 'app', 'extensions', extensionDir)
 }
 
-module.exports.getIndexHTML = function () {
+module.exports.getBraveExtIndexHTML = function () {
+  var prefix = path.resolve(__dirname, '..', '..') + '/app/extensions/brave'
   return process.env.NODE_ENV === 'development'
-    ? module.exports.fileUrl(path.resolve(__dirname, '..', '..') + '/app/extensions/brave/index-dev.html')
-    : module.exports.fileUrl(path.resolve(__dirname, '..', '..') + '/app/extensions/brave/index.html')
+    ? module.exports.fileUrl(prefix + '/index-dev.html')
+    : module.exports.fileUrl(prefix + '/index.html')
 }
 
 /**
  * Returns the URL to the application's manifest
  */
 module.exports.getManifestUrl = function () {
-  return module.exports.getAppUrl('manifest.webapp')
+  return module.exports.getBraveExtUrl('manifest.webapp')
 }
 
 // Map of source about: URLs mapped to target URLs
 module.exports.aboutUrls = new Immutable.Map({
-  'about:about': module.exports.getAppUrl('about-about.html'),
-  'about:adblock': module.exports.getAppUrl('about-adblock.html'),
-  'about:autofill': module.exports.getAppUrl('about-autofill.html'),
-  'about:blank': module.exports.getAppUrl('about-blank.html'),
-  'about:bookmarks': module.exports.getAppUrl('about-bookmarks.html'),
-  'about:brave': module.exports.getAppUrl('about-brave.html'),
-  'about:certerror': module.exports.getAppUrl('about-certerror.html'),
-  'about:config': module.exports.getAppUrl('about-config.html'),
-  'about:downloads': module.exports.getAppUrl('about-downloads.html'),
-  'about:error': module.exports.getAppUrl('about-error.html'),
-  'about:extensions': module.exports.getAppUrl('about-extensions.html'),
-  'about:flash': module.exports.getAppUrl('about-flash.html'),
-  'about:history': module.exports.getAppUrl('about-history.html'),
-  'about:newtab': module.exports.getAppUrl('about-newtab.html'),
-  'about:passwords': module.exports.getAppUrl('about-passwords.html'),
-  'about:preferences': module.exports.getAppUrl('about-preferences.html'),
-  'about:safebrowsing': module.exports.getAppUrl('about-safebrowsing.html'),
-  'about:styles': module.exports.getAppUrl('about-styles.html')
+  'about:about': module.exports.getBraveExtUrl('about-about.html'),
+  'about:adblock': module.exports.getBraveExtUrl('about-adblock.html'),
+  'about:autofill': module.exports.getBraveExtUrl('about-autofill.html'),
+  'about:blank': module.exports.getBraveExtUrl('about-blank.html'),
+  'about:bookmarks': module.exports.getBraveExtUrl('about-bookmarks.html'),
+  'about:brave': module.exports.getBraveExtUrl('about-brave.html'),
+  'about:certerror': module.exports.getBraveExtUrl('about-certerror.html'),
+  'about:config': module.exports.getBraveExtUrl('about-config.html'),
+  'about:downloads': module.exports.getBraveExtUrl('about-downloads.html'),
+  'about:error': module.exports.getBraveExtUrl('about-error.html'),
+  'about:extensions': module.exports.getBraveExtUrl('about-extensions.html'),
+  'about:flash': module.exports.getBraveExtUrl('about-flash.html'),
+  'about:history': module.exports.getBraveExtUrl('about-history.html'),
+  'about:newtab': module.exports.getBraveExtUrl('about-newtab.html'),
+  'about:passwords': module.exports.getBraveExtUrl('about-passwords.html'),
+  'about:preferences': module.exports.getBraveExtUrl('about-preferences.html'),
+  'about:safebrowsing': module.exports.getBraveExtUrl('about-safebrowsing.html'),
+  'about:styles': module.exports.getBraveExtUrl('about-styles.html')
 })
 
 module.exports.isIntermediateAboutPage = (location) =>
@@ -131,7 +145,7 @@ module.exports.isTargetAboutUrl = function (input) {
  */
 module.exports.getTargetMagnetUrl = function (input) {
   if (!input.startsWith('magnet:')) return null
-  const url = module.exports.getAppUrl('webtorrent.html')
+  const url = getTorrentExtUrl('webtorrent.html')
   return [url, input].join('#')
 }
 
@@ -141,7 +155,7 @@ module.exports.getTargetMagnetUrl = function (input) {
  * Example: getSourceMagnetUrl('chrome-extension://<...>.html#magnet:...') -> 'magnet:...'
  */
 module.exports.getSourceMagnetUrl = function (input) {
-  if (getBaseUrl(input) !== module.exports.getAppUrl('webtorrent.html')) return null
+  if (getBaseUrl(input) !== getTorrentExtUrl('webtorrent.html')) return null
   const url = getHash(input)
   return url
 }

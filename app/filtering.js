@@ -369,7 +369,8 @@ function registerPermissionHandler (session, partition) {
     const appState = appStore.getState()
     let settings
     let tempSettings
-    if (mainFrameUrl === appUrlUtil.getIndexHTML() || origin.startsWith('chrome-extension://' + config.braveExtensionId)) {
+    if (mainFrameUrl === appUrlUtil.getBraveExtIndexHTML() ||
+      origin.startsWith('chrome-extension://' + config.braveExtensionId)) {
       // lookup, display and store site settings by "Brave Browser"
       origin = 'Brave Browser'
       // display on all tabs
