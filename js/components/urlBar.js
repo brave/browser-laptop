@@ -409,6 +409,9 @@ class UrlBar extends ImmutableComponent {
   }
 
   render () {
+    const showIconSecure = !this.activateSearchEngine && this.isHTTPPage && this.props.isSecure && !this.props.urlbar.get('active')
+    const showIconInsecure = !this.activateSearchEngine && this.isHTTPPage && !this.props.isSecure && !this.props.urlbar.get('active') && !this.props.titleMode
+    const showIconSearch = !this.activateSearchEngine && this.props.urlbar.get('active') && this.props.loading === false
     const value = this.isActive || (!this.locationValue && this.isFocused())
       ? undefined
       : this.locationValue
@@ -424,9 +427,9 @@ class UrlBar extends ImmutableComponent {
         className={cx({
           urlbarIcon: true,
           'fa': !this.activateSearchEngine,
-          'fa-lock': !this.activateSearchEngine && this.isHTTPPage && this.props.isSecure && !this.props.urlbar.get('active'),
-          'fa-unlock': !this.activateSearchEngine && this.isHTTPPage && !this.props.isSecure && !this.props.urlbar.get('active') && !this.props.titleMode,
-          'fa fa-file': !this.activateSearchEngine && this.props.urlbar.get('active') && this.props.loading === false,
+          'fa-lock': showIconSecure,
+          'fa-exclamation-triangle': showIconInsecure,
+          'fa fa-search': showIconSearch || (!showIconSecure && !showIconInsecure && !showIconSearch),
           extendedValidation: this.extendedValidationSSL
         })}
         style={

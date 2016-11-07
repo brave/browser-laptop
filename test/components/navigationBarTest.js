@@ -332,7 +332,7 @@ describe('navigationBar', function () {
           .moveToObject(navigator)
           .waitForExist(urlbarIcon)
           .getAttribute(urlbarIcon, 'class').then((classes) =>
-            classes.includes('fa-unlock')
+            classes.includes('fa-exclamation-triangle')
         ))
         .windowByUrl(Brave.browserWindowUrl)
         .click(urlbarIcon)
@@ -791,6 +791,9 @@ describe('navigationBar', function () {
             return this.getValue(urlInput).then((val) => val === 'about:blank')
           })
       })
+      it('has the search icon', function * () {
+        yield this.app.client.waitForExist('.urlbarIcon.fa-search')
+      })
     })
 
     describe('page with focused form input', function () {
@@ -850,8 +853,8 @@ describe('navigationBar', function () {
         yield selectsText(this.app.client, 'brave.com')
       })
 
-      it('has the file icon', function * () {
-        yield this.app.client.waitForExist('.urlbarIcon.fa-file')
+      it('has the search icon', function * () {
+        yield this.app.client.waitForExist('.urlbarIcon.fa-search')
       })
     })
 

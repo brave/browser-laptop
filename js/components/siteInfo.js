@@ -61,9 +61,9 @@ class SiteInfo extends ImmutableComponent {
           extendedValidation: this.isExtendedValidation
         })} /><span data-l10n-id='secureConnection' /></li>
     } else if (this.runInsecureContent) {
-      secureIcon = <li><span className='fa fa-unlock' /><span data-l10n-id='mixedConnection' /></li>
+      secureIcon = <li><span className='fa fa-exclamation-triangle' /><span data-l10n-id='mixedConnection' /></li>
     } else {
-      secureIcon = <li><span className='fa fa-unlock' /><span data-l10n-id='insecureConnection' data-l10n-args={JSON.stringify(l10nArgs)} /></li>
+      secureIcon = <li><span className='fa fa-exclamation-triangle' /><span data-l10n-id='insecureConnection' data-l10n-args={JSON.stringify(l10nArgs)} /></li>
     }
 
     // Figure out the partition info display
