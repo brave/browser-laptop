@@ -3,6 +3,7 @@
 
 'use strict'
 const Immutable = require('immutable')
+const normalizeUrl = require('normalize-url')
 const siteTags = require('../constants/siteTags')
 const settings = require('../constants/settings')
 const getSetting = require('../settings').getSetting
@@ -339,7 +340,7 @@ module.exports.updateSiteFavicon = function (sites, location, favicon) {
   const matchingIndices = []
 
   sites.filter((site, index) => {
-    if (site.get('location') === location) {
+    if (normalizeUrl(site.get('location')) === normalizeUrl(location)) {
       matchingIndices.push(index)
       return true
     }
