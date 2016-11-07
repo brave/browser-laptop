@@ -133,7 +133,7 @@ module.exports = {
     'security.passwords.dashlane-enabled': false,
     'security.passwords.last-pass-enabled': false,
     'general.downloads.default-save-path': null,
-    'general.disable-title-mode': process.platform === 'win32',
+    'general.disable-title-mode': process.platform === 'linux',
     'advanced.hardware-acceleration-enabled': true,
     'advanced.default-zoom-level': null,
     'advanced.pdfjs-enabled': true,
