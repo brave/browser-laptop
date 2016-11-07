@@ -6,38 +6,32 @@ const ipc = window.chrome.ipc
 let element
 
 switch (getBaseUrl(getSourceAboutUrl(window.location.href))) {
-  case 'about:newtab':
-    element = require('./newtab')
-    break
   case 'about:about':
     element = require('./about')
-    break
-  case 'about:preferences':
-    element = require('./preferences')
-    break
-  case 'about:bookmarks':
-    element = require('./bookmarks')
-    break
-  case 'about:extensions':
-    element = require('./extensions')
     break
   case 'about:adblock':
     element = require('./adblock')
     break
-  case 'about:downloads':
-    element = require('./downloads')
+  case 'about:autofill':
+    element = require('./autofill')
+    break
+  case 'about:brave':
+    element = require('./brave')
+    break
+  case 'about:bookmarks':
+    element = require('./bookmarks')
     break
   case 'about:certerror':
     element = require('./certerror')
     break
-  case 'about:passwords':
-    element = require('./passwords')
-    break
-  case 'about:safebrowsing':
-    element = require('./safebrowsing')
+  case 'about:downloads':
+    element = require('./downloads')
     break
   case 'about:error':
     element = require('./errorPage')
+    break
+  case 'about:extensions':
+    element = require('./extensions')
     break
   case 'about:flash':
     element = require('./flashPlaceholder')
@@ -45,11 +39,21 @@ switch (getBaseUrl(getSourceAboutUrl(window.location.href))) {
   case 'about:history':
     element = require('./history')
     break
+  case 'about:newtab':
+    element = require('./newtab')
+    break
+  case 'about:passwords':
+    element = require('./passwords')
+    break
+  case 'about:preferences':
+    element = require('./preferences')
+    break
+  case 'about:safebrowsing':
+    element = require('./safebrowsing')
+    break
   case 'about:styles':
     element = require('./styles')
     break
-  case 'about:autofill':
-    element = require('./autofill')
 }
 
 if (element) {

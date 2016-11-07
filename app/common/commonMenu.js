@@ -301,7 +301,7 @@ module.exports.aboutBraveMenuItem = () => {
   return {
     label: locale.translation('aboutApp'),
     click: (item, focusedWindow) => {
-      module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:about', { singleFrame: true }])
+      module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:brave', { singleFrame: true }])
     }
   }
 }

@@ -430,7 +430,7 @@ module.exports.loadAppState = () => {
         }
       }
 
-      // version information (shown on about:about)
+      // version information (shown on about:brave)
       const os = require('os')
       const versionInformation = [
         {name: 'brave', version: app.getVersion()},

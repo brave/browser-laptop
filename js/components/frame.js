@@ -170,7 +170,7 @@ class Frame extends ImmutableComponent {
         })
         this.webview.send(messages.AUTOFILL_CREDIT_CARDS_UPDATED, list)
       }
-    } else if (location === 'about:about') {
+    } else if (location === 'about:brave') {
       const versionInformation = appStoreRenderer.state.get('versionInformation')
       if (versionInformation && versionInformation.toJS) {
         this.webview.send(messages.VERSION_INFORMATION_UPDATED, versionInformation.toJS())
