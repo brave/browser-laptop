@@ -94,6 +94,21 @@ module.exports = { "providers" :
       "search" : "https://www.startpage.com/do/dsearch?query={searchTerms}&cat=web&pl=opensearch",
       "autocomplete": "https://www.startpage.com/cgi-bin/csuggest?query={searchTerms}&limit=10&format=json",
       "shortcut" : ":sp"
+    },
+    {
+      "name" : "Infogalactic",
+      "base" : "https://infogalactic.com",
+      "image" : "https://infogalactic.com/favicon.ico",
+      "search" : "https://infogalactic.com/w/index.php?title=Special:Search&search={searchTerms}",
+      "autocomplete": "https://infogalactic.com/w/api.php?action=opensearch&search={searchTerms}&namespace=0",
+      "shortcut" : ":i"
+    },
+    {
+      "name" : "Wolfram Alpha",
+      "base" : "https://www.wolframalpha.com",
+      "image" : "https://www.wolframalpha.com/favicon.ico?v=2",
+      "search" : "https://www.wolframalpha.com/input/?i={searchTerms}",
+      "shortcut" : ":wa"
     }
   ]
 }
