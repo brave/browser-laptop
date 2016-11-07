@@ -5,7 +5,6 @@
 - Added button to view about:extensions from preferences. ([#5244](https://github.com/brave/browser-laptop/issues/5244))
 - Added regional adblock filter lists for India. ([#4996](https://github.com/brave/browser-laptop/issues/4996))
 - Added search autocomplete for start page search engine. ([#5281](https://github.com/brave/browser-laptop/issues/5281))
-- Added about:styles page to display style guide. ([#5195](https://github.com/brave/browser-laptop/issues/5195))
 - Changed clear data menu items in History menu with new, single item. ([#3093](https://github.com/brave/browser-laptop/issues/3093))
 - Changed PDFJS to show in extensions section in preferences ([#5245](https://github.com/brave/browser-laptop/issues/5245))
 - Fixed numerous issues for bookmark manager. ([#5183](https://github.com/brave/browser-laptop/issues/5183))([#5331](https://github.com/brave/browser-laptop/pull/5331))([#5223](https://github.com/brave/browser-laptop/issues/5223))([#5249](https://github.com/brave/browser-laptop/issues/5249))([#5148](https://github.com/brave/browser-laptop/issues/5148))([#4860](https://github.com/brave/browser-laptop/issues/4860))
