@@ -43,15 +43,15 @@
 
   #navigator {
     .homeButton {
-      margin: 0 3px 3px 3px;
-    }
-
-    .stopButton {
       margin: 0 3px 4px 3px;
     }
 
+    .stopButton {
+      margin: 0 3px 6px 3px;
+    }
+
     .reloadButton {
-      margin: 0 3px 2px 3px;
+      margin: 0 3px 3px 3px;
     }
   }
 
@@ -575,12 +575,16 @@
     margin: 0 3px 3px 3px;
     padding: 0 6px;
     height: 9px;
+    position: relative;
+    top: 3px;
   }
 
   .reloadButton {
     background: url('../img/toolbar/reload_btn.svg') center no-repeat;
     margin: 0 3px 1px 3px;
     padding: 0 6px;
+    position: relative;
+    top: 3px;
   }
 
   .homeButton {
@@ -589,6 +593,8 @@
     height: 13px;
     margin: 0 3px 2px 3px;
     padding: 0 6px;
+    position: relative;
+    top: 3px;
   }
 
   .bookmarkButton {
@@ -596,7 +602,7 @@
     -webkit-mask-repeat: no-repeat;
     width: 14px;
     height: 14px;
-    margin-bottom: 1px;
+    margin-bottom: 2px;
 
     &.removeBookmarkButton {
       background: url('../img/toolbar/bookmark_marked.svg') center no-repeat;

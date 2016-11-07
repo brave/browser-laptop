@@ -125,32 +125,32 @@ class NavigationBar extends ImmutableComponent {
           withHomeButton={getSetting(settings.SHOW_HOME_BUTTON)}
           />
         : null
-        }
-      <div className='startButtons'>
-        {
-          this.titleMode
-          ? null
-          : this.loading
-            ? <span className='navigationButtonContainer'>
-              <span data-l10n-id='stopButton'
-                className='navigationButton stopButton'
-                onClick={this.onStop} />
-            </span>
-            : <span className='navigationButtonContainer'>
-              <span data-l10n-id='reloadButton'
-                className='navigationButton reloadButton'
-                onClick={this.onReload} />
-            </span>
-        }
-        {
-          !this.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
+      }
+      {
+        this.titleMode
+        ? null
+        : this.loading
           ? <span className='navigationButtonContainer'>
-            <span data-l10n-id='homeButton'
-              className='navigationButton homeButton'
-              onClick={this.onHome} />
+            <span data-l10n-id='stopButton'
+              className='navigationButton stopButton'
+              onClick={this.onStop} />
           </span>
-          : null
-        }
+          : <span className='navigationButtonContainer'>
+            <span data-l10n-id='reloadButton'
+              className='navigationButton reloadButton'
+              onClick={this.onReload} />
+          </span>
+      }
+      {
+        !this.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
+        ? <span className='navigationButtonContainer'>
+          <span data-l10n-id='homeButton'
+            className='navigationButton homeButton'
+            onClick={this.onHome} />
+        </span>
+        : null
+      }
+      <div className='startButtons'>
         {
           !this.titleMode
           ? <span className='bookmarkButtonContainer'>
