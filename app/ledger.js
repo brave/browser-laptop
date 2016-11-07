@@ -1494,29 +1494,43 @@ const showDisabledNotifications = () => {
 */
 const showEnabledNotifications = () => {
   const reconcileStamp = ledgerInfo.reconcileStamp
-  const balance = Number(ledgerInfo.balance || 0)
-  const unconfirmed = Number(ledgerInfo.unconfirmed || 0)
-
   if (reconcileStamp && reconcileStamp - underscore.now() < msecs.day) {
-    if (ledgerInfo.btc &&
-        balance + unconfirmed < 0.9 * Number(ledgerInfo.btc)) {
-      addFundsMessage = addFundsMessage || locale.translation('addFundsNotification')
-      appActions.showMessageBox({
-        greeting: locale.translation('updateHello'),
-        message: addFundsMessage,
-        buttons: [
-          {text: locale.translation('updateLater')},
-          {text: locale.translation('addFunds'), className: 'primary'}
-        ],
-        options: {
-          style: 'greetingStyle',
-          persist: false
-        }
-      })
+    if (shouldShowNotificationAddFunds()) {
+      showNotificationAddFunds()
     } else if (shouldShowNotificationReviewPublishers()) {
       showNotificationReviewPublishers()
     }
   }
+}
+
+const shouldShowNotificationAddFunds = () => {
+  const balance = Number(ledgerInfo.balance || 0)
+  const unconfirmed = Number(ledgerInfo.unconfirmed || 0)
+  const nextTime = getSetting(settings.PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP)
+  if (nextTime && (nextTime > underscore.now())) {
+    return false
+  }
+  return ledgerInfo.btc &&
+         (balance + unconfirmed < 0.9 * Number(ledgerInfo.btc))
+}
+
+const showNotificationAddFunds = () => {
+  const nextTime = underscore.now() + 3 * msecs.day
+  appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP, nextTime)
+
+  addFundsMessage = addFundsMessage || locale.translation('addFundsNotification')
+  appActions.showMessageBox({
+    greeting: locale.translation('updateHello'),
+    message: addFundsMessage,
+    buttons: [
+      {text: locale.translation('updateLater')},
+      {text: locale.translation('addFunds'), className: 'primary'}
+    ],
+    options: {
+      style: 'greetingStyle',
+      persist: false
+    }
+  })
 }
 
 const shouldShowNotificationReviewPublishers = () => {
