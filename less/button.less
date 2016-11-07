@@ -20,12 +20,19 @@ span.buttonSeparator {
 }
 
 span.menuButton {
-  background: url('../img/toolbar/menu_btn.svg') center no-repeat;
+  background-color: @buttonColor;
   display: inline-block;
   width: 20px;
   height: 12px;
-  margin: 6px 4px 0 0;
+  margin: 8px 4px 0 0;
   cursor: default;
+  -webkit-mask-image: url('../img/toolbar/menu_btn.svg');
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+
+  &:hover {
+    background-color: black;
+  }
 }
 
 a.browserButton,
