@@ -27,6 +27,7 @@ const filtering = require('./filtering')
 const autofill = require('./autofill')
 const {navigatableTypes} = require('../js/lib/appUrlUtil')
 // const tabState = require('./common/state/tabState')
+const Channel = require('./channel')
 
 const getSetting = require('../js/settings').getSetting
 const promisify = require('../js/lib/promisify')
@@ -323,6 +324,8 @@ module.exports.cleanAppData = (data, isShutdown) => {
       delete data.extensions[extensionId].tabs
     })
   }
+
+  delete data.versionInformation
 }
 
 /**
@@ -426,6 +429,22 @@ module.exports.loadAppState = () => {
           return
         }
       }
+
+      // version information (shown on about:brave)
+      const os = require('os')
+      const versionInformation = [
+        {name: 'brave', version: app.getVersion()},
+        {name: 'muon', version: process.versions['atom-shell']},
+        {name: 'libchromiumcontent', version: process.versions['chrome']},
+        {name: 'V8', version: process.versions.v8},
+        {name: 'Node.js', version: process.versions.node},
+        {name: 'channel', version: Channel.channel()},
+        {name: 'os.platform', version: os.platform()},
+        {name: 'os.release', version: os.release()},
+        {name: 'os.arch', version: os.arch()}
+        // TODO(bsclifton): read the latest commit hash from a file, etc.
+      ]
+      data.versionInformation = versionInformation
     } catch (e) {
       // TODO: Session state is corrupted, maybe we should backup this
       // corrupted value for people to report into support.

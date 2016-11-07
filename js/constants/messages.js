@@ -57,7 +57,6 @@ const messages = {
   UPDATE_AVAILABLE: _,
   UPDATE_NOT_AVAILABLE: _,
   CHECK_FOR_UPDATE: _,
-  SHOW_ABOUT: _,
   UPDATE_META_DATA_RETRIEVED: _,
   // App state
   APP_INITIALIZED: _,
@@ -113,6 +112,7 @@ const messages = {
   DOWNLOADS_UPDATED: _,
   FLASH_UPDATED: _,
   NEWTAB_DATA_UPDATED: _,
+  VERSION_INFORMATION_UPDATED: _,
   // About pages from contentScript
   OPEN_DOWNLOAD_PATH: _,
   RELOAD_URL: _,
