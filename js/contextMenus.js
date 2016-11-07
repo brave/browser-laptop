@@ -1196,10 +1196,10 @@ function mainTemplateInit (nodeProps, frame) {
 
 function onHamburgerMenu (location, e) {
   const menuTemplate = hamburgerTemplateInit(location, e)
-  const rect = e.target.getBoundingClientRect()
+  const rect = e.target.parentNode.getBoundingClientRect()
   windowActions.setContextMenuDetail(Immutable.fromJS({
     right: 0,
-    top: rect.bottom + 2,
+    top: rect.bottom,
     template: menuTemplate
   }))
 }
@@ -1346,7 +1346,8 @@ function onMoreBookmarksMenu (activeFrame, allBookmarkItems, overflowItems, e) {
   }))
 }
 
-function onBackButtonHistoryMenu (activeFrame, history, rect) {
+function onBackButtonHistoryMenu (activeFrame, history, target) {
+  const rect = target.parentNode.getBoundingClientRect()
   const menuTemplate = []
 
   if (activeFrame && history && history.entries.length > 0) {
@@ -1389,7 +1390,8 @@ function onBackButtonHistoryMenu (activeFrame, history, rect) {
   }))
 }
 
-function onForwardButtonHistoryMenu (activeFrame, history, rect) {
+function onForwardButtonHistoryMenu (activeFrame, history, target) {
+  const rect = target.parentNode.getBoundingClientRect()
   const menuTemplate = []
 
   if (activeFrame && history && history.entries.length > 0) {

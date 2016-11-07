@@ -125,40 +125,44 @@ class NavigationBar extends ImmutableComponent {
           withHomeButton={getSetting(settings.SHOW_HOME_BUTTON)}
           />
         : null
-        }
+      }
+      {
+        this.titleMode
+        ? null
+        : this.loading
+          ? <span className='navigationButtonContainer'>
+            <span data-l10n-id='stopButton'
+              className='navigationButton stopButton'
+              onClick={this.onStop} />
+          </span>
+          : <span className='navigationButtonContainer'>
+            <span data-l10n-id='reloadButton'
+              className='navigationButton reloadButton'
+              onClick={this.onReload} />
+          </span>
+      }
+      {
+        !this.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
+        ? <span className='navigationButtonContainer'>
+          <span data-l10n-id='homeButton'
+            className='navigationButton homeButton'
+            onClick={this.onHome} />
+        </span>
+        : null
+      }
       <div className='startButtons'>
         {
-          this.titleMode
-          ? null
-          : this.loading
-            ? <Button iconClass='fa-times'
-              l10nId='stopButton'
-              className='navbutton stop-button'
-              onClick={this.onStop} />
-            : <Button iconClass='fa-repeat'
-              l10nId='reloadButton'
-              className='navbutton reload-button'
-              onClick={this.onReload} />
-        }
-        {
-          !this.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
-          ? <Button iconClass='fa-home'
-            l10nId='homeButton'
-            className='navbutton homeButton'
-            onClick={this.onHome} />
-          : null
-        }
-        {
           !this.titleMode
-          ? <Button iconClass={this.bookmarked ? 'fa-star' : 'fa-star-o'}
-            className={cx({
-              navbutton: true,
-              bookmarkButton: true,
-              removeBookmarkButton: this.bookmarked,
-              withHomeButton: getSetting(settings.SHOW_HOME_BUTTON)
-            })}
-            l10nId={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
-            onClick={this.onToggleBookmark} />
+          ? <span className='bookmarkButtonContainer'>
+            <span data-l10n-id={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
+              className={cx({
+                navigationButton: true,
+                bookmarkButton: true,
+                removeBookmarkButton: this.bookmarked,
+                withHomeButton: getSetting(settings.SHOW_HOME_BUTTON)
+              })}
+              onClick={this.onToggleBookmark} />
+          </span>
           : null
         }
       </div>
