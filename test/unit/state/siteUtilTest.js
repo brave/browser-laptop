@@ -487,7 +487,7 @@ describe('siteUtil', function () {
       const siteDetail2 = Immutable.fromJS({
         tags: [],
         location: testUrl1,
-        title: 'bookmarked site'
+        title: 'visited site'
       })
       const sites = Immutable.fromJS([siteDetail1, siteDetail2])
       const processedSites = siteUtil.updateSiteFavicon(sites, testUrl1, 'https://brave.com/favicon.ico')
@@ -496,6 +496,92 @@ describe('siteUtil', function () {
       const expectedSites = Immutable.fromJS([updatedSiteDetail1, updatedSiteDetail2])
 
       assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+    })
+
+    describe('normalizes the URL when searching for matches', function () {
+      it('normalizes trailing slashes', function () {
+        const siteDetail1 = Immutable.fromJS({
+          tags: [siteTags.BOOKMARK],
+          location: 'https://brave.com',
+          title: 'bookmarked site'
+        })
+        const siteDetail2 = Immutable.fromJS({
+          tags: [],
+          location: 'https://brave.com/',
+          title: 'visited site'
+        })
+
+        const sites = Immutable.fromJS([siteDetail1, siteDetail2])
+        const processedSites = siteUtil.updateSiteFavicon(sites, 'https://brave.com/', 'https://brave.com/favicon.ico')
+        const updatedSiteDetail1 = siteDetail1.set('favicon', 'https://brave.com/favicon.ico')
+        const updatedSiteDetail2 = siteDetail2.set('favicon', 'https://brave.com/favicon.ico')
+        const expectedSites = Immutable.fromJS([updatedSiteDetail1, updatedSiteDetail2])
+
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+      })
+
+      it('normalizes port numbers', function () {
+        const siteDetail1 = Immutable.fromJS({
+          tags: [siteTags.BOOKMARK],
+          location: 'https://brave.com:443',
+          title: 'bookmarked site'
+        })
+        const siteDetail2 = Immutable.fromJS({
+          tags: [],
+          location: 'https://brave.com/',
+          title: 'visited site'
+        })
+
+        const sites = Immutable.fromJS([siteDetail1, siteDetail2])
+        const processedSites = siteUtil.updateSiteFavicon(sites, 'https://brave.com/', 'https://brave.com/favicon.ico')
+        const updatedSiteDetail1 = siteDetail1.set('favicon', 'https://brave.com/favicon.ico')
+        const updatedSiteDetail2 = siteDetail2.set('favicon', 'https://brave.com/favicon.ico')
+        const expectedSites = Immutable.fromJS([updatedSiteDetail1, updatedSiteDetail2])
+
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+      })
+
+      it('strips www', function () {
+        const siteDetail1 = Immutable.fromJS({
+          tags: [siteTags.BOOKMARK],
+          location: 'https://www.brave.com/',
+          title: 'bookmarked site'
+        })
+        const siteDetail2 = Immutable.fromJS({
+          tags: [],
+          location: 'https://brave.com/',
+          title: 'visited site'
+        })
+
+        const sites = Immutable.fromJS([siteDetail1, siteDetail2])
+        const processedSites = siteUtil.updateSiteFavicon(sites, 'https://brave.com/', 'https://brave.com/favicon.ico')
+        const updatedSiteDetail1 = siteDetail1.set('favicon', 'https://brave.com/favicon.ico')
+        const updatedSiteDetail2 = siteDetail2.set('favicon', 'https://brave.com/favicon.ico')
+        const expectedSites = Immutable.fromJS([updatedSiteDetail1, updatedSiteDetail2])
+
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+      })
+
+      it('removes the fragment', function () {
+        const siteDetail1 = Immutable.fromJS({
+          tags: [siteTags.BOOKMARK],
+          location: 'https://www.brave.com/#contact',
+          title: 'bookmarked site'
+        })
+        const siteDetail2 = Immutable.fromJS({
+          tags: [],
+          location: 'https://brave.com/#people',
+          title: 'visited site'
+        })
+
+        const sites = Immutable.fromJS([siteDetail1, siteDetail2])
+        const processedSites = siteUtil.updateSiteFavicon(sites, 'https://brave.com/#about', 'https://brave.com/favicon.ico')
+        const updatedSiteDetail1 = siteDetail1.set('favicon', 'https://brave.com/favicon.ico')
+        const updatedSiteDetail2 = siteDetail2.set('favicon', 'https://brave.com/favicon.ico')
+        const expectedSites = Immutable.fromJS([updatedSiteDetail1, updatedSiteDetail2])
+
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+      })
     })
   })
 
