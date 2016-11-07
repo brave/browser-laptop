@@ -469,7 +469,7 @@ class UrlBar extends ImmutableComponent {
           'fa': !this.activateSearchEngine,
           'fa-lock': showIconSecure,
           'fa-exclamation-triangle': showIconInsecure,
-          'fa fa-search': showIconSearch || (!showIconSecure && !showIconInsecure && !showIconSearch),
+          'fa fa-search': showIconSearch || (!showIconSecure && !showIconInsecure && !showIconSearch && !this.props.titleMode),
           extendedValidation: this.extendedValidationSSL
         })}
         style={
