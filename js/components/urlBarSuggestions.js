@@ -289,7 +289,8 @@ class UrlBarSuggestions extends ImmutableComponent {
       // status. If history is turned off, bookmarked sites will appear
       // in the bookmark section.
       return (title.toLowerCase().includes(urlLocationLower) ||
-              location.toLowerCase().includes(urlLocationLower))
+              location.toLowerCase().includes(urlLocationLower)) &&
+              site.get('lastAccessedTime')
     }
     var historySites = props.sites.filter(historyFilter)
 
