@@ -74,7 +74,9 @@ var exports = {
     CONTROL: '\ue009',
     ESCAPE: '\ue00c',
     RETURN: '\ue006',
-    SHIFT: '\ue008'
+    ENTER: '\ue007',
+    SHIFT: '\ue008',
+    BACKSPACE: '\ue003'
   },
 
   browserWindowUrl: 'file://' + path.resolve(__dirname, '..', '..') + '/app/extensions/brave/index.html',

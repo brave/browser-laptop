@@ -106,7 +106,7 @@ describe('navigationBar', function () {
       })
     })
 
-    describe('window.open spoofing', function () {
+    describe.skip('window.open spoofing', function () {
       Brave.beforeAll(this)
 
       before(function * () {
@@ -133,7 +133,7 @@ describe('navigationBar', function () {
           .waitForExist(urlInput)
           .waitUntil(function () {
             return this.getValue(urlInput).then((val) => {
-              return val.startsWith('https://www.google.com/')
+              return val.startsWith('https://www.example.com/')
             })
           })
           .getText(activeTabTitle)
@@ -165,6 +165,35 @@ describe('navigationBar', function () {
       })
     })
 
+    describe('User input', function () {
+      Brave.beforeAll(this)
+      before(function * () {
+        yield setup(this.app.client)
+        var page1 = Brave.server.url('page1.html')
+        yield this.app.client
+          .tabByUrl(Brave.newTabUrl)
+          .url(page1)
+          .waitForUrl(page1)
+      })
+
+      it('remains cleared when onChange is fired but not onKeyUp', function * () {
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .setValue(urlInput, '')
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => val === '')
+          })
+          .moveToObject(activeWebview)
+          .click(activeWebview)
+          .moveToObject(navigator)
+          .waitForExist(urlInput)
+          .click(urlInput)
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => val === '')
+          })
+      })
+    })
+
     describe('page with a title', function () {
       Brave.beforeAll(this)
 
@@ -183,6 +212,7 @@ describe('navigationBar', function () {
         const host = this.host
         yield this.app.client
           .moveToObject(activeWebview)
+          .click(activeWebview)
           .waitForExist(titleBar)
           .waitUntil(function () {
             return this.getText(titleBar).then((val) => val === host + ' | Page 1')
@@ -193,6 +223,7 @@ describe('navigationBar', function () {
       it('shows the url on mouseover', function * () {
         yield this.app.client
           .moveToObject(activeWebview)
+          .click(activeWebview)
           .moveToObject(titleBar)
           .waitForExist(navigatorLoadTime)
           .getValue(urlInput)
@@ -273,6 +304,7 @@ describe('navigationBar', function () {
         var page = this.page
         yield this.app.client
           .moveToObject(activeWebview)
+          .click(activeWebview)
           .waitForExist(titleBar)
           .moveToObject(titleBar)
           .waitForExist(urlInput)
@@ -337,7 +369,7 @@ describe('navigationBar', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .click(urlbarIcon)
         .waitForVisible('[data-l10n-id="insecureConnection"]')
-        .keys('\uE00C')
+        .keys(Brave.keys.ESCAPE)
     })
     it('Shows secure URL icon', function * () {
       const page1Url = 'https://badssl.com/'
@@ -352,7 +384,7 @@ describe('navigationBar', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .click(urlbarIcon)
         .waitForVisible('[data-l10n-id="secureConnection"]')
-        .keys('\uE00C')
+        .keys(Brave.keys.ESCAPE)
     })
     it('Blocks running insecure content', function * () {
       const page1Url = 'https://mixed-script.badssl.com/'
@@ -658,7 +690,7 @@ describe('navigationBar', function () {
       it('sets location to new URL', function * () {
         const page2 = this.page2
         yield this.app.client.keys(this.page2)
-        yield this.app.client.keys('\uE007')
+        yield this.app.client.keys(Brave.keys.ENTER)
         yield this.app.client
           .waitUntil(function () {
             return this.getValue(urlInput).then((val) => {
@@ -670,14 +702,15 @@ describe('navigationBar', function () {
       it('resets URL to previous location if page does not load', function * () {
         const page1 = this.page1
         yield this.app.client.tabByUrl(this.newTabUrl).url(page1).waitForUrl(page1).windowParentByUrl(page1)
-        yield this.app.client
+          .moveToObject(activeWebview)
+          .click(activeWebview)
           .moveToObject(navigator)
           .waitForExist(urlInput)
           .click(urlInput)
         yield selectsText(this.app.client, page1)
-        yield this.app.client.keys(this.page2)
-        yield this.app.client.keys('\uE007')
         yield this.app.client
+          .keys(this.page2)
+          .keys(Brave.keys.ENTER)
           .waitUntil(function () {
             return this.getValue(urlInput).then((val) => {
               return val === page1
@@ -697,7 +730,7 @@ describe('navigationBar', function () {
         yield this.app.client.waitForExist(urlInput)
         yield this.app.client.keys(this.page1)
         // hit enter
-        yield this.app.client.keys('\uE007')
+        yield this.app.client.keys(Brave.keys.ENTER)
       })
 
       it('webview has focus', function * () {
@@ -742,7 +775,7 @@ describe('navigationBar', function () {
         yield this.app.client.waitForExist(urlInput)
         yield this.app.client.keys('  javascript:alert(1)')
         // hit enter
-        yield this.app.client.keys('\uE007')
+        yield this.app.client.keys(Brave.keys.ENTER)
       })
       it('filters javascript urls', function * () {
         yield this.app.client.waitUntil(function () {
@@ -759,7 +792,7 @@ describe('navigationBar', function () {
         yield this.app.client.waitForExist(urlInput)
         yield this.app.client.keys('brave.com@example.com')
         // hit enter
-        yield this.app.client.keys('\uE007')
+        yield this.app.client.keys(Brave.keys.ENTER)
       })
       it('hides auth part of the url', function * () {
         yield this.app.client.waitUntil(function () {
@@ -786,7 +819,7 @@ describe('navigationBar', function () {
       it('shows about:blank', function * () {
         yield this.app.client
           .keys('about:blank')
-          .keys('\uE007')
+          .keys(Brave.keys.ENTER)
           .waitUntil(function () {
             return this.getValue(urlInput).then((val) => val === 'about:blank')
           })
@@ -874,13 +907,12 @@ describe('navigationBar', function () {
           .keys('\uE00C')
           .waitForElementFocus(urlInput)
       })
-
-      it('does not select the urlbar text', function * () {
-        yield selectsText(this.app.client, '.com')
+      it('does select the urlbar text', function * () {
+        yield selectsText(this.app.client, this.page)
       })
 
-      it('does not revert the urlbar text', function * () {
-        yield this.app.client.getValue(urlInput).should.eventually.be.equal('google.com')
+      it('does revert the urlbar text', function * () {
+        yield this.app.client.getValue(urlInput).should.eventually.be.equal(this.page)
       })
     })
 
@@ -899,7 +931,6 @@ describe('navigationBar', function () {
           .keys('\uE00C')
           .waitForElementFocus(urlInput)
       })
-
       it('does select the urlbar text', function * () {
         yield selectsText(this.app.client, this.page)
       })
@@ -920,9 +951,9 @@ describe('navigationBar', function () {
           .waitForElementFocus(urlInput)
           .setValue(urlInput, 'blah')
           // hit escape
-          .keys('\uE00C')
+          .keys(Brave.keys.ESCAPE)
           .waitForElementFocus(urlInput)
-          .keys('\uE00C')
+          .keys(Brave.keys.ESCAPE)
       })
 
       it('selects the urlbar text', function * () {
@@ -940,7 +971,7 @@ describe('navigationBar', function () {
         return yield this.app.client.ipcSend('shortcut-focus-url')
           .setValue(urlInput, url)
           // hit enter
-          .keys('\uE007')
+          .keys(Brave.keys.ENTER)
       })
 
       it('changes the webview src', function * () {
@@ -953,10 +984,10 @@ describe('navigationBar', function () {
   })
 
   describe('search engine go key', function () {
-    Brave.beforeEach(this)
+    Brave.beforeAll(this)
     const entries = searchProviders.providers
 
-    beforeEach(function * () {
+    before(function * () {
       yield setup(this.app.client)
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
@@ -964,15 +995,19 @@ describe('navigationBar', function () {
         .waitForElementFocus(urlInput)
     })
 
+    beforeEach(function * () {
+      yield this.app.client
+        .setValue(urlInput, '')
+        .waitUntil(function () {
+          return this.getValue(urlInput).then((val) => val === '')
+        })
+    })
+
     entries.forEach((entry) => {
       describe(entry.name, function () {
-        beforeEach(function * () {
-          yield this.app.client
-            .keys(entry.shortcut + ' ')
-        })
-
         it('has the icon', function * () {
           yield this.app.client
+            .keys(entry.shortcut + ' ')
             .waitForExist(urlbarIcon)
             .waitUntil(function () {
               return this
@@ -1097,6 +1132,7 @@ describe('navigationBar', function () {
         yield this.app.client.waitUntil(function () {
           return this.getValue(urlInput).then((val) => val === 'br')
         })
+        yield selectsText(this.app.client, 'ave.com')
         yield blur(this.app.client)
         yield this.app.client
           .waitForExist(urlInput)
