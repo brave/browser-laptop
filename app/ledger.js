@@ -320,12 +320,14 @@ if (ipc) {
     const win = electron.BrowserWindow.getFocusedWindow()
     if (message === addFundsMessage) {
       appActions.hideMessageBox(message)
+      // See showNotificationAddFunds() for buttons.
+      // buttonIndex === 1 is "Later"; the timestamp until which to delay is set
+      // in showNotificationAddFunds() when triggering this notification.
       if (buttonIndex === 0) {
-        // "Later" -- wait 6 hours to re-show "reconciliation soon" notification.
-        const nextTime = ledgerInfo.reconcileStamp + 6 * msecs.hour
-        appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_RECONCILE_SOON_TIMESTAMP, nextTime)
-      } else {
-        // Open payments panel
+        // Turn off notifications
+        appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
+      } else if (buttonIndex === 2) {
+        // Add funds: Open payments panel
         if (win) {
           win.webContents.send(messages.SHORTCUT_NEW_FRAME,
             'about:preferences#payments', { singleFrame: true })
@@ -1495,23 +1497,26 @@ const showDisabledNotifications = () => {
 const showEnabledNotifications = () => {
   const reconcileStamp = ledgerInfo.reconcileStamp
   if (reconcileStamp && reconcileStamp - underscore.now() < msecs.day) {
-    if (shouldShowNotificationAddFunds()) {
+    if (sufficientBalanceToReconcile()) {
+      if (shouldShowNotificationReviewPublishers()) {
+        showNotificationReviewPublishers()
+      }
+    } else if (shouldShowNotificationAddFunds()) {
       showNotificationAddFunds()
-    } else if (shouldShowNotificationReviewPublishers()) {
-      showNotificationReviewPublishers()
     }
   }
 }
 
-const shouldShowNotificationAddFunds = () => {
+const sufficientBalanceToReconcile = () => {
   const balance = Number(ledgerInfo.balance || 0)
   const unconfirmed = Number(ledgerInfo.unconfirmed || 0)
-  const nextTime = getSetting(settings.PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP)
-  if (nextTime && (nextTime > underscore.now())) {
-    return false
-  }
   return ledgerInfo.btc &&
-         (balance + unconfirmed < 0.9 * Number(ledgerInfo.btc))
+    (balance + unconfirmed > 0.9 * Number(ledgerInfo.btc))
+}
+
+const shouldShowNotificationAddFunds = () => {
+  const nextTime = getSetting(settings.PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP)
+  return !nextTime || (underscore.now() > nextTime)
 }
 
 const showNotificationAddFunds = () => {
@@ -1523,6 +1528,7 @@ const showNotificationAddFunds = () => {
     greeting: locale.translation('updateHello'),
     message: addFundsMessage,
     buttons: [
+      {text: locale.translation('turnOffNotifications')},
       {text: locale.translation('updateLater')},
       {text: locale.translation('addFunds'), className: 'primary'}
     ],

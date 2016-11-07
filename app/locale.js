@@ -193,6 +193,7 @@ var rendererIdentifiers = function () {
     'reconciliationNotification',
     'reviewSites',
     'addFunds',
+    'turnOffNotifications',
     'copyToClipboard',
     'smartphoneTitle',
     'displayQRCode',
