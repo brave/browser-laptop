@@ -995,6 +995,10 @@ function mainTemplateInit (nodeProps, frame) {
     if (editableItems.length > 0) {
       template.push(...editableItems, CommonMenu.separatorMenuItem)
     }
+
+    if (isTextSelected) {
+      template.push(searchSelectionMenuItem(nodeProps.selectionText), CommonMenu.separatorMenuItem)
+    }
   } else if (isTextSelected) {
     if (isDarwin) {
       template.push(showDefinitionMenuItem(nodeProps.selectionText),
