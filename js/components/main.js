@@ -104,6 +104,7 @@ class Main extends ImmutableComponent {
     this.onFind = this.onFind.bind(this)
     this.onFindHide = this.onFindHide.bind(this)
     this.checkForTitleMode = debounce(this.checkForTitleMode.bind(this), 20)
+    this.lastKeyPressed = undefined
   }
   registerWindowLevelShortcuts () {
     // For window level shortcuts that don't work as local shortcuts
@@ -129,6 +130,8 @@ class Main extends ImmutableComponent {
           }
           break
       }
+
+      this.lastKeyPressed = e.which
     })
   }
 
@@ -143,16 +146,20 @@ class Main extends ImmutableComponent {
               break
             }
 
-            e.preventDefault()
+            // Only show/hide the menu if last key pressed was ALT
+            // (typing ALT codes should not toggle menu)
+            if (this.lastKeyPressed === keyCodes.ALT) {
+              e.preventDefault()
 
-            if (getSetting(settings.AUTO_HIDE_MENU)) {
-              windowActions.toggleMenubarVisible(null)
-            } else {
-              if (customTitlebar.menubarSelectedIndex) {
-                windowActions.setSubmenuSelectedIndex()
-                windowActions.setContextMenuDetail()
+              if (getSetting(settings.AUTO_HIDE_MENU)) {
+                windowActions.toggleMenubarVisible(null)
               } else {
-                windowActions.setSubmenuSelectedIndex([0])
+                if (customTitlebar.menubarSelectedIndex) {
+                  windowActions.setSubmenuSelectedIndex()
+                  windowActions.setContextMenuDetail()
+                } else {
+                  windowActions.setSubmenuSelectedIndex([0])
+                }
               }
             }
             break
