@@ -1,6 +1,6 @@
 const {app, BrowserWindow, session, webContents} = require('electron')
 const extensions = process.atomBinding('extension')
-const { getIndexHTML } = require('../../js/lib/appUrlUtil')
+const { getBraveExtIndexHTML } = require('../../js/lib/appUrlUtil')
 
 let currentWebContents = {}
 let activeTab = null
@@ -13,7 +13,7 @@ const tabs = {
   init: () => {
     app.on('web-contents-created', function (event, tab) {
       // TODO(bridiver) - also exclude extension action windows??
-      if (extensions.isBackgroundPage(tab) || tab.getURL() === getIndexHTML()) {
+      if (extensions.isBackgroundPage(tab) || tab.getURL() === getBraveExtIndexHTML()) {
         return
       }
       let tabId = tab.getId()
