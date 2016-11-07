@@ -424,27 +424,6 @@ span.browserButton.primaryButton {
       margin-left: 10px;
     }
 
-    input,
-    select {
-      display: block;
-      border-radius: @borderRadius;
-      height: 2.25em;
-      font-size: 0.9em;
-      padding: 0.4em;
-      border: solid 1px @lightGray;
-      background: white;
-      color: @darkGray;
-      outline: none;
-    }
-
-    input {
-      box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    }
-
-    select  {
-      box-shadow: @lightBoxShadow;
-    }
-
     input[type="number"] {
       width: 50px;
       min-width: 50px;
@@ -469,9 +448,11 @@ span.browserButton.primaryButton {
 }
 
 input:not([type="checkbox"]), select {
-  box-sizing: border-box;
-  padding-left: 2px;
-  width: 280px;
+  &.form-control {
+    box-sizing: border-box;
+    padding-left: 2px;
+    width: 280px;
+  }
 }
 
 input[type="checkbox"][disabled] {
