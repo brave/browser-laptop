@@ -1015,6 +1015,10 @@ describe('navigationBar', function () {
                 .then((backgroundImage) => backgroundImage.value === `url("${entry.image}")`)
             })
         })
+
+        it('does not show the default icon (search)', function * () {
+          yield this.app.client.waitForExist('.urlbarIcon.fa-search', 1500, true)
+        })
       })
     })
   })

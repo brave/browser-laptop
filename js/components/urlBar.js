@@ -455,6 +455,7 @@ class UrlBar extends ImmutableComponent {
     const showIconSecure = !this.activateSearchEngine && this.isHTTPPage && this.props.isSecure && !this.props.urlbar.get('active')
     const showIconInsecure = !this.activateSearchEngine && this.isHTTPPage && !this.props.isSecure && !this.props.urlbar.get('active') && !this.props.titleMode
     const showIconSearch = !this.activateSearchEngine && this.props.urlbar.get('active') && this.props.loading === false
+    const showSearchByDefault = !this.activateSearchEngine && !showIconSecure && !showIconInsecure && !showIconSearch && !this.props.titleMode
     return <form
       className='urlbarForm'
       action='#'
@@ -469,7 +470,7 @@ class UrlBar extends ImmutableComponent {
           'fa': !this.activateSearchEngine,
           'fa-lock': showIconSecure,
           'fa-exclamation-triangle': showIconInsecure,
-          'fa fa-search': showIconSearch || (!showIconSecure && !showIconInsecure && !showIconSearch && !this.props.titleMode),
+          'fa fa-search': showIconSearch || showSearchByDefault,
           extendedValidation: this.extendedValidationSSL
         })}
         style={
