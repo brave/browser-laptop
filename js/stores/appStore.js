@@ -236,7 +236,7 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
 
   LocalShortcuts.register(mainWindow)
 
-  mainWindow.loadURL(appUrlUtil.getIndexHTML())
+  mainWindow.loadURL(appUrlUtil.getBraveExtIndexHTML())
   return mainWindow
 }
 
@@ -386,7 +386,7 @@ const handleAppAction = (action) => {
       })
       mainWindow.webContents.on('crashed', (e) => {
         console.error('Window crashed. Reloading...')
-        mainWindow.loadURL(appUrlUtil.getIndexHTML())
+        mainWindow.loadURL(appUrlUtil.getBraveExtIndexHTML())
 
         ipcMain.on(messages.NOTIFICATION_RESPONSE, function notificationResponseCallback (e, message, buttonIndex, persist) {
           if (message === locale.translation('unexpectedErrorWindowReload')) {
@@ -405,7 +405,7 @@ const handleAppAction = (action) => {
           message: locale.translation('unexpectedErrorWindowReload')
         })
       })
-      mainWindow.loadURL(appUrlUtil.getIndexHTML())
+      mainWindow.loadURL(appUrlUtil.getBraveExtIndexHTML())
       mainWindow.show()
       break
     case AppConstants.APP_CLOSE_WINDOW:
