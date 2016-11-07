@@ -205,6 +205,7 @@ var rendererIdentifiers = function () {
     'notificationTryPayments',
     'notificationTryPaymentsYes',
     'prefsRestart',
+    'dismiss',
     'yes',
     'no',
     'noThanks',
