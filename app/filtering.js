@@ -81,7 +81,8 @@ module.exports.registerHeadersReceivedFilteringCB = (filteringFn) => {
  * session.
  * @param {object} session Session to add webRequest filtering on
  */
-function registerForBeforeRequest (session) {
+function registerForBeforeRequest (session, partition) {
+  const isPrivate = !partition.startsWith('persist:')
   session.webRequest.onBeforeRequest((details, cb) => {
     if (shouldIgnoreUrl(details.url)) {
       cb({})
@@ -114,7 +115,7 @@ function registerForBeforeRequest (session) {
       const isHttpsEverywhere = results.resourceName === appConfig.resourceNames.HTTPS_EVERYWHERE
       const isTracker = results.resourceName === appConfig.resourceNames.TRACKING_PROTECTION
 
-      if (!module.exports.isResourceEnabled(results.resourceName, firstPartyUrl)) {
+      if (!module.exports.isResourceEnabled(results.resourceName, firstPartyUrl, isPrivate)) {
         continue
       }
       if (results.cancel) {
@@ -170,7 +171,7 @@ function registerForBeforeRequest (session) {
     let url = details.url
     if (details.resourceType === 'mainFrame' &&
       url.startsWith('https://duckduckgo.com/?q') &&
-    module.exports.isResourceEnabled('noScript', url)) {
+    module.exports.isResourceEnabled('noScript', url, isPrivate)) {
       url = url.replace('?q=', 'html?q=')
       cb({redirectURL: url})
     } else {
@@ -205,12 +206,13 @@ function registerForBeforeRedirect (session) {
  * a particular session.
  * @param {object} The session to add webRequest filtering on
  */
-function registerForBeforeSendHeaders (session) {
+function registerForBeforeSendHeaders (session, partition) {
   // For efficiency, avoid calculating these settings on every request. This means the
   // browser must be restarted for changes to take effect.
   const sendDNT = getSetting(settings.DO_NOT_TRACK)
   let spoofedUserAgent = getSetting(settings.USERAGENT)
   const braveRegex = new RegExp('brave/.+? ', 'gi')
+  const isPrivate = !partition.startsWith('persist:')
 
   session.webRequest.onBeforeSendHeaders(function (details, cb) {
     // Using an electron binary which isn't from Brave
@@ -243,7 +245,7 @@ function registerForBeforeSendHeaders (session) {
 
     for (let i = 0; i < beforeSendHeadersFilteringFns.length; i++) {
       let results = beforeSendHeadersFilteringFns[i](details)
-      if (!module.exports.isResourceEnabled(results.resourceName, firstPartyUrl)) {
+      if (!module.exports.isResourceEnabled(results.resourceName, firstPartyUrl, isPrivate)) {
         continue
       }
       if (results.cancel) {
@@ -255,7 +257,7 @@ function registerForBeforeSendHeaders (session) {
       }
     }
 
-    if (module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, firstPartyUrl)) {
+    if (module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, firstPartyUrl, isPrivate)) {
       if (module.exports.isThirdPartyHost(urlParse(firstPartyUrl || '').hostname,
                                           parsedUrl.hostname)) {
         // Clear cookie and referer on third-party requests
@@ -282,7 +284,8 @@ function registerForBeforeSendHeaders (session) {
  * session.
  * @param {object} session Session to add webRequest filtering on
  */
-function registerForHeadersReceived (session) {
+function registerForHeadersReceived (session, partition) {
+  const isPrivate = !partition.startsWith('persist:')
   // Note that onBeforeRedirect listener doesn't take a callback
   session.webRequest.onHeadersReceived(function (details, cb) {
     // Using an electron binary which isn't from Brave
@@ -298,7 +301,7 @@ function registerForHeadersReceived (session) {
     }
     for (let i = 0; i < headersReceivedFilteringFns.length; i++) {
       let results = headersReceivedFilteringFns[i](details)
-      if (!module.exports.isResourceEnabled(results.resourceName, firstPartyUrl)) {
+      if (!module.exports.isResourceEnabled(results.resourceName, firstPartyUrl, isPrivate)) {
         continue
       }
       if (results.responseHeaders) {
@@ -581,13 +584,18 @@ module.exports.init = () => {
   })
 }
 
-module.exports.isResourceEnabled = (resourceName, url) => {
+module.exports.isResourceEnabled = (resourceName, url, isPrivate) => {
   if (resourceName === 'siteHacks') {
     return true
   }
 
   const appState = appStore.getState()
-  const settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
+  let settings
+  if (!isPrivate) {
+    settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
+  } else {
+    settings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), url)
+  }
   const braverySettings = siteSettings.activeSettings(settings, appState, appConfig)
 
   // If full shields are down never enable extra protection
