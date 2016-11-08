@@ -17,7 +17,6 @@ const aboutActions = require('./aboutActions')
 const siteUtil = require('../state/siteUtil')
 const urlutils = require('../lib/urlutil')
 const siteTags = require('../constants/siteTags')
-const cx = require('../lib/classSet.js')
 const config = require('../constants/config')
 const backgrounds = require('../data/backgrounds')
 
@@ -262,7 +261,6 @@ class NewTabPage extends React.Component {
       return null
     }
 
-    const gridLayoutSize = this.gridLayoutSize
     const gridLayout = this.gridLayout
 
     const getLetterFromUrl = (url) => {
@@ -285,15 +283,6 @@ class NewTabPage extends React.Component {
             <Clock />
           </div>
           <div className='topSitesContainer'>
-            <button
-              className={cx({
-                toggleTopSitesGridIcon: true,
-                hasThreeRows: gridLayoutSize === 'large',
-                hasTwoRows: gridLayoutSize === 'medium',
-                hasOneRow: gridLayoutSize === 'small'
-              })}
-              onClick={this.onChangeGridLayout.bind(this)}
-            />
             <nav className='topSitesGrid'>
               {
                 gridLayout.map((site) =>
