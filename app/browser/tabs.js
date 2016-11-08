@@ -25,6 +25,12 @@ const tabs = {
           activeTab = tab
         }
       })
+      tab.on('new-window', (e, url, frameName, disposition, options = {}) => {
+        let userGesture = options.userGesture
+        if (userGesture === false) {
+          e.preventDefault()
+        }
+      })
       currentWebContents[tabId] = tab
     })
   },

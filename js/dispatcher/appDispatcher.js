@@ -4,7 +4,7 @@
 
 const Serializer = require('./serializer')
 const messages = require('../constants/messages')
-const electron = process.type === 'renderer' ? global.require('electron') : require('electron')
+const electron = require('electron')
 'use strict'
 
 class AppDispatcher {

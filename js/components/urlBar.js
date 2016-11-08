@@ -11,7 +11,7 @@ const appActions = require('../actions/appActions')
 const KeyCodes = require('../../app/common/constants/keyCodes')
 const cx = require('../lib/classSet')
 const debounce = require('../lib/debounce')
-const ipc = global.require('electron').ipcRenderer
+const ipc = require('electron').ipcRenderer
 
 const UrlBarSuggestions = require('./urlBarSuggestions')
 const UrlBarIcon = require('../../app/renderer/components/urlBarIcon')

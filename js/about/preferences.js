@@ -50,7 +50,7 @@ const widevine = appConfig.resourceNames.WIDEVINE
 const isDarwin = navigator.platform === 'MacIntel'
 const isWindows = navigator.platform && navigator.platform.includes('Win')
 
-const ipc = window.chrome.ipc
+const ipc = window.chrome.ipcRenderer
 
 // TODO: Determine this from the l20n file automatically
 const hintCount = 3

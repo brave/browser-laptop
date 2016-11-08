@@ -233,8 +233,6 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
   })
 
   LocalShortcuts.register(mainWindow)
-
-  mainWindow.loadURL(appUrlUtil.getBraveExtIndexHTML())
   return mainWindow
 }
 
@@ -287,6 +285,7 @@ function windowDefaults () {
     windowOffset: 20,
     webPreferences: {
       sharedWorker: true,
+      nodeIntegration: false,
       partition: 'default',
       allowFileAccessFromFileUrls: true,
       allowUniversalAccessFromFileUrls: true

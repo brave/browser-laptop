@@ -8,7 +8,7 @@
 let ready = false
 
 // Setup the crash handling
-const CrashHerald = require('./crash-herald')
+// const CrashHerald = require('./crash-herald')
 
 const handleUncaughtError = (error) => {
   var message, ref, stack
@@ -42,14 +42,12 @@ if (process.platform === 'win32') {
 
 const electron = require('electron')
 const app = electron.app
-// set userData before loading anything else
-require('./browser/lib/patchUserDataDir')
 const BrowserWindow = electron.BrowserWindow
 const dialog = electron.dialog
 const ipcMain = electron.ipcMain
 const Immutable = require('immutable')
 const Menu = require('./browser/menu')
-const Updater = require('./updater')
+// const Updater = require('./updater')
 const Importer = require('./importer')
 const messages = require('../js/constants/messages')
 const appConfig = require('../js/constants/appConfig')
@@ -212,7 +210,7 @@ const saveAppState = (appState, cb) => {
       // Otherwise just quit.
       if (appState.updates && (appState.updates.status === UpdateStatus.UPDATE_APPLYING_NO_RESTART ||
           appState.updates.status === UpdateStatus.UPDATE_APPLYING_RESTART)) {
-        Updater.quitAndInstall()
+        // Updater.quitAndInstall()
       } else {
         app.quit()
       }
@@ -254,7 +252,7 @@ loadAppStatePromise.then((initialState) => {
   }
   if (initialState.settings[SEND_CRASH_REPORTS] !== false) {
     console.log('Crash reporting enabled')
-    CrashHerald.init()
+    // CrashHerald.init()
   } else {
     console.log('Crash reporting disabled')
   }
@@ -435,7 +433,7 @@ app.on('ready', () => {
     webtorrent.init()
 
     if (!loadedPerWindowState || loadedPerWindowState.length === 0) {
-      if (!CmdLine.newWindowURL()) {
+      if (!CmdLine.newWindowURL) {
         appActions.newWindow()
       }
     } else {
@@ -458,9 +456,9 @@ app.on('ready', () => {
       appActions.changeSetting(settings.IS_DEFAULT_BROWSER, isDefaultBrowser)
     }
 
-    if (CmdLine.newWindowURL()) {
+    if (CmdLine.newWindowURL) {
       appActions.newWindow(Immutable.fromJS({
-        location: CmdLine.newWindowURL()
+        location: CmdLine.newWindowURL
       }))
     }
 
@@ -750,11 +748,11 @@ app.on('ready', () => {
 
       // Setup the auto updater, check the env variable first because it's
       // used to check the update channel before releases.
-      Updater.init(process.platform, process.arch, process.env.BRAVE_UPDATE_VERSION || pack.version)
+      // Updater.init(process.platform, process.arch, process.env.BRAVE_UPDATE_VERSION || pack.version)
 
       // This is fired by a menu entry (for now - will be scheduled)
-      process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
-      ipcMain.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
+      // process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
+      // ipcMain.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
 
       // This is fired from a auto-update metadata call
       process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => {
