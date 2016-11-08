@@ -333,7 +333,8 @@ if (ipc) {
       }
     } else if (message === reconciliationMessage) {
       appActions.hideMessageBox(message)
-      if (win) {
+      // buttonIndex === 1 is Dismiss
+      if (buttonIndex === 0 && win) {
         win.webContents.send(messages.SHORTCUT_NEW_FRAME,
           'about:preferences#payments', { singleFrame: true })
       }
@@ -1532,7 +1533,8 @@ const showNotificationReviewPublishers = () => {
     greeting: locale.translation('updateHello'),
     message: reconciliationMessage,
     buttons: [
-      {text: locale.translation('reviewSites'), className: 'primary'}
+      {text: locale.translation('reviewSites'), className: 'primary'},
+      {text: locale.translation('dismiss')}
     ],
     options: {
       style: 'greetingStyle',
