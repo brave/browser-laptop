@@ -12,7 +12,7 @@ const aboutActions = require('./aboutActions')
 const ImmutableComponent = require('../components/immutableComponent')
 const SwitchControl = require('../components/switchControl')
 
-const ipc = window.chrome.ipc
+const ipc = window.chrome.ipcRenderer
 
 // Stylesheets
 require('../../less/switchControls.less')

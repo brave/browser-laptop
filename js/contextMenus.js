@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const electron = global.require('electron')
+const electron = require('electron')
 const remote = electron.remote
 const Menu = remote.Menu
 const Immutable = require('immutable')
@@ -23,7 +23,7 @@ const CommonMenu = require('../app/common/commonMenu')
 const dnd = require('./dnd')
 const dndData = require('./dndData')
 const appStoreRenderer = require('./stores/appStoreRenderer')
-const ipc = global.require('electron').ipcRenderer
+const ipc = require('electron').ipcRenderer
 const locale = require('../js/l10n')
 const {getSetting} = require('./settings')
 const settings = require('./constants/settings')

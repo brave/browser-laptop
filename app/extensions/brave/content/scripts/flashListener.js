@@ -13,7 +13,7 @@ function isAdobeLink (href) {
 }
 
 function showFlashNotification (origin, e) {
-  chrome.ipc.sendToHost('show-flash-notification', origin)
+  chrome.ipcRenderer.sendToHost('show-flash-notification', origin)
   e.preventDefault()
   e.stopPropagation()
 }

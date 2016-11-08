@@ -84,18 +84,6 @@ module.exports.registerHeadersReceivedFilteringCB = (filteringFn) => {
 function registerForBeforeRequest (session, partition) {
   const isPrivate = !partition.startsWith('persist:')
   session.webRequest.onBeforeRequest((details, cb) => {
-    if (shouldIgnoreUrl(details.url)) {
-      cb({})
-      return
-    }
-
-    const firstPartyUrl = module.exports.getMainFrameUrl(details)
-    // this can happen if the tab is closed and the webContents is no longer available
-    if (!firstPartyUrl) {
-      cb({ cancel: true })
-      return
-    }
-
     if (appUrlUtil.isTargetAboutUrl(details.url)) {
       if (process.env.NODE_ENV === 'development' && !details.url.match(/devServerPort/)) {
         // add webpack dev server port
@@ -107,6 +95,18 @@ function registerForBeforeRequest (session, partition) {
         })
         return
       }
+    }
+
+    if (shouldIgnoreUrl(details.url)) {
+      cb({})
+      return
+    }
+
+    const firstPartyUrl = module.exports.getMainFrameUrl(details)
+    // this can happen if the tab is closed and the webContents is no longer available
+    if (!firstPartyUrl) {
+      cb({ cancel: true })
+      return
     }
 
     for (let i = 0; i < beforeRequestFilteringFns.length; i++) {
@@ -541,17 +541,20 @@ function initForPartition (partition) {
   fns.forEach((fn) => { fn(ses, partition) })
 }
 
+const filterableProtocols = ['http:', 'https:']
+
 function shouldIgnoreUrl (url) {
   // Ensure host is well-formed (RFC 1035) and has a non-empty hostname
   try {
-    let host = urlParse(url).hostname
-    if (host.includes('..') || host.length > 255 || host.length === 0) {
-      return true
+    // TODO(bridiver) - handle RFS check and cancel http/https requests with 0 or > 255 length hostames
+    const parsedUrl = urlParse(url)
+    if (filterableProtocols.includes(parsedUrl.protocol)) {
+      return false
     }
   } catch (e) {
-    return true
+    console.warn('Error parsing ' + url)
   }
-  return false
+  return true
 }
 
 module.exports.init = () => {

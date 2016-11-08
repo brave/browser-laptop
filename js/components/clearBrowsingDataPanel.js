@@ -9,7 +9,7 @@ const Button = require('./button')
 const SwitchControl = require('./switchControl')
 const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
-const ipc = global.require('electron').ipcRenderer
+const ipc = require('electron').ipcRenderer
 const messages = require('../constants/messages')
 
 class ClearBrowsingDataPanel extends ImmutableComponent {

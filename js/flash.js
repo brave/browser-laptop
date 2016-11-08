@@ -5,13 +5,8 @@
 
 const fs = require('fs')
 const path = require('path')
-let electron
+const electron = require('electron')
 let app
-try {
-  electron = require('electron')
-} catch (e) {
-  electron = global.require('electron')
-}
 if (process.type === 'browser') {
   app = electron.app
 } else {

@@ -4,5 +4,5 @@
 
 let lang = navigator.language.split('-')[0].split('_')[0]
 chrome.webFrame.setSpellCheckProvider(lang || '', true, {
-  spellCheck: (word) => !chrome.ipc.sendSync('is-misspelled', word)
+  spellCheck: (word) => !chrome.ipcRenderer.sendSync('is-misspelled', word)
 })

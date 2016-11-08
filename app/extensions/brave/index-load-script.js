@@ -1,4 +1,4 @@
-var baseHref = 'http://localhost:' + process.env.npm_package_config_port
+var baseHref = 'http://localhost:8080' // + process.env.npm_package_config_port
 var appEntry = baseHref + '/gen/app.entry.js'
 
 var baseNode = document.createElement('base')

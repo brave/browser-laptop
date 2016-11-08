@@ -5,7 +5,7 @@
 if (chrome.contentSettings.passwordManager == 'allow') {
   let credentials = {}
   function savePassword (username/*: ?string*/, pw/*: string*/, origin/*: string*/, action/*: string*/) {
-    chrome.ipc.send('save-password', username, pw, origin, action)
+    chrome.ipcRenderer.send('save-password', username, pw, origin, action)
   }
 
   let submittedForms = []
@@ -62,7 +62,7 @@ if (chrome.contentSettings.passwordManager == 'allow') {
 
     // Fill the password immediately if there's only one or if the username
     // is already autofilled
-    chrome.ipc.send('get-passwords', formOrigin, action)
+    chrome.ipcRenderer.send('get-passwords', formOrigin, action)
 
     if (usernameElem) {
       usernameElem.addEventListener('keyup', (e) => {
@@ -73,11 +73,11 @@ if (chrome.contentSettings.passwordManager == 'allow') {
           case KeyEvent.DOM_VK_ESCAPE:
             e.preventDefault()
             e.stopPropagation()
-            chrome.ipc.send('hide-context-menu')
+            chrome.ipcRenderer.send('hide-context-menu')
             break
           default:
             let rect = usernameElem.getBoundingClientRect()
-            chrome.ipc.send('show-username-list', formOrigin, action, {
+            chrome.ipcRenderer.send('show-username-list', formOrigin, action, {
               bottom: rect.bottom,
               left: rect.left,
               width: rect.width
@@ -91,7 +91,7 @@ if (chrome.contentSettings.passwordManager == 'allow') {
     form.addEventListener('submit', (e) => {
       if (usernameElem) {
         usernameElem.blur()
-        chrome.ipc.send('hide-context-menu')
+        chrome.ipcRenderer.send('hide-context-menu')
       }
       onFormSubmit(form, formOrigin)
     })
@@ -137,7 +137,7 @@ if (chrome.contentSettings.passwordManager == 'allow') {
       tryAutofillForm(formOrigin, form)
     })
 
-    chrome.ipc.on('got-password', (e, username, password, origin, action, isUnique) => {
+    chrome.ipcRenderer.on('got-password', (e, username, password, origin, action, isUnique) => {
       var elems = credentials[action]
       if (formOrigin === origin && elems) {
         elems.forEach((elem) => {

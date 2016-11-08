@@ -4,7 +4,7 @@
 
 const React = require('react')
 const ImmutableComponent = require('../../../js/components/immutableComponent')
-const electron = global.require('electron')
+const electron = require('electron')
 const ipc = electron.ipcRenderer
 const Button = require('../../../js/components/button')
 const cx = require('../../../js/lib/classSet')

@@ -6,7 +6,7 @@ const messages = require('../constants/messages')
 const serializer = require('../dispatcher/serializer')
 const windowConstants = require('../constants/windowConstants')
 const appConstants = require('../constants/appConstants')
-const ipc = window.chrome.ipc
+const ipc = window.chrome.ipcRenderer
 
 const aboutActions = {
   /**
