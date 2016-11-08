@@ -232,6 +232,9 @@
         }
       }
     }
+    .verticallyCenter {
+      justify-content: center;
+    }
   }
 
   // Windows 10 specific styles
@@ -243,16 +246,29 @@
       border: 1px solid #2283d3;
     }
     .windowCaptionButtons {
+      &.verticallyCenter {
+        > .container {
+          height: 100%;
+        }
+      }
+      &:not(.verticallyCenter) {
+        > .container {
+          button.captionButton {
+            height: 29px;
+            &.fullscreen {
+              height: 21px;
+            }
+          }
+        }
+      }
+
       > .container {
         button.captionButton {
           width: 45px;
-          height: 29px;
           border: 0;
           background-color: transparent;
 
-          &.fullscreen {
-            height:21px;
-          }
+          &.fullscreen { }
 
           &.minimize {
             &:hover {
@@ -350,6 +366,9 @@
         }
       }
     }
+    .verticallyCenter {
+      justify-content: center;
+    }
   }
 }
 
@@ -414,8 +433,9 @@
     display: flex;
     cursor: default;
     -webkit-user-select: none;
-    flex-grow: 0;
+    flex-grow: 1;
     margin-top: 2px;
+    height: 19px;
 
     .menubarItem {
       color: black;
@@ -435,6 +455,10 @@
       background-color: #cce8ff !important;
       border: 1px solid #99d1ff !important;
     }
+  }
+
+  .windowCaptionButtons {
+    flex-grow: 0;
   }
 }
 
@@ -499,6 +523,7 @@
   .topLevelEndButtons {
     display: flex;
     flex-direction: row;
+    margin-left: 3px;
 
     .extensionButton {
       -webkit-app-region: no-drag;
@@ -521,6 +546,9 @@
       &.braveShieldsDisabled {
         -webkit-filter: grayscale(100%);
         opacity: 0.4;
+      }
+      &.leftOfCaptionButton {
+        margin-right: 1px;
       }
     }
 
@@ -812,7 +840,7 @@
     &.endButtons {
       margin-right: 20px;
       @media (max-width: @breakpointNarrowViewport) {
-        margin-right: -5px;
+        margin-right: 0px;
       }
     }
   }

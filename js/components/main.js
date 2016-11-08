@@ -909,6 +909,7 @@ class Main extends ImmutableComponent {
                     contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
                     autohide={getSetting(settings.AUTO_HIDE_MENU)}
                     lastFocusedSelector={customTitlebar.lastFocusedSelector} />
+                  <WindowCaptionButtons windowMaximized={customTitlebar.isMaximized} />
                 </div>
                 : null
             }
@@ -969,7 +970,7 @@ class Main extends ImmutableComponent {
               />
               <div className='topLevelEndButtons'>
                 <div className={cx({
-                  extraDragArea: true,
+                  extraDragArea: !customTitlebar.menubarVisible,
                   allowDragging: shouldAllowWindowDrag
                 })} />
                 {
@@ -980,15 +981,21 @@ class Main extends ImmutableComponent {
                   className={cx({
                     navbutton: true,
                     braveShieldsDisabled,
-                    braveShieldsDown: !braverySettings.shieldsUp
+                    braveShieldsDown: !braverySettings.shieldsUp,
+                    leftOfCaptionButton: customTitlebar.captionButtonsVisible && !customTitlebar.menubarVisible
                   })}
                   onClick={this.onBraveMenu} />
+                {
+                  customTitlebar.captionButtonsVisible && !customTitlebar.menubarVisible
+                  ? <span className='buttonSeparator' />
+                  : null
+                }
               </div>
             </div>
           </div>
           {
-            customTitlebar.captionButtonsVisible
-              ? <WindowCaptionButtons windowMaximized={customTitlebar.isMaximized} />
+            customTitlebar.captionButtonsVisible && !customTitlebar.menubarVisible
+              ? <WindowCaptionButtons windowMaximized={customTitlebar.isMaximized} verticallyCenter='true' />
               : null
           }
         </div>

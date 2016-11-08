@@ -53,7 +53,8 @@ class WindowCaptionButtons extends ImmutableComponent {
 
     return <div className={cx({
       fullscreen: this.props.windowMaximized,
-      windowCaptionButtons: true
+      windowCaptionButtons: true,
+      verticallyCenter: this.props.verticallyCenter
     })}>
       <div className='container'>
         <button
