@@ -555,10 +555,8 @@ var enable = (paymentsEnabled) => {
     appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED, true)
   }
 
-  if (!paymentsEnabled) {
-    synopsis = null
-    return updatePublisherInfo()
-  }
+  publisherInfo._internal.enabled = paymentsEnabled
+  if (synopsis) return updatePublisherInfo()
 
   synopsis = new (ledgerPublisher.Synopsis)()
   fs.readFile(pathName(synopsisPath), (err, data) => {
@@ -652,6 +650,8 @@ var publisherInfo = {
   synopsis: undefined,
 
   _internal: {
+    enabled: false,
+
     ruleset: { raw: [], cooked: [] }
   }
 }
@@ -659,8 +659,6 @@ var publisherInfo = {
 var updatePublisherInfo = () => {
   var data = {}
   var then = underscore.now() - msecs.week
-
-  if (!synopsis) return
 
   underscore.keys(publishers).sort().forEach((publisher) => {
     var entries = []
@@ -677,8 +675,9 @@ var updatePublisherInfo = () => {
   syncWriter(pathName(scoresPath), synopsis.allN(), () => {})
 
   syncWriter(pathName(synopsisPath), synopsis, () => {})
-  publisherInfo.synopsis = synopsisNormalizer()
+  if (!publisherInfo._internal.enabled) return
 
+  publisherInfo.synopsis = synopsisNormalizer()
   publisherInfo.synopsisOptions = synopsis.options
 
   if (publisherInfo._internal.debugP) {
