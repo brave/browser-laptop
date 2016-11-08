@@ -20,22 +20,18 @@ class ImportBrowserDataPanel extends ImmutableComponent {
     this.onClickRememberForNetflix = this.onClickRememberForNetflix.bind(this)
   }
   get origin () {
-    return siteUtil.getOrigin(this.props.location)
+    return siteUtil.getOrigin(this.props.widevinePanelDetail.get('location'))
   }
   onInstallAndAllow () {
     appActions.setResourceEnabled(appConfig.resourceNames.WIDEVINE, true)
-    appActions.changeSiteSetting(this.origin, appConfig.resourceNames.WIDEVINE, this.props.widevinePanelDetail.get('alsoAddRememberSiteSetting') ? 1 : 0)
-    windowActions.widevinePanelDetailChanged()
+    this.props.onHide()
+    // The site permissions that is set if this.props.widevinePanelDetail.get('alsoAddRememberSiteSetting') is handled once the resource is ready
+    // in main.js.  This is so that the reload doesn't happen until it is ready.
   }
   onClickRememberForNetflix (e) {
     windowActions.widevinePanelDetailChanged({
       alsoAddRememberSiteSetting: e.target.value
     })
-  }
-  componentWillUpdate (nextProps) {
-    if (nextProps.widevineReady && !this.props.widevineReady) {
-      windowActions.reloadActiveFrame()
-    }
   }
   render () {
     const isLinux = process.platform === 'linux'

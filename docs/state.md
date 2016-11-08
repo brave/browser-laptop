@@ -557,6 +557,8 @@ WindowStore
     cookies: boolean
   },
   widevinePanelDetail: {
+    shown: boolean, // True if the panel is shown
+    location: string, // Location this dialog is for
     alsoAddRememberSiteSetting: boolean, // True if an allow always rule should be added for the acitve frame as well if installed
   },
   modalDialogDetail: {

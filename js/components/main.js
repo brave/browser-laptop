@@ -45,7 +45,6 @@ const LongPressButton = require('./longPressButton')
 const Menubar = require('../../app/renderer/components/menubar')
 const WindowCaptionButtons = require('../../app/renderer/components/windowCaptionButtons')
 const CheckDefaultBrowserDialog = require('../../app/renderer/components/checkDefaultBrowserDialog')
-
 // Constants
 const appConfig = require('../constants/appConfig')
 const messages = require('../constants/messages')
@@ -61,6 +60,7 @@ const {bookmarksToolbarMode} = require('../../app/common/constants/settingsEnums
 const basicAuthState = require('../../app/common/state/basicAuthState')
 const extensionState = require('../../app/common/state/extensionState')
 const FrameStateUtil = require('../state/frameStateUtil')
+const siteUtil = require('../state/siteUtil')
 const searchProviders = require('../data/searchProviders')
 const defaultBrowserState = require('../../app/common/state/defaultBrowserState')
 
@@ -292,6 +292,16 @@ class Main extends ImmutableComponent {
           return false
         }
       })
+    }
+  }
+
+  componentWillUpdate (nextProps) {
+    if (!this.props.appState.getIn([appConfig.resourceNames.WIDEVINE, 'ready']) &&
+        nextProps.appState.getIn([appConfig.resourceNames.WIDEVINE, 'ready'])) {
+      const widevinePanelDetail = this.props.windowState.get('widevinePanelDetail')
+      const origin = siteUtil.getOrigin(widevinePanelDetail.get('location'))
+      // This automatically handles reloading the frame as well
+      appActions.changeSiteSetting(origin, appConfig.resourceNames.WIDEVINE, widevinePanelDetail.get('alsoAddRememberSiteSetting') ? 1 : 0)
     }
   }
 
@@ -622,7 +632,9 @@ class Main extends ImmutableComponent {
   }
 
   onHideWidevinePanel () {
-    windowActions.widevinePanelDetailChanged()
+    windowActions.widevinePanelDetailChanged({
+      shown: false
+    })
   }
 
   onHideAutofillAddressPanel () {
@@ -845,7 +857,7 @@ class Main extends ImmutableComponent {
     const braveryPanelIsVisible = !braveShieldsDisabled && this.props.windowState.get('braveryPanelDetail')
     const clearBrowsingDataPanelIsVisible = this.props.windowState.get('clearBrowsingDataDetail')
     const importBrowserDataPanelIsVisible = this.props.windowState.get('importBrowserDataDetail')
-    const widevinePanelIsVisible = this.props.windowState.get('widevinePanelDetail')
+    const widevinePanelIsVisible = this.props.windowState.getIn(['widevinePanelDetail', 'shown'])
     const autofillAddressPanelIsVisible = this.props.windowState.get('autofillAddressDetail')
     const autofillCreditCardPanelIsVisible = this.props.windowState.get('autofillCreditCardDetail')
     const activeRequestedLocation = this.activeRequestedLocation
@@ -1033,7 +1045,6 @@ class Main extends ImmutableComponent {
         {
           widevinePanelIsVisible
           ? <WidevinePanel
-            location={activeFrame && activeFrame.get('location') || ''}
             widevinePanelDetail={this.props.windowState.get('widevinePanelDetail')}
             widevineReady={this.props.appState.getIn([appConfig.resourceNames.WIDEVINE, 'ready'])}
             onHide={this.onHideWidevinePanel} />

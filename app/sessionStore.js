@@ -100,6 +100,8 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
   delete perWindowData.contextMenuDetail
   // Don't save preview frame since they are only related to hovering on a tab
   delete perWindowData.previewFrameKey
+  // Don't save widevine panel detail
+  delete perWindowData.widevinePanelDetail
   // Don't save preview tab pages
   if (perWindowData.ui && perWindowData.ui.tabs) {
     delete perWindowData.ui.tabs.previewTabPageIndex

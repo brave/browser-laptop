@@ -1192,15 +1192,6 @@ const windowActions = {
       className,
       props
     })
-  },
-
-  /**
-   * Reloads the current active frame
-   */
-  reloadActiveFrame: function () {
-    dispatch({
-      actionType: WindowConstants.WINDOW_RELOAD_ACTIVE_FRAME
-    })
   }
 }
 
