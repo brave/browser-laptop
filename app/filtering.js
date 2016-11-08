@@ -549,17 +549,20 @@ function initForPartition (partition) {
   fns.forEach((fn) => { fn(ses, partition) })
 }
 
+const filterableProtocols = ['http:', 'https:']
+
 function shouldIgnoreUrl (url) {
   // Ensure host is well-formed (RFC 1035) and has a non-empty hostname
   try {
-    let host = urlParse(url).hostname
-    if (host.includes('..') || host.length > 255 || host.length === 0) {
-      return true
+    // TODO(bridiver) - handle RFS check and cancel http/https requests with 0 or > 255 length hostames
+    const parsedUrl = urlParse(url)
+    if (filterableProtocols.includes(parsedUrl.protocol)) {
+      return false
     }
   } catch (e) {
-    return true
+    console.warn('Error parsing ' + url)
   }
-  return false
+  return true
 }
 
 module.exports.init = () => {

@@ -314,7 +314,7 @@ const windowActions = {
    * @param {Object} frameProps - The properties of the frame to close
    */
   closeFrame: function (frames, frameProps, forceClosePinned) {
-    const ipc = global.require('electron').ipcRenderer
+    const ipc = require('electron').ipcRenderer
     const origin = siteUtil.getOrigin(frameProps.get('location'))
     if (origin) {
       appActions.clearMessageBoxes(origin)

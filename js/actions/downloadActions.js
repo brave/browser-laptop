@@ -4,12 +4,7 @@
 
 'use strict'
 
-let electron
-try {
-  electron = require('electron')
-} catch (e) {
-  electron = global.require('electron')
-}
+const electron = require('electron')
 
 let shell, ipc, clipboard, getCurrentWebContents
 if (process.type === 'browser') {
@@ -27,8 +22,8 @@ if (process.type === 'browser') {
 const appDownloadActions = require('../constants/downloadActions')
 const appActions = require('../actions/appActions')
 const messages = require('../constants/messages')
-const fs = require('fs')
-const path = require('path')
+// const fs = require('fs')
+// const path = require('path')
 
 /**
   * Creates an action function for the specified app download action
@@ -48,22 +43,22 @@ const downloadActions = {
     // void new window.Notification(locale.translation('urlCopied'))
   },
   openDownloadPath: function (download) {
-    fs.exists(download.get('savePath'), (exists) => {
-      if (exists) {
-        shell.openItem(download.get('savePath'))
-      } else {
-        shell.beep()
-      }
-    })
+    // fs.exists(download.get('savePath'), (exists) => {
+    //   if (exists) {
+    //     shell.openItem(download.get('savePath'))
+    //   } else {
+    //     shell.beep()
+    //   }
+    // })
   },
   locateShellPath: function (download) {
-    fs.exists(download.get('savePath'), (exists) => {
-      if (exists) {
-        shell.showItemInFolder(download.get('savePath'))
-      } else {
-        shell.openItem(path.dirname(download.get('savePath')))
-      }
-    })
+    // fs.exists(download.get('savePath'), (exists) => {
+    //   if (exists) {
+    //     shell.showItemInFolder(download.get('savePath'))
+    //   } else {
+    //     shell.openItem(path.dirname(download.get('savePath')))
+    //   }
+    // })
   },
   hideDownloadsToolbar: function () {
     if (process.type === 'renderer') {

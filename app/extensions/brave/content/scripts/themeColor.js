@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 (function () {
-  var ipcRenderer = chrome.ipc;
+  var ipcRenderer = chrome.ipcRenderer;
 
   const rgbaFromStr = function (rgba) {
     if (!rgba) {
@@ -57,6 +57,6 @@
   }
 
   if(window.top == window.self) {
-    chrome.ipc.sendToHost('theme-color-computed', computeThemeColor())
+    chrome.ipcRenderer.sendToHost('theme-color-computed', computeThemeColor())
   }
 })()

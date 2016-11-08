@@ -71,8 +71,8 @@ module.exports.getBraveIndexPath = function (relateivePath = '') {
 
 module.exports.getBraveExtIndexHTML = function () {
   return process.env.NODE_ENV === 'development'
-    ? module.exports.getBraveIndexPath('index-dev.html')
-    : module.exports.getBraveIndexPath('index.html')
+    ? module.exports.getBraveIndexPath('index-dev.html').replace('file://', 'chrome://brave')
+    : module.exports.getBraveIndexPath('index.html').replace('file://', 'chrome://brave')
 }
 
 /**

@@ -12,13 +12,7 @@ const settings = require('../../js/constants/settings')
 const getSetting = require('../../js/settings').getSetting
 const issuesUrl = 'https://github.com/brave/browser-laptop/issues'
 const isDarwin = process.platform === 'darwin'
-
-let electron
-try {
-  electron = require('electron')
-} catch (e) {
-  electron = global.require('electron')
-}
+const electron = require('electron')
 
 let app
 let BrowserWindow

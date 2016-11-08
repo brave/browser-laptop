@@ -136,17 +136,17 @@ document.addEventListener('keydown', (e /*: Event*/) => {
     case KeyEvent.DOM_VK_ESCAPE:
       if (document.readyState !== 'complete') {
         e.preventDefault()
-        chrome.ipc.sendToHost('stop-load')
+        chrome.ipcRenderer.sendToHost('stop-load')
       }
       break
     case KeyEvent.DOM_VK_LEFT:
       if (e.metaKey && !isEditable(document.activeElement) && isPlatformOSX()) {
-        chrome.ipc.sendToHost('go-back')
+        chrome.ipcRenderer.sendToHost('go-back')
       }
       break
     case KeyEvent.DOM_VK_RIGHT:
       if (e.metaKey && !isEditable(document.activeElement) && isPlatformOSX()) {
-        chrome.ipc.sendToHost('go-forward')
+        chrome.ipcRenderer.sendToHost('go-forward')
       }
       break
   }
