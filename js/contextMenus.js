@@ -683,7 +683,7 @@ function hamburgerTemplateInit (location, e) {
     }, {
       label: locale.translation('bravery'),
       submenu: [
-        CommonMenu.braveryGlobalMenuItem(),
+//        CommonMenu.braveryGlobalMenuItem(),
         CommonMenu.braverySiteMenuItem(),
         CommonMenu.braveryPaymentsMenuItem()
       ]
