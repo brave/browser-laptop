@@ -324,7 +324,6 @@ if (ipc) {
       // buttonIndex === 1 is "Later"; the timestamp until which to delay is set
       // in showNotificationAddFunds() when triggering this notification.
       if (buttonIndex === 0) {
-        // Turn off notifications
         appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
       } else if (buttonIndex === 2) {
         // Add funds: Open payments panel
@@ -336,12 +335,17 @@ if (ipc) {
     } else if (message === reconciliationMessage) {
       appActions.hideMessageBox(message)
       // buttonIndex === 1 is Dismiss
-      if (buttonIndex === 0 && win) {
+      if (buttonIndex === 0) {
+        appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
+      } else if (buttonIndex === 2 && win) {
         win.webContents.send(messages.SHORTCUT_NEW_FRAME,
           'about:preferences#payments', { singleFrame: true })
       }
     } else if (message === notificationPaymentDoneMessage) {
       appActions.hideMessageBox(message)
+      if (buttonIndex === 0) {
+        appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
+      }
     } else if (message === notificationTryPaymentsMessage) {
       appActions.hideMessageBox(message)
       if (buttonIndex === 1 && win) {
@@ -1553,8 +1557,9 @@ const showNotificationReviewPublishers = () => {
     greeting: locale.translation('updateHello'),
     message: reconciliationMessage,
     buttons: [
-      {text: locale.translation('reviewSites'), className: 'primary'},
-      {text: locale.translation('dismiss')}
+      {text: locale.translation('turnOffNotifications')},
+      {text: locale.translation('dismiss')},
+      {text: locale.translation('reviewSites'), className: 'primary'}
     ],
     options: {
       style: 'greetingStyle',
@@ -1574,6 +1579,7 @@ const showNotificationPaymentDone = (transactionContributionFiat) => {
     greeting: locale.translation('updateHello'),
     message: notificationPaymentDoneMessage,
     buttons: [
+      {text: locale.translation('turnOffNotifications')},
       {text: locale.translation('Ok'), className: 'primary'}
     ],
     options: {
