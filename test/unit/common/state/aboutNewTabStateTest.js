@@ -56,6 +56,14 @@ describe('aboutNewTabState', function () {
     },
     tag: siteTags.BOOKMARK
   }
+  const historyAction = {
+    siteDetail: {
+      title: 'Brave',
+      location: 'https://brave.com',
+      lastAccessedTime: testTime
+    },
+    tag: undefined
+  }
 
   describe('mergeDetails', function () {
     it('updates the `updatedStamp` value on success', function () {
@@ -106,12 +114,6 @@ describe('aboutNewTabState', function () {
       assert.equal(updatedValue, bookmarkAction.siteDetail.location)
     })
 
-    it('removes the tags when adding to the sites list', function () {
-      const state = aboutNewTabState.addSite(defaultAppState, bookmarkAction)
-      const updatedValue = state.getIn(['about', 'newtab', 'sites', 0, 'tags'])
-      assert.deepEqual(updatedValue.toJS(), [])
-    })
-
     it('will add lastAccessedTime to the siteDetail if missing from history entry', function () {
       const action = {siteDetail: {location: 'https://brave.com'}}
       const state = aboutNewTabState.addSite(defaultAppState, action)
@@ -145,10 +147,10 @@ describe('aboutNewTabState', function () {
     })
 
     it('removes the entry from the sites list', function () {
-      const stateWithSite = aboutNewTabState.addSite(defaultAppState, bookmarkAction)
+      const stateWithSite = aboutNewTabState.addSite(defaultAppState, historyAction)
       assert.equal(stateWithSite.size, 1)
 
-      const state = aboutNewTabState.removeSite(stateWithSite, bookmarkAction)
+      const state = aboutNewTabState.removeSite(stateWithSite, historyAction)
       const sites = state.getIn(['about', 'newtab', 'sites'])
       assert.equal(sites.size, 0)
     })

@@ -7,6 +7,7 @@ const normalizeUrl = require('normalize-url')
 const siteTags = require('../constants/siteTags')
 const settings = require('../constants/settings')
 const getSetting = require('../settings').getSetting
+const UrlUtil = require('../lib/urlutil')
 const urlParse = require('url').parse
 
 const isBookmark = (tags) => {
@@ -337,9 +338,19 @@ module.exports.getDetailFromFrame = function (frame, tag) {
  * @param favicon favicon URL
  */
 module.exports.updateSiteFavicon = function (sites, location, favicon) {
+  if (UrlUtil.isNotURL(location)) {
+    return sites
+  }
+
   const matchingIndices = []
 
   sites.filter((site, index) => {
+    if (isBookmarkFolder(site.get('tags'))) {
+      return false
+    }
+    if (UrlUtil.isNotURL(site.get('location'))) {
+      return false
+    }
     if (normalizeUrl(site.get('location')) === normalizeUrl(location)) {
       matchingIndices.push(index)
       return true
