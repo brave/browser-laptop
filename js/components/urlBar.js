@@ -14,16 +14,13 @@ const debounce = require('../lib/debounce')
 const ipc = global.require('electron').ipcRenderer
 
 const UrlBarSuggestions = require('./urlBarSuggestions')
+const UrlBarIcon = require('../../app/renderer/components/urlBarIcon')
 const messages = require('../constants/messages')
-const dragTypes = require('../constants/dragTypes')
 const {getSetting} = require('../settings')
 const settings = require('../constants/settings')
 const contextMenus = require('../contextMenus')
-const dndData = require('../dndData')
 const windowStore = require('../stores/windowStore')
-const {isSourceAboutUrl} = require('../lib/appUrlUtil')
 const searchProviders = require('../data/searchProviders')
-const searchIconSize = 16
 const UrlUtil = require('../lib/urlutil')
 
 const EventUtil = require('../lib/eventUtil')
@@ -35,7 +32,6 @@ class UrlBar extends ImmutableComponent {
   constructor () {
     super()
     this.onActiveFrameStop = this.onActiveFrameStop.bind(this)
-    this.onDragStart = this.onDragStart.bind(this)
     this.onFocus = this.onFocus.bind(this)
     this.onBlur = this.onBlur.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
@@ -43,7 +39,6 @@ class UrlBar extends ImmutableComponent {
     this.onChange = this.onChange.bind(this)
     this.onClick = this.onClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
-    this.onSiteInfo = this.onSiteInfo.bind(this)
     this.activateSearchEngine = false
     this.searchSelectEntry = null
     this.keyPressed = false
@@ -431,21 +426,9 @@ class UrlBar extends ImmutableComponent {
     return protocol === 'http:' || protocol === 'https:'
   }
 
-  onSiteInfo () {
-    if (isSourceAboutUrl(this.props.location)) {
-      return
-    }
-    windowActions.setSiteInfoVisible(true)
-  }
-
   get shouldRenderUrlBarSuggestions () {
     let shouldRender = this.props.urlbar.getIn(['suggestions', 'shouldRender'])
     return shouldRender === true
-  }
-
-  onDragStart (e) {
-    dndData.setupDataTransferURL(e.dataTransfer, this.props.location, this.props.title)
-    dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.TAB, this.activeFrame)
   }
 
   onContextMenu (e) {
@@ -453,39 +436,22 @@ class UrlBar extends ImmutableComponent {
   }
 
   render () {
-    const showIconSecure = !this.activateSearchEngine && this.isHTTPPage && this.props.isSecure && !this.props.urlbar.get('active')
-    const showIconInsecure = !this.activateSearchEngine && this.isHTTPPage && !this.props.isSecure && !this.props.urlbar.get('active') && !this.props.titleMode
-    const showIconSearch = !this.activateSearchEngine && this.props.urlbar.get('active') && this.props.loading === false
-    const showSearchByDefault = !this.activateSearchEngine && !showIconSecure && !showIconInsecure && !showIconSearch && !this.props.titleMode
     return <form
       className='urlbarForm'
       action='#'
       id='urlbar'
       ref='urlbar'>
-      <span
-        onDragStart={this.onDragStart}
-        draggable
-        onClick={this.onSiteInfo}
-        className={cx({
-          urlbarIcon: true,
-          'fa': !this.activateSearchEngine,
-          'fa-lock': showIconSecure,
-          'fa-exclamation-triangle': showIconInsecure,
-          'fa fa-search': showIconSearch || showSearchByDefault,
-          extendedValidation: this.extendedValidationSSL
-        })}
-        style={
-          this.activateSearchEngine
-          ? {
-            backgroundImage: `url(${this.searchSelectEntry.image})`,
-            minWidth: searchIconSize,
-            width: searchIconSize,
-            backgroundSize: searchIconSize,
-            height: searchIconSize,
-            marginTop: '3px',
-            marginRight: '3px'
-          } : {}
-        } />
+      <UrlBarIcon
+        activateSearchEngine={this.activateSearchEngine}
+        active={this.props.urlbar.get('active')}
+        isSecure={this.props.isSecure}
+        isHTTPPage={this.isHTTPPage}
+        loading={this.props.loading}
+        location={this.props.location}
+        searchSelectEntry={this.searchSelectEntry}
+        title={this.props.title}
+        titleMode={this.props.titleMode}
+      />
       {
         this.props.titleMode
         ? <div id='titleBar'>
