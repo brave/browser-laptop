@@ -7,9 +7,9 @@ const contextMenus = {
         extensionActions.contextMenuAllRemoved(extensionId)
       })
     })
-    process.on('chrome-context-menus-create', (extensionId, menuItemId, properties) => {
+    process.on('chrome-context-menus-create', (extensionId, menuItemId, properties, icon) => {
       setImmediate(() => {
-        extensionActions.contextMenuCreated(extensionId, menuItemId, properties)
+        extensionActions.contextMenuCreated(extensionId, menuItemId, properties, icon)
       })
     })
   }

@@ -85,13 +85,15 @@ const extensionActions = {
    * @param {string} extensionId - the extension id
    * @param {string} menuItemId - the id of the menu item that was clicked
    * @param {object} properties - createProperties of chrome.contextMenus.create
+   * @param {string} icon - 16x16 extension icon
    */
-  contextMenuCreated: function (extensionId, menuItemId, properties) {
+  contextMenuCreated: function (extensionId, menuItemId, properties, icon) {
     AppDispatcher.dispatch({
       actionType: ExtensionConstants.CONTEXT_MENU_CREATED,
       extensionId,
       menuItemId,
-      properties
+      properties,
+      icon
     })
   },
 

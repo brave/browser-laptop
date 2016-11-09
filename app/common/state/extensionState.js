@@ -157,11 +157,15 @@ const extensionState = {
         state = state.setIn(['extensions', action.get('extensionId'), 'contextMenus'], new Immutable.List())
       }
       let contextMenus = state.getIn(['extensions', action.get('extensionId'), 'contextMenus'])
+      let basePath = state.getIn(['extensions', action.get('extensionId'), 'base_path'])
+      basePath = decodeURI(basePath)
+      basePath = basePath.replace('file://', '')
       return state.setIn(['extensions', action.get('extensionId'), 'contextMenus'],
         contextMenus.push({
           extensionId: action.get('extensionId'),
           menuItemId: action.get('menuItemId'),
-          properties: action.get('properties').toJS()
+          properties: action.get('properties').toJS(),
+          icon: basePath + '/' + action.get('icon')
         }))
     } else {
       return state

@@ -1176,7 +1176,8 @@ function mainTemplateInit (nodeProps, frame) {
                   extensionActions.contextMenuClicked(
                     extensionContextMenu.extensionId, frame.get('tabId'), info)
                 }
-              }
+              },
+              icon: extensionContextMenu.icon
             })
           templateMap[extensionContextMenu.menuItemId] = template[template.length - 1]
         }
