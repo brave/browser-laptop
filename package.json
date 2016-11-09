@@ -99,6 +99,8 @@
     "lru_cache": "^1.0.0",
     "moment": "^2.15.1",
     "normalize-url": "^1.7.0",
+    "parse-torrent": "^5.8.1",
+    "prettier-bytes": "^1.0.3",
     "punycode": "^2.0.0",
     "qr-image": "^3.1.0",
     "random-lib": "2.1.0",
@@ -114,7 +116,6 @@
     "tracking-protection": "1.1.x",
     "underscore": "1.8.3",
     "url-loader": "^0.5.7",
-    "webtorrent": "^0.97.2",
     "webtorrent-remote": "0.0.0"
   },
   "devDependencies": {
@@ -143,6 +144,7 @@
     "jsdom": "9.4.1",
     "jsdom-global": "2.0.0",
     "jsdox": "^0.4.9",
+    "json-loader": "^0.5.4",
     "jsonfile": "^2.2.3",
     "less": "^2.5.3",
     "less-loader": "^2.2.1",
