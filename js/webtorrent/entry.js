@@ -1,53 +1,63 @@
 const ReactDOM = require('react-dom')
 const magnetURI = require('magnet-uri')
 const Button = require('../components/button')
+const messages = require('../constants/messages')
+const uuid = require('uuid')
 
-/**
- * TODO: Once WebTorrent is running in it's own process, replace the window
- * globals with require() calls. Delete ext/webtorrent.min.js.
- */
-const WebTorrent = window.WebTorrent // require('webtorrent')
+require('../../less/webtorrent.less')
 
-/**
- * TODO: Replace hard-coded list of community trackers with latest list from
- * create-torrent package, similar to how WebTorrent Desktop does it here:
- * https://github.com/feross/webtorrent-desktop/blob/4bb2056bc9c1a421815b97d03ffed512575dfde0/src/renderer/webtorrent.js#L29-L31
- */
-window.WEBTORRENT_ANNOUNCE = [
-  'wss://tracker.btorrent.xyz',
-  'wss://tracker.openwebtorrent.com',
-  'wss://tracker.fastcast.nz'
-]
-
-var state = {
-  torrentId: window.location.hash.substring(1),
+// Set window.state for easier debugging
+var state = window.state = {
+  torrentID: window.location.hash.substring(1),
   torrent: null,
-  progress: 0,
-  files: [],
   dn: '',
   errorMessage: '',
   isFileLoaded: false
 }
 
-require('../../less/webtorrent.less')
-
-// Start downloading the torrent
-var client = window.client = new WebTorrent()
-client.on('error', onError)
-
 // Show download progress
 setInterval(render, 1000)
 render()
 
+// Talk to the webtorrent process
+var CHANNEL_ID = uuid.v4()
+var ipc = window.chrome.ipc
+ipc.on(messages.TORRENT_MESSAGE, function (e, msg) {
+  switch (msg.type) {
+    case 'info':
+      return handleInfo(msg)
+    case 'progress':
+      return handleProgress(msg)
+    case 'error':
+      return handleError(msg)
+  }
+})
+
+function handleInfo (msg) {
+  state.torrent = msg.torrent
+}
+
+function handleProgress (msg) {
+  if (state.torrent) state.torrent.progress = msg.progress
+}
+
+function handleError (msg) {
+  state.errorMessage = msg.errorMessage
+}
+
 function start () {
-  state.torrent = client.add(state.torrentId)
+  ipc.sendToHost(messages.TORRENT_MESSAGE, {
+    channelID: CHANNEL_ID,
+    type: 'add',
+    torrentID: state.torrentID
+  })
 }
 
 function render () {
   var torrent = state.torrent
-  var id = state.torrentId
+  var id = state.torrentID
 
-  // TODO: right now, we only support magnet links as the torrentId
+  // TODO: right now, we only support magnet links as the torrentID
   // Eventually, we need to support .torrent files as well, prob using parse-torrent
   if (!state.magnetInfo && id.startsWith('magnet:?')) {
     state.magnetInfo = magnetURI(id)
@@ -94,18 +104,14 @@ function render () {
       </div>
     )
   } else if (state.magnetInfo && state.magnetInfo.ix != null) {
+    // TODO: load over HTTP, either into an <iframe>
+    // ... or pick <video> / <audio> / <img> etc based on filetype
+    // var ix = Number(state.magnetInfo.ix)
     content = (
       <div className='content'>
         <div id='fileContainer' />
       </div>
     )
-
-    var ix = Number(state.magnetInfo.ix)
-    if (torrent && torrent.files && torrent.files[ix] && !state.isFileLoaded) {
-      var file = state.torrent.files[ix]
-      file.appendTo(document.querySelector('#fileContainer'))
-      state.isFileLoaded = true
-    }
   } else {
     var fileElems = torrent.files.map((file, i) => {
       return (
@@ -153,8 +159,4 @@ function render () {
     </div>
   )
   ReactDOM.render(elem, document.querySelector('#appContainer'))
-}
-
-function onError (err) {
-  state.errorMessage = err.message
 }
