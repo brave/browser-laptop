@@ -471,7 +471,6 @@ class UrlBar extends ImmutableComponent {
           onContextMenu={this.onContextMenu}
           data-l10n-id='urlbar'
           className={cx({
-            insecure: !this.props.isSecure && this.props.loading === false && !this.isHTTPPage,
             private: this.private,
             testHookLoadDone: !this.props.loading
           })}

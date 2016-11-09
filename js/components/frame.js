@@ -916,17 +916,12 @@ class Frame extends ImmutableComponent {
           interceptFlash(true, e.url)
         }
         windowActions.onWebviewLoadStart(this.frame, e.url)
+        // Clear security state
         windowActions.setBlockedRunInsecureContent(this.frame)
-        const isSecure = parsedUrl.protocol === 'https:' && !this.runInsecureContent()
-        const runInsecureContent = parsedUrl.protocol === 'https:' && this.runInsecureContent()
         windowActions.setSecurityState(this.frame, {
-          secure: isSecure,
-          runInsecureContent: runInsecureContent
+          secure: null,
+          runInsecureContent: false
         })
-        if (isSecure) {
-          // Check that there isn't a cert error.
-          ipc.send(messages.CHECK_CERT_ERROR_ACCEPTED, parsedUrl.host, this.props.frameKey)
-        }
       }
       windowActions.updateBackForwardState(
         this.frame,
@@ -1000,11 +995,27 @@ class Frame extends ImmutableComponent {
         windowActions.setNavigated(this.webview.getURL(), this.props.frameKey, true, this.frame.get('tabId'))
       }
     }
-    this.webview.addEventListener('load-commit', (e) => {
-      loadStart(e)
+    this.webview.addEventListener('did-change-security', (e) => {
+      let isSecure = null
+      let runInsecureContent = false
+      if (e.securityState === 'secure') {
+        isSecure = true
+        runInsecureContent = this.runInsecureContent()
+      } else if (e.securityState === 'insecure') {
+        isSecure = false
+      }
+      // TODO: handle 'warning' security state
+      windowActions.setSecurityState(this.frame, {
+        secure: isSecure,
+        runInsecureContent
+      })
+      if (isSecure) {
+        // Check that there isn't a cert error.
+        const parsedUrl = urlParse(this.props.location)
+        ipc.send(messages.CHECK_CERT_ERROR_ACCEPTED, parsedUrl.host, this.props.frameKey)
+      }
     })
     this.webview.addEventListener('load-start', (e) => {
-      // XXX: loadstart probably does not need to be called twice anymore.
       loadStart(e)
     })
 

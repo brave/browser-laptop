@@ -30,9 +30,8 @@ class UrlBarIcon extends ImmutableComponent {
    */
   get isInsecure () {
     return this.props.isHTTPPage &&
-           !this.props.isSecure &&
+           this.props.isSecure === false &&
            !this.props.active &&
-           this.props.loading === false &&
            !this.props.titleMode
   }
   /**
@@ -63,7 +62,7 @@ class UrlBarIcon extends ImmutableComponent {
       // NOTE: EV style not approved yet; see discussion at https://github.com/brave/browser-laptop/issues/791
       'fa-lock': this.isSecure,
       'fa-exclamation-triangle': this.isInsecure,
-      'fa fa-search': this.isSearch
+      'fa-search': this.isSearch
     })
   }
   get iconStyles () {
