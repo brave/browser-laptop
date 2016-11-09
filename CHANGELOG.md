@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.12.9](https://github.com/brave/browser-laptop/releases/v0.12.9dev)
+- (TODO)
+
 ## [0.12.8](https://github.com/brave/browser-laptop/releases/v0.12.8dev)
 - Added Pocket extension. ([#4702](https://github.com/brave/browser-laptop/issues/4702))([#5227](https://github.com/brave/browser-laptop/issues/5227))([#516](https://github.com/brave/browser-laptop/issues/516))([#4689](https://github.com/brave/browser-laptop/issues/4689))([#4700](https://github.com/brave/browser-laptop/issues/4700))([#5226](https://github.com/brave/browser-laptop/issues/5226))
 - Added button to view about:extensions from preferences. ([#5244](https://github.com/brave/browser-laptop/issues/5244))
