@@ -940,12 +940,6 @@ Set Modal Dialog detail
 
 
 
-### reloadActiveFrame() 
-
-Reloads the current active frame
-
-
-
 
 * * *
 
