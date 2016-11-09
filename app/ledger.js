@@ -320,12 +320,13 @@ if (ipc) {
     const win = electron.BrowserWindow.getFocusedWindow()
     if (message === addFundsMessage) {
       appActions.hideMessageBox(message)
+      // See showNotificationAddFunds() for buttons.
+      // buttonIndex === 1 is "Later"; the timestamp until which to delay is set
+      // in showNotificationAddFunds() when triggering this notification.
       if (buttonIndex === 0) {
-        // "Later" -- wait 6 hours to re-show "reconciliation soon" notification.
-        const nextTime = ledgerInfo.reconcileStamp + 6 * msecs.hour
-        appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_RECONCILE_SOON_TIMESTAMP, nextTime)
-      } else {
-        // Open payments panel
+        appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
+      } else if (buttonIndex === 2) {
+        // Add funds: Open payments panel
         if (win) {
           win.webContents.send(messages.SHORTCUT_NEW_FRAME,
             'about:preferences#payments', { singleFrame: true })
@@ -334,12 +335,17 @@ if (ipc) {
     } else if (message === reconciliationMessage) {
       appActions.hideMessageBox(message)
       // buttonIndex === 1 is Dismiss
-      if (buttonIndex === 0 && win) {
+      if (buttonIndex === 0) {
+        appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
+      } else if (buttonIndex === 2 && win) {
         win.webContents.send(messages.SHORTCUT_NEW_FRAME,
           'about:preferences#payments', { singleFrame: true })
       }
     } else if (message === notificationPaymentDoneMessage) {
       appActions.hideMessageBox(message)
+      if (buttonIndex === 0) {
+        appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
+      }
     } else if (message === notificationTryPaymentsMessage) {
       appActions.hideMessageBox(message)
       if (buttonIndex === 1 && win) {
@@ -1493,29 +1499,47 @@ const showDisabledNotifications = () => {
 */
 const showEnabledNotifications = () => {
   const reconcileStamp = ledgerInfo.reconcileStamp
-  const balance = Number(ledgerInfo.balance || 0)
-  const unconfirmed = Number(ledgerInfo.unconfirmed || 0)
-
   if (reconcileStamp && reconcileStamp - underscore.now() < msecs.day) {
-    if (ledgerInfo.btc &&
-        balance + unconfirmed < 0.9 * Number(ledgerInfo.btc)) {
-      addFundsMessage = addFundsMessage || locale.translation('addFundsNotification')
-      appActions.showMessageBox({
-        greeting: locale.translation('updateHello'),
-        message: addFundsMessage,
-        buttons: [
-          {text: locale.translation('updateLater')},
-          {text: locale.translation('addFunds'), className: 'primary'}
-        ],
-        options: {
-          style: 'greetingStyle',
-          persist: false
-        }
-      })
-    } else if (shouldShowNotificationReviewPublishers()) {
-      showNotificationReviewPublishers()
+    if (sufficientBalanceToReconcile()) {
+      if (shouldShowNotificationReviewPublishers()) {
+        showNotificationReviewPublishers()
+      }
+    } else if (shouldShowNotificationAddFunds()) {
+      showNotificationAddFunds()
     }
   }
+}
+
+const sufficientBalanceToReconcile = () => {
+  const balance = Number(ledgerInfo.balance || 0)
+  const unconfirmed = Number(ledgerInfo.unconfirmed || 0)
+  return ledgerInfo.btc &&
+    (balance + unconfirmed > 0.9 * Number(ledgerInfo.btc))
+}
+
+const shouldShowNotificationAddFunds = () => {
+  const nextTime = getSetting(settings.PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP)
+  return !nextTime || (underscore.now() > nextTime)
+}
+
+const showNotificationAddFunds = () => {
+  const nextTime = underscore.now() + 3 * msecs.day
+  appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP, nextTime)
+
+  addFundsMessage = addFundsMessage || locale.translation('addFundsNotification')
+  appActions.showMessageBox({
+    greeting: locale.translation('updateHello'),
+    message: addFundsMessage,
+    buttons: [
+      {text: locale.translation('turnOffNotifications')},
+      {text: locale.translation('updateLater')},
+      {text: locale.translation('addFunds'), className: 'primary'}
+    ],
+    options: {
+      style: 'greetingStyle',
+      persist: false
+    }
+  })
 }
 
 const shouldShowNotificationReviewPublishers = () => {
@@ -1532,8 +1556,9 @@ const showNotificationReviewPublishers = () => {
     greeting: locale.translation('updateHello'),
     message: reconciliationMessage,
     buttons: [
-      {text: locale.translation('reviewSites'), className: 'primary'},
-      {text: locale.translation('dismiss')}
+      {text: locale.translation('turnOffNotifications')},
+      {text: locale.translation('dismiss')},
+      {text: locale.translation('reviewSites'), className: 'primary'}
     ],
     options: {
       style: 'greetingStyle',
@@ -1553,6 +1578,7 @@ const showNotificationPaymentDone = (transactionContributionFiat) => {
     greeting: locale.translation('updateHello'),
     message: notificationPaymentDoneMessage,
     buttons: [
+      {text: locale.translation('turnOffNotifications')},
       {text: locale.translation('Ok'), className: 'primary'}
     ],
     options: {

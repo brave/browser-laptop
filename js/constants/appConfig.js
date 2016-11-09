@@ -120,6 +120,8 @@ module.exports = {
     'bookmarks.toolbar.showOnlyFavicon': false,
     'payments.enabled': false,
     'payments.notifications': false,
+    // "Add funds to your wallet" -- Limit to once every n days to reduce nagging.
+    'payments.notification-add-funds-timestamp': null,
     // "Out of money, pls add" / "In 24h we'll pay publishers [Review]"
     // After shown, set timestamp to next reconcile time - 1 day.
     'payments.notification-reconcile-soon-timestamp': null,
