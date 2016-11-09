@@ -4,44 +4,61 @@
 
 @import "./variables.less";
 @import "./button.less";
-@import "../node_modules/font-awesome/css/font-awesome.css";
+@import "./about/siteDetails.less";
 
-.files {
-  padding: 0;
-  list-style: none;
-}
+.siteDetailsPage {
+  min-width: 704px;
 
-.files li {
-  cursor: pointer;
-}
+  .siteDetailsPageHeader {
+    .headerActions > * {
+      display: inline-block;
+    }
+    .startDownload {
+      background: linear-gradient(@braveLightOrange, @braveOrange);
+      border: 2px solid transparent;
+      border-top: 2px solid @braveLightOrange;
+      border-bottom: 2px solid @braveOrange;
+      box-shadow: @buttonShadow;
+      color: white;
+      font-weight: 400;
+    }
+  }
 
-.files .selected {
-  color: @highlightBlue;
+  .siteDetailsPageContent {
+    padding: 0 24px;
+
+    .sortableTable {
+      -webkit-user-select: none;
+      .num {
+        font-size: 11pt;
+        font-weight: 800;
+        text-align: center;
+        width: 154px;
+        white-space: nowrap;
+      }
+
+      .name {
+        font-size: 11pt;
+        max-width: 415px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
 }
 
 .error {
   color: @errorTextColor;
 }
 
-.status-bar {
-  margin-bottom: 20px;
+.legalNotice {
+  font-size: 9pt;
+  margin-top: 15px;
 }
 
-.status {
-  display: inline-block;
-  width: 160px;
-  font-size: 1.17em;
-  font-weight: bold;
-}
-
-.button:not(:last-child) {
-  display: inline-block;
-  padding-right: 20px;
-}
-
-.fa {
-  display: inline-block;
-  width: 20px;
+.torrentStats {
+  margin-right: 10px
 }
 
 .content {
@@ -54,7 +71,8 @@ body {
 }
 
 html,
-body > div, {
+#appContainer,
+#appContainer > div {
   height: 100%;
 }
 
@@ -62,4 +80,11 @@ iframe {
   border: 0;
   width: 100%;
   height: 100%;
+}
+
+.torrentStats span:not(:last-child)::after {
+  content: ' • ';
+  opacity: 0.7;
+  padding-left: 4px;
+  padding-right: 4px;
 }

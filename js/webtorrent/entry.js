@@ -1,162 +1,154 @@
-const ReactDOM = require('react-dom')
-const magnetURI = require('magnet-uri')
-const Button = require('../components/button')
+/* global Blob, URL */
+
+const ipc = window.chrome.ipc
 const messages = require('../constants/messages')
+const parseTorrent = require('parse-torrent')
+const React = require('react')
+const ReactDOM = require('react-dom')
 const WebTorrentRemoteClient = require('webtorrent-remote/client')
 
+// React Components
+const Button = require('../components/button')
+const TorrentFileList = require('./components/torrentFileList')
+const TorrentStats = require('./components/torrentStats')
+
+// Stylesheets
 require('../../less/webtorrent.less')
+require('../../node_modules/font-awesome/css/font-awesome.css')
 
-// All state lives here. The UI is a pure function from `state` -> React element
-// Set window.state for easier debugging
-var state = window.state = {
-  torrentID: window.location.hash.substring(1),
+const torrentID = window.location.hash.substring(1)
+
+// UI state object. Pure function from `state` -> React element.
+const state = {
+  torrentID: torrentID,
+  parsedTorrent: parseTorrent(torrentID),
   torrent: null,
-  magnetInfo: null,
-  dn: '',
-  errorMessage: '',
-  isFileLoaded: false
+  errorMessage: null
 }
+window.state = state /* for easier debugging */
 
-// TODO: right now, we only support magnet links as the torrentID
-// Eventually, we need to support .torrent files as well, prob using parse-torrent
-if (state.torrentID.startsWith('magnet:?')) {
-  state.magnetInfo = magnetURI(state.torrentID)
-}
+// TODO: REMOVE THIS HACK ONCE THIS IS ADDRESSED:
+// https://github.com/webpack/node-libs-browser/issues/38#issuecomment-259586299
+state.torrentID = state.torrentID.replace(/&ws=[^&]/g, '')
+state.parsedTorrent = parseTorrent(state.torrentID)
 
-// Show download progress
-setInterval(render, 1000)
-render()
-
-// Talk to WebTorrent over in a different process
-var client = window.client = new WebTorrentRemoteClient(send)
-client.on('error', handleError)
-
-var ipc = window.chrome.ipc
-ipc.on(messages.TORRENT_MESSAGE, function (e, msg) {
-  client.receive(msg)
-})
-
-function send (msg) {
-  ipc.sendToHost(messages.TORRENT_MESSAGE, msg)
-}
-
-function handleError (error) {
-  state.errorMessage = error.message
-}
-
-function start () {
-  state.torrent = client.add(state.torrentID)
-  if (state.magnetInfo && state.magnetInfo.ix != null) {
-    state.torrent.createServer()
+function update () {
+  let name = state.parsedTorrent && state.parsedTorrent.name
+  if (!name) {
+    name = state.torrent
+      ? 'Loading torrent information...'
+      : 'Untitled torrent'
   }
+  document.title = name
+
+  const elem = <TorrentViewer name={name} />
+  ReactDOM.render(elem, document.querySelector('#appContainer'))
 }
 
-function render () {
-  var torrent = state.torrent
-  var id = state.torrentID
-  var magnetName = state.magnetInfo && state.magnetInfo.dn
+class TorrentViewer extends React.Component {
+  constructor () {
+    super()
+    this.state = {}
 
-  var title
-  if (!torrent) {
-    title = magnetName || 'New torrent'
-  } else if (!torrent.name) {
-    title = magnetName || 'Loading torrent information...'
-  } else {
-    title = torrent.name
+    this.start = this.start.bind(this)
+    this.onError = this.onError.bind(this)
   }
-  document.title = title
 
-  var status
-  if (!torrent) {
-    status = (
-      <Button l10nId='startTorrent' className='primaryButton' onClick={start}>Start</Button>
-    )
-  } else if (torrent.progress < 1) {
-    status = (
-      <span>Downloading: {(torrent.progress * 100).toFixed(1)}%</span>
-    )
-  } else {
-    status = (
-      <span>Complete: 100%</span>
-    )
+  onWarning (err) {
+    console.warn(err.message)
   }
-  status = (
-    <span className='status'>
-      {status}
-    </span>
-  )
 
-  var content
-  if (!torrent) {
-    content = (
-      <div className='content'>
-        <strong>Warning: </strong>
-        please ensure that you have legal rights to download and share this content before
-        clicking Start.
-      </div>
-    )
-  } else if (state.magnetInfo && state.magnetInfo.ix != null) {
-    var serverURL = torrent.serverURL
-    if (serverURL) {
-      // Load from the streaming torrent-to-HTTP local server into an <iframe>
-      var ix = Number(state.magnetInfo.ix)
-      content = (
-        <div className='content'>
-          <iframe src={serverURL + '/' + ix} sandbox='allow-same-origin' seamless='seamless' />
-        </div>
-      )
-    } else {
-      content = (
-        <div className='content'>
-          Loading...
-        </div>
-      )
-    }
-  } else {
-    var fileElems = torrent.files.map((file, i) => {
-      return (
-        <li>
-          <a href={id + '&ix=' + i}>{file.name}</a>
-        </li>
-      )
+  onError (err) {
+    state.errorMessage = err.message
+  }
+
+  start () {
+    const client = new WebTorrentRemoteClient(send)
+    client.on('warning', this.onWarning)
+    client.on('error', this.onError)
+
+    ipc.on(messages.TORRENT_MESSAGE, function (e, msg) {
+      client.recieve(msg)
     })
 
-    var fileList
-    if (fileElems.length === 0) {
-      fileList = (<div>Loading...</div>)
-    } else {
-      fileList = (
-        <ul className='files'>
-          {fileElems}
-        </ul>
-      )
+    function send (msg) {
+      ipc.sendToHost(messages.TORRENT_MESSAGE, msg)
     }
 
-    content = (
-      <div className='content'>
-        <h3>Files</h3>
-        {fileList}
+    state.torrent = client.add(state.torrentID)
+    state.torrent.on('warning', this.onWarning)
+    state.torrent.on('error', this.onError)
+
+    if (state.parsedTorrent.ix) {
+      state.torrent.createServer()
+    }
+
+    // Render immediately, then periodically to show download progress
+    update()
+    setInterval(update, 1000)
+  }
+
+  saveTorrentFile () {
+    let parsedTorrent = parseTorrent(state.torrentID)
+    let torrentFile = parseTorrent.toTorrentFile(parsedTorrent)
+
+    let torrentFileName = state.parsedTorrent.name + '.torrent'
+    let torrentFileBlobURL = URL.createObjectURL(
+      new Blob([torrentFile],
+      { type: 'application/x-bittorrent' }
+    ))
+
+    let a = document.createElement('a')
+    a.target = '_blank'
+    a.download = torrentFileName
+    a.href = torrentFileBlobURL
+    a.click()
+  }
+
+  render () {
+    const ix = state.parsedTorrent && state.parsedTorrent.ix // Selected file index
+
+    const legalNotice = state.torrent == null
+      ? <div className='legalNotice' data-l10n-id='legalNotice' />
+      : <div className='legalNotice' data-l10n-id='poweredByWebTorrent' />
+
+    let fileContent
+    if (state.torrent && ix) {
+      fileContent = state.server != null
+        ? <iframe src={state.server + '/' + ix} sandbox='allow-same-origin' />
+        : <div>Loading...</div>
+    }
+
+    return (
+      <div className='siteDetailsPage'>
+        <div className='siteDetailsPageHeader'>
+          <div data-l10n-id='webtorrentPage' className='sectionTitle' />
+          <div className='sectionTitle'>: {this.props.name}</div>
+          <div className='headerActions'>
+            <TorrentStats torrent={state.torrent} errorMessage={state.errorMessage} />
+            <Button
+              l10nId='startDownload'
+              className='whiteButton startDownload'
+              disabled={!!state.torrent}
+              onClick={this.start} />
+            <Button
+              l10nId='saveTorrentFile'
+              className='whiteButton saveTorrentFile'
+              onClick={this.saveTorrentFile} />
+          </div>
+        </div>
+
+        <div className='siteDetailsPageContent'>
+          <div className='fileContent'>
+            {fileContent}
+          </div>
+          <TorrentFileList
+            files={state.torrent && state.torrent.files}
+            stateOwner={this}
+            torrentID={state.torrentID} />
+          {legalNotice}
+        </div>
       </div>
     )
   }
-
-  var elem = (
-    <div>
-      <h1>{title}</h1>
-      <div className='status-bar'>
-        {status}
-        <span className='button'>
-          <span className='fa fa-magnet' />
-          <span>Copy magnet link</span>
-        </span>
-        <span className='button'>
-          <span className='fa fa-file-o' />
-          <span>Save torrent file</span>
-        </span>
-      </div>
-      {content}
-      <div className='error'>{state.errorMessage}</div>
-    </div>
-  )
-  ReactDOM.render(elem, document.querySelector('body'))
 }
