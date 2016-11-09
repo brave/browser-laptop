@@ -82,6 +82,7 @@ const basicAuth = require('./browser/basicAuth')
 const async = require('async')
 const tabs = require('./browser/tabs')
 const settings = require('../js/constants/settings')
+require('./browser/webtorrent')
 
 // temporary fix for #4517, #4518 and #4472
 app.commandLine.appendSwitch('enable-use-zoom-for-dsf', 'false')
