@@ -725,8 +725,9 @@ class ContributionStatement extends ImmutableComponent {
 .sectionTitleWrapper .sectionSubTitle {\n\
   color: #ff5000;\n\
   font-size: 15px;\n\
-  top: 0px;\n\
-  right: 19px;\n\
+  top: -20px;\n\
+  right: 0px;\n\
+  position: relative;\n\
 }\n\
 .sectionTitleWrapper .sectionTitle.smaller {\n\
   white-space: nowrap;\n\
