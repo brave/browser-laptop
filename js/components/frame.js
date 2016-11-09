@@ -23,7 +23,7 @@ const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
 const config = require('../constants/config')
 const settings = require('../constants/settings')
-const {aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
+const {aboutUrls, isSourceMagnetUrl, getTargetMagnetUrl, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
 const {isFrameError} = require('../../app/common/lib/httpUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
@@ -316,7 +316,11 @@ class Frame extends ImmutableComponent {
     }
 
     if (!guestInstanceId || newSrc !== 'about:blank') {
-      this.webview.setAttribute('src', isSourceAboutUrl(newSrc) ? getTargetAboutUrl(newSrc) : newSrc)
+      let webviewSrc
+      if (isSourceAboutUrl(newSrc)) webviewSrc = getTargetAboutUrl(newSrc)
+      else if (isSourceMagnetUrl(newSrc)) webviewSrc = getTargetMagnetUrl(newSrc)
+      else webviewSrc = newSrc
+      this.webview.setAttribute('src', webviewSrc)
     }
 
     if (webviewAdded) {
@@ -877,8 +881,29 @@ class Frame extends ImmutableComponent {
           method = (currentDetail, originalDetail) =>
             windowActions.setAutofillCreditCardDetail(currentDetail, originalDetail)
           break
+        case messages.TORRENT_MESSAGE:
+          // Relay torrent IPC from the webview to a browser process
+          method = (message) => {
+            if (typeof message.channelID !== 'string') {
+              throw new Error('Invalid or missing channelID: ' + JSON.stringify(message))
+            }
+            if (this.torrentChannelID && this.torrentChannelID !== message.channelID) {
+              throw new Error('ChannelID changed, expected ' + this.torrentChannelID +
+                ': ' + JSON.stringify(message))
+            }
+            this.torrentChannelID = message.channelID
+            ipc.send(messages.TORRENT_MESSAGE, message)
+          }
+          break
       }
       method.apply(this, e.args)
+    })
+
+    // Relay torrent IPC from the browser process back to the webview
+    ipc.on(messages.TORRENT_MESSAGE, (e, obj) => {
+      // Ignore the message if it's for a different tab
+      if (obj.channelID !== this.torrentChannelID) return
+      this.webview.send(messages.TORRENT_MESSAGE, obj)
     })
 
     const interceptFlash = (stopCurrentLoad, adobeUrl, redirectUrl) => {
@@ -907,7 +932,17 @@ class Frame extends ImmutableComponent {
     }
 
     const loadStart = (e) => {
+      // We have two kinds of special URLs: magnet links and about pages
+      // When the user clicks on a magnet link, navigate to the corresponding local URL
+      // (The address bar will still show the magnet URL. See appUrlUtil.getSourceMagnetUrl.)
+      if (isSourceMagnetUrl(e.url)) {
+        var targetURL = getTargetMagnetUrl(e.url)
+        // Return right away. loadStart will be called again with targetURL
+        return windowActions.loadUrl(this.frame, targetURL)
+      }
+
       const parsedUrl = urlParse(e.url)
+
       // Instead of telling person to install Flash, ask them if they want to
       // run Flash if it's installed.
       if (e.isMainFrame && !e.isErrorPage && !e.isFrameSrcDoc) {
@@ -940,6 +975,7 @@ class Frame extends ImmutableComponent {
         this.webview.executeJavaScript('Navigator.prototype.__defineGetter__("doNotTrack", () => {return 1});')
       }
     }
+
     const loadEnd = (savePage) => {
       windowActions.onWebviewLoadEnd(
         this.frame,
@@ -970,6 +1006,7 @@ class Frame extends ImmutableComponent {
         interceptFlash(false, undefined, hack.redirectURL)
       }
     }
+
     const loadFail = (e, provisionLoadFailure = false) => {
       if (isFrameError(e.errorCode)) {
         // temporary workaround for https://github.com/brave/browser-laptop/issues/1817
@@ -1000,6 +1037,7 @@ class Frame extends ImmutableComponent {
         windowActions.setNavigated(this.webview.getURL(), this.props.frameKey, true, this.frame.get('tabId'))
       }
     }
+
     this.webview.addEventListener('load-commit', (e) => {
       loadStart(e)
     })
@@ -1007,7 +1045,6 @@ class Frame extends ImmutableComponent {
       // XXX: loadstart probably does not need to be called twice anymore.
       loadStart(e)
     })
-
     this.webview.addEventListener('did-navigate', (e) => {
       if (this.props.findbarShown) {
         this.props.onFindHide()
