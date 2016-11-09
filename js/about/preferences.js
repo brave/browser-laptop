@@ -21,6 +21,7 @@ const settings = require('../constants/settings')
 const coinbaseCountries = require('../constants/coinbaseCountries')
 const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
 const {startsWithOption, newTabMode, bookmarksToolbarMode} = require('../../app/common/constants/settingsEnums')
+const {l10nErrorText} = require('../../app/common/lib/httpUtil')
 
 const WidevineInfo = require('../../app/renderer/components/widevineInfo')
 const aboutActions = require('./aboutActions')
@@ -1124,6 +1125,16 @@ class PaymentsTab extends ImmutableComponent {
     return <div className='nextReconcileDate' data-l10n-args={JSON.stringify(l10nDataArgs)} data-l10n-id='statusNextReconcileDate' />
   }
 
+  get ledgerDataErrorText () {
+    const ledgerError = this.props.ledgerData.get('error')
+    if (!ledgerError) {
+      return null
+    }
+    // 'error' here is a chromium webRequest error as returned by request.js
+    const errorCode = ledgerError.get('error').get('errorCode')
+    return l10nErrorText(errorCode)
+  }
+
   btcToCurrencyString (btc) {
     const balance = Number(btc || 0)
     const currency = this.props.ledgerData.get('currency') || 'USD'
@@ -1183,8 +1194,11 @@ class PaymentsTab extends ImmutableComponent {
               <td>
                 {
                   this.props.ledgerData.get('error') && this.props.ledgerData.get('error').get('caller') === 'getWalletProperties'
-                    ? <span data-l10n-id='accountBalanceConnectionError' />
-                    : <span>
+                    ? <div>
+                      <div data-l10n-id='accountBalanceConnectionError' />
+                      <div className='accountBalanceError' data-l10n-id={this.ledgerDataErrorText} />
+                    </div>
+                    : <div>
                       <SettingsList>
                         <SettingItem>
                           {this.fundsAmount}
@@ -1192,7 +1206,7 @@ class PaymentsTab extends ImmutableComponent {
                           {this.paymentHistoryButton}
                         </SettingItem>
                       </SettingsList>
-                    </span>
+                    </div>
                 }
               </td>
               <td>
