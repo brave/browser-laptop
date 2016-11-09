@@ -354,14 +354,7 @@ module.exports.updateSiteFavicon = function (sites, location, favicon) {
     if (UrlUtil.isNotURL(site.get('location'))) {
       return false
     }
-
-    let siteLocation
-    try { siteLocation = normalizeUrl(site.get('location')) } catch (e) { siteLocation = site.get('location') }
-
-    let inputLocation
-    try { inputLocation = normalizeUrl(location) } catch (e) { inputLocation = location }
-
-    if (siteLocation === inputLocation) {
+    if (normURL(site.get('location')) === normURL(location)) {
       matchingIndices.push(index)
       return true
     }
@@ -376,6 +369,19 @@ module.exports.updateSiteFavicon = function (sites, location, favicon) {
   })
 
   return updatedSites
+}
+
+/**
+ * Normalizes a URL for comparison, with special handling for magnet links
+ */
+function normURL (url) {
+  const lowerURL = url.toLowerCase()
+  if (lowerURL.startsWith('magnet:?')) return lowerURL
+  try {
+    return normalizeUrl(url)
+  } catch (e) {
+    return url
+  }
 }
 
 /**
