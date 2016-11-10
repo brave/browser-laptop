@@ -37,6 +37,7 @@ public/built
 
 # Temp files
 .DS_Store
+.DS-Store
 temp.VisualElementsManifest.xml
 
 # electron-packager output dirs

@@ -68,7 +68,6 @@ const HttpsEverywhere = require('./httpsEverywhere')
 const SiteHacks = require('./siteHacks')
 const CmdLine = require('./cmdLine')
 const UpdateStatus = require('../js/constants/updateStatus')
-const showAbout = require('./aboutDialog').showAbout
 const urlParse = require('url').parse
 const CryptoUtil = require('../js/lib/cryptoUtil')
 const keytar = require('keytar')
@@ -82,6 +81,7 @@ const privacy = require('../js/state/privacy')
 const basicAuth = require('./browser/basicAuth')
 const async = require('async')
 const tabs = require('./browser/tabs')
+const settings = require('../js/constants/settings')
 
 // temporary fix for #4517, #4518 and #4472
 app.commandLine.appendSwitch('enable-use-zoom-for-dsf', 'false')
@@ -106,6 +106,8 @@ const prefsRestartCallbacks = {}
 const prefsRestartLastValue = {}
 
 const unsafeTestMasterKey = 'c66af15fc6555ebecf7cee3a5b82c108fd3cb4b587ab0b299d28e39c79ecc708'
+
+const defaultProtocols = ['http', 'https']
 
 const sessionStoreQueue = async.queue((task, callback) => {
   task(callback)
@@ -363,11 +365,10 @@ app.on('ready', () => {
   ipcMain.removeAllListeners('window-alert')
   ipcMain.on('window-alert', function (event, message, title) {
     var buttons
-    if (title == null) {
-      title = ''
-    }
+
     buttons = ['OK']
-    message = message.toString()
+    message = message ? message.toString() : ''
+    title = title ? title.toString() : ''
     dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
       message: message,
       title: title,
@@ -379,10 +380,10 @@ app.on('ready', () => {
   ipcMain.removeAllListeners('window-confirm')
   ipcMain.on('window-confirm', function (event, message, title) {
     var buttons, cancelId
-    if (title == null) {
-      title = ''
-    }
+
     buttons = ['OK', 'Cancel']
+    message = message ? message.toString() : ''
+    title = title ? title.toString() : ''
     cancelId = 1
     event.returnValue = !dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
       message: message,
@@ -432,7 +433,7 @@ app.on('ready', () => {
     AdInsertion.init()
 
     if (!loadedPerWindowState || loadedPerWindowState.length === 0) {
-      if (!CmdLine.newWindowURL) {
+      if (!CmdLine.newWindowURL()) {
         appActions.newWindow()
       }
     } else {
@@ -442,9 +443,22 @@ app.on('ready', () => {
     }
     process.emit(messages.APP_INITIALIZED)
 
-    if (CmdLine.newWindowURL) {
+    if (process.env.BRAVE_IS_DEFAULT_BROWSER !== undefined) {
+      if (process.env.BRAVE_IS_DEFAULT_BROWSER === 'true') {
+        appActions.changeSetting(settings.IS_DEFAULT_BROWSER, true)
+      } else if (process.env.BRAVE_IS_DEFAULT_BROWSER === 'false') {
+        appActions.changeSetting(settings.IS_DEFAULT_BROWSER, false)
+      }
+    } else {
+      // Default browser checking
+      let isDefaultBrowser = ['development', 'test'].includes(process.env.NODE_ENV)
+        ? true : defaultProtocols.every(p => app.isDefaultProtocolClient(p))
+      appActions.changeSetting(settings.IS_DEFAULT_BROWSER, isDefaultBrowser)
+    }
+
+    if (CmdLine.newWindowURL()) {
       appActions.newWindow(Immutable.fromJS({
-        location: CmdLine.newWindowURL
+        location: CmdLine.newWindowURL()
       }))
     }
 
@@ -739,9 +753,6 @@ app.on('ready', () => {
       // This is fired by a menu entry (for now - will be scheduled)
       process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
       ipcMain.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
-
-      process.on(messages.SHOW_ABOUT, showAbout)
-      ipcMain.on(messages.SHOW_ABOUT, showAbout)
 
       // This is fired from a auto-update metadata call
       process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => {

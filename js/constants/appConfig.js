@@ -21,6 +21,7 @@ module.exports = {
     AD_INSERTION: 'adInsertion',
     NOSCRIPT: 'noScript',
     FLASH: 'flash',
+    WIDEVINE: 'widevine',
     COOKIEBLOCK: 'cookieblock' // block 3p cookies and referer
     // ... other optional resource files are identified by uuid such as for regional adblock
   },
@@ -35,29 +36,34 @@ module.exports = {
     installUrl: 'https://get.adobe.com/flashplayer/',
     url: getTargetAboutUrl('about:flash')
   },
+  widevine: {
+    enabled: false,
+    moreInfoUrl: 'https://www.eff.org/issues/drm',
+    licenseUrl: 'https://www.google.com/policies/terms/'
+  },
   adblock: {
     alternateDataFiles: 'https://s3.amazonaws.com/adblock-data/{version}/{uuid}.dat',
     url: 'https://s3.amazonaws.com/adblock-data/{version}/ABPFilterParserData.dat',
     version: '2',
-    msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
+    msBetweenRechecks: 1000 * 60 * 60 * 2, // 2 hours
     enabled: true
   },
   safeBrowsing: {
     url: 'https://s3.amazonaws.com/adblock-data/{version}/SafeBrowsingData.dat',
     version: '2',
-    msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
+    msBetweenRechecks: 1000 * 60 * 60 * 2, // 2 hours
     enabled: true
   },
   trackingProtection: {
     url: 'https://s3.amazonaws.com/tracking-protection-data/{version}/TrackingProtection.dat',
     version: '1',
-    msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
+    msBetweenRechecks: 1000 * 60 * 60 * 2, // 2 hours
     enabled: true
   },
   httpsEverywhere: {
     url: 'https://s3.amazonaws.com/https-everywhere-data/{version}/httpse.json',
     version: '5.2', // latest major point release from https://eff.org/https-everywhere
-    msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
+    msBetweenRechecks: 1000 * 60 * 60 * 12, // 1/2 day
     enabled: true
   },
   siteHacks: {
@@ -85,14 +91,19 @@ module.exports = {
     baseUrl: `${updateHost}/1/releases`,
     winBaseUrl: `${winUpdateHost}/multi-channel/releases/CHANNEL/`
   },
+  urlSuggestions: {
+    ageDecayConstant: 50
+  },
   defaultSettings: {
     'adblock.customRules': '',
     'general.language': null, // null means to use the OS lang
     'general.startup-mode': 'lastTime',
     'general.homepage': 'https://www.brave.com',
+    'general.newtab-mode': 'newTabPage',
     'general.show-home-button': false,
     'general.useragent.value': null, // Set at runtime
     'general.autohide-menu': true,
+    'general.check-default-on-startup': true,
     'search.default-search-engine': 'Google',
     'search.offer-search-suggestions': false, // false by default for privacy reasons
     'tabs.switch-to-new-tabs': false,
@@ -109,6 +120,11 @@ module.exports = {
     'bookmarks.toolbar.showOnlyFavicon': false,
     'payments.enabled': false,
     'payments.notifications': false,
+    // "Add funds to your wallet" -- Limit to once every n days to reduce nagging.
+    'payments.notification-add-funds-timestamp': null,
+    // "Out of money, pls add" / "In 24h we'll pay publishers [Review]"
+    // After shown, set timestamp to next reconcile time - 1 day.
+    'payments.notification-reconcile-soon-timestamp': null,
     'payments.notificationTryPaymentsDismissed': false, // True if you dismiss the message or enable Payments
     'payments.contribution-amount': 5, // USD
     'privacy.autofill-enabled': true,
@@ -119,12 +135,13 @@ module.exports = {
     'security.passwords.dashlane-enabled': false,
     'security.passwords.last-pass-enabled': false,
     'general.downloads.default-save-path': null,
-    'general.disable-title-mode': process.platform === 'win32',
+    'general.disable-title-mode': process.platform === 'linux',
     'advanced.hardware-acceleration-enabled': true,
     'advanced.default-zoom-level': null,
     'advanced.pdfjs-enabled': true,
     'advanced.smooth-scroll-enabled': false,
     'advanced.send-crash-reports': true,
+    'advanced.send-usage-statistics': false,
     'advanced.minimum-visit-time': 8,
     'advanced.minimum-visits': 5,
     'shutdown.clear-history': false,
@@ -133,7 +150,9 @@ module.exports = {
     'shutdown.clear-all-site-cookies': false,
     'shutdown.clear-autocomplete-data': false,
     'shutdown.clear-autofill-data': false,
-    'shutdown.clear-site-settings': false
+    'shutdown.clear-site-settings': false,
+    'extensions.pocket.enabled': false,
+    'general.bookmarks-toolbar-mode': null
   },
   defaultFavicon: 'img/empty_favicon.png',
   uaExceptionHosts: [

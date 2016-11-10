@@ -25,7 +25,9 @@ const siteUtil = require('../js/state/siteUtil')
 const sessionStorageVersion = 1
 const filtering = require('./filtering')
 const autofill = require('./autofill')
+const {navigatableTypes} = require('../js/lib/appUrlUtil')
 // const tabState = require('./common/state/tabState')
+const Channel = require('./channel')
 
 const getSetting = require('../js/settings').getSetting
 const promisify = require('../js/lib/promisify')
@@ -98,6 +100,8 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
   delete perWindowData.contextMenuDetail
   // Don't save preview frame since they are only related to hovering on a tab
   delete perWindowData.previewFrameKey
+  // Don't save widevine panel detail
+  delete perWindowData.widevinePanelDetail
   // Don't save preview tab pages
   if (perWindowData.ui && perWindowData.ui.tabs) {
     delete perWindowData.ui.tabs.previewTabPageIndex
@@ -125,6 +129,7 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
     }
     frame.key = newKey
     // Full history is not saved yet
+    // TODO (bsclifton): remove this when https://github.com/brave/browser-laptop/issues/963 is complete
     frame.canGoBack = false
     frame.canGoForward = false
 
@@ -175,6 +180,7 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
     if (frame.findDetail) {
       delete frame.findDetail.numberOfMatches
       delete frame.findDetail.activeMatchOrdinal
+      delete frame.findDetail.internalFindStatePresent
     }
     delete frame.findbarShown
     // Don't restore full screen state
@@ -234,6 +240,10 @@ module.exports.cleanAppData = (data, isShutdown) => {
   data.temporarySiteSettings = {}
   // Delete Flash state since this is checked on startup
   delete data.flashInitialized
+  if (data.settings[settings.CHECK_DEFAULT_ON_STARTUP] === true) {
+    // Delete defaultBrowserCheckComplete state since this is checked on startup
+    delete data.defaultBrowserCheckComplete
+  }
   // Delete Recovery status on shut down
   try {
     delete data.ui.about.preferences.recoverySucceeded
@@ -252,6 +262,11 @@ module.exports.cleanAppData = (data, isShutdown) => {
   const clearAutofillData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOFILL_DATA) === true
   if (clearAutofillData) {
     autofill.clearAutofillData()
+    const date = new Date().getTime()
+    data.autofill.addresses.guid = []
+    data.autofill.addresses.timestamp = date
+    data.autofill.creditCards.guid = []
+    data.autofill.creditCards.timestamp = date
   }
   const clearSiteSettings = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_SITE_SETTINGS) === true
   if (clearSiteSettings) {
@@ -311,6 +326,8 @@ module.exports.cleanAppData = (data, isShutdown) => {
       delete data.extensions[extensionId].tabs
     })
   }
+
+  delete data.versionInformation
 }
 
 /**
@@ -414,6 +431,22 @@ module.exports.loadAppState = () => {
           return
         }
       }
+
+      // version information (shown on about:brave)
+      const os = require('os')
+      const versionInformation = [
+        {name: 'brave', version: app.getVersion()},
+        {name: 'muon', version: process.versions['atom-shell']},
+        {name: 'libchromiumcontent', version: process.versions['chrome']},
+        {name: 'V8', version: process.versions.v8},
+        {name: 'Node.js', version: process.versions.node},
+        {name: 'channel', version: Channel.channel()},
+        {name: 'os.platform', version: os.platform()},
+        {name: 'os.release', version: os.release()},
+        {name: 'os.arch', version: os.arch()}
+        // TODO(bsclifton): read the latest commit hash from a file, etc.
+      ]
+      data.versionInformation = versionInformation
     } catch (e) {
       // TODO: Session state is corrupted, maybe we should backup this
       // corrupted value for people to report into support.
@@ -456,6 +489,25 @@ module.exports.defaultAppState = () => {
         timestamp: 0
       }
     },
-    menubar: {}
+    menubar: {},
+    about: {
+      newtab: {
+        gridLayoutSize: 'small',
+        sites: [],
+        ignoredTopSites: [],
+        pinnedTopSites: []
+      }
+    },
+    defaultWindowParams: {}
   }
+}
+
+/**
+ * Determines if a protocol is handled.
+ * app.on('ready') must have been fired before this is called.
+ */
+module.exports.isProtocolHandled = (protocol) => {
+  protocol = (protocol || '').split(':')[0]
+  return navigatableTypes.includes(`${protocol}:`) ||
+      electron.session.defaultSession.protocol.isNavigatorProtocolHandled(protocol)
 }

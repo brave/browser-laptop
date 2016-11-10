@@ -116,13 +116,15 @@ Dispatches a message to clear all completed downloads
 
 
 
-### setDefaultWindowSize(size) 
+### defaultWindowParamsChanged(size, position) 
 
-Sets the default window size
+Sets the default window size / position
 
 **Parameters**
 
 **size**: `Array`, [width, height]
+
+**position**: `Array`, [x, y]
 
 
 
@@ -161,6 +163,16 @@ Sets whether the resource is enabled or not.
 **resourceName**: `string`, 'adblock', 'trackingProtection', or 'httpsEverywhere'
 
 **enabled**: `boolean`, true if the resource is enabled.
+
+
+
+### resourceReady(resourceName) 
+
+Indicates a resource is ready
+
+**Parameters**
+
+**resourceName**: `string`, 'widevine'
 
 
 
@@ -463,6 +475,22 @@ Dispatches a message when the network is disconnected
 ### submitFeedback() 
 
 Dispatches a message to submit feedback
+
+
+
+### defaultBrowserUpdated(useBrave) 
+
+Dispatch a message to set default browser
+
+**Parameters**
+
+**useBrave**: `boolean`, whether set Brave as default browser
+
+
+
+### defaultBrowserCheckComplete() 
+
+Dispatch a message to indicate default browser check is complete
 
 
 

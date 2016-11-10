@@ -145,13 +145,15 @@ const appActions = {
   },
 
   /**
-   * Sets the default window size
+   * Sets the default window size / position
    * @param {Array} size - [width, height]
+   * @param {Array} position - [x, y]
    */
-  setDefaultWindowSize: function (size) {
+  defaultWindowParamsChanged: function (size, position) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_DEFAULT_WINDOW_SIZE,
-      size
+      actionType: AppConstants.APP_DEFAULT_WINDOW_PARAMS_CHANGED,
+      size,
+      position
     })
   },
 
@@ -194,6 +196,17 @@ const appActions = {
       actionType: AppConstants.APP_SET_RESOURCE_ENABLED,
       resourceName,
       enabled
+    })
+  },
+
+  /**
+   * Indicates a resource is ready
+   * @param {string} resourceName - 'widevine'
+   */
+  resourceReady: function (resourceName) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_RESOURCE_READY,
+      resourceName
     })
   },
 
@@ -544,6 +557,27 @@ const appActions = {
   submitFeedback: function () {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_SUBMIT_FEEDBACK
+    })
+  },
+
+  /**
+   * Dispatch a message to set default browser
+   *
+   * @param {boolean} useBrave - whether set Brave as default browser
+   */
+  defaultBrowserUpdated: function (useBrave) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_DEFAULT_BROWSER_UPDATED,
+      useBrave
+    })
+  },
+
+  /**
+   * Dispatch a message to indicate default browser check is complete
+   */
+  defaultBrowserCheckComplete: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_DEFAULT_BROWSER_CHECK_COMPLETE
     })
   }
 }

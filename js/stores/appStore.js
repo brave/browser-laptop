@@ -38,11 +38,14 @@ const autofill = require('../../app/autofill')
 const basicAuthState = require('../../app/common/state/basicAuthState')
 const extensionState = require('../../app/common/state/extensionState')
 const tabState = require('../../app/common/state/tabState')
+const aboutNewTabState = require('../../app/common/state/aboutNewTabState')
 const isDarwin = process.platform === 'darwin'
 const isWindows = process.platform === 'win32'
 
 // Only used internally
 const CHANGE_EVENT = 'app-state-change'
+
+const defaultProtocols = ['https', 'http']
 
 let appState
 let lastEmittedState
@@ -53,42 +56,62 @@ function isModal (browserOpts) {
   return browserOpts.scrollbars === false
 }
 
-function navbarHeight () {
+const navbarHeight = () => {
   // TODO there has to be a better way to get this or at least add a test
   return 75
 }
 
-const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
-  const parentWindowKey = browserOpts.parentWindowKey
-
+/**
+ * Determine window dimensions (width / height)
+ */
+const setWindowDimensions = (browserOpts, defaults, windowState) => {
   if (windowState.ui && windowState.ui.size) {
     browserOpts.width = firstDefinedValue(browserOpts.width, windowState.ui.size[0])
     browserOpts.height = firstDefinedValue(browserOpts.height, windowState.ui.size[1])
   }
-
   browserOpts.width = firstDefinedValue(browserOpts.width, browserOpts.innerWidth, defaults.width)
   // height and innerHeight are the frame webview size
   browserOpts.height = firstDefinedValue(browserOpts.height, browserOpts.innerHeight)
-  if (isNaN(browserOpts.height)) {
+  if (typeof browserOpts.height === 'number') {
+    // add navbar height to get total height for BrowserWindow
+    browserOpts.height = browserOpts.height + navbarHeight()
+  } else {
     // no inner height so check outer height or use default
     browserOpts.height = firstDefinedValue(browserOpts.outerHeight, defaults.height)
-  } else {
-    // BrowserWindow height is window height so add navbar height
-    browserOpts.height = browserOpts.height + navbarHeight()
   }
+  return browserOpts
+}
 
+/**
+ * Determine window position (x / y)
+ */
+const setWindowPosition = (browserOpts, defaults, windowState) => {
   if (windowState.ui && windowState.ui.position) {
+    // Position comes from window state
     browserOpts.x = firstDefinedValue(browserOpts.x, windowState.ui.position[0])
     browserOpts.y = firstDefinedValue(browserOpts.y, windowState.ui.position[1])
+  } else if (typeof defaults.x === 'number' && typeof defaults.y === 'number') {
+    // Position comes from the default position
+    browserOpts.x = firstDefinedValue(browserOpts.x, defaults.x)
+    browserOpts.y = firstDefinedValue(browserOpts.y, defaults.y)
+  } else {
+    // Default the position
+    browserOpts.x = firstDefinedValue(browserOpts.x, browserOpts.left, browserOpts.screenX)
+    browserOpts.y = firstDefinedValue(browserOpts.y, browserOpts.top, browserOpts.screenY)
   }
+  return browserOpts
+}
 
-  browserOpts.x = firstDefinedValue(browserOpts.x, browserOpts.left, browserOpts.screenX)
-  browserOpts.y = firstDefinedValue(browserOpts.y, browserOpts.top, browserOpts.screenY)
+const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
+  browserOpts = setWindowDimensions(browserOpts, defaults, windowState)
+  browserOpts = setWindowPosition(browserOpts, defaults, windowState)
+
   delete browserOpts.left
   delete browserOpts.top
 
   const screen = electron.screen
   const primaryDisplay = screen.getPrimaryDisplay()
+  const parentWindowKey = browserOpts.parentWindowKey
   const parentWindow = parentWindowKey ? BrowserWindow.fromId(parentWindowKey) : BrowserWindow.getFocusedWindow()
   const bounds = parentWindow ? parentWindow.getBounds() : primaryDisplay.bounds
 
@@ -98,7 +121,7 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
 
   // if no parentWindow, x, y or center is defined then go ahead
   // and center it if it's smaller than the display width
-  // typeof and isNaN are used because 0 is falsy
+  // typeof and isNaN are used because 0 is falsey
   if (!(parentWindow ||
       browserOpts.center === false ||
       browserOpts.x > 0 ||
@@ -164,15 +187,6 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
   if (windowState.ui && windowState.ui.isFullScreen) {
     mainWindow.setFullScreen(true)
   }
-
-  mainWindow.on('blur', function () {
-    appActions.windowBlurred(mainWindow.id)
-  })
-
-  mainWindow.on('resize', function (evt) {
-    // the default window size is whatever the last window resize was
-    appActions.setDefaultWindowSize(evt.sender.getSize())
-  })
 
   mainWindow.on('close', function () {
     LocalShortcuts.unregister(mainWindow)
@@ -263,8 +277,10 @@ function windowDefaults () {
 
   return {
     show: false,
-    width: appState.get('defaultWindowWidth'),
-    height: appState.get('defaultWindowHeight'),
+    width: appState.getIn(['defaultWindowParams', 'width']) || appState.get('defaultWindowWidth'),
+    height: appState.getIn(['defaultWindowParams', 'height']) || appState.get('defaultWindowHeight'),
+    x: appState.getIn(['defaultWindowParams', 'x']) || undefined,
+    y: appState.getIn(['defaultWindowParams', 'y']) || undefined,
     minWidth: 480,
     minHeight: 300,
     minModalHeight: 100,
@@ -289,9 +305,10 @@ function setDefaultWindowSize () {
   }
   const screen = electron.screen
   const primaryDisplay = screen.getPrimaryDisplay()
-  if (!appState.get('defaultWindowWidth') && !appState.get('defaultWindowHeight')) {
-    appState = appState.set('defaultWindowWidth', primaryDisplay.workAreaSize.width)
-    appState = appState.set('defaultWindowHeight', primaryDisplay.workAreaSize.height)
+  if (!appState.getIn(['defaultWindowParams', 'width']) && !appState.get('defaultWindowWidth') &&
+      !appState.getIn(['defaultWindowParams', 'height']) && !appState.get('defaultWindowHeight')) {
+    appState = appState.setIn(['defaultWindowParams', 'width'], primaryDisplay.workAreaSize.width)
+    appState = appState.setIn(['defaultWindowParams', 'height'], primaryDisplay.workAreaSize.height)
   }
 }
 
@@ -413,7 +430,7 @@ const handleAppAction = (action) => {
       appState = appState.set('passwords', new Immutable.List())
       break
     case AppConstants.APP_CHANGE_NEW_TAB_DETAIL:
-      appState = appState.setIn(['about', 'newtab'], action.newTabPageDetail)
+      appState = aboutNewTabState.mergeDetails(appState, action)
       break
     case AppConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size
@@ -431,9 +448,11 @@ const handleAppAction = (action) => {
       if (oldSiteSize !== appState.get('sites').size) {
         filterOutNonRecents()
       }
+      appState = aboutNewTabState.addSite(appState, action)
       break
     case AppConstants.APP_REMOVE_SITE:
       appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag))
+      appState = aboutNewTabState.removeSite(appState, action)
       break
     case AppConstants.APP_MOVE_SITE:
       appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent, false))
@@ -456,9 +475,15 @@ const handleAppAction = (action) => {
     case AppConstants.APP_CLEAR_HISTORY:
       appState = appState.set('sites', siteUtil.clearHistory(appState.get('sites')))
       break
-    case AppConstants.APP_SET_DEFAULT_WINDOW_SIZE:
-      appState = appState.set('defaultWindowWidth', action.size[0])
-      appState = appState.set('defaultWindowHeight', action.size[1])
+    case AppConstants.APP_DEFAULT_WINDOW_PARAMS_CHANGED:
+      if (action.size && action.size.size === 2) {
+        appState = appState.setIn(['defaultWindowParams', 'width'], action.size.get(0))
+        appState = appState.setIn(['defaultWindowParams', 'height'], action.size.get(1))
+      }
+      if (action.position && action.position.size === 2) {
+        appState = appState.setIn(['defaultWindowParams', 'x'], action.position.get(0))
+        appState = appState.setIn(['defaultWindowParams', 'y'], action.position.get(1))
+      }
       break
     case AppConstants.APP_SET_DATA_FILE_ETAG:
       appState = appState.setIn([action.resourceName, 'etag'], action.etag)
@@ -487,6 +512,9 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_SET_RESOURCE_ENABLED:
       appState = appState.setIn([action.resourceName, 'enabled'], action.enabled)
+      break
+    case AppConstants.APP_RESOURCE_READY:
+      appState = appState.setIn([action.resourceName, 'ready'], true)
       break
     case AppConstants.APP_ADD_RESOURCE_COUNT:
       const oldCount = appState.getIn([action.resourceName, 'count']) || 0
@@ -691,6 +719,16 @@ const handleAppAction = (action) => {
     case ExtensionConstants.EXTENSION_DISABLED:
       appState = extensionState.extensionDisabled(appState, action)
       break
+    case ExtensionConstants.CONTEXT_MENU_CREATED:
+      appState = extensionState.contextMenuCreated(appState, action)
+      break
+    case ExtensionConstants.CONTEXT_MENU_ALL_REMOVED:
+      appState = extensionState.contextMenuAllRemoved(appState, action)
+      break
+    case ExtensionConstants.CONTEXT_MENU_CLICKED:
+      process.emit('chrome-context-menus-clicked',
+        action.extensionId, action.tabId, action.info.toJS())
+      break
     case AppConstants.APP_SET_MENUBAR_TEMPLATE:
       appState = appState.setIn(['menu', 'template'], action.menubarTemplate)
       break
@@ -726,6 +764,26 @@ const handleAppAction = (action) => {
     case AppConstants.APP_RENDER_URL_TO_PDF:
       const pdf = require('../../app/pdf')
       appState = pdf.renderUrlToPdf(appState, action)
+    case AppConstants.APP_DEFAULT_BROWSER_UPDATED:
+      if (action.useBrave) {
+        for (const p of defaultProtocols) {
+          app.setAsDefaultProtocolClient(p)
+        }
+      }
+      let isDefaultBrowser = defaultProtocols.every(p => app.isDefaultProtocolClient(p))
+      appState = appState.setIn(['settings', settings.IS_DEFAULT_BROWSER], isDefaultBrowser)
+      break
+    case AppConstants.APP_DEFAULT_BROWSER_CHECK_COMPLETE:
+      appState = appState.set('defaultBrowserCheckComplete', {})
+      break
+    case WindowConstants.WINDOW_SET_FAVICON:
+      appState = appState.set('sites', siteUtil.updateSiteFavicon(appState.get('sites'), action.frameProps.get('location'), action.favicon))
+      appState = aboutNewTabState.updateSiteFavicon(appState, action)
+      break
+    case WindowConstants.WINDOW_SET_NAVIGATED:
+      if (!action.isNavigatedInPage) {
+        appState = extensionState.browserActionUpdated(appState, action)
+      }
       break
     default:
   }

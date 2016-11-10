@@ -15,6 +15,7 @@ const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const ipc = global.require('electron').ipcRenderer
 const {isSourceAboutUrl} = require('../lib/appUrlUtil')
+const AddEditBookmarkHanger = require('../../app/renderer/components/addEditBookmarkHanger')
 const siteUtil = require('../state/siteUtil')
 const eventUtil = require('../lib/eventUtil')
 const getSetting = require('../settings').getSetting
@@ -38,9 +39,10 @@ class NavigationBar extends ImmutableComponent {
   }
 
   onToggleBookmark () {
-    // trigger the AddEditBookmark modal; saving/deleting takes place there
+    const editing = this.bookmarked
+    // show the AddEditBookmarkHanger control; saving/deleting takes place there
     const siteDetail = siteUtil.getDetailFromFrame(this.activeFrame, siteTags.BOOKMARK)
-    windowActions.setBookmarkDetail(siteDetail, siteDetail)
+    windowActions.setBookmarkDetail(siteDetail, siteDetail, null, editing, true)
   }
 
   onReload (e) {
@@ -73,6 +75,7 @@ class NavigationBar extends ImmutableComponent {
 
   get titleMode () {
     return this.props.mouseInTitlebar === false &&
+      !this.props.bookmarkDetail &&
       this.props.title &&
       !['about:blank', 'about:newtab'].includes(this.props.location) &&
       !this.loading &&
@@ -112,26 +115,54 @@ class NavigationBar extends ImmutableComponent {
       className={cx({
         titleMode: this.titleMode
       })}>
+      {
+        this.props.bookmarkDetail && this.props.bookmarkDetail.get('isBookmarkHanger')
+        ? <AddEditBookmarkHanger sites={this.props.sites}
+          currentDetail={this.props.bookmarkDetail.get('currentDetail')}
+          originalDetail={this.props.bookmarkDetail.get('originalDetail')}
+          destinationDetail={this.props.bookmarkDetail.get('destinationDetail')}
+          shouldShowLocation={this.props.bookmarkDetail.get('shouldShowLocation')}
+          withHomeButton={getSetting(settings.SHOW_HOME_BUTTON)}
+          />
+        : null
+      }
+      {
+        this.titleMode
+        ? null
+        : this.loading
+          ? <span className='navigationButtonContainer'>
+            <span data-l10n-id='stopButton'
+              className='navigationButton stopButton'
+              onClick={this.onStop} />
+          </span>
+          : <span className='navigationButtonContainer'>
+            <span data-l10n-id='reloadButton'
+              className='navigationButton reloadButton'
+              onClick={this.onReload} />
+          </span>
+      }
+      {
+        !this.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
+        ? <span className='navigationButtonContainer'>
+          <span data-l10n-id='homeButton'
+            className='navigationButton homeButton'
+            onClick={this.onHome} />
+        </span>
+        : null
+      }
       <div className='startButtons'>
         {
-          isSourceAboutUrl(this.props.location) || this.titleMode
-          ? <span className='browserButton' />
-          : this.loading
-            ? <Button iconClass='fa-times'
-              l10nId='stopButton'
-              className='navbutton stop-button'
-              onClick={this.onStop} />
-            : <Button iconClass='fa-repeat'
-              l10nId='reloadButton'
-              className='navbutton reload-button'
-              onClick={this.onReload} />
-        }
-        {
-          !this.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
-          ? <Button iconClass='fa-home'
-            l10nId='homeButton'
-            className='navbutton homeButton'
-            onClick={this.onHome} />
+          !this.titleMode
+          ? <span className='bookmarkButtonContainer'>
+            <span data-l10n-id={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
+              className={cx({
+                navigationButton: true,
+                bookmarkButton: true,
+                removeBookmarkButton: this.bookmarked,
+                withHomeButton: getSetting(settings.SHOW_HOME_BUTTON)
+              })}
+              onClick={this.onToggleBookmark} />
+          </span>
           : null
         }
       </div>
@@ -168,14 +199,6 @@ class NavigationBar extends ImmutableComponent {
               })}
               onClick={this.onNoScript} />
           }
-          <Button iconClass={this.bookmarked ? 'fa-star' : 'fa-star-o'}
-            className={cx({
-              navbutton: true,
-              bookmarkButton: true,
-              removeBookmarkButton: this.bookmarked
-            })}
-            l10nId={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
-            onClick={this.onToggleBookmark} />
         </div>
       }
     </div>

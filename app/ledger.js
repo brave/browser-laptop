@@ -73,7 +73,8 @@ var bootP = false
 var client
 const clientOptions = { debugP: process.env.LEDGER_DEBUG,
                         loggingP: process.env.LEDGER_LOGGING,
-                        verboseP: process.env.LEDGER_VERBOSE
+                        verboseP: process.env.LEDGER_VERBOSE,
+                        server: process.env.LEDGER_SERVER_URL
                       }
 
 /*
@@ -104,8 +105,6 @@ let addFundsMessage
 let reconciliationMessage
 let notificationPaymentDoneMessage
 let notificationTryPaymentsMessage
-let suppressNotifications = false
-let reconciliationNotificationShown = false
 let notificationTimeout = null
 
 // TODO(bridiver) - create a better way to get setting changes
@@ -144,11 +143,11 @@ const doAction = (action) => {
         case settings.MINIMUM_VISIT_TIME:
           if (action.value <= 0) break
 
-          synopsis.options.minDuration = action.value
+          synopsis.options.minDuration = action.value * 1000
           updatePublisherInfo()
           break
 
-        case settings.MINIMUM_VISTS:
+        case settings.MINIMUM_VISITS:
           if (action.value <= 0) break
 
           synopsis.options.minPublisherVisits = action.value
@@ -322,12 +321,13 @@ if (ipc) {
     const win = electron.BrowserWindow.getFocusedWindow()
     if (message === addFundsMessage) {
       appActions.hideMessageBox(message)
+      // See showNotificationAddFunds() for buttons.
+      // buttonIndex === 1 is "Later"; the timestamp until which to delay is set
+      // in showNotificationAddFunds() when triggering this notification.
       if (buttonIndex === 0) {
-        // Don't show notifications for the next 6 hours.
-        suppressNotifications = true
-        setTimeout(() => { suppressNotifications = false }, 6 * msecs.hour)
-      } else {
-        // Open payments panel
+        appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
+      } else if (buttonIndex === 2) {
+        // Add funds: Open payments panel
         if (win) {
           win.webContents.send(messages.SHORTCUT_NEW_FRAME,
             'about:preferences#payments', { singleFrame: true })
@@ -335,15 +335,18 @@ if (ipc) {
       }
     } else if (message === reconciliationMessage) {
       appActions.hideMessageBox(message)
-      if (win) {
+      // buttonIndex === 1 is Dismiss
+      if (buttonIndex === 0) {
+        appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
+      } else if (buttonIndex === 2 && win) {
         win.webContents.send(messages.SHORTCUT_NEW_FRAME,
           'about:preferences#payments', { singleFrame: true })
       }
-      // If > 24 hours has passed, it might be time to show the reconciliation
-      // message again
-      setTimeout(() => { reconciliationNotificationShown = false }, 1 * msecs.day)
     } else if (message === notificationPaymentDoneMessage) {
       appActions.hideMessageBox(message)
+      if (buttonIndex === 0) {
+        appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
+      }
     } else if (message === notificationTryPaymentsMessage) {
       appActions.hideMessageBox(message)
       if (buttonIndex === 1 && win) {
@@ -559,15 +562,29 @@ var enable = (paymentsEnabled) => {
     appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED, true)
   }
 
-  if (!paymentsEnabled) {
-    synopsis = null
-    return updatePublisherInfo()
-  }
+  publisherInfo._internal.enabled = paymentsEnabled
+  if (synopsis) return updatePublisherInfo()
 
   synopsis = new (ledgerPublisher.Synopsis)()
   fs.readFile(pathName(synopsisPath), (err, data) => {
     var initSynopsis = () => {
+      var value
+
       // cf., the `Synopsis` constructor, https://github.com/brave/ledger-publisher/blob/master/index.js#L167
+      value = getSetting(settings.MINIMUM_VISIT_TIME)
+      if (!value) {
+        value = 8
+        appActions.changeSetting(settings.MINIMUM_VISIT_TIME, value)
+      }
+      if (value > 0) synopsis.options.minDuration = value * 1000
+
+      value = getSetting(settings.MINIMUM_VISITS)
+      if (!value) {
+        value = 5
+        appActions.changeSetting(settings.MINIMUM_VISITS, value)
+      }
+      if (value > 0) synopsis.options.minPublisherVisits = value
+
       if (process.env.NODE_ENV === 'test') {
         synopsis.options.minDuration = 0
         synopsis.options.minPublisherDuration = 0
@@ -640,6 +657,8 @@ var publisherInfo = {
   synopsis: undefined,
 
   _internal: {
+    enabled: false,
+
     ruleset: { raw: [], cooked: [] }
   }
 }
@@ -647,8 +666,6 @@ var publisherInfo = {
 var updatePublisherInfo = () => {
   var data = {}
   var then = underscore.now() - msecs.week
-
-  if (!synopsis) return
 
   underscore.keys(publishers).sort().forEach((publisher) => {
     var entries = []
@@ -665,8 +682,9 @@ var updatePublisherInfo = () => {
   syncWriter(pathName(scoresPath), synopsis.allN(), () => {})
 
   syncWriter(pathName(synopsisPath), synopsis, () => {})
-  publisherInfo.synopsis = synopsisNormalizer()
+  if (!publisherInfo._internal.enabled) return
 
+  publisherInfo.synopsis = synopsisNormalizer()
   publisherInfo.synopsisOptions = synopsis.options
 
   if (publisherInfo._internal.debugP) {
@@ -709,8 +727,7 @@ var synopsisNormalizer = () => {
 
     data[i] = {
       rank: i + 1,
-      // TBD: the `ledger-publisher` package does not currently report `verified` ...
-      verified: publisher.verified || false,
+      verified: (ledgerInfo._internal.verifiedPublishers || []).indexOf(results[i].publisher) !== -1,
       site: results[i].publisher,
       views: results[i].visits,
       duration: duration,
@@ -890,6 +907,7 @@ var ledgerInfo = {
   creating: false,
   created: false,
 
+  reconcileFrequency: undefined,
   reconcileStamp: undefined,
 
   transactions:
@@ -954,6 +972,7 @@ var ledgerInfo = {
   exchangeInfo: undefined,
 
   _internal: {
+    verifiedPublishers: [],
     exchangeExpiry: 0,
     exchanges: {},
     geoipExpiry: 0
@@ -1194,11 +1213,17 @@ var getStateInfo = (state) => {
   ledgerInfo.created = !!state.properties.wallet
   ledgerInfo.creating = !ledgerInfo.created
 
+  ledgerInfo.reconcileFrequency = state.properties.days
   ledgerInfo.reconcileStamp = state.reconcileStamp
 
   if (info) {
     ledgerInfo._internal.paymentInfo = info
     cacheReturnValue()
+  }
+
+  if (!underscore.isEqual(ledgerInfo._internal.verifiedPublishers, state.verifiedPublishers)) {
+    ledgerInfo._internal.verifiedPublishers = state.verifiedPublishers
+    updatePublisherInfo()
   }
 
   ledgerInfo.transactions = []
@@ -1437,8 +1462,7 @@ var pathName = (name) => {
 
 const showNotifications = () => {
   if (getSetting(settings.PAYMENTS_ENABLED) &&
-      getSetting(settings.PAYMENTS_NOTIFICATIONS) &&
-      !suppressNotifications) {
+      getSetting(settings.PAYMENTS_NOTIFICATIONS)) {
     showEnabledNotifications()
   } else if (!getSetting(settings.PAYMENTS_ENABLED)) {
     showDisabledNotifications()
@@ -1476,41 +1500,72 @@ const showDisabledNotifications = () => {
 */
 const showEnabledNotifications = () => {
   const reconcileStamp = ledgerInfo.reconcileStamp
-  const balance = Number(ledgerInfo.balance || 0)
-  const unconfirmed = Number(ledgerInfo.unconfirmed || 0)
-
   if (reconcileStamp && reconcileStamp - underscore.now() < msecs.day) {
-    if (ledgerInfo.btc &&
-        balance + unconfirmed < 0.9 * Number(ledgerInfo.btc)) {
-      addFundsMessage = addFundsMessage || locale.translation('addFundsNotification')
-      appActions.showMessageBox({
-        greeting: locale.translation('updateHello'),
-        message: addFundsMessage,
-        buttons: [
-          {text: locale.translation('updateLater')},
-          {text: locale.translation('addFunds'), className: 'primary'}
-        ],
-        options: {
-          style: 'greetingStyle',
-          persist: false
-        }
-      })
-    } else if (!reconciliationNotificationShown) {
-      reconciliationMessage = reconciliationMessage || locale.translation('reconciliationNotification')
-      appActions.showMessageBox({
-        greeting: locale.translation('updateHello'),
-        message: reconciliationMessage,
-        buttons: [
-          {text: locale.translation('reviewSites'), className: 'primary'}
-        ],
-        options: {
-          style: 'greetingStyle',
-          persist: false
-        }
-      })
-      reconciliationNotificationShown = true
+    if (sufficientBalanceToReconcile()) {
+      if (shouldShowNotificationReviewPublishers()) {
+        showNotificationReviewPublishers()
+      }
+    } else if (shouldShowNotificationAddFunds()) {
+      showNotificationAddFunds()
     }
   }
+}
+
+const sufficientBalanceToReconcile = () => {
+  const balance = Number(ledgerInfo.balance || 0)
+  const unconfirmed = Number(ledgerInfo.unconfirmed || 0)
+  return ledgerInfo.btc &&
+    (balance + unconfirmed > 0.9 * Number(ledgerInfo.btc))
+}
+
+const shouldShowNotificationAddFunds = () => {
+  const nextTime = getSetting(settings.PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP)
+  return !nextTime || (underscore.now() > nextTime)
+}
+
+const showNotificationAddFunds = () => {
+  const nextTime = underscore.now() + 3 * msecs.day
+  appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP, nextTime)
+
+  addFundsMessage = addFundsMessage || locale.translation('addFundsNotification')
+  appActions.showMessageBox({
+    greeting: locale.translation('updateHello'),
+    message: addFundsMessage,
+    buttons: [
+      {text: locale.translation('turnOffNotifications')},
+      {text: locale.translation('updateLater')},
+      {text: locale.translation('addFunds'), className: 'primary'}
+    ],
+    options: {
+      style: 'greetingStyle',
+      persist: false
+    }
+  })
+}
+
+const shouldShowNotificationReviewPublishers = () => {
+  const nextTime = getSetting(settings.PAYMENTS_NOTIFICATION_RECONCILE_SOON_TIMESTAMP)
+  return !nextTime || (underscore.now() > nextTime)
+}
+
+const showNotificationReviewPublishers = () => {
+  const nextTime = ledgerInfo.reconcileStamp + (ledgerInfo.reconcileFrequency - 1) * msecs.day
+  appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_RECONCILE_SOON_TIMESTAMP, nextTime)
+
+  reconciliationMessage = reconciliationMessage || locale.translation('reconciliationNotification')
+  appActions.showMessageBox({
+    greeting: locale.translation('updateHello'),
+    message: reconciliationMessage,
+    buttons: [
+      {text: locale.translation('turnOffNotifications')},
+      {text: locale.translation('dismiss')},
+      {text: locale.translation('reviewSites'), className: 'primary'}
+    ],
+    options: {
+      style: 'greetingStyle',
+      persist: false
+    }
+  })
 }
 
 // Called from observeTransactions() when we see a new payment (transaction).
@@ -1518,10 +1573,13 @@ const showNotificationPaymentDone = (transactionContributionFiat) => {
   notificationPaymentDoneMessage = locale.translation('notificationPaymentDone')
     .replace(/{{\s*amount\s*}}/, transactionContributionFiat.amount)
     .replace(/{{\s*currency\s*}}/, transactionContributionFiat.currency)
+  // Hide the 'waiting for deposit' message box if it exists
+  appActions.hideMessageBox(addFundsMessage)
   appActions.showMessageBox({
     greeting: locale.translation('updateHello'),
     message: notificationPaymentDoneMessage,
     buttons: [
+      {text: locale.translation('turnOffNotifications')},
       {text: locale.translation('Ok'), className: 'primary'}
     ],
     options: {

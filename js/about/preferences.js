@@ -22,12 +22,18 @@ const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const coinbaseCountries = require('../constants/coinbaseCountries')
 const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
+const {startsWithOption, newTabMode, bookmarksToolbarMode} = require('../../app/common/constants/settingsEnums')
+const {l10nErrorText} = require('../../app/common/lib/httpUtil')
+
+const WidevineInfo = require('../../app/renderer/components/widevineInfo')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
 const Button = require('../components/button')
 const searchProviders = require('../data/searchProviders')
+const punycode = require('punycode')
 const moment = require('moment')
+moment.locale(navigator.language)
 
 const adblock = appConfig.resourceNames.ADBLOCK
 const cookieblock = appConfig.resourceNames.COOKIEBLOCK
@@ -37,6 +43,7 @@ const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
 const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
 const noScript = appConfig.resourceNames.NOSCRIPT
 const flash = appConfig.resourceNames.FLASH
+const widevine = appConfig.resourceNames.WIDEVINE
 
 const isDarwin = navigator.platform === 'MacIntel'
 const isWindows = navigator.platform && navigator.platform.includes('Win')
@@ -62,7 +69,8 @@ const permissionNames = {
   'fullscreenPermission': ['boolean'],
   'openExternalPermission': ['boolean'],
   'protocolRegistrationPermission': ['boolean'],
-  'flash': ['boolean', 'number']
+  'flash': ['boolean', 'number'],
+  'widevine': ['boolean', 'number']
 }
 
 const braveryPermissionNames = {
@@ -140,7 +148,14 @@ class SettingCheckbox extends ImmutableComponent {
   }
 
   render () {
-    return <div style={this.props.style} className='settingItem'>
+    const props = {
+      style: this.props.style,
+      className: 'settingItem'
+    }
+    if (this.props.id) {
+      props.id = this.props.id
+    }
+    return <div {...props}>
       <SwitchControl id={this.props.prefKey}
         disabled={this.props.disabled}
         onClick={this.onClick}
@@ -204,6 +219,10 @@ class LedgerTable extends ImmutableComponent {
     return `https?://${synopsis.get('site')}`
   }
 
+  getVerifiedIcon (synopsis) {
+    return <span className='verified' />
+  }
+
   enabledForSite (synopsis) {
     const hostSettings = this.props.siteSettings.get(this.getHostPattern(synopsis))
     if (hostSettings) {
@@ -230,9 +249,10 @@ class LedgerTable extends ImmutableComponent {
     if (!synopsis || !synopsis.get || !this.shouldShow(synopsis)) {
       return []
     }
-    const faviconURL = synopsis.get('faviconURL') || appConfig.defaultFavicon
+    const faviconURL = synopsis.get('faviconURL')
     const rank = synopsis.get('rank')
     const views = synopsis.get('views')
+    const verified = synopsis.get('verified')
     const duration = synopsis.get('duration')
     const publisherURL = synopsis.get('publisherURL')
     const percentage = synopsis.get('percentage')
@@ -242,7 +262,7 @@ class LedgerTable extends ImmutableComponent {
     return [
       rank + 1,
       {
-        html: <a href={publisherURL} target='_blank'><img src={faviconURL} alt={site} /><span>{site}</span></a>,
+        html: <a href={publisherURL} target='_blank'>{verified ? this.getVerifiedIcon() : null}{faviconURL ? <img src={faviconURL} alt={site} /> : <span className='fa fa-file-o' />}<span>{site}</span></a>,
         value: site
       },
       {
@@ -267,7 +287,7 @@ class LedgerTable extends ImmutableComponent {
         headings={['rank', 'publisher', 'include', 'views', 'timeSpent', 'percentage']}
         defaultHeading='rank'
         overrideDefaultStyle
-        columnClassNames={['alignRight', '', '', 'alignRight', 'alignRight', '']}
+        columnClassNames={['alignRight', '', '', 'alignRight', 'alignRight', 'alignRight']}
         rowClassNames={
           this.synopsis.map((item) =>
             this.enabledForSite(item) ? '' : 'paymentsDisabled').toJS()
@@ -836,10 +856,27 @@ class GeneralTab extends ImmutableComponent {
   constructor (e) {
     super()
     this.importBrowserDataNow = this.importBrowserDataNow.bind(this)
+    this.onChangeSetting = this.onChangeSetting.bind(this)
+    this.setAsDefaultBrowser = this.setAsDefaultBrowser.bind(this)
   }
 
   importBrowserDataNow () {
-    aboutActions.importBrowerDataNow()
+    aboutActions.importBrowserDataNow()
+  }
+
+  onChangeSetting (key, value) {
+    // disable "SHOW_HOME_BUTTON" if it's enabled and homepage is blank
+    if (key === settings.HOMEPAGE && getSetting(settings.SHOW_HOME_BUTTON, this.props.settings)) {
+      const homepage = value && value.trim()
+      if (!homepage || !homepage.length) {
+        this.props.onChangeSetting(settings.SHOW_HOME_BUTTON, false)
+      }
+    }
+    this.props.onChangeSetting(key, value)
+  }
+
+  setAsDefaultBrowser () {
+    aboutActions.setAsDefaultBrowser()
   }
 
   enabled (keyArray) {
@@ -852,23 +889,62 @@ class GeneralTab extends ImmutableComponent {
         <option data-l10n-id={lc} value={lc} />
       )
     })
+    var homepageValue = getSetting(settings.HOMEPAGE, this.props.settings)
+    if (typeof homepageValue === 'string') {
+      homepageValue = punycode.toASCII(homepageValue)
+    }
+    const homepage = homepageValue && homepageValue.trim()
+    const disableShowHomeButton = !homepage || !homepage.length
     const defaultLanguage = this.props.languageCodes.find((lang) => lang.includes(navigator.language)) || 'en-US'
+    const defaultBrowser = getSetting(settings.IS_DEFAULT_BROWSER, this.props.settings)
+      ? <SettingItem dataL10nId='defaultBrowser' />
+      : <SettingItem dataL10nId='notDefaultBrowser' >
+        <Button l10nId='setAsDefault' className='primaryButton setAsDefaultButton'
+          onClick={this.setAsDefaultBrowser} />
+      </SettingItem>
+
     return <SettingsList>
       <div className='sectionTitle' data-l10n-id='generalSettings' />
       <SettingsList>
         <SettingItem dataL10nId='startsWith'>
           <select value={getSetting(settings.STARTUP_MODE, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.STARTUP_MODE)} >
-            <option data-l10n-id='startsWithOptionLastTime' value='lastTime' />
-            <option data-l10n-id='startsWithOptionHomePage' value='homePage' />
-            <option data-l10n-id='startsWithOptionNewTabPage' value='newTabPage' />
+            <option data-l10n-id='startsWithOptionLastTime' value={startsWithOption.WINDOWS_TABS_FROM_LAST_TIME} />
+            <option data-l10n-id='startsWithOptionHomePage' value={startsWithOption.HOMEPAGE} />
+            <option data-l10n-id='startsWithOptionNewTabPage' value={startsWithOption.NEW_TAB_PAGE} />
+          </select>
+        </SettingItem>
+        <SettingItem dataL10nId='newTabMode'>
+          <select value={getSetting(settings.NEWTAB_MODE, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.NEWTAB_MODE)} >
+            <option data-l10n-id='newTabNewTabPage' value={newTabMode.NEW_TAB_PAGE} />
+            <option data-l10n-id='newTabHomePage' value={newTabMode.HOMEPAGE} />
+            <option data-l10n-id='newTabDefaultSearchEngine' value={newTabMode.DEFAULT_SEARCH_ENGINE} />
           </select>
         </SettingItem>
         <SettingItem dataL10nId='myHomepage'>
           <input spellCheck='false'
             data-l10n-id='homepageInput'
-            value={getSetting(settings.HOMEPAGE, this.props.settings)}
-            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.HOMEPAGE)} />
+            value={homepageValue}
+            onChange={changeSetting.bind(null, this.onChangeSetting, settings.HOMEPAGE)} />
+        </SettingItem>
+        <SettingCheckbox dataL10nId='showHomeButton' prefKey={settings.SHOW_HOME_BUTTON}
+          settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}
+          disabled={disableShowHomeButton} />
+        {
+          isDarwin ? null : <SettingCheckbox dataL10nId='autoHideMenuBar' prefKey={settings.AUTO_HIDE_MENU} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        }
+        <SettingCheckbox dataL10nId='disableTitleMode' prefKey={settings.DISABLE_TITLE_MODE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingItem dataL10nId='bookmarkToolbarSettings'>
+          <select id='bookmarksBarSelect' value={getSetting(settings.BOOKMARKS_TOOLBAR_MODE, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.BOOKMARKS_TOOLBAR_MODE)} >
+            <option data-l10n-id='bookmarksBarTextOnly' value={bookmarksToolbarMode.TEXT_ONLY} />
+            <option data-l10n-id='bookmarksBarTextAndFavicon' value={bookmarksToolbarMode.TEXT_AND_FAVICONS} />
+            <option data-l10n-id='bookmarksBarFaviconOnly' value={bookmarksToolbarMode.FAVICONS_ONLY} />
+          </select>
+          <SettingCheckbox id='bookmarksBarSwitch' dataL10nId='bookmarkToolbar'
+            prefKey={settings.SHOW_BOOKMARKS_TOOLBAR} settings={this.props.settings}
+            onChangeSetting={this.props.onChangeSetting} />
         </SettingItem>
         <SettingItem dataL10nId='selectedLanguage'>
           <select value={getSetting(settings.LANGUAGE, this.props.settings) || defaultLanguage}
@@ -876,24 +952,16 @@ class GeneralTab extends ImmutableComponent {
             {languageOptions}
           </select>
         </SettingItem>
+        <SettingItem dataL10nId='importBrowserData'>
+          <Button l10nId='importNow' className='primaryButton importNowButton'
+            onClick={this.importBrowserDataNow} />
+        </SettingItem>
+        {defaultBrowser}
+        <SettingItem>
+          <SettingCheckbox dataL10nId='checkDefaultOnStartup' prefKey={settings.CHECK_DEFAULT_ON_STARTUP}
+            settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        </SettingItem>
       </SettingsList>
-      <div className='sectionTitle' data-l10n-id='bookmarkToolbarSettings' />
-      <SettingsList>
-        <SettingCheckbox dataL10nId='bookmarkToolbar' prefKey={settings.SHOW_BOOKMARKS_TOOLBAR} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='bookmarkToolbarShowFavicon' style={{ display: this.enabled([settings.SHOW_BOOKMARKS_TOOLBAR]) ? 'block' : 'none' }} prefKey={settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='bookmarkToolbarShowOnlyFavicon' style={{ display: this.enabled([settings.SHOW_BOOKMARKS_TOOLBAR, settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON]) ? 'block' : 'none' }} prefKey={settings.SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-      </SettingsList>
-      <div className='sectionTitle' data-l10n-id='appearanceSettings' />
-      <SettingsList>
-        <SettingCheckbox dataL10nId='showHomeButton' prefKey={settings.SHOW_HOME_BUTTON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        {
-          isDarwin ? null : <SettingCheckbox dataL10nId='autoHideMenuBar' prefKey={settings.AUTO_HIDE_MENU} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        }
-        <SettingCheckbox dataL10nId='disableTitleMode' prefKey={settings.DISABLE_TITLE_MODE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-      </SettingsList>
-      <div className='sectionTitle' data-l10n-id='importBrowserData' />
-      <Button l10nId='importNow' className='primaryButton importNowButton'
-        onClick={this.importBrowserDataNow} />
     </SettingsList>
   }
 }
@@ -1195,7 +1263,7 @@ class PaymentsTab extends ImmutableComponent {
             <SettingItem>
               <select
                 defaultValue={minPublisherVisits || 5}
-                onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.MINIMUM_VISTS)}>>>
+                onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.MINIMUM_VISITS)}>>>
                 <option value='2'>2 visits</option>
                 <option value='5'>5 visits</option>
                 <option value='10'>10 visits</option>
@@ -1321,6 +1389,16 @@ class PaymentsTab extends ImmutableComponent {
     return <div className='nextReconcileDate' data-l10n-args={JSON.stringify(l10nDataArgs)} data-l10n-id='statusNextReconcileDate' />
   }
 
+  get ledgerDataErrorText () {
+    const ledgerError = this.props.ledgerData.get('error')
+    if (!ledgerError) {
+      return null
+    }
+    // 'error' here is a chromium webRequest error as returned by request.js
+    const errorCode = ledgerError.get('error').get('errorCode')
+    return l10nErrorText(errorCode)
+  }
+
   btcToCurrencyString (btc) {
     const balance = Number(btc || 0)
     const currency = this.props.ledgerData.get('currency') || 'USD'
@@ -1380,8 +1458,11 @@ class PaymentsTab extends ImmutableComponent {
               <td>
                 {
                   this.props.ledgerData.get('error') && this.props.ledgerData.get('error').get('caller') === 'getWalletProperties'
-                    ? <span data-l10n-id='accountBalanceConnectionError' />
-                    : <span>
+                    ? <div>
+                      <div data-l10n-id='accountBalanceConnectionError' />
+                      <div className='accountBalanceError' data-l10n-id={this.ledgerDataErrorText} />
+                    </div>
+                    : <div>
                       <SettingsList>
                         <SettingItem>
                           {this.fundsAmount}
@@ -1389,7 +1470,7 @@ class PaymentsTab extends ImmutableComponent {
                           {this.paymentHistoryButton}
                         </SettingItem>
                       </SettingsList>
-                    </span>
+                    </div>
                 }
               </td>
               <td>
@@ -1441,7 +1522,7 @@ class PaymentsTab extends ImmutableComponent {
             <span data-l10n-id='off' />
             <SettingCheckbox dataL10nId='on' prefKey={settings.PAYMENTS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
           </div>
-          <Button l10nId='advancedSettings' className='whiteButton inlineButton' onClick={this.props.showOverlay.bind(this, 'advancedSettings')} />
+          { this.props.ledgerData.get('created') && this.enabled ? <Button l10nId='advancedSettings' className='advancedSettings whiteButton inlineButton' onClick={this.props.showOverlay.bind(this, 'advancedSettings')} /> : null }
         </div>
       </div>
       {
@@ -1556,6 +1637,14 @@ class SitePermissionsPage extends React.Component {
                             time: new Date(granted).toLocaleString()
                           }
                         }
+                      } else if (name === 'widevine') {
+                        if (granted === 1) {
+                          statusText = 'alwaysAllow'
+                        } else if (granted === 0) {
+                          statusText = 'allowOnce'
+                        } else {
+                          statusText = 'alwaysDeny'
+                        }
                       } else if (name === 'noScript' && typeof granted === 'number') {
                         if (granted === 1) {
                           statusText = 'allowUntilRestart'
@@ -1639,7 +1728,7 @@ class ShieldsTab extends ImmutableComponent {
         </SettingItem>
         <SettingCheckbox checked={this.props.braveryDefaults.get('httpsEverywhere')} dataL10nId='httpsEverywhere' onChange={this.onToggleHTTPSE} />
         <SettingCheckbox checked={this.props.braveryDefaults.get('safeBrowsing')} dataL10nId='safeBrowsing' onChange={this.onToggleSafeBrowsing} />
-        <SettingCheckbox checked={this.props.braveryDefaults.get('noScript')} dataL10nId='noScript' onChange={this.onToggleNoScript} />
+        <SettingCheckbox checked={this.props.braveryDefaults.get('noScript')} dataL10nId='noScriptPref' onChange={this.onToggleNoScript} />
         <SettingCheckbox dataL10nId='blockCanvasFingerprinting' prefKey={settings.BLOCK_CANVAS_FINGERPRINTING} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingItem>
           <Button l10nId='manageAdblockSettings' className='primaryButton manageAdblockSettings'
@@ -1669,8 +1758,13 @@ class SecurityTab extends ImmutableComponent {
     aboutActions.setResourceEnabled(flash, e.target.value)
     ipc.send(messages.PREFS_RESTART, flash, e.target.value)
   }
+  onToggleWidevine (e) {
+    aboutActions.setResourceEnabled(widevine, e.target.value)
+  }
   render () {
     const lastPassPreferencesUrl = ('chrome-extension://' + extensionIds[passwordManagers.LAST_PASS] + '/tabDialog.html?dialog=preferences&cmd=open')
+
+    const isLinux = navigator.appVersion.indexOf('Linux') !== -1
 
     return <div>
       <div className='sectionTitle' data-l10n-id='privateData' />
@@ -1718,7 +1812,7 @@ class SecurityTab extends ImmutableComponent {
         <Button l10nId='manageAutofillData' className='primaryButton manageAutofillDataButton'
           onClick={aboutActions.newFrame.bind(null, {
             location: 'about:autofill'
-          }, true)} />
+          }, true)} disabled={!getSetting(settings.AUTOFILL_ENABLED, this.props.settings)} />
       </SettingsList>
       <div className='sectionTitle' data-l10n-id='doNotTrackTitle' />
       <SettingsList>
@@ -1739,6 +1833,16 @@ class SecurityTab extends ImmutableComponent {
           }
         </span>
       </SettingsList>
+      { !isLinux
+      ? <div>
+        <div className='sectionTitle' data-l10n-id='widevineSection' />
+        <SettingsList>
+          <WidevineInfo newFrameAction={aboutActions.newFrame} />
+          <SettingCheckbox checked={this.props.braveryDefaults.get('widevine')} dataL10nId='enableWidevine' onChange={this.onToggleWidevine} />
+        </SettingsList>
+      </div>
+      : null
+      }
       <SitePermissionsPage siteSettings={this.props.siteSettings} names={permissionNames} />
     </div>
   }
@@ -1762,9 +1866,21 @@ class AdvancedTab extends ImmutableComponent {
           </select>
         </SettingItem>
         <SettingCheckbox dataL10nId='useHardwareAcceleration' prefKey={settings.HARDWARE_ACCELERATION_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='usePDFJS' prefKey={settings.PDFJS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='useSmoothScroll' prefKey={settings.SMOOTH_SCROLL_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='sendCrashReports' prefKey={settings.SEND_CRASH_REPORTS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='sendUsageStatistics' prefKey={settings.SEND_USAGE_STATISTICS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+      </SettingsList>
+      <div className='sectionTitle' data-l10n-id='extensions' />
+      <SettingsList>
+        <SettingCheckbox dataL10nId='usePDFJS' prefKey={settings.PDFJS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='enablePocket' prefKey={settings.POCKET_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingItem>
+          <Button l10nId='viewInstalledExtensions' className='primaryButton viewExtensionsInfo'
+            onClick={aboutActions.newFrame.bind(null, {
+              location: 'about:extensions'
+            }, true)} />
+        </SettingItem>
+        <div data-l10n-id='moreExtensionsComingSoon' className='moreExtensionsComingSoon' />
       </SettingsList>
     </div>
   }

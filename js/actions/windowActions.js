@@ -97,13 +97,15 @@ const windowActions = {
    * @param {string} location - The URL of the page that was navigated to.
    * @param {number} key - The frame key to modify.
    * @param {boolean} isNavigatedInPage - true if it was a navigation within the same page.
+   * @param {number} tabId - the tab id
    */
-  setNavigated: function (location, key, isNavigatedInPage) {
+  setNavigated: function (location, key, isNavigatedInPage, tabId) {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_NAVIGATED,
       location,
       key,
-      isNavigatedInPage
+      isNavigatedInPage,
+      tabId
     })
   },
 
@@ -532,6 +534,18 @@ const windowActions = {
   },
 
   /*
+   * Sets if we should render URL bar suggestions.
+   *
+   * @param enabled If false URL bar suggestions will not be rendered.
+   */
+  setRenderUrlBarSuggestions: function (enabled) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_RENDER_URL_BAR_SUGGESTIONS,
+      enabled
+    })
+  },
+
+  /*
    * Sets the URL bar preview value.
    * TODO: name this something better.
    *
@@ -643,13 +657,17 @@ const windowActions = {
    * @param {Object} currentDetail - Properties of the bookmark to change to
    * @param {Object} originalDetail - Properties of the bookmark to edit
    * @param {Object} destinationDetail - Will move the added bookmark to the specified position
+   * @param {boolean} shouldShowLocation - Whether or not to show the URL input
+   * @param {boolean} isBookmarkHanger - true if triggered from star icon in nav bar
    */
-  setBookmarkDetail: function (currentDetail, originalDetail, destinationDetail) {
+  setBookmarkDetail: function (currentDetail, originalDetail, destinationDetail, shouldShowLocation, isBookmarkHanger) {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_BOOKMARK_DETAIL,
       currentDetail,
       originalDetail,
-      destinationDetail
+      destinationDetail,
+      shouldShowLocation,
+      isBookmarkHanger
     })
   },
 
@@ -1002,6 +1020,23 @@ const windowActions = {
     })
   },
 
+  widevineSiteAccessedWithoutInstall: function () {
+    dispatch({
+      actionType: WindowConstants.WINDOW_WIDEVINE_SITE_ACCESSED_WITHOUT_INSTALL
+    })
+  },
+
+  /**
+   * Widevine popup detail changed
+   * @param {Object} widevinePanelDetail - detail of the widevine panel
+   */
+  widevinePanelDetailChanged: function (widevinePanelDetail) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_WIDEVINE_PANEL_DETAIL_CHANGED,
+      widevinePanelDetail
+    })
+  },
+
   /**
    * Sets the manage autofill address popup detail
    * @param {Object} currentDetail - Properties of the address to change to
@@ -1132,6 +1167,30 @@ const windowActions = {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID,
       folderId
+    })
+  },
+
+  /**
+   * Fired when window receives or loses focus
+   * @param {boolean} hasFocus - true if focused, false if blurred
+   */
+  onFocusChanged: function (hasFocus) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_ON_FOCUS_CHANGED,
+      hasFocus
+    })
+  },
+
+  /**
+   * Set Modal Dialog detail
+   * @param {string} className - name of modal dialog
+   * @param {Object} props - properties of the modal dialog
+   */
+  setModalDialogDetail: function (className, props) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_MODAL_DIALOG_DETAIL,
+      className,
+      props
     })
   }
 }

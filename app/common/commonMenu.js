@@ -301,11 +301,7 @@ module.exports.aboutBraveMenuItem = () => {
   return {
     label: locale.translation('aboutApp'),
     click: (item, focusedWindow) => {
-      if (process.type === 'browser') {
-        process.emit(messages.SHOW_ABOUT)
-      } else {
-        electron.ipcRenderer.send(messages.SHOW_ABOUT)
-      }
+      module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:brave', { singleFrame: true }])
     }
   }
 }

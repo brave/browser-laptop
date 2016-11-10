@@ -23,7 +23,7 @@ const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
 const config = require('../constants/config')
 const settings = require('../constants/settings')
-const {aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isNavigatableAboutPage} = require('../lib/appUrlUtil')
+const {aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
 const {isFrameError} = require('../../app/common/lib/httpUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
@@ -73,6 +73,14 @@ class Frame extends ImmutableComponent {
     return aboutUrls.get(getBaseUrl(this.props.location))
   }
 
+  isIntermediateAboutPage () {
+    return isIntermediateAboutPage(getBaseUrl(this.props.location))
+  }
+
+  /**
+   * Send data critical for the given about page via IPC.
+   * The page receiving the data typically uses it in component state.
+   */
   updateAboutDetails () {
     let location = getBaseUrl(this.props.location)
     if (location === 'about:preferences') {
@@ -116,6 +124,13 @@ class Frame extends ImmutableComponent {
       }
     } else if (location === 'about:flash') {
       this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.braveryDefaults)
+    } else if (location === 'about:newtab') {
+      this.webview.send(messages.NEWTAB_DATA_UPDATED, {
+        trackedBlockersCount: this.props.trackedBlockersCount,
+        adblockCount: this.props.adblockCount,
+        httpsUpgradedCount: this.props.httpsUpgradedCount,
+        newTabDetail: this.props.newTabDetail.toJS()
+      })
     } else if (location === 'about:autofill') {
       const defaultSession = global.require('electron').remote.session.defaultSession
       if (this.props.autofillAddresses) {
@@ -155,6 +170,11 @@ class Frame extends ImmutableComponent {
         })
         this.webview.send(messages.AUTOFILL_CREDIT_CARDS_UPDATED, list)
       }
+    } else if (location === 'about:brave') {
+      const versionInformation = appStoreRenderer.state.get('versionInformation')
+      if (versionInformation && versionInformation.toJS) {
+        this.webview.send(messages.VERSION_INFORMATION_UPDATED, versionInformation.toJS())
+      }
     }
 
     // send state to about pages
@@ -164,7 +184,8 @@ class Frame extends ImmutableComponent {
   }
 
   shouldCreateWebview () {
-    return !this.webview || !!this.webview.allowRunningPlugins !== this.allowRunningPlugins()
+    return !this.webview ||
+      !!this.webview.allowRunningPlugins !== (this.allowRunningFlashPlugin() || this.allowRunningWidevinePlugin())
   }
 
   runInsecureContent () {
@@ -173,7 +194,7 @@ class Frame extends ImmutableComponent {
       ? false : activeSiteSettings.get('runInsecureContent')
   }
 
-  allowRunningPlugins (url) {
+  allowRunningFlashPlugin (url) {
     if (!this.props.flashInitialized) {
       return false
     }
@@ -193,6 +214,26 @@ class Frame extends ImmutableComponent {
     return false
   }
 
+  allowRunningWidevinePlugin (url) {
+    if (!this.props.widevine || !this.props.widevine.get('enabled')) {
+      return false
+    }
+    const origin = url ? siteUtil.getOrigin(url) : this.origin
+    if (!origin) {
+      return false
+    }
+    // Check for at least one CtP allowed on this origin
+    if (!this.props.allSiteSettings) {
+      return false
+    }
+    const activeSiteSettings = getSiteSettingsForHostPattern(this.props.allSiteSettings,
+                                                             origin)
+    if (activeSiteSettings && typeof activeSiteSettings.get('widevine') === 'number') {
+      return true
+    }
+    return false
+  }
+
   expireContentSettings (origin) {
     // Expired Flash settings should be deleted when the webview is
     // navigated or closed. Same for NoScript's allow-once option.
@@ -205,6 +246,9 @@ class Frame extends ImmutableComponent {
       if (activeSiteSettings.get('flash') < Date.now()) {
         appActions.removeSiteSetting(origin, 'flash', this.props.isPrivate)
       }
+    }
+    if (activeSiteSettings.get('widevine') === 0) {
+      appActions.removeSiteSetting(origin, 'widevine', this.props.isPrivate)
     }
     if (activeSiteSettings.get('noScript') === 0) {
       appActions.removeSiteSetting(origin, 'noScript', this.props.isPrivate)
@@ -266,7 +310,7 @@ class Frame extends ImmutableComponent {
     if (hack && hack.userAgent) {
       this.webview.setAttribute('useragent', hack.userAgent)
     }
-    if (this.allowRunningPlugins()) {
+    if (this.allowRunningFlashPlugin() || this.allowRunningWidevinePlugin()) {
       this.webview.setAttribute('plugins', true)
       this.webview.allowRunningPlugins = true
     }
@@ -404,9 +448,6 @@ class Frame extends ImmutableComponent {
   }
 
   clone (args) {
-    if (!isNavigatableAboutPage(getBaseUrl(this.props.location))) {
-      return
-    }
     const newGuest = this.webview.clone()
     const newGuestInstanceId = newGuest.getWebPreferences().guestInstanceId
     let cloneAction
@@ -427,23 +468,22 @@ class Frame extends ImmutableComponent {
         this.webview.stop()
         break
       case 'reload':
-        if (this.isAboutPage()) {
-          break
-        }
         // Ensure that the webview thinks we're on the same location as the browser does.
         // This can happen for pages which don't load properly.
         // Some examples are basic http auth and bookmarklets.
         // In this case both the user display and the user think they're on this.props.location.
-        if (this.webview.getURL() !== this.props.location) {
+        if (this.webview.getURL() !== this.props.location && !this.isAboutPage()) {
           this.webview.loadURL(this.props.location)
+        } else if (this.isIntermediateAboutPage() &&
+          this.webview.getURL() !== this.props.location &&
+          this.webview.getURL() !== this.props.aboutDetails.get('url')) {
+          windowActions.setUrl(this.props.aboutDetails.get('url'),
+            this.props.aboutDetails.get('frameKey'))
         } else {
           this.webview.reload()
         }
         break
       case 'clean-reload':
-        if (this.isAboutPage()) {
-          break
-        }
         this.webview.reloadIgnoringCache()
         break
       case 'clone':
@@ -613,6 +653,75 @@ class Frame extends ImmutableComponent {
     })
   }
 
+  /**
+   * Shows a Widevine CtP notification if Widevine is installed and enabled.
+   * If not enabled, alert user that Widevine is installed.
+   * @param {string} origin - frame origin that is requesting to run widevine.
+   *   can either be main frame or subframe.
+   * @param {function=} noWidevineCallback - Optional callback to run if Widevine is not
+   *   installed
+   * @param {function=} widevineCallback - Optional callback to run if Widevine is
+   *   accepted
+   */
+  showWidevineNotification (location, origin, noWidevineCallback, widevineCallback) {
+    // https://www.nfl.com is said to be a widevine site but it actually uses Flash for me Oct 10, 2016
+    const widevineSites = ['https://www.netflix.com',
+      'http://bitmovin.com',
+      'https://shaka-player-demo.appspot.com']
+    const isForWidevineTest = process.env.NODE_ENV === 'test' && location.endsWith('/drm.html')
+    if (!isForWidevineTest && (!origin || !widevineSites.includes(origin))) {
+      noWidevineCallback()
+      return
+    }
+
+    // Generate a random string that is unlikely to collide. Not
+    // cryptographically random.
+    const nonce = Math.random().toString()
+
+    if (this.props.widevine && this.props.widevine.get('enabled')) {
+      const message = locale.translation('allowWidevine').replace(/{{\s*origin\s*}}/, this.origin)
+      // Show Widevine notification bar
+      appActions.showMessageBox({
+        buttons: [
+          {text: locale.translation('deny')},
+          {text: locale.translation('allow')}
+        ],
+        message,
+        frameOrigin: this.origin,
+        options: {
+          nonce,
+          persist: true
+        }
+      })
+      this.notificationCallbacks[message] = (buttonIndex, persist) => {
+        if (buttonIndex === 1) {
+          if (persist) {
+            appActions.changeSiteSetting(this.origin, 'widevine', 1)
+          } else {
+            appActions.changeSiteSetting(this.origin, 'widevine', 0)
+          }
+          if (widevineCallback) {
+            widevineCallback()
+          }
+        } else {
+          if (persist) {
+            appActions.changeSiteSetting(this.origin, 'widevine', false)
+          }
+        }
+        appActions.hideMessageBox(message)
+      }
+    } else {
+      windowActions.widevineSiteAccessedWithoutInstall()
+    }
+
+    ipc.once(messages.NOTIFICATION_RESPONSE + nonce, (e, msg, buttonIndex, persist) => {
+      const cb = this.notificationCallbacks[msg]
+      if (cb) {
+        cb(buttonIndex, persist)
+      }
+    })
+  }
+
   addEventListeners () {
     this.webview.addEventListener('content-blocked', (e) => {
       if (e.details[0] === 'javascript') {
@@ -628,8 +737,11 @@ class Frame extends ImmutableComponent {
       e.stopPropagation()
     })
     this.webview.addEventListener('update-target-url', (e) => {
-      const downloadsBarHeight = 50
-      let nearBottom = e.y > (window.innerHeight - 150 - downloadsBarHeight) // todo: magic number
+      if (!this.root) {
+        this.root = window.getComputedStyle(document.querySelector(':root'))
+        this.downloadsBarHeight = Number.parseInt(this.root.getPropertyValue('--downloads-bar-height'), 10)
+      }
+      let nearBottom = e.y > (window.innerHeight - 150 - this.downloadsBarHeight)
       let mouseOnLeft = e.x < (window.innerWidth / 2)
       let showOnRight = nearBottom && mouseOnLeft
       windowActions.setLinkHoverPreview(e.url, showOnRight)
@@ -704,8 +816,10 @@ class Frame extends ImmutableComponent {
       contextMenus.onShowAutofillMenu(e.suggestions, e.rect, this.frame)
     })
     this.webview.addEventListener('hide-autofill-popup', (e) => {
-      // TODO(Anthony): conflict with contextmenu
-      // windowActions.setContextMenuDetail()
+      let webContents = this.webview.getWebContents()
+      if (webContents && webContents.isFocused()) {
+        windowActions.setContextMenuDetail()
+      }
     })
     this.webview.addEventListener('ipc-message', (e) => {
       let method = () => {}
@@ -802,17 +916,12 @@ class Frame extends ImmutableComponent {
           interceptFlash(true, e.url)
         }
         windowActions.onWebviewLoadStart(this.frame, e.url)
+        // Clear security state
         windowActions.setBlockedRunInsecureContent(this.frame)
-        const isSecure = parsedUrl.protocol === 'https:' && !this.runInsecureContent()
-        const runInsecureContent = parsedUrl.protocol === 'https:' && this.runInsecureContent()
         windowActions.setSecurityState(this.frame, {
-          secure: isSecure,
-          runInsecureContent: runInsecureContent
+          secure: null,
+          runInsecureContent: false
         })
-        if (isSecure) {
-          // Check that there isn't a cert error.
-          ipc.send(messages.CHECK_CERT_ERROR_ACCEPTED, parsedUrl.host, this.props.frameKey)
-        }
       }
       windowActions.updateBackForwardState(
         this.frame,
@@ -832,6 +941,13 @@ class Frame extends ImmutableComponent {
         this.webview.getURL())
 
       const parsedUrl = urlParse(this.props.location)
+      if (!this.allowRunningWidevinePlugin()) {
+        this.showWidevineNotification(this.props.location, this.origin, () => {
+        }, () => {
+          windowActions.loadUrl(this.frame, this.props.provisionalLocation)
+        })
+      }
+
       const protocol = parsedUrl.protocol
       const isError = this.props.aboutDetails && this.props.aboutDetails.get('errorCode')
       if (!this.props.isPrivate && this.props.provisionalLocation === this.props.location && (protocol === 'http:' || protocol === 'https:') && !isError && savePage) {
@@ -876,20 +992,36 @@ class Frame extends ImmutableComponent {
         windowActions.loadUrl(this.frame, 'about:error')
         appActions.removeSite(siteUtil.getDetailFromFrame(this.frame))
       } else if (provisionLoadFailure) {
-        windowActions.setNavigated(this.webview.getURL(), this.props.frameKey, true)
+        windowActions.setNavigated(this.webview.getURL(), this.props.frameKey, true, this.frame.get('tabId'))
       }
     }
-    this.webview.addEventListener('load-commit', (e) => {
-      loadStart(e)
+    this.webview.addEventListener('did-change-security', (e) => {
+      let isSecure = null
+      let runInsecureContent = false
+      if (e.securityState === 'secure' || e.securityState === 'warning') {
+        isSecure = true
+        runInsecureContent = this.runInsecureContent()
+      } else if (e.securityState === 'insecure' || e.securityState === 'unknown') {
+        isSecure = false
+      }
+      // TODO: handle 'warning' security state
+      windowActions.setSecurityState(this.frame, {
+        secure: isSecure,
+        runInsecureContent
+      })
+      if (isSecure) {
+        // Check that there isn't a cert error.
+        const parsedUrl = urlParse(this.props.location)
+        ipc.send(messages.CHECK_CERT_ERROR_ACCEPTED, parsedUrl.host, this.props.frameKey)
+      }
     })
     this.webview.addEventListener('load-start', (e) => {
-      // XXX: loadstart probably does not need to be called twice anymore.
       loadStart(e)
     })
 
     this.webview.addEventListener('did-navigate', (e) => {
       if (this.props.findbarShown) {
-        windowActions.setFindbarShown(this.frame, false)
+        this.props.onFindHide()
       }
 
       for (let message in this.notificationCallbacks) {
@@ -900,14 +1032,17 @@ class Frame extends ImmutableComponent {
       if (this.props.isActive && this.webview.canGoBack() && document.activeElement !== this.webview) {
         this.webview.focus()
       }
-      windowActions.setNavigated(e.url, this.props.frameKey, false)
+      windowActions.setNavigated(e.url, this.props.frameKey, false, this.frame.get('tabId'))
       // force temporary url display for tabnapping protection
       windowActions.setMouseInTitlebar(true)
 
-      // After navigating to the URL, set correct frame title
-      let webContents = this.webview.getWebContents()
-      let title = webContents.getTitleAtIndex(webContents.getCurrentEntryIndex())
-      windowActions.setFrameTitle(this.frame, title)
+      // After navigating to the URL via back/forward buttons, set correct frame title
+      if (!e.isRendererInitiated) {
+        let webContents = this.webview.getWebContents()
+        let index = webContents.getCurrentEntryIndex()
+        let title = webContents.getTitleAtIndex(index)
+        windowActions.setFrameTitle(this.frame, title)
+      }
     })
     this.webview.addEventListener('crashed', (e) => {
       windowActions.setFrameError(this.frame, {
@@ -938,7 +1073,7 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('did-navigate-in-page', (e) => {
       if (e.isMainFrame) {
-        windowActions.setNavigated(e.url, this.props.frameKey, true)
+        windowActions.setNavigated(e.url, this.props.frameKey, true, this.frame.get('tabId'))
         loadEnd(true)
       }
     })

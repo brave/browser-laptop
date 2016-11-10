@@ -27,6 +27,10 @@ describe('siteUtil', function () {
     parentFolderId: 0,
     tags: [siteTags.BOOKMARK_FOLDER]
   })
+  const siteMinFields = Immutable.fromJS({
+    location: testUrl1,
+    title: 'sample'
+  })
 
   describe('getSiteIndex', function () {
     it('returns -1 if sites is falsey', function () {
@@ -178,7 +182,17 @@ describe('siteUtil', function () {
       const expectedSites = Immutable.fromJS([bookmarkAllFields])
       assert.deepEqual(processedSites.getIn([0, 'tags']), expectedSites.getIn([0, 'tags']))
     })
-
+    describe('record count', function () {
+      var processedSites
+      it('create history record with count', function () {
+        processedSites = siteUtil.addSite(emptySites, siteMinFields)
+        assert.deepEqual(processedSites.getIn([0, 'count']), 1)
+      })
+      it('increments count for history item', function () {
+        processedSites = siteUtil.addSite(processedSites, siteMinFields)
+        assert.deepEqual(processedSites.getIn([0, 'count']), 2)
+      })
+    })
     describe('for new entries (oldSite is null)', function () {
       describe('when adding bookmark', function () {
         it('preserves existing siteDetail fields', function () {
@@ -186,13 +200,12 @@ describe('siteUtil', function () {
           const expectedSites = Immutable.fromJS([bookmarkAllFields])
           assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
         })
-        it('sets default values for lastAccessedTime and tag when they are missing', function () {
+        it('sets 0 for lastAccessedTime if not specified', function () {
           const processedSites = siteUtil.addSite(emptySites, bookmarkMinFields, siteTags.BOOKMARK)
-          assert.equal(!!processedSites.getIn([0, 'lastAccessedTime']), true)
+          assert.equal(processedSites.getIn([0, 'lastAccessedTime']), 0)
           assert.deepEqual(processedSites.getIn([0, 'tags']).toJS(), [siteTags.BOOKMARK])
         })
       })
-
       describe('when adding bookmark folder', function () {
         it('assigns a folderId', function () {
           const processedSites = siteUtil.addSite(emptySites, folderMinFields)
@@ -264,6 +277,13 @@ describe('siteUtil', function () {
           })
           const expectedSites = sites
           assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+        })
+      })
+      describe('when adding history', function () {
+        it('sets default values for lastAccessedTime and tag when they are missing', function () {
+          const processedSites = siteUtil.addSite(emptySites, bookmarkMinFields)
+          assert.equal(!!processedSites.getIn([0, 'lastAccessedTime']), true)
+          assert.deepEqual(processedSites.getIn([0, 'tags']).toJS(), [])
         })
       })
     })
@@ -426,27 +446,152 @@ describe('siteUtil', function () {
     })
   })
 
-  describe('moveSite', function () {
+  describe('isMoveAllowed', function () {
+    // NOTE: usage taken from Bookmark Manager, which calls aboutActions.moveSite
     it('does not allow you to move a bookmark folder into itself', function () {
       // Add a new bookmark folder
       let processedSites = siteUtil.addSite(emptySites, folderMinFields)
       const folderId = processedSites.getIn([0, 'folderId'])
-      const bookmark = Immutable.fromJS({
-        lastAccessedTime: 123,
-        title: 'bookmark1',
-        parentFolderId: folderId,
-        location: testUrl1,
-        tags: [siteTags.BOOKMARK]
-      })
       // Add a bookmark into that folder
-      processedSites = siteUtil.addSite(processedSites, bookmark)
+      processedSites = siteUtil.addSite(processedSites, bookmarkAllFields.set('parentFolderId', folderId))
       const bookmarkFolder = processedSites.get(0)
+      // Should NOT be able to move bookmark folder into itself
+      assert.equal(false, siteUtil.isMoveAllowed(processedSites, bookmarkFolder, bookmarkFolder))
+    })
+    it('does not allow you to move an ancestor folder into a descendant folder', function () {
+      // Add a new bookmark folder
+      let processedSites = siteUtil.addSite(emptySites, folderMinFields)
+      const folderId1 = processedSites.getIn([0, 'folderId'])
+      // Add a child below that folder
+      processedSites = siteUtil.addSite(processedSites, folderMinFields.set('parentFolderId', folderId1))
+      const folderId2 = processedSites.getIn([1, 'folderId'])
+      // Add a folder below the previous child
+      processedSites = siteUtil.addSite(processedSites, folderMinFields.set('parentFolderId', folderId2))
+      const bookmarkFolder1 = processedSites.get(0)
+      const bookmarkFolder3 = processedSites.get(2)
+      // Should NOT be able to move grandparent folder into its grandchild
+      assert.equal(false, siteUtil.isMoveAllowed(processedSites, bookmarkFolder1, bookmarkFolder3))
+    })
+  })
 
-      // Usage taken from Bookmark Manager, which calls aboutActions.moveSite
-      processedSites = siteUtil.moveSite(processedSites, bookmarkFolder, bookmarkFolder, false, true, false)
-      const siteIndex = siteUtil.getSiteIndex(processedSites, bookmarkFolder, siteTags.BOOKMARK_FOLDER)
+  describe('moveSite', function () {
+  })
 
-      assert.notEqual(processedSites.getIn([siteIndex, 'parentFolderId']), processedSites.getIn([siteIndex, 'folderId']))
+  describe('updateSiteFavicon', function () {
+    it('updates the favicon for all matching entries', function () {
+      const sites = Immutable.fromJS([bookmarkMinFields, siteMinFields])
+      const processedSites = siteUtil.updateSiteFavicon(sites, testUrl1, 'https://brave.com/favicon.ico')
+      const updatedSiteDetail1 = bookmarkMinFields.set('favicon', 'https://brave.com/favicon.ico')
+      const updatedSiteDetail2 = siteMinFields.set('favicon', 'https://brave.com/favicon.ico')
+      const expectedSites = Immutable.fromJS([updatedSiteDetail1, updatedSiteDetail2])
+
+      assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+    })
+
+    describe('when searching for matches', function () {
+      it('disregards folders', function () {
+        const sites = siteUtil.addSite(emptySites, folderMinFields)
+        const processedSites = siteUtil.updateSiteFavicon(sites, testUrl1, 'https://brave.com/favicon.ico')
+        assert.deepEqual(processedSites.toJS(), sites.toJS())
+      })
+      it('ensures entry.location is truthy', function () {
+        const invalidSite = Immutable.fromJS({
+          title: 'sample'
+        })
+        const sites = siteUtil.addSite(emptySites, invalidSite)
+        const processedSites = siteUtil.updateSiteFavicon(sites, testUrl1, 'https://brave.com/favicon.ico')
+        assert.deepEqual(processedSites.toJS(), sites.toJS())
+      })
+      it('ensures input and entry.location are valid URLs', function () {
+        const invalidSite = Immutable.fromJS({
+          title: 'sample',
+          location: '......not a real URL'
+        })
+        const sites = siteUtil.addSite(emptySites, invalidSite)
+        const processedSites = siteUtil.updateSiteFavicon(sites, '......not a real URL', 'https://brave.com/favicon.ico')
+        assert.deepEqual(processedSites.toJS(), sites.toJS())
+      })
+      it('ensures input is truthy', function () {
+        const sites = siteUtil.addSite(emptySites, bookmarkMinFields)
+        const processedSites = siteUtil.updateSiteFavicon(sites, undefined, 'https://brave.com/favicon.ico')
+        assert.deepEqual(processedSites.toJS(), sites.toJS())
+      })
+    })
+
+    describe('normalizes the URL when searching for matches', function () {
+      it('normalizes trailing slashes', function () {
+        const siteDetail1 = Immutable.fromJS({
+          tags: [siteTags.BOOKMARK],
+          location: 'https://brave.com',
+          title: 'bookmarked site'
+        })
+        const siteDetail2 = Immutable.fromJS({
+          tags: [],
+          location: 'https://brave.com/',
+          title: 'visited site'
+        })
+
+        const sites = Immutable.fromJS([siteDetail1, siteDetail2])
+        const processedSites = siteUtil.updateSiteFavicon(sites, 'https://brave.com/', 'https://brave.com/favicon.ico')
+        const updatedSiteDetail1 = siteDetail1.set('favicon', 'https://brave.com/favicon.ico')
+        const updatedSiteDetail2 = siteDetail2.set('favicon', 'https://brave.com/favicon.ico')
+        const expectedSites = Immutable.fromJS([updatedSiteDetail1, updatedSiteDetail2])
+
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+      })
+
+      it('normalizes port numbers', function () {
+        const siteDetail1 = Immutable.fromJS({
+          tags: [siteTags.BOOKMARK],
+          location: 'https://brave.com:443',
+          title: 'bookmarked site'
+        })
+
+        const sites = Immutable.fromJS([siteDetail1, siteMinFields])
+        const processedSites = siteUtil.updateSiteFavicon(sites, 'https://brave.com/', 'https://brave.com/favicon.ico')
+        const updatedSiteDetail1 = siteDetail1.set('favicon', 'https://brave.com/favicon.ico')
+        const updatedSiteDetail2 = siteMinFields.set('favicon', 'https://brave.com/favicon.ico')
+        const expectedSites = Immutable.fromJS([updatedSiteDetail1, updatedSiteDetail2])
+
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+      })
+
+      it('strips www', function () {
+        const siteDetail1 = Immutable.fromJS({
+          tags: [siteTags.BOOKMARK],
+          location: 'https://www.brave.com/',
+          title: 'bookmarked site'
+        })
+
+        const sites = Immutable.fromJS([siteDetail1, siteMinFields])
+        const processedSites = siteUtil.updateSiteFavicon(sites, 'https://brave.com/', 'https://brave.com/favicon.ico')
+        const updatedSiteDetail1 = siteDetail1.set('favicon', 'https://brave.com/favicon.ico')
+        const updatedSiteDetail2 = siteMinFields.set('favicon', 'https://brave.com/favicon.ico')
+        const expectedSites = Immutable.fromJS([updatedSiteDetail1, updatedSiteDetail2])
+
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+      })
+
+      it('removes the fragment', function () {
+        const siteDetail1 = Immutable.fromJS({
+          tags: [siteTags.BOOKMARK],
+          location: 'https://www.brave.com/#contact',
+          title: 'bookmarked site'
+        })
+        const siteDetail2 = Immutable.fromJS({
+          tags: [],
+          location: 'https://brave.com/#people',
+          title: 'visited site'
+        })
+
+        const sites = Immutable.fromJS([siteDetail1, siteDetail2])
+        const processedSites = siteUtil.updateSiteFavicon(sites, 'https://brave.com/#about', 'https://brave.com/favicon.ico')
+        const updatedSiteDetail1 = siteDetail1.set('favicon', 'https://brave.com/favicon.ico')
+        const updatedSiteDetail2 = siteDetail2.set('favicon', 'https://brave.com/favicon.ico')
+        const expectedSites = Immutable.fromJS([updatedSiteDetail1, updatedSiteDetail2])
+
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+      })
     })
   })
 

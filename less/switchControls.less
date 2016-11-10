@@ -19,8 +19,7 @@
     .switchBackground.switchedOn {
       background-color: @braveOrange;
       .switchIndicator {
-        left: auto;
-        right: @switchNubRightMargin;
+        right: 2px;
       }
     }
   }
@@ -29,10 +28,11 @@
     .switchBackground {
       height: 26px;
       width: 60px;
-        background-color: @switchBG_off_lrg;
+      background-color: @switchBG_off_lrg;
       .switchIndicator {
         height: 22px;
         width: 22px;
+        right: calc(60px - 22px - @switchNubRightMargin);
       }
     }
   }
@@ -70,16 +70,18 @@
     position: relative;
     width: @switchWidth;
     box-shadow: @switchShadow;
+    transition: @switchBGTransition;
 
     .switchIndicator {
       background-color: white;
       border-radius: 100%;
       height: @switchNubDiameter;
-      left: @switchNubLeftMargin;
+      right: calc(@switchWidth - @switchNubDiameter - @switchNubRightMargin);
       position: absolute;
       top: @switchNubTopMargin;
       width: @switchNubDiameter;
       box-shadow: @switchNubShadow;
+      transition: @switchNubTransition;
     }
   }
 }

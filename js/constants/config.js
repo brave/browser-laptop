@@ -26,10 +26,10 @@ module.exports = {
   urlBarSuggestions: {
     maxOpenedFrames: 2,
     maxBookmarkSites: 2,
-    maxHistorySites: 2,
+    maxHistorySites: 3,
     maxAboutPages: 2,
     maxSearch: 3,
-    maxTopSites: 5
+    maxTopSites: 3
   },
   navigationBar: {
     defaultSearchSuggestions: false,
@@ -43,5 +43,15 @@ module.exports = {
   },
   braveExtensionId: 'mnojpmjdmbbfmejpflffifhffcmidifd',
   PDFJSExtensionId: 'jdbefljfgobbmcidnmpjamcbhnbphjnb',
-  coinbaseOrigin: 'https://buy.coinbase.com'
+  PocketExtensionId: 'niloccemoadcdkdjlinkgdfekeahmflj',
+  widevineComponentId: 'oimompecagnajdejgnnjijobebaeigek',
+  coinbaseOrigin: 'https://buy.coinbase.com',
+  newtab: {
+    fallbackImage: {
+      name: 'Bay Bridge',
+      source: 'img/newtab_stock_image.jpg',
+      author: 'Darrell Sano',
+      link: 'http://dksfoto.smugmug.com'
+    }
+  }
 }

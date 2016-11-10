@@ -25,7 +25,7 @@ const dndData = require('./dndData')
 const appStoreRenderer = require('./stores/appStoreRenderer')
 const ipc = global.require('electron').ipcRenderer
 const locale = require('../js/l10n')
-const {getSetting, getActivePasswordManager} = require('./settings')
+const {getSetting} = require('./settings')
 const settings = require('./constants/settings')
 const textUtils = require('./lib/text')
 const {isIntermediateAboutPage, isUrl} = require('./lib/appUrlUtil')
@@ -34,6 +34,10 @@ const urlParse = require('url').parse
 const eventUtil = require('./lib/eventUtil')
 const currentWindow = require('../app/renderer/currentWindow')
 const config = require('./constants/config')
+const {bookmarksToolbarMode} = require('../app/common/constants/settingsEnums')
+const extensionState = require('../app/common/state/extensionState')
+const extensionActions = require('../app/common/actions/extensionActions')
+const appStore = require('./stores/appStoreRenderer')
 
 const isDarwin = process.platform === 'darwin'
 
@@ -49,7 +53,7 @@ const addBookmarkMenuItem = (label, siteDetail, closestDestinationDetail, isPare
       if (isParent) {
         siteDetail = siteDetail.set('parentFolderId', closestDestinationDetail && (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
       }
-      windowActions.setBookmarkDetail(siteDetail, siteDetail, closestDestinationDetail)
+      windowActions.setBookmarkDetail(siteDetail, siteDetail, closestDestinationDetail, true)
     }
   }
 }
@@ -62,9 +66,14 @@ const addFolderMenuItem = (closestDestinationDetail, isParent) => {
       if (isParent) {
         emptyFolder = emptyFolder.set('parentFolderId', closestDestinationDetail && (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
       }
-      windowActions.setBookmarkDetail(emptyFolder, undefined, closestDestinationDetail)
+      windowActions.setBookmarkDetail(emptyFolder, undefined, closestDestinationDetail, false)
     }
   }
+}
+
+const getDownloadsBarHeight = () => {
+  const root = window.getComputedStyle(document.querySelector(':root'))
+  return Number.parseInt(root.getPropertyValue('--downloads-bar-height'), 10)
 }
 
 function tabPageTemplateInit (framePropsList) {
@@ -108,6 +117,10 @@ function urlBarTemplateInit (searchDetail, activeFrame, e) {
   }
 
   return items
+}
+
+function findBarTemplateInit () {
+  return getEditableItems(window.getSelection().toString())
 }
 
 function tabsToolbarTemplateInit (activeFrame, closestDestinationDetail, isParent) {
@@ -215,31 +228,42 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
 
 function siteDetailTemplateInit (siteDetail, activeFrame) {
   let isHistoryEntry = false
-  let isHistoryEntries = false
+  let multipleHistoryEntries = false
+  let multipleBookmarks = false
   let isFolder = false
-  let isRootFolder = false
+  let isSystemFolder = false
   let deleteLabel
   let deleteTag
 
+  // TODO(bsclifton): pull this out to a method
   if (siteUtil.isBookmark(siteDetail) && activeFrame) {
     deleteLabel = 'deleteBookmark'
     deleteTag = siteTags.BOOKMARK
   } else if (siteUtil.isFolder(siteDetail)) {
     isFolder = true
-    isRootFolder = siteDetail.get('folderId') === 0
+    isSystemFolder = siteDetail.get('folderId') === 0 ||
+      siteDetail.get('folderId') === -1
     deleteLabel = 'deleteFolder'
     deleteTag = siteTags.BOOKMARK_FOLDER
   } else if (siteUtil.isHistoryEntry(siteDetail)) {
     isHistoryEntry = true
     deleteLabel = 'deleteHistoryEntry'
   } else if (Immutable.List.isList(siteDetail)) {
-    isHistoryEntries = true
+    // Multiple bookmarks OR history entries selected
+    multipleHistoryEntries = true
+    multipleBookmarks = true
     siteDetail.forEach((site) => {
-      if (!siteUtil.isHistoryEntry(site)) {
-        isHistoryEntries = false
-      }
+      if (!siteUtil.isBookmark(site)) multipleBookmarks = false
+      if (!siteUtil.isHistoryEntry(site)) multipleHistoryEntries = false
     })
-    deleteLabel = 'deleteHistoryEntries'
+    if (multipleBookmarks) {
+      deleteLabel = 'deleteBookmarks'
+      deleteTag = siteTags.BOOKMARK
+    } else if (multipleHistoryEntries) {
+      deleteLabel = 'deleteHistoryEntries'
+    }
+  } else {
+    deleteLabel = ''
   }
 
   const template = []
@@ -271,14 +295,16 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
       CommonMenu.separatorMenuItem)
   }
 
-  if (!isRootFolder) {
-    // History can be deleted but not edited
+  if (!isSystemFolder) {
     // Picking this menu item pops up the AddEditBookmark modal
-    if (!isHistoryEntry && !isHistoryEntries) {
+    // - History can be deleted but not edited
+    // - Multiple bookmarks cannot be edited at once
+    // - "Bookmarks Toolbar" and "Other Bookmarks" folders cannot be deleted
+    if (!isHistoryEntry && !multipleHistoryEntries && !multipleBookmarks) {
       template.push(
         {
           label: locale.translation(isFolder ? 'editFolder' : 'editBookmark'),
-          click: () => windowActions.setBookmarkDetail(siteDetail, siteDetail)
+          click: () => windowActions.setBookmarkDetail(siteDetail, siteDetail, null, true)
         },
         CommonMenu.separatorMenuItem)
     }
@@ -296,7 +322,7 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
       })
   }
 
-  if (!isHistoryEntry && !isHistoryEntries) {
+  if (!isHistoryEntry && !multipleHistoryEntries) {
     if (template[template.length - 1] !== CommonMenu.separatorMenuItem) {
       template.push(CommonMenu.separatorMenuItem)
     }
@@ -331,7 +357,8 @@ function showBookmarkFolderInit (allBookmarkItems, parentBookmarkFolder, activeF
 }
 
 function bookmarkItemsInit (allBookmarkItems, items, activeFrame) {
-  const showFavicon = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON) === true
+  const btbMode = getSetting(settings.BOOKMARKS_TOOLBAR_MODE)
+  const showFavicon = (btbMode === bookmarksToolbarMode.TEXT_AND_FAVICONS || btbMode === bookmarksToolbarMode.FAVICONS_ONLY)
   return items.map((site) => {
     const isFolder = siteUtil.isFolder(site)
     let faIcon
@@ -656,7 +683,7 @@ function hamburgerTemplateInit (location, e) {
     }, {
       label: locale.translation('bravery'),
       submenu: [
-        CommonMenu.braveryGlobalMenuItem(),
+//        CommonMenu.braveryGlobalMenuItem(),
         CommonMenu.braverySiteMenuItem(),
         CommonMenu.braveryPaymentsMenuItem()
       ]
@@ -868,6 +895,8 @@ function mainTemplateInit (nodeProps, frame) {
 
   const isLink = nodeProps.linkURL && nodeProps.linkURL !== ''
   const isImage = nodeProps.mediaType === 'image'
+  const isVideo = nodeProps.mediaType === 'video'
+  const isAudio = nodeProps.mediaType === 'audio'
   const isInputField = nodeProps.isEditable || nodeProps.inputFieldType !== 'none'
   const isTextSelected = nodeProps.selectionText.length > 0
 
@@ -966,6 +995,10 @@ function mainTemplateInit (nodeProps, frame) {
     if (editableItems.length > 0) {
       template.push(...editableItems, CommonMenu.separatorMenuItem)
     }
+
+    if (isTextSelected) {
+      template.push(searchSelectionMenuItem(nodeProps.selectionText), CommonMenu.separatorMenuItem)
+    }
   } else if (isTextSelected) {
     if (isDarwin) {
       template.push(showDefinitionMenuItem(nodeProps.selectionText),
@@ -1021,6 +1054,12 @@ function mainTemplateInit (nodeProps, frame) {
           CommonMenu.separatorMenuItem,
           addBookmarkMenuItem('bookmarkPage', siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false),
           {
+            label: locale.translation('savePageAs'),
+            accelerator: 'CmdOrCtrl+S',
+            click: function (item, focusedWindow) {
+              CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_SAVE])
+            }
+          }, {
             label: locale.translation('find'),
             accelerator: 'CmdOrCtrl+F',
             click: function (item, focusedWindow) {
@@ -1061,18 +1100,89 @@ function mainTemplateInit (nodeProps, frame) {
     }
   })
 
-  const passwordManager = getActivePasswordManager()
-  if (passwordManager.get('extensionId')) {
-    template.push(
-      CommonMenu.separatorMenuItem,
-      {
-        label: passwordManager.get('displayName'),
-        click: (item, focusedWindow) => {
-          if (focusedWindow) {
-            ipc.send('chrome-browser-action-clicked', passwordManager.get('extensionId'), frame.get('tabId'), passwordManager.get('name'), nodeProps)
+  const extensionContextMenus =
+    extensionState.getContextMenusProperties(appStore.state)
+  if (extensionContextMenus !== undefined &&
+    extensionContextMenus.length) {
+    template.push(CommonMenu.separatorMenuItem)
+    let templateMap = {}
+    extensionContextMenus.forEach((extensionContextMenu) => {
+      let info = {}
+      let contextsPassed = false
+      if (extensionContextMenu.properties.contexts !== undefined &&
+        extensionContextMenu.properties.contexts.length) {
+        extensionContextMenu.properties.contexts.forEach((context) => {
+          if (isTextSelected && (context === 'selection' || context === 'all')) {
+            info['selectionText'] = nodeProps.selectionText
+            contextsPassed = true
+          } else if (isLink && (context === 'link' || context === 'all')) {
+            info['linkUrl'] = nodeProps.linkURL
+            contextsPassed = true
+          } else if (isImage && (context === 'image' || context === 'all')) {
+            info['mediaType'] = 'image'
+            contextsPassed = true
+          } else if (isInputField && (context === 'editable' || context === 'all')) {
+            info['editable'] = true
+            contextsPassed = true
+          } else if (nodeProps.pageURL && (context === 'page' || context === 'all')) {
+            info['pageUrl'] = nodeProps.pageURL
+            contextsPassed = true
+          } else if (isVideo && (context === 'video' || context === 'all')) {
+            info['mediaType'] = 'video'
+            contextsPassed = true
+          } else if (isAudio && (context === 'audio' || context === 'all')) {
+            info['mediaType'] = 'audio'
+            contextsPassed = true
+          } else if (nodeProps.frameURL && (context === 'frame' || context === 'all')) {
+            info['frameURL'] = nodeProps.frameURL
+            contextsPassed = true
           }
+        })
+      }
+      if (nodeProps.srcURL) {
+        info['srcURL'] = nodeProps.srcURL
+      }
+      // TODO (Anthony): Browser Action context menu
+      if (extensionContextMenu.properties.contexts !== undefined &&
+        extensionContextMenu.properties.contexts.length === 1 &&
+        extensionContextMenu.properties.contexts[0] === 'browser_action') {
+        contextsPassed = false
+      }
+      if (contextsPassed) {
+        info['menuItemId'] = extensionContextMenu.menuItemId
+        if (extensionContextMenu.properties.parentId) {
+          if (templateMap[extensionContextMenu.properties.parentId].submenu === undefined) {
+            templateMap[extensionContextMenu.properties.parentId].submenu = []
+          }
+          templateMap[extensionContextMenu.properties.parentId].submenu.push(
+            {
+              label: extensionContextMenu.properties.title,
+              click: (item, focusedWindow) => {
+                if (focusedWindow) {
+                  extensionActions.contextMenuClicked(
+                    extensionContextMenu.extensionId, frame.get('tabId'), info)
+                }
+              }
+            })
+          const submenuLength = templateMap[extensionContextMenu.properties.parentId].submenu.length
+          templateMap[extensionContextMenu.menuItemId] =
+            templateMap[extensionContextMenu.properties.parentId].submenu[submenuLength - 1]
+        } else {
+          template.push(
+            {
+              label: extensionContextMenu.properties.title,
+              click: (item, focusedWindow) => {
+                if (focusedWindow) {
+                  extensionActions.contextMenuClicked(
+                    extensionContextMenu.extensionId, frame.get('tabId'), info)
+                }
+              },
+              icon: extensionContextMenu.icon
+            })
+          templateMap[extensionContextMenu.menuItemId] = template[template.length - 1]
         }
-      })
+      }
+    })
   }
 
   if (frame.get('location') === 'about:bookmarks') {
@@ -1091,10 +1201,10 @@ function mainTemplateInit (nodeProps, frame) {
 
 function onHamburgerMenu (location, e) {
   const menuTemplate = hamburgerTemplateInit(location, e)
-  const rect = e.target.getBoundingClientRect()
+  const rect = e.target.parentNode.getBoundingClientRect()
   windowActions.setContextMenuDetail(Immutable.fromJS({
     right: 0,
-    top: rect.bottom + 2,
+    top: rect.bottom,
     template: menuTemplate
   }))
 }
@@ -1153,6 +1263,13 @@ function onUrlBarContextMenu (searchDetail, activeFrame, e) {
   inputMenu.destroy()
 }
 
+function onFindBarContextMenu (e) {
+  e.stopPropagation()
+  const findBarMenu = Menu.buildFromTemplate(findBarTemplateInit(e))
+  findBarMenu.popup(currentWindow)
+  findBarMenu.destroy()
+}
+
 function onSiteDetailContextMenu (siteDetail, activeFrame, e) {
   if (e) {
     e.stopPropagation()
@@ -1201,8 +1318,7 @@ function onShowBookmarkFolderMenu (bookmarks, bookmark, activeFrame, e) {
  */
 function onShowUsernameMenu (usernames, origin, action, boundingRect,
                                     topOffset) {
-  // TODO: magic number
-  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) ? 50 : 0
+  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) ? getDownloadsBarHeight() : 0
   const menuTemplate = usernameTemplateInit(usernames, origin, action)
   windowActions.setContextMenuDetail(Immutable.fromJS({
     left: boundingRect.left,
@@ -1213,8 +1329,7 @@ function onShowUsernameMenu (usernames, origin, action, boundingRect,
 
 function onShowAutofillMenu (suggestions, boundingRect, frame) {
   const menuTemplate = autofillTemplateInit(suggestions, frame)
-  // TODO: magic number
-  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) ? 50 : 0
+  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) ? getDownloadsBarHeight() : 0
   const offset = {
     x: (window.innerWidth - boundingRect.clientWidth),
     y: (window.innerHeight - boundingRect.clientHeight)
@@ -1236,7 +1351,8 @@ function onMoreBookmarksMenu (activeFrame, allBookmarkItems, overflowItems, e) {
   }))
 }
 
-function onBackButtonHistoryMenu (activeFrame, history, rect) {
+function onBackButtonHistoryMenu (activeFrame, history, target) {
+  const rect = target.parentNode.getBoundingClientRect()
   const menuTemplate = []
 
   if (activeFrame && history && history.entries.length > 0) {
@@ -1279,7 +1395,8 @@ function onBackButtonHistoryMenu (activeFrame, history, rect) {
   }))
 }
 
-function onForwardButtonHistoryMenu (activeFrame, history, rect) {
+function onForwardButtonHistoryMenu (activeFrame, history, target) {
+  const rect = target.parentNode.getBoundingClientRect()
   const menuTemplate = []
 
   if (activeFrame && history && history.entries.length > 0) {
@@ -1330,6 +1447,7 @@ module.exports = {
   onDownloadsToolbarContextMenu,
   onTabPageContextMenu,
   onUrlBarContextMenu,
+  onFindBarContextMenu,
   onSiteDetailContextMenu,
   onShowBookmarkFolderMenu,
   onShowUsernameMenu,

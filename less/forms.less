@@ -97,6 +97,50 @@
   }
 }
 
+.commonDialog {
+  .commonForm {
+    .flyoutDialog;
+    background-color: #f7f7f7;
+    border-radius: @borderRadius;
+    max-width: 422px;
+    padding: 0;
+    text-align: left;
+    max-width: 600px;
+    -webkit-user-select: none;
+    cursor: default;
+    color: #3B3B3B;
+    overflow-y: auto;
+    max-height: 100%;
+
+    .clickable {
+      color: #5B5B5B;
+      &:hover {
+        color: #000;
+      }
+    }
+
+    .formSection {
+      padding: 16px 30px;
+      &.commonFormTitle {
+        color: #ff5000;
+        font-size: 1.2em;
+      }
+      &.commonFormButtons {
+        text-align: center;
+      }
+      &.commonFormBottom {
+        background-color: #dddee0;
+        text-align: center;
+      }
+      .commonFormButtonGroup {
+        margin: 0 auto;
+        display: inline-block;
+      }
+    }
+  }
+}
+
+// TODO: Make this use commonDialog
 .importBrowserDataPanel {
   .importBrowserData {
     .flyoutDialog;
@@ -146,6 +190,7 @@
   }
 }
 
+// TODO: Make this use commonDialog
 .manageAutofillDataPanel {
   .manageAutofillData {
     .flyoutDialog;
@@ -192,6 +237,64 @@
         text-align: right;
         padding: 16px 10px;
       }
+    }
+  }
+}
+
+// TODO: Make this use commonDialog
+.checkDefaultBrowserDialog {
+  .checkDefaultBrowser {
+    .flyoutDialog;
+    background-color: #f7f7f7;
+    border-radius: @borderRadius;
+    max-width: 422px;
+    padding: 1;
+    text-align: left;
+    width: 614px;
+    height: 120px;
+    -webkit-user-select: none;
+    cursor: default;
+    color: #3B3B3B;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    max-height: 100%;
+
+    .clickable {
+      color: #5B5B5B;
+      &:hover {
+        color: #000;
+      }
+    }
+
+    .checkDefaultBrowserButtons {
+      text-align: right;
+      padding: 16px 10px;
+      position: relative;
+      top: -30px;
+    }
+
+    .makeBraveDefault {
+      font-weight: bold;
+      display: inline-block;
+      position: relative;
+      top: -35px;
+      margin-left: 15px;
+    }
+
+    .braveIcon {
+      background-image: -webkit-image-set(url(../app/extensions/brave/img/braveAbout.png) 2x);
+      background-repeat: no-repeat;
+      height: 64px;
+      width: 64px;
+      display: inline-block;
+      position: relative;
+      top: 10px;
+    }
+
+    .checkDefaultOnStartup {
+      left: 75px;
+      position: relative;
+      top: -25px;
     }
   }
 }
@@ -265,19 +368,19 @@
 
       .braveryStat {
         font-size: 40px;
-        color: @chromeText;
+        color: @statsGray;
 
         &.adsBlockedStat {
-          color: #fe521d;
+          color: @statsRed;
         }
         &.trackersBlockedStat {
-          color: #f39030;
+          color: @statsOrange;
         }
         &.redirectedResourcesStat {
-          color: #0796fa;
+          color: @statsBlue;
         }
         &.fpStat {
-          color: #ffc000;
+          color: @statsYellow;
         }
       }
       .statDisabled {
@@ -405,6 +508,107 @@
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.dialog > .bookmarkDialog {
+  width: 350px;
+  position: absolute;
+  top: 30px;
+}
+
+.dialog > .bookmarkDialog > .bookmarkForm {
+  width: 350px;
+}
+
+.dialog > .bookmarkDialog .fa-close {
+  color: #999;
+  font-size: 16px;
+  float: right;
+  margin-top: 7px;
+  margin-right: 10px;
+}
+
+.bookmarkForm {
+  .genericForm;
+  background: linear-gradient(#FFFFFF, #DEDEDE);
+  margin-top: 10px;
+  padding: 0;
+
+  .arrowUp {
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid #FFFFFF;
+    position: relative;
+    bottom: 10px;
+    left: 37px;
+
+    &.withHomeButton {
+      left: 67px;
+    }
+  }
+
+  .bookmarkFormRow {
+    margin-bottom: 10px;
+  }
+
+  .bookmarkButtons {
+    margin: 20px 0 10px 0;
+  }
+
+  .bookmarkFormInner {
+    padding: 10px 30px;
+    h2 {
+      -webkit-user-select: none;
+      cursor: default;
+    }
+  }
+
+  label {
+    color: @darkGray;
+    margin-left: 5px;
+  }
+
+  h2 {
+    color: @braveOrange;
+    font-weight: normal;
+    font-size: 16px;
+  }
+
+  input,
+  select {
+    display: block;
+    width: 100%;
+    max-width: 250px;
+    height: 25px;
+    border-radius: 5px;
+    padding: 0 5px;
+    margin: 5px 0 5px 0;
+    font-size: 0.9em;
+    border: solid 1px #ececec;
+    background: white;
+    color: #444444;
+    outline: none;
+  }
+
+  input {
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  }
+
+  select {
+    box-shadow: 0px 1px 5px -1px rgba(0, 0, 0, 0.8);
+  }
+}
+
+.bookmarkFormFooter {
+  background: @gray;
+  padding: 10px 30px;
+
+  span {
+    font-size: 12px;
+    text-align: left;
+  }
 }
 
 .genericForm {

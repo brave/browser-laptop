@@ -15,8 +15,24 @@
 
 span.buttonSeparator {
   width: 1px;
-  border-left: 1px solid @gray;
+  border-left: 1px solid #e2e2e2;
   margin: 4px 3px 4px 3px;
+}
+
+span.menuButton {
+  background-color: @buttonColor;
+  display: inline-block;
+  width: 20px;
+  height: 12px;
+  margin: 8px 4px 0 0;
+  cursor: default;
+  -webkit-mask-image: url('../img/toolbar/menu_btn.svg');
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+
+  &:hover {
+    background-color: black;
+  }
 }
 
 a.browserButton,
@@ -41,8 +57,10 @@ span.browserButton,
   }
 
   &[disabled] {
-    opacity: .25;
     pointer-events: none;
+    // prevent titleMode animation from overriding opacity
+    animation: none !important;
+    opacity: .25 !important;
   }
 
   &.smallButton {
@@ -54,17 +72,18 @@ span.browserButton,
 
   &.newFrameButton {
     font-size: 0px;
-    width: 24px;
-    height: 100%;
-    opacity: 0.5;
-    background: url('../img/icon_new_frame.svg') 50% 20% scroll / 20px no-repeat;
+    width: 10px;
+    max-height: 14px;
+    position: relative;
+    top: 8px;
+    left: 2px;
+    -webkit-mask-image: url('../img/toolbar/newtab_btn.svg');
+    -webkit-mask-repeat: no-repeat;
+    background-color: @buttonColor;
     &:hover {
       opacity: 0.8;
+      background-color: black;
     }
-  }
-
-  &.menuButton {
-    height: auto;
   }
 
   &.primaryButton,

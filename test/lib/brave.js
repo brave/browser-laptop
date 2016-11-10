@@ -13,6 +13,14 @@ chai.use(chaiAsPromised)
 
 const Server = require('./server')
 
+// toggle me for more verbose logs! :)
+const logVerboseEnabled = false
+const logVerbose = (string) => {
+  if (logVerboseEnabled) {
+    console.log(string)
+  }
+}
+
 const generateUserDataDir = () => {
   return path.join(os.tmpdir(), 'brave-test', (new Date().getTime()) + Math.floor(Math.random() * 1000).toString())
 }
@@ -66,11 +74,16 @@ var exports = {
     CONTROL: '\ue009',
     ESCAPE: '\ue00c',
     RETURN: '\ue006',
-    SHIFT: '\ue008'
+    ENTER: '\ue007',
+    SHIFT: '\ue008',
+    BACKSPACE: '\ue003'
   },
 
   browserWindowUrl: 'file://' + path.resolve(__dirname, '..', '..') + '/app/extensions/brave/index.html',
   newTabUrl: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-newtab.html',
+  fixtureUrl: function (filename) {
+    return 'file://' + path.resolve(__dirname, '..', 'fixtures', filename)
+  },
 
   beforeAllServerSetup: function (context) {
     context.beforeAll(function (done) {
@@ -181,7 +194,7 @@ var exports = {
             var newHandles = []
             for (var i = 0; i < urls.length; i++) {
               // ignore extension urls unless they are "about" pages
-              if (!(urls[i].startsWith('chrome-extension') && !urls[i].match(/about-.*\.html$/)) &&
+              if (!(urls[i].startsWith('chrome-extension') && !urls[i].match(/about-.*\.html(#.*)?$/)) &&
                   // ignore window urls
                   !urls[i].startsWith('file:')) {
                 newHandles.push(handles[i])
@@ -194,34 +207,76 @@ var exports = {
     })
 
     this.app.client.addCommand('tabByIndex', function (index) {
+      logVerbose('tabByIndex(' + index + ')')
       return this.tabHandles().then((response) => response.value).then(function (handles) {
+        logVerbose('tabHandles() => handles.length = ' + handles.length + '; handles[' + index + '] = "' + handles[index] + '";')
         return this.window(handles[index])
       })
     })
 
     this.app.client.addCommand('getTabCount', function () {
       return this.tabHandles().then((response) => response.value).then(function (handles) {
+        logVerbose('getTabCount() => ' + handles.length)
         return handles.length
       })
     })
 
     this.app.client.addCommand('waitForBrowserWindow', function () {
       return this.waitUntil(function () {
-        return this.windowByUrl(exports.browserWindowUrl).then((response) => response, () => false)
+        logVerbose('waitForBrowserWindow()')
+        return this.windowByUrl(exports.browserWindowUrl).then((response) => {
+          logVerbose('waitForBrowserWindow() => ' + JSON.stringify(response))
+          return response
+        }, () => {
+          logVerbose('waitForBrowserWindow() => false')
+          return false
+        })
       })
     })
 
     this.app.client.addCommand('waitForUrl', function (url) {
       return this.waitUntil(function () {
-        return this.tabByUrl(url).then((response) => response, () => false)
+        logVerbose('waitForUrl("' + url + '")')
+        return this.tabByUrl(url).then((response) => {
+          logVerbose('tabByUrl("' + url + '") => ' + JSON.stringify(response))
+          return response
+        }, () => {
+          logVerbose('tabByUrl("' + url + '") => false')
+          return false
+        })
       })
+    })
+
+    this.app.client.addCommand('waitForTabCount', function (tabCount) {
+      logVerbose('waitForTabCount(' + tabCount + ')')
+      return this.waitUntil(function () {
+        return this.getTabCount().then((count) => {
+          return count === tabCount
+        })
+      })
+    })
+
+    this.app.client.addCommand('waitForResourceReady', function (resourceName) {
+      logVerbose('waitForResourceReady(' + resourceName + ')')
+      return this.waitUntil(function () {
+        return this.getAppState().then((val) => {
+          logVerbose('waitForResourceReady("' + resourceName + '") => ' + JSON.stringify(val.value[resourceName]))
+          return val.value[resourceName] && val.value[resourceName].ready
+        })
+      }, 3000)
     })
 
     this.app.client.addCommand('loadUrl', function (url) {
       if (isSourceAboutUrl(url)) {
         url = getTargetAboutUrl(url)
       }
-      return this.url(url).waitForUrl(url)
+      logVerbose('loadUrl("' + url + '")')
+
+      return this.url(url).then((response) => {
+        logVerbose('loadUrl.url() => ' + JSON.stringify(response))
+      }, (error) => {
+        logVerbose('loadUrl.url() => ERROR: ' + JSON.stringify(error))
+      }).waitForUrl(url)
     })
 
     this.app.client.addCommand('getAppState', function () {
@@ -249,6 +304,14 @@ var exports = {
           key
         }), show !== false)
       }, show, key)
+    })
+
+    this.app.client.addCommand('openBraveMenu', function (braveMenu, braveryPanel) {
+      logVerbose('openBraveMenu()')
+      return this.windowByUrl(exports.browserWindowUrl)
+        .waitForVisible(braveMenu)
+        .click(braveMenu)
+        .waitForVisible(braveryPanel)
     })
 
     this.app.client.addCommand('setPinned', function (location, isPinned, options = {}) {
@@ -294,6 +357,18 @@ var exports = {
       return this.execute(function (siteDetail) {
         return require('../../../js/actions/appActions').addSite(siteDetail)
       }, siteDetail).then((response) => response.value)
+    })
+
+    /**
+     * Enables or disables the specified resource.
+     *
+     * @param {string} resourceName - The resource to enable or disable
+     * @param {boolean} enabled - Whether to enable or disable the resource
+     */
+    this.app.client.addCommand('setResourceEnabled', function (resourceName, enabled) {
+      return this.execute(function (resourceName, enabled) {
+        return require('../../../js/actions/appActions').setResourceEnabled(resourceName, enabled)
+      }, resourceName, enabled).then((response) => response.value)
     })
 
     /**
@@ -457,6 +532,16 @@ var exports = {
               return el.value.ELEMENT === activeElement.value.ELEMENT
             })
         })
+    })
+
+    this.app.client.addCommand('waitForDataFile', function (dataFile) {
+      logVerbose('waitForDataFile("' + dataFile + '")')
+      return this.waitUntil(function () {
+        return this.getAppState().then((val) => {
+          logVerbose('waitForDataFile("' + dataFile + '") => ' + JSON.stringify(val.value[dataFile]))
+          return val.value[dataFile] && val.value[dataFile].etag && val.value[dataFile].etag.length > 0
+        })
+      }, 10000)
     })
   },
 

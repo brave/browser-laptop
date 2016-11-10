@@ -22,28 +22,69 @@ const ipc = window.chrome.ipc
 require('../../less/about/bookmarks.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
-class BookmarkFolderItem extends ImmutableComponent {
+class BookmarkFolderItem extends React.Component {
+  constructor () {
+    super()
+    this.state = {
+      isDragOver: false
+    }
+  }
   onDragStart (e) {
     if (this.props.draggable !== false) {
       e.dataTransfer.effectAllowed = 'all'
-      dndData.setupDataTransferURL(e.dataTransfer, this.props.bookmarkFolder.get('location'), this.props.bookmarkFolder.get('customTitle') || this.props.bookmarkFolder.get('title'))
+      dndData.setupDataTransferURL(e.dataTransfer,
+        this.props.bookmarkFolder.get('location'),
+        this.props.bookmarkFolder.get('customTitle') || this.props.bookmarkFolder.get('title'))
       dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.BOOKMARK, this.props.bookmarkFolder)
     }
   }
   onDragOver (e) {
     e.preventDefault()
     e.dataTransfer.dropEffect = 'move'
+    this.setState({
+      isDragOver: true
+    })
   }
-
+  onDragLeave (e) {
+    this.setState({
+      isDragOver: false
+    })
+  }
+  /**
+   * Move a folder, a bookmark, or multiple bookmarks IF move is allowed.
+   * ex: won't allow child folder to become parent of an ancestor, etc.
+   */
+  moveBookmark (e, bookmark) {
+    if (siteUtil.isMoveAllowed(this.props.allBookmarkFolders, bookmark, this.props.bookmarkFolder)) {
+      aboutActions.moveSite(bookmark.toJS(),
+        this.props.bookmarkFolder.toJS(),
+        dndData.shouldPrependVerticalItem(e.target, e.clientY),
+        true)
+    }
+  }
+  clearSelection () {
+    if (this.props.onClearSelection) {
+      this.props.onClearSelection()
+    }
+  }
+  // NOTE: both folders AND bookmarks can be dropped here
   onDrop (e) {
-    const bookmark = dndData.getDragData(e.dataTransfer, dragTypes.BOOKMARK)
+    this.setState({
+      isDragOver: false
+    })
 
-    if (bookmark) {
-      // Don't allow a bookmark folder to be moved into itself
-      if (bookmark.get('folderId') === this.props.bookmarkFolder.get('folderId')) {
+    const bookmarkData = dndData.getDragData(e.dataTransfer, dragTypes.BOOKMARK)
+    if (bookmarkData) {
+      if (Immutable.List.isList(bookmarkData)) {
+        bookmarkData.forEach((bookmark) => {
+          this.moveBookmark(e, bookmark)
+        })
+        this.clearSelection()
         return
       }
-      aboutActions.moveSite(bookmark.toJS(), this.props.bookmarkFolder.toJS(), dndData.shouldPrependVerticalItem(e.target, e.clientY), true)
+
+      this.moveBookmark(e, bookmarkData)
+      this.clearSelection()
     }
   }
   render () {
@@ -54,20 +95,22 @@ class BookmarkFolderItem extends ImmutableComponent {
         onDrop={this.onDrop.bind(this)}
         onDragStart={this.onDragStart.bind(this)}
         onDragOver={this.onDragOver.bind(this)}
+        onDragLeave={this.onDragLeave.bind(this)}
         onContextMenu={aboutActions.contextMenu.bind(this, this.props.bookmarkFolder.toJS(), 'bookmark-folder')}
         onClick={this.props.onChangeSelectedFolder.bind(null, this.props.bookmarkFolder.get('folderId'))}
         draggable={this.props.draggable !== false ? 'true' : 'false'}
         data-folder-id={this.props.bookmarkFolder.get('folderId')}
         className={cx({
           listItem: true,
-          selected: this.props.selected
+          selected: this.props.selected,
+          isDragOver: this.state.isDragOver
         })}>
 
         <span className={cx({
           bookmarkFolderIcon: true,
           fa: true,
-          'fa-folder-o': !this.props.selected,
-          'fa-folder-open-o': this.props.selected
+          'fa-folder-o': !this.props.selected && !this.state.isDragOver,
+          'fa-folder-open-o': this.props.selected || this.state.isDragOver
         })} />
         <span data-l10n-id={this.props.dataL10nId}>
           {this.props.bookmarkFolder.get('customTitle') || this.props.bookmarkFolder.get('title')}
@@ -75,7 +118,9 @@ class BookmarkFolderItem extends ImmutableComponent {
       </div>
       {
         childBookmarkFolders.size > 0
-        ? <BookmarkFolderList onChangeSelectedFolder={this.props.onChangeSelectedFolder}
+        ? <BookmarkFolderList
+          search={this.props.search}
+          onChangeSelectedFolder={this.props.onChangeSelectedFolder}
           bookmarkFolders={childBookmarkFolders}
           selectedFolderId={this.props.selectedFolderId}
           allBookmarkFolders={this.props.allBookmarkFolders} />
@@ -98,7 +143,10 @@ class BookmarkFolderList extends ImmutableComponent {
       }
       {
         this.props.isRoot
-        ? <BookmarkFolderItem selected={!this.props.search && this.props.selectedFolderId === 0}
+        ? <BookmarkFolderItem
+          onClearSelection={this.props.onClearSelection}
+          search={this.props.search}
+          selected={!this.props.search && this.props.selectedFolderId === 0}
           dataL10nId='bookmarksToolbar'
           draggable={false}
           onChangeSelectedFolder={this.props.onChangeSelectedFolder}
@@ -111,15 +159,21 @@ class BookmarkFolderList extends ImmutableComponent {
         this.props.bookmarkFolders.map((bookmarkFolder) =>
           this.props.isRoot && bookmarkFolder.get('parentFolderId') === -1
           ? null
-          : <BookmarkFolderItem bookmarkFolder={bookmarkFolder}
+          : <BookmarkFolderItem
+            onClearSelection={this.props.onClearSelection}
+            bookmarkFolder={bookmarkFolder}
             allBookmarkFolders={this.props.allBookmarkFolders}
+            search={this.props.search}
             selected={!this.props.search && this.props.selectedFolderId === bookmarkFolder.get('folderId')}
             selectedFolderId={this.props.selectedFolderId}
             onChangeSelectedFolder={this.props.onChangeSelectedFolder} />)
       }
       {
         this.props.isRoot
-        ? <BookmarkFolderItem selected={this.props.selectedFolderId === -1}
+        ? <BookmarkFolderItem
+          onClearSelection={this.props.onClearSelection}
+          search={this.props.search}
+          selected={!this.props.search && this.props.selectedFolderId === -1}
           dataL10nId='otherBookmarks'
           draggable={false}
           onChangeSelectedFolder={this.props.onChangeSelectedFolder}
@@ -129,6 +183,26 @@ class BookmarkFolderList extends ImmutableComponent {
         : null
       }
     </list>
+  }
+}
+
+class BookmarkTitleHeader extends ImmutableComponent {
+  constructor () {
+    super()
+    this.addBookmark = this.addBookmark.bind(this)
+  }
+  addBookmark () {
+    const newBookmark = Immutable.fromJS({
+      parentFolderId: this.props.selectedFolderId,
+      tags: [siteTags.BOOKMARK]
+    })
+    aboutActions.showAddBookmark(newBookmark)
+  }
+  render () {
+    return <div className='th-inner'>
+      <span data-l10n-id={this.props.heading} />
+      <span data-l10n-id='addBookmark' className='addBookmark' onClick={this.addBookmark} />
+    </div>
   }
 }
 
@@ -170,30 +244,80 @@ class BookmarksList extends ImmutableComponent {
     if (e && e.preventDefault) {
       e.preventDefault()
     }
-
     aboutActions.newFrame({
       location: entry.location,
       partitionNumber: entry.partitionNumber
     })
   }
+  /**
+   * Called when a bookmark (or bookmarks) begin dragging.
+   * If multiple items are selected, please note this method is
+   * called by the onDragStart handler in sortableTable instead
+   * of being directly bound to the table row being dragged.
+   */
   onDragStart (siteDetail, e) {
+    const isList = Immutable.List.isList(siteDetail)
     e.dataTransfer.effectAllowed = 'all'
     dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.BOOKMARK, siteDetail)
     // TODO: Pass the location here when content scripts are fixed
-    dndData.setupDataTransferURL(e.dataTransfer, '', siteDetail.get('customTitle') || siteDetail.get('title'))
+    dndData.setupDataTransferURL(e.dataTransfer, '', isList
+      ? 'Multi-selection (' + siteDetail.size + ' bookmarks)'
+      : siteDetail.get('customTitle') || siteDetail.get('title'))
   }
+  /**
+   * Bookmark entry is being dragged.
+   */
   onDragOver (siteDetail, e) {
     e.preventDefault()
     e.dataTransfer.dropEffect = 'move'
   }
-  onDrop (siteDetail, e) {
-    const bookmark = dndData.getDragData(e.dataTransfer, dragTypes.BOOKMARK)
-    if (bookmark) {
-      aboutActions.moveSite(bookmark.toJS(), siteDetail.toJS(), dndData.shouldPrependVerticalItem(e.target, e.clientY), false)
+  /**
+   * Move a folder, a bookmark, or multiple bookmarks IF move is allowed.
+   * ex: won't allow child folder to become parent of an ancestor, etc.
+   */
+  moveBookmark (e, bookmark, siteDetail) {
+    let destinationIsParent = false
+
+    // If source is folder, destination needs to be a folder too
+    if (siteUtil.isFolder(bookmark)) {
+      siteDetail = siteDetail.get('parentFolderId')
+        ? this.props.allBookmarkFolders.find((folder) => folder.get('folderId') === siteDetail.get('parentFolderId'))
+        : Immutable.fromJS({folderId: 0, tags: [siteTags.BOOKMARK_FOLDER]})
+      destinationIsParent = true
     }
+
+    if (siteUtil.isMoveAllowed(this.props.allBookmarkFolders, bookmark, siteDetail)) {
+      aboutActions.moveSite(bookmark.toJS(),
+        siteDetail.toJS(),
+        dndData.shouldPrependVerticalItem(e.target, e.clientY),
+        destinationIsParent)
+    }
+  }
+  /**
+   * Bookmark (one or multiple) or BookmarkFolderItem object was dropped
+   * onto `siteDetail` (which is a bookmark inside of sortableTable).
+   */
+  onDrop (siteDetail, e) {
+    const bookmarkData = dndData.getDragData(e.dataTransfer, dragTypes.BOOKMARK)
+    if (bookmarkData) {
+      if (Immutable.List.isList(bookmarkData)) {
+        bookmarkData.forEach((bookmark) => {
+          this.moveBookmark(e, bookmark, siteDetail)
+        })
+        this.clearSelection()
+        return
+      }
+
+      this.moveBookmark(e, bookmarkData, siteDetail)
+      this.clearSelection()
+    }
+  }
+  clearSelection () {
+    this.refs.bookmarkTable.clearSelection()
   }
   render () {
     const props = !this.props.draggable ? {
+      onDragStart: this.onDragStart,
       sortingDisabled: !this.props.sortable
     } : {
       onDoubleClick: this.onDoubleClick,
@@ -202,9 +326,13 @@ class BookmarksList extends ImmutableComponent {
       onDrop: this.onDrop,
       sortingDisabled: !this.props.sortable
     }
-
     return <div>
-      <SortableTable headings={['Title', 'Last Visited']}
+      <SortableTable
+        ref='bookmarkTable'
+        headings={[
+          <BookmarkTitleHeader heading='Title' selectedFolderId={this.props.selectedFolderId} />,
+          'Last Visited'
+        ]}
         defaultHeading='Title'
         rows={this.props.bookmarks.map((entry) => [
           {
@@ -218,11 +346,12 @@ class BookmarksList extends ImmutableComponent {
         ])}
         rowObjects={this.props.bookmarks}
         columnClassNames={['title', 'date']}
-        tableID={this.props.tableID}
         addHoverClass
+        multiSelect
         onDoubleClick={this.onDoubleClick}
         {...props}
         contextMenuName='bookmark'
+        thisArg={this}
         onContextMenu={aboutActions.contextMenu} />
     </div>
   }
@@ -235,6 +364,9 @@ class AboutBookmarks extends React.Component {
     this.onChangeSearch = this.onChangeSearch.bind(this)
     this.onClearSearchText = this.onClearSearchText.bind(this)
     this.importBrowserData = this.importBrowserData.bind(this)
+    this.addBookmarkFolder = this.addBookmarkFolder.bind(this)
+    this.onClick = this.onClick.bind(this)
+    this.clearSelection = this.clearSelection.bind(this)
     this.state = {
       bookmarks: Immutable.List(),
       bookmarkFolders: Immutable.Map(),
@@ -264,6 +396,19 @@ class AboutBookmarks extends React.Component {
       search: ''
     })
   }
+  onClick (e) {
+    // Determine if click was on sortableTable
+    let targetElement = e.target
+    while (targetElement) {
+      if (targetElement.tagName === 'TBODY') {
+        return
+      }
+      targetElement = targetElement.parentNode
+    }
+
+    // Click was not a child element of sortableTable; clear selection
+    this.clearSelection()
+  }
   searchedBookmarks (searchTerm, bookmarks) {
     return bookmarks.filter((bookmark) => {
       const title = bookmark.get('customTitle') + bookmark.get('title') + bookmark.get('location')
@@ -274,7 +419,17 @@ class AboutBookmarks extends React.Component {
     return this.state.bookmarks.filter((bookmark) => (bookmark.get('parentFolderId') || 0) === this.state.selectedFolderId)
   }
   importBrowserData () {
-    aboutActions.importBrowerDataNow()
+    aboutActions.importBrowserDataNow()
+  }
+  addBookmarkFolder () {
+    const newFolder = Immutable.fromJS({
+      parentFolderId: this.state.selectedFolderId,
+      tags: [siteTags.BOOKMARK_FOLDER]
+    })
+    aboutActions.showAddBookmarkFolder(newFolder)
+  }
+  clearSelection () {
+    this.refs.bookmarkList.clearSelection()
   }
   componentDidMount () {
     this.refs.bookmarkSearch.focus()
@@ -295,13 +450,16 @@ class AboutBookmarks extends React.Component {
         </div>
       </div>
 
-      <div className='siteDetailsPageContent'>
+      <div className='siteDetailsPageContent' onClick={this.onClick}>
         <div className='folderView'>
           <div className='columnHeader'>
             <span data-l10n-id='folders' />
             <span data-l10n-id='importBrowserData' className='fa fa-download clearBrowsingDataButton' onClick={this.importBrowserData} />
+            <span data-l10n-id='addBookmarkFolder' className='addBookmarkFolder' onClick={this.addBookmarkFolder} />
           </div>
-          <BookmarkFolderList onChangeSelectedFolder={this.onChangeSelectedFolder}
+          <BookmarkFolderList
+            onClearSelection={this.clearSelection}
+            onChangeSelectedFolder={this.onChangeSelectedFolder}
             bookmarkFolders={this.state.bookmarkFolders.filter((bookmark) => bookmark.get('parentFolderId') === -1)}
             allBookmarkFolders={this.state.bookmarkFolders}
             isRoot
@@ -310,14 +468,16 @@ class AboutBookmarks extends React.Component {
         </div>
         <div className='organizeView'>
           <BookmarksList
+            ref='bookmarkList'
             bookmarks={
               this.state.search
               ? this.searchedBookmarks(this.state.search, this.state.bookmarks)
               : this.bookmarksInFolder
             }
+            allBookmarkFolders={this.state.bookmarkFolders}
             sortable={false}
             draggable={!this.state.search}
-            tableID={this.selectedFolderId} />
+            selectedFolderId={this.state.selectedFolderId} />
         </div>
       </div>
     </div>

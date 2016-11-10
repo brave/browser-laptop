@@ -1,6 +1,8 @@
 const browserActions = require('./browser/extensions/browserActions')
+const contextMenus = require('./browser/extensions/contextMenus')
 const extensionActions = require('./common/actions/extensionActions')
 const config = require('../js/constants/config')
+const appConfig = require('../js/constants/appConfig')
 const {fileUrl} = require('../js/lib/appUrlUtil')
 const {getAppUrl, getExtensionsPath, getIndexHTML} = require('../js/lib/appUrlUtil')
 const {getSetting} = require('../js/settings')
@@ -9,6 +11,7 @@ const extensionStates = require('../js/constants/extensionStates')
 const {passwordManagers, extensionIds} = require('../js/constants/passwordManagers')
 const appStore = require('../js/stores/appStore')
 const extensionState = require('./common/state/extensionState')
+const appActions = require('../js/actions/appActions')
 const fs = require('fs')
 const path = require('path')
 
@@ -109,8 +112,9 @@ let generateBraveManifest = () => {
       ]
     },
     web_accessible_resources: [
-      'about-*.html',
-      'img/favicon.ico'
+      'img/favicon.ico',
+      'about-flash.html',
+      'about-blank.html'
     ],
     incognito: 'spanning',
     key: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAupOLMy5Fd4dCSOtjcApsAQOnuBdTs+OvBVt/3P93noIrf068x0xXkvxbn+fpigcqfNamiJ5CjGyfx9zAIs7zcHwbxjOw0Uih4SllfgtK+svNTeE0r5atMWE0xR489BvsqNuPSxYJUmW28JqhaSZ4SabYrRx114KcU6ko7hkjyPkjQa3P+chStJjIKYgu5tWBiMJp5QVLelKoM+xkY6S7efvJ8AfajxCViLGyDQPDviGr2D0VvIBob0D1ZmAoTvYOWafcNCaqaejPDybFtuLFX3pZBqfyOCyyzGhucyCmfBXJALKbhjRAqN5glNsUmGhhPK87TuGATQfVuZtenMvXMQIDAQAB'
@@ -174,8 +178,14 @@ const extensionInfo = {
   installInfo: {}
 }
 
+const isExtension = (componentId) =>
+  componentId !== config.widevineComponentId
+const isWidevine = (componentId) =>
+  componentId === config.widevineComponentId
+
 module.exports.init = () => {
   browserActions.init()
+  contextMenus.init()
 
   const {componentUpdater, session} = require('electron')
   componentUpdater.on('component-checking-for-updates', () => {
@@ -190,11 +200,15 @@ module.exports.init = () => {
   componentUpdater.on('component-update-updated', (e, extensionId, version) => {
     // console.log('update-updated', extensionId, version)
   })
-  componentUpdater.on('component-ready', (e, extensionId, extensionPath) => {
-    // console.log('component-ready', extensionId, extensionPath)
+  componentUpdater.on('component-ready', (e, componentId, extensionPath) => {
+    // console.log('component-ready', componentId, extensionPath)
     // Re-setup the loadedExtensions info if it exists
-    extensionInfo.setState(extensionId, extensionStates.REGISTERED)
-    loadExtension(extensionId, extensionPath)
+    extensionInfo.setState(componentId, extensionStates.REGISTERED)
+    if (isExtension(componentId)) {
+      loadExtension(componentId, extensionPath)
+    } else if (isWidevine(componentId)) {
+      appActions.resourceReady(appConfig.resourceNames.WIDEVINE)
+    }
   })
   componentUpdater.on('component-not-updated', () => {
     // console.log('update-not-updated')
@@ -261,7 +275,7 @@ module.exports.init = () => {
     session.defaultSession.extensions.disable(extensionId)
   }
 
-  let registerExtension = (extensionId) => {
+  let registerComponent = (extensionId) => {
     if (!extensionInfo.isRegistered(extensionId) && !extensionInfo.isRegistering(extensionId)) {
       extensionInfo.setState(extensionId, extensionStates.REGISTERING)
       componentUpdater.registerComponent(extensionId)
@@ -279,33 +293,43 @@ module.exports.init = () => {
   extensionInfo.setState(config.braveExtensionId, extensionStates.REGISTERED)
   loadExtension(config.braveExtensionId, getExtensionsPath('brave'), generateBraveManifest(), 'component')
 
-  let registerExtensions = () => {
+  let registerComponents = () => {
     if (getSetting(settings.PDFJS_ENABLED)) {
-      registerExtension(config.PDFJSExtensionId)
+      registerComponent(config.PDFJSExtensionId)
     } else {
       disableExtension(config.PDFJSExtensionId)
     }
 
     const activePasswordManager = getSetting(settings.ACTIVE_PASSWORD_MANAGER)
     if (activePasswordManager === passwordManagers.ONE_PASSWORD) {
-      registerExtension(extensionIds[passwordManagers.ONE_PASSWORD])
+      registerComponent(extensionIds[passwordManagers.ONE_PASSWORD])
     } else {
       disableExtension(extensionIds[passwordManagers.ONE_PASSWORD])
     }
 
     if (activePasswordManager === passwordManagers.DASHLANE) {
-      registerExtension(extensionIds[passwordManagers.DASHLANE])
+      registerComponent(extensionIds[passwordManagers.DASHLANE])
     } else {
       disableExtension(extensionIds[passwordManagers.DASHLANE])
     }
 
     if (activePasswordManager === passwordManagers.LAST_PASS) {
-      registerExtension(extensionIds[passwordManagers.LAST_PASS])
+      registerComponent(extensionIds[passwordManagers.LAST_PASS])
     } else {
       disableExtension(extensionIds[passwordManagers.LAST_PASS])
     }
+
+    if (getSetting(settings.POCKET_ENABLED)) {
+      registerComponent(config.PocketExtensionId)
+    } else {
+      disableExtension(config.PocketExtensionId)
+    }
+
+    if (appStore.getState().getIn(['widevine', 'enabled'])) {
+      registerComponent(config.widevineComponentId)
+    }
   }
 
-  registerExtensions()
-  appStore.addChangeListener(registerExtensions)
+  registerComponents()
+  appStore.addChangeListener(registerComponents)
 }

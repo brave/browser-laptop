@@ -210,7 +210,7 @@ const aboutActions = {
     ipc.sendToHost(messages.CLEAR_BROWSING_DATA_NOW, clearBrowsingDataDetail)
   },
 
-  importBrowerDataNow: function () {
+  importBrowserDataNow: function () {
     ipc.send(messages.IMPORT_BROWSER_DATA_NOW)
   },
 
@@ -322,6 +322,61 @@ const aboutActions = {
       actionType: appConstants.APP_RENDER_URL_TO_PDF,
       url: url,
       savePath: savePath
+    })
+  },
+
+  /**
+   * Show the "Add Bookmark" control
+   * @param {Object} siteDetail - object bound to add/edit control
+   */
+  showAddBookmark: function (siteDetail) {
+    aboutActions.dispatchAction({
+      actionType: windowConstants.WINDOW_SET_BOOKMARK_DETAIL,
+      currentDetail: siteDetail,
+      originalDetail: null,
+      destinationDetail: null,
+      shouldShowLocation: true
+    })
+  },
+
+  /**
+   * Show the "Add Bookmark" control for a folder
+   * @param {Object} siteDetail - object bound to add/edit control
+   */
+  showAddBookmarkFolder: function (siteDetail) {
+    aboutActions.dispatchAction({
+      actionType: windowConstants.WINDOW_SET_BOOKMARK_DETAIL,
+      currentDetail: siteDetail
+    })
+  },
+
+  /**
+   * Dispatches a message to set add/edit bookmark details
+   * If set, also indicates that add/edit is shown
+   * @param {Object} currentDetail - Properties of the bookmark to change to
+   * @param {Object} originalDetail - Properties of the bookmark to edit
+   * @param {Object} destinationDetail - Will move the added bookmark to the specified position
+   * @param {boolean} shouldShowLocation - Whether or not to show the URL input
+   * @param {boolean} isBookmarkHanger - true if triggered from star icon in nav bar
+   */
+  setBookmarkDetail: function (currentDetail, originalDetail, destinationDetail, shouldShowLocation, isBookmarkHanger) {
+    aboutActions.dispatchAction({
+      actionType: windowConstants.WINDOW_SET_BOOKMARK_DETAIL,
+      currentDetail,
+      originalDetail,
+      destinationDetail,
+      shouldShowLocation,
+      isBookmarkHanger
+    })
+  },
+
+  /**
+   * Dispatch a message to set default browser
+   */
+  setAsDefaultBrowser: function () {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_DEFAULT_BROWSER_UPDATED,
+      useBrave: true
     })
   }
 }

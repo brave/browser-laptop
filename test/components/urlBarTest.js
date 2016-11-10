@@ -1,7 +1,7 @@
 /* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
-const {urlInput} = require('../lib/selectors')
+const {urlInput, urlBarSuggestions} = require('../lib/selectors')
 
 describe('urlBar', function () {
   function * setup (client) {
@@ -85,6 +85,19 @@ describe('urlBar', function () {
         .waitUntil(function () {
           return this.getValue(urlInput)
             .then((val) => val === 'aboutx')
+        })
+    })
+
+    it('does not show suggestions on focus', function * () {
+      yield this.app.client
+        .keys('brave')
+        .waitUntil(function () {
+          return this.isExisting(urlBarSuggestions).then((exists) => exists === true)
+        })
+        .ipcSend('shortcut-focus-url')
+        .waitForElementFocus(urlInput)
+        .waitUntil(function () {
+          return this.isExisting(urlBarSuggestions).then((exists) => exists === false)
         })
     })
   })

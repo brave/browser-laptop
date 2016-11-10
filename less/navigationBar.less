@@ -6,17 +6,8 @@
  * Navigation layers
  */
 
+@import "animations.less";
 @import "variables.less";
-
-// Fade In animation for URL bar transitions
-@keyframes fadeIn {
-  from {
-    opacity: 0
-  }
-  to {
-    opacity: 1
-  }
-}
 
 // All platforms - media queries
 @media (max-width: @breakpointNarrowViewport) {
@@ -36,7 +27,7 @@
 
 // Windows specific styles
 .platform--win32 {
-  div#window.frameless {
+  div#window.frameless:not(.isFullScreen):not(.isMaximized) {
     border: 1px solid #000;
     box-sizing: border-box;
   }
@@ -45,7 +36,35 @@
     padding-left: 5px;
   }
 
+  .startButtons {
+    position: relative;
+    top: -1px;
+  }
+
+  #navigator {
+    .homeButton {
+      margin: 0 3px 4px 3px;
+    }
+
+    .stopButton {
+      margin: 0 3px 6px 3px;
+    }
+
+    .reloadButton {
+      margin: 0 3px 3px 3px;
+    }
+  }
+
   #urlInput { width: 100%; }
+
+  #navigator {
+    &:not(.titleMode) {
+      .bookmarkButtonContainer {
+        margin-top: 4px;
+        line-height: 24px;
+      }
+    }
+  }
 
   // changes to ensure window can be as small as 480px wide
   // and still be useable and have the caption buttons intact
@@ -213,21 +232,43 @@
         }
       }
     }
+    .verticallyCenter {
+      justify-content: center;
+    }
   }
 
   // Windows 10 specific styles
   &.win10 {
+    &.inactive div#window.frameless:not(.isFullScreen):not(.isMaximized) {
+      border: 1px solid #aaaaaa;
+    }
+    div#window.frameless:not(.isFullScreen):not(.isMaximized) {
+      border: 1px solid #2283d3;
+    }
     .windowCaptionButtons {
+      &.verticallyCenter {
+        > .container {
+          height: 100%;
+        }
+      }
+      &:not(.verticallyCenter) {
+        > .container {
+          button.captionButton {
+            height: 29px;
+            &.fullscreen {
+              height: 21px;
+            }
+          }
+        }
+      }
+
       > .container {
         button.captionButton {
           width: 45px;
-          height: 29px;
           border: 0;
           background-color: transparent;
 
-          &.fullscreen {
-            height:21px;
-          }
+          &.fullscreen { }
 
           &.minimize {
             &:hover {
@@ -325,13 +366,16 @@
         }
       }
     }
+    .verticallyCenter {
+      justify-content: center;
+    }
   }
 }
 
 // Styles had to be reworked to properly position the new caption buttons for Windows
 .navbarCaptionButtonContainer {
   display: flex;
-  border-bottom: 1px solid #aaaaaa;
+  border-bottom: 1px solid #bbb;
 
   &.allowDragging {
     -webkit-app-region: drag;
@@ -389,7 +433,9 @@
     display: flex;
     cursor: default;
     -webkit-user-select: none;
-    flex-grow: 0;
+    flex-grow: 1;
+    margin-top: 2px;
+    height: 19px;
 
     .menubarItem {
       color: black;
@@ -410,6 +456,10 @@
       border: 1px solid #99d1ff !important;
     }
   }
+
+  .windowCaptionButtons {
+    flex-grow: 0;
+  }
 }
 
 // Here I grouped the rules to keep the layout of the top bar consistent.
@@ -428,19 +478,18 @@
   .backforward {
     display: flex;
 
-    .back,
-    .forward {
+    .backButton,
+    .forwardButton {
       width: @navbarButtonWidth;
     }
 
-    .back {
+    .backButton {
       padding-right: @navbarButtonSpacing;
     }
 
-    .forward {
+    .forwardButton {
       padding-left: @navbarButtonSpacing;
     }
-
   }
 
   // Navigation bar at the center
@@ -474,6 +523,7 @@
   .topLevelEndButtons {
     display: flex;
     flex-direction: row;
+    margin-left: 3px;
 
     .extensionButton {
       -webkit-app-region: no-drag;
@@ -497,6 +547,9 @@
         -webkit-filter: grayscale(100%);
         opacity: 0.4;
       }
+      &.leftOfCaptionButton {
+        margin-right: 1px;
+      }
     }
 
     .extraDragArea {
@@ -507,6 +560,83 @@
   }
 }
 
+.navigationButton {
+  background-color: @buttonColor;
+  display: inline-block;
+  width: 12px;
+  height: 14px;
+  margin: 0 6px;
+}
+
+.navigationButtonContainer {
+  border-radius: @borderRadius;
+  height: 28px;
+  margin: 0 3px;
+
+  &:last-child {
+    margin-right: 8px;
+  }
+
+  &:not(.disabled):hover {
+    background: white;
+    box-shadow: 1px 1px 1px #EEE;
+  }
+}
+
+.backButton,
+.forwardButton {
+  height: 16px;
+  margin: 6px 0 0 0;
+}
+
+.backButton {
+  background: url('../img/toolbar/back_btn.svg') center no-repeat;
+}
+
+.forwardButton {
+  background: url('../img/toolbar/forward_btn.svg') center no-repeat;
+}
+
+#navigator {
+  .stopButton {
+    background: url('../img/toolbar/stoploading_btn.svg') center no-repeat;
+    margin: 0 3px 3px 3px;
+    padding: 0 6px;
+    height: 9px;
+    position: relative;
+    top: 3px;
+  }
+
+  .reloadButton {
+    background: url('../img/toolbar/reload_btn.svg') center no-repeat;
+    margin: 0 3px 1px 3px;
+    padding: 0 6px;
+    position: relative;
+    top: 3px;
+  }
+
+  .homeButton {
+    background: url('../img/toolbar/home_btn.svg') center no-repeat;
+    width: 14px;
+    height: 13px;
+    margin: 0 3px 2px 3px;
+    padding: 0 6px;
+    position: relative;
+    top: 3px;
+  }
+
+  .bookmarkButton {
+    background: url('../img/toolbar/bookmark_btn.svg') center no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    width: 14px;
+    height: 14px;
+    margin-bottom: 2px;
+
+    &.removeBookmarkButton {
+      background: url('../img/toolbar/bookmark_marked.svg') center no-repeat;
+    }
+  }
+}
 
 .navigatorWrapper {
   justify-content: space-between;
@@ -523,28 +653,17 @@
     transition: margin @transitionDuration ease-in-out;
 
     span {
-      -webkit-app-region: no-drag;
       -webkit-user-select: none;
       color: @buttonColor;
+      cursor: default;
       border-radius: 4px;
       font-weight: 300;
       opacity: 0.2;
 
       &:not([disabled]) {
         opacity: 0.85;
+        -webkit-app-region: no-drag;
       }
-
-      &:not([disabled]):hover {
-        color: @buttonColor;
-        opacity: 1.0;
-        background-color: white;
-      }
-    }
-
-    .back,
-    .forward {
-      font-size: 28px;
-      text-align: center;
     }
   }
 }
@@ -584,6 +703,8 @@
   #navigator:not(.titleMode) & {
     background: white;
     border-radius: @borderRadiusURL;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
     box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1), inset 0 1px 0 rgba(0,0,0,0.05), inset 0 1px 1px rgba(0,0,0,0.1);
     color: @chromeText;
   }
@@ -611,10 +732,23 @@
   }
 
   &:not(.titleMode) {
-    .urlbarForm, .browserButton {
+    .urlbarForm, .browserButton, .bookmarkButtonContainer {
       animation: fadeIn .6s;
       opacity: 0;
       animation-fill-mode: forwards;
+    }
+
+    .bookmarkButtonContainer {
+      border: 1px solid #CBCBCB;
+      border-radius: @borderRadius;
+      border-right: none;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      box-sizing: border-box;
+      height: 25px;
+      line-height: 25px;
+      margin-right: -2px;
+      display: inline-block;
     }
   }
 
@@ -679,7 +813,7 @@
     font-size: 12px;
     right: 10px;
     text-align: right;
-    margin: 4px 0 0 0;
+    margin: 2px 0 0 0;
     top: 9px;
     cursor: default;
     padding-top: 1px;
@@ -706,7 +840,7 @@
     &.endButtons {
       margin-right: 20px;
       @media (max-width: @breakpointNarrowViewport) {
-        margin-right: -5px;
+        margin-right: 0px;
       }
     }
   }
@@ -745,13 +879,8 @@
     }
   }
 
-  span.navbutton.removeBookmarkButton {
-    color: @braveOrange;
-    opacity: 1;
-  }
-
   .urlbarIcon {
-    color: @focusUrlbarOutline;
+    color: @siteSecureColor;
     left: 14px;
     margin-top: 1px;
     font-size: 13px;
@@ -759,19 +888,19 @@
     min-width: 16px;
 
     &.fa-lock,
-    &.fa-unlock {
-      margin-top: 4px;
+    &.fa-exclamation-triangle {
+      margin-top: 1px;
       font-size: 16px;
       min-height: 10px;
       min-width: 16px;
     }
 
-    &.fa-unlock {
-        color: @gray;
+    &.fa-exclamation-triangle {
+        color: @siteInsecureColor;
     }
 
     &.extendedValidation {
-      color: green;
+      color: @siteEVColor;
     }
   }
 }

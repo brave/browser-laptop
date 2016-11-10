@@ -3,9 +3,11 @@
 
 'use strict'
 const Immutable = require('immutable')
+const normalizeUrl = require('normalize-url')
 const siteTags = require('../constants/siteTags')
 const settings = require('../constants/settings')
 const getSetting = require('../settings').getSetting
+const UrlUtil = require('../lib/urlutil')
 const urlParse = require('url').parse
 
 const isBookmark = (tags) => {
@@ -93,8 +95,15 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId) => {
     ? newSiteDetail.get('customTitle')
     : (newSiteDetail.get('customTitle') || oldSiteDetail && oldSiteDetail.get('customTitle'))
 
+  let lastAccessedTime
+  if (isBookmark(tag) || isBookmarkFolder(tag)) {
+    lastAccessedTime = newSiteDetail.get('lastAccessedTime') || 0
+  } else {
+    lastAccessedTime = newSiteDetail.get('lastAccessedTime') || new Date().getTime()
+  }
+
   let site = Immutable.fromJS({
-    lastAccessedTime: newSiteDetail.get('lastAccessedTime') || new Date().getTime(),
+    lastAccessedTime: lastAccessedTime,
     tags,
     title: newSiteDetail.get('title')
   })
@@ -123,6 +132,10 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId) => {
   }
   if (newSiteDetail.get('themeColor') || oldSiteDetail && oldSiteDetail.get('themeColor')) {
     site = site.set('themeColor', newSiteDetail.get('themeColor') || oldSiteDetail.get('themeColor'))
+  }
+  if (site.get('tags').size === 0) {
+    // Increment the visit count for history items
+    site = site.set('count', ((oldSiteDetail || site).get('count') || 0) + 1)
   }
 
   return site
@@ -216,14 +229,41 @@ module.exports.removeSite = function (sites, siteDetail, tag) {
     .setIn([index, 'tags'], tags.toSet().remove(tag).toList())
 }
 
-function fillParentFolders (parentFolderIds, bookmarkFolder, allBookmarks) {
+/**
+ * Called by isMoveAllowed
+ * Trace a folder's ancestory, collecting all parent folderIds until reaching Bookmarks Toolbar (folderId=0)
+ */
+const getAncestorFolderIds = (parentFolderIds, bookmarkFolder, allBookmarks) => {
   if (bookmarkFolder.get('parentFolderId')) {
     parentFolderIds.push(bookmarkFolder.get('parentFolderId'))
     const nextItem = allBookmarks.find((item) => item.get('folderId') === bookmarkFolder.get('parentFolderId'))
     if (nextItem) {
-      fillParentFolders(parentFolderIds, nextItem, allBookmarks)
+      getAncestorFolderIds(parentFolderIds, nextItem, allBookmarks)
     }
   }
+}
+
+/**
+ * Determine if a proposed move is valid
+ *
+ * @param sites The application state's Immutable sites list
+ * @param siteDetail The site detail to move
+ * @param destinationDetail The site detail to move to
+ */
+module.exports.isMoveAllowed = (sites, sourceDetail, destinationDetail) => {
+  if (typeof destinationDetail.get('parentFolderId') === 'number' && typeof sourceDetail.get('folderId') === 'number') {
+    // Folder can't be its own parent
+    if (sourceDetail.get('folderId') === destinationDetail.get('folderId')) {
+      return false
+    }
+    // Ancestor folder can't be moved into a descendant
+    let ancestorFolderIds = []
+    getAncestorFolderIds(ancestorFolderIds, destinationDetail, sites)
+    if (ancestorFolderIds.includes(sourceDetail.get('folderId'))) {
+      return false
+    }
+  }
+  return true
 }
 
 /**
@@ -238,21 +278,14 @@ function fillParentFolders (parentFolderIds, bookmarkFolder, allBookmarks) {
  * @return The new sites Immutable object
  */
 module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prepend, destinationIsParent, disallowReparent) {
-  // Disallow loops
-  let parentFolderIds = []
-  if (typeof destinationDetail.get('parentFolderId') === 'number' &&
-      typeof sourceDetail.get('folderId') === 'number') {
-    fillParentFolders(parentFolderIds, destinationDetail, sites)
-    if (sourceDetail.get('folderId') === destinationDetail.get('folderId') ||
-        parentFolderIds.includes(sourceDetail.get('folderId'))) {
-      return sites
-    }
+  if (!module.exports.isMoveAllowed(sites, sourceDetail, destinationDetail)) {
+    return sites
   }
 
   const sourceSiteIndex = module.exports.getSiteIndex(sites, sourceDetail, sourceDetail.get('tags'))
   let destinationSiteIndex
   if (destinationIsParent) {
-    // When the destinatiaon is the parent we want to put it at the end
+    // When the destination is the parent we want to put it at the end
     destinationSiteIndex = sites.size - 1
     prepend = false
   } else {
@@ -293,6 +326,46 @@ module.exports.getDetailFromFrame = function (frame, tag) {
     favicon: frame.get('icon'),
     themeColor: frame.get('themeColor') || frame.get('computedThemeColor')
   })
+}
+
+/**
+ * Update the favicon URL for all entries in the sites list
+ * which match a given location. Currently, there should only be
+ * one match, but this will handle multiple.
+ *
+ * @param sites The application state's Immutable sites list
+ * @param location URL for the entry needing an update
+ * @param favicon favicon URL
+ */
+module.exports.updateSiteFavicon = function (sites, location, favicon) {
+  if (UrlUtil.isNotURL(location)) {
+    return sites
+  }
+
+  const matchingIndices = []
+
+  sites.filter((site, index) => {
+    if (isBookmarkFolder(site.get('tags'))) {
+      return false
+    }
+    if (UrlUtil.isNotURL(site.get('location'))) {
+      return false
+    }
+    if (normalizeUrl(site.get('location')) === normalizeUrl(location)) {
+      matchingIndices.push(index)
+      return true
+    }
+    return false
+  })
+
+  if (!matchingIndices.length) return sites
+
+  let updatedSites = sites
+  matchingIndices.forEach((index) => {
+    updatedSites = updatedSites.setIn([index, 'favicon'], favicon)
+  })
+
+  return updatedSites
 }
 
 /**

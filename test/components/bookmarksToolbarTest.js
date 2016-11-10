@@ -1,7 +1,7 @@
 /* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
-const { urlInput, bookmarksToolbar, navigator, navigatorNotBookmarked, saveButton } = require('../lib/selectors')
+const { urlInput, bookmarksToolbar, navigator, navigatorNotBookmarked, doneButton } = require('../lib/selectors')
 const settings = require('../../js/constants/settings')
 const siteTags = require('../../js/constants/siteTags')
 const assert = require('assert')
@@ -106,9 +106,9 @@ describe('bookmarksToolbar', function () {
         .moveToObject(navigator)
         .waitForVisible(navigatorNotBookmarked)
         .click(navigatorNotBookmarked)
-        .waitForVisible(saveButton)
+        .waitForVisible(doneButton)
         .selectByValue('#bookmarkParentFolder select', folderId2)
-        .click(saveButton)
+        .click(doneButton)
         .click('.bookmarkToolbarButton[title=demo1]')
         .moveToObject('.bookmarkToolbarButton[title=demo2]')
         .getText('.contextMenuItemText').then((val) => {
@@ -140,9 +140,9 @@ describe('bookmarksToolbar', function () {
         .moveToObject(navigator)
         .waitForVisible(navigatorNotBookmarked)
         .click(navigatorNotBookmarked)
-        .waitForVisible(saveButton)
+        .waitForVisible(doneButton)
         .setValue('#bookmarkName input', 'test1')
-        .click(saveButton)
+        .click(doneButton)
         .waitForVisible('.bookmarkToolbarButton[title^=test1]')
         .click('.bookmarkToolbarButton[title=demo1]')
         .waitForVisible('.contextMenuItemText[data-l10n-id=emptyFolderItem]', 1000)

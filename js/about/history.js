@@ -14,6 +14,8 @@ const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
 const Button = require('../components/button')
 const siteUtil = require('../state/siteUtil')
+const {makeImmutable} = require('../../app/common/state/immutableUtil')
+const historyUtil = require('../../app/common/lib/historyUtil')
 
 const ipc = window.chrome.ipc
 
@@ -21,6 +23,9 @@ const ipc = window.chrome.ipc
 require('../../less/about/history.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
+// TODO(bsclifton): this button is currently hidden (along with column icon)
+// When ready, this can be shown again (by updating style in history.less)
+// When that happens, be sure to also show the ::before (which has trash can icon)
 class DeleteHistoryEntryButton extends ImmutableComponent {
   constructor () {
     super()
@@ -31,7 +36,7 @@ class DeleteHistoryEntryButton extends ImmutableComponent {
     if (e && e.preventDefault) {
       e.preventDefault()
     }
-    // BSCTODO: ...
+    // TODO(bsclifton): delete the selected entry
   }
 
   render () {
@@ -54,9 +59,10 @@ class HistoryTimeCell extends ImmutableComponent {
 
 class HistoryDay extends ImmutableComponent {
   navigate (entry) {
+    entry = makeImmutable(entry)
     aboutActions.newFrame({
-      location: entry.location,
-      partitionNumber: entry.partitionNumber
+      location: entry.get('location'),
+      partitionNumber: entry.get('partitionNumber')
     })
   }
   render () {
@@ -76,11 +82,12 @@ class HistoryDay extends ImmutableComponent {
           urlutils.getHostname(entry.get('location'), true)
         ])}
         rowObjects={this.props.entries}
-        totalRowObjects={this.props.totalEntries}
+        totalRowObjects={this.props.totalEntries.toJS()}
         tableID={this.props.tableID}
         columnClassNames={['time', 'title', 'domain']}
         addHoverClass
         multiSelect
+        stateOwner={this.props.stateOwner}
         onDoubleClick={this.navigate}
         contextMenuName='history'
         onContextMenu={aboutActions.contextMenu} />
@@ -89,52 +96,22 @@ class HistoryDay extends ImmutableComponent {
 }
 
 class GroupedHistoryList extends ImmutableComponent {
-  getDayString (locale, item) {
-    const lastAccessedTime = item.get('lastAccessedTime')
-    return lastAccessedTime
-      ? new Date(lastAccessedTime).toLocaleDateString(locale, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
-      : ''
-  }
-  groupEntriesByDay (locale) {
-    const reduced = this.props.history.reduce((previousValue, currentValue, currentIndex, array) => {
-      const result = currentIndex === 1 ? [] : previousValue
-      if (currentIndex === 1) {
-        const firstDate = this.getDayString(locale, currentValue)
-        result.push({date: firstDate, entries: [previousValue]})
-      }
-      const date = this.getDayString(locale, currentValue)
-      const dateIndex = result.findIndex((entryByDate) => entryByDate.date === date)
-      if (dateIndex !== -1) {
-        result[dateIndex].entries.push(currentValue)
-      } else {
-        result.push({date: date, entries: [currentValue]})
-      }
-      return result
-    })
-    if (reduced) {
-      return Array.isArray(reduced)
-        ? reduced
-        : [{date: this.getDayString(locale, reduced), entries: [reduced]}]
-    }
-    return []
-  }
-  totalEntries (entriesByDay) {
-    const result = []
-    entriesByDay.forEach((entry) => {
-      result.push(entry.entries)
-    })
-    return result
-  }
   render () {
     const defaultLanguage = this.props.languageCodes.find((lang) => lang.includes(navigator.language)) || 'en-US'
-    const userLanguage = getSetting(settings.LANGUAGE, this.props.settings)
-    const entriesByDay = this.groupEntriesByDay(userLanguage || defaultLanguage)
+    const userLanguage = getSetting(settings.LANGUAGE, this.props.settings) || defaultLanguage
+    const entriesByDay = historyUtil.groupEntriesByDay(this.props.history, userLanguage)
+    const totalEntries = historyUtil.totalEntries(entriesByDay)
     let index = 0
     return <list className='historyList'>
       {
         entriesByDay.map((groupedEntry) =>
-          <HistoryDay date={groupedEntry.date} entries={groupedEntry.entries}
-            totalEntries={this.totalEntries(entriesByDay)} tableID={index++} />)
+          <HistoryDay
+            date={groupedEntry.get('date')}
+            entries={groupedEntry.get('entries')}
+            totalEntries={totalEntries}
+            tableID={index++}
+            stateOwner={this.props.stateOwner}
+          />)
       }
     </list>
   }
@@ -150,7 +127,8 @@ class AboutHistory extends React.Component {
       history: Immutable.List(),
       search: '',
       settings: Immutable.Map(),
-      languageCodes: Immutable.Map()
+      languageCodes: Immutable.Map(),
+      selection: Immutable.Set()
     }
     ipc.on(messages.HISTORY_UPDATED, (e, detail) => {
       this.setState({ history: Immutable.fromJS(detail && detail.history || {}) })
@@ -180,11 +158,8 @@ class AboutHistory extends React.Component {
   }
   get historyDescendingOrder () {
     return this.state.history.filter((site) => siteUtil.isHistoryEntry(site))
-      .sort((left, right) => {
-        if (left.get('lastAccessedTime') < right.get('lastAccessedTime')) return 1
-        if (left.get('lastAccessedTime') > right.get('lastAccessedTime')) return -1
-        return 0
-      }).slice(-500)
+      .sort(historyUtil.sortTimeDescending)
+      .slice(-500)
   }
   clearBrowsingDataNow () {
     aboutActions.clearBrowsingDataNow({browserHistory: true})
@@ -217,7 +192,8 @@ class AboutHistory extends React.Component {
             this.state.search
             ? this.searchedSiteDetails(this.state.search, this.historyDescendingOrder)
             : this.historyDescendingOrder
-          } />
+          }
+          stateOwner={this} />
       </div>
     </div>
   }

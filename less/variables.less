@@ -18,7 +18,7 @@
 @chromeTertiary: #c7c7c7;
 @chromeText: #555555;
 
-@tabsBackground: #dcdcdc;
+@tabsBackground: #dddddd;
 @navigationBarBackground: @chromeSecondary;
 @navigationBarBackground: white;
 @chromeBorderColor: @chromePrimary;
@@ -38,6 +38,9 @@
 @contextMenuFontSize: 14px;
 @audioColor: @highlightBlue;
 @focusUrlbarOutline: @highlightBlue;
+@siteSecureColor: @highlightBlue;
+@siteInsecureColor: #FCBA00;
+@siteEVColor: green;
 @loadTimeColor: @highlightBlue;
 @activeTabDefaultColor: @chromePrimary;
 @buttonColor: #5a5a5a;
@@ -51,6 +54,7 @@
 @switchBG_off: #d3d3d3;
 @switchBG_off_lrg: #adadad;
 @switchBG_dis: #e8e8e8;
+@switchBGTransition: background-color 100ms;
 @switchHeight: 16px;
 @switchWidth: 45px;
 @switchRadius: 10px;
@@ -61,10 +65,12 @@
 @switchNubRightMargin: 2px;
 @switchNubColor: white;
 @switchNubShadow: 1px 1px 5px -2px black;
+@switchNubTransition: right 100ms;
 
 @navbarHeight: 36px;
-@tabsToolbarHeight: 23px;
-@tabPagesHeight: 12px;
+@downloadsBarHeight: 50px;
+@tabsToolbarHeight: 26px;
+@tabPagesHeight: 9px;
 @bookmarksToolbarHeight: 24px;
 @bookmarksToolbarWithFaviconsHeight: 28px;
 @bookmarksFileIconSize: 13px;
@@ -142,6 +148,20 @@
 @transitionFastEase: all 100ms ease;
 @transitionSlowEase: all 1s ease;
 
+// Colors used for stats on:
+// - Bravery panel
+// - about:newtab
+@statsYellow: #ffc000;
+@statsOrange: #f39030;
+@statsRed: #fe521d;
+@statsBlue: #0796fa;
+@statsGray: @chromeText;
+
+@defaultIconBackground: #F7F7F7;
+
+// Variables can be exposed to (and read from) our JavaScript code
+// (for more info, search MDN for CSSStyleDeclaration)
 :root {
   --navbar-height: @navbarHeight;
+  --downloads-bar-height: @downloadsBarHeight;
 }

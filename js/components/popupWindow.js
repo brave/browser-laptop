@@ -22,7 +22,7 @@ class PopupWindow extends ImmutableComponent {
   }
 
   onKeyDown (e) {
-    if (e.keyCode === KeyCodes.ESC || e.keyCode === KeyCodes.TAB) {
+    if (e.keyCode === KeyCodes.ESC) {
       windowActions.setPopupWindowDetail()
     }
   }

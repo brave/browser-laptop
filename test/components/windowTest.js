@@ -750,6 +750,38 @@ describe('application window', function () {
     })
   })
 
+  describe('open and close windows with scripts', function () {
+    Brave.beforeAll(this)
+
+    before(function * () {
+      this.page1 = Brave.server.url('close.html')
+
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForUrl(Brave.newTabUrl)
+        .url(this.page1)
+        .waitForExist('a')
+        .click('a')
+        .waitForExist('button')
+        .click('button')
+    })
+
+    it('keeps the first window and opens a new window', function * () {
+      yield this.app.client
+        .getWindowCount().should.become(2)
+    })
+
+    it('can close the child window', function * () {
+      yield this.app.client
+        .windowByIndex(1)
+        .url(this.page1)
+        .waitForExist('a')
+        .click('a')
+      yield this.app.client
+        .getWindowCount().should.become(1)
+    })
+  })
+
   describe('window.open of "modal" window', function () {
     it('has a min width of 100 and min height of 100')
   })

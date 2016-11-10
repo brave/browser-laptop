@@ -142,6 +142,10 @@ function onBeforeRedirect (details) {
   if (!mainFrameUrl || !Filtering.isResourceEnabled(module.exports.resourceName, mainFrameUrl)) {
     return
   }
+  // Ignore URLs that are not HTTP
+  if (!['http:', 'https:'].includes(urlParse(details.url).protocol)) {
+    return
+  }
 
   var canonicalUrl = canonicalizeUrl(details.url)
 
