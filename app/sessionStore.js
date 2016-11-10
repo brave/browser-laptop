@@ -432,6 +432,16 @@ module.exports.loadAppState = () => {
         }
       }
 
+      // sites refactoring migration
+      if (Array.isArray(data.sites) && data.sites.length) {
+        let sites = {}
+        data.sites.forEach((site) => {
+          let key = siteUtil.getSiteKey(Immutable.fromJS(site), site.tags)
+          sites[key] = site
+        })
+        data.sites = sites
+      }
+
       // version information (shown on about:brave)
       const os = require('os')
       const versionInformation = [
@@ -466,7 +476,7 @@ module.exports.loadAppState = () => {
 module.exports.defaultAppState = () => {
   return {
     firstRunTimestamp: new Date().getTime(),
-    sites: [],
+    sites: {},
     tabs: [],
     extensions: {},
     visits: [],
