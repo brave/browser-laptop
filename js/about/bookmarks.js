@@ -435,7 +435,7 @@ class AboutBookmarks extends React.Component {
     this.refs.bookmarkSearch.focus()
   }
   render () {
-    return <div className='siteDetailsPage'>
+    return <div className='siteDetailsPage' onClick={this.onClick}>
       <div className='siteDetailsPageHeader'>
         <div data-l10n-id='bookmarkManager' className='sectionTitle' />
         <div className='headerActions'>
@@ -450,7 +450,7 @@ class AboutBookmarks extends React.Component {
         </div>
       </div>
 
-      <div className='siteDetailsPageContent' onClick={this.onClick}>
+      <div className='siteDetailsPageContent'>
         <div className='folderView'>
           <div className='columnHeader'>
             <span data-l10n-id='folders' />
