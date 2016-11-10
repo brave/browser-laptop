@@ -386,6 +386,16 @@ describe('navigationBar', function () {
         .waitForVisible('[data-l10n-id="secureConnection"]')
         .keys(Brave.keys.ESCAPE)
     })
+    it('does not show secure icon if page load fails', function * () {
+      const page1Url = Brave.server.url('ssl_spoof.html')
+      yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
+      yield this.app.client
+        .moveToObject(navigator)
+        .waitForExist(urlbarIcon)
+        .getAttribute(urlbarIcon, 'class').then((classes) =>
+          assert(!classes.includes('fa-lock'))
+        )
+    })
     it('Blocks running insecure content', function * () {
       const page1Url = 'https://mixed-script.badssl.com/'
       yield this.app.client.tabByUrl(Brave.newTabUrl)

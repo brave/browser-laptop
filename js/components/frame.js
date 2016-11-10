@@ -998,10 +998,10 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('did-change-security', (e) => {
       let isSecure = null
       let runInsecureContent = false
-      if (e.securityState === 'secure') {
+      if (e.securityState === 'secure' || e.securityState === 'warning') {
         isSecure = true
         runInsecureContent = this.runInsecureContent()
-      } else if (e.securityState === 'insecure') {
+      } else if (e.securityState === 'insecure' || e.securityState === 'unknown') {
         isSecure = false
       }
       // TODO: handle 'warning' security state
