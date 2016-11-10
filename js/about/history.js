@@ -31,14 +31,12 @@ class DeleteHistoryEntryButton extends ImmutableComponent {
     super()
     this.onClick = this.onClick.bind(this)
   }
-
   onClick (e) {
     if (e && e.preventDefault) {
       e.preventDefault()
     }
     // TODO(bsclifton): delete the selected entry
   }
-
   render () {
     return <div className='fa fa-times deleteEntry' onClick={this.onClick} />
   }
@@ -58,6 +56,13 @@ class HistoryTimeCell extends ImmutableComponent {
 }
 
 class HistoryDay extends ImmutableComponent {
+  constructor () {
+    super()
+    this.clearSelection = this.clearSelection.bind(this)
+  }
+  clearSelection () {
+    this.refs.historyTable.clearSelection()
+  }
   navigate (entry) {
     entry = makeImmutable(entry)
     aboutActions.newFrame({
@@ -69,6 +74,7 @@ class HistoryDay extends ImmutableComponent {
     return <div>
       <div className='sectionTitle historyDayName'>{this.props.date}</div>
       <SortableTable headings={['time', 'title', 'domain']}
+        ref='historyTable'
         defaultHeading='time'
         defaultHeadingSortOrder='desc'
         rows={this.props.entries.map((entry) => [
@@ -96,22 +102,35 @@ class HistoryDay extends ImmutableComponent {
 }
 
 class GroupedHistoryList extends ImmutableComponent {
+  constructor () {
+    super()
+    this.entriesByDay = []
+    this.clearSelection = this.clearSelection.bind(this)
+  }
+  clearSelection () {
+    this.entriesByDay.forEach((day) => day.clearSelection())
+  }
   render () {
     const defaultLanguage = this.props.languageCodes.find((lang) => lang.includes(navigator.language)) || 'en-US'
     const userLanguage = getSetting(settings.LANGUAGE, this.props.settings) || defaultLanguage
     const entriesByDay = historyUtil.groupEntriesByDay(this.props.history, userLanguage)
     const totalEntries = historyUtil.totalEntries(entriesByDay)
     let index = 0
+    this.entriesByDay = []
     return <list className='historyList'>
       {
-        entriesByDay.map((groupedEntry) =>
-          <HistoryDay
+        entriesByDay.map((groupedEntry) => {
+          const day = <HistoryDay
+            ref={'historyDay' + index}
             date={groupedEntry.get('date')}
             entries={groupedEntry.get('entries')}
             totalEntries={totalEntries}
-            tableID={index++}
+            tableID={index}
             stateOwner={this.props.stateOwner}
-          />)
+          />
+          this.entriesByDay.push(this.refs[('historyDay' + index++)])
+          return day
+        })
       }
     </list>
   }
@@ -123,6 +142,8 @@ class AboutHistory extends React.Component {
     this.onChangeSearch = this.onChangeSearch.bind(this)
     this.onClearSearchText = this.onClearSearchText.bind(this)
     this.clearBrowsingDataNow = this.clearBrowsingDataNow.bind(this)
+    this.clearSelection = this.clearSelection.bind(this)
+    this.onClick = this.onClick.bind(this)
     this.state = {
       history: Immutable.List(),
       search: '',
@@ -150,6 +171,19 @@ class AboutHistory extends React.Component {
       search: ''
     })
   }
+  onClick (e) {
+    // Determine if click was on sortableTable
+    let targetElement = e.target
+    while (targetElement) {
+      if (targetElement.tagName === 'TBODY' || targetElement.tagName === 'THEAD') {
+        return
+      }
+      targetElement = targetElement.parentNode
+    }
+
+    // Click was not a child element of sortableTable; clear selection
+    this.clearSelection()
+  }
   searchedSiteDetails (searchTerm, siteDetails) {
     return siteDetails.filter((siteDetail) => {
       const title = siteDetail.get('title') + siteDetail.get('location')
@@ -164,11 +198,14 @@ class AboutHistory extends React.Component {
   clearBrowsingDataNow () {
     aboutActions.clearBrowsingDataNow({browserHistory: true})
   }
+  clearSelection () {
+    this.refs.historyList.clearSelection()
+  }
   componentDidMount () {
     this.refs.historySearch.focus()
   }
   render () {
-    return <div className='siteDetailsPage'>
+    return <div className='siteDetailsPage' onClick={this.onClick}>
       <div className='siteDetailsPageHeader'>
         <div data-l10n-id='history' className='sectionTitle' />
         <div className='headerActions'>
@@ -186,6 +223,7 @@ class AboutHistory extends React.Component {
 
       <div className='siteDetailsPageContent'>
         <GroupedHistoryList
+          ref='historyList'
           languageCodes={this.state.languageCodes}
           settings={this.state.settings}
           history={
