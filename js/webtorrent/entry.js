@@ -2,7 +2,7 @@ const ReactDOM = require('react-dom')
 const magnetURI = require('magnet-uri')
 const Button = require('../components/button')
 const messages = require('../constants/messages')
-const uuid = require('uuid')
+const WebTorrentRemoteClient = require('webtorrent-remote/client')
 
 require('../../less/webtorrent.less')
 
@@ -19,38 +19,25 @@ var state = window.state = {
 setInterval(render, 1000)
 render()
 
-// Talk to the webtorrent process
-var CHANNEL_ID = uuid.v4()
+// Talk to WebTorrent over in a different process
+var client = window.client = new WebTorrentRemoteClient(send)
+client.on('error', handleError)
+
 var ipc = window.chrome.ipc
 ipc.on(messages.TORRENT_MESSAGE, function (e, msg) {
-  switch (msg.type) {
-    case 'info':
-      return handleInfo(msg)
-    case 'progress':
-      return handleProgress(msg)
-    case 'error':
-      return handleError(msg)
-  }
+  client.recieve(msg)
 })
 
-function handleInfo (msg) {
-  state.torrent = msg.torrent
+function send (msg) {
+  ipc.sendToHost(messages.TORRENT_MESSAGE, msg)
 }
 
-function handleProgress (msg) {
-  if (state.torrent) state.torrent.progress = msg.progress
-}
-
-function handleError (msg) {
-  state.errorMessage = msg.errorMessage
+function handleError (error) {
+  state.errorMessage = error.message
 }
 
 function start () {
-  ipc.sendToHost(messages.TORRENT_MESSAGE, {
-    channelID: CHANNEL_ID,
-    type: 'add',
-    torrentID: state.torrentID
-  })
+  state.torrent = client.add(state.torrentID)
 }
 
 function render () {
