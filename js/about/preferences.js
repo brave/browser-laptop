@@ -314,6 +314,11 @@ class BitcoinDashboard extends ImmutableComponent {
   get bitcoinOverlayContent () {
     return <iframe src={this.ledgerData.get('buyURL')} />
   }
+  get bitcoinPurchaseButton () {
+    if (!this.ledgerData.get('buyURLFrame')) return <Button l10nId='add' className='primaryButton' onClick={this.props.showOverlay.bind(this)} />
+// should also do this.props.hideParentalOverlay
+    return <Button l10nId='add' className='primaryButton' onClick={aboutActions.newFrame.bind(null, { location: this.ledgerData.get('buyURL') }, true)} />
+  }
   get qrcodeOverlayContent () {
     return <div>
       <img src={this.ledgerData.get('paymentIMG')} title='Brave wallet QR code' />
@@ -366,7 +371,7 @@ class BitcoinDashboard extends ImmutableComponent {
           <div className='settingsListSubTitle' data-l10n-id='moneyAddSubTitle' />
         </div>
         <div className='settingsPanelDivider'>
-          <Button l10nId='add' className='primaryButton' onClick={this.props.showOverlay.bind(this)} />
+          {this.bitcoinPurchaseButton}
           <div className='settingsListSubTitle' data-l10n-id='transferTime' />
         </div>
       </div>
@@ -415,7 +420,11 @@ class BitcoinDashboard extends ImmutableComponent {
     </div>
   }
   get panelFooter () {
-    if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
+    if (this.ledgerData.get('buyURLFrame')) {
+      return <div className='panelFooter'>
+        <Button l10nId='done' className='pull-right whiteButton' onClick={this.props.hideParentOverlay} />
+      </div>
+    } else if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
       return <div className='panelFooter'>
         <div id='coinbaseLogo' />
         <span className='coinbaseMessage' data-l10n-id='coinbaseMessage' />
