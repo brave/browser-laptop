@@ -33,7 +33,7 @@ client.on('error', handleError)
 
 var ipc = window.chrome.ipc
 ipc.on(messages.TORRENT_MESSAGE, function (e, msg) {
-  client.recieve(msg)
+  client.receive(msg)
 })
 
 function send (msg) {
@@ -67,7 +67,7 @@ function render () {
   document.title = title
 
   var status
-  if (!state.torrent) {
+  if (!torrent) {
     status = (
       <Button l10nId='startTorrent' className='primaryButton' onClick={start}>Start</Button>
     )
@@ -87,7 +87,7 @@ function render () {
   )
 
   var content
-  if (!state.torrent) {
+  if (!torrent) {
     content = (
       <div className='content'>
         <strong>Warning: </strong>
@@ -96,13 +96,13 @@ function render () {
       </div>
     )
   } else if (state.magnetInfo && state.magnetInfo.ix != null) {
-    var serverURL = state.torrent.serverURL
+    var serverURL = torrent.serverURL
     if (serverURL) {
       // Load from the streaming torrent-to-HTTP local server into an <iframe>
       var ix = Number(state.magnetInfo.ix)
       content = (
         <div className='content'>
-          <iframe src={serverURL + '/' + ix} sandbox='' seamless='seamless' />
+          <iframe src={serverURL + '/' + ix} sandbox='allow-same-origin' seamless='seamless' />
         </div>
       )
     } else {
@@ -160,14 +160,3 @@ function render () {
   )
   ReactDOM.render(elem, document.querySelector('#appContainer'))
 }
-
-function resizeToContent (iframe) {
-  iframe.width = iframe.contentWindow.document.body.scrollWidth
-  iframe.height = iframe.contentWindow.document.body.scrollHeight
-  console.log('Resizing iframe: ' + iframe.width + 'x' + iframe.height)
-}
-
-window.addEventListener('DOMContentReady', function () {
-  var iframe = document.querySelector('iframe')
-  resizeToContent(iframe)
-})
