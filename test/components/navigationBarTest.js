@@ -396,6 +396,18 @@ describe('navigationBar', function () {
           assert(!classes.includes('fa-lock'))
         )
     })
+    it('shows secure icon on a site with passive mixed content', function * () {
+      const page1Url = 'https://mixed.badssl.com/'
+      yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
+      yield this.app.client
+        .moveToObject(navigator)
+        .waitForExist(urlbarIcon)
+        .waitUntil(() =>
+          this.app.client.getAttribute(urlbarIcon, 'class').then((classes) =>
+            classes.includes('fa-lock')
+          )
+        )
+    })
     it('Blocks running insecure content', function * () {
       const page1Url = 'https://mixed-script.badssl.com/'
       yield this.app.client.tabByUrl(Brave.newTabUrl)
