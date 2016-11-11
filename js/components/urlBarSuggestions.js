@@ -282,6 +282,9 @@ class UrlBarSuggestions extends ImmutableComponent {
     }
 
     const historyFilter = (site) => {
+      if (!site) {
+        return false
+      }
       const title = site.get('title') || ''
       const location = site.get('location') || ''
       // Note: Bookmark sites are now included in history. This will allow
