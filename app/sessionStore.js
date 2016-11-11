@@ -436,7 +436,7 @@ module.exports.loadAppState = () => {
       if (Array.isArray(data.sites) && data.sites.length) {
         let sites = {}
         data.sites.forEach((site) => {
-          let key = siteUtil.getSiteKey(Immutable.fromJS(site), site.tags)
+          let key = siteUtil.getSiteKey(Immutable.fromJS(site))
           sites[key] = site
         })
         data.sites = sites
@@ -446,7 +446,7 @@ module.exports.loadAppState = () => {
           let sites = {}
           data.about.newtab.sites.forEach((site) => {
             if (site) {
-              let key = siteUtil.getSiteKey(Immutable.fromJS(site), site.tags)
+              let key = siteUtil.getSiteKey(Immutable.fromJS(site))
               sites[key] = site
             }
           })
