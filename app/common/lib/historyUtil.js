@@ -17,10 +17,11 @@ const sortTimeDescending = (left, right) => {
 }
 
 module.exports.getHistory = (sites) => {
-  sites = makeImmutable(sites) || new Immutable.List()
-  return sites.filter((site) => siteUtil.isHistoryEntry(site))
-      .sort(sortTimeDescending)
-      .slice(-aboutHistoryMaxEntries)
+  sites = makeImmutable(sites) || new Immutable.Map()
+  return sites.toList()
+    .filter((site) => siteUtil.isHistoryEntry(site))
+    .sort(sortTimeDescending)
+    .slice(-aboutHistoryMaxEntries)
 }
 
 const getDayString = (entry, locale) => {
