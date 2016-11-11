@@ -995,16 +995,20 @@ class Frame extends ImmutableComponent {
         windowActions.setNavigated(this.webview.getURL(), this.props.frameKey, true, this.frame.get('tabId'))
       }
     }
-    this.webview.addEventListener('did-change-security', (e) => {
+    this.webview.addEventListener('security-style-changed', (e) => {
       let isSecure = null
-      let runInsecureContent = false
-      if (e.securityState === 'secure' || e.securityState === 'warning') {
+      let runInsecureContent = this.runInsecureContent()
+      // 'warning' and 'passive mixed content' should never upgrade the
+      // security state from insecure to secure
+      if (e.securityState === 'secure' ||
+          (this.props.isSecure !== false &&
+           runInsecureContent !== true &&
+           ['warning', 'passive-mixed-content'].includes(e.securityState))) {
         isSecure = true
-        runInsecureContent = this.runInsecureContent()
-      } else if (e.securityState === 'insecure' || e.securityState === 'unknown') {
+      } else if (['broken', 'insecure'].includes(e.securityState)) {
         isSecure = false
       }
-      // TODO: handle 'warning' security state
+      // TODO: show intermediate UI for 'warning' and 'passive-mixed-content'
       windowActions.setSecurityState(this.frame, {
         secure: isSecure,
         runInsecureContent

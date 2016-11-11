@@ -1207,6 +1207,7 @@ class Main extends ImmutableComponent {
                         .includes(siteTags.BOOKMARK_FOLDER)) || emptyMap
                   : null}
                 isFullScreen={frame.get('isFullScreen')}
+                isSecure={frame.getIn(['security', 'isSecure'])}
                 showFullScreenWarning={frame.get('showFullScreenWarning')}
                 findbarShown={frame.get('findbarShown')}
                 findDetail={frame.get('findDetail')}
