@@ -887,10 +887,10 @@ class Frame extends ImmutableComponent {
         case messages.TORRENT_MESSAGE:
           // Relay torrent IPC from the webview to a browser process
           method = (message) => {
-            if (typeof message.channelID !== 'string') {
-              throw new Error('Invalid or missing channelID: ' + JSON.stringify(message))
+            if (typeof message.clientKey !== 'string') {
+              throw new Error('Invalid or missing clientKey: ' + JSON.stringify(message))
             }
-            this.torrentChannelID = message.channelID
+            this.torrentChannelID = message.clientKey
             ipc.send(messages.TORRENT_MESSAGE, message)
           }
           break
@@ -899,10 +899,10 @@ class Frame extends ImmutableComponent {
     })
 
     // Relay torrent IPC from the browser process back to the webview
-    ipc.on(messages.TORRENT_MESSAGE, (e, obj) => {
+    ipc.on(messages.TORRENT_MESSAGE, (e, message) => {
       // Ignore the message if it's for a different tab
-      if (obj.channelID !== this.torrentChannelID) return
-      this.webview.send(messages.TORRENT_MESSAGE, obj)
+      if (message.clientKey !== this.torrentChannelID) return
+      this.webview.send(messages.TORRENT_MESSAGE, message)
     })
 
     const interceptFlash = (stopCurrentLoad, adobeUrl, redirectUrl) => {
