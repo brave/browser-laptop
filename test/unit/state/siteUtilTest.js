@@ -34,7 +34,7 @@ describe('siteUtil', function () {
 
   describe('getSiteKey', function () {
     it('returns null if siteDetail is falsey', function () {
-      const key = siteUtil.getSiteKey(null, siteTags.BOOKMARK_FOLDER)
+      const key = siteUtil.getSiteKey(null)
       assert.equal(key, null)
     })
     describe('matching `BOOKMARK_FOLDER`', function () {
@@ -42,12 +42,12 @@ describe('siteUtil', function () {
         const siteDetail = Immutable.fromJS({
           folderId: 1
         })
-        const key = siteUtil.getSiteKey(siteDetail, siteTags.BOOKMARK_FOLDER)
+        const key = siteUtil.getSiteKey(siteDetail)
         assert.equal(key, 1)
       })
       it('returns null if folderId is missing', function () {
         const siteDetail = new Immutable.Map()
-        const key = siteUtil.getSiteKey(siteDetail, siteTags.BOOKMARK_FOLDER)
+        const key = siteUtil.getSiteKey(siteDetail)
         assert.equal(key, null)
       })
     })
@@ -57,19 +57,19 @@ describe('siteUtil', function () {
           location: testUrl1,
           partitionNumber: 0
         })
-        const key = siteUtil.getSiteKey(siteDetail, siteTags.BOOKMARK)
+        const key = siteUtil.getSiteKey(siteDetail)
         assert.equal(key, testUrl1 + '00')
       })
       it('returns key if location matches and partitionNumber is NOT present', function () {
         const siteDetail = Immutable.fromJS({
           location: testUrl1
         })
-        const key = siteUtil.getSiteKey(siteDetail, siteTags.BOOKMARK)
+        const key = siteUtil.getSiteKey(siteDetail)
         assert.equal(key, testUrl1 + '00')
       })
       it('returns null if location is missing', function () {
         const siteDetail = new Immutable.Map()
-        const key = siteUtil.getSiteKey(siteDetail, siteTags.BOOKMARK)
+        const key = siteUtil.getSiteKey(siteDetail)
         assert.equal(key, null)
       })
     })
@@ -82,7 +82,7 @@ describe('siteUtil', function () {
         tags: [siteTags.BOOKMARK]
       }
       const siteDetail = Immutable.fromJS(site)
-      const key = siteUtil.getSiteKey(siteDetail, siteTags.BOOKMARK)
+      const key = siteUtil.getSiteKey(siteDetail)
       const sites = {}
       sites[key] = site
       const result = siteUtil.isSiteBookmarked(Immutable.fromJS(sites), siteDetail)
@@ -93,7 +93,7 @@ describe('siteUtil', function () {
         location: testUrl2,
         tags: [siteTags.BOOKMARK]
       }
-      const key = siteUtil.getSiteKey(Immutable.fromJS(site), siteTags.BOOKMARK)
+      const key = siteUtil.getSiteKey(Immutable.fromJS(site))
       const sites = {}
       sites[key] = site
       const result = siteUtil.isSiteBookmarked(Immutable.fromJS(sites), Immutable.fromJS({
@@ -108,7 +108,7 @@ describe('siteUtil', function () {
         tags: [siteTags.BOOKMARK_FOLDER]
       }
       const siteDetail = Immutable.fromJS(site)
-      const key = siteUtil.getSiteKey(siteDetail, siteTags.BOOKMARK_FOLDER)
+      const key = siteUtil.getSiteKey(siteDetail)
       const sites = {}
       sites[key] = site
       const result = siteUtil.isSiteBookmarked(Immutable.fromJS(sites), siteDetail)
@@ -135,7 +135,7 @@ describe('siteUtil', function () {
   describe('addSite', function () {
     it('gets the tag from siteDetail if not provided', function () {
       const processedSites = siteUtil.addSite(emptySites, bookmarkAllFields)
-      const processedKey = siteUtil.getSiteKey(bookmarkAllFields, bookmarkAllFields.tags)
+      const processedKey = siteUtil.getSiteKey(bookmarkAllFields)
       const expectedSites = Immutable.fromJS([bookmarkAllFields])
       assert.deepEqual(processedSites.getIn([processedKey, 'tags']), expectedSites.getIn([0, 'tags']))
     })
@@ -156,7 +156,7 @@ describe('siteUtil', function () {
       describe('when adding bookmark', function () {
         it('preserves existing siteDetail fields', function () {
           const processedSites = siteUtil.addSite(emptySites, bookmarkAllFields, siteTags.BOOKMARK)
-          const processedKey = siteUtil.getSiteKey(bookmarkAllFields, siteTags.BOOKMARK)
+          const processedKey = siteUtil.getSiteKey(bookmarkAllFields)
           let sites = {}
           sites[processedKey] = bookmarkAllFields.set('order', 0).toJS()
           const expectedSites = Immutable.fromJS(sites)
@@ -164,7 +164,7 @@ describe('siteUtil', function () {
         })
         it('sets 0 for lastAccessedTime if not specified', function () {
           const processedSites = siteUtil.addSite(emptySites, bookmarkMinFields, siteTags.BOOKMARK)
-          const processedKey = siteUtil.getSiteKey(bookmarkMinFields, siteTags.BOOKMARK)
+          const processedKey = siteUtil.getSiteKey(bookmarkMinFields)
           assert.equal(processedSites.getIn([processedKey, 'lastAccessedTime']), 0)
           assert.deepEqual(processedSites.getIn([processedKey, 'tags']).toJS(), [siteTags.BOOKMARK])
         })
@@ -173,7 +173,7 @@ describe('siteUtil', function () {
         it('assigns a folderId', function () {
           const processedSites = siteUtil.addSite(emptySites, folderMinFields)
           const folderMinFieldsWithId = folderMinFields.set('folderId', 1)
-          const processedKey = siteUtil.getSiteKey(folderMinFieldsWithId, folderMinFieldsWithId.get('tags'))
+          const processedKey = siteUtil.getSiteKey(folderMinFieldsWithId)
           const folderId = processedSites.getIn([processedKey, 'folderId'])
           assert.equal(folderId, 1)
         })
@@ -181,7 +181,7 @@ describe('siteUtil', function () {
           // Add a new bookmark folder
           let processedSites = siteUtil.addSite(emptySites, folderMinFields)
           const folderMinFieldsWithId1 = folderMinFields.set('folderId', 1)
-          const processedKey1 = siteUtil.getSiteKey(folderMinFieldsWithId1, folderMinFieldsWithId1.get('tags'))
+          const processedKey1 = siteUtil.getSiteKey(folderMinFieldsWithId1)
           const folderId = processedSites.getIn([processedKey1, 'folderId'])
           const bookmark = Immutable.fromJS({
             lastAccessedTime: 123,
@@ -192,14 +192,14 @@ describe('siteUtil', function () {
           })
           // Add a bookmark into that folder
           processedSites = siteUtil.addSite(processedSites, bookmark)
-          const processedKey2 = siteUtil.getSiteKey(bookmark, bookmark.get('tags'))
+          const processedKey2 = siteUtil.getSiteKey(bookmark)
           assert.equal(processedSites.size, 2)
           assert.equal(processedSites.getIn([processedKey2, 'parentFolderId']), folderId)
 
           // Add another bookmark folder with the same name / parentFolderId
           processedSites = siteUtil.addSite(processedSites, folderMinFields)
           const folderMinFieldsWithId2 = folderMinFields.set('folderId', 2)
-          const processedKey3 = siteUtil.getSiteKey(folderMinFieldsWithId2, folderMinFieldsWithId2.get('tags'))
+          const processedKey3 = siteUtil.getSiteKey(folderMinFieldsWithId2)
           assert.equal(processedSites.size, 3)
           const folderId2 = processedSites.getIn([processedKey3, 'folderId'])
           assert.equal(folderId === folderId2, false)
@@ -245,10 +245,10 @@ describe('siteUtil', function () {
             order: 3,
             tags: [siteTags.BOOKMARK]
           }
-          const siteKey1 = siteUtil.getSiteKey(Immutable.fromJS(site1), site1.tags)
-          const siteKey2 = siteUtil.getSiteKey(Immutable.fromJS(site2), site2.tags)
-          const siteKey3 = siteUtil.getSiteKey(Immutable.fromJS(site3), site3.tags)
-          const siteKey4 = siteUtil.getSiteKey(Immutable.fromJS(site4), site4.tags)
+          const siteKey1 = siteUtil.getSiteKey(Immutable.fromJS(site1))
+          const siteKey2 = siteUtil.getSiteKey(Immutable.fromJS(site2))
+          const siteKey3 = siteUtil.getSiteKey(Immutable.fromJS(site3))
+          const siteKey4 = siteUtil.getSiteKey(Immutable.fromJS(site4))
           sites[siteKey1] = site1
           sites[siteKey2] = site2
           sites[siteKey3] = site3
@@ -283,7 +283,7 @@ describe('siteUtil', function () {
           order: 0,
           favicon: 'https://brave.com/favicon.ico'
         })
-        const oldSiteKey = siteUtil.getSiteKey(oldSiteDetail, oldSiteDetail.get('tags'))
+        const oldSiteKey = siteUtil.getSiteKey(oldSiteDetail)
         const newSiteDetail = Immutable.fromJS({
           lastAccessedTime: 456,
           tags: [siteTags.BOOKMARK],
@@ -304,7 +304,7 @@ describe('siteUtil', function () {
         let sites = {}
         sites[oldSiteKey] = oldSiteDetail.toJS()
         const processedSites = siteUtil.addSite(Immutable.fromJS(sites), newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
-        const expectedSiteKey = siteUtil.getSiteKey(expectedSiteDetail, expectedSiteDetail.get('tags'))
+        const expectedSiteKey = siteUtil.getSiteKey(expectedSiteDetail)
         let expectedSites = {}
         expectedSites[expectedSiteKey] = expectedSiteDetail.toJS()
         assert.deepEqual(processedSites.toJS(), expectedSites)
@@ -318,7 +318,7 @@ describe('siteUtil', function () {
           order: 0,
           customTitle: 'old customTitle'
         })
-        const oldSiteKey = siteUtil.getSiteKey(oldSiteDetail, oldSiteDetail.get('tags'))
+        const oldSiteKey = siteUtil.getSiteKey(oldSiteDetail)
         const newSiteDetail = Immutable.fromJS({
           lastAccessedTime: 456,
           tags: [siteTags.BOOKMARK],
@@ -330,7 +330,7 @@ describe('siteUtil', function () {
         sites[oldSiteKey] = oldSiteDetail.toJS()
         const processedSites = siteUtil.addSite(Immutable.fromJS(sites), newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
         const expectedSites = {}
-        const expectedSiteKey = siteUtil.getSiteKey(newSiteDetail, newSiteDetail.get('tags'))
+        const expectedSiteKey = siteUtil.getSiteKey(newSiteDetail)
         expectedSites[expectedSiteKey] = newSiteDetail.set('order', 0).toJS()
         assert.deepEqual(processedSites.toJS(), expectedSites)
       })
@@ -344,7 +344,7 @@ describe('siteUtil', function () {
           tags: [siteTags.BOOKMARK],
           location: testUrl1
         }
-        const siteKey = siteUtil.getSiteKey(Immutable.fromJS(siteDetail), siteDetail.tags)
+        const siteKey = siteUtil.getSiteKey(Immutable.fromJS(siteDetail))
         let sites = {}
         sites[siteKey] = siteDetail
         const processedSites = siteUtil.removeSite(Immutable.fromJS(sites), Immutable.fromJS(siteDetail), siteTags.BOOKMARK)
@@ -377,10 +377,10 @@ describe('siteUtil', function () {
           order: 3,
           tags: [siteTags.BOOKMARK]
         }
-        const siteKey1 = siteUtil.getSiteKey(Immutable.fromJS(site1), site1.tags)
-        const siteKey2 = siteUtil.getSiteKey(Immutable.fromJS(site2), site2.tags)
-        const siteKey3 = siteUtil.getSiteKey(Immutable.fromJS(site3), site3.tags)
-        const siteKey4 = siteUtil.getSiteKey(Immutable.fromJS(site4), site4.tags)
+        const siteKey1 = siteUtil.getSiteKey(Immutable.fromJS(site1))
+        const siteKey2 = siteUtil.getSiteKey(Immutable.fromJS(site2))
+        const siteKey3 = siteUtil.getSiteKey(Immutable.fromJS(site3))
+        const siteKey4 = siteUtil.getSiteKey(Immutable.fromJS(site4))
         sites[siteKey1] = site1
         sites[siteKey2] = site2
         sites[siteKey3] = site3
@@ -394,6 +394,59 @@ describe('siteUtil', function () {
         const expectedSites = new Immutable.Map()
         assert.deepEqual(processedSites, expectedSites)
       })
+      it('removes with reorder', function () {
+        let sites = {}
+        let expectedSites = {}
+        const site1 = {
+          folderId: 1,
+          parentFolderId: 0,
+          order: 0,
+          tags: [siteTags.BOOKMARK_FOLDER]
+        }
+        const site2 = {
+          folderId: 2,
+          parentFolderId: 1,
+          order: 1,
+          tags: [siteTags.BOOKMARK_FOLDER]
+        }
+        const site3 = {
+          parentFolderId: 1,
+          location: testUrl1,
+          order: 2,
+          tags: [siteTags.BOOKMARK]
+        }
+        const site4 = {
+          parentFolderId: 2,
+          location: testUrl2,
+          order: 3,
+          tags: [siteTags.BOOKMARK]
+        }
+        const expectedSite4 = {
+          parentFolderId: 2,
+          location: testUrl2,
+          order: 2,
+          tags: [siteTags.BOOKMARK]
+        }
+        const siteKey1 = siteUtil.getSiteKey(Immutable.fromJS(site1))
+        const siteKey2 = siteUtil.getSiteKey(Immutable.fromJS(site2))
+        const siteKey3 = siteUtil.getSiteKey(Immutable.fromJS(site3))
+        const siteKey4 = siteUtil.getSiteKey(Immutable.fromJS(site4))
+        sites[siteKey1] = site1
+        sites[siteKey2] = site2
+        sites[siteKey3] = site3
+        sites[siteKey4] = site4
+        expectedSites[siteKey1] = site1
+        expectedSites[siteKey2] = site2
+        expectedSites[siteKey4] = expectedSite4
+        const siteDetail = {
+          parentFolderId: 1,
+          location: testUrl1,
+          tags: [siteTags.BOOKMARK]
+        }
+        const processedSites = siteUtil.removeSite(Immutable.fromJS(sites), Immutable.fromJS(siteDetail),
+          siteTags.BOOKMARK_FOLDER)
+        assert.deepEqual(processedSites.toJS(), expectedSites)
+      })
     })
     describe('tag=falsey', function () {
       it('deletes a history entry (has no tags)', function () {
@@ -401,7 +454,7 @@ describe('siteUtil', function () {
           tags: [],
           location: testUrl1
         }
-        const siteKey = siteUtil.getSiteKey(Immutable.fromJS(siteDetail), siteDetail.tags)
+        const siteKey = siteUtil.getSiteKey(Immutable.fromJS(siteDetail))
         let sites = {}
         sites[siteKey] = siteDetail
         const processedSites = siteUtil.removeSite(Immutable.fromJS(sites), Immutable.fromJS(siteDetail))
@@ -416,7 +469,7 @@ describe('siteUtil', function () {
       // Add a new bookmark folder
       let processedSites = siteUtil.addSite(emptySites, folderMinFields)
       const folderMinFieldsWithId = folderMinFields.set('folderId', 1)
-      const processedKey = siteUtil.getSiteKey(folderMinFieldsWithId, folderMinFieldsWithId.get('tags'))
+      const processedKey = siteUtil.getSiteKey(folderMinFieldsWithId)
       const folderId = processedSites.getIn([processedKey, 'folderId'])
       // Add a bookmark into that folder
       processedSites = siteUtil.addSite(processedSites, bookmarkAllFields.set('parentFolderId', folderId))
@@ -428,17 +481,17 @@ describe('siteUtil', function () {
       // Add a new bookmark folder
       let processedSites = siteUtil.addSite(emptySites, folderMinFields)
       const folderMinFieldsWithId1 = folderMinFields.set('folderId', 1)
-      const processedKey1 = siteUtil.getSiteKey(folderMinFieldsWithId1, folderMinFieldsWithId1.get('tags'))
+      const processedKey1 = siteUtil.getSiteKey(folderMinFieldsWithId1)
       const folderId1 = processedSites.getIn([processedKey1, 'folderId'])
       // Add a child below that folder
       processedSites = siteUtil.addSite(processedSites, folderMinFields.set('parentFolderId', folderId1))
       const folderMinFieldsWithId2 = folderMinFields.set('folderId', 2)
-      const processedKey2 = siteUtil.getSiteKey(folderMinFieldsWithId2, folderMinFieldsWithId2.get('tags'))
+      const processedKey2 = siteUtil.getSiteKey(folderMinFieldsWithId2)
       const folderId2 = processedSites.getIn([processedKey2, 'folderId'])
       // Add a folder below the previous child
       processedSites = siteUtil.addSite(processedSites, folderMinFields.set('parentFolderId', folderId2))
       const folderMinFieldsWithId3 = folderMinFields.set('folderId', 3)
-      const processedKey3 = siteUtil.getSiteKey(folderMinFieldsWithId3, folderMinFieldsWithId3.get('tags'))
+      const processedKey3 = siteUtil.getSiteKey(folderMinFieldsWithId3)
       const bookmarkFolder1 = processedSites.get(processedKey1)
       const bookmarkFolder3 = processedSites.get(processedKey3)
       // Should NOT be able to move grandparent folder into its grandchild

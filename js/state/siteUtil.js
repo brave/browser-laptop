@@ -25,13 +25,30 @@ const isBookmarkFolder = (tags) => {
     tags && typeof tags !== 'string' && tags.includes(siteTags.BOOKMARK_FOLDER)
 }
 
-module.exports.getSiteKey = function (siteDetail, tags) {
+const reorderSite = (sites, order) => {
+  sites = sites.map((site) => {
+    const siteOrder = site.get('order')
+    if (siteOrder > order) {
+      return site.set('order', siteOrder - 1)
+    }
+    return site
+  })
+  return sites
+}
+
+/**
+ * Calculate siteKey for siteDetail
+ *
+ * @param siteDetail The site to to be calculated
+ * @return key if siteDetail is valid
+ */
+module.exports.getSiteKey = function (siteDetail) {
   if (!siteDetail) {
     return null
   }
   const folderId = siteDetail.get('folderId')
   const location = siteDetail.get('location')
-  if (isBookmarkFolder(tags) && folderId) {
+  if (folderId) {
     return folderId.toString()
   } else if (location) {
     return location +
@@ -52,7 +69,7 @@ module.exports.isSiteBookmarked = function (sites, siteDetail) {
   if (!sites) {
     return false
   }
-  const key = module.exports.getSiteKey(siteDetail, siteTags.BOOKMARK)
+  const key = module.exports.getSiteKey(siteDetail)
   if (key === null) {
     return false
   }
@@ -170,10 +187,10 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
 
   let originalSiteKey
   if (originalSiteDetail) {
-    originalSiteKey = module.exports.getSiteKey(originalSiteDetail, originalSiteDetail.get('tags'))
+    originalSiteKey = module.exports.getSiteKey(originalSiteDetail)
   }
 
-  const oldKey = originalSiteKey || module.exports.getSiteKey(siteDetail, tag)
+  const oldKey = originalSiteKey || module.exports.getSiteKey(siteDetail)
   const oldSite = oldKey !== null ? sites.get(oldKey) : null
   let folderId = siteDetail.get('folderId')
 
@@ -194,7 +211,7 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
 
   let site = mergeSiteDetails(oldSite, siteDetail, tag, folderId, sites.size)
 
-  const key = originalSiteKey || module.exports.getSiteKey(site, tag)
+  const key = originalSiteKey || module.exports.getSiteKey(site)
   if (key === null) {
     return sites
   }
@@ -206,10 +223,11 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
  *
  * @param sites The application state's Immutable sites list
  * @param siteDetail The siteDetail to remove a tag from
+ * @param reorder whether to reorder sites (default with reorder)
  * @return The new sites Immutable object
  */
-module.exports.removeSite = function (sites, siteDetail, tag, reorder) {
-  const key = module.exports.getSiteKey(siteDetail, tag)
+module.exports.removeSite = function (sites, siteDetail, tag, reorder = true) {
+  const key = module.exports.getSiteKey(siteDetail)
 
   const tags = sites.getIn([key, 'tags'])
   if (isBookmarkFolder(tags)) {
@@ -222,15 +240,9 @@ module.exports.removeSite = function (sites, siteDetail, tag, reorder) {
       })
     })
   }
-  if (reorder) {
+  if (sites.size && reorder) {
     const order = sites.getIn([key, 'order'])
-    sites = sites.map((site) => {
-      const siteOrder = site.get('order')
-      if (siteOrder > order) {
-        return site.set('order', siteOrder - 1)
-      }
-      return site
-    })
+    sites = reorderSite(sites, order)
   }
 
   return sites.delete(key)
@@ -290,8 +302,8 @@ module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prep
     return sites
   }
 
-  let sourceKey = module.exports.getSiteKey(sourceDetail, sourceDetail.get('tags'))
-  let destinationKey = module.exports.getSiteKey(destinationDetail, destinationDetail.get('tags'))
+  let sourceKey = module.exports.getSiteKey(sourceDetail)
+  let destinationKey = module.exports.getSiteKey(destinationDetail)
 
   const sourceSiteIndex = sites.getIn([sourceKey, 'order'])
   let destinationSiteIndex
@@ -328,7 +340,7 @@ module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prep
       sourceSite = sourceSite.set('parentFolderId', destinationSite.get('parentFolderId'))
     }
   }
-  sourceKey = module.exports.getSiteKey(sourceSite, sourceSite.get('tags'))
+  sourceKey = module.exports.getSiteKey(sourceSite)
   return sites.set(sourceKey, sourceSite)
 }
 

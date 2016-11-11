@@ -35,7 +35,7 @@ AppStore
     }
   },
   sites: {
-  [siteKey]: { // Calculated by siteUtil.getSiteKey()
+  [siteKey]: { // folder: folderId; bookmark/history: location + partitionNumber + parentFolderId
     location: string,
     title: string,
     customTitle: string, // User provided title for bookmark; overrides title
