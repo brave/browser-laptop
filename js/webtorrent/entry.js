@@ -158,5 +158,5 @@ function render () {
       <div className='error'>{state.errorMessage}</div>
     </div>
   )
-  ReactDOM.render(elem, document.querySelector('#appContainer'))
+  ReactDOM.render(elem, document.querySelector('body'))
 }
