@@ -299,6 +299,10 @@ class Main extends ImmutableComponent {
     if (!this.props.appState.getIn([appConfig.resourceNames.WIDEVINE, 'ready']) &&
         nextProps.appState.getIn([appConfig.resourceNames.WIDEVINE, 'ready'])) {
       const widevinePanelDetail = this.props.windowState.get('widevinePanelDetail')
+      // User may have enabled from preferences and no details are present
+      if (!widevinePanelDetail) {
+        return
+      }
       const origin = siteUtil.getOrigin(widevinePanelDetail.get('location'))
       // This automatically handles reloading the frame as well
       appActions.changeSiteSetting(origin, appConfig.resourceNames.WIDEVINE, widevinePanelDetail.get('alsoAddRememberSiteSetting') ? 1 : 0)
