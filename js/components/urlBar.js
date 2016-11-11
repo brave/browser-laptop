@@ -187,6 +187,7 @@ class UrlBar extends ImmutableComponent {
         }
         break
       case KeyCodes.BACKSPACE:
+        this.hideAutoComplete()
         this.clearSearchEngine()
         break
       case KeyCodes.TAB:
