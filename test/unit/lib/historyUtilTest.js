@@ -35,6 +35,29 @@ describe('historyUtil', function () {
   }])
   const historyMultipleDays = historyDayThree.push(historyDayTwo, historyDayOne)
 
+  describe('getHistory', function () {
+    it('returns the result as an Immutable.List', function () {
+      const result = historyUtil.getHistory(historyMultipleDays)
+      assert.equal(Immutable.List.isList(result), true)
+    })
+    it('sorts the items by date/time DESC', function () {
+      const result = historyUtil.getHistory(historyMultipleDays)
+      const expectedResult = historyDayThree.toJS().reverse()
+      expectedResult.push(historyDayTwo.toJS())
+      expectedResult.push(historyDayOne.toJS())
+      assert.deepEqual(result.toJS(), expectedResult)
+    })
+    it('only returns `historyUtil.maxEntries` results', function () {
+      let tooManyEntries = new Immutable.List().push(historyDayOne)
+      for (let i = 0; i < historyUtil.maxEntries; i++) {
+        tooManyEntries = tooManyEntries.push(historyDayOne)
+      }
+      assert.equal(tooManyEntries.size, (historyUtil.maxEntries + 1))
+      const result = historyUtil.getHistory(tooManyEntries)
+      assert.equal(result.size, historyUtil.maxEntries)
+    })
+  })
+
   describe('groupEntriesByDay', function () {
     it('returns the result as an Immutable.List', function () {
       const result = historyUtil.groupEntriesByDay(historyDayThree)
@@ -76,17 +99,6 @@ describe('historyUtil', function () {
         [historyDayOne.toJS()]
       ]
       assert.deepEqual(result2.toJS(), expectedResult)
-    })
-  })
-
-  describe('sortTimeDescending', function () {
-    it('sorts the items by date/time DESC', function () {
-      const result = historyMultipleDays.sort(historyUtil.sortTimeDescending)
-      const expectedResult = historyDayThree.toJS().reverse()
-      expectedResult.push(historyDayTwo.toJS())
-      expectedResult.push(historyDayOne.toJS())
-
-      assert.deepEqual(result.toJS(), expectedResult)
     })
   })
 })
