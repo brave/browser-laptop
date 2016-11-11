@@ -364,8 +364,10 @@ class UrlBar extends ImmutableComponent {
       } else if (this.isActive) {
         const selectedIndex = this.activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])
         if (typeof selectedIndex === 'number') {
-          const suggestionLocation = this.activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'suggestionList', selectedIndex - 1]).location
-          this.urlInput.value = suggestionLocation
+          const suggestion = this.activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'suggestionList', selectedIndex - 1])
+          if (suggestion) {
+            this.urlInput.value = suggestion.location
+          }
         }
       }
     }
