@@ -6,13 +6,21 @@ const WebTorrentRemoteClient = require('webtorrent-remote/client')
 
 require('../../less/webtorrent.less')
 
+// All state lives here. The UI is a pure function from `state` -> React element
 // Set window.state for easier debugging
 var state = window.state = {
   torrentID: window.location.hash.substring(1),
   torrent: null,
+  magnetInfo: null,
   dn: '',
   errorMessage: '',
   isFileLoaded: false
+}
+
+// TODO: right now, we only support magnet links as the torrentID
+// Eventually, we need to support .torrent files as well, prob using parse-torrent
+if (state.torrentID.startsWith('magnet:?')) {
+  state.magnetInfo = magnetURI(state.torrentID)
 }
 
 // Show download progress
@@ -38,17 +46,14 @@ function handleError (error) {
 
 function start () {
   state.torrent = client.add(state.torrentID)
+  if (state.magnetInfo && state.magnetInfo.ix != null) {
+    state.torrent.createServer()
+  }
 }
 
 function render () {
   var torrent = state.torrent
   var id = state.torrentID
-
-  // TODO: right now, we only support magnet links as the torrentID
-  // Eventually, we need to support .torrent files as well, prob using parse-torrent
-  if (!state.magnetInfo && id.startsWith('magnet:?')) {
-    state.magnetInfo = magnetURI(id)
-  }
   var magnetName = state.magnetInfo && state.magnetInfo.dn
 
   var title
@@ -91,14 +96,22 @@ function render () {
       </div>
     )
   } else if (state.magnetInfo && state.magnetInfo.ix != null) {
-    // TODO: load over HTTP, either into an <iframe>
-    // ... or pick <video> / <audio> / <img> etc based on filetype
-    // var ix = Number(state.magnetInfo.ix)
-    content = (
-      <div className='content'>
-        <div id='fileContainer' />
-      </div>
-    )
+    var serverURL = state.torrent.serverURL
+    if (serverURL) {
+      // Load from the streaming torrent-to-HTTP local server into an <iframe>
+      var ix = Number(state.magnetInfo.ix)
+      content = (
+        <div className='content'>
+          <iframe src={serverURL + '/' + ix} sandbox='' seamless='seamless' />
+        </div>
+      )
+    } else {
+      content = (
+        <div className='content'>
+          Loading...
+        </div>
+      )
+    }
   } else {
     var fileElems = torrent.files.map((file, i) => {
       return (
@@ -147,3 +160,14 @@ function render () {
   )
   ReactDOM.render(elem, document.querySelector('#appContainer'))
 }
+
+function resizeToContent (iframe) {
+  iframe.width = iframe.contentWindow.document.body.scrollWidth
+  iframe.height = iframe.contentWindow.document.body.scrollHeight
+  console.log('Resizing iframe: ' + iframe.width + 'x' + iframe.height)
+}
+
+window.addEventListener('DOMContentReady', function () {
+  var iframe = document.querySelector('iframe')
+  resizeToContent(iframe)
+})
