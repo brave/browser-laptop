@@ -105,7 +105,7 @@ class NewTabPage extends React.Component {
 
     const getUnpinned = () => {
       const firstSite = unpinnedTopSites.first()
-      unpinnedTopSites = unpinnedTopSites.shift()
+      unpinnedTopSites = unpinnedTopSites.slice(1)
       return firstSite
     }
 

@@ -432,6 +432,28 @@ module.exports.loadAppState = () => {
         }
       }
 
+      // sites refactoring migration
+      if (Array.isArray(data.sites) && data.sites.length) {
+        let sites = {}
+        data.sites.forEach((site) => {
+          let key = siteUtil.getSiteKey(Immutable.fromJS(site))
+          sites[key] = site
+        })
+        data.sites = sites
+      }
+      if (data.about && data.about.newtab && data.about.newtab.sites) {
+        if (Array.isArray(data.about.newtab.sites) && data.about.newtab.sites.length) {
+          let sites = {}
+          data.about.newtab.sites.forEach((site) => {
+            if (site) {
+              let key = siteUtil.getSiteKey(Immutable.fromJS(site))
+              sites[key] = site
+            }
+          })
+          data.about.newtab.sites = sites
+        }
+      }
+
       // version information (shown on about:brave)
       const os = require('os')
       const versionInformation = [
@@ -466,7 +488,7 @@ module.exports.loadAppState = () => {
 module.exports.defaultAppState = () => {
   return {
     firstRunTimestamp: new Date().getTime(),
-    sites: [],
+    sites: {},
     tabs: [],
     extensions: {},
     visits: [],
