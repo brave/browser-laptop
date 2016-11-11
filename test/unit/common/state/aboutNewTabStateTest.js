@@ -3,12 +3,13 @@ const aboutNewTabState = require('../../../../app/common/state/aboutNewTabState'
 const Immutable = require('immutable')
 const assert = require('assert')
 const siteTags = require('../../../../js/constants/siteTags')
+const siteUtil = require('../../../../js/state/siteUtil')
 
 const defaultAppState = Immutable.fromJS({
   about: {
     newtab: {
       gridLayoutSize: 'large',
-      sites: [],
+      sites: {},
       ignoredTopSites: [],
       pinnedTopSites: [],
       updatedStamp: undefined
@@ -110,14 +111,16 @@ describe('aboutNewTabState', function () {
 
     it('adds the entry into the sites list', function () {
       const state = aboutNewTabState.addSite(defaultAppState, bookmarkAction)
-      const updatedValue = state.getIn(['about', 'newtab', 'sites', 0, 'location'])
+      const key = siteUtil.getSiteKey(Immutable.fromJS(bookmarkAction.siteDetail))
+      const updatedValue = state.getIn(['about', 'newtab', 'sites', key, 'location'])
       assert.equal(updatedValue, bookmarkAction.siteDetail.location)
     })
 
     it('will add lastAccessedTime to the siteDetail if missing from history entry', function () {
       const action = {siteDetail: {location: 'https://brave.com'}}
       const state = aboutNewTabState.addSite(defaultAppState, action)
-      const updatedValue = state.getIn(['about', 'newtab', 'sites', 0, 'lastAccessedTime'])
+      const key = siteUtil.getSiteKey(Immutable.fromJS(action.siteDetail))
+      const updatedValue = state.getIn(['about', 'newtab', 'sites', key, 'lastAccessedTime'])
       assert.equal(typeof updatedValue === 'number' && updatedValue > arbitraryTimeInThePast, true)
     })
   })
@@ -182,12 +185,14 @@ describe('aboutNewTabState', function () {
 
     it('updates the entry into the sites list', function () {
       let state = aboutNewTabState.addSite(defaultAppState, bookmarkAction)
-      let favicon = state.getIn(['about', 'newtab', 'sites', 0, 'favicon'])
+      let key = siteUtil.getSiteKey(Immutable.fromJS(bookmarkAction.siteDetail))
+      let favicon = state.getIn(['about', 'newtab', 'sites', key, 'favicon'])
       assert.equal(favicon, undefined)
 
       const action = {frameProps: {location: 'https://brave.com'}, favicon: 'https://brave.com/favicon.ico'}
       state = aboutNewTabState.updateSiteFavicon(state, action)
-      favicon = state.getIn(['about', 'newtab', 'sites', 0, 'favicon'])
+      key = siteUtil.getSiteKey(Immutable.fromJS({location: 'https://brave.com'}))
+      favicon = state.getIn(['about', 'newtab', 'sites', key, 'favicon'])
       assert.equal(favicon, action.favicon)
     })
   })

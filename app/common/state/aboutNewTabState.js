@@ -10,14 +10,6 @@ const excludeSiteDetail = (siteDetail) => {
   return !siteUtil.isBookmark(siteDetail) && !siteUtil.isHistoryEntry(siteDetail)
 }
 
-const removeDuplicateSites = (sites) => {
-  // Filter out duplicate entries by location
-  return sites.filter((element, index, list) => {
-    if (!element) return false
-    return index === list.findIndex((site) => site && site.get('location') === element.get('location'))
-  })
-}
-
 const aboutNewTabState = {
   mergeDetails: (state, props) => {
     state = makeImmutable(state)
@@ -46,8 +38,6 @@ const aboutNewTabState = {
 
     // Keep track of the last 18 visited sites
     let sites = state.getIn(['about', 'newtab', 'sites']) || new Immutable.List()
-    sites = sites.unshift(siteDetail)
-    sites = removeDuplicateSites(sites)
     sites = sites.take(18)
     // TODO(cezaraugusto): Sort should respect unshift and don't prioritize bookmarks
     // |
