@@ -9,6 +9,7 @@ const settings = require('../constants/settings')
 const getSetting = require('../settings').getSetting
 const UrlUtil = require('../lib/urlutil')
 const urlParse = require('url').parse
+const {makeImmutable} = require('../../app/common/state/immutableUtil')
 
 const isBookmark = (tags) => {
   if (!tags) {
@@ -120,7 +121,7 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId, order) =>
     lastAccessedTime = newSiteDetail.get('lastAccessedTime') || new Date().getTime()
   }
 
-  let site = Immutable.fromJS({
+  let site = makeImmutable({
     lastAccessedTime: lastAccessedTime,
     tags,
     title: newSiteDetail.get('title'),
@@ -350,7 +351,7 @@ module.exports.getDetailFromFrame = function (frame, tag) {
     location = frame.get('pinnedLocation')
   }
 
-  return Immutable.fromJS({
+  return makeImmutable({
     location,
     title: frame.get('title'),
     partitionNumber: frame.get('partitionNumber'),
@@ -370,13 +371,21 @@ module.exports.getDetailFromFrame = function (frame, tag) {
  * @param favicon favicon URL
  */
 module.exports.updateSiteFavicon = function (sites, location, favicon) {
+  sites = makeImmutable(sites)
+
   if (UrlUtil.isNotURL(location)) {
+    return sites
+  }
+  if (!Immutable.Map.isMap(sites)) {
     return sites
   }
 
   const matchingIndices = []
 
   sites.filter((site, index) => {
+    if (!site) {
+      return false
+    }
     if (isBookmarkFolder(site.get('tags'))) {
       return false
     }
@@ -538,14 +547,6 @@ module.exports.clearHistory = function (sites) {
 }
 
 /**
- * Determines if the sites list has any sites with no tags
- * @param sites The application state's Immutable sites list.
- */
-module.exports.hasNoTagSites = function (sites) {
-  return sites.findIndex((site) => !site.get('tags') || site.get('tags').size === 0) !== -1
-}
-
-/**
  * Returns all sites that have a bookmark tag.
  * @param sites The application state's Immutable sites list.
  */
@@ -554,7 +555,7 @@ module.exports.getBookmarks = function (sites) {
   if (sites) {
     return sites.filter((site) => isBookmarkFolder(site.get('tags')) || isBookmark(site.get('tags')))
   }
-  return []
+  return makeImmutable({})
 }
 
 /**

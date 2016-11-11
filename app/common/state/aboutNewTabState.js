@@ -37,7 +37,7 @@ const aboutNewTabState = {
     }
 
     // Keep track of the last 18 visited sites
-    let sites = state.getIn(['about', 'newtab', 'sites']) || new Immutable.List()
+    let sites = state.getIn(['about', 'newtab', 'sites']) || new Immutable.Map()
     sites = sites.take(18)
     // TODO(cezaraugusto): Sort should respect unshift and don't prioritize bookmarks
     // |

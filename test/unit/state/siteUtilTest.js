@@ -118,13 +118,16 @@ describe('siteUtil', function () {
 
   describe('getNextFolderId', function () {
     it('returns the next possible folderId', function () {
-      const sites = Immutable.fromJS([{
-        folderId: 0,
-        tags: [siteTags.BOOKMARK_FOLDER]
-      }, {
-        folderId: 1,
-        tags: [siteTags.BOOKMARK_FOLDER]
-      }])
+      const sites = Immutable.fromJS({
+        'key1': {
+          folderId: 0,
+          tags: [siteTags.BOOKMARK_FOLDER]
+        },
+        'key2': {
+          folderId: 1,
+          tags: [siteTags.BOOKMARK_FOLDER]
+        }
+      })
       assert.equal(siteUtil.getNextFolderId(sites), 2)
     })
     it('returns default (0) if sites is falsey', function () {
@@ -136,8 +139,7 @@ describe('siteUtil', function () {
     it('gets the tag from siteDetail if not provided', function () {
       const processedSites = siteUtil.addSite(emptySites, bookmarkAllFields)
       const processedKey = siteUtil.getSiteKey(bookmarkAllFields)
-      const expectedSites = Immutable.fromJS([bookmarkAllFields])
-      assert.deepEqual(processedSites.getIn([processedKey, 'tags']), expectedSites.getIn([0, 'tags']))
+      assert.deepEqual(processedSites.getIn([processedKey, 'tags']), bookmarkAllFields.get('tags'))
     })
     describe('record count', function () {
       var processedSites
@@ -503,23 +505,47 @@ describe('siteUtil', function () {
   })
 
   describe('updateSiteFavicon', function () {
-    it('updates the favicon for all matching entries', function () {
+    it('updates the favicon for all matching entries (normalizing the URL)', function () {
       const siteDetail1 = Immutable.fromJS({
         tags: [siteTags.BOOKMARK],
         location: testUrl1,
-        title: 'bookmarked site'
+        title: 'bookmarked site',
+        lastAccessedTime: 123
       })
       const siteDetail2 = Immutable.fromJS({
         tags: [],
-        location: testUrl1,
-        title: 'bookmarked site'
+        location: 'https://www.brave.com',
+        title: 'history entry',
+        lastAccessedTime: 456
       })
-      const sites = Immutable.fromJS([siteDetail1, siteDetail2])
+      let sites = siteUtil.addSite(emptySites, siteDetail1, siteTags.BOOKMARK)
+      sites = siteUtil.addSite(sites, siteDetail2)
       const processedSites = siteUtil.updateSiteFavicon(sites, testUrl1, 'https://brave.com/favicon.ico')
       const updatedSiteDetail1 = siteDetail1.set('favicon', 'https://brave.com/favicon.ico')
       const updatedSiteDetail2 = siteDetail2.set('favicon', 'https://brave.com/favicon.ico')
-      const expectedSites = Immutable.fromJS([updatedSiteDetail1, updatedSiteDetail2])
-
+      let expectedSites = siteUtil.addSite(emptySites, updatedSiteDetail1, siteTags.BOOKMARK)
+      expectedSites = siteUtil.addSite(expectedSites, updatedSiteDetail2)
+      assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+    })
+    it('returns the object unchanged if location is not a URL', function () {
+      const sites = siteUtil.addSite(emptySites, bookmarkMinFields, siteTags.BOOKMARK)
+      const processedSites = siteUtil.updateSiteFavicon(sites, 'not-a-url', 'https://brave.com/favicon.ico')
+      assert.deepEqual(processedSites, sites)
+    })
+    it('returns the object unchanged if it is not an Immutable.Map', function () {
+      const emptyLegacySites = Immutable.fromJS([])
+      const processedSites = siteUtil.updateSiteFavicon(emptyLegacySites, testUrl1, 'https://brave.com/favicon.ico')
+      assert.deepEqual(processedSites, emptyLegacySites)
+    })
+    it('works even if null/undefined entries are present', function () {
+      const hasInvalidEntries = Immutable.fromJS({
+        'null': null,
+        'undefined': undefined
+      })
+      const sites = siteUtil.addSite(hasInvalidEntries, bookmarkMinFields, siteTags.BOOKMARK)
+      const processedSites = siteUtil.updateSiteFavicon(sites, testUrl1, 'https://brave.com/favicon.ico')
+      const updatedSiteDetail = bookmarkMinFields.set('favicon', 'https://brave.com/favicon.ico')
+      const expectedSites = siteUtil.addSite(hasInvalidEntries, updatedSiteDetail, siteTags.BOOKMARK)
       assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
     })
   })
@@ -728,91 +754,68 @@ describe('siteUtil', function () {
 
   describe('clearHistory', function () {
     it('does not remove sites which have a valid `tags` property', function () {
-      const sites = Immutable.fromJS([
-        { tags: [siteTags.BOOKMARK_FOLDER] },
-        { tags: [siteTags.BOOKMARK] }
-      ])
+      const sites = Immutable.fromJS({
+        'key1': { tags: [siteTags.BOOKMARK_FOLDER] },
+        'key2': { tags: [siteTags.BOOKMARK] }
+      })
       const processedSites = siteUtil.clearHistory(sites)
       assert.deepEqual(processedSites.toJS(), sites.toJS())
     })
     it('sets the lastAccessedTime for all entries to null', function () {
-      const sites = Immutable.fromJS([
-        {
+      const sites = Immutable.fromJS({
+        'key1': {
           location: 'location1',
           tags: [],
           lastAccessedTime: 123
         },
-        {
+        'key2': {
           location: 'location2',
           tags: [siteTags.BOOKMARK],
           lastAccessedTime: 123
         }
-      ])
-      const expectedSites = Immutable.fromJS([{
-        location: 'location2',
-        tags: [siteTags.BOOKMARK],
-        lastAccessedTime: null
-      }])
+      })
+      const expectedSites = Immutable.fromJS({
+        'key2': {
+          location: 'location2',
+          tags: [siteTags.BOOKMARK],
+          lastAccessedTime: null
+        }
+      })
       const processedSites = siteUtil.clearHistory(sites)
       assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
     })
   })
 
-  describe('hasNoTagSites', function () {
-    it('returns true if the ANY sites in the provided list are missing a `tags` property', function () {
-      const sites = [
-        Immutable.fromJS({
-          location: 'https://brave.com'
-        })]
-      assert.equal(siteUtil.hasNoTagSites(sites), true)
-    })
-    it('returns true if the ANY sites in the provided list have an empty `tags` property', function () {
-      const sites = [
-        Immutable.fromJS({
-          tags: []
-        })]
-      assert.equal(siteUtil.hasNoTagSites(sites), true)
-    })
-    it('returns false if all sites have a valid `tags` property', function () {
-      const sites = [
-        Immutable.fromJS({
-          tags: [siteTags.BOOKMARK_FOLDER]
-        }),
-        Immutable.fromJS({
-          tags: [siteTags.BOOKMARK]
-        })]
-      assert.equal(siteUtil.hasNoTagSites(sites), false)
-    })
-  })
-
   describe('getBookmarks', function () {
     it('returns items which are tagged either `BOOKMARK_FOLDER` or `BOOKMARK`', function () {
-      const sites = [
-        Immutable.fromJS({
+      const sites = Immutable.fromJS({
+        'key1': {
           tags: [siteTags.BOOKMARK_FOLDER]
-        }),
-        Immutable.fromJS({
+        },
+        'key2': {
           tags: [siteTags.BOOKMARK]
-        })]
+        }
+      })
       const processedSites = siteUtil.getBookmarks(sites)
       assert.deepEqual(sites, processedSites)
     })
     it('excludes items which are NOT tagged `BOOKMARK_FOLDER` or `BOOKMARK`', function () {
-      const sites = [
-        Immutable.fromJS({
+      const sites = Immutable.fromJS({
+        'key1': {
           tags: ['unknown1']
-        }),
-        Immutable.fromJS({
-          tags: ['unknown2']
-        })]
-      const expectedSites = []
+        },
+        'key2': {
+          tags: ['unknown1']
+        }
+      })
+      const expectedSites = Immutable.fromJS({})
       const processedSites = siteUtil.getBookmarks(sites)
-      assert.deepEqual(expectedSites, processedSites)
+      assert.deepEqual(expectedSites.toJS(), processedSites.toJS())
     })
-    it('returns empty list if input was falsey', function () {
+    it('returns empty map if input was falsey', function () {
       const processedSites = siteUtil.getBookmarks(null)
-      const expectedSites = []
-      assert.deepEqual(processedSites, expectedSites)
+      const expectedSites = Immutable.fromJS({})
+      assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
     })
   })
 
