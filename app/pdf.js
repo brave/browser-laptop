@@ -8,14 +8,14 @@ const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
 const base64Encode = require('../js/lib/base64').encode
 
-const renderUrlToPdf = (appState, action) => {
+const renderUrlToPdf = (appState, action, testingMode) => {
   let url = action.url
   let savePath = action.savePath
   let openAfterwards = action.openAfterwards
 
   let currentBw = BrowserWindow.getFocusedWindow()
 
-  let bw = new BrowserWindow({show: false, backgroundColor: '#ffffff'})
+  let bw = new BrowserWindow({show: !!testingMode, backgroundColor: '#ffffff'})
   let wv = bw.webContents
 
   wv.loadURL(url)
@@ -47,7 +47,7 @@ const renderUrlToPdf = (appState, action) => {
               currentBw.webContents.loadURL('file://' + savePath)
             }
 
-            if (bw) {
+            if (bw && !testingMode) {
               try {
                 bw.close()
               } catch (exc) {}

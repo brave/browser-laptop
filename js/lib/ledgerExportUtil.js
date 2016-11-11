@@ -101,7 +101,7 @@ let getTotalContribution = function getTotalContribution (transactions, viewingI
 }
 
 /**
- * Gives a summary of votes/contributions by Publisher from an array of one or ore transactions
+ * Gives a summary of votes/contributions by Publisher from an array of one or more transactions
  * @example
  * txUtil.getPublisherVoteData(client.state.transactions)
  * // {
@@ -203,15 +203,29 @@ let getPublisherVoteData = function getPublisherVoteData (transactions, viewingI
  * @param {string[]=} viewingIds - OPTIONAL array/string with one or more viewingIds to filter transactions by (if empty, uses all tx)
  * @param {boolean=} addTotalRow - OPTIONAL boolean indicating whether to add a TOTALS row (defaults false)
  **/
-let getTransactionCSVRows = function (transactions, viewingIds, addTotalRow) {
+let getTransactionCSVRows = function (transactions, viewingIds, addTotalRow, sortByContribution) {
   let txContribData = getPublisherVoteData(transactions, viewingIds)
   var publishers = (underscore.keys(txContribData) || [])
 
-  // sort publishers alphabetically
-  // TODO: take locale argument and pass to localeCompare below
-  publishers = publishers.sort(function (a, b) {
-    return (a && typeof a === 'string' ? a : '').localeCompare(b && typeof b === 'string' ? b : '')
-  })
+  let publisherSortFunction
+
+  if (sortByContribution) {
+    // sort publishers by contribution
+    publisherSortFunction = function (a, b) {
+      var getFraction = function (pubStr) {
+        return (pubStr && typeof pubStr === 'string' && txContribData[pubStr] && txContribData[pubStr].fraction ? txContribData[pubStr].fraction : 0)
+      }
+      return getFraction(a) < getFraction(b)
+    }
+  } else {
+    // sort publishers alphabetically by default (per spec)
+    // TODO: take locale argument and pass to localeCompare below
+    publisherSortFunction = function (a, b) {
+      return (a && typeof a === 'string' ? a : '').localeCompare(b && typeof b === 'string' ? b : '')
+    }
+  }
+
+  publishers = publishers.sort(publisherSortFunction)
 
   var currency = (publishers.length ? txContribData[publishers[0]].contribution.currency : 'USD')
 
