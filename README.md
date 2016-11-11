@@ -140,10 +140,9 @@ You can simply run an npm task to build and install your local electron instance
 
     npm run install
 
-If your directory structure isn't side by side, you can run the following (altering the rsync as needed):
+If your directory structure isn't side by side, you can run the following (altering the rsync as needed) command from within electron:
 
-    npm run build
-    rsync -avz --delete out/D/Brave.app {{path-to-browser-laptop}}/node_modules/electron-prebuilt/dist/
+    rsync -avz --delete out/D/Brave.app dist {{path-to-browser-laptop}}/node_modules/electron-prebuilt/dist/ 
 
 
 ## Packaging for bundles, installers, and updates
@@ -189,3 +188,9 @@ To create a package:
 To create a dev package:
 
     CHANNEL=dev npm run build-package
+
+Finally run:
+
+    npm run build-installer
+
+You will see a .deb and .rpm files in dist/
