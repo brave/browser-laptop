@@ -932,6 +932,7 @@ class Main extends ImmutableComponent {
               <div className='backforward'>
                 <div className={cx({
                   navigationButtonContainer: true,
+                  nav: true,
                   disabled: !activeFrame || !activeFrame.get('canGoBack')
                 })}>
                   <LongPressButton
@@ -944,6 +945,7 @@ class Main extends ImmutableComponent {
                 </div>
                 <div className={cx({
                   navigationButtonContainer: true,
+                  nav: true,
                   disabled: !activeFrame || !activeFrame.get('canGoForward')
                 })}>
                   <LongPressButton

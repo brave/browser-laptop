@@ -480,15 +480,21 @@
 
     .backButton,
     .forwardButton {
-      width: @navbarButtonWidth;
+//      width: @navbarButtonWidth;
+    width: 20px;
+    margin-top: 5px;
     }
 
     .backButton {
-      padding-right: @navbarButtonSpacing;
+//      padding-right: @navbarButtonSpacing;
+    padding-right:4px;
+    margin-left: 4px;
     }
 
     .forwardButton {
-      padding-left: @navbarButtonSpacing;
+//      padding-left: @navbarButtonSpacing;
+    padding-left: 4px;
+    margin-left: 6px;
     }
   }
 
@@ -569,13 +575,21 @@
   display: inline-block;
   width: 12px;
   height: 14px;
-  margin: 0 6px;
+  margin: 0 7px 0 0;
 }
 
 .navigationButtonContainer {
   border-radius: @borderRadius;
-  height: 28px;
-  margin: 0 3px;
+  height: 24px;
+  width: 26px;
+  margin-left: -3px;
+  margin-right: 6px;
+    
+  &.nav {
+  margin-left: 4px;
+  margin-right: 1px;
+  width: 34px;
+  }
 
   &:last-child {
     margin-right: 8px;
@@ -583,22 +597,25 @@
 
   &:not(.disabled):hover {
     background: white;
-    box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.15);
   }
 }
 
 .backButton,
 .forwardButton {
-  height: 16px;
-  margin: 7px 0 0 0;
+  height: 15px;
+  width: 30px;
+  margin-top: 5px;
 }
 
 .backButton {
   background: url('../img/toolbar/back_btn.svg') center no-repeat;
+  margin-left: 4px;
 }
 
 .forwardButton {
   background: url('../img/toolbar/forward_btn.svg') center no-repeat;
+  margin-left: 4px;
 }
 
 #navigator {
@@ -606,27 +623,25 @@
     background: url('../img/toolbar/stoploading_btn.svg') center no-repeat;
     margin: 0 3px 3px 3px;
     padding: 0 6px;
-    height: 10px;
+    height: 12px;
     position: relative;
     top: 3px;
   }
 
   .reloadButton {
     background: url('../img/toolbar/reload_btn.svg') center no-repeat;
-    margin: 0 3px 0px 3px;
-    padding: 0 6px;
+    margin: 0 3px -1px 3px;
+    padding: 0 4px;
     position: relative;
-    top: 3px;
   }
 
   .homeButton {
     background: url('../img/toolbar/home_btn.svg') center no-repeat;
     width: 14px;
     height: 13px;
-    margin: 0 7px 1px 0px;
+//    margin: 0 7px 1px 0px;
     padding: 0 6px;
     position: relative;
-    top: 3px;
   }
 
   .bookmarkButton {
@@ -635,6 +650,7 @@
     width: 14px;
     height: 14px;
     margin-bottom: 2px;
+    margin-left: 6px;
 
     &.removeBookmarkButton {
       background: url('../img/toolbar/bookmark_marked.svg') center no-repeat;
@@ -645,6 +661,7 @@
 .navigatorWrapper {
   justify-content: space-between;
   align-items: center;
+  margin-top: 1px;
   height: @navbarHeight;
   box-sizing: border-box;
 
