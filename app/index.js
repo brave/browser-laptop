@@ -82,7 +82,7 @@ const basicAuth = require('./browser/basicAuth')
 const async = require('async')
 const tabs = require('./browser/tabs')
 const settings = require('../js/constants/settings')
-require('./browser/webtorrent')
+const webtorrent = require('./browser/webtorrent')
 
 // temporary fix for #4517, #4518 and #4472
 app.commandLine.appendSwitch('enable-use-zoom-for-dsf', 'false')
@@ -432,6 +432,7 @@ app.on('ready', () => {
     TrackingProtection.init()
     AdBlock.init()
     AdInsertion.init()
+    webtorrent.init()
 
     if (!loadedPerWindowState || loadedPerWindowState.length === 0) {
       if (!CmdLine.newWindowURL()) {

@@ -890,10 +890,6 @@ class Frame extends ImmutableComponent {
             if (typeof message.channelID !== 'string') {
               throw new Error('Invalid or missing channelID: ' + JSON.stringify(message))
             }
-            if (this.torrentChannelID && this.torrentChannelID !== message.channelID) {
-              throw new Error('ChannelID changed, expected ' + this.torrentChannelID +
-                ': ' + JSON.stringify(message))
-            }
             this.torrentChannelID = message.channelID
             ipc.send(messages.TORRENT_MESSAGE, message)
           }
