@@ -2,7 +2,26 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 'use strict'
+
 const Immutable = require('immutable')
+const {makeImmutable} = require('../state/immutableUtil')
+const siteUtil = require('../../../js/state/siteUtil')
+const aboutHistoryMaxEntries = 500
+
+module.exports.maxEntries = aboutHistoryMaxEntries
+
+const sortTimeDescending = (left, right) => {
+  if (left.get('lastAccessedTime') < right.get('lastAccessedTime')) return 1
+  if (left.get('lastAccessedTime') > right.get('lastAccessedTime')) return -1
+  return 0
+}
+
+module.exports.getHistory = (sites) => {
+  sites = makeImmutable(sites) || new Immutable.List()
+  return sites.filter((site) => siteUtil.isHistoryEntry(site))
+      .sort(sortTimeDescending)
+      .slice(0, aboutHistoryMaxEntries)
+}
 
 const getDayString = (entry, locale) => {
   const lastAccessedTime = entry.get('lastAccessedTime')
@@ -42,15 +61,11 @@ module.exports.groupEntriesByDay = (history, locale) => {
  * Format is expected to be array containing one array per day.
  */
 module.exports.totalEntries = (entriesByDay) => {
+  entriesByDay = makeImmutable(entriesByDay) || new Immutable.List()
+
   let result = new Immutable.List()
   entriesByDay.forEach((entry) => {
     result = result.push(entry.get('entries'))
   })
   return result
-}
-
-module.exports.sortTimeDescending = (left, right) => {
-  if (left.get('lastAccessedTime') < right.get('lastAccessedTime')) return 1
-  if (left.get('lastAccessedTime') > right.get('lastAccessedTime')) return -1
-  return 0
 }

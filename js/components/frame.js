@@ -96,9 +96,10 @@ class Frame extends ImmutableComponent {
         bookmarkFolders: this.props.bookmarkFolders.toJS()
       })
     } else if (location === 'about:history') {
-      this.webview.send(messages.HISTORY_UPDATED, {
-        history: this.props.history.toJS()
-      })
+      const aboutHistoryState = this.props.history && this.props.history.toJS
+        ? this.props.history.toJS()
+        : {}
+      this.webview.send(messages.HISTORY_UPDATED, aboutHistoryState)
       this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
     } else if (location === 'about:extensions') {
       this.webview.send(messages.EXTENSIONS_UPDATED, {
@@ -171,7 +172,7 @@ class Frame extends ImmutableComponent {
         this.webview.send(messages.AUTOFILL_CREDIT_CARDS_UPDATED, list)
       }
     } else if (location === 'about:brave') {
-      const versionInformation = appStoreRenderer.state.get('versionInformation')
+      const versionInformation = appStoreRenderer.state.getIn(['about', 'brave', 'versionInformation'])
       if (versionInformation && versionInformation.toJS) {
         this.webview.send(messages.VERSION_INFORMATION_UPDATED, versionInformation.toJS())
       }

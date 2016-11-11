@@ -39,6 +39,7 @@ const basicAuthState = require('../../app/common/state/basicAuthState')
 const extensionState = require('../../app/common/state/extensionState')
 const tabState = require('../../app/common/state/tabState')
 const aboutNewTabState = require('../../app/common/state/aboutNewTabState')
+const aboutHistoryState = require('../../app/common/state/aboutHistoryState')
 const isDarwin = process.platform === 'darwin'
 const isWindows = process.platform === 'win32'
 
@@ -435,6 +436,9 @@ const handleAppAction = (action) => {
         appState = aboutNewTabState.setSites(appState, action)
       }
       break
+    case AppConstants.APP_POPULATE_HISTORY:
+      appState = aboutHistoryState.setHistory(appState, action)
+      break
     case AppConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size
       if (action.siteDetail.constructor === Immutable.List) {
@@ -452,10 +456,12 @@ const handleAppAction = (action) => {
         filterOutNonRecents()
       }
       appState = aboutNewTabState.setSites(appState, action)
+      appState = aboutHistoryState.setHistory(appState, action)
       break
     case AppConstants.APP_REMOVE_SITE:
       appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag))
       appState = aboutNewTabState.setSites(appState, action)
+      appState = aboutHistoryState.setHistory(appState, action)
       break
     case AppConstants.APP_MOVE_SITE:
       appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent, false))

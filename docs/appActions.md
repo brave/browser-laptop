@@ -494,6 +494,12 @@ Dispatch a message to indicate default browser check is complete
 
 
 
+### populateHistory() 
+
+Notify the AppStore to provide default history values.
+
+
+
 
 * * *
 

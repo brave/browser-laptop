@@ -13,7 +13,6 @@ const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
 const Button = require('../components/button')
-const siteUtil = require('../state/siteUtil')
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
 const historyUtil = require('../../app/common/lib/historyUtil')
 
@@ -56,13 +55,6 @@ class HistoryTimeCell extends ImmutableComponent {
 }
 
 class HistoryDay extends ImmutableComponent {
-  constructor () {
-    super()
-    this.clearSelection = this.clearSelection.bind(this)
-  }
-  clearSelection () {
-    this.refs.historyTable.clearSelection()
-  }
   navigate (entry) {
     entry = makeImmutable(entry)
     aboutActions.newFrame({
@@ -74,7 +66,6 @@ class HistoryDay extends ImmutableComponent {
     return <div>
       <div className='sectionTitle historyDayName'>{this.props.date}</div>
       <SortableTable headings={['time', 'title', 'domain']}
-        ref='historyTable'
         defaultHeading='time'
         defaultHeadingSortOrder='desc'
         rows={this.props.entries.map((entry) => [
@@ -101,36 +92,23 @@ class HistoryDay extends ImmutableComponent {
   }
 }
 
-class GroupedHistoryList extends ImmutableComponent {
-  constructor () {
-    super()
-    this.entriesByDay = []
-    this.clearSelection = this.clearSelection.bind(this)
-  }
-  clearSelection () {
-    this.entriesByDay.forEach((day) => day.clearSelection())
-  }
+class GroupedHistoryList extends React.Component {
   render () {
     const defaultLanguage = this.props.languageCodes.find((lang) => lang.includes(navigator.language)) || 'en-US'
     const userLanguage = getSetting(settings.LANGUAGE, this.props.settings) || defaultLanguage
     const entriesByDay = historyUtil.groupEntriesByDay(this.props.history, userLanguage)
     const totalEntries = historyUtil.totalEntries(entriesByDay)
     let index = 0
-    this.entriesByDay = []
     return <list className='historyList'>
       {
-        entriesByDay.map((groupedEntry) => {
-          const day = <HistoryDay
-            ref={'historyDay' + index}
+        entriesByDay.map((groupedEntry) =>
+          <HistoryDay
             date={groupedEntry.get('date')}
             entries={groupedEntry.get('entries')}
             totalEntries={totalEntries}
-            tableID={index}
+            tableID={index++}
             stateOwner={this.props.stateOwner}
-          />
-          this.entriesByDay.push(this.refs[('historyDay' + index++)])
-          return day
-        })
+          />)
       }
     </list>
   }
@@ -149,10 +127,22 @@ class AboutHistory extends React.Component {
       search: '',
       settings: Immutable.Map(),
       languageCodes: Immutable.Map(),
-      selection: Immutable.Set()
+      selection: Immutable.Set(),
+      updatedStamp: undefined
     }
     ipc.on(messages.HISTORY_UPDATED, (e, detail) => {
-      this.setState({ history: Immutable.fromJS(detail && detail.history || {}) })
+      const aboutHistory = Immutable.fromJS(detail || {})
+      const updatedStamp = aboutHistory.get('updatedStamp')
+      // Only update if the data has changed.
+      if (typeof updatedStamp === 'number' &&
+          typeof this.state.updatedStamp === 'number' &&
+          updatedStamp === this.state.updatedStamp) {
+        return
+      }
+      this.setState({
+        history: aboutHistory.get('entries') || new Immutable.List(),
+        updatedStamp: updatedStamp
+      })
     })
     ipc.on(messages.SETTINGS_UPDATED, (e, settings) => {
       this.setState({ settings: Immutable.fromJS(settings || {}) })
@@ -180,7 +170,6 @@ class AboutHistory extends React.Component {
       }
       targetElement = targetElement.parentNode
     }
-
     // Click was not a child element of sortableTable; clear selection
     this.clearSelection()
   }
@@ -190,16 +179,13 @@ class AboutHistory extends React.Component {
       return title.match(new RegExp(searchTerm, 'gi'))
     })
   }
-  get historyDescendingOrder () {
-    return this.state.history.filter((site) => siteUtil.isHistoryEntry(site))
-      .sort(historyUtil.sortTimeDescending)
-      .slice(0, 500)
-  }
   clearBrowsingDataNow () {
     aboutActions.clearBrowsingDataNow({browserHistory: true})
   }
   clearSelection () {
-    this.refs.historyList.clearSelection()
+    this.setState({
+      selection: new Immutable.Set()
+    })
   }
   componentDidMount () {
     this.refs.historySearch.focus()
@@ -223,13 +209,12 @@ class AboutHistory extends React.Component {
 
       <div className='siteDetailsPageContent'>
         <GroupedHistoryList
-          ref='historyList'
           languageCodes={this.state.languageCodes}
           settings={this.state.settings}
           history={
             this.state.search
-            ? this.searchedSiteDetails(this.state.search, this.historyDescendingOrder)
-            : this.historyDescendingOrder
+            ? this.searchedSiteDetails(this.state.search, this.state.history)
+            : this.state.history
           }
           stateOwner={this} />
       </div>
