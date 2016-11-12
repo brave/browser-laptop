@@ -319,18 +319,17 @@ class BookmarksToolbar extends ImmutableComponent {
 
     // Loop through until we fill up the entire bookmark toolbar width
     let i
-    let noParentItemsList = noParentItems.toList()
-    for (i = 0; i < noParentItemsList.size; i++) {
+    for (i = 0; i < noParentItems.size; i++) {
       let iconWidth = props.showFavicon ? iconSize : 0
       // font-awesome file icons are 3px smaller
-      if (props.showFavicon && !noParentItemsList.getIn([i, 'folderId']) && !noParentItemsList.getIn([i, 'favicon'])) {
+      if (props.showFavicon && !noParentItems.getIn([i, 'folderId']) && !noParentItems.getIn([i, 'favicon'])) {
         iconWidth -= 3
       }
-      const chevronWidth = props.showFavicon && noParentItemsList.getIn([i, 'folderId']) ? this.chevronWidth : 0
+      const chevronWidth = props.showFavicon && noParentItems.getIn([i, 'folderId']) ? this.chevronWidth : 0
       if (props.showFavicon && props.showOnlyFavicon) {
         widthAccountedFor += this.padding + iconWidth + chevronWidth
       } else {
-        const text = noParentItemsList.getIn([i, 'customTitle']) || noParentItemsList.getIn([i, 'title']) || noParentItemsList.getIn([i, 'location'])
+        const text = noParentItems.getIn([i, 'customTitle']) || noParentItems.getIn([i, 'title']) || noParentItems.getIn([i, 'location'])
         widthAccountedFor += Math.min(calculateTextWidth(text, `${this.fontSize} ${this.fontFamily}`) + this.padding + iconWidth + chevronWidth, this.maxWidth)
       }
       widthAccountedFor += margin
@@ -338,18 +337,9 @@ class BookmarksToolbar extends ImmutableComponent {
         break
       }
     }
-    const bookmarkSort = (x, y) => {
-      if (x.get('order') < y.get('order')) {
-        return -1
-      } else if (x.get('order') > y.get('order')) {
-        return 1
-      } else {
-        return 0
-      }
-    }
-    this.bookmarksForToolbar = noParentItems.take(i).sort(bookmarkSort)
+    this.bookmarksForToolbar = noParentItems.take(i)
     // Show at most 100 items in the overflow menu
-    this.overflowBookmarkItems = noParentItems.skip(i).take(100).sort(bookmarkSort)
+    this.overflowBookmarkItems = noParentItems.skip(i).take(100)
   }
   componentWillMount () {
     this.updateBookmarkData(this.props)

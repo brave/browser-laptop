@@ -34,8 +34,7 @@ AppStore
       }
     }
   },
-  sites: {
-  [siteKey]: { // folder: folderId; bookmark/history: location + partitionNumber + parentFolderId
+  sites: [{
     location: string,
     title: string,
     customTitle: string, // User provided title for bookmark; overrides title
@@ -47,7 +46,7 @@ AppStore
     partitionNumber: number, // Optionally specifies a specific session
     folderId: number, // Set for bookmark folders only
     parentFolderId: number // Set for bookmarks and bookmark folders only
-  }},
+  }],
   downloads: [{
     [downloadId]: {
       startTime: number, // datetime.getTime()

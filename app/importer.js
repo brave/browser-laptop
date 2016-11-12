@@ -23,7 +23,6 @@ const locale = require('./locale')
 var isMergeFavorites = false
 var isImportingBookmarks = false
 var hasBookmarks
-var importedSites
 
 exports.init = () => {
   importer.initialize()
@@ -172,7 +171,6 @@ importer.on('add-bookmarks', (e, bookmarks, topLevelFolder) => {
       sites.push(site)
     }
   }
-  importedSites = Immutable.fromJS(sites)
   appActions.addSite(Immutable.fromJS(sites))
 })
 
@@ -189,7 +187,7 @@ importer.on('add-favicons', (e, detail) => {
       }
     }
   })
-  let sites = importedSites
+  let sites = AppStore.getState().get('sites')
   sites = sites.map((site) => {
     if ((site.get('favicon') === undefined && site.get('location') !== undefined &&
       faviconMap[site.get('location')] !== undefined) ||
