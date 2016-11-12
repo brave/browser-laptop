@@ -112,8 +112,8 @@ class TorrentViewer extends React.Component {
 
     let fileContent
     if (state.torrent && ix) {
-      fileContent = state.server != null
-        ? <iframe src={state.server + '/' + ix} sandbox='allow-same-origin' />
+      fileContent = state.torrent.serverURL != null
+        ? <iframe src={state.torrent.serverURL + '/' + ix} sandbox='allow-same-origin' />
         : <div>Loading...</div>
     }
 

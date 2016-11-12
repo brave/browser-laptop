@@ -1,16 +1,15 @@
 const prettierBytes = require('prettier-bytes')
-
-const ImmutableComponent = require('../../components/immutableComponent')
+const React = require('react')
 const SortableTable = require('../../components/sortableTable')
 
-class TorrentFileList extends ImmutableComponent {
+class TorrentFileList extends React.Component {
   constructor () {
     super()
     this.onClick = this.onClick.bind(this)
   }
 
   onClick (file) {
-    window.location = this.props.torrentID + '&ix=' + file.offset
+    window.location = this.props.torrentID + '&ix=' + this.props.files.indexOf(file)
   }
 
   render () {
