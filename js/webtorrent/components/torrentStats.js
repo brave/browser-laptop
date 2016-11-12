@@ -1,8 +1,7 @@
 const prettierBytes = require('prettier-bytes')
+const React = require('react')
 
-const ImmutableComponent = require('../../components/immutableComponent')
-
-class TorrentStats extends ImmutableComponent {
+class TorrentStats extends React.Component {
   render () {
     const torrent = this.props.torrent
     const errorMessage = this.props.errorMessage
@@ -51,6 +50,9 @@ class TorrentStats extends ImmutableComponent {
     }
 
     function renderEta () {
+      if (torrent.timeRemaining === Infinity) return // Zero download speed
+      if (torrent.downloaded === torrent.length) return // Already done
+
       const rawEta = torrent.timeRemaining / 1000
       const hours = Math.floor(rawEta / 3600) % 24
       const minutes = Math.floor(rawEta / 60) % 60
