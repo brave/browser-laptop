@@ -12,17 +12,6 @@ const React = require('react')
 const ImmutableComponent = require('../../../js/components/immutableComponent')
 const appConfig = require('../../../js/constants/appConfig')
 
-const widevineInfoStyle = {
-  paddingBottom: 10
-}
-const widevineInfoIconStyle = {
-  padding: 5
-}
-
-const subtextStyle = {
-  marginBottom: 7
-}
-
 class WidevineInfo extends ImmutableComponent {
   constructor () {
     super()
@@ -40,19 +29,17 @@ class WidevineInfo extends ImmutableComponent {
     }, true)
   }
   render () {
-    return <div style={widevineInfoStyle}>
-      <div style={subtextStyle} className='subtext'>
+    return <div className='widevineInfo'>
+      <div className='subtext'>
         <span data-l10n-id='enableWidevineSubtext' />
-        <span style={widevineInfoIconStyle}
-          className='fa fa-info-circle'
+        <span className='fa fa-info-circle'
           onClick={this.onMoreInfo}
           title={appConfig.widevine.moreInfoUrl}
         />
       </div>
       <div className='subtext'>
         <span data-l10n-id='enableWidevineSubtext2' />
-        <span style={widevineInfoIconStyle}
-          className='fa fa-info-circle'
+        <span className='fa fa-info-circle'
           onClick={this.onViewLicense}
           title={appConfig.widevine.licenseUrl}
         />
