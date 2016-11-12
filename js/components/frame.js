@@ -1032,8 +1032,11 @@ class Frame extends ImmutableComponent {
         appActions.hideMessageBox(message)
       }
       this.notificationCallbacks = {}
-      // only give focus focus is this is not the initial default page load
-      if (this.props.isActive && this.webview.canGoBack() && document.activeElement !== this.webview) {
+      const isNewTabPage = e.url === getTargetAboutUrl('about:newtab')
+      if (isNewTabPage) {
+        windowActions.setUrlBarActive(true)
+        windowActions.setUrlBarFocused(true)
+      } else if (this.props.isActive && !isNewTabPage && document.activeElement !== this.webview) {
         this.webview.focus()
       }
       windowActions.setNavigated(e.url, this.props.frameKey, false, this.frame.get('tabId'))

@@ -57,6 +57,34 @@ describe('navigationBar', function () {
   }
 
   describe('navigation', function () {
+    describe('focus', function () {
+      Brave.beforeAll(this)
+      before(function * () {
+        const page1 = Brave.server.url('page1.html')
+        yield this.app.client.waitForExist(urlInput)
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .tabByIndex(0)
+          .url(page1)
+          .waitForUrl(page1)
+          .windowByUrl(Brave.browserWindowUrl)
+          .ipcSend('shortcut-focus-url')
+          .waitForElementFocus(urlInput)
+          .keys(Brave.keys.ENTER)
+      })
+
+      it('webview has focus after initial load', function * () {
+        yield this.app.client.waitForElementFocus(activeWebview)
+      })
+
+      it('webview has focus after second load', function * () {
+        yield this.app.client
+          .ipcSend('shortcut-focus-url')
+          .waitForElementFocus(urlInput)
+          .keys(Brave.keys.ENTER)
+          .waitForElementFocus(activeWebview)
+      })
+    })
     describe('tabnapping', function () {
       Brave.beforeAll(this)
 
