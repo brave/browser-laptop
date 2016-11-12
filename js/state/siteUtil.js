@@ -9,7 +9,6 @@ const settings = require('../constants/settings')
 const getSetting = require('../settings').getSetting
 const UrlUtil = require('../lib/urlutil')
 const urlParse = require('url').parse
-const {makeImmutable} = require('../../app/common/state/immutableUtil')
 
 const isBookmark = (tags) => {
   if (!tags) {
@@ -26,37 +25,22 @@ const isBookmarkFolder = (tags) => {
     tags && typeof tags !== 'string' && tags.includes(siteTags.BOOKMARK_FOLDER)
 }
 
-const reorderSite = (sites, order) => {
-  sites = sites.map((site) => {
-    const siteOrder = site.get('order')
-    if (siteOrder > order) {
-      return site.set('order', siteOrder - 1)
-    }
-    return site
-  })
-  return sites
-}
-
 /**
- * Calculate siteKey for siteDetail
+ * Obtains the index of the location in sites
  *
- * @param siteDetail The site to to be calculated
- * @return key if siteDetail is valid
+ * @param sites The application state's Immutable sites list
+ * @param siteDetail The siteDetails entry to get the index of
+ * @param tags Tag for siteDetail (ex: bookmark). Folders are searched differently than other entries
+ * @return index of the siteDetail or -1 if not found.
  */
-module.exports.getSiteKey = function (siteDetail) {
-  if (!siteDetail) {
-    return null
+module.exports.getSiteIndex = function (sites, siteDetail, tags) {
+  if (!sites || !siteDetail) {
+    return -1
   }
-  const folderId = siteDetail.get('folderId')
-  const location = siteDetail.get('location')
-  if (folderId) {
-    return folderId.toString()
-  } else if (location) {
-    return location +
-      (siteDetail.get('partitionNumber') || 0) +
-      (siteDetail.get('parentFolderId') || 0)
+  if (isBookmarkFolder(tags)) {
+    return sites.findIndex((site) => isBookmarkFolder(site.get('tags')) && site.get('folderId') === siteDetail.get('folderId'))
   }
-  return null
+  return sites.findIndex((site) => site.get('location') === siteDetail.get('location') && (site.get('partitionNumber') || 0) === (siteDetail.get('partitionNumber') || 0))
 }
 
 /**
@@ -67,14 +51,11 @@ module.exports.getSiteKey = function (siteDetail) {
  * @return true if the location is already bookmarked
  */
 module.exports.isSiteBookmarked = function (sites, siteDetail) {
-  if (!sites) {
+  const index = module.exports.getSiteIndex(sites, siteDetail, siteTags.BOOKMARK)
+  if (index === -1) {
     return false
   }
-  const key = module.exports.getSiteKey(siteDetail)
-  if (key === null) {
-    return false
-  }
-  return isBookmark(sites.getIn([key, 'tags']))
+  return isBookmark(sites.get(index).get('tags'))
 }
 
 const getNextFolderIdItem = (sites) =>
@@ -104,7 +85,7 @@ module.exports.getNextFolderId = (sites) => {
 
 // Some details can be copied from the existing siteDetail if null
 // ex: parentFolderId, partitionNumber, and favicon
-const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId, order) => {
+const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId) => {
   let tags = oldSiteDetail && oldSiteDetail.get('tags') || new Immutable.List()
   if (tag) {
     tags = tags.toSet().add(tag).toList()
@@ -121,16 +102,11 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId, order) =>
     lastAccessedTime = newSiteDetail.get('lastAccessedTime') || new Date().getTime()
   }
 
-  let site = makeImmutable({
+  let site = Immutable.fromJS({
     lastAccessedTime: lastAccessedTime,
     tags,
-    title: newSiteDetail.get('title'),
-    order
+    title: newSiteDetail.get('title')
   })
-
-  if (oldSiteDetail && oldSiteDetail.get('order') !== undefined) {
-    site = site.set('order', oldSiteDetail.get('order'))
-  }
 
   if (newSiteDetail.get('location')) {
     site = site.set('location', newSiteDetail.get('location'))
@@ -186,13 +162,8 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
     tag = siteDetail.getIn(['tags', 0])
   }
 
-  let originalSiteKey
-  if (originalSiteDetail) {
-    originalSiteKey = module.exports.getSiteKey(originalSiteDetail)
-  }
-
-  const oldKey = originalSiteKey || module.exports.getSiteKey(siteDetail)
-  const oldSite = oldKey !== null ? sites.get(oldKey) : null
+  const index = module.exports.getSiteIndex(sites, originalSiteDetail || siteDetail, tag)
+  const oldSite = index !== -1 ? sites.getIn([index]) : null
   let folderId = siteDetail.get('folderId')
 
   if (tag === siteTags.BOOKMARK_FOLDER) {
@@ -202,7 +173,7 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
         site.get('parentFolderId') === siteDetail.get('parentFolderId') &&
         site.get('customTitle') === siteDetail.get('customTitle'))
       if (dupFolder) {
-        sites = module.exports.removeSite(sites, dupFolder, siteTags.BOOKMARK_FOLDER, true)
+        sites = module.exports.removeSite(sites, dupFolder, siteTags.BOOKMARK_FOLDER)
       }
     } else if (!folderId) {
       // Assign an id if this is a new folder
@@ -210,13 +181,13 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
     }
   }
 
-  let site = mergeSiteDetails(oldSite, siteDetail, tag, folderId, sites.size)
-
-  const key = originalSiteKey || module.exports.getSiteKey(site)
-  if (key === null) {
-    return sites
+  let site = mergeSiteDetails(oldSite, siteDetail, tag, folderId)
+  if (index === -1) {
+    // Insert new entry
+    return sites.push(site)
   }
-  return sites.set(key, site)
+  // Update existing entry
+  return sites.setIn([index], site)
 }
 
 /**
@@ -224,29 +195,38 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
  *
  * @param sites The application state's Immutable sites list
  * @param siteDetail The siteDetail to remove a tag from
- * @param reorder whether to reorder sites (default with reorder)
  * @return The new sites Immutable object
  */
-module.exports.removeSite = function (sites, siteDetail, tag, reorder = true) {
-  const key = module.exports.getSiteKey(siteDetail)
+module.exports.removeSite = function (sites, siteDetail, tag) {
+  const index = module.exports.getSiteIndex(sites, siteDetail, tag)
+  if (index === -1) {
+    return sites
+  }
 
-  const tags = sites.getIn([key, 'tags'])
+  const tags = sites.getIn([index, 'tags'])
   if (isBookmarkFolder(tags)) {
-    const folderId = sites.getIn([key, 'folderId'])
+    const folderId = sites.getIn([index, 'folderId'])
     const childSites = sites.filter((site) => site.get('parentFolderId') === folderId)
     childSites.forEach((site) => {
       const tags = site.get('tags')
       tags.forEach((tag) => {
-        sites = module.exports.removeSite(sites, site, tag, false)
+        sites = module.exports.removeSite(sites, site, tag)
       })
     })
   }
-  if (sites.size && reorder) {
-    const order = sites.getIn([key, 'order'])
-    sites = reorderSite(sites, order)
+  if (tags.size === 0 && !tag) {
+    // If called without tags and entry has no tags, remove the entry
+    return sites.splice(index, 1)
+  } else if (tags.size > 0 && !tag) {
+    // If called without tags BUT entry has tags, null out lastAccessedTime.
+    // This is a bookmark entry that we want to clear history for (but NOT delete/untag bookmark)
+    return sites.setIn([index, 'lastAccessedTime'], null)
   }
-
-  return sites.delete(key)
+  // Else, remove the specified tag
+  return sites
+    .setIn([index, 'parentFolderId'], 0)
+    .deleteIn([index, 'customTitle'])
+    .setIn([index, 'tags'], tags.toSet().remove(tag).toList())
 }
 
 /**
@@ -297,40 +277,28 @@ module.exports.isMoveAllowed = (sites, sourceDetail, destinationDetail) => {
  * @param disallowReparent If set to true, parent folder will not be set
  * @return The new sites Immutable object
  */
-module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prepend,
-  destinationIsParent, disallowReparent) {
+module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prepend, destinationIsParent, disallowReparent) {
   if (!module.exports.isMoveAllowed(sites, sourceDetail, destinationDetail)) {
     return sites
   }
 
-  let sourceKey = module.exports.getSiteKey(sourceDetail)
-  let destinationKey = module.exports.getSiteKey(destinationDetail)
-
-  const sourceSiteIndex = sites.getIn([sourceKey, 'order'])
+  const sourceSiteIndex = module.exports.getSiteIndex(sites, sourceDetail, sourceDetail.get('tags'))
   let destinationSiteIndex
   if (destinationIsParent) {
     // When the destination is the parent we want to put it at the end
     destinationSiteIndex = sites.size - 1
     prepend = false
   } else {
-    destinationSiteIndex = sites.getIn([destinationKey, 'order'])
+    destinationSiteIndex = module.exports.getSiteIndex(sites, destinationDetail, destinationDetail.get('tags'))
   }
 
   let newIndex = destinationSiteIndex + (prepend ? 0 : 1)
-  let sourceSite = sites.get(sourceKey)
-  let destinationSite = sites.get(destinationKey)
-  sites = sites.delete(sourceKey)
-  sites = sites.map((site) => {
-    const siteOrder = site.get('order')
-    if (siteOrder > sourceSiteIndex) {
-      return site.set('order', siteOrder - 1)
-    }
-    return site
-  })
+  let sourceSite = sites.get(sourceSiteIndex)
+  let destinationSite = sites.get(destinationSiteIndex)
+  sites = sites.splice(sourceSiteIndex, 1)
   if (newIndex > sourceSiteIndex) {
     newIndex--
   }
-  sourceSite = sourceSite.set('order', newIndex)
 
   if (!disallowReparent) {
     if (destinationIsParent && destinationDetail.get('folderId') !== sourceSite.get('folderId')) {
@@ -341,8 +309,7 @@ module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prep
       sourceSite = sourceSite.set('parentFolderId', destinationSite.get('parentFolderId'))
     }
   }
-  sourceKey = module.exports.getSiteKey(sourceSite)
-  return sites.set(sourceKey, sourceSite)
+  return sites.splice(newIndex, 0, sourceSite)
 }
 
 module.exports.getDetailFromFrame = function (frame, tag) {
@@ -351,7 +318,7 @@ module.exports.getDetailFromFrame = function (frame, tag) {
     location = frame.get('pinnedLocation')
   }
 
-  return makeImmutable({
+  return Immutable.fromJS({
     location,
     title: frame.get('title'),
     partitionNumber: frame.get('partitionNumber'),
@@ -371,21 +338,13 @@ module.exports.getDetailFromFrame = function (frame, tag) {
  * @param favicon favicon URL
  */
 module.exports.updateSiteFavicon = function (sites, location, favicon) {
-  sites = makeImmutable(sites)
-
   if (UrlUtil.isNotURL(location)) {
-    return sites
-  }
-  if (!Immutable.Map.isMap(sites)) {
     return sites
   }
 
   const matchingIndices = []
 
   sites.filter((site, index) => {
-    if (!site) {
-      return false
-    }
     if (isBookmarkFolder(site.get('tags'))) {
       return false
     }
@@ -547,6 +506,14 @@ module.exports.clearHistory = function (sites) {
 }
 
 /**
+ * Determines if the sites list has any sites with no tags
+ * @param sites The application state's Immutable sites list.
+ */
+module.exports.hasNoTagSites = function (sites) {
+  return sites.findIndex((site) => !site.get('tags') || site.get('tags').size === 0) !== -1
+}
+
+/**
  * Returns all sites that have a bookmark tag.
  * @param sites The application state's Immutable sites list.
  */
@@ -555,7 +522,7 @@ module.exports.getBookmarks = function (sites) {
   if (sites) {
     return sites.filter((site) => isBookmarkFolder(site.get('tags')) || isBookmark(site.get('tags')))
   }
-  return makeImmutable({})
+  return []
 }
 
 /**
