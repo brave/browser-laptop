@@ -371,10 +371,10 @@ class UrlBar extends ImmutableComponent {
         }
       }
     }
-    if (this.isFocused() !== prevProps.urlbar.get('focused')) {
+    if (this.isFocused() && !prevProps.urlbar.get('focused')) {
       this.updateDOMInputFocus()
     }
-    if (this.isSelected() !== prevProps.urlbar.get('selected')) {
+    if (this.isSelected() && !prevProps.urlbar.get('selected')) {
       this.select()
       windowActions.setUrlBarSelected(false)
     }
