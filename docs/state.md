@@ -499,7 +499,6 @@ WindowStore
     }
   },
   publisherInfo: {
-    enabled: boolean,            // display publisher information
     synopsis: [ { // one entry for each publisher having a non-zero `score`
       rank: number,              // i.e., 1, 2, 3, ...
       verified: boolean,         // there is a verified wallet for this publisher
