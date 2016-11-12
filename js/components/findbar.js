@@ -82,7 +82,7 @@ class FindBar extends ImmutableComponent {
     this.searchInput.value = this.searchString
     this.focus()
     this.select()
-    windowActions.setFindbarSelected(false)
+    windowActions.setFindbarSelected(this.frame, false)
   }
 
   componentWillUpdate (nextProps) {
@@ -97,7 +97,7 @@ class FindBar extends ImmutableComponent {
       // Findbar might already be focused, so make sure select happens even if no
       // onFocus event happens.
       this.select()
-      windowActions.setFindbarSelected(false)
+      windowActions.setFindbarSelected(this.frame, false)
     }
     if (!this.props.findDetail || !prevProps.findDetail ||
         this.props.findDetail.get('searchString') !== prevProps.findDetail.get('searchString') ||
