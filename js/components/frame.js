@@ -1032,7 +1032,7 @@ class Frame extends ImmutableComponent {
         appActions.hideMessageBox(message)
       }
       this.notificationCallbacks = {}
-      const isNewTabPage = e.url === getTargetAboutUrl('about:newtab')
+      const isNewTabPage = getBaseUrl(e.url) === getTargetAboutUrl('about:newtab')
       if (isNewTabPage) {
         windowActions.setUrlBarActive(true)
         windowActions.setUrlBarFocused(true)

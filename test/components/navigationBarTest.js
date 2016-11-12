@@ -84,6 +84,29 @@ describe('navigationBar', function () {
           .keys(Brave.keys.ENTER)
           .waitForElementFocus(activeWebview)
       })
+
+      it('newtab hasfocus in urlbar', function * () {
+        yield this.app.client
+          .ipcSend(messages.SHORTCUT_NEW_FRAME)
+          .waitUntil(function () {
+            return this.getWindowState().then((val) => {
+              return val.value.frames.length === 2
+            })
+          })
+          .waitForElementFocus(urlInput)
+          .ipcSend(messages.SHORTCUT_CLOSE_FRAME, 2)
+      })
+      it('newtab with page has focus in webview', function * () {
+        var page1Url = Brave.server.url('tabnapping.html')
+        yield this.app.client
+          .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
+          .waitUntil(function () {
+            return this.getWindowState().then((val) => {
+              return val.value.frames.length === 2
+            })
+          })
+          .waitForElementFocus(activeWebview)
+      })
     })
     describe('tabnapping', function () {
       Brave.beforeAll(this)
