@@ -69,8 +69,8 @@ class UrlBar extends ImmutableComponent {
     return this.props.urlbar.get('focused')
   }
 
-  updateDOMInputFocus (focused) {
-    if (this.urlInput && focused) {
+  updateDOMInputFocus () {
+    if (this.urlInput && this.isFocused()) {
       this.focus()
     }
   }
@@ -146,7 +146,7 @@ class UrlBar extends ImmutableComponent {
           }
           // this can't go through appActions for some reason
           // or the whole window will reload on the first page request
-          this.updateDOMInputFocus(false)
+          this.updateDOMInputFocus()
           this.clearSearchEngine()
         }
         windowActions.setRenderUrlBarSuggestions(false)
@@ -371,12 +371,16 @@ class UrlBar extends ImmutableComponent {
         }
       }
     }
+    // Manually sync some react state with DOM state
     if (this.isFocused() !== prevProps.urlbar.get('focused')) {
       this.updateDOMInputFocus()
     }
     if (this.isSelected() !== prevProps.urlbar.get('selected')) {
-      this.select()
-      windowActions.setUrlBarSelected(false)
+      const selected = this.isSelected()
+      if (selected) {
+        this.select()
+      }
+      windowActions.setUrlBarSelected(selected)
     }
   }
 
