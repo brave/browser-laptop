@@ -733,6 +733,7 @@ class ContributionStatement extends ImmutableComponent {
              }
             </tbody>
           </table>
+          <div className='verifiedExplainer'><span className='verified' /> = publisher has verified their wallet</div>
         </div>
       </div>
     )
@@ -749,7 +750,7 @@ class ContributionStatement extends ImmutableComponent {
   get staticStyles () {
     /** since the ContributionStatement is rendered into a PDF from a self-contained data URL, we have to hardcode all the requisite CSS like this **/
     return (
-        <style dangerouslySetInnerHTML={ {__html: '\n\
+      <style dangerouslySetInnerHTML={{__html: '\n\
 * {\n\
   color: #3B3B3B;\n\
   font-family: Arial;\n\
@@ -871,8 +872,10 @@ span.verified {\n\
   background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MS41MSA3MS44Ij48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6IzcyYmY0NDt9LmNscy0ye2ZpbGw6I2ZmZjt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPnZlcmlmaWVkX2dyZWVuX2ljb248L3RpdGxlPjxnIGlkPSJMYXllcl8yIiBkYXRhLW5hbWU9IkxheWVyIDIiPjxnIGlkPSJMYXllcl8xLTIiIGRhdGEtbmFtZT0iTGF5ZXIgMSI+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNLjA3LDE4LjA2LDMwLjY4LDAsNjEuNTEsMTguMDZWNTMuNDJMMzEuMTIsNzEuOC4xLDUzLjg2Uy0uMSwzNC42Mi4wNywxOC4wNloiLz48cG9seWdvbiBjbGFzcz0iY2xzLTIiIHBvaW50cz0iMTcuNTQgMjkuNTMgMTMuMDEgMzQuMDYgMjkuNDMgNTAuNDUgNTIuNDIgMjcuNTkgNDcuMTkgMjIuNzEgMjkuMzcgNDAuODggMTcuNTQgMjkuNTMiLz48L2c+PC9nPjwvc3ZnPg==) center no-repeat;\n\
   display: inline-block;\n\
   position: relative;\n\
-  left: -25px;\n\
   vertical-align: middle;\n\
+}\n\
+.detailTableRow span.verified {\n\
+  left: -25px;\n\
 }\n\
 span.verified + span.site {\n\
   position: relative;\n\
@@ -880,7 +883,12 @@ span.verified + span.site {\n\
 }\n\
 span.site {\n\
   vertical-align: middle;\n\
-}'} }/>
+}\n\
+div.verifiedExplainer {\n\
+  margin-top: 10px;\n\
+  margin-left: 10px;\n\
+}\n\
+'}} />
     )
   }
 
