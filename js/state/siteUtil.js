@@ -345,13 +345,23 @@ module.exports.updateSiteFavicon = function (sites, location, favicon) {
   const matchingIndices = []
 
   sites.filter((site, index) => {
+    if (!site || typeof site.get !== 'function') {
+      return false
+    }
     if (isBookmarkFolder(site.get('tags'))) {
       return false
     }
     if (UrlUtil.isNotURL(site.get('location'))) {
       return false
     }
-    if (normalizeUrl(site.get('location')) === normalizeUrl(location)) {
+
+    let siteLocation
+    try { siteLocation = normalizeUrl(site.get('location')) } catch (e) { siteLocation = site.get('location') }
+
+    let inputLocation
+    try { inputLocation = normalizeUrl(location) } catch (e) { inputLocation = location }
+
+    if (siteLocation === inputLocation) {
       matchingIndices.push(index)
       return true
     }
