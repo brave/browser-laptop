@@ -74,6 +74,10 @@ class Frame extends ImmutableComponent {
     return aboutUrls.get(getBaseUrl(this.props.location))
   }
 
+  isMagnetPage () {
+    return isSourceMagnetUrl(this.props.location)
+  }
+
   isIntermediateAboutPage () {
     return isIntermediateAboutPage(getBaseUrl(this.props.location))
   }
@@ -479,7 +483,9 @@ class Frame extends ImmutableComponent {
         // This can happen for pages which don't load properly.
         // Some examples are basic http auth and bookmarklets.
         // In this case both the user display and the user think they're on this.props.location.
-        if (this.webview.getURL() !== this.props.location && !this.isAboutPage()) {
+        if (this.webview.getURL() !== this.props.location &&
+          !this.isAboutPage() &&
+          !this.isMagnetPage()) {
           this.webview.loadURL(this.props.location)
         } else if (this.isIntermediateAboutPage() &&
           this.webview.getURL() !== this.props.location &&
