@@ -575,7 +575,7 @@ class PaymentHistoryRow extends ImmutableComponent {
   }
 
   get htmlDataURL () {
-    let dataURL = 'data:text/html,' + encodeURIComponent('<html><body style="-webkit-print-color-adjust:exact">' + ReactDOMServer.renderToStaticMarkup(<ContributionStatement transaction={this.transaction} synopsis={this.ledgerData.get('synopsis')} />) + '</body></html>')
+    let dataURL = 'data:text/html,' + encodeURIComponent('<html><head><meta charset="UTF-8" /></head><body style="-webkit-print-color-adjust:exact">' + ReactDOMServer.renderToStaticMarkup(<ContributionStatement transaction={this.transaction} synopsis={this.ledgerData.get('synopsis')} />) + '</body></html>')
     return dataURL
   }
 
@@ -740,11 +740,23 @@ class ContributionStatement extends ImmutableComponent {
   }
 
   get ContributionStatementFooterNoteBox () {
-    return (<div />)
+    return (
+      <div className='footerNoteBox'>
+        <span className='noteHeading'>Note:</span>
+        <br />
+        <span className='noteBody'>
+        To protect your privacy, this Brave Payments contribution statement is not saved, recorded or logged anywhere other than on your device (this computer). It cannot be retrieved from Brave in the event of data loss on your device.
+        </span>
+      </div>
+    )
   }
 
   get ContributionStatementPageFooter () {
-    return (<div />)
+    return (
+      <div className='pageFooterBox'>
+        <span className='pageFooterBody'> &copy; 2016 Brave Software. Brave is a registered trademark of Brave Software. Site names may be trademarks or registered trademarks of the site owner.</span>
+      </div>
+    )
   }
 
   get staticStyles () {
@@ -887,6 +899,22 @@ span.site {\n\
 div.verifiedExplainer {\n\
   margin-top: 10px;\n\
   margin-left: 10px;\n\
+}\n\
+div.footerNoteBox {\n\
+  background-color: #f7f7f7;\n\
+  padding: 20px;\n\
+}\n\
+span.noteHeading {\n\
+  color: #ff5000;\n\
+  margin-bottom: 5px;\n\
+}\n\
+div.pageFooterBox {\n\
+  padding: 20px;\n\
+}\n\
+span.pageFooterBody {\n\
+  color: #aaaaaa;\n\
+}\n\
+span.noteBody {\n\
 }\n\
 '}} />
     )
