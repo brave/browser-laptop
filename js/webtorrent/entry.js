@@ -68,7 +68,7 @@ class TorrentViewer extends React.Component {
     client.on('error', this.onError)
 
     ipc.on(messages.TORRENT_MESSAGE, function (e, msg) {
-      client.recieve(msg)
+      client.receive(msg)
     })
 
     function send (msg) {
@@ -83,9 +83,7 @@ class TorrentViewer extends React.Component {
       state.torrent.createServer()
     }
 
-    // Render immediately, then periodically to show download progress
     update()
-    setInterval(update, 1000)
   }
 
   saveTorrentFile () {
@@ -152,3 +150,7 @@ class TorrentViewer extends React.Component {
     )
   }
 }
+
+// Render immediately, then periodically to show download progress
+update()
+setInterval(update, 1000)
