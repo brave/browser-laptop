@@ -1212,6 +1212,7 @@ describe('navigationBar', function () {
         yield selectsText(this.app.client, 'ave.com')
         yield blur(this.app.client)
         yield this.app.client
+          .moveToObject(navigator)
           .waitForExist(urlInput)
           .leftClick(urlInput)
       })
