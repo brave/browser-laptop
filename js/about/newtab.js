@@ -173,8 +173,6 @@ class NewTabPage extends React.Component {
   onIgnoredTopSite (siteProps) {
     this.showSiteRemovalNotification()
 
-    // TODO: this is not working :(
-
     // If a pinnedTopSite is ignored, remove it from the pinned list as well
     const newTabState = {}
     if (this.isPinned(siteProps)) {
@@ -183,16 +181,19 @@ class NewTabPage extends React.Component {
       const currentPositionIndex = gridSites.indexOf(currentPosition)
       const pinnedTopSites = this.pinnedTopSites.splice(currentPositionIndex, 1, null)
       newTabState.pinnedTopSites = pinnedTopSites
+
+      // TODO: ignoring an item sometimes was removing a pin for a different site
+      // I think the merge is not working properly.
     }
 
     newTabState.ignoredTopSites = this.ignoredTopSites.push(siteProps)
-    aboutActions.setNewTabDetail(newTabState)
+    aboutActions.setNewTabDetail(newTabState, true)
   }
 
   onUndoIgnoredTopSite () {
     // Remove last List's entry
     const ignoredTopSites = this.ignoredTopSites.splice(-1, 1)
-    aboutActions.setNewTabDetail({ignoredTopSites: ignoredTopSites})
+    aboutActions.setNewTabDetail({ignoredTopSites: ignoredTopSites}, true)
     this.hideSiteRemovalNotification()
   }
 
@@ -200,7 +201,7 @@ class NewTabPage extends React.Component {
    * Clear ignoredTopSites and pinnedTopSites list
    */
   onRestoreAll () {
-    aboutActions.setNewTabDetail({ignoredTopSites: [], pinnedTopSites: []})
+    aboutActions.setNewTabDetail({ignoredTopSites: []}, true)
     this.hideSiteRemovalNotification()
   }
 

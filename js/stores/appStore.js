@@ -431,6 +431,9 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_CHANGE_NEW_TAB_DETAIL:
       appState = aboutNewTabState.mergeDetails(appState, action)
+      if (action.refresh) {
+        appState = aboutNewTabState.setSites(appState, action)
+      }
       break
     case AppConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size
