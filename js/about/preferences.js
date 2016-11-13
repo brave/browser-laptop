@@ -716,23 +716,45 @@ class ContributionStatement extends ImmutableComponent {
     }).slice(1)
   }
 
-  get ContributionStatementDetailTable () {
+  get PER_PAGE () {
+    return 20
+  }
+
+  get pages () {
+    const PER_PAGE = this.PER_PAGE
+    let rows = this.rows
+
+    let pages = []
+
+    rows.forEach(function (row, idx) {
+      let pageIdx = Math.floor(idx / PER_PAGE)
+
+      if (!pages[pageIdx]) {
+        pages[pageIdx] = []
+      }
+
+      pages[pageIdx][idx % PER_PAGE] = row
+    })
+
+    return pages
+  }
+
+  ContributionStatementDetailTable (page, pageIdx, totalPages) {
     return (
       <div className='contributionStatementDetailTableContainer'>
-        <div className='pull-right'>{ this.lastContributionHumanFormattedDate } - { this.thisContributionHumanFormattedDate }</div>
+        <div className='pull-right'>{ this.lastContributionHumanFormattedDate } - { this.contributionHumanFormattedDate }</div>
         <div>
           <table className='contributionStatementDetailTable'>
-            <thead>
-              <tr className='detailTableRow'>
-                <th className='rankColumn'>Rank</th>
-                <th className='siteColumn'>Site</th>
-                <th className='fractionColumn'>% Paid</th>
-                <th className='fiatColumn'>$ Paid</th>
-              </tr>
-            </thead>
             <tbody>
+              <tr className='headingRow detailTableRow'>
+                <td className='rankColumn'>Rank</td>
+                <td className='siteColumn'>Site</td>
+                <td className='fractionColumn'>% Paid</td>
+                <td className='fiatColumn'>$ Paid</td>
+              </tr>
+              <tr className='spacingRow' />
               {
-              this.rows.map(function (row, idx) {
+              page.map(function (row, idx) {
                 let publisherSynopsis = this.synopsis[row.siteColumn] || {}
 
                 let verified = publisherSynopsis.verified
@@ -742,7 +764,7 @@ class ContributionStatement extends ImmutableComponent {
 
                 return (
                   <tr className='detailTableRow'>
-                    <td className='rankColumn'>{idx + 1}</td>
+                    <td className='rankColumn'>{(pageIdx * this.PER_PAGE) + idx + 1}</td>
                     <td className='siteColumn'>{verified ? <span className='verified' /> : null}<span className='site'>{site}</span></td>
                     <td className='fractionColumn'>{fractionStr}</td>
                     <td className='fiatColumn'>{fiatStr}</td>
@@ -750,21 +772,35 @@ class ContributionStatement extends ImmutableComponent {
                 )
               }.bind(this))
              }
+            <tr className='spacingRow' />
             </tbody>
           </table>
           <div className='verifiedExplainer'><span className='verified' /> = publisher has verified their wallet</div>
+          <div className='pageIndicator pull-right'>Page {pageIdx + 1} of {totalPages}</div>
         </div>
       </div>
     )
   }
 
-  get ContributionStatementFooterNoteBox () {
+  ContributionStatementFooterNoteBox (pageIdx) {
+    const headings = [
+      'Note:',
+      'About publisher distributions'
+    ]
+
+    const messages = [
+      'To protect your privacy, this Brave Payments contribution statement is not saved, recorded or logged anywhere other than on your device (this computer). It cannot be retrieved from Brave in the event of data loss on your device.',
+      'Brave Payments uses a statistical model that removes any ability to identify Brave users based on their browsing behaviors. Anonymous contributions are first combined in the Brave vault and then redistributed into publisher wallets which are confirmed and then collected by the publisher.'
+    ]
+
     return (
       <div className='footerNoteBox'>
-        <span className='noteHeading'>Note:</span>
+        <span className='noteHeading'>
+          { headings[pageIdx % headings.length] }
+        </span>
         <br />
         <span className='noteBody'>
-        To protect your privacy, this Brave Payments contribution statement is not saved, recorded or logged anywhere other than on your device (this computer). It cannot be retrieved from Brave in the event of data loss on your device.
+          { messages[pageIdx % messages.length] }
         </span>
       </div>
     )
@@ -773,9 +809,33 @@ class ContributionStatement extends ImmutableComponent {
   get ContributionStatementPageFooter () {
     return (
       <div className='pageFooterBox'>
-        <span className='pageFooterBody'> &copy; 2016 Brave Software. Brave is a registered trademark of Brave Software. Site names may be trademarks or registered trademarks of the site owner.</span>
+        <span className='pageFooterBody'>{"\u00a9 2016 Brave Software. Brave is a registered trademark of Brave Software. Site names may be trademarks or registered trademarks of the site owner."}</span>
       </div>
     )
+  }
+
+  ContributionStatementPage (page, pageIdx, pages) {
+    let totalPages = pages.length
+    return [
+      <div className='contributionStatementSection'>
+        {this.ContributionStatementHeader}
+      </div>,
+      pageIdx ? null
+        : (
+          <div className='contributionStatementSection'>
+            {this.ContributionStatementSummaryBox}
+          </div>
+        ),
+      <div className='contributionStatementSection'>
+        {this.ContributionStatementDetailTable(page, pageIdx, totalPages)}
+      </div>,
+      <div className='contributionStatementSection'>
+        {this.ContributionStatementFooterNoteBox(pageIdx)}
+      </div>,
+      <div className='contributionStatementSection'>
+        {this.ContributionStatementPageFooter}
+      </div>
+    ]
   }
 
   get staticStyles () {
@@ -835,28 +895,31 @@ class ContributionStatement extends ImmutableComponent {
   border-style: solid;\n\
   border-color: #f7f7f7;\n\
 }\n\
-.contributionStatementDetailTable tbody:before {\n\
+.contributionStatementDetailTable tbody tr.spacingRow:before {\n\
   line-height: 0.5em;\n\
   content: "_";\n\
   display: block;\n\
   color: white;\n\
 }\n\
-.contributionStatementDetailTable thead tr.detailTableRow, .contributionStatementDetailTable tbody tr.detailTableRow {\n\
+.contributionStatementDetailTable tr.headingRow.detailTableRow, .contributionStatementDetailTable tbody tr.detailTableRow {\n\
   text-align: right;\n\
 }\n\
-.contributionStatementDetailTable thead tr.detailTableRow {\n\
+.contributionStatementDetailTable tr.headingRow.detailTableRow {\n\
   background-color: #f7f7f7;\n\
 }\n\
-.detailTableRow th.rankColumn, .detailTableRow td.rankColumn {\n\
+.detailTableRow tr.headingRow td.rankColumn, .detailTableRow td.rankColumn {\n\
   width: 30px;\n\
 }\n\
-.detailTableRow th.siteColumn, .detailTableRow td.siteColumn {\n\
+.detailTableRow tr.headingRow td.siteColumn, .detailTableRow td.siteColumn {\n\
   text-align: left;\n\
   padding-left: 40px;\n\
 }\n\
 .contributionStatementSummaryBox {\n\
   margin-top: 25px;\n\
   margin-bottom: 25px;\n\
+}\n\
+table.contributionStatementSummaryBoxTable {\n\
+  border-spacing: 10px;\n\
 }\n\
 .contributionStatementSummaryBoxTable tbody tr td.leftColumn {\n\
   text-align: right;\n\
@@ -918,10 +981,15 @@ span.site {\n\
 div.verifiedExplainer {\n\
   margin-top: 10px;\n\
   margin-left: 10px;\n\
+  display: inline-block;\n\
+}\n\
+div.pageIndicator {\n\
+  margin-top: 10px;\n\
 }\n\
 div.footerNoteBox {\n\
   background-color: #f7f7f7;\n\
   padding: 20px;\n\
+  float: bottom;\n\
 }\n\
 span.noteHeading {\n\
   color: #ff5000;\n\
@@ -929,6 +997,8 @@ span.noteHeading {\n\
 }\n\
 div.pageFooterBox {\n\
   padding: 20px;\n\
+  float: bottom;\n\
+  page-break-after: always;\n\
 }\n\
 span.pageFooterBody {\n\
   color: #aaaaaa;\n\
@@ -940,24 +1010,12 @@ span.noteBody {\n\
   }
 
   render () {
+    let pages = this.pages
+
     return (
       <div className='contributionStatementContainer'>
         { this.staticStyles }
-        <div className='contributionStatementSection'>
-          {this.ContributionStatementHeader}
-        </div>
-        <div className='contributionStatementSection'>
-          {this.ContributionStatementSummaryBox}
-        </div>
-        <div className='contributionStatementSection'>
-          {this.ContributionStatementDetailTable}
-        </div>
-        <div className='contributionStatementSection'>
-          {this.ContributionStatementFooterNoteBox}
-        </div>
-        <div className='contributionStatementSection'>
-          {this.ContributionStatementPageFooter}
-        </div>
+        { pages.map(this.ContributionStatementPage.bind(this)) }
       </div>
     )
   }
@@ -2296,7 +2354,7 @@ function formattedDateFromTimestamp (timestamp) {
 }
 
 function formattedTimeFromTimestamp (timestamp) {
-  return moment(new Date(timestamp)).format('HH:mm a')
+  return moment(new Date(timestamp)).format('hh:mm a')
 }
 
 function formattedTimeFromNow (timestamp) {

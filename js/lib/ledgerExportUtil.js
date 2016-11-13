@@ -212,10 +212,10 @@ let getTransactionCSVRows = function (transactions, viewingIds, addTotalRow, sor
   if (sortByContribution) {
     // sort publishers by contribution
     publisherSortFunction = function (a, b) {
-      var getFraction = function (pubStr) {
-        return (pubStr && typeof pubStr === 'string' && txContribData[pubStr] && txContribData[pubStr].fraction ? txContribData[pubStr].fraction : 0)
+      var getVotes = function (pubStr) {
+        return (pubStr && typeof pubStr === 'string' && txContribData[pubStr] && txContribData[pubStr].votes ? parseInt(txContribData[pubStr].votes) : 0)
       }
-      return getFraction(a) < getFraction(b)
+      return (getVotes(a) > getVotes(b) ? -1 : 1)
     }
   } else {
     // sort publishers alphabetically by default (per spec)
