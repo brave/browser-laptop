@@ -592,11 +592,11 @@ describe('siteUtil', function () {
       it('handles malformed URIs gracefully', function () {
         const siteDetail = Immutable.fromJS({
           tags: [siteTags.BOOKMARK],
-          location: 'https://www.foo.com/bar/archive/%3c',
+          location: 'https://www.foo.com/bar/archive/%3+c',
           title: 'bookmarked site'
         })
         const sites = Immutable.fromJS([siteDetail])
-        const processedSites = siteUtil.updateSiteFavicon(sites, 'https://www.foo.com/bar/archive/%3c', 'https://www.foo.com/favicon.ico')
+        const processedSites = siteUtil.updateSiteFavicon(sites, 'https://www.foo.com/bar/archive/%3+c', 'https://www.foo.com/favicon.ico')
         const updatedSiteDetail1 = siteDetail.set('favicon', 'https://www.foo.com/favicon.ico')
         const expectedSites = Immutable.fromJS([updatedSiteDetail1])
 
