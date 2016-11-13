@@ -706,7 +706,7 @@ class ContributionStatement extends ImmutableComponent {
     let rows = this.rows
 
     let pages = []
-    console.log(JSON.stringify(rows, null, 2))
+
     rows.forEach(function (row, idx) {
       let pageIdx = Math.floor(idx / PER_PAGE)
 
@@ -716,7 +716,7 @@ class ContributionStatement extends ImmutableComponent {
 
       pages[pageIdx][idx % PER_PAGE] = row
     })
-    console.log(JSON.stringify(pages, null, 2))
+
     return pages
   }
 
@@ -753,6 +753,7 @@ class ContributionStatement extends ImmutableComponent {
                 )
               }.bind(this))
              }
+            <tr className='spacingRow' />
             </tbody>
           </table>
           <div className='verifiedExplainer'><span className='verified' /> = publisher has verified their wallet</div>
@@ -875,7 +876,7 @@ class ContributionStatement extends ImmutableComponent {
   border-style: solid;\n\
   border-color: #f7f7f7;\n\
 }\n\
-.contributionStatementDetailTable tbody tr:nth-of-type(2):before {\n\
+.contributionStatementDetailTable tbody tr.spacingRow:before {\n\
   line-height: 0.5em;\n\
   content: "_";\n\
   display: block;\n\
@@ -897,6 +898,9 @@ class ContributionStatement extends ImmutableComponent {
 .contributionStatementSummaryBox {\n\
   margin-top: 25px;\n\
   margin-bottom: 25px;\n\
+}\n\
+table.contributionStatementSummaryBoxTable {\n\
+  border-spacing: 10px;\n\
 }\n\
 .contributionStatementSummaryBoxTable tbody tr td.leftColumn {\n\
   text-align: right;\n\
@@ -2303,7 +2307,7 @@ function formattedDateFromTimestamp (timestamp) {
 }
 
 function formattedTimeFromTimestamp (timestamp) {
-  return moment(new Date(timestamp)).format('HH:mm a')
+  return moment(new Date(timestamp)).format('hh:mm a')
 }
 
 function formattedTimeFromNow (timestamp) {
