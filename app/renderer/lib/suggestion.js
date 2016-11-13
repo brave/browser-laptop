@@ -71,16 +71,17 @@ module.exports.sortingPriority = (count, currentTime, lastAccessedTime, ageDecay
  *
  */
 module.exports.sortByAccessCountWithAgeDecay = (s1, s2) => {
+  const now = new Date()
   const s1Priority = module.exports.sortingPriority(
     s1.get('count') || 0,
-    (new Date()).getTime(),
-    s1.get('lastAccessedTime') || (new Date()).getTime(),
+    now.getTime(),
+    s1.get('lastAccessedTime') || now.getTime(),
     appConfig.urlSuggestions.ageDecayConstant
   )
   const s2Priority = module.exports.sortingPriority(
     s2.get('count') || 0,
-    (new Date()).getTime(),
-    s2.get('lastAccessedTime') || (new Date()).getTime(),
+    now.getTime(),
+    s2.get('lastAccessedTime') || now.getTime(),
     appConfig.urlSuggestions.ageDecayConstant
   )
   return s2Priority - s1Priority
@@ -113,6 +114,28 @@ module.exports.normalizeLocation = (location) => {
   location = location.replace(/^http:\/\//, '')
   location = location.replace(/^https:\/\//, '')
   return location
+}
+
+/*
+ * Determines based on user input if the location should
+ * be normalized.  If the user is typing http prefix then
+ * they are specifying something explicitly.
+ *
+ * @return true if urls being compared should be normalized
+ */
+module.exports.shouldNormalizeLocation = (input) => {
+  const prefixes = ['http://', 'https://', 'www.']
+  return prefixes.every((prefix) => {
+    if (input.length > prefix.length) {
+      return true
+    }
+    for (let i = 0; i < Math.min(prefix.length, input.length); i++) {
+      if (input[i] !== prefix[i]) {
+        return true
+      }
+    }
+    return false
+  })
 }
 
 /*

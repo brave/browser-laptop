@@ -19,8 +19,15 @@ describe('urlbarSuggestions', function () {
 
     yield setup(this.app.client)
     yield this.app.client
-      .tabByUrl(Brave.newTabUrl)
+      .tabByIndex(0)
       .loadUrl(this.page1Url)
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitUntil(function () {
+        return this.getAppState().then((val) => {
+          return val.value.sites.length === 1
+        })
+      })
+      .tabByIndex(0)
       .loadUrl(this.page2Url)
       .windowByUrl(Brave.browserWindowUrl)
       .ipcSend(messages.SHORTCUT_NEW_FRAME)
@@ -28,14 +35,11 @@ describe('urlbarSuggestions', function () {
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist('.tab[data-frame-key="2"].active')
       .waitForElementFocus(urlInput)
-       // XXX: this wait never resolves
-    /*
       .waitUntil(function () {
         return this.getAppState().then((val) => {
           return val.value.sites.length === 2
         })
       })
-    */
   })
 
   it('show suggestion when single letter is typed in', function * () {

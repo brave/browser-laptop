@@ -252,11 +252,13 @@ class UrlBarSuggestions extends ImmutableComponent {
         }
       })
 
+    const shouldNormalize = suggestion.shouldNormalizeLocation(urlLocationLower)
+    const urlLocationLowerNormalized = suggestion.normalizeLocation(urlLocationLower)
     const sortBasedOnLocationPos = (s1, s2) => {
-      const location1 = suggestion.normalizeLocation(s1.get('location'))
-      const location2 = suggestion.normalizeLocation(s2.get('location'))
-      const pos1 = location1.indexOf(urlLocationLower)
-      const pos2 = location2.indexOf(urlLocationLower)
+      const location1 = shouldNormalize ? suggestion.normalizeLocation(s1.get('location')) : s1.get('location')
+      const location2 = shouldNormalize ? suggestion.normalizeLocation(s2.get('location')) : s2.get('location')
+      const pos1 = location1.indexOf(urlLocationLowerNormalized)
+      const pos2 = location2.indexOf(urlLocationLowerNormalized)
       if (pos1 === -1 && pos2 === -1) {
         return 0
       } else if (pos1 === -1) {
