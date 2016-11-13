@@ -49,7 +49,7 @@ const getTopSites = (state) => {
 
   // Merge the pinned and unpinned lists together
   // Pinned items have priority because the position is important
-  const gridSites = pinnedTopSites(state).map((pinnedSite) => {
+  let gridSites = pinnedTopSites(state).map((pinnedSite) => {
     // Fetch latest siteDetail objects from appState.sites using location/partition
     if (pinnedSite) {
       const matches = sites.filter((site) => compareSites(site, pinnedSite))
@@ -61,13 +61,17 @@ const getTopSites = (state) => {
     return firstSite
   })
 
+  // Include up to [aboutNewTabMaxEntries] entries so that folks
+  // can ignore sites and have new items fill those empty spaces
+  if (unpinnedSites.size > 0) {
+    gridSites = gridSites.concat(unpinnedSites)
+  }
+
   return gridSites.filter((site) => site != null)
 }
 
 const aboutNewTabState = {
-  getGridLayoutSize: (state) => {
-    return state.getIn(['about', 'newtab', 'gridLayoutSize'])
-  },
+  maxSites: aboutNewTabMaxEntries,
 
   getSites: (state) => {
     return state.getIn(['about', 'newtab', 'sites'])

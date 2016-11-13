@@ -31,7 +31,16 @@ const assertNoChange = (state) => {
 }
 
 describe('aboutNewTabState', function () {
-  describe('BSC]] setSites', function () {
+  describe('getSites', function () {
+    it('returns the contents of about.newtab.sites', function () {
+      const expectedSites = Immutable.List().push(1).push(2).push(3)
+      const stateWithSites = defaultAppState.setIn(['about', 'newtab', 'sites'], expectedSites)
+      const actualSites = aboutNewTabState.getSites(stateWithSites)
+      assert.deepEqual(actualSites.toJS(), expectedSites.toJS())
+    })
+  })
+
+  describe('setSites', function () {
     const site1 = Immutable.fromJS({
       location: 'https://example1.com/',
       title: 'sample 1',
@@ -67,7 +76,7 @@ describe('aboutNewTabState', function () {
       let expectedState = stateWithSites.setIn(['about', 'newtab', 'sites'],
         Immutable.List().push(site3).push(site1).push(site2))
 
-      // verify timestamp was updated
+      // account for timestamp being updated in results
       const actualState = aboutNewTabState.setSites(stateWithSites)
       const ts = assertTimeUpdated(actualState)
       expectedState = expectedState.setIn(['about', 'newtab', 'updatedStamp'], ts)
@@ -88,7 +97,7 @@ describe('aboutNewTabState', function () {
       let expectedState = stateWithPinnedSites.setIn(['about', 'newtab', 'sites'],
         Immutable.List().push(site3).push(site2).push(site1).push(site4))
 
-      // verify timestamp was updated
+      // account for timestamp being updated in results
       const actualState = aboutNewTabState.setSites(stateWithPinnedSites)
       const ts = assertTimeUpdated(actualState)
       expectedState = expectedState.setIn(['about', 'newtab', 'updatedStamp'], ts)
@@ -98,8 +107,37 @@ describe('aboutNewTabState', function () {
       // - unpinned items fill the rest of the spots (starting w/ highest # visits first)
       assert.deepEqual(actualState.toJS(), expectedState.toJS())
     })
-    // TODO(bsclifton): test ignored sites
-    // TODO(bsclifton): check that max# entries is enforced
+    it('only returns `maxSites` results', function () {
+      const maxSites = aboutNewTabState.maxSites
+      let tooManySites = Immutable.List()
+      for (let i = 0; i < maxSites + 1; i++) {
+        tooManySites = tooManySites.push(
+            site1.set('location', 'https://example' + i + '.com').set('title', 'sample ' + i))
+      }
+      const stateWithTooManySites = defaultAppState.set('sites', tooManySites)
+      const actualState = aboutNewTabState.setSites(stateWithTooManySites)
+      assert.equal(actualState.getIn(['about', 'newtab', 'sites']).size, maxSites)
+    })
+
+    it('does not include items marked as ignored', function () {
+      let stateWithIgnoredSites = defaultAppState.set('sites',
+        Immutable.List().push(site1).push(site2).push(site3).push(site4))
+
+      const ignoredSites = Immutable.List().push(site1).push(site3)
+      stateWithIgnoredSites = stateWithIgnoredSites.setIn(['about', 'newtab', 'ignoredTopSites'], ignoredSites)
+
+      let expectedState = stateWithIgnoredSites.setIn(['about', 'newtab', 'sites'],
+        Immutable.List().push(site2).push(site4))
+
+      // account for timestamp being updated in results
+      const actualState = aboutNewTabState.setSites(stateWithIgnoredSites)
+      const ts = assertTimeUpdated(actualState)
+      expectedState = expectedState.setIn(['about', 'newtab', 'updatedStamp'], ts)
+
+      // checks:
+      // - ignored items are not included
+      assert.deepEqual(actualState.toJS(), expectedState.toJS())
+    })
     // TODO(bsclifton): test de-duping
   })
 
