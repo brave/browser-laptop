@@ -260,12 +260,26 @@ class UrlBar extends ImmutableComponent {
     this.searchSelectEntry = null
   }
 
+  get suggestionLocation () {
+    const selectedIndex = this.activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])
+    if (typeof selectedIndex === 'number') {
+      const suggestion = this.activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'suggestionList', selectedIndex - 1])
+      if (suggestion) {
+        return suggestion.location
+      }
+    }
+  }
+
   onChange (e) {
     const oldActivateSearchEngine = this.activateSearchEngine
     const oldSearchSelectEntry = this.searchSelectEntry
 
     this.clearSearchEngine()
     this.detectSearchEngine(e.target.value)
+
+    if (this.suggestionLocation) {
+      windowActions.setUrlBarSuggestions(undefined, null)
+    }
 
     // TODO: activeSearchEngine and searchSelectEntry should be stored in
     // state so we don't have to do this hack.
@@ -362,12 +376,8 @@ class UrlBar extends ImmutableComponent {
           !this.isActive && !this.isFocused) {
         this.urlInput.value = this.locationValue
       } else if (this.isActive) {
-        const selectedIndex = this.activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])
-        if (typeof selectedIndex === 'number') {
-          const suggestion = this.activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'suggestionList', selectedIndex - 1])
-          if (suggestion) {
-            this.urlInput.value = suggestion.location
-          }
+        if (this.suggestionLocation) {
+          this.urlInput.value = this.suggestionLocation
         }
       }
     }
