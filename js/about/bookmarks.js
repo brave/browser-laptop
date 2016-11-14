@@ -14,6 +14,7 @@ const dndData = require('../dndData')
 const cx = require('../lib/classSet')
 const SortableTable = require('../components/sortableTable')
 const siteUtil = require('../state/siteUtil')
+const formatUtil = require('../../app/common/lib/formatUtil')
 const iconSize = require('../../app/common/lib/faviconUtil').iconSize
 
 const ipc = window.chrome.ipc
@@ -340,8 +341,8 @@ class BookmarksList extends ImmutableComponent {
             value: entry.get('customTitle') || entry.get('title') || entry.get('location')
           },
           {
-            html: new Date(entry.get('lastAccessedTime')).toLocaleString(),
-            value: entry.get('lastAccessedTime')
+            html: formatUtil.toLocaleString(entry.get('lastAccessedTime'), ''),
+            value: entry.get('lastAccessedTime') || 0
           }
         ])}
         rowObjects={this.props.bookmarks}
