@@ -4,7 +4,7 @@ const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
 const {urlInput, urlBarSuggestions} = require('../lib/selectors')
 
-describe('urlbarSuggestions', function () {
+describe('urlBarSuggestions', function () {
   function * setup (client) {
     yield client
       .waitForUrl(Brave.newTabUrl)
