@@ -181,9 +181,6 @@ class NewTabPage extends React.Component {
       const currentPositionIndex = gridSites.indexOf(currentPosition)
       const pinnedTopSites = this.pinnedTopSites.splice(currentPositionIndex, 1, null)
       newTabState.pinnedTopSites = pinnedTopSites
-
-      // TODO: ignoring an item sometimes was removing a pin for a different site
-      // I think the merge is not working properly.
     }
 
     newTabState.ignoredTopSites = this.ignoredTopSites.push(siteProps)

@@ -29,7 +29,21 @@ const sortCountDescending = (left, right) => {
   if (left.get('count') > right.get('count')) return -1
   return 0
 }
-
+const removeDuplicateDomains = (list) => {
+  const siteDomains = new Set()
+  return list.filter((site) => {
+    try {
+      const hostname = require('url').parse(site.get('location')).hostname
+      if (!siteDomains.has(hostname)) {
+        siteDomains.add(hostname)
+        return true
+      }
+    } catch (e) {
+      console.log('Error parsing hostname: ', e)
+    }
+    return false
+  })
+}
 /**
  * topSites are defined by users. Pinned sites are attached to their positions
  * in the grid, and the non pinned indexes are populated with newly accessed sites
@@ -43,9 +57,7 @@ const getTopSites = (state) => {
 
   // Filter out pinned and ignored sites
   let unpinnedSites = sites.filter((site) => !(isPinned(state, site) || isIgnored(state, site)))
-
-  // TODO(bsclifton): de-dupe here
-  // ..
+  unpinnedSites = removeDuplicateDomains(unpinnedSites)
 
   // Merge the pinned and unpinned lists together
   // Pinned items have priority because the position is important
