@@ -157,4 +157,15 @@ describe('urlBarSuggestions', function () {
         })
       })
   })
+
+  it('selection is not reset', function * () {
+    const pagePartialUrl = Brave.server.url('page')
+    yield this.app.client
+      .setValue(urlInput, pagePartialUrl)
+      .waitForExist(urlBarSuggestions)
+      .keys(Brave.keys.DOWN)
+      .keys(Brave.keys.CONTROL)
+      .keys(Brave.keys.CONTROL)
+      .waitForSelectedText('1.html')
+  })
 })

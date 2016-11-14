@@ -301,7 +301,9 @@ class UrlBar extends ImmutableComponent {
     if (this.isSelected()) {
       windowActions.setUrlBarSelected(false)
     }
-    windowActions.setNavBarUserInput(e.target.value)
+    if (this.locationValue + this.props.locationValueSuffix !== e.target.value) {
+      windowActions.setNavBarUserInput(e.target.value)
+    }
     this.clearSearchEngine()
     this.detectSearchEngine(e.target.value)
     this.keyPressed = false
