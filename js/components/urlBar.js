@@ -382,7 +382,8 @@ class UrlBar extends ImmutableComponent {
         (this.props.locationValueSuffix !== prevProps.locationValueSuffix ||
          this.props.urlbar.get('location') !== prevProps.urlbar.get('location'))) {
         this.showAutocompleteResult()
-      } else if (this.props.titleMode !== prevProps.titleMode ||
+      } else if (this.props.activeFrameKey !== prevProps.activeFrameKey ||
+          this.props.titleMode !== prevProps.titleMode ||
           !this.isActive && !this.isFocused) {
         this.urlInput.value = this.locationValue
       } else if (this.isActive) {
