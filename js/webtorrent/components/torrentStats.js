@@ -18,10 +18,10 @@ class TorrentStats extends React.Component {
       <div className='torrentStats'>
         <span>{torrent.progress < 1 ? 'Downloading' : 'Seeding'}</span>
         <span>{(torrent.progress * 100).toFixed(1)}%</span>
-        {renderTotalProgress()}
-        {renderPeers()}
         {renderSpeeds()}
         {renderEta()}
+        {renderTotalProgress()}
+        {renderPeers()}
       </div>
     )
 
