@@ -1,6 +1,7 @@
 /* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
+const Immutable = require('immutable')
 const {urlInput, braveMenu, noScriptSwitch, braveryPanel, notificationBar, clearBrowsingDataButton, securityTab} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 const messages = require('../../js/constants/messages')
@@ -33,7 +34,7 @@ describe('Clear Browsing Panel', function () {
         .waitForBrowserWindow()
         .waitUntil(function () {
           return this.getAppState().then((val) =>
-            val.value.sites.length === 1 &&
+              Immutable.fromJS(val.value.sites).size === 1 &&
               val.value.about.history.entries.length === 1 &&
               val.value.about.newtab.sites.length === 1)
         })
@@ -63,7 +64,7 @@ describe('Clear Browsing Panel', function () {
         .click('.clearDataButton')
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return val.value.sites.length === 0
+            return Immutable.fromJS(val.value.sites).size === 0
           })
         })
     })
@@ -81,7 +82,7 @@ describe('Clear Browsing Panel', function () {
         .waitForBrowserWindow()
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return val.value.sites.length === 1
+            return Immutable.fromJS(val.value.sites).size === 1
           })
         })
     })

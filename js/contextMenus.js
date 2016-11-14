@@ -358,7 +358,8 @@ function showBookmarkFolderInit (allBookmarkItems, parentBookmarkFolder, activeF
 function bookmarkItemsInit (allBookmarkItems, items, activeFrame) {
   const btbMode = getSetting(settings.BOOKMARKS_TOOLBAR_MODE)
   const showFavicon = (btbMode === bookmarksToolbarMode.TEXT_AND_FAVICONS || btbMode === bookmarksToolbarMode.FAVICONS_ONLY)
-  const template = items.map((site) => {
+  const itemsList = items.toList()
+  const template = itemsList.map((site) => {
     const isFolder = siteUtil.isFolder(site)
     let faIcon
     if (showFavicon && !site.get('favicon')) {

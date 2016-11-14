@@ -66,7 +66,7 @@ const removeDuplicateDomains = (list) => {
  */
 const getTopSites = (state) => {
   // remove folders; sort by visit count; enforce a max limit
-  const sites = (state.get('sites') || new Immutable.List())
+  const sites = (state.get('sites') ? state.get('sites').toList() : new Immutable.List())
     .filter((site) => !siteUtil.isFolder(site))
     .filter((site) => !isSourceAboutUrl(site.get('location')))
     .sort(sortCountDescending)

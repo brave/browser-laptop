@@ -319,17 +319,18 @@ class BookmarksToolbar extends ImmutableComponent {
 
     // Loop through until we fill up the entire bookmark toolbar width
     let i
-    for (i = 0; i < noParentItems.size; i++) {
+    let noParentItemsList = noParentItems.toList()
+    for (i = 0; i < noParentItemsList.size; i++) {
       let iconWidth = props.showFavicon ? iconSize : 0
       // font-awesome file icons are 3px smaller
-      if (props.showFavicon && !noParentItems.getIn([i, 'folderId']) && !noParentItems.getIn([i, 'favicon'])) {
+      if (props.showFavicon && !noParentItemsList.getIn([i, 'folderId']) && !noParentItemsList.getIn([i, 'favicon'])) {
         iconWidth -= 3
       }
-      const chevronWidth = props.showFavicon && noParentItems.getIn([i, 'folderId']) ? this.chevronWidth : 0
+      const chevronWidth = props.showFavicon && noParentItemsList.getIn([i, 'folderId']) ? this.chevronWidth : 0
       if (props.showFavicon && props.showOnlyFavicon) {
         widthAccountedFor += this.padding + iconWidth + chevronWidth
       } else {
-        const text = noParentItems.getIn([i, 'customTitle']) || noParentItems.getIn([i, 'title']) || noParentItems.getIn([i, 'location'])
+        const text = noParentItemsList.getIn([i, 'customTitle']) || noParentItemsList.getIn([i, 'title']) || noParentItemsList.getIn([i, 'location'])
         widthAccountedFor += Math.min(calculateTextWidth(text, `${this.fontSize} ${this.fontFamily}`) + this.padding + iconWidth + chevronWidth, this.maxWidth)
       }
       widthAccountedFor += margin
@@ -337,9 +338,9 @@ class BookmarksToolbar extends ImmutableComponent {
         break
       }
     }
-    this.bookmarksForToolbar = noParentItems.take(i)
+    this.bookmarksForToolbar = noParentItems.take(i).sort(siteUtil.siteSort)
     // Show at most 100 items in the overflow menu
-    this.overflowBookmarkItems = noParentItems.skip(i).take(100)
+    this.overflowBookmarkItems = noParentItems.skip(i).take(100).sort(siteUtil.siteSort)
   }
   componentWillMount () {
     this.updateBookmarkData(this.props)

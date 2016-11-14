@@ -324,7 +324,7 @@ var exports = {
       logVerbose('waitForSiteEntry("' + location + '", "' + waitForTitle + '")')
       return this.waitUntil(function () {
         return this.getAppState().then((val) => {
-          const ret = val.value && val.value.sites && val.value.sites.find(
+          const ret = val.value && val.value.sites && Array.from(Object.values(val.value.sites)).find(
             (site) => site.location === location &&
               (!waitForTitle || waitForTitle && site.title))
           logVerbose('waitForSiteEntry("' + location + ', ' + waitForTitle + '") => ' + ret)

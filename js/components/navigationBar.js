@@ -46,10 +46,10 @@ class NavigationBar extends ImmutableComponent {
     const editing = this.bookmarked
     // show the AddEditBookmarkHanger control; saving/deleting takes place there
     let siteDetail = siteUtil.getDetailFromFrame(this.activeFrame, siteTags.BOOKMARK)
-    const siteIndex = siteUtil.getSiteIndex(this.props.sites, siteDetail)
+    const key = siteUtil.getSiteKey(siteDetail)
 
-    if (siteIndex > 0) {
-      siteDetail = siteDetail.set('parentFolderId', this.props.sites.getIn([siteIndex]).get('parentFolderId'))
+    if (key !== null) {
+      siteDetail = siteDetail.set('parentFolderId', this.props.sites.getIn([key]).get('parentFolderId'))
     }
     windowActions.setBookmarkDetail(siteDetail, siteDetail, null, editing, true)
   }
