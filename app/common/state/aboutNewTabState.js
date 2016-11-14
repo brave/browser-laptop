@@ -5,20 +5,78 @@
 const Immutable = require('immutable')
 const {makeImmutable} = require('./immutableUtil')
 const siteUtil = require('../../../js/state/siteUtil')
+const aboutNewTabMaxEntries = 100
 
-const excludeSiteDetail = (siteDetail) => {
-  return !siteUtil.isBookmark(siteDetail) && !siteUtil.isHistoryEntry(siteDetail)
+const compareSites = (site1, site2) => {
+  if (!site1 || !site2) return false
+  return site1.get('location') === site2.get('location') &&
+    site1.get('partitionNumber') === site2.get('partitionNumber')
+}
+const pinnedTopSites = (state) => {
+  return (state.getIn(['about', 'newtab', 'pinnedTopSites']) || Immutable.List()).setSize(18)
+}
+const ignoredTopSites = (state) => {
+  return state.getIn(['about', 'newtab', 'ignoredTopSites']) || Immutable.List()
+}
+const isPinned = (state, siteProps) => {
+  return pinnedTopSites(state).filter((site) => compareSites(site, siteProps)).size > 0
+}
+const isIgnored = (state, siteProps) => {
+  return ignoredTopSites(state).filter((site) => compareSites(site, siteProps)).size > 0
+}
+const sortCountDescending = (left, right) => {
+  if (left.get('count') < right.get('count')) return 1
+  if (left.get('count') > right.get('count')) return -1
+  return 0
 }
 
-const removeDuplicateSites = (sites) => {
-  // Filter out duplicate entries by location
-  return sites.filter((element, index, list) => {
-    if (!element) return false
-    return index === list.findIndex((site) => site && site.get('location') === element.get('location'))
+/**
+ * topSites are defined by users. Pinned sites are attached to their positions
+ * in the grid, and the non pinned indexes are populated with newly accessed sites
+ */
+const getTopSites = (state) => {
+  // remove folders; sort by visit count; enforce a max limit
+  const sites = (state.get('sites') || new Immutable.List())
+    .filter((site) => !siteUtil.isFolder(site))
+    .sort(sortCountDescending)
+    .slice(-aboutNewTabMaxEntries)
+
+  // Filter out pinned and ignored sites
+  let unpinnedSites = sites.filter((site) => !(isPinned(state, site) || isIgnored(state, site)))
+
+  // TODO(bsclifton): de-dupe here
+  // ..
+
+  // Merge the pinned and unpinned lists together
+  // Pinned items have priority because the position is important
+  let gridSites = pinnedTopSites(state).map((pinnedSite) => {
+    // Fetch latest siteDetail objects from appState.sites using location/partition
+    if (pinnedSite) {
+      const matches = sites.filter((site) => compareSites(site, pinnedSite))
+      if (matches.size > 0) return matches.first()
+    }
+    // Default to unpinned items
+    const firstSite = unpinnedSites.first()
+    unpinnedSites = unpinnedSites.shift()
+    return firstSite
   })
+
+  // Include up to [aboutNewTabMaxEntries] entries so that folks
+  // can ignore sites and have new items fill those empty spaces
+  if (unpinnedSites.size > 0) {
+    gridSites = gridSites.concat(unpinnedSites)
+  }
+
+  return gridSites.filter((site) => site != null)
 }
 
 const aboutNewTabState = {
+  maxSites: aboutNewTabMaxEntries,
+
+  getSites: (state) => {
+    return state.getIn(['about', 'newtab', 'sites'])
+  },
+
   mergeDetails: (state, props) => {
     state = makeImmutable(state)
     if (!props) {
@@ -29,68 +87,11 @@ const aboutNewTabState = {
     return state.setIn(['about', 'newtab', 'updatedStamp'], new Date().getTime())
   },
 
-  addSite: (state, props) => {
+  setSites: (state) => {
     state = makeImmutable(state)
-    if (!props) {
-      return state
-    }
 
-    // Add timestamp if missing (ex: this is a visit, not a bookmark)
-    let siteDetail = makeImmutable(props.siteDetail)
-    siteDetail = siteDetail.set('lastAccessedTime', siteDetail.get('lastAccessedTime') || new Date().getTime())
-
-    // Only bookmarks and history items should be considered
-    if (excludeSiteDetail(siteDetail)) {
-      return state
-    }
-
-    // Keep track of the last 18 visited sites
-    let sites = state.getIn(['about', 'newtab', 'sites']) || new Immutable.List()
-    sites = sites.unshift(siteDetail)
-    sites = removeDuplicateSites(sites)
-    sites = sites.take(18)
-    // TODO(cezaraugusto): Sort should respect unshift and don't prioritize bookmarks
-    // |
-    // V
-    // .sort(suggestion.sortByAccessCountWithAgeDecay)
-    sites = siteUtil.addSite(sites, siteDetail, props.tag, props.originalSiteDetail)
-    state = state.setIn(['about', 'newtab', 'sites'], sites)
-    return state.setIn(['about', 'newtab', 'updatedStamp'], new Date().getTime())
-  },
-
-  removeSite: (state, props) => {
-    state = makeImmutable(state)
-    if (!props) {
-      return state
-    }
-
-    // Only bookmarks and history items should be considered
-    let siteDetail = makeImmutable(props.siteDetail)
-    if (excludeSiteDetail(siteDetail)) {
-      return state
-    }
-
-    // Remove tags if this is a history item.
-    // NOTE: siteUtil.removeSite won't delete the entry unless tags are missing
-    if (siteDetail.get('tags') && siteDetail.get('tags').size === 0) {
-      siteDetail = siteDetail.delete('tags')
-    }
-
-    const sites = state.getIn(['about', 'newtab', 'sites'])
-    state = state.setIn(['about', 'newtab', 'sites'], siteUtil.removeSite(sites, siteDetail, undefined))
-    return state.setIn(['about', 'newtab', 'updatedStamp'], new Date().getTime())
-  },
-
-  updateSiteFavicon: (state, props) => {
-    state = makeImmutable(state)
-    props = makeImmutable(props)
-    if (!props || !props.get('frameProps') || !props.getIn(['frameProps', 'location'])) {
-      return state
-    }
-
-    const sites = state.getIn(['about', 'newtab', 'sites'])
-    const sitesWithFavicon = siteUtil.updateSiteFavicon(sites, props.getIn(['frameProps', 'location']), props.get('favicon'))
-    state = state.setIn(['about', 'newtab', 'sites'], sitesWithFavicon)
+    // return a filtered version of the sites array
+    state = state.setIn(['about', 'newtab', 'sites'], getTopSites(state))
     return state.setIn(['about', 'newtab', 'updatedStamp'], new Date().getTime())
   }
 }

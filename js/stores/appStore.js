@@ -431,6 +431,9 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_CHANGE_NEW_TAB_DETAIL:
       appState = aboutNewTabState.mergeDetails(appState, action)
+      if (action.refresh) {
+        appState = aboutNewTabState.setSites(appState, action)
+      }
       break
     case AppConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size
@@ -448,11 +451,11 @@ const handleAppAction = (action) => {
       if (oldSiteSize !== appState.get('sites').size) {
         filterOutNonRecents()
       }
-      appState = aboutNewTabState.addSite(appState, action)
+      appState = aboutNewTabState.setSites(appState, action)
       break
     case AppConstants.APP_REMOVE_SITE:
       appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag))
-      appState = aboutNewTabState.removeSite(appState, action)
+      appState = aboutNewTabState.setSites(appState, action)
       break
     case AppConstants.APP_MOVE_SITE:
       appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent, false))
@@ -775,7 +778,7 @@ const handleAppAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_FAVICON:
       appState = appState.set('sites', siteUtil.updateSiteFavicon(appState.get('sites'), action.frameProps.get('location'), action.favicon))
-      appState = aboutNewTabState.updateSiteFavicon(appState, action)
+      appState = aboutNewTabState.setSites(appState, action)
       break
     case WindowConstants.WINDOW_SET_NAVIGATED:
       if (!action.isNavigatedInPage) {

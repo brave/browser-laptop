@@ -51,86 +51,49 @@ class NewTabPage extends React.Component {
       })
     })
   }
-
   get randomBackgroundImage () {
     const image = Object.assign({}, backgrounds[Math.floor(Math.random() * backgrounds.length)])
     image.style = {backgroundImage: 'url(' + image.source + ')'}
     return image
   }
-
   get fallbackImage () {
     const image = Object.assign({}, config.newtab.fallbackImage)
     const pathToImage = path.join(__dirname, '..', '..', image.source)
     image.style = {backgroundImage: 'url(' + `${pathToImage}` + ')'}
     return image
   }
-
-  get sites () {
-    return this.state.newTabData.getIn(['newTabDetail', 'sites'])
+  get topSites () {
+    return this.state.newTabData.getIn(['newTabDetail', 'sites']) || Immutable.List()
   }
-
   get pinnedTopSites () {
-    return this.state.newTabData.getIn(['newTabDetail', 'pinnedTopSites']).setSize(18)
+    return this.state.newTabData.getIn(['newTabDetail', 'pinnedTopSites']) || Immutable.List().setSize(18)
   }
-
   get ignoredTopSites () {
-    return this.state.newTabData.getIn(['newTabDetail', 'ignoredTopSites'])
+    return this.state.newTabData.getIn(['newTabDetail', 'ignoredTopSites']) || Immutable.List()
   }
-
   get gridLayoutSize () {
-    return this.state.newTabData.getIn(['newTabDetail', 'gridLayoutSize'])
+    return this.state.newTabData.getIn(['newTabDetail', 'gridLayoutSize']) || 'small'
   }
-
   isPinned (siteProps) {
-    return this.pinnedTopSites.includes(siteProps)
+    return this.pinnedTopSites.filter((site) => {
+      if (!site || !site.get) return false
+      return site.get('location') === siteProps.get('location') &&
+        site.get('partitionNumber') === siteProps.get('partitionNumber')
+    }).size > 0
   }
-
-  isIgnored (siteProps) {
-    return this.ignoredTopSites.includes(siteProps)
-  }
-
   isBookmarked (siteProps) {
     return siteUtil.isSiteBookmarked(this.topSites, siteProps)
   }
-
-  /**
-   * topSites are defined by users. Pinned sites are attached to their positions
-   * in the grid, and the non pinned indexes are populated with newly accessed sites
-   */
-  get topSites () {
-    const pinnedTopSites = this.pinnedTopSites
-    const sites = this.sites
-    let unpinnedTopSites = sites.filter((site) => !this.isPinned(site) ? site : null)
-    let gridSites
-
-    const getUnpinned = () => {
-      const firstSite = unpinnedTopSites.first()
-      unpinnedTopSites = unpinnedTopSites.shift()
-      return firstSite
-    }
-
-    gridSites = pinnedTopSites.map(pinned => pinned || getUnpinned())
-
-    // Remove from grid all ignored sites
-    gridSites = gridSites.filter((site) => !this.isIgnored(site))
-
-    return gridSites.filter(site => site != null)
-  }
-
   get gridLayout () {
-    const gridLayoutSize = this.gridLayoutSize
-    const gridSizes = {large: 18, medium: 12, small: 6}
-    const sitesRow = gridSizes[gridLayoutSize]
-
-    return this.topSites.take(sitesRow)
+    const sizeToCount = {large: 18, medium: 12, small: 6}
+    const count = sizeToCount[this.gridLayoutSize]
+    return this.topSites.take(count)
   }
-
   showSiteRemovalNotification () {
     this.setState({
       showSiteRemovalNotification: true
     })
   }
-
   hideSiteRemovalNotification () {
     this.setState({
       showSiteRemovalNotification: false
@@ -160,8 +123,6 @@ class NewTabPage extends React.Component {
 
   onDraggedSite (currentId, finalId) {
     let gridSites = this.topSites
-    let pinnedTopSites = this.pinnedTopSites
-
     const currentPosition = gridSites.filter((site) => site.get('location') === currentId).get(0)
     const finalPosition = gridSites.filter((site) => site.get('location') === finalId).get(0)
 
@@ -173,6 +134,7 @@ class NewTabPage extends React.Component {
     gridSites = gridSites.splice(finalPositionIndex, 0, currentPosition)
 
     // If the reordered site is pinned, update pinned order as well
+    let pinnedTopSites = this.pinnedTopSites
     pinnedTopSites = pinnedTopSites.splice(currentPositionIndex, 1)
     pinnedTopSites = pinnedTopSites.splice(finalPositionIndex, 0, currentPosition)
 
@@ -199,13 +161,11 @@ class NewTabPage extends React.Component {
   }
 
   onPinnedTopSite (siteProps) {
-    const gridSites = this.topSites
-    const currentPosition = gridSites.filter((site) => siteProps.get('location') === site.get('location')).get(0)
-    const currentPositionIndex = gridSites.indexOf(currentPosition)
+    const currentPosition = this.topSites.filter((site) => siteProps.get('location') === site.get('location')).get(0)
+    const currentPositionIndex = this.topSites.indexOf(currentPosition)
 
     // If pinned, leave it null. Otherwise stores site on ignoredTopSites list, retaining the same position
-    let pinnedTopSites = this.pinnedTopSites
-    pinnedTopSites = pinnedTopSites.splice(currentPositionIndex, 1, this.isPinned(siteProps) ? null : siteProps)
+    let pinnedTopSites = this.pinnedTopSites.splice(currentPositionIndex, 1, this.isPinned(siteProps) ? null : siteProps)
 
     aboutActions.setNewTabDetail({pinnedTopSites: pinnedTopSites})
   }
@@ -221,16 +181,19 @@ class NewTabPage extends React.Component {
       const currentPositionIndex = gridSites.indexOf(currentPosition)
       const pinnedTopSites = this.pinnedTopSites.splice(currentPositionIndex, 1, null)
       newTabState.pinnedTopSites = pinnedTopSites
+
+      // TODO: ignoring an item sometimes was removing a pin for a different site
+      // I think the merge is not working properly.
     }
 
     newTabState.ignoredTopSites = this.ignoredTopSites.push(siteProps)
-    aboutActions.setNewTabDetail(newTabState)
+    aboutActions.setNewTabDetail(newTabState, true)
   }
 
   onUndoIgnoredTopSite () {
     // Remove last List's entry
     const ignoredTopSites = this.ignoredTopSites.splice(-1, 1)
-    aboutActions.setNewTabDetail({ignoredTopSites: ignoredTopSites})
+    aboutActions.setNewTabDetail({ignoredTopSites: ignoredTopSites}, true)
     this.hideSiteRemovalNotification()
   }
 
@@ -238,7 +201,7 @@ class NewTabPage extends React.Component {
    * Clear ignoredTopSites and pinnedTopSites list
    */
   onRestoreAll () {
-    aboutActions.setNewTabDetail({ignoredTopSites: [], pinnedTopSites: []})
+    aboutActions.setNewTabDetail({ignoredTopSites: []}, true)
     this.hideSiteRemovalNotification()
   }
 
@@ -261,13 +224,13 @@ class NewTabPage extends React.Component {
       return null
     }
 
-    const gridLayout = this.gridLayout
-
     const getLetterFromUrl = (url) => {
       const hostname = urlutils.getHostname(url.get('location'), true)
       const name = url.get('title') || hostname || '?'
       return name.charAt(0).toUpperCase()
     }
+
+    const gridLayout = this.gridLayout
 
     return <div className='dynamicBackground' style={this.state.backgroundImage.style}>
       {
