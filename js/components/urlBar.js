@@ -69,12 +69,6 @@ class UrlBar extends ImmutableComponent {
     return this.props.urlbar.get('focused')
   }
 
-  updateDOMInputFocus (focused) {
-    if (this.urlInput && focused) {
-      this.focus()
-    }
-  }
-
   // restores the url bar to the current location
   restore () {
     const location = UrlUtil.getDisplayLocation(this.props.location, getSetting(settings.PDFJS_ENABLED))
@@ -146,7 +140,6 @@ class UrlBar extends ImmutableComponent {
           }
           // this can't go through appActions for some reason
           // or the whole window will reload on the first page request
-          this.updateDOMInputFocus(false)
           this.clearSearchEngine()
         }
         windowActions.setRenderUrlBarSuggestions(false)
@@ -349,8 +342,6 @@ class UrlBar extends ImmutableComponent {
       windowActions.setRenderUrlBarSuggestions(false)
       windowActions.setUrlBarSelected(true)
       windowActions.setUrlBarActive(true)
-      // The urlbar "selected" might already be set in the window state, so subsequent Command+L won't trigger component updates, so this needs another DOM refresh for selection.
-      this.updateDOMInputFocus()
     })
     // escape key handling
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_STOP, this.onActiveFrameStop)
@@ -391,9 +382,6 @@ class UrlBar extends ImmutableComponent {
           this.urlInput.value = this.suggestionLocation
         }
       }
-    }
-    if (this.isFocused() && !prevProps.urlbar.get('focused')) {
-      this.updateDOMInputFocus()
     }
     if (this.isSelected() && !prevProps.urlbar.get('selected')) {
       this.select()
