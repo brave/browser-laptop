@@ -5,7 +5,7 @@ const {urlInput} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 const aboutNewTabUrl = getTargetAboutUrl('about:newtab')
 
-describe('about:newtab', function () {
+describe('about:newtab tests', function () {
   function * setup (client) {
     yield client
       .waitForUrl(Brave.newTabUrl)
@@ -56,6 +56,12 @@ describe('about:newtab', function () {
             })
         })
     })
+
+    // TODO(bsclifton):
+    // - link check
+    // has link to settings
+    // has link to bookmarks
+    // has link to history
   })
 
   describe('when displaying stats', function () {
@@ -97,11 +103,35 @@ describe('about:newtab', function () {
     // TODO(bsclifton):
     // upgrades
     // shows a time based on # blocked
+  })
 
-    // TODO(bsclifton):
-    // - link check
-    // has link to settings
-    // has link to bookmarks
-    // has link to history
+  describe('with the top sites tile area', function () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
+      yield setup(this.app.client)
+    })
+
+    it('shows sites that have been visited', function * () {
+      yield loadPageWithTracker(this.app.client)
+
+      yield reloadNewTab(this.app.client)
+
+      yield this.app.client
+        .waitForVisible('.topSitesElementFavicon')
+    })
+
+    it('lets you pin a tile (and shows the pinned icon afterwards)', function * () {
+      yield loadPageWithTracker(this.app.client)
+
+      yield reloadNewTab(this.app.client)
+
+      yield this.app.client
+        .waitForVisible('.topSitesElementFavicon')
+        .moveToObject('.topSitesElement')
+        .waitForVisible('.topSitesActionContainer')
+        .click('.topSitesActionBtn')
+        .moveToObject('.timeSaved')
+        .waitForVisible('.pinnedTopSite')
+    })
   })
 })
