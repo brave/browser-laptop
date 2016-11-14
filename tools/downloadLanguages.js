@@ -63,7 +63,7 @@ if (process.env.RESOURCE) {
 languages.forEach(function (languageCode) {
   resources.forEach(function (resource) {
     // Build the URI
-    var URI = TEMPLATE.replace('RESOURCE_SLUG', resource + 'properties')
+    var URI = TEMPLATE.replace('RESOURCE_SLUG', resource.toLowerCase() + 'properties')
     URI = URI.replace('LANG_CODE', languageCode)
 
     // Authorize and request the translation file
