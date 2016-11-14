@@ -193,7 +193,7 @@ class AboutHistory extends React.Component {
   get historyDescendingOrder () {
     return this.state.history.filter((site) => siteUtil.isHistoryEntry(site))
       .sort(historyUtil.sortTimeDescending)
-      .slice(-500)
+      .slice(0, 500)
   }
   clearBrowsingDataNow () {
     aboutActions.clearBrowsingDataNow({browserHistory: true})
