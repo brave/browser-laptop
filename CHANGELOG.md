@@ -1,7 +1,26 @@
 # Changelog
 
 ## [0.12.9](https://github.com/brave/browser-laptop/releases/v0.12.9dev)
-- (TODO)
+- Added New Tab page. ([#3001](https://github.com/brave/browser-laptop/issues/3001))([#2106](https://github.com/brave/browser-laptop/issues/2106))([#5334](https://github.com/brave/browser-laptop/issues/5334))([#5310](https://github.com/brave/browser-laptop/issues/5310))([#5396](https://github.com/brave/browser-laptop/issues/5396))([#5336](https://github.com/brave/browser-laptop/issues/5336))([#5482](https://github.com/brave/browser-laptop/issues/5482))([#5332](https://github.com/brave/browser-laptop/issues/5332))([#5337](https://github.com/brave/browser-laptop/issues/5337))([#5380](https://github.com/brave/browser-laptop/issues/5380))([#5324](https://github.com/brave/browser-laptop/issues/5324))([#5321](https://github.com/brave/browser-laptop/issues/5321))([#5322](https://github.com/brave/browser-laptop/issues/5322))
+- Added Password Manager/Extension icon in right click menu. ([#5292](https://github.com/brave/browser-laptop/issues/5292))
+- Added infogalactic.com to Search prefs. ([#5475](https://github.com/brave/browser-laptop/issues/5475))
+- Added Wolfram Alpha to Search prefs. ([#5478](https://github.com/brave/browser-laptop/issues/5478))
+- Fixed various UI issues. ([#5069](https://github.com/brave/browser-laptop/issues/5069))([#5522](https://github.com/brave/browser-laptop/pull/5522))([#5381](https://github.com/brave/browser-laptop/issues/5381))([#5518](https://github.com/brave/browser-laptop/issues/5518))([#5456](https://github.com/brave/browser-laptop/issues/5456))([#4852](https://github.com/brave/browser-laptop/issues/4852))([#5384](https://github.com/brave/browser-laptop/issues/5384))([#5446](https://github.com/brave/browser-laptop/issues/5446))([#4910](https://github.com/brave/browser-laptop/issues/4910))([#5145](https://github.com/brave/browser-laptop/issues/5145))([#5210](https://github.com/brave/browser-laptop/issues/5210))([#5383](https://github.com/brave/browser-laptop/issues/5383))([#5485](https://github.com/brave/browser-laptop/issues/5485))([#5436](https://github.com/brave/browser-laptop/issues/5436))([#5398](https://github.com/brave/browser-laptop/issues/5398))([#5023](https://github.com/brave/browser-laptop/issues/5023))([#5416](https://github.com/brave/browser-laptop/issues/5416))([#5377](https://github.com/brave/browser-laptop/issues/5377))
+- Fixed various issues for about:history. ([#5458](https://github.com/brave/browser-laptop/issues/5458))([#5525](https://github.com/brave/browser-laptop/pull/5525))([#5405](https://github.com/brave/browser-laptop/issues/5405))
+- Fixed right click when using 1Password or Lastpass. ([#5509](https://github.com/brave/browser-laptop/issues/5509))
+- Fixed help link. ([#2902](https://github.com/brave/browser-laptop/issues/2902))
+- Fixed various issues for Brave Payments. ([#4920](https://github.com/brave/browser-laptop/issues/4920))([#5418](https://github.com/brave/browser-laptop/issues/5418))([#5299](https://github.com/brave/browser-laptop/issues/5299))([#4274](https://github.com/brave/browser-laptop/issues/4274))([#5343](https://github.com/brave/browser-laptop/issues/5343))([#5200](https://github.com/brave/browser-laptop/issues/5200))([#5473](https://github.com/brave/browser-laptop/issues/5473))([#5402](https://github.com/brave/browser-laptop/issues/5402))
+- Fixed [HackerOne] security issues. https://hackerone.com/reports/178379 ([#5238](https://github.com/brave/browser-laptop/issues/5238))
+ https://hackerone.com/reports/180234 ([#5447](https://github.com/brave/browser-laptop/issues/5447))
+- Fixed address bar suggestions. ([#5313](https://github.com/brave/browser-laptop/issues/5313))([#5315](https://github.com/brave/browser-laptop/issues/5315))
+- Fixed Widevine permission notification display. ([#5488](https://github.com/brave/browser-laptop/issues/5488))
+- Fixed various issues for bookmarks. ([#4860](https://github.com/brave/browser-laptop/issues/4860))([#5183](https://github.com/brave/browser-laptop/issues/5183))([#5374](https://github.com/brave/browser-laptop/issues/5374))([#5357](https://github.com/brave/browser-laptop/issues/5357))
+- Fixed AVG deleting latest update. ([#5241](https://github.com/brave/browser-laptop/issues/5241))
+- Fixed when Alt key Reveals Toolbar. ([#4295](https://github.com/brave/browser-laptop/issues/4295))
+- Fixed various issues with address bar. ([#5460](https://github.com/brave/browser-laptop/issues/5460))([#5063](https://github.com/brave/browser-laptop/issues/5063))([#5459](https://github.com/brave/browser-laptop/issues/5459))([#5036](https://github.com/brave/browser-laptop/issues/5036))
+- Fixed Autofill suggestion closing when form is submit / enter pressed. ([#4540](https://github.com/brave/browser-laptop/issues/4540))
+- Fixed Autofill suggestion closing when field is out of focus. ([#3816](https://github.com/brave/browser-laptop/issues/3816))
+- Upgraded to muon 1.4.25 ([#5568](https://github.com/brave/browser-laptop/issues/5568))
 
 ## [0.12.8](https://github.com/brave/browser-laptop/releases/v0.12.8dev)
 - Added Pocket extension. ([#4702](https://github.com/brave/browser-laptop/issues/4702))([#5227](https://github.com/brave/browser-laptop/issues/5227))([#516](https://github.com/brave/browser-laptop/issues/516))([#4689](https://github.com/brave/browser-laptop/issues/4689))([#4700](https://github.com/brave/browser-laptop/issues/4700))([#5226](https://github.com/brave/browser-laptop/issues/5226))
@@ -29,6 +48,7 @@
 - Fixed check adblock / TP lists more frequently than daily. ([#5228](https://github.com/brave/browser-laptop/issues/5228))
 - Fixed don't show blank urlbar for about:blank. ([#5209](https://github.com/brave/browser-laptop/issues/5209))
 - Upgraded to brave/electron 1.4.23. ([#5243](https://github.com/brave/browser-laptop/issues/5243))
+
 
 ## [0.12.7](https://github.com/brave/browser-laptop/releases/v0.12.7dev)
 - Added Google Widevine for Netflix support. ([#5131](https://github.com/brave/browser-laptop/issues/5131))([#468](https://github.com/brave/browser-laptop/issues/468))
