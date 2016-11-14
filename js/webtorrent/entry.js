@@ -79,7 +79,7 @@ class TorrentViewer extends React.Component {
     state.torrent.on('warning', this.onWarning)
     state.torrent.on('error', this.onError)
 
-    if (state.parsedTorrent.ix) {
+    if (state.parsedTorrent.ix !== undefined) {
       state.torrent.createServer()
     }
 
