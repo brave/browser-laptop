@@ -4,6 +4,7 @@ const Brave = require('../lib/brave')
 const {urlInput, urlBarSuggestions, urlbarIcon, activeWebview} = require('../lib/selectors')
 const searchProviders = require('../../js/data/searchProviders')
 const config = require('../../js/constants/config')
+const messages = require('../../js/constants/messages')
 
 describe('urlBar tests', function () {
   function * setup (client) {
@@ -297,5 +298,68 @@ describe('urlBar tests', function () {
         })
       })
     })
+  })
+
+  const tabLoadingTest = function * () {
+    const coffee = 'coffee'
+    yield this.app.client
+      .windowByUrl(Brave.browserWindowUrl)
+      .ipcSend('shortcut-focus-url')
+      .waitForElementFocus(urlInput)
+      .keys(coffee)
+      .waitUntil(function () {
+        return this.getValue(urlInput).then((val) => val === coffee)
+      })
+      .click('.tab[data-frame-key="1"]')
+      .waitUntil(function () {
+        return this.getValue(urlInput).then((val) => val !== coffee)
+      })
+      .click('.tab[data-frame-key="2"]')
+      .waitUntil(function () {
+        return this.getValue(urlInput).then((val) => val === coffee)
+      })
+  }
+
+  describe('location bar with loaded tabs', function () {
+    Brave.beforeAll(this)
+
+    before(function * () {
+      this.page1Url = Brave.server.url('page1.html')
+      this.page2Url = Brave.server.url('page2.html')
+      yield setup(this.app.client)
+      yield this.app.client.waitForExist(urlInput)
+      yield this.app.client.waitForElementFocus(urlInput)
+      yield this.app.client.waitUntil(function () {
+        return this.getValue(urlInput).then((val) => val === '')
+      })
+      .tabByIndex(0)
+      .loadUrl(this.page1Url)
+      .windowByUrl(Brave.browserWindowUrl)
+      .ipcSend(messages.SHORTCUT_NEW_FRAME)
+      .waitForUrl(Brave.newTabUrl)
+      .tabByIndex(1)
+      .loadUrl(this.page2Url)
+    })
+
+    it('Retains user input on tab switches', tabLoadingTest)
+  })
+
+  describe('location bar with new tabs', function () {
+    Brave.beforeAll(this)
+
+    before(function * () {
+      yield setup(this.app.client)
+      yield this.app.client.waitForExist(urlInput)
+      yield this.app.client.waitForElementFocus(urlInput)
+      yield this.app.client.waitUntil(function () {
+        return this.getValue(urlInput).then((val) => val === '')
+      })
+      .windowByUrl(Brave.browserWindowUrl)
+      .ipcSend(messages.SHORTCUT_NEW_FRAME)
+      .waitForUrl(Brave.newTabUrl)
+      .tabByIndex(1)
+    })
+
+    it('Retains user input on tab switches', tabLoadingTest)
   })
 })

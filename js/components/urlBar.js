@@ -364,8 +364,17 @@ class UrlBar extends ImmutableComponent {
   componentDidUpdate (prevProps) {
     // this.urlInput is not initialized in titleMode
     if (this.urlInput) {
-      // Select the part of the URL which was an autocomplete suffix.
-      if (this.props.location !== prevProps.location) {
+      if (this.props.activeFrameKey !== prevProps.activeFrameKey) {
+        // The user just changed tabs
+        this.urlInput.value = UrlUtil.getDisplayLocation(this.props.urlbar.get('location'), getSetting(settings.PDFJS_ENABLED))
+        // Each tab has a focused state stored separately
+        if (this.isFocused()) {
+          this.focus()
+        }
+        windowActions.setUrlBarSuggestions(undefined, null)
+        windowActions.setRenderUrlBarSuggestions(false)
+      } else if (this.props.location !== prevProps.location) {
+        // This is a url nav change
         this.urlInput.value = UrlUtil.getDisplayLocation(this.props.location, getSetting(settings.PDFJS_ENABLED))
       } else if (this.props.locationValueSuffix.length > 0 && this.isActive &&
         (this.props.locationValueSuffix !== prevProps.locationValueSuffix ||
