@@ -129,7 +129,7 @@ class Frame extends ImmutableComponent {
         trackedBlockersCount: this.props.trackedBlockersCount,
         adblockCount: this.props.adblockCount,
         httpsUpgradedCount: this.props.httpsUpgradedCount,
-        newTabDetail: this.props.newTabDetail.toJS()
+        newTabDetail: this.props.newTabDetail ? this.props.newTabDetail.toJS() : null
       })
     } else if (location === 'about:autofill') {
       const defaultSession = global.require('electron').remote.session.defaultSession

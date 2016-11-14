@@ -25,13 +25,28 @@ const isIgnored = (state, siteProps) => {
   return ignoredTopSites(state).filter((site) => compareSites(site, siteProps)).size > 0
 }
 const sortCountDescending = (left, right) => {
-  if (left.get('count') < right.get('count')) return 1
-  if (left.get('count') > right.get('count')) return -1
+  const leftCount = left.get('count') || 0
+  const rightCount = right.get('count') || 0
+  if (leftCount < rightCount) {
+    return 1
+  }
+  if (leftCount > rightCount) {
+    return -1
+  }
+  if (left.get('lastAccessedTime') < right.get('lastAccessedTime')) {
+    return 1
+  }
+  if (left.get('lastAccessedTime') > right.get('lastAccessedTime')) {
+    return -1
+  }
   return 0
 }
 const removeDuplicateDomains = (list) => {
   const siteDomains = new Set()
   return list.filter((site) => {
+    if (!site.get('location')) {
+      return false
+    }
     try {
       const hostname = require('url').parse(site.get('location')).hostname
       if (!siteDomains.has(hostname)) {
@@ -53,7 +68,7 @@ const getTopSites = (state) => {
   const sites = (state.get('sites') || new Immutable.List())
     .filter((site) => !siteUtil.isFolder(site))
     .sort(sortCountDescending)
-    .slice(-aboutNewTabMaxEntries)
+    .slice(0, aboutNewTabMaxEntries)
 
   // Filter out pinned and ignored sites
   let unpinnedSites = sites.filter((site) => !(isPinned(state, site) || isIgnored(state, site)))
