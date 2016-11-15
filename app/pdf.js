@@ -15,12 +15,11 @@ const renderUrlToPdf = (appState, action, testingMode) => {
 
   let currentBw = BrowserWindow.getFocusedWindow()
 
-  let bw = new BrowserWindow({show: !!testingMode, backgroundColor: '#ffffff'})
+  let bw = new BrowserWindow({parent: currentBw, show: !!testingMode, backgroundColor: '#ffffff'})
+
   let wv = bw.webContents
 
-  wv.loadURL(url)
-
-  wv.on('did-finish-load', () => {
+  let afterLoaded = () => {
     wv.printToPDF({}, function (err, data) {
       if (err) {
         throw err
@@ -36,7 +35,6 @@ const renderUrlToPdf = (appState, action, testingMode) => {
       wv.downloadURL(pdfDataURI)
       wv.session.on('will-download', function (event, item) {
         if (savePath) {
-          console.log('suggested save path: ' + savePath)
           item.setSavePath(savePath)
         }
 
@@ -60,7 +58,10 @@ const renderUrlToPdf = (appState, action, testingMode) => {
         wv.session.on('will-download', listener)
       })
     })
-  })
+  }
+
+  bw.loadURL(url)
+  wv.on('did-finish-load', afterLoaded)
 
   return appState
 }
