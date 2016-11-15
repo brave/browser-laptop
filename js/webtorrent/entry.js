@@ -124,9 +124,22 @@ class TorrentViewer extends React.Component {
         : <div>Loading...</div>
     }
 
-    const mainButtonLabel = state.torrent
-      ? state.torrent.progress < 1 ? 'downloading' : 'seeding'
-      : 'startDownload'
+    let titleElem, mainButtonId
+    if (state.torrent) {
+      titleElem = <div className='sectionTitle'>{this.props.name}</div>
+      mainButtonId = state.torrent.progress < 1 ? 'downloading' : 'seeding'
+    } else {
+      const l10nArgs = {
+        name: this.props.name
+      }
+      titleElem = (
+        <div
+          data-l10n-id='startPrompt'
+          data-l10n-args={JSON.stringify(l10nArgs)}
+          className='sectionTitle' />
+      )
+      mainButtonId = 'startDownload'
+    }
 
     const legalNotice = state.torrent == null
       ? <div className='legalNotice' data-l10n-id='legalNotice' />
@@ -135,15 +148,14 @@ class TorrentViewer extends React.Component {
     return (
       <div className='siteDetailsPage'>
         <div className='siteDetailsPageHeader'>
-          <div data-l10n-id='webtorrentPage' className='sectionTitle' />
-          <div className='sectionTitle'>: {this.props.name}</div>
+          {titleElem}
           <div className='headerActions'>
             <Button
               l10nId='saveTorrentFile'
               className='whiteButton saveTorrentFile'
               onClick={saveTorrentFile} />
             <Button
-              l10nId={mainButtonLabel}
+              l10nId={mainButtonId}
               className='whiteButton mainButton'
               disabled={!!state.torrent}
               onClick={start} />

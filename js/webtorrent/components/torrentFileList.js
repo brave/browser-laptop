@@ -23,7 +23,6 @@ class TorrentFileList extends React.Component {
     } else {
       // TODO(feross): Add context menu support, like History page has.
       content = [
-        <div data-l10n-id='files' className='sectionTitle' />,
         <SortableTable
           headings={['num', 'name', 'size']}
           defaultHeading='num'
@@ -43,6 +42,7 @@ class TorrentFileList extends React.Component {
 
     return (
       <div className='torrentFileList'>
+        <div data-l10n-id='files' className='sectionTitle' />
         {content}
       </div>
     )

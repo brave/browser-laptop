@@ -14,15 +14,22 @@ class TorrentStats extends React.Component {
       return <div className='error'>{errorMessage}</div>
     }
 
-    return (
+    return <div>
+      <div data-l10n-id='torrentStatus' className='sectionTitle' />
       <div className='torrentStats'>
+        {renderStatus()}
         {renderPercentage()}
         {renderSpeeds()}
-        {renderEta()}
         {renderTotalProgress()}
         {renderPeers()}
+        {renderEta()}
       </div>
-    )
+    </div>
+
+    function renderStatus () {
+      const label = torrent.progress < 1 ? 'downloading' : 'seeding'
+      return <span data-l10n-id={label} />
+    }
 
     function renderPercentage () {
       const percent = (torrent.progress < 1)
@@ -56,7 +63,7 @@ class TorrentStats extends React.Component {
     }
 
     function renderEta () {
-      if (torrent.timeRemaining === Infinity) return // Zero download speed
+      if (torrent.timeRemaining === 0 || torrent.timeRemaining === Infinity) return // Zero download speed
       if (torrent.downloaded === torrent.length) return // Already done
 
       const rawEta = torrent.timeRemaining / 1000
