@@ -37,7 +37,7 @@ ipc.on(messages.TORRENT_MESSAGE, function (e, msg) {
 })
 
 function send (msg) {
-  ipc.sendToHost(messages.TORRENT_MESSAGE, msg)
+  ipc.send(messages.TORRENT_MESSAGE, msg)
 }
 
 // Check whether we're already part of this swarm. If not, show a Start button.
