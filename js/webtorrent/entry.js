@@ -117,16 +117,20 @@ class TorrentViewer extends React.Component {
   render () {
     const ix = state.parsedTorrent && state.parsedTorrent.ix // Selected file index
 
-    const legalNotice = state.torrent == null
-      ? <div className='legalNotice' data-l10n-id='legalNotice' />
-      : <div className='legalNotice' data-l10n-id='poweredByWebTorrent' />
-
     let fileContent
-    if (state.torrent && ix !== undefined) {
+    if (state.torrent && ix != null) {
       fileContent = state.torrent.serverURL != null
         ? <iframe src={state.torrent.serverURL + '/' + ix} sandbox='allow-same-origin' />
         : <div>Loading...</div>
     }
+
+    const mainButtonLabel = state.torrent
+      ? state.torrent.progress < 1 ? 'downloading' : 'seeding'
+      : 'startDownload'
+
+    const legalNotice = state.torrent == null
+      ? <div className='legalNotice' data-l10n-id='legalNotice' />
+      : <a className='legalNotice' data-l10n-id='poweredByWebTorrent' href='https://webtorrent.io' target='_blank' />
 
     return (
       <div className='siteDetailsPage'>
@@ -134,20 +138,20 @@ class TorrentViewer extends React.Component {
           <div data-l10n-id='webtorrentPage' className='sectionTitle' />
           <div className='sectionTitle'>: {this.props.name}</div>
           <div className='headerActions'>
-            <TorrentStats torrent={state.torrent} errorMessage={state.errorMessage} />
-            <Button
-              l10nId='startDownload'
-              className='whiteButton startDownload'
-              disabled={!!state.torrent}
-              onClick={start} />
             <Button
               l10nId='saveTorrentFile'
               className='whiteButton saveTorrentFile'
               onClick={saveTorrentFile} />
+            <Button
+              l10nId={mainButtonLabel}
+              className='whiteButton mainButton'
+              disabled={!!state.torrent}
+              onClick={start} />
           </div>
         </div>
 
         <div className='siteDetailsPageContent'>
+          <TorrentStats torrent={state.torrent} errorMessage={state.errorMessage} />
           <div className='fileContent'>
             {fileContent}
           </div>

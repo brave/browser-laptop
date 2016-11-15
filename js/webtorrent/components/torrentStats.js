@@ -16,14 +16,20 @@ class TorrentStats extends React.Component {
 
     return (
       <div className='torrentStats'>
-        <span>{torrent.progress < 1 ? 'Downloading' : 'Seeding'}</span>
-        <span>{(torrent.progress * 100).toFixed(1)}%</span>
+        {renderPercentage()}
         {renderSpeeds()}
         {renderEta()}
         {renderTotalProgress()}
         {renderPeers()}
       </div>
     )
+
+    function renderPercentage () {
+      const percent = (torrent.progress < 1)
+        ? (torrent.progress * 100).toFixed(1)
+        : '100'
+      return <span>{percent}%</span>
+    }
 
     function renderTotalProgress () {
       const downloaded = prettierBytes(torrent.downloaded)

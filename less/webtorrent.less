@@ -11,9 +11,9 @@
 
   .siteDetailsPageHeader {
     .headerActions > * {
-      display: inline-block;
+      float: right;
     }
-    .startDownload {
+    .mainButton {
       background: linear-gradient(@braveLightOrange, @braveOrange);
       border: 2px solid transparent;
       border-top: 2px solid @braveLightOrange;
@@ -29,32 +29,51 @@
 
     .sortableTable {
       -webkit-user-select: none;
+      table-layout: fixed;
+
+      td {
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+
       .num {
         font-size: 11pt;
-        font-weight: 800;
         text-align: center;
-        width: 154px;
-        white-space: nowrap;
       }
 
       .name {
-        font-size: 11pt;
-        max-width: 415px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+      }
+
+      .heading-num {
+        width: 60px;
+      }
+
+      .heading-size {
+        width: 120px;
       }
     }
   }
 }
 
+.torrentStats {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
 .error {
-  color: @errorTextColor;
+  color: red;
 }
 
 .legalNotice {
   font-size: 9pt;
   margin-top: 15px;
+  color: @gray;
+  text-decoration: none; // for when legal notice is a link
 }
 
 .torrentStats {
@@ -87,4 +106,9 @@ iframe {
   opacity: 0.7;
   padding-left: 4px;
   padding-right: 4px;
+}
+
+.torrentFileList {
+  margin-top: 20px;
+  margin-bottom: 20px;
 }

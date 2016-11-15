@@ -15,27 +15,37 @@ class TorrentFileList extends React.Component {
   render () {
     const files = this.props.files
 
+    let content
     if (files == null) {
-      return <div data-l10n-id='missingFilesList' />
+      content = <div data-l10n-id='missingFilesList' />
     } else if (files.length === 0) {
-      return <div data-l10n-id='loadingFilesList' />
+      content = <div data-l10n-id='loadingFilesList' />
     } else {
       // TODO(feross): Add context menu support, like History page has.
-      return <div className='torrentFileList'>
-        <SortableTable headings={['name', 'size']}
-          defaultHeading='name'
+      content = [
+        <div data-l10n-id='files' className='sectionTitle' />,
+        <SortableTable
+          headings={['num', 'name', 'size']}
+          defaultHeading='num'
           defaultHeadingSortOrder='asc'
-          rows={files.map((file) => [
+          rows={files.map((file, i) => [
+            String(i + 1),
             file.name,
             prettierBytes(file.length)
           ])}
           rowObjects={files}
-          columnClassNames={['name', 'size']}
+          columnClassNames={['num', 'name', 'size']}
           addHoverClass
           stateOwner={this.props.stateOwner}
           onClick={this.onClick} />
-      </div>
+      ]
     }
+
+    return (
+      <div className='torrentFileList'>
+        {content}
+      </div>
+    )
   }
 }
 
