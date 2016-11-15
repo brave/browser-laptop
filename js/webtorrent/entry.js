@@ -8,9 +8,8 @@ const ReactDOM = require('react-dom')
 const WebTorrentRemoteClient = require('webtorrent-remote/client')
 
 // React Components
-const Button = require('../components/button')
-const TorrentFileList = require('./components/torrentFileList')
-const TorrentStats = require('./components/torrentStats')
+const MediaViewer = require('./components/mediaViewer')
+const TorrentViewer = require('./components/torrentViewer')
 
 // Stylesheets
 require('../../less/webtorrent.less')
@@ -59,15 +58,7 @@ function render () {
 }
 
 function update () {
-  let name = state.parsedTorrent && state.parsedTorrent.name
-  if (!name) {
-    name = state.torrent
-      ? 'Loading torrent information...'
-      : 'Untitled torrent'
-  }
-  document.title = name
-
-  const elem = <TorrentViewer name={name} />
+  const elem = <App />
   ReactDOM.render(elem, document.querySelector('#appContainer'))
 }
 
@@ -92,6 +83,7 @@ function start () {
 }
 
 function saveTorrentFile () {
+  console.log('saveTorrentFile')
   let parsedTorrent = parseTorrent(state.torrentID)
   let torrentFile = parseTorrent.toTorrentFile(parsedTorrent)
 
@@ -108,72 +100,45 @@ function saveTorrentFile () {
   a.click()
 }
 
-class TorrentViewer extends React.Component {
+class App extends React.Component {
   constructor () {
     super()
-    this.state = {} // Needed for SortableTable.stateOwner
+    this.dispatch = this.dispatch.bind(this)
+  }
+
+  dispatch (action) {
+    switch (action) {
+      case 'start':
+        return start()
+      case 'saveTorrentFile':
+        return saveTorrentFile()
+      default:
+        console.error('Ignoring unknown dispatch type: ' + JSON.stringify(action))
+    }
   }
 
   render () {
-    const ix = state.parsedTorrent && state.parsedTorrent.ix // Selected file index
+    const {torrent, torrentID, errorMessage, parsedTorrent} = state
+    const ix = parsedTorrent && parsedTorrent.ix // Selected file index
+    let name = parsedTorrent && parsedTorrent.name
+    if (!name) {
+      name = state.torrent
+        ? 'Loading torrent information...'
+        : 'Untitled torrent'
+    }
+    document.title = name // Set page title
 
-    let fileContent
     if (state.torrent && ix != null) {
-      fileContent = state.torrent.serverURL != null
-        ? <iframe src={state.torrent.serverURL + '/' + ix} sandbox='allow-same-origin' />
-        : <div>Loading...</div>
-    }
-
-    let titleElem, mainButtonId
-    if (state.torrent) {
-      titleElem = <div className='sectionTitle'>{this.props.name}</div>
-      mainButtonId = state.torrent.progress < 1 ? 'downloading' : 'seeding'
+      return <MediaViewer torrent={torrent} ix={ix} />
     } else {
-      const l10nArgs = {
-        name: this.props.name
-      }
-      titleElem = (
-        <div
-          data-l10n-id='startPrompt'
-          data-l10n-args={JSON.stringify(l10nArgs)}
-          className='sectionTitle' />
+      return (
+        <TorrentViewer
+          name={name}
+          torrent={torrent}
+          torrentID={torrentID}
+          errorMessage={errorMessage}
+          dispatch={this.dispatch} />
       )
-      mainButtonId = 'startDownload'
     }
-
-    const legalNotice = state.torrent == null
-      ? <div className='legalNotice' data-l10n-id='legalNotice' />
-      : <a className='legalNotice' data-l10n-id='poweredByWebTorrent' href='https://webtorrent.io' target='_blank' />
-
-    return (
-      <div className='siteDetailsPage'>
-        <div className='siteDetailsPageHeader'>
-          {titleElem}
-          <div className='headerActions'>
-            <Button
-              l10nId='saveTorrentFile'
-              className='whiteButton saveTorrentFile'
-              onClick={saveTorrentFile} />
-            <Button
-              l10nId={mainButtonId}
-              className='whiteButton mainButton'
-              disabled={!!state.torrent}
-              onClick={start} />
-          </div>
-        </div>
-
-        <div className='siteDetailsPageContent'>
-          <TorrentStats torrent={state.torrent} errorMessage={state.errorMessage} />
-          <div className='fileContent'>
-            {fileContent}
-          </div>
-          <TorrentFileList
-            files={state.torrent && state.torrent.files}
-            stateOwner={this}
-            torrentID={state.torrentID} />
-          {legalNotice}
-        </div>
-      </div>
-    )
   }
 }
