@@ -29,6 +29,14 @@ function init () {
 function send (msg) {
   if (DEBUG_IPC) console.log('Sending IPC: ' + JSON.stringify(msg))
   const channel = channels[msg.clientKey]
-  if (!channel) throw new Error('Unrecognized clientKey ' + msg.clientKey)
+  if (!channel) {
+    if (DEBUG_IPC) console.error('Ignoring unrecognized clientKey ' + msg.clientKey)
+    return
+  }
+  if (channel.isDestroyed()) {
+    if (DEBUG_IPC) console.log('Removing destroyed channel, clientKey ' + msg.clientKey)
+    delete channels[msg.clientKey]
+    return
+  }
   channel.send(messages.TORRENT_MESSAGE, msg)
 }
