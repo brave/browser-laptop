@@ -9,7 +9,7 @@ class MediaViewer extends React.Component {
     if (torrent.serverURL != null) {
       content = <iframe src={torrent.serverURL + '/' + ix} sandbox='allow-same-origin' />
     } else {
-      content = <div>Loading...</div>
+      content = <div data-l10n-id='torrentLoadingMedia' />
     }
 
     return (
