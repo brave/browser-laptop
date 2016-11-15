@@ -350,7 +350,9 @@ class BitcoinDashboard extends ImmutableComponent {
     return getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, this.props.settings) || 0
   }
   get canUseCoinbase () {
-    return this.currency === 'USD' && this.amount < 6
+    if (!this.props.ledgerData.get('buyMaximumUSD')) return true
+
+    return this.currency === 'USD' && this.amount < this.props.ledgerData.get('buyMaximumUSD')
   }
   get userInAmerica () {
     const countryCode = this.props.ledgerData.get('countryCode')

@@ -988,13 +988,17 @@ var updateLedgerInfo = () => {
     underscore.extend(ledgerInfo,
                       underscore.pick(info, [ 'address', 'passphrase', 'balance', 'unconfirmed', 'satoshis', 'btc', 'amount',
                                               'currency' ]))
-    if ((!info.buyURLExpires) || (info.buyURLExpires > now)) ledgerInfo.buyURL = info.buyURL
-    if ((process.env.NODE_ENV === 'development') && (typeof process.env.ADDFUNDS_URL !== 'undefined')) {
+    if ((!info.buyURLExpires) || (info.buyURLExpires > now)) {
+      ledgerInfo.buyURL = info.buyURL
+      ledgerInfo.buyMaximumUSD = 6
+    }
+    if (typeof process.env.ADDFUNDS_URL !== 'undefined') {
       ledgerInfo.buyURLFrame = true
       ledgerInfo.buyURL = process.env.ADDFUNDS_URL + '?' +
                           querystring.stringify({ currency: ledgerInfo.currency,
                                                   amount: getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT),
                                                   address: ledgerInfo.address })
+      ledgerInfo.buyMaximumUSD = false
     }
 
     underscore.extend(ledgerInfo, ledgerInfo._internal.cache || {})
