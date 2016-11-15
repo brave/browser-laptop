@@ -6,7 +6,6 @@
 
 const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
-const base64Encode = require('../js/lib/base64').encode
 
 const renderUrlToPdf = (appState, action, testingMode) => {
   let url = action.url
@@ -16,17 +15,16 @@ const renderUrlToPdf = (appState, action, testingMode) => {
   let currentBw = BrowserWindow.getFocusedWindow()
 
   let bw = new BrowserWindow({show: !!testingMode, backgroundColor: '#ffffff'})
+
   let wv = bw.webContents
 
-  wv.loadURL(url)
-
-  wv.on('did-finish-load', () => {
+  let whenReadyToGeneratePDF = () => {
     wv.printToPDF({}, function (err, data) {
       if (err) {
         throw err
       }
 
-      let pdfDataURI = 'data:application/pdf;base64,' + base64Encode(data)
+      let pdfDataURI = 'data:application/pdf;base64,' + data.toString('base64')
 
       // need to put our event handler first so we can set filename
       //   specifically, needs to execute ahead of app/filtering.js:registerForDownloadListener (which opens the dialog box)
@@ -34,17 +32,17 @@ const renderUrlToPdf = (appState, action, testingMode) => {
       wv.session.removeAllListeners('will-download')
 
       wv.downloadURL(pdfDataURI)
-      wv.session.on('will-download', function (event, item) {
+      wv.session.once('will-download', function (event, item) {
         if (savePath) {
-          console.log('suggested save path: ' + savePath)
           item.setSavePath(savePath)
         }
 
-        item.on('done', function (event, state) {
+        item.once('done', function (event, state) {
           if (state === 'completed') {
-            let savePath = item && item.getSavePath()
+            let finalSavePath = item && item.getSavePath()
+
             if (openAfterwards && savePath) {
-              currentBw.webContents.loadURL('file://' + savePath)
+              currentBw.webContents.loadURL('file://' + finalSavePath)
             }
 
             if (bw && !testingMode) {
@@ -60,7 +58,15 @@ const renderUrlToPdf = (appState, action, testingMode) => {
         wv.session.on('will-download', listener)
       })
     })
-  })
+  }
+
+  let afterLoaded = () => {
+    let removeCharEncodingArtifactJS = 'document.body.outerHTML = document.body.outerHTML.replace(/Â/g, "")'
+    wv.executeJavaScript(removeCharEncodingArtifactJS, whenReadyToGeneratePDF)
+  }
+
+  bw.loadURL(url)
+  wv.on('did-finish-load', afterLoaded)
 
   return appState
 }

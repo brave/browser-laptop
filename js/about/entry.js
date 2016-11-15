@@ -54,6 +54,9 @@ switch (getBaseUrl(getSourceAboutUrl(window.location.href))) {
   case 'about:styles':
     element = require('./styles')
     break
+  case 'about:contributions':
+    element = require('./contributionStatement')
+    break
 }
 
 if (element) {
