@@ -16,21 +16,47 @@ const TorrentStats = require('./components/torrentStats')
 require('../../less/webtorrent.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
-const torrentID = window.location.hash.substring(1)
-
 // UI state object. Pure function from `state` -> React element.
 const state = {
-  torrentID: torrentID,
-  parsedTorrent: parseTorrent(torrentID),
+  torrentID: window.location.hash.substring(1),
+  parsedTorrent: null,
+  client: null,
   torrent: null,
   errorMessage: null
 }
 window.state = state /* for easier debugging */
 
-// TODO: REMOVE THIS HACK ONCE THIS IS ADDRESSED:
-// https://github.com/webpack/node-libs-browser/issues/38#issuecomment-259586299
-state.torrentID = state.torrentID.replace(/&ws=[^&]/g, '')
 state.parsedTorrent = parseTorrent(state.torrentID)
+
+// Create the client, set up IPC to the WebTorrentRemoteServer
+state.client = new WebTorrentRemoteClient(send)
+state.client.on('warning', onWarning)
+state.client.on('error', onError)
+
+ipc.on(messages.TORRENT_MESSAGE, function (e, msg) {
+  state.client.receive(msg)
+})
+
+function send (msg) {
+  ipc.sendToHost(messages.TORRENT_MESSAGE, msg)
+}
+
+// Check whether we're already part of this swarm. If not, show a Start button.
+console.log('GETTING ' + state.torrentID)
+state.client.get(state.torrentID, function (err, torrent) {
+  console.log('GOT ' + state.torrentID, err, torrent)
+  if (!err) {
+    state.torrent = torrent
+    addTorrentEvents(torrent)
+  }
+  render()
+})
+
+// Page starts blank, once you call render() it shows a continuously updating torrent UI
+function render () {
+  update()
+  setInterval(update, 1000)
+}
 
 function update () {
   let name = state.parsedTorrent && state.parsedTorrent.name
@@ -45,62 +71,47 @@ function update () {
   ReactDOM.render(elem, document.querySelector('#appContainer'))
 }
 
+function addTorrentEvents (torrent) {
+  torrent.on('warning', onWarning)
+  torrent.on('error', onError)
+}
+
+function onWarning (err) {
+  console.warn(err.message)
+}
+
+function onError (err) {
+  state.errorMessage = err.message
+}
+
+function start () {
+  state.torrent = state.client.add(state.torrentID)
+  addTorrentEvents(state.torrent)
+  state.torrent.createServer()
+  update()
+}
+
+function saveTorrentFile () {
+  let parsedTorrent = parseTorrent(state.torrentID)
+  let torrentFile = parseTorrent.toTorrentFile(parsedTorrent)
+
+  let torrentFileName = state.parsedTorrent.name + '.torrent'
+  let torrentFileBlobURL = URL.createObjectURL(
+    new Blob([torrentFile],
+    { type: 'application/x-bittorrent' }
+  ))
+
+  let a = document.createElement('a')
+  a.target = '_blank'
+  a.download = torrentFileName
+  a.href = torrentFileBlobURL
+  a.click()
+}
+
 class TorrentViewer extends React.Component {
   constructor () {
     super()
-    this.state = {}
-
-    this.start = this.start.bind(this)
-    this.onError = this.onError.bind(this)
-  }
-
-  onWarning (err) {
-    console.warn(err.message)
-  }
-
-  onError (err) {
-    state.errorMessage = err.message
-  }
-
-  start () {
-    const client = new WebTorrentRemoteClient(send)
-    client.on('warning', this.onWarning)
-    client.on('error', this.onError)
-
-    ipc.on(messages.TORRENT_MESSAGE, function (e, msg) {
-      client.receive(msg)
-    })
-
-    function send (msg) {
-      ipc.sendToHost(messages.TORRENT_MESSAGE, msg)
-    }
-
-    state.torrent = client.add(state.torrentID)
-    state.torrent.on('warning', this.onWarning)
-    state.torrent.on('error', this.onError)
-
-    if (state.parsedTorrent.ix !== undefined) {
-      state.torrent.createServer()
-    }
-
-    update()
-  }
-
-  saveTorrentFile () {
-    let parsedTorrent = parseTorrent(state.torrentID)
-    let torrentFile = parseTorrent.toTorrentFile(parsedTorrent)
-
-    let torrentFileName = state.parsedTorrent.name + '.torrent'
-    let torrentFileBlobURL = URL.createObjectURL(
-      new Blob([torrentFile],
-      { type: 'application/x-bittorrent' }
-    ))
-
-    let a = document.createElement('a')
-    a.target = '_blank'
-    a.download = torrentFileName
-    a.href = torrentFileBlobURL
-    a.click()
+    this.state = {} // Needed for SortableTable.stateOwner
   }
 
   render () {
@@ -111,7 +122,7 @@ class TorrentViewer extends React.Component {
       : <div className='legalNotice' data-l10n-id='poweredByWebTorrent' />
 
     let fileContent
-    if (state.torrent && ix) {
+    if (state.torrent && ix !== undefined) {
       fileContent = state.torrent.serverURL != null
         ? <iframe src={state.torrent.serverURL + '/' + ix} sandbox='allow-same-origin' />
         : <div>Loading...</div>
@@ -128,11 +139,11 @@ class TorrentViewer extends React.Component {
               l10nId='startDownload'
               className='whiteButton startDownload'
               disabled={!!state.torrent}
-              onClick={this.start} />
+              onClick={start} />
             <Button
               l10nId='saveTorrentFile'
               className='whiteButton saveTorrentFile'
-              onClick={this.saveTorrentFile} />
+              onClick={saveTorrentFile} />
           </div>
         </div>
 
@@ -150,7 +161,3 @@ class TorrentViewer extends React.Component {
     )
   }
 }
-
-// Render immediately, then periodically to show download progress
-update()
-setInterval(update, 1000)
