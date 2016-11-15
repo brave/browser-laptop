@@ -165,14 +165,8 @@ let generateTorrentManifest = () => {
     'frame-src': 'http://localhost:*',
     'form-action': '\'none\'',
     'referrer': 'no-referrer',
-    'style-src': '\'self\' \'unsafe-inline\'',
-    'img-src': '* data: blob:'
+    'style-src': '\'self\' \'unsafe-inline\''
   }
-
-  // TODO:
-  // * Move WebTorrent to its own process, similar to the way it's done in WebTorrent Desktop
-  // * Remove this CSP exception:
-  cspDirectives['connect-src'] = '*'
 
   return {
     name: 'Torrent Viewer',
