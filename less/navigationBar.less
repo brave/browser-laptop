@@ -42,6 +42,8 @@
   }
 
   #navigator {
+    margin-right: 0px;
+
     .homeButton {
       margin: 0 0 3px 0;
     }
@@ -469,6 +471,8 @@
   @centerOffset: 2 * (@navbarButtonWidth + @navbarButtonSpacing) // width area on the left
                  - (@navbarBraveButtonWidth + 2 * @navbarButtonSpacing);
 
+  @rightMargin: @navbarLeftMarginDarwin / 2;
+
   display: flex;
 
   // Buttons on the left
@@ -498,6 +502,7 @@
     flex-grow: 1;
     min-width: 0%; // allow the navigator to shrink
     max-width: 900px;
+    margin-right: @rightMargin;
 
     &.titleMode {
       padding-right: @centerOffset;
@@ -552,10 +557,12 @@
       }
     }
 
-    .extraDragArea {
-      display: flex;
-      flex-grow: 0;
-      width: @navbarBraveButtonMarginLeft;
+    @media (max-width: @breakpointWideViewport) {
+      .extraDragArea {
+        display: flex;
+        flex-grow: 0;
+        width: @navbarBraveButtonMarginLeft;
+      }
     }
   }
 }
@@ -846,13 +853,6 @@
 
   > * {
     -webkit-app-region: no-drag;
-
-    &.endButtons {
-      margin-right: 20px;
-      @media (max-width: @breakpointNarrowViewport) {
-        margin-right: 0px;
-      }
-    }
   }
 
   .inputbar-wrapper {
