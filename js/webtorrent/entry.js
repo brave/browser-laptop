@@ -118,12 +118,7 @@ class App extends React.Component {
     const {torrent, torrentID, errorMessage, parsedTorrent} = state
     const ix = parsedTorrent && parsedTorrent.ix // Selected file index
     let name = parsedTorrent && parsedTorrent.name
-    if (!name) {
-      name = state.torrent
-        ? 'Loading torrent information...'
-        : 'Untitled torrent'
-    }
-    document.title = name // Set page title
+    if (name) document.title = name
 
     if (state.torrent && ix != null) {
       return <MediaViewer torrent={torrent} ix={ix} />

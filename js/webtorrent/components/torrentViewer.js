@@ -12,19 +12,24 @@ class TorrentViewer extends React.Component {
   }
 
   render () {
-    const {torrent, torrentID, errorMessage, dispatch} = this.props
+    const {torrent, torrentID, name, errorMessage, dispatch} = this.props
+
+    const l10nTitle = name
+      ? '' // No localization, just use the torrent name
+      : torrent
+      ? 'torrentLoadingInfo' // eg 'Loading torrent information...'
+      : 'torrentUntitled' // eg 'Untitled torrent'
+    const l10nStart = name ? 'startPrompt' : 'startPromptUntitled'
 
     let titleElem, mainButtonId
     if (torrent) {
-      titleElem = <div className='sectionTitle'>{this.props.name}</div>
+      titleElem = <div className='sectionTitle' data-l10n-id={l10nTitle}>{name}</div>
       mainButtonId = torrent.progress < 1 ? 'downloading' : 'seeding'
     } else {
-      const l10nArgs = {
-        name: this.props.name
-      }
+      const l10nArgs = {name}
       titleElem = (
         <div
-          data-l10n-id='startPrompt'
+          data-l10n-id={l10nStart}
           data-l10n-args={JSON.stringify(l10nArgs)}
           className='sectionTitle' />
       )
