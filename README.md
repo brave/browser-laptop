@@ -74,6 +74,8 @@ After installing the prerequisites:
 
 If this fails on Linux with an error related to `abp-filter-parser-cpp`, try updating to Node 6.1 and `node-gyp` 3.3.1 (see discussion at https://github.com/brave/browser-laptop/issues/214)
 
+Instead of `npm install` you may also install with [yarn](https://github.com/yarnpkg/yarn). This works with yarn 0.16.1 (`npm install -g yarn@0.16.1` then `yarn install`).
+
 ### Troubleshooting
 
 Additional notes on troubleshooting installation issues are in the [Troubleshooting](https://github.com/brave/browser-laptop/wiki/Troubleshooting) page in the Wiki.
