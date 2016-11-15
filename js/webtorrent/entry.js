@@ -41,9 +41,7 @@ function send (msg) {
 }
 
 // Check whether we're already part of this swarm. If not, show a Start button.
-console.log('GETTING ' + state.torrentID)
 state.client.get(state.torrentID, function (err, torrent) {
-  console.log('GOT ' + state.torrentID, err, torrent)
   if (!err) {
     state.torrent = torrent
     addTorrentEvents(torrent)
@@ -83,7 +81,6 @@ function start () {
 }
 
 function saveTorrentFile () {
-  console.log('saveTorrentFile')
   let parsedTorrent = parseTorrent(state.torrentID)
   let torrentFile = parseTorrent.toTorrentFile(parsedTorrent)
 
