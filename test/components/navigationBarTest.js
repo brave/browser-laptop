@@ -873,14 +873,14 @@ describe('navigationBar tests', function () {
       })
     })
 
-    describe('with blank url input value', function () {
-      Brave.beforeAll(this)
+    describe('with about page url input values', function () {
+      Brave.beforeEach(this)
 
-      before(function * () {
+      beforeEach(function * () {
         yield setup(this.app.client)
         yield this.app.client.waitForExist(urlInput)
       })
-      it('hides about:newtab', function * () {
+      it('hides "about:newtab" inside the URL bar', function * () {
         yield this.app.client
           .tabByUrl(this.newTabUrl)
           .windowByUrl(Brave.browserWindowUrl)
@@ -888,7 +888,7 @@ describe('navigationBar tests', function () {
             return this.getValue(urlInput).then((val) => val === '')
           })
       })
-      it('shows about:blank', function * () {
+      it('shows "about:blank" in the URL bar', function * () {
         yield this.app.client
           .keys('about:blank')
           .keys(Brave.keys.ENTER)
@@ -896,8 +896,21 @@ describe('navigationBar tests', function () {
             return this.getValue(urlInput).then((val) => val === 'about:blank')
           })
       })
-      it('has the search icon', function * () {
-        yield this.app.client.waitForExist('.urlbarIcon.fa-search')
+      it('shows the search icon in URL bar for "about:newtab"', function * () {
+        yield this.app.client
+          .tabByUrl(this.newTabUrl)
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitForExist('.urlbarIcon.fa-search')
+      })
+      it('shows the list icon in URL bar for other about pages', function * () {
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .keys('about:about')
+          .keys(Brave.keys.ENTER)
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => val === 'about:about')
+          })
+          .waitForExist('.urlbarIcon.fa-list')
       })
     })
 

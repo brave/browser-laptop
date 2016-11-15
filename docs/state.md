@@ -220,6 +220,15 @@ AppStore
     }
   },
   about: {
+    brave: {
+      versionInformation: [{
+        name: string,
+        version: string
+      }] // used on about:brave. not persisted (removed on save)
+    },
+    history: {
+      entries: [object] // used on about:history. not persisted (removed on save)
+    },
     newtab: {
       gridLayoutSize: string, // 'small', 'medium', 'large'
       sites: [string], // List of sites to be used on gridLayout

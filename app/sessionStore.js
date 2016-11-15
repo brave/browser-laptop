@@ -327,7 +327,10 @@ module.exports.cleanAppData = (data, isShutdown) => {
     })
   }
 
-  delete data.versionInformation
+  if (data.about) {
+    delete data.about.brave
+    delete data.about.history
+  }
 }
 
 /**
@@ -435,18 +438,21 @@ module.exports.loadAppState = () => {
       // version information (shown on about:brave)
       const os = require('os')
       const versionInformation = [
-        {name: 'brave', version: app.getVersion()},
-        {name: 'muon', version: process.versions['atom-shell']},
+        {name: 'Brave', version: app.getVersion()},
+        {name: 'Muon', version: process.versions['atom-shell']},
         {name: 'libchromiumcontent', version: process.versions['chrome']},
         {name: 'V8', version: process.versions.v8},
         {name: 'Node.js', version: process.versions.node},
-        {name: 'channel', version: Channel.channel()},
+        {name: 'Update Channel', version: Channel.channel()},
         {name: 'os.platform', version: os.platform()},
         {name: 'os.release', version: os.release()},
         {name: 'os.arch', version: os.arch()}
         // TODO(bsclifton): read the latest commit hash from a file, etc.
       ]
-      data.versionInformation = versionInformation
+      data.about = data.about || {}
+      data.about.brave = {
+        versionInformation: versionInformation
+      }
     } catch (e) {
       // TODO: Session state is corrupted, maybe we should backup this
       // corrupted value for people to report into support.
