@@ -902,7 +902,10 @@ function mainTemplateInit (nodeProps, frame) {
   const isAboutPage = aboutUrls.has(frame.get('location'))
 
   if (isLink) {
-    template.push(openInNewTabMenuItem(nodeProps.linkURL, frame.get('isPrivate'), frame.get('partitionNumber'), frame.get('key')),
+    if (!frame.get('isPrivate')) {
+      template.push(openInNewTabMenuItem(nodeProps.linkURL, frame.get('isPrivate'), frame.get('partitionNumber'), frame.get('key')))
+    }
+    template.push(
       openInNewPrivateTabMenuItem(nodeProps.linkURL, frame.get('key')),
       openInNewWindowMenuItem(nodeProps.linkURL, frame.get('isPrivate'), frame.get('partitionNumber')),
       CommonMenu.separatorMenuItem,
