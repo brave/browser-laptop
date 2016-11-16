@@ -109,6 +109,13 @@ module.exports = { "providers" :
       "image" : "https://www.wolframalpha.com/favicon.ico?v=2",
       "search" : "https://www.wolframalpha.com/input/?i={searchTerms}",
       "shortcut" : ":wa"
+    },
+    {
+      "name" : "Semantic Scholar",
+      "base" : "https://www.semanticscholar.org",
+      "image" : "https://www.semanticscholar.org/img/favicon.png",
+      "search" : "https://www.semanticscholar.org/search?q={searchTerms}",
+      "shortcut" : ":ss"
     }
   ]
 }
