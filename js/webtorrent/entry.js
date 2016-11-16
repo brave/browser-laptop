@@ -74,9 +74,16 @@ function onError (err) {
 }
 
 function start () {
-  state.torrent = state.client.add(state.torrentID)
-  addTorrentEvents(state.torrent)
-  state.torrent.createServer()
+  state.client.add(state.torrentID, onAdded, {server: {}})
+}
+
+function onAdded (err, torrent) {
+  if (err) {
+    state.errorMessage = err.message
+    return console.error(err)
+  }
+  state.torrent = torrent
+  addTorrentEvents(torrent)
   update()
 }
 
