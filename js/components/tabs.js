@@ -11,8 +11,9 @@ const windowActions = require('../actions/windowActions')
 const windowStore = require('../stores/windowStore')
 const dragTypes = require('../constants/dragTypes')
 const cx = require('../lib/classSet')
+const contextMenus = require('../contextMenus')
 
-const Button = require('./button')
+const LongPressButton = require('./longPressButton')
 const Tab = require('./tab')
 const dnd = require('../dnd')
 const dndData = require('../dndData')
@@ -87,6 +88,10 @@ class Tabs extends ImmutableComponent {
     windowActions.newFrame()
   }
 
+  onNewTabLongPress (rect) {
+    contextMenus.onNewTabContextMenu(rect)
+  }
+
   render () {
     this.tabRefs = []
     const index = this.props.previewTabPageIndex !== undefined
@@ -125,10 +130,15 @@ class Tabs extends ImmutableComponent {
               onClick={this.onNextPage} />
           }
         })()}
-        <Button label='+'
+
+        <LongPressButton
+          label='+'
           l10nId='newTabButton'
-          className='navbutton newFrameButton'
-          onClick={this.newTab} />
+          className='browserButton navbutton newFrameButton'
+          disabled={false}
+          onClick={this.newTab}
+          onLongPress={this.onNewTabLongPress}
+        />
       </span>
     </div>
   }
