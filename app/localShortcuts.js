@@ -14,6 +14,7 @@ module.exports.register = (win) => {
   // the URL bar.  In those cases it's acceptable for the individual components to
   // listen to the events.
   const simpleWebContentEvents = [
+    ['F6', messages.SHORTCUT_FOCUS_URL],
     ['CmdOrCtrl+Shift+]', messages.SHORTCUT_NEXT_TAB],
     ['CmdOrCtrl+Shift+[', messages.SHORTCUT_PREV_TAB],
     ['CmdOrCtrl+Alt+Right', messages.SHORTCUT_NEXT_TAB],
