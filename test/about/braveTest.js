@@ -23,7 +23,6 @@ describe('about:brave tests', function () {
         .waitUntil(function () {
           return this.getText('table.sortableTable td[data-sort="Brave"]')
             .then((textValue) => {
-              console.log(textValue)
               return textValue && String(textValue).length > 0 && String(textValue) !== 'null'
             })
         })
@@ -33,7 +32,6 @@ describe('about:brave tests', function () {
         .waitUntil(function () {
           return this.getText('table.sortableTable td[data-sort="Muon"]')
             .then((textValue) => {
-              console.log(textValue)
               return textValue && String(textValue).length > 0 && String(textValue) !== 'null'
             })
         })
@@ -43,7 +41,6 @@ describe('about:brave tests', function () {
         .waitUntil(function () {
           return this.getText('table.sortableTable td[data-sort="Update Channel"]')
             .then((textValue) => {
-              console.log(textValue)
               return textValue && String(textValue).length > 0 && String(textValue) !== 'null'
             })
         })

@@ -611,15 +611,6 @@ function getMisspelledSuggestions (selection, isMisspelled, suggestions) {
   return items
 }
 
-function newTabMenuTemplateInit (location, e) {
-  const template = [
-    CommonMenu.newPrivateTabMenuItem(),
-    CommonMenu.newPartitionedTabMenuItem(),
-    CommonMenu.newWindowMenuItem()
-  ]
-  return template
-}
-
 function getEditableItems (selection, editFlags) {
   const hasSelection = selection.length > 0
   const hasClipboard = clipboard.readText().length > 0
@@ -1257,8 +1248,13 @@ function onTabContextMenu (frameProps, e) {
   tabMenu.destroy()
 }
 
-function onNewTabContextMenu (rect) {
-  const menuTemplate = newTabMenuTemplateInit(rect)
+function onNewTabContextMenu (target) {
+  const rect = target.getBoundingClientRect()
+  const menuTemplate = [
+    CommonMenu.newPrivateTabMenuItem(),
+    CommonMenu.newPartitionedTabMenuItem(),
+    CommonMenu.newWindowMenuItem()
+  ]
 
   windowActions.setContextMenuDetail(Immutable.fromJS({
     left: rect.left,

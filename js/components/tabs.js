@@ -25,6 +25,8 @@ class Tabs extends ImmutableComponent {
     this.onDrop = this.onDrop.bind(this)
     this.onPrevPage = this.onPrevPage.bind(this)
     this.onNextPage = this.onNextPage.bind(this)
+    this.onNewTabLongPress = this.onNewTabLongPress.bind(this)
+    this.wasNewTabClicked = this.wasNewTabClicked.bind(this)
   }
 
   onPrevPage () {
@@ -83,15 +85,15 @@ class Tabs extends ImmutableComponent {
       e.preventDefault()
     }
   }
-
+  wasNewTabClicked (target) {
+    return target.className === this.refs.newTabButton.props.className
+  }
   newTab () {
     windowActions.newFrame()
   }
-
-  onNewTabLongPress (rect) {
-    contextMenus.onNewTabContextMenu(rect)
+  onNewTabLongPress (target) {
+    contextMenus.onNewTabContextMenu(target)
   }
-
   render () {
     this.tabRefs = []
     const index = this.props.previewTabPageIndex !== undefined
@@ -132,6 +134,7 @@ class Tabs extends ImmutableComponent {
         })()}
 
         <LongPressButton
+          ref='newTabButton'
           label='+'
           l10nId='newTabButton'
           className='browserButton navbutton newFrameButton'
