@@ -161,7 +161,7 @@ module.exports.newFrameUrl = function () {
 
   switch (settingValue) {
     case newTabMode.HOMEPAGE:
-      return getSetting(settings.HOMEPAGE) || 'about:newtab'
+      return getSetting(settings.HOMEPAGE) || 'about:blank'
 
     case newTabMode.DEFAULT_SEARCH_ENGINE:
       const searchProviders = require('../data/searchProviders').providers
