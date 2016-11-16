@@ -5,6 +5,7 @@ body {
 * {
   color: #3B3B3B;
   font-family: Arial;
+  font-size: 16px;
   margin: 0;
   padding: 0;
 }
@@ -24,9 +25,26 @@ body {
   clear: left;
 }
 
-.sectionTitleWrapper .sectionTitle {
-  color: #3B3B3B;
-  font-size: 28px;
+/** flexbox for vertical ordering of page components **/
+.contributionStatementPage {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  page-break-after: always;
+}
+div.contributionStatementHeader {
+  -webkit-box-ordinal-group: 1;
+}
+div.contributionStatementSummaryBox {
+  -webkit-box-ordinal-group: 2;
+}
+div.contributionStatementDetailTableContainer {
+  -webkit-box-ordinal-group: 3;
+}
+div.footerNoteBox {
+  -webkit-box-ordinal-group: 4;
+}
+div.pageFooterBox {
+  -webkit-box-ordinal-group: 5;
 }
 
 .sectionTitleWrapper #braveLogo + span.sectionTitle {
@@ -37,12 +55,22 @@ body {
   position: relative;
 }
 
+.sectionTitleWrapper .sectionTitle {
+  color: #3B3B3B;
+  font-size: 28px;
+}
+
 .sectionTitleWrapper .sectionSubTitle {
   color: #ff5000;
   font-size: 15px;
   top: -35px;
   right: 5px;
   position: relative;
+}
+
+.statementDatesCoveredText {
+  margin-top: 15x;
+  margin-bottom: 15px;
 }
 
 .sectionTitleWrapper.pull-right {
@@ -54,8 +82,8 @@ body {
 }
 
 .contributionStatementDetailTableContainer {
-  margin-top: 25px;
-  margin-bottom: 25px;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 .contributionStatementDetailTable {
@@ -66,10 +94,14 @@ body {
 }
 
 .contributionStatementDetailTable tbody tr.spacingRow:before {
-  line-height: 0.5em;
+  line-height: 16px;
   content: "_";
   display: block;
   color: white;
+}
+
+.contributionStatementDetailTable tr {
+  height: 22px;
 }
 
 .contributionStatementDetailTable tr.headingRow.detailTableRow, .contributionStatementDetailTable tbody tr.detailTableRow {
@@ -179,7 +211,6 @@ div.pageIndicator {
 div.footerNoteBox {
   background-color: #f7f7f7;
   padding: 20px;
-  float: bottom;
 }
 
 span.noteHeading {
@@ -190,7 +221,6 @@ span.noteHeading {
 div.pageFooterBox {
   padding: 20px;
   float: bottom;
-  page-break-after: always;
 }
 
 span.pageFooterBody {

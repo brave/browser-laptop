@@ -96,7 +96,6 @@ class ContributionStatement extends ImmutableComponent {
 
     if (transaction) {
       this.setState({transaction: transaction})
-      this.forceUpdate()
 
       if (!this.state.savedPDF) {
         this.setState({savedPDF: true})
@@ -105,6 +104,9 @@ class ContributionStatement extends ImmutableComponent {
           window.close()
         }.bind(this), 250)
       }
+
+      this.forceUpdate()
+
       return true
     } else {
       return false
@@ -140,7 +142,11 @@ class ContributionStatement extends ImmutableComponent {
   }
 
   get timestamp () {
-    return this.transaction.get('submissionStamp')
+    if (!this.transaction) {
+      return null
+    } else {
+      return this.transaction.get('submissionStamp')
+    }
   }
 
   get formattedDate () {
@@ -195,11 +201,27 @@ class ContributionStatement extends ImmutableComponent {
   }
 
   get lastContributionHumanFormattedDate () {
-    return ''
+    if (!this.transactionIds || !this.transactionIds.length || !this.transaction) {
+      return ''
+    }
+
+    let transactionIds = this.transactionIds
+    let currentTxIdx = transactionIds.indexOf(this.transaction.get('viewingId'))
+    let lastTxIdx = (currentTxIdx ? currentTxIdx - 1 : -1)
+    let date = ''
+    if (lastTxIdx > -1) {
+      let previousTransaction = this.transactions.toJS()[lastTxIdx] || {}
+      let previousTimestamp = previousTransaction.submissionStamp
+
+      if (previousTimestamp && previousTimestamp < this.timestamp) {
+        date = longFormattedDateFromTimestamp(previousTimestamp)
+      }
+    }
+    return date
   }
 
   get thisContributionHumanFormattedDate () {
-    return ''
+    return longFormattedDateFromTimestamp(this.timestamp)
   }
 
   get rows () {
@@ -242,8 +264,10 @@ class ContributionStatement extends ImmutableComponent {
   ContributionStatementDetailTable (page, pageIdx, totalPages) {
     return (
       <div className='contributionStatementDetailTableContainer'>
-        <div className='pull-right'>{ this.lastContributionHumanFormattedDate } - { this.contributionHumanFormattedDate }</div>
         <div>
+          <span className='statementDatesCoveredText pull-right'>
+            { this.lastContributionHumanFormattedDate } - { this.thisContributionHumanFormattedDate }
+          </span>
           <table className='contributionStatementDetailTable'>
             <tbody>
               <tr className='headingRow detailTableRow'>
@@ -312,16 +336,15 @@ class ContributionStatement extends ImmutableComponent {
 
   ContributionStatementPage (page, pageIdx, pages) {
     let totalPages = pages.length
-    return [
+    let pageContent = [
       <div className='contributionStatementSection'>
         {this.ContributionStatementHeader}
       </div>,
-      pageIdx ? null
-        : (
-          <div className='contributionStatementSection'>
-            {this.ContributionStatementSummaryBox}
-          </div>
-        ),
+      pageIdx ? null : (
+        <div className='contributionStatementSection'>
+          {this.ContributionStatementSummaryBox}
+        </div>
+      ),
       <div className='contributionStatementSection'>
         {this.ContributionStatementDetailTable(page, pageIdx, totalPages)}
       </div>,
@@ -332,6 +355,12 @@ class ContributionStatement extends ImmutableComponent {
         {this.ContributionStatementPageFooter}
       </div>
     ]
+
+    return (
+      <div className='contributionStatementPage'>
+        {pageContent}
+      </div>
+    )
   }
 
   render () {
@@ -373,11 +402,20 @@ class ContributionStatement extends ImmutableComponent {
 }
 
 function formattedDateFromTimestamp (timestamp) {
+  // e.g. 2016-11-15
   return moment(new Date(timestamp)).format('YYYY-MM-DD')
 }
 
 function formattedTimeFromTimestamp (timestamp) {
-  return moment(new Date(timestamp)).format('hh:mm a')
+  // e.g. 4:00pm
+  return moment(new Date(timestamp)).format('h:mma')
+}
+
+function longFormattedDateFromTimestamp (timestamp) {
+  let momentDate = moment(new Date(timestamp))
+
+  // e.g. June 15th at 4:00pm
+  return `${momentDate.format('MMMM Do')} at ${momentDate.format('h:mma')}`
 }
 
 module.exports = <ContributionStatement />
