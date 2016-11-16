@@ -28,7 +28,7 @@ window.state = state /* for easier debugging */
 state.parsedTorrent = parseTorrent(state.torrentID)
 
 // Create the client, set up IPC to the WebTorrentRemoteServer
-state.client = new WebTorrentRemoteClient(send, {heartbeat: 5e3})
+state.client = new WebTorrentRemoteClient(send)
 state.client.on('warning', onWarning)
 state.client.on('error', onError)
 
