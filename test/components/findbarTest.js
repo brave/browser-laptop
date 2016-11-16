@@ -12,6 +12,7 @@ describe('findbar', function () {
     yield setup(this.app.client)
     const url = Brave.server.url('find_in_page.html')
     yield this.app.client
+      .changeSetting('general.disable-title-mode', false)
       .tabByIndex(0)
       .url(url)
       .waitForUrl(url)

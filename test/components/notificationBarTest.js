@@ -8,6 +8,7 @@ describe('notificationBar', function () {
     yield client
       .waitForBrowserWindow()
       .waitForVisible(urlInput)
+      .changeSetting('general.disable-title-mode', false)
   }
 
   Brave.beforeAll(this)
@@ -166,6 +167,7 @@ describe('permissions state', function () {
     yield client
       .waitForBrowserWindow()
       .waitForVisible(urlInput)
+      .changeSetting('general.disable-title-mode', false)
   }
 
   Brave.beforeAll(this)

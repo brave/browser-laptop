@@ -17,6 +17,7 @@ describe('navigationBar tests', function () {
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
       .waitForEnabled(urlInput)
+      .changeSetting('general.disable-title-mode', false)
   }
 
   function * newFrame (client, frameKey = 2) {
