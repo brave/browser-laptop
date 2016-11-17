@@ -358,9 +358,9 @@ function registerPermissionHandler (session, partition) {
       return
     }
 
-    // TOOD(bridiver) - this seems overly permissive and we should narrow this down
-    // to the specific extension that required it which is most likely PDFJS
-    if (origin.startsWith('chrome-extension://') && permission === 'openExternal') {
+    // PDFJS is always allowed to open files in an external app
+    if (origin.startsWith('chrome-extension://' + config.PDFJSExtensionId) &&
+      permission === 'openExternal') {
       cb(true)
       return
     }
