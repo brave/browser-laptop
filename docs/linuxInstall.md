@@ -2,6 +2,9 @@
 
 Signed packages are on their way, but in the meantime you can use the following.
 
+**NOTE**: _If you experience a problem with dependencies while installing, you may
+want to try installing `git` using the package manager for your distro._
+
 ## Debian AMD64:
 
 ```
