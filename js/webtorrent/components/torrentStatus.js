@@ -6,12 +6,12 @@ class TorrentStats extends React.Component {
     const torrent = this.props.torrent
     const errorMessage = this.props.errorMessage
 
-    if (!torrent) {
-      return null
-    }
-
     if (errorMessage) {
       return <div className='error'>{errorMessage}</div>
+    }
+
+    if (!torrent) {
+      return null
     }
 
     return <div>
