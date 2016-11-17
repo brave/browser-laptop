@@ -365,29 +365,35 @@ span.settingsListCopy {
   }
 }
 
-span.browserButton.primaryButton {
-  &.addFunds {
+span.browserButton {
+  &.advancedSettings {
     font-size: 0.9em;
-    margin-right: 50px;
   }
 
-  &.clearBrowsingDataButton,
-  &.importNowButton,
-  &.setAsDefaultButton,
-  &.manageAdblockSettings,
-  &.viewExtensionsInfo,
-  &.manageAutofillDataButton {
-    font-size: 0.9em;
-    margin-top: 20px;
-    padding: 5px 20px;
-  }
+  &.primaryButton {
+    &.addFunds {
+      font-size: 0.9em;
+      margin-right: 50px;
+    }
 
-  &.importNowButton {
-    margin-top: 5px;
-  }
+    &.clearBrowsingDataButton,
+    &.importNowButton,
+    &.setAsDefaultButton,
+    &.manageAdblockSettings,
+    &.viewExtensionsInfo,
+    &.manageAutofillDataButton {
+      font-size: 0.9em;
+      margin-top: 20px;
+      padding: 5px 20px;
+    }
 
-  &.setAsDefaultButton {
-    margin-top: 5px;
+    &.importNowButton {
+      margin-top: 5px;
+    }
+
+    &.setAsDefaultButton {
+      margin-top: 5px;
+    }
   }
 }
 
@@ -992,8 +998,11 @@ div.nextPaymentSubmission {
 }
 
 .advancedSettingsFooter {
-  padding: 20px 100px;
-  text-align: right;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .recoveryOverlay {

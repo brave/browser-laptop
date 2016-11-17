@@ -11,6 +11,7 @@
   line-height: 22px;
   margin: 5px 5px 0px 0px;
   padding: 0px 20px;
+  white-space: nowrap;
 }
 
 span.buttonSeparator {
@@ -35,8 +36,6 @@ span.menuButton {
   }
 }
 
-a.browserButton,
-span.browserButton,
 .browserButton {
   cursor: default;
   display: inline-block;
@@ -91,7 +90,8 @@ span.browserButton,
   &.wideButton,
   &.secondaryButton,
   &.secondaryAltButton,
-  &.subtleButton {
+  &.subtleButton,
+  &.whiteButton {
     .buttonCommon;
     width: auto;
     height: auto;
@@ -121,6 +121,8 @@ span.browserButton,
     display: block;
     margin-right: 0px;
     margin-left: 0px;
+    width: auto;
+    padding: 3px 35px;
   }
 
   &.whiteButton {
@@ -131,10 +133,7 @@ span.browserButton,
     display: block;
     font-weight: normal;
     font-style: normal;
-    font-size: 14px;
     color: @darkGray;
-    width: auto;
-    padding: 3px 35px;
   }
 
   &.inlineButton {
