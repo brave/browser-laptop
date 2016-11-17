@@ -287,6 +287,7 @@ function windowDefaults () {
       sharedWorker: true,
       nodeIntegration: false,
       partition: 'default',
+      webSecurity: false,
       allowFileAccessFromFileUrls: true,
       allowUniversalAccessFromFileUrls: true
     }
