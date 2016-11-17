@@ -414,12 +414,28 @@ describe('navigationBar tests', function () {
           .moveToObject(navigator)
           .waitForExist(urlbarIcon)
           .getAttribute(urlbarIcon, 'class').then((classes) =>
-            classes.includes('fa-exclamation-triangle')
+            classes.includes('fa-unlock')
         ))
         .windowByUrl(Brave.browserWindowUrl)
         .click(urlbarIcon)
         .waitForVisible('[data-l10n-id="insecureConnection"]')
         .keys(Brave.keys.ESCAPE)
+    })
+    it('Shows insecure URL icon in title mode', function * () {
+      const page1Url = Brave.server.url('page1.html')
+      yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
+      yield this.app.client
+        .moveToObject(navigator)
+        .waitForExist(urlInput)
+        .waitForValue(urlInput)
+      yield this.app.client
+        .moveToObject(activeWebview)
+        .click(activeWebview)
+        .waitForExist(titleBar)
+        .isExisting(urlbarIcon).then((isExisting) => assert(isExisting))
+        .getAttribute(urlbarIcon, 'class').then((classes) =>
+          classes.includes('fa-unlock')
+        )
     })
     it('Shows secure URL icon', function * () {
       const page1Url = 'https://badssl.com/'
@@ -435,6 +451,22 @@ describe('navigationBar tests', function () {
         .click(urlbarIcon)
         .waitForVisible('[data-l10n-id="secureConnection"]')
         .keys(Brave.keys.ESCAPE)
+    })
+    it('Shows secure URL icon in title mode', function * () {
+      const page1Url = Brave.server.url('page1.html')
+      yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
+      yield this.app.client
+        .moveToObject(navigator)
+        .waitForExist(urlInput)
+        .waitForValue(urlInput)
+      yield this.app.client
+        .moveToObject(activeWebview)
+        .click(activeWebview)
+        .waitForExist(titleBar)
+        .isExisting(urlbarIcon).then((isExisting) => assert(isExisting))
+        .getAttribute(urlbarIcon, 'class').then((classes) =>
+          classes.includes('fa-lock')
+        )
     })
     it('does not show secure icon if page load fails', function * () {
       const page1Url = Brave.server.url('ssl_spoof.html')
@@ -455,6 +487,18 @@ describe('navigationBar tests', function () {
         .waitUntil(() =>
           this.app.client.getAttribute(urlbarIcon, 'class').then((classes) =>
             classes.includes('fa-lock')
+          )
+        )
+    })
+    it('shows insecure icon on a site with a sha-1 cert', function * () {
+      const page1Url = 'https://very.badssl.com/'
+      yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
+      yield this.app.client
+        .moveToObject(navigator)
+        .waitForExist(urlbarIcon)
+        .waitUntil(() =>
+          this.app.client.getAttribute(urlbarIcon, 'class').then((classes) =>
+            classes.includes('fa-unlock')
           )
         )
     })
