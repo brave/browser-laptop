@@ -11,8 +11,9 @@ const windowActions = require('../actions/windowActions')
 const windowStore = require('../stores/windowStore')
 const dragTypes = require('../constants/dragTypes')
 const cx = require('../lib/classSet')
+const contextMenus = require('../contextMenus')
 
-const Button = require('./button')
+const LongPressButton = require('./longPressButton')
 const Tab = require('./tab')
 const dnd = require('../dnd')
 const dndData = require('../dndData')
@@ -24,6 +25,8 @@ class Tabs extends ImmutableComponent {
     this.onDrop = this.onDrop.bind(this)
     this.onPrevPage = this.onPrevPage.bind(this)
     this.onNextPage = this.onNextPage.bind(this)
+    this.onNewTabLongPress = this.onNewTabLongPress.bind(this)
+    this.wasNewTabClicked = this.wasNewTabClicked.bind(this)
   }
 
   onPrevPage () {
@@ -82,11 +85,15 @@ class Tabs extends ImmutableComponent {
       e.preventDefault()
     }
   }
-
+  wasNewTabClicked (target) {
+    return target.className === this.refs.newTabButton.props.className
+  }
   newTab () {
     windowActions.newFrame()
   }
-
+  onNewTabLongPress (target) {
+    contextMenus.onNewTabContextMenu(target)
+  }
   render () {
     this.tabRefs = []
     const index = this.props.previewTabPageIndex !== undefined
@@ -125,10 +132,16 @@ class Tabs extends ImmutableComponent {
               onClick={this.onNextPage} />
           }
         })()}
-        <Button label='+'
+
+        <LongPressButton
+          ref='newTabButton'
+          label='+'
           l10nId='newTabButton'
-          className='navbutton newFrameButton'
-          onClick={this.newTab} />
+          className='browserButton navbutton newFrameButton'
+          disabled={false}
+          onClick={this.newTab}
+          onLongPress={this.onNewTabLongPress}
+        />
       </span>
     </div>
   }

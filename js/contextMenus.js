@@ -1248,6 +1248,21 @@ function onTabContextMenu (frameProps, e) {
   tabMenu.destroy()
 }
 
+function onNewTabContextMenu (target) {
+  const rect = target.getBoundingClientRect()
+  const menuTemplate = [
+    CommonMenu.newPrivateTabMenuItem(),
+    CommonMenu.newPartitionedTabMenuItem(),
+    CommonMenu.newWindowMenuItem()
+  ]
+
+  windowActions.setContextMenuDetail(Immutable.fromJS({
+    left: rect.left,
+    top: rect.bottom + 2,
+    template: menuTemplate
+  }))
+}
+
 function onTabsToolbarContextMenu (activeFrame, closestDestinationDetail, isParent, e) {
   e.stopPropagation()
   const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(activeFrame, closestDestinationDetail, isParent))
@@ -1458,6 +1473,7 @@ module.exports = {
   onHamburgerMenu,
   onMainContextMenu,
   onTabContextMenu,
+  onNewTabContextMenu,
   onTabsToolbarContextMenu,
   onDownloadsToolbarContextMenu,
   onTabPageContextMenu,
