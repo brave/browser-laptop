@@ -1234,6 +1234,8 @@ var getStateInfo = (state) => {
     transaction = state.transactions[i]
     if (transaction.stamp < then) break
 
+    if ((!transaction.ballots) || (transaction.ballots.length < transaction.count)) continue
+
     ballots = underscore.clone(transaction.ballots || {})
     state.ballots.forEach((ballot) => {
       if (ballot.viewingId !== transaction.viewingId) return
@@ -1462,10 +1464,9 @@ var pathName = (name) => {
  */
 
 const showNotifications = () => {
-  if (getSetting(settings.PAYMENTS_ENABLED) &&
-      getSetting(settings.PAYMENTS_NOTIFICATIONS)) {
-    showEnabledNotifications()
-  } else if (!getSetting(settings.PAYMENTS_ENABLED)) {
+  if (getSetting(settings.PAYMENTS_ENABLED)) {
+    if (getSetting(settings.PAYMENTS_NOTIFICATIONS)) showEnabledNotifications()
+  } else {
     showDisabledNotifications()
   }
 }
