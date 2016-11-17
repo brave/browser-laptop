@@ -38,9 +38,9 @@ class AboutStyle extends ImmutableComponent {
         </select>
         <pre><code>
           &lt;select className='form-control'>{'\n'}
-            &lt;option>Select Box&lt;/option>{'\n'}
-            &lt;option>Second Choice&lt;/option>{'\n'}
-            &lt;option>Third Choice&lt;/option>{'\n'}
+          &lt;option>Select Box&lt;/option>{'\n'}
+          &lt;option>Second Choice&lt;/option>{'\n'}
+          &lt;option>Third Choice&lt;/option>{'\n'}
           &lt;/select>
         </code></pre>
       </div>
@@ -48,12 +48,12 @@ class AboutStyle extends ImmutableComponent {
       <span data-l10n-id='whiteButton' className='browserButton whiteButton inlineButton' onClick={this.onRemoveBookmark} />
       <pre><code>
         &lt;span data-l10n-id='cancel' className='browserButton whiteButton inlineButton'{'\n'}
-          onClick={'{this.onRemoveBookmark}'} />
+        onClick={'{this.onRemoveBookmark}'} />
       </code></pre>
       <span data-l10n-id='primaryButton' className='browserButton primaryButton' onClick={this.onRemoveBookmark} />
       <pre><code>
         &lt;span data-l10n-id='done' className='browserButton primaryButton'{'\n'}
-          onClick={'{this.onRemoveBookmark}'} />
+        onClick={'{this.onRemoveBookmark}'} />
       </code></pre>
     </div>
   }
