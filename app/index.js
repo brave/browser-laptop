@@ -47,7 +47,7 @@ const dialog = electron.dialog
 const ipcMain = electron.ipcMain
 const Immutable = require('immutable')
 const Menu = require('./browser/menu')
-// const Updater = require('./updater')
+const Updater = require('./updater')
 const Importer = require('./importer')
 const messages = require('../js/constants/messages')
 const appConfig = require('../js/constants/appConfig')
@@ -210,7 +210,7 @@ const saveAppState = (appState, cb) => {
       // Otherwise just quit.
       if (appState.updates && (appState.updates.status === UpdateStatus.UPDATE_APPLYING_NO_RESTART ||
           appState.updates.status === UpdateStatus.UPDATE_APPLYING_RESTART)) {
-        // Updater.quitAndInstall()
+        Updater.quitAndInstall()
       } else {
         app.quit()
       }
@@ -748,11 +748,11 @@ app.on('ready', () => {
 
       // Setup the auto updater, check the env variable first because it's
       // used to check the update channel before releases.
-      // Updater.init(process.platform, process.arch, process.env.BRAVE_UPDATE_VERSION || pack.version)
+      Updater.init(process.platform, process.arch, process.env.BRAVE_UPDATE_VERSION || pack.version)
 
       // This is fired by a menu entry (for now - will be scheduled)
-      // process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
-      // ipcMain.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
+      process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
+      ipcMain.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
 
       // This is fired from a auto-update metadata call
       process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => {
