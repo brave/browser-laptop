@@ -1251,6 +1251,7 @@ function onTabContextMenu (frameProps, e) {
 function onNewTabContextMenu (target) {
   const rect = target.getBoundingClientRect()
   const menuTemplate = [
+    CommonMenu.newTabMenuItem(),
     CommonMenu.newPrivateTabMenuItem(),
     CommonMenu.newPartitionedTabMenuItem(),
     CommonMenu.newWindowMenuItem()
