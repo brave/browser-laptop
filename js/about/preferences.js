@@ -907,12 +907,15 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get walletStatus () {
+    const ledgerData = this.props.ledgerData
     let status = {}
-    if (this.props.ledgerData.get('created')) {
-      const transactions = this.props.ledgerData.get('transactions')
-      const pendingFunds = Number(this.props.ledgerData.get('unconfirmed') || 0)
-      if (pendingFunds + Number(this.props.ledgerData.get('balance') || 0) <
-          0.9 * Number(this.props.ledgerData.get('btc') || 0)) {
+    if (ledgerData.get('error')) {
+      status.id = 'statusOnError'
+    } else if (ledgerData.get('created')) {
+      const transactions = ledgerData.get('transactions')
+      const pendingFunds = Number(ledgerData.get('unconfirmed') || 0)
+      if (pendingFunds + Number(ledgerData.get('balance') || 0) <
+          0.9 * Number(ledgerData.get('btc') || 0)) {
         status.id = 'insufficientFundsStatus'
       } else if (pendingFunds > 0) {
         status.id = 'pendingFundsStatus'
@@ -922,7 +925,7 @@ class PaymentsTab extends ImmutableComponent {
       } else {
         status.id = 'createdWalletStatus'
       }
-    } else if (this.props.ledgerData.get('creating')) {
+    } else if (ledgerData.get('creating')) {
       status.id = 'creatingWalletStatus'
     } else {
       status.id = 'createWalletStatus'
@@ -1119,7 +1122,7 @@ class PaymentsTab extends ImmutableComponent {
 
   get nextReconcileDate () {
     const ledgerData = this.props.ledgerData
-    if (!ledgerData.get('reconcileStamp')) {
+    if ((ledgerData.get('error')) || (!ledgerData.get('reconcileStamp'))) {
       return null
     }
     const timestamp = ledgerData.get('reconcileStamp')

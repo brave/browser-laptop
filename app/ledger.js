@@ -1205,6 +1205,7 @@ var getStateInfo = (state) => {
   var then = underscore.now() - msecs.year
 
   ledgerInfo.paymentId = state.properties.wallet.paymentId
+  ledgerInfo.address = state.properties.wallet.address
   ledgerInfo.passphrase = state.properties.wallet.keychains.passphrase
 
   ledgerInfo.minDuration = synopsis.options.minDuration
@@ -1411,7 +1412,7 @@ var networkConnected = underscore.debounce(() => {
   if (client.sync(callback) === true) run(random.randomInt({ min: msecs.minute, max: 10 * msecs.minute }))
 
   if (balanceTimeoutId) clearTimeout(balanceTimeoutId)
-  balanceTimeoutId = setTimeout(getBalance, 5 * msecs.second)
+  balanceTimeoutId = setTimeout(getBalance, 1 * msecs.second)
 }, 1 * msecs.minute, true)
 
 /*
