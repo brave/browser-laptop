@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.12.10](https://github.com/brave/browser-laptop/releases/v0.12.10dev)
+- (TODO)
+
 ## [0.12.9](https://github.com/brave/browser-laptop/releases/v0.12.9dev)
 - Added New Tab page. ([#3001](https://github.com/brave/browser-laptop/issues/3001))([#2106](https://github.com/brave/browser-laptop/issues/2106))([#5334](https://github.com/brave/browser-laptop/issues/5334))([#5310](https://github.com/brave/browser-laptop/issues/5310))([#5396](https://github.com/brave/browser-laptop/issues/5396))([#5336](https://github.com/brave/browser-laptop/issues/5336))([#5482](https://github.com/brave/browser-laptop/issues/5482))([#5332](https://github.com/brave/browser-laptop/issues/5332))([#5337](https://github.com/brave/browser-laptop/issues/5337))([#5380](https://github.com/brave/browser-laptop/issues/5380))([#5324](https://github.com/brave/browser-laptop/issues/5324))([#5321](https://github.com/brave/browser-laptop/issues/5321))([#5322](https://github.com/brave/browser-laptop/issues/5322))
 - Added Password Manager/Extension icon in right click menu. ([#5292](https://github.com/brave/browser-laptop/issues/5292))
