@@ -1578,6 +1578,13 @@ class SecurityTab extends ImmutableComponent {
                 }, true)}>{'Adobe'}</span>.</span>
               : <span data-l10n-id='enableFlashSubtextLinux' />
           }
+          <div>
+            <span className='fa fa-info-circle' id='flashInfoIcon' />
+            <span><span data-l10n-id='flashTroubleshooting' />&nbsp;
+              <span className='linkText' onClick={aboutActions.newFrame.bind(null, {
+                location: 'https://github.com/brave/browser-laptop/wiki/Flash-Support-Deprecation-Proposal#troubleshooting-flash-issues'
+              }, true)}>{'wiki'}</span>.</span>
+          </div>
         </span>
       </SettingsList>
       { !isLinux
