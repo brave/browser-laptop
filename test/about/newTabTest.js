@@ -129,7 +129,7 @@ describe('about:newtab tests', function () {
         .waitForVisible('.topSitesElementFavicon')
         .moveToObject('.topSitesElement')
         .waitForVisible('.topSitesActionContainer')
-        .click('.topSitesActionBtn')
+        .click('.topSitesActionBtn:first-child')
         .moveToObject('.timeSaved')
         .waitForVisible('.pinnedTopSite')
     })
