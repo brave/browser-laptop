@@ -111,6 +111,18 @@ describe('about:newtab tests', function () {
       yield setup(this.app.client)
     })
 
+    it('shows a preloaded list of sites if session has no entries yet', function * () {
+      yield reloadNewTab(this.app.client)
+
+      yield this.app.client
+        .waitForVisible('.topSitesElementFavicon[href^="https://twitter.com/brave"]')
+        .waitForVisible('.topSitesElementFavicon[href^="https://www.facebook.com/BraveSoftware"]')
+        .waitForVisible('.topSitesElementFavicon[href^="https://www.youtube.com"]')
+        .waitForVisible('.topSitesElementFavicon[href^="https://brave.com"]')
+        .waitForVisible('.topSitesElementFavicon[href^="https://itunes.apple.com"]')
+        .waitForVisible('.topSitesElementFavicon[href^="https://play.google.com/store"]')
+    })
+
     it('shows sites that have been visited', function * () {
       yield loadPageWithTracker(this.app.client)
 

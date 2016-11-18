@@ -22,6 +22,7 @@ const settings = require('../js/constants/settings')
 const downloadStates = require('../js/constants/downloadStates')
 const {tabFromFrame} = require('../js/state/frameStateUtil')
 const siteUtil = require('../js/state/siteUtil')
+const { topSites, pinnedTopSites } = require('../js/data/newTabData')
 const sessionStorageVersion = 1
 const filtering = require('./filtering')
 const autofill = require('./autofill')
@@ -483,7 +484,7 @@ module.exports.loadAppState = () => {
 module.exports.defaultAppState = () => {
   return {
     firstRunTimestamp: new Date().getTime(),
-    sites: [],
+    sites: topSites,
     tabs: [],
     extensions: {},
     visits: [],
@@ -510,9 +511,9 @@ module.exports.defaultAppState = () => {
     about: {
       newtab: {
         gridLayoutSize: 'small',
-        sites: [],
+        sites: topSites,
         ignoredTopSites: [],
-        pinnedTopSites: []
+        pinnedTopSites: pinnedTopSites
       }
     },
     defaultWindowParams: {}
