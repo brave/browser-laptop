@@ -339,7 +339,8 @@ const UrlUtil = {
     if (!url || url === 'about:newtab') {
       return ''
     }
-    const parsed = urlParse(pdfjsEnabled ? this.getLocationIfPDF(url) : url)
+    url = pdfjsEnabled ? this.getLocationIfPDF(url) : url
+    const parsed = urlParse(url)
     if (parsed && parsed.auth) {
       parsed.auth = null
       return urlFormat(parsed)
