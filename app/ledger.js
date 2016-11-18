@@ -77,6 +77,8 @@ const clientOptions = { debugP: process.env.LEDGER_DEBUG,
                         server: process.env.LEDGER_SERVER_URL
                       }
 
+var doneTimer
+
 /*
  * publisher globals
  */
@@ -199,11 +201,15 @@ var init = () => {
 
     appDispatcher.register(doAction)
     initialize(getSetting(settings.PAYMENTS_ENABLED))
+
+    doneTimer = setInterval(doneWriter, 1 * msecs.hour)
   } catch (ex) { console.log('ledger.js initialization failed: ' + ex.toString() + '\n' + ex.stack) }
 }
 
 var quit = () => {
   visit('NOOP', underscore.now(), null)
+  clearInterval(doneTimer)
+  doneWriter()
 }
 
 var boot = () => {
@@ -388,7 +394,8 @@ eventStore.addChangeListener(() => {
 
   if ((!synopsis) || (!util.isArray(info))) return
 
-  info.forEach((page) => {
+// NB: in theory we have already seen every element in info except for (perhaps) the last one...
+  underscore.rest(info, info.length - 1).forEach((page) => {
     var entry, faviconURL, publisher, siteSetting
     var location = page.url
 
@@ -466,7 +473,7 @@ eventStore.addChangeListener(() => {
       faviconURL = page.faviconURL || entry.protocol + '//' + url.parse(location).host + '/favicon.ico'
       entry.faviconURL = null
 
-      if (publisherInfo._internal.debugP) console.log('request: ' + faviconURL)
+      if (publisherInfo._internal.debugP) console.log('\nrequest: ' + faviconURL)
       fetch(faviconURL)
     }
   })
@@ -535,7 +542,7 @@ var initialize = (paymentsEnabled) => {
               }
               getStateInfo(stateResult)
 
-              syncWriter(pathName(statePath), stateResult, () => {})
+              syncWriter(pathName(statePath), stateResult, { flushP: true }, () => {})
             })
           }
         } catch (ex) {
@@ -561,10 +568,8 @@ var enable = (paymentsEnabled) => {
     appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED, true)
   }
 
-  if (!paymentsEnabled) {
-    synopsis = null
-    return updatePublisherInfo()
-  }
+  publisherInfo._internal.enabled = paymentsEnabled
+  if (synopsis) return updatePublisherInfo()
 
   synopsis = new (ledgerPublisher.Synopsis)()
   fs.readFile(pathName(synopsisPath), (err, data) => {
@@ -658,6 +663,8 @@ var publisherInfo = {
   synopsis: undefined,
 
   _internal: {
+    enabled: false,
+
     ruleset: { raw: [], cooked: [] }
   }
 }
@@ -665,8 +672,6 @@ var publisherInfo = {
 var updatePublisherInfo = () => {
   var data = {}
   var then = underscore.now() - msecs.week
-
-  if (!synopsis) return
 
   underscore.keys(publishers).sort().forEach((publisher) => {
     var entries = []
@@ -683,8 +688,9 @@ var updatePublisherInfo = () => {
   syncWriter(pathName(scoresPath), synopsis.allN(), () => {})
 
   syncWriter(pathName(synopsisPath), synopsis, () => {})
-  publisherInfo.synopsis = synopsisNormalizer()
+  if (!publisherInfo._internal.enabled) return
 
+  publisherInfo.synopsis = synopsisNormalizer()
   publisherInfo.synopsisOptions = synopsis.options
 
   if (publisherInfo._internal.debugP) {
@@ -1064,7 +1070,7 @@ var callback = (err, result, delayTime) => {
   }
   cacheRuleSet(result.ruleset)
 
-  syncWriter(pathName(statePath), result, () => {})
+  syncWriter(pathName(statePath), result, { flushP: true }, () => {})
   run(delayTime)
 }
 
@@ -1160,7 +1166,7 @@ var run = (delayTime) => {
       result = client.vote(winner)
       if (result) state = result
     })
-    if (state) syncWriter(pathName(statePath), state, () => {})
+    if (state) syncWriter(pathName(statePath), state, { flushP: true }, () => {})
   } catch (ex) {
     console.log('ledger client error(2): ' + ex.toString() + (ex.stack ? ('\n' + ex.stack) : ''))
   }
@@ -1205,7 +1211,6 @@ var getStateInfo = (state) => {
   var then = underscore.now() - msecs.year
 
   ledgerInfo.paymentId = state.properties.wallet.paymentId
-  ledgerInfo.address = state.properties.wallet.address
   ledgerInfo.passphrase = state.properties.wallet.keychains.passphrase
 
   ledgerInfo.minDuration = synopsis.options.minDuration
@@ -1373,7 +1378,7 @@ var setPaymentInfo = (amount) => {
   client.setBraveryProperties(bravery, (err, result) => {
     if (err) return console.log('ledger setBraveryProperties: ' + err.toString())
 
-    if (result) syncWriter(pathName(statePath), result, () => {})
+    if (result) syncWriter(pathName(statePath), result, { flushP: true }, () => {})
   })
   if (ledgerInfo.created) getPaymentInfo()
 }
@@ -1414,7 +1419,7 @@ var networkConnected = underscore.debounce(() => {
   if (client.sync(callback) === true) run(random.randomInt({ min: msecs.minute, max: 10 * msecs.minute }))
 
   if (balanceTimeoutId) clearTimeout(balanceTimeoutId)
-  balanceTimeoutId = setTimeout(getBalance, 1 * msecs.second)
+  balanceTimeoutId = setTimeout(getBalance, 5 * msecs.second)
 }, 1 * msecs.minute, true)
 
 /*
@@ -1430,26 +1435,40 @@ var syncWriter = (path, obj, options, cb) => {
   }
   options = underscore.defaults(options || {}, { encoding: 'utf8', mode: parseInt('644', 8) })
 
+  if ((!options.flushP) && (!syncingP[path])) syncingP[path] = true
   if (syncingP[path]) {
     syncingP[path] = { obj: obj, options: options, cb: cb }
-    if (ledgerInfo._internal.debugP) console.log('deferring ' + path)
+    if (ledgerInfo._internal.debugP) console.log('\ndeferring ' + path)
     return
   }
   syncingP[path] = true
 
-  if (ledgerInfo._internal.debugP) console.log('writing ' + path)
+  if (ledgerInfo._internal.debugP) console.log('\nwriting ' + path)
   fs.writeFile(path, JSON.stringify(obj, null, 2), options, (err) => {
     var deferred = syncingP[path]
 
     delete syncingP[path]
     if (typeof deferred === 'object') {
-      if (ledgerInfo._internal.debugP) console.log('restarting ' + path)
+      if (ledgerInfo._internal.debugP) console.log('\nrestarting ' + path)
       syncWriter(path, deferred.obj, deferred.options, deferred.cb)
     }
 
     if (err) console.log('write error: ' + err.toString())
 
     cb(err)
+  })
+}
+
+var doneWriter = () => {
+  underscore.keys(syncingP).forEach((path) => {
+    var deferred = syncingP[path]
+
+    if (typeof deferred !== 'object') return
+
+    delete syncingP[path]
+    if (ledgerInfo._internal.debugP) console.log('\nflushing ' + path)
+    deferred.options.flushP = true
+    syncWriter(path, deferred.obj, deferred.options, deferred.cb)
   })
 }
 
