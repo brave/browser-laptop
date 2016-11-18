@@ -79,6 +79,7 @@ describe('application window', function () {
           .waitForUrl(Brave.newTabUrl)
           .windowByIndex(0)
           .resizeWindow(600, 700)
+          .pause(2000)
           .newWindowAction()
           .waitUntil(function () {
             return this.getWindowCount().then((count) => {
