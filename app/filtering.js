@@ -358,6 +358,13 @@ function registerPermissionHandler (session, partition) {
       return
     }
 
+    // The Torrent Viewer extension is always allowed to show fullscreen media
+    if (permission === 'fullscreen' &&
+      origin.startsWith('chrome-extension://' + config.torrentExtensionId)) {
+      cb(true)
+      return
+    }
+
     // The Brave extension and PDFJS are always allowed to open files in an external app
     if (permission === 'openExternal' && (
       origin.startsWith('chrome-extension://' + config.PDFJSExtensionId) ||

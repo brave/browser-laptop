@@ -162,6 +162,7 @@ let generateBraveManifest = () => {
 let generateTorrentManifest = () => {
   let cspDirectives = {
     'default-src': '\'self\'',
+    'media-src': '\'self\' http://localhost:*',
     'frame-src': 'http://localhost:*',
     'form-action': '\'none\'',
     'referrer': 'no-referrer',
