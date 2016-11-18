@@ -84,7 +84,7 @@ describe('notificationBar', function () {
       })
     yield this.app.client
       .tabByIndex(0)
-      .loadUrl(Brave.newTabUrl)
+      .loadUrl(Brave.server.url('page1.html'))
     yield this.app.client
       .loadUrl(this.notificationUrl)
       .windowByUrl(Brave.browserWindowUrl)
