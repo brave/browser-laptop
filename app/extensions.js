@@ -341,8 +341,13 @@ module.exports.init = () => {
   // Manually install the braveExtension and torrentExtension
   extensionInfo.setState(config.braveExtensionId, extensionStates.REGISTERED)
   loadExtension(config.braveExtensionId, getExtensionsPath('brave'), generateBraveManifest(), 'component')
-  extensionInfo.setState(config.torrentExtensionId, extensionStates.REGISTERED)
-  loadExtension(config.torrentExtensionId, getExtensionsPath('torrent'), generateTorrentManifest(), 'component')
+  if (getSetting(settings.TORRENT_VIEWER_ENABLED)) {
+    extensionInfo.setState(config.torrentExtensionId, extensionStates.REGISTERED)
+    loadExtension(config.torrentExtensionId, getExtensionsPath('torrent'), generateTorrentManifest(), 'component')
+  } else {
+    extensionInfo.setState(config.torrentExtensionId, extensionStates.DISABLED)
+    extensionActions.extensionDisabled(config.torrentExtensionId)
+  }
 
   let registerComponents = () => {
     if (getSetting(settings.PDFJS_ENABLED)) {

@@ -1650,6 +1650,7 @@ class AdvancedTab extends ImmutableComponent {
       <div className='sectionTitle' data-l10n-id='extensions' />
       <SettingsList>
         <SettingCheckbox dataL10nId='usePDFJS' prefKey={settings.PDFJS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='useTorrentViewer' prefKey={settings.TORRENT_VIEWER_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='enablePocket' prefKey={settings.POCKET_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingItem>
           <Button l10nId='viewInstalledExtensions' className='primaryButton viewExtensionsInfo'
@@ -1836,8 +1837,8 @@ class AboutPreferences extends React.Component {
     })
     aboutActions.changeSetting(key, value)
     if (key === settings.DO_NOT_TRACK || key === settings.HARDWARE_ACCELERATION_ENABLED ||
-        key === settings.PDFJS_ENABLED || key === settings.SMOOTH_SCROLL_ENABLED ||
-        key === settings.SEND_CRASH_REPORTS) {
+        key === settings.PDFJS_ENABLED || key === settings.TORRENT_VIEWER_ENABLED ||
+        key === settings.SMOOTH_SCROLL_ENABLED || key === settings.SEND_CRASH_REPORTS) {
       ipc.send(messages.PREFS_RESTART, key, value)
     }
     if (key === settings.PAYMENTS_ENABLED) {

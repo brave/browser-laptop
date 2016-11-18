@@ -41,6 +41,11 @@ const WEBRTC_DISABLE_NON_PROXY = 'disable_non_proxied_udp'
 // is on.
 // const WEBRTC_PUBLIC_ONLY = 'default_public_interface_only'
 
+function isTorrentViewerURL (url) {
+  const isEnabled = getSetting(settings.TORRENT_VIEWER_ENABLED)
+  return isEnabled && isSourceMagnetUrl(url)
+}
+
 class Frame extends ImmutableComponent {
   constructor () {
     super()
@@ -72,10 +77,6 @@ class Frame extends ImmutableComponent {
 
   isAboutPage () {
     return aboutUrls.get(getBaseUrl(this.props.location))
-  }
-
-  isMagnetPage () {
-    return isSourceMagnetUrl(this.props.location)
   }
 
   isIntermediateAboutPage () {
@@ -325,7 +326,7 @@ class Frame extends ImmutableComponent {
     if (!guestInstanceId || newSrc !== 'about:blank') {
       let webviewSrc
       if (isSourceAboutUrl(newSrc)) webviewSrc = getTargetAboutUrl(newSrc)
-      else if (isSourceMagnetUrl(newSrc)) webviewSrc = getTargetMagnetUrl(newSrc)
+      else if (isTorrentViewerURL(newSrc)) webviewSrc = getTargetMagnetUrl(newSrc)
       else webviewSrc = newSrc
       this.webview.setAttribute('src', webviewSrc)
     }
@@ -485,7 +486,7 @@ class Frame extends ImmutableComponent {
         // In this case both the user display and the user think they're on this.props.location.
         if (this.webview.getURL() !== this.props.location &&
           !this.isAboutPage() &&
-          !this.isMagnetPage()) {
+          !isTorrentViewerURL(this.props.location)) {
           this.webview.loadURL(this.props.location)
         } else if (this.isIntermediateAboutPage() &&
           this.webview.getURL() !== this.props.location &&
@@ -923,7 +924,7 @@ class Frame extends ImmutableComponent {
       // We have two kinds of special URLs: magnet links and about pages
       // When the user clicks on a magnet link, navigate to the corresponding local URL
       // (The address bar will still show the magnet URL. See appUrlUtil.getSourceMagnetUrl.)
-      if (isSourceMagnetUrl(e.url)) {
+      if (isTorrentViewerURL(e.url)) {
         var targetURL = getTargetMagnetUrl(e.url)
         // Return right away. loadStart will be called again with targetURL
         return windowActions.loadUrl(this.frame, targetURL)

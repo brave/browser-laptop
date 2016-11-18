@@ -139,6 +139,7 @@ module.exports = {
     'advanced.hardware-acceleration-enabled': true,
     'advanced.default-zoom-level': null,
     'advanced.pdfjs-enabled': true,
+    'advanced.torrent-viewer-enabled': true,
     'advanced.smooth-scroll-enabled': false,
     'advanced.send-crash-reports': true,
     'advanced.send-usage-statistics': false,
