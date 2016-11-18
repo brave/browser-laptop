@@ -358,9 +358,10 @@ function registerPermissionHandler (session, partition) {
       return
     }
 
-    // PDFJS is always allowed to open files in an external app
-    if (origin.startsWith('chrome-extension://' + config.PDFJSExtensionId) &&
-      permission === 'openExternal') {
+    // The Brave extension and PDFJS are always allowed to open files in an external app
+    if (permission === 'openExternal' && (
+      origin.startsWith('chrome-extension://' + config.PDFJSExtensionId) ||
+      origin.startsWith('chrome-extension://' + config.braveExtensionId))) {
       cb(true)
       return
     }
@@ -379,6 +380,12 @@ function registerPermissionHandler (session, partition) {
       // a parseable URL
       settings = siteSettings.getSiteSettingsForHostPattern(appState.get('siteSettings'), origin)
       tempSettings = siteSettings.getSiteSettingsForHostPattern(appState.get('temporarySiteSettings'), origin)
+    } else if (mainFrameUrl.startsWith('magnet:')) {
+      // Show "Allow magnet URL to open an external application?", instead of
+      // "Allow null to open an external application?"
+      // This covers an edge case where you open a magnet link tab, then disable Torrent Viewer
+      // and restart Brave. I don't think it needs localization. See 'Brave Browser' above.
+      origin = 'Magnet URL'
     } else {
       // Strip trailing slash
       origin = getOrigin(origin)
