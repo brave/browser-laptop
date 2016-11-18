@@ -34,7 +34,7 @@ module.exports.getBraveExtUrl = function (relativeUrl) {
  * Gets the URL of a page hosted by the torrentExtension
  * Returns 'chrome-extension://<...>'
  */
-const getTorrentExtUrl = function (relativeUrl) {
+module.exports.getTorrentExtUrl = function (relativeUrl) {
   if (relativeUrl === undefined) {
     relativeUrl = ''
   }
@@ -145,7 +145,7 @@ module.exports.isTargetAboutUrl = function (input) {
  */
 module.exports.getTargetMagnetUrl = function (input) {
   if (!input.startsWith('magnet:')) return null
-  const url = getTorrentExtUrl('webtorrent.html')
+  const url = module.exports.getTorrentExtUrl('webtorrent.html')
   return [url, input].join('#')
 }
 
@@ -155,7 +155,7 @@ module.exports.getTargetMagnetUrl = function (input) {
  * Example: getSourceMagnetUrl('chrome-extension://<...>.html#magnet:...') -> 'magnet:...'
  */
 module.exports.getSourceMagnetUrl = function (input) {
-  if (getBaseUrl(input) !== getTorrentExtUrl('webtorrent.html')) return null
+  if (getBaseUrl(input) !== module.exports.getTorrentExtUrl('webtorrent.html')) return null
   const url = getHash(input)
   return url
 }
