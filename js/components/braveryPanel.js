@@ -300,7 +300,7 @@ class BraveryPanel extends ImmutableComponent {
                     braverySelectTitle: true,
                     disabled: !shieldsUp
                   })} data-l10n-id='cookieControl' />
-                  <select value={this.props.braverySettings.cookieControl} onChange={this.onToggleCookieControl} disabled={!shieldsUp}>
+                  <select className='form-control' value={this.props.braverySettings.cookieControl} onChange={this.onToggleCookieControl} disabled={!shieldsUp}>
                     <option data-l10n-id='block3rdPartyCookie' value='block3rdPartyCookie' />
                     <option data-l10n-id='allowAllCookies' value='allowAllCookies' />
                   </select>
