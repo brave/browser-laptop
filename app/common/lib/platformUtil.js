@@ -9,12 +9,12 @@
  * return array of strings (each being a class name)
  */
 module.exports.getPlatformStyles = () => {
-  const platform = process.platform()
+  const platform = process.platform
   const styleList = ['platform--' + platform]
 
   switch (platform) {
     case 'win32':
-      if (process.platformVersion() === 'win7') {
+      if (process.platformVersion === 'win7') {
         styleList.push('win7')
       } else {
         styleList.push('win10')
@@ -25,11 +25,11 @@ module.exports.getPlatformStyles = () => {
 }
 
 module.exports.isDarwin = () => {
-  return process.platform() === 'darwin' ||
+  return process.platform === 'darwin' ||
     navigator.platform === 'MacIntel'
 }
 
 module.exports.isWindows = () => {
-  return process.platform() === 'win32' ||
+  return process.platform === 'win32' ||
     navigator.platform === 'Win32'
 }
