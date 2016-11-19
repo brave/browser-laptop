@@ -98,6 +98,8 @@ describe('findbar', function () {
       .waitForElementFocus(findBarInput)
       .keys('test search')
     yield this.app.client
+      .moveToObject(activeWebview)
+      .waitForExist(titleBar)
       .click(titleBar)
       .waitForExist(urlInput)
       .click(urlInput)
