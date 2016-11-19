@@ -25,30 +25,19 @@ module.exports = class MediaViewer extends React.Component {
     const fileExt = file && getExtension(file.name)
     const isVideo = SUPPORTED_VIDEO_EXTENSIONS.includes(fileExt)
     const isAudio = SUPPORTED_AUDIO_EXTENSIONS.includes(fileExt)
+    const fileURL = torrent.serverURL && (torrent.serverURL + '/' + ix)
 
     let content
     if (torrent.serverURL == null) {
       content = <div data-l10n-id='torrentLoadingMedia' />
     } else if (isVideo) {
-      content = (
-        <video
-          src={torrent.serverURL + '/' + ix}
-          autoplay='true'
-          controls='true' />
-      )
+      content = <video src={fileURL} autoPlay controls />
     } else if (isAudio) {
-      content = (
-        <audio
-          src={torrent.serverURL + '/' + ix}
-          autoplay='true'
-          controls='true' />
-      )
+      content = <audio src={fileURL} autoPlay controls />
     } else {
-      content = (
-        <iframe
-          src={torrent.serverURL + '/' + ix}
-          sandbox='allow-same-origin' />
-      )
+      // For security, sandbox and disallow scripts.
+      // We need allow-same-origin so that the iframe can load from http://localhost:...
+      content = <iframe src={fileURL} sandbox='allow-same-origin' />
     }
 
     return (

@@ -60,7 +60,7 @@ class TorrentViewer extends React.Component {
         <div className='siteDetailsPageContent'>
           <TorrentStatus torrent={torrent} errorMessage={errorMessage} />
           <TorrentFileList
-            files={torrent && torrent.files}
+            torrent={torrent}
             stateOwner={this}
             torrentID={torrentID} />
           {legalNotice}

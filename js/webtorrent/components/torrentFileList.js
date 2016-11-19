@@ -3,17 +3,9 @@ const React = require('react')
 const SortableTable = require('../../components/sortableTable')
 
 class TorrentFileList extends React.Component {
-  constructor () {
-    super()
-    this.onClick = this.onClick.bind(this)
-  }
-
-  onClick (file) {
-    window.location = this.props.torrentID + '&ix=' + this.props.files.indexOf(file)
-  }
-
   render () {
-    const files = this.props.files
+    const torrent = this.props.torrent
+    const files = torrent && torrent.files
 
     let content
     if (files == null) {
@@ -21,22 +13,21 @@ class TorrentFileList extends React.Component {
     } else if (files.length === 0) {
       content = <div data-l10n-id='loadingFilesList' />
     } else {
-      // TODO(feross): Add context menu support, like History page has.
       content = [
         <SortableTable
-          headings={['num', 'name', 'size']}
+          headings={['num', 'name', 'downloadFile', 'size']}
           defaultHeading='num'
           defaultHeadingSortOrder='asc'
           rows={files.map((file, i) => [
             String(i + 1),
-            file.name,
+            {cell: this.renderFileLink(file, false)},
+            {cell: this.renderFileLink(file, true)},
             prettierBytes(file.length)
           ])}
           rowObjects={files}
-          columnClassNames={['num', 'name', 'size']}
+          columnClassNames={['num', 'name', 'downloadFile', 'size']}
           addHoverClass
-          stateOwner={this.props.stateOwner}
-          onClick={this.onClick} />
+          stateOwner={this.props.stateOwner} />
       ]
     }
 
@@ -46,6 +37,22 @@ class TorrentFileList extends React.Component {
         {content}
       </div>
     )
+  }
+
+  renderFileLink (file, isDownload) {
+    const { torrent, torrentID } = this.props
+    const ix = torrent.files.indexOf(file)
+    if (isDownload) {
+      if (torrent.serverURL) {
+        const httpURL = torrent.serverURL + '/' + ix
+        return <a href={httpURL} download={file.name}>⇩</a>
+      } else {
+        return <div /> // No download links until the server is ready
+      }
+    } else {
+      const magnetURL = torrentID + '&ix=' + ix
+      return <a href={magnetURL}>{file.name}</a>
+    }
   }
 }
 
