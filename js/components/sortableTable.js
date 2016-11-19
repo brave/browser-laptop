@@ -336,14 +336,15 @@ class SortableTable extends React.Component {
               'sort-header': true,
               'sort-default': this.sortingDisabled || heading === this.props.defaultHeading
             }
-            headerClasses['heading-' + heading] = true
+            const isString = typeof heading === 'string'
+            if (isString) headerClasses['heading-' + heading] = true
             return <th className={cx(headerClasses)}
               data-sort-method={dataType === 'number' ? 'number' : undefined}
               data-sort-order={this.props.defaultHeadingSortOrder}>
               {
-                typeof heading === 'string'
-                ? <div className='th-inner' data-l10n-id={heading} />
-                : heading
+                isString
+                  ? <div className='th-inner' data-l10n-id={heading} />
+                  : heading
               }
             </th>
           })}
