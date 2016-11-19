@@ -40,6 +40,11 @@ function send (msg) {
   ipc.send(messages.TORRENT_MESSAGE, msg)
 }
 
+// Clean up the client before the window exits
+window.addEventListener('beforeunload', function () {
+  state.client.destroy({delay: 1000})
+})
+
 // Check whether we're already part of this swarm. If not, show a Start button.
 state.client.get(state.torrentID, function (err, torrent) {
   if (!err) {
