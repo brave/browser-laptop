@@ -1058,7 +1058,7 @@ class PaymentsTab extends ImmutableComponent {
         <span data-l10n-id='ledgerBackupContent' />
         <div className='copyKeyContainer'>
           <div className='copyContainer'>
-            <Button l10nId='copy' className='whiteButton inlineButton' onClick={this.copyToClipboard.bind(this, paymentId)} />
+            <Button l10nId='copy' className='copyButton whiteButton wideButton' onClick={this.copyToClipboard.bind(this, paymentId)} />
           </div>
           <div className='keyContainer'>
             <h3 data-l10n-id='firstKey' />
@@ -1067,7 +1067,7 @@ class PaymentsTab extends ImmutableComponent {
         </div>
         <div className='copyKeyContainer'>
           <div className='copyContainer'>
-            <Button l10nId='copy' className='whiteButton inlineButton' onClick={this.copyToClipboard.bind(this, passphrase)} />
+            <Button l10nId='copy' className='copyButton whiteButton wideButton' onClick={this.copyToClipboard.bind(this, passphrase)} />
           </div>
           <div className='keyContainer'>
             <h3 data-l10n-id='secondKey' />

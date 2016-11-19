@@ -188,10 +188,10 @@ class AddEditBookmarkHanger extends ImmutableComponent {
             <div className='bookmarkButtons'>
               {
                 this.props.originalDetail
-                ? <Button l10nId='remove' className='primaryButton whiteButton inlineButton' onClick={this.onRemoveBookmark} />
+                ? <Button l10nId='remove' className='removeButton whiteButton' onClick={this.onRemoveBookmark} />
                 : null
               }
-              <Button l10nId='done' disabled={!this.bookmarkNameValid} className='primaryButton' onClick={this.onSave} />
+              <Button l10nId='done' disabled={!this.bookmarkNameValid} className='doneButton primaryButton' onClick={this.onSave} />
             </div>
           </div>
         </div>

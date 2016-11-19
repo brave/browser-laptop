@@ -904,7 +904,7 @@ div.nextPaymentSubmission {
       line-height: 1.3em;
     }
     span {
-      display: inline-block;
+      display: inline;
     }
     a {
       text-decoration: none;
@@ -949,15 +949,21 @@ div.nextPaymentSubmission {
 
     .copyKeyContainer {
       display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
       width: 75%;
       margin: 20px auto;
 
       .copyContainer {
-        margin-top: 35px;
+        .copyButton {
+          font-size: 14px;
+          margin: 0;
+        }
+
       }
 
       .keyContainer {
-        margin-left: 75px;
+        margin-left: 1em;
 
         h3 {
           margin-bottom: 15px;
