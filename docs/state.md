@@ -158,7 +158,7 @@ AppStore
       style: string // css class for notification bar. See notificationBar.less
     }
   }], // the notifications for the frame. not preserved across restart.
-  settings: [{
+  settings: {
     // See defaults in js/constants/appConfig.js
     'general.startup-mode': string, // One of: lastTime, homePage, newTabPage
     'general.homepage': string, // URL of the user's homepage
@@ -203,7 +203,7 @@ AppStore
     'shutdown.clear-all-site-cookies': boolean, // true to clear all site cookies on shutdown
     'adblock.customRules': string, // custom rules in ABP filter syntax
     'extensions.pocket.enabled': boolean, // true if pocket is enabled
-  }],
+  },
   dictionary: {
     locale: string, // en_US, en, or any other locale string
     ignoredWords: Array<string>, // List of words to ignore
