@@ -640,6 +640,7 @@ class GeneralTab extends ImmutableComponent {
           onClick={this.setAsDefaultBrowser} />
       </SettingItem>
 
+    const defaultZoomSetting = getSetting(settings.DEFAULT_ZOOM_LEVEL, this.props.settings)
     return <SettingsList>
       <div className='sectionTitle' data-l10n-id='generalSettings' />
       <SettingsList>
@@ -688,6 +689,18 @@ class GeneralTab extends ImmutableComponent {
           <select className='form-control' value={getSetting(settings.LANGUAGE, this.props.settings) || defaultLanguage}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.LANGUAGE)} >
             {languageOptions}
+          </select>
+        </SettingItem>
+        <SettingItem dataL10nId='defaultZoomLevel'>
+          <select
+            className='form-control'
+            value={defaultZoomSetting === undefined || defaultZoomSetting === null ? config.zoom.defaultValue : defaultZoomSetting}
+            data-type='float'
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.DEFAULT_ZOOM_LEVEL)}>
+            {
+              config.zoom.zoomLevels.map((x) =>
+                <option value={x} key={x}>{getZoomValuePercentage(x) + '%'}</option>)
+            }
           </select>
         </SettingItem>
         <SettingItem dataL10nId='importBrowserData'>
@@ -1607,22 +1620,9 @@ class SecurityTab extends ImmutableComponent {
 
 class AdvancedTab extends ImmutableComponent {
   render () {
-    const defaultZoomSetting = getSetting(settings.DEFAULT_ZOOM_LEVEL, this.props.settings)
     return <div>
       <div className='sectionTitle' data-l10n-id='contentSettings' />
       <SettingsList>
-        <SettingItem dataL10nId='defaultZoomLevel'>
-          <select
-            className='form-control'
-            value={defaultZoomSetting === undefined || defaultZoomSetting === null ? config.zoom.defaultValue : defaultZoomSetting}
-            data-type='float'
-            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.DEFAULT_ZOOM_LEVEL)}>
-            {
-              config.zoom.zoomLevels.map((x) =>
-                <option value={x} key={x}>{getZoomValuePercentage(x) + '%'}</option>)
-            }
-          </select>
-        </SettingItem>
         <SettingCheckbox dataL10nId='useHardwareAcceleration' prefKey={settings.HARDWARE_ACCELERATION_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='useSmoothScroll' prefKey={settings.SMOOTH_SCROLL_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='sendCrashReports' prefKey={settings.SEND_CRASH_REPORTS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
