@@ -279,6 +279,7 @@ const doAction = (action) => {
         windowState = windowState.mergeIn(tabStatePath(action.key), {
           audioPlaybackActive: false
         })
+        updateNavBarInput(frame.get('location'), frameStatePath(action.key))
       } else {
       // If the user is changing back to the original src and they already navigated away then we need to
       // explicitly set a new location via webview.loadURL.

@@ -1,7 +1,7 @@
 /* global describe, it, before, beforeEach */
 
 const Brave = require('../lib/brave')
-const {urlInput, urlBarSuggestions, urlbarIcon, activeWebview} = require('../lib/selectors')
+const {urlInput, urlBarSuggestions, urlbarIcon, activeWebview, reloadButton} = require('../lib/selectors')
 const searchProviders = require('../../js/data/searchProviders')
 const config = require('../../js/constants/config')
 const messages = require('../../js/constants/messages')
@@ -382,5 +382,70 @@ describe('urlBar tests', function () {
     })
 
     it('Retains user input on tab switches', tabLoadingTest)
+  })
+
+  describe('loading same URL as current page with changed input', function () {
+    Brave.beforeAll(this)
+
+    before(function * () {
+      this.page1Url = Brave.server.url('page1.html')
+      yield setup(this.app.client)
+      yield this.app.client
+        .waitForExist(urlInput)
+        .waitForElementFocus(urlInput)
+        .tabByIndex(0)
+        .loadUrl(this.page1Url)
+        .windowByUrl(Brave.browserWindowUrl)
+        .setValue(urlInput, '')
+        .waitUntil(function () {
+          return this.getValue(urlInput).then((val) => val === '')
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .click(reloadButton)
+    })
+
+    it('reverts the URL', function * () {
+      const page1Url = this.page1Url
+      yield this.app.client
+        .waitUntil(function () {
+          return this.getValue(urlInput).then((val) => {
+            return val === page1Url
+          })
+        })
+    })
+  })
+
+  describe('loading different URL as current page with changed input', function () {
+    Brave.beforeAll(this)
+
+    before(function * () {
+      this.page1Url = Brave.server.url('page1.html')
+      this.page2Url = Brave.server.url('page2.html')
+      yield setup(this.app.client)
+      yield this.app.client
+        .waitForExist(urlInput)
+        .waitForElementFocus(urlInput)
+        .tabByIndex(0)
+        .loadUrl(this.page1Url)
+        .windowByUrl(Brave.browserWindowUrl)
+        .setValue(urlInput, '')
+        .waitUntil(function () {
+          return this.getValue(urlInput).then((val) => val === '')
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .tabByIndex(0)
+        .loadUrl(this.page2Url)
+        .windowByUrl(Brave.browserWindowUrl)
+    })
+
+    it('reverts the URL', function * () {
+      const page2Url = this.page2Url
+      yield this.app.client
+        .waitUntil(function () {
+          return this.getValue(urlInput).then((val) => {
+            return val === page2Url
+          })
+        })
+    })
   })
 })
