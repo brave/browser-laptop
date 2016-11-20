@@ -109,6 +109,27 @@ describe('urlBar tests', function () {
           return this.isExisting(urlBarSuggestions).then((exists) => exists === false)
         })
     })
+
+    describe('with scrolling match', function () {
+      it('does not show suggestions on focus', function * () {
+        yield this.app.client
+          .addSite({ location: 'https://brave.com/test2' })
+          .addSite({ location: 'https://brave.com/test3' })
+          .addSite({ location: 'https://brave.com/test4' })
+          .addSite({ location: 'https://brianbondy.com/test4' })
+          .resizeWindow(500, 300)
+          .setValue(urlInput, 'b')
+          .waitForVisible(urlBarSuggestions)
+          .moveToObject(urlBarSuggestions, 0, 50)
+          .moveToObject(urlBarSuggestions, 0, 100)
+          .moveToObject(urlBarSuggestions, 0, 150)
+          .keys('ra')
+          .execute(function (urlBarSuggestions) {
+            document.querySelector(urlBarSuggestions).scrollTop = 200
+          }, urlBarSuggestions)
+        yield selectsText(this.app.client, 've.com')
+      })
+    })
   })
 
   describe('typing', function () {
