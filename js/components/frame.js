@@ -924,10 +924,6 @@ class Frame extends ImmutableComponent {
           runInsecureContent: false
         })
       }
-      windowActions.updateBackForwardState(
-        this.frame,
-        this.webview.canGoBack(),
-        this.webview.canGoForward())
       const hack = siteHacks[parsedUrl.hostname]
       if (hack && hack.pageLoadStartScript) {
         this.webview.executeJavaScript(hack.pageLoadStartScript)
@@ -940,6 +936,10 @@ class Frame extends ImmutableComponent {
       windowActions.onWebviewLoadEnd(
         this.frame,
         this.webview.getURL())
+      windowActions.updateBackForwardState(
+        this.frame,
+        this.webview.canGoBack(),
+        this.webview.canGoForward())
 
       const parsedUrl = urlParse(this.props.location)
       if (!this.allowRunningWidevinePlugin()) {

@@ -118,6 +118,31 @@ describe('frame tests', function () {
       })
     })
 
+    describe('back-forward state', function () {
+      Brave.beforeAll(this)
+      before(function * () {
+        this.url1 = Brave.server.url('page1.html')
+        yield setup(this.app.client)
+        yield this.app.client
+          .waitForExist('.navigationButtonContainer.disabled .backButton')
+          .tabByIndex(0)
+          // add some history
+          .loadUrl(this.url1)
+          .windowByUrl(Brave.browserWindowUrl)
+      })
+
+      it('enables back button on first nav', function * () {
+        yield this.app.client
+          .waitForExist('.navigationButtonContainer:not(.disabled) .backButton')
+      })
+
+      it('enables forward button after pressing back', function * () {
+        yield this.app.client
+          .click(backButton)
+          .waitForExist('.navigationButtonContainer:not(.disabled) .forwardButton')
+      })
+    })
+
     describe('back clone', function () {
       Brave.beforeAll(this)
 
