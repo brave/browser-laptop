@@ -7,7 +7,6 @@ const remote = electron.remote
 const Menu = remote.Menu
 const Immutable = require('immutable')
 const clipboard = remote.clipboard
-const nativeImage = electron.nativeImage
 const messages = require('./constants/messages')
 const windowStore = require('./stores/windowStore')
 const windowActions = require('./actions/windowActions')
@@ -939,18 +938,12 @@ function mainTemplateInit (nodeProps, frame) {
       {
         label: locale.translation('copyImage'),
         click: (item) => {
-          const copyFromDataURL = (dataURL) =>
-            clipboard.write({
-              image: nativeImage.createFromDataURL(dataURL),
-              html: `<img src='${nodeProps.srcURL}'>`,
-              text: nodeProps.srcURL
-            })
           if (nodeProps.srcURL) {
             if (urlParse(nodeProps.srcURL).protocol === 'data:') {
-              copyFromDataURL(nodeProps.srcURL)
+              appActions.dataURLCopied(nodeProps.srcURL, `<img src='${nodeProps.srcURL}>`, nodeProps.srcURL)
             } else {
               getBase64FromImageUrl(nodeProps.srcURL).then((dataURL) =>
-                copyFromDataURL(dataURL))
+                appActions.dataURLCopied(dataURL, `<img src='${nodeProps.srcURL}>`, nodeProps.srcURL))
             }
           }
         }

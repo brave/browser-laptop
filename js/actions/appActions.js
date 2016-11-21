@@ -579,6 +579,18 @@ const appActions = {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_POPULATE_HISTORY
     })
+  },
+
+  /**
+   * Dispatch a message to copy data URL to clipboard
+   **/
+  dataURLCopied: function (dataURL, html, text) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_DATA_URL_COPIED,
+      dataURL,
+      html,
+      text
+    })
   }
 }
 
