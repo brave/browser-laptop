@@ -1,7 +1,21 @@
 # Changelog
 
 ## [0.12.10](https://github.com/brave/browser-laptop/releases/v0.12.10dev)
-- (TODO)
+- Added dropdown menu with options for new tab. ([#4398](https://github.com/brave/browser-laptop/issues/4398))
+- Added F6 jump to url / search bar. ([#4464](https://github.com/brave/browser-laptop/issues/4464))
+- Fixed various issues for the new tab page. ([#5337](https://github.com/brave/browser-laptop/issues/5337))([#5703](https://github.com/brave/browser-laptop/issues/5703))([#5735](https://github.com/brave/browser-laptop/issues/5735))([#5666](https://github.com/brave/browser-laptop/issues/5666))([#5511](https://github.com/brave/browser-laptop/issues/5511))
+- Fixed various issues for Brave Payments. ([#5606](https://github.com/brave/browser-laptop/issues/5606))([#4981](https://github.com/brave/browser-laptop/issues/4981))
+([#5503](https://github.com/brave/browser-laptop/issues/5503))
+- Fixed URL not showing on address bar. ([#5629](https://github.com/brave/browser-laptop/issues/5629))
+- Fixed autocomplete selection accidents made by mouse position. ([#5612](https://github.com/brave/browser-laptop/issues/5612))
+- Fixed UI on Brave shield. ([#5715](https://github.com/brave/browser-laptop/issues/5715))
+- Fixed address bar showing chrome-extension:// prefix for PDFs. ([#5725](https://github.com/brave/browser-laptop/issues/5725))
+- Fixed imported Bookmarks from showing the Wrong Date and Time. ([#5576](https://github.com/brave/browser-laptop/issues/5576))
+- Fixed various UI issues. ([#5497](https://github.com/brave/browser-laptop/issues/5497))([#5476](https://github.com/brave/browser-laptop/issues/5476))([#5094](https://github.com/brave/browser-laptop/issues/5094))([#5680](https://github.com/brave/browser-laptop/issues/5680))([#1594](https://github.com/brave/browser-laptop/issues/1594))([#5695](https://github.com/brave/browser-laptop/issues/5695))([#3651](https://github.com/brave/browser-laptop/issues/3651))([#2178](https://github.com/brave/browser-laptop/issues/2178))([#5610](https://github.com/brave/browser-laptop/issues/5610))([#5652](https://github.com/brave/browser-laptop/issues/5652))([#4812](https://github.com/brave/browser-laptop/issues/4812))
+- Fixed Chromium not recognized as a browser for importing bookmarks. ([#5463](https://github.com/brave/browser-laptop/issues/5463))
+- Fixed about:brave doesn't show details. ([#5633](https://github.com/brave/browser-laptop/issues/5633))
+- Fixed [HackerOne] media permission requests in iframes show top-level origin. ([#5378](https://github.com/brave/browser-laptop/issues/5378))
+- Upgrade to muon v1.4.26 ([#5716](https://github.com/brave/browser-laptop/issues/5716))
 
 ## [0.12.9](https://github.com/brave/browser-laptop/releases/v0.12.9dev)
 - Added New Tab page. ([#3001](https://github.com/brave/browser-laptop/issues/3001))([#2106](https://github.com/brave/browser-laptop/issues/2106))([#5334](https://github.com/brave/browser-laptop/issues/5334))([#5310](https://github.com/brave/browser-laptop/issues/5310))([#5396](https://github.com/brave/browser-laptop/issues/5396))([#5336](https://github.com/brave/browser-laptop/issues/5336))([#5482](https://github.com/brave/browser-laptop/issues/5482))([#5332](https://github.com/brave/browser-laptop/issues/5332))([#5337](https://github.com/brave/browser-laptop/issues/5337))([#5380](https://github.com/brave/browser-laptop/issues/5380))([#5324](https://github.com/brave/browser-laptop/issues/5324))([#5321](https://github.com/brave/browser-laptop/issues/5321))([#5322](https://github.com/brave/browser-laptop/issues/5322))
