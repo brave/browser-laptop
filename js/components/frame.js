@@ -328,14 +328,14 @@ class Frame extends ImmutableComponent {
 
     const parsedUrl = urlParse(location)
     if (!appConfig.uaExceptionHosts.includes(parsedUrl.hostname)) {
-      this.webview.setAttribute('useragent', getSetting(settings.USERAGENT) || '')
+      this.webview.setUserAgentOverride(getSetting(settings.USERAGENT) || '')
     }
     const hack = siteHacks[parsedUrl.hostname]
     if (hack && hack.userAgent) {
-      this.webview.setAttribute('useragent', hack.userAgent)
+      this.webview.setUserAgentOverride(hack.userAgent)
     }
     if (this.allowRunningFlashPlugin() || this.allowRunningWidevinePlugin()) {
-      this.webview.setAttribute('plugins', true)
+      this.webview.setAllowPlugins(true)
       this.webview.allowRunningPlugins = true
     }
 
