@@ -33,6 +33,7 @@ const path = require('path')
 const {channel} = require('../../app/channel')
 const os = require('os')
 const autofill = require('../../app/autofill')
+const nativeImage = require('../../app/nativeImage')
 
 // state helpers
 const basicAuthState = require('../../app/common/state/basicAuthState')
@@ -438,6 +439,9 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_POPULATE_HISTORY:
       appState = aboutHistoryState.setHistory(appState, action)
+      break
+    case AppConstants.APP_DATA_URL_COPIED:
+      nativeImage.copyDataURL(action.dataURL, action.html, action.text)
       break
     case AppConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size

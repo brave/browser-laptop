@@ -64,7 +64,8 @@ const AppConstants = {
   APP_SUBMIT_FEEDBACK: _,
   APP_DEFAULT_BROWSER_UPDATED: _,
   APP_DEFAULT_BROWSER_CHECK_COMPLETE: _,
-  APP_POPULATE_HISTORY: _
+  APP_POPULATE_HISTORY: _,
+  APP_DATA_URL_COPIED: _
 }
 
 module.exports = mapValuesByKeys(AppConstants)
