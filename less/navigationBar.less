@@ -485,19 +485,9 @@
 
     .backButton,
     .forwardButton {
-    width: 20px;
-    margin-top: 5px;
+      width: 100%;
     }
 
-    .backButton {
-    padding-right:4px;
-    margin-left: 4px;
-    }
-
-    .forwardButton {
-    padding-left: 4px;
-    margin-left: 6px;
-    }
   }
 
   // Navigation bar at the center
@@ -536,10 +526,10 @@
 
     .extensionButton {
       -webkit-app-region: no-drag;
-    background-size: contain;
-    height: 17px;
-    margin: 4px 4px 0 0;
-    opacity: 0.85;
+      background-size: contain;
+      height: 17px;
+      margin: 4px 4px 0 0;
+      opacity: 0.85;
     }
 
     .braveMenu {
@@ -587,9 +577,9 @@
   margin-right: 6px;
 
   &.nav {
-  margin-left: 4px;
-  margin-right: 1px;
-  width: 34px;
+    margin-left: 4px;
+    margin-right: 1px;
+    width: 34px;
   }
 
   &:last-child {
@@ -604,44 +594,44 @@
 
 .backButton,
 .forwardButton {
-  height: 15px;
+  height: 24px;
   width: 30px;
-  margin-top: 5px;
+  margin: 0;
 }
 
 .backButton {
   background: url('../img/toolbar/back_btn.svg') center no-repeat;
-  margin-left: 4px;
+  background-size: 14px 14px;
 }
 
 .forwardButton {
   background: url('../img/toolbar/forward_btn.svg') center no-repeat;
-  margin-left: 4px;
+  background-size: 14px 14px;
 }
 
 #navigator {
+  .stopButton,
+  .reloadButton,
+  .homeButton {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+  }
+
   .stopButton {
     background: url('../img/toolbar/stoploading_btn.svg') center no-repeat;
-    margin: 0 3px 3px 3px;
-    padding: 0 6px;
-    height: 12px;
-    position: relative;
-    top: 3px;
+    background-size: 11px 11px;
   }
 
   .reloadButton {
     background: url('../img/toolbar/reload_btn.svg') center no-repeat;
-    margin: 0 3px -1px 3px;
-    padding: 0 4px;
-    position: relative;
+    background-size: 13px 13px;
   }
 
   .homeButton {
     background: url('../img/toolbar/home_btn.svg') center no-repeat;
-    width: 14px;
-    height: 13px;
-    padding: 0 6px;
-    position: relative;
+    background-size: 16px 16px;
   }
 
   .bookmarkButton {
