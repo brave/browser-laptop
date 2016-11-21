@@ -42,8 +42,8 @@
 }
 
 .tab {
-  // background: rgba(222, 222, 222, 0.6);
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
+  position: relative;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
   border-radius: @borderRadiusTabs @borderRadiusTabs 0px 0px;
   border-width: 1px 1px 0;
   box-sizing: border-box;
@@ -157,13 +157,24 @@
   }
 
   .closeTab {
+    transition: opacity 100ms linear;
     opacity: 0;
     text-align: center;
     width: 16px;
     height: 16px;
     margin-left: 4px;
     margin-right: 4px;
-
+    @media (max-width: @breakpointTabsTextTrim) {
+      position: absolute;
+      width: 100%;
+      margin: 0;
+      background: #fff;
+      border-radius: 0;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
     &:hover {
       opacity: 1;
     }
