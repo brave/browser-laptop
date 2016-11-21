@@ -231,9 +231,9 @@ AppStore
     },
     newtab: {
       gridLayoutSize: string, // 'small', 'medium', 'large'
-      sites: [string], // List of sites to be used on gridLayout
+      sites: [string], // List of sites to be used on gridLayout. Defaults to 6 Brave-related sites; see data/newTabData.js => topSites
       ignoredTopSites: [string], // List of ignored sites
-      pinnedTopSites: [string], // List of pinned sites
+      pinnedTopSites: [string], // List of pinned sites to be used on gridLayout. Defaults to 1 Brave-related site; see data/newTabData.js => pinnedTopSites
       updatedStamp: number // timestamp for when the data was last updated
     }
   },
