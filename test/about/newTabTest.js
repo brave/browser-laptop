@@ -1,7 +1,7 @@
 /* global describe, it, before, beforeEach */
 
 const Brave = require('../lib/brave')
-const {urlInput} = require('../lib/selectors')
+const {urlInput, navigator, navigatorBookmarked, navigatorNotBookmarked, doneButton} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 const aboutNewTabUrl = getTargetAboutUrl('about:newtab')
 
@@ -34,6 +34,31 @@ describe('about:newtab tests', function () {
     yield client
       .tabByIndex(0)
       .loadUrl(aboutNewTabUrl)
+  }
+
+  function * addDemoAboutPages (client) {
+    yield client
+      .addSite({ location: 'about:about' })
+      .addSite({ location: 'about:adblock' })
+      .addSite({ location: 'about:autofill' })
+      .addSite({ location: 'about:blank' })
+      .addSite({ location: 'about:bookmarks' })
+      .addSite({ location: 'about:brave' })
+      .addSite({ location: 'about:certerror' })
+      .addSite({ location: 'about:config' })
+      .addSite({ location: 'about:downloads' })
+      .addSite({ location: 'about:error' })
+      .addSite({ location: 'about:extensions' })
+      .addSite({ location: 'about:flash' })
+      .addSite({ location: 'about:history' })
+      .addSite({ location: 'about:newtab' })
+      .addSite({ location: 'about:passwords' })
+      .addSite({ location: 'about:preferences' })
+      .addSite({ location: 'about:safebrowsing' })
+      .addSite({ location: 'about:styles' })
+      .waitForExist('.tab[data-frame-key="1"]')
+      .tabByIndex(0)
+      .url(aboutNewTabUrl)
   }
 
   describe('page content', function () {
@@ -132,6 +157,29 @@ describe('about:newtab tests', function () {
         .click('.topSitesActionBtn')
         .moveToObject('.timeSaved')
         .waitForVisible('.pinnedTopSite')
+    })
+
+    it('doesn\'t show about pages on topSites grid', function * () {
+      // Adding about pages shouldn't add them to topSites grid
+      yield addDemoAboutPages(this.app.client)
+
+      // Bookmarking an about:page should not add it to grid as well
+      yield this.app.client
+        .tabByUrl(aboutNewTabUrl)
+        .windowParentByUrl(aboutNewTabUrl)
+        .waitForVisible(navigator)
+        .moveToObject(navigator)
+        .waitForVisible(navigatorNotBookmarked)
+        .click(navigatorNotBookmarked)
+        .waitForVisible(doneButton)
+        .click(doneButton)
+        .moveToObject(navigator)
+        .waitForVisible(navigatorBookmarked)
+
+      yield reloadNewTab(this.app.client)
+
+      yield this.app.client
+        .waitForExist('.topSitesElementFavicon', 3000, true)
     })
   })
 })
