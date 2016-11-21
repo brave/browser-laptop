@@ -33,6 +33,7 @@ const currentWindow = require('../../app/renderer/currentWindow')
 const windowStore = require('../stores/windowStore')
 const appStoreRenderer = require('../stores/appStoreRenderer')
 const siteSettings = require('../state/siteSettings')
+const {newTabMode} = require('../../app/common/constants/settingsEnums')
 
 const WEBRTC_DEFAULT = 'default'
 const WEBRTC_DISABLE_NON_PROXY = 'disable_non_proxied_udp'
@@ -127,6 +128,7 @@ class Frame extends ImmutableComponent {
       this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.braveryDefaults)
     } else if (location === 'about:newtab') {
       this.webview.send(messages.NEWTAB_DATA_UPDATED, {
+        showEmptyPage: getSetting(settings.NEWTAB_MODE) === newTabMode.EMPTY_NEW_TAB,
         trackedBlockersCount: this.props.trackedBlockersCount,
         adblockCount: this.props.adblockCount,
         httpsUpgradedCount: this.props.httpsUpgradedCount,

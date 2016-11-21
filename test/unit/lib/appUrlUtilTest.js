@@ -59,7 +59,7 @@ describe('appUrlUtil test', function () {
     })
 
     describe('when NEWTAB_MODE = EMPTY_NEW_TAB', function () {
-      it('returns about:blank', function () {
+      it('returns about:newtab', function () {
         loadMocks({ getSetting: (settingKey, settingsCollection) => {
           if (settingKey === settings.NEWTAB_MODE) {
             return newTabMode.EMPTY_NEW_TAB
@@ -67,7 +67,7 @@ describe('appUrlUtil test', function () {
         }})
 
         const url = appUrlUtil.newFrameUrl()
-        assert.equal(url, 'about:blank')
+        assert.equal(url, 'about:newtab')
       })
     })
 

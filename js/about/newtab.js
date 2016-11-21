@@ -7,7 +7,7 @@ const React = require('react')
 const Immutable = require('immutable')
 const messages = require('../constants/messages')
 const HTML5Backend = require('react-dnd-html5-backend')
-const { DragDropContext } = require('react-dnd')
+const {DragDropContext} = require('react-dnd')
 const Stats = require('./newTabComponents/stats')
 const Clock = require('./newTabComponents/clock')
 const Block = require('./newTabComponents/block')
@@ -32,7 +32,8 @@ class NewTabPage extends React.Component {
       showSiteRemovalNotification: false,
       backgroundImage: this.randomBackgroundImage,
       imageLoadFailed: false,
-      updatedStamp: undefined
+      updatedStamp: undefined,
+      showEmptyPage: true
     }
     ipc.on(messages.NEWTAB_DATA_UPDATED, (e, newTabData) => {
       const data = Immutable.fromJS(newTabData || {})
@@ -47,7 +48,8 @@ class NewTabPage extends React.Component {
 
       this.setState({
         newTabData: data,
-        updatedStamp: updatedStamp
+        updatedStamp: updatedStamp,
+        showEmptyPage: !!data.get('showEmptyPage')
       })
     })
   }
@@ -216,6 +218,10 @@ class NewTabPage extends React.Component {
   }
 
   render () {
+    // don't render if user prefers an empty page
+    if (this.state.showEmptyPage) {
+      return <div className='empty' />
+    }
     // don't render until object is found
     if (!this.state.newTabData) {
       return null
