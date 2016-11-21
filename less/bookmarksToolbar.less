@@ -40,8 +40,8 @@
   }
 
   .bookmarkToolbarButton {
-    border-radius: @borderRadius;
-    color: black;
+    border-radius: 3px;
+    color: @mediumGray;
     cursor: default;
     font-size: 11px;
     line-height: 12px;
@@ -57,7 +57,8 @@
     display: flex;
 
     &:hover {
-      background: lighten(@tabsBackground, 5%);
+      background: white;
+      box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.1);
     }
 
     &.draggingOverLeft {
@@ -112,6 +113,7 @@
     .bookmarkFolderChevron {
       color: #676767;
       margin-left: var(--bookmark-item-chevron-margin);
+      font-size: 8px;
     }
   }
 
