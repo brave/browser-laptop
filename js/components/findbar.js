@@ -21,7 +21,7 @@ class FindBar extends ImmutableComponent {
     this.onClear = this.onClear.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
-    this.onKeyUp = this.onKeyUp.bind(this)
+    this.onInput = this.onInput.bind(this)
     this.onFindPrev = this.onFindPrev.bind(this)
     this.onFindNext = this.onFindNext.bind(this)
     this.onCaseSensitivityChange = this.onCaseSensitivityChange.bind(this)
@@ -32,7 +32,7 @@ class FindBar extends ImmutableComponent {
     return windowStore.getFrame(this.props.frameKey)
   }
 
-  onKeyUp (e) {
+  onInput (e) {
     windowActions.setFindDetail(this.frame, Immutable.fromJS({
       searchString: e.target.value,
       caseSensitivity: this.isCaseSensitive
@@ -221,7 +221,7 @@ class FindBar extends ImmutableComponent {
             ref={(node) => { this.searchInput = node }}
             onFocus={this.onInputFocus}
             onKeyDown={this.onKeyDown}
-            onKeyUp={this.onKeyUp} />
+            onInput={this.onInput} />
           <span className='searchStringContainerIcon fa fa-times findClear'
             onClick={this.onClear} />
         </div>
