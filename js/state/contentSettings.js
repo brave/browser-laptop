@@ -14,6 +14,7 @@ const urlParse = require('url').parse
 const siteSettings = require('./siteSettings')
 const {setUserPref} = require('./userPrefs')
 const {getSetting} = require('../settings')
+const {getIndexHTML} = require('../lib/appUrlUtil')
 
 // backward compatibility with appState siteSettings
 const parseSiteSettingsPattern = (pattern) => {
@@ -110,8 +111,12 @@ const hostSettingsToContentSettings = (hostSettings, contentSettingsSource) => {
     if (hostSetting.adControl) {
       addContentSettings(contentSettings.adInsertion, hostPattern, '*', hostSetting.adControl === 'showBraveAds' ? 'allow' : 'block')
     }
-    if (typeof hostSetting.flash === 'number') {
+    if (typeof hostSetting.flash === 'number' && AppStore.getState().get('flashInitialized')) {
       addContentSettings(contentSettings.flashActive, hostPattern, '*', 'allow')
+      addContentSettings(contentSettings.plugins, hostPattern, '*', 'allow')
+    }
+    if (typeof hostSetting.widevine === 'number' && AppStore.getState().getIn(['widevine', 'enabled'])) {
+      addContentSettings(contentSettings.plugins, hostPattern, '*', 'allow')
     }
   }
   // On the second pass we consider only shieldsUp === false settings since we want those to take precedence.
@@ -168,6 +173,13 @@ const getContentSettingsFromSiteSettings = (appState, isPrivate = false) => {
     runInsecureContent: [{
       setting: 'block',
       primaryPattern: '*'
+    }],
+    plugins: [{
+      setting: 'block',
+      primaryPattern: '*'
+    }, {
+      setting: 'allow',
+      primaryPattern: getIndexHTML()
     }]
   }
 
