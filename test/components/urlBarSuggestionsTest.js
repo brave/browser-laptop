@@ -18,13 +18,15 @@ describe('urlBarSuggestions', function () {
     this.page2Url = Brave.server.url('page2.html')
 
     yield setup(this.app.client)
+    const page1Url = this.page1Url
+    const page2Url = this.page2Url
     yield this.app.client
       .tabByIndex(0)
-      .loadUrl(this.page1Url)
+      .loadUrl(page1Url)
       .windowByUrl(Brave.browserWindowUrl)
       .waitUntil(function () {
         return this.getAppState().then((val) => {
-          return val.value.sites.length === 1
+          return !!val.value.sites.find((site) => site.location === page1Url)
         })
       })
       .tabByIndex(0)
@@ -37,7 +39,7 @@ describe('urlBarSuggestions', function () {
       .waitForElementFocus(urlInput)
       .waitUntil(function () {
         return this.getAppState().then((val) => {
-          return val.value.sites.length === 2
+          return !!val.value.sites.find((site) => site.location === page2Url)
         })
       })
   })
