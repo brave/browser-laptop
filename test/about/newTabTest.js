@@ -134,6 +134,7 @@ describe('about:newtab tests', function () {
     Brave.beforeEach(this)
     beforeEach(function * () {
       yield setup(this.app.client)
+      yield this.app.client.clearAppData({browserHistory: true})
     })
 
     it('shows a preloaded list of sites if session has no entries yet', function * () {
