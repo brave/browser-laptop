@@ -658,6 +658,7 @@ class GeneralTab extends ImmutableComponent {
             <option data-l10n-id='newTabNewTabPage' value={newTabMode.NEW_TAB_PAGE} />
             <option data-l10n-id='newTabHomePage' value={newTabMode.HOMEPAGE} />
             <option data-l10n-id='newTabDefaultSearchEngine' value={newTabMode.DEFAULT_SEARCH_ENGINE} />
+            <option data-l10n-id='newTabEmpty' value={newTabMode.EMPTY_NEW_TAB} />
           </select>
         </SettingItem>
         <SettingItem dataL10nId='myHomepage'>

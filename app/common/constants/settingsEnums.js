@@ -11,7 +11,8 @@ const startsWithOption = {
 const newTabMode = {
   NEW_TAB_PAGE: 'newTabPage',
   HOMEPAGE: 'homePage',
-  DEFAULT_SEARCH_ENGINE: 'defaultSearchEngine'
+  DEFAULT_SEARCH_ENGINE: 'defaultSearchEngine',
+  EMPTY_NEW_TAB: 'emptyNewTab'
 }
 
 const bookmarksToolbarMode = {

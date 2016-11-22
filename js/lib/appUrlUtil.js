@@ -171,6 +171,7 @@ module.exports.newFrameUrl = function () {
       })
       return defaultSearchEngineSettings[0].base
 
+    case newTabMode.EMPTY_NEW_TAB:
     case newTabMode.NEW_TAB_PAGE:
     default:
       return 'about:newtab'
