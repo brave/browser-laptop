@@ -31,6 +31,7 @@ describe('urlBar tests', function () {
         return this.getValue(urlInput).then((val) => val === '')
       })
       yield this.app.client
+        .clearAppData({browserHistory: true})
         .addSite({ location: 'https://brave.com', title: 'Brave' })
         .addSite({ location: 'https://brave.com/test' })
         .addSite({ location: 'https://www.youtube.com' })
