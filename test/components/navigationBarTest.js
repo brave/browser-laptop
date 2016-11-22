@@ -37,7 +37,7 @@ describe('navigationBar tests', function () {
   function blur (client) {
     return client
       .waitForExist(activeWebview)
-      .leftClick(activeWebview) // clear focus from urlbar
+      .leftClick(activeWebview, 0, 0) // clear focus from urlbar
       .waitUntil(function () {
         return this.getSelectedText().then(function (value) { return value === '' })
       })
