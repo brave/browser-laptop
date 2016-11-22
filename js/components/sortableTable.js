@@ -332,15 +332,19 @@ class SortableTable extends React.Component {
             if (dataType === 'object' && firstEntry.value) {
               dataType = typeof firstEntry.value
             }
-            return <th className={cx({
+            const headerClasses = {
               'sort-header': true,
-              'sort-default': this.sortingDisabled || heading === this.props.defaultHeading})}
+              'sort-default': this.sortingDisabled || heading === this.props.defaultHeading
+            }
+            const isString = typeof heading === 'string'
+            if (isString) headerClasses['heading-' + heading] = true
+            return <th className={cx(headerClasses)}
               data-sort-method={dataType === 'number' ? 'number' : undefined}
               data-sort-order={this.props.defaultHeadingSortOrder}>
               {
-                typeof heading === 'string'
-                ? <div className='th-inner' data-l10n-id={heading} />
-                : heading
+                isString
+                  ? <div className='th-inner' data-l10n-id={heading} />
+                  : heading
               }
             </th>
           })}

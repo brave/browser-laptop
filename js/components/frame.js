@@ -23,7 +23,7 @@ const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
 const config = require('../constants/config')
 const settings = require('../constants/settings')
-const {aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
+const {aboutUrls, isSourceMagnetUrl, getTargetMagnetUrl, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
 const {isFrameError} = require('../../app/common/lib/httpUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
@@ -39,6 +39,11 @@ const WEBRTC_DISABLE_NON_PROXY = 'disable_non_proxied_udp'
 // Looks like Brave leaks true public IP from behind system proxy when this option
 // is on.
 // const WEBRTC_PUBLIC_ONLY = 'default_public_interface_only'
+
+function isTorrentViewerURL (url) {
+  const isEnabled = getSetting(settings.TORRENT_VIEWER_ENABLED)
+  return isEnabled && isSourceMagnetUrl(url)
+}
 
 class Frame extends ImmutableComponent {
   constructor () {
@@ -317,7 +322,11 @@ class Frame extends ImmutableComponent {
     }
 
     if (!guestInstanceId || newSrc !== 'about:blank') {
-      this.webview.setAttribute('src', isSourceAboutUrl(newSrc) ? getTargetAboutUrl(newSrc) : newSrc)
+      let webviewSrc
+      if (isSourceAboutUrl(newSrc)) webviewSrc = getTargetAboutUrl(newSrc)
+      else if (isTorrentViewerURL(newSrc)) webviewSrc = getTargetMagnetUrl(newSrc)
+      else webviewSrc = newSrc
+      this.webview.setAttribute('src', webviewSrc)
     }
 
     if (webviewAdded) {
@@ -473,7 +482,9 @@ class Frame extends ImmutableComponent {
         // This can happen for pages which don't load properly.
         // Some examples are basic http auth and bookmarklets.
         // In this case both the user display and the user think they're on this.props.location.
-        if (this.webview.getURL() !== this.props.location && !this.isAboutPage()) {
+        if (this.webview.getURL() !== this.props.location &&
+          !this.isAboutPage() &&
+          !isTorrentViewerURL(this.props.location)) {
           this.webview.loadURL(this.props.location)
         } else if (this.isIntermediateAboutPage() &&
           this.webview.getURL() !== this.props.location &&
@@ -908,7 +919,17 @@ class Frame extends ImmutableComponent {
     }
 
     const loadStart = (e) => {
+      // We have two kinds of special URLs: magnet links and about pages
+      // When the user clicks on a magnet link, navigate to the corresponding local URL
+      // (The address bar will still show the magnet URL. See appUrlUtil.getSourceMagnetUrl.)
+      if (isTorrentViewerURL(e.url)) {
+        var targetURL = getTargetMagnetUrl(e.url)
+        // Return right away. loadStart will be called again with targetURL
+        return windowActions.loadUrl(this.frame, targetURL)
+      }
+
       const parsedUrl = urlParse(e.url)
+
       // Instead of telling person to install Flash, ask them if they want to
       // run Flash if it's installed.
       if (e.isMainFrame && !e.isErrorPage && !e.isFrameSrcDoc) {
@@ -932,6 +953,7 @@ class Frame extends ImmutableComponent {
         this.webview.executeJavaScript('Navigator.prototype.__defineGetter__("doNotTrack", () => {return 1});')
       }
     }
+
     const loadEnd = (savePage) => {
       windowActions.onWebviewLoadEnd(
         this.frame,
@@ -966,6 +988,7 @@ class Frame extends ImmutableComponent {
         interceptFlash(false, undefined, hack.redirectURL)
       }
     }
+
     const loadFail = (e, provisionLoadFailure = false) => {
       if (isFrameError(e.errorCode)) {
         // temporary workaround for https://github.com/brave/browser-laptop/issues/1817
@@ -1023,7 +1046,6 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('load-start', (e) => {
       loadStart(e)
     })
-
     this.webview.addEventListener('did-navigate', (e) => {
       if (this.props.findbarShown) {
         this.props.onFindHide()

@@ -32,6 +32,10 @@ function config () {
           test: /\.css$/,
           loader: 'style-loader!css-loader'
         },
+        {
+          test: /\.json$/,
+          loader: 'json'
+        },
         // Loads font files for Font Awesome
         {
           test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
@@ -61,7 +65,8 @@ function config () {
     ],
     node: {
       __filename: true,
-      __dirname: true
+      __dirname: true,
+      fs: 'empty'
     }
   }
 }
@@ -90,7 +95,7 @@ function production () {
 }
 
 function merge (config, env) {
-  var merged = Object.assign({}, config, env)
+  var merged = Object.assign({}, env, config)
   merged.plugins = (config.plugins || []).concat(env.plugins || [])
   return merged
 }
@@ -117,17 +122,31 @@ var aboutPages = {
   }
 }
 
+var webtorrentPage = {
+  name: 'webtorrent',
+  target: 'web',
+  entry: ['./js/webtorrent/entry.js'],
+  output: {
+    path: path.resolve(__dirname, 'app', 'extensions', 'torrent', 'gen'),
+    filename: 'webtorrentPage.entry.js',
+    publicPath: './gen/'
+  }
+}
+
 module.exports = {
   development: [
     merge(app, development()),
-    merge(aboutPages, development())
+    merge(aboutPages, development()),
+    merge(webtorrentPage, development())
   ],
   production: [
     merge(app, production()),
-    merge(aboutPages, production())
+    merge(aboutPages, production()),
+    merge(webtorrentPage, production())
   ],
   test: [
     merge(app, production()),
-    merge(aboutPages, production())
+    merge(aboutPages, production()),
+    merge(webtorrentPage, production())
   ]
 }[env]

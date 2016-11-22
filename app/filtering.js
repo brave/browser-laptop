@@ -358,9 +358,17 @@ function registerPermissionHandler (session, partition) {
       return
     }
 
-    // TOOD(bridiver) - this seems overly permissive and we should narrow this down
-    // to the specific extension that required it which is most likely PDFJS
-    if (origin.startsWith('chrome-extension://') && permission === 'openExternal') {
+    // The Torrent Viewer extension is always allowed to show fullscreen media
+    if (permission === 'fullscreen' &&
+      origin.startsWith('chrome-extension://' + config.torrentExtensionId)) {
+      cb(true)
+      return
+    }
+
+    // The Brave extension and PDFJS are always allowed to open files in an external app
+    if (permission === 'openExternal' && (
+      origin.startsWith('chrome-extension://' + config.PDFJSExtensionId) ||
+      origin.startsWith('chrome-extension://' + config.braveExtensionId))) {
       cb(true)
       return
     }
@@ -369,7 +377,8 @@ function registerPermissionHandler (session, partition) {
     const appState = appStore.getState()
     let settings
     let tempSettings
-    if (mainFrameUrl === appUrlUtil.getIndexHTML() || origin.startsWith('chrome-extension://' + config.braveExtensionId)) {
+    if (mainFrameUrl === appUrlUtil.getBraveExtIndexHTML() ||
+      origin.startsWith('chrome-extension://' + config.braveExtensionId)) {
       // lookup, display and store site settings by "Brave Browser"
       origin = 'Brave Browser'
       // display on all tabs
@@ -378,6 +387,12 @@ function registerPermissionHandler (session, partition) {
       // a parseable URL
       settings = siteSettings.getSiteSettingsForHostPattern(appState.get('siteSettings'), origin)
       tempSettings = siteSettings.getSiteSettingsForHostPattern(appState.get('temporarySiteSettings'), origin)
+    } else if (mainFrameUrl.startsWith('magnet:')) {
+      // Show "Allow magnet URL to open an external application?", instead of
+      // "Allow null to open an external application?"
+      // This covers an edge case where you open a magnet link tab, then disable Torrent Viewer
+      // and restart Brave. I don't think it needs localization. See 'Brave Browser' above.
+      origin = 'Magnet URL'
     } else {
       // Strip trailing slash
       origin = getOrigin(origin)
