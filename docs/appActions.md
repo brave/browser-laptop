@@ -541,6 +541,12 @@ Notify the AppStore to provide default history values.
 
 
 
+### dataURLCopied() 
+
+Dispatch a message to copy data URL to clipboard
+
+
+
 
 * * *
 
