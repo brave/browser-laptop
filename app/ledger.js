@@ -35,6 +35,7 @@ const ledgerClient = require('ledger-client')
 const ledgerGeoIP = require('ledger-geoip')
 const ledgerPublisher = require('ledger-publisher')
 const qr = require('qr-image')
+const querystring = require('querystring')
 const random = require('random-lib')
 const tldjs = require('tldjs')
 const underscore = require('underscore')
@@ -994,7 +995,19 @@ var updateLedgerInfo = () => {
     underscore.extend(ledgerInfo,
                       underscore.pick(info, [ 'address', 'passphrase', 'balance', 'unconfirmed', 'satoshis', 'btc', 'amount',
                                               'currency' ]))
-    if ((!info.buyURLExpires) || (info.buyURLExpires > now)) ledgerInfo.buyURL = info.buyURL
+    if ((!info.buyURLExpires) || (info.buyURLExpires > now)) {
+      ledgerInfo.buyURL = info.buyURL
+      ledgerInfo.buyMaximumUSD = 6
+    }
+    if (typeof process.env.ADDFUNDS_URL !== 'undefined') {
+      ledgerInfo.buyURLFrame = true
+      ledgerInfo.buyURL = process.env.ADDFUNDS_URL + '?' +
+                          querystring.stringify({ currency: ledgerInfo.currency,
+                                                  amount: getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT),
+                                                  address: ledgerInfo.address })
+      ledgerInfo.buyMaximumUSD = false
+    }
+
     underscore.extend(ledgerInfo, ledgerInfo._internal.cache || {})
   }
 
