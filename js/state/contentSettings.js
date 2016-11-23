@@ -14,7 +14,6 @@ const urlParse = require('url').parse
 const siteSettings = require('./siteSettings')
 const {setUserPref} = require('./userPrefs')
 const {getSetting} = require('../settings')
-const {getIndexHTML} = require('../lib/appUrlUtil')
 
 // backward compatibility with appState siteSettings
 const parseSiteSettingsPattern = (pattern) => {
@@ -177,9 +176,6 @@ const getContentSettingsFromSiteSettings = (appState, isPrivate = false) => {
     plugins: [{
       setting: 'block',
       primaryPattern: '*'
-    }, {
-      setting: 'allow',
-      primaryPattern: getIndexHTML()
     }]
   }
 

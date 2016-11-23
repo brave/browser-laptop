@@ -7,29 +7,29 @@ const assert = require('assert')
 
 // TODO(bridiver) - make these generic validation functions
 const validateId = function (propName, id) {
-  assert(id, `${propName} cannot be null`)
+  assert.ok(id, `${propName} cannot be null`)
   id = parseInt(id)
-  assert(id > 0, `${propName} must be positive`)
+  assert.ok(id > 0, `${propName} must be positive`)
   return id
 }
 
 const validateState = function (state) {
   state = makeImmutable(state)
-  assert(isMap(state), 'state must be an Immutable.Map')
-  assert(isList(state.get('windows')), 'state must contain an Immutable.List of windows')
+  assert.ok(isMap(state), 'state must be an Immutable.Map')
+  assert.ok(isList(state.get('windows')), 'state must contain an Immutable.List of windows')
   return state
 }
 
 const validateWindowValue = function (windowValue) {
   windowValue = makeImmutable(windowValue)
-  assert(isMap(windowValue), 'windowValue must be an Immutable.Map')
-  assert(windowValue.get('windowId'), 'window must have a windowId')
+  assert.ok(isMap(windowValue), 'windowValue must be an Immutable.Map')
+  assert.ok(windowValue.get('windowId'), 'window must have a windowId')
   return windowValue
 }
 
 const validateAction = function (action) {
   action = makeImmutable(action)
-  assert(isMap(action), 'action must be an Immutable.Map')
+  assert.ok(isMap(action), 'action must be an Immutable.Map')
   return action
 }
 
@@ -45,7 +45,7 @@ const api = {
     action = validateAction(action)
     state = validateState(state)
     let windowValue = validateWindowValue(action.get('windowValue'))
-    assert(!api.getWindow(state, windowValue), 'Window already exists')
+    assert.ok(!api.getWindow(state, windowValue), 'Window already exists')
     return state.set('windows', state.get('windows').push(windowValue))
   },
 
@@ -93,7 +93,7 @@ const api = {
 
   removeWindowByIndex: (state, index) => {
     index = parseInt(index)
-    assert(index >= 0, 'index must be positive')
+    assert.ok(index >= 0, 'index must be positive')
     state = validateState(state)
     return state.set('windows', state.get('windows').delete(index))
   },
@@ -124,7 +124,7 @@ const api = {
       windowId = validateId('windowId', windowId)
       let currentWindowId = currentWindowValue.get('windowId')
       if (currentWindowId) {
-        assert(windowId === currentWindowId, 'Changing a windowId is not allowed')
+        assert.ok(windowId === currentWindowId, 'Changing a windowId is not allowed')
       }
     }
     if (!action.get('replace')) {

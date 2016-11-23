@@ -6,43 +6,43 @@ const { makeImmutable, isMap, isList } = require('./immutableUtil')
 const assert = require('assert')
 
 const validateId = function (propName, id) {
-  assert(id, `${propName} cannot be null`)
+  assert.ok(id, `${propName} cannot be null`)
   id = parseInt(id)
-  assert(id === -1 || id > 0, `${propName} must be positive`)
+  assert.ok(id === -1 || id > 0, `${propName} must be positive`)
   return id
 }
 
 const validateTabs = function (tabs) {
   tabs = makeImmutable(tabs)
-  assert(isList(tabs), 'tabs must be an Immutable.List')
+  assert.ok(isList(tabs), 'tabs must be an Immutable.List')
   tabs.forEach((tab) => validateTabValue(tab))
   return tabs
 }
 
 const validateState = function (state) {
   state = makeImmutable(state)
-  assert(isMap(state), 'state must be an Immutable.Map')
-  assert(isList(state.get('tabs')), 'state must contain an Immutable.List of tabs')
+  assert.ok(isMap(state), 'state must be an Immutable.Map')
+  assert.ok(isList(state.get('tabs')), 'state must contain an Immutable.List of tabs')
   return state
 }
 
 const validateWindowValue = function (windowValue) {
   windowValue = makeImmutable(windowValue)
-  assert(isMap(windowValue), 'windowValue must be an Immutable.Map')
-  assert(windowValue.get('windowId'), 'window must have a windowId')
+  assert.ok(isMap(windowValue), 'windowValue must be an Immutable.Map')
+  assert.ok(windowValue.get('windowId'), 'window must have a windowId')
   return windowValue
 }
 
 const validateTabValue = function (tabValue) {
   tabValue = makeImmutable(tabValue)
-  assert(isMap(tabValue), 'tabValue must be an Immutable.Map')
-  assert(tabValue.get('tabId'), 'tab must have a tabId')
+  assert.ok(isMap(tabValue), 'tabValue must be an Immutable.Map')
+  assert.ok(tabValue.get('tabId'), 'tab must have a tabId')
   return tabValue
 }
 
 const validateAction = function (action) {
   action = makeImmutable(action)
-  assert(isMap(action), 'action must be an Immutable.Map')
+  assert.ok(isMap(action), 'action must be an Immutable.Map')
   return action
 }
 
@@ -74,7 +74,7 @@ const api = {
 
   removeTabByIndex: (state, index) => {
     index = parseInt(index)
-    assert(index >= 0, 'index must be positive')
+    assert.ok(index >= 0, 'index must be positive')
     state = validateState(state)
     return state.set('tabs', state.get('tabs').delete(index))
   },
@@ -96,7 +96,7 @@ const api = {
     action = validateAction(action)
     state = validateState(state)
     let tabValue = validateTabValue(action.get('tabValue'))
-    assert(!api.getTab(state, tabValue), 'Tab already exists')
+    assert.ok(!api.getTab(state, tabValue), 'Tab already exists')
     return state.set('tabs', state.get('tabs').push(tabValue))
   },
 
@@ -156,7 +156,7 @@ const api = {
       tabId = validateId('tabId', tabId)
       let currentTabId = currentTabValue.get('tabId')
       if (currentTabId) {
-        assert(tabId === currentTabId, 'Changing a tabId is not allowed')
+        assert.ok(tabId === currentTabId, 'Changing a tabId is not allowed')
       }
     }
     if (!action.get('replace')) {
