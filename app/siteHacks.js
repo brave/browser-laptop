@@ -15,7 +15,7 @@ module.exports.init = () => {
   if (!appConfig[resourceName].enabled) {
     return
   }
-  Filtering.registerBeforeSendHeadersFilteringCB((details) => {
+  Filtering.registerBeforeSendHeadersFilteringCB((details, isPrivate) => {
     if (details.resourceType !== 'mainFrame') {
       return {
         resourceName
@@ -31,7 +31,7 @@ module.exports.init = () => {
       const result = hack.onBeforeSendHeaders.call(this, details)
       if (result && result.customCookie) {
         customCookie = result.customCookie
-      } else if (Filtering.isResourceEnabled(appConfig.resourceNames.NOSCRIPT, 'https://twitter.com/') &&
+      } else if (Filtering.isResourceEnabled(appConfig.resourceNames.NOSCRIPT, 'https://twitter.com/', isPrivate) &&
         result && result.cancel) {
         // cancel is only called on Twitter where noscript is enabled
         cancel = true
@@ -43,7 +43,7 @@ module.exports.init = () => {
       cancel
     }
   })
-  Filtering.registerBeforeRequestFilteringCB((details) => {
+  Filtering.registerBeforeRequestFilteringCB((details, isPrivate) => {
     let domain = URL.parse(details.url).hostname
     let hack = siteHacks[domain]
 
@@ -58,8 +58,8 @@ module.exports.init = () => {
     }
     if (hack && hack.onBeforeRequest &&
         (hack.enableForAll ||
-         hack.enableForAdblock && Filtering.isResourceEnabled(appConfig.resourceNames.ADBLOCK, mainFrameUrl) ||
-         hack.enableForTrackingProtection && Filtering.isResourceEnabled(appConfig.resourceNames.TRACKING_PROTECTION, mainFrameUrl))) {
+         hack.enableForAdblock && Filtering.isResourceEnabled(appConfig.resourceNames.ADBLOCK, mainFrameUrl, isPrivate) ||
+         hack.enableForTrackingProtection && Filtering.isResourceEnabled(appConfig.resourceNames.TRACKING_PROTECTION, mainFrameUrl, isPrivate))) {
       const result = hack.onBeforeRequest.call(this, details)
       if (result && result.redirectURL) {
         redirectURL = result.redirectURL

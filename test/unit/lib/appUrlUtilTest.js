@@ -63,7 +63,6 @@ describe('appUrlUtil test', function () {
     })
   })
 
-
   describe('newFrameUrl', function () {
     describe('when NEWTAB_MODE = HOMEPAGE', function () {
       it('returns the configured home page', function () {
