@@ -14,6 +14,7 @@ const dndData = require('../dndData')
 const cx = require('../lib/classSet')
 const SortableTable = require('../components/sortableTable')
 const siteUtil = require('../state/siteUtil')
+const formatUtil = require('../../app/common/lib/formatUtil')
 const iconSize = require('../../app/common/lib/faviconUtil').iconSize
 
 const ipc = window.chrome.ipc
@@ -340,8 +341,8 @@ class BookmarksList extends ImmutableComponent {
             value: entry.get('customTitle') || entry.get('title') || entry.get('location')
           },
           {
-            html: new Date(entry.get('lastAccessedTime')).toLocaleString(),
-            value: entry.get('lastAccessedTime')
+            html: formatUtil.toLocaleString(entry.get('lastAccessedTime'), ''),
+            value: entry.get('lastAccessedTime') || 0
           }
         ])}
         rowObjects={this.props.bookmarks}
@@ -435,7 +436,7 @@ class AboutBookmarks extends React.Component {
     this.refs.bookmarkSearch.focus()
   }
   render () {
-    return <div className='siteDetailsPage'>
+    return <div className='siteDetailsPage' onClick={this.onClick}>
       <div className='siteDetailsPageHeader'>
         <div data-l10n-id='bookmarkManager' className='sectionTitle' />
         <div className='headerActions'>
@@ -450,7 +451,7 @@ class AboutBookmarks extends React.Component {
         </div>
       </div>
 
-      <div className='siteDetailsPageContent' onClick={this.onClick}>
+      <div className='siteDetailsPageContent'>
         <div className='folderView'>
           <div className='columnHeader'>
             <span data-l10n-id='folders' />

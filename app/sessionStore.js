@@ -22,6 +22,7 @@ const settings = require('../js/constants/settings')
 const downloadStates = require('../js/constants/downloadStates')
 const {tabFromFrame} = require('../js/state/frameStateUtil')
 const siteUtil = require('../js/state/siteUtil')
+const { topSites, pinnedTopSites } = require('../js/data/newTabData')
 const sessionStorageVersion = 1
 const filtering = require('./filtering')
 const autofill = require('./autofill')
@@ -327,7 +328,10 @@ module.exports.cleanAppData = (data, isShutdown) => {
     })
   }
 
-  delete data.versionInformation
+  if (data.about) {
+    delete data.about.brave
+    delete data.about.history
+  }
 }
 
 /**
@@ -343,6 +347,34 @@ module.exports.cleanSessionDataOnShutdown = () => {
     p = p.then(filtering.clearCache())
   }
   return p
+}
+
+/**
+ * version information (shown on about:brave)
+ */
+const setVersionInformation = (data) => {
+  try {
+    const os = require('os')
+    const versionInformation = [
+      {name: 'Brave', version: app.getVersion()},
+      {name: 'Muon', version: process.versions['atom-shell']},
+      {name: 'libchromiumcontent', version: process.versions['chrome']},
+      {name: 'V8', version: process.versions.v8},
+      {name: 'Node.js', version: process.versions.node},
+      {name: 'Update Channel', version: Channel.channel()},
+      {name: 'os.platform', version: os.platform()},
+      {name: 'os.release', version: os.release()},
+      {name: 'os.arch', version: os.arch()}
+      // TODO(bsclifton): read the latest commit hash from a file, etc.
+    ]
+    data.about = data.about || {}
+    data.about.brave = {
+      versionInformation: versionInformation
+    }
+  } catch (e) {
+    console.log('ERROR calling sessionStore::setVersionInformation(): ', e)
+  }
+  return data
 }
 
 /**
@@ -431,27 +463,13 @@ module.exports.loadAppState = () => {
           return
         }
       }
-
-      // version information (shown on about:brave)
-      const os = require('os')
-      const versionInformation = [
-        {name: 'brave', version: app.getVersion()},
-        {name: 'muon', version: process.versions['atom-shell']},
-        {name: 'libchromiumcontent', version: process.versions['chrome']},
-        {name: 'V8', version: process.versions.v8},
-        {name: 'Node.js', version: process.versions.node},
-        {name: 'channel', version: Channel.channel()},
-        {name: 'os.platform', version: os.platform()},
-        {name: 'os.release', version: os.release()},
-        {name: 'os.arch', version: os.arch()}
-        // TODO(bsclifton): read the latest commit hash from a file, etc.
-      ]
-      data.versionInformation = versionInformation
+      data = setVersionInformation(data)
     } catch (e) {
       // TODO: Session state is corrupted, maybe we should backup this
       // corrupted value for people to report into support.
       console.log('could not parse data: ', data)
       data = exports.defaultAppState()
+      data = setVersionInformation(data)
     }
     locale.init(data.settings[settings.LANGUAGE]).then((locale) => {
       app.setLocale(locale)
@@ -466,7 +484,7 @@ module.exports.loadAppState = () => {
 module.exports.defaultAppState = () => {
   return {
     firstRunTimestamp: new Date().getTime(),
-    sites: [],
+    sites: topSites,
     tabs: [],
     extensions: {},
     visits: [],
@@ -493,9 +511,9 @@ module.exports.defaultAppState = () => {
     about: {
       newtab: {
         gridLayoutSize: 'small',
-        sites: [],
+        sites: topSites,
         ignoredTopSites: [],
-        pinnedTopSites: []
+        pinnedTopSites: pinnedTopSites
       }
     },
     defaultWindowParams: {}

@@ -42,6 +42,7 @@ module.exports = {
     replacementUrl: adHost
   },
   braveExtensionId: 'mnojpmjdmbbfmejpflffifhffcmidifd',
+  torrentExtensionId: 'fmdpfempfmekjkcfdehndghogpnpjeno',
   PDFJSExtensionId: 'jdbefljfgobbmcidnmpjamcbhnbphjnb',
   PocketExtensionId: 'niloccemoadcdkdjlinkgdfekeahmflj',
   widevineComponentId: 'oimompecagnajdejgnnjijobebaeigek',

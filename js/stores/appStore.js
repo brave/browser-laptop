@@ -39,6 +39,7 @@ const basicAuthState = require('../../app/common/state/basicAuthState')
 const extensionState = require('../../app/common/state/extensionState')
 const tabState = require('../../app/common/state/tabState')
 const aboutNewTabState = require('../../app/common/state/aboutNewTabState')
+const aboutHistoryState = require('../../app/common/state/aboutHistoryState')
 const isDarwin = process.platform === 'darwin'
 const isWindows = process.platform === 'win32'
 
@@ -235,7 +236,7 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
 
   LocalShortcuts.register(mainWindow)
 
-  mainWindow.loadURL(appUrlUtil.getIndexHTML())
+  mainWindow.loadURL(appUrlUtil.getBraveExtIndexHTML())
   return mainWindow
 }
 
@@ -385,7 +386,7 @@ const handleAppAction = (action) => {
       })
       mainWindow.webContents.on('crashed', (e) => {
         console.error('Window crashed. Reloading...')
-        mainWindow.loadURL(appUrlUtil.getIndexHTML())
+        mainWindow.loadURL(appUrlUtil.getBraveExtIndexHTML())
 
         ipcMain.on(messages.NOTIFICATION_RESPONSE, function notificationResponseCallback (e, message, buttonIndex, persist) {
           if (message === locale.translation('unexpectedErrorWindowReload')) {
@@ -404,7 +405,7 @@ const handleAppAction = (action) => {
           message: locale.translation('unexpectedErrorWindowReload')
         })
       })
-      mainWindow.loadURL(appUrlUtil.getIndexHTML())
+      mainWindow.loadURL(appUrlUtil.getBraveExtIndexHTML())
       mainWindow.show()
       break
     case AppConstants.APP_CLOSE_WINDOW:
@@ -431,6 +432,12 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_CHANGE_NEW_TAB_DETAIL:
       appState = aboutNewTabState.mergeDetails(appState, action)
+      if (action.refresh) {
+        appState = aboutNewTabState.setSites(appState, action)
+      }
+      break
+    case AppConstants.APP_POPULATE_HISTORY:
+      appState = aboutHistoryState.setHistory(appState, action)
       break
     case AppConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size
@@ -448,11 +455,13 @@ const handleAppAction = (action) => {
       if (oldSiteSize !== appState.get('sites').size) {
         filterOutNonRecents()
       }
-      appState = aboutNewTabState.addSite(appState, action)
+      appState = aboutNewTabState.setSites(appState, action)
+      appState = aboutHistoryState.setHistory(appState, action)
       break
     case AppConstants.APP_REMOVE_SITE:
       appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag))
-      appState = aboutNewTabState.removeSite(appState, action)
+      appState = aboutNewTabState.setSites(appState, action)
+      appState = aboutHistoryState.setHistory(appState, action)
       break
     case AppConstants.APP_MOVE_SITE:
       appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent, false))
@@ -779,7 +788,7 @@ const handleAppAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_FAVICON:
       appState = appState.set('sites', siteUtil.updateSiteFavicon(appState.get('sites'), action.frameProps.get('location'), action.favicon))
-      appState = aboutNewTabState.updateSiteFavicon(appState, action)
+      appState = aboutNewTabState.setSites(appState, action)
       break
     case WindowConstants.WINDOW_SET_NAVIGATED:
       if (!action.isNavigatedInPage) {

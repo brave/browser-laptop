@@ -4,7 +4,7 @@ const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
 const {urlInput, urlBarSuggestions} = require('../lib/selectors')
 
-describe('urlbarSuggestions', function () {
+describe('urlBarSuggestions', function () {
   function * setup (client) {
     yield client
       .waitForUrl(Brave.newTabUrl)
@@ -18,9 +18,18 @@ describe('urlbarSuggestions', function () {
     this.page2Url = Brave.server.url('page2.html')
 
     yield setup(this.app.client)
+    const page1Url = this.page1Url
+    const page2Url = this.page2Url
     yield this.app.client
-      .tabByUrl(Brave.newTabUrl)
-      .loadUrl(this.page1Url)
+      .tabByIndex(0)
+      .loadUrl(page1Url)
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitUntil(function () {
+        return this.getAppState().then((val) => {
+          return !!val.value.sites.find((site) => site.location === page1Url)
+        })
+      })
+      .tabByIndex(0)
       .loadUrl(this.page2Url)
       .windowByUrl(Brave.browserWindowUrl)
       .ipcSend(messages.SHORTCUT_NEW_FRAME)
@@ -30,7 +39,7 @@ describe('urlbarSuggestions', function () {
       .waitForElementFocus(urlInput)
       .waitUntil(function () {
         return this.getAppState().then((val) => {
-          return val.value.sites.length === 2
+          return !!val.value.sites.find((site) => site.location === page2Url)
         })
       })
   })
@@ -52,7 +61,33 @@ describe('urlbarSuggestions', function () {
         return this.getValue(urlInput).then((val) => val === 'Page 1')
       })
       .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
-      .keys('\uE00C')
+      .keys(Brave.keys.ESCAPE)
+      .waitUntil(function () {
+        return this.isExisting(urlBarSuggestions).then((exists) => exists === false)
+      })
+  })
+
+  it('deactivates suggestions on backspace', function * () {
+    yield this.app.client
+      .setValue(urlInput, 'Page 1')
+      .waitUntil(function () {
+        return this.getValue(urlInput).then((val) => val === 'Page 1')
+      })
+      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
+      .keys(Brave.keys.BACKSPACE)
+      .waitUntil(function () {
+        return this.isExisting(urlBarSuggestions).then((exists) => exists === false)
+      })
+  })
+
+  it('deactivates suggestions on delete', function * () {
+    yield this.app.client
+      .setValue(urlInput, 'Page 1')
+      .waitUntil(function () {
+        return this.getValue(urlInput).then((val) => val === 'Page 1')
+      })
+      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
+      .keys(Brave.keys.DELETE)
       .waitUntil(function () {
         return this.isExisting(urlBarSuggestions).then((exists) => exists === false)
       })
@@ -76,11 +111,11 @@ describe('urlbarSuggestions', function () {
         return this.getValue(urlInput).then((val) => val === 'Page')
       })
       .waitForExist(urlBarSuggestions)
-      .keys('\uE015')
+      .keys(Brave.keys.DOWN)
       .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="1"].selected')
-      .keys('\uE015')
+      .keys(Brave.keys.DOWN)
       .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="2"].selected')
-      .keys('\uE007')
+      .keys(Brave.keys.ENTER)
       .tabByIndex(1).getUrl().should.become(this.page1Url)
   })
 
@@ -123,5 +158,16 @@ describe('urlbarSuggestions', function () {
           return val === page2Url // without moving mouse, typing rest of 1st option URL overwrites the autocomplete from mouseover
         })
       })
+  })
+
+  it('selection is not reset', function * () {
+    const pagePartialUrl = Brave.server.url('page')
+    yield this.app.client
+      .setValue(urlInput, pagePartialUrl)
+      .waitForExist(urlBarSuggestions)
+      .keys(Brave.keys.DOWN)
+      .keys(Brave.keys.CONTROL)
+      .keys(Brave.keys.CONTROL)
+      .waitForSelectedText('1.html')
   })
 })

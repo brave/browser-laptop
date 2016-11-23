@@ -83,7 +83,12 @@ module.exports.shouldRedownloadFirst = (resourceName, version) => {
  */
 module.exports.init = (resourceName, startExtension, onInitDone, forceDownload) => {
   const version = appConfig[resourceName].version
-  const url = appConfig[resourceName].url.replace('{version}', version)
+
+  let versionFolder = version
+  if (process.env.NODE_ENV === 'development' && resourceName === appConfig.resourceNames.ADBLOCK) {
+    versionFolder = 'test'
+  }
+  const url = appConfig[resourceName].url.replace('{version}', versionFolder)
 
   if (!appConfig[resourceName].enabled) {
     return

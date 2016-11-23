@@ -84,6 +84,20 @@ module.exports.formatAccelerator = (accelerator) => {
   return result
 }
 
+module.exports.toLocaleString = (epoch, defaultValue) => {
+  if (epoch && typeof epoch === 'number') {
+    try {
+      const date = new Date(epoch).toLocaleString()
+      if (date !== 'Invalid Date') {
+        return date
+      }
+    } catch (e) {
+      console.log('Error parsing date: ', e)
+    }
+  }
+  return defaultValue || ''
+}
+
 /**
  * Clamp values down to a given range (min/max).
  * Value is wrapped when out of bounds. ex:

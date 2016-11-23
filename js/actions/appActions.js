@@ -579,6 +579,15 @@ const appActions = {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_DEFAULT_BROWSER_CHECK_COMPLETE
     })
+  },
+
+  /**
+   * Notify the AppStore to provide default history values.
+   */
+  populateHistory: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_POPULATE_HISTORY
+    })
   }
 }
 

@@ -158,7 +158,7 @@ AppStore
       style: string // css class for notification bar. See notificationBar.less
     }
   }], // the notifications for the frame. not preserved across restart.
-  settings: [{
+  settings: {
     // See defaults in js/constants/appConfig.js
     'general.startup-mode': string, // One of: lastTime, homePage, newTabPage
     'general.homepage': string, // URL of the user's homepage
@@ -195,6 +195,7 @@ AppStore
     'advanced.hardware-acceleration-enabled': boolean, // false if hardware acceleration should be explicitly disabled
     'advanced.default-zoom-level': number, // the default zoom level for sites that have no specific setting
     'advanced.pdfjs-enabled': boolean, // Whether or not to render PDF documents in the browser
+    'advanced.torrent-viewer-enabled': boolean, // Whether to render magnet links in the browser
     'advanced.smooth-scroll-enabled': boolean, // false if smooth scrolling should be explicitly disabled
     'advanced.send-crash-reports': boolean, // true or undefined if crash reports should be sent
     'shutdown.clear-history': boolean, // true to clear history on shutdown
@@ -203,7 +204,7 @@ AppStore
     'shutdown.clear-all-site-cookies': boolean, // true to clear all site cookies on shutdown
     'adblock.customRules': string, // custom rules in ABP filter syntax
     'extensions.pocket.enabled': boolean, // true if pocket is enabled
-  }],
+  },
   dictionary: {
     locale: string, // en_US, en, or any other locale string
     ignoredWords: Array<string>, // List of words to ignore
@@ -220,11 +221,20 @@ AppStore
     }
   },
   about: {
+    brave: {
+      versionInformation: [{
+        name: string,
+        version: string
+      }] // used on about:brave. not persisted (removed on save)
+    },
+    history: {
+      entries: [object] // used on about:history. not persisted (removed on save)
+    },
     newtab: {
       gridLayoutSize: string, // 'small', 'medium', 'large'
-      sites: [string], // List of sites to be used on gridLayout
+      sites: [string], // List of sites to be used on gridLayout. Defaults to 6 Brave-related sites; see data/newTabData.js => topSites
       ignoredTopSites: [string], // List of ignored sites
-      pinnedTopSites: [string], // List of pinned sites
+      pinnedTopSites: [string], // List of pinned sites to be used on gridLayout. Defaults to 1 Brave-related site; see data/newTabData.js => pinnedTopSites
       updatedStamp: number // timestamp for when the data was last updated
     }
   },
@@ -499,7 +509,6 @@ WindowStore
     }
   },
   publisherInfo: {
-    enabled: boolean,            // display publisher information
     synopsis: [ { // one entry for each publisher having a non-zero `score`
       rank: number,              // i.e., 1, 2, 3, ...
       verified: boolean,         // there is a verified wallet for this publisher

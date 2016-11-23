@@ -25,6 +25,23 @@ describe('suggestion', function () {
     assert.ok(suggestion.simpleDomainNameValue(siteSimple) === 1, 'simple site returns 1')
     assert.ok(suggestion.simpleDomainNameValue(siteComplex) === 0, 'complex site returns 0')
   })
+
+  it('Determines prefixes which should be normalized', function () {
+    const prefixes = ['http://', 'https://', 'www.']
+    prefixes.forEach((prefix) => {
+      for (let i = 0; i < prefix.length; i++) {
+        const substring = prefix.substring(0, i + 1)
+        assert.equal(suggestion.shouldNormalizeLocation(substring), false)
+      }
+    })
+  })
+
+  it('Determines prefixes which should NOT be normalized', function () {
+    const prefixes = ['httphttp', 'brave.com', 'www3', 'http://www.x']
+    prefixes.forEach((prefix) => {
+      assert.equal(suggestion.shouldNormalizeLocation(prefix), true)
+    })
+  })
 })
 
 const site1 = Immutable.Map({

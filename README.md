@@ -74,6 +74,8 @@ After installing the prerequisites:
 
 If this fails on Linux with an error related to `abp-filter-parser-cpp`, try updating to Node 6.1 and `node-gyp` 3.3.1 (see discussion at https://github.com/brave/browser-laptop/issues/214)
 
+Instead of `npm install` you may also install with [yarn](https://github.com/yarnpkg/yarn).
+
 ### Troubleshooting
 
 Additional notes on troubleshooting installation issues are in the [Troubleshooting](https://github.com/brave/browser-laptop/wiki/Troubleshooting) page in the Wiki.
@@ -140,10 +142,9 @@ You can simply run an npm task to build and install your local electron instance
 
     npm run install
 
-If your directory structure isn't side by side, you can run the following (altering the rsync as needed):
+If your directory structure isn't side by side, you can run the following (altering the rsync as needed) command from within electron:
 
-    npm run build
-    rsync -avz --delete out/D/Brave.app {{path-to-browser-laptop}}/node_modules/electron-prebuilt/dist/
+    rsync -avz --delete out/D/Brave.app dist {{path-to-browser-laptop}}/node_modules/electron-prebuilt/dist/ 
 
 
 ## Packaging for bundles, installers, and updates
@@ -189,3 +190,9 @@ To create a package:
 To create a dev package:
 
     CHANNEL=dev npm run build-package
+
+Finally run:
+
+    npm run build-installer
+
+You will see a .deb and .rpm files in dist/

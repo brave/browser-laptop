@@ -26,6 +26,10 @@ class TabsToolbar extends ImmutableComponent {
   }
 
   onContextMenu (e) {
+    if (this.refs.tabs.wasNewTabClicked(e.target)) {
+      // Don't show the tabs menu if the new tab "+"" was clicked
+      return
+    }
     contextMenus.onTabsToolbarContextMenu(windowStore.getFrame(this.props.activeFrameKey), undefined, undefined, e)
   }
 
@@ -51,7 +55,9 @@ class TabsToolbar extends ImmutableComponent {
           />
         : null
       }
-      <Tabs tabs={unpinnedTabs}
+      <Tabs
+        ref='tabs'
+        tabs={unpinnedTabs}
         shouldAllowWindowDrag={this.props.shouldAllowWindowDrag}
         draggingOverData={this.props.draggingOverData}
         paintTabs={this.props.paintTabs}

@@ -1,11 +1,11 @@
-/* global describe, it, before */
+/* global describe, it, before, beforeEach */
 
 const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
-const {urlInput, backButton, forwardButton, activeTabTitle} = require('../lib/selectors')
+const {urlInput, backButton, forwardButton, activeTabTitle, newFrameButton} = require('../lib/selectors')
 
-describe('tabs', function () {
+describe('tab tests', function () {
   function * setup (client) {
     yield client
       .waitForUrl(Brave.newTabUrl)
@@ -70,6 +70,31 @@ describe('tabs', function () {
     it('makes the non partitioned webview visible', function * () {
       yield this.app.client
         .waitForVisible('webview[partition="persist:default"]')
+    })
+  })
+
+  describe('new tab button', function () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
+      yield setup(this.app.client)
+    })
+
+    it('creates a new tab when clicked', function * () {
+      yield this.app.client
+        .click(newFrameButton)
+        .waitForExist('.tab[data-frame-key="2"]')
+    })
+    it('shows a context menu when long pressed (click and hold)', function * () {
+      yield this.app.client
+        .moveToObject(newFrameButton)
+        .buttonDown(0)
+        .waitForExist('.contextMenu .contextMenuItem .contextMenuItemText')
+        .buttonUp(0)
+    })
+    it('shows a context menu when right clicked', function * () {
+      yield this.app.client
+        .rightClick(newFrameButton)
+        .waitForExist('.contextMenu .contextMenuItem .contextMenuItemText')
     })
   })
 

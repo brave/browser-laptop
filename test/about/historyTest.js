@@ -168,5 +168,27 @@ describe('about:history', function () {
         .keys(Brave.keys.SHIFT)
         .click('table.sortableTable td.title[data-sort="Brave"]')
     })
+    it('deselects everything if something other than the table is clicked', function * () {
+      yield this.app.client
+        .tabByUrl(aboutHistoryUrl)
+        .loadUrl(aboutHistoryUrl)
+        // Click one bookmark, to select it
+        .click('table.sortableTable td.title[data-sort="Brave"]')
+        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
+        // Click the search box; this should dismiss and release selection
+        .click('input#historySearch')
+        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]', 5000, true)
+    })
+    it('does not lose selection if table is sorted', function * () {
+      yield this.app.client
+        .tabByUrl(aboutHistoryUrl)
+        .loadUrl(aboutHistoryUrl)
+        // Click one bookmark, to select it
+        .click('table.sortableTable td.title[data-sort="Brave"]')
+        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
+        // Click the "title" header; this sort the rows (but keep selection)
+        .click('table.sortableTable th')
+        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
+    })
   })
 })

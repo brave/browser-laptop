@@ -27,6 +27,7 @@ describe('Clear Browsing Panel', function () {
       const page1Url = Brave.server.url('page1.html')
       yield setup(this.app.client)
       yield this.app.client
+        .clearAppData({browserHistory: true})
         .tabByIndex(0)
         .loadUrl(page1Url)
         .waitForBrowserWindow()
@@ -73,6 +74,7 @@ describe('Clear Browsing Panel', function () {
       const page1Url = Brave.server.url('page1.html')
       yield setup(this.app.client)
       yield this.app.client
+        .clearAppData({browserHistory: true})
         .tabByIndex(0)
         .loadUrl(page1Url)
         .waitForBrowserWindow()

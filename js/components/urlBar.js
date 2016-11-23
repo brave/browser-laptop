@@ -69,12 +69,6 @@ class UrlBar extends ImmutableComponent {
     return this.props.urlbar.get('focused')
   }
 
-  updateDOMInputFocus (focused) {
-    if (this.urlInput && focused) {
-      this.focus()
-    }
-  }
-
   // restores the url bar to the current location
   restore () {
     const location = UrlUtil.getDisplayLocation(this.props.location, getSetting(settings.PDFJS_ENABLED))
@@ -146,7 +140,6 @@ class UrlBar extends ImmutableComponent {
           }
           // this can't go through appActions for some reason
           // or the whole window will reload on the first page request
-          this.updateDOMInputFocus(false)
           this.clearSearchEngine()
         }
         windowActions.setRenderUrlBarSuggestions(false)
@@ -187,6 +180,7 @@ class UrlBar extends ImmutableComponent {
         }
         break
       case KeyCodes.BACKSPACE:
+        this.hideAutoComplete()
         this.clearSearchEngine()
         break
       case KeyCodes.TAB:
@@ -259,12 +253,26 @@ class UrlBar extends ImmutableComponent {
     this.searchSelectEntry = null
   }
 
+  get suggestionLocation () {
+    const selectedIndex = this.activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])
+    if (typeof selectedIndex === 'number') {
+      const suggestion = this.activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'suggestionList', selectedIndex - 1])
+      if (suggestion) {
+        return suggestion.location
+      }
+    }
+  }
+
   onChange (e) {
     const oldActivateSearchEngine = this.activateSearchEngine
     const oldSearchSelectEntry = this.searchSelectEntry
 
     this.clearSearchEngine()
     this.detectSearchEngine(e.target.value)
+
+    if (this.suggestionLocation) {
+      windowActions.setUrlBarSuggestions(undefined, null)
+    }
 
     // TODO: activeSearchEngine and searchSelectEntry should be stored in
     // state so we don't have to do this hack.
@@ -286,7 +294,9 @@ class UrlBar extends ImmutableComponent {
     if (this.isSelected()) {
       windowActions.setUrlBarSelected(false)
     }
-    windowActions.setNavBarUserInput(e.target.value)
+    if (this.locationValue + this.props.locationValueSuffix !== e.target.value) {
+      windowActions.setNavBarUserInput(e.target.value)
+    }
     this.clearSearchEngine()
     this.detectSearchEngine(e.target.value)
     this.keyPressed = false
@@ -332,8 +342,6 @@ class UrlBar extends ImmutableComponent {
       windowActions.setRenderUrlBarSuggestions(false)
       windowActions.setUrlBarSelected(true)
       windowActions.setUrlBarActive(true)
-      // The urlbar "selected" might already be set in the window state, so subsequent Command+L won't trigger component updates, so this needs another DOM refresh for selection.
-      this.updateDOMInputFocus()
     })
     // escape key handling
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_STOP, this.onActiveFrameStop)
@@ -349,8 +357,17 @@ class UrlBar extends ImmutableComponent {
   componentDidUpdate (prevProps) {
     // this.urlInput is not initialized in titleMode
     if (this.urlInput) {
-      // Select the part of the URL which was an autocomplete suffix.
-      if (this.props.location !== prevProps.location) {
+      if (this.props.activeFrameKey !== prevProps.activeFrameKey) {
+        // The user just changed tabs
+        this.urlInput.value = UrlUtil.getDisplayLocation(this.props.urlbar.get('location'), getSetting(settings.PDFJS_ENABLED))
+        // Each tab has a focused state stored separately
+        if (this.isFocused()) {
+          this.focus()
+        }
+        windowActions.setUrlBarSuggestions(undefined, null)
+        windowActions.setRenderUrlBarSuggestions(false)
+      } else if (this.props.location !== prevProps.location) {
+        // This is a url nav change
         this.urlInput.value = UrlUtil.getDisplayLocation(this.props.location, getSetting(settings.PDFJS_ENABLED))
       } else if (this.props.locationValueSuffix.length > 0 && this.isActive &&
         (this.props.locationValueSuffix !== prevProps.locationValueSuffix ||
@@ -360,18 +377,12 @@ class UrlBar extends ImmutableComponent {
           this.props.titleMode !== prevProps.titleMode ||
           !this.isActive && !this.isFocused) {
         this.urlInput.value = this.locationValue
-      } else if (this.isActive) {
-        const selectedIndex = this.activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])
-        if (typeof selectedIndex === 'number') {
-          const suggestionLocation = this.activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'suggestionList', selectedIndex - 1]).location
-          this.urlInput.value = suggestionLocation
-        }
+      } else if (this.props.urlbar.get('location') !== prevProps.urlbar.get('location') &&
+          this.urlInput.value !== this.props.urlbar.get('location')) {
+        this.urlInput.value = this.locationValue
       }
     }
-    if (this.isFocused() !== prevProps.urlbar.get('focused')) {
-      this.updateDOMInputFocus()
-    }
-    if (this.isSelected() !== prevProps.urlbar.get('selected')) {
+    if (this.isSelected() && !prevProps.urlbar.get('selected')) {
       this.select()
       windowActions.setUrlBarSelected(false)
     }

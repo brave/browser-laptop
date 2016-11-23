@@ -59,6 +59,7 @@ const hintCount = 3
 
 require('../../less/switchControls.less')
 require('../../less/about/preferences.less')
+require('../../less/forms.less')
 require('../../less/button.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
@@ -311,12 +312,24 @@ class BitcoinDashboard extends ImmutableComponent {
   constructor () {
     super()
     this.buyCompleted = false
+    this.openBuyURLTab = this.openBuyURLTab.bind(this)
+  }
+  openBuyURLTab () {
+    // close parent dialog
+    this.props.hideParentOverlay()
+    // open the new buyURL frame
+    aboutActions.newFrame({ location: this.ledgerData.get('buyURL') }, true)
   }
   get ledgerData () {
     return this.props.ledgerData
   }
   get bitcoinOverlayContent () {
     return <iframe src={this.ledgerData.get('buyURL')} />
+  }
+  get bitcoinPurchaseButton () {
+    if (!this.ledgerData.get('buyURLFrame')) return <Button l10nId='add' className='primaryButton' onClick={this.props.showOverlay.bind(this)} />
+// should also do this.props.hideParentalOverlay
+    return <Button l10nId='add' className='primaryButton' onClick={this.openBuyURLTab} />
   }
   get qrcodeOverlayContent () {
     return <div>
@@ -342,7 +355,9 @@ class BitcoinDashboard extends ImmutableComponent {
     return getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, this.props.settings) || 0
   }
   get canUseCoinbase () {
-    return this.currency === 'USD' && this.amount < 6
+    if (!this.props.ledgerData.get('buyMaximumUSD')) return true
+
+    return this.currency === 'USD' && this.amount < this.props.ledgerData.get('buyMaximumUSD')
   }
   get userInAmerica () {
     const countryCode = this.props.ledgerData.get('countryCode')
@@ -370,7 +385,7 @@ class BitcoinDashboard extends ImmutableComponent {
           <div className='settingsListSubTitle' data-l10n-id='moneyAddSubTitle' />
         </div>
         <div className='settingsPanelDivider'>
-          <Button l10nId='add' className='primaryButton' onClick={this.props.showOverlay.bind(this)} />
+          {this.bitcoinPurchaseButton}
           <div className='settingsListSubTitle' data-l10n-id='transferTime' />
         </div>
       </div>
@@ -419,7 +434,11 @@ class BitcoinDashboard extends ImmutableComponent {
     </div>
   }
   get panelFooter () {
-    if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
+    if (this.ledgerData.get('buyURLFrame')) {
+      return <div className='panelFooter'>
+        <Button l10nId='done' className='pull-right whiteButton' onClick={this.props.hideParentOverlay} />
+      </div>
+    } else if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
       return <div className='panelFooter'>
         <div id='coinbaseLogo' />
         <span className='coinbaseMessage' data-l10n-id='coinbaseMessage' />
@@ -641,11 +660,12 @@ class GeneralTab extends ImmutableComponent {
           onClick={this.setAsDefaultBrowser} />
       </SettingItem>
 
+    const defaultZoomSetting = getSetting(settings.DEFAULT_ZOOM_LEVEL, this.props.settings)
     return <SettingsList>
       <div className='sectionTitle' data-l10n-id='generalSettings' />
       <SettingsList>
         <SettingItem dataL10nId='startsWith'>
-          <select value={getSetting(settings.STARTUP_MODE, this.props.settings)}
+          <select className='form-control' value={getSetting(settings.STARTUP_MODE, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.STARTUP_MODE)} >
             <option data-l10n-id='startsWithOptionLastTime' value={startsWithOption.WINDOWS_TABS_FROM_LAST_TIME} />
             <option data-l10n-id='startsWithOptionHomePage' value={startsWithOption.HOMEPAGE} />
@@ -653,15 +673,17 @@ class GeneralTab extends ImmutableComponent {
           </select>
         </SettingItem>
         <SettingItem dataL10nId='newTabMode'>
-          <select value={getSetting(settings.NEWTAB_MODE, this.props.settings)}
+          <select className='form-control' value={getSetting(settings.NEWTAB_MODE, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.NEWTAB_MODE)} >
             <option data-l10n-id='newTabNewTabPage' value={newTabMode.NEW_TAB_PAGE} />
             <option data-l10n-id='newTabHomePage' value={newTabMode.HOMEPAGE} />
             <option data-l10n-id='newTabDefaultSearchEngine' value={newTabMode.DEFAULT_SEARCH_ENGINE} />
+            <option data-l10n-id='newTabEmpty' value={newTabMode.EMPTY_NEW_TAB} />
           </select>
         </SettingItem>
         <SettingItem dataL10nId='myHomepage'>
           <input spellCheck='false'
+            className='form-control'
             data-l10n-id='homepageInput'
             value={homepageValue}
             onChange={changeSetting.bind(null, this.onChangeSetting, settings.HOMEPAGE)} />
@@ -674,7 +696,7 @@ class GeneralTab extends ImmutableComponent {
         }
         <SettingCheckbox dataL10nId='disableTitleMode' prefKey={settings.DISABLE_TITLE_MODE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingItem dataL10nId='bookmarkToolbarSettings'>
-          <select id='bookmarksBarSelect' value={getSetting(settings.BOOKMARKS_TOOLBAR_MODE, this.props.settings)}
+          <select className='form-control' id='bookmarksBarSelect' value={getSetting(settings.BOOKMARKS_TOOLBAR_MODE, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.BOOKMARKS_TOOLBAR_MODE)} >
             <option data-l10n-id='bookmarksBarTextOnly' value={bookmarksToolbarMode.TEXT_ONLY} />
             <option data-l10n-id='bookmarksBarTextAndFavicon' value={bookmarksToolbarMode.TEXT_AND_FAVICONS} />
@@ -685,9 +707,21 @@ class GeneralTab extends ImmutableComponent {
             onChangeSetting={this.props.onChangeSetting} />
         </SettingItem>
         <SettingItem dataL10nId='selectedLanguage'>
-          <select value={getSetting(settings.LANGUAGE, this.props.settings) || defaultLanguage}
+          <select className='form-control' value={getSetting(settings.LANGUAGE, this.props.settings) || defaultLanguage}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.LANGUAGE)} >
             {languageOptions}
+          </select>
+        </SettingItem>
+        <SettingItem dataL10nId='defaultZoomLevel'>
+          <select
+            className='form-control'
+            value={defaultZoomSetting === undefined || defaultZoomSetting === null ? config.zoom.defaultValue : defaultZoomSetting}
+            data-type='float'
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.DEFAULT_ZOOM_LEVEL)}>
+            {
+              config.zoom.zoomLevels.map((x) =>
+                <option value={x} key={x}>{getZoomValuePercentage(x) + '%'}</option>)
+            }
           </select>
         </SettingItem>
         <SettingItem dataL10nId='importBrowserData'>
@@ -792,6 +826,7 @@ class TabsTab extends ImmutableComponent {
       <SettingsList>
         <SettingItem dataL10nId='tabsPerTabPage'>
           <select
+            className='form-control'
             value={getSetting(settings.TABS_PER_PAGE, this.props.settings)}
             data-type='number'
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TABS_PER_PAGE)}>
@@ -872,7 +907,7 @@ class PaymentsTab extends ImmutableComponent {
     return <div>
       {
       !(this.props.ledgerData.get('balance') === undefined || this.props.ledgerData.get('balance') === null)
-        ? <input className='fundsAmount' readOnly value={this.btcToCurrencyString(this.props.ledgerData.get('balance'))} />
+        ? <input className='form-control fundsAmount' readOnly value={this.btcToCurrencyString(this.props.ledgerData.get('balance'))} />
         : <span><span data-l10n-id='accountBalanceLoading' /></span>
       }
       <a href='https://brave.com/Payments_FAQ.html' target='_blank'>
@@ -906,12 +941,15 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get walletStatus () {
+    const ledgerData = this.props.ledgerData
     let status = {}
-    if (this.props.ledgerData.get('created')) {
-      const transactions = this.props.ledgerData.get('transactions')
-      const pendingFunds = Number(this.props.ledgerData.get('unconfirmed') || 0)
-      if (pendingFunds + Number(this.props.ledgerData.get('balance') || 0) <
-          0.9 * Number(this.props.ledgerData.get('btc') || 0)) {
+    if (ledgerData.get('error')) {
+      status.id = 'statusOnError'
+    } else if (ledgerData.get('created')) {
+      const transactions = ledgerData.get('transactions')
+      const pendingFunds = Number(ledgerData.get('unconfirmed') || 0)
+      if (pendingFunds + Number(ledgerData.get('balance') || 0) <
+          0.9 * Number(ledgerData.get('btc') || 0)) {
         status.id = 'insufficientFundsStatus'
       } else if (pendingFunds > 0) {
         status.id = 'pendingFundsStatus'
@@ -921,7 +959,7 @@ class PaymentsTab extends ImmutableComponent {
       } else {
         status.id = 'createdWalletStatus'
       }
-    } else if (this.props.ledgerData.get('creating')) {
+    } else if (ledgerData.get('creating')) {
       status.id = 'creatingWalletStatus'
     } else {
       status.id = 'createWalletStatus'
@@ -988,6 +1026,7 @@ class PaymentsTab extends ImmutableComponent {
           <SettingsList>
             <SettingItem>
               <select
+                className='form-control'
                 defaultValue={minDuration || 8}
                 onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.MINIMUM_VISIT_TIME)}>>
                 <option value='5'>5 seconds</option>
@@ -1000,6 +1039,7 @@ class PaymentsTab extends ImmutableComponent {
           <SettingsList>
             <SettingItem>
               <select
+                className='form-control'
                 defaultValue={minPublisherVisits || 5}
                 onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.MINIMUM_VISITS)}>>>
                 <option value='2'>2 visits</option>
@@ -1096,9 +1136,9 @@ class PaymentsTab extends ImmutableComponent {
         <SettingsList>
           <SettingItem>
             <h3 data-l10n-id='firstRecoveryKey' />
-            <input onChange={this.handleFirstRecoveryKeyChange} type='text' />
+            <input className='form-control' onChange={this.handleFirstRecoveryKeyChange} type='text' />
             <h3 data-l10n-id='secondRecoveryKey' />
-            <input onChange={this.handleSecondRecoveryKeyChange} type='text' />
+            <input className='form-control' onChange={this.handleSecondRecoveryKeyChange} type='text' />
           </SettingItem>
         </SettingsList>
       </div>
@@ -1116,7 +1156,7 @@ class PaymentsTab extends ImmutableComponent {
 
   get nextReconcileDate () {
     const ledgerData = this.props.ledgerData
-    if (!ledgerData.get('reconcileStamp')) {
+    if ((ledgerData.get('error')) || (!ledgerData.get('reconcileStamp'))) {
       return null
     }
     const timestamp = ledgerData.get('reconcileStamp')
@@ -1180,7 +1220,7 @@ class PaymentsTab extends ImmutableComponent {
               <td>
                 <SettingsList>
                   <SettingItem>
-                    <select id='fundsSelectBox'
+                    <select className='form-control' id='fundsSelectBox'
                       value={getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT,
                         this.props.settings)}
                       onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)} >
@@ -1452,14 +1492,18 @@ class ShieldsTab extends ImmutableComponent {
       <div className='sectionTitle' data-l10n-id='braveryDefaults' />
       <SettingsList>
         <SettingItem dataL10nId='adControl'>
-          <select value={this.props.braveryDefaults.get('adControl')} onChange={this.onChangeAdControl}>
+          <select className='form-control'
+            value={this.props.braveryDefaults.get('adControl')}
+            onChange={this.onChangeAdControl}>
             <option data-l10n-id='showBraveAds' value='showBraveAds' />
             <option data-l10n-id='blockAds' value='blockAds' />
             <option data-l10n-id='allowAdsAndTracking' value='allowAdsAndTracking' />
           </select>
         </SettingItem>
         <SettingItem dataL10nId='cookieControl'>
-          <select value={this.props.braveryDefaults.get('cookieControl')} onChange={this.onChangeCookieControl}>
+          <select className='form-control'
+            value={this.props.braveryDefaults.get('cookieControl')}
+            onChange={this.onChangeCookieControl}>
             <option data-l10n-id='block3rdPartyCookie' value='block3rdPartyCookie' />
             <option data-l10n-id='allowAllCookies' value='allowAllCookies' />
           </select>
@@ -1519,7 +1563,9 @@ class SecurityTab extends ImmutableComponent {
       <div className='sectionTitle' data-l10n-id='passwordsAndForms' />
       <SettingsList>
         <SettingItem dataL10nId='passwordManager'>
-          <select value={getSetting(settings.ACTIVE_PASSWORD_MANAGER, this.props.settings)} onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.ACTIVE_PASSWORD_MANAGER)} >
+          <select className='form-control'
+            value={getSetting(settings.ACTIVE_PASSWORD_MANAGER, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.ACTIVE_PASSWORD_MANAGER)} >
             <option data-l10n-id='builtInPasswordManager' value={passwordManagers.BUILT_IN} />
             <option data-l10n-id='onePassword' value={passwordManagers.ONE_PASSWORD} />
             <option data-l10n-id='dashlane' value={passwordManagers.DASHLANE} />
@@ -1569,6 +1615,13 @@ class SecurityTab extends ImmutableComponent {
                 }, true)}>{'Adobe'}</span>.</span>
               : <span data-l10n-id='enableFlashSubtextLinux' />
           }
+          <div>
+            <span className='fa fa-info-circle' id='flashInfoIcon' />
+            <span><span data-l10n-id='flashTroubleshooting' />&nbsp;
+              <span className='linkText' onClick={aboutActions.newFrame.bind(null, {
+                location: 'https://github.com/brave/browser-laptop/wiki/Flash-Support-Deprecation-Proposal#troubleshooting-flash-issues'
+              }, true)}>{'wiki'}</span>.</span>
+          </div>
         </span>
       </SettingsList>
       { !isLinux
@@ -1588,21 +1641,9 @@ class SecurityTab extends ImmutableComponent {
 
 class AdvancedTab extends ImmutableComponent {
   render () {
-    const defaultZoomSetting = getSetting(settings.DEFAULT_ZOOM_LEVEL, this.props.settings)
     return <div>
       <div className='sectionTitle' data-l10n-id='contentSettings' />
       <SettingsList>
-        <SettingItem dataL10nId='defaultZoomLevel'>
-          <select
-            value={defaultZoomSetting === undefined || defaultZoomSetting === null ? config.zoom.defaultValue : defaultZoomSetting}
-            data-type='float'
-            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.DEFAULT_ZOOM_LEVEL)}>
-            {
-              config.zoom.zoomLevels.map((x) =>
-                <option value={x} key={x}>{getZoomValuePercentage(x) + '%'}</option>)
-            }
-          </select>
-        </SettingItem>
         <SettingCheckbox dataL10nId='useHardwareAcceleration' prefKey={settings.HARDWARE_ACCELERATION_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='useSmoothScroll' prefKey={settings.SMOOTH_SCROLL_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='sendCrashReports' prefKey={settings.SEND_CRASH_REPORTS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
@@ -1611,6 +1652,7 @@ class AdvancedTab extends ImmutableComponent {
       <div className='sectionTitle' data-l10n-id='extensions' />
       <SettingsList>
         <SettingCheckbox dataL10nId='usePDFJS' prefKey={settings.PDFJS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='useTorrentViewer' prefKey={settings.TORRENT_VIEWER_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='enablePocket' prefKey={settings.POCKET_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingItem>
           <Button l10nId='viewInstalledExtensions' className='primaryButton viewExtensionsInfo'
@@ -1797,8 +1839,8 @@ class AboutPreferences extends React.Component {
     })
     aboutActions.changeSetting(key, value)
     if (key === settings.DO_NOT_TRACK || key === settings.HARDWARE_ACCELERATION_ENABLED ||
-        key === settings.PDFJS_ENABLED || key === settings.SMOOTH_SCROLL_ENABLED ||
-        key === settings.SEND_CRASH_REPORTS) {
+        key === settings.PDFJS_ENABLED || key === settings.TORRENT_VIEWER_ENABLED ||
+        key === settings.SMOOTH_SCROLL_ENABLED || key === settings.SEND_CRASH_REPORTS) {
       ipc.send(messages.PREFS_RESTART, key, value)
     }
     if (key === settings.PAYMENTS_ENABLED) {

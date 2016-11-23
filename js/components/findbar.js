@@ -82,7 +82,7 @@ class FindBar extends ImmutableComponent {
     this.searchInput.value = this.searchString
     this.focus()
     this.select()
-    windowActions.setFindbarSelected(false)
+    windowActions.setFindbarSelected(this.frame, false)
   }
 
   componentWillUpdate (nextProps) {
@@ -97,7 +97,7 @@ class FindBar extends ImmutableComponent {
       // Findbar might already be focused, so make sure select happens even if no
       // onFocus event happens.
       this.select()
-      windowActions.setFindbarSelected(false)
+      windowActions.setFindbarSelected(this.frame, false)
     }
     if (!this.props.findDetail || !prevProps.findDetail ||
         this.props.findDetail.get('searchString') !== prevProps.findDetail.get('searchString') ||
@@ -199,10 +199,14 @@ class FindBar extends ImmutableComponent {
 
     const backgroundColor = this.backgroundColor
     let findBarStyle = {}
+    let findBarTextStyle = {}
 
     if (backgroundColor) {
       findBarStyle = {
         background: backgroundColor,
+        color: this.textColor
+      }
+      findBarTextStyle = {
         color: this.textColor
       }
     }
@@ -236,10 +240,10 @@ class FindBar extends ImmutableComponent {
           id='caseSensitivityCheckbox'
           checkedOn={this.isCaseSensitive}
           onClick={this.onCaseSensitivityChange} />
-        <label htmlFor='caseSensitivityCheckbox' data-l10n-id='caseSensitivity' style={findBarStyle} />
+        <label htmlFor='caseSensitivityCheckbox' data-l10n-id='caseSensitivity' style={findBarTextStyle} />
       </div>
       <span className='findButton closeButton'
-        style={findBarStyle}
+        style={findBarTextStyle}
         onClick={this.props.onFindHide}>+</span>
     </div>
   }

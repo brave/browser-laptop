@@ -4,7 +4,7 @@ const extensionActions = require('./common/actions/extensionActions')
 const config = require('../js/constants/config')
 const appConfig = require('../js/constants/appConfig')
 const {fileUrl} = require('../js/lib/appUrlUtil')
-const {getAppUrl, getExtensionsPath, getIndexHTML} = require('../js/lib/appUrlUtil')
+const {getExtensionsPath, getBraveExtUrl, getBraveExtIndexHTML} = require('../js/lib/appUrlUtil')
 const {getSetting} = require('../js/settings')
 const settings = require('../js/constants/settings')
 const extensionStates = require('../js/constants/extensionStates')
@@ -15,7 +15,21 @@ const appActions = require('../js/actions/appActions')
 const fs = require('fs')
 const path = require('path')
 
+// Takes Content Security Policy flags, for example { 'default-src': '*' }
+// Returns a CSP string, for example 'default-src: *;'
+let concatCSP = (cspDirectives) => {
+  let csp = ''
+  for (let directive in cspDirectives) {
+    csp += directive + ' ' + cspDirectives[directive] + '; '
+  }
+  return csp.trim()
+}
+
+// Returns the Chromium extension manifest for the braveExtension
+// The braveExtension handles about: pages, ad blocking, and a few other things
 let generateBraveManifest = () => {
+  const indexHTML = getBraveExtIndexHTML()
+
   let baseManifest = {
     name: 'brave',
     manifest_version: 2,
@@ -32,7 +46,7 @@ let generateBraveManifest = () => {
           'http://*/*', 'https://*/*', 'file://*', 'data:*', 'about:srcdoc'
         ],
         exclude_globs: [
-          getIndexHTML()
+          indexHTML
         ],
         match_about_blank: true,
         js: [
@@ -55,7 +69,7 @@ let generateBraveManifest = () => {
           'http://*/*', 'https://*/*', 'file://*', 'data:*', 'about:srcdoc'
         ],
         exclude_globs: [
-          getIndexHTML()
+          indexHTML
         ],
         js: [
           'content/scripts/adInsertion.js',
@@ -70,13 +84,13 @@ let generateBraveManifest = () => {
         matches: ['<all_urls>'],
         include_globs: [
           'http://*/*', 'https://*/*', 'file://*', 'data:*', 'about:srcdoc',
-          getIndexHTML(),
-          getAppUrl('about-*.html'),
-          getAppUrl('about-*.html') + '#*'
+          indexHTML,
+          getBraveExtUrl('about-*.html'),
+          getBraveExtUrl('about-*.html') + '#*'
         ],
         exclude_globs: [
-          getAppUrl('about-blank.html'),
-          getAppUrl('about-blank.html') + '#*'
+          getBraveExtUrl('about-blank.html'),
+          getBraveExtUrl('about-blank.html') + '#*'
         ],
         js: [
           'content/scripts/spellCheck.js',
@@ -93,13 +107,13 @@ let generateBraveManifest = () => {
           '<all_urls>'
         ],
         include_globs: [
-          getIndexHTML(),
-          getAppUrl('about-*.html'),
-          getAppUrl('about-*.html') + '#*'
+          indexHTML,
+          getBraveExtUrl('about-*.html'),
+          getBraveExtUrl('about-*.html') + '#*'
         ],
         exclude_globs: [
-          getAppUrl('about-blank.html'),
-          getAppUrl('about-blank.html') + '#*'
+          getBraveExtUrl('about-blank.html'),
+          getBraveExtUrl('about-blank.html') + '#*'
         ]
       }
     ],
@@ -137,13 +151,50 @@ let generateBraveManifest = () => {
     cspDirectives['style-src'] = '\'self\' \'unsafe-inline\' http://' + devServer
   }
 
-  var csp = ''
-  for (var directive in cspDirectives) {
-    csp += directive + ' ' + cspDirectives[directive] + '; '
-  }
-  baseManifest.content_security_policy = csp.trim()
+  baseManifest.content_security_policy = concatCSP(cspDirectives)
 
   return baseManifest
+}
+
+// Returns the Chromium extension manifest for the torrentExtension
+// The torrentExtension handles magnet: URLs
+// Analagous to the PDFJS extension, it shows a special UI for that type of resource
+let generateTorrentManifest = () => {
+  let cspDirectives = {
+    'default-src': '\'self\'',
+    'media-src': '\'self\' http://localhost:*',
+    'frame-src': 'http://localhost:*',
+    'form-action': '\'none\'',
+    'referrer': 'no-referrer',
+    'style-src': '\'self\' \'unsafe-inline\''
+  }
+
+  return {
+    name: 'Torrent Viewer',
+    manifest_version: 2,
+    version: '1.0',
+    content_security_policy: concatCSP(cspDirectives),
+    content_scripts: [],
+    permissions: [
+      'externally_connectable.all_urls', 'tabs', '<all_urls>'
+    ],
+    externally_connectable: {
+      matches: [
+        '<all_urls>'
+      ]
+    },
+    icons: {
+      128: 'img/webtorrent-128.png',
+      48: 'img/webtorrent-48.png',
+      16: 'img/webtorrent-16.png'
+    },
+    web_accessible_resources: [
+      'img/favicon.ico',
+      'img/webtorrent-128.png'
+    ],
+    incognito: 'split',
+    key: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyWl+wMvL0wZX3JUs7GeZAvxMP+LWEh2bwMV1HyuBra/lGZIq3Fmh0+AFnvFPXz1NpQkbLS3QWyqhdIn/lepGwuc2ma0glPzzmieqwctUurMGSGManApGO1MkcbSPhb+R1mx8tMam5+wbme4WoW37PI3oATgOs2NvHYuP60qol3U7b/zB3IWuqtwtqKe2Q1xY17btvPuz148ygWWIHneedt0jwfr6Zp+CSLARB9Heq/jqGXV4dPSVZ5ebBHLQ452iZkHxS6fm4Z+IxjKdYs3HNj/s8xbfEZ2ydnArGdJ0lpSK9jkDGYyUBugq5Qp3FH6zV89WqBvoV1dqUmL9gxbHsQIDAQAB'
+  }
 }
 
 const extensionInfo = {
@@ -246,7 +297,7 @@ module.exports.init = () => {
   let loadExtension = (extensionId, extensionPath, manifest = {}, manifestLocation = 'unpacked') => {
     if (!extensionInfo.isLoaded(extensionId) && !extensionInfo.isLoading(extensionId)) {
       extensionInfo.setState(extensionId, extensionStates.LOADING)
-      if (extensionId === config.braveExtensionId) {
+      if (extensionId === config.braveExtensionId || extensionId === config.torrentExtensionId) {
         session.defaultSession.extensions.load(extensionPath, manifest, manifestLocation)
         return
       }
@@ -289,9 +340,16 @@ module.exports.init = () => {
     }
   }
 
-  // Manually install only the braveExtension
+  // Manually install the braveExtension and torrentExtension
   extensionInfo.setState(config.braveExtensionId, extensionStates.REGISTERED)
   loadExtension(config.braveExtensionId, getExtensionsPath('brave'), generateBraveManifest(), 'component')
+  if (getSetting(settings.TORRENT_VIEWER_ENABLED)) {
+    extensionInfo.setState(config.torrentExtensionId, extensionStates.REGISTERED)
+    loadExtension(config.torrentExtensionId, getExtensionsPath('torrent'), generateTorrentManifest(), 'component')
+  } else {
+    extensionInfo.setState(config.torrentExtensionId, extensionStates.DISABLED)
+    extensionActions.extensionDisabled(config.torrentExtensionId)
+  }
 
   let registerComponents = () => {
     if (getSetting(settings.PDFJS_ENABLED)) {

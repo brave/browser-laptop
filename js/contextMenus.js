@@ -28,7 +28,7 @@ const locale = require('../js/l10n')
 const {getSetting} = require('./settings')
 const settings = require('./constants/settings')
 const textUtils = require('./lib/text')
-const {isIntermediateAboutPage, isUrl} = require('./lib/appUrlUtil')
+const {isIntermediateAboutPage, isUrl, aboutUrls} = require('./lib/appUrlUtil')
 const {getBase64FromImageUrl} = require('./lib/imageUtil')
 const urlParse = require('url').parse
 const eventUtil = require('./lib/eventUtil')
@@ -53,7 +53,7 @@ const addBookmarkMenuItem = (label, siteDetail, closestDestinationDetail, isPare
       if (isParent) {
         siteDetail = siteDetail.set('parentFolderId', closestDestinationDetail && (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
       }
-      windowActions.setBookmarkDetail(siteDetail, siteDetail, closestDestinationDetail, true)
+      windowActions.setBookmarkDetail(siteDetail, siteDetail, closestDestinationDetail, false, true)
     }
   }
 }
@@ -899,9 +899,13 @@ function mainTemplateInit (nodeProps, frame) {
   const isAudio = nodeProps.mediaType === 'audio'
   const isInputField = nodeProps.isEditable || nodeProps.inputFieldType !== 'none'
   const isTextSelected = nodeProps.selectionText.length > 0
+  const isAboutPage = aboutUrls.has(frame.get('location'))
 
   if (isLink) {
-    template.push(openInNewTabMenuItem(nodeProps.linkURL, frame.get('isPrivate'), frame.get('partitionNumber'), frame.get('key')),
+    if (!frame.get('isPrivate')) {
+      template.push(openInNewTabMenuItem(nodeProps.linkURL, frame.get('isPrivate'), frame.get('partitionNumber'), frame.get('key')))
+    }
+    template.push(
       openInNewPrivateTabMenuItem(nodeProps.linkURL, frame.get('key')),
       openInNewWindowMenuItem(nodeProps.linkURL, frame.get('isPrivate'), frame.get('partitionNumber')),
       CommonMenu.separatorMenuItem,
@@ -1052,35 +1056,44 @@ function mainTemplateInit (nodeProps, frame) {
             }
           },
           CommonMenu.separatorMenuItem,
-          addBookmarkMenuItem('bookmarkPage', siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false),
-          {
+          addBookmarkMenuItem('bookmarkPage', siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false))
+
+        if (!isAboutPage) {
+          template.push({
             label: locale.translation('savePageAs'),
             accelerator: 'CmdOrCtrl+S',
             click: function (item, focusedWindow) {
               CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_SAVE])
             }
-          }, {
-            label: locale.translation('find'),
-            accelerator: 'CmdOrCtrl+F',
-            click: function (item, focusedWindow) {
-              focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_SHOW_FINDBAR)
-            }
-          }, {
+          })
+        }
+
+        template.push({
+          label: locale.translation('find'),
+          accelerator: 'CmdOrCtrl+F',
+          click: function (item, focusedWindow) {
+            focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_SHOW_FINDBAR)
+          }
+        })
+
+        if (!isAboutPage) {
+          template.push({
             label: locale.translation('print'),
             accelerator: 'CmdOrCtrl+P',
             click: function (item, focusedWindow) {
               focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_PRINT)
             }
-          }
-          // CommonMenu.separatorMenuItem
-          // TODO: bravery menu goes here
-          )
+          })
+        }
+
+        // CommonMenu.separatorMenuItem
+        // TODO: bravery menu goes here
       }
 
       template.push(CommonMenu.separatorMenuItem)
     }
 
-    if (!isLink && !isImage) {
+    if (!isLink && !isImage && !isAboutPage) {
       template.push({
         label: locale.translation('viewPageSource'),
         accelerator: 'CmdOrCtrl+Alt+U',
@@ -1093,12 +1106,14 @@ function mainTemplateInit (nodeProps, frame) {
     }
   }
 
-  template.push({
-    label: locale.translation('inspectElement'),
-    click: (item, focusedWindow) => {
-      webviewActions.inspectElement(nodeProps.x, nodeProps.y)
-    }
-  })
+  if (!isAboutPage) {
+    template.push({
+      label: locale.translation('inspectElement'),
+      click: (item, focusedWindow) => {
+        webviewActions.inspectElement(nodeProps.x, nodeProps.y)
+      }
+    })
+  }
 
   const extensionContextMenus =
     extensionState.getContextMenusProperties(appStore.state)
@@ -1231,6 +1246,22 @@ function onTabContextMenu (frameProps, e) {
   const tabMenu = Menu.buildFromTemplate(tabTemplateInit(frameProps))
   tabMenu.popup(currentWindow)
   tabMenu.destroy()
+}
+
+function onNewTabContextMenu (target) {
+  const rect = target.getBoundingClientRect()
+  const menuTemplate = [
+    CommonMenu.newTabMenuItem(),
+    CommonMenu.newPrivateTabMenuItem(),
+    CommonMenu.newPartitionedTabMenuItem(),
+    CommonMenu.newWindowMenuItem()
+  ]
+
+  windowActions.setContextMenuDetail(Immutable.fromJS({
+    left: rect.left,
+    top: rect.bottom + 2,
+    template: menuTemplate
+  }))
 }
 
 function onTabsToolbarContextMenu (activeFrame, closestDestinationDetail, isParent, e) {
@@ -1443,6 +1474,7 @@ module.exports = {
   onHamburgerMenu,
   onMainContextMenu,
   onTabContextMenu,
+  onNewTabContextMenu,
   onTabsToolbarContextMenu,
   onDownloadsToolbarContextMenu,
   onTabPageContextMenu,

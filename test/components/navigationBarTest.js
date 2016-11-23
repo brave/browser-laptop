@@ -2,22 +2,22 @@
 
 const Brave = require('../lib/brave')
 const config = require('../../js/constants/config')
-const {urlBarSuggestions, urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime,
+const {urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime,
   navigator, titleBar, urlbarIcon, bookmarksToolbar, navigatorNotBookmarked, navigatorBookmarked,
   doneButton, allowRunInsecureContentButton, dismissAllowRunInsecureContentButton,
   denyRunInsecureContentButton, dismissDenyRunInsecureContentButton, activeTabTitle} = require('../lib/selectors')
 const urlParse = require('url').parse
 const assert = require('assert')
 const settings = require('../../js/constants/settings')
-const searchProviders = require('../../js/data/searchProviders')
 const messages = require('../../js/constants/messages')
 
-describe('navigationBar', function () {
+describe('navigationBar tests', function () {
   function * setup (client) {
     yield client
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
       .waitForEnabled(urlInput)
+      .changeSetting('general.disable-title-mode', false)
   }
 
   function * newFrame (client, frameKey = 2) {
@@ -37,7 +37,7 @@ describe('navigationBar', function () {
   function blur (client) {
     return client
       .waitForExist(activeWebview)
-      .leftClick(activeWebview) // clear focus from urlbar
+      .leftClick(activeWebview, 0, 0) // clear focus from urlbar
       .waitUntil(function () {
         return this.getSelectedText().then(function (value) { return value === '' })
       })
@@ -57,6 +57,57 @@ describe('navigationBar', function () {
   }
 
   describe('navigation', function () {
+    describe('focus', function () {
+      Brave.beforeAll(this)
+      before(function * () {
+        const page1 = Brave.server.url('page1.html')
+        yield this.app.client.waitForExist(urlInput)
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .tabByIndex(0)
+          .url(page1)
+          .waitForUrl(page1)
+          .windowByUrl(Brave.browserWindowUrl)
+          .ipcSend('shortcut-focus-url')
+          .waitForElementFocus(urlInput)
+          .keys(Brave.keys.ENTER)
+      })
+
+      it('webview has focus after initial load', function * () {
+        yield this.app.client.waitForElementFocus(activeWebview)
+      })
+
+      it('webview has focus after second load', function * () {
+        yield this.app.client
+          .ipcSend('shortcut-focus-url')
+          .waitForElementFocus(urlInput)
+          .keys(Brave.keys.ENTER)
+          .waitForElementFocus(activeWebview)
+      })
+
+      it('newtab hasfocus in urlbar', function * () {
+        yield this.app.client
+          .ipcSend(messages.SHORTCUT_NEW_FRAME)
+          .waitUntil(function () {
+            return this.getWindowState().then((val) => {
+              return val.value.frames.length === 2
+            })
+          })
+          .waitForElementFocus(urlInput)
+          .ipcSend(messages.SHORTCUT_CLOSE_FRAME, 2)
+      })
+      it('newtab with page has focus in webview', function * () {
+        var page1Url = Brave.server.url('tabnapping.html')
+        yield this.app.client
+          .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
+          .waitUntil(function () {
+            return this.getWindowState().then((val) => {
+              return val.value.frames.length === 2
+            })
+          })
+          .waitForElementFocus(activeWebview)
+      })
+    })
     describe('tabnapping', function () {
       Brave.beforeAll(this)
 
@@ -364,12 +415,28 @@ describe('navigationBar', function () {
           .moveToObject(navigator)
           .waitForExist(urlbarIcon)
           .getAttribute(urlbarIcon, 'class').then((classes) =>
-            classes.includes('fa-exclamation-triangle')
+            classes.includes('fa-unlock')
         ))
         .windowByUrl(Brave.browserWindowUrl)
         .click(urlbarIcon)
         .waitForVisible('[data-l10n-id="insecureConnection"]')
         .keys(Brave.keys.ESCAPE)
+    })
+    it('Shows insecure URL icon in title mode', function * () {
+      const page1Url = Brave.server.url('page1.html')
+      yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
+      yield this.app.client
+        .moveToObject(navigator)
+        .waitForExist(urlInput)
+        .waitForValue(urlInput)
+      yield this.app.client
+        .moveToObject(activeWebview)
+        .click(activeWebview)
+        .waitForExist(titleBar)
+        .isExisting(urlbarIcon).then((isExisting) => assert(isExisting))
+        .getAttribute(urlbarIcon, 'class').then((classes) =>
+          classes.includes('fa-unlock')
+        )
     })
     it('Shows secure URL icon', function * () {
       const page1Url = 'https://badssl.com/'
@@ -386,6 +453,22 @@ describe('navigationBar', function () {
         .waitForVisible('[data-l10n-id="secureConnection"]')
         .keys(Brave.keys.ESCAPE)
     })
+    it('Shows secure URL icon in title mode', function * () {
+      const page1Url = Brave.server.url('page1.html')
+      yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
+      yield this.app.client
+        .moveToObject(navigator)
+        .waitForExist(urlInput)
+        .waitForValue(urlInput)
+      yield this.app.client
+        .moveToObject(activeWebview)
+        .click(activeWebview)
+        .waitForExist(titleBar)
+        .isExisting(urlbarIcon).then((isExisting) => assert(isExisting))
+        .getAttribute(urlbarIcon, 'class').then((classes) =>
+          classes.includes('fa-lock')
+        )
+    })
     it('does not show secure icon if page load fails', function * () {
       const page1Url = Brave.server.url('ssl_spoof.html')
       yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
@@ -394,6 +477,30 @@ describe('navigationBar', function () {
         .waitForExist(urlbarIcon)
         .getAttribute(urlbarIcon, 'class').then((classes) =>
           assert(!classes.includes('fa-lock'))
+        )
+    })
+    it('shows secure icon on a site with passive mixed content', function * () {
+      const page1Url = 'https://mixed.badssl.com/'
+      yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
+      yield this.app.client
+        .moveToObject(navigator)
+        .waitForExist(urlbarIcon)
+        .waitUntil(() =>
+          this.app.client.getAttribute(urlbarIcon, 'class').then((classes) =>
+            classes.includes('fa-lock')
+          )
+        )
+    })
+    it('shows insecure icon on a site with a sha-1 cert', function * () {
+      const page1Url = 'https://very.badssl.com/'
+      yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
+      yield this.app.client
+        .moveToObject(navigator)
+        .waitForExist(urlbarIcon)
+        .waitUntil(() =>
+          this.app.client.getAttribute(urlbarIcon, 'class').then((classes) =>
+            classes.includes('fa-unlock')
+          )
         )
     })
     it('Blocks running insecure content', function * () {
@@ -811,14 +918,14 @@ describe('navigationBar', function () {
       })
     })
 
-    describe('with blank url input value', function () {
-      Brave.beforeAll(this)
+    describe('with about page url input values', function () {
+      Brave.beforeEach(this)
 
-      before(function * () {
+      beforeEach(function * () {
         yield setup(this.app.client)
         yield this.app.client.waitForExist(urlInput)
       })
-      it('hides about:newtab', function * () {
+      it('hides "about:newtab" inside the URL bar', function * () {
         yield this.app.client
           .tabByUrl(this.newTabUrl)
           .windowByUrl(Brave.browserWindowUrl)
@@ -826,7 +933,7 @@ describe('navigationBar', function () {
             return this.getValue(urlInput).then((val) => val === '')
           })
       })
-      it('shows about:blank', function * () {
+      it('shows "about:blank" in the URL bar', function * () {
         yield this.app.client
           .keys('about:blank')
           .keys(Brave.keys.ENTER)
@@ -834,202 +941,26 @@ describe('navigationBar', function () {
             return this.getValue(urlInput).then((val) => val === 'about:blank')
           })
       })
-      it('has the search icon', function * () {
-        yield this.app.client.waitForExist('.urlbarIcon.fa-search')
+      it('shows the search icon in URL bar for "about:newtab"', function * () {
+        yield this.app.client
+          .tabByUrl(this.newTabUrl)
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitForExist('.urlbarIcon.fa-search')
+      })
+      it('shows the list icon in URL bar for other about pages', function * () {
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .keys('about:about')
+          .keys(Brave.keys.ENTER)
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => val === 'about:about')
+          })
+          .waitForExist('.urlbarIcon.fa-list')
       })
     })
 
     describe('page with focused form input', function () {
       it('loads the url without submitting the form')
-    })
-  })
-
-  describe('typing', function () {
-    Brave.beforeAll(this)
-
-    before(function * () {
-      yield setup(this.app.client)
-      yield this.app.client.waitForExist(urlInput)
-      yield this.app.client.waitForElementFocus(urlInput)
-      yield this.app.client.waitUntil(function () {
-        return this.getValue(urlInput).then((val) => val === '')
-      })
-
-      yield this.app.client
-        .addSite({ location: 'https://brave.com', title: 'Brave' })
-
-      // now type something
-      yield this.app.client
-        .setValue(urlInput, 'b')
-        .waitUntil(function () {
-          return this.getValue(urlInput).then((val) => val === 'b')
-        })
-        .waitForExist(urlBarSuggestions + ' li')
-    })
-
-    it('sets the value to "b"', function * () {
-      yield this.app.client.waitUntil(function () {
-        return this.getValue(urlInput).then((val) => val === 'brave.com')
-      })
-    })
-
-    it('clears the selected text', function * () {
-      // Since now the first letter will trigger the autocomplete
-      // expect the selected text to be part of the first suggestion
-      // in the list
-      yield selectsText(this.app.client, 'rave.com')
-    })
-
-    describe('shortcut-focus-url', function () {
-      before(function * () {
-        yield this.app.client
-          .ipcSend('shortcut-focus-url')
-      })
-
-      it('has focus', function * () {
-        yield this.app.client.waitForElementFocus(urlInput)
-      })
-
-      it('selects the text', function * () {
-        // Since now the first letter will trigger the autocomplete
-        // expect the selected text to be the first suggestion in the list
-        yield selectsText(this.app.client, 'brave.com')
-      })
-
-      it('has the search icon', function * () {
-        yield this.app.client.waitForExist('.urlbarIcon.fa-search')
-      })
-    })
-
-    describe('type escape once with suggestions', function () {
-      before(function * () {
-        this.page = Brave.server.url('page1.html')
-        return yield this.app.client
-          .tabByIndex(0)
-          .loadUrl(this.page)
-          .windowByUrl(Brave.browserWindowUrl)
-          .ipcSend('shortcut-focus-url')
-          .waitForElementFocus(urlInput)
-          .setValue(urlInput, 'google')
-          .waitForExist(urlBarSuggestions + ' li')
-
-          // hit escape
-          .keys('\uE00C')
-          .waitForElementFocus(urlInput)
-      })
-      it('does select the urlbar text', function * () {
-        yield selectsText(this.app.client, this.page)
-      })
-
-      it('does revert the urlbar text', function * () {
-        yield this.app.client.getValue(urlInput).should.eventually.be.equal(this.page)
-      })
-    })
-
-    describe('type escape once with no suggestions', function () {
-      before(function * () {
-        this.page = Brave.server.url('page1.html')
-        return yield this.app.client
-          .tabByIndex(0)
-          .loadUrl(this.page)
-          .windowByUrl(Brave.browserWindowUrl)
-          .ipcSend('shortcut-focus-url')
-          .waitForElementFocus(urlInput)
-          .setValue(urlInput, 'random-uuid-d63ecb78-eec8-4c08-973b-fb39cb5a6f1a')
-
-          // hit escape
-          .keys('\uE00C')
-          .waitForElementFocus(urlInput)
-      })
-      it('does select the urlbar text', function * () {
-        yield selectsText(this.app.client, this.page)
-      })
-
-      it('does revert the urlbar text', function * () {
-        yield this.app.client.getValue(urlInput).should.eventually.be.equal(this.page)
-      })
-    })
-
-    describe('type escape twice', function () {
-      before(function * () {
-        this.page = Brave.server.url('page1.html')
-        return yield this.app.client
-          .tabByIndex(0)
-          .loadUrl(this.page)
-          .windowByUrl(Brave.browserWindowUrl)
-          .ipcSend('shortcut-focus-url')
-          .waitForElementFocus(urlInput)
-          .setValue(urlInput, 'blah')
-          // hit escape
-          .keys(Brave.keys.ESCAPE)
-          .waitForElementFocus(urlInput)
-          .keys(Brave.keys.ESCAPE)
-      })
-
-      it('selects the urlbar text', function * () {
-        yield selectsText(this.app.client, this.page)
-      })
-
-      it('sets the urlbar text to the webview src', function * () {
-        yield this.app.client.getValue(urlInput).should.eventually.be.equal(this.page)
-      })
-    })
-
-    describe('submitting by typing a URL', function () {
-      before(function * () {
-        const url = Brave.server.url('page1.html')
-        return yield this.app.client.ipcSend('shortcut-focus-url')
-          .setValue(urlInput, url)
-          // hit enter
-          .keys(Brave.keys.ENTER)
-      })
-
-      it('changes the webview src', function * () {
-        const url = Brave.server.url('page1.html')
-        yield this.app.client.waitUntil(function () {
-          return this.getAttribute(activeWebview, 'src').then((src) => src === url)
-        })
-      })
-    })
-  })
-
-  describe('search engine go key', function () {
-    Brave.beforeAll(this)
-    const entries = searchProviders.providers
-
-    before(function * () {
-      yield setup(this.app.client)
-      yield this.app.client
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist(urlInput)
-        .waitForElementFocus(urlInput)
-    })
-
-    beforeEach(function * () {
-      yield this.app.client
-        .setValue(urlInput, '')
-        .waitUntil(function () {
-          return this.getValue(urlInput).then((val) => val === '')
-        })
-    })
-
-    entries.forEach((entry) => {
-      describe(entry.name, function () {
-        it('has the icon', function * () {
-          yield this.app.client
-            .keys(entry.shortcut + ' ')
-            .waitForExist(urlbarIcon)
-            .waitUntil(function () {
-              return this
-                .getCssProperty(urlbarIcon, 'background-image')
-                .then((backgroundImage) => backgroundImage.value === `url("${entry.image}")`)
-            })
-        })
-
-        it('does not show the default icon (search)', function * () {
-          yield this.app.client.waitForExist('.urlbarIcon.fa-search', 1500, true)
-        })
-      })
     })
   })
 
@@ -1149,6 +1080,7 @@ describe('navigationBar', function () {
         yield selectsText(this.app.client, 'ave.com')
         yield blur(this.app.client)
         yield this.app.client
+          .moveToObject(navigator)
           .waitForExist(urlInput)
           .leftClick(urlInput)
       })

@@ -23,7 +23,7 @@ const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
 const config = require('../constants/config')
 const settings = require('../constants/settings')
-const {aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
+const {aboutUrls, isSourceMagnetUrl, getTargetMagnetUrl, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
 const {isFrameError} = require('../../app/common/lib/httpUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
@@ -33,12 +33,18 @@ const currentWindow = require('../../app/renderer/currentWindow')
 const windowStore = require('../stores/windowStore')
 const appStoreRenderer = require('../stores/appStoreRenderer')
 const siteSettings = require('../state/siteSettings')
+const {newTabMode} = require('../../app/common/constants/settingsEnums')
 
 const WEBRTC_DEFAULT = 'default'
 const WEBRTC_DISABLE_NON_PROXY = 'disable_non_proxied_udp'
 // Looks like Brave leaks true public IP from behind system proxy when this option
 // is on.
 // const WEBRTC_PUBLIC_ONLY = 'default_public_interface_only'
+
+function isTorrentViewerURL (url) {
+  const isEnabled = getSetting(settings.TORRENT_VIEWER_ENABLED)
+  return isEnabled && isSourceMagnetUrl(url)
+}
 
 class Frame extends ImmutableComponent {
   constructor () {
@@ -96,9 +102,10 @@ class Frame extends ImmutableComponent {
         bookmarkFolders: this.props.bookmarkFolders.toJS()
       })
     } else if (location === 'about:history') {
-      this.webview.send(messages.HISTORY_UPDATED, {
-        history: this.props.history.toJS()
-      })
+      const aboutHistoryState = this.props.history && this.props.history.toJS
+        ? this.props.history.toJS()
+        : {}
+      this.webview.send(messages.HISTORY_UPDATED, aboutHistoryState)
       this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
     } else if (location === 'about:extensions') {
       this.webview.send(messages.EXTENSIONS_UPDATED, {
@@ -126,10 +133,11 @@ class Frame extends ImmutableComponent {
       this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.braveryDefaults)
     } else if (location === 'about:newtab') {
       this.webview.send(messages.NEWTAB_DATA_UPDATED, {
+        showEmptyPage: getSetting(settings.NEWTAB_MODE) === newTabMode.EMPTY_NEW_TAB,
         trackedBlockersCount: this.props.trackedBlockersCount,
         adblockCount: this.props.adblockCount,
         httpsUpgradedCount: this.props.httpsUpgradedCount,
-        newTabDetail: this.props.newTabDetail.toJS()
+        newTabDetail: this.props.newTabDetail ? this.props.newTabDetail.toJS() : null
       })
     } else if (location === 'about:autofill') {
       const defaultSession = global.require('electron').remote.session.defaultSession
@@ -171,7 +179,7 @@ class Frame extends ImmutableComponent {
         this.webview.send(messages.AUTOFILL_CREDIT_CARDS_UPDATED, list)
       }
     } else if (location === 'about:brave') {
-      const versionInformation = appStoreRenderer.state.get('versionInformation')
+      const versionInformation = appStoreRenderer.state.getIn(['about', 'brave', 'versionInformation'])
       if (versionInformation && versionInformation.toJS) {
         this.webview.send(messages.VERSION_INFORMATION_UPDATED, versionInformation.toJS())
       }
@@ -316,7 +324,11 @@ class Frame extends ImmutableComponent {
     }
 
     if (!guestInstanceId || newSrc !== 'about:blank') {
-      this.webview.setAttribute('src', isSourceAboutUrl(newSrc) ? getTargetAboutUrl(newSrc) : newSrc)
+      let webviewSrc
+      if (isSourceAboutUrl(newSrc)) webviewSrc = getTargetAboutUrl(newSrc)
+      else if (isTorrentViewerURL(newSrc)) webviewSrc = getTargetMagnetUrl(newSrc)
+      else webviewSrc = newSrc
+      this.webview.setAttribute('src', webviewSrc)
     }
 
     if (webviewAdded) {
@@ -472,7 +484,9 @@ class Frame extends ImmutableComponent {
         // This can happen for pages which don't load properly.
         // Some examples are basic http auth and bookmarklets.
         // In this case both the user display and the user think they're on this.props.location.
-        if (this.webview.getURL() !== this.props.location && !this.isAboutPage()) {
+        if (this.webview.getURL() !== this.props.location &&
+          !this.isAboutPage() &&
+          !isTorrentViewerURL(this.props.location)) {
           this.webview.loadURL(this.props.location)
         } else if (this.isIntermediateAboutPage() &&
           this.webview.getURL() !== this.props.location &&
@@ -907,7 +921,17 @@ class Frame extends ImmutableComponent {
     }
 
     const loadStart = (e) => {
+      // We have two kinds of special URLs: magnet links and about pages
+      // When the user clicks on a magnet link, navigate to the corresponding local URL
+      // (The address bar will still show the magnet URL. See appUrlUtil.getSourceMagnetUrl.)
+      if (isTorrentViewerURL(e.url)) {
+        var targetURL = getTargetMagnetUrl(e.url)
+        // Return right away. loadStart will be called again with targetURL
+        return windowActions.loadUrl(this.frame, targetURL)
+      }
+
       const parsedUrl = urlParse(e.url)
+
       // Instead of telling person to install Flash, ask them if they want to
       // run Flash if it's installed.
       if (e.isMainFrame && !e.isErrorPage && !e.isFrameSrcDoc) {
@@ -923,10 +947,6 @@ class Frame extends ImmutableComponent {
           runInsecureContent: false
         })
       }
-      windowActions.updateBackForwardState(
-        this.frame,
-        this.webview.canGoBack(),
-        this.webview.canGoForward())
       const hack = siteHacks[parsedUrl.hostname]
       if (hack && hack.pageLoadStartScript) {
         this.webview.executeJavaScript(hack.pageLoadStartScript)
@@ -935,10 +955,15 @@ class Frame extends ImmutableComponent {
         this.webview.executeJavaScript('Navigator.prototype.__defineGetter__("doNotTrack", () => {return 1});')
       }
     }
+
     const loadEnd = (savePage) => {
       windowActions.onWebviewLoadEnd(
         this.frame,
         this.webview.getURL())
+      windowActions.updateBackForwardState(
+        this.frame,
+        this.webview.canGoBack(),
+        this.webview.canGoForward())
 
       const parsedUrl = urlParse(this.props.location)
       if (!this.allowRunningWidevinePlugin()) {
@@ -965,6 +990,7 @@ class Frame extends ImmutableComponent {
         interceptFlash(false, undefined, hack.redirectURL)
       }
     }
+
     const loadFail = (e, provisionLoadFailure = false) => {
       if (isFrameError(e.errorCode)) {
         // temporary workaround for https://github.com/brave/browser-laptop/issues/1817
@@ -995,16 +1021,20 @@ class Frame extends ImmutableComponent {
         windowActions.setNavigated(this.webview.getURL(), this.props.frameKey, true, this.frame.get('tabId'))
       }
     }
-    this.webview.addEventListener('did-change-security', (e) => {
+    this.webview.addEventListener('security-style-changed', (e) => {
       let isSecure = null
-      let runInsecureContent = false
-      if (e.securityState === 'secure' || e.securityState === 'warning') {
+      let runInsecureContent = this.runInsecureContent()
+      // 'warning' and 'passive mixed content' should never upgrade the
+      // security state from insecure to secure
+      if (e.securityState === 'secure' ||
+          (this.props.isSecure !== false &&
+           runInsecureContent !== true &&
+           ['warning', 'passive-mixed-content'].includes(e.securityState))) {
         isSecure = true
-        runInsecureContent = this.runInsecureContent()
-      } else if (e.securityState === 'insecure' || e.securityState === 'unknown') {
+      } else if (['broken', 'insecure'].includes(e.securityState)) {
         isSecure = false
       }
-      // TODO: handle 'warning' security state
+      // TODO: show intermediate UI for 'warning' and 'passive-mixed-content'
       windowActions.setSecurityState(this.frame, {
         secure: isSecure,
         runInsecureContent
@@ -1018,7 +1048,6 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('load-start', (e) => {
       loadStart(e)
     })
-
     this.webview.addEventListener('did-navigate', (e) => {
       if (this.props.findbarShown) {
         this.props.onFindHide()
@@ -1028,8 +1057,11 @@ class Frame extends ImmutableComponent {
         appActions.hideMessageBox(message)
       }
       this.notificationCallbacks = {}
-      // only give focus focus is this is not the initial default page load
-      if (this.props.isActive && this.webview.canGoBack() && document.activeElement !== this.webview) {
+      const isNewTabPage = getBaseUrl(e.url) === getTargetAboutUrl('about:newtab')
+      if (isNewTabPage) {
+        windowActions.setUrlBarActive(true)
+        windowActions.setUrlBarFocused(true)
+      } else if (this.props.isActive && !isNewTabPage && document.activeElement !== this.webview) {
         this.webview.focus()
       }
       windowActions.setNavigated(e.url, this.props.frameKey, false, this.frame.get('tabId'))

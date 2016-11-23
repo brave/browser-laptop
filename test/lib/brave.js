@@ -76,7 +76,9 @@ var exports = {
     RETURN: '\ue006',
     ENTER: '\ue007',
     SHIFT: '\ue008',
-    BACKSPACE: '\ue003'
+    BACKSPACE: '\ue003',
+    DELETE: '\ue017',
+    DOWN: '\ue015'
   },
 
   browserWindowUrl: 'file://' + path.resolve(__dirname, '..', '..') + '/app/extensions/brave/index.html',
@@ -244,6 +246,12 @@ var exports = {
           logVerbose('tabByUrl("' + url + '") => false')
           return false
         })
+      })
+    })
+
+    this.app.client.addCommand('waitForSelectedText', function (text) {
+      return this.waitUntil(function () {
+        return this.getSelectedText(text).then((value) => { return value === text })
       })
     })
 

@@ -139,6 +139,7 @@ module.exports = {
     'advanced.hardware-acceleration-enabled': true,
     'advanced.default-zoom-level': null,
     'advanced.pdfjs-enabled': true,
+    'advanced.torrent-viewer-enabled': true,
     'advanced.smooth-scroll-enabled': false,
     'advanced.send-crash-reports': true,
     'advanced.send-usage-statistics': false,
@@ -152,7 +153,10 @@ module.exports = {
     'shutdown.clear-autofill-data': false,
     'shutdown.clear-site-settings': false,
     'extensions.pocket.enabled': false,
-    'general.bookmarks-toolbar-mode': null
+    'general.bookmarks-toolbar-mode': null,
+    'general.is-default-browser': null,
+    'notification-add-funds-timestamp': null,
+    'notification-reconcile-soon-timestamp': null
   },
   defaultFavicon: 'img/empty_favicon.png',
   uaExceptionHosts: [

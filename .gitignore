@@ -52,6 +52,7 @@ win64-dist
 Brave.tar.bz2
 
 app/extensions/brave/gen
+app/extensions/torrent/gen
 *.pfx
 buildConfig.js
 

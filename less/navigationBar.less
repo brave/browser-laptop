@@ -42,16 +42,22 @@
   }
 
   #navigator {
+    margin-right: 0px;
+
     .homeButton {
-      margin: 0 3px 4px 3px;
+      margin: 0 0 3px 0;
     }
 
     .stopButton {
-      margin: 0 3px 6px 3px;
+      margin: 0 2px 6px 2px;
     }
 
     .reloadButton {
-      margin: 0 3px 3px 3px;
+      margin: 0 3px 2px 3px;
+    }
+    input {
+      font-weight: 500;
+      margin: 1px 0 0 3px;
     }
   }
 
@@ -231,9 +237,6 @@
           }
         }
       }
-    }
-    .verticallyCenter {
-      justify-content: center;
     }
   }
 
@@ -472,6 +475,8 @@
   @centerOffset: 2 * (@navbarButtonWidth + @navbarButtonSpacing) // width area on the left
                  - (@navbarBraveButtonWidth + 2 * @navbarButtonSpacing);
 
+  @rightMargin: @navbarLeftMarginDarwin / 2;
+
   display: flex;
 
   // Buttons on the left
@@ -480,16 +485,9 @@
 
     .backButton,
     .forwardButton {
-      width: @navbarButtonWidth;
+      width: 100%;
     }
 
-    .backButton {
-      padding-right: @navbarButtonSpacing;
-    }
-
-    .forwardButton {
-      padding-left: @navbarButtonSpacing;
-    }
   }
 
   // Navigation bar at the center
@@ -498,6 +496,7 @@
     flex-grow: 1;
     min-width: 0%; // allow the navigator to shrink
     max-width: 900px;
+    margin-right: @rightMargin;
 
     &.titleMode {
       padding-right: @centerOffset;
@@ -527,6 +526,10 @@
 
     .extensionButton {
       -webkit-app-region: no-drag;
+      background-size: contain;
+      height: 17px;
+      margin: 4px 4px 0 0;
+      opacity: 0.85;
     }
 
     .braveMenu {
@@ -539,23 +542,21 @@
         -webkit-filter: grayscale(100%);
       }
 
-      &:not(.braveShieldsDisabled):hover {
-        -webkit-filter: brightness(0.7);
-      }
-
       &.braveShieldsDisabled {
         -webkit-filter: grayscale(100%);
         opacity: 0.4;
       }
       &.leftOfCaptionButton {
-        margin-right: 1px;
+        margin-right: 3px;
       }
     }
 
-    .extraDragArea {
-      display: flex;
-      flex-grow: 0;
-      width: @navbarBraveButtonMarginLeft;
+    @media (max-width: @breakpointWideViewport) {
+      .extraDragArea {
+        display: flex;
+        flex-grow: 0;
+        width: @navbarBraveButtonMarginLeft;
+      }
     }
   }
 }
@@ -565,13 +566,21 @@
   display: inline-block;
   width: 12px;
   height: 14px;
-  margin: 0 6px;
+  margin: 0 7px 0 0;
 }
 
 .navigationButtonContainer {
   border-radius: @borderRadius;
-  height: 28px;
-  margin: 0 3px;
+  height: 24px;
+  width: 26px;
+  margin-left: -3px;
+  margin-right: 6px;
+
+  &.nav {
+    margin-left: 4px;
+    margin-right: 1px;
+    width: 34px;
+  }
 
   &:last-child {
     margin-right: 8px;
@@ -579,50 +588,50 @@
 
   &:not(.disabled):hover {
     background: white;
-    box-shadow: 1px 1px 1px #EEE;
+    box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.15);
   }
 }
 
 .backButton,
 .forwardButton {
-  height: 16px;
-  margin: 6px 0 0 0;
+  height: 24px;
+  width: 30px;
+  margin: 0;
 }
 
 .backButton {
   background: url('../img/toolbar/back_btn.svg') center no-repeat;
+  background-size: 14px 14px;
 }
 
 .forwardButton {
   background: url('../img/toolbar/forward_btn.svg') center no-repeat;
+  background-size: 14px 14px;
 }
 
 #navigator {
+  .stopButton,
+  .reloadButton,
+  .homeButton {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+  }
+
   .stopButton {
     background: url('../img/toolbar/stoploading_btn.svg') center no-repeat;
-    margin: 0 3px 3px 3px;
-    padding: 0 6px;
-    height: 9px;
-    position: relative;
-    top: 3px;
+    background-size: 11px 11px;
   }
 
   .reloadButton {
     background: url('../img/toolbar/reload_btn.svg') center no-repeat;
-    margin: 0 3px 1px 3px;
-    padding: 0 6px;
-    position: relative;
-    top: 3px;
+    background-size: 13px 13px;
   }
 
   .homeButton {
     background: url('../img/toolbar/home_btn.svg') center no-repeat;
-    width: 14px;
-    height: 13px;
-    margin: 0 3px 2px 3px;
-    padding: 0 6px;
-    position: relative;
-    top: 3px;
+    background-size: 16px 16px;
   }
 
   .bookmarkButton {
@@ -630,7 +639,10 @@
     -webkit-mask-repeat: no-repeat;
     width: 14px;
     height: 14px;
-    margin-bottom: 2px;
+    margin: 0;
+    position: absolute;
+    top: 4px;
+    left: 4px;
 
     &.removeBookmarkButton {
       background: url('../img/toolbar/bookmark_marked.svg') center no-repeat;
@@ -641,6 +653,7 @@
 .navigatorWrapper {
   justify-content: space-between;
   align-items: center;
+  margin-top: 1px;
   height: @navbarHeight;
   box-sizing: border-box;
 
@@ -703,8 +716,6 @@
   #navigator:not(.titleMode) & {
     background: white;
     border-radius: @borderRadiusURL;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
     box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1), inset 0 1px 0 rgba(0,0,0,0.05), inset 0 1px 1px rgba(0,0,0,0.1);
     color: @chromeText;
   }
@@ -732,23 +743,28 @@
   }
 
   &:not(.titleMode) {
-    .urlbarForm, .browserButton, .bookmarkButtonContainer {
+    .urlbarForm,
+    .bookmarkButtonContainer,
+    span[class$="Button"] {
       animation: fadeIn .6s;
       opacity: 0;
       animation-fill-mode: forwards;
     }
 
+    .startButtons {
+      position: relative;
+      z-index: 999;
+    }
+
     .bookmarkButtonContainer {
-      border: 1px solid #CBCBCB;
-      border-radius: @borderRadius;
-      border-right: none;
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
+      background-color: #f7f7f7;
       box-sizing: border-box;
-      height: 25px;
-      line-height: 25px;
-      margin-right: -2px;
+      height: 21px;
+      width: 23px;
       display: inline-block;
+      position: relative;
+      left: 25px;
+      top: 2px;
     }
   }
 
@@ -793,6 +809,10 @@
         color: @chromeText;
         min-width: 14px;
       }
+      &.fa-unlock {
+        color: @siteInsecureColor;
+        opacity: 1.0;
+      }
     }
 
     .bookmarkButton {
@@ -836,13 +856,6 @@
 
   > * {
     -webkit-app-region: no-drag;
-
-    &.endButtons {
-      margin-right: 20px;
-      @media (max-width: @breakpointNarrowViewport) {
-        margin-right: 0px;
-      }
-    }
   }
 
   .inputbar-wrapper {
@@ -883,19 +896,20 @@
     color: @siteSecureColor;
     left: 14px;
     margin-top: 1px;
+    padding-left: 20px;
     font-size: 13px;
     min-height: 10px;
     min-width: 16px;
 
     &.fa-lock,
-    &.fa-exclamation-triangle {
+    &.fa-unlock {
       margin-top: 1px;
       font-size: 16px;
       min-height: 10px;
       min-width: 16px;
     }
 
-    &.fa-exclamation-triangle {
+    &.fa-unlock {
         color: @siteInsecureColor;
     }
 
@@ -912,4 +926,10 @@
                                       url(../app/extensions/brave/img/braveBtn3x.png) 3x);
   background-repeat: no-repeat;
   height: 24px;
+
+  &:hover {
+    background-image: -webkit-image-set(url(../app/extensions/brave/img/braveBtn_hover.png) 1x,
+                                        url(../app/extensions/brave/img/braveBtn2x_hover.png) 2x,
+                                        url(../app/extensions/brave/img/braveBtn3x_hover.png) 3x);
+  }
 }

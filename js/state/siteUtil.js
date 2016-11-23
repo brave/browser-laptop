@@ -345,13 +345,16 @@ module.exports.updateSiteFavicon = function (sites, location, favicon) {
   const matchingIndices = []
 
   sites.filter((site, index) => {
+    if (!site || typeof site.get !== 'function') {
+      return false
+    }
     if (isBookmarkFolder(site.get('tags'))) {
       return false
     }
     if (UrlUtil.isNotURL(site.get('location'))) {
       return false
     }
-    if (normalizeUrl(site.get('location')) === normalizeUrl(location)) {
+    if (normURL(site.get('location')) === normURL(location)) {
       matchingIndices.push(index)
       return true
     }
@@ -366,6 +369,19 @@ module.exports.updateSiteFavicon = function (sites, location, favicon) {
   })
 
   return updatedSites
+}
+
+/**
+ * Normalizes a URL for comparison, with special handling for magnet links
+ */
+function normURL (url) {
+  const lowerURL = url.toLowerCase()
+  if (lowerURL.startsWith('magnet:?')) return lowerURL
+  try {
+    return normalizeUrl(url)
+  } catch (e) {
+    return url
+  }
 }
 
 /**

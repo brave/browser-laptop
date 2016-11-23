@@ -31,8 +31,7 @@ class UrlBarIcon extends ImmutableComponent {
   get isInsecure () {
     return this.props.isHTTPPage &&
            this.props.isSecure === false &&
-           !this.props.active &&
-           !this.props.titleMode
+           !this.props.active
   }
   /**
    * search icon:
@@ -47,9 +46,14 @@ class UrlBarIcon extends ImmutableComponent {
 
     const defaultToSearch = (!this.isSecure && !this.isInsecure && !showSearch) &&
                             !this.props.titleMode &&
-                            this.props.loading === false
+                            this.props.loading === false &&
+                            !this.isAboutPage
 
     return showSearch || defaultToSearch
+  }
+  get isAboutPage () {
+    return isSourceAboutUrl(this.props.location) &&
+      this.props.location !== 'about:newtab'
   }
   get iconClasses () {
     if (this.props.activateSearchEngine) {
@@ -61,8 +65,9 @@ class UrlBarIcon extends ImmutableComponent {
       'fa': true,
       // NOTE: EV style not approved yet; see discussion at https://github.com/brave/browser-laptop/issues/791
       'fa-lock': this.isSecure,
-      'fa-exclamation-triangle': this.isInsecure,
-      'fa-search': this.isSearch
+      'fa-unlock': this.isInsecure,
+      'fa-search': this.isSearch,
+      'fa-list': this.isAboutPage && !this.props.titleMode
     })
   }
   get iconStyles () {

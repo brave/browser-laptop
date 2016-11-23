@@ -59,6 +59,7 @@ const {bookmarksToolbarMode} = require('../../app/common/constants/settingsEnums
 // State handling
 const basicAuthState = require('../../app/common/state/basicAuthState')
 const extensionState = require('../../app/common/state/extensionState')
+const aboutHistoryState = require('../../app/common/state/aboutHistoryState')
 const FrameStateUtil = require('../state/frameStateUtil')
 const siteUtil = require('../state/siteUtil')
 const searchProviders = require('../data/searchProviders')
@@ -299,6 +300,10 @@ class Main extends ImmutableComponent {
     if (!this.props.appState.getIn([appConfig.resourceNames.WIDEVINE, 'ready']) &&
         nextProps.appState.getIn([appConfig.resourceNames.WIDEVINE, 'ready'])) {
       const widevinePanelDetail = this.props.windowState.get('widevinePanelDetail')
+      // User may have enabled from preferences and no details are present
+      if (!widevinePanelDetail) {
+        return
+      }
       const origin = siteUtil.getOrigin(widevinePanelDetail.get('location'))
       // This automatically handles reloading the frame as well
       appActions.changeSiteSetting(origin, appConfig.resourceNames.WIDEVINE, widevinePanelDetail.get('alsoAddRememberSiteSetting') ? 1 : 0)
@@ -833,6 +838,17 @@ class Main extends ImmutableComponent {
     }
   }
 
+  bindHistory (frame) {
+    if (frame.get('location') === 'about:history') {
+      const history = aboutHistoryState.getHistory(this.props.appState)
+      if (history) {
+        return history
+      }
+      appActions.populateHistory()
+    }
+    return null
+  }
+
   render () {
     const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
@@ -883,6 +899,8 @@ class Main extends ImmutableComponent {
       activeFrame && !activeFrame.getIn(['security', 'loginRequiredDetail']) &&
       !customTitlebar.menubarSelectedIndex
 
+    const appStateSites = this.props.appState.get('sites')
+
     return <div id='window'
       className={cx({
         isFullScreen: activeFrame && activeFrame.get('isFullScreen'),
@@ -932,6 +950,7 @@ class Main extends ImmutableComponent {
               <div className='backforward'>
                 <div className={cx({
                   navigationButtonContainer: true,
+                  nav: true,
                   disabled: !activeFrame || !activeFrame.get('canGoBack')
                 })}>
                   <LongPressButton
@@ -944,6 +963,7 @@ class Main extends ImmutableComponent {
                 </div>
                 <div className={cx({
                   navigationButtonContainer: true,
+                  nav: true,
                   disabled: !activeFrame || !activeFrame.get('canGoForward')
                 })}>
                   <LongPressButton
@@ -959,7 +979,7 @@ class Main extends ImmutableComponent {
                 ref={(node) => { this.navBar = node }}
                 navbar={activeFrame && activeFrame.get('navbar')}
                 frames={this.props.windowState.get('frames')}
-                sites={this.props.appState.get('sites')}
+                sites={appStateSites}
                 activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
                 location={activeFrame && activeFrame.get('location') || ''}
                 title={activeFrame && activeFrame.get('title') || ''}
@@ -1074,7 +1094,8 @@ class Main extends ImmutableComponent {
         }
         {
           this.props.windowState.get('bookmarkDetail') && !this.props.windowState.getIn(['bookmarkDetail', 'isBookmarkHanger'])
-          ? <AddEditBookmark sites={this.props.appState.get('sites')}
+          ? <AddEditBookmark
+            sites={appStateSites}
             currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])}
             originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}
             destinationDetail={this.props.windowState.getIn(['bookmarkDetail', 'destinationDetail'])}
@@ -1124,7 +1145,7 @@ class Main extends ImmutableComponent {
             activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
             windowWidth={window.innerWidth}
             contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
-            sites={this.props.appState.get('sites')}
+            sites={appStateSites}
             selectedFolderId={this.props.windowState.getIn(['ui', 'bookmarksToolbar', 'selectedFolderId'])} />
           : null
         }
@@ -1152,7 +1173,7 @@ class Main extends ImmutableComponent {
           tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}
           previewTabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'previewTabPageIndex'])}
           tabs={this.props.windowState.get('tabs')}
-          sites={this.props.appState.get('sites')}
+          sites={appStateSites}
           key='tab-bar'
           activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
           onMenu={this.onHamburgerMenu}
@@ -1187,13 +1208,11 @@ class Main extends ImmutableComponent {
                   ? this.props.appState.get('settings') || emptyMap
                   : null}
                 bookmarks={frame.get('location') === 'about:bookmarks'
-                  ? this.props.appState.get('sites')
+                  ? appStateSites
                       .filter((site) => site.get('tags')
                         .includes(siteTags.BOOKMARK)) || emptyMap
                   : null}
-                history={frame.get('location') === 'about:history'
-                  ? this.props.appState.get('sites') || emptyMap
-                  : null}
+                history={this.bindHistory(frame)}
                 extensions={frame.get('location') === 'about:extensions'
                   ? this.props.appState.get('extensions') || emptyMap
                   : null}
@@ -1202,11 +1221,12 @@ class Main extends ImmutableComponent {
                   : null}
                 downloads={this.props.appState.get('downloads') || emptyMap}
                 bookmarkFolders={frame.get('location') === 'about:bookmarks'
-                  ? this.props.appState.get('sites')
+                  ? appStateSites
                       .filter((site) => site.get('tags')
                         .includes(siteTags.BOOKMARK_FOLDER)) || emptyMap
                   : null}
                 isFullScreen={frame.get('isFullScreen')}
+                isSecure={frame.getIn(['security', 'isSecure'])}
                 showFullScreenWarning={frame.get('showFullScreenWarning')}
                 findbarShown={frame.get('findbarShown')}
                 findDetail={frame.get('findDetail')}

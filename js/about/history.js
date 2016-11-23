@@ -13,7 +13,6 @@ const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
 const Button = require('../components/button')
-const siteUtil = require('../state/siteUtil')
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
 const historyUtil = require('../../app/common/lib/historyUtil')
 
@@ -31,14 +30,12 @@ class DeleteHistoryEntryButton extends ImmutableComponent {
     super()
     this.onClick = this.onClick.bind(this)
   }
-
   onClick (e) {
     if (e && e.preventDefault) {
       e.preventDefault()
     }
     // TODO(bsclifton): delete the selected entry
   }
-
   render () {
     return <div className='fa fa-times deleteEntry' onClick={this.onClick} />
   }
@@ -95,7 +92,7 @@ class HistoryDay extends ImmutableComponent {
   }
 }
 
-class GroupedHistoryList extends ImmutableComponent {
+class GroupedHistoryList extends React.Component {
   render () {
     const defaultLanguage = this.props.languageCodes.find((lang) => lang.includes(navigator.language)) || 'en-US'
     const userLanguage = getSetting(settings.LANGUAGE, this.props.settings) || defaultLanguage
@@ -123,15 +120,29 @@ class AboutHistory extends React.Component {
     this.onChangeSearch = this.onChangeSearch.bind(this)
     this.onClearSearchText = this.onClearSearchText.bind(this)
     this.clearBrowsingDataNow = this.clearBrowsingDataNow.bind(this)
+    this.clearSelection = this.clearSelection.bind(this)
+    this.onClick = this.onClick.bind(this)
     this.state = {
       history: Immutable.List(),
       search: '',
       settings: Immutable.Map(),
       languageCodes: Immutable.Map(),
-      selection: Immutable.Set()
+      selection: Immutable.Set(),
+      updatedStamp: undefined
     }
     ipc.on(messages.HISTORY_UPDATED, (e, detail) => {
-      this.setState({ history: Immutable.fromJS(detail && detail.history || {}) })
+      const aboutHistory = Immutable.fromJS(detail || {})
+      const updatedStamp = aboutHistory.get('updatedStamp')
+      // Only update if the data has changed.
+      if (typeof updatedStamp === 'number' &&
+          typeof this.state.updatedStamp === 'number' &&
+          updatedStamp === this.state.updatedStamp) {
+        return
+      }
+      this.setState({
+        history: aboutHistory.get('entries') || new Immutable.List(),
+        updatedStamp: updatedStamp
+      })
     })
     ipc.on(messages.SETTINGS_UPDATED, (e, settings) => {
       this.setState({ settings: Immutable.fromJS(settings || {}) })
@@ -150,25 +161,37 @@ class AboutHistory extends React.Component {
       search: ''
     })
   }
+  onClick (e) {
+    // Determine if click was on sortableTable
+    let targetElement = e.target
+    while (targetElement) {
+      if (targetElement.tagName === 'TBODY' || targetElement.tagName === 'THEAD') {
+        return
+      }
+      targetElement = targetElement.parentNode
+    }
+    // Click was not a child element of sortableTable; clear selection
+    this.clearSelection()
+  }
   searchedSiteDetails (searchTerm, siteDetails) {
     return siteDetails.filter((siteDetail) => {
       const title = siteDetail.get('title') + siteDetail.get('location')
       return title.match(new RegExp(searchTerm, 'gi'))
     })
   }
-  get historyDescendingOrder () {
-    return this.state.history.filter((site) => siteUtil.isHistoryEntry(site))
-      .sort(historyUtil.sortTimeDescending)
-      .slice(-500)
-  }
   clearBrowsingDataNow () {
     aboutActions.clearBrowsingDataNow({browserHistory: true})
+  }
+  clearSelection () {
+    this.setState({
+      selection: new Immutable.Set()
+    })
   }
   componentDidMount () {
     this.refs.historySearch.focus()
   }
   render () {
-    return <div className='siteDetailsPage'>
+    return <div className='siteDetailsPage' onClick={this.onClick}>
       <div className='siteDetailsPageHeader'>
         <div data-l10n-id='history' className='sectionTitle' />
         <div className='headerActions'>
@@ -190,8 +213,8 @@ class AboutHistory extends React.Component {
           settings={this.state.settings}
           history={
             this.state.search
-            ? this.searchedSiteDetails(this.state.search, this.historyDescendingOrder)
-            : this.historyDescendingOrder
+            ? this.searchedSiteDetails(this.state.search, this.state.history)
+            : this.state.history
           }
           stateOwner={this} />
       </div>

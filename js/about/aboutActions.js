@@ -166,10 +166,11 @@ const aboutActions = {
     ipc.send(messages.SET_CLIPBOARD, text)
   },
 
-  setNewTabDetail: function (newTabPageDetail) {
+  setNewTabDetail: function (newTabPageDetail, refresh) {
     aboutActions.dispatchAction({
       actionType: appConstants.APP_CHANGE_NEW_TAB_DETAIL,
-      newTabPageDetail
+      newTabPageDetail,
+      refresh
     })
   },
 
