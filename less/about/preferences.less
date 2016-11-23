@@ -365,29 +365,35 @@ span.settingsListCopy {
   }
 }
 
-span.browserButton.primaryButton {
-  &.addFunds {
+span.browserButton {
+  &.advancedSettings {
     font-size: 0.9em;
-    margin-right: 50px;
   }
 
-  &.clearBrowsingDataButton,
-  &.importNowButton,
-  &.setAsDefaultButton,
-  &.manageAdblockSettings,
-  &.viewExtensionsInfo,
-  &.manageAutofillDataButton {
-    font-size: 0.9em;
-    margin-top: 20px;
-    padding: 5px 20px;
-  }
+  &.primaryButton {
+    &.addFunds {
+      font-size: 0.9em;
+      margin-right: 50px;
+    }
 
-  &.importNowButton {
-    margin-top: 5px;
-  }
+    &.clearBrowsingDataButton,
+    &.importNowButton,
+    &.setAsDefaultButton,
+    &.manageAdblockSettings,
+    &.viewExtensionsInfo,
+    &.manageAutofillDataButton {
+      font-size: 0.9em;
+      margin-top: 20px;
+      padding: 5px 20px;
+    }
 
-  &.setAsDefaultButton {
-    margin-top: 5px;
+    &.importNowButton {
+      margin-top: 5px;
+    }
+
+    &.setAsDefaultButton {
+      margin-top: 5px;
+    }
   }
 }
 
@@ -898,7 +904,7 @@ div.nextPaymentSubmission {
       line-height: 1.3em;
     }
     span {
-      display: inline-block;
+      display: inline;
     }
     a {
       text-decoration: none;
@@ -943,15 +949,21 @@ div.nextPaymentSubmission {
 
     .copyKeyContainer {
       display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
       width: 75%;
       margin: 20px auto;
 
       .copyContainer {
-        margin-top: 35px;
+        .copyButton {
+          font-size: 14px;
+          margin: 0;
+        }
+
       }
 
       .keyContainer {
-        margin-left: 75px;
+        margin-left: 1em;
 
         h3 {
           margin-bottom: 15px;
@@ -992,8 +1004,11 @@ div.nextPaymentSubmission {
 }
 
 .advancedSettingsFooter {
-  padding: 20px 100px;
-  text-align: right;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .recoveryOverlay {
