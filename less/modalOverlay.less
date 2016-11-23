@@ -4,19 +4,31 @@
 
 @import "variables.less";
 
+.modal.last + .modal.last {
+  background: transparent;
+}
+
 .modal {
   opacity: 1;
   overflow: auto;
   position: fixed;
-  background: @black25;
+  background: transparent;
   width: 100vw;
   height: 100vh;
   left: 0;
   top: 0;
   z-index: 8999;
 
-  &.fade {
-    transition: @transitionFast;
+  +.modal {
+    background: transparent;
+  }
+
+  &.last {
+    background: @black25;
+
+    &.transparentBackground {
+      background: transparent;
+    }
   }
 
   &.hidden {
@@ -25,8 +37,6 @@
   }
 
   .modal {
-    background: transparent;
-
     .dialog {
       left: 0;
       top: 0;
