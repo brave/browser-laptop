@@ -6,19 +6,19 @@ require('../braveUnit')
 
 describe('urlutil', function () {
   describe('getScheme', function () {
-    it('null for empty', function * () {
+    it('null for empty', function () {
       assert.equal(UrlUtil.getScheme('/file/path/to/file'), null)
     })
-    it('localhost: for localhost', function * () {
+    it('localhost: for localhost', function () {
       assert.equal(UrlUtil.getScheme('localhost://127.0.0.1'), 'localhost:')
     })
-    it('gets scheme with :', function * () {
+    it('gets scheme with :', function () {
       assert.equal(UrlUtil.getScheme('data:datauri'), 'data:')
     })
-    it('host:port is not recognized as a scheme', function * () {
+    it('host:port is not recognized as a scheme', function () {
       assert.equal(UrlUtil.getScheme('localhost:8089'), null)
     })
-    it('gets scheme with ://', function * () {
+    it('gets scheme with ://', function () {
       assert.equal(UrlUtil.getScheme('http://www.brave.com'), 'http://')
     })
   })
@@ -30,13 +30,13 @@ describe('urlutil', function () {
     it('returns undefined when input is undefined', function () {
       assert.equal(UrlUtil.prependScheme(), undefined)
     })
-    it('prepends file:// to absolute file path', function * () {
+    it('prepends file:// to absolute file path', function () {
       assert.equal(UrlUtil.prependScheme('/file/path/to/file'), 'file:///file/path/to/file')
     })
-    it('defaults to http://', function * () {
+    it('defaults to http://', function () {
       assert.equal(UrlUtil.prependScheme('www.brave.com'), 'http://www.brave.com')
     })
-    it('keeps schema if already exists', function * () {
+    it('keeps schema if already exists', function () {
       assert.equal(UrlUtil.prependScheme('https://www.brave.com'), 'https://www.brave.com')
     })
   })
@@ -110,37 +110,37 @@ describe('urlutil', function () {
   })
 
   describe('isURL', function () {
-    it('absolute file path without scheme', function * () {
+    it('absolute file path without scheme', function () {
       assert.equal(UrlUtil.isURL('/file/path/to/file'), true)
     })
-    it('absolute file path with scheme', function * () {
+    it('absolute file path with scheme', function () {
       assert.equal(UrlUtil.isURL('file:///file/path/to/file'), true)
     })
-    it('detects data URI', function * () {
+    it('detects data URI', function () {
       assert.equal(UrlUtil.isURL('data:text/html,hi'), true)
     })
-    it('someBraveServer:8089', function * () {
+    it('someBraveServer:8089', function () {
       assert.equal(UrlUtil.isURL('someBraveServer:8089'), true)
     })
-    it('localhost', function * () {
+    it('localhost', function () {
       assert.equal(UrlUtil.isURL('localhost:8089'), true)
     })
   })
 
   describe('isFileType', function () {
-    it('relative file', function * () {
+    it('relative file', function () {
       assert.equal(UrlUtil.isFileType('/file/abc/test.pdf', 'pdf'), true)
     })
-    it('relative path', function * () {
+    it('relative path', function () {
       assert.equal(UrlUtil.isFileType('/file/abc/test', 'pdf'), false)
     })
-    it('JPG URL', function * () {
+    it('JPG URL', function () {
       assert.equal(UrlUtil.isFileType('http://example.com/test/ABC.JPG?a=b#test', 'jpg'), true)
     })
-    it('non-JPG URL', function * () {
+    it('non-JPG URL', function () {
       assert.equal(UrlUtil.isFileType('http://example.com/test/jpg', 'jpg'), false)
     })
-    it('invalid URL', function * () {
+    it('invalid URL', function () {
       assert.equal(UrlUtil.isFileType('foo', 'jpg'), false)
     })
   })
