@@ -1147,7 +1147,7 @@ class PaymentsTab extends ImmutableComponent {
     return <div className='panel advancedSettingsFooter'>
       <div className='recoveryFooterButtons'>
         <Button l10nId='recover' className='primaryButton' onClick={this.recoverWallet} />
-        <Button l10nId='cancel' className='whiteButton inlineButton' onClick={this.props.hideOverlay.bind(this, 'ledgerRecovery')} />
+        <Button l10nId='cancel' className='whiteButton' onClick={this.props.hideOverlay.bind(this, 'ledgerRecovery')} />
       </div>
     </div>
   }
