@@ -81,6 +81,8 @@ var exports = {
     DOWN: '\ue015'
   },
 
+  defaultTimeout: 10000,
+
   browserWindowUrl: 'file://' + path.resolve(__dirname, '..', '..') + '/app/extensions/brave/index.html',
   newTabUrl: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-newtab.html',
   fixtureUrl: function (filename) {
@@ -562,8 +564,9 @@ var exports = {
       BRAVE_USER_DATA_DIR: userDataDir
     }
     this.app = new Application({
-      waitforInterval: 100,
-      waitforTimeout: 1000,
+      // I don't think waitForInterval is actually used.
+      waitforInterval: 5,
+      waitforTimeout: exports.defaultTimeout,
       quitTimeout: 0,
       path: './node_modules/.bin/electron',
       env,

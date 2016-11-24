@@ -69,7 +69,7 @@ describe('bookmark tests', function () {
 
       it('does not show the url field', function * () {
         yield this.app.client
-          .waitForExist('#bookmarkLocation input', 500, true)
+          .waitForExist('#bookmarkLocation input', Brave.defaultTimeout, true)
       })
 
       describe('saved with a title', function () {
@@ -98,7 +98,7 @@ describe('bookmark tests', function () {
           })
           it('removes the bookmark from the toolbar', function * () {
             yield this.app.client
-              .waitForExist('.bookmarkText', 1000, true)
+              .waitForExist('.bookmarkText', Brave.defaultTimeout, true)
           })
         })
       })
@@ -131,7 +131,7 @@ describe('bookmark tests', function () {
 
       it('does not show the url field', function * () {
         yield this.app.client
-          .waitForExist('#bookmarkLocation input', 500, true)
+          .waitForExist('#bookmarkLocation input', Brave.defaultTimeout, true)
       })
 
       describe('saved without a title', function () {
@@ -156,7 +156,7 @@ describe('bookmark tests', function () {
           })
           it('removes the bookmark from the toolbar', function * () {
             yield this.app.client
-              .waitForExist('.bookmarkText', 1000, true)
+              .waitForExist('.bookmarkText', Brave.defaultTimeout, true)
           })
         })
       })
