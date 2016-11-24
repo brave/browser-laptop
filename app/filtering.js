@@ -110,7 +110,7 @@ function registerForBeforeRequest (session, partition) {
     }
 
     for (let i = 0; i < beforeRequestFilteringFns.length; i++) {
-      let results = beforeRequestFilteringFns[i](details)
+      let results = beforeRequestFilteringFns[i](details, isPrivate)
       const isAdBlock = results.resourceName === appConfig.resourceNames.ADBLOCK || appConfig[results.resourceName] && appConfig[results.resourceName].resourceType === adBlockResourceName
       const isHttpsEverywhere = results.resourceName === appConfig.resourceNames.HTTPS_EVERYWHERE
       const isTracker = results.resourceName === appConfig.resourceNames.TRACKING_PROTECTION
@@ -185,7 +185,8 @@ function registerForBeforeRequest (session, partition) {
  * session.
  * @param {object} session Session to add webRequest filtering on
  */
-function registerForBeforeRedirect (session) {
+function registerForBeforeRedirect (session, partition) {
+  const isPrivate = !partition.startsWith('persist:')
   // Note that onBeforeRedirect listener doesn't take a callback
   session.webRequest.onBeforeRedirect(function (details) {
     // Using an electron binary which isn't from Brave
@@ -196,7 +197,7 @@ function registerForBeforeRedirect (session) {
       // Note that since this isn't supposed to have a return value, the
       // redirect filtering function must check whether the resource is
       // enabled and do nothing if it's not.
-      beforeRedirectFilteringFns[i](details)
+      beforeRedirectFilteringFns[i](details, isPrivate)
     }
   })
 }
@@ -244,7 +245,7 @@ function registerForBeforeSendHeaders (session, partition) {
     }
 
     for (let i = 0; i < beforeSendHeadersFilteringFns.length; i++) {
-      let results = beforeSendHeadersFilteringFns[i](details)
+      let results = beforeSendHeadersFilteringFns[i](details, isPrivate)
       if (!module.exports.isResourceEnabled(results.resourceName, firstPartyUrl, isPrivate)) {
         continue
       }
@@ -401,20 +402,17 @@ function registerPermissionHandler (session, partition) {
     }
 
     const permissionName = permission + 'Permission'
+    let isAllowed
     if (settings) {
-      let isAllowed = settings.get(permissionName)
-      if (typeof isAllowed === 'boolean') {
-        cb(isAllowed)
-        return
-      }
+      isAllowed = settings.get(permissionName)
     }
     // Private tabs inherit settings from normal tabs, but not vice versa.
     if (isPrivate && tempSettings) {
-      let isAllowed = tempSettings.get(permissionName)
-      if (typeof isAllowed === 'boolean') {
-        cb(isAllowed)
-        return
-      }
+      isAllowed = tempSettings.get(permissionName)
+    }
+    if (typeof isAllowed === 'boolean') {
+      cb(isAllowed)
+      return
     }
 
     const message = locale.translation('permissionMessage').replace(/{{\s*host\s*}}/, origin).replace(/{{\s*permission\s*}}/, permissions[permission].action)
@@ -605,13 +603,13 @@ module.exports.isResourceEnabled = (resourceName, url, isPrivate) => {
   }
 
   const appState = appStore.getState()
-  let settings
-  if (!isPrivate) {
-    settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
-  } else {
-    settings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), url)
+  const settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
+  const tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), url)
+
+  let braverySettings = siteSettings.activeSettings(settings, appState, appConfig)
+  if (isPrivate && tempSettings) {
+    braverySettings = siteSettings.activeSettings(tempSettings, appState, appConfig)
   }
-  const braverySettings = siteSettings.activeSettings(settings, appState, appConfig)
 
   // If full shields are down never enable extra protection
   if (braverySettings.shieldsUp === false) {
