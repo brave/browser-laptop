@@ -271,7 +271,7 @@ var exports = {
           logVerbose('waitForResourceReady("' + resourceName + '") => ' + JSON.stringify(val.value[resourceName]))
           return val.value[resourceName] && val.value[resourceName].ready
         })
-      }, 3000)
+      }, 20000)
     })
 
     this.app.client.addCommand('loadUrl', function (url) {
