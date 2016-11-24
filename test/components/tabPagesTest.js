@@ -87,8 +87,12 @@ describe('tab pages', function () {
       yield this.app.client.changeSetting(settings.TABS_PER_PAGE, appConfig.defaultSettings[settings.TABS_PER_PAGE])
       // Make sure there are 2 tab pages
       yield this.app.client.windowByUrl(Brave.browserWindowUrl)
-      for (let i = 0; i < appConfig.defaultSettings[settings.TABS_PER_PAGE]; i++) {
-        yield this.app.client.click(newFrameButton)
+      const tabsPerPage = appConfig.defaultSettings[settings.TABS_PER_PAGE]
+      for (let i = 0; i < tabsPerPage; i++) {
+        yield this.app.client
+          .waitForExist(newFrameButton)
+          .click(newFrameButton)
+          .elements(tabPage).then((res) => res.value.length === (i + 2) % tabsPerPage)
       }
 
       yield this.app.client
