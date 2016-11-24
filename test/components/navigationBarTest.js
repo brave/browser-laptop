@@ -503,6 +503,54 @@ describe('navigationBar tests', function () {
           )
         )
     })
+    it('shows insecure icon on an HTTP PDF', function * () {
+      const page1Url = Brave.server.url('img/test.pdf')
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitUntil(function () {
+          return this.getAppState().then((val) => {
+            return val.value.extensions['jdbefljfgobbmcidnmpjamcbhnbphjnb']
+          })
+        })
+      yield this.app.client.tabByIndex(0).url(page1Url).windowParentByUrl(page1Url)
+      yield this.app.client
+        .moveToObject(navigator)
+        .waitUntil(function () {
+          return this.getValue(urlInput).then((val) => {
+            return val === page1Url
+          })
+        })
+        .waitForExist(urlbarIcon)
+        .waitUntil(() =>
+          this.app.client.getAttribute(urlbarIcon, 'class').then((classes) =>
+            classes.includes('fa-unlock')
+          )
+        )
+    })
+    it('shows secure icon on an HTTPS PDF', function * () {
+      const page1Url = 'https://letsencrypt.org/documents/ISRG-CPS-October-18-2016.pdf'
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitUntil(function () {
+          return this.getAppState().then((val) => {
+            return val.value.extensions['jdbefljfgobbmcidnmpjamcbhnbphjnb']
+          })
+        })
+      yield this.app.client.tabByIndex(0).url(page1Url).windowParentByUrl(page1Url)
+      yield this.app.client
+        .moveToObject(navigator)
+        .waitUntil(function () {
+          return this.getValue(urlInput).then((val) => {
+            return val === page1Url
+          })
+        })
+        .waitForExist(urlbarIcon)
+        .waitUntil(() =>
+          this.app.client.getAttribute(urlbarIcon, 'class').then((classes) =>
+            classes.includes('fa-lock')
+          )
+        )
+    })
     it('Blocks running insecure content', function * () {
       const page1Url = 'https://mixed-script.badssl.com/'
       yield this.app.client.tabByUrl(Brave.newTabUrl)

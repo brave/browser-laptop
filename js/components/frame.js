@@ -41,6 +41,8 @@ const WEBRTC_DISABLE_NON_PROXY = 'disable_non_proxied_udp'
 // is on.
 // const WEBRTC_PUBLIC_ONLY = 'default_public_interface_only'
 
+const pdfjsOrigin = `chrome-extension://${config.PDFJSExtensionId}/`
+
 function isTorrentViewerURL (url) {
   const isEnabled = getSetting(settings.TORRENT_VIEWER_ENABLED)
   return isEnabled && isSourceMagnetUrl(url)
@@ -988,6 +990,13 @@ class Frame extends ImmutableComponent {
           !this.webview.allowRunningPlugins && this.props.flashInitialized) {
         // Fix #3011
         interceptFlash(false, undefined, hack.redirectURL)
+      }
+      if (this.props.location.startsWith(pdfjsOrigin)) {
+        let displayLocation = UrlUtil.getLocationIfPDF(this.props.location)
+        windowActions.setSecurityState(this.frame, {
+          secure: urlParse(displayLocation).protocol === 'https:',
+          runInsecureContent: false
+        })
       }
     }
 

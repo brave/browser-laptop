@@ -433,7 +433,8 @@ class UrlBar extends ImmutableComponent {
   get isHTTPPage () {
     // Whether this page is HTTP or HTTPS. We don't show security indicators
     // for other protocols like mailto: and about:.
-    const protocol = urlParse(this.props.location).protocol
+    const protocol = urlParse(
+      UrlUtil.getLocationIfPDF(this.props.location)).protocol
     return protocol === 'http:' || protocol === 'https:'
   }
 
