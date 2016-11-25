@@ -1,4 +1,4 @@
-const {app, extensions} = require('electron')
+const {app, extensions, webContents} = require('electron')
 const appActions = require('../../js/actions/appActions')
 const { makeImmutable } = require('../common/state/immutableUtil')
 const tabState = require('../common/state/tabState')
@@ -17,25 +17,6 @@ const getTabValue = function (tabId) {
   if (tab) {
     return makeImmutable(extensions.tabValue(tab))
   }
-}
-
-const createInternal = (createProperties, tab, cb = null) => {
-  return new Promise((resolve, reject) => {
-    tab.once('did-attach', () => {
-      cb && cb(tab)
-    })
-    tab.once('did-fail-provisional-load', (e) => {
-      resolve(tab, e)
-    })
-    tab.once('did-fail-load', (e) => {
-      resolve(tab, e)
-    })
-    tab.once('did-finish-load', (e) => {
-      resolve(tab, e)
-    })
-    let openerTab = extensions.getOpener(createProperties)
-    extensions.openTab(tab, createProperties, openerTab)
-  })
 }
 
 const updateTab = (tabId) => {
@@ -67,6 +48,12 @@ const api = {
             faviconUrl: favicons[0]
           })
           updateTab(tabId)
+        }
+      })
+      tab.on('new-window', (e, url, frameName, disposition, options = {}) => {
+        let userGesture = options.userGesture
+        if (userGesture === false) {
+          e.preventDefault()
         }
       })
       tab.on('unresponsive', () => {
@@ -137,20 +124,6 @@ const api = {
     }
   },
 
-  newTab: (state, action) => {
-    action = makeImmutable(action)
-    let createProperties = action.get('createProperties')
-    createProperties = makeImmutable(createProperties).toJS()
-    let guest = extensions.registerGuest(createProperties)
-    createInternal(createProperties, guest).catch((err) => {
-      console.error(err)
-      // TODO(bridiver) - report the error
-    })
-    let tab = guest.webContents
-    let tabValue = getTabValue(tab)
-    return tabState.maybeCreateTab(state, { tabValue })
-  },
-
   closeTab: (state, action) => {
     action = makeImmutable(action)
     let tabId = action.get('tabId')
@@ -166,14 +139,10 @@ const api = {
   },
 
   create: (createProperties, cb = null) => {
-    try {
-      createProperties = makeImmutable(createProperties).toJS()
-      let guest = extensions.registerGuest(createProperties)
-      return createInternal(createProperties, guest, cb)
-    } catch (e) {
-      cb && cb()
-      return new Promise((resolve, reject) => { reject(e.message) })
-    }
+    createProperties = makeImmutable(createProperties).toJS()
+    webContents.createTab(createProperties, (webContents) => {
+      cb && cb(webContents)
+    })
   }
 }
 

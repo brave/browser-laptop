@@ -805,9 +805,6 @@ const handleAppAction = (action) => {
       appState = appState.set('sites', siteUtil.updateSiteFavicon(appState.get('sites'), action.frameProps.get('location'), action.favicon))
       appState = aboutNewTabState.setSites(appState, action)
       break
-    case AppConstants.APP_NEW_TAB:
-      appState = tabs.newTab(appState, action)
-      break
     case AppConstants.APP_TAB_CREATED:
       appState = tabState.maybeCreateTab(appState, action)
       break

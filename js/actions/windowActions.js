@@ -1192,6 +1192,24 @@ const windowActions = {
       className,
       props
     })
+  },
+
+  autofillSelectionClicked: function (tabId, value, frontEndId, index) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_AUTOFILL_SELECTION_CLICKED,
+      tabId,
+      value,
+      frontEndId,
+      index
+    })
+  },
+
+  autofillPopupHidden: function (tabId, notify = false) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_AUTOFILL_POPUP_HIDDEN,
+      tabId,
+      notify
+    })
   }
 }
 

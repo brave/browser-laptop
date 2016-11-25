@@ -14,7 +14,7 @@ let currentWindows = {}
 const cleanupWindow = (windowId) => {
   delete currentWindows[windowId]
   setImmediate(() => {
-    appActions.windowClosed({ windowValue: windowId })
+    appActions.windowClosed({ windowId })
   })
 }
 
@@ -71,6 +71,29 @@ const api = {
       })
       win.once('closed', () => {
         cleanupWindow(windowId)
+      })
+      win.webContents.on('new-window', (e, url, frameName, disposition, options = {}) => {
+        console.log(options)
+        let userGesture = options.userGesture
+        if (userGesture === false) {
+          e.preventDefault()
+        } else {
+          let frameProps = {
+            location: url,
+            delayedLoadUrl: options.delayedLoadUrl,
+            guestInstanceId: options.guestInstanceId,
+            windowId,
+            disposition
+          }
+
+          let windowOpts = options.windowOptions || {}
+          windowOpts.disposition = disposition
+          if (disposition === 'new-window' || disposition === 'new-popup') {
+            appActions.newWindow(frameProps, windowOpts)
+          } else {
+            appActions.newTab(frameProps)
+          }
+        }
       })
       win.on('blur', () => {
         updateWindow(windowId)

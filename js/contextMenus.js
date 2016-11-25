@@ -455,8 +455,7 @@ function autofillTemplateInit (suggestions, frame) {
       template.push({
         label: value,
         click: (item, focusedWindow) => {
-          ipc.send('autofill-selection-clicked', frame.get('tabId'), value, frontendId, i)
-          windowActions.setContextMenuDetail()
+          windowActions.autofillSelectionClicked(frame.get('tabId'), value, frontendId, i)
         }
       })
     }
@@ -1370,7 +1369,10 @@ function onShowAutofillMenu (suggestions, boundingRect, frame) {
     x: (window.innerWidth - boundingRect.clientWidth),
     y: (window.innerHeight - boundingRect.clientHeight)
   }
+  const tabId = frame.get('tabId')
   windowActions.setContextMenuDetail(Immutable.fromJS({
+    type: 'autofill',
+    tabId,
     left: offset.x + boundingRect.x,
     top: offset.y + (boundingRect.y + boundingRect.height) - downloadsBarOffset,
     template: menuTemplate
