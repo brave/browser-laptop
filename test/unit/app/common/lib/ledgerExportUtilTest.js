@@ -3,10 +3,10 @@ const assert = require('assert')
 const underscore = require('underscore')
 const uuid = require('node-uuid')
 
-require('../braveUnit')
+require('../../../braveUnit')
 
-const ledgerExportUtil = require('../../../js/lib/ledgerExportUtil')
-const base64Encode = require('../../../js/lib/base64').encode
+const ledgerExportUtil = require('../../../../../app/common/lib/ledgerExportUtil')
+const base64Encode = require('../../../../../js/lib/base64').encode
 
 const CSV_HEADER_ROW_PREFIX_COLUMNS = ['Publisher', 'Votes', 'Fraction', 'BTC']
 const CSV_HEADER_ROW_PREFIX = CSV_HEADER_ROW_PREFIX_COLUMNS.join(',')
@@ -24,7 +24,7 @@ const EMPTY_CSV_DATA_URL = CSV_DATA_URI_PREFIX + base64Encode(EMPTY_CSV)
 const EXPORT_FILENAME_CONST_PREFIX_PART = 'Brave_Payments_'
 const EXPORT_FILENAME_PREFIX_EXPECTED_FORM = `${EXPORT_FILENAME_CONST_PREFIX_PART}\${MM-D(D)-YYYY}`
 
-const exampleTransactions = require('./exampleLedgerData').transactions
+const exampleTransactions = require('../../../fixtures/exampleLedgerData').transactions
 const exampleTransaction = exampleTransactions[0]
 
 const PUBLISHERS = (exampleTransaction.ballots ? underscore.keys(exampleTransaction.ballots) : [])
@@ -164,20 +164,31 @@ describe('ledger export utilities test', function () {
 
       checkTotalRow(rows)
     })
+
+    it('returns the same output for a single transaction input as an array of 1 element and a plain transaction object', function () {
+      let singleTxRows = ledgerExportUtil.getTransactionCSVText(exampleTransaction)
+      let arrayWithSingleTxRows = ledgerExportUtil.getTransactionCSVText(exampleTransactions)
+
+      assert.deepEqual(singleTxRows, arrayWithSingleTxRows)
+    })
   })
 
   describe('getTransactionCSVRows', function () {
-    it('for empty input, returns an array containing only the expected CSV header row', function () {
-      let output
+    describe('with invalid input', function () {
+      it('returns an array w/ header if undefined', function () {
+        assert.deepEqual(ledgerExportUtil.getTransactionCSVRows(undefined),
+          [DEFAULT_CSV_HEADER_ROW])
+      })
 
-      output = ledgerExportUtil.getTransactionCSVRows(undefined)
-      assert.deepEqual(output, [DEFAULT_CSV_HEADER_ROW])
+      it('returns an array w/ header if null', function () {
+        assert.deepEqual(ledgerExportUtil.getTransactionCSVRows(null),
+          [DEFAULT_CSV_HEADER_ROW])
+      })
 
-      output = ledgerExportUtil.getTransactionCSVRows(null)
-      assert.deepEqual(output, [DEFAULT_CSV_HEADER_ROW])
-
-      output = ledgerExportUtil.getTransactionCSVRows([])
-      assert.deepEqual(output, [DEFAULT_CSV_HEADER_ROW])
+      it('returns an array w/ header if empty', function () {
+        assert.deepEqual(ledgerExportUtil.getTransactionCSVRows([]),
+          [DEFAULT_CSV_HEADER_ROW])
+      })
     })
 
     it('returns a CSV row array, where the first row is the expected header row up to the currency column (which varies)', function () {
@@ -198,33 +209,71 @@ describe('ledger export utilities test', function () {
       checkColumnDatatypesForRows(rows)
     })
 
-    it('returns the same output for a single transaction input as an array of 1 element and a plain transaction object', function () {
-      let singleTxRows = ledgerExportUtil.getTransactionCSVText(exampleTransaction)
-      let arrayWithSingleTxRows = ledgerExportUtil.getTransactionCSVText(exampleTransactions)
+    describe('with `addTotalRow` == false', function () {
+      it('returns an array w/ correct # of rows', function () {
+        const EXPECTED_CSV_ROW_COUNT_NO_TOTAL = 1 + NUM_PUBLISHERS
+        const rows = ledgerExportUtil.getTransactionCSVRows(exampleTransaction)
 
-      assert.deepEqual(singleTxRows, arrayWithSingleTxRows)
+        assert.equal(rows.length, EXPECTED_CSV_ROW_COUNT_NO_TOTAL)
+      })
     })
 
-    it('given a transaction, returns an array containing the right number of CSV rows: 1 header row, 1 row per publisher, and if addTotalRow===true, 1 row with totals', function () {
-      const EXPECTED_CSV_ROW_COUNT_NO_TOTAL = 1 + NUM_PUBLISHERS
-      const EXPECTED_CSV_ROW_COUNT_WITH_TOTAL = 1 + NUM_PUBLISHERS + 1
+    describe('with `addTotalRow` == true', function () {
+      it('returns an array w/ correct # of rows (1 header, 1 per publisher, and 1 with totals)', function () {
+        const EXPECTED_CSV_ROW_COUNT_WITH_TOTAL = 1 + NUM_PUBLISHERS + 1
+        const ADD_TOTAL_ROW = true
+        const rows = ledgerExportUtil.getTransactionCSVRows(exampleTransaction, null, ADD_TOTAL_ROW)
 
-      // output with NO TOTAL ROW
-      var rows = ledgerExportUtil.getTransactionCSVRows(exampleTransaction)
+        assert.equal(rows.length, EXPECTED_CSV_ROW_COUNT_WITH_TOTAL)
+      })
+      it('returns a `total row` entry with correct totals for each numeric column', function () {
+        const ADD_TOTAL_ROW = true
+        let rows = ledgerExportUtil.getTransactionCSVRows(exampleTransaction, null, ADD_TOTAL_ROW)
 
-      assert.equal(rows.length, EXPECTED_CSV_ROW_COUNT_NO_TOTAL)
-
-      let ADD_TOTAL_ROW = true
-      rows = ledgerExportUtil.getTransactionCSVRows(exampleTransaction, null, ADD_TOTAL_ROW)
-
-      assert.equal(rows.length, EXPECTED_CSV_ROW_COUNT_WITH_TOTAL)
+        checkTotalRow(rows)
+      })
     })
 
-    it('when argument addTotalRow===true, there should be a total row with correct totals for each numeric column', function () {
-      let ADD_TOTAL_ROW = true
-      let rows = ledgerExportUtil.getTransactionCSVRows(exampleTransaction, null, ADD_TOTAL_ROW)
+    describe('with `sortByContribution` == false', function () {
+      it('sort publishers alphabetically (per spec)', function () {
+        const rows = ledgerExportUtil.getTransactionCSVRows(exampleTransaction)
+        let lastEntry
+        let isValid = true
+        rows.forEach((row) => {
+          const rowData = row.split(',')
+          const publisherName = rowData[0]
+          if (!lastEntry) {
+            lastEntry = publisherName
+            return
+          }
+          if (publisherName < lastEntry) {
+            isValid = false
+          }
+          lastEntry = publisherName
+        })
+        assert.equal(isValid, true)
+      })
+    })
 
-      checkTotalRow(rows)
+    describe('with `sortByContribution` == true', function () {
+      it('sort publishers by contribution', function () {
+        const rows = ledgerExportUtil.getTransactionCSVRows(exampleTransaction, null, null, true)
+        let lastEntry
+        let isValid = true
+        rows.forEach((row) => {
+          const rowData = row.split(',')
+          const votes = parseInt(rowData[1], 10)
+          if (typeof lastEntry !== 'number') {
+            lastEntry = votes
+            return
+          }
+          if (votes > lastEntry) {
+            isValid = false
+          }
+          lastEntry = votes
+        })
+        assert.equal(isValid, true)
+      })
     })
   })
 
@@ -350,13 +399,13 @@ describe('ledger export utilities test', function () {
   })
 
   describe('getTotalContribution', function () {
-/**
-  var totalContribution = {
-    satoshis: 0,
-    fiat: { amount: 0, currency: null },
-    fee: 0
-  }
-**/
+    /**
+      var totalContribution = {
+        satoshis: 0,
+        fiat: { amount: 0, currency: null },
+        fee: 0
+      }
+    **/
     let contributionData
 
     before(function () {

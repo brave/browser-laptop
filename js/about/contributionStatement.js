@@ -7,7 +7,7 @@ const ReactDOM = require('react-dom')
 const Immutable = require('immutable')
 const ImmutableComponent = require('../components/immutableComponent')
 
-const ledgerExportUtil = require('../lib/ledgerExportUtil')
+const ledgerExportUtil = require('../../app/common/lib/ledgerExportUtil')
 const getTransactionCSVRows = ledgerExportUtil.getTransactionCSVRows
 const addExportFilenamePrefixToTransactions = ledgerExportUtil.addExportFilenamePrefixToTransactions
 
