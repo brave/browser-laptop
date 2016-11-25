@@ -20,7 +20,7 @@ const siteTags = require('../constants/siteTags')
 const config = require('../constants/config')
 const backgrounds = require('../data/backgrounds')
 
-const ipc = window.chrome.ipc
+const ipc = window.chrome.ipcRenderer
 
 require('../../less/about/newtab.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
