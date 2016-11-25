@@ -8,6 +8,7 @@
   },
   "scripts": {
     "add-simulated-payment-history": "node ./tools/addSimulatedPaymentHistory.js",
+    "add-simulated-synopsis-visits": "node ./tools/addSimulatedSynopsisVisits.js",
     "build-installer": "node ./tools/buildInstaller.js",
     "build-package": "node ./tools/buildPackage.js",
     "check-security": "nsp check",

@@ -40,6 +40,14 @@ function addSimulatedLedgerTransactions (numTx) {
   }
 }
 
+const updateExistingSynopsisFile = require('../synopsisHelpers').updateExistingSynopsisFile
+function addSimulatedSynopsisVisits (numPublishers) {
+  let userDataPath = app.getPath('userData')
+  let ledgerSynopsisPath = path.join(userDataPath, 'ledger-synopsis.json')
+
+  updateExistingSynopsisFile(ledgerSynopsisPath, numPublishers)
+}
+
 app.on('ready', () => {
   const cmd = process.argv[2]
   switch (cmd) {
@@ -48,6 +56,9 @@ app.on('ready', () => {
       break
     case 'addSimulatedLedgerTransactions':
       addSimulatedLedgerTransactions(process.argv[3])
+      break
+    case 'addSimulatedSynopsisVisits':
+      addSimulatedSynopsisVisits(process.argv[3])
       break
   }
 
