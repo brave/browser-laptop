@@ -1,0 +1,62 @@
+#!/bin/sh
+set -exu
+OPTION=${1:-brave-apt-staging}
+GPG_KEY="4A1B4360"
+KEY_NAME=keys.asc
+KEY_FILE=/tmp/${KEY_NAME}
+
+cat <<EOF > $HOME/.aptly.conf
+{ "rootDir": "$HOME/.aptly",
+"downloadConcurrency": 4,
+"downloadSpeedLimit": 0,
+"architectures": [],
+"dependencyFollowSuggests": false,
+"dependencyFollowRecommends": false,
+"dependencyFollowAllVariants": false,
+"dependencyFollowSource": false,
+"gpgDisableSign": false,
+"gpgDisableVerify": false,
+"downloadSourcePackages": false,
+"ppaDistributorID": "ubuntu",
+"ppaCodename": "",
+"S3PublishEndpoints": {
+"brave-apt": {
+"region": "us-west-2",
+"bucket": "brave-apt",
+"acl": "public-read"
+},
+"brave-apt-staging": {
+"region": "us-west-2",
+"bucket": "brave-apt-staging",
+"acl": "public-read"
+}
+},
+"SwiftPublishEndpoints": {} }
+EOF
+
+gpg --export --armor ${GPG_KEY} > ${KEY_FILE}
+aws s3 cp ${KEY_FILE} s3://${OPTION}/keys.asc
+aws s3api put-object-acl --acl public-read --bucket ${OPTION} --key ${KEY_NAME}
+
+
+### You will want to run with brave-apt as your first argument to push to
+### production
+for i in xenial jesse trusty
+	do aptly repo create -distribution=$i -component=main ${i}-release
+done
+
+for i in xenial jesse trusty
+	do aptly repo add ${i}-release dist/*.deb
+done
+
+for i in xenial jesse trusty
+	do aptly snapshot create ${i}-snapshot from repo ${i}-release
+done
+
+for i in xenial jesse trusty
+	do aptly repo edit ${i}-release
+done
+
+for i in xenial jesse trusty
+	do aptly publish snapshot -gpg-key=${GPG_KEY} ${i}-snapshot s3:${OPTION}:
+done
