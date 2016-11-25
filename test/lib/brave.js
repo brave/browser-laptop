@@ -5,7 +5,7 @@ require('./coMocha')
 const path = require('path')
 const fs = require('fs')
 const os = require('os')
-const {getTargetAboutUrl, isSourceAboutUrl} = require('../../js/lib/appUrlUtil')
+const {getTargetAboutUrl, isSourceAboutUrl, getBraveExtIndexHTML} = require('../../js/lib/appUrlUtil')
 
 var chaiAsPromised = require('chai-as-promised')
 chai.should()
@@ -83,7 +83,7 @@ var exports = {
 
   defaultTimeout: 10000,
 
-  browserWindowUrl: 'file://' + path.resolve(__dirname, '..', '..') + '/app/extensions/brave/index.html',
+  browserWindowUrl: getBraveExtIndexHTML(),
   newTabUrl: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-newtab.html',
   fixtureUrl: function (filename) {
     return 'file://' + path.resolve(__dirname, '..', 'fixtures', filename)
@@ -200,7 +200,7 @@ var exports = {
               // ignore extension urls unless they are "about" pages
               if (!(urls[i].startsWith('chrome-extension') && !urls[i].match(/about-.*\.html(#.*)?$/)) &&
                   // ignore window urls
-                  !urls[i].startsWith('file:')) {
+                  !urls[i].startsWith('chrome://brave')) {
                 newHandles.push(handles[i])
               }
             }
