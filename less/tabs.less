@@ -70,9 +70,13 @@
   padding: 0;
   width: 100%;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   border: 1px solid rgba(0, 0, 0, 0.0);
   border-bottom: 1px;
+  padding: 0 4px;
+  @media screen and (max-width: @breakpointFitTabCloseButton) {
+    padding: 0 2px;
+  }
 
   .tabTitle {
     -webkit-user-select: none;
@@ -92,8 +96,6 @@
     background-repeat: no-repeat;
     display: inline-block;
     font-size: 12px;
-    margin-left: 4px;
-    margin-right: 4px;
     text-align: center;
   }
 
@@ -174,8 +176,6 @@
     text-align: center;
     width: 16px;
     height: 16px;
-    margin-left: 4px;
-    margin-right: 4px;
 
     &:hover {
       opacity: 1;
