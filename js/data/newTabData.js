@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const appUrlUtil = require('../lib/appUrlUtil')
-const iconPath = appUrlUtil.fileUrl('img/newtab/defaultTopSitesIcon')
+const {getBraveExtUrl} = require('../lib/appUrlUtil')
+const iconPath = getBraveExtUrl('img/newtab/defaultTopSitesIcon')
 
 /**
  * Let lastAccessedTime be the first-time user see the new tab page
