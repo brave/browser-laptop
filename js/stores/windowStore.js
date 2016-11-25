@@ -4,6 +4,7 @@
 
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const EventEmitter = require('events').EventEmitter
+const AppConstants = require('../constants/appConstants')
 const WindowConstants = require('../constants/windowConstants')
 const config = require('../constants/config')
 const settings = require('../constants/settings')
@@ -634,8 +635,19 @@ const doAction = (action) => {
       // Since the input values of bookmarks are bound, we need to notify the controls sync.
       windowStore.emitChanges()
       return
+    case WindowConstants.WINDOW_AUTOFILL_SELECTION_CLICKED:
+      ipc.send('autofill-selection-clicked', action.tabId, action.value, action.frontendId, action.index)
+      windowState = windowState.delete('contextMenuDetail')
+      break
+    case WindowConstants.WINDOW_AUTOFILL_POPUP_HIDDEN:
     case WindowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL:
       if (!action.detail) {
+        if (windowState.getIn('contextMenuDetail', 'type') === 'autofill' &&
+            windowState.getIn('contextMenuDetail', 'tabId') === action.tabId) {
+          if (action.notify) {
+            ipc.send('autofill-popup-hidden', action.tabId)
+          }
+        }
         windowState = windowState.delete('contextMenuDetail')
       } else {
         windowState = windowState.set('contextMenuDetail', action.detail)
@@ -895,6 +907,9 @@ const doAction = (action) => {
       }
       // Since the input values of address are bound, we need to notify the controls sync.
       windowStore.emitChanges()
+      break
+    case AppConstants.APP_NEW_TAB:
+      newFrame(action.frameProps, action.frameProps.get('disposition') === 'foreground-tab')
       break
     default:
   }

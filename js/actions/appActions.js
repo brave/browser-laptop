@@ -69,10 +69,10 @@ const appActions = {
    * A new tab has been requested
    * @param {Object} createProperties - windowId, url, active, openerTabId
    */
-  newTab: function (createProperties) {
+  newTab: function (frameProps) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_NEW_TAB,
-      createProperties
+      frameProps
     })
   },
 
