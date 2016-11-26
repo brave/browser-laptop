@@ -6,8 +6,9 @@ const React = require('react')
 const ReactDOM = require('react-dom')
 const Immutable = require('immutable')
 const ImmutableComponent = require('../components/immutableComponent')
+const {makeImmutable} = require('../../app/common/state/immutableUtil')
 
-const ledgerExportUtil = require('../lib/ledgerExportUtil')
+const ledgerExportUtil = require('../../app/common/lib/ledgerExportUtil')
 const getTransactionCSVRows = ledgerExportUtil.getTransactionCSVRows
 const addExportFilenamePrefixToTransactions = ledgerExportUtil.addExportFilenamePrefixToTransactions
 
@@ -59,7 +60,7 @@ class ContributionStatement extends ImmutableComponent {
   }
 
   initializePublisherMap (synopsis) {
-    synopsis = synopsis || this.synopsis
+    synopsis = makeImmutable(synopsis || this.synopsis)
 
     let publisherMap = {}
 
@@ -121,7 +122,7 @@ class ContributionStatement extends ImmutableComponent {
   }
 
   receiptFileName (transaction) {
-    transaction = transaction || this.transaction
+    transaction = makeImmutable(transaction || this.transaction)
     return `${transaction.get('exportFilenamePrefix')}.pdf`
   }
 
