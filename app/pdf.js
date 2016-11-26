@@ -14,7 +14,7 @@ const renderUrlToPdf = (appState, action, testingMode) => {
 
   let currentBw = BrowserWindow.getFocusedWindow()
 
-  let bw = new BrowserWindow({parent: currentBw, show: !!testingMode, backgroundColor: '#ffffff'})
+  let bw = new BrowserWindow({show: !!testingMode, backgroundColor: '#ffffff'})
 
   let wv = bw.webContents
 
@@ -32,16 +32,17 @@ const renderUrlToPdf = (appState, action, testingMode) => {
       wv.session.removeAllListeners('will-download')
 
       wv.downloadURL(pdfDataURI)
-      wv.session.on('will-download', function (event, item) {
+      wv.session.once('will-download', function (event, item) {
         if (savePath) {
           item.setSavePath(savePath)
         }
 
-        item.on('done', function (event, state) {
+        item.once('done', function (event, state) {
           if (state === 'completed') {
-            let savePath = item && item.getSavePath()
+            let finalSavePath = item && item.getSavePath()
+
             if (openAfterwards && savePath) {
-              currentBw.webContents.loadURL('file://' + savePath)
+              currentBw.webContents.loadURL('file://' + finalSavePath)
             }
 
             if (bw && !testingMode) {
