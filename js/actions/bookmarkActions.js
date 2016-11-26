@@ -7,6 +7,8 @@
 const siteUtil = require('../state/siteUtil')
 const windowActions = require('./windowActions')
 const eventUtil = require('../lib/eventUtil')
+const {SWITCH_TO_NEW_TABS} = require('../constants/settings')
+const getSetting = require('../settings').getSetting
 
 const bookmarkActions = {
   openBookmarksInFolder: function (allBookmarkItems, folderDetail) {
@@ -17,7 +19,7 @@ const bookmarkActions = {
     // Only load the first 25 tabs as loaded
     bookmarks
       .forEach((bookmark, i) =>
-        windowActions.newFrame(Object.assign(siteUtil.toFrameOpts(bookmark), {unloaded: i > 25}), false))
+        windowActions.newFrame(Object.assign(siteUtil.toFrameOpts(bookmark), {unloaded: i > 25}), getSetting(SWITCH_TO_NEW_TABS)))
   },
 
   /**
@@ -31,7 +33,7 @@ const bookmarkActions = {
         windowActions.newFrame({
           location: bookmarkItem.get('location'),
           partitionNumber: bookmarkItem && bookmarkItem.get && bookmarkItem.get('partitionNumber') || undefined
-        }, !!e.shiftKey)
+        }, !!e.shiftKey || getSetting(SWITCH_TO_NEW_TABS))
       } else {
         windowActions.loadUrl(activeFrame, bookmarkItem.get('location'))
       }
