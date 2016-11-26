@@ -15,9 +15,6 @@ const UrlUtil = require('../lib/urlutil')
 const currentWindow = require('../../app/renderer/currentWindow')
 const windowStore = require('../stores/windowStore')
 
-const settings = require('../constants/settings')
-const getSetting = require('../settings').getSetting
-
 function dispatch (action) {
   AppDispatcher.dispatch(action)
 }
@@ -284,14 +281,15 @@ const windowActions = {
    * Dispatches a message to the store to create a new frame
    *
    * @param {Object} frameOpts - An object of frame options such as isPrivate, element, and tab features.
-   *                  These may not all be hooked up in Electron yet.
-   * @param {boolean} openInForeground - true if the new frame should become the new active frame
+   * These may not all be hooked up in Electron yet.
+   * @param {boolean} openInForeground - true if the new frame should become the new active frame.
+   * If missing, this value will be defaulted to the user's preference (SWITCH_TO_NEW_TABS).
    */
   newFrame: function (frameOpts, openInForeground) {
     dispatch({
       actionType: WindowConstants.WINDOW_NEW_FRAME,
       frameOpts: frameOpts,
-      openInForeground: openInForeground || getSetting(settings.SWITCH_TO_NEW_TABS)
+      openInForeground
     })
   },
 
@@ -300,13 +298,15 @@ const windowActions = {
    *
    * @param {Object} frameProps - The properties of the frame to clone
    * @param {number} guestInstanceId - The guestInstanceId of the cloned webcontents
+   * @param {boolean} openInForeground - true if the new frame should become the new active frame.
+   * If missing, this value will be defaulted to the user's preference (SWITCH_TO_NEW_TABS).
    */
   cloneFrame: function (frameProps, guestInstanceId, openInForeground) {
     dispatch({
       actionType: WindowConstants.WINDOW_CLONE_FRAME,
       frameOpts: frameProps.toJS ? frameProps.toJS() : frameProps,
       guestInstanceId,
-      openInForeground: openInForeground || getSetting(settings.SWITCH_TO_NEW_TABS)
+      openInForeground
     })
   },
 
