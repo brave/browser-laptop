@@ -20,6 +20,7 @@
  */
 
 const fs = require('fs')
+const os = require('os')
 const path = require('path')
 const url = require('url')
 const util = require('util')
@@ -40,6 +41,7 @@ const random = require('random-lib')
 const tldjs = require('tldjs')
 const underscore = require('underscore')
 const uuid = require('node-uuid')
+const moment = require('moment')
 
 const appActions = require('../js/actions/appActions')
 const appConfig = require('../js/constants/appConfig')
@@ -244,9 +246,19 @@ var boot = () => {
  */
 
 var backupKeys = (appState, action) => {
+  const date = moment().format('L')
   const paymentId = appState.getIn(['ledgerInfo', 'paymentId'])
   const passphrase = appState.getIn(['ledgerInfo', 'passphrase'])
-  const message = locale.translation('ledgerBackupText', {paymentId, passphrase})
+  const messageLines = [
+    locale.translation('ledgerBackupText1'),
+    [locale.translation('ledgerBackupText2'), date].join(' '),
+    '',
+    [locale.translation('ledgerBackupText3'), paymentId].join(' '),
+    [locale.translation('ledgerBackupText4'), passphrase].join(' '),
+    '',
+    locale.translation('ledgerBackupText5')
+  ]
+  const message = messageLines.join(os.EOL)
   const filePath = path.join(app.getPath('userData'), '/brave_wallet_recovery.txt')
 
   fs.writeFile(filePath, message, (err) => {
