@@ -21,6 +21,15 @@ describe('about:bookmarks', function () {
       .windowByUrl(Brave.browserWindowUrl)
   }
 
+  function * addDemoSitesWithAndWithoutFavicon (client) {
+    const siteWithFavicon = Brave.server.url('favicon.html')
+    const favicon = Brave.server.url('img/test.ico')
+    const siteWithoutFavicon = Brave.server.url('page_favicon_not_found.html')
+    yield client
+      .addSite({ location: siteWithFavicon, title: 'Page with Favicon', favicon: favicon, tags: bookmarkTag, parentFolderId: 0, lastAccessedTime: lastVisit }, siteTags.BOOKMARK)
+      .addSite({ location: siteWithoutFavicon, title: 'Page without Favicon', tags: bookmarkTag, parentFolderId: 0, lastAccessedTime: lastVisit }, siteTags.BOOKMARK)
+  }
+
   function * addDemoSites (client) {
     yield client
       .addSite({
@@ -198,6 +207,35 @@ describe('about:bookmarks', function () {
         // Click the header; this should dismiss and release selection
         .click('table.sortableTable th')
         .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]', 5000, true)
+    })
+  })
+
+  describe('display favicon on bookmarks manager', function () {
+    Brave.beforeAll(this)
+
+    before(function * () {
+      yield setup(this.app.client)
+      yield addDemoSitesWithAndWithoutFavicon(this.app.client)
+    })
+
+    it('display favicon for url inside bookmarks toolbar', function * () {
+      yield this.app.client
+        .tabByUrl(aboutBookmarksUrl)
+        .loadUrl(aboutBookmarksUrl)
+        .getCssProperty('td.title[data-sort="Page with Favicon"] .bookmarkFavicon', 'background-image')
+        .then((val) => {
+          return val === `url("${Brave.server.url('img/test.ico')}")`
+        })
+    })
+
+    it('fallback to default favicon when url has no favicon inside bookmarks toolbar', function * () {
+      yield this.app.client
+        .tabByUrl(aboutBookmarksUrl)
+        .loadUrl(aboutBookmarksUrl)
+        .getAttribute('td.title[data-sort="Page without Favicon"] .bookmarkFavicon', 'class')
+        .then((val) => {
+          return val === 'bookmarkFavicon bookmarkFile fa fa-file-o'
+        })
     })
   })
 })

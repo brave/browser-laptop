@@ -159,6 +159,8 @@ class Tab extends ImmutableComponent {
     }
 
     const icon = this.props.tab.get('icon')
+    const defaultIcon = 'fa fa-file-o'
+
     if (!this.loading && icon) {
       iconStyle = Object.assign(iconStyle, {
         backgroundImage: `url(${icon})`,
@@ -225,6 +227,8 @@ class Tab extends ImmutableComponent {
           locationHasFavicon
           ? <div className={cx({
             tabIcon: true,
+            bookmarkFile: !icon,
+            [defaultIcon]: !icon,
             'fa fa-circle-o-notch fa-spin': this.loading
           })}
             style={iconStyle} />

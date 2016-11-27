@@ -224,6 +224,37 @@ describe('about:newtab tests', function () {
         yield this.app.client
           .waitForExist('.topSitesElementFavicon', 3000, true)
       })
+
+      it('shows favicon image for topSites', function * () {
+        const pageWithFavicon = Brave.server.url('favicon.html')
+
+        yield this.app.client
+          .tabByUrl(Brave.newTabUrl)
+          .url(pageWithFavicon)
+          .waitForUrl(pageWithFavicon)
+          .windowParentByUrl(pageWithFavicon)
+
+        yield reloadNewTab(this.app.client)
+
+        yield this.app.client
+          .waitForVisible('.topSitesElementFavicon img').should.eventually.be.true
+      })
+
+      it('replace topSites favicon images with a letter when no icon is found', function * () {
+        const pageWithoutFavicon = Brave.server.url('page_favicon_not_found.html')
+
+        yield this.app.client
+          .tabByUrl(Brave.newTabUrl)
+          .url(pageWithoutFavicon)
+          .waitForUrl(pageWithoutFavicon)
+          .windowParentByUrl(pageWithoutFavicon)
+
+        yield reloadNewTab(this.app.client)
+
+        yield this.app.client
+          .waitForVisible('.topSitesElementFavicon')
+          .getText('.topSitesElementFavicon').should.eventually.be.equal('F')
+      })
     })
   })
 })
