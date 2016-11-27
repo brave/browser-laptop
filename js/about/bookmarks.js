@@ -210,9 +210,8 @@ class BookmarkTitleHeader extends ImmutableComponent {
 class BookmarkTitleCell extends ImmutableComponent {
   render () {
     let iconStyle
-    let showingFavicon = false
+    const icon = this.props.siteDetail.get('favicon')
     if (!siteUtil.isFolder(this.props.siteDetail)) {
-      const icon = this.props.siteDetail.get('favicon')
       if (icon) {
         iconStyle = {
           minWidth: iconSize,
@@ -221,16 +220,23 @@ class BookmarkTitleCell extends ImmutableComponent {
           backgroundSize: iconSize,
           height: iconSize
         }
-        showingFavicon = true
       }
     }
 
     const bookmarkTitle = this.props.siteDetail.get('customTitle') || this.props.siteDetail.get('title')
     const bookmarkLocation = this.props.siteDetail.get('location')
+    const defaultIcon = 'fa fa-file-o'
 
     return <div>
       {
-        showingFavicon ? <span className='bookmarkFavicon' style={iconStyle} /> : null
+        <span
+          className={cx({
+            bookmarkFavicon: true,
+            bookmarkFile: !icon,
+            [defaultIcon]: !icon
+          })}
+          style={iconStyle}
+        />
       }
       <span>{bookmarkTitle || bookmarkLocation}</span>
       {

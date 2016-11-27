@@ -150,4 +150,57 @@ describe('bookmarksToolbar', function () {
         .waitForVisible('.contextMenuItemText', 1000, true)
     })
   })
+
+  describe('display favicon on bookmarks toolbar', function () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
+      yield setup(this.app.client)
+    })
+
+    it('display bookmark favicon for url that has it', function * () {
+      const pageWithFavicon = Brave.server.url('favicon.html')
+
+      yield this.app.client
+        .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
+        .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON, true)
+        .waitForVisible(bookmarksToolbar)
+        .waitForUrl(Brave.newTabUrl)
+        .loadUrl(pageWithFavicon)
+        .windowParentByUrl(pageWithFavicon)
+        .waitForVisible(navigator)
+        .moveToObject(navigator)
+        .waitForVisible(navigatorNotBookmarked)
+        .click(navigatorNotBookmarked)
+        .waitForVisible(doneButton)
+        .click(doneButton)
+
+      yield this.app.client.waitUntil(() =>
+        this.app.client.getCssProperty('.bookmarkFavicon', 'background-image').then((backgroundImage) =>
+          backgroundImage.value === `url("${Brave.server.url('img/test.ico')}")`
+      ))
+    })
+
+    it('fallback to default bookmark icon when url has no favicon', function * () {
+      const pageWithoutFavicon = Brave.server.url('page_favicon_not_found.html')
+
+      yield this.app.client
+        .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
+        .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON, true)
+        .waitForVisible(bookmarksToolbar)
+        .waitForUrl(Brave.newTabUrl)
+        .loadUrl(pageWithoutFavicon)
+        .windowParentByUrl(pageWithoutFavicon)
+        .waitForVisible(navigator)
+        .moveToObject(navigator)
+        .waitForVisible(navigatorNotBookmarked)
+        .click(navigatorNotBookmarked)
+        .waitForVisible(doneButton)
+        .click(doneButton)
+
+      yield this.app.client.waitUntil(() =>
+        this.app.client.getAttribute('.bookmarkFavicon', 'class').then((className) =>
+          className === 'bookmarkFavicon bookmarkFile fa fa-file-o'
+      ))
+    })
+  })
 })

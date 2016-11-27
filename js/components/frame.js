@@ -34,6 +34,7 @@ const windowStore = require('../stores/windowStore')
 const appStoreRenderer = require('../stores/appStoreRenderer')
 const siteSettings = require('../state/siteSettings')
 const {newTabMode} = require('../../app/common/constants/settingsEnums')
+const imageUtil = require('../lib/imageUtil')
 
 const WEBRTC_DEFAULT = 'default'
 const WEBRTC_DISABLE_NON_PROXY = 'disable_non_proxied_udp'
@@ -819,7 +820,9 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('page-favicon-updated', (e) => {
       if (e.favicons && e.favicons.length > 0) {
-        windowActions.setFavicon(this.frame, e.favicons[0])
+        imageUtil.getWorkingImageUrl(e.favicons[0], (imageFound) => {
+          windowActions.setFavicon(this.frame, imageFound ? e.favicons[0] : null)
+        })
       }
     })
     this.webview.addEventListener('page-title-updated', ({title}) => {

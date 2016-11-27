@@ -398,6 +398,15 @@ describe('navigationBar tests', function () {
           backgroundImage.value === `url("${Brave.server.url('img/test.ico')}")`
       ))
     })
+
+    it('Fallback to default icon when no one is specified', function * () {
+      const pageWithNoFavicon = Brave.server.url('page_no_favicon.html')
+      yield this.app.client.tabByUrl(Brave.newTabUrl).url(pageWithNoFavicon).waitForUrl(pageWithNoFavicon).windowParentByUrl(pageWithNoFavicon)
+      yield this.app.client.waitUntil(() =>
+        this.app.client.getAttribute(activeTabFavicon, 'class').then((className) =>
+          className === 'tabIcon bookmarkFile fa fa-file-o'
+      ))
+    })
   })
 
   describe('lockIcon', function () {
