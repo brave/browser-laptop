@@ -3,7 +3,7 @@
 const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
-const {urlInput, backButton, forwardButton, activeTabTitle, newFrameButton} = require('../lib/selectors')
+const {urlInput, backButton, forwardButton, activeTabTitle, activeTabFavicon, newFrameButton} = require('../lib/selectors')
 
 describe('tab tests', function () {
   function * setup (client) {
@@ -324,6 +324,34 @@ describe('tab tests', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('.tab[data-frame-key="3"]')
       yield this.app.client.waitForExist('.frameWrapper.isActive webview[data-frame-key="3"]')
+    })
+  })
+
+  describe('tabs with icons', function () {
+    Brave.beforeAll(this)
+    before(function * () {
+      yield setup(this.app.client)
+    })
+
+    it('shows tab\'s icon when page is not about:blank or about:newtab ', function * () {
+      var url = Brave.server.url('page1.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(url)
+        .windowByUrl(url)
+        .waitForExist(activeTabFavicon)
+    })
+
+    it('about:newtab and about:blank shouldn\'t have a tab icon', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl('about:blank')
+        .windowByUrl('about:blank')
+        .waitForExist(activeTabFavicon, 1000, true)
+        .tabByIndex(0)
+        .loadUrl('about:newtab')
+        .windowByUrl('about:newtab')
+        .waitForExist(activeTabFavicon, 1000, true)
     })
   })
 })

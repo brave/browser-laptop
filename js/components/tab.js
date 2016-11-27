@@ -180,6 +180,8 @@ class Tab extends ImmutableComponent {
         onClick={this.onMuteFrame.bind(this, !this.props.tab.get('audioMuted'))} />
     }
 
+    const locationHasFavicon = this.props.tab.get('location') !== 'about:newtab' && this.props.tab.get('location') !== 'about:blank'
+
     return <div
       className={cx({
         tabArea: true,
@@ -219,11 +221,15 @@ class Tab extends ImmutableComponent {
             className='privateIcon fa fa-user' />
           : null
         }
-        <div className={cx({
-          tabIcon: true,
-          'fa fa-circle-o-notch fa-spin': this.loading
-        })}
-          style={iconStyle} />
+        {
+          locationHasFavicon
+          ? <div className={cx({
+            tabIcon: true,
+            'fa fa-circle-o-notch fa-spin': this.loading
+          })}
+            style={iconStyle} />
+          : null
+        }
         {playIcon}
         {
           !this.isPinned
