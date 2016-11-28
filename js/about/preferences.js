@@ -1014,8 +1014,8 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get advancedSettingsContent () {
-    const minDuration = this.props.ledgerData.get('minDuration')
-    const minPublisherVisits = this.props.ledgerData.get('minPublisherVisits')
+    const minDuration = this.props.ledgerData.getIn(['synopsisOptions', 'minDuration'])
+    const minPublisherVisits = this.props.ledgerData.getIn(['synopsisOptions', 'minPublisherVisits'])
 
     return <div className='board'>
       <div className='panel advancedSettings'>
@@ -1025,11 +1025,11 @@ class PaymentsTab extends ImmutableComponent {
             <SettingItem>
               <select
                 className='form-control'
-                defaultValue={minDuration || 8}
+                defaultValue={minDuration || 8000}
                 onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.MINIMUM_VISIT_TIME)}>>
-                <option value='5'>5 seconds</option>
-                <option value='8'>8 seconds</option>
-                <option value='60'>1 minute</option>
+                <option value='5000'>5 seconds</option>
+                <option value='8000'>8 seconds</option>
+                <option value='60000'>1 minute</option>
               </select>
             </SettingItem>
           </SettingsList>

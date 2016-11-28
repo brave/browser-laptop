@@ -147,7 +147,7 @@ const doAction = (action) => {
         case settings.MINIMUM_VISIT_TIME:
           if (action.value <= 0) break
 
-          synopsis.options.minDuration = action.value * 1000
+          synopsis.options.minDuration = action.value
           updatePublisherInfo()
           break
 
@@ -592,10 +592,11 @@ var enable = (paymentsEnabled) => {
       // cf., the `Synopsis` constructor, https://github.com/brave/ledger-publisher/blob/master/index.js#L167
       value = getSetting(settings.MINIMUM_VISIT_TIME)
       if (!value) {
-        value = 8
+        value = 8 * 1000
         appActions.changeSetting(settings.MINIMUM_VISIT_TIME, value)
       }
-      if (value > 0) synopsis.options.minDuration = value * 1000
+      // for earlier versions of the code...
+      if ((value > 0) && (value < 1000)) synopsis.options.minDuration = value * 1000
 
       value = getSetting(settings.MINIMUM_VISITS)
       if (!value) {
@@ -1237,9 +1238,6 @@ var getStateInfo = (state) => {
 
   ledgerInfo.paymentId = state.properties.wallet.paymentId
   ledgerInfo.passphrase = state.properties.wallet.keychains.passphrase
-
-  ledgerInfo.minDuration = synopsis.options.minDuration
-  ledgerInfo.minPublisherVisits = synopsis.options.minPublisherVisits
 
   ledgerInfo.created = !!state.properties.wallet
   ledgerInfo.creating = !ledgerInfo.created
