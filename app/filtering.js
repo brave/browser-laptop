@@ -138,7 +138,10 @@ function registerForBeforeRequest (session, partition) {
         }
 
         BrowserWindow.getAllWindows().forEach((wnd) =>
-          wnd.webContents.send(message, parentResourceName, details))
+          wnd.webContents.send(message, parentResourceName, {
+            tabId: details.tabId,
+            url: details.url
+          }))
         if (details.resourceType === 'image') {
           cb({ redirectURL: transparent1pxGif })
         } else {
@@ -159,7 +162,10 @@ function registerForBeforeRequest (session, partition) {
             appActions.addResourceCount(results.resourceName, 1)
           }
           BrowserWindow.getAllWindows().forEach((wnd) =>
-            wnd.webContents.send(messages.HTTPSE_RULE_APPLIED, results.ruleset, details))
+            wnd.webContents.send(messages.HTTPSE_RULE_APPLIED, results.ruleset, {
+              tabId: details.tabId,
+              url: details.url
+            }))
         }
         cb({redirectURL: results.redirectURL})
         return
