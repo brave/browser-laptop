@@ -54,7 +54,7 @@ const addBookmarkMenuItem = (label, siteDetail, closestDestinationDetail, isPare
       if (isParent) {
         siteDetail = siteDetail.set('parentFolderId', closestDestinationDetail && (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
       }
-      windowActions.setBookmarkDetail(siteDetail, siteDetail, closestDestinationDetail, false, true)
+      windowActions.setBookmarkDetail(siteDetail, siteDetail, closestDestinationDetail, true)
     }
   }
 }
