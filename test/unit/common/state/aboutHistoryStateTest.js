@@ -1,5 +1,5 @@
 /* global describe, it */
-const aboutHistoryState = require('../../../../../app/common/state/aboutHistoryState')
+const aboutHistoryState = require('../../../../app/common/state/aboutHistoryState')
 const Immutable = require('immutable')
 const assert = require('assert')
 

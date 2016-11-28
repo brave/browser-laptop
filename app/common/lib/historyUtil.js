@@ -34,7 +34,7 @@ module.exports.groupEntriesByDay = (history, locale) => {
   const reduced = history.reduce((previousValue, currentValue, currentIndex, array) => {
     const result = currentIndex === 1 ? [] : previousValue
     if (currentIndex === 1) {
-      const firstDate = getDayString(previousValue, locale)
+      const firstDate = getDayString(currentValue, locale)
       result.push({date: firstDate, entries: [previousValue]})
     }
     const date = getDayString(currentValue, locale)

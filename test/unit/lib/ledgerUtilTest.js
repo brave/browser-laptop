@@ -1,8 +1,8 @@
 /* global describe, it */
-const ledgerUtil = require('../../../../../app/common/lib/ledgerUtil')
+const ledgerUtil = require('../../../app/common/lib/ledgerUtil')
 const assert = require('assert')
 
-require('../../../braveUnit')
+require('../braveUnit')
 
 describe('ledgerUtil test', function () {
   describe('shouldTrackView', function () {

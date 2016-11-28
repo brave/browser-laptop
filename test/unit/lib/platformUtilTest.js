@@ -1,9 +1,9 @@
 /* global describe, it */
 const mockery = require('mockery')
 const assert = require('assert')
-let platformUtil = require('../../../../../app/common/lib/platformUtil')
+let platformUtil = require('../../../app/common/lib/platformUtil')
 
-require('../../../braveUnit')
+require('../braveUnit')
 
 describe('platformUtil', function () {
   const mockWin7 = {
@@ -26,11 +26,11 @@ describe('platformUtil', function () {
   const loadMocks = (osMock) => {
     mockery.enable({ warnOnReplace: false, warnOnUnregistered: false, useCleanCache: true })
     mockery.registerMock('os', osMock)
-    platformUtil = require('../../../../../app/common/lib/platformUtil')
+    platformUtil = require('../../../app/common/lib/platformUtil')
   }
   const unloadMocks = () => {
     mockery.disable()
-    platformUtil = require('../../../../../app/common/lib/platformUtil')
+    platformUtil = require('../../../app/common/lib/platformUtil')
   }
 
   describe('getPlatformStyles', function () {
