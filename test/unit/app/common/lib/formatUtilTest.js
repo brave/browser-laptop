@@ -1,8 +1,8 @@
 /* global describe, before, after, it */
-const formatUtil = require('../../../app/common/lib/formatUtil')
+const formatUtil = require('../../../../../app/common/lib/formatUtil')
 const assert = require('assert')
 
-require('../braveUnit')
+require('../../../braveUnit')
 
 describe('formatUtil', function () {
   describe('formatAccelerator', function () {
