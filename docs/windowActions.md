@@ -215,13 +215,14 @@ Dispatches a message to the store to create a new frame
 **Parameters**
 
 **frameOpts**: `Object`, An object of frame options such as isPrivate, element, and tab features.
-                 These may not all be hooked up in Electron yet.
+These may not all be hooked up in Electron yet.
 
-**openInForeground**: `boolean`, true if the new frame should become the new active frame
+**openInForeground**: `boolean`, true if the new frame should become the new active frame.
+If missing, this value will be defaulted to the user's preference (SWITCH_TO_NEW_TABS).
 
 
 
-### cloneFrame(frameProps, guestInstanceId) 
+### cloneFrame(frameProps, guestInstanceId, openInForeground) 
 
 Dispatches a message to the store to clone an existing frame
 
@@ -230,6 +231,9 @@ Dispatches a message to the store to clone an existing frame
 **frameProps**: `Object`, The properties of the frame to clone
 
 **guestInstanceId**: `number`, The guestInstanceId of the cloned webcontents
+
+**openInForeground**: `boolean`, true if the new frame should become the new active frame.
+If missing, this value will be defaulted to the user's preference (SWITCH_TO_NEW_TABS).
 
 
 

@@ -168,8 +168,8 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
   }
   frameOpts = frameOpts.toJS ? frameOpts.toJS() : frameOpts
 
-  if (openInForeground === undefined) {
-    openInForeground = true
+  if (typeof openInForeground !== 'boolean') {
+    openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS)
   }
 
   // evaluate the location
