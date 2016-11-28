@@ -70,13 +70,9 @@
   padding: 0;
   width: 100%;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   border: 1px solid rgba(0, 0, 0, 0.0);
   border-bottom: 1px;
-  padding: 0 4px;
-  @media screen and (max-width: @breakpointFitTabCloseButton) {
-    padding: 0 2px;
-  }
 
   .tabTitle {
     -webkit-user-select: none;
@@ -97,6 +93,8 @@
     display: inline-block;
     font-size: 12px;
     text-align: center;
+    margin-left: 4px;
+    margin-right: 4px;
   }
 
   .privateIcon {
@@ -176,6 +174,8 @@
     text-align: center;
     width: 16px;
     height: 16px;
+    margin-left: 4px;
+    margin-right: 4px;
 
     &:hover {
       opacity: 1;
