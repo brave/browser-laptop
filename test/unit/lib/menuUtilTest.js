@@ -1,14 +1,12 @@
 /* global describe, before, after, it */
-const siteTags = require('../../../../../js/constants/siteTags')
+const siteTags = require('../../../js/constants/siteTags')
 const mockery = require('mockery')
 const assert = require('assert')
 const Immutable = require('immutable')
+require('../braveUnit')
 
-require('../../../braveUnit')
-
-describe('menuUtil tests', function () {
+describe('menuUtil', function () {
   let menuUtil
-  let separator
 
   before(function () {
     mockery.enable({
@@ -16,10 +14,8 @@ describe('menuUtil tests', function () {
       warnOnUnregistered: false,
       useCleanCache: true
     })
-    // This is required; commonMenu is included by menuUtil (and references electron)
-    mockery.registerMock('electron', require('../../../lib/fakeElectron'))
-    menuUtil = require('../../../../../app/common/lib/menuUtil')
-    separator = require('../../../../../app/common/commonMenu').separatorMenuItem
+    mockery.registerMock('electron', require('./fakeElectron'))
+    menuUtil = require('../../../app/browser/lib/menuUtil')
   })
 
   after(function () {
@@ -120,13 +116,13 @@ describe('menuUtil tests', function () {
     })
   })
 
-  describe('createBookmarkTemplateItems', function () {
+  describe('createBookmarkMenuItems', function () {
     it('returns an array of items w/ the bookmark tag', function () {
       const appStateSites = Immutable.fromJS([
         { tags: [siteTags.BOOKMARK], title: 'my website', location: 'https://brave.com' }
       ])
 
-      const menuItems = menuUtil.createBookmarkTemplateItems(appStateSites)
+      const menuItems = menuUtil.createBookmarkMenuItems(appStateSites)
 
       assert.equal(Array.isArray(menuItems), true)
       assert.equal(menuItems.length, 1)
@@ -137,7 +133,7 @@ describe('menuUtil tests', function () {
         { tags: [siteTags.BOOKMARK], customTitle: 'use this', title: 'not this', location: 'https://brave.com' }
       ])
 
-      const menuItems = menuUtil.createBookmarkTemplateItems(appStateSites)
+      const menuItems = menuUtil.createBookmarkMenuItems(appStateSites)
 
       assert.equal(menuItems[0].label, 'use this')
     })
@@ -148,7 +144,7 @@ describe('menuUtil tests', function () {
         ]
       })
 
-      const menuItems = menuUtil.createBookmarkTemplateItems(appStateSites)
+      const menuItems = menuUtil.createBookmarkMenuItems(appStateSites)
 
       assert.deepEqual(menuItems, [])
     })
@@ -159,7 +155,7 @@ describe('menuUtil tests', function () {
         ]
       })
 
-      const menuItems = menuUtil.createBookmarkTemplateItems(appStateSites)
+      const menuItems = menuUtil.createBookmarkMenuItems(appStateSites)
 
       assert.deepEqual(menuItems, [])
     })
@@ -168,7 +164,7 @@ describe('menuUtil tests', function () {
         { tags: [siteTags.PINNED], title: 'pinned site', location: 'https://pinned-website.com' },
         { tags: [siteTags.BOOKMARK], title: 'my website', location: 'https://brave.com' }
       ])
-      const menuItems = menuUtil.createBookmarkTemplateItems(appStateSites)
+      const menuItems = menuUtil.createBookmarkMenuItems(appStateSites)
 
       assert.equal(menuItems.length, 1)
       assert.equal(menuItems[0].label, 'my website')
@@ -178,7 +174,7 @@ describe('menuUtil tests', function () {
         { tags: [siteTags.BOOKMARK_FOLDER], title: 'my folder', folderId: 123 },
         { tags: [siteTags.BOOKMARK], title: 'my website', location: 'https://brave.com', parentFolderId: 123 }
       ])
-      const menuItems = menuUtil.createBookmarkTemplateItems(appStateSites)
+      const menuItems = menuUtil.createBookmarkMenuItems(appStateSites)
 
       assert.equal(menuItems.length, 1)
       assert.equal(menuItems[0].label, 'my folder')
@@ -191,20 +187,20 @@ describe('menuUtil tests', function () {
         { tags: [siteTags.BOOKMARK], title: 'my website', location: 'https://brave.com', parentFolderId: 123 }
       ])
 
-      const menuItems = menuUtil.createBookmarkTemplateItems(appStateSites)
+      const menuItems = menuUtil.createBookmarkMenuItems(appStateSites)
 
       assert.equal(menuItems.length, 1)
       assert.equal(menuItems[0].label, 'use this')
     })
   })
 
-  describe('createRecentlyClosedTemplateItems', function () {
+  describe('createRecentlyClosedMenuItems', function () {
     it('returns an array of closedFrames preceded by a separator and "Recently Closed" items', function () {
       const windowStateClosedFrames = Immutable.fromJS([{
         title: 'sample',
         location: 'https://brave.com'
       }])
-      const menuItems = menuUtil.createRecentlyClosedTemplateItems(windowStateClosedFrames)
+      const menuItems = menuUtil.createRecentlyClosedMenuItems(windowStateClosedFrames)
 
       assert.equal(Array.isArray(menuItems), true)
       assert.equal(menuItems.length, 3)
@@ -228,38 +224,11 @@ describe('menuUtil tests', function () {
         { title: 'site10', location: 'https://brave10.com' },
         { title: 'site11', location: 'https://brave11.com' }
       ])
-      const menuItems = menuUtil.createRecentlyClosedTemplateItems(windowStateClosedFrames)
+      const menuItems = menuUtil.createRecentlyClosedMenuItems(windowStateClosedFrames)
 
       assert.equal(menuItems.length, 12)
       assert.equal(menuItems[2].label, windowStateClosedFrames.get(1).get('title'))
       assert.equal(menuItems[11].label, windowStateClosedFrames.get(10).get('title'))
-    })
-  })
-
-  describe('sanitizeTemplateItems', function () {
-    it('removes entries which are falsey', function () {
-      const template = [null, undefined, false, {label: 'lol'}]
-      const result = menuUtil.sanitizeTemplateItems(template)
-      const expectedResult = [{label: 'lol'}]
-      assert.deepEqual(result, expectedResult)
-    })
-    it('removes duplicate menu separators', function () {
-      const template = [separator, separator, {label: 'lol'}]
-      const result = menuUtil.sanitizeTemplateItems(template)
-      const expectedResult = [separator, {label: 'lol'}]
-      assert.deepEqual(result, expectedResult)
-    })
-    it('removes items which are missing label or type', function () {
-      const template = [{}, {test: 'test'}, {label: 'lol'}]
-      const result = menuUtil.sanitizeTemplateItems(template)
-      const expectedResult = [{label: 'lol'}]
-      assert.deepEqual(result, expectedResult)
-    })
-    it('removes items which have non-string values for label or type', function () {
-      const template = [{label: true}, {type: function () { console.log('test') }}, {label: 'lol'}]
-      const result = menuUtil.sanitizeTemplateItems(template)
-      const expectedResult = [{label: 'lol'}]
-      assert.deepEqual(result, expectedResult)
     })
   })
 })

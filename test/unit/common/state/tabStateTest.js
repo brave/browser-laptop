@@ -1,5 +1,5 @@
 /* global describe, it, before */
-const tabState = require('../../../../../app/common/state/tabState')
+const tabState = require('../../../../app/common/state/tabState')
 const Immutable = require('immutable')
 const assert = require('assert')
 

@@ -20,7 +20,7 @@ const siteTags = require('../../js/constants/siteTags')
 const dialog = electron.dialog
 const BrowserWindow = electron.BrowserWindow
 const {fileUrl} = require('../../js/lib/appUrlUtil')
-const menuUtil = require('../common/lib/menuUtil')
+const menuUtil = require('./lib/menuUtil')
 const getSetting = require('../../js/settings').getSetting
 const locale = require('../locale')
 const {isSiteBookmarked} = require('../../js/state/siteUtil')
@@ -329,7 +329,7 @@ const createHistorySubmenu = () => {
       }
     }
   ]
-  submenu = submenu.concat(menuUtil.createRecentlyClosedTemplateItems(Immutable.fromJS(Object.keys(closedFrames).map(key => closedFrames[key]))))
+  submenu = submenu.concat(menuUtil.createRecentlyClosedMenuItems(Immutable.fromJS(Object.keys(closedFrames).map(key => closedFrames[key]))))
 
   submenu.push(
     // TODO: recently visited
@@ -374,7 +374,7 @@ const createBookmarksSubmenu = () => {
     CommonMenu.importBrowserDataMenuItem()
   ]
 
-  const bookmarks = menuUtil.createBookmarkTemplateItems(appStore.getState().get('sites'))
+  const bookmarks = menuUtil.createBookmarkMenuItems(appStore.getState().get('sites'))
   if (bookmarks.length > 0) {
     submenu.push(CommonMenu.separatorMenuItem)
     submenu = submenu.concat(bookmarks)

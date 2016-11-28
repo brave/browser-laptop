@@ -1,8 +1,8 @@
 /* global describe, it */
-const httpUtil = require('../../../../../app/common/lib/httpUtil')
+const httpUtil = require('../../../app/common/lib/httpUtil')
 const assert = require('assert')
 
-require('../../../braveUnit')
+require('../braveUnit')
 
 describe('httpUtil test', function () {
   describe('responseHasContent', function () {
