@@ -83,7 +83,7 @@
     "aphrodite": "^1.0.0",
     "async": "^2.0.1",
     "electron-localshortcut": "^0.6.0",
-    "electron-prebuilt": "brave/electron-prebuilt",
+    "electron-prebuilt": "brave/electron-prebuilt#2.0.0",
     "electron-squirrel-startup": "brave/electron-squirrel-startup",
     "file-loader": "^0.8.5",
     "font-awesome": "^4.5.0",
