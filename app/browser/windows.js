@@ -73,7 +73,6 @@ const api = {
         cleanupWindow(windowId)
       })
       win.webContents.on('new-window', (e, url, frameName, disposition, options = {}) => {
-        console.log(options)
         let userGesture = options.userGesture
         if (userGesture === false) {
           e.preventDefault()

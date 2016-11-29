@@ -34,7 +34,7 @@ const {channel} = require('../../app/channel')
 const os = require('os')
 const autofill = require('../../app/autofill')
 const nativeImage = require('../../app/nativeImage')
-
+const Filtering = require('../../app/filtering')
 const basicAuth = require('../../app/browser/basicAuth')
 const tabs = require('../../app/browser/tabs')
 const windows = require('../../app/browser/windows')
@@ -46,6 +46,9 @@ const tabState = require('../../app/common/state/tabState')
 const aboutNewTabState = require('../../app/common/state/aboutNewTabState')
 const aboutHistoryState = require('../../app/common/state/aboutHistoryState')
 const windowState = require('../../app/common/state/windowState')
+
+const flash = require('../flash.js')
+const webtorrent = require('../../app/browser/webtorrent')
 
 const isDarwin = process.platform === 'darwin'
 const isWindows = process.platform === 'win32'
@@ -347,7 +350,6 @@ function handleChangeSettingAction (settingKey, settingValue) {
       })
       break
     case settings.DEFAULT_ZOOM_LEVEL:
-      const Filtering = require('../../app/filtering')
       Filtering.setDefaultZoomLevel(settingValue)
       break
     default:
@@ -364,9 +366,12 @@ const handleAppAction = (action) => {
   switch (action.actionType) {
     case AppConstants.APP_SET_STATE:
       appState = action.appState
-      windows.init(appState, action)
-      tabs.init(appState, action)
-      basicAuth.init(appState, action)
+      appState = Filtering.init(appState, action, appStore)
+      appState = windows.init(appState, action, appStore)
+      appState = tabs.init(appState, action, appStore)
+      appState = basicAuth.init(appState, action, appStore)
+      appState = flash.init(appState, action, appStore)
+      appState = webtorrent.init(appState, action, appStore)
       break
     case AppConstants.APP_SHUTTING_DOWN:
       shuttingDown = true

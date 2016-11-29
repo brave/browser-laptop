@@ -58,7 +58,6 @@ const AppStore = require('../js/stores/appStore')
 const PackageLoader = require('./package-loader')
 const Autofill = require('./autofill')
 const Extensions = require('./extensions')
-const Filtering = require('./filtering')
 const TrackingProtection = require('./trackingProtection')
 const AdBlock = require('./adBlock')
 const AdInsertion = require('./browser/ads/adInsertion')
@@ -73,12 +72,10 @@ const siteSettings = require('../js/state/siteSettings')
 const spellCheck = require('./spellCheck')
 const locale = require('./locale')
 const ledger = require('./ledger')
-const flash = require('../js/flash')
 const contentSettings = require('../js/state/contentSettings')
 const privacy = require('../js/state/privacy')
 const async = require('async')
 const settings = require('../js/constants/settings')
-const webtorrent = require('./browser/webtorrent')
 
 // temporary fix for #4517, #4518 and #4472
 app.commandLine.appendSwitch('enable-use-zoom-for-dsf', 'false')
@@ -240,8 +237,6 @@ const initiateSessionStateSave = (beforeQuit) => {
 
 let loadAppStatePromise = SessionStore.loadAppState()
 
-let flashInitialized = false
-
 // Some settings must be set right away on startup, those settings should be handled here.
 loadAppStatePromise.then((initialState) => {
   const {HARDWARE_ACCELERATION_ENABLED, SMOOTH_SCROLL_ENABLED, SEND_CRASH_REPORTS} = require('../js/constants/settings')
@@ -256,13 +251,6 @@ loadAppStatePromise.then((initialState) => {
   }
   if (initialState.settings[SMOOTH_SCROLL_ENABLED] === false) {
     app.commandLine.appendSwitch('disable-smooth-scrolling')
-  }
-  if (initialState.flash && initialState.flash.enabled === true) {
-    if (flash.init()) {
-      // Flash was initialized successfully
-      flashInitialized = true
-      return
-    }
   }
 })
 
@@ -410,7 +398,6 @@ app.on('ready', () => {
     // For tests we always want to load default app state
     const loadedPerWindowState = initialState.perWindowState
     delete initialState.perWindowState
-    initialState.flashInitialized = flashInitialized
     appActions.setState(Immutable.fromJS(initialState))
     Menu.init(initialState, null)
     return loadedPerWindowState
@@ -419,14 +406,12 @@ app.on('ready', () => {
     privacy.init()
     Autofill.init()
     Extensions.init()
-    Filtering.init()
     SiteHacks.init()
     spellCheck.init()
     HttpsEverywhere.init()
     TrackingProtection.init()
     AdBlock.init()
     AdInsertion.init()
-    webtorrent.init()
 
     if (!loadedPerWindowState || loadedPerWindowState.length === 0) {
       if (!CmdLine.newWindowURL()) {
@@ -496,12 +481,6 @@ app.on('ready', () => {
 
     ipcMain.on(messages.SET_CLIPBOARD, (e, text) => {
       electron.clipboard.writeText(text)
-    })
-
-    ipcMain.on(messages.CHECK_FLASH_INSTALLED, (e) => {
-      flash.checkFlashInstalled((installed) => {
-        e.sender.send(messages.FLASH_UPDATED, installed)
-      })
     })
 
     ipcMain.on(messages.OPEN_DOWNLOAD_PATH, (e, download) => {
