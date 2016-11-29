@@ -1,7 +1,6 @@
 const electron = require('electron')
 const ipc = electron.ipcMain
 const messages = require('../../js/constants/messages')
-const WebTorrentRemoteServer = require('webtorrent-remote/server')
 
 module.exports = {init}
 
@@ -17,8 +16,11 @@ let channels = {}
 // Receive messages via the window process, ultimately from the UI in a <webview> process
 function init () {
   if (DEBUG_IPC) console.log('WebTorrent IPC init')
-  server = new WebTorrentRemoteServer(send, {trace: DEBUG_IPC})
   ipc.on(messages.TORRENT_MESSAGE, function (e, msg) {
+    if (server === null) {
+      const WebTorrentRemoteServer = require('webtorrent-remote/server')
+      server = new WebTorrentRemoteServer(send, {trace: DEBUG_IPC})
+    }
     if (DEBUG_IPC) console.log('Received IPC: ' + JSON.stringify(msg))
     channels[msg.clientKey] = e.sender
     server.receive(msg)
