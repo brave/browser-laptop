@@ -151,6 +151,7 @@ const messages = {
   LEDGER_CREATE_WALLET: _,
   CHECK_BITCOIN_HANDLER: _,
   ADD_FUNDS_CLOSED: _,
+  RENDER_URL_TO_PDF: _,
   // Torrent
   TORRENT_MESSAGE: _
 }

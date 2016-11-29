@@ -129,6 +129,7 @@ const doAction = (action) => {
   if (publisherInfo._internal.debugP) {
     console.log('\napplication event: ' + JSON.stringify(underscore.pick(action, [ 'actionType', 'key' ]), null, 2))
   }
+
   switch (action.actionType) {
     case appConstants.APP_IDLE_STATE_CHANGED:
       visit('NOOP', underscore.now(), null)

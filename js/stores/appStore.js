@@ -791,6 +791,10 @@ const handleAppAction = (action) => {
         appState = extensionState.browserActionUpdated(appState, action)
       }
       break
+    case AppConstants.APP_RENDER_URL_TO_PDF:
+      const pdf = require('../../app/pdf')
+      appState = pdf.renderUrlToPdf(appState, action)
+      break
     default:
   }
 

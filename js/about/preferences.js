@@ -9,10 +9,14 @@ const Immutable = require('immutable')
 const SwitchControl = require('../components/switchControl')
 const ModalOverlay = require('../components/modalOverlay')
 const cx = require('../lib/classSet')
-const ledgerExportUtil = require('../lib/ledgerExportUtil')
-const transactionsToCSVDataURL = ledgerExportUtil.transactionsToCSVDataURL
+const ledgerExportUtil = require('../../app/common/lib/ledgerExportUtil')
 const addExportFilenamePrefixToTransactions = ledgerExportUtil.addExportFilenamePrefixToTransactions
+const appUrlUtil = require('../lib/appUrlUtil')
+const aboutUrls = appUrlUtil.aboutUrls
+const aboutContributionsUrl = aboutUrls.get('about:contributions')
+
 const {getZoomValuePercentage} = require('../lib/zoom')
+
 const config = require('../constants/config')
 const appConfig = require('../constants/appConfig')
 const preferenceTabs = require('../constants/preferenceTabs')
@@ -588,11 +592,7 @@ class PaymentHistoryRow extends ImmutableComponent {
   }
 
   get receiptFileName () {
-    return `${this.transaction.get('exportFilenamePrefix')}.csv`
-  }
-
-  get dataURL () {
-    return transactionsToCSVDataURL(this.transaction.toJS())
+    return `${this.transaction.get('exportFilenamePrefix')}.pdf`
   }
 
   render () {
@@ -602,7 +602,9 @@ class PaymentHistoryRow extends ImmutableComponent {
     return <tr>
       <td className='narrow' data-sort={this.timestamp}>{date}</td>
       <td className='wide' data-sort={this.satoshis}>{totalAmountStr}</td>
-      <td className='wide'><a href={this.dataURL} download={this.receiptFileName}>{this.receiptFileName}</a></td>
+      <td className='wide'>
+        <a href={aboutContributionsUrl + '#' + this.viewingId} target='_blank'>{this.receiptFileName}</a>
+      </td>
     </tr>
   }
 }

@@ -1,12 +1,16 @@
-const base64Encode = require('./base64').encode
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+const base64Encode = require('../../../js/lib/base64').encode
 const underscore = require('underscore')
 
 /**
  * Generates a contribution breakdown by publisher as a CSV data URL from an array of one or more transactions
  * @param {Object[]} transactions - array of transactions
  */
-let transactionsToCSVDataURL = function (transactions) {
-  let csvText = getTransactionCSVText(transactions, null, true)
+module.exports.transactionsToCSVDataURL = (transactions) => {
+  const csvText = module.exports.getTransactionCSVText(transactions, null, true)
   return 'data:text/csv;base64,' + base64Encode(csvText)
 }
 
@@ -24,7 +28,7 @@ let transactionsToCSVDataURL = function (transactions) {
  * @param {string[]=} viewingIds - OPTIONAL array of one or more viewingIds to filter transactions (single string viewingId supported too)
  *                            if null or undefined, all transactions are returned
  */
-let getTransactionsByViewingIds = function getTransactionsByViewingIds (transactions, viewingIds) {
+module.exports.getTransactionsByViewingIds = (transactions, viewingIds) => {
   if (!transactions) {
     return []
   }
@@ -67,18 +71,18 @@ let getTransactionsByViewingIds = function getTransactionsByViewingIds (transact
  * @param {string[]} viewingIds - OPTIONAL array/string containing one or more viewingIds to filter by
  *                            if null or undefined, all transactions are used
  */
-let getTotalContribution = function getTotalContribution (transactions, viewingIds) {
-  var txs = getTransactionsByViewingIds(transactions, viewingIds)
+module.exports.getTotalContribution = (transactions, viewingIds) => {
+  const txs = module.exports.getTransactionsByViewingIds(transactions, viewingIds)
 
-  var totalContribution = {
+  const totalContribution = {
     satoshis: 0,
     fiat: { amount: 0, currency: null },
     fee: 0
   }
 
-  for (var i = txs.length - 1; i >= 0; i--) {
-    var tx = txs[i] || {}
-    var txContribution = tx.contribution || {}
+  for (let i = txs.length - 1; i >= 0; i--) {
+    const tx = txs[i] || {}
+    const txContribution = tx.contribution || {}
 
     totalContribution.satoshis += 0 || txContribution.satoshis
 
@@ -101,7 +105,7 @@ let getTotalContribution = function getTotalContribution (transactions, viewingI
 }
 
 /**
- * Gives a summary of votes/contributions by Publisher from an array of one or ore transactions
+ * Gives a summary of votes/contributions by Publisher from an array of one or more transactions
  * @example
  * txUtil.getPublisherVoteData(client.state.transactions)
  * // {
@@ -123,13 +127,13 @@ let getTotalContribution = function getTotalContribution (transactions, viewingI
  * @param {Object[]} transactions - array of transactions
  * @param {string[]=} viewingIds - OPTIONAL array/string with one or more viewingIds to filter transactions by (if empty, uses all tx)
  **/
-let getPublisherVoteData = function getPublisherVoteData (transactions, viewingIds) {
-  transactions = getTransactionsByViewingIds(transactions, viewingIds)
+module.exports.getPublisherVoteData = (transactions, viewingIds) => {
+  transactions = module.exports.getTransactionsByViewingIds(transactions, viewingIds)
 
-  var publishersWithVotes = {}
-  var totalVotes = 0
+  const publishersWithVotes = {}
+  let totalVotes = 0
 
-  for (var i = transactions.length - 1; i >= 0; i--) {
+  for (let i = transactions.length - 1; i >= 0; i--) {
     var tx = transactions[i]
     var ballots = tx.ballots
 
@@ -157,7 +161,7 @@ let getPublisherVoteData = function getPublisherVoteData (transactions, viewingI
   var totalContributionAmountFiat = null
   var currency = null
 
-  var totalContribution = getTotalContribution(transactions)
+  const totalContribution = module.exports.getTotalContribution(transactions)
 
   if (totalContribution) {
     totalContributionAmountSatoshis = totalContributionAmountSatoshis || totalContribution.satoshis
@@ -166,7 +170,7 @@ let getPublisherVoteData = function getPublisherVoteData (transactions, viewingI
   }
 
   for (let publisher in publishersWithVotes) {
-    let voteDataForPublisher = publishersWithVotes[publisher]
+    const voteDataForPublisher = publishersWithVotes[publisher]
     let fraction = voteDataForPublisher.fraction = voteDataForPublisher.votes / totalVotes
 
     let contribution = voteDataForPublisher.contribution || {}
@@ -192,10 +196,10 @@ let getPublisherVoteData = function getPublisherVoteData (transactions, viewingI
  * Generates a contribution breakdown by publisher in an array of CSV rows from an array of transactions
  * @example
  * txUtil.getTransactionCSVRows(client.state.transactions)
- * // [ 'Publisher,Votes,Fraction,BTC,USD',
- * //   'chronicle.com,2,0.04081632653061224,0.0000033221,0.20 USD',
- * //   'waitbutwhy.com,3,0.061224489795918366,0.0000049832,0.31 USD',
- * //   'archlinux.org,1,0.02040816326530612,0.0000016611,0.10 USD',
+ * // [ ['Publisher,Votes,Fraction,BTC,USD'],
+ * //   ['chronicle.com,2,0.04081632653061224,0.0000033221,0.20 USD'],
+ * //   ['waitbutwhy.com,3,0.061224489795918366,0.0000049832,0.31 USD'],
+ * //   ['archlinux.org,1,0.02040816326530612,0.0000016611,0.10 USD'],
  * //   /.../
  * // ]
  *
@@ -203,19 +207,33 @@ let getPublisherVoteData = function getPublisherVoteData (transactions, viewingI
  * @param {string[]=} viewingIds - OPTIONAL array/string with one or more viewingIds to filter transactions by (if empty, uses all tx)
  * @param {boolean=} addTotalRow - OPTIONAL boolean indicating whether to add a TOTALS row (defaults false)
  **/
-let getTransactionCSVRows = function (transactions, viewingIds, addTotalRow) {
-  let txContribData = getPublisherVoteData(transactions, viewingIds)
+module.exports.getTransactionCSVRows = (transactions, viewingIds, addTotalRow, sortByContribution) => {
+  let txContribData = module.exports.getPublisherVoteData(transactions, viewingIds)
   var publishers = (underscore.keys(txContribData) || [])
 
-  // sort publishers alphabetically
-  // TODO: take locale argument and pass to localeCompare below
-  publishers = publishers.sort(function (a, b) {
-    return (a && typeof a === 'string' ? a : '').localeCompare(b && typeof b === 'string' ? b : '')
-  })
+  let publisherSortFunction
 
-  var currency = (publishers.length ? txContribData[publishers[0]].contribution.currency : 'USD')
+  if (sortByContribution) {
+    // sort publishers by contribution
+    publisherSortFunction = function (a, b) {
+      var getVotes = function (pubStr) {
+        return (pubStr && typeof pubStr === 'string' && txContribData[pubStr] && txContribData[pubStr].votes ? parseInt(txContribData[pubStr].votes) : 0)
+      }
+      return (getVotes(a) > getVotes(b) ? -1 : 1)
+    }
+  } else {
+    // sort publishers alphabetically by default (per spec)
+    // TODO: take locale argument and pass to localeCompare below
+    publisherSortFunction = function (a, b) {
+      return (a && typeof a === 'string' ? a : '').localeCompare(b && typeof b === 'string' ? b : '')
+    }
+  }
 
-  var headerRow = ['Publisher', 'Votes', 'Fraction', 'BTC', currency].join(',')
+  publishers = publishers.sort(publisherSortFunction)
+
+  const currency = (publishers.length ? txContribData[publishers[0]].contribution.currency : 'USD')
+
+  const headerRow = ['Publisher', 'Votes', 'Fraction', 'BTC', currency].join(',')
 
   var totalsRow = {
     label: 'TOTAL',
@@ -275,8 +293,8 @@ let getTransactionCSVRows = function (transactions, viewingIds, addTotalRow) {
  *
  * returns a CSV with only a header row if input is empty or invalid
  **/
-let getTransactionCSVText = function (transactions, viewingIds, addTotalRow) {
-  return getTransactionCSVRows(transactions, viewingIds, addTotalRow).join('\n')
+module.exports.getTransactionCSVText = (transactions, viewingIds, addTotalRow) => {
+  return module.exports.getTransactionCSVRows(transactions, viewingIds, addTotalRow).join('\n')
 }
 
 /**
@@ -287,7 +305,7 @@ let getTransactionCSVText = function (transactions, viewingIds, addTotalRow) {
  *
  * @returns {Object[]} transactions (with each element having an added field `exportFilenamePrefix`)
  */
-let addExportFilenamePrefixToTransactions = function (transactions) {
+module.exports.addExportFilenamePrefixToTransactions = (transactions) => {
   transactions = transactions || []
 
   if (!underscore.isArray(transactions)) {
@@ -298,10 +316,10 @@ let addExportFilenamePrefixToTransactions = function (transactions) {
     return transactions
   }
 
-  var dateCountMap = {}
+  const dateCountMap = {}
 
   return transactions.map(function (transaction) {
-    let timestamp = transaction.submissionStamp
+    const timestamp = transaction.submissionStamp
     let numericDateStr = (new Date(timestamp)).toLocaleDateString().replace(/\//g, '-')
 
     let dateCount = (dateCountMap[numericDateStr] ? dateCountMap[numericDateStr] : 1)
@@ -315,14 +333,4 @@ let addExportFilenamePrefixToTransactions = function (transactions) {
 
     return transaction
   })
-}
-
-module.exports = {
-  transactionsToCSVDataURL,
-  getTransactionCSVText,
-  getTransactionCSVRows,
-  getPublisherVoteData,
-  getTransactionsByViewingIds,
-  getTotalContribution,
-  addExportFilenamePrefixToTransactions
 }
