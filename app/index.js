@@ -387,6 +387,15 @@ app.on('ready', () => {
     message = message ? message.toString() : ''
     title = title ? title.toString() : ''
     cancelId = 1
+
+    if (typeof message === 'number') {
+      message = '' + message
+    }
+
+    if (typeof title === 'number') {
+      title = '' + title
+    }
+
     event.returnValue = !dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
       message: message,
       title: title,
