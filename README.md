@@ -43,11 +43,18 @@ Please see the [Building on Windows wiki entry](https://github.com/brave/browser
 
 ###  Linux
 
-* `apt-get install libgnome-keyring-dev build-essential`
+On Debian/Ubuntu
 
-OR
+````
+apt-get install libgnome-keyring-dev build-essential
+````
 
-* `dnf install libgnome-keyring-devel rpm-build`
+On Fedora
+
+````
+dnf install libgnome-keyring-devel rpm-build
+dnf group install "Development Tools" "C Development Tools and Libraries"
+````
 
 ## Installation
 
