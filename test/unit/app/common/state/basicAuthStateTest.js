@@ -1,6 +1,6 @@
 /* global describe, it, before */
-const basicAuthState = require('../../../../app/common/state/basicAuthState')
-const tabState = require('../../../../app/common/state/tabState')
+const basicAuthState = require('../../../../../app/common/state/basicAuthState')
+const tabState = require('../../../../../app/common/state/tabState')
 const Immutable = require('immutable')
 const assert = require('assert')
 

@@ -1,5 +1,5 @@
 /* global describe, it, before */
-const extensionState = require('../../../../app/common/state/extensionState')
+const extensionState = require('../../../../../app/common/state/extensionState')
 const Immutable = require('immutable')
 const assert = require('assert')
 

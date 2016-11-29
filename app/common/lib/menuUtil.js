@@ -69,7 +69,7 @@ module.exports.setTemplateItemChecked = (template, label, checked) => {
   return null
 }
 
-const createBookmarkMenuItems = (bookmarks, parentFolderId) => {
+const createBookmarkTemplateItems = (bookmarks, parentFolderId) => {
   const filteredBookmarks = parentFolderId
     ? bookmarks.filter((bookmark) => bookmark.get('parentFolderId') === parentFolderId)
     : bookmarks.filter((bookmark) => !bookmark.get('parentFolderId'))
@@ -99,7 +99,7 @@ const createBookmarkMenuItems = (bookmarks, parentFolderId) => {
       const submenuItems = bookmarks.filter((bookmark) => bookmark.get('parentFolderId') === folderId)
       payload.push({
         label: site.get('customTitle') || site.get('title'),
-        submenu: submenuItems.count() > 0 ? createBookmarkMenuItems(bookmarks, folderId) : null
+        submenu: submenuItems.count() > 0 ? createBookmarkTemplateItems(bookmarks, folderId) : null
       })
     }
   })
@@ -107,15 +107,18 @@ const createBookmarkMenuItems = (bookmarks, parentFolderId) => {
 }
 
 /**
- * Add bookmarks / folders to "Bookmarks" menu
+ * Used to create bookmarks and bookmark folder entries for the "Bookmarks" menu
  *
  * @param sites The application state's Immutable sites list
  */
-module.exports.createBookmarkMenuItems = (sites) => {
-  return createBookmarkMenuItems(siteUtil.getBookmarks(sites))
+module.exports.createBookmarkTemplateItems = (sites) => {
+  return createBookmarkTemplateItems(siteUtil.getBookmarks(sites))
 }
 
-module.exports.createRecentlyClosedMenuItems = (lastClosedFrames) => {
+/**
+ * Create "recently closed" history entries for the "History" menu
+ */
+module.exports.createRecentlyClosedTemplateItems = (lastClosedFrames) => {
   const payload = []
   if (lastClosedFrames && lastClosedFrames.size > 0) {
     payload.push(
@@ -140,4 +143,41 @@ module.exports.createRecentlyClosedMenuItems = (lastClosedFrames) => {
     })
   }
   return payload
+}
+
+const isItemValid = (currentItem, previousItem) => {
+  if (previousItem && previousItem === CommonMenu.separatorMenuItem) {
+    if (currentItem === CommonMenu.separatorMenuItem) {
+      return false
+    }
+  }
+  return currentItem && (typeof currentItem.label === 'string' || typeof currentItem.type === 'string')
+}
+
+/**
+ * Remove invalid entries from a menu template:
+ * - null or falsey entries
+ * - extra menu separators
+ * - entries which don't have a label or type
+ */
+module.exports.sanitizeTemplateItems = (template) => {
+  const result = template.reduce((previousValue, currentValue, currentIndex, array) => {
+    const result = currentIndex === 1 ? [] : previousValue
+    if (currentIndex === 1) {
+      if (isItemValid(previousValue)) {
+        result.push(previousValue)
+      }
+    }
+    const previousItem = result.length > 0
+      ? result[result.length - 1]
+      : undefined
+    if (isItemValid(currentValue, previousItem)) {
+      result.push(currentValue)
+    }
+    return result
+  })
+
+  return Array.isArray(result)
+    ? result
+    : [result]
 }

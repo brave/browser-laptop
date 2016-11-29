@@ -1,8 +1,8 @@
 /* global describe, it */
-const aboutNewTabState = require('../../../../app/common/state/aboutNewTabState')
+const aboutNewTabState = require('../../../../../app/common/state/aboutNewTabState')
 const Immutable = require('immutable')
 const assert = require('assert')
-const siteTags = require('../../../../js/constants/siteTags')
+const siteTags = require('../../../../../js/constants/siteTags')
 
 const defaultAppState = Immutable.fromJS({
   about: {

@@ -1,8 +1,9 @@
 /* global describe, it */
 const assert = require('assert')
 const Immutable = require('immutable')
-const historyUtil = require('../../../app/common/lib/historyUtil')
-require('../braveUnit')
+const historyUtil = require('../../../../../app/common/lib/historyUtil')
+
+require('../../../braveUnit')
 
 describe('historyUtil', function () {
   const historyDayOne = Immutable.fromJS({

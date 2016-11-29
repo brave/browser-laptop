@@ -19,6 +19,7 @@ const siteTags = require('./constants/siteTags')
 const dragTypes = require('./constants/dragTypes')
 const siteUtil = require('./state/siteUtil')
 const downloadUtil = require('./state/downloadUtil')
+const menuUtil = require('../app/common/lib/menuUtil')
 const CommonMenu = require('../app/common/commonMenu')
 const dnd = require('./dnd')
 const dndData = require('./dndData')
@@ -124,79 +125,79 @@ function findBarTemplateInit () {
 }
 
 function tabsToolbarTemplateInit (activeFrame, closestDestinationDetail, isParent) {
-  const menu = [
+  const template = [
     CommonMenu.bookmarksManagerMenuItem(),
     CommonMenu.bookmarksToolbarMenuItem(),
     CommonMenu.separatorMenuItem
   ]
 
   if (!isDarwin) {
-    menu.push(CommonMenu.autoHideMenuBarMenuItem(),
+    template.push(CommonMenu.autoHideMenuBarMenuItem(),
       CommonMenu.separatorMenuItem)
   }
 
-  menu.push(addBookmarkMenuItem('addBookmark', siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), closestDestinationDetail, isParent),
+  template.push(addBookmarkMenuItem('addBookmark', siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), closestDestinationDetail, isParent),
     addFolderMenuItem(closestDestinationDetail, isParent))
 
-  return menu
+  return menuUtil.sanitizeTemplateItems(template)
 }
 
 function downloadsToolbarTemplateInit (downloadId, downloadItem) {
-  const menu = []
+  const template = []
 
   if (downloadItem) {
     const downloads = appStoreRenderer.state.get('downloads')
     if (downloadUtil.shouldAllowPause(downloadItem)) {
-      menu.push({
+      template.push({
         label: locale.translation('downloadItemPause'),
         click: downloadActions.pauseDownload.bind(null, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowResume(downloadItem)) {
-      menu.push({
+      template.push({
         label: locale.translation('downloadItemResume'),
         click: downloadActions.resumeDownload.bind(null, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowCancel(downloadItem)) {
-      menu.push({
+      template.push({
         label: locale.translation('downloadItemCancel'),
         click: downloadActions.cancelDownload.bind(null, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowRedownload(downloadItem)) {
-      menu.push({
+      template.push({
         label: locale.translation('downloadItemRedownload'),
         click: downloadActions.redownloadURL.bind(null, downloadItem, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowCopyLink(downloadItem)) {
-      menu.push({
+      template.push({
         label: locale.translation('downloadItemCopyLink'),
         click: downloadActions.copyLinkToClipboard.bind(null, downloadItem)
       })
     }
 
     if (downloadUtil.shouldAllowOpenDownloadLocation(downloadItem)) {
-      menu.push({
+      template.push({
         label: locale.translation('downloadItemPath'),
         click: downloadActions.locateShellPath.bind(null, downloadItem)
       })
     }
 
     if (downloadUtil.shouldAllowDelete(downloadItem)) {
-      menu.push({
+      template.push({
         label: locale.translation('downloadItemDelete'),
         click: downloadActions.deleteDownload.bind(null, downloads, downloadItem, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowRemoveFromList(downloadItem)) {
-      menu.push({
+      template.push({
         label: locale.translation('downloadItemClear'),
         click: downloadActions.clearDownload.bind(null, downloads, downloadId)
       })
@@ -204,26 +205,26 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
   }
 
   if (windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible'])) {
-    if (menu.length) {
-      menu.push(CommonMenu.separatorMenuItem)
+    if (template.length) {
+      template.push(CommonMenu.separatorMenuItem)
     }
-    menu.push({
+    template.push({
       label: locale.translation('downloadToolbarHide'),
       click: () => {
         windowActions.setDownloadsToolbarVisible(false)
       }
     })
   }
-  if (menu.length) {
-    menu.push(CommonMenu.separatorMenuItem)
+  if (template.length) {
+    template.push(CommonMenu.separatorMenuItem)
   }
-  menu.push({
+  template.push({
     label: locale.translation('downloadItemClearCompleted'),
     click: () => {
       appActions.clearCompletedDownloads()
     }
   })
-  return menu
+  return menuUtil.sanitizeTemplateItems(template)
 }
 
 function siteDetailTemplateInit (siteDetail, activeFrame) {
@@ -331,7 +332,7 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
       addFolderMenuItem(siteDetail, true))
   }
 
-  return template
+  return menuUtil.sanitizeTemplateItems(template)
 }
 
 function showBookmarkFolderInit (allBookmarkItems, parentBookmarkFolder, activeFrame) {
@@ -359,7 +360,7 @@ function showBookmarkFolderInit (allBookmarkItems, parentBookmarkFolder, activeF
 function bookmarkItemsInit (allBookmarkItems, items, activeFrame) {
   const btbMode = getSetting(settings.BOOKMARKS_TOOLBAR_MODE)
   const showFavicon = (btbMode === bookmarksToolbarMode.TEXT_AND_FAVICONS || btbMode === bookmarksToolbarMode.FAVICONS_ONLY)
-  return items.map((site) => {
+  const template = items.map((site) => {
     const isFolder = siteUtil.isFolder(site)
     let faIcon
     if (showFavicon && !site.get('favicon')) {
@@ -400,6 +401,7 @@ function bookmarkItemsInit (allBookmarkItems, items, activeFrame) {
     }
     return templateItem
   }).toJS()
+  return menuUtil.sanitizeTemplateItems(template)
 }
 
 function moreBookmarksTemplateInit (allBookmarkItems, bookmarks, activeFrame) {
@@ -411,14 +413,14 @@ function moreBookmarksTemplateInit (allBookmarkItems, bookmarks, activeFrame) {
       windowActions.setContextMenuDetail()
     }
   })
-  return template
+  return menuUtil.sanitizeTemplateItems(template)
 }
 
 function usernameTemplateInit (usernames, origin, action) {
-  let items = []
+  let template = []
   for (let username in usernames) {
     let password = usernames[username]
-    items.push({
+    template.push({
       label: username,
       click: (item, focusedWindow) => {
         windowActions.setActiveFrameShortcut(null, messages.FILL_PASSWORD, {
@@ -431,11 +433,11 @@ function usernameTemplateInit (usernames, origin, action) {
       }
     })
   }
-  return items
+  return menuUtil.sanitizeTemplateItems(template)
 }
 
 function autofillTemplateInit (suggestions, frame) {
-  const items = []
+  const template = []
   for (let i = 0; i < suggestions.length; ++i) {
     let value
     const frontendId = suggestions[i].frontend_id
@@ -449,9 +451,9 @@ function autofillTemplateInit (suggestions, frame) {
       value = 'Autofill Settings'
     }
     if (frontendId === -3) { // POPUP_ITEM_ID_SEPARATOR
-      items.push(CommonMenu.separatorMenuItem)
+      template.push(CommonMenu.separatorMenuItem)
     } else {
-      items.push({
+      template.push({
         label: value,
         click: (item, focusedWindow) => {
           ipc.send('autofill-selection-clicked', frame.get('tabId'), value, frontendId, i)
@@ -460,15 +462,15 @@ function autofillTemplateInit (suggestions, frame) {
       })
     }
   }
-  return items
+  return menuUtil.sanitizeTemplateItems(template)
 }
 
 function tabTemplateInit (frameProps) {
   const frameKey = frameProps.get('key')
-  const items = [CommonMenu.newTabMenuItem(frameProps.get('key'))]
+  const template = [CommonMenu.newTabMenuItem(frameProps.get('key'))]
   const location = frameProps.get('location')
   if (location !== 'about:newtab') {
-    items.push(
+    template.push(
       CommonMenu.separatorMenuItem,
       {
         label: locale.translation('reloadTab'),
@@ -492,7 +494,7 @@ function tabTemplateInit (frameProps) {
   if (!frameProps.get('isPrivate')) {
     const isPinned = frameProps.get('pinnedLocation')
     if (!(location === 'about:blank' || location === 'about:newtab' || isIntermediateAboutPage(location))) {
-      items.push({
+      template.push({
         label: locale.translation(isPinned ? 'unpinTab' : 'pinTab'),
         click: (item) => {
           // Handle converting the current tab window into a pinned site
@@ -502,7 +504,7 @@ function tabTemplateInit (frameProps) {
     }
   }
 
-  // items.push({
+  // template.push({
   //   label: locale.translation('moveTabToNewWindow'),
   //   enabled: false,
   //   click: (item, focusedWindow) => {
@@ -510,7 +512,7 @@ function tabTemplateInit (frameProps) {
   //   }
   // })
 
-  items.push(CommonMenu.separatorMenuItem,
+  template.push(CommonMenu.separatorMenuItem,
     {
       label: locale.translation('muteOtherTabs'),
       click: (item, focusedWindow) => {
@@ -521,7 +523,7 @@ function tabTemplateInit (frameProps) {
   if (frameProps.get('audioPlaybackActive')) {
     const isMuted = frameProps.get('audioMuted')
 
-    items.push({
+    template.push({
       label: locale.translation(isMuted ? 'unmuteTab' : 'muteTab'),
       click: (item) => {
         windowActions.setAudioMuted(frameProps, !isMuted)
@@ -529,10 +531,10 @@ function tabTemplateInit (frameProps) {
     })
   }
 
-  items.push(CommonMenu.separatorMenuItem)
+  template.push(CommonMenu.separatorMenuItem)
 
   if (!frameProps.get('pinnedLocation')) {
-    items.push({
+    template.push({
       label: locale.translation('closeTab'),
       click: (item, focusedWindow) => {
         if (focusedWindow) {
@@ -543,7 +545,7 @@ function tabTemplateInit (frameProps) {
     })
   }
 
-  items.push({
+  template.push({
     label: locale.translation('closeOtherTabs'),
     click: (item, focusedWindow) => {
       if (focusedWindow) {
@@ -566,22 +568,22 @@ function tabTemplateInit (frameProps) {
     }
   }, CommonMenu.separatorMenuItem)
 
-  items.push(Object.assign({},
+  template.push(Object.assign({},
     CommonMenu.reopenLastClosedTabItem(),
     { enabled: windowStore.getState().get('closedFrames').size > 0 }
   ))
 
-  return items
+  return menuUtil.sanitizeTemplateItems(template)
 }
 
 function getMisspelledSuggestions (selection, isMisspelled, suggestions) {
   const hasSelection = selection.length > 0
-  const items = []
+  const template = []
   if (hasSelection) {
     if (suggestions.length > 0) {
       // Map the first 3 suggestions to menu items that allows click
       // to replace the text.
-      items.push(...suggestions.slice(0, 3).map((suggestion) => {
+      template.push(...suggestions.slice(0, 3).map((suggestion) => {
         return {
           label: suggestion,
           click: () => {
@@ -591,7 +593,7 @@ function getMisspelledSuggestions (selection, isMisspelled, suggestions) {
       }), CommonMenu.separatorMenuItem)
     }
     if (isMisspelled) {
-      items.push({
+      template.push({
         label: locale.translation('learnSpelling'),
         click: () => {
           appActions.addWord(selection, true)
@@ -608,16 +610,16 @@ function getMisspelledSuggestions (selection, isMisspelled, suggestions) {
       }, CommonMenu.separatorMenuItem)
     }
   }
-  return items
+  return menuUtil.sanitizeTemplateItems(template)
 }
 
 function getEditableItems (selection, editFlags) {
   const hasSelection = selection.length > 0
   const hasClipboard = clipboard.readText().length > 0
-  const items = []
+  const template = []
 
   if (!editFlags || editFlags.canCut) {
-    items.push({
+    template.push({
       label: locale.translation('cut'),
       enabled: hasSelection,
       accelerator: 'CmdOrCtrl+X',
@@ -625,7 +627,7 @@ function getEditableItems (selection, editFlags) {
     })
   }
   if (!editFlags || editFlags.canCopy) {
-    items.push({
+    template.push({
       label: locale.translation('copy'),
       enabled: hasSelection,
       accelerator: 'CmdOrCtrl+C',
@@ -633,14 +635,14 @@ function getEditableItems (selection, editFlags) {
     })
   }
   if (!editFlags || editFlags.canPaste) {
-    items.push({
+    template.push({
       label: locale.translation('paste'),
       accelerator: 'CmdOrCtrl+V',
       enabled: hasClipboard,
       role: 'paste'
     })
   }
-  return items
+  return menuUtil.sanitizeTemplateItems(template)
 }
 
 function hamburgerTemplateInit (location, e) {
@@ -683,7 +685,7 @@ function hamburgerTemplateInit (location, e) {
     }, {
       label: locale.translation('bravery'),
       submenu: [
-//        CommonMenu.braveryGlobalMenuItem(),
+        // CommonMenu.braveryGlobalMenuItem(),
         CommonMenu.braverySiteMenuItem(),
         CommonMenu.braveryPaymentsMenuItem()
       ]
@@ -707,7 +709,7 @@ function hamburgerTemplateInit (location, e) {
     },
     CommonMenu.quitMenuItem()
   ]
-  return template
+  return menuUtil.sanitizeTemplateItems(template)
 }
 
 const openInNewTabMenuItem = (location, isPrivate, partitionNumber, parentFrameKey) => {
@@ -890,7 +892,7 @@ function mainTemplateInit (nodeProps, frame) {
         }
       })
     }
-    return template
+    return menuUtil.sanitizeTemplateItems(template)
   }
 
   const isLink = nodeProps.linkURL && nodeProps.linkURL !== ''
@@ -1211,7 +1213,7 @@ function mainTemplateInit (nodeProps, frame) {
     )
   }
 
-  return template
+  return menuUtil.sanitizeTemplateItems(template)
 }
 
 function onHamburgerMenu (location, e) {
