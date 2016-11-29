@@ -9,7 +9,6 @@ const electron = require('electron')
 const session = electron.session
 const BrowserWindow = electron.BrowserWindow
 const webContents = electron.webContents
-const appStore = require('../js/stores/appStore')
 const appActions = require('../js/actions/appActions')
 const appConfig = require('../js/constants/appConfig')
 const downloadStates = require('../js/constants/downloadStates')
@@ -32,6 +31,8 @@ const uuid = require('node-uuid')
 const path = require('path')
 const getOrigin = require('../js/state/siteUtil').getOrigin
 const {adBlockResourceName} = require('./adBlock')
+
+let appStore = null
 
 const beforeSendHeadersFilteringFns = []
 const beforeRequestFilteringFns = []
@@ -571,51 +572,73 @@ function shouldIgnoreUrl (url) {
   return true
 }
 
-module.exports.init = () => {
-  ['default'].forEach((partition) => {
-    initForPartition(partition)
-  })
-  ipcMain.on(messages.INITIALIZE_PARTITION, (e, partition) => {
-    if (initializedPartitions[partition]) {
+module.exports.init = (state, action, store) => {
+  appStore = store
+
+  setImmediate(() => {
+    ['default'].forEach((partition) => {
+      initForPartition(partition)
+    })
+    ipcMain.on(messages.INITIALIZE_PARTITION, (e, partition) => {
+      if (initializedPartitions[partition]) {
+        e.returnValue = true
+        return e.returnValue
+      }
+      initForPartition(partition)
       e.returnValue = true
       return e.returnValue
-    }
-    initForPartition(partition)
-    e.returnValue = true
-    return e.returnValue
+    })
+    ipcMain.on(messages.DOWNLOAD_ACTION, (e, downloadId, action) => {
+      const item = downloadMap[downloadId]
+      switch (action) {
+        case downloadActions.CANCEL:
+          updateDownloadState(downloadId, item, downloadStates.CANCELLED)
+          if (item) {
+            item.cancel()
+          }
+          break
+        case downloadActions.PAUSE:
+          if (item) {
+            item.pause()
+          }
+          updateDownloadState(downloadId, item, downloadStates.PAUSED)
+          break
+        case downloadActions.RESUME:
+          if (item) {
+            item.resume()
+          }
+          updateDownloadState(downloadId, item, downloadStates.IN_PROGRESS)
+          break
+      }
+    })
+    ipcMain.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex, persist) => {
+      if (permissionCallbacks[message]) {
+        permissionCallbacks[message](buttonIndex, persist)
+      }
+    })
   })
-  ipcMain.on(messages.DOWNLOAD_ACTION, (e, downloadId, action) => {
-    const item = downloadMap[downloadId]
-    switch (action) {
-      case downloadActions.CANCEL:
-        updateDownloadState(downloadId, item, downloadStates.CANCELLED)
-        if (item) {
-          item.cancel()
-        }
-        break
-      case downloadActions.PAUSE:
-        if (item) {
-          item.pause()
-        }
-        updateDownloadState(downloadId, item, downloadStates.PAUSED)
-        break
-      case downloadActions.RESUME:
-        if (item) {
-          item.resume()
-        }
-        updateDownloadState(downloadId, item, downloadStates.IN_PROGRESS)
-        break
-    }
-  })
-  ipcMain.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex, persist) => {
-    if (permissionCallbacks[message]) {
-      permissionCallbacks[message](buttonIndex, persist)
-    }
-  })
+
+  return state
+}
+
+module.exports.getSiteSettings = (url, isPrivate) => {
+  const appState = appStore.getState()
+  let settings = appState.get('siteSettings')
+  if (isPrivate) {
+    settings = settings.mergeDeep(appState.get('temporarySiteSettings'))
+  }
+  return siteSettings.getSiteSettingsForURL(settings, url)
 }
 
 module.exports.isResourceEnabled = (resourceName, url, isPrivate) => {
   if (resourceName === 'siteHacks') {
+    return true
+  }
+
+  // TODO(bridiver) - need to clean up the rest of this so web can
+  // remove this because it duplicates checks made in siteSettings
+  // and not all resources  are controlled by shields up/down
+  if (resourceName === 'flash' || resourceName === 'webtorrent') {
     return true
   }
 
@@ -702,13 +725,9 @@ module.exports.getMainFrameUrl = (details) => {
   if (details.resourceType === 'mainFrame') {
     return details.url
   }
-  const tabId = details.tabId
-  const wc = webContents.getAllWebContents()
-  if (wc && tabId) {
-    const content = wc.find((item) => item.getId() === tabId)
-    if (content) {
-      return content.getURL()
-    }
+  const tab = webContents.fromTabID(details.tabId)
+  if (tab) {
+    return tab.getURL()
   }
   return null
 }

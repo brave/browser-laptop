@@ -1552,6 +1552,7 @@ class SecurityTab extends ImmutableComponent {
 
     const isLinux = navigator.appVersion.indexOf('Linux') !== -1
 
+    const flashInstalled = getSetting(settings.FLASH_INSTALLED, this.props.settings)
     return <div>
       <div className='sectionTitle' data-l10n-id='privateData' />
       <SettingsList dataL10nId='privateDataMessage'>
@@ -1608,8 +1609,9 @@ class SecurityTab extends ImmutableComponent {
       </SettingsList>
       <div className='sectionTitle' data-l10n-id='pluginSettings' />
       <SettingsList>
-        <SettingCheckbox checked={this.props.flashInstalled ? this.props.braveryDefaults.get('flash') : false} dataL10nId='enableFlash' onChange={this.onToggleFlash} disabled={!this.props.flashInstalled} />
-        <div className='subtext flashText'>
+        <SettingCheckbox checked={flashInstalled ? this.props.braveryDefaults.get('flash') : false} dataL10nId='enableFlash' onChange={this.onToggleFlash} disabled={!flashInstalled} />
+        <span className='subtext flashText'>
+          <span className='fa fa-info-circle' id='flashInfoIcon' />
           {
             isDarwin || isWindows
               ? <div>
@@ -1802,9 +1804,6 @@ class AboutPreferences extends React.Component {
     })
     ipc.on(messages.BRAVERY_DEFAULTS_UPDATED, (e, braveryDefaults) => {
       this.setState({ braveryDefaults: Immutable.fromJS(braveryDefaults || {}) })
-    })
-    ipc.on(messages.FLASH_UPDATED, (e, flashInstalled) => {
-      this.setState({ flashInstalled })
     })
     ipc.on(messages.LANGUAGE, (e, {langCode, languageCodes}) => {
       this.setState({ languageCodes })
