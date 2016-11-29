@@ -564,8 +564,8 @@
 .navigationButton {
   background-color: @buttonColor;
   display: inline-block;
-  width: 12px;
-  height: 14px;
+  width: 100%;
+  height: 100%;
   margin: 0 7px 0 0;
 }
 
@@ -645,13 +645,17 @@
   .bookmarkButton {
     background: url('../img/toolbar/bookmark_btn.svg') center no-repeat;
     -webkit-mask-repeat: no-repeat;
+    background-size: 14px 14px;
+    margin: 0;
+    height: 0;
     width: 14px;
     height: 14px;
-    margin-bottom: 2px;
-    margin-left: 6px;
+    position: relative;
+    left: 5px;
 
     &.removeBookmarkButton {
       background: url('../img/toolbar/bookmark_marked.svg') center no-repeat;
+      background-size: 14px 14px;
     }
   }
 }
@@ -766,10 +770,9 @@
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
       box-sizing: border-box;
+      display: block;
       height: 25px;
-      line-height: 25px;
-      margin-right: -2px;
-      display: inline-block;
+      width: 25px;
     }
   }
 
