@@ -482,7 +482,7 @@ class BitcoinDashboard extends ImmutableComponent {
       }
       <div className='board'>
         {
-          this.userInAmerica
+          (this.userInAmerica || this.ledgerData.get('buyURLFrame'))
           ? this.coinbasePanel
           : this.exchangePanel
         }
