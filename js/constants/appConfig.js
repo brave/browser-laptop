@@ -22,7 +22,9 @@ module.exports = {
     NOSCRIPT: 'noScript',
     FLASH: 'flash',
     WIDEVINE: 'widevine',
-    COOKIEBLOCK: 'cookieblock' // block 3p cookies and referer
+    COOKIEBLOCK: 'cookieblock', // block 3p cookies and referer
+    SITEHACK: 'siteHacks',
+    WEBTORRENT: 'webtorrent'
     // ... other optional resource files are identified by uuid such as for regional adblock
   },
   cookieblock: {
@@ -34,12 +36,14 @@ module.exports = {
   flash: {
     enabled: false,
     installUrl: 'https://get.adobe.com/flashplayer/',
-    url: getTargetAboutUrl('about:flash')
+    url: getTargetAboutUrl('about:flash'),
+    shields: false
   },
   widevine: {
     enabled: false,
     moreInfoUrl: 'https://www.eff.org/issues/drm',
-    licenseUrl: 'https://www.google.com/policies/terms/'
+    licenseUrl: 'https://www.google.com/policies/terms/',
+    shields: false
   },
   adblock: {
     alternateDataFiles: 'https://s3.amazonaws.com/adblock-data/{version}/{uuid}.dat',
@@ -67,6 +71,9 @@ module.exports = {
     enabled: true
   },
   siteHacks: {
+    enabled: true
+  },
+  webtorrent: {
     enabled: true
   },
   adInsertion: {

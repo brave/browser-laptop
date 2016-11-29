@@ -23,12 +23,11 @@ const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
 const config = require('../constants/config')
 const settings = require('../constants/settings')
-const {aboutUrls, isSourceMagnetUrl, getTargetMagnetUrl, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
+const {aboutUrls, getTargetMagnetUrl, isSourceMagnetUrl, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
 const {isFrameError} = require('../../app/common/lib/httpUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
 const {getSiteSettingsForHostPattern} = require('../state/siteSettings')
-// const flash = require('../flash')
 const currentWindow = require('../../app/renderer/currentWindow')
 const windowStore = require('../stores/windowStore')
 const appStoreRenderer = require('../stores/appStoreRenderer')
@@ -204,26 +203,6 @@ class Frame extends ImmutableComponent {
       ? false : activeSiteSettings.get('runInsecureContent')
   }
 
-  allowRunningFlashPlugin (url) {
-    if (!this.props.flashInitialized) {
-      return false
-    }
-    const origin = url ? siteUtil.getOrigin(url) : this.origin
-    if (!origin) {
-      return false
-    }
-    // Check for at least one CtP allowed on this origin
-    if (!this.props.allSiteSettings) {
-      return false
-    }
-    const activeSiteSettings = getSiteSettingsForHostPattern(this.props.allSiteSettings,
-                                                             origin)
-    if (activeSiteSettings && typeof activeSiteSettings.get('flash') === 'number') {
-      return true
-    }
-    return false
-  }
-
   allowRunningWidevinePlugin (url) {
     if (!this.props.widevine || !this.props.widevine.get('enabled')) {
       return false
@@ -332,9 +311,6 @@ class Frame extends ImmutableComponent {
     const hack = siteHacks[parsedUrl.hostname]
     if (hack && hack.userAgent) {
       this.webview.setUserAgentOverride(hack.userAgent)
-    }
-    if (this.allowRunningFlashPlugin() || this.allowRunningWidevinePlugin()) {
-      this.webview.allowRunningPlugins = true
     }
 
     if (!guestInstanceId || newSrc !== 'about:blank') {
@@ -584,88 +560,6 @@ class Frame extends ImmutableComponent {
   }
 
   /**
-   * Shows a Flash CtP notification if Flash is installed and enabled.
-   * If not enabled, alert user that Flash is installed.
-   * @param {string} origin - frame origin that is requesting to run flash.
-   *   can either be main frame or subframe.
-   * @param {function=} noFlashCallback - Optional callback to run if Flash is not
-   *   installed
-   * @param {function=} flashCallback - Optional callback to run if Flash is
-   *   accepted
-   */
-  showFlashNotification (origin, noFlashCallback, flashCallback) {
-    if (!origin || !UrlUtil.shouldInterceptFlash(origin)) {
-      noFlashCallback()
-      return
-    }
-
-    // Generate a random string that is unlikely to collide. Not
-    // cryptographically random.
-    const nonce = Math.random().toString()
-    if (this.props.flashInitialized) {
-      const message = locale.translation('allowFlashPlayer').replace(/{{\s*origin\s*}}/, this.origin)
-      // Show Flash notification bar
-      appActions.showMessageBox({
-        buttons: [
-          {text: locale.translation('deny')},
-          {text: locale.translation('allow')}
-        ],
-        message,
-        frameOrigin: this.origin,
-        options: {
-          nonce,
-          persist: true
-        }
-      })
-      this.notificationCallbacks[message] = (buttonIndex, persist) => {
-        if (buttonIndex === 1) {
-          if (persist) {
-            appActions.changeSiteSetting(this.origin, 'flash', Date.now() + 7 * 24 * 1000 * 3600)
-          } else {
-            appActions.changeSiteSetting(this.origin, 'flash', 1)
-          }
-          if (flashCallback) {
-            flashCallback()
-          }
-        } else {
-          if (persist) {
-            appActions.changeSiteSetting(this.origin, 'flash', false)
-          }
-        }
-        appActions.hideMessageBox(message)
-      }
-    } else {
-      // flash.checkFlashInstalled((installed) => {
-      //   if (installed) {
-      //     let message = locale.translation('flashInstalled')
-      //     appActions.showMessageBox({
-      //       buttons: [
-      //         {text: locale.translation('goToPrefs')},
-      //         {text: locale.translation('goToAdobe')}
-      //       ],
-      //       message: message,
-      //       options: {nonce}
-      //     })
-      //     this.notificationCallbacks[message] = (buttonIndex) => {
-      //       appActions.hideMessageBox(message)
-      //       const location = buttonIndex === 0 ? 'about:preferences#security' : appConfig.flash.installUrl
-      //       windowActions.newFrame({ location }, true)
-      //     }
-      //   } else if (noFlashCallback) {
-      //     noFlashCallback()
-      //   }
-      // })
-    }
-
-    ipc.once(messages.NOTIFICATION_RESPONSE + nonce, (e, msg, buttonIndex, persist) => {
-      const cb = this.notificationCallbacks[msg]
-      if (cb) {
-        cb(buttonIndex, persist)
-      }
-    })
-  }
-
-  /**
    * Shows a Widevine CtP notification if Widevine is installed and enabled.
    * If not enabled, alert user that Widevine is installed.
    * @param {string} origin - frame origin that is requesting to run widevine.
@@ -860,11 +754,6 @@ class Frame extends ImmutableComponent {
         case messages.GO_FORWARD:
           method = () => this.webview.goForward()
           break
-        case messages.SHOW_FLASH_NOTIFICATION:
-          method = (origin) => this.showFlashNotification(origin, () => {
-            windowActions.loadUrl(this.frame, appConfig.flash.installUrl)
-          })
-          break
         case messages.RELOAD:
           method = () => {
             this.reloadCounter[this.props.location] = this.reloadCounter[this.props.location] || 0
@@ -890,50 +779,8 @@ class Frame extends ImmutableComponent {
       method.apply(this, e.args)
     })
 
-    const interceptFlash = (stopCurrentLoad, adobeUrl, redirectUrl) => {
-      if (!this.origin) {
-        return
-      }
-      const activeSiteSettings = getSiteSettingsForHostPattern(this.props.allSiteSettings,
-                                                               this.origin)
-      if (activeSiteSettings && activeSiteSettings.get('flash') === false) {
-        return
-      }
-
-      if (stopCurrentLoad) {
-        this.webview.stop()
-      }
-
-      this.showFlashNotification(this.origin, () => {
-        if (stopCurrentLoad && adobeUrl) {
-          windowActions.loadUrl(this.frame, adobeUrl)
-        }
-      }, () => {
-        if (redirectUrl) {
-          windowActions.loadUrl(this.frame, redirectUrl)
-        }
-      })
-    }
-
     const loadStart = (e) => {
-      // We have two kinds of special URLs: magnet links and about pages
-      // When the user clicks on a magnet link, navigate to the corresponding local URL
-      // (The address bar will still show the magnet URL. See appUrlUtil.getSourceMagnetUrl.)
-      if (isTorrentViewerURL(e.url)) {
-        var targetURL = getTargetMagnetUrl(e.url)
-        // Return right away. loadStart will be called again with targetURL
-        return windowActions.loadUrl(this.frame, targetURL)
-      }
-
-      const parsedUrl = urlParse(e.url)
-
-      // Instead of telling person to install Flash, ask them if they want to
-      // run Flash if it's installed.
       if (e.isMainFrame && !e.isErrorPage && !e.isFrameSrcDoc) {
-        if (UrlUtil.isFlashInstallUrl(e.url) &&
-            UrlUtil.shouldInterceptFlash(this.props.provisionalLocation)) {
-          interceptFlash(true, e.url)
-        }
         windowActions.onWebviewLoadStart(this.frame, e.url)
         // Clear security state
         windowActions.setBlockedRunInsecureContent(this.frame)
@@ -942,6 +789,7 @@ class Frame extends ImmutableComponent {
           runInsecureContent: false
         })
       }
+      const parsedUrl = urlParse(e.url)
       const hack = siteHacks[parsedUrl.hostname]
       if (hack && hack.pageLoadStartScript) {
         this.webview.executeJavaScript(hack.pageLoadStartScript)
@@ -978,11 +826,6 @@ class Frame extends ImmutableComponent {
       const hack = siteHacks[parsedUrl.hostname]
       if (hack && hack.pageLoadEndScript) {
         this.webview.executeJavaScript(hack.pageLoadEndScript)
-      }
-      if (hack && hack.enableFlashCTP &&
-          !this.webview.allowRunningPlugins && this.props.flashInitialized) {
-        // Fix #3011
-        interceptFlash(false, undefined, hack.redirectURL)
       }
       if (this.props.location.startsWith(pdfjsOrigin)) {
         let displayLocation = UrlUtil.getLocationIfPDF(this.props.location)

@@ -12,12 +12,6 @@ function isAdobeLink (href) {
   return adobeRegex.test(href)
 }
 
-function showFlashNotification (origin, e) {
-  chrome.ipcRenderer.sendToHost('show-flash-notification', origin)
-  e.preventDefault()
-  e.stopPropagation()
-}
-
 /**
  * Whether a src is a .swf file.
  * If so, returns the origin of the file. Otherwise returns false.
@@ -137,24 +131,6 @@ function insertFlashPlaceholders (elem = document.documentElement) {
 if (chrome.contentSettings.flashActive != 'allow' ||
     chrome.contentSettings.flashEnabled != 'allow') {
   // Open flash links in the same tab so we can intercept them correctly
-  (function () {
-    function replaceAdobeLinks () {
-      Array.from(document.querySelectorAll('a')).forEach((elem) => {
-        const href = elem.getAttribute('href')
-        if (isAdobeLink(href)) {
-          elem.onclick = showFlashNotification.bind(null, window.location.origin)
-        }
-      })
-    }
-    replaceAdobeLinks()
-    let interval = setInterval(replaceAdobeLinks, 3000)
-    document.addEventListener('visibilitychange', () => {
-      clearInterval(interval)
-      if (document.visibilityState !== 'hidden') {
-        interval = setInterval(replaceAdobeLinks, 3000)
-      }
-    })
-  })()
   insertFlashPlaceholders()
   let interval = setInterval(insertFlashPlaceholders, 3000)
   document.addEventListener('visibilitychange', () => {
