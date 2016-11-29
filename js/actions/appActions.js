@@ -127,6 +127,13 @@ const appActions = {
     })
   },
 
+  addLocalSearchHistory: function (localSearchDetails) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_ADD_LOCAL_SEARCH,
+      localSearchDetails
+    })
+  },
+
   /**
    * Clears history (all sites without tags). Indirectly called by appActions.onClearBrowsingData().
    */
