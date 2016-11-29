@@ -370,9 +370,11 @@ class BitcoinDashboard extends ImmutableComponent {
         <div className='settingsListTitle' data-l10n-id='outsideUSAPayment' />
       </div>
       <div className='settingsPanelDivider'>
-        <a target='_blank' className='browserButton primaryButton' href='https://www.buybitcoinworldwide.com/'>
-          buybitcoinworldwide.com
-        </a>
+        <button className='browserButton primaryButton'>
+          <a target='_blank' href='https://www.buybitcoinworldwide.com/'>
+            buybitcoinworldwide.com
+          </a>
+        </button>
       </div>
     </div>
   }
@@ -415,9 +417,11 @@ class BitcoinDashboard extends ImmutableComponent {
           <div className='settingsListTitle' data-l10n-id='outsideUSAPayment' />
         </div>
         <div className='settingsPanelDivider'>
-          <a target='_blank' className='browserButton primaryButton' href={url}>
-            {name}
-          </a>
+          <button className='browserButton primaryButton'>
+            <a target='_blank' href={url}>
+              {name}
+            </a>
+          </button>
         </div>
       </div>
     }

@@ -4,13 +4,11 @@
 
 @import "variables.less";
 
-.buttonCommon {
-  color: #fff;
-  font-size: inherit;
-  height: 22px;
-  line-height: 22px;
-  margin: 5px 5px 0px 0px;
-  padding: 0px 20px;
+button[class*="Button"] {
+  background: none;
+  outline: none;
+  border: none;
+  margin: 0;
   white-space: nowrap;
 }
 
@@ -20,7 +18,7 @@ span.buttonSeparator {
   margin: 4px 3px 4px 3px;
 }
 
-span.menuButton {
+.menuButton {
   background-color: @buttonColor;
   display: inline-block;
   width: 20px;
@@ -42,7 +40,7 @@ span.menuButton {
   line-height: 25px;
   width: 25px;
   height: 25px;
-  font-size: 15px;
+  font-size: 14px;
   color: @buttonColor;
   border-radius: @borderRadius;
   margin: 0 3px;
@@ -50,6 +48,10 @@ span.menuButton {
   transition: .1s opacity, .1s background;
   user-select: none;
   -webkit-user-select: none;
+
+  & + .browserButton {
+    margin-left: 5px;
+  }
 
   &:not([disabled]):hover {
     color: black;
@@ -88,94 +90,101 @@ span.menuButton {
   &.primaryButton,
   &.actionButton,
   &.wideButton,
-  &.secondaryButton,
-  &.secondaryAltButton,
   &.subtleButton,
   &.whiteButton {
-    .buttonCommon;
+    color: #fff;
+    line-height: 1.25;
+    padding-top: 5px;
+    padding-bottom: 5px;
     width: auto;
     height: auto;
   }
 
+  &.primaryButton,
+  &.actionButton,
+  &.subtleButton,
+  &.whiteButton {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
   &.primaryButton {
     background: linear-gradient(@braveLightOrange, @braveOrange);
-    border: 2px solid transparent;
-    border-top: 2px solid @braveLightOrange;
-    border-bottom: 2px solid @braveOrange;
+    border: 1px solid transparent;
+    border-top: 1px solid @braveLightOrange;
+    border-bottom: 1px solid @braveOrange;
     box-shadow: @buttonShadow;
     font-weight: 400;
 
     &:hover {
-      border: 2px solid white;
+      border: 1px solid white;
       color: white;
       cursor: pointer;
     }
   }
 
-  &.actionButton,
-  &.wideButton {
+  &.actionButton {
     background-color: #4099FF;
   }
 
   &.wideButton {
-    display: block;
-    margin-right: 0px;
-    margin-left: 0px;
     width: auto;
-    padding: 3px 35px;
+    padding-right: 35px;
+    padding-left: 35px;
   }
 
   &.whiteButton {
     background: linear-gradient(white, @lightGray);
-    border: 2px solid white;
+    border: 1px solid white;
     box-shadow: @buttonShadow;
     cursor: pointer;
-    font-weight: normal;
-    font-style: normal;
     color: @darkGray;
+
+    &:hover {
+      border: 1px solid @gray;
+    }
   }
 
   &.inlineButton {
     display: inline;
   }
 
-  &.secondaryButton {
-    background-color: #eee;
-  }
-
-  &.secondaryAltButton {
-    background-color: #fff;
-    color: @braveOrange;
-    border: 1px solid #ccc;
-  }
-
   &.subtleButton {
     background-color: #ccc;
     font-size: 14px;
   }
+}
 
-  &.tactileButton {
-    display: block;
-    min-width: 80px;
-    height: 2em;
-    line-height: 2em;
-    margin: 0.5em 0;
-    vertical-align: middle;
-    text-align: center;
-    border: solid 1px @braveMediumOrange;
-    background: @braveMediumOrange;
-    border-radius: @borderRadius;
-    color: white;
-    box-shadow: @lightBoxShadow;
-    padding-left: 1em;
-    font-size: 0.9em;
-    font-weight: 400;
-    cursor: pointer;
-    outline: none;
-    text-align: left;
+// for about:preferences
+.prefBody {
+  .browserButton {
+    &.advancedSettings {
+      font-size: 0.9em;
+    }
 
-    &:hover {
-      color: white;
+    &.primaryButton {
+      &.addFunds {
+        margin-right: 50px;
+      }
+
+      &.clearBrowsingDataButton,
+      &.importNowButton,
+      &.setAsDefaultButton,
+      &.manageAdblockSettings,
+      &.viewExtensionsInfo,
+      &.manageAutofillDataButton {
+        font-size: 0.9em;
+        margin-top: 20px;
+        padding: 5px 20px;
+      }
+
+      &.importNowButton {
+        margin-top: 5px;
+      }
+
+      &.setAsDefaultButton {
+        margin-top: 5px;
+      }
     }
   }
 }

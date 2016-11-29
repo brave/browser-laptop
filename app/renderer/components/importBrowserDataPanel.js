@@ -135,7 +135,7 @@ class ImportBrowserDataPanel extends ImmutableComponent {
           <div data-l10n-id='importDataCloseBrowserWarning' />
         </div>
         <div className='formSection importBrowserDataButtons'>
-          <Button l10nId='cancel' className='secondaryAltButton' onClick={this.props.onHide} />
+          <Button l10nId='cancel' className='whiteButton' onClick={this.props.onHide} />
           <Button l10nId='import' className='primaryButton' onClick={this.onImport} />
         </div>
         <div className='formSection importBrowserDataWarning'>

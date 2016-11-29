@@ -84,7 +84,7 @@ class SiteInfo extends ImmutableComponent {
           <ul>
             <li><span className='runInsecureContentWarning' data-l10n-id='runInsecureContentWarning' /></li>
             <li>
-              <Button l10nId='allowRunInsecureContent' className='secondaryAltButton allowRunInsecureContentButton' onClick={this.onAllowRunInsecureContent} />
+              <Button l10nId='allowRunInsecureContent' className='whiteButton allowRunInsecureContentButton' onClick={this.onAllowRunInsecureContent} />
               <Button l10nId='dismissAllowRunInsecureContent' className='primaryButton dismissAllowRunInsecureContentButton' onClick={this.props.onHide} />
             </li>
           </ul>
@@ -96,7 +96,7 @@ class SiteInfo extends ImmutableComponent {
             <li><span className='denyRunInsecureContentWarning' data-l10n-id='denyRunInsecureContentWarning' /></li>
             <li>
               <Button l10nId='denyRunInsecureContent' className='primaryButton denyRunInsecureContentButton' onClick={this.onDenyRunInsecureContent} />
-              <Button l10nId='dismissDenyRunInsecureContent' className='secondaryAltButton dismissDenyRunInsecureContentButton' onClick={this.props.onHide} />
+              <Button l10nId='dismissDenyRunInsecureContent' className='whiteButton dismissDenyRunInsecureContentButton' onClick={this.props.onHide} />
             </li>
           </ul>
         </li>

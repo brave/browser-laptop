@@ -9,7 +9,7 @@ const cx = require('../lib/classSet')
 class Button extends ImmutableComponent {
   render () {
     if (this.props.iconClass) {
-      return <span disabled={this.props.disabled}
+      return <button disabled={this.props.disabled}
         data-l10n-id={this.props.l10nId}
         style={this.props.inlineStyles}
         data-button-value={this.props.dataButtonValue}
@@ -21,7 +21,7 @@ class Button extends ImmutableComponent {
         })}
         onClick={this.props.onClick} />
     }
-    return <span disabled={this.props.disabled}
+    return <button disabled={this.props.disabled}
       data-l10n-id={this.props.l10nId}
       data-l10n-args={JSON.stringify(this.props.l10nArgs || {})}
       style={this.props.inlineStyles}
@@ -30,7 +30,7 @@ class Button extends ImmutableComponent {
         [this.props.className]: !!this.props.className
       })} onClick={this.props.onClick}>
       {this.props.label}
-    </span>
+    </button>
   }
 }
 

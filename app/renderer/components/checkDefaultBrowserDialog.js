@@ -42,7 +42,7 @@ class CheckDefaultBrowserDialog extends ImmutableComponent {
         <SwitchControl className='checkDefaultOnStartup' rightl10nId='checkDefaultOnStartup'
           checkedOn={this.props.checkDefaultOnStartup} onClick={this.onCheckDefaultOnStartup} />
         <div className='checkDefaultBrowserButtons'>
-          <Button l10nId='notNow' className='secondaryAltButton' onClick={this.onNotNow} />
+          <Button l10nId='notNow' className='whiteButton' onClick={this.onNotNow} />
           <Button l10nId='useBrave' className='primaryButton' onClick={this.onUseBrave} />
         </div>
       </div>

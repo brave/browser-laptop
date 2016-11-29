@@ -131,12 +131,12 @@ class NavigationBar extends ImmutableComponent {
         ? null
         : this.loading
           ? <span className='navigationButtonContainer'>
-            <span data-l10n-id='stopButton'
+            <button data-l10n-id='stopButton'
               className='navigationButton stopButton'
               onClick={this.onStop} />
           </span>
           : <span className='navigationButtonContainer'>
-            <span data-l10n-id='reloadButton'
+            <button data-l10n-id='reloadButton'
               className='navigationButton reloadButton'
               onClick={this.onReload} />
           </span>
@@ -144,7 +144,7 @@ class NavigationBar extends ImmutableComponent {
       {
         !this.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
         ? <span className='navigationButtonContainer'>
-          <span data-l10n-id='homeButton'
+          <button data-l10n-id='homeButton'
             className='navigationButton homeButton'
             onClick={this.onHome} />
         </span>
@@ -154,7 +154,7 @@ class NavigationBar extends ImmutableComponent {
         {
           !this.titleMode
           ? <span className='bookmarkButtonContainer'>
-            <span data-l10n-id={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
+            <button data-l10n-id={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
               className={cx({
                 navigationButton: true,
                 bookmarkButton: true,
@@ -192,12 +192,14 @@ class NavigationBar extends ImmutableComponent {
           {
             !this.showNoScriptInfo
             ? null
-            : <Button iconClass='fa-ban'
-              l10nId='noScriptButton'
-              className={cx({
-                'noScript': true
-              })}
-              onClick={this.onNoScript} />
+            : <span className='noScriptButtonContainer'>
+              <Button iconClass='fa-ban'
+                l10nId='noScriptButton'
+                className={cx({
+                  'noScript': true
+                })}
+                onClick={this.onNoScript} />
+            </span>
           }
         </div>
       }

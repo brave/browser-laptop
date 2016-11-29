@@ -486,8 +486,19 @@
     .backButton,
     .forwardButton {
       width: 100%;
+      height: 100%;
+      margin: 0;
     }
 
+    .backButton {
+      background: url('../img/toolbar/back_btn.svg') center no-repeat;
+      background-size: 14px 14px;
+    }
+
+    .forwardButton {
+      background: url('../img/toolbar/forward_btn.svg') center no-repeat;
+      background-size: 14px 14px;
+    }
   }
 
   // Navigation bar at the center
@@ -592,21 +603,18 @@
   }
 }
 
-.backButton,
-.forwardButton {
-  height: 24px;
-  width: 30px;
-  margin: 0;
-}
+.noScriptButtonContainer {
+    display: flex;
+    margin-left: 6px;
 
-.backButton {
-  background: url('../img/toolbar/back_btn.svg') center no-repeat;
-  background-size: 14px 14px;
-}
+    .noScript {
+      font-size: 16px;
+      color: @braveOrange;
 
-.forwardButton {
-  background: url('../img/toolbar/forward_btn.svg') center no-repeat;
-  background-size: 14px 14px;
+      &:hover {
+        color: @braveOrange;
+      }
+  }
 }
 
 #navigator {
@@ -675,7 +683,7 @@
     z-index: @zindexNavigationBar;
     transition: margin @transitionDuration ease-in-out;
 
-    span {
+    button {
       -webkit-user-select: none;
       color: @buttonColor;
       cursor: default;
@@ -849,12 +857,6 @@
     &.onFocus {
         display: none;
     }
-  }
-
-  .noScript {
-    font-size: 16px;
-    margin-left: 10px;
-    color: @braveOrange;
   }
 
   /* Disable selection of button text */

@@ -150,7 +150,7 @@ class AutofillAddressPanel extends ImmutableComponent {
               value={this.props.currentDetail.get('email')} />
           </div>
           <div className='formRow manageAutofillDataButtons'>
-            <Button l10nId='cancel' className='secondaryAltButton' onClick={this.props.onHide} />
+            <Button l10nId='cancel' className='whiteButton' onClick={this.props.onHide} />
             <Button l10nId='save' className='primaryButton saveAddressButton' onClick={this.onSave}
               disabled={this.disableSaveButton} />
           </div>
