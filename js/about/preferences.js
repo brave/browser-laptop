@@ -1603,24 +1603,29 @@ class SecurityTab extends ImmutableComponent {
       <div className='sectionTitle' data-l10n-id='pluginSettings' />
       <SettingsList>
         <SettingCheckbox checked={this.props.flashInstalled ? this.props.braveryDefaults.get('flash') : false} dataL10nId='enableFlash' onChange={this.onToggleFlash} disabled={!this.props.flashInstalled} />
-        <span className='subtext'>
-          <span className='fa fa-info-circle' id='flashInfoIcon' />
+        <div className='subtext flashText'>
           {
             isDarwin || isWindows
-              ? <span><span data-l10n-id='enableFlashSubtext' />&nbsp;
+              ? <div>
+                <span className='fa fa-info-circle' id='flashInfoIcon' />
+                <span data-l10n-id='enableFlashSubtext' />&nbsp;
                 <span className='linkText' onClick={aboutActions.newFrame.bind(null, {
                   location: appConfig.flash.installUrl
-                }, true)}>{'Adobe'}</span>.</span>
-              : <span data-l10n-id='enableFlashSubtextLinux' />
+                }, true)}>{'Adobe'}</span>.
+                </div>
+              : <div>
+                <span className='fa fa-info-circle' id='flashInfoIcon' />
+                <span data-l10n-id='enableFlashSubtextLinux' />
+              </div>
           }
           <div>
             <span className='fa fa-info-circle' id='flashInfoIcon' />
-            <span><span data-l10n-id='flashTroubleshooting' />&nbsp;
-              <span className='linkText' onClick={aboutActions.newFrame.bind(null, {
-                location: 'https://github.com/brave/browser-laptop/wiki/Flash-Support-Deprecation-Proposal#troubleshooting-flash-issues'
-              }, true)}>{'wiki'}</span>.</span>
+            <span data-l10n-id='flashTroubleshooting' />&nbsp;
+            <span className='linkText' onClick={aboutActions.newFrame.bind(null, {
+              location: 'https://github.com/brave/browser-laptop/wiki/Flash-Support-Deprecation-Proposal#troubleshooting-flash-issues'
+            }, true)}>{'wiki'}</span>.
           </div>
-        </span>
+        </div>
       </SettingsList>
       { !isLinux
       ? <div>
