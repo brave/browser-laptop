@@ -22,6 +22,7 @@ const contextMenus = require('../contextMenus')
 const windowStore = require('../stores/windowStore')
 const searchProviders = require('../data/searchProviders')
 const UrlUtil = require('../lib/urlutil')
+const localSearchHistoryState = require('../../app/common/state/localSearchHistoryState')
 
 const EventUtil = require('../lib/eventUtil')
 const eventElHasAncestorWithClasses = EventUtil.eventElHasAncestorWithClasses
@@ -126,6 +127,11 @@ class UrlBar extends ImmutableComponent {
               const replaceRE = new RegExp('^' + this.searchSelectEntry.shortcut + ' ', 'g')
               location = location.replace(replaceRE, '')
               searchUrl = this.searchSelectEntry.search.replace('{searchTerms}', encodeURIComponent(location))
+            }
+
+            // saved search history
+            if (!isLocationUrl && !this.props.isPrivate) {
+              appActions.addLocalSearchHistory(localSearchHistoryState.buildEntry(location))
             }
 
             location = isLocationUrl ? location : searchUrl
@@ -512,6 +518,7 @@ class UrlBar extends ImmutableComponent {
             searchResults={this.props.urlbar.getIn(['suggestions', 'searchResults'])}
             locationValueSuffix={this.props.locationValueSuffix}
             sites={this.props.sites}
+            localSearchTerms={this.props.localSearchTerms}
             searchDetail={this.props.searchDetail}
             activeFrameKey={this.props.activeFrameKey}
             urlLocation={this.props.urlbar.get('location')}
