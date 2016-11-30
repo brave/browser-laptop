@@ -256,12 +256,22 @@ class Tab extends ImmutableComponent {
   }
 }
 
+const paymentsEnabled = () => {
+  const getSetting = require('../settings').getSetting
+  const settings = require('../constants/settings')
+  return getSetting(settings.PAYMENTS_ENABLED)
+}
+
 windowStore.addChangeListener(() => {
-  var presentP = false
-  const windowState = windowStore.getState().toJS()
-
-  windowState.tabs.forEach((tab) => { if (tab.location === 'about:preferences#payments') presentP = true })
-
-  ipc.send(messages.LEDGER_PAYMENTS_PRESENT, presentP)
+  if (paymentsEnabled()) {
+    const windowState = windowStore.getState()
+    const tabs = windowState && windowState.get('tabs')
+    if (tabs) {
+      const presentP = tabs.some((tab) => {
+        return tab.get('location') === 'about:preferences#payments'
+      })
+      ipc.send(messages.LEDGER_PAYMENTS_PRESENT, presentP)
+    }
+  }
 })
 module.exports = Tab
