@@ -536,11 +536,14 @@
 }
 
 .dialog > .bookmarkDialog .fa-close {
-  color: #999;
+  color: @buttonColor;
   font-size: 16px;
   float: right;
   margin-top: 7px;
   margin-right: 10px;
+  &:hover {
+    color: #000;
+  }
 }
 
 .bookmarkForm {
