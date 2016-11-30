@@ -36,21 +36,34 @@
   z-index: @zindexTabs;
   overflow-x: hidden;
   overflow-y: hidden;
+
   &.allowDragging {
     -webkit-app-region: drag;
     >* {
       -webkit-app-region: no-drag;
     }
   }
-  .browserButton {
-    height: 26px;
-    line-height: 22px;
-  }
 
   &.isPreview {
     opacity: 0.5;
     animation: tabFadeIn 0.75s ease-in-out;
     animation-fill-mode: forwards;
+  }
+
+  .newFrameButton {
+    background: @buttonColor;
+    width: 14px;
+    height: 24px;
+    line-height: 24px;
+    -webkit-mask-image: url('../img/toolbar/newtab_btn.svg');
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-size: 12px 12px;
+
+    &:hover {
+      opacity: 1.0;
+      background-color: black;
+    }
   }
 }
 
