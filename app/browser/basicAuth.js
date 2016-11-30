@@ -1,4 +1,4 @@
-const {app} = require('electron')
+const { app } = require('electron')
 const appActions = require('../../js/actions/appActions')
 const basicAuthState = require('../common/state/basicAuthState')
 const { makeImmutable } = require('../common/state/immutableUtil')
@@ -11,7 +11,7 @@ const cleanupAuthCallback = (tabId) => {
 }
 
 const basicAuth = {
-  init: () => {
+  init: (state, action) => {
     app.on('login', (e, webContents, request, authInfo, cb) => {
       e.preventDefault()
       let tabId = webContents.getId()
@@ -29,6 +29,8 @@ const basicAuth = {
         })
       })
     })
+
+    return state
   },
 
   setLoginResponseDetail: (state, action) => {

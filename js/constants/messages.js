@@ -76,7 +76,6 @@ const messages = {
   RELOAD: _,
   ENABLE_SWIPE_GESTURE: _,
   DISABLE_SWIPE_GESTURE: _,
-  SHOW_FLASH_NOTIFICATION: _,
   // Password manager
   GET_PASSWORDS: _, /** @arg {string} formOrigin, @arg {string} action */
   GOT_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action, @arg {boolean} isUnique */
@@ -110,7 +109,6 @@ const messages = {
   EXTENSIONS_UPDATED: _,
   ADBLOCK_UPDATED: _,
   DOWNLOADS_UPDATED: _,
-  FLASH_UPDATED: _,
   NEWTAB_DATA_UPDATED: _,
   VERSION_INFORMATION_UPDATED: _,
   // About pages from contentScript

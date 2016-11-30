@@ -61,8 +61,8 @@ if (isDarwin) {
   // need to store the output files in separate directories
   outDir = path.join(outDir, arch)
 
-  var electronInstaller = require('electron-winstaller')
-  var resultPromise = electronInstaller.createWindowsInstaller({
+  var muonInstaller = require('muon-winstaller')
+  var resultPromise = muonInstaller.createWindowsInstaller({
     appDirectory: buildDir,
     outputDirectory: outDir,
     title: 'Brave',
