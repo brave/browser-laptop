@@ -287,6 +287,7 @@ var backupKeys = (appState, action) => {
 
 var recoverKeys = (appState, action) => {
   client.recoverWallet(action.firstRecoveryKey, action.secondRecoveryKey, (err, body) => {
+    if (logError(err, 'recoveryWallet')) appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
     if (err) {
       setImmediate(() => appActions.ledgerRecoveryFailed())
     } else {
@@ -302,6 +303,15 @@ var recoverKeys = (appState, action) => {
  */
 
 if (ipc) {
+  ipc.on(messages.LEDGER_PAYMENTS_PRESENT, (event, presentP) => {
+    if (presentP) {
+      if (!balanceTimeoutId) getBalance()
+    } else if (balanceTimeoutId) {
+      clearTimeout(balanceTimeoutId)
+      balanceTimeoutId = false
+    }
+  })
+
   ipc.on(messages.CHECK_BITCOIN_HANDLER, (event, partition) => {
     const protocolHandler = session.fromPartition(partition).protocol
     // TODO: https://github.com/brave/browser-laptop/issues/3625

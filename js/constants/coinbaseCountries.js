@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const coinbaseCountries = [
+/* although coibnase operates in all these countries, the debit/credit payment service is, at present, only in the US
   'AT',
   'AU',
   'BE',
@@ -35,6 +36,7 @@ const coinbaseCountries = [
   'SI',
   'SK',
   'SM',
+ */
   'US'
 ]
 
