@@ -8,6 +8,7 @@ const ImmutableComponent = require('./immutableComponent')
 
 const windowActions = require('../actions/windowActions')
 const dragTypes = require('../constants/dragTypes')
+const messages = require('../constants/messages')
 const cx = require('../lib/classSet')
 const {getTextColorForBackground} = require('../lib/color')
 const {isIntermediateAboutPage} = require('../lib/appUrlUtil')
@@ -15,6 +16,7 @@ const {isIntermediateAboutPage} = require('../lib/appUrlUtil')
 const contextMenus = require('../contextMenus')
 const dnd = require('../dnd')
 const windowStore = require('../stores/windowStore')
+const ipc = global.require('electron').ipcRenderer
 
 class Tab extends ImmutableComponent {
   constructor () {
@@ -254,4 +256,22 @@ class Tab extends ImmutableComponent {
   }
 }
 
+const paymentsEnabled = () => {
+  const getSetting = require('../settings').getSetting
+  const settings = require('../constants/settings')
+  return getSetting(settings.PAYMENTS_ENABLED)
+}
+
+windowStore.addChangeListener(() => {
+  if (paymentsEnabled()) {
+    const windowState = windowStore.getState()
+    const tabs = windowState && windowState.get('tabs')
+    if (tabs) {
+      const presentP = tabs.some((tab) => {
+        return tab.get('location') === 'about:preferences#payments'
+      })
+      ipc.send(messages.LEDGER_PAYMENTS_PRESENT, presentP)
+    }
+  }
+})
 module.exports = Tab

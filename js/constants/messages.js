@@ -146,6 +146,7 @@ const messages = {
   // Debugging
   DEBUG_REACT_PROFILE: _,
   // Ledger
+  LEDGER_PAYMENTS_PRESENT: _,
   LEDGER_PUBLISHER: _,
   LEDGER_UPDATED: _,
   LEDGER_CREATE_WALLET: _,
