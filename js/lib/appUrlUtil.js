@@ -50,10 +50,10 @@ module.exports.getExtensionsPath = function (extensionDir) {
 }
 
 module.exports.getBraveExtIndexHTML = function () {
-  var prefix = path.resolve(__dirname, '..', '..') + '/app/extensions/brave'
+  var prefix = path.join(path.resolve(__dirname, '..', '..'), 'app', 'extensions', 'brave')
   return process.env.NODE_ENV === 'development'
-    ? module.exports.fileUrl(prefix + '/index-dev.html')
-    : module.exports.fileUrl(prefix + '/index.html')
+    ? module.exports.fileUrl(path.join(prefix, 'index-dev.html')).replace('file://', 'chrome://brave')
+    : module.exports.fileUrl(path.join(prefix, 'index.html')).replace('file://', 'chrome://brave')
 }
 
 /**

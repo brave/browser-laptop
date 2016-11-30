@@ -1,6 +1,6 @@
 /* global Blob, URL */
 
-const ipc = window.chrome.ipc
+const ipc = window.chrome.ipcRenderer
 const messages = require('../constants/messages')
 const parseTorrent = require('parse-torrent')
 const React = require('react')

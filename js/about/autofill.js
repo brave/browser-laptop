@@ -9,7 +9,7 @@ const ImmutableComponent = require('../components/immutableComponent')
 const aboutActions = require('./aboutActions')
 const Button = require('../components/button')
 
-const ipc = window.chrome.ipc
+const ipc = window.chrome.ipcRenderer
 
 require('../../less/about/autofill.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')

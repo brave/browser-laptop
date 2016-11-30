@@ -314,7 +314,7 @@ const windowActions = {
    * @param {Object} frameProps - The properties of the frame to close
    */
   closeFrame: function (frames, frameProps, forceClosePinned) {
-    const ipc = global.require('electron').ipcRenderer
+    const ipc = require('electron').ipcRenderer
     const origin = siteUtil.getOrigin(frameProps.get('location'))
     if (origin) {
       appActions.clearMessageBoxes(origin)
@@ -1191,6 +1191,24 @@ const windowActions = {
       actionType: WindowConstants.WINDOW_SET_MODAL_DIALOG_DETAIL,
       className,
       props
+    })
+  },
+
+  autofillSelectionClicked: function (tabId, value, frontEndId, index) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_AUTOFILL_SELECTION_CLICKED,
+      tabId,
+      value,
+      frontEndId,
+      index
+    })
+  },
+
+  autofillPopupHidden: function (tabId, notify = false) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_AUTOFILL_POPUP_HIDDEN,
+      tabId,
+      notify
     })
   }
 }

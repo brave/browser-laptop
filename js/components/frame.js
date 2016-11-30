@@ -16,8 +16,8 @@ const UrlUtil = require('../lib/urlutil')
 const messages = require('../constants/messages')
 const contextMenus = require('../contextMenus')
 const {siteHacks} = require('../data/siteHacks')
-const ipc = global.require('electron').ipcRenderer
-const clipboard = global.require('electron').clipboard
+const ipc = require('electron').ipcRenderer
+const clipboard = require('electron').clipboard
 const FullScreenWarning = require('./fullScreenWarning')
 const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
@@ -28,7 +28,7 @@ const {isFrameError} = require('../../app/common/lib/httpUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
 const {getSiteSettingsForHostPattern} = require('../state/siteSettings')
-const flash = require('../flash')
+// const flash = require('../flash')
 const currentWindow = require('../../app/renderer/currentWindow')
 const windowStore = require('../stores/windowStore')
 const appStoreRenderer = require('../stores/appStoreRenderer')
@@ -143,7 +143,7 @@ class Frame extends ImmutableComponent {
         newTabDetail: this.props.newTabDetail ? this.props.newTabDetail.toJS() : null
       })
     } else if (location === 'about:autofill') {
-      const defaultSession = global.require('electron').remote.session.defaultSession
+      const defaultSession = require('electron').remote.session.defaultSession
       if (this.props.autofillAddresses) {
         const guids = this.props.autofillAddresses.get('guid')
         let list = []
@@ -195,8 +195,7 @@ class Frame extends ImmutableComponent {
   }
 
   shouldCreateWebview () {
-    return !this.webview ||
-      !!this.webview.allowRunningPlugins !== (this.allowRunningFlashPlugin() || this.allowRunningWidevinePlugin())
+    return !this.webview
   }
 
   runInsecureContent () {
@@ -300,41 +299,7 @@ class Frame extends ImmutableComponent {
       // the webview tag is where the user's page is rendered (runs in its own process)
       // @see http://electron.atom.io/docs/api/web-view-tag/
       this.webview = document.createElement('webview')
-
-      let partition = FrameStateUtil.getPartition(this.frame)
-      ipc.sendSync(messages.INITIALIZE_PARTITION, partition)
-      this.webview.setAttribute('partition', partition)
-
-      if (guestInstanceId) {
-        this.webview.setAttribute('data-guest-instance-id', guestInstanceId)
-      }
-      webviewAdded = true
-    }
-    this.webview.setAttribute('allowDisplayingInsecureContent', true)
-    this.webview.setAttribute('data-frame-key', this.props.frameKey)
-
-    const parsedUrl = urlParse(location)
-    if (!appConfig.uaExceptionHosts.includes(parsedUrl.hostname)) {
-      this.webview.setAttribute('useragent', getSetting(settings.USERAGENT) || '')
-    }
-    const hack = siteHacks[parsedUrl.hostname]
-    if (hack && hack.userAgent) {
-      this.webview.setAttribute('useragent', hack.userAgent)
-    }
-    if (this.allowRunningFlashPlugin() || this.allowRunningWidevinePlugin()) {
-      this.webview.setAttribute('plugins', true)
-      this.webview.allowRunningPlugins = true
-    }
-
-    if (!guestInstanceId || newSrc !== 'about:blank') {
-      let webviewSrc
-      if (isSourceAboutUrl(newSrc)) webviewSrc = getTargetAboutUrl(newSrc)
-      else if (isTorrentViewerURL(newSrc)) webviewSrc = getTargetMagnetUrl(newSrc)
-      else webviewSrc = newSrc
-      this.webview.setAttribute('src', webviewSrc)
-    }
-
-    if (webviewAdded) {
+      this.addEventListeners()
       if (cb) {
         this.runOnDomReady = cb
         let eventCallback = (e) => {
@@ -348,7 +313,39 @@ class Frame extends ImmutableComponent {
         }
         this.webview.addEventListener('did-attach', eventCallback)
       }
-      this.addEventListeners()
+      let partition = FrameStateUtil.getPartition(this.frame)
+      ipc.sendSync(messages.INITIALIZE_PARTITION, partition)
+      this.webview.setAttribute('partition', partition)
+      if (guestInstanceId) {
+        if (!this.webview.setGuestInstanceId(guestInstanceId)) {
+          guestInstanceId = null
+        }
+      }
+      webviewAdded = true
+    }
+    this.webview.setAttribute('data-frame-key', this.props.frameKey)
+
+    const parsedUrl = urlParse(location)
+    if (!appConfig.uaExceptionHosts.includes(parsedUrl.hostname)) {
+      this.webview.setUserAgentOverride(getSetting(settings.USERAGENT) || '')
+    }
+    const hack = siteHacks[parsedUrl.hostname]
+    if (hack && hack.userAgent) {
+      this.webview.setUserAgentOverride(hack.userAgent)
+    }
+    if (this.allowRunningFlashPlugin() || this.allowRunningWidevinePlugin()) {
+      this.webview.allowRunningPlugins = true
+    }
+
+    if (!guestInstanceId || newSrc !== 'about:blank') {
+      let webviewSrc
+      if (isSourceAboutUrl(newSrc)) webviewSrc = getTargetAboutUrl(newSrc)
+      else if (isTorrentViewerURL(newSrc)) webviewSrc = getTargetMagnetUrl(newSrc)
+      else webviewSrc = newSrc
+      this.webview.setAttribute('src', webviewSrc)
+    }
+
+    if (webviewAdded) {
       this.webviewContainer.appendChild(this.webview)
     } else {
       cb && cb()
@@ -358,7 +355,6 @@ class Frame extends ImmutableComponent {
   componentDidMount () {
     const cb = () => {
       this.webview.setActive(this.props.isActive)
-      this.webview.setAudioMuted(this.props.audioMuted || false)
       this.updateAboutDetails()
     }
     this.updateWebview(cb)
@@ -434,7 +430,6 @@ class Frame extends ImmutableComponent {
           this.exitHtmlFullScreen()
         }
       }
-      this.webview.setAudioMuted(this.props.audioMuted || false)
       this.updateAboutDetails()
     }
 
@@ -640,26 +635,26 @@ class Frame extends ImmutableComponent {
         appActions.hideMessageBox(message)
       }
     } else {
-      flash.checkFlashInstalled((installed) => {
-        if (installed) {
-          let message = locale.translation('flashInstalled')
-          appActions.showMessageBox({
-            buttons: [
-              {text: locale.translation('goToPrefs')},
-              {text: locale.translation('goToAdobe')}
-            ],
-            message: message,
-            options: {nonce}
-          })
-          this.notificationCallbacks[message] = (buttonIndex) => {
-            appActions.hideMessageBox(message)
-            const location = buttonIndex === 0 ? 'about:preferences#security' : appConfig.flash.installUrl
-            windowActions.newFrame({ location }, true)
-          }
-        } else if (noFlashCallback) {
-          noFlashCallback()
-        }
-      })
+      // flash.checkFlashInstalled((installed) => {
+      //   if (installed) {
+      //     let message = locale.translation('flashInstalled')
+      //     appActions.showMessageBox({
+      //       buttons: [
+      //         {text: locale.translation('goToPrefs')},
+      //         {text: locale.translation('goToAdobe')}
+      //       ],
+      //       message: message,
+      //       options: {nonce}
+      //     })
+      //     this.notificationCallbacks[message] = (buttonIndex) => {
+      //       appActions.hideMessageBox(message)
+      //       const location = buttonIndex === 0 ? 'about:preferences#security' : appConfig.flash.installUrl
+      //       windowActions.newFrame({ location }, true)
+      //     }
+      //   } else if (noFlashCallback) {
+      //     noFlashCallback()
+      //   }
+      // })
     }
 
     ipc.once(messages.NOTIFICATION_RESPONSE + nonce, (e, msg, buttonIndex, persist) => {
@@ -780,9 +775,7 @@ class Frame extends ImmutableComponent {
     })
     // @see <a href="https://github.com/atom/electron/blob/master/docs/api/web-view-tag.md#event-new-window">new-window event</a>
     this.webview.addEventListener('new-window', (e) => {
-      e.preventDefault()
-
-      let guestInstanceId = e.options && e.options.webPreferences && e.options.webPreferences.guestInstanceId
+      let guestInstanceId = e.options && e.options.guestInstanceId
       let windowOpts = e.options && e.options.windowOptions || {}
       windowOpts.parentWindowKey = currentWindow.id
       windowOpts.disposition = e.disposition
@@ -835,10 +828,7 @@ class Frame extends ImmutableComponent {
       contextMenus.onShowAutofillMenu(e.suggestions, e.rect, this.frame)
     })
     this.webview.addEventListener('hide-autofill-popup', (e) => {
-      let webContents = this.webview.getWebContents()
-      if (webContents && webContents.isFocused()) {
-        windowActions.setContextMenuDetail()
-      }
+      windowActions.autofillPopupHidden(this.props.tabId)
     })
     this.webview.addEventListener('ipc-message', (e) => {
       let method = () => {}
@@ -1163,7 +1153,7 @@ class Frame extends ImmutableComponent {
       }
     })
     // Handle zoom using Ctrl/Cmd and the mouse wheel.
-    this.webview.addEventListener('mousewheel', this.onMouseWheel.bind(this))
+    // this.webview.addEventListener('mousewheel', this.onMouseWheel.bind(this))
   }
 
   goBack () {

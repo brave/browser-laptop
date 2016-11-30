@@ -4,13 +4,22 @@
 
 const Immutable = require('immutable')
 
-const immutableUtils = {
+const api = {
+  isImmutable: (obj) => {
+    return obj && obj.toJS
+  },
+
+  isMap: (obj) => {
+    return Immutable.Map.isMap(obj)
+  },
+
+  isList: (obj) => {
+    return Immutable.List.isList(obj)
+  },
+
   makeImmutable: (obj) => {
-    if (!obj) {
-      return null
-    }
-    return obj.toJS ? obj : Immutable.fromJS(obj)
+    return api.isImmutable(obj) ? obj : Immutable.fromJS(obj)
   }
 }
 
-module.exports = immutableUtils
+module.exports = api

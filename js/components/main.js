@@ -5,9 +5,9 @@
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
-const electron = global.require('electron')
+const electron = require('electron')
 const ipc = electron.ipcRenderer
-const systemPreferences = electron.remote.systemPreferences
+// const systemPreferences = electron.remote.systemPreferences
 
 // Actions
 const appActions = require('../actions/appActions')
@@ -206,7 +206,7 @@ class Main extends ImmutableComponent {
   registerSwipeListener () {
     // Navigates back/forward on macOS two-finger swipe
     var trackingFingers = false
-    var swipeGesture = false
+    // var swipeGesture = false
     var isSwipeOnEdge = false
     var deltaX = 0
     var deltaY = 0
@@ -219,7 +219,7 @@ class Main extends ImmutableComponent {
         deltaY = deltaY + e.deltaY
         time = (new Date()).getTime() - startTime
       }
-    })
+    }, { passive: true })
     ipc.on(messages.DEBUG_REACT_PROFILE, (e, args) => {
       window.perf = require('react-addons-perf')
       if (!window.perf.isRunning()) {
@@ -247,18 +247,18 @@ class Main extends ImmutableComponent {
       }
     })
     ipc.on(messages.ENABLE_SWIPE_GESTURE, (e) => {
-      swipeGesture = true
+      // swipeGesture = true
     })
     ipc.on(messages.DISABLE_SWIPE_GESTURE, (e) => {
-      swipeGesture = false
+      // swipeGesture = false
     })
     ipc.on('scroll-touch-begin', function () {
-      if (swipeGesture &&
-        systemPreferences.isSwipeTrackingFromScrollEventsEnabled()) {
-        trackingFingers = true
-        isSwipeOnEdge = false
-        startTime = (new Date()).getTime()
-      }
+      // if (swipeGesture &&
+      //   systemPreferences.isSwipeTrackingFromScrollEventsEnabled()) {
+      //   trackingFingers = true
+      //   isSwipeOnEdge = false
+      //   startTime = (new Date()).getTime()
+      // }
     })
     ipc.on('scroll-touch-end', function () {
       if (time > 50 && trackingFingers && Math.abs(deltaY) < 50 && isSwipeOnEdge) {
@@ -498,7 +498,7 @@ class Main extends ImmutableComponent {
     }, true)
 
     const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
-    if (activeFrame) {
+    if (activeFrame && activeFrame.get('title')) {
       currentWindow.setTitle(activeFrame.get('title'))
     }
 

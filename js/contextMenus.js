@@ -2,12 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const electron = global.require('electron')
+const electron = require('electron')
 const remote = electron.remote
 const Menu = remote.Menu
 const Immutable = require('immutable')
-const clipboard = electron.clipboard
-const nativeImage = electron.nativeImage
+const clipboard = remote.clipboard
 const messages = require('./constants/messages')
 const windowStore = require('./stores/windowStore')
 const windowActions = require('./actions/windowActions')
@@ -24,7 +23,7 @@ const CommonMenu = require('../app/common/commonMenu')
 const dnd = require('./dnd')
 const dndData = require('./dndData')
 const appStoreRenderer = require('./stores/appStoreRenderer')
-const ipc = global.require('electron').ipcRenderer
+const ipc = require('electron').ipcRenderer
 const locale = require('../js/l10n')
 const {getSetting} = require('./settings')
 const settings = require('./constants/settings')
@@ -456,8 +455,7 @@ function autofillTemplateInit (suggestions, frame) {
       template.push({
         label: value,
         click: (item, focusedWindow) => {
-          ipc.send('autofill-selection-clicked', frame.get('tabId'), value, frontendId, i)
-          windowActions.setContextMenuDetail()
+          windowActions.autofillSelectionClicked(frame.get('tabId'), value, frontendId, i)
         }
       })
     }
@@ -939,18 +937,12 @@ function mainTemplateInit (nodeProps, frame) {
       {
         label: locale.translation('copyImage'),
         click: (item) => {
-          const copyFromDataURL = (dataURL) =>
-            clipboard.write({
-              image: nativeImage.createFromDataURL(dataURL),
-              html: `<img src='${nodeProps.srcURL}'>`,
-              text: nodeProps.srcURL
-            })
           if (nodeProps.srcURL) {
             if (urlParse(nodeProps.srcURL).protocol === 'data:') {
-              copyFromDataURL(nodeProps.srcURL)
+              appActions.dataURLCopied(nodeProps.srcURL, `<img src='${nodeProps.srcURL}>`, nodeProps.srcURL)
             } else {
               getBase64FromImageUrl(nodeProps.srcURL).then((dataURL) =>
-                copyFromDataURL(dataURL))
+                appActions.dataURLCopied(dataURL, `<img src='${nodeProps.srcURL}>`, nodeProps.srcURL))
             }
           }
         }
@@ -1377,7 +1369,10 @@ function onShowAutofillMenu (suggestions, boundingRect, frame) {
     x: (window.innerWidth - boundingRect.clientWidth),
     y: (window.innerHeight - boundingRect.clientHeight)
   }
+  const tabId = frame.get('tabId')
   windowActions.setContextMenuDetail(Immutable.fromJS({
+    type: 'autofill',
+    tabId,
     left: offset.x + boundingRect.x,
     top: offset.y + (boundingRect.y + boundingRect.height) - downloadsBarOffset,
     template: menuTemplate

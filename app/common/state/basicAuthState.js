@@ -6,35 +6,48 @@ const tabState = require('./tabState')
 const {makeImmutable} = require('./immutableUtil')
 
 const loginRequiredDetail = 'loginRequiredDetail'
-tabState.addTransientFields([loginRequiredDetail])
 
 const basicAuthState = {
-  setLoginRequiredDetail: (appState, tabId, detail) => {
-    appState = makeImmutable(appState)
-    detail = makeImmutable(detail)
-    let tab = tabState.getOrCreateByTabId(appState, tabId)
+  setLoginRequiredDetail: (state, action) => {
+    state = makeImmutable(state)
+    action = makeImmutable(action)
+    let tabId = action.get('tabId')
+    let detail = action.get('detail')
+    let tabValue = tabState.getByTabId(state, tabId)
+
+    if (!tabValue) {
+      return state
+    }
+
     if (!detail || detail.size === 0) {
-      tab = tab.delete(loginRequiredDetail)
+      tabValue = tabValue.delete(loginRequiredDetail)
     } else {
-      tab = tab.set(loginRequiredDetail, detail)
+      tabValue = tabValue.set(loginRequiredDetail, detail)
     }
-    return tabState.updateTab(appState, tabId, tab)
+    return tabState.updateTab(state, {tabValue, replace: true})
   },
 
-  getLoginRequiredDetail: (appState, tabId) => {
-    appState = makeImmutable(appState)
-    let tab = tabState.getByTabId(appState, tabId)
-    return tab && tab.get(loginRequiredDetail)
+  getLoginRequiredDetail: (state, tabId) => {
+    if (!tabId) {
+      return
+    }
+    state = makeImmutable(state)
+    let tabValue = tabState.getByTabId(state, tabId)
+    return tabValue && tabValue.get(loginRequiredDetail)
   },
 
-  setLoginResponseDetail: (appState, tabId, detail) => {
-    appState = makeImmutable(appState)
-    let tab = tabState.getByTabId(appState, tabId)
-    if (!tab) {
-      return appState
+  setLoginResponseDetail: (state, action) => {
+    state = makeImmutable(state)
+    action = makeImmutable(action)
+    let tabId = action.get('tabId')
+    let tabValue = tabState.getByTabId(state, tabId)
+
+    if (!tabValue) {
+      return state
     }
-    tab = tab.delete(loginRequiredDetail)
-    return tabState.updateTab(appState, tabId, tab)
+
+    tabValue = tabValue.delete(loginRequiredDetail)
+    return tabState.updateTab(state, {tabValue, replace: true})
   }
 }
 

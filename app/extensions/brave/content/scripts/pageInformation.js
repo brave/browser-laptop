@@ -5,7 +5,7 @@
 /* jshint asi: true */
 /* jshint esversion: 6 */
 
-(function () { try { 
+(function () { try {
   var resolve = (tree, context) => {
     var node = tree.body ? tree.body[0] : tree
 
@@ -135,7 +135,7 @@
   if (!node) node = document.head.querySelector("link[rel='shortcut icon']")
   if (node) results.faviconURL = node.getAttribute('href')
 
-  var pubinfo = chrome.ipc.sendSync('ledger-publisher', document.location.href)
+  var pubinfo = chrome.ipcRenderer.sendSync('ledger-publisher', document.location.href)
   if ((!pubinfo) || (!pubinfo.context) || (!pubinfo.rules)) return console.log('no pubinfo available')
 
   var context = pubinfo.context
@@ -171,7 +171,7 @@
       results.faviconURL = resolve(rule.faviconURL.consequent, context)
     }
     break
-  }    
+  }
 
   if (results.faviconURL) {
     var prefix = (results.faviconURL.indexOf('//') === 0) ? document.location.protocol
@@ -182,7 +182,7 @@
   }
 
   results.url = window.location.href
-  chrome.ipc.send('dispatch-action', JSON.stringify({
+  chrome.ipcRenderer.send('dispatch-action', JSON.stringify({
     location: window.location.href,
     actionType: 'event-set-page-info',
     pageInfo: results
