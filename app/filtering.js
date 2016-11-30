@@ -96,7 +96,7 @@ function registerForBeforeRequest (session, partition) {
       }
     }
 
-    if (shouldIgnoreUrl(details.url)) {
+    if (shouldIgnoreUrl(details)) {
       cb({})
       return
     }
@@ -195,7 +195,7 @@ function registerForBeforeRedirect (session, partition) {
   // Note that onBeforeRedirect listener doesn't take a callback
   session.webRequest.onBeforeRedirect(function (details) {
     // Using an electron binary which isn't from Brave
-    if (shouldIgnoreUrl(details.url)) {
+    if (shouldIgnoreUrl(details)) {
       return
     }
     for (let i = 0; i < beforeRedirectFilteringFns.length; i++) {
@@ -222,7 +222,7 @@ function registerForBeforeSendHeaders (session, partition) {
 
   session.webRequest.onBeforeSendHeaders(function (details, cb) {
     // Using an electron binary which isn't from Brave
-    if (shouldIgnoreUrl(details.url)) {
+    if (shouldIgnoreUrl(details)) {
       cb({})
       return
     }
@@ -295,7 +295,7 @@ function registerForHeadersReceived (session, partition) {
   // Note that onBeforeRedirect listener doesn't take a callback
   session.webRequest.onHeadersReceived(function (details, cb) {
     // Using an electron binary which isn't from Brave
-    if (shouldIgnoreUrl(details.url)) {
+    if (shouldIgnoreUrl(details)) {
       cb({})
       return
     }
@@ -558,16 +558,30 @@ function initForPartition (partition) {
 
 const filterableProtocols = ['http:', 'https:']
 
-function shouldIgnoreUrl (url) {
+function shouldIgnoreUrl (details) {
+  // internal requests
+  if (details.tabId === -1) {
+    return true
+  }
+
   // Ensure host is well-formed (RFC 1035) and has a non-empty hostname
   try {
+    const firstPartyUrl = urlParse(details.firstPartyUrl)
+    if (!filterableProtocols.includes(firstPartyUrl.protocol)) {
+      return true
+    }
+  } catch (e) {
+    console.warn('Error parsing ' + details.firstPartyUrl)
+  }
+
+  try {
     // TODO(bridiver) - handle RFS check and cancel http/https requests with 0 or > 255 length hostames
-    const parsedUrl = urlParse(url)
+    const parsedUrl = urlParse(details.url)
     if (filterableProtocols.includes(parsedUrl.protocol)) {
       return false
     }
   } catch (e) {
-    console.warn('Error parsing ' + url)
+    console.warn('Error parsing ' + details.url)
   }
   return true
 }
