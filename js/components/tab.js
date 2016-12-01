@@ -267,10 +267,12 @@ windowStore.addChangeListener(() => {
     const windowState = windowStore.getState()
     const tabs = windowState && windowState.get('tabs')
     if (tabs) {
-      const presentP = tabs.some((tab) => {
-        return tab.get('location') === 'about:preferences#payments'
-      })
-      ipc.send(messages.LEDGER_PAYMENTS_PRESENT, presentP)
+      try {
+        const presentP = tabs.some((tab) => {
+          return tab.get('location') === 'about:preferences#payments'
+        })
+        ipc.send(messages.LEDGER_PAYMENTS_PRESENT, presentP)
+      } catch (ex) { }
     }
   }
 })
