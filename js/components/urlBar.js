@@ -89,6 +89,59 @@ class UrlBar extends ImmutableComponent {
     windowActions.setRenderUrlBarSuggestions(false)
   }
 
+  /**
+   * Assign client ID based on user's os/platform.
+   * `platformClientId` must be populated for this entry in `searchProviders.js`.
+   */
+  getPlatformClientId (provider) {
+    try {
+      if (provider.platformClientId) {
+        const platformUtil = require('../../app/common/lib/platformUtil')
+        if (platformUtil.isWindows()) {
+          return provider.platformClientId.win32 || ''
+        } else if (platformUtil.isDarwin()) {
+          return provider.platformClientId.darwin || ''
+        }
+        return provider.platformClientId.linux || ''
+      }
+    } catch (e) { }
+    return ''
+  }
+
+  /**
+   * Build a search URL considering:
+   * - user's default search engine provider
+   * - search engine shortcut keywords
+   *
+   * Future considerations could include criteria such as:
+   * - user's country / locale (amazon.com vs amazon.ca)
+   * - http verb
+   */
+  buildSearchUrl (searchTerms) {
+    let provider = this.props.searchDetail.toJS()
+    let url = provider.searchURL
+
+    // remove shortcut from the search terms
+    if (this.activateSearchEngine && this.searchSelectEntry !== null) {
+      provider = this.searchSelectEntry
+      const shortcut = new RegExp('^' + provider.shortcut + ' ', 'g')
+      searchTerms = searchTerms.replace(shortcut, '')
+      url = provider.search
+    }
+
+    // required: populate the search terms (URL encoded)
+    url = url.replace('{searchTerms}',
+      encodeURIComponent(searchTerms))
+
+    // optional: populate the client id
+    // some search engines have a different clientId depending on the platform
+    if (url.indexOf('{platformClientId}') > -1) {
+      url = url.replace('{platformClientId}',
+        this.getPlatformClientId(provider))
+    }
+    return url
+  }
+
   onKeyDown (e) {
     if (!this.isActive) {
       windowActions.setUrlBarActive(true)
@@ -121,14 +174,9 @@ class UrlBar extends ImmutableComponent {
             // load the selected suggestion
             this.urlBarSuggestions.clickSelected(e)
           } else {
-            let searchUrl = this.props.searchDetail.get('searchURL').replace('{searchTerms}', encodeURIComponent(location))
-            if (this.activateSearchEngine && this.searchSelectEntry !== null && !isLocationUrl) {
-              const replaceRE = new RegExp('^' + this.searchSelectEntry.shortcut + ' ', 'g')
-              location = location.replace(replaceRE, '')
-              searchUrl = this.searchSelectEntry.search.replace('{searchTerms}', encodeURIComponent(location))
-            }
-
-            location = isLocationUrl ? location : searchUrl
+            location = isLocationUrl
+              ? location
+              : this.buildSearchUrl(location)
             // do search.
             if (e.altKey) {
               windowActions.newFrame({ location }, true)
