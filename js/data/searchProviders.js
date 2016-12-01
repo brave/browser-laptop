@@ -116,6 +116,14 @@ module.exports = { "providers" :
       "image" : "https://www.semanticscholar.org/img/favicon.png",
       "search" : "https://www.semanticscholar.org/search?q={searchTerms}",
       "shortcut" : ":ss"
+    },
+    {
+      "name" : "Qwant",
+      "base" : "https://www.qwant.com/",
+      "image" : "https://www.qwant.com/favicon.ico",
+      "search" : "https://www.qwant.com/?q={searchTerms}&client=brave",
+      "autocomplete": "https://api.qwant.com/api/suggest/?q={searchTerms}&client=brave",
+      "shortcut" : ":q"
     }
   ]
 }
