@@ -112,7 +112,6 @@ const messages = {
   NEWTAB_DATA_UPDATED: _,
   VERSION_INFORMATION_UPDATED: _,
   // About pages from contentScript
-  OPEN_DOWNLOAD_PATH: _,
   RELOAD_URL: _,
   DISPATCH_ACTION: _,
   CHECK_FLASH_INSTALLED: _,

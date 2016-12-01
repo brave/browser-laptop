@@ -1,4 +1,7 @@
 const fakeElectron = {
+  BrowserWindow: {
+    getFocusedWindow: function () {}
+  },
   ipcMain: {
     on: function () { }
   },
@@ -11,6 +14,21 @@ const fakeElectron = {
   app: {
     on: function () {
     }
+  },
+  clipboard: {
+    writeText: function () {
+    }
+  },
+  shell: {
+    showItemInFolder: function () {
+    },
+    openItem: function () {
+    },
+    beep: function () {
+    },
+    moveItemToTrash: function () {
+    }
   }
 }
+
 module.exports = fakeElectron

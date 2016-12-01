@@ -52,7 +52,6 @@ const Importer = require('./importer')
 const messages = require('../js/constants/messages')
 const appConfig = require('../js/constants/appConfig')
 const appActions = require('../js/actions/appActions')
-const downloadActions = require('../js/actions/downloadActions')
 const SessionStore = require('./sessionStore')
 const AppStore = require('../js/stores/appStore')
 const PackageLoader = require('./package-loader')
@@ -488,10 +487,6 @@ app.on('ready', () => {
 
     ipcMain.on(messages.SET_CLIPBOARD, (e, text) => {
       electron.clipboard.writeText(text)
-    })
-
-    ipcMain.on(messages.OPEN_DOWNLOAD_PATH, (e, download) => {
-      downloadActions.openDownloadPath(Immutable.fromJS(download))
     })
 
     ipcMain.on(messages.CERT_ERROR_ACCEPTED, (event, url) => {

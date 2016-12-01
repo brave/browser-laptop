@@ -36,6 +36,7 @@ module.exports = [
   '.github',
   'jsdoc',
   'docs',
+  'sinon',
   'electron-download',
   'electron-rebuild',
   'electron-packager',
