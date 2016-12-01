@@ -381,31 +381,22 @@ describe('navigationBar tests', function () {
       yield setup(this.app.client)
     })
 
-    it('Uses the default favicon when one is not specified', function * () {
-      const page1Url = Brave.server.url('page1.html')
-      yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
-      yield this.app.client.waitUntil(() =>
-        this.app.client.getCssProperty(activeTabFavicon, 'background-image').then((backgroundImage) =>
-          backgroundImage.value === `url("${Brave.server.url('favicon.ico')}")`
-        ))
-    })
-
     it('Parses favicon when one is present', function * () {
       const pageWithFavicon = Brave.server.url('favicon.html')
       yield this.app.client.tabByUrl(Brave.newTabUrl).url(pageWithFavicon).waitForUrl(pageWithFavicon).windowParentByUrl(pageWithFavicon)
-      yield this.app.client.waitUntil(() =>
-        this.app.client.getCssProperty(activeTabFavicon, 'background-image').then((backgroundImage) =>
-          backgroundImage.value === `url("${Brave.server.url('img/test.ico')}")`
-      ))
+      yield this.app.client.waitUntil(function () {
+        return this.getCssProperty(activeTabFavicon, 'background-image').then((backgroundImage) =>
+          backgroundImage.value === `url("${Brave.server.url('img/test.ico')}")`)
+      })
     })
 
     it('Fallback to default icon when no one is specified', function * () {
       const pageWithNoFavicon = Brave.server.url('page_no_favicon.html')
       yield this.app.client.tabByUrl(Brave.newTabUrl).url(pageWithNoFavicon).waitForUrl(pageWithNoFavicon).windowParentByUrl(pageWithNoFavicon)
-      yield this.app.client.waitUntil(() =>
-        this.app.client.getAttribute(activeTabFavicon, 'class').then((className) =>
-          className === 'tabIcon bookmarkFile fa fa-file-o'
-      ))
+      yield this.app.client.waitUntil(function () {
+        return this.getAttribute(activeTabFavicon, 'class').then((className) =>
+          className === 'tabIcon bookmarkFile fa fa-file-o')
+      })
     })
   })
 

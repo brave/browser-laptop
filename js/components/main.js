@@ -287,7 +287,8 @@ class Main extends ImmutableComponent {
         if (entry.name === engine) {
           windowActions.setSearchDetail(Immutable.fromJS({
             searchURL: entry.search,
-            autocompleteURL: entry.autocomplete
+            autocompleteURL: entry.autocomplete,
+            platformClientId: entry.platformClientId
           }))
           this.lastLoadedSearchProviders = engine
           return false
