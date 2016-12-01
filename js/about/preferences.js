@@ -1516,12 +1516,10 @@ class ShieldsTab extends ImmutableComponent {
         <SettingCheckbox checked={this.props.braveryDefaults.get('safeBrowsing')} dataL10nId='safeBrowsing' onChange={this.onToggleSafeBrowsing} />
         <SettingCheckbox checked={this.props.braveryDefaults.get('noScript')} dataL10nId='noScriptPref' onChange={this.onToggleNoScript} />
         <SettingCheckbox dataL10nId='blockCanvasFingerprinting' prefKey={settings.BLOCK_CANVAS_FINGERPRINTING} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingItem>
-          <Button l10nId='manageAdblockSettings' className='primaryButton manageAdblockSettings'
-            onClick={aboutActions.newFrame.bind(null, {
-              location: 'about:adblock'
-            }, true)} />
-        </SettingItem>
+        <Button l10nId='manageAdblockSettings' className='primaryButton manageAdblockSettings'
+          onClick={aboutActions.newFrame.bind(null, {
+            location: 'about:adblock'
+          }, true)} />
       </SettingsList>
       <SitePermissionsPage siteSettings={this.props.siteSettings}
         names={braveryPermissionNames}
@@ -1663,12 +1661,10 @@ class AdvancedTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='usePDFJS' prefKey={settings.PDFJS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='useTorrentViewer' prefKey={settings.TORRENT_VIEWER_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='enablePocket' prefKey={settings.POCKET_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingItem>
-          <Button l10nId='viewInstalledExtensions' className='primaryButton viewExtensionsInfo'
-            onClick={aboutActions.newFrame.bind(null, {
-              location: 'about:extensions'
-            }, true)} />
-        </SettingItem>
+        <Button l10nId='viewInstalledExtensions' className='primaryButton viewExtensionsInfo'
+          onClick={aboutActions.newFrame.bind(null, {
+            location: 'about:extensions'
+          }, true)} />
         <div data-l10n-id='moreExtensionsComingSoon' className='moreExtensionsComingSoon' />
       </SettingsList>
     </div>

@@ -157,34 +157,17 @@ span.buttonSeparator {
 
 // for about:preferences
 .prefBody {
-  .browserButton {
-    &.advancedSettings {
-      font-size: 0.9em;
-    }
+  .settingsList > .settingItem + button,
+  .settingItem > span + button {
+    font-size: 0.9em;
+    padding: 5px 20px;
+  }
 
-    &.primaryButton {
-      &.addFunds {
-        margin-right: 50px;
-      }
+  .settingsList > .settingItem + button {
+    margin-top: 20px;
+  }
 
-      &.clearBrowsingDataButton,
-      &.importNowButton,
-      &.setAsDefaultButton,
-      &.manageAdblockSettings,
-      &.viewExtensionsInfo,
-      &.manageAutofillDataButton {
-        font-size: 0.9em;
-        margin-top: 20px;
-        padding: 5px 20px;
-      }
-
-      &.importNowButton {
-        margin-top: 5px;
-      }
-
-      &.setAsDefaultButton {
-        margin-top: 5px;
-      }
-    }
+  .settingItem > span + button {
+    margin-top: 5px;
   }
 }
