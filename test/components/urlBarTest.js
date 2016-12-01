@@ -20,6 +20,44 @@ describe('urlBar tests', function () {
     })
   }
 
+  describe('typing speed', function () {
+    Brave.beforeAll(this)
+    before(function * () {
+      yield setup(this.app.client)
+      yield this.app.client.waitForExist(urlInput)
+      yield this.app.client.waitForElementFocus(urlInput)
+      yield this.app.client
+        .clearAppData({browserHistory: true})
+        .addSite({ location: 'https://brave.com', title: 'Brave' })
+    })
+
+    // OMG, Brad would hate this test!
+    const typingDelays = [0, 2, 11, 53, 101, 151, 251]
+    typingDelays.forEach((delay) => {
+      it(`delay of ${delay}ms/character fills correctly`, function * () {
+        const input = 'brave.com'
+        yield this.app.client
+          .keys(Brave.keys.ESCAPE)
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => val === '')
+          })
+          .waitForSelectedText('')
+        for (let i = 0; i < input.length; i++) {
+          yield this.app.client
+            .keys(input[i])
+            .pause(delay)
+        }
+        yield this.app.client
+          .waitForSelectedText('')
+          .waitUntil(function () {
+            return this.getValue(urlInput)
+              .then((val) => val === 'brave.com')
+          })
+          .keys(Brave.keys.ESCAPE)
+      })
+    })
+  })
+
   describe('autocomplete', function () {
     Brave.beforeEach(this)
 
