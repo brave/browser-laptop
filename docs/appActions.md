@@ -541,6 +541,85 @@ Dispatch a message to copy data URL to clipboard
 
 
 
+### shuttingDown() 
+
+Dispatches a message when the app is shutting down.
+
+
+
+### downloadRevealed(downloadId) 
+
+Dispatches a message when a download is being revealed.
+Typically this will open the download directory in finder / explorer and select the icon.
+
+**Parameters**
+
+**downloadId**: `string`, ID of the download being revealed
+
+
+
+### downloadOpened(downloadId) 
+
+Dispatches a message when a download is being opened.
+
+**Parameters**
+
+**downloadId**: `string`, ID of the download being opened
+
+
+
+### downloadActionPerformed(downloadId, downloadAction) 
+
+Dispatches a message when an electron download action is being performed (pause, resume, cancel)
+
+**Parameters**
+
+**downloadId**: `string`, ID of the download item the action is being performed to
+
+**downloadAction**: `string`, the action to perform from constants/electronDownloadItemActions.js
+
+
+
+### downloadCopiedToClipboard(downloadId) 
+
+Dispatches a message when a download URL is being copied to the clipboard
+
+**Parameters**
+
+**downloadId**: `string`, ID of the download item being copied to the clipboard
+
+
+
+### downloadDeleted(downloadId) 
+
+Dispatches a message when a download is being deleted
+
+**Parameters**
+
+**downloadId**: `string`, ID of the download item being deleted
+
+
+
+### downloadCleared(downloadId) 
+
+Dispatches a message when a download is being cleared
+
+**Parameters**
+
+**downloadId**: `string`, ID of the download item being cleared
+
+
+
+### downloadRedownloaded(downloadId) 
+
+Dispatches a message when a download is being redownloaded
+
+**Parameters**
+
+**downloadId**: `string`, ID of the download item being redownloaded
+
+
+
 
 * * *
 

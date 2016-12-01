@@ -12,7 +12,6 @@ const webContents = electron.webContents
 const appActions = require('../js/actions/appActions')
 const appConfig = require('../js/constants/appConfig')
 const downloadStates = require('../js/constants/downloadStates')
-const downloadActions = require('../js/constants/downloadActions')
 const urlParse = require('url').parse
 const getBaseDomain = require('../js/lib/baseDomain').getBaseDomain
 const getSetting = require('../js/settings').getSetting
@@ -31,6 +30,7 @@ const uuid = require('node-uuid')
 const path = require('path')
 const getOrigin = require('../js/state/siteUtil').getOrigin
 const {adBlockResourceName} = require('./adBlock')
+const {updateElectronDownloadItem} = require('./browser/electronDownloadItem')
 
 let appStore = null
 
@@ -45,11 +45,6 @@ const pdfjsOrigin = `chrome-extension://${config.PDFJSExtensionId}`
 
 // Third party domains that require a valid referer to work
 const refererExceptions = ['use.typekit.net', 'cloud.typography.com']
-
-/**
- * Maps downloadId to an electron download-item
- */
-const downloadMap = {}
 
 /**
  * Maps partition name to the session object
@@ -467,11 +462,7 @@ module.exports.isThirdPartyHost = (baseContextHost, testHost) => {
 }
 
 function updateDownloadState (downloadId, item, state) {
-  if (state === downloadStates.INTERRUPTED || state === downloadStates.CANCELLED || state === downloadStates.COMPLETED) {
-    delete downloadMap[downloadId]
-  } else {
-    downloadMap[downloadId] = item
-  }
+  updateElectronDownloadItem(downloadId, item, state)
 
   if (!item) {
     appActions.mergeDownloadDetail(downloadId, { state: downloadStates.INTERRUPTED })
@@ -601,29 +592,6 @@ module.exports.init = (state, action, store) => {
       initForPartition(partition)
       e.returnValue = true
       return e.returnValue
-    })
-    ipcMain.on(messages.DOWNLOAD_ACTION, (e, downloadId, action) => {
-      const item = downloadMap[downloadId]
-      switch (action) {
-        case downloadActions.CANCEL:
-          updateDownloadState(downloadId, item, downloadStates.CANCELLED)
-          if (item) {
-            item.cancel()
-          }
-          break
-        case downloadActions.PAUSE:
-          if (item) {
-            item.pause()
-          }
-          updateDownloadState(downloadId, item, downloadStates.PAUSED)
-          break
-        case downloadActions.RESUME:
-          if (item) {
-            item.resume()
-          }
-          updateDownloadState(downloadId, item, downloadStates.IN_PROGRESS)
-          break
-      }
     })
     ipcMain.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex, persist) => {
       if (permissionCallbacks[message]) {

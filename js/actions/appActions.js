@@ -4,7 +4,7 @@
 
 'use strict'
 const AppDispatcher = require('../dispatcher/appDispatcher')
-const AppConstants = require('../constants/appConstants')
+const appConstants = require('../constants/appConstants')
 
 const appActions = {
   /**
@@ -15,7 +15,7 @@ const appActions = {
    */
   setState: function (appState) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_STATE,
+      actionType: appConstants.APP_SET_STATE,
       appState
     })
   },
@@ -29,7 +29,7 @@ const appActions = {
    */
   newWindow: function (frameOpts, browserOpts, restoredState, cb) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_NEW_WINDOW,
+      actionType: appConstants.APP_NEW_WINDOW,
       frameOpts,
       browserOpts,
       restoredState,
@@ -39,28 +39,28 @@ const appActions = {
 
   closeWindow: function (windowId) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_CLOSE_WINDOW,
+      actionType: appConstants.APP_CLOSE_WINDOW,
       windowId
     })
   },
 
   windowClosed: function (windowValue) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_WINDOW_CLOSED,
+      actionType: appConstants.APP_WINDOW_CLOSED,
       windowValue
     })
   },
 
   windowCreated: function (windowValue) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_WINDOW_CREATED,
+      actionType: appConstants.APP_WINDOW_CREATED,
       windowValue
     })
   },
 
   windowUpdated: function (windowValue) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_WINDOW_UPDATED,
+      actionType: appConstants.APP_WINDOW_UPDATED,
       windowValue
     })
   },
@@ -71,7 +71,7 @@ const appActions = {
    */
   newTab: function (frameProps) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_NEW_TAB,
+      actionType: appConstants.APP_NEW_TAB,
       frameProps
     })
   },
@@ -82,7 +82,7 @@ const appActions = {
    */
   tabCreated: function (tabValue) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_TAB_CREATED,
+      actionType: appConstants.APP_TAB_CREATED,
       tabValue
     })
   },
@@ -93,7 +93,7 @@ const appActions = {
    */
   tabUpdated: function (tabValue) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_TAB_UPDATED,
+      actionType: appConstants.APP_TAB_UPDATED,
       tabValue
     })
   },
@@ -104,7 +104,7 @@ const appActions = {
    */
   tabClosed: function (tabValue) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_TAB_CLOSED,
+      actionType: appConstants.APP_TAB_CLOSED,
       tabValue
     })
   },
@@ -119,7 +119,7 @@ const appActions = {
    */
   addSite: function (siteDetail, tag, originalSiteDetail, destinationDetail) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_ADD_SITE,
+      actionType: appConstants.APP_ADD_SITE,
       siteDetail,
       tag,
       originalSiteDetail,
@@ -132,7 +132,7 @@ const appActions = {
    */
   clearHistory: function () {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_CLEAR_HISTORY
+      actionType: appConstants.APP_CLEAR_HISTORY
     })
   },
 
@@ -143,7 +143,7 @@ const appActions = {
    */
   removeSite: function (siteDetail, tag) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_REMOVE_SITE,
+      actionType: appConstants.APP_REMOVE_SITE,
       siteDetail,
       tag
     })
@@ -160,7 +160,7 @@ const appActions = {
    */
   moveSite: function (sourceDetail, destinationDetail, prepend, destinationIsParent) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_MOVE_SITE,
+      actionType: appConstants.APP_MOVE_SITE,
       sourceDetail,
       destinationDetail,
       prepend,
@@ -176,7 +176,7 @@ const appActions = {
    */
   mergeDownloadDetail: function (downloadId, downloadDetail) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_MERGE_DOWNLOAD_DETAIL,
+      actionType: appConstants.APP_MERGE_DOWNLOAD_DETAIL,
       downloadId,
       downloadDetail
     })
@@ -187,7 +187,7 @@ const appActions = {
    */
   clearCompletedDownloads: function () {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_CLEAR_COMPLETED_DOWNLOADS
+      actionType: appConstants.APP_CLEAR_COMPLETED_DOWNLOADS
     })
   },
 
@@ -196,7 +196,7 @@ const appActions = {
    */
   ledgerRecoverySucceeded: function () {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_LEDGER_RECOVERY_SUCCEEDED
+      actionType: appConstants.APP_LEDGER_RECOVERY_SUCCEEDED
     })
   },
 
@@ -205,7 +205,7 @@ const appActions = {
    */
   ledgerRecoveryFailed: function () {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_LEDGER_RECOVERY_FAILED
+      actionType: appConstants.APP_LEDGER_RECOVERY_FAILED
     })
   },
 
@@ -216,7 +216,7 @@ const appActions = {
    */
   defaultWindowParamsChanged: function (size, position) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_DEFAULT_WINDOW_PARAMS_CHANGED,
+      actionType: appConstants.APP_DEFAULT_WINDOW_PARAMS_CHANGED,
       size,
       position
     })
@@ -231,7 +231,7 @@ const appActions = {
    */
   setResourceETag: function (resourceName, etag) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_DATA_FILE_ETAG,
+      actionType: appConstants.APP_SET_DATA_FILE_ETAG,
       resourceName,
       etag
     })
@@ -244,7 +244,7 @@ const appActions = {
    */
   setResourceLastCheck: function (resourceName, lastCheckVersion, lastCheckDate) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_DATA_FILE_LAST_CHECK,
+      actionType: appConstants.APP_SET_DATA_FILE_LAST_CHECK,
       resourceName,
       lastCheckVersion,
       lastCheckDate
@@ -258,7 +258,7 @@ const appActions = {
    */
   setResourceEnabled: function (resourceName, enabled) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_RESOURCE_ENABLED,
+      actionType: appConstants.APP_SET_RESOURCE_ENABLED,
       resourceName,
       enabled
     })
@@ -270,7 +270,7 @@ const appActions = {
    */
   resourceReady: function (resourceName) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_RESOURCE_READY,
+      actionType: appConstants.APP_RESOURCE_READY,
       resourceName
     })
   },
@@ -282,7 +282,7 @@ const appActions = {
   */
   addResourceCount: function (resourceName, count) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_ADD_RESOURCE_COUNT,
+      actionType: appConstants.APP_ADD_RESOURCE_COUNT,
       resourceName,
       count
     })
@@ -294,7 +294,7 @@ const appActions = {
    */
   setUpdateLastCheck: function () {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_UPDATE_LAST_CHECK
+      actionType: appConstants.APP_UPDATE_LAST_CHECK
     })
   },
 
@@ -306,7 +306,7 @@ const appActions = {
    */
   setUpdateStatus: function (status, verbose, metadata) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_UPDATE_STATUS,
+      actionType: appConstants.APP_SET_UPDATE_STATUS,
       status,
       verbose,
       metadata
@@ -319,7 +319,7 @@ const appActions = {
    */
   savePassword: function (passwordDetail) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_ADD_PASSWORD,
+      actionType: appConstants.APP_ADD_PASSWORD,
       passwordDetail
     })
   },
@@ -330,7 +330,7 @@ const appActions = {
    */
   deletePassword: function (passwordDetail) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_REMOVE_PASSWORD,
+      actionType: appConstants.APP_REMOVE_PASSWORD,
       passwordDetail
     })
   },
@@ -340,7 +340,7 @@ const appActions = {
    */
   clearPasswords: function () {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_CLEAR_PASSWORDS
+      actionType: appConstants.APP_CLEAR_PASSWORDS
     })
   },
 
@@ -351,7 +351,7 @@ const appActions = {
    */
   changeSetting: function (key, value) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_CHANGE_SETTING,
+      actionType: appConstants.APP_CHANGE_SETTING,
       key,
       value
     })
@@ -367,7 +367,7 @@ const appActions = {
    */
   changeSiteSetting: function (hostPattern, key, value, temp) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_CHANGE_SITE_SETTING,
+      actionType: appConstants.APP_CHANGE_SITE_SETTING,
       hostPattern,
       key,
       value,
@@ -384,7 +384,7 @@ const appActions = {
    */
   removeSiteSetting: function (hostPattern, key, temp) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_REMOVE_SITE_SETTING,
+      actionType: appConstants.APP_REMOVE_SITE_SETTING,
       hostPattern,
       key,
       temporary: temp || false
@@ -397,7 +397,7 @@ const appActions = {
    */
   updateLedgerInfo: function (ledgerInfo) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_UPDATE_LEDGER_INFO,
+      actionType: appConstants.APP_UPDATE_LEDGER_INFO,
       ledgerInfo
     })
   },
@@ -408,7 +408,7 @@ const appActions = {
    */
   updatePublisherInfo: function (publisherInfo) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_UPDATE_PUBLISHER_INFO,
+      actionType: appConstants.APP_UPDATE_PUBLISHER_INFO,
       publisherInfo
     })
   },
@@ -419,7 +419,7 @@ const appActions = {
    */
   showMessageBox: function (detail) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SHOW_MESSAGE_BOX,
+      actionType: appConstants.APP_SHOW_MESSAGE_BOX,
       detail
     })
   },
@@ -430,7 +430,7 @@ const appActions = {
    */
   hideMessageBox: function (message) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_HIDE_MESSAGE_BOX,
+      actionType: appConstants.APP_HIDE_MESSAGE_BOX,
       message
     })
   },
@@ -441,7 +441,7 @@ const appActions = {
    */
   clearMessageBoxes: function (origin) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_CLEAR_MESSAGE_BOXES,
+      actionType: appConstants.APP_CLEAR_MESSAGE_BOXES,
       origin
     })
   },
@@ -453,7 +453,7 @@ const appActions = {
    */
   addWord: function (word, learn) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_ADD_WORD,
+      actionType: appConstants.APP_ADD_WORD,
       word,
       learn
     })
@@ -465,7 +465,7 @@ const appActions = {
    */
   setDictionary: function (locale) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_DICTIONARY,
+      actionType: appConstants.APP_SET_DICTIONARY,
       locale
     })
   },
@@ -477,7 +477,7 @@ const appActions = {
    */
   setLoginRequiredDetail: function (tabId, detail) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_LOGIN_REQUIRED_DETAIL,
+      actionType: appConstants.APP_SET_LOGIN_REQUIRED_DETAIL,
       tabId,
       detail
     })
@@ -485,7 +485,7 @@ const appActions = {
 
   setLoginResponseDetail: function (tabId, detail) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_LOGIN_RESPONSE_DETAIL,
+      actionType: appConstants.APP_SET_LOGIN_RESPONSE_DETAIL,
       tabId,
       detail
     })
@@ -497,7 +497,7 @@ const appActions = {
    */
   clearAppData: function (clearDataDetail) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_CLEAR_DATA,
+      actionType: appConstants.APP_CLEAR_DATA,
       clearDataDetail
     })
   },
@@ -508,7 +508,7 @@ const appActions = {
    */
   importBrowserData: function (selected) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_IMPORT_BROWSER_DATA,
+      actionType: appConstants.APP_IMPORT_BROWSER_DATA,
       selected
     })
   },
@@ -520,7 +520,7 @@ const appActions = {
    */
   addAutofillAddress: function (detail, originalDetail) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_ADD_AUTOFILL_ADDRESS,
+      actionType: appConstants.APP_ADD_AUTOFILL_ADDRESS,
       detail,
       originalDetail
     })
@@ -532,7 +532,7 @@ const appActions = {
    */
   removeAutofillAddress: function (detail) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_REMOVE_AUTOFILL_ADDRESS,
+      actionType: appConstants.APP_REMOVE_AUTOFILL_ADDRESS,
       detail
     })
   },
@@ -544,7 +544,7 @@ const appActions = {
    */
   addAutofillCreditCard: function (detail, originalDetail) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_ADD_AUTOFILL_CREDIT_CARD,
+      actionType: appConstants.APP_ADD_AUTOFILL_CREDIT_CARD,
       detail,
       originalDetail
     })
@@ -556,7 +556,7 @@ const appActions = {
    */
   removeAutofillCreditCard: function (detail) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_REMOVE_AUTOFILL_CREDIT_CARD,
+      actionType: appConstants.APP_REMOVE_AUTOFILL_CREDIT_CARD,
       detail
     })
   },
@@ -568,7 +568,7 @@ const appActions = {
    */
   autofillDataChanged: function (addressGuids, creditCardGuids) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_AUTOFILL_DATA_CHANGED,
+      actionType: appConstants.APP_AUTOFILL_DATA_CHANGED,
       addressGuids,
       creditCardGuids
     })
@@ -582,7 +582,7 @@ const appActions = {
    */
   windowBlurred: function (windowId) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_WINDOW_BLURRED,
+      actionType: appConstants.APP_WINDOW_BLURRED,
       windowId: windowId
     })
   },
@@ -593,7 +593,7 @@ const appActions = {
    */
   setMenubarTemplate: function (menubarTemplate) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_MENUBAR_TEMPLATE,
+      actionType: appConstants.APP_SET_MENUBAR_TEMPLATE,
       menubarTemplate
     })
   },
@@ -604,7 +604,7 @@ const appActions = {
    */
   networkConnected: function () {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_NETWORK_CONNECTED
+      actionType: appConstants.APP_NETWORK_CONNECTED
     })
   },
 
@@ -613,7 +613,7 @@ const appActions = {
    */
   networkDisconnected: function () {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_NETWORK_DISCONNECTED
+      actionType: appConstants.APP_NETWORK_DISCONNECTED
     })
   },
 
@@ -624,7 +624,7 @@ const appActions = {
    */
   defaultBrowserUpdated: function (useBrave) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_DEFAULT_BROWSER_UPDATED,
+      actionType: appConstants.APP_DEFAULT_BROWSER_UPDATED,
       useBrave
     })
   },
@@ -634,7 +634,7 @@ const appActions = {
    */
   defaultBrowserCheckComplete: function () {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_DEFAULT_BROWSER_CHECK_COMPLETE
+      actionType: appConstants.APP_DEFAULT_BROWSER_CHECK_COMPLETE
     })
   },
 
@@ -643,7 +643,7 @@ const appActions = {
    */
   populateHistory: function () {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_POPULATE_HISTORY
+      actionType: appConstants.APP_POPULATE_HISTORY
     })
   },
 
@@ -652,16 +652,99 @@ const appActions = {
    **/
   dataURLCopied: function (dataURL, html, text) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_DATA_URL_COPIED,
+      actionType: appConstants.APP_DATA_URL_COPIED,
       dataURL,
       html,
       text
     })
   },
 
+  /**
+   * Dispatches a message when the app is shutting down.
+   */
   shuttingDown: function () {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SHUTTING_DOWN
+      actionType: appConstants.APP_SHUTTING_DOWN
+    })
+  },
+
+  /**
+   * Dispatches a message when a download is being revealed.
+   * Typically this will open the download directory in finder / explorer and select the icon.
+   * @param {string} downloadId - ID of the download being revealed
+   */
+  downloadRevealed: function (downloadId) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_DOWNLOAD_REVEALED,
+      downloadId
+    })
+  },
+
+  /**
+   * Dispatches a message when a download is being opened.
+   * @param {string} downloadId - ID of the download being opened
+   */
+  downloadOpened: function (downloadId) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_DOWNLOAD_OPENED,
+      downloadId
+    })
+  },
+
+  /**
+   * Dispatches a message when an electron download action is being performed (pause, resume, cancel)
+   * @param {string} downloadId - ID of the download item the action is being performed to
+   * @param {string} downloadAction - the action to perform from constants/electronDownloadItemActions.js
+   */
+  downloadActionPerformed: function (downloadId, downloadAction) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_DOWNLOAD_ACTION_PERFORMED,
+      downloadId,
+      downloadAction
+    })
+  },
+
+  /**
+   * Dispatches a message when a download URL is being copied to the clipboard
+   * @param {string} downloadId - ID of the download item being copied to the clipboard
+   */
+  downloadCopiedToClipboard: function (downloadId) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_DOWNLOAD_COPIED_TO_CLIPBOARD,
+      downloadId
+    })
+  },
+
+  /**
+   * Dispatches a message when a download is being deleted
+   * @param {string} downloadId - ID of the download item being deleted
+   */
+  downloadDeleted: function (downloadId) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_DOWNLOAD_DELETED,
+      downloadId
+    })
+  },
+
+  /**
+   * Dispatches a message when a download is being cleared
+   * @param {string} downloadId - ID of the download item being cleared
+   */
+  downloadCleared: function (downloadId) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_DOWNLOAD_CLEARED,
+      downloadId
+    })
+  },
+
+  /**
+   * Dispatches a message when a download is being redownloaded
+   * @param {string} downloadId - ID of the download item being redownloaded
+   */
+  downloadRedownloaded: function (downloadId) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_DOWNLOAD_REDOWNLOADED,
+      downloadId
     })
   }
 }

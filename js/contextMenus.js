@@ -12,9 +12,9 @@ const windowStore = require('./stores/windowStore')
 const windowActions = require('./actions/windowActions')
 const webviewActions = require('./actions/webviewActions')
 const bookmarkActions = require('./actions/bookmarkActions')
-const downloadActions = require('./actions/downloadActions')
 const appActions = require('./actions/appActions')
 const siteTags = require('./constants/siteTags')
+const electronDownloadItemActions = require('../app/common/constants/electronDownloadItemActions')
 const dragTypes = require('./constants/dragTypes')
 const siteUtil = require('./state/siteUtil')
 const downloadUtil = require('./state/downloadUtil')
@@ -145,60 +145,59 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
   const template = []
 
   if (downloadItem) {
-    const downloads = appStoreRenderer.state.get('downloads')
     if (downloadUtil.shouldAllowPause(downloadItem)) {
       template.push({
         label: locale.translation('downloadItemPause'),
-        click: downloadActions.pauseDownload.bind(null, downloadId)
+        click: appActions.downloadActionPerformed.bind(null, downloadId, electronDownloadItemActions.PAUSE)
       })
     }
 
     if (downloadUtil.shouldAllowResume(downloadItem)) {
       template.push({
         label: locale.translation('downloadItemResume'),
-        click: downloadActions.resumeDownload.bind(null, downloadId)
+        click: appActions.downloadActionPerformed.bind(null, downloadId, electronDownloadItemActions.RESUME)
       })
     }
 
     if (downloadUtil.shouldAllowCancel(downloadItem)) {
       template.push({
         label: locale.translation('downloadItemCancel'),
-        click: downloadActions.cancelDownload.bind(null, downloadId)
+        click: appActions.downloadActionPerformed.bind(null, downloadId, electronDownloadItemActions.CANCEL)
       })
     }
 
     if (downloadUtil.shouldAllowRedownload(downloadItem)) {
       template.push({
         label: locale.translation('downloadItemRedownload'),
-        click: downloadActions.redownloadURL.bind(null, downloadItem, downloadId)
+        click: appActions.downloadRedownloaded.bind(null, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowCopyLink(downloadItem)) {
       template.push({
         label: locale.translation('downloadItemCopyLink'),
-        click: downloadActions.copyLinkToClipboard.bind(null, downloadItem)
+        click: appActions.downloadCopiedToClipboard.bind(null, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowOpenDownloadLocation(downloadItem)) {
       template.push({
         label: locale.translation('downloadItemPath'),
-        click: downloadActions.locateShellPath.bind(null, downloadItem)
+        click: appActions.downloadRevealed.bind(null, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowDelete(downloadItem)) {
       template.push({
         label: locale.translation('downloadItemDelete'),
-        click: downloadActions.deleteDownload.bind(null, downloads, downloadItem, downloadId)
+        click: appActions.downloadDeleted.bind(null, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowRemoveFromList(downloadItem)) {
       template.push({
         label: locale.translation('downloadItemClear'),
-        click: downloadActions.clearDownload.bind(null, downloads, downloadId)
+        click: appActions.downloadCleared.bind(null, downloadId)
       })
     }
   }

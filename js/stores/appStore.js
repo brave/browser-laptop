@@ -17,7 +17,6 @@ const app = electron.app
 const ipcMain = electron.ipcMain
 const messages = require('../constants/messages')
 const UpdateStatus = require('../constants/updateStatus')
-const downloadStates = require('../constants/downloadStates')
 const BrowserWindow = electron.BrowserWindow
 const LocalShortcuts = require('../../app/localShortcuts')
 const appActions = require('../actions/appActions')
@@ -36,6 +35,7 @@ const Filtering = require('../../app/filtering')
 const basicAuth = require('../../app/browser/basicAuth')
 const tabs = require('../../app/browser/tabs')
 const windows = require('../../app/browser/windows')
+const downloadsReducer = require('../../app/browser/reducers/downloadsReducer')
 
 // state helpers
 const basicAuthState = require('../../app/common/state/basicAuthState')
@@ -361,6 +361,8 @@ const handleAppAction = (action) => {
 
   const ledger = require('../../app/ledger')
 
+  appState = downloadsReducer(appState, action)
+
   switch (action.actionType) {
     case AppConstants.APP_SET_STATE:
       appState = action.appState
@@ -497,21 +499,6 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_MOVE_SITE:
       appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent, false))
-      break
-    case AppConstants.APP_MERGE_DOWNLOAD_DETAIL:
-      if (action.downloadDetail) {
-        appState = appState.mergeIn(['downloads', action.downloadId], action.downloadDetail)
-      } else {
-        appState = appState.deleteIn(['downloads', action.downloadId])
-      }
-      break
-    case AppConstants.APP_CLEAR_COMPLETED_DOWNLOADS:
-      if (appState.get('downloads')) {
-        const downloads = appState.get('downloads')
-          .filter((download) =>
-            ![downloadStates.COMPLETED, downloadStates.INTERRUPTED, downloadStates.CANCELLED].includes(download.get('state')))
-        appState = appState.set('downloads', downloads)
-      }
       break
     case AppConstants.APP_CLEAR_HISTORY:
       appState = appState.set('sites', siteUtil.clearHistory(appState.get('sites')))
