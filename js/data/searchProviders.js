@@ -124,6 +124,18 @@ module.exports = { "providers" :
       "search" : "https://www.qwant.com/?q={searchTerms}&client=brave",
       "autocomplete": "https://api.qwant.com/api/suggest/?q={searchTerms}&client=brave",
       "shortcut" : ":q"
+    },
+    {
+      "name" : "Yandex",
+      "base" : "https://yandex.com",
+      "image" : "https://yastatic.net/islands-icons/_/6jyHGXR8-HAc8oJ1bU8qMUQQz_g.ico",
+      "search" : "https://yandex.com/search/?text={searchTerms}&clid={platformClientId}",
+      "shortcut" : ":ya",
+      "platformClientId": {
+        "win32": 2274777,
+        "darwin": 2274776,
+        "linux": 2274778
+      }
     }
   ]
 }
