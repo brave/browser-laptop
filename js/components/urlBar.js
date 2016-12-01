@@ -47,10 +47,12 @@ class UrlBar extends ImmutableComponent {
         return
       }
       const suffixLen = this.props.locationValueSuffix.length
-      this.urlInput.value = this.locationValue + this.props.locationValueSuffix
-      const len = this.locationValue.length
-      this.urlInput.setSelectionRange(len, len + suffixLen)
-    }, 100)
+      if (suffixLen > 0 && this.urlInput.value !== this.locationValue + this.props.locationValueSuffix) {
+        this.urlInput.value = this.locationValue + this.props.locationValueSuffix
+        const len = this.locationValue.length
+        this.urlInput.setSelectionRange(len, len + suffixLen)
+      }
+    }, 10)
   }
 
   get activeFrame () {
