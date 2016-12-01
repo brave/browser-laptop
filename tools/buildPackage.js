@@ -4,9 +4,12 @@
 
 var VersionInfo = require('./lib/versionInfo')
 var execute = require('./lib/execute')
+var format = require('util').format
+
 const ignoredPaths = require('./lib/ignoredPaths')
 const config = require('./lib/config')
 const path = require('path')
+
 
 const isWindows = process.platform === 'win32'
 const isDarwin = process.platform === 'darwin'
@@ -14,11 +17,12 @@ var arch = 'x64'
 const isLinux = process.platform === 'linux'
 
 var appIcon
+if (process.env.TARGET_ARCH === 'ia32') {
+  arch = 'ia32'
+}
+
 if (isWindows) {
   appIcon = 'res/app.ico'
-  if (process.env.TARGET_ARCH === 'ia32') {
-    arch = 'ia32'
-  }
 } else if (isDarwin) {
   appIcon = 'res/app.icns'
 } else {
@@ -107,7 +111,7 @@ function BuildManifestFile () {
 }
 
 if (isLinux) {
-  cmds.push('mv Brave-linux-x64/Brave Brave-linux-x64/brave')
+  cmds.push(format('mv Brave-linux-%s/Brave Brave-linux-%s/brave', arch, arch))
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'resources', 'extensions'))
 } else if (isDarwin) {
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'Brave.app', 'Contents', 'Resources', 'extensions'))
