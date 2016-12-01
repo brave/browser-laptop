@@ -154,8 +154,11 @@ const aboutActions = {
     })
   },
 
-  openDownloadPath: function (download) {
-    ipc.send(messages.OPEN_DOWNLOAD_PATH, download.toJS())
+  downloadRevealed: function (downloadId) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_DOWNLOAD_REVEALED,
+      downloadId
+    })
   },
 
   decryptPassword: function (encryptedPassword, authTag, iv, id) {
