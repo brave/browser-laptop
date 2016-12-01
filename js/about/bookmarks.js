@@ -461,7 +461,7 @@ class AboutBookmarks extends React.Component {
         <div className='folderView'>
           <div className='columnHeader'>
             <span data-l10n-id='folders' />
-            <span data-l10n-id='importBrowserData' className='fa fa-download clearBrowsingDataButton' onClick={this.importBrowserData} />
+            <span data-l10n-id='importBrowserData' className='fa fa-download importBrowserData' onClick={this.importBrowserData} />
             <span data-l10n-id='addBookmarkFolder' className='addBookmarkFolder' onClick={this.addBookmarkFolder} />
           </div>
           <BookmarkFolderList
