@@ -36,25 +36,7 @@
     padding-left: 5px;
   }
 
-  .startButtons {
-    position: relative;
-    top: -1px;
-  }
-
   #navigator {
-    margin-right: 0px;
-
-    .homeButton {
-      margin: 0 0 3px 0;
-    }
-
-    .stopButton {
-      margin: 0 2px 6px 2px;
-    }
-
-    .reloadButton {
-      margin: 0 3px 2px 3px;
-    }
     input {
       font-weight: 500;
       margin: 1px 0 0 3px;
@@ -62,15 +44,6 @@
   }
 
   #urlInput { width: 100%; }
-
-  #navigator {
-    &:not(.titleMode) {
-      .bookmarkButtonContainer {
-        margin-top: 4px;
-        line-height: 24px;
-      }
-    }
-  }
 
   // changes to ensure window can be as small as 480px wide
   // and still be useable and have the caption buttons intact
@@ -770,7 +743,8 @@
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
       box-sizing: border-box;
-      display: block;
+      display: flex;
+      align-items: center;
       height: 25px;
       width: 25px;
     }
