@@ -636,7 +636,7 @@ const doAction = (action) => {
       windowStore.emitChanges()
       return
     case WindowConstants.WINDOW_AUTOFILL_SELECTION_CLICKED:
-      ipc.send('autofill-selection-clicked', action.tabId, action.value, action.frontendId, action.index)
+      ipc.send('autofill-selection-clicked', action.tabId, action.value, action.frontEndId, action.index)
       windowState = windowState.delete('contextMenuDetail')
       break
     case WindowConstants.WINDOW_AUTOFILL_POPUP_HIDDEN:
