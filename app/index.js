@@ -347,44 +347,51 @@ app.on('ready', () => {
     }
   })
 
-  ipcMain.removeAllListeners('window-alert')
-  ipcMain.on('window-alert', function (event, message, title) {
-    var buttons
+  process.on('window-alert',
+    (webContents, extraData, title, message, defaultPromptText,
+        shouldDisplaySuppressCheckbox, isBeforeUnloadDialog, isReload, cb) => {
+      let suppress = false
+      const buttons = ['OK']
+      if (!webContents || webContents.isDestroyed()) {
+        cb(false, '', suppress)
+      } else {
+        cb(true, '', suppress)
+      }
 
-    buttons = ['OK']
-    message = message ? message.toString() : ''
-    title = title ? title.toString() : ''
-    dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
-      message: message,
-      title: title,
-      buttons: buttons
+      const hostWebContents = webContents.hostWebContents || webContents
+      dialog.showMessageBox(BrowserWindow.fromWebContents(hostWebContents), {
+        message,
+        title,
+        buttons: buttons
+      })
     })
-    // Alert should always return undefined.
-  })
 
-  ipcMain.removeAllListeners('window-confirm')
-  ipcMain.on('window-confirm', function (event, message, title) {
-    var buttons, cancelId
+  process.on('window-confirm',
+    (webContents, extraData, title, message, defaultPromptText,
+        shouldDisplaySuppressCheckbox, isBeforeUnloadDialog, isReload, cb) => {
+      let suppress = false
+      const buttons = ['OK', 'Cancel']
+      if (!webContents || webContents.isDestroyed()) {
+        cb(false, '', suppress)
+      }
 
-    buttons = ['OK', 'Cancel']
-    message = message ? message.toString() : ''
-    title = title ? title.toString() : ''
-    cancelId = 1
-    event.returnValue = !dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
-      message: message,
-      title: title,
-      buttons: buttons,
-      cancelId: cancelId
+      const hostWebContents = webContents.hostWebContents || webContents
+      const response = dialog.showMessageBox(BrowserWindow.fromWebContents(hostWebContents), {
+        message,
+        title,
+        buttons: buttons,
+        cancelId: 1
+      })
+      cb(!response, '', suppress)
     })
-    return event.returnValue
-  })
 
-  ipcMain.removeAllListeners('window-prompt')
-  ipcMain.on('window-prompt', function (event, text, defaultText) {
-    console.warn('window.prompt is not supported yet')
-    event.returnValue = null
-    return event.returnValue
-  })
+  process.on('window-prompt',
+    (webContents, extraData, title, message, defaultPromptText,
+        shouldDisplaySuppressCheckbox, isBeforeUnloadDialog, isReload, cb) => {
+      console.warn('window.prompt is not supported yet')
+      let suppress = false
+      cb(false, '', suppress)
+    })
 
   process.on(messages.UNDO_CLOSED_WINDOW, () => {
     if (lastWindowState) {
