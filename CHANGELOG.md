@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.12.11](https://github.com/brave/browser-laptop/releases/v0.12.11dev)
+- Muon update (Brave's Electron fork)
+
 ## [0.12.10](https://github.com/brave/browser-laptop/releases/v0.12.10dev)
 - Added dropdown menu with options for new tab. ([#4398](https://github.com/brave/browser-laptop/issues/4398))
 - Added F6 jump to url / search bar. ([#4464](https://github.com/brave/browser-laptop/issues/4464))
