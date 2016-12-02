@@ -14,7 +14,9 @@ body {
 }
 
 #paymentsSwitches {
-  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  min-height: 40px;
 
   .enablePaymentsSwitch {
     float: left;
@@ -375,38 +377,6 @@ span.settingsListCopy {
   }
 }
 
-span.browserButton {
-  &.advancedSettings {
-    font-size: 0.9em;
-  }
-
-  &.primaryButton {
-    &.addFunds {
-      font-size: 0.9em;
-      margin-right: 50px;
-    }
-
-    &.clearBrowsingDataButton,
-    &.importNowButton,
-    &.setAsDefaultButton,
-    &.manageAdblockSettings,
-    &.viewExtensionsInfo,
-    &.manageAutofillDataButton {
-      font-size: 0.9em;
-      margin-top: 20px;
-      padding: 5px 20px;
-    }
-
-    &.importNowButton {
-      margin-top: 5px;
-    }
-
-    &.setAsDefaultButton {
-      margin-top: 5px;
-    }
-  }
-}
-
 .settingsList {
   .settingItem {
 
@@ -427,10 +397,6 @@ span.browserButton {
 
     label {
       text-align: left;
-      font-size: 0.95em;
-    }
-
-    .browserButton {
       font-size: 0.95em;
     }
 
@@ -689,9 +655,7 @@ div.nextPaymentSubmission {
       width: auto;
       min-width: 235px;
     }
-    span.browserButton.primaryButton.addFunds {
-      margin-right: 0;
-    }
+
     .fundsAmount {
       display: inline;
       margin: 0;
@@ -702,12 +666,6 @@ div.nextPaymentSubmission {
       position: relative;
       top: 1px;
       left: 5px;
-    }
-    .addFunds {
-      margin: 0;
-      height: 30px;
-      line-height: 24px;
-      box-sizing: border-box;
     }
     .accountBalanceError, .nextReconcileDate {
       font-size: 14px;
@@ -919,6 +877,11 @@ div.nextPaymentSubmission {
     a {
       text-decoration: none;
     }
+
+    button > a {
+      color: #fff;
+    }
+
     .labelText {
       clear: both;
       font-size: 1em;
@@ -934,12 +897,11 @@ div.nextPaymentSubmission {
         transform: rotate(12deg);
       }
     }
+
     .primaryButton {
       display: block;
       float: right;
-      font-size: 14px;
       width: 180px;
-      padding: 4px 0px;
       margin-bottom: 15px;
     }
 

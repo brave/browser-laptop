@@ -103,7 +103,7 @@ class AutofillCreditCardPanel extends ImmutableComponent {
             </select>
           </div>
           <div className='formRow manageAutofillDataButtons'>
-            <Button l10nId='cancel' className='secondaryAltButton' onClick={this.props.onHide} />
+            <Button l10nId='cancel' className='whiteButton' onClick={this.props.onHide} />
             <Button l10nId='save' className='primaryButton saveCreditCardButton' onClick={this.onSave}
               disabled={this.disableSaveButton} />
           </div>

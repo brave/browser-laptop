@@ -68,7 +68,7 @@ class LongPressButton extends ImmutableComponent {
   }
 
   render () {
-    return <span data-l10n-id={this.props.l10nId}
+    return <button data-l10n-id={this.props.l10nId}
       className={this.props.className}
       disabled={this.props.disabled}
       onClick={this.onClick}

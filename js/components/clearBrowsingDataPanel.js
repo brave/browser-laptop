@@ -52,7 +52,7 @@ class ClearBrowsingDataPanel extends ImmutableComponent {
           <SwitchControl className='siteSettingsSwitch' rightl10nId='savedSiteSettings' checkedOn={this.props.clearBrowsingDataDetail.get('savedSiteSettings')} onClick={this.onToggleSavedSiteSettings} />
         </div>
         <div className='formSection clearBrowsingDataButtons'>
-          <Button l10nId='cancel' className='secondaryAltButton' onClick={this.props.onHide} />
+          <Button l10nId='cancel' className='whiteButton' onClick={this.props.onHide} />
           <Button l10nId='clear' className='primaryButton clearDataButton' onClick={this.onClear} />
         </div>
         <div className='formSection clearBrowsingDataWarning'>

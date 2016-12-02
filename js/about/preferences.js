@@ -370,9 +370,11 @@ class BitcoinDashboard extends ImmutableComponent {
         <div className='settingsListTitle' data-l10n-id='outsideUSAPayment' />
       </div>
       <div className='settingsPanelDivider'>
-        <a target='_blank' className='browserButton primaryButton' href='https://www.buybitcoinworldwide.com/'>
-          buybitcoinworldwide.com
-        </a>
+        <button className='browserButton primaryButton'>
+          <a target='_blank' href='https://www.buybitcoinworldwide.com/'>
+            buybitcoinworldwide.com
+          </a>
+        </button>
       </div>
     </div>
   }
@@ -415,9 +417,11 @@ class BitcoinDashboard extends ImmutableComponent {
           <div className='settingsListTitle' data-l10n-id='outsideUSAPayment' />
         </div>
         <div className='settingsPanelDivider'>
-          <a target='_blank' className='browserButton primaryButton' href={url}>
-            {name}
-          </a>
+          <button className='browserButton primaryButton'>
+            <a target='_blank' href={url}>
+              {name}
+            </a>
+          </button>
         </div>
       </div>
     }
@@ -923,7 +927,7 @@ class PaymentsTab extends ImmutableComponent {
     const onButtonClick = this.props.ledgerData.get('created')
       ? this.props.showOverlay.bind(this, 'addFunds')
       : (this.props.ledgerData.get('creating') ? () => {} : this.createWallet)
-    return <Button l10nId={buttonText} className='primaryButton addFunds' onClick={onButtonClick.bind(this)} disabled={this.props.ledgerData.get('creating')} />
+    return <Button l10nId={buttonText} className='primaryButton wideButton' onClick={onButtonClick.bind(this)} disabled={this.props.ledgerData.get('creating')} />
   }
 
   get paymentHistoryButton () {
@@ -1512,12 +1516,10 @@ class ShieldsTab extends ImmutableComponent {
         <SettingCheckbox checked={this.props.braveryDefaults.get('safeBrowsing')} dataL10nId='safeBrowsing' onChange={this.onToggleSafeBrowsing} />
         <SettingCheckbox checked={this.props.braveryDefaults.get('noScript')} dataL10nId='noScriptPref' onChange={this.onToggleNoScript} />
         <SettingCheckbox dataL10nId='blockCanvasFingerprinting' prefKey={settings.BLOCK_CANVAS_FINGERPRINTING} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingItem>
-          <Button l10nId='manageAdblockSettings' className='primaryButton manageAdblockSettings'
-            onClick={aboutActions.newFrame.bind(null, {
-              location: 'about:adblock'
-            }, true)} />
-        </SettingItem>
+        <Button l10nId='manageAdblockSettings' className='primaryButton manageAdblockSettings'
+          onClick={aboutActions.newFrame.bind(null, {
+            location: 'about:adblock'
+          }, true)} />
       </SettingsList>
       <SitePermissionsPage siteSettings={this.props.siteSettings}
         names={braveryPermissionNames}
@@ -1659,12 +1661,10 @@ class AdvancedTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='usePDFJS' prefKey={settings.PDFJS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='useTorrentViewer' prefKey={settings.TORRENT_VIEWER_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='enablePocket' prefKey={settings.POCKET_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingItem>
-          <Button l10nId='viewInstalledExtensions' className='primaryButton viewExtensionsInfo'
-            onClick={aboutActions.newFrame.bind(null, {
-              location: 'about:extensions'
-            }, true)} />
-        </SettingItem>
+        <Button l10nId='viewInstalledExtensions' className='primaryButton viewExtensionsInfo'
+          onClick={aboutActions.newFrame.bind(null, {
+            location: 'about:extensions'
+          }, true)} />
         <div data-l10n-id='moreExtensionsComingSoon' className='moreExtensionsComingSoon' />
       </SettingsList>
     </div>

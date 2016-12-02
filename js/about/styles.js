@@ -44,16 +44,66 @@ class AboutStyle extends ImmutableComponent {
           &lt;/select>
         </code></pre>
       </div>
+
       <h2 data-l10n-id='buttons' />
-      <span data-l10n-id='whiteButton' className='browserButton whiteButton inlineButton' onClick={this.onRemoveBookmark} />
+      <button data-l10n-id='browserButton' className='browserButton' onClick={this.onRemoveBookmark} />
       <pre><code>
-        &lt;span data-l10n-id='cancel' className='browserButton whiteButton inlineButton'{'\n'}
+        &lt;button data-l10n-id='done' className='browserButton'{'\n'}
         onClick={'{this.onRemoveBookmark}'} />
       </code></pre>
-      <span data-l10n-id='primaryButton' className='browserButton primaryButton' onClick={this.onRemoveBookmark} />
+
+      <button data-l10n-id='whiteButton' className='browserButton whiteButton' onClick={this.onRemoveBookmark} />
       <pre><code>
-        &lt;span data-l10n-id='done' className='browserButton primaryButton'{'\n'}
+        &lt;button data-l10n-id='cancel' className='browserButton whiteButton'{'\n'}
         onClick={'{this.onRemoveBookmark}'} />
+      </code></pre>
+
+      <button data-l10n-id='inlineButton' className='browserButton whiteButton inlineButton' onClick={this.onRemoveBookmark} />
+      <pre><code>
+        &lt;button data-l10n-id='done' className='browserButton whiteButton inlineButton'{'\n'}
+        onClick={'{this.onRemoveBookmark}'} />
+      </code></pre>
+
+      <button data-l10n-id='wideButton' className='browserButton whiteButton wideButton' onClick={this.onRemoveBookmark} />
+      <pre><code>
+        &lt;button data-l10n-id='cancel' className='browserButton whiteButton wideButton'{'\n'}
+        onClick={'{this.onRemoveBookmark}'} />
+      </code></pre>
+
+      <button data-l10n-id='smallButton' className='browserButton whiteButton smallButton' onClick={this.onRemoveBookmark} />
+      <pre><code>
+        &lt;button data-l10n-id='done' className='browserButton whiteButton smallButton'{'\n'}
+        onClick={'{this.onRemoveBookmark}'} />
+      </code></pre>
+
+      <button data-l10n-id='primaryButton' className='browserButton primaryButton' onClick={this.onRemoveBookmark} />
+      <pre><code>
+        &lt;button data-l10n-id='cancel' className='browserButton primaryButton'{'\n'}
+        onClick={'{this.onRemoveBookmark}'} />
+      </code></pre>
+
+      <button data-l10n-id='actionButton' className='browserButton actionButton' onClick={this.onRemoveBookmark} />
+      <pre><code>
+        &lt;button data-l10n-id='done' className='browserButton actionButton'{'\n'}
+        onClick={'{this.onRemoveBookmark}'} />
+      </code></pre>
+
+      <button data-l10n-id='subtleButton' className='browserButton subtleButton' onClick={this.onRemoveBookmark} />
+      <pre><code>
+        &lt;button data-l10n-id='cancel' className='browserButton subtleButton'{'\n'}
+        onClick={'{this.onRemoveBookmark}'} />
+      </code></pre>
+
+      <button data-l10n-id='primaryButton' className='browserButton primaryButton' onClick={this.onRemoveBookmark} /><button data-l10n-id='whiteButton' className='browserButton whiteButton' onClick={this.onRemoveBookmark} /><button data-l10n-id='wideButton' className='browserButton whiteButton wideButton' onClick={this.onRemoveBookmark} /><button data-l10n-id='primaryButton' className='browserButton primaryButton' onClick={this.onRemoveBookmark} />
+      <pre><code>
+        &lt;button data-l10n-id='cancel' className='browserButton primaryButton'{'\n'}
+        onClick={'{this.onRemoveBookmark}'} />{'\n'}
+        &lt;button data-l10n-id='cancel' className='browserButton whiteButton'{'\n'}
+        onClick={'{this.onRemoveBookmark}'} />{'\n'}
+        &lt;button data-l10n-id='cancel' className='browserButton whiteButton wideButton'{'\n'}
+        onClick={'{this.onRemoveBookmark}'} />{'\n'}
+        &lt;button data-l10n-id='cancel' className='browserButton primaryButton'{'\n'}
+        onClick={'{this.onRemoveBookmark}'} />{'\n'}
       </code></pre>
     </div>
   }

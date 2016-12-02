@@ -45,7 +45,7 @@ class ImportBrowserDataPanel extends ImmutableComponent {
           <WidevineInfo newFrameAction={windowActions.newFrame} />
         </div>
         <div className='formSection commonFormButtons'>
-          <Button l10nId='cancel' className='secondaryAltButton' onClick={this.props.onHide} />
+          <Button l10nId='cancel' className='whiteButton' onClick={this.props.onHide} />
           <Button l10nId='installAndAllow' className='primaryButton' onClick={this.onInstallAndAllow} />
         </div>
         <div className='formSection commonFormBottom'>
