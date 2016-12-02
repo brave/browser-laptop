@@ -254,6 +254,22 @@ ul {
           height: 80px;
           font-size: 38px;
 
+          // Add an opacity layer on top of tile
+          // to avoid backgrounds with the same color as icon
+          // (as seen on issue #5868)
+          &:before {
+              content: '';
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background-color: #fff;
+              opacity: 0.15;
+              z-index: 0;
+              border-radius: 4px;
+          }
+
           .pinnedTopSite {
             opacity: 1;
             visibility: visible;
@@ -275,6 +291,8 @@ ul {
 
           }
           img {
+            position: relative;
+            z-index: 1;
             max-width: 64px;
             max-height: 64px;
           }
