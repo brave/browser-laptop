@@ -158,9 +158,10 @@ span.buttonSeparator {
 // for about:preferences
 .prefBody {
   .settingsList > .settingItem + button,
-  .settingItem > span + button {
+  .settingItem > span + button,
+  #paymentsContainer button:not(.close) {
     font-size: 0.9em;
-    padding: 5px 20px;
+    padding: 8px 20px;
   }
 
   .settingsList > .settingItem + button {
@@ -170,4 +171,11 @@ span.buttonSeparator {
   .settingItem > span + button {
     margin-top: 5px;
   }
+
+  #paymentsContainer {
+    .browserButton + .browserButton {
+      margin-left: 8px;
+    }
+  }
+
 }
