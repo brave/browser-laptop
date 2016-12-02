@@ -28,4 +28,17 @@ describe('content loading', function () {
         })
       })
   })
+
+  it('does not support battery status API', function * () {
+    var page1 = Brave.fixtureUrl('battery.html')
+    yield this.app.client
+      .tabByIndex(0)
+      .url(page1)
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitUntil(function () {
+        return this.getText('.tabTitle').then((title) => {
+          return title === 'fail'
+        })
+      })
+  })
 })

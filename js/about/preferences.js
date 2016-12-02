@@ -1614,7 +1614,7 @@ class SecurityTab extends ImmutableComponent {
                 <span className='linkText' onClick={aboutActions.newFrame.bind(null, {
                   location: appConfig.flash.installUrl
                 }, true)}>{'Adobe'}</span>.
-                </div>
+              </div>
               : <div>
                 <span className='fa fa-info-circle' id='flashInfoIcon' />
                 <span data-l10n-id='enableFlashSubtextLinux' />

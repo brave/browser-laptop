@@ -1,0 +1,15 @@
+<script>
+navigator.getBattery().then(function(battery) {
+  function updateLevelInfo(){
+    document.title = battery.level * 100 + "%";
+  }
+  updateLevelInfo();
+  battery.addEventListener('levelchange', function(){
+    updateLevelInfo();
+  });
+  }).catch((e) => {
+    if (e.message === 'navigator.getBattery not supported.') {
+      document.title = 'fail'
+    }
+  });
+</script>
