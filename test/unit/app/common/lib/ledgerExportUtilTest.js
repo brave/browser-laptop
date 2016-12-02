@@ -2,6 +2,7 @@
 const assert = require('assert')
 const underscore = require('underscore')
 const uuid = require('node-uuid')
+const moment = require('moment')
 
 require('../../../braveUnit')
 
@@ -22,7 +23,7 @@ const CSV_DATA_URI_PREFIX = 'data:' + CSV_CONTENT_TYPE + ';base64,'
 const EMPTY_CSV_DATA_URL = CSV_DATA_URI_PREFIX + base64Encode(EMPTY_CSV)
 
 const EXPORT_FILENAME_CONST_PREFIX_PART = 'Brave_Payments_'
-const EXPORT_FILENAME_PREFIX_EXPECTED_FORM = `${EXPORT_FILENAME_CONST_PREFIX_PART}\${MM-D(D)-YYYY}`
+const EXPORT_FILENAME_PREFIX_EXPECTED_FORM = `${EXPORT_FILENAME_CONST_PREFIX_PART}\${YYYY-MM-DD}`
 
 const exampleTransactions = require('../../../fixtures/exampleLedgerData').transactions
 const exampleTransaction = exampleTransactions[0]
@@ -466,7 +467,7 @@ describe('ledger export utilities test', function () {
 
       let tx = txs[0]
       let timestamp = tx.submissionStamp
-      let dateStr = (new Date(timestamp)).toLocaleDateString().replace(/\//g, '-')
+      let dateStr = moment(new Date(timestamp)).format('YYYY-MM-DD')
       let expectedExportFilenamePrefix = `${EXPORT_FILENAME_CONST_PREFIX_PART}${dateStr}`
 
       assert.equal(typeof tx.exportFilenamePrefix, 'string', 'transaction should have "exportFilenamePrefix" field with type "string"')
