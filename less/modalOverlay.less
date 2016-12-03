@@ -38,15 +38,6 @@
       box-shadow: none;
       border: none;
 
-      button.close {
-        margin-top: -8px;
-        margin-right: -8px;
-        span {
-          font-size: 1.5em;
-          color: @highlightBlue;
-        }
-      }
-
       iframe {
         display: block;
         width: 100%;
@@ -56,35 +47,6 @@
         margin: 0;
         padding: 0;
         overflow: hidden;
-      }
-    }
-
-    .qrcodeOverlay {
-      width: 350px;
-      height: auto;
-      margin: 100px auto 0 auto;
-      background: white;
-      box-shadow: @dialogShadow;
-
-      button.close span {
-        color: @gray;
-        font-size: 2.5em;
-      }
-
-      img {
-        clear: both;
-        display: block;
-        margin: 0 auto;
-        padding: 20px 0 0 0;
-      }
-
-      .dialog-header {
-        padding: 15px;
-      }
-
-      .dialog-footer {
-        background: @gray;
-        padding: 15px;
       }
     }
   }
@@ -141,14 +103,19 @@
   button {
     &.close {
       display: inline-block;
-      background: none;
-      height: 2em;
-      width: 2em;
-      min-width: 2em;
+      background: url('../img/toolbar/stoploading_btn.svg') center no-repeat;
+      background-size: 15px 15px;
+      height: 15px;
+      width: 15px;
       cursor: pointer;
       border: none;
-      box-shadow: none;
-      margin: 5px;
+      position: absolute;
+      right: 15px;
+      top: 15px;
+
+      &:focus {
+        outline: none;
+      }
 
       span {
         font-size: 2.5em;

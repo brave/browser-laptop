@@ -339,7 +339,7 @@ class BitcoinDashboard extends ImmutableComponent {
   }
   get qrcodeOverlayFooter () {
     if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
-      return <div>
+      return <div className='qrcodeOverlayFooter'>
         <div id='coinbaseLogo' />
         <a href='https://itunes.apple.com/us/app/coinbase-bitcoin-wallet/id886427730?mt=8' target='_blank' id='appstoreLogo' />
         <a href='https://play.google.com/store/apps/details?id=com.coinbase.android' target='_blank' id='playstoreLogo' />
@@ -384,11 +384,11 @@ class BitcoinDashboard extends ImmutableComponent {
         <div className='settingsPanelDivider'>
           <span className='fa fa-credit-card' />
           <div className='settingsListTitle' data-l10n-id='moneyAdd' />
-          <div className='settingsListSubTitle' data-l10n-id='moneyAddSubTitle' />
+          <div className='settingsListTitle subTitle' data-l10n-id='moneyAddSubTitle' />
         </div>
         <div className='settingsPanelDivider'>
           {this.bitcoinPurchaseButton}
-          <div className='settingsListSubTitle' data-l10n-id='transferTime' />
+          <div className='settingsListTitle subTitle' data-l10n-id='transferTime' />
         </div>
       </div>
     } else {
@@ -396,7 +396,7 @@ class BitcoinDashboard extends ImmutableComponent {
         <div className='settingsPanelDivider'>
           <span className='fa fa-credit-card' />
           <div className='settingsListTitle' data-l10n-id='moneyAdd' />
-          <div className='settingsListSubTitle' data-l10n-id='moneyAddSubTitle' />
+          <div className='settingsListTitle subTitle' data-l10n-id='moneyAddSubTitle' />
         </div>
         <div className='settingsPanelDivider'>
           <div data-l10n-id='coinbaseNotAvailable' />
@@ -497,7 +497,7 @@ class BitcoinDashboard extends ImmutableComponent {
               <span className='fa fa-bitcoin fa-stack-1x' />
             </span>
             <div className='settingsListTitle' data-l10n-id='bitcoinAdd' />
-            <div className='settingsListSubTitle' data-l10n-id='bitcoinAddDescription' />
+            <div className='settingsListTitle subTitle' data-l10n-id='bitcoinAddDescription' />
           </div>
           {
             this.ledgerData.get('address')
@@ -908,7 +908,7 @@ class PaymentsTab extends ImmutableComponent {
       return null
     }
 
-    return <div>
+    return <div className='balance'>
       {
       !(this.props.ledgerData.get('balance') === undefined || this.props.ledgerData.get('balance') === null)
         ? <input className='form-control fundsAmount' readOnly value={this.btcToCurrencyString(this.props.ledgerData.get('balance'))} />
@@ -1235,6 +1235,9 @@ class PaymentsTab extends ImmutableComponent {
                       }
                     </select>
                   </SettingItem>
+                  <SettingItem>
+                    {this.paymentHistoryButton}
+                  </SettingItem>
                 </SettingsList>
               </td>
               <td>
@@ -1249,14 +1252,13 @@ class PaymentsTab extends ImmutableComponent {
                         <SettingItem>
                           {this.fundsAmount}
                           {this.walletButton}
-                          {this.paymentHistoryButton}
                         </SettingItem>
                       </SettingsList>
                     </div>
                 }
               </td>
               <td>
-                <div id='walletStatus' data-l10n-id={this.walletStatus.id} data-l10n-args={this.walletStatus.args ? JSON.stringify(this.walletStatus.args) : null} />
+                <div className='walletStatus' data-l10n-id={this.walletStatus.id} data-l10n-args={this.walletStatus.args ? JSON.stringify(this.walletStatus.args) : null} />
                 {this.nextReconcileDate}
               </td>
             </tr>
@@ -1299,7 +1301,7 @@ class PaymentsTab extends ImmutableComponent {
           <span className='sectionTitle'>Brave Payments</span>
           <span className='sectionSubTitle'>beta</span>
         </div>
-        <div className='pull-left' id='paymentsSwitches'>
+        <div className='paymentsSwitches'>
           <div className='enablePaymentsSwitch'>
             <span data-l10n-id='off' />
             <SettingCheckbox dataL10nId='on' prefKey={settings.PAYMENTS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />

@@ -13,33 +13,6 @@ body {
   display: none !important; /* for testing/debug only */
 }
 
-#paymentsSwitches {
-  display: flex;
-  align-items: center;
-  min-height: 40px;
-
-  .enablePaymentsSwitch {
-    float: left;
-    min-width: 215px;
-    margin-right: 30px;
-
-    span {
-      font-weight: bold;
-      color: @gray;
-    }
-
-    label {
-      font-weight: bold;
-      color: @braveOrange;
-    }
-  }
-
-  .settingItem {
-    display: inline;
-    margin-right: 30px;
-  }
-}
-
 #coinbaseLogo {
   width: 40px;
   height: 40px;
@@ -67,12 +40,6 @@ body {
   height: 42.75px;
   background-size: 130.5px 42.75px;
   display: inline-block;
-}
-
-.bitcoinQRTitle {
-  color: @braveOrange;
-  margin-bottom: 70px;
-  text-align: center;
 }
 
 .sectionTitle {
@@ -516,30 +483,6 @@ table.sortableTable {
   }
 }
 
-.paymentsMessage {
-  background-color: @lightGray;
-  border-radius: @borderRadiusUIbox;
-  margin: 1em 0;
-  padding: 40px;
-  font-size: 1.3em;
-  line-height: 1.3em;
-  color: @mediumGray;
-  width: 500px;
-  float: left;
-  > div {
-    padding: 0.5em 0;
-    font-size: 14px;
-  }
-  > h3 {
-    font-weight: 200;
-    font-size: 18px;
-    padding-bottom: 0.5em;
-  }
-  .boldText {
-    font-weight: bold;
-  }
-}
-
 #ledgerTable {
 
   tr {
@@ -547,6 +490,11 @@ table.sortableTable {
     td {
       padding: 0 15px;
     }
+
+    td {
+      position: relative;
+    }
+
     .th-inner {
       font-weight: bold;
 
@@ -561,13 +509,6 @@ table.sortableTable {
 
 .modal .dialog.paymentHistory .sectionTitle {
   text-align: left;
-}
-
-span.paymentHistoryButton.browserButton {
-  display: block;
-  color: @braveOrange;
-  font-size: 14px;
-  white-space: nowrap;
 }
 
 .paymentHistoryFooter span.okButton.primaryButton {
@@ -622,12 +563,37 @@ div.nextPaymentSubmission {
 
 
 #paymentsContainer {
+  @walletTableData: 235px + 30px; // .walletBar td (min-width + padding)
+  @barMargin: 15px 0 30px;
+
   position: relative;
   overflow-x: hidden;
   width: 805px;
 
   .titleBar {
     overflow: hidden;
+    display: flex;
+    align-items: center;
+
+    .paymentsSwitches {
+      display: flex;
+
+      .enablePaymentsSwitch {
+        display: flex;
+        align-items: center;
+        width: @walletTableData;
+
+        span {
+          font-weight: bold;
+          color: @gray;
+        }
+
+        label {
+          font-weight: bold;
+          color: @braveOrange;
+        }
+      }
+    }
   }
 
   & > table,
@@ -638,22 +604,107 @@ div.nextPaymentSubmission {
     width: 80%;
   }
 
+  .paymentsMessage {
+    background-color: @lightGray;
+    border-radius: @borderRadiusUIbox;
+    margin: @barMargin;
+    padding: 40px;
+    font-size: 1.3em;
+    line-height: 1.3em;
+    color: @mediumGray;
+    width: 500px;
+    float: left;
+
+    > div {
+      padding: 0.5em 0;
+      font-size: 14px;
+    }
+
+    > h3 {
+      font-weight: 200;
+      font-size: 18px;
+      padding-bottom: 0.5em;
+    }
+
+    .boldText {
+      font-weight: bold;
+    }
+  }
+
   .walletBar {
     padding: 20px;
     padding-bottom: 10px;
     background: @lightGray;
     border-radius: @borderRadiusUIbox;
-    margin: 30px 0px;
+    margin: @barMargin;
+
+    .settingsList .settingItem {
+      .paymentHistoryButton {
+        display: block;
+        color: @braveOrange;
+        font-size: 14px;
+        margin: 0;
+        padding: 0;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .balance {
+        display: flex;
+        align-items: center;
+        vertical-align: 0;
+        height: 100%;
+        margin-bottom: 0;
+
+        > span {
+          height: 2.25em; // .form-control
+          display: flex;
+          align-items: center;
+          margin: 0;
+          padding: 0; // .fundsFAQ
+
+          > span {
+            margin: 0; // for "Loading..."
+            padding: 0; // .fundsFAQ
+          }
+        }
+
+        + button {
+          margin-top: 12px; // .nextReconcileDate
+        }
+
+        .fundsFAQ {
+          color: @gray;
+          margin: 0 0 0 5px;
+        }
+      }
+    }
+
     th {
       text-align: left;
     }
+
     tr {
       height: 1em;
     }
+
     td {
       padding: 15px 30px 0 0;
       width: auto;
       min-width: 235px;
+      vertical-align: top;
+
+      .settingsListContainer {
+        margin-bottom: 0;
+
+        #fundsSelectBox {
+          width: auto;
+        }
+      }
+
+      .walletStatus {
+        font-size: 14.5px; // .form-control
+      }
     }
 
     .fundsAmount {
@@ -661,13 +712,9 @@ div.nextPaymentSubmission {
       margin: 0;
       width: auto;
     }
-    .fundsFAQ {
-      display: inline;
-      position: relative;
-      top: 1px;
-      left: 5px;
-    }
-    .accountBalanceError, .nextReconcileDate {
+
+    .accountBalanceError,
+    .nextReconcileDate {
       font-size: 14px;
       margin: 10px 0;
     }
@@ -712,11 +759,6 @@ div.nextPaymentSubmission {
     }
 
     td {
-      color: @mediumGray;
-      -webkit-font-smoothing: antialiased;
-      text-align: left;
-      vertical-align: top;
-      position: relative;
 
       a {
         vertical-align: middle;
@@ -783,9 +825,60 @@ div.nextPaymentSubmission {
 }
 
 #bitcoinDashboard {
+
+  .modal {
+    .qrcodeOverlay {
+      border: 0;
+      width: 350px;
+      height: auto;
+      margin: 100px auto 0 auto;
+      background: white;
+      box-shadow: @dialogShadow;
+
+      &.fade {
+        transition: @transitionFast;
+      }
+
+      button.close span {
+        color: @gray;
+        font-size: 2.5em;
+      }
+
+      img {
+        clear: both;
+        display: block;
+        margin: 0 auto;
+      }
+
+      .dialog-header {}
+
+      .dialog-body {
+        padding: 30px;
+
+        .bitcoinQRTitle {
+          color: @braveOrange;
+          text-align: center;
+        }
+      }
+
+      .dialog-footer {
+        .qrcodeOverlayFooter {
+          display: flex;
+          justify-content: center;
+          background: @gray;
+          padding: 15px 0;
+        }
+      }
+    }
+  }
+
   .board {
     .panel {
       padding-left: 100px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
     }
   }
 }
@@ -799,7 +892,7 @@ div.nextPaymentSubmission {
     position: relative;
     margin-top: 8px;
     margin-bottom: 8px;
-    padding: 20px;
+    padding: 25px 20px;
 
     &.advancedSettings {
       padding-left: 50px;
@@ -814,10 +907,6 @@ div.nextPaymentSubmission {
       width: 50%;
       position: relative;
       float: left;
-
-      .settingsListTitle {
-        margin-top: 0;
-      }
 
       &:nth-child(1) {
         text-align: left;
@@ -862,17 +951,18 @@ div.nextPaymentSubmission {
       color: @darkGray;
       font-weight: bold;
       font-size: 15px;
-      margin-bottom: 15px;
-      padding-right: 25px;
+      margin: 0;
+
+      &.subTitle {
+        clear: both;
+        font-weight: normal;
+        font-size: 14px;
+        font-style: italic;
+        line-height: 1.3em;
+        margin-top: 20px;
+      }
     }
-    .settingsListSubTitle {
-      color: @darkGray;
-      clear: both;
-      font-weight: normal;
-      font-size: 14px;
-      font-style: italic;
-      line-height: 1.3em;
-    }
+
     span {
       display: inline;
     }
@@ -929,7 +1019,6 @@ div.nextPaymentSubmission {
           font-size: 14px;
           margin: 0;
         }
-
       }
 
       .keyContainer {
@@ -1141,11 +1230,6 @@ div.nextPaymentSubmission {
     font-weight: 200;
     margin: 70px 0 -15px 12px;
   }
-}
-
-#fundsSelectBox {
-  margin-top: 0px;
-  width: auto;
 }
 
 .moreExtensionsComingSoon {
