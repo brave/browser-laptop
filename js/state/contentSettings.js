@@ -151,10 +151,6 @@ const getContentSettingsFromSiteSettings = (appState, isPrivate = false) => {
     }, {
       setting: 'allow',
       secondaryPattern: '*',
-      primaryPattern: 'file:///*'
-    }, {
-      setting: 'allow',
-      secondaryPattern: '*',
       primaryPattern: 'chrome-extension://*'
     }],
     canvasFingerprinting: [{
