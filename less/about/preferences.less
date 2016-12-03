@@ -786,6 +786,10 @@ div.nextPaymentSubmission {
   .board {
     .panel {
       padding-left: 100px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
     }
   }
 }
@@ -799,7 +803,7 @@ div.nextPaymentSubmission {
     position: relative;
     margin-top: 8px;
     margin-bottom: 8px;
-    padding: 20px;
+    padding: 25px 20px;
 
     &.advancedSettings {
       padding-left: 50px;
@@ -814,10 +818,6 @@ div.nextPaymentSubmission {
       width: 50%;
       position: relative;
       float: left;
-
-      .settingsListTitle {
-        margin-top: 0;
-      }
 
       &:nth-child(1) {
         text-align: left;
@@ -862,17 +862,18 @@ div.nextPaymentSubmission {
       color: @darkGray;
       font-weight: bold;
       font-size: 15px;
-      margin-bottom: 15px;
-      padding-right: 25px;
+      margin: 0;
+
+      &.subTitle {
+        clear: both;
+        font-weight: normal;
+        font-size: 14px;
+        font-style: italic;
+        line-height: 1.3em;
+        margin-top: 20px;
+      }
     }
-    .settingsListSubTitle {
-      color: @darkGray;
-      clear: both;
-      font-weight: normal;
-      font-size: 14px;
-      font-style: italic;
-      line-height: 1.3em;
-    }
+
     span {
       display: inline;
     }

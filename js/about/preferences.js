@@ -384,11 +384,11 @@ class BitcoinDashboard extends ImmutableComponent {
         <div className='settingsPanelDivider'>
           <span className='fa fa-credit-card' />
           <div className='settingsListTitle' data-l10n-id='moneyAdd' />
-          <div className='settingsListSubTitle' data-l10n-id='moneyAddSubTitle' />
+          <div className='settingsListTitle subTitle' data-l10n-id='moneyAddSubTitle' />
         </div>
         <div className='settingsPanelDivider'>
           {this.bitcoinPurchaseButton}
-          <div className='settingsListSubTitle' data-l10n-id='transferTime' />
+          <div className='settingsListTitle subTitle' data-l10n-id='transferTime' />
         </div>
       </div>
     } else {
@@ -396,7 +396,7 @@ class BitcoinDashboard extends ImmutableComponent {
         <div className='settingsPanelDivider'>
           <span className='fa fa-credit-card' />
           <div className='settingsListTitle' data-l10n-id='moneyAdd' />
-          <div className='settingsListSubTitle' data-l10n-id='moneyAddSubTitle' />
+          <div className='settingsListTitle subTitle' data-l10n-id='moneyAddSubTitle' />
         </div>
         <div className='settingsPanelDivider'>
           <div data-l10n-id='coinbaseNotAvailable' />
@@ -497,7 +497,7 @@ class BitcoinDashboard extends ImmutableComponent {
               <span className='fa fa-bitcoin fa-stack-1x' />
             </span>
             <div className='settingsListTitle' data-l10n-id='bitcoinAdd' />
-            <div className='settingsListSubTitle' data-l10n-id='bitcoinAddDescription' />
+            <div className='settingsListTitle subTitle' data-l10n-id='bitcoinAddDescription' />
           </div>
           {
             this.ledgerData.get('address')
