@@ -514,7 +514,7 @@ class BitcoinDashboard extends ImmutableComponent {
                       <div data-l10n-id='bitcoinPaymentURL' className='labelText' />
                     </div>
                 }
-                <span className='smallText'>{this.ledgerData.get('address')}</span>
+                <div className='walletAddressText'>{this.ledgerData.get('address')}</div>
                 <Button className='primaryButton' l10nId='copyToClipboard' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('address'))} />
               </div>
             : <div className='settingsPanelDivider'>
