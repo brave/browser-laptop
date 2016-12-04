@@ -49,11 +49,30 @@ module.exports.getExtensionsPath = function (extensionDir) {
     : path.join(__dirname, '..', '..', 'app', 'extensions', extensionDir)
 }
 
+module.exports.getGenDir = function (url) {
+  const genDirRoots = [
+    module.exports.getBraveIndexPath,
+    module.exports.getBraveExtUrl,
+    module.exports.getTorrentExtUrl
+  ]
+  for (let i = 0; i < genDirRoots.length; i++) {
+    let genDir = url.replace(genDirRoots[i]('gen'), '')
+    if (genDir !== url) {
+      return 'gen' + genDir
+    }
+  }
+  return null
+}
+
+module.exports.getBraveIndexPath = function (relateivePath = '') {
+  return module.exports.fileUrl(
+      path.resolve(__dirname, '..', '..') + '/app/extensions/brave/' + relateivePath)
+}
+
 module.exports.getBraveExtIndexHTML = function () {
-  var prefix = path.resolve(__dirname, '..', '..') + '/app/extensions/brave'
   return process.env.NODE_ENV === 'development'
-    ? module.exports.fileUrl(prefix + '/index-dev.html')
-    : module.exports.fileUrl(prefix + '/index.html')
+    ? module.exports.getBraveIndexPath('index-dev.html')
+    : module.exports.getBraveIndexPath('index.html')
 }
 
 /**

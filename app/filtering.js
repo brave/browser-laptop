@@ -84,6 +84,17 @@ module.exports.registerHeadersReceivedFilteringCB = (filteringFn) => {
 function registerForBeforeRequest (session, partition) {
   const isPrivate = !partition.startsWith('persist:')
   session.webRequest.onBeforeRequest((details, cb) => {
+    if (process.env.NODE_ENV === 'development') {
+      let page = appUrlUtil.getGenDir(details.url)
+      if (page) {
+        let redirectURL = 'http://localhost:' + (process.env.BRAVE_PORT || process.env.npm_package_config_port) + '/' + page
+        cb({
+          redirectURL
+        })
+        return
+      }
+    }
+
     if (shouldIgnoreUrl(details.url)) {
       cb({})
       return
@@ -94,19 +105,6 @@ function registerForBeforeRequest (session, partition) {
     if (!firstPartyUrl) {
       cb({ cancel: true })
       return
-    }
-
-    if (appUrlUtil.isTargetAboutUrl(details.url)) {
-      if (process.env.NODE_ENV === 'development' && !details.url.match(/devServerPort/)) {
-        // add webpack dev server port
-        let url = details.url
-        let urlComponents = url.split('#')
-        urlComponents[0] = urlComponents[0] + '?devServerPort=' + (process.env.BRAVE_PORT || process.env.npm_package_config_port)
-        cb({
-          redirectURL: urlComponents.join('#')
-        })
-        return
-      }
     }
 
     for (let i = 0; i < beforeRequestFilteringFns.length; i++) {
