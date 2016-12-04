@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.12.12](https://github.com/brave/browser-laptop/releases/v0.12.12dev)
+- Muon update (Brave's Electron fork)
+
 ## [0.12.11](https://github.com/brave/browser-laptop/releases/v0.12.11dev)
 - Muon update (Brave's Electron fork)
 
