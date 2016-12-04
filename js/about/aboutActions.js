@@ -316,6 +316,17 @@ const aboutActions = {
   },
 
   /**
+   * Dispatches a message to render a URL into a PDF file
+   */
+  renderUrlToPdf: function (url, savePath) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_RENDER_URL_TO_PDF,
+      url: url,
+      savePath: savePath
+    })
+  },
+
+  /**
    * Show the "Add Bookmark" control
    * @param {Object} siteDetail - object bound to add/edit control
    */

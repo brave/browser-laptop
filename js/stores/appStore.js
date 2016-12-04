@@ -770,6 +770,10 @@ const handleAppAction = (action) => {
       const subject = encodeURIComponent(`Brave ${platform} ${os.arch()} ${app.getVersion()}${channel()} feedback`)
       electron.shell.openExternal(`${appConfig.contactUrl}?subject=${subject}`)
       break
+    case AppConstants.APP_RENDER_URL_TO_PDF:
+      const pdf = require('../../app/pdf')
+      appState = pdf.renderUrlToPdf(appState, action)
+      break
     case AppConstants.APP_DEFAULT_BROWSER_UPDATED:
       if (action.useBrave) {
         for (const p of defaultProtocols) {
