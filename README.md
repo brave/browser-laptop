@@ -29,7 +29,7 @@ You'll need certain packages installed before you can build and run Brave locall
 
 ### Windows
 
-Please see the [Building on Windows wiki entry](https://github.com/brave/browser-laptop/wiki/Building-on-Windows)
+Please see the [Building on Windows wiki entry](https://github.com/brave/browser-laptop/wiki/(setup)-Windows-build-guide)
 
 ### All other platforms
 
