@@ -17,7 +17,8 @@ const messages = require('./constants/messages')
 const siteUtil = require('./state/siteUtil')
 const urlParse = require('url').parse
 const settings = require('./constants/settings')
-const { siteHacks } = require('./data/siteHacks')
+const {siteHacks} = require('./data/siteHacks')
+const urlutil = require('./lib/urlutil')
 
 let flashInstalled = false
 const notificationCallbacks = {}
@@ -41,16 +42,6 @@ const getPepperFlashPath = () => {
     }
   }
   return pluginPath
-}
-
-/**
- * Checks whether a link is an Flash installer URL.
- * @param {string} url
- * @return {boolean}
- */
-const isFlashInstallUrl = (url) => {
-  const adobeRegex = new RegExp('//(get\\.adobe\\.com/([a-z_-]+/)*flashplayer|www\\.macromedia\\.com/go/getflash|www\\.adobe\\.com/go/getflash)', 'i')
-  return adobeRegex.test(url)
 }
 
 /**
@@ -169,12 +160,7 @@ const shouldInterceptFlash = (url, isPrivate) => {
     return false
   }
 
-  const parsed = urlParse(url)
-  const exemptHostPattern = new RegExp('(\\.adobe\\.com|www\\.google(\\.\\w+){1,2}|^duckduckgo\\.com|^search\\.yahoo\\.com)$')
-  return parsed.hostname &&
-    ['http:', 'https:'].includes(parsed.protocol) &&
-    !exemptHostPattern.test(parsed.hostname) &&
-    !['/search', '/search/'].includes(parsed.pathname)
+  return urlutil.shouldInterceptFlash(url)
 }
 
 function handleFlashCTP (details, isPrivate) {
@@ -221,7 +207,7 @@ function handleFlashInstallUrl (details, isPrivate) {
   }
 
   const origin = siteUtil.getOrigin(mainFrameUrl)
-  if (origin && isFlashInstallUrl(details.url) &&
+  if (origin && urlutil.isFlashInstallUrl(details.url) &&
         shouldInterceptFlash(mainFrameUrl, isPrivate)) {
     result.cancel = true
     showFlashNotification(origin, details.tabId, details.url)
