@@ -219,19 +219,9 @@ const createViewSubmenu = () => {
       click: function (item, focusedWindow) {
         CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_STOP])
       }
-    }, {
-      label: locale.translation('reloadPage'),
-      accelerator: 'CmdOrCtrl+R',
-      click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_RELOAD])
-      }
-    }, {
-      label: locale.translation('cleanReload'),
-      accelerator: 'CmdOrCtrl+Shift+R',
-      click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD])
-      }
     },
+    CommonMenu.reloadPageMenuItem(),
+    CommonMenu.cleanReloadMenuItem(),
     CommonMenu.separatorMenuItem,
     /*
     {

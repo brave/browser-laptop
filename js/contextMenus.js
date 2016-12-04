@@ -1482,6 +1482,20 @@ function onForwardButtonHistoryMenu (activeFrame, history, target) {
   }))
 }
 
+function onReloadContextMenu (target) {
+  const rect = target.getBoundingClientRect()
+  const menuTemplate = [
+    CommonMenu.reloadPageMenuItem(),
+    CommonMenu.cleanReloadMenuItem()
+  ]
+
+  windowActions.setContextMenuDetail(Immutable.fromJS({
+    left: rect.left,
+    top: rect.bottom + 2,
+    template: menuTemplate
+  }))
+}
+
 module.exports = {
   onHamburgerMenu,
   onMainContextMenu,
@@ -1498,5 +1512,6 @@ module.exports = {
   onShowAutofillMenu,
   onMoreBookmarksMenu,
   onBackButtonHistoryMenu,
-  onForwardButtonHistoryMenu
+  onForwardButtonHistoryMenu,
+  onReloadContextMenu
 }

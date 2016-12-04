@@ -348,3 +348,23 @@ module.exports.braveryPaymentsMenuItem = () => {
     }
   }
 }
+
+module.exports.reloadPageMenuItem = () => {
+  return {
+    label: locale.translation('reloadPage'),
+    accelerator: 'CmdOrCtrl+R',
+    click: function (item, focusedWindow) {
+      module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_RELOAD])
+    }
+  }
+}
+
+module.exports.cleanReloadMenuItem = () => {
+  return {
+    label: locale.translation('cleanReload'),
+    accelerator: 'CmdOrCtrl+Shift+R',
+    click: function (item, focusedWindow) {
+      module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD])
+    }
+  }
+}
