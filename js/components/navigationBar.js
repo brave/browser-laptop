@@ -20,6 +20,8 @@ const siteUtil = require('../state/siteUtil')
 const eventUtil = require('../lib/eventUtil')
 const getSetting = require('../settings').getSetting
 const windowStore = require('../stores/windowStore')
+const contextMenus = require('../contextMenus')
+const LongPressButton = require('./longPressButton')
 
 class NavigationBar extends ImmutableComponent {
   constructor () {
@@ -27,6 +29,7 @@ class NavigationBar extends ImmutableComponent {
     this.onToggleBookmark = this.onToggleBookmark.bind(this)
     this.onStop = this.onStop.bind(this)
     this.onReload = this.onReload.bind(this)
+    this.onReloadLongPress = this.onReloadLongPress.bind(this)
     this.onNoScript = this.onNoScript.bind(this)
   }
 
@@ -51,6 +54,10 @@ class NavigationBar extends ImmutableComponent {
     } else {
       ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
     }
+  }
+
+  onReloadLongPress (target) {
+    contextMenus.onReloadContextMenu(target)
   }
 
   onHome () {
@@ -136,9 +143,11 @@ class NavigationBar extends ImmutableComponent {
               onClick={this.onStop} />
           </span>
           : <span className='navigationButtonContainer'>
-            <button data-l10n-id='reloadButton'
+            <LongPressButton
+              l10nId='reloadButton'
               className='navigationButton reloadButton'
-              onClick={this.onReload} />
+              onClick={this.onReload}
+              onLongPress={this.onReloadLongPress} />
           </span>
       }
       {
