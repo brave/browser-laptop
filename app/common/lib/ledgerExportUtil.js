@@ -4,6 +4,7 @@
 
 const base64Encode = require('../../../js/lib/base64').encode
 const underscore = require('underscore')
+const moment = require('moment')
 
 /**
  * Generates a contribution breakdown by publisher as a CSV data URL from an array of one or more transactions
@@ -299,7 +300,7 @@ module.exports.getTransactionCSVText = (transactions, viewingIds, addTotalRow) =
 
 /**
  * Adds an `exportFilenamePrefix` field to the provided transaction(s)
- * of form `Brave_Payments_${MM-D(D)-YYYY}`, with "_<n>" added for the nth time a date occurs (n > 1)
+ * of form `Brave_Payments_${YYYY-MM-DD}`, with "_<n>" added for the nth time a date occurs (n > 1)
  *
  * @param {Object[]} transactions - an array of transaction(s) or single transaction object
  *
@@ -320,7 +321,8 @@ module.exports.addExportFilenamePrefixToTransactions = (transactions) => {
 
   return transactions.map(function (transaction) {
     const timestamp = transaction.submissionStamp
-    let numericDateStr = (new Date(timestamp)).toLocaleDateString().replace(/\//g, '-')
+
+    let numericDateStr = moment(new Date(timestamp)).format('YYYY-MM-DD')
 
     let dateCount = (dateCountMap[numericDateStr] ? dateCountMap[numericDateStr] : 1)
     dateCountMap[numericDateStr] = dateCount + 1
