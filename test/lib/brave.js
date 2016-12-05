@@ -534,9 +534,9 @@ var exports = {
      *
      * @param {object} clearDataDetail - the options to use for clearing
      */
-    this.app.client.addCommand('clearAppData', function (clearDataDetail) {
+    this.app.client.addCommand('onClearBrowsingData', function (clearDataDetail) {
       return this.execute(function (clearDataDetail) {
-        return devTools('appActions').clearAppData(clearDataDetail)
+        return devTools('appActions').onClearBrowsingData(clearDataDetail)
       }, clearDataDetail).then((response) => response.value)
     })
 
