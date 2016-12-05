@@ -114,11 +114,10 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
   delete perWindowData.bookmarkDetail
   // Don't restore bravery panel
   delete perWindowData.braveryPanelDetail
-  // Don't restore cache clearing popup
-  delete perWindowData.clearBrowsingDataDetail
-  // Don't restore drag data
+  // Don't restore drag data and clearBrowsingDataPanel's visibility
   if (perWindowData.ui) {
     delete perWindowData.ui.dragging
+    delete perWindowData.ui.isClearBrowsingDataPanelVisible
   }
   perWindowData.frames = perWindowData.frames || []
   let newKey = 0

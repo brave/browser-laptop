@@ -686,7 +686,9 @@ const handleAppAction = (action) => {
     case appConstants.APP_CLEAR_RECOVERY:
       appState = appState.setIn(['ui', 'about', 'preferences', 'recoverySucceeded'], undefined)
       break
-    case appConstants.APP_CLEAR_DATA:
+    case appConstants.APP_ON_CLEAR_BROWSING_DATA:
+      // TODO: Maybe make storing this state optional?
+      appState = appState.set('clearBrowsingDataDefaults', action.clearDataDetail)
       if (action.clearDataDetail.get('browserHistory')) {
         handleAppAction({actionType: appConstants.APP_CLEAR_HISTORY})
         BrowserWindow.getAllWindows().forEach((wnd) => wnd.webContents.send(messages.CLEAR_CLOSED_FRAMES))
