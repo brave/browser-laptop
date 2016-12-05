@@ -575,12 +575,8 @@ const doAction = (action) => {
         })
       }
       break
-    case windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL:
-      if (!action.clearBrowsingDataDetail) {
-        windowState = windowState.delete('clearBrowsingDataDetail')
-      } else {
-        windowState = windowState.set('clearBrowsingDataDetail', Immutable.fromJS(action.clearBrowsingDataDetail))
-      }
+    case windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_VISIBLE:
+      windowState = windowState.setIn(['ui', 'isClearBrowsingDataPanelVisible'], action.isVisible)
       break
     case windowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_DETAIL:
       if (!action.importBrowserDataDetail) {
@@ -766,10 +762,10 @@ ipc.on(messages.SHORTCUT_PREV_TAB, () => {
   emitChanges()
 })
 
-ipc.on(messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, (e, clearBrowsingDataDetail) => {
+ipc.on(messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, (e) => {
   doAction({
-    actionType: windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL,
-    clearBrowsingDataDetail
+    actionType: windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_VISIBLE,
+    isVisible: true
   })
 })
 
