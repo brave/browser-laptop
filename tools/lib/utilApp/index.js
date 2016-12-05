@@ -3,7 +3,6 @@
 const electron = require('electron')
 const app = electron.app
 app.setName('brave')
-require('../../../app/browser/lib/patchUserDataDir')
 
 const path = require('path')
 const rimraf = require('../rimraf')
