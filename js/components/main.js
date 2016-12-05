@@ -631,7 +631,7 @@ class Main extends ImmutableComponent {
   }
 
   onHideClearBrowsingDataPanel () {
-    windowActions.setClearBrowsingDataDetail()
+    windowActions.setClearBrowsingDataPanelVisible(false)
   }
 
   onHideImportBrowserDataPanel () {
@@ -873,7 +873,7 @@ class Main extends ImmutableComponent {
     const siteInfoIsVisible = this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
     const braveShieldsDisabled = this.braveShieldsDisabled
     const braveryPanelIsVisible = !braveShieldsDisabled && this.props.windowState.get('braveryPanelDetail')
-    const clearBrowsingDataPanelIsVisible = this.props.windowState.get('clearBrowsingDataDetail')
+    const clearBrowsingDataPanelIsVisible = this.props.windowState.getIn(['ui', 'isClearBrowsingDataPanelVisible'])
     const importBrowserDataPanelIsVisible = this.props.windowState.get('importBrowserDataDetail')
     const widevinePanelIsVisible = this.props.windowState.getIn(['widevinePanelDetail', 'shown'])
     const autofillAddressPanelIsVisible = this.props.windowState.get('autofillAddressDetail')
@@ -1055,7 +1055,7 @@ class Main extends ImmutableComponent {
         {
          clearBrowsingDataPanelIsVisible
           ? <ClearBrowsingDataPanel
-            clearBrowsingDataDetail={this.props.windowState.get('clearBrowsingDataDetail')}
+            clearBrowsingDataDefaults={this.props.appState.get('clearBrowsingDataDefaults')}
             onHide={this.onHideClearBrowsingDataPanel} />
           : null
         }
