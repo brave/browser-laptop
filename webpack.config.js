@@ -20,6 +20,7 @@ function config () {
           exclude: [
             /node_modules/,
             /\.min.js$/,
+            path.resolve(__dirname, 'app', 'browser', '*'),
             path.resolve(__dirname, 'app', 'extensions', '*')
           ],
           loader: 'babel'
@@ -106,24 +107,28 @@ function merge (config, env) {
 }
 
 var app = {
-  name: 'app',
   target: 'web',
-  entry: ['./js/entry.js'],
+  entry: {
+    app: [ path.resolve(__dirname, 'js', 'entry.js') ],
+    aboutPages: [ path.resolve(__dirname, 'js', 'about', 'entry.js') ]
+  },
   output: {
     path: path.resolve(__dirname, 'app', 'extensions', 'brave', 'gen'),
-    filename: 'app.entry.js',
+    filename: '[name].entry.js',
     publicPath: './gen/'
   }
 }
 
-var aboutPages = {
-  name: 'about',
+var devTools = {
   target: 'web',
-  entry: ['./js/about/entry.js'],
+  entry: {
+    devTools: [ path.resolve(__dirname, 'js', 'devTools.js') ]
+  },
   output: {
     path: path.resolve(__dirname, 'app', 'extensions', 'brave', 'gen'),
-    filename: 'aboutPages.entry.js',
-    publicPath: './gen/'
+    filename: 'lib.[name].js',
+    publicPath: './gen/',
+    library: '[name]'
   }
 }
 
@@ -141,17 +146,17 @@ var webtorrentPage = {
 module.exports = {
   development: [
     merge(app, development()),
-    merge(aboutPages, development()),
+    merge(devTools, development()),
     merge(webtorrentPage, development())
   ],
   production: [
     merge(app, production()),
-    merge(aboutPages, production()),
+    merge(devTools, development()),
     merge(webtorrentPage, production())
   ],
   test: [
     merge(app, production()),
-    merge(aboutPages, production()),
+    merge(devTools, development()),
     merge(webtorrentPage, production())
   ]
 }[env]
