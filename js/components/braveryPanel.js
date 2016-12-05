@@ -304,7 +304,7 @@ class BraveryPanel extends ImmutableComponent {
                     <option data-l10n-id='block3rdPartyCookie' value='block3rdPartyCookie' />
                     <option data-l10n-id='allowAllCookies' value='allowAllCookies' />
                   </select>
-                  <SwitchControl onClick={this.onToggleFp} rightl10nId='fingerprintingProtection' checkedOn={fpEnabled} disabled={!shieldsUp} onInfoClick={this.onInfoClick} className='fingerprintingProtectionSwitch' />
+                  <SwitchControl onClick={this.onToggleFp} rightl10nId='fingerprintingProtection' checkedOn={fpEnabled} disabled={!shieldsUp} onInfoClick={this.onInfoClick} infoTitle={config.fingerprintingInfoUrl} className='fingerprintingProtectionSwitch' />
                   <SwitchControl onClick={this.onToggleSafeBrowsing} rightl10nId='safeBrowsing' checkedOn={this.props.braverySettings.safeBrowsing} disabled={!shieldsUp} />
                 </div>
               </div></span>

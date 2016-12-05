@@ -57,7 +57,7 @@ class SwitchControl extends ImmutableComponent {
           ? <span className='switchControlRightText' data-l10n-id={this.props.rightl10nId} data-l10n-args={this.props.rightl10nArgs}>{this.props.rightText || ''}</span>
           : null}
           {(this.props.rightl10nId || this.props.rightText) && this.props.onInfoClick
-          ? <div className='switchControlRightText'><span data-l10n-id={this.props.rightl10nId} data-l10n-args={this.props.rightl10nArgs}>{this.props.rightText}</span><span className='fa fa-question-circle info clickable' onClick={this.props.onInfoClick} /></div>
+          ? <div className='switchControlRightText'><span data-l10n-id={this.props.rightl10nId} data-l10n-args={this.props.rightl10nArgs}>{this.props.rightText}</span><span className='fa fa-question-circle info clickable' onClick={this.props.onInfoClick} title={this.props.infoTitle} /></div>
           : null}
         </div>
       }

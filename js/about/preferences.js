@@ -1615,7 +1615,7 @@ class SecurityTab extends ImmutableComponent {
                 <span data-l10n-id='enableFlashSubtext' />&nbsp;
                 <span className='linkText' onClick={aboutActions.newFrame.bind(null, {
                   location: appConfig.flash.installUrl
-                }, true)}>{'Adobe'}</span>.
+                }, true)} title={appConfig.flash.installUrl}>{'Adobe'}</span>.
               </div>
               : <div>
                 <span className='fa fa-info-circle' id='flashInfoIcon' />
@@ -1627,7 +1627,7 @@ class SecurityTab extends ImmutableComponent {
             <span data-l10n-id='flashTroubleshooting' />&nbsp;
             <span className='linkText' onClick={aboutActions.newFrame.bind(null, {
               location: 'https://github.com/brave/browser-laptop/wiki/Flash-Support-Deprecation-Proposal#troubleshooting-flash-issues'
-            }, true)}>{'wiki'}</span>.
+            }, true)} title='https://github.com/brave/browser-laptop/wiki/Flash-Support-Deprecation-Proposal#troubleshooting-flash-issues'>{'wiki'}</span>.
           </div>
         </div>
       </SettingsList>

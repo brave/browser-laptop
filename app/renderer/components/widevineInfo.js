@@ -46,6 +46,7 @@ class WidevineInfo extends ImmutableComponent {
         <span style={widevineInfoIconStyle}
           className='fa fa-info-circle'
           onClick={this.onMoreInfo}
+          title={appConfig.widevine.moreInfoUrl}
         />
       </div>
       <div className='subtext'>
@@ -53,6 +54,7 @@ class WidevineInfo extends ImmutableComponent {
         <span style={widevineInfoIconStyle}
           className='fa fa-info-circle'
           onClick={this.onViewLicense}
+          title={appConfig.widevine.licenseUrl}
         />
       </div>
     </div>
