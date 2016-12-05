@@ -483,6 +483,8 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_CLEAR_HISTORY:
       appState = appState.set('sites', siteUtil.clearHistory(appState.get('sites')))
+      appState = aboutNewTabState.setSites(appState, action)
+      appState = aboutHistoryState.setHistory(appState, action)
       break
     case AppConstants.APP_DEFAULT_WINDOW_PARAMS_CHANGED:
       if (action.size && action.size.size === 2) {

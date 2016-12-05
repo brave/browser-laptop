@@ -32,9 +32,10 @@ describe('Clear Browsing Panel', function () {
         .loadUrl(page1Url)
         .waitForBrowserWindow()
         .waitUntil(function () {
-          return this.getAppState().then((val) => {
-            return val.value.sites.length === 1
-          })
+          return this.getAppState().then((val) =>
+            val.value.sites.length === 1 &&
+              val.value.about.history.entries.length === 1 &&
+              val.value.about.newtab.sites.length === 1)
         })
     })
 
