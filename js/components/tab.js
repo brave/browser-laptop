@@ -18,6 +18,8 @@ const dnd = require('../dnd')
 const windowStore = require('../stores/windowStore')
 const ipc = global.require('electron').ipcRenderer
 
+const {TabIcon, AudioTabIcon} = require('../../app/renderer/components/tabIcon')
+
 class Tab extends ImmutableComponent {
   constructor () {
     super()
@@ -172,15 +174,15 @@ class Tab extends ImmutableComponent {
     }
 
     let playIcon = null
+    let iconClass = null
+
     if (this.props.tab.get('audioPlaybackActive') || this.props.tab.get('audioMuted')) {
-      playIcon = <span className={cx({
-        audioPlaybackActive: true,
-        fa: true,
-        'fa-volume-up': this.props.tab.get('audioPlaybackActive') &&
-          !this.props.tab.get('audioMuted'),
-        'fa-volume-off': this.props.tab.get('audioPlaybackActive') &&
-          this.props.tab.get('audioMuted')
-      })}
+      if (this.props.tab.get('audioPlaybackActive') && !this.props.tab.get('audioMuted')) {
+        iconClass = 'fa fa-volume-up'
+      } else if (this.props.tab.get('audioPlaybackActive') && this.props.tab.get('audioMuted')) {
+        iconClass = 'fa fa-volume-off'
+      }
+      playIcon = <AudioTabIcon styles={iconClass}
         onClick={this.onMuteFrame.bind(this, !this.props.tab.get('audioMuted'))} />
     }
 
@@ -215,14 +217,14 @@ class Tab extends ImmutableComponent {
         style={activeTabStyle}>
         {
           this.props.tab.get('isPrivate')
-          ? <div className='privateIcon fa fa-eye' />
+          ? <TabIcon styles='fa fa-eye' />
           : null
         }
         {
           this.props.tab.get('partitionNumber')
-          ? <div data-l10n-args={JSON.stringify({partitionNumber: this.props.tab.get('partitionNumber')})}
-            data-l10n-id='sessionInfoTab'
-            className='privateIcon fa fa-user' />
+          ? <TabIcon l10nArgs={JSON.stringify({partitionNumber: this.props.tab.get('partitionNumber')})}
+            l10nId='sessionInfoTab'
+            styles='fa fa-user' />
           : null
         }
         {
