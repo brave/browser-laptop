@@ -206,7 +206,7 @@ class Main extends ImmutableComponent {
   registerSwipeListener () {
     // Navigates back/forward on macOS two-finger swipe
     var trackingFingers = false
-    // var swipeGesture = false
+    var swipeGesture = false
     var isSwipeOnEdge = false
     var deltaX = 0
     var deltaY = 0
@@ -247,18 +247,19 @@ class Main extends ImmutableComponent {
       }
     })
     ipc.on(messages.ENABLE_SWIPE_GESTURE, (e) => {
-      // swipeGesture = true
+      swipeGesture = true
     })
     ipc.on(messages.DISABLE_SWIPE_GESTURE, (e) => {
-      // swipeGesture = false
+      swipeGesture = false
     })
     ipc.on('scroll-touch-begin', function () {
-      // if (swipeGesture &&
-      //   systemPreferences.isSwipeTrackingFromScrollEventsEnabled()) {
-      //   trackingFingers = true
-      //   isSwipeOnEdge = false
-      //   startTime = (new Date()).getTime()
-      // }
+      if (swipeGesture) {
+        // TODO(Anthony): respecting system settings on cr54
+        // systemPreferences.isSwipeTrackingFromScrollEventsEnabled()) {
+        trackingFingers = true
+        isSwipeOnEdge = false
+        startTime = (new Date()).getTime()
+      }
     })
     ipc.on('scroll-touch-end', function () {
       if (time > 50 && trackingFingers && Math.abs(deltaY) < 50 && isSwipeOnEdge) {
