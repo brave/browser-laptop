@@ -765,9 +765,13 @@ Adds a history entry
 
 
 
-### setClearBrowsingDataDetail() 
+### setClearBrowsingDataPanelVisible(isVisible) 
 
-Sets the clear browsing data popup detail
+Sets whether the clear browsing data popup is visible
+
+**Parameters**
+
+**isVisible**: `boolean`, Sets whether the clear browsing data popup is visible
 
 
 
