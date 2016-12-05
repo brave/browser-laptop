@@ -60,8 +60,6 @@ const registeredSessions = {}
  */
 const permissionCallbacks = {}
 
-let entryPages = ['gen/app.entry.js', 'gen/webtorrentPage.entry.js', 'gen/aboutPages.entry.js']
-
 module.exports.registerBeforeSendHeadersFilteringCB = (filteringFn) => {
   beforeSendHeadersFilteringFns.push(filteringFn)
 }
@@ -98,16 +96,16 @@ function registerForBeforeRequest (session, partition) {
       return
     }
 
-    if (process.env.NODE_ENV === 'development') {
-      for (let i = 0; i < entryPages.length; i++) {
-        let page = entryPages[i]
-        if (appUrlUtil.getBraveExtUrl(page) === details.url) {
-          let redirectURL = 'http://localhost:' + (process.env.BRAVE_PORT || process.env.npm_package_config_port) + '/' + page
-          cb({
-            redirectURL
-          })
-          return
-        }
+    if (appUrlUtil.isTargetAboutUrl(details.url)) {
+      if (process.env.NODE_ENV === 'development' && !details.url.match(/devServerPort/)) {
+        // add webpack dev server port
+        let url = details.url
+        let urlComponents = url.split('#')
+        urlComponents[0] = urlComponents[0] + '?devServerPort=' + (process.env.BRAVE_PORT || process.env.npm_package_config_port)
+        cb({
+          redirectURL: urlComponents.join('#')
+        })
+        return
       }
     }
 
