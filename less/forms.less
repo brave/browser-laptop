@@ -1,5 +1,10 @@
 @import "variables.less";
 
+input,
+select {
+  box-sizing: border-box;
+}
+
 .form-control {
   display: block;
   background: white;
@@ -601,7 +606,6 @@
 
   input,
   select {
-    box-sizing: border-box;
     display: block;
     width: 100%;
     max-width: 250px;
@@ -682,7 +686,6 @@
 #navigator {
   .urlBarSuggestions {
     .flyoutDialog;
-    box-sizing: border-box;
     color: @chromeText;
     left: 0;
     overflow-y: auto;
