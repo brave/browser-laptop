@@ -1,10 +1,14 @@
 # Changelog
 
+## [0.12.13](https://github.com/brave/browser-laptop/releases/v0.12.13dev)
+- Typing fast could lead to partial selection inside URL bar. ([#5943](https://github.com/brave/browser-laptop/issues/5943))
+- Muon updated to 1.4.29 (Brave's Electron fork)
+
 ## [0.12.12](https://github.com/brave/browser-laptop/releases/v0.12.12dev)
-- Muon update (Brave's Electron fork)
+- Muon updated to 1.4.28 (Brave's Electron fork)
 
 ## [0.12.11](https://github.com/brave/browser-laptop/releases/v0.12.11dev)
-- Muon update (Brave's Electron fork)
+- Muon updated to 1.4.27 (Brave's Electron fork)
 
 ## [0.12.10](https://github.com/brave/browser-laptop/releases/v0.12.10dev)
 - Added dropdown menu with options for new tab. ([#4398](https://github.com/brave/browser-laptop/issues/4398))
