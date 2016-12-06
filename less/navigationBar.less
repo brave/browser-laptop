@@ -809,87 +809,89 @@
     text-overflow: ellipsis;
   }
 
-  .loadTime {
-    color: @loadTimeColor;
-    background: @navigationBarBackground;
-    font-size: 12px;
-    right: 10px;
-    text-align: right;
-    margin: 2px 0 0 0;
-    top: 9px;
-    cursor: default;
-    padding-top: 1px;
+  .urlbarForm {
+    .loadTime {
+      color: @loadTimeColor;
+      background: @navigationBarBackground;
+      font-size: 12px;
+      right: 10px;
+      text-align: right;
+      margin: 2px 0 0 0;
+      top: 9px;
+      cursor: default;
+      padding-top: 1px;
 
-    &.onFocus {
-        display: none;
-    }
-  }
-
-  /* Disable selection of button text */
-  > span {
-     -webkit-user-select: none;
-  }
-
-  > * {
-    -webkit-app-region: no-drag;
-  }
-
-  .inputbar-wrapper {
-    background: white;
-    display: flex;
-    flex: 1 1 0;
-    border-radius: 4px;
-    align-items: center;
-    justify-content: center;
-  }
-
-  input {
-    background: @navigationBarBackground;
-    border: none;
-    box-sizing: border-box;
-    color: @chromeText;
-    cursor: text;
-    font-size: @defaultFontSize;
-    font-weight: normal;
-    margin: 2px 0 0 3px;
-    outline: none;
-    text-overflow: ellipsis;
-    flex-grow: 1;
-    min-width: 0%; // allow the navigator to shrink
-
-    &:hover {
-      background: @chromeControlsBackground2;
+      &.onFocus {
+          display: none;
+      }
     }
 
+    /* Disable selection of button text */
+    > span {
+       -webkit-user-select: none;
+    }
 
-    &.private {
-      background: @privateTabBackground;
+    > * {
+      -webkit-app-region: no-drag;
+    }
+
+    .inputbar-wrapper {
+      background: white;
+      display: flex;
+      flex: 1 1 0;
+      border-radius: 4px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    input {
+      background: @navigationBarBackground;
+      border: none;
+      box-sizing: border-box;
       color: @chromeText;
+      cursor: text;
+      font-size: @defaultFontSize;
+      font-weight: normal;
+      margin: 2px 0 0 3px;
+      outline: none;
+      text-overflow: ellipsis;
+      flex-grow: 1;
+      min-width: 0%; // allow the navigator to shrink
+
+      &:hover {
+        background: @chromeControlsBackground2;
+      }
+
+
+      &.private {
+        background: @privateTabBackground;
+        color: @chromeText;
+      }
     }
-  }
 
-  .urlbarIcon {
-    color: @siteSecureColor;
-    left: 14px;
-    margin-top: 1px;
-    font-size: 13px;
-    min-height: 10px;
-    min-width: 16px;
-
-    &.fa-lock,
-    &.fa-unlock {
-      margin-top: 2px;
-      font-size: 15px;
+    .urlbarIcon {
+      color: @siteSecureColor;
+      left: 14px;
+      margin-top: 1px;
+      font-size: 13px;
       min-height: 10px;
       min-width: 16px;
-    }
 
-    &.fa-unlock {
-        color: @siteInsecureColor;
-    }
+      &.fa-lock,
+      &.fa-unlock {
+        margin-top: 1px;
+        font-size: 16px;
+        min-height: 10px;
+        min-width: 16px;
+      }
 
-    &.extendedValidation {
-      color: @siteEVColor;
+      &.fa-unlock {
+          color: @siteInsecureColor;
+      }
+
+      &.extendedValidation {
+        color: @siteEVColor;
+      }
     }
   }
 }
