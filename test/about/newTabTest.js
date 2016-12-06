@@ -164,7 +164,6 @@ describe('about:newtab tests', function () {
       Brave.beforeEach(this)
       beforeEach(function * () {
         yield setup(this.app.client)
-        yield this.app.client.clearAppData({browserHistory: true})
       })
 
       it('shows a preloaded list of sites if session has no entries yet', function * () {
@@ -180,6 +179,8 @@ describe('about:newtab tests', function () {
       })
 
       it('shows sites that have been visited', function * () {
+        yield this.app.client.clearAppData({browserHistory: true})
+
         yield loadPageWithTracker(this.app.client)
 
         yield reloadNewTab(this.app.client)
@@ -189,6 +190,8 @@ describe('about:newtab tests', function () {
       })
 
       it('lets you pin a tile (and shows the pinned icon afterwards)', function * () {
+        yield this.app.client.clearAppData({browserHistory: true})
+
         yield loadPageWithTracker(this.app.client)
 
         yield reloadNewTab(this.app.client)
@@ -203,6 +206,8 @@ describe('about:newtab tests', function () {
       })
 
       it('doesn\'t show about pages on topSites grid', function * () {
+        yield this.app.client.clearAppData({browserHistory: true})
+
         // Adding about pages shouldn't add them to topSites grid
         yield addDemoAboutPages(this.app.client)
 
@@ -226,6 +231,8 @@ describe('about:newtab tests', function () {
       })
 
       it('shows favicon image for topSites', function * () {
+        yield this.app.client.clearAppData({browserHistory: true})
+
         const pageWithFavicon = Brave.server.url('favicon.html')
 
         yield this.app.client
@@ -241,6 +248,8 @@ describe('about:newtab tests', function () {
       })
 
       it('replace topSites favicon images with a letter when no icon is found', function * () {
+        yield this.app.client.clearAppData({browserHistory: true})
+
         const pageWithoutFavicon = Brave.server.url('page_favicon_not_found.html')
 
         yield this.app.client
