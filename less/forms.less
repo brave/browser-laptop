@@ -551,6 +551,7 @@
   background: linear-gradient(#FFFFFF, #DEDEDE);
   margin-top: 10px;
   padding: 0;
+  min-width: 310px;
 
   .arrowUp {
     width: 0;
@@ -572,18 +573,18 @@
   }
 
   .bookmarkButtons {
-    margin: 20px 0 10px 0;
-
-    .doneButton {
-      margin-right: 0;
-    }
+    display: flex;
+    justify-content: flex-end;
+    margin: 20px 0 10px;
   }
 
   .bookmarkFormInner {
     padding: 10px 30px;
+
     h2 {
       -webkit-user-select: none;
       cursor: default;
+        min-width: 250px;
     }
   }
 
