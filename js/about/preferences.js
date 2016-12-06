@@ -506,12 +506,12 @@ class BitcoinDashboard extends ImmutableComponent {
                   this.ledgerData.get('hasBitcoinHandler') && this.ledgerData.get('paymentURL')
                     ? <div>
                       <a href={this.ledgerData.get('paymentURL')} target='_blank'>
-                        <Button l10nId='bitcoinVisitAccount' className='primaryButton' />
+                        <Button l10nId='bitcoinVisitAccount' className='primaryButton bitcoinAddressButton' />
                       </a>
-                      <div data-l10n-id='bitcoinAddress' className='labelText' />
+                      <div data-l10n-id='bitcoinAddress' className='walletLabelText' />
                     </div>
                     : <div>
-                      <div data-l10n-id='bitcoinPaymentURL' className='labelText' />
+                      <div data-l10n-id='bitcoinPaymentURL' className='walletLabelText' />
                     </div>
                 }
                 <div className='walletAddressText'>{this.ledgerData.get('address')}</div>
