@@ -172,7 +172,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
         : siteDetailLocation
     }
 
-    return <span
+    return <button
       className={cx({
         bookmarkToolbarButton: true,
         draggingOverLeft: this.isDraggingOverLeft && !this.isExpanded,
@@ -217,7 +217,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
         ? <span className='bookmarkFolderChevron fa fa-chevron-down' />
         : null
       }
-    </span>
+    </button>
   }
 }
 
