@@ -285,7 +285,7 @@ class LedgerTable extends ImmutableComponent {
     if (!this.synopsis || !this.synopsis.size) {
       return null
     }
-    return <div id='ledgerTable'>
+    return <div className='ledgerTable'>
       <SortableTable
         headings={['rank', 'publisher', 'include', 'views', 'timeSpent', 'percentage']}
         defaultHeading='rank'
@@ -473,7 +473,7 @@ class BitcoinDashboard extends ImmutableComponent {
   render () {
     window.addEventListener('message', this.onMessage.bind(this), false)
     var emptyDialog = true
-    return <div id='bitcoinDashboard'>
+    return <div className='bitcoinDashboard'>
       {
       this.props.bitcoinOverlayVisible
         ? <ModalOverlay title={'bitcoinBuy'} content={this.bitcoinOverlayContent} customTitleClasses={'coinbaseOverlay'} emptyDialog={emptyDialog} onHide={this.props.hideOverlay.bind(this)} />
@@ -1224,7 +1224,7 @@ class PaymentsTab extends ImmutableComponent {
               <td>
                 <SettingsList>
                   <SettingItem>
-                    <select className='form-control' id='fundsSelectBox'
+                    <select className='form-control fundsSelectBox'
                       value={getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT,
                         this.props.settings)}
                       onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)} >
@@ -1270,7 +1270,7 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   render () {
-    return <div id='paymentsContainer'>
+    return <div className='paymentsContainer'>
       {
       this.enabled && this.props.addFundsOverlayVisible
         ? <ModalOverlay title={this.overlayTitle} content={this.overlayContent} onHide={this.props.hideOverlay.bind(this, 'addFunds')} />
