@@ -134,8 +134,7 @@ class DownloadsBar extends ImmutableComponent {
         }
       </div>
       <div className='downloadBarButtons'>
-        <Button iconClass='fa-times'
-          className='downloadButton smallButton hideButton'
+        <Button className='downloadButton'
           onClick={downloadActions.hideDownloadsToolbar} />
       </div>
     </div>
