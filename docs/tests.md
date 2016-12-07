@@ -120,8 +120,8 @@ the IPC message was received and processed).
 ## Debugging tests
 
 ### Enabling verbose mode
-You can get more verbose output from some of our commands by toggling the `logVerboseEnabled` flag in [test/lib/brave.js](https://github.com/brave/browser-laptop/blob/3ede178b5f4655e53e6c55a916c271a89f20317d/test/lib/brave.js#L17).
-When set to true, tests will output extra information which can be very valuable when trying to understand what is going wrong with a failing test (be sure to disable the flag before checking in).
+You can get more verbose output from some of our commands by setting the `BRAVE_TEST_COMMAND_LOGS=1` env variable.
+If `BRAVE_TEST_COMMAND_LOGS=1` is set, tests will output extra information which can be very valuable when trying to understand what is going wrong with a failing test.
 
 As an example, here's the output you get when running the `blocks custom adblock resources in private tab` test in `test/components/braveryPanelTest.js` with verbose logging enabled:
 ```
@@ -158,4 +158,5 @@ Or most of the time just append `.debug()` to a series of commands.
 This will pause the browser from running tests, and you can open up browser dev tools or content dev tools to inspect logs, console, and other things.
 You should act fast or else adjust the timeout or the test will fail though.
 
-To get browser process logs just do `git grep this.app.client.getMainProcessLogs` and uncomment that block of code.
+To get browser process logs, run tests with the `BRAVE_TEST_BROWSER_LOGS=1` envrionment variable.
+To get renderer process logs, run tests with the `BRAVE_TEST_RENDERER_LOGS=1` envrionment variable.
