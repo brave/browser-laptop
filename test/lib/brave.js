@@ -292,25 +292,25 @@ var exports = {
 
     this.app.client.addCommand('getAppState', function () {
       return this.execute(function () {
-        return window.appStoreRenderer.state.toJS()
+        return devTools('electron').testData.appStoreRenderer.state.toJS()
       })
     })
 
     this.app.client.addCommand('getWindowState', function () {
       return this.execute(function () {
-        return window.windowStore.state.toJS()
+        return devTools('electron').testData.windowStore.state.toJS()
       })
     })
 
     this.app.client.addCommand('setContextMenuDetail', function () {
       return this.execute(function () {
-        return window.windowActions.setContextMenuDetail()
+        return devTools('electron').testData.windowActions.setContextMenuDetail()
       })
     })
 
     this.app.client.addCommand('showFindbar', function (show, key = 1) {
       return this.execute(function (show, key) {
-        window.windowActions.setFindbarShown(Object.assign({
+        devTools('electron').testData.windowActions.setFindbarShown(Object.assign({
           windowId: devTools('electron').remote.getCurrentWindow().id,
           key
         }), show !== false)
@@ -328,7 +328,7 @@ var exports = {
     this.app.client.addCommand('setPinned', function (location, isPinned, options = {}) {
       return this.execute(function (location, isPinned, options) {
         var Immutable = require('immutable')
-        window.windowActions.setPinned(Immutable.fromJS(Object.assign({
+        devTools('electron').testData.windowActions.setPinned(Immutable.fromJS(Object.assign({
           windowId: devTools('electron').remote.getCurrentWindow().id,
           location
         }, options)), isPinned)
