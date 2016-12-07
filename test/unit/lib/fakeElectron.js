@@ -5,10 +5,16 @@ const fakeElectron = {
   ipcMain: {
     on: function () { }
   },
+  ipcRenderer: {
+    on: function () { }
+  },
   remote: {
     app: {
       on: function () {
       }
+    },
+    getCurrentWindow: function () {
+      return {}
     }
   },
   app: {

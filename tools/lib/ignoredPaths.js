@@ -51,6 +51,8 @@ module.exports = [
   'babel-(?!polyfill|regenerator-runtime)',
   'jsdom-global',
   'react-addons-perf',
+  'react-addons-test-utils',
+  'enzyme',
   'leveldown',
   'sqlite3'
 ]
