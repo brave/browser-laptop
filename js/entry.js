@@ -63,11 +63,13 @@ ipc.on(messages.REQUEST_WINDOW_STATE, () => {
   ipc.send(messages.RESPONSE_WINDOW_STATE, windowStore.getState().toJS())
 })
 
-// // if (process.env.NODE_ENV === 'test') {
-// //   window.appStoreRenderer = appStoreRenderer
-// //   window.windowActions = windowActions
-// //   window.windowStore = windowStore
-// // }
+if (process.env.NODE_ENV === 'test') {
+  electron.testData = {
+    appStoreRenderer,
+    windowActions,
+    windowStore
+  }
+}
 
 ipc.on(messages.APP_STATE_CHANGE, (e, action) => {
   appStoreRenderer.state = action.stateDiff
@@ -91,7 +93,6 @@ ipc.on(messages.INITIALIZE_WINDOW, (e, disposition, appState, frames, initWindow
   //   disableCrashReporting()
   // }
   appStoreRenderer.state = Immutable.fromJS(appState)
-  // ReactDOM.render(<div>test</div>, document.getElementById('windowContainer'))
   ReactDOM.render(
     <Window includePinnedSites={disposition !== 'new-popup'} frames={frames} initWindowState={initWindowState} />,
     document.getElementById('windowContainer'))
