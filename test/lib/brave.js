@@ -15,7 +15,7 @@ chai.use(chaiAsPromised)
 const Server = require('./server')
 
 // toggle me for more verbose logs! :)
-const logVerboseEnabled = false
+const logVerboseEnabled = process.env.BRAVE_TEST_ALL_LOGS || process.env.BRAVE_TEST_COMMAND_LOGS
 const logVerbose = (string) => {
   if (logVerboseEnabled) {
     console.log(string)
@@ -588,16 +588,20 @@ var exports = {
       return app
     })
 
-    // this.app.client.getMainProcessLogs().then(function (logs) {
-    //   logs.forEach(function (log) {
-    //     console.log(log)
-    //   })
-    // })
-    // this.app.client.getRenderProcessLogs().then(function (logs) {
-    //   logs.forEach(function (log) {
-    //     console.log(log)
-    //   })
-    // })
+    if (process.env.BRAVE_TEST_ALL_LOGS || process.env.BRAVE_TEST_BROWSER_LOGS) {
+      this.app.client.getMainProcessLogs().then(function (logs) {
+        logs.forEach(function (log) {
+          console.log(log)
+        })
+      })
+    }
+    if (process.env.BRAVE_TEST_ALL_LOGS || process.env.BRAVE_TEST_RENDERER_LOGS) {
+      this.app.client.getRenderProcessLogs().then(function (logs) {
+        logs.forEach(function (log) {
+          console.log(log)
+        })
+      })
+    }
     return stop
   }
 }
