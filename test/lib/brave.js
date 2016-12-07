@@ -16,9 +16,9 @@ const Server = require('./server')
 
 // toggle me for more verbose logs! :)
 const logVerboseEnabled = process.env.BRAVE_TEST_ALL_LOGS || process.env.BRAVE_TEST_COMMAND_LOGS
-const logVerbose = (string) => {
+const logVerbose = (string, ...rest) => {
   if (logVerboseEnabled) {
-    console.log(string)
+    console.log(string, ...rest)
   }
 }
 
