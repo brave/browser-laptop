@@ -465,7 +465,9 @@ module.exports.loadAppState = () => {
     } catch (e) {
       // TODO: Session state is corrupted, maybe we should backup this
       // corrupted value for people to report into support.
-      console.log('could not parse data: ', data, e)
+      if (data) {
+        console.log('could not parse data: ', data, e)
+      }
       data = exports.defaultAppState()
       data = setVersionInformation(data)
     }
