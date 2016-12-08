@@ -706,14 +706,20 @@ class Frame extends ImmutableComponent {
       this.props.onCloseFrame(this.frame)
     })
     this.webview.addEventListener('page-favicon-updated', (e) => {
-      if (e.favicons && e.favicons.length > 0) {
+      // TODO(Anthony): more general solution on muon to prevent weview event
+      // from emitting after tab closed
+      if (e.favicons && e.favicons.length > 0 && this.frame) {
         imageUtil.getWorkingImageUrl(e.favicons[0], (imageFound) => {
           windowActions.setFavicon(this.frame, imageFound ? e.favicons[0] : null)
         })
       }
     })
     this.webview.addEventListener('page-title-updated', ({title}) => {
-      windowActions.setFrameTitle(this.frame, title)
+      // TODO(Anthony): more general solution on muon to prevent weview event
+      // from emitting after tab closed
+      if (this.frame) {
+        windowActions.setFrameTitle(this.frame, title)
+      }
     })
     this.webview.addEventListener('show-autofill-settings', (e) => {
       windowActions.newFrame({ location: 'about:autofill' }, true)
@@ -722,9 +728,13 @@ class Frame extends ImmutableComponent {
       contextMenus.onShowAutofillMenu(e.suggestions, e.rect, this.frame)
     })
     this.webview.addEventListener('hide-autofill-popup', (e) => {
-      let webContents = this.webview.getWebContents()
-      if (webContents && webContents.isFocused()) {
-        windowActions.autofillPopupHidden(this.props.tabId)
+      // TODO(Anthony): more general solution on muon to prevent weview event
+      // from emitting after tab closed
+      if (this.frame) {
+        let webContents = this.webview.getWebContents()
+        if (webContents && webContents.isFocused()) {
+          windowActions.autofillPopupHidden(this.props.tabId)
+        }
       }
     })
     this.webview.addEventListener('ipc-message', (e) => {
