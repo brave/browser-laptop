@@ -223,6 +223,7 @@ AppStore
     'advanced.torrent-viewer-enabled': boolean, // Whether to render magnet links in the browser
     'advanced.smooth-scroll-enabled': boolean, // false if smooth scrolling should be explicitly disabled
     'advanced.send-crash-reports': boolean, // true or undefined if crash reports should be sent
+    'advanced.hide-excluded-sites': boolean, // Whether to hide excluded sites in the payments list
     'shutdown.clear-history': boolean, // true to clear history on shutdown
     'shutdown.clear-downloads': boolean, // true to clear downloads on shutdown
     'shutdown.clear-cache': boolean, // true to clear cache on shutdown
