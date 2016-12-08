@@ -471,6 +471,28 @@ table.sortableTable {
     }
   }
 
+  tr {
+    th,
+    td {
+      padding: 0 15px;
+    }
+  }
+
+  .neverShowSiteIcon {
+    font-size: 20px;
+    text-align: center;
+
+    .fa {
+      visibility: hidden;
+    }
+
+    &:hover {
+      .fa {
+        visibility: visible;
+      }
+    }
+  }
+
   th {
     color: @darkGray;
     font-weight: 600;
