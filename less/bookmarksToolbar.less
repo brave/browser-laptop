@@ -82,7 +82,9 @@
       margin: auto 0px;
 
       .bookmarkFavicon, .bookmarkFile {
-        margin-right: 0px;
+        &:not(.bookmarkFolder) {
+          margin-right: 0px;
+        }
       }
     }
 
