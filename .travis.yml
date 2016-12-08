@@ -1,26 +1,28 @@
 language: node_js
 node_js:
-  - "6.1"
+- '6.1'
 dist: trusty
 sudo: required
 cache:
   directories:
-    - node_modules
+  - node_modules
 before_install:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
+- openssl aes-256-cbc -K $encrypted_02ddd67d5586_key -iv $encrypted_02ddd67d5586_iv
+  -in tools/encrypted_gpg_passphrase.enc -out encrypted_gpg_passphrase -d
+- export DISPLAY=:99.0
+- sh -e /etc/init.d/xvfb start
 script:
-  - npm run lint && npm test
+- npm run lint && npm test
 notifications:
   slack:
     secure: bDwO2uce5JAZvjrvWj4+/+yEXJAIK4O0RcgUWvZ2IMbi7Q9I89Mw40JmkLWL6x2gWZwxr8+FoLtErJA7RVrsfImjrX+NmMyAB7AydLdrBJtkLozNnuacnhcnBRyp1gGCa1ymxCEXGbgC6onAD3kiJJhggr70T+2lu3IuJYXENhc=
 env:
-  - CXX=g++-4.8 NODE_ENV=test
+- CXX=g++-4.8 NODE_ENV=test
 addons:
   apt:
     sources:
-      - ubuntu-toolchain-r-test
+    - ubuntu-toolchain-r-test
     packages:
-      - xvfb
-      - g++-4.8
-      - libgnome-keyring-dev
+    - xvfb
+    - g++-4.8
+    - libgnome-keyring-dev
