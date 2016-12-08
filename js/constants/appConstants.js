@@ -5,7 +5,7 @@
 const mapValuesByKeys = require('../lib/functional').mapValuesByKeys
 
 const _ = null
-const AppConstants = {
+const appConstants = {
   APP_NEW_WINDOW: _,
   APP_CLOSE_WINDOW: _,
   APP_WINDOW_CLOSED: _,
@@ -83,4 +83,4 @@ const AppConstants = {
   APP_DOWNLOAD_REDOWNLOADED: _
 }
 
-module.exports = mapValuesByKeys(AppConstants)
+module.exports = mapValuesByKeys(appConstants)

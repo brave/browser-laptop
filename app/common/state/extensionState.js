@@ -4,7 +4,7 @@
 
 const { makeImmutable } = require('./immutableUtil')
 const Immutable = require('immutable')
-const WindowConstants = require('../../../js/constants/windowConstants')
+const windowConstants = require('../../../js/constants/windowConstants')
 
 const browserActionDefaults = Immutable.fromJS({
   tabs: {}
@@ -52,7 +52,7 @@ const extensionState = {
   browserActionUpdated: (state, action) => {
     action = makeImmutable(action)
     state = makeImmutable(state)
-    if (action.get('actionType') === WindowConstants.WINDOW_SET_NAVIGATED &&
+    if (action.get('actionType') === windowConstants.WINDOW_SET_NAVIGATED &&
       action.get('tabId')) {
       let tabId = action.get('tabId')
       let extensions = extensionState.getEnabledExtensions(state)
