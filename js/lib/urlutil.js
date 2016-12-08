@@ -99,29 +99,32 @@ const UrlUtil = {
     if (input === undefined || input === null) {
       return true
     }
-
+    if (typeof input !== 'string') {
+      return true
+    }
     // for cases where we have scheme and we dont want spaces in domain names
     const caseDomain = /^[\w]{2,5}:\/\/[^\s\/]+\//
     // for cases, quoted strings
     const case1Reg = /^".*"$/
-    // for cases, ?abc, "a? b", ".abc" and "abc." which should searching query
-    const case2Reg = /^(\?)|(\?.+\s)|^(\.)|(\.)$/
+    // for cases:
+    // - starts with "?" or "."
+    // - contains "? "
+    // - ends with "." (and was not preceded by a domain or /)
+    const case2Reg = /(^\?)|(\?.+\s)|(^\.)|(^[^.+\..+]*[^\/]*\.$)/
     // for cases, pure string
     const case3Reg = /[\?\.\/\s:]/
     // for cases, data:uri, view-source:uri and about
-    const case4Reg = /^data:|view-source:|mailto:|about:|chrome-extension:|magnet:.*/
+    const case4Reg = /^(data|view-source|mailto|about|chrome-extension|magnet):.*/
 
     let str = input.trim()
-    let scheme = this.getScheme(str)
+    const scheme = this.getScheme(str)
 
     if (str.toLowerCase() === 'localhost') {
       return false
     }
-
     if (case1Reg.test(str)) {
       return true
     }
-
     if (case2Reg.test(str) || !case3Reg.test(str) ||
         (scheme === undefined && /\s/g.test(str))) {
       return true
@@ -129,11 +132,9 @@ const UrlUtil = {
     if (case4Reg.test(str)) {
       return !this.canParseURL(str)
     }
-
     if (scheme && (scheme !== 'file://')) {
       return !caseDomain.test(str + '/')
     }
-
     str = this.prependScheme(str)
     return !this.canParseURL(str)
   },
