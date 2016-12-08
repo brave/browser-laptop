@@ -4,7 +4,7 @@
 
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const AppStore = require('../stores/appStore')
-const AppConstants = require('../constants/appConstants')
+const appConstants = require('../constants/appConstants')
 const settings = require('../constants/settings')
 const {registerUserPrefs} = require('./userPrefs')
 const getSetting = require('../settings').getSetting
@@ -17,7 +17,7 @@ let updateTrigger
 
 // Register callback to handle all updates
 const doAction = (action) => {
-  if (action.actionType === AppConstants.APP_CHANGE_SETTING) {
+  if (action.actionType === appConstants.APP_CHANGE_SETTING) {
     AppDispatcher.waitFor([AppStore.dispatchToken], () => {
       updateTrigger()
     })
