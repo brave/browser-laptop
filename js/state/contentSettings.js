@@ -4,7 +4,7 @@
 
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const AppStore = require('../stores/appStore')
-const AppConstants = require('../constants/appConstants')
+const appConstants = require('../constants/appConstants')
 const appConfig = require('../constants/appConfig')
 const config = require('../constants/config')
 const settings = require('../constants/settings')
@@ -192,7 +192,7 @@ const getContentSettingsFromSiteSettings = (appState, isPrivate = false) => {
 // Register callback to handle all updates
 const doAction = (action) => {
   switch (action.actionType) {
-    case AppConstants.APP_CHANGE_SITE_SETTING:
+    case appConstants.APP_CHANGE_SITE_SETTING:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
         if (action.temporary) {
           setUserPref('content_settings', getContentSettingsFromSiteSettings(AppStore.getState(), true).content_settings, true)
@@ -201,7 +201,7 @@ const doAction = (action) => {
         }
       })
       break
-    case AppConstants.APP_REMOVE_SITE_SETTING:
+    case appConstants.APP_REMOVE_SITE_SETTING:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
         if (action.temporary) {
           setUserPref('content_settings', getContentSettingsFromSiteSettings(AppStore.getState(), true).content_settings, true)
@@ -210,12 +210,12 @@ const doAction = (action) => {
         }
       })
       break
-    case AppConstants.APP_SET_RESOURCE_ENABLED:
+    case appConstants.APP_SET_RESOURCE_ENABLED:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
         setUserPref('content_settings', getContentSettingsFromSiteSettings(AppStore.getState()).content_settings)
       })
       break
-    case AppConstants.APP_CHANGE_SETTING:
+    case appConstants.APP_CHANGE_SETTING:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
         setUserPref('content_settings', getContentSettingsFromSiteSettings(AppStore.getState()).content_settings)
       })
