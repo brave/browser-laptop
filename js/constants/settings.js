@@ -59,6 +59,7 @@ const settings = {
   SEND_CRASH_REPORTS: 'advanced.send-crash-reports',
   SEND_USAGE_STATISTICS: 'advanced.send-usage-statistics',
   ADBLOCK_CUSTOM_RULES: 'adblock.customRules',
+  HIDE_EXCLUDED_SITES: 'advanced.hide-excluded-sites',
   MINIMUM_VISIT_TIME: 'advanced.minimum-visit-time',
   MINIMUM_VISITS: 'advanced.minimum-visits',
   MINIMUM_PERCENTAGE: 'advanced.minimum-percentage',
