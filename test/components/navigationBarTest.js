@@ -885,44 +885,66 @@ describe('navigationBar tests', function () {
     })
 
     describe('with url input value', function () {
-      Brave.beforeAll(this)
+      describe('with regards to the webview', function () {
+        Brave.beforeAll(this)
 
-      before(function * () {
-        this.page1 = Brave.server.url('page1.html')
+        before(function * () {
+          this.page1 = Brave.server.url('page1.html')
 
-        yield setup(this.app.client)
-        // wait for the urlInput to be fully initialized
-        yield this.app.client.waitForExist(urlInput)
-        yield this.app.client.keys(this.page1)
-        // hit enter
-        yield this.app.client.keys(Brave.keys.ENTER)
-      })
+          yield setup(this.app.client)
+          // wait for the urlInput to be fully initialized
+          yield this.app.client.waitForExist(urlInput)
+          yield this.app.client.keys(this.page1)
+          // hit enter
+          yield this.app.client.keys(Brave.keys.ENTER)
+        })
 
-      it('webview has focus', function * () {
-        yield this.app.client.waitForElementFocus(activeWebview)
-      })
+        it('webview has focus', function * () {
+          yield this.app.client.waitForElementFocus(activeWebview)
+        })
 
-      it('webview loads url', function * () {
-        var page1 = this.page1
-        yield this.app.client.waitUntil(function () {
-          return this.getAttribute(activeWebview, 'src').then((src) => src === page1)
+        it('webview loads url', function * () {
+          var page1 = this.page1
+          yield this.app.client.waitUntil(function () {
+            return this.getAttribute(activeWebview, 'src').then((src) => src === page1)
+          })
+        })
+
+        it('urlbar shows webview url when focused', function * () {
+          var page1 = this.page1
+          yield blur(this.app.client)
+          yield this.app.client.waitUntil(function () {
+            return this.isExisting(urlInput).then((exists) => exists === false)
+          })
+          yield this.app.client
+            .ipcSend('shortcut-focus-url')
+          yield this.app.client.waitUntil(function () {
+            return this.getValue(urlInput).then((val) => val === page1)
+          })
+          yield this.app.client.keys('abc')
+          yield this.app.client.waitUntil(function () {
+            return this.getValue(urlInput).then((val) => val === 'abc')
+          })
         })
       })
 
-      it('urlbar shows webview url when focused', function * () {
-        var page1 = this.page1
-        yield blur(this.app.client)
-        yield this.app.client.waitUntil(function () {
-          return this.isExisting(urlInput).then((exists) => exists === false)
+      describe('when following URLs', function () {
+        Brave.beforeEach(this)
+
+        beforeEach(function * () {
+          yield setup(this.app.client)
+          yield this.app.client.waitForExist(urlInput)
         })
-        yield this.app.client
-          .ipcSend('shortcut-focus-url')
-        yield this.app.client.waitUntil(function () {
-          return this.getValue(urlInput).then((val) => val === page1)
-        })
-        yield this.app.client.keys('abc')
-        yield this.app.client.waitUntil(function () {
-          return this.getValue(urlInput).then((val) => val === 'abc')
+
+        it('goes to the page (instead of search for the URL)', function * () {
+          const url = 'https://brave.com/page/cc?_ri_=3vv-8-e.'
+          yield this.app.client.keys(url)
+          yield this.app.client.keys(Brave.keys.ENTER)
+          yield this.app.client.waitUntil(function () {
+            return this.getValue(urlInput).then((val) => {
+              return val === url
+            })
+          })
         })
       })
     })
