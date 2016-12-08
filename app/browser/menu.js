@@ -18,6 +18,7 @@ const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
 const siteTags = require('../../js/constants/siteTags')
 const dialog = electron.dialog
+const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 const {fileUrl} = require('../../js/lib/appUrlUtil')
 const menuUtil = require('../common/lib/menuUtil')
@@ -456,7 +457,7 @@ const createDebugSubmenu = () => {
       // To debug all renderer processes then add the appendSwitch call to app/index.js
       label: 'append wait renderer switch',
       click: function () {
-        electron.app.commandLine.appendSwitch('renderer-startup-dialog')
+        app.commandLine.appendSwitch('renderer-startup-dialog')
       }
     }, {
       label: 'Crash main process',
@@ -467,8 +468,8 @@ const createDebugSubmenu = () => {
       label: 'Relaunch',
       accelerator: 'Command+Alt+R',
       click: function () {
-        electron.app.relaunch({args: process.argv.slice(1) + ['--relaunch']})
-        electron.app.quit()
+        app.relaunch({args: process.argv.slice(1) + ['--relaunch']})
+        app.quit()
       }
     }, {
       label: locale.translation('toggleBrowserConsole'),
@@ -484,6 +485,15 @@ const createDebugSubmenu = () => {
       click: function (item, focusedWindow) {
         CommonMenu.sendToFocusedWindow(focusedWindow, [messages.DEBUG_REACT_PROFILE])
       }
+    }
+  ]
+}
+
+const createDockSubmenu = () => {
+  return [
+    {
+      label: locale.translation('newWindow'),
+      click: () => appActions.newWindow()
     }
   ]
 }
@@ -557,6 +567,11 @@ const createMenu = () => {
   Menu.setApplicationMenu(appMenu)
   if (oldMenu) {
     oldMenu.destroy()
+  }
+
+  if (app.dock) {
+    const dockMenu = Menu.buildFromTemplate(createDockSubmenu())
+    app.dock.setMenu(dockMenu)
   }
 }
 
