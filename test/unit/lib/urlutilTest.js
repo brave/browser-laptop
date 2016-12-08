@@ -86,6 +86,9 @@ describe('urlutil', function () {
       it('is localhost (case-insensitive)', function () {
         assert.equal(UrlUtil.isNotURL('LoCaLhOsT'), false)
       })
+      it('is a hostname (not a domain)', function () {
+        assert.equal(UrlUtil.isNotURL('http://computer001/phpMyAdmin'), false)
+      })
       it('ends with period (input contains a forward slash and domain)', function () {
         assert.equal(UrlUtil.isNotURL('brave.com/test/cc?_ri_=3vv-8-e.'), false)
       })
