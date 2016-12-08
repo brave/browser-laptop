@@ -61,6 +61,7 @@ module.exports = {
   advancedSettings: '.advancedSettings',
   fundsSelectBox: '.fundsSelectBox',
   paymentsStatus: '.walletStatus',
+  siteSettingItem: '.siteSettingItem',
   ledgerTable: '.ledgerTable',
   bitcoinDashboard: '.bitcoinDashboard',
   modalCloseButton: 'button.close',

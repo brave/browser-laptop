@@ -249,6 +249,10 @@ class LedgerTable extends ImmutableComponent {
     return true
   }
 
+  banSite (hostPattern) {
+    aboutActions.changeSiteSetting(hostPattern, 'ledgerPaymentsShown', false)
+  }
+
   getRow (synopsis) {
     if (!synopsis || !synopsis.get || !this.shouldShow(synopsis)) {
       return []
@@ -264,6 +268,10 @@ class LedgerTable extends ImmutableComponent {
     const defaultSiteSetting = true
 
     return [
+      {
+        html: <div className='neverShowSiteIcon' onClick={this.banSite.bind(this, this.getHostPattern(synopsis))}><span className='fa fa-ban' /></div>,
+        value: ''
+      },
       rank,
       {
         html: <div className='site'>{verified ? this.getVerifiedIcon() : null}<a href={publisherURL} target='_blank'>{faviconURL ? <img src={faviconURL} alt={site} /> : <span className='fa fa-file-o' />}<span>{site}</span></a></div>,
@@ -287,11 +295,18 @@ class LedgerTable extends ImmutableComponent {
       return null
     }
     return <div className='ledgerTable'>
+      <div className='hideExcludedSites'>
+        <SettingCheckbox
+          dataL10nId='hideExcluded'
+          prefKey={settings.HIDE_EXCLUDED_SITES}
+          settings={this.props.settings}
+          onChangeSetting={this.props.onChangeSetting}
+        />
+      </div>
       <SortableTable
-        headings={['rank', 'publisher', 'include', 'views', 'timeSpent', 'percentage']}
+        headings={['remove', 'rank', 'publisher', 'include', 'views', 'timeSpent', 'percentage']}
         defaultHeading='rank'
-        overrideDefaultStyle
-        columnClassNames={['alignRight', '', '', 'alignRight', 'alignRight', 'alignRight']}
+        columnClassNames={['', 'alignRight', '', '', 'alignRight', 'alignRight', 'alignRight']}
         rowClassNames={
           this.synopsis.map((item) =>
             this.enabledForSite(item) ? '' : 'paymentsDisabled').toJS()
@@ -304,7 +319,12 @@ class LedgerTable extends ImmutableComponent {
             location: entry.get('publisherURL')
           }
         }).toJS()}
-        rows={this.synopsis.map((synopsis) => this.getRow(synopsis)).toJS()} />
+        rows={this.synopsis.filter((synopsis) => {
+          return !getSetting(settings.HIDE_EXCLUDED_SITES, this.props.settings) || this.enabledForSite(synopsis)
+        }).map((synopsis) => {
+          return this.getRow(synopsis)
+        }).toJS()}
+        />
     </div>
   }
 }
@@ -976,6 +996,8 @@ class PaymentsTab extends ImmutableComponent {
   get tableContent () {
     // TODO: This should be sortable. #2497
     return <LedgerTable ledgerData={this.props.ledgerData}
+      settings={this.props.settings}
+      onChangeSetting={this.props.onChangeSetting}
       siteSettings={this.props.siteSettings} />
   }
 

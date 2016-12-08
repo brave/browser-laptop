@@ -455,7 +455,6 @@ table.sortableTable {
 }
 
 .paymentsContainer {
-
   @walletTableData: 235px + 30px; // .walletBar td (min-width + padding)
   @barMargin: 15px 0 30px;
   @fontSize: 14.5px; // .form-control
@@ -472,14 +471,37 @@ table.sortableTable {
     }
   }
 
+  tr {
+    th,
+    td {
+      padding: 0 15px;
+    }
+  }
+
+  .neverShowSiteIcon {
+    font-size: 20px;
+    text-align: center;
+
+    .fa {
+      visibility: hidden;
+    }
+
+    &:hover {
+      .fa {
+        visibility: visible;
+      }
+    }
+  }
+
   th {
     color: @darkGray;
     font-weight: 600;
   }
 
-  .sort {
-    text-align: left;
-  }
+.hideExcludedSites {
+  text-align: right;
+  margin: 10px 75px;
+}
 
   .modal {
     .dialog {
@@ -1172,6 +1194,11 @@ table.sortableTable {
     .nextReconcileDate {
       margin-bottom: 0;
     }
+  }
+
+  .sort {
+    width: 100%;
+    text-align: left;
   }
 
   .ledgerTable {
