@@ -89,9 +89,6 @@ describe('urlutil', function () {
       it('ends with period (input contains a forward slash and domain)', function () {
         assert.equal(UrlUtil.isNotURL('brave.com/test/cc?_ri_=3vv-8-e.'), false)
       })
-      it('ends with period (input contains only a forward slash)', function () {
-        assert.equal(UrlUtil.isNotURL('brave/com/test/cc?_ri_=3vv-8-e.'), true)
-      })
       it('is a string with whitespace but has schema', function () {
         assert.equal(UrlUtil.isNotURL('https://wwww.brave.com/test space.jpg'), false)
       })
@@ -127,6 +124,9 @@ describe('urlutil', function () {
         })
         it('ends with . (input does NOT contain a forward slash)', function () {
           assert.equal(UrlUtil.isNotURL('brave.'), true)
+        })
+        it('ends with period (input contains only a forward slash)', function () {
+          assert.equal(UrlUtil.isNotURL('brave/com/test/cc?_ri_=3vv-8-e.'), true)
         })
       })
       it('is a string with schema but invalid domain name', function () {
