@@ -128,7 +128,7 @@ module.exports = { "providers" :
     {
       "name" : "Yandex",
       "base" : "https://yandex.com",
-      "image" : "https://yastatic.net/islands-icons/_/6jyhgxr8-hac8oj1bu8qmuqqz_g.ico",
+      "image" : "https://www.yandex.com/favicon.ico",
       "search" : "https://yandex.com/search/?text={searchTerms}&clid={platformClientId}",
       "shortcut" : ":ya",
       "platformClientId": {
