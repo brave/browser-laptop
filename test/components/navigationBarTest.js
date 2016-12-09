@@ -341,10 +341,6 @@ describe('navigationBar tests', function () {
           .waitUntil(function () {
             return this.getValue(urlInput).then((val) => val === page)
           })
-          .waitUntil(function () {
-            return this.getAttribute(activeWebview, 'src').then((src) => src === page)
-          })
-        yield this.app.client
           .tabByUrl(this.page)
           .waitForExist('#bottom_link')
           .leftClick('#bottom_link')
@@ -894,20 +890,13 @@ describe('navigationBar tests', function () {
           yield setup(this.app.client)
           // wait for the urlInput to be fully initialized
           yield this.app.client.waitForExist(urlInput)
-          yield this.app.client.keys(this.page1)
-          // hit enter
-          yield this.app.client.keys(Brave.keys.ENTER)
+            .keys(this.page1)
+            // hit enter
+            .keys(Brave.keys.ENTER)
         })
 
         it('webview has focus', function * () {
           yield this.app.client.waitForElementFocus(activeWebview)
-        })
-
-        it('webview loads url', function * () {
-          var page1 = this.page1
-          yield this.app.client.waitUntil(function () {
-            return this.getAttribute(activeWebview, 'src').then((src) => src === page1)
-          })
         })
 
         it('urlbar shows webview url when focused', function * () {
@@ -1076,9 +1065,8 @@ describe('navigationBar tests', function () {
       })
 
       it('focuses on the webview', function * () {
-        this.app.client.waitUntil(function () {
-          return this.getAttribute(':focus', 'src').then((src) => src === config.defaultUrl)
-        })
+        this.app.client
+          .waitForUrl(config.defaultUrl)
       })
     })
 

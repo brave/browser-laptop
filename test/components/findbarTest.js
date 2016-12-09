@@ -17,10 +17,6 @@ describe('findBar', function () {
       .url(url)
       .waitForUrl(url)
       .windowParentByUrl(url)
-      .waitUntil(function () {
-        return this.getAttribute('webview[data-frame-key="1"]', 'src').then((src) => src === url)
-      })
-      .waitForElementFocus('webview[data-frame-key="1"]')
   })
 
   it('should focus findbar on show', function * () {
@@ -208,9 +204,6 @@ describe('findBar', function () {
       .url(url2)
       .waitForUrl(url2)
       .windowParentByUrl(url2)
-      .waitUntil(function () {
-        return this.getAttribute('webview[data-frame-key="1"]', 'src').then((src) => src === url2)
-      })
       // No findbar
       .waitForVisible(findBarInput, 500, true)
       .showFindbar()
