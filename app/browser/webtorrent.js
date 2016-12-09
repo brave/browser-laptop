@@ -33,7 +33,9 @@ function handleMangetUrl (details, isPrivate) {
 }
 
 // Receive messages via the window process, ultimately from the UI in a <webview> process
-function init () {
+function init (state, action) {
+  Filtering.registerBeforeRequestFilteringCB(handleMangetUrl)
+
   if (DEBUG_IPC) console.log('WebTorrent IPC init')
   ipc.on(messages.TORRENT_MESSAGE, function (e, msg) {
     if (server === null) {
@@ -44,6 +46,8 @@ function init () {
     channels[msg.clientKey] = e.sender
     server.receive(msg)
   })
+
+  return state
 }
 
 // Send messages from the browser process (here), thru the window process, to the <webview>
