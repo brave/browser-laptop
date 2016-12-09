@@ -14,9 +14,7 @@ Now you need to add
 ```
 deb https://s3-us-west-2.amazonaws.com/brave-apt jesse main  
 ```
-to your /etc/apt/sources.list. Upgrades can be done via
-
-Upgrades can be done via:
+to your /etc/apt/sources.list. Upgrades can be done via:
 ```
 apt-get update && apt-get upgrade -y
 ```
