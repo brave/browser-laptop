@@ -10,11 +10,10 @@ var outDir = 'dist'
 var arch = 'x64'
 var cmds
 
-if (isWindows) {
-  if (process.env.TARGET_ARCH === 'ia32') {
-    arch = 'ia32'
-  }
+if (process.env.TARGET_ARCH === 'ia32') {
+  arch = 'ia32'
 }
+
 const buildDir = 'Brave-' + process.platform + '-' + arch
 
 console.log('Building install and update for version ' + VersionInfo.braveVersion + ' in ' + buildDir + ' with Electron ' + VersionInfo.electronVersion)
@@ -81,23 +80,23 @@ if (isDarwin) {
     execute(cmds, {}, console.log.bind(null, 'done'))
   }, (e) => console.log(`No dice: ${e.message}`))
 } else if (isLinux) {
-  console.log('Install with sudo dpkg -i dist/brave_' + VersionInfo.braveVersion + '_amd64.deb')
-  console.log('Or install with sudo dnf install dist/brave_' + VersionInfo.braveVersion + '.x86_64.rpm')
+  console.log(format('Install with sudo dpkg -i dist/brave_' + VersionInfo.braveVersion + '_%s.deb', arch))
+  console.log(format('Or install with sudo dnf install dist/brave_' + VersionInfo.braveVersion + '.%s.rpm', arch))
   cmds = [
     // .deb file
     'electron-installer-debian' +
-      ' --src Brave-linux-x64/' +
+      format(' --src Brave-linux-%s/', arch) +
       ' --dest dist/' +
-      ' --arch amd64' +
+      format(' --arch %s', arch) +
       ' --config res/linuxPackaging.json',
     // .rpm file
     'electron-installer-redhat' +
-      ' --src Brave-linux-x64/' +
+      format(' --src Brave-linux-%s/', arch) +
       ' --dest dist/' +
-      ' --arch x86_64' +
+      format(' --arch %s', arch) +
       ' --config res/linuxPackaging.json',
     // .tar.bz2 file
-    'tar -jcvf dist/Brave.tar.bz2 ./Brave-linux-x64'
+    format('tar -jcvf dist/Brave.tar.bz2 ./Brave-linux-%s', arch)
   ]
   execute(cmds, {}, console.log.bind(null, 'done'))
 } else {
