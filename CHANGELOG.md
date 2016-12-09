@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.12.14](https://github.com/brave/browser-laptop/releases/v0.12.14dev)
+- Muon updated to 1.4.31 to address Symantec issued cert problems
+
 ## [0.12.13](https://github.com/brave/browser-laptop/releases/v0.12.13dev)
 - Typing fast could lead to partial selection inside URL bar. ([#5943](https://github.com/brave/browser-laptop/issues/5943))
 - Muon updated to 1.4.29 (Brave's Electron fork)
