@@ -99,6 +99,7 @@
     vertical-align: middle;
     width: calc(~'100% - 40px');
     height: 15px;
+    margin-left: 7px;
   }
   .tabIcon {
     background-position: center;
@@ -106,25 +107,7 @@
     display: inline-block;
     font-size: 12px;
     text-align: center;
-    margin-left: 4px;
-    margin-right: 4px;
-  }
-
-  .privateIcon {
-    background-position: center;
-    background-repeat: no-repeat;
-    display: inline-block;
-    font-size: 14px;
-    margin: auto 0px auto 9px;
-    position: relative;
-    vertical-align: middle;
-  }
-
-
-  .audioPlaybackActive {
-    margin: auto 4px auto 0;
-    color: @audioColor;
-    width: 20px;
+    margin-left: 7px;
   }
 
   .thumbnail {
@@ -168,7 +151,7 @@
   }
 
   &:not(.active):hover {
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(250, 250, 250, 0.4), );
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(250, 250, 250, 0.4));
     &.private {
       background: lighten(@privateTabBackground, 20%);
     }
