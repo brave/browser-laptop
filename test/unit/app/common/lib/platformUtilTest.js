@@ -77,6 +77,23 @@ describe('platformUtil', function () {
     })
   })
 
+  describe('getPathFromFileURI', function () {
+    const winFileURI = 'file:///C:/brave/brave%20is%20awesome'
+    const fileURI = 'file:///brave/brave%20is%20awesome'
+    const winExpectedResult = 'C:/brave/brave is awesome'
+    const expectedResult = '/brave/brave is awesome'
+    it('return path for window', function () {
+      loadMocks(mockWin10)
+      const result = platformUtil.getPathFromFileURI(winFileURI)
+      assert.equal(result, winExpectedResult)
+    })
+    it('return path for non window', function () {
+      loadMocks(mockMacOS)
+      const result = platformUtil.getPathFromFileURI(fileURI)
+      assert.equal(result, expectedResult)
+    })
+  })
+
   describe('isDarwin', function () {
     it('returns true if using macOS', function () {
       loadMocks(mockMacOS)

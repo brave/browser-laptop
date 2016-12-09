@@ -24,6 +24,15 @@ module.exports.getPlatformStyles = () => {
   return styleList
 }
 
+module.exports.getPathFromFileURI = (fileURI) => {
+  const path = decodeURI(fileURI)
+  if (process.platform === 'win32') {
+    return path.replace('file:///', '')
+  } else {
+    return path.replace('file://', '')
+  }
+}
+
 module.exports.isDarwin = () => {
   return process.platform === 'darwin' ||
     navigator.platform === 'MacIntel'
