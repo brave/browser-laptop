@@ -63,3 +63,6 @@ httpse.leveldb
 
 # vim swap files
 *.swp
+
+# webstrom
+.idea
