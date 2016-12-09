@@ -317,8 +317,6 @@ class BitcoinDashboard extends ImmutableComponent {
   openBuyURLTab () {
     // close parent dialog
     this.props.hideParentOverlay()
-    // open the new buyURL frame
-    aboutActions.newFrame({ location: this.ledgerData.get('buyURL') }, true)
   }
   get ledgerData () {
     return this.props.ledgerData
@@ -328,8 +326,7 @@ class BitcoinDashboard extends ImmutableComponent {
   }
   get bitcoinPurchaseButton () {
     if (!this.ledgerData.get('buyURLFrame')) return <Button l10nId='add' className='primaryButton' onClick={this.props.showOverlay.bind(this)} />
-// should also do this.props.hideParentalOverlay
-    return <Button l10nId='add' className='primaryButton' onClick={this.openBuyURLTab} />
+    return <a href={this.ledgerData.get('buyURL')} target='_blank' onClick={this.openBuyURLTab}><Button l10nId='add' className='primaryButton' /></a>
   }
   get qrcodeOverlayContent () {
     return <div>
