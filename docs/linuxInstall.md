@@ -6,6 +6,14 @@ Signed packages are on their way, but in the meantime you can use the following.
 want to try installing `git` using the package manager for your distro._
 
 ## Debian AMD64:
+To install brave using apt
+``` 
+curl https://s3-us-west-2.amazonaws.com/brave-apt/keys.asc | sudo apt-key add -
+deb https://s3-us-west-2.amazonaws.com/brave-apt jesse main  
+```
+
+Upgrades can be done via 
+```apt-get update && apt-get upgrade -y```
 
 ```
 wget -O brave.deb https://laptop-updates.brave.com/latest/dev/debian64
@@ -13,6 +21,17 @@ sudo apt-get install -y gdebi && sudo gdebi brave.deb
 ```
 
 ## Ubuntu AMD64:
+To install brave using apt
+``` 
+curl https://s3-us-west-2.amazonaws.com/brave-apt/keys.asc | sudo apt-key add -
+deb https://s3-us-west-2.amazonaws.com/brave-apt [xenial/trusty] main  
+```
+
+Upgrades can be done via 
+```
+apt-get update && apt-get upgrade -y
+```
+
 
 ```
 wget -O brave.deb https://laptop-updates.brave.com/latest/dev/ubuntu64
