@@ -43,7 +43,7 @@ const aboutNewTabState = require('../../app/common/state/aboutNewTabState')
 const aboutHistoryState = require('../../app/common/state/aboutHistoryState')
 const windowState = require('../../app/common/state/windowState')
 
-const flash = require('../flash.js')
+const flashReducer = require('../../app/browser/reducers/flashReducer')
 const tabsReducer = require('../../app/browser/reducers/tabsReducer')
 const webtorrent = require('../../app/browser/webtorrent')
 
@@ -361,6 +361,7 @@ const handleAppAction = (action) => {
   const ledger = require('../../app/ledger')
 
   appState = downloadsReducer(appState, action)
+  appState = flashReducer(appState, action)
   appState = tabsReducer(appState, action)
 
   switch (action.actionType) {
@@ -369,7 +370,6 @@ const handleAppAction = (action) => {
       appState = Filtering.init(appState, action, appStore)
       appState = windows.init(appState, action, appStore)
       appState = basicAuth.init(appState, action, appStore)
-      appState = flash.init(appState, action, appStore)
       appState = webtorrent.init(appState, action, appStore)
       break
     case appConstants.APP_SHUTTING_DOWN:
@@ -559,6 +559,23 @@ const handleAppAction = (action) => {
       appState = appState.setIn(['settings', action.key], action.value)
       handleChangeSettingAction(action.key, action.value)
       break
+    case appConstants.APP_ALLOW_FLASH_ONCE:
+      {
+        const propertyName = action.isPrivate ? 'temporarySiteSettings' : 'siteSettings'
+        console.log(siteUtil.getOrigin(action.url))
+        console.log(propertyName)
+        appState = appState.set(propertyName,
+          siteSettings.mergeSiteSetting(appState.get(propertyName), siteUtil.getOrigin(action.url), 'flash', 1))
+        break
+      }
+    case appConstants.APP_ALLOW_FLASH_ALWAYS:
+      {
+        const propertyName = action.isPrivate ? 'temporarySiteSettings' : 'siteSettings'
+        const expirationTime = Date.now() + 7 * 24 * 3600 * 1000
+        appState = appState.set(propertyName,
+          siteSettings.mergeSiteSetting(appState.get(propertyName), siteUtil.getOrigin(action.url), 'flash', expirationTime))
+        break
+      }
     case appConstants.APP_CHANGE_SITE_SETTING:
       {
         let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'

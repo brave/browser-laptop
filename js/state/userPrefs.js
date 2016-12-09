@@ -6,8 +6,6 @@ let registeredCallbacks = []
 let registeredSessions = []
 let registeredPrivateSessions = []
 
-const isPrivate = (partition) => !partition.startsWith('persist:') && partition !== 'main-1'
-
 // TODO(bridiver) move this to electron so we can call a simpler api
 const setUserPrefType = (ses, path, value) => {
   switch (typeof value) {
@@ -58,14 +56,17 @@ const runCallback = (cb, name, incognito) => {
 }
 
 module.exports.setUserPref = (path, value, incognito = false) => {
+  value = value.toJS ? value.toJS() : value
+
   let partitions = incognito ? Object.keys(registeredPrivateSessions) : Object.keys(registeredSessions)
   partitions.forEach((partition) => {
     setUserPrefType(registeredSessions[partition], path, value)
+    registeredSessions[partition].webRequest.handleBehaviorChanged()
   })
 }
 
-module.exports.init = (ses, partition) => {
-  if (isPrivate(partition)) {
+module.exports.init = (ses, partition, isPrivate) => {
+  if (isPrivate) {
     registeredPrivateSessions[partition] = ses
   }
   registeredSessions[partition] = ses

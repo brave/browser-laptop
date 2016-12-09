@@ -647,6 +647,23 @@ const appActions = {
     })
   },
 
+  allowFlashOnce: function (tabId, url, isPrivate) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_ALLOW_FLASH_ONCE,
+      tabId,
+      url,
+      isPrivate
+    })
+  },
+
+  allowFlashAlways: function (tabId, url) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_ALLOW_FLASH_ALWAYS,
+      tabId,
+      url
+    })
+  },
+
   /**
    * Dispatch a message to copy data URL to clipboard
    **/

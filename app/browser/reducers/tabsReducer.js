@@ -10,7 +10,6 @@ const tabs = require('../tabs')
 const tabState = require('../../common/state/tabState')
 const windowConstants = require('../../../js/constants/windowConstants')
 const { makeImmutable } = require('../../common/state/immutableUtil')
-const { getSiteSettingsForURL } = require('../../../js/state/siteSettings')
 
 const tabsReducer = (state, action) => {
   action = makeImmutable(action)
