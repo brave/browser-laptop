@@ -6,11 +6,16 @@ const React = require('react')
 const Immutable = require('immutable')
 const messages = require('../constants/messages')
 const SortableTable = require('../components/sortableTable')
+const aboutActions = require('./aboutActions')
 
 const ipc = window.chrome.ipc
 
 require('../../less/about/history.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
+
+const tranformVersionInfoToString = (versionInformation) =>
+  versionInformation
+    .reduce((coll, entry) => `${coll} \n${entry.get('name')}: ${entry.get('version')}`, '')
 
 class AboutBrave extends React.Component {
   constructor () {
@@ -21,6 +26,11 @@ class AboutBrave extends React.Component {
         this.setState({versionInformation: Immutable.fromJS(versionInformation)})
       }
     })
+    this.onCopy = this.onCopy.bind(this)
+  }
+
+  onCopy () {
+    aboutActions.setClipboard(tranformVersionInfoToString(this.state.versionInformation))
   }
 
   render () {
@@ -30,7 +40,10 @@ class AboutBrave extends React.Component {
       </div>
 
       <div className='siteDetailsPageContent aboutAbout'>
-        <div className='sectionTitle' data-l10n-id='versionInformation' />
+        <div className='title'>
+          <span className='sectionTitle' data-l10n-id='versionInformation' />
+          <span className='fa fa-clipboard' title='Copy password to clipboard' onClick={this.onCopy} />
+        </div>
         <SortableTable
           headings={['Name', 'Version']}
           rows={this.state.versionInformation.map((entry) => [
