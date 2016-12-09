@@ -114,7 +114,6 @@ const messages = {
   // About pages from contentScript
   RELOAD_URL: _,
   DISPATCH_ACTION: _,
-  CHECK_FLASH_INSTALLED: _,
   ABOUT_COMPONENT_INITIALIZED: _,
   CLEAR_BROWSING_DATA_NOW: _,
   IMPORT_BROWSER_DATA_NOW: _,

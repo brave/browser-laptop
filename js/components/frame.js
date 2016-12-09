@@ -637,6 +637,11 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('did-block-run-insecure-content', (e) => {
       windowActions.setBlockedRunInsecureContent(this.frame, e.details[0])
     })
+    this.webview.addEventListener('enable-pepper-menu', (e) => {
+      contextMenus.onFlashContextMenu(e.params, this.frame)
+      e.preventDefault()
+      e.stopPropagation()
+    })
     this.webview.addEventListener('context-menu', (e) => {
       contextMenus.onMainContextMenu(e.params, this.frame)
       e.preventDefault()

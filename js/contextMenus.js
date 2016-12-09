@@ -462,6 +462,25 @@ function autofillTemplateInit (suggestions, frame) {
   return menuUtil.sanitizeTemplateItems(template)
 }
 
+function flashTemplateInit (frameProps) {
+  const template = []
+  template.push({
+    label: locale.translation('allowFlashOnce'),
+    click: () => {
+      appActions.allowFlashOnce(frameProps.get('tabId'), frameProps.get('location'), frameProps.get('isPrivate'))
+    }
+  })
+  if (!frameProps.get('isPrivate')) {
+    template.push({
+      label: locale.translation('allowFlashAlways'),
+      click: () => {
+        appActions.allowFlashAlways(frameProps.get('tabId'), frameProps.get('location'))
+      }
+    })
+  }
+  return template
+}
+
 function tabTemplateInit (frameProps) {
   const frameKey = frameProps.get('key')
   const template = [CommonMenu.newTabMenuItem(frameProps.get('key'))]
@@ -872,26 +891,6 @@ const showDefinitionMenuItem = (selectionText) => {
 function mainTemplateInit (nodeProps, frame) {
   const template = []
 
-  if (nodeProps.frameURL && nodeProps.frameURL.startsWith('chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-flash.html')) {
-    const pageOrigin = siteUtil.getOrigin(nodeProps.pageURL)
-    template.push({
-      label: locale.translation('allowFlashOnce'),
-      click: () => {
-        appActions.changeSiteSetting(pageOrigin, 'flash', 1, frame.get('isPrivate'))
-      }
-    })
-    if (!frame.get('isPrivate')) {
-      template.push({
-        label: locale.translation('allowFlashAlways'),
-        click: () => {
-          const expirationTime = Date.now() + 7 * 24 * 3600 * 1000
-          appActions.changeSiteSetting(pageOrigin, 'flash', expirationTime)
-        }
-      })
-    }
-    return menuUtil.sanitizeTemplateItems(template)
-  }
-
   const isLink = nodeProps.linkURL && nodeProps.linkURL !== ''
   const isImage = nodeProps.mediaType === 'image'
   const isVideo = nodeProps.mediaType === 'video'
@@ -1234,6 +1233,12 @@ function onMainContextMenu (nodeProps, frame, contextMenuType) {
   }
 }
 
+function onFlashContextMenu (nodeProps, frameProps) {
+  const flashMenu = Menu.buildFromTemplate(flashTemplateInit(frameProps))
+  flashMenu.popup(currentWindow)
+  flashMenu.destroy()
+}
+
 function onTabContextMenu (frameProps, e) {
   e.stopPropagation()
   const tabMenu = Menu.buildFromTemplate(tabTemplateInit(frameProps))
@@ -1492,6 +1497,7 @@ function onReloadContextMenu (target) {
 
 module.exports = {
   onHamburgerMenu,
+  onFlashContextMenu,
   onMainContextMenu,
   onTabContextMenu,
   onNewTabContextMenu,

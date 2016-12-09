@@ -1535,17 +1535,15 @@ class SecurityTab extends ImmutableComponent {
   }
   onToggleFlash (e) {
     aboutActions.setResourceEnabled(flash, e.target.value)
-    ipc.send(messages.PREFS_RESTART, flash, e.target.value)
   }
   onToggleWidevine (e) {
     aboutActions.setResourceEnabled(widevine, e.target.value)
   }
   render () {
     const lastPassPreferencesUrl = ('chrome-extension://' + extensionIds[passwordManagers.LAST_PASS] + '/tabDialog.html?dialog=preferences&cmd=open')
-
     const isLinux = navigator.appVersion.indexOf('Linux') !== -1
-
     const flashInstalled = getSetting(settings.FLASH_INSTALLED, this.props.settings)
+
     return <div>
       <div className='sectionTitle' data-l10n-id='privateData' />
       <SettingsList dataL10nId='privateDataMessage'>
@@ -1784,7 +1782,6 @@ class AboutPreferences extends React.Component {
       firstRecoveryKey: '',
       secondRecoveryKey: ''
     }
-    aboutActions.checkFlashInstalled()
 
     ipc.on(messages.SETTINGS_UPDATED, (e, settings) => {
       this.setState({ settings: Immutable.fromJS(settings || {}) })
@@ -1911,7 +1908,7 @@ class AboutPreferences extends React.Component {
           hideOverlay={this.setOverlayVisible.bind(this, false)} />
         break
       case preferenceTabs.SECURITY:
-        tab = <SecurityTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} flashInstalled={this.state.flashInstalled} onChangeSetting={this.onChangeSetting} />
+        tab = <SecurityTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.ADVANCED:
         tab = <AdvancedTab settings={settings} onChangeSetting={this.onChangeSetting} />

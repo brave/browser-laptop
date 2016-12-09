@@ -246,8 +246,7 @@ module.exports.cleanAppData = (data, isShutdown) => {
   data.notifications = []
   // Delete temp site settings
   data.temporarySiteSettings = {}
-  // Delete Flash state since this is checked on startup
-  delete data.flashInitialized
+
   if (data.settings[settings.CHECK_DEFAULT_ON_STARTUP] === true) {
     // Delete defaultBrowserCheckComplete state since this is checked on startup
     delete data.defaultBrowserCheckComplete

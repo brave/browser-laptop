@@ -37,6 +37,7 @@ module.exports = {
     enabled: false,
     installUrl: 'https://get.adobe.com/flashplayer/',
     url: getTargetAboutUrl('about:flash'),
+    resourceId: 'PepperFlashPlayer.plugin',
     shields: false
   },
   widevine: {

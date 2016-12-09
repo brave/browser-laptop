@@ -11,6 +11,7 @@ const BrowserWindow = electron.BrowserWindow
 const webContents = electron.webContents
 const appActions = require('../js/actions/appActions')
 const appConfig = require('../js/constants/appConfig')
+const hostContentSettings = require('./browser/contentSettings/hostContentSettings')
 const downloadStates = require('../js/constants/downloadStates')
 const urlParse = require('url').parse
 const getBaseDomain = require('../js/lib/baseDomain').getBaseDomain
@@ -78,7 +79,7 @@ module.exports.registerHeadersReceivedFilteringCB = (filteringFn) => {
  * @param {object} session Session to add webRequest filtering on
  */
 function registerForBeforeRequest (session, partition) {
-  const isPrivate = !partition.startsWith('persist:')
+  const isPrivate = module.exports.isPrivate(partition)
   session.webRequest.onBeforeRequest((details, cb) => {
     if (process.env.NODE_ENV === 'development') {
       let page = appUrlUtil.getGenDir(details.url)
@@ -186,7 +187,7 @@ function registerForBeforeRequest (session, partition) {
  * @param {object} session Session to add webRequest filtering on
  */
 function registerForBeforeRedirect (session, partition) {
-  const isPrivate = !partition.startsWith('persist:')
+  const isPrivate = module.exports.isPrivate(partition)
   // Note that onBeforeRedirect listener doesn't take a callback
   session.webRequest.onBeforeRedirect(function (details) {
     // Using an electron binary which isn't from Brave
@@ -213,7 +214,7 @@ function registerForBeforeSendHeaders (session, partition) {
   const sendDNT = getSetting(settings.DO_NOT_TRACK)
   let spoofedUserAgent = getSetting(settings.USERAGENT)
   const braveRegex = new RegExp('brave/.+? ', 'gi')
-  const isPrivate = !partition.startsWith('persist:')
+  const isPrivate = module.exports.isPrivate(partition)
 
   session.webRequest.onBeforeSendHeaders(function (details, cb) {
     // Using an electron binary which isn't from Brave
@@ -286,7 +287,7 @@ function registerForBeforeSendHeaders (session, partition) {
  * @param {object} session Session to add webRequest filtering on
  */
 function registerForHeadersReceived (session, partition) {
-  const isPrivate = !partition.startsWith('persist:')
+  const isPrivate = module.exports.isPrivate(partition)
   // Note that onBeforeRedirect listener doesn't take a callback
   session.webRequest.onHeadersReceived(function (details, cb) {
     // Using an electron binary which isn't from Brave
@@ -301,7 +302,7 @@ function registerForHeadersReceived (session, partition) {
       return
     }
     for (let i = 0; i < headersReceivedFilteringFns.length; i++) {
-      let results = headersReceivedFilteringFns[i](details)
+      let results = headersReceivedFilteringFns[i](details, isPrivate)
       if (!module.exports.isResourceEnabled(results.resourceName, firstPartyUrl, isPrivate)) {
         continue
       }
@@ -320,7 +321,7 @@ function registerForHeadersReceived (session, partition) {
  * @param {string} partition name of the partition
  */
 function registerPermissionHandler (session, partition) {
-  const isPrivate = !partition.startsWith('persist:')
+  const isPrivate = module.exports.isPrivate(partition)
   // Keep track of per-site permissions granted for this session.
   let permissions = null
   session.setPermissionRequestHandler((origin, mainFrameUrl, permission, cb) => {
@@ -533,6 +534,7 @@ function initSession (ses, partition) {
 function initForPartition (partition) {
   let fns = [initSession,
     userPrefs.init,
+    hostContentSettings.init,
     registerForBeforeRequest,
     registerForBeforeRedirect,
     registerForBeforeSendHeaders,
@@ -544,7 +546,7 @@ function initForPartition (partition) {
     options.parent_partition = ''
   }
   let ses = session.fromPartition(partition, options)
-  fns.forEach((fn) => { fn(ses, partition) })
+  fns.forEach((fn) => { fn(ses, partition, module.exports.isPrivate(partition)) })
 }
 
 const filterableProtocols = ['http:', 'https:']
@@ -575,6 +577,10 @@ function shouldIgnoreUrl (details) {
     console.warn('Error parsing ' + details.url)
   }
   return true
+}
+
+module.exports.isPrivate = (partition) => {
+  return !partition.startsWith('persist:')
 }
 
 module.exports.init = (state, action, store) => {
