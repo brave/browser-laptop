@@ -78,6 +78,7 @@ const settings = require('../js/constants/settings')
 
 // temporary fix for #4517, #4518 and #4472
 app.commandLine.appendSwitch('enable-use-zoom-for-dsf', 'false')
+app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferHtmlOverPlugins')
 
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
@@ -280,12 +281,13 @@ app.on('ready', () => {
     let host = urlParse(url).host
     if (host && acceptCertDomains[host] === true) {
       // Ignore the cert error
-      cb(true)
+      cb('continue')
       return
+    } else {
+      cb('deny')
     }
 
     if (resourceType !== 'mainFrame') {
-      // Block subresources with certificate errors
       return
     }
 
