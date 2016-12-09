@@ -6,5 +6,7 @@ module.exports = function (name) {
     return electron
   } else if (name === 'appActions') {
     return appActions
+  } else if (name === 'immutable') {
+    return require('immutable')
   }
 }
