@@ -327,8 +327,7 @@ var exports = {
 
     this.app.client.addCommand('setPinned', function (location, isPinned, options = {}) {
       return this.execute(function (location, isPinned, options) {
-        var Immutable = require('immutable')
-        devTools('electron').testData.windowActions.setPinned(Immutable.fromJS(Object.assign({
+        devTools('electron').testData.windowActions.setPinned(devTools('immutable').fromJS(Object.assign({
           windowId: devTools('electron').remote.getCurrentWindow().id,
           location
         }, options)), isPinned)
