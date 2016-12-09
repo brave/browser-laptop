@@ -5,6 +5,7 @@
 const { makeImmutable } = require('./immutableUtil')
 const Immutable = require('immutable')
 const windowConstants = require('../../../js/constants/windowConstants')
+const platformUtil = require('../lib/platformUtil')
 
 const browserActionDefaults = Immutable.fromJS({
   tabs: {}
@@ -148,20 +149,25 @@ const extensionState = {
         state = state.setIn(['extensions', action.get('extensionId'), 'contextMenus'], new Immutable.List())
       }
       let contextMenus = state.getIn(['extensions', action.get('extensionId'), 'contextMenus'])
-      let basePath = state.getIn(['extensions', action.get('extensionId'), 'base_path'])
-      basePath = decodeURI(basePath)
-      if (process.platform === 'win32') {
-        basePath = basePath.replace('file:///', '')
+      const basePath =
+        platformUtil.getPathFromFileURI(state.getIn(['extensions', action.get('extensionId'), 'base_path']))
+      const iconPath = action.get('icon')
+      if (!iconPath) {
+        contextMenus = contextMenus.push({
+          extensionId: action.get('extensionId'),
+          menuItemId: action.get('menuItemId'),
+          properties: action.get('properties').toJS()
+        })
       } else {
-        basePath = basePath.replace('file://', '')
-      }
-      return state.setIn(['extensions', action.get('extensionId'), 'contextMenus'],
-        contextMenus.push({
+        contextMenus = contextMenus.push({
           extensionId: action.get('extensionId'),
           menuItemId: action.get('menuItemId'),
           properties: action.get('properties').toJS(),
-          icon: basePath + '/' + action.get('icon')
-        }))
+          icon: basePath + '/' + iconPath
+        })
+      }
+      return state.setIn(['extensions', action.get('extensionId'), 'contextMenus'],
+        contextMenus)
     } else {
       return state
     }
