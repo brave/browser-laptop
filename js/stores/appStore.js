@@ -810,7 +810,7 @@ const handleAppAction = (action) => {
       appState = appState.set('sites', siteUtil.updateSiteFavicon(appState.get('sites'), action.frameProps.get('location'), action.favicon))
       appState = aboutNewTabState.setSites(appState, action)
       break
-    case AppConstants.APP_RENDER_URL_TO_PDF:
+    case appConstants.APP_RENDER_URL_TO_PDF:
       const pdf = require('../../app/pdf')
       appState = pdf.renderUrlToPdf(appState, action)
       break

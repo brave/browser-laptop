@@ -72,10 +72,6 @@ const getDefaultUserPrefContentSettings = (braveryDefaults, appSettings, appConf
     }, {
       setting: 'allow',
       secondaryPattern: '*',
-      primaryPattern: 'file:///*'
-    }, {
-      setting: 'allow',
-      secondaryPattern: '*',
       primaryPattern: 'chrome-extension://*'
     }],
     canvasFingerprinting: [{

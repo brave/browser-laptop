@@ -1608,8 +1608,7 @@ class SecurityTab extends ImmutableComponent {
       <div className='sectionTitle' data-l10n-id='pluginSettings' />
       <SettingsList>
         <SettingCheckbox checked={flashInstalled ? this.props.braveryDefaults.get('flash') : false} dataL10nId='enableFlash' onChange={this.onToggleFlash} disabled={!flashInstalled} />
-        <span className='subtext flashText'>
-          <span className='fa fa-info-circle' id='flashInfoIcon' />
+        <div className='subtext flashText'>
           {
             isDarwin || isWindows
               ? <div>

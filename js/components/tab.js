@@ -16,7 +16,7 @@ const {isIntermediateAboutPage} = require('../lib/appUrlUtil')
 const contextMenus = require('../contextMenus')
 const dnd = require('../dnd')
 const windowStore = require('../stores/windowStore')
-const ipc = global.require('electron').ipcRenderer
+const ipc = require('electron').ipcRenderer
 
 const {TabIcon, AudioTabIcon} = require('../../app/renderer/components/tabIcon')
 
