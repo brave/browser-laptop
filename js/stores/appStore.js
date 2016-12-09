@@ -33,19 +33,18 @@ const autofill = require('../../app/autofill')
 const nativeImage = require('../../app/nativeImage')
 const Filtering = require('../../app/filtering')
 const basicAuth = require('../../app/browser/basicAuth')
-const tabs = require('../../app/browser/tabs')
 const windows = require('../../app/browser/windows')
 const downloadsReducer = require('../../app/browser/reducers/downloadsReducer')
 
 // state helpers
 const basicAuthState = require('../../app/common/state/basicAuthState')
 const extensionState = require('../../app/common/state/extensionState')
-const tabState = require('../../app/common/state/tabState')
 const aboutNewTabState = require('../../app/common/state/aboutNewTabState')
 const aboutHistoryState = require('../../app/common/state/aboutHistoryState')
 const windowState = require('../../app/common/state/windowState')
 
 const flash = require('../flash.js')
+const tabsReducer = require('../../app/browser/reducers/tabsReducer')
 const webtorrent = require('../../app/browser/webtorrent')
 
 const isDarwin = process.platform === 'darwin'
@@ -362,13 +361,13 @@ const handleAppAction = (action) => {
   const ledger = require('../../app/ledger')
 
   appState = downloadsReducer(appState, action)
+  appState = tabsReducer(appState, action)
 
   switch (action.actionType) {
     case appConstants.APP_SET_STATE:
       appState = action.appState
       appState = Filtering.init(appState, action, appStore)
       appState = windows.init(appState, action, appStore)
-      appState = tabs.init(appState, action, appStore)
       appState = basicAuth.init(appState, action, appStore)
       appState = flash.init(appState, action, appStore)
       appState = webtorrent.init(appState, action, appStore)
@@ -731,9 +730,6 @@ const handleAppAction = (action) => {
     case appConstants.APP_SET_LOGIN_RESPONSE_DETAIL:
       appState = basicAuth.setLoginResponseDetail(appState, action)
       break
-    case windowConstants.WINDOW_CLOSE_FRAME:
-      appState = tabState.closeFrame(appState, action)
-      break
     case ExtensionConstants.BROWSER_ACTION_REGISTERED:
       appState = extensionState.browserActionRegistered(appState, action)
       break
@@ -793,24 +789,9 @@ const handleAppAction = (action) => {
     case appConstants.APP_DEFAULT_BROWSER_CHECK_COMPLETE:
       appState = appState.set('defaultBrowserCheckComplete', {})
       break
-    case appConstants.APP_TAB_CREATED:
-      appState = tabState.maybeCreateTab(appState, action)
-      break
-    case appConstants.APP_TAB_UPDATED:
-      appState = tabState.maybeCreateTab(appState, action)
-      break
-    case appConstants.APP_CLOSE_TAB:
-      appState = tabs.removeTab(appState, action)
-      break
-    case appConstants.APP_TAB_CLOSED:
-      appState = tabState.removeTab(appState, action)
-      break
     case windowConstants.WINDOW_SET_FAVICON:
       appState = appState.set('sites', siteUtil.updateSiteFavicon(appState.get('sites'), action.frameProps.get('location'), action.favicon))
       appState = aboutNewTabState.setSites(appState, action)
-      break
-    case windowConstants.WINDOW_SET_AUDIO_MUTED:
-      appState = tabs.setAudioMuted(appState, action)
       break
     case AppConstants.APP_RENDER_URL_TO_PDF:
       const pdf = require('../../app/pdf')

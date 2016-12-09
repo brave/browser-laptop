@@ -62,7 +62,7 @@ class Frame extends ImmutableComponent {
   }
 
   get frame () {
-    return windowStore.getFrame(this.props.frameKey)
+    return windowStore.getFrame(this.props.frameKey) || {}
   }
 
   get braveryDefaults () {

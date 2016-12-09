@@ -15,7 +15,8 @@ const cleanupWebContents = (tabId) => {
 const getTabValue = function (tabId) {
   let tab = api.getWebContents(tabId)
   if (tab) {
-    return makeImmutable(extensions.tabValue(tab))
+    const tabValue = makeImmutable(extensions.tabValue(tab))
+    return tabValue.set('tabId', tabId)
   }
 }
 
@@ -30,9 +31,13 @@ const updateTab = (tabId) => {
 
 const api = {
   init: (state, action) => {
+    process.on('add-new-contents', (e, openerTab, newTab, disposition, userGesture) => {
+      if (userGesture === false) {
+        e.preventDefault()
+      }
+    })
     app.on('web-contents-created', function (event, tab) {
-      // TODO(bridiver) - also exclude extension action windows??
-      if (extensions.isBackgroundPage(tab) || !tab.hostWebContents) {
+      if (extensions.isBackgroundPage(tab) || !tab.isGuest()) {
         return
       }
       let tabId = tab.getId()
@@ -48,12 +53,6 @@ const api = {
             faviconUrl: favicons[0]
           })
           updateTab(tabId)
-        }
-      })
-      tab.on('new-window', (e, url, frameName, disposition, options = {}) => {
-        let userGesture = options.userGesture
-        if (userGesture === false) {
-          e.preventDefault()
         }
       })
       tab.on('unresponsive', () => {
