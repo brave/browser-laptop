@@ -173,10 +173,6 @@ describe('pinnedTabs', function () {
         .url(page2Url)
         .waitForUrl(page2Url)
         .windowByUrl(Brave.browserWindowUrl)
-      yield this.app.client
-        .waitUntil(function () {
-          return this.getAttribute('webview[data-frame-key="2"]', 'src').then((src) => src === page2Url)
-        })
         .waitUntil(function () {
           return this.elements(pinnedTabsTabs).then((res) => res.value.length === 1)
         })
@@ -187,11 +183,10 @@ describe('pinnedTabs', function () {
     it('navigating to a different origin opens a new tab', function * () {
       const page2Url = Brave.server.url('page2.html').replace('localhost', '127.0.0.1')
       yield this.app.client
-        .tabByUrl(this.page1Url)
-        .url(page2Url)
-        .waitForUrl(page2Url)
+        .click(urlInput)
+        .setValue(urlInput, page2Url)
+        .keys(Brave.keys.ENTER)
         .windowByUrl(Brave.browserWindowUrl)
-      this.app.client.waitForExist('webview[data-frame-key="3"]')
         .waitUntil(function () {
           return this.elements(pinnedTabsTabs).then((res) => res.value.length === 1)
         })
