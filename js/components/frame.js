@@ -9,6 +9,7 @@ const webviewActions = require('../actions/webviewActions')
 const appActions = require('../actions/appActions')
 const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
+const immutableUtil = require('../../app/common/state/immutableUtil')
 const cx = require('../lib/classSet')
 const siteUtil = require('../state/siteUtil')
 const FrameStateUtil = require('../state/frameStateUtil')
@@ -713,7 +714,7 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('page-favicon-updated', (e) => {
       // TODO(Anthony): more general solution on muon to prevent weview event
       // from emitting after tab closed
-      if (e.favicons && e.favicons.length > 0 && this.frame) {
+      if (e.favicons && e.favicons.length > 0 && immutableUtil.isImmutable(this.frame)) {
         imageUtil.getWorkingImageUrl(e.favicons[0], (imageFound) => {
           windowActions.setFavicon(this.frame, imageFound ? e.favicons[0] : null)
         })
@@ -722,7 +723,7 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('page-title-updated', ({title}) => {
       // TODO(Anthony): more general solution on muon to prevent weview event
       // from emitting after tab closed
-      if (this.frame) {
+      if (immutableUtil.isImmutable(this.frame)) {
         windowActions.setFrameTitle(this.frame, title)
       }
     })
@@ -735,7 +736,7 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('hide-autofill-popup', (e) => {
       // TODO(Anthony): more general solution on muon to prevent weview event
       // from emitting after tab closed
-      if (this.frame) {
+      if (immutableUtil.isImmutable(this.frame)) {
         let webContents = this.webview.getWebContents()
         if (webContents && webContents.isFocused()) {
           windowActions.autofillPopupHidden(this.props.tabId)
@@ -1009,7 +1010,7 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('did-get-response-details', (details) => {
-      if (this.frame) {
+      if (immutableUtil.isImmutable(this.frame)) {
         windowActions.gotResponseDetails(this.frame.get('tabId'), details)
       }
     })
