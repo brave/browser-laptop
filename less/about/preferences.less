@@ -895,11 +895,53 @@ div.nextPaymentSubmission {
     padding: 25px 20px;
 
     &.advancedSettings {
-      padding-left: 50px;
-      padding-right: 50px;
+      display: flex;
+      flex-wrap: nowrap;
 
-      select {
+      .settingsPanelDivider {
         width: 100%;
+      }
+
+      .settingsPanelDivider:nth-child(1) {
+        .settingsListContainer:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      .settingsPanelDivider:nth-child(2) {
+        display: flex;
+        align-items: center;
+        width: auto;
+        margin-left: 1em;
+
+         .settingsListContainer:last-child {
+           margin-bottom: 0;
+
+          .settingsList {
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: space-between;
+
+            .settingItem {
+              display: flex;
+              margin-bottom: 1em;
+
+              &:last-child {
+                margin-bottom: 0;
+              }
+
+              label {
+                margin-bottom: 0;
+              }
+
+              .switchControl {
+                margin-top: 2px;
+                padding-top: 0;
+                padding-bottom: 0;
+              }
+            }
+          }
+        }
       }
     }
 
