@@ -1606,19 +1606,19 @@ class SecurityTab extends ImmutableComponent {
           {
             isDarwin || isWindows
               ? <div>
-                <span className='fa fa-info-circle' id='flashInfoIcon' />
+                <span className='fa fa-info-circle flashInfoIcon' />
                 <span data-l10n-id='enableFlashSubtext' />&nbsp;
                 <span className='linkText' onClick={aboutActions.newFrame.bind(null, {
                   location: appConfig.flash.installUrl
                 }, true)} title={appConfig.flash.installUrl}>{'Adobe'}</span>.
               </div>
               : <div>
-                <span className='fa fa-info-circle' id='flashInfoIcon' />
+                <span className='fa fa-info-circle flashInfoIcon' />
                 <span data-l10n-id='enableFlashSubtextLinux' />
               </div>
           }
           <div>
-            <span className='fa fa-info-circle' id='flashInfoIcon' />
+            <span className='fa fa-info-circle flashInfoIcon' />
             <span data-l10n-id='flashTroubleshooting' />&nbsp;
             <span className='linkText' onClick={aboutActions.newFrame.bind(null, {
               location: 'https://github.com/brave/browser-laptop/wiki/Flash-Support-Deprecation-Proposal#troubleshooting-flash-issues'
