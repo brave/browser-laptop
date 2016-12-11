@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.12.14](https://github.com/brave/browser-laptop/releases/v0.12.12dev)
+## [0.12.14](https://github.com/brave/browser-laptop/releases/v0.12.14dev)
 - Muon updated to 1.4.31 (Brave's Electron fork)
 
 ## [0.12.13](https://github.com/brave/browser-laptop/releases/v0.12.13dev)
