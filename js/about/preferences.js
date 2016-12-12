@@ -433,16 +433,20 @@ class BitcoinDashboard extends ImmutableComponent {
   get panelFooter () {
     if (this.ledgerData.get('buyURLFrame')) {
       return <div className='panelFooter'>
-        <Button l10nId='done' className='pull-right whiteButton' onClick={this.props.hideParentOverlay} />
+        <Button l10nId='done' className='whiteButton' onClick={this.props.hideParentOverlay} />
       </div>
     } else if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
-      return <div className='panelFooter'>
-        <div className='coinbaseLogo' />
-        <span className='coinbaseMessage' data-l10n-id='coinbaseMessage' />
-        <Button l10nId='done' className='pull-right whiteButton' onClick={this.props.hideParentOverlay} />
+      return <div className='panelFooter coinbaseFooter'>
+        <div className='coinbase'>
+          <div className='coinbaseLogo' />
+          <span className='coinbaseMessage' data-l10n-id='coinbaseMessage' />
+        </div>
+        <Button l10nId='done' className='whiteButton' onClick={this.props.hideParentOverlay} />
       </div>
     } else {
-      return null
+      return <div className='panelFooter'>
+        <Button l10nId='done' className='whiteButton' onClick={this.props.hideParentOverlay} />
+      </div>
     }
   }
   copyToClipboard (text) {
@@ -477,7 +481,7 @@ class BitcoinDashboard extends ImmutableComponent {
         ? <ModalOverlay content={this.qrcodeOverlayContent} customTitleClasses={'qrcodeOverlay'} footer={this.qrcodeOverlayFooter} onHide={this.props.hideQRcode.bind(this)} />
         : null
       }
-      <div className='board'>
+      <div className='board addFundsBoard'>
         {
           (this.userInAmerica || this.ledgerData.get('buyURLFrame'))
           ? this.coinbasePanel
@@ -497,7 +501,7 @@ class BitcoinDashboard extends ImmutableComponent {
               ? <div className='settingsPanelDivider'>
                 {
                   this.ledgerData.get('hasBitcoinHandler') && this.ledgerData.get('paymentURL')
-                    ? <div>
+                    ? <div className='hasBitcoinHandler'>
                       <a href={this.ledgerData.get('paymentURL')} target='_blank'>
                         <Button l10nId='bitcoinVisitAccount' className='primaryButton bitcoinAddressButton' />
                       </a>

@@ -483,7 +483,12 @@ table.sortableTable {
 
   .modal {
     .dialog {
+      background: linear-gradient(@modalVeryLightGray, @modalLightGray);
+      border-radius: @borderRadiusModal;
+
       &.coinbaseOverlay {
+        background: transparent;
+
         .dialog-body {
           height: 100%;
           width: 100%;
@@ -498,7 +503,11 @@ table.sortableTable {
         }
 
         .dialog-header {
-          background: #EEE;
+
+          .sectionTitle {
+            margin-bottom: 0;
+            padding: 0;
+          }
         }
 
         .dialog-body {
@@ -534,7 +543,6 @@ table.sortableTable {
         }
 
         .dialog-footer {
-          background: #EEE;
           padding-top: 10px;
           padding-bottom: 10px;
 
@@ -550,26 +558,118 @@ table.sortableTable {
         }
       }
 
-      .dialog-header {}
+      .dialog-header {
+        .sectionTitle {
+          margin-bottom: 0;
+          padding: 25px 0; // text-indent / 2
+        }
+      }
 
       .dialog-body {
         .board {
           .panel {
+            @margin-bottom-header: .5em;
+
+            &:first-child {
+              margin-top: 0;
+            }
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
             &.advancedSettings,
             &.ledgerBackupContent,
             &.recoveryContent {
               padding-left: 50px;
               padding-right: 50px;
+            }
+
+            &.advancedSettings {
+              display: flex;
+              flex-wrap: nowrap;
 
               select {
                 width: 100%;
               }
+
+              .settingsPanelDivider {
+                width: 100%;
+
+                &:first-child { // select elements
+                  .minimumPageTimeSetting,
+                  .minimumVisitsSetting {
+                    margin-bottom: @margin-bottom-header;
+                  }
+
+                  .settingsListContainer:last-child {
+                    margin-bottom: 0;
+                  }
+                }
+
+                &:last-child { // switches
+                  display: flex;
+                  align-items: center;
+                  width: auto;
+                  position: relative;
+                  left: 1em;
+
+                  .settingsListContainer:last-child {
+                    margin-bottom: 0;
+
+                    .settingsList {
+                      display: flex;
+                      flex-flow: column nowrap;
+                      justify-content: space-between;
+
+                      .settingItem {
+                        display: flex;
+                        margin-bottom: 1em;
+
+                        &:last-child {
+                          margin-bottom: 0;
+                        }
+
+                        label {
+                          margin-bottom: 0;
+                        }
+
+                        .switchControl {
+                          margin-top: 2px;
+                          padding-top: 0;
+                          padding-bottom: 0;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             }
 
-            &.advancedSettings {
-              .settingsPanelDivider {
-                .settingsListContainer:last-child {
-                  margin-bottom: 0;
+            &.ledgerBackupContent {
+              .copyKeyContainer {
+                display: flex;
+                align-items: flex-end;
+                width: 75%;
+                margin: 20px auto;
+
+                .copyContainer {
+                  .copyButton {
+                    font-size: 14px;
+                    margin: 0;
+                  }
+                }
+
+                .keyContainer {
+                  margin-left: 2em;
+
+                  h3 {
+                    margin-bottom: @margin-bottom-header;
+                  }
+
+                  > span {
+                    white-space: nowrap;
+                  }
                 }
               }
             }
@@ -582,56 +682,14 @@ table.sortableTable {
                 & + .settingsListContainer {
                   margin-bottom: 0;
 
+                  h3 {
+                    margin-bottom: @margin-bottom-header;
+                  }
+
                   .firstRecoveryKey,
                   .secondRecoveryKey {
                     margin-bottom: 20px;
                   }
-                }
-              }
-            }
-
-            .settingsPanelDivider {
-              width: 50%;
-              position: relative;
-              float: left;
-
-              &:nth-child(1) {
-                text-align: left;
-              }
-
-              &:nth-child(2) {
-                text-align: right;
-              }
-
-              .minimumPageTimeSetting,
-              .minimumVisitsSetting {
-                margin-bottom: 12px; // @itemMargin in .walletBar
-              }
-
-            }
-
-            .copyKeyContainer {
-              display: flex;
-              align-items: flex-end;
-              width: 75%;
-              margin: 20px auto;
-
-              .copyContainer {
-                .copyButton {
-                  font-size: 14px;
-                  margin: 0;
-                }
-              }
-
-              .keyContainer {
-                margin-left: 2em;
-
-                h3 {
-                  margin-bottom: 15px;
-                }
-
-                > span {
-                  white-space: nowrap;
                 }
               }
             }
@@ -733,74 +791,112 @@ table.sortableTable {
           }
 
           .board {
-            .panel {
-              padding-left: 100px;
+            &.addFundsBoard {
+              .panel {
+                display: flex;
+                padding-left: 100px;
 
-              .settingsPanelDivider {
-                width: 50%;
-                position: relative;
-                float: left;
-
-                &:nth-child(1) {
-                  text-align: left;
+                &:nth-child(1) { // credit card
+                  margin-top: 0;
                 }
 
-                &:nth-child(2) {
-                  text-align: right;
-                }
+                &:nth-child(2) { // bitcoin address
 
-                .fa {
-                  position: absolute;
-                  left: -45px;
-
-                  &.fa-credit-card {
-                    font-size: 30px;
-                  }
-                  &.fa-mobile {
-                    font-size: 50px;
+                  .settingsPanelDivider {
+                    .hasBitcoinHandler {
+                      display: flex;
+                      flex-flow: column;
+                      align-items: flex-end;
+                    }
                   }
                 }
 
-                .bitcoinAddressButton {
-                  margin-bottom: 15px; // .walletAddressText
-                }
+                &:nth-child(3) { // mobile phone
+                  margin-bottom: 0;
 
-                .walletLabelText {
-                  font-size: 1em;
-                  color: @braveOrange;
-                  margin-bottom: 5px;
-                }
-
-                .walletAddressText {
-                  font-size: 12px;
-                  color: black;
-                  margin-bottom: 15px; // .bitcoinAddressButton
-                }
-
-                .bitcoinIcon {
-                  position: absolute;
-                  left: -5px;
-                  top: 0;
-
-                  .fa-circle {
-                    color: @bitcoinOrange;
+                  .settingsPanelDivider {
+                    justify-content: center; // align the mobile phone icon and the label vertically
                   }
-                  .fa-bitcoin {
-                    color: white;
-                    transform: rotate(12deg);
+                }
+
+                .settingsPanelDivider {
+                  width: 50%;
+                  position: relative;
+                  display: flex;
+                  flex-flow: column;
+
+                  &:first-child {
+                    align-items: flex-start; // to align the icons and texts left
+
+                    .fa {
+                      position: absolute;
+                      left: -45px;
+
+                      &.fa-credit-card {
+                        font-size: 30px;
+                      }
+
+                      &.fa-mobile {
+                        font-size: 50px;
+                        left: -40px;
+                      }
+                    }
+
+                    .bitcoinIcon {
+                      position: absolute;
+                      left: -5px;
+                      top: 0;
+
+                      .fa-circle {
+                        color: @bitcoinOrange;
+                      }
+                      .fa-bitcoin {
+                        color: white;
+                        transform: rotate(12deg);
+                      }
+                    }
+                  }
+
+                  &:last-child {
+                    align-items: flex-end; // to align the buttons right
+
+                    .bitcoinAddressButton {
+                      margin-bottom: 15px; // .walletAddressText
+                    }
+
+                    .walletLabelText {
+                      font-size: 1em;
+                      color: @braveOrange;
+                      margin-bottom: 5px;
+                    }
+
+                    .walletAddressText {
+                      font-size: 12px;
+                      color: black;
+                      margin-bottom: 15px; // .bitcoinAddressButton
+                    }
                   }
                 }
               }
 
-              &:last-child {
-                margin-bottom: 0;
-              }
-            }
+              .panelFooter {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
 
-            .panelFooter {
-              .coinbaseMessage {
-                display: inline-block;
-                max-width: 450px;
+                &.coinbaseFooter {
+                  justify-content: space-between;
+
+                  .coinbase {
+                    display: flex;
+                    align-items: center;
+
+                    .coinbaseMessage {
+                      display: inline-block;
+                      max-width: 450px;
+                    }
+                  }
+                }
               }
             }
           }
@@ -812,7 +908,7 @@ table.sortableTable {
           padding: 20px;
           display: flex;
           flex-wrap: wrap;
-          justify-content: center;
+          justify-content: flex-end;
 
           .recoveryFooterButtons {
             float: right;
