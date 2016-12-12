@@ -496,10 +496,11 @@ table.sortableTable {
       }
 
       &.paymentHistory {
+        @padding-horizontal: 30px;
+
         .dialog-header,
-        .dialog-body,
         .dialog-footer {
-          padding: 20px;
+          padding: 20px @padding-horizontal;
         }
 
         .dialog-header {
@@ -507,6 +508,8 @@ table.sortableTable {
           .sectionTitle {
             margin-bottom: 0;
             padding: 0;
+            color: @braveMediumOrange;
+            text-indent: 0;
           }
         }
 
@@ -514,28 +517,56 @@ table.sortableTable {
           background: #FFF;
           height: 300px;
           overflow-y: scroll;
+          padding-right: 0;
+          padding-left: 0;
 
           .paymentHistoryTable {
             background-color: #FFF;
 
-            tr {
-              th {
-                color: @darkGray;
-                font-weight: 500;
-                border-bottom: 2px solid @lightGray;
-                text-align: left;
-                width: 18%;
-              }
+            table {
+              border-spacing: 0;
+              margin-top: 1em;
+              margin-bottom: 1em;
 
-              td {
-                text-align: left;
+              tr {
 
-                &.narrow {
-                  color: @darkGray;
+                &:first-child {
+                  td {
+                    padding-top: .5em;
+                  }
                 }
 
-                &.wide {
-                  color: #777;
+                th,
+                td {
+                  &:first-child {
+                    padding-left: @padding-horizontal;
+                  }
+
+                  &:last-child {
+                    padding-right: @padding-horizontal;
+                  }
+                }
+
+                th {
+                  color: @darkGray;
+                  font-weight: 500;
+                  border-bottom: 2px solid @lightGray;
+                  width: 18%;
+                  padding-bottom: .25em;
+                }
+
+                td {
+                  white-space: nowrap;
+                  height: 1.5em;
+                  padding: .125em;
+
+                  &.narrow {
+                    color: @darkGray;
+                  }
+
+                  &.wide {
+                    color: #777;
+                  }
                 }
               }
             }
@@ -553,6 +584,10 @@ table.sortableTable {
 
             .nextPaymentSubmission {
               font-size: 14px;
+            }
+
+            .browserButton {
+              min-width: 80px;
             }
           }
         }
