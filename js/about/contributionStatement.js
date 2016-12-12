@@ -342,9 +342,9 @@ class ContributionStatement extends ImmutableComponent {
         {this.ContributionStatementHeader}
       </div>,
       pageIdx ? null : (
-        <div className='contributionStatementSection'>
-          {this.ContributionStatementSummaryBox}
-        </div>
+      <div className='contributionStatementSection'>
+        {this.ContributionStatementSummaryBox}
+      </div>
       ),
       <div className='contributionStatementSection'>
         {this.ContributionStatementDetailTable(page, pageIdx, totalPages)}
