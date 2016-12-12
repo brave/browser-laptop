@@ -472,12 +472,6 @@ Dispatches a message when the network is disconnected
 
 
 
-### submitFeedback() 
-
-Dispatches a message to submit feedback
-
-
-
 ### defaultBrowserUpdated(useBrave) 
 
 Dispatch a message to set default browser

@@ -10,7 +10,7 @@ const Immutable = require('immutable')
 const locale = require('../../js/l10n')
 const settings = require('../../js/constants/settings')
 const getSetting = require('../../js/settings').getSetting
-const issuesUrl = 'https://github.com/brave/browser-laptop/issues'
+const communityURL = 'https://community.brave.com/'
 const isDarwin = process.platform === 'darwin'
 
 let electron
@@ -260,7 +260,7 @@ module.exports.reportAnIssueMenuItem = () => {
     label: locale.translation('reportAnIssue'),
     click: function (item, focusedWindow) {
       module.exports.sendToFocusedWindow(focusedWindow,
-                                         [messages.SHORTCUT_NEW_FRAME, issuesUrl])
+                                         [messages.SHORTCUT_NEW_FRAME, communityURL])
     }
   }
 }
@@ -268,8 +268,9 @@ module.exports.reportAnIssueMenuItem = () => {
 module.exports.submitFeedbackMenuItem = () => {
   return {
     label: locale.translation('submitFeedback'),
-    click: function () {
-      appActions.submitFeedback()
+    click: function (item, focusedWindow) {
+      module.exports.sendToFocusedWindow(focusedWindow,
+                                         [messages.SHORTCUT_NEW_FRAME, communityURL])
     }
   }
 }
