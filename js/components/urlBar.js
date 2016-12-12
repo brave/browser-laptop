@@ -31,7 +31,6 @@ const {isUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
 class UrlBar extends ImmutableComponent {
   constructor () {
     super()
-    this.onActiveFrameStop = this.onActiveFrameStop.bind(this)
     this.onFocus = this.onFocus.bind(this)
     this.onBlur = this.onBlur.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
@@ -213,7 +212,7 @@ class UrlBar extends ImmutableComponent {
         break
       case KeyCodes.ESC:
         e.preventDefault()
-        ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_STOP)
+        this.props.onStop()
         this.clearSearchEngine()
         this.restore()
         this.select()
@@ -373,28 +372,12 @@ class UrlBar extends ImmutableComponent {
     this.detectSearchEngine()
   }
 
-  onActiveFrameStop () {
-    if (this.isFocused()) {
-      windowActions.setUrlBarActive(false)
-      if (!this.shouldRenderUrlBarSuggestions ||
-          // TODO: Once we take out suggestion generation from within URLBarSuggestions we can remove this check
-          // and put it in shouldRenderUrlBarSuggestions where it belongs.  See https://github.com/brave/browser-laptop/issues/3151
-          !this.props.urlbar.getIn(['suggestions', 'suggestionList']) ||
-          this.props.urlbar.getIn(['suggestions', 'suggestionList']).size === 0) {
-        this.restore()
-        windowActions.setUrlBarSelected(true)
-      }
-    }
-  }
-
   componentWillMount () {
     ipc.on(messages.SHORTCUT_FOCUS_URL, (e) => {
       windowActions.setRenderUrlBarSuggestions(false)
       windowActions.setUrlBarSelected(true)
       windowActions.setUrlBarActive(true)
     })
-    // escape key handling
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_STOP, this.onActiveFrameStop)
   }
 
   componentDidMount () {
