@@ -265,7 +265,7 @@ class LedgerTable extends ImmutableComponent {
     return [
       rank,
       {
-        html: <a href={publisherURL} target='_blank'>{verified ? this.getVerifiedIcon() : null}{faviconURL ? <img src={faviconURL} alt={site} /> : <span className='fa fa-file-o' />}<span>{site}</span></a>,
+        html: <div className='site'>{verified ? this.getVerifiedIcon() : null}<a href={publisherURL} target='_blank'>{faviconURL ? <img src={faviconURL} alt={site} /> : <span className='fa fa-file-o' />}<span>{site}</span></a></div>,
         value: site
       },
       {
@@ -337,9 +337,9 @@ class BitcoinDashboard extends ImmutableComponent {
   get qrcodeOverlayFooter () {
     if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
       return <div className='qrcodeOverlayFooter'>
-        <div id='coinbaseLogo' />
-        <a href='https://itunes.apple.com/us/app/coinbase-bitcoin-wallet/id886427730?mt=8' target='_blank' id='appstoreLogo' />
-        <a href='https://play.google.com/store/apps/details?id=com.coinbase.android' target='_blank' id='playstoreLogo' />
+        <div className='coinbaseLogo' />
+        <a target='_blank' className='appstoreLogo' href='https://itunes.apple.com/us/app/coinbase-bitcoin-wallet/id886427730?mt=8' />
+        <a target='_blank' className='playstoreLogo' href='https://play.google.com/store/apps/details?id=com.coinbase.android' />
       </div>
     } else {
       return null
@@ -437,7 +437,7 @@ class BitcoinDashboard extends ImmutableComponent {
       </div>
     } else if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
       return <div className='panelFooter'>
-        <div id='coinbaseLogo' />
+        <div className='coinbaseLogo' />
         <span className='coinbaseMessage' data-l10n-id='coinbaseMessage' />
         <Button l10nId='done' className='pull-right whiteButton' onClick={this.props.hideParentOverlay} />
       </div>
@@ -532,7 +532,7 @@ class PaymentHistory extends ImmutableComponent {
         addExportFilenamePrefixToTransactions(this.props.ledgerData.get('transactions').toJS())
     )
 
-    return <div id='paymentHistory'>
+    return <div className='paymentHistoryTable'>
       <table className='sort'>
         <thead>
           <tr>
@@ -1195,7 +1195,7 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get sidebarContent () {
-    return <div id='paymentsSidebar'>
+    return <div className='paymentsSidebar'>
       <h2 data-l10n-id='paymentsSidebarText1' />
       <div data-l10n-id='paymentsSidebarText2' />
       <a href='https://www.privateinternetaccess.com/' target='_blank'><div className='paymentsSidebarPIA' /></a>
