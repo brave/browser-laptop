@@ -430,7 +430,7 @@ var exports = {
 
     this.app.client.addCommand('getDefaultWindowHeight', function () {
       return this.execute(function () {
-        let screen = devTools('electron').screen
+        let screen = devTools('electron').remote.screen
         let primaryDisplay = screen.getPrimaryDisplay()
         return primaryDisplay.workAreaSize.height
       }).then((response) => response.value)
@@ -438,7 +438,7 @@ var exports = {
 
     this.app.client.addCommand('getDefaultWindowWidth', function () {
       return this.execute(function () {
-        let screen = devTools('electron').screen
+        let screen = devTools('electron').remote.screen
         let primaryDisplay = screen.getPrimaryDisplay()
         return primaryDisplay.workAreaSize.width
       }).then((response) => response.value)
@@ -446,7 +446,7 @@ var exports = {
 
     this.app.client.addCommand('getPrimaryDisplayHeight', function () {
       return this.execute(function () {
-        let screen = devTools('electron').screen
+        let screen = devTools('electron').remote.screen
         return screen.getPrimaryDisplay().bounds.height
       }).then((response) => response.value)
     })
@@ -459,7 +459,7 @@ var exports = {
 
     this.app.client.addCommand('getPrimaryDisplayWidth', function () {
       return this.execute(function () {
-        let screen = devTools('electron').screen
+        let screen = devTools('electron').remote.screen
         return screen.getPrimaryDisplay().bounds.width
       }).then((response) => response.value)
     })
