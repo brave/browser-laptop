@@ -1,15 +1,21 @@
 # Linux install instructions
 
-Signed packages are on their way, but in the meantime you can use the following.
-
 **NOTE**: _If you experience a problem with dependencies while installing, you may
 want to try installing `git` using the package manager for your distro._
 
-## Debian AMD64:
-To install brave using apt:
+## Debian and Ubuntu AMD64:
+To install brave using apt and lsb\_release :
+
 ``` 
 curl https://s3-us-west-2.amazonaws.com/brave-apt/keys.asc | sudo apt-key add -
-deb https://s3-us-west-2.amazonaws.com/brave-apt jesse main  
+echo "deb https://s3-us-west-2.amazonaws.com/brave-apt `lsb_release -sc` main" | sudo tee -a /etc/apt/sources.list
+```
+
+You will want to make sure the bottom line of /etc/apt/sources.list lists a new repository and doesn not contain the word lsb\_release. If you see the word lsb\_release you might not have lsb\_release installed. Otherwise run
+
+```
+sudo apt update
+sudo apt install brave
 ```
 
 Upgrades can be done via:
@@ -22,21 +28,7 @@ Alternatively you can install the deb directly but then you wont get automatic u
 wget -O brave.deb https://laptop-updates.brave.com/latest/dev/debian64
 sudo apt-get install -y gdebi && sudo gdebi brave.deb
 ```
-
-## Ubuntu AMD64:
-To install brave using apt:
-``` 
-curl https://s3-us-west-2.amazonaws.com/brave-apt/keys.asc | sudo apt-key add -
-echo "deb https://s3-us-west-2.amazonaws.com/brave-apt [xenial/trusty] main" | sudo tee -a /etc/apt/sources.list
-sudo apt update
-sudo apt install brave
-```
-
-Upgrades can be done via:
-```
-apt-get update && apt-get upgrade -y
-```
-Alternatively you can install the deb directly but then you wont get automatic upgrades with apt
+or for ubuntu
 ```
 wget -O brave.deb https://laptop-updates.brave.com/latest/dev/ubuntu64
 sudo dpkg -i ./brave.deb
