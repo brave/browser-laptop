@@ -1,43 +1,17 @@
 # Linux install instructions
 
-Signed packages are on their way, but in the meantime you can use the following.
-
-**NOTE**: _If you experience a problem with dependencies while installing, you may
-want to try installing `git` using the package manager for your distro._
-
-## Debian AMD64:
+## Debian or Ubuntu AMD64:
 To install brave using apt:
 ``` 
 curl https://s3-us-west-2.amazonaws.com/brave-apt/keys.asc | sudo apt-key add -
-deb https://s3-us-west-2.amazonaws.com/brave-apt jesse main  
+echo "deb https://s3-us-west-2.amazonaws.com/brave-apt [xenial/trusty] main" | sudo tee -a /etc/apt/sources.list
+sudo apt update
+sudo apt install brave -y
 ```
 
 Upgrades can be done via:
 ```
 apt-get update && apt-get upgrade -y
-```
-
-Alternatively you can install the deb directly but then you wont get automatic upgrades with apt
-```
-wget -O brave.deb https://laptop-updates.brave.com/latest/dev/debian64
-sudo apt-get install -y gdebi && sudo gdebi brave.deb
-```
-
-## Ubuntu AMD64:
-To install brave using apt:
-``` 
-curl https://s3-us-west-2.amazonaws.com/brave-apt/keys.asc | sudo apt-key add -
-deb https://s3-us-west-2.amazonaws.com/brave-apt [xenial/trusty] main  
-```
-
-Upgrades can be done via:
-```
-apt-get update && apt-get upgrade -y
-```
-Alternatively you can install the deb directly but then you wont get automatic upgrades with apt
-```
-wget -O brave.deb https://laptop-updates.brave.com/latest/dev/ubuntu64
-sudo dpkg -i ./brave.deb
 ```
 
 ## Mint AMD64:
