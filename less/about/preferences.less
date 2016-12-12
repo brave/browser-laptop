@@ -504,7 +504,6 @@ table.sortableTable {
       }
     }
   }
-
 }
 
 .modal .dialog.paymentHistory .sectionTitle {
@@ -565,10 +564,27 @@ div.nextPaymentSubmission {
 .paymentsContainer {
   @walletTableData: 235px + 30px; // .walletBar td (min-width + padding)
   @barMargin: 15px 0 30px;
+  @fontSize: 14.5px; // .form-control
 
   position: relative;
   overflow-x: hidden;
   width: 805px;
+
+  a {
+    vertical-align: middle;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    img {
+      width: 1.5em;
+      height: 1.5em;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+  }
 
   .titleBar {
     overflow: hidden;
@@ -609,15 +625,14 @@ div.nextPaymentSubmission {
     border-radius: @borderRadiusUIbox;
     margin: @barMargin;
     padding: 40px;
-    font-size: 1.3em;
-    line-height: 1.3em;
+    font-size: @fontSize;
+    line-height: 1.8em;
     color: @mediumGray;
     width: 500px;
     float: left;
 
     > div {
       padding: 0.5em 0;
-      font-size: 14px;
     }
 
     > h3 {
@@ -632,18 +647,55 @@ div.nextPaymentSubmission {
   }
 
   .walletBar {
-    padding: 20px;
-    padding-bottom: 10px;
+    @itemMargin: 12px; // button, .nextReconcileDate, .accountBalanceError, .nextReconcileDate
+
+    padding: calc(@itemMargin * 1.5);
     background: @lightGray;
     border-radius: @borderRadiusUIbox;
     margin: @barMargin;
 
+    th {
+      text-align: left;
+    }
+
+    tr {
+      height: 1em;
+    }
+
+    td {
+      font-size: @fontSize;
+      padding: 10px 30px 0 0; // .settingsList .settingItem > *:not(.switchControl) 10px
+      width: auto;
+      min-width: 235px;
+      vertical-align: top;
+
+      .settingsListContainer {
+        margin-bottom: 0;
+
+        .settingsList {
+          .settingItem {
+            .fundsAmount,
+            .fundsSelectBox,
+            .addFunds {
+              min-width: 180px;
+              width: auto;
+            }
+
+            .fundsSelectBox {
+              margin-bottom: 0;
+            }
+          }
+        }
+      }
+    }
+
     .settingsList .settingItem {
+
       .paymentHistoryButton {
         display: block;
+        font-size: @fontSize;
         color: @braveOrange;
-        font-size: 14px;
-        margin: 0;
+        margin-top: @itemMargin;
         padding: 0;
         text-align: left;
         cursor: pointer;
@@ -655,6 +707,10 @@ div.nextPaymentSubmission {
         vertical-align: 0;
         height: 100%;
         margin-bottom: 0;
+
+        span {
+          font-size: @fontSize; // for "Loading..." and .fundsFAQ
+        }
 
         > span {
           height: 2.25em; // .form-control
@@ -670,12 +726,18 @@ div.nextPaymentSubmission {
         }
 
         + button {
-          margin-top: 12px; // .nextReconcileDate
+          margin-top: @itemMargin;
         }
 
-        .fundsFAQ {
-          color: @gray;
-          margin: 0 0 0 5px;
+        a {
+          &:hover {
+            text-decoration: none;
+          }
+
+          .fundsFAQ {
+            color: @gray;
+            margin: 0 0 0 5px;
+          }
         }
       }
     }
@@ -689,7 +751,8 @@ div.nextPaymentSubmission {
     }
 
     td {
-      padding: 15px 30px 0 0;
+      font-size: @fontSize;
+      padding: 10px 30px 0 0; // .settingsList .settingItem > *:not(.switchControl) 10px
       width: auto;
       min-width: 235px;
       vertical-align: top;
@@ -699,11 +762,8 @@ div.nextPaymentSubmission {
 
         .fundsSelectBox {
           width: auto;
+          margin-bottom: 0;
         }
-      }
-
-      .walletStatus {
-        font-size: 14.5px; // .form-control
       }
     }
 
@@ -715,8 +775,11 @@ div.nextPaymentSubmission {
 
     .accountBalanceError,
     .nextReconcileDate {
-      font-size: 14px;
-      margin: 10px 0;
+      margin-top: @itemMargin;
+    }
+
+    .nextReconcileDate {
+      margin-bottom: 0;
     }
   }
 
@@ -726,6 +789,7 @@ div.nextPaymentSubmission {
 
   #paymentHistory {
     background-color: #FFF;
+
     tr {
        th {
          color: @darkGray;
@@ -747,7 +811,6 @@ div.nextPaymentSubmission {
   }
 
   tr {
-    height: 1.7em;
 
     th {
       color: @darkGray;
@@ -870,6 +933,10 @@ div.nextPaymentSubmission {
         }
       }
     }
+  }
+
+  .sort {
+    text-align: left;
   }
 
   .board {
