@@ -66,7 +66,7 @@ class UrlBarIcon extends ImmutableComponent {
       // NOTE: EV style not approved yet; see discussion at https://github.com/brave/browser-laptop/issues/791
       'fa-lock': this.isSecure,
       'fa-unlock': this.isInsecure,
-      'fa-search': this.isSearch,
+      'fa-search': this.isSearch && !this.isAboutPage,
       'fa-list': this.isAboutPage && !this.props.titleMode
     })
   }
@@ -77,12 +77,9 @@ class UrlBarIcon extends ImmutableComponent {
 
     return {
       backgroundImage: `url(${this.props.searchSelectEntry.image})`,
-      minWidth: searchIconSize,
-      width: searchIconSize,
       backgroundSize: searchIconSize,
-      height: searchIconSize,
-      marginTop: '3px',
-      marginRight: '3px'
+      width: searchIconSize,
+      height: searchIconSize
     }
   }
   onClick () {

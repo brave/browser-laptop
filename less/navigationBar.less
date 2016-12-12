@@ -616,23 +616,6 @@
     background: url('../img/toolbar/home_btn.svg') center no-repeat;
     background-size: 16px 16px;
   }
-
-  .bookmarkButton {
-    background: url('../img/toolbar/bookmark_btn.svg') center no-repeat;
-    -webkit-mask-repeat: no-repeat;
-    background-size: 14px 14px;
-    margin: 0;
-    height: 0;
-    width: 14px;
-    height: 14px;
-    position: relative;
-    left: 5px;
-
-    &.removeBookmarkButton {
-      background: url('../img/toolbar/bookmark_marked.svg') center no-repeat;
-      background-size: 14px 14px;
-    }
-  }
 }
 
 .navigatorWrapper {
@@ -666,17 +649,18 @@
   }
 }
 
+@urlbarFormHeight: 25px;
+
 .urlbarForm {
   width: 0; // Fixes #4298
   align-items: center;
   justify-content: center;
-  height: 25px;
-  padding: 0 10px;
+  height: @urlbarFormHeight;
+  padding: 0 10px 0 3px;
 
   display: flex;
   flex-grow: 1;
   min-width: 0%; // allow the navigator to shrink
-  position: relative;
 
   *:not(legend) {
     z-index: @zindexUrlbarNotLegend;
@@ -736,6 +720,7 @@
       animation-fill-mode: forwards;
     }
 
+    // Create 25x25 square and place .bookmarkButton at the center of it
     .bookmarkButtonContainer {
       border: 1px solid #CBCBCB;
       border-radius: @borderRadius;
@@ -745,9 +730,28 @@
       box-sizing: border-box;
       display: flex;
       align-items: center;
-      height: 25px;
-      width: 25px;
+      height: @urlbarFormHeight;
+      width: @urlbarFormHeight;
+      min-height: @urlbarFormHeight;
+      min-width: @urlbarFormHeight;
       -webkit-app-region: no-drag;
+
+      .bookmarkButton {
+        background: url('../img/toolbar/bookmark_btn.svg') center no-repeat;
+        -webkit-mask-repeat: no-repeat;
+        background-size: 14px 14px;
+        margin: 0;
+        height: 0;
+        width: 14px;
+        height: 14px;
+        position: relative;
+        left: 5px;
+
+        &.removeBookmarkButton {
+          background: url('../img/toolbar/bookmark_marked.svg') center no-repeat;
+          background-size: 14px 14px;
+        }
+      }
     }
   }
 
@@ -767,6 +771,7 @@
       overflow-x: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      margin-left: 2px;
 
       strong {
         font-weight: 600;
@@ -784,14 +789,6 @@
       left: 2px;
       min-width: 0;
 
-      &[class*=" fa-"] {
-        margin-right: 5px;
-        margin-top: 1px;
-        font-size: 14px;
-        min-height: 12px;
-        color: @chromeText;
-        min-width: 14px;
-      }
       &.fa-unlock {
         color: @siteInsecureColor;
         opacity: 1.0;
@@ -815,15 +812,11 @@
       color: @loadTimeColor;
       background: @navigationBarBackground;
       font-size: 12px;
-      right: 10px;
       text-align: right;
-      margin: 2px 0 0 0;
-      top: 9px;
       cursor: default;
-      padding-top: 1px;
 
       &.onFocus {
-          display: none;
+        display: none;
       }
     }
 
@@ -833,6 +826,8 @@
     }
 
     > * {
+      position: relative;
+      top: 1px;
       -webkit-app-region: no-drag;
     }
 
@@ -851,18 +846,16 @@
       box-sizing: border-box;
       color: @chromeText;
       cursor: text;
+      flex-grow: 1;
       font-size: @defaultFontSize;
       font-weight: normal;
-      margin: 2px 0 0 3px;
       outline: none;
       text-overflow: ellipsis;
-      flex-grow: 1;
       min-width: 0%; // allow the navigator to shrink
 
       &:hover {
         background: @chromeControlsBackground2;
       }
-
 
       &.private {
         background: @privateTabBackground;
@@ -870,32 +863,44 @@
       }
     }
 
-    .urlbarIcon {
-      color: @siteSecureColor;
-      margin-top: 1px;
-      font-size: 13px;
-      min-height: 10px;
-      min-width: 16px;
+    // Create 25x25 square and place .urlbarIcon at the center of it
+    .urlbarIconContainer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: @urlbarFormHeight;
+      width: @urlbarFormHeight;
+      min-height: @urlbarFormHeight;
+      min-width: @urlbarFormHeight;
 
-      &.fa-lock,
-      &.fa-unlock {
-        margin-top: 1px;
-        font-size: 16px;
-        min-height: 10px;
-        min-width: 16px;
-      }
+      .urlbarIcon {
+        color: @siteSecureColor;
+        font-size: 13px;
+        background-repeat: no-repeat;
+        background-position: center;
 
-      &.fa-unlock {
+        // about:newtab
+        &.fa-search {
+          position: relative;
+          bottom: 1px;
+        }
+
+        &.fa-lock,
+        &.fa-unlock {
+          font-size: 16px;
+        }
+
+        &.fa-unlock {
           color: @siteInsecureColor;
-      }
+        }
 
-      &.extendedValidation {
-        color: @siteEVColor;
+        &.extendedValidation {
+          color: @siteEVColor;
+        }
       }
     }
   }
 }
-
 
 .topLevelEndButtons .braveMenu {
   background-image: -webkit-image-set(url(../app/extensions/brave/img/braveBtn.png) 1x,
