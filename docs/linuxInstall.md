@@ -27,7 +27,9 @@ sudo apt-get install -y gdebi && sudo gdebi brave.deb
 To install brave using apt:
 ``` 
 curl https://s3-us-west-2.amazonaws.com/brave-apt/keys.asc | sudo apt-key add -
-deb https://s3-us-west-2.amazonaws.com/brave-apt [xenial/trusty] main  
+echo "deb https://s3-us-west-2.amazonaws.com/brave-apt [xenial/trusty] main" | sudo tee -a /etc/apt/sources.list
+sudo apt update
+sudo apt install brave
 ```
 
 Upgrades can be done via:
