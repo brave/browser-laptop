@@ -20,6 +20,18 @@
         padding-bottom: 1rem;
       }
 
+      .buttons {
+        display: flex;
+        flex-flow: row wrap;
+        position: relative;
+        right: .2em; // cancel margin: .2em to align .buttons and .certErrorText
+
+        > .browserButton {
+          margin: .2em;
+          font-size: 14px;
+        }
+      }
+
       .errorLogo {
         margin-bottom: 2rem;
 
