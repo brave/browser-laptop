@@ -270,14 +270,12 @@ var backupKeys = (appState, action) => {
     if (err) {
       console.log(err)
     } else {
-      Tabs.create({url: fileUrl(filePath)}).then((webContents) => {
+      Tabs.create({url: fileUrl(filePath)}, (webContents) => {
         if (action.backupAction === 'print') {
           webContents.print({silent: false, printBackground: false})
         } else {
           webContents.downloadURL(fileUrl(filePath))
         }
-      }).catch((err) => {
-        console.error(err)
       })
     }
   })
