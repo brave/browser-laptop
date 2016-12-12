@@ -1019,7 +1019,7 @@ class PaymentsTab extends ImmutableComponent {
     return <div className='board'>
       <div className='panel advancedSettings'>
         <div className='settingsPanelDivider'>
-          <div data-l10n-id='minimumPageTimeSetting' />
+          <div className='minimumPageTimeSetting' data-l10n-id='minimumPageTimeSetting' />
           <SettingsList>
             <SettingItem>
               <select
@@ -1032,7 +1032,7 @@ class PaymentsTab extends ImmutableComponent {
               </select>
             </SettingItem>
           </SettingsList>
-          <div data-l10n-id='minimumVisitsSetting' />
+          <div className='minimumVisitsSetting' data-l10n-id='minimumVisitsSetting' />
           <SettingsList>
             <SettingItem>
               <select
@@ -1079,7 +1079,7 @@ class PaymentsTab extends ImmutableComponent {
     const passphrase = this.props.ledgerData.get('passphrase')
 
     return <div className='board'>
-      <div className='panel'>
+      <div className='panel ledgerBackupContent'>
         <span data-l10n-id='ledgerBackupContent' />
         <div className='copyKeyContainer'>
           <div className='copyContainer'>
@@ -1136,13 +1136,13 @@ class PaymentsTab extends ImmutableComponent {
       }
       <div className='panel recoveryContent'>
         <h4 data-l10n-id='ledgerRecoverySubtitle' />
-        <span data-l10n-id='ledgerRecoveryContent' />
+        <div className='ledgerRecoveryContent' data-l10n-id='ledgerRecoveryContent' />
         <SettingsList>
           <SettingItem>
             <h3 data-l10n-id='firstRecoveryKey' />
-            <input className='form-control' onChange={this.handleFirstRecoveryKeyChange} type='text' />
+            <input className='form-control firstRecoveryKey' onChange={this.handleFirstRecoveryKeyChange} type='text' />
             <h3 data-l10n-id='secondRecoveryKey' />
-            <input className='form-control' onChange={this.handleSecondRecoveryKeyChange} type='text' />
+            <input className='form-control secondRecoveryKey' onChange={this.handleSecondRecoveryKeyChange} type='text' />
           </SettingItem>
         </SettingsList>
       </div>

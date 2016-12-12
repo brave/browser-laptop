@@ -555,7 +555,9 @@ table.sortableTable {
       .dialog-body {
         .board {
           .panel {
-            &.advancedSettings {
+            &.advancedSettings,
+            &.ledgerBackupContent,
+            &.recoveryContent {
               padding-left: 50px;
               padding-right: 50px;
 
@@ -564,10 +566,27 @@ table.sortableTable {
               }
             }
 
+            &.advancedSettings {
+              .settingsPanelDivider {
+                .settingsListContainer:last-child {
+                  margin-bottom: 0;
+                }
+              }
+            }
+
             &.recoveryContent {
               h4,
-              span {
+              .ledgerRecoveryContent {
                 margin-bottom: 20px;
+
+                & + .settingsListContainer {
+                  margin-bottom: 0;
+
+                  .firstRecoveryKey,
+                  .secondRecoveryKey {
+                    margin-bottom: 20px;
+                  }
+                }
               }
             }
 
@@ -583,6 +602,12 @@ table.sortableTable {
               &:nth-child(2) {
                 text-align: right;
               }
+
+              .minimumPageTimeSetting,
+              .minimumVisitsSetting {
+                margin-bottom: 12px; // @itemMargin in .walletBar
+              }
+
             }
 
             .copyKeyContainer {
@@ -603,6 +628,10 @@ table.sortableTable {
 
                 h3 {
                   margin-bottom: 15px;
+                }
+
+                > span {
+                  white-space: nowrap;
                 }
               }
             }
@@ -780,8 +809,7 @@ table.sortableTable {
 
       .dialog-footer {
         .advancedSettingsFooter {
-          padding-top: 20px;
-          padding-bottom: 20px;
+          padding: 20px;
           display: flex;
           flex-wrap: wrap;
           justify-content: center;
