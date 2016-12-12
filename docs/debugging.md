@@ -82,11 +82,11 @@ See [tests.md](https://github.com/brave/browser-laptop/blob/master/docs/tests.md
 
 ### Logging
 
-Enable Chrome logging (same as `—enable-logging`, but set at the right time)
+Enable Chromium and electron logging using:
 
-```
-export ELECTRON_ENABLE_LOGGING=stderr
-```
+`npm run start-log`
+
+This will pass `--enable-logging=stderr` and set the log level to `--v=1` to `start.js`.
 
 https://www.chromium.org/for-testers/enable-logging
 [docs/api/chrome-command-line-switches.md](https://github.com/brave/electron/blob/master/docs/api/chrome-command-line-switches.md) from electron docs.
