@@ -68,7 +68,17 @@ class NavigationBar extends ImmutableComponent {
   }
 
   onStop () {
-    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_STOP)
+    if (this.props.navbar.getIn(['urlbar', 'focused'])) {
+      windowActions.setUrlBarActive(false)
+      const shouldRenderSuggestions = this.props.navbar.getIn(['urlbar', 'suggestions', 'shouldRender']) === true
+      const suggestionList = this.props.navbar.getIn(['urlbar', 'suggestions', 'suggestionList'])
+      if (!shouldRenderSuggestions ||
+          // TODO: Once we take out suggestion generation from within URLBarSuggestions we can remove this check
+          // and put it in shouldRenderUrlBarSuggestions where it belongs.  See https://github.com/brave/browser-laptop/issues/3151
+          !suggestionList || suggestionList.size === 0) {
+        windowActions.setUrlBarSelected(true)
+      }
+    }
   }
 
   get bookmarked () {
@@ -190,6 +200,7 @@ class NavigationBar extends ImmutableComponent {
         endLoadTime={this.props.endLoadTime}
         titleMode={this.titleMode}
         urlbar={this.props.navbar.get('urlbar')}
+        onStop={this.onStop}
         menubarVisible={this.props.menubarVisible}
         />
       {
