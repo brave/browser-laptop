@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.12.15](https://github.com/brave/browser-laptop/releases/v0.12.15dev)
+- Added Yandex as a new search engine. ([#2703](https://github.com/brave/browser-laptop/issues/2703))
+- Added Qwant as a new search engine. ([#2701](https://github.com/brave/browser-laptop/issues/2701))
+- Added Semantic Scholar as a new search engine. ([#5656](https://github.com/brave/browser-laptop/issues/5656))
+- Added a "Copy to Cliboard" button in about:brave. ([#5790](https://github.com/brave/browser-laptop/issues/5790))
+- Changed "Submit Feedback..." link to use community.brave.com. ([#6179](https://github.com/brave/browser-laptop/issues/6179))
+- Fixed a Windows installer issue causing shortcuts to try and open brave.exe. ([#6075](https://github.com/brave/browser-laptop/issues/6075))
+- Fixed alignment for icons on about pages. ([#6137](https://github.com/brave/browser-laptop/issues/6137))
+- Fixed blue line appearing above page contents after some page loads. ([#5661](https://github.com/brave/browser-laptop/issues/5661))
+- Moved default zoom level from Advanced to General prefs. ([#5697](https://github.com/brave/browser-laptop/issues/5697))
+
 ## [0.12.14](https://github.com/brave/browser-laptop/releases/v0.12.14dev)
 - Muon updated to 1.4.31 to address Symantec issued cert problems
 
