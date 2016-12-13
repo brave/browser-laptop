@@ -552,15 +552,6 @@ const appActions = {
   },
 
   /**
-   * Dispatches a message to submit feedback
-   */
-  submitFeedback: function () {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SUBMIT_FEEDBACK
-    })
-  },
-
-  /**
    * Dispatch a message to set default browser
    *
    * @param {boolean} useBrave - whether set Brave as default browser

@@ -16,6 +16,10 @@ To download the latest release, [see our releases page](https://github.com/brave
 
 For a more user-friendly download page, [please visit our website](https://brave.com/downloads.html).
 
+## Community
+
+[The Brave Community](https://community.brave.com/)
+
 ## Useful documentation
 
 * See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for tips and guidelines about contributing.

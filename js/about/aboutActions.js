@@ -307,15 +307,6 @@ const aboutActions = {
   },
 
   /**
-   * Dispatches a message to submit feedback
-   */
-  submitFeedback: function () {
-    aboutActions.dispatchAction({
-      actionType: appConstants.APP_SUBMIT_FEEDBACK
-    })
-  },
-
-  /**
    * Show the "Add Bookmark" control
    * @param {Object} siteDetail - object bound to add/edit control
    */

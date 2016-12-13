@@ -30,8 +30,6 @@ const diff = require('immutablediff')
 const debounce = require('../lib/debounce.js')
 const locale = require('../../app/locale')
 const path = require('path')
-const {channel} = require('../../app/channel')
-const os = require('os')
 const autofill = require('../../app/autofill')
 
 // state helpers
@@ -762,16 +760,6 @@ const handleAppAction = (action) => {
       })
       return
     }
-    case AppConstants.APP_SUBMIT_FEEDBACK:
-      let platform = os.platform()
-      if (platform === 'darwin') {
-        platform = 'macOS'
-      } else if (platform === 'windows') {
-        platform = 'Windows'
-      }
-      const subject = encodeURIComponent(`Brave ${platform} ${os.arch()} ${app.getVersion()}${channel()} feedback`)
-      electron.shell.openExternal(`${appConfig.contactUrl}?subject=${subject}`)
-      break
     case AppConstants.APP_DEFAULT_BROWSER_UPDATED:
       if (action.useBrave) {
         for (const p of defaultProtocols) {
