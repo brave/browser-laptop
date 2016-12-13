@@ -1,4 +1,5 @@
-/* global describe, it, beforeEach */
+/* global describe, it, beforeEach, before, after */
+const mockery = require('mockery')
 const settings = require('../../js/settings')
 const settingsConst = require('../../js/constants/settings')
 const {passwordManagers, extensionIds, displayNames} = require('../../js/constants/passwordManagers')
@@ -12,6 +13,18 @@ require('./braveUnit')
 describe('settings unit test', function () {
   let settingsCollection = null
 
+  before(function () {
+    mockery.enable({
+      warnOnReplace: false,
+      warnOnUnregistered: false,
+      useCleanCache: true
+    })
+  })
+
+  after(function () {
+    mockery.disable()
+  })
+
   beforeEach(function () {
     settingsCollection = {}
   })
@@ -23,9 +36,24 @@ describe('settings unit test', function () {
       assert.equal(response, 'testValue')
     })
 
-    it('returns default value from appConfig if not found', function () {
+    it('returns value from appConfig if both collection and appStore not found', function () {
       const response = settings.getSetting(settingsConst.TABS_PER_PAGE, settingsCollection)
       assert.equal(response, appConfig.defaultSettings[settingsConst.TABS_PER_PAGE])
+    })
+
+    it('returns value from appStore if collection not found', function () {
+      const nonDefaultValue = appConfig.defaultSettings[settingsConst.TABS_PER_PAGE] + 10
+      let settingsState = {}
+      settingsState[settingsConst.TABS_PER_PAGE] = nonDefaultValue
+      mockery.registerMock('./stores/appStoreRenderer', {
+        get state () {
+          return Immutable.fromJS({
+            settings: settingsState
+          })
+        }
+      })
+      const response = settings.getSetting(settingsConst.TABS_PER_PAGE, settingsCollection)
+      assert.equal(response, nonDefaultValue)
     })
 
     describe('when setting default value for new config entries (based on previous session data)', function () {
