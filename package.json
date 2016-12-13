@@ -138,7 +138,7 @@
     "electron-builder": "^2.3.1",
     "electron-packager": "brave/electron-packager",
     "electron-rebuild": "^1.1.1",
-    "electron-winstaller": "^2.3.0",
+    "electron-winstaller": "2.4.0",
     "empty-port": "0.0.2",
     "flow-bin": "^0.22.1",
     "gulp": "^3.9.0",
