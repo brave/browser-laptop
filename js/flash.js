@@ -87,23 +87,27 @@ const handleFlashInstallUrl = (details, isPrivate) => {
 }
 
 module.exports.checkFlashInstalled = (cb) => {
-  const pepperFlashSystemPluginPath = getPepperFlashPath()
-  const pepperFlashManifestPath = path.resolve(pepperFlashSystemPluginPath, '..', 'manifest.json')
-  fs.readFile(pepperFlashManifestPath, (err, data) => {
-    try {
-      if (err || !data) {
-        flashInstalled = false
-      } else {
-        const manifest = JSON.parse(data)
-        app.commandLine.appendSwitch('ppapi-flash-path', pepperFlashSystemPluginPath)
-        app.commandLine.appendSwitch('ppapi-flash-version', manifest.version)
-        flashInstalled = true
+  try {
+    const pepperFlashSystemPluginPath = getPepperFlashPath()
+    const pepperFlashManifestPath = path.resolve(pepperFlashSystemPluginPath, '..', 'manifest.json')
+    fs.readFile(pepperFlashManifestPath, (err, data) => {
+      try {
+        if (err || !data) {
+          flashInstalled = false
+        } else {
+          const manifest = JSON.parse(data)
+          app.commandLine.appendSwitch('ppapi-flash-path', pepperFlashSystemPluginPath)
+          app.commandLine.appendSwitch('ppapi-flash-version', manifest.version)
+          flashInstalled = true
+        }
+      } finally {
+        appActions.changeSetting(settings.FLASH_INSTALLED, flashInstalled)
+        cb && cb(flashInstalled)
       }
-    } finally {
-      appActions.changeSetting(settings.FLASH_INSTALLED, flashInstalled)
-      cb && cb(flashInstalled)
-    }
-  })
+    })
+  } catch (e) {
+    cb && cb(flashInstalled)
+  }
 }
 
 module.exports.init = () => {
