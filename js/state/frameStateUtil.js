@@ -214,6 +214,10 @@ function getPartitionNumber (partition) {
   return matches && matches[0]
 }
 
+function isPrivatePartition (partition) {
+  return partition && !partition.startsWith('persist:')
+}
+
 function isSessionPartition (partition) {
   return partition && partition.startsWith('persist:partition-')
 }
@@ -509,6 +513,7 @@ module.exports = {
   isAncestorFrameKey,
   isFrameKeyActive,
   isFrameKeyPinned,
+  isPrivatePartition,
   isSessionPartition,
   getFrameIndex,
   getFrameDisplayIndex,

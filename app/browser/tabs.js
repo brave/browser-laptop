@@ -43,11 +43,12 @@ const api = {
         location = 'about:blank'
       }
 
+      // TODO(bridiver) - handle pinned property?? - probably through tabValue
       const frameOpts = {
         location,
         partition: newTab.session.partition,
         guestInstanceId: newTab.guestInstanceId,
-        active: disposition !== 'background-tab'
+        disposition
       }
 
       if (disposition === 'new-window' || disposition === 'new-popup') {

@@ -172,15 +172,20 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
   // handle tabs.create properties
   insertionIndex = frameOpts.index || insertionIndex
 
-  if (frameOpts.active !== undefined) {
-    openInForeground = frameOpts.active
+  if (frameOpts.partition) {
+    frameOpts.isPrivate = FrameStateUtil.isPrivatePartition(frameOpts.partition)
+    if (FrameStateUtil.isSessionPartition(frameOpts.partition)) {
+      frameOpts.partitionNumber = FrameStateUtil.getPartitionNumber(frameOpts.partition)
+    }
+  }
+
+  if (frameOpts.disposition) {
+    openInForeground = frameOpts.disposition !== 'background-tab'
   }
 
   if (openInForeground === undefined) {
     openInForeground = true
   }
-
-  // TODO(bridiver) - handle pinned property
 
   // evaluate the location
   frameOpts.location = frameOpts.location || newFrameUrl()
@@ -199,10 +204,6 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
   }
 
   let partitionNumber = frameOpts.partitionNumber
-  if (!partitionNumber && frameOpts.partition) {
-    partitionNumber = FrameStateUtil.getPartitionNumber(frameOpts.partition)
-  }
-
   let nextPartitionNumber = 0
   if (partitionNumber) {
     nextPartitionNumber = partitionNumber
