@@ -9,7 +9,7 @@ want to try installing `git` using the package manager for your distro._
 To install brave using apt:
 ``` 
 curl https://s3-us-west-2.amazonaws.com/brave-apt/keys.asc | sudo apt-key add -
-deb https://s3-us-west-2.amazonaws.com/brave-apt jesse main  
+deb [arch=amd64]  https://s3-us-west-2.amazonaws.com/brave-apt jesse main  
 ```
 
 Upgrades can be done via:
@@ -27,7 +27,7 @@ sudo apt-get install -y gdebi && sudo gdebi brave.deb
 To install brave using apt:
 ``` 
 curl https://s3-us-west-2.amazonaws.com/brave-apt/keys.asc | sudo apt-key add -
-echo "deb https://s3-us-west-2.amazonaws.com/brave-apt [xenial/trusty] main" | sudo tee -a /etc/apt/sources.list
+echo "deb [arch=amd64] https://s3-us-west-2.amazonaws.com/brave-apt [xenial/trusty] main" | sudo tee -a /etc/apt/sources.list
 sudo apt update
 sudo apt install brave
 ```
