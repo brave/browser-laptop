@@ -344,7 +344,7 @@ class Main extends ImmutableComponent {
         }
       }
       let openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS) === true || options.openInForeground
-      const frameOpts = {
+      const frameOpts = options.frameOpts || {
         location: url,
         isPrivate: !!options.isPrivate,
         isPartitioned: !!options.isPartitioned,

@@ -169,9 +169,18 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
   }
   frameOpts = frameOpts.toJS ? frameOpts.toJS() : frameOpts
 
+  // handle tabs.create properties
+  insertionIndex = frameOpts.index || insertionIndex
+
+  if (frameOpts.active !== undefined) {
+    openInForeground = frameOpts.active
+  }
+
   if (openInForeground === undefined) {
     openInForeground = true
   }
+
+  // TODO(bridiver) - handle pinned property
 
   // evaluate the location
   frameOpts.location = frameOpts.location || newFrameUrl()
@@ -189,12 +198,14 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
     }
   }
 
-  if (nextKey === undefined) {
-    nextKey = incrementNextKey()
+  let partitionNumber = frameOpts.partitionNumber
+  if (!partitionNumber && frameOpts.partition) {
+    partitionNumber = FrameStateUtil.getPartitionNumber(frameOpts.partition)
   }
+
   let nextPartitionNumber = 0
-  if (frameOpts.partitionNumber) {
-    nextPartitionNumber = frameOpts.partitionNumber
+  if (partitionNumber) {
+    nextPartitionNumber = partitionNumber
     if (currentPartitionNumber < nextPartitionNumber) {
       currentPartitionNumber = nextPartitionNumber
     }
@@ -220,6 +231,10 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
   }
   if (FrameStateUtil.isFrameKeyPinned(frames, frameOpts.parentFrameKey)) {
     insertionIndex = 0
+  }
+
+  if (nextKey === undefined) {
+    nextKey = incrementNextKey()
   }
 
   windowState = windowState.merge(
@@ -644,11 +659,11 @@ const doAction = (action) => {
       if (!action.detail) {
         if (windowState.getIn('contextMenuDetail', 'type') === 'autofill' &&
             windowState.getIn('contextMenuDetail', 'tabId') === action.tabId) {
+          windowState = windowState.delete('contextMenuDetail')
           if (action.notify) {
             ipc.send('autofill-popup-hidden', action.tabId)
           }
         }
-        windowState = windowState.delete('contextMenuDetail')
       } else {
         windowState = windowState.set('contextMenuDetail', action.detail)
       }

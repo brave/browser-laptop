@@ -9,7 +9,6 @@ const webviewActions = require('../actions/webviewActions')
 const appActions = require('../actions/appActions')
 const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
-const immutableUtil = require('../../app/common/state/immutableUtil')
 const cx = require('../lib/classSet')
 const siteUtil = require('../state/siteUtil')
 const FrameStateUtil = require('../state/frameStateUtil')
@@ -264,45 +263,49 @@ class Frame extends ImmutableComponent {
     let location = this.props.location
     newSrc = newSrc || this.props.src
 
+    if (isSourceAboutUrl(newSrc)) {
+      newSrc = getTargetAboutUrl(newSrc)
+    } else if (isTorrentViewerURL(newSrc)) {
+      newSrc = getTargetMagnetUrl(newSrc)
+    }
+
+    let guestInstanceId = null
+
     // Create the webview dynamically because React doesn't whitelist all
     // of the attributes we need
     let webviewAdded = false
-    let guestInstanceId = null
     if (this.shouldCreateWebview()) {
-      // only set the guestInstanceId if this is a new frame
-      if (this.webview == null) {
-        guestInstanceId = this.props.guestInstanceId
-      }
-      while (this.webviewContainer.firstChild) {
-        this.webviewContainer.removeChild(this.webviewContainer.firstChild)
-      }
-      // the webview tag is where the user's page is rendered (runs in its own process)
-      // @see http://electron.atom.io/docs/api/web-view-tag/
+      guestInstanceId = this.props.guestInstanceId
       this.webview = document.createElement('webview')
+      if (guestInstanceId) {
+        if (!this.webview.setGuestInstanceId(guestInstanceId)) {
+          console.error('could not set guestInstanceId ' + guestInstanceId)
+          guestInstanceId = null
+        }
+      } else {
+        let partition = FrameStateUtil.getPartition(this.frame)
+        ipc.sendSync(messages.INITIALIZE_PARTITION, partition)
+        this.webview.setAttribute('partition', partition)
+      }
+
       this.addEventListeners()
       if (cb) {
         this.runOnDomReady = cb
         let eventCallback = (e) => {
           this.webview.removeEventListener(e.type, eventCallback)
-          // handle deprectaed zoom level site settings
-          if (this.zoomLevel) {
-            this.webview.setZoomLevel(this.zoomLevel)
-          }
           this.runOnDomReady()
           delete this.runOnDomReady
         }
         this.webview.addEventListener('did-attach', eventCallback)
       }
-      let partition = FrameStateUtil.getPartition(this.frame)
-      ipc.sendSync(messages.INITIALIZE_PARTITION, partition)
-      this.webview.setAttribute('partition', partition)
-      if (guestInstanceId) {
-        if (!this.webview.setGuestInstanceId(guestInstanceId)) {
-          guestInstanceId = null
-        }
-      }
+
       webviewAdded = true
     }
+
+    if (!guestInstanceId || newSrc !== getTargetAboutUrl('about:blank')) {
+      this.webview.setAttribute('src', newSrc)
+    }
+
     this.webview.setAttribute('data-frame-key', this.props.frameKey)
 
     const parsedUrl = urlParse(location)
@@ -312,14 +315,6 @@ class Frame extends ImmutableComponent {
     const hack = siteHacks[parsedUrl.hostname]
     if (hack && hack.userAgent) {
       this.webview.setUserAgentOverride(hack.userAgent)
-    }
-
-    if (!guestInstanceId || newSrc !== 'about:blank') {
-      let webviewSrc
-      if (isSourceAboutUrl(newSrc)) webviewSrc = getTargetAboutUrl(newSrc)
-      else if (isTorrentViewerURL(newSrc)) webviewSrc = getTargetMagnetUrl(newSrc)
-      else webviewSrc = newSrc
-      this.webview.setAttribute('src', webviewSrc)
     }
 
     if (webviewAdded) {
@@ -673,32 +668,6 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('mouseleave', (e) => {
       currentWindow.webContents.send(messages.DISABLE_SWIPE_GESTURE)
     })
-    // @see <a href="https://github.com/atom/electron/blob/master/docs/api/web-view-tag.md#event-new-window">new-window event</a>
-    this.webview.addEventListener('new-window', (e) => {
-      let guestInstanceId = e.options && e.options.guestInstanceId
-      let windowOpts = e.options && e.options.windowOptions || {}
-      windowOpts.parentWindowKey = currentWindow.id
-      windowOpts.disposition = e.disposition
-      let delayedLoadUrl = e.options && e.options.delayedLoadUrl
-
-      let frameOpts = {
-        location: e.url,
-        parentFrameKey: this.props.frameKey,
-        isPrivate: this.props.isPrivate,
-        partitionNumber: this.props.partitionNumber,
-        // use the delayed load url for the temporary title
-        delayedLoadUrl,
-        guestInstanceId
-      }
-
-      if (e.disposition === 'new-window' || e.disposition === 'new-popup') {
-        appActions.newWindow(frameOpts, windowOpts)
-      } else {
-        let openInForeground = this.props.prefOpenInForeground === true ||
-          e.disposition !== 'background-tab'
-        windowActions.newFrame(frameOpts, openInForeground)
-      }
-    })
     this.webview.addEventListener('did-attach', (e) => {
       let tabId = this.webview.getWebContents().getId()
       if (this.props.tabId !== tabId) {
@@ -712,20 +681,14 @@ class Frame extends ImmutableComponent {
       this.props.onCloseFrame(this.frame)
     })
     this.webview.addEventListener('page-favicon-updated', (e) => {
-      // TODO(Anthony): more general solution on muon to prevent weview event
-      // from emitting after tab closed
-      if (e.favicons && e.favicons.length > 0 && immutableUtil.isImmutable(this.frame)) {
+      if (e.favicons && e.favicons.length > 0) {
         imageUtil.getWorkingImageUrl(e.favicons[0], (imageFound) => {
           windowActions.setFavicon(this.frame, imageFound ? e.favicons[0] : null)
         })
       }
     })
     this.webview.addEventListener('page-title-updated', ({title}) => {
-      // TODO(Anthony): more general solution on muon to prevent weview event
-      // from emitting after tab closed
-      if (immutableUtil.isImmutable(this.frame)) {
-        windowActions.setFrameTitle(this.frame, title)
-      }
+      windowActions.setFrameTitle(this.frame, title)
     })
     this.webview.addEventListener('show-autofill-settings', (e) => {
       windowActions.newFrame({ location: 'about:autofill' }, true)
@@ -734,14 +697,7 @@ class Frame extends ImmutableComponent {
       contextMenus.onShowAutofillMenu(e.suggestions, e.rect, this.frame)
     })
     this.webview.addEventListener('hide-autofill-popup', (e) => {
-      // TODO(Anthony): more general solution on muon to prevent weview event
-      // from emitting after tab closed
-      if (immutableUtil.isImmutable(this.frame)) {
-        let webContents = this.webview.getWebContents()
-        if (webContents && webContents.isFocused()) {
-          windowActions.autofillPopupHidden(this.props.tabId)
-        }
-      }
+      windowActions.autofillPopupHidden(this.props.tabId)
     })
     this.webview.addEventListener('ipc-message', (e) => {
       let method = () => {}
@@ -1010,9 +966,7 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('did-get-response-details', (details) => {
-      if (immutableUtil.isImmutable(this.frame)) {
-        windowActions.gotResponseDetails(this.frame.get('tabId'), details)
-      }
+      windowActions.gotResponseDetails(this.frame.get('tabId'), details)
     })
     // Handle zoom using Ctrl/Cmd and the mouse wheel.
     // this.webview.addEventListener('mousewheel', this.onMouseWheel.bind(this))

@@ -66,13 +66,13 @@ module.exports.getGenDir = function (url) {
 
 module.exports.getBraveIndexPath = function (relateivePath = '') {
   return module.exports.fileUrl(
-      path.resolve(__dirname, '..', '..') + '/app/extensions/brave/' + relateivePath)
+      path.resolve(__dirname, '..', '..') + '/app/extensions/brave/' + relateivePath).replace('file://', 'chrome://brave')
 }
 
 module.exports.getBraveExtIndexHTML = function () {
   return process.env.NODE_ENV === 'development'
-    ? module.exports.getBraveIndexPath('index-dev.html').replace('file://', 'chrome://brave')
-    : module.exports.getBraveIndexPath('index.html').replace('file://', 'chrome://brave')
+    ? module.exports.getBraveIndexPath('index-dev.html')
+    : module.exports.getBraveIndexPath('index.html')
 }
 
 /**

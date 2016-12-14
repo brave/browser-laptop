@@ -1,7 +1,8 @@
-const {app, extensions, webContents} = require('electron')
 const appActions = require('../../js/actions/appActions')
-const { makeImmutable } = require('../common/state/immutableUtil')
+const messages = require('../..//js/constants/messages')
 const tabState = require('../common/state/tabState')
+const {app, extensions, webContents} = require('electron')
+const { makeImmutable } = require('../common/state/immutableUtil')
 
 let currentWebContents = {}
 
@@ -31,9 +32,30 @@ const updateTab = (tabId) => {
 
 const api = {
   init: (state, action) => {
-    process.on('add-new-contents', (e, openerTab, newTab, disposition, userGesture) => {
+    process.on('add-new-contents', (e, source, newTab, disposition, size, userGesture) => {
       if (userGesture === false) {
         e.preventDefault()
+        return
+      }
+
+      let location = newTab.getURL()
+      if (!location || location === '') {
+        location = 'about:blank'
+      }
+
+      const frameOpts = {
+        location,
+        partition: newTab.session.partition,
+        guestInstanceId: newTab.guestInstanceId,
+        active: disposition !== 'background-tab'
+      }
+
+      if (disposition === 'new-window' || disposition === 'new-popup') {
+        const windowOpts = makeImmutable(size)
+        appActions.newWindow(makeImmutable(frameOpts), windowOpts)
+      } else {
+        let hostWebContents = source.hostWebContents || source
+        hostWebContents.send(messages.SHORTCUT_NEW_FRAME, location, { frameOpts })
       }
     })
     app.on('web-contents-created', function (event, tab) {

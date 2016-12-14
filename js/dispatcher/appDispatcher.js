@@ -117,12 +117,18 @@ if (process.type === 'browser') {
 
     let queryInfo = payload.queryInfo || payload.frameProps || (payload.queryInfo = {})
     queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
-    if (event.sender.hostWebContents) {
+    if (!event.sender.isDestroyed() && event.sender.hostWebContents) {
       // received from an extension
       // only extension messages will have a hostWebContents
-      let win = require('electron').BrowserWindow.fromWebContents(event.sender.hostWebContents)
+
       // default to the windowId of the hostWebContents
-      queryInfo.windowId = queryInfo.windowId || win.id
+      if (!queryInfo.windowId) {
+        let win = require('electron').BrowserWindow.fromWebContents(event.sender.hostWebContents)
+        if (!win) {
+          return
+        }
+        queryInfo.windowId = win.id
+      }
       // add queryInfo if we only had frameProps before
       payload.queryInfo = queryInfo
 
