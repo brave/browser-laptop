@@ -58,5 +58,50 @@ module.exports = [
     "source": "https://s3.amazonaws.com/brave-backgrounds/dksfoto11.jpg",
     "author": "Darrell Sano",
     "link": "http://dksfoto.smugmug.com"
+  }, {
+    "name": "Corsica",
+    "source": "https://s3.amazonaws.com/brave-backgrounds/Phoyoserge_Corsica.jpg",
+    "author": "Serge Ramelli",
+    "link": "http://www.photoserge.com/"
+  }, {
+    "name": "Corsica",
+    "source": "https://s3.amazonaws.com/brave-backgrounds/Phoyoserge_Corsica2.jpg",
+    "author": "Serge Ramelli",
+    "link": "http://www.photoserge.com/"
+  }, {
+    "name": "Downtown Griffith",
+    "source": "https://s3.amazonaws.com/brave-backgrounds/Phoyoserge_DowntownGriffith.jpg",
+    "author": "Serge Ramelli",
+    "link": "http://www.photoserge.com/"
+  }, {
+    "name": "Elmatador Beach",
+    "source": "https://s3.amazonaws.com/brave-backgrounds/Phoyoserge_ElmatadorBeach.jpg",
+    "author": "Serge Ramelli",
+    "link": "http://www.photoserge.com/"
+  }, {
+    "name": "Paris:Conciergeri",
+    "source": "https://s3.amazonaws.com/brave-backgrounds/Phoyoserge_ParisConciergeri.jpg",
+    "author": "Serge Ramelli",
+    "link": "http://www.photoserge.com/"
+  }, {
+    "name": "Paris:The Roof",
+    "source": "https://s3.amazonaws.com/brave-backgrounds/Phoyoserge_Theroofparis.jpg",
+    "author": "Serge Ramelli",
+    "link": "http://www.photoserge.com/"
+  }, {
+    "name": "Paris:The Seant",
+    "source": "https://s3.amazonaws.com/brave-backgrounds/Phoyoserge_TheSeantParis.jpg",
+    "author": "Serge Ramelli",
+    "link": "http://www.photoserge.com/"
+  }, {
+    "name": "Venise Sunset",
+    "source": "https://s3.amazonaws.com/brave-backgrounds/Phoyoserge_VeniseSunset.jpg",
+    "author": "Serge Ramelli",
+    "link": "http://www.photoserge.com/"
+  }, {
+    "name": "Yosemite",
+    "source": "https://s3.amazonaws.com/brave-backgrounds/Phoyoserge_Yosemite.jpg",
+    "author": "Serge Ramelli",
+    "link": "http://www.photoserge.com/"
   }
 ]
