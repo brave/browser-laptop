@@ -26,18 +26,18 @@ describe('errorPage', function () {
       yield this.app.client
         .waitForVisible(errorContent)
         .waitForVisible('span[data-l10n-id=nameNotResolved]')
-        .waitForVisible('span[data-l10n-id=errorReload]')
+        .waitForVisible('button[data-l10n-id=errorReload]')
         .waitForVisible(errorUrl)
         .getText(errorUrl).should.eventually.be.equal(this.url)
-        .isVisible('span[data-l10n-id=errorReload]').should.eventually.be.true
-        .isVisible('span[data-l10n-id=back]').should.eventually.be.true
+        .isVisible('button[data-l10n-id=errorReload]').should.eventually.be.true
+        .isVisible('button[data-l10n-id=back]').should.eventually.be.true
     })
 
     it('should go back to newtab when back is clicked', function * () {
       yield this.app.client
         .waitForUrl(getTargetAboutUrl('about:error'))
-        .waitForVisible('span[data-l10n-id=back]')
-        .leftClick('span[data-l10n-id=back]', 5, 5)
+        .waitForVisible('button[data-l10n-id=back]')
+        .leftClick('button[data-l10n-id=back]', 5, 5)
         .waitForUrl(Brave.newTabUrl)
     })
 
@@ -45,13 +45,13 @@ describe('errorPage', function () {
     it.skip('should attempt a reload when reload is clicked', function * () {
       yield this.app.client
         .waitForUrl(getTargetAboutUrl('about:error'))
-        .waitForVisible('span[data-l10n-id=errorReload]')
-        .leftClick('span[data-l10n-id=errorReload]')
+        .waitForVisible('button[data-l10n-id=errorReload]')
+        .leftClick('button[data-l10n-id=errorReload]')
         .waitForUrl(getTargetAboutUrl('about:error'))
         // still no back button for the url
         .waitForVisible(errorUrl)
         .getText(errorUrl).should.eventually.be.equal(this.url)
-        .isVisible('span[data-l10n-id=back]').should.eventually.be.false
+        .isVisible('button[data-l10n-id=back]').should.eventually.be.false
     })
   })
 })
