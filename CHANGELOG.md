@@ -4,7 +4,6 @@
 - Added Yandex as a new search engine. ([#2703](https://github.com/brave/browser-laptop/issues/2703))
 - Added Qwant as a new search engine. ([#2701](https://github.com/brave/browser-laptop/issues/2701))
 - Added Semantic Scholar as a new search engine. ([#5656](https://github.com/brave/browser-laptop/issues/5656))
-- Added a "Copy to Cliboard" button in about:brave. ([#5790](https://github.com/brave/browser-laptop/issues/5790))
 - Changed "Submit Feedback..." link to use community.brave.com. ([#6179](https://github.com/brave/browser-laptop/issues/6179))
 - Fixed a Windows installer issue causing shortcuts to try and open brave.exe. ([#6075](https://github.com/brave/browser-laptop/issues/6075))
 - Fixed alignment for icons on about pages. ([#6137](https://github.com/brave/browser-laptop/issues/6137))
