@@ -304,7 +304,9 @@ describe('application window', function () {
 
         yield this.app.client
           .waitForVisible(selector)
-          .getAttribute(selector, 'src').should.become(page1)
+          .tabByIndex(1)
+          .waitForUrl(page1)
+          .windowByUrl(Brave.browserWindowUrl)
           .getWindowCount().should.become(1)
           .getTabCount().should.become(2)
       })
@@ -615,17 +617,15 @@ describe('application window', function () {
 
         yield this.app.client
           .windowByIndex(0)
-          .getAttribute('.frameWrapper:nth-child(1) webview', 'src').should.become(clickWithTargetPage)
-        yield this.app.client
-          .windowByIndex(0)
-          .getAttribute('.frameWrapper:nth-child(2) webview', 'src').should.become(page1)
+          .tabByIndex(0)
+          .waitForUrl(clickWithTargetPage)
+          .windowByIndex(1)
+          .waitForUrl(page1)
       })
 
       // https://github.com/brave/browser-laptop/issues/143
       it('loads in the tab with the target name', function * () {
         let clickWithTargetPage = this.clickWithTargetPage
-        let page2 = this.page2
-
         yield this.app.client
           .windowByIndex(0)
           .click('.tabArea:nth-child(1)')
@@ -633,13 +633,10 @@ describe('application window', function () {
           .waitForVisible('#name2')
           .click('#name2')
           .windowByIndex(0)
-
-        yield this.app.client
-          .waitForVisible('.frameWrapper:nth-child(1) webview')
-          .getAttribute('.frameWrapper:nth-child(1) webview', 'src').should.become(clickWithTargetPage)
-        yield this.app.client
-          .getAttribute('.frameWrapper:nth-child(2) webview', 'src').should.become(page2)
-        yield this.app.client
+          .tabByIndex(0)
+          .waitForUrl(clickWithTargetPage)
+          .tabByIndex(1)
+          .waitForUrl(this.page2)
           .isExisting('.frameWrapper:nth-child(3) webview').should.eventually.be.false // same tab
       })
     })
