@@ -61,6 +61,7 @@ const settings = {
   ADBLOCK_CUSTOM_RULES: 'adblock.customRules',
   MINIMUM_VISIT_TIME: 'advanced.minimum-visit-time',
   MINIMUM_VISITS: 'advanced.minimum-visits',
+  MINIMUM_PERCENTAGE: 'advanced.minimum-percentage',
 
   // DEPRECATED settings
   // ########################

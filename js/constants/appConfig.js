@@ -145,6 +145,7 @@ module.exports = {
     'advanced.send-usage-statistics': false,
     'advanced.minimum-visit-time': 8,
     'advanced.minimum-visits': 5,
+    'advanced.minimum-percentage': false,
     'shutdown.clear-history': false,
     'shutdown.clear-downloads': false,
     'shutdown.clear-cache': false,

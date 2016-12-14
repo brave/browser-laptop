@@ -1048,11 +1048,18 @@ class PaymentsTab extends ImmutableComponent {
         </div>
         <div className='settingsPanelDivider'>
           {this.enabled
-            ? <SettingCheckbox
-              dataL10nId='notifications'
-              prefKey={settings.PAYMENTS_NOTIFICATIONS}
-              settings={this.props.settings}
-              onChangeSetting={this.props.onChangeSetting} />
+            ? <SettingsList>
+              <SettingCheckbox
+                dataL10nId='minimumPercentage'
+                prefKey={settings.MINIMUM_PERCENTAGE}
+                settings={this.props.settings}
+                onChangeSetting={this.props.onChangeSetting} />
+              <SettingCheckbox
+                dataL10nId='notifications'
+                prefKey={settings.PAYMENTS_NOTIFICATIONS}
+                settings={this.props.settings}
+                onChangeSetting={this.props.onChangeSetting} />
+            </SettingsList>
             : null}
         </div>
       </div>
