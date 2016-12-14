@@ -18,7 +18,8 @@ For a more user-friendly download page, [please visit our website](https://brave
 
 ## Community
 
-[The Brave Community](https://community.brave.com/)
+[Join the community](https://community.brave.com/) if you'd like to get more involved with Brave. You can [ask for help](https://community.brave.com/c/help-me),
+[discuss features you'd like to see](https://community.brave.com/c/feature-requests), and a lot more. We'd love to have your help so that we can continue improving Brave.
 
 ## Useful documentation
 
