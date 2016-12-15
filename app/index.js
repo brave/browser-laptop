@@ -36,6 +36,8 @@ process.on('unhandledRejection', function (error, promise) {
   handleUncaughtError(error)
 })
 
+process.on('warning', warning => console.warn(warning.stack))
+
 if (process.platform === 'win32') {
   require('./windowsInit')
 }
