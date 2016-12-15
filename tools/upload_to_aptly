@@ -1,7 +1,7 @@
 #!/bin/sh
 set -exu
 OPTION=${1:-brave-apt-staging}
-GPG_KEY="4A1B4360"
+GPG_KEY=${2:-4A1B4360}
 KEY_NAME=keys.asc
 KEY_FILE=/tmp/${KEY_NAME}
 
