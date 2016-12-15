@@ -266,7 +266,8 @@ const doAction = (action) => {
             currentLocation.substring(0, 6).toLowerCase() !== 'about:') {
           windowState = windowState.mergeIn(frameStatePath(action.key), {
             activeShortcut: 'load-non-navigatable-url',
-            activeShortcutDetails: action.location
+            activeShortcutDetails: action.location,
+            loading: true
           })
         }
         updateNavBarInput(frame.get('location'), frameStatePath(action.key))
@@ -274,7 +275,8 @@ const doAction = (action) => {
         // reload if the url is unchanged
         windowState = windowState.mergeIn(frameStatePath(action.key), {
           audioPlaybackActive: false,
-          activeShortcut: 'reload'
+          activeShortcut: 'reload',
+          loading: true
         })
         windowState = windowState.mergeIn(tabStatePath(action.key), {
           audioPlaybackActive: false
@@ -293,7 +295,8 @@ const doAction = (action) => {
         windowState = windowState.mergeIn(frameStatePath(action.key), {
           src: action.location,
           location: action.location,
-          activeShortcut
+          activeShortcut,
+          loading: true
         })
         windowState = windowState.mergeIn(tabStatePath(action.key), {
           location: action.location
