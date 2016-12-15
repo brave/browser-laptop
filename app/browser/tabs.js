@@ -1,7 +1,7 @@
 const appActions = require('../../js/actions/appActions')
 const messages = require('../..//js/constants/messages')
 const tabState = require('../common/state/tabState')
-const {app, extensions, webContents} = require('electron')
+const {app, extensions} = require('electron')
 const { makeImmutable } = require('../common/state/immutableUtil')
 
 let currentWebContents = {}
@@ -138,9 +138,9 @@ const api = {
     let frameProps = action.get('frameProps')
     let muted = action.get('muted')
     let tabId = frameProps.get('tabId')
-    let webContents = api.getWebContents(tabId)
-    if (webContents) {
-      webContents.setAudioMuted(muted)
+    let tab = api.getWebContents(tabId)
+    if (tab) {
+      tab.setAudioMuted(muted)
       let tabValue = getTabValue(tabId)
       return tabState.updateTab(state, { tabValue })
     }
@@ -162,8 +162,8 @@ const api = {
 
   create: (createProperties, cb = null) => {
     createProperties = makeImmutable(createProperties).toJS()
-    webContents.createTab(createProperties, (webContents) => {
-      cb && cb(webContents)
+    extensions.createTab(createProperties, (tab) => {
+      cb && cb(tab)
     })
   }
 }
