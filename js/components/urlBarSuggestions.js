@@ -379,6 +379,17 @@ class UrlBarSuggestions extends ImmutableComponent {
       }))
     }
 
+    // Local search suggestions
+    suggestions = suggestions.concat(mapListToElements({
+      data: props.localSearchTerms.map((e) => { return e.get('searchTerm') }),
+      maxResults: config.urlBarSuggestions.maxSearch,
+      type: suggestionTypes.SEARCH,
+      clickHandler: navigateClickHandler((searchTerms) => {
+        let searchURL = props.searchSelectEntry ? props.searchSelectEntry.search : props.searchDetail.get('searchURL')
+        return searchURL.replace('{searchTerms}', encodeURIComponent(searchTerms))
+      })
+    }))
+
     // Alexa top 500
     suggestions = suggestions.concat(mapListToElements({
       data: top500,

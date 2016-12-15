@@ -901,6 +901,7 @@ class Main extends ImmutableComponent {
       !customTitlebar.menubarSelectedIndex
 
     const appStateSites = this.props.appState.get('sites')
+    const appLocalSearchTerms = this.props.appState.get('localSearchTerms')
 
     return <div id='window'
       className={cx({
@@ -981,6 +982,7 @@ class Main extends ImmutableComponent {
                 navbar={activeFrame && activeFrame.get('navbar')}
                 frames={this.props.windowState.get('frames')}
                 sites={appStateSites}
+                localSearchTerms={appLocalSearchTerms}
                 activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
                 location={activeFrame && activeFrame.get('location') || ''}
                 title={activeFrame && activeFrame.get('title') || ''}
@@ -990,6 +992,7 @@ class Main extends ImmutableComponent {
                 suggestionIndex={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex']) || 0}
                 isSecure={activeFrame && activeFrame.getIn(['security', 'isSecure']) &&
                  !activeFrame.getIn(['security', 'runInsecureContent'])}
+                isPrivate={activeFrame.get('isPrivate')}
                 locationValueSuffix={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix']) || ''}
                 startLoadTime={activeFrame && activeFrame.get('startLoadTime') || undefined}
                 endLoadTime={activeFrame && activeFrame.get('endLoadTime') || undefined}
