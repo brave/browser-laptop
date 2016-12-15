@@ -430,18 +430,9 @@ class Frame extends ImmutableComponent {
   }
 
   clone (args) {
-    const newGuest = this.webview.clone()
-    const newGuestInstanceId = newGuest.getWebPreferences().guestInstanceId
-    let cloneAction
-    if (args && args.get('back')) {
-      cloneAction = newGuest.goBack
-    } else if (args && args.get('forward')) {
-      cloneAction = () => newGuest.goForward
-    }
-    if (cloneAction) {
-      newGuest.once('did-attach', cloneAction.bind(newGuest))
-    }
-    windowActions.cloneFrame(this.frame, newGuestInstanceId, args && args.get('openInForeground'))
+    this.webview.clone((tab) => {
+      console.log(tab)
+    })
   }
 
   handleShortcut () {
