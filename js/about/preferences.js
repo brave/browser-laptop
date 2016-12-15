@@ -265,7 +265,7 @@ class LedgerTable extends ImmutableComponent {
     return [
       rank,
       {
-        html: <a href={publisherURL} target='_blank'>{verified ? this.getVerifiedIcon() : null}{faviconURL ? <img src={faviconURL} alt={site} /> : <span className='fa fa-file-o' />}<span>{site}</span></a>,
+        html: <div className='site'>{verified ? this.getVerifiedIcon() : null}<a href={publisherURL} target='_blank'>{faviconURL ? <img src={faviconURL} alt={site} /> : <span className='fa fa-file-o' />}<span>{site}</span></a></div>,
         value: site
       },
       {
@@ -337,9 +337,9 @@ class BitcoinDashboard extends ImmutableComponent {
   get qrcodeOverlayFooter () {
     if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
       return <div className='qrcodeOverlayFooter'>
-        <div id='coinbaseLogo' />
-        <a href='https://itunes.apple.com/us/app/coinbase-bitcoin-wallet/id886427730?mt=8' target='_blank' id='appstoreLogo' />
-        <a href='https://play.google.com/store/apps/details?id=com.coinbase.android' target='_blank' id='playstoreLogo' />
+        <div className='coinbaseLogo' />
+        <a target='_blank' className='appstoreLogo' href='https://itunes.apple.com/us/app/coinbase-bitcoin-wallet/id886427730?mt=8' />
+        <a target='_blank' className='playstoreLogo' href='https://play.google.com/store/apps/details?id=com.coinbase.android' />
       </div>
     } else {
       return null
@@ -433,16 +433,20 @@ class BitcoinDashboard extends ImmutableComponent {
   get panelFooter () {
     if (this.ledgerData.get('buyURLFrame')) {
       return <div className='panelFooter'>
-        <Button l10nId='done' className='pull-right whiteButton' onClick={this.props.hideParentOverlay} />
+        <Button l10nId='done' className='whiteButton' onClick={this.props.hideParentOverlay} />
       </div>
     } else if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
-      return <div className='panelFooter'>
-        <div id='coinbaseLogo' />
-        <span className='coinbaseMessage' data-l10n-id='coinbaseMessage' />
-        <Button l10nId='done' className='pull-right whiteButton' onClick={this.props.hideParentOverlay} />
+      return <div className='panelFooter coinbaseFooter'>
+        <div className='coinbase'>
+          <div className='coinbaseLogo' />
+          <span className='coinbaseMessage' data-l10n-id='coinbaseMessage' />
+        </div>
+        <Button l10nId='done' className='whiteButton' onClick={this.props.hideParentOverlay} />
       </div>
     } else {
-      return null
+      return <div className='panelFooter'>
+        <Button l10nId='done' className='whiteButton' onClick={this.props.hideParentOverlay} />
+      </div>
     }
   }
   copyToClipboard (text) {
@@ -477,7 +481,7 @@ class BitcoinDashboard extends ImmutableComponent {
         ? <ModalOverlay content={this.qrcodeOverlayContent} customTitleClasses={'qrcodeOverlay'} footer={this.qrcodeOverlayFooter} onHide={this.props.hideQRcode.bind(this)} />
         : null
       }
-      <div className='board'>
+      <div className='board addFundsBoard'>
         {
           (this.userInAmerica || this.ledgerData.get('buyURLFrame'))
           ? this.coinbasePanel
@@ -497,7 +501,7 @@ class BitcoinDashboard extends ImmutableComponent {
               ? <div className='settingsPanelDivider'>
                 {
                   this.ledgerData.get('hasBitcoinHandler') && this.ledgerData.get('paymentURL')
-                    ? <div>
+                    ? <div className='hasBitcoinHandler'>
                       <a href={this.ledgerData.get('paymentURL')} target='_blank'>
                         <Button l10nId='bitcoinVisitAccount' className='primaryButton bitcoinAddressButton' />
                       </a>
@@ -532,7 +536,7 @@ class PaymentHistory extends ImmutableComponent {
         addExportFilenamePrefixToTransactions(this.props.ledgerData.get('transactions').toJS())
     )
 
-    return <div id='paymentHistory'>
+    return <div className='paymentHistoryTable'>
       <table className='sort'>
         <thead>
           <tr>
@@ -1019,7 +1023,7 @@ class PaymentsTab extends ImmutableComponent {
     return <div className='board'>
       <div className='panel advancedSettings'>
         <div className='settingsPanelDivider'>
-          <div data-l10n-id='minimumPageTimeSetting' />
+          <div className='minimumPageTimeSetting' data-l10n-id='minimumPageTimeSetting' />
           <SettingsList>
             <SettingItem>
               <select
@@ -1032,7 +1036,7 @@ class PaymentsTab extends ImmutableComponent {
               </select>
             </SettingItem>
           </SettingsList>
-          <div data-l10n-id='minimumVisitsSetting' />
+          <div className='minimumVisitsSetting' data-l10n-id='minimumVisitsSetting' />
           <SettingsList>
             <SettingItem>
               <select
@@ -1079,7 +1083,7 @@ class PaymentsTab extends ImmutableComponent {
     const passphrase = this.props.ledgerData.get('passphrase')
 
     return <div className='board'>
-      <div className='panel'>
+      <div className='panel ledgerBackupContent'>
         <span data-l10n-id='ledgerBackupContent' />
         <div className='copyKeyContainer'>
           <div className='copyContainer'>
@@ -1136,13 +1140,13 @@ class PaymentsTab extends ImmutableComponent {
       }
       <div className='panel recoveryContent'>
         <h4 data-l10n-id='ledgerRecoverySubtitle' />
-        <span data-l10n-id='ledgerRecoveryContent' />
+        <div className='ledgerRecoveryContent' data-l10n-id='ledgerRecoveryContent' />
         <SettingsList>
           <SettingItem>
             <h3 data-l10n-id='firstRecoveryKey' />
-            <input className='form-control' onChange={this.handleFirstRecoveryKeyChange} type='text' />
+            <input className='form-control firstRecoveryKey' onChange={this.handleFirstRecoveryKeyChange} type='text' />
             <h3 data-l10n-id='secondRecoveryKey' />
-            <input className='form-control' onChange={this.handleSecondRecoveryKeyChange} type='text' />
+            <input className='form-control secondRecoveryKey' onChange={this.handleSecondRecoveryKeyChange} type='text' />
           </SettingItem>
         </SettingsList>
       </div>
@@ -1195,7 +1199,7 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get sidebarContent () {
-    return <div id='paymentsSidebar'>
+    return <div className='paymentsSidebar'>
       <h2 data-l10n-id='paymentsSidebarText1' />
       <div data-l10n-id='paymentsSidebarText2' />
       <a href='https://www.privateinternetaccess.com/' target='_blank'><div className='paymentsSidebarPIA' /></a>
