@@ -430,9 +430,7 @@ class Frame extends ImmutableComponent {
   }
 
   clone (args) {
-    this.webview.clone((tab) => {
-      console.log(tab)
-    })
+    this.webview.clone()
   }
 
   handleShortcut () {
@@ -462,7 +460,7 @@ class Frame extends ImmutableComponent {
         this.webview.reloadIgnoringCache()
         break
       case 'clone':
-        this.clone(this.props.activeShortcutDetails)
+        this.clone()
         break
       case 'explicitLoadURL':
         this.webview.loadURL(this.props.location)
