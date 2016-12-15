@@ -9,6 +9,7 @@ const webviewActions = require('../actions/webviewActions')
 const appActions = require('../actions/appActions')
 const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
+const immutableUtil = require('../../app/common/state/immutableUtil')
 const cx = require('../lib/classSet')
 const siteUtil = require('../state/siteUtil')
 const FrameStateUtil = require('../state/frameStateUtil')
@@ -62,7 +63,7 @@ class Frame extends ImmutableComponent {
   }
 
   get frame () {
-    return windowStore.getFrame(this.props.frameKey) || Immutable.fromJS({})
+    return windowStore.getFrame(this.props.frameKey) || Immutable.Map()
   }
 
   get braveryDefaults () {
@@ -672,14 +673,21 @@ class Frame extends ImmutableComponent {
       this.props.onCloseFrame(this.frame)
     })
     this.webview.addEventListener('page-favicon-updated', (e) => {
-      if (e.favicons && e.favicons.length > 0) {
+      // TODO(Anthony): more general solution on muon to prevent weview event
+      // from emitting after tab closed
+      if (e.favicons && e.favicons.length > 0 &&
+        immutableUtil.isMap(this.frame) && this.frame.size) {
         imageUtil.getWorkingImageUrl(e.favicons[0], (imageFound) => {
           windowActions.setFavicon(this.frame, imageFound ? e.favicons[0] : null)
         })
       }
     })
     this.webview.addEventListener('page-title-updated', ({title}) => {
-      windowActions.setFrameTitle(this.frame, title)
+      // TODO(Anthony): more general solution on muon to prevent weview event
+      // from emitting after tab closed
+      if (immutableUtil.isMap(this.frame) && this.frame.size) {
+        windowActions.setFrameTitle(this.frame, title)
+      }
     })
     this.webview.addEventListener('show-autofill-settings', (e) => {
       windowActions.newFrame({ location: 'about:autofill' }, true)
@@ -688,9 +696,13 @@ class Frame extends ImmutableComponent {
       contextMenus.onShowAutofillMenu(e.suggestions, e.rect, this.frame)
     })
     this.webview.addEventListener('hide-autofill-popup', (e) => {
-      let webContents = this.webview.getWebContents()
-      if (webContents && webContents.isFocused()) {
-        windowActions.autofillPopupHidden(this.props.tabId)
+      // TODO(Anthony): more general solution on muon to prevent weview event
+      // from emitting after tab closed
+      if (immutableUtil.isMap(this.frame) && this.frame.size) {
+        let webContents = this.webview.getWebContents()
+        if (webContents && webContents.isFocused()) {
+          windowActions.autofillPopupHidden(this.props.tabId)
+        }
       }
     })
     this.webview.addEventListener('ipc-message', (e) => {
@@ -960,7 +972,9 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('did-get-response-details', (details) => {
-      windowActions.gotResponseDetails(this.frame.get('tabId'), details)
+      if (immutableUtil.isMap(this.frame) && this.frame.size) {
+        windowActions.gotResponseDetails(this.frame.get('tabId'), details)
+      }
     })
     // Handle zoom using Ctrl/Cmd and the mouse wheel.
     // this.webview.addEventListener('mousewheel', this.onMouseWheel.bind(this))
