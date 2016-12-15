@@ -72,10 +72,10 @@ const api = {
       })
       tab.on('page-favicon-updated', function (e, favicons) {
         if (favicons && favicons.length > 0) {
-          tab.setTabValues({
-            faviconUrl: favicons[0]
-          })
-          updateTab(tabId)
+          // tab.setTabValues({
+          //   faviconUrl: favicons[0]
+          // })
+          // updateTab(tabId)
         }
       })
       tab.on('unresponsive', () => {
