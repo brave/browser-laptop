@@ -660,7 +660,7 @@ class Frame extends ImmutableComponent {
       currentWindow.webContents.send(messages.DISABLE_SWIPE_GESTURE)
     })
     this.webview.addEventListener('did-attach', (e) => {
-      let tabId = this.webview.getWebContents().getId()
+      let tabId = this.webview.getId()
       if (this.props.tabId !== tabId) {
         windowActions.setFrameTabId(this.frame, tabId)
       }
@@ -688,8 +688,7 @@ class Frame extends ImmutableComponent {
       contextMenus.onShowAutofillMenu(e.suggestions, e.rect, this.frame)
     })
     this.webview.addEventListener('hide-autofill-popup', (e) => {
-      let webContents = this.webview.getWebContents()
-      if (webContents && webContents.isFocused()) {
+      if (this.webview.isFocused()) {
         windowActions.autofillPopupHidden(this.props.tabId)
       }
     })
@@ -884,9 +883,8 @@ class Frame extends ImmutableComponent {
 
       // After navigating to the URL via back/forward buttons, set correct frame title
       if (!e.isRendererInitiated) {
-        let webContents = this.webview.getWebContents()
-        let index = webContents.getCurrentEntryIndex()
-        let title = webContents.getTitleAtIndex(index)
+        let index = this.webview.getCurrentEntryIndex()
+        let title = this.webview.getTitleAtIndex(index)
         windowActions.setFrameTitle(this.frame, title)
       }
     })
@@ -970,9 +968,9 @@ class Frame extends ImmutableComponent {
     this.webview.goBack()
   }
 
-  getHistoryEntry (sites, webContent, index) {
-    const url = webContent.getURLAtIndex(index)
-    const title = webContent.getTitleAtIndex(index)
+  getHistoryEntry (sites, index) {
+    const url = this.webview.getURLAtIndex(index)
+    const title = this.webview.getTitleAtIndex(index)
 
     let entry = {
       index: index,
@@ -996,18 +994,18 @@ class Frame extends ImmutableComponent {
   }
 
   getHistory (appState) {
-    const webContent = this.webview.getWebContents()
-    const historyCount = webContent.getEntryCount()
+    const historyCount = this.webview.getEntryCount()
+    const currentIndex = this.webview.getCurrentEntryIndex()
     const sites = appState ? appState.get('sites') : null
 
     let history = {
       count: historyCount,
-      currentIndex: webContent.getCurrentEntryIndex(),
+      currentIndex,
       entries: []
     }
 
     for (let index = 0; index < historyCount; index++) {
-      history.entries.push(this.getHistoryEntry(sites, webContent, index))
+      history.entries.push(this.getHistoryEntry(sites, index))
     }
 
     return history
