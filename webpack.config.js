@@ -151,12 +151,12 @@ module.exports = {
   ],
   production: [
     merge(app, production()),
-    merge(devTools, development()),
+    merge(devTools, production()),
     merge(webtorrentPage, production())
   ],
   test: [
     merge(app, production()),
-    merge(devTools, development()),
+    merge(devTools, production()),
     merge(webtorrentPage, production())
   ]
 }[env]
