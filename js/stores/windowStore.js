@@ -658,9 +658,10 @@ const doAction = (action) => {
     case windowConstants.WINDOW_AUTOFILL_POPUP_HIDDEN:
     case windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL:
       if (!action.detail) {
+        windowState = windowState.delete('contextMenuDetail')
+
         if (windowState.getIn(['contextMenuDetail', 'type']) === 'autofill' &&
             windowState.getIn(['contextMenuDetail', 'tabId']) === action.tabId) {
-          windowState = windowState.delete('contextMenuDetail')
           if (action.notify) {
             ipc.send('autofill-popup-hidden', action.tabId)
           }
