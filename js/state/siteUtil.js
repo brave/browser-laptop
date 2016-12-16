@@ -447,7 +447,7 @@ module.exports.isFolder = function (siteDetail) {
  */
 module.exports.isHistoryEntry = function (siteDetail) {
   if (siteDetail && typeof siteDetail.get('location') === 'string') {
-    if (siteDetail.get('location').startsWith('about:')) {
+    if (siteDetail.get('location').startsWith('about:') || siteDetail.get('lastAccessedTime') === 0) {
       return false
     }
     return !!siteDetail.get('lastAccessedTime') && !module.exports.isFolder(siteDetail)

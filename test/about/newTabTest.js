@@ -6,6 +6,7 @@ const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 const settings = require('../../js/constants/settings')
 const {newTabMode} = require('../../app/common/constants/settingsEnums')
 const aboutNewTabUrl = getTargetAboutUrl('about:newtab')
+const siteTags = require('../../js/constants/siteTags')
 
 describe('about:newtab tests', function () {
   function * setup (client) {
@@ -62,6 +63,22 @@ describe('about:newtab tests', function () {
       .waitForExist('.tab[data-frame-key="1"]')
       .tabByIndex(0)
       .url(aboutNewTabUrl)
+  }
+
+  function * addDemoImportedBookmarks (client) {
+    yield client
+      .addSite({
+        lastAcessedTime: 0,
+        location: 'page1.html',
+        title: 'page 1',
+        tags: [siteTags.BOOKMARK]
+      })
+      .addSite({
+        lastAcessedTime: 0,
+        location: 'page2.html',
+        title: 'page 2',
+        tags: [siteTags.BOOKMARK]
+      })
   }
 
   function * waitForPageLoad (client) {
@@ -228,6 +245,16 @@ describe('about:newtab tests', function () {
 
         yield this.app.client
           .waitForExist('.topSitesElementFavicon', 3000, true)
+      })
+
+      it('skip imported bookmarks on topSites grid', function * () {
+        yield this.app.client.clearAppData({browserHistory: true})
+
+        yield addDemoImportedBookmarks(this.app.client)
+
+        yield this.app.client
+          .tabByUrl(aboutNewTabUrl)
+          .waitForExist('.topSitesElementFavicon', true)
       })
 
       it('shows favicon image for topSites', function * () {

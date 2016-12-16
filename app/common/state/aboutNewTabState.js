@@ -5,7 +5,6 @@
 const Immutable = require('immutable')
 const {makeImmutable} = require('./immutableUtil')
 const siteUtil = require('../../../js/state/siteUtil')
-const {isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
 const aboutNewTabMaxEntries = 100
 
 const compareSites = (site1, site2) => {
@@ -68,7 +67,7 @@ const getTopSites = (state) => {
   // remove folders; sort by visit count; enforce a max limit
   const sites = (state.get('sites') || new Immutable.List())
     .filter((site) => !siteUtil.isFolder(site))
-    .filter((site) => !isSourceAboutUrl(site.get('location')))
+    .filter((site) => siteUtil.isHistoryEntry(site))
     .sort(sortCountDescending)
     .slice(0, aboutNewTabMaxEntries)
 
