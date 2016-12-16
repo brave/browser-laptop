@@ -640,6 +640,13 @@ function getEditableItems (selection, editFlags) {
       accelerator: 'CmdOrCtrl+V',
       enabled: hasClipboard,
       role: 'paste'
+    }, {
+      label: locale.translation('pasteWithoutFormatting'),
+      accelerator: 'Shift+CmdOrCtrl+V',
+      enabled: hasClipboard,
+      click: function (item, focusedWindow) {
+        focusedWindow.webContents.pasteAndMatchStyle()
+      }
     })
   }
   return menuUtil.sanitizeTemplateItems(template)
