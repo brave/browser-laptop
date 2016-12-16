@@ -8,7 +8,7 @@
 let ready = false
 
 // Setup the crash handling
-const CrashHerald = require('./crash-herald')
+// const CrashHerald = require('./crash-herald')
 
 const handleUncaughtError = (error) => {
   var message, ref, stack
@@ -36,14 +36,14 @@ process.on('unhandledRejection', function (error, promise) {
   handleUncaughtError(error)
 })
 
+process.on('warning', warning => console.warn(warning.stack))
+
 if (process.platform === 'win32') {
   require('./windowsInit')
 }
 
 const electron = require('electron')
 const app = electron.app
-// set userData before loading anything else
-require('./browser/lib/patchUserDataDir')
 const BrowserWindow = electron.BrowserWindow
 const dialog = electron.dialog
 const ipcMain = electron.ipcMain
@@ -54,13 +54,11 @@ const Importer = require('./importer')
 const messages = require('../js/constants/messages')
 const appConfig = require('../js/constants/appConfig')
 const appActions = require('../js/actions/appActions')
-const downloadActions = require('../js/actions/downloadActions')
 const SessionStore = require('./sessionStore')
 const AppStore = require('../js/stores/appStore')
 const PackageLoader = require('./package-loader')
 const Autofill = require('./autofill')
 const Extensions = require('./extensions')
-const Filtering = require('./filtering')
 const TrackingProtection = require('./trackingProtection')
 const AdBlock = require('./adBlock')
 const AdInsertion = require('./browser/ads/adInsertion')
@@ -75,17 +73,14 @@ const siteSettings = require('../js/state/siteSettings')
 const spellCheck = require('./spellCheck')
 const locale = require('./locale')
 const ledger = require('./ledger')
-const flash = require('../js/flash')
 const contentSettings = require('../js/state/contentSettings')
 const privacy = require('../js/state/privacy')
-const basicAuth = require('./browser/basicAuth')
 const async = require('async')
-const tabs = require('./browser/tabs')
 const settings = require('../js/constants/settings')
-const webtorrent = require('./browser/webtorrent')
 
 // temporary fix for #4517, #4518 and #4472
 app.commandLine.appendSwitch('enable-use-zoom-for-dsf', 'false')
+app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferHtmlOverPlugins')
 
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
@@ -244,8 +239,6 @@ const initiateSessionStateSave = (beforeQuit) => {
 
 let loadAppStatePromise = SessionStore.loadAppState()
 
-let flashInitialized = false
-
 // Some settings must be set right away on startup, those settings should be handled here.
 loadAppStatePromise.then((initialState) => {
   const {HARDWARE_ACCELERATION_ENABLED, SMOOTH_SCROLL_ENABLED, SEND_CRASH_REPORTS} = require('../js/constants/settings')
@@ -254,19 +247,12 @@ loadAppStatePromise.then((initialState) => {
   }
   if (initialState.settings[SEND_CRASH_REPORTS] !== false) {
     console.log('Crash reporting enabled')
-    CrashHerald.init()
+    // CrashHerald.init()
   } else {
     console.log('Crash reporting disabled')
   }
   if (initialState.settings[SMOOTH_SCROLL_ENABLED] === false) {
     app.commandLine.appendSwitch('disable-smooth-scrolling')
-  }
-  if (initialState.flash && initialState.flash.enabled === true) {
-    if (flash.init()) {
-      // Flash was initialized successfully
-      flashInitialized = true
-      return
-    }
   }
 })
 
@@ -297,13 +283,13 @@ app.on('ready', () => {
     let host = urlParse(url).host
     if (host && acceptCertDomains[host] === true) {
       // Ignore the cert error
-      e.preventDefault()
-      cb(true)
+      cb('continue')
       return
+    } else {
+      cb('deny')
     }
 
     if (resourceType !== 'mainFrame') {
-      // Block subresources with certificate errors
       return
     }
 
@@ -320,6 +306,7 @@ app.on('ready', () => {
   })
 
   app.on('before-quit', (e) => {
+    appActions.shuttingDown()
     shuttingDown = true
     if (sessionStateStoreCompleteOnQuit) {
       return
@@ -363,44 +350,51 @@ app.on('ready', () => {
     }
   })
 
-  ipcMain.removeAllListeners('window-alert')
-  ipcMain.on('window-alert', function (event, message, title) {
-    var buttons
+  process.on('window-alert',
+    (webContents, extraData, title, message, defaultPromptText,
+        shouldDisplaySuppressCheckbox, isBeforeUnloadDialog, isReload, cb) => {
+      let suppress = false
+      const buttons = ['OK']
+      if (!webContents || webContents.isDestroyed()) {
+        cb(false, '', suppress)
+      } else {
+        cb(true, '', suppress)
+      }
 
-    buttons = ['OK']
-    message = message ? message.toString() : ''
-    title = title ? title.toString() : ''
-    dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
-      message: message,
-      title: title,
-      buttons: buttons
+      const hostWebContents = webContents.hostWebContents || webContents
+      dialog.showMessageBox(BrowserWindow.fromWebContents(hostWebContents), {
+        message,
+        title,
+        buttons: buttons
+      })
     })
-    // Alert should always return undefined.
-  })
 
-  ipcMain.removeAllListeners('window-confirm')
-  ipcMain.on('window-confirm', function (event, message, title) {
-    var buttons, cancelId
+  process.on('window-confirm',
+    (webContents, extraData, title, message, defaultPromptText,
+        shouldDisplaySuppressCheckbox, isBeforeUnloadDialog, isReload, cb) => {
+      let suppress = false
+      const buttons = ['OK', 'Cancel']
+      if (!webContents || webContents.isDestroyed()) {
+        cb(false, '', suppress)
+      }
 
-    buttons = ['OK', 'Cancel']
-    message = message ? message.toString() : ''
-    title = title ? title.toString() : ''
-    cancelId = 1
-    event.returnValue = !dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
-      message: message,
-      title: title,
-      buttons: buttons,
-      cancelId: cancelId
+      const hostWebContents = webContents.hostWebContents || webContents
+      const response = dialog.showMessageBox(BrowserWindow.fromWebContents(hostWebContents), {
+        message,
+        title,
+        buttons: buttons,
+        cancelId: 1
+      })
+      cb(!response, '', suppress)
     })
-    return event.returnValue
-  })
 
-  ipcMain.removeAllListeners('window-prompt')
-  ipcMain.on('window-prompt', function (event, text, defaultText) {
-    console.warn('window.prompt is not supported yet')
-    event.returnValue = null
-    return event.returnValue
-  })
+  process.on('window-prompt',
+    (webContents, extraData, title, message, defaultPromptText,
+        shouldDisplaySuppressCheckbox, isBeforeUnloadDialog, isReload, cb) => {
+      console.warn('window.prompt is not supported yet')
+      let suppress = false
+      cb(false, '', suppress)
+    })
 
   process.on(messages.UNDO_CLOSED_WINDOW, () => {
     if (lastWindowState) {
@@ -414,25 +408,20 @@ app.on('ready', () => {
     // For tests we always want to load default app state
     const loadedPerWindowState = initialState.perWindowState
     delete initialState.perWindowState
-    initialState.flashInitialized = flashInitialized
     appActions.setState(Immutable.fromJS(initialState))
     Menu.init(initialState, null)
     return loadedPerWindowState
   }).then((loadedPerWindowState) => {
-    tabs.init()
-    basicAuth.init()
     contentSettings.init()
     privacy.init()
     Autofill.init()
     Extensions.init()
-    Filtering.init()
     SiteHacks.init()
     spellCheck.init()
     HttpsEverywhere.init()
     TrackingProtection.init()
     AdBlock.init()
     AdInsertion.init()
-    webtorrent.init()
 
     if (!loadedPerWindowState || loadedPerWindowState.length === 0) {
       if (!CmdLine.newWindowURL()) {
@@ -502,16 +491,6 @@ app.on('ready', () => {
 
     ipcMain.on(messages.SET_CLIPBOARD, (e, text) => {
       electron.clipboard.writeText(text)
-    })
-
-    ipcMain.on(messages.CHECK_FLASH_INSTALLED, (e) => {
-      flash.checkFlashInstalled((installed) => {
-        e.sender.send(messages.FLASH_UPDATED, installed)
-      })
-    })
-
-    ipcMain.on(messages.OPEN_DOWNLOAD_PATH, (e, download) => {
-      downloadActions.openDownloadPath(Immutable.fromJS(download))
     })
 
     ipcMain.on(messages.CERT_ERROR_ACCEPTED, (event, url) => {

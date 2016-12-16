@@ -1,3 +1,4 @@
+/* globals devTools */
 var Application = require('spectron').Application
 var chai = require('chai')
 require('./coMocha')
@@ -5,7 +6,7 @@ require('./coMocha')
 const path = require('path')
 const fs = require('fs')
 const os = require('os')
-const {getTargetAboutUrl, isSourceAboutUrl} = require('../../js/lib/appUrlUtil')
+const {getTargetAboutUrl, isSourceAboutUrl, getBraveExtIndexHTML} = require('../../js/lib/appUrlUtil')
 
 var chaiAsPromised = require('chai-as-promised')
 chai.should()
@@ -14,10 +15,10 @@ chai.use(chaiAsPromised)
 const Server = require('./server')
 
 // toggle me for more verbose logs! :)
-const logVerboseEnabled = false
-const logVerbose = (string) => {
+const logVerboseEnabled = process.env.BRAVE_TEST_ALL_LOGS || process.env.BRAVE_TEST_COMMAND_LOGS
+const logVerbose = (string, ...rest) => {
   if (logVerboseEnabled) {
-    console.log(string)
+    console.log(string, ...rest)
   }
 }
 
@@ -83,7 +84,7 @@ var exports = {
 
   defaultTimeout: 10000,
 
-  browserWindowUrl: 'file://' + path.resolve(__dirname, '..', '..') + '/app/extensions/brave/index.html',
+  browserWindowUrl: getBraveExtIndexHTML(),
   newTabUrl: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-newtab.html',
   fixtureUrl: function (filename) {
     return 'file://' + path.resolve(__dirname, '..', 'fixtures', filename)
@@ -153,13 +154,13 @@ var exports = {
   addCommands: function () {
     this.app.client.addCommand('ipcSend', function (message, ...param) {
       return this.execute(function (message, ...param) {
-        return require('electron').remote.getCurrentWindow().webContents.send(message, ...param)
+        return devTools('electron').remote.getCurrentWindow().webContents.send(message, ...param)
       }, message, ...param).then((response) => response.value)
     })
 
     this.app.client.addCommand('ipcSendRenderer', function (message, ...param) {
       return this.execute(function (message, ...param) {
-        return require('electron').ipcRenderer.send(message, ...param)
+        return devTools('electron').ipcRenderer.send(message, ...param)
       }, message, ...param).then((response) => response.value)
     })
 
@@ -200,7 +201,7 @@ var exports = {
               // ignore extension urls unless they are "about" pages
               if (!(urls[i].startsWith('chrome-extension') && !urls[i].match(/about-.*\.html(#.*)?$/)) &&
                   // ignore window urls
-                  !urls[i].startsWith('file:')) {
+                  !urls[i].startsWith('chrome://brave')) {
                 newHandles.push(handles[i])
               }
             }
@@ -291,26 +292,26 @@ var exports = {
 
     this.app.client.addCommand('getAppState', function () {
       return this.execute(function () {
-        return window.appStoreRenderer.state.toJS()
+        return devTools('electron').testData.appStoreRenderer.state.toJS()
       })
     })
 
     this.app.client.addCommand('getWindowState', function () {
       return this.execute(function () {
-        return window.windowStore.state.toJS()
+        return devTools('electron').testData.windowStore.state.toJS()
       })
     })
 
     this.app.client.addCommand('setContextMenuDetail', function () {
       return this.execute(function () {
-        return window.windowActions.setContextMenuDetail()
+        return devTools('electron').testData.windowActions.setContextMenuDetail()
       })
     })
 
     this.app.client.addCommand('showFindbar', function (show, key = 1) {
       return this.execute(function (show, key) {
-        window.windowActions.setFindbarShown(Object.assign({
-          windowId: require('electron').remote.getCurrentWindow().id,
+        devTools('electron').testData.windowActions.setFindbarShown(Object.assign({
+          windowId: devTools('electron').remote.getCurrentWindow().id,
           key
         }), show !== false)
       }, show, key)
@@ -326,9 +327,8 @@ var exports = {
 
     this.app.client.addCommand('setPinned', function (location, isPinned, options = {}) {
       return this.execute(function (location, isPinned, options) {
-        var Immutable = require('immutable')
-        window.windowActions.setPinned(Immutable.fromJS(Object.assign({
-          windowId: require('electron').remote.getCurrentWindow().id,
+        devTools('electron').testData.windowActions.setPinned(devTools('immutable').fromJS(Object.assign({
+          windowId: devTools('electron').remote.getCurrentWindow().id,
           location
         }, options)), isPinned)
       }, location, isPinned, options)
@@ -336,13 +336,13 @@ var exports = {
 
     this.app.client.addCommand('ipcOn', function (message, fn) {
       return this.execute(function (message, fn) {
-        return require('electron').remote.getCurrentWindow().webContents.on(message, fn)
+        return devTools('electron').remote.getCurrentWindow().webContents.on(message, fn)
       }, message, fn).then((response) => response.value)
     })
 
     this.app.client.addCommand('newWindowAction', function (frameOpts, browserOpts) {
       return this.execute(function () {
-        return require('../../../js/actions/appActions').newWindow()
+        return devTools('appActions').newWindow()
       }, frameOpts, browserOpts).then((response) => response.value)
     })
 
@@ -354,7 +354,7 @@ var exports = {
      */
     this.app.client.addCommand('addSite', function (siteDetail, tag) {
       return this.execute(function (siteDetail, tag) {
-        return require('../../../js/actions/appActions').addSite(siteDetail, tag)
+        return devTools('appActions').addSite(siteDetail, tag)
       }, siteDetail, tag).then((response) => response.value)
     })
 
@@ -365,7 +365,7 @@ var exports = {
      */
     this.app.client.addCommand('addSiteList', function (siteDetail) {
       return this.execute(function (siteDetail) {
-        return require('../../../js/actions/appActions').addSite(siteDetail)
+        return devTools('appActions').addSite(siteDetail)
       }, siteDetail).then((response) => response.value)
     })
 
@@ -377,7 +377,7 @@ var exports = {
      */
     this.app.client.addCommand('setResourceEnabled', function (resourceName, enabled) {
       return this.execute(function (resourceName, enabled) {
-        return require('../../../js/actions/appActions').setResourceEnabled(resourceName, enabled)
+        return devTools('appActions').setResourceEnabled(resourceName, enabled)
       }, resourceName, enabled).then((response) => response.value)
     })
 
@@ -389,7 +389,7 @@ var exports = {
      */
     this.app.client.addCommand('removeSite', function (siteDetail, tag) {
       return this.execute(function (siteDetail, tag) {
-        return require('../../../js/actions/appActions').removeSite(siteDetail, tag)
+        return devTools('appActions').removeSite(siteDetail, tag)
       }, siteDetail, tag).then((response) => response.value)
     })
 
@@ -401,7 +401,7 @@ var exports = {
      */
     this.app.client.addCommand('changeSetting', function (key, value) {
       return this.execute(function (key, value) {
-        return require('../../../js/actions/appActions').changeSetting(key, value)
+        return devTools('appActions').changeSetting(key, value)
       }, key, value).then((response) => response.value)
     })
 
@@ -413,7 +413,7 @@ var exports = {
      */
     this.app.client.addCommand('changeSiteSetting', function (hostPattern, key, value) {
       return this.execute(function (hostPattern, key, value) {
-        return require('../../../js/actions/appActions').changeSiteSetting(hostPattern, key, value)
+        return devTools('appActions').changeSiteSetting(hostPattern, key, value)
       }, hostPattern, key, value).then((response) => response.value)
     })
 
@@ -424,13 +424,13 @@ var exports = {
      */
     this.app.client.addCommand('clearAppData', function (clearDataDetail) {
       return this.execute(function (clearDataDetail) {
-        return require('../../../js/actions/appActions').clearAppData(clearDataDetail)
+        return devTools('appActions').clearAppData(clearDataDetail)
       }, clearDataDetail).then((response) => response.value)
     })
 
     this.app.client.addCommand('getDefaultWindowHeight', function () {
       return this.execute(function () {
-        let screen = require('electron').screen
+        let screen = devTools('electron').remote.screen
         let primaryDisplay = screen.getPrimaryDisplay()
         return primaryDisplay.workAreaSize.height
       }).then((response) => response.value)
@@ -438,7 +438,7 @@ var exports = {
 
     this.app.client.addCommand('getDefaultWindowWidth', function () {
       return this.execute(function () {
-        let screen = require('electron').screen
+        let screen = devTools('electron').remote.screen
         let primaryDisplay = screen.getPrimaryDisplay()
         return primaryDisplay.workAreaSize.width
       }).then((response) => response.value)
@@ -446,7 +446,7 @@ var exports = {
 
     this.app.client.addCommand('getPrimaryDisplayHeight', function () {
       return this.execute(function () {
-        let screen = require('electron').screen
+        let screen = devTools('electron').remote.screen
         return screen.getPrimaryDisplay().bounds.height
       }).then((response) => response.value)
     })
@@ -459,14 +459,14 @@ var exports = {
 
     this.app.client.addCommand('getPrimaryDisplayWidth', function () {
       return this.execute(function () {
-        let screen = require('electron').screen
+        let screen = devTools('electron').remote.screen
         return screen.getPrimaryDisplay().bounds.width
       }).then((response) => response.value)
     })
 
     this.app.client.addCommand('resizeWindow', function (width, height) {
       return this.execute(function (width, height) {
-        return require('electron').remote.getCurrentWindow().setSize(width, height)
+        return devTools('electron').remote.getCurrentWindow().setSize(width, height)
       }, width, height).then((response) => response.value)
     })
 
@@ -527,7 +527,7 @@ var exports = {
         internal.viewInstanceId
         // This allows you to send more args than just the event itself like would only
         // be possible with dispatchEvent.
-        require('electron').ipcRenderer.emit('ELECTRON_GUEST_VIEW_INTERNAL_DISPATCH_EVENT-' + internal.viewInstanceId, ...params)
+        devTools('electron').ipcRenderer.emit('ELECTRON_GUEST_VIEW_INTERNAL_DISPATCH_EVENT-' + internal.viewInstanceId, ...params)
       }, frameKey, eventName, ...params).then((response) => response.value)
     })
 
@@ -570,7 +570,8 @@ var exports = {
       quitTimeout: 0,
       path: './node_modules/.bin/electron',
       env,
-      args: ['./', '--debug=5858', '--enable-logging', '--v=1']
+      args: ['./', '--debug=5858', '--enable-logging', '--v=1'],
+      requireName: 'devTools'
     })
     return this.app.start()
   },
@@ -586,16 +587,20 @@ var exports = {
       return app
     })
 
-    // this.app.client.getMainProcessLogs().then(function (logs) {
-    //   logs.forEach(function (log) {
-    //     console.log(log)
-    //   })
-    // })
-    // this.app.client.getRenderProcessLogs().then(function (logs) {
-    //   logs.forEach(function (log) {
-    //     console.log(log)
-    //   })
-    // })
+    if (process.env.BRAVE_TEST_ALL_LOGS || process.env.BRAVE_TEST_BROWSER_LOGS) {
+      this.app.client.getMainProcessLogs().then(function (logs) {
+        logs.forEach(function (log) {
+          console.log(log)
+        })
+      })
+    }
+    if (process.env.BRAVE_TEST_ALL_LOGS || process.env.BRAVE_TEST_RENDERER_LOGS) {
+      this.app.client.getRenderProcessLogs().then(function (logs) {
+        logs.forEach(function (log) {
+          console.log(log)
+        })
+      })
+    }
     return stop
   }
 }

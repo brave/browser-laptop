@@ -41,6 +41,7 @@ const settings = {
   SHUTDOWN_CLEAR_AUTOCOMPLETE_DATA: 'shutdown.clear-autocomplete-data',
   SHUTDOWN_CLEAR_AUTOFILL_DATA: 'shutdown.clear-autofill-data',
   SHUTDOWN_CLEAR_SITE_SETTINGS: 'shutdown.clear-site-settings',
+  FLASH_INSTALLED: 'security.flash.installed',
   // Autofill
   AUTOFILL_ENABLED: 'privacy.autofill-enabled',
   // Payments Tab

@@ -6,7 +6,7 @@ const messages = require('../constants/messages')
 const serializer = require('../dispatcher/serializer')
 const windowConstants = require('../constants/windowConstants')
 const appConstants = require('../constants/appConstants')
-const ipc = window.chrome.ipc
+const ipc = window.chrome.ipcRenderer
 
 const aboutActions = {
   /**
@@ -154,8 +154,11 @@ const aboutActions = {
     })
   },
 
-  openDownloadPath: function (download) {
-    ipc.send(messages.OPEN_DOWNLOAD_PATH, download.toJS())
+  downloadRevealed: function (downloadId) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_DOWNLOAD_REVEALED,
+      downloadId
+    })
   },
 
   decryptPassword: function (encryptedPassword, authTag, iv, id) {
@@ -193,10 +196,6 @@ const aboutActions = {
     aboutActions.dispatchAction({
       actionType: appConstants.APP_CLEAR_PASSWORDS
     })
-  },
-
-  checkFlashInstalled: function () {
-    ipc.send(messages.CHECK_FLASH_INSTALLED)
   },
 
   setResourceEnabled: function (resourceName, enabled) {

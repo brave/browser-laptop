@@ -50,7 +50,7 @@ module.exports.activeSettings = (siteSettings, appState, appConfig) => {
   Object.keys(appConfig.resourceNames).forEach((resourceName) => {
     let name = appConfig.resourceNames[resourceName]
     settings[name] = (() => {
-      if (settings.shieldsUp === false) {
+      if (settings.shieldsUp === false && appConfig[name].shields !== false) {
         return false
       }
 

@@ -10,6 +10,31 @@ AppStore
 ```javascript
 {
   firstRunTimestamp: integer,
+  tabs: [{
+    // persistent properties
+    url: string,
+    index: number,  // the position of the tab in the window
+    windowUUID: string,  // the permanent identifier for the window
+    active: boolean,  // whether the tab is selected
+    title: string,
+    favIconUrl: string,
+    // session properties
+    windowId: number,  // the windowId that contains the tab
+    audible: boolean,  // is audio playing (muted or not)
+    muted: boolean,  // is the tab muted
+  }],
+  windows: [{
+    // persistent properties
+    focused: boolean,
+    top: number,
+    left: number,
+    width: number,
+    height: number,
+    type: string,  // "normal", "popup", or "devtools"
+    state: string  // "normal", "minimized", "maximized", or "fullscreen"
+    // session properties
+    id: number,  // the electron id for the window
+  }],
   extensions: {
     [id]: { // the unique id of the extension
       id: string,
@@ -452,7 +477,6 @@ WindowStore
     maxHeight: number, // the maximum height of the popup window
     src: string, // the src for the popup window webview
   },
-  flashInitialized: boolean, // Whether flash was initialized successfully. Cleared on shutdown.
   cleanedOnShutdown: boolean, // whether app data was successfully cleared on shutdown
   lastAppVersion: string, // Version of the last file that was saved
   ledgerInfo: {

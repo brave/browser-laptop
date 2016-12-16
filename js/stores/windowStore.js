@@ -4,12 +4,13 @@
 
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const EventEmitter = require('events').EventEmitter
-const WindowConstants = require('../constants/windowConstants')
+const appConstants = require('../constants/appConstants')
+const windowConstants = require('../constants/windowConstants')
 const config = require('../constants/config')
 const settings = require('../constants/settings')
 const Immutable = require('immutable')
 const FrameStateUtil = require('../state/frameStateUtil')
-const ipc = global.require('electron').ipcRenderer
+const ipc = require('electron').ipcRenderer
 const messages = require('../constants/messages')
 const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
@@ -168,6 +169,20 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
   }
   frameOpts = frameOpts.toJS ? frameOpts.toJS() : frameOpts
 
+  // handle tabs.create properties
+  insertionIndex = frameOpts.index || insertionIndex
+
+  if (frameOpts.partition) {
+    frameOpts.isPrivate = FrameStateUtil.isPrivatePartition(frameOpts.partition)
+    if (FrameStateUtil.isSessionPartition(frameOpts.partition)) {
+      frameOpts.partitionNumber = FrameStateUtil.getPartitionNumber(frameOpts.partition)
+    }
+  }
+
+  if (frameOpts.disposition) {
+    openInForeground = frameOpts.disposition !== 'background-tab'
+  }
+
   if (openInForeground === undefined) {
     openInForeground = true
   }
@@ -188,12 +203,10 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
     }
   }
 
-  if (nextKey === undefined) {
-    nextKey = incrementNextKey()
-  }
+  let partitionNumber = frameOpts.partitionNumber
   let nextPartitionNumber = 0
-  if (frameOpts.partitionNumber) {
-    nextPartitionNumber = frameOpts.partitionNumber
+  if (partitionNumber) {
+    nextPartitionNumber = partitionNumber
     if (currentPartitionNumber < nextPartitionNumber) {
       currentPartitionNumber = nextPartitionNumber
     }
@@ -221,6 +234,10 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
     insertionIndex = 0
   }
 
+  if (nextKey === undefined) {
+    nextKey = incrementNextKey()
+  }
+
   windowState = windowState.merge(
     FrameStateUtil.addFrame(
       frames, windowState.get('tabs'), frameOpts,
@@ -245,7 +262,7 @@ const emitChanges = debounce(windowStore.emitChanges.bind(windowStore), 5)
 const doAction = (action) => {
   // console.log(action.actionType, action, windowState.toJS())
   switch (action.actionType) {
-    case WindowConstants.WINDOW_SET_STATE:
+    case windowConstants.WINDOW_SET_STATE:
       windowState = action.windowState
       currentKey = windowState.get('frames').reduce((previousVal, frame) => Math.max(previousVal, frame.get('key')), 0)
       currentPartitionNumber = windowState.get('frames').reduce((previousVal, frame) => Math.max(previousVal, frame.get('partitionNumber')), 0)
@@ -255,7 +272,7 @@ const doAction = (action) => {
       }
       // We should not emit here because the Window already know about the change on startup.
       return
-    case WindowConstants.WINDOW_SET_URL:
+    case windowConstants.WINDOW_SET_URL:
       const frame = FrameStateUtil.getFrameByKey(windowState, action.key)
       const currentLocation = frame.get('location')
       const parsedUrl = urlParse(action.location)
@@ -303,7 +320,7 @@ const doAction = (action) => {
         updateNavBarInput(action.location, frameStatePath(action.key))
       }
       break
-    case WindowConstants.WINDOW_SET_NAVIGATED:
+    case windowConstants.WINDOW_SET_NAVIGATED:
       action.location = action.location.trim()
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), false)
       // For about: URLs, make sure we store the URL as about:something
@@ -353,18 +370,18 @@ const doAction = (action) => {
         updateNavBarInput(action.location, frameStatePath(key))
       }
       break
-    case WindowConstants.WINDOW_SET_NAVBAR_INPUT:
+    case windowConstants.WINDOW_SET_NAVBAR_INPUT:
       updateNavBarInput(action.location)
       updateUrlSuffix(windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), action.suggestionList))
       // Since this value is bound we need to notify the control sync
       windowStore.emitChanges()
       return
-    case WindowConstants.WINDOW_SET_FRAME_TAB_ID:
+    case windowConstants.WINDOW_SET_FRAME_TAB_ID:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         tabId: action.tabId
       })
       break
-    case WindowConstants.WINDOW_SET_FRAME_ERROR:
+    case windowConstants.WINDOW_SET_FRAME_ERROR:
       const frameKey = action.frameProps.get('key')
       // set the previous location to the most recent history item or the default url
       let previousLocation = action.frameProps.get('history').unshift(config.defaultUrl).findLast((url) => url !== action.errorDetails.url)
@@ -378,7 +395,7 @@ const doAction = (action) => {
         }, action.errorDetails)
       })
       break
-    case WindowConstants.WINDOW_SET_FRAME_TITLE:
+    case windowConstants.WINDOW_SET_FRAME_TITLE:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         title: action.title
       })
@@ -386,7 +403,7 @@ const doAction = (action) => {
         title: action.title
       })
       break
-    case WindowConstants.WINDOW_SET_FINDBAR_SHOWN:
+    case windowConstants.WINDOW_SET_FINDBAR_SHOWN:
       if (action.shown) {
         windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), false)
       }
@@ -397,12 +414,12 @@ const doAction = (action) => {
         findbarSelected: action.shown
       })
       break
-    case WindowConstants.WINDOW_SET_FINDBAR_SELECTED:
+    case windowConstants.WINDOW_SET_FINDBAR_SELECTED:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         findbarSelected: action.selected
       })
       break
-    case WindowConstants.WINDOW_WEBVIEW_LOAD_START:
+    case windowConstants.WINDOW_WEBVIEW_LOAD_START:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         loading: true,
         provisionalLocation: action.location,
@@ -414,7 +431,7 @@ const doAction = (action) => {
         provisionalLocation: action.location
       })
       break
-    case WindowConstants.WINDOW_WEBVIEW_LOAD_END:
+    case windowConstants.WINDOW_WEBVIEW_LOAD_END:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         loading: false,
         endLoadTime: new Date().getTime(),
@@ -424,13 +441,13 @@ const doAction = (action) => {
         loading: false
       })
       break
-    case WindowConstants.WINDOW_SET_FULL_SCREEN:
+    case windowConstants.WINDOW_SET_FULL_SCREEN:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         isFullScreen: action.isFullScreen !== undefined ? action.isFullScreen : windowState.getIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)].concat('isFullScreen')),
         showFullScreenWarning: action.showFullScreenWarning
       })
       break
-    case WindowConstants.WINDOW_SET_NAVBAR_FOCUSED:
+    case windowConstants.WINDOW_SET_NAVBAR_FOCUSED:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'focused']), action.focused)
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'focused']), action.focused)
       // selection should be cleared on blur
@@ -438,13 +455,13 @@ const doAction = (action) => {
         windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'selected']), false)
       }
       break
-    case WindowConstants.WINDOW_NEW_FRAME:
+    case windowConstants.WINDOW_NEW_FRAME:
       newFrame(action.frameOpts, action.openInForeground)
       break
-    case WindowConstants.WINDOW_VIEW_KEY:
+    case windowConstants.WINDOW_VIEW_KEY:
       newFrame(action.frameOpts, action.openInForeground)
       break
-    case WindowConstants.WINDOW_CLONE_FRAME:
+    case windowConstants.WINDOW_CLONE_FRAME:
       {
         let insertionIndex = FrameStateUtil.findIndexForFrameKey(windowState.get('frames'), action.frameOpts.key) + 1
         const nextKey = incrementNextKey()
@@ -452,7 +469,7 @@ const doAction = (action) => {
           action.openInForeground, insertionIndex, nextKey)
         break
       }
-    case WindowConstants.WINDOW_CLOSE_FRAME:
+    case windowConstants.WINDOW_CLOSE_FRAME:
       // Use the frameProps we passed in, or default to the active frame
       const frameProps = action.frameProps || FrameStateUtil.getActiveFrame(windowState)
       const index = FrameStateUtil.getFramePropsIndex(windowState.get('frames'), frameProps)
@@ -467,14 +484,14 @@ const doAction = (action) => {
         updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))
       }
       break
-    case WindowConstants.WINDOW_UNDO_CLOSED_FRAME:
+    case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
       windowState = windowState.merge(FrameStateUtil.undoCloseFrame(windowState, windowState.get('closedFrames')))
       focusWebview(activeFrameStatePath())
       break
-    case WindowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
+    case windowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
       windowState = windowState.set('closedFrames', new Immutable.List())
       break
-    case WindowConstants.WINDOW_SET_ACTIVE_FRAME:
+    case windowConstants.WINDOW_SET_ACTIVE_FRAME:
       if (!action.frameProps) {
         break
       }
@@ -485,20 +502,20 @@ const doAction = (action) => {
       windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
       updateTabPageIndex(action.frameProps)
       break
-    case WindowConstants.WINDOW_SET_PREVIEW_FRAME:
+    case windowConstants.WINDOW_SET_PREVIEW_FRAME:
       windowState = windowState.merge({
         previewFrameKey: action.frameProps && action.frameProps.get('key') !== windowState.get('activeFrameKey')
           ? action.frameProps.get('key') : null
       })
       break
-    case WindowConstants.WINDOW_SET_PREVIEW_TAB_PAGE_INDEX:
+    case windowConstants.WINDOW_SET_PREVIEW_TAB_PAGE_INDEX:
       if (action.previewTabPageIndex !== windowState.getIn(['ui', 'tabs', 'tabPageIndex'])) {
         windowState = windowState.setIn(['ui', 'tabs', 'previewTabPageIndex'], action.previewTabPageIndex)
       } else {
         windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
       }
       break
-    case WindowConstants.WINDOW_SET_TAB_PAGE_INDEX:
+    case windowConstants.WINDOW_SET_TAB_PAGE_INDEX:
       if (action.index !== undefined) {
         windowState = windowState.setIn(['ui', 'tabs', 'tabPageIndex'], action.index)
         windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
@@ -506,20 +523,20 @@ const doAction = (action) => {
         updateTabPageIndex(action.frameProps)
       }
       break
-    case WindowConstants.WINDOW_UPDATE_BACK_FORWARD:
+    case windowConstants.WINDOW_UPDATE_BACK_FORWARD:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         canGoBack: action.canGoBack,
         canGoForward: action.canGoForward
       })
       break
-    case WindowConstants.WINDOW_SET_IS_BEING_DRAGGED_OVER_DETAIL:
+    case windowConstants.WINDOW_SET_IS_BEING_DRAGGED_OVER_DETAIL:
       if (!action.dragOverKey) {
         windowState = windowState.deleteIn(['ui', 'dragging'])
       } else {
         windowState = windowState.mergeIn(['ui', 'dragging', 'draggingOver'], Immutable.fromJS(Object.assign({}, action.dragDetail, { dragOverKey: action.dragOverKey, dragType: action.dragType })))
       }
       break
-    case WindowConstants.WINDOW_TAB_MOVE:
+    case windowConstants.WINDOW_TAB_MOVE:
       const sourceFramePropsIndex = FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.sourceFrameProps)
       let newIndex = FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.destinationFrameProps) + (action.prepend ? 0 : 1)
       let frames = windowState.get('frames').splice(sourceFramePropsIndex, 1)
@@ -534,13 +551,13 @@ const doAction = (action) => {
       // Since the tab could have changed pages, update the tab page as well
       updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))
       break
-    case WindowConstants.WINDOW_SET_LINK_HOVER_PREVIEW:
+    case windowConstants.WINDOW_SET_LINK_HOVER_PREVIEW:
       windowState = windowState.mergeIn(activeFrameStatePath(), {
         hrefPreview: action.href,
         showOnRight: action.showOnRight
       })
       break
-    case WindowConstants.WINDOW_SET_URL_BAR_SUGGESTIONS:
+    case windowConstants.WINDOW_SET_URL_BAR_SUGGESTIONS:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), action.selectedIndex)
 
       if (action.suggestionList !== undefined) {
@@ -548,13 +565,13 @@ const doAction = (action) => {
       }
       updateUrlSuffix(action.suggestionList)
       break
-    case WindowConstants.WINDOW_SET_URL_BAR_PREVIEW:
+    case windowConstants.WINDOW_SET_URL_BAR_PREVIEW:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'urlPreview']), action.value)
       break
-    case WindowConstants.WINDOW_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS:
+    case windowConstants.WINDOW_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'searchResults']), action.searchResults)
       break
-    case WindowConstants.WINDOW_SET_THEME_COLOR:
+    case windowConstants.WINDOW_SET_THEME_COLOR:
       if (action.themeColor !== undefined) {
         windowState = windowState.setIn(frameStatePathForFrame(action.frameProps).concat(['themeColor']), action.themeColor)
         windowState = windowState.setIn(tabStatePathForFrame(action.frameProps).concat(['themeColor']), action.themeColor)
@@ -564,7 +581,7 @@ const doAction = (action) => {
         windowState = windowState.setIn(tabStatePathForFrame(action.frameProps).concat(['computedThemeColor']), action.computedThemeColor)
       }
       break
-    case WindowConstants.WINDOW_SET_URL_BAR_ACTIVE:
+    case windowConstants.WINDOW_SET_URL_BAR_ACTIVE:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'active']), action.isActive)
       if (!action.isActive) {
         windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), false)
@@ -574,7 +591,7 @@ const doAction = (action) => {
         })
       }
       break
-    case WindowConstants.WINDOW_SET_RENDER_URL_BAR_SUGGESTIONS:
+    case windowConstants.WINDOW_SET_RENDER_URL_BAR_SUGGESTIONS:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), action.enabled)
       if (!action.enabled) {
         windowState = windowState.mergeIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions']), {
@@ -586,13 +603,13 @@ const doAction = (action) => {
         updateUrlSuffix(undefined)
       }
       break
-    case WindowConstants.WINDOW_SET_URL_BAR_AUTCOMPLETE_ENABLED:
+    case windowConstants.WINDOW_SET_URL_BAR_AUTCOMPLETE_ENABLED:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']), action.enabled)
       break
-    case WindowConstants.WINDOW_SET_URL_BAR_FOCUSED:
+    case windowConstants.WINDOW_SET_URL_BAR_FOCUSED:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'focused']), action.isFocused)
       break
-    case WindowConstants.WINDOW_SET_URL_BAR_SELECTED:
+    case windowConstants.WINDOW_SET_URL_BAR_SELECTED:
       const urlBarPath = activeFrameStatePath().concat(['navbar', 'urlbar'])
       windowState = windowState.mergeIn(urlBarPath, {
         selected: action.selected
@@ -602,24 +619,24 @@ const doAction = (action) => {
         windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'focused']), true)
       }
       break
-    case WindowConstants.WINDOW_SET_ACTIVE_FRAME_SHORTCUT:
+    case windowConstants.WINDOW_SET_ACTIVE_FRAME_SHORTCUT:
       const framePath = action.frameProps ? ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)] : activeFrameStatePath()
       windowState = windowState.mergeIn(framePath, {
         activeShortcut: action.activeShortcut,
         activeShortcutDetails: action.activeShortcutDetails
       })
       break
-    case WindowConstants.WINDOW_SET_SEARCH_DETAIL:
+    case windowConstants.WINDOW_SET_SEARCH_DETAIL:
       windowState = windowState.merge({
         searchDetail: action.searchDetail
       })
       break
-    case WindowConstants.WINDOW_SET_FIND_DETAIL:
+    case windowConstants.WINDOW_SET_FIND_DETAIL:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'findDetail'], action.findDetail)
       // Since the input value is bound, we need to notify the control sync.
       windowStore.emitChanges()
       return
-    case WindowConstants.WINDOW_SET_BOOKMARK_DETAIL:
+    case windowConstants.WINDOW_SET_BOOKMARK_DETAIL:
       if (!action.currentDetail && !action.originalDetail) {
         windowState = windowState.delete('bookmarkDetail')
       } else {
@@ -634,16 +651,27 @@ const doAction = (action) => {
       // Since the input values of bookmarks are bound, we need to notify the controls sync.
       windowStore.emitChanges()
       return
-    case WindowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL:
+    case windowConstants.WINDOW_AUTOFILL_SELECTION_CLICKED:
+      ipc.send('autofill-selection-clicked', action.tabId, action.value, action.frontEndId, action.index)
+      windowState = windowState.delete('contextMenuDetail')
+      break
+    case windowConstants.WINDOW_AUTOFILL_POPUP_HIDDEN:
+    case windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL:
       if (!action.detail) {
-        windowState = windowState.delete('contextMenuDetail')
+        if (windowState.getIn(['contextMenuDetail', 'type']) === 'autofill' &&
+            windowState.getIn(['contextMenuDetail', 'tabId']) === action.tabId) {
+          windowState = windowState.delete('contextMenuDetail')
+          if (action.notify) {
+            ipc.send('autofill-popup-hidden', action.tabId)
+          }
+        }
       } else {
         windowState = windowState.set('contextMenuDetail', action.detail)
       }
       // Drag and drop bookmarks code expects this to be set sync
       windowStore.emitChanges()
       return
-    case WindowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL:
+    case windowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL:
       if (!action.detail) {
         windowState = windowState.delete('popupWindowDetail')
       } else {
@@ -652,7 +680,7 @@ const doAction = (action) => {
       // Drag and drop bookmarks code expects this to be set sync
       windowStore.emitChanges()
       return
-    case WindowConstants.WINDOW_SET_PINNED:
+    case windowConstants.WINDOW_SET_PINNED:
       // Check if there's already a frame which is pinned.
       // If so we just want to set it as active.
       const location = action.frameProps.get('location')
@@ -660,9 +688,9 @@ const doAction = (action) => {
         (frame) => frame.get('pinnedLocation') && frame.get('pinnedLocation') === location &&
           (action.frameProps.get('partitionNumber') || 0) === (frame.get('partitionNumber') || 0))
       if (alreadyPinnedFrameProps && action.isPinned) {
-        action.actionType = WindowConstants.WINDOW_CLOSE_FRAME
+        action.actionType = windowConstants.WINDOW_CLOSE_FRAME
         doAction(action)
-        action.actionType = WindowConstants.WINDOW_SET_ACTIVE_FRAME
+        action.actionType = windowConstants.WINDOW_SET_ACTIVE_FRAME
         action.frameProps = alreadyPinnedFrameProps
         doAction(action)
       } else {
@@ -681,43 +709,43 @@ const doAction = (action) => {
       // change detection where it adds a second frame
       windowStore.emitChanges()
       return
-    case WindowConstants.WINDOW_SET_AUDIO_MUTED:
+    case windowConstants.WINDOW_SET_AUDIO_MUTED:
       windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioMuted'], action.muted)
       windowState = windowState.setIn(['tabs', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioMuted'], action.muted)
       break
-    case WindowConstants.WINDOW_SET_AUDIO_PLAYBACK_ACTIVE:
+    case windowConstants.WINDOW_SET_AUDIO_PLAYBACK_ACTIVE:
       windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioPlaybackActive'], action.audioPlaybackActive)
       windowState = windowState.setIn(['tabs', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioPlaybackActive'], action.audioPlaybackActive)
       break
-    case WindowConstants.WINDOW_SET_FAVICON:
+    case windowConstants.WINDOW_SET_FAVICON:
       windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'icon'], action.favicon)
       windowState = windowState.setIn(['tabs', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'icon'], action.favicon)
       break
-    case WindowConstants.WINDOW_SET_LAST_ZOOM_PERCENTAGE:
+    case windowConstants.WINDOW_SET_LAST_ZOOM_PERCENTAGE:
       windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'lastZoomPercentage'], action.percentage)
       break
-    case WindowConstants.WINDOW_SET_MAXIMIZE_STATE:
+    case windowConstants.WINDOW_SET_MAXIMIZE_STATE:
       windowState = windowState.setIn(['ui', 'isMaximized'], action.isMaximized)
       break
-    case WindowConstants.WINDOW_SAVE_POSITION:
+    case windowConstants.WINDOW_SAVE_POSITION:
       windowState = windowState.setIn(['ui', 'position'], action.position)
       break
-    case WindowConstants.WINDOW_SAVE_SIZE:
+    case windowConstants.WINDOW_SAVE_SIZE:
       windowState = windowState.setIn(['ui', 'size'], action.size)
       break
-    case WindowConstants.WINDOW_SET_FULLSCREEN_STATE:
+    case windowConstants.WINDOW_SET_FULLSCREEN_STATE:
       windowState = windowState.setIn(['ui', 'isFullScreen'], action.isFullScreen)
       break
-    case WindowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR:
+    case windowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR:
       windowState = windowState.setIn(['ui', 'mouseInTitlebar'], action.mouseInTitlebar)
       break
-    case WindowConstants.WINDOW_SET_NOSCRIPT_VISIBLE:
+    case windowConstants.WINDOW_SET_NOSCRIPT_VISIBLE:
       windowState = windowState.setIn(['ui', 'noScriptInfo', 'isVisible'], action.isVisible)
       break
-    case WindowConstants.WINDOW_SET_SITE_INFO_VISIBLE:
+    case windowConstants.WINDOW_SET_SITE_INFO_VISIBLE:
       windowState = windowState.setIn(['ui', 'siteInfo', 'isVisible'], action.isVisible)
       break
-    case WindowConstants.WINDOW_SET_BRAVERY_PANEL_DETAIL:
+    case windowConstants.WINDOW_SET_BRAVERY_PANEL_DETAIL:
       if (!action.braveryPanelDetail) {
         windowState = windowState.delete('braveryPanelDetail')
       } else {
@@ -730,35 +758,35 @@ const doAction = (action) => {
         })
       }
       break
-    case WindowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL:
+    case windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL:
       if (!action.clearBrowsingDataDetail) {
         windowState = windowState.delete('clearBrowsingDataDetail')
       } else {
         windowState = windowState.set('clearBrowsingDataDetail', Immutable.fromJS(action.clearBrowsingDataDetail))
       }
       break
-    case WindowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_DETAIL:
+    case windowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_DETAIL:
       if (!action.importBrowserDataDetail) {
         windowState = windowState.delete('importBrowserDataDetail')
       } else {
         windowState = windowState.set('importBrowserDataDetail', Immutable.fromJS(action.importBrowserDataDetail))
       }
       break
-    case WindowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_SELECTED:
+    case windowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_SELECTED:
       if (!action.selected) {
         windowState = windowState.delete('importBrowserDataSelected')
       } else {
         windowState = windowState.set('importBrowserDataSelected', Immutable.fromJS(action.selected))
       }
       break
-    case WindowConstants.WINDOW_WIDEVINE_PANEL_DETAIL_CHANGED:
+    case windowConstants.WINDOW_WIDEVINE_PANEL_DETAIL_CHANGED:
       if (!action.widevinePanelDetail) {
         windowState = windowState.delete('widevinePanelDetail')
       } else {
         windowState = windowState.mergeIn(['widevinePanelDetail'], Immutable.fromJS(action.widevinePanelDetail))
       }
       break
-    case WindowConstants.WINDOW_WIDEVINE_SITE_ACCESSED_WITHOUT_INSTALL:
+    case windowConstants.WINDOW_WIDEVINE_SITE_ACCESSED_WITHOUT_INSTALL:
       const activeLocation = windowState.getIn(activeFrameStatePath().concat(['location']))
       windowState = windowState.set('widevinePanelDetail', Immutable.Map({
         alsoAddRememberSiteSetting: true,
@@ -766,7 +794,7 @@ const doAction = (action) => {
         shown: true
       }))
       break
-    case WindowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL:
+    case windowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL:
       if (!action.currentDetail && !action.originalDetail) {
         windowState = windowState.delete('autofillAddressDetail')
       } else {
@@ -778,7 +806,7 @@ const doAction = (action) => {
       // Since the input values of address are bound, we need to notify the controls sync.
       windowStore.emitChanges()
       break
-    case WindowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL:
+    case windowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL:
       if (!action.currentDetail && !action.originalDetail) {
         windowState = windowState.delete('autofillCreditCardDetail')
       } else {
@@ -790,13 +818,13 @@ const doAction = (action) => {
       // Since the input values of credit card are bound, we need to notify the controls sync.
       windowStore.emitChanges()
       break
-    case WindowConstants.WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE:
+    case windowConstants.WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE:
       windowState = windowState.setIn(['ui', 'downloadsToolbar', 'isVisible'], action.isVisible)
       break
-    case WindowConstants.WINDOW_SET_RELEASE_NOTES_VISIBLE:
+    case windowConstants.WINDOW_SET_RELEASE_NOTES_VISIBLE:
       windowState = windowState.setIn(['ui', 'releaseNotes', 'isVisible'], action.isVisible)
       break
-    case WindowConstants.WINDOW_SET_SECURITY_STATE:
+    case windowConstants.WINDOW_SET_SECURITY_STATE:
       let path = frameStatePathForFrame(action.frameProps)
       if (action.securityState.secure !== undefined) {
         windowState = windowState.setIn(path.concat(['security', 'isSecure']),
@@ -811,23 +839,23 @@ const doAction = (action) => {
                                         action.securityState.certDetails)
       }
       break
-    case WindowConstants.WINDOW_SET_BLOCKED_BY:
+    case windowConstants.WINDOW_SET_BLOCKED_BY:
       const blockedByPath = ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), action.blockType, 'blocked']
       let blockedBy = windowState.getIn(blockedByPath) || new Immutable.List()
       blockedBy = blockedBy.toSet().add(action.location).toList()
       windowState = windowState.setIn(blockedByPath, blockedBy)
       break
-    case WindowConstants.WINDOW_SET_REDIRECTED_BY:
+    case windowConstants.WINDOW_SET_REDIRECTED_BY:
       const redirectedByPath = ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'httpsEverywhere', action.ruleset]
       let redirectedBy = windowState.getIn(redirectedByPath) || new Immutable.List()
       windowState = windowState.setIn(redirectedByPath, redirectedBy.push(action.location))
       break
-    case WindowConstants.WINDOW_ADD_HISTORY:
+    case windowConstants.WINDOW_ADD_HISTORY:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         history: addToHistory(action.frameProps)
       })
       break
-    case WindowConstants.WINDOW_SET_BLOCKED_RUN_INSECURE_CONTENT:
+    case windowConstants.WINDOW_SET_BLOCKED_RUN_INSECURE_CONTENT:
       const blockedRunInsecureContentPath =
         ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)]
       if (action.source) {
@@ -841,53 +869,53 @@ const doAction = (action) => {
           windowState.deleteIn(blockedRunInsecureContentPath.concat(['security', 'blockedRunInsecureContent']))
       }
       break
-    case WindowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE:
+    case windowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE:
       if (getSetting(settings.AUTO_HIDE_MENU)) {
-        doAction({actionType: WindowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL})
+        doAction({actionType: windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL})
         // Use value if provided; if not, toggle to opposite.
         const newVisibleStatus = typeof action.isVisible === 'boolean'
           ? action.isVisible
           : !windowState.getIn(['ui', 'menubar', 'isVisible'])
         // Clear selection when menu is shown
         if (newVisibleStatus) {
-          doAction({ actionType: WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX, index: [0] })
+          doAction({ actionType: windowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX, index: [0] })
         }
         windowState = windowState.setIn(['ui', 'menubar', 'isVisible'], newVisibleStatus)
       }
       break
-    case WindowConstants.WINDOW_HIDE_BOOKMARK_HANGER:
+    case windowConstants.WINDOW_HIDE_BOOKMARK_HANGER:
       const hangerShowing = windowState.getIn(['bookmarkDetail', 'isBookmarkHanger'])
       if (hangerShowing) {
         windowState = windowState.delete('bookmarkDetail')
       }
       break
-    case WindowConstants.WINDOW_RESET_MENU_STATE:
-      doAction({actionType: WindowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL})
-      doAction({actionType: WindowConstants.WINDOW_HIDE_BOOKMARK_HANGER})
+    case windowConstants.WINDOW_RESET_MENU_STATE:
+      doAction({actionType: windowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL})
+      doAction({actionType: windowConstants.WINDOW_HIDE_BOOKMARK_HANGER})
       if (getSetting(settings.AUTO_HIDE_MENU)) {
-        doAction({actionType: WindowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE, isVisible: false})
+        doAction({actionType: windowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE, isVisible: false})
       } else {
-        doAction({actionType: WindowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL})
+        doAction({actionType: windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL})
       }
-      doAction({actionType: WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX})
-      doAction({actionType: WindowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID})
+      doAction({actionType: windowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX})
+      doAction({actionType: windowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID})
       break
-    case WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX:
+    case windowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX:
       windowState = windowState.setIn(['ui', 'menubar', 'selectedIndex'],
         Array.isArray(action.index)
         ? action.index
         : null)
       break
-    case WindowConstants.WINDOW_SET_LAST_FOCUSED_SELECTOR:
+    case windowConstants.WINDOW_SET_LAST_FOCUSED_SELECTOR:
       windowState = windowState.setIn(['ui', 'menubar', 'lastFocusedSelector'], action.selector)
       break
-    case WindowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID:
+    case windowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID:
       windowState = windowState.setIn(['ui', 'bookmarksToolbar', 'selectedFolderId'], action.folderId)
       break
-    case WindowConstants.WINDOW_ON_FOCUS_CHANGED:
+    case windowConstants.WINDOW_ON_FOCUS_CHANGED:
       windowState = windowState.setIn(['ui', 'hasFocus'], action.hasFocus)
       break
-    case WindowConstants.WINDOW_SET_MODAL_DIALOG_DETAIL:
+    case windowConstants.WINDOW_SET_MODAL_DIALOG_DETAIL:
       if (action.className && action.props === undefined) {
         windowState = windowState.deleteIn(['modalDialogDetail', action.className])
       } else if (action.className) {
@@ -895,6 +923,9 @@ const doAction = (action) => {
       }
       // Since the input values of address are bound, we need to notify the controls sync.
       windowStore.emitChanges()
+      break
+    case appConstants.APP_NEW_TAB:
+      newFrame(action.frameProps, action.frameProps.get('disposition') === 'foreground-tab')
       break
     default:
   }
@@ -916,7 +947,7 @@ ipc.on(messages.SHORTCUT_PREV_TAB, () => {
 
 ipc.on(messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, (e, clearBrowsingDataDetail) => {
   doAction({
-    actionType: WindowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL,
+    actionType: windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL,
     clearBrowsingDataDetail
   })
 })

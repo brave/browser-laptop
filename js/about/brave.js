@@ -8,7 +8,7 @@ const messages = require('../constants/messages')
 const SortableTable = require('../components/sortableTable')
 const aboutActions = require('./aboutActions')
 
-const ipc = window.chrome.ipc
+const ipc = window.chrome.ipcRenderer
 
 require('../../less/about/history.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')

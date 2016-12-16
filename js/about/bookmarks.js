@@ -17,7 +17,7 @@ const siteUtil = require('../state/siteUtil')
 const formatUtil = require('../../app/common/lib/formatUtil')
 const iconSize = require('../../app/common/lib/faviconUtil').iconSize
 
-const ipc = window.chrome.ipc
+const ipc = window.chrome.ipcRenderer
 
 // Stylesheets
 require('../../less/about/bookmarks.less')

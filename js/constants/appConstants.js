@@ -5,9 +5,16 @@
 const mapValuesByKeys = require('../lib/functional').mapValuesByKeys
 
 const _ = null
-const AppConstants = {
+const appConstants = {
   APP_NEW_WINDOW: _,
   APP_CLOSE_WINDOW: _,
+  APP_WINDOW_CLOSED: _,
+  APP_WINDOW_CREATED: _,
+  APP_WINDOW_UPDATED: _,
+  APP_NEW_TAB: _,
+  APP_CLOSE_TAB: _,
+  APP_TAB_CLOSED: _,
+  APP_TAB_UPDATED: _,
   APP_ADD_SITE: _,
   APP_CLEAR_HISTORY: _,
   APP_SET_STATE: _,
@@ -64,7 +71,18 @@ const AppConstants = {
   APP_DEFAULT_BROWSER_UPDATED: _,
   APP_DEFAULT_BROWSER_CHECK_COMPLETE: _,
   APP_POPULATE_HISTORY: _,
-  APP_RENDER_URL_TO_PDF: _
+  APP_RENDER_URL_TO_PDF: _,
+  APP_DATA_URL_COPIED: _,
+  APP_DOWNLOAD_REVEALED: _,
+  APP_DOWNLOAD_OPENED: _,
+  APP_DOWNLOAD_ACTION_PERFORMED: _,
+  APP_DOWNLOAD_COPIED_TO_CLIPBOARD: _,
+  APP_DOWNLOAD_DELETED: _,
+  APP_DOWNLOAD_CLEARED: _,
+  APP_DOWNLOAD_REDOWNLOADED: _,
+  APP_ALLOW_FLASH_ONCE: _,
+  APP_ALLOW_FLASH_ALWAYS: _,
+  APP_SHUTTING_DOWN: _
 }
 
-module.exports = mapValuesByKeys(AppConstants)
+module.exports = mapValuesByKeys(appConstants)

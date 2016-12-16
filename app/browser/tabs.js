@@ -1,106 +1,178 @@
-const {app, BrowserWindow, session, webContents} = require('electron')
-const extensions = process.atomBinding('extension')
-const { getBraveExtIndexHTML } = require('../../js/lib/appUrlUtil')
+const appActions = require('../../js/actions/appActions')
+const messages = require('../..//js/constants/messages')
+const tabState = require('../common/state/tabState')
+const {app, extensions} = require('electron')
+const { makeImmutable } = require('../common/state/immutableUtil')
 
 let currentWebContents = {}
-let activeTab = null
 
 const cleanupWebContents = (tabId) => {
   delete currentWebContents[tabId]
+  setImmediate(() => {
+    appActions.tabClosed({ tabId })
+  })
 }
 
-const tabs = {
-  init: () => {
+const getTabValue = function (tabId) {
+  let tab = api.getWebContents(tabId)
+  if (tab) {
+    const tabValue = makeImmutable(extensions.tabValue(tab))
+    return tabValue.set('tabId', tabId)
+  }
+}
+
+const updateTab = (tabId) => {
+  let tabValue = getTabValue(tabId)
+  if (tabValue) {
+    setImmediate(() => {
+      appActions.tabUpdated(tabValue)
+    })
+  }
+}
+
+const api = {
+  init: (state, action) => {
+    process.on('open-url-from-tab', (e, source, targetUrl) => {
+      api.create({
+        url: targetUrl,
+        openerTabId: source.getId()
+      })
+    })
+
+    process.on('add-new-contents', (e, source, newTab, disposition, size, userGesture) => {
+      if (userGesture === false) {
+        e.preventDefault()
+        return
+      }
+
+      let location = newTab.getURL()
+      if (!location || location === '') {
+        location = 'about:blank'
+      }
+
+      // TODO(bridiver) - handle pinned property?? - probably through tabValue
+      const frameOpts = {
+        location,
+        partition: newTab.session.partition,
+        guestInstanceId: newTab.guestInstanceId,
+        disposition
+      }
+
+      if (disposition === 'new-window' || disposition === 'new-popup') {
+        const windowOpts = makeImmutable(size)
+        appActions.newWindow(makeImmutable(frameOpts), windowOpts)
+      } else {
+        let hostWebContents = source.hostWebContents || source
+        hostWebContents.send(messages.SHORTCUT_NEW_FRAME, location, { frameOpts })
+      }
+    })
     app.on('web-contents-created', function (event, tab) {
-      // TODO(bridiver) - also exclude extension action windows??
-      if (extensions.isBackgroundPage(tab) || tab.getURL() === getBraveExtIndexHTML()) {
+      if (extensions.isBackgroundPage(tab) || !tab.isGuest()) {
         return
       }
       let tabId = tab.getId()
-      tab.on('destroyed', cleanupWebContents.bind(null, tabId))
-      tab.on('crashed', cleanupWebContents.bind(null, tabId))
-      tab.on('close', cleanupWebContents.bind(null, tabId))
+      tab.once('destroyed', cleanupWebContents.bind(null, tabId))
+      tab.once('crashed', cleanupWebContents.bind(null, tabId))
+      tab.once('close', cleanupWebContents.bind(null, tabId))
       tab.on('set-active', function (evt, active) {
-        if (active) {
-          activeTab = tab
+        updateTab(tabId)
+      })
+      tab.on('page-favicon-updated', function (e, favicons) {
+        if (favicons && favicons.length > 0) {
+          // tab.setTabValues({
+          //   faviconUrl: favicons[0]
+          // })
+          // updateTab(tabId)
         }
       })
+      tab.on('unresponsive', () => {
+        console.log('unresponsive')
+      })
+      tab.on('responsive', () => {
+        console.log('responsive')
+      })
+      tab.on('did-attach', () => {
+        updateTab(tabId)
+      })
+      tab.on('did-detach', () => {
+        updateTab(tabId)
+      })
+      tab.on('page-title-updated', function () {
+        updateTab(tabId)
+      })
+      tab.on('did-fail-load', function () {
+        updateTab(tabId)
+      })
+      tab.on('did-fail-provisional-load', function () {
+        updateTab(tabId)
+      })
+      tab.on('did-stop-loading', function () {
+        updateTab(tabId)
+      })
+      tab.on('navigation-entry-commited', function (evt, url) {
+        updateTab(tabId)
+      })
+      tab.on('did-navigate', function (evt, url) {
+        updateTab(tabId)
+      })
+      tab.on('load-start', function (evt, url, isMainFrame, isErrorPage) {
+        if (isMainFrame) {
+          updateTab(tabId)
+        }
+      })
+      tab.on('did-finish-load', function () {
+        updateTab(tabId)
+      })
+
       currentWebContents[tabId] = tab
+      let tabValue = getTabValue(tabId)
+      if (tabValue) {
+        setImmediate(() => {
+          appActions.tabCreated(tabValue)
+        })
+      }
     })
+
+    return state
   },
 
   getWebContents: (tabId) => {
     return currentWebContents[tabId]
   },
 
-  create: (createProperties) => {
-    return new Promise((resolve, reject) => {
-      // TODO(bridiver) - make this available from electron
-      var payload = {}
-      process.emit('ELECTRON_GUEST_VIEW_MANAGER_NEXT_INSTANCE_ID', payload)
-      var guestInstanceId = payload.returnValue
+  setAudioMuted: (state, action) => {
+    action = makeImmutable(action)
+    let frameProps = action.get('frameProps')
+    let muted = action.get('muted')
+    let tabId = frameProps.get('tabId')
+    let tab = api.getWebContents(tabId)
+    if (tab) {
+      tab.setAudioMuted(muted)
+      let tabValue = getTabValue(tabId)
+      return tabState.updateTab(state, { tabValue })
+    }
+  },
 
-      let win = BrowserWindow.getFocusedWindow()
-      let windowId = createProperties.windowId
-      if (windowId && windowId !== -2) {
-        win = BrowserWindow.fromId(windowId) || win
+  closeTab: (state, action) => {
+    action = makeImmutable(action)
+    let tabId = action.get('tabId')
+    let tab = api.getWebContents(tabId)
+    try {
+      if (!tab.isDestroyed()) {
+        tab.close()
       }
-      if (!win) {
-        reject('Could not find a window for new tab')
-        return
-      }
-      let opener = null
-      let newSession = session.defaultSession
-      let openerTabId = createProperties.openerTabId
-      if (openerTabId) {
-        opener = tabs.getWebContents(openerTabId)
-        if (!opener) {
-          reject('Opener does not exist')
-          return
-        }
-        // only use the opener if it is in the same window
-        if (opener.webContents.hostWebContents !== win.webContents) {
-          reject('Opener must be in the same window as new tab')
-          return
-        }
-      }
+    } catch (e) {
+      // ignore
+    }
+    return tabState.removeTabByTabId(state, tabId)
+  },
 
-      opener = opener || activeTab
-      if (opener) {
-        newSession = opener.session
-      } else {
-        reject('Could not find an opener for new tab')
-        return
-      }
-
-      let webPreferences = {
-        isGuest: true,
-        embedder: win.webContents,
-        session: newSession,
-        guestInstanceId,
-        delayedLoadUrl: createProperties.url || 'about:newtab'
-      }
-      webPreferences = Object.assign({}, opener.getWebPreferences(), webPreferences)
-      let guest = webContents.create(webPreferences)
-      process.emit('ELECTRON_GUEST_VIEW_MANAGER_REGISTER_GUEST', { sender: opener }, guest, guestInstanceId)
-
-      guest.once('did-finish-load', () => {
-        resolve(guest)
-      })
-      let active = createProperties.active !== false
-      if (!active) {
-        active = createProperties.selected !== false
-      }
-      let disposition = active ? 'foreground-tab' : 'background-tab'
-
-      process.emit('ELECTRON_GUEST_VIEW_MANAGER_TAB_OPEN',
-        { sender: opener }, // event
-        'about:blank',
-        '',
-        disposition,
-        { webPreferences: guest.getWebPreferences() })
+  create: (createProperties, cb = null) => {
+    createProperties = makeImmutable(createProperties).toJS()
+    extensions.createTab(createProperties, (tab) => {
+      cb && cb(tab)
     })
   }
 }
 
-module.exports = tabs
+module.exports = api

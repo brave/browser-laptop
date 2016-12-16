@@ -2,20 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const electron = global.require('electron')
+const electron = require('electron')
 const remote = electron.remote
 const Menu = remote.Menu
 const Immutable = require('immutable')
-const clipboard = electron.clipboard
-const nativeImage = electron.nativeImage
+const clipboard = remote.clipboard
 const messages = require('./constants/messages')
 const windowStore = require('./stores/windowStore')
 const windowActions = require('./actions/windowActions')
 const webviewActions = require('./actions/webviewActions')
 const bookmarkActions = require('./actions/bookmarkActions')
-const downloadActions = require('./actions/downloadActions')
 const appActions = require('./actions/appActions')
 const siteTags = require('./constants/siteTags')
+const electronDownloadItemActions = require('../app/common/constants/electronDownloadItemActions')
 const dragTypes = require('./constants/dragTypes')
 const siteUtil = require('./state/siteUtil')
 const downloadUtil = require('./state/downloadUtil')
@@ -24,7 +23,7 @@ const CommonMenu = require('../app/common/commonMenu')
 const dnd = require('./dnd')
 const dndData = require('./dndData')
 const appStoreRenderer = require('./stores/appStoreRenderer')
-const ipc = global.require('electron').ipcRenderer
+const ipc = require('electron').ipcRenderer
 const locale = require('../js/l10n')
 const {getSetting} = require('./settings')
 const settings = require('./constants/settings')
@@ -146,60 +145,59 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
   const template = []
 
   if (downloadItem) {
-    const downloads = appStoreRenderer.state.get('downloads')
     if (downloadUtil.shouldAllowPause(downloadItem)) {
       template.push({
         label: locale.translation('downloadItemPause'),
-        click: downloadActions.pauseDownload.bind(null, downloadId)
+        click: appActions.downloadActionPerformed.bind(null, downloadId, electronDownloadItemActions.PAUSE)
       })
     }
 
     if (downloadUtil.shouldAllowResume(downloadItem)) {
       template.push({
         label: locale.translation('downloadItemResume'),
-        click: downloadActions.resumeDownload.bind(null, downloadId)
+        click: appActions.downloadActionPerformed.bind(null, downloadId, electronDownloadItemActions.RESUME)
       })
     }
 
     if (downloadUtil.shouldAllowCancel(downloadItem)) {
       template.push({
         label: locale.translation('downloadItemCancel'),
-        click: downloadActions.cancelDownload.bind(null, downloadId)
+        click: appActions.downloadActionPerformed.bind(null, downloadId, electronDownloadItemActions.CANCEL)
       })
     }
 
     if (downloadUtil.shouldAllowRedownload(downloadItem)) {
       template.push({
         label: locale.translation('downloadItemRedownload'),
-        click: downloadActions.redownloadURL.bind(null, downloadItem, downloadId)
+        click: appActions.downloadRedownloaded.bind(null, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowCopyLink(downloadItem)) {
       template.push({
         label: locale.translation('downloadItemCopyLink'),
-        click: downloadActions.copyLinkToClipboard.bind(null, downloadItem)
+        click: appActions.downloadCopiedToClipboard.bind(null, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowOpenDownloadLocation(downloadItem)) {
       template.push({
         label: locale.translation('downloadItemPath'),
-        click: downloadActions.locateShellPath.bind(null, downloadItem)
+        click: appActions.downloadRevealed.bind(null, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowDelete(downloadItem)) {
       template.push({
         label: locale.translation('downloadItemDelete'),
-        click: downloadActions.deleteDownload.bind(null, downloads, downloadItem, downloadId)
+        click: appActions.downloadDeleted.bind(null, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowRemoveFromList(downloadItem)) {
       template.push({
         label: locale.translation('downloadItemClear'),
-        click: downloadActions.clearDownload.bind(null, downloads, downloadId)
+        click: appActions.downloadCleared.bind(null, downloadId)
       })
     }
   }
@@ -456,13 +454,31 @@ function autofillTemplateInit (suggestions, frame) {
       template.push({
         label: value,
         click: (item, focusedWindow) => {
-          ipc.send('autofill-selection-clicked', frame.get('tabId'), value, frontendId, i)
-          windowActions.setContextMenuDetail()
+          windowActions.autofillSelectionClicked(frame.get('tabId'), value, frontendId, i)
         }
       })
     }
   }
   return menuUtil.sanitizeTemplateItems(template)
+}
+
+function flashTemplateInit (frameProps) {
+  const template = []
+  template.push({
+    label: locale.translation('allowFlashOnce'),
+    click: () => {
+      appActions.allowFlashOnce(frameProps.get('tabId'), frameProps.get('location'), frameProps.get('isPrivate'))
+    }
+  })
+  if (!frameProps.get('isPrivate')) {
+    template.push({
+      label: locale.translation('allowFlashAlways'),
+      click: () => {
+        appActions.allowFlashAlways(frameProps.get('tabId'), frameProps.get('location'))
+      }
+    })
+  }
+  return template
 }
 
 function tabTemplateInit (frameProps) {
@@ -882,26 +898,6 @@ const showDefinitionMenuItem = (selectionText) => {
 function mainTemplateInit (nodeProps, frame) {
   const template = []
 
-  if (nodeProps.frameURL && nodeProps.frameURL.startsWith('chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-flash.html')) {
-    const pageOrigin = siteUtil.getOrigin(nodeProps.pageURL)
-    template.push({
-      label: locale.translation('allowFlashOnce'),
-      click: () => {
-        appActions.changeSiteSetting(pageOrigin, 'flash', 1, frame.get('isPrivate'))
-      }
-    })
-    if (!frame.get('isPrivate')) {
-      template.push({
-        label: locale.translation('allowFlashAlways'),
-        click: () => {
-          const expirationTime = Date.now() + 7 * 24 * 3600 * 1000
-          appActions.changeSiteSetting(pageOrigin, 'flash', expirationTime)
-        }
-      })
-    }
-    return menuUtil.sanitizeTemplateItems(template)
-  }
-
   const isLink = nodeProps.linkURL && nodeProps.linkURL !== ''
   const isImage = nodeProps.mediaType === 'image'
   const isVideo = nodeProps.mediaType === 'video'
@@ -946,18 +942,12 @@ function mainTemplateInit (nodeProps, frame) {
       {
         label: locale.translation('copyImage'),
         click: (item) => {
-          const copyFromDataURL = (dataURL) =>
-            clipboard.write({
-              image: nativeImage.createFromDataURL(dataURL),
-              html: `<img src='${nodeProps.srcURL}'>`,
-              text: nodeProps.srcURL
-            })
           if (nodeProps.srcURL) {
             if (urlParse(nodeProps.srcURL).protocol === 'data:') {
-              copyFromDataURL(nodeProps.srcURL)
+              appActions.dataURLCopied(nodeProps.srcURL, `<img src='${nodeProps.srcURL}>`, nodeProps.srcURL)
             } else {
               getBase64FromImageUrl(nodeProps.srcURL).then((dataURL) =>
-                copyFromDataURL(dataURL))
+                appActions.dataURLCopied(dataURL, `<img src='${nodeProps.srcURL}>`, nodeProps.srcURL))
             }
           }
         }
@@ -1250,6 +1240,12 @@ function onMainContextMenu (nodeProps, frame, contextMenuType) {
   }
 }
 
+function onFlashContextMenu (nodeProps, frameProps) {
+  const flashMenu = Menu.buildFromTemplate(flashTemplateInit(frameProps))
+  flashMenu.popup(currentWindow)
+  flashMenu.destroy()
+}
+
 function onTabContextMenu (frameProps, e) {
   e.stopPropagation()
   const tabMenu = Menu.buildFromTemplate(tabTemplateInit(frameProps))
@@ -1384,7 +1380,10 @@ function onShowAutofillMenu (suggestions, boundingRect, frame) {
     x: (window.innerWidth - boundingRect.clientWidth),
     y: (window.innerHeight - boundingRect.clientHeight)
   }
+  const tabId = frame.get('tabId')
   windowActions.setContextMenuDetail(Immutable.fromJS({
+    type: 'autofill',
+    tabId,
     left: offset.x + boundingRect.x,
     top: offset.y + (boundingRect.y + boundingRect.height) - downloadsBarOffset,
     template: menuTemplate
@@ -1505,6 +1504,7 @@ function onReloadContextMenu (target) {
 
 module.exports = {
   onHamburgerMenu,
+  onFlashContextMenu,
   onMainContextMenu,
   onTabContextMenu,
   onNewTabContextMenu,

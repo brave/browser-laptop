@@ -5,9 +5,9 @@
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
-const electron = global.require('electron')
+const electron = require('electron')
 const ipc = electron.ipcRenderer
-const systemPreferences = electron.remote.systemPreferences
+// const systemPreferences = electron.remote.systemPreferences
 
 // Actions
 const appActions = require('../actions/appActions')
@@ -24,7 +24,7 @@ const TabsToolbar = require('./tabsToolbar')
 const FindBar = require('./findbar')
 const UpdateBar = require('./updateBar')
 const NotificationBar = require('./notificationBar')
-const DownloadsBar = require('./downloadsBar')
+const DownloadsBar = require('../../app/renderer/components/downloadsBar')
 const Button = require('./button')
 const BrowserActionButton = require('../../app/renderer/components/browserActionButton')
 const SiteInfo = require('./siteInfo')
@@ -219,7 +219,7 @@ class Main extends ImmutableComponent {
         deltaY = deltaY + e.deltaY
         time = (new Date()).getTime() - startTime
       }
-    })
+    }, { passive: true })
     ipc.on(messages.DEBUG_REACT_PROFILE, (e, args) => {
       window.perf = require('react-addons-perf')
       if (!window.perf.isRunning()) {
@@ -253,8 +253,9 @@ class Main extends ImmutableComponent {
       swipeGesture = false
     })
     ipc.on('scroll-touch-begin', function () {
-      if (swipeGesture &&
-        systemPreferences.isSwipeTrackingFromScrollEventsEnabled()) {
+      if (swipeGesture) {
+        // TODO(Anthony): respecting system settings on cr54
+        // systemPreferences.isSwipeTrackingFromScrollEventsEnabled()) {
         trackingFingers = true
         isSwipeOnEdge = false
         startTime = (new Date()).getTime()
@@ -343,7 +344,7 @@ class Main extends ImmutableComponent {
         }
       }
       let openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS) === true || options.openInForeground
-      const frameOpts = {
+      const frameOpts = options.frameOpts || {
         location: url,
         isPrivate: !!options.isPrivate,
         isPartitioned: !!options.isPartitioned,
@@ -499,7 +500,7 @@ class Main extends ImmutableComponent {
     }, true)
 
     const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
-    if (activeFrame) {
+    if (activeFrame && activeFrame.get('title')) {
       currentWindow.setTitle(activeFrame.get('title'))
     }
 
@@ -1256,7 +1257,6 @@ class Main extends ImmutableComponent {
                 flash={this.props.appState.get('flash')}
                 widevine={this.props.appState.get('widevine')}
                 cookieblock={this.props.appState.get('cookieblock')}
-                flashInitialized={this.props.appState.get('flashInitialized')}
                 allSiteSettings={allSiteSettings}
                 ledgerInfo={this.props.appState.get('ledgerInfo') || new Immutable.Map()}
                 publisherInfo={this.props.appState.get('publisherInfo') || new Immutable.Map()}

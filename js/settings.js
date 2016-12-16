@@ -49,11 +49,12 @@ const resolveValue = (settingKey, settingsCollection) => {
   const appSettings = (process.type === 'browser'
       ? require('./stores/appStore').getState().get('settings')
       : require('./stores/appStoreRenderer').state.get('settings')) || Immutable.Map()
-  if (settingsCollection && settingsCollection.constructor === Immutable.Map) {
-    return settingsCollection.get(settingKey) !== undefined ? settingsCollection.get(settingKey) : appConfig.defaultSettings[settingKey]
+  if (settingsCollection && settingsCollection.constructor === Immutable.Map &&
+    settingsCollection.get(settingKey) !== undefined) {
+    return settingsCollection.get(settingKey)
   }
-  if (settingsCollection) {
-    return settingsCollection[settingKey] !== undefined ? settingsCollection[settingKey] : appConfig.defaultSettings[settingKey]
+  if (settingsCollection && settingsCollection[settingKey] !== undefined) {
+    return settingsCollection[settingKey]
   }
   return appSettings.get(settingKey) !== undefined ? appSettings.get(settingKey) : appConfig.defaultSettings[settingKey]
 }

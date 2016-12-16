@@ -9,7 +9,7 @@ const ImmutableComponent = require('../components/immutableComponent')
 const messages = require('../constants/messages')
 const aboutActions = require('./aboutActions')
 
-const ipc = window.chrome.ipc
+const ipc = window.chrome.ipcRenderer
 
 // Stylesheets
 require('../../less/about/itemList.less')

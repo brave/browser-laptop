@@ -5,8 +5,8 @@ import subprocess
 import sys
 import os.path
 
-BRAVE_ELECTRON = '1.4.31'
-UPSTREAM_ELECTRON = '1.4.0'
+BRAVE_ELECTRON = '2.0.4'
+UPSTREAM_ELECTRON = '2.0.4'
 SOURCE_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 TARGET_ARCH= os.environ['TARGET_ARCH'] if os.environ.has_key('TARGET_ARCH') else 'x64'
 os.environ['npm_config_arch'] = TARGET_ARCH
@@ -27,7 +27,7 @@ def write_npmrc():
   'target = %s\n' \
   'target_arch = %s\n' \
   'brave_electron_version = %s\n' \
-  'disturl = https://atom.io/download/atom-shell\n' % (UPSTREAM_ELECTRON, TARGET_ARCH, BRAVE_ELECTRON)
+  'disturl = http://brave-laptop-binaries.s3.amazonaws.com/atom-shell/dist\n' % (UPSTREAM_ELECTRON, TARGET_ARCH, BRAVE_ELECTRON)
   f = open('.npmrc','wb')
   f.write(data)
   f.close()

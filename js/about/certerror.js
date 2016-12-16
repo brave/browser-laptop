@@ -5,9 +5,9 @@
 const React = require('react')
 const Button = require('../components/button')
 const aboutActions = require('./aboutActions')
-const WindowConstants = require('../constants/windowConstants')
+const windowConstants = require('../constants/windowConstants')
 const messages = require('../constants/messages')
-const ipc = window.chrome.ipc
+const ipc = window.chrome.ipcRenderer
 
 require('../../less/button.less')
 require('../../less/window.less')
@@ -72,7 +72,7 @@ class CertErrorPage extends React.Component {
   onAccept () {
     aboutActions.acceptCertError(this.state.url)
     aboutActions.dispatchAction({
-      actionType: WindowConstants.WINDOW_SET_URL,
+      actionType: windowConstants.WINDOW_SET_URL,
       location: this.state.url,
       key: this.state.frameKey
     })
@@ -80,7 +80,7 @@ class CertErrorPage extends React.Component {
 
   onSafety () {
     aboutActions.dispatchAction({
-      actionType: WindowConstants.WINDOW_SET_URL,
+      actionType: windowConstants.WINDOW_SET_URL,
       location: this.state.previousLocation,
       key: this.state.frameKey
     })

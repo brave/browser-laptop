@@ -207,6 +207,17 @@ function isAncestorFrameKey (frames, frame, parentFrameKey) {
   return isAncestorFrameKey(frames, parentFrame, parentFrameKey)
 }
 
+function getPartitionNumber (partition) {
+  console.log(partition)
+  const regex = /partition-(\d+)/
+  const matches = regex.exec(partition)
+  return matches && matches[0]
+}
+
+function isPrivatePartition (partition) {
+  return partition && !partition.startsWith('persist:')
+}
+
 function isSessionPartition (partition) {
   return partition && partition.startsWith('persist:partition-')
 }
@@ -502,6 +513,7 @@ module.exports = {
   isAncestorFrameKey,
   isFrameKeyActive,
   isFrameKeyPinned,
+  isPrivatePartition,
   isSessionPartition,
   getFrameIndex,
   getFrameDisplayIndex,
@@ -511,6 +523,7 @@ module.exports = {
   getFrameByDisplayIndex,
   getFrameByKey,
   getFrameByTabId,
+  getPartitionNumber,
   getActiveFrame,
   setActiveFrameDisplayIndex,
   setActiveFrameIndex,

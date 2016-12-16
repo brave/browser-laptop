@@ -29,7 +29,7 @@ describe('Payments Panel', function () {
         .click(paymentsTab)
         .waitForVisible(paymentsWelcomePage)
       let background = yield this.app.client.getCssProperty(walletSwitch, 'background-color')
-      assert.equal(background.value, 'rgba(211,211,211,1)')
+      assert.equal(background.value, 'rgba(204,204,204,1)')
     })
 
     it('payments can be enabled', function * () {

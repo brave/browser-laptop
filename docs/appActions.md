@@ -33,6 +33,46 @@ Dispatches an event to the main process to create a new window.
 
 
 
+### newTab(createProperties) 
+
+A new tab has been requested
+
+**Parameters**
+
+**createProperties**: `Object`, windowId, url, active, openerTabId
+
+
+
+### tabCreated(tabValue) 
+
+A new tab has been created
+
+**Parameters**
+
+**tabValue**: `Object`, A new tab has been created
+
+
+
+### tabUpdated(tabValue) 
+
+A tab has been updated
+
+**Parameters**
+
+**tabValue**: `Object`, A tab has been updated
+
+
+
+### tabClosed(tabId) 
+
+Closes an open tab
+
+**Parameters**
+
+**tabId**: `number`, Closes an open tab
+
+
+
 ### addSite(siteDetail, tag, originalSiteDetail, destinationIsParent) 
 
 Adds a site to the site list
@@ -439,13 +479,14 @@ Autofill data changed
 
 
 
-### windowBlurred(appWindowId) 
+### windowBlurred(windowId) 
 
 Dispatches a message when appWindowId loses focus
+Dispatches a message when windowId loses focus
 
 **Parameters**
 
-**appWindowId**: `Number`, the unique id of the window
+**windowId**: `Number`, the unique id of the window
 
 
 
@@ -491,6 +532,91 @@ Dispatch a message to indicate default browser check is complete
 ### populateHistory() 
 
 Notify the AppStore to provide default history values.
+
+
+
+### dataURLCopied() 
+
+Dispatch a message to copy data URL to clipboard
+
+
+
+### shuttingDown() 
+
+Dispatches a message when the app is shutting down.
+
+
+
+### downloadRevealed(downloadId) 
+
+Dispatches a message when a download is being revealed.
+Typically this will open the download directory in finder / explorer and select the icon.
+
+**Parameters**
+
+**downloadId**: `string`, ID of the download being revealed
+
+
+
+### downloadOpened(downloadId) 
+
+Dispatches a message when a download is being opened.
+
+**Parameters**
+
+**downloadId**: `string`, ID of the download being opened
+
+
+
+### downloadActionPerformed(downloadId, downloadAction) 
+
+Dispatches a message when an electron download action is being performed (pause, resume, cancel)
+
+**Parameters**
+
+**downloadId**: `string`, ID of the download item the action is being performed to
+
+**downloadAction**: `string`, the action to perform from constants/electronDownloadItemActions.js
+
+
+
+### downloadCopiedToClipboard(downloadId) 
+
+Dispatches a message when a download URL is being copied to the clipboard
+
+**Parameters**
+
+**downloadId**: `string`, ID of the download item being copied to the clipboard
+
+
+
+### downloadDeleted(downloadId) 
+
+Dispatches a message when a download is being deleted
+
+**Parameters**
+
+**downloadId**: `string`, ID of the download item being deleted
+
+
+
+### downloadCleared(downloadId) 
+
+Dispatches a message when a download is being cleared
+
+**Parameters**
+
+**downloadId**: `string`, ID of the download item being cleared
+
+
+
+### downloadRedownloaded(downloadId) 
+
+Dispatches a message when a download is being redownloaded
+
+**Parameters**
+
+**downloadId**: `string`, ID of the download item being redownloaded
 
 
 

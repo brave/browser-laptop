@@ -66,7 +66,7 @@ module.exports.getGenDir = function (url) {
 
 module.exports.getBraveIndexPath = function (relateivePath = '') {
   return module.exports.fileUrl(
-      path.resolve(__dirname, '..', '..') + '/app/extensions/brave/' + relateivePath)
+      path.resolve(__dirname, '..', '..') + '/app/extensions/brave/' + relateivePath).replace('file://', 'chrome://brave')
 }
 
 module.exports.getBraveExtIndexHTML = function () {

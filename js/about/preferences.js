@@ -50,7 +50,7 @@ const widevine = appConfig.resourceNames.WIDEVINE
 const isDarwin = navigator.platform === 'MacIntel'
 const isWindows = navigator.platform && navigator.platform.includes('Win')
 
-const ipc = window.chrome.ipc
+const ipc = window.chrome.ipcRenderer
 
 // TODO: Determine this from the l20n file automatically
 const hintCount = 3
@@ -1546,15 +1546,14 @@ class SecurityTab extends ImmutableComponent {
   }
   onToggleFlash (e) {
     aboutActions.setResourceEnabled(flash, e.target.value)
-    ipc.send(messages.PREFS_RESTART, flash, e.target.value)
   }
   onToggleWidevine (e) {
     aboutActions.setResourceEnabled(widevine, e.target.value)
   }
   render () {
     const lastPassPreferencesUrl = ('chrome-extension://' + extensionIds[passwordManagers.LAST_PASS] + '/tabDialog.html?dialog=preferences&cmd=open')
-
     const isLinux = navigator.appVersion.indexOf('Linux') !== -1
+    const flashInstalled = getSetting(settings.FLASH_INSTALLED, this.props.settings)
 
     return <div>
       <div className='sectionTitle' data-l10n-id='privateData' />
@@ -1612,7 +1611,7 @@ class SecurityTab extends ImmutableComponent {
       </SettingsList>
       <div className='sectionTitle' data-l10n-id='pluginSettings' />
       <SettingsList>
-        <SettingCheckbox checked={this.props.flashInstalled ? this.props.braveryDefaults.get('flash') : false} dataL10nId='enableFlash' onChange={this.onToggleFlash} disabled={!this.props.flashInstalled} />
+        <SettingCheckbox checked={flashInstalled ? this.props.braveryDefaults.get('flash') : false} dataL10nId='enableFlash' onChange={this.onToggleFlash} disabled={!flashInstalled} />
         <div className='subtext flashText'>
           {
             isDarwin || isWindows
@@ -1793,7 +1792,6 @@ class AboutPreferences extends React.Component {
       firstRecoveryKey: '',
       secondRecoveryKey: ''
     }
-    aboutActions.checkFlashInstalled()
 
     ipc.on(messages.SETTINGS_UPDATED, (e, settings) => {
       this.setState({ settings: Immutable.fromJS(settings || {}) })
@@ -1806,9 +1804,6 @@ class AboutPreferences extends React.Component {
     })
     ipc.on(messages.BRAVERY_DEFAULTS_UPDATED, (e, braveryDefaults) => {
       this.setState({ braveryDefaults: Immutable.fromJS(braveryDefaults || {}) })
-    })
-    ipc.on(messages.FLASH_UPDATED, (e, flashInstalled) => {
-      this.setState({ flashInstalled })
     })
     ipc.on(messages.LANGUAGE, (e, {langCode, languageCodes}) => {
       this.setState({ languageCodes })
@@ -1923,7 +1918,7 @@ class AboutPreferences extends React.Component {
           hideOverlay={this.setOverlayVisible.bind(this, false)} />
         break
       case preferenceTabs.SECURITY:
-        tab = <SecurityTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} flashInstalled={this.state.flashInstalled} onChangeSetting={this.onChangeSetting} />
+        tab = <SecurityTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.ADVANCED:
         tab = <AdvancedTab settings={settings} onChangeSetting={this.onChangeSetting} />

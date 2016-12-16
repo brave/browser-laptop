@@ -2,14 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const tabState = require('./tabState')
-const {makeImmutable} = require('./immutableUtil')
+const { makeImmutable } = require('./immutableUtil')
 const Immutable = require('immutable')
-const WindowConstants = require('../../../js/constants/windowConstants')
-
-let transientFields = []
-
-tabState.addTransientFields(['browserAction'])
+const windowConstants = require('../../../js/constants/windowConstants')
+const platformUtil = require('../lib/platformUtil')
 
 const browserActionDefaults = Immutable.fromJS({
   tabs: {}
@@ -57,7 +53,7 @@ const extensionState = {
   browserActionUpdated: (state, action) => {
     action = makeImmutable(action)
     state = makeImmutable(state)
-    if (action.get('actionType') === WindowConstants.WINDOW_SET_NAVIGATED &&
+    if (action.get('actionType') === windowConstants.WINDOW_SET_NAVIGATED &&
       action.get('tabId')) {
       let tabId = action.get('tabId')
       let extensions = extensionState.getEnabledExtensions(state)
@@ -135,10 +131,6 @@ const extensionState = {
     }
   },
 
-  getTransientFields: () => {
-    return transientFields
-  },
-
   getPersistentTabState: (extension) => {
     extension = makeImmutable(extension)
     extensionState.getTransientFields().forEach((field) => {
@@ -157,20 +149,25 @@ const extensionState = {
         state = state.setIn(['extensions', action.get('extensionId'), 'contextMenus'], new Immutable.List())
       }
       let contextMenus = state.getIn(['extensions', action.get('extensionId'), 'contextMenus'])
-      let basePath = state.getIn(['extensions', action.get('extensionId'), 'base_path'])
-      basePath = decodeURI(basePath)
-      if (process.platform === 'win32') {
-        basePath = basePath.replace('file:///', '')
+      const basePath =
+        platformUtil.getPathFromFileURI(state.getIn(['extensions', action.get('extensionId'), 'base_path']))
+      const iconPath = action.get('icon')
+      if (!iconPath) {
+        contextMenus = contextMenus.push({
+          extensionId: action.get('extensionId'),
+          menuItemId: action.get('menuItemId'),
+          properties: action.get('properties').toJS()
+        })
       } else {
-        basePath = basePath.replace('file://', '')
-      }
-      return state.setIn(['extensions', action.get('extensionId'), 'contextMenus'],
-        contextMenus.push({
+        contextMenus = contextMenus.push({
           extensionId: action.get('extensionId'),
           menuItemId: action.get('menuItemId'),
           properties: action.get('properties').toJS(),
-          icon: basePath + '/' + action.get('icon')
-        }))
+          icon: basePath + '/' + iconPath
+        })
+      }
+      return state.setIn(['extensions', action.get('extensionId'), 'contextMenus'],
+        contextMenus)
     } else {
       return state
     }

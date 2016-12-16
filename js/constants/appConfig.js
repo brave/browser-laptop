@@ -22,7 +22,9 @@ module.exports = {
     NOSCRIPT: 'noScript',
     FLASH: 'flash',
     WIDEVINE: 'widevine',
-    COOKIEBLOCK: 'cookieblock' // block 3p cookies and referer
+    COOKIEBLOCK: 'cookieblock', // block 3p cookies and referer
+    SITEHACK: 'siteHacks',
+    WEBTORRENT: 'webtorrent'
     // ... other optional resource files are identified by uuid such as for regional adblock
   },
   cookieblock: {
@@ -34,12 +36,15 @@ module.exports = {
   flash: {
     enabled: false,
     installUrl: 'https://get.adobe.com/flashplayer/',
-    url: getTargetAboutUrl('about:flash')
+    url: getTargetAboutUrl('about:flash'),
+    resourceId: 'PepperFlashPlayer.plugin',
+    shields: false
   },
   widevine: {
     enabled: false,
     moreInfoUrl: 'https://www.eff.org/issues/drm',
-    licenseUrl: 'https://www.google.com/policies/terms/'
+    licenseUrl: 'https://www.google.com/policies/terms/',
+    shields: false
   },
   adblock: {
     alternateDataFiles: 'https://s3.amazonaws.com/adblock-data/{version}/{uuid}.dat',
@@ -67,6 +72,9 @@ module.exports = {
     enabled: true
   },
   siteHacks: {
+    enabled: true
+  },
+  webtorrent: {
     enabled: true
   },
   adInsertion: {
@@ -134,6 +142,7 @@ module.exports = {
     'security.passwords.one-password-enabled': false,
     'security.passwords.dashlane-enabled': false,
     'security.passwords.last-pass-enabled': false,
+    'security.flash.installed': false,
     'general.downloads.default-save-path': null,
     'general.disable-title-mode': process.platform === 'linux',
     'advanced.hardware-acceleration-enabled': true,

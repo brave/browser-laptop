@@ -16,19 +16,18 @@ const UrlUtil = require('../lib/urlutil')
 const messages = require('../constants/messages')
 const contextMenus = require('../contextMenus')
 const {siteHacks} = require('../data/siteHacks')
-const ipc = global.require('electron').ipcRenderer
-const clipboard = global.require('electron').clipboard
+const ipc = require('electron').ipcRenderer
+const clipboard = require('electron').clipboard
 const FullScreenWarning = require('./fullScreenWarning')
 const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
 const config = require('../constants/config')
 const settings = require('../constants/settings')
-const {aboutUrls, isSourceMagnetUrl, getTargetMagnetUrl, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
+const {aboutUrls, getTargetMagnetUrl, isSourceMagnetUrl, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
 const {isFrameError} = require('../../app/common/lib/httpUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
 const {getSiteSettingsForHostPattern} = require('../state/siteSettings')
-const flash = require('../flash')
 const currentWindow = require('../../app/renderer/currentWindow')
 const windowStore = require('../stores/windowStore')
 const appStoreRenderer = require('../stores/appStoreRenderer')
@@ -63,7 +62,7 @@ class Frame extends ImmutableComponent {
   }
 
   get frame () {
-    return windowStore.getFrame(this.props.frameKey)
+    return windowStore.getFrame(this.props.frameKey) || Immutable.fromJS({})
   }
 
   get braveryDefaults () {
@@ -143,7 +142,7 @@ class Frame extends ImmutableComponent {
         newTabDetail: this.props.newTabDetail ? this.props.newTabDetail.toJS() : null
       })
     } else if (location === 'about:autofill') {
-      const defaultSession = global.require('electron').remote.session.defaultSession
+      const defaultSession = require('electron').remote.session.defaultSession
       if (this.props.autofillAddresses) {
         const guids = this.props.autofillAddresses.get('guid')
         let list = []
@@ -195,34 +194,13 @@ class Frame extends ImmutableComponent {
   }
 
   shouldCreateWebview () {
-    return !this.webview ||
-      !!this.webview.allowRunningPlugins !== (this.allowRunningFlashPlugin() || this.allowRunningWidevinePlugin())
+    return !this.webview
   }
 
   runInsecureContent () {
     const activeSiteSettings = getSiteSettingsForHostPattern(this.props.allSiteSettings, this.origin)
     return activeSiteSettings === undefined
       ? false : activeSiteSettings.get('runInsecureContent')
-  }
-
-  allowRunningFlashPlugin (url) {
-    if (!this.props.flashInitialized) {
-      return false
-    }
-    const origin = url ? siteUtil.getOrigin(url) : this.origin
-    if (!origin) {
-      return false
-    }
-    // Check for at least one CtP allowed on this origin
-    if (!this.props.allSiteSettings) {
-      return false
-    }
-    const activeSiteSettings = getSiteSettingsForHostPattern(this.props.allSiteSettings,
-                                                             origin)
-    if (activeSiteSettings && typeof activeSiteSettings.get('flash') === 'number') {
-      return true
-    }
-    return false
   }
 
   allowRunningWidevinePlugin (url) {
@@ -285,70 +263,61 @@ class Frame extends ImmutableComponent {
     let location = this.props.location
     newSrc = newSrc || this.props.src
 
+    if (isSourceAboutUrl(newSrc)) {
+      newSrc = getTargetAboutUrl(newSrc)
+    } else if (isTorrentViewerURL(newSrc)) {
+      newSrc = getTargetMagnetUrl(newSrc)
+    }
+
+    let guestInstanceId = null
+
     // Create the webview dynamically because React doesn't whitelist all
     // of the attributes we need
     let webviewAdded = false
-    let guestInstanceId = null
     if (this.shouldCreateWebview()) {
-      // only set the guestInstanceId if this is a new frame
-      if (this.webview == null) {
-        guestInstanceId = this.props.guestInstanceId
-      }
-      while (this.webviewContainer.firstChild) {
-        this.webviewContainer.removeChild(this.webviewContainer.firstChild)
-      }
-      // the webview tag is where the user's page is rendered (runs in its own process)
-      // @see http://electron.atom.io/docs/api/web-view-tag/
+      guestInstanceId = this.props.guestInstanceId
       this.webview = document.createElement('webview')
-
-      let partition = FrameStateUtil.getPartition(this.frame)
-      ipc.sendSync(messages.INITIALIZE_PARTITION, partition)
-      this.webview.setAttribute('partition', partition)
-
       if (guestInstanceId) {
-        this.webview.setAttribute('data-guest-instance-id', guestInstanceId)
+        if (!this.webview.setGuestInstanceId(guestInstanceId)) {
+          console.error('could not set guestInstanceId ' + guestInstanceId)
+          guestInstanceId = null
+        }
+      } else {
+        let partition = FrameStateUtil.getPartition(this.frame)
+        ipc.sendSync(messages.INITIALIZE_PARTITION, partition)
+        this.webview.setAttribute('partition', partition)
       }
-      webviewAdded = true
-    }
-    this.webview.setAttribute('allowDisplayingInsecureContent', true)
-    this.webview.setAttribute('data-frame-key', this.props.frameKey)
 
-    const parsedUrl = urlParse(location)
-    if (!appConfig.uaExceptionHosts.includes(parsedUrl.hostname)) {
-      this.webview.setAttribute('useragent', getSetting(settings.USERAGENT) || '')
-    }
-    const hack = siteHacks[parsedUrl.hostname]
-    if (hack && hack.userAgent) {
-      this.webview.setAttribute('useragent', hack.userAgent)
-    }
-    if (this.allowRunningFlashPlugin() || this.allowRunningWidevinePlugin()) {
-      this.webview.setAttribute('plugins', true)
-      this.webview.allowRunningPlugins = true
-    }
-
-    if (!guestInstanceId || newSrc !== 'about:blank') {
-      let webviewSrc
-      if (isSourceAboutUrl(newSrc)) webviewSrc = getTargetAboutUrl(newSrc)
-      else if (isTorrentViewerURL(newSrc)) webviewSrc = getTargetMagnetUrl(newSrc)
-      else webviewSrc = newSrc
-      this.webview.setAttribute('src', webviewSrc)
-    }
-
-    if (webviewAdded) {
+      this.addEventListeners()
       if (cb) {
         this.runOnDomReady = cb
         let eventCallback = (e) => {
           this.webview.removeEventListener(e.type, eventCallback)
-          // handle deprectaed zoom level site settings
-          if (this.zoomLevel) {
-            this.webview.setZoomLevel(this.zoomLevel)
-          }
           this.runOnDomReady()
           delete this.runOnDomReady
         }
         this.webview.addEventListener('did-attach', eventCallback)
       }
-      this.addEventListeners()
+
+      webviewAdded = true
+    }
+
+    if (!guestInstanceId || newSrc !== getTargetAboutUrl('about:blank')) {
+      this.webview.setAttribute('src', newSrc)
+    }
+
+    this.webview.setAttribute('data-frame-key', this.props.frameKey)
+
+    const parsedUrl = urlParse(location)
+    if (!appConfig.uaExceptionHosts.includes(parsedUrl.hostname)) {
+      this.webview.setUserAgentOverride(getSetting(settings.USERAGENT) || '')
+    }
+    const hack = siteHacks[parsedUrl.hostname]
+    if (hack && hack.userAgent) {
+      this.webview.setUserAgentOverride(hack.userAgent)
+    }
+
+    if (webviewAdded) {
       this.webviewContainer.appendChild(this.webview)
     } else {
       cb && cb()
@@ -358,7 +327,6 @@ class Frame extends ImmutableComponent {
   componentDidMount () {
     const cb = () => {
       this.webview.setActive(this.props.isActive)
-      this.webview.setAudioMuted(this.props.audioMuted || false)
       this.updateAboutDetails()
     }
     this.updateWebview(cb)
@@ -434,7 +402,6 @@ class Frame extends ImmutableComponent {
           this.exitHtmlFullScreen()
         }
       }
-      this.webview.setAudioMuted(this.props.audioMuted || false)
       this.updateAboutDetails()
     }
 
@@ -463,18 +430,7 @@ class Frame extends ImmutableComponent {
   }
 
   clone (args) {
-    const newGuest = this.webview.clone()
-    const newGuestInstanceId = newGuest.getWebPreferences().guestInstanceId
-    let cloneAction
-    if (args && args.get('back')) {
-      cloneAction = newGuest.goBack
-    } else if (args && args.get('forward')) {
-      cloneAction = () => newGuest.goForward
-    }
-    if (cloneAction) {
-      newGuest.once('did-attach', cloneAction.bind(newGuest))
-    }
-    windowActions.cloneFrame(this.frame, newGuestInstanceId, args && args.get('openInForeground'))
+    this.webview.clone()
   }
 
   handleShortcut () {
@@ -504,7 +460,7 @@ class Frame extends ImmutableComponent {
         this.webview.reloadIgnoringCache()
         break
       case 'clone':
-        this.clone(this.props.activeShortcutDetails)
+        this.clone()
         break
       case 'explicitLoadURL':
         this.webview.loadURL(this.props.location)
@@ -589,88 +545,6 @@ class Frame extends ImmutableComponent {
   }
 
   /**
-   * Shows a Flash CtP notification if Flash is installed and enabled.
-   * If not enabled, alert user that Flash is installed.
-   * @param {string} origin - frame origin that is requesting to run flash.
-   *   can either be main frame or subframe.
-   * @param {function=} noFlashCallback - Optional callback to run if Flash is not
-   *   installed
-   * @param {function=} flashCallback - Optional callback to run if Flash is
-   *   accepted
-   */
-  showFlashNotification (origin, noFlashCallback, flashCallback) {
-    if (!origin || !UrlUtil.shouldInterceptFlash(origin)) {
-      noFlashCallback()
-      return
-    }
-
-    // Generate a random string that is unlikely to collide. Not
-    // cryptographically random.
-    const nonce = Math.random().toString()
-    if (this.props.flashInitialized) {
-      const message = locale.translation('allowFlashPlayer').replace(/{{\s*origin\s*}}/, this.origin)
-      // Show Flash notification bar
-      appActions.showMessageBox({
-        buttons: [
-          {text: locale.translation('deny')},
-          {text: locale.translation('allow')}
-        ],
-        message,
-        frameOrigin: this.origin,
-        options: {
-          nonce,
-          persist: true
-        }
-      })
-      this.notificationCallbacks[message] = (buttonIndex, persist) => {
-        if (buttonIndex === 1) {
-          if (persist) {
-            appActions.changeSiteSetting(this.origin, 'flash', Date.now() + 7 * 24 * 1000 * 3600)
-          } else {
-            appActions.changeSiteSetting(this.origin, 'flash', 1)
-          }
-          if (flashCallback) {
-            flashCallback()
-          }
-        } else {
-          if (persist) {
-            appActions.changeSiteSetting(this.origin, 'flash', false)
-          }
-        }
-        appActions.hideMessageBox(message)
-      }
-    } else {
-      flash.checkFlashInstalled((installed) => {
-        if (installed) {
-          let message = locale.translation('flashInstalled')
-          appActions.showMessageBox({
-            buttons: [
-              {text: locale.translation('goToPrefs')},
-              {text: locale.translation('goToAdobe')}
-            ],
-            message: message,
-            options: {nonce}
-          })
-          this.notificationCallbacks[message] = (buttonIndex) => {
-            appActions.hideMessageBox(message)
-            const location = buttonIndex === 0 ? 'about:preferences#security' : appConfig.flash.installUrl
-            windowActions.newFrame({ location }, true)
-          }
-        } else if (noFlashCallback) {
-          noFlashCallback()
-        }
-      })
-    }
-
-    ipc.once(messages.NOTIFICATION_RESPONSE + nonce, (e, msg, buttonIndex, persist) => {
-      const cb = this.notificationCallbacks[msg]
-      if (cb) {
-        cb(buttonIndex, persist)
-      }
-    })
-  }
-
-  /**
    * Shows a Widevine CtP notification if Widevine is installed and enabled.
    * If not enabled, alert user that Widevine is installed.
    * @param {string} origin - frame origin that is requesting to run widevine.
@@ -748,6 +622,11 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('did-block-run-insecure-content', (e) => {
       windowActions.setBlockedRunInsecureContent(this.frame, e.details[0])
     })
+    this.webview.addEventListener('enable-pepper-menu', (e) => {
+      contextMenus.onFlashContextMenu(e.params, this.frame)
+      e.preventDefault()
+      e.stopPropagation()
+    })
     this.webview.addEventListener('context-menu', (e) => {
       contextMenus.onMainContextMenu(e.params, this.frame)
       e.preventDefault()
@@ -778,36 +657,8 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('mouseleave', (e) => {
       currentWindow.webContents.send(messages.DISABLE_SWIPE_GESTURE)
     })
-    // @see <a href="https://github.com/atom/electron/blob/master/docs/api/web-view-tag.md#event-new-window">new-window event</a>
-    this.webview.addEventListener('new-window', (e) => {
-      e.preventDefault()
-
-      let guestInstanceId = e.options && e.options.webPreferences && e.options.webPreferences.guestInstanceId
-      let windowOpts = e.options && e.options.windowOptions || {}
-      windowOpts.parentWindowKey = currentWindow.id
-      windowOpts.disposition = e.disposition
-      let delayedLoadUrl = e.options && e.options.delayedLoadUrl
-
-      let frameOpts = {
-        location: e.url,
-        parentFrameKey: this.props.frameKey,
-        isPrivate: this.props.isPrivate,
-        partitionNumber: this.props.partitionNumber,
-        // use the delayed load url for the temporary title
-        delayedLoadUrl,
-        guestInstanceId
-      }
-
-      if (e.disposition === 'new-window' || e.disposition === 'new-popup') {
-        appActions.newWindow(frameOpts, windowOpts)
-      } else {
-        let openInForeground = this.props.prefOpenInForeground === true ||
-          e.disposition !== 'background-tab'
-        windowActions.newFrame(frameOpts, openInForeground)
-      }
-    })
     this.webview.addEventListener('did-attach', (e) => {
-      let tabId = this.webview.getWebContents().getId()
+      let tabId = this.webview.getId()
       if (this.props.tabId !== tabId) {
         windowActions.setFrameTabId(this.frame, tabId)
       }
@@ -835,9 +686,8 @@ class Frame extends ImmutableComponent {
       contextMenus.onShowAutofillMenu(e.suggestions, e.rect, this.frame)
     })
     this.webview.addEventListener('hide-autofill-popup', (e) => {
-      let webContents = this.webview.getWebContents()
-      if (webContents && webContents.isFocused()) {
-        windowActions.setContextMenuDetail()
+      if (this.webview.isFocused()) {
+        windowActions.autofillPopupHidden(this.props.tabId)
       }
     })
     this.webview.addEventListener('ipc-message', (e) => {
@@ -870,11 +720,6 @@ class Frame extends ImmutableComponent {
         case messages.GO_FORWARD:
           method = () => this.webview.goForward()
           break
-        case messages.SHOW_FLASH_NOTIFICATION:
-          method = (origin) => this.showFlashNotification(origin, () => {
-            windowActions.loadUrl(this.frame, appConfig.flash.installUrl)
-          })
-          break
         case messages.RELOAD:
           method = () => {
             this.reloadCounter[this.props.location] = this.reloadCounter[this.props.location] || 0
@@ -900,50 +745,8 @@ class Frame extends ImmutableComponent {
       method.apply(this, e.args)
     })
 
-    const interceptFlash = (stopCurrentLoad, adobeUrl, redirectUrl) => {
-      if (!this.origin) {
-        return
-      }
-      const activeSiteSettings = getSiteSettingsForHostPattern(this.props.allSiteSettings,
-                                                               this.origin)
-      if (activeSiteSettings && activeSiteSettings.get('flash') === false) {
-        return
-      }
-
-      if (stopCurrentLoad) {
-        this.webview.stop()
-      }
-
-      this.showFlashNotification(this.origin, () => {
-        if (stopCurrentLoad && adobeUrl) {
-          windowActions.loadUrl(this.frame, adobeUrl)
-        }
-      }, () => {
-        if (redirectUrl) {
-          windowActions.loadUrl(this.frame, redirectUrl)
-        }
-      })
-    }
-
     const loadStart = (e) => {
-      // We have two kinds of special URLs: magnet links and about pages
-      // When the user clicks on a magnet link, navigate to the corresponding local URL
-      // (The address bar will still show the magnet URL. See appUrlUtil.getSourceMagnetUrl.)
-      if (isTorrentViewerURL(e.url)) {
-        var targetURL = getTargetMagnetUrl(e.url)
-        // Return right away. loadStart will be called again with targetURL
-        return windowActions.loadUrl(this.frame, targetURL)
-      }
-
-      const parsedUrl = urlParse(e.url)
-
-      // Instead of telling person to install Flash, ask them if they want to
-      // run Flash if it's installed.
       if (e.isMainFrame && !e.isErrorPage && !e.isFrameSrcDoc) {
-        if (UrlUtil.isFlashInstallUrl(e.url) &&
-            UrlUtil.shouldInterceptFlash(this.props.provisionalLocation)) {
-          interceptFlash(true, e.url)
-        }
         windowActions.onWebviewLoadStart(this.frame, e.url)
         // Clear security state
         windowActions.setBlockedRunInsecureContent(this.frame)
@@ -952,6 +755,7 @@ class Frame extends ImmutableComponent {
           runInsecureContent: false
         })
       }
+      const parsedUrl = urlParse(e.url)
       const hack = siteHacks[parsedUrl.hostname]
       if (hack && hack.pageLoadStartScript) {
         this.webview.executeJavaScript(hack.pageLoadStartScript)
@@ -988,11 +792,6 @@ class Frame extends ImmutableComponent {
       const hack = siteHacks[parsedUrl.hostname]
       if (hack && hack.pageLoadEndScript) {
         this.webview.executeJavaScript(hack.pageLoadEndScript)
-      }
-      if (hack && hack.enableFlashCTP &&
-          !this.webview.allowRunningPlugins && this.props.flashInitialized) {
-        // Fix #3011
-        interceptFlash(false, undefined, hack.redirectURL)
       }
       if (this.props.location.startsWith(pdfjsOrigin)) {
         let displayLocation = UrlUtil.getLocationIfPDF(this.props.location)
@@ -1082,9 +881,8 @@ class Frame extends ImmutableComponent {
 
       // After navigating to the URL via back/forward buttons, set correct frame title
       if (!e.isRendererInitiated) {
-        let webContents = this.webview.getWebContents()
-        let index = webContents.getCurrentEntryIndex()
-        let title = webContents.getTitleAtIndex(index)
+        let index = this.webview.getCurrentEntryIndex()
+        let title = this.webview.getTitleAtIndex(index)
         windowActions.setFrameTitle(this.frame, title)
       }
     })
@@ -1158,21 +956,19 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('did-get-response-details', (details) => {
-      if (this.frame) {
-        windowActions.gotResponseDetails(this.frame.get('tabId'), details)
-      }
+      windowActions.gotResponseDetails(this.frame.get('tabId'), details)
     })
     // Handle zoom using Ctrl/Cmd and the mouse wheel.
-    this.webview.addEventListener('mousewheel', this.onMouseWheel.bind(this))
+    // this.webview.addEventListener('mousewheel', this.onMouseWheel.bind(this))
   }
 
   goBack () {
     this.webview.goBack()
   }
 
-  getHistoryEntry (sites, webContent, index) {
-    const url = webContent.getURLAtIndex(index)
-    const title = webContent.getTitleAtIndex(index)
+  getHistoryEntry (sites, index) {
+    const url = this.webview.getURLAtIndex(index)
+    const title = this.webview.getTitleAtIndex(index)
 
     let entry = {
       index: index,
@@ -1196,18 +992,18 @@ class Frame extends ImmutableComponent {
   }
 
   getHistory (appState) {
-    const webContent = this.webview.getWebContents()
-    const historyCount = webContent.getEntryCount()
+    const historyCount = this.webview.getEntryCount()
+    const currentIndex = this.webview.getCurrentEntryIndex()
     const sites = appState ? appState.get('sites') : null
 
     let history = {
       count: historyCount,
-      currentIndex: webContent.getCurrentEntryIndex(),
+      currentIndex,
       entries: []
     }
 
     for (let index = 0; index < historyCount; index++) {
-      history.entries.push(this.getHistoryEntry(sites, webContent, index))
+      history.entries.push(this.getHistoryEntry(sites, index))
     }
 
     return history

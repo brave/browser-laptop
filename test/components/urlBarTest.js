@@ -1,7 +1,7 @@
 /* global describe, it, before, beforeEach */
 
 const Brave = require('../lib/brave')
-const {urlInput, urlBarSuggestions, urlbarIcon, activeWebview, reloadButton} = require('../lib/selectors')
+const {urlInput, urlBarSuggestions, urlbarIcon, reloadButton} = require('../lib/selectors')
 const searchProviders = require('../../js/data/searchProviders')
 const config = require('../../js/constants/config')
 const messages = require('../../js/constants/messages')
@@ -311,11 +311,11 @@ describe('urlBar tests', function () {
           .keys(Brave.keys.ENTER)
       })
 
-      it('changes the webview src', function * () {
+      it('changes the webview location', function * () {
         const url = Brave.server.url('page1.html')
-        yield this.app.client.waitUntil(function () {
-          return this.getAttribute(activeWebview, 'src').then((src) => src === url)
-        })
+        yield this.app.client
+          .tabByIndex(0)
+          .waitForUrl(url)
       })
     })
   })
