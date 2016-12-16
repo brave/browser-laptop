@@ -1,14 +1,14 @@
 # Overview
 
-The telemetry is used to (optionally) send timing information to a `vault-collector` instance. Typically this will be used in a C.I. system to identify performance regressions.
+The telemetry is used to (optionally) send timing information to a [vault-collector](https://github.com/brave/vault-collector) instance. Typically this will be used in a C.I. system to identify performance regressions.
 
 ## Setup
 
 The following environment variables must be set for the telemetry system to be enabled:
 
-1. TELEMETRY_URL - url to `vault-collector` endpoint
+1. TELEMETRY_URL - url to [vault-collector](https://github.com/brave/vault-collector) endpoint
 2. TELEMETRY_MACHINE - string identifier of the machine (i.e. MacBookPro)
-3. TELEMETRY_TOKEN - string used to authenticate POST to `vault-collector`
+3. TELEMETRY_TOKEN - string used to authenticate POST to [vault-collector](https://github.com/brave/vault-collector)
 
 The following environment variables may be set if desired:
 
