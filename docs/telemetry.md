@@ -17,13 +17,13 @@ The following environment variables may be set if desired:
 
 ## Usage
 
-The browser will automatically create an `init` checkpoint before it begins its startup.
+The browser will automatically create an `init` checkpoint before it begins its startup sequence.
 
 Use the `setCheckpointAndReport` function to send telemetry information.
 
 `telemetry.setCheckpointAndReport('startup-complete')`
 
-This will issue a telemetry POST with the measure set to `startup-complete` and the value set to the amount of time since the `init` checkpoint was set.
+This will issue a telemetry POST with the `measure` set to `startup-complete` and the `value` set to the amount of time since the `init` checkpoint was set.
 
 ## API
 
@@ -31,12 +31,12 @@ This will issue a telemetry POST with the measure set to `startup-complete` and 
 
 * `clearCheckpoint(checkpoint)` - clear a previously set checkpoint
 
-* `deltaBetween(checkpoint1, checkpoint2) - return timing difference between two checkpoints
+* `deltaBetween(checkpoint1, checkpoint2)` - return timing difference between two checkpoints
 
-* `setCheckpointAndReport(checkpoint, [initialCheckpoint], [extra], [ts]) - set a checkpoint and send telemetry
+* `setCheckpointAndReport(checkpoint, [initialCheckpoint], [extra], [ts])` - set a checkpoint and send telemetry
 
 ## Extra
 
-Each telemetry POST may contain an object with extra information. This should be passed as the third parameter to the `setCheckpointAndReport` function.
+Each telemetry POST may contain an object with `extra` information. This should be passed as the third parameter to the `setCheckpointAndReport` function.
 
 `setCheckpointAndReport('ready', 'init', { lastCommit: 'a3e5fa3' })`
