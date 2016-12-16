@@ -4,6 +4,7 @@
 
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
+const KeyCodes = require('../../app/common/constants/keyCodes')
 
 /**
  * Represents a modal overlay
@@ -13,6 +14,13 @@ var globalInstanceCounter = 0
 var mountedInstances = []
 
 class ModalOverlay extends ImmutableComponent {
+  constructor () {
+    super()
+    this.state = {
+      previousElement: null
+    }
+    this.onKeyDown = this.onKeyDown.bind(this)
+  }
 
   componentWillMount () {
     this.instanceId = globalInstanceCounter++
@@ -28,8 +36,17 @@ class ModalOverlay extends ImmutableComponent {
     mountedInstances.push(this)
   }
 
+  componentDidMount () {
+    this.setState({previousElement: document.activeElement})
+    this.closeButton.focus()
+  }
+
   componentWillUnmount () {
     let instId = this.instanceId
+
+    if (this.state.previousElement) {
+      this.state.previousElement.focus()
+    }
 
     mountedInstances = mountedInstances.filter(function (inst) {
       return inst.instanceId !== instId
@@ -42,12 +59,22 @@ class ModalOverlay extends ImmutableComponent {
     }
   }
 
+  onKeyDown (e) {
+    switch (e.keyCode) {
+      case KeyCodes.ESC:
+        // Stop propagation to make sure only the top modal closes
+        e.stopPropagation()
+        this.props.onEscape()
+        break
+    }
+  }
+
   get dialogContent () {
     var close = null
     var button = null
     var title = null
     if (!this.props.emptyDialog) {
-      close = (this.props.onHide ? <button type='button' className='close' onClick={this.props.onHide} /> : null)
+      close = (this.props.onHide ? <button ref={(node) => { this.closeButton = node }} type='button' className='close' onClick={this.props.onHide} /> : null)
       title = (this.props.title ? <div className='sectionTitle' data-l10n-id={this.props.title} /> : null)
     }
     let customTitleClassesStr = (this.props.customTitleClasses ? this.props.customTitleClasses : '')
@@ -67,7 +94,7 @@ class ModalOverlay extends ImmutableComponent {
   }
 
   render () {
-    return <div className={'modal fade' + (this.state.last ? ' last' : '') + (this.props.transparentBackground ? ' transparentBackground' : '')} role='alert'>
+    return <div onKeyDown={this.onKeyDown} className={'modal fade' + (this.state.last ? ' last' : '') + (this.props.transparentBackground ? ' transparentBackground' : '')} role='alert'>
       {this.dialogContent}
     </div>
   }
