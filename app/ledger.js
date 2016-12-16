@@ -456,6 +456,15 @@ eventStore.addChangeListener(() => {
         request.request({ url: url, responseType: 'blob' }, (err, response, blob) => {
           var matchP, prefix, tail
 
+          if ((response) && (publisherInfo._internal.verboseP)) {
+            console.log('[ response for ' + url + ' ]')
+            console.log('>>> HTTP/' + response.httpVersionMajor + '.' + response.httpVersionMinor + ' ' + response.statusCode +
+                       ' ' + (response.statusMessage || ''))
+            underscore.keys(response.headers).forEach((header) => { console.log('>>> ' + header + ': ' + response.headers[header]) })
+            console.log('>>>')
+            console.log('>>> ' + (blob || '').substr(0, 80))
+          }
+
           if (publisherInfo._internal.debugP) {
             console.log('\nresponse: ' + url +
                         ' errP=' + (!!err) + ' blob=' + (blob || '').substr(0, 80) + '\nresponse=' +
@@ -480,12 +489,13 @@ eventStore.addChangeListener(() => {
             prefix = new Buffer(blob.substr(tail + 8, signatureMax), 'base64')
             underscore.keys(fileTypes).forEach((fileType) => {
               if (matchP) return
-              if ((prefix.length < fileTypes[fileType].length) &&
+              if ((prefix.length >= fileTypes[fileType].length) ||
                   (fileTypes[fileType].compare(prefix, 0, fileTypes[fileType].length) !== 0)) return
 
               blob = 'data:image/' + fileType + blob.substr(tail)
               matchP = true
             })
+            if (!matchP) return
           }
 
           entry.faviconURL = blob
