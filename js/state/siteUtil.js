@@ -86,6 +86,7 @@ module.exports.getNextFolderId = (sites) => {
 // Some details can be copied from the existing siteDetail if null
 // ex: parentFolderId, partitionNumber, and favicon
 const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId) => {
+  const siteDetailExist = newSiteDetail.get('lastAccessedTime') !== undefined || oldSiteDetail && oldSiteDetail.get('lastAccessedTime')
   let tags = oldSiteDetail && oldSiteDetail.get('tags') || new Immutable.List()
   if (tag) {
     tags = tags.toSet().add(tag).toList()
@@ -97,7 +98,9 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId) => {
 
   let lastAccessedTime
   if (isBookmark(tag) || isBookmarkFolder(tag)) {
-    lastAccessedTime = newSiteDetail.get('lastAccessedTime') || 0
+    siteDetailExist
+      ? lastAccessedTime = newSiteDetail.get('lastAccessedTime') || oldSiteDetail.get('lastAccessedTime')
+      : lastAccessedTime = 0
   } else {
     lastAccessedTime = newSiteDetail.get('lastAccessedTime') || new Date().getTime()
   }
