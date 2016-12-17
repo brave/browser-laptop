@@ -17,9 +17,13 @@
     }, error => {
       result.textContent = error.message;
     }, {timeout: 1});
-    Notification.requestPermission(function (permission) {
-        document.title = permission
-    })
+    // Make sure the 2 geolocation events are handled first.
+    // app/filtering.js can get permission requests out of order otherwise.
+    setTimeout(function () {
+      Notification.requestPermission(function (permission) {
+          document.title = permission
+      })
+    }, 50)
   </script>
 </body>
 </html>
