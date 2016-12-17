@@ -615,7 +615,7 @@ class Frame extends ImmutableComponent {
 
   addEventListeners () {
     this.webview.addEventListener('content-blocked', (e) => {
-      if (e.details[0] === 'javascript') {
+      if (e.details[0] === 'javascript' && e.details[1]) {
         windowActions.setBlockedBy(this.frame, 'noScript', e.details[1])
       }
     })
