@@ -23,6 +23,7 @@ const preferenceTabs = require('../constants/preferenceTabs')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const coinbaseCountries = require('../constants/coinbaseCountries')
+const getSymbolFromCurrency = require('currency-symbol-map').getSymbolFromCurrency
 const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
 const {startsWithOption, newTabMode, bookmarksToolbarMode} = require('../../app/common/constants/settingsEnums')
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
@@ -598,7 +599,7 @@ class PaymentHistoryRow extends ImmutableComponent {
 
   render () {
     var date = this.formattedDate
-    var totalAmountStr = `${this.totalAmount} ${this.currency}`
+    var totalAmountStr = `${getSymbolFromCurrency(this.currency)} ${this.totalAmount}`
 
     return <tr>
       <td className='narrow' data-sort={this.timestamp}>{date}</td>
@@ -1187,13 +1188,13 @@ class PaymentsTab extends ImmutableComponent {
 
   btcToCurrencyString (btc) {
     const balance = Number(btc || 0)
-    const currency = this.props.ledgerData.get('currency') || 'USD'
+    const currency = getSymbolFromCurrency(this.props.ledgerData.get('currency')) || getSymbolFromCurrency('USD')
     if (balance === 0) {
-      return `0 ${currency}`
+      return `${currency} 0`
     }
     if (this.props.ledgerData.get('btc') && typeof this.props.ledgerData.get('amount') === 'number') {
       const btcValue = this.props.ledgerData.get('btc') / this.props.ledgerData.get('amount')
-      return `${(balance / btcValue).toFixed(2)} ${currency}`
+      return `${currency} ${(balance / btcValue).toFixed(2)}`
     }
     return `${balance} BTC`
   }
@@ -1234,7 +1235,7 @@ class PaymentsTab extends ImmutableComponent {
                       onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)} >
                       {
                         [5, 10, 15, 20].map((amount) =>
-                          <option value={amount}>{amount} {this.props.ledgerData.get('currency') || 'USD'}</option>
+                          <option value={amount}>{getSymbolFromCurrency(this.props.ledgerData.get('currency')) || getSymbolFromCurrency('USD')} {amount}</option>
                         )
                       }
                     </select>
