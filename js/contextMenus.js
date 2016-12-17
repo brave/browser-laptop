@@ -447,6 +447,8 @@ function autofillTemplateInit (suggestions, frame) {
       value = 'Clear Form'
     } else if (frontendId === -5) { // POPUP_ITEM_ID_AUTOFILL_OPTIONS
       value = 'Autofill Settings'
+    } else if (frontendId === -6) { // POPUP_ITEM_ID_DATALIST_ENTRY
+      value = suggestions[i].value
     }
     if (frontendId === -3) { // POPUP_ITEM_ID_SEPARATOR
       template.push(CommonMenu.separatorMenuItem)
