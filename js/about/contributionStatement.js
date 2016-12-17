@@ -280,7 +280,7 @@ class ContributionStatement extends ImmutableComponent {
               <tr className='spacingRow' />
               {
               page.map(function (row, idx) {
-                let publisherSynopsis = this.synopsis[row.siteColumn] || {}
+                let publisherSynopsis = (this.synopsis.filter((entry) => { return entry.site === row[0] }) || [])[0] || {}
 
                 let verified = publisherSynopsis.verified
                 let site = row[0]
