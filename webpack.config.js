@@ -61,9 +61,7 @@ function config () {
       new webpack.DefinePlugin({
         'process.env': {
           NODE_ENV: JSON.stringify(env),
-          BRAVE_PORT: port,
-          GOOGLE_API_ENDPOINT: process.env.GOOGLE_API_ENDPOINT,
-          GOOGLE_API_KEY: process.env.GOOGLE_API_KEY
+          BRAVE_PORT: port
         }
       })
     ],
