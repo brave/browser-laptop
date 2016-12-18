@@ -15,7 +15,7 @@ const {cookieExceptions, localStorageExceptions} = require('../data/siteHacks')
 const {defaultPasswordManager} = require('../constants/passwordManagers')
 const urlParse = require('url').parse
 const siteSettings = require('./siteSettings')
-const { setUserPref } = require('./userPrefs')
+const { registerUserPrefs } = require('./userPrefs')
 const { getSetting } = require('../settings')
 
 // backward compatibility with appState siteSettings
@@ -63,6 +63,10 @@ const getDefaultUserPrefContentSettings = (braveryDefaults, appSettings, appConf
     }],
     adInsertion: [{
       setting: braveryDefaults.adControl === 'showBraveAds' ? 'allow' : 'block',
+      primaryPattern: '*'
+    }],
+    doNotTrack: [{
+      setting: getSetting(settings.DO_NOT_TRACK, appSettings) ? 'allow' : 'block',
       primaryPattern: '*'
     }],
     passwordManager: getDefaultPasswordManagerSettings(braveryDefaults, appSettings, appConfig),
@@ -235,9 +239,11 @@ const updateContentSettings = (appState, appConfig, isPrivate = false) => {
   const defaultUserPrefs = getDefaultUserPrefContentSettings(braveryDefaults, appState, appConfig)
   const defaultHostContentSettings = getDefaultHostContentSettings(braveryDefaults, appState, appConfig)
 
-  setUserPref('content_settings', getSettingsFromSiteSettings(defaultUserPrefs, appState, appConfig, isPrivate), isPrivate)
   hostContentSettings.setContentSettings(getSettingsFromSiteSettings(defaultHostContentSettings, appState, appConfig, isPrivate), isPrivate)
+  return { 'content_settings': getSettingsFromSiteSettings(defaultUserPrefs, appState, appConfig, isPrivate) }
 }
+
+let updateTrigger
 
 // Register callback to handle all updates
 const doAction = (action) => {
@@ -245,19 +251,19 @@ const doAction = (action) => {
     case appConstants.APP_REMOVE_SITE_SETTING:
     case appConstants.APP_CHANGE_SITE_SETTING:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
-        updateContentSettings(AppStore.getState(), appConfig, action.temporary)
+        updateTrigger(action.temporary)
       })
       break
     case appConstants.APP_CHANGE_SETTING:
     case appConstants.APP_SET_RESOURCE_ENABLED:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
-        updateContentSettings(AppStore.getState(), appConfig)
+        updateTrigger()
       })
       break
     case appConstants.APP_ALLOW_FLASH_ONCE:
     case appConstants.APP_ALLOW_FLASH_ALWAYS:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
-        updateContentSettings(AppStore.getState(), appConfig, action.isPrivate)
+        updateTrigger(action.isPrivate)
       })
       break
     default:
@@ -265,5 +271,9 @@ const doAction = (action) => {
 }
 
 module.exports.init = () => {
+  updateTrigger = registerUserPrefs((incognito) =>
+    updateContentSettings(AppStore.getState(), appConfig, incognito)
+  )
+
   AppDispatcher.register(doAction)
 }

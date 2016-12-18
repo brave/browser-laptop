@@ -34,7 +34,7 @@ const setUserPrefType = (ses, path, value) => {
 }
 
 const runCallback = (cb, name, incognito) => {
-  let prefs = cb()
+  let prefs = cb(incognito)
 
   if (typeof prefs !== 'object') {
     console.warn('userPrefs callback did not return an object:', prefs)
@@ -70,7 +70,7 @@ module.exports.init = (ses, partition, isPrivate) => {
     registeredPrivateSessions[partition] = ses
   }
   registeredSessions[partition] = ses
-  registeredCallbacks.forEach((fn) => fn())
+  registeredCallbacks.forEach((fn) => fn(null, isPrivate))
 }
 
 module.exports.registerUserPrefs = (cb) => {

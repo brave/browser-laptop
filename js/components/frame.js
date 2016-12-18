@@ -54,8 +54,6 @@ class Frame extends ImmutableComponent {
     this.onFocus = this.onFocus.bind(this)
     // Maps notification message to its callback
     this.notificationCallbacks = {}
-    // Change to DNT requires restart
-    this.doNotTrack = getSetting(settings.DO_NOT_TRACK)
     // Counter for detecting PDF URL redirect loops
     this.reloadCounter = {}
   }
@@ -743,9 +741,6 @@ class Frame extends ImmutableComponent {
           secure: null,
           runInsecureContent: false
         })
-      }
-      if (this.doNotTrack) {
-        this.webview.executeJavaScript('Navigator.prototype.__defineGetter__("doNotTrack", () => {return 1});')
       }
     }
 
