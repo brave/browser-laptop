@@ -744,11 +744,6 @@ class Frame extends ImmutableComponent {
           runInsecureContent: false
         })
       }
-      const parsedUrl = urlParse(e.url)
-      const hack = siteHacks[parsedUrl.hostname]
-      if (hack && hack.pageLoadStartScript) {
-        this.webview.executeJavaScript(hack.pageLoadStartScript)
-      }
       if (this.doNotTrack) {
         this.webview.executeJavaScript('Navigator.prototype.__defineGetter__("doNotTrack", () => {return 1});')
       }
@@ -778,10 +773,6 @@ class Frame extends ImmutableComponent {
         appActions.addSite(siteUtil.getDetailFromFrame(this.frame))
       }
 
-      const hack = siteHacks[parsedUrl.hostname]
-      if (hack && hack.pageLoadEndScript) {
-        this.webview.executeJavaScript(hack.pageLoadEndScript)
-      }
       if (this.props.location.startsWith(pdfjsOrigin)) {
         let displayLocation = UrlUtil.getLocationIfPDF(this.props.location)
         windowActions.setSecurityState(this.frame, {

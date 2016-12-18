@@ -69,29 +69,6 @@ module.exports.siteHacks = {
   'player.twitch.tv': {
     enableForAll: true
   },
-  'www.wired.com': {
-    // Site hack from
-    // https://github.com/gorhill/uBlock/blob/ce2d235e4fd2ade2be101fa7030870044b30fd3c/assets/ublock/resources.txt#L699
-    pageLoadEndScript: `(function() {
-      var sto = window.setTimeout,
-        re = /^function n\(\)/;
-      window.setTimeout = function(a, b) {
-          if ( b !== 50 || !re.test(a.toString()) ) {
-                sto(a, b);
-              }
-        };
-    })();`
-  },
-  'www.extremetech.com': {
-    pageLoadStartScript: `(function() {
-      var sto = window.setTimeout;
-      window.setTimeout = function(a, b) {
-          if ( b !== 250 ) {
-                sto(a, b);
-              }
-        };
-    })();`
-  },
   'imasdk.googleapis.com': {
     enableForAdblock: true,
     onBeforeRequest: function (details) {
