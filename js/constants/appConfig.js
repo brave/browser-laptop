@@ -168,8 +168,5 @@ module.exports = {
     'notification-add-funds-timestamp': null,
     'notification-reconcile-soon-timestamp': null
   },
-  defaultFavicon: 'img/empty_favicon.png',
-  uaExceptionHosts: [
-    'get.adobe.com', 'adobe.com', 'www.adobe.com', 'helpx.adobe.com'
-  ] // hosts to send true UA to
+  defaultFavicon: 'img/empty_favicon.png'
 }

@@ -8,7 +8,6 @@ const settings = {
   HOMEPAGE: 'general.homepage',
   NEWTAB_MODE: 'general.newtab-mode',
   SHOW_HOME_BUTTON: 'general.show-home-button',
-  USERAGENT: 'general.useragent.value',
   DEFAULT_DOWNLOAD_SAVE_PATH: 'general.downloads.default-save-path',
   AUTO_HIDE_MENU: 'general.autohide-menu',
   DISABLE_TITLE_MODE: 'general.disable-title-mode',

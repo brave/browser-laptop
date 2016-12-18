@@ -15,7 +15,6 @@ const FrameStateUtil = require('../state/frameStateUtil')
 const UrlUtil = require('../lib/urlutil')
 const messages = require('../constants/messages')
 const contextMenus = require('../contextMenus')
-const {siteHacks} = require('../data/siteHacks')
 const ipc = require('electron').ipcRenderer
 const clipboard = require('electron').clipboard
 const FullScreenWarning = require('./fullScreenWarning')
@@ -260,7 +259,6 @@ class Frame extends ImmutableComponent {
       return
     }
 
-    let location = this.props.location
     newSrc = newSrc || this.props.src
 
     if (isSourceAboutUrl(newSrc)) {
@@ -307,15 +305,6 @@ class Frame extends ImmutableComponent {
     }
 
     this.webview.setAttribute('data-frame-key', this.props.frameKey)
-
-    const parsedUrl = urlParse(location)
-    if (!appConfig.uaExceptionHosts.includes(parsedUrl.hostname)) {
-      this.webview.setUserAgentOverride(getSetting(settings.USERAGENT) || '')
-    }
-    const hack = siteHacks[parsedUrl.hostname]
-    if (hack && hack.userAgent) {
-      this.webview.setUserAgentOverride(hack.userAgent)
-    }
 
     if (webviewAdded) {
       this.webviewContainer.appendChild(this.webview)

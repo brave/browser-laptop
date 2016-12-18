@@ -212,8 +212,6 @@ function registerForBeforeSendHeaders (session, partition) {
   // For efficiency, avoid calculating these settings on every request. This means the
   // browser must be restarted for changes to take effect.
   const sendDNT = getSetting(settings.DO_NOT_TRACK)
-  let spoofedUserAgent = getSetting(settings.USERAGENT)
-  const braveRegex = new RegExp('brave/.+? ', 'gi')
   const isPrivate = module.exports.isPrivate(partition)
 
   session.webRequest.onBeforeSendHeaders(function (details, cb) {
@@ -225,18 +223,6 @@ function registerForBeforeSendHeaders (session, partition) {
 
     let requestHeaders = details.requestHeaders
     let parsedUrl = urlParse(details.url || '')
-
-    if (!spoofedUserAgent) {
-      // To minimize fingerprintability, remove Brave from the UA string.
-      // This can be removed once https://github.com/atom/electron/issues/3602 is
-      // resolved
-      spoofedUserAgent = requestHeaders['User-Agent'].replace(braveRegex, '')
-      appActions.changeSetting(settings.USERAGENT, spoofedUserAgent)
-    }
-
-    if (!appConfig.uaExceptionHosts.includes(parsedUrl.hostname)) {
-      requestHeaders['User-Agent'] = spoofedUserAgent
-    }
 
     const firstPartyUrl = module.exports.getMainFrameUrl(details)
     // this can happen if the tab is closed and the webContents is no longer available
@@ -254,6 +240,11 @@ function registerForBeforeSendHeaders (session, partition) {
         cb({cancel: true})
         return
       }
+
+      if (results.requestHeaders) {
+        requestHeaders = results.requestHeaders
+      }
+
       if (results.customCookie) {
         requestHeaders.Cookie = results.customCookie
       }

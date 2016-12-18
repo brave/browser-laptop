@@ -238,10 +238,6 @@ module.exports.cleanAppData = (data, isShutdown) => {
   // TODO(bridiver) use immutable
   data = makeImmutable(data).toJS()
 
-  if (data.settings) {
-    // useragent value gets recalculated on restart
-    data.settings[settings.USERAGENT] = undefined
-  }
   // Don't show notifications from the last session
   data.notifications = []
   // Delete temp site settings
