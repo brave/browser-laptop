@@ -65,6 +65,10 @@ const getDefaultUserPrefContentSettings = (braveryDefaults, appSettings, appConf
       setting: braveryDefaults.adControl === 'showBraveAds' ? 'allow' : 'block',
       primaryPattern: '*'
     }],
+    ads: [{
+      setting: ['blockAds', 'showBraveAds'].includes(braveryDefaults.adControl) ? 'block' : 'allow',
+      primaryPattern: '*'
+    }],
     doNotTrack: [{
       setting: getSetting(settings.DO_NOT_TRACK, appSettings) ? 'allow' : 'block',
       primaryPattern: '*'

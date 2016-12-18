@@ -15,3 +15,7 @@ chrome.webFrame.setGlobal("navigator.getBattery", function () {
 if (chrome.contentSettings.doNotTrack == 'allow') {
   executeScript("window.Navigator.prototype.__defineGetter__('doNotTrack', () => { return 1 })")
 }
+
+if (chrome.contentSettings.ads == 'block') {
+  chrome.webFrame.setGlobal("window.google_onload_fired", true)
+}
