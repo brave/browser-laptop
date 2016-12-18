@@ -74,7 +74,6 @@ let generateBraveManifest = () => {
         js: [
           'content/scripts/adInsertion.js',
           'content/scripts/passwordManager.js',
-          'content/scripts/flashListener.js',
           'content/scripts/pageInformation.js'
         ]
       },
@@ -127,7 +126,6 @@ let generateBraveManifest = () => {
     },
     web_accessible_resources: [
       'img/favicon.ico',
-      'about-flash.html',
       'about-blank.html',
       'about-newtab.html',
       'about-preferences.html'

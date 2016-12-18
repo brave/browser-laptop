@@ -7,17 +7,11 @@ const fs = require('fs')
 const path = require('path')
 const electron = require('electron')
 const app = electron.app
-const webContents = electron.webContents
 const appActions = require('./actions/appActions')
-const Filtering = require('../app/filtering')
 const settings = require('./constants/settings')
 
-// set to true if `init` has been called
-let initialized = false
 // set to true if the flash install check has succeeded
 let flashInstalled = false
-// set to true if a flash install url has been loaded
-let flashMaybeInstalled = false
 
 const getPepperFlashPath = () => {
   if (['darwin', 'win32'].includes(process.platform)) {
@@ -38,52 +32,6 @@ const getPepperFlashPath = () => {
     }
   }
   return pluginPath
-}
-
-/**
- * Checks whether a link is an Flash installer URL.
- * @param {string} url
- * @return {boolean}
- */
-const isFlashInstallUrl = (url) => {
-  const adobeRegex = new RegExp('//(get\\.adobe\\.com/([a-z_-]+/)*flashplayer|www\\.macromedia\\.com/go/getflash|www\\.adobe\\.com/go/getflash)', 'i')
-  return adobeRegex.test(url)
-}
-
-const handleFlashInstallUrl = (details, isPrivate) => {
-  const result = {
-    resourceName: module.exports.resourceName,
-    redirectURL: null,
-    cancel: false
-  }
-
-  const url = details.url
-  if (!url || details.resourceType !== 'mainFrame') {
-    return result
-  }
-
-  if (!isFlashInstallUrl(url)) {
-    return result
-  }
-
-  if (!flashInstalled) {
-    if (flashMaybeInstalled) {
-      setImmediate(() => {
-        module.exports.checkFlashInstalled((installed) => {
-          flashMaybeInstalled = installed
-          let tab = webContents.fromTabID(details.tabId)
-          if (tab && !tab.isDestroyed()) {
-            tab.loadURL(url)
-          }
-        })
-      })
-      result.cancel = true
-    } else {
-      flashMaybeInstalled = true
-    }
-  }
-
-  return result
 }
 
 module.exports.checkFlashInstalled = (cb) => {
@@ -111,13 +59,7 @@ module.exports.checkFlashInstalled = (cb) => {
 }
 
 module.exports.init = () => {
-  if (initialized) {
-    return
-  }
-  initialized = true
-
-  Filtering.registerBeforeRequestFilteringCB(handleFlashInstallUrl)
-  module.exports.checkFlashInstalled()
+  setImmediate(module.exports.checkFlashInstalled)
 }
 
 module.exports.resourceName = 'flash'

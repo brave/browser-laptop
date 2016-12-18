@@ -95,7 +95,6 @@ module.exports.aboutUrls = new Immutable.Map({
   'about:downloads': module.exports.getBraveExtUrl('about-downloads.html'),
   'about:error': module.exports.getBraveExtUrl('about-error.html'),
   'about:extensions': module.exports.getBraveExtUrl('about-extensions.html'),
-  'about:flash': module.exports.getBraveExtUrl('about-flash.html'),
   'about:history': module.exports.getBraveExtUrl('about-history.html'),
   'about:newtab': module.exports.getBraveExtUrl('about-newtab.html'),
   'about:passwords': module.exports.getBraveExtUrl('about-passwords.html'),
@@ -112,7 +111,7 @@ module.exports.isNotImplementedAboutPage = (location) =>
   ['about:config'].includes(getBaseUrl(location))
 
 module.exports.isNavigatableAboutPage = (location) =>
-  !module.exports.isIntermediateAboutPage(location) && !module.exports.isNotImplementedAboutPage(location) && !['about:newtab', 'about:blank', 'about:flash', 'about:contributions'].includes(getBaseUrl(location))
+  !module.exports.isIntermediateAboutPage(location) && !module.exports.isNotImplementedAboutPage(location) && !['about:newtab', 'about:blank', 'about:contributions'].includes(getBaseUrl(location))
 
 // Map of target URLs mapped to source about: URLs
 const aboutUrlsReverse = new Immutable.Map(module.exports.aboutUrls.reduce((obj, v, k) => {

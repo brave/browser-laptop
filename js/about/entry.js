@@ -70,9 +70,6 @@ switch (getBaseUrl(getSourceAboutUrl(window.location.href))) {
   case 'about:extensions':
     element = require('./extensions')
     break
-  case 'about:flash':
-    element = require('./flashPlaceholder')
-    break
   case 'about:history':
     element = require('./history')
     break

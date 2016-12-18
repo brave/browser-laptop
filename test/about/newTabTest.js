@@ -52,7 +52,6 @@ describe('about:newtab tests', function () {
       .addSite({ location: 'about:downloads' })
       .addSite({ location: 'about:error' })
       .addSite({ location: 'about:extensions' })
-      .addSite({ location: 'about:flash' })
       .addSite({ location: 'about:history' })
       .addSite({ location: 'about:newtab' })
       .addSite({ location: 'about:passwords' })

@@ -223,41 +223,6 @@ describe('urlutil', function () {
     })
   })
 
-  describe('isFlashInstallUrl', function () {
-    it('gets English flash install', function () {
-      assert(UrlUtil.isFlashInstallUrl('https://get.adobe.com/flashplayer'))
-      assert(UrlUtil.isFlashInstallUrl('https://www.adobe.com/go/getflash/'))
-      assert(UrlUtil.isFlashInstallUrl('http://www.macromedia.com/go/GETFLASH'))
-    })
-    it('gets non-English flash install', function () {
-      assert(UrlUtil.isFlashInstallUrl('https://get.adobe.com/jp/flashplayer#test'))
-      assert(UrlUtil.isFlashInstallUrl('https://get.adobe.com/en/us/flashplayer/etc'))
-      assert(UrlUtil.isFlashInstallUrl('https://get.adobe.com/en-US/flashplayer/etc'))
-    })
-    it('returns false for non-flash url', function () {
-      assert(!UrlUtil.isFlashInstallUrl('https://gettadobe.com/jp/flashplayer'))
-    })
-  })
-
-  describe('shouldInterceptFlash', function () {
-    it('intercepts flash', function () {
-      assert(UrlUtil.shouldInterceptFlash('http://adobe.com.abc/flashthing'))
-      assert(UrlUtil.shouldInterceptFlash('https://site.duckduckgo.com'))
-    })
-    it('does not intercept on search engine pages', function () {
-      assert(!UrlUtil.shouldInterceptFlash('https://www.google.com/#q=flash'))
-      assert(!UrlUtil.shouldInterceptFlash('https://www.google.jp/#q=flash'))
-      assert(!UrlUtil.shouldInterceptFlash('https://www.google.co.uk/#q=flash'))
-      assert(!UrlUtil.shouldInterceptFlash('https://duckduckgo.com/?q=flash+player&t=hd&ia=about'))
-      assert(!UrlUtil.shouldInterceptFlash('https://www.bing.com/search?q=flash&go=Submit&qs=n&form=QBLH'))
-      assert(!UrlUtil.shouldInterceptFlash('https://yandex.ru/search/?lr=21411&msid=1469118356.6242.22900.32200&text=flash%20player'))
-      assert(!UrlUtil.shouldInterceptFlash('https://search.yahoo.com/search;_ylt=AwrBT4at95BXs8sAdpdXNyoA;_ylc=X1MDMjc2NjY3OQRfcgMyBGZyA3lmcC1'))
-    })
-    it('does not intercept on adobe site', function () {
-      assert(!UrlUtil.shouldInterceptFlash('https://www.adobe.com/test'))
-    })
-  })
-
   describe('getLocationIfPDF', function () {
     it('gets location for PDF JS URL', function () {
       assert.equal(UrlUtil.getLocationIfPDF('chrome-extension://jdbefljfgobbmcidnmpjamcbhnbphjnb/https://www.blackhat.co…king-Kernel-Address-Space-Layout-Randomization-KASLR-With-Intel-TSX-wp.pdf'),
