@@ -17,7 +17,9 @@ class AboutAbout extends ImmutableComponent {
       </div>
 
       <div className='siteDetailsPageContent aboutAbout'>
-        <div className='sectionTitle' data-l10n-id='listOfAboutPages' />
+        <div className='title'>
+          <span className='sectionTitle' data-l10n-id='listOfAboutPages' />
+        </div>
         <ul>
           {
             aboutUrls.keySeq().sort().filter((aboutSourceUrl) => isNavigatableAboutPage(aboutSourceUrl)).map((aboutSourceUrl) =>
