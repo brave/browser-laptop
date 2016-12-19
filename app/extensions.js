@@ -139,7 +139,7 @@ let generateBraveManifest = () => {
     'form-action': '\'none\'',
     'referrer': 'no-referrer',
     'style-src': '\'self\' \'unsafe-inline\'',
-    'img-src': '* data:',
+    'img-src': '* data: file://*',
     'frame-src': '\'self\' https://buy.coinbase.com'
   }
 
