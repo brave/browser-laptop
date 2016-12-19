@@ -1,7 +1,7 @@
 # Changelog
 
 ## [0.13.0](https://github.com/brave/browser-laptop/releases/v0.13.0dev)
-- (TODO)
+- Muon updated to 2.0.5
 
 ## [0.12.15](https://github.com/brave/browser-laptop/releases/v0.12.15dev)
 - Added Yandex as a new search engine. ([#2703](https://github.com/brave/browser-laptop/issues/2703))
