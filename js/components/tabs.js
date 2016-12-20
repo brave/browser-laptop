@@ -27,6 +27,20 @@ class Tabs extends ImmutableComponent {
     this.onNextPage = this.onNextPage.bind(this)
     this.onNewTabLongPress = this.onNewTabLongPress.bind(this)
     this.wasNewTabClicked = this.wasNewTabClicked.bind(this)
+    this.onMouseLeave = this.onMouseLeave.bind(this)
+    this.onFrameClose = this.onFrameClose.bind(this)
+  }
+
+  onMouseLeave () {
+    windowActions.onTabMouseLeave({
+      fixTabWidth: null
+    })
+  }
+
+  onFrameClose (rect) {
+    windowActions.onTabClose({
+      fixTabWidth: rect.width
+    })
   }
 
   onPrevPage () {
@@ -100,7 +114,8 @@ class Tabs extends ImmutableComponent {
     this.tabRefs = []
     const index = this.props.previewTabPageIndex !== undefined
       ? this.props.previewTabPageIndex : this.props.tabPageIndex
-    return <div className='tabs'>
+    return <div className='tabs'
+      onMouseLeave={this.props.fixTabWidth ? this.onMouseLeave : null}>
       <span className={cx({
         tabStripContainer: true,
         isPreview: this.props.previewTabPageIndex !== undefined,
@@ -125,6 +140,8 @@ class Tabs extends ImmutableComponent {
                 paintTabs={this.props.paintTabs}
                 previewTabs={this.props.previewTabs}
                 isActive={this.props.activeFrameKey === tab.get('frameKey')}
+                onFrameClose={this.onFrameClose}
+                tabWidth={this.props.fixTabWidth}
                 partOfFullPageSet={this.props.partOfFullPageSet} />)
         }
         {(() => {
