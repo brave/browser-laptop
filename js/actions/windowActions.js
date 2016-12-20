@@ -1199,6 +1199,20 @@ const windowActions = {
       tabId,
       notify
     })
+  },
+
+  onTabClose: function (data) {
+    dispatch({
+      actionType: windowConstants.WINDOW_TAB_CLOSE,
+      data
+    })
+  },
+
+  onTabMouseLeave: function (data) {
+    dispatch({
+      actionType: windowConstants.WINDOW_TAB_MOUSE_LEAVE,
+      data
+    })
   }
 }
 
