@@ -130,7 +130,7 @@ class BraveryPanel extends ImmutableComponent {
     })
   }
   onReload () {
-    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD, {}, this.props.activeRequestedLocation)
+    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, {}, this.props.activeRequestedLocation)
   }
   onEditGlobal () {
     ipc.emit(messages.SHORTCUT_NEW_FRAME, {}, 'about:preferences#shields')
