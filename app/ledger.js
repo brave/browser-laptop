@@ -1127,6 +1127,7 @@ var roundtrip = (params, options, callback) => {
   var parts = typeof params.server === 'string' ? url.parse(params.server)
                 : typeof params.server !== 'undefined' ? params.server
                 : typeof options.server === 'string' ? url.parse(options.server) : options.server
+  var rawP = options.rawP
 
   if (!params.method) params.method = 'GET'
   parts = underscore.extend(underscore.pick(parts, [ 'protocol', 'hostname', 'port' ]),
@@ -1170,7 +1171,7 @@ var roundtrip = (params, options, callback) => {
     }
 
     try {
-      payload = (response.statusCode !== 204) ? JSON.parse(body) : null
+      payload = rawP ? body : (response.statusCode !== 204) ? JSON.parse(body) : null
     } catch (err) {
       return callback(err)
     }
