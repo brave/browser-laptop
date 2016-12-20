@@ -33,7 +33,7 @@ const setUserPrefType = (ses, path, value) => {
   }
 }
 
-const runCallback = (cb, name, incognito) => {
+const runCallback = (cb, incognito) => {
   let prefs = cb(incognito)
 
   if (typeof prefs !== 'object') {
@@ -41,17 +41,10 @@ const runCallback = (cb, name, incognito) => {
     return
   }
 
-  if (name) {
-    if (prefs[name]) {
-      module.exports.setUserPref(name, prefs[name], incognito)
-      return true
-    }
-    return false
-  }
-
-  for (name in prefs) {
+  for (let name in prefs) {
     module.exports.setUserPref(name, prefs[name], incognito)
   }
+
   return true
 }
 
@@ -70,7 +63,7 @@ module.exports.init = (ses, partition, isPrivate) => {
     registeredPrivateSessions[partition] = ses
   }
   registeredSessions[partition] = ses
-  registeredCallbacks.forEach((fn) => fn(null, isPrivate))
+  registeredCallbacks.forEach((fn) => fn(isPrivate))
 }
 
 module.exports.registerUserPrefs = (cb) => {
