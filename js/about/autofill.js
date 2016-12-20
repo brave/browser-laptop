@@ -133,7 +133,7 @@ class AboutAutofill extends React.Component {
 
   render () {
     var savedAddresssPage = this.isAddresssEmpty
-    ? <div><span data-l10n-id='noAddressesSaved' /></div>
+    ? <div><span className='notSaved' data-l10n-id='noAddressesSaved' /></div>
     : <div>
       <table className='autofillList'>
         <thead>
@@ -162,7 +162,7 @@ class AboutAutofill extends React.Component {
     </div>
 
     var savedCreditCardsPage = this.isCreditCardsEmpty
-    ? <div><span data-l10n-id='noCreditCardsSaved' /></div>
+    ? <div><span className='notSaved' data-l10n-id='noCreditCardsSaved' /></div>
     : <div>
       <table className='autofillList'>
         <thead>
