@@ -32,14 +32,17 @@ const updateTab = (tabId) => {
 
 const api = {
   init: (state, action) => {
-    process.on('open-url-from-tab', (e, source, targetUrl) => {
+    process.on('open-url-from-tab', (e, source, targetUrl, disposition) => {
       api.create({
         url: targetUrl,
-        openerTabId: source.getId()
+        openerTabId: source.getId(),
+        active: disposition !== 'background-tab'
       })
     })
 
     process.on('add-new-contents', (e, source, newTab, disposition, size, userGesture) => {
+      console.log(disposition, size, userGesture)
+
       if (userGesture === false) {
         e.preventDefault()
         return
