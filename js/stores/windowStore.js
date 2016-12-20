@@ -747,6 +747,14 @@ const doAction = (action) => {
     case appConstants.APP_NEW_TAB:
       newFrame(action.frameProps, action.frameProps.get('disposition') === 'foreground-tab')
       break
+    case windowConstants.WINDOW_TAB_CLOSE:
+      windowState = windowState.setIn(['ui', 'tabs', 'fixTabWidth'], action.data.fixTabWidth)
+      windowStore.emitChanges()
+      break
+    case windowConstants.WINDOW_TAB_MOUSE_LEAVE:
+      windowState = windowState.setIn(['ui', 'tabs', 'fixTabWidth'], action.data.fixTabWidth)
+      windowStore.emitChanges()
+      break
     default:
       break
   }

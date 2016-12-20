@@ -1182,6 +1182,7 @@ class Main extends ImmutableComponent {
           tabsPerTabPage={tabsPerPage}
           tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}
           previewTabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'previewTabPageIndex'])}
+          fixTabWidth={this.props.windowState.getIn(['ui', 'tabs', 'fixTabWidth'])}
           tabs={this.props.windowState.get('tabs')}
           sites={appStateSites}
           key='tab-bar'
