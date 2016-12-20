@@ -41,8 +41,6 @@ const api = {
     })
 
     process.on('add-new-contents', (e, source, newTab, disposition, size, userGesture) => {
-      console.log(disposition, size, userGesture)
-
       if (userGesture === false) {
         e.preventDefault()
         return
