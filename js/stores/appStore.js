@@ -34,7 +34,6 @@ const nativeImage = require('../../app/nativeImage')
 const Filtering = require('../../app/filtering')
 const basicAuth = require('../../app/browser/basicAuth')
 const windows = require('../../app/browser/windows')
-const downloadsReducer = require('../../app/browser/reducers/downloadsReducer')
 
 // state helpers
 const basicAuthState = require('../../app/common/state/basicAuthState')
@@ -43,8 +42,6 @@ const aboutNewTabState = require('../../app/common/state/aboutNewTabState')
 const aboutHistoryState = require('../../app/common/state/aboutHistoryState')
 const windowState = require('../../app/common/state/windowState')
 
-const flashReducer = require('../../app/browser/reducers/flashReducer')
-const tabsReducer = require('../../app/browser/reducers/tabsReducer')
 const webtorrent = require('../../app/browser/webtorrent')
 
 const isDarwin = process.platform === 'darwin'
@@ -353,6 +350,13 @@ function handleChangeSettingAction (settingKey, settingValue) {
   }
 }
 
+const reducers = [
+  require('../../app/browser/reducers/downloadsReducer'),
+  require('../../app/browser/reducers/flashReducer'),
+  require('../../app/browser/reducers/tabsReducer'),
+  require('../../app/browser/reducers/clipboardReducer')
+]
+
 const handleAppAction = (action) => {
   if (shuttingDown) {
     return
@@ -360,9 +364,7 @@ const handleAppAction = (action) => {
 
   const ledger = require('../../app/ledger')
 
-  appState = downloadsReducer(appState, action)
-  appState = flashReducer(appState, action)
-  appState = tabsReducer(appState, action)
+  appState = reducers.reduce((appState, reducer) => reducer(appState, action), appState)
 
   switch (action.actionType) {
     case appConstants.APP_SET_STATE:

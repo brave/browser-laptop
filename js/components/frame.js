@@ -16,7 +16,6 @@ const UrlUtil = require('../lib/urlutil')
 const messages = require('../constants/messages')
 const contextMenus = require('../contextMenus')
 const ipc = require('electron').ipcRenderer
-const clipboard = require('electron').clipboard
 const FullScreenWarning = require('./fullScreenWarning')
 const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
@@ -514,7 +513,7 @@ class Frame extends ImmutableComponent {
       case 'copy':
         let selection = window.getSelection()
         if (selection && selection.toString()) {
-          clipboard.writeText(selection.toString())
+          appActions.clipboardTextCopied(selection.toString())
         } else {
           this.webview.copy()
         }

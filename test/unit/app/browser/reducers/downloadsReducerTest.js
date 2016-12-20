@@ -1,4 +1,4 @@
-/* global describe, it, before, after, beforeEach */
+/* global describe, it, before, after */
 const mockery = require('mockery')
 const sinon = require('sinon')
 const Immutable = require('immutable')
@@ -40,9 +40,6 @@ describe('downloadsReducer', function () {
     })
     mockery.registerMock('electron', fakeElectron)
     downloadsReducer = require('../../../../../app/browser/reducers/downloadsReducer')
-  })
-
-  beforeEach(function () {
   })
 
   after(function () {
@@ -120,7 +117,6 @@ describe('downloadsReducer', function () {
   describe('APP_DOWNLOAD_COPIED_TO_CLIPBOARD', function () {
     it('copies the download URL to the clipboard', function () {
       const spy = sinon.spy(fakeElectron.clipboard, 'writeText')
-      spy.withArgs(downloadUrl)
       const oldState = oneDownloadWithState(IN_PROGRESS)
       downloadsReducer(oldState, {actionType: appConstants.APP_DOWNLOAD_COPIED_TO_CLIPBOARD, downloadId: downloadId(oldState)})
       assert(spy.withArgs(downloadUrl).calledOnce)

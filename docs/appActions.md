@@ -620,6 +620,16 @@ Dispatches a message when a download is being redownloaded
 
 
 
+### clipboardTextCopied(text) 
+
+Dispatches a message when text is updated to the clipboard
+
+**Parameters**
+
+**text**: `string`, clipboard text which is copied
+
+
+
 
 * * *
 

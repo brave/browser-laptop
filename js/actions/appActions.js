@@ -763,6 +763,17 @@ const appActions = {
       actionType: appConstants.APP_DOWNLOAD_REDOWNLOADED,
       downloadId
     })
+  },
+
+  /**
+   * Dispatches a message when text is updated to the clipboard
+   * @param {string} text - clipboard text which is copied
+   */
+  clipboardTextCopied: function (text) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_CLIPBOARD_TEXT_UPDATED,
+      text
+    })
   }
 }
 
