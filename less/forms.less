@@ -29,7 +29,7 @@ select {
   padding: 10px 30px;
   position: absolute;
   text-align: left;
-  top: 30px;
+  top: @dialogTopOffset;
 }
 
 .releaseNotes {
@@ -331,7 +331,7 @@ select {
     cursor: default;
     color: #3B3B3B;
     overflow-y: auto;
-    max-height: 100%;
+    max-height: calc(~'100% - @{dialogTopOffset}');
 
     .clickable {
       color: #5B5B5B;
