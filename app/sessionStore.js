@@ -350,6 +350,7 @@ const setVersionInformation = (data) => {
     const os = require('os')
     const versionInformation = [
       {name: 'Brave', version: app.getVersion()},
+      {name: 'rev', version: Channel.browserLaptopRev()},
       {name: 'Muon', version: process.versions['atom-shell']},
       {name: 'libchromiumcontent', version: process.versions['chrome']},
       {name: 'V8', version: process.versions.v8},

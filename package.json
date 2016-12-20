@@ -142,6 +142,7 @@
     "empty-port": "0.0.2",
     "enzyme": "^2.6.0",
     "flow-bin": "^0.22.1",
+    "git-rev-sync": "^1.8.0",
     "gulp": "^3.9.0",
     "jsdom": "9.4.1",
     "jsdom-global": "2.0.0",

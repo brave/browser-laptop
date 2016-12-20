@@ -53,7 +53,9 @@ class AboutBrave extends React.Component {
               value: entry.get('name')
             },
             {
-              html: entry.get('version'),
+              html: entry.get('name') === 'rev'
+                ? <a target='_blank' href={`https://github.com/brave/browser-laptop/commit/${entry.get('version')}`}>{entry.get('version') && entry.get('version').substring(0, 7) || ''}</a>
+                : entry.get('version'),
               value: entry.get('version')
             }
           ])}

@@ -40,7 +40,8 @@ if (!channels[env.CHANNEL]) {
 console.log('Writing buildConfig.js...')
 config.writeBuildConfig(
   {
-    channel: env.CHANNEL
+    channel: env.CHANNEL,
+    BROWSER_LAPTOP_REV: require('git-rev-sync').long()
   },
   'buildConfig.js'
 )
