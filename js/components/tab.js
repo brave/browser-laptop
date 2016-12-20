@@ -173,17 +173,15 @@ class Tab extends ImmutableComponent {
       })
     }
 
-    let playIcon = null
+    let playIcon = false
     let iconClass = null
-
     if (this.props.tab.get('audioPlaybackActive') || this.props.tab.get('audioMuted')) {
       if (this.props.tab.get('audioPlaybackActive') && !this.props.tab.get('audioMuted')) {
         iconClass = 'fa fa-volume-up'
       } else if (this.props.tab.get('audioPlaybackActive') && this.props.tab.get('audioMuted')) {
         iconClass = 'fa fa-volume-off'
       }
-      playIcon = <AudioTabIcon styles={iconClass}
-        onClick={this.onMuteFrame.bind(this, !this.props.tab.get('audioMuted'))} />
+      playIcon = true
     }
 
     const locationHasFavicon = this.props.tab.get('location') !== 'about:newtab' && this.props.tab.get('location') !== 'about:blank'
@@ -238,7 +236,12 @@ class Tab extends ImmutableComponent {
             style={iconStyle} />
           : null
         }
-        {playIcon}
+        {
+          playIcon
+          ? <AudioTabIcon styles={iconClass}
+            onClick={this.onMuteFrame.bind(this, !this.props.tab.get('audioMuted'))} />
+          : null
+        }
         {
           !this.isPinned
           ? <div className='tabTitle'>

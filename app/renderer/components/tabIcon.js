@@ -13,7 +13,7 @@ class TabIcon extends ImmutableComponent {
       styles.icon,
       this.props.withBlueIcon && styles.blueIcon
     )
-    return <div className={className}>
+    return <div className={className} onClick={this.props.onClick}>
       <span className={this.props.styles} />
     </div>
   }
