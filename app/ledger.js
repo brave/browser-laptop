@@ -478,10 +478,9 @@ eventStore.addChangeListener(() => {
 
           if ((response.statusCode !== 200) || (response.headers['content-length'] === '0')) return
 
+          tail = blob.indexOf(';base64,')
           if (blob.indexOf('data:image/') !== 0) {
             // NB: for some reason, some sites return an image, but with the wrong content-type...
-
-            tail = blob.indexOf(';base64,')
             if (tail <= 0) return
 
             prefix = new Buffer(blob.substr(tail + 8, signatureMax), 'base64')
@@ -494,7 +493,7 @@ eventStore.addChangeListener(() => {
               matchP = true
             })
             if (!matchP) return
-          }
+          } else if ((tail > 0) && (tail + 8 >= blob.length)) return
 
           entry.faviconURL = blob
           updatePublisherInfo()
