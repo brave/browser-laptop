@@ -244,9 +244,9 @@ describe('menuUtil tests', function () {
       assert.deepEqual(result, expectedResult)
     })
     it('removes duplicate menu separators', function () {
-      const template = [separator, separator, {label: 'lol'}]
+      const template = [{label: 'lol1'}, separator, separator, {label: 'lol2'}]
       const result = menuUtil.sanitizeTemplateItems(template)
-      const expectedResult = [separator, {label: 'lol'}]
+      const expectedResult = [{label: 'lol1'}, separator, {label: 'lol2'}]
       assert.deepEqual(result, expectedResult)
     })
     it('removes items which are missing label or type', function () {
@@ -265,6 +265,24 @@ describe('menuUtil tests', function () {
       const template = [{label: 'lol'}]
       const result = menuUtil.sanitizeTemplateItems(template)
       const expectedResult = [{label: 'lol'}]
+      assert.deepEqual(result, expectedResult)
+    })
+    it('does not allow the list to start with a separator', function () {
+      const template = [separator, {label: 'lol'}]
+      const result = menuUtil.sanitizeTemplateItems(template)
+      const expectedResult = [{label: 'lol'}]
+      assert.deepEqual(result, expectedResult)
+    })
+    it('does not allow the list to end with a separator', function () {
+      const template = [{label: 'lol'}, separator]
+      const result = menuUtil.sanitizeTemplateItems(template)
+      const expectedResult = [{label: 'lol'}]
+      assert.deepEqual(result, expectedResult)
+    })
+    it('does not allow only a separator', function () {
+      const template = [separator]
+      const result = menuUtil.sanitizeTemplateItems(template)
+      const expectedResult = []
       assert.deepEqual(result, expectedResult)
     })
   })
