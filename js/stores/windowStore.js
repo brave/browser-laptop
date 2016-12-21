@@ -9,7 +9,7 @@ const windowConstants = require('../constants/windowConstants')
 const config = require('../constants/config')
 const settings = require('../constants/settings')
 const Immutable = require('immutable')
-const FrameStateUtil = require('../state/frameStateUtil')
+const frameStateUtil = require('../state/frameStateUtil')
 const ipc = require('electron').ipcRenderer
 const messages = require('../constants/messages')
 const debounce = require('../lib/debounce')
@@ -41,14 +41,14 @@ let lastEmittedState
 const CHANGE_EVENT = 'change'
 
 const frameStatePath = (key) =>
-  ['frames', FrameStateUtil.findIndexForFrameKey(windowState.get('frames'), key)]
+  ['frames', frameStateUtil.findIndexForFrameKey(windowState.get('frames'), key)]
 const tabStatePath = (frameKey) =>
-  ['tabs', FrameStateUtil.findIndexForFrameKey(windowState.get('frames'), frameKey)]
+  ['tabs', frameStateUtil.findIndexForFrameKey(windowState.get('frames'), frameKey)]
 const activeFrameStatePath = () => frameStatePath(windowState.get('activeFrameKey'))
 const frameStatePathForFrame = (frameProps) =>
-  ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), frameProps)]
+  ['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), frameProps)]
 const tabStatePathForFrame = (frameProps) =>
-  ['tabs', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), frameProps)]
+  ['tabs', frameStateUtil.getFramePropsIndex(windowState.get('frames'), frameProps)]
 
 const updateNavBarInput = (loc, frameStatePath = activeFrameStatePath()) => {
   windowState = windowState.setIn(frameStatePath.concat(['navbar', 'urlbar', 'location']), loc)
@@ -97,7 +97,7 @@ const updateTabPageIndex = (frameProps) => {
     return
   }
 
-  const index = FrameStateUtil.getFrameTabPageIndex(windowState.get('frames')
+  const index = frameStateUtil.getFrameTabPageIndex(windowState.get('frames')
       .filter((frame) => !frame.get('pinnedLocation')), frameProps, getSetting(settings.TABS_PER_PAGE))
   if (index === -1) {
     return
@@ -132,7 +132,7 @@ class WindowStore extends EventEmitter {
   }
 
   getFrame (key) {
-    return FrameStateUtil.getFrameByKey(windowState, key)
+    return frameStateUtil.getFrameByKey(windowState, key)
   }
 
   getFrameCount () {
@@ -173,9 +173,9 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
   insertionIndex = frameOpts.index || insertionIndex
 
   if (frameOpts.partition) {
-    frameOpts.isPrivate = FrameStateUtil.isPrivatePartition(frameOpts.partition)
-    if (FrameStateUtil.isSessionPartition(frameOpts.partition)) {
-      frameOpts.partitionNumber = FrameStateUtil.getPartitionNumber(frameOpts.partition)
+    frameOpts.isPrivate = frameStateUtil.isPrivatePartition(frameOpts.partition)
+    if (frameStateUtil.isSessionPartition(frameOpts.partition)) {
+      frameOpts.partitionNumber = frameStateUtil.getPartitionNumber(frameOpts.partition)
     }
   }
 
@@ -214,23 +214,30 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
     nextPartitionNumber = incrementPartitionNumber()
   }
 
+  // TODO: longer term get rid of parentFrameKey completely instead of
+  // calculating it here.
+  let parentFrameKey = frameOpts.parentFrameKey
+  if (frameOpts.openerTabId) {
+    parentFrameKey = frameStateUtil.getFrameKeyByTabId(windowState, frameOpts.openerTabId)
+  }
+
   // Find the closest index to the current frame's index which has
   // a different ancestor frame key.
   const frames = windowState.get('frames')
   if (insertionIndex === undefined) {
-    insertionIndex = FrameStateUtil.findIndexForFrameKey(frames, frameOpts.parentFrameKey)
+    insertionIndex = frameStateUtil.findIndexForFrameKey(frames, parentFrameKey)
     if (insertionIndex === -1) {
       insertionIndex = frames.size
     } else {
       while (insertionIndex < frames.size) {
         ++insertionIndex
-        if (!FrameStateUtil.isAncestorFrameKey(frames, frames.get(insertionIndex), frameOpts.parentFrameKey)) {
+        if (!frameStateUtil.isAncestorFrameKey(frames, frames.get(insertionIndex), parentFrameKey)) {
           break
         }
       }
     }
   }
-  if (FrameStateUtil.isFrameKeyPinned(frames, frameOpts.parentFrameKey)) {
+  if (frameStateUtil.isFrameKeyPinned(frames, parentFrameKey)) {
     insertionIndex = 0
   }
 
@@ -239,13 +246,12 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
   }
 
   windowState = windowState.merge(
-    FrameStateUtil.addFrame(
-      frames, windowState.get('tabs'), frameOpts,
-    nextKey, nextPartitionNumber, openInForeground ? nextKey : windowState.get('activeFrameKey'), insertionIndex)
-  )
+    frameStateUtil.addFrame(
+      windowState, windowState.get('tabs'), frameOpts,
+      nextKey, nextPartitionNumber, openInForeground ? nextKey : windowState.get('activeFrameKey'), insertionIndex))
 
   if (openInForeground) {
-    const activeFrame = FrameStateUtil.getActiveFrame(windowState)
+    const activeFrame = frameStateUtil.getActiveFrame(windowState)
     updateTabPageIndex(activeFrame)
     // For about:newtab we want to have the urlbar focused, not the new frame.
     // Otherwise we want to focus the new tab when it is a new frame in the foreground.
@@ -266,14 +272,14 @@ const doAction = (action) => {
       windowState = action.windowState
       currentKey = windowState.get('frames').reduce((previousVal, frame) => Math.max(previousVal, frame.get('key')), 0)
       currentPartitionNumber = windowState.get('frames').reduce((previousVal, frame) => Math.max(previousVal, frame.get('partitionNumber')), 0)
-      const activeFrame = FrameStateUtil.getActiveFrame(windowState)
+      const activeFrame = frameStateUtil.getActiveFrame(windowState)
       if (activeFrame && activeFrame.get('location') !== 'about:newtab') {
         focusWebview(activeFrameStatePath())
       }
       // We should not emit here because the Window already know about the change on startup.
       return
     case windowConstants.WINDOW_SET_URL:
-      const frame = FrameStateUtil.getFrameByKey(windowState, action.key)
+      const frame = frameStateUtil.getFrameByKey(windowState, action.key)
       const currentLocation = frame.get('location')
       const parsedUrl = urlParse(action.location)
 
@@ -366,7 +372,7 @@ const doAction = (action) => {
 
       // Update nav bar unless when spawning a new tab. The user might have
       // typed in the URL bar while we were navigating -- we should preserve it.
-      if (!(action.location === 'about:newtab' && !FrameStateUtil.getActiveFrame(windowState).get('canGoForward'))) {
+      if (!(action.location === 'about:newtab' && !frameStateUtil.getActiveFrame(windowState).get('canGoForward'))) {
         updateNavBarInput(action.location, frameStatePath(key))
       }
       break
@@ -377,7 +383,7 @@ const doAction = (action) => {
       windowStore.emitChanges()
       return
     case windowConstants.WINDOW_SET_FRAME_TAB_ID:
-      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         tabId: action.tabId
       })
       break
@@ -386,7 +392,7 @@ const doAction = (action) => {
       // set the previous location to the most recent history item or the default url
       let previousLocation = action.frameProps.get('history').unshift(config.defaultUrl).findLast((url) => url !== action.errorDetails.url)
 
-      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         aboutDetails: Object.assign({
           title: action.errorDetails.title || l10nErrorText(action.errorDetails.errorCode),
           message: action.errorDetails.message,
@@ -396,10 +402,10 @@ const doAction = (action) => {
       })
       break
     case windowConstants.WINDOW_SET_FRAME_TITLE:
-      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         title: action.title
       })
-      windowState = windowState.mergeIn(['tabs', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+      windowState = windowState.mergeIn(['tabs', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         title: action.title
       })
       break
@@ -407,43 +413,43 @@ const doAction = (action) => {
       if (action.shown) {
         windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), false)
       }
-      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         findbarShown: action.shown
       })
-      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         findbarSelected: action.shown
       })
       break
     case windowConstants.WINDOW_SET_FINDBAR_SELECTED:
-      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         findbarSelected: action.selected
       })
       break
     case windowConstants.WINDOW_WEBVIEW_LOAD_START:
-      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         loading: true,
         provisionalLocation: action.location,
         startLoadTime: new Date().getTime(),
         endLoadTime: null
       })
-      windowState = windowState.mergeIn(['tabs', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+      windowState = windowState.mergeIn(['tabs', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         loading: true,
         provisionalLocation: action.location
       })
       break
     case windowConstants.WINDOW_WEBVIEW_LOAD_END:
-      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         loading: false,
         endLoadTime: new Date().getTime(),
         history: addToHistory(action.frameProps)
       })
-      windowState = windowState.mergeIn(['tabs', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+      windowState = windowState.mergeIn(['tabs', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         loading: false
       })
       break
     case windowConstants.WINDOW_SET_FULL_SCREEN:
-      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
-        isFullScreen: action.isFullScreen !== undefined ? action.isFullScreen : windowState.getIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)].concat('isFullScreen')),
+      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+        isFullScreen: action.isFullScreen !== undefined ? action.isFullScreen : windowState.getIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)].concat('isFullScreen')),
         showFullScreenWarning: action.showFullScreenWarning
       })
       break
@@ -463,29 +469,29 @@ const doAction = (action) => {
       break
     case windowConstants.WINDOW_CLONE_FRAME:
       {
-        let insertionIndex = FrameStateUtil.findIndexForFrameKey(windowState.get('frames'), action.frameOpts.key) + 1
+        let insertionIndex = frameStateUtil.findIndexForFrameKey(windowState.get('frames'), action.frameOpts.key) + 1
         const nextKey = incrementNextKey()
-        newFrame(FrameStateUtil.cloneFrame(action.frameOpts, action.guestInstanceId, nextKey),
+        newFrame(frameStateUtil.cloneFrame(action.frameOpts, action.guestInstanceId, nextKey),
           action.openInForeground, insertionIndex, nextKey)
         break
       }
     case windowConstants.WINDOW_CLOSE_FRAME:
       // Use the frameProps we passed in, or default to the active frame
-      const frameProps = action.frameProps || FrameStateUtil.getActiveFrame(windowState)
-      const index = FrameStateUtil.getFramePropsIndex(windowState.get('frames'), frameProps)
-      const activeFrameKey = FrameStateUtil.getActiveFrame(windowState).get('key')
-      windowState = windowState.merge(FrameStateUtil.removeFrame(windowState.get('frames'), windowState.get('tabs'),
+      const frameProps = action.frameProps || frameStateUtil.getActiveFrame(windowState)
+      const index = frameStateUtil.getFramePropsIndex(windowState.get('frames'), frameProps)
+      const activeFrameKey = frameStateUtil.getActiveFrame(windowState).get('key')
+      windowState = windowState.merge(frameStateUtil.removeFrame(windowState.get('frames'), windowState.get('tabs'),
         windowState.get('closedFrames'), frameProps.set('closedAtIndex', index),
         activeFrameKey))
       // If we reach the limit of opened tabs per page while closing tabs, switch to
       // the active tab's page otherwise the user will hang on empty page
       let totalOpenTabs = windowState.get('frames').filter((frame) => !frame.get('pinnedLocation')).size
       if ((totalOpenTabs % getSetting(settings.TABS_PER_PAGE)) === 0) {
-        updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))
+        updateTabPageIndex(frameStateUtil.getActiveFrame(windowState))
       }
       break
     case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
-      windowState = windowState.merge(FrameStateUtil.undoCloseFrame(windowState, windowState.get('closedFrames')))
+      windowState = windowState.merge(frameStateUtil.undoCloseFrame(windowState, windowState.get('closedFrames')))
       focusWebview(activeFrameStatePath())
       break
     case windowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
@@ -524,7 +530,7 @@ const doAction = (action) => {
       }
       break
     case windowConstants.WINDOW_UPDATE_BACK_FORWARD:
-      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         canGoBack: action.canGoBack,
         canGoForward: action.canGoForward
       })
@@ -537,8 +543,8 @@ const doAction = (action) => {
       }
       break
     case windowConstants.WINDOW_TAB_MOVE:
-      const sourceFramePropsIndex = FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.sourceFrameProps)
-      let newIndex = FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.destinationFrameProps) + (action.prepend ? 0 : 1)
+      const sourceFramePropsIndex = frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.sourceFrameProps)
+      let newIndex = frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.destinationFrameProps) + (action.prepend ? 0 : 1)
       let frames = windowState.get('frames').splice(sourceFramePropsIndex, 1)
       let tabs = windowState.get('tabs').splice(sourceFramePropsIndex, 1)
       if (newIndex > sourceFramePropsIndex) {
@@ -549,7 +555,7 @@ const doAction = (action) => {
       windowState = windowState.set('frames', frames)
       windowState = windowState.set('tabs', tabs)
       // Since the tab could have changed pages, update the tab page as well
-      updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))
+      updateTabPageIndex(frameStateUtil.getActiveFrame(windowState))
       break
     case windowConstants.WINDOW_SET_LINK_HOVER_PREVIEW:
       windowState = windowState.mergeIn(activeFrameStatePath(), {
@@ -620,7 +626,7 @@ const doAction = (action) => {
       }
       break
     case windowConstants.WINDOW_SET_ACTIVE_FRAME_SHORTCUT:
-      const framePath = action.frameProps ? ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)] : activeFrameStatePath()
+      const framePath = action.frameProps ? ['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)] : activeFrameStatePath()
       windowState = windowState.mergeIn(framePath, {
         activeShortcut: action.activeShortcut,
         activeShortcutDetails: action.activeShortcutDetails
@@ -632,7 +638,7 @@ const doAction = (action) => {
       })
       break
     case windowConstants.WINDOW_SET_FIND_DETAIL:
-      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'findDetail'], action.findDetail)
+      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'findDetail'], action.findDetail)
       // Since the input value is bound, we need to notify the control sync.
       windowStore.emitChanges()
       return
@@ -695,9 +701,9 @@ const doAction = (action) => {
         action.frameProps = alreadyPinnedFrameProps
         doAction(action)
       } else {
-        windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'pinnedLocation'],
+        windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'pinnedLocation'],
           action.isPinned ? location : undefined)
-        windowState = windowState.setIn(['tabs', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'pinnedLocation'],
+        windowState = windowState.setIn(['tabs', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'pinnedLocation'],
           action.isPinned ? location : undefined)
       }
       // Remove preview frame key when unpinning / pinning
@@ -711,19 +717,19 @@ const doAction = (action) => {
       windowStore.emitChanges()
       return
     case windowConstants.WINDOW_SET_AUDIO_MUTED:
-      windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioMuted'], action.muted)
-      windowState = windowState.setIn(['tabs', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioMuted'], action.muted)
+      windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioMuted'], action.muted)
+      windowState = windowState.setIn(['tabs', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioMuted'], action.muted)
       break
     case windowConstants.WINDOW_SET_AUDIO_PLAYBACK_ACTIVE:
-      windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioPlaybackActive'], action.audioPlaybackActive)
-      windowState = windowState.setIn(['tabs', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioPlaybackActive'], action.audioPlaybackActive)
+      windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioPlaybackActive'], action.audioPlaybackActive)
+      windowState = windowState.setIn(['tabs', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioPlaybackActive'], action.audioPlaybackActive)
       break
     case windowConstants.WINDOW_SET_FAVICON:
-      windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'icon'], action.favicon)
-      windowState = windowState.setIn(['tabs', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'icon'], action.favicon)
+      windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'icon'], action.favicon)
+      windowState = windowState.setIn(['tabs', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'icon'], action.favicon)
       break
     case windowConstants.WINDOW_SET_LAST_ZOOM_PERCENTAGE:
-      windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'lastZoomPercentage'], action.percentage)
+      windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'lastZoomPercentage'], action.percentage)
       break
     case windowConstants.WINDOW_SET_MAXIMIZE_STATE:
       windowState = windowState.setIn(['ui', 'isMaximized'], action.isMaximized)
@@ -841,24 +847,24 @@ const doAction = (action) => {
       }
       break
     case windowConstants.WINDOW_SET_BLOCKED_BY:
-      const blockedByPath = ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), action.blockType, 'blocked']
+      const blockedByPath = ['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), action.blockType, 'blocked']
       let blockedBy = windowState.getIn(blockedByPath) || new Immutable.List()
       blockedBy = blockedBy.toSet().add(action.location).toList()
       windowState = windowState.setIn(blockedByPath, blockedBy)
       break
     case windowConstants.WINDOW_SET_REDIRECTED_BY:
-      const redirectedByPath = ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'httpsEverywhere', action.ruleset]
+      const redirectedByPath = ['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'httpsEverywhere', action.ruleset]
       let redirectedBy = windowState.getIn(redirectedByPath) || new Immutable.List()
       windowState = windowState.setIn(redirectedByPath, redirectedBy.push(action.location))
       break
     case windowConstants.WINDOW_ADD_HISTORY:
-      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         history: addToHistory(action.frameProps)
       })
       break
     case windowConstants.WINDOW_SET_BLOCKED_RUN_INSECURE_CONTENT:
       const blockedRunInsecureContentPath =
-        ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)]
+        ['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)]
       if (action.source) {
         let blockedList = windowState.getIn(
           blockedRunInsecureContentPath.concat(['security', 'blockedRunInsecureContent'])) || new Immutable.List()
@@ -935,14 +941,14 @@ const doAction = (action) => {
 }
 
 ipc.on(messages.SHORTCUT_NEXT_TAB, () => {
-  windowState = FrameStateUtil.makeNextFrameActive(windowState)
-  updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))
+  windowState = frameStateUtil.makeNextFrameActive(windowState)
+  updateTabPageIndex(frameStateUtil.getActiveFrame(windowState))
   emitChanges()
 })
 
 ipc.on(messages.SHORTCUT_PREV_TAB, () => {
-  windowState = FrameStateUtil.makePrevFrameActive(windowState)
-  updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))
+  windowState = frameStateUtil.makePrevFrameActive(windowState)
+  updateTabPageIndex(frameStateUtil.getActiveFrame(windowState))
   emitChanges()
 })
 
@@ -966,7 +972,7 @@ frameShortcuts.forEach((shortcut) => {
   // Listen for actions on frame N
   if (['reload', 'mute', 'clone'].includes(shortcut)) {
     ipc.on(`shortcut-frame-${shortcut}`, (e, i, args) => {
-      const path = ['frames', FrameStateUtil.findIndexForFrameKey(windowState.get('frames'), i)]
+      const path = ['frames', frameStateUtil.findIndexForFrameKey(windowState.get('frames'), i)]
       windowState = windowState.mergeIn(path, {
         activeShortcut: shortcut,
         activeShortcutDetails: args

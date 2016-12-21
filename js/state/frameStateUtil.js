@@ -43,6 +43,16 @@ function getFrameByIndex (windowState, i) {
   return windowState.getIn(['frames', i])
 }
 
+// This will eventually go away fully when we replace frameKey by tabId
+function getFrameKeyByTabId (windowState, tabId) {
+  let parentFrameKey
+  const openerFrame = getFrameByTabId(windowState, tabId)
+  if (openerFrame) {
+    parentFrameKey = openerFrame.get('key')
+  }
+  return parentFrameKey
+}
+
 function getFrameKeysByDisplayIndex (frames) {
   let framesByDisplayIndex = [[], []]
   frames.forEach((frame) => {
@@ -306,7 +316,8 @@ const tabFromFrame = (frame) => {
  * Adds a frame specified by frameOpts and newKey and sets the activeFrameKey
  * @return Immutable top level application state ready to merge back in
  */
-function addFrame (frames, tabs, frameOpts, newKey, partitionNumber, activeFrameKey, insertionIndex) {
+function addFrame (windowState, tabs, frameOpts, newKey, partitionNumber, activeFrameKey, insertionIndex) {
+  const frames = windowState.get('frames')
   const url = frameOpts.location || config.defaultUrl
 
   // delayedLoadUrl is used as a placeholder when the new frame is created
@@ -327,6 +338,13 @@ function addFrame (frames, tabs, frameOpts, newKey, partitionNumber, activeFrame
     if (alreadyPinnedFrameProps) {
       return {}
     }
+  }
+
+  // TODO: longer term get rid of parentFrameKey completely instead of
+  // calculating it here.
+  let parentFrameKey = frameOpts.parentFrameKey
+  if (frameOpts.openerTabId) {
+    parentFrameKey = getFrameKeyByTabId(windowState, frameOpts.openerTabId)
   }
 
   const frame = Immutable.fromJS(Object.assign({
@@ -371,6 +389,7 @@ function addFrame (frames, tabs, frameOpts, newKey, partitionNumber, activeFrame
       certDetails: null
     },
     unloaded: frameOpts.unloaded,
+    parentFrameKey,
     history: []
   }, frameOpts))
 
@@ -543,5 +562,6 @@ module.exports = {
   removeFrame,
   removeOtherFrames,
   tabFromFrame,
+  getFrameKeyByTabId,
   getFrameTabPageIndex
 }
