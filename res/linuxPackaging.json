@@ -3,6 +3,7 @@
   "section": "web",
   "categories": ["Network","WebBrowser"],
   "mimeType": ["text/html", "text/xml", "application/xhtml_xml", "image/webp","x-scheme-handler/http", "x-scheme-handler/https", "x-scheme-handler/ftp"],
+  "requires": [ "GConf2", "libXScrnSaver" , "lsb" ],
   "depends": [  "git",
  "gconf2",
  "gconf-service",
@@ -20,4 +21,3 @@
  "gir1.2-gnomekeyring-1.0",
  "libgnome-keyring0"]
 }
-
