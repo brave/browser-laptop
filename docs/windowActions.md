@@ -221,18 +221,6 @@ Dispatches a message to the store to create a new frame
 
 
 
-### cloneFrame(frameProps, guestInstanceId) 
-
-Dispatches a message to the store to clone an existing frame
-
-**Parameters**
-
-**frameProps**: `Object`, The properties of the frame to clone
-
-**guestInstanceId**: `number`, The guestInstanceId of the cloned webcontents
-
-
-
 ### closeFrame(frames, frameProps) 
 
 Dispatches a message to close a frame

@@ -51,11 +51,14 @@ const api = {
         location = 'about:blank'
       }
 
+      const openerTabId = !source.isDestroyed() ? source.getId() : -1
+
       // TODO(bridiver) - handle pinned property?? - probably through tabValue
       const frameOpts = {
         location,
         partition: newTab.session.partition,
         guestInstanceId: newTab.guestInstanceId,
+        openerTabId,
         disposition
       }
 

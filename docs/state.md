@@ -358,6 +358,7 @@ WindowStore
       internalFindStatePresent: boolean // true if a find-first (ie findNext: false) call has been made
     }
     unloaded: boolean, // true if the tab is unloaded
+    openerTabId: number, // web contents tabId that opened this tab
 
     navbar: {
       focused: boolean, // whether the navbar is focused
