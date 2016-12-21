@@ -476,7 +476,9 @@ app.on('ready', () => {
         prefsRestartCallbacks[message] = (buttonIndex, persist) => {
           delete prefsRestartCallbacks[message]
           if (buttonIndex === 0) {
-            app.relaunch({args: process.argv.slice(1) + ['--relaunch']})
+            const args = process.argv.slice(1)
+            args.push('--relaunch')
+            app.relaunch({args})
             app.quit()
           } else {
             delete prefsRestartLastValue[config]
