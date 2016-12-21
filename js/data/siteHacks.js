@@ -50,8 +50,9 @@ module.exports.siteHacks = {
   },
   'adobe.com': {
     onBeforeSendHeaders: function(details) {
-      let ua = details.requestHeaders['User-Agent'].replace('Chrome', 'Brave')
-      details.requestHeaders['User-Agent'] = ua
+      let userAgent = details.requestHeaders['User-Agent']
+      userAgent = [userAgent.split('Chrome')[0], 'Brave Chrome', userAgent.split('Chrome')[1]].join('')
+      details.requestHeaders['User-Agent'] = userAgent
       return {
         requestHeaders: details.requestHeaders
       }
