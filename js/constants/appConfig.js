@@ -9,6 +9,8 @@ const winUpdateHost = process.env.BRAVE_WIN_UPDATE_HOST || 'https://brave-downlo
 const crashURL = process.env.BRAVE_CRASH_URL || 'https://brave-laptop-updates.herokuapp.com/1/crashes'
 const adHost = process.env.AD_HOST || 'https://oip.brave.com'
 
+const isProduction = process.env.NODE_ENV === 'production'
+
 module.exports = {
   name: 'Brave',
   contactUrl: 'mailto:support+laptop@brave.com',
@@ -97,6 +99,15 @@ module.exports = {
     // url to check for updates
     baseUrl: `${updateHost}/1/releases`,
     winBaseUrl: `${winUpdateHost}/multi-channel/releases/CHANNEL/`
+  },
+  sync: {
+    enabled: true,
+    apiVersion: '0',
+    serverUrl: isProduction ? 'https://sync.brave.com' : 'https://sync-staging.brave.com',
+    debug: true,
+    s3Url: isProduction ? 'https://brave-sync.s3.dualstack.us-west-2.amazonaws.com' : 'https://brave-sync-staging.s3.dualstack.us-west-2.amazonaws.com',
+    fetchInterval: 5000,
+    sendInterval: 7000
   },
   urlSuggestions: {
     ageDecayConstant: 50
