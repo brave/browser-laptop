@@ -81,6 +81,7 @@ const contentSettings = require('../js/state/contentSettings')
 const privacy = require('../js/state/privacy')
 const async = require('async')
 const settings = require('../js/constants/settings')
+const sync = require('./sync')
 
 // temporary fix for #4517, #4518 and #4472
 app.commandLine.appendSwitch('enable-use-zoom-for-dsf', 'false')
@@ -415,6 +416,7 @@ app.on('ready', () => {
     delete initialState.perWindowState
     appActions.setState(Immutable.fromJS(initialState))
     Menu.init(initialState, null)
+    sync.init(initialState.sync || {})
     return loadedPerWindowState
   }).then((loadedPerWindowState) => {
     contentSettings.init()

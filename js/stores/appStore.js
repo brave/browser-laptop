@@ -826,6 +826,17 @@ const handleAppAction = (action) => {
       const pdf = require('../../app/pdf')
       appState = pdf.renderUrlToPdf(appState, action)
       break
+    case appConstants.APP_SAVE_SYNC_INIT_DATA:
+      if (action.deviceId) {
+        appState = appState.setIn(['sync', 'deviceId'], action.deviceId)
+      }
+      if (action.seed) {
+        appState = appState.setIn(['sync', 'seed'], action.seed)
+      }
+      if (action.lastFetchTimestamp) {
+        appState = appState.setIn(['sync', 'lastFetchTimestamp'], action.lastFetchTimestamp)
+      }
+      break
     default:
   }
 

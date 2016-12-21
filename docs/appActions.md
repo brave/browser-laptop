@@ -642,6 +642,20 @@ Dispatches a message when a tab is being cloned
 
 
 
+### saveSyncInitData(seed, deviceId, lastFetchTimestamp) 
+
+Dispatches a message when sync init data needs to be saved
+
+**Parameters**
+
+**seed**: `Buffer | null`, Dispatches a message when sync init data needs to be saved
+
+**deviceId**: `Buffer | null`, Dispatches a message when sync init data needs to be saved
+
+**lastFetchTimestamp**: `number | null`, Dispatches a message when sync init data needs to be saved
+
+
+
 
 * * *
 
