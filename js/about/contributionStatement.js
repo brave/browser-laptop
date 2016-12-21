@@ -127,7 +127,7 @@ class ContributionStatement extends ImmutableComponent {
   }
 
   renderPdf () {
-    aboutActions.renderUrlToPdf(this.htmlDataURL, this.receiptFileName())
+    aboutActions.renderUrlToPdf(this.htmlDataURL, this.receiptFileName(), true)
   }
 
   get transaction () {
