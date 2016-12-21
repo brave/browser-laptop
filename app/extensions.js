@@ -35,7 +35,7 @@ let generateBraveManifest = () => {
     manifest_version: 2,
     version: '1.0',
     background: {
-      scripts: [ 'content/scripts/idleHandler.js' ]
+      scripts: [ 'content/scripts/idleHandler.js', 'content/scripts/sync.js' ]
     },
     content_scripts: [
       {
@@ -147,7 +147,11 @@ let generateBraveManifest = () => {
     // allow access to webpack dev server resources
     let devServer = 'localhost:' + process.env.npm_package_config_port
     cspDirectives['default-src'] = '\'self\' http://' + devServer
-    cspDirectives['connect-src'] = '\'self\' http://' + devServer + ' ws://' + devServer
+    cspDirectives['connect-src'] = ['\'self\'',
+      'http://' + devServer,
+      'ws://' + devServer,
+      appConfig.sync.serverUrl,
+      appConfig.sync.s3Url].join(' ')
     cspDirectives['style-src'] = '\'self\' \'unsafe-inline\' http://' + devServer
   }
 
