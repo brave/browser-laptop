@@ -55,18 +55,19 @@ const getDefaultHostContentSettings = (braveryDefaults, appSettings, appConfig) 
 // Usage of these settings is deprecated and we should be transitioning to HostContentSettings
 // Check with @bridiver before adding additional user pref content settings
 const getDefaultUserPrefContentSettings = (braveryDefaults, appSettings, appConfig) => {
+  braveryDefaults = makeImmutable(braveryDefaults)
   return Immutable.fromJS({
     cookies: getDefault3rdPartyStorageSettings(braveryDefaults, appSettings, appConfig),
     referer: [{
-      setting: braveryDefaults.cookieControl === 'block3rdPartyCookie' ? 'block' : 'allow',
+      setting: braveryDefaults.get('cookieControl') === 'block3rdPartyCookie' ? 'block' : 'allow',
       primaryPattern: '*'
     }],
     adInsertion: [{
-      setting: braveryDefaults.adControl === 'showBraveAds' ? 'allow' : 'block',
+      setting: braveryDefaults.get('adControl') === 'showBraveAds' ? 'allow' : 'block',
       primaryPattern: '*'
     }],
     ads: [{
-      setting: ['blockAds', 'showBraveAds'].includes(braveryDefaults.adControl) ? 'block' : 'allow',
+      setting: ['blockAds', 'showBraveAds'].includes(braveryDefaults.get('adControl')) ? 'block' : 'allow',
       primaryPattern: '*'
     }],
     doNotTrack: [{
@@ -75,7 +76,7 @@ const getDefaultUserPrefContentSettings = (braveryDefaults, appSettings, appConf
     }],
     passwordManager: getDefaultPasswordManagerSettings(braveryDefaults, appSettings, appConfig),
     javascript: [{
-      setting: braveryDefaults.noScript ? 'block' : 'allow',
+      setting: braveryDefaults.get('noScript') ? 'block' : 'allow',
       primaryPattern: '*'
     }, {
       setting: 'allow',
@@ -83,17 +84,22 @@ const getDefaultUserPrefContentSettings = (braveryDefaults, appSettings, appConf
       primaryPattern: 'chrome-extension://*'
     }],
     canvasFingerprinting: [{
-      setting: braveryDefaults.fingerprintingProtection ? 'block' : 'allow',
+      setting: braveryDefaults.get('fingerprintingProtection') ? 'block' : 'allow',
       primaryPattern: '*'
     }],
     runInsecureContent: [{
       setting: 'block',
       primaryPattern: '*'
     }],
+    flashEnabled: [{
+      setting: braveryDefaults.get('flash') ? 'allow' : 'block',
+      primaryPattern: '*'
+    }],
     popups: [{
       setting: 'block',
       primaryPattern: '*'
-    }]
+    }],
+    plugins: getDefaultPluginSettings(braveryDefaults, appSettings, appConfig)
   })
 }
 
@@ -128,12 +134,24 @@ const getDefaultPluginSettings = (braveryDefaults, appSettings, appConfig) => {
       setting: 'block',
       resourceId: appConfig.widevine.resourceId,
       primaryPattern: '*'
+    },
+    // allow autodetction of flash install by adobe
+    {
+      setting: 'allow',
+      resourceId: appConfig.flash.resourceId,
+      primaryPattern: '[*.]adobe.com'
+    },
+    {
+      setting: 'allow',
+      resourceId: appConfig.flash.resourceId,
+      primaryPattern: '[*.]macromedia.com'
     }
   ]
 }
 
 const getDefault3rdPartyStorageSettings = (braveryDefaults, appSettings, appConfig) => {
-  if (braveryDefaults.cookieControl === 'block3rdPartyCookie') {
+  braveryDefaults = makeImmutable(braveryDefaults)
+  if (braveryDefaults.get('cookieControl') === 'block3rdPartyCookie') {
     const contentSettings = [
       {
         setting: 'block',
@@ -204,10 +222,10 @@ const siteSettingsToContentSettings = (currentSiteSettings, defaultContentSettin
     if (siteSetting.get('adControl')) {
       contentSettings = addContentSettings(contentSettings, 'adInsertion', primaryPattern, '*', siteSetting.get('adControl') === 'showBraveAds' ? 'allow' : 'block')
     }
-    if (typeof siteSetting.get('flash') === 'number') { // && braveryDefaults.flash) {
+    if (typeof siteSetting.get('flash') === 'number'  && braveryDefaults.get('flash')) {
       contentSettings = addContentSettings(contentSettings, 'plugins', primaryPattern, '*', 'allow', appConfig.flash.resourceId)
     }
-    if (typeof siteSetting.get('widevine') === 'number' && braveryDefaults.widevine) {
+    if (typeof siteSetting.get('widevine') === 'number' && braveryDefaults.get('widevine')) {
       contentSettings = addContentSettings(contentSettings, 'plugins', primaryPattern, '*', 'allow', appConfig.widevine.resourceId)
     }
   })

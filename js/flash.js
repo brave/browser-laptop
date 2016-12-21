@@ -5,9 +5,11 @@
 
 const fs = require('fs')
 const path = require('path')
-const electron = require('electron')
-const app = electron.app
+const {app, ipcMain} = require('electron')
 const appActions = require('./actions/appActions')
+const {getOrigin} = require('./state/siteUtil')
+const locale = require('../app/locale')
+const messages = require('./constants/messages')
 const settings = require('./constants/settings')
 
 // set to true if the flash install check has succeeded
@@ -32,6 +34,44 @@ const getPepperFlashPath = () => {
     }
   }
   return pluginPath
+}
+
+module.exports.showFlashMessageBox = (location) => {
+  const origin = getOrigin(location)
+  const message = locale.translation('allowFlashPlayer', {origin})
+
+  setImmediate(() => {
+    // This is bad, we shouldn't be calling actions from actions
+    // so we need to refactor notifications into a state helper
+    appActions.showMessageBox({
+      buttons: [
+        {text: locale.translation('deny')},
+        {text: locale.translation('allow')}
+      ],
+      message,
+      frameOrigin: origin,
+      options: {
+        persist: true
+      }
+    })
+
+    ipcMain.once(messages.NOTIFICATION_RESPONSE, (e, msg, buttonIndex, persist) => {
+      if (msg === message) {
+        appActions.hideMessageBox(message)
+        if (buttonIndex === 1) {
+          if (persist) {
+            appActions.changeSiteSetting(origin, 'flash', Date.now() + 7 * 24 * 1000 * 3600)
+          } else {
+            appActions.changeSiteSetting(origin, 'flash', 1)
+          }
+        } else {
+          if (persist) {
+            appActions.changeSiteSetting(origin, 'flash', false)
+          }
+        }
+      }
+    })
+  })
 }
 
 module.exports.checkFlashInstalled = (cb) => {
