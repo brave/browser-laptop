@@ -6,7 +6,7 @@
 
 - Platform (Win7, 8, 10? macOS? Linux distro?):
 
-- Brave Version:
+- Brave Version (revision SHA):
 
 - Steps to reproduce:
     1.
