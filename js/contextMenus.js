@@ -630,7 +630,7 @@ function getMisspelledSuggestions (selection, isMisspelled, suggestions) {
   return menuUtil.sanitizeTemplateItems(template)
 }
 
-function getEditableItems (selection, editFlags) {
+function getEditableItems (selection, editFlags, hasFormat) {
   const hasSelection = selection.length > 0
   const hasClipboard = clipboard.readText().length > 0
   const template = []
@@ -658,6 +658,16 @@ function getEditableItems (selection, editFlags) {
       enabled: hasClipboard,
       role: 'paste'
     })
+    if (hasFormat) {
+      template.push({
+        label: locale.translation('pasteWithoutFormatting'),
+        accelerator: 'Shift+CmdOrCtrl+V',
+        enabled: hasClipboard,
+        click: function (item, focusedWindow) {
+          focusedWindow.webContents.pasteAndMatchStyle()
+        }
+      })
+    }
   }
   return menuUtil.sanitizeTemplateItems(template)
 }
@@ -987,7 +997,7 @@ function mainTemplateInit (nodeProps, frame) {
       }
     }
 
-    const editableItems = getEditableItems(nodeProps.selectionText, nodeProps.editFlags)
+    const editableItems = getEditableItems(nodeProps.selectionText, nodeProps.editFlags, true)
     template.push(...misspelledSuggestions, {
       label: locale.translation('undo'),
       accelerator: 'CmdOrCtrl+Z',
