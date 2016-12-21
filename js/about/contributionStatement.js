@@ -21,7 +21,7 @@ const aboutContributionsUrl = aboutUrls.get('about:contributions')
 
 const aboutActions = require('./aboutActions')
 
-const ipc = window.chrome.ipc
+const ipc = window.chrome.ipcRenderer
 
 require('../../less/contributionStatement.less')
 
