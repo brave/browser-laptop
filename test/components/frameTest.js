@@ -38,13 +38,9 @@ describe('frame tests', function () {
           .windowByUrl(Brave.browserWindowUrl)
           .waitForExist(this.webview1)
           .waitForExist(this.webview2)
-          .waitForExist(this.webview2 + '[src="' + this.url1 + '"]')
-      })
-
-      it('uses the cloned webcontents', function * () {
-        yield this.app.client
+          .tabByIndex(1)
+          .waitForUrl(this.url1)
           .windowByUrl(Brave.browserWindowUrl)
-          .waitForExist(this.webview2 + '[data-guest-instance-id]')
       })
     })
 
@@ -53,7 +49,6 @@ describe('frame tests', function () {
 
       before(function * () {
         this.clickWithTargetPage = Brave.server.url('click_with_target.html')
-        this.page1 = Brave.server.url('page1.html')
 
         yield setup(this.app.client)
         yield this.app.client
@@ -110,11 +105,15 @@ describe('frame tests', function () {
       it('preserves the history', function * () {
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
-          .waitForExist(this.webview2 + '[src="' + this.url2 + '"]')
+          .tabByIndex(1)
+          .waitForUrl(this.url2)
+          .windowByUrl(Brave.browserWindowUrl)
           .waitForExist(backButton + ':not([disabled])')
           .waitForExist(forwardButton + '[disabled]')
           .click(backButton)
-          .waitForExist(this.webview2 + '[src="' + this.url1 + '"]')
+          .tabByIndex(1)
+          .waitForUrl(this.url1)
+          .windowByUrl(Brave.browserWindowUrl)
       })
     })
 
@@ -165,11 +164,15 @@ describe('frame tests', function () {
       it('preserves proper navigation', function * () {
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
-          .waitForExist(this.webview2 + '[src="' + this.url1 + '"]')
+          .tabByIndex(1)
+          .waitForUrl(this.url1)
+          .windowByUrl(Brave.browserWindowUrl)
           .waitForExist(backButton + ':not([disabled])')
           .waitForExist(forwardButton + ':not([disabled])')
           .click(forwardButton)
-          .waitForExist(this.webview2 + '[src="' + this.url2 + '"]')
+          .tabByIndex(1)
+          .waitForUrl(this.url2)
+          .windowByUrl(Brave.browserWindowUrl)
           .waitForExist(backButton + ':not([disabled])')
           .waitForExist(forwardButton + '[disabled]')
       })
