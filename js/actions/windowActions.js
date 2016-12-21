@@ -293,21 +293,6 @@ const windowActions = {
   },
 
   /**
-   * Dispatches a message to the store to clone an existing frame
-   *
-   * @param {Object} frameProps - The properties of the frame to clone
-   * @param {number} guestInstanceId - The guestInstanceId of the cloned webcontents
-   */
-  cloneFrame: function (frameProps, guestInstanceId, openInForeground) {
-    dispatch({
-      actionType: windowConstants.WINDOW_CLONE_FRAME,
-      frameOpts: frameProps.toJS ? frameProps.toJS() : frameProps,
-      guestInstanceId,
-      openInForeground
-    })
-  },
-
-  /**
    * Dispatches a message to close a frame
    *
    * @param {Object[]} frames - Immutable list of of all the frames

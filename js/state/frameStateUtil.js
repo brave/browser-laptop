@@ -242,38 +242,6 @@ function getPartition (frameOpts) {
   return partition
 }
 
-function cloneFrame (frameOpts, guestInstanceId, key) {
-  const cloneableAttributes = [
-    'audioMuted',
-    'canGoBack',
-    'canGoForward',
-    'icon',
-    'title',
-    'isPrivate',
-    'partitionNumber',
-    'themeColor',
-    'computedThemeColor'
-  ]
-  let clone = {}
-  cloneableAttributes.forEach((attr) => {
-    clone[attr] = frameOpts[attr]
-  })
-
-  clone.guestInstanceId = guestInstanceId
-  // copy the history
-  clone.history = frameOpts.history.slice(0)
-  // location is loaded by the webcontents
-  clone.delayedLoadUrl = frameOpts.location
-  clone.location = 'about:blank'
-  clone.src = 'about:blank'
-  clone.parentFrameKey = frameOpts.key
-  if (frameOpts.aboutDetails !== undefined) {
-    clone.aboutDetails = frameOpts.aboutDetails
-    clone.aboutDetails.frameKey = key
-  }
-  return clone
-}
-
 /**
  * Returns an object in the same format that was passed to it (ImmutableJS/POD)
  * for the subset of frame data that is used for tabs.
@@ -556,7 +524,6 @@ module.exports = {
   getFramePropsIndex,
   getFrameKeysByDisplayIndex,
   getPartition,
-  cloneFrame,
   addFrame,
   undoCloseFrame,
   removeFrame,
