@@ -120,6 +120,7 @@ describe('downloadsReducer', function () {
       const oldState = oneDownloadWithState(IN_PROGRESS)
       downloadsReducer(oldState, {actionType: appConstants.APP_DOWNLOAD_COPIED_TO_CLIPBOARD, downloadId: downloadId(oldState)})
       assert(spy.withArgs(downloadUrl).calledOnce)
+      fakeElectron.clipboard.writeText.restore()
     })
   })
 

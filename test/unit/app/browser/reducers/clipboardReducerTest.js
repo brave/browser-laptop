@@ -30,6 +30,7 @@ describe('clipboardReducer', function () {
       // Make sure clipboardReducer doesn't update state when text is updated
       this.text = 'Mn = 2n − 1'
       this.newState = clipboardReducer(Immutable.Map(), {actionType: appConstants.APP_CLIPBOARD_TEXT_UPDATED, text: this.text})
+      fakeElectron.clipboard.writeText.restore()
     })
     it('Does not modify state', function () {
       assert(this.newState.isEmpty())
