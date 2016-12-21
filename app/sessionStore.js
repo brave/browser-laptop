@@ -359,7 +359,6 @@ const setVersionInformation = (data) => {
       {name: 'os.platform', version: os.platform()},
       {name: 'os.release', version: os.release()},
       {name: 'os.arch', version: os.arch()}
-      // TODO(bsclifton): read the latest commit hash from a file, etc.
     ]
     data.about = data.about || {}
     data.about.brave = {
