@@ -1,11 +1,23 @@
 # Changelog
 
 ## [0.13.0](https://github.com/brave/browser-laptop/releases/v0.13.0dev)
-- Linux sandbox added. ([#874](https://github.com/brave/browser-laptop/issues/874))
-- Window renderer processes no longer include Node, content renderer never did in Brave. ([#6454](https://github.com/brave/browser-laptop/issues/6454))
-- URL bar autocomplete no longer flashes when you enter text. ([#6644](https://github.com/brave/browser-laptop/issues/6644))
-- Muon updated to 2.0.12.
-- Chromium updated to 54.0.2840.100.
+- Added a feature for Bookmark text only for folders. ([#6078](https://github.com/brave/browser-laptop/issues/6078))
+- Added WebTorrent support. ([#5818](https://github.com/brave/browser-laptop/issues/5818))([#5815](https://github.com/brave/browser-laptop/issues/5815))
+- Fixed 1Password Should Auto-Submit on fill. ([#5875](https://github.com/brave/browser-laptop/issues/5875))
+- Fixed labels and buttons in notification bar behavior. ([#6417](https://github.com/brave/browser-laptop/issues/6417))
+- Fixed focus on tabs keeps "bouncing" back to previous tab. ([#5730](https://github.com/brave/browser-laptop/issues/5730))
+- Fixed cloned tab missing forward history. ([#6304](https://github.com/brave/browser-laptop/issues/6304))
+- Fixed Bookmarks showing wrong folder name. ([#4983](https://github.com/brave/browser-laptop/issues/4983))
+- Fixed github drop down for releases page. ([#5213](https://github.com/brave/browser-laptop/issues/5213))
+- Fixed context menu cut and paste does not change findbar state. ([#5753](https://github.com/brave/browser-laptop/issues/5753))
+- Fixed clicking link from email will sometimes will do a search instead of directly following. ([#5911](https://github.com/brave/browser-laptop/issues/5911))
+- Fixed numerous issues for Brave Payments. ([#6345](https://github.com/brave/browser-laptop/issues/6345))
+- Fixed numerous issues for new tab page. ([#6355](https://github.com/brave/browser-laptop/issues/6355))
+- Fixed numerous issues for UI polish. ([#6346](https://github.com/brave/browser-laptop/issues/6346))
+- Fixed various security & privacy issues.  ([#6356](https://github.com/brave/browser-laptop/issues/6356))
+- Fixed borders and corners of each button on navbar are not clickable. ([#5679](https://github.com/brave/browser-laptop/issues/5679))
+- Upgrade to Chromium 54. ([#3679](https://github.com/brave/browser-laptop/issues/3679))
+- Updated Muon to 2.0.12. ([#6340](https://github.com/brave/browser-laptop/issues/6340))
 
 ## [0.12.15](https://github.com/brave/browser-laptop/releases/v0.12.15dev)
 - Added Yandex as a new search engine. ([#2703](https://github.com/brave/browser-laptop/issues/2703))
