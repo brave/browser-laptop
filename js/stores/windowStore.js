@@ -951,7 +951,7 @@ ipc.on(messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, (e, clearBrowsingDataDe
   })
 })
 
-const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools', 'clean-reload', 'view-source', 'mute', 'save', 'print', 'show-findbar', 'copy', 'find-next', 'find-prev', 'clone']
+const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools', 'clean-reload', 'view-source', 'mute', 'save', 'print', 'show-findbar', 'copy', 'find-next', 'find-prev']
 frameShortcuts.forEach((shortcut) => {
   // Listen for actions on the active frame
   ipc.on(`shortcut-active-frame-${shortcut}`, (e, args) => {
@@ -962,7 +962,7 @@ frameShortcuts.forEach((shortcut) => {
     emitChanges()
   })
   // Listen for actions on frame N
-  if (['reload', 'mute', 'clone'].includes(shortcut)) {
+  if (['reload', 'mute'].includes(shortcut)) {
     ipc.on(`shortcut-frame-${shortcut}`, (e, i, args) => {
       const path = ['frames', frameStateUtil.findIndexForFrameKey(windowState.get('frames'), i)]
       windowState = windowState.mergeIn(path, {

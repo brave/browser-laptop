@@ -19,7 +19,7 @@ describe('frame tests', function () {
           .tabByIndex(0)
           .loadUrl(this.url1)
           .windowByUrl(Brave.browserWindowUrl)
-          .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_CLONE)
+          .cloneTabByIndex(0)
       })
 
       it('opens a new foreground tab', function * () {
@@ -63,7 +63,7 @@ describe('frame tests', function () {
         yield this.app.client
           .ipcSend('shortcut-set-active-frame-by-index', 0)
           .windowByUrl(Brave.browserWindowUrl)
-          .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_CLONE)
+          .cloneTabByIndex(0)
           .waitUntil(function () {
             return this.getTabCount().then((count) => {
               return count === 3
@@ -99,7 +99,7 @@ describe('frame tests', function () {
           .loadUrl(this.url1)
           .loadUrl(this.url2)
           .windowByUrl(Brave.browserWindowUrl)
-          .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_CLONE)
+          .cloneTabByIndex(0)
       })
 
       it('preserves the history', function * () {
@@ -158,7 +158,7 @@ describe('frame tests', function () {
           .loadUrl(this.url1)
           .loadUrl(this.url2)
           .windowByUrl(Brave.browserWindowUrl)
-          .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_CLONE, { back: true })
+          .cloneTabByIndex(0, {back: true})
       })
 
       it('preserves proper navigation', function * () {

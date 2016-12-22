@@ -38,6 +38,9 @@ const tabsReducer = (state, action) => {
         }
         break
       }
+    case appConstants.APP_CLONE_TAB:
+      state = tabs.clone(state, action)
+      break
     case windowConstants.WINDOW_SET_AUDIO_MUTED:
       state = tabs.setAudioMuted(state, action)
       break

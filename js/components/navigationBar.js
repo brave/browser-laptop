@@ -10,6 +10,7 @@ const cx = require('../lib/classSet')
 const Button = require('./button')
 const UrlBar = require('./urlBar')
 const windowActions = require('../actions/windowActions')
+const appActions = require('../actions/appActions')
 const siteTags = require('../constants/siteTags')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
@@ -55,7 +56,7 @@ class NavigationBar extends ImmutableComponent {
 
   onReload (e) {
     if (eventUtil.isForSecondaryAction(e)) {
-      ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_CLONE, {}, { openInForeground: !!e.shiftKey })
+      appActions.tabCloned(this.activeFrame.get('tabId'), {active: !!e.shiftKey})
     } else {
       ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
     }

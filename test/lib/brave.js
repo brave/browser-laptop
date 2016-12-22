@@ -382,6 +382,21 @@ var exports = {
     })
 
     /**
+     * Clones the specified tab
+     *
+     * @param {number} index - The index of the tabId to clone
+     * @param {Object} options - options to pass to clone
+     */
+    this.app.client.addCommand('cloneTabByIndex', function (index, options) {
+      return this.getWindowState().then((val) => {
+        const tabId = val.value.frames[index].tabId
+        return this.execute(function (tabId, options) {
+          return devTools('appActions').tabCloned(tabId, options)
+        }, tabId, options).then((response) => response.value)
+      })
+    })
+
+    /**
      * Removes a site from the sites list, or removes a bookmark.
      *
      * @param {object} siteDetail - Properties for the frame to add

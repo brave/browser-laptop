@@ -157,6 +157,28 @@ const api = {
     }
   },
 
+  clone: (state, action) => {
+    action = makeImmutable(action)
+    const tabId = action.get('tabId')
+    const tab = api.getWebContents(tabId)
+    if (tab) {
+      const options = makeImmutable(action.get('options') || {})
+      tab.clone(options.toJS(), (newTab) => {
+        let cloneAction
+        if (options.get('back')) {
+          cloneAction = newTab.goBack
+        } else if (options.get('forward')) {
+          cloneAction = newTab.goForward
+        }
+        if (cloneAction) {
+          newTab.once('did-attach', cloneAction.bind(newTab))
+        }
+      })
+      const tabValue = getTabValue(tabId)
+      return tabState.updateTab(state, { tabValue })
+    }
+  },
+
   closeTab: (state, action) => {
     action = makeImmutable(action)
     let tabId = action.get('tabId')

@@ -774,7 +774,21 @@ const appActions = {
       actionType: appConstants.APP_CLIPBOARD_TEXT_UPDATED,
       text
     })
+  },
+
+  /**
+   * Dispatches a message when a tab is being cloned
+   * @param {number} tabId - The tabId of the tab to clone
+   * @param {object} options - object containing options such as acive, back, and forward booleans
+   */
+  tabCloned: function (tabId, options) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_CLONE_TAB,
+      tabId,
+      options
+    })
   }
+
 }
 
 module.exports = appActions

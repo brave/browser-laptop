@@ -585,9 +585,9 @@ class Main extends ImmutableComponent {
     const isNavigatable = isNavigatableAboutPage(getBaseUrl(activeFrame.get('location')))
     if (e && eventUtil.isForSecondaryAction(e) && isNavigatable) {
       if (activeFrame && activeFrame.get(navCheckProp)) {
-        currentWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_CLONE, {
+        appActions.tabCloned(activeFrame.get('tabId'), {
           [navType]: true,
-          openInForeground: !!e.shiftKey
+          active: !!e.shiftKey
         })
       }
     } else {

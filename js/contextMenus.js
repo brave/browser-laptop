@@ -501,9 +501,7 @@ function tabTemplateInit (frameProps) {
         label: locale.translation('clone'),
         click: (item, focusedWindow) => {
           if (focusedWindow) {
-            focusedWindow.webContents.send(messages.SHORTCUT_FRAME_CLONE, frameKey, {
-              openInForeground: true
-            })
+            appActions.tabCloned(frameProps.get('tabId'))
           }
         }
       })
