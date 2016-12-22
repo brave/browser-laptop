@@ -222,7 +222,7 @@ const siteSettingsToContentSettings = (currentSiteSettings, defaultContentSettin
     if (siteSetting.get('adControl')) {
       contentSettings = addContentSettings(contentSettings, 'adInsertion', primaryPattern, '*', siteSetting.get('adControl') === 'showBraveAds' ? 'allow' : 'block')
     }
-    if (typeof siteSetting.get('flash') === 'number'  && braveryDefaults.get('flash')) {
+    if (typeof siteSetting.get('flash') === 'number' && braveryDefaults.get('flash')) {
       contentSettings = addContentSettings(contentSettings, 'plugins', primaryPattern, '*', 'allow', appConfig.flash.resourceId)
     }
     if (typeof siteSetting.get('widevine') === 'number' && braveryDefaults.get('widevine')) {
