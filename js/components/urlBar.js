@@ -486,17 +486,19 @@ class UrlBar extends ImmutableComponent {
       action='#'
       id='urlbar'
       ref='urlbar'>
-      <UrlBarIcon
-        activateSearchEngine={this.activateSearchEngine}
-        active={this.props.urlbar.get('active')}
-        isSecure={this.props.isSecure}
-        isHTTPPage={this.isHTTPPage}
-        loading={this.props.loading}
-        location={this.props.location}
-        searchSelectEntry={this.searchSelectEntry}
-        title={this.props.title}
-        titleMode={this.props.titleMode}
-      />
+      <div className='urlbarIconContainer'>
+        <UrlBarIcon
+          activateSearchEngine={this.activateSearchEngine}
+          active={this.props.urlbar.get('active')}
+          isSecure={this.props.isSecure}
+          isHTTPPage={this.isHTTPPage}
+          loading={this.props.loading}
+          location={this.props.location}
+          searchSelectEntry={this.searchSelectEntry}
+          title={this.props.title}
+          titleMode={this.props.titleMode}
+        />
+      </div>
       {
         this.props.titleMode
         ? <div id='titleBar'>
