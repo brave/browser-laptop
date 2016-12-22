@@ -137,6 +137,19 @@ const api = {
       }
     })
 
+    process.on('on-tab-created', (tab, options) => {
+      tab.once('did-attach', () => {
+        if (tab.isDestroyed()) {
+          return
+        }
+        if (options.back) {
+          tab.goBack()
+        } else if (options.forward) {
+          tab.goForward()
+        }
+      })
+    })
+
     return state
   },
 
@@ -150,7 +163,7 @@ const api = {
     let muted = action.get('muted')
     let tabId = frameProps.get('tabId')
     let tab = api.getWebContents(tabId)
-    if (tab) {
+    if (tab && !tab.isDestroyed()) {
       tab.setAudioMuted(muted)
       let tabValue = getTabValue(tabId)
       return tabState.updateTab(state, { tabValue })
@@ -160,23 +173,13 @@ const api = {
   clone: (state, action) => {
     action = makeImmutable(action)
     const tabId = action.get('tabId')
+    const options = action.get('options')
     const tab = api.getWebContents(tabId)
-    if (tab) {
-      const options = makeImmutable(action.get('options') || {})
-      tab.clone(options.toJS(), (newTab) => {
-        let cloneAction
-        if (options.get('back')) {
-          cloneAction = newTab.goBack
-        } else if (options.get('forward')) {
-          cloneAction = newTab.goForward
-        }
-        if (cloneAction) {
-          newTab.once('did-attach', cloneAction.bind(newTab))
-        }
+    if (tab && !tab.isDestroyed()) {
+      tab.clone(options && options.toJS() || {}, (newTab) => {
       })
-      const tabValue = getTabValue(tabId)
-      return tabState.updateTab(state, { tabValue })
     }
+    return state
   },
 
   closeTab: (state, action) => {
