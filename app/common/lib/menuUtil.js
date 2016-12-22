@@ -161,7 +161,7 @@ const isItemValid = (currentItem, previousItem) => {
  * - entries which don't have a label or type
  */
 module.exports.sanitizeTemplateItems = (template) => {
-  const result = template.reduce((previousValue, currentValue, currentIndex, array) => {
+  const reduced = template.reduce((previousValue, currentValue, currentIndex, array) => {
     const result = currentIndex === 1 ? [] : previousValue
     if (currentIndex === 1) {
       if (isItemValid(previousValue)) {
@@ -177,7 +177,17 @@ module.exports.sanitizeTemplateItems = (template) => {
     return result
   })
 
-  return Array.isArray(result)
-    ? result
-    : [result]
+  const result = Array.isArray(reduced)
+    ? reduced
+    : [reduced]
+
+  if (result.length > 0 && result[0] === CommonMenu.separatorMenuItem) {
+    result.shift()
+  }
+
+  if (result.length > 0 && result[result.length - 1] === CommonMenu.separatorMenuItem) {
+    result.pop()
+  }
+
+  return result
 }
