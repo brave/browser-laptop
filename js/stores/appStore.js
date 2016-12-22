@@ -34,6 +34,7 @@ const nativeImage = require('../../app/nativeImage')
 const Filtering = require('../../app/filtering')
 const basicAuth = require('../../app/browser/basicAuth')
 const windows = require('../../app/browser/windows')
+const assert = require('assert')
 
 // state helpers
 const basicAuthState = require('../../app/common/state/basicAuthState')
@@ -350,12 +351,18 @@ function handleChangeSettingAction (settingKey, settingValue) {
   }
 }
 
-const reducers = [
+const applyReducers = (state, action) => [
   require('../../app/browser/reducers/downloadsReducer'),
   require('../../app/browser/reducers/flashReducer'),
   require('../../app/browser/reducers/tabsReducer'),
   require('../../app/browser/reducers/clipboardReducer')
-]
+].reduce(
+    (appState, reducer) => {
+      const newState = reducer(appState, action)
+      assert.ok(action.actionType === appConstants.APP_SET_STATE || Immutable.Map.isMap(newState),
+        `Oops! action ${action.actionType} didn't return valid state for reducer:\n\n${reducer}`)
+      return newState
+    }, appState)
 
 const handleAppAction = (action) => {
   if (shuttingDown) {
@@ -364,7 +371,7 @@ const handleAppAction = (action) => {
 
   const ledger = require('../../app/ledger')
 
-  appState = reducers.reduce((appState, reducer) => reducer(appState, action), appState)
+  appState = applyReducers(appState, action)
 
   switch (action.actionType) {
     case appConstants.APP_SET_STATE:
