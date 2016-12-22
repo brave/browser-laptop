@@ -21,21 +21,6 @@ require('../less/notificationBar.less')
 require('../less/addEditBookmark.less')
 require('../node_modules/font-awesome/css/font-awesome.css')
 
-// Enable or disable crash reporting based on platform
-// const setupCrashReporting = () => {
-//   // if (process.platform === 'darwin') {
-//   //   // Setup the crash handling for mac renderer processes
-//   //   // https://github.com/electron/electron/blob/master/docs/api/crash-reporter.md#crashreporterstartoptions
-//   //   console.log('macOS renderer crash reporting initialized')
-//   //   require('../app/crash-herald').init()
-//   // }
-// }
-
-// // Notify that renderer crash reporting is disabled
-// const disableCrashReporting = () => {
-//   console.log('Disabling renderer crash reporting')
-// }
-
 const React = require('react')
 const ReactDOM = require('react-dom')
 const Window = require('./components/window')
@@ -86,12 +71,6 @@ window.addEventListener('beforeunload', function () {
 })
 
 ipc.on(messages.INITIALIZE_WINDOW, (e, disposition, appState, frames, initWindowState) => {
-  // Configure renderer crash reporting
-  // if (appState.settings[require('./constants/settings').SEND_CRASH_REPORTS] !== false) {
-  //   setupCrashReporting()
-  // } else {
-  //   disableCrashReporting()
-  // }
   appStoreRenderer.state = Immutable.fromJS(appState)
   ReactDOM.render(
     <Window includePinnedSites={disposition !== 'new-popup'} frames={frames} initWindowState={initWindowState} />,
