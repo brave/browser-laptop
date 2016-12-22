@@ -705,7 +705,7 @@ module.exports.getMainFrameUrl = (details) => {
     return details.url
   }
   const tab = webContents.fromTabID(details.tabId)
-  if (tab) {
+  if (tab && !tab.isDestroyed()) {
     return tab.getURL()
   }
   return null

@@ -120,6 +120,7 @@ if (process.type === 'browser') {
     if (!event.sender.isDestroyed() && event.sender.hostWebContents) {
       // received from an extension
       // only extension messages will have a hostWebContents
+      // because other messages come from the main window
 
       // default to the windowId of the hostWebContents
       if (!queryInfo.windowId) {
@@ -131,13 +132,12 @@ if (process.type === 'browser') {
       }
       // add queryInfo if we only had frameProps before
       payload.queryInfo = queryInfo
+      payload.senderTabId = event.sender.getId()
 
-      appDispatcher.dispatch(payload, event.sender.hostWebContents)
+      appDispatcher.dispatch(payload)
     } else {
       // received from a browser window
-      if (event.sender.id !== queryInfo.windowId) {
-        appDispatcher.dispatch(payload, event.sender)
-      }
+      appDispatcher.dispatch(payload)
     }
   })
 }

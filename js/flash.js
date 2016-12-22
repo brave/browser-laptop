@@ -5,7 +5,7 @@
 
 const fs = require('fs')
 const path = require('path')
-const {app, ipcMain} = require('electron')
+const {app, ipcMain, webContents} = require('electron')
 const appActions = require('./actions/appActions')
 const {getOrigin} = require('./state/siteUtil')
 const locale = require('../app/locale')
@@ -36,7 +36,7 @@ const getPepperFlashPath = () => {
   return pluginPath
 }
 
-module.exports.showFlashMessageBox = (location) => {
+module.exports.showFlashMessageBox = (location, tabId) => {
   const origin = getOrigin(location)
   const message = locale.translation('allowFlashPlayer', {origin})
 
@@ -63,6 +63,13 @@ module.exports.showFlashMessageBox = (location) => {
             appActions.changeSiteSetting(origin, 'flash', Date.now() + 7 * 24 * 1000 * 3600)
           } else {
             appActions.changeSiteSetting(origin, 'flash', 1)
+          }
+
+          if (tabId) {
+            const tab = webContents.fromTabID(tabId)
+            if (tab && !tab.isDestroyed()) {
+              return tab.reload()
+            }
           }
         } else {
           if (persist) {

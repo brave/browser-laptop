@@ -15,7 +15,7 @@ const flashReducer = (state, action) => {
       flash.init()
       break
     case appConstants.APP_FLASH_PERMISSION_REQUESTED:
-      flash.showFlashMessageBox(action.get('location'))
+      flash.showFlashMessageBox(action.get('location'), action.get('senderTabId'))
       break
   }
   return state
