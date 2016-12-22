@@ -44,6 +44,7 @@ module.exports = {
     enabled: false,
     moreInfoUrl: 'https://www.eff.org/issues/drm',
     licenseUrl: 'https://www.google.com/policies/terms/',
+    resourceId: 'widevinecdmadapter.plugin',
     shields: false
   },
   adblock: {

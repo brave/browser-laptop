@@ -3,8 +3,8 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 let registeredCallbacks = []
-let registeredSessions = []
-let registeredPrivateSessions = []
+let registeredSessions = {}
+let registeredPrivateSessions = {}
 
 // TODO(bridiver) move this to electron so we can call a simpler api
 const setUserPrefType = (ses, path, value) => {
@@ -51,11 +51,12 @@ const runCallback = (cb, incognito) => {
 module.exports.setUserPref = (path, value, incognito = false) => {
   value = value.toJS ? value.toJS() : value
 
-  let partitions = incognito ? Object.keys(registeredPrivateSessions) : Object.keys(registeredSessions)
-  partitions.forEach((partition) => {
-    setUserPrefType(registeredSessions[partition], path, value)
-    registeredSessions[partition].webRequest.handleBehaviorChanged()
-  })
+  const partitions = incognito ? registeredPrivateSessions : registeredSessions
+  for (let partition in partitions) {
+    const ses = partitions[partition]
+    setUserPrefType(ses, path, value)
+    ses.webRequest.handleBehaviorChanged()
+  }
 }
 
 module.exports.init = (ses, partition, isPrivate) => {

@@ -7,7 +7,7 @@ const AppStore = require('../stores/appStore')
 const appConstants = require('../constants/appConstants')
 const appConfig = require('../constants/appConfig')
 const config = require('../constants/config')
-const hostContentSettings = require('../../app/browser/contentSettings/hostContentSettings')
+const { registerContentSettings } = require('../../app/browser/contentSettings/hostContentSettings')
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
 const Immutable = require('immutable')
 const settings = require('../constants/settings')
@@ -256,16 +256,22 @@ const getSettingsFromSiteSettings = (defaultSettings, appState, appConfig, isPri
   return siteSettingsToContentSettings(currentSiteSettings, defaultSettings, braveryDefaults, appConfig)
 }
 
-const updateContentSettings = (appState, appConfig, isPrivate = false) => {
+const updateUserPrefs = (appState, appConfig, isPrivate = false) => {
   const braveryDefaults = siteSettings.braveryDefaults(appState, appConfig)
   const defaultUserPrefs = getDefaultUserPrefContentSettings(braveryDefaults, appState, appConfig)
-  const defaultHostContentSettings = getDefaultHostContentSettings(braveryDefaults, appState, appConfig)
 
-  hostContentSettings.setContentSettings(getSettingsFromSiteSettings(defaultHostContentSettings, appState, appConfig, isPrivate), isPrivate)
   return { 'content_settings': getSettingsFromSiteSettings(defaultUserPrefs, appState, appConfig, isPrivate) }
 }
 
-let updateTrigger
+const updateContentSettings = (appState, appConfig, isPrivate = false) => {
+  const braveryDefaults = siteSettings.braveryDefaults(appState, appConfig)
+  const defaultHostContentSettings = getDefaultHostContentSettings(braveryDefaults, appState, appConfig)
+
+  return getSettingsFromSiteSettings(defaultHostContentSettings, appState, appConfig, isPrivate)
+}
+
+let userPrefsUpdateTrigger
+let contentSettingsUpdateTrigger
 
 // Register callback to handle all updates
 const doAction = (action) => {
@@ -273,19 +279,22 @@ const doAction = (action) => {
     case appConstants.APP_REMOVE_SITE_SETTING:
     case appConstants.APP_CHANGE_SITE_SETTING:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
-        updateTrigger(action.temporary)
+        userPrefsUpdateTrigger(action.temporary)
+        contentSettingsUpdateTrigger(action.temporary)
       })
       break
     case appConstants.APP_CHANGE_SETTING:
     case appConstants.APP_SET_RESOURCE_ENABLED:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
-        updateTrigger()
+        userPrefsUpdateTrigger()
+        contentSettingsUpdateTrigger()
       })
       break
     case appConstants.APP_ALLOW_FLASH_ONCE:
     case appConstants.APP_ALLOW_FLASH_ALWAYS:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
-        updateTrigger(action.isPrivate)
+        userPrefsUpdateTrigger(action.isPrivate)
+        contentSettingsUpdateTrigger(action.isPrivate)
       })
       break
     default:
@@ -293,7 +302,11 @@ const doAction = (action) => {
 }
 
 module.exports.init = () => {
-  updateTrigger = registerUserPrefs((incognito) =>
+  userPrefsUpdateTrigger = registerUserPrefs((incognito = false) =>
+    updateUserPrefs(AppStore.getState(), appConfig, incognito)
+  )
+
+  contentSettingsUpdateTrigger = registerContentSettings((incognito = false) =>
     updateContentSettings(AppStore.getState(), appConfig, incognito)
   )
 
