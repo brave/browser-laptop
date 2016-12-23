@@ -163,6 +163,7 @@ describe('urlBarSuggestions', function () {
   it('selection is not reset', function * () {
     const pagePartialUrl = Brave.server.url('page')
     yield this.app.client
+      .moveToObject(urlInput)
       .setValue(urlInput, pagePartialUrl)
       .waitForExist(urlBarSuggestions)
       .keys(Brave.keys.DOWN)
