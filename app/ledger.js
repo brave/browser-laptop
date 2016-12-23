@@ -19,6 +19,7 @@
       addChangeListener - called when tabs render or gain focus
  */
 
+const crypto = require('crypto')
 const fs = require('fs')
 const os = require('os')
 const path = require('path')
@@ -577,7 +578,7 @@ var initialize = (paymentsEnabled) => {
               }
               getStateInfo(stateResult)
 
-              syncWriter(pathName(statePath), stateResult, { flushP: true }, () => {})
+              atomicWriter(pathName(statePath), stateResult, { flushP: true }, () => {})
             })
           }
         } catch (ex) {
@@ -720,10 +721,10 @@ var updatePublisherInfo = () => {
 
     if (entries.length > 0) data[publisher] = entries
   })
-  syncWriter(pathName(publisherPath), data, () => {})
-  syncWriter(pathName(scoresPath), synopsis.allN(), () => {})
+  atomicWriter(pathName(publisherPath), data, () => {})
+  atomicWriter(pathName(scoresPath), synopsis.allN(), () => {})
 
-  syncWriter(pathName(synopsisPath), synopsis, () => {})
+  atomicWriter(pathName(synopsisPath), synopsis, () => {})
   if (!publisherInfo._internal.enabled) return
 
   publisherInfo.synopsis = synopsisNormalizer()
@@ -1097,7 +1098,7 @@ var callback = (err, result, delayTime) => {
     if ((i !== 0) && (i !== logs.length)) logs = logs.slice(i)
     if (result) entries.push({ who: 'callback', what: result, when: underscore.now() })
 
-    syncWriter(pathName(logPath), entries, { flag: 'a' }, () => {})
+    atomicWriter(pathName(logPath), entries, { flag: 'a' }, () => {})
   }
 
   if (err) {
@@ -1117,7 +1118,7 @@ var callback = (err, result, delayTime) => {
   }
   cacheRuleSet(result.ruleset)
 
-  syncWriter(pathName(statePath), result, { flushP: true }, () => {})
+  atomicWriter(pathName(statePath), result, { flushP: true }, () => {})
   run(delayTime)
 }
 
@@ -1214,7 +1215,7 @@ var run = (delayTime) => {
       result = client.vote(winner)
       if (result) state = result
     })
-    if (state) syncWriter(pathName(statePath), state, { flushP: true }, () => {})
+    if (state) atomicWriter(pathName(statePath), state, { flushP: true }, () => {})
   } catch (ex) {
     console.log('ledger client error(2): ' + ex.toString() + (ex.stack ? ('\n' + ex.stack) : ''))
   }
@@ -1423,7 +1424,7 @@ var setPaymentInfo = (amount) => {
   client.setBraveryProperties(bravery, (err, result) => {
     if (err) return console.log('ledger setBraveryProperties: ' + err.toString())
 
-    if (result) syncWriter(pathName(statePath), result, { flushP: true }, () => {})
+    if (result) atomicWriter(pathName(statePath), result, { flushP: true }, () => {})
   })
   if (ledgerInfo.created) getPaymentInfo()
 }
@@ -1473,7 +1474,9 @@ var networkConnected = underscore.debounce(() => {
 
 var syncingP = {}
 
-var syncWriter = (path, obj, options, cb) => {
+var atomicWriter = (path, obj, options, cb) => {
+  var data, suffix
+
   if (typeof options === 'function') {
     cb = options
     options = null
@@ -1488,19 +1491,28 @@ var syncWriter = (path, obj, options, cb) => {
   }
   syncingP[path] = true
 
-  if (ledgerInfo._internal.debugP) console.log('\nwriting ' + path)
-  fs.writeFile(path, JSON.stringify(obj, null, 2), options, (err) => {
+  data = JSON.stringify(obj, null, 2)
+  suffix = '-' + crypto.createHash('md5').update(data).digest('hex')
+  if (ledgerInfo._internal.debugP) console.log('\nwriting ' + path + suffix)
+  fs.writeFile(path + suffix, data, options, (err) => {
     var deferred = syncingP[path]
 
     delete syncingP[path]
     if (typeof deferred === 'object') {
       if (ledgerInfo._internal.debugP) console.log('\nrestarting ' + path)
-      syncWriter(path, deferred.obj, deferred.options, deferred.cb)
+      atomicWriter(path, deferred.obj, deferred.options, deferred.cb)
     }
 
-    if (err) console.log('write error: ' + err.toString())
+    if (err) {
+      console.log('write error: ' + err.toString())
+      return cb(err)
+    }
 
-    cb(err)
+    if (ledgerInfo._internal.debugP) console.log('\nrenaming ' + path + suffix)
+    fs.rename(path + suffix, path, (err) => {
+      if (err) console.log('rename error: ' + err.toString())
+      cb(err)
+    })
   })
 }
 
@@ -1513,7 +1525,7 @@ var doneWriter = () => {
     delete syncingP[path]
     if (ledgerInfo._internal.debugP) console.log('\nflushing ' + path)
     deferred.options.flushP = true
-    syncWriter(path, deferred.obj, deferred.options, deferred.cb)
+    atomicWriter(path, deferred.obj, deferred.options, deferred.cb)
   })
 }
 
