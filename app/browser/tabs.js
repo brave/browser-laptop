@@ -153,9 +153,7 @@ const api = {
       }
 
       if (options.index !== undefined) {
-        tab.setTabValues({
-          index: options.index
-        })
+        tab.setTabIndex(options.index)
       }
 
       tab.once('did-attach', () => {

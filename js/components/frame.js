@@ -365,9 +365,7 @@ class Frame extends ImmutableComponent {
         this.webview.setWebRTCIPHandlingPolicy(this.getWebRTCPolicy())
       }
       this.webview.setActive(this.props.isActive)
-      if (prevProps.tabIndex !== this.props.tabIndex) {
-        this.webview.setTabIndex(this.props.tabIndex)
-      }
+      this.webview.setTabIndex(this.props.tabIndex)
       this.handleShortcut()
 
       // give focus when switching tabs
