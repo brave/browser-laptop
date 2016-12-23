@@ -68,8 +68,10 @@ class Tabs extends ImmutableComponent {
       return
     }
     if (e.dataTransfer.files) {
-      Array.from(e.dataTransfer.files).forEach((file) =>
-        windowActions.newFrame({location: file.path, title: file.name}))
+      Array.from(e.dataTransfer.files).forEach((file) => {
+        const path = encodeURI(file.path)
+        return windowActions.newFrame({location: path, title: file.name})
+      })
     }
   }
 
