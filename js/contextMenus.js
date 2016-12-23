@@ -1212,7 +1212,8 @@ function onHamburgerMenu (location, e) {
   windowActions.setContextMenuDetail(Immutable.fromJS({
     right: 0,
     top: rect.bottom,
-    template: menuTemplate
+    template: menuTemplate,
+    type: 'hamburgerMenu'
   }))
 }
 
