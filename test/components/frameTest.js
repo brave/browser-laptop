@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const {urlInput, backButton, forwardButton} = require('../lib/selectors')
+const {urlInput, backButton, forwardButton, pinnedTabsTabs} = require('../lib/selectors')
 const messages = require('../../js/constants/messages')
 
 describe('frame tests', function () {
@@ -212,6 +212,9 @@ describe('frame tests', function () {
     it('open from pinned tab', function * () {
       yield this.app.client
         .setPinned(this.url, true)
+        .waitUntil(function () {
+          return this.elements(pinnedTabsTabs).then((res) => res.value.length === 1)
+        })
         .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
         .waitUntil(function () {
           return this.getTabCount().then((count) => {
