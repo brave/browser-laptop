@@ -342,30 +342,48 @@ module.exports.cleanSessionDataOnShutdown = () => {
   return p
 }
 
+const safeGetVersion = (fieldName, getFieldVersion) => {
+  const versionField = {
+    name: fieldName,
+    version: undefined
+  }
+  try {
+    if (typeof getFieldVersion === 'function') {
+      versionField.version = getFieldVersion()
+      return versionField
+    }
+    console.log('ERROR getting value for field ' + fieldName + ' in sessionStore::setVersionInformation(): ', getFieldVersion, ' is not a function')
+  } catch (e) {
+    console.log('ERROR getting value for field ' + fieldName + ' in sessionStore::setVersionInformation(): ', e)
+  }
+  return versionField
+}
+
 /**
  * version information (shown on about:brave)
  */
 const setVersionInformation = (data) => {
-  try {
-    const os = require('os')
-    const versionInformation = [
-      {name: 'Brave', version: app.getVersion()},
-      {name: 'rev', version: Channel.browserLaptopRev()},
-      {name: 'Muon', version: process.versions['atom-shell']},
-      {name: 'libchromiumcontent', version: process.versions['chrome']},
-      {name: 'V8', version: process.versions.v8},
-      {name: 'Node.js', version: process.versions.node},
-      {name: 'Update Channel', version: Channel.channel()},
-      {name: 'os.platform', version: os.platform()},
-      {name: 'os.release', version: os.release()},
-      {name: 'os.arch', version: os.arch()}
-    ]
-    data.about = data.about || {}
-    data.about.brave = {
-      versionInformation: versionInformation
-    }
-  } catch (e) {
-    console.log('ERROR calling sessionStore::setVersionInformation(): ', e)
+  const versionFields = [
+    ['Brave', app.getVersion],
+    ['rev', Channel.browserLaptopRev],
+    ['Muon', () => { return process.versions['atom-shell'] }],
+    ['libchromiumcontent', () => { return process.versions['chrome'] }],
+    ['V8', () => { return process.versions.v8 }],
+    ['Node.js', () => { return process.versions.node }],
+    ['Update Channel', Channel.channel],
+    ['os.platform', require('os').platform],
+    ['os.release', require('os').release],
+    ['os.arch', require('os').arch]
+  ]
+  const versionInformation = []
+
+  versionFields.forEach((field) => {
+    versionInformation.push(safeGetVersion(field[0], field[1]))
+  })
+
+  data.about = data.about || {}
+  data.about.brave = {
+    versionInformation: versionInformation
   }
   return data
 }
