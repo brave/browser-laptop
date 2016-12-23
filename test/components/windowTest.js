@@ -619,7 +619,7 @@ describe('application window', function () {
           .windowByIndex(0)
           .tabByIndex(0)
           .waitForUrl(clickWithTargetPage)
-          .windowByIndex(1)
+          .tabByIndex(1)
           .waitForUrl(page1)
       })
 
