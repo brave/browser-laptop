@@ -234,35 +234,6 @@ describe('tab tests', function () {
     })
   })
 
-  describe('webview background-tab events', function () {
-    Brave.beforeAll(this)
-    before(function * () {
-      yield setup(this.app.client)
-      yield this.app.client
-        .sendWebviewEvent(1, 'new-window', {}, 'new-window', Brave.server.url('page1.html'), 'some-frame', 'background-tab')
-    })
-    it('opens in a new, but not active tab', function * () {
-      yield this.app.client
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist('.tab.active[data-frame-key="1"]')
-        .waitForExist('.tab:not(.active)[data-frame-key="2"]')
-    })
-  })
-
-  describe('webview foreground-tab events', function () {
-    Brave.beforeAll(this)
-    before(function * () {
-      yield setup(this.app.client)
-      yield this.app.client
-        .sendWebviewEvent(1, 'new-window', {}, 'new-window', Brave.server.url('page1.html'), 'some-frame', 'foreground-tab')
-    })
-    it('opens in a new active tab', function * () {
-      yield this.app.client
-        .waitForExist('.frameWrapper:not(.isActive) webview[data-frame-key="1"]')
-        .waitForExist('.frameWrapper.isActive webview[data-frame-key="2"]')
-    })
-  })
-
   describe('webview previews when tab is hovered', function () {
     Brave.beforeAll(this)
     before(function * () {
