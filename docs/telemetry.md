@@ -4,7 +4,11 @@ The telemetry is used to (optionally) send timing information to a [vault-collec
 
 ## Setup
 
-The following environment variables must be set for the telemetry system to be enabled:
+Quick setup: To record telemetry without sending to the collector, start browser with the `TELEMETRY_DEBUG` environment variables set to `1`.
+
+`TELEMETRY_DEBUG=1 npm start`
+
+The following environment variables must be set for the complete telemetry system to be enabled:
 
 1. TELEMETRY_URL - url to [vault-collector](https://github.com/brave/vault-collector) endpoint
 2. TELEMETRY_MACHINE - string identifier of the machine (i.e. MacBookPro)
@@ -34,6 +38,8 @@ This will issue a telemetry POST with the `measure` set to `startup-complete` an
 * `deltaBetween(checkpoint1, checkpoint2)` - return timing difference between two checkpoints
 
 * `setCheckpointAndReport(checkpoint, [initialCheckpoint], [extra], [ts])` - set a checkpoint and send telemetry
+
+* `events()` - returns an array containing timing info for each recorded event
 
 ## Extra
 
