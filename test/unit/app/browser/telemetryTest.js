@@ -32,4 +32,7 @@ describe('telemetry', function () {
     }
     assert.deepEqual(payload, expected, 'payload is correct')
   })
+  it('records events correctly', function () {
+    assert.equal(telemetry.events().length, 5, 'correct number of events')
+  })
 })
