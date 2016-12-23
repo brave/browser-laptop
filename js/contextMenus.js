@@ -19,6 +19,7 @@ const dragTypes = require('./constants/dragTypes')
 const siteUtil = require('./state/siteUtil')
 const downloadUtil = require('./state/downloadUtil')
 const menuUtil = require('../app/common/lib/menuUtil')
+const urlUtil = require('./lib/urlutil')
 const CommonMenu = require('../app/common/commonMenu')
 const dnd = require('./dnd')
 const dndData = require('./dndData')
@@ -900,8 +901,32 @@ const showDefinitionMenuItem = (selectionText) => {
   }
 }
 
-function mainTemplateInit (nodeProps, frame, tab) {
+function addLinkMenu (link, frame) {
   const template = []
+  if (!frame.get('isPrivate')) {
+    template.push(openInNewTabMenuItem(link, frame.get('isPrivate'), frame.get('partitionNumber'), frame.get('key')))
+  }
+  template.push(
+    openInNewPrivateTabMenuItem(link, frame.get('key')),
+    openInNewWindowMenuItem(link, frame.get('isPrivate'), frame.get('partitionNumber')),
+    CommonMenu.separatorMenuItem,
+    openInNewSessionTabMenuItem(link, frame.get('key')),
+    CommonMenu.separatorMenuItem)
+
+  if (link.toLowerCase().startsWith('mailto:')) {
+    template.push(copyEmailAddressMenuItem(link))
+  } else {
+    template.push(
+        saveAsMenuItem('saveLinkAs', link),
+        copyAddressMenuItem('copyLinkAddress', link),
+        CommonMenu.separatorMenuItem)
+  }
+
+  return template
+}
+
+function mainTemplateInit (nodeProps, frame, tab) {
+  let template = []
 
   const isLink = nodeProps.linkURL && nodeProps.linkURL !== ''
   const isImage = nodeProps.mediaType === 'image'
@@ -912,24 +937,9 @@ function mainTemplateInit (nodeProps, frame, tab) {
   const isAboutPage = aboutUrls.has(frame.get('location'))
 
   if (isLink) {
-    if (!frame.get('isPrivate')) {
-      template.push(openInNewTabMenuItem(nodeProps.linkURL, frame.get('isPrivate'), frame.get('partitionNumber'), frame.get('key')))
-    }
-    template.push(
-      openInNewPrivateTabMenuItem(nodeProps.linkURL, frame.get('key')),
-      openInNewWindowMenuItem(nodeProps.linkURL, frame.get('isPrivate'), frame.get('partitionNumber')),
-      CommonMenu.separatorMenuItem,
-      openInNewSessionTabMenuItem(nodeProps.linkURL, frame.get('key')),
-      CommonMenu.separatorMenuItem)
-
-    if (nodeProps.linkURL.toLowerCase().startsWith('mailto:')) {
-      template.push(copyEmailAddressMenuItem(nodeProps.linkURL))
-    } else {
-      template.push(
-        saveAsMenuItem('saveLinkAs', nodeProps.linkURL),
-        copyAddressMenuItem('copyLinkAddress', nodeProps.linkURL),
-        CommonMenu.separatorMenuItem)
-    }
+    template = addLinkMenu(nodeProps.linkURL, frame)
+  } else if (isTextSelected && urlUtil.isURL(nodeProps.selectionText)) {
+    template = addLinkMenu(nodeProps.selectionText, frame)
   }
 
   if (isImage) {
