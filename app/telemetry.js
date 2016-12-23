@@ -10,6 +10,7 @@ const Channel = require('./channel')
 const request = require('request')
 
 var telemetry = Immutable.Map()
+var eventList = Immutable.List()
 var enabled = false
 const params = {}
 const DEBUG = !!process.env.TELEMETRY_DEBUG
@@ -49,9 +50,22 @@ if (!!process.env.TELEMETRY_URL &&
  */
 function setCheckpoint (checkpoint, ts) {
   ts = ts || (new Date()).getTime()
+  var delta = 0
 
-  if (DEBUG) console.log(checkpoint, ts)
   telemetry = telemetry.set(checkpoint, ts)
+
+  if (eventList.size > 0) {
+    delta = ts - eventList.get(eventList.size - 1)[1]
+  }
+  eventList = eventList.push([checkpoint, ts, delta / 1000])
+  if (DEBUG) console.log(events())
+}
+
+/**
+ * Return array containing timing info for all calls to setCheckpoint
+ */
+function events () {
+  return eventList.toJS()
 }
 
 /**
@@ -122,7 +136,10 @@ var sendTelemetry = (measure, value, extra) => {
   return payload
 }
 
+setCheckpoint('__baseline__')
+
 module.exports = {
+  events: events,
   setCheckpoint: setCheckpoint,
   clearCheckpoint: clearCheckpoint,
   deltaBetween: deltaBetween,
