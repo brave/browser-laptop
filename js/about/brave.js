@@ -43,7 +43,7 @@ class AboutBrave extends React.Component {
       <div className='siteDetailsPageContent aboutAbout'>
         <div className='title'>
           <span className='sectionTitle' data-l10n-id='versionInformation' />
-          <span className='fa fa-clipboard' title='Copy to clipboard' onClick={this.onCopy} />
+          <span className='fa fa-clipboard' data-l10n-id='copyToClipboard' onClick={this.onCopy} />
         </div>
         <SortableTable
           headings={['Name', 'Version']}
