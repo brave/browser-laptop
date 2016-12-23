@@ -170,7 +170,9 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
   frameOpts = frameOpts.toJS ? frameOpts.toJS() : frameOpts
 
   // handle tabs.create properties
-  insertionIndex = frameOpts.index || insertionIndex
+  insertionIndex = frameOpts.index !== undefined
+    ? frameOpts.index
+    : insertionIndex
 
   if (frameOpts.partition) {
     frameOpts.isPrivate = frameStateUtil.isPrivatePartition(frameOpts.partition)

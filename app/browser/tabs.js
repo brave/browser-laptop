@@ -1,5 +1,6 @@
 const appActions = require('../../js/actions/appActions')
 const messages = require('../..//js/constants/messages')
+const Immutable = require('immutable')
 const tabState = require('../common/state/tabState')
 const {app, extensions} = require('electron')
 const { makeImmutable } = require('../common/state/immutableUtil')
@@ -52,6 +53,11 @@ const api = {
       }
 
       const openerTabId = !source.isDestroyed() ? source.getId() : -1
+      let newTabValue = getTabValue(newTab.getId())
+      let index
+      if (newTabValue && newTabValue.get('index') !== -1) {
+        index = newTabValue.get('index')
+      }
 
       // TODO(bridiver) - handle pinned property?? - probably through tabValue
       const frameOpts = {
@@ -59,7 +65,8 @@ const api = {
         partition: newTab.session.partition,
         guestInstanceId: newTab.guestInstanceId,
         openerTabId,
-        disposition
+        disposition,
+        index
       }
 
       if (disposition === 'new-window' || disposition === 'new-popup') {
@@ -79,6 +86,9 @@ const api = {
       tab.once('crashed', cleanupWebContents.bind(null, tabId))
       tab.once('close', cleanupWebContents.bind(null, tabId))
       tab.on('set-active', function (evt, active) {
+        updateTab(tabId)
+      })
+      tab.on('set-tab-index', function (evt, index) {
         updateTab(tabId)
       })
       tab.on('page-favicon-updated', function (e, favicons) {
@@ -138,10 +148,17 @@ const api = {
     })
 
     process.on('on-tab-created', (tab, options) => {
+      if (tab.isDestroyed()) {
+        return
+      }
+
+      if (options.index !== undefined) {
+        tab.setTabValues({
+          index: options.index
+        })
+      }
+
       tab.once('did-attach', () => {
-        if (tab.isDestroyed()) {
-          return
-        }
         if (options.back) {
           tab.goBack()
         } else if (options.forward) {
@@ -173,10 +190,14 @@ const api = {
   clone: (state, action) => {
     action = makeImmutable(action)
     const tabId = action.get('tabId')
-    const options = action.get('options')
+    let options = action.get('options') || Immutable.Map()
+    let tabValue = getTabValue(tabId)
+    if (tabValue && tabValue.get('index') !== undefined) {
+      options = options.set('index', tabValue.get('index') + 1)
+    }
     const tab = api.getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
-      tab.clone(options && options.toJS() || {}, (newTab) => {
+      tab.clone(options.toJS(), (newTab) => {
       })
     }
     return state
