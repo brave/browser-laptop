@@ -479,6 +479,11 @@ const doAction = (action) => {
     case windowConstants.WINDOW_AUTOFILL_POPUP_HIDDEN:
     case windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL:
       if (!action.detail) {
+        if (windowState.getIn(['contextMenuDetail', 'type']) === 'hamburgerMenu') {
+          windowState = windowState.set('hamburgerMenuWasOpen', true)
+        } else {
+          windowState = windowState.set('hamburgerMenuWasOpen', false)
+        }
         windowState = windowState.delete('contextMenuDetail')
 
         if (windowState.getIn(['contextMenuDetail', 'type']) === 'autofill' &&
@@ -488,7 +493,10 @@ const doAction = (action) => {
           }
         }
       } else {
-        windowState = windowState.set('contextMenuDetail', action.detail)
+        if (!(action.detail.get('type') === 'hamburgerMenu' && windowState.get('hamburgerMenuWasOpen'))) {
+          windowState = windowState.set('contextMenuDetail', action.detail)
+        }
+        windowState = windowState.set('hamburgerMenuWasOpen', false)
       }
       break
     case windowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL:
