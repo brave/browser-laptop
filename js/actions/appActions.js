@@ -783,7 +783,7 @@ const appActions = {
    */
   tabCloned: function (tabId, options) {
     AppDispatcher.dispatch({
-      actionType: appConstants.APP_CLONE_TAB,
+      actionType: appConstants.APP_TAB_CLONED,
       tabId,
       options
     })

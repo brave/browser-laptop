@@ -85,7 +85,7 @@ const appConstants = {
   APP_FLASH_PERMISSION_REQUESTED: _,
   APP_SHUTTING_DOWN: _,
   APP_CLIPBOARD_TEXT_UPDATED: _,
-  APP_CLONE_TAB: _
+  APP_TAB_CLONED: _
 }
 
 module.exports = mapValuesByKeys(appConstants)
