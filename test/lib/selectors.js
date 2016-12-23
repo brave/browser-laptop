@@ -74,5 +74,8 @@ module.exports = {
   allowRunInsecureContentButton: '.allowRunInsecureContentButton',
   dismissAllowRunInsecureContentButton: '.dismissAllowRunInsecureContentButton',
   denyRunInsecureContentButton: '.denyRunInsecureContentButton',
-  dismissDenyRunInsecureContentButton: '.dismissDenyRunInsecureContentButton'
+  dismissDenyRunInsecureContentButton: '.dismissDenyRunInsecureContentButton',
+  tabsToolbar: '.tabsToolbar',
+  hamburgerMenu: '.menuButton',
+  contextMenu: '.contextMenu'
 }
