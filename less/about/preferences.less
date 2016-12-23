@@ -991,72 +991,74 @@ table.sortableTable {
     width: 80%;
   }
 
-  .paymentsMessage {
-    background-color: @lightGray;
-    border-radius: @borderRadiusUIbox;
-    margin: @barMargin;
-    padding: 40px;
-    font-size: @fontSize;
-    line-height: 1.8em;
-    color: @mediumGray;
-    width: 500px;
-    float: left;
+  .disabledContent {
+    .paymentsMessage {
+      background-color: @lightGray;
+      border-radius: @borderRadiusUIbox;
+      margin: @barMargin;
+      padding: 40px;
+      font-size: @fontSize;
+      line-height: 1.8em;
+      color: @mediumGray;
+      width: 500px;
+      float: left;
 
-    > div {
-      padding: 0.5em 0;
-    }
+      > div {
+        padding: 0.5em 0;
+      }
 
-    > h3 {
-      font-size: 18px;
-      padding-bottom: 0.5em;
-    }
+      > h3 {
+        font-size: 18px;
+        padding-bottom: 0.5em;
+      }
 
-    .boldText {
-      font-weight: bold;
-    }
-  }
-
-  .paymentsSidebar {
-    opacity: 0.8;
-    width: 200px;
-    float: left;
-    margin-left: 23px;
-
-    .paymentsSidebarPIA {
-      background-image: -webkit-image-set(url(../../app/extensions/brave/img/private_internet_access.png) 1x,
-                                          url(../../app/extensions/brave/img/private_internet_access_2x.png) 2x);
-      width: 195px;
-      height: 20px;
-    }
-
-    .paymentsSidebarBitgo {
-      background-image: -webkit-image-set(url(../../app/extensions/brave/img/bitgo.png) 1x,
-                                          url(../../app/extensions/brave/img/bitgo_2x.png) 2x);
-      width: 100px;
-      height: 25px;
-    }
-
-    .paymentsSidebarCoinbase {
-      background-image: -webkit-image-set(url(../../app/extensions/brave/img/coinbase.png) 1x,
-                                          url(../../app/extensions/brave/img/coinbase_2x.png) 2x);
-      width: 100px;
-      height: 35px;
-    }
-
-    div {
-      font-size: 12px;
-      margin: 50px 0 20px 12px;
-    }
-
-    a {
-      div {
-        margin-top: 0;
+      .boldText {
+        font-weight: bold;
       }
     }
 
-    h2 {
-      font-size: 18px;
-      margin: 70px 0 -15px 12px;
+    .paymentsSidebar {
+      opacity: 0.8;
+      width: 200px;
+      float: left;
+      margin-left: 23px;
+
+      .paymentsSidebarPIA {
+        background-image: -webkit-image-set(url(../../app/extensions/brave/img/private_internet_access.png) 1x,
+                                            url(../../app/extensions/brave/img/private_internet_access_2x.png) 2x);
+        width: 195px;
+        height: 20px;
+      }
+
+      .paymentsSidebarBitgo {
+        background-image: -webkit-image-set(url(../../app/extensions/brave/img/bitgo.png) 1x,
+                                            url(../../app/extensions/brave/img/bitgo_2x.png) 2x);
+        width: 100px;
+        height: 25px;
+      }
+
+      .paymentsSidebarCoinbase {
+        background-image: -webkit-image-set(url(../../app/extensions/brave/img/coinbase.png) 1x,
+                                            url(../../app/extensions/brave/img/coinbase_2x.png) 2x);
+        width: 100px;
+        height: 35px;
+      }
+
+      div {
+        font-size: 12px;
+        margin: 50px 0 20px 12px;
+      }
+
+      a {
+        div {
+          margin-top: 0;
+        }
+      }
+
+      h2 {
+        font-size: 18px;
+        margin: 70px 0 -15px 12px;
+      }
     }
   }
 

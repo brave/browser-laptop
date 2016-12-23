@@ -1199,15 +1199,30 @@ class PaymentsTab extends ImmutableComponent {
     return `${balance} BTC`
   }
 
-  get sidebarContent () {
-    return <div className='paymentsSidebar'>
-      <h2 data-l10n-id='paymentsSidebarText1' />
-      <div data-l10n-id='paymentsSidebarText2' />
-      <a href='https://www.privateinternetaccess.com/' target='_blank'><div className='paymentsSidebarPIA' /></a>
-      <div data-l10n-id='paymentsSidebarText3' />
-      <a href='https://www.bitgo.com/' target='_blank'><div className='paymentsSidebarBitgo' /></a>
-      <div data-l10n-id='paymentsSidebarText4' />
-      <a href='https://www.coinbase.com/' target='_blank'><div className='paymentsSidebarCoinbase' /></a>
+  get disabledContent () {
+    return <div className='disabledContent'>
+      <div className='paymentsMessage'>
+        <h3 data-l10n-id='paymentsWelcomeTitle' />
+        <div data-l10n-id='paymentsWelcomeText1' />
+        <div className='boldText' data-l10n-id='paymentsWelcomeText2' />
+        <div data-l10n-id='paymentsWelcomeText3' />
+        <div data-l10n-id='paymentsWelcomeText4' />
+        <div data-l10n-id='paymentsWelcomeText5' />
+        <div>
+          <span data-l10n-id='paymentsWelcomeText6' />&nbsp;
+          <a href='https://brave.com/Payments_FAQ.html' target='_blank' data-l10n-id='paymentsWelcomeLink' />&nbsp;
+          <span data-l10n-id='paymentsWelcomeText7' />
+        </div>
+      </div>
+      <div className='paymentsSidebar'>
+        <h2 data-l10n-id='paymentsSidebarText1' />
+        <div data-l10n-id='paymentsSidebarText2' />
+        <a href='https://www.privateinternetaccess.com/' target='_blank'><div className='paymentsSidebarPIA' /></a>
+        <div data-l10n-id='paymentsSidebarText3' />
+        <a href='https://www.bitgo.com/' target='_blank'><div className='paymentsSidebarBitgo' /></a>
+        <div data-l10n-id='paymentsSidebarText4' />
+        <a href='https://www.coinbase.com/' target='_blank'><div className='paymentsSidebarCoinbase' /></a>
+      </div>
     </div>
   }
 
@@ -1317,21 +1332,8 @@ class PaymentsTab extends ImmutableComponent {
       {
         this.enabled
           ? this.enabledContent
-          : <div className='paymentsMessage'>
-            <h3 data-l10n-id='paymentsWelcomeTitle' />
-            <div data-l10n-id='paymentsWelcomeText1' />
-            <div className='boldText' data-l10n-id='paymentsWelcomeText2' />
-            <div data-l10n-id='paymentsWelcomeText3' />
-            <div data-l10n-id='paymentsWelcomeText4' />
-            <div data-l10n-id='paymentsWelcomeText5' />
-            <div>
-              <span data-l10n-id='paymentsWelcomeText6' />&nbsp;
-              <a href='https://brave.com/Payments_FAQ.html' target='_blank' data-l10n-id='paymentsWelcomeLink' />&nbsp;
-              <span data-l10n-id='paymentsWelcomeText7' />
-            </div>
-          </div>
+          : this.disabledContent
       }
-      {this.enabled ? null : this.sidebarContent}
     </div>
   }
 }
