@@ -183,6 +183,7 @@ const api = {
       let tabValue = getTabValue(tabId)
       return tabState.updateTab(state, { tabValue })
     }
+    return state
   },
 
   clone: (state, action) => {
