@@ -3,7 +3,7 @@
 **NOTE**: _If you experience a problem with dependencies while installing, you may
 want to try installing `git` using the package manager for your distro._
 
-## Debian and Ubuntu AMD64:
+## Debian (jessie) and Ubuntu (Trusty and Xenial) AMD64:
 To install brave using apt and lsb\_release :
 
 ``` 
