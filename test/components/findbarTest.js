@@ -186,7 +186,7 @@ describe('findBar', function () {
      .ipcSend(messages.SHORTCUT_CLOSE_FRAME, 2)
   })
 
-  it('findbar input remembered but no active ordinals after navigation until RETURN key', function * () {
+  it.skip('findbar input remembered but no active ordinals after navigation until RETURN key', function * () {
     const url2 = Brave.server.url('find_in_page2.html')
     yield this.app.client
       .showFindbar()
