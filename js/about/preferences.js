@@ -1775,7 +1775,6 @@ class PreferenceNavigation extends ImmutableComponent {
 class AboutPreferences extends React.Component {
   constructor () {
     super()
-    let hash = window.location.hash ? window.location.hash.slice(1) : ''
     this.state = {
       bitcoinOverlayVisible: false,
       qrcodeOverlayVisible: false,
@@ -1784,7 +1783,7 @@ class AboutPreferences extends React.Component {
       ledgerBackupOverlayVisible: false,
       ledgerRecoveryOverlayVisible: false,
       addFundsOverlayVisible: false,
-      preferenceTab: hash.toUpperCase() in preferenceTabs ? hash : preferenceTabs.GENERAL,
+      preferenceTab: this.tabFromCurrentHash,
       hintNumber: this.getNextHintNumber(),
       languageCodes: Immutable.Map(),
       flashInstalled: false,
@@ -1813,13 +1812,34 @@ class AboutPreferences extends React.Component {
     })
     ipc.send(messages.REQUEST_LANGUAGE)
     this.onChangeSetting = this.onChangeSetting.bind(this)
+    this.updateTabFromAnchor = this.updateTabFromAnchor.bind(this)
+  }
+
+  componentDidMount () {
+    window.addEventListener('popstate', this.updateTabFromAnchor)
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener('popstate', this.updateTabFromAnchor)
+  }
+
+  updateTabFromAnchor () {
+    this.setState({
+      preferenceTab: this.tabFromCurrentHash
+    })
+  }
+
+  get hash () {
+    return window.location.hash ? window.location.hash.slice(1) : ''
+  }
+
+  get tabFromCurrentHash () {
+    return this.hash.toUpperCase() in preferenceTabs ? this.hash : preferenceTabs.GENERAL
   }
 
   changeTab (preferenceTab) {
     window.location.hash = preferenceTab.toLowerCase()
-    this.setState({
-      preferenceTab
-    })
+    this.updateTabFromAnchor()
   }
 
   refreshHint () {

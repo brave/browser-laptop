@@ -7,7 +7,6 @@ const Immutable = require('immutable')
 const tableSort = require('tablesort')
 const cx = require('../lib/classSet')
 const eventUtil = require('../lib/eventUtil')
-const cursorMultiCopyPages = require('../../img/cursor_multi_copy_pages.svg')
 
 tableSort.extend('number', (item) => {
   return typeof item === 'number'
@@ -206,7 +205,7 @@ class SortableTable extends React.Component {
     // Set the ghost drag icon to default of SVG of multiple pages
     // TODO: does this cause a memory leak if you continually drag items?
     const dragImage = document.createElement('img')
-    dragImage.src = cursorMultiCopyPages
+    dragImage.src = require('../../img/cursor_multi_copy_pages.svg')
     e.dataTransfer.setDragImage(dragImage, 15, 30)
 
     // Call the provided onDragStart handler with the list of selected objects

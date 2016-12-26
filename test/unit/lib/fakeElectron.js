@@ -3,10 +3,12 @@ const fakeElectron = {
     getFocusedWindow: function () {}
   },
   ipcMain: {
-    on: function () { }
+    on: function () { },
+    send: function () { }
   },
   ipcRenderer: {
-    on: function () { }
+    on: function () { },
+    send: function () { }
   },
   remote: {
     app: {
