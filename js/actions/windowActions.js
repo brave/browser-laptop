@@ -7,7 +7,6 @@
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const windowConstants = require('../constants/windowConstants')
 const appActions = require('../actions/appActions')
-const webviewActions = require('../actions/webviewActions')
 const messages = require('../constants/messages')
 const siteTags = require('../constants/siteTags')
 const siteUtil = require('../state/siteUtil')
@@ -306,7 +305,6 @@ const windowActions = {
     }
     // If the frame was full screen, exit
     if (frameProps && frameProps.get('isFullScreen')) {
-      webviewActions.setFullScreen(false)
       this.setFullScreen(frameProps, false)
     }
     // Unless a caller explicitly specifies to close a pinned frame, then
