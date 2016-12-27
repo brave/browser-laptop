@@ -723,7 +723,10 @@
   }
 
   &:not(.titleMode) {
-    > * {
+
+    // Animate all direct descendants except for the bookmark bar
+    // PR #6382
+    > *:not(.bookmarkHanger) {
       animation: fadeIn .6s;
       opacity: 0;
       animation-fill-mode: forwards;
