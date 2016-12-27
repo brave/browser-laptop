@@ -5,6 +5,7 @@
 'use strict'
 
 const electron = require('electron')
+const config = require('../js/constants/config')
 const BrowserWindow = electron.BrowserWindow
 
 const renderUrlToPdf = (appState, action, testingMode) => {
@@ -62,7 +63,7 @@ const renderUrlToPdf = (appState, action, testingMode) => {
 
   let afterLoaded = () => {
     let removeCharEncodingArtifactJS = 'document.body.outerHTML = document.body.outerHTML.replace(/Â/g, "")'
-    wv.executeJavaScript(removeCharEncodingArtifactJS, whenReadyToGeneratePDF)
+    wv.executeScriptInTab(config.braveExtensionId, removeCharEncodingArtifactJS, {}, whenReadyToGeneratePDF)
   }
 
   bw.loadURL(url)
