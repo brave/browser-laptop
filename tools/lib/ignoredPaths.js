@@ -43,7 +43,7 @@ module.exports = [
   'electron-builder',
   'electron-prebuilt',
   'electron-rebuild',
-  'muon-winstaller',
+  'electron-winstaller',
   'electron-winstaller-fixed',
   'electron-installer-redhat',
   'flow-bin',
