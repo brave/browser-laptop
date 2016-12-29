@@ -47,6 +47,7 @@ const windowConstants = {
   WINDOW_SET_FIND_DETAIL: _,
   WINDOW_SET_BOOKMARK_DETAIL: _, // If set, also indicates that add/edit is shown
   WINDOW_SET_CONTEXT_MENU_DETAIL: _, // If set, also indicates that the context menu is shown
+  WINDOW_SET_CONTEXT_MENU_SELECTED_INDEX: _,
   WINDOW_SET_POPUP_WINDOW_DETAIL: _, // If set, also indicates that the popup window is shown
   WINDOW_HIDE_BOOKMARK_HANGER: _,
   WINDOW_SET_AUDIO_MUTED: _,
@@ -79,7 +80,7 @@ const windowConstants = {
   WINDOW_TOGGLE_MENUBAR_VISIBLE: _,
   WINDOW_CLICK_MENUBAR_SUBMENU: _,
   WINDOW_RESET_MENU_STATE: _,
-  WINDOW_SET_SUBMENU_SELECTED_INDEX: _,
+  WINDOW_SET_MENUBAR_SELECTED_INDEX: _,
   WINDOW_SET_LAST_FOCUSED_SELECTOR: _,
   WINDOW_GOT_RESPONSE_DETAILS: _,
   WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID: _,
