@@ -156,10 +156,10 @@ class Main extends ImmutableComponent {
                 windowActions.toggleMenubarVisible(null)
               } else {
                 if (customTitlebar.menubarSelectedIndex) {
-                  windowActions.setSubmenuSelectedIndex()
+                  windowActions.setMenuBarSelectedIndex()
                   windowActions.setContextMenuDetail()
                 } else {
-                  windowActions.setSubmenuSelectedIndex([0])
+                  windowActions.setMenuBarSelectedIndex(0)
                 }
               }
             }
@@ -172,7 +172,7 @@ class Main extends ImmutableComponent {
             }
             if (customTitlebar.menubarSelectedIndex) {
               e.preventDefault()
-              windowActions.setSubmenuSelectedIndex()
+              windowActions.setMenuBarSelectedIndex()
               windowActions.setContextMenuDetail()
             }
             break
@@ -825,15 +825,15 @@ class Main extends ImmutableComponent {
     const customTitlebarEnabled = isWindows
     const captionButtonsVisible = customTitlebarEnabled
     const menubarVisible = customTitlebarEnabled && (!getSetting(settings.AUTO_HIDE_MENU) || this.props.windowState.getIn(['ui', 'menubar', 'isVisible']))
-    const selectedIndex = this.props.windowState.getIn(['ui', 'menubar', 'selectedIndex'])
+    const selectedIndex = this.props.windowState.getIn(['ui', 'contextMenu', 'selectedIndex'])
     return {
       enabled: customTitlebarEnabled,
       captionButtonsVisible: captionButtonsVisible,
       menubarVisible: menubarVisible,
       menubarTemplate: menubarVisible ? this.props.appState.getIn(['menu', 'template']) : null,
-      menubarSelectedIndex: selectedIndex,
-      contextMenuSelectedIndex: typeof selectedIndex === 'object' && Array.isArray(selectedIndex) && selectedIndex.length > 1
-        ? selectedIndex.slice(1)
+      menubarSelectedIndex: this.props.windowState.getIn(['ui', 'menubar', 'selectedIndex']),
+      contextMenuSelectedIndex: typeof selectedIndex === 'object' && Array.isArray(selectedIndex) && selectedIndex.length > 0
+        ? selectedIndex
         : null,
       lastFocusedSelector: this.props.windowState.getIn(['ui', 'menubar', 'lastFocusedSelector']),
       isMaximized: currentWindow.isMaximized() || currentWindow.isFullScreen()
@@ -940,6 +940,7 @@ class Main extends ImmutableComponent {
                   <Menubar
                     template={customTitlebar.menubarTemplate}
                     selectedIndex={customTitlebar.menubarSelectedIndex}
+                    contextMenuSelectedIndex={customTitlebar.contextMenuSelectedIndex}
                     contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
                     autohide={getSetting(settings.AUTO_HIDE_MENU)}
                     lastFocusedSelector={customTitlebar.lastFocusedSelector} />
