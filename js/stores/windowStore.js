@@ -683,7 +683,7 @@ const doAction = (action) => {
           : !windowState.getIn(['ui', 'menubar', 'isVisible'])
         // Clear selection when menu is shown
         if (newVisibleStatus) {
-          doAction({ actionType: windowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX, index: [0] })
+          doAction({ actionType: windowConstants.WINDOW_SET_MENUBAR_SELECTED_INDEX, index: 0 })
         }
         windowState = windowState.setIn(['ui', 'menubar', 'isVisible'], newVisibleStatus)
       }
@@ -702,14 +702,18 @@ const doAction = (action) => {
       } else {
         doAction({actionType: windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL})
       }
-      doAction({actionType: windowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX})
+      doAction({actionType: windowConstants.WINDOW_SET_MENUBAR_SELECTED_INDEX})
+      doAction({actionType: windowConstants.WINDOW_SET_CONTEXT_MENU_SELECTED_INDEX})
       doAction({actionType: windowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID})
       break
-    case windowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX:
-      windowState = windowState.setIn(['ui', 'menubar', 'selectedIndex'],
-        Array.isArray(action.index)
-        ? action.index
-        : null)
+    case windowConstants.WINDOW_SET_MENUBAR_SELECTED_INDEX:
+      windowState = windowState.setIn(['ui', 'menubar', 'selectedIndex'], action.index)
+      break
+    case windowConstants.WINDOW_SET_CONTEXT_MENU_SELECTED_INDEX:
+      windowState = windowState.setIn(['ui', 'contextMenu', 'selectedIndex'],
+          Array.isArray(action.index)
+          ? action.index
+          : null)
       break
     case windowConstants.WINDOW_SET_LAST_FOCUSED_SELECTOR:
       windowState = windowState.setIn(['ui', 'menubar', 'lastFocusedSelector'], action.selector)
