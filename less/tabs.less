@@ -53,14 +53,14 @@
 
   .newFrameButton {
     background: @buttonColor;
-    width: 15px;
-    height: 26px;
-    line-height: 24px;
+    min-width: 25px;
+    min-height: 25px;
     -webkit-mask-image: url('../img/toolbar/newtab_btn.svg');
     -webkit-mask-repeat: no-repeat;
     -webkit-mask-position: center;
     -webkit-mask-size: 12px 12px;
-
+    -webkit-mask-origin: border;
+    border: 3px solid @tabsBackground;
     &:hover {
       opacity: 1.0;
       background-color: black;
