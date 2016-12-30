@@ -850,6 +850,10 @@ class TabsTab extends ImmutableComponent {
 class PaymentsTab extends ImmutableComponent {
   constructor () {
     super()
+    this.state = {
+      FirstRecoveryKey: '',
+      SecondRecoveryKey: ''
+    }
 
     this.printKeys = this.printKeys.bind(this)
     this.saveKeys = this.saveKeys.bind(this)
