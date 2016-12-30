@@ -9,7 +9,8 @@ function runUtilApp (cmd, file, stdioOptions) {
   const options = {
     env: process.env,
     cwd: utilAppDir,
-    stdio: stdioOptions
+    stdio: stdioOptions,
+    shell: true
   }
   cmd = cmd.split(' ')
   if (process.env.NODE_ENV === 'development') {
