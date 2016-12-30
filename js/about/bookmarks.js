@@ -107,12 +107,15 @@ class BookmarkFolderItem extends React.Component {
           isDragOver: this.state.isDragOver
         })}>
 
-        <span className={cx({
-          bookmarkFolderIcon: true,
-          fa: true,
-          'fa-folder-o': !this.props.selected && !this.state.isDragOver,
-          'fa-folder-open-o': this.props.selected || this.state.isDragOver
-        })} />
+        <div className='bookmarkFolderIconContainer'>
+          <span className={cx({
+            bookmarkFolderIcon: true,
+            fa: true,
+            'fa-folder-o': !this.props.selected && !this.state.isDragOver,
+            'fa-folder-open-o': this.props.selected || this.state.isDragOver
+          })} />
+        </div>
+
         <span data-l10n-id={this.props.dataL10nId}>
           {this.props.bookmarkFolder.get('customTitle') || this.props.bookmarkFolder.get('title')}
         </span>
@@ -227,17 +230,19 @@ class BookmarkTitleCell extends ImmutableComponent {
     const bookmarkLocation = this.props.siteDetail.get('location')
     const defaultIcon = 'fa fa-file-o'
 
-    return <div>
-      {
-        <span
-          className={cx({
-            bookmarkFavicon: true,
-            bookmarkFile: !icon,
-            [defaultIcon]: !icon
-          })}
-          style={iconStyle}
-        />
-      }
+    return <div className='bookmarkItem'>
+      <div className='bookmarkFaviconContainer'>
+        {
+          <span
+            className={cx({
+              bookmarkFavicon: true,
+              bookmarkFile: !icon,
+              [defaultIcon]: !icon
+            })}
+            style={iconStyle}
+          />
+        }
+      </div>
       <span>{bookmarkTitle || bookmarkLocation}</span>
       {
         bookmarkTitle ? <span className='bookmarkLocation'>{bookmarkLocation}</span> : null

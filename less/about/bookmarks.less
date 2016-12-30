@@ -33,6 +33,39 @@
     margin: 0;
     flex: 1;
 
+    // issue #6457
+    .bookmarkFolderList .listItem,
+    .bookmarkItem {
+      display: flex;
+
+      div[class$="Container"] {
+        display: inline-flex;
+        align-items: center;
+        width: 16px;
+        height: 16px;
+        min-width: 16px;
+        min-height: 16px;
+        margin-right: 5px;
+      }
+    }
+
+    .bookmarkFolderList .listItem {
+      align-items: flex-end;
+
+      // because the width of .fa-folder-open-o and .fa-folder-o is slightly different
+      div[class$="Container"] {
+        justify-content: flex-start;
+      }
+    }
+
+    .bookmarkItem {
+      align-items: center;
+
+      div[class$="Container"] {
+        justify-content: center;
+      }
+    }
+
     .folderView {
       min-width: 220px;
       flex-grow: 1;
@@ -79,9 +112,6 @@
             background-color: lighten(@braveOrange, 20%);
           }
         }
-        .bookmarkFolderIcon {
-          margin-right: 5px;
-        }
       }
     }
     .organizeView {
@@ -99,10 +129,7 @@
           padding-left: 10px;
           white-space: nowrap;
           max-width: 0;
-          .bookmarkFavicon {
-            display: inline-block;
-            margin-right: 5px;
-          }
+
           .bookmarkLocation {
             color: @gray;
             margin-left: 12px;
@@ -117,11 +144,6 @@
           span {
             vertical-align: middle;
           }
-
-          .bookmarkFavicon {
-            width: 16px;
-          }
-
         }
         tr:hover {
           .bookmarkLocation {
