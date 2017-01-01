@@ -28,6 +28,7 @@ function loadRulesets (data) {
   var parsedData = JSON.parse(data)
   targets = parsedData.targets
   db = parsedData.rulesetStrings
+  return true
 }
 
 /**

@@ -99,8 +99,16 @@ module.exports.init = (resourceName, startExtension, onInitDone, forceDownload) 
     // it's used directly
     // console.log('done init:', resourceName)
     cachedDataFiles[resourceName] = data
-    onInitDone(data)
-    startExtension()
+    if (onInitDone(data)) {
+      startExtension()
+    } else {
+      console.error(`Failed to deserialize data file for resource: ${resourceName}`)
+      fs.unlink(storagePath(url), (err) => {
+        if (err) {
+          console.error(`Could not remove unserializable data file for resource: ${resourceName}`)
+        }
+      })
+    }
   }
 
   const loadProcess = (resourceName, version) =>
