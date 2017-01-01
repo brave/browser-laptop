@@ -5,18 +5,16 @@
 'use strict'
 
 const URL = require('url')
-const ABPFilterParserLib = require('abp-filter-parser-cpp')
-const ABPFilterParser = ABPFilterParserLib.ABPFilterParser
-const FilterOptions = ABPFilterParserLib.FilterOptions
+const {AdBlockClient, FilterOptions} = require('ad-block')
 const DataFile = require('./dataFile')
 const Filtering = require('./filtering')
 const appConfig = require('../js/constants/appConfig')
 const debounce = require('../js/lib/debounce')
 // Maintains a map between a resource uuid and an adblock instance
 const adblockInstances = new Map()
-const defaultAdblock = new ABPFilterParser()
-const defaultSafeBrowsing = new ABPFilterParser()
-const regions = require('abp-filter-parser-cpp/lib/regions')
+const defaultAdblock = new AdBlockClient()
+const defaultSafeBrowsing = new AdBlockClient()
+const regions = require('ad-block/lib/regions')
 const getSetting = require('../js/settings').getSetting
 const {ADBLOCK_CUSTOM_RULES} = require('../js/constants/settings')
 const customFilterRulesUUID = 'CE61F035-9F0A-4999-9A5A-D4E46AF676F7'
@@ -66,9 +64,9 @@ const startAdBlocking = (adblock, resourceName, shouldCheckMainFrame) => {
   })
 }
 
-module.exports.initInstance = (parser, resourceName, shouldCheckMainFrame) => {
-  DataFile.init(resourceName, startAdBlocking.bind(null, parser, resourceName, shouldCheckMainFrame),
-                (data) => parser.deserialize(data))
+module.exports.initInstance = (adBlockClient, resourceName, shouldCheckMainFrame) => {
+  DataFile.init(resourceName, startAdBlocking.bind(null, adBlockClient, resourceName, shouldCheckMainFrame),
+                (data) => adBlockClient.deserialize(data))
   return module.exports
 }
 
@@ -104,29 +102,29 @@ const registerAppConfigForResource = (uuid, enabled, version) => {
 module.exports.updateAdblockDataFiles = (uuid, enabled, version = 2, shouldCheckMainFrame = false) => {
   registerAppConfigForResource(uuid, enabled, version)
   if (!adblockInstances.has(uuid)) {
-    const parser = new ABPFilterParser()
-    adblockInstances.set(uuid, parser)
-    module.exports.initInstance(parser, uuid, shouldCheckMainFrame)
+    const adBlockClient = new AdBlockClient()
+    adblockInstances.set(uuid, adBlockClient)
+    module.exports.initInstance(adBlockClient, uuid, shouldCheckMainFrame)
   }
 }
 
 module.exports.updateAdblockCustomRules = debounce((rules) => {
-  let parser
+  let adBlockClient
   registerAppConfigForResource(customFilterRulesUUID, true, 1)
   if (!adblockInstances.has(customFilterRulesUUID)) {
-    parser = new ABPFilterParser()
+    adBlockClient = new AdBlockClient()
   } else {
-    parser = adblockInstances.get(customFilterRulesUUID)
+    adBlockClient = adblockInstances.get(customFilterRulesUUID)
   }
-  parser.clear()
-  parser.parse(rules)
+  adBlockClient.clear()
+  adBlockClient.parse(rules)
 
   if (!adblockInstances.has(customFilterRulesUUID)) {
-    adblockInstances.set(customFilterRulesUUID, parser)
+    adblockInstances.set(customFilterRulesUUID, adBlockClient)
     // This is just to stay consistent with other adblock resources
     // which use data files.  Tests will check for this to make sure
     // the resource loaded correctly.
     appActions.setResourceETag(customFilterRulesUUID, '.')
-    startAdBlocking(parser, customFilterRulesUUID, false)
+    startAdBlocking(adBlockClient, customFilterRulesUUID, false)
   }
 }, 1500)

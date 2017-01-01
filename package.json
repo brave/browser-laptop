@@ -79,7 +79,6 @@
   },
   "homepage": "https://www.brave.com/",
   "dependencies": {
-    "abp-filter-parser-cpp": "1.2.x",
     "acorn": "3.2.0",
     "aphrodite": "^1.0.0",
     "async": "^2.0.1",
@@ -122,6 +121,7 @@
     "webtorrent-remote": "0.0.9"
   },
   "devDependencies": {
+    "ad-block": "^2.0.0",
     "asar": "^0.11.0",
     "babel": "^6.1.18",
     "babel-core": "^6.3.15",
