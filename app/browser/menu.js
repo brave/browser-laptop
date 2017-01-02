@@ -426,7 +426,6 @@ const createWindowSubmenu = () => {
 
 const createHelpSubmenu = () => {
   const submenu = [
-    CommonMenu.reportAnIssueMenuItem(),
     CommonMenu.separatorMenuItem,
     CommonMenu.submitFeedbackMenuItem(),
     {
