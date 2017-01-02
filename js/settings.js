@@ -18,6 +18,9 @@ const passwordManagerDefault = (settingKey, settingsCollection) => {
   const lastPassEnabled = resolveValue(settings.LAST_PASS_ENABLED, settingsCollection) === true
   if (lastPassEnabled) return passwordManagers.LAST_PASS
 
+  const enpassEnabled = resolveValue(settings.ENPASS_ENABLED, settingsCollection) === true
+  if (enpassEnabled) return passwordManagers.ENPASS
+
   const disabled = resolveValue(settings.PASSWORD_MANAGER_ENABLED, settingsCollection) === false
   if (disabled) return passwordManagers.UNMANAGED
 
