@@ -742,7 +742,6 @@ function hamburgerTemplateInit (location, e) {
         CommonMenu.separatorMenuItem,
         CommonMenu.checkForUpdateMenuItem(),
         CommonMenu.separatorMenuItem,
-        CommonMenu.reportAnIssueMenuItem(),
         CommonMenu.submitFeedbackMenuItem()
       ]
     },
