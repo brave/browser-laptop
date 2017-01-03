@@ -2,24 +2,20 @@
 set -exu
 
 BUCKET=${1:-brave-rpm-nightly}
-GPG_KEY="4A1B4360"
+GPG_KEY=${2:-4A1B4360}
 KEY_NAME=keys.asc
 KEY_FILE=/tmp/${KEY_NAME}
 TMP_REPO=/tmp/rpm_repo
 
-echo "You'll want something like
-%_signature gpg
-%_gpg_path /home/posi/.gnupg
-%_gpg_name Alex Newman
-%_gpgbin /usr/bin/gpg"
-echo "In your ~/.rpmmacros"
+echo "%_signature gpg
+%_gpg_path $HOME/.gnupg
+%_gpg_name Brave Builder
+%_gpgbin /usr/bin/gpg" > ~/.rpmmacros
 
 rm -rf $TMP_REPO
 mkdir -pv $TMP_REPO/x86_64
+env GPG_PASS=$PASSPHRASE ./tools/auto_rpm_sign
 cp dist/*.rpm $TMP_REPO/x86_64/
-for rpm in dist/*.rpm ; do
-  rpm --addsign  $rpm
-done
 
 for arch in $TMP_REPO/x86_64 ; do
   createrepo -v --deltas $arch/ 
