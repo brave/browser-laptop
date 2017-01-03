@@ -70,5 +70,5 @@ for i in xenial jessie trusty
 done
 
 for i in xenial jessie trusty
-	do aptly publish snapshot -gpg-key=${GPG_KEY} ${i}-snapshot s3:${OPTION}:
+	do aptly publish snapshot -force-overwrite=true -passphrase=$PASSPHRASE -gpg-key=${GPG_KEY} ${i}-snapshot s3:${OPTION}:
 done
