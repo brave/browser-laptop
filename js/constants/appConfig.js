@@ -106,8 +106,7 @@ module.exports = {
     serverUrl: isProduction ? 'https://sync.brave.com' : 'https://sync-staging.brave.com',
     debug: true,
     s3Url: isProduction ? 'https://brave-sync.s3.dualstack.us-west-2.amazonaws.com' : 'https://brave-sync-staging.s3.dualstack.us-west-2.amazonaws.com',
-    fetchInterval: 5000,
-    sendInterval: 7000
+    fetchInterval: 1000 * 60 * 10
   },
   urlSuggestions: {
     ageDecayConstant: 50
