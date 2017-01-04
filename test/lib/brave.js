@@ -311,7 +311,6 @@ var exports = {
     this.app.client.addCommand('showFindbar', function (show, key = 1) {
       return this.execute(function (show, key) {
         devTools('electron').testData.windowActions.setFindbarShown(Object.assign({
-          windowId: devTools('electron').remote.getCurrentWindow().id,
           key
         }), show !== false)
       }, show, key)
@@ -328,7 +327,6 @@ var exports = {
     this.app.client.addCommand('setPinned', function (location, isPinned, options = {}) {
       return this.execute(function (location, isPinned, options) {
         devTools('electron').testData.windowActions.setPinned(devTools('immutable').fromJS(Object.assign({
-          windowId: devTools('electron').remote.getCurrentWindow().id,
           location
         }, options)), isPinned)
       }, location, isPinned, options)
