@@ -11,6 +11,7 @@ AppStore
 {
   firstRunTimestamp: integer,
   sync: {
+    objectId: Array.<number>, // objectId for this sync device
     deviceId: Uint8Array,
     seed: Uint8Array,
     lastFetchTimestamp: integer // the last time new sync records were fetched in seconds
@@ -67,6 +68,7 @@ AppStore
     }
   },
   sites: [{
+    objectId: Array.<number>,
     location: string,
     title: string,
     customTitle: string, // User provided title for bookmark; overrides title
@@ -92,6 +94,7 @@ AppStore
   }],
   siteSettings: {
     [hostPattern]: {
+      objectId: Array.<number>,
       zoomLevel: number,
       mediaPermission: boolean,
       geolocationPermission: boolean,

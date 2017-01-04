@@ -826,6 +826,13 @@ const handleAppAction = (action) => {
       const pdf = require('../../app/pdf')
       appState = pdf.renderUrlToPdf(appState, action)
       break
+    case appConstants.APP_SET_OBJECT_ID:
+      let obj = appState.getIn(action.objectPath)
+      if (obj && obj.constructor === Immutable.Map) {
+        appState = appState.setIn(action.objectPath.concat(['objectId']),
+          action.objectId)
+      }
+      break
     case appConstants.APP_SAVE_SYNC_INIT_DATA:
       if (action.deviceId) {
         appState = appState.setIn(['sync', 'deviceId'], action.deviceId)

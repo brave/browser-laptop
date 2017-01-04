@@ -8,7 +8,9 @@ const siteTags = require('../constants/siteTags')
 const settings = require('../constants/settings')
 const getSetting = require('../settings').getSetting
 const UrlUtil = require('../lib/urlutil')
+const syncUtil = require('./syncUtil')
 const urlParse = require('../../app/common/urlParse')
+const syncActions = require('../actions/syncActions')
 
 const isBookmark = (tags) => {
   if (!tags) {
@@ -108,6 +110,7 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId) => {
   let site = Immutable.fromJS({
     lastAccessedTime: lastAccessedTime,
     tags,
+    objectId: newSiteDetail.get('objectId') || (oldSiteDetail ? oldSiteDetail.get('objectId') : undefined),
     title: newSiteDetail.get('title')
   })
 
@@ -185,11 +188,14 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
   }
 
   let site = mergeSiteDetails(oldSite, siteDetail, tag, folderId)
+  site = syncUtil.setObjectId(site)
   if (index === -1) {
     // Insert new entry
+    syncActions.addSite(site)
     return sites.push(site)
   }
   // Update existing entry
+  syncActions.updateSite(site)
   return sites.setIn([index], site)
 }
 
@@ -205,6 +211,8 @@ module.exports.removeSite = function (sites, siteDetail, tag) {
   if (index === -1) {
     return sites
   }
+
+  syncActions.removeSite(sites.getIn([index]))
 
   const tags = sites.getIn([index, 'tags'])
   if (isBookmarkFolder(tags)) {
