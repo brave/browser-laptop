@@ -642,6 +642,18 @@ Dispatches a message when a tab is being cloned
 
 
 
+### setObjectId(objectId, objectPath) 
+
+Dispatches a message to set objectId for a syncable object.
+
+**Parameters**
+
+**objectId**: `Array.&lt;number&gt;`, Dispatches a message to set objectId for a syncable object.
+
+**objectPath**: `Array.&lt;string&gt;`, Dispatches a message to set objectId for a syncable object.
+
+
+
 ### saveSyncInitData(seed, deviceId, lastFetchTimestamp) 
 
 Dispatches a message when sync init data needs to be saved

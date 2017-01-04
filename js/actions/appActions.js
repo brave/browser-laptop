@@ -790,6 +790,19 @@ const appActions = {
   },
 
   /**
+   * Dispatches a message to set objectId for a syncable object.
+   * @param {Array.<number>} objectId
+   * @param {Array.<string>} objectPath
+   */
+  setObjectId: function (objectId, objectPath) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_SET_OBJECT_ID,
+      objectId,
+      objectPath
+    })
+  },
+
+  /**
    * Dispatches a message when sync init data needs to be saved
    * @param {Buffer|null} seed
    * @param {Buffer|null} deviceId
