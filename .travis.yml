@@ -7,7 +7,7 @@ before_install:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
 script:
-  - npm run lint && npm test
+  - npm run lint && npm run download-sync-client && npm test
 notifications:
   slack:
     secure: bDwO2uce5JAZvjrvWj4+/+yEXJAIK4O0RcgUWvZ2IMbi7Q9I89Mw40JmkLWL6x2gWZwxr8+FoLtErJA7RVrsfImjrX+NmMyAB7AydLdrBJtkLozNnuacnhcnBRyp1gGCa1ymxCEXGbgC6onAD3kiJJhggr70T+2lu3IuJYXENhc=
