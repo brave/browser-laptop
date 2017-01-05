@@ -267,6 +267,16 @@ var exports = {
       })
     })
 
+    this.app.client.addCommand('waitForElementCount', function (selector, count) {
+      logVerbose('waitForElementCount("' + selector + '", ' + count + ')')
+      return this.waitUntil(function () {
+        return this.elements(selector).then((res) => {
+          logVerbose('waitForElementCount("' + selector + '", ' + count + ') => ' + res.value.length)
+          return res.value.length === count
+        })
+      })
+    })
+
     this.app.client.addCommand('waitForResourceReady', function (resourceName) {
       logVerbose('waitForResourceReady(' + resourceName + ')')
       return this.waitUntil(function () {

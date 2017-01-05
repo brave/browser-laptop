@@ -148,11 +148,13 @@ describe('navigationBar tests', function () {
 
       it('updates the location in the navbar to blank', function * () {
         yield this.app.client
-          .windowByUrl(Brave.browserWindowUrl)
-          .waitUntil(function () {
-            return this.getValue(urlInput).then((val) => {
-              return val === 'about:blank'
-            })
+          .tabByIndex(1)
+          .waitForUrl('https://www.google.com/')
+          .waitForVisible('input')
+          .getText('body').then((val) => {
+            if (val.includes('phishing')) {
+              throw new Error('should not contain phishing')
+            }
           })
       })
     })
@@ -862,7 +864,11 @@ describe('navigationBar tests', function () {
 
       it('resets URL to previous location if page does not load', function * () {
         const page1 = this.page1
-        yield this.app.client.tabByUrl(this.newTabUrl).url(page1).waitForUrl(page1).windowParentByUrl(page1)
+        yield this.app.client
+          .tabByUrl(this.newTabUrl)
+          .url(page1)
+          .waitForUrl(page1)
+          .windowParentByUrl(page1)
           .moveToObject(activeWebview)
           .click(activeWebview)
           .moveToObject(navigator)
@@ -1024,7 +1030,7 @@ describe('navigationBar tests', function () {
   })
 
   // need to move urlbar state to frame before enabling these
-  describe('change tabs', function () {
+  describe.skip('change tabs', function () {
     Brave.beforeAll(this)
 
     before(function * () {

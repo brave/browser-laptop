@@ -99,9 +99,10 @@ describe('urlBarSuggestions', function () {
       .waitUntil(function () {
         return this.getValue(urlInput).then((val) => val === 'Page 1')
       })
-      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
+      .waitForVisible(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
       .click(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
-      .tabByIndex(1).getUrl().should.eventually.equal(this.page1Url)
+      .tabByIndex(1)
+      .waitForUrl(this.page1Url)
   })
 
   it('navigates to a suggestion with keyboard', function * () {

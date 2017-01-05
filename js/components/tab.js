@@ -93,12 +93,6 @@ class Tab extends ImmutableComponent {
   setActiveFrame (event) {
     event.stopPropagation()
     windowActions.setActiveFrame(this.frame)
-
-    if (this.frame.get('location') === 'about:newtab') {
-      windowActions.setUrlBarActive(true)
-      windowActions.setUrlBarFocused(true)
-      windowActions.setUrlBarSelected(false)
-    }
   }
 
   onCloseFrame (event) {

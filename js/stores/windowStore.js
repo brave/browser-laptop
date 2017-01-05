@@ -455,14 +455,6 @@ const doAction = (action) => {
         showFullScreenWarning: action.showFullScreenWarning
       })
       break
-    case windowConstants.WINDOW_SET_NAVBAR_FOCUSED:
-      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'focused']), action.focused)
-      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'focused']), action.focused)
-      // selection should be cleared on blur
-      if (!action.focused) {
-        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'selected']), false)
-      }
-      break
     case windowConstants.WINDOW_NEW_FRAME:
       newFrame(action.frameOpts, action.openInForeground)
       break

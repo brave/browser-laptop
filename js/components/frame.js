@@ -368,18 +368,10 @@ class Frame extends ImmutableComponent {
       this.webview.setTabIndex(this.props.tabIndex)
       this.handleShortcut()
 
-      // give focus when switching tabs
-      if (this.props.isActive && !prevProps.isActive) {
-        // If the tab we switch to is a new tab page, give focus
-        // to the UrlBar
-        if (this.props.location === 'about:newtab') {
-          windowActions.setUrlBarActive(true)
-          windowActions.setUrlBarFocused(true)
-        } else {
-          // If it is a regular webpage, just focus the webcontents
-          this.webview.focus()
-        }
+      if (this.props.isActive && !prevProps.isActive && !this.props.urlBarFocused) {
+        this.webview.focus()
       }
+
       // make sure the webview content updates to
       // match the fullscreen state of the frame
       if (prevProps.isFullScreen !== this.props.isFullScreen ||
@@ -838,10 +830,9 @@ class Frame extends ImmutableComponent {
       }
       this.notificationCallbacks = {}
       const isNewTabPage = getBaseUrl(e.url) === getTargetAboutUrl('about:newtab')
-      if (isNewTabPage) {
-        windowActions.setUrlBarActive(true)
-        windowActions.setUrlBarFocused(true)
-      } else if (this.props.isActive && !isNewTabPage && document.activeElement !== this.webview) {
+      // Only take focus away from the urlBar if:
+      // The tab is active, it's not the new tab page, and the webview isn't already active.
+      if (this.props.isActive && !isNewTabPage && document.activeElement !== this.webview) {
         this.webview.focus()
       }
       windowActions.setNavigated(e.url, this.props.frameKey, false, this.frame.get('tabId'))
@@ -992,7 +983,12 @@ class Frame extends ImmutableComponent {
 
   onFocus () {
     windowActions.setTabPageIndexByFrame(this.frame)
+
+    // Make sure urlBar focused state is updated so that on tab
+    // changes the focus state doesn't go back to the urlBar
+    windowActions.setUrlBarFocused(false)
     windowActions.setUrlBarActive(false)
+
     windowActions.setContextMenuDetail()
     windowActions.setPopupWindowDetail()
   }

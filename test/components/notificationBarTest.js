@@ -24,7 +24,7 @@ describe('notificationBar', function () {
 
   beforeEach(function * () {
     yield this.app.client
-      .waitForExist('.notificationItem', undefined, true)
+      .waitForElementCount('.notificationItem', 0)
   })
 
   it('shows notification bar for geolocation', function * () {
@@ -65,6 +65,7 @@ describe('notificationBar', function () {
         return this.getText('.notificationItem:last-child').then((val) => val.includes('notification'))
       })
       .click('button=Deny')
+      .waitForElementCount('.notificationItem', 1)
       .click('button=Deny')
   })
 
