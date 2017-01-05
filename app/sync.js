@@ -202,10 +202,9 @@ const doAction = (sender, action) => {
 /**
  * Called when sync client is done initializing.
  * @param {boolean} isFirstRun - whether this is the first time sync is running
- * @param {number} lastFetchTimestamp - timestamp in s when the last sync fetch occured
  * @param {Event} e
  */
-module.exports.onSyncReady = (isFirstRun, lastFetchTimestamp, e) => {
+module.exports.onSyncReady = (isFirstRun, e) => {
   appDispatcher.register(doAction.bind(null, e.sender))
   if (isFirstRun) {
     // Sync the device id for this device
@@ -216,30 +215,32 @@ module.exports.onSyncReady = (isFirstRun, lastFetchTimestamp, e) => {
         name: 'browser-laptop' // todo: support user-chosen names
       }
     }])
-    // Sync old bookmarks and settings
-    const appState = AppStore.getState()
-    const sites = appState.get('sites').toJS() || []
-    sites.forEach((site, i) => {
-      if (isBookmark(site)) {
-        sendSyncRecords(e.sender, writeActions.CREATE, [createSiteData(site, i)])
-      }
-    })
-    const siteSettings = appState.get('siteSettings').toJS()
-    if (siteSettings) {
-      sendSyncRecords(e.sender, writeActions.CREATE,
-        Object.keys(siteSettings).map((item) => {
-          return createSiteSettingsData(item, siteSettings[item])
-        }))
+  }
+  // Sync bookmarks that have not been synced yet
+  const appState = AppStore.getState()
+  const sites = appState.get('sites').toJS() || []
+  sites.forEach((site, i) => {
+    if (site && !site.objectId && isBookmark(site)) {
+      sendSyncRecords(e.sender, writeActions.CREATE, [createSiteData(site, i)])
     }
+  })
+  // Sync site settings in case they changed while sync was disabled
+  const siteSettings = appState.get('siteSettings').toJS()
+  if (siteSettings) {
+    sendSyncRecords(e.sender, writeActions.UPDATE,
+      Object.keys(siteSettings).map((item) => {
+        return createSiteSettingsData(item, siteSettings[item])
+      }))
   }
   ipcMain.on(messages.RECEIVE_SYNC_RECORDS, (event, categoryName, records) => {
     if (categoryNames.includes(categoryName) || !records || !records.length) {
       return
     }
-    // TODO: update appstate
+    // TODO (Ayumi): get existing objects with objectId, send
+    // RESOLVE_SYNC_RECORDS, handle RESOLVED_SYNC_RECORDS
   })
   // Periodically poll for new records
-  let startAt = lastFetchTimestamp
+  let startAt = appState.getIn(['sync', 'lastFetchTimestamp']) || 0
   const poll = () => {
     e.sender.send(messages.FETCH_SYNC_RECORDS, categoryNames, startAt)
     startAt = now()
@@ -266,8 +267,7 @@ module.exports.init = function (initialState) {
     appActions.saveSyncInitData(seed, newDeviceId)
   })
   ipcMain.on(messages.SYNC_READY, module.exports.onSyncReady.bind(null,
-    !initialState.seed && !initialState.deviceId,
-    initialState.lastFetchTimestamp || 0))
+    !initialState.seed && !initialState.deviceId))
   ipcMain.on(messages.SYNC_DEBUG, (e, msg) => {
     console.log('sync-client:', msg)
   })
