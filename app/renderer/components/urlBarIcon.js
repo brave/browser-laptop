@@ -35,18 +35,15 @@ class UrlBarIcon extends ImmutableComponent {
   }
   /**
    * search icon:
-   * - does not show when loading
    * - does not show when in title mode
    * - shows when urlbar is active (ex: you can type)
    * - is a catch-all for: about pages, files, etc
    */
   get isSearch () {
-    const showSearch = this.props.active &&
-                       this.props.loading === false
+    const showSearch = this.props.active
 
     const defaultToSearch = (!this.isSecure && !this.isInsecure && !showSearch) &&
                             !this.props.titleMode &&
-                            this.props.loading === false &&
                             !this.isAboutPage
 
     return showSearch || defaultToSearch
