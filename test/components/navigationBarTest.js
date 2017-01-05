@@ -24,11 +24,7 @@ describe('navigationBar tests', function () {
     yield client
       .ipcSend('shortcut-new-frame')
       // wait for correct urlInput based on frameKey
-      .waitUntil(function () {
-        return this.getTabCount().then((count) => {
-          return count === frameKey
-        })
-      })
+      .waitForTabCount(frameKey)
       .windowByUrl(Brave.browserWindowUrl)
       .waitForVisible('div[id="navigator"][data-frame-key="' + frameKey + '"] ' + urlInput)
       .waitForElementFocus(urlInput)
@@ -1039,9 +1035,7 @@ describe('navigationBar tests', function () {
       // tab with typing
       yield newFrame(this.app.client, 2)
       yield this.app.client
-        .waitUntil(function () {
-          return this.getTabCount().then((count) => count === 2)
-        })
+        .waitForTabCount(2)
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
           return this.keys('a').getValue(urlInput).then((val) => val === 'a')
@@ -1049,9 +1043,7 @@ describe('navigationBar tests', function () {
       // tab with loaded url
       yield newFrame(this.app.client, 3)
       yield this.app.client
-        .waitUntil(function () {
-          return this.getTabCount().then((count) => count === 3)
-        })
+        .waitForTabCount(3)
         .tabByIndex(2)
         .url(Brave.server.url('page1.html'))
         .waitForUrl(Brave.server.url('page1.html'))

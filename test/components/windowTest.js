@@ -308,7 +308,7 @@ describe('application window', function () {
           .waitForUrl(page1)
           .windowByUrl(Brave.browserWindowUrl)
           .getWindowCount().should.become(1)
-          .getTabCount().should.become(2)
+          .waitForTabCount(2)
       })
     })
   })

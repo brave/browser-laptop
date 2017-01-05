@@ -157,11 +157,7 @@ describe('synopsis', function () {
       .loadUrl(prefsUrl)
       .waitForVisible(paymentsTab)
       .click(paymentsTab)
-      .waitUntil(function () {
-        return this.elements(ledgerTable + ' tr').then((response) => {
-          return response.value.length === 2
-        })
-      })
+      .waitForElementCount(ledgerTable + ' tr', 2)
   })
 
   it('can sort synopsis table', function * () {

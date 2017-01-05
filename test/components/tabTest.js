@@ -202,13 +202,15 @@ describe('tab tests', function () {
         .waitForExist('.tab.active[data-frame-key="1"]')
         .ipcSend(messages.SHORTCUT_NEW_FRAME)
         .waitUntil(function () {
-          return this.waitForUrl(Brave.newTabUrl).getTabCount().then((count) => count === tabCountBeforeTabClose)
+          return this.waitForUrl(Brave.newTabUrl)
+            .waitForTabCount(tabCountBeforeTabClose)
         })
       yield this.app.client
         .waitForBrowserWindow()
         .ipcSend(messages.SHORTCUT_CLOSE_FRAME)
         .waitUntil(function () {
-          return this.waitForUrl(Brave.newTabUrl).getTabCount().then((count) => count === tabCountAfterTabClose)
+          return this.waitForUrl(Brave.newTabUrl)
+            .waitForTabCount(tabCountAfterTabClose)
         })
     })
     it('should undo last closed tab', function * () {
@@ -217,19 +219,22 @@ describe('tab tests', function () {
         .waitForExist('.tab.active[data-frame-key="1"]')
         .ipcSend(messages.SHORTCUT_NEW_FRAME, Brave.server.url('page1.html'))
         .waitUntil(function () {
-          return this.waitForUrl(Brave.newTabUrl).getTabCount().then((count) => count === tabCountBeforeTabClose)
+          return this.waitForUrl(Brave.newTabUrl)
+            .waitForTabCount(tabCountBeforeTabClose)
         })
       yield this.app.client
         .waitForBrowserWindow()
         .ipcSend(messages.SHORTCUT_CLOSE_FRAME)
         .waitUntil(function () {
-          return this.waitForUrl(Brave.newTabUrl).getTabCount().then((count) => count === tabCountAfterTabClose)
+          return this.waitForUrl(Brave.newTabUrl)
+            .waitForTabCount(tabCountAfterTabClose)
         })
       yield this.app.client
         .waitForBrowserWindow()
         .ipcSend(messages.SHORTCUT_UNDO_CLOSED_FRAME)
         .waitUntil(function () {
-          return this.waitForUrl(Brave.newTabUrl).getTabCount().then((count) => count === tabCountBeforeTabClose)
+          return this.waitForUrl(Brave.newTabUrl)
+            .waitForTabCount(tabCountBeforeTabClose)
         })
     })
   })

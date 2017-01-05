@@ -25,11 +25,7 @@ describe('frame tests', function () {
       it('opens a new foreground tab', function * () {
         let url1 = this.url1
         yield this.app.client
-          .waitUntil(function () {
-            return this.getTabCount().then((count) => {
-              return count === 2
-            })
-          })
+          .waitForTabCount(2)
           .waitUntil(function () {
             return this.tabByIndex(1).getUrl().then((url) => {
               return url === url1
@@ -64,11 +60,7 @@ describe('frame tests', function () {
           .ipcSend('shortcut-set-active-frame-by-index', 0)
           .windowByUrl(Brave.browserWindowUrl)
           .cloneTabByIndex(0)
-          .waitUntil(function () {
-            return this.getTabCount().then((count) => {
-              return count === 3
-            })
-          })
+          .waitForTabCount(3)
       })
 
       it('inserts after the tab to clone', function * () {
@@ -200,11 +192,7 @@ describe('frame tests', function () {
     it('should open in new tab', function * () {
       yield this.app.client
         .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
-        .waitUntil(function () {
-          return this.getTabCount().then((count) => {
-            return count === 2
-          })
-        })
+        .waitForTabCount(2)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist(this.webview2)
     })
@@ -212,15 +200,9 @@ describe('frame tests', function () {
     it('open from pinned tab', function * () {
       yield this.app.client
         .setPinned(this.url, true)
-        .waitUntil(function () {
-          return this.elements(pinnedTabsTabs).then((res) => res.value.length === 1)
-        })
+        .waitForElementCount(pinnedTabsTabs, 1)
         .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
-        .waitUntil(function () {
-          return this.getTabCount().then((count) => {
-            return count === 2
-          })
-        })
+        .waitForTabCount(2)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist(this.webview2)
     })
