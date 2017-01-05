@@ -41,14 +41,29 @@ const messages = {
   /**
    * browser -> webview
    * sent to fetch sync records after a given start time from the sync server.
+   * we perform an S3 ListObjectsV2 request per category. for each category
+   * with new records, do
+   * GET_EXISTING_OBJECTS -> RESOLVE_SYNC_RECORDS -> RESOLVED_SYNC_RECORDS
    */
   FETCH_SYNC_RECORDS: _, /* @param Array.<string> categoryNames, @param {number} startAt (in seconds) */
   /**
    * webview -> browser
-   * browser must update its local values with the new sync records, performing
-   * conflict-resolution as necessary.
+   * after sync gets records, it requests the browser's existing objects so sync
+   * can perform conflict resolution.
    */
-  RECEIVE_SYNC_RECORDS: _, /* @param {string} categoryName, @param {Array.<Object>} records */
+  GET_EXISTING_OBJECTS: _, /* @param {string} categoryName, @param {Array.<Object>} records */
+  /**
+   * browser -> webview
+   * webview resolves sync records against matching browser objects and returns
+   * resolved syncRecords to apply against browser data.
+   * recordsAndExistingObjects: e.g. [[<syncRecord>, <browserObject=>], ...]
+   */
+  RESOLVE_SYNC_RECORDS: _, /* @param {string} categoryName, @param {Array.<Array.<Object>>} recordsAndExistingObjects */
+  /**
+   * webview -> browser
+   * browser must update its local values with the resolved sync records.
+   */
+  RESOLVED_SYNC_RECORDS: _, /* @param {string} categoryName, @param {Array.<Object>} records */
   /**
    * browser -> webview
    * browser sends this to the webview with the data that needs to be synced
