@@ -1002,6 +1002,9 @@ function mainTemplateInit (nodeProps, frame) {
     }
 
     if (isTextSelected) {
+      if (isDarwin) {
+        template.push(showDefinitionMenuItem(nodeProps.selectionText), CommonMenu.separatorMenuItem)
+      }
       template.push(searchSelectionMenuItem(nodeProps.selectionText), CommonMenu.separatorMenuItem)
     }
   } else if (isTextSelected) {
