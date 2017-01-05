@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# stop on errors (nonzero exit codes), uninitialized vars
+set -eu
+
+SYNC_PATH=app/extensions/brave/content/scripts/sync.js
+
+curl -L -o $SYNC_PATH $(curl -s https://api.github.com/repos/brave/sync/releases/latest | grep \/bundle.js | head -n 1 | cut -d '"' -f 4)
