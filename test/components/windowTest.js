@@ -756,7 +756,7 @@ describe('application window', function () {
     })
   })
 
-  describe('open and close windows with scripts', function () {
+  describe.skip('open and close windows with scripts', function () {
     Brave.beforeAll(this)
 
     before(function * () {

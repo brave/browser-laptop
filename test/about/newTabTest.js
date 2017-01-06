@@ -87,7 +87,7 @@ describe('about:newtab tests', function () {
     })
   })
 
-  describe('with NEWTAB_MODE === NEW_TAB_PAGE', function () {
+  describe.skip('with NEWTAB_MODE === NEW_TAB_PAGE', function () {
     describe('page content', function () {
       Brave.beforeAll(this)
 
