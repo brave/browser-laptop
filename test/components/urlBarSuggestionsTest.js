@@ -24,6 +24,7 @@ describe('urlBarSuggestions', function () {
       .tabByIndex(0)
       .loadUrl(page1Url)
       .windowByUrl(Brave.browserWindowUrl)
+      .waitForSiteEntry(page1Url)
       .waitUntil(function () {
         return this.getAppState().then((val) => {
           return !!val.value.sites.find((site) => site.location === page1Url)
@@ -32,6 +33,7 @@ describe('urlBarSuggestions', function () {
       .tabByIndex(0)
       .loadUrl(this.page2Url)
       .windowByUrl(Brave.browserWindowUrl)
+      .waitForSiteEntry(page2Url)
       .ipcSend(messages.SHORTCUT_NEW_FRAME)
       .waitForUrl(Brave.newTabUrl)
       .windowByUrl(Brave.browserWindowUrl)
@@ -99,9 +101,10 @@ describe('urlBarSuggestions', function () {
       .waitUntil(function () {
         return this.getValue(urlInput).then((val) => val === 'Page 1')
       })
-      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
+      .waitForVisible(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
       .click(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
-      .tabByIndex(1).getUrl().should.eventually.equal(this.page1Url)
+      .tabByIndex(1)
+      .waitForUrl(this.page1Url)
   })
 
   it('navigates to a suggestion with keyboard', function * () {

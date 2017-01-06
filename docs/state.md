@@ -369,7 +369,6 @@ WindowStore
     openerTabId: number, // web contents tabId that opened this tab
 
     navbar: {
-      focused: boolean, // whether the navbar is focused
       urlbar: {
         location: string, // the string displayed in the urlbar
         urlPreview: string,
@@ -386,7 +385,7 @@ WindowStore
           shouldRender: boolean, // if the suggestions should render
           autocompleteEnabled: boolean // used to enable or disable autocomplete
         },
-        focused: boolean, // whether the urlbar is focused
+        focused: boolean, // whether the urlbar should be focused instead of the webview
         active: boolean, // whether the user is typing in the urlbar
         selected: boolean // is the urlbar text selected
       }

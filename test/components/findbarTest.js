@@ -95,10 +95,9 @@ describe('findBar', function () {
       .waitForElementFocus(findBarInput)
       .keys('test search')
     yield this.app.client
-      .moveToObject(activeWebview)
-      .waitForExist(titleBar)
+      .activateTitleMode()
       .click(titleBar)
-      .waitForExist(urlInput)
+      .waitForVisible(urlInput)
       .click(urlInput)
       .waitForVisible(findBarInput)
       .waitForElementFocus(urlInput)
@@ -219,6 +218,7 @@ describe('findBar', function () {
   it('remembers findbar input when switching frames', function * () {
     const url = Brave.server.url('find_in_page.html')
     yield this.app.client
+      .windowParentByUrl(url)
       .tabByIndex(0)
       .url(url)
       .waitForUrl(url)

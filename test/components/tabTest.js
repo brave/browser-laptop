@@ -2,6 +2,7 @@
 
 const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
+const assert = require('assert')
 const settings = require('../../js/constants/settings')
 const {urlInput, backButton, forwardButton, activeTabTitle, activeTabFavicon, newFrameButton} = require('../lib/selectors')
 
@@ -202,13 +203,15 @@ describe('tab tests', function () {
         .waitForExist('.tab.active[data-frame-key="1"]')
         .ipcSend(messages.SHORTCUT_NEW_FRAME)
         .waitUntil(function () {
-          return this.waitForUrl(Brave.newTabUrl).getTabCount().then((count) => count === tabCountBeforeTabClose)
+          return this.waitForUrl(Brave.newTabUrl)
+            .waitForTabCount(tabCountBeforeTabClose)
         })
       yield this.app.client
         .waitForBrowserWindow()
         .ipcSend(messages.SHORTCUT_CLOSE_FRAME)
         .waitUntil(function () {
-          return this.waitForUrl(Brave.newTabUrl).getTabCount().then((count) => count === tabCountAfterTabClose)
+          return this.waitForUrl(Brave.newTabUrl)
+            .waitForTabCount(tabCountAfterTabClose)
         })
     })
     it('should undo last closed tab', function * () {
@@ -217,19 +220,22 @@ describe('tab tests', function () {
         .waitForExist('.tab.active[data-frame-key="1"]')
         .ipcSend(messages.SHORTCUT_NEW_FRAME, Brave.server.url('page1.html'))
         .waitUntil(function () {
-          return this.waitForUrl(Brave.newTabUrl).getTabCount().then((count) => count === tabCountBeforeTabClose)
+          return this.waitForUrl(Brave.newTabUrl)
+            .waitForTabCount(tabCountBeforeTabClose)
         })
       yield this.app.client
         .waitForBrowserWindow()
         .ipcSend(messages.SHORTCUT_CLOSE_FRAME)
         .waitUntil(function () {
-          return this.waitForUrl(Brave.newTabUrl).getTabCount().then((count) => count === tabCountAfterTabClose)
+          return this.waitForUrl(Brave.newTabUrl)
+            .waitForTabCount(tabCountAfterTabClose)
         })
       yield this.app.client
         .waitForBrowserWindow()
         .ipcSend(messages.SHORTCUT_UNDO_CLOSED_FRAME)
         .waitUntil(function () {
-          return this.waitForUrl(Brave.newTabUrl).getTabCount().then((count) => count === tabCountBeforeTabClose)
+          return this.waitForUrl(Brave.newTabUrl)
+            .waitForTabCount(tabCountBeforeTabClose)
         })
     })
   })
@@ -323,6 +329,21 @@ describe('tab tests', function () {
         .loadUrl('about:newtab')
         .windowByUrl('about:newtab')
         .waitForExist(activeTabFavicon, 1000, true)
+    })
+  })
+
+  describe('about:blank tab', function () {
+    Brave.beforeAll(this)
+    before(function * () {
+      yield setup(this.app.client)
+    })
+
+    it('has untitled text right away', function * () {
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'about:blank', { openInForeground: false })
+        .waitForVisible('.tab[data-frame-key="2"]')
+        // This should not be converted to a waitUntil
+        .getText('.tab[data-frame-key="2"]').then((val) => assert.equal(val, 'Untitled'))
     })
   })
 })

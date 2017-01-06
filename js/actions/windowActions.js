@@ -265,18 +265,6 @@ const windowActions = {
   },
 
   /**
-   * Dispatches a message to the store to indicate if the navigation bar is focused.
-   *
-   * @param {boolean} focused - true if the navigation bar should be considered as focused
-   */
-  setNavBarFocused: function (focused) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_NAVBAR_FOCUSED,
-      focused
-    })
-  },
-
-  /**
    * Dispatches a message to the store to create a new frame
    *
    * @param {Object} frameOpts - An object of frame options such as isPrivate, element, and tab features.

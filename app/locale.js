@@ -171,6 +171,7 @@ var rendererIdentifiers = function () {
     'ignoreSpelling',
     'lookupSelection',
     // Other identifiers
+    'aboutBlankTitle',
     'urlCopied',
     'autoHideMenuBar',
     'unexpectedErrorWindowReload',
@@ -353,10 +354,12 @@ exports.init = function (language) {
   const propertyFiles = []
   const appendLangProperties = function (lang) {
     // Property files to parse (only ones containing menu specific identifiers)
-    propertyFiles.push(path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'menu.properties'),
+    propertyFiles.push(
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'menu.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'app.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'error.properties'),
-      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'passwords.properties'))
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'passwords.properties'),
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'common.properties'))
   }
 
   appendLangProperties(lang)

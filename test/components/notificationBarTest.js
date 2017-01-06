@@ -1,7 +1,7 @@
 /* global describe, it, before, beforeEach */
 
 const Brave = require('../lib/brave')
-const {activeWebview, notificationBar, titleBar, urlInput} = require('../lib/selectors')
+const {notificationBar, titleBar, urlInput} = require('../lib/selectors')
 
 describe('notificationBar', function () {
   function * setup (client) {
@@ -24,7 +24,7 @@ describe('notificationBar', function () {
 
   beforeEach(function * () {
     yield this.app.client
-      .waitForExist('.notificationItem', undefined, true)
+      .waitForElementCount('.notificationItem', 0)
   })
 
   it('shows notification bar for geolocation', function * () {
@@ -47,8 +47,7 @@ describe('notificationBar', function () {
       .waitForExist(notificationBar)
       .element('.notificationItem:nth-Child(1) .options')
       .click('button=Deny')
-      .moveToObject(activeWebview)
-      .waitForExist(titleBar)
+      .activateTitleMode()
       .waitUntil(function () {
         return this.getText(titleBar).then((val) => val.includes('denied'))
       })
@@ -65,6 +64,7 @@ describe('notificationBar', function () {
         return this.getText('.notificationItem:last-child').then((val) => val.includes('notification'))
       })
       .click('button=Deny')
+      .waitForElementCount('.notificationItem', 1)
       .click('button=Deny')
   })
 
@@ -78,8 +78,7 @@ describe('notificationBar', function () {
       .click('[data-l10n-id=rememberDecision]')
       .waitForExist('button=Allow')
       .click('button=Allow')
-      .moveToObject(activeWebview)
-      .waitForExist(titleBar)
+      .activateTitleMode()
       .waitUntil(function () {
         return this.getText(titleBar).then((val) => val.includes('granted'))
       })
@@ -89,8 +88,7 @@ describe('notificationBar', function () {
     yield this.app.client
       .loadUrl(this.notificationUrl)
       .windowByUrl(Brave.browserWindowUrl)
-      .moveToObject(activeWebview)
-      .waitForExist(titleBar)
+      .activateTitleMode()
       .waitUntil(function () {
         return this.getText(titleBar).then((val) => val.includes('granted'))
       })
@@ -181,8 +179,7 @@ describe('permissions state', function () {
     yield this.app.client.tabByIndex(0)
       .loadUrl(notificationUrl)
       .windowByUrl(Brave.browserWindowUrl)
-      .moveToObject(activeWebview)
-      .waitForExist(titleBar)
+      .activateTitleMode()
       .waitUntil(function () {
         return this.getText(titleBar).then((val) => val.includes('denied'))
       })

@@ -37,6 +37,7 @@ describe('about:newtab tests', function () {
     yield client
       .tabByIndex(0)
       .loadUrl(aboutNewTabUrl)
+      .waitForUrl(aboutNewTabUrl)
   }
 
   function * addDemoAboutPages (client) {
@@ -74,9 +75,9 @@ describe('about:newtab tests', function () {
     Brave.beforeAll(this)
 
     before(function * () {
+      yield setup(this.app.client)
       yield this.app.client.changeSetting(settings.NEWTAB_MODE, newTabMode.EMPTY_NEW_TAB)
       yield reloadNewTab(this.app.client)
-      yield setup(this.app.client)
     })
 
     it('returns an empty page', function * () {
@@ -86,7 +87,7 @@ describe('about:newtab tests', function () {
     })
   })
 
-  describe('with NEWTAB_MODE === NEW_TAB_PAGE', function () {
+  describe.skip('with NEWTAB_MODE === NEW_TAB_PAGE', function () {
     describe('page content', function () {
       Brave.beforeAll(this)
 
@@ -130,12 +131,7 @@ describe('about:newtab tests', function () {
 
         yield this.app.client
           .waitForVisible('.counter.trackers')
-          .waitUntil(function () {
-            return this.getText('.counter.trackers')
-              .then((blocked) => {
-                return blocked === '2'
-              })
-          })
+          .waitForTextValue('.counter.trackers', '2')
       })
 
       // NOTE(bsclifton): this test can take 20+ seconds to run :(
@@ -146,12 +142,7 @@ describe('about:newtab tests', function () {
 
         yield this.app.client
           .waitForVisible('.counter.ads')
-          .waitUntil(function () {
-            return this.getText('.counter.ads')
-              .then((blocked) => {
-                return blocked === '1'
-              })
-          })
+          .waitForTextValue('.counter.ads', '1')
       })
 
       // TODO(bsclifton):
@@ -226,15 +217,13 @@ describe('about:newtab tests', function () {
         yield reloadNewTab(this.app.client)
 
         yield this.app.client
-          .waitForExist('.topSitesElementFavicon', 3000, true)
+          .waitForElementCount('.topSitesElementFavicon', 0)
       })
 
       it('shows favicon image for topSites', function * () {
-        yield this.app.client.clearAppData({browserHistory: true})
-
         const pageWithFavicon = Brave.server.url('favicon.html')
-
         yield this.app.client
+          .clearAppData({browserHistory: true})
           .tabByUrl(Brave.newTabUrl)
           .url(pageWithFavicon)
           .waitForUrl(pageWithFavicon)
@@ -243,7 +232,7 @@ describe('about:newtab tests', function () {
         yield reloadNewTab(this.app.client)
 
         yield this.app.client
-          .waitForVisible('.topSitesElementFavicon img').should.eventually.be.true
+          .waitForVisible('.topSitesElementFavicon img')
       })
 
       it('replace topSites favicon images with a letter when no icon is found', function * () {
@@ -261,7 +250,7 @@ describe('about:newtab tests', function () {
 
         yield this.app.client
           .waitForVisible('.topSitesElementFavicon')
-          .getText('.topSitesElementFavicon').should.eventually.be.equal('F')
+          .waitForTextValue('.topSitesElementFavicon', 'F')
       })
     })
   })

@@ -198,16 +198,6 @@ Dispatches a message to the store to indicate that the webview entered full scre
 
 
 
-### setNavBarFocused(focused) 
-
-Dispatches a message to the store to indicate if the navigation bar is focused.
-
-**Parameters**
-
-**focused**: `boolean`, true if the navigation bar should be considered as focused
-
-
-
 ### newFrame(frameOpts, openInForeground) 
 
 Dispatches a message to the store to create a new frame

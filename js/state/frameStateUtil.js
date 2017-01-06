@@ -292,9 +292,9 @@ function addFrame (windowState, tabs, frameOpts, newKey, partitionNumber, active
   // from a renderer initiated navigation (window.open, cmd/ctrl-click, etc...)
   const delayedLoadUrl = frameOpts.delayedLoadUrl
   delete frameOpts.delayedLoadUrl
-  const navbarFocus = activeFrameKey === newKey &&
-                      url === config.defaultUrl &&
-                      delayedLoadUrl === undefined
+  const urlBarFocused = activeFrameKey === newKey &&
+    url === config.defaultUrl &&
+    delayedLoadUrl === undefined
   const location = delayedLoadUrl || url // page url
 
   // Only add pin requests if it's not already added
@@ -333,7 +333,6 @@ function addFrame (windowState, tabs, frameOpts, newKey, partitionNumber, active
     pinnedLocation: isPinned ? url : undefined,
     key: newKey,
     navbar: {
-      focused: navbarFocus,
       urlbar: {
         location: url,
         urlPreview: '',
@@ -342,8 +341,8 @@ function addFrame (windowState, tabs, frameOpts, newKey, partitionNumber, active
           searchResults: [],
           suggestionList: null
         },
-        selected: navbarFocus,
-        focused: navbarFocus,
+        selected: urlBarFocused,
+        focused: urlBarFocused,
         active: false
       }
     },

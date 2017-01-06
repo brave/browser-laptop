@@ -1,6 +1,7 @@
 /* globals devTools */
 var Application = require('spectron').Application
 var chai = require('chai')
+const {activeWebview, titleBar} = require('./selectors')
 require('./coMocha')
 
 const path = require('path')
@@ -239,6 +240,13 @@ var exports = {
       })
     })
 
+    this.app.client.addCommand('activateTitleMode', function () {
+      return this
+        .moveToObject(activeWebview, 2, 2)
+        .moveToObject(activeWebview, 3, 3)
+        .waitForVisible(titleBar)
+    })
+
     this.app.client.addCommand('waitForUrl', function (url) {
       return this.waitUntil(function () {
         logVerbose('waitForUrl("' + url + '")')
@@ -258,11 +266,29 @@ var exports = {
       })
     })
 
+    this.app.client.addCommand('waitForTextValue', function (selector, text) {
+      return this
+        .waitForVisible(selector)
+        .waitUntil(function () {
+          return this.getText(selector).then((value) => { return value === text })
+        })
+    })
+
     this.app.client.addCommand('waitForTabCount', function (tabCount) {
       logVerbose('waitForTabCount(' + tabCount + ')')
       return this.waitUntil(function () {
         return this.getTabCount().then((count) => {
           return count === tabCount
+        })
+      })
+    })
+
+    this.app.client.addCommand('waitForElementCount', function (selector, count) {
+      logVerbose('waitForElementCount("' + selector + '", ' + count + ')')
+      return this.waitUntil(function () {
+        return this.elements(selector).then((res) => {
+          logVerbose('waitForElementCount("' + selector + '", ' + count + ') => ' + res.value.length)
+          return res.value.length === count
         })
       })
     })
@@ -275,6 +301,27 @@ var exports = {
           return val.value[resourceName] && val.value[resourceName].ready
         })
       }, 20000)
+    })
+
+    this.app.client.addCommand('waitForSettingValue', function (setting, value) {
+      logVerbose('waitForSettingValue(' + setting + ', ' + value + ')')
+      return this.waitUntil(function () {
+        return this.getAppState().then((val) => {
+          logVerbose('waitForSettingValue("' + setting + ', ' + value + '") => ' + val.value && val.value.settings && val.value.settings[setting])
+          return val.value && val.value.settings && val.value.settings[setting] === value
+        })
+      })
+    })
+
+    this.app.client.addCommand('waitForSiteEntry', function (location) {
+      logVerbose('waitForSiteEntry(' + location + ')')
+      return this.waitUntil(function () {
+        return this.getAppState().then((val) => {
+          const ret = val.value && val.value.sites && val.value.sites.find((site) => site.location === location)
+          logVerbose('waitForSiteEntry("' + location + '") => ' + ret)
+          return ret
+        })
+      })
     })
 
     this.app.client.addCommand('loadUrl', function (url) {
@@ -311,7 +358,6 @@ var exports = {
     this.app.client.addCommand('showFindbar', function (show, key = 1) {
       return this.execute(function (show, key) {
         devTools('electron').testData.windowActions.setFindbarShown(Object.assign({
-          windowId: devTools('electron').remote.getCurrentWindow().id,
           key
         }), show !== false)
       }, show, key)
@@ -328,7 +374,6 @@ var exports = {
     this.app.client.addCommand('setPinned', function (location, isPinned, options = {}) {
       return this.execute(function (location, isPinned, options) {
         devTools('electron').testData.windowActions.setPinned(devTools('immutable').fromJS(Object.assign({
-          windowId: devTools('electron').remote.getCurrentWindow().id,
           location
         }, options)), isPinned)
       }, location, isPinned, options)
@@ -415,9 +460,11 @@ var exports = {
      * @param value - The setting value to change to
      */
     this.app.client.addCommand('changeSetting', function (key, value) {
-      return this.execute(function (key, value) {
-        return devTools('appActions').changeSetting(key, value)
-      }, key, value).then((response) => response.value)
+      return this
+        .execute(function (key, value) {
+          return devTools('appActions').changeSetting(key, value)
+        }, key, value).then((response) => response.value)
+        .waitForSettingValue(key, value)
     })
 
     /**
@@ -579,10 +626,8 @@ var exports = {
       BRAVE_USER_DATA_DIR: userDataDir
     }
     this.app = new Application({
-      // I don't think waitForInterval is actually used.
-      waitforInterval: 5,
-      waitforTimeout: exports.defaultTimeout,
-      quitTimeout: 0,
+      waitTimeout: exports.defaultTimeout,
+      connectionRetryTimeout: exports.defaultTimeout,
       path: './node_modules/.bin/electron',
       env,
       args: ['./', '--debug=5858', '--enable-logging', '--v=1'],

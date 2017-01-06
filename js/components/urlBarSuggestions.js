@@ -217,7 +217,6 @@ class UrlBarSuggestions extends ImmutableComponent {
           partitionNumber: site && site.get && site.get('partitionNumber') || undefined
         }, !!e.shiftKey)
         e.preventDefault()
-        windowActions.setNavBarFocused(true)
       } else {
         windowActions.loadUrl(this.activeFrame, location)
         windowActions.setUrlBarActive(false)

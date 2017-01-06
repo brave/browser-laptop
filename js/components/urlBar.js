@@ -254,13 +254,13 @@ class UrlBar extends ImmutableComponent {
 
   onClick (e) {
     if (this.isSelected()) {
-      windowActions.setUrlBarSelected(true)
       windowActions.setUrlBarActive(true)
     }
   }
 
   onBlur (e) {
-    windowActions.setNavBarFocused(false)
+    // We intentionally do not setUrlBarFocused(false) here because
+    // that state is for managing when it should be set if it is active.
     if (!this.isActive) {
       windowActions.setNavBarUserInput(e.target.value)
     }
@@ -368,13 +368,18 @@ class UrlBar extends ImmutableComponent {
   }
 
   onFocus (e) {
+    this.select()
+    windowActions.setUrlBarFocused(true)
     windowActions.setUrlBarSelected(true)
     this.detectSearchEngine()
   }
 
   componentWillMount () {
     ipc.on(messages.SHORTCUT_FOCUS_URL, (e) => {
+      this.focus()
+      this.select()
       windowActions.setRenderUrlBarSuggestions(false)
+      windowActions.setUrlBarFocused(true)
       windowActions.setUrlBarSelected(true)
       windowActions.setUrlBarActive(true)
     })
