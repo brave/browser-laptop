@@ -258,6 +258,14 @@ var exports = {
       })
     })
 
+    this.app.client.addCommand('waitForTextValue', function (selector, text) {
+      return this
+        .waitForVisible(selector)
+        .waitUntil(function () {
+          return this.getText(selector).then((value) => { return value === text })
+        })
+    })
+
     this.app.client.addCommand('waitForTabCount', function (tabCount) {
       logVerbose('waitForTabCount(' + tabCount + ')')
       return this.waitUntil(function () {

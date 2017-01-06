@@ -1218,7 +1218,7 @@ describe('navigationBar tests', function () {
     it('should open if user has no bookmarks', function * () {
       yield this.app.client
         .moveToObject(navigator)
-        .isExisting(bookmarksToolbar).should.eventually.be.true
+        .waitForVisible(bookmarksToolbar, 1)
     })
 
     it('should remain hidden if user has bookmarks but has toolbar hidden', function * () {
@@ -1240,8 +1240,7 @@ describe('navigationBar tests', function () {
         .waitForVisible(doneButton)
         .click(doneButton)
         .waitForExist(navigatorBookmarked)
-
-      yield this.app.client.isExisting(bookmarksToolbar).should.eventually.be.false
+        .waitForElementCount(bookmarksToolbar, 0)
     })
   })
 })
