@@ -1,7 +1,7 @@
 /* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
-const { urlInput, bookmarksToolbar, navigator, navigatorNotBookmarked, doneButton } = require('../lib/selectors')
+const {urlInput, bookmarksToolbar, navigator, navigatorNotBookmarked, doneButton} = require('../lib/selectors')
 const settings = require('../../js/constants/settings')
 const siteTags = require('../../js/constants/siteTags')
 const assert = require('assert')
@@ -33,13 +33,13 @@ describe('bookmarksToolbar', function () {
     it('shows the bookmarks toolbar if the setting is enabled', function * () {
       yield this.app.client
         .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
-        .waitForVisible(bookmarksToolbar, 1000)
+        .waitForVisible(bookmarksToolbar)
     })
 
     it('hides the bookmarks toolbar if the setting is disabled', function * () {
       yield this.app.client
         .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, false)
-        .waitForVisible(bookmarksToolbar, 1000, true)
+        .waitForElementCount(bookmarksToolbar, 0)
     })
   })
 
@@ -52,7 +52,7 @@ describe('bookmarksToolbar', function () {
     it('shows a context menu', function * () {
       yield this.app.client
         .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
-        .waitForVisible(bookmarksToolbar, 1000)
+        .waitForVisible(bookmarksToolbar)
         .addSite({
           customTitle: 'demo1',
           folderId: Math.random(),
@@ -65,7 +65,7 @@ describe('bookmarksToolbar', function () {
           })
         })
         .click('.bookmarkToolbarButton[title=demo1]')
-        .waitForVisible('.contextMenuItemText[data-l10n-id=emptyFolderItem]', 1000)
+        .waitForVisible('.contextMenuItemText[data-l10n-id=emptyFolderItem]')
     })
 
     it('automatically opens context menu if you move mouse over a different folder', function * () {
@@ -76,7 +76,7 @@ describe('bookmarksToolbar', function () {
 
       yield this.app.client
         .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
-        .waitForVisible(bookmarksToolbar, 1000)
+        .waitForVisible(bookmarksToolbar)
         .addSite({
           customTitle: 'demo1',
           folderId: folderId1,
@@ -102,11 +102,13 @@ describe('bookmarksToolbar', function () {
         .waitForUrl(Brave.newTabUrl)
         .loadUrl(this.page1Url)
         .windowParentByUrl(this.page1Url)
+        .waitForSiteEntry(this.page1Url)
         .waitForVisible(navigator)
         .moveToObject(navigator)
         .waitForVisible(navigatorNotBookmarked)
         .click(navigatorNotBookmarked)
         .waitForVisible(doneButton)
+        .waitForEnabled(doneButton)
         .selectByValue('#bookmarkParentFolder select', folderId2)
         .click(doneButton)
         .click('.bookmarkToolbarButton[title=demo1]')
@@ -118,10 +120,9 @@ describe('bookmarksToolbar', function () {
 
     it('hides context menu when mousing over regular bookmark', function * () {
       this.page1Url = Brave.server.url('page1.html')
-
       yield this.app.client
         .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
-        .waitForVisible(bookmarksToolbar, 1000)
+        .waitForVisible(bookmarksToolbar)
         .addSite({
           customTitle: 'demo1',
           folderId: Math.random(),
@@ -136,18 +137,20 @@ describe('bookmarksToolbar', function () {
         .waitForUrl(Brave.newTabUrl)
         .loadUrl(this.page1Url)
         .windowParentByUrl(this.page1Url)
+        .waitForSiteEntry(this.page1Url)
         .waitForVisible(navigator)
         .moveToObject(navigator)
         .waitForVisible(navigatorNotBookmarked)
         .click(navigatorNotBookmarked)
         .waitForVisible(doneButton)
+        .waitForEnabled(doneButton)
         .setValue('#bookmarkName input', 'test1')
         .click(doneButton)
         .waitForVisible('.bookmarkToolbarButton[title^=test1]')
         .click('.bookmarkToolbarButton[title=demo1]')
-        .waitForVisible('.contextMenuItemText[data-l10n-id=emptyFolderItem]', 1000)
+        .waitForVisible('.contextMenuItemText[data-l10n-id=emptyFolderItem]')
         .moveToObject('.bookmarkToolbarButton[title^=test1]')
-        .waitForVisible('.contextMenuItemText', 1000, true)
+        .waitForElementCount('.contextMenuItemText', 0)
     })
   })
 
@@ -167,11 +170,13 @@ describe('bookmarksToolbar', function () {
         .waitForUrl(Brave.newTabUrl)
         .loadUrl(pageWithFavicon)
         .windowParentByUrl(pageWithFavicon)
+        .waitForSiteEntry(pageWithFavicon)
         .waitForVisible(navigator)
         .moveToObject(navigator)
         .waitForVisible(navigatorNotBookmarked)
         .click(navigatorNotBookmarked)
         .waitForVisible(doneButton)
+        .waitForEnabled(doneButton)
         .click(doneButton)
 
       yield this.app.client.waitUntil(() =>
@@ -190,11 +195,13 @@ describe('bookmarksToolbar', function () {
         .waitForUrl(Brave.newTabUrl)
         .loadUrl(pageWithoutFavicon)
         .windowParentByUrl(pageWithoutFavicon)
+        .waitForSiteEntry(pageWithoutFavicon)
         .waitForVisible(navigator)
         .moveToObject(navigator)
         .waitForVisible(navigatorNotBookmarked)
         .click(navigatorNotBookmarked)
         .waitForVisible(doneButton)
+        .waitForEnabled(doneButton)
         .click(doneButton)
 
       yield this.app.client.waitUntil(() =>
