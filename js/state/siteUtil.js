@@ -10,7 +10,6 @@ const getSetting = require('../settings').getSetting
 const UrlUtil = require('../lib/urlutil')
 const syncUtil = require('./syncUtil')
 const urlParse = require('../../app/common/urlParse')
-const syncActions = require('../actions/syncActions')
 
 const isBookmark = (tags) => {
   if (!tags) {
@@ -160,9 +159,10 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId) => {
  * @param tag The tag to add for this site
  *   See siteTags.js for supported types. No tag means just a history item
  * @param originalSiteDetail If specified, use when searching site list
+ * @param {Function=} syncCallback specified if this change should be synced
  * @return The new sites Immutable object
  */
-module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
+module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail, syncCallback) {
   // Get tag from siteDetail object if not passed via tag param
   if (tag === undefined) {
     tag = siteDetail.getIn(['tags', 0])
@@ -188,14 +188,15 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
   }
 
   let site = mergeSiteDetails(oldSite, siteDetail, tag, folderId)
-  site = syncUtil.setObjectId(site)
+  if (syncCallback) {
+    site = syncUtil.setObjectId(site)
+    syncCallback(site)
+  }
   if (index === -1) {
     // Insert new entry
-    syncActions.addSite(site)
     return sites.push(site)
   }
   // Update existing entry
-  syncActions.updateSite(site)
   return sites.setIn([index], site)
 }
 
@@ -204,15 +205,18 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
  *
  * @param sites The application state's Immutable sites list
  * @param siteDetail The siteDetail to remove a tag from
+ * @param {string} tag
+ * @param {Function=} syncCallback
  * @return The new sites Immutable object
  */
-module.exports.removeSite = function (sites, siteDetail, tag) {
+module.exports.removeSite = function (sites, siteDetail, tag, syncCallback) {
   const index = module.exports.getSiteIndex(sites, siteDetail, tag)
   if (index === -1) {
     return sites
   }
-
-  syncActions.removeSite(sites.getIn([index]))
+  if (syncCallback) {
+    syncCallback(sites.getIn([index]))
+  }
 
   const tags = sites.getIn([index, 'tags'])
   if (isBookmarkFolder(tags)) {

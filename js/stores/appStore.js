@@ -20,6 +20,7 @@ const UpdateStatus = require('../constants/updateStatus')
 const BrowserWindow = electron.BrowserWindow
 const LocalShortcuts = require('../../app/localShortcuts')
 const appActions = require('../actions/appActions')
+const syncActions = require('../actions/syncActions')
 const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const dates = require('../../app/dates')
 const getSetting = require('../settings').getSetting
@@ -486,10 +487,10 @@ const handleAppAction = (action) => {
       const oldSiteSize = appState.get('sites').size
       if (action.siteDetail.constructor === Immutable.List) {
         action.siteDetail.forEach((s) => {
-          appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), s, action.tag))
+          appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), s, action.tag, undefined, syncActions.updateSite))
         })
       } else {
-        appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), action.siteDetail, action.tag, action.originalSiteDetail))
+        appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), action.siteDetail, action.tag, action.originalSiteDetail, syncActions.updateSite))
       }
       if (action.destinationDetail) {
         appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.siteDetail, action.destinationDetail, false, false, true))
@@ -502,7 +503,7 @@ const handleAppAction = (action) => {
       appState = aboutHistoryState.setHistory(appState, action)
       break
     case appConstants.APP_REMOVE_SITE:
-      appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag))
+      appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag, syncActions.removeSite))
       appState = aboutNewTabState.setSites(appState, action)
       appState = aboutHistoryState.setHistory(appState, action)
       break
