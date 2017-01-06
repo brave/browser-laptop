@@ -95,8 +95,7 @@ describe('findBar', function () {
       .waitForElementFocus(findBarInput)
       .keys('test search')
     yield this.app.client
-      .moveToObject(activeWebview)
-      .waitForExist(titleBar)
+      .activateTitleMode()
       .click(titleBar)
       .waitForVisible(urlInput)
       .click(urlInput)

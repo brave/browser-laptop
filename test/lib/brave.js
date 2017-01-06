@@ -1,6 +1,7 @@
 /* globals devTools */
 var Application = require('spectron').Application
 var chai = require('chai')
+const {activeWebview, titleBar} = require('./selectors')
 require('./coMocha')
 
 const path = require('path')
@@ -237,6 +238,13 @@ var exports = {
           return false
         })
       })
+    })
+
+    this.app.client.addCommand('activateTitleMode', function () {
+      return this
+        .moveToObject(activeWebview, 2, 2)
+        .moveToObject(activeWebview, 3, 3)
+        .waitForVisible(titleBar)
     })
 
     this.app.client.addCommand('waitForUrl', function (url) {
