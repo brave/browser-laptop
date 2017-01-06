@@ -618,10 +618,8 @@ var exports = {
       BRAVE_USER_DATA_DIR: userDataDir
     }
     this.app = new Application({
-      // I don't think waitForInterval is actually used.
-      waitforInterval: 5,
-      waitforTimeout: exports.defaultTimeout,
-      quitTimeout: 0,
+      waitTimeout: exports.defaultTimeout,
+      connectionRetryTimeout: exports.defaultTimeout,
       path: './node_modules/.bin/electron',
       env,
       args: ['./', '--debug=5858', '--enable-logging', '--v=1'],
