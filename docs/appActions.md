@@ -660,9 +660,9 @@ Dispatches a message when sync init data needs to be saved
 
 **Parameters**
 
-**seed**: `Buffer | null`, Dispatches a message when sync init data needs to be saved
+**seed**: `Array.&lt;number&gt; | null`, Dispatches a message when sync init data needs to be saved
 
-**deviceId**: `Buffer | null`, Dispatches a message when sync init data needs to be saved
+**deviceId**: `Array.&lt;number&gt; | null`, Dispatches a message when sync init data needs to be saved
 
 **lastFetchTimestamp**: `number | null`, Dispatches a message when sync init data needs to be saved
 

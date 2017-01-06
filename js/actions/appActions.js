@@ -804,8 +804,8 @@ const appActions = {
 
   /**
    * Dispatches a message when sync init data needs to be saved
-   * @param {Buffer|null} seed
-   * @param {Buffer|null} deviceId
+   * @param {Array.<number>|null} seed
+   * @param {Array.<number>|null} deviceId
    * @param {number|null} lastFetchTimestamp
    */
   saveSyncInitData: function (seed, deviceId, lastFetchTimestamp) {
