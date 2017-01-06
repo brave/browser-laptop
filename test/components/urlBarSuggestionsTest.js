@@ -24,6 +24,7 @@ describe('urlBarSuggestions', function () {
       .tabByIndex(0)
       .loadUrl(page1Url)
       .windowByUrl(Brave.browserWindowUrl)
+      .waitForSiteEntry(page1Url)
       .waitUntil(function () {
         return this.getAppState().then((val) => {
           return !!val.value.sites.find((site) => site.location === page1Url)
@@ -32,6 +33,7 @@ describe('urlBarSuggestions', function () {
       .tabByIndex(0)
       .loadUrl(this.page2Url)
       .windowByUrl(Brave.browserWindowUrl)
+      .waitForSiteEntry(page2Url)
       .ipcSend(messages.SHORTCUT_NEW_FRAME)
       .waitForUrl(Brave.newTabUrl)
       .windowByUrl(Brave.browserWindowUrl)

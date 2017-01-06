@@ -305,6 +305,17 @@ var exports = {
       })
     })
 
+    this.app.client.addCommand('waitForSiteEntry', function (location) {
+      logVerbose('waitForSiteEntry(' + location + ')')
+      return this.waitUntil(function () {
+        return this.getAppState().then((val) => {
+          const ret = val.value && val.value.sites && val.value.sites.find((site) => site.location === location)
+          logVerbose('waitForSiteEntry("' + location + '") => ' + ret)
+          return ret
+        })
+      })
+    })
+
     this.app.client.addCommand('loadUrl', function (url) {
       if (isSourceAboutUrl(url)) {
         url = getTargetAboutUrl(url)
