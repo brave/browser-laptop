@@ -12,6 +12,7 @@ describe('siteUtil', function () {
   const emptySites = Immutable.fromJS([])
   const bookmarkAllFields = Immutable.fromJS({
     lastAccessedTime: 123,
+    objectId: [210, 115, 31, 176, 57, 212, 167, 120, 104, 88, 88, 27, 141, 36, 235, 226],
     tags: [siteTags.BOOKMARK],
     location: testUrl1,
     title: 'sample',
@@ -276,7 +277,9 @@ describe('siteUtil', function () {
           sites.forEach((site) => {
             processedSites = siteUtil.addSite(processedSites, site)
           })
-          const expectedSites = sites
+          const expectedSites = sites.map((site) => {
+            return site.set('objectId', undefined)
+          })
           assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
         })
       })
@@ -302,16 +305,19 @@ describe('siteUtil', function () {
           customTitle: 'old customTitle',
           partitionNumber: 3,
           parentFolderId: 8,
+          objectId: undefined,
           favicon: testFavicon1
         })
         const newSiteDetail = Immutable.fromJS({
           lastAccessedTime: 456,
+          objectId: [210, 115, 31, 176, 57, 212, 167, 120, 104, 88, 88, 27, 141, 36, 235, 226],
           tags: [siteTags.BOOKMARK],
           location: testUrl1,
           title: 'same entry also acts as history entry'
         })
         const expectedSiteDetail = Immutable.fromJS({
           lastAccessedTime: newSiteDetail.get('lastAccessedTime'),
+          objectId: newSiteDetail.get('objectId'),
           tags: newSiteDetail.get('tags').toJS(),
           location: newSiteDetail.get('location'),
           title: newSiteDetail.get('title'),
@@ -342,7 +348,7 @@ describe('siteUtil', function () {
         })
         const sites = Immutable.fromJS([oldSiteDetail])
         const processedSites = siteUtil.addSite(sites, newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
-        const expectedSites = Immutable.fromJS([newSiteDetail])
+        const expectedSites = Immutable.fromJS([newSiteDetail]).setIn([0, 'objectId'], undefined)
         assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
       })
       it('returns oldSiteDetail value for lastAccessedTime when newSite value is undefined', function () {
@@ -361,6 +367,25 @@ describe('siteUtil', function () {
         const processedSites = siteUtil.addSite(sites, newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
         const expectedSites = sites
         assert.deepEqual(processedSites.getIn([0, 'lastAccessedTime']), expectedSites.getIn([0, 'lastAccessedTime']))
+      })
+      it('sets an objectId when syncCallback is provided', function () {
+        const oldSiteDetail = Immutable.fromJS({
+          lastAccessedTime: 123,
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1,
+          title: 'old title',
+          customTitle: 'old customTitle'
+        })
+        const newSiteDetail = Immutable.fromJS({
+          lastAccessedTime: 456,
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1,
+          title: 'new title',
+          customTitle: 'new customTitle'
+        })
+        const sites = Immutable.fromJS([oldSiteDetail])
+        const processedSites = siteUtil.addSite(sites, newSiteDetail, siteTags.BOOKMARK, oldSiteDetail, () => {})
+        assert.equal(processedSites.getIn([0, 'objectId']).size, 16)
       })
     })
   })
