@@ -12,8 +12,8 @@ AppStore
   firstRunTimestamp: integer,
   sync: {
     objectId: Array.<number>, // objectId for this sync device
-    deviceId: Uint8Array,
-    seed: Uint8Array,
+    deviceId: Array.<number>,
+    seed: Array.<number>,
     lastFetchTimestamp: integer // the last time new sync records were fetched in seconds
   },
   tabs: [{
