@@ -7,6 +7,7 @@ const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 
 const windowActions = require('../actions/windowActions')
+const locale = require('../l10n')
 const dragTypes = require('../constants/dragTypes')
 const messages = require('../constants/messages')
 const cx = require('../lib/classSet')
@@ -71,6 +72,13 @@ class Tab extends ImmutableComponent {
   }
 
   get displayValue () {
+    // For renderer initiated navigations, make sure we show Untitled
+    // until we know what we're loading.  We should probably do this for
+    // all about: pages that we already know the title for so we don't have
+    // to wait for the title to be parsed.
+    if (this.props.tab.get('location') === 'about:blank') {
+      return locale.translation('aboutBlankTitle')
+    }
     // YouTube tries to change the title to add a play icon when
     // there is audio. Since we have our own audio indicator we get
     // rid of it.
@@ -107,7 +115,8 @@ class Tab extends ImmutableComponent {
 
   get loading () {
     return this.frame &&
-    this.props.tab.get('loading') &&
+    (this.props.tab.get('loading') ||
+     this.props.tab.get('location') === 'about:blank') &&
     (!this.props.tab.get('provisionalLocation') ||
     !this.props.tab.get('provisionalLocation').startsWith('chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/'))
   }
@@ -178,7 +187,7 @@ class Tab extends ImmutableComponent {
       playIcon = true
     }
 
-    const locationHasFavicon = this.props.tab.get('location') !== 'about:newtab' && this.props.tab.get('location') !== 'about:blank'
+    const locationHasFavicon = this.props.tab.get('location') !== 'about:newtab'
 
     return <div
       className={cx({
