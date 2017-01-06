@@ -295,6 +295,16 @@ var exports = {
       }, 20000)
     })
 
+    this.app.client.addCommand('waitForSettingValue', function (setting, value) {
+      logVerbose('waitForSettingValue(' + setting + ', ' + value + ')')
+      return this.waitUntil(function () {
+        return this.getAppState().then((val) => {
+          logVerbose('waitForSettingValue("' + setting + ', ' + value + '") => ' + val.value && val.value.settings && val.value.settings[setting])
+          return val.value && val.value.settings && val.value.settings[setting] === value
+        })
+      })
+    })
+
     this.app.client.addCommand('loadUrl', function (url) {
       if (isSourceAboutUrl(url)) {
         url = getTargetAboutUrl(url)
@@ -431,9 +441,11 @@ var exports = {
      * @param value - The setting value to change to
      */
     this.app.client.addCommand('changeSetting', function (key, value) {
-      return this.execute(function (key, value) {
-        return devTools('appActions').changeSetting(key, value)
-      }, key, value).then((response) => response.value)
+      return this
+        .execute(function (key, value) {
+          return devTools('appActions').changeSetting(key, value)
+        }, key, value).then((response) => response.value)
+        .waitForSettingValue(key, value)
     })
 
     /**
