@@ -326,6 +326,7 @@ WindowStore
     showFullScreenWarning: boolean, // true if a warning should be shown about full screen
     startLoadTime: datetime,
     endtLoadTime: datetime,
+    lastAccessedTime: datetime,
     guestInstanceId: string, // not persisted
     tabId: number, // session tab id not persisted
     closedAtIndex: number, // Index the frame was last closed at, cleared unless the frame is inside of closedFrames
