@@ -94,6 +94,11 @@ function tabPageTemplateInit (framePropsList) {
     click: (item, focusedWindow) => {
       windowActions.muteAllAudio(framePropsList, true)
     }
+  }, {
+    label: locale.translation('closeTabPage'),
+    click: () => {
+      windowActions.closeFrames(framePropsList)
+    }
   }]
 }
 

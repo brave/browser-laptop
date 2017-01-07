@@ -76,6 +76,7 @@ var rendererIdentifiers = function () {
     'closeOtherTabs',
     'closeTabsToRight',
     'closeTabsToLeft',
+    'closeTabPage',
     'bookmarkPage',
     'bookmarkLink',
     'openFile',

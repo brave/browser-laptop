@@ -10,6 +10,7 @@ const appActions = require('../actions/appActions')
 const messages = require('../constants/messages')
 const siteTags = require('../constants/siteTags')
 const siteUtil = require('../state/siteUtil')
+const frameStateUtil = require('../state/frameStateUtil')
 const UrlUtil = require('../lib/urlutil')
 const {currentWindow} = require('../../app/renderer/currentWindow')
 const windowStore = require('../stores/windowStore')
@@ -344,6 +345,33 @@ const windowActions = {
     } else {
       appActions.closeWindow(currentWindow.id)
     }
+  },
+
+  /**
+   * Dispatches a message to close multiple frames
+   * @param {Object[]} framePropsList - The properties of all frames to close
+   */
+  closeFrames: function (framePropsList) {
+    const activeFrameKey = windowStore.getState().get('activeFrameKey')
+    const activeFrame = frameStateUtil.findFrameInList(framePropsList, activeFrameKey)
+
+    if (activeFrame) {
+      const origin = siteUtil.getOrigin(activeFrame.get('location'))
+      if (origin) {
+        appActions.clearMessageBoxes(origin)
+      }
+
+      // If the frame was full screen, exit
+      if (activeFrame && activeFrame.get('isFullScreen')) {
+        this.setFullScreen(activeFrame, false)
+      }
+    }
+
+    dispatch({
+      actionType: windowConstants.WINDOW_CLOSE_FRAMES,
+      framePropsList,
+      activeFrameRemoved: activeFrame
+    })
   },
 
   /**

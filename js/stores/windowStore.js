@@ -368,6 +368,20 @@ const doAction = (action) => {
         })
       }
       break
+    case windowConstants.WINDOW_CLOSE_FRAMES:
+      windowState = windowState.merge(frameStateUtil.removeFrames(
+        windowState.get('frames'),
+        windowState.get('tabs'),
+        windowState.get('closedFrames'),
+        action.framePropsList,
+        action.activeFrameRemoved,
+        windowState.get('activeFrameKey'),
+        getSetting(settings.TAB_CLOSE_ACTION)
+      ))
+
+      updateTabPageIndex(frameStateUtil.getActiveFrame(windowState))
+      windowState = windowState.deleteIn(['ui', 'tabs', 'fixTabWidth'])
+      break
     case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
       windowState = windowState.merge(frameStateUtil.undoCloseFrame(windowState, windowState.get('closedFrames')))
       focusWebview(activeFrameStatePath(windowState))
