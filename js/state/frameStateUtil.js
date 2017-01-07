@@ -4,6 +4,7 @@
 
 const Immutable = require('immutable')
 const config = require('../constants/config')
+const {tabCloseAction} = require('../../app/common/constants/settingsEnums')
 const urlParse = require('../../app/common/urlParse')
 
 const matchFrame = (queryInfo, frame) => {
@@ -186,6 +187,23 @@ function getFramePropsIndex (frames, frameProps) {
 }
 
 /**
+ * Find frame that was accessed last
+ */
+function getFrameByLastAccessedTime (frames) {
+  const frameProps = frames.toJS()
+    .reduce((pre, cur) => {
+      return (cur.pinnedLocation === undefined &&
+        cur.lastAccessedTime &&
+        cur.lastAccessedTime > pre.lastAccessedTime
+      ) ? cur : pre
+    }, {
+      lastAccessedTime: 0
+    })
+
+  return (frameProps.lastAccessedTime === 0) ? -1 : getFramePropsIndex(frames, frameProps)
+}
+
+/**
  * Determines if the specified frame was opened from the specified
  * ancestorFrameKey.
  *
@@ -326,6 +344,7 @@ function addFrame (windowState, tabs, frameOpts, newKey, partitionNumber, active
     loading: !!delayedLoadUrl,
     startLoadTime: delayedLoadUrl ? new Date().getTime() : null,
     endLoadTime: null,
+    lastAccessedTime: (activeFrameKey === newKey) ? new Date().getTime() : null,
     isPrivate: false,
     partitionNumber,
     pinnedLocation: isPinned ? url : undefined,
@@ -389,32 +408,32 @@ function undoCloseFrame (windowState, closedFrames) {
  * Removes a frame specified by frameProps
  * @return Immutable top level application state ready to merge back in
  */
-function removeFrame (frames, tabs, closedFrames, frameProps, activeFrameKey) {
+function removeFrame (frames, tabs, closedFrames, frameProps, activeFrameKey, framePropsIndex, closeAction) {
   function getNewActiveFrame (activeFrameIndex) {
     // Go to the next frame if it exists.
     let index = activeFrameIndex
-    let nextFrame = frames.get(index)
+    let nextFrame = newFrames.get(index)
     do {
       if (nextFrame) {
         if (nextFrame.get('pinnedLocation') === undefined) {
           return nextFrame.get('key')
         }
-        nextFrame = frames.get(++index)
+        nextFrame = newFrames.get(++index)
       }
     } while (nextFrame)
     // Otherwise go to the frame right before the active tab.
     index = activeFrameIndex
     while (index > 0) {
-      const prevFrame = frames.get(--index)
+      const prevFrame = newFrames.get(--index)
       if (prevFrame && prevFrame.get('pinnedLocation') === undefined) {
         return prevFrame.get('key')
       }
     }
     // Fall back on the original logic.
     return Math.max(
-      frames.get(activeFrameIndex)
-      ? frames.get(activeFrameIndex).get('key')
-      : frames.get(activeFrameIndex - 1).get('key'),
+      newFrames.get(activeFrameIndex)
+      ? newFrames.get(activeFrameIndex).get('key')
+      : newFrames.get(activeFrameIndex - 1).get('key'),
     0)
   }
 
@@ -429,24 +448,34 @@ function removeFrame (frames, tabs, closedFrames, frameProps, activeFrameKey) {
     }
   }
 
-  // If the frame being removed IS ACTIVE, then try to replace activeFrameKey with parentFrameKey
-  let isActiveFrameBeingRemoved = frameProps.get('key') === activeFrameKey
-  let parentFrameIndex = findIndexForFrameKey(frames, frameProps.get('parentFrameKey'))
-  let activeFrameIndex
-
-  if (!isActiveFrameBeingRemoved || parentFrameIndex === -1) {
-    activeFrameIndex = findIndexForFrameKey(frames, activeFrameKey)
-  } else {
-    activeFrameIndex = parentFrameIndex
-  }
-
-  const framePropsIndex = getFramePropsIndex(frames, frameProps)
-  frames = frames.splice(framePropsIndex, 1)
-  tabs = tabs.splice(framePropsIndex, 1)
-
+  const newFrames = frames.splice(framePropsIndex, 1)
+  const newTabs = tabs.splice(framePropsIndex, 1)
   let newActiveFrameKey = activeFrameKey
-  if (isActiveFrameBeingRemoved && frames.size > 0) {
-    // Frame with focus was closed; let's find new active NON-PINNED frame.
+
+  // If the frame being removed IS ACTIVE
+  let isActiveFrameBeingRemoved = frameProps.get('key') === activeFrameKey
+  if (isActiveFrameBeingRemoved && newFrames.size > 0) {
+    let activeFrameIndex
+
+    switch (closeAction) {
+      case tabCloseAction.LAST_ACTIVE:
+        const lastActive = getFrameByLastAccessedTime(newFrames)
+        activeFrameIndex = (lastActive > -1) ? lastActive : frames.count() - 1
+        break
+      case tabCloseAction.NEXT:
+        activeFrameIndex = ((frames.count() - 1) === framePropsIndex) ? (framePropsIndex - 1) : framePropsIndex
+        break
+      case tabCloseAction.FIRST:
+        activeFrameIndex = 0
+        break
+      // Default is a parent tab
+      default:
+        let parentFrameIndex = findIndexForFrameKey(frames, frameProps.get('parentFrameKey'))
+        activeFrameIndex = (parentFrameIndex === -1) ? findIndexForFrameKey(frames, activeFrameKey) : parentFrameIndex
+        break
+    }
+
+    // let's find new active NON-PINNED frame.
     newActiveFrameKey = getNewActiveFrame(activeFrameIndex)
   }
 
@@ -454,8 +483,8 @@ function removeFrame (frames, tabs, closedFrames, frameProps, activeFrameKey) {
     previewFrameKey: null,
     activeFrameKey: newActiveFrameKey,
     closedFrames,
-    tabs,
-    frames
+    tabs: newTabs,
+    frames: newFrames
   }
 }
 
