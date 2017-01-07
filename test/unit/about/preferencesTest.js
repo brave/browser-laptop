@@ -5,6 +5,7 @@
 
 const mockery = require('mockery')
 const {mount} = require('enzyme')
+const sinon = require('sinon')
 const assert = require('assert')
 const fakeElectron = require('../lib/fakeElectron')
 let Preferences
@@ -34,9 +35,10 @@ describe('Preferences component', function () {
   describe('loads', function () {
     before(function () {
       this.eventMap = {}
-      window.addEventListener = (event, cb) => {
+      sinon.stub(window, 'addEventListener', (event, cb) => {
         this.eventMap[event] = cb
-      }
+      })
+      window.CustomEvent = {}
       this.result = mount(Preferences)
     })
 

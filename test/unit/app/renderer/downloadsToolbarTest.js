@@ -6,7 +6,6 @@
 const mockery = require('mockery')
 const {mount} = require('enzyme')
 const assert = require('assert')
-const sinon = require('sinon')
 const fakeElectron = require('../../lib/fakeElectron')
 const path = require('path')
 const uuid = require('uuid')
@@ -96,14 +95,9 @@ describe('downloadsBar component', function () {
   describe('very narrow downloads bar with items', function () {
     before(function () {
       // TODO: We can remove this once we're on Khan/aphrodite
-      sinon.stub(window, 'getComputedStyle', () => ({
-        getPropertyValue: function () {
-          return 10
-        }
-      }))
+      mockery.registerMock('../getComputedStyle', () => 10)
       this.result = mount(<DownloadsBar windowWidth={0} downloads={newDownloads()} />)
     })
-
     it('renders no downloads', function () {
       assert.equal(this.result.find(DownloadItem).length, 0)
     })
