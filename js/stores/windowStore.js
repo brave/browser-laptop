@@ -338,9 +338,15 @@ const doAction = (action) => {
       const frameProps = action.frameProps || frameStateUtil.getActiveFrame(windowState)
       const index = frameStateUtil.getFramePropsIndex(windowState.get('frames'), frameProps)
       const activeFrameKey = frameStateUtil.getActiveFrame(windowState).get('key')
-      windowState = windowState.merge(frameStateUtil.removeFrame(windowState.get('frames'), windowState.get('tabs'),
-        windowState.get('closedFrames'), frameProps.set('closedAtIndex', index),
-        activeFrameKey))
+      windowState = windowState.merge(frameStateUtil.removeFrame(
+        windowState.get('frames'),
+        windowState.get('tabs'),
+        windowState.get('closedFrames'),
+        frameProps.set('closedAtIndex', index),
+        activeFrameKey,
+        index,
+        getSetting(settings.TAB_CLOSE_ACTION)
+      ))
       // If we reach the limit of opened tabs per page while closing tabs, switch to
       // the active tab's page otherwise the user will hang on empty page
       let totalOpenTabs = windowState.get('frames').filter((frame) => !frame.get('pinnedLocation')).size
@@ -362,6 +368,9 @@ const doAction = (action) => {
       windowState = windowState.merge({
         activeFrameKey: action.frameProps.get('key'),
         previewFrameKey: null
+      })
+      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+        lastAccessedTime: new Date().getTime()
       })
       windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
       updateTabPageIndex(action.frameProps)

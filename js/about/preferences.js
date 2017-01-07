@@ -24,7 +24,7 @@ const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const coinbaseCountries = require('../constants/coinbaseCountries')
 const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
-const {startsWithOption, newTabMode, bookmarksToolbarMode} = require('../../app/common/constants/settingsEnums')
+const {startsWithOption, newTabMode, bookmarksToolbarMode, tabCloseAction} = require('../../app/common/constants/settingsEnums')
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
 
 const WidevineInfo = require('../../app/renderer/components/widevineInfo')
@@ -856,6 +856,17 @@ class TabsTab extends ImmutableComponent {
               [6, 8, 10, 20].map((x) =>
                 <option value={x} key={x}>{x}</option>)
             }
+          </select>
+        </SettingItem>
+        <SettingItem dataL10nId='tabCloseAction'>
+          <select
+            className='form-control'
+            value={getSetting(settings.TAB_CLOSE_ACTION, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TAB_CLOSE_ACTION)}>
+            <option data-l10n-id='tabCloseActionLastActive' value={tabCloseAction.LAST_ACTIVE} />
+            <option data-l10n-id='tabCloseActionNext' value={tabCloseAction.NEXT} />
+            <option data-l10n-id='tabCloseActionFirst' value={tabCloseAction.FIRST} />
+            <option data-l10n-id='tabCloseActionParent' value={tabCloseAction.PARENT} />
           </select>
         </SettingItem>
         <SettingCheckbox dataL10nId='switchToNewTabs' prefKey={settings.SWITCH_TO_NEW_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
