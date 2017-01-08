@@ -162,17 +162,20 @@ describe('synopsis', function () {
 
   it('can sort synopsis table', function * () {
     var site1 = 'http://web.mit.edu/zyan/Public/wait.html'
-    var site2 = 'http://example.com'
-    var site3 = 'https://eff.org'
+    var site2 = 'http://example.com/'
+    var site3 = 'https://www.eff.org/'
     yield this.app.client
       .url(site1)
       .windowByUrl(Brave.browserWindowUrl)
+      .waitForSiteEntry(site1)
       .tabByUrl(site1)
       .url(site2)
       .windowByUrl(Brave.browserWindowUrl)
+      .waitForSiteEntry(site2)
       .tabByUrl(site2)
       .url(site3)
       .windowByUrl(Brave.browserWindowUrl)
+      .waitForSiteEntry(site3)
       .tabByUrl(site3)
       .loadUrl(prefsUrl)
       .waitForVisible(paymentsTab)
