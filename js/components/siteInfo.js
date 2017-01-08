@@ -52,6 +52,10 @@ class SiteInfo extends ImmutableComponent {
     return this.props.frameProps.getIn(['location'])
   }
   render () {
+    // Figure out the partition info display
+    let l10nArgs = {
+      partitionNumber: this.partitionNumber
+    }
     let secureIcon
     if (this.isSecure && !this.runInsecureContent) {
       secureIcon = <li><span
@@ -64,11 +68,6 @@ class SiteInfo extends ImmutableComponent {
       secureIcon = <li><span className='fa fa-unlock' /><span data-l10n-id='mixedConnection' /></li>
     } else {
       secureIcon = <li><span className='fa fa-unlock' /><span data-l10n-id='insecureConnection' data-l10n-args={JSON.stringify(l10nArgs)} /></li>
-    }
-
-    // Figure out the partition info display
-    let l10nArgs = {
-      partitionNumber: this.partitionNumber
     }
 
     let partitionInfo
