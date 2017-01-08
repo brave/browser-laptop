@@ -319,16 +319,12 @@ describe('tab tests', function () {
         .waitForExist(activeTabFavicon)
     })
 
-    it('about:newtab and about:blank shouldn\'t have a tab icon', function * () {
+    it('about:newtab shouldn\'t have a tab icon', function * () {
       yield this.app.client
-        .tabByIndex(0)
-        .loadUrl('about:blank')
-        .windowByUrl('about:blank')
-        .waitForExist(activeTabFavicon, 1000, true)
         .tabByIndex(0)
         .loadUrl('about:newtab')
         .windowByUrl('about:newtab')
-        .waitForExist(activeTabFavicon, 1000, true)
+        .waitForElementCount(activeTabFavicon, 0)
     })
   })
 
