@@ -588,19 +588,31 @@ class Frame extends ImmutableComponent {
 
   addEventListeners () {
     this.webview.addEventListener('content-blocked', (e) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       if (e.details[0] === 'javascript' && e.details[1]) {
         windowActions.setBlockedBy(this.frame, 'noScript', e.details[1])
       }
     })
     this.webview.addEventListener('did-block-run-insecure-content', (e) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       windowActions.setBlockedRunInsecureContent(this.frame, e.details[0])
     })
     this.webview.addEventListener('enable-pepper-menu', (e) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       contextMenus.onFlashContextMenu(e.params, this.frame)
       e.preventDefault()
       e.stopPropagation()
     })
     this.webview.addEventListener('context-menu', (e) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       contextMenus.onMainContextMenu(e.params, this.frame)
       e.preventDefault()
       e.stopPropagation()
@@ -616,6 +628,9 @@ class Frame extends ImmutableComponent {
       windowActions.setLinkHoverPreview(e.url, showOnRight)
     })
     this.webview.addEventListener('set-active', (e) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       if (e.active && currentWindow.isFocused()) {
         windowActions.setFocusedFrame(this.frame)
       }
@@ -631,18 +646,30 @@ class Frame extends ImmutableComponent {
       currentWindow.webContents.send(messages.DISABLE_SWIPE_GESTURE)
     })
     this.webview.addEventListener('did-attach', (e) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       let tabId = this.webview.getId()
       if (this.props.tabId !== tabId) {
         windowActions.setFrameTabId(this.frame, tabId)
       }
     })
     this.webview.addEventListener('destroyed', (e) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       this.props.onCloseFrame(this.frame)
     })
     this.webview.addEventListener('close', () => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       this.props.onCloseFrame(this.frame)
     })
     this.webview.addEventListener('page-favicon-updated', (e) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       if (e.favicons && e.favicons.length > 0) {
         imageUtil.getWorkingImageUrl(e.favicons[0], (imageFound) => {
           windowActions.setFavicon(this.frame, imageFound ? e.favicons[0] : null)
@@ -650,12 +677,18 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('page-title-updated', ({title}) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       windowActions.setFrameTitle(this.frame, title)
     })
     this.webview.addEventListener('show-autofill-settings', (e) => {
       windowActions.newFrame({ location: 'about:autofill' }, true)
     })
     this.webview.addEventListener('show-autofill-popup', (e) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       contextMenus.onShowAutofillMenu(e.suggestions, e.rect, this.frame)
     })
     this.webview.addEventListener('hide-autofill-popup', (e) => {
@@ -670,16 +703,25 @@ class Frame extends ImmutableComponent {
           this.updateAboutDetails()
           break
         case messages.GOT_CANVAS_FINGERPRINTING:
+          if (this.frame.isEmpty()) {
+            return
+          }
           method = (detail) => {
             const description = [detail.type, detail.scriptUrl || this.props.provisionalLocation].join(': ')
             windowActions.setBlockedBy(this.frame, 'fingerprintingProtection', description)
           }
           break
         case messages.THEME_COLOR_COMPUTED:
+          if (this.frame.isEmpty()) {
+            return
+          }
           method = (computedThemeColor) =>
             windowActions.setThemeColor(this.frame, undefined, computedThemeColor || null)
           break
         case messages.CONTEXT_MENU_OPENED:
+          if (this.frame.isEmpty()) {
+            return
+          }
           method = (nodeProps, contextMenuType) => {
             contextMenus.onMainContextMenu(nodeProps, this.frame, contextMenuType)
           }
@@ -719,6 +761,9 @@ class Frame extends ImmutableComponent {
     })
 
     const loadStart = (e) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       if (e.isMainFrame && !e.isErrorPage && !e.isFrameSrcDoc) {
         windowActions.onWebviewLoadStart(this.frame, e.url)
         // Clear security state
@@ -731,6 +776,9 @@ class Frame extends ImmutableComponent {
     }
 
     const loadEnd = (savePage) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       windowActions.onWebviewLoadEnd(
         this.frame,
         this.webview.getURL())
@@ -764,6 +812,9 @@ class Frame extends ImmutableComponent {
     }
 
     const loadFail = (e, provisionLoadFailure = false) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       if (isFrameError(e.errorCode)) {
         // temporary workaround for https://github.com/brave/browser-laptop/issues/1817
         if (e.validatedURL === aboutUrls.get('about:newtab') ||
@@ -794,6 +845,9 @@ class Frame extends ImmutableComponent {
       }
     }
     this.webview.addEventListener('security-style-changed', (e) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       let isSecure = null
       let runInsecureContent = this.runInsecureContent()
       // 'warning' and 'passive mixed content' should never upgrade the
@@ -835,7 +889,9 @@ class Frame extends ImmutableComponent {
       if (this.props.isActive && !isNewTabPage && document.activeElement !== this.webview) {
         this.webview.focus()
       }
-      windowActions.setNavigated(e.url, this.props.frameKey, false, this.frame.get('tabId'))
+      if (!this.frame.isEmpty()) {
+        windowActions.setNavigated(e.url, this.props.frameKey, false, this.frame.get('tabId'))
+      }
       // force temporary url display for tabnapping protection
       windowActions.setMouseInTitlebar(true)
 
@@ -843,10 +899,15 @@ class Frame extends ImmutableComponent {
       if (!e.isRendererInitiated) {
         let index = this.webview.getCurrentEntryIndex()
         let title = this.webview.getTitleAtIndex(index)
-        windowActions.setFrameTitle(this.frame, title)
+        if (!this.frame.isEmpty()) {
+          windowActions.setFrameTitle(this.frame, title)
+        }
       }
     })
     this.webview.addEventListener('crashed', (e) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       windowActions.setFrameError(this.frame, {
         event_type: 'crashed',
         title: 'unexpectedError',
@@ -874,26 +935,44 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('did-navigate-in-page', (e) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       if (e.isMainFrame) {
         windowActions.setNavigated(e.url, this.props.frameKey, true, this.frame.get('tabId'))
         loadEnd(true)
       }
     })
     this.webview.addEventListener('enter-html-full-screen', () => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       windowActions.setFullScreen(this.frame, true, true)
       // disable the fullscreen warning after 5 seconds
       setTimeout(windowActions.setFullScreen.bind(this, this.frame, undefined, false), 5000)
     })
     this.webview.addEventListener('leave-html-full-screen', () => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       windowActions.setFullScreen(this.frame, false)
     })
     this.webview.addEventListener('media-started-playing', ({title}) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       windowActions.setAudioPlaybackActive(this.frame, true)
     })
     this.webview.addEventListener('media-paused', ({title}) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       windowActions.setAudioPlaybackActive(this.frame, false)
     })
     this.webview.addEventListener('did-change-theme-color', ({themeColor}) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       // Due to a bug in Electron, after navigating to a page with a theme color
       // to a page without a theme color, the background is sent to us as black
       // even know there is no background. To work around this we just ignore
@@ -901,6 +980,9 @@ class Frame extends ImmutableComponent {
       windowActions.setThemeColor(this.frame, themeColor !== '#000000' ? themeColor : null)
     })
     this.webview.addEventListener('found-in-page', (e) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       if (e.result !== undefined && (e.result.matches !== undefined || e.result.activeMatchOrdinal !== undefined)) {
         if (e.result.matches === 0) {
           windowActions.setFindDetail(this.frame, Immutable.fromJS({
@@ -916,6 +998,9 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('did-get-response-details', (details) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
       windowActions.gotResponseDetails(this.frame.get('tabId'), details)
     })
     // Handle zoom using Ctrl/Cmd and the mouse wheel.
@@ -982,7 +1067,9 @@ class Frame extends ImmutableComponent {
   }
 
   onFocus () {
-    windowActions.setTabPageIndexByFrame(this.frame)
+    if (!this.frame.isEmpty()) {
+      windowActions.setTabPageIndexByFrame(this.frame)
+    }
 
     // Make sure urlBar focused state is updated so that on tab
     // changes the focus state doesn't go back to the urlBar
