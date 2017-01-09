@@ -1,28 +1,23 @@
-language: node_js
-node_js:
-  - "6.1"
+language: generic
 dist: trusty
 sudo: required
 before_install:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
   - openssl aes-256-cbc -K $encrypted_1366e420413c_key -iv $encrypted_1366e420413c_iv -in gpg_key.enc -out gpg_key -d
   - gpg --allow-secret-key-import --import gpg_key
   - pip install --user awscli
   - export PATH=$PATH:$HOME/.local/bin
+  - nvm install stable; nvm use stable
 # install aptly
   - echo 'deb http://repo.aptly.info/ squeeze main' | sudo tee -a /etc/apt/sources.list
   - sudo apt-key adv --keyserver keys.gnupg.net --recv-keys 9E3E53F19C7DE460
   - sudo apt-get update -qq
-  - sudo apt-get install -y --force-yes aptly
-  - aws s3 ls brave-apt-staging
+  - sudo apt-get install -y --force-yes aptly xvfb
 script:
-  - npm run lint
-  - npm test
-after_success:
   - npm install
+  - xvfb-run npm run lint
+  - xvfb-run npm test
+after_success:
   - CHANNEL=dev npm run build-package
-  - echo 123 | gpg --passphrase $PASSPHRASE -s
   - npm run build-installer
   - bash tools/upload_to_aptly
   - bash tools/upload_to_rpm_repo
