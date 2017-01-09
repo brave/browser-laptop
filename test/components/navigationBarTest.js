@@ -486,7 +486,7 @@ describe('navigationBar tests', function () {
         )
     })
     it('shows insecure icon on a site with a sha-1 cert', function * () {
-      const page1Url = 'https://very.badssl.com/'
+      const page1Url = 'https://sha1-2017.badssl.com/'
       yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
       yield this.app.client
         .moveToObject(navigator)
