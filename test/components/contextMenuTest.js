@@ -124,5 +124,32 @@ describe('ContextMenu', function () {
         .tabByUrl(this.formfill)
         .getValue(this.input).should.eventually.be.equal(this.values[3])
     })
+
+    it('check left/right on non sub menu item', function *() {
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(this.formfill)
+        .waitForVisible('<form>')
+        .click(this.input)
+        .windowByUrl(Brave.browserWindowUrl)
+        .keys('\uE015')
+        .waitForVisible('.contextMenu')
+        .keys('\uE012') // left
+        .pause(10)
+        .keys('\uE014') // right
+        .pause(10)
+        .keys('\uE014') // right
+        .pause(10)
+        .keys('\uE012') // left
+        .pause(10)
+        .keys('\uE015')
+        .pause(10)
+        .keys('\uE015')
+        .pause(10)
+        .keys('\uE007')
+        .pause(10)
+        .tabByUrl(this.formfill)
+        .getValue(this.input).should.eventually.be.equal(this.values[2])
+    })
   })
 })
