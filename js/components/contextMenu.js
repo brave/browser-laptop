@@ -391,7 +391,7 @@ class ContextMenu extends ImmutableComponent {
   }
 
   get hasSubmenuSelection () {
-    return this.props.selectedIndex.length > 1
+    return (this.props.selectedIndex === null) ? false : this.props.selectedIndex.length > 1
   }
 
   render () {
