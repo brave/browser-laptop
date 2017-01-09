@@ -232,7 +232,7 @@ module.exports.onSyncReady = (isFirstRun, e) => {
         return createSiteSettingsData(item, siteSettings[item])
       }))
   }
-  ipcMain.on(messages.RECEIVE_SYNC_RECORDS, (event, categoryName, records) => {
+  ipcMain.on(messages.GET_EXISTING_OBJECTS, (event, categoryName, records) => {
     if (categoryNames.includes(categoryName) || !records || !records.length) {
       return
     }
