@@ -20,7 +20,7 @@ body {
   background: #fff;
 }
 
-body, .dynamicBackground, bgGradient {
+bgGradient {
   opacity: 0;
   animation: fadeIn 200ms;
   animation-fill-mode: forwards;
@@ -45,13 +45,27 @@ ul {
 }
 
 .dynamicBackground {
+  display: flex;
+  flex: 1;
+  background-color: #000;
+}
+
+.backgroundContainer {
   background-position: top center;
   background-repeat: no-repeat;
   background-size: cover;
-  display: flex;
-  flex: 1;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
   > img {
     display: none;
+  }
+  &.backgroundLoaded {
+    animation: fadeIn 200ms;
+    animation-fill-mode: forwards;
   }
 }
 

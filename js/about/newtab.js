@@ -32,6 +32,7 @@ class NewTabPage extends React.Component {
     this.state = {
       showSiteRemovalNotification: false,
       imageLoadFailed: false,
+      imageLoadCompleted: false,
       updatedStamp: undefined,
       showEmptyPage: true,
       showImages: false,
@@ -61,6 +62,7 @@ class NewTabPage extends React.Component {
       })
     })
   }
+
   get showImages () {
     return this.state.showImages && !!this.state.backgroundImage
   }
@@ -227,6 +229,21 @@ class NewTabPage extends React.Component {
         : this.fallbackImage
     })
   }
+  /**
+   * Displays background image once it loads
+   */
+  onImageLoadCompleted () {
+    this.setState({
+      imageLoadCompleted: true
+    })
+  }
+  /**
+   * Helper for background className
+   */
+  get backgroundClassName () {
+    return 'backgroundContainer' +
+      (this.state.imageLoadCompleted ? ' backgroundLoaded' : '')
+  }
 
   render () {
     // don't render if user prefers an empty page
@@ -249,12 +266,17 @@ class NewTabPage extends React.Component {
       backgroundProps.style = this.state.backgroundImage.style
       gradientClassName = 'bgGradient'
     }
-    return <div className='dynamicBackground' {...backgroundProps}>
-      {
-        this.showImages
-          ? <img src={this.state.backgroundImage.source} onError={this.onImageLoadFailed.bind(this)} data-test-id='backgroundImage' />
-          : null
-      }
+    return <div className='dynamicBackground'>
+      <div className={this.backgroundClassName} {...backgroundProps}>
+        {
+          this.showImages
+            ? <img src={this.state.backgroundImage.source}
+              onLoad={this.onImageLoadCompleted.bind(this)}
+              onError={this.onImageLoadFailed.bind(this)}
+              data-test-id='backgroundImage' />
+            : null
+        }
+      </div>
       <div className={gradientClassName} />
       <div className='content'>
         <main>
