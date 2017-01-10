@@ -1,7 +1,7 @@
 /* globals devTools */
 var Application = require('spectron').Application
 var chai = require('chai')
-const {activeWebview, titleBar} = require('./selectors')
+const {activeWebview, navigator, titleBar} = require('./selectors')
 require('./coMocha')
 
 const path = require('path')
@@ -353,6 +353,17 @@ var exports = {
       return this.execute(function () {
         return devTools('electron').testData.windowActions.setContextMenuDetail()
       })
+    })
+
+    this.app.client.addCommand('setInputText', function (selector, input) {
+      this
+        .moveToObject(navigator)
+        .setValue(selector, input)
+        .waitUntil(function () {
+          return this.getValue(selector).then(function (val) {
+            return val === input
+          })
+        })
     })
 
     this.app.client.addCommand('showFindbar', function (show, key = 1) {
