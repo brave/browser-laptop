@@ -10,6 +10,7 @@ const AppDispatcher = require('../dispatcher/appDispatcher')
 const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
 const siteUtil = require('../state/siteUtil')
+const syncUtil = require('../state/syncUtil')
 const siteSettings = require('../state/siteSettings')
 const appUrlUtil = require('../lib/appUrlUtil')
 const electron = require('electron')
@@ -511,9 +512,11 @@ const handleAppAction = (action) => {
       appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent, false))
       break
     case appConstants.APP_CLEAR_HISTORY:
-      appState = appState.set('sites', siteUtil.clearHistory(appState.get('sites')))
+      appState = appState.set('sites',
+        siteUtil.clearHistory(appState.get('sites'), syncActions.updateSite))
       appState = aboutNewTabState.setSites(appState, action)
       appState = aboutHistoryState.setHistory(appState, action)
+      syncActions.clearHistory()
       break
     case appConstants.APP_DEFAULT_WINDOW_PARAMS_CHANGED:
       if (action.size && action.size.size === 2) {
@@ -590,8 +593,13 @@ const handleAppAction = (action) => {
     case appConstants.APP_CHANGE_SITE_SETTING:
       {
         let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
-        appState = appState.set(propertyName,
-          siteSettings.mergeSiteSetting(appState.get(propertyName), action.hostPattern, action.key, action.value))
+        let newSiteSettings = siteSettings.mergeSiteSetting(appState.get(propertyName), action.hostPattern, action.key, action.value)
+        if (!action.temporary) {
+          let syncObject = syncUtil.setObjectId(newSiteSettings.get(action.hostPattern))
+          syncActions.updateSiteSetting(action.hostPattern, syncObject)
+          newSiteSettings = newSiteSettings.set(action.hostPattern, syncObject)
+        }
+        appState = appState.set(propertyName, newSiteSettings)
         break
       }
     case appConstants.APP_REMOVE_SITE_SETTING:
@@ -599,6 +607,11 @@ const handleAppAction = (action) => {
         let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
         let newSiteSettings = siteSettings.removeSiteSetting(appState.get(propertyName),
           action.hostPattern, action.key)
+        if (!action.temporary) {
+          let syncObject = syncUtil.setObjectId(newSiteSettings.get(action.hostPattern))
+          syncActions.updateSiteSetting(action.hostPattern, syncObject)
+          newSiteSettings = newSiteSettings.set(action.hostPattern, syncObject)
+        }
         appState = appState.set(propertyName, newSiteSettings)
         break
       }
@@ -607,7 +620,11 @@ const handleAppAction = (action) => {
         let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
         let newSiteSettings = new Immutable.Map()
         appState.get(propertyName).map((entry, hostPattern) => {
-          newSiteSettings = newSiteSettings.set(hostPattern, entry.delete(action.key))
+          let newEntry = entry.delete(action.key)
+          newSiteSettings = newSiteSettings.set(hostPattern, newEntry)
+          if (entry.get('objectId')) {
+            syncActions.updateSiteSetting(hostPattern, newEntry)
+          }
         })
         appState = appState.set(propertyName, newSiteSettings)
         break
@@ -719,6 +736,7 @@ const handleAppAction = (action) => {
       if (action.clearDataDetail.get('savedSiteSettings')) {
         appState = appState.set('siteSettings', Immutable.Map())
         appState = appState.set('temporarySiteSettings', Immutable.Map())
+        syncActions.clearSiteSettings()
       }
       break
     case appConstants.APP_IMPORT_BROWSER_DATA:

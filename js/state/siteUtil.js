@@ -534,12 +534,16 @@ module.exports.filterSitesRelativeTo = function (sites, relSite) {
  * - filtering out entries which have no tags
  * - setting lastAccessedTime to null for remaining entries (bookmarks)
  * @param sites The application state's Immutable sites list.
+ * @param {function} syncCallback
  */
-module.exports.clearHistory = function (sites) {
+module.exports.clearHistory = function (sites, syncCallback) {
   let bookmarks = sites.filter((site) => site.get('tags') && site.get('tags').size > 0)
   bookmarks.forEach((site, index) => {
     if (site.get('lastAccessedTime')) {
       bookmarks = bookmarks.setIn([index, 'lastAccessedTime'], null)
+      if (syncCallback && site.get('objectId')) {
+        syncCallback(site.set('lastAccessedTime', null))
+      }
     }
   })
   return bookmarks
