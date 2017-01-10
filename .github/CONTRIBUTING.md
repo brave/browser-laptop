@@ -40,7 +40,9 @@ Feel free to tag a Brave employee in the pull request to assign them to review y
 ### Employees should
 
 * Assign the issue being fixed to a milestone.
-* Ensure another employee is tagged in the PR to review the code, via the `Auditor: @username` syntax.
+* Ensure the owner is tagged using the `Assignees` field
+* Ensure at least one other employee or contributor is tagged using the `Reviewers` field
+* Ensure the PR is approved before merging (see [`Reviewer guidelines`](https://github.com/brave/browser-laptop/wiki/Reviewer-guideline) for more information)
 * Flag issues with `qa-steps-specified` if there are special things to test at the issue level. In particular you should always specify this if there’s an upgrade of the session store file.  It’s a signal to QA to make sure they pay extra special attention to this task.
 
 ### Considerations before submitting a pull request
