@@ -206,8 +206,8 @@ const aboutActions = {
     })
   },
 
-  clearBrowsingDataNow: function (clearBrowsingDataDetail) {
-    ipc.sendToHost(messages.CLEAR_BROWSING_DATA_NOW, clearBrowsingDataDetail)
+  clearBrowsingDataNow: function () {
+    ipc.sendToHost(messages.CLEAR_BROWSING_DATA_NOW)
   },
 
   importBrowserDataNow: function () {

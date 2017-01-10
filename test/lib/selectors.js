@@ -52,6 +52,7 @@ module.exports = {
   reloadButton: '.reloadButton',
   clearBrowsingDataPanel: '.clearBrowsingDataPanel',
   clearBrowsingDataButton: '.clearBrowsingDataButton',
+  clearDataButton: '.clearDataButton',
   securityTab: '[data-l10n-id="security"]',
   paymentsTab: '[data-l10n-id="payments"]',
   doneButton: '[data-l10n-id="done"]',
