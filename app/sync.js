@@ -6,7 +6,6 @@
 
 const Immutable = require('immutable')
 const electron = require('electron')
-const crypto = require('crypto')
 const ipcMain = electron.ipcMain
 const messages = require('../js/constants/sync/messages')
 const categories = require('../js/constants/sync/proto').categories
@@ -16,6 +15,7 @@ const appActions = require('../js/actions/appActions')
 const syncConstants = require('../js/constants/syncConstants')
 const appDispatcher = require('../js/dispatcher/appDispatcher')
 const AppStore = require('../js/stores/appStore')
+const syncUtil = require('../js/state/syncUtil')
 
 const categoryNames = Object.keys(categories)
 const categoryMap = {
@@ -27,13 +27,6 @@ const categoryMap = {
 
 let deviceId = null /** @type {Array|null} */
 let pollIntervalId = null
-
-/**
- * Gets current time in seconds
- */
-const now = () => {
-  return Math.floor(Date.now() / 1000)
-}
 
 /**
  * Sends sync records of the same category to the sync server.
@@ -62,120 +55,6 @@ const sendSyncRecords = (sender, action, data) => {
   }))
 }
 
-/**
- * Sets a new object ID for an existing object in appState
- * @param {Array.<string>} objectPath - Path to get to the object from appState root,
- *   for use with Immutable.setIn
- * @returns {Array.<number>}
- */
-const newObjectId = (objectPath) => {
-  const objectId = new Immutable.List(crypto.randomBytes(16))
-  appActions.setObjectId(objectId, objectPath)
-  return objectId.toJS()
-}
-
-/**
- * Checks whether a site is a bookmark or a bookmark folder
- * @param {Object} site
- * @returns {boolean}
- */
-const isBookmark = (site) => {
-  return (site.tags &&
-    (site.tags.includes('bookmark') || site.tags.includes('bookmark-folder')))
-}
-
-/**
- * Converts a site object into input for sendSyncRecords
- * @param {Object} site
- * @param {number=} siteIndex
- * @returns {{name: string, value: object, objectId: Array.<number>}}
- */
-const createSiteData = (site, siteIndex) => {
-  const siteData = {
-    location: '',
-    title: '',
-    customTitle: '',
-    lastAccessedTime: 0,
-    creationTime: 0
-  }
-  for (let field in site) {
-    if (field in siteData) {
-      siteData[field] = site[field]
-    }
-  }
-  if (isBookmark(site)) {
-    if (!site.objectId && typeof siteIndex !== 'number') {
-      throw new Error('Missing bookmark objectId.')
-    }
-    return {
-      name: 'bookmark',
-      objectId: site.objectId || newObjectId(['sites', siteIndex]),
-      value: {
-        site: siteData,
-        isFolder: site.tags.includes('bookmark-folder'),
-        folderId: site.folderId || 0,
-        parentFolderId: site.parentFolderId || 0
-      }
-    }
-  } else if (!site.tags || !site.tags.length) {
-    if (!site.objectId && typeof siteIndex !== 'number') {
-      throw new Error('Missing historySite objectId.')
-    }
-    return {
-      name: 'historySite',
-      objectId: site.objectId || newObjectId(['sites', siteIndex]),
-      value: siteData
-    }
-  }
-}
-
-/**
- * Converts a site settings object into input for sendSyncRecords
- * @param {string} hostPattern
- * @param {Object} setting
- * @returns {{name: string, value: object, objectId: Array.<number>}}
- */
-const createSiteSettingsData = (hostPattern, setting) => {
-  const adControlEnum = {
-    showBraveAds: 0,
-    blockAds: 1,
-    allowAdsAndTracking: 2
-  }
-  const cookieControlEnum = {
-    block3rdPartyCookie: 0,
-    allowAllCookies: 1
-  }
-  const value = {
-    hostPattern: hostPattern || '',
-    zoomLevel: 0,
-    shieldsUp: true,
-    adControl: 1,
-    cookieControl: 0,
-    safeBrowsing: true,
-    noScript: false,
-    httpsEverywhere: true,
-    fingerprintingProtection: false,
-    ledgerPayments: true,
-    ledgerPaymentsShown: true
-  }
-
-  for (let field in setting) {
-    if (field === 'adControl') {
-      value.adControl = adControlEnum[setting.adControl]
-    } else if (field === 'cookieControl') {
-      value.cookieControl = cookieControlEnum[setting.cookieControl]
-    } else if (field in value) {
-      value[field] = setting[field]
-    }
-  }
-
-  return {
-    name: 'siteSetting',
-    objectId: setting.objectId || newObjectId(['siteSettings', hostPattern]),
-    value
-  }
-}
-
 const doAction = (sender, action) => {
   if (!action.item || !action.item.toJS) {
     return
@@ -187,13 +66,40 @@ const doAction = (sender, action) => {
   }
   switch (action.actionType) {
     case syncConstants.SYNC_ADD_SITE:
-      sendSyncRecords(sender, writeActions.CREATE, [createSiteData(action.item.toJS())])
+      sendSyncRecords(sender, writeActions.CREATE,
+        [syncUtil.createSiteData(action.item.toJS())])
       break
     case syncConstants.SYNC_UPDATE_SITE:
-      sendSyncRecords(sender, writeActions.UPDATE, [createSiteData(action.item.toJS())])
+      sendSyncRecords(sender, writeActions.UPDATE,
+        [syncUtil.createSiteData(action.item.toJS())])
       break
     case syncConstants.SYNC_REMOVE_SITE:
-      sendSyncRecords(sender, writeActions.DELETE, [createSiteData(action.item.toJS())])
+      sendSyncRecords(sender, writeActions.DELETE,
+        [syncUtil.createSiteData(action.item.toJS())])
+      break
+    case syncConstants.SYNC_CLEAR_HISTORY:
+      sender.send(messages.DELETE_SYNC_CATEGORY, categoryMap.historySite)
+      break
+    case syncConstants.SYNC_ADD_SITE_SETTING:
+      if (syncUtil.isSyncable('siteSetting', action.item)) {
+        sendSyncRecords(sender, writeActions.CREATE,
+          [syncUtil.createSiteSettingsData(action.hostPattern, action.item.toJS())])
+      }
+      break
+    case syncConstants.SYNC_UPDATE_SITE_SETTING:
+      if (syncUtil.isSyncable('siteSetting', action.item)) {
+        sendSyncRecords(sender, writeActions.UPDATE,
+          [syncUtil.createSiteSettingsData(action.hostPattern, action.item.toJS())])
+      }
+      break
+    case syncConstants.SYNC_REMOVE_SITE_SETTING:
+      sendSyncRecords(sender, writeActions.DELETE,
+        [syncUtil.createSiteSettingsData(action.hostPattern, action.item.toJS())])
+      break
+    case syncConstants.SYNC_CLEAR_SITE_SETTINGS:
+      sender.send(messages.DELETE_SYNC_SITE_SETTINGS)
+      // TODO: sync-client should listen for this message and delete
+      // all existing synced site settings
       break
     default:
   }
@@ -210,7 +116,7 @@ module.exports.onSyncReady = (isFirstRun, e) => {
     // Sync the device id for this device
     sendSyncRecords(e.sender, writeActions.CREATE, [{
       name: 'device',
-      objectId: newObjectId(['sync']),
+      objectId: syncUtil.newObjectId(['sync']),
       value: {
         name: 'browser-laptop' // todo: support user-chosen names
       }
@@ -218,18 +124,22 @@ module.exports.onSyncReady = (isFirstRun, e) => {
   }
   // Sync bookmarks that have not been synced yet
   const appState = AppStore.getState()
-  const sites = appState.get('sites').toJS() || []
+  const sites = appState.get('sites') || new Immutable.List()
   sites.forEach((site, i) => {
-    if (site && !site.objectId && isBookmark(site)) {
-      sendSyncRecords(e.sender, writeActions.CREATE, [createSiteData(site, i)])
+    if (site && !site.get('objectId') && syncUtil.isSyncable('bookmark', site)) {
+      sendSyncRecords(e.sender, writeActions.CREATE,
+        [syncUtil.createSiteData(site.toJS(), i)])
     }
   })
   // Sync site settings in case they changed while sync was disabled
-  const siteSettings = appState.get('siteSettings').toJS()
+  const siteSettings =
+    appState.get('siteSettings').filter((value, key) => {
+      return syncUtil.isSyncable('siteSetting', value)
+    }).toJS()
   if (siteSettings) {
     sendSyncRecords(e.sender, writeActions.UPDATE,
       Object.keys(siteSettings).map((item) => {
-        return createSiteSettingsData(item, siteSettings[item])
+        return syncUtil.createSiteSettingsData(item, siteSettings[item])
       }))
   }
   ipcMain.on(messages.GET_EXISTING_OBJECTS, (event, categoryName, records) => {
@@ -243,7 +153,7 @@ module.exports.onSyncReady = (isFirstRun, e) => {
   let startAt = appState.getIn(['sync', 'lastFetchTimestamp']) || 0
   const poll = () => {
     e.sender.send(messages.FETCH_SYNC_RECORDS, categoryNames, startAt)
-    startAt = now()
+    startAt = syncUtil.now()
     appActions.saveSyncInitData(null, null, startAt)
   }
   poll()
