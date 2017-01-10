@@ -486,12 +486,13 @@ const handleAppAction = (action) => {
       break
     case appConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size
+      const addSiteSyncCallback = action.skipSync ? undefined : syncActions.updateSite
       if (action.siteDetail.constructor === Immutable.List) {
         action.siteDetail.forEach((s) => {
-          appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), s, action.tag, undefined, syncActions.updateSite))
+          appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), s, action.tag, undefined, addSiteSyncCallback))
         })
       } else {
-        appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), action.siteDetail, action.tag, action.originalSiteDetail, syncActions.updateSite))
+        appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), action.siteDetail, action.tag, action.originalSiteDetail, addSiteSyncCallback))
       }
       if (action.destinationDetail) {
         appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.siteDetail, action.destinationDetail, false, false, true))
@@ -504,12 +505,13 @@ const handleAppAction = (action) => {
       appState = aboutHistoryState.setHistory(appState, action)
       break
     case appConstants.APP_REMOVE_SITE:
-      appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag, syncActions.removeSite))
+      const removeSiteSyncCallback = action.skipSync ? undefined : syncActions.removeSite
+      appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag, removeSiteSyncCallback))
       appState = aboutNewTabState.setSites(appState, action)
       appState = aboutHistoryState.setHistory(appState, action)
       break
     case appConstants.APP_MOVE_SITE:
-      appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent, false))
+      appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent, false, syncActions.updateSite))
       break
     case appConstants.APP_CLEAR_HISTORY:
       appState = appState.set('sites',
