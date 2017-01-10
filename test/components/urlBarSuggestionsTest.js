@@ -136,12 +136,13 @@ describe('urlBarSuggestions', function () {
       })
   })
 
-  it('selection is not reset', function * () {
+  it('selection is not reset when pressing non-input key', function * () {
     const pagePartialUrl = Brave.server.url('page')
     yield this.app.client
       .setInputText(urlInput, pagePartialUrl)
       .waitForVisible(urlBarSuggestions)
       .keys(Brave.keys.DOWN)
+      .waitForInputText(urlInput, this.page1Url)
       .keys(Brave.keys.CONTROL)
       .keys(Brave.keys.CONTROL)
       .waitForSelectedText('1.html')
