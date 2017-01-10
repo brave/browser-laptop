@@ -290,9 +290,10 @@ module.exports.isMoveAllowed = (sites, sourceDetail, destinationDetail) => {
  * @param prepend Whether the destination detail should be prepended or not, not used if destinationIsParent is true
  * @param destinationIsParent Whether the item should be moved inside of the destinationDetail.
  * @param disallowReparent If set to true, parent folder will not be set
+ * @param {Function=} syncCallback
  * @return The new sites Immutable object
  */
-module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prepend, destinationIsParent, disallowReparent) {
+module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prepend, destinationIsParent, disallowReparent, syncCallback) {
   if (!module.exports.isMoveAllowed(sites, sourceDetail, destinationDetail)) {
     return sites
   }
@@ -323,6 +324,9 @@ module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prep
     } else if (destinationSite.get('parentFolderId') !== sourceSite.get('parentFolderId')) {
       sourceSite = sourceSite.set('parentFolderId', destinationSite.get('parentFolderId'))
     }
+  }
+  if (syncCallback) {
+    syncCallback(sourceSite)
   }
   return sites.splice(newIndex, 0, sourceSite)
 }
