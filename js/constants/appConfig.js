@@ -153,6 +153,7 @@ module.exports = {
     'advanced.smooth-scroll-enabled': false,
     'advanced.send-crash-reports': true,
     'advanced.send-usage-statistics': false,
+    'advanced.hide-excluded-sites': false,
     'advanced.minimum-visit-time': 8,
     'advanced.minimum-visits': 5,
     'advanced.minimum-percentage': false,

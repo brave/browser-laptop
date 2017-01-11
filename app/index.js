@@ -676,11 +676,9 @@ app.on('ready', () => {
           ],
           options: {
             persist: false,
-            frameOrigin: origin,
             advancedText: locale.translation('notificationPasswordSettings'),
             advancedLink: 'about:passwords'
           },
-          frameOrigin: origin,
           message
         })
       }
