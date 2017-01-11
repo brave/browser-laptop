@@ -1,22 +1,58 @@
 @import "variables.less";
 
+@inputSelectPadding: 0.4em;
+
 input,
 select {
+  color: @darkGray;
+  font-size: 14.5px;
   box-sizing: border-box;
+  border-radius: @borderRadius;
+  outline: none;
+  padding: @inputSelectPadding;
+  height: 2rem;
+
+  &.form-control {
+    display: block;
+    background-color: #fff;
+  }
+}
+
+select {
+  box-shadow: @selectBoxShadow;
+  border: solid 1px @lightGray;
+  background: url('../app/extensions/brave/img/caret_down_grey.svg') calc(~'100% - @{inputSelectPadding}') 50% / contain no-repeat;
+  background-color: #fefefe;
+  -webkit-appearance: none;
+
+  &.form-control {
+    background-size: 12px 12px;
+  }
+}
+
+input {
+  box-shadow: @inputBoxShadow;
+  border: solid 1px @black20;
+
+  &:not([readonly]):focus {
+    outline-offset: -4px;
+    outline-color: -webkit-focus-ring-color;
+    outline-width: 1px;
+    outline-style: solid;
+  }
 }
 
 .form-control {
-  display: block;
-  background: white;
-  border: solid 1px @lightGray;
-  border-radius: @borderRadius;
-  box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-  box-sizing: border-box;
-  color: @darkGray;
-  font-size: 14.5px;
-  height: 2.25em;
-  padding: 0.4em;
   width: 100%;
+}
+
+.prefBody {
+  input:not([type="checkbox"]),
+  select {
+    &.form-control {
+      width: 280px;
+    }
+  }
 }
 
 .flyoutDialog {
@@ -610,26 +646,22 @@ select {
 
   input,
   select {
+    font-size: 1em;
     display: block;
     width: 100%;
     max-width: 250px;
-    height: 25px;
-    border-radius: 5px;
     padding: 0 5px;
-    margin: 5px 0 5px 0;
-    font-size: 0.9em;
-    border: solid 1px #ececec;
-    background: white;
-    color: #444444;
-    outline: none;
+    margin: 5px 0;
   }
 
   input {
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    &:focus {
+      outline: none;
+    }
   }
 
   select {
-    box-shadow: 0px 1px 5px -1px rgba(0, 0, 0, 0.8);
+    background-size: 12px 12px;
   }
 }
 
