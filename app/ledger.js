@@ -191,8 +191,16 @@ const doAction = (action) => {
       break
 
     case appConstants.APP_REMOVE_SITE_SETTING:
-      if (action.key === 'ledgerPaymentsShown') {
-        // nothing to do!
+      i = action.hostPattern.indexOf('://')
+      if (i === -1) break
+
+      publisher = action.hostPattern.substr(i + 3)
+      if (action.key === 'ledgerPayments') {
+        if (!synopsis.publishers[publisher]) break
+
+        if (publisherInfo._internal.verboseP) console.log('\nupdating ' + publisher + ' stickyP=' + true)
+        synopsis.publishers[publisher].options.stickyP = true
+        updatePublisherInfo()
       }
       break
 
