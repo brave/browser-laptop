@@ -328,10 +328,15 @@ class UrlBarSuggestions extends ImmutableComponent {
           return site.get('location')
         }),
         sortHandler: sortBasedOnLocationPos,
-        formatTitle: (site) => site.get('title'),
+        formatTitle: (site) => {
+          const customTitle = site.get('customTitle')
+          const title = site.get('title')
+
+          return customTitle ? `${customTitle} (${title})` : title
+        },
         formatUrl: (site) => site.get('location'),
         filterValue: (site) => {
-          const title = site.get('title') || ''
+          const title = site.get('customTitle') || site.get('title') || ''
           const location = site.get('location') || ''
           return (title.toLowerCase().includes(urlLocationLower) ||
             location.toLowerCase().includes(urlLocationLower)) &&
