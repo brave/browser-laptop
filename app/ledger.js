@@ -170,23 +170,29 @@ const doAction = (action) => {
       break
 
     case appConstants.APP_CHANGE_SITE_SETTING:
+      i = action.hostPattern.indexOf('://')
+      if (i === -1) break
+
+      publisher = action.hostPattern.substr(i + 3)
       if (action.key === 'ledgerPaymentsShown') {
         if (action.value === false) {
-          i = action.hostPattern.indexOf('://')
-          if (i !== -1) {
-            publisher = action.hostPattern.substr(i + 3)
-            if (publisherInfo._internal.verboseP) console.log('\npurging ' + publisher)
-            delete synopsis.publishers[publisher]
-            delete publishers[publisher]
-            updatePublisherInfo()
-          }
+          if (publisherInfo._internal.verboseP) console.log('\npurging ' + publisher)
+          delete synopsis.publishers[publisher]
+          delete publishers[publisher]
+          updatePublisherInfo()
         }
+      } else if (action.key === 'ledgerPayments') {
+        if (!synopsis.publishers[publisher]) break
+
+        if (publisherInfo._internal.verboseP) console.log('\nupdating ' + publisher + ' stickyP=' + action.value)
+        synopsis.publishers[publisher].options.stickyP = action.value
+        updatePublisherInfo()
       }
       break
 
     case appConstants.APP_REMOVE_SITE_SETTING:
       if (action.key === 'ledgerPaymentsShown') {
-        // TODO
+        // nothing to do!
       }
       break
 
@@ -710,7 +716,8 @@ var enable = (paymentsEnabled) => {
   synopsis = new (ledgerPublisher.Synopsis)()
   fs.readFile(pathName(synopsisPath), (err, data) => {
     var initSynopsis = () => {
-      var value
+      var updateP, value
+      var siteSettings = appStore.getState().get('siteSettings')
 
       // cf., the `Synopsis` constructor, https://github.com/brave/ledger-publisher/blob/master/index.js#L167
       value = getSetting(settings.MINIMUM_VISIT_TIME)
@@ -743,6 +750,18 @@ var enable = (paymentsEnabled) => {
           synopsis.options.minPublisherVisits = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_MIN_VISITS)
         }
       }
+
+      underscore.keys(synopsis.publishers).forEach((publisher) => {
+        var siteSetting
+
+        if (typeof synopsis.publishers[publisher].options.stickyP !== 'undefined') return
+
+        updateP = true
+        siteSetting = siteSettings.get(`https?://${publisher}`)
+        synopsis.publishers[publisher].options.stickyP = siteSetting && siteSetting.get('ledgerPayments')
+      })
+
+      if (updateP) updatePublisherInfo()
     }
 
     if (publisherInfo._internal.verboseP) console.log('\nstarting up ledger publisher integration')
@@ -849,10 +868,11 @@ var synopsisNormalizer = () => {
 
   results = []
   underscore.keys(synopsis.publishers).forEach((publisher) => {
-    if (synopsis.publishers[publisher].scores[scorekeeper] <= 0) return
-
-    if ((synopsis.options.minPublisherDuration > synopsis.publishers[publisher].duration) ||
-        (synopsis.options.minPublisherVisits > synopsis.publishers[publisher].visits)) return
+    if ((getSetting(settings.AUTO_SUGGEST_SITES)) && (!synopsis.publishers[publisher].options.stickyP)) {
+      if ((synopsis.publishers[publisher].scores[scorekeeper] <= 0) ||
+          (synopsis.options.minPublisherDuration > synopsis.publishers[publisher].duration) ||
+          (synopsis.options.minPublisherVisits > synopsis.publishers[publisher].visits)) return
+    }
 
     results.push(underscore.extend({ publisher: publisher }, underscore.omit(synopsis.publishers[publisher], 'window')))
   }, synopsis)
