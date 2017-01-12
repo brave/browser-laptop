@@ -16,17 +16,31 @@ const syncConstants = require('../js/constants/syncConstants')
 const appDispatcher = require('../js/dispatcher/appDispatcher')
 const AppStore = require('../js/stores/appStore')
 const syncUtil = require('../js/state/syncUtil')
+const getSetting = require('../js/settings').getSetting
+const settings = require('../js/constants/settings')
 
 const categoryNames = Object.keys(categories)
 const categoryMap = {
-  'bookmark': 'BOOKMARKS',
-  'historySite': 'HISTORY_SITES',
-  'siteSetting': 'PREFERENCES',
-  'device': 'PREFERENCES'
+  bookmark: {
+    categoryName: 'BOOKMARKS',
+    settingName: 'SYNC_TYPE_BOOKMARK'
+  },
+  historySite: {
+    categoryName: 'HISTORY_SITES',
+    settingName: 'SYNC_TYPE_HISTORY'
+  },
+  siteSetting: {
+    categoryName: 'PREFERENCES',
+    settingName: 'SYNC_TYPE_SITE_SETTING'
+  },
+  device: {
+    categoryName: 'PREFERENCES'
+  }
 }
 
 let deviceId = null /** @type {Array|null} */
 let pollIntervalId = null
+let dispatcherCallback = null
 
 /**
  * Sends sync records of the same category to the sync server.
@@ -42,7 +56,11 @@ const sendSyncRecords = (sender, action, data) => {
     return
   }
   const category = categoryMap[data[0].name]
-  sender.send(messages.SEND_SYNC_RECORDS, category, data.map((item) => {
+  if (!category ||
+    (category.settingName && !getSetting(settings[category.settingName]))) {
+    return
+  }
+  sender.send(messages.SEND_SYNC_RECORDS, category.categoryName, data.map((item) => {
     if (!item || !item.name || !item.value) {
       return
     }
@@ -56,6 +74,11 @@ const sendSyncRecords = (sender, action, data) => {
 }
 
 const doAction = (sender, action) => {
+  if (action.key === settings.SYNC_ENABLED && action.value === false) {
+    module.exports.stop()
+    // XXX: setting SYNC_ENABLED to true requires restart
+    return
+  }
   if (!action.item || !action.item.toJS) {
     return
   }
@@ -78,7 +101,7 @@ const doAction = (sender, action) => {
         [syncUtil.createSiteData(action.item.toJS())])
       break
     case syncConstants.SYNC_CLEAR_HISTORY:
-      sender.send(messages.DELETE_SYNC_CATEGORY, categoryMap.historySite)
+      sender.send(messages.DELETE_SYNC_CATEGORY, categoryMap.historySite.categoryName)
       break
     case syncConstants.SYNC_ADD_SITE_SETTING:
       if (syncUtil.isSyncable('siteSetting', action.item)) {
@@ -111,19 +134,23 @@ const doAction = (sender, action) => {
  * @param {Event} e
  */
 module.exports.onSyncReady = (isFirstRun, e) => {
-  appDispatcher.register(doAction.bind(null, e.sender))
+  if (getSetting(settings.SYNC_ENABLED) !== true) {
+    return
+  }
+  dispatcherCallback = doAction.bind(null, e.sender)
+  appDispatcher.register(dispatcherCallback)
   if (isFirstRun) {
     // Sync the device id for this device
     sendSyncRecords(e.sender, writeActions.CREATE, [{
       name: 'device',
       objectId: syncUtil.newObjectId(['sync']),
       value: {
-        name: 'browser-laptop' // todo: support user-chosen names
+        name: getSetting(settings.SYNC_DEVICE_NAME)
       }
     }])
   }
-  // Sync bookmarks that have not been synced yet
   const appState = AppStore.getState()
+  // Sync bookmarks that have not been synced yet
   const sites = appState.get('sites') || new Immutable.List()
   sites.forEach((site, i) => {
     if (site && !site.get('objectId') && syncUtil.isSyncable('bookmark', site)) {
@@ -143,6 +170,9 @@ module.exports.onSyncReady = (isFirstRun, e) => {
       }))
   }
   ipcMain.on(messages.GET_EXISTING_OBJECTS, (event, categoryName, records) => {
+    if (getSetting(settings.SYNC_ENABLED) !== true) {
+      return
+    }
     if (categoryNames.includes(categoryName) || !records || !records.length) {
       return
     }
@@ -152,6 +182,13 @@ module.exports.onSyncReady = (isFirstRun, e) => {
   // Periodically poll for new records
   let startAt = appState.getIn(['sync', 'lastFetchTimestamp']) || 0
   const poll = () => {
+    let categoryNames = []
+    for (let type in categoryMap) {
+      let item = categoryMap[type]
+      if (item.settingName && getSetting(settings[item.settingName]) === true) {
+        categoryNames.push(item.categoryName)
+      }
+    }
     e.sender.send(messages.FETCH_SYNC_RECORDS, categoryNames, startAt)
     startAt = syncUtil.now()
     appActions.saveSyncInitData(null, null, startAt)
@@ -161,7 +198,7 @@ module.exports.onSyncReady = (isFirstRun, e) => {
 }
 
 module.exports.init = function (initialState) {
-  if (config.enabled !== true) {
+  if (getSetting(settings.SYNC_ENABLED) !== true) {
     return
   }
   ipcMain.on(messages.GET_INIT_DATA, (e) => {
@@ -184,5 +221,10 @@ module.exports.init = function (initialState) {
 }
 
 module.exports.stop = function () {
-  clearInterval(pollIntervalId)
+  if (pollIntervalId !== null) {
+    clearInterval(pollIntervalId)
+  }
+  if (dispatcherCallback) {
+    appDispatcher.unregister(dispatcherCallback)
+  }
 }
