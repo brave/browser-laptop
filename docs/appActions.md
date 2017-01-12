@@ -146,13 +146,13 @@ Dispatches a message to clear all completed downloads
 
 ### ledgerRecoverySucceeded() 
 
-Dispatches a message to clear all completed downloads
+Dispatches a message indicating ledger recovery succeeded
 
 
 
 ### ledgerRecoveryFailed() 
 
-Dispatches a message to clear all completed downloads
+Dispatches a message indicating ledger recovery failed
 
 
 
