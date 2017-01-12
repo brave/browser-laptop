@@ -116,14 +116,16 @@ const appActions = {
    * @param {string} originalSiteDetail - If specified, the original site detail to edit / overwrite.
    * @param {boolean} destinationIsParent - Whether or not the destinationDetail should be considered the new parent.
    *   The details of the old entries will be modified if this is set, otherwise only the tag will be added.
+   * @param {boolean} skipSync - Set true if a site isn't eligible for Sync (e.g. if addSite was triggered by Sync)
    */
-  addSite: function (siteDetail, tag, originalSiteDetail, destinationDetail) {
+  addSite: function (siteDetail, tag, originalSiteDetail, destinationDetail, skipSync) {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_ADD_SITE,
       siteDetail,
       tag,
       originalSiteDetail,
-      destinationDetail
+      destinationDetail,
+      skipSync
     })
   },
 
@@ -140,12 +142,14 @@ const appActions = {
    * Removes a site from the site list
    * @param {Object} siteDetail - Properties of the site in question
    * @param {string} tag - A tag to associate with the site. e.g. bookmarks.
+   * @param {boolean} skipSync - Set true if a site isn't eligible for Sync (e.g. if this removal was triggered by Sync)
    */
-  removeSite: function (siteDetail, tag) {
+  removeSite: function (siteDetail, tag, skipSync) {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_REMOVE_SITE,
       siteDetail,
-      tag
+      tag,
+      skipSync
     })
   },
 

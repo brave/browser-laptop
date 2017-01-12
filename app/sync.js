@@ -19,23 +19,12 @@ const syncUtil = require('../js/state/syncUtil')
 const getSetting = require('../js/settings').getSetting
 const settings = require('../js/constants/settings')
 
-const categoryNames = Object.keys(categories)
-const categoryMap = {
-  bookmark: {
-    categoryName: 'BOOKMARKS',
-    settingName: 'SYNC_TYPE_BOOKMARK'
-  },
-  historySite: {
-    categoryName: 'HISTORY_SITES',
-    settingName: 'SYNC_TYPE_HISTORY'
-  },
-  siteSetting: {
-    categoryName: 'PREFERENCES',
-    settingName: 'SYNC_TYPE_SITE_SETTING'
-  },
-  device: {
-    categoryName: 'PREFERENCES'
-  }
+const CATEGORY_MAP = syncUtil.CATEGORY_MAP
+const CATEGORY_NAMES = Object.keys(categories)
+
+const log = (message) => {
+  if (!config.debug) { return }
+  console.log(`sync ${new Date().getTime()}:`, message)
 }
 
 let deviceId = null /** @type {Array|null} */
@@ -55,7 +44,7 @@ const sendSyncRecords = (sender, action, data) => {
   if (!data || !data.length) {
     return
   }
-  const category = categoryMap[data[0].name]
+  const category = CATEGORY_MAP[data[0].name]
   if (!category ||
     (category.settingName && !getSetting(settings[category.settingName]))) {
     return
@@ -84,7 +73,7 @@ const doAction = (sender, action) => {
   }
   // Only accept items who have an objectId set already
   if (!action.item.get('objectId')) {
-    console.log('Missing object ID!', action.item.toJS())
+    log(`Missing object ID! ${action.item.toJS()}`)
     return
   }
   switch (action.actionType) {
@@ -101,7 +90,7 @@ const doAction = (sender, action) => {
         [syncUtil.createSiteData(action.item.toJS())])
       break
     case syncConstants.SYNC_CLEAR_HISTORY:
-      sender.send(messages.DELETE_SYNC_CATEGORY, categoryMap.historySite.categoryName)
+      sender.send(messages.DELETE_SYNC_CATEGORY, CATEGORY_MAP.historySite.categoryName)
       break
     case syncConstants.SYNC_ADD_SITE_SETTING:
       if (syncUtil.isSyncable('siteSetting', action.item)) {
@@ -173,18 +162,30 @@ module.exports.onSyncReady = (isFirstRun, e) => {
     if (getSetting(settings.SYNC_ENABLED) !== true) {
       return
     }
-    if (categoryNames.includes(categoryName) || !records || !records.length) {
+    log(`getting existing objects for ${records.length} ${categoryName}`)
+    if (!CATEGORY_NAMES.includes(categoryName) || !records || !records.length) {
       return
     }
-    // TODO (Ayumi): get existing objects with objectId, send
-    // RESOLVE_SYNC_RECORDS, handle RESOLVED_SYNC_RECORDS
+    const recordsAndExistingObjects = records.map((record) => {
+      const safeRecord = syncUtil.ipcSafeObject(record)
+      const existingObject = syncUtil.getExistingObject(categoryName, record)
+      return [safeRecord, existingObject]
+    })
+    e.sender.send(messages.RESOLVE_SYNC_RECORDS, categoryName, recordsAndExistingObjects)
+  })
+  ipcMain.on(messages.RESOLVED_SYNC_RECORDS, (event, categoryName, records) => {
+    if (!records || !records.length) {
+      return
+    }
+    log(`applying resolved ${records.length} ${categoryName}.`)
+    for (let record of records) { syncUtil.applySyncRecord(record) }
   })
   // Periodically poll for new records
   let startAt = appState.getIn(['sync', 'lastFetchTimestamp']) || 0
   const poll = () => {
     let categoryNames = []
-    for (let type in categoryMap) {
-      let item = categoryMap[type]
+    for (let type in CATEGORY_MAP) {
+      let item = CATEGORY_MAP[type]
       if (item.settingName && getSetting(settings[item.settingName]) === true) {
         categoryNames.push(item.categoryName)
       }
@@ -216,7 +217,7 @@ module.exports.init = function (initialState) {
   ipcMain.on(messages.SYNC_READY, module.exports.onSyncReady.bind(null,
     !initialState.seed && !initialState.deviceId))
   ipcMain.on(messages.SYNC_DEBUG, (e, msg) => {
-    console.log('sync-client:', msg)
+    log(msg)
   })
 }
 
