@@ -1,0 +1,46 @@
+#!/bin/bash
+set -exu
+
+until apt-get update -y
+	do echo "Doh!"
+done
+until apt-get install system-config-lvm lvm2 -y
+	do echo "GGGG"
+done
+
+if [ -f /etc/stratos_dev_env_disk_added_date ]
+then
+	echo "Stratos runtime already provisioned so exiting."
+	exit 0
+fi
+
+
+fdisk -u /dev/sdb <<EOF
+n
+p
+1
+
+
+t
+8e
+w
+EOF
+
+mkfs.ext4 /dev/sdb1
+mkdir /build
+mount /dev/sdb1 /build
+date > /etc/stratos_dev_env_disk_added_date
+
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E1DF1F24
+cat > /etc/apt/sources.list.d/git.list << EOF
+deb-src http://ppa.launchpad.net/git-core/ppa/ubuntu precise main
+EOF
+
+chown -R vagrant /build
+
+apt-get update -y
+apt-get install build-essential clang libdbus-1-dev libgtk2.0-dev \
+	libnotify-dev libgnome-keyring-dev libgconf2-dev \
+	libasound2-dev libcap-dev libcups2-dev libxtst-dev \
+	libxss1 libnss3-dev gcc-multilib g++-multilib curl \
+	gperf bison git python-software-properties python g++ make libgl1-mesa-dev -y
