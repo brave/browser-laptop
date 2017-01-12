@@ -21,6 +21,7 @@ const settings = require('../js/constants/settings')
 
 const CATEGORY_MAP = syncUtil.CATEGORY_MAP
 const CATEGORY_NAMES = Object.keys(categories)
+const SYNC_ACTIONS = Object.values(syncConstants)
 
 const log = (message) => {
   if (!config.debug) { return }
@@ -62,20 +63,41 @@ const sendSyncRecords = (sender, action, data) => {
   }))
 }
 
+/**
+ * @param {Object} action
+ * @returns {boolean}
+ */
+const validateAction = (action) => {
+  const SYNC_ACTIONS_WITHOUT_ITEMS = [
+    syncConstants.SYNC_CLEAR_HISTORY,
+    syncConstants.SYNC_CLEAR_SITE_SETTINGS
+  ]
+  if (SYNC_ACTIONS.includes(action.actionType) !== true) {
+    return false
+  }
+
+  // If the action requires an item, validate the item.
+  if (SYNC_ACTIONS_WITHOUT_ITEMS.includes(action.actionType) !== true) {
+    if (!action.item || !action.item.toJS) {
+      log(`Missing item! ${action.item.toJS()}`)
+      return false
+    }
+    // Only accept items who have an objectId set already
+    if (!action.item.get('objectId')) {
+      log(`Missing object ID! ${action.item.toJS()}`)
+      return false
+    }
+  }
+  return true
+}
+
 const doAction = (sender, action) => {
   if (action.key === settings.SYNC_ENABLED && action.value === false) {
     module.exports.stop()
     // XXX: setting SYNC_ENABLED to true requires restart
     return
   }
-  if (!action.item || !action.item.toJS) {
-    return
-  }
-  // Only accept items who have an objectId set already
-  if (!action.item.get('objectId')) {
-    log(`Missing object ID! ${action.item.toJS()}`)
-    return
-  }
+  if (validateAction(action) !== true) { return }
   switch (action.actionType) {
     case syncConstants.SYNC_ADD_SITE:
       sendSyncRecords(sender, writeActions.CREATE,
