@@ -10,17 +10,18 @@ const config = require('../constants/config')
 const settings = require('../constants/settings')
 const Immutable = require('immutable')
 const frameStateUtil = require('../state/frameStateUtil')
+const {activeFrameStatePath, frameStatePathForFrame, tabStatePathForFrame} = frameStateUtil
 const ipc = require('electron').ipcRenderer
 const messages = require('../constants/messages')
 const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
 const UrlUtil = require('../lib/urlutil')
-const urlParse = require('url').parse
 const currentWindow = require('../../app/renderer/currentWindow')
 const {tabFromFrame} = require('../state/frameStateUtil')
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
-const {aboutUrls, getSourceAboutUrl, isIntermediateAboutPage, getSourceMagnetUrl, navigatableTypes, newFrameUrl} = require('../lib/appUrlUtil')
+const {aboutUrls, newFrameUrl} = require('../lib/appUrlUtil')
 const Serializer = require('../dispatcher/serializer')
+const assert = require('assert')
 
 let windowState = Immutable.fromJS({
   activeFrameKey: null,
@@ -39,53 +40,6 @@ let windowState = Immutable.fromJS({
 let lastEmittedState
 
 const CHANGE_EVENT = 'change'
-
-const frameStatePath = (key) =>
-  ['frames', frameStateUtil.findIndexForFrameKey(windowState.get('frames'), key)]
-const tabStatePath = (frameKey) =>
-  ['tabs', frameStateUtil.findIndexForFrameKey(windowState.get('frames'), frameKey)]
-const activeFrameStatePath = () => frameStatePath(windowState.get('activeFrameKey'))
-const frameStatePathForFrame = (frameProps) =>
-  ['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), frameProps)]
-const tabStatePathForFrame = (frameProps) =>
-  ['tabs', frameStateUtil.getFramePropsIndex(windowState.get('frames'), frameProps)]
-
-const updateNavBarInput = (loc, frameStatePath = activeFrameStatePath()) => {
-  windowState = windowState.setIn(frameStatePath.concat(['navbar', 'urlbar', 'location']), loc)
-  windowState = windowState.setIn(frameStatePath.concat(['navbar', 'urlbar', 'urlPreview']), null)
-}
-
-/**
- * Updates the active frame state with what the URL bar suffix should be.
- * @param suggestionList - The suggestion list to use to figure out the suffix.
- */
-const updateUrlSuffix = (suggestionList) => {
-  let selectedIndex = windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']))
-
-  if (!selectedIndex) {
-    selectedIndex = 0
-  } else {
-    selectedIndex--
-  }
-
-  const suggestion = suggestionList && suggestionList.get(selectedIndex)
-  let suffix = ''
-  if (suggestion) {
-    const autocompleteEnabled = windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']))
-
-    if (autocompleteEnabled) {
-      const location = windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'location']))
-      const index = suggestion.location.toLowerCase().indexOf(location.toLowerCase())
-      if (index !== -1) {
-        const beforePrefix = suggestion.location.substring(0, index)
-        if (beforePrefix.endsWith('://') || beforePrefix.endsWith('://www.') || index === 0) {
-          suffix = suggestion.location.substring(index + location.length)
-        }
-      }
-    }
-  }
-  windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'urlSuffix']), suffix)
-}
 
 /**
  * Updates the tab page index to the specified frameProps
@@ -106,8 +60,8 @@ const updateTabPageIndex = (frameProps) => {
   windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
 }
 
-const focusWebview = (frameStatePath) => {
-  windowState = windowState.mergeIn(frameStatePath, {
+const focusWebview = (framePath) => {
+  windowState = windowState.mergeIn(framePath, {
     activeShortcut: 'focus-webview',
     activeShortcutDetails: null
   })
@@ -258,7 +212,7 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
     // For about:newtab we want to have the urlbar focused, not the new frame.
     // Otherwise we want to focus the new tab when it is a new frame in the foreground.
     if (activeFrame.get('location') !== 'about:newtab') {
-      focusWebview(activeFrameStatePath())
+      focusWebview(activeFrameStatePath(windowState))
     }
   }
 }
@@ -266,9 +220,34 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
 const windowStore = new WindowStore()
 const emitChanges = debounce(windowStore.emitChanges.bind(windowStore), 5)
 
+const applyReducers = (state, action) => [
+  require('../../app/renderer/reducers/urlBarReducer'),
+  require('../../app/renderer/reducers/urlBarSuggestionsReducer')
+].reduce(
+    (windowState, reducer) => {
+      const newState = reducer(windowState, action)
+      assert.ok(Immutable.Map.isMap(newState),
+        `Oops! action ${action.actionType} didn't return valid state for reducer:\n\n${reducer}`)
+      return newState
+    }, windowState)
+
+const immediatelyEmittedActions = [
+  windowConstants.WINDOW_SET_NAVBAR_INPUT,
+  windowConstants.WINDOW_SET_FIND_DETAIL,
+  windowConstants.WINDOW_SET_BOOKMARK_DETAIL,
+  windowConstants.WINDOW_AUTOFILL_POPUP_HIDDEN,
+  windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL,
+  windowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL,
+  windowConstants.WINDOW_SET_PINNED,
+  windowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL,
+  windowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL,
+  windowConstants.WINDOW_SET_MODAL_DIALOG_DETAIL
+]
+
 // Register callback to handle all updates
 const doAction = (action) => {
   // console.log(action.actionType, action, windowState.toJS())
+  windowState = applyReducers(windowState, action)
   switch (action.actionType) {
     case windowConstants.WINDOW_SET_STATE:
       windowState = action.windowState
@@ -276,113 +255,9 @@ const doAction = (action) => {
       currentPartitionNumber = windowState.get('frames').reduce((previousVal, frame) => Math.max(previousVal, frame.get('partitionNumber')), 0)
       const activeFrame = frameStateUtil.getActiveFrame(windowState)
       if (activeFrame && activeFrame.get('location') !== 'about:newtab') {
-        focusWebview(activeFrameStatePath())
+        focusWebview(activeFrameStatePath(windowState))
       }
       // We should not emit here because the Window already know about the change on startup.
-      return
-    case windowConstants.WINDOW_SET_URL:
-      const frame = frameStateUtil.getFrameByKey(windowState, action.key)
-      const currentLocation = frame.get('location')
-      const parsedUrl = urlParse(action.location)
-
-      // For types that are not navigatable, just do a loadUrl on them
-      if (!navigatableTypes.includes(parsedUrl.protocol)) {
-        if (parsedUrl.protocol !== 'javascript:' ||
-            currentLocation.substring(0, 6).toLowerCase() !== 'about:') {
-          windowState = windowState.mergeIn(frameStatePath(action.key), {
-            activeShortcut: 'load-non-navigatable-url',
-            activeShortcutDetails: action.location
-          })
-        }
-        updateNavBarInput(frame.get('location'), frameStatePath(action.key))
-      } else if (currentLocation === action.location) {
-        // reload if the url is unchanged
-        windowState = windowState.mergeIn(frameStatePath(action.key), {
-          audioPlaybackActive: false,
-          activeShortcut: 'reload'
-        })
-        windowState = windowState.mergeIn(tabStatePath(action.key), {
-          audioPlaybackActive: false
-        })
-        updateNavBarInput(frame.get('location'), frameStatePath(action.key))
-      } else {
-        // If the user is changing back to the original src and they already navigated away then we need to
-        // explicitly set a new location via webview.loadURL.
-        let activeShortcut
-        if (frame.get('location') !== action.location &&
-            frame.get('src') === action.location &&
-            !isIntermediateAboutPage(action.location)) {
-          activeShortcut = 'explicitLoadURL'
-        }
-
-        windowState = windowState.mergeIn(frameStatePath(action.key), {
-          src: action.location,
-          location: action.location,
-          activeShortcut
-        })
-        windowState = windowState.mergeIn(tabStatePath(action.key), {
-          location: action.location
-        })
-        // Show the location for directly-entered URLs before the page finishes
-        // loading
-        updateNavBarInput(action.location, frameStatePath(action.key))
-      }
-      break
-    case windowConstants.WINDOW_SET_NAVIGATED:
-      action.location = action.location.trim()
-      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), false)
-      // For about: URLs, make sure we store the URL as about:something
-      // and not what we map to.
-      action.location = getSourceAboutUrl(action.location) ||
-        getSourceMagnetUrl(action.location) ||
-        action.location
-
-      if (UrlUtil.isURL(action.location)) {
-        action.location = UrlUtil.getUrlFromInput(action.location)
-      }
-
-      const key = action.key || windowState.get('activeFrameKey')
-      windowState = windowState.mergeIn(frameStatePath(key), {
-        location: action.location
-      })
-      windowState = windowState.mergeIn(tabStatePath(key), {
-        location: action.location
-      })
-      if (!action.isNavigatedInPage) {
-        windowState = windowState.mergeIn(frameStatePath(key), {
-          adblock: {},
-          audioPlaybackActive: false,
-          computedThemeColor: undefined,
-          httpsEverywhere: {},
-          icon: undefined,
-          location: action.location,
-          noScript: {},
-          themeColor: undefined,
-          title: '',
-          trackingProtection: {},
-          fingerprintingProtection: {}
-        })
-        windowState = windowState.mergeIn(tabStatePath(key), {
-          audioPlaybackActive: false,
-          themeColor: undefined,
-          location: action.location,
-          computedThemeColor: undefined,
-          icon: undefined,
-          title: ''
-        })
-      }
-
-      // Update nav bar unless when spawning a new tab. The user might have
-      // typed in the URL bar while we were navigating -- we should preserve it.
-      if (!(action.location === 'about:newtab' && !frameStateUtil.getActiveFrame(windowState).get('canGoForward'))) {
-        updateNavBarInput(action.location, frameStatePath(key))
-      }
-      break
-    case windowConstants.WINDOW_SET_NAVBAR_INPUT:
-      updateNavBarInput(action.location)
-      updateUrlSuffix(windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), action.suggestionList))
-      // Since this value is bound we need to notify the control sync
-      windowStore.emitChanges()
       return
     case windowConstants.WINDOW_SET_FRAME_TAB_ID:
       windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
@@ -412,9 +287,6 @@ const doAction = (action) => {
       })
       break
     case windowConstants.WINDOW_SET_FINDBAR_SHOWN:
-      if (action.shown) {
-        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), false)
-      }
       windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         findbarShown: action.shown
       })
@@ -478,7 +350,7 @@ const doAction = (action) => {
       break
     case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
       windowState = windowState.merge(frameStateUtil.undoCloseFrame(windowState, windowState.get('closedFrames')))
-      focusWebview(activeFrameStatePath())
+      focusWebview(activeFrameStatePath(windowState))
       break
     case windowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
       windowState = windowState.set('closedFrames', new Immutable.List())
@@ -544,75 +416,39 @@ const doAction = (action) => {
       updateTabPageIndex(frameStateUtil.getActiveFrame(windowState))
       break
     case windowConstants.WINDOW_SET_LINK_HOVER_PREVIEW:
-      windowState = windowState.mergeIn(activeFrameStatePath(), {
+      windowState = windowState.mergeIn(activeFrameStatePath(windowState), {
         hrefPreview: action.href,
         showOnRight: action.showOnRight
       })
       break
-    case windowConstants.WINDOW_SET_URL_BAR_SUGGESTIONS:
-      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), action.selectedIndex)
-
-      if (action.suggestionList !== undefined) {
-        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), action.suggestionList)
-      }
-      updateUrlSuffix(action.suggestionList)
-      break
     case windowConstants.WINDOW_SET_URL_BAR_PREVIEW:
-      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'urlPreview']), action.value)
-      break
-    case windowConstants.WINDOW_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS:
-      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'searchResults']), action.searchResults)
+      windowState = windowState.setIn(activeFrameStatePath(windowState).concat(['navbar', 'urlbar', 'urlPreview']), action.value)
       break
     case windowConstants.WINDOW_SET_THEME_COLOR:
       if (action.themeColor !== undefined) {
-        windowState = windowState.setIn(frameStatePathForFrame(action.frameProps).concat(['themeColor']), action.themeColor)
-        windowState = windowState.setIn(tabStatePathForFrame(action.frameProps).concat(['themeColor']), action.themeColor)
+        windowState = windowState.setIn(frameStatePathForFrame(windowState, action.frameProps).concat(['themeColor']), action.themeColor)
+        windowState = windowState.setIn(tabStatePathForFrame(windowState, action.frameProps).concat(['themeColor']), action.themeColor)
       }
       if (action.computedThemeColor !== undefined) {
-        windowState = windowState.setIn(frameStatePathForFrame(action.frameProps).concat(['computedThemeColor']), action.computedThemeColor)
-        windowState = windowState.setIn(tabStatePathForFrame(action.frameProps).concat(['computedThemeColor']), action.computedThemeColor)
+        windowState = windowState.setIn(frameStatePathForFrame(windowState, action.frameProps).concat(['computedThemeColor']), action.computedThemeColor)
+        windowState = windowState.setIn(tabStatePathForFrame(windowState, action.frameProps).concat(['computedThemeColor']), action.computedThemeColor)
       }
-      break
-    case windowConstants.WINDOW_SET_URL_BAR_ACTIVE:
-      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'active']), action.isActive)
-      if (!action.isActive) {
-        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), false)
-        windowState = windowState.mergeIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions']), {
-          selectedIndex: null,
-          suggestionList: null
-        })
-      }
-      break
-    case windowConstants.WINDOW_SET_RENDER_URL_BAR_SUGGESTIONS:
-      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), action.enabled)
-      if (!action.enabled) {
-        windowState = windowState.mergeIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions']), {
-          selectedIndex: null,
-          suggestionList: null
-        })
-        // Make sure to remove the suffix from the url bar
-        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), null)
-        updateUrlSuffix(undefined)
-      }
-      break
-    case windowConstants.WINDOW_SET_URL_BAR_AUTCOMPLETE_ENABLED:
-      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']), action.enabled)
       break
     case windowConstants.WINDOW_SET_URL_BAR_FOCUSED:
-      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'focused']), action.isFocused)
+      windowState = windowState.setIn(activeFrameStatePath(windowState).concat(['navbar', 'urlbar', 'focused']), action.isFocused)
       break
     case windowConstants.WINDOW_SET_URL_BAR_SELECTED:
-      const urlBarPath = activeFrameStatePath().concat(['navbar', 'urlbar'])
+      const urlBarPath = activeFrameStatePath(windowState).concat(['navbar', 'urlbar'])
       windowState = windowState.mergeIn(urlBarPath, {
         selected: action.selected
       })
       // selection implies focus
       if (action.selected) {
-        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'focused']), true)
+        windowState = windowState.setIn(activeFrameStatePath(windowState).concat(['navbar', 'urlbar', 'focused']), true)
       }
       break
     case windowConstants.WINDOW_SET_ACTIVE_FRAME_SHORTCUT:
-      const framePath = action.frameProps ? ['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)] : activeFrameStatePath()
+      const framePath = action.frameProps ? ['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)] : activeFrameStatePath(windowState)
       windowState = windowState.mergeIn(framePath, {
         activeShortcut: action.activeShortcut,
         activeShortcutDetails: action.activeShortcutDetails
@@ -625,9 +461,7 @@ const doAction = (action) => {
       break
     case windowConstants.WINDOW_SET_FIND_DETAIL:
       windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'findDetail'], action.findDetail)
-      // Since the input value is bound, we need to notify the control sync.
-      windowStore.emitChanges()
-      return
+      break
     case windowConstants.WINDOW_SET_BOOKMARK_DETAIL:
       if (!action.currentDetail && !action.originalDetail) {
         windowState = windowState.delete('bookmarkDetail')
@@ -640,9 +474,7 @@ const doAction = (action) => {
           isBookmarkHanger: action.isBookmarkHanger
         })
       }
-      // Since the input values of bookmarks are bound, we need to notify the controls sync.
-      windowStore.emitChanges()
-      return
+      break
     case windowConstants.WINDOW_AUTOFILL_SELECTION_CLICKED:
       ipc.send('autofill-selection-clicked', action.tabId, action.value, action.frontEndId, action.index)
       windowState = windowState.delete('contextMenuDetail')
@@ -661,18 +493,14 @@ const doAction = (action) => {
       } else {
         windowState = windowState.set('contextMenuDetail', action.detail)
       }
-      // Drag and drop bookmarks code expects this to be set sync
-      windowStore.emitChanges()
-      return
+      break
     case windowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL:
       if (!action.detail) {
         windowState = windowState.delete('popupWindowDetail')
       } else {
         windowState = windowState.set('popupWindowDetail', action.detail)
       }
-      // Drag and drop bookmarks code expects this to be set sync
-      windowStore.emitChanges()
-      return
+      break
     case windowConstants.WINDOW_SET_PINNED:
       // Check if there's already a frame which is pinned.
       // If so we just want to set it as active.
@@ -698,10 +526,7 @@ const doAction = (action) => {
         previewFrameKey: null
       })
       windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
-      // Pin changes need to happen right away or else a race condition could happen for app state
-      // change detection where it adds a second frame
-      windowStore.emitChanges()
-      return
+      break
     case windowConstants.WINDOW_SET_AUDIO_MUTED:
       windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioMuted'], action.muted)
       windowState = windowState.setIn(['tabs', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioMuted'], action.muted)
@@ -780,7 +605,7 @@ const doAction = (action) => {
       }
       break
     case windowConstants.WINDOW_WIDEVINE_SITE_ACCESSED_WITHOUT_INSTALL:
-      const activeLocation = windowState.getIn(activeFrameStatePath().concat(['location']))
+      const activeLocation = windowState.getIn(activeFrameStatePath(windowState).concat(['location']))
       windowState = windowState.set('widevinePanelDetail', Immutable.Map({
         alsoAddRememberSiteSetting: true,
         location: activeLocation,
@@ -796,8 +621,6 @@ const doAction = (action) => {
           originalDetail: action.originalDetail
         })
       }
-      // Since the input values of address are bound, we need to notify the controls sync.
-      windowStore.emitChanges()
       break
     case windowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL:
       if (!action.currentDetail && !action.originalDetail) {
@@ -808,8 +631,6 @@ const doAction = (action) => {
           originalDetail: action.originalDetail
         })
       }
-      // Since the input values of credit card are bound, we need to notify the controls sync.
-      windowStore.emitChanges()
       break
     case windowConstants.WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE:
       windowState = windowState.setIn(['ui', 'downloadsToolbar', 'isVisible'], action.isVisible)
@@ -818,7 +639,7 @@ const doAction = (action) => {
       windowState = windowState.setIn(['ui', 'releaseNotes', 'isVisible'], action.isVisible)
       break
     case windowConstants.WINDOW_SET_SECURITY_STATE:
-      let path = frameStatePathForFrame(action.frameProps)
+      let path = frameStatePathForFrame(windowState, action.frameProps)
       if (action.securityState.secure !== undefined) {
         windowState = windowState.setIn(path.concat(['security', 'isSecure']),
                                         action.securityState.secure)
@@ -914,16 +735,20 @@ const doAction = (action) => {
       } else if (action.className) {
         windowState = windowState.setIn(['modalDialogDetail', action.className], Immutable.fromJS(action.props))
       }
-      // Since the input values of address are bound, we need to notify the controls sync.
-      windowStore.emitChanges()
       break
     case appConstants.APP_NEW_TAB:
       newFrame(action.frameProps, action.frameProps.get('disposition') === 'foreground-tab')
       break
     default:
+      break
   }
 
-  emitChanges()
+  // Some events must be emitted right away, such as bound countrols
+  if (immediatelyEmittedActions.includes(action.actionType)) {
+    windowStore.emitChanges()
+  } else {
+    emitChanges()
+  }
 }
 
 ipc.on(messages.SHORTCUT_NEXT_TAB, () => {
@@ -949,7 +774,7 @@ const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', '
 frameShortcuts.forEach((shortcut) => {
   // Listen for actions on the active frame
   ipc.on(`shortcut-active-frame-${shortcut}`, (e, args) => {
-    windowState = windowState.mergeIn(activeFrameStatePath(), {
+    windowState = windowState.mergeIn(activeFrameStatePath(windowState), {
       activeShortcut: shortcut,
       activeShortcutDetails: args
     })

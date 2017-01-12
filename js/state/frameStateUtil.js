@@ -493,6 +493,20 @@ function getFrameTabPageIndex (frames, frameProps, tabsPerTabPage) {
   return Math.floor(index / tabsPerTabPage)
 }
 
+const frameStatePath = (windowState, key) =>
+  ['frames', findIndexForFrameKey(windowState.get('frames'), key)]
+
+const activeFrameStatePath = (windowState) => frameStatePath(windowState, windowState.get('activeFrameKey'))
+
+const frameStatePathForFrame = (windowState, frameProps) =>
+  ['frames', getFramePropsIndex(windowState.get('frames'), frameProps)]
+
+const tabStatePath = (windowState, frameKey) =>
+  ['tabs', findIndexForFrameKey(windowState.get('frames'), frameKey)]
+
+const tabStatePathForFrame = (windowState, frameProps) =>
+  ['tabs', getFramePropsIndex(windowState.get('frames'), frameProps)]
+
 module.exports = {
   query,
   find,
@@ -529,5 +543,10 @@ module.exports = {
   removeOtherFrames,
   tabFromFrame,
   getFrameKeyByTabId,
-  getFrameTabPageIndex
+  getFrameTabPageIndex,
+  frameStatePath,
+  activeFrameStatePath,
+  frameStatePathForFrame,
+  tabStatePath,
+  tabStatePathForFrame
 }

@@ -20,12 +20,8 @@ const {getSetting} = require('../settings')
 const settings = require('../constants/settings')
 const contextMenus = require('../contextMenus')
 const windowStore = require('../stores/windowStore')
-const searchProviders = require('../data/searchProviders')
 const UrlUtil = require('../lib/urlutil')
-
-const EventUtil = require('../lib/eventUtil')
-const eventElHasAncestorWithClasses = EventUtil.eventElHasAncestorWithClasses
-
+const {eventElHasAncestorWithClasses, isForSecondaryAction} = require('../lib/eventUtil')
 const {isUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
 
 class UrlBar extends ImmutableComponent {
@@ -38,8 +34,6 @@ class UrlBar extends ImmutableComponent {
     this.onChange = this.onChange.bind(this)
     this.onClick = this.onClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
-    this.activateSearchEngine = false
-    this.searchSelectEntry = null
     this.keyPressed = false
     this.showAutocompleteResult = debounce(() => {
       if (!this.urlInput || this.keyPressed || this.locationValue.length === 0) {
@@ -47,7 +41,7 @@ class UrlBar extends ImmutableComponent {
       }
       const suffixLen = this.props.locationValueSuffix.length
       if (suffixLen > 0 && this.urlInput.value !== this.locationValue + this.props.locationValueSuffix) {
-        this.urlInput.value = this.locationValue + this.props.locationValueSuffix
+        this.setValue(this.locationValue, this.props.locationValueSuffix)
         const len = this.locationValue.length
         this.urlInput.setSelectionRange(len, len + suffixLen)
       }
@@ -70,11 +64,19 @@ class UrlBar extends ImmutableComponent {
     return this.props.urlbar.get('focused')
   }
 
+  get activateSearchEngine () {
+    return this.props.urlbar.getIn(['searchDetail', 'activateSearchEngine'])
+  }
+
+  get searchSelectEntry () {
+    return this.props.urlbar.get('searchDetail')
+  }
+
   // restores the url bar to the current location
   restore () {
     const location = UrlUtil.getDisplayLocation(this.props.location, getSetting(settings.PDFJS_ENABLED))
     if (this.urlInput) {
-      this.urlInput.value = location
+      this.setValue(location)
     }
     windowActions.setNavBarUserInput(location)
   }
@@ -84,7 +86,7 @@ class UrlBar extends ImmutableComponent {
   // to delete.
   hideAutoComplete () {
     if (this.autocompleteEnabled) {
-      windowActions.setUrlBarAutocompleteEnabled(false)
+      windowActions.urlBarAutocompleteEnabled(false)
     }
     windowActions.setUrlBarSuggestions(undefined, null)
     windowActions.setRenderUrlBarSuggestions(false)
@@ -96,14 +98,14 @@ class UrlBar extends ImmutableComponent {
    */
   getPlatformClientId (provider) {
     try {
-      if (provider.platformClientId) {
+      if (provider.get('platformClientId')) {
         const platformUtil = require('../../app/common/lib/platformUtil')
         if (platformUtil.isWindows()) {
-          return provider.platformClientId.win32 || ''
+          return provider.getIn(['platformClientId', 'win32']) || ''
         } else if (platformUtil.isDarwin()) {
-          return provider.platformClientId.darwin || ''
+          return provider.getIn(['platformClientId', 'darwin']) || ''
         }
-        return provider.platformClientId.linux || ''
+        return provider.getIn(['platformClientId', 'linux']) || ''
       }
     } catch (e) { }
     return ''
@@ -125,9 +127,9 @@ class UrlBar extends ImmutableComponent {
     // remove shortcut from the search terms
     if (this.activateSearchEngine && this.searchSelectEntry !== null) {
       provider = this.searchSelectEntry
-      const shortcut = new RegExp('^' + provider.shortcut + ' ', 'g')
+      const shortcut = new RegExp('^' + provider.get('shortcut') + ' ', 'g')
       searchTerms = searchTerms.replace(shortcut, '')
-      url = provider.search
+      url = provider.get('search')
     }
 
     // required: populate the search terms (URL encoded)
@@ -143,6 +145,21 @@ class UrlBar extends ImmutableComponent {
     return url
   }
 
+  get suggestionList () {
+    return this.props.urlbar.getIn(['suggestions', 'suggestionList'])
+  }
+
+  get selectedIndex () {
+    return this.props.urlbar.getIn(['suggestions', 'selectedIndex'])
+  }
+
+  get activeIndex () {
+    if (this.suggestionList === null) {
+      return 0
+    }
+    return Math.abs(this.selectedIndex % (this.suggestionList.size + 1))
+  }
+
   onKeyDown (e) {
     if (!this.isActive) {
       windowActions.setUrlBarActive(true)
@@ -151,7 +168,6 @@ class UrlBar extends ImmutableComponent {
       case KeyCodes.ENTER:
         e.preventDefault()
         let location = this.urlInput ? this.urlInput.value : this.props.urlbar.get('location')
-        windowActions.setUrlBarActive(false)
 
         if (location === null || location.length === 0) {
           windowActions.setUrlBarSelected(true)
@@ -161,7 +177,7 @@ class UrlBar extends ImmutableComponent {
           const isLocationUrl = isUrl(location)
           if (!isLocationUrl && e.ctrlKey) {
             windowActions.loadUrl(this.activeFrame, `www.${location}.com`)
-          } else if (this.shouldRenderUrlBarSuggestions && (this.urlBarSuggestions.activeIndex > 0 || this.props.locationValueSuffix && this.autocompleteEnabled)) {
+          } else if (this.shouldRenderUrlBarSuggestions && (this.activeIndex > 0 || this.props.locationValueSuffix && this.autocompleteEnabled)) {
             // Hack to make alt enter open a new tab for url bar suggestions when hitting enter on them.
             const isDarwin = process.platform === 'darwin'
             if (e.altKey) {
@@ -171,9 +187,7 @@ class UrlBar extends ImmutableComponent {
                 e.ctrlKey = true
               }
             }
-            // TODO: We shouldn't be calling into urlBarSuggestions from the parent component at all
-            // load the selected suggestion
-            this.urlBarSuggestions.clickSelected(e)
+            windowActions.activeSuggestionClicked(isForSecondaryAction(e), e.shiftKey)
           } else {
             location = isLocationUrl
               ? location
@@ -187,33 +201,25 @@ class UrlBar extends ImmutableComponent {
               windowActions.loadUrl(this.activeFrame, location)
             }
           }
-          // this can't go through appActions for some reason
-          // or the whole window will reload on the first page request
-          this.clearSearchEngine()
         }
+        windowActions.setUrlBarActive(false)
         windowActions.setRenderUrlBarSuggestions(false)
         break
       case KeyCodes.UP:
         if (this.shouldRenderUrlBarSuggestions) {
-          // TODO: We shouldn't be calling into urlBarSuggestions from the parent component at all
-          this.urlBarSuggestions.previousSuggestion()
+          windowActions.previousUrlBarSuggestionSelected()
           e.preventDefault()
         }
         break
       case KeyCodes.DOWN:
         if (this.shouldRenderUrlBarSuggestions) {
-          // TODO: We shouldn't be calling into urlBarSuggestions from the parent component at all
-          if (!this.urlBarSuggestions.suggestionList) {
-            this.urlBarSuggestions.suggestionList = this.urlBarSuggestions.getNewSuggestionList()
-          }
-          this.urlBarSuggestions.nextSuggestion()
+          windowActions.nextUrlBarSuggestionSelected()
           e.preventDefault()
         }
         break
       case KeyCodes.ESC:
         e.preventDefault()
         this.props.onStop()
-        this.clearSearchEngine()
         this.restore()
         this.select()
         break
@@ -230,7 +236,6 @@ class UrlBar extends ImmutableComponent {
         break
       case KeyCodes.BACKSPACE:
         this.hideAutoComplete()
-        this.clearSearchEngine()
         break
       case KeyCodes.TAB:
         this.hideAutoComplete()
@@ -247,7 +252,7 @@ class UrlBar extends ImmutableComponent {
         windowActions.setRenderUrlBarSuggestions(true)
         // Any other keydown is fair game for autocomplete to be enabled.
         if (!this.autocompleteEnabled) {
-          windowActions.setUrlBarAutocompleteEnabled(true)
+          windowActions.urlBarAutocompleteEnabled(true)
         }
     }
   }
@@ -264,9 +269,6 @@ class UrlBar extends ImmutableComponent {
     if (!this.isActive) {
       windowActions.setNavBarUserInput(e.target.value)
     }
-    // On blur, a user expects the text shown from the last autocomplete suffix
-    // to be auto entered as the new location.
-    this.clearSearchEngine()
 
     if (!eventElHasAncestorWithClasses(e, ['urlBarSuggestions', 'urlbarForm'])) {
       this.updateLocationToSuggestion()
@@ -277,29 +279,6 @@ class UrlBar extends ImmutableComponent {
     if (this.props.locationValueSuffix.length > 0) {
       windowActions.setNavBarUserInput(this.locationValue + this.props.locationValueSuffix)
     }
-  }
-
-  detectSearchEngine (input) {
-    let location = typeof input === 'string' ? input : this.props.urlbar.get('location')
-    if (typeof location === 'string' && location.length !== 0) {
-      const isLocationUrl = isUrl(location)
-      if (!isLocationUrl &&
-        !(this.searchSelectEntry && location.startsWith(this.searchSelectEntry.shortcut + ' '))) {
-        let entries = searchProviders.providers
-        entries.forEach((entry) => {
-          if (location.startsWith(entry.shortcut + ' ')) {
-            this.activateSearchEngine = true
-            this.searchSelectEntry = entry
-            return false
-          }
-        })
-      }
-    }
-  }
-
-  clearSearchEngine () {
-    this.activateSearchEngine = false
-    this.searchSelectEntry = null
   }
 
   get suggestionLocation () {
@@ -313,24 +292,17 @@ class UrlBar extends ImmutableComponent {
   }
 
   onChange (e) {
-    const oldActivateSearchEngine = this.activateSearchEngine
-    const oldSearchSelectEntry = this.searchSelectEntry
-
-    this.clearSearchEngine()
-    this.detectSearchEngine(e.target.value)
-
+    this.setValue(e.target.value)
     if (this.suggestionLocation) {
       windowActions.setUrlBarSuggestions(undefined, null)
     }
+  }
 
-    // TODO: activeSearchEngine and searchSelectEntry should be stored in
-    // state so we don't have to do this hack.
-    // It comes into play because no keyUp state changes happen when
-    // you use the context menu to select all and then cut.
-    if (oldActivateSearchEngine !== this.activateSearchEngine ||
-        oldSearchSelectEntry !== this.searchSelectEntry) {
-      this.forceUpdate()
-    }
+  // Keeps track of which part was set for the url suffix and which
+  // part was set for the value.
+  setValue (val, suffix) {
+    this.lastVal = val
+    this.urlInput.value = val + (suffix || '')
   }
 
   onKeyUp (e) {
@@ -343,16 +315,11 @@ class UrlBar extends ImmutableComponent {
     if (this.isSelected()) {
       windowActions.setUrlBarSelected(false)
     }
+    // We never want to set the full navbar user input to include the suffix
     if (this.locationValue + this.props.locationValueSuffix !== e.target.value) {
-      windowActions.setNavBarUserInput(e.target.value)
+      windowActions.setNavBarUserInput(this.lastVal)
     }
-    this.clearSearchEngine()
-    this.detectSearchEngine(e.target.value)
     this.keyPressed = false
-
-    if ((e.target.value !== undefined) && e.target.value.length === 0) {
-      windowActions.setRenderUrlBarSuggestions(false)
-    }
   }
 
   select () {
@@ -371,7 +338,6 @@ class UrlBar extends ImmutableComponent {
     this.select()
     windowActions.setUrlBarFocused(true)
     windowActions.setUrlBarSelected(true)
-    this.detectSearchEngine()
   }
 
   componentWillMount () {
@@ -387,7 +353,7 @@ class UrlBar extends ImmutableComponent {
 
   componentDidMount () {
     if (this.urlInput) {
-      this.urlInput.value = UrlUtil.getDisplayLocation(this.props.location, getSetting(settings.PDFJS_ENABLED))
+      this.setValue(UrlUtil.getDisplayLocation(this.props.location, getSetting(settings.PDFJS_ENABLED)))
       this.focus()
     }
   }
@@ -397,7 +363,7 @@ class UrlBar extends ImmutableComponent {
     if (this.urlInput) {
       if (this.props.activeFrameKey !== prevProps.activeFrameKey) {
         // The user just changed tabs
-        this.urlInput.value = UrlUtil.getDisplayLocation(this.props.urlbar.get('location'), getSetting(settings.PDFJS_ENABLED))
+        this.setValue(UrlUtil.getDisplayLocation(this.props.urlbar.get('location'), getSetting(settings.PDFJS_ENABLED)))
         // Each tab has a focused state stored separately
         if (this.isFocused()) {
           this.focus()
@@ -406,18 +372,17 @@ class UrlBar extends ImmutableComponent {
         windowActions.setRenderUrlBarSuggestions(false)
       } else if (this.props.location !== prevProps.location) {
         // This is a url nav change
-        this.urlInput.value = UrlUtil.getDisplayLocation(this.props.location, getSetting(settings.PDFJS_ENABLED))
+        this.setValue(UrlUtil.getDisplayLocation(this.props.location, getSetting(settings.PDFJS_ENABLED)))
       } else if (this.props.locationValueSuffix.length > 0 && this.isActive &&
         (this.props.locationValueSuffix !== prevProps.locationValueSuffix ||
          this.props.urlbar.get('location') !== prevProps.urlbar.get('location'))) {
         this.showAutocompleteResult()
-      } else if (this.props.activeFrameKey !== prevProps.activeFrameKey ||
-          this.props.titleMode !== prevProps.titleMode ||
+      } else if (this.props.titleMode !== prevProps.titleMode ||
           !this.isActive && !this.isFocused) {
-        this.urlInput.value = this.locationValue
+        this.setValue(this.locationValue)
       } else if (this.props.urlbar.get('location') !== prevProps.urlbar.get('location') &&
           this.urlInput.value !== this.props.urlbar.get('location')) {
-        this.urlInput.value = this.locationValue
+        this.setValue(this.locationValue)
       }
     }
     if (this.isSelected() && !prevProps.urlbar.get('selected')) {
@@ -541,22 +506,11 @@ class UrlBar extends ImmutableComponent {
       }
 
       {
-          // TODO(for perf!): urlLocation shouldn't be passed into UrlBarSuggestions props.
-          // `urlLocation` usage should be refactored out into UrlBar.
-          // Passing it in causes uneeded extra renders for UrlBarSuggestions.
           this.shouldRenderUrlBarSuggestions
           ? <UrlBarSuggestions
-            ref={(node) => { this.urlBarSuggestions = node }}
             selectedIndex={this.props.urlbar.getIn(['suggestions', 'selectedIndex'])}
             suggestionList={this.props.urlbar.getIn(['suggestions', 'suggestionList'])}
-            searchResults={this.props.urlbar.getIn(['suggestions', 'searchResults'])}
-            locationValueSuffix={this.props.locationValueSuffix}
-            sites={this.props.sites}
-            searchDetail={this.props.searchDetail}
-            activeFrameKey={this.props.activeFrameKey}
-            urlLocation={this.props.urlbar.get('location')}
-            urlPreview={this.props.urlbar.get('urlPreview')}
-            searchSelectEntry={this.searchSelectEntry}
+            hasLocationValueSuffix={!!this.props.locationValueSuffix}
             menubarVisible={this.props.menubarVisible} />
           : null
         }

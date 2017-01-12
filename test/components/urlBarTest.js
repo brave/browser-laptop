@@ -114,13 +114,13 @@ describe('urlBar tests', function () {
             .then((val) => val === 'https://brave.com')
         })
         // hit down
-        .keys('\uE015')
+        .keys(Brave.keys.DOWN)
         .waitUntil(function () {
           return this.getValue(urlInput)
             .then((val) => val === 'https://brave.com/test')
         })
         // hit up
-        .keys('\uE013')
+        .keys(Brave.keys.UP)
         .waitUntil(function () {
           return this.getValue(urlInput)
             .then((val) => val === 'https://brave.com')
@@ -189,7 +189,7 @@ describe('urlBar tests', function () {
       yield this.app.client
         .setValue(urlInput, 'b')
         .waitUntil(function () {
-          return this.getValue(urlInput).then((val) => val === 'b')
+          return this.getValue(urlInput).then((val) => val.startsWith('b'))
         })
         .waitForExist(urlBarSuggestions + ' li')
     })
@@ -240,8 +240,7 @@ describe('urlBar tests', function () {
           .setValue(urlInput, 'google')
           .waitForExist(urlBarSuggestions + ' li')
 
-          // hit escape
-          .keys('\uE00C')
+          .keys(Brave.keys.ESCAPE)
           .waitForElementFocus(urlInput)
       })
       it('does select the urlbar text', function * () {
@@ -264,8 +263,7 @@ describe('urlBar tests', function () {
           .waitForElementFocus(urlInput)
           .setValue(urlInput, 'random-uuid-d63ecb78-eec8-4c08-973b-fb39cb5a6f1a')
 
-          // hit escape
-          .keys('\uE00C')
+          .keys(Brave.keys.ESCAPE)
           .waitForElementFocus(urlInput)
       })
       it('does select the urlbar text', function * () {

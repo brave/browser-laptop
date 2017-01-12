@@ -364,6 +364,8 @@ WindowStore
       urlbar: {
         location: string, // the string displayed in the urlbar
         urlPreview: string,
+        searchDetail: {
+        },
         suggestions: {
           selectedIndex: number, // index of the item in focus
           searchResults: array, // autocomplete server results if enabled

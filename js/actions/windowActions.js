@@ -489,7 +489,39 @@ const windowActions = {
   },
 
   /**
-   * Enables or disables the urlbar autocomplete.
+   * The active URL bar suggestion was clicked
+   * @param {boolean} isForSecondaryAction - Whether the secondary action is expected
+   *  which happens when a modifier key is pressed.
+   * @param {boolean} shiftKey - Whether the shift key is being pressed
+   */
+  activeSuggestionClicked: function (isForSecondaryAction, shiftKey) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ACTIVE_URL_BAR_SUGGESTION_CLICKED,
+      isForSecondaryAction,
+      shiftKey
+    })
+  },
+
+  /**
+   * The previous suggestion is being selected
+   */
+  previousUrlBarSuggestionSelected: function () {
+    dispatch({
+      actionType: windowConstants.WINDOW_PREVIOUS_URL_BAR_SUGGESTION_SELECTED
+    })
+  },
+
+  /**
+   * The next suggestion is being selected
+   */
+  nextUrlBarSuggestionSelected: function () {
+    dispatch({
+      actionType: windowConstants.WINDOW_NEXT_URL_BAR_SUGGESTION_SELECTED
+    })
+  },
+
+  /**
+   * autocomplete for urlbar is being enabled or disabled.
    * Autocomplete is defined to be the action of inserting text into the urlbar itself
    * to the first item's URL match if possible.  The inserted text is auto selected so
    * that the next character inserted will replace it.
@@ -497,9 +529,9 @@ const windowActions = {
    *
    * @param {boolean} enabled - true if the urlbar should autocomplete
    */
-  setUrlBarAutocompleteEnabled: function (enabled) {
+  urlBarAutocompleteEnabled: function (enabled) {
     dispatch({
-      actionType: windowConstants.WINDOW_SET_URL_BAR_AUTCOMPLETE_ENABLED,
+      actionType: windowConstants.WINDOW_URL_BAR_AUTOCOMPLETE_ENABLED,
       enabled
     })
   },
@@ -530,15 +562,16 @@ const windowActions = {
   },
 
   /**
-   * Sets the URL bar suggestion search results.
+   * New URL bar suggestion search results are available.
    * This is typically from a service like Duck Duck Go auto complete for the portion of text that the user typed in.
-   * Note: This should eventually be refactored outside of the component doing XHR and into a store.
    *
-   * @param searchResults The search results to set for the currently entered URL bar text.
+   * @param {number} tabId - the tab id for the action
+   * @param searchResults The search results for the currently entered URL bar text.
    */
-  setUrlBarSuggestionSearchResults: function (searchResults) {
+  searchSuggestionResultsAvailable: function (tabId, searchResults) {
     dispatch({
-      actionType: windowConstants.WINDOW_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS,
+      actionType: windowConstants.WINDOW_SEARCH_SUGGESTION_RESULTS_AVAILABLE,
+      tabId,
       searchResults
     })
   },

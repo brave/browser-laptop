@@ -80,7 +80,8 @@ var exports = {
     SHIFT: '\ue008',
     BACKSPACE: '\ue003',
     DELETE: '\ue017',
-    DOWN: '\ue015'
+    DOWN: '\ue015',
+    UP: '\ue013'
   },
 
   defaultTimeout: 10000,

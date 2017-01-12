@@ -980,7 +980,6 @@ class Main extends ImmutableComponent {
               <NavigationBar
                 ref={(node) => { this.navBar = node }}
                 navbar={activeFrame && activeFrame.get('navbar')}
-                frames={this.props.windowState.get('frames')}
                 sites={appStateSites}
                 activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
                 location={activeFrame && activeFrame.get('location') || ''}

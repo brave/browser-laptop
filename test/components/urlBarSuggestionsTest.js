@@ -47,7 +47,7 @@ describe('urlBarSuggestions', function () {
   it('deactivates suggestions on escape', function * () {
     yield this.app.client
       .setInputText(urlInput, 'Page 1')
-      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
+      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]')
       .keys(Brave.keys.ESCAPE)
       .waitUntil(function () {
         return this.isExisting(urlBarSuggestions).then((exists) => exists === false)
@@ -57,7 +57,7 @@ describe('urlBarSuggestions', function () {
   it('deactivates suggestions on backspace', function * () {
     yield this.app.client
       .setInputText(urlInput, 'Page 1')
-      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
+      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]')
       .keys(Brave.keys.BACKSPACE)
       .waitUntil(function () {
         return this.isExisting(urlBarSuggestions).then((exists) => exists === false)
@@ -67,7 +67,7 @@ describe('urlBarSuggestions', function () {
   it('deactivates suggestions on delete', function * () {
     yield this.app.client
       .setInputText(urlInput, 'Page 1')
-      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
+      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]')
       .keys(Brave.keys.DELETE)
       .waitUntil(function () {
         return this.isExisting(urlBarSuggestions).then((exists) => exists === false)
@@ -77,8 +77,8 @@ describe('urlBarSuggestions', function () {
   it('navigates to a suggestion when clicked', function * () {
     yield this.app.client
       .setInputText(urlInput, 'Page 1')
-      .waitForVisible(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
-      .click(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
+      .waitForVisible(urlBarSuggestions + ' li.suggestionItem[data-index="0"]')
+      .click(urlBarSuggestions + ' li.suggestionItem[data-index="0"]')
       .tabByIndex(1)
       .waitForUrl(this.page1Url)
   })
@@ -88,9 +88,9 @@ describe('urlBarSuggestions', function () {
       .setInputText(urlInput, 'Page')
       .waitForExist(urlBarSuggestions)
       .keys(Brave.keys.DOWN)
-      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="1"].selected')
+      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"].selected')
       .keys(Brave.keys.DOWN)
-      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="2"].selected')
+      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="1"].selected')
       .keys(Brave.keys.ENTER)
       .tabByIndex(1).getUrl().should.become(this.page1Url)
   })

@@ -76,7 +76,7 @@ class UrlBarIcon extends ImmutableComponent {
     }
 
     return {
-      backgroundImage: `url(${this.props.searchSelectEntry.image})`,
+      backgroundImage: `url(${this.props.searchSelectEntry.get('image')})`,
       backgroundSize: searchIconSize,
       width: searchIconSize,
       height: searchIconSize
