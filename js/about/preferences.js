@@ -961,14 +961,27 @@ class PaymentsTab extends ImmutableComponent {
     const walletCreated = this.props.ledgerData.get('created') && !this.props.ledgerData.get('creating')
     const walletTransactions = this.props.ledgerData.get('transactions')
     const walletHasTransactions = walletTransactions && walletTransactions.size
+    let buttonText
 
     if (!walletCreated || !walletHasTransactions) {
-      return null
+      buttonText = 'noPaymentHistory'
+    } else {
+      buttonText = 'viewPaymentHistory'
     }
 
-    const buttonText = 'viewPaymentHistory'
+    const l10nDataArgs = {
+      reconcileDate: this.nextReconcileDate
+    }
+
     const onButtonClick = this.props.showOverlay.bind(this, 'paymentHistory')
-    return <Button className='paymentHistoryButton' l10nId={buttonText} onClick={onButtonClick.bind(this)} disabled={this.props.ledgerData.get('creating')} />
+
+    return <Button
+      className='paymentHistoryButton'
+      l10nId={buttonText}
+      l10nArgs={l10nDataArgs}
+      onClick={onButtonClick.bind(this)}
+      disabled={this.props.ledgerData.get('creating')}
+      />
   }
 
   get walletStatus () {
@@ -1204,7 +1217,12 @@ class PaymentsTab extends ImmutableComponent {
       return null
     }
     const timestamp = ledgerData.get('reconcileStamp')
-    const nextReconcileDateRelative = formattedTimeFromNow(timestamp)
+    return formattedTimeFromNow(timestamp)
+  }
+
+  get nextReconcileMessage () {
+    const nextReconcileDateRelative = this.nextReconcileDate
+
     const l10nDataArgs = {
       reconcileDate: nextReconcileDateRelative
     }
@@ -1314,7 +1332,7 @@ class PaymentsTab extends ImmutableComponent {
               </td>
               <td>
                 <div className='walletStatus' data-l10n-id={this.walletStatus.id} data-l10n-args={this.walletStatus.args ? JSON.stringify(this.walletStatus.args) : null} />
-                {this.nextReconcileDate}
+                {this.nextReconcileMessage}
               </td>
             </tr>
           </tbody>
