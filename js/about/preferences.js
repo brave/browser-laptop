@@ -1413,9 +1413,33 @@ class PaymentsTab extends ImmutableComponent {
 }
 
 class SyncTab extends ImmutableComponent {
+  get enabled () {
+    return getSetting(settings.SYNC_ENABLED, this.props.settings)
+  }
+
   render () {
-    return <div>
-      Sync settings coming soon
+    return <div id='syncContainer'>
+      <div className='sectionTitle' data-l10n-id='syncTitle' />
+      <div className='settingsListContainer'>
+        <span className='settingsListTitle syncTitleMessage' data-l10n-id='syncTitleMessage' />
+        <a href='https://github.com/brave/sync/wiki/Design' target='_blank'>
+          <span className='fa fa-question-circle fundsFAQ' />
+        </a>
+        <div className='settingsList'>
+          <SettingCheckbox dataL10nId='syncEnable' prefKey={settings.SYNC_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        </div>
+      </div>
+      {
+        this.enabled
+          ? <div id='syncData'><div className='sectionTitle' data-l10n-id='syncData' />
+            <SettingsList dataL10nId='syncDataMessage'>
+              <SettingCheckbox dataL10nId='syncBookmarks' prefKey={settings.SYNC_TYPE_BOOKMARK} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+              <SettingCheckbox dataL10nId='syncSiteSettings' prefKey={settings.SYNC_TYPE_SITE_SETTING} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+              <SettingCheckbox dataL10nId='syncHistory' prefKey={settings.SYNC_TYPE_HISTORY} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+            </SettingsList>
+          </div>
+          : null
+      }
     </div>
   }
 }
@@ -1840,7 +1864,6 @@ class PreferenceNavigation extends ImmutableComponent {
         selected={this.props.preferenceTab === preferenceTabs.PAYMENTS}
       />
       <PreferenceNavigationButton icon='fa-refresh'
-        className='notImplemented'
         dataL10nId='sync'
         onClick={this.props.changeTab.bind(null, preferenceTabs.SYNC)}
         selected={this.props.preferenceTab === preferenceTabs.SYNC}
@@ -1962,6 +1985,7 @@ class AboutPreferences extends React.Component {
     if (key === settings.HARDWARE_ACCELERATION_ENABLED ||
         key === settings.DO_NOT_TRACK ||
         key === settings.LANGUAGE ||
+        (key === settings.SYNC_ENABLED && value === true) ||
         key === settings.PDFJS_ENABLED || key === settings.TORRENT_VIEWER_ENABLED ||
         key === settings.SMOOTH_SCROLL_ENABLED || key === settings.SEND_CRASH_REPORTS) {
       ipc.send(messages.PREFS_RESTART, key, value)

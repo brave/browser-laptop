@@ -101,7 +101,6 @@ module.exports = {
     winBaseUrl: `${winUpdateHost}/multi-channel/releases/CHANNEL/`
   },
   sync: {
-    enabled: true,
     apiVersion: '0',
     serverUrl: isProduction ? 'https://sync.brave.com' : 'https://sync-staging.brave.com',
     debug: true,
@@ -153,6 +152,12 @@ module.exports = {
     'security.passwords.dashlane-enabled': false,
     'security.passwords.last-pass-enabled': false,
     'security.flash.installed': false,
+    // sync
+    'sync.enabled': false,
+    'sync.device-name': 'browser-laptop',
+    'sync.type.bookmark': true,
+    'sync.type.history': false,
+    'sync.type.siteSetting': true,
     'general.downloads.default-save-path': null,
     'general.disable-title-mode': process.platform === 'linux',
     'advanced.hardware-acceleration-enabled': true,

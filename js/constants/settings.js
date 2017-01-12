@@ -65,7 +65,11 @@ const settings = {
   MINIMUM_VISITS: 'advanced.minimum-visits',
   MINIMUM_PERCENTAGE: 'advanced.minimum-percentage',
   AUTO_SUGGEST_SITES: 'advanced.auto-suggest-sites',
-
+  SYNC_ENABLED: 'sync.enabled',
+  SYNC_DEVICE_NAME: 'sync.device-name',
+  SYNC_TYPE_BOOKMARK: 'sync.type.bookmark',
+  SYNC_TYPE_HISTORY: 'sync.type.history',
+  SYNC_TYPE_SITE_SETTING: 'sync.type.siteSetting',
   // DEPRECATED settings
   // ########################
   // these constants should not appear outside of this file, ../settings.js, and our tests
