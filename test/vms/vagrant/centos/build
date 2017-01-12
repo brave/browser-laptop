@@ -1,0 +1,26 @@
+#!/bin/bash
+set -ex
+wget -O installer https://sh.rustup.rs
+bash installer -y -v
+echo "export SCCACHE_BUCKET='brave-sc-cache'" >> ~/.bashrc
+echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> ~/.bashrc
+export PATH="$HOME/.cargo/bin:$PATH"
+export SCCACHE_BUCKET='brave-sc-cache'
+cargo install sccache
+
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.32.1/install.sh | bash
+export MANPATH=/tmp/
+export NVM_DIR="/home/vagrant/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+source ~/.nvm/nvm.sh 
+nvm install stable
+nvm use stable
+
+
+cd /build
+git clone https://github.com/posix4e/browser-laptop-bootstrap
+cd browser-laptop-bootstrap
+cat /vagrant/patch-for-sccache | patch -p1
+npm install
+npm run init
+npm run build
