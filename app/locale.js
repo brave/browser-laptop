@@ -159,6 +159,7 @@ var rendererIdentifiers = function () {
     'settings',
     'bookmarksManager',
     'importBrowserData',
+    'exportBookmarks',
     'submitFeedback',
     'bookmarksToolbar',
     'bravery',

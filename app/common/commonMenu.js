@@ -249,6 +249,19 @@ module.exports.importBrowserDataMenuItem = () => {
   }
 }
 
+module.exports.exportBookmarksMenuItem = () => {
+  return {
+    label: locale.translation('exportBookmarks'),
+    click: function (item, focusedWindow) {
+      if (process.type === 'browser') {
+        process.emit(messages.EXPORT_BOOKMARKS)
+      } else {
+        electron.ipcRenderer.send(messages.EXPORT_BOOKMARKS)
+      }
+    }
+  }
+}
+
 module.exports.submitFeedbackMenuItem = () => {
   return {
     label: locale.translation('submitFeedback'),
