@@ -168,22 +168,6 @@ module.exports.getObjectById = (objectId, category) => {
 }
 
 /**
- * Sets object id on a state entry.
- * @param {Immutable.Map} item
- * @returns {Immutable.map}
- */
-module.exports.setObjectId = (item) => {
-  if (!item || !item.toJS) {
-    return
-  }
-  if (item.get('objectId')) {
-    return item
-  }
-  const crypto = require('crypto')
-  return item.set('objectId', new Immutable.List(crypto.randomBytes(16)))
-}
-
-/**
  * Gets current time in seconds
  */
 module.exports.now = () => {
