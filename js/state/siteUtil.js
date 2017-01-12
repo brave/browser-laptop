@@ -8,7 +8,6 @@ const siteTags = require('../constants/siteTags')
 const settings = require('../constants/settings')
 const getSetting = require('../settings').getSetting
 const UrlUtil = require('../lib/urlutil')
-const syncUtil = require('./syncUtil')
 const urlParse = require('../../app/common/urlParse')
 
 const isBookmark = (tags) => {
@@ -189,7 +188,7 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail, s
 
   let site = mergeSiteDetails(oldSite, siteDetail, tag, folderId)
   if (syncCallback) {
-    site = syncUtil.setObjectId(site)
+    site = module.exports.setObjectId(site)
     syncCallback(site)
   }
   if (index === -1) {
@@ -593,4 +592,20 @@ module.exports.getOrigin = function (location) {
   } else {
     return null
   }
+}
+
+/**
+ * Sets object id on a state entry.
+ * @param {Immutable.Map} item
+ * @returns {Immutable.map}
+ */
+module.exports.setObjectId = (item) => {
+  if (!item || !item.toJS) {
+    return
+  }
+  if (item.get('objectId')) {
+    return item
+  }
+  const crypto = require('crypto')
+  return item.set('objectId', new Immutable.List(crypto.randomBytes(16)))
 }

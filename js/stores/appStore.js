@@ -10,7 +10,6 @@ const AppDispatcher = require('../dispatcher/appDispatcher')
 const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
 const siteUtil = require('../state/siteUtil')
-const syncUtil = require('../state/syncUtil')
 const siteSettings = require('../state/siteSettings')
 const appUrlUtil = require('../lib/appUrlUtil')
 const electron = require('electron')
@@ -597,7 +596,7 @@ const handleAppAction = (action) => {
         let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
         let newSiteSettings = siteSettings.mergeSiteSetting(appState.get(propertyName), action.hostPattern, action.key, action.value)
         if (!action.temporary) {
-          let syncObject = syncUtil.setObjectId(newSiteSettings.get(action.hostPattern))
+          let syncObject = siteUtil.setObjectId(newSiteSettings.get(action.hostPattern))
           syncActions.updateSiteSetting(action.hostPattern, syncObject)
           newSiteSettings = newSiteSettings.set(action.hostPattern, syncObject)
         }
@@ -610,7 +609,7 @@ const handleAppAction = (action) => {
         let newSiteSettings = siteSettings.removeSiteSetting(appState.get(propertyName),
           action.hostPattern, action.key)
         if (!action.temporary) {
-          let syncObject = syncUtil.setObjectId(newSiteSettings.get(action.hostPattern))
+          let syncObject = siteUtil.setObjectId(newSiteSettings.get(action.hostPattern))
           syncActions.updateSiteSetting(action.hostPattern, syncObject)
           newSiteSettings = newSiteSettings.set(action.hostPattern, syncObject)
         }
