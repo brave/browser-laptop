@@ -1780,7 +1780,7 @@ class PreferenceNavigation extends ImmutableComponent {
         onClick={this.props.changeTab.bind(null, preferenceTabs.PAYMENTS)}
         selected={this.props.preferenceTab === preferenceTabs.PAYMENTS}
       />
-      <PreferenceNavigationButton icon='fa-refresh'
+      <PreferenceNavigationButton icon='fa-brave-sync'
         dataL10nId='sync'
         onClick={this.props.changeTab.bind(null, preferenceTabs.SYNC)}
         selected={this.props.preferenceTab === preferenceTabs.SYNC}
