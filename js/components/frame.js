@@ -93,6 +93,9 @@ class Frame extends ImmutableComponent {
         const ledgerData = this.props.ledgerInfo.merge(this.props.publisherInfo).merge(this.props.preferencesData)
         this.webview.send(messages.LEDGER_UPDATED, ledgerData.toJS())
       }
+      if (!Immutable.is(prevProps.sync, this.props.sync)) {
+        this.webview.send(messages.SYNC_UPDATED, this.props.sync.toJS())
+      }
       if (!Immutable.is(prevProps.settings, this.props.settings)) {
         this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
       }
