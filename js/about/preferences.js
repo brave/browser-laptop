@@ -963,7 +963,9 @@ class PaymentsTab extends ImmutableComponent {
     const walletHasTransactions = walletTransactions && walletTransactions.size
     let buttonText
 
-    if (!walletCreated || !walletHasTransactions) {
+    if (!walletCreated) {
+      buttonText = null
+    } else if (!walletHasTransactions) {
       buttonText = 'noPaymentHistory'
     } else {
       buttonText = 'viewPaymentHistory'
@@ -1222,6 +1224,9 @@ class PaymentsTab extends ImmutableComponent {
 
   get nextReconcileMessage () {
     const nextReconcileDateRelative = this.nextReconcileDate
+    if (!nextReconcileDateRelative) {
+      return null
+    }
 
     const l10nDataArgs = {
       reconcileDate: nextReconcileDateRelative
