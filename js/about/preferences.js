@@ -1373,6 +1373,16 @@ class PaymentsTab extends ImmutableComponent {
         ? <ModalOverlay title={'ledgerRecoveryTitle'} content={this.ledgerRecoveryContent} footer={this.ledgerRecoveryFooter} onHide={this.props.hideOverlay.bind(this, 'ledgerRecovery')} />
         : null
       }
+      <div className='advancedSettingsWrapper'>
+        {
+          this.props.ledgerData.get('created') && this.enabled
+          ? <Button
+            l10nId='advancedSettings'
+            className='advancedSettings whiteButton'
+            onClick={this.props.showOverlay.bind(this, 'advancedSettings')} />
+          : null
+        }
+      </div>
       <div className='titleBar'>
         <div className='sectionTitleWrapper pull-left'>
           <span className='sectionTitle'>Brave Payments</span>
@@ -1383,7 +1393,14 @@ class PaymentsTab extends ImmutableComponent {
             <span data-l10n-id='off' />
             <SettingCheckbox dataL10nId='on' prefKey={settings.PAYMENTS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
           </div>
-          { this.props.ledgerData.get('created') && this.enabled ? <Button l10nId='advancedSettings' className='advancedSettings whiteButton' onClick={this.props.showOverlay.bind(this, 'advancedSettings')} /> : null }
+          {
+            this.props.ledgerData.get('created') && this.enabled
+            ? <div className='autoSuggestSwitch'>
+              <SettingCheckbox dataL10nId='autoSuggestSites' prefKey={settings.AUTO_SUGGEST_SITES} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+              <a className='moreInfoBtn fa fa-question-circle' href='https://brave.com/Payments_FAQ.html' target='_blank' data-l10n-id='paymentsFAQLink' />
+            </div>
+            : null
+          }
         </div>
       </div>
       {
