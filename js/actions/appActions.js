@@ -811,13 +811,15 @@ const appActions = {
    * @param {Array.<number>|null} seed
    * @param {Array.<number>|null} deviceId
    * @param {number|null} lastFetchTimestamp
+   * @param {string=} seedQr
    */
-  saveSyncInitData: function (seed, deviceId, lastFetchTimestamp) {
+  saveSyncInitData: function (seed, deviceId, lastFetchTimestamp, seedQr) {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_SAVE_SYNC_INIT_DATA,
       seed,
       deviceId,
-      lastFetchTimestamp
+      lastFetchTimestamp,
+      seedQr
     })
   }
 }

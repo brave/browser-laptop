@@ -6,6 +6,7 @@
 
 const Immutable = require('immutable')
 const electron = require('electron')
+const qr = require('qr-image')
 const ipcMain = electron.ipcMain
 const messages = require('../js/constants/sync/messages')
 const categories = require('../js/constants/sync/proto').categories
@@ -233,8 +234,20 @@ module.exports.init = function (initialState) {
     if (!deviceId && newDeviceId) {
       deviceId = Array.from(newDeviceId)
     }
-    appActions.saveSyncInitData(new Immutable.List(seed),
-      new Immutable.List(newDeviceId))
+    try {
+      let chunks = []
+      qr.image(Buffer.from(seed).toString('hex')).on('data', (chunk) => {
+        chunks.push(chunk)
+      }).on('end', () => {
+        let seedQr = 'data:image/png;base64,' + Buffer.concat(chunks).toString('base64')
+        appActions.saveSyncInitData(new Immutable.List(seed),
+          new Immutable.List(newDeviceId), null, seedQr)
+      })
+    } catch (ex) {
+      console.log('qr image error: ' + ex.toString())
+      appActions.saveSyncInitData(new Immutable.List(seed),
+        new Immutable.List(newDeviceId))
+    }
   })
   ipcMain.on(messages.SYNC_READY, module.exports.onSyncReady.bind(null,
     !initialState.seed && !initialState.deviceId))
