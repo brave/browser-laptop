@@ -157,6 +157,7 @@ module.exports = {
     'advanced.minimum-visit-time': 8,
     'advanced.minimum-visits': 5,
     'advanced.minimum-percentage': false,
+    'advanced.auto-suggest-sites': true,
     'shutdown.clear-history': false,
     'shutdown.clear-downloads': false,
     'shutdown.clear-cache': false,
