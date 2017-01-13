@@ -863,6 +863,9 @@ const handleAppAction = (action) => {
       if (action.lastFetchTimestamp) {
         appState = appState.setIn(['sync', 'lastFetchTimestamp'], action.lastFetchTimestamp)
       }
+      if (action.seedQr) {
+        appState = appState.setIn(['sync', 'seedQr'], action.seedQr)
+      }
       break
     default:
   }

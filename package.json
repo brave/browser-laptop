@@ -101,6 +101,7 @@
     "ledger-publisher": "^0.8.108",
     "lru_cache": "^1.0.0",
     "moment": "^2.15.1",
+    "niceware": "^1.0.4",
     "normalize-url": "^1.7.0",
     "parse-torrent": "^5.8.1",
     "prettier-bytes": "^1.0.3",

@@ -465,7 +465,7 @@ app.on('ready', () => {
     })
 
     ipcMain.on(messages.PREFS_RESTART, (e, config, value) => {
-      var message = locale.translation('prefsRestart')
+      var message = config === settings.SYNC_ENABLED ? locale.translation('prefsRestartSync') : locale.translation('prefsRestart')
       if (prefsRestartLastValue[config] !== undefined && prefsRestartLastValue[config] !== value) {
         delete prefsRestartLastValue[config]
         appActions.hideMessageBox(message)

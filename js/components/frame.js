@@ -105,6 +105,9 @@ class Frame extends ImmutableComponent {
       if (!Immutable.is(prevProps.allSiteSettings, this.props.allSiteSettings)) {
         this.webview.send(messages.SITE_SETTINGS_UPDATED, this.props.allSiteSettings ? this.props.allSiteSettings.toJS() : null)
       }
+      if (this.props.sync && !Immutable.is(prevProps.sync, this.props.sync)) {
+        this.webview.send(messages.SYNC_UPDATED, this.props.sync.toJS())
+      }
       if (!Immutable.is(prevProps.braveryDefaults, this.props.braveryDefaults)) {
         this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.props.braveryDefaults.toJS())
       }
