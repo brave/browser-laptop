@@ -73,7 +73,7 @@ Closes an open tab
 
 
 
-### addSite(siteDetail, tag, originalSiteDetail, destinationIsParent) 
+### addSite(siteDetail, tag, originalSiteDetail, destinationIsParent, skipSync) 
 
 Adds a site to the site list
 
@@ -88,6 +88,8 @@ Adds a site to the site list
 **destinationIsParent**: `boolean`, Whether or not the destinationDetail should be considered the new parent.
   The details of the old entries will be modified if this is set, otherwise only the tag will be added.
 
+**skipSync**: `boolean`, Set true if a site isn't eligible for Sync (e.g. if addSite was triggered by Sync)
+
 
 
 ### clearHistory() 
@@ -96,7 +98,7 @@ Clears history (all sites without tags). Indirectly called by appActions.onClear
 
 
 
-### removeSite(siteDetail, tag) 
+### removeSite(siteDetail, tag, skipSync) 
 
 Removes a site from the site list
 
@@ -105,6 +107,8 @@ Removes a site from the site list
 **siteDetail**: `Object`, Properties of the site in question
 
 **tag**: `string`, A tag to associate with the site. e.g. bookmarks.
+
+**skipSync**: `boolean`, Set true if a site isn't eligible for Sync (e.g. if this removal was triggered by Sync)
 
 
 
