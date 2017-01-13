@@ -1262,6 +1262,7 @@ class Main extends ImmutableComponent {
                 widevine={this.props.appState.get('widevine')}
                 cookieblock={this.props.appState.get('cookieblock')}
                 allSiteSettings={allSiteSettings}
+                sync={this.props.appState.get('sync') || new Immutable.Map()}
                 ledgerInfo={this.props.appState.get('ledgerInfo') || new Immutable.Map()}
                 publisherInfo={this.props.appState.get('publisherInfo') || new Immutable.Map()}
                 frameSiteSettings={this.frameSiteSettings(frame.get('location'))}

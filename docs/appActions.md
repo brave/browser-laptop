@@ -658,7 +658,7 @@ Dispatches a message to set objectId for a syncable object.
 
 
 
-### saveSyncInitData(seed, deviceId, lastFetchTimestamp) 
+### saveSyncInitData(seed, deviceId, lastFetchTimestamp, seedQr) 
 
 Dispatches a message when sync init data needs to be saved
 
@@ -669,6 +669,8 @@ Dispatches a message when sync init data needs to be saved
 **deviceId**: `Array.&lt;number&gt; | null`, Dispatches a message when sync init data needs to be saved
 
 **lastFetchTimestamp**: `number | null`, Dispatches a message when sync init data needs to be saved
+
+**seedQr**: `string`, Dispatches a message when sync init data needs to be saved
 
 
 
