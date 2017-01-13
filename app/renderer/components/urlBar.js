@@ -481,7 +481,10 @@ class UrlBar extends ImmutableComponent {
 
   render () {
     return <form
-      className='urlbarForm'
+      className={cx({
+        urlbarForm: true,
+        noBorderRadius: this.props.noBorderRadius
+      })}
       action='#'
       id='urlbar'
       ref='urlbar'>
