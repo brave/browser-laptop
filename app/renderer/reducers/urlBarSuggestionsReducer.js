@@ -124,8 +124,8 @@ const generateNewSuggestionsList = (state) => {
   const activeFrameKey = state.get('activeFrameKey')
   const urlLocation = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'location']))
   const sites = appStoreRenderer.state.get('sites')
-  const searchResults = activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'searchResults'])
-  const frameSearchDetail = activeFrameStatePath(state).concat(['navbar', 'urlbar', 'searchDetail'])
+  const searchResults = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'searchResults']))
+  const frameSearchDetail = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'searchDetail']))
   const searchDetail = state.get('searchDetail')
 
   if (!urlLocation) {
@@ -137,7 +137,9 @@ const generateNewSuggestionsList = (state) => {
   const defaultme = (x) => x
   const mapListToElements = ({data, maxResults, type, clickHandler = navigateSiteClickHandler.bind(this),
       sortHandler = defaultme, formatTitle = defaultme, formatUrl = defaultme,
-      filterValue = (site) => site.toLowerCase().includes(urlLocationLower)
+      filterValue = (site) => {
+        return site.toLowerCase().includes(urlLocationLower)
+      }
   }) => // Filter out things which are already in our own list at a smaller index
     data
     // Per suggestion provider filter
