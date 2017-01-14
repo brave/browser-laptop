@@ -880,6 +880,7 @@
       background: @navigationBarBackground;
       border: none;
       box-sizing: border-box;
+      box-shadow: none;
       color: @chromeText;
       cursor: text;
       flex-grow: 1;
@@ -888,6 +889,8 @@
       outline: none;
       text-overflow: ellipsis;
       min-width: 0%; // allow the navigator to shrink
+      padding: 0;
+      height: auto;
 
       &:hover {
         background: @chromeControlsBackground2;
