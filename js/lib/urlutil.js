@@ -39,7 +39,7 @@ const UrlUtil = {
    * @returns {Boolean} Whether or not the input has a scheme.
    */
   hasScheme: function (input) {
-    return !!this.getScheme(input)
+    return !!UrlUtil.getScheme(input)
   },
 
   /**
@@ -63,7 +63,7 @@ const UrlUtil = {
     }
 
     // If there's no scheme, prepend the default scheme
-    if (!this.hasScheme(input)) {
+    if (!UrlUtil.hasScheme(input)) {
       input = defaultScheme + input
     }
 
@@ -117,7 +117,7 @@ const UrlUtil = {
     const case4Reg = /^(data|view-source|mailto|about|chrome-extension|magnet):.*/
 
     let str = input.trim()
-    const scheme = this.getScheme(str)
+    const scheme = UrlUtil.getScheme(str)
 
     if (str.toLowerCase() === 'localhost') {
       return false
@@ -130,13 +130,13 @@ const UrlUtil = {
       return true
     }
     if (case4Reg.test(str)) {
-      return !this.canParseURL(str)
+      return !UrlUtil.canParseURL(str)
     }
     if (scheme && (scheme !== 'file://')) {
       return !caseDomain.test(str + '/')
     }
-    str = this.prependScheme(str)
-    return !this.canParseURL(str)
+    str = UrlUtil.prependScheme(str)
+    return !UrlUtil.canParseURL(str)
   },
 
   /**
@@ -151,9 +151,9 @@ const UrlUtil = {
 
     input = input.trim()
 
-    input = this.prependScheme(input)
+    input = UrlUtil.prependScheme(input)
 
-    if (this.isNotURL(input)) {
+    if (UrlUtil.isNotURL(input)) {
       return input
     }
 
@@ -170,7 +170,7 @@ const UrlUtil = {
    * @returns {Boolean} Whether or not this is a valid URL.
    */
   isURL: function (input) {
-    return !this.isNotURL(input)
+    return !UrlUtil.isNotURL(input)
   },
 
   /**
@@ -220,10 +220,10 @@ const UrlUtil = {
    * @returns {String} A normal url.
    */
   getUrlFromViewSourceUrl: function (input) {
-    if (!this.isViewSourceUrl(input)) {
+    if (!UrlUtil.isViewSourceUrl(input)) {
       return input
     }
-    return this.getUrlFromInput(input.substring('view-source:'.length))
+    return UrlUtil.getUrlFromInput(input.substring('view-source:'.length))
   },
 
   /**
@@ -232,15 +232,15 @@ const UrlUtil = {
    * @returns {String} The view-source URL.
    */
   getViewSourceUrlFromUrl: function (input) {
-    if (this.isImageAddress(input) || !this.isHttpAddress(input)) {
+    if (UrlUtil.isImageAddress(input) || !UrlUtil.isHttpAddress(input)) {
       return null
     }
-    if (this.isViewSourceUrl(input)) {
+    if (UrlUtil.isViewSourceUrl(input)) {
       return input
     }
 
     // Normalizes the actual URL before the view-source: scheme like prefix.
-    return 'view-source:' + this.getUrlFromViewSourceUrl(input)
+    return 'view-source:' + UrlUtil.getUrlFromViewSourceUrl(input)
   },
 
   /**
@@ -312,7 +312,7 @@ const UrlUtil = {
     if (!url || url === 'about:newtab') {
       return ''
     }
-    url = pdfjsEnabled ? this.getLocationIfPDF(url) : url
+    url = pdfjsEnabled ? UrlUtil.getLocationIfPDF(url) : url
     const parsed = urlParse(url)
     if (parsed && parsed.auth) {
       parsed.auth = null
@@ -328,7 +328,7 @@ const UrlUtil = {
    * @return {string} url The base favicon URL
    */
   getDefaultFaviconUrl: function (url) {
-    if (this.isURL(url)) {
+    if (UrlUtil.isURL(url)) {
       const loc = new window.URL(url)
       return loc.protocol + '//' + loc.host + '/favicon.ico'
     }

@@ -1,7 +1,7 @@
 /* globals devTools */
 var Application = require('spectron').Application
 var chai = require('chai')
-const {activeWebview, titleBar} = require('./selectors')
+const {activeWebview, navigator, titleBar} = require('./selectors')
 require('./coMocha')
 
 const path = require('path')
@@ -80,7 +80,8 @@ var exports = {
     SHIFT: '\ue008',
     BACKSPACE: '\ue003',
     DELETE: '\ue017',
-    DOWN: '\ue015'
+    DOWN: '\ue015',
+    UP: '\ue013'
   },
 
   defaultTimeout: 10000,
@@ -313,12 +314,14 @@ var exports = {
       })
     })
 
-    this.app.client.addCommand('waitForSiteEntry', function (location) {
-      logVerbose('waitForSiteEntry(' + location + ')')
+    this.app.client.addCommand('waitForSiteEntry', function (location, waitForTitle = true) {
+      logVerbose('waitForSiteEntry(' + location + ', ' + waitForTitle + ')')
       return this.waitUntil(function () {
         return this.getAppState().then((val) => {
-          const ret = val.value && val.value.sites && val.value.sites.find((site) => site.location === location)
-          logVerbose('waitForSiteEntry("' + location + '") => ' + ret)
+          const ret = val.value && val.value.sites && val.value.sites.find(
+            (site) => site.location === location &&
+              (!waitForTitle || waitForTitle && site.title))
+          logVerbose('waitForSiteEntry("' + location + ', ' + waitForTitle + '") => ' + ret)
           return ret
         })
       })
@@ -353,6 +356,22 @@ var exports = {
       return this.execute(function () {
         return devTools('electron').testData.windowActions.setContextMenuDetail()
       })
+    })
+
+    this.app.client.addCommand('waitForInputText', function (selector, input) {
+      this
+        .waitUntil(function () {
+          return this.getValue(selector).then(function (val) {
+            return val === input
+          })
+        })
+    })
+
+    this.app.client.addCommand('setInputText', function (selector, input) {
+      this
+        .moveToObject(navigator)
+        .setValue(selector, input)
+        .waitForInputText(selector, input)
     })
 
     this.app.client.addCommand('showFindbar', function (show, key = 1) {

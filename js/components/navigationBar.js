@@ -8,7 +8,7 @@ const ImmutableComponent = require('./immutableComponent')
 
 const cx = require('../lib/classSet')
 const Button = require('./button')
-const UrlBar = require('./urlBar')
+const UrlBar = require('../../app/renderer/components/urlBar')
 const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
 const siteTags = require('../constants/siteTags')
@@ -192,12 +192,10 @@ class NavigationBar extends ImmutableComponent {
         }
       </div>
       <UrlBar ref='urlBar'
-        sites={this.props.sites}
         activeFrameKey={this.props.activeFrameKey}
         searchDetail={this.props.searchDetail}
         loading={this.loading}
         location={this.props.location}
-        suggestionIndex={this.props.suggestionIndex}
         title={this.props.title}
         history={this.props.history}
         isSecure={this.props.isSecure}

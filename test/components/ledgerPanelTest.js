@@ -167,7 +167,7 @@ describe('synopsis', function () {
     yield this.app.client
       .url(site1)
       .windowByUrl(Brave.browserWindowUrl)
-      .waitForSiteEntry(site1)
+      .waitForSiteEntry(site1, false)
       .tabByUrl(site1)
       .url(site2)
       .windowByUrl(Brave.browserWindowUrl)

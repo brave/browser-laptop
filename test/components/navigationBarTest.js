@@ -1119,20 +1119,13 @@ describe('navigationBar tests', function () {
 
       before(function * () {
         yield setup(this.app.client)
-        yield this.app.client.waitForExist(urlInput)
-        yield this.app.client.waitForElementFocus(urlInput)
-        yield this.app.client.waitUntil(function () {
-          return this.getValue(urlInput).then((val) => val === '')
-        })
-
         yield this.app.client
+          .waitForExist(urlInput)
+          .waitForElementFocus(urlInput)
+          .waitForInputText(urlInput, '')
           .addSite({ location: 'https://brave.com', title: 'Brave' })
-
-        // now type something
-        yield this.app.client.keys('br')
-        yield this.app.client.waitUntil(function () {
-          return this.getValue(urlInput).then((val) => val === 'br')
-        })
+          .waitForSiteEntry('https://brave.com')
+          .keys('br')
         yield selectsText(this.app.client, 'ave.com')
         yield blur(this.app.client)
         yield this.app.client

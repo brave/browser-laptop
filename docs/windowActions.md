@@ -351,9 +351,34 @@ Sets the URL bar suggestions and selected index.
 
 
 
-### setUrlBarAutocompleteEnabled(enabled) 
+### activeSuggestionClicked(isForSecondaryAction, shiftKey) 
 
-Enables or disables the urlbar autocomplete.
+The active URL bar suggestion was clicked
+
+**Parameters**
+
+**isForSecondaryAction**: `boolean`, Whether the secondary action is expected
+ which happens when a modifier key is pressed.
+
+**shiftKey**: `boolean`, Whether the shift key is being pressed
+
+
+
+### previousUrlBarSuggestionSelected() 
+
+The previous suggestion is being selected
+
+
+
+### nextUrlBarSuggestionSelected() 
+
+The next suggestion is being selected
+
+
+
+### urlBarAutocompleteEnabled(enabled) 
+
+autocomplete for urlbar is being enabled or disabled.
 Autocomplete is defined to be the action of inserting text into the urlbar itself
 to the first item's URL match if possible.  The inserted text is auto selected so
 that the next character inserted will replace it.
@@ -365,15 +390,16 @@ This is sometimes only temporarily disabled, e.g. a user is pressing backspace.
 
 
 
-### setUrlBarSuggestionSearchResults(searchResults) 
+### searchSuggestionResultsAvailable(tabId, searchResults) 
 
-Sets the URL bar suggestion search results.
+New URL bar suggestion search results are available.
 This is typically from a service like Duck Duck Go auto complete for the portion of text that the user typed in.
-Note: This should eventually be refactored outside of the component doing XHR and into a store.
 
 **Parameters**
 
-**searchResults**: , The search results to set for the currently entered URL bar text.
+**tabId**: `number`, the tab id for the action
+
+**searchResults**: , The search results for the currently entered URL bar text.
 
 
 
