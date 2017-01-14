@@ -104,6 +104,7 @@ const urlBarReducer = (state, action) => {
           trackingProtection: {},
           fingerprintingProtection: {}
         })
+        // TODO: This should be moved into a tabs reducer
         state = state.mergeIn(tabStatePath(state, key), {
           audioPlaybackActive: false,
           themeColor: undefined,
