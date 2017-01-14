@@ -990,7 +990,7 @@ class Main extends ImmutableComponent {
                 suggestionIndex={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex']) || 0}
                 isSecure={activeFrame && activeFrame.getIn(['security', 'isSecure']) &&
                  !activeFrame.getIn(['security', 'runInsecureContent'])}
-                locationValueSuffix={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix']) || ''}
+                hasLocationValueSuffix={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix'])}
                 startLoadTime={activeFrame && activeFrame.get('startLoadTime') || undefined}
                 endLoadTime={activeFrame && activeFrame.get('endLoadTime') || undefined}
                 loading={activeFrame && activeFrame.get('loading')}

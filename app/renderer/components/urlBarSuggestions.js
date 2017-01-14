@@ -10,7 +10,6 @@ const ImmutableComponent = require('../../../js/components/immutableComponent')
 const suggestionTypes = require('../../../js/constants/suggestionTypes')
 const cx = require('../../../js/lib/classSet')
 const locale = require('../../../js/l10n')
-const {isForSecondaryAction} = require('../../../js/lib/eventUtil')
 
 class UrlBarSuggestions extends ImmutableComponent {
   get activeIndex () {
@@ -21,32 +20,10 @@ class UrlBarSuggestions extends ImmutableComponent {
   }
 
   blur () {
-    window.removeEventListener('click', this)
     windowActions.setUrlBarSuggestions(null, null)
   }
 
-  clickSelected (e) {
-    windowActions.activeSuggestionClicked(isForSecondaryAction(e), e.shiftKey)
-  }
-
-  // Whether the suggestions box should be rendered
-  shouldRender () {
-    return this.props.suggestionList && this.props.suggestionList.size > 0
-  }
-
   render () {
-    window.removeEventListener('click', this)
-
-    if (!this.shouldRender()) {
-      return null
-    }
-
-    // Add an event listener on the window to hide suggestions when they are shown.
-    window.addEventListener('click', this)
-
-    // If there is a URL suffix that means there's an active autocomplete for the first element.
-    // We should show that as selected so the user knows what is being matched.
-
     const suggestions = this.props.suggestionList
     const bookmarkSuggestions = suggestions.filter((s) => s.type === suggestionTypes.BOOKMARK)
     const historySuggestions = suggestions.filter((s) => s.type === suggestionTypes.HISTORY)

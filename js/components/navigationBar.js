@@ -199,7 +199,7 @@ class NavigationBar extends ImmutableComponent {
         title={this.props.title}
         history={this.props.history}
         isSecure={this.props.isSecure}
-        locationValueSuffix={this.props.locationValueSuffix}
+        hasLocationValueSuffix={this.props.hasLocationValueSuffix}
         startLoadTime={this.props.startLoadTime}
         endLoadTime={this.props.endLoadTime}
         titleMode={this.titleMode}
