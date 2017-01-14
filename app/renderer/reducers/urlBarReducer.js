@@ -15,7 +15,6 @@ const updateNavBarInput = (state, loc, framePath) => {
     framePath = activeFrameStatePath(state)
   }
   state = state.setIn(framePath.concat(['navbar', 'urlbar', 'location']), loc)
-  state = state.setIn(framePath.concat(['navbar', 'urlbar', 'urlPreview']), null)
   return state
 }
 

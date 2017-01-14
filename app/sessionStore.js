@@ -199,7 +199,6 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
     delete frame.activeShortcutDetails
 
     if (frame.navbar && frame.navbar.urlbar) {
-      frame.navbar.urlbar.urlPreview = null
       if (frame.navbar.urlbar.suggestions) {
         frame.navbar.urlbar.suggestions.selectedIndex = null
         frame.navbar.urlbar.suggestions.suggestionList = null

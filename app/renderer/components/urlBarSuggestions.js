@@ -23,7 +23,6 @@ class UrlBarSuggestions extends ImmutableComponent {
   blur () {
     window.removeEventListener('click', this)
     windowActions.setUrlBarSuggestions(null, null)
-    windowActions.setUrlBarPreview(null)
   }
 
   clickSelected (e) {
@@ -136,13 +135,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     }
     // Update the urlbar preview content
     if (newIndex === 0 || newIndex > suggestions.size) {
-      windowActions.setUrlBarPreview(null)
       newIndex = null
-    } else {
-      const currentActive = suggestions.get(newIndex - 1)
-      if (currentActive && currentActive.title) {
-        windowActions.setUrlBarPreview(currentActive.title)
-      }
     }
     windowActions.setUrlBarSuggestions(suggestions, newIndex)
   }

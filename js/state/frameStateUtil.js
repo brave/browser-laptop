@@ -335,7 +335,6 @@ function addFrame (windowState, tabs, frameOpts, newKey, partitionNumber, active
     navbar: {
       urlbar: {
         location: url,
-        urlPreview: '',
         suggestions: {
           selectedIndex: 0,
           searchResults: [],

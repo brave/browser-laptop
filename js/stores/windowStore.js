@@ -421,9 +421,6 @@ const doAction = (action) => {
         showOnRight: action.showOnRight
       })
       break
-    case windowConstants.WINDOW_SET_URL_BAR_PREVIEW:
-      windowState = windowState.setIn(activeFrameStatePath(windowState).concat(['navbar', 'urlbar', 'urlPreview']), action.value)
-      break
     case windowConstants.WINDOW_SET_THEME_COLOR:
       if (action.themeColor !== undefined) {
         windowState = windowState.setIn(frameStatePathForFrame(windowState, action.frameProps).concat(['themeColor']), action.themeColor)

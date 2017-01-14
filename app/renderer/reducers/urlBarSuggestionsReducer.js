@@ -123,13 +123,12 @@ const updateUrlSuffix = (state, suggestionList) => {
 const generateNewSuggestionsList = (state) => {
   const activeFrameKey = state.get('activeFrameKey')
   const urlLocation = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'location']))
-  const urlPreview = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'urlPreview']))
   const sites = appStoreRenderer.state.get('sites')
   const searchResults = activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'searchResults'])
   const frameSearchDetail = activeFrameStatePath(state).concat(['navbar', 'urlbar', 'searchDetail'])
   const searchDetail = state.get('searchDetail')
 
-  if (!urlLocation && !urlPreview) {
+  if (!urlLocation) {
     return state
   }
 

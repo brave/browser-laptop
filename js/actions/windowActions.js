@@ -548,19 +548,6 @@ const windowActions = {
     })
   },
 
-  /*
-   * Sets the URL bar preview value.
-   * TODO: name this something better.
-   *
-   * @param value If false URL bar previews will not be set.
-   */
-  setUrlBarPreview: function (value) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_URL_BAR_PREVIEW,
-      value
-    })
-  },
-
   /**
    * New URL bar suggestion search results are available.
    * This is typically from a service like Duck Duck Go auto complete for the portion of text that the user typed in.

@@ -21,7 +21,6 @@ const navigateSiteClickHandler = (formatUrl) => (site, isForSecondaryAction, shi
     const activeFrame = getActiveFrame(windowStore.state)
     windowActions.loadUrl(activeFrame, location)
     windowActions.setUrlBarActive(false)
-    windowActions.setUrlBarPreview(null)
   }
 }
 

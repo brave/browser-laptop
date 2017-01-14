@@ -363,7 +363,6 @@ WindowStore
     navbar: {
       urlbar: {
         location: string, // the string displayed in the urlbar
-        urlPreview: string,
         searchDetail: {
         },
         suggestions: {
