@@ -3,7 +3,7 @@
 ## [0.13.0](https://github.com/brave/browser-laptop/releases/v0.13.0dev)
 - Linux sandbox added. ([#874])
 - Window renderer processes no longer include Node, content renderer never did in Brave. ([#6454])
-- Muon updated to 2.0.8.
+- Muon updated to 2.0.10.
 - Chromium updated to 54.0.2840.100.
 
 ## [0.12.15](https://github.com/brave/browser-laptop/releases/v0.12.15dev)
