@@ -5,24 +5,24 @@
 const React = require('react')
 const urlParse = require('url').parse
 
-const ImmutableComponent = require('./immutableComponent')
-const windowActions = require('../actions/windowActions')
-const appActions = require('../actions/appActions')
-const KeyCodes = require('../../app/common/constants/keyCodes')
-const cx = require('../lib/classSet')
-const debounce = require('../lib/debounce')
+const ImmutableComponent = require('../../../js/components/immutableComponent')
+const windowActions = require('../../../js/actions/windowActions')
+const appActions = require('../../../js/actions/appActions')
+const KeyCodes = require('../../common/constants/keyCodes')
+const cx = require('../../../js/lib/classSet')
+const debounce = require('../../../js/lib/debounce')
 const ipc = require('electron').ipcRenderer
 
 const UrlBarSuggestions = require('./urlBarSuggestions')
-const UrlBarIcon = require('../../app/renderer/components/urlBarIcon')
-const messages = require('../constants/messages')
-const {getSetting} = require('../settings')
-const settings = require('../constants/settings')
-const contextMenus = require('../contextMenus')
-const windowStore = require('../stores/windowStore')
-const UrlUtil = require('../lib/urlutil')
-const {eventElHasAncestorWithClasses, isForSecondaryAction} = require('../lib/eventUtil')
-const {isUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
+const UrlBarIcon = require('./urlBarIcon')
+const messages = require('../../../js/constants/messages')
+const {getSetting} = require('../../../js/settings')
+const settings = require('../../../js/constants/settings')
+const contextMenus = require('../../../js/contextMenus')
+const windowStore = require('../../../js/stores/windowStore')
+const UrlUtil = require('../../../js/lib/urlutil')
+const {eventElHasAncestorWithClasses, isForSecondaryAction} = require('../../../js/lib/eventUtil')
+const {isUrl, isIntermediateAboutPage} = require('../../../js/lib/appUrlUtil')
 
 class UrlBar extends ImmutableComponent {
   constructor () {

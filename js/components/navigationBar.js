@@ -8,7 +8,7 @@ const ImmutableComponent = require('./immutableComponent')
 
 const cx = require('../lib/classSet')
 const Button = require('./button')
-const UrlBar = require('./urlBar')
+const UrlBar = require('../../app/renderer/components/urlBar')
 const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
 const siteTags = require('../constants/siteTags')

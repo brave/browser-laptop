@@ -4,13 +4,13 @@
 
 const React = require('react')
 
-const windowActions = require('../actions/windowActions')
-const ImmutableComponent = require('./immutableComponent')
+const windowActions = require('../../../js/actions/windowActions')
+const ImmutableComponent = require('../../../js/components/immutableComponent')
 
-const suggestionTypes = require('../constants/suggestionTypes')
-const cx = require('../lib/classSet')
-const locale = require('../l10n')
-const {isForSecondaryAction} = require('../lib/eventUtil')
+const suggestionTypes = require('../../../js/constants/suggestionTypes')
+const cx = require('../../../js/lib/classSet')
+const locale = require('../../../js/l10n')
+const {isForSecondaryAction} = require('../../../js/lib/eventUtil')
 
 class UrlBarSuggestions extends ImmutableComponent {
   get activeIndex () {
