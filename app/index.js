@@ -81,7 +81,7 @@ const contentSettings = require('../js/state/contentSettings')
 const privacy = require('../js/state/privacy')
 const async = require('async')
 const settings = require('../js/constants/settings')
-const BookmarksExporter = require('./bookmarksExporter')
+const BookmarksExporter = require('./browser/bookmarksExporter')
 
 app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferHtmlOverPlugins')
 
@@ -726,9 +726,8 @@ app.on('ready', () => {
       Importer.init()
     })
 
-    // TODO check if needed
     ipcMain.on(messages.EXPORT_BOOKMARKS, () => {
-      BookmarksExporter.dialog()
+      BookmarksExporter.dialog(AppStore.getState().get('sites'))
     })
 
     // This loads package.json into an object
@@ -754,9 +753,8 @@ app.on('ready', () => {
         Importer.init()
       })
 
-      // This is fired by a menu entry
       process.on(messages.EXPORT_BOOKMARKS, () => {
-        BookmarksExporter.dialog()
+        BookmarksExporter.dialog(AppStore.getState().get('sites'))
       })
     })
     ready = true

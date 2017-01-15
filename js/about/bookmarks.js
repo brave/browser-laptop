@@ -371,6 +371,7 @@ class AboutBookmarks extends React.Component {
     this.onChangeSearch = this.onChangeSearch.bind(this)
     this.onClearSearchText = this.onClearSearchText.bind(this)
     this.importBrowserData = this.importBrowserData.bind(this)
+    this.exportBookmarks = this.exportBookmarks.bind(this)
     this.addBookmarkFolder = this.addBookmarkFolder.bind(this)
     this.onClick = this.onClick.bind(this)
     this.clearSelection = this.clearSelection.bind(this)
@@ -428,6 +429,9 @@ class AboutBookmarks extends React.Component {
   importBrowserData () {
     aboutActions.importBrowserDataNow()
   }
+  exportBookmarks () {
+    aboutActions.exportBookmarks()
+  }
   addBookmarkFolder () {
     const newFolder = Immutable.fromJS({
       parentFolderId: this.state.selectedFolderId,
@@ -461,7 +465,8 @@ class AboutBookmarks extends React.Component {
         <div className='folderView'>
           <div className='columnHeader'>
             <span data-l10n-id='folders' />
-            <span data-l10n-id='importBrowserData' className='fa fa-download importBrowserData' onClick={this.importBrowserData} />
+            <span data-l10n-id='importBrowserData' className='fa fa-upload importBrowserData' onClick={this.importBrowserData} />
+            <span data-l10n-id='exportBookmarks' className='fa fa-download exportBookmarks' onClick={this.exportBookmarks} />
             <span data-l10n-id='addBookmarkFolder' className='addBookmarkFolder' onClick={this.addBookmarkFolder} />
           </div>
           <BookmarkFolderList

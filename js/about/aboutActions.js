@@ -222,6 +222,13 @@ const aboutActions = {
     ipc.send(messages.IMPORT_BROWSER_DATA_NOW)
   },
 
+  /**
+   * Export bookmarks
+   */
+  exportBookmarks: function () {
+    ipc.send(messages.EXPORT_BOOKMARKS)
+  },
+
   createWallet: function () {
     ipc.send(messages.LEDGER_CREATE_WALLET)
   },
