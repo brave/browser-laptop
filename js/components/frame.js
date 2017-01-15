@@ -91,6 +91,7 @@ class Frame extends ImmutableComponent {
       ipc.send(messages.CHECK_BITCOIN_HANDLER, FrameStateUtil.getPartition(this.frame))
       const ledgerData = this.props.ledgerInfo.merge(this.props.publisherInfo).merge(this.props.preferencesData).toJS()
       this.webview.send(messages.LEDGER_UPDATED, ledgerData)
+      this.webview.send(messages.SYNC_UPDATED, this.props.sync.toJS())
       this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
       this.webview.send(messages.SITE_SETTINGS_UPDATED, this.props.allSiteSettings ? this.props.allSiteSettings.toJS() : null)
       this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.braveryDefaults)
