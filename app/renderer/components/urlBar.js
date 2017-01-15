@@ -398,7 +398,7 @@ class UrlBar extends ImmutableComponent {
       } else if (this.props.location !== prevProps.location) {
         // This is a url nav change
         this.setValue(UrlUtil.getDisplayLocation(this.props.location, getSetting(settings.PDFJS_ENABLED)))
-      } else if (this.locationValueSuffix.length > 0 && this.isActive &&
+      } else if (this.props.hasLocationValueSuffix && this.isActive &&
         (this.props.hasLocationValueSuffix !== prevProps.hasLocationValueSuffix ||
          this.props.urlbar.get('location') !== prevProps.urlbar.get('location'))) {
         this.showAutocompleteResult()
