@@ -19,7 +19,7 @@ const isWindows = process.platform === 'win32'
 const indentLength = 2
 const indentType = ' '
 
-module.exports.dialog = (sites) => {
+function showDialog (sites) {
   const focusedWindow = BrowserWindow.getFocusedWindow()
   const fileName = moment().format('DD_MM_YYYY') + '.html'
   const defaultPath = path.join(getSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH) || app.getPath('downloads'), fileName)
@@ -36,7 +36,7 @@ module.exports.dialog = (sites) => {
     if (fileName) {
       personal = createBookmarkArray(sites)
       other = createBookmarkArray(sites, -1, false)
-      fs.writeFileSync(fileName, createStringHTML(personal, other))
+      fs.writeFileSync(fileName, createBookmarkHTML(personal, other))
     }
   })
 }
@@ -73,7 +73,7 @@ function createBookmarkArray (sites, parentFolderId, first = true, depth = 1) {
   return payload
 }
 
-function createStringHTML (personal, other) {
+function createBookmarkHTML (personal, other) {
   const breakTag = (isWindows) ? '\r\n' : '\n'
   const title = 'Bookmarks'
 
@@ -87,4 +87,10 @@ function createStringHTML (personal, other) {
 ${personal.join(breakTag)}
 ${other.join(breakTag)}
 </DL><p>`
+}
+
+module.exports = {
+  createBookmarkArray,
+  createBookmarkHTML,
+  showDialog
 }

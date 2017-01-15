@@ -727,7 +727,7 @@ app.on('ready', () => {
     })
 
     ipcMain.on(messages.EXPORT_BOOKMARKS, () => {
-      BookmarksExporter.dialog(AppStore.getState().get('sites'))
+      BookmarksExporter.showDialog(AppStore.getState().get('sites'))
     })
 
     // This loads package.json into an object
@@ -754,7 +754,7 @@ app.on('ready', () => {
       })
 
       process.on(messages.EXPORT_BOOKMARKS, () => {
-        BookmarksExporter.dialog(AppStore.getState().get('sites'))
+        BookmarksExporter.showDialog(AppStore.getState().get('sites'))
       })
     })
     ready = true
