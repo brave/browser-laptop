@@ -78,6 +78,7 @@ describe('application window', function () {
         yield this.app.client
           .waitForUrl(Brave.newTabUrl)
           .windowByIndex(0)
+          .unmaximize()
           .resizeWindow(600, 700)
           .waitUntil(function () {
             return this.getAppState().then((val) => {

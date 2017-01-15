@@ -160,6 +160,12 @@ var exports = {
       }, message, ...param).then((response) => response.value)
     })
 
+    this.app.client.addCommand('unmaximize', function () {
+      return this.execute(function () {
+        return devTools('electron').remote.getCurrentWindow().unmaximize()
+      }).then((response) => response.value)
+    })
+
     this.app.client.addCommand('ipcSendRenderer', function (message, ...param) {
       return this.execute(function (message, ...param) {
         return devTools('electron').ipcRenderer.send(message, ...param)
