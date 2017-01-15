@@ -32,6 +32,7 @@ class UrlBar extends ImmutableComponent {
     this.onKeyDown = this.onKeyDown.bind(this)
     this.onKeyUp = this.onKeyUp.bind(this)
     this.onChange = this.onChange.bind(this)
+    this.onKeyPress = this.onKeyPress.bind(this)
     this.onClick = this.onClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
     this.keyPressed = false
@@ -295,6 +296,22 @@ class UrlBar extends ImmutableComponent {
     }
   }
 
+  onKeyPress (e) {
+    // If we're just continuing an autocomplete then prevent a change event
+    const last = this.lastVal + this.lastSuffix
+    const newValue = this.lastVal + String.fromCharCode(e.which)
+    if (last.startsWith(newValue)) {
+      const newSuffix = last.substring(newValue.length)
+      this.setValue(newValue, newSuffix)
+      windowActions.setNavBarUserInput(newValue)
+      this.urlInput.setSelectionRange(newValue.length, newValue.length + newSuffix.length + 1)
+      if (this.suggestionLocation) {
+        windowActions.setUrlBarSuggestions(undefined, null)
+      }
+      e.preventDefault()
+    }
+  }
+
   onChange (e) {
     this.setValue(e.target.value)
     if (this.suggestionLocation) {
@@ -306,7 +323,11 @@ class UrlBar extends ImmutableComponent {
   // part was set for the value.
   setValue (val, suffix) {
     this.lastVal = val
-    this.urlInput.value = val + (suffix || '')
+    this.lastSuffix = suffix
+    const newValue = val + (suffix || '')
+    if (this.urlInput.value !== newValue) {
+      this.urlInput.value = newValue
+    }
   }
 
   onKeyUp (e) {
@@ -488,6 +509,7 @@ class UrlBar extends ImmutableComponent {
           onKeyDown={this.onKeyDown}
           onKeyUp={this.onKeyUp}
           onChange={this.onChange}
+          onKeyPress={this.onKeyPress}
           onClick={this.onClick}
           onContextMenu={this.onContextMenu}
           data-l10n-id='urlbar'

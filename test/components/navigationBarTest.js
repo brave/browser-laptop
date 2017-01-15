@@ -902,20 +902,13 @@ describe('navigationBar tests', function () {
         })
 
         it('urlbar shows webview url when focused', function * () {
-          var page1 = this.page1
           yield blur(this.app.client)
-          yield this.app.client.waitUntil(function () {
-            return this.isExisting(urlInput).then((exists) => exists === false)
-          })
           yield this.app.client
+            .waitForElementCount(urlInput, 0)
             .ipcSend('shortcut-focus-url')
-          yield this.app.client.waitUntil(function () {
-            return this.getValue(urlInput).then((val) => val === page1)
-          })
-          yield this.app.client.keys('abc')
-          yield this.app.client.waitUntil(function () {
-            return this.getValue(urlInput).then((val) => val === 'abc')
-          })
+            .waitForInputText(urlInput, this.page1)
+            .keys('zzz')
+            .waitForInputText(urlInput, 'zzz')
         })
       })
 

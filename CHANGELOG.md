@@ -1,8 +1,9 @@
 # Changelog
 
 ## [0.13.0](https://github.com/brave/browser-laptop/releases/v0.13.0dev)
-- Linux sandbox added. ([#874])
-- Window renderer processes no longer include Node, content renderer never did in Brave. ([#6454])
+- Linux sandbox added. ([#874](https://github.com/brave/browser-laptop/issues/874))
+- Window renderer processes no longer include Node, content renderer never did in Brave. ([#6454](https://github.com/brave/browser-laptop/issues/6454))
+- URL bar autocomplete no longer flashes when you enter text. ([#6644](https://github.com/brave/browser-laptop/issues/6644))
 - Muon updated to 2.0.10.
 - Chromium updated to 54.0.2840.100.
 
