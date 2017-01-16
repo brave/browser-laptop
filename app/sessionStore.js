@@ -203,6 +203,7 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
         frame.navbar.urlbar.suggestions.selectedIndex = null
         frame.navbar.urlbar.suggestions.suggestionList = null
       }
+      delete frame.navbar.urlbar.searchDetail
     }
   }
   const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY) === true

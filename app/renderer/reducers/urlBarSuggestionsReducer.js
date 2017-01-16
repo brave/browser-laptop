@@ -29,13 +29,17 @@ const updateSearchEngineInfoFromInput = (state, frameProps) => {
     if (!isLocationUrl &&
       !(frameSearchDetail && input.startsWith(frameSearchDetail.get('shortcut') + ' '))) {
       let entries = searchProviders.providers
-      entries.forEach((entry) => {
+      const searchDetailPath = frameStatePath(state, frameProps.get('key')).concat(['navbar', 'urlbar', 'searchDetail'])
+      for (let i = 0; i < entries.length; i++) {
+        const entry = entries[i]
         if (input.startsWith(entry.shortcut + ' ')) {
           state = state.setIn(
-            frameStatePath(state, frameProps.get('key')).concat(['navbar', 'urlbar', 'searchDetail']),
+            searchDetailPath,
             Immutable.fromJS(Object.assign({}, entry, { activateSearchEngine: true })))
+          return state
         }
-      })
+      }
+      state = state.setIn(searchDetailPath, Immutable.fromJS({}))
     }
   }
   return state

@@ -356,6 +356,21 @@ describe('urlBar tests', function () {
         })
       })
     })
+    it('Clears last search engine when removed', function * () {
+      const entry = entries[0]
+      yield this.app.client
+        .keys(`${entry.shortcut} hi`)
+        .waitForElementCount(urlbarIcon, 1)
+        .waitUntil(function () {
+          return this
+            .getCssProperty(urlbarIcon, 'background-image')
+            .then((backgroundImage) => backgroundImage.value === `url("${entry.image}")`)
+        })
+        .keys(Brave.keys.BACKSPACE)
+        .keys(Brave.keys.BACKSPACE)
+        .keys(Brave.keys.BACKSPACE)
+        .waitForElementCount(urlbarIcon + '.fa-search', 1)
+    })
   })
 
   const tabLoadingTest = function * () {
