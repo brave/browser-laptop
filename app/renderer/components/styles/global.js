@@ -46,6 +46,7 @@ const globalStyles = {
     gray25: 'rgba(116, 116, 130, 0.25)',
     gray50: 'rgba(116, 116, 130, 0.5)',
     black10: 'rgba(0, 0, 0, 0.1)',
+    black20: 'rgba(0, 0, 0, 0.2)',
     black25: 'rgba(0, 0, 0, 0.25)',
     black50: 'rgba(0, 0, 0, 0.5)',
     black75: 'rgba(0, 0, 0, 0.75)',
