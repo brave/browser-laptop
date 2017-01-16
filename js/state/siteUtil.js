@@ -441,6 +441,15 @@ module.exports.isFolder = function (siteDetail) {
 }
 
 /**
+ * Determines if the site detail is an imported bookmark.
+ * @param siteDetail The site detail to check.
+ * @return true if the site detail is a folder.
+ */
+module.exports.isImportedBookmark = function (siteDetail) {
+  return siteDetail.get('lastAccessedTime') === 0
+}
+
+/**
  * Determines if the site detail is a history entry.
  * @param siteDetail The site detail to check.
  * @return true if the site detail is a history entry.
