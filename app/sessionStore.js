@@ -294,6 +294,8 @@ module.exports.cleanAppData = (data, isShutdown) => {
     const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY) === true
     if (clearHistory) {
       data.sites = siteUtil.clearHistory(Immutable.fromJS(data.sites)).toJS()
+      delete data.about.history
+      delete data.about.newtab
     }
   }
   if (data.downloads) {
