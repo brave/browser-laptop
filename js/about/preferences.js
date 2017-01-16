@@ -8,6 +8,10 @@ const ImmutableComponent = require('../components/immutableComponent')
 const Immutable = require('immutable')
 const SwitchControl = require('../components/switchControl')
 const ModalOverlay = require('../components/modalOverlay')
+const {SettingsList, SettingItem} = require('../../app/renderer/components/settings')
+const {FormTextbox, SettingTextbox, RecoveryKeyTextbox} = require('../../app/renderer/components/textbox')
+const {FormDropdown, SettingDropdown} = require('../../app/renderer/components/dropdown')
+const Button = require('../components/button')
 const cx = require('../lib/classSet')
 const ledgerExportUtil = require('../../app/common/lib/ledgerExportUtil')
 const addExportFilenamePrefixToTransactions = ledgerExportUtil.addExportFilenamePrefixToTransactions
@@ -31,7 +35,6 @@ const WidevineInfo = require('../../app/renderer/components/widevineInfo')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
-const Button = require('../components/button')
 const searchProviders = require('../data/searchProviders')
 const punycode = require('punycode')
 const moment = require('moment')
@@ -106,34 +109,6 @@ const changeSetting = (cb, key, e) => {
       value = Math.min(e.target.getAttribute('max'), Math.max(value, e.target.getAttribute('min')))
     }
     cb(key, value)
-  }
-}
-
-class SettingsList extends ImmutableComponent {
-  render () {
-    return <div className='settingsListContainer'>
-      {
-        this.props.dataL10nId
-        ? <div className='settingsListTitle' data-l10n-id={this.props.dataL10nId} />
-        : null
-      }
-      <div className='settingsList'>
-        {this.props.children}
-      </div>
-    </div>
-  }
-}
-
-class SettingItem extends ImmutableComponent {
-  render () {
-    return <div className='settingItem'>
-      {
-        this.props.dataL10nId
-          ? <span data-l10n-id={this.props.dataL10nId} />
-          : null
-      }
-      {this.props.children}
-    </div>
   }
 }
 
@@ -686,25 +661,25 @@ class GeneralTab extends ImmutableComponent {
       <div className='sectionTitle' data-l10n-id='generalSettings' />
       <SettingsList>
         <SettingItem dataL10nId='startsWith'>
-          <select className='form-control' value={getSetting(settings.STARTUP_MODE, this.props.settings)}
-            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.STARTUP_MODE)} >
+          <SettingDropdown value={getSetting(settings.STARTUP_MODE, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.STARTUP_MODE)}>
             <option data-l10n-id='startsWithOptionLastTime' value={startsWithOption.WINDOWS_TABS_FROM_LAST_TIME} />
             <option data-l10n-id='startsWithOptionHomePage' value={startsWithOption.HOMEPAGE} />
             <option data-l10n-id='startsWithOptionNewTabPage' value={startsWithOption.NEW_TAB_PAGE} />
-          </select>
+          </SettingDropdown>
         </SettingItem>
         <SettingItem dataL10nId='newTabMode'>
-          <select className='form-control' value={getSetting(settings.NEWTAB_MODE, this.props.settings)}
+          <SettingDropdown value={getSetting(settings.NEWTAB_MODE, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.NEWTAB_MODE)} >
             <option data-l10n-id='newTabNewTabPage' value={newTabMode.NEW_TAB_PAGE} />
             <option data-l10n-id='newTabHomePage' value={newTabMode.HOMEPAGE} />
             <option data-l10n-id='newTabDefaultSearchEngine' value={newTabMode.DEFAULT_SEARCH_ENGINE} />
             <option data-l10n-id='newTabEmpty' value={newTabMode.EMPTY_NEW_TAB} />
-          </select>
+          </SettingDropdown>
         </SettingItem>
         <SettingItem dataL10nId='myHomepage'>
-          <input spellCheck='false'
-            className='form-control'
+          <SettingTextbox
+            spellCheck='false'
             data-l10n-id='homepageInput'
             value={homepageValue}
             onChange={changeSetting.bind(null, this.onChangeSetting, settings.HOMEPAGE)} />
@@ -717,25 +692,24 @@ class GeneralTab extends ImmutableComponent {
         }
         <SettingCheckbox dataL10nId='disableTitleMode' prefKey={settings.DISABLE_TITLE_MODE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingItem dataL10nId='bookmarkToolbarSettings'>
-          <select className='form-control' id='bookmarksBarSelect' value={getSetting(settings.BOOKMARKS_TOOLBAR_MODE, this.props.settings)}
-            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.BOOKMARKS_TOOLBAR_MODE)} >
+          <SettingDropdown id='bookmarksBarSelect' value={getSetting(settings.BOOKMARKS_TOOLBAR_MODE, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.BOOKMARKS_TOOLBAR_MODE)}>
             <option data-l10n-id='bookmarksBarTextOnly' value={bookmarksToolbarMode.TEXT_ONLY} />
             <option data-l10n-id='bookmarksBarTextAndFavicon' value={bookmarksToolbarMode.TEXT_AND_FAVICONS} />
             <option data-l10n-id='bookmarksBarFaviconOnly' value={bookmarksToolbarMode.FAVICONS_ONLY} />
-          </select>
+          </SettingDropdown>
           <SettingCheckbox id='bookmarksBarSwitch' dataL10nId='bookmarkToolbar'
             prefKey={settings.SHOW_BOOKMARKS_TOOLBAR} settings={this.props.settings}
             onChangeSetting={this.props.onChangeSetting} />
         </SettingItem>
         <SettingItem dataL10nId='selectedLanguage'>
-          <select className='form-control' value={getSetting(settings.LANGUAGE, this.props.settings) || defaultLanguage}
-            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.LANGUAGE)} >
+          <SettingDropdown value={getSetting(settings.LANGUAGE, this.props.settings) || defaultLanguage}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.LANGUAGE)}>
             {languageOptions}
-          </select>
+          </SettingDropdown>
         </SettingItem>
         <SettingItem dataL10nId='defaultZoomLevel'>
-          <select
-            className='form-control'
+          <SettingDropdown
             value={defaultZoomSetting === undefined || defaultZoomSetting === null ? config.zoom.defaultValue : defaultZoomSetting}
             data-type='float'
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.DEFAULT_ZOOM_LEVEL)}>
@@ -743,7 +717,7 @@ class GeneralTab extends ImmutableComponent {
               config.zoom.zoomLevels.map((x) =>
                 <option value={x} key={x}>{getZoomValuePercentage(x) + '%'}</option>)
             }
-          </select>
+          </SettingDropdown>
         </SettingItem>
         <SettingItem dataL10nId='importBrowserData'>
           <Button l10nId='importNow' className='primaryButton importNowButton'
@@ -846,8 +820,7 @@ class TabsTab extends ImmutableComponent {
       <div className='sectionTitle' data-l10n-id='tabSettings' />
       <SettingsList>
         <SettingItem dataL10nId='tabsPerTabPage'>
-          <select
-            className='form-control'
+          <SettingDropdown
             value={getSetting(settings.TABS_PER_PAGE, this.props.settings)}
             data-type='number'
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TABS_PER_PAGE)}>
@@ -856,7 +829,7 @@ class TabsTab extends ImmutableComponent {
               [6, 8, 10, 20].map((x) =>
                 <option value={x} key={x}>{x}</option>)
             }
-          </select>
+          </SettingDropdown>
         </SettingItem>
         <SettingItem dataL10nId='tabCloseAction'>
           <select
@@ -948,7 +921,7 @@ class PaymentsTab extends ImmutableComponent {
     return <div className='balance'>
       {
       !(this.props.ledgerData.get('balance') === undefined || this.props.ledgerData.get('balance') === null)
-        ? <input className='form-control fundsAmount' readOnly value={this.btcToCurrencyString(this.props.ledgerData.get('balance'))} />
+        ? <FormTextbox readOnly data-test-id='fundsAmount' value={this.btcToCurrencyString(this.props.ledgerData.get('balance'))} />
         : <span><span data-l10n-id='accountBalanceLoading' /></span>
       }
       <a href='https://brave.com/Payments_FAQ.html' target='_blank'>
@@ -1083,27 +1056,25 @@ class PaymentsTab extends ImmutableComponent {
           <div className='minimumPageTimeSetting' data-l10n-id='minimumPageTimeSetting' />
           <SettingsList>
             <SettingItem>
-              <select
-                className='form-control'
+              <SettingDropdown
                 defaultValue={minDuration || 8000}
                 onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.MINIMUM_VISIT_TIME)}>>
                 <option value='5000'>5 seconds</option>
                 <option value='8000'>8 seconds</option>
                 <option value='60000'>1 minute</option>
-              </select>
+              </SettingDropdown>
             </SettingItem>
           </SettingsList>
           <div className='minimumVisitsSetting' data-l10n-id='minimumVisitsSetting' />
           <SettingsList>
             <SettingItem>
-              <select
-                className='form-control'
+              <SettingDropdown
                 defaultValue={minPublisherVisits || 5}
                 onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.MINIMUM_VISITS)}>>>
                 <option value='2'>2 visits</option>
                 <option value='5'>5 visits</option>
                 <option value='10'>10 visits</option>
-              </select>
+              </SettingDropdown>
             </SettingItem>
           </SettingsList>
         </div>
@@ -1204,9 +1175,9 @@ class PaymentsTab extends ImmutableComponent {
         <SettingsList>
           <SettingItem>
             <h3 data-l10n-id='firstRecoveryKey' />
-            <input className='form-control firstRecoveryKey' onChange={this.handleFirstRecoveryKeyChange} type='text' />
+            <RecoveryKeyTextbox id='firstRecoveryKey' onChange={this.handleFirstRecoveryKeyChange} />
             <h3 data-l10n-id='secondRecoveryKey' />
-            <input className='form-control secondRecoveryKey' onChange={this.handleSecondRecoveryKeyChange} type='text' />
+            <RecoveryKeyTextbox id='secondRecoveryKey' onChange={this.handleFirstRecoveryKeyChange} />
           </SettingItem>
         </SettingsList>
       </div>
@@ -1319,16 +1290,17 @@ class PaymentsTab extends ImmutableComponent {
               <td>
                 <SettingsList>
                   <SettingItem>
-                    <select className='form-control fundsSelectBox'
+                    <FormDropdown
+                      data-test-id='fundsSelectBox'
                       value={getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT,
                         this.props.settings)}
-                      onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)} >
+                      onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)}>
                       {
                         [5, 10, 15, 20].map((amount) =>
                           <option value={amount}>{amount} {this.props.ledgerData.get('currency') || 'USD'}</option>
                         )
                       }
-                    </select>
+                    </FormDropdown>
                   </SettingItem>
                   <SettingItem>
                     {this.paymentHistoryButton}
@@ -1597,21 +1569,21 @@ class ShieldsTab extends ImmutableComponent {
       <div className='sectionTitle' data-l10n-id='braveryDefaults' />
       <SettingsList>
         <SettingItem dataL10nId='adControl'>
-          <select className='form-control'
+          <SettingDropdown
             value={this.props.braveryDefaults.get('adControl')}
             onChange={this.onChangeAdControl}>
             <option data-l10n-id='showBraveAds' value='showBraveAds' />
             <option data-l10n-id='blockAds' value='blockAds' />
             <option data-l10n-id='allowAdsAndTracking' value='allowAdsAndTracking' />
-          </select>
+          </SettingDropdown>
         </SettingItem>
         <SettingItem dataL10nId='cookieControl'>
-          <select className='form-control'
+          <SettingDropdown
             value={this.props.braveryDefaults.get('cookieControl')}
             onChange={this.onChangeCookieControl}>
             <option data-l10n-id='block3rdPartyCookie' value='block3rdPartyCookie' />
             <option data-l10n-id='allowAllCookies' value='allowAllCookies' />
-          </select>
+          </SettingDropdown>
         </SettingItem>
         <SettingCheckbox checked={this.props.braveryDefaults.get('httpsEverywhere')} dataL10nId='httpsEverywhere' onChange={this.onToggleHTTPSE} />
         <SettingCheckbox checked={this.props.braveryDefaults.get('safeBrowsing')} dataL10nId='safeBrowsing' onChange={this.onToggleSafeBrowsing} />
@@ -1674,7 +1646,7 @@ class SecurityTab extends ImmutableComponent {
       <div className='sectionTitle' data-l10n-id='passwordsAndForms' />
       <SettingsList>
         <SettingItem dataL10nId='passwordManager'>
-          <select className='form-control'
+          <SettingDropdown
             value={getSetting(settings.ACTIVE_PASSWORD_MANAGER, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.ACTIVE_PASSWORD_MANAGER)} >
             <option data-l10n-id='builtInPasswordManager' value={passwordManagers.BUILT_IN} />
@@ -1682,7 +1654,7 @@ class SecurityTab extends ImmutableComponent {
             <option data-l10n-id='dashlane' value={passwordManagers.DASHLANE} />
             <option data-l10n-id='lastPass' value={passwordManagers.LAST_PASS} />
             <option data-l10n-id='doNotManageMyPasswords' value={passwordManagers.UNMANAGED} />
-          </select>
+          </SettingDropdown>
         </SettingItem>
         {
           getSetting(settings.ACTIVE_PASSWORD_MANAGER, this.props.settings) === passwordManagers.BUILT_IN
