@@ -17,7 +17,7 @@ const {aboutUrls, isNavigatableAboutPage, isSourceAboutUrl, isUrl} = require('..
 const siteTags = require('../../../js/constants/siteTags')
 const suggestion = require('../lib/suggestion')
 const suggestionTypes = require('../../../js/constants/suggestionTypes')
-const {navigateSiteClickHandler, frameClickHandler} = require('../suggestionClickHandlers')
+const {navigateSiteClickHandler, navigateLocalSearchClickHandler, frameClickHandler} = require('../suggestionClickHandlers')
 // TODO: I think appStoreRenderer should just be collapsed into windowStore to avoid this
 const appStoreRenderer = require('../../../js/stores/appStoreRenderer')
 
@@ -128,6 +128,7 @@ const generateNewSuggestionsList = (state) => {
   const activeFrameKey = state.get('activeFrameKey')
   const urlLocation = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'location']))
   const sites = appStoreRenderer.state.get('sites')
+  const localSearchTerms = appStoreRenderer.state.get('localSearchTerms')
   const searchResults = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'searchResults']))
   const frameSearchDetail = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'searchDetail']))
   const searchDetail = state.get('searchDetail')
@@ -166,6 +167,11 @@ const generateNewSuggestionsList = (state) => {
 
   const shouldNormalize = suggestion.shouldNormalizeLocation(urlLocationLower)
   const urlLocationLowerNormalized = suggestion.normalizeLocation(urlLocationLower)
+
+  const sortBasedOnRecency = (s1, s2) => {
+    return s2.get('ts') - s1.get('ts')
+  }
+
   const sortBasedOnLocationPos = (s1, s2) => {
     const location1 = shouldNormalize ? suggestion.normalizeLocation(s1.get('location')) : s1.get('location')
     const location2 = shouldNormalize ? suggestion.normalizeLocation(s2.get('location')) : s2.get('location')
@@ -289,6 +295,28 @@ const generateNewSuggestionsList = (state) => {
       })
     }))
   }
+
+  // Local search suggestions
+  suggestionsList = suggestionsList.concat(mapListToElements({
+    data: localSearchTerms,
+    maxResults: config.urlBarSuggestions.maxSearch,
+    type: suggestionTypes.SEARCH,
+    sortHandler: sortBasedOnRecency,
+    filterValue: (site) => {
+      return site.get('searchTerm').toLowerCase().includes(urlLocationLower)
+    },
+    formatTitle: (site) => {
+      return site.get('searchTerm')
+    },
+    formatUrl: (site) => {
+      return site.get('searchTerm')
+    },
+    clickHandler: navigateLocalSearchClickHandler((search) => {
+      let searchURL = frameSearchDetail
+      ? frameSearchDetail.get('search') : searchDetail.get('searchURL')
+      return searchURL.replace('{searchTerms}', encodeURIComponent(search.get('searchTerm')))
+    })
+  }))
 
   // Alexa top 500
   suggestionsList = suggestionsList.concat(mapListToElements({
