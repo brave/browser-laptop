@@ -28,6 +28,8 @@ describe('bookmark tests', function () {
           .waitForVisible(navigatorNotBookmarked)
           .click(navigatorNotBookmarked)
           .waitForVisible(doneButton)
+          .waitForBookmarkDetail(this.page1Url, 'Page 1')
+          .waitForEnabled(doneButton)
           .click(doneButton)
           .moveToObject(navigator)
           .waitForVisible(navigatorBookmarked)
@@ -37,8 +39,8 @@ describe('bookmark tests', function () {
 
       it('fills in the url field', function * () {
         yield this.app.client
-          .waitForExist('#bookmarkLocation input', 500, false)
-          .getValue('#bookmarkLocation input').should.eventually.be.equal(this.page1Url)
+          .waitForExist('#bookmarkLocation input')
+          .waitForBookmarkDetail(this.page1Url, 'Page 1')
       })
     })
 
@@ -64,6 +66,8 @@ describe('bookmark tests', function () {
       it('fills in the title field', function * () {
         yield this.app.client
           .waitForExist('#bookmarkName input')
+          .waitForBookmarkDetail(this.page1Url, 'Page 1')
+          .waitForEnabled(doneButton)
           .getValue('#bookmarkName input').should.eventually.be.equal('Page 1')
       })
 
@@ -75,6 +79,8 @@ describe('bookmark tests', function () {
       describe('saved with a title', function () {
         before(function * () {
           yield this.app.client
+            .waitForBookmarkDetail(this.page1Url, 'Page 1')
+            .waitForEnabled(doneButton)
             .click(doneButton)
         })
 
@@ -108,19 +114,20 @@ describe('bookmark tests', function () {
       Brave.beforeAll(this)
 
       before(function * () {
-        this.page1Url = Brave.server.url('page_no_title.html')
+        this.pageNoTitle = Brave.server.url('page_no_title.html')
 
         yield setup(this.app.client)
 
         yield this.app.client
           .waitForUrl(Brave.newTabUrl)
-          .loadUrl(this.page1Url)
-          .windowParentByUrl(this.page1Url)
+          .loadUrl(this.pageNoTitle)
+          .windowParentByUrl(this.pageNoTitle)
           .moveToObject(navigator)
           .waitForExist(navigatorNotBookmarked)
           .moveToObject(navigator)
           .click(navigatorNotBookmarked)
-          .waitForVisible(doneButton + ':not([disabled]')
+          .waitForBookmarkDetail(this.pageNoTitle, '')
+          .waitForEnabled(doneButton + ':not([disabled]')
       })
 
       it('leaves the title field blank', function * () {
@@ -137,14 +144,16 @@ describe('bookmark tests', function () {
       describe('saved without a title', function () {
         before(function * () {
           yield this.app.client
+            .waitForBookmarkDetail(this.pageNoTitle, '')
+            .waitForEnabled(doneButton)
             .click(doneButton)
         })
         it('displays URL', function * () {
-          const page1Url = this.page1Url
+          const pageNoTitle = this.pageNoTitle
           yield this.app.client
             .waitUntil(function () {
               return this.getText('.bookmarkText')
-                .then((val) => val === page1Url)
+                .then((val) => val === pageNoTitle)
             })
         })
         describe('and then removed', function () {
