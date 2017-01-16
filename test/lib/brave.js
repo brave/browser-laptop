@@ -381,16 +381,19 @@ var exports = {
     })
 
     this.app.client.addCommand('waitForInputText', function (selector, input) {
-      this
+      logVerbose('waitForInputText("' + selector + '", "' + input + '")')
+      return this
         .waitUntil(function () {
           return this.getValue(selector).then(function (val) {
-            return val === input
+            const ret = val === input
+            logVerbose('waitForInputText("' + selector + '", "' + input + '") => ' + ret)
+            return ret
           })
         })
     })
 
     this.app.client.addCommand('setInputText', function (selector, input) {
-      this
+      return this
         .moveToObject(navigator)
         .setValue(selector, input)
         .waitForInputText(selector, input)

@@ -147,4 +147,14 @@ describe('urlBarSuggestions', function () {
       .keys(Brave.keys.CONTROL)
       .waitForSelectedText('1.html')
   })
+
+  it('non-prefixed active suggestion loads the suggestion when enter is pressed', function * () {
+    yield this.app.client
+      .setInputText(urlInput, 'pref')
+      .waitForVisible(urlBarSuggestions)
+      .keys(Brave.keys.DOWN)
+      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"].selected')
+      .keys(Brave.keys.ENTER)
+      .waitForInputText(urlInput, 'about:preferences')
+  })
 })

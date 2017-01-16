@@ -160,9 +160,9 @@ class UrlBar extends ImmutableComponent {
 
   get activeIndex () {
     if (this.suggestionList === null) {
-      return 0
+      return -1
     }
-    return Math.abs(this.selectedIndex % (this.suggestionList.size + 1))
+    return this.selectedIndex
   }
 
   onKeyDown (e) {
@@ -182,7 +182,7 @@ class UrlBar extends ImmutableComponent {
           const isLocationUrl = isUrl(location)
           if (!isLocationUrl && e.ctrlKey) {
             windowActions.loadUrl(this.activeFrame, `www.${location}.com`)
-          } else if (this.shouldRenderUrlBarSuggestions && (this.activeIndex > 0 || this.locationValueSuffix && this.autocompleteEnabled)) {
+          } else if (this.shouldRenderUrlBarSuggestions && (this.activeIndex >= 0 || this.locationValueSuffix && this.autocompleteEnabled)) {
             // Hack to make alt enter open a new tab for url bar suggestions when hitting enter on them.
             const isDarwin = process.platform === 'darwin'
             if (e.altKey) {
