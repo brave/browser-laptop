@@ -129,7 +129,7 @@ const appActions = {
 
   addLocalSearchHistory: function (localSearchDetails) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_ADD_LOCAL_SEARCH,
+      actionType: appConstants.APP_ADD_LOCAL_SEARCH,
       localSearchDetails
     })
   },

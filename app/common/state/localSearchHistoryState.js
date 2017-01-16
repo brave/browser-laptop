@@ -13,7 +13,7 @@ const localSearchHistoryState = {
     if (entryIndex !== -1) {
       let entry = localSearchTerms.get(entryIndex)
       entry = entry.set('ts', (new Date()).getTime())
-      localSearchTerms.set(entryIndex, entry)
+      localSearchTerms = localSearchTerms.set(entryIndex, entry)
     } else {
       localSearchTerms = localSearchTerms.push(localSearchDetails)
     }
