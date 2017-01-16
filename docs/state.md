@@ -14,6 +14,7 @@ AppStore
     objectId: Array.<number>, // objectId for this sync device
     deviceId: Array.<number>,
     seed: Array.<number>,
+    seedQr: string, // data URL of QR code representing the seed
     lastFetchTimestamp: integer // the last time new sync records were fetched in seconds
   },
   tabs: [{
