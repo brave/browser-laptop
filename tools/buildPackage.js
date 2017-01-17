@@ -120,7 +120,7 @@ if (isLinux) {
   cmds.push('makensis.exe -DARCH=' + arch + ' res/braveDefaults.nsi')
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'resources', 'extensions'))
   // Make sure the Brave.exe binary is squirrel aware so we get squirrel events and so that Squirrel doesn't auto create shortcuts.
-  cmds.push('"node_modules/rcedit/bin/rcedit.exe" ./Brave-win32-x64/Brave.exe --set-version-string "SquirrelAwareVersion" "1"')
+  cmds.push('"node_modules/rcedit/bin/rcedit.exe" ./Brave-win32-' + arch + '/Brave.exe --set-version-string "SquirrelAwareVersion" "1"')
 }
 
 cmds.push('mkdirp ' + path.join(buildDir, 'resources', 'app.asar.unpacked', 'node_modules', 'spellchecker', 'vendor', 'hunspell_dictionaries'))
