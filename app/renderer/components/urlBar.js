@@ -23,6 +23,7 @@ const windowStore = require('../../../js/stores/windowStore')
 const UrlUtil = require('../../../js/lib/urlutil')
 const {eventElHasAncestorWithClasses, isForSecondaryAction} = require('../../../js/lib/eventUtil')
 const {isUrl, isIntermediateAboutPage} = require('../../../js/lib/appUrlUtil')
+const localSearchHistoryState = require('../../common/state/localSearchHistoryState')
 
 class UrlBar extends ImmutableComponent {
   constructor () {
@@ -195,9 +196,20 @@ class UrlBar extends ImmutableComponent {
             }
             windowActions.activeSuggestionClicked(isForSecondaryAction(e), e.shiftKey)
           } else {
+            if (this.activateSearchEngine && this.searchSelectEntry !== null && !isLocationUrl) {
+              const replaceRE = new RegExp('^' + this.searchSelectEntry.shortcut + ' ', 'g')
+              location = location.replace(replaceRE, '')
+            }
+
+            // saved search history
+            if (!isLocationUrl && !this.props.isPrivate) {
+              appActions.addLocalSearchHistory(localSearchHistoryState.buildEntry(location))
+            }
+
             location = isLocationUrl
               ? location
               : this.buildSearchUrl(location)
+
             // do search.
             if (e.altKey) {
               windowActions.newFrame({ location }, true)
@@ -541,6 +553,7 @@ class UrlBar extends ImmutableComponent {
             selectedIndex={this.props.urlbar.getIn(['suggestions', 'selectedIndex'])}
             suggestionList={this.props.urlbar.getIn(['suggestions', 'suggestionList'])}
             hasLocationValueSuffix={this.props.hasLocationValueSuffix}
+            localSearchTerms={this.props.localSearchTerms}
             menubarVisible={this.props.menubarVisible} />
           : null
         }

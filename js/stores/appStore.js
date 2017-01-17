@@ -44,6 +44,7 @@ const aboutHistoryState = require('../../app/common/state/aboutHistoryState')
 const windowState = require('../../app/common/state/windowState')
 
 const webtorrent = require('../../app/browser/webtorrent')
+const localSearchHistoryState = require('../../app/common/state/localSearchHistoryState')
 
 const isDarwin = process.platform === 'darwin'
 const isWindows = process.platform === 'win32'
@@ -481,6 +482,11 @@ const handleAppAction = (action) => {
     case appConstants.APP_DATA_URL_COPIED:
       nativeImage.copyDataURL(action.dataURL, action.html, action.text)
       break
+    case appConstants.APP_ADD_LOCAL_SEARCH:
+      let localSearchTerms = appState.get('localSearchTerms') || Immutable.fromJS([])
+      localSearchTerms = localSearchHistoryState.update(localSearchTerms, action.localSearchDetails)
+      appState = appState.set('localSearchTerms', localSearchTerms)
+      break
     case appConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size
       if (action.siteDetail.constructor === Immutable.List) {
@@ -512,6 +518,7 @@ const handleAppAction = (action) => {
       appState = appState.set('sites', siteUtil.clearHistory(appState.get('sites')))
       appState = aboutNewTabState.setSites(appState, action)
       appState = aboutHistoryState.setHistory(appState, action)
+      appState = appState.set('localSearchTerms', localSearchHistoryState.clear())
       break
     case appConstants.APP_DEFAULT_WINDOW_PARAMS_CHANGED:
       if (action.size && action.size.size === 2) {

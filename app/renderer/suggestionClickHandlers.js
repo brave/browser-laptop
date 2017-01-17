@@ -6,6 +6,7 @@
 
 const windowActions = require('../../js/actions/windowActions')
 const windowStore = require('../../js/stores/windowStore')
+const appActions = require('../../js/actions/appActions')
 const {getActiveFrame} = require('../../js/state/frameStateUtil')
 
 const navigateSiteClickHandler = (formatUrl) => (site, isForSecondaryAction, shiftKey) => {
@@ -24,10 +25,22 @@ const navigateSiteClickHandler = (formatUrl) => (site, isForSecondaryAction, shi
   }
 }
 
+const navigateLocalSearchClickHandler = (formatUrl) => {
+  return function (site, isForSecondaryAction, shiftKey) {
+    // Update the local search time only if not in a private frame
+    if (!getActiveFrame(windowStore.state).get('isPrivate')) {
+      appActions.addLocalSearchHistory(site)
+    }
+    // delegate click handling
+    navigateSiteClickHandler(formatUrl)(site, isForSecondaryAction, shiftKey)
+  }
+}
+
 const frameClickHandler = (frameProps) =>
   windowActions.setActiveFrame(frameProps)
 
 module.exports = {
   navigateSiteClickHandler,
+  navigateLocalSearchClickHandler,
   frameClickHandler
 }
