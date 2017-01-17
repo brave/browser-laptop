@@ -79,6 +79,7 @@ See [tests.md](https://github.com/brave/browser-laptop/blob/master/docs/tests.md
 
 ## Debugging Electron / Chromium C++
 
+NOTE: this section references an out of date library (libchromiumcontent). For more info about our new structure, please see [browser-laptop-bootstrap](https://github.com/brave/browser-laptop-bootstrap/wiki).
 
 ### Logging
 

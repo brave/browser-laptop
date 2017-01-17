@@ -1,4 +1,4 @@
-# Contributing to browser-laptop
+# Contribution guidelines
 
 Brave welcomes contributions via [pull requests](https://github.com/brave/browser-laptop/pulls). Below are a few guidelines we ask of contributors:
 
@@ -24,6 +24,7 @@ Brave welcomes contributions via [pull requests](https://github.com/brave/browse
 
 * Run the tests by running `npm run watch-test` and `npm test` in separate terminals.
 * Make sure [Flow](http://flowtype.org/) type checking passes: `npm run-script flow`. BONUS: Help us out by adding more [Flow type annotations](http://flowtype.org/blog/2015/02/20/Flow-Comments.html) to new and existing Brave code!
+* When making style changes, please be sure that you are [following our style guidelines](https://github.com/brave/browser-laptop/blob/master/docs/style.md).
 
 ## Pull requests
 
@@ -35,7 +36,9 @@ Brave welcomes contributions via [pull requests](https://github.com/brave/browse
 * steps to test the fix (if applicable)
 * for design-related changes, it is helpful to include screenshots
 
-Feel free to tag a Brave employee in the pull request to assign them to review your code.
+Feel free to tag a Brave employee in the pull request to assign them to review your code.  Please note that your pull request will
+be subject to our [reviewer guidelines](https://github.com/brave/browser-laptop/wiki/Reviewer-guideline), which you'll want to make
+sure your PR meets.
 
 ### Employees should
 
