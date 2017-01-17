@@ -1,4 +1,4 @@
-# Overview
+# Style guidelines
 
 All applicable styles should be colocated with their corresponding JavaScript component using [Aphrodite](https://github.com/Khan/aphrodite).
 
@@ -19,7 +19,7 @@ const {StyleSheet, css} = require('aphrodite')
 
 class Button extends ImmutableComponent {
   render () {
-    return <span className={css(styles.browserButton)} 
+    return <span className={css(styles.browserButton)}
       disabled={this.props.disabled}
       data-l10n-id={this.props.l10nId}
       data-button-value={this.props.dataButtonValue}
