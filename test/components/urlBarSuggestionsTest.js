@@ -157,4 +157,13 @@ describe('urlBarSuggestions', function () {
       .keys(Brave.keys.ENTER)
       .waitForInputText(urlInput, 'about:preferences')
   })
+
+  it('no active suggestion witch matching suggestions does a search', function * () {
+    yield this.app.client
+      .setInputText(urlInput, 'ave')
+      .waitForVisible(urlBarSuggestions)
+      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]:not(.selected)')
+      .keys(Brave.keys.ENTER)
+      .waitForInputText(urlInput, /google.com\/.*q=ave/)
+  })
 })

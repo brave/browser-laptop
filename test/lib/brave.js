@@ -385,7 +385,12 @@ var exports = {
       return this
         .waitUntil(function () {
           return this.getValue(selector).then(function (val) {
-            const ret = val === input
+            let ret
+            if (input.constructor === RegExp) {
+              ret = val && val.match(input)
+            } else {
+              ret = val === input
+            }
             logVerbose('waitForInputText("' + selector + '", "' + input + '") => ' + ret)
             return ret
           })
