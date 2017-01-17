@@ -133,8 +133,6 @@ const doAction = (sender, action) => {
       break
     case syncConstants.SYNC_CLEAR_SITE_SETTINGS:
       sender.send(messages.DELETE_SYNC_SITE_SETTINGS)
-      // TODO: sync-client should listen for this message and delete
-      // all existing synced site settings
       break
     default:
   }
