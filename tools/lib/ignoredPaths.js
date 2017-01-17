@@ -28,6 +28,7 @@ module.exports = [
   'nsp/node_modules',
   'electron-installer-squirrel-windows',
   'electron-chromedriver',
+  'electron-installer-debian',
   'node-notifier/vendor',
   'node-gyp',
   'npm',
@@ -48,12 +49,15 @@ module.exports = [
   'electron-installer-redhat',
   'flow-bin',
   'babel$',
-  'babel-(?!polyfill|regenerator-runtime)',
+  'babel-(?!polyfill|regenerator-runtime|preset-env)',
   'jsdom-global',
   'react-addons-perf',
   'react-addons-test-utils',
   'enzyme',
   'leveldown',
   'git-rev-sync',
-  'sqlite3'
+  'sqlite3',
+  'uglify-js',
+  'webdriverio',
+  'webpack-dev-server'
 ]
