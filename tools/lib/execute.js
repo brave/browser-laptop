@@ -19,9 +19,9 @@ module.exports = function (cmds, env, cb) {
 
   var r = exec(cmd, {
     env: process.env
-  }, function () {
+  }, function (err) {
     if (cb) {
-      cb()
+      cb(err)
     }
   })
   r.stdout.pipe(process.stdout)

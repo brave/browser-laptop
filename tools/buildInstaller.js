@@ -99,9 +99,15 @@ if (isDarwin) {
     // .tar.bz2 file
     'tar -jcvf dist/Brave.tar.bz2 ./Brave-linux-x64'
   ]
-  execute(cmds, {}, console.log.bind(null, 'done'))
+  execute(cmds, {}, (err) => {
+    if (err) {
+      console.error('buildInstaller failed', err)
+      process.exit(1)
+      return
+    }
+    console.log('done')
+  })
 } else {
   console.log('Installer not supported for platform: ' + process.platform)
   process.exit(1)
 }
-

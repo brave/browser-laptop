@@ -134,4 +134,11 @@ if (isDarwin) {
   cmds.push('ncp ' + path.join('node_modules', 'node-anonize2-relic-emscripten', 'anonize2.js.mem') + ' ' + path.join(buildDir, 'resources', 'app.asar.unpacked', 'node_modules', 'node-anonize2-relic-emscripten', 'anonize2.js.mem'))
 }
 
-execute(cmds, env, console.log.bind(null, 'done'))
+execute(cmds, env, (err) => {
+  if (err) {
+    console.error('buildPackage failed', err)
+    process.exit(1)
+    return
+  }
+  console.log('done')
+})
