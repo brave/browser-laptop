@@ -79,7 +79,12 @@ const messages = {
    * browser -> webview
    * browser sends this to delete all records in a category.
    */
-  DELETE_SYNC_CATEGORY: _ /* @param {string} categoryName */
+  DELETE_SYNC_CATEGORY: _, /* @param {string} categoryName */
+  /**
+   * webview -> browser
+   * webview sends this to delete all site settings.
+   */
+  DELETE_SYNC_SITE_SETTINGS: _
 }
 
 module.exports = mapValuesByKeys(messages)
