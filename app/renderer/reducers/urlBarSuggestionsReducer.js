@@ -39,7 +39,7 @@ const updateSearchEngineInfoFromInput = (state, frameProps) => {
           return state
         }
       }
-      state = state.setIn(searchDetailPath, Immutable.fromJS({}))
+      state = state.deleteIn(searchDetailPath)
     }
   }
   return state
@@ -342,6 +342,7 @@ const urlBarSuggestionsReducer = (state, action) => {
     case windowConstants.WINDOW_SEARCH_SUGGESTION_RESULTS_AVAILABLE:
       const frameKey = getFrameKeyByTabId(state, action.tabId)
       state = state.setIn(frameStatePath(state, frameKey).concat(['navbar', 'urlbar', 'suggestions', 'searchResults']), action.searchResults)
+      state = generateNewSuggestionsList(state)
       break
     case windowConstants.WINDOW_SET_NAVBAR_INPUT:
       const activeFrameProps = getActiveFrame(state)

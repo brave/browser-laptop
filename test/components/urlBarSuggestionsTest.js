@@ -1,7 +1,8 @@
-/* global describe, it, beforeEach */
+/* global describe, it, before, beforeEach */
 
 const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
+const settings = require('../../js/constants/settings')
 const {urlInput, urlBarSuggestions} = require('../lib/selectors')
 
 describe('urlBarSuggestions', function () {
@@ -164,6 +165,28 @@ describe('urlBarSuggestions', function () {
       .waitForVisible(urlBarSuggestions)
       .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]:not(.selected)')
       .keys(Brave.keys.ENTER)
-      .waitForInputText(urlInput, /google.com\/.*q=ave/)
+      .waitForInputText(urlInput, /google.*\/.*q=ave/)
+  })
+})
+
+describe('search suggestions', function () {
+  Brave.beforeAll(this)
+
+  before(function * () {
+    yield this.app.client
+      .waitForUrl(Brave.newTabUrl)
+      .waitForBrowserWindow()
+      .waitForVisible(urlInput)
+  })
+
+  it('Finds search suggestions and performs a search when selected', function * () {
+    yield this.app.client
+      .changeSetting(settings.OFFER_SEARCH_SUGGESTIONS, true)
+      .setInputText(urlInput, 'what is')
+      .waitForVisible(urlBarSuggestions)
+      .keys(Brave.keys.DOWN)
+      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]:not(.selected)')
+      .keys(Brave.keys.ENTER)
+      .waitForInputText(urlInput, /google.*\/.*q=what\+is/)
   })
 })

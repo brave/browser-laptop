@@ -16,6 +16,6 @@ const fetchSearchSuggestions = debounce((tabId, autocompleteURL, searchTerms) =>
     // Once we have the online suggestions, append them to the others
     windowActions.searchSuggestionResultsAvailable(tabId, Immutable.fromJS(xhr.response[1]))
   }
-}, 50)
+}, 100)
 
 module.exports = fetchSearchSuggestions
