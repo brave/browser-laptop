@@ -6,12 +6,14 @@ const React = require('react')
 const ImmutableComponent = require('../../../js/components/immutableComponent')
 const {StyleSheet, css} = require('aphrodite')
 const globalStyles = require('./styles/global')
+const commonStyles = require('./styles/commonStyles')
+
 const caretDownGrey = require('../../extensions/brave/img/caret_down_grey.svg')
 
 class Dropdown extends ImmutableComponent {
   render () {
     const className = css(
-      this.props['data-isFormControl'] && styles.formControl,
+      this.props['data-isFormControl'] && commonStyles.formControl,
       styles.dropdown,
       this.props['data-isSettings'] && styles.settings
     )
@@ -37,20 +39,6 @@ class SettingDropdown extends ImmutableComponent {
 const selectPadding = '0.4em'
 
 const styles = StyleSheet.create({
-  'formControl': {
-    background: 'white',
-    border: `solid 1px ${globalStyles.color.black20}`,
-    borderRadius: globalStyles.radius.borderRadius,
-    boxShadow: `inset 0 1px 1px ${globalStyles.color.black10}`,
-    boxSizing: 'border-box',
-    display: 'block',
-    color: globalStyles.color.darkGray,
-    fontSize: '14.5px',
-    height: '2.25em',
-    outline: 'none',
-    padding: '0.4em',
-    width: '100%'
-  },
   'dropdown': {
     background: `url(${caretDownGrey}) calc(100% - ${selectPadding}) 50% / contain no-repeat`,
     backgroundColor: '#fefefe',
