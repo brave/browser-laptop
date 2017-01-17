@@ -6,11 +6,12 @@ const React = require('react')
 const ImmutableComponent = require('../../../js/components/immutableComponent')
 const {StyleSheet, css} = require('aphrodite')
 const globalStyles = require('./styles/global')
+const commonStyles = require('./styles/commonStyles')
 
 class Textbox extends ImmutableComponent {
   render () {
     const className = css(
-      this.props['data-isFormControl'] && styles.formControl,
+      this.props['data-isFormControl'] && commonStyles.formControl,
       styles.textbox,
       this.props['data-isSettings'] && styles.isSettings,
       (this.props.readonly || this.props.readOnly) ? styles.readOnly : styles.outlineable,
@@ -40,20 +41,6 @@ class RecoveryKeyTextbox extends ImmutableComponent {
 }
 
 const styles = StyleSheet.create({
-  'formControl': {
-    background: 'white',
-    border: `solid 1px ${globalStyles.color.black20}`,
-    borderRadius: globalStyles.radius.borderRadius,
-    boxShadow: `inset 0 1px 1px ${globalStyles.color.black10}`,
-    boxSizing: 'border-box',
-    display: 'block',
-    color: globalStyles.color.darkGray,
-    fontSize: '14.5px',
-    height: '2.25em',
-    outline: 'none',
-    padding: '0.4em',
-    width: '100%'
-  },
   'textbox': {
     boxSizing: 'border-box',
     width: 'auto'
