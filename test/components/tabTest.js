@@ -197,7 +197,7 @@ describe('tab tests', function () {
     before(function * () {
       yield setup(this.app.client)
     })
-    it('should close the tab', function * () {
+    it('can close a normal tab', function * () {
       yield this.app.client
         .waitForBrowserWindow()
         .waitForExist('.tab.active[data-frame-key="1"]')
@@ -213,6 +213,18 @@ describe('tab tests', function () {
           return this.waitForUrl(Brave.newTabUrl)
             .waitForTabCount(tabCountAfterTabClose)
         })
+    })
+    it('can close an unloaded tab', function * () {
+      yield this.app.client
+        .waitForBrowserWindow()
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, Brave.server.url('page1.html'), {frameOpts: {unloaded: true, location: Brave.server.url('page1.html'), title: 'hi', tabId: null}, openInForeground: false})
+        .waitForElementCount('.tab', 2)
+        // This ensures it's actually unloaded
+        .waitForTabCount(1)
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_CLOSE_OTHER_FRAMES, 1, true, true)
+        .waitForTabCount(tabCountAfterTabClose)
     })
     it('should undo last closed tab', function * () {
       yield this.app.client

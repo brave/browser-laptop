@@ -80,8 +80,12 @@ const api = {
   },
 
   closeFrame: (state, action) => {
-    let tabId = makeImmutable(action).getIn(['frameProps', 'tabId'])
-    return api.removeTabByTabId(state, tabId)
+    const frameProps = makeImmutable(action).getIn(['frameProps'])
+    // Unloaded tabs have no tab state because the webcontents isn't created yet.
+    if (frameProps.get('unloaded')) {
+      return state
+    }
+    return api.removeTabByTabId(state, frameProps.get('tabId'))
   },
 
   removeTab: (state, action) => {
