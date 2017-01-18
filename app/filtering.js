@@ -524,7 +524,7 @@ function registerForMagnetHandler (session) {
       session.protocol.unregisterNavigatorHandler('magnet', `${webtorrentUrl}#%s`)
     }
   } catch (e) {
-    console.warn('Could not register magnet URL handler, are oyu using the latest electron?')
+    console.warn('Could not register magnet URL handler. Are you using the latest electron?')
   }
 }
 
