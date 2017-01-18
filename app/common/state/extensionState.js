@@ -91,15 +91,15 @@ const extensionState = {
     tabId = tabId ? tabId.toString() : '-1'
     let basePath = browserAction.get('base_path')
     if (basePath) {
-      if (browserAction.getIn(['icons', '19']) && browserAction.getIn(['icons', '38'])) {
-        return `-webkit-image-set(
-                  url(${basePath}/${browserAction.getIn(['icons', '19'])}) 1x,
-                  url(${basePath}/${browserAction.getIn(['icons', '38'])}) 2x`
-      }
       if (browserAction.getIn(['icons', '16']) && browserAction.getIn(['icons', '48'])) {
         return `-webkit-image-set(
                   url(${basePath}/${browserAction.getIn(['icons', '16'])}) 1x,
                   url(${basePath}/${browserAction.getIn(['icons', '48'])}) 2x`
+      }
+      if (browserAction.getIn(['icons', '19']) && browserAction.getIn(['icons', '38'])) {
+        return `-webkit-image-set(
+                  url(${basePath}/${browserAction.getIn(['icons', '19'])}) 1x,
+                  url(${basePath}/${browserAction.getIn(['icons', '38'])}) 2x`
       }
       if (browserAction.getIn(['tabs', tabId, 'path', '19']) && browserAction.getIn(['tabs', tabId, 'path', '38'])) {
         return `-webkit-image-set(
