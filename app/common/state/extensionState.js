@@ -30,7 +30,7 @@ const extensionState = {
   getBrowserActionByTabId: (state, extensionId, tabId) => {
     tabId = tabId ? tabId.toString() : '-1'
     let extension = extensionState.getExtensionById(state, extensionId)
-    let icons = extension.getIn(['manifest', 'icons']) || Immutable.Map()
+    let icons = extension.getIn(['manifest', 'icons'])
     let defaultIcons = extension.getIn(['manifest', 'browser_action', 'default_icon'])
     if (extension && extension.get('browserAction')) {
       let tabBrowserAction = extension.getIn(['tabs', tabId]) || Immutable.Map()
