@@ -61,10 +61,6 @@ class Frame extends ImmutableComponent {
     return windowStore.getFrame(this.props.frameKey) || Immutable.fromJS({})
   }
 
-  get braveryDefaults () {
-    return siteSettings.braveryDefaults(appStoreRenderer.state, appConfig)
-  }
-
   get frameBraverySettings () {
     const frameSiteSettings =
       siteSettings.getSiteSettingsForURL(this.props.allSiteSettings, this.props.location)
@@ -85,61 +81,95 @@ class Frame extends ImmutableComponent {
    * Send data critical for the given about page via IPC.
    * The page receiving the data typically uses it in component state.
    */
-  updateAboutDetails () {
+  updateAboutDetails (prevProps) {
     let location = getBaseUrl(this.props.location)
     if (location === 'about:preferences' || location === 'about:contributions' || location === aboutUrls.get('about:contributions')) {
-      ipc.send(messages.CHECK_BITCOIN_HANDLER, FrameStateUtil.getPartition(this.frame))
-      const ledgerData = this.props.ledgerInfo.merge(this.props.publisherInfo).merge(this.props.preferencesData).toJS()
-      this.webview.send(messages.LEDGER_UPDATED, ledgerData)
-      this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
-      this.webview.send(messages.SITE_SETTINGS_UPDATED, this.props.allSiteSettings ? this.props.allSiteSettings.toJS() : null)
-      this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.braveryDefaults)
+      if (prevProps.partition !== this.props.partition) {
+        ipc.send(messages.CHECK_BITCOIN_HANDLER, this.props.partition)
+      }
+      if (!Immutable.is(prevProps.ledgerInfo, this.props.ledgerInfo) ||
+          !Immutable.is(prevProps.publisherInfo, this.props.publisherInfo) ||
+          !Immutable.is(prevProps.preferencesData, this.props.preferencesData)) {
+        const ledgerData = this.props.ledgerInfo.merge(this.props.publisherInfo).merge(this.props.preferencesData)
+        this.webview.send(messages.LEDGER_UPDATED, ledgerData.toJS())
+      }
+      if (!Immutable.is(prevProps.settings, this.props.settings)) {
+        this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
+      }
+      if (!Immutable.is(prevProps.allSiteSettings, this.props.allSiteSettings)) {
+        this.webview.send(messages.SITE_SETTINGS_UPDATED, this.props.allSiteSettings ? this.props.allSiteSettings.toJS() : null)
+      }
+      if (!Immutable.is(prevProps.braveryDefaults, this.props.braveryDefaults)) {
+        this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.props.braveryDefaults.toJS())
+      }
     } else if (location === 'about:bookmarks') {
-      this.webview.send(messages.BOOKMARKS_UPDATED, {
-        bookmarks: this.props.bookmarks.toJS(),
-        bookmarkFolders: this.props.bookmarkFolders.toJS()
-      })
+      if (!Immutable.is(prevProps.bookmarks, this.props.bookmarks) ||
+          !Immutable.is(prevProps.bookmarkFolders, this.props.bookmarkFolders)) {
+        this.webview.send(messages.BOOKMARKS_UPDATED, {
+          bookmarks: this.props.bookmarks.toJS(),
+          bookmarkFolders: this.props.bookmarkFolders.toJS()
+        })
+      }
     } else if (location === 'about:history') {
-      const aboutHistoryState = this.props.history && this.props.history.toJS
-        ? this.props.history.toJS()
-        : {}
-      this.webview.send(messages.HISTORY_UPDATED, aboutHistoryState)
-      this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
+      if (!Immutable.is(prevProps.history, this.props.history)) {
+        const aboutHistoryState = this.props.history && this.props.history.toJS
+          ? this.props.history.toJS()
+          : {}
+        this.webview.send(messages.HISTORY_UPDATED, aboutHistoryState)
+      }
+      if (!Immutable.is(prevProps.settings, this.props.settings)) {
+        this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
+      }
     } else if (location === 'about:extensions') {
-      this.webview.send(messages.EXTENSIONS_UPDATED, {
-        extensions: this.props.extensions.toJS()
-      })
+      if (!Immutable.is(prevProps.extensions, this.props.extensions)) {
+        this.webview.send(messages.EXTENSIONS_UPDATED, {
+          extensions: this.props.extensions.toJS()
+        })
+      }
     } else if (location === 'about:adblock') {
-      this.webview.send(messages.ADBLOCK_UPDATED, {
-        adblock: this.props.adblock.toJS(),
-        settings: this.props.settings ? this.props.settings.toJS() : null,
-        resources: require('ad-block/lib/regions')
-      })
+      if (!Immutable.is(prevProps.adblock, this.props.adblock) ||
+          !Immutable.is(prevProps.settings, this.props.settings)) {
+        this.webview.send(messages.ADBLOCK_UPDATED, {
+          adblock: this.props.adblock.toJS(),
+          settings: this.props.settings ? this.props.settings.toJS() : null,
+          resources: require('ad-block/lib/regions')
+        })
+      }
     } else if (location === 'about:downloads') {
-      this.webview.send(messages.DOWNLOADS_UPDATED, {
-        downloads: this.props.downloads.toJS()
-      })
+      if (!Immutable.is(prevProps.downloads, this.props.downloads)) {
+        this.webview.send(messages.DOWNLOADS_UPDATED, {
+          downloads: this.props.downloads.toJS()
+        })
+      }
     } else if (location === 'about:passwords') {
-      if (this.props.passwords) {
+      if (this.props.passwords && !Immutable.is(prevProps.passwords, this.props.passwords)) {
         this.webview.send(messages.PASSWORD_DETAILS_UPDATED, this.props.passwords.toJS())
       }
-      if (this.props.allSiteSettings) {
+      if (this.props.allSiteSettings && !Immutable.is(prevProps.allSiteSettings, this.props.allSiteSettings)) {
         this.webview.send(messages.PASSWORD_SITE_DETAILS_UPDATED,
                             this.props.allSiteSettings.filter((setting) => setting.get('savePasswords') === false).toJS())
       }
     } else if (location === 'about:flash') {
-      this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.braveryDefaults)
+      if (!Immutable.is(prevProps.braveryDefaults, this.props.braveryDefaults)) {
+        this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.props.braveryDefaults.toJS())
+      }
     } else if (location === 'about:newtab') {
-      this.webview.send(messages.NEWTAB_DATA_UPDATED, {
-        showEmptyPage: getSetting(settings.NEWTAB_MODE) === newTabMode.EMPTY_NEW_TAB,
-        trackedBlockersCount: this.props.trackedBlockersCount,
-        adblockCount: this.props.adblockCount,
-        httpsUpgradedCount: this.props.httpsUpgradedCount,
-        newTabDetail: this.props.newTabDetail ? this.props.newTabDetail.toJS() : null
-      })
+      if (!Immutable.is(prevProps.settings, this.props.settings) ||
+          prevProps.trackedBlockersCount !== this.props.trackedBlockersCount ||
+          prevProps.adblockCount !== this.props.adblockCount ||
+          prevProps.httpsUpgradedCount !== this.props.httpsUpgradedCount ||
+          !Immutable.is(prevProps.newTabDetail, this.props.newTabDetail)) {
+        this.webview.send(messages.NEWTAB_DATA_UPDATED, {
+          showEmptyPage: getSetting(settings.NEWTAB_MODE) === newTabMode.EMPTY_NEW_TAB,
+          trackedBlockersCount: this.props.trackedBlockersCount,
+          adblockCount: this.props.adblockCount,
+          httpsUpgradedCount: this.props.httpsUpgradedCount,
+          newTabDetail: this.props.newTabDetail ? this.props.newTabDetail.toJS() : null
+        })
+      }
     } else if (location === 'about:autofill') {
-      const defaultSession = require('electron').remote.session.defaultSession
-      if (this.props.autofillAddresses) {
+      if (this.props.autofillAddresses && !Immutable.is(prevProps.autofillAddresses, this.props.autofillAddresses)) {
+        const defaultSession = require('electron').remote.session.defaultSession
         const guids = this.props.autofillAddresses.get('guid')
         let list = []
         guids.forEach((entry) => {
@@ -160,7 +190,8 @@ class Frame extends ImmutableComponent {
         })
         this.webview.send(messages.AUTOFILL_ADDRESSES_UPDATED, list)
       }
-      if (this.props.autofillCreditCards) {
+      if (this.props.autofillCreditCards && !Immutable.is(prevProps.autofillCreditCards, this.props.autofillCreditCards)) {
+        const defaultSession = require('electron').remote.session.defaultSession
         const guids = this.props.autofillCreditCards.get('guid')
         let list = []
         guids.forEach((entry) => {
@@ -177,15 +208,17 @@ class Frame extends ImmutableComponent {
         this.webview.send(messages.AUTOFILL_CREDIT_CARDS_UPDATED, list)
       }
     } else if (location === 'about:brave') {
-      const versionInformation = appStoreRenderer.state.getIn(['about', 'brave', 'versionInformation'])
-      if (versionInformation && versionInformation.toJS) {
-        this.webview.send(messages.VERSION_INFORMATION_UPDATED, versionInformation.toJS())
+      if (this.props.versionInformation && this.props.versionInformation.toJS &&
+          !Immutable.is(prevProps.versionInformation, this.props.versionInformation)) {
+        this.webview.send(messages.VERSION_INFORMATION_UPDATED, this.props.versionInformation.toJS())
       }
     }
 
     // send state to about pages
     if (this.isAboutPage() && this.props.aboutDetails) {
-      this.webview.send(messages.STATE_UPDATED, this.props.aboutDetails.toJS())
+      if (!Immutable.is(prevProps.aboutDetails, this.props.aboutDetails)) {
+        this.webview.send(messages.STATE_UPDATED, this.props.aboutDetails.toJS())
+      }
     }
   }
 
@@ -312,7 +345,7 @@ class Frame extends ImmutableComponent {
     const cb = () => {
       this.webview.setActive(this.props.isActive)
       this.webview.setTabIndex(this.props.tabIndex)
-      this.updateAboutDetails()
+      this.updateAboutDetails({})
     }
     this.updateWebview(cb)
   }
@@ -380,7 +413,7 @@ class Frame extends ImmutableComponent {
           this.exitHtmlFullScreen()
         }
       }
-      this.updateAboutDetails()
+      this.updateAboutDetails(prevProps)
     }
 
     // For cross-origin navigation, clear temp approvals
@@ -698,7 +731,7 @@ class Frame extends ImmutableComponent {
       let method = () => {}
       switch (e.channel) {
         case messages.ABOUT_COMPONENT_INITIALIZED:
-          this.updateAboutDetails()
+          this.updateAboutDetails({})
           break
         case messages.GOT_CANVAS_FINGERPRINTING:
           if (this.frame.isEmpty()) {

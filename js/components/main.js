@@ -60,7 +60,7 @@ const {bookmarksToolbarMode} = require('../../app/common/constants/settingsEnums
 const basicAuthState = require('../../app/common/state/basicAuthState')
 const extensionState = require('../../app/common/state/extensionState')
 const aboutHistoryState = require('../../app/common/state/aboutHistoryState')
-const FrameStateUtil = require('../state/frameStateUtil')
+const frameStateUtil = require('../state/frameStateUtil')
 const siteUtil = require('../state/siteUtil')
 const searchProviders = require('../data/searchProviders')
 const defaultBrowserState = require('../../app/common/state/defaultBrowserState')
@@ -197,7 +197,7 @@ class Main extends ImmutableComponent {
   }
 
   exitFullScreen () {
-    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
     if (activeFrame && activeFrame.get('isFullScreen')) {
       windowActions.setFullScreen(activeFrame, false)
     }
@@ -314,8 +314,8 @@ class Main extends ImmutableComponent {
 
   componentDidUpdate (prevProps) {
     this.loadSearchProviders()
-    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
-    const activeFramePrev = FrameStateUtil.getActiveFrame(prevProps.windowState)
+    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
+    const activeFramePrev = frameStateUtil.getActiveFrame(prevProps.windowState)
     const activeFrameTitle = activeFrame && (activeFrame.get('title') || activeFrame.get('location')) || ''
     const activeFramePrevTitle = activeFramePrev && (activeFramePrev.get('title') || activeFramePrev.get('location')) || ''
     if (activeFrameTitle !== activeFramePrevTitle) {
@@ -367,12 +367,12 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.SHORTCUT_CLOSE_FRAME, (e, i) => typeof i !== 'undefined' && i !== null
-      ? windowActions.closeFrame(self.props.windowState.get('frames'), FrameStateUtil.getFrameByKey(self.props.windowState, i))
-      : windowActions.closeFrame(self.props.windowState.get('frames'), FrameStateUtil.getActiveFrame(this.props.windowState)))
+      ? windowActions.closeFrame(self.props.windowState.get('frames'), frameStateUtil.getFrameByKey(self.props.windowState, i))
+      : windowActions.closeFrame(self.props.windowState.get('frames'), frameStateUtil.getActiveFrame(this.props.windowState)))
     ipc.on(messages.SHORTCUT_UNDO_CLOSED_FRAME, () => windowActions.undoClosedFrame())
 
     ipc.on(messages.SHORTCUT_CLOSE_OTHER_FRAMES, (e, key, isCloseRight, isCloseLeft) => {
-      const currentIndex = FrameStateUtil.getFrameIndex(self.props.windowState, key)
+      const currentIndex = frameStateUtil.getFrameIndex(self.props.windowState, key)
       if (currentIndex === -1) {
         return
       }
@@ -395,18 +395,18 @@ class Main extends ImmutableComponent {
 
     const self = this
     ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_BY_INDEX, (e, i) =>
-      windowActions.setActiveFrame(FrameStateUtil.getFrameByDisplayIndex(self.props.windowState, i)))
+      windowActions.setActiveFrame(frameStateUtil.getFrameByDisplayIndex(self.props.windowState, i)))
 
     ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST, () =>
       windowActions.setActiveFrame(self.props.windowState.getIn(['frames', self.props.windowState.get('frames').size - 1])))
 
     ipc.on(messages.BLOCKED_RESOURCE, (e, blockType, details) => {
-      const frameProps = FrameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
+      const frameProps = frameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
       frameProps && windowActions.setBlockedBy(frameProps, blockType, details.url)
     })
 
     ipc.on(messages.BLOCKED_PAGE, (e, blockType, details) => {
-      const frameProps = FrameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
+      const frameProps = frameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
       if (!frameProps) {
         return
       }
@@ -419,7 +419,7 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.HTTPSE_RULE_APPLIED, (e, ruleset, details) => {
-      const frameProps = FrameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
+      const frameProps = frameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
       frameProps && windowActions.setRedirectedBy(frameProps, ruleset, details.url)
     })
 
@@ -427,12 +427,12 @@ class Main extends ImmutableComponent {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_FORWARD, this.onForward)
 
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, (e, url) => {
-      const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
+      const activeFrame = frameStateUtil.getActiveFrame(self.props.windowState)
       windowActions.loadUrl(activeFrame, url)
     })
 
     ipc.on(messages.CERT_ERROR, (e, details) => {
-      const frame = FrameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
+      const frame = frameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
       if (frame && (frame.get('location') === details.url ||
                     frame.get('provisionalLocation') === details.url)) {
         windowActions.setFrameError(frame, {
@@ -444,7 +444,7 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.SET_SECURITY_STATE, (e, frameKey, securityState) => {
-      windowActions.setSecurityState(FrameStateUtil.getFrameByKey(self.props.windowState, frameKey),
+      windowActions.setSecurityState(frameStateUtil.getFrameByKey(self.props.windowState, frameKey),
                                      securityState)
     })
 
@@ -471,7 +471,7 @@ class Main extends ImmutableComponent {
       }
     })
     window.addEventListener('focus', () => {
-      const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
+      const activeFrame = frameStateUtil.getActiveFrame(self.props.windowState)
       windowActions.setFocusedFrame(activeFrame)
       // For whatever reason other elements are preserved but webviews are not.
       if (document.activeElement && document.activeElement.tagName === 'BODY') {
@@ -499,7 +499,7 @@ class Main extends ImmutableComponent {
       return false
     }, true)
 
-    const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
+    const activeFrame = frameStateUtil.getActiveFrame(self.props.windowState)
     if (activeFrame && activeFrame.get('title')) {
       currentWindow.setTitle(activeFrame.get('title'))
     }
@@ -568,7 +568,7 @@ class Main extends ImmutableComponent {
   // Returns the same as the active frame's location, but returns the requested
   // URL if it's safe browsing, a cert error page or an error page.
   get activeRequestedLocation () {
-    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
     if (!activeFrame) {
       return undefined
     }
@@ -581,7 +581,7 @@ class Main extends ImmutableComponent {
   }
 
   onNav (e, navCheckProp, navType, navAction) {
-    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
     const isNavigatable = isNavigatableAboutPage(getBaseUrl(activeFrame.get('location')))
     if (e && eventUtil.isForSecondaryAction(e) && isNavigatable) {
       if (activeFrame && activeFrame.get(navCheckProp)) {
@@ -618,7 +618,7 @@ class Main extends ImmutableComponent {
   }
 
   onHamburgerMenu (e) {
-    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
     contextMenus.onHamburgerMenu(activeFrame && activeFrame.get('location') || '', e)
   }
 
@@ -685,7 +685,7 @@ class Main extends ImmutableComponent {
       Array.from(e.dataTransfer.files).forEach((file) =>
         windowActions.newFrame({location: file.path, title: file.name}))
     } else if (e.dataTransfer.getData('text/plain')) {
-      let activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+      let activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
       if (activeFrame) {
         windowActions.loadUrl(activeFrame, e.dataTransfer.getData('text/plain'))
       }
@@ -737,7 +737,7 @@ class Main extends ImmutableComponent {
   }
 
   onFindHide () {
-    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
     windowActions.setFindbarShown(activeFrame, false)
     webviewActions.stopFindInPage()
     windowActions.setFindDetail(activeFrame, Immutable.fromJS({
@@ -748,7 +748,7 @@ class Main extends ImmutableComponent {
   }
 
   onFind (searchString, caseSensitivity, forward, findNext) {
-    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
     webviewActions.findInPage(searchString, caseSensitivity, forward, findNext)
     if (!findNext) {
       windowActions.setFindDetail(activeFrame, Immutable.fromJS({
@@ -758,12 +758,12 @@ class Main extends ImmutableComponent {
   }
 
   onTabContextMenu (e) {
-    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
     contextMenus.onTabsToolbarContextMenu(activeFrame, undefined, undefined, e)
   }
 
   get allSiteSettings () {
-    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
     if (activeFrame && activeFrame.get('isPrivate')) {
       return this.props.appState.get('siteSettings').mergeDeep(this.props.appState.get('temporarySiteSettings'))
     }
@@ -784,7 +784,7 @@ class Main extends ImmutableComponent {
   }
 
   get activeTabId () {
-    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
     return activeFrame && activeFrame.get('tabId')
   }
 
@@ -860,7 +860,7 @@ class Main extends ImmutableComponent {
     // All frame operations work off of frame keys and not index though so unsorted frames
     // can be passed everywhere other than the Frame elements.
     const sortedFrames = this.props.windowState.get('frames').sort(comparatorByKeyAsc)
-    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
     this.frames = {}
     const allSiteSettings = this.allSiteSettings
     const activeSiteSettings = this.activeSiteSettings
@@ -886,6 +886,8 @@ class Main extends ImmutableComponent {
     const braverySettings = siteSettings.activeSettings(activeSiteSettings, this.props.appState, appConfig)
     const loginRequiredDetail = activeFrame ? basicAuthState.getLoginRequiredDetail(this.props.appState, activeFrame.get('tabId')) : null
     const customTitlebar = this.customTitlebar
+    const versionInformation = this.props.appState.getIn(['about', 'brave', 'versionInformation'])
+    const braveryDefaults = Immutable.fromJS(siteSettings.braveryDefaults(this.props.appState, appConfig))
     const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&
       !this.props.windowState.get('bookmarkDetail') &&
       !siteInfoIsVisible &&
@@ -1202,10 +1204,11 @@ class Main extends ImmutableComponent {
               <Frame
                 ref={(node) => { this.frames[frame.get('key')] = node }}
                 urlBarFocused={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'focused'])}
-                tabIndex={FrameStateUtil.getFrameIndex(this.props.windowState, frame.get('key'))}
+                tabIndex={frameStateUtil.getFrameIndex(this.props.windowState, frame.get('key'))}
                 prefOpenInForeground={getSetting(settings.SWITCH_TO_NEW_TABS)}
                 onCloseFrame={this.onCloseFrame}
                 frameKey={frame.get('key')}
+                partition={frameStateUtil.getPartition(frame)}
                 key={frame.get('key')}
                 settings={['about:preferences', 'about:history', 'about:adblock'].includes(getBaseUrl(frame.get('location')))
                   ? this.props.appState.get('settings') || emptyMap
@@ -1264,8 +1267,10 @@ class Main extends ImmutableComponent {
                 frameSiteSettings={this.frameSiteSettings(frame.get('location'))}
                 onFindHide={this.onFindHide}
                 enableNoScript={this.enableNoScript(this.frameSiteSettings(frame.get('location')))}
+                versionInformation={versionInformation}
+                braveryDefaults={braveryDefaults}
                 isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
-                isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
+                isActive={frameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
                 autofillCreditCards={this.props.appState.getIn(['autofill', 'creditCards'])}
                 autofillAddresses={this.props.appState.getIn(['autofill', 'addresses'])}
                 adblockCount={this.props.appState.getIn(['adblock', 'count'])}
