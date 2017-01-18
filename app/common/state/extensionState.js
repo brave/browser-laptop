@@ -30,9 +30,11 @@ const extensionState = {
   getBrowserActionByTabId: (state, extensionId, tabId) => {
     tabId = tabId ? tabId.toString() : '-1'
     let extension = extensionState.getExtensionById(state, extensionId)
+    let icons = extension.getIn(['manifest', 'icons']) || Immutable.Map()
+    let defaultIcons = extension.getIn(['manifest', 'browser_action', 'default_icon'])
     if (extension && extension.get('browserAction')) {
       let tabBrowserAction = extension.getIn(['tabs', tabId]) || Immutable.Map()
-      return extension.get('browserAction').merge(tabBrowserAction).merge({base_path: extension.get('base_path')})
+      return extension.get('browserAction').merge({icons, defaultIcons}).merge(tabBrowserAction).merge({base_path: extension.get('base_path')})
     }
     return null
   },
@@ -87,14 +89,27 @@ const extensionState = {
 
   browserActionBackgroundImage: (browserAction, tabId) => {
     tabId = tabId ? tabId.toString() : '-1'
-    if (browserAction.get('base_path')) {
+    let basePath = browserAction.get('base_path')
+    if (basePath) {
+      if (browserAction.getIn(['icons', '19']) && browserAction.getIn(['icons', '38'])) {
+        return `-webkit-image-set(
+                  url(${basePath}/${browserAction.getIn(['icons', '19'])}) 1x,
+                  url(${basePath}/${browserAction.getIn(['icons', '38'])}) 2x`
+      }
+      if (browserAction.getIn(['icons', '16']) && browserAction.getIn(['icons', '48'])) {
+        return `-webkit-image-set(
+                  url(${basePath}/${browserAction.getIn(['icons', '16'])}) 1x,
+                  url(${basePath}/${browserAction.getIn(['icons', '48'])}) 2x`
+      }
       if (browserAction.getIn(['tabs', tabId, 'path', '19']) && browserAction.getIn(['tabs', tabId, 'path', '38'])) {
-        return '-webkit-image-set(url(\'' + browserAction.get('base_path') + '/' + browserAction.getIn(['tabs', tabId, 'path', '19']) +
-          '\') 1x, url(\'' + browserAction.get('base_path') + '/' + browserAction.getIn(['tabs', tabId, 'path', '38']) + '\') 2x'
+        return `-webkit-image-set(
+                  url(${basePath}/${browserAction.getIn(['tabs', tabId, 'path', '19'])}) 1x,
+                  url(${basePath}/${browserAction.getIn(['tabs', tabId, 'path', '38'])}) 2x`
       }
       if (browserAction.getIn(['path', '19']) && browserAction.getIn(['path', '38'])) {
-        return '-webkit-image-set(url(\'' + browserAction.get('base_path') + '/' + browserAction.getIn(['path', '19']) +
-          '\') 1x, url(\'' + browserAction.get('base_path') + '/' + browserAction.getIn(['path', '38']) + '\') 2x'
+        return `-webkit-image-set(
+                  url(${basePath}/${browserAction.getIn(['path', '19'])}) 1x,
+                  url(${basePath}/${browserAction.getIn(['path', '38'])}) 2x`
       }
     }
     return ''
