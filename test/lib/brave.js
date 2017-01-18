@@ -678,7 +678,9 @@ var exports = {
     this.app = new Application({
       waitTimeout: exports.defaultTimeout,
       connectionRetryTimeout: exports.defaultTimeout,
-      path: './node_modules/.bin/electron',
+      path: process.platform === 'win32'
+        ? 'node_modules/electron-prebuilt/dist/brave.exe'
+        : './node_modules/.bin/electron',
       env,
       args: ['./', '--debug=5858', '--enable-logging', '--v=1'],
       requireName: 'devTools'

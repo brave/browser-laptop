@@ -12,6 +12,7 @@ module.exports = [
   'eslint',
   'cppunitlite',
   'caniuse-db',
+  'cross-env',
   'spectron',
   'ad-block/(node_modules|test|perf|sample|scripts|test|vendor|ABPFilterParserData.dat)',
   'ad-block/build/Release/(obj|obj.target|.deps|ad-block.pdb|ad-block.map)',
