@@ -50,6 +50,7 @@ const globalStyles = {
     black25: 'rgba(0, 0, 0, 0.25)',
     black50: 'rgba(0, 0, 0, 0.5)',
     black75: 'rgba(0, 0, 0, 0.75)',
+    black100: 'rgba(0, 0, 0, 1)',
     statsYellow: '#ffc000',
     statsOrange: '#f39030',
     statsRed: '#fe521d',

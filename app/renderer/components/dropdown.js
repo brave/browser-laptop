@@ -41,9 +41,9 @@ const selectPadding = '0.4em'
 const styles = StyleSheet.create({
   'dropdown': {
     background: `url(${caretDownGrey}) calc(100% - ${selectPadding}) 50% / contain no-repeat`,
-    backgroundColor: '#fefefe',
+    backgroundColor: '#fbfbfb',
     backgroundSize: '12px 12px',
-    boxShadow: `-1px 1px 3px -1px ${globalStyles.color.mediumGray}`,
+    boxShadow: `0px 2px 8px -5px ${globalStyles.color.black100}`,
     height: '2rem',
     outline: 'none',
     // right padding is larger, to account for the down arrow SVG
