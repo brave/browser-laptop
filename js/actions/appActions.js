@@ -368,14 +368,16 @@ const appActions = {
    * @param {string|number} value - The value to update to
    * @param {boolean} temp - Whether to change temporary or persistent
    *   settings. defaults to false (persistent).
+   * @param {boolean} skipSync - Set true if a site isn't eligible for Sync (e.g. if addSite was triggered by Sync)
    */
-  changeSiteSetting: function (hostPattern, key, value, temp) {
+  changeSiteSetting: function (hostPattern, key, value, temp, skipSync) {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_CHANGE_SITE_SETTING,
       hostPattern,
       key,
       value,
-      temporary: temp || false
+      temporary: temp || false,
+      skipSync
     })
   },
 
@@ -385,13 +387,15 @@ const appActions = {
    * @param {string} key - The config key to update
    * @param {boolean} temp - Whether to change temporary or persistent
    *   settings. defaults to false (persistent).
+   * @param {boolean} skipSync - Set true if a site isn't eligible for Sync (e.g. if addSite was triggered by Sync)
    */
-  removeSiteSetting: function (hostPattern, key, temp) {
+  removeSiteSetting: function (hostPattern, key, temp, skipSync) {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_REMOVE_SITE_SETTING,
       hostPattern,
       key,
-      temporary: temp || false
+      temporary: temp || false,
+      skipSync
     })
   },
 
