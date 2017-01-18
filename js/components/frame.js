@@ -21,7 +21,7 @@ const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
 const config = require('../constants/config')
 const settings = require('../constants/settings')
-const {aboutUrls, getTargetMagnetUrl, isSourceMagnetUrl, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
+const {aboutUrls, isSourceMagnetUrl, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
 const {isFrameError} = require('../../app/common/lib/httpUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
@@ -260,8 +260,6 @@ class Frame extends ImmutableComponent {
 
     if (isSourceAboutUrl(newSrc)) {
       newSrc = getTargetAboutUrl(newSrc)
-    } else if (isTorrentViewerURL(newSrc)) {
-      newSrc = getTargetMagnetUrl(newSrc)
     }
 
     let guestInstanceId = null

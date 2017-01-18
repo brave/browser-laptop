@@ -515,6 +515,19 @@ function registerForDownloadListener (session) {
   })
 }
 
+function registerForMagnetHandler (session) {
+  const webtorrentUrl = appUrlUtil.getTorrentExtUrl('webtorrent.html')
+  try {
+    if (getSetting(settings.TORRENT_VIEWER_ENABLED)) {
+      session.protocol.registerNavigatorHandler('magnet', `${webtorrentUrl}#%s`)
+    } else {
+      session.protocol.unregisterNavigatorHandler('magnet', `${webtorrentUrl}#%s`)
+    }
+  } catch (e) {
+    console.warn('Could not register magnet URL handler, are oyu using the latest electron?')
+  }
+}
+
 function initSession (ses, partition) {
   initializedPartitions[partition] = true
   registeredSessions[partition] = ses
@@ -531,7 +544,8 @@ function initForPartition (partition) {
     registerForBeforeSendHeaders,
     registerPermissionHandler,
     registerForHeadersReceived,
-    registerForDownloadListener]
+    registerForDownloadListener,
+    registerForMagnetHandler]
   let options = {}
   if (isSessionPartition(partition)) {
     options.parent_partition = ''

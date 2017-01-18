@@ -17,7 +17,7 @@ require('../../node_modules/font-awesome/css/font-awesome.css')
 
 // UI state object. Pure function from `state` -> React element.
 const state = {
-  torrentID: window.location.hash.substring(1),
+  torrentID: window.decodeURIComponent(window.location.hash.substring(1)),
   parsedTorrent: null,
   client: null,
   torrent: null,

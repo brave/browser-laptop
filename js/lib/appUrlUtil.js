@@ -163,7 +163,9 @@ module.exports.isTargetAboutUrl = function (input) {
  * Example: getTargetMagnetUrl('magnet:...') -> 'chrome-extension://<...>.html#magnet:...'
  */
 module.exports.getTargetMagnetUrl = function (input) {
-  if (!input.startsWith('magnet:')) return null
+  if (!input.startsWith('magnet:')) {
+    return null
+  }
   const url = module.exports.getTorrentExtUrl('webtorrent.html')
   return [url, input].join('#')
 }
@@ -175,7 +177,7 @@ module.exports.getTargetMagnetUrl = function (input) {
  */
 module.exports.getSourceMagnetUrl = function (input) {
   if (getBaseUrl(input) !== module.exports.getTorrentExtUrl('webtorrent.html')) return null
-  const url = getHash(input)
+  const url = decodeURIComponent(getHash(input))
   return url
 }
 
