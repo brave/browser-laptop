@@ -83,7 +83,6 @@
     "ad-block": "^2.0.0",
     "aphrodite": "^1.0.0",
     "async": "^2.0.1",
-    "currency-symbol-map": "^3.1.0",
     "electron-localshortcut": "^0.6.0",
     "electron-prebuilt": "brave/electron-prebuilt",
     "electron-squirrel-startup": "brave/electron-squirrel-startup",
