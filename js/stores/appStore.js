@@ -597,7 +597,11 @@ const handleAppAction = (action) => {
         let newSiteSettings = siteSettings.mergeSiteSetting(appState.get(propertyName), action.hostPattern, action.key, action.value)
         if (!action.temporary) {
           let syncObject = siteUtil.setObjectId(newSiteSettings.get(action.hostPattern))
-          syncActions.updateSiteSetting(action.hostPattern, syncObject)
+          if (!action.skipSync) {
+            const objectId = syncObject.get('objectId')
+            const item = new Immutable.Map({objectId, [action.key]: action.value})
+            syncActions.updateSiteSetting(action.hostPattern, item)
+          }
           newSiteSettings = newSiteSettings.set(action.hostPattern, syncObject)
         }
         appState = appState.set(propertyName, newSiteSettings)
@@ -610,7 +614,11 @@ const handleAppAction = (action) => {
           action.hostPattern, action.key)
         if (!action.temporary) {
           let syncObject = siteUtil.setObjectId(newSiteSettings.get(action.hostPattern))
-          syncActions.updateSiteSetting(action.hostPattern, syncObject)
+          if (!action.skipSync) {
+            const objectId = syncObject.get('objectId')
+            const item = new Immutable.Map({objectId, [action.key]: null})
+            syncActions.removeSiteSetting(action.hostPattern, item)
+          }
           newSiteSettings = newSiteSettings.set(action.hostPattern, syncObject)
         }
         appState = appState.set(propertyName, newSiteSettings)
@@ -622,10 +630,13 @@ const handleAppAction = (action) => {
         let newSiteSettings = new Immutable.Map()
         appState.get(propertyName).map((entry, hostPattern) => {
           let newEntry = entry.delete(action.key)
-          newSiteSettings = newSiteSettings.set(hostPattern, newEntry)
-          if (entry.get('objectId')) {
-            syncActions.updateSiteSetting(hostPattern, newEntry)
+          if (!action.skipSync) {
+            newEntry = siteUtil.setObjectId(newEntry)
+            const objectId = newEntry.get('objectId')
+            const item = new Immutable.Map({objectId, [action.key]: null})
+            syncActions.removeSiteSetting(hostPattern, item)
           }
+          newSiteSettings = newSiteSettings.set(hostPattern, newEntry)
         })
         appState = appState.set(propertyName, newSiteSettings)
         break
