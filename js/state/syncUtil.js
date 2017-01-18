@@ -64,6 +64,64 @@ const applySiteRecord = (record, siteDetail, tag) => {
   }
 }
 
+const applySiteSettingRecord = (record) => {
+  // TODO: In Sync lib syncRecordAsJS() convert Enums into strings
+  const adControlEnum = {
+    0: 'showBraveAds',
+    1: 'blockAds',
+    2: 'allowAdsAndTracking'
+  }
+  const cookieControlEnum = {
+    0: 'block3rdPartyCookie',
+    1: 'allowAllCookies'
+  }
+  const getValue = (key, value) => {
+    if (key === 'adControl') {
+      return adControlEnum[value]
+    } else if (key === 'cookieControl') {
+      return cookieControlEnum[value]
+    } else {
+      return value
+    }
+  }
+  const appActions = require('../actions/appActions')
+  const objectId = new Immutable.List(record.objectId)
+  const category = CATEGORY_MAP[record.objectData].categoryName
+  const hostPattern = record.siteSetting.hostPattern
+  if (!hostPattern) {
+    throw new Error('siteSetting.hostPattern is required.')
+  }
+
+  let applySetting = null
+  switch (record.action) {
+    case writeActions.CREATE:
+    case writeActions.UPDATE:
+      // Set the objectId if needed so we can access the existing object
+      let existingObject = this.getObjectById(objectId, category)
+      if (!existingObject) {
+        appActions.changeSiteSetting(hostPattern, 'objectId', objectId, false, true)
+        existingObject = this.getObjectById(objectId, category)
+      }
+      const existingObjectData = existingObject[1]
+      applySetting = (key, value) => {
+        const applyValue = getValue(key, value)
+        if (existingObjectData.get(key) === applyValue) { return }
+        appActions.changeSiteSetting(hostPattern, key, applyValue, false, true)
+      }
+      break
+    case writeActions.DELETE:
+      applySetting = (key, _value) => {
+        appActions.removeSiteSetting(hostPattern, key, false, true)
+      }
+      break
+  }
+
+  for (let key in record.siteSetting) {
+    if (key === 'hostPattern') { continue }
+    applySetting(key, record.siteSetting[key])
+  }
+}
+
 /**
  * Given a SyncRecord, apply it to the browser data store.
  * @param {Object} record
@@ -87,7 +145,7 @@ module.exports.applySyncRecord = (record) => {
       applySiteRecord(record, historySite, null)
       break
     case 'siteSetting':
-      // TODO
+      applySiteSettingRecord(record)
       break
     case 'device':
       // TODO
@@ -270,22 +328,24 @@ module.exports.createSiteSettingsData = (hostPattern, setting) => {
     block3rdPartyCookie: 0,
     allowAllCookies: 1
   }
-  const value = Object.assign({}, siteSettingDefaults, {hostPattern})
+  const objectData = {hostPattern}
 
-  for (let field in setting) {
-    if (field === 'adControl') {
-      value.adControl = adControlEnum[setting.adControl]
-    } else if (field === 'cookieControl') {
-      value.cookieControl = cookieControlEnum[setting.cookieControl]
-    } else if (field in value) {
-      value[field] = setting[field]
+  for (let key in setting) {
+    if (key === 'objectId') { continue }
+    const value = setting[key]
+    if (key === 'adControl' && typeof adControlEnum[value] !== 'undefined') {
+      objectData[key] = adControlEnum[value]
+    } else if (key === 'cookieControl' && typeof cookieControlEnum[value] !== 'undefined') {
+      objectData[key] = cookieControlEnum[value]
+    } else if (key in siteSettingDefaults) {
+      objectData[key] = value
     }
   }
 
   return {
     name: 'siteSetting',
     objectId: setting.objectId || module.exports.newObjectId(['siteSettings', hostPattern]),
-    value
+    value: objectData
   }
 }
 
