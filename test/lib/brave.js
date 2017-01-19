@@ -538,11 +538,11 @@ var exports = {
     /**
      * Sets the sync init data
      */
-    this.app.client.addCommand('saveSyncInitData', function (seed) {
+    this.app.client.addCommand('saveSyncInitData', function (seed, deviceId, lastFetchTimestamp, qr) {
       return this
-        .execute(function (seed, deviceId, lastFetchTimestamp) {
-          return devTools('appActions').saveSyncInitData(seed, deviceId, lastFetchTimestamp)
-        }, seed, [0], 0).then((response) => response.value)
+        .execute(function (seed, deviceId, lastFetchTimestamp, qr) {
+          return devTools('appActions').saveSyncInitData(seed, deviceId, lastFetchTimestamp, qr)
+        }, seed, deviceId, lastFetchTimestamp, qr).then((response) => response.value)
     })
 
     /**

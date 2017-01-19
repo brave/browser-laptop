@@ -149,6 +149,7 @@ const messages = {
   RENDER_URL_TO_PDF: _,
   // Sync
   SYNC_UPDATED: _,
+  SAVE_INIT_DATA: _,
   // Torrent
   TORRENT_MESSAGE: _
 }
