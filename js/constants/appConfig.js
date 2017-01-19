@@ -37,14 +37,12 @@ module.exports = {
     enabled: false,
     installUrl: 'https://get.adobe.com/flashplayer/',
     url: getTargetAboutUrl('about:flash'),
-    resourceId: 'PepperFlashPlayer.plugin',
     shields: false
   },
   widevine: {
     enabled: false,
     moreInfoUrl: 'https://www.eff.org/issues/drm',
     licenseUrl: 'https://www.google.com/policies/terms/',
-    resourceId: 'widevinecdmadapter.plugin',
     shields: false
   },
   adblock: {

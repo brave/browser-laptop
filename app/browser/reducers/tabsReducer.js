@@ -4,12 +4,12 @@
 
 'use strict'
 
-const appConfig = require('../../../js/constants/appConfig')
 const appConstants = require('../../../js/constants/appConstants')
 const tabs = require('../tabs')
 const tabState = require('../../common/state/tabState')
 const windowConstants = require('../../../js/constants/windowConstants')
-const { makeImmutable } = require('../../common/state/immutableUtil')
+const {makeImmutable} = require('../../common/state/immutableUtil')
+const {getFlashResourceId} = require('../../../js/flash')
 
 const tabsReducer = (state, action) => {
   action = makeImmutable(action)
@@ -34,7 +34,7 @@ const tabsReducer = (state, action) => {
       {
         const webContents = tabs.getWebContents(action.get('tabId'))
         if (webContents && !webContents.isDestroyed() && webContents.getURL() === action.get('url')) {
-          webContents.authorizePlugin(appConfig.flash.resourceId)
+          webContents.authorizePlugin(getFlashResourceId())
         }
         break
       }

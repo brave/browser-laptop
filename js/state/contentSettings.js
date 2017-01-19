@@ -7,7 +7,7 @@ const AppStore = require('../stores/appStore')
 const appConstants = require('../constants/appConstants')
 const appConfig = require('../constants/appConfig')
 const config = require('../constants/config')
-const { registerContentSettings } = require('../../app/browser/contentSettings/hostContentSettings')
+const {registerContentSettings} = require('../../app/browser/contentSettings/hostContentSettings')
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
 const Immutable = require('immutable')
 const settings = require('../constants/settings')
@@ -15,8 +15,9 @@ const {cookieExceptions, localStorageExceptions} = require('../data/siteHacks')
 const {defaultPasswordManager} = require('../constants/passwordManagers')
 const urlParse = require('url').parse
 const siteSettings = require('./siteSettings')
-const { registerUserPrefs } = require('./userPrefs')
-const { getSetting } = require('../settings')
+const {registerUserPrefs} = require('./userPrefs')
+const {getSetting} = require('../settings')
+const {getFlashResourceId} = require('../flash')
 
 // backward compatibility with appState siteSettings
 const parseSiteSettingsPattern = (pattern) => {
@@ -127,7 +128,7 @@ const getDefaultPluginSettings = (braveryDefaults, appSettings, appConfig) => {
     },
     {
       setting: 'block',
-      resourceId: appConfig.flash.resourceId,
+      resourceId: getFlashResourceId(),
       primaryPattern: '*'
     },
     {
@@ -138,12 +139,12 @@ const getDefaultPluginSettings = (braveryDefaults, appSettings, appConfig) => {
     // allow autodetction of flash install by adobe
     {
       setting: 'allow',
-      resourceId: appConfig.flash.resourceId,
+      resourceId: getFlashResourceId(),
       primaryPattern: '[*.]adobe.com'
     },
     {
       setting: 'allow',
-      resourceId: appConfig.flash.resourceId,
+      resourceId: getFlashResourceId(),
       primaryPattern: '[*.]macromedia.com'
     }
   ]
@@ -223,7 +224,7 @@ const siteSettingsToContentSettings = (currentSiteSettings, defaultContentSettin
       contentSettings = addContentSettings(contentSettings, 'adInsertion', primaryPattern, '*', siteSetting.get('adControl') === 'showBraveAds' ? 'allow' : 'block')
     }
     if (typeof siteSetting.get('flash') === 'number' && braveryDefaults.get('flash')) {
-      contentSettings = addContentSettings(contentSettings, 'plugins', primaryPattern, '*', 'allow', appConfig.flash.resourceId)
+      contentSettings = addContentSettings(contentSettings, 'plugins', primaryPattern, '*', 'allow', getFlashResourceId())
     }
     if (typeof siteSetting.get('widevine') === 'number' && braveryDefaults.get('widevine')) {
       contentSettings = addContentSettings(contentSettings, 'plugins', primaryPattern, '*', 'allow', appConfig.widevine.resourceId)

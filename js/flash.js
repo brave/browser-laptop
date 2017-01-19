@@ -11,11 +11,12 @@ const {getOrigin} = require('./state/siteUtil')
 const locale = require('../app/locale')
 const messages = require('./constants/messages')
 const settings = require('./constants/settings')
+const {memoize} = require('underscore')
 
 // set to true if the flash install check has succeeded
 let flashInstalled = false
 
-const getPepperFlashPath = () => {
+const getPepperFlashPath = memoize(() => {
   if (['darwin', 'win32'].includes(process.platform)) {
     return app.getPath('pepperFlashSystemPlugin')
   }
@@ -34,6 +35,10 @@ const getPepperFlashPath = () => {
     }
   }
   return pluginPath
+})
+
+module.exports.getFlashResourceId = () => {
+  return path.basename(getPepperFlashPath())
 }
 
 module.exports.showFlashMessageBox = (location, tabId) => {
