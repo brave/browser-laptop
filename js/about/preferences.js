@@ -1436,7 +1436,7 @@ class SyncTab extends ImmutableComponent {
     return <div><div className='settingsList' id='syncEnableSwitch'>
       <SettingCheckbox dataL10nId='syncEnable' prefKey={settings.SYNC_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
     </div>
-      <Button l10nId='syncNewDevice' className='whiteButton' onClick={this.props.showOverlay.bind(this, 'syncNewDevice')} />
+      <Button l10nId='syncNewDevice' className='whiteButton syncNewDeviceButton' onClick={this.props.showOverlay.bind(this, 'syncNewDevice')} />
     </div>
   }
 
@@ -1449,7 +1449,7 @@ class SyncTab extends ImmutableComponent {
         <div><Button l10nId='syncHideQR' className='whiteButton syncToggleButton' onClick={this.props.hideQR} /></div>
         <img id='syncQR' title='Brave sync QR code' src={this.props.syncData.get('seedQr')} />
       </div>
-      : <Button l10nId='syncShowQR' className='whiteButton syncToggleButton' onClick={this.props.showQR} />
+    : <Button l10nId='syncShowQR' className='whiteButton syncToggleButton' onClick={this.props.showQR} />
   }
 
   get passphraseContent () {
@@ -1481,23 +1481,35 @@ class SyncTab extends ImmutableComponent {
           {this.qrcodeContent}
           <li data-l10n-id='syncNewDevice3' />
           {this.passphraseContent}
-          <li data-l10n-id='syncNewDevice4' />
         </ol>
       </div>
     </div>
   }
 
-  get addOverlayContent () {
-    return <div className='syncOverlay' data-l10n-id='comingSoon' />
-  }
-
-  get startOverlayContent () {
-    return <div className='syncOverlay'>
+  get deviceNameInputContent () {
+    return <div>
       <span data-l10n-id='syncDeviceName' />
       <input spellCheck='false'
         ref={(node) => { this.deviceNameInput = node }}
         className='form-control'
         placeholder={getSetting(settings.SYNC_DEVICE_NAME, this.props.settings)} />
+    </div>
+  }
+
+  get addOverlayContent () {
+    return <div className='syncOverlay'>
+      <p data-l10n-id='syncEnterPassphrase' />
+      <textarea spellCheck='false'
+        ref={(node) => { this.passphraseInput = node }}
+        className='form-control' />
+      <div>{this.deviceNameInputContent}</div>
+      <Button l10nId='syncCreate' className='primaryButton' onClick={this.restoreSyncProfile.bind(this)} />
+    </div>
+  }
+
+  get startOverlayContent () {
+    return <div className='syncOverlay'>
+      {this.deviceNameInputContent}
       <div>
         <Button l10nId='syncCreate' className='primaryButton' onClick={this.setupSyncProfile.bind(this)} />
       </div>
@@ -1510,6 +1522,25 @@ class SyncTab extends ImmutableComponent {
     }
     this.props.onChangeSetting(settings.SYNC_ENABLED, true)
     this.props.hideOverlay('syncStart')
+  }
+
+  restoreSyncProfile () {
+    if (this.passphraseInput.value) {
+      let text = this.passphraseInput.value.toLowerCase().replace(/,/g, ' ').replace(/\s+/g, ' ').trim()
+      let inputCode = ''
+      try {
+        inputCode = window.niceware.passphraseToBytes(text.split(' '))
+      } catch (e) {
+        console.log('Could not convert niceware passphrase', e)
+      }
+      if (inputCode && inputCode.length === 32) {
+        // QR code and device ID are set after sync restarts
+        aboutActions.saveSyncInitData(Array.from(inputCode))
+        this.setupSyncProfile()
+        return
+      }
+    }
+    window.alert('Invalid input code; please try again or create a new profile.')
   }
 
   render () {
