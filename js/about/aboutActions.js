@@ -75,6 +75,14 @@ const aboutActions = {
   },
 
   /**
+   * Dispatches a message when sync init data needs to be saved
+   * @param {Array.<number>|null} seed
+   */
+  saveSyncInitData: function (seed) {
+    ipc.send(messages.SAVE_INIT_DATA, seed)
+  },
+
+  /**
    * Loads a URL in a new frame in a safe way.
    * It is important that it is not a simple anchor because it should not
    * preserve the about preload script. See #672
