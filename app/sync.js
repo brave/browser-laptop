@@ -220,17 +220,15 @@ module.exports.onSyncReady = (isFirstRun, e) => {
 }
 
 module.exports.init = function (initialState) {
-  if (getSetting(settings.SYNC_ENABLED) !== true) {
-    return
-  }
-  ipcMain.on(messages.GET_INIT_DATA, (e) => {
-    const seed = initialState.seed || null
-    deviceId = initialState.deviceId || null
-    e.sender.send(messages.GOT_INIT_DATA, seed, deviceId, config)
-  })
+  // SAVE_INIT_DATA is sent by about:preferences before sync is enabled
+  // when restoring from an existing seed
   ipcMain.on(messages.SAVE_INIT_DATA, (e, seed, newDeviceId) => {
     if (!deviceId && newDeviceId) {
       deviceId = Array.from(newDeviceId)
+    }
+    if (!seed && newDeviceId) {
+      appActions.saveSyncInitData(null, new Immutable.List(newDeviceId), null)
+      return
     }
     try {
       let chunks = []
@@ -239,13 +237,21 @@ module.exports.init = function (initialState) {
       }).on('end', () => {
         let seedQr = 'data:image/png;base64,' + Buffer.concat(chunks).toString('base64')
         appActions.saveSyncInitData(new Immutable.List(seed),
-          new Immutable.List(newDeviceId), null, seedQr)
+          newDeviceId ? new Immutable.List(newDeviceId) : null, null, seedQr)
       })
     } catch (ex) {
       console.log('qr image error: ' + ex.toString())
       appActions.saveSyncInitData(new Immutable.List(seed),
-        new Immutable.List(newDeviceId))
+        newDeviceId ? new Immutable.List(newDeviceId) : null)
     }
+  })
+  if (getSetting(settings.SYNC_ENABLED) !== true) {
+    return
+  }
+  ipcMain.on(messages.GET_INIT_DATA, (e) => {
+    const seed = initialState.seed || null
+    deviceId = initialState.deviceId || null
+    e.sender.send(messages.GOT_INIT_DATA, seed, deviceId, config)
   })
   ipcMain.on(messages.SYNC_READY, module.exports.onSyncReady.bind(null,
     !initialState.seed && !initialState.deviceId))

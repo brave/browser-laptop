@@ -291,7 +291,7 @@ Changes an application level setting
 
 
 
-### changeSiteSetting(hostPattern, key, value, temp, skipSync)
+### changeSiteSetting(hostPattern, key, value, temp, skipSync) 
 
 Change a hostPattern's config
 
@@ -306,11 +306,11 @@ Change a hostPattern's config
 **temp**: `boolean`, Whether to change temporary or persistent
   settings. defaults to false (persistent).
 
-**skipSync**: `boolean`, Set true if a site isn't eligible for Sync (e.g. if this update was triggered by Sync)
+**skipSync**: `boolean`, Set true if a site isn't eligible for Sync (e.g. if addSite was triggered by Sync)
 
 
 
-### removeSiteSetting(hostPattern, key, temp, skipSync)
+### removeSiteSetting(hostPattern, key, temp, skipSync) 
 
 Removes a site setting
 
@@ -323,7 +323,7 @@ Removes a site setting
 **temp**: `boolean`, Whether to change temporary or persistent
   settings. defaults to false (persistent).
 
-**skipSync**: `boolean`, Set true if a site isn't eligible for Sync (e.g. if this update was triggered by Sync)
+**skipSync**: `boolean`, Set true if a site isn't eligible for Sync (e.g. if addSite was triggered by Sync)
 
 
 
