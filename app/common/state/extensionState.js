@@ -91,25 +91,33 @@ const extensionState = {
     tabId = tabId ? tabId.toString() : '-1'
     let basePath = browserAction.get('base_path')
     if (basePath) {
-      if (browserAction.getIn(['icons', '16']) && browserAction.getIn(['icons', '48'])) {
+      let baseIcons16 = browserAction.getIn(['icons', '16'])
+      let baseIcons48 = browserAction.getIn(['icons', '48'])
+      if (baseIcons16 && baseIcons48) {
         return `-webkit-image-set(
-                  url(${basePath}/${browserAction.getIn(['icons', '16'])}) 1x,
-                  url(${basePath}/${browserAction.getIn(['icons', '48'])}) 2x`
+                  url(${basePath}/${baseIcons16}) 1x,
+                  url(${basePath}/${baseIcons48}) 2x`
       }
-      if (browserAction.getIn(['icons', '19']) && browserAction.getIn(['icons', '38'])) {
+      let baseIcons19 = browserAction.getIn(['icons', '19'])
+      let baseIcons38 = browserAction.getIn(['icons', '38'])
+      if (baseIcons19 && baseIcons38) {
         return `-webkit-image-set(
-                  url(${basePath}/${browserAction.getIn(['icons', '19'])}) 1x,
-                  url(${basePath}/${browserAction.getIn(['icons', '38'])}) 2x`
+                  url(${basePath}/${baseIcons19}) 1x,
+                  url(${basePath}/${baseIcons38}) 2x`
       }
-      if (browserAction.getIn(['tabs', tabId, 'path', '19']) && browserAction.getIn(['tabs', tabId, 'path', '38'])) {
+      let tabsPath19 = browserAction.getIn(['tabs', tabId, 'path', '19'])
+      let tabsPath38 = browserAction.getIn(['tabs', tabId, 'path', '38'])
+      if (tabsPath19 && tabsPath38) {
         return `-webkit-image-set(
-                  url(${basePath}/${browserAction.getIn(['tabs', tabId, 'path', '19'])}) 1x,
-                  url(${basePath}/${browserAction.getIn(['tabs', tabId, 'path', '38'])}) 2x`
+                  url(${basePath}/${tabsPath19}) 1x,
+                  url(${basePath}/${tabsPath38}) 2x`
       }
-      if (browserAction.getIn(['path', '19']) && browserAction.getIn(['path', '38'])) {
+      let basePath19 = browserAction.getIn(['path', '19'])
+      let basePath38 = browserAction.getIn(['path', '38'])
+      if (basePath19 && basePath38) {
         return `-webkit-image-set(
-                  url(${basePath}/${browserAction.getIn(['path', '19'])}) 1x,
-                  url(${basePath}/${browserAction.getIn(['path', '38'])}) 2x`
+                  url(${basePath}/${basePath19}) 1x,
+                  url(${basePath}/${basePath38}) 2x`
       }
     }
     return ''
