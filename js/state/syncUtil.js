@@ -241,7 +241,7 @@ module.exports.createSiteData = (site, siteIndex) => {
         parentFolderId: site.parentFolderId || 0
       }
     }
-  } else if (!site.tags || !site.tags.length) {
+  } else if (!site.tags || !site.tags.length || site.tags.includes('pinned')) {
     if (!site.objectId && typeof siteIndex !== 'number') {
       throw new Error('Missing historySite objectId.')
     }
