@@ -16,13 +16,8 @@
 - Fixed numerous issues for UI polish. ([#6346](https://github.com/brave/browser-laptop/issues/6346))
 - Fixed various security & privacy issues.  ([#6356](https://github.com/brave/browser-laptop/issues/6356))
 - Fixed borders and corners of each button on navbar are not clickable. ([#5679](https://github.com/brave/browser-laptop/issues/5679))
-<<<<<<< HEAD
 - Upgrade to Chromium 54. ([#3679](https://github.com/brave/browser-laptop/issues/3679))
 - Updated Muon to 2.0.12. ([#6340](https://github.com/brave/browser-laptop/issues/6340))
-=======
-- Upgrade to Chromium v54. ([#3679](https://github.com/brave/browser-laptop/issues/3679))
-- Updated Muon to 2.0.11. ([#6340](https://github.com/brave/browser-laptop/issues/6340))
->>>>>>> updated changelog to reflect latest additions and removed issues which regressed and were fixed during dev of 0.13.0
 
 ## [0.12.15](https://github.com/brave/browser-laptop/releases/v0.12.15dev)
 - Added Yandex as a new search engine. ([#2703](https://github.com/brave/browser-laptop/issues/2703))
