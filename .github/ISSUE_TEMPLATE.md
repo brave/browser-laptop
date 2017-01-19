@@ -13,6 +13,11 @@
     2.
     3.
 
+- Extra QA steps:
+    1.
+    2.
+    3.
+
 - Screenshot if needed:
 
 - Any related issues:
