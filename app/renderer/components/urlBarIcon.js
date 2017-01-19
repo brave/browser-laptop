@@ -19,7 +19,7 @@ const getIconCssClass = (ctx) => {
   } else if (ctx.isSecure) {
     // NOTE: EV style not approved yet; see discussion at https://github.com/brave/browser-laptop/issues/791
     return 'fa-lock'
-  } else if (ctx.inInsecure) {
+  } else if (ctx.isInsecure) {
     return 'fa-unlock'
   }
 }
