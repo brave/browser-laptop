@@ -12,7 +12,6 @@ const locale = require('../app/locale')
 const messages = require('./constants/messages')
 const settings = require('./constants/settings')
 const {memoize} = require('underscore')
-const appConfig = require('./constants/appConfig')
 
 // set to true if the flash install check has succeeded
 let flashInstalled = false
@@ -87,41 +86,32 @@ module.exports.showFlashMessageBox = (location, tabId) => {
   })
 }
 
-module.exports.checkFlashInstalled = (state, cb) => {
+module.exports.checkFlashInstalled = (cb) => {
   try {
     const pepperFlashSystemPluginPath = getPepperFlashPath()
     const pepperFlashManifestPath = path.resolve(pepperFlashSystemPluginPath, '..', 'manifest.json')
     fs.readFile(pepperFlashManifestPath, (err, data) => {
-      let manifest
       try {
         if (err || !data) {
           flashInstalled = false
         } else {
-          manifest = JSON.parse(data)
+          const manifest = JSON.parse(data)
+          app.commandLine.appendSwitch('ppapi-flash-path', pepperFlashSystemPluginPath)
+          app.commandLine.appendSwitch('ppapi-flash-version', manifest.version)
           flashInstalled = true
         }
       } finally {
         appActions.changeSetting(settings.FLASH_INSTALLED, flashInstalled)
-        cb && cb({flashInstalled, manifest, pepperFlashSystemPluginPath})
+        cb && cb(flashInstalled)
       }
     })
   } catch (e) {
-    cb && cb({flashInstalled, manifest: undefined})
+    cb && cb(flashInstalled)
   }
 }
 
-module.exports.init = (state) => {
-  const siteSettings = require('./state/siteSettings')
-  const braveryDefaults = siteSettings.braveryDefaults(state, appConfig)
-  setImmediate(() => module.exports.checkFlashInstalled(state, ({flashInstalled, manifest, pepperFlashSystemPluginPath}) => {
-    if (!flashInstalled) {
-      return
-    }
-    if (braveryDefaults.flash) {
-      app.commandLine.appendSwitch('ppapi-flash-path', pepperFlashSystemPluginPath)
-      app.commandLine.appendSwitch('ppapi-flash-version', manifest.version)
-    }
-  }))
+module.exports.init = () => {
+  setImmediate(module.exports.checkFlashInstalled)
 }
 
 module.exports.resourceName = 'flash'

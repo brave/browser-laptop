@@ -1552,7 +1552,6 @@ class SecurityTab extends ImmutableComponent {
   }
   onToggleFlash (e) {
     aboutActions.setResourceEnabled(flash, e.target.value)
-    ipc.send(messages.PREFS_RESTART, flash, e.target.value)
   }
   onToggleWidevine (e) {
     aboutActions.setResourceEnabled(widevine, e.target.value)

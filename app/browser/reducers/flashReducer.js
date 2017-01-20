@@ -12,7 +12,7 @@ const flashReducer = (state, action) => {
   action = makeImmutable(action)
   switch (action.get('actionType')) {
     case appConstants.APP_SET_STATE:
-      flash.init(state)
+      flash.init()
       break
     case appConstants.APP_FLASH_PERMISSION_REQUESTED:
       flash.showFlashMessageBox(action.get('location'), action.get('senderTabId'))
