@@ -512,6 +512,29 @@ select {
     .truncate {
       margin-bottom: 5px;
     }
+
+    // Issue #6783
+    .allowScriptsButtons {
+      display: flex;
+      flex-flow: column nowrap;
+      align-items: center;
+
+      > .browserButton {
+        margin: 2px 0;
+
+        &:first-child {
+          margin-top: 0;
+        }
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        + .browserButton {
+          margin-left: 0;
+        }
+      }
+    }
   }
 }
 

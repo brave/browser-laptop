@@ -43,17 +43,17 @@ class NoScriptInfo extends ImmutableComponent {
       return <div><Button l10nId='allow' className='actionButton'
         onClick={this.onAllow.bind(this, false)} /></div>
     } else {
-      return <div>
+      return <div className='allowScriptsButtons'>
         <Button l10nId='allowScriptsOnce' className='actionButton'
           onClick={this.onAllow.bind(this, 0)} />
         {this.isPrivate
           ? null
-          : <div>
-            <div><Button l10nId='allowScriptsTemp' className='subtleButton'
-              onClick={this.onAllow.bind(this, 1)} /></div>
-            <div><Button l10nId='allow' className='subtleButton'
-              onClick={this.onAllow.bind(this, false)} /></div>
-          </div>}
+          : <Button l10nId='allowScriptsTemp' className='subtleButton'
+            onClick={this.onAllow.bind(this, 1)} />}
+        {this.isPrivate
+          ? null
+          : <Button l10nId='allow' className='subtleButton'
+            onClick={this.onAllow.bind(this, false)} />}
       </div>
     }
   }
