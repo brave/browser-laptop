@@ -410,12 +410,6 @@ class Main extends ImmutableComponent {
       if (!frameProps) {
         return
       }
-      if (blockType === appConfig.resourceNames.SAFE_BROWSING) {
-        // Since Safe Browsing never actually loads the main frame we need to add history here.
-        // That way about:safebrowsing can figure out the correct location.
-        windowActions.addHistory(frameProps)
-      }
-      windowActions.loadUrl(frameProps, blockType === appConfig.resourceNames.SAFE_BROWSING ? 'about:safebrowsing' : 'about:blank')
     })
 
     ipc.on(messages.HTTPSE_RULE_APPLIED, (e, ruleset, details) => {
@@ -574,8 +568,13 @@ class Main extends ImmutableComponent {
     }
     let location = activeFrame.get('location')
     const history = activeFrame.get('history')
-    if (isIntermediateAboutPage(location) && history.size > 0) {
-      location = history.last()
+    if (isIntermediateAboutPage(location)) {
+      const parsedUrl = urlParse(location)
+      if (parsedUrl.hash) {
+        location = parsedUrl.hash.split('#')[1]
+      } else if (history.size > 0) {
+        location = history.last()
+      }
     }
     return location
   }
@@ -799,7 +798,7 @@ class Main extends ImmutableComponent {
     }
 
     const parsedUrl = urlParse(activeRequestedLocation)
-    return parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:' && activeRequestedLocation !== 'about:safebrowsing'
+    return parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:' && (parsedUrl.protocol + parsedUrl.host) !== 'about:safebrowsing'
   }
 
   get extensionButtons () {
