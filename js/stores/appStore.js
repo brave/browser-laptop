@@ -351,12 +351,18 @@ function handleChangeSettingAction (settingKey, settingValue) {
   }
 }
 
-const applyReducers = (state, action) => [
+const preReducers = [
   require('../../app/browser/reducers/downloadsReducer'),
-  require('../../app/browser/reducers/flashReducer'),
   require('../../app/browser/reducers/tabsReducer'),
   require('../../app/browser/reducers/clipboardReducer')
-].reduce(
+]
+
+const postReducers = [
+  require('../../app/browser/reducers/flashReducer')
+]
+
+const applyReducers = (reducers, state, action) =>
+  reducers.reduce(
     (appState, reducer) => {
       const newState = reducer(appState, action)
       assert.ok(action.actionType === appConstants.APP_SET_STATE || Immutable.Map.isMap(newState),
@@ -371,7 +377,7 @@ const handleAppAction = (action) => {
 
   const ledger = require('../../app/ledger')
 
-  appState = applyReducers(appState, action)
+  appState = applyReducers(preReducers, appState, action)
 
   switch (action.actionType) {
     case appConstants.APP_SET_STATE:
@@ -571,8 +577,6 @@ const handleAppAction = (action) => {
     case appConstants.APP_ALLOW_FLASH_ONCE:
       {
         const propertyName = action.isPrivate ? 'temporarySiteSettings' : 'siteSettings'
-        console.log(siteUtil.getOrigin(action.url))
-        console.log(propertyName)
         appState = appState.set(propertyName,
           siteSettings.mergeSiteSetting(appState.get(propertyName), siteUtil.getOrigin(action.url), 'flash', 1))
         break
@@ -825,6 +829,8 @@ const handleAppAction = (action) => {
       break
     default:
   }
+
+  appState = applyReducers(postReducers, appState, action)
 
   emitChanges()
 }

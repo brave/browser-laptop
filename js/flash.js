@@ -12,6 +12,7 @@ const locale = require('../app/locale')
 const messages = require('./constants/messages')
 const settings = require('./constants/settings')
 const {memoize} = require('underscore')
+const appConfig = require('./constants/appConfig')
 
 // set to true if the flash install check has succeeded
 let flashInstalled = false
@@ -86,32 +87,41 @@ module.exports.showFlashMessageBox = (location, tabId) => {
   })
 }
 
-module.exports.checkFlashInstalled = (cb) => {
+module.exports.checkFlashInstalled = (state, cb) => {
   try {
     const pepperFlashSystemPluginPath = getPepperFlashPath()
     const pepperFlashManifestPath = path.resolve(pepperFlashSystemPluginPath, '..', 'manifest.json')
     fs.readFile(pepperFlashManifestPath, (err, data) => {
+      let manifest
       try {
         if (err || !data) {
           flashInstalled = false
         } else {
-          const manifest = JSON.parse(data)
-          app.commandLine.appendSwitch('ppapi-flash-path', pepperFlashSystemPluginPath)
-          app.commandLine.appendSwitch('ppapi-flash-version', manifest.version)
+          manifest = JSON.parse(data)
           flashInstalled = true
         }
       } finally {
         appActions.changeSetting(settings.FLASH_INSTALLED, flashInstalled)
-        cb && cb(flashInstalled)
+        cb && cb({flashInstalled, manifest, pepperFlashSystemPluginPath})
       }
     })
   } catch (e) {
-    cb && cb(flashInstalled)
+    cb && cb({flashInstalled, manifest: undefined})
   }
 }
 
-module.exports.init = () => {
-  setImmediate(module.exports.checkFlashInstalled)
+module.exports.init = (state) => {
+  const siteSettings = require('./state/siteSettings')
+  const braveryDefaults = siteSettings.braveryDefaults(state, appConfig)
+  setImmediate(() => module.exports.checkFlashInstalled(state, ({flashInstalled, manifest, pepperFlashSystemPluginPath}) => {
+    if (!flashInstalled) {
+      return
+    }
+    if (braveryDefaults.flash) {
+      app.commandLine.appendSwitch('ppapi-flash-path', pepperFlashSystemPluginPath)
+      app.commandLine.appendSwitch('ppapi-flash-version', manifest.version)
+    }
+  }))
 }
 
 module.exports.resourceName = 'flash'
