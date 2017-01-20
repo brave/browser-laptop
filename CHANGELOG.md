@@ -28,7 +28,7 @@
 - Fixed borders and corners of each button on navbar not being clickable. ([#5679](https://github.com/brave/browser-laptop/issues/5679))
 - Fixed Geolocations not working on Windows ia32. ([#6331](https://github.com/brave/browser-laptop/issues/6331))
 - Upgrade to Chromium 54.0.2840.100. ([#3679](https://github.com/brave/browser-laptop/issues/3679))
-- Updated Muon to 2.0.12. ([#6340](https://github.com/brave/browser-laptop/issues/6340))
+- Updated Muon to 2.0.13. ([#6340](https://github.com/brave/browser-laptop/issues/6340))
 
 ## [0.12.15](https://github.com/brave/browser-laptop/releases/v0.12.15dev)
 - Added Yandex as a new search engine. ([#2703](https://github.com/brave/browser-laptop/issues/2703))
