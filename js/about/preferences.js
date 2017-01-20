@@ -1252,7 +1252,14 @@ class PaymentsTab extends ImmutableComponent {
     }
     if (this.props.ledgerData.get('btc') && typeof this.props.ledgerData.get('amount') === 'number') {
       const btcValue = this.props.ledgerData.get('btc') / this.props.ledgerData.get('amount')
-      return `${currency} ${(balance / btcValue).toFixed(2)}`
+      const fiatValue = (balance / btcValue).toFixed(2)
+      let roundedValue = Math.floor(fiatValue)
+      const diff = fiatValue - roundedValue
+
+      if (diff > 0.74) roundedValue += 0.75
+      else if (diff > 0.49) roundedValue += 0.50
+      else if (diff > 0.24) roundedValue += 0.25
+      return `${currency} ${roundedValue.toFixed(2)}`
     }
     return `${balance} BTC`
   }
