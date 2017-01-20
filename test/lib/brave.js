@@ -448,9 +448,14 @@ var exports = {
      * @param {string} tag - A site tag from js/constants/siteTags.js
      */
     this.app.client.addCommand('addSite', function (siteDetail, tag) {
+      let waitUrl = siteDetail.location
+      if (isSourceAboutUrl(waitUrl)) {
+        waitUrl = getTargetAboutUrl(waitUrl)
+      }
       return this.execute(function (siteDetail, tag) {
         return devTools('appActions').addSite(siteDetail, tag)
       }, siteDetail, tag).then((response) => response.value)
+      .waitForSiteEntry(waitUrl, false)
     })
 
     /**
