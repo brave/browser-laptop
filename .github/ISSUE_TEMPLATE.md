@@ -1,8 +1,6 @@
-**Did you search for similar issues before submitting this one?**
+- Did you search for similar issues before submitting this one?
 
-**Describe the issue you encountered:**
-
-**Expected behavior:**
+- Describe the issue you encountered:
 
 - Platform (Win7, 8, 10? macOS? Linux distro?):
 
@@ -12,6 +10,16 @@
     1.
     2.
     3.
+    
+- Actual result:
+
+- Expected result:
+
+- Will the steps above reproduce in a fresh profile? If not what other info can be added?
+
+- Is this an issue in the currently released version?
+
+- Can this issue be consistently reproduced?
 
 - Extra QA steps:
     1.
