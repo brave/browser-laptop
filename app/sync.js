@@ -168,10 +168,12 @@ module.exports.onSyncReady = (isFirstRun, e) => {
         [syncUtil.createSiteData(site.toJS(), i)])
     }
   })
-  // Sync site settings in case they changed while sync was disabled
+  // Sync site settings that have not been synced yet
+  // FIXME: If Sync was disabled and settings were changed, those changes
+  // might not be synced.
   const siteSettings =
     appState.get('siteSettings').filter((value, key) => {
-      return syncUtil.isSyncable('siteSetting', value)
+      return !value.get('objectId') && syncUtil.isSyncable('siteSetting', value)
     }).toJS()
   if (siteSettings) {
     sendSyncRecords(e.sender, writeActions.UPDATE,
