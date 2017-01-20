@@ -8,10 +8,10 @@ To install brave using apt and lsb\_release :
 
 ``` 
 curl https://s3-us-west-2.amazonaws.com/brave-apt/keys.asc | sudo apt-key add -
-echo "deb [arch=amd64] https://s3-us-west-2.amazonaws.com/brave-apt `lsb_release -sc` main" | sudo tee -a /etc/apt/sources.list
+echo "deb [arch=amd64] https://s3-us-west-2.amazonaws.com/brave-apt `lsb_release -sc` main" | sudo tee -a /etc/apt/sources.list.d/brave-`lsb_release -sc`.list
 ```
 
-You will want to make sure the bottom line of /etc/apt/sources.list lists a new repository and doesn not contain the word lsb\_release. If you see the word lsb\_release you might not have lsb\_release installed. Otherwise run
+You will want to make sure the /etc/apt/sources.list.d/brave-\*.list file lists a new repository and doesn not contain the word lsb\_release. If you see the word lsb\_release you might not have lsb\_release installed. Otherwise run:
 
 ```
 sudo apt update
