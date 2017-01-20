@@ -1552,6 +1552,15 @@ class SecurityTab extends ImmutableComponent {
   }
   onToggleFlash (e) {
     aboutActions.setResourceEnabled(flash, e.target.value)
+    if (e.target.value !== true) {
+      // When flash is disabled, clear flash approvals
+      aboutActions.clearSiteSettings('flash', {
+        temporary: true
+      })
+      aboutActions.clearSiteSettings('flash', {
+        temporary: false
+      })
+    }
   }
   onToggleWidevine (e) {
     aboutActions.setResourceEnabled(widevine, e.target.value)
