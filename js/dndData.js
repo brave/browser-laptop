@@ -5,7 +5,7 @@
 const Immutable = require('immutable')
 
 module.exports.hasDragData = (dataTransfer, dragType) => {
-  return !!dataTransfer.getData(`application/x-brave-${dragType}`)
+  return dataTransfer.types.includes(`application/x-brave-${dragType}`)
 }
 
 module.exports.getDragData = (dataTransfer, dragType) => {
