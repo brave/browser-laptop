@@ -399,7 +399,9 @@ class Frame extends ImmutableComponent {
         this.webview.setActive(this.props.isActive)
       }
       this.webview.setTabIndex(this.props.tabIndex)
-      this.handleShortcut()
+      if (prevProps.activeShortcut !== this.props.activeShortcut) {
+        this.handleShortcut()
+      }
 
       if (this.props.isActive && !prevProps.isActive && !this.props.urlBarFocused) {
         this.webview.focus()
