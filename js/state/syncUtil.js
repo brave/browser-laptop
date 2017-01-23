@@ -156,6 +156,19 @@ module.exports.applySyncRecord = (record) => {
 }
 
 /**
+ * Apply several SyncRecords in a less blocking manner.
+ * @param {Array<Object>} records
+ */
+module.exports.applySyncRecords = (records) => {
+  if (!records || records.length === 0) { return }
+  setImmediate(() => {
+    const record = records.shift()
+    this.applySyncRecord(record)
+    this.applySyncRecords(records)
+  })
+}
+
+/**
  * Given a category and SyncRecord, get an existing browser object.
  * Used to respond to IPC GET_EXISTING_OBJECTS.
  * @param {string} categoryName
