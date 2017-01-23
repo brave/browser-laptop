@@ -468,12 +468,23 @@ class BitcoinDashboard extends ImmutableComponent {
     return <div className='bitcoinDashboard'>
       {
       this.props.bitcoinOverlayVisible
-        ? <ModalOverlay title={'bitcoinBuy'} content={this.bitcoinOverlayContent} customTitleClasses={'coinbaseOverlay'} emptyDialog={emptyDialog} onHide={this.props.hideOverlay.bind(this)} />
+        ? <ModalOverlay
+          title={'bitcoinBuy'}
+          content={this.bitcoinOverlayContent}
+          customTitleClasses={'coinbaseOverlay'}
+          emptyDialog={emptyDialog}
+          onEscape={this.props.hideOverlay.bind(this)}
+          onHide={this.props.hideOverlay.bind(this)} />
         : null
       }
       {
         this.props.qrcodeOverlayVisible
-        ? <ModalOverlay content={this.qrcodeOverlayContent} customTitleClasses={'qrcodeOverlay'} footer={this.qrcodeOverlayFooter} onHide={this.props.hideQRcode.bind(this)} />
+        ? <ModalOverlay
+          content={this.qrcodeOverlayContent}
+          customTitleClasses={'qrcodeOverlay'}
+          footer={this.qrcodeOverlayFooter}
+          onEscape={this.props.hideQRcode.bind(this)}
+          onHide={this.props.hideQRcode.bind(this)} />
         : null
       }
       <div className='board addFundsBoard'>
@@ -1339,27 +1350,47 @@ class PaymentsTab extends ImmutableComponent {
     return <div className='paymentsContainer'>
       {
       this.enabled && this.props.addFundsOverlayVisible
-        ? <ModalOverlay title={this.overlayTitle} content={this.overlayContent} onHide={this.props.hideOverlay.bind(this, 'addFunds')} />
+        ? <ModalOverlay title={this.overlayTitle}
+          content={this.overlayContent}
+          onEscape={this.props.hideOverlay.bind(this, 'addFunds')}
+          onHide={this.props.hideOverlay.bind(this, 'addFunds')} />
         : null
       }
       {
         this.enabled && this.props.paymentHistoryOverlayVisible
-        ? <ModalOverlay title={'paymentHistoryTitle'} customTitleClasses={'paymentHistory'} content={this.paymentHistoryContent} footer={this.paymentHistoryFooter} onHide={this.props.hideOverlay.bind(this, 'paymentHistory')} />
+        ? <ModalOverlay title={'paymentHistoryTitle'}
+          customTitleClasses={'paymentHistory'}
+          content={this.paymentHistoryContent}
+          footer={this.paymentHistoryFooter}
+          onEscape={this.props.hideOverlay.bind(this, 'paymentHistory')}
+          onHide={this.props.hideOverlay.bind(this, 'paymentHistory')} />
         : null
       }
       {
         this.enabled && this.props.advancedSettingsOverlayVisible
-        ? <ModalOverlay title={'advancedSettingsTitle'} content={this.advancedSettingsContent} footer={this.advancedSettingsFooter} onHide={this.props.hideOverlay.bind(this, 'advancedSettings')} />
+        ? <ModalOverlay title={'advancedSettingsTitle'}
+          content={this.advancedSettingsContent}
+          footer={this.advancedSettingsFooter}
+          onEscape={this.props.hideOverlay.bind(this, 'advancedSettings')}
+          onHide={this.props.hideOverlay.bind(this, 'advancedSettings')} />
         : null
       }
       {
         this.enabled && this.props.ledgerBackupOverlayVisible
-        ? <ModalOverlay title={'ledgerBackupTitle'} content={this.ledgerBackupContent} footer={this.ledgerBackupFooter} onHide={this.props.hideOverlay.bind(this, 'ledgerBackup')} />
+        ? <ModalOverlay title={'ledgerBackupTitle'}
+          content={this.ledgerBackupContent}
+          footer={this.ledgerBackupFooter}
+          onEscape={this.props.hideOverlay.bind(this, 'ledgerBackup')}
+          onHide={this.props.hideOverlay.bind(this, 'ledgerBackup')} />
         : null
       }
       {
         this.enabled && this.props.ledgerRecoveryOverlayVisible
-        ? <ModalOverlay title={'ledgerRecoveryTitle'} content={this.ledgerRecoveryContent} footer={this.ledgerRecoveryFooter} onHide={this.props.hideOverlay.bind(this, 'ledgerRecovery')} />
+        ? <ModalOverlay title={'ledgerRecoveryTitle'}
+          content={this.ledgerRecoveryContent}
+          footer={this.ledgerRecoveryFooter}
+          onEscape={this.props.hideOverlay.bind(this, 'ledgerRecovery')}
+          onHide={this.props.hideOverlay.bind(this, 'ledgerRecovery')} />
         : null
       }
       <div className='advancedSettingsWrapper'>
@@ -1966,11 +1997,7 @@ class AboutPreferences extends React.Component {
   setOverlayVisible (isVisible, overlayName) {
     let stateDiff = {}
     stateDiff[`${overlayName}OverlayVisible`] = isVisible
-    if (overlayName === 'addFunds' && isVisible === false) {
-      // Hide the child overlays when the parent is closed
-      stateDiff['bitcoinOverlayVisible'] = false
-      stateDiff['qrcodeOverlayVisible'] = false
-    }
+
     this.setState(stateDiff)
     // Tell ledger when Add Funds overlay is closed
     if (isVisible === false && overlayName === 'addFunds') {
