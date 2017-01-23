@@ -46,7 +46,8 @@ const styles = StyleSheet.create({
     boxShadow: `-1px 1px 3px -1px ${globalStyles.color.mediumGray}`,
     height: '2rem',
     outline: 'none',
-    padding: selectPadding,
+    // right padding is larger, to account for the down arrow SVG
+    padding: `${selectPadding} 1.5em ${selectPadding} ${selectPadding}`,
     '-webkit-appearance': 'none',
     width: 'auto'
   },

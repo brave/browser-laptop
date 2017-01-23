@@ -9,6 +9,7 @@ const ImmutableComponent = require('./immutableComponent')
 const config = require('../constants/config')
 const Dialog = require('./dialog')
 const SwitchControl = require('./switchControl')
+const {FormDropdown} = require('../../app/renderer/components/dropdown')
 const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
 const urlParse = require('../../app/common/urlParse')
@@ -287,11 +288,11 @@ class BraveryPanel extends ImmutableComponent {
                     braverySelectTitle: true,
                     disabled: !shieldsUp
                   })} data-l10n-id='adControl' />
-                  <select className='adsBlockedControl form-control' value={adControl} onChange={this.onToggleAdControl} disabled={!shieldsUp}>
+                  <FormDropdown data-test-id='adsBlockedControl' value={adControl} onChange={this.onToggleAdControl} disabled={!shieldsUp}>
                     <option data-l10n-id='showBraveAds' value='showBraveAds' />
                     <option data-l10n-id='blockAds' value='blockAds' />
                     <option data-l10n-id='allowAdsAndTracking' value='allowAdsAndTracking' />
-                  </select>
+                  </FormDropdown>
                   <SwitchControl onClick={this.onToggleHTTPSE} rightl10nId='httpsEverywhere' checkedOn={httpseEnabled} disabled={!shieldsUp} />
                   <SwitchControl onClick={this.onToggleNoScript} rightl10nId='noScript' checkedOn={noScriptEnabled} disabled={!shieldsUp} className='noScriptSwitch' />
                 </div>
@@ -300,10 +301,10 @@ class BraveryPanel extends ImmutableComponent {
                     braverySelectTitle: true,
                     disabled: !shieldsUp
                   })} data-l10n-id='cookieControl' />
-                  <select className='form-control' value={this.props.braverySettings.cookieControl} onChange={this.onToggleCookieControl} disabled={!shieldsUp}>
+                  <FormDropdown value={this.props.braverySettings.cookieControl} onChange={this.onToggleCookieControl} disabled={!shieldsUp}>
                     <option data-l10n-id='block3rdPartyCookie' value='block3rdPartyCookie' />
                     <option data-l10n-id='allowAllCookies' value='allowAllCookies' />
-                  </select>
+                  </FormDropdown>
                   <SwitchControl onClick={this.onToggleFp} rightl10nId='fingerprintingProtection' checkedOn={fpEnabled} disabled={!shieldsUp} onInfoClick={this.onInfoClick} infoTitle={config.fingerprintingInfoUrl} className='fingerprintingProtectionSwitch' />
                   <SwitchControl onClick={this.onToggleSafeBrowsing} rightl10nId='safeBrowsing' checkedOn={this.props.braverySettings.safeBrowsing} disabled={!shieldsUp} />
                 </div>

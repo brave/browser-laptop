@@ -37,7 +37,7 @@ module.exports = {
   braveMenu: '.braveMenu:not(.braveShieldsDisabled)',
   braveMenuDisabled: '.braveMenu.braveShieldsDisabled',
   adsBlockedStat: '.braveryStat.adsBlockedStat',
-  adsBlockedControl: '.adsBlockedControl',
+  adsBlockedControl: '[data-test-id="adsBlockedControl"]',
   showAdsOption: '[data-l10n-id="allowAdsAndTracking"]',
   blockAdsOption: '[data-l10n-id="blockAds"]',
   braveryPanel: '.braveryPanel',
