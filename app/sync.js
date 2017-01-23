@@ -201,7 +201,7 @@ module.exports.onSyncReady = (isFirstRun, e) => {
       return
     }
     log(`applying resolved ${records.length} ${categoryName}.`)
-    for (let record of records) { syncUtil.applySyncRecord(record) }
+    syncUtil.applySyncRecords(records)
   })
   // Periodically poll for new records
   let startAt = appState.getIn(['sync', 'lastFetchTimestamp']) || 0
