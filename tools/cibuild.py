@@ -5,8 +5,8 @@ import subprocess
 import sys
 import os.path
 
-BRAVE_ELECTRON = '2.0.12'
-UPSTREAM_ELECTRON = '2.0.12'
+BRAVE_ELECTRON = '2.0.13'
+UPSTREAM_ELECTRON = '2.0.13'
 SOURCE_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 TARGET_ARCH= os.environ['TARGET_ARCH'] if os.environ.has_key('TARGET_ARCH') else 'x64'
 os.environ['npm_config_arch'] = TARGET_ARCH

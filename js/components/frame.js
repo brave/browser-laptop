@@ -395,9 +395,13 @@ class Frame extends ImmutableComponent {
       if (this.webRTCPolicy !== this.getWebRTCPolicy()) {
         this.webview.setWebRTCIPHandlingPolicy(this.getWebRTCPolicy())
       }
-      this.webview.setActive(this.props.isActive)
+      if (prevProps.isActive !== this.props.isActive) {
+        this.webview.setActive(this.props.isActive)
+      }
       this.webview.setTabIndex(this.props.tabIndex)
-      this.handleShortcut()
+      if (prevProps.activeShortcut !== this.props.activeShortcut) {
+        this.handleShortcut()
+      }
 
       if (this.props.isActive && !prevProps.isActive && !this.props.urlBarFocused) {
         this.webview.focus()

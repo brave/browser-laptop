@@ -27,11 +27,11 @@ function config () {
         },
         {
           test: /\.less$/,
-          loader: 'style-loader!css-loader!less-loader'
+          loader: 'style-loader!css-loader?-minimize!less-loader'
         },
         {
           test: /\.css$/,
-          loader: 'style-loader!css-loader'
+          loader: 'style-loader!css-loader?-minimize'
         },
         {
           test: /\.json$/,

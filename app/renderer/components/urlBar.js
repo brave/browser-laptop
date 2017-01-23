@@ -323,9 +323,11 @@ class UrlBar extends ImmutableComponent {
   // Keeps track of which part was set for the url suffix and which
   // part was set for the value.
   setValue (val, suffix) {
+    val = val || ''
+    suffix = suffix || ''
     this.lastVal = val
     this.lastSuffix = suffix
-    const newValue = val + (suffix || '')
+    const newValue = val + suffix
     if (this.urlInput.value !== newValue) {
       this.urlInput.value = newValue
     }
@@ -367,6 +369,8 @@ class UrlBar extends ImmutableComponent {
   }
 
   componentWillMount () {
+    this.lastVal = ''
+    this.lastSuffix = ''
     ipc.on(messages.SHORTCUT_FOCUS_URL, (e) => {
       this.focus()
       this.select()

@@ -73,11 +73,19 @@ describe('urlBar tests', function () {
         .addSite({ location: 'https://brave.com', title: 'Brave' })
         .addSite({ location: 'https://brave.com/test' })
         .addSite({ location: 'https://www.youtube.com' })
+        .addSite({ location: 'http://uncrate.com' })
+    })
+
+    it('un does not autocomplete to undefined', function * () {
+      yield this.app.client
+        .keys('un')
+        .waitForInputText(urlInput, 'uncrate.com')
     })
 
     it('autocompletes without protocol', function * () {
       // now type something
       yield this.app.client
+        .setInputText(urlInput, '')
         .keys('br')
         .waitUntil(function () {
           return this.getValue(urlInput)

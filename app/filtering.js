@@ -139,7 +139,10 @@ function registerForBeforeRequest (session, partition) {
             tabId: details.tabId,
             url: details.url
           }))
-        if (details.resourceType === 'image') {
+
+        if (parentResourceName === appConfig.resourceNames.SAFE_BROWSING) {
+          cb({ redirectURL: appUrlUtil.getTargetAboutUrl('about:safebrowsing#' + details.url) })
+        } else if (details.resourceType === 'image') {
           cb({ redirectURL: transparent1pxGif })
         } else {
           cb({ cancel: true })
