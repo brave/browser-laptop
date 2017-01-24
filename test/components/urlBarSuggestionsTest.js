@@ -82,6 +82,17 @@ describe('urlBarSuggestions', function () {
       .click(urlBarSuggestions + ' li.suggestionItem[data-index="0"]')
       .tabByIndex(1)
       .waitForUrl(this.page1Url)
+      .waitForTabCount(2)
+  })
+
+  it('navigates to non-first suggestion when clicked', function * () {
+    yield this.app.client
+      .setInputText(urlInput, 'Page')
+      .waitForVisible(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
+      .click(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
+      .tabByIndex(1)
+      .waitForUrl(this.page2Url)
+      .waitForTabCount(2)
   })
 
   it('navigates to a suggestion with keyboard', function * () {
