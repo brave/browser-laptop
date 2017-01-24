@@ -61,9 +61,10 @@ class Frame extends ImmutableComponent {
     return windowStore.getFrame(this.props.frameKey) || Immutable.fromJS({})
   }
 
-  get frameBraverySettings () {
+  getFrameBraverySettings (props) {
+    props = props || this.props
     const frameSiteSettings =
-      siteSettings.getSiteSettingsForURL(this.props.allSiteSettings, this.props.location)
+      siteSettings.getSiteSettingsForURL(props.allSiteSettings, props.location)
     return Immutable.fromJS(siteSettings.activeSettings(frameSiteSettings,
                                                         appStoreRenderer.state,
                                                         appConfig))
@@ -392,8 +393,8 @@ class Frame extends ImmutableComponent {
 
   componentDidUpdate (prevProps, prevState) {
     const cb = () => {
-      if (this.webRTCPolicy !== this.getWebRTCPolicy()) {
-        this.webview.setWebRTCIPHandlingPolicy(this.getWebRTCPolicy())
+      if (this.getWebRTCPolicy(prevProps) !== this.getWebRTCPolicy(this.props)) {
+        this.webview.setWebRTCIPHandlingPolicy(this.getWebRTCPolicy(this.props))
       }
       if (prevProps.isActive !== this.props.isActive) {
         this.webview.setActive(this.props.isActive)
@@ -1148,8 +1149,8 @@ class Frame extends ImmutableComponent {
     return this.webview ? this.webview.getWebRTCIPHandlingPolicy() : WEBRTC_DEFAULT
   }
 
-  getWebRTCPolicy () {
-    const braverySettings = this.frameBraverySettings
+  getWebRTCPolicy (props) {
+    const braverySettings = this.getFrameBraverySettings(props)
     if (!braverySettings || braverySettings.get('fingerprintingProtection') !== true) {
       return WEBRTC_DEFAULT
     } else {
