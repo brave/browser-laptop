@@ -26,7 +26,7 @@ const {isFrameError} = require('../../app/common/lib/httpUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
 const {getSiteSettingsForHostPattern} = require('../state/siteSettings')
-const {currentWindowWebContents} = require('../../app/renderer/currentWindow')
+const {currentWindowWebContents, isFocused} = require('../../app/renderer/currentWindow')
 const windowStore = require('../stores/windowStore')
 const appStoreRenderer = require('../stores/appStoreRenderer')
 const siteSettings = require('../state/siteSettings')
@@ -667,7 +667,7 @@ class Frame extends ImmutableComponent {
       if (this.frame.isEmpty()) {
         return
       }
-      if (e.active && currentWindowWebContents.isFocused()) {
+      if (e.active && isFocused()) {
         windowActions.setFocusedFrame(this.frame)
       }
       if (e.active && !this.props.isActive) {
