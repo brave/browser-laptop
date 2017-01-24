@@ -730,6 +730,30 @@ function hamburgerTemplateInit (location, e) {
       ]
     },
     CommonMenu.downloadsMenuItem(),
+    CommonMenu.separatorMenuItem,
+    {
+      l10nLabelId: 'edit',
+      type: 'multi',
+      submenu: [{
+        l10nLabelId: 'cut',
+        click: () => {
+          document.querySelector('.frameWrapper.isActive webview').cut()
+          windowActions.setContextMenuDetail()
+        }
+      }, {
+        l10nLabelId: 'copy',
+        click: () => {
+          document.querySelector('.frameWrapper.isActive webview').copy()
+          windowActions.setContextMenuDetail()
+        }
+      }, {
+        l10nLabelId: 'paste',
+        click: () => {
+          document.querySelector('.frameWrapper.isActive webview').paste()
+          windowActions.setContextMenuDetail()
+        }
+      }]
+    },
     CommonMenu.findOnPageMenuItem(),
     CommonMenu.printMenuItem(),
     CommonMenu.separatorMenuItem,
@@ -1241,6 +1265,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
 }
 
 function onHamburgerMenu (location, e) {
+  webviewActions.setWebviewFocused()
   const menuTemplate = hamburgerTemplateInit(location, e)
   const rect = e.target.parentNode.getBoundingClientRect()
   windowActions.setContextMenuDetail(Immutable.fromJS({
