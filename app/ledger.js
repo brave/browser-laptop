@@ -32,10 +32,6 @@ const ipc = electron.ipcMain
 const session = electron.session
 
 const acorn = require('acorn')
-const ledgerBalance = require('ledger-balance')
-const ledgerClient = require('ledger-client')
-const ledgerGeoIP = require('ledger-geoip')
-const ledgerPublisher = require('ledger-publisher')
 const qr = require('qr-image')
 const querystring = require('querystring')
 const random = require('random-lib')
@@ -59,6 +55,12 @@ const rulesolver = require('./extensions/brave/content/scripts/pageInformation')
 const ledgerUtil = require('./common/lib/ledgerUtil')
 const Tabs = require('./browser/tabs')
 const {fileUrl} = require('../js/lib/appUrlUtil')
+
+// "only-when-needed" loading...
+let ledgerBalance = null
+let ledgerClient = null
+let ledgerGeoIP = null
+let ledgerPublisher = null
 
 // TBD: remove these post beta [MTR]
 const logPath = 'ledger-log.json'
@@ -204,10 +206,6 @@ const doAction = (action) => {
  */
 var init = () => {
   try {
-    ledgerInfo._internal.debugP = ledgerClient.prototype.boolion(process.env.LEDGER_CLIENT_DEBUG)
-    publisherInfo._internal.debugP = ledgerClient.prototype.boolion(process.env.LEDGER_PUBLISHER_DEBUG)
-    publisherInfo._internal.verboseP = ledgerClient.prototype.boolion(process.env.LEDGER_PUBLISHER_VERBOSE)
-
     appDispatcher.register(doAction)
     initialize(getSetting(settings.PAYMENTS_ENABLED))
 
@@ -233,6 +231,7 @@ var boot = () => {
     ledgerInfo.creating = true
     appActions.updateLedgerInfo({ creating: true })
     try {
+      clientprep()
       client = ledgerClient(null, underscore.extend({ roundtrip: roundtrip }, clientOptions), null)
     } catch (ex) {
       appActions.updateLedgerInfo({})
@@ -539,6 +538,7 @@ var initialize = (paymentsEnabled) => {
   }
   if (client) return
 
+  if (!ledgerPublisher) ledgerPublisher = require('ledger-publisher')
   cacheRuleSet(ledgerPublisher.rules)
 
   fs.access(pathName(statePath), fs.FF_OK, (err) => {
@@ -560,6 +560,7 @@ var initialize = (paymentsEnabled) => {
         getStateInfo(state)
 
         try {
+          clientprep()
           client = ledgerClient(state.personaId,
                                 underscore.extend(state.options, { roundtrip: roundtrip }, clientOptions),
                                 state)
@@ -584,8 +585,12 @@ var initialize = (paymentsEnabled) => {
         } catch (ex) {
           return console.log('ledger client creation error: ' + ex.toString() + '\n' + ex.stack)
         }
-        if (client.sync(callback) === true) run(random.randomInt({ min: msecs.minute, max: 10 * msecs.minute }))
-        cacheRuleSet(state.ruleset)
+
+        // speed-up browser start-up by delaying the first synchronization action
+        setTimeout(() => {
+          if (client.sync(callback) === true) run(random.randomInt({ min: msecs.minute, max: 10 * msecs.minute }))
+          cacheRuleSet(state.ruleset)
+        }, 3 * msecs.second)
 
         // Make sure bravery props are up-to-date with user settings
         setPaymentInfo(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
@@ -599,6 +604,13 @@ var initialize = (paymentsEnabled) => {
   })
 }
 
+var clientprep = () => {
+  if (!ledgerClient) ledgerClient = require('ledger-client')
+  ledgerInfo._internal.debugP = ledgerClient.prototype.boolion(process.env.LEDGER_CLIENT_DEBUG)
+  publisherInfo._internal.debugP = ledgerClient.prototype.boolion(process.env.LEDGER_PUBLISHER_DEBUG)
+  publisherInfo._internal.verboseP = ledgerClient.prototype.boolion(process.env.LEDGER_PUBLISHER_VERBOSE)
+}
+
 var enable = (paymentsEnabled) => {
   if (paymentsEnabled && !getSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED)) {
     appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED, true)
@@ -607,6 +619,7 @@ var enable = (paymentsEnabled) => {
   publisherInfo._internal.enabled = paymentsEnabled
   if (synopsis) return updatePublisherInfo()
 
+  if (!ledgerPublisher) ledgerPublisher = require('ledger-publisher')
   synopsis = new (ledgerPublisher.Synopsis)()
   fs.readFile(pathName(synopsisPath), (err, data) => {
     var initSynopsis = () => {
@@ -1048,6 +1061,8 @@ var updateLedgerInfo = () => {
 
   if ((client) && (now > ledgerInfo._internal.geoipExpiry)) {
     ledgerInfo._internal.geoipExpiry = now + (5 * msecs.minute)
+
+    if (!ledgerGeoIP) ledgerGeoIP = require('ledger-geoip')
     return ledgerGeoIP.getGeoIP(client.options, (err, provider, result) => {
       if (err) console.log('ledger geoip warning: ' + JSON.stringify(err, null, 2))
       if (result) ledgerInfo.countryCode = result
@@ -1330,6 +1345,7 @@ var getBalance = () => {
   balanceTimeoutId = setTimeout(getBalance, 1 * msecs.minute)
   if (!ledgerInfo.address) return
 
+  if (!ledgerBalance) ledgerBalance = require('ledger-balance')
   ledgerBalance.getBalance(ledgerInfo.address, underscore.extend({ balancesP: true }, client.options),
   (err, provider, result) => {
     var unconfirmed
