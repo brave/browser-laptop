@@ -9,12 +9,12 @@ const Immutable = require('immutable')
 const UrlUtil = require('../lib/urlutil')
 
 // Components
+const PreferenceNavigation = require('../../app/renderer/components/preferences/PreferenceNavigation')
 const ModalOverlay = require('../components/modalOverlay')
 const {SettingsList, SettingItem, SettingCheckbox, SiteSettingCheckbox} = require('../../app/renderer/components/settings')
 const {SettingTextbox} = require('../../app/renderer/components/textbox')
 const {SettingDropdown} = require('../../app/renderer/components/dropdown')
 const Button = require('../components/button')
-const HelpfulHints = require('../../app/renderer/components/preferences/helpfulHints')
 
 // Tabs
 const PaymentsTab = require('../../app/renderer/components/preferences/paymentsTab')
@@ -27,9 +27,6 @@ const addExportFilenamePrefixToTransactions = ledgerExportUtil.addExportFilename
 const appUrlUtil = require('../lib/appUrlUtil')
 const aboutUrls = appUrlUtil.aboutUrls
 const aboutContributionsUrl = aboutUrls.get('about:contributions')
-
-// Tabs icons
-const pluginsTabIcon = require('../../app/extensions/brave/img/preferences/browser_prefs_plugins.svg')
 
 const {getZoomValuePercentage} = require('../lib/zoom')
 
@@ -1096,93 +1093,6 @@ class AdvancedTab extends ImmutableComponent {
           }, true)} />
         <div data-l10n-id='moreExtensionsComingSoon' className='moreExtensionsComingSoon' />
       </SettingsList>
-    </div>
-  }
-}
-
-class PreferenceNavigationButton extends ImmutableComponent {
-  render () {
-    return <div className={cx({
-      selected: this.props.selected,
-      [this.props.className]: !!this.props.className
-    })}>
-      <div onClick={this.props.onClick}
-        className={cx({
-          topBarButton: true,
-          fa: true,
-          [this.props.icon]: true
-        })}>
-        <i className={this.props.icon ? this.props.icon.replace('fa-', 'i-') : ''} style={this.props.style} />
-        <div className='tabMarkerText'
-          data-l10n-id={this.props.dataL10nId} />
-      </div>
-      {
-        this.props.selected
-        ? <div className='tabMarkerContainer'>
-          <div className='tabMarker' />
-        </div>
-        : null
-      }
-    </div>
-  }
-}
-
-class PreferenceNavigation extends ImmutableComponent {
-  render () {
-    return <div className='prefAside'>
-      <div />
-      <PreferenceNavigationButton icon='fa-list-alt'
-        dataL10nId='general'
-        onClick={this.props.changeTab.bind(null, preferenceTabs.GENERAL)}
-        selected={this.props.preferenceTab === preferenceTabs.GENERAL}
-      />
-      <PreferenceNavigationButton icon='fa-search'
-        dataL10nId='search'
-        onClick={this.props.changeTab.bind(null, preferenceTabs.SEARCH)}
-        selected={this.props.preferenceTab === preferenceTabs.SEARCH}
-      />
-      <PreferenceNavigationButton icon='fa-bookmark-o'
-        dataL10nId='tabs'
-        onClick={this.props.changeTab.bind(null, preferenceTabs.TABS)}
-        selected={this.props.preferenceTab === preferenceTabs.TABS}
-      />
-      <PreferenceNavigationButton
-        dataL10nId='plugins'
-        onClick={this.props.changeTab.bind(null, preferenceTabs.PLUGINS)}
-        selected={this.props.preferenceTab === preferenceTabs.PLUGINS}
-        style={{
-          backgroundImage: `url(${pluginsTabIcon})`,
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: '18px',
-          backgroundPosition: 'top left'
-        }}
-      />
-      <PreferenceNavigationButton icon='fa-lock'
-        dataL10nId='security'
-        onClick={this.props.changeTab.bind(null, preferenceTabs.SECURITY)}
-        selected={this.props.preferenceTab === preferenceTabs.SECURITY}
-      />
-      <PreferenceNavigationButton icon='fa-user'
-        dataL10nId='shields'
-        onClick={this.props.changeTab.bind(null, preferenceTabs.SHIELDS)}
-        selected={this.props.preferenceTab === preferenceTabs.SHIELDS}
-      />
-      <PreferenceNavigationButton icon='fa-bitcoin'
-        dataL10nId='payments'
-        onClick={this.props.changeTab.bind(null, preferenceTabs.PAYMENTS)}
-        selected={this.props.preferenceTab === preferenceTabs.PAYMENTS}
-      />
-      <PreferenceNavigationButton icon='fa-brave-sync'
-        dataL10nId='sync'
-        onClick={this.props.changeTab.bind(null, preferenceTabs.SYNC)}
-        selected={this.props.preferenceTab === preferenceTabs.SYNC}
-      />
-      <PreferenceNavigationButton icon='fa-server'
-        dataL10nId='advanced'
-        onClick={this.props.changeTab.bind(null, preferenceTabs.ADVANCED)}
-        selected={this.props.preferenceTab === preferenceTabs.ADVANCED}
-      />
-      <HelpfulHints hintNumber={this.props.hintNumber} refreshHint={this.props.refreshHint} />
     </div>
   }
 }
