@@ -206,13 +206,20 @@ class PaymentsTab extends ImmutableComponent {
       return null
     }
     const timestamp = ledgerData.get('reconcileStamp')
+    const now = new Date().getTime()
+    let l10nDataId = 'paymentHistoryFooterText'
+    if (timestamp <= now) {
+      l10nDataId = (timestamp <= (now - (24 * 60 * 60 * 1000)))
+                     ? 'paymentHistoryOverdueFooterText' : 'paymentHistoryDueFooterText'
+    }
+
     const nextReconcileDateRelative = formattedTimeFromNow(timestamp)
     const l10nDataArgs = {
       reconcileDate: nextReconcileDateRelative
     }
     return <div className='paymentHistoryFooter'>
       <div className='nextPaymentSubmission'>
-        <span data-l10n-id='paymentHistoryFooterText' data-l10n-args={JSON.stringify(l10nDataArgs)} />
+        <span data-l10n-id={l10nDataId} data-l10n-args={JSON.stringify(l10nDataArgs)} />
       </div>
       <Button l10nId='paymentHistoryOKText' className='okButton primaryButton' onClick={this.props.hideOverlay.bind(this, 'paymentHistory')} />
     </div>
@@ -380,15 +387,24 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get nextReconcileMessage () {
+    const ledgerData = this.props.ledgerData
     const nextReconcileDateRelative = this.nextReconcileDate
     if (!nextReconcileDateRelative) {
       return null
     }
 
+    const timestamp = ledgerData.get('reconcileStamp')
+    const now = new Date().getTime()
+    let l10nDataId = 'statusNextReconcileDate'
+    if (timestamp <= now) {
+      l10nDataId = (timestamp <= (now - (24 * 60 * 60 * 1000)))
+                     ? 'paymentHistoryOverdueFooterText' : 'statusNextReconcileToday'
+    }
+
     const l10nDataArgs = {
       reconcileDate: nextReconcileDateRelative
     }
-    return <div className='nextReconcileDate' data-l10n-args={JSON.stringify(l10nDataArgs)} data-l10n-id='statusNextReconcileDate' />
+    return <div className='nextReconcileDate' data-l10n-args={JSON.stringify(l10nDataArgs)} data-l10n-id={l10nDataId} />
   }
 
   get ledgerDataErrorText () {
