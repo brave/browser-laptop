@@ -887,7 +887,8 @@ class Main extends ImmutableComponent {
     const customTitlebar = this.customTitlebar
     const versionInformation = this.props.appState.getIn(['about', 'brave', 'versionInformation'])
     const braveryDefaults = Immutable.fromJS(siteSettings.braveryDefaults(this.props.appState, appConfig))
-    const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&
+    const contextMenuDetail = this.props.windowState.get('contextMenuDetail')
+    const shouldAllowWindowDrag = !contextMenuDetail &&
       !this.props.windowState.get('bookmarkDetail') &&
       !siteInfoIsVisible &&
       !braveryPanelIsVisible &&
@@ -914,10 +915,10 @@ class Main extends ImmutableComponent {
       onMouseDown={this.onMouseDown}
       onClick={this.onClickWindow}>
       {
-        this.props.windowState.get('contextMenuDetail')
+        contextMenuDetail
         ? <ContextMenu
           lastZoomPercentage={activeFrame && activeFrame.get('lastZoomPercentage')}
-          contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
+          contextMenuDetail={contextMenuDetail}
           selectedIndex={customTitlebar.contextMenuSelectedIndex} />
         : null
       }
@@ -939,7 +940,7 @@ class Main extends ImmutableComponent {
                   <Menubar
                     template={customTitlebar.menubarTemplate}
                     selectedIndex={customTitlebar.menubarSelectedIndex}
-                    contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
+                    contextMenuDetail={contextMenuDetail}
                     autohide={getSetting(settings.AUTO_HIDE_MENU)}
                     lastFocusedSelector={customTitlebar.lastFocusedSelector} />
                   <WindowCaptionButtons windowMaximized={customTitlebar.isMaximized} />
@@ -1146,7 +1147,7 @@ class Main extends ImmutableComponent {
             shouldAllowWindowDrag={shouldAllowWindowDrag && !isWindows}
             activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
             windowWidth={window.innerWidth}
-            contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
+            contextMenuDetail={contextMenuDetail}
             sites={appStateSites}
             selectedFolderId={this.props.windowState.getIn(['ui', 'bookmarksToolbar', 'selectedFolderId'])} />
           : null
@@ -1207,6 +1208,7 @@ class Main extends ImmutableComponent {
                 prefOpenInForeground={getSetting(settings.SWITCH_TO_NEW_TABS)}
                 onCloseFrame={this.onCloseFrame}
                 frameKey={frame.get('key')}
+                contextMenuDetail={contextMenuDetail}
                 partition={frameStateUtil.getPartition(frame)}
                 key={frame.get('key')}
                 settings={['about:preferences', 'about:history', 'about:adblock'].includes(getBaseUrl(frame.get('location')))
