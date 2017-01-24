@@ -72,7 +72,7 @@ const {isIntermediateAboutPage, getBaseUrl, isNavigatableAboutPage} = require('.
 const siteSettings = require('../state/siteSettings')
 const urlParse = require('url').parse
 const debounce = require('../lib/debounce')
-const {currentWindow} = require('../../app/renderer/currentWindow')
+const {currentWindow, isMaximized, isFocused, isFullScreen} = require('../../app/renderer/currentWindow')
 const emptyMap = new Immutable.Map()
 const emptyList = new Immutable.List()
 
@@ -695,7 +695,7 @@ class Main extends ImmutableComponent {
     if (!e.target.className.includes('navigatorWrapper')) {
       return
     }
-    return (!currentWindow.isMaximized()) ? currentWindow.maximize() : currentWindow.unmaximize()
+    return !isMaximized() ? currentWindow.maximize() : currentWindow.unmaximize()
   }
 
   onMouseDown (e) {
@@ -835,7 +835,7 @@ class Main extends ImmutableComponent {
         ? selectedIndex.slice(1)
         : null,
       lastFocusedSelector: this.props.windowState.getIn(['ui', 'menubar', 'lastFocusedSelector']),
-      isMaximized: currentWindow.isMaximized() || currentWindow.isFullScreen()
+      isMaximized: isMaximized() || isFullScreen()
     }
   }
 
@@ -881,7 +881,7 @@ class Main extends ImmutableComponent {
     const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
     const checkDefaultBrowserDialogIsVisible =
-      currentWindow.isFocused() && defaultBrowserState.shouldDisplayDialog(this.props.appState)
+      isFocused() && defaultBrowserState.shouldDisplayDialog(this.props.appState)
     const braverySettings = siteSettings.activeSettings(activeSiteSettings, this.props.appState, appConfig)
     const loginRequiredDetail = activeFrame ? basicAuthState.getLoginRequiredDetail(this.props.appState, activeFrame.get('tabId')) : null
     const customTitlebar = this.customTitlebar

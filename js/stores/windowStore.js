@@ -16,7 +16,7 @@ const messages = require('../constants/messages')
 const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
 const UrlUtil = require('../lib/urlutil')
-const {currentWindow} = require('../../app/renderer/currentWindow')
+const {currentWindow, isFocused} = require('../../app/renderer/currentWindow')
 const {tabFromFrame} = require('../state/frameStateUtil')
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
 const {aboutUrls, newFrameUrl} = require('../lib/appUrlUtil')
@@ -795,7 +795,7 @@ ipc.on(messages.DISPATCH_ACTION, (e, serializedPayload) => {
   let action = Serializer.deserialize(serializedPayload)
   let queryInfo = action.queryInfo || action.frameProps || {}
   queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
-  if (queryInfo.windowId === -2 && currentWindow.isFocused()) {
+  if (queryInfo.windowId === -2 && isFocused()) {
     queryInfo.windowId = currentWindow.id
   }
   // handle any ipc dispatches that are targeted to this window
