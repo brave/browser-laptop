@@ -11,7 +11,7 @@ const messages = require('../constants/messages')
 const siteTags = require('../constants/siteTags')
 const siteUtil = require('../state/siteUtil')
 const UrlUtil = require('../lib/urlutil')
-const currentWindow = require('../../app/renderer/currentWindow')
+const {currentWindow} = require('../../app/renderer/currentWindow')
 const windowStore = require('../stores/windowStore')
 
 function dispatch (action) {

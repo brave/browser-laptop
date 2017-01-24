@@ -5,7 +5,7 @@
 const React = require('react')
 const ImmutableComponent = require('../../../js/components/immutableComponent')
 const locale = require('../../../js/l10n')
-const currentWindow = require('../currentWindow')
+const {currentWindow} = require('../currentWindow')
 const cx = require('../../../js/lib/classSet')
 
 class WindowCaptionButtons extends ImmutableComponent {

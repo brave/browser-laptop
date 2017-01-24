@@ -72,7 +72,7 @@ const {isIntermediateAboutPage, getBaseUrl, isNavigatableAboutPage} = require('.
 const siteSettings = require('../state/siteSettings')
 const urlParse = require('url').parse
 const debounce = require('../lib/debounce')
-const currentWindow = require('../../app/renderer/currentWindow')
+const {currentWindow} = require('../../app/renderer/currentWindow')
 const emptyMap = new Immutable.Map()
 const emptyList = new Immutable.List()
 

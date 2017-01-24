@@ -26,7 +26,7 @@ const {isFrameError} = require('../../app/common/lib/httpUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
 const {getSiteSettingsForHostPattern} = require('../state/siteSettings')
-const currentWindow = require('../../app/renderer/currentWindow')
+const {currentWindowWebContents} = require('../../app/renderer/currentWindow')
 const windowStore = require('../stores/windowStore')
 const appStoreRenderer = require('../stores/appStoreRenderer')
 const siteSettings = require('../state/siteSettings')
@@ -666,7 +666,7 @@ class Frame extends ImmutableComponent {
       if (this.frame.isEmpty()) {
         return
       }
-      if (e.active && currentWindow.isFocused()) {
+      if (e.active && currentWindowWebContents.isFocused()) {
         windowActions.setFocusedFrame(this.frame)
       }
       if (e.active && !this.props.isActive) {
@@ -675,10 +675,10 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('focus', this.onFocus)
     this.webview.addEventListener('mouseenter', (e) => {
-      currentWindow.webContents.send(messages.ENABLE_SWIPE_GESTURE)
+      currentWindowWebContents.send(messages.ENABLE_SWIPE_GESTURE)
     })
     this.webview.addEventListener('mouseleave', (e) => {
-      currentWindow.webContents.send(messages.DISABLE_SWIPE_GESTURE)
+      currentWindowWebContents.send(messages.DISABLE_SWIPE_GESTURE)
     })
     this.webview.addEventListener('did-attach', (e) => {
       if (this.frame.isEmpty()) {
