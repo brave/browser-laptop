@@ -72,9 +72,8 @@ const api = {
       }
 
       if (disposition === 'new-window' || disposition === 'new-popup') {
-        const windowOpts = size
-        windowOpts.disposition = disposition
-        appActions.newWindow(makeImmutable(frameOpts), makeImmutable(windowOpts))
+        const windowOpts = makeImmutable(size)
+        appActions.newWindow(makeImmutable(frameOpts), windowOpts)
       } else {
         let hostWebContents = source.hostWebContents || source
         hostWebContents.send(messages.SHORTCUT_NEW_FRAME, location, { frameOpts })

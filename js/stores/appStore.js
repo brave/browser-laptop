@@ -386,7 +386,7 @@ const handleAppAction = (action) => {
       shuttingDown = true
       break
     case appConstants.APP_NEW_WINDOW:
-      const frameOpts = action.frameOpts && action.frameOpts.toJS()
+      const frameOpts = (action.frameOpts && action.frameOpts.toJS()) || {}
       const browserOpts = (action.browserOpts && action.browserOpts.toJS()) || {}
       const newWindowState = action.restoredState || {}
 
@@ -411,7 +411,7 @@ const handleAppAction = (action) => {
 
       mainWindow.webContents.on('did-finish-load', (e) => {
         lastEmittedState = appState
-        e.sender.send(messages.INITIALIZE_WINDOW, browserOpts.disposition, appState.toJS(), frames, action.restoredState)
+        e.sender.send(messages.INITIALIZE_WINDOW, frameOpts.disposition, appState.toJS(), frames, action.restoredState)
         if (action.cb) {
           action.cb()
         }
