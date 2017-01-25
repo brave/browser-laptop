@@ -32,6 +32,8 @@ const path = require('path')
 const getOrigin = require('../js/state/siteUtil').getOrigin
 const {adBlockResourceName} = require('./adBlock')
 const {updateElectronDownloadItem} = require('./browser/electronDownloadItem')
+const {makeImmutable} = require('../app/common/state/immutableUtil')
+const cookieExceptions = makeImmutable(require('../js/data/siteHacks').cookieExceptions)
 
 let appStore = null
 
@@ -256,9 +258,12 @@ function registerForBeforeSendHeaders (session, partition) {
     if (module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, firstPartyUrl, isPrivate)) {
       if (module.exports.isThirdPartyHost(urlParse(firstPartyUrl || '').hostname,
                                           parsedUrl.hostname)) {
+        // For matching cookie exceptions
+        const cookie = makeImmutable([firstPartyUrl.replace(/\/$/g, ''), parsedUrl.protocol + '//' + parsedUrl.hostname])
         // Clear cookie and referer on third-party requests
         if (requestHeaders['Cookie'] &&
-            getOrigin(firstPartyUrl) !== pdfjsOrigin) {
+            getOrigin(firstPartyUrl) !== pdfjsOrigin &&
+            !cookieExceptions.includes(cookie)) {
           requestHeaders['Cookie'] = undefined
         }
         if (requestHeaders['Referer'] &&

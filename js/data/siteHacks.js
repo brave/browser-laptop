@@ -26,7 +26,9 @@ const emptyDataURI = {
  */
 module.exports.cookieExceptions = [
   ['https://inbox.google.com', 'https://hangouts.google.com'],
-  ['https://mail.google.com', 'https://hangouts.google.com']
+  ['https://mail.google.com', 'https://hangouts.google.com'],
+  ['http://www.zillow.com', 'https://www.facebook.com'],
+  ['http://www.zillow.com', 'https://accounts.google.com']
 ]
 
 /**
@@ -35,7 +37,9 @@ module.exports.cookieExceptions = [
  */
 module.exports.localStorageExceptions = [
   ['https://inbox.google.com', 'https://hangouts.google.com'],
-  ['https://mail.google.com', 'https://hangouts.google.com']
+  ['https://mail.google.com', 'https://hangouts.google.com'],
+  ['http://www.zillow.com', 'https://www.facebook.com'],
+  ['http://www.zillow.com', 'https://accounts.google.com']
 ]
 
 module.exports.siteHacks = {
