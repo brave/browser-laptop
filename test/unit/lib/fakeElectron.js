@@ -16,7 +16,13 @@ const fakeElectron = {
       }
     },
     getCurrentWindow: function () {
-      return {}
+      return {
+        on: () => {},
+        isFocused: () => true,
+        isFullScreen: () => false,
+        isMaximized: () => false,
+        webContents: {}
+      }
     }
   },
   app: {
