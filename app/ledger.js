@@ -364,7 +364,12 @@ var recoverKeys = (appState, action) => {
 
   const UUID_REGEX = /^[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12}$/
   if (typeof firstRecoveryKey !== 'string' || !firstRecoveryKey.match(UUID_REGEX) || typeof secondRecoveryKey !== 'string' || !secondRecoveryKey.match(UUID_REGEX)) {
-    setImmediate(() => appActions.ledgerRecoveryFailed())
+    setImmediate(() => {
+      // calling logError sets the error object
+      logError(true, 'recoverKeys')
+      appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
+      appActions.ledgerRecoveryFailed()
+    })
     return appState
   }
 

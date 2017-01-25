@@ -120,7 +120,8 @@ const aboutActions = {
    */
   clearRecoveryStatus: function () {
     aboutActions.dispatchAction({
-      actionType: appConstants.APP_CLEAR_RECOVERY
+      actionType: appConstants.APP_LEDGER_RECOVERY_STATUS_CHANGED,
+      recoverySucceeded: undefined
     })
   },
 

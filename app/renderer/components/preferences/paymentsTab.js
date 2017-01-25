@@ -328,9 +328,6 @@ class PaymentsTab extends ImmutableComponent {
     const recoverySucceeded = this.props.ledgerData.get('recoverySucceeded')
     const recoveryError = this.props.ledgerData.getIn(['error', 'error'])
     const isNetworkError = typeof recoveryError === 'object'
-console.log('recoverySucceeded=' + JSON.stringify(recoverySucceeded))
-console.log('!!recoveryError=' + (!!recoveryError))
-console.log('isNetworkError=' + isNetworkError)
 
     return <div className='board'>
       {

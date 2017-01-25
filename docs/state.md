@@ -265,6 +265,10 @@ AppStore
       ignoredTopSites: [string], // List of ignored sites
       pinnedTopSites: [string], // List of pinned sites to be used on gridLayout. Defaults to 1 Brave-related site; see data/newTabData.js => pinnedTopSites
       updatedStamp: number // timestamp for when the data was last updated
+    },
+    preferences: {
+      recoverySucceeded: boolean, // true, false, or undefined
+      updatedStamp: number
     }
   },
   menu: {

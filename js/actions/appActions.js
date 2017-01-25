@@ -196,7 +196,8 @@ const appActions = {
    */
   ledgerRecoverySucceeded: function () {
     AppDispatcher.dispatch({
-      actionType: appConstants.APP_LEDGER_RECOVERY_SUCCEEDED
+      actionType: appConstants.APP_LEDGER_RECOVERY_STATUS_CHANGED,
+      recoverySucceeded: true
     })
   },
 
@@ -205,7 +206,8 @@ const appActions = {
    */
   ledgerRecoveryFailed: function () {
     AppDispatcher.dispatch({
-      actionType: appConstants.APP_LEDGER_RECOVERY_FAILED
+      actionType: appConstants.APP_LEDGER_RECOVERY_STATUS_CHANGED,
+      recoverySucceeded: false
     })
   },
 
