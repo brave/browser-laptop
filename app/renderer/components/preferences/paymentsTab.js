@@ -320,10 +320,9 @@ class PaymentsTab extends ImmutableComponent {
 
   get ledgerRecoveryContent () {
     const {SettingsList, SettingItem} = require('../../../../js/about/preferences')
-    let balance = this.props.ledgerData.get('balance')
 
     const l10nDataArgs = {
-      balance: (!balance ? '0.00' : balance)
+      balance: this.btcToCurrencyString(this.props.ledgerData.get('balance'))
     }
     const recoverySucceeded = this.props.ledgerData.get('recoverySucceeded')
     const recoveryError = this.props.ledgerData.getIn(['error', 'error'])
