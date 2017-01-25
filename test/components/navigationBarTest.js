@@ -770,7 +770,7 @@ describe('navigationBar tests', function () {
       const page1Url = Brave.server.url('page1.html')
       yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
       let background = yield this.app.client.getCssProperty(activeTab, 'background')
-      assert.equal(background.value, 'rgba(0,0,0,0)linear-gradient(rgb(255,255,255),rgb(243,243,243))repeatscroll0%0%/autopadding-boxborder-box')
+      assert.equal(background.value, 'rgba(0,0,0,0)linear-gradient(white,rgb(243,243,243))repeatscroll0%0%/autopadding-boxborder-box')
     })
 
     // We need a newer electron build first
