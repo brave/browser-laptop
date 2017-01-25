@@ -811,13 +811,11 @@ class Frame extends ImmutableComponent {
       }
     }
 
-    const loadEnd = (savePage) => {
+    const loadEnd = (savePage, url) => {
       if (this.frame.isEmpty()) {
         return
       }
-      windowActions.onWebviewLoadEnd(
-        this.frame,
-        this.webview.getURL())
+      windowActions.onWebviewLoadEnd(this.frame, url)
       windowActions.updateBackForwardState(
         this.frame,
         this.webview.canGoBack(),
@@ -847,7 +845,7 @@ class Frame extends ImmutableComponent {
       }
     }
 
-    const loadFail = (e, provisionLoadFailure = false) => {
+    const loadFail = (e, provisionLoadFailure, url) => {
       if (this.frame.isEmpty()) {
         return
       }
@@ -877,7 +875,7 @@ class Frame extends ImmutableComponent {
         windowActions.loadUrl(this.frame, 'about:error')
         appActions.removeSite(siteUtil.getDetailFromFrame(this.frame))
       } else if (provisionLoadFailure) {
-        windowActions.setNavigated(this.webview.getURL(), this.props.frameKey, true, this.frame.get('tabId'))
+        windowActions.setNavigated(url, this.props.frameKey, true, this.frame.get('tabId'))
       }
     }
     this.webview.addEventListener('security-style-changed', (e) => {
@@ -954,18 +952,19 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('did-fail-provisional-load', (e) => {
       if (e.isMainFrame) {
-        loadEnd(false)
-        loadFail(e, true)
+        loadEnd(false, e.validatedURL)
+        loadFail(e, true, e.validatedURL)
       }
     })
     this.webview.addEventListener('did-fail-load', (e) => {
       if (e.isMainFrame) {
-        loadEnd(false)
-        loadFail(e)
+        loadEnd(false, e.validatedURL)
+        loadFail(e, false, e.validatedURL)
       }
     })
-    this.webview.addEventListener('did-finish-load', () => {
-      loadEnd(true)
+    this.webview.addEventListener('did-finish-load', (e) => {
+      // TODO: We can remove this.webview.getURL() once people are using newer electron
+      loadEnd(true, e.validatedURL || this.webview.getURL())
       if (this.runInsecureContent()) {
         appActions.removeSiteSetting(this.origin, 'runInsecureContent', this.props.isPrivate)
       }
@@ -976,7 +975,7 @@ class Frame extends ImmutableComponent {
       }
       if (e.isMainFrame) {
         windowActions.setNavigated(e.url, this.props.frameKey, true, this.frame.get('tabId'))
-        loadEnd(true)
+        loadEnd(true, e.url)
       }
     })
     this.webview.addEventListener('enter-html-full-screen', () => {
@@ -1143,10 +1142,6 @@ class Frame extends ImmutableComponent {
     } else {
       this.wheelDeltaY = 0
     }
-  }
-
-  get webRTCPolicy () {
-    return this.webview ? this.webview.getWebRTCIPHandlingPolicy() : WEBRTC_DEFAULT
   }
 
   getWebRTCPolicy (props) {
