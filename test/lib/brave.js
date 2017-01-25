@@ -81,7 +81,8 @@ var exports = {
     BACKSPACE: '\ue003',
     DELETE: '\ue017',
     DOWN: '\ue015',
-    UP: '\ue013'
+    UP: '\ue013',
+    PAGEDOWN: '\uE00F'
   },
 
   defaultTimeout: 10000,

@@ -614,4 +614,39 @@ describe('Autofill', function () {
       })
     })
   })
+  describe('autofill context menu', function () {
+    Brave.beforeAll(this)
+    before(function * () {
+      yield setup(this.app.client)
+      this.formfill = Brave.server.url('formfill.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(this.formfill)
+        .waitForVisible('<form>')
+        .setValue('[name="04fullname"]', 'test')
+        .click('#submit')
+    })
+    it('hide when scroll', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .waitForVisible('<form>')
+        .click('[name="04fullname"]')
+        .click('[name="04fullname"]')
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible('.contextMenuItemText')
+        .keys(Brave.keys.PAGEDOWN)
+        .waitForVisible('.contextMenuItemText', 1000, true)
+    })
+    it('hide when new tab', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .waitForVisible('<form>')
+        .click('[name="04fullname"]')
+        .click('[name="04fullname"]')
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible('.contextMenuItemText')
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.formfill + '?2')
+        .waitForVisible('.contextMenuItemText', 1000, true)
+    })
+  })
 })

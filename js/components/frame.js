@@ -734,7 +734,7 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('hide-autofill-popup', (e) => {
       if (this.props.contextMenuDetail && this.props.contextMenuDetail.get('type') === 'autofill' &&
-        this.webview.isFocused()) {
+        (this.props.contextMenuDetail.get('tabId') !== this.props.tabId || this.webview.isFocused())) {
         windowActions.autofillPopupHidden(this.props.tabId)
       }
     })
