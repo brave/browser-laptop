@@ -879,6 +879,7 @@ class Main extends ImmutableComponent {
     const autofillCreditCardPanelIsVisible = this.props.windowState.get('autofillCreditCardDetail')
     const activeRequestedLocation = this.activeRequestedLocation
     const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
+    const activeTab = activeFrame ? this.props.appState.get('tabs').find((tab) => tab.get('tabId') === activeFrame.get('tabId')) : null
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
     const checkDefaultBrowserDialogIsVisible =
       isFocused() && defaultBrowserState.shouldDisplayDialog(this.props.appState)
@@ -955,12 +956,12 @@ class Main extends ImmutableComponent {
                 <div className={cx({
                   navigationButtonContainer: true,
                   nav: true,
-                  disabled: !activeFrame || !activeFrame.get('canGoBack')
+                  disabled: !activeTab || !activeTab.get('canGoBack')
                 })}>
                   <LongPressButton
                     l10nId='backButton'
                     className='navigationButton backButton'
-                    disabled={!activeFrame || !activeFrame.get('canGoBack')}
+                    disabled={!activeTab || !activeTab.get('canGoBack')}
                     onClick={this.onBack}
                     onLongPress={this.onBackLongPress}
                   />
@@ -968,12 +969,12 @@ class Main extends ImmutableComponent {
                 <div className={cx({
                   navigationButtonContainer: true,
                   nav: true,
-                  disabled: !activeFrame || !activeFrame.get('canGoForward')
+                  disabled: !activeTab || !activeTab.get('canGoForward')
                 })}>
                   <LongPressButton
                     l10nId='forwardButton'
                     className='navigationButton forwardButton'
-                    disabled={!activeFrame || !activeFrame.get('canGoForward')}
+                    disabled={!activeTab || !activeTab.get('canGoForward')}
                     onClick={this.onForward}
                     onLongPress={this.onForwardLongPress}
                   />
@@ -1242,6 +1243,7 @@ class Main extends ImmutableComponent {
                 location={frame.get('location')}
                 isPrivate={frame.get('isPrivate')}
                 partitionNumber={frame.get('partitionNumber')}
+                tabData={this.props.appState.get('tabs').find((tab) => tab.get('tabId') === frame.get('tabId'))}
                 activeShortcut={frame.get('activeShortcut')}
                 activeShortcutDetails={frame.get('activeShortcutDetails')}
                 provisionalLocation={frame.get('provisionalLocation')}

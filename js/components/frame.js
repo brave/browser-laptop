@@ -816,11 +816,6 @@ class Frame extends ImmutableComponent {
         return
       }
       windowActions.onWebviewLoadEnd(this.frame, url)
-      windowActions.updateBackForwardState(
-        this.frame,
-        this.webview.canGoBack(),
-        this.webview.canGoForward())
-
       const parsedUrl = urlParse(this.props.location)
       if (!this.allowRunningWidevinePlugin()) {
         this.showWidevineNotification(this.props.location, this.origin, () => {

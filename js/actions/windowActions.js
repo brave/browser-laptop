@@ -427,22 +427,6 @@ const windowActions = {
   },
 
   /**
-   * Dispatches a message to the store to update the back-forward information.
-   *
-   * @param {Object} frameProps - the frame properties for the webview in question.
-   * @param {boolean} canGoBack - Specifies if the active frame has previous entries in its history
-   * @param {boolean} canGoForward - Specifies if the active frame has next entries in its history (i.e. the user pressed back at least once)
-   */
-  updateBackForwardState: function (frameProps, canGoBack, canGoForward) {
-    dispatch({
-      actionType: windowConstants.WINDOW_UPDATE_BACK_FORWARD,
-      frameProps,
-      canGoBack,
-      canGoForward
-    })
-  },
-
-  /**
    * Dispatches a message to the store to indicate that something is dragging over this item.
    *
    * @param {string} dragType - The type of drag operation being performed

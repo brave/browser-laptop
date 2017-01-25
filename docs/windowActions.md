@@ -297,20 +297,6 @@ Dispatches a message to the store to set the tab page index.
 
 
 
-### updateBackForwardState(frameProps, canGoBack, canGoForward) 
-
-Dispatches a message to the store to update the back-forward information.
-
-**Parameters**
-
-**frameProps**: `Object`, the frame properties for the webview in question.
-
-**canGoBack**: `boolean`, Specifies if the active frame has previous entries in its history
-
-**canGoForward**: `boolean`, Specifies if the active frame has next entries in its history (i.e. the user pressed back at least once)
-
-
-
 ### setIsBeingDraggedOverDetail(dragType, dragOverKey, dragDetail) 
 
 Dispatches a message to the store to indicate that something is dragging over this item.

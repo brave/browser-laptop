@@ -17,7 +17,9 @@ const cleanupWebContents = (tabId) => {
 const getTabValue = function (tabId) {
   let tab = api.getWebContents(tabId)
   if (tab) {
-    const tabValue = makeImmutable(extensions.tabValue(tab))
+    let tabValue = makeImmutable(extensions.tabValue(tab))
+    tabValue = tabValue.set('canGoBack', tab.canGoBack())
+    tabValue = tabValue.set('canGoForward', tab.canGoForward())
     return tabValue.set('tabId', tabId)
   }
 }
@@ -127,6 +129,9 @@ const api = {
         updateTab(tabId)
       })
       tab.on('did-navigate', function (evt, url) {
+        updateTab(tabId)
+      })
+      tab.on('did-navigate-in-page', function (evt, url, isMainFrame) {
         updateTab(tabId)
       })
       tab.on('load-start', function (evt, url, isMainFrame, isErrorPage) {

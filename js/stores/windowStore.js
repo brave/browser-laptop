@@ -387,12 +387,6 @@ const doAction = (action) => {
         updateTabPageIndex(action.frameProps)
       }
       break
-    case windowConstants.WINDOW_UPDATE_BACK_FORWARD:
-      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
-        canGoBack: action.canGoBack,
-        canGoForward: action.canGoForward
-      })
-      break
     case windowConstants.WINDOW_SET_IS_BEING_DRAGGED_OVER_DETAIL:
       if (!action.dragOverKey) {
         windowState = windowState.deleteIn(['ui', 'dragging'])

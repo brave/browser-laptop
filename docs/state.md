@@ -22,6 +22,8 @@ AppStore
     windowId: number,  // the windowId that contains the tab
     audible: boolean,  // is audio playing (muted or not)
     muted: boolean,  // is the tab muted
+    canGoBack: boolean, // the tab can be navigated back
+    canGoForward: boolean // the tab can be navigated forward
   }],
   windows: [{
     // persistent properties
@@ -295,8 +297,6 @@ WindowStore
   frames: [{
     audioMuted: boolean, // frame is muted
     audioPlaybackActive: boolean, // frame is playing audio
-    canGoBack: boolean,
-    canGoForward: boolean,
     icon: string, // favicon url
     location: string, // The currently navigated location
     src: string, // The iframe src attribute
