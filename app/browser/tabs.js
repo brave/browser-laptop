@@ -168,6 +168,19 @@ const api = {
     return state
   },
 
+  sendToAll: (...args) => {
+    for (let tabId in currentWebContents) {
+      const tab = currentWebContents[tabId]
+      try {
+        if (tab && !tab.isDestroyed()) {
+          tab.send(...args)
+        }
+      } catch (e) {
+        // ignore exceptions
+      }
+    }
+  },
+
   getWebContents: (tabId) => {
     return currentWebContents[tabId]
   },

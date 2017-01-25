@@ -355,6 +355,7 @@ const applyReducers = (state, action) => [
   require('../../app/browser/reducers/downloadsReducer'),
   require('../../app/browser/reducers/flashReducer'),
   require('../../app/browser/reducers/tabsReducer'),
+  require('../../app/browser/reducers/spellCheckReducer'),
   require('../../app/browser/reducers/clipboardReducer')
 ].reduce(
     (appState, reducer) => {
