@@ -61,6 +61,11 @@ class Frame extends ImmutableComponent {
     return windowStore.getFrame(this.props.frameKey) || Immutable.fromJS({})
   }
 
+  get tab () {
+    const frame = this.frame
+    return appStoreRenderer.state.get('tabs').find((tab) => tab.get('tabId') === frame.get('tabId'))
+  }
+
   getFrameBraverySettings (props) {
     props = props || this.props
     const frameSiteSettings =
@@ -649,7 +654,7 @@ class Frame extends ImmutableComponent {
       if (this.frame.isEmpty()) {
         return
       }
-      contextMenus.onMainContextMenu(e.params, this.frame)
+      contextMenus.onMainContextMenu(e.params, this.frame, this.tab)
       e.preventDefault()
       e.stopPropagation()
     })
@@ -760,7 +765,7 @@ class Frame extends ImmutableComponent {
             return
           }
           method = (nodeProps, contextMenuType) => {
-            contextMenus.onMainContextMenu(nodeProps, this.frame, contextMenuType)
+            contextMenus.onMainContextMenu(nodeProps, this.frame, this.tab, contextMenuType)
           }
           break
         case messages.STOP_LOAD:

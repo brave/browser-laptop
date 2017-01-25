@@ -132,10 +132,6 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
       frame.unloaded = true
     }
     frame.key = newKey
-    // Full history is not saved yet
-    // TODO (bsclifton): remove this when https://github.com/brave/browser-laptop/issues/963 is complete
-    frame.canGoBack = false
-    frame.canGoForward = false
 
     // Set the frame src to the last visited location
     // or else users will see the first visited URL.

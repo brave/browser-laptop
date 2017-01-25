@@ -318,8 +318,6 @@ function addFrame (windowState, tabs, frameOpts, newKey, partitionNumber, active
   const frame = Immutable.fromJS(Object.assign({
     zoomLevel: config.zoom.defaultValue,
     audioMuted: false, // frame is muted
-    canGoBack: false,
-    canGoForward: false,
     location,
     aboutDetails: undefined,
     src: url, // what the iframe src should be

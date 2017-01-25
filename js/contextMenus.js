@@ -900,7 +900,7 @@ const showDefinitionMenuItem = (selectionText) => {
   }
 }
 
-function mainTemplateInit (nodeProps, frame) {
+function mainTemplateInit (nodeProps, frame, tab) {
   const template = []
 
   const isLink = nodeProps.linkURL && nodeProps.linkURL !== ''
@@ -1036,7 +1036,7 @@ function mainTemplateInit (nodeProps, frame) {
         template.push(
           {
             label: locale.translation('back'),
-            enabled: frame.get('canGoBack'),
+            enabled: tab.get('canGoBack'),
             click: (item, focusedWindow) => {
               if (focusedWindow) {
                 focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
@@ -1044,7 +1044,7 @@ function mainTemplateInit (nodeProps, frame) {
             }
           }, {
             label: locale.translation('forward'),
-            enabled: frame.get('canGoForward'),
+            enabled: tab.get('canGoForward'),
             click: (item, focusedWindow) => {
               if (focusedWindow) {
                 focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
@@ -1228,7 +1228,7 @@ function onHamburgerMenu (location, e) {
   }))
 }
 
-function onMainContextMenu (nodeProps, frame, contextMenuType) {
+function onMainContextMenu (nodeProps, frame, tab, contextMenuType) {
   if (contextMenuType === 'bookmark' || contextMenuType === 'bookmark-folder') {
     const activeFrame = Immutable.fromJS({ location: '', title: '', partitionNumber: frame.get('partitionNumber') })
     onSiteDetailContextMenu(Immutable.fromJS(nodeProps), activeFrame)
@@ -1239,7 +1239,7 @@ function onMainContextMenu (nodeProps, frame, contextMenuType) {
   } else if (contextMenuType === 'download') {
     onDownloadsToolbarContextMenu(nodeProps.downloadId, Immutable.fromJS(nodeProps))
   } else {
-    const mainMenu = Menu.buildFromTemplate(mainTemplateInit(nodeProps, frame))
+    const mainMenu = Menu.buildFromTemplate(mainTemplateInit(nodeProps, frame, tab))
     mainMenu.popup(currentWindow)
     mainMenu.destroy()
   }

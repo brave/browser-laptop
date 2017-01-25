@@ -581,10 +581,12 @@ class Main extends ImmutableComponent {
 
   onNav (e, navCheckProp, navType, navAction) {
     const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
+    const activeTabId = activeFrame.get('tabId')
+    const activeTab = activeFrame ? this.props.appState.get('tabs').find((tab) => tab.get('tabId') === activeTabId) : null
     const isNavigatable = isNavigatableAboutPage(getBaseUrl(activeFrame.get('location')))
     if (e && eventUtil.isForSecondaryAction(e) && isNavigatable) {
-      if (activeFrame && activeFrame.get(navCheckProp)) {
-        appActions.tabCloned(activeFrame.get('tabId'), {
+      if (activeTab && activeTab.get(navCheckProp)) {
+        appActions.tabCloned(activeTabId, {
           [navType]: true,
           active: !!e.shiftKey
         })
@@ -984,6 +986,7 @@ class Main extends ImmutableComponent {
                 ref={(node) => { this.navBar = node }}
                 navbar={activeFrame && activeFrame.get('navbar')}
                 sites={appStateSites}
+                canGoForward={activeTab && activeTab.get('canGoForward')}
                 activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
                 location={activeFrame && activeFrame.get('location') || ''}
                 title={activeFrame && activeFrame.get('title') || ''}
