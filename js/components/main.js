@@ -1243,7 +1243,6 @@ class Main extends ImmutableComponent {
                 location={frame.get('location')}
                 isPrivate={frame.get('isPrivate')}
                 partitionNumber={frame.get('partitionNumber')}
-                tabData={this.props.appState.get('tabs').find((tab) => tab.get('tabId') === frame.get('tabId'))}
                 activeShortcut={frame.get('activeShortcut')}
                 activeShortcutDetails={frame.get('activeShortcutDetails')}
                 provisionalLocation={frame.get('provisionalLocation')}
