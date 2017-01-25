@@ -76,6 +76,7 @@ const settings = {
   ONE_PASSWORD_ENABLED: 'security.passwords.one-password-enabled',
   DASHLANE_ENABLED: 'security.passwords.dashlane-enabled',
   LAST_PASS_ENABLED: 'security.passwords.last-pass-enabled',
+  ENPASS_ENABLED: 'security.passwords.enpass-enabled',
   // > phased out with 0.12.6
   SHOW_BOOKMARKS_TOOLBAR_FAVICON: 'bookmarks.toolbar.showFavicon',
   SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON: 'bookmarks.toolbar.showOnlyFavicon',

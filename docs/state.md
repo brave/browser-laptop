@@ -213,6 +213,7 @@ AppStore
     'security.passwords.manager-enabled': boolean, // whether to use default password manager
     'security.passwords.one-password-enabled': boolean, // true if the 1Password extension should be enabled
     'security.passwords.dashlane-enabled': boolean, // true if the Dashlane extension should be enabled
+    'security.passwords.enpass-enabled': boolean, // true if the Enpass extension should be enabled
     'bookmarks.toolbar.show': boolean, // true if the bookmakrs toolbar should be shown
     'bookmarks.toolbar.showFavicon': boolean, // true if bookmark favicons should be shown on the bookmarks toolbar
     'bookmarks.toolbar.showOnlyFavicon': boolean, // true if only favicons should be shown on the bookmarks toolbar
