@@ -312,6 +312,7 @@ const urlBarSuggestionsReducer = (state, action) => {
       break
     case windowConstants.WINDOW_SET_URL:
       state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'searchResults']), Immutable.fromJS([]))
+      state = state.deleteIn(frameStatePath(state, action.key).concat(['navbar', 'urlbar', 'searchDetail']))
       break
     case windowConstants.WINDOW_PREVIOUS_URL_BAR_SUGGESTION_SELECTED: {
       const selectedIndexPath = activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])

@@ -364,7 +364,7 @@ describe('urlBar tests', function () {
         })
       })
     })
-    it('Clears last search engine when removed', function * () {
+    it('clears last search engine when removed', function * () {
       const entry = entries[0]
       yield this.app.client
         .keys(`${entry.shortcut} hi`)
@@ -378,6 +378,19 @@ describe('urlBar tests', function () {
         .keys(Brave.keys.BACKSPACE)
         .keys(Brave.keys.BACKSPACE)
         .waitForElementCount(urlbarIcon + '.fa-search', 1)
+    })
+    it('clears last search engine when searching', function * () {
+      const entry = entries[0]
+      yield this.app.client
+        .keys(`${entry.shortcut} hi`)
+        .waitForElementCount(urlbarIcon, 1)
+        .waitUntil(function () {
+          return this
+            .getCssProperty(urlbarIcon, 'background-image')
+            .then((backgroundImage) => backgroundImage.value === `url("${entry.image}")`)
+        })
+        .keys(Brave.keys.ENTER)
+        .waitForElementCount(urlbarIcon + '.fa-lock', 1)
     })
   })
 
