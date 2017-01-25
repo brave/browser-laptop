@@ -4,7 +4,7 @@
 
 'use strict'
 
-const URL = require('url')
+const urlParse = require('./common/urlParse')
 const TrackingProtection = require('tracking-protection').CTPParser
 const DataFile = require('./dataFile')
 const Filtering = require('./filtering')
@@ -28,7 +28,7 @@ const startTrackingProtection = (wnd) => {
         resourceName: module.exports.resourceName
       }
     }
-    const firstPartyUrl = URL.parse(mainFrameUrl)
+    const firstPartyUrl = urlParse(mainFrameUrl)
     let firstPartyUrlHost = firstPartyUrl.hostname || ''
     if (firstPartyUrlHost.startsWith('www.')) {
       firstPartyUrlHost = firstPartyUrlHost.substring(4)
@@ -39,7 +39,7 @@ const startTrackingProtection = (wnd) => {
         cachedFirstParty.put(firstPartyUrlHost, firstPartyHosts && firstPartyHosts.split(',') || [])
       }
     }
-    const urlHost = URL.parse(details.url).hostname
+    const urlHost = urlParse(details.url).hostname
     const cancel = firstPartyUrl.protocol &&
       details.resourceType !== 'mainFrame' &&
       firstPartyUrl.protocol.startsWith('http') &&

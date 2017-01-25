@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 'use strict'
 
-const urlParse = require('url').parse
+const urlParse = require('./common/urlParse')
 const DataFile = require('./dataFile')
 const Filtering = require('./filtering')
 const LRUCache = require('lru_cache/core').LRUCache

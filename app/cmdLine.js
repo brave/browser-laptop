@@ -10,7 +10,7 @@ const app = electron.app
 const messages = require('../js/constants/messages')
 const BrowserWindow = electron.BrowserWindow
 const appActions = require('../js/actions/appActions')
-const urlParse = require('url').parse
+const urlParse = require('./common/urlParse')
 const {fileUrl} = require('../js/lib/appUrlUtil')
 const sessionStore = require('./sessionStore')
 const isDarwin = process.platform === 'darwin'

@@ -10,6 +10,9 @@ const vaultHost = process.env.VAULT_HOST || 'https://vault-staging.brave.com'
 const adHost = process.env.AD_HOST || 'https://oip.brave.com'
 
 module.exports = {
+  cache: {
+    urlParse: 30
+  },
   zoom: {
     defaultValue: 0,
     // Each zoomLevel is multiplied by 20 to get the percentage offset from 100. That's 0.05 per percentage offset.

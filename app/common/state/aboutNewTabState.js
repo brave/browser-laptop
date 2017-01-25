@@ -49,7 +49,7 @@ const removeDuplicateDomains = (list) => {
       return false
     }
     try {
-      const hostname = require('url').parse(site.get('location')).hostname
+      const hostname = require('../urlParse')(site.get('location')).hostname
       if (!siteDomains.has(hostname)) {
         siteDomains.add(hostname)
         return true

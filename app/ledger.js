@@ -23,7 +23,8 @@ const crypto = require('crypto')
 const fs = require('fs')
 const os = require('os')
 const path = require('path')
-const url = require('url')
+const urlParse = require('./common/urlParse')
+const urlFormat = require('url').format
 const util = require('util')
 
 const electron = require('electron')
@@ -331,7 +332,7 @@ if (ipc) {
       return
     }
 
-    ctx = url.parse(location, true)
+    ctx = urlParse(location, true)
     ctx.TLD = tldjs.getPublicSuffix(ctx.host)
     if (!ctx.TLD) {
       if (publisherInfo._internal.verboseP) console.log('\nno TLD for:' + ctx.host)
@@ -505,7 +506,7 @@ eventStore.addChangeListener(() => {
         })
       }
 
-      faviconURL = page.faviconURL || entry.protocol + '//' + url.parse(location).host + '/favicon.ico'
+      faviconURL = page.faviconURL || entry.protocol + '//' + urlParse(location).host + '/favicon.ico'
       entry.faviconURL = null
 
       if (publisherInfo._internal.debugP) console.log('\nrequest: ' + faviconURL)
@@ -925,7 +926,7 @@ var cacheRuleSet = (ruleset) => {
 
     underscore.keys(synopsis.publishers).forEach((publisher) => {
       var location = (synopsis.publishers[publisher].protocol || 'http:') + '//' + publisher
-      var ctx = url.parse(location, true)
+      var ctx = urlParse(location, true)
 
       ctx.TLD = tldjs.getPublicSuffix(ctx.host)
       if (!ctx.TLD) return
@@ -1139,9 +1140,9 @@ var callback = (err, result, delayTime) => {
 
 var roundtrip = (params, options, callback) => {
   var i
-  var parts = typeof params.server === 'string' ? url.parse(params.server)
+  var parts = typeof params.server === 'string' ? urlParse(params.server)
                 : typeof params.server !== 'undefined' ? params.server
-                : typeof options.server === 'string' ? url.parse(options.server) : options.server
+                : typeof options.server === 'string' ? urlParse(options.server) : options.server
   var rawP = options.rawP
 
   if (!params.method) params.method = 'GET'
@@ -1160,7 +1161,7 @@ var roundtrip = (params, options, callback) => {
   }
 
   options = {
-    url: url.format(parts),
+    url: urlFormat(parts),
     method: params.method,
     payload: params.payload,
     responseType: 'text',

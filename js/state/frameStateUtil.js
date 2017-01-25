@@ -4,7 +4,7 @@
 
 const Immutable = require('immutable')
 const config = require('../constants/config')
-const urlParse = require('url').parse
+const urlParse = require('../../app/common/urlParse')
 
 const matchFrame = (queryInfo, frame) => {
   queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo

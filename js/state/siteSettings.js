@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Immutable = require('immutable')
-const urlParse = require('url').parse
+const urlParse = require('../../app/common/urlParse')
 
 module.exports.braveryDefaults = (appState, appConfig) => {
   let defaults = {}

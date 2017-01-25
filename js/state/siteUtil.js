@@ -8,7 +8,7 @@ const siteTags = require('../constants/siteTags')
 const settings = require('../constants/settings')
 const getSetting = require('../settings').getSetting
 const UrlUtil = require('../lib/urlutil')
-const urlParse = require('url').parse
+const urlParse = require('../../app/common/urlParse')
 
 const isBookmark = (tags) => {
   if (!tags) {
