@@ -11,7 +11,6 @@ const messages = require('../constants/messages')
 const siteTags = require('../constants/siteTags')
 const siteUtil = require('../state/siteUtil')
 const UrlUtil = require('../lib/urlutil')
-const {currentWindow} = require('../../app/renderer/currentWindow')
 const windowStore = require('../stores/windowStore')
 
 function dispatch (action) {
@@ -303,7 +302,7 @@ const windowActions = {
       // only has pinned frames and tried to close, so close the
       // whole app.
       if (nonPinnedFrames.size === 0) {
-        appActions.closeWindow(currentWindow.id)
+        appActions.closeWindow(windowStore.getState().get('id'))
         return
       }
 
@@ -328,7 +327,7 @@ const windowActions = {
         frameProps
       })
     } else {
-      appActions.closeWindow(currentWindow.id)
+      appActions.closeWindow(windowStore.getState().get('id'))
     }
   },
 
