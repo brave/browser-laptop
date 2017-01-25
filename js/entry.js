@@ -36,16 +36,11 @@ const Immutable = require('immutable')
 const patch = require('immutablepatch')
 const l10n = require('./l10n')
 
-try {
-  // don't allow scaling or zooming of the ui
-  webFrame.setPageScaleLimits(1, 1)
-  webFrame.setZoomLevelLimits(0, 0)
-  // override any default zoom level changes
-  currentWindowWebContents.webContents.setZoomLevel(0.0)
-} catch (e) {
-  // TODO: Remove this exception wrapping once we update pre-built
-  console.error('Could not set zoom limits, you are using an old electron version')
-}
+// don't allow scaling or zooming of the ui
+webFrame.setPageScaleLimits(1, 1)
+webFrame.setZoomLevelLimits(0, 0)
+// override any default zoom level changes
+currentWindowWebContents.setZoomLevel(0.0)
 
 l10n.init()
 
