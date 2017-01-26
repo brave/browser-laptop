@@ -4,6 +4,7 @@
 - Added WebTorrent support for magnet links. ([#5818](https://github.com/brave/browser-laptop/issues/5818))([#5815](https://github.com/brave/browser-laptop/issues/5815))
 - Added Linux sandbox. ([#874](https://github.com/brave/browser-laptop/issues/874))
 - Added PDF based payment history contribution statements. ([#4769](https://github.com/brave/browser-laptop/issues/4769))
+- Arrow keys can now be used to select popups for autofill ([#1302](https://github.com/brave/browser-laptop/issues/1302))
 - Added the revision SHA the source code was built from to about:brave. ([#5462](https://github.com/brave/browser-laptop/issues/5462))
 - Added copy to clipboard option for about:brave page. ([#5790](https://github.com/brave/browser-laptop/issues/5790))
 - Added a display-text-only mode for bookmark toolbar folders. ([#6078](https://github.com/brave/browser-laptop/issues/6078))
