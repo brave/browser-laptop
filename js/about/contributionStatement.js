@@ -301,7 +301,7 @@ class ContributionStatement extends ImmutableComponent {
             </tbody>
           </table>
           <div className='verifiedExplainer'><span className='verified' /> <span data-l10n-id='verifiedExplainerText' /></div>
-           <div className='pageIndicator pull-right' data-l10n-id='pageNofMText' data-l10n-args={JSON.stringify({ n: (pageIdx + 1), m: totalPages })} />
+          <div className='pageIndicator pull-right' data-l10n-id='pageNofMText' data-l10n-args={JSON.stringify({ n: (pageIdx + 1), m: totalPages })} />
         </div>
       </div>
     )
