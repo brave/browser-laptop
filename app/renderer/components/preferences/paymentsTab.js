@@ -115,7 +115,7 @@ class PaymentsTab extends ImmutableComponent {
     const walletHasTransactions = walletTransactions && walletTransactions.size
     let buttonText
 
-    if (!walletCreated) {
+    if ((!walletCreated) || (!this.nextReconcileDate)) {
       return null
     } else if (!walletHasTransactions) {
       buttonText = 'noPaymentHistory'

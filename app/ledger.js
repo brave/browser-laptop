@@ -384,6 +384,9 @@ var recoverKeys = (appState, action) => {
       appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
       setImmediate(() => appActions.ledgerRecoveryFailed())
     } else {
+      appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
+      if (balanceTimeoutId) clearTimeout(balanceTimeoutId)
+      getBalance()
       setImmediate(() => appActions.ledgerRecoverySucceeded())
     }
   })
@@ -713,6 +716,7 @@ var initialize = (paymentsEnabled) => {
         }, 3 * msecs.second)
 
         // Make sure bravery props are up-to-date with user settings
+        if (!ledgerInfo.address) ledgerInfo.address = client.getWalletAddress()
         setPaymentInfo(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
         getBalance()
       })
