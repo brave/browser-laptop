@@ -820,7 +820,7 @@ class Frame extends ImmutableComponent {
         return
       }
       windowActions.onWebviewLoadEnd(this.frame, url)
-      const parsedUrl = urlParse(url)
+      const parsedUrl = urlParse(this.props.location)
       if (!this.allowRunningWidevinePlugin()) {
         this.showWidevineNotification(this.props.location, this.origin, () => {
         }, () => {
@@ -836,8 +836,8 @@ class Frame extends ImmutableComponent {
         appActions.addSite(siteUtil.getDetailFromFrame(this.frame))
       }
 
-      if (url.startsWith(pdfjsOrigin)) {
-        let displayLocation = UrlUtil.getLocationIfPDF(url)
+      if (this.props.location.startsWith(pdfjsOrigin)) {
+        let displayLocation = UrlUtil.getLocationIfPDF(this.props.location)
         windowActions.setSecurityState(this.frame, {
           secure: urlParse(displayLocation).protocol === 'https:',
           runInsecureContent: false
