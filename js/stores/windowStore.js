@@ -338,9 +338,15 @@ const doAction = (action) => {
       const frameProps = action.frameProps || frameStateUtil.getActiveFrame(windowState)
       const index = frameStateUtil.getFramePropsIndex(windowState.get('frames'), frameProps)
       const activeFrameKey = frameStateUtil.getActiveFrame(windowState).get('key')
-      windowState = windowState.merge(frameStateUtil.removeFrame(windowState.get('frames'), windowState.get('tabs'),
-        windowState.get('closedFrames'), frameProps.set('closedAtIndex', index),
-        activeFrameKey))
+      windowState = windowState.merge(frameStateUtil.removeFrame(
+        windowState.get('frames'),
+        windowState.get('tabs'),
+        windowState.get('closedFrames'),
+        frameProps.set('closedAtIndex', index),
+        activeFrameKey,
+        index,
+        getSetting(settings.TAB_CLOSE_ACTION)
+      ))
       // If we reach the limit of opened tabs per page while closing tabs, switch to
       // the active tab's page otherwise the user will hang on empty page
       let totalOpenTabs = windowState.get('frames').filter((frame) => !frame.get('pinnedLocation')).size
@@ -362,6 +368,9 @@ const doAction = (action) => {
       windowState = windowState.merge({
         activeFrameKey: action.frameProps.get('key'),
         previewFrameKey: null
+      })
+      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+        lastAccessedTime: new Date().getTime()
       })
       windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
       updateTabPageIndex(action.frameProps)
@@ -473,6 +482,11 @@ const doAction = (action) => {
     case windowConstants.WINDOW_AUTOFILL_POPUP_HIDDEN:
     case windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL:
       if (!action.detail) {
+        if (windowState.getIn(['contextMenuDetail', 'type']) === 'hamburgerMenu') {
+          windowState = windowState.set('hamburgerMenuWasOpen', true)
+        } else {
+          windowState = windowState.set('hamburgerMenuWasOpen', false)
+        }
         windowState = windowState.delete('contextMenuDetail')
 
         if (windowState.getIn(['contextMenuDetail', 'type']) === 'autofill' &&
@@ -482,7 +496,10 @@ const doAction = (action) => {
           }
         }
       } else {
-        windowState = windowState.set('contextMenuDetail', action.detail)
+        if (!(action.detail.get('type') === 'hamburgerMenu' && windowState.get('hamburgerMenuWasOpen'))) {
+          windowState = windowState.set('contextMenuDetail', action.detail)
+        }
+        windowState = windowState.set('hamburgerMenuWasOpen', false)
       }
       break
     case windowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL:
@@ -567,12 +584,8 @@ const doAction = (action) => {
         })
       }
       break
-    case windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL:
-      if (!action.clearBrowsingDataDetail) {
-        windowState = windowState.delete('clearBrowsingDataDetail')
-      } else {
-        windowState = windowState.set('clearBrowsingDataDetail', Immutable.fromJS(action.clearBrowsingDataDetail))
-      }
+    case windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_VISIBLE:
+      windowState = windowState.setIn(['ui', 'isClearBrowsingDataPanelVisible'], action.isVisible)
       break
     case windowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_DETAIL:
       if (!action.importBrowserDataDetail) {
@@ -734,6 +747,14 @@ const doAction = (action) => {
     case appConstants.APP_NEW_TAB:
       newFrame(action.frameProps, action.frameProps.get('disposition') === 'foreground-tab')
       break
+    case windowConstants.WINDOW_TAB_CLOSE:
+      windowState = windowState.setIn(['ui', 'tabs', 'fixTabWidth'], action.data.fixTabWidth)
+      windowStore.emitChanges()
+      break
+    case windowConstants.WINDOW_TAB_MOUSE_LEAVE:
+      windowState = windowState.setIn(['ui', 'tabs', 'fixTabWidth'], action.data.fixTabWidth)
+      windowStore.emitChanges()
+      break
     default:
       break
   }
@@ -758,10 +779,10 @@ ipc.on(messages.SHORTCUT_PREV_TAB, () => {
   emitChanges()
 })
 
-ipc.on(messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, (e, clearBrowsingDataDetail) => {
+ipc.on(messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, (e) => {
   doAction({
-    actionType: windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL,
-    clearBrowsingDataDetail
+    actionType: windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_VISIBLE,
+    isVisible: true
   })
 })
 

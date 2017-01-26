@@ -732,7 +732,7 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('hide-autofill-popup', (e) => {
       if (this.props.contextMenuDetail && this.props.contextMenuDetail.get('type') === 'autofill' &&
-        this.webview.isFocused()) {
+        (this.props.contextMenuDetail.get('tabId') !== this.props.tabId || this.webview.isFocused())) {
         windowActions.autofillPopupHidden(this.props.tabId)
       }
     })
@@ -785,8 +785,8 @@ class Frame extends ImmutableComponent {
           }
           break
         case messages.CLEAR_BROWSING_DATA_NOW:
-          method = (clearBrowsingDataDetail) =>
-            windowActions.setClearBrowsingDataDetail(clearBrowsingDataDetail)
+          method = () =>
+            windowActions.setClearBrowsingDataPanelVisible(true)
           break
         case messages.AUTOFILL_SET_ADDRESS:
           method = (currentDetail, originalDetail) =>

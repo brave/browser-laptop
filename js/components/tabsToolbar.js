@@ -69,6 +69,7 @@ class TabsToolbar extends ImmutableComponent {
         previewTabPageIndex={this.props.previewTabPageIndex}
         startingFrameIndex={startingFrameIndex}
         partOfFullPageSet={currentTabs.size === this.props.tabsPerTabPage}
+        fixTabWidth={this.props.fixTabWidth}
       />
       <TabsToolbarButtons
         noFrames={currentTabs.size === 0}

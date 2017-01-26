@@ -10,42 +10,121 @@ require('../../less/about/styles.less')
 require('../../less/button.less')
 require('../../less/forms.less')
 
+const {Textbox, FormTextbox, SettingTextbox, RecoveryKeyTextbox} = require('../../app/renderer/components/textbox')
+const {Dropdown, FormDropdown, SettingDropdown} = require('../../app/renderer/components/dropdown')
+
 class AboutStyle extends ImmutableComponent {
   render () {
     return <div className='wrapper'>
       <h1 data-l10n-id='introTitle' />
       <p data-l10n-id='intro' />
+
+      <hr />
+
       <h1 className='typography' data-l10n-id='typography' />
       <h1 data-l10n-id='h1' />
       <h2 data-l10n-id='h2' />
       <h3 data-l10n-id='h3' />
       <h4 data-l10n-id='h4' />
 
-      <h1 data-l10n-id='forms' />
-      <h2 data-l10n-id='inputs' />
+      <hr />
+
+      <h1 data-l10n-id='textboxes' />
+
       <div className='container'>
-        <input placeholder='Input box' className='form-control' type='text' />
+        <h2>Plain textbox</h2>
+        <Textbox placeholder='Textbox' />
         <pre><code>
-          // require('less/forms.less'){'\n'}{'\n'}
-          &lt;input className='form-control' type='text' />
-        </code></pre>
-      </div>
-      <div className='container'>
-        <select className='form-control'>
-          <option>Select Box</option>
-          <option>Second Choice</option>
-          <option>Third Choice</option>
-        </select>
-        <pre><code>
-          &lt;select className='form-control'>{'\n'}
-          &lt;option>Select Box&lt;/option>{'\n'}
-          &lt;option>Second Choice&lt;/option>{'\n'}
-          &lt;option>Third Choice&lt;/option>{'\n'}
-          &lt;/select>
+          const { '{Textbox}' } = require('../../app/renderer/components/textbox'){'\n'}
+          &lt;Textbox />
         </code></pre>
       </div>
 
-      <h2 data-l10n-id='buttons' />
+      <div className='container'>
+        <h2>Textbox for use in forms</h2>
+        <FormTextbox placeholder='FormTextbox' />
+        <pre><code>
+          const { '{FormTextbox}' } = require('../../app/renderer/components/textbox'){'\n'}
+          &lt;FormTextbox />
+        </code></pre>
+      </div>
+
+      <div className='container'>
+        <h2>Texbox used mostly in Preferences; has a fixed width</h2>
+        <SettingTextbox placeholder='SettingTextbox' />
+        <pre><code>
+          const { '{SettingTextbox}' } = require('../../app/renderer/components/textbox'){'\n'}
+          &lt;SettingTextbox />
+        </code></pre>
+      </div>
+
+      <div className='container'>
+        <h2>Textbox used on wallet recovery screen in Brave Payments</h2>
+        <RecoveryKeyTextbox placeholder='RecoveryKeyTextbox' />
+        <pre><code>
+          const { '{RecoveryKeyTextbox}' } = require('../../app/renderer/components/textbox'){'\n'}
+          &lt;RecoveryKeyTextbox />
+        </code></pre>
+      </div>
+
+      <hr />
+
+      <h1 data-l10n-id='dropdowns' />
+
+      <div className='container'>
+        <h2>Plain dropdown</h2>
+        <Dropdown>
+          <option>Select Box</option>
+          <option>Second Choice</option>
+          <option>Third Choice</option>
+        </Dropdown>
+        <pre><code>
+          const { '{Dropdown}' } = require('../../app/renderer/components/dropdown'){'\n'}
+          &lt;Dropdown>{'\n'}
+          &nbsp;&nbsp;&lt;option>Select Box&lt;/option>{'\n'}
+          &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
+          &nbsp;&nbsp;&lt;option>Third Choice&lt;/option>{'\n'}
+          &lt;/Dropdown>
+        </code></pre>
+      </div>
+
+      <div className='container'>
+        <h2>Dropdown for use in forms</h2>
+        <FormDropdown>
+          <option>Select Box</option>
+          <option>Second Choice</option>
+          <option>Third Choice</option>
+        </FormDropdown>
+        <pre><code>
+          const { '{FormDropdown}' } = require('../../app/renderer/components/dropdown'){'\n'}
+          &lt;FormDropdown>{'\n'}
+          &nbsp;&nbsp;&lt;option>Select Box&lt;/option>{'\n'}
+          &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
+          &nbsp;&nbsp;&lt;option>Third Choice&lt;/option>{'\n'}
+          &lt;/FormDropdown>
+        </code></pre>
+      </div>
+
+      <div className='container'>
+        <h2>Dropdown used mostly in Preferences; has a fixed width</h2>
+        <SettingDropdown>
+          <option>Select Box</option>
+          <option>Second Choice</option>
+          <option>Third Choice</option>
+        </SettingDropdown>
+        <pre><code>
+          const { '{SettingDropdown}' } = require('../../app/renderer/components/dropdown'){'\n'}
+          &lt;SettingDropdown>{'\n'}
+          &nbsp;&nbsp;&lt;option>Select Box&lt;/option>{'\n'}
+          &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
+          &nbsp;&nbsp;&lt;option>Third Choice&lt;/option>{'\n'}
+          &lt;/SettingDropdown>
+        </code></pre>
+      </div>
+
+      <hr />
+
+      <h1 data-l10n-id='buttons' />
       <button data-l10n-id='browserButton' className='browserButton' onClick={this.onRemoveBookmark} />
       <pre><code>
         &lt;button data-l10n-id='done' className='browserButton'{'\n'}

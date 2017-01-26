@@ -316,7 +316,7 @@ const createHistorySubmenu = () => {
       label: locale.translation('clearBrowsingData'),
       accelerator: 'Shift+CmdOrCtrl+Delete',
       click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, {browserHistory: true}])
+        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL])
       }
     }
   ]
@@ -426,7 +426,6 @@ const createWindowSubmenu = () => {
 
 const createHelpSubmenu = () => {
   const submenu = [
-    CommonMenu.reportAnIssueMenuItem(),
     CommonMenu.separatorMenuItem,
     CommonMenu.submitFeedbackMenuItem(),
     {

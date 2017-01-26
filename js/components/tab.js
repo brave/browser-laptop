@@ -105,6 +105,7 @@ class Tab extends ImmutableComponent {
 
   onCloseFrame (event) {
     event.stopPropagation()
+    this.props.onFrameClose(this.tabNode.parentNode.getBoundingClientRect())
     windowActions.closeFrame(windowStore.getFrames(), this.frame)
   }
 
@@ -196,8 +197,9 @@ class Tab extends ImmutableComponent {
         draggingOverRight: this.isDraggingOverRight,
         isDragging: this.isDragging,
         isPinned: this.isPinned,
-        partOfFullPageSet: this.props.partOfFullPageSet
+        partOfFullPageSet: this.props.partOfFullPageSet || !!this.props.tabWidth
       })}
+      style={this.props.tabWidth ? { flex: `0 0 ${this.props.tabWidth}px` } : {}}
       onMouseEnter={this.props.previewTabs ? this.onMouseEnter : null}
       onMouseLeave={this.props.previewTabs ? this.onMouseLeave : null}>
       <div className={cx({
