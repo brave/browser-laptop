@@ -343,7 +343,7 @@ class PaymentsTab extends ImmutableComponent {
         ? <div className='recoveryOverlay'>
           <h1 data-l10n-id='ledgerRecoveryNetworkFailedTitle' className='recoveryError' />
           <p data-l10n-id='ledgerRecoveryNetworkFailedMessage' className='spaceAround' />
-          <Button l10nId='ok' className='whiteButton inlineButton' onClick={this.clearRecoveryStatus} />
+          <Button l10nId='ok' className='whiteButton inlineButton' onClick={this.clearRecoveryStatus.bind(this)} />
         </div>
         : null
       }
@@ -352,7 +352,7 @@ class PaymentsTab extends ImmutableComponent {
         ? <div className='recoveryOverlay'>
           <h1 data-l10n-id='ledgerRecoveryFailedTitle' />
           <p data-l10n-id='ledgerRecoveryFailedMessage' className='spaceAround' />
-          <Button l10nId='ok' className='whiteButton inlineButton' onClick={this.clearRecoveryStatus} />
+          <Button l10nId='ok' className='whiteButton inlineButton' onClick={this.clearRecoveryStatus.bind(this)} />
         </div>
         : null
       }
