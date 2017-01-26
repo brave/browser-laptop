@@ -398,7 +398,7 @@ var exports = {
             } else {
               ret = val === input
             }
-            logVerbose('Current val: ' + val)
+            logVerbose('Current val (in quotes): "' + val + '"')
             logVerbose('waitForInputText("' + selector + '", "' + input + '") => ' + ret)
             return ret
           })
