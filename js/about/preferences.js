@@ -874,17 +874,15 @@ class SyncTab extends ImmutableComponent {
 
   get setupContent () {
     // displayed before a sync userId has been created
-    return this.enabled
-      ? <div className='syncWarning' data-l10n-id='syncRestartNeeded' />
-      : <div>
-        <Button l10nId='syncStart' className='primaryButton' onClick={this.props.showOverlay.bind(this, 'syncStart')} />
-        <Button l10nId='syncAdd' className='whiteButton' onClick={this.props.showOverlay.bind(this, 'syncAdd')} />
-      </div>
+    return <div>
+      <Button l10nId='syncStart' className='primaryButton' onClick={this.props.showOverlay.bind(this, 'syncStart')} />
+      <Button l10nId='syncAdd' className='whiteButton' onClick={this.props.showOverlay.bind(this, 'syncAdd')} />
+    </div>
   }
 
   get postSetupContent () {
     return <div><div className='settingsList' id='syncEnableSwitch'>
-      <SettingCheckbox dataL10nId='syncEnable' prefKey={settings.SYNC_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+      <SettingCheckbox dataL10nId='syncEnable' prefKey={settings.SYNC_ENABLED} settings={this.props.settings} onChangeSetting={this.toggleSync.bind(this)} />
     </div>
       <Button l10nId='syncNewDevice' className='whiteButton syncNewDeviceButton' onClick={this.props.showOverlay.bind(this, 'syncNewDevice')} />
     </div>
@@ -966,12 +964,19 @@ class SyncTab extends ImmutableComponent {
     </div>
   }
 
-  setupSyncProfile () {
+  setupSyncProfile (isRestoring = false) {
     if (this.deviceNameInput.value) {
       this.props.onChangeSetting(settings.SYNC_DEVICE_NAME, this.deviceNameInput.value)
     }
-    this.props.onChangeSetting(settings.SYNC_ENABLED, true)
+    this.toggleSync(settings.SYNC_ENABLED, true, isRestoring)
     this.props.hideOverlay('syncStart')
+  }
+
+  toggleSync (key, value, isRestoring = false) {
+    this.props.onChangeSetting(key, value)
+    if (!isRestoring) {
+      aboutActions.reloadSyncExtension()
+    }
   }
 
   restoreSyncProfile () {
@@ -986,7 +991,7 @@ class SyncTab extends ImmutableComponent {
       if (inputCode && inputCode.length === 32) {
         // QR code and device ID are set after sync restarts
         aboutActions.saveSyncInitData(Array.from(inputCode))
-        this.setupSyncProfile()
+        this.setupSyncProfile(true)
         return
       }
     }
@@ -1588,7 +1593,6 @@ class AboutPreferences extends React.Component {
     if (key === settings.HARDWARE_ACCELERATION_ENABLED ||
         key === settings.DO_NOT_TRACK ||
         key === settings.LANGUAGE ||
-        (key === settings.SYNC_ENABLED && value === true) ||
         key === settings.PDFJS_ENABLED || key === settings.TORRENT_VIEWER_ENABLED ||
         key === settings.SMOOTH_SCROLL_ENABLED || key === settings.SEND_CRASH_REPORTS) {
       ipc.send(messages.PREFS_RESTART, key, value)

@@ -83,6 +83,14 @@ const aboutActions = {
   },
 
   /**
+   * Dispatches a message when sync needs to be restarted
+   * @param {Array.<number>|null} seed
+   */
+  reloadSyncExtension: function () {
+    ipc.send(messages.RELOAD_SYNC_EXTENSION)
+  },
+
+  /**
    * Loads a URL in a new frame in a safe way.
    * It is important that it is not a simple anchor because it should not
    * preserve the about preload script. See #672
