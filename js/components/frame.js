@@ -830,7 +830,8 @@ class Frame extends ImmutableComponent {
 
       const protocol = parsedUrl.protocol
       const isError = this.props.aboutDetails && this.props.aboutDetails.get('errorCode')
-      if (!this.props.isPrivate && this.props.provisionalLocation === this.props.location && (protocol === 'http:' || protocol === 'https:') && !isError && savePage) {
+
+      if (!this.props.isPrivate && this.props.provisionalLocation === url && (protocol === 'http:' || protocol === 'https:') && !isError && savePage) {
         // Register the site for recent history for navigation bar
         appActions.addSite(siteUtil.getDetailFromFrame(this.frame))
       }
