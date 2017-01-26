@@ -7,7 +7,7 @@
 const windowConstants = require('../../../js/constants/windowConstants')
 const getSetting = require('../../../js/settings').getSetting
 const fetchSearchSuggestions = require('../fetchSearchSuggestions')
-const {activeFrameStatePath, frameStatePath, getFrameKeyByTabId, getActiveFrame} = require('../../../js/state/frameStateUtil')
+const {activeFrameStatePath, frameStatePath, getFrameByKey, getFrameKeyByTabId, getActiveFrame} = require('../../../js/state/frameStateUtil')
 const searchProviders = require('../../../js/data/searchProviders')
 const settings = require('../../../js/constants/settings')
 const Immutable = require('immutable')
@@ -24,23 +24,21 @@ const appStoreRenderer = require('../../../js/stores/appStoreRenderer')
 const updateSearchEngineInfoFromInput = (state, frameProps) => {
   const input = frameProps.getIn(['navbar', 'urlbar', 'location'])
   const frameSearchDetail = frameProps.getIn(['navbar', 'urlbar', 'searchDetail'])
-  if (input && input.length > 0) {
-    const isLocationUrl = isUrl(input)
-    if (!isLocationUrl &&
-      !(frameSearchDetail && input.startsWith(frameSearchDetail.get('shortcut') + ' '))) {
-      let entries = searchProviders.providers
-      const searchDetailPath = frameStatePath(state, frameProps.get('key')).concat(['navbar', 'urlbar', 'searchDetail'])
-      for (let i = 0; i < entries.length; i++) {
-        const entry = entries[i]
-        if (input.startsWith(entry.shortcut + ' ')) {
-          state = state.setIn(
-            searchDetailPath,
-            Immutable.fromJS(Object.assign({}, entry, { activateSearchEngine: true })))
-          return state
-        }
+  const searchDetailPath = frameStatePath(state, frameProps.get('key')).concat(['navbar', 'urlbar', 'searchDetail'])
+  if (!input || !input.length || isUrl(input) || !input.startsWith(':')) {
+    state = state.deleteIn(searchDetailPath)
+  } else if (!frameSearchDetail || !input.startsWith(frameSearchDetail.get('shortcut') + ' ')) {
+    let entries = searchProviders.providers
+    for (let i = 0; i < entries.length; i++) {
+      const entry = entries[i]
+      if (input.startsWith(entry.shortcut + ' ')) {
+        state = state.setIn(
+          searchDetailPath,
+          Immutable.fromJS(Object.assign({}, entry, { activateSearchEngine: true })))
+        return state
       }
-      state = state.deleteIn(searchDetailPath)
     }
+    state = state.deleteIn(searchDetailPath)
   }
   return state
 }
@@ -303,7 +301,10 @@ const generateNewSuggestionsList = (state) => {
 const urlBarSuggestionsReducer = (state, action) => {
   switch (action.actionType) {
     case windowConstants.WINDOW_SET_NAVIGATED:
-      state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), false)
+      const key = action.key || state.get('activeFrameKey')
+      state = state.setIn(frameStatePath(state, key).concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), false)
+      const frame = getFrameByKey(state, key)
+      state = updateSearchEngineInfoFromInput(state, frame)
       break
     case windowConstants.WINDOW_SET_FINDBAR_SHOWN:
       if (action.shown) {
