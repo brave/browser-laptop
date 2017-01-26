@@ -27,7 +27,6 @@ class ExtensionItem extends ImmutableComponent {
   }
   render () {
     const icon = this.props.extension.getIn(['manifest', 'icons', '48'])
-    const permissions = this.props.extension.getIn(['manifest', 'permissions'])
     return <div role='listitem'
       disabled={!this.props.extension.get('enabled')}
       className='listItem'
@@ -47,11 +46,7 @@ class ExtensionItem extends ImmutableComponent {
         }
         <div className='extensionPath'><span data-l10n-id='extensionPathLabel' /> <span>{this.props.extension.get('base_path')}</span></div>
         <div className='extensionID'><span data-l10n-id='extensionIdLabel' /> <span>{this.props.extension.get('id')}</span></div>
-        {
-          permissions
-          ? <div className='extensionPermissions'><span data-l10n-id='extensionPermissionsLabel' /> <span>{permissions.join(', ')}</span></div>
-          : null
-        }
+        <div className='extensionPermissions'><span data-l10n-id='extensionPermissionsLabel' /> <span>{this.props.extension.getIn(['manifest', 'permissions']).join(', ')}</span></div>
       </div>
     </div>
   }

@@ -68,7 +68,6 @@ const getTopSites = (state) => {
   // remove folders; sort by visit count; enforce a max limit
   const sites = (state.get('sites') || new Immutable.List())
     .filter((site) => !siteUtil.isFolder(site))
-    .filter((site) => !siteUtil.isImportedBookmark(site))
     .filter((site) => !isSourceAboutUrl(site.get('location')))
     .sort(sortCountDescending)
     .slice(0, aboutNewTabMaxEntries)

@@ -225,7 +225,6 @@ AppStore
     'advanced.torrent-viewer-enabled': boolean, // Whether to render magnet links in the browser
     'advanced.smooth-scroll-enabled': boolean, // false if smooth scrolling should be explicitly disabled
     'advanced.send-crash-reports': boolean, // true or undefined if crash reports should be sent
-    'advanced.hide-excluded-sites': boolean, // Whether to hide excluded sites in the payments list
     'shutdown.clear-history': boolean, // true to clear history on shutdown
     'shutdown.clear-downloads': boolean, // true to clear downloads on shutdown
     'shutdown.clear-cache': boolean, // true to clear cache on shutdown
@@ -269,17 +268,7 @@ AppStore
   menu: {
     template: object // used on Windows and by our tests: template object with Menubar control
   },
-  defaultBrowserCheckComplete: boolean, // true to indicate default browser check is complete
-  clearBrowsingDataDefaults: {
-    browserHistory: boolean,
-    downloadHistory: boolean,
-    cachedImagesAndFiles: boolean,
-    savedPasswords: boolean,
-    allSiteCookies: boolean,
-    autocompleteData: boolean,
-    autofillData: boolean,
-    savedSiteSettings: booleanß
-  }
+  defaultBrowserCheckComplete: boolean // true to indicate default browser check is complete
 }
 ```
 
@@ -403,7 +392,6 @@ WindowStore
     position: array, // last known window position [x, y]
     size: array, // last known window size [x, y]
     isFullScreen: boolean, // true if window is fullscreen
-    isClearBrowsingDataPanelVisible: boolean, // true if the Clear Browsing Data panel is visible
     mouseInTitlebar: boolean, //Whether or not the mouse is in the titlebar
     dragging: {
       dragType: string, // tab, bookmark
@@ -455,6 +443,13 @@ WindowStore
     expandHttpse: boolean, // If specified, indicates if the httpse section should be expanded
     expandNoScript: boolean, // Whether noscript section should be expanded
     expandFp: boolean // Whether fingerprinting protection should be expanded
+  },
+  clearBrowsingDataDetail: {
+    browserHistory: boolean,
+    downloadHistory: boolean,
+    cachedImagesAndFiles: boolean,
+    savedPasswords: boolean,
+    allSiteCookies: boolean
   },
   contextMenuDetail: {
     left: number, // the left position of the context menu

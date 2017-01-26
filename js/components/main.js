@@ -632,7 +632,7 @@ class Main extends ImmutableComponent {
   }
 
   onHideClearBrowsingDataPanel () {
-    windowActions.setClearBrowsingDataPanelVisible(false)
+    windowActions.setClearBrowsingDataDetail()
   }
 
   onHideImportBrowserDataPanel () {
@@ -874,7 +874,7 @@ class Main extends ImmutableComponent {
     const siteInfoIsVisible = this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
     const braveShieldsDisabled = this.braveShieldsDisabled
     const braveryPanelIsVisible = !braveShieldsDisabled && this.props.windowState.get('braveryPanelDetail')
-    const clearBrowsingDataPanelIsVisible = this.props.windowState.getIn(['ui', 'isClearBrowsingDataPanelVisible'])
+    const clearBrowsingDataPanelIsVisible = this.props.windowState.get('clearBrowsingDataDetail')
     const importBrowserDataPanelIsVisible = this.props.windowState.get('importBrowserDataDetail')
     const widevinePanelIsVisible = this.props.windowState.getIn(['widevinePanelDetail', 'shown'])
     const autofillAddressPanelIsVisible = this.props.windowState.get('autofillAddressDetail')
@@ -1008,8 +1008,6 @@ class Main extends ImmutableComponent {
                 settings={this.props.appState.get('settings')}
                 noScriptIsVisible={noScriptIsVisible}
                 menubarVisible={customTitlebar.menubarVisible}
-                siteSettings={this.props.appState.get('siteSettings')}
-                synopsis={this.props.appState.getIn(['publisherInfo', 'synopsis']) || new Immutable.Map()}
               />
               <div className='topLevelEndButtons'>
                 <div className={cx({
@@ -1061,7 +1059,7 @@ class Main extends ImmutableComponent {
         {
          clearBrowsingDataPanelIsVisible
           ? <ClearBrowsingDataPanel
-            clearBrowsingDataDefaults={this.props.appState.get('clearBrowsingDataDefaults')}
+            clearBrowsingDataDetail={this.props.windowState.get('clearBrowsingDataDetail')}
             onHide={this.onHideClearBrowsingDataPanel} />
           : null
         }

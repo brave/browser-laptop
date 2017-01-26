@@ -1,11 +1,11 @@
 /* global describe, it, beforeEach, before */
 
 const Brave = require('../lib/brave')
-const {urlInput, advancedSettings, addFundsButton, paymentsStatus, paymentsWelcomePage, paymentsTab, walletSwitch, siteSettingItem, ledgerTable} = require('../lib/selectors')
+const {urlInput, advancedSettings, addFundsButton, paymentsStatus, paymentsWelcomePage, paymentsTab, walletSwitch, ledgerTable} = require('../lib/selectors')
 const assert = require('assert')
 
 const prefsUrl = 'about:preferences'
-const ledgerAPIWaitTimeout = 20000
+const ledgerAPIWaitTimeout = 10000
 
 function * setup (client) {
   yield client
@@ -206,8 +206,8 @@ describe('synopsis', function () {
       .click(paymentsTab)
       .waitForVisible('[data-l10n-id="publisher"]')
       .click('[data-l10n-id="publisher"]')
-      .waitForVisible(siteSettingItem + ' .switchBackground')
-      .click(siteSettingItem + ' .switchBackground')
+      .waitForVisible(ledgerTable + ' .switchBackground')
+      .click(ledgerTable + ' .switchBackground')
       .windowByUrl(Brave.browserWindowUrl)
       .waitUntil(function () {
         return this.getAppState().then((val) => {

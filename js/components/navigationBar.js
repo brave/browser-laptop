@@ -23,7 +23,6 @@ const getSetting = require('../settings').getSetting
 const windowStore = require('../stores/windowStore')
 const contextMenus = require('../contextMenus')
 const LongPressButton = require('./longPressButton')
-const PublisherToggle = require('../../app/renderer/components/publisherToggle')
 
 class NavigationBar extends ImmutableComponent {
   constructor () {
@@ -129,8 +128,7 @@ class NavigationBar extends ImmutableComponent {
   }
 
   render () {
-    if (this.props.activeFrameKey === undefined ||
-        this.props.siteSettings === undefined) {
+    if (this.props.activeFrameKey === undefined) {
       return null
     }
 
@@ -209,7 +207,6 @@ class NavigationBar extends ImmutableComponent {
         urlbar={this.props.navbar.get('urlbar')}
         onStop={this.onStop}
         menubarVisible={this.props.menubarVisible}
-        noBorderRadius={this.shouldShowAddPublisherButton}
         />
       {
         isSourceAboutUrl(this.props.location)
@@ -217,13 +214,6 @@ class NavigationBar extends ImmutableComponent {
           <span className='browserButton' />
         </div>
         : <div className='endButtons'>
-          {
-            <PublisherToggle
-              url={this.props.location}
-              hostSettings={this.props.siteSettings}
-              synopsis={this.props.synopsis}
-            />
-          }
           {
             !this.showNoScriptInfo
             ? null

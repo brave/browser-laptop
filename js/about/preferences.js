@@ -248,10 +248,6 @@ class LedgerTable extends ImmutableComponent {
     return true
   }
 
-  banSite (hostPattern) {
-    aboutActions.changeSiteSetting(hostPattern, 'ledgerPaymentsShown', false)
-  }
-
   getRow (synopsis) {
     if (!synopsis || !synopsis.get || !this.shouldShow(synopsis)) {
       return []
@@ -267,10 +263,6 @@ class LedgerTable extends ImmutableComponent {
     const defaultSiteSetting = true
 
     return [
-      {
-        html: <div className='neverShowSiteIcon' onClick={this.banSite.bind(this, this.getHostPattern(synopsis))}><span className='fa fa-ban' /></div>,
-        value: ''
-      },
       rank,
       {
         html: <div className='site'>{verified ? this.getVerifiedIcon() : null}<a href={publisherURL} target='_blank'>{faviconURL ? <img src={faviconURL} alt={site} /> : <span className='fa fa-file-o' />}<span>{site}</span></a></div>,
@@ -294,18 +286,11 @@ class LedgerTable extends ImmutableComponent {
       return null
     }
     return <div className='ledgerTable'>
-      <div className='hideExcludedSites'>
-        <SettingCheckbox
-          dataL10nId='hideExcluded'
-          prefKey={settings.HIDE_EXCLUDED_SITES}
-          settings={this.props.settings}
-          onChangeSetting={this.props.onChangeSetting}
-        />
-      </div>
       <SortableTable
-        headings={['remove', 'rank', 'publisher', 'include', 'views', 'timeSpent', 'percentage']}
+        headings={['rank', 'publisher', 'include', 'views', 'timeSpent', 'percentage']}
         defaultHeading='rank'
-        columnClassNames={['', 'alignRight', '', '', 'alignRight', 'alignRight', 'alignRight']}
+        overrideDefaultStyle
+        columnClassNames={['alignRight', '', '', 'alignRight', 'alignRight', 'alignRight']}
         rowClassNames={
           this.synopsis.map((item) =>
             this.enabledForSite(item) ? '' : 'paymentsDisabled').toJS()
@@ -318,12 +303,7 @@ class LedgerTable extends ImmutableComponent {
             location: entry.get('publisherURL')
           }
         }).toJS()}
-        rows={this.synopsis.filter((synopsis) => {
-          return !getSetting(settings.HIDE_EXCLUDED_SITES, this.props.settings) || this.enabledForSite(synopsis)
-        }).map((synopsis) => {
-          return this.getRow(synopsis)
-        }).toJS()}
-        />
+        rows={this.synopsis.map((synopsis) => this.getRow(synopsis)).toJS()} />
     </div>
   }
 }
@@ -900,10 +880,6 @@ class PaymentsTab extends ImmutableComponent {
     aboutActions.ledgerRecoverWallet(this.state.FirstRecoveryKey, this.state.SecondRecoveryKey)
   }
 
-  recoverWalletFromFile () {
-    aboutActions.ledgerRecoverWalletFromFile()
-  }
-
   copyToClipboard (text) {
     aboutActions.setClipboard(text)
   }
@@ -914,7 +890,6 @@ class PaymentsTab extends ImmutableComponent {
 
   clearRecoveryStatus () {
     aboutActions.clearRecoveryStatus()
-    this.props.hideAdvancedOverlays()
   }
 
   printKeys () {
@@ -960,29 +935,14 @@ class PaymentsTab extends ImmutableComponent {
     const walletCreated = this.props.ledgerData.get('created') && !this.props.ledgerData.get('creating')
     const walletTransactions = this.props.ledgerData.get('transactions')
     const walletHasTransactions = walletTransactions && walletTransactions.size
-    let buttonText
 
-    if (!walletCreated) {
-      buttonText = null
-    } else if (!walletHasTransactions) {
-      buttonText = 'noPaymentHistory'
-    } else {
-      buttonText = 'viewPaymentHistory'
+    if (!walletCreated || !walletHasTransactions) {
+      return null
     }
 
-    const l10nDataArgs = {
-      reconcileDate: this.nextReconcileDate
-    }
-
+    const buttonText = 'viewPaymentHistory'
     const onButtonClick = this.props.showOverlay.bind(this, 'paymentHistory')
-
-    return <Button
-      className='paymentHistoryButton'
-      l10nId={buttonText}
-      l10nArgs={l10nDataArgs}
-      onClick={onButtonClick.bind(this)}
-      disabled={this.props.ledgerData.get('creating')}
-      />
+    return <Button className='paymentHistoryButton' l10nId={buttonText} onClick={onButtonClick.bind(this)} disabled={this.props.ledgerData.get('creating')} />
   }
 
   get walletStatus () {
@@ -1015,8 +975,6 @@ class PaymentsTab extends ImmutableComponent {
   get tableContent () {
     // TODO: This should be sortable. #2497
     return <LedgerTable ledgerData={this.props.ledgerData}
-      settings={this.props.settings}
-      onChangeSetting={this.props.onChangeSetting}
       siteSettings={this.props.siteSettings} />
   }
 
@@ -1162,26 +1120,23 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get ledgerRecoveryContent () {
-    let balance = this.props.ledgerData.get('balance')
-
     const l10nDataArgs = {
-      balance: (!balance ? '0.00' : balance)
+      balance: this.props.ledgerData.get('balance')
     }
-
     return <div className='board'>
       {
         this.props.ledgerData.get('recoverySucceeded') === true
         ? <div className='recoveryOverlay'>
           <h1>Success!</h1>
           <p className='spaceAround' data-l10n-id='balanceRecovered' data-l10n-args={JSON.stringify(l10nDataArgs)} />
-          <Button l10nId='ok' className='whiteButton inlineButton' onClick={this.clearRecoveryStatus.bind(this)} />
+          <Button l10nId='ok' className='whiteButton inlineButton' onClick={this.clearRecoveryStatus} />
         </div>
         : null
       }
       {
         this.props.ledgerData.get('recoverySucceeded') === false
         ? <div className='recoveryOverlay'>
-          <h1 className='recoveryError'>Recovery failed</h1>
+          <h1>Recovery failed</h1>
           <p className='spaceAround'>Please re-enter keys or try different keys.</p>
           <Button l10nId='ok' className='whiteButton inlineButton' onClick={this.clearRecoveryStatus} />
         </div>
@@ -1206,7 +1161,6 @@ class PaymentsTab extends ImmutableComponent {
     return <div className='panel advancedSettingsFooter'>
       <div className='recoveryFooterButtons'>
         <Button l10nId='recover' className='primaryButton' onClick={this.recoverWallet} />
-        <Button l10nId='recoverFromFile' className='primaryButton' onClick={this.recoverWalletFromFile} />
         <Button l10nId='cancel' className='whiteButton' onClick={this.props.hideOverlay.bind(this, 'ledgerRecovery')} />
       </div>
     </div>
@@ -1218,15 +1172,7 @@ class PaymentsTab extends ImmutableComponent {
       return null
     }
     const timestamp = ledgerData.get('reconcileStamp')
-    return formattedTimeFromNow(timestamp)
-  }
-
-  get nextReconcileMessage () {
-    const nextReconcileDateRelative = this.nextReconcileDate
-    if (!nextReconcileDateRelative) {
-      return null
-    }
-
+    const nextReconcileDateRelative = formattedTimeFromNow(timestamp)
     const l10nDataArgs = {
       reconcileDate: nextReconcileDateRelative
     }
@@ -1251,14 +1197,7 @@ class PaymentsTab extends ImmutableComponent {
     }
     if (this.props.ledgerData.get('btc') && typeof this.props.ledgerData.get('amount') === 'number') {
       const btcValue = this.props.ledgerData.get('btc') / this.props.ledgerData.get('amount')
-      const fiatValue = (balance / btcValue).toFixed(2)
-      let roundedValue = Math.floor(fiatValue)
-      const diff = fiatValue - roundedValue
-
-      if (diff > 0.74) roundedValue += 0.75
-      else if (diff > 0.49) roundedValue += 0.50
-      else if (diff > 0.24) roundedValue += 0.25
-      return `${roundedValue.toFixed(2)} ${currency}`
+      return `${(balance / btcValue).toFixed(2)} ${currency}`
     }
     return `${balance} BTC`
   }
@@ -1343,7 +1282,7 @@ class PaymentsTab extends ImmutableComponent {
               </td>
               <td>
                 <div className='walletStatus' data-l10n-id={this.walletStatus.id} data-l10n-args={this.walletStatus.args ? JSON.stringify(this.walletStatus.args) : null} />
-                {this.nextReconcileMessage}
+                {this.nextReconcileDate}
               </td>
             </tr>
           </tbody>
@@ -1380,16 +1319,6 @@ class PaymentsTab extends ImmutableComponent {
         ? <ModalOverlay title={'ledgerRecoveryTitle'} content={this.ledgerRecoveryContent} footer={this.ledgerRecoveryFooter} onHide={this.props.hideOverlay.bind(this, 'ledgerRecovery')} />
         : null
       }
-      <div className='advancedSettingsWrapper'>
-        {
-          this.props.ledgerData.get('created') && this.enabled
-          ? <Button
-            l10nId='advancedSettings'
-            className='advancedSettings whiteButton'
-            onClick={this.props.showOverlay.bind(this, 'advancedSettings')} />
-          : null
-        }
-      </div>
       <div className='titleBar'>
         <div className='sectionTitleWrapper pull-left'>
           <span className='sectionTitle'>Brave Payments</span>
@@ -1400,14 +1329,7 @@ class PaymentsTab extends ImmutableComponent {
             <span data-l10n-id='off' />
             <SettingCheckbox dataL10nId='on' prefKey={settings.PAYMENTS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
           </div>
-          {
-            this.props.ledgerData.get('created') && this.enabled
-            ? <div className='autoSuggestSwitch'>
-              <SettingCheckbox dataL10nId='autoSuggestSites' prefKey={settings.AUTO_SUGGEST_SITES} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-              <a className='moreInfoBtn fa fa-question-circle' href='https://brave.com/Payments_FAQ.html' target='_blank' data-l10n-id='paymentsFAQLink' />
-            </div>
-            : null
-          }
+          { this.props.ledgerData.get('created') && this.enabled ? <Button l10nId='advancedSettings' className='advancedSettings whiteButton' onClick={this.props.showOverlay.bind(this, 'advancedSettings')} /> : null }
         </div>
       </div>
       {
@@ -1626,7 +1548,7 @@ class SecurityTab extends ImmutableComponent {
     this.clearBrowsingDataNow = this.clearBrowsingDataNow.bind(this)
   }
   clearBrowsingDataNow () {
-    aboutActions.clearBrowsingDataNow()
+    aboutActions.clearBrowsingDataNow({browserHistory: true})
   }
   onToggleFlash (e) {
     aboutActions.setResourceEnabled(flash, e.target.value)
@@ -1905,15 +1827,6 @@ class AboutPreferences extends React.Component {
     this.updateTabFromAnchor = this.updateTabFromAnchor.bind(this)
   }
 
-  hideAdvancedOverlays () {
-    this.setState({
-      advancedSettingsOverlayVisible: false,
-      ledgerBackupOverlayVisible: false,
-      ledgerRecoveryOverlayVisible: false
-    })
-    this.forceUpdate()
-  }
-
   componentDidMount () {
     window.addEventListener('popstate', this.updateTabFromAnchor)
   }
@@ -2039,8 +1952,7 @@ class AboutPreferences extends React.Component {
           ledgerRecoveryOverlayVisible={this.state.ledgerRecoveryOverlayVisible}
           addFundsOverlayVisible={this.state.addFundsOverlayVisible}
           showOverlay={this.setOverlayVisible.bind(this, true)}
-          hideOverlay={this.setOverlayVisible.bind(this, false)}
-          hideAdvancedOverlays={this.hideAdvancedOverlays.bind(this)} />
+          hideOverlay={this.setOverlayVisible.bind(this, false)} />
         break
       case preferenceTabs.SECURITY:
         tab = <SecurityTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />

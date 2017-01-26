@@ -286,11 +286,6 @@ describe('siteUtil', function () {
           assert.equal(!!processedSites.getIn([0, 'lastAccessedTime']), true)
           assert.deepEqual(processedSites.getIn([0, 'tags']).toJS(), [])
         })
-        it('returns newSiteDetail value for lastAccessedTime when oldSite value is undefined', function () {
-          const processedSites = siteUtil.addSite(emptySites, bookmarkAllFields)
-          const expectedSites = Immutable.fromJS([bookmarkAllFields])
-          assert.deepEqual(processedSites.getIn([0, 'lastAccessedTime']), expectedSites.getIn([0, 'lastAccessedTime']))
-        })
       })
     })
     describe('for existing entries (oldSite is an existing siteDetail)', function () {
@@ -344,23 +339,6 @@ describe('siteUtil', function () {
         const processedSites = siteUtil.addSite(sites, newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
         const expectedSites = Immutable.fromJS([newSiteDetail])
         assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
-      })
-      it('returns oldSiteDetail value for lastAccessedTime when newSite value is undefined', function () {
-        const oldSiteDetail = Immutable.fromJS({
-          lastAccessedTime: 456,
-          location: testUrl1,
-          title: 'a brave title'
-        })
-        const newSiteDetail = Immutable.fromJS({
-          tags: [siteTags.BOOKMARK],
-          location: testUrl1,
-          title: 'a brave title'
-        })
-
-        const sites = Immutable.fromJS([oldSiteDetail])
-        const processedSites = siteUtil.addSite(sites, newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
-        const expectedSites = sites
-        assert.deepEqual(processedSites.getIn([0, 'lastAccessedTime']), expectedSites.getIn([0, 'lastAccessedTime']))
       })
     })
   })

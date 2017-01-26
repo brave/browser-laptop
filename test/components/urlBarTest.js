@@ -27,7 +27,7 @@ describe('urlBar tests', function () {
       yield this.app.client.waitForExist(urlInput)
       yield this.app.client.waitForElementFocus(urlInput)
       yield this.app.client
-        .onClearBrowsingData({browserHistory: true})
+        .clearAppData({browserHistory: true})
         .addSite({ location: 'https://brave.com', title: 'Brave' })
     })
 
@@ -69,7 +69,7 @@ describe('urlBar tests', function () {
         return this.getValue(urlInput).then((val) => val === '')
       })
       yield this.app.client
-        .onClearBrowsingData({browserHistory: true})
+        .clearAppData({browserHistory: true})
         .addSite({ location: 'https://brave.com', title: 'Brave' })
         .addSite({ location: 'https://brave.com/test' })
         .addSite({ location: 'https://www.youtube.com' })

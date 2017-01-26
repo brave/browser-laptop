@@ -785,8 +785,8 @@ class Frame extends ImmutableComponent {
           }
           break
         case messages.CLEAR_BROWSING_DATA_NOW:
-          method = () =>
-            windowActions.setClearBrowsingDataPanelVisible(true)
+          method = (clearBrowsingDataDetail) =>
+            windowActions.setClearBrowsingDataDetail(clearBrowsingDataDetail)
           break
         case messages.AUTOFILL_SET_ADDRESS:
           method = (currentDetail, originalDetail) =>

@@ -964,13 +964,12 @@ const windowActions = {
   },
 
   /**
-   * Sets whether the clear browsing data popup is visible
-   * @param {boolean} isVisible
+   * Sets the clear browsing data popup detail
    */
-  setClearBrowsingDataPanelVisible: function (isVisible) {
+  setClearBrowsingDataDetail: function (clearBrowsingDataDetail) {
     dispatch({
-      actionType: windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_VISIBLE,
-      isVisible
+      actionType: windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL,
+      clearBrowsingDataDetail
     })
   },
 

@@ -9,18 +9,6 @@ const LRUCache = require('lru_cache/core').LRUCache
 
 let cachedBaseDomain = new LRUCache(50)
 
-const checkASCII = function (str) {
-  if (typeof str !== 'string') {
-    return false
-  }
-  for (let i = 0; i < str.length; i++) {
-    if (str.charCodeAt(i) > 127) {
-      return false
-    }
-  }
-  return true
-}
-
 /**
  * Returns base domain for specified host based on Public Suffix List.
  * @param {string} hostname The name of the host to get the base domain for
@@ -28,13 +16,8 @@ const checkASCII = function (str) {
 
 module.exports.getBaseDomain = function (hostname) {
   // decode punycode if exists
-  if (hostname.indexOf('xn--') >= 0 &&
-    checkASCII(hostname)) {
-    try {
-      hostname = punycode.toUnicode(hostname)
-    } catch (e) {
-      console.error('punnycode.toUnicode() failure:', e)
-    }
+  if (hostname.indexOf('xn--') >= 0) {
+    hostname = punycode.toUnicode(hostname)
   }
 
   let baseDomain = cachedBaseDomain.get(hostname)

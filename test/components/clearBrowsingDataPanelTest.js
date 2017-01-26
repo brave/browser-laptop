@@ -1,7 +1,7 @@
 /* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
-const {urlInput, braveMenu, noScriptSwitch, braveryPanel, notificationBar, clearBrowsingDataButton, securityTab, clearDataButton} = require('../lib/selectors')
+const {urlInput, braveMenu, noScriptSwitch, braveryPanel, notificationBar, clearBrowsingDataButton, securityTab} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 const messages = require('../../js/constants/messages')
 
@@ -21,71 +21,13 @@ describe('Clear Browsing Panel', function () {
       .waitForVisible(braveryPanel)
   }
 
-  function * openClearBrowsingDataPanel (client) {
-    return client
-      .tabByIndex(0)
-      .loadUrl(getTargetAboutUrl('about:preferences'))
-      .waitForVisible(securityTab)
-      .click(securityTab)
-      .waitForVisible(clearBrowsingDataButton)
-      .click(clearBrowsingDataButton)
-      .waitForBrowserWindow()
-  }
-
-  describe('with saved state values', function () {
-    Brave.beforeEach(this)
-    beforeEach(function * () {
-      const page1Url = Brave.server.url('page1.html')
-      yield setup(this.app.client)
-      yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(page1Url)
-        .waitForBrowserWindow()
-    })
-
-    it('saves the history switch state', function * () {
-      const page1Url = Brave.server.url('page1.html')
-      const browserHistorySwitch = '.browserHistorySwitch'
-      yield openClearBrowsingDataPanel(this.app.client)
-      yield this.app.client
-        .waitForVisible(browserHistorySwitch)
-        .waitForVisible(clearDataButton)
-        .click(`${browserHistorySwitch} .switchBackground`)
-        .click(clearDataButton)
-        .waitUntil(function () {
-          return this.getAppState().then((val) => {
-            return val.value.sites.length === 0
-          })
-        })
-      yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(page1Url)
-        .waitForBrowserWindow()
-        .waitUntil(function () {
-          return this.getAppState().then((val) => {
-            return val.value.sites.length === 1
-          })
-        })
-      yield openClearBrowsingDataPanel(this.app.client)
-      yield this.app.client
-        .waitForVisible(`${browserHistorySwitch} .switchedOn`)
-        .waitForVisible(clearDataButton)
-        .click(clearDataButton)
-        .waitUntil(function () {
-          return this.getAppState().then((val) => {
-            return val.value.sites.length === 0
-          })
-        })
-    })
-  })
-
   describe('with history', function () {
     Brave.beforeEach(this)
     beforeEach(function * () {
       const page1Url = Brave.server.url('page1.html')
       yield setup(this.app.client)
       yield this.app.client
-        .onClearBrowsingData({browserHistory: true})
+        .clearAppData({browserHistory: true})
         .tabByIndex(0)
         .loadUrl(page1Url)
         .waitForBrowserWindow()
@@ -117,8 +59,8 @@ describe('Clear Browsing Panel', function () {
         .click(clearBrowsingDataButton)
         .waitForBrowserWindow()
         .waitForVisible('.browserHistorySwitch')
-        .waitForVisible(clearDataButton)
-        .click(clearDataButton)
+        .waitForVisible('.clearDataButton')
+        .click('.clearDataButton')
         .waitUntil(function () {
           return this.getAppState().then((val) => {
             return val.value.sites.length === 0
@@ -133,7 +75,7 @@ describe('Clear Browsing Panel', function () {
       const page1Url = Brave.server.url('page1.html')
       yield setup(this.app.client)
       yield this.app.client
-        .onClearBrowsingData({browserHistory: true})
+        .clearAppData({browserHistory: true})
         .tabByIndex(0)
         .loadUrl(page1Url)
         .waitForBrowserWindow()
@@ -160,7 +102,7 @@ describe('Clear Browsing Panel', function () {
             return val.value.closedFrames.length === 1
           })
         })
-        .onClearBrowsingData({browserHistory: true})
+        .clearAppData({browserHistory: true})
         .waitUntil(function () {
           return this.getWindowState().then((val) => {
             return val.value.closedFrames.length === 0
@@ -207,8 +149,8 @@ describe('Clear Browsing Panel', function () {
         .waitForBrowserWindow()
         .waitForVisible('.siteSettingsSwitch')
         .click('.siteSettingsSwitch .switchBackground')
-        .waitForVisible(clearDataButton)
-        .click(clearDataButton)
+        .waitForVisible('.clearDataButton')
+        .click('.clearDataButton')
         .waitUntil(function () {
           return this.getAppState().then((val) => {
             return Object.keys(val.value.siteSettings).length === 0

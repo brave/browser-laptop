@@ -249,6 +249,16 @@ module.exports.importBrowserDataMenuItem = () => {
   }
 }
 
+module.exports.reportAnIssueMenuItem = () => {
+  return {
+    label: locale.translation('reportAnIssue'),
+    click: function (item, focusedWindow) {
+      module.exports.sendToFocusedWindow(focusedWindow,
+                                         [messages.SHORTCUT_NEW_FRAME, communityURL])
+    }
+  }
+}
+
 module.exports.submitFeedbackMenuItem = () => {
   return {
     label: locale.translation('submitFeedback'),

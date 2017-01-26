@@ -11,19 +11,6 @@ const dndData = require('../../../js/dndData')
 const {isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
 const searchIconSize = 16
 
-const getIconCssClass = (ctx) => {
-  if (ctx.isSearch) {
-    return 'fa-search'
-  } else if (ctx.isAboutPage && !ctx.props.titleMode) {
-    return 'fa-list'
-  } else if (ctx.isSecure) {
-    // NOTE: EV style not approved yet; see discussion at https://github.com/brave/browser-laptop/issues/791
-    return 'fa-lock'
-  } else if (ctx.isInsecure) {
-    return 'fa-unlock'
-  }
-}
-
 class UrlBarIcon extends ImmutableComponent {
   constructor () {
     super()
@@ -48,15 +35,18 @@ class UrlBarIcon extends ImmutableComponent {
   }
   /**
    * search icon:
+   * - does not show when loading
    * - does not show when in title mode
    * - shows when urlbar is active (ex: you can type)
    * - is a catch-all for: about pages, files, etc
    */
   get isSearch () {
-    const showSearch = this.props.isSearching && !this.props.titleMode
+    const showSearch = this.props.active &&
+                       this.props.loading === false
 
     const defaultToSearch = (!this.isSecure && !this.isInsecure && !showSearch) &&
                             !this.props.titleMode &&
+                            this.props.loading === false &&
                             !this.isAboutPage
 
     return showSearch || defaultToSearch
@@ -73,7 +63,11 @@ class UrlBarIcon extends ImmutableComponent {
     return cx({
       urlbarIcon: true,
       'fa': true,
-      [ getIconCssClass(this) ]: true
+      // NOTE: EV style not approved yet; see discussion at https://github.com/brave/browser-laptop/issues/791
+      'fa-lock': this.isSecure,
+      'fa-unlock': this.isInsecure,
+      'fa-search': this.isSearch && !this.isAboutPage,
+      'fa-list': this.isAboutPage && !this.props.titleMode
     })
   }
   get iconStyles () {

@@ -57,8 +57,6 @@ class CertErrorPage extends React.Component {
       var validExpiry = new Date()
       validStart.setTime(detail.validStart * 1000)
       validExpiry.setTime(detail.validExpiry * 1000)
-      var fingerprint = detail.fingerprint.split('/')
-      var algorithm = fingerprint.shift()
       this.setState({
         certDetail: true,
         certIssuerName: detail.issuerName,
@@ -66,7 +64,7 @@ class CertErrorPage extends React.Component {
         certSerialNumber: seperateHex(detail.serialNumber),
         certValidStart: validStart.toString(),
         certValidExpiry: validExpiry.toString(),
-        certFingerprint: [algorithm, fingerprint.join('/')]
+        certFingerprint: detail.fingerprint.split('/')
       })
     })
   }

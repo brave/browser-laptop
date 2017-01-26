@@ -92,7 +92,7 @@ Adds a site to the site list
 
 ### clearHistory() 
 
-Clears history (all sites without tags). Indirectly called by appActions.onClearBrowsingData().
+Clears history (all sites without tags). Indirectly called by appActions.clearAppData().
 
 
 
@@ -146,13 +146,13 @@ Dispatches a message to clear all completed downloads
 
 ### ledgerRecoverySucceeded() 
 
-Dispatches a message indicating ledger recovery succeeded
+Dispatches a message to clear all completed downloads
 
 
 
 ### ledgerRecoveryFailed() 
 
-Dispatches a message indicating ledger recovery failed
+Dispatches a message to clear all completed downloads
 
 
 
@@ -403,13 +403,13 @@ Adds information about pending basic auth login requests
 
 
 
-### onClearBrowsingData(clearDataDetail) 
+### clearAppData(clearDataDetail) 
 
-Clears the data specified in clearDataDetail
+Clears the data specified in dataDetail
 
 **Parameters**
 
-**clearDataDetail**: `object`, the app data to clear as per doc/state.md's clearBrowsingDataDefaults
+**clearDataDetail**: `object`, the app data to clear as per doc/state.md's clearBrowsingDataDetail
 
 
 
