@@ -857,23 +857,11 @@ Used by `main.js` when click happens on content area (not on a link or react con
 
 
 
-### setMenuBarSelectedIndex(index) 
+### setSubmenuSelectedIndex(index) 
 
 (Windows only)
-Used to track selected index of a menu bar
-Needed because arrow keys can be used to navigate the custom menu
-
-**Parameters**
-
-**index**: `number`, zero based index of the item.
-  Index excludes menu separators and hidden items.
-
-
-
-### setContextMenuSelectedIndex(index) 
-
 Used to track selected index of a context menu
-Needed because arrow keys can be used to navigate the context menu
+Needed because arrow keys can be used to navigate the custom menu
 
 **Parameters**
 

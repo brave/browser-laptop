@@ -1092,27 +1092,14 @@ const windowActions = {
 
   /**
    * (Windows only)
-   * Used to track selected index of a menu bar
+   * Used to track selected index of a context menu
    * Needed because arrow keys can be used to navigate the custom menu
    * @param {number} index - zero based index of the item.
    *   Index excludes menu separators and hidden items.
    */
-  setMenuBarSelectedIndex: function (index) {
+  setSubmenuSelectedIndex: function (index) {
     dispatch({
-      actionType: windowConstants.WINDOW_SET_MENUBAR_SELECTED_INDEX,
-      index
-    })
-  },
-
-  /**
-   * Used to track selected index of a context menu
-   * Needed because arrow keys can be used to navigate the context menu
-   * @param {number} index - zero based index of the item.
-   *   Index excludes menu separators and hidden items.
-   */
-  setContextMenuSelectedIndex: function (index) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_CONTEXT_MENU_SELECTED_INDEX,
+      actionType: windowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX,
       index
     })
   },

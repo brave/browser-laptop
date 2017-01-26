@@ -53,19 +53,22 @@ class MenubarItem extends ImmutableComponent {
     }
     // If clicking on an already selected item, deselect it
     const selected = this.props.menubar.props.selectedIndex
+      ? this.props.menubar.props.selectedIndex[0]
+      : null
     if (selected && selected === this.props.index) {
       windowActions.setContextMenuDetail()
-      windowActions.setMenuBarSelectedIndex()
+      windowActions.setSubmenuSelectedIndex()
       return
     }
     // Otherwise, mark item as selected and show its context menu
-    windowActions.setMenuBarSelectedIndex(this.props.index)
-    windowActions.setContextMenuSelectedIndex([0])
+    windowActions.setSubmenuSelectedIndex([this.props.index])
     const rect = e.target.getBoundingClientRect()
     showContextMenu(rect, this.props.submenu, this.props.lastFocusedSelector)
   }
   onMouseOver (e) {
     const selected = this.props.menubar.props.selectedIndex
+      ? this.props.menubar.props.selectedIndex[0]
+      : null
     if (typeof selected === 'number' && selected !== this.props.index) {
       this.onClick(e)
     }
@@ -99,74 +102,195 @@ class Menubar extends ImmutableComponent {
   }
 
   /**
+   * Used to get the submenu of a top level menu like File, Edit, etc.
+   * Index will default to the selected menu if not provided / valid.
+   */
+  getTemplate (index) {
+    if (typeof index !== 'number') index = this.props.selectedIndex[0]
+    return this.props.template.get(index).get('submenu')
+  }
+  /**
+   * Same as getTemplate but excluding line separators and items that are not visible.
+   */
+  getTemplateItemsOnly (index) {
+    return this.getTemplate(index).filter((element) => {
+      if (element.get('type') === separatorMenuItem.type) return false
+      if (element.has('visible')) return element.get('visible')
+      return true
+    })
+  }
+  /**
    * Get client rect for the MenubarItem controls.
    * Used to position the context menu object.
    */
   getMenubarItemBounds (index) {
-    if (typeof index !== 'number') index = this.props.selectedIndex
+    if (typeof index !== 'number') index = this.props.selectedIndex[0]
     const selected = document.querySelectorAll('.menubar .menubarItem[data-index=\'' + index + '\']')
     if (selected.length === 1) {
       return selected.item(0).getBoundingClientRect()
     }
     return null
   }
+  /**
+   * Get client rect for the actively selected ContextMenu.
+   * Used to position the child menu if parent has children.
+   */
+  getContextMenuItemBounds () {
+    const selected = document.querySelectorAll('.contextMenuItem.selectedByKeyboard')
+    if (selected.length > 0) {
+      return selected.item(selected.length - 1).getBoundingClientRect()
+    }
+    return null
+  }
+  /**
+   * Returns index for the active / focused menu.
+   */
+  get currentIndex () {
+    return this.props.selectedIndex[this.props.selectedIndex.length - 1]
+  }
+  /**
+   * Upper bound for the active / focused menu.
+   */
+  get maxIndex () {
+    return this.getMenuByIndex().size - 1
+  }
+  /**
+   * Returns true is current state is inside a regular menu.
+   */
+  get hasMenuSelection () {
+    return this.props.selectedIndex.length > 1
+  }
+  /**
+   * Returns true if current state is inside a submenu.
+   */
+  get hasSubmenuSelection () {
+    return this.props.selectedIndex.length > 2
+  }
+  /**
+   * Fetch menu based on selected index.
+   * Will navigate children to find nested menus.
+   */
+  getMenuByIndex (parentItem, currentDepth) {
+    if (!parentItem) parentItem = this.getTemplateItemsOnly()
+    if (!currentDepth) currentDepth = 0
+
+    const selectedIndices = this.props.selectedIndex.slice(1)
+    if (selectedIndices.length === 0) return parentItem
+
+    const submenuIndex = selectedIndices[currentDepth]
+    const childItem = parentItem.get(submenuIndex)
+
+    if (childItem && childItem.get('submenu') && currentDepth < (selectedIndices.length - 1)) {
+      return this.getMenuByIndex(childItem.get('submenu'), currentDepth + 1)
+    }
+
+    return parentItem
+  }
 
   onKeyDown (e) {
     const selectedIndex = this.props.selectedIndex
-    const template = this.props.template
-    const contextMenuIndex = this.props.contextMenuSelectedIndex
 
-    if (!template) return
+    if (!selectedIndex || !this.props.template) return
 
     switch (e.which) {
+      case keyCodes.ENTER:
+        e.preventDefault()
+        const selectedLabel = this.getMenuByIndex().getIn([this.currentIndex, 'label'])
+        windowActions.clickMenubarSubmenu(selectedLabel)
+        windowActions.resetMenuState()
+        break
+
       case keyCodes.LEFT:
       case keyCodes.RIGHT:
-        if (contextMenuIndex !== null) {
-          const currentTemplate = template.get(selectedIndex).get('submenu').filter((element) => {
-            if (element.get('type') === separatorMenuItem.type) return false
-            if (element.has('visible')) return element.get('visible')
-            return true
-          }).get(contextMenuIndex[0])
+        e.preventDefault()
 
-          if (currentTemplate && currentTemplate.has('submenu')) {
-            break
-          }
+        // Left arrow inside a submenu
+        // <= go back one level
+        if (e.which === keyCodes.LEFT && this.hasSubmenuSelection) {
+          const newIndices = selectedIndex.slice()
+          newIndices.pop()
+          windowActions.setSubmenuSelectedIndex(newIndices)
+
+          let openedSubmenuDetails = this.props.contextMenuDetail.get('openedSubmenuDetails')
+            ? this.props.contextMenuDetail.get('openedSubmenuDetails')
+            : new Immutable.List()
+          openedSubmenuDetails = openedSubmenuDetails.pop()
+
+          windowActions.setContextMenuDetail(this.props.contextMenuDetail.set('openedSubmenuDetails', openedSubmenuDetails))
+          break
         }
 
-        e.preventDefault()
-        e.stopPropagation()
+        const selectedMenuItem = selectedIndex
+          ? this.getMenuByIndex().get(this.currentIndex)
+          : null
+
+        // Right arrow on a menu item which has a submenu
+        // => go up one level (default next menu to item 0)
+        if (e.which === keyCodes.RIGHT && selectedMenuItem && selectedMenuItem.has('submenu')) {
+          const newIndices = selectedIndex.slice()
+          newIndices.push(0)
+          windowActions.setSubmenuSelectedIndex(newIndices)
+
+          let openedSubmenuDetails = this.props.contextMenuDetail.get('openedSubmenuDetails')
+            ? this.props.contextMenuDetail.get('openedSubmenuDetails')
+            : new Immutable.List()
+
+          const rect = this.getContextMenuItemBounds()
+          const itemHeight = (rect.bottom - rect.top)
+
+          openedSubmenuDetails = openedSubmenuDetails.push(Immutable.fromJS({
+            y: (rect.top - itemHeight),
+            template: selectedMenuItem.get('submenu')
+          }))
+
+          windowActions.setContextMenuDetail(this.props.contextMenuDetail.set('openedSubmenuDetails', openedSubmenuDetails))
+          break
+        }
 
         // Regular old menu item
         const nextIndex = selectedIndex === null
           ? 0
           : wrappingClamp(
-              selectedIndex + (e.which === keyCodes.LEFT ? -1 : 1),
+              selectedIndex[0] + (e.which === keyCodes.LEFT ? -1 : 1),
               0,
               this.props.template.size - 1)
 
-        windowActions.setMenuBarSelectedIndex(nextIndex)
-
+        // Context menu already being displayed; auto-open the next one
         if (this.props.contextMenuDetail) {
-          windowActions.setContextMenuSelectedIndex([0])
-          showContextMenu(this.getMenubarItemBounds(nextIndex), template.get(nextIndex).get('submenu').toJS(), this.props.lastFocusedSelector)
+          windowActions.setSubmenuSelectedIndex([nextIndex, 0])
+          showContextMenu(this.getMenubarItemBounds(nextIndex), this.getTemplate(nextIndex).toJS(), this.props.lastFocusedSelector)
         } else {
-          windowActions.setContextMenuSelectedIndex()
-        }
-        break
-
-      case keyCodes.DOWN:
-      case keyCodes.ENTER:
-        e.preventDefault()
-        if (contextMenuIndex === null && template.get(selectedIndex).has('submenu')) {
-          e.stopPropagation()
-          windowActions.setContextMenuSelectedIndex([0])
-          showContextMenu(this.getMenubarItemBounds(selectedIndex), template.get(selectedIndex).get('submenu').toJS(), this.props.lastFocusedSelector)
+          windowActions.setSubmenuSelectedIndex([nextIndex])
         }
         break
 
       case keyCodes.UP:
+      case keyCodes.DOWN:
         e.preventDefault()
+        if (this.getTemplateItemsOnly()) {
+          if (!this.props.contextMenuDetail) {
+            // First time hitting up/down; popup the context menu
+            const newIndices = selectedIndex.slice()
+            newIndices.push(0)
+            windowActions.setSubmenuSelectedIndex(newIndices)
+            showContextMenu(this.getMenubarItemBounds(), this.getTemplate().toJS(), this.props.lastFocusedSelector)
+          } else {
+            // Context menu already visible; move selection up or down
+            const nextIndex = wrappingClamp(
+              this.currentIndex + (e.which === keyCodes.UP ? -1 : 1),
+              0,
+              this.maxIndex)
 
+            const newIndices = selectedIndex.slice()
+            if (this.hasMenuSelection) {
+              newIndices[selectedIndex.length - 1] = nextIndex
+            } else {
+              newIndices.push(0)
+            }
+            windowActions.setSubmenuSelectedIndex(newIndices)
+          }
+        }
+        break
     }
   }
   shouldComponentUpdate (nextProps, nextState) {
@@ -185,7 +309,7 @@ class Menubar extends ImmutableComponent {
             lastFocusedSelector: this.props.lastFocusedSelector,
             menubar: this
           }
-          if (props.index === this.props.selectedIndex) {
+          if (this.props.selectedIndex && props.index === this.props.selectedIndex[0]) {
             props.selected = true
           }
           return <MenubarItem {...props} />
