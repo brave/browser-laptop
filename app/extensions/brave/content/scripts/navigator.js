@@ -9,7 +9,9 @@ chrome.webFrame.setGlobal("navigator.credentials.store", function () {
 
 // disable battery status API
 chrome.webFrame.setGlobal("navigator.getBattery", function () {
-  return new Promise((resolve, reject) => { reject(new Error('navigator.getBattery not supported.')) })
+  return new Promise((resolve, reject) => {
+    resolve({ charging: false, chargingTime: Infinity, dischargingTime: Infinity, level: 1, onchargingchange: null, onchargingtimechange: null, ondischargingtimechange: null, onlevelchange: null })
+  })
 })
 
 if (chrome.contentSettings.doNotTrack == 'allow') {
