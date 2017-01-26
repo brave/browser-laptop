@@ -1,6 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
+const screen = require('electron').screen
 
 const React = require('react')
 
@@ -20,6 +21,9 @@ const windowStore = require('../stores/windowStore')
 const ipc = require('electron').ipcRenderer
 
 const {TabIcon, AudioTabIcon} = require('../../app/renderer/components/tabIcon')
+
+const getSetting = require('../settings').getSetting
+const settings = require('../constants/settings')
 
 class Tab extends ImmutableComponent {
   constructor () {
@@ -129,13 +133,86 @@ class Tab extends ImmutableComponent {
   onMouseEnter (e) {
     // relatedTarget inside mouseenter checks which element before this event was the pointer on
     // if this element has a tab-like class, then it's likely that the user was previewing
-    // a sequency of tabs. Called here as previewMode.
+    // a sequence of tabs. Called here as previewMode.
     const previewMode = /tab(?!pages)/i.test(e.relatedTarget.classList)
 
     // If user isn't in previewMode, we add a bit of delay to avoid tab from flashing out
     // as reported here: https://github.com/brave/browser-laptop/issues/1434
+    let hoverTimeoutMs = 100
+    if (previewMode) {
+      hoverTimeoutMs = 0
+    }
+
+    let scalingFactor = { // scale by component dim so higher resolution displays don't feel different
+      x: e.target.clientWidth,
+      y: e.target.clientHeight
+    }
+
+    let getScaledCursorCoord = function () {
+      let cursorScreenPoint = screen.getCursorScreenPoint()
+      return {
+        x: (cursorScreenPoint.x / scalingFactor.x),
+        y: (cursorScreenPoint.y / scalingFactor.y),
+        timestamp: (new Date()).getTime()
+      }
+    }
+
+    let getMouseDelta = function (mouseCoordA, mouseCoordB) {
+      let delta = {
+        x: mouseCoordA.x - mouseCoordB.x,
+        y: mouseCoordA.y - mouseCoordB.y,
+        dt: (mouseCoordA.timestamp - mouseCoordB.timestamp) / 1000
+      }
+
+      delta.magnitude = Math.sqrt(delta.x * delta.x + delta.y * delta.y)
+      delta.velocity = delta.magnitude / delta.dt // relative coords / sec (if will leave in 1s, this would be 1)
+
+      return delta
+    }
+
+    this.mouseVecData = {
+      enterTimestamp: (new Date().getTime()),
+      lastVec: getScaledCursorCoord(),
+      delta: null
+    }
+
+    let hoverTimeoutFun = function () {
+      var curTimestamp = (new Date().getTime())
+
+      var mouseoverDuration = curTimestamp - this.mouseVecData.enterTimestamp
+
+      let lastVec = this.mouseVecData.lastVec
+      let curVec = getScaledCursorCoord()
+
+      let delta = getMouseDelta(curVec, lastVec)
+      let mouseVelocity = delta.velocity
+
+      this.mouseVecData.lastVec = curVec
+      this.mouseVecData.delta = delta
+
+      let TAB_PREVIEW_MOUSE_VELOCITY_THRESHOLD = getSetting(settings.TAB_PREVIEW_MOUSE_VELOCITY_THRESHOLD)
+      let TAB_PREVIEW_MOUSEOVER_DURATION_THRESHOLD = getSetting(settings.TAB_PREVIEW_MOUSEOVER_DURATION_THRESHOLD)
+
+      // If user is in "preview mode", let's increase the tolerated velocity by 50%
+      if (previewMode) {
+        TAB_PREVIEW_MOUSE_VELOCITY_THRESHOLD *= 1.5
+      }
+
+      let criterion = mouseVelocity < TAB_PREVIEW_MOUSE_VELOCITY_THRESHOLD || mouseoverDuration > TAB_PREVIEW_MOUSEOVER_DURATION_THRESHOLD
+
+      if (criterion) {
+        window.clearTimeout(this.hoverTimeout)
+        windowActions.setPreviewFrame(this.frame)
+
+        this.mouseVecData.enterTimestamp = null
+        this.mouseVecData.delta = null
+      } else {
+        this.hoverTimeout = window.setTimeout(hoverTimeoutFun, 100)
+      }
+    }.bind(this)
+
     this.hoverTimeout =
-      window.setTimeout(windowActions.setPreviewFrame.bind(null, this.frame), previewMode ? 0 : 200)
+      window.setTimeout(hoverTimeoutFun, hoverTimeoutMs)
   }
 
   onClickTab (e) {

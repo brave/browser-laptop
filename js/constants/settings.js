@@ -24,6 +24,8 @@ const settings = {
   PAINT_TABS: 'tabs.paint-tabs',
   TABS_PER_PAGE: 'tabs.tabs-per-page',
   SHOW_TAB_PREVIEWS: 'tabs.show-tab-previews',
+  TAB_PREVIEW_MOUSE_VELOCITY_THRESHOLD: 'tabs.tab-previews.mouse-velocity-threshold',
+  TAB_PREVIEW_MOUSEOVER_DURATION_THRESHOLD: 'tabs.tab-previews.mouseover-duration-threshold-ms',
   // Privacy Tab
   HISTORY_SUGGESTIONS: 'privacy.history-suggestions',
   BOOKMARK_SUGGESTIONS: 'privacy.bookmark-suggestions',

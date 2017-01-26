@@ -117,6 +117,8 @@ module.exports = {
     'tabs.paint-tabs': true,
     'tabs.tabs-per-page': 10,
     'tabs.show-tab-previews': true,
+    'tabs.tab-previews.mouse-velocity-threshold': 0.5,
+    'tabs.tab-previews.mouseover-duration-threshold-ms': 1250,
     'privacy.history-suggestions': true,
     'privacy.bookmark-suggestions': true,
     'privacy.opened-tab-suggestions': true,
