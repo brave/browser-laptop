@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.13.1](https://github.com/brave/browser-laptop/releases/v0.13.1dev)
+- TODO
+
 ## [0.13.0](https://github.com/brave/browser-laptop/releases/v0.13.0dev)
 - Added WebTorrent support for magnet links. ([#5818](https://github.com/brave/browser-laptop/issues/5818))([#5815](https://github.com/brave/browser-laptop/issues/5815))
 - Added Linux sandbox. ([#874](https://github.com/brave/browser-laptop/issues/874))
