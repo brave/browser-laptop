@@ -114,6 +114,7 @@ app.on('will-finish-launching', () => {
   // User clicked on a file or dragged a file to the dock on macOS
   app.on('open-file', (event, path) => {
     event.preventDefault()
+    path = encodeURI(path)
     if (!focusOrOpenWindow(path)) {
       newWindowURL = path
     }

@@ -128,7 +128,7 @@ const appActions = {
   },
 
   /**
-   * Clears history (all sites without tags). Indirectly called by appActions.clearAppData().
+   * Clears history (all sites without tags). Indirectly called by appActions.onClearBrowsingData().
    */
   clearHistory: function () {
     AppDispatcher.dispatch({
@@ -192,7 +192,7 @@ const appActions = {
   },
 
   /**
-   * Dispatches a message to clear all completed downloads
+   * Dispatches a message indicating ledger recovery succeeded
    */
   ledgerRecoverySucceeded: function () {
     AppDispatcher.dispatch({
@@ -201,7 +201,7 @@ const appActions = {
   },
 
   /**
-   * Dispatches a message to clear all completed downloads
+   * Dispatches a message indicating ledger recovery failed
    */
   ledgerRecoveryFailed: function () {
     AppDispatcher.dispatch({
@@ -492,12 +492,12 @@ const appActions = {
   },
 
   /**
-   * Clears the data specified in dataDetail
-   * @param {object} clearDataDetail - the app data to clear as per doc/state.md's clearBrowsingDataDetail
+   * Clears the data specified in clearDataDetail
+   * @param {object} clearDataDetail - the app data to clear as per doc/state.md's clearBrowsingDataDefaults
    */
-  clearAppData: function (clearDataDetail) {
+  onClearBrowsingData: function (clearDataDetail) {
     AppDispatcher.dispatch({
-      actionType: appConstants.APP_CLEAR_DATA,
+      actionType: appConstants.APP_ON_CLEAR_BROWSING_DATA,
       clearDataDetail
     })
   },

@@ -473,6 +473,11 @@ const doAction = (action) => {
     case windowConstants.WINDOW_AUTOFILL_POPUP_HIDDEN:
     case windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL:
       if (!action.detail) {
+        if (windowState.getIn(['contextMenuDetail', 'type']) === 'hamburgerMenu') {
+          windowState = windowState.set('hamburgerMenuWasOpen', true)
+        } else {
+          windowState = windowState.set('hamburgerMenuWasOpen', false)
+        }
         windowState = windowState.delete('contextMenuDetail')
 
         if (windowState.getIn(['contextMenuDetail', 'type']) === 'autofill' &&
@@ -482,7 +487,10 @@ const doAction = (action) => {
           }
         }
       } else {
-        windowState = windowState.set('contextMenuDetail', action.detail)
+        if (!(action.detail.get('type') === 'hamburgerMenu' && windowState.get('hamburgerMenuWasOpen'))) {
+          windowState = windowState.set('contextMenuDetail', action.detail)
+        }
+        windowState = windowState.set('hamburgerMenuWasOpen', false)
       }
       break
     case windowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL:
@@ -567,12 +575,8 @@ const doAction = (action) => {
         })
       }
       break
-    case windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL:
-      if (!action.clearBrowsingDataDetail) {
-        windowState = windowState.delete('clearBrowsingDataDetail')
-      } else {
-        windowState = windowState.set('clearBrowsingDataDetail', Immutable.fromJS(action.clearBrowsingDataDetail))
-      }
+    case windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_VISIBLE:
+      windowState = windowState.setIn(['ui', 'isClearBrowsingDataPanelVisible'], action.isVisible)
       break
     case windowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_DETAIL:
       if (!action.importBrowserDataDetail) {
@@ -758,10 +762,10 @@ ipc.on(messages.SHORTCUT_PREV_TAB, () => {
   emitChanges()
 })
 
-ipc.on(messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, (e, clearBrowsingDataDetail) => {
+ipc.on(messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, (e) => {
   doAction({
-    actionType: windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL,
-    clearBrowsingDataDetail
+    actionType: windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_VISIBLE,
+    isVisible: true
   })
 })
 

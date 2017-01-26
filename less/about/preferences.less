@@ -454,16 +454,22 @@ table.sortableTable {
   }
 }
 
+// about:preferences#payments
 .paymentsContainer {
-
-  @walletTableData: 235px + 30px; // .walletBar td (min-width + padding)
-  @barMargin: 15px 0 30px;
   @fontSize: 14.5px; // .form-control
+
+  @walletBarTableRowWidth: 235px;
+  @walletBarTableData: @walletBarTableRowWidth + 30px; // .walletBar td (min-width + padding)
+  @walletBarMargin: 15px;
+  @walletBarItemMargin: 12px;
+  @walletBarPadding: @walletBarItemMargin * 1.5;
 
   position: relative;
   overflow-x: hidden;
   width: 805px;
 
+  // General properties on about:preferences#payments.
+  // Make sure any change here could cause unexpected regressions.
   a {
     text-decoration: none;
 
@@ -477,15 +483,21 @@ table.sortableTable {
     font-weight: 600;
   }
 
-  .sort {
-    text-align: left;
+  & > table,
+  & > table tbody {
+    border: none;
+    padding: 50px;
+    margin: 0 auto;
+    width: 80%;
   }
 
+  // This defines the styling of modal dialogs on "Add funds..." and "Advanced Settings..."
   .modal {
     .dialog {
       background: linear-gradient(@modalVeryLightGray, @modalLightGray);
       border-radius: @borderRadiusModal;
 
+      // Specific properties of the Coinbase overlay displayed by clicking "Fund with debit/credit"
       &.coinbaseOverlay {
         background: transparent;
 
@@ -495,6 +507,7 @@ table.sortableTable {
         }
       }
 
+      // Specific properties of the Payment History
       &.paymentHistory {
         @padding-horizontal: 30px;
 
@@ -593,6 +606,7 @@ table.sortableTable {
         }
       }
 
+      // General properties of the header on the modal dialogs
       .dialog-header {
         .sectionTitle {
           margin-bottom: 0;
@@ -600,19 +614,23 @@ table.sortableTable {
         }
       }
 
+      // General properties of the body on the modal dialogs
       .dialog-body {
         .board {
           .panel {
             @margin-bottom-header: .5em;
 
+            // This removes the margin which increases the size of the dialog-header
             &:first-child {
               margin-top: 0;
             }
 
+            // This removes the margin which increases the size of the dialog-footer
             &:last-child {
               margin-bottom: 0;
             }
 
+            // This makes the width of the content on Advanced Settings consistent
             &.advancedSettings,
             &.ledgerBackupContent,
             &.recoveryContent {
@@ -631,7 +649,8 @@ table.sortableTable {
               .settingsPanelDivider {
                 width: 100%;
 
-                &:first-child { // select elements
+                // This defines select elements on Advanced Settings (left side)
+                &:first-child {
                   .minimumPageTimeSetting,
                   .minimumVisitsSetting {
                     margin-bottom: @margin-bottom-header;
@@ -642,7 +661,10 @@ table.sortableTable {
                   }
                 }
 
-                &:last-child { // switches
+                // This defines switches on Advanced Settings (right side)
+                // "position: relative" and "left: 1em" create the margin between select elements and switches.
+                // "margin-left: 1em" decreases the width of the left side, so it should not be used here.
+                &:last-child {
                   display: flex;
                   align-items: center;
                   width: auto;
@@ -730,6 +752,7 @@ table.sortableTable {
             }
           }
 
+          // This defines styling of the overlay on "Recover your wallet"
           .recoveryOverlay {
             background-color: @black75;
             border: 1px solid @black75;
@@ -757,7 +780,6 @@ table.sortableTable {
         }
 
         .bitcoinDashboard {
-
           .coinbaseLogo {
             width: 40px;
             height: 40px;
@@ -797,6 +819,8 @@ table.sortableTable {
               }
 
               .dialog-footer {
+
+                // This defines styling of the footer on the modal dialog of "Display QR code"
                 .qrcodeOverlayFooter {
                   display: flex;
                   justify-content: center;
@@ -826,16 +850,20 @@ table.sortableTable {
           }
 
           .board {
+
+            // This defines styling of the three rows on the dialog of "Add funds..."
             &.addFundsBoard {
               .panel {
                 display: flex;
                 padding-left: 100px;
 
-                &:nth-child(1) { // credit card
+                // 1st row (credit card)
+                &:nth-child(1) {
                   margin-top: 0;
                 }
 
-                &:nth-child(2) { // bitcoin address
+                // 2nd row (bitcoin address)
+                &:nth-child(2) {
 
                   .settingsPanelDivider {
                     .hasBitcoinHandler {
@@ -846,7 +874,8 @@ table.sortableTable {
                   }
                 }
 
-                &:nth-child(3) { // mobile phone
+                // 3rd row (mobile phone)
+                &:nth-child(3) {
                   margin-bottom: 0;
 
                   .settingsPanelDivider {
@@ -854,12 +883,14 @@ table.sortableTable {
                   }
                 }
 
+                // This defines the styling inside each of those rows
                 .settingsPanelDivider {
                   width: 50%;
                   position: relative;
                   display: flex;
                   flex-flow: column;
 
+                  // left side (descriptions)
                   &:first-child {
                     align-items: flex-start; // to align the icons and texts left
 
@@ -892,6 +923,7 @@ table.sortableTable {
                     }
                   }
 
+                  // right side (buttons)
                   &:last-child {
                     align-items: flex-end; // to align the buttons right
 
@@ -914,6 +946,7 @@ table.sortableTable {
                 }
               }
 
+              // This defines styling of the panel footer of "Add funds..."
               .panelFooter {
                 display: flex;
                 align-items: center;
@@ -953,6 +986,24 @@ table.sortableTable {
     }
   }
 
+  .advancedSettingsWrapper {
+    // cf: .hideExcludedSites
+    @margin-bottom: @walletBarMargin / 2;
+
+    text-align: right;
+    margin-right: @walletBarPadding;
+    margin-bottom: @margin-bottom;
+
+    // align the button with .autoSuggestSwitch
+    position: relative;
+    left: 3px;
+
+    button {
+      min-width: 235px; // PR #6287
+    }
+  }
+
+  // This defines the styling of the title row (1st) on about:preferences#payments
   .titleBar {
     overflow: hidden;
     display: flex;
@@ -961,13 +1012,21 @@ table.sortableTable {
     .paymentsSwitches {
       display: flex;
 
-      .enablePaymentsSwitch {
+      .enablePaymentsSwitch,
+      .autoSuggestSwitch {
         display: flex;
         align-items: center;
-        width: @walletTableData;
+        width: @walletBarTableData;
 
-        span {
+        .settingItem .switchControl {
+          padding-top: 0;
+          padding-bottom: 0;
+        }
+
+        span,
+        .moreInfoBtn {
           font-weight: bold;
+          font-size: @fontSize;
           color: @gray;
         }
 
@@ -976,26 +1035,26 @@ table.sortableTable {
           color: @braveOrange;
         }
       }
-    }
 
-    .advancedSettings {
-      min-width: 235px; // .walletBar td min-width
+      .autoSuggestSwitch {
+        position: relative;
+        left: -5px; // .prefTabContainer .switchControl
+
+        .moreInfoBtn {
+          margin-left: 7px;
+          cursor: pointer;
+          text-decoration: none;
+        }
+      }
     }
   }
 
-  & > table,
-  & > table tbody {
-    border: none;
-    padding: 50px;
-    margin: 0 auto;
-    width: 80%;
-  }
-
+  // PR #6370
   .disabledContent {
     .paymentsMessage {
       background-color: @lightGray;
       border-radius: @borderRadiusUIbox;
-      margin: @barMargin;
+      margin-top: @walletBarMargin;
       padding: 40px;
       font-size: @fontSize;
       line-height: 1.8em;
@@ -1062,13 +1121,13 @@ table.sortableTable {
     }
   }
 
+  // This defines the styling of the control panel (2nd) on about:preferences#payments
   .walletBar {
-    @itemMargin: 12px; // button, .nextReconcileDate, .accountBalanceError, .nextReconcileDate
 
-    padding: calc(@itemMargin * 1.5);
     background: @lightGray;
     border-radius: @borderRadiusUIbox;
-    margin: @barMargin;
+    padding: @walletBarPadding;
+    margin: @walletBarMargin 0;
 
     th {
       text-align: left;
@@ -1082,7 +1141,7 @@ table.sortableTable {
       font-size: @fontSize;
       padding: 10px 30px 0 0; // .settingsList .settingItem > *:not(.switchControl) 10px
       width: auto;
-      min-width: 235px;
+      min-width: @walletBarTableRowWidth;
       vertical-align: top;
 
       .settingsListContainer {
@@ -1111,10 +1170,12 @@ table.sortableTable {
         display: block;
         font-size: @fontSize;
         color: @braveOrange;
-        margin-top: @itemMargin;
+        height: auto;
+        margin-top: @walletBarItemMargin;
         padding: 0;
         text-align: left;
         cursor: pointer;
+        white-space: normal;
       }
 
       .balance {
@@ -1142,7 +1203,7 @@ table.sortableTable {
         }
 
         + button {
-          margin-top: @itemMargin;
+          margin-top: @walletBarItemMargin;
         }
 
         a {
@@ -1166,7 +1227,7 @@ table.sortableTable {
 
     .accountBalanceError,
     .nextReconcileDate {
-      margin-top: @itemMargin;
+      margin-top: @walletBarItemMargin;
     }
 
     .nextReconcileDate {
@@ -1174,63 +1235,100 @@ table.sortableTable {
     }
   }
 
+  // This defines the styling inside the table (3rd) on about:preferences#payments
   .ledgerTable {
-    tr {
-      height: 26px;
+    .hideExcludedSites {
 
-      &.paymentsDisabled {
-        opacity: 0.6;
+      // Because the length of the string "Hide excluded sites" is different between languages, text-align:right should not be used.
+      // Instead the width of the table data inside .walletBar is doubled, adding the padding-left of the .walletBar.
+      // The similar way styling is used for .enablePaymentsSwitch too.
+      @margin-left: (@walletBarTableData * 2) + @walletBarPadding;
+
+      // This applies the margin bottom to the spec image
+      @margin-bottom: @walletBarMargin / 2;
+
+      margin-left: @margin-left;
+      margin-bottom: @margin-bottom;
+    }
+
+    table {
+      &.sort {
+        width: 100%;
+        text-align: left;
       }
 
-      th,
-      td {
-        padding: 0 15px;
-      }
+      tr {
+        height: 26px;
 
-      td {
-        position: relative;
-
-        &.alignRight {
-          text-align: right;
+        th,
+        td {
+          padding: 0 15px;
         }
 
-        .site {
-          .verified {
-            height: 20px;
-            width: 20px;
-            background: url('../../img/toolbar/verified_green_icon.svg') center no-repeat;
-            display: inline-block;
-            position: absolute;
-            left: -10px;
-            top: 3px; // (26px - 20px)/2
+        td {
+          position: relative;
+
+          &.alignRight {
+            text-align: right;
           }
 
-          a {
-            height: 24px;
+          .neverShowSiteIcon {
+            font-size: 20px;
+            text-align: center;
 
-            .fa-file-o {
-              font-size: 15px;
-              margin-right: 6px;
-              text-align: center;
-              width: 24px;
+            .fa {
+              visibility: hidden;
             }
 
-            img {
-              width: 1.5em;
-              height: 1.5em;
-              margin-right: 6px;
-              vertical-align: middle;
+            &:hover {
+              .fa {
+                visibility: visible;
+              }
+            }
+          }
+
+          .site {
+            .verified {
+              height: 20px;
+              width: 20px;
+              background: url('../../img/toolbar/verified_green_icon.svg') center no-repeat;
+              display: inline-block;
+              position: absolute;
+              left: -10px;
+              top: 3px; // (26px - 20px)/2
+            }
+
+            a {
+              height: 24px;
+
+              .fa-file-o {
+                font-size: 15px;
+                margin-right: 6px;
+                text-align: center;
+                width: 24px;
+              }
+
+              img {
+                width: 1.5em;
+                height: 1.5em;
+                margin-right: 6px;
+                vertical-align: middle;
+              }
             }
           }
         }
-      }
 
-      .th-inner {
-        font-weight: bold;
+        &.paymentsDisabled {
+          opacity: 0.6;
+        }
 
-        &:hover {
-          cursor: pointer;
-          text-decoration: underline;
+        .th-inner {
+          font-weight: bold;
+
+          &:hover {
+            cursor: pointer;
+            text-decoration: underline;
+          }
         }
       }
     }

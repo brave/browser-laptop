@@ -56,6 +56,9 @@ describe('aboutNewTabState', function () {
     const site5 = Immutable.fromJS({
       location: 'https://example4.com', title: 'sample 5', parentFolderId: 0, count: 23, lastAccessedTime: 456
     })
+    const importedBookmark1 = Immutable.fromJS({
+      location: 'https://example6.com', title: 'sample 6', parentFolderId: 0, count: 23, lastAccessedTime: 0
+    })
     const folder1 = Immutable.fromJS({
       customTitle: 'folder1', parentFolderId: 0, tags: [siteTags.BOOKMARK_FOLDER]
     })
@@ -64,6 +67,14 @@ describe('aboutNewTabState', function () {
       it('does not include bookmark folders', function () {
         const stateWithSites = defaultAppState.set('sites',
           Immutable.List().push(site1).push(folder1))
+        const expectedSites = Immutable.List().push(site1)
+        const actualState = aboutNewTabState.setSites(stateWithSites)
+        assert.deepEqual(actualState.getIn(['about', 'newtab', 'sites']).toJS(), expectedSites.toJS())
+      })
+
+      it('does not include imported bookmarks (lastAccessedTime === 0)', function () {
+        const stateWithSites = defaultAppState.set('sites',
+          Immutable.List().push(site1).push(importedBookmark1))
         const expectedSites = Immutable.List().push(site1)
         const actualState = aboutNewTabState.setSites(stateWithSites)
         assert.deepEqual(actualState.getIn(['about', 'newtab', 'sites']).toJS(), expectedSites.toJS())

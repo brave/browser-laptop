@@ -545,6 +545,11 @@
   }
 }
 
+.navbutton,
+.navigationButton {
+  outline: none;
+}
+
 .navigationButton {
   background-color: @buttonColor;
   display: inline-block;
@@ -650,7 +655,7 @@
 @urlbarFormHeight: 25px;
 
 .urlbarForm {
-  position: relative;
+  position: relative; // PR #6485
   width: 0; // Fixes #4298
   align-items: center;
   justify-content: center;
@@ -716,6 +721,10 @@
     }
   }
 
+  .endButtons {
+    display: flex;
+  }
+
   &:not(.titleMode) {
     > * {
       animation: fadeIn .6s;
@@ -723,13 +732,17 @@
       animation-fill-mode: forwards;
     }
 
-    // Create 25x25 square and place .bookmarkButton at the center of it
-    .bookmarkButtonContainer {
+    .urlbarForm {
+        &.noBorderRadius {
+        border-radius: 0;
+      }
+    }
+
+    // Create 25x25 squares and place the buttons at the center of each container
+    .bookmarkButtonContainer,
+    .addPublisherButtonContainer {
       border: 1px solid #CBCBCB;
       border-radius: @borderRadius;
-      border-right: none;
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
       box-sizing: border-box;
       display: flex;
       align-items: center;
@@ -738,6 +751,12 @@
       min-height: @urlbarFormHeight;
       min-width: @urlbarFormHeight;
       -webkit-app-region: no-drag;
+    }
+
+    .bookmarkButtonContainer {
+      border-right: none;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
 
       .bookmarkButton {
         background: url('../img/toolbar/bookmark_btn.svg') center no-repeat;
@@ -754,6 +773,23 @@
           background: url('../img/toolbar/bookmark_marked.svg') center no-repeat;
           background-size: 14px 14px;
         }
+      }
+    }
+
+    .addPublisherButtonContainer {
+      border-left: none;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-bottom-color: rgba(0,0,0,0.1);
+
+      &.authorizedPublisher {
+        button {
+          color: @braveOrange
+        }
+      }
+
+      button {
+        font-size: 14px;
       }
     }
   }
@@ -862,6 +898,10 @@
       &.private {
         background: @privateTabBackground;
         color: @chromeText;
+      }
+
+      &:focus {
+        margin-right: 3px;
       }
     }
 

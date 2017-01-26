@@ -108,6 +108,13 @@ const aboutActions = {
     })
   },
 
+  ledgerRecoverWalletFromFile: function () {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_RECOVER_WALLET,
+      useRecoveryKeyFile: true
+    })
+  },
+
   /**
    * Clear wallet recovery status
    */
@@ -206,8 +213,8 @@ const aboutActions = {
     })
   },
 
-  clearBrowsingDataNow: function (clearBrowsingDataDetail) {
-    ipc.sendToHost(messages.CLEAR_BROWSING_DATA_NOW, clearBrowsingDataDetail)
+  clearBrowsingDataNow: function () {
+    ipc.sendToHost(messages.CLEAR_BROWSING_DATA_NOW)
   },
 
   importBrowserDataNow: function () {
