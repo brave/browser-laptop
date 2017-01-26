@@ -24,6 +24,7 @@ describe('PaymentsTab component', function () {
     mockery.registerMock('../../less/forms.less', {})
     mockery.registerMock('../../less/button.less', {})
     mockery.registerMock('../../node_modules/font-awesome/css/font-awesome.css', {})
+    mockery.registerMock('../../extensions/brave/img/caret_down_grey.svg', 'caret_down_grey.svg')
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('../../../../js/settings', fakeSettings)
     fakeSettings.mockReturnValue = false
@@ -42,7 +43,11 @@ describe('PaymentsTab component', function () {
 
     it('renders enabled content when enabled', function () {
       fakeSettings.mockReturnValue = true
-      const wrapper = shallow(<PaymentsTab ledgerData={Immutable.Map()} />)
+      const wrapper = shallow(
+        <PaymentsTab
+          ledgerData={Immutable.Map()}
+          showOverlay={function () {}} />
+      )
       assert.equal(wrapper.find('.disabledContent').length, 0)
       assert.equal(wrapper.find('.walletBar').length, 1)
     })
@@ -50,19 +55,29 @@ describe('PaymentsTab component', function () {
 
   describe('rendering functions', function () {
     it('renders a paymentsContainer', function () {
-      const wrapper = shallow(<PaymentsTab ledgerData={Immutable.Map()} />)
+      const wrapper = shallow(
+        <PaymentsTab
+          ledgerData={Immutable.Map()}
+          showOverlay={function () {}} />
+      )
       assert(wrapper.find('.paymentsContainer'))
       assert.equal(wrapper.find('.paymentsContainer').length, 1)
     })
 
     it('does not render any dialogs by default', function () {
-      const wrapper = shallow(<PaymentsTab ledgerData={Immutable.Map()} />)
+      const wrapper = shallow(
+        <PaymentsTab
+          ledgerData={Immutable.Map()}
+          showOverlay={function () {}} />
+      )
       assert.equal(wrapper.find('.dialog').length, 0)
     })
 
     it('renders the create wallet button by default', function () {
       const wrapper = shallow(
-        <PaymentsTab ledgerData={Immutable.Map()} />
+        <PaymentsTab
+          ledgerData={Immutable.Map()}
+          showOverlay={function () {}} />
       )
       assert.equal(wrapper.find('[data-test-id="createWallet"]').length, 1)
     })
@@ -89,7 +104,7 @@ describe('PaymentsTab component', function () {
       assert.equal(wrapper.find('[data-test-id="creatingWallet"]').length, 1)
     })
 
-    it('renders payment history button when there are transactions', function () {
+    it('renders payment history button', function () {
       const wrapper = shallow(
         <PaymentsTab
           showOverlay={function () {}}
@@ -99,12 +114,12 @@ describe('PaymentsTab component', function () {
       assert.equal(wrapper.find('.paymentHistoryButton').length, 1)
     })
 
-    it('does not render payment history button when there are no transactions', function () {
+    it('does not render payment history button when wallet is not created', function () {
       const wrapper = shallow(
         <PaymentsTab
           showOverlay={function () {}}
           hideOverlay={function () {}}
-          ledgerData={Immutable.Map({created: true, transactions: null})} />
+          ledgerData={Immutable.Map({created: false, balance: null})} />
       )
       assert.equal(wrapper.find('.paymentHistoryButton').length, 0)
     })
@@ -154,7 +169,7 @@ describe('PaymentsTab component', function () {
           ledgerData={Immutable.Map({created: false, btc: 10, amount: 10})} />
       )
       const inst = wrapper.instance()
-      assert.equal(inst.btcToCurrencyString(10), '$ 10.00')
+      assert.equal(inst.btcToCurrencyString(10), '10.00 USD')
     })
 
     it('renders partial balance correctly', function () {
@@ -166,7 +181,7 @@ describe('PaymentsTab component', function () {
           ledgerData={Immutable.Map({created: false, btc: 10, amount: 2})} />
       )
       const inst = wrapper.instance()
-      assert.equal(inst.btcToCurrencyString(10), '$ 2.00')
+      assert.equal(inst.btcToCurrencyString(10), '2.00 USD')
     })
   })
 

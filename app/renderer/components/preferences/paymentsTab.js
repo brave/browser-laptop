@@ -116,7 +116,7 @@ class PaymentsTab extends ImmutableComponent {
     let buttonText
 
     if (!walletCreated) {
-      buttonText = null
+      return null
     } else if (!walletHasTransactions) {
       buttonText = 'noPaymentHistory'
     } else {
