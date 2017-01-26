@@ -140,14 +140,22 @@ class ContextMenuItem extends ImmutableComponent {
         }
       </div>
     }
-    return <div className={cx({
-      contextMenuItem: true,
-      hasFaIcon: faIcon,
-      checkedMenuItem: this.props.contextMenuItem.get('checked'),
-      hasIcon: icon || faIcon,
-      selectedByKeyboard: this.props.selected
-    })}
-      role='listitem'
+    const props = {
+      className: cx({
+        contextMenuItem: true,
+        hasFaIcon: faIcon,
+        checkedMenuItem: this.props.contextMenuItem.get('checked'),
+        hasIcon: icon || faIcon,
+        selectedByKeyboard: this.props.selected
+      }),
+      role: 'listitem'
+    }
+
+    if (typeof this.props.dataIndex === 'number') {
+      props['data-index'] = this.props.dataIndex
+    }
+
+    return <div {...props}
       draggable={this.props.contextMenuItem.get('draggable')}
       onDragStart={this.onDragStart.bind(this)}
       onDragEnd={this.onDragEnd.bind(this)}
@@ -223,7 +231,8 @@ class ContextMenuSingle extends ImmutableComponent {
           }
           // don't count separators when finding selectedIndex
           if (contextMenuItem.get('type') !== separatorMenuItem.type) {
-            props.selected = index === this.props.selectedIndex
+            props.dataIndex = index
+            props.selected = (index === this.props.selectedIndex)
             index++
           }
           return <ContextMenuItem {...props} />
