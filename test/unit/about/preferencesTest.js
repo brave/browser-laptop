@@ -26,7 +26,7 @@ describe('Preferences component', function () {
     window.chrome = fakeElectron
     window.CustomEvent = {}
 
-    Preferences = require('../../../js/about/preferences').AboutPreferences
+    Preferences = require('../../../js/about/preferences')
   })
   after(function () {
     mockery.disable()
