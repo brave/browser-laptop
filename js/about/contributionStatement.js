@@ -201,30 +201,6 @@ class ContributionStatement extends ImmutableComponent {
     )
   }
 
-  get lastContributionHumanFormattedDate () {
-    if (!this.transactionIds || !this.transactionIds.length || !this.transaction) {
-      return ''
-    }
-
-    let transactionIds = this.transactionIds
-    let currentTxIdx = transactionIds.indexOf(this.transaction.get('viewingId'))
-    let lastTxIdx = (currentTxIdx ? currentTxIdx - 1 : -1)
-    let date = ''
-    if (lastTxIdx > -1) {
-      let previousTransaction = this.transactions.toJS()[lastTxIdx] || {}
-      let previousTimestamp = previousTransaction.submissionStamp
-
-      if (previousTimestamp && previousTimestamp < this.timestamp) {
-        date = longFormattedDateFromTimestamp(previousTimestamp)
-      }
-    }
-    return date
-  }
-
-  get thisContributionHumanFormattedDate () {
-    return longFormattedDateFromTimestamp(this.timestamp)
-  }
-
   get rows () {
     if (!this.transaction) {
       // without a transaction there are no rows to process
@@ -266,9 +242,6 @@ class ContributionStatement extends ImmutableComponent {
     return (
       <div className='contributionStatementDetailTableContainer'>
         <div>
-          <span className='statementDatesCoveredText pull-right'>
-            { this.lastContributionHumanFormattedDate } - { this.thisContributionHumanFormattedDate }
-          </span>
           <table className='contributionStatementDetailTable'>
             <tbody>
               <tr className='headingRow detailTableRow'>
