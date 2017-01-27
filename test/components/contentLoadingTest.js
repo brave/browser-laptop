@@ -29,7 +29,7 @@ describe('content loading', function () {
       })
   })
 
-  it('does not support battery status API', function * () {
+  it('always returns 100% for battery status API', function * () {
     var page1 = Brave.fixtureUrl('battery.html')
     yield this.app.client
       .tabByIndex(0)
@@ -37,7 +37,7 @@ describe('content loading', function () {
       .windowByUrl(Brave.browserWindowUrl)
       .waitUntil(function () {
         return this.getText('.tabTitle').then((title) => {
-          return title === 'fail'
+          return title === '100%'
         })
       })
   })
