@@ -198,6 +198,6 @@ describe('search suggestions', function () {
       .keys(Brave.keys.DOWN)
       .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]:not(.selected)')
       .keys(Brave.keys.ENTER)
-      .waitForInputText(urlInput, /google.*\/.*q=what\+is/)
+      .waitForInputText(urlInput, /google.*\/.*q=what.+is/)
   })
 })
