@@ -42,7 +42,7 @@ class ContextMenuItem extends ImmutableComponent {
     e.stopPropagation()
     if (clickAction) {
       if (shouldHide) {
-        windowActions.resetMenuState()
+        setImmediate(() => windowActions.resetMenuState())
       }
       clickAction(e)
     }
@@ -253,7 +253,7 @@ class ContextMenuSingle extends ImmutableComponent {
  */
 class ContextMenu extends ImmutableComponent {
   onClick () {
-    windowActions.resetMenuState()
+    setImmediate(() => windowActions.resetMenuState())
   }
   get openedSubmenuDetails () {
     return this.props.contextMenuDetail.get('openedSubmenuDetails') || new Immutable.List()
