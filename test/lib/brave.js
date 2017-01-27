@@ -1,7 +1,7 @@
 /* globals devTools */
 var Application = require('spectron').Application
 var chai = require('chai')
-const {activeWebview, navigator, titleBar} = require('./selectors')
+const {activeWebview, navigator, titleBar, urlInput} = require('./selectors')
 require('./coMocha')
 
 const path = require('path')
@@ -256,9 +256,16 @@ var exports = {
 
     this.app.client.addCommand('activateTitleMode', function () {
       return this
-        .moveToObject(activeWebview, 2, 2)
-        .moveToObject(activeWebview, 3, 3)
+        .setMouseInTitlebar(false)
+        .moveToObject(activeWebview)
         .waitForVisible(titleBar)
+    })
+
+    this.app.client.addCommand('activateURLMode', function () {
+      return this
+        .setMouseInTitlebar(true)
+        .moveToObject(navigator)
+        .waitForVisible(urlInput)
     })
 
     this.app.client.addCommand('waitForUrl', function (url) {
@@ -407,7 +414,7 @@ var exports = {
 
     this.app.client.addCommand('setInputText', function (selector, input) {
       return this
-        .moveToObject(navigator)
+        .activateURLMode()
         .setValue(selector, input)
         .waitForInputText(selector, input)
     })
@@ -418,6 +425,12 @@ var exports = {
           key
         }), show !== false)
       }, show, key)
+    })
+
+    this.app.client.addCommand('setMouseInTitlebar', function (mouseInTitleBar) {
+      return this.execute(function (mouseInTitleBar) {
+        devTools('electron').testData.windowActions.setMouseInTitlebar(mouseInTitleBar)
+      }, mouseInTitleBar)
     })
 
     this.app.client.addCommand('openBraveMenu', function (braveMenu, braveryPanel) {
