@@ -26,6 +26,7 @@ class ExtensionItem extends ImmutableComponent {
     aboutActions.contextMenu(this.props.extension.toJS(), 'extensions', e)
   }
   render () {
+    const permissions = this.props.extension.getIn(['manifest', 'permissions'])
     const icon = this.props.extension.getIn(['manifest', 'icons', '48'])
     const permissions = this.props.extension.getIn(['manifest', 'permissions'])
     return <div role='listitem'
