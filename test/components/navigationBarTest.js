@@ -144,13 +144,11 @@ describe('navigationBar tests', function () {
 
       it('updates the location in the navbar to blank', function * () {
         yield this.app.client
-          .tabByIndex(1)
-          .waitForUrl('https://www.google.com/')
-          .waitForVisible('input')
-          .getText('body').then((val) => {
-            if (val.includes('phishing')) {
-              throw new Error('should not contain phishing')
-            }
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => {
+              return val === 'about:blank'
+            })
           })
       })
     })
