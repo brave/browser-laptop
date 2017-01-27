@@ -1,7 +1,7 @@
 /* global describe, it, before, after */
 
 const Brave = require('../lib/brave')
-const {navigator, urlInput, navigatorBookmarked, navigatorNotBookmarked} = require('../lib/selectors')
+const {urlInput, navigatorBookmarked, navigatorNotBookmarked} = require('../lib/selectors')
 const siteTags = require('../../js/constants/siteTags')
 
 describe('sessionStore', function () {
@@ -20,7 +20,7 @@ describe('sessionStore', function () {
         .waitForUrl(Brave.newTabUrl)
         .loadUrl(page1Url)
         .windowParentByUrl(page1Url)
-        .moveToObject(navigator)
+        .activateURLMode()
         .waitForExist(navigatorNotBookmarked)
       yield Brave.app.client.addSite({
         location: page1Url,

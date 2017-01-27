@@ -354,10 +354,7 @@ describe('urlBar tests', function () {
                 .getCssProperty(urlbarIcon, 'background-image')
                 .then((backgroundImage) => backgroundImage.value === `url("${entry.image}")`)
             })
-        })
-
-        it('does not show the default icon (search)', function * () {
-          yield this.app.client.waitForExist('.urlbarIcon.fa-search', 1500, true)
+            .waitForElementCount('.urlbarIcon.fa-search', 0)
         })
       })
     })
