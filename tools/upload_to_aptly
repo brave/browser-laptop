@@ -42,7 +42,7 @@ aws s3 cp ${KEY_FILE} s3://${OPTION}/keys.asc
 aws s3api put-object-acl --acl public-read --bucket ${OPTION} --key ${KEY_NAME}
 
 for i in xenial jessie trusty
-	do aptly publish drop $i s3:brave-apt-staging: || true
+	do aptly publish drop $i s3:${OPTION}: || true
 done
 
 for i in xenial jessie trusty
@@ -70,5 +70,5 @@ for i in xenial jessie trusty
 done
 
 for i in xenial jessie trusty
-	do aptly publish snapshot -gpg-key=${GPG_KEY} ${i}-snapshot s3:${OPTION}:
+	do aptly publish snapshot -force-overwrite=true -passphrase=$PASSPHRASE -gpg-key=${GPG_KEY} ${i}-snapshot s3:${OPTION}:
 done
