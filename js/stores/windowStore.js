@@ -349,9 +349,9 @@ const doAction = (action) => {
       ))
       // If we reach the limit of opened tabs per page while closing tabs, switch to
       // the active tab's page otherwise the user will hang on empty page
-      let totalOpenTabs = windowState.get('frames').filter((frame) => !frame.get('pinnedLocation')).size
-      if ((totalOpenTabs % getSetting(settings.TABS_PER_PAGE)) === 0) {
+      if (frameStateUtil.getNonPinnedFrameCount(windowState) % getSetting(settings.TABS_PER_PAGE) === 0) {
         updateTabPageIndex(frameStateUtil.getActiveFrame(windowState))
+        windowState = windowState.deleteIn(['ui', 'tabs', 'fixTabWidth'])
       }
       break
     case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
@@ -748,12 +748,14 @@ const doAction = (action) => {
       newFrame(action.frameProps, action.frameProps.get('disposition') === 'foreground-tab')
       break
     case windowConstants.WINDOW_TAB_CLOSE:
-      windowState = windowState.setIn(['ui', 'tabs', 'fixTabWidth'], action.data.fixTabWidth)
-      windowStore.emitChanges()
+      if (frameStateUtil.getNonPinnedFrameCount(windowState) % getSetting(settings.TABS_PER_PAGE) === 0) {
+        windowState = windowState.deleteIn(['ui', 'tabs', 'fixTabWidth'])
+      } else {
+        windowState = windowState.setIn(['ui', 'tabs', 'fixTabWidth'], action.data.fixTabWidth)
+      }
       break
     case windowConstants.WINDOW_TAB_MOUSE_LEAVE:
-      windowState = windowState.setIn(['ui', 'tabs', 'fixTabWidth'], action.data.fixTabWidth)
-      windowStore.emitChanges()
+      windowState = windowState.deleteIn(['ui', 'tabs', 'fixTabWidth'])
       break
     default:
       break

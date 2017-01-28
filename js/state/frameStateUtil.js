@@ -87,6 +87,10 @@ function isFrameKeyPinned (frames, key) {
   return frame ? frame.get('pinnedLocation') : false
 }
 
+function getNonPinnedFrameCount (windowState) {
+  return windowState.get('frames').filter((frame) => !frame.get('pinnedLocation')).size
+}
+
 function getFrameByTabId (windowState, tabId) {
   return find(windowState, {tabId})
 }
@@ -539,6 +543,7 @@ module.exports = {
   isAncestorFrameKey,
   isFrameKeyActive,
   isFrameKeyPinned,
+  getNonPinnedFrameCount,
   isPrivatePartition,
   isSessionPartition,
   getFrameIndex,
