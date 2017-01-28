@@ -104,7 +104,7 @@ describe('PaymentsTab component', function () {
       assert.equal(wrapper.find('[data-test-id="creatingWallet"]').length, 1)
     })
 
-    it('renders payment history button', function () {
+    it.skip('renders payment history button', function () {
       const wrapper = shallow(
         <PaymentsTab
           showOverlay={function () {}}
