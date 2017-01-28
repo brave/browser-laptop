@@ -130,7 +130,7 @@ let generateAndSaveRecoveryFile = function (recoveryFilePath, paymentId, passphr
   return
 }
 
-describe('Payments Panel -> Advanced Panel', function () {
+describe.skip('Payments Panel -> Advanced Panel', function () {
   let context = this
   Brave.beforeEach(this)
 
