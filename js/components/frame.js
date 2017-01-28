@@ -112,7 +112,7 @@ class Frame extends ImmutableComponent {
       if (!Immutable.is(prevProps.bookmarks, this.props.bookmarks) ||
           !Immutable.is(prevProps.bookmarkFolders, this.props.bookmarkFolders)) {
         this.webview.send(messages.BOOKMARKS_UPDATED, {
-          bookmarks: this.props.bookmarks.toJS(),
+          bookmarks: this.props.bookmarks.toList().sort(siteUtil.siteSort).toJS(),
           bookmarkFolders: this.props.bookmarkFolders.toJS()
         })
       }

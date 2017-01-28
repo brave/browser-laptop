@@ -37,6 +37,20 @@ const getSetting = require('../js/settings').getSetting
 const promisify = require('../js/lib/promisify')
 const sessionStorageName = `session-store-${sessionStorageVersion}`
 
+const getTopSiteMap = () => {
+  if (Array.isArray(topSites) && topSites.length) {
+    let siteMap = {}
+    let order = 0
+    topSites.forEach((site) => {
+      let key = siteUtil.getSiteKey(Immutable.fromJS(site))
+      site.order = order++
+      siteMap[key] = site
+    })
+    return siteMap
+  }
+  return {}
+}
+
 const getStoragePath = () => {
   return path.join(app.getPath('userData'), sessionStorageName)
 }
@@ -472,6 +486,18 @@ module.exports.loadAppState = () => {
         }
       }
       data = setVersionInformation(data)
+
+      // sites refactoring migration
+      if (Array.isArray(data.sites) && data.sites.length) {
+        let sites = {}
+        let order = 0
+        data.sites.forEach((site) => {
+          let key = siteUtil.getSiteKey(Immutable.fromJS(site))
+          site.order = order++
+          sites[key] = site
+        })
+        data.sites = sites
+      }
     } catch (e) {
       // TODO: Session state is corrupted, maybe we should backup this
       // corrupted value for people to report into support.
@@ -494,7 +520,7 @@ module.exports.loadAppState = () => {
 module.exports.defaultAppState = () => {
   return {
     firstRunTimestamp: new Date().getTime(),
-    sites: topSites,
+    sites: getTopSiteMap(),
     tabs: [],
     windows: [],
     extensions: {},

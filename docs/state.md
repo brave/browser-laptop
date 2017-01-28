@@ -61,19 +61,21 @@ AppStore
       }
     }
   },
-  sites: [{
-    location: string,
-    title: string,
-    customTitle: string, // User provided title for bookmark; overrides title
-    tags: [string], // empty, 'bookmark', 'bookmark-folder', 'pinned', or 'reader'
-    favicon: string, // URL of the favicon
-    themeColor: string, // css compatible color string
-    lastAccessedTime: number, // datetime.getTime()
-    creationTime: number, //creation time of bookmark
-    partitionNumber: number, // Optionally specifies a specific session
-    folderId: number, // Set for bookmark folders only
-    parentFolderId: number // Set for bookmarks and bookmark folders only
-  }],
+  sites: {
+    [siteKey]: { // folder: folderId; bookmark/history: location + partitionNumber + parentFolderId
+      location: string,
+      title: string,
+      customTitle: string, // User provided title for bookmark; overrides title
+      tags: [string], // empty, 'bookmark', 'bookmark-folder', 'pinned', or 'reader'
+      favicon: string, // URL of the favicon
+      themeColor: string, // css compatible color string
+      lastAccessedTime: number, // datetime.getTime()
+      creationTime: number, //creation time of bookmark
+      partitionNumber: number, // Optionally specifies a specific session
+      folderId: number, // Set for bookmark folders only
+      parentFolderId: number // Set for bookmarks and bookmark folders only
+    },
+  },
   downloads: [{
     [downloadId]: {
       startTime: number, // datetime.getTime()
