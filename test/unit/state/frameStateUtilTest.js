@@ -287,7 +287,7 @@ describe('frameStateUtil', function () {
         })
         it('returns 0 with only pinned frames', function () {
           this.windowState = Immutable.fromJS(Object.assign({}, defaultWindowStore.toJS()))
-          assert.equal(frameStateUtil.getNonPinnedFrameCount(Immutable.fromJS({frames: [{title:'153,409th prime', pinnedLocation: 'http://www.brave.com/2064737'}]})), 0)
+          assert.equal(frameStateUtil.getNonPinnedFrameCount(Immutable.fromJS({frames: [{title: '153,409th prime', pinnedLocation: 'http://www.brave.com/2064737'}]})), 0)
         })
         it('returns 1 with a frame and a pinned frames', function () {
           this.windowState = Immutable.fromJS(Object.assign({}, defaultWindowStore.toJS()))

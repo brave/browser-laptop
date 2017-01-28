@@ -1201,9 +1201,9 @@ const windowActions = {
     })
   },
 
-  onTabClose: function (data) {
+  onTabClosedWithMouse: function (data) {
     dispatch({
-      actionType: windowConstants.WINDOW_TAB_CLOSE,
+      actionType: windowConstants.WINDOW_TAB_CLOSED_WITH_MOUSE,
       data
     })
   },
