@@ -23,7 +23,8 @@ Upgrades can be done via:
 apt-get update && apt-get upgrade -y
 ```
 
-Alternatively you can install the deb directly but then you wont get automatic upgrades with apt
+Alternatively you can install the deb directly but then you won't get automatic upgrades:
+
 ```
 wget -O brave.deb https://laptop-updates.brave.com/latest/dev/debian64
 sudo apt-get install -y gdebi && sudo gdebi brave.deb
@@ -42,6 +43,22 @@ sudo dpkg -i ./brave.deb
 ```
 
 ## Fedora x86_64:
+
+To install brave using yum:
+
+```
+yum-config-manager --add-repo https://s3-us-west-2.amazonaws.com/brave-rpm-release/x86_64
+yum install brave
+```
+
+To update brave using yum:
+
+```
+sudo yum update brave
+```
+
+
+Alternatively you can install the rpm directly, but then you won't get automatic upgrades:
 
 ```
 sudo dnf install lsb
@@ -62,7 +79,14 @@ sudo zypper install brave
 To update brave using zypper:
 
 ```
-sudo zypper update
+sudo zypper update brave
+```
+
+Alternatively you can install the rpm directly, but then you won't get automatic upgrades:
+
+```
+wget -O brave.rpm https://laptop-updates.brave.com/latest/openSUSE64
+sudo rpm -i ./brave.rpm
 ```
 
 ## Raw x64 binaries:
