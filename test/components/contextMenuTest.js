@@ -64,7 +64,7 @@ describe('ContextMenu', function () {
         .pause(10)
         .tabByUrl(this.formfill)
         .getValue('[name="02frstname"]').should.eventually.be.equal('Test value')
-        .getValue(this.input).should.eventually.be.equal(this.values[2])
+        .getValue(this.input).should.eventually.be.equal(this.values[1])
     })
 
     it('click on item', function *() {
@@ -97,7 +97,7 @@ describe('ContextMenu', function () {
         .keys('\uE007')
         .pause(10)
         .tabByUrl(this.formfill)
-        .getValue(this.input).should.eventually.be.equal(this.values[2])
+        .getValue(this.input).should.eventually.be.equal(this.values[1])
     })
 
     it('select item via keys only', function *() {
@@ -122,7 +122,7 @@ describe('ContextMenu', function () {
         .keys('\uE007')
         .pause(10)
         .tabByUrl(this.formfill)
-        .getValue(this.input).should.eventually.be.equal(this.values[3])
+        .getValue(this.input).should.eventually.be.equal(this.values[2])
     })
 
     it('check left/right on non sub menu item', function *() {
@@ -141,6 +141,8 @@ describe('ContextMenu', function () {
         .keys('\uE014') // right
         .pause(10)
         .keys('\uE012') // left
+        .pause(10)
+        .keys('\uE015')
         .pause(10)
         .keys('\uE015')
         .pause(10)
