@@ -21,6 +21,7 @@ const settings = {
   OFFER_SEARCH_SUGGESTIONS: 'search.offer-search-suggestions',
   // Tabs tab
   SWITCH_TO_NEW_TABS: 'tabs.switch-to-new-tabs',
+  TAB_CLOSE_ACTION: 'tabs.close-action',
   PAINT_TABS: 'tabs.paint-tabs',
   TABS_PER_PAGE: 'tabs.tabs-per-page',
   SHOW_TAB_PREVIEWS: 'tabs.show-tab-previews',
@@ -59,9 +60,11 @@ const settings = {
   SEND_CRASH_REPORTS: 'advanced.send-crash-reports',
   SEND_USAGE_STATISTICS: 'advanced.send-usage-statistics',
   ADBLOCK_CUSTOM_RULES: 'adblock.customRules',
+  HIDE_EXCLUDED_SITES: 'advanced.hide-excluded-sites',
   MINIMUM_VISIT_TIME: 'advanced.minimum-visit-time',
   MINIMUM_VISITS: 'advanced.minimum-visits',
   MINIMUM_PERCENTAGE: 'advanced.minimum-percentage',
+  AUTO_SUGGEST_SITES: 'advanced.auto-suggest-sites',
 
   // DEPRECATED settings
   // ########################
@@ -73,6 +76,7 @@ const settings = {
   ONE_PASSWORD_ENABLED: 'security.passwords.one-password-enabled',
   DASHLANE_ENABLED: 'security.passwords.dashlane-enabled',
   LAST_PASS_ENABLED: 'security.passwords.last-pass-enabled',
+  ENPASS_ENABLED: 'security.passwords.enpass-enabled',
   // > phased out with 0.12.6
   SHOW_BOOKMARKS_TOOLBAR_FAVICON: 'bookmarks.toolbar.showFavicon',
   SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON: 'bookmarks.toolbar.showOnlyFavicon',

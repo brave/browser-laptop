@@ -687,16 +687,16 @@ const handleAppAction = (action) => {
     case appConstants.APP_RECOVER_WALLET:
       appState = ledger.recoverKeys(appState, action)
       break
-    case appConstants.APP_LEDGER_RECOVERY_SUCCEEDED:
-      appState = appState.setIn(['ui', 'about', 'preferences', 'recoverySucceeded'], true)
+    case appConstants.APP_LEDGER_RECOVERY_STATUS_CHANGED:
+      {
+        const date = new Date().getTime()
+        appState = appState.setIn(['about', 'preferences', 'recoverySucceeded'], action.recoverySucceeded)
+        appState = appState.setIn(['about', 'preferences', 'updatedStamp'], date)
+      }
       break
-    case appConstants.APP_LEDGER_RECOVERY_FAILED:
-      appState = appState.setIn(['ui', 'about', 'preferences', 'recoverySucceeded'], false)
-      break
-    case appConstants.APP_CLEAR_RECOVERY:
-      appState = appState.setIn(['ui', 'about', 'preferences', 'recoverySucceeded'], undefined)
-      break
-    case appConstants.APP_CLEAR_DATA:
+    case appConstants.APP_ON_CLEAR_BROWSING_DATA:
+      // TODO: Maybe make storing this state optional?
+      appState = appState.set('clearBrowsingDataDefaults', action.clearDataDetail)
       if (action.clearDataDetail.get('browserHistory')) {
         handleAppAction({actionType: appConstants.APP_CLEAR_HISTORY})
         BrowserWindow.getAllWindows().forEach((wnd) => wnd.webContents.send(messages.CLEAR_CLOSED_FRAMES))

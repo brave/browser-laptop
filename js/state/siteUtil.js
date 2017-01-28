@@ -117,7 +117,9 @@ module.exports.getNextFolderId = (sites) => {
 
 // Some details can be copied from the existing siteDetail if null
 // ex: parentFolderId, partitionNumber, and favicon
+
 const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId, order) => {
+  const siteDetailExist = newSiteDetail.get('lastAccessedTime') !== undefined || oldSiteDetail && oldSiteDetail.get('lastAccessedTime')
   let tags = oldSiteDetail && oldSiteDetail.get('tags') || new Immutable.List()
   if (tag) {
     tags = tags.toSet().add(tag).toList()
@@ -129,7 +131,9 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId, order) =>
 
   let lastAccessedTime
   if (isBookmark(tag) || isBookmarkFolder(tag)) {
-    lastAccessedTime = newSiteDetail.get('lastAccessedTime') || 0
+    siteDetailExist
+      ? lastAccessedTime = newSiteDetail.get('lastAccessedTime') || oldSiteDetail.get('lastAccessedTime')
+      : lastAccessedTime = 0
   } else {
     lastAccessedTime = newSiteDetail.get('lastAccessedTime') || new Date().getTime()
   }
@@ -489,6 +493,15 @@ module.exports.isFolder = function (siteDetail) {
     return isBookmarkFolder(siteDetail.get('tags'))
   }
   return false
+}
+
+/**
+ * Determines if the site detail is an imported bookmark.
+ * @param siteDetail The site detail to check.
+ * @return true if the site detail is a folder.
+ */
+module.exports.isImportedBookmark = function (siteDetail) {
+  return siteDetail.get('lastAccessedTime') === 0
 }
 
 /**

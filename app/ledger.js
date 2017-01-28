@@ -173,23 +173,37 @@ const doAction = (action) => {
       break
 
     case appConstants.APP_CHANGE_SITE_SETTING:
+      i = action.hostPattern.indexOf('://')
+      if (i === -1) break
+
+      publisher = action.hostPattern.substr(i + 3)
       if (action.key === 'ledgerPaymentsShown') {
         if (action.value === false) {
-          i = action.hostPattern.indexOf('://')
-          if (i !== -1) {
-            publisher = action.hostPattern.substr(i + 3)
-            if (publisherInfo._internal.verboseP) console.log('\npurging ' + publisher)
-            delete synopsis.publishers[publisher]
-            delete publishers[publisher]
-            updatePublisherInfo()
-          }
+          if (publisherInfo._internal.verboseP) console.log('\npurging ' + publisher)
+          delete synopsis.publishers[publisher]
+          delete publishers[publisher]
+          updatePublisherInfo()
         }
+      } else if (action.key === 'ledgerPayments') {
+        if (!synopsis.publishers[publisher]) break
+
+        if (publisherInfo._internal.verboseP) console.log('\nupdating ' + publisher + ' stickyP=' + action.value)
+        synopsis.publishers[publisher].options.stickyP = action.value
+        updatePublisherInfo()
       }
       break
 
     case appConstants.APP_REMOVE_SITE_SETTING:
-      if (action.key === 'ledgerPaymentsShown') {
-        // TODO
+      i = action.hostPattern.indexOf('://')
+      if (i === -1) break
+
+      publisher = action.hostPattern.substr(i + 3)
+      if (action.key === 'ledgerPayments') {
+        if (!synopsis.publishers[publisher]) break
+
+        if (publisherInfo._internal.verboseP) console.log('\nupdating ' + publisher + ' stickyP=' + true)
+        synopsis.publishers[publisher].options.stickyP = true
+        updatePublisherInfo()
       }
       break
 
@@ -255,6 +269,7 @@ var backupKeys = (appState, action) => {
   const date = moment().format('L')
   const paymentId = appState.getIn(['ledgerInfo', 'paymentId'])
   const passphrase = appState.getIn(['ledgerInfo', 'passphrase'])
+
   const messageLines = [
     locale.translation('ledgerBackupText1'),
     [locale.translation('ledgerBackupText2'), date].join(' '),
@@ -264,6 +279,7 @@ var backupKeys = (appState, action) => {
     '',
     locale.translation('ledgerBackupText5')
   ]
+
   const message = messageLines.join(os.EOL)
   const filePath = path.join(app.getPath('userData'), '/brave_wallet_recovery.txt')
 
@@ -284,21 +300,123 @@ var backupKeys = (appState, action) => {
   return appState
 }
 
+var loadKeysFromBackupFile = (filePath) => {
+  let keys = null
+  let data = fs.readFileSync(filePath)
+
+  if (!data || !data.length || !(data.toString())) {
+    logError('No data in backup file', 'recoveryWallet')
+  } else {
+    try {
+      const recoveryFileContents = data.toString()
+
+      let messageLines = recoveryFileContents.split(os.EOL)
+
+      let paymentIdLine = '' || messageLines[3]
+      let passphraseLine = '' || messageLines[4]
+
+      const paymentIdPattern = new RegExp([locale.translation('ledgerBackupText3'), '([^ ]+)'].join(' '))
+      const paymentId = (paymentIdLine.match(paymentIdPattern) || [])[1]
+
+      const passphrasePattern = new RegExp([locale.translation('ledgerBackupText4'), '(.+)$'].join(' '))
+      const passphrase = (passphraseLine.match(passphrasePattern) || [])[1]
+
+      keys = {
+        paymentId,
+        passphrase
+      }
+    } catch (exc) {
+      logError(exc, 'recoveryWallet')
+    }
+  }
+
+  return keys
+}
+
 /*
  * Recover Ledger Keys
  */
 
 var recoverKeys = (appState, action) => {
-  client.recoverWallet(action.firstRecoveryKey, action.secondRecoveryKey, (err, body) => {
-    if (logError(err, 'recoveryWallet')) appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
-    if (err) {
+  let firstRecoveryKey, secondRecoveryKey
+
+  if (action.useRecoveryKeyFile) {
+    let recoveryKeyFile = promptForRecoveryKeyFile()
+    if (!recoveryKeyFile) {
+      // user canceled from dialog, we abort without error
+      return appState
+    }
+
+    if (recoveryKeyFile) {
+      let keys = loadKeysFromBackupFile(recoveryKeyFile) || {}
+
+      if (keys) {
+        firstRecoveryKey = keys.paymentId
+        secondRecoveryKey = keys.passphrase
+      }
+    }
+  }
+
+  if (!firstRecoveryKey || !secondRecoveryKey) {
+    firstRecoveryKey = action.firstRecoveryKey
+    secondRecoveryKey = action.secondRecoveryKey
+  }
+
+  const UUID_REGEX = /^[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12}$/
+  if (typeof firstRecoveryKey !== 'string' || !firstRecoveryKey.match(UUID_REGEX) || typeof secondRecoveryKey !== 'string' || !secondRecoveryKey.match(UUID_REGEX)) {
+    setImmediate(() => {
+      // calling logError sets the error object
+      logError(true, 'recoverKeys')
+      appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
+      appActions.ledgerRecoveryFailed()
+    })
+    return appState
+  }
+
+  client.recoverWallet(firstRecoveryKey, secondRecoveryKey, (err, body) => {
+    let existingLedgerError = ledgerInfo.error
+
+    if (logError(err, 'recoveryWallet')) {
+      // we reset ledgerInfo.error to what it was before (likely null)
+      // if ledgerInfo.error is not null, the wallet info will not display in UI
+      // logError sets ledgerInfo.error, so we must we clear it or UI will show an error
+      ledgerInfo.error = existingLedgerError
+      appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
       setImmediate(() => appActions.ledgerRecoveryFailed())
     } else {
+      appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
+      if (balanceTimeoutId) clearTimeout(balanceTimeoutId)
+      getBalance()
       setImmediate(() => appActions.ledgerRecoverySucceeded())
     }
   })
 
   return appState
+}
+
+const dialog = electron.dialog
+
+var promptForRecoveryKeyFile = () => {
+  const defaultRecoveryKeyFilePath = path.join(app.getPath('userData'), '/brave_wallet_recovery.txt')
+
+  let files
+
+  if (process.env.SPECTRON) {
+    // skip the dialog for tests
+    console.log(`for test, trying to recover keys from path: ${defaultRecoveryKeyFilePath}`)
+    files = [defaultRecoveryKeyFilePath]
+  } else {
+    files = dialog.showOpenDialog({
+      properties: ['openFile'],
+      defaultPath: defaultRecoveryKeyFilePath,
+      filters: [{
+        name: 'TXT files',
+        extensions: ['txt']
+      }]
+    })
+  }
+
+  return (files && files.length ? files[0] : null)
 }
 
 /*
@@ -423,7 +541,7 @@ eventStore.addChangeListener(() => {
 
 // NB: in theory we have already seen every element in info except for (perhaps) the last one...
   underscore.rest(info, info.length - 1).forEach((page) => {
-    var entry, faviconURL, publisher, siteSetting
+    var entry, faviconURL, pattern, publisher, siteSetting
     var location = page.url
 
     if ((location.match(/^about/)) || ((locations[location]) && (locations[location].publisher))) return
@@ -444,6 +562,10 @@ eventStore.addChangeListener(() => {
     if (!page.publisher) return
 
     publisher = page.publisher
+    pattern = `https?://${publisher}`
+    if ((!synopsis.publishers[publisher]) && (!getSetting(settings.AUTO_SUGGEST_SITES))) {
+      appActions.changeSiteSetting(pattern, 'ledgerPayments', false)
+    }
     synopsis.initPublisher(publisher)
     entry = synopsis.publishers[publisher]
     if ((page.protocol) && (!entry.protocol)) entry.protocol = page.protocol
@@ -594,6 +716,7 @@ var initialize = (paymentsEnabled) => {
         }, 3 * msecs.second)
 
         // Make sure bravery props are up-to-date with user settings
+        if (!ledgerInfo.address) ledgerInfo.address = client.getWalletAddress()
         setPaymentInfo(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
         getBalance()
       })
@@ -624,7 +747,8 @@ var enable = (paymentsEnabled) => {
   synopsis = new (ledgerPublisher.Synopsis)()
   fs.readFile(pathName(synopsisPath), (err, data) => {
     var initSynopsis = () => {
-      var value
+      var updateP, value
+      var siteSettings = appStore.getState().get('siteSettings')
 
       // cf., the `Synopsis` constructor, https://github.com/brave/ledger-publisher/blob/master/index.js#L167
       value = getSetting(settings.MINIMUM_VISIT_TIME)
@@ -657,6 +781,18 @@ var enable = (paymentsEnabled) => {
           synopsis.options.minPublisherVisits = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_MIN_VISITS)
         }
       }
+
+      underscore.keys(synopsis.publishers).forEach((publisher) => {
+        var siteSetting
+
+        if (typeof synopsis.publishers[publisher].options.stickyP !== 'undefined') return
+
+        updateP = true
+        siteSetting = siteSettings.get(`https?://${publisher}`)
+        synopsis.publishers[publisher].options.stickyP = siteSetting && siteSetting.get('ledgerPayments')
+      })
+
+      if (updateP) updatePublisherInfo()
     }
 
     if (publisherInfo._internal.verboseP) console.log('\nstarting up ledger publisher integration')
@@ -763,10 +899,11 @@ var synopsisNormalizer = () => {
 
   results = []
   underscore.keys(synopsis.publishers).forEach((publisher) => {
-    if (synopsis.publishers[publisher].scores[scorekeeper] <= 0) return
-
-    if ((synopsis.options.minPublisherDuration > synopsis.publishers[publisher].duration) ||
-        (synopsis.options.minPublisherVisits > synopsis.publishers[publisher].visits)) return
+    if ((getSetting(settings.AUTO_SUGGEST_SITES)) && (!synopsis.publishers[publisher].options.stickyP)) {
+      if ((synopsis.publishers[publisher].scores[scorekeeper] <= 0) ||
+          (synopsis.options.minPublisherDuration > synopsis.publishers[publisher].duration) ||
+          (synopsis.options.minPublisherVisits > synopsis.publishers[publisher].visits)) return
+    }
 
     results.push(underscore.extend({ publisher: publisher }, underscore.omit(synopsis.publishers[publisher], 'window')))
   }, synopsis)
@@ -1595,13 +1732,20 @@ const showDisabledNotifications = () => {
 */
 const showEnabledNotifications = () => {
   const reconcileStamp = ledgerInfo.reconcileStamp
-  if (reconcileStamp && reconcileStamp - underscore.now() < msecs.day) {
+
+  if (!reconcileStamp) return
+
+  if (reconcileStamp - underscore.now() < msecs.day) {
     if (sufficientBalanceToReconcile()) {
       if (shouldShowNotificationReviewPublishers()) {
-        showNotificationReviewPublishers()
+        showNotificationReviewPublishers(reconcileStamp + (ledgerInfo.reconcileFrequency - 2) * msecs.day)
       }
     } else if (shouldShowNotificationAddFunds()) {
       showNotificationAddFunds()
+    }
+  } else if (reconcileStamp - underscore.now() < 2 * msecs.day) {
+    if (sufficientBalanceToReconcile() && (shouldShowNotificationReviewPublishers())) {
+      showNotificationReviewPublishers(underscore.now() + msecs.day)
     }
   }
 }
@@ -1643,8 +1787,7 @@ const shouldShowNotificationReviewPublishers = () => {
   return !nextTime || (underscore.now() > nextTime)
 }
 
-const showNotificationReviewPublishers = () => {
-  const nextTime = ledgerInfo.reconcileStamp + (ledgerInfo.reconcileFrequency - 1) * msecs.day
+const showNotificationReviewPublishers = (nextTime) => {
   appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_RECONCILE_SOON_TIMESTAMP, nextTime)
 
   reconciliationMessage = reconciliationMessage || locale.translation('reconciliationNotification')

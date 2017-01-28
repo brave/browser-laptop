@@ -1,10 +1,12 @@
 # Changelog
 
+## [0.13.1](https://github.com/brave/browser-laptop/releases/v0.13.1dev)
+- TODO
+
 ## [0.13.0](https://github.com/brave/browser-laptop/releases/v0.13.0dev)
 - Added WebTorrent support for magnet links. ([#5818](https://github.com/brave/browser-laptop/issues/5818))([#5815](https://github.com/brave/browser-laptop/issues/5815))
 - Added Linux sandbox. ([#874](https://github.com/brave/browser-laptop/issues/874))
 - Added PDF based payment history contribution statements. ([#4769](https://github.com/brave/browser-laptop/issues/4769))
-- Arrow keys can now be used to select popups for autofill ([#1302](https://github.com/brave/browser-laptop/issues/1302))
 - Added the revision SHA the source code was built from to about:brave. ([#5462](https://github.com/brave/browser-laptop/issues/5462))
 - Added copy to clipboard option for about:brave page. ([#5790](https://github.com/brave/browser-laptop/issues/5790))
 - Added a display-text-only mode for bookmark toolbar folders. ([#6078](https://github.com/brave/browser-laptop/issues/6078))
@@ -13,6 +15,10 @@
 - Changed "window renderer" processes to no longer include Node (content renderers never did in Brave). ([#6454](https://github.com/brave/browser-laptop/issues/6454))
 - Changed Battery Status API to require user permission. ([#1885](https://github.com/brave/browser-laptop/issues/1885))
 - Updated localization files. ([#6709]((https://github.com/brave/browser-laptop/issues/6709))
+- Fixed Twitter login. ([#4758](https://github.com/brave/browser-laptop/issues/4758))
+- Fixed blocking of YouTube ads. ([#4693](https://github.com/brave/browser-laptop/issues/4693))
+- Fixed tab switching performance. ([#6715](https://github.com/brave/browser-laptop/issues/6715))
+- Fixed drag and drop for tabs. ([#6033](https://github.com/brave/browser-laptop/issues/6033))
 - Fixed memory leak causing renderer crashes. ([#6656](https://github.com/brave/browser-laptop/issues/6656))
 - Fixed 1Password auto-submit on fill. ([#5875](https://github.com/brave/browser-laptop/issues/5875))
 - Fixed focus on tabs keeps "bouncing" back to previous tab. ([#5730](https://github.com/brave/browser-laptop/issues/5730))
@@ -29,7 +35,7 @@
 - Fixed borders and corners of each button on navbar not being clickable. ([#5679](https://github.com/brave/browser-laptop/issues/5679))
 - Fixed Geolocations not working on Windows ia32. ([#6331](https://github.com/brave/browser-laptop/issues/6331))
 - Upgrade to Chromium 54.0.2840.100. ([#3679](https://github.com/brave/browser-laptop/issues/3679))
-- Updated Muon to 2.0.14. ([#6340](https://github.com/brave/browser-laptop/issues/6340))
+- Updated Muon to 2.0.17. ([#6340](https://github.com/brave/browser-laptop/issues/6340))
 
 ## [0.12.15](https://github.com/brave/browser-laptop/releases/v0.12.15dev)
 - Added Yandex as a new search engine. ([#2703](https://github.com/brave/browser-laptop/issues/2703))

@@ -401,9 +401,7 @@ class Frame extends ImmutableComponent {
       if (this.getWebRTCPolicy(prevProps) !== this.getWebRTCPolicy(this.props)) {
         this.webview.setWebRTCIPHandlingPolicy(this.getWebRTCPolicy(this.props))
       }
-      if (prevProps.isActive !== this.props.isActive) {
-        this.webview.setActive(this.props.isActive)
-      }
+      this.webview.setActive(this.props.isActive)
       this.webview.setTabIndex(this.props.tabIndex)
       if (prevProps.activeShortcut !== this.props.activeShortcut) {
         this.handleShortcut()
@@ -734,7 +732,7 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('hide-autofill-popup', (e) => {
       if (this.props.contextMenuDetail && this.props.contextMenuDetail.get('type') === 'autofill' &&
-        this.webview.isFocused()) {
+        (this.props.contextMenuDetail.get('tabId') !== this.props.tabId || this.webview.isFocused())) {
         windowActions.autofillPopupHidden(this.props.tabId)
       }
     })
@@ -787,8 +785,8 @@ class Frame extends ImmutableComponent {
           }
           break
         case messages.CLEAR_BROWSING_DATA_NOW:
-          method = (clearBrowsingDataDetail) =>
-            windowActions.setClearBrowsingDataDetail(clearBrowsingDataDetail)
+          method = () =>
+            windowActions.setClearBrowsingDataPanelVisible(true)
           break
         case messages.AUTOFILL_SET_ADDRESS:
           method = (currentDetail, originalDetail) =>
@@ -822,7 +820,7 @@ class Frame extends ImmutableComponent {
         return
       }
       windowActions.onWebviewLoadEnd(this.frame, url)
-      const parsedUrl = urlParse(this.props.location)
+      const parsedUrl = urlParse(url)
       if (!this.allowRunningWidevinePlugin()) {
         this.showWidevineNotification(this.props.location, this.origin, () => {
         }, () => {
@@ -832,13 +830,14 @@ class Frame extends ImmutableComponent {
 
       const protocol = parsedUrl.protocol
       const isError = this.props.aboutDetails && this.props.aboutDetails.get('errorCode')
-      if (!this.props.isPrivate && this.props.provisionalLocation === this.props.location && (protocol === 'http:' || protocol === 'https:') && !isError && savePage) {
+
+      if (!this.props.isPrivate && this.props.provisionalLocation === url && (protocol === 'http:' || protocol === 'https:') && !isError && savePage) {
         // Register the site for recent history for navigation bar
         appActions.addSite(siteUtil.getDetailFromFrame(this.frame))
       }
 
-      if (this.props.location.startsWith(pdfjsOrigin)) {
-        let displayLocation = UrlUtil.getLocationIfPDF(this.props.location)
+      if (url.startsWith(pdfjsOrigin)) {
+        let displayLocation = UrlUtil.getLocationIfPDF(url)
         windowActions.setSecurityState(this.frame, {
           secure: urlParse(displayLocation).protocol === 'https:',
           runInsecureContent: false
@@ -876,7 +875,7 @@ class Frame extends ImmutableComponent {
         windowActions.loadUrl(this.frame, 'about:error')
         appActions.removeSite(siteUtil.getDetailFromFrame(this.frame))
       } else if (provisionLoadFailure) {
-        windowActions.setNavigated(url, this.props.frameKey, true, this.frame.get('tabId'))
+        windowActions.setNavigated(this.webview.getURL(), this.props.frameKey, true, this.frame.get('tabId'))
       }
     }
     this.webview.addEventListener('security-style-changed', (e) => {

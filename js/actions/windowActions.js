@@ -964,12 +964,13 @@ const windowActions = {
   },
 
   /**
-   * Sets the clear browsing data popup detail
+   * Sets whether the clear browsing data popup is visible
+   * @param {boolean} isVisible
    */
-  setClearBrowsingDataDetail: function (clearBrowsingDataDetail) {
+  setClearBrowsingDataPanelVisible: function (isVisible) {
     dispatch({
-      actionType: windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL,
-      clearBrowsingDataDetail
+      actionType: windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_VISIBLE,
+      isVisible
     })
   },
 
@@ -1197,6 +1198,20 @@ const windowActions = {
       actionType: windowConstants.WINDOW_AUTOFILL_POPUP_HIDDEN,
       tabId,
       notify
+    })
+  },
+
+  onTabClose: function (data) {
+    dispatch({
+      actionType: windowConstants.WINDOW_TAB_CLOSE,
+      data
+    })
+  },
+
+  onTabMouseLeave: function (data) {
+    dispatch({
+      actionType: windowConstants.WINDOW_TAB_MOUSE_LEAVE,
+      data
     })
   }
 }

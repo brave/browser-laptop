@@ -76,13 +76,19 @@ describe('settings unit test', function () {
           assert.equal(response, passwordManagers.LAST_PASS)
         })
 
+        it('returns `Enpass` if ENPASS_ENABLED was true', function () {
+          settingsCollection[settingsConst.ENPASS_ENABLED] = true
+          const response = settings.getSetting(settingsConst.ACTIVE_PASSWORD_MANAGER, settingsCollection)
+          assert.equal(response, passwordManagers.ENPASS)
+        })
+
         it('returns `BuiltIn` if PASSWORD_MANAGER_ENABLED was true', function () {
           settingsCollection[settingsConst.PASSWORD_MANAGER_ENABLED] = true
           const response = settings.getSetting(settingsConst.ACTIVE_PASSWORD_MANAGER, settingsCollection)
           assert.equal(response, passwordManagers.BUILT_IN)
         })
 
-        it('returns `1Password`/`Dashlane`/`LastPass`, even if PASSWORD_MANAGER_ENABLED was true', function () {
+        it('returns `1Password`/`Dashlane`/`LastPass`/`Enpass`, even if PASSWORD_MANAGER_ENABLED was true', function () {
           // 1Password
           settingsCollection[settingsConst.ONE_PASSWORD_ENABLED] = true
           settingsCollection[settingsConst.PASSWORD_MANAGER_ENABLED] = true
@@ -100,6 +106,12 @@ describe('settings unit test', function () {
           settingsCollection[settingsConst.PASSWORD_MANAGER_ENABLED] = true
           response = settings.getSetting(settingsConst.ACTIVE_PASSWORD_MANAGER, settingsCollection)
           assert.equal(response, passwordManagers.LAST_PASS)
+          // Enpass
+          settingsCollection = {}
+          settingsCollection[settingsConst.ENPASS_ENABLED] = true
+          settingsCollection[settingsConst.PASSWORD_MANAGER_ENABLED] = true
+          response = settings.getSetting(settingsConst.ACTIVE_PASSWORD_MANAGER, settingsCollection)
+          assert.equal(response, passwordManagers.ENPASS)
         })
 
         it('returns `Unmanaged` if PASSWORD_MANAGER_ENABLED was false', function () {

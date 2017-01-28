@@ -27,7 +27,7 @@ describe('urlBar tests', function () {
       yield this.app.client.waitForExist(urlInput)
       yield this.app.client.waitForElementFocus(urlInput)
       yield this.app.client
-        .clearAppData({browserHistory: true})
+        .onClearBrowsingData({browserHistory: true})
         .addSite({ location: 'https://brave.com', title: 'Brave' })
     })
 
@@ -69,7 +69,7 @@ describe('urlBar tests', function () {
         return this.getValue(urlInput).then((val) => val === '')
       })
       yield this.app.client
-        .clearAppData({browserHistory: true})
+        .onClearBrowsingData({browserHistory: true})
         .addSite({ location: 'https://brave.com', title: 'Brave' })
         .addSite({ location: 'https://brave.com/test' })
         .addSite({ location: 'https://www.youtube.com' })
@@ -340,10 +340,7 @@ describe('urlBar tests', function () {
 
     beforeEach(function * () {
       yield this.app.client
-        .setValue(urlInput, '')
-        .waitUntil(function () {
-          return this.getValue(urlInput).then((val) => val === '')
-        })
+        .setInputText(urlInput, '')
     })
 
     entries.forEach((entry) => {
@@ -357,40 +354,52 @@ describe('urlBar tests', function () {
                 .getCssProperty(urlbarIcon, 'background-image')
                 .then((backgroundImage) => backgroundImage.value === `url("${entry.image}")`)
             })
-        })
-
-        it('does not show the default icon (search)', function * () {
-          yield this.app.client.waitForExist('.urlbarIcon.fa-search', 1500, true)
+            .waitForElementCount('.urlbarIcon.fa-search', 0)
         })
       })
     })
-    it('clears last search engine when removed', function * () {
+  })
+
+  describe('search engine icon clears', function () {
+    Brave.beforeAll(this)
+    const entries = searchProviders.providers
+
+    before(function * () {
+      yield setup(this.app.client)
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(urlInput)
+        .waitForElementFocus(urlInput)
+    })
+
+    beforeEach(function * () {
       const entry = entries[0]
       yield this.app.client
+        .setInputText(urlInput, '')
         .keys(`${entry.shortcut} hi`)
-        .waitForElementCount(urlbarIcon, 1)
         .waitUntil(function () {
           return this
             .getCssProperty(urlbarIcon, 'background-image')
             .then((backgroundImage) => backgroundImage.value === `url("${entry.image}")`)
         })
-        .keys(Brave.keys.BACKSPACE)
-        .keys(Brave.keys.BACKSPACE)
-        .keys(Brave.keys.BACKSPACE)
+    })
+
+    it('clears last search engine when removed', function * () {
+      yield this.app.client
+        .setInputText(urlInput, '.')
         .waitForElementCount(urlbarIcon + '.fa-search', 1)
     })
     it('clears last search engine when searching', function * () {
-      const entry = entries[0]
       yield this.app.client
-        .keys(`${entry.shortcut} hi`)
-        .waitForElementCount(urlbarIcon, 1)
-        .waitUntil(function () {
-          return this
-            .getCssProperty(urlbarIcon, 'background-image')
-            .then((backgroundImage) => backgroundImage.value === `url("${entry.image}")`)
-        })
         .keys(Brave.keys.ENTER)
         .waitForElementCount(urlbarIcon + '.fa-lock', 1)
+    })
+    it('clears last search engine when loading arbitrary page', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(Brave.server.url('page1.html'))
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForElementCount(urlbarIcon + '.fa-unlock', 1)
     })
   })
 
@@ -470,7 +479,7 @@ describe('urlBar tests', function () {
         .tabByIndex(0)
         .loadUrl(this.page1Url)
         .windowByUrl(Brave.browserWindowUrl)
-        .setValue(urlInput, '')
+        .setInputText(urlInput, '')
         .waitUntil(function () {
           return this.getValue(urlInput).then((val) => val === '')
         })
@@ -502,10 +511,7 @@ describe('urlBar tests', function () {
         .tabByIndex(0)
         .loadUrl(this.page1Url)
         .windowByUrl(Brave.browserWindowUrl)
-        .setValue(urlInput, '')
-        .waitUntil(function () {
-          return this.getValue(urlInput).then((val) => val === '')
-        })
+        .setInputText(urlInput, '')
         .windowByUrl(Brave.browserWindowUrl)
         .tabByIndex(0)
         .loadUrl(this.page2Url)

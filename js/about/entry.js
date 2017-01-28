@@ -80,7 +80,7 @@ switch (getBaseUrl(getSourceAboutUrl(window.location.href))) {
     element = require('./passwords')
     break
   case 'about:preferences':
-    element = require('./preferences')
+    element = require('./preferences').AboutPreferences
     break
   case 'about:safebrowsing':
     element = require('./safebrowsing')

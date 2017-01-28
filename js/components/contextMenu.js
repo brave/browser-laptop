@@ -32,7 +32,7 @@ class ContextMenuItem extends ImmutableComponent {
     e.stopPropagation()
     if (clickAction) {
       if (shouldHide) {
-        windowActions.resetMenuState()
+        setImmediate(() => windowActions.resetMenuState())
       }
       clickAction(e)
     }
@@ -339,7 +339,7 @@ class ContextMenu extends ImmutableComponent {
   }
 
   onClick () {
-    windowActions.resetMenuState()
+    setImmediate(() => windowActions.resetMenuState())
   }
 
   getTemplateItemsOnly (template) {
@@ -391,7 +391,7 @@ class ContextMenu extends ImmutableComponent {
   }
 
   get hasSubmenuSelection () {
-    return this.props.selectedIndex.length > 1
+    return (this.props.selectedIndex === null) ? false : this.props.selectedIndex.length > 1
   }
 
   render () {
