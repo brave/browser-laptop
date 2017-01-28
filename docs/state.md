@@ -61,19 +61,40 @@ AppStore
       }
     }
   },
-  sites: {
-    [siteKey]: { // folder: folderId; bookmark/history: location + partitionNumber + parentFolderId
+  bookmarks: {
+    [siteKey]: {
       location: string,
       title: string,
-      customTitle: string, // User provided title for bookmark; overrides title
-      tags: [string], // empty, 'bookmark', 'bookmark-folder', 'pinned', or 'reader'
+      tags: [string], // 'bookmark' or 'bookmark-folder'
       favicon: string, // URL of the favicon
       themeColor: string, // css compatible color string
       lastAccessedTime: number, // datetime.getTime()
       creationTime: number, //creation time of bookmark
       partitionNumber: number, // Optionally specifies a specific session
-      folderId: number, // Set for bookmark folders only
-      parentFolderId: number // Set for bookmarks and bookmark folders only
+      folderId: number,
+      parentFolderId: number
+    },
+  },
+  visitedSites: {
+    [siteKey]: {
+      location: string,
+      title: string,
+      favicon: string, // URL of the favicon
+      themeColor: string, // css compatible color string
+      lastAccessedTime: number, // datetime.getTime()
+      creationTime: number, //creation time of bookmark
+      partitionNumber: number // Optionally specifies a specific session
+    },
+  },
+  pinnedSites: {
+    [siteKey]: {
+      location: string,
+      title: string,
+      favicon: string, // URL of the favicon
+      themeColor: string, // css compatible color string
+      lastAccessedTime: number, // datetime.getTime()
+      creationTime: number, //creation time of bookmark
+      partitionNumber: number // Optionally specifies a specific session
     },
   },
   downloads: [{
