@@ -51,10 +51,18 @@ sudo dnf install ./brave.rpm
 
 ## OpenSUSE AMD64:
 
+To install brave using zypper:
+
 ```
 sudo zypper install lsb
-wget -O brave.rpm https://laptop-updates.brave.com/latest/openSUSE64
-sudo rpm -i ./brave.rpm
+sudo zypper addrepo https://s3-us-west-2.amazonaws.com/brave-rpm-release/x86_64/ brave-rpm-release
+sudo zypper install brave
+```
+
+To update brave using zypper:
+
+```
+sudo zypper update
 ```
 
 ## Raw x64 binaries:
