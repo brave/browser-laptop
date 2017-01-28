@@ -389,11 +389,4 @@ function formattedTimeFromTimestamp (timestamp) {
   return moment(new Date(timestamp)).format('h:mma')
 }
 
-function longFormattedDateFromTimestamp (timestamp) {
-  let momentDate = moment(new Date(timestamp))
-
-  // e.g. June 15th at 4:00pm
-  return `${momentDate.format('MMMM Do')} at ${momentDate.format('h:mma')}`
-}
-
 module.exports = <ContributionStatement />
