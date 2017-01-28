@@ -11,10 +11,14 @@ describe('ContextMenu', function () {
       .waitForEnabled(urlInput)
   }
 
+  const contextMenuIndexOf = (index) => {
+    return `.contextMenu div.selectedByKeyboard[data-index="${index}"]`
+  }
+
   describe('navigation', function () {
     Brave.beforeAll(this)
 
-    before(function *() {
+    before(function * () {
       yield setup(this.app.client)
       this.formfill = Brave.server.url('formfill.html')
       this.input = '[name="01___title"]'
@@ -34,7 +38,7 @@ describe('ContextMenu', function () {
       }
     })
 
-    it('check if context menu exists', function *() {
+    it('check if context menu exists', function * () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(this.formfill)
@@ -45,7 +49,7 @@ describe('ContextMenu', function () {
         .waitForVisible('.contextMenuItemText')
     })
 
-    it('check if enter is prevented', function *() {
+    it('check if enter is prevented', function * () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(this.formfill)
@@ -56,18 +60,17 @@ describe('ContextMenu', function () {
         .click(this.input)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible('.contextMenu')
-        .keys('\uE015')
-        .pause(10)
-        .keys('\uE015')
-        .pause(10)
-        .keys('\uE007')
-        .pause(10)
+        .keys(Brave.keys.DOWN)
+        .waitForExist(contextMenuIndexOf(1))
+        .keys(Brave.keys.DOWN)
+        .waitForExist(contextMenuIndexOf(2))
+        .keys(Brave.keys.ENTER)
         .tabByUrl(this.formfill)
         .getValue('[name="02frstname"]').should.eventually.be.equal('Test value')
         .getValue(this.input).should.eventually.be.equal(this.values[1])
     })
 
-    it('click on item', function *() {
+    it('click on item', function * () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(this.formfill)
@@ -81,7 +84,7 @@ describe('ContextMenu', function () {
         .getValue(this.input).should.eventually.be.equal(this.values[0])
     })
 
-    it('select item via click and keys', function *() {
+    it('select item via click and keys', function * () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(this.formfill)
@@ -90,37 +93,35 @@ describe('ContextMenu', function () {
         .click(this.input)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible('.contextMenu')
-        .keys('\uE015')
-        .pause(10)
-        .keys('\uE015')
-        .pause(10)
-        .keys('\uE007')
-        .pause(10)
+        .keys(Brave.keys.DOWN)
+        .waitForExist(contextMenuIndexOf(1))
+        .keys(Brave.keys.DOWN)
+        .waitForExist(contextMenuIndexOf(2))
+        .keys(Brave.keys.ENTER)
         .tabByUrl(this.formfill)
         .getValue(this.input).should.eventually.be.equal(this.values[1])
     })
 
-    it('select item via keys only', function *() {
+    it('select item via keys only', function * () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(this.formfill)
         .waitForVisible('<form>')
         .click(this.input)
         .windowByUrl(Brave.browserWindowUrl)
-        .keys('\uE015')
+        .keys(Brave.keys.DOWN)
         .waitForVisible('.contextMenu')
-        .keys('\uE015')
-        .pause(10)
-        .keys('\uE015')
-        .pause(10)
-        .keys('\uE015')
-        .pause(10)
-        .keys('\uE015')
-        .pause(10)
-        .keys('\uE013')
-        .pause(10)
-        .keys('\uE007')
-        .pause(10)
+        .keys(Brave.keys.DOWN)
+        .waitForExist(contextMenuIndexOf(1))
+        .keys(Brave.keys.DOWN)
+        .waitForExist(contextMenuIndexOf(2))
+        .keys(Brave.keys.DOWN)
+        .waitForExist(contextMenuIndexOf(3))
+        .keys(Brave.keys.DOWN)
+        .waitForExist(contextMenuIndexOf(0))
+        .keys(Brave.keys.UP)
+        .waitForExist(contextMenuIndexOf(3))
+        .keys(Brave.keys.ENTER)
         .tabByUrl(this.formfill)
         .getValue(this.input).should.eventually.be.equal(this.values[2])
     })
