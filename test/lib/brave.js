@@ -367,7 +367,8 @@ var exports = {
           const ret = val.value && val.value.sites && Array.from(Object.values(val.value.sites)).find(
             (site) => site.location === location &&
               (!waitForTitle || waitForTitle && site.title))
-          logVerbose('waitForSiteEntry("' + location + ', ' + waitForTitle + '") => ' + ret)
+          logVerbose('sites:' + JSON.stringify(val.value.sites))
+          logVerbose('waitForSiteEntry("' + location + '", ' + waitForTitle + ') => ' + ret)
           return ret
         })
       })
