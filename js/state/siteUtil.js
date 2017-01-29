@@ -139,7 +139,7 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId, order) =>
   }
 
   let site = makeImmutable({
-    lastAccessedTime: lastAccessedTime,
+    lastAccessedTime,
     tags,
     title: newSiteDetail.get('title'),
     order

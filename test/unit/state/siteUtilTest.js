@@ -273,8 +273,9 @@ describe('siteUtil', function () {
         })
         it('returns newSiteDetail value for lastAccessedTime when oldSite value is undefined', function () {
           const processedSites = siteUtil.addSite(emptySites, bookmarkAllFields)
+          const processedKey = siteUtil.getSiteKey(bookmarkAllFields)
           const expectedSites = Immutable.fromJS([bookmarkAllFields])
-          assert.deepEqual(processedSites.getIn([0, 'lastAccessedTime']), expectedSites.getIn([0, 'lastAccessedTime']))
+          assert.deepEqual(processedSites.getIn([processedKey, 'lastAccessedTime']), expectedSites.getIn([0, 'lastAccessedTime']))
         })
       })
     })
