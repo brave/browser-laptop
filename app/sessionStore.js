@@ -114,6 +114,8 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
   if (!perWindowData) {
     perWindowData = {}
   }
+  // Delete the window session id
+  delete perWindowData.id
   // Hide the context menu when we restore.
   delete perWindowData.contextMenuDetail
   // Don't save preview frame since they are only related to hovering on a tab

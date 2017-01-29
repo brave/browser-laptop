@@ -528,7 +528,7 @@ class Main extends ImmutableComponent {
       windowActions.onFocusChanged(true)
     })
     currentWindow.on('blur', function () {
-      appActions.windowBlurred(currentWindow.id)
+      appActions.windowBlurred(this.props.windowState.get('id'))
       windowActions.onFocusChanged(false)
     })
     // Full screen as in F11 (not full screen on a video)
