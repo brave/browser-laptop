@@ -688,7 +688,8 @@ class Frame extends ImmutableComponent {
       if (this.frame.isEmpty()) {
         return
       }
-      let tabId = this.webview.getId()
+      // TODO: Remove webview.getId() part below when everyone is on a newer electron
+      let tabId = e.tabId !== undefined ? e.tabId : this.webview.getId()
       if (this.props.tabId !== tabId) {
         windowActions.setFrameTabId(this.frame, tabId)
       }
@@ -930,10 +931,8 @@ class Frame extends ImmutableComponent {
 
       // After navigating to the URL via back/forward buttons, set correct frame title
       if (!e.isRendererInitiated) {
-        let index = this.webview.getCurrentEntryIndex()
-        let title = this.webview.getTitleAtIndex(index)
-        if (!this.frame.isEmpty()) {
-          windowActions.setFrameTitle(this.frame, title)
+        if (!this.frame.isEmpty() && this.props.tabData) {
+          windowActions.setFrameTitle(this.frame, this.props.tabData.get('title'))
         }
       }
     })

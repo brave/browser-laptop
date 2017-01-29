@@ -1211,6 +1211,7 @@ class Main extends ImmutableComponent {
             sortedFrames.map((frame) =>
               <Frame
                 ref={(node) => { this.frames[frame.get('key')] = node }}
+                tabData={this.props.appState.get('tabs').find((tab) => tab.get('tabId') === frame.get('tabId'))}
                 urlBarFocused={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'focused'])}
                 tabIndex={frameStateUtil.getFrameIndex(this.props.windowState, frame.get('key'))}
                 prefOpenInForeground={getSetting(settings.SWITCH_TO_NEW_TABS)}

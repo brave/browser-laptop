@@ -1,4 +1,5 @@
 const currentWindow = require('electron').remote.getCurrentWindow()
+const currentWindowId = currentWindow.id
 let isFocused = currentWindow.isFocused()
 let isMaximized = currentWindow.isMaximized()
 let isFullScreen = currentWindow.isMaximized()
@@ -29,6 +30,7 @@ currentWindow.on('leave-full-screen', function (wnd) {
 
 module.exports = {
   currentWindow,
+  currentWindowId,
   currentWindowWebContents: currentWindow.webContents,
   isMaximized: () => isMaximized,
   isFocused: () => isFocused,
