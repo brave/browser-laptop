@@ -132,7 +132,7 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId, order) =>
   let lastAccessedTime
   if (isBookmark(tag) || isBookmarkFolder(tag)) {
     siteDetailExist
-      ? lastAccessedTime = newSiteDetail.get('lastAccessedTime') || oldSiteDetail.get('lastAccessedTime')
+      ? lastAccessedTime = newSiteDetail.get('lastAccessedTime') || oldSiteDetail && oldSiteDetail.get('lastAccessedTime') || 0
       : lastAccessedTime = 0
   } else {
     lastAccessedTime = newSiteDetail.get('lastAccessedTime') || new Date().getTime()
