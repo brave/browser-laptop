@@ -304,6 +304,19 @@ var exports = {
       })
     })
 
+    this.app.client.addCommand('waitForAddressCount', function (addressCount) {
+      logVerbose('waitForAddressCount(' + addressCount + ')')
+      return this.waitUntil(function () {
+        return this.getAppState().then((val) => {
+          console.log(val.value && val.value.autofill)
+          const ret = val.value && val.value && val.value.autofill &&
+            val.value.autofill.addresses && val.value.autofill.addresses.guid.length || 0
+          logVerbose('waitForAddressCount(' + addressCount + ') => ' + ret)
+          return ret
+        })
+      })
+    })
+
     this.app.client.addCommand('waitForElementCount', function (selector, count) {
       logVerbose('waitForElementCount("' + selector + '", ' + count + ')')
       return this.waitUntil(function () {
@@ -336,6 +349,19 @@ var exports = {
 
     this.app.client.addCommand('waitForSiteEntry', function (location, waitForTitle = true) {
       logVerbose('waitForSiteEntry("' + location + '", "' + waitForTitle + '")')
+      return this.waitUntil(function () {
+        return this.getAppState().then((val) => {
+          const ret = val.value && val.value.sites && Array.from(Object.values(val.value.sites)).find(
+            (site) => site.location === location &&
+              (!waitForTitle || waitForTitle && site.title))
+          logVerbose('waitForSiteEntry("' + location + ', ' + waitForTitle + '") => ' + ret)
+          return ret
+        })
+      })
+    })
+
+    this.app.client.addCommand('waitForAddressEntry', function (location, waitForTitle = true) {
+      logVerbose('waitForAddressEntry("' + location + '", "' + waitForTitle + '")')
       return this.waitUntil(function () {
         return this.getAppState().then((val) => {
           const ret = val.value && val.value.sites && Array.from(Object.values(val.value.sites)).find(
