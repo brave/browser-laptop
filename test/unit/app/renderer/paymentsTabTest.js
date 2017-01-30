@@ -104,12 +104,12 @@ describe('PaymentsTab component', function () {
       assert.equal(wrapper.find('[data-test-id="creatingWallet"]').length, 1)
     })
 
-    it.skip('renders payment history button', function () {
+    it('renders payment history button (requires wallet and reconcileStamp)', function () {
       const wrapper = shallow(
         <PaymentsTab
           showOverlay={function () {}}
           hideOverlay={function () {}}
-          ledgerData={Immutable.Map({created: true, transactions: {size: 3}})} />
+          ledgerData={Immutable.Map({created: true, transactions: {size: 3}, reconcileStamp: 1})} />
       )
       assert.equal(wrapper.find('.paymentHistoryButton').length, 1)
     })
@@ -120,6 +120,16 @@ describe('PaymentsTab component', function () {
           showOverlay={function () {}}
           hideOverlay={function () {}}
           ledgerData={Immutable.Map({created: false, balance: null})} />
+      )
+      assert.equal(wrapper.find('.paymentHistoryButton').length, 0)
+    })
+
+    it('does not render payment history button when reconcileStamp is not set', function () {
+      const wrapper = shallow(
+        <PaymentsTab
+          showOverlay={function () {}}
+          hideOverlay={function () {}}
+          ledgerData={Immutable.Map({created: true, transactions: {size: 3}})} />
       )
       assert.equal(wrapper.find('.paymentHistoryButton').length, 0)
     })
