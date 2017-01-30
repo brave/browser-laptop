@@ -194,7 +194,7 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail, s
   }
 
   let site = mergeSiteDetails(oldSite, siteDetail, tag, folderId)
-  if (syncCallback) {
+  if (getSetting(settings.SYNC_ENABLED) === true && syncCallback) {
     site = module.exports.setObjectId(site)
     syncCallback(site)
   }
@@ -220,7 +220,7 @@ module.exports.removeSite = function (sites, siteDetail, tag, syncCallback) {
   if (index === -1) {
     return sites
   }
-  if (syncCallback) {
+  if (getSetting(settings.SYNC_ENABLED) === true && syncCallback) {
     syncCallback(sites.getIn([index]))
   }
 
@@ -331,7 +331,7 @@ module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prep
       sourceSite = sourceSite.set('parentFolderId', destinationSite.get('parentFolderId'))
     }
   }
-  if (syncCallback) {
+  if (getSetting(settings.SYNC_ENABLED) === true && syncCallback) {
     syncCallback(sourceSite)
   }
   return sites.splice(newIndex, 0, sourceSite)
@@ -551,7 +551,7 @@ module.exports.clearHistory = function (sites, syncCallback) {
   bookmarks.forEach((site, index) => {
     if (site.get('lastAccessedTime')) {
       bookmarks = bookmarks.setIn([index, 'lastAccessedTime'], null)
-      if (syncCallback && site.get('objectId')) {
+      if (getSetting(settings.SYNC_ENABLED) === true && syncCallback && site.get('objectId')) {
         syncCallback(site.set('lastAccessedTime', null))
       }
     }
