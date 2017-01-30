@@ -4,6 +4,8 @@ const siteTags = require('../../../js/constants/siteTags')
 const siteUtil = require('../../../js/state/siteUtil')
 const assert = require('assert')
 const Immutable = require('immutable')
+const mockery = require('mockery')
+const settings = require('../../../js/constants/settings')
 
 describe('siteUtil', function () {
   const testUrl1 = 'https://brave.com/'
@@ -369,6 +371,20 @@ describe('siteUtil', function () {
         assert.deepEqual(processedSites.getIn([0, 'lastAccessedTime']), expectedSites.getIn([0, 'lastAccessedTime']))
       })
       it('sets an objectId when syncCallback is provided', function () {
+        mockery.enable({
+          warnOnReplace: false,
+          warnOnUnregistered: false,
+          useCleanCache: true
+        })
+        mockery.registerMock('./stores/appStoreRenderer', {
+          get state () {
+            return Immutable.fromJS({
+              settings: {
+                [settings.SYNC_ENABLED]: true
+              }
+            })
+          }
+        })
         const oldSiteDetail = Immutable.fromJS({
           lastAccessedTime: 123,
           tags: [siteTags.BOOKMARK],
@@ -385,6 +401,8 @@ describe('siteUtil', function () {
         })
         const sites = Immutable.fromJS([oldSiteDetail])
         const processedSites = siteUtil.addSite(sites, newSiteDetail, siteTags.BOOKMARK, oldSiteDetail, () => {})
+        mockery.deregisterMock('./stores/appStoreRenderer')
+        mockery.disable()
         assert.equal(processedSites.getIn([0, 'objectId']).size, 16)
       })
     })
