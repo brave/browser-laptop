@@ -74,7 +74,7 @@ method in at [brave.js](https://github.com/brave/browser-laptop/blob/master/test
 
 ### IPC
 
-- ipcSend: send an IPC message, like SHORTCUT_NEW_FRAME, etc. To see more message types, check out componentDidMount in [main.js](https://github.com/brave/browser-laptop/blob/master/js/components/main.js)
+- ipcSend: send an IPC message, To see more message types, check out componentDidMount in [main.js](https://github.com/brave/browser-laptop/blob/master/js/components/main.js)
 - ipcSendRenderer
 
 ### Tab management
@@ -84,12 +84,12 @@ method in at [brave.js](https://github.com/brave/browser-laptop/blob/master/test
 - getTabCount
 - tabByUrl
 - waitForTabCount
+- pinTabByIndex
 
 ### Window management
 - waitForBrowserWindow
 - setContextMenuDetail: hides any context menus which are actively showing
 - showFindbar
-- setPinned
 - getDefaultWindowHeight
 - getDefaultWindowWidth
 - resizeWindow

@@ -27,7 +27,6 @@ const locale = require('../locale')
 const {isSiteBookmarked, siteSort} = require('../../js/state/siteUtil')
 const isDarwin = process.platform === 'darwin'
 const isLinux = process.platform === 'linux'
-const aboutUrl = 'https://brave.com/'
 
 let appMenu = null
 // TODO(bridiver) - these should be handled in the appStore
@@ -51,7 +50,10 @@ const createFileSubmenu = () => {
         }, (paths) => {
           if (paths) {
             paths.forEach((path) => {
-              CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, fileUrl(path)])
+              appActions.createTabRequested({
+                url: fileUrl(path),
+                windowId: focusedWindow.id
+              })
             })
           }
         })
@@ -278,8 +280,14 @@ const createHistorySubmenu = () => {
       accelerator: 'CmdOrCtrl+Shift+H',
       click: function (item, focusedWindow) {
         getSetting(settings.HOMEPAGE).split('|').forEach((homepage, i) => {
-          CommonMenu.sendToFocusedWindow(focusedWindow,
-              [i === 0 ? messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL : messages.SHORTCUT_NEW_FRAME, homepage])
+          if (i === 0) {
+            appActions.loadURLInActiveTabRequested(focusedWindow.id, homepage)
+          } else {
+            appActions.createTabRequested({
+              url: homepage,
+              windowId: focusedWindow.id
+            })
+          }
         })
       }
     }, {
@@ -428,14 +436,7 @@ const createWindowSubmenu = () => {
 
 const createHelpSubmenu = () => {
   const submenu = [
-    CommonMenu.submitFeedbackMenuItem(),
-    {
-      label: locale.translation('spreadTheWord'),
-      click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow,
-                            [messages.SHORTCUT_NEW_FRAME, aboutUrl])
-      }
-    }
+    CommonMenu.submitFeedbackMenuItem()
   ]
 
   if (!isDarwin && !isLinux) {

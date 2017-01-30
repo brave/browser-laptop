@@ -46,12 +46,22 @@ const validateAction = function (action) {
   return action
 }
 
-const api = {
+const matchTab = function (queryInfo, tab) {
+  queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
+  return !Object.keys(queryInfo).map((queryKey) => (tab.get(queryKey) === queryInfo[queryKey])).includes(false)
+}
+
+const tabState = {
+  queryTab: (state, queryInfo) => {
+    state = validateState(state)
+    return state.get('tabs').filter(matchTab.bind(null, queryInfo)).get(0)
+  },
+
   getTabIndex: (state, tabValue) => {
     state = validateState(state)
     tabValue = validateTabValue(tabValue)
     let tabId = validateId('tabId', tabValue.get('tabId'))
-    return api.getTabIndexByTabId(state, tabId)
+    return tabState.getTabIndexByTabId(state, tabId)
   },
 
   getTabIndexByTabId: (state, tabId) => {
@@ -61,15 +71,21 @@ const api = {
     return state.get('tabs').findIndex((tab) => tab.get('tabId') === tabId)
   },
 
+  getActiveTabValue: (state, windowId) => {
+    windowId = validateId('windowId', windowId)
+    state = validateState(state)
+    return state.get('tabs').find((tab) => tab.get('windowId') === windowId && tab.get('active'))
+  },
+
   removeTabByTabId: (state, tabId) => {
     tabId = validateId('tabId', tabId)
     state = validateState(state)
 
-    let index = api.getTabIndexByTabId(state, tabId)
+    let index = tabState.getTabIndexByTabId(state, tabId)
     if (index === -1) {
       return state
     }
-    return api.removeTabByIndex(state, index)
+    return tabState.removeTabByIndex(state, index)
   },
 
   removeTabByIndex: (state, index) => {
@@ -85,7 +101,7 @@ const api = {
     if (frameProps.get('unloaded')) {
       return state
     }
-    return api.removeTabByTabId(state, frameProps.get('tabId'))
+    return tabState.removeTabByTabId(state, frameProps.get('tabId'))
   },
 
   removeTab: (state, action) => {
@@ -93,14 +109,14 @@ const api = {
     state = validateState(state)
     let tabValue = validateTabValue(action.get('tabValue'))
     let tabId = validateId('tabId', tabValue.get('tabId'))
-    return api.removeTabByTabId(state, tabId)
+    return tabState.removeTabByTabId(state, tabId)
   },
 
   insertTab: (state, action) => {
     action = validateAction(action)
     state = validateState(state)
     let tabValue = validateTabValue(action.get('tabValue'))
-    assert.ok(!api.getTab(state, tabValue), 'Tab already exists')
+    assert.ok(!tabState.getTab(state, tabValue), 'Tab already exists')
     return state.set('tabs', state.get('tabs').push(tabValue))
   },
 
@@ -109,10 +125,10 @@ const api = {
     state = validateState(state)
     let tabValue = validateTabValue(action.get('tabValue'))
 
-    if (api.getTab(state, tabValue)) {
-      return api.updateTab(state, action)
+    if (tabState.getTab(state, tabValue)) {
+      return tabState.updateTab(state, action)
     } else {
-      return api.insertTab(state, action)
+      return tabState.insertTab(state, action)
     }
   },
 
@@ -120,6 +136,20 @@ const api = {
     state = validateState(state)
     windowId = validateId('windowId', windowId)
     return state.get('tabs').filter((tab) => tab.get('windowId') === windowId)
+  },
+
+  getPinnedTabs: (state) => {
+    state = validateState(state)
+    return state.get('tabs').filter((tab) => tab.get('pinned'))
+  },
+
+  getMatchingTab: (state, createProperties) => {
+    state = validateState(state)
+    const windowId = validateId('windowId', createProperties.get('windowId'))
+    return state.get('tabs').find(
+      (tab) => tab.get('windowId') === windowId &&
+        tab.get('url') === createProperties.get('url') &&
+        (tab.get('partition') || 'default') === (createProperties.get('partition') || 'default'))
   },
 
   getTabsByWindow: (state, windowValue) => {
@@ -140,7 +170,7 @@ const api = {
     state = validateState(state)
     tabValue = validateTabValue(tabValue)
     let tabId = validateId('tabId', tabValue.get('tabId'))
-    return api.getByTabId(state, tabId)
+    return tabState.getByTabId(state, tabId)
   },
 
   updateTab: (state, action) => {
@@ -148,7 +178,7 @@ const api = {
     action = validateAction(action)
     let tabValue = validateTabValue(action.get('tabValue'))
     let tabs = state.get('tabs')
-    let index = api.getTabIndex(state, tabValue)
+    let index = tabState.getTabIndex(state, tabValue)
     if (index === -1) {
       return state
     }
@@ -196,11 +226,15 @@ const api = {
   getPersistentState: (state) => {
     state = makeImmutable(state)
 
-    state = api.removeTabField(state, 'messageBoxDetail')
+    state = tabState.removeTabField(state, 'messageBoxDetail')
+
+    // TOOD: Once we persist tabs, we can refactor this away
+    state = state.set('pinnedTabs', state.get('tabs')
+      .filter((tab) => tab.get('pinned')))
 
     // TODO(bridiver) - handle restoring tabs
     return state.delete('tabs')
   }
 }
 
-module.exports = api
+module.exports = tabState

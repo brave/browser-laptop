@@ -4,8 +4,10 @@
 
 'use strict'
 
-const getWebview = () =>
-  document.querySelector('.frameWrapper.isActive webview')
+const getWebview = (key) =>
+  key
+  ? document.querySelector(`webview[data-frame-key="${key}"]`)
+  : document.querySelector('.frameWrapper.isActive webview')
 
 const webviewActions = {
   /**
@@ -84,6 +86,16 @@ const webviewActions = {
       return
     }
     webview.stopFindInPage('keepSelection')
+  },
+
+  guestAttached: function (frame, cb) {
+    getWebview(frame.get('key'))
+      .attachGuest(frame.get('guestInstanceId'))
+  },
+
+  guestDetached: function (frame, cb) {
+    getWebview(frame.get('key'))
+      .detachGuest(cb)
   }
 }
 

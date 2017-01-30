@@ -389,32 +389,10 @@ class Main extends ImmutableComponent {
       if (!this.braveShieldsDisabled) {
         this.onBraveMenu()
       } else {
-        windowActions.newFrame({
-          location: 'about:preferences#shields',
-          singleFrame: true
-        }, true)
+        appActions.maybeCreateTabRequested({
+          url: 'about:preferences#shields'
+        })
       }
-    })
-
-    ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url, options = {}) => {
-      if (options.singleFrame) {
-        const frameProps = self.props.windowState.get('frames').find((frame) => frame.get('location') === url)
-        if (frameProps) {
-          windowActions.setActiveFrame(frameProps)
-          return
-        }
-      }
-      let openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS) === true || options.openInForeground
-      const frameOpts = options.frameOpts || {
-        location: url,
-        isPrivate: !!options.isPrivate,
-        isPartitioned: !!options.isPartitioned,
-        parentFrameKey: options.parentFrameKey
-      }
-      if (options.partitionNumber !== undefined) {
-        frameOpts.partitionNumber = options.partitionNumber
-      }
-      windowActions.newFrame(frameOpts, openInForeground)
     })
 
     ipc.on(messages.NEW_POPUP_WINDOW, function (evt, extensionId, src, props) {
@@ -481,11 +459,6 @@ class Main extends ImmutableComponent {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BACK, this.onBack)
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_FORWARD, this.onForward)
 
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, (e, url) => {
-      const activeFrame = frameStateUtil.getActiveFrame(self.props.windowState)
-      windowActions.loadUrl(activeFrame, url)
-    })
-
     ipc.on(messages.CERT_ERROR, (e, details) => {
       const frame = frameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
       if (frame && (frame.get('location') === details.url ||
@@ -494,7 +467,7 @@ class Main extends ImmutableComponent {
           url: details.url,
           error: details.error
         })
-        windowActions.loadUrl(frame, 'about:certerror')
+        appActions.loadURLRequested(frame.get('tabId'), 'about:certerror')
       }
     })
 
@@ -585,14 +558,23 @@ class Main extends ImmutableComponent {
     })
     currentWindow.on('resize', onWindowResize)
     currentWindow.on('move', onWindowMove)
-    currentWindow.on('focus', function () {
+    currentWindow.on('focus', () => {
+      const pinnedFrames = this.props.windowState.get('frames').filter((frame) => frame.get('pinnedLocation'))
+      pinnedFrames.forEach((frame) => {
+        webviewActions.guestAttached(frame)
+      })
       windowActions.onFocusChanged(true)
     })
-    currentWindow.on('blur', function () {
+    currentWindow.on('blur', () => {
+      const pinnedFrames = this.props.windowState.get('frames').filter((frame) => frame.get('pinnedLocation'))
+      pinnedFrames.forEach((frame) => {
+        webviewActions.guestDetached(frame)
+      })
       self.resetAltMenuProcessing()
       appActions.windowBlurred(currentWindow.id)
       windowActions.onFocusChanged(false)
     })
+
     // Full screen as in F11 (not full screen on a video)
     currentWindow.on('enter-full-screen', function (event) {
       windowActions.setWindowFullScreen(true)
@@ -732,7 +714,7 @@ class Main extends ImmutableComponent {
   }
 
   onCloseFrame (activeFrameProps) {
-    windowActions.closeFrame(this.props.windowState.get('frames'), activeFrameProps)
+    windowActions.closeFrame(this.props.windowState.get('frames'), activeFrameProps, false)
   }
 
   onDragOver (e) {
@@ -746,8 +728,8 @@ class Main extends ImmutableComponent {
   onDrop (e) {
     if (e.dataTransfer.files.length > 0) {
       Array.from(e.dataTransfer.files).forEach((file) => {
-        const path = encodeURI(file.path)
-        return windowActions.newFrame({location: path, title: file.name})
+        const url = encodeURI(file.path)
+        appActions.createTabRequested({ url })
       })
     } else if (e.dataTransfer.getData('text/plain')) {
       let activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
@@ -1253,7 +1235,7 @@ class Main extends ImmutableComponent {
         {
           showBookmarksToolbar
           ? <BookmarksToolbar
-            draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.BOOKMARK && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
+            draggingOverData={this.props.appState.getIn(['dragData', 'dragOverData', 'draggingOverType']) === dragTypes.BOOKMARK && this.props.appState.getIn(['dragData', 'dragOverData'])}
             showFavicon={showFavicon}
             showOnlyFavicon={showOnlyFavicon}
             shouldAllowWindowDrag={shouldAllowWindowDrag && !isWindows}
@@ -1282,7 +1264,7 @@ class Main extends ImmutableComponent {
         <TabsToolbar
           paintTabs={getSetting(settings.PAINT_TABS)}
           shouldAllowWindowDrag={shouldAllowWindowDrag}
-          draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.TAB && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
+          dragData={this.props.appState.getIn(['dragData', 'type']) === dragTypes.TAB && this.props.appState.get('dragData')}
           previewTabs={getSetting(settings.SHOW_TAB_PREVIEWS)}
           tabsPerTabPage={tabsPerPage}
           tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}

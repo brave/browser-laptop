@@ -36,11 +36,11 @@ class PluginsTab extends ImmutableComponent {
     aboutActions.setResourceEnabled(widevine, e.target.value)
   }
 
-  infoCircle (location) {
+  infoCircle (url) {
     return <span className='fa fa-info-circle flashInfoIcon'
-      onClick={aboutActions.newFrame.bind(null, {
-        location
-      }, true)} />
+      onClick={aboutActions.createTabRequested.bind(null, {
+        url
+      })} />
   }
 
   render () {
@@ -56,9 +56,9 @@ class PluginsTab extends ImmutableComponent {
             ? <div>
               {this.infoCircle(appConfig.flash.installUrl)}
               <span data-l10n-id='enableFlashSubtext' />&nbsp;
-              <span className='linkText' onClick={aboutActions.newFrame.bind(null, {
-                location: appConfig.flash.installUrl
-              }, true)} title={appConfig.flash.installUrl}>{'Adobe'}</span>.
+              <span className='linkText' onClick={aboutActions.createTabRequested.bind(null, {
+                url: appConfig.flash.installUrl
+              })} title={appConfig.flash.installUrl}>{'Adobe'}</span>.
             </div>
             : <div>
               <span className='fa fa-info-circle flashInfoIcon' />
@@ -69,9 +69,10 @@ class PluginsTab extends ImmutableComponent {
             {this.infoCircle(flashInfoLink)}
             <span data-l10n-id='flashTroubleshooting' />&nbsp;
             <span className='linkText'
-              onClick={aboutActions.newFrame.bind(null, {
-                location: flashInfoLink
-              }, true)}
+              onClick={aboutActions.createTabRequested.bind(null, {
+                url: flashInfoLink,
+                active: true
+              })}
               title={flashInfoLink}>{'wiki'}</span>.
           </div>
         </div>
@@ -81,7 +82,7 @@ class PluginsTab extends ImmutableComponent {
           ? <div>
             <div className='sectionTitle' data-l10n-id='widevineSection' />
             <SettingsList>
-              <WidevineInfo newFrameAction={aboutActions.newFrame} />
+              <WidevineInfo createTabRequestedAction={aboutActions.createTabRequested} />
               <SettingCheckbox checked={this.props.braveryDefaults.get('widevine')} dataL10nId='enableWidevine' onChange={this.onToggleWidevine} />
             </SettingsList>
           </div>

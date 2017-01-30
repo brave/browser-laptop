@@ -30,11 +30,12 @@ const debounce = require('../lib/debounce')
 const path = require('path')
 const autofill = require('../../app/autofill')
 const nativeImage = require('../../app/nativeImage')
-const Filtering = require('../../app/filtering')
+const filtering = require('../../app/filtering')
 const basicAuth = require('../../app/browser/basicAuth')
 const webtorrent = require('../../app/browser/webtorrent')
 const windows = require('../../app/browser/windows')
 const assert = require('assert')
+const profiles = require('../../app/browser/profiles')
 
 // state helpers
 const basicAuthState = require('../../app/common/state/basicAuthState')
@@ -91,7 +92,11 @@ const setWindowDimensions = (browserOpts, defaults, windowState) => {
  * Determine window position (x / y)
  */
 const setWindowPosition = (browserOpts, defaults, windowState) => {
-  if (windowState.ui && windowState.ui.position) {
+  if (browserOpts.positionByMouseCursor) {
+    const screenPos = electron.screen.getCursorScreenPoint()
+    browserOpts.x = screenPos.x
+    browserOpts.y = screenPos.y
+  } else if (windowState.ui && windowState.ui.position) {
     // Position comes from window state
     browserOpts.x = firstDefinedValue(browserOpts.x, windowState.ui.position[0])
     browserOpts.y = firstDefinedValue(browserOpts.y, windowState.ui.position[1])
@@ -334,7 +339,7 @@ function handleChangeSettingAction (settingKey, settingValue) {
       })
       break
     case settings.DEFAULT_ZOOM_LEVEL:
-      Filtering.setDefaultZoomLevel(settingValue)
+      filtering.setDefaultZoomLevel(settingValue)
       break
     default:
   }
@@ -347,11 +352,13 @@ const syncEnabled = () => {
 const applyReducers = (state, action) => [
   require('../../app/browser/reducers/downloadsReducer'),
   require('../../app/browser/reducers/flashReducer'),
+  require('../../app/browser/reducers/sitesReducer'),
   require('../../app/browser/reducers/tabsReducer'),
   require('../../app/browser/reducers/spellCheckReducer'),
   require('../../app/browser/reducers/clipboardReducer'),
   require('../../app/browser/reducers/passwordManagerReducer'),
-  require('../../app/browser/reducers/tabMessageBoxReducer')
+  require('../../app/browser/reducers/tabMessageBoxReducer'),
+  require('../../app/browser/reducers/dragDropReducer')
 ].reduce(
     (appState, reducer) => {
       const newState = reducer(appState, action)
@@ -379,11 +386,12 @@ const handleAppAction = (action) => {
     case appConstants.APP_SET_STATE:
       // DO NOT ADD TO THIS LIST
       // See tabsReducer.js for app state init example
-      // TODO(bridiver) - these shold be refactored into reducers
-      appState = Filtering.init(appState, action, appStore)
+      // TODO(bridiver) - these should be refactored into reducers
+      appState = filtering.init(appState, action, appStore)
       appState = windows.init(appState, action, appStore)
       appState = basicAuth.init(appState, action, appStore)
       appState = webtorrent.init(appState, action, appStore)
+      appState = profiles.init(appState, action, appStore)
       appState = require('../../app/browser/menu').init(appState, action, appStore)
       appState = require('../../app/sync').init(appState, action, appStore)
       ledger.init()
@@ -476,51 +484,17 @@ const handleAppAction = (action) => {
       break
     case appConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size
-      const addSiteSyncCallback = action.skipSync ? undefined : syncActions.updateSite
-      if (action.siteDetail.constructor === Immutable.List) {
-        action.siteDetail.forEach((s) => {
-          appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), s, action.tag, undefined, addSiteSyncCallback))
-        })
-      } else {
-        let sites = appState.get('sites')
-        if (!action.siteDetail.get('folderId') && siteUtil.isFolder(action.siteDetail)) {
-          action.siteDetail = action.siteDetail.set('folderId', siteUtil.getNextFolderId(sites))
-        }
-        appState = appState.set('sites', siteUtil.addSite(sites, action.siteDetail, action.tag, action.originalSiteDetail, addSiteSyncCallback))
-      }
-      if (action.destinationDetail) {
-        appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'),
-          action.siteDetail, action.destinationDetail, false, false, true))
-      }
+      appState = aboutNewTabState.setSites(appState, action)
+      appState = aboutHistoryState.setHistory(appState, action)
       // If there was an item added then clear out the old history entries
       if (oldSiteSize !== appState.get('sites').size) {
         filterOutNonRecents()
       }
-      if (syncEnabled()) {
-        appState = syncUtil.updateSiteCache(appState, action.destinationDetail || action.siteDetail)
-      }
-      appState = aboutNewTabState.setSites(appState, action)
-      appState = aboutHistoryState.setHistory(appState, action)
       break
     case appConstants.APP_REMOVE_SITE:
-      const removeSiteSyncCallback = action.skipSync ? undefined : syncActions.removeSite
-      appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag, true, removeSiteSyncCallback))
-      if (syncEnabled()) {
-        appState = syncUtil.updateSiteCache(appState, action.siteDetail)
-      }
       appState = aboutNewTabState.setSites(appState, action)
       appState = aboutHistoryState.setHistory(appState, action)
       break
-    case appConstants.APP_MOVE_SITE:
-      {
-        appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'),
-          action.sourceDetail, action.destinationDetail, action.prepend,
-          action.destinationIsParent, false, syncActions.updateSite))
-        if (syncEnabled()) {
-          appState = syncUtil.updateSiteCache(appState, action.destinationDetail)
-        }
-        break
-      }
     case appConstants.APP_CLEAR_HISTORY:
       appState = appState.set('sites',
         siteUtil.clearHistory(appState.get('sites'), syncActions.updateSite))
@@ -749,15 +723,13 @@ const handleAppAction = (action) => {
       }
       // Site cookies clearing should also clear cache so that evercookies will be properly removed
       if (action.clearDataDetail.get('cachedImagesAndFiles') || action.clearDataDetail.get('allSiteCookies')) {
-        const Filtering = require('../../app/filtering')
-        Filtering.clearCache()
+        filtering.clearCache()
       }
       if (action.clearDataDetail.get('savedPasswords')) {
         handleAppAction({actionType: appConstants.APP_CLEAR_PASSWORDS})
       }
       if (action.clearDataDetail.get('allSiteCookies')) {
-        const Filtering = require('../../app/filtering')
-        Filtering.clearStorageData()
+        filtering.clearStorageData()
       }
       if (action.clearDataDetail.get('autocompleteData')) {
         autofill.clearAutocompleteData()

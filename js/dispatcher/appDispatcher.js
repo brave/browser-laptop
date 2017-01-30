@@ -69,7 +69,7 @@ class AppDispatcher {
     }
   }
 
-  dispatchInternal (payload, cb) {
+  dispatchToOwnRegisteredCallbacks (payload) {
     // First create array of promises for callbacks to reference.
     const resolves = []
     const rejects = []
@@ -85,12 +85,23 @@ class AppDispatcher {
       resolves[i](payload)
     })
     this.promises = []
+  }
 
-    cb()
-
+  dispatchInternal (payload, cb) {
     if (process.type === 'renderer') {
-      ipcCargo.push(payload)
+      const {currentWindowId} = require('../../app/renderer/currentWindow')
+      if (!payload.queryInfo || !payload.queryInfo.windowId || payload.queryInfo.windowId === currentWindowId) {
+        this.dispatchToOwnRegisteredCallbacks(payload)
+      }
+      cb()
+      if (!payload.queryInfo || !payload.queryInfo.windowId || payload.queryInfo.windowId !== currentWindowId) {
+        ipcCargo.push(payload)
+      }
+      return
     }
+
+    this.dispatchToOwnRegisteredCallbacks(payload)
+    cb()
   }
 
   waitFor (promiseIndexes, callback) {

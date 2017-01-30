@@ -74,13 +74,13 @@ describe('tab tests', function () {
 
     it('creates a new tab when signaled', function * () {
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME)
+        .newTab()
         .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
     })
 
     it('makes the non partitioned webview visible', function * () {
       yield this.app.client
-        .waitForVisible('webview[partition="persist:default"]')
+        .waitForVisible('.frameWrapper[data-partition="persist:default"] webview')
     })
 
     it('shows new tab title instead of about:newtab', function * () {
@@ -125,13 +125,13 @@ describe('tab tests', function () {
 
       it('creates a new tab when signaled', function * () {
         yield this.app.client
-          .ipcSend(messages.SHORTCUT_NEW_FRAME, 'about:blank', { openInForeground: false })
+          .newTab({ url: 'about:blank', active: false })
           .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
-          .ipcSend(messages.SHORTCUT_NEW_FRAME, 'about:blank')
+          .newTab({ url: 'about:blank' })
           .waitForExist('.tabArea + .tabArea + .tabArea [data-test-id="tab"][data-frame-key="3"]')
       })
     })
-    describe('respects parentFrameKey', function () {
+    describe('respects openerTabId', function () {
       Brave.beforeAll(this)
       before(function * () {
         yield setup(this.app.client)
@@ -139,9 +139,13 @@ describe('tab tests', function () {
 
       it('creates a new tab when signaled', function * () {
         yield this.app.client
-          .ipcSend(messages.SHORTCUT_NEW_FRAME, 'about:blank', { openInForeground: false })
+          .newTab({ url: 'about:blank', active: false })
+          .waitForTabCount(2)
+          .windowByUrl(Brave.browserWindowUrl)
           .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
-          .ipcSend(messages.SHORTCUT_NEW_FRAME, 'about:blank', { parentFrameKey: 1 })
+          .newTab({ url: 'about:blank', openerTabId: 1 })
+          .waitForTabCount(3)
+          .windowByUrl(Brave.browserWindowUrl)
           .waitForExist('.tabArea:nth-child(2) [data-test-id="tab"][data-frame-key="3"]')
       })
     })
@@ -152,8 +156,8 @@ describe('tab tests', function () {
     before(function * () {
       const page1 = Brave.server.url('page1.html')
       yield setup(this.app.client)
-      yield this.app
-        .client.ipcSend(messages.SHORTCUT_NEW_FRAME, page1, { isPrivate: true })
+      yield this.app.client
+        .newTab({ url: page1, isPrivate: true })
         .waitForUrl(page1)
         .windowByUrl(Brave.browserWindowUrl)
     })
@@ -163,7 +167,7 @@ describe('tab tests', function () {
     })
     it('makes the private webview visible', function * () {
       yield this.app.client
-        .waitForVisible('webview[partition="default"]')
+        .waitForVisible('.frameWrapper[data-partition="default"] webview')
     })
   })
 
@@ -171,9 +175,8 @@ describe('tab tests', function () {
     Brave.beforeAll(this)
     before(function * () {
       const page1 = Brave.server.url('page1.html')
-      yield setup(this.app.client)
-      yield this.app
-        .client.ipcSend(messages.SHORTCUT_NEW_FRAME, page1, { isPartitioned: true })
+      yield this.app.client
+        .newTab({ url: page1, isPartitioned: true })
         .waitForUrl(page1)
         .windowByUrl(Brave.browserWindowUrl)
     })
@@ -183,7 +186,7 @@ describe('tab tests', function () {
     })
     it('makes the new session webview visible', function * () {
       yield this.app.client
-        .waitForVisible('webview[partition="persist:partition-1"]')
+        .waitForVisible('.frameWrapper[data-partition="persist:partition-1"] webview')
     })
   })
 
@@ -192,8 +195,8 @@ describe('tab tests', function () {
     before(function * () {
       const page1 = Brave.server.url('page1.html')
       yield setup(this.app.client)
-      yield this.app
-        .client.ipcSend(messages.SHORTCUT_NEW_FRAME, page1, { partitionNumber: 3 })
+      yield this.app.client
+        .newTab({ url: page1, partitionNumber: 3 })
         .waitForUrl(page1)
         .windowByUrl(Brave.browserWindowUrl)
     })
@@ -203,7 +206,7 @@ describe('tab tests', function () {
     })
     it('makes the new session webview visible', function * () {
       yield this.app.client
-        .waitForVisible('webview[partition="persist:partition-3"]')
+        .waitForVisible('.frameWrapper[data-partition="persist:partition-3"] webview')
     })
   })
 
@@ -219,7 +222,7 @@ describe('tab tests', function () {
       yield this.app.client
         .waitForBrowserWindow()
         .waitForExist('[data-test-active-tab][data-frame-key="1"]')
-        .ipcSend(messages.SHORTCUT_NEW_FRAME)
+        .newTab()
         .waitUntil(function () {
           return this.waitForUrl(Brave.newTabUrl)
             .waitForTabCount(tabCountBeforeTabClose)
@@ -236,7 +239,11 @@ describe('tab tests', function () {
       yield this.app.client
         .waitForBrowserWindow()
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page1, {frameOpts: {unloaded: true, location: this.page1, title: 'hi', tabId: null}, openInForeground: false})
+        .newFrame({
+          url: this.page1,
+          unloaded: true,
+          active: false
+        })
         .waitForElementCount('[data-test-id="tab"]', 2)
         // This ensures it's actually unloaded
         .waitForTabCount(1)
@@ -248,7 +255,7 @@ describe('tab tests', function () {
       yield this.app.client
         .waitForBrowserWindow()
         .waitForExist('[data-test-active-tab][data-frame-key="1"]')
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page1)
+        .newTab({ url: this.page1 })
         .waitUntil(function () {
           return this.waitForUrl(Brave.newTabUrl)
             .waitForTabCount(tabCountBeforeTabClose)
@@ -277,11 +284,11 @@ describe('tab tests', function () {
       const page2 = Brave.server.url('page2.html')
       yield setup(this.app.client)
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1)
+        .newTab({ url: page1 })
         .waitForUrl(page1)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page2)
+        .newTab({ url: page2 })
         .waitForUrl(page2)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('[data-test-id="tab"][data-frame-key="3"]')
@@ -316,7 +323,7 @@ describe('tab tests', function () {
     })
     it('new tab opens in background by default', function * () {
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page1, {openInForeground: false})
+        .newTab({ url: this.page1, active: false })
         .waitForUrl(this.page1)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
@@ -325,8 +332,8 @@ describe('tab tests', function () {
     it('changing new tab default makes new tabs open in background by default', function * () {
       yield this.app.client.changeSetting(settings.SWITCH_TO_NEW_TABS, true)
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page2, {openInForeground: false})
-        .waitForUrl(this.page2)
+        .newTab({ url: this.page2, active: false })
+        .waitForUrl(this.pgae2)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('[data-test-id="tab"][data-frame-key="3"]')
       yield this.app.client.waitForExist('.frameWrapper.isActive webview[data-frame-key="3"]')
@@ -365,7 +372,7 @@ describe('tab tests', function () {
 
     it('has untitled text right away', function * () {
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'about:blank', { openInForeground: false })
+        .newTab({ url: 'about:blank', active: false })
         .waitForVisible('[data-test-id="tab"][data-frame-key="2"]')
         // This should not be converted to a waitUntil
         .waitForTextValue('[data-test-id="tab"][data-frame-key="2"]', 'Untitled')

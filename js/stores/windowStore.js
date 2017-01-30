@@ -20,7 +20,7 @@ const UrlUtil = require('../lib/urlutil')
 const {currentWindowId, isFocused} = require('../../app/renderer/currentWindow')
 const {tabFromFrame} = require('../state/frameStateUtil')
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
-const {aboutUrls, newFrameUrl} = require('../lib/appUrlUtil')
+const {aboutUrls, getTargetAboutUrl, newFrameUrl} = require('../lib/appUrlUtil')
 const Serializer = require('../dispatcher/serializer')
 const {updateTabPageIndex} = require('../../app/renderer/lib/tabUtil')
 const assert = require('assert')
@@ -51,9 +51,7 @@ const focusWebview = (framePath) => {
 }
 
 let currentKey = 0
-let currentPartitionNumber = 0
 const incrementNextKey = () => ++currentKey
-const incrementPartitionNumber = () => ++currentPartitionNumber
 
 class WindowStore extends EventEmitter {
   getState () {
@@ -117,6 +115,7 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
       frameOpts.partitionNumber = frameStateUtil.getPartitionNumber(frameOpts.partition)
     }
   }
+  frameOpts.partitionNumber = frameOpts.partitionNumber || 0
 
   if (frameOpts.disposition) {
     openInForeground = frameOpts.disposition !== 'background-tab'
@@ -142,17 +141,6 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
     }
   }
 
-  let partitionNumber = frameOpts.partitionNumber
-  let nextPartitionNumber = 0
-  if (partitionNumber) {
-    nextPartitionNumber = partitionNumber
-    if (currentPartitionNumber < nextPartitionNumber) {
-      currentPartitionNumber = nextPartitionNumber
-    }
-  } else if (frameOpts.isPartitioned) {
-    nextPartitionNumber = incrementPartitionNumber()
-  }
-
   // TODO: longer term get rid of parentFrameKey completely instead of
   // calculating it here.
   let parentFrameKey = frameOpts.parentFrameKey
@@ -164,10 +152,14 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
   // a different ancestor frame key.
   const frames = windowState.get('frames')
   if (insertionIndex === undefined) {
-    insertionIndex = frameStateUtil.findIndexForFrameKey(frames, parentFrameKey)
+    insertionIndex = frameStateUtil.findIndexForFrameKey(frames, parentFrameKey || frameOpts.indexByFrameKey)
+    if (frameOpts.prependIndexByFrameKey === false) {
+      insertionIndex++
+    }
     if (insertionIndex === -1) {
       insertionIndex = frames.size
-    } else {
+    // frameOpts.indexByFrameKey is used when the insertionIndex should be used exactly
+    } else if (!frameOpts.indexByFrameKey) {
       while (insertionIndex < frames.size) {
         ++insertionIndex
         if (!frameStateUtil.isAncestorFrameKey(frames, frames.get(insertionIndex), parentFrameKey)) {
@@ -187,7 +179,7 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
   windowState = windowState.merge(
     frameStateUtil.addFrame(
       windowState, windowState.get('tabs'), frameOpts,
-      nextKey, nextPartitionNumber, openInForeground ? nextKey : windowState.get('activeFrameKey'), insertionIndex))
+      nextKey, frameOpts.partitionNumber, openInForeground || typeof windowState.get('activeFrameKey') !== 'number' ? nextKey : windowState.get('activeFrameKey'), insertionIndex))
 
   if (openInForeground) {
     const activeFrame = frameStateUtil.getActiveFrame(windowState)
@@ -197,6 +189,45 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
     if (activeFrame.get('location') !== 'about:newtab') {
       focusWebview(activeFrameStatePath(windowState))
     }
+  }
+}
+
+const removeFrame = (frame) => {
+  if (!frame) {
+    return
+  }
+  const index = frameStateUtil.getFramePropsIndex(windowState.get('frames'), frame)
+  const hoverState = windowState.getIn(['frames', index, 'hoverState'])
+  const activeFrameKey = frameStateUtil.getActiveFrame(windowState).get('key')
+  windowState = windowState.merge(frameStateUtil.removeFrame(
+    windowState.get('frames'),
+    windowState.get('tabs'),
+    windowState.get('closedFrames'),
+    frame.set('closedAtIndex', index),
+    activeFrameKey,
+    index,
+    getSetting(settings.TAB_CLOSE_ACTION)
+  ))
+  // If we reach the limit of opened tabs per page while closing tabs, switch to
+  // the active tab's page otherwise the user will hang on empty page
+  if (frameStateUtil.getNonPinnedFrameCount(windowState) % getSetting(settings.TABS_PER_PAGE) === 0) {
+    updateTabPageIndex(frameStateUtil.getActiveFrame(windowState))
+    windowState = windowState.deleteIn(['ui', 'tabs', 'fixTabWidth'])
+  }
+
+  const nextFrame = frameStateUtil.getFrameByIndex(windowState, index)
+
+  // Copy the hover state if tab closed with mouse as long as we have a next frame
+  // This allow us to have closeTab button visible  for sequential frames closing, until onMouseLeave event happens.
+  if (hoverState && nextFrame) {
+    doAction({
+      actionType: windowConstants.WINDOW_SET_TAB_HOVER_STATE,
+      frame: nextFrame,
+      hoverState: hoverState
+    })
+  }
+  if (windowState.get('frames').size === 0) {
+    appActions.closeWindow(currentWindowId)
   }
 }
 
@@ -222,7 +253,6 @@ const immediatelyEmittedActions = [
   windowConstants.WINDOW_AUTOFILL_POPUP_HIDDEN,
   windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL,
   windowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL,
-  windowConstants.WINDOW_SET_PINNED,
   windowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL,
   windowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL,
   windowConstants.WINDOW_SET_MODAL_DIALOG_DETAIL
@@ -236,7 +266,6 @@ const doAction = (action) => {
     case windowConstants.WINDOW_SET_STATE:
       windowState = action.windowState
       currentKey = windowState.get('frames').reduce((previousVal, frame) => Math.max(previousVal, frame.get('key')), 0)
-      currentPartitionNumber = windowState.get('frames').reduce((previousVal, frame) => Math.max(previousVal, frame.get('partitionNumber')), 0)
       const activeFrame = frameStateUtil.getActiveFrame(windowState)
       if (activeFrame && activeFrame.get('location') !== 'about:newtab') {
         focusWebview(activeFrameStatePath(windowState))
@@ -294,6 +323,11 @@ const doAction = (action) => {
         loading: true,
         provisionalLocation: action.location
       })
+      // For about:newtab we want to have the urlbar focused, not the new frame.
+      // Otherwise we want to focus the new tab when it is a new frame in the foreground.
+      if (action.location !== getTargetAboutUrl('about:newtab')) {
+        focusWebview(activeFrameStatePath(windowState))
+      }
       break
     case windowConstants.WINDOW_WEBVIEW_LOAD_END:
       windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
@@ -304,12 +338,6 @@ const doAction = (action) => {
       windowState = windowState.mergeIn(['tabs', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         loading: false
       })
-      break
-    case windowConstants.WINDOW_NEW_FRAME:
-      newFrame(action.frameOpts, action.openInForeground)
-      break
-    case windowConstants.WINDOW_VIEW_KEY:
-      newFrame(action.frameOpts, action.openInForeground)
       break
     case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
       windowState = windowState.merge(frameStateUtil.undoCloseFrame(windowState, windowState.get('closedFrames')))
@@ -327,8 +355,7 @@ const doAction = (action) => {
         previewFrameKey: null
       })
       windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
-        lastAccessedTime: new Date().getTime()
-      })
+        lastAccessedTime: new Date().getTime() })
       windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
       windowState = updateTabPageIndex(windowState, action.frameProps)
       break
@@ -360,13 +387,6 @@ const doAction = (action) => {
     case windowConstants.WINDOW_SET_TAB_HOVER_STATE:
       windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'hoverState'], action.hoverState)
       windowState = windowState.setIn(['tabs', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'hoverState'], action.hoverState)
-      break
-    case windowConstants.WINDOW_SET_IS_BEING_DRAGGED_OVER_DETAIL:
-      if (!action.dragOverKey) {
-        windowState = windowState.deleteIn(['ui', 'dragging'])
-      } else {
-        windowState = windowState.mergeIn(['ui', 'dragging', 'draggingOver'], Immutable.fromJS(Object.assign({}, action.dragDetail, { dragOverKey: action.dragOverKey, dragType: action.dragType })))
-      }
       break
     case windowConstants.WINDOW_TAB_MOVE:
       const sourceFramePropsIndex = frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.sourceFrameProps)
@@ -412,7 +432,7 @@ const doAction = (action) => {
         windowState = windowState.setIn(activeFrameStatePath(windowState).concat(['navbar', 'urlbar', 'focused']), true)
       }
       break
-    case windowConstants.WINDOW_SET_ACTIVE_FRAME_SHORTCUT:
+    case windowConstants.WINDOW_FRAME_SHORTCUT_CHANGED:
       const framePath = action.frameProps ? ['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)] : activeFrameStatePath(windowState)
       windowState = windowState.mergeIn(framePath, {
         activeShortcut: action.activeShortcut,
@@ -475,32 +495,6 @@ const doAction = (action) => {
       } else {
         windowState = windowState.set('popupWindowDetail', action.detail)
       }
-      break
-    case windowConstants.WINDOW_SET_PINNED:
-      // Check if there's already a frame which is pinned.
-      // If so we just want to set it as active.
-      const location = action.frameProps.get('location')
-      const alreadyPinnedFrameProps = windowState.get('frames').find(
-        (frame) => frame.get('pinnedLocation') && frame.get('pinnedLocation') === location &&
-          (action.frameProps.get('partitionNumber') || 0) === (frame.get('partitionNumber') || 0))
-      if (alreadyPinnedFrameProps && action.isPinned) {
-        action.actionType = windowConstants.WINDOW_CLOSE_FRAME
-        doAction(action)
-        action.actionType = windowConstants.WINDOW_SET_ACTIVE_FRAME
-        action.frameProps = alreadyPinnedFrameProps
-        doAction(action)
-      } else {
-        windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'pinnedLocation'],
-          action.isPinned ? location : undefined)
-        windowState = windowState.setIn(['tabs', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'pinnedLocation'],
-          action.isPinned ? location : undefined)
-      }
-      // Remove preview frame key when unpinning / pinning
-      // becuase it can get messed up.
-      windowState = windowState.merge({
-        previewFrameKey: null
-      })
-      windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
       break
     case windowConstants.WINDOW_SET_AUDIO_MUTED:
       windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioMuted'], action.muted)
@@ -711,9 +705,6 @@ const doAction = (action) => {
         windowState = windowState.setIn(['modalDialogDetail', action.className], Immutable.fromJS(action.props))
       }
       break
-    case appConstants.APP_NEW_TAB:
-      newFrame(action.frameProps, action.frameProps.get('disposition') === 'foreground-tab')
-      break
     case windowConstants.WINDOW_TAB_CLOSED_WITH_MOUSE:
       if (frameStateUtil.getNonPinnedFrameCount(windowState) % getSetting(settings.TABS_PER_PAGE) === 0) {
         windowState = windowState.deleteIn(['ui', 'tabs', 'fixTabWidth'])
@@ -724,6 +715,24 @@ const doAction = (action) => {
     case windowConstants.WINDOW_TAB_MOUSE_LEAVE:
       windowState = windowState.deleteIn(['ui', 'tabs', 'fixTabWidth'])
       break
+    case windowConstants.WINDOW_FRAME_PINNED:
+      if (action.pinned) {
+        windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'pinnedLocation'], action.frameProps.get('location'))
+        windowState = windowState.setIn(['tabs', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'pinnedLocation'], action.frameProps.get('location'))
+      } else {
+        windowState = windowState.deleteIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'pinnedLocation'])
+        windowState = windowState.deleteIn(['tabs', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'pinnedLocation'])
+      }
+      break
+    case appConstants.APP_NEW_WEB_CONTENTS_ADDED:
+      newFrame(action.frameOpts, action.frameOpts.openInForeground)
+      updateTabPageIndex(frameStateUtil.getActiveFrame(windowState))
+      break
+    case appConstants.APP_TAB_DETACHED_FROM_WINDOW: {
+      const frame = frameStateUtil.getFrameByTabId(windowState, action.tabId)
+      removeFrame(frame)
+      break
+    }
     default:
       break
   }

@@ -5,10 +5,9 @@
 'use strict'
 
 const windowConstants = require('../../../js/constants/windowConstants')
-const {getSourceAboutUrl, getSourceMagnetUrl, isIntermediateAboutPage, navigatableTypes} = require('../../../js/lib/appUrlUtil')
-const {isURL, isPotentialPhishingUrl, getUrlFromInput} = require('../../../js/lib/urlutil')
-const {activeFrameStatePath, frameStatePath, frameStatePathForFrame, getFrameByKey, getActiveFrame, tabStatePath, getFrameByTabId} = require('../../../js/state/frameStateUtil')
-const urlParse = require('../../common/urlParse')
+const {getSourceAboutUrl, getSourceMagnetUrl} = require('../../../js/lib/appUrlUtil')
+const {isURL, getUrlFromInput} = require('../../../js/lib/urlutil')
+const {activeFrameStatePath, frameStatePath, frameStatePathForFrame, getActiveFrame, tabStatePath, getFrameByTabId} = require('../../../js/state/frameStateUtil')
 
 const getLocation = (location) => {
   location = location.trim()
@@ -50,59 +49,6 @@ const urlBarReducer = (state, action) => {
   switch (action.actionType) {
     case windowConstants.WINDOW_SET_NAVBAR_INPUT:
       state = updateNavBarInput(state, action.location)
-      break
-    case windowConstants.WINDOW_SET_URL:
-      const frame = getFrameByKey(state, action.key)
-      const currentLocation = frame.get('location')
-      const parsedUrl = urlParse(action.location)
-
-      // For potential phishing pages, show a warning
-      if (isPotentialPhishingUrl(action.location)) {
-        state = state.setIn(['ui', 'siteInfo', 'isVisible'], true)
-      }
-
-      // For types that are not navigatable, just do a loadUrl on them
-      if (!navigatableTypes.includes(parsedUrl.protocol)) {
-        if (parsedUrl.protocol !== 'javascript:' ||
-            currentLocation.substring(0, 6).toLowerCase() !== 'about:') {
-          state = state.mergeIn(frameStatePath(state, action.key), {
-            activeShortcut: 'load-non-navigatable-url',
-            activeShortcutDetails: action.location
-          })
-        }
-        state = updateNavBarInput(state, frame.get('location'), frameStatePath(state, action.key))
-      } else if (currentLocation === action.location) {
-        // reload if the url is unchanged
-        state = state.mergeIn(frameStatePath(state, action.key), {
-          audioPlaybackActive: false,
-          activeShortcut: 'reload'
-        })
-        state = state.mergeIn(tabStatePath(state, action.key), {
-          audioPlaybackActive: false
-        })
-        state = updateNavBarInput(state, frame.get('location'), frameStatePath(state, action.key))
-      } else {
-        // If the user is changing back to the original src and they already navigated away then we need to
-        // explicitly set a new location via webview.loadURL.
-        let activeShortcut
-        if (frame.get('location') !== action.location &&
-            frame.get('src') === action.location &&
-            !isIntermediateAboutPage(action.location)) {
-          activeShortcut = 'explicitLoadURL'
-        }
-
-        state = state.mergeIn(frameStatePath(state, action.key), {
-          src: action.location,
-          location: action.location,
-          activeShortcut
-        })
-        state = state.mergeIn(tabStatePath(state, action.key), {
-          location: action.location
-        })
-        // Show the location for directly-entered URLs before the page finishes
-        // loading
-        state = updateNavBarInput(state, action.location, frameStatePath(state, action.key))
-      }
       break
     case windowConstants.WINDOW_SET_NAVIGATED:
       // For about: URLs, make sure we store the URL as about:something

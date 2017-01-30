@@ -26,12 +26,10 @@ const messages = {
   SHORTCUT_ACTIVE_FRAME_FORWARD: _,
   SHORTCUT_ACTIVE_FRAME_BOOKMARK: _,
   SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK: _,
-  SHORTCUT_ACTIVE_FRAME_LOAD_URL: _, /** @arg {string} url to load */
   SHORTCUT_ACTIVE_FRAME_COPY: _,
   SHORTCUT_ACTIVE_FRAME_FIND_NEXT: _,
   SHORTCUT_ACTIVE_FRAME_FIND_PREV: _,
   // Frame management shortcuts
-  SHORTCUT_NEW_FRAME: _, /** @arg {string} opt_url to load if any */
   SHORTCUT_CLOSE_FRAME: _, /** @arg {number} opt_key of frame, defaults to active frame */
   SHORTCUT_CLOSE_OTHER_FRAMES: _, /** @arg {boolean} close to the right, @arg {boolean} close to the left */
   SHORTCUT_UNDO_CLOSED_FRAME: _,
@@ -72,6 +70,7 @@ const messages = {
   GO_BACK: _,
   GO_FORWARD: _,
   RELOAD: _,
+  DETACH: _,
   ENABLE_SWIPE_GESTURE: _,
   DISABLE_SWIPE_GESTURE: _,
   // Password manager
@@ -88,7 +87,6 @@ const messages = {
   DECRYPTED_PASSWORD: _, /** @arg {number} decrypted pw, @arg {number} id */
   // Init
   INITIALIZE_WINDOW: _,
-  INITIALIZE_PARTITION: _, /** @arg {string} name of partition */
   // Session restore
   REQUEST_WINDOW_STATE: _,
   RESPONSE_WINDOW_STATE: _,
@@ -110,7 +108,6 @@ const messages = {
   NEWTAB_DATA_UPDATED: _,
   VERSION_INFORMATION_UPDATED: _,
   // About pages from contentScript
-  RELOAD_URL: _,
   DISPATCH_ACTION: _,
   ABOUT_COMPONENT_INITIALIZED: _,
   CLEAR_BROWSING_DATA_NOW: _,

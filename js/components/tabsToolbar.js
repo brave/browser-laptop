@@ -49,7 +49,7 @@ class TabsToolbar extends ImmutableComponent {
           activeFrameKey={this.props.activeFrameKey}
           paintTabs={this.props.paintTabs}
           previewTabs={this.props.previewTabs}
-          draggingOverData={this.props.draggingOverData}
+          dragData={this.props.dragData}
           tabPageIndex={this.props.tabPageIndex}
           pinnedTabs={pinnedTabs}
           />
@@ -59,7 +59,7 @@ class TabsToolbar extends ImmutableComponent {
         ref='tabs'
         tabs={unpinnedTabs}
         shouldAllowWindowDrag={this.props.shouldAllowWindowDrag}
-        draggingOverData={this.props.draggingOverData}
+        dragData={this.props.dragData}
         paintTabs={this.props.paintTabs}
         previewTabs={this.props.previewTabs}
         tabsPerTabPage={this.props.tabsPerTabPage}

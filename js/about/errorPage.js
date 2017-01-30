@@ -4,8 +4,6 @@
 
 const React = require('react')
 const Button = require('../components/button')
-const aboutActions = require('./aboutActions')
-const windowConstants = require('../constants/windowConstants')
 
 require('../../less/button.less')
 require('../../less/window.less')
@@ -18,19 +16,11 @@ class ErrorPage extends React.Component {
   }
 
   reloadPrevious () {
-    aboutActions.dispatchAction({
-      actionType: windowConstants.WINDOW_SET_URL,
-      location: this.state.previousLocation,
-      key: this.state.frameKey
-    })
+    window.location = this.state.previousLocation
   }
 
   reload () {
-    aboutActions.dispatchAction({
-      actionType: windowConstants.WINDOW_SET_URL,
-      location: this.state.url,
-      key: this.state.frameKey
-    })
+    window.location = this.state.url
   }
 
   get showBackButton () {

@@ -4,6 +4,7 @@
 
 const React = require('react')
 const ReactDOM = require('react-dom')
+const Immutable = require('immutable')
 const ImmutableComponent = require('../../../js/components/immutableComponent')
 const contextMenus = require('../../../js/contextMenus')
 const windowActions = require('../../../js/actions/windowActions')
@@ -19,6 +20,7 @@ const dndData = require('../../../js/dndData')
 const calculateTextWidth = require('../../../js/lib/textCalculator').calculateTextWidth
 const windowStore = require('../../../js/stores/windowStore')
 const iconSize = require('../../common/lib/faviconUtil').iconSize
+const {currentWindowId} = require('../currentWindow')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('./styles/global')
@@ -87,7 +89,10 @@ class BookmarkToolbarButton extends ImmutableComponent {
       e.target = ReactDOM.findDOMNode(this)
       if (dnd.isMiddle(e.target, e.clientX)) {
         this.props.showBookmarkFolderMenu(this.props.bookmark, e)
-        windowActions.setIsBeingDraggedOverDetail(dragTypes.BOOKMARK, this.props.bookmark, {
+        appActions.draggedOver({
+          draggingOverKey: this.props.bookmark,
+          draggingOverType: dragTypes.BOOKMARK,
+          draggingOverWindowId: currentWindowId,
           expanded: true
         })
       }
@@ -97,7 +102,10 @@ class BookmarkToolbarButton extends ImmutableComponent {
   onDragLeave (e) {
     // Bookmark specific DND code to expand hover when on a folder item
     if (this.isFolder) {
-      windowActions.setIsBeingDraggedOverDetail(dragTypes.BOOKMARK, this.props.bookmark, {
+      appActions.draggedOver({
+        draggingOverKey: this.props.bookmark,
+        draggingOverType: dragTypes.BOOKMARK,
+        draggingOverWindowId: currentWindowId,
         expanded: false
       })
     }
@@ -109,7 +117,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
 
   get draggingOverData () {
     if (!this.props.draggingOverData ||
-        this.props.draggingOverData.get('dragOverKey') !== this.props.bookmark) {
+        !Immutable.is(this.props.draggingOverData.get('draggingOverKey'), this.props.bookmark)) {
       return
     }
 
@@ -117,7 +125,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
   }
 
   get isDragging () {
-    return this.props.bookmark === dnd.getInProcessDragData()
+    return Immutable.is(this.props.bookmark, dnd.getInterBraveDragData())
   }
 
   get isDraggingOverLeft () {
@@ -288,7 +296,6 @@ class BookmarksToolbar extends ImmutableComponent {
         const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn.selectedRef), e.clientX)
         const droppedOnSiteDetail = droppedOn.selectedRef.props.bookmark || droppedOn.selectedRef.props.bookmarkFolder
         appActions.moveSite(bookmark, droppedOnSiteDetail, isLeftSide, droppedOnSiteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER) && droppedOn && droppedOn.isDroppedOn)
-        windowActions.setIsBeingDraggedOverDetail()
       }
       return
     }

@@ -61,8 +61,22 @@ const api = {
   init: (state, action) => {
     app.on('browser-window-created', function (event, win) {
       let windowId = -1
+      const initialPinnedTabs = state.get('pinnedTabs')
       const updateWindowMove = debounce(updateWindow, 100)
       const updateWindowDebounce = debounce(updateWindow, 5)
+
+      win.once('show', () => {
+        if (BrowserWindow.getAllWindows().length === 1 && initialPinnedTabs) {
+          initialPinnedTabs
+            .forEach((tab) => {
+              appActions.createTabRequested({
+                url: tab.get('url'),
+                windowId,
+                partition: tab.get('partition')
+              })
+            })
+        }
+      })
 
       win.once('initialized', () => {
         windowId = win.id
@@ -139,9 +153,11 @@ const api = {
         cleanupWindow(windowId)
       })
       win.on('blur', () => {
+        appActions.windowBlurred(windowId)
         updateWindowDebounce(windowId)
       })
       win.on('focus', () => {
+        appActions.windowFocused(windowId)
         updateWindowDebounce(windowId)
       })
       win.on('show', () => {

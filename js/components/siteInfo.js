@@ -3,7 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ipc = require('electron').ipcRenderer
 const ImmutableComponent = require('./immutableComponent')
 const cx = require('../lib/classSet')
 const {isPotentialPhishingUrl} = require('../lib/urlutil')
@@ -11,7 +10,6 @@ const Dialog = require('./dialog')
 const Button = require('./button')
 const appActions = require('../actions/appActions')
 const webviewActions = require('../actions/webviewActions')
-const messages = require('../constants/messages')
 const siteUtil = require('../state/siteUtil')
 const platformUtil = require('../../app/common/lib/platformUtil')
 
@@ -29,13 +27,13 @@ class SiteInfo extends ImmutableComponent {
   onAllowRunInsecureContent () {
     appActions.changeSiteSetting(siteUtil.getOrigin(this.location),
       'runInsecureContent', true, this.isPrivate)
-    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, {}, this.location)
+    appActions.loadURLRequested(this.props.frameProps.get('tabId'), this.location)
     this.props.onHide()
   }
   onDenyRunInsecureContent () {
     appActions.removeSiteSetting(siteUtil.getOrigin(this.location),
       'runInsecureContent', this.isPrivate)
-    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, {}, this.location)
+    appActions.loadURLRequested(this.props.frameProps.get('tabId'), this.location)
     this.props.onHide()
   }
   onViewCertificate () {

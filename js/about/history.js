@@ -57,8 +57,8 @@ class HistoryTimeCell extends ImmutableComponent {
 class HistoryDay extends ImmutableComponent {
   navigate (entry) {
     entry = makeImmutable(entry)
-    aboutActions.newFrame({
-      location: entry.get('location'),
+    aboutActions.createTabRequested({
+      url: entry.get('location'),
       partitionNumber: entry.get('partitionNumber')
     })
   }

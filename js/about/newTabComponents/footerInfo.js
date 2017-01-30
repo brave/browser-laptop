@@ -8,7 +8,7 @@ const aboutActions = require('../aboutActions')
 
 class FooterInfo extends ImmutableComponent {
   render () {
-    const openUrl = (location) => aboutActions.newFrame.bind(null, {location}, true)
+    const openUrl = (url) => aboutActions.createTabRequested.bind(null, {url})
     return <footer className='footerContainer'>
       <div className='copyrightNotice'>
         {

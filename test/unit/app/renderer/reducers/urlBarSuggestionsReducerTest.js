@@ -111,13 +111,6 @@ describe('urlBarSuggestionsReducer unit tests', function () {
     })
   })
 
-  describe('WINDOW_SET_URL', function () {
-    it('turns off suggestions', function () {
-      const newState = urlBarSuggestionsReducer(windowState, {actionType: windowConstants.WINDOW_SET_URL, shown: true})
-      assert.equal(newState.getIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'searchResults']).size, 0)
-    })
-  })
-
   describe('WINDOW_PREVIOUS_URL_BAR_SUGGESTION_SELECTED', function () {
     it('turns off suggestions', function () {
       const newState = urlBarSuggestionsReducer(windowState, {actionType: windowConstants.WINDOW_PREVIOUS_URL_BAR_SUGGESTION_SELECTED})

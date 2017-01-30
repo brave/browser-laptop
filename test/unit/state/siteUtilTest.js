@@ -1050,14 +1050,31 @@ describe('siteUtil', function () {
     })
   })
 
-  describe('toFrameOpts', function () {
+  describe('getDetailFromTab', function () {
+    it('returns a properly formed siteDetail', function () {
+      const tab = Immutable.fromJS({
+        url: 'https://brave.com/2',
+        title: '3'
+      })
+      assert.deepEqual(
+        siteUtil.getDetailFromTab(tab, siteTags.BOOKMARK).toJS(),
+        {
+          location: tab.get('url'),
+          title: tab.get('title'),
+          tags: [siteTags.BOOKMARK]
+        }
+      )
+    })
+  })
+
+  describe('toCreateProperties', function () {
     it('returns a plain javascript object with location and partitionNumber', function () {
       const siteDetail = Immutable.fromJS({
         location: testUrl1,
         partitionNumber: 5
       })
-      const result = siteUtil.toFrameOpts(siteDetail)
-      assert.equal(result.location, siteDetail.get('location'))
+      const result = siteUtil.toCreateProperties(siteDetail)
+      assert.equal(result.url, siteDetail.get('location'))
       assert.equal(result.partitionNumber, siteDetail.get('partitionNumber'))
     })
   })
@@ -1358,6 +1375,22 @@ describe('siteUtil', function () {
     })
     it('returns correct result for URL with hostname that is a scheme', function () {
       assert.strictEqual(siteUtil.getOrigin('http://http/test'), 'http://http')
+    })
+  })
+  describe('isPinnedTab', function () {
+    it('detects pinned tab site', function () {
+      assert.strictEqual(siteUtil.isPinnedTab(siteTags.PINNED), true)
+      assert.strictEqual(siteUtil.isPinnedTab([siteTags.PINNED]), true)
+    })
+    it('detects not pinned for no site tags', function () {
+      assert.strictEqual(siteUtil.isPinnedTab([]), false)
+    })
+    it('detects not pinned for site tags which are not PINNED', function () {
+      assert.strictEqual(siteUtil.isPinnedTab(siteTags.BOOKMARK), false)
+      assert.strictEqual(siteUtil.isPinnedTab([siteTags.BOOKMARK]), false)
+    })
+    it('detects pinned when bookmarked and pinned', function () {
+      assert.strictEqual(siteUtil.isPinnedTab([siteTags.PINNED, siteTags.BOOKMARK]), true)
     })
   })
 })

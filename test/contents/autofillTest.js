@@ -1,7 +1,6 @@
 /* global describe, it, before, beforeEach */
 
 const Brave = require('../lib/brave')
-const messages = require('../../js/constants/messages')
 const {urlInput, autofillAddressPanel, autofillCreditCardPanel, clearBrowsingDataButton, securityTab} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 
@@ -104,7 +103,7 @@ describe('Autofill', function () {
     it('autofills the address in a private tab', function * () {
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.formfill + '?2', { isPrivate: true })
+        .newTab({ url: this.formfill + '?2', isPrivate: true })
         .waitForUrl(this.formfill + '?2')
         .waitForVisible('<form>')
         .click('[name="04fullname"]')
@@ -231,7 +230,7 @@ describe('Autofill', function () {
     it.skip('autofills the credit card in a private tab', function * () {
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.formfill + '?2', { isPrivate: true })
+        .newTab({ url: this.formfill + '?2', isPrivate: true })
         .waitForUrl(this.formfill + '?2')
         .waitForVisible('<form>')
         .click('[name="41ccnumber"]')
@@ -426,7 +425,7 @@ describe('Autofill', function () {
     it('does not autofill in regular tab', function * () {
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.formfill)
+        .newTab({ url: this.formfill })
         .waitForUrl(this.formfill)
         .waitForVisible('<form>')
         .click('[name="04fullname"]')
@@ -471,7 +470,7 @@ describe('Autofill', function () {
       it('autofills in private tab', function * () {
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
-          .ipcSend(messages.SHORTCUT_NEW_FRAME, this.formfill + '?2', { isPrivate: true })
+          .newTab({ url: this.formfill + '?2', isPrivate: true })
           .waitForUrl(this.formfill + '?2')
           .waitForVisible('<form>')
           .click('[name="04fullname"]')
@@ -510,7 +509,7 @@ describe('Autofill', function () {
       it('autofills in session tab', function * () {
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
-          .ipcSend(messages.SHORTCUT_NEW_FRAME, this.formfill + '?2', { partitionNumber: 3 })
+          .newTab({ url: this.formfill + '?2', partitionNumber: 3 })
           .waitForUrl(this.formfill + '?2')
           .waitForVisible('<form>')
           .click('[name="04fullname"]')
@@ -529,7 +528,7 @@ describe('Autofill', function () {
         this.formfill = Brave.server.url('formfill.html')
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
-          .ipcSend(messages.SHORTCUT_NEW_FRAME, this.formfill, { isPrivate: true })
+          .newTab({ url: this.formfill, isPrivate: true })
           .waitForUrl(this.formfill)
           .waitForVisible('<form>')
           .setValue('[name="04fullname"]', 'test')
@@ -600,7 +599,7 @@ describe('Autofill', function () {
       it('does not autofill in regular tab', function * () {
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
-          .ipcSend(messages.SHORTCUT_NEW_FRAME, this.formfill)
+          .newTab({ url: this.formfill })
           .waitForUrl(this.formfill)
           .waitForVisible('<form>')
           .click('[name="04fullname"]')
@@ -644,7 +643,7 @@ describe('Autofill', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible('.contextMenuItemText')
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.formfill + '?2')
+        .newTab({ url: this.formfill + '?2' })
         .waitForUrl(this.formfill + '?2')
         .waitForElementCount('.contextMenuItemText', 0)
     })
