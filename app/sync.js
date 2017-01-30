@@ -16,6 +16,7 @@ const appActions = require('../js/actions/appActions')
 const syncConstants = require('../js/constants/syncConstants')
 const appDispatcher = require('../js/dispatcher/appDispatcher')
 const AppStore = require('../js/stores/appStore')
+const siteUtil = require('../js/state/siteUtil')
 const syncUtil = require('../js/state/syncUtil')
 const getSetting = require('../js/settings').getSetting
 const settings = require('../js/constants/settings')
@@ -160,14 +161,49 @@ module.exports.onSyncReady = (isFirstRun, e) => {
     }])
   }
   const appState = AppStore.getState()
-  // Sync bookmarks that have not been synced yet
   const sites = appState.get('sites') || new Immutable.List()
-  sites.forEach((site, i) => {
-    if (site && !site.get('objectId') && syncUtil.isSyncable('bookmark', site)) {
-      sendSyncRecords(e.sender, writeActions.CREATE,
-        [syncUtil.createSiteData(site.toJS(), i)])
+
+  /**
+   * Sync a bookmark that has not been synced yet, first syncing the parent
+   * folder if needed.
+   * @param {Immutable.Map} site
+   * @param {number} SyncRecord.Bookmark.index Specifies index within this
+   *   record batch so other clients apply records in the correct order.
+   * @returns {number} Next index.
+   */
+  // Setting objectIds happens with AppActions IPC but we need it immediately.
+  const folderObjectIds = {}
+  const syncBookmark = (site, siteIndex, syncIndex) => {
+    if (!site || site.get('objectId') || !syncUtil.isSyncable('bookmark', site)) {
+      return syncIndex
     }
-  })
+
+    const record = syncUtil.createSiteData(site.toJS(), siteIndex)
+    record.value.index = syncIndex
+    const folderId = site.get('folderId')
+    if (typeof folderId === 'number') {
+      folderObjectIds[folderId] = record.objectId
+    }
+
+    const parentFolderId = site.get('parentFolderId')
+    if (typeof parentFolderId === 'number') {
+      if (!folderObjectIds[parentFolderId]) {
+        const folderResult = siteUtil.getFolder(sites, parentFolderId)
+        if (folderResult) {
+          syncIndex = syncBookmark(folderResult[1], folderResult[0], syncIndex)
+        }
+      }
+      record.value.parentFolderObjectId = folderObjectIds[parentFolderId]
+    }
+
+    sendSyncRecords(e.sender, writeActions.CREATE, [record])
+    return syncIndex + 1
+  }
+
+  // Sync bookmarks that have not been synced yet.
+  let i = 0
+  sites.forEach((site, siteIndex) => { i = syncBookmark(site, siteIndex, i) })
+
   // Sync site settings that have not been synced yet
   // FIXME: If Sync was disabled and settings were changed, those changes
   // might not be synced.
@@ -200,7 +236,12 @@ module.exports.onSyncReady = (isFirstRun, e) => {
     if (!records || !records.length) {
       return
     }
-    log(`applying resolved ${records.length} ${categoryName}.`)
+    const getSortValue = (record) => {
+      if (record.objectData === 'bookmark') {
+        return record.bookmark.index || 0
+      } else { return 0 }
+    }
+    records.sort((a, b) => getSortValue(a) - getSortValue(b))
     syncUtil.applySyncRecords(records)
   })
   // Periodically poll for new records

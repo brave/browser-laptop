@@ -490,6 +490,20 @@ module.exports.isHistoryEntry = function (siteDetail) {
 }
 
 /**
+ * Get a folder by folderId
+ * @returns {Immutable.List.<Immutable.Map>} sites
+ * @param {number} folderId
+ * @returns {Array[<number>, <Immutable.Map>]|undefined}
+ */
+module.exports.getFolder = function (sites, folderId) {
+  const entry = sites.findEntry((site, _path) => {
+    return module.exports.isFolder(site) && site.get('folderId') === folderId
+  })
+  if (!entry) { return undefined }
+  return entry
+}
+
+/**
  * Obtains an array of folders
  */
 module.exports.getFolders = function (sites, folderId, parentId, labelPrefix) {

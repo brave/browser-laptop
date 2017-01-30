@@ -853,6 +853,24 @@ describe('siteUtil', function () {
     })
   })
 
+  describe('getFolder', function () {
+    const folder = Immutable.fromJS({
+      customTitle: 'folder1',
+      folderId: 2,
+      parentFolderId: 0,
+      tags: [siteTags.BOOKMARK_FOLDER]
+    })
+    const bookmark = Immutable.fromJS({
+      location: testUrl1,
+      title: 'sample',
+      parentFolderId: 2
+    })
+    const sites = Immutable.fromJS([folder, bookmark])
+    const result = siteUtil.getFolder(sites, bookmark.get('parentFolderId'))
+    assert.deepEqual(result[0], 0)
+    assert.deepEqual(result[1], folder)
+  })
+
   describe('getFolders', function () {
   })
 
