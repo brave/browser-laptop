@@ -44,7 +44,6 @@ const updateTab = (tabId) => {
  */
 const getPartition = (createProperties) => {
   let partition = session.defaultSession.partition
-  const openerTab = currentWebContents[createProperties.openerTabId]
   if (createProperties.partition) {
     partition = createProperties.partition
   } else if (createProperties.isPrivate) {
@@ -53,9 +52,7 @@ const getPartition = (createProperties) => {
     partition = `persist:partition-${createProperties.partitionNumber}`
   } else if (createProperties.isPartitioned) {
     partition = `persist:partition-${incrementPartitionNumber()}`
-  } else if (openerTab) {
-    partition = openerTab.session.partition
-  }
+  } 
 
   return partition
 }
