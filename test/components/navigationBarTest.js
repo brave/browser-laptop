@@ -842,7 +842,7 @@ describe('navigationBar tests', function () {
         yield this.app.client.keys(Brave.keys.ENTER)
         yield this.app.client
           .waitUntil(function () {
-            return this.getValue(urlInput).then((val) => {
+            return this.windowByUrl(Brave.browserWindowUrl).getValue(urlInput).then((val) => {
               return val === page2
             })
           })
@@ -956,7 +956,7 @@ describe('navigationBar tests', function () {
       })
       it('hides auth part of the url', function * () {
         yield this.app.client.waitUntil(function () {
-          return this.getValue(urlInput).then((val) => val === 'http://example.com/')
+          return this.windowByUrl(Brave.browserWindowUrl).getValue(urlInput).then((val) => val === 'http://example.com/')
         })
       })
     })
@@ -1188,6 +1188,8 @@ describe('navigationBar tests', function () {
         .waitForBookmarkDetail(page1Url, 'Page 1')
         .waitForEnabled(doneButton)
         .click(doneButton)
+        .activateTitleMode()
+        .activateURLMode()
         .waitForExist(navigatorBookmarked)
     })
 
