@@ -54,7 +54,7 @@ app.on('ready', () => {
       cleanUserData(process.argv[3])
       break
     case 'addSimulatedLedgerTransactions':
-      addSimulatedLedgerTransactions(process.argv[3])
+      addSimulatedLedgerTransactions(parseInt(process.argv[3]))
       break
     case 'addSimulatedSynopsisVisits':
       addSimulatedSynopsisVisits(process.argv[3])
