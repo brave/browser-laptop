@@ -9,11 +9,15 @@ const Immutable = require('immutable')
 const windowStore = require('../stores/windowStore')
 const appStoreRenderer = require('../stores/appStoreRenderer')
 const windowActions = require('../actions/windowActions')
+const appActions = require('../actions/appActions')
 const Main = require('./main')
-const SiteTags = require('../constants/siteTags')
 const cx = require('../lib/classSet')
 const {getPlatformStyles} = require('../../app/common/lib/platformUtil')
-const {siteSort} = require('../state/siteUtil')
+const alreadyPinnedTabs = new Set()
+const {currentWindowId, isFocused} = require('../../app/renderer/currentWindow')
+const {isPinnedTab} = require('../state/siteUtil')
+
+window.appActions = appActions
 
 class Window extends React.Component {
   constructor (props) {
@@ -32,19 +36,106 @@ class Window extends React.Component {
       windowActions.setState(this.windowState)
     }
 
+    this.syncPinnedTabs()
+
+    // Find all the pinned sites which have no tabs yet and create a tab for these
+    this.appState.get('sites')
+      .filter((site) => isPinnedTab(site.get('tags')) && !alreadyPinnedTabs.has(site.get('location')))
+      .forEach((site) => {
+        const url = site.get('location')
+        alreadyPinnedTabs.add(url)
+        appActions.createTabRequested({
+          url,
+          partition: site.get('partition'),
+          pinned: true
+        })
+      })
+
     this.onChange = this.onChange.bind(this)
     this.onAppStateChange = this.onAppStateChange.bind(this)
     windowStore.addChangeListener(this.onChange)
     appStoreRenderer.addChangeListener(this.onAppStateChange)
   }
+  syncPinnedTabs () {
+    // Only sync pinned tabs when a window is focused to avoid race conditions
+    if (!isFocused) {
+      console.log('---- !isFocused so returning')
+      return
+    }
+    console.log('---- isFocused so syncPinnedTabas')
+
+    // Shortcut to only do this when the number of pinned tabs in app storage changes
+    const pinnedTabSize = this.appState.get('tabs').filter((tab) => tab.get('pinned')).size
+    if (pinnedTabSize === this.lastPinnedTabSize) {
+      return
+    }
+
+    // Avoid duplicate pinned tabs by ensuing all frames are inside the alreadyPinnedTabs set
+    const frames = windowStore.state.get('frames')
+    frames
+      .filter((frame) => frame.get('pinnedLocation'))
+      .map((frame) => frame.get('pinnedLocation'))
+      .forEach(Set.prototype.add.bind(alreadyPinnedTabs))
+
+    const pinnedTabs = this.appState.get('tabs')
+      .filter((tab) => tab.get('pinned'))
+
+    // Calculate the unpinned tabs and then remove them from memory.
+    // The actual removal will be done in frame.js when detection of pinned status changes.
+    const pinnedTabUrls = pinnedTabs.map((tab) => tab.get('url'))
+    const tabsToRemove = Array.from(alreadyPinnedTabs.values())
+      .filter((x) => {
+        const result = !pinnedTabUrls.includes(x)
+        console.log('checking for has:', x, 'result:', result)
+        return result
+      })
+
+    // Preload current app tabs that are pinned into already pinned locations
+    pinnedTabs.filter((tab) => !alreadyPinnedTabs.has(tab.get('url')))
+      .forEach((tab) => {
+        const url = tab.get('url')
+        alreadyPinnedTabs.add(url)
+        const site = this.appState.get('sites').find(function (element) { return element.get('location') === url })
+        const icon = site && site.get('favicon') || undefined
+        console.log('----adding pin: ', url)
+        appActions.newWebContentsAdded(currentWindowId, {
+          location: url,
+          partition: tab.get('partition'),
+          guestInstanceId: tab.get('guestInstanceId'),
+          pinnedLocation: url,
+          icon
+        })
+      })
+
+    if (tabsToRemove.length > 0) {
+      console.log('---removing pins:')
+      tabsToRemove.forEach(console.log.bind(console))
+      console.log('---alreadyPinnedTabs:')
+      Array.from(alreadyPinnedTabs.values()).forEach(console.log.bind(console))
+      console.log('---pinnedTabUrls:')
+      pinnedTabUrls.toJS().forEach(console.log.bind(console))
+      console.log('---end')
+    }
+    tabsToRemove.forEach(Set.prototype.delete.bind(alreadyPinnedTabs))
+    this.lastPinnedTabSize = pinnedTabSize
+  }
 
   componentWillMount () {
     if (!this.props.initWindowState || this.props.initWindowState.frames.length === 0) {
       if (this.props.frames.length === 0) {
-        windowActions.newFrame()
+        appActions.createTabRequested({})
       } else {
-        this.props.frames.forEach((frame) => {
-          windowActions.newFrame(frame)
+        this.props.frames.forEach((frame, i) => {
+          if (frame.guestInstanceId) {
+            appActions.newWebContentsAdded(currentWindowId, frame)
+            return
+          }
+          appActions.createTabRequested({
+            url: frame.location,
+            partitionNumber: frame.partitionNumber,
+            isPrivate: frame.isPrivate,
+            active: i === 0
+          })
         })
       }
     }
@@ -104,33 +195,35 @@ class Window extends React.Component {
       return
     }
 
-    const sites = this.appState.get('sites')
-    const frames = this.windowState.get('frames')
+    this.syncPinnedTabs()
 
-    // Check for new pinned sites which we don't already know about
-    const sitesToAdd = sites
-      .filter((site) => {
-        return site.get('tags').includes(SiteTags.PINNED) &&
-          !frames.find((frame) => frame.get('pinnedLocation') &&
+    /*
+
+    let pinnedTabs = this.appState.get('tabs').filter(
+      (tab) => tab.get('pinned') &&
+        !alreadyPinnedTabs.has(tab.get('url')))
+
+    pinnedTabs = pinnedTabs
+      .filter((pinnedTab) => {
+        return !frames.find((frame) => frame.get('pinnedLocation') &&
             // Compare to the original src of the pinned frame
-            frame.get('pinnedLocation') === site.get('location') &&
-            (frame.get('partitionNumber') || 0) === (site.get('partitionNumber') || 0))
+            frame.get('pinnedLocation') === pinnedTab.get('url') &&
+            (frame.get('partitionNumber') || 0) === (pinnedTab.get('partition') || 0))
       })
-    sitesToAdd.toList().sort(siteSort).forEach((site) => {
-      windowActions.newFrame({
-        location: site.get('location'),
-        partitionNumber: site.get('partitionNumber'),
-        isPinned: true
-      }, false)
+
+    // console.log('----------------pinnedTabs size:', pinnedTabs.size)
+    pinnedTabs.forEach((pinnedTab) => {
+      const url = pinnedTab.get('url')
     })
 
     // Check for unpinned sites which should be closed
     const framesToClose = frames.filter((frame) =>
       frame.get('pinnedLocation') &&
       // Compare to the original src of the pinned frame
-      !sites.find((site) => frame.get('pinnedLocation') === site.get('location') &&
-        (frame.get('partitionNumber') || 0) === (site.get('partitionNumber') || 0) && site.get('tags').includes(SiteTags.PINNED)))
+      !pinnedTabs.find((pinnedTab) => frame.get('pinnedLocation') === pinnedTab.get('url') &&
+        (frame.get('partitionNumber') || 0) === (pinnedTab.get('partition') || 0)))
     framesToClose.forEach((frameProps) => windowActions.closeFrame(frames, frameProps, true))
+    */
   }
 }
 Window.propTypes = { appState: React.PropTypes.object, frames: React.PropTypes.array, initWindowState: React.PropTypes.object }

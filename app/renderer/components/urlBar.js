@@ -181,7 +181,7 @@ class UrlBar extends ImmutableComponent {
           location = location.replace(/^(\s*javascript:)+/i, '')
           const isLocationUrl = isUrl(location)
           if (!isLocationUrl && e.ctrlKey) {
-            windowActions.loadUrl(this.activeFrame, `www.${location}.com`)
+            appActions.loadURLRequested(this.activeFrame.get('tabId'), `www.${location}.com`)
           } else if (this.shouldRenderUrlBarSuggestions &&
               ((typeof this.activeIndex === 'number' && this.activeIndex >= 0) ||
               (this.locationValueSuffix && this.autocompleteEnabled))) {
@@ -201,11 +201,16 @@ class UrlBar extends ImmutableComponent {
               : this.buildSearchUrl(location)
             // do search.
             if (e.altKey) {
-              windowActions.newFrame({ location }, true)
+              appActions.createTabRequested({
+                url: location
+              })
             } else if (e.metaKey) {
-              windowActions.newFrame({ location }, !!e.shiftKey)
+              appActions.createTabRequested({
+                url: location,
+                active: !!e.shiftKey
+              })
             } else {
-              windowActions.loadUrl(this.activeFrame, location)
+              appActions.loadURLRequested(this.activeFrame.get('tabId'), location)
             }
           }
         }

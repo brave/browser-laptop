@@ -6,10 +6,7 @@ const mapValuesByKeys = require('../lib/functional').mapValuesByKeys
 
 const _ = null
 const windowConstants = {
-  WINDOW_SET_URL: _,
   WINDOW_SET_NAVBAR_INPUT: _,
-  WINDOW_NEW_FRAME: _,
-  WINDOW_VIEW_KEY: _,
   WINDOW_CLOSE_FRAME: _,
   WINDOW_SET_ACTIVE_FRAME: _,
   WINDOW_SET_FOCUSED_FRAME: _,
@@ -18,7 +15,6 @@ const windowConstants = {
   WINDOW_SET_TAB_PAGE_INDEX: _,
   WINDOW_SET_TAB_BREAKPOINT: _,
   WINDOW_SET_TAB_HOVER_STATE: _,
-  WINDOW_SET_IS_BEING_DRAGGED_OVER_DETAIL: _,
   WINDOW_TAB_MOVE: _,
   WINDOW_SET_THEME_COLOR: _,
   WINDOW_WEBVIEW_LOAD_END: _,
@@ -36,12 +32,13 @@ const windowConstants = {
   WINDOW_ADD_HISTORY: _,
   WINDOW_SET_FRAME_ERROR: _,
   WINDOW_SET_FRAME_TAB_ID: _,
+  WINDOW_FRAME_PINNED: _,
   WINDOW_SET_FRAME_TITLE: _,
   WINDOW_SET_NAVIGATED: _,
   WINDOW_SET_URL_BAR_ACTIVE: _, // whether the URL bar is being typed in
   WINDOW_UNDO_CLOSED_FRAME: _,
   WINDOW_CLEAR_CLOSED_FRAMES: _,
-  WINDOW_SET_ACTIVE_FRAME_SHORTCUT: _,
+  WINDOW_FRAME_SHORTCUT_CHANGED: _,
   WINDOW_SET_URL_BAR_SELECTED: _,
   WINDOW_SET_URL_BAR_FOCUSED: _,
   WINDOW_SET_SEARCH_DETAIL: _,
@@ -61,7 +58,6 @@ const windowConstants = {
   WINDOW_SET_MOUSE_IN_TITLEBAR: _,
   WINDOW_SET_FINDBAR_SHOWN: _, // whether the findbar is shown
   WINDOW_SET_FINDBAR_SELECTED: _, // whether the findbar is active
-  WINDOW_SET_PINNED: _, // Whehter the current tab is pinned or not
   WINDOW_SET_SITE_INFO_VISIBLE: _, // Whether or not to show site info like # of blocked ads
   WINDOW_SET_BRAVERY_PANEL_DETAIL: _, // Whether or not to show the Bravery panel and info about how to show it
   WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE: _, // Whether or not to show the downloads toolbar

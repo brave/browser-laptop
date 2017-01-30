@@ -22,7 +22,7 @@ describe('navigationBar tests', function () {
 
   function * newFrame (client, frameKey = 2) {
     yield client
-      .ipcSend('shortcut-new-frame')
+      .newTab()
       // wait for correct urlInput based on frameKey
       .waitForTabCount(frameKey)
       .windowByUrl(Brave.browserWindowUrl)
@@ -82,7 +82,7 @@ describe('navigationBar tests', function () {
 
       it('newtab hasfocus in urlbar', function * () {
         yield this.app.client
-          .ipcSend(messages.SHORTCUT_NEW_FRAME)
+          .newTab()
           .waitUntil(function () {
             return this.getWindowState().then((val) => {
               return val.value.frames.length === 2
@@ -94,7 +94,7 @@ describe('navigationBar tests', function () {
       it('newtab with page has focus in webview', function * () {
         var page1Url = Brave.server.url('tabnapping.html')
         yield this.app.client
-          .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
+          .newTab({ url: page1Url })
           .waitUntil(function () {
             return this.getWindowState().then((val) => {
               return val.value.frames.length === 2
@@ -658,7 +658,7 @@ describe('navigationBar tests', function () {
           )
         })
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
+        .newTab({ url: page1Url })
         .waitUntil(function () {
           return this.getWindowState().then((val) => {
             return val.value.frames.length === 2
@@ -672,7 +672,7 @@ describe('navigationBar tests', function () {
           )
         })
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { isPrivate: true })
+        .newTab({ url: page1Url, isPrivate: true })
         .waitUntil(function () {
           return this.getWindowState().then((val) => {
             return val.value.frames.length === 3
@@ -686,7 +686,7 @@ describe('navigationBar tests', function () {
           )
         })
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { partitionNumber: 1 })
+        .newTab({ url: page1Url, partitionNumber: 1 })
         .waitUntil(function () {
           return this.getWindowState().then((val) => {
             return val.value.frames.length === 4
@@ -703,7 +703,7 @@ describe('navigationBar tests', function () {
     it('Limit effect of running insecure content in private frame', function * () {
       const page1Url = 'https://mixed-script.badssl.com/'
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { isPrivate: true })
+        .newTab({ url: page1Url, isPrivate: true })
         .waitUntil(function () {
           return this.getWindowState().then((val) => {
             return val.value.frames.length === 2
@@ -732,7 +732,7 @@ describe('navigationBar tests', function () {
           )
         })
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
+        .newTab({ url: page1Url })
         .waitUntil(function () {
           return this.getWindowState().then((val) => {
             return val.value.frames.length === 3
@@ -746,7 +746,7 @@ describe('navigationBar tests', function () {
           )
         })
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { isPrivate: true })
+        .newTab({ url: page1Url, isPrivate: true })
         .waitUntil(function () {
           return this.getWindowState().then((val) => {
             return val.value.frames.length === 4
@@ -760,7 +760,7 @@ describe('navigationBar tests', function () {
           )
         })
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { partitionNumber: 1 })
+        .newTab({ url: page1Url, partitionNumber: 1 })
         .waitUntil(function () {
           return this.getWindowState().then((val) => {
             return val.value.frames.length === 5

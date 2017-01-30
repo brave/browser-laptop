@@ -151,6 +151,13 @@ AppStore
     origin: string, // origin of the form
     username: string
   }],
+  pinnedTabs: {
+    attachWindowId: number, // The windowId that should have all attached pins only
+    pendingCloseWindowId: number, // Th windowId to close if all pinned tabs have been transferred to attachWindowId
+    attachedState: {
+      [tabId]: guestInstanceId
+    }
+  },
   settings: {
     // See defaults in js/constants/appConfig.js
     'adblock.customRules': string, // custom rules in ABP filter syntax
@@ -232,7 +239,7 @@ AppStore
       originalSeed: Array.<number>, // only set for bookmarks that have been synced before a sync profile reset
       parentFolderId: number, // set for bookmarks and bookmark folders only
       partitionNumber: number, // optionally specifies a specific session
-      tags: [string], // empty, 'bookmark', 'bookmark-folder', 'pinned', 'default', or 'reader'
+      tags: [string], // empty, 'bookmark', 'bookmark-folder', 'default', or 'reader'
       themeColor: string, // CSS compatible color string
       title: string
     } // folder: folderId; bookmark/history: location + partitionNumber + parentFolderId
@@ -295,6 +302,8 @@ AppStore
     },
     muted: boolean, // is the tab muted
     windowId: number // the windowId that contains the tab
+    guestInstanceId: number,
+    tabId: number
   }],
   temporarySiteSettings: {
     // Same as siteSettings but never gets written to disk
@@ -621,15 +630,6 @@ WindowStore
     },
     downloadsToolbar: {
       isVisible: boolean // whether or not the downloads toolbar is visible
-    },
-    dragging: {
-      draggingOver: {
-        dragKey: any,
-        dragType: string,
-        draggingOverLeft: boolean,
-        draggingOverRight: boolean
-      },
-      dragType: string // tab, bookmark
     },
     hasFocus: boolean, // true if window has focus
     isClearBrowsingDataPanelVisible: boolean, // true if the Clear Browsing Data panel is visible

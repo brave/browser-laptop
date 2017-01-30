@@ -33,16 +33,6 @@ Dispatches an event to the main process to create a new window.
 
 
 
-### newTab(createProperties) 
-
-A new tab has been requested
-
-**Parameters**
-
-**createProperties**: `Object`, windowId, url, active, openerTabId
-
-
-
 ### tabCreated(tabValue) 
 
 A new tab has been created
@@ -50,6 +40,51 @@ A new tab has been created
 **Parameters**
 
 **tabValue**: `Object`, A new tab has been created
+
+
+
+### createTabRequested(createProperties) 
+
+A request for a new tab has been made with the specified createProperties
+
+**Parameters**
+
+**createProperties**: `Object`, A request for a new tab has been made with the specified createProperties
+
+
+
+### loadURLRequested(tabId, url) 
+
+A request for a URL load
+
+**Parameters**
+
+**tabId**: `number`, the tab ID to load the URL inside of
+
+**url**: `string`, The url to load
+
+
+
+### loadURLInActiveTabRequested(windowId, url) 
+
+A request for a URL load for the active tab of the specified window
+
+**Parameters**
+
+**windowId**: `number`, the window ID to load the URL inside of
+
+**url**: `string`, The url to load
+
+
+
+### maybeCreateTabRequested(createProperties) 
+
+A request for a "maybe" new tab has been made with the specified createProperties
+If a tab is already opened it will instead set it as active.
+
+**Parameters**
+
+**createProperties**: `Object`, these are only used if a new tab is being created
 
 
 
@@ -499,8 +534,17 @@ Autofill data changed
 
 ### windowBlurred(windowId) 
 
-Dispatches a message when appWindowId loses focus
 Dispatches a message when windowId loses focus
+
+**Parameters**
+
+**windowId**: `Number`, the unique id of the window
+
+
+
+### windowFocused(windowId) 
+
+Dispatches a message when windowId gains focus
 
 **Parameters**
 
@@ -806,6 +850,59 @@ also change all undefined ledgerPayments to value true
 **Parameters**
 
 **publishers**: `Object`, publishers from the synopsis
+
+
+
+### tabPinned(tabId) 
+
+Open dialog for default download path setting
+Dispatches a message when a tab is being pinned
+
+**Parameters**
+
+**tabId**: `number`, The tabId of the tab to pin
+
+
+
+### dragEnded(dragType, dragData) 
+
+Notifies the app that a drag operation stopped from within the app
+
+**Parameters**
+
+**dragType**: `string`, The type of data
+
+**dragData**: `object`, Data being transfered
+
+
+
+### dataDropped() 
+
+Notifies the app that a drop operation occurred
+
+
+
+### draggedOver() 
+
+Notifies the app that a drop operation occurred
+
+
+
+### guestReady() 
+
+Notifies the app that a guest should be attached
+
+
+
+### guestAttached() 
+
+Notifies the app that a guest should be attached
+
+
+
+### guestDetached() 
+
+Notifies the app that a guest should be detached
 
 
 

@@ -16,38 +16,6 @@ Dispatches an event to the main process to replace the window state
 
 
 
-### loadUrl(frame, location) 
-
-Dispatches a message to the store to load a new URL.
-Both the frame's src and location properties will be updated accordingly.
-
-If the frame is a pinned site and the origin of the pinned site does
-not match the origin of the passed in location, then a new frame will be
-created for the load.
-
-In general, an iframe's src should not be updated when navigating within the frame to a new page,
-but the location should. For user entered new URLs, both should be updated.
-
-**Parameters**
-
-**frame**: `object`, The frame props
-
-**location**: `string`, The URL of the page to load
-
-
-
-### setUrl(location, key) 
-
-Dispatches a message to the store to set the new URL.
-
-**Parameters**
-
-**location**: `string`, Dispatches a message to the store to set the new URL.
-
-**key**: `number`, Dispatches a message to the store to set the new URL.
-
-
-
 ### setNavigated(location, key, isNavigatedInPage, tabId) 
 
 Dispatches a message to the store to let it know a page has been navigated.
@@ -77,7 +45,7 @@ Dispatches a message to set the security state.
 
 
 
-### setFrameTabId(frameProps, tabId) 
+### setFrameTabId(frameProps, tabId, guestInstanceId) 
 
 Dispatches a message to set the frame tab id
 
@@ -86,6 +54,20 @@ Dispatches a message to set the frame tab id
 **frameProps**: `Object`, The frame properties
 
 **tabId**: `Number`, the tab id to set
+
+**guestInstanceId**: `Number`, the guest instance id to set
+
+
+
+### framePinned(frameProps, pinned) 
+
+Dispatches a message to pin a tab
+
+**Parameters**
+
+**frameProps**: `Object`, The frame properties
+
+**pinned**: `boolean`, true if pinned, otherwise false
 
 
 
@@ -150,18 +132,6 @@ Highlight text in the findbar
 
 
 
-### setPinned(frameProps, isPinned) 
-
-Sets a frame as pinned
-
-**Parameters**
-
-**frameProps**: `Object`, The frame properties to modify
-
-**isPinned**: `boolean`, Whether to pin or not
-
-
-
 ### onWebviewLoadStart(frameProps, location) 
 
 Dispatches a message to the store to indicate that the webview is loading.
@@ -195,19 +165,6 @@ Dispatches a message to the store to indicate that the webview entered full scre
 **isFullScreen**: `boolean`, true if the webview is entering full screen mode.
 
 **showFullScreenWarning**: `boolean`, true if a warning about entering full screen should be shown.
-
-
-
-### newFrame(frameOpts, openInForeground) 
-
-Dispatches a message to the store to create a new frame
-
-**Parameters**
-
-**frameOpts**: `Object`, An object of frame options such as isPrivate, element, and tab features.
-                 These may not all be hooked up in Electron yet.
-
-**openInForeground**: `boolean`, true if the new frame should become the new active frame
 
 
 
@@ -318,20 +275,6 @@ Dispatches a message to the store to set the tab page index.
 **Parameters**
 
 **frameProps**: `number`, The frame props to center around
-
-
-
-### setIsBeingDraggedOverDetail(dragType, dragOverKey, dragDetail) 
-
-Dispatches a message to the store to indicate that something is dragging over this item.
-
-**Parameters**
-
-**dragType**: `string`, The type of drag operation being performed
-
-**dragOverKey**: `Object`, A unique identifier for the storage for the item being dragged over
-
-**dragDetail**: `Object`, detail about the item drag operation
 
 
 
@@ -446,7 +389,7 @@ Marks the URL bar as focused or not.
 
 
 
-### setActiveFrameShortcut(frameProps, activeShortcut, activeShortcutDetails) 
+### frameShortcutChanged(frameProps, activeShortcut, activeShortcutDetails) 
 
 Dispatches a message to the store to indicate that the pending frame shortcut info should be updated.
 

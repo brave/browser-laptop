@@ -2,7 +2,6 @@
 
 const Brave = require('../lib/brave')
 const {activeWebview, findBarInput, findBarMatches, findBarNextButton, findBarClearButton, urlInput, titleBar} = require('../lib/selectors')
-const messages = require('../../js/constants/messages')
 const assert = require('assert')
 
 describe('findBar', function () {
@@ -165,7 +164,7 @@ describe('findBar', function () {
     yield this.app.client
       .showFindbar()
       .waitForElementFocus(findBarInput)
-      .ipcSend(messages.SHORTCUT_NEW_FRAME, url2, { openInForeground: false })
+      .newTab({ url: url2, active: false })
       .setValue(findBarInput, 'test')
       .waitUntil(function () {
         return this.getValue(findBarInput).then((val) => val === 'test')
@@ -224,7 +223,7 @@ describe('findBar', function () {
       .showFindbar()
       .waitForElementFocus(findBarInput)
       .setValue(findBarInput, 'test')
-      .ipcSend(messages.SHORTCUT_NEW_FRAME, url)
+      .newTab({ url })
       .waitForTabCount(2)
       .tabByIndex(1)
       .waitForUrl(url)

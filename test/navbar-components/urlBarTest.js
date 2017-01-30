@@ -4,7 +4,6 @@ const Brave = require('../lib/brave')
 const {urlInput, urlBarSuggestions, urlbarIcon, reloadButton} = require('../lib/selectors')
 const searchProviders = require('../../js/data/searchProviders')
 const config = require('../../js/constants/config')
-const messages = require('../../js/constants/messages')
 
 describe('urlBar tests', function () {
   function * setup (client) {
@@ -438,7 +437,7 @@ describe('urlBar tests', function () {
       .tabByIndex(0)
       .loadUrl(this.page1Url)
       .windowByUrl(Brave.browserWindowUrl)
-      .ipcSend(messages.SHORTCUT_NEW_FRAME)
+      .newTab()
       .waitForUrl(Brave.newTabUrl)
       .tabByIndex(1)
       .loadUrl(this.page2Url)
@@ -459,7 +458,7 @@ describe('urlBar tests', function () {
         return this.getValue(urlInput).then((val) => val === '')
       })
       .windowByUrl(Brave.browserWindowUrl)
-      .ipcSend(messages.SHORTCUT_NEW_FRAME)
+      .newTab()
       .waitForUrl(Brave.newTabUrl)
       .tabByIndex(1)
     })

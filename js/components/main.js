@@ -267,10 +267,9 @@ class Main extends ImmutableComponent {
       if (!this.braveShieldsDisabled) {
         this.onBraveMenu()
       } else {
-        windowActions.newFrame({
-          location: 'about:preferences#shields',
-          singleFrame: true
-        }, true)
+        appActions.maybeCreateTabRequested({
+          url: 'about:preferences#shields'
+        })
       }
     })
     ipc.on(messages.ENABLE_SWIPE_GESTURE, (e) => {
@@ -370,27 +369,6 @@ class Main extends ImmutableComponent {
     this.registerWindowLevelShortcuts()
     this.registerCustomTitlebarHandlers()
 
-    ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url, options = {}) => {
-      if (options.singleFrame) {
-        const frameProps = self.props.windowState.get('frames').find((frame) => frame.get('location') === url)
-        if (frameProps) {
-          windowActions.setActiveFrame(frameProps)
-          return
-        }
-      }
-      let openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS) === true || options.openInForeground
-      const frameOpts = options.frameOpts || {
-        location: url,
-        isPrivate: !!options.isPrivate,
-        isPartitioned: !!options.isPartitioned,
-        parentFrameKey: options.parentFrameKey
-      }
-      if (options.partitionNumber !== undefined) {
-        frameOpts.partitionNumber = options.partitionNumber
-      }
-      windowActions.newFrame(frameOpts, openInForeground)
-    })
-
     ipc.on(messages.NEW_POPUP_WINDOW, function (evt, extensionId, src, props) {
       windowActions.setPopupWindowDetail(Immutable.fromJS({
         left: props.left,
@@ -455,11 +433,6 @@ class Main extends ImmutableComponent {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BACK, this.onBack)
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_FORWARD, this.onForward)
 
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, (e, url) => {
-      const activeFrame = frameStateUtil.getActiveFrame(self.props.windowState)
-      windowActions.loadUrl(activeFrame, url)
-    })
-
     ipc.on(messages.CERT_ERROR, (e, details) => {
       const frame = frameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
       if (frame && (frame.get('location') === details.url ||
@@ -468,7 +441,7 @@ class Main extends ImmutableComponent {
           url: details.url,
           error: details.error
         })
-        windowActions.loadUrl(frame, 'about:certerror')
+        appActions.loadURLRequested(frame.get('tabId'), 'about:certerror')
       }
     })
 
@@ -559,7 +532,14 @@ class Main extends ImmutableComponent {
     })
     currentWindow.on('resize', onWindowResize)
     currentWindow.on('move', onWindowMove)
-    currentWindow.on('focus', function () {
+    currentWindow.on('focus', () => {
+      /*
+      const pinnedFrames = this.props.windowState.get('frames').filter((frame) => frame.get('pinnedLocation'))
+      pinnedFrames.forEach((frame) => {
+        const webview = document.querySelector(`webview[data-frame-key="${frame.get('key')}"]`)
+        webview.attachGuest(frame.get('guestInstanceId'))
+      })
+      */
       windowActions.onFocusChanged(true)
     })
     currentWindow.on('blur', function () {
@@ -567,6 +547,18 @@ class Main extends ImmutableComponent {
       appActions.windowBlurred(currentWindow.id)
       windowActions.onFocusChanged(false)
     })
+    /*
+    const detachPinnedTabs = (e) => {
+      console.log('main.js: detachPinnedTabs------')
+      const pinnedFrames = this.props.windowState.get('frames').filter((frame) => frame.get('pinnedLocation'))
+      pinnedFrames.forEach((frame) => {
+        const webview = document.querySelector(`webview[data-frame-key="${frame.get('key')}"]`)
+        webview.detachGuest()
+      })
+    }
+    */
+    // currentWindow.on('blur', detachPinnedTabs)
+    // currentWindow.on('close', detachPinnedTabs)
     // Full screen as in F11 (not full screen on a video)
     currentWindow.on('enter-full-screen', function (event) {
       windowActions.setWindowFullScreen(true)
@@ -705,8 +697,8 @@ class Main extends ImmutableComponent {
     return siteSettings.activeSettings(settings, this.props.appState, appConfig).noScript === true
   }
 
-  onCloseFrame (activeFrameProps) {
-    windowActions.closeFrame(this.props.windowState.get('frames'), activeFrameProps)
+  onCloseFrame (activeFrameProps, suppressCloseWindow) {
+    windowActions.closeFrame(this.props.windowState.get('frames'), activeFrameProps, false, suppressCloseWindow)
   }
 
   onDragOver (e) {
@@ -720,8 +712,9 @@ class Main extends ImmutableComponent {
   onDrop (e) {
     if (e.dataTransfer.files.length > 0) {
       Array.from(e.dataTransfer.files).forEach((file) => {
-        const path = encodeURI(file.path)
-        return windowActions.newFrame({location: path, title: file.name})
+        const url = encodeURI(file.path)
+        appActions.createTabRequested({ url })
+        return
       })
     } else if (e.dataTransfer.getData('text/plain')) {
       let activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
@@ -1207,7 +1200,7 @@ class Main extends ImmutableComponent {
         {
           showBookmarksToolbar
           ? <BookmarksToolbar
-            draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.BOOKMARK && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
+            draggingOverData={this.props.appState.getIn(['dragData', 'dragOverData', 'draggingOverType']) === dragTypes.BOOKMARK && this.props.appState.getIn(['dragData', 'dragOverData'])}
             showFavicon={showFavicon}
             showOnlyFavicon={showOnlyFavicon}
             shouldAllowWindowDrag={shouldAllowWindowDrag && !isWindows}
@@ -1236,7 +1229,7 @@ class Main extends ImmutableComponent {
         <TabsToolbar
           paintTabs={getSetting(settings.PAINT_TABS)}
           shouldAllowWindowDrag={shouldAllowWindowDrag}
-          draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.TAB && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
+          dragData={this.props.appState.getIn(['dragData', 'type']) === dragTypes.TAB && this.props.appState.get('dragData')}
           previewTabs={getSetting(settings.SHOW_TAB_PREVIEWS)}
           tabsPerTabPage={tabsPerPage}
           tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}

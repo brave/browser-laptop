@@ -6,9 +6,9 @@ const React = require('react')
 const ReactDOM = require('react-dom')
 const ImmutableComponent = require('./immutableComponent')
 const Tab = require('./tab')
+const appActions = require('../actions/appActions')
 const windowActions = require('../actions/windowActions')
 const windowStore = require('../stores/windowStore')
-const appActions = require('../actions/appActions')
 const siteTags = require('../constants/siteTags')
 const dragTypes = require('../constants/dragTypes')
 const siteUtil = require('../state/siteUtil')
@@ -41,7 +41,7 @@ class PinnedTabs extends ImmutableComponent {
         const droppedOnFrameProps = windowStore.getFrame(droppedOnTab.props.tab.get('frameKey'))
         windowActions.moveTab(sourceDragData, droppedOnFrameProps, isLeftSide)
         if (!sourceDragData.get('pinnedLocation')) {
-          windowActions.setPinned(sourceDragData, true)
+          appActions.setPinned(sourceDragData.get('tabId'), true)
         } else {
           appActions.moveSite(siteUtil.getDetailFromFrame(sourceDragData, siteTags.PINNED),
             siteUtil.getDetailFromFrame(droppedOnFrameProps, siteTags.PINNED),
@@ -65,7 +65,7 @@ class PinnedTabs extends ImmutableComponent {
          this.props.pinnedTabs
            .map((tab) =>
              <Tab ref={(node) => this.tabRefs.push(node)}
-               draggingOverData={this.props.draggingOverData}
+               dragData={this.props.dragData}
                tab={tab}
                key={'tab-' + tab.get('frameKey')}
                paintTabs={this.props.paintTabs}

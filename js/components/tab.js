@@ -8,6 +8,7 @@ const ImmutableComponent = require('./immutableComponent')
 const {StyleSheet, css} = require('aphrodite')
 
 const windowActions = require('../actions/windowActions')
+const appActions = require('../actions/appActions')
 const locale = require('../l10n')
 const dragTypes = require('../constants/dragTypes')
 const messages = require('../constants/messages')
@@ -26,6 +27,8 @@ const {Favicon, AudioTabIcon, NewSessionIcon,
       PrivateIcon, TabTitle, CloseTabIcon} = require('../../app/renderer/components/tabContent')
 const {getTabBreakpoint, tabUpdateFrameRate} = require('../../app/renderer/lib/tabUtil')
 const {isWindows} = require('../../app/common/lib/platformUtil')
+const {currentWindowId} = require('../../app/renderer/currentWindow')
+const {frameOptsFromFrame} = require('../state/frameStateUtil')
 
 class Tab extends ImmutableComponent {
   constructor () {
@@ -42,26 +45,33 @@ class Tab extends ImmutableComponent {
   }
 
   get draggingOverData () {
-    if (!this.props.draggingOverData ||
-        this.props.draggingOverData.get('dragOverKey') !== this.props.tab.get('frameKey')) {
+    const draggingOverData = this.props.dragData && this.props.dragData.get('dragOverData')
+    if (!draggingOverData ||
+        draggingOverData.get('draggingOverKey') !== this.props.tab.get('frameKey') ||
+        draggingOverData.get('draggingOverWindowId') !== currentWindowId) {
       return
     }
 
-    const sourceDragData = dnd.getInProcessDragData()
+    const sourceDragData = dnd.getInterBraveDragData()
+    if (!sourceDragData) {
+      return
+    }
     const location = sourceDragData.get('location')
-    const key = this.props.draggingOverData.get('dragOverKey')
+    const key = draggingOverData.get('draggingOverKey')
     const draggingOverFrame = windowStore.getFrame(key)
     if ((location === 'about:blank' || location === 'about:newtab' || isIntermediateAboutPage(location)) &&
         (draggingOverFrame && draggingOverFrame.get('pinnedLocation'))) {
       return
     }
 
-    return this.props.draggingOverData
+    return draggingOverData
   }
 
   get isDragging () {
-    const sourceDragData = dnd.getInProcessDragData()
-    return sourceDragData && this.props.tab.get('frameKey') === sourceDragData.get('key')
+    const sourceDragData = dnd.getInterBraveDragData()
+    return sourceDragData &&
+      sourceDragData.get('key') === this.props.tab.get('frameKey') &&
+      sourceDragData.get('draggingOverWindowId') === currentWindowId
   }
 
   get isDraggingOverLeft () {
@@ -101,6 +111,38 @@ class Tab extends ImmutableComponent {
 
   onDragEnd (e) {
     dnd.onDragEnd(dragTypes.TAB, this.frame, e)
+    // If there's no dropWindowId that means the user dropped it outside of Brave completely and we should
+    // create a new window with the tab.
+    if (!dnd.isDraggingInsideWindow()) {
+      const tabId = this.frame.get('tabId')
+      const frameOpts = frameOptsFromFrame(this.frame).toJS()
+      frameOpts.disposition = 'foreground-tab'
+      const browserOpts = { positionByMouseCursor: true }
+      if (this.props.dragData) {
+        console.log('this.props.dragData:', this.props.dragData.toJS())
+        frameOpts.indexByFrameKey = this.props.dragData.getIn(['dragOverData', 'draggingOverKey'])
+        frameOpts.prependIndexByFrameKey = this.props.dragData.getIn(['dragOverData', 'draggingOverLeftHalf'])
+        const dropWindowId = this.props.dragData.get('dropWindowId') || this.props.dragData.getIn(['dragOverData', 'draggingOverWindowId'])
+        if (currentWindowId !== dropWindowId) {
+          const closeWindowWhenAttached = windowStore.getFrameCount() === 1
+          if (closeWindowWhenAttached) {
+            frameOpts.closeWindowWhenAttachedId = currentWindowId
+          }
+          appActions.guestDetached(tabId)
+          appActions.newWebContentsAdded(dropWindowId, frameOpts)
+          this.props.onCloseFrame(this.frame, closeWindowWhenAttached)
+        } else if (windowStore.getFrameCount() > 1) {
+          appActions.guestDetached(tabId)
+          appActions.newWindow(frameOpts, browserOpts)
+          this.props.onCloseFrame(this.frame)
+        }
+      // If there's only 1 frame we don't want to detach when dropped outside of a window
+      } else if (windowStore.getFrameCount() > 1) {
+        appActions.guestDetached(tabId)
+        appActions.newWindow(frameOpts, browserOpts)
+        this.props.onCloseFrame(this.frame)
+      }
+    }
   }
 
   onDragOver (e) {

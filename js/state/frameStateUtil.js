@@ -245,10 +245,9 @@ function isAncestorFrameKey (frames, frame, parentFrameKey) {
 }
 
 function getPartitionNumber (partition) {
-  console.log(partition)
-  const regex = /partition-(\d+)/
+  const regex = /(?:persist:)?partition-(\d+)/
   const matches = regex.exec(partition)
-  return matches && matches[0]
+  return matches && matches[1]
 }
 
 function isPrivatePartition (partition) {
@@ -260,13 +259,16 @@ function isSessionPartition (partition) {
 }
 
 function getPartition (frameOpts) {
-  let partition = 'persist:default'
-  if (frameOpts.get('isPrivate')) {
-    partition = 'default'
-  } else if (frameOpts.get('partitionNumber')) {
-    partition = `persist:partition-${frameOpts.get('partitionNumber')}`
+  return getPartitionFromNumber(frameOpts.get('partitionNumber'), frameOpts.get('isPrivate'))
+}
+
+function getPartitionFromNumber (partitionNumber, incognito) {
+  if (!partitionNumber && !incognito) {
+    return 'persist:default'
+  } else if (incognito) {
+    return 'default'
   }
-  return partition
+  return `persist:partition-${partitionNumber}`
 }
 
 /**
@@ -305,6 +307,15 @@ const tabFromFrame = (frame) => {
     pinnedLocation: frame.pinnedLocation,
     location: frame.location
   }
+}
+
+const frameOptsFromFrame = (frame) => {
+  return frame
+    .delete('tabId')
+    .delete('key')
+    .delete('parentFrameKey')
+    .delete('activeShortcut')
+    .delete('activeShortcutDetails')
 }
 
 /**
@@ -571,11 +582,13 @@ module.exports = {
   getFramePropsIndex,
   getFrameKeysByDisplayIndex,
   getPartition,
+  getPartitionFromNumber,
   addFrame,
   undoCloseFrame,
   removeFrame,
   removeOtherFrames,
   tabFromFrame,
+  frameOptsFromFrame,
   getFrameKeyByTabId,
   getFrameTabPageIndex,
   frameStatePath,

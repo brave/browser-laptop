@@ -74,9 +74,34 @@ const api = {
           LocalShortcuts.unregister(win)
         })
         win.webContents.once('close', () => {
+          console.log('webcontents close')
           LocalShortcuts.unregister(win)
         })
+        /*
+        win.once('close', (e) => {
+          console.log('app actions pinned tab transferring, for window id 2, and closing window: ', windowId)
+
+          const otherWindows = Object.keys(currentWindows).filter((id) => Number(id) !== windowId)
+          if (otherWindows.length > 0) {
+            console.log('otherWindows:', otherWindows)
+            const nextWindowId = otherWindows[0]
+            console.log('otherWindows first id:', nextWindowId)
+
+            // Transfer to the first arbitrary other window
+            // Window we're transferring to must be in focus or else there's a race condition
+            // with pinned tabs.
+            let win = api.getWindow(nextWindowId)
+            if (!win.isDestroyed()) {
+              win.focus()
+            }
+
+            // appActions.pinnedTabsTransferring(currentWindows[otherWindows[0]].id, true, windowId)
+            e.preventDefault()
+          }
+        })
+      */
         win.once('close', () => {
+          console.log('----win.once unregister local shortcuts')
           LocalShortcuts.unregister(win)
         })
         win.on('scroll-touch-begin', function (e) {
@@ -139,9 +164,13 @@ const api = {
         cleanupWindow(windowId)
       })
       win.on('blur', () => {
+        console.log('===win.on blur:', windowId)
+        appActions.windowBlurred(windowId)
         updateWindowDebounce(windowId)
       })
       win.on('focus', () => {
+        console.log('===win.on focus:', windowId)
+        // appActions.windowFocused(windowId)
         updateWindowDebounce(windowId)
       })
       win.on('show', () => {
