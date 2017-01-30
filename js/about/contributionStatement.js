@@ -262,12 +262,19 @@ class ContributionStatement extends ImmutableComponent {
     return pages
   }
 
+  get contributionDateRangeString () {
+    if (this.lastContributionHumanFormattedDate !== '') {
+      return (this.lastContributionHumanFormattedDate + ' - ' + this.thisContributionHumanFormattedDate)
+    }
+    return null
+  }
+
   ContributionStatementDetailTable (page, pageIdx, totalPages) {
     return (
       <div className='contributionStatementDetailTableContainer'>
         <div>
           <span className='statementDatesCoveredText pull-right'>
-            { this.lastContributionHumanFormattedDate } - { this.thisContributionHumanFormattedDate }
+            { this.contributionDateRangeString }
           </span>
           <table className='contributionStatementDetailTable'>
             <tbody>
