@@ -449,6 +449,12 @@ module.exports.init = () => {
       disableExtension(extensionIds[passwordManagers.ENPASS])
     }
 
+    if (activePasswordManager === passwordManagers.BITWARDEN) {
+      registerComponent(extensionIds[passwordManagers.BITWARDEN])
+    } else {
+      disableExtension(extensionIds[passwordManagers.BITWARDEN])
+    }
+
     if (getSetting(settings.POCKET_ENABLED)) {
       registerComponent(config.PocketExtensionId)
     } else {

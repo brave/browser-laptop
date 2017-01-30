@@ -196,6 +196,7 @@ AppStore
     'search.offer-search-suggestions': boolean, // true if suggestions should be offered from the default search engine when available.
     'security.flash.installed': boolean,
     'security.passwords.active-password-manager': string, // name of active password manager
+    'security.passwords.bitwarden-enabled': boolean, // true if the bitwarden extension should be enabled
     'security.passwords.dashlane-enabled': boolean, // true if the Dashlane extension should be enabled
     'security.passwords.enpass-enabled': boolean, // true if the Enpass extension should be enabled
     'security.passwords.last-pass-enabled': boolean, // true if the Last password extension should be enabled

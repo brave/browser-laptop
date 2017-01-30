@@ -8,6 +8,7 @@ const passwordManagers = {
   DASHLANE: 'Dashlane',
   LAST_PASS: 'LastPass',
   ENPASS: 'Enpass',
+  BITWARDEN: 'bitwarden',
   UNMANAGED: 'Unmanaged'
 }
 
@@ -19,6 +20,7 @@ extensionIds[passwordManagers.ONE_PASSWORD] = 'aomjjhallfgjeglblehebfpbcfeobpgk'
 extensionIds[passwordManagers.DASHLANE] = 'fdjamakpfbbddfjaooikfcpapjohcfmg'
 extensionIds[passwordManagers.LAST_PASS] = 'hdokiejnpimakedhajhdlcegeplioahd'
 extensionIds[passwordManagers.ENPASS] = 'kmcfomidfpdkfieipokbalgegidffkal'
+extensionIds[passwordManagers.BITWARDEN] = 'nngceckbapebfimnlniiiahkandclblb'
 extensionIds[passwordManagers.UNMANAGED] = null
 
 let displayNames = {}
@@ -27,6 +29,7 @@ displayNames[passwordManagers.ONE_PASSWORD] = '1Password'
 displayNames[passwordManagers.DASHLANE] = 'Dashlane'
 displayNames[passwordManagers.LAST_PASS] = 'LastPass'
 displayNames[passwordManagers.ENPASS] = 'Enpass'
+displayNames[passwordManagers.BITWARDEN] = 'bitwarden'
 displayNames[passwordManagers.UNMANAGED] = null
 
 module.exports = {
