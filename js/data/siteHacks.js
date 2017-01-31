@@ -41,6 +41,15 @@ module.exports.localStorageExceptions = [
 module.exports.siteHacks = {
   'sp1.nypost.com': emptyDataURI,
   'sp.nasdaq.com': emptyDataURI,
+  'www.lesechos.fr': {
+    enableForAdblock: true,
+    enableForTrackingProtection: true,
+    onBeforeRequest: function (details) {
+      if (urlParse(details.url).pathname === '/xtcore.js') {
+        return { cancel: true }
+      }
+    }
+  },
   'forbes.com': {
     onBeforeSendHeaders: function(details) {
       return {

@@ -225,7 +225,6 @@ function registerForBeforeSendHeaders (session, partition) {
     }
 
     let requestHeaders = details.requestHeaders
-    let parsedUrl = urlParse(details.url || '')
 
     const firstPartyUrl = module.exports.getMainFrameUrl(details)
     // this can happen if the tab is closed and the webContents is no longer available
@@ -254,15 +253,17 @@ function registerForBeforeSendHeaders (session, partition) {
     }
 
     if (module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, firstPartyUrl, isPrivate)) {
-      if (module.exports.isThirdPartyHost(urlParse(firstPartyUrl || '').hostname,
-                                          parsedUrl.hostname)) {
+      const parsedTargetUrl = urlParse(details.url || '')
+      const parsedFirstPartyUrl = urlParse(firstPartyUrl)
+
+      if (module.exports.isThirdPartyHost(parsedFirstPartyUrl.hostname, parsedTargetUrl.hostname)) {
         // Clear cookie and referer on third-party requests
         if (requestHeaders['Cookie'] &&
             getOrigin(firstPartyUrl) !== pdfjsOrigin) {
           requestHeaders['Cookie'] = undefined
         }
         if (requestHeaders['Referer'] &&
-            !refererExceptions.includes(parsedUrl.hostname)) {
+            !refererExceptions.includes(parsedTargetUrl.hostname)) {
           requestHeaders['Referer'] = getOrigin(details.url)
         }
       }

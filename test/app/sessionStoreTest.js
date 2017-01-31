@@ -1,8 +1,10 @@
 /* global describe, it, before, after */
 
 const Brave = require('../lib/brave')
-const {navigator, urlInput, navigatorBookmarked, navigatorNotBookmarked} = require('../lib/selectors')
+const Immutable = require('immutable')
+const {urlInput, navigatorBookmarked, navigatorNotBookmarked} = require('../lib/selectors')
 const siteTags = require('../../js/constants/siteTags')
+const siteUtil = require('../../js/state/siteUtil')
 
 describe('sessionStore', function () {
   function * setup (client) {
@@ -13,6 +15,11 @@ describe('sessionStore', function () {
     Brave.beforeAllServerSetup(this)
     before(function * () {
       const page1Url = Brave.server.url('page1.html')
+      const site = {
+        location: page1Url,
+        title: 'some page'
+      }
+      const key = siteUtil.getSiteKey(Immutable.fromJS(site))
       yield Brave.startApp()
       yield setup(Brave.app.client)
       yield Brave.app.client
@@ -20,16 +27,13 @@ describe('sessionStore', function () {
         .waitForUrl(Brave.newTabUrl)
         .loadUrl(page1Url)
         .windowParentByUrl(page1Url)
-        .moveToObject(navigator)
+        .activateURLMode()
         .waitForExist(navigatorNotBookmarked)
-      yield Brave.app.client.addSite({
-        location: page1Url,
-        title: 'some page'
-      }, siteTags.BOOKMARK)
+      yield Brave.app.client.addSite(site, siteTags.BOOKMARK)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
             let state = val.value
-            return state.sites.length === 1 && state.sites[0].location === page1Url
+            return Immutable.fromJS(state.sites).size === 1 && state.sites[key].location === page1Url
           })
         })
       yield Brave.stopApp(false)

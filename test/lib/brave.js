@@ -1,7 +1,7 @@
 /* globals devTools */
 var Application = require('spectron').Application
 var chai = require('chai')
-const {activeWebview, navigator, titleBar} = require('./selectors')
+const {activeWebview, navigator, titleBar, urlInput} = require('./selectors')
 require('./coMocha')
 
 const path = require('path')
@@ -256,9 +256,16 @@ var exports = {
 
     this.app.client.addCommand('activateTitleMode', function () {
       return this
-        .moveToObject(activeWebview, 2, 2)
-        .moveToObject(activeWebview, 3, 3)
+        .setMouseInTitlebar(false)
+        .moveToObject(activeWebview)
         .waitForVisible(titleBar)
+    })
+
+    this.app.client.addCommand('activateURLMode', function () {
+      return this
+        .setMouseInTitlebar(true)
+        .moveToObject(navigator)
+        .waitForVisible(urlInput)
     })
 
     this.app.client.addCommand('waitForUrl', function (url) {
@@ -297,6 +304,19 @@ var exports = {
       })
     })
 
+    this.app.client.addCommand('waitForAddressCount', function (addressCount) {
+      logVerbose('waitForAddressCount(' + addressCount + ')')
+      return this.waitUntil(function () {
+        return this.getAppState().then((val) => {
+          console.log(val.value && val.value.autofill)
+          const ret = val.value && val.value && val.value.autofill &&
+            val.value.autofill.addresses && val.value.autofill.addresses.guid.length || 0
+          logVerbose('waitForAddressCount(' + addressCount + ') => ' + ret)
+          return ret
+        })
+      })
+    })
+
     this.app.client.addCommand('waitForElementCount', function (selector, count) {
       logVerbose('waitForElementCount("' + selector + '", ' + count + ')')
       return this.waitUntil(function () {
@@ -331,10 +351,24 @@ var exports = {
       logVerbose('waitForSiteEntry("' + location + '", "' + waitForTitle + '")')
       return this.waitUntil(function () {
         return this.getAppState().then((val) => {
-          const ret = val.value && val.value.sites && val.value.sites.find(
+          const ret = val.value && val.value.sites && Array.from(Object.values(val.value.sites)).find(
             (site) => site.location === location &&
               (!waitForTitle || waitForTitle && site.title))
           logVerbose('waitForSiteEntry("' + location + ', ' + waitForTitle + '") => ' + ret)
+          return ret
+        })
+      })
+    })
+
+    this.app.client.addCommand('waitForAddressEntry', function (location, waitForTitle = true) {
+      logVerbose('waitForAddressEntry("' + location + '", "' + waitForTitle + '")')
+      return this.waitUntil(function () {
+        return this.getAppState().then((val) => {
+          const ret = val.value && val.value.sites && Array.from(Object.values(val.value.sites)).find(
+            (site) => site.location === location &&
+              (!waitForTitle || waitForTitle && site.title))
+          logVerbose('sites:' + JSON.stringify(val.value.sites))
+          logVerbose('waitForSiteEntry("' + location + '", ' + waitForTitle + ') => ' + ret)
           return ret
         })
       })
@@ -407,7 +441,7 @@ var exports = {
 
     this.app.client.addCommand('setInputText', function (selector, input) {
       return this
-        .moveToObject(navigator)
+        .activateURLMode()
         .setValue(selector, input)
         .waitForInputText(selector, input)
     })
@@ -418,6 +452,12 @@ var exports = {
           key
         }), show !== false)
       }, show, key)
+    })
+
+    this.app.client.addCommand('setMouseInTitlebar', function (mouseInTitleBar) {
+      return this.execute(function (mouseInTitleBar) {
+        devTools('electron').testData.windowActions.setMouseInTitlebar(mouseInTitleBar)
+      }, mouseInTitleBar)
     })
 
     this.app.client.addCommand('openBraveMenu', function (braveMenu, braveryPanel) {

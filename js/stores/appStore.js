@@ -491,10 +491,15 @@ const handleAppAction = (action) => {
           appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), s, action.tag, undefined, addSiteSyncCallback))
         })
       } else {
-        appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), action.siteDetail, action.tag, action.originalSiteDetail, addSiteSyncCallback))
+        let sites = appState.get('sites')
+        if (!action.siteDetail.get('folderId') && siteUtil.isFolder(action.siteDetail)) {
+          action.siteDetail = action.siteDetail.set('folderId', siteUtil.getNextFolderId(sites))
+        }
+        appState = appState.set('sites', siteUtil.addSite(sites, action.siteDetail, action.tag, action.originalSiteDetail, addSiteSyncCallback))
       }
       if (action.destinationDetail) {
-        appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.siteDetail, action.destinationDetail, false, false, true))
+        appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'),
+          action.siteDetail, action.destinationDetail, false, false, true))
       }
       // If there was an item added then clear out the old history entries
       if (oldSiteSize !== appState.get('sites').size) {
@@ -505,13 +510,17 @@ const handleAppAction = (action) => {
       break
     case appConstants.APP_REMOVE_SITE:
       const removeSiteSyncCallback = action.skipSync ? undefined : syncActions.removeSite
-      appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag, removeSiteSyncCallback))
+      appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag, true, removeSiteSyncCallback))
       appState = aboutNewTabState.setSites(appState, action)
       appState = aboutHistoryState.setHistory(appState, action)
       break
     case appConstants.APP_MOVE_SITE:
-      appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent, false, syncActions.updateSite))
-      break
+      {
+        appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'),
+          action.sourceDetail, action.destinationDetail, action.prepend,
+          action.destinationIsParent, false, syncActions.updateSite))
+        break
+      }
     case appConstants.APP_CLEAR_HISTORY:
       appState = appState.set('sites',
         siteUtil.clearHistory(appState.get('sites'), syncActions.updateSite))
@@ -708,14 +717,12 @@ const handleAppAction = (action) => {
     case appConstants.APP_RECOVER_WALLET:
       appState = ledger.recoverKeys(appState, action)
       break
-    case appConstants.APP_LEDGER_RECOVERY_SUCCEEDED:
-      appState = appState.setIn(['ui', 'about', 'preferences', 'recoverySucceeded'], true)
-      break
-    case appConstants.APP_LEDGER_RECOVERY_FAILED:
-      appState = appState.setIn(['ui', 'about', 'preferences', 'recoverySucceeded'], false)
-      break
-    case appConstants.APP_CLEAR_RECOVERY:
-      appState = appState.setIn(['ui', 'about', 'preferences', 'recoverySucceeded'], undefined)
+    case appConstants.APP_LEDGER_RECOVERY_STATUS_CHANGED:
+      {
+        const date = new Date().getTime()
+        appState = appState.setIn(['about', 'preferences', 'recoverySucceeded'], action.recoverySucceeded)
+        appState = appState.setIn(['about', 'preferences', 'updatedStamp'], date)
+      }
       break
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
       // TODO: Maybe make storing this state optional?

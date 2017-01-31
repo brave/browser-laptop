@@ -16,7 +16,7 @@ const messages = require('../constants/messages')
 const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
 const UrlUtil = require('../lib/urlutil')
-const {currentWindow, isFocused} = require('../../app/renderer/currentWindow')
+const {currentWindowId, isFocused} = require('../../app/renderer/currentWindow')
 const {tabFromFrame} = require('../state/frameStateUtil')
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
 const {aboutUrls, newFrameUrl} = require('../lib/appUrlUtil')
@@ -349,9 +349,9 @@ const doAction = (action) => {
       ))
       // If we reach the limit of opened tabs per page while closing tabs, switch to
       // the active tab's page otherwise the user will hang on empty page
-      let totalOpenTabs = windowState.get('frames').filter((frame) => !frame.get('pinnedLocation')).size
-      if ((totalOpenTabs % getSetting(settings.TABS_PER_PAGE)) === 0) {
+      if (frameStateUtil.getNonPinnedFrameCount(windowState) % getSetting(settings.TABS_PER_PAGE) === 0) {
         updateTabPageIndex(frameStateUtil.getActiveFrame(windowState))
+        windowState = windowState.deleteIn(['ui', 'tabs', 'fixTabWidth'])
       }
       break
     case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
@@ -747,13 +747,15 @@ const doAction = (action) => {
     case appConstants.APP_NEW_TAB:
       newFrame(action.frameProps, action.frameProps.get('disposition') === 'foreground-tab')
       break
-    case windowConstants.WINDOW_TAB_CLOSE:
-      windowState = windowState.setIn(['ui', 'tabs', 'fixTabWidth'], action.data.fixTabWidth)
-      windowStore.emitChanges()
+    case windowConstants.WINDOW_TAB_CLOSED_WITH_MOUSE:
+      if (frameStateUtil.getNonPinnedFrameCount(windowState) % getSetting(settings.TABS_PER_PAGE) === 0) {
+        windowState = windowState.deleteIn(['ui', 'tabs', 'fixTabWidth'])
+      } else {
+        windowState = windowState.setIn(['ui', 'tabs', 'fixTabWidth'], action.data.fixTabWidth)
+      }
       break
     case windowConstants.WINDOW_TAB_MOUSE_LEAVE:
-      windowState = windowState.setIn(['ui', 'tabs', 'fixTabWidth'], action.data.fixTabWidth)
-      windowStore.emitChanges()
+      windowState = windowState.deleteIn(['ui', 'tabs', 'fixTabWidth'])
       break
     default:
       break
@@ -815,10 +817,10 @@ ipc.on(messages.DISPATCH_ACTION, (e, serializedPayload) => {
   let queryInfo = action.queryInfo || action.frameProps || {}
   queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
   if (queryInfo.windowId === -2 && isFocused()) {
-    queryInfo.windowId = currentWindow.id
+    queryInfo.windowId = currentWindowId
   }
   // handle any ipc dispatches that are targeted to this window
-  if (queryInfo.windowId && queryInfo.windowId === currentWindow.id) {
+  if (queryInfo.windowId && queryInfo.windowId === currentWindowId) {
     doAction(action)
   }
 })

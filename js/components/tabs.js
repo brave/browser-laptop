@@ -28,7 +28,7 @@ class Tabs extends ImmutableComponent {
     this.onNewTabLongPress = this.onNewTabLongPress.bind(this)
     this.wasNewTabClicked = this.wasNewTabClicked.bind(this)
     this.onMouseLeave = this.onMouseLeave.bind(this)
-    this.onFrameClose = this.onFrameClose.bind(this)
+    this.onTabClosedWithMouse = this.onTabClosedWithMouse.bind(this)
   }
 
   onMouseLeave () {
@@ -37,8 +37,8 @@ class Tabs extends ImmutableComponent {
     })
   }
 
-  onFrameClose (rect) {
-    windowActions.onTabClose({
+  onTabClosedWithMouse (rect) {
+    windowActions.onTabClosedWithMouse({
       fixTabWidth: rect.width
     })
   }
@@ -140,7 +140,7 @@ class Tabs extends ImmutableComponent {
                 paintTabs={this.props.paintTabs}
                 previewTabs={this.props.previewTabs}
                 isActive={this.props.activeFrameKey === tab.get('frameKey')}
-                onFrameClose={this.onFrameClose}
+                onTabClosedWithMouse={this.onTabClosedWithMouse}
                 tabWidth={this.props.fixTabWidth}
                 partOfFullPageSet={this.props.partOfFullPageSet} />)
         }

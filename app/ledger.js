@@ -364,7 +364,12 @@ var recoverKeys = (appState, action) => {
 
   const UUID_REGEX = /^[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12}$/
   if (typeof firstRecoveryKey !== 'string' || !firstRecoveryKey.match(UUID_REGEX) || typeof secondRecoveryKey !== 'string' || !secondRecoveryKey.match(UUID_REGEX)) {
-    setImmediate(() => appActions.ledgerRecoveryFailed())
+    setImmediate(() => {
+      // calling logError sets the error object
+      logError(true, 'recoverKeys')
+      appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
+      appActions.ledgerRecoveryFailed()
+    })
     return appState
   }
 
@@ -379,6 +384,9 @@ var recoverKeys = (appState, action) => {
       appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
       setImmediate(() => appActions.ledgerRecoveryFailed())
     } else {
+      appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
+      if (balanceTimeoutId) clearTimeout(balanceTimeoutId)
+      getBalance()
       setImmediate(() => appActions.ledgerRecoverySucceeded())
     }
   })
@@ -708,6 +716,7 @@ var initialize = (paymentsEnabled) => {
         }, 3 * msecs.second)
 
         // Make sure bravery props are up-to-date with user settings
+        if (!ledgerInfo.address) ledgerInfo.address = client.getWalletAddress()
         setPaymentInfo(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
         getBalance()
       })

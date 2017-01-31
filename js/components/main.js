@@ -1211,6 +1211,7 @@ class Main extends ImmutableComponent {
             sortedFrames.map((frame) =>
               <Frame
                 ref={(node) => { this.frames[frame.get('key')] = node }}
+                tabData={this.props.appState.get('tabs').find((tab) => tab.get('tabId') === frame.get('tabId'))}
                 urlBarFocused={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'focused'])}
                 tabIndex={frameStateUtil.getFrameIndex(this.props.windowState, frame.get('key'))}
                 prefOpenInForeground={getSetting(settings.SWITCH_TO_NEW_TABS)}
@@ -1232,7 +1233,7 @@ class Main extends ImmutableComponent {
                   ? this.props.appState.get('extensions') || emptyMap
                   : null}
                 preferencesData={frame.get('location') === 'about:preferences#payments'
-                  ? this.props.appState.getIn(['ui', 'about', 'preferences']) || emptyMap
+                  ? this.props.appState.getIn(['about', 'preferences']) || emptyMap
                   : null}
                 downloads={this.props.appState.get('downloads') || emptyMap}
                 bookmarkFolders={frame.get('location') === 'about:bookmarks'

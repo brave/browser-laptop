@@ -32,7 +32,7 @@ class ContextMenuItem extends ImmutableComponent {
     e.stopPropagation()
     if (clickAction) {
       if (shouldHide) {
-        windowActions.resetMenuState()
+        setImmediate(() => windowActions.resetMenuState())
       }
       clickAction(e)
     }
@@ -140,14 +140,22 @@ class ContextMenuItem extends ImmutableComponent {
         }
       </div>
     }
-    return <div className={cx({
-      contextMenuItem: true,
-      hasFaIcon: faIcon,
-      checkedMenuItem: this.props.contextMenuItem.get('checked'),
-      hasIcon: icon || faIcon,
-      selectedByKeyboard: this.props.selected
-    })}
-      role='listitem'
+    const props = {
+      className: cx({
+        contextMenuItem: true,
+        hasFaIcon: faIcon,
+        checkedMenuItem: this.props.contextMenuItem.get('checked'),
+        hasIcon: icon || faIcon,
+        selectedByKeyboard: this.props.selected
+      }),
+      role: 'listitem'
+    }
+
+    if (typeof this.props.dataIndex === 'number') {
+      props['data-index'] = this.props.dataIndex
+    }
+
+    return <div {...props}
       draggable={this.props.contextMenuItem.get('draggable')}
       onDragStart={this.onDragStart.bind(this)}
       onDragEnd={this.onDragEnd.bind(this)}
@@ -223,7 +231,8 @@ class ContextMenuSingle extends ImmutableComponent {
           }
           // don't count separators when finding selectedIndex
           if (contextMenuItem.get('type') !== separatorMenuItem.type) {
-            props.selected = index === this.props.selectedIndex
+            props.dataIndex = index
+            props.selected = (index === this.props.selectedIndex)
             index++
           }
           return <ContextMenuItem {...props} />
@@ -253,18 +262,27 @@ class ContextMenu extends ImmutableComponent {
   }
 
   onKeyDown (e) {
-    const selectedIndex = (this.props.selectedIndex === null) ? [0] : this.props.selectedIndex
-    const currentIndex = selectedIndex[selectedIndex.length - 1]
-    const selectedTemplate = this.getMenuByIndex(selectedIndex, this.props.contextMenuDetail.get('template'))
-    const selectedMenuItem = selectedTemplate.get(currentIndex)
+    let selectedIndex = null
+    let currentIndex = null
+    let selectedTemplate = null
+    let selectedMenuItem = null
+
+    if (this.props.selectedIndex !== null) {
+      selectedIndex = this.props.selectedIndex
+      currentIndex = selectedIndex[selectedIndex.length - 1]
+      selectedTemplate = this.getMenuByIndex(selectedIndex, this.props.contextMenuDetail.get('template'))
+      selectedMenuItem = selectedTemplate.get(currentIndex)
+    }
 
     switch (e.keyCode) {
       case keyCodes.ENTER:
         e.preventDefault()
         e.stopPropagation()
-        const action = selectedTemplate.getIn([currentIndex, 'click'])
-        if (action) {
-          action(e)
+        if (currentIndex !== null) {
+          const action = selectedTemplate.getIn([currentIndex, 'click'])
+          if (action) {
+            action(e)
+          }
         }
         windowActions.resetMenuState()
         break
@@ -321,13 +339,20 @@ class ContextMenu extends ImmutableComponent {
       case keyCodes.UP:
       case keyCodes.DOWN:
         if (this.props.contextMenuDetail) {
-          const nextIndex = wrappingClamp(
-            currentIndex + (e.which === keyCodes.UP ? -1 : 1),
-            0,
-            this.maxIndex(selectedTemplate))
+          let newIndices
 
-          const newIndices = selectedIndex.slice()
-          newIndices[selectedIndex.length - 1] = nextIndex
+          if (selectedIndex === null) {
+            newIndices = [0]
+          } else {
+            const nextIndex = wrappingClamp(
+              currentIndex + (e.which === keyCodes.UP ? -1 : 1),
+              0,
+              this.maxIndex(selectedTemplate))
+
+            newIndices = selectedIndex.slice()
+            newIndices[selectedIndex.length - 1] = nextIndex
+          }
+
           windowActions.setContextMenuSelectedIndex(newIndices)
         }
         break
@@ -339,7 +364,7 @@ class ContextMenu extends ImmutableComponent {
   }
 
   onClick () {
-    windowActions.resetMenuState()
+    setImmediate(() => windowActions.resetMenuState())
   }
 
   getTemplateItemsOnly (template) {
@@ -427,7 +452,7 @@ class ContextMenu extends ImmutableComponent {
         submenuIndex={0}
         lastZoomPercentage={this.props.lastZoomPercentage}
         template={this.props.contextMenuDetail.get('template')}
-        selectedIndex={selectedIndex[0]} />
+        selectedIndex={this.props.selectedIndex ? this.props.selectedIndex[0] : null} />
       {
         this.openedSubmenuDetails.map((openedSubmenuDetail, i) =>
           <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}

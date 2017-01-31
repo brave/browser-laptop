@@ -17,7 +17,7 @@ const sortTimeDescending = (left, right) => {
 }
 
 module.exports.getHistory = (sites) => {
-  sites = makeImmutable(sites) || new Immutable.List()
+  sites = makeImmutable(sites) ? makeImmutable(sites).toList() : new Immutable.List()
   return sites.filter((site) => siteUtil.isHistoryEntry(site))
       .sort(sortTimeDescending)
       .slice(0, aboutHistoryMaxEntries)

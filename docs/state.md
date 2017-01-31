@@ -68,20 +68,22 @@ AppStore
       }
     }
   },
-  sites: [{
-    objectId: Array.<number>,
-    location: string,
-    title: string,
-    customTitle: string, // User provided title for bookmark; overrides title
-    tags: [string], // empty, 'bookmark', 'bookmark-folder', 'pinned', or 'reader'
-    favicon: string, // URL of the favicon
-    themeColor: string, // css compatible color string
-    lastAccessedTime: number, // datetime.getTime()
-    creationTime: number, //creation time of bookmark
-    partitionNumber: number, // Optionally specifies a specific session
-    folderId: number, // Set for bookmark folders only
-    parentFolderId: number // Set for bookmarks and bookmark folders only
-  }],
+  sites: {
+    [siteKey]: { // folder: folderId; bookmark/history: location + partitionNumber + parentFolderId
+      objectId: Array.<number>,
+      location: string,
+      title: string,
+      customTitle: string, // User provided title for bookmark; overrides title
+      tags: [string], // empty, 'bookmark', 'bookmark-folder', 'pinned', or 'reader'
+      favicon: string, // URL of the favicon
+      themeColor: string, // css compatible color string
+      lastAccessedTime: number, // datetime.getTime()
+      creationTime: number, //creation time of bookmark
+      partitionNumber: number, // Optionally specifies a specific session
+      folderId: number, // Set for bookmark folders only
+      parentFolderId: number // Set for bookmarks and bookmark folders only
+    },
+  },
   downloads: [{
     [downloadId]: {
       startTime: number, // datetime.getTime()
@@ -274,6 +276,10 @@ AppStore
       ignoredTopSites: [string], // List of ignored sites
       pinnedTopSites: [string], // List of pinned sites to be used on gridLayout. Defaults to 1 Brave-related site; see data/newTabData.js => pinnedTopSites
       updatedStamp: number // timestamp for when the data was last updated
+    },
+    preferences: {
+      recoverySucceeded: boolean, // true, false, or undefined
+      updatedStamp: number
     }
   },
   menu: {

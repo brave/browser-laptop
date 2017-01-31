@@ -74,5 +74,5 @@ ipc.on(messages.INITIALIZE_WINDOW, (e, disposition, appState, frames, initWindow
   appStoreRenderer.state = Immutable.fromJS(appState)
   ReactDOM.render(
     <Window includePinnedSites={disposition !== 'new-popup'} frames={frames} initWindowState={initWindowState} />,
-    document.getElementById('windowContainer'))
+    document.getElementById('appContainer'))
 })

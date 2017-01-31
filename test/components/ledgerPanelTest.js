@@ -14,7 +14,7 @@ function * setup (client) {
     .waitForVisible(urlInput)
 }
 
-describe('Payments Panel', function () {
+describe('Regular payment panel tests', function () {
   describe('can setup payments', function () {
     Brave.beforeEach(this)
     beforeEach(function * () {

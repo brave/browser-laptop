@@ -103,9 +103,9 @@ class Tab extends ImmutableComponent {
     windowActions.setActiveFrame(this.frame)
   }
 
-  onCloseFrame (event) {
+  onTabClosedWithMouse (event) {
     event.stopPropagation()
-    this.props.onFrameClose(this.tabNode.parentNode.getBoundingClientRect())
+    this.props.onTabClosedWithMouse(this.tabNode.parentNode.getBoundingClientRect())
     windowActions.closeFrame(windowStore.getFrames(), this.frame)
   }
 
@@ -142,7 +142,7 @@ class Tab extends ImmutableComponent {
   onClickTab (e) {
     // Middle click should close tab
     if (e.button === 1) {
-      this.onCloseFrame(e)
+      this.onTabClosedWithMouse(e)
     } else {
       this.setActiveFrame(e)
     }
@@ -256,7 +256,7 @@ class Tab extends ImmutableComponent {
         }
         {
           !this.isPinned
-          ? <span onClick={this.onCloseFrame.bind(this)}
+          ? <span onClick={this.onTabClosedWithMouse.bind(this)}
             data-l10n-id='closeTabButton'
             className='closeTab fa fa-times-circle' />
           : null
