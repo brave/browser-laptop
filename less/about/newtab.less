@@ -20,13 +20,14 @@ body {
   background: #fff;
 }
 
-body, .dynamicBackground, .gradient {
+body, .dynamicBackground {
   opacity: 0;
   animation: fadeIn 200ms;
   animation-fill-mode: forwards;
 }
 
 .copyrightNotice {
+  visibility: hidden !important;
   -webkit-user-select: none;
   cursor: default;
 }
@@ -60,12 +61,12 @@ ul {
 }
 
 .gradient {
+  background: linear-gradient(rgba(93, 0, 95, 0.99), #ff5000);
+  height: 100%;
+  left: 0;
   position: absolute;
   top: 0;
-  left: 0;
   width: 100%;
-  background: linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
-  height: 400px;
 }
 
 .content {
