@@ -3,6 +3,7 @@
 ## [0.13.1](https://github.com/brave/browser-laptop/releases/v0.13.1dev)
 - Fixed Widevine not working on Windows (Netflix). ([#6948](https://github.com/brave/browser-laptop/issues/6948))
 - Fixed DPI settings on Windows causing blurriness and causing missing pixels.  ([#6462](https://github.com/brave/browser-laptop/issues/6462))
+- Fixed high memory usage by temporarily disabling newtab background images.  ([#6945](https://github.com/brave/browser-laptop/issues/6945))
 - Upgrade to Muon 2.0.18. ([#6949](https://github.com/brave/browser-laptop/issues/6949))
 
 ## [0.13.0](https://github.com/brave/browser-laptop/releases/v0.13.0dev)
