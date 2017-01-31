@@ -34,7 +34,7 @@ const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const coinbaseCountries = require('../constants/coinbaseCountries')
 const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
-const {startsWithOption, newTabMode, bookmarksToolbarMode, tabCloseAction} = require('../../app/common/constants/settingsEnums')
+const {startsWithOption, newTabMode, bookmarksToolbarMode, tabCloseAction, newTabPosition} = require('../../app/common/constants/settingsEnums')
 
 const WidevineInfo = require('../../app/renderer/components/widevineInfo')
 const aboutActions = require('./aboutActions')
@@ -836,6 +836,14 @@ class TabsTab extends ImmutableComponent {
                 <option value={x} key={x}>{x}</option>)
             }
           </SettingDropdown>
+        </SettingItem>
+        <SettingItem dataL10nId='newTabPosition'>
+          <FormDropdown
+            value={getSetting(settings.NEW_TAB_POSITION, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.NEW_TAB_POSITION)}>
+            <option data-l10n-id='newTabPositionNext' value={newTabPosition.NEXT} />
+            <option data-l10n-id='newTabPositionLast' value={newTabPosition.LAST} />
+          </FormDropdown>
         </SettingItem>
         <SettingItem dataL10nId='tabCloseAction'>
           <FormDropdown

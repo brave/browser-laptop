@@ -117,6 +117,7 @@ module.exports = {
     'tabs.paint-tabs': true,
     'tabs.tabs-per-page': 10,
     'tabs.close-action': 'parent',
+    'tabs.new-tab-position': 'next',
     'tabs.show-tab-previews': true,
     'privacy.history-suggestions': true,
     'privacy.bookmark-suggestions': true,

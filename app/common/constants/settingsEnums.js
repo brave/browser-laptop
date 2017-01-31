@@ -28,9 +28,15 @@ const tabCloseAction = {
   PARENT: 'parent'
 }
 
+const newTabPosition = {
+  LAST: 'last',
+  NEXT: 'next'
+}
+
 module.exports = {
   startsWithOption,
   newTabMode,
   bookmarksToolbarMode,
-  tabCloseAction
+  tabCloseAction,
+  newTabPosition
 }
