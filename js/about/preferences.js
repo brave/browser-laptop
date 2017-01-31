@@ -12,7 +12,7 @@ const SwitchControl = require('../components/switchControl')
 const ModalOverlay = require('../components/modalOverlay')
 const {SettingsList, SettingItem} = require('../../app/renderer/components/settings')
 const {SettingTextbox} = require('../../app/renderer/components/textbox')
-const {FormDropdown, SettingDropdown} = require('../../app/renderer/components/dropdown')
+const {SettingDropdown} = require('../../app/renderer/components/dropdown')
 const Button = require('../components/button')
 
 // Tabs
@@ -836,14 +836,13 @@ class TabsTab extends ImmutableComponent {
           </SettingDropdown>
         </SettingItem>
         <SettingItem dataL10nId='tabCloseAction'>
-          <FormDropdown
+          <SettingDropdown
             value={getSetting(settings.TAB_CLOSE_ACTION, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TAB_CLOSE_ACTION)}>
             <option data-l10n-id='tabCloseActionLastActive' value={tabCloseAction.LAST_ACTIVE} />
             <option data-l10n-id='tabCloseActionNext' value={tabCloseAction.NEXT} />
-            <option data-l10n-id='tabCloseActionFirst' value={tabCloseAction.FIRST} />
             <option data-l10n-id='tabCloseActionParent' value={tabCloseAction.PARENT} />
-          </FormDropdown>
+          </SettingDropdown>
         </SettingItem>
         <SettingCheckbox dataL10nId='switchToNewTabs' prefKey={settings.SWITCH_TO_NEW_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='paintTabs' prefKey={settings.PAINT_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />

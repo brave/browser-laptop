@@ -24,7 +24,6 @@ const bookmarksToolbarMode = {
 const tabCloseAction = {
   LAST_ACTIVE: 'lastActive',
   NEXT: 'next',
-  FIRST: 'first',
   PARENT: 'parent'
 }
 
