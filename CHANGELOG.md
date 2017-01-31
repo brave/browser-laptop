@@ -1,7 +1,9 @@
 # Changelog
 
 ## [0.13.1](https://github.com/brave/browser-laptop/releases/v0.13.1dev)
-- TODO
+- Fixed Widevine not working on Windows (Netflix). ([#6948](https://github.com/brave/browser-laptop/issues/6948))
+- Fixed DPI settings on Windows causing blurriness and causing missing pixels.  ([#6462](https://github.com/brave/browser-laptop/issues/6462))
+- Upgrade to Muon 2.0.18. ([#6949](https://github.com/brave/browser-laptop/issues/6949))
 
 ## [0.13.0](https://github.com/brave/browser-laptop/releases/v0.13.0dev)
 - Added WebTorrent support for magnet links. ([#5818](https://github.com/brave/browser-laptop/issues/5818))([#5815](https://github.com/brave/browser-laptop/issues/5815))
