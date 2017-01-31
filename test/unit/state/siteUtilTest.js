@@ -263,10 +263,10 @@ describe('siteUtil', function () {
           Immutable.fromJS(sites).forEach((site) => {
             processedSites = siteUtil.addSite(processedSites, site)
           })
-          const expectedSites = sites.map((site) => {
+          const expectedSites = Immutable.fromJS(sites).map((site) => {
             return site.set('objectId', undefined)
           })
-          assert.deepEqual(processedSites.toJS(), expectedSites)
+          assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
         })
       })
       describe('when adding history', function () {
@@ -396,11 +396,14 @@ describe('siteUtil', function () {
           title: 'new title',
           customTitle: 'new customTitle'
         })
-        const sites = Immutable.fromJS([oldSiteDetail])
+        const siteKey = siteUtil.getSiteKey(oldSiteDetail)
+        const sites = Immutable.fromJS({
+          [siteKey]: oldSiteDetail
+        })
         const processedSites = siteUtil.addSite(sites, newSiteDetail, siteTags.BOOKMARK, oldSiteDetail, () => {})
         mockery.deregisterMock('./stores/appStoreRenderer')
         mockery.disable()
-        assert.equal(processedSites.getIn([0, 'objectId']).size, 16)
+        assert.equal(processedSites.getIn([siteKey, 'objectId']).size, 16)
       })
     })
   })
