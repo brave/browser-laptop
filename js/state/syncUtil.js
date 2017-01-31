@@ -5,6 +5,7 @@
 
 const Immutable = require('immutable')
 const writeActions = require('../constants/sync/proto').actions
+const siteUtil = require('./siteUtil')
 
 const CATEGORY_MAP = {
   bookmark: {
@@ -310,30 +311,24 @@ module.exports.newObjectId = (objectPath) => {
  * @returns {Array.<number>}
  */
 module.exports.findOrCreateFolderObjectId = (folderId) => {
-  if (!folderId) { return undefined }
+  if (typeof folderId !== 'number') { return undefined }
   const AppStore = require('../stores/appStore')
-  const appState = AppStore.getState()
-  const folderEntry = appState.get('sites').findEntry((site, _index) => {
-    return site.get('folderId') === folderId
-  })
-  if (!folderEntry) { return undefined }
-  const folderIndex = folderEntry[0]
-  const folder = folderEntry[1]
+  const folder = AppStore.getState().getIn(['sites', folderId.toString()])
+  if (!folder) { return undefined }
   const objectId = folder.get('objectId')
   if (objectId) {
     return objectId.toJS()
   } else {
-    return module.exports.newObjectId(['sites', folderIndex])
+    return module.exports.newObjectId(['sites', folderId.toString()])
   }
 }
 
 /**
  * Converts a site object into input for sendSyncRecords
  * @param {Object} site
- * @param {number=} siteIndex
  * @returns {{name: string, value: object, objectId: Array.<number>}}
  */
-module.exports.createSiteData = (site, siteIndex) => {
+module.exports.createSiteData = (site) => {
   const siteData = {
     location: '',
     title: '',
@@ -346,11 +341,12 @@ module.exports.createSiteData = (site, siteIndex) => {
       siteData[field] = site[field]
     }
   }
+  const siteKey = siteUtil.getSiteKey(Immutable.fromJS(site)) || siteUtil.getSiteKey(Immutable.fromJS(siteData))
+  if (siteKey === null) {
+    throw new Error('Sync could not create siteKey')
+  }
   if (module.exports.isSyncable('bookmark', Immutable.fromJS(site))) {
-    if (!site.objectId && typeof siteIndex !== 'number') {
-      throw new Error('Missing bookmark objectId.')
-    }
-    const objectId = site.objectId || module.exports.newObjectId(['sites', siteIndex])
+    const objectId = site.objectId || module.exports.newObjectId(['sites', siteKey])
     const parentFolderObjectId = site.parentFolderObjectId || (site.parentFolderId && module.exports.findOrCreateFolderObjectId(site.parentFolderId))
     return {
       name: 'bookmark',
@@ -358,17 +354,13 @@ module.exports.createSiteData = (site, siteIndex) => {
       value: {
         site: siteData,
         isFolder: site.tags.includes('bookmark-folder'),
-        parentFolderObjectId,
-        index: siteIndex || 0
+        parentFolderObjectId
       }
     }
   } else if (!site.tags || !site.tags.length || site.tags.includes('pinned')) {
-    if (!site.objectId && typeof siteIndex !== 'number') {
-      throw new Error('Missing historySite objectId.')
-    }
     return {
       name: 'historySite',
-      objectId: site.objectId || module.exports.newObjectId(['sites', siteIndex]),
+      objectId: site.objectId || module.exports.newObjectId(['sites', siteKey]),
       value: siteData
     }
   }

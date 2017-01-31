@@ -167,19 +167,16 @@ module.exports.onSyncReady = (isFirstRun, e) => {
    * Sync a bookmark that has not been synced yet, first syncing the parent
    * folder if needed.
    * @param {Immutable.Map} site
-   * @param {number} SyncRecord.Bookmark.index Specifies index within this
-   *   record batch so other clients apply records in the correct order.
-   * @returns {number} Next index.
    */
   // Setting objectIds happens with AppActions IPC but we need it immediately.
   const folderObjectIds = {}
-  const syncBookmark = (site, siteIndex, syncIndex) => {
+  // TODO (@ayumi): siteIndex is now ignored since switching to siteKey
+  const syncBookmark = (site) => {
     if (!site || site.get('objectId') || !syncUtil.isSyncable('bookmark', site)) {
-      return syncIndex
+      return
     }
 
-    const record = syncUtil.createSiteData(site.toJS(), siteIndex)
-    record.value.index = syncIndex
+    const record = syncUtil.createSiteData(site.toJS())
     const folderId = site.get('folderId')
     if (typeof folderId === 'number') {
       folderObjectIds[folderId] = record.objectId
@@ -190,19 +187,16 @@ module.exports.onSyncReady = (isFirstRun, e) => {
       if (!folderObjectIds[parentFolderId]) {
         const folderResult = siteUtil.getFolder(sites, parentFolderId)
         if (folderResult) {
-          syncIndex = syncBookmark(folderResult[1], folderResult[0], syncIndex)
+          syncBookmark(folderResult[1])
         }
       }
       record.value.parentFolderObjectId = folderObjectIds[parentFolderId]
     }
-
     sendSyncRecords(e.sender, writeActions.CREATE, [record])
-    return syncIndex + 1
   }
 
   // Sync bookmarks that have not been synced yet.
-  let i = 0
-  sites.forEach((site, siteIndex) => { i = syncBookmark(site, siteIndex, i) })
+  sites.forEach(syncBookmark)
 
   // Sync site settings that have not been synced yet
   // FIXME: If Sync was disabled and settings were changed, those changes
@@ -236,6 +230,7 @@ module.exports.onSyncReady = (isFirstRun, e) => {
     if (!records || !records.length) {
       return
     }
+    // TODO (ayumi): record.bookmark.index was removed
     const getSortValue = (record) => {
       if (record.objectData === 'bookmark') {
         return record.bookmark.index || 0

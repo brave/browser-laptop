@@ -46,8 +46,7 @@ describe('syncUtil', () => {
         value: {
           site: expectedSite.value,
           isFolder: false,
-          parentFolderObjectId: undefined,
-          index: 0
+          parentFolderObjectId: undefined
         }
       }
       assert.deepEqual(syncUtil.createSiteData(bookmark), expectedBookmark)
