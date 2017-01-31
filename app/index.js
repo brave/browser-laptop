@@ -82,8 +82,6 @@ const privacy = require('../js/state/privacy')
 const async = require('async')
 const settings = require('../js/constants/settings')
 
-// temporary fix for #4517, #4518 and #4472
-app.commandLine.appendSwitch('enable-use-zoom-for-dsf', 'false')
 app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferHtmlOverPlugins')
 
 // Used to collect the per window state when shutting down the application
