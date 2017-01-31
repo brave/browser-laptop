@@ -21,6 +21,7 @@ const {tabFromFrame} = require('../state/frameStateUtil')
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
 const {aboutUrls, newFrameUrl} = require('../lib/appUrlUtil')
 const Serializer = require('../dispatcher/serializer')
+const {newTabPosition} = require('../../app/common/constants/settingsEnums')
 const assert = require('assert')
 
 let windowState = Immutable.fromJS({
@@ -175,22 +176,21 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
   let parentFrameKey = frameOpts.parentFrameKey
   if (frameOpts.openerTabId) {
     parentFrameKey = frameStateUtil.getFrameKeyByTabId(windowState, frameOpts.openerTabId)
+
+    if (parentFrameKey === undefined) {
+      parentFrameKey = frameOpts.openerTabId
+    }
   }
 
-  // Find the closest index to the current frame's index which has
-  // a different ancestor frame key.
+  // Based on a setting NEW_TAB_POSITION define position
   const frames = windowState.get('frames')
+  const tabPostion = getSetting(settings.NEW_TAB_POSITION)
   if (insertionIndex === undefined) {
     insertionIndex = frameStateUtil.findIndexForFrameKey(frames, parentFrameKey)
-    if (insertionIndex === -1) {
+    if (insertionIndex === -1 || tabPostion === newTabPosition.LAST) {
       insertionIndex = frames.size
     } else {
-      while (insertionIndex < frames.size) {
-        ++insertionIndex
-        if (!frameStateUtil.isAncestorFrameKey(frames, frames.get(insertionIndex), parentFrameKey)) {
-          break
-        }
-      }
+      insertionIndex++
     }
   }
   if (frameStateUtil.isFrameKeyPinned(frames, parentFrameKey)) {
