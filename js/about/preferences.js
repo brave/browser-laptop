@@ -683,7 +683,14 @@ class GeneralTab extends ImmutableComponent {
             <option data-l10n-id='newTabEmpty' value={newTabMode.EMPTY_NEW_TAB} />
           </SettingDropdown>
         </SettingItem>
-        <SettingItem dataL10nId='myHomepage'>
+        <div className='iconTitle'>
+          <span data-l10n-id='myHomepage' />
+          <span className='fa fa-info-circle iconLink' onClick={aboutActions.newFrame.bind(null, {
+            location: 'https://github.com/brave/browser-laptop/wiki/End-User-FAQ#how-to-set-up-multiple-home-pages'
+          }, true)}
+            data-l10n-id='multipleHomePages' />
+        </div>
+        <SettingItem>
           <SettingTextbox
             spellCheck='false'
             data-l10n-id='homepageInput'
