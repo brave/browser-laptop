@@ -1016,7 +1016,6 @@ table.sortableTable {
 
         label {
           font-weight: bold;
-          color: @braveOrange;
         }
       }
 
@@ -1460,6 +1459,19 @@ table.sortableTable {
       .switchIndicator {
         height: 22px;
         width: 22px;
+      }
+    }
+  }
+
+  &.small {
+    .switchBackground {
+      height: @smallSwitchHeight;
+      width: @smallSwitchWidth;
+      .switchIndicator {
+        height: @smallSwitchNubDiameter;
+        width: @smallSwitchNubDiameter;
+        top: 1px;
+        right: calc(@smallSwitchWidth - @smallSwitchNubDiameter - @switchNubRightMargin);
       }
     }
   }
