@@ -47,7 +47,7 @@ sudo dpkg -i ./brave.deb
 To install brave using dnf:
 
 ```
-dnf config-manager --add-repo dnf config-manager --add-repo repository_url
+dnf config-manager --add-repo dnf config-manager --add-repo https://s3-us-west-2.amazonaws.com/brave-rpm-release/x86_64/
 dnf check-update
 dnf install brave
 ```
