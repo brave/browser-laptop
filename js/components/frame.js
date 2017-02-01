@@ -486,13 +486,6 @@ class Frame extends ImmutableComponent {
       case 'zoom-reset':
         this.zoomReset()
         break
-      case 'toggle-dev-tools':
-        if (this.webview.isDevToolsOpened()) {
-          this.webview.closeDevTools()
-        } else {
-          this.webview.openDevTools()
-        }
-        break
       case 'view-source':
         const sourceLocation = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
         if (sourceLocation !== null) {

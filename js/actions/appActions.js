@@ -779,6 +779,17 @@ const appActions = {
   },
 
   /**
+   * Dispatches a message to toogle the dev tools on/off for the specified tabId
+   * @param {number} tabId - The tabId
+   */
+  toggleDevTools: function (tabId) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_TAB_TOGGLE_DEV_TOOLS,
+      tabId
+    })
+  },
+
+  /**
    * Dispatches a message when a tab is being cloned
    * @param {number} tabId - The tabId of the tab to clone
    * @param {object} options - object containing options such as acive, back, and forward booleans

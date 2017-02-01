@@ -190,6 +190,20 @@ const api = {
     return currentWebContents[tabId]
   },
 
+  toggleDevTools: (state, action) => {
+    action = makeImmutable(action)
+    const tabId = action.get('tabId')
+    const tab = api.getWebContents(tabId)
+    if (tab && !tab.isDestroyed()) {
+      if (tab.isDevToolsOpened()) {
+        tab.closeDevTools()
+      } else {
+        tab.openDevTools()
+      }
+    }
+    return state
+  },
+
   setAudioMuted: (state, action) => {
     action = makeImmutable(action)
     let frameProps = action.get('frameProps')

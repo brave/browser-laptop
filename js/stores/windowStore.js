@@ -4,6 +4,7 @@
 
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const EventEmitter = require('events').EventEmitter
+const appActions = require('../actions/appActions')
 const appConstants = require('../constants/appConstants')
 const windowConstants = require('../constants/windowConstants')
 const config = require('../constants/config')
@@ -792,11 +793,15 @@ const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', '
 frameShortcuts.forEach((shortcut) => {
   // Listen for actions on the active frame
   ipc.on(`shortcut-active-frame-${shortcut}`, (e, args) => {
-    windowState = windowState.mergeIn(activeFrameStatePath(windowState), {
-      activeShortcut: shortcut,
-      activeShortcutDetails: args
-    })
-    emitChanges()
+    if (shortcut === 'toggle-dev-tools') {
+      appActions.toggleDevTools(frameStateUtil.getActiveFrameTabId(windowState))
+    } else {
+      windowState = windowState.mergeIn(activeFrameStatePath(windowState), {
+        activeShortcut: shortcut,
+        activeShortcutDetails: args
+      })
+      emitChanges()
+    }
   })
   // Listen for actions on frame N
   if (['reload', 'mute'].includes(shortcut)) {
