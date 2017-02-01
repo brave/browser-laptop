@@ -165,38 +165,44 @@ module.exports.onSyncReady = (isFirstRun, e) => {
 
   /**
    * Sync a bookmark that has not been synced yet, first syncing the parent
-   * folder if needed.
+   * folder if needed. For folders, set and memoize folderId to ensure
+   * consistent parentFolderObjectIds.
+   * Otherwise siteUtil.createSiteData() will generate new objectIds every
+   * call; there's not enough time to dispatch id updates to appStore.sites.
    * @param {Immutable.Map} site
    */
-  // Setting objectIds happens with AppActions IPC but we need it immediately.
-  const folderObjectIds = {}
-  // TODO (@ayumi): siteIndex is now ignored since switching to siteKey
+  const folderToObjectId = {}
   const syncBookmark = (site) => {
-    if (!site || site.get('objectId') || !syncUtil.isSyncable('bookmark', site)) {
+    if (!site || site.get('objectId') || folderToObjectId[site.get('folderId')] || !syncUtil.isSyncable('bookmark', site)) {
       return
     }
 
-    const record = syncUtil.createSiteData(site.toJS())
-    const folderId = site.get('folderId')
-    if (typeof folderId === 'number') {
-      folderObjectIds[folderId] = record.objectId
-    }
+    const siteJS = site.toJS()
 
     const parentFolderId = site.get('parentFolderId')
     if (typeof parentFolderId === 'number') {
-      if (!folderObjectIds[parentFolderId]) {
+      if (!folderToObjectId[parentFolderId]) {
         const folderResult = siteUtil.getFolder(sites, parentFolderId)
         if (folderResult) {
           syncBookmark(folderResult[1])
         }
       }
-      record.value.parentFolderObjectId = folderObjectIds[parentFolderId]
+      siteJS.parentFolderObjectId = folderToObjectId[parentFolderId]
     }
+
+    const record = syncUtil.createSiteData(siteJS)
+    // order currently only used for initial sync
+    if (siteJS.order) { record.value.index = siteJS.order }
+    const folderId = site.get('folderId')
+    if (typeof folderId === 'number') {
+      folderToObjectId[folderId] = record.objectId
+    }
+
     sendSyncRecords(e.sender, writeActions.CREATE, [record])
   }
 
   // Sync bookmarks that have not been synced yet.
-  sites.forEach(syncBookmark)
+  siteUtil.getBookmarks(sites).forEach(syncBookmark)
 
   // Sync site settings that have not been synced yet
   // FIXME: If Sync was disabled and settings were changed, those changes
@@ -230,7 +236,6 @@ module.exports.onSyncReady = (isFirstRun, e) => {
     if (!records || !records.length) {
       return
     }
-    // TODO (ayumi): record.bookmark.index was removed
     const getSortValue = (record) => {
       if (record.objectData === 'bookmark') {
         return record.bookmark.index || 0
