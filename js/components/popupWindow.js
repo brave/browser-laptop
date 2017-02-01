@@ -47,16 +47,17 @@ class PopupWindow extends ImmutableComponent {
         windowActions.setPopupWindowDetail()
       })
       let updateSize = () => {
-        let preferredSize = webview.getPreferredSize()
-        let width = preferredSize.width
-        let height = preferredSize.height
-        if (width !== this.width || height !== this.height) {
-          this.width = width
-          this.height = height
-          webview.style.height = height + 'px'
-          webview.style.width = width + 'px'
-          this.forceUpdate()
-        }
+        webview.getPreferredSize((preferredSize) => {
+          let width = preferredSize.width
+          let height = preferredSize.height
+          if (width !== this.width || height !== this.height) {
+            this.width = width
+            this.height = height
+            webview.style.height = height + 'px'
+            webview.style.width = width + 'px'
+            this.forceUpdate()
+          }
+        })
       }
       webview.addEventListener('did-attach', () => {
         webview.enablePreferredSizeMode(true)
