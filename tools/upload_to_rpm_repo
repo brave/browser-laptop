@@ -9,7 +9,7 @@ TMP_REPO=/tmp/rpm_repo
 
 echo "%_signature gpg
 %_gpg_path $HOME/.gnupg
-%_gpg_name Brave Builder
+%_gpg_name Brave Software
 %_gpgbin /usr/bin/gpg" > ~/.rpmmacros
 
 rm -rf $TMP_REPO
@@ -18,14 +18,14 @@ env GPG_PASS=$PASSPHRASE ./tools/auto_rpm_sign
 cp dist/*.rpm $TMP_REPO/x86_64/
 
 for arch in $TMP_REPO/x86_64 ; do
-  createrepo -v --deltas $arch/ 
+	createrepo -v --deltas $arch/
 done
 for arch in $TMP_REPO/x86_64 ; do
-  createrepo -v --update --deltas $arch/ 
+	createrepo -v --update --deltas $arch/
 done
 
 gpg --export --armor ${GPG_KEY} > ${KEY_FILE}
 aws s3 cp ${KEY_FILE} s3://${BUCKET}/keys.asc
 aws s3api put-object-acl --acl public-read --bucket ${BUCKET} --key ${KEY_NAME}
 aws s3 sync --acl public-read $TMP_REPO/ s3://$BUCKET/
-
+rpm --checksig ./dist/*.rpm

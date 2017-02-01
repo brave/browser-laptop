@@ -37,20 +37,23 @@ cat <<EOF > $HOME/.aptly.conf
 "SwiftPublishEndpoints": {} }
 EOF
 
+# Make sure staging and release cache isn't mixed
+rm -Rf ~/.aptly
+
 gpg --export --armor ${GPG_KEY} > ${KEY_FILE}
 aws s3 cp ${KEY_FILE} s3://${OPTION}/keys.asc
 aws s3api put-object-acl --acl public-read --bucket ${OPTION} --key ${KEY_NAME}
 
 for i in xenial jessie trusty
-	do aptly publish drop $i s3:${OPTION}: || true
+	do aptly publish drop -force-drop $i s3:${OPTION}: || true
 done
 
 for i in xenial jessie trusty
-	do aptly repo drop --force ${i}-release || true
+	do aptly repo drop -force ${i}-release || true
 done
 
 for i in xenial jessie trusty
-	do aptly snapshot drop --force ${i}-snapshot || true
+	do aptly snapshot drop -force ${i}-snapshot || true
 done
 
 for i in xenial jessie trusty
