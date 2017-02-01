@@ -251,9 +251,9 @@ class PaymentsTab extends ImmutableComponent {
             <SettingItem>
               <SettingDropdown
                 data-test-id='visitSelector'
-                defaultValue={minPublisherVisits || 5}
+                defaultValue={minPublisherVisits || 1}
                 onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.MINIMUM_VISITS)}>>>
-                <option value='2'>2 visits</option>
+                <option value='1'>1 visits</option>
                 <option value='5'>5 visits</option>
                 <option value='10'>10 visits</option>
               </SettingDropdown>
