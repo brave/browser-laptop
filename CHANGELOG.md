@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.13.2](https://github.com/brave/browser-laptop/releases/v0.13.2dev)
+- TODO
+
 ## [0.13.1](https://github.com/brave/browser-laptop/releases/v0.13.1dev)
 - Fixed Widevine not working on Windows (Netflix). ([#6948](https://github.com/brave/browser-laptop/issues/6948))
 - Fixed DPI settings on Windows causing blurriness and causing missing pixels.  ([#6462](https://github.com/brave/browser-laptop/issues/6462))
