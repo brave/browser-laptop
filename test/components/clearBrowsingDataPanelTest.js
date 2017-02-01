@@ -55,7 +55,7 @@ describe('Clear Browsing Panel', function () {
         .click(clearDataButton)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return val.value.sites.length === 0
+            return Object.keys(val.value.sites).length === 0
           })
         })
       yield this.app.client
@@ -64,7 +64,7 @@ describe('Clear Browsing Panel', function () {
         .waitForBrowserWindow()
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return val.value.sites.length === 1
+            return Object.keys(val.value.sites).length === 1
           })
         })
       yield openClearBrowsingDataPanel(this.app.client)
@@ -74,7 +74,7 @@ describe('Clear Browsing Panel', function () {
         .click(clearDataButton)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return val.value.sites.length === 0
+            return Object.keys(val.value.sites).length === 0
           })
         })
     })

@@ -9,6 +9,7 @@ const top500 = Immutable.fromJS([
   'gmail.com',
   'google.com',
   'mail.google.com',
+  'calendar.google.com',
   'facebook.com',
   'youtube.com',
   'yahoo.com',

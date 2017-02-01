@@ -65,8 +65,8 @@ module.exports.getSiteKey = function (siteDetail) {
   if (folderId) {
     return folderId.toString()
   } else if (location) {
-    return location +
-      (siteDetail.get('partitionNumber') || 0) +
+    return location + '|' +
+      (siteDetail.get('partitionNumber') || 0) + '|' +
       (siteDetail.get('parentFolderId') || 0)
   }
   return null

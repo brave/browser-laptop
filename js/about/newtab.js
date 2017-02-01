@@ -235,12 +235,7 @@ class NewTabPage extends React.Component {
 
     const gridLayout = this.gridLayout
 
-    return <div className='dynamicBackground' style={this.state.backgroundImage.style}>
-      {
-        this.state.backgroundImage
-          ? <img src={this.state.backgroundImage.source} onError={this.onImageLoadFailed.bind(this)} />
-          : null
-      }
+    return <div className='dynamicBackground'>
       <div className='gradient' />
       <div className='content'>
         <main>

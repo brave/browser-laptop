@@ -209,7 +209,7 @@ describe('PaymentsTab component', function () {
       assert.equal(wrapper.find('[data-test-id="durationSelector"]').node.value, 8000)
     })
 
-    it('defaults to 5 minimum publisher visits', function () {
+    it('defaults to 1 minimum publisher visit', function () {
       fakeSettings.mockReturnValue = true
       const wrapper = mount(
         <PaymentsTab
@@ -219,7 +219,7 @@ describe('PaymentsTab component', function () {
           ledgerData={Immutable.Map()} />
       )
       assert.equal(wrapper.find('.advancedSettings').length, 1)
-      assert.equal(wrapper.find('[data-test-id="visitSelector"]').node.value, 5)
+      assert.equal(wrapper.find('[data-test-id="visitSelector"]').node.value, 1)
     })
   })
 })

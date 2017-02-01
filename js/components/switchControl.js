@@ -27,6 +27,7 @@ class SwitchControl extends ImmutableComponent {
       [this.props.className]: !!this.props.className,
       disabled: this.props.disabled,
       large: this.props.large,
+      small: this.props.small,
       hasTopText: this.props.topl10nId
     })}>
       {

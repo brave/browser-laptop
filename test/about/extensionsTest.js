@@ -91,7 +91,7 @@ describe('about:extensions', function () {
         .waitForVisible(`[data-extension-id="${extensionIds[passwordManagers.LAST_PASS]}"]`, extensionDownloadWaitTime)
     })
   })
-  describe.skip('Enpass installs when enabled', function () {
+  describe('Enpass installs when enabled', function () {
     Brave.beforeAll(this)
     before(function * () {
       yield setup(this.app.client)

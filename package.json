@@ -1,6 +1,6 @@
 {
   "name": "brave",
-  "version": "0.13.1",
+  "version": "0.13.2",
   "description": "Brave laptop and desktop browser",
   "main": "./app/index.js",
   "config": {
@@ -141,7 +141,6 @@
     "css-loader": "^0.23.0",
     "electron-builder": "^2.3.1",
     "electron-packager": "brave/electron-packager",
-    "electron-winstaller": "^2.5.1",
     "empty-port": "0.0.2",
     "enzyme": "^2.6.0",
     "flow-bin": "^0.22.1",
@@ -159,6 +158,7 @@
     "mkdirp": "^0.5.1",
     "mocha": "^2.3.4",
     "mockery": "^1.7.0",
+    "muon-winstaller": "^2.5.4",
     "ncp": "^2.0.0",
     "node-gyp": "^3.2.1",
     "node-libs-browser": "^1.0.0",

@@ -396,7 +396,7 @@ const handleAppAction = (action) => {
 
       // initialize frames state
       let frames = []
-      if (frameOpts) {
+      if (frameOpts && Object.keys(frameOpts).length > 0) {
         if (frameOpts.forEach) {
           frames = frameOpts
         } else {

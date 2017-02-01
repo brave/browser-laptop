@@ -140,6 +140,7 @@ class SettingCheckbox extends ImmutableComponent {
     }
     return <div {...props}>
       <SwitchControl id={this.props.prefKey}
+        small={this.props.small}
         disabled={this.props.disabled}
         onClick={this.onClick}
         checkedOn={this.props.checked !== undefined ? this.props.checked : getSetting(this.props.prefKey, this.props.settings)} />
@@ -171,6 +172,7 @@ class SiteSettingCheckbox extends ImmutableComponent {
   render () {
     return <div style={this.props.style} className='settingItem siteSettingItem'>
       <SwitchControl
+        small={this.props.small}
         disabled={this.props.disabled}
         onClick={this.onClick}
         checkedOn={this.props.checked} />
@@ -257,7 +259,7 @@ class LedgerTable extends ImmutableComponent {
         value: site
       },
       {
-        html: <SiteSettingCheckbox hostPattern={this.getHostPattern(synopsis)} defaultValue={defaultSiteSetting} prefKey='ledgerPayments' siteSettings={this.props.siteSettings} checked={this.enabledForSite(synopsis)} />,
+        html: <SiteSettingCheckbox small hostPattern={this.getHostPattern(synopsis)} defaultValue={defaultSiteSetting} prefKey='ledgerPayments' siteSettings={this.props.siteSettings} checked={this.enabledForSite(synopsis)} />,
         value: this.enabledForSite(synopsis) ? 1 : 0
       },
       views,
@@ -275,7 +277,7 @@ class LedgerTable extends ImmutableComponent {
     }
     return <div className='ledgerTable'>
       <div className='hideExcludedSites'>
-        <SettingCheckbox
+        <SettingCheckbox small
           dataL10nId='hideExcluded'
           prefKey={settings.HIDE_EXCLUDED_SITES}
           settings={this.props.settings}
@@ -682,7 +684,14 @@ class GeneralTab extends ImmutableComponent {
             <option data-l10n-id='newTabEmpty' value={newTabMode.EMPTY_NEW_TAB} />
           </SettingDropdown>
         </SettingItem>
-        <SettingItem dataL10nId='myHomepage'>
+        <div className='iconTitle'>
+          <span data-l10n-id='myHomepage' />
+          <span className='fa fa-info-circle iconLink' onClick={aboutActions.newFrame.bind(null, {
+            location: 'https://github.com/brave/browser-laptop/wiki/End-User-FAQ#how-to-set-up-multiple-home-pages'
+          }, true)}
+            data-l10n-id='multipleHomePages' />
+        </div>
+        <SettingItem>
           <SettingTextbox
             spellCheck='false'
             data-l10n-id='homepageInput'

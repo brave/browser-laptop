@@ -761,7 +761,7 @@ var enable = (paymentsEnabled) => {
 
       value = getSetting(settings.MINIMUM_VISITS)
       if (!value) {
-        value = 5
+        value = 1
         appActions.changeSetting(settings.MINIMUM_VISITS, value)
       }
       if (value > 0) synopsis.options.minPublisherVisits = value

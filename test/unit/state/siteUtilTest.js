@@ -62,19 +62,49 @@ describe('siteUtil', function () {
           partitionNumber: 0
         })
         const key = siteUtil.getSiteKey(siteDetail)
-        assert.equal(key, testUrl1 + '00')
+        assert.equal(key, testUrl1 + '|0|0')
       })
       it('returns key if location matches and partitionNumber is NOT present', function () {
         const siteDetail = Immutable.fromJS({
           location: testUrl1
         })
         const key = siteUtil.getSiteKey(siteDetail)
-        assert.equal(key, testUrl1 + '00')
+        assert.equal(key, testUrl1 + '|0|0')
       })
       it('returns null if location is missing', function () {
         const siteDetail = new Immutable.Map()
         const key = siteUtil.getSiteKey(siteDetail)
         assert.equal(key, null)
+      })
+    })
+    describe('prevent collision', function () {
+      it('partition number', function () {
+        const siteA = Immutable.fromJS({
+          location: testUrl1 + '1',
+          partitionNumber: 0
+        })
+        const siteB = Immutable.fromJS({
+          location: testUrl1,
+          partitionNumber: 10
+        })
+        const keyA = siteUtil.getSiteKey(siteA)
+        const keyB = siteUtil.getSiteKey(siteB)
+        assert.notEqual(keyA, keyB)
+      })
+      it('parent folder id', function () {
+        const siteA = Immutable.fromJS({
+          location: testUrl1 + '1',
+          partitionNumber: 0,
+          parentFolderId: 0
+        })
+        const siteB = Immutable.fromJS({
+          location: testUrl1,
+          partitionNumber: 10,
+          parentFolderId: 0
+        })
+        const keyA = siteUtil.getSiteKey(siteA)
+        const keyB = siteUtil.getSiteKey(siteB)
+        assert.notEqual(keyA, keyB)
       })
     })
   })

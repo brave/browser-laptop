@@ -1,18 +1,36 @@
-language: node_js
-node_js:
-  - "6.1"
+language: generic
 dist: trusty
 sudo: required
 before_install:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
+  - openssl aes-256-cbc -K $encrypted_1366e420413c_key -iv $encrypted_1366e420413c_iv -in gpg_key.enc -out gpg_key -d
+  - gpg --allow-secret-key-import --import gpg_key
+  - pip install --user awscli
+  - export PATH=$PATH:$HOME/.local/bin
+  - nvm install stable; nvm use stable
+# install aptly
+  - echo 'deb http://repo.aptly.info/ squeeze main' | sudo tee -a /etc/apt/sources.list
+  - sudo apt-key adv --keyserver keys.gnupg.net --recv-keys 9E3E53F19C7DE460
+  - sudo apt-get update -qq
+  - sudo apt-get install -y --force-yes aptly xvfb
 script:
-  - npm run lint && npm run download-sync-client && npm test
+  - npm install
+  - npm run download-sync-client
+  - xvfb-run npm run lint
+  - xvfb-run npm test
+after_success:
+  - CHANNEL=dev npm run build-package
+  - npm run build-installer
+  - bash tools/upload_to_aptly
+  - bash tools/upload_to_rpm_repo
 notifications:
   slack:
-    secure: bDwO2uce5JAZvjrvWj4+/+yEXJAIK4O0RcgUWvZ2IMbi7Q9I89Mw40JmkLWL6x2gWZwxr8+FoLtErJA7RVrsfImjrX+NmMyAB7AydLdrBJtkLozNnuacnhcnBRyp1gGCa1ymxCEXGbgC6onAD3kiJJhggr70T+2lu3IuJYXENhc=
+    secure: "bDwO2uce5JAZvjrvWj4+/+yEXJAIK4O0RcgUWvZ2IMbi7Q9I89Mw40JmkLWL6x2gWZwxr8+FoLtErJA7RVrsfImjrX+NmMyAB7AydLdrBJtkLozNnuacnhcnBRyp1gGCa1ymxCEXGbgC6onAD3kiJJhggr70T+2lu3IuJYXENhc="
 env:
-  - CXX=g++-4.8 NODE_ENV=test
+  global:
+    - secure: "SnC/JYCTk4sr6pI5ae8nB7MZrmckjVqTvwk0fCMIRzzbSRSLHnYyOsfMXalGy1dKK7k7sL5INlo8iSEqQAi4ScRSlE/0uPIa822sAFIp35kiWuGJzOWcplfBc9j6ecS6TsgHF15EAUgGZ89r932Swk2RK4nCL5HCVmrxc5moCcraGGIy80STkDdJaZbHjVGl9KwnOTW8iHbxo/Emd3r/yFH6MdFLWLYfgNiT36dzGZIl+sfQomjWyx3HhepsBiFXQYJgDpuiY8reOvRsbDwZUdbxDxbBQKwL3FMDOHgAzDArlY+8Dja7CBKyj+G5SFa8rN3RUNVuC2UyC2ZCb5tdolyxVB+zywrVnJYXAa6icdL7hMejrkn+lVht0tnx0NXjzFL/AI+hfOCm2CvQYi/Fezr2rXgQh2H35RaRFaft9tZsLv32KfJCwSIIDwnRZ8YCqb2cYqXp+pqR6smCd+i+USvV7FvaFdygyTDghnctDA/h67PVW1ZaUVV3In3L3fuI4ON7JUdhnyZVVsRIy30dHLw9WhUNFQqld0bu1MM7Q3QDZRAsgCB4JrulKtn88rXlA+3Zw0kZzOvUpJ7V3GaN8bE8lru6ZY6V8MWqX3oid0dO2HE4Z69Ev5L/N0E0Kh8NS9aA4Vu0mmiuDn6TPIRtOsV1hNmvzJB1PhTuBs4iUSo="
+    - secure: "OaAA1hHmlT/5yj1r6yG9rhlzZGX7crC9O4qT//FG4AgKQ1fZFxpVMp+HG0fKji3CyFXg1JrpgdAB79jZq3Il6hNNuSHnNlaWwfMR+zWWXZ4WVacIU5fly+nsONzRZG5RCoaCV/pQlqc+qtLSDkS27M54WKC4JxM6QvOjl9GWH4EiLIdvI266FzlYirHtB066SS+H7sB09wCNJc0MjRgTIPh0xhOOUdVD9YKyg1bhkN/nqufghvGseQx8/7r8ejZThUMJD0+AGqlzeijxq7EkDu4qkJmAIx7rrGQeL0D12s8yGn9sQ3KREFto6HPSk1C++okFgHy+JRLwpdKvEpsuZLQh/dNRbxMVzOW/qMXwmtsgwkbTD/92Z13+vfIlmkT0OQ4iFmm+PJQb5jEGDSwDZw//pth5jwjapBeeCTv8ve1A2Z3nErIZfyEMgRghjTohux0whnYKXqf7MQuCGBeQyNTwxf209Bbuz/D02SMOvCROTFCqpl+RNIR2XnKxHCynyCoqOIIV9/iT//cDdqxfEPIe8UWaydX1MjxPGcBLw5LLCq+H0uKPoNrbAtxORndA594ndS5uVqjVex17oaYDf0GaTz7A4UQXvz3/N4sbDzLgFhArlmQdJaWkZMa9KeZx09LwCb73dsO4PBP5jS+r0rGh2/ukIsQl/TuIJ6yWzn0"
+    - CXX=g++-4.8 NODE_ENV=test
+
 addons:
   apt:
     sources:
@@ -21,3 +39,5 @@ addons:
       - xvfb
       - g++-4.8
       - libgnome-keyring-dev
+      - createrepo
+      - expect
