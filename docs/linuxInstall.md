@@ -44,17 +44,19 @@ sudo dpkg -i ./brave.deb
 
 ## Fedora x86_64:
 
-To install brave using yum:
+To install brave using dnf:
 
 ```
-yum-config-manager --add-repo https://s3-us-west-2.amazonaws.com/brave-rpm-release/x86_64
-yum install brave
+dnf config-manager --add-repo dnf config-manager --add-repo repository_url
+dnf check-update
+dnf install brave
 ```
 
-To update brave using yum:
+To update brave using dnf:
 
 ```
-sudo yum update brave
+dnf check-update
+dnf update brave
 ```
 
 
@@ -73,12 +75,14 @@ To install brave using zypper:
 ```
 sudo zypper install lsb
 sudo zypper addrepo https://s3-us-west-2.amazonaws.com/brave-rpm-release/x86_64/ brave-rpm-release
+sudo zypper ref
 sudo zypper install brave
 ```
 
 To update brave using zypper:
 
 ```
+sudo zypper ref
 sudo zypper update brave
 ```
 
