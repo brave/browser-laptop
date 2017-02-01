@@ -838,12 +838,12 @@ class TabsTab extends ImmutableComponent {
           </SettingDropdown>
         </SettingItem>
         <SettingItem dataL10nId='newTabPosition'>
-          <FormDropdown
+          <SettingDropdown
             value={getSetting(settings.NEW_TAB_POSITION, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.NEW_TAB_POSITION)}>
             <option data-l10n-id='newTabPositionNext' value={newTabPosition.NEXT} />
             <option data-l10n-id='newTabPositionLast' value={newTabPosition.LAST} />
-          </FormDropdown>
+          </SettingDropdown>
         </SettingItem>
         <SettingItem dataL10nId='tabCloseAction'>
           <FormDropdown
