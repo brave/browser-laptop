@@ -48,7 +48,7 @@ For other platforms (macOS, Linux) You'll need certain packages installed before
 #### On Debian/Ubuntu
 
 ````
-apt-get install libgnome-keyring-dev build-essential
+apt-get install libgnome-keyring-dev build-essential rpm ninja-build
 ````
 
 #### On Fedora
