@@ -458,13 +458,13 @@ class Frame extends ImmutableComponent {
         // This can happen for pages which don't load properly.
         // Some examples are basic http auth and bookmarklets.
         // In this case both the user display and the user think they're on this.props.location.
-        if (this.webview.getURL() !== this.props.location &&
+        if (this.tab.get('url') !== this.props.location &&
           !this.isAboutPage() &&
           !isTorrentViewerURL(this.props.location)) {
           this.webview.loadURL(this.props.location)
         } else if (this.isIntermediateAboutPage() &&
-          this.webview.getURL() !== this.props.location &&
-          this.webview.getURL() !== this.props.aboutDetails.get('url')) {
+          this.tab.get('url') !== this.props.location &&
+          this.tab.get('url') !== this.props.aboutDetails.get('url')) {
           windowActions.setUrl(this.props.aboutDetails.get('url'),
             this.props.aboutDetails.get('frameKey'))
         } else {
@@ -487,7 +487,7 @@ class Frame extends ImmutableComponent {
         this.zoomReset()
         break
       case 'view-source':
-        const sourceLocation = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
+        const sourceLocation = UrlUtil.getViewSourceUrlFromUrl(this.tab.get('url'))
         if (sourceLocation !== null) {
           windowActions.newFrame({
             location: sourceLocation,
@@ -500,8 +500,8 @@ class Frame extends ImmutableComponent {
         break
       case 'save':
         const downloadLocation = getSetting(settings.PDFJS_ENABLED)
-          ? UrlUtil.getLocationIfPDF(this.webview.getURL())
-          : this.webview.getURL()
+          ? UrlUtil.getLocationIfPDF(this.tab.get('url'))
+          : this.tab.get('url')
         // TODO: Sometimes this tries to save in a non-existent directory
         this.webview.downloadURL(downloadLocation)
         break
@@ -512,7 +512,7 @@ class Frame extends ImmutableComponent {
         windowActions.setFindbarShown(this.frame, true)
         break
       case 'fill-password':
-        let currentUrl = urlParse(this.webview.getURL())
+        let currentUrl = urlParse(this.tab.get('url'))
         if (currentUrl &&
             [currentUrl.protocol, currentUrl.host].join('//') === this.props.activeShortcutDetails.get('origin')) {
           this.webview.send(messages.GOT_PASSWORD,
@@ -868,7 +868,7 @@ class Frame extends ImmutableComponent {
         windowActions.loadUrl(this.frame, 'about:error')
         appActions.removeSite(siteUtil.getDetailFromFrame(this.frame))
       } else if (provisionLoadFailure) {
-        windowActions.setNavigated(this.webview.getURL(), this.props.frameKey, true, this.frame.get('tabId'))
+        windowActions.setNavigated(url, this.props.frameKey, true, this.frame.get('tabId'))
       }
     }
     this.webview.addEventListener('security-style-changed', (e) => {
@@ -944,7 +944,7 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('did-fail-provisional-load', (e) => {
       if (e.isMainFrame) {
         loadEnd(false, e.validatedURL)
-        loadFail(e, true, e.validatedURL)
+        loadFail(e, true, e.currentURL)
       }
     })
     this.webview.addEventListener('did-fail-load', (e) => {
@@ -954,8 +954,7 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('did-finish-load', (e) => {
-      // TODO: We can remove this.webview.getURL() once people are using newer electron
-      loadEnd(true, e.validatedURL || this.webview.getURL())
+      loadEnd(true, e.validatedURL)
       if (this.runInsecureContent()) {
         appActions.removeSiteSetting(this.origin, 'runInsecureContent', this.props.isPrivate)
       }
