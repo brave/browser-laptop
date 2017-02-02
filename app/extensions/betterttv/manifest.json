@@ -1,0 +1,24 @@
+{
+"update_url": "https://clients2.google.com/service/update2/crx",
+
+   "content_scripts": [ {
+      "all_frames": true,
+      "js": [ "betterttv.js" ],
+      "matches": [ "*://*.twitch.tv/*" ]
+   } ],
+   "description": "Enhances Twitch with new features, bug fixes, and reduced clutter.",
+   "icons": {
+      "128": "icon.png",
+      "16": "icon.png",
+      "48": "icon.png"
+   },
+   "browser_action": {
+      "default_popup": "settings.html"
+   },
+   "manifest_version": 2,
+   "name": "BetterTTV",
+   "short_name": "BTTV",
+   "homepage_url": "https://www.betterttv.com",
+   "permissions": [ "*://*.twitch.tv/*" ],
+   "version": "6.9"
+}
