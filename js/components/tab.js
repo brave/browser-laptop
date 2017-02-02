@@ -107,8 +107,8 @@ class Tab extends ImmutableComponent {
     event.stopPropagation()
     if (this.props.onTabClosedWithMouse) {
       this.props.onTabClosedWithMouse(this.tabNode.parentNode.getBoundingClientRect())
+      windowActions.closeFrame(windowStore.getFrames(), this.frame)
     }
-    windowActions.closeFrame(windowStore.getFrames(), this.frame)
   }
 
   onMuteFrame (muted, event) {
