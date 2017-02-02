@@ -451,6 +451,8 @@ class AboutBookmarks extends React.Component {
         <div data-l10n-id='bookmarkManager' className='sectionTitle' />
         <div className='headerActions'>
           <div className='searchWrapper'>
+            <span data-l10n-id='importBrowserData' className='importBrowserData' onClick={this.importBrowserData} />
+            <span data-l10n-id='exportBookmarks' className='exportBookmarks' onClick={this.exportBookmarks} />
             <input type='text' className='searchInput' ref='bookmarkSearch' id='bookmarkSearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='bookmarkSearch' />
             {
               this.state.search
@@ -465,8 +467,6 @@ class AboutBookmarks extends React.Component {
         <div className='folderView'>
           <div className='columnHeader'>
             <span data-l10n-id='folders' />
-            <span data-l10n-id='importBrowserData' className='fa fa-upload importBrowserData' onClick={this.importBrowserData} />
-            <span data-l10n-id='exportBookmarks' className='fa fa-download exportBookmarks' onClick={this.exportBookmarks} />
             <span data-l10n-id='addBookmarkFolder' className='addBookmarkFolder' onClick={this.addBookmarkFolder} />
           </div>
           <BookmarkFolderList
