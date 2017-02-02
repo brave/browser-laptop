@@ -396,7 +396,21 @@ class Frame extends ImmutableComponent {
     }
   }
 
+  setTitle (title) {
+    if (this.frame.isEmpty()) {
+      return
+    }
+    windowActions.setFrameTitle(this.frame, title)
+  }
+
   componentDidUpdate (prevProps, prevState) {
+    if (this.props.tabData) {
+      if (!prevProps.tabData ||
+            prevProps.tabData.get('title') !== this.props.tabData.get('title')) {
+        this.setTitle(this.props.tabData.get('title'))
+      }
+    }
+
     const cb = () => {
       if (this.getWebRTCPolicy(prevProps) !== this.getWebRTCPolicy(this.props)) {
         this.webview.setWebRTCIPHandlingPolicy(this.getWebRTCPolicy(this.props))
@@ -709,12 +723,6 @@ class Frame extends ImmutableComponent {
         })
       }
     })
-    this.webview.addEventListener('page-title-updated', ({title}) => {
-      if (this.frame.isEmpty()) {
-        return
-      }
-      windowActions.setFrameTitle(this.frame, title)
-    })
     this.webview.addEventListener('show-autofill-settings', (e) => {
       windowActions.newFrame({ location: 'about:autofill' }, true)
     })
@@ -826,7 +834,12 @@ class Frame extends ImmutableComponent {
       const isError = this.props.aboutDetails && this.props.aboutDetails.get('errorCode')
       if (!this.props.isPrivate && (protocol === 'http:' || protocol === 'https:') && !isError && savePage) {
         // Register the site for recent history for navigation bar
-        appActions.addSite(siteUtil.getDetailFromFrame(this.frame))
+        // calling with setTimeout is an ugly hack for a race condition
+        // with setTitle. We either need to delay this call until the title is
+        // or add a way to update it
+        setTimeout(() => {
+          appActions.addSite(siteUtil.getDetailFromFrame(this.frame))
+        }, 250)
       }
 
       if (url.startsWith(pdfjsOrigin)) {
@@ -921,13 +934,6 @@ class Frame extends ImmutableComponent {
       }
       // force temporary url display for tabnapping protection
       windowActions.setMouseInTitlebar(true)
-
-      // After navigating to the URL via back/forward buttons, set correct frame title
-      if (!e.isRendererInitiated) {
-        if (!this.frame.isEmpty() && this.props.tabData) {
-          windowActions.setFrameTitle(this.frame, this.props.tabData.get('title'))
-        }
-      }
     })
     this.webview.addEventListener('crashed', (e) => {
       if (this.frame.isEmpty()) {
