@@ -4,7 +4,7 @@ All applicable styles should be colocated with their corresponding JavaScript co
 
 ## Legacy
 
-All legacy styles are processed with [Less](http://lesscss.org/) and can be found in the /less directory. These should still be maintained but all future CSS should be written in JavaScript and kept inside the appropriate component file.
+All legacy styles are processed with [Less](http://lesscss.org/) and can be found in the /less directory. These should still be maintained but all future CSS should be written in JavaScript and kept inside the appropriate component file. **For further information regarding how to refactor legacy code to Aphrodite, check this [Wiki page](https://github.com/brave/browser-laptop/wiki/Refactoring-styles-to-Aphrodite).**
 
 ## Example
 
