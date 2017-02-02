@@ -8,8 +8,12 @@ const ImmutableComponent = require('../../../js/components/immutableComponent')
 const appActions = require('../../../js/actions/appActions')
 const settings = require('../../../js/constants/settings')
 const getSetting = require('../../../js/settings').getSetting
-const cx = require('../../../js/lib/classSet')
-const Button = require('../../../js/components/button')
+const {StyleSheet, css} = require('aphrodite')
+
+const noFundVerifiedPublisherImage = require('../../extensions/brave/img/urlbar/browser_URL_fund_no_verified.svg')
+const fundVerifiedPublisherImage = require('../../extensions/brave/img/urlbar/browser_URL_fund_yes_verified.svg')
+const noFundUnverifiedPublisherImage = require('../../extensions/brave/img/urlbar/browser_URL_fund_no.svg')
+const fundUnverifiedPublisherImage = require('../../extensions/brave/img/urlbar/browser_URL_fund_yes.svg')
 
 class PublisherToggle extends ImmutableComponent {
   constructor () {
@@ -38,7 +42,7 @@ class PublisherToggle extends ImmutableComponent {
     return this.props.synopsis.map(entry => entry.get('site')).includes(this.domain)
   }
 
-  get enabledPublisher () {
+  get authorizedPublisher () {
     // If we can't get ledgerPayments, then it's likely that we are
     // on a clean session. Let's then check for publisher's synopsis
     return this.hostSettings
@@ -46,11 +50,23 @@ class PublisherToggle extends ImmutableComponent {
       : this.validPublisherSynopsis
   }
 
+  get verifiedPublisher () {
+    let verifiedPublisher
+    this.props.synopsis.map(publisher => {
+      if (publisher.get('site') === this.domain && publisher.get('verified') === true) {
+        verifiedPublisher = !!publisher
+        return false
+      }
+      return true
+    })
+    return verifiedPublisher
+  }
+
   get visiblePublisher () {
     // ledgerPaymentsShown is undefined by default until user decide to permanently hide the publisher
     // so for icon to be shown it can be everything but false
     const ledgerPaymentsShown = this.hostSettings && this.hostSettings.get('ledgerPaymentsShown')
-    return ledgerPaymentsShown === 'undefined' || ledgerPaymentsShown !== false
+    return ledgerPaymentsShown !== false
   }
 
   get shouldShowAddPublisherButton () {
@@ -61,25 +77,44 @@ class PublisherToggle extends ImmutableComponent {
     return false
   }
 
+  get l10nString () {
+    if (this.verifiedPublisher && !this.authorizedPublisher) {
+      return 'verifiedPublisher'
+    } else if (this.authorizedPublisher) {
+      return 'enabledPublisher'
+    }
+    return 'disabledPublisher'
+  }
+
   onAuthorizePublisher () {
     // if payments disabled, enable it
     if (!getSetting(settings.AUTO_SUGGEST_SITES)) {
       appActions.changeSetting(settings.PAYMENTS_ENABLED, true)
     }
 
-    this.enabledPublisher
+    this.authorizedPublisher
       ? appActions.changeSiteSetting(this.hostPattern, 'ledgerPayments', false)
       : appActions.changeSiteSetting(this.hostPattern, 'ledgerPayments', true)
   }
 
   render () {
     return this.shouldShowAddPublisherButton
-      ? <span className={cx({
-        addPublisherButtonContainer: true,
-        authorizedPublisher: this.enabledPublisher
-      })}>
-        <Button iconClass='fa-btc publisherToggleBtn'
-          l10nId='enablePublisher'
+      ? <span
+        data-test-id='publisherButton'
+        data-test-authorized={this.authorizedPublisher}
+        data-test-verified={this.verifiedPublisher}
+        className={css(styles.addPublisherButtonContainer)}>
+        <button
+          className={
+          css(
+            styles.browserButton,
+            !this.authorizedPublisher && this.verifiedPublisher && styles.noFundVerified,
+            this.authorizedPublisher && this.verifiedPublisher && styles.fundVerified,
+            !this.authorizedPublisher && !this.verifiedPublisher && styles.noFundUnverified,
+            this.authorizedPublisher && !this.verifiedPublisher && styles.fundUnverified
+            )
+          }
+          data-l10n-id={this.l10nString}
           onClick={this.onAuthorizePublisher}
         />
       </span>
@@ -87,10 +122,61 @@ class PublisherToggle extends ImmutableComponent {
   }
 }
 
-PublisherToggle.propTypes = {
-  url: React.PropTypes.string,
-  hostSettings: React.PropTypes.string,
-  synopsis: React.PropTypes.string
-}
+const styles = StyleSheet.create({
+  addPublisherButtonContainer: {
+    boxSizing: 'border-box',
+    display: 'flex',
+    alignItems: 'center',
+    height: '25px',
+    width: '25px',
+    minHeight: '25px',
+    minWidth: '25px',
+    WebkitAppRegion: 'no-drag',
+    borderWidth: '1px 1px 1px 0px',
+    borderStyle: 'solid',
+    borderColor: '#CBCBCB',
+    borderRadius: '0 4px 4px 0',
+    borderTopLeftRadius: '0',
+    borderBottomLeftRadius: '0',
+    borderBottomColor: 'rgba(0, 0, 0, 0.1)'
+  },
+
+  browserButton: {
+    border: 'none',
+    margin: '0',
+    whiteSpace: 'nowrap',
+    outline: 'none',
+    cursor: 'default',
+    display: 'inline-block',
+    lineHeight: '25px',
+    width: '25px',
+    height: '25px',
+    fontSize: '13px',
+    color: '#5a5a5a',
+    borderRadius: '4px',
+    textAlign: 'center',
+    transition: '.1s opacity, .1s background',
+    WebkitUserSelect: 'none',
+    backgroundSize: '16px',
+    backgroundPosition: 'center center',
+    backgroundRepeat: 'no-repeat'
+  },
+
+  noFundVerified: {
+    backgroundImage: `url(${noFundVerifiedPublisherImage})`
+  },
+
+  fundVerified: {
+    backgroundImage: `url(${fundVerifiedPublisherImage})`
+  },
+
+  noFundUnverified: {
+    backgroundImage: `url(${noFundUnverifiedPublisherImage})`
+  },
+
+  fundUnverified: {
+    backgroundImage: `url(${fundUnverifiedPublisherImage})`
+  }
+})
 
 module.exports = PublisherToggle
