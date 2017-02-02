@@ -19,6 +19,27 @@ const styles = StyleSheet.create({
     outline: 'none',
     padding: '0.4em',
     width: '100%'
+  },
+
+  browserButton: {
+    border: 'none',
+    margin: '0',
+    whiteSpace: 'nowrap',
+    outline: 'none',
+    cursor: 'default',
+    display: 'inline-block',
+    lineHeight: globalStyles.spacing.buttonHeight,
+    height: globalStyles.spacing.buttonHeight,
+    width: globalStyles.spacing.buttonWidth,
+    fontSize: globalStyles.spacing.defaultFontSize,
+    color: globalStyles.color.buttonColor,
+    borderRadius: globalStyles.radius.borderRadius,
+    textAlign: 'center',
+    transition: '.1s opacity, .1s background',
+    WebkitUserSelect: 'none',
+    backgroundSize: '16px',
+    backgroundPosition: 'center center',
+    backgroundRepeat: 'no-repeat'
   }
 })
 
