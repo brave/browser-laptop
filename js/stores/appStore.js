@@ -36,6 +36,8 @@ const autofill = require('../../app/autofill')
 const nativeImage = require('../../app/nativeImage')
 const Filtering = require('../../app/filtering')
 const basicAuth = require('../../app/browser/basicAuth')
+const messageBox = require('../../app/browser/messageBox')
+const webtorrent = require('../../app/browser/webtorrent')
 const windows = require('../../app/browser/windows')
 const assert = require('assert')
 
@@ -45,8 +47,7 @@ const extensionState = require('../../app/common/state/extensionState')
 const aboutNewTabState = require('../../app/common/state/aboutNewTabState')
 const aboutHistoryState = require('../../app/common/state/aboutHistoryState')
 const windowState = require('../../app/common/state/windowState')
-
-const webtorrent = require('../../app/browser/webtorrent')
+const messageBoxState = require('../../app/common/state/messageBoxState')
 
 const isDarwin = process.platform === 'darwin'
 const isWindows = process.platform === 'win32'
@@ -438,12 +439,12 @@ const handleAppAction = (action) => {
 
         ipcMain.on(messages.NOTIFICATION_RESPONSE, function notificationResponseCallback (e, message, buttonIndex, persist) {
           if (message === locale.translation('unexpectedErrorWindowReload')) {
-            appActions.hideMessageBox(message)
+            appActions.hideNotification(message)
             ipcMain.removeListener(messages.NOTIFICATION_RESPONSE, notificationResponseCallback)
           }
         })
 
-        appActions.showMessageBox({
+        appActions.showNotification({
           buttons: [
             {text: locale.translation('ok')}
           ],
@@ -709,7 +710,7 @@ const handleAppAction = (action) => {
     case appConstants.APP_UPDATE_PUBLISHER_INFO:
       appState = appState.set('publisherInfo', Immutable.fromJS(action.publisherInfo))
       break
-    case appConstants.APP_SHOW_MESSAGE_BOX:
+    case appConstants.APP_SHOW_NOTIFICATION:
       let notifications = appState.get('notifications')
       notifications = notifications.filterNot((notification) => {
         let message = notification.get('message')
@@ -740,12 +741,12 @@ const handleAppAction = (action) => {
       notifications = notifications.insert(insertIndex, Immutable.fromJS(action.detail))
       appState = appState.set('notifications', notifications)
       break
-    case appConstants.APP_HIDE_MESSAGE_BOX:
+    case appConstants.APP_HIDE_NOTIFICATION:
       appState = appState.set('notifications', appState.get('notifications').filterNot((notification) => {
         return notification.get('message') === action.message
       }))
       break
-    case appConstants.APP_CLEAR_MESSAGE_BOXES:
+    case appConstants.APP_CLEAR_NOTIFICATIONS:
       appState = appState.set('notifications', appState.get('notifications').filterNot((notification) => {
         return notification.get('frameOrigin') === action.origin
       }))
@@ -956,6 +957,15 @@ const handleAppAction = (action) => {
       break
     case appConstants.APP_HIDE_DOWNLOAD_DELETE_CONFIRMATION:
       appState = appState.set('deleteConfirmationVisible', false)
+      break
+    case appConstants.APP_SHOW_MESSAGE_BOX_FOR_TAB:
+      appState = messageBoxState.show(appState, action)
+      break
+    case appConstants.APP_DISMISS_MESSAGE_BOX_FOR_TAB:
+      appState = messageBox.close(appState, action)
+      break
+    case appConstants.APP_UPDATE_MESSAGE_BOX_FOR_TAB:
+      appState = messageBoxState.update(appState, action)
       break
     default:
   }

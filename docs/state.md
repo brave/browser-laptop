@@ -279,7 +279,15 @@ AppStore
     canGoBack: boolean, // the tab can be navigated back
     canGoForward: boolean. // the tab can be navigated forward
     muted: boolean,  // is the tab muted
-    windowId: number  // the windowId that contains the tab
+    windowId: number,  // the windowId that contains the tab
+    messageBoxDetail: { // fields used if showing a message box for a tab
+      message: string,
+      title: string, // title is the source; ex: "brave.com says:"
+      buttons: [string], // array of buttons as string; code only handles 1 or 2
+      suppress: boolean, // if true, show a suppress checkbox (defaulted to not checked)
+      showSuppress: boolean, // final result of the suppress checkbox
+      cancelId: number // optional: used for a confirm message box
+    }
   }],
   temporarySiteSettings: {
     // Same as siteSettings but never gets written to disk

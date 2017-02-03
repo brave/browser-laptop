@@ -347,33 +347,33 @@ Updates publisher information for the payments pane
 
 
 
-### showMessageBox(detail) 
+### showNotification(detail) 
 
-Shows a message box in the notification bar
-
-**Parameters**
-
-**detail**: `Object`, Shows a message box in the notification bar
-
-
-
-### hideMessageBox(message) 
-
-Hides a message box in the notification bar
+Shows a message in the notification bar
 
 **Parameters**
 
-**message**: `string`, Hides a message box in the notification bar
+**detail**: `Object`, Shows a message in the notification bar
 
 
 
-### clearMessageBoxes(origin) 
+### hideNotification(message) 
 
-Clears all message boxes for a given origin.
+Hides a message in the notification bar
 
 **Parameters**
 
-**origin**: `string`, Clears all message boxes for a given origin.
+**message**: `string`, Hides a message in the notification bar
+
+
+
+### clearNotifications(origin) 
+
+Clears all notifications for a given origin.
+
+**Parameters**
+
+**origin**: `string`, Clears all notifications for a given origin.
 
 
 
@@ -727,6 +727,30 @@ TODO: Refactor this to merge it into addSite/removeSite
 ### resetSyncData() 
 
 Dispatches a message to delete sync data.
+
+
+
+### dismissMessageBoxForTab(tabId, detail) 
+
+Close a tab's open alert/confirm/etc (triggered by clicking OK/cancel).
+
+**Parameters**
+
+**tabId**: `number`, The tabId
+
+**detail**: `Object`, Object containing: suppressCheckbox (boolean)
+
+
+
+### updateMessageBoxForTab(tabId, detail) 
+
+Update the detail object for the open alert/confirm/prompt (triggers re-render)
+
+**Parameters**
+
+**tabId**: `number`, The tabId
+
+**detail**: `Object`, Replacement object
 
 
 

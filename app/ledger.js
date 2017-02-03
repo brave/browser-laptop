@@ -503,7 +503,7 @@ if (ipc) {
   ipc.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex) => {
     const win = electron.BrowserWindow.getFocusedWindow()
     if (message === addFundsMessage) {
-      appActions.hideMessageBox(message)
+      appActions.hideNotification(message)
       // See showNotificationAddFunds() for buttons.
       // buttonIndex === 1 is "Later"; the timestamp until which to delay is set
       // in showNotificationAddFunds() when triggering this notification.
@@ -517,7 +517,7 @@ if (ipc) {
         }
       }
     } else if (message === reconciliationMessage) {
-      appActions.hideMessageBox(message)
+      appActions.hideNotification(message)
       // buttonIndex === 1 is Dismiss
       if (buttonIndex === 0) {
         appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
@@ -526,12 +526,12 @@ if (ipc) {
           'about:preferences#payments', { singleFrame: true })
       }
     } else if (message === notificationPaymentDoneMessage) {
-      appActions.hideMessageBox(message)
+      appActions.hideNotification(message)
       if (buttonIndex === 0) {
         appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
       }
     } else if (message === notificationTryPaymentsMessage) {
-      appActions.hideMessageBox(message)
+      appActions.hideNotification(message)
       if (buttonIndex === 1 && win) {
         win.webContents.send(messages.SHORTCUT_NEW_FRAME,
           'about:preferences#payments', { singleFrame: true })
@@ -1944,7 +1944,7 @@ const showDisabledNotifications = () => {
       return
     }
     notificationTryPaymentsMessage = locale.translation('notificationTryPayments')
-    appActions.showMessageBox({
+    appActions.showNotification({
       greeting: locale.translation('updateHello'),
       message: notificationTryPaymentsMessage,
       buttons: [
@@ -2002,7 +2002,7 @@ const showNotificationAddFunds = () => {
   appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP, nextTime)
 
   addFundsMessage = addFundsMessage || locale.translation('addFundsNotification')
-  appActions.showMessageBox({
+  appActions.showNotification({
     greeting: locale.translation('updateHello'),
     message: addFundsMessage,
     buttons: [
@@ -2026,7 +2026,7 @@ const showNotificationReviewPublishers = (nextTime) => {
   appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_RECONCILE_SOON_TIMESTAMP, nextTime)
 
   reconciliationMessage = reconciliationMessage || locale.translation('reconciliationNotification')
-  appActions.showMessageBox({
+  appActions.showNotification({
     greeting: locale.translation('updateHello'),
     message: reconciliationMessage,
     buttons: [
@@ -2047,8 +2047,8 @@ const showNotificationPaymentDone = (transactionContributionFiat) => {
     .replace(/{{\s*amount\s*}}/, transactionContributionFiat.amount)
     .replace(/{{\s*currency\s*}}/, transactionContributionFiat.currency)
   // Hide the 'waiting for deposit' message box if it exists
-  appActions.hideMessageBox(addFundsMessage)
-  appActions.showMessageBox({
+  appActions.hideNotification(addFundsMessage)
+  appActions.showNotification({
     greeting: locale.translation('updateHello'),
     message: notificationPaymentDoneMessage,
     buttons: [

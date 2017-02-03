@@ -49,7 +49,6 @@ if (process.platform === 'win32') {
 const electron = require('electron')
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
-const dialog = electron.dialog
 const ipcMain = electron.ipcMain
 const Immutable = require('immutable')
 const Updater = require('./updater')
@@ -77,6 +76,7 @@ const privacy = require('../js/state/privacy')
 const async = require('async')
 const settings = require('../js/constants/settings')
 const BookmarksExporter = require('./browser/bookmarksExporter')
+const MessageBox = require('./browser/messageBox')
 
 app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferHtmlOverPlugins')
 
@@ -290,39 +290,32 @@ app.on('ready', () => {
   process.on('window-alert',
     (webContents, extraData, title, message, defaultPromptText,
         shouldDisplaySuppressCheckbox, isBeforeUnloadDialog, isReload, cb) => {
-      let suppress = false
-      const buttons = ['OK']
-      if (!webContents || webContents.isDestroyed()) {
-        cb(false, '', suppress)
-      } else {
-        cb(true, '', suppress)
-      }
-
-      const hostWebContents = webContents.hostWebContents || webContents
-      dialog.showMessageBox(BrowserWindow.fromWebContents(hostWebContents), {
+      const tabId = webContents.getId()
+      const detail = {
         message,
         title,
-        buttons: buttons
-      })
+        buttons: ['OK'],
+        suppress: false,
+        showSuppress: shouldDisplaySuppressCheckbox
+      }
+
+      MessageBox.show(tabId, detail, cb)
     })
 
   process.on('window-confirm',
     (webContents, extraData, title, message, defaultPromptText,
         shouldDisplaySuppressCheckbox, isBeforeUnloadDialog, isReload, cb) => {
-      let suppress = false
-      const buttons = ['OK', 'Cancel']
-      if (!webContents || webContents.isDestroyed()) {
-        cb(false, '', suppress)
-      }
-
-      const hostWebContents = webContents.hostWebContents || webContents
-      const response = dialog.showMessageBox(BrowserWindow.fromWebContents(hostWebContents), {
+      const tabId = webContents.getId()
+      const detail = {
         message,
         title,
-        buttons: buttons,
-        cancelId: 1
-      })
-      cb(!response, '', suppress)
+        buttons: ['OK', 'Cancel'],
+        cancelId: 1,
+        suppress: false,
+        showSuppress: shouldDisplaySuppressCheckbox
+      }
+
+      MessageBox.show(tabId, detail, cb)
     })
 
   process.on('window-prompt',
@@ -398,9 +391,9 @@ app.on('ready', () => {
       var message = locale.translation('prefsRestart')
       if (prefsRestartLastValue[config] !== undefined && prefsRestartLastValue[config] !== value) {
         delete prefsRestartLastValue[config]
-        appActions.hideMessageBox(message)
+        appActions.hideNotification(message)
       } else {
-        appActions.showMessageBox({
+        appActions.showNotification({
           buttons: [
             {text: locale.translation('yes')},
             {text: locale.translation('no')}
@@ -419,7 +412,7 @@ app.on('ready', () => {
             app.quit()
           } else {
             delete prefsRestartLastValue[config]
-            appActions.hideMessageBox(message)
+            appActions.hideNotification(message)
           }
         }
         if (prefsRestartLastValue[config] === undefined) {

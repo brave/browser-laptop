@@ -424,34 +424,34 @@ const appActions = {
   },
 
   /**
-   * Shows a message box in the notification bar
+   * Shows a message in the notification bar
    * @param {{message: string, buttons: Array.<string>, frameOrigin: string, options: Object}} detail
    */
-  showMessageBox: function (detail) {
+  showNotification: function (detail) {
     AppDispatcher.dispatch({
-      actionType: appConstants.APP_SHOW_MESSAGE_BOX,
+      actionType: appConstants.APP_SHOW_NOTIFICATION,
       detail
     })
   },
 
   /**
-   * Hides a message box in the notification bar
+   * Hides a message in the notification bar
    * @param {string} message
    */
-  hideMessageBox: function (message) {
+  hideNotification: function (message) {
     AppDispatcher.dispatch({
-      actionType: appConstants.APP_HIDE_MESSAGE_BOX,
+      actionType: appConstants.APP_HIDE_NOTIFICATION,
       message
     })
   },
 
   /**
-   * Clears all message boxes for a given origin.
+   * Clears all notifications for a given origin.
    * @param {string} origin
    */
-  clearMessageBoxes: function (origin) {
+  clearNotifications: function (origin) {
     AppDispatcher.dispatch({
-      actionType: appConstants.APP_CLEAR_MESSAGE_BOXES,
+      actionType: appConstants.APP_CLEAR_NOTIFICATIONS,
       origin
     })
   },
@@ -889,6 +889,45 @@ const appActions = {
   resetSyncData: function () {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_RESET_SYNC_DATA
+    })
+  },
+
+  /*
+   * Will pop up an alert/confirm/prompt for a given tab. Window is still usable.
+   * @param {number} tabId - The tabId
+   * @param {Object} detail - Object containing: title, message, buttons to show
+   */
+  showMessageBoxForTab: function (tabId, detail) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_SHOW_MESSAGE_BOX_FOR_TAB,
+      tabId,
+      detail
+    })
+  },
+
+  /**
+   * Close a tab's open alert/confirm/etc (triggered by clicking OK/cancel).
+   * @param {number} tabId - The tabId
+   * @param {Object} detail - Object containing: suppressCheckbox (boolean)
+   */
+  dismissMessageBoxForTab: function (tabId, detail) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_DISMISS_MESSAGE_BOX_FOR_TAB,
+      tabId,
+      detail
+    })
+  },
+
+  /**
+   * Update the detail object for the open alert/confirm/prompt (triggers re-render)
+   * @param {number} tabId - The tabId
+   * @param {Object} detail - Replacement object
+   */
+  updateMessageBoxForTab: function (tabId, detail) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_UPDATE_MESSAGE_BOX_FOR_TAB,
+      tabId,
+      detail
     })
   }
 }

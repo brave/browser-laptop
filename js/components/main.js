@@ -909,6 +909,7 @@ class Main extends ImmutableComponent {
       !customTitlebar.menubarSelectedIndex
 
     const appStateSites = this.props.appState.get('sites')
+    const activeTabShowingMessageBox = !!(activeTab && activeTab.get('messageBoxDetail'))
 
     return <div id='window'
       className={cx({
@@ -961,12 +962,12 @@ class Main extends ImmutableComponent {
                 <div className={cx({
                   navigationButtonContainer: true,
                   nav: true,
-                  disabled: !activeTab || !activeTab.get('canGoBack')
+                  disabled: !activeTab || !activeTab.get('canGoBack') || activeTabShowingMessageBox
                 })}>
                   <LongPressButton
                     l10nId='backButton'
                     className='navigationButton backButton'
-                    disabled={!activeTab || !activeTab.get('canGoBack')}
+                    disabled={!activeTab || !activeTab.get('canGoBack') || activeTabShowingMessageBox}
                     onClick={this.onBack}
                     onLongPress={this.onBackLongPress}
                   />
@@ -974,12 +975,12 @@ class Main extends ImmutableComponent {
                 <div className={cx({
                   navigationButtonContainer: true,
                   nav: true,
-                  disabled: !activeTab || !activeTab.get('canGoForward')
+                  disabled: !activeTab || !activeTab.get('canGoForward') || activeTabShowingMessageBox
                 })}>
                   <LongPressButton
                     l10nId='forwardButton'
                     className='navigationButton forwardButton'
-                    disabled={!activeTab || !activeTab.get('canGoForward')}
+                    disabled={!activeTab || !activeTab.get('canGoForward') || activeTabShowingMessageBox}
                     onClick={this.onForward}
                     onLongPress={this.onForwardLongPress}
                   />
@@ -1012,6 +1013,7 @@ class Main extends ImmutableComponent {
                 menubarVisible={customTitlebar.menubarVisible}
                 siteSettings={this.props.appState.get('siteSettings')}
                 synopsis={this.props.appState.getIn(['publisherInfo', 'synopsis']) || new Immutable.Map()}
+                activeTabShowingMessageBox={activeTabShowingMessageBox}
               />
               <div className='topLevelEndButtons'>
                 <div className={cx({
