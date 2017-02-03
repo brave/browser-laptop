@@ -7,6 +7,7 @@ const urlParse = require('../../common/urlParse')
 
 const ImmutableComponent = require('../../../js/components/immutableComponent')
 const windowActions = require('../../../js/actions/windowActions')
+const webviewActions = require('../../../js/actions/webviewActions')
 const appActions = require('../../../js/actions/appActions')
 const KeyCodes = require('../../common/constants/keyCodes')
 const cx = require('../../../js/lib/classSet')
@@ -335,9 +336,11 @@ class UrlBar extends ImmutableComponent {
 
   onKeyUp (e) {
     switch (e.keyCode) {
+      case KeyCodes.ESC:
+        webviewActions.setWebviewFocused()
+        return
       case KeyCodes.UP:
       case KeyCodes.DOWN:
-      case KeyCodes.ESC:
         return
     }
     if (this.isSelected()) {
