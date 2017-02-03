@@ -7,6 +7,7 @@ const ImmutableComponent = require('../../../js/components/immutableComponent')
 const Button = require('../../../js/components/button')
 const contextMenus = require('../../../js/contextMenus')
 const windowActions = require('../../../js/actions/windowActions')
+const webviewActions = require('../../../js/actions/webviewActions')
 const DownloadItem = require('./downloadItem')
 
 class DownloadsBar extends ImmutableComponent {
@@ -16,6 +17,7 @@ class DownloadsBar extends ImmutableComponent {
   }
   onHideDownloadsToolbar () {
     windowActions.setDownloadsToolbarVisible(false)
+    webviewActions.setWebviewFocused()
   }
   render () {
     const getComputedStyle = require('../getComputedStyle')
