@@ -27,11 +27,15 @@ const fakeElectron = {
   },
   app: {
     on: function () {
-    }
+    },
+    getPath: (param) => `${process.cwd()}/${param}`
   },
   clipboard: {
     writeText: function () {
     }
+  },
+  dialog: {
+    showOpenDialog: function () { }
   },
   shell: {
     showItemInFolder: function () {

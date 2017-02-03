@@ -8,7 +8,7 @@ const {mount} = require('enzyme')
 const sinon = require('sinon')
 const assert = require('assert')
 const fakeElectron = require('../lib/fakeElectron')
-let Preferences
+let Preferences, appActions, SettingItemIcon
 require('../braveUnit')
 
 describe('Preferences component', function () {
@@ -46,11 +46,14 @@ describe('Preferences component', function () {
     mockery.registerMock('../../../../extensions/brave/img/coinbase_logo.png')
     mockery.registerMock('../../../../extensions/brave/img/android_download.svg')
     mockery.registerMock('../../../../extensions/brave/img/ios_download.svg')
+    mockery.registerMock('../../img/icon_pencil.svg')
 
     window.chrome = fakeElectron
     window.CustomEvent = {}
 
     Preferences = require('../../../js/about/preferences').AboutPreferences
+    SettingItemIcon = require('../../../app/renderer/components/settings').SettingItemIcon
+    appActions = require('../../../js/actions/appActions')
   })
   after(function () {
     mockery.disable()
@@ -88,6 +91,23 @@ describe('Preferences component', function () {
       this.result = mount(Preferences)
       assert.equal(this.result.find('[data-l10n-id="generalSettings"]').length, 0)
       assert.equal(this.result.find('[data-l10n-id="searchSettings"]').length, 1)
+    })
+  })
+
+  describe('General', function () {
+    describe('Default path', function () {
+      it('call appActions.defaultDownloadPath when pencil is clicked', function () {
+        const spy = sinon.spy(appActions, 'defaultDownloadPath')
+        const wrapper = mount(
+          <SettingItemIcon
+            clickAction={appActions.defaultDownloadPath()}
+            position='right'
+          />
+        )
+        wrapper.find('span[data-icon-position="right"]').simulate('click')
+        assert.equal(spy.calledOnce, true)
+        appActions.defaultDownloadPath.restore()
+      })
     })
   })
 })

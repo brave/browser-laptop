@@ -231,4 +231,34 @@ describe('downloadsReducer', function () {
       })
     })
   })
+
+  describe('APP_DOWNLOAD_DEFAULT_PATH', function () {
+    describe('when showing folder selection dialog', function () {
+      let stub
+      let options
+
+      before(function () {
+        stub = sinon.stub(fakeElectron.dialog, 'showOpenDialog', function (arg1, arg2) {
+          options = arg2
+        })
+        downloadsReducer({}, {actionType: appConstants.APP_DOWNLOAD_DEFAULT_PATH})
+      })
+
+      after(function () {
+        stub.restore()
+      })
+
+      it('calls dialog.showOpenDialog', function () {
+        assert(stub.calledOnce)
+      })
+
+      it('passes the correct defaultPath', function () {
+        assert.equal(options.defaultPath, `${process.cwd()}/downloads`)
+      })
+
+      it('passes the correct properties object', function () {
+        assert.deepEqual(options.properties, ['openDirectory'])
+      })
+    })
+  })
 })
