@@ -86,7 +86,8 @@ module.exports.isSiteBookmarked = function (sites, siteDetail) {
 
   const site = sites.find((site) =>
     isBookmark(site.get('tags')) &&
-    site.get('location') === siteDetail.get('location')
+    site.get('location') === siteDetail.get('location') &&
+    (site.get('partitionNumber') || 0) === (siteDetail.get('partitionNumber') || 0)
   )
 
   if (site) {

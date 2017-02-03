@@ -91,7 +91,10 @@ class NavigationBar extends ImmutableComponent {
 
   get bookmarked () {
     return this.props.activeFrameKey !== undefined &&
-      siteUtil.isSiteBookmarked(this.props.sites, Immutable.fromJS({location: this.props.location}))
+      siteUtil.isSiteBookmarked(this.props.sites, Immutable.fromJS({
+        location: this.props.location,
+        partitionNumber: this.props.partitionNumber
+      }))
   }
 
   get titleMode () {
