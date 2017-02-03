@@ -399,7 +399,21 @@ class Frame extends ImmutableComponent {
     }
   }
 
+  setTitle (title) {
+    if (this.frame.isEmpty()) {
+      return
+    }
+    windowActions.setFrameTitle(this.frame, title)
+  }
+
   componentDidUpdate (prevProps, prevState) {
+    if (this.props.tabData) {
+      if (!prevProps.tabData ||
+            prevProps.tabData.get('title') !== this.props.tabData.get('title')) {
+        this.setTitle(this.props.tabData.get('title'))
+      }
+    }
+
     const cb = () => {
       if (this.getWebRTCPolicy(prevProps) !== this.getWebRTCPolicy(this.props)) {
         this.webview.setWebRTCIPHandlingPolicy(this.getWebRTCPolicy(this.props))
@@ -461,13 +475,13 @@ class Frame extends ImmutableComponent {
         // This can happen for pages which don't load properly.
         // Some examples are basic http auth and bookmarklets.
         // In this case both the user display and the user think they're on this.props.location.
-        if (this.webview.getURL() !== this.props.location &&
+        if (this.tab.get('url') !== this.props.location &&
           !this.isAboutPage() &&
           !isTorrentViewerURL(this.props.location)) {
           this.webview.loadURL(this.props.location)
         } else if (this.isIntermediateAboutPage() &&
-          this.webview.getURL() !== this.props.location &&
-          this.webview.getURL() !== this.props.aboutDetails.get('url')) {
+          this.tab.get('url') !== this.props.location &&
+          this.tab.get('url') !== this.props.aboutDetails.get('url')) {
           windowActions.setUrl(this.props.aboutDetails.get('url'),
             this.props.aboutDetails.get('frameKey'))
         } else {
@@ -489,15 +503,8 @@ class Frame extends ImmutableComponent {
       case 'zoom-reset':
         this.zoomReset()
         break
-      case 'toggle-dev-tools':
-        if (this.webview.isDevToolsOpened()) {
-          this.webview.closeDevTools()
-        } else {
-          this.webview.openDevTools()
-        }
-        break
       case 'view-source':
-        const sourceLocation = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
+        const sourceLocation = UrlUtil.getViewSourceUrlFromUrl(this.tab.get('url'))
         if (sourceLocation !== null) {
           windowActions.newFrame({
             location: sourceLocation,
@@ -510,8 +517,8 @@ class Frame extends ImmutableComponent {
         break
       case 'save':
         const downloadLocation = getSetting(settings.PDFJS_ENABLED)
-          ? UrlUtil.getLocationIfPDF(this.webview.getURL())
-          : this.webview.getURL()
+          ? UrlUtil.getLocationIfPDF(this.tab.get('url'))
+          : this.tab.get('url')
         // TODO: Sometimes this tries to save in a non-existent directory
         this.webview.downloadURL(downloadLocation)
         break
@@ -522,7 +529,7 @@ class Frame extends ImmutableComponent {
         windowActions.setFindbarShown(this.frame, true)
         break
       case 'fill-password':
-        let currentUrl = urlParse(this.webview.getURL())
+        let currentUrl = urlParse(this.tab.get('url'))
         if (currentUrl &&
             [currentUrl.protocol, currentUrl.host].join('//') === this.props.activeShortcutDetails.get('origin')) {
           this.webview.send(messages.GOT_PASSWORD,
@@ -719,12 +726,6 @@ class Frame extends ImmutableComponent {
         })
       }
     })
-    this.webview.addEventListener('page-title-updated', ({title}) => {
-      if (this.frame.isEmpty()) {
-        return
-      }
-      windowActions.setFrameTitle(this.frame, title)
-    })
     this.webview.addEventListener('show-autofill-settings', (e) => {
       windowActions.newFrame({ location: 'about:autofill' }, true)
     })
@@ -836,7 +837,12 @@ class Frame extends ImmutableComponent {
       const isError = this.props.aboutDetails && this.props.aboutDetails.get('errorCode')
       if (!this.props.isPrivate && (protocol === 'http:' || protocol === 'https:') && !isError && savePage) {
         // Register the site for recent history for navigation bar
-        appActions.addSite(siteUtil.getDetailFromFrame(this.frame))
+        // calling with setTimeout is an ugly hack for a race condition
+        // with setTitle. We either need to delay this call until the title is
+        // or add a way to update it
+        setTimeout(() => {
+          appActions.addSite(siteUtil.getDetailFromFrame(this.frame))
+        }, 250)
       }
 
       if (url.startsWith(pdfjsOrigin)) {
@@ -878,7 +884,7 @@ class Frame extends ImmutableComponent {
         windowActions.loadUrl(this.frame, 'about:error')
         appActions.removeSite(siteUtil.getDetailFromFrame(this.frame))
       } else if (provisionLoadFailure) {
-        windowActions.setNavigated(this.webview.getURL(), this.props.frameKey, true, this.frame.get('tabId'))
+        windowActions.setNavigated(url, this.props.frameKey, true, this.frame.get('tabId'))
       }
     }
     this.webview.addEventListener('security-style-changed', (e) => {
@@ -931,13 +937,6 @@ class Frame extends ImmutableComponent {
       }
       // force temporary url display for tabnapping protection
       windowActions.setMouseInTitlebar(true)
-
-      // After navigating to the URL via back/forward buttons, set correct frame title
-      if (!e.isRendererInitiated) {
-        if (!this.frame.isEmpty() && this.props.tabData) {
-          windowActions.setFrameTitle(this.frame, this.props.tabData.get('title'))
-        }
-      }
     })
     this.webview.addEventListener('crashed', (e) => {
       if (this.frame.isEmpty()) {
@@ -954,7 +953,7 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('did-fail-provisional-load', (e) => {
       if (e.isMainFrame) {
         loadEnd(false, e.validatedURL)
-        loadFail(e, true, e.validatedURL)
+        loadFail(e, true, e.currentURL)
       }
     })
     this.webview.addEventListener('did-fail-load', (e) => {
@@ -964,8 +963,7 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('did-finish-load', (e) => {
-      // TODO: We can remove this.webview.getURL() once people are using newer electron
-      loadEnd(true, e.validatedURL || this.webview.getURL())
+      loadEnd(true, e.validatedURL)
       if (this.runInsecureContent()) {
         appActions.removeSiteSetting(this.origin, 'runInsecureContent', this.props.isPrivate)
       }

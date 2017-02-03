@@ -8,10 +8,12 @@ const { makeImmutable } = require('../common/state/immutableUtil')
 let currentWebContents = {}
 
 const cleanupWebContents = (tabId) => {
-  delete currentWebContents[tabId]
-  setImmediate(() => {
-    appActions.tabClosed({ tabId })
-  })
+  if (currentWebContents[tabId]) {
+    delete currentWebContents[tabId]
+    setImmediate(() => {
+      appActions.tabClosed({ tabId })
+    })
+  }
 }
 
 const getTabValue = function (tabId) {
@@ -79,6 +81,15 @@ const api = {
         hostWebContents.send(messages.SHORTCUT_NEW_FRAME, location, { frameOpts })
       }
     })
+
+    process.on('chrome-tabs-updated', (e, tabId) => {
+      updateTab(tabId)
+    })
+
+    process.on('chrome-tabs-removed', (e, tabId) => {
+      cleanupWebContents(tabId)
+    })
+
     app.on('web-contents-created', function (event, tab) {
       if (extensions.isBackgroundPage(tab) || !tab.isGuest()) {
         return
@@ -188,6 +199,20 @@ const api = {
 
   getWebContents: (tabId) => {
     return currentWebContents[tabId]
+  },
+
+  toggleDevTools: (state, action) => {
+    action = makeImmutable(action)
+    const tabId = action.get('tabId')
+    const tab = api.getWebContents(tabId)
+    if (tab && !tab.isDestroyed()) {
+      if (tab.isDevToolsOpened()) {
+        tab.closeDevTools()
+      } else {
+        tab.openDevTools()
+      }
+    }
+    return state
   },
 
   setAudioMuted: (state, action) => {

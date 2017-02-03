@@ -44,34 +44,34 @@ gpg --export --armor ${GPG_KEY} > ${KEY_FILE}
 aws s3 cp ${KEY_FILE} s3://${OPTION}/keys.asc
 aws s3api put-object-acl --acl public-read --bucket ${OPTION} --key ${KEY_NAME}
 
-for i in xenial jessie trusty
+for i in yakkety xenial jessie trusty
 	do aptly publish drop -force-drop $i s3:${OPTION}: || true
 done
 
-for i in xenial jessie trusty
+for i in yakkety xenial jessie trusty
 	do aptly repo drop -force ${i}-release || true
 done
 
-for i in xenial jessie trusty
+for i in yakkety xenial jessie trusty
 	do aptly snapshot drop -force ${i}-snapshot || true
 done
 
-for i in xenial jessie trusty
+for i in yakkety xenial jessie trusty
 	do aptly repo create -distribution=$i -component=main ${i}-release
 done
 
-for i in xenial jessie trusty
+for i in yakkety xenial jessie trusty
 	do aptly repo add ${i}-release dist/*.deb
 done
 
-for i in xenial jessie trusty
+for i in yakkety xenial jessie trusty
 	do aptly snapshot create ${i}-snapshot from repo ${i}-release
 done
 
-for i in xenial jessie trusty
+for i in yakkety xenial jessie trusty
 	do aptly repo edit ${i}-release
 done
 
-for i in xenial jessie trusty
+for i in yakkety xenial jessie trusty
 	do aptly publish snapshot -force-overwrite=true -passphrase=$PASSPHRASE -gpg-key=${GPG_KEY} ${i}-snapshot s3:${OPTION}:
 done

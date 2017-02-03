@@ -71,12 +71,12 @@ if (isDarwin) {
     setupIcon: 'res/brave_installer.ico',
     iconUrl: 'https://brave.com/favicon.ico',
     signWithParams: format('-a -fd sha256 -f "%s" -p "%s" -t http://timestamp.verisign.com/scripts/timstamp.dll', path.resolve(cert), certPassword),
+    noMsi: true,
     exe: 'Brave.exe'
   })
   resultPromise.then(() => {
     cmds = [
-      `mv ${outDir}/Setup.exe ${outDir}/BraveSetup-${arch}.exe`,
-      `mv ${outDir}/Setup.msi ${outDir}/BraveSetup-${arch}.msi`
+      `mv ${outDir}/Setup.exe ${outDir}/BraveSetup-${arch}.exe`
     ]
     execute(cmds, {}, console.log.bind(null, 'done'))
   }, (e) => console.log(`No dice: ${e.message}`))

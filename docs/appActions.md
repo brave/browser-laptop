@@ -638,6 +638,16 @@ Dispatches a message when text is updated to the clipboard
 
 
 
+### toggleDevTools(tabId) 
+
+Dispatches a message to toogle the dev tools on/off for the specified tabId
+
+**Parameters**
+
+**tabId**: `number`, The tabId
+
+
+
 ### tabCloned(tabId, options) 
 
 Dispatches a message when a tab is being cloned
