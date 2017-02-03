@@ -51,7 +51,7 @@ class NavigationBar extends ImmutableComponent {
     const key = siteUtil.getSiteKey(siteDetail)
 
     if (key !== null) {
-      siteDetail = siteDetail.set('parentFolderId', this.props.sites.getIn([key]).get('parentFolderId'))
+      siteDetail = siteDetail.set('parentFolderId', this.props.sites.getIn([key, 'parentFolderId']))
     }
     windowActions.setBookmarkDetail(siteDetail, siteDetail, null, editing, true)
   }
@@ -91,11 +91,7 @@ class NavigationBar extends ImmutableComponent {
 
   get bookmarked () {
     return this.props.activeFrameKey !== undefined &&
-      siteUtil.isSiteBookmarked(this.props.sites, Immutable.fromJS({
-        location: this.props.location,
-        partitionNumber: this.props.partitionNumber,
-        title: this.props.title
-      }))
+      siteUtil.isSiteBookmarked(this.props.sites, Immutable.fromJS({location: this.props.location}))
   }
 
   get titleMode () {
