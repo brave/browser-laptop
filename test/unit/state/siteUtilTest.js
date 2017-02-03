@@ -397,6 +397,45 @@ describe('siteUtil', function () {
         const expectedSites = sites
         assert.deepEqual(processedSites.getIn([0, 'lastAccessedTime']), expectedSites.getIn([0, 'lastAccessedTime']))
       })
+      it('move oldSiteDetail to new folder', function () {
+        const oldSiteDetail = Immutable.fromJS({
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1,
+          title: 'bookmarked site',
+          customTitle: 'old customTitle',
+          partitionNumber: 0,
+          parentFolderId: 0,
+          order: 0,
+          favicon: testFavicon1
+        })
+        const oldSiteKey = siteUtil.getSiteKey(oldSiteDetail)
+        const newSiteDetail = Immutable.fromJS({
+          lastAccessedTime: 456,
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1,
+          partitionNumber: 0,
+          parentFolderId: 1,
+          title: 'same entry also acts as history entry'
+        })
+        const expectedSiteDetail = Immutable.fromJS({
+          lastAccessedTime: newSiteDetail.get('lastAccessedTime'),
+          tags: newSiteDetail.get('tags').toJS(),
+          location: newSiteDetail.get('location'),
+          title: newSiteDetail.get('title'),
+          customTitle: oldSiteDetail.get('customTitle'),
+          partitionNumber: newSiteDetail.get('partitionNumber'),
+          parentFolderId: newSiteDetail.get('parentFolderId'),
+          order: oldSiteDetail.get('order'),
+          favicon: oldSiteDetail.get('favicon')
+        })
+        let sites = {}
+        sites[oldSiteKey] = oldSiteDetail.toJS()
+        const processedSites = siteUtil.addSite(Immutable.fromJS(sites), newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
+        const expectedSiteKey = siteUtil.getSiteKey(expectedSiteDetail)
+        let expectedSites = {}
+        expectedSites[expectedSiteKey] = expectedSiteDetail.set('objectId', undefined).toJS()
+        assert.deepEqual(processedSites.toJS(), expectedSites)
+      })
       it('sets an objectId when syncCallback is provided', function () {
         mockery.enable({
           warnOnReplace: false,
@@ -601,6 +640,163 @@ describe('siteUtil', function () {
   })
 
   describe('moveSite', function () {
+    describe('order test', function () {
+      const destinationDetail = {
+        location: testUrl1,
+        partitionNumber: 0,
+        parentFolderId: 0,
+        order: 0
+      }
+      const sourceDetail = {
+        location: testUrl2 + '4',
+        partitionNumber: 0,
+        parentFolderId: 0,
+        order: 3
+      }
+      const sites = {
+        'https://brave.com/|0|0': destinationDetail,
+        'http://example.com/0|0': {
+          location: testUrl2,
+          partitionNumber: 0,
+          parentFolderId: 0,
+          order: 1
+        },
+        'https://brave.com/3|0|0': {
+          location: testUrl1 + '3',
+          partitionNumber: 0,
+          parentFolderId: 0,
+          order: 2
+        },
+        'http://example.com/4|0|0': sourceDetail
+      }
+
+      it('prepend target', function () {
+        const expectedSites = {
+          'http://example.com/4|0|0': {
+            location: testUrl2 + '4',
+            partitionNumber: 0,
+            parentFolderId: 0,
+            order: 0
+          },
+          'https://brave.com/|0|0': {
+            location: testUrl1,
+            partitionNumber: 0,
+            parentFolderId: 0,
+            order: 1
+          },
+          'http://example.com/0|0': {
+            location: testUrl2,
+            partitionNumber: 0,
+            parentFolderId: 0,
+            order: 2
+          },
+          'https://brave.com/3|0|0': {
+            location: testUrl1 + '3',
+            partitionNumber: 0,
+            parentFolderId: 0,
+            order: 3
+          }
+        }
+        const processedSites = siteUtil.moveSite(Immutable.fromJS(sites),
+          Immutable.fromJS(sourceDetail),
+          Immutable.fromJS(destinationDetail), true, false, true)
+        assert.deepEqual(processedSites.toJS(), expectedSites)
+      })
+      it('not prepend target', function () {
+        const expectedSites = {
+          'http://example.com/4|0|0': {
+            location: testUrl2 + '4',
+            partitionNumber: 0,
+            parentFolderId: 0,
+            order: 1
+          },
+          'https://brave.com/|0|0': {
+            location: testUrl1,
+            partitionNumber: 0,
+            parentFolderId: 0,
+            order: 0
+          },
+          'http://example.com/0|0': {
+            location: testUrl2,
+            partitionNumber: 0,
+            parentFolderId: 0,
+            order: 2
+          },
+          'https://brave.com/3|0|0': {
+            location: testUrl1 + '3',
+            partitionNumber: 0,
+            parentFolderId: 0,
+            order: 3
+          }
+        }
+        const processedSites = siteUtil.moveSite(Immutable.fromJS(sites),
+          Immutable.fromJS(sourceDetail),
+          Immutable.fromJS(destinationDetail), false, false, true)
+        assert.deepEqual(processedSites.toJS(), expectedSites)
+      })
+    })
+    it('destination is parent', function () {
+      const sourceDetail = {
+        location: testUrl1,
+        partitionNumber: 0,
+        parentFolderId: 0,
+        order: 1
+      }
+      const destinationDetail = {
+        folderId: 1,
+        parentFolderId: 0,
+        order: 0,
+        tags: [siteTags.BOOKMARK_FOLDER]
+      }
+      const sites = {
+        1: destinationDetail,
+        'https://brave.com/|0|0': sourceDetail
+      }
+      const expectedSites = {
+        1: destinationDetail,
+        'https://brave.com/|0|1': {
+          location: testUrl1,
+          partitionNumber: 0,
+          parentFolderId: 1,
+          order: 1
+        }
+      }
+      const processedSites = siteUtil.moveSite(Immutable.fromJS(sites),
+        Immutable.fromJS(sourceDetail),
+        Immutable.fromJS(destinationDetail), false, true, false)
+      assert.deepEqual(processedSites.toJS(), expectedSites)
+    })
+    it('reparent', function () {
+      const sourceDetail = {
+        location: testUrl1,
+        partitionNumber: 0,
+        parentFolderId: 1,
+        order: 1
+      }
+      const destinationDetail = {
+        folderId: 1,
+        parentFolderId: 0,
+        order: 0,
+        tags: [siteTags.BOOKMARK_FOLDER]
+      }
+      const sites = {
+        1: destinationDetail,
+        'https://brave.com/|0|1': sourceDetail
+      }
+      const expectedSites = {
+        1: destinationDetail,
+        'https://brave.com/|0|0': {
+          location: testUrl1,
+          partitionNumber: 0,
+          parentFolderId: 0,
+          order: 1
+        }
+      }
+      const processedSites = siteUtil.moveSite(Immutable.fromJS(sites),
+        Immutable.fromJS(sourceDetail),
+        Immutable.fromJS(destinationDetail), false, false, false)
+      assert.deepEqual(processedSites.toJS(), expectedSites)
+    })
   })
 
   describe('updateSiteFavicon', function () {

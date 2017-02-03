@@ -75,7 +75,7 @@ module.exports.getSiteKey = function (siteDetail) {
 /**
  * Checks if a siteDetail has the specified tag
  *
- * @param sites The application state's Immutable sites list
+ * @param sites The application state's Immutable sites map
  * @param siteDetail The site to check if it's in the specified tag
  * @return true if the location is already bookmarked
  */
@@ -83,11 +83,17 @@ module.exports.isSiteBookmarked = function (sites, siteDetail) {
   if (!sites) {
     return false
   }
-  const key = module.exports.getSiteKey(siteDetail)
-  if (key === null) {
-    return false
+
+  const site = sites.find((site) =>
+    isBookmark(site.get('tags')) &&
+    site.get('location') === siteDetail.get('location') &&
+    (site.get('partitionNumber') || 0) === (siteDetail.get('partitionNumber') || 0)
+  )
+
+  if (site) {
+    return true
   }
-  return isBookmark(sites.getIn([key, 'tags']))
+  return false
 }
 
 const getNextFolderIdItem = (sites) =>
@@ -236,7 +242,11 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail, s
   }
 
   let site = mergeSiteDetails(oldSite, siteDetail, tag, folderId, sites.size)
-  const key = originalSiteKey || module.exports.getSiteKey(site)
+  if (oldSite) {
+    sites = sites.delete(oldKey)
+  }
+
+  const key = module.exports.getSiteKey(site)
   if (key === null) {
     return sites
   }
@@ -250,12 +260,12 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail, s
 /**
  * Removes the specified tag from a siteDetail
  *
- * @param {Immutable.Map} sites The application state's Immutable sites list
+ * @param {Immutable.Map} sites The application state's Immutable sites map
  * @param {Immutable.Map} siteDetail The siteDetail to remove a tag from
  * @param {string} tag
  * @param {boolean} reorder whether to reorder sites (default with reorder)
  * @param {Function=} syncCallback
- * @return {Immutable.Map}
+ * @return {Immutable.Map} The new sites Immutable object
  */
 module.exports.removeSite = function (sites, siteDetail, tag, reorder = true, syncCallback) {
   const key = module.exports.getSiteKey(siteDetail)
@@ -325,7 +335,7 @@ module.exports.isMoveAllowed = (sites, sourceDetail, destinationDetail) => {
 /**
  * Moves the specified site from one location to another
  *
- * @param sites The application state's Immutable sites list
+ * @param sites The application state's Immutable sites map
  * @param siteDetail The site detail to move
  * @param destinationDetail The site detail to move to
  * @param prepend Whether the destination detail should be prepended or not, not used if destinationIsParent is true
@@ -340,40 +350,40 @@ module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prep
     return sites
   }
 
-  let sourceKey = module.exports.getSiteKey(sourceDetail)
-  let destinationKey = module.exports.getSiteKey(destinationDetail)
+  const sourceKey = module.exports.getSiteKey(sourceDetail)
+  const destinationKey = module.exports.getSiteKey(destinationDetail)
 
   const sourceSiteIndex = sites.getIn([sourceKey, 'order'])
   let destinationSiteIndex
   if (destinationIsParent) {
     // When the destination is the parent we want to put it at the end
     destinationSiteIndex = sites.size - 1
-    prepend = false
+    prepend = true
   } else {
     destinationSiteIndex = sites.getIn([destinationKey, 'order'])
   }
 
-  let newIndex = destinationSiteIndex + (prepend ? 0 : 1)
+  const newIndex = destinationSiteIndex + (prepend ? 0 : 1)
   let sourceSite = sites.get(sourceKey)
-  let destinationSite = sites.get(destinationKey)
+  if (!sourceSite) {
+    return sites
+  }
+  const destinationSite = sites.get(destinationKey)
   sites = sites.delete(sourceKey)
   sites = sites.map((site) => {
     const siteOrder = site.get('order')
-    if (siteOrder > sourceSiteIndex) {
-      return site.set('order', siteOrder - 1)
+    if (siteOrder >= newIndex && siteOrder < sourceSiteIndex) {
+      return site.set('order', siteOrder + 1)
     }
     return site
   })
-  if (newIndex > sourceSiteIndex) {
-    newIndex--
-  }
   sourceSite = sourceSite.set('order', newIndex)
 
   if (!disallowReparent) {
     if (destinationIsParent && destinationDetail.get('folderId') !== sourceSite.get('folderId')) {
       sourceSite = sourceSite.set('parentFolderId', destinationDetail.get('folderId'))
     } else if (!destinationSite.get('parentFolderId')) {
-      sourceSite = sourceSite.delete('parentFolderId')
+      sourceSite = sourceSite.set('parentFolderId', 0)
     } else if (destinationSite.get('parentFolderId') !== sourceSite.get('parentFolderId')) {
       sourceSite = sourceSite.set('parentFolderId', destinationSite.get('parentFolderId'))
     }
@@ -381,8 +391,7 @@ module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prep
   if (getSetting(settings.SYNC_ENABLED) === true && syncCallback) {
     syncCallback(sourceSite)
   }
-  sourceKey = module.exports.getSiteKey(sourceSite)
-  return sites.set(sourceKey, sourceSite)
+  return sites.set(module.exports.getSiteKey(sourceSite), sourceSite)
 }
 
 module.exports.getDetailFromFrame = function (frame, tag) {

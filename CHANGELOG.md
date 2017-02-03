@@ -1,7 +1,25 @@
 # Changelog
 
 ## [0.13.2](https://github.com/brave/browser-laptop/releases/v0.13.2dev)
-- TODO
+- Added a way to keep tabs the same size when closing instead of resizing. ([#6088](https://github.com/brave/browser-laptop/issues/6088))
+- Added import recovery keys feature for Brave Wallet. ([#4806](https://github.com/brave/browser-laptop/issues/4806))
+- Added HTTP auth (login) dialogs which now have a cancel button. ([#6855](https://github.com/brave/browser-laptop/issues/6855))
+- Added file open with drag-and-drop. ([#3819](https://github.com/brave/browser-laptop/issues/3819))
+- Added keyboard selection for autocomplete.  ([#1302](https://github.com/brave/browser-laptop/issues/1302))
+- Added performance improvements (particularly startup time and bookmarks import). ([#6833](https://github.com/brave/browser-laptop/issues/6833))([#4879](https://github.com/brave/browser-laptop/issues/4879))
+- Fixed spellcheck on Linux. ([#7015](https://github.com/brave/browser-laptop/issues/7015))([#6967](https://github.com/brave/browser-laptop/issues/6967))
+- Fixed Command+Click to open a new tab next to the parent tab. ([#6971](https://github.com/brave/browser-laptop/issues/6971))
+- Fixed various UI issues. ([#6812](https://github.com/brave/browser-laptop/issues/6812))([#6806](https://github.com/brave/browser-laptop/issues/6806))([#6867](https://github.com/brave/browser-laptop/issues/6867))([#6754](https://github.com/brave/browser-laptop/issues/6754))([#5494](https://github.com/brave/browser-laptop/issues/5494))
+- Fixed various ledger issues. ([#6966](https://github.com/brave/browser-laptop/issues/6966))([#6592](https://github.com/brave/browser-laptop/issues/6592))([#6878](https://github.com/brave/browser-laptop/issues/6878))([#6685](https://github.com/brave/browser-laptop/issues/6685))([#6941](https://github.com/brave/browser-laptop/issues/6941))
+- Fixed multiple home page URLs which stopped working - "Your file was not found". ([#6913](https://github.com/brave/browser-laptop/issues/6913))
+- Fixed lesechos.fr anti-ad blocking behavior. ([#6879](https://github.com/brave/browser-laptop/issues/6879))
+- Fixed tab title display when reloading the page. ([#5738](https://github.com/brave/browser-laptop/issues/5738))
+- Fixed autofill suggestion not being dismissed when tabs are switched. ([#6820](https://github.com/brave/browser-laptop/issues/6820))
+- Fixed change language to require restart similar to other pref settings. ([#6782](https://github.com/brave/browser-laptop/issues/6782))
+- Fixed bookmark hanger items alignment & text blur. ([#6777](https://github.com/brave/browser-laptop/issues/6777))
+- Fixed bookmark listing to make it more clickable for adding/editing a bookmark. ([#6704](https://github.com/brave/browser-laptop/issues/6704))
+- Fixed apt repository not working for Ubuntu yakkety. ([#6643](https://github.com/brave/browser-laptop/issues/6643))
+- Upgrade to muon 2.0.19 ([#7003](https://github.com/brave/browser-laptop/issues/7003))
 
 ## [0.13.1](https://github.com/brave/browser-laptop/releases/v0.13.1dev)
 - Fixed Widevine not working on Windows (Netflix). ([#6948](https://github.com/brave/browser-laptop/issues/6948))
