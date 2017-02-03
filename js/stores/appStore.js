@@ -493,7 +493,7 @@ const handleAppAction = (action) => {
         if (!action.siteDetail.get('folderId') && siteUtil.isFolder(action.siteDetail)) {
           action.siteDetail = action.siteDetail.set('folderId', siteUtil.getNextFolderId(sites))
         }
-        appState = appState.set('sites', siteUtil.addSite(sites, action.siteDetail, action.tag))
+        appState = appState.set('sites', siteUtil.addSite(sites, action.siteDetail, action.tag, action.originalSiteDetail))
       }
       if (action.destinationDetail) {
         appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'),
