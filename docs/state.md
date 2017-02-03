@@ -151,11 +151,16 @@ AppStore
   settings: {
     // See defaults in js/constants/appConfig.js
     'adblock.customRules': string, // custom rules in ABP filter syntax
+    'advanced.auto-suggest-sites': boolean, // show auto suggestion
     'advanced.default-zoom-level': number, // the default zoom level for sites that have no specific setting
     'advanced.hardware-acceleration-enabled': boolean, // false if hardware acceleration should be explicitly disabled
     'advanced.hide-excluded-sites': boolean, // whether to hide excluded sites in the payments list
+    'advanced.minimum-visit-time': number,
+    'advanced.minimum-visits': number,
+    'advanced.minimum-percentage': boolean,
     'advanced.pdfjs-enabled': boolean, // whether or not to render PDF documents in the browser
     'advanced.send-crash-reports': boolean, // true or undefined if crash reports should be sent
+    'advanced.send-usage-statistics': boolean, // true or undefined if usage reports should be sent
     'advanced.smooth-scroll-enabled': boolean, // false if smooth scrolling should be explicitly disabled
     'advanced.torrent-viewer-enabled': boolean, // whether to render magnet links in the browser
     'bookmarks.toolbar.show': boolean, // true if the bookmakrs toolbar should be shown
@@ -163,6 +168,7 @@ AppStore
     'bookmarks.toolbar.showOnlyFavicon': boolean, // true if only favicons should be shown on the bookmarks toolbar
     'extensions.pocket.enabled': boolean, // true if pocket is enabled
     'general.autohide-menu': boolean, // true if the Windows menu should be autohidden
+    'general.bookmarks-toolbar-mode': boolean, // true to show bookmakrs toolbar
     'general.check-default-on-startup': boolean, // true to check whether brave is default browser on startup
     'general.disable-title-mode': boolean, // true if title mode should always be disabled
     'general.downloads.default-save-path': string, // default path for saving files
@@ -173,8 +179,12 @@ AppStore
     'general.show-home-button': boolean, // true if the home button should be shown
     'general.startup-mode': string, // one of: lastTime, homePage, newTabPage
     'general.useragent.value': (undefined|string), // custom user agent value
+    'notification-add-funds-timestamp': number, // timestamp on which we decide if we will show notification Add founds
+    'notification-reconcile-soon-timestamp': number, // timestamp
     'payments.contribution-amount': number, // in USD
     'payments.enabled': boolean, // true if the Payments pane is active
+    'payments.notifications': boolean, // true to show payment notifications
+    'payments.notificationTryPaymentsDismissed': boolean, // true if you dismiss the message or enable Payments
     'privacy.autocomplete.history-size': number, // number of autocomplete entries to keep
     'privacy.autofill-enabled': boolean, // true to enable autofill
     'privacy.block-canvas-fingerprinting': boolean, // canvas fingerprinting defense
@@ -184,18 +194,25 @@ AppStore
     'privacy.opened-tab-suggestions': boolean, // auto suggest for opened tabs enabled
     'search.default-search-engine': string, // name of search engine, from js/data/searchProviders.js
     'search.offer-search-suggestions': boolean, // true if suggestions should be offered from the default search engine when available.
+    'security.flash.installed': boolean,
+    'security.passwords.active-password-manager': string, // name of active password manager
     'security.passwords.dashlane-enabled': boolean, // true if the Dashlane extension should be enabled
     'security.passwords.enpass-enabled': boolean, // true if the Enpass extension should be enabled
+    'security.passwords.last-pass-enabled': boolean, // true if the Last password extension should be enabled
     'security.passwords.manager-enabled': boolean, // whether to use default password manager
     'security.passwords.one-password-enabled': boolean, // true if the 1Password extension should be enabled
     'shutdown.clear-all-site-cookies': boolean, // true to clear all site cookies on shutdown
+    'shutdown.clear-autocomplete-data': boolean, // true to clear all autocomplete data on shutdown
+    'shutdown.clear-autofill-data': boolean, // true to clear all autofill data on shutdown
     'shutdown.clear-cache': boolean, // true to clear cache on shutdown
     'shutdown.clear-downloads': boolean, // true to clear downloads on shutdown
     'shutdown.clear-history': boolean, // true to clear history on shutdown
+    'shutdown.clear-site-settings': boolean, // true to clear site settings on shutdown
+    'tabs.close-action': string, // one of: parent, lastActive, next
     'tabs.paint-tabs': boolean, // true if the page theme color and favicon color should be used for tabs
     'tabs.show-tab-previews': boolean, // true to show tab previews
     'tabs.switch-to-new-tabs': boolean, // true if newly opened tabs should be focused immediately
-    'tabs.tabs-per-page': number, // number of tabs per tab page    
+    'tabs.tabs-per-page': number // number of tabs per tab page    
   },
   sites: {
     [siteKey]: {
