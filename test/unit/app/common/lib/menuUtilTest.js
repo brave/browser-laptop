@@ -285,5 +285,11 @@ describe('menuUtil tests', function () {
       const expectedResult = []
       assert.deepEqual(result, expectedResult)
     })
+    it('supports empty arrays', function () {
+      const template = []
+      const result = menuUtil.sanitizeTemplateItems(template)
+      const expectedResult = []
+      assert.deepEqual(result, expectedResult)
+    })
   })
 })
