@@ -2,9 +2,10 @@
 
 ## [0.13.2](https://github.com/brave/browser-laptop/releases/v0.13.2dev)
 - Add muon and vault-updater support for Enpass. ([#6906](https://github.com/brave/browser-laptop/issues/6906))
+- Added import recovery keys feature for Brave Wallet. ([#4806](https://github.com/brave/browser-laptop/issues/4806))
 - Fixed spellcheck on Linux. ([#7015](https://github.com/brave/browser-laptop/issues/7015))([#6967](https://github.com/brave/browser-laptop/issues/6967))
 - Fixed Command+Click to open a new tab. ([#6971](https://github.com/brave/browser-laptop/issues/6971))
-- Fixed various UI issues. ([#6812](https://github.com/brave/browser-laptop/issues/6812))([#6806](https://github.com/brave/browser-laptop/issues/6806))([#6867](https://github.com/brave/browser-laptop/issues/6867))([#6754](https://github.com/brave/browser-laptop/issues/6754))
+- Fixed various UI issues. ([#6812](https://github.com/brave/browser-laptop/issues/6812))([#6806](https://github.com/brave/browser-laptop/issues/6806))([#6867](https://github.com/brave/browser-laptop/issues/6867))([#6754](https://github.com/brave/browser-laptop/issues/6754))([#5494](https://github.com/brave/browser-laptop/issues/5494))
 - Fixed various ledger issues. ([#6966](https://github.com/brave/browser-laptop/issues/6966))([#6592](https://github.com/brave/browser-laptop/issues/6592))([#6878](https://github.com/brave/browser-laptop/issues/6878))([#6833](https://github.com/brave/browser-laptop/issues/6833))([#6685](https://github.com/brave/browser-laptop/issues/6685))([#6941](https://github.com/brave/browser-laptop/issues/6941))
 - Fixed multiple home page URLs which stopped working - "Your file was not found". ([#6913](https://github.com/brave/browser-laptop/issues/6913))
 - Fixed lesechos.fr anti-ad blocking behavior. ([#6879](https://github.com/brave/browser-laptop/issues/6879))
