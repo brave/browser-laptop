@@ -1,7 +1,20 @@
 # Changelog
 
 ## [0.13.2](https://github.com/brave/browser-laptop/releases/v0.13.2dev)
-- TODO
+- Add muon and vault-updater support for Enpass. ([#6906](https://github.com/brave/browser-laptop/issues/6906))
+- Fixed spellcheck on Linux. ([#7015](https://github.com/brave/browser-laptop/issues/7015))([#6967](https://github.com/brave/browser-laptop/issues/6967))
+- Fixed Command+Click to open a new tab. ([#6971](https://github.com/brave/browser-laptop/issues/6971))
+- Fixed various UI issues. ([#6812](https://github.com/brave/browser-laptop/issues/6812))([#6806](https://github.com/brave/browser-laptop/issues/6806))([#6867](https://github.com/brave/browser-laptop/issues/6867))([#6754](https://github.com/brave/browser-laptop/issues/6754))
+- Fixed various ledger issues. ([#6966](https://github.com/brave/browser-laptop/issues/6966))([#6592](https://github.com/brave/browser-laptop/issues/6592))([#6878](https://github.com/brave/browser-laptop/issues/6878))([#6833](https://github.com/brave/browser-laptop/issues/6833))([#6685](https://github.com/brave/browser-laptop/issues/6685))([#6941](https://github.com/brave/browser-laptop/issues/6941))
+- Fixed multiple home page URLs which stopped working - "Your file was not found". ([#6913](https://github.com/brave/browser-laptop/issues/6913))
+- Fixed lesechos.fr anti-ad blocking behavior. ([#6879](https://github.com/brave/browser-laptop/issues/6879))
+- Fixed HTTP auth (login) dialogs which had no cancel button. ([#6855](https://github.com/brave/browser-laptop/issues/6855))
+- Fixed autofill suggestion not being dismissed when tabs are switched. ([#6820](https://github.com/brave/browser-laptop/issues/6820))
+- Fixed change language to require restart similar to other pref settings. ([#6782](https://github.com/brave/browser-laptop/issues/6782))
+- Fixed bookmark hanger items alignment & text blur. ([#6777](https://github.com/brave/browser-laptop/issues/6777))
+- Fixed bookmark listing to make it more clickable for adding/editing a bookmark. ([#6704](https://github.com/brave/browser-laptop/issues/6704))
+- Fixed apt repository not working for ubuntu yakkety. ([#6643](https://github.com/brave/browser-laptop/issues/6643))
+- Upgrade to muon 2.0.19 ([#7003](https://github.com/brave/browser-laptop/issues/7003))
 
 ## [0.13.1](https://github.com/brave/browser-laptop/releases/v0.13.1dev)
 - Fixed Widevine not working on Windows (Netflix). ([#6948](https://github.com/brave/browser-laptop/issues/6948))
