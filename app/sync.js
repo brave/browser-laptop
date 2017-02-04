@@ -81,7 +81,7 @@ const validateAction = (action) => {
   // If the action requires an item, validate the item.
   if (SYNC_ACTIONS_WITHOUT_ITEMS.includes(action.actionType) !== true) {
     if (!action.item || !action.item.toJS) {
-      log(`Missing item! ${action.item.toJS()}`)
+      log('Missing item!')
       return false
     }
     // Only accept items who have an objectId set already
@@ -236,12 +236,6 @@ module.exports.onSyncReady = (isFirstRun, e) => {
     if (!records || !records.length) {
       return
     }
-    const getSortValue = (record) => {
-      if (record.objectData === 'bookmark') {
-        return record.bookmark.index || 0
-      } else { return 0 }
-    }
-    records.sort((a, b) => getSortValue(a) - getSortValue(b))
     syncUtil.applySyncRecords(records)
   })
   // Periodically poll for new records

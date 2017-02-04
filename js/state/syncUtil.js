@@ -42,7 +42,7 @@ const siteSettingDefaults = {
 
 // Whitelist of valid browser-laptop site fields. In browser-laptop, site
 // is used for both bookmarks and history sites.
-const SITE_FIELDS = ['objectId', 'location', 'title', 'customTitle', 'tags', 'favicon', 'themeColor', 'lastAccessedTime', 'creationTime', 'partitionNumber', 'parentFolderId']
+const SITE_FIELDS = ['objectId', 'location', 'title', 'customTitle', 'tags', 'favicon', 'themeColor', 'lastAccessedTime', 'creationTime', 'partitionNumber', 'folderId', 'parentFolderId']
 
 const pickFields = (object, fields) => {
   return fields.reduce((a, x) => {
@@ -63,18 +63,32 @@ const applySiteRecord = (record) => {
   const category = CATEGORY_MAP[record.objectData].categoryName
   const existingObject = this.getObjectById(objectId, category)
   const existingObjectData = existingObject && existingObject[1]
+  let tag
 
-  let siteProps = Object.assign({}, record.historySite, record.bookmark, record.bookmark && record.bookmark.site, {objectId})
-  const isFolder = (typeof siteProps.isFolder === 'boolean')
-    ? siteProps.isFolder
-    : (existingObjectData && existingObjectData.get('folderId'))
-  const tag = isFolder
-    ? siteTags.BOOKMARK_FOLDER
-    : siteTags.BOOKMARK
-  const parentFolderObjectId = siteProps.parentFolderObjectId
-  if (parentFolderObjectId && parentFolderObjectId.length > 0) {
-    siteProps.parentFolderId =
-      getFolderIdByObjectId(new Immutable.List(parentFolderObjectId))
+  let siteProps = Object.assign(
+    {},
+    existingObjectData && existingObjectData.toJS(),
+    record.historySite,
+    record.bookmark,
+    record.bookmark && record.bookmark.site,
+    {objectId}
+  )
+  if (record.objectData === 'bookmark') {
+    const existingFolderId = existingObjectData && existingObjectData.get('folderId')
+    if (existingFolderId) {
+      siteProps.folderId = existingFolderId
+    }
+    const isFolder = (typeof siteProps.isFolder === 'boolean')
+      ? siteProps.isFolder
+      : !!existingFolderId
+    tag = isFolder
+      ? siteTags.BOOKMARK_FOLDER
+      : siteTags.BOOKMARK
+    const parentFolderObjectId = siteProps.parentFolderObjectId
+    if (parentFolderObjectId && parentFolderObjectId.length > 0) {
+      siteProps.parentFolderId =
+        getFolderIdByObjectId(new Immutable.List(parentFolderObjectId))
+    }
   }
   const siteDetail = new Immutable.Map(pickFields(siteProps, SITE_FIELDS))
 
