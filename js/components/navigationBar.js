@@ -52,6 +52,7 @@ class NavigationBar extends ImmutableComponent {
 
     if (key !== null) {
       siteDetail = siteDetail.set('parentFolderId', this.props.sites.getIn([key, 'parentFolderId']))
+      siteDetail = siteDetail.set('customTitle', this.props.sites.getIn([key, 'customTitle']))
     }
     windowActions.setBookmarkDetail(siteDetail, siteDetail, null, editing, true)
   }
