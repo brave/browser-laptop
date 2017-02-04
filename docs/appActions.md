@@ -628,6 +628,18 @@ Dispatches a message when a download is being redownloaded
 
 
 
+### showDownloadDeleteConfirmation() 
+
+Shows delete confirmation bar in download item panel
+
+
+
+### hideDownloadDeleteConfirmation() 
+
+Hides delete confirmation bar in download item panel
+
+
+
 ### clipboardTextCopied(text) 
 
 Dispatches a message when text is updated to the clipboard

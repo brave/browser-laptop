@@ -37,6 +37,7 @@ class DownloadsBar extends ImmutableComponent {
             .map((download, downloadId) =>
               <DownloadItem download={download}
                 windowWidth={this.props.windowWidth}
+                deleteConfirmationVisible={this.props.deleteConfirmationVisible}
                 downloadId={downloadId}
                 downloadsSize={this.props.downloads.size} />)
         }

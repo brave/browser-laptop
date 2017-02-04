@@ -21,6 +21,8 @@ class DownloadItem extends ImmutableComponent {
     this.onResumeDownload = this.onDownloadActionPerformed.bind(this, RESUME)
     this.onCancelDownload = this.onDownloadActionPerformed.bind(this, CANCEL)
     this.onClearDownload = this.onClearDownload.bind(this)
+    this.onShowDeleteConfirmation = this.onShowDeleteConfirmation.bind(this)
+    this.onHideDeleteConfirmation = this.onHideDeleteConfirmation.bind(this)
     this.onDeleteDownload = this.onDeleteDownload.bind(this)
     this.onRedownload = this.onRedownload.bind(this)
     this.onCopyLinkToClipboard = this.onCopyLinkToClipboard.bind(this)
@@ -34,7 +36,14 @@ class DownloadItem extends ImmutableComponent {
   onClearDownload () {
     appActions.downloadCleared(this.props.downloadId)
   }
+  onShowDeleteConfirmation () {
+    appActions.showDownloadDeleteConfirmation()
+  }
+  onHideDeleteConfirmation () {
+    appActions.hideDownloadDeleteConfirmation()
+  }
   onDeleteDownload () {
+    appActions.hideDownloadDeleteConfirmation()
     appActions.downloadDeleted(this.props.downloadId)
   }
   onDownloadActionPerformed (downloadAction) {
@@ -74,10 +83,17 @@ class DownloadItem extends ImmutableComponent {
     return <span
       onContextMenu={contextMenus.onDownloadsToolbarContextMenu.bind(null, this.props.downloadId, this.props.download)}
       onDoubleClick={this.onOpenDownload}
+      onMouseLeave={this.onHideDeleteConfirmation}
       className={cx({
         downloadItem: true,
+        deleteConfirmationVisible: this.props.deleteConfirmationVisible,
         [this.props.download.get('state')]: true
       })}>
+      {
+        this.props.deleteConfirmationVisible
+        ? <div className='deleteConfirmation'>Delete?<Button l10nId='ok' className='primaryButton confirmDeleteButton' onClick={this.onDeleteDownload} /></div>
+        : null
+      }
       <div className='downloadActions'>
         {
           downloadUtil.shouldAllowPause(this.props.download)
@@ -111,7 +127,7 @@ class DownloadItem extends ImmutableComponent {
         }
         {
           downloadUtil.shouldAllowDelete(this.props.download)
-          ? <Button className='deleteButton' l10nId='downloadDelete' iconClass='fa-trash-o' onClick={this.onDeleteDownload} />
+          ? <Button className='deleteButton' l10nId='downloadDelete' iconClass='fa-trash-o' onClick={this.onShowDeleteConfirmation} />
           : null
         }
         {
