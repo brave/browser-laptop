@@ -9,6 +9,8 @@ const winUpdateHost = process.env.BRAVE_WIN_UPDATE_HOST || 'https://brave-downlo
 const crashURL = process.env.BRAVE_CRASH_URL || 'https://brave-laptop-updates.herokuapp.com/1/crashes'
 const adHost = process.env.AD_HOST || 'https://oip.brave.com'
 
+const {fullscreenOption} = require('../../app/common/constants/settingsEnums')
+
 module.exports = {
   name: 'Brave',
   contactUrl: 'mailto:support+laptop@brave.com',
@@ -143,6 +145,7 @@ module.exports = {
     'security.passwords.dashlane-enabled': false,
     'security.passwords.last-pass-enabled': false,
     'security.passwords.enpass-enabled': false,
+    'security.fullscreen.content': fullscreenOption.ALWAYS_ASK,
     'security.flash.installed': false,
     'general.downloads.default-save-path': null,
     'general.disable-title-mode': process.platform === 'linux',
