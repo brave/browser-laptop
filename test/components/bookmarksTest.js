@@ -41,6 +41,22 @@ describe('bookmark tests', function () {
           .waitForExist('#bookmarkLocation input')
           .waitForBookmarkDetail(this.page1Url, 'Page 1')
       })
+      it('add custom title', function * () {
+        yield this.app.client
+          .waitForExist('#bookmarkName input')
+          .waitForBookmarkDetail(this.page1Url, 'Page 1')
+          .setValue('#bookmarkName input', 'Custom Page 1')
+          .waitForEnabled(doneButton)
+          .click(doneButton)
+      })
+      it('check custom title', function * () {
+        yield this.app.client
+          .activateURLMode()
+          .waitForVisible(navigatorBookmarked)
+          .click(navigatorBookmarked)
+          .waitForVisible(doneButton)
+          .getValue('#bookmarkName input').should.eventually.be.equal('Custom Page 1')
+      })
     })
 
     describe('pages with title', function () {
