@@ -60,7 +60,7 @@ class MenubarItem extends ImmutableComponent {
     }
     // Otherwise, mark item as selected and show its context menu
     windowActions.setMenuBarSelectedIndex(this.props.index)
-    windowActions.setContextMenuSelectedIndex([0])
+    windowActions.setContextMenuSelectedIndex()
     const rect = e.target.getBoundingClientRect()
     showContextMenu(rect, this.props.submenu, this.props.lastFocusedSelector)
   }
