@@ -22,6 +22,7 @@ const settings = {
   // Tabs tab
   SWITCH_TO_NEW_TABS: 'tabs.switch-to-new-tabs',
   TAB_CLOSE_ACTION: 'tabs.close-action',
+  NEW_TAB_POSITION: 'tabs.new-tab-position',
   PAINT_TABS: 'tabs.paint-tabs',
   TABS_PER_PAGE: 'tabs.tabs-per-page',
   SHOW_TAB_PREVIEWS: 'tabs.show-tab-previews',

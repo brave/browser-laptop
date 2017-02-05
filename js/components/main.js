@@ -353,6 +353,7 @@ class Main extends ImmutableComponent {
       if (options.partitionNumber !== undefined) {
         frameOpts.partitionNumber = options.partitionNumber
       }
+
       windowActions.newFrame(frameOpts, openInForeground)
     })
 
