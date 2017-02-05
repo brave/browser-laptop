@@ -403,12 +403,12 @@ class Frame extends ImmutableComponent {
     windowActions.setFrameTitle(this.frame, title)
   }
 
-  componentDidUpdate (prevProps, prevState) {
-    if (this.props.tabData) {
-      if (!prevProps.tabData ||
-            prevProps.tabData.get('title') !== this.props.tabData.get('title')) {
-        this.setTitle(this.props.tabData.get('title'))
-      }
+  componentDidUpdate (prevProps) {
+    // TODO: This title should be set in app/browser/tabs.js and then we should use the
+    // app state for the tabData everywhere and remove windowState's title completely.
+    if (this.props.tabData && this.frame &&
+        this.props.tabData.get('title') !== this.frame.get('title')) {
+      this.setTitle(this.props.tabData.get('title'))
     }
 
     const cb = () => {
