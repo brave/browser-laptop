@@ -11,6 +11,7 @@
   --bookmark-item-chevron-margin: 4px;
   --bookmark-item-font-size: 16px;
   --bookmarks-toolbar-padding: 10px;
+  --bookmark-item-show-only-favicon-max-width: 24px;
 }
 
 .bookmarksToolbar {
@@ -80,6 +81,7 @@
     &.showOnlyFavicon {
       padding: 2px 4px;
       margin: auto 0px;
+      max-width: var(--bookmark-item-show-only-favicon-max-width);
 
       .bookmarkFavicon, .bookmarkFile {
         &:not(.bookmarkFolder) {
@@ -131,11 +133,18 @@
   }
 
   .overflowIndicator {
-    padding-left: 6px;
-    padding-right: 11px;
+    padding-right: 3px;
     margin-left: auto;
     margin-right: 0;
     margin-bottom: auto;
     margin-top: auto;
+    display: flex;
+    flex-grow: 0.1;
+    justify-content: flex-end;
+  }
+
+  .showOnlyFavicon + .overflowIndicator {
+    // If we're seeing only favicons, add an extra gutter for our » arrow
+    padding-right: 12px;
   }
 }
