@@ -116,7 +116,9 @@ class Menubar extends ImmutableComponent {
     const template = this.props.template
     const contextMenuIndex = this.props.contextMenuSelectedIndex
 
-    if (!template) return
+    if (!template || !template.get(selectedIndex)) {
+      return
+    }
 
     switch (e.which) {
       case keyCodes.LEFT:
@@ -158,7 +160,6 @@ class Menubar extends ImmutableComponent {
       case keyCodes.ENTER:
         e.preventDefault()
         if (contextMenuIndex === null &&
-            template.get(selectedIndex) &&
             template.get(selectedIndex).has('submenu')) {
           e.stopPropagation()
           windowActions.setContextMenuSelectedIndex([0])
