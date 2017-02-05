@@ -157,7 +157,9 @@ class Menubar extends ImmutableComponent {
       case keyCodes.DOWN:
       case keyCodes.ENTER:
         e.preventDefault()
-        if (contextMenuIndex === null && template.get(selectedIndex).has('submenu')) {
+        if (contextMenuIndex === null &&
+            template.get(selectedIndex) &&
+            template.get(selectedIndex).has('submenu')) {
           e.stopPropagation()
           windowActions.setContextMenuSelectedIndex([0])
           showContextMenu(this.getMenubarItemBounds(selectedIndex), template.get(selectedIndex).get('submenu').toJS(), this.props.lastFocusedSelector)
