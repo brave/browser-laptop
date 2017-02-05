@@ -567,8 +567,10 @@ WindowStore
   tabs: [{
     audioMuted: boolean, // frame is muted
     audioPlaybackActive: boolean, // frame is playing audio
+    breakpoint: string, // breakpoint name for current tab size, specified in app/renderer/components/styles/tab.js
     computedThemeColor: string, // CSS computed theme color from the favicon
     frameKey: number,
+    hoverState: boolean, // wheter or not tab is being hovered
     icon: string, // favicon url
     isPrivate: boolean, // private browsing tab
     loading: boolean,

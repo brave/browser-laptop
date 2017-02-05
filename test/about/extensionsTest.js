@@ -15,7 +15,7 @@ describe('about:extensions', function () {
       .waitForBrowserWindow()
       .waitForVisible(urlInput)
       .windowByUrl(Brave.browserWindowUrl)
-      .waitForExist('.tab[data-frame-key="1"]')
+      .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
       .tabByIndex(0)
       .url(aboutExtensionsUrl)
   }

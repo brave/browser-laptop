@@ -42,3 +42,8 @@ module.exports.isWindows = () => {
   return process.platform === 'win32' ||
     navigator.platform === 'Win32'
 }
+
+module.exports.isLinux = () => {
+  return !module.exports.isDarwin() &&
+    !module.exports.isWindows()
+}

@@ -55,7 +55,7 @@ describe('frame tests', function () {
           .click('#name')
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
-          .waitForExist('.tab[data-frame-key="2"]')
+          .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
         yield this.app.client
           .ipcSend('shortcut-set-active-frame-by-index', 0)
           .windowByUrl(Brave.browserWindowUrl)
@@ -64,9 +64,9 @@ describe('frame tests', function () {
       })
 
       it('inserts after the tab to clone', function * () {
-        this.tab1 = '.tabArea:nth-child(1) .tab[data-frame-key="1"]'
-        this.tab2 = '.tabArea:nth-child(2) .tab[data-frame-key="3"]'
-        this.tab3 = '.tabArea:nth-child(3) .tab[data-frame-key="2"]'
+        this.tab1 = '.tabArea:nth-child(1) [data-test-id="tab"][data-frame-key="1"]'
+        this.tab2 = '.tabArea:nth-child(2) [data-test-id="tab"][data-frame-key="3"]'
+        this.tab3 = '.tabArea:nth-child(3) [data-test-id="tab"][data-frame-key="2"]'
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
           .waitForExist(this.tab1)
@@ -185,7 +185,7 @@ describe('frame tests', function () {
         .tabByIndex(0)
         .loadUrl(this.url)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist('.tab[data-frame-key="1"]')
+        .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
         .waitForExist(this.webview1)
     })
 
@@ -214,7 +214,7 @@ describe('frame tests', function () {
       yield setup(this.app.client)
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist('.tab[data-frame-key="1"]')
+        .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
     })
 
     it('loads an image', function * () {

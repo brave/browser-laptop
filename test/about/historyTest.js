@@ -23,7 +23,7 @@ describe('about:history', function () {
       .addSite({ location: 'https://brave.com/test', customTitle: 'customTest' })
       .addSite({ location: 'https://www.youtube.com' })
       .addSite({ location: 'https://www.facebook.com' })
-      .waitForExist('.tab[data-frame-key="1"]')
+      .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
       .tabByIndex(0)
       .url(aboutHistoryUrl)
   }
@@ -35,7 +35,7 @@ describe('about:history', function () {
         location: site,
         title: 'Page 1'
       })
-      .waitForExist('.tab[data-frame-key="1"]')
+      .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
       .tabByIndex(0)
       .url(aboutHistoryUrl)
   }

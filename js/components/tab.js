@@ -5,6 +5,7 @@
 const React = require('react')
 
 const ImmutableComponent = require('./immutableComponent')
+const {StyleSheet, css} = require('aphrodite')
 
 const windowActions = require('../actions/windowActions')
 const locale = require('../l10n')
@@ -18,14 +19,20 @@ const contextMenus = require('../contextMenus')
 const dnd = require('../dnd')
 const windowStore = require('../stores/windowStore')
 const ipc = require('electron').ipcRenderer
+const throttle = require('../lib/throttle')
 
-const {TabIcon, AudioTabIcon} = require('../../app/renderer/components/tabIcon')
+const styles = require('../../app/renderer/components/styles/tab')
+const {Favicon, AudioTabIcon, NewSessionIcon,
+      PrivateIcon, TabTitle, CloseTabIcon} = require('../../app/renderer/components/tabContent')
+const {getTabBreakpoint, tabUpdateFrameRate} = require('../../app/renderer/lib/tabUtil')
+const {isWindows} = require('../../app/common/lib/platformUtil')
 
 class Tab extends ImmutableComponent {
   constructor () {
     super()
     this.onMouseEnter = this.onMouseEnter.bind(this)
     this.onMouseLeave = this.onMouseLeave.bind(this)
+    this.onUpdateTabSize = this.onUpdateTabSize.bind(this)
   }
   get frame () {
     return windowStore.getFrame(this.props.tab.get('frameKey'))
@@ -125,8 +132,11 @@ class Tab extends ImmutableComponent {
   }
 
   onMouseLeave () {
-    window.clearTimeout(this.hoverTimeout)
-    windowActions.setPreviewFrame(null)
+    if (this.props.previewTabs) {
+      window.clearTimeout(this.hoverTimeout)
+      windowActions.setPreviewFrame(null)
+    }
+    windowActions.setTabHoverState(this.frame, false)
   }
 
   onMouseEnter (e) {
@@ -137,8 +147,11 @@ class Tab extends ImmutableComponent {
 
     // If user isn't in previewMode, we add a bit of delay to avoid tab from flashing out
     // as reported here: https://github.com/brave/browser-laptop/issues/1434
-    this.hoverTimeout =
-      window.setTimeout(windowActions.setPreviewFrame.bind(null, this.frame), previewMode ? 0 : 200)
+    if (this.props.previewTabs) {
+      this.hoverTimeout =
+        window.setTimeout(windowActions.setPreviewFrame.bind(null, this.frame), previewMode ? 0 : 200)
+    }
+    windowActions.setTabHoverState(this.frame, true)
   }
 
   onClickTab (e) {
@@ -150,48 +163,70 @@ class Tab extends ImmutableComponent {
     }
   }
 
+  get themeColor () {
+    return this.props.paintTabs &&
+    (this.props.tab.get('themeColor') || this.props.tab.get('computedThemeColor'))
+  }
+
+  get tabSize () {
+    const tab = this.tabNode
+    // Avoid TypeError keeping it null until component is mounted
+    return tab && !this.isPinned ? tab.getBoundingClientRect().width : null
+  }
+
+  get narrowView () {
+    const sizes = ['medium', 'mediumSmall', 'small', 'extraSmall', 'smallest']
+    return sizes.includes(this.props.tab.get('breakpoint'))
+  }
+
+  get narrowestView () {
+    const sizes = ['extraSmall', 'smallest']
+    return sizes.includes(this.props.tab.get('breakpoint'))
+  }
+
+  get canPlayAudio () {
+    return this.props.tab.get('audioPlaybackActive') || this.props.tab.get('audioMuted')
+  }
+
+  onUpdateTabSize () {
+    const currentSize = getTabBreakpoint(this.tabSize)
+    // Avoid changing state on unmounted component
+    // when user switch to a new tabSet
+    if (this.tabNode) {
+      windowActions.setTabBreakpoint(this.frame, currentSize)
+    }
+  }
+
+  componentWillMount () {
+    this.onUpdateTabSize()
+  }
+
+  componentDidMount () {
+    this.onUpdateTabSize()
+    window.addEventListener('resize', throttle(this.onUpdateTabSize, tabUpdateFrameRate))
+  }
+
+  componentDidUpdate () {
+    this.tabSize
+    this.onUpdateTabSize()
+  }
+
+  componentWillUnmount () {
+    this.onUpdateTabSize()
+    window.removeEventListener('resize', this.onUpdateTabSize)
+  }
+
   render () {
-    // Style based on theme-color
-    const iconSize = 16
-    let iconStyle = {
-      minWidth: iconSize,
-      width: iconSize
-    }
-    const activeTabStyle = {}
-    const backgroundColor = this.props.paintTabs && (this.props.tab.get('themeColor') || this.props.tab.get('computedThemeColor'))
-    if (this.props.isActive && backgroundColor) {
-      activeTabStyle.background = backgroundColor
-      const textColor = getTextColorForBackground(backgroundColor)
-      iconStyle.color = textColor
-      if (textColor) {
-        activeTabStyle.color = getTextColorForBackground(backgroundColor)
+    const perPageStyles = StyleSheet.create({
+      themeColor: {
+        color: this.themeColor ? getTextColorForBackground(this.themeColor) : 'inherit',
+        background: this.themeColor ? this.themeColor : 'inherit',
+        ':hover': {
+          color: this.themeColor ? getTextColorForBackground(this.themeColor) : 'inherit',
+          background: this.themeColor ? this.themeColor : 'inherit'
+        }
       }
-    }
-
-    const icon = this.props.tab.get('icon')
-    const defaultIcon = 'fa fa-file-o'
-
-    if (!this.loading && icon) {
-      iconStyle = Object.assign(iconStyle, {
-        backgroundImage: `url(${icon})`,
-        backgroundSize: iconSize,
-        height: iconSize
-      })
-    }
-
-    let playIcon = false
-    let iconClass = null
-    if (this.props.tab.get('audioPlaybackActive') || this.props.tab.get('audioMuted')) {
-      if (this.props.tab.get('audioPlaybackActive') && !this.props.tab.get('audioMuted')) {
-        iconClass = 'fa fa-volume-up'
-      } else if (this.props.tab.get('audioPlaybackActive') && this.props.tab.get('audioMuted')) {
-        iconClass = 'fa fa-volume-off'
-      }
-      playIcon = true
-    }
-
-    const locationHasFavicon = this.props.tab.get('location') !== 'about:newtab'
-
+    })
     return <div
       className={cx({
         tabArea: true,
@@ -202,14 +237,26 @@ class Tab extends ImmutableComponent {
         partOfFullPageSet: this.props.partOfFullPageSet || !!this.props.tabWidth
       })}
       style={this.props.tabWidth ? { flex: `0 0 ${this.props.tabWidth}px` } : {}}
-      onMouseEnter={this.props.previewTabs ? this.onMouseEnter : null}
-      onMouseLeave={this.props.previewTabs ? this.onMouseLeave : null}>
-      <div className={cx({
-        tab: true,
-        isPinned: this.isPinned,
-        active: this.props.isActive,
-        private: this.props.tab.get('isPrivate')
-      })}
+      onMouseEnter={this.onMouseEnter}
+      onMouseLeave={this.onMouseLeave}>
+      <div className={css(
+        styles.tab,
+        this.isPinned && styles.isPinned,
+        this.props.isActive && styles.active,
+        this.props.tab.get('isPrivate') && styles.private,
+        this.props.isActive && this.props.tab.get('isPrivate') && styles.activePrivateTab,
+        this.narrowView && this.canPlayAudio && styles.narrowViewPlayIndicator,
+        this.props.isActive && this.themeColor && perPageStyles.themeColor,
+        !this.isPinned && this.narrowView && styles.tabNarrowView,
+        !this.isPinned && this.narrowestView && styles.tabNarrowestView,
+        !this.isPinned && this.props.tab.get('breakpoint') === 'smallest' && styles.tabMinAllowedSize,
+        // Windows specific style
+        isWindows() && styles.tabForWindows
+        )}
+        data-test-active-tab={this.props.isActive}
+        data-test-pinned-tab={this.isPinned}
+        data-test-private-tab={this.props.tab.get('isPrivate')}
+        data-test-id='tab'
         data-frame-key={this.props.tab.get('frameKey')}
         ref={(node) => { this.tabNode = node }}
         draggable
@@ -218,51 +265,30 @@ class Tab extends ImmutableComponent {
         onDragEnd={this.onDragEnd.bind(this)}
         onDragOver={this.onDragOver.bind(this)}
         onClick={this.onClickTab.bind(this)}
-        onContextMenu={contextMenus.onTabContextMenu.bind(this, this.frame)}
-        style={activeTabStyle}>
-        {
-          this.props.tab.get('isPrivate')
-          ? <TabIcon styles='fa fa-eye' />
-          : null
-        }
-        {
-          this.props.tab.get('partitionNumber')
-          ? <TabIcon l10nArgs={JSON.stringify({partitionNumber: this.props.tab.get('partitionNumber')})}
-            l10nId='sessionInfoTab'
-            styles='fa fa-user' />
-          : null
-        }
-        {
-          locationHasFavicon
-          ? <div className={cx({
-            tabIcon: true,
-            bookmarkFile: !icon,
-            [defaultIcon]: !icon,
-            'fa fa-circle-o-notch fa-spin': this.loading
-          })}
-            style={iconStyle} />
-          : null
-        }
-        {
-          playIcon
-          ? <AudioTabIcon styles={iconClass}
-            onClick={this.onMuteFrame.bind(this, !this.props.tab.get('audioMuted'))} />
-          : null
-        }
-        {
-          !this.isPinned
-          ? <div className='tabTitle'>
-            {this.displayValue}
-          </div>
-          : null
-        }
-        {
-          !this.isPinned
-          ? <span onClick={this.onTabClosedWithMouse.bind(this)}
-            data-l10n-id='closeTabButton'
-            className='closeTab fa fa-times-circle' />
-          : null
-        }
+        onContextMenu={contextMenus.onTabContextMenu.bind(this, this.frame)}>
+        <div className={css(
+          styles.tabId,
+          this.narrowView && styles.tabIdNarrowView,
+          this.props.tab.get('breakpoint') === 'smallest' && styles.tabIdMinAllowedSize
+          )}>
+          <Favicon tabProps={this.props.tab} isLoading={this.loading} isPinned={this.isPinned} />
+          <AudioTabIcon
+            tabProps={this.props.tab}
+            onClick={this.onMuteFrame.bind(this, !this.props.tab.get('audioMuted'))}
+          />
+          <TabTitle tabProps={this.props.tab} pageTitle={this.displayValue} />
+        </div>
+        <PrivateIcon tabProps={this.props.tab} />
+        <NewSessionIcon
+          tabProps={this.props.tab}
+          l10nArgs={this.props.tab.get('partitionNumber')}
+          l10nId='sessionInfoTab'
+        />
+        <CloseTabIcon
+          tabProps={this.props.tab}
+          onClick={this.onTabClosedWithMouse.bind(this)}
+          l10nId='closeTabButton'
+        />
       </div>
     </div>
   }

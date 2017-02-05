@@ -277,6 +277,30 @@ Dispatches a message to the store to set the tab page index.
 
 
 
+### setTabBreakpoint(frameProps, breakpoint) 
+
+Dispatches a message to the store to set the tab breakpoint.
+
+**Parameters**
+
+**frameProps**: `Object`, the frame properties for the webview in question.
+
+**breakpoint**: `string`, the tab breakpoint to change to
+
+
+
+### setTabHoverState(frameProps, hoverState) 
+
+Dispatches a message to the store to set the current tab hover state.
+
+**Parameters**
+
+**frameProps**: `Object`, the frame properties for the webview in question.
+
+**hoverState**: `boolean`, whether or not mouse is over tab
+
+
+
 ### setPreviewTabPageIndex(previewTabPageIndex) 
 
 Dispatches a message to the store to set the tab page index being previewed.

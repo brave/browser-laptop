@@ -60,7 +60,7 @@ describe('about:newtab tests', function () {
       .addSite({ location: 'about:preferences' })
       .addSite({ location: 'about:safebrowsing' })
       .addSite({ location: 'about:styles' })
-      .waitForExist('.tab[data-frame-key="1"]')
+      .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
       .tabByIndex(0)
       .url(aboutNewTabUrl)
   }
@@ -68,7 +68,7 @@ describe('about:newtab tests', function () {
   function * waitForPageLoad (client) {
     yield client
       .windowByUrl(Brave.browserWindowUrl)
-      .waitForExist('.tab[data-frame-key="1"]')
+      .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
       .tabByIndex(0)
   }
 
@@ -120,7 +120,7 @@ describe('about:newtab tests', function () {
 
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
-          .waitForExist('.tab[data-frame-key="1"]')
+          .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
           .tabByIndex(0)
           .waitForVisible('.clock .time')
           .waitUntil(function () {
