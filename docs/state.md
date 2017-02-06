@@ -201,6 +201,7 @@ AppStore
     'security.passwords.last-pass-enabled': boolean, // true if the Last password extension should be enabled
     'security.passwords.manager-enabled': boolean, // whether to use default password manager
     'security.passwords.one-password-enabled': boolean, // true if the 1Password extension should be enabled
+    'security.fullscreen.content': string, // whether or not user choose to allow fullscreen content by default
     'shutdown.clear-all-site-cookies': boolean, // true to clear all site cookies on shutdown
     'shutdown.clear-autocomplete-data': boolean, // true to clear all autocomplete data on shutdown
     'shutdown.clear-autofill-data': boolean, // true to clear all autofill data on shutdown

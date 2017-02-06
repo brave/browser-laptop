@@ -34,7 +34,7 @@ const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const coinbaseCountries = require('../constants/coinbaseCountries')
 const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
-const {startsWithOption, newTabMode, bookmarksToolbarMode, tabCloseAction} = require('../../app/common/constants/settingsEnums')
+const {startsWithOption, newTabMode, bookmarksToolbarMode, tabCloseAction, fullscreenOption} = require('../../app/common/constants/settingsEnums')
 
 const WidevineInfo = require('../../app/renderer/components/widevineInfo')
 const aboutActions = require('./aboutActions')
@@ -1140,6 +1140,17 @@ class SecurityTab extends ImmutableComponent {
           onClick={aboutActions.newFrame.bind(null, {
             location: 'about:autofill'
           }, true)} disabled={!getSetting(settings.AUTOFILL_ENABLED, this.props.settings)} />
+      </SettingsList>
+      <div className='sectionTitle' data-l10n-id='fullscreenContent' />
+      <SettingsList>
+        <SettingItem>
+          <SettingDropdown
+            value={getSetting(settings.FULLSCREEN_CONTENT, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.FULLSCREEN_CONTENT)}>
+            <option data-l10n-id='alwaysAsk' value={fullscreenOption.ALWAYS_ASK} />
+            <option data-l10n-id='alwaysAllow' value={fullscreenOption.ALWAYS_ALLOW} />
+          </SettingDropdown>
+        </SettingItem>
       </SettingsList>
       <div className='sectionTitle' data-l10n-id='doNotTrackTitle' />
       <SettingsList>
