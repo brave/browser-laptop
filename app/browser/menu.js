@@ -362,7 +362,8 @@ const createBookmarksSubmenu = () => {
     CommonMenu.bookmarksManagerMenuItem(),
     CommonMenu.bookmarksToolbarMenuItem(),
     CommonMenu.separatorMenuItem,
-    CommonMenu.importBrowserDataMenuItem()
+    CommonMenu.importBrowserDataMenuItem(),
+    CommonMenu.exportBookmarksMenuItem()
   ]
 
   const bookmarks = menuUtil.createBookmarkTemplateItems(appStore.getState().get('sites').toList().sort(siteSort))
