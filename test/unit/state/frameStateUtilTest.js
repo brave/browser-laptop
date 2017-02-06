@@ -200,19 +200,6 @@ describe('frameStateUtil', function () {
           assert.equal(result.activeFrameKey, 5)
         })
 
-        it('first tab action', function () {
-          const result = frameStateUtil.removeFrame(
-            frames,
-            tabs,
-            closedFrames,
-            frameProps,
-            activeFrameKey,
-            framePropsIndex,
-            tabCloseAction.FIRST
-          )
-          assert.equal(result.activeFrameKey, 2)
-        })
-
         it('next tab action', function () {
           const result = frameStateUtil.removeFrame(
             frames,
