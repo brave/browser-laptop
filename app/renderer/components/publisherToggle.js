@@ -9,6 +9,8 @@ const appActions = require('../../../js/actions/appActions')
 const settings = require('../../../js/constants/settings')
 const getSetting = require('../../../js/settings').getSetting
 const {StyleSheet, css} = require('aphrodite')
+const globalStyles = require('./styles/global')
+const commonStyles = require('./styles/commonStyles')
 
 const noFundVerifiedPublisherImage = require('../../extensions/brave/img/urlbar/browser_URL_fund_no_verified.svg')
 const fundVerifiedPublisherImage = require('../../extensions/brave/img/urlbar/browser_URL_fund_yes_verified.svg')
@@ -107,7 +109,7 @@ class PublisherToggle extends ImmutableComponent {
         <button
           className={
           css(
-            styles.browserButton,
+            commonStyles.browserButton,
             !this.authorizedPublisher && this.verifiedPublisher && styles.noFundVerified,
             this.authorizedPublisher && this.verifiedPublisher && styles.fundVerified,
             !this.authorizedPublisher && !this.verifiedPublisher && styles.noFundUnverified,
@@ -127,10 +129,10 @@ const styles = StyleSheet.create({
     boxSizing: 'border-box',
     display: 'flex',
     alignItems: 'center',
-    height: '25px',
-    width: '25px',
-    minHeight: '25px',
-    minWidth: '25px',
+    height: globalStyles.spacing.buttonHeight,
+    width: globalStyles.spacing.buttonWidth,
+    minHeight: globalStyles.spacing.buttonHeight,
+    minWidth: globalStyles.spacing.buttonWidth,
     WebkitAppRegion: 'no-drag',
     borderWidth: '1px 1px 1px 0px',
     borderStyle: 'solid',
@@ -139,27 +141,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: '0',
     borderBottomLeftRadius: '0',
     borderBottomColor: 'rgba(0, 0, 0, 0.1)'
-  },
-
-  browserButton: {
-    border: 'none',
-    margin: '0',
-    whiteSpace: 'nowrap',
-    outline: 'none',
-    cursor: 'default',
-    display: 'inline-block',
-    lineHeight: '25px',
-    width: '25px',
-    height: '25px',
-    fontSize: '13px',
-    color: '#5a5a5a',
-    borderRadius: '4px',
-    textAlign: 'center',
-    transition: '.1s opacity, .1s background',
-    WebkitUserSelect: 'none',
-    backgroundSize: '16px',
-    backgroundPosition: 'center center',
-    backgroundRepeat: 'no-repeat'
   },
 
   noFundVerified: {

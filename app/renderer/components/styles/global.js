@@ -79,6 +79,8 @@ const globalStyles = {
     switchNubTopMargin: '2px',
     switchNubLeftMargin: '2px',
     switchNubRightMargin: '2px',
+    buttonHeight: '25px',
+    buttonWidth: '25px',
     navbarHeight: '36px',
     downloadsBarHeight: '50px',
     tabsToolbarHeight: '28px',
