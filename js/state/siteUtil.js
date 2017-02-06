@@ -342,10 +342,13 @@ module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prep
     destinationSiteIndex = sites.getIn([destinationKey, 'order'])
   }
 
-  const newIndex = destinationSiteIndex + (prepend ? 0 : 1)
   let sourceSite = sites.get(sourceKey)
   if (!sourceSite) {
     return sites
+  }
+  let newIndex = destinationSiteIndex + (prepend ? 0 : 1)
+  if (destinationSiteIndex > sourceSiteIndex) {
+    --newIndex
   }
   const destinationSite = sites.get(destinationKey)
   sites = sites.delete(sourceKey)
@@ -353,6 +356,8 @@ module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prep
     const siteOrder = site.get('order')
     if (siteOrder >= newIndex && siteOrder < sourceSiteIndex) {
       return site.set('order', siteOrder + 1)
+    } else if (siteOrder <= newIndex && siteOrder > sourceSiteIndex) {
+      return site.set('order', siteOrder - 1)
     }
     return site
   })

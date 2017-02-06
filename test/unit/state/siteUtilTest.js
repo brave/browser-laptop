@@ -595,98 +595,195 @@ describe('siteUtil', function () {
 
   describe('moveSite', function () {
     describe('order test', function () {
-      const destinationDetail = {
-        location: testUrl1,
-        partitionNumber: 0,
-        parentFolderId: 0,
-        order: 0
-      }
-      const sourceDetail = {
-        location: testUrl2 + '4',
-        partitionNumber: 0,
-        parentFolderId: 0,
-        order: 3
-      }
-      const sites = {
-        'https://brave.com/|0|0': destinationDetail,
-        'http://example.com/0|0': {
-          location: testUrl2,
+      describe('back to front', function () {
+        const destinationDetail = {
+          location: testUrl1,
           partitionNumber: 0,
           parentFolderId: 0,
-          order: 1
-        },
-        'https://brave.com/3|0|0': {
-          location: testUrl1 + '3',
+          order: 0
+        }
+        const sourceDetail = {
+          location: testUrl2 + '4',
           partitionNumber: 0,
           parentFolderId: 0,
-          order: 2
-        },
-        'http://example.com/4|0|0': sourceDetail
-      }
+          order: 3
+        }
+        const sites = {
+          'https://brave.com/|0|0': destinationDetail,
+          'http://example.com/0|0': {
+            location: testUrl2,
+            partitionNumber: 0,
+            parentFolderId: 0,
+            order: 1
+          },
+          'https://brave.com/3|0|0': {
+            location: testUrl1 + '3',
+            partitionNumber: 0,
+            parentFolderId: 0,
+            order: 2
+          },
+          'http://example.com/4|0|0': sourceDetail
+        }
 
-      it('prepend target', function () {
-        const expectedSites = {
-          'http://example.com/4|0|0': {
-            location: testUrl2 + '4',
-            partitionNumber: 0,
-            parentFolderId: 0,
-            order: 0
-          },
-          'https://brave.com/|0|0': {
-            location: testUrl1,
-            partitionNumber: 0,
-            parentFolderId: 0,
-            order: 1
-          },
-          'http://example.com/0|0': {
-            location: testUrl2,
-            partitionNumber: 0,
-            parentFolderId: 0,
-            order: 2
-          },
-          'https://brave.com/3|0|0': {
-            location: testUrl1 + '3',
-            partitionNumber: 0,
-            parentFolderId: 0,
-            order: 3
+        it('prepend target', function () {
+          const expectedSites = {
+            'http://example.com/4|0|0': {
+              location: testUrl2 + '4',
+              partitionNumber: 0,
+              parentFolderId: 0,
+              order: 0
+            },
+            'https://brave.com/|0|0': {
+              location: testUrl1,
+              partitionNumber: 0,
+              parentFolderId: 0,
+              order: 1
+            },
+            'http://example.com/0|0': {
+              location: testUrl2,
+              partitionNumber: 0,
+              parentFolderId: 0,
+              order: 2
+            },
+            'https://brave.com/3|0|0': {
+              location: testUrl1 + '3',
+              partitionNumber: 0,
+              parentFolderId: 0,
+              order: 3
+            }
           }
-        }
-        const processedSites = siteUtil.moveSite(Immutable.fromJS(sites),
-          Immutable.fromJS(sourceDetail),
-          Immutable.fromJS(destinationDetail), true, false, true)
-        assert.deepEqual(processedSites.toJS(), expectedSites)
+          const processedSites = siteUtil.moveSite(Immutable.fromJS(sites),
+            Immutable.fromJS(sourceDetail),
+            Immutable.fromJS(destinationDetail), true, false, true)
+          assert.deepEqual(processedSites.toJS(), expectedSites)
+        })
+        it('not prepend target', function () {
+          const expectedSites = {
+            'http://example.com/4|0|0': {
+              location: testUrl2 + '4',
+              partitionNumber: 0,
+              parentFolderId: 0,
+              order: 1
+            },
+            'https://brave.com/|0|0': {
+              location: testUrl1,
+              partitionNumber: 0,
+              parentFolderId: 0,
+              order: 0
+            },
+            'http://example.com/0|0': {
+              location: testUrl2,
+              partitionNumber: 0,
+              parentFolderId: 0,
+              order: 2
+            },
+            'https://brave.com/3|0|0': {
+              location: testUrl1 + '3',
+              partitionNumber: 0,
+              parentFolderId: 0,
+              order: 3
+            }
+          }
+          const processedSites = siteUtil.moveSite(Immutable.fromJS(sites),
+            Immutable.fromJS(sourceDetail),
+            Immutable.fromJS(destinationDetail), false, false, true)
+          assert.deepEqual(processedSites.toJS(), expectedSites)
+        })
       })
-      it('not prepend target', function () {
-        const expectedSites = {
-          'http://example.com/4|0|0': {
-            location: testUrl2 + '4',
-            partitionNumber: 0,
-            parentFolderId: 0,
-            order: 1
-          },
-          'https://brave.com/|0|0': {
-            location: testUrl1,
-            partitionNumber: 0,
-            parentFolderId: 0,
-            order: 0
-          },
+      describe('front to back', function () {
+        const sourceDetail = {
+          location: testUrl1,
+          partitionNumber: 0,
+          parentFolderId: 0,
+          order: 0
+        }
+        const destinationDetail = {
+          location: testUrl2 + '4',
+          partitionNumber: 0,
+          parentFolderId: 0,
+          order: 3
+        }
+        const sites = {
+          'https://brave.com/|0|0': sourceDetail,
           'http://example.com/0|0': {
             location: testUrl2,
             partitionNumber: 0,
             parentFolderId: 0,
-            order: 2
+            order: 1
           },
           'https://brave.com/3|0|0': {
             location: testUrl1 + '3',
             partitionNumber: 0,
             parentFolderId: 0,
-            order: 3
-          }
+            order: 2
+          },
+          'http://example.com/4|0|0': destinationDetail
         }
-        const processedSites = siteUtil.moveSite(Immutable.fromJS(sites),
-          Immutable.fromJS(sourceDetail),
-          Immutable.fromJS(destinationDetail), false, false, true)
-        assert.deepEqual(processedSites.toJS(), expectedSites)
+
+        it('prepend target', function () {
+          const expectedSites = {
+            'http://example.com/0|0': {
+              location: testUrl2,
+              partitionNumber: 0,
+              parentFolderId: 0,
+              order: 0
+            },
+            'https://brave.com/3|0|0': {
+              location: testUrl1 + '3',
+              partitionNumber: 0,
+              parentFolderId: 0,
+              order: 1
+            },
+            'https://brave.com/|0|0': {
+              location: testUrl1,
+              partitionNumber: 0,
+              parentFolderId: 0,
+              order: 2
+            },
+            'http://example.com/4|0|0': {
+              location: testUrl2 + '4',
+              partitionNumber: 0,
+              parentFolderId: 0,
+              order: 3
+            }
+          }
+          const processedSites = siteUtil.moveSite(Immutable.fromJS(sites),
+            Immutable.fromJS(sourceDetail),
+            Immutable.fromJS(destinationDetail), true, false, true)
+          assert.deepEqual(processedSites.toJS(), expectedSites)
+        })
+        it('not prepend target', function () {
+          const expectedSites = {
+            'http://example.com/0|0': {
+              location: testUrl2,
+              partitionNumber: 0,
+              parentFolderId: 0,
+              order: 0
+            },
+            'https://brave.com/3|0|0': {
+              location: testUrl1 + '3',
+              partitionNumber: 0,
+              parentFolderId: 0,
+              order: 1
+            },
+            'http://example.com/4|0|0': {
+              location: testUrl2 + '4',
+              partitionNumber: 0,
+              parentFolderId: 0,
+              order: 2
+            },
+            'https://brave.com/|0|0': {
+              location: testUrl1,
+              partitionNumber: 0,
+              parentFolderId: 0,
+              order: 3
+            }
+          }
+          const processedSites = siteUtil.moveSite(Immutable.fromJS(sites),
+            Immutable.fromJS(sourceDetail),
+            Immutable.fromJS(destinationDetail), false, false, true)
+          assert.deepEqual(processedSites.toJS(), expectedSites)
+        })
       })
     })
     it('destination is parent', function () {
