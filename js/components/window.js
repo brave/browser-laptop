@@ -13,6 +13,7 @@ const Main = require('./main')
 const SiteTags = require('../constants/siteTags')
 const cx = require('../lib/classSet')
 const {getPlatformStyles} = require('../../app/common/lib/platformUtil')
+const {siteSort} = require('../state/siteUtil')
 
 class Window extends React.Component {
   constructor (props) {
@@ -103,7 +104,7 @@ class Window extends React.Component {
       return
     }
 
-    const sites = this.appState.get('sites')
+    const sites = this.appState.get('sites').toList().sort(siteSort)
     const frames = this.windowState.get('frames')
 
     // Check for new pinned sites which we don't already know about
