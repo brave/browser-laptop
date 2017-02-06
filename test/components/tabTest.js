@@ -4,7 +4,7 @@ const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
 const assert = require('assert')
 const settings = require('../../js/constants/settings')
-const {urlInput, backButton, forwardButton, activeTabTitle, activeTabFavicon, newFrameButton} = require('../lib/selectors')
+const {urlInput, backButton, forwardButton, activeTabTitle, activeTabFavicon, newFrameButton, hamburgerMenuButton} = require('../lib/selectors')
 
 describe('tab tests', function () {
   function * setup (client) {
@@ -354,6 +354,20 @@ describe('tab tests', function () {
         .waitForVisible('.tab[data-frame-key="2"]')
         // This should not be converted to a waitUntil
         .getText('.tab[data-frame-key="2"]').then((val) => assert.equal(val, 'Untitled'))
+    })
+  })
+
+  describe('hamburger menu', function () {
+    Brave.beforeAll(this)
+    before(function * () {
+      yield setup(this.app.client)
+    })
+
+    it('opens hamburger menu on click', function * () {
+      yield this.app.client
+        .waitForBrowserWindow()
+        .click(hamburgerMenuButton)
+        .waitForExist('.contextMenuSingle')
     })
   })
 })
