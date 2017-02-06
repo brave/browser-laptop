@@ -45,7 +45,7 @@ class TabsToolbar extends ImmutableComponent {
       onContextMenu={this.onContextMenu}>
       {
         pinnedTabs.size > 0
-        ? <PinnedTabs sites={this.props.sites}
+        ? <PinnedTabs
           activeFrameKey={this.props.activeFrameKey}
           paintTabs={this.props.paintTabs}
           previewTabs={this.props.previewTabs}
