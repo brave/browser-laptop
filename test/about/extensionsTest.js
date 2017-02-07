@@ -15,7 +15,7 @@ describe('about:extensions', function () {
       .waitForBrowserWindow()
       .waitForVisible(urlInput)
       .windowByUrl(Brave.browserWindowUrl)
-      .waitForExist('.tab[data-frame-key="1"]')
+      .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
       .tabByIndex(0)
       .url(aboutExtensionsUrl)
   }
@@ -89,6 +89,20 @@ describe('about:extensions', function () {
         .waitForVisible(`.extensionBrowserAction[data-button-value="${extensionIds[passwordManagers.LAST_PASS]}"]`)
         .tabByIndex(0)
         .waitForVisible(`[data-extension-id="${extensionIds[passwordManagers.LAST_PASS]}"]`, extensionDownloadWaitTime)
+    })
+  })
+  describe('Enpass installs when enabled', function () {
+    Brave.beforeAll(this)
+    before(function * () {
+      yield setup(this.app.client)
+    })
+    it('installs', function * () {
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+        .changeSetting(settingsConst.ACTIVE_PASSWORD_MANAGER, passwordManagers.ENPASS)
+        .waitForVisible(`.extensionBrowserAction[data-button-value="${extensionIds[passwordManagers.ENPASS]}"]`)
+        .tabByIndex(0)
+        .waitForVisible(`[data-extension-id="${extensionIds[passwordManagers.ENPASS]}"]`, extensionDownloadWaitTime)
     })
   })
 })

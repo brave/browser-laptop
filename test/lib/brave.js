@@ -1,7 +1,7 @@
 /* globals devTools */
 var Application = require('spectron').Application
 var chai = require('chai')
-const {activeWebview, navigator, titleBar} = require('./selectors')
+const {activeWebview, navigator, titleBar, urlInput} = require('./selectors')
 require('./coMocha')
 
 const path = require('path')
@@ -81,7 +81,8 @@ var exports = {
     BACKSPACE: '\ue003',
     DELETE: '\ue017',
     DOWN: '\ue015',
-    UP: '\ue013'
+    UP: '\ue013',
+    PAGEDOWN: '\uE00F'
   },
 
   defaultTimeout: 10000,
@@ -149,7 +150,7 @@ var exports = {
     })
 
     context.afterEach(function () {
-      return exports.stopApp.call(this)
+      return exports.stopApp.call(this, context.cleanSessionStoreAfterEach)
     })
   },
 
@@ -170,6 +171,12 @@ var exports = {
       return this.execute(function (message, ...param) {
         return devTools('electron').ipcRenderer.send(message, ...param)
       }, message, ...param).then((response) => response.value)
+    })
+
+    this.app.client.addCommand('ipcSendRendererSync', function (message, ...param) {
+      return this.execute(function (message, ...param) {
+        return devTools('electron').ipcRenderer.sendSync(message, ...param)
+      }, message, ...param)
     })
 
     var windowHandlesOrig = this.app.client.windowHandles
@@ -249,9 +256,16 @@ var exports = {
 
     this.app.client.addCommand('activateTitleMode', function () {
       return this
-        .moveToObject(activeWebview, 2, 2)
-        .moveToObject(activeWebview, 3, 3)
+        .setMouseInTitlebar(false)
+        .moveToObject(activeWebview)
         .waitForVisible(titleBar)
+    })
+
+    this.app.client.addCommand('activateURLMode', function () {
+      return this
+        .setMouseInTitlebar(true)
+        .moveToObject(navigator)
+        .waitForVisible(urlInput)
     })
 
     this.app.client.addCommand('waitForUrl', function (url) {
@@ -290,6 +304,19 @@ var exports = {
       })
     })
 
+    this.app.client.addCommand('waitForAddressCount', function (addressCount) {
+      logVerbose('waitForAddressCount(' + addressCount + ')')
+      return this.waitUntil(function () {
+        return this.getAppState().then((val) => {
+          console.log(val.value && val.value.autofill)
+          const ret = val.value && val.value && val.value.autofill &&
+            val.value.autofill.addresses && val.value.autofill.addresses.guid.length || 0
+          logVerbose('waitForAddressCount(' + addressCount + ') => ' + ret)
+          return ret
+        })
+      })
+    })
+
     this.app.client.addCommand('waitForElementCount', function (selector, count) {
       logVerbose('waitForElementCount("' + selector + '", ' + count + ')')
       return this.waitUntil(function () {
@@ -324,10 +351,24 @@ var exports = {
       logVerbose('waitForSiteEntry("' + location + '", "' + waitForTitle + '")')
       return this.waitUntil(function () {
         return this.getAppState().then((val) => {
-          const ret = val.value && val.value.sites && val.value.sites.find(
+          const ret = val.value && val.value.sites && Array.from(Object.values(val.value.sites)).find(
             (site) => site.location === location &&
               (!waitForTitle || waitForTitle && site.title))
           logVerbose('waitForSiteEntry("' + location + ', ' + waitForTitle + '") => ' + ret)
+          return ret
+        })
+      })
+    })
+
+    this.app.client.addCommand('waitForAddressEntry', function (location, waitForTitle = true) {
+      logVerbose('waitForAddressEntry("' + location + '", "' + waitForTitle + '")')
+      return this.waitUntil(function () {
+        return this.getAppState().then((val) => {
+          const ret = val.value && val.value.sites && Array.from(Object.values(val.value.sites)).find(
+            (site) => site.location === location &&
+              (!waitForTitle || waitForTitle && site.title))
+          logVerbose('sites:' + JSON.stringify(val.value.sites))
+          logVerbose('waitForSiteEntry("' + location + '", ' + waitForTitle + ') => ' + ret)
           return ret
         })
       })
@@ -391,7 +432,7 @@ var exports = {
             } else {
               ret = val === input
             }
-            logVerbose('Current val: ' + val)
+            logVerbose('Current val (in quotes): "' + val + '"')
             logVerbose('waitForInputText("' + selector + '", "' + input + '") => ' + ret)
             return ret
           })
@@ -400,7 +441,7 @@ var exports = {
 
     this.app.client.addCommand('setInputText', function (selector, input) {
       return this
-        .moveToObject(navigator)
+        .activateURLMode()
         .setValue(selector, input)
         .waitForInputText(selector, input)
     })
@@ -411,6 +452,12 @@ var exports = {
           key
         }), show !== false)
       }, show, key)
+    })
+
+    this.app.client.addCommand('setMouseInTitlebar', function (mouseInTitleBar) {
+      return this.execute(function (mouseInTitleBar) {
+        devTools('electron').testData.windowActions.setMouseInTitlebar(mouseInTitleBar)
+      }, mouseInTitleBar)
     })
 
     this.app.client.addCommand('openBraveMenu', function (braveMenu, braveryPanel) {
@@ -435,6 +482,12 @@ var exports = {
       }, message, fn).then((response) => response.value)
     })
 
+    this.app.client.addCommand('ipcOnce', function (message, fn) {
+      return this.execute(function (message, fn) {
+        return devTools('electron').remote.getCurrentWindow().webContents.once(message, fn)
+      }, message, fn).then((response) => response.value)
+    })
+
     this.app.client.addCommand('newWindowAction', function (frameOpts, browserOpts) {
       return this.execute(function () {
         return devTools('appActions').newWindow()
@@ -448,9 +501,14 @@ var exports = {
      * @param {string} tag - A site tag from js/constants/siteTags.js
      */
     this.app.client.addCommand('addSite', function (siteDetail, tag) {
+      let waitUrl = siteDetail.location
+      if (isSourceAboutUrl(waitUrl)) {
+        waitUrl = getTargetAboutUrl(waitUrl)
+      }
       return this.execute(function (siteDetail, tag) {
         return devTools('appActions').addSite(siteDetail, tag)
       }, siteDetail, tag).then((response) => response.value)
+      .waitForSiteEntry(waitUrl, false)
     })
 
     /**
@@ -534,9 +592,9 @@ var exports = {
      *
      * @param {object} clearDataDetail - the options to use for clearing
      */
-    this.app.client.addCommand('clearAppData', function (clearDataDetail) {
+    this.app.client.addCommand('onClearBrowsingData', function (clearDataDetail) {
       return this.execute(function (clearDataDetail) {
-        return devTools('appActions').clearAppData(clearDataDetail)
+        return devTools('appActions').onClearBrowsingData(clearDataDetail)
       }, clearDataDetail).then((response) => response.value)
     })
 
@@ -643,9 +701,9 @@ var exports = {
       }, frameKey, eventName, ...params).then((response) => response.value)
     })
 
-    this.app.client.addCommand('waitForElementFocus', function (selector) {
+    this.app.client.addCommand('waitForElementFocus', function (selector, timeout) {
       let activeElement
-      return this.waitForVisible(selector)
+      return this.waitForVisible(selector, timeout)
         .element(selector)
           .then(function (el) { activeElement = el })
         .waitUntil(function () {
@@ -653,7 +711,7 @@ var exports = {
             .then(function (el) {
               return el.value.ELEMENT === activeElement.value.ELEMENT
             })
-        })
+        }, timeout)
     })
 
     this.app.client.addCommand('waitForDataFile', function (dataFile) {
@@ -665,6 +723,11 @@ var exports = {
         })
       }, 10000)
     })
+
+    // retrieve a map of all the translations per existing IPC message 'translations'
+    this.app.client.addCommand('translations', function () {
+      return this.ipcSendRendererSync('translations')
+    })
   },
 
   startApp: function () {
@@ -673,12 +736,15 @@ var exports = {
     }
     let env = {
       NODE_ENV: 'test',
-      BRAVE_USER_DATA_DIR: userDataDir
+      BRAVE_USER_DATA_DIR: userDataDir,
+      SPECTRON: true
     }
     this.app = new Application({
       waitTimeout: exports.defaultTimeout,
       connectionRetryTimeout: exports.defaultTimeout,
-      path: './node_modules/.bin/electron',
+      path: process.platform === 'win32'
+        ? 'node_modules/electron-prebuilt/dist/brave.exe'
+        : './node_modules/.bin/electron',
       env,
       args: ['./', '--debug=5858', '--enable-logging', '--v=1'],
       requireName: 'devTools'

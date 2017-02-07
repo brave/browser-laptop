@@ -277,6 +277,30 @@ Dispatches a message to the store to set the tab page index.
 
 
 
+### setTabBreakpoint(frameProps, breakpoint) 
+
+Dispatches a message to the store to set the tab breakpoint.
+
+**Parameters**
+
+**frameProps**: `Object`, the frame properties for the webview in question.
+
+**breakpoint**: `string`, the tab breakpoint to change to
+
+
+
+### setTabHoverState(frameProps, hoverState) 
+
+Dispatches a message to the store to set the current tab hover state.
+
+**Parameters**
+
+**frameProps**: `Object`, the frame properties for the webview in question.
+
+**hoverState**: `boolean`, whether or not mouse is over tab
+
+
+
 ### setPreviewTabPageIndex(previewTabPageIndex) 
 
 Dispatches a message to the store to set the tab page index being previewed.
@@ -294,20 +318,6 @@ Dispatches a message to the store to set the tab page index.
 **Parameters**
 
 **frameProps**: `number`, The frame props to center around
-
-
-
-### updateBackForwardState(frameProps, canGoBack, canGoForward) 
-
-Dispatches a message to the store to update the back-forward information.
-
-**Parameters**
-
-**frameProps**: `Object`, the frame properties for the webview in question.
-
-**canGoBack**: `boolean`, Specifies if the active frame has previous entries in its history
-
-**canGoForward**: `boolean`, Specifies if the active frame has next entries in its history (i.e. the user pressed back at least once)
 
 
 
@@ -765,9 +775,13 @@ Adds a history entry
 
 
 
-### setClearBrowsingDataDetail() 
+### setClearBrowsingDataPanelVisible(isVisible) 
 
-Sets the clear browsing data popup detail
+Sets whether the clear browsing data popup is visible
+
+**Parameters**
+
+**isVisible**: `boolean`, Sets whether the clear browsing data popup is visible
 
 
 
@@ -871,11 +885,23 @@ Used by `main.js` when click happens on content area (not on a link or react con
 
 
 
-### setSubmenuSelectedIndex(index) 
+### setMenuBarSelectedIndex(index) 
 
 (Windows only)
-Used to track selected index of a context menu
+Used to track selected index of a menu bar
 Needed because arrow keys can be used to navigate the custom menu
+
+**Parameters**
+
+**index**: `number`, zero based index of the item.
+  Index excludes menu separators and hidden items.
+
+
+
+### setContextMenuSelectedIndex(index) 
+
+Used to track selected index of a context menu
+Needed because arrow keys can be used to navigate the context menu
 
 **Parameters**
 

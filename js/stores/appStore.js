@@ -355,6 +355,7 @@ const applyReducers = (state, action) => [
   require('../../app/browser/reducers/downloadsReducer'),
   require('../../app/browser/reducers/flashReducer'),
   require('../../app/browser/reducers/tabsReducer'),
+  require('../../app/browser/reducers/spellCheckReducer'),
   require('../../app/browser/reducers/clipboardReducer')
 ].reduce(
     (appState, reducer) => {
@@ -385,7 +386,7 @@ const handleAppAction = (action) => {
       shuttingDown = true
       break
     case appConstants.APP_NEW_WINDOW:
-      const frameOpts = action.frameOpts && action.frameOpts.toJS()
+      const frameOpts = (action.frameOpts && action.frameOpts.toJS()) || {}
       const browserOpts = (action.browserOpts && action.browserOpts.toJS()) || {}
       const newWindowState = action.restoredState || {}
 
@@ -394,7 +395,7 @@ const handleAppAction = (action) => {
 
       // initialize frames state
       let frames = []
-      if (frameOpts) {
+      if (frameOpts && Object.keys(frameOpts).length > 0) {
         if (frameOpts.forEach) {
           frames = frameOpts
         } else {
@@ -410,7 +411,7 @@ const handleAppAction = (action) => {
 
       mainWindow.webContents.on('did-finish-load', (e) => {
         lastEmittedState = appState
-        e.sender.send(messages.INITIALIZE_WINDOW, browserOpts.disposition, appState.toJS(), frames, action.restoredState)
+        e.sender.send(messages.INITIALIZE_WINDOW, frameOpts.disposition, appState.toJS(), frames, action.restoredState)
         if (action.cb) {
           action.cb()
         }
@@ -488,10 +489,15 @@ const handleAppAction = (action) => {
           appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), s, action.tag))
         })
       } else {
-        appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), action.siteDetail, action.tag, action.originalSiteDetail))
+        let sites = appState.get('sites')
+        if (!action.siteDetail.get('folderId') && siteUtil.isFolder(action.siteDetail)) {
+          action.siteDetail = action.siteDetail.set('folderId', siteUtil.getNextFolderId(sites))
+        }
+        appState = appState.set('sites', siteUtil.addSite(sites, action.siteDetail, action.tag, action.originalSiteDetail))
       }
       if (action.destinationDetail) {
-        appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.siteDetail, action.destinationDetail, false, false, true))
+        appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'),
+          action.siteDetail, action.destinationDetail, false, false, true))
       }
       // If there was an item added then clear out the old history entries
       if (oldSiteSize !== appState.get('sites').size) {
@@ -501,13 +507,17 @@ const handleAppAction = (action) => {
       appState = aboutHistoryState.setHistory(appState, action)
       break
     case appConstants.APP_REMOVE_SITE:
-      appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag))
+      appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag, true))
       appState = aboutNewTabState.setSites(appState, action)
       appState = aboutHistoryState.setHistory(appState, action)
       break
     case appConstants.APP_MOVE_SITE:
-      appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent, false))
-      break
+      {
+        appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'),
+          action.sourceDetail, action.destinationDetail, action.prepend,
+          action.destinationIsParent, false))
+        break
+      }
     case appConstants.APP_CLEAR_HISTORY:
       appState = appState.set('sites', siteUtil.clearHistory(appState.get('sites')))
       appState = aboutNewTabState.setSites(appState, action)
@@ -677,16 +687,16 @@ const handleAppAction = (action) => {
     case appConstants.APP_RECOVER_WALLET:
       appState = ledger.recoverKeys(appState, action)
       break
-    case appConstants.APP_LEDGER_RECOVERY_SUCCEEDED:
-      appState = appState.setIn(['ui', 'about', 'preferences', 'recoverySucceeded'], true)
+    case appConstants.APP_LEDGER_RECOVERY_STATUS_CHANGED:
+      {
+        const date = new Date().getTime()
+        appState = appState.setIn(['about', 'preferences', 'recoverySucceeded'], action.recoverySucceeded)
+        appState = appState.setIn(['about', 'preferences', 'updatedStamp'], date)
+      }
       break
-    case appConstants.APP_LEDGER_RECOVERY_FAILED:
-      appState = appState.setIn(['ui', 'about', 'preferences', 'recoverySucceeded'], false)
-      break
-    case appConstants.APP_CLEAR_RECOVERY:
-      appState = appState.setIn(['ui', 'about', 'preferences', 'recoverySucceeded'], undefined)
-      break
-    case appConstants.APP_CLEAR_DATA:
+    case appConstants.APP_ON_CLEAR_BROWSING_DATA:
+      // TODO: Maybe make storing this state optional?
+      appState = appState.set('clearBrowsingDataDefaults', action.clearDataDetail)
       if (action.clearDataDetail.get('browserHistory')) {
         handleAppAction({actionType: appConstants.APP_CLEAR_HISTORY})
         BrowserWindow.getAllWindows().forEach((wnd) => wnd.webContents.send(messages.CLEAR_CLOSED_FRAMES))

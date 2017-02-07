@@ -249,12 +249,15 @@ module.exports.importBrowserDataMenuItem = () => {
   }
 }
 
-module.exports.reportAnIssueMenuItem = () => {
+module.exports.exportBookmarksMenuItem = () => {
   return {
-    label: locale.translation('reportAnIssue'),
+    label: locale.translation('exportBookmarks'),
     click: function (item, focusedWindow) {
-      module.exports.sendToFocusedWindow(focusedWindow,
-                                         [messages.SHORTCUT_NEW_FRAME, communityURL])
+      if (process.type === 'browser') {
+        process.emit(messages.EXPORT_BOOKMARKS)
+      } else {
+        electron.ipcRenderer.send(messages.EXPORT_BOOKMARKS)
+      }
     }
   }
 }

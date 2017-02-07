@@ -6,8 +6,18 @@
 const React = require('react')
 const ImmutableComponent = require('../components/immutableComponent')
 const Immutable = require('immutable')
+
+// Components
 const SwitchControl = require('../components/switchControl')
 const ModalOverlay = require('../components/modalOverlay')
+const {SettingsList, SettingItem} = require('../../app/renderer/components/settings')
+const {SettingTextbox} = require('../../app/renderer/components/textbox')
+const {SettingDropdown} = require('../../app/renderer/components/dropdown')
+const Button = require('../components/button')
+
+// Tabs
+const PaymentsTab = require('../../app/renderer/components/preferences/paymentsTab')
+
 const cx = require('../lib/classSet')
 const ledgerExportUtil = require('../../app/common/lib/ledgerExportUtil')
 const addExportFilenamePrefixToTransactions = ledgerExportUtil.addExportFilenamePrefixToTransactions
@@ -23,16 +33,13 @@ const preferenceTabs = require('../constants/preferenceTabs')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const coinbaseCountries = require('../constants/coinbaseCountries')
-const getSymbolFromCurrency = require('currency-symbol-map').getSymbolFromCurrency
 const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
-const {startsWithOption, newTabMode, bookmarksToolbarMode} = require('../../app/common/constants/settingsEnums')
-const {l10nErrorText} = require('../../app/common/lib/httpUtil')
+const {startsWithOption, newTabMode, bookmarksToolbarMode, tabCloseAction, fullscreenOption} = require('../../app/common/constants/settingsEnums')
 
 const WidevineInfo = require('../../app/renderer/components/widevineInfo')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
-const Button = require('../components/button')
 const searchProviders = require('../data/searchProviders')
 const punycode = require('punycode')
 const moment = require('moment')
@@ -57,7 +64,6 @@ const ipc = window.chrome.ipcRenderer
 const hintCount = 3
 
 // Stylesheets
-
 require('../../less/switchControls.less')
 require('../../less/about/preferences.less')
 require('../../less/forms.less')
@@ -110,34 +116,6 @@ const changeSetting = (cb, key, e) => {
   }
 }
 
-class SettingsList extends ImmutableComponent {
-  render () {
-    return <div className='settingsListContainer'>
-      {
-        this.props.dataL10nId
-        ? <div className='settingsListTitle' data-l10n-id={this.props.dataL10nId} />
-        : null
-      }
-      <div className='settingsList'>
-        {this.props.children}
-      </div>
-    </div>
-  }
-}
-
-class SettingItem extends ImmutableComponent {
-  render () {
-    return <div className='settingItem'>
-      {
-        this.props.dataL10nId
-          ? <span data-l10n-id={this.props.dataL10nId} />
-          : null
-      }
-      {this.props.children}
-    </div>
-  }
-}
-
 class SettingCheckbox extends ImmutableComponent {
   constructor () {
     super()
@@ -161,6 +139,7 @@ class SettingCheckbox extends ImmutableComponent {
     }
     return <div {...props}>
       <SwitchControl id={this.props.prefKey}
+        small={this.props.small}
         disabled={this.props.disabled}
         onClick={this.onClick}
         checkedOn={this.props.checked !== undefined ? this.props.checked : getSetting(this.props.prefKey, this.props.settings)} />
@@ -192,6 +171,7 @@ class SiteSettingCheckbox extends ImmutableComponent {
   render () {
     return <div style={this.props.style} className='settingItem siteSettingItem'>
       <SwitchControl
+        small={this.props.small}
         disabled={this.props.disabled}
         onClick={this.onClick}
         checkedOn={this.props.checked} />
@@ -249,6 +229,10 @@ class LedgerTable extends ImmutableComponent {
     return true
   }
 
+  banSite (hostPattern) {
+    aboutActions.changeSiteSetting(hostPattern, 'ledgerPaymentsShown', false)
+  }
+
   getRow (synopsis) {
     if (!synopsis || !synopsis.get || !this.shouldShow(synopsis)) {
       return []
@@ -264,13 +248,17 @@ class LedgerTable extends ImmutableComponent {
     const defaultSiteSetting = true
 
     return [
+      {
+        html: <div className='neverShowSiteIcon' onClick={this.banSite.bind(this, this.getHostPattern(synopsis))}><span className='fa fa-ban' /></div>,
+        value: ''
+      },
       rank,
       {
         html: <div className='site'>{verified ? this.getVerifiedIcon() : null}<a href={publisherURL} target='_blank'>{faviconURL ? <img src={faviconURL} alt={site} /> : <span className='fa fa-file-o' />}<span>{site}</span></a></div>,
         value: site
       },
       {
-        html: <SiteSettingCheckbox hostPattern={this.getHostPattern(synopsis)} defaultValue={defaultSiteSetting} prefKey='ledgerPayments' siteSettings={this.props.siteSettings} checked={this.enabledForSite(synopsis)} />,
+        html: <SiteSettingCheckbox small hostPattern={this.getHostPattern(synopsis)} defaultValue={defaultSiteSetting} prefKey='ledgerPayments' siteSettings={this.props.siteSettings} checked={this.enabledForSite(synopsis)} />,
         value: this.enabledForSite(synopsis) ? 1 : 0
       },
       views,
@@ -287,11 +275,18 @@ class LedgerTable extends ImmutableComponent {
       return null
     }
     return <div className='ledgerTable'>
+      <div className='hideExcludedSites'>
+        <SettingCheckbox small
+          dataL10nId='hideExcluded'
+          prefKey={settings.HIDE_EXCLUDED_SITES}
+          settings={this.props.settings}
+          onChangeSetting={this.props.onChangeSetting}
+        />
+      </div>
       <SortableTable
-        headings={['rank', 'publisher', 'include', 'views', 'timeSpent', 'percentage']}
+        headings={['remove', 'rank', 'publisher', 'include', 'views', 'timeSpent', 'percentage']}
         defaultHeading='rank'
-        overrideDefaultStyle
-        columnClassNames={['alignRight', '', '', 'alignRight', 'alignRight', 'alignRight']}
+        columnClassNames={['', 'alignRight', '', '', 'alignRight', 'alignRight', 'alignRight']}
         rowClassNames={
           this.synopsis.map((item) =>
             this.enabledForSite(item) ? '' : 'paymentsDisabled').toJS()
@@ -304,7 +299,12 @@ class LedgerTable extends ImmutableComponent {
             location: entry.get('publisherURL')
           }
         }).toJS()}
-        rows={this.synopsis.map((synopsis) => this.getRow(synopsis)).toJS()} />
+        rows={this.synopsis.filter((synopsis) => {
+          return !getSetting(settings.HIDE_EXCLUDED_SITES, this.props.settings) || this.enabledForSite(synopsis)
+        }).map((synopsis) => {
+          return this.getRow(synopsis)
+        }).toJS()}
+        />
     </div>
   }
 }
@@ -599,7 +599,7 @@ class PaymentHistoryRow extends ImmutableComponent {
 
   render () {
     var date = this.formattedDate
-    var totalAmountStr = `${getSymbolFromCurrency(this.currency)} ${this.totalAmount}`
+    var totalAmountStr = `${this.totalAmount} ${this.currency}`
 
     return <tr>
       <td className='narrow' data-sort={this.timestamp}>{date}</td>
@@ -667,25 +667,32 @@ class GeneralTab extends ImmutableComponent {
       <div className='sectionTitle' data-l10n-id='generalSettings' />
       <SettingsList>
         <SettingItem dataL10nId='startsWith'>
-          <select className='form-control' value={getSetting(settings.STARTUP_MODE, this.props.settings)}
-            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.STARTUP_MODE)} >
+          <SettingDropdown value={getSetting(settings.STARTUP_MODE, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.STARTUP_MODE)}>
             <option data-l10n-id='startsWithOptionLastTime' value={startsWithOption.WINDOWS_TABS_FROM_LAST_TIME} />
             <option data-l10n-id='startsWithOptionHomePage' value={startsWithOption.HOMEPAGE} />
             <option data-l10n-id='startsWithOptionNewTabPage' value={startsWithOption.NEW_TAB_PAGE} />
-          </select>
+          </SettingDropdown>
         </SettingItem>
         <SettingItem dataL10nId='newTabMode'>
-          <select className='form-control' value={getSetting(settings.NEWTAB_MODE, this.props.settings)}
+          <SettingDropdown value={getSetting(settings.NEWTAB_MODE, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.NEWTAB_MODE)} >
             <option data-l10n-id='newTabNewTabPage' value={newTabMode.NEW_TAB_PAGE} />
             <option data-l10n-id='newTabHomePage' value={newTabMode.HOMEPAGE} />
             <option data-l10n-id='newTabDefaultSearchEngine' value={newTabMode.DEFAULT_SEARCH_ENGINE} />
             <option data-l10n-id='newTabEmpty' value={newTabMode.EMPTY_NEW_TAB} />
-          </select>
+          </SettingDropdown>
         </SettingItem>
-        <SettingItem dataL10nId='myHomepage'>
-          <input spellCheck='false'
-            className='form-control'
+        <div className='iconTitle'>
+          <span data-l10n-id='myHomepage' />
+          <span className='fa fa-info-circle iconLink' onClick={aboutActions.newFrame.bind(null, {
+            location: 'https://github.com/brave/browser-laptop/wiki/End-User-FAQ#how-to-set-up-multiple-home-pages'
+          }, true)}
+            data-l10n-id='multipleHomePages' />
+        </div>
+        <SettingItem>
+          <SettingTextbox
+            spellCheck='false'
             data-l10n-id='homepageInput'
             value={homepageValue}
             onChange={changeSetting.bind(null, this.onChangeSetting, settings.HOMEPAGE)} />
@@ -698,25 +705,24 @@ class GeneralTab extends ImmutableComponent {
         }
         <SettingCheckbox dataL10nId='disableTitleMode' prefKey={settings.DISABLE_TITLE_MODE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingItem dataL10nId='bookmarkToolbarSettings'>
-          <select className='form-control' id='bookmarksBarSelect' value={getSetting(settings.BOOKMARKS_TOOLBAR_MODE, this.props.settings)}
-            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.BOOKMARKS_TOOLBAR_MODE)} >
+          <SettingDropdown id='bookmarksBarSelect' value={getSetting(settings.BOOKMARKS_TOOLBAR_MODE, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.BOOKMARKS_TOOLBAR_MODE)}>
             <option data-l10n-id='bookmarksBarTextOnly' value={bookmarksToolbarMode.TEXT_ONLY} />
             <option data-l10n-id='bookmarksBarTextAndFavicon' value={bookmarksToolbarMode.TEXT_AND_FAVICONS} />
             <option data-l10n-id='bookmarksBarFaviconOnly' value={bookmarksToolbarMode.FAVICONS_ONLY} />
-          </select>
+          </SettingDropdown>
           <SettingCheckbox id='bookmarksBarSwitch' dataL10nId='bookmarkToolbar'
             prefKey={settings.SHOW_BOOKMARKS_TOOLBAR} settings={this.props.settings}
             onChangeSetting={this.props.onChangeSetting} />
         </SettingItem>
         <SettingItem dataL10nId='selectedLanguage'>
-          <select className='form-control' value={getSetting(settings.LANGUAGE, this.props.settings) || defaultLanguage}
-            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.LANGUAGE)} >
+          <SettingDropdown value={getSetting(settings.LANGUAGE, this.props.settings) || defaultLanguage}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.LANGUAGE)}>
             {languageOptions}
-          </select>
+          </SettingDropdown>
         </SettingItem>
         <SettingItem dataL10nId='defaultZoomLevel'>
-          <select
-            className='form-control'
+          <SettingDropdown
             value={defaultZoomSetting === undefined || defaultZoomSetting === null ? config.zoom.defaultValue : defaultZoomSetting}
             data-type='float'
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.DEFAULT_ZOOM_LEVEL)}>
@@ -724,7 +730,7 @@ class GeneralTab extends ImmutableComponent {
               config.zoom.zoomLevels.map((x) =>
                 <option value={x} key={x}>{getZoomValuePercentage(x) + '%'}</option>)
             }
-          </select>
+          </SettingDropdown>
         </SettingItem>
         <SettingItem dataL10nId='importBrowserData'>
           <Button l10nId='importNow' className='primaryButton importNowButton'
@@ -827,8 +833,7 @@ class TabsTab extends ImmutableComponent {
       <div className='sectionTitle' data-l10n-id='tabSettings' />
       <SettingsList>
         <SettingItem dataL10nId='tabsPerTabPage'>
-          <select
-            className='form-control'
+          <SettingDropdown
             value={getSetting(settings.TABS_PER_PAGE, this.props.settings)}
             data-type='number'
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TABS_PER_PAGE)}>
@@ -837,507 +842,21 @@ class TabsTab extends ImmutableComponent {
               [6, 8, 10, 20].map((x) =>
                 <option value={x} key={x}>{x}</option>)
             }
-          </select>
+          </SettingDropdown>
+        </SettingItem>
+        <SettingItem dataL10nId='tabCloseAction'>
+          <SettingDropdown
+            value={getSetting(settings.TAB_CLOSE_ACTION, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TAB_CLOSE_ACTION)}>
+            <option data-l10n-id='tabCloseActionLastActive' value={tabCloseAction.LAST_ACTIVE} />
+            <option data-l10n-id='tabCloseActionNext' value={tabCloseAction.NEXT} />
+            <option data-l10n-id='tabCloseActionParent' value={tabCloseAction.PARENT} />
+          </SettingDropdown>
         </SettingItem>
         <SettingCheckbox dataL10nId='switchToNewTabs' prefKey={settings.SWITCH_TO_NEW_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='paintTabs' prefKey={settings.PAINT_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='showTabPreviews' prefKey={settings.SHOW_TAB_PREVIEWS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
-    </div>
-  }
-}
-
-class PaymentsTab extends ImmutableComponent {
-  constructor () {
-    super()
-    this.state = {
-      FirstRecoveryKey: '',
-      SecondRecoveryKey: ''
-    }
-
-    this.printKeys = this.printKeys.bind(this)
-    this.saveKeys = this.saveKeys.bind(this)
-    this.createWallet = this.createWallet.bind(this)
-    this.recoverWallet = this.recoverWallet.bind(this)
-    this.handleFirstRecoveryKeyChange = this.handleFirstRecoveryKeyChange.bind(this)
-    this.handleSecondRecoveryKeyChange = this.handleSecondRecoveryKeyChange.bind(this)
-  }
-
-  createWallet () {
-    if (!this.props.ledgerData.get('created')) {
-      aboutActions.createWallet()
-    }
-  }
-
-  handleFirstRecoveryKeyChange (e) {
-    this.setState({FirstRecoveryKey: e.target.value})
-  }
-
-  handleSecondRecoveryKeyChange (e) {
-    this.setState({SecondRecoveryKey: e.target.value})
-  }
-
-  recoverWallet () {
-    aboutActions.ledgerRecoverWallet(this.state.FirstRecoveryKey, this.state.SecondRecoveryKey)
-  }
-
-  copyToClipboard (text) {
-    aboutActions.setClipboard(text)
-  }
-
-  generateKeyFile (backupAction) {
-    aboutActions.ledgerGenerateKeyFile(backupAction)
-  }
-
-  clearRecoveryStatus () {
-    aboutActions.clearRecoveryStatus()
-  }
-
-  printKeys () {
-    this.generateKeyFile('print')
-  }
-
-  saveKeys () {
-    this.generateKeyFile('save')
-  }
-
-  get enabled () {
-    return getSetting(settings.PAYMENTS_ENABLED, this.props.settings)
-  }
-
-  get fundsAmount () {
-    if (!this.props.ledgerData.get('created')) {
-      return null
-    }
-
-    return <div className='balance'>
-      {
-      !(this.props.ledgerData.get('balance') === undefined || this.props.ledgerData.get('balance') === null)
-        ? <input className='form-control fundsAmount' readOnly value={this.btcToCurrencyString(this.props.ledgerData.get('balance'))} />
-        : <span><span data-l10n-id='accountBalanceLoading' /></span>
-      }
-      <a href='https://brave.com/Payments_FAQ.html' target='_blank'>
-        <span className='fa fa-question-circle fundsFAQ' />
-      </a>
-    </div>
-  }
-
-  get walletButton () {
-    const buttonText = this.props.ledgerData.get('created')
-      ? 'addFundsTitle'
-      : (this.props.ledgerData.get('creating') ? 'creatingWallet' : 'createWallet')
-    const onButtonClick = this.props.ledgerData.get('created')
-      ? this.props.showOverlay.bind(this, 'addFunds')
-      : (this.props.ledgerData.get('creating') ? () => {} : this.createWallet)
-    return <Button l10nId={buttonText} className='primaryButton addFunds' onClick={onButtonClick.bind(this)} disabled={this.props.ledgerData.get('creating')} />
-  }
-
-  get paymentHistoryButton () {
-    const walletCreated = this.props.ledgerData.get('created') && !this.props.ledgerData.get('creating')
-    const walletTransactions = this.props.ledgerData.get('transactions')
-    const walletHasTransactions = walletTransactions && walletTransactions.size
-
-    if (!walletCreated || !walletHasTransactions) {
-      return null
-    }
-
-    const buttonText = 'viewPaymentHistory'
-    const onButtonClick = this.props.showOverlay.bind(this, 'paymentHistory')
-    return <Button className='paymentHistoryButton' l10nId={buttonText} onClick={onButtonClick.bind(this)} disabled={this.props.ledgerData.get('creating')} />
-  }
-
-  get walletStatus () {
-    const ledgerData = this.props.ledgerData
-    let status = {}
-    if (ledgerData.get('error')) {
-      status.id = 'statusOnError'
-    } else if (ledgerData.get('created')) {
-      const transactions = ledgerData.get('transactions')
-      const pendingFunds = Number(ledgerData.get('unconfirmed') || 0)
-      if (pendingFunds + Number(ledgerData.get('balance') || 0) <
-          0.9 * Number(ledgerData.get('btc') || 0)) {
-        status.id = 'insufficientFundsStatus'
-      } else if (pendingFunds > 0) {
-        status.id = 'pendingFundsStatus'
-        status.args = {funds: this.btcToCurrencyString(pendingFunds)}
-      } else if (transactions && transactions.size > 0) {
-        status.id = 'defaultWalletStatus'
-      } else {
-        status.id = 'createdWalletStatus'
-      }
-    } else if (ledgerData.get('creating')) {
-      status.id = 'creatingWalletStatus'
-    } else {
-      status.id = 'createWalletStatus'
-    }
-    return status
-  }
-
-  get tableContent () {
-    // TODO: This should be sortable. #2497
-    return <LedgerTable ledgerData={this.props.ledgerData}
-      siteSettings={this.props.siteSettings} />
-  }
-
-  get overlayTitle () {
-    if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
-      return 'addFunds'
-    } else {
-      return 'addFundsAlternate'
-    }
-  }
-
-  get overlayContent () {
-    return <BitcoinDashboard ledgerData={this.props.ledgerData}
-      settings={this.props.settings}
-      bitcoinOverlayVisible={this.props.bitcoinOverlayVisible}
-      qrcodeOverlayVisible={this.props.qrcodeOverlayVisible}
-      showOverlay={this.props.showOverlay.bind(this, 'bitcoin')}
-      hideOverlay={this.props.hideOverlay.bind(this, 'bitcoin')}
-      showQRcode={this.props.showOverlay.bind(this, 'qrcode')}
-      hideQRcode={this.props.hideOverlay.bind(this, 'qrcode')}
-      hideParentOverlay={this.props.hideOverlay.bind(this, 'addFunds')} />
-  }
-
-  get paymentHistoryContent () {
-    return <PaymentHistory ledgerData={this.props.ledgerData} />
-  }
-
-  get paymentHistoryFooter () {
-    let ledgerData = this.props.ledgerData
-    if (!ledgerData.get('reconcileStamp')) {
-      return null
-    }
-    const timestamp = ledgerData.get('reconcileStamp')
-    const nextReconcileDateRelative = formattedTimeFromNow(timestamp)
-    const l10nDataArgs = {
-      reconcileDate: nextReconcileDateRelative
-    }
-    return <div className='paymentHistoryFooter'>
-      <div className='nextPaymentSubmission'>
-        <span data-l10n-id='paymentHistoryFooterText' data-l10n-args={JSON.stringify(l10nDataArgs)} />
-      </div>
-      <Button l10nId='paymentHistoryOKText' className='okButton primaryButton' onClick={this.props.hideOverlay.bind(this, 'paymentHistory')} />
-    </div>
-  }
-
-  get advancedSettingsContent () {
-    const minDuration = this.props.ledgerData.getIn(['synopsisOptions', 'minDuration'])
-    const minPublisherVisits = this.props.ledgerData.getIn(['synopsisOptions', 'minPublisherVisits'])
-
-    return <div className='board'>
-      <div className='panel advancedSettings'>
-        <div className='settingsPanelDivider'>
-          <div className='minimumPageTimeSetting' data-l10n-id='minimumPageTimeSetting' />
-          <SettingsList>
-            <SettingItem>
-              <select
-                className='form-control'
-                defaultValue={minDuration || 8000}
-                onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.MINIMUM_VISIT_TIME)}>>
-                <option value='5000'>5 seconds</option>
-                <option value='8000'>8 seconds</option>
-                <option value='60000'>1 minute</option>
-              </select>
-            </SettingItem>
-          </SettingsList>
-          <div className='minimumVisitsSetting' data-l10n-id='minimumVisitsSetting' />
-          <SettingsList>
-            <SettingItem>
-              <select
-                className='form-control'
-                defaultValue={minPublisherVisits || 5}
-                onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.MINIMUM_VISITS)}>>>
-                <option value='2'>2 visits</option>
-                <option value='5'>5 visits</option>
-                <option value='10'>10 visits</option>
-              </select>
-            </SettingItem>
-          </SettingsList>
-        </div>
-        <div className='settingsPanelDivider'>
-          {this.enabled
-            ? <SettingsList>
-              <SettingCheckbox
-                dataL10nId='minimumPercentage'
-                prefKey={settings.MINIMUM_PERCENTAGE}
-                settings={this.props.settings}
-                onChangeSetting={this.props.onChangeSetting} />
-              <SettingCheckbox
-                dataL10nId='notifications'
-                prefKey={settings.PAYMENTS_NOTIFICATIONS}
-                settings={this.props.settings}
-                onChangeSetting={this.props.onChangeSetting} />
-            </SettingsList>
-            : null}
-        </div>
-      </div>
-    </div>
-  }
-
-  get advancedSettingsFooter () {
-    return <div className='panel advancedSettingsFooter'>
-      <Button l10nId='backupLedger' className='primaryButton' onClick={this.props.showOverlay.bind(this, 'ledgerBackup')} />
-      <Button l10nId='recoverLedger' className='primaryButton' onClick={this.props.showOverlay.bind(this, 'ledgerRecovery')} />
-      <Button l10nId='done' className='whiteButton inlineButton' onClick={this.props.hideOverlay.bind(this, 'advancedSettings')} />
-    </div>
-  }
-
-  get ledgerBackupContent () {
-    const paymentId = this.props.ledgerData.get('paymentId')
-    const passphrase = this.props.ledgerData.get('passphrase')
-
-    return <div className='board'>
-      <div className='panel ledgerBackupContent'>
-        <span data-l10n-id='ledgerBackupContent' />
-        <div className='copyKeyContainer'>
-          <div className='copyContainer'>
-            <Button l10nId='copy' className='copyButton whiteButton' onClick={this.copyToClipboard.bind(this, paymentId)} />
-          </div>
-          <div className='keyContainer'>
-            <h3 data-l10n-id='firstKey' />
-            <span>{paymentId}</span>
-          </div>
-        </div>
-        <div className='copyKeyContainer'>
-          <div className='copyContainer'>
-            <Button l10nId='copy' className='copyButton whiteButton' onClick={this.copyToClipboard.bind(this, passphrase)} />
-          </div>
-          <div className='keyContainer'>
-            <h3 data-l10n-id='secondKey' />
-            <span>{passphrase}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  }
-
-  get ledgerBackupFooter () {
-    return <div className='panel advancedSettingsFooter'>
-      <Button l10nId='printKeys' className='primaryButton' onClick={this.printKeys} />
-      <Button l10nId='saveRecoveryFile' className='primaryButton' onClick={this.saveKeys} />
-      <Button l10nId='done' className='whiteButton inlineButton' onClick={this.props.hideOverlay.bind(this, 'ledgerBackup')} />
-    </div>
-  }
-
-  get ledgerRecoveryContent () {
-    const l10nDataArgs = {
-      balance: this.props.ledgerData.get('balance')
-    }
-    return <div className='board'>
-      {
-        this.props.ledgerData.get('recoverySucceeded') === true
-        ? <div className='recoveryOverlay'>
-          <h1>Success!</h1>
-          <p className='spaceAround' data-l10n-id='balanceRecovered' data-l10n-args={JSON.stringify(l10nDataArgs)} />
-          <Button l10nId='ok' className='whiteButton inlineButton' onClick={this.clearRecoveryStatus} />
-        </div>
-        : null
-      }
-      {
-        this.props.ledgerData.get('recoverySucceeded') === false
-        ? <div className='recoveryOverlay'>
-          <h1>Recovery failed</h1>
-          <p className='spaceAround'>Please re-enter keys or try different keys.</p>
-          <Button l10nId='ok' className='whiteButton inlineButton' onClick={this.clearRecoveryStatus} />
-        </div>
-        : null
-      }
-      <div className='panel recoveryContent'>
-        <h4 data-l10n-id='ledgerRecoverySubtitle' />
-        <div className='ledgerRecoveryContent' data-l10n-id='ledgerRecoveryContent' />
-        <SettingsList>
-          <SettingItem>
-            <h3 data-l10n-id='firstRecoveryKey' />
-            <input className='form-control firstRecoveryKey' onChange={this.handleFirstRecoveryKeyChange} type='text' />
-            <h3 data-l10n-id='secondRecoveryKey' />
-            <input className='form-control secondRecoveryKey' onChange={this.handleSecondRecoveryKeyChange} type='text' />
-          </SettingItem>
-        </SettingsList>
-      </div>
-    </div>
-  }
-
-  get ledgerRecoveryFooter () {
-    return <div className='panel advancedSettingsFooter'>
-      <div className='recoveryFooterButtons'>
-        <Button l10nId='recover' className='primaryButton' onClick={this.recoverWallet} />
-        <Button l10nId='cancel' className='whiteButton' onClick={this.props.hideOverlay.bind(this, 'ledgerRecovery')} />
-      </div>
-    </div>
-  }
-
-  get nextReconcileDate () {
-    const ledgerData = this.props.ledgerData
-    if ((ledgerData.get('error')) || (!ledgerData.get('reconcileStamp'))) {
-      return null
-    }
-    const timestamp = ledgerData.get('reconcileStamp')
-    const nextReconcileDateRelative = formattedTimeFromNow(timestamp)
-    const l10nDataArgs = {
-      reconcileDate: nextReconcileDateRelative
-    }
-    return <div className='nextReconcileDate' data-l10n-args={JSON.stringify(l10nDataArgs)} data-l10n-id='statusNextReconcileDate' />
-  }
-
-  get ledgerDataErrorText () {
-    const ledgerError = this.props.ledgerData.get('error')
-    if (!ledgerError) {
-      return null
-    }
-    // 'error' here is a chromium webRequest error as returned by request.js
-    const errorCode = ledgerError.get('error').get('errorCode')
-    return l10nErrorText(errorCode)
-  }
-
-  btcToCurrencyString (btc) {
-    const balance = Number(btc || 0)
-    const currency = getSymbolFromCurrency(this.props.ledgerData.get('currency')) || getSymbolFromCurrency('USD')
-    if (balance === 0) {
-      return `${currency} 0`
-    }
-    if (this.props.ledgerData.get('btc') && typeof this.props.ledgerData.get('amount') === 'number') {
-      const btcValue = this.props.ledgerData.get('btc') / this.props.ledgerData.get('amount')
-      return `${currency} ${(balance / btcValue).toFixed(2)}`
-    }
-    return `${balance} BTC`
-  }
-
-  get disabledContent () {
-    return <div className='disabledContent'>
-      <div className='paymentsMessage'>
-        <h3 data-l10n-id='paymentsWelcomeTitle' />
-        <div data-l10n-id='paymentsWelcomeText1' />
-        <div className='boldText' data-l10n-id='paymentsWelcomeText2' />
-        <div data-l10n-id='paymentsWelcomeText3' />
-        <div data-l10n-id='paymentsWelcomeText4' />
-        <div data-l10n-id='paymentsWelcomeText5' />
-        <div>
-          <span data-l10n-id='paymentsWelcomeText6' />&nbsp;
-          <a href='https://brave.com/Payments_FAQ.html' target='_blank' data-l10n-id='paymentsWelcomeLink' />&nbsp;
-          <span data-l10n-id='paymentsWelcomeText7' />
-        </div>
-      </div>
-      <div className='paymentsSidebar'>
-        <h2 data-l10n-id='paymentsSidebarText1' />
-        <div data-l10n-id='paymentsSidebarText2' />
-        <a href='https://www.privateinternetaccess.com/' target='_blank'><div className='paymentsSidebarPIA' /></a>
-        <div data-l10n-id='paymentsSidebarText3' />
-        <a href='https://www.bitgo.com/' target='_blank'><div className='paymentsSidebarBitgo' /></a>
-        <div data-l10n-id='paymentsSidebarText4' />
-        <a href='https://www.coinbase.com/' target='_blank'><div className='paymentsSidebarCoinbase' /></a>
-      </div>
-    </div>
-  }
-
-  get enabledContent () {
-    // TODO: report when funds are too low
-    // TODO: support non-USD currency
-    return <div>
-      <div className='walletBar'>
-        <table>
-          <thead>
-            <tr>
-              <th data-l10n-id='monthlyBudget' />
-              <th data-l10n-id='accountBalance' />
-              <th data-l10n-id='status' />
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <SettingsList>
-                  <SettingItem>
-                    <select className='form-control fundsSelectBox'
-                      value={getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT,
-                        this.props.settings)}
-                      onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)} >
-                      {
-                        [5, 10, 15, 20].map((amount) =>
-                          <option value={amount}>{getSymbolFromCurrency(this.props.ledgerData.get('currency')) || getSymbolFromCurrency('USD')} {amount}</option>
-                        )
-                      }
-                    </select>
-                  </SettingItem>
-                  <SettingItem>
-                    {this.paymentHistoryButton}
-                  </SettingItem>
-                </SettingsList>
-              </td>
-              <td>
-                {
-                  this.props.ledgerData.get('error') && this.props.ledgerData.get('error').get('caller') === 'getWalletProperties'
-                    ? <div>
-                      <div data-l10n-id='accountBalanceConnectionError' />
-                      <div className='accountBalanceError' data-l10n-id={this.ledgerDataErrorText} />
-                    </div>
-                    : <div>
-                      <SettingsList>
-                        <SettingItem>
-                          {this.fundsAmount}
-                          {this.walletButton}
-                        </SettingItem>
-                      </SettingsList>
-                    </div>
-                }
-              </td>
-              <td>
-                <div className='walletStatus' data-l10n-id={this.walletStatus.id} data-l10n-args={this.walletStatus.args ? JSON.stringify(this.walletStatus.args) : null} />
-                {this.nextReconcileDate}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      {this.tableContent}
-    </div>
-  }
-
-  render () {
-    return <div className='paymentsContainer'>
-      {
-      this.enabled && this.props.addFundsOverlayVisible
-        ? <ModalOverlay title={this.overlayTitle} content={this.overlayContent} onHide={this.props.hideOverlay.bind(this, 'addFunds')} />
-        : null
-      }
-      {
-        this.enabled && this.props.paymentHistoryOverlayVisible
-        ? <ModalOverlay title={'paymentHistoryTitle'} customTitleClasses={'paymentHistory'} content={this.paymentHistoryContent} footer={this.paymentHistoryFooter} onHide={this.props.hideOverlay.bind(this, 'paymentHistory')} />
-        : null
-      }
-      {
-        this.enabled && this.props.advancedSettingsOverlayVisible
-        ? <ModalOverlay title={'advancedSettingsTitle'} content={this.advancedSettingsContent} footer={this.advancedSettingsFooter} onHide={this.props.hideOverlay.bind(this, 'advancedSettings')} />
-        : null
-      }
-      {
-        this.enabled && this.props.ledgerBackupOverlayVisible
-        ? <ModalOverlay title={'ledgerBackupTitle'} content={this.ledgerBackupContent} footer={this.ledgerBackupFooter} onHide={this.props.hideOverlay.bind(this, 'ledgerBackup')} />
-        : null
-      }
-      {
-        this.enabled && this.props.ledgerRecoveryOverlayVisible
-        ? <ModalOverlay title={'ledgerRecoveryTitle'} content={this.ledgerRecoveryContent} footer={this.ledgerRecoveryFooter} onHide={this.props.hideOverlay.bind(this, 'ledgerRecovery')} />
-        : null
-      }
-      <div className='titleBar'>
-        <div className='sectionTitleWrapper pull-left'>
-          <span className='sectionTitle'>Brave Payments</span>
-          <span className='sectionSubTitle'>beta</span>
-        </div>
-        <div className='paymentsSwitches'>
-          <div className='enablePaymentsSwitch'>
-            <span data-l10n-id='off' />
-            <SettingCheckbox dataL10nId='on' prefKey={settings.PAYMENTS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-          </div>
-          { this.props.ledgerData.get('created') && this.enabled ? <Button l10nId='advancedSettings' className='advancedSettings whiteButton' onClick={this.props.showOverlay.bind(this, 'advancedSettings')} /> : null }
-        </div>
-      </div>
-      {
-        this.enabled
-          ? this.enabledContent
-          : this.disabledContent
-      }
     </div>
   }
 }
@@ -1509,21 +1028,21 @@ class ShieldsTab extends ImmutableComponent {
       <div className='sectionTitle' data-l10n-id='braveryDefaults' />
       <SettingsList>
         <SettingItem dataL10nId='adControl'>
-          <select className='form-control'
+          <SettingDropdown
             value={this.props.braveryDefaults.get('adControl')}
             onChange={this.onChangeAdControl}>
             <option data-l10n-id='showBraveAds' value='showBraveAds' />
             <option data-l10n-id='blockAds' value='blockAds' />
             <option data-l10n-id='allowAdsAndTracking' value='allowAdsAndTracking' />
-          </select>
+          </SettingDropdown>
         </SettingItem>
         <SettingItem dataL10nId='cookieControl'>
-          <select className='form-control'
+          <SettingDropdown
             value={this.props.braveryDefaults.get('cookieControl')}
             onChange={this.onChangeCookieControl}>
             <option data-l10n-id='block3rdPartyCookie' value='block3rdPartyCookie' />
             <option data-l10n-id='allowAllCookies' value='allowAllCookies' />
-          </select>
+          </SettingDropdown>
         </SettingItem>
         <SettingCheckbox checked={this.props.braveryDefaults.get('httpsEverywhere')} dataL10nId='httpsEverywhere' onChange={this.onToggleHTTPSE} />
         <SettingCheckbox checked={this.props.braveryDefaults.get('safeBrowsing')} dataL10nId='safeBrowsing' onChange={this.onToggleSafeBrowsing} />
@@ -1549,10 +1068,19 @@ class SecurityTab extends ImmutableComponent {
     this.clearBrowsingDataNow = this.clearBrowsingDataNow.bind(this)
   }
   clearBrowsingDataNow () {
-    aboutActions.clearBrowsingDataNow({browserHistory: true})
+    aboutActions.clearBrowsingDataNow()
   }
   onToggleFlash (e) {
     aboutActions.setResourceEnabled(flash, e.target.value)
+    if (e.target.value !== true) {
+      // When flash is disabled, clear flash approvals
+      aboutActions.clearSiteSettings('flash', {
+        temporary: true
+      })
+      aboutActions.clearSiteSettings('flash', {
+        temporary: false
+      })
+    }
   }
   onToggleWidevine (e) {
     aboutActions.setResourceEnabled(widevine, e.target.value)
@@ -1577,15 +1105,16 @@ class SecurityTab extends ImmutableComponent {
       <div className='sectionTitle' data-l10n-id='passwordsAndForms' />
       <SettingsList>
         <SettingItem dataL10nId='passwordManager'>
-          <select className='form-control'
+          <SettingDropdown
             value={getSetting(settings.ACTIVE_PASSWORD_MANAGER, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.ACTIVE_PASSWORD_MANAGER)} >
             <option data-l10n-id='builtInPasswordManager' value={passwordManagers.BUILT_IN} />
             <option data-l10n-id='onePassword' value={passwordManagers.ONE_PASSWORD} />
             <option data-l10n-id='dashlane' value={passwordManagers.DASHLANE} />
             <option data-l10n-id='lastPass' value={passwordManagers.LAST_PASS} />
+            { /* <option data-l10n-id='enpass' value={passwordManagers.ENPASS} /> */ }
             <option data-l10n-id='doNotManageMyPasswords' value={passwordManagers.UNMANAGED} />
-          </select>
+          </SettingDropdown>
         </SettingItem>
         {
           getSetting(settings.ACTIVE_PASSWORD_MANAGER, this.props.settings) === passwordManagers.BUILT_IN
@@ -1611,6 +1140,17 @@ class SecurityTab extends ImmutableComponent {
           onClick={aboutActions.newFrame.bind(null, {
             location: 'about:autofill'
           }, true)} disabled={!getSetting(settings.AUTOFILL_ENABLED, this.props.settings)} />
+      </SettingsList>
+      <div className='sectionTitle' data-l10n-id='fullscreenContent' />
+      <SettingsList>
+        <SettingItem>
+          <SettingDropdown
+            value={getSetting(settings.FULLSCREEN_CONTENT, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.FULLSCREEN_CONTENT)}>
+            <option data-l10n-id='alwaysAsk' value={fullscreenOption.ALWAYS_ASK} />
+            <option data-l10n-id='alwaysAllow' value={fullscreenOption.ALWAYS_ALLOW} />
+          </SettingDropdown>
+        </SettingItem>
       </SettingsList>
       <div className='sectionTitle' data-l10n-id='doNotTrackTitle' />
       <SettingsList>
@@ -1819,6 +1359,15 @@ class AboutPreferences extends React.Component {
     this.updateTabFromAnchor = this.updateTabFromAnchor.bind(this)
   }
 
+  hideAdvancedOverlays () {
+    this.setState({
+      advancedSettingsOverlayVisible: false,
+      ledgerBackupOverlayVisible: false,
+      ledgerRecoveryOverlayVisible: false
+    })
+    this.forceUpdate()
+  }
+
   componentDidMount () {
     window.addEventListener('popstate', this.updateTabFromAnchor)
   }
@@ -1944,7 +1493,8 @@ class AboutPreferences extends React.Component {
           ledgerRecoveryOverlayVisible={this.state.ledgerRecoveryOverlayVisible}
           addFundsOverlayVisible={this.state.addFundsOverlayVisible}
           showOverlay={this.setOverlayVisible.bind(this, true)}
-          hideOverlay={this.setOverlayVisible.bind(this, false)} />
+          hideOverlay={this.setOverlayVisible.bind(this, false)}
+          hideAdvancedOverlays={this.hideAdvancedOverlays.bind(this)} />
         break
       case preferenceTabs.SECURITY:
         tab = <SecurityTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />
@@ -1971,8 +1521,13 @@ function formattedDateFromTimestamp (timestamp) {
   return moment(new Date(timestamp)).format('YYYY-MM-DD')
 }
 
-function formattedTimeFromNow (timestamp) {
-  return moment(new Date(timestamp)).fromNow()
+module.exports = {
+  AboutPreferences: <AboutPreferences />,
+  BitcoinDashboard,
+  LedgerTable,
+  SettingsList,
+  SettingItem,
+  SettingCheckbox,
+  PaymentHistory,
+  changeSetting
 }
-
-module.exports = <AboutPreferences />

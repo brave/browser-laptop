@@ -31,7 +31,8 @@ if (adobeRegex.test(window.location.href)) {
 
 if (chrome.contentSettings.flashEnabled == 'allow') {
   document.addEventListener('click', (e) => {
-    if (e.target.href.match(adobeRegex)) {
+    let href = e.target.href || (e.target.parentNode && e.target.parentNode.href)
+    if (href && href.match(adobeRegex)) {
       e.preventDefault()
       chrome.ipcRenderer.send('dispatch-action', JSON.stringify({
         actionType: 'app-flash-permission-requested',

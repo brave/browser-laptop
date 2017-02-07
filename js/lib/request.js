@@ -8,7 +8,7 @@ const electron = require('electron')
 const session = electron.session
 const underscore = require('underscore')
 const util = require('util')
-const urlParse = require('url').parse
+const urlParse = require('../../app/common/urlParse')
 
 /**
  * Sends a network request using Chromium's networks stack instead of Node's.

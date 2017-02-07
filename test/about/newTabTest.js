@@ -6,6 +6,7 @@ const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 const settings = require('../../js/constants/settings')
 const {newTabMode} = require('../../app/common/constants/settingsEnums')
 const aboutNewTabUrl = getTargetAboutUrl('about:newtab')
+const messages = require('../../js/constants/messages')
 
 describe('about:newtab tests', function () {
   function * setup (client) {
@@ -59,7 +60,7 @@ describe('about:newtab tests', function () {
       .addSite({ location: 'about:preferences' })
       .addSite({ location: 'about:safebrowsing' })
       .addSite({ location: 'about:styles' })
-      .waitForExist('.tab[data-frame-key="1"]')
+      .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
       .tabByIndex(0)
       .url(aboutNewTabUrl)
   }
@@ -67,7 +68,7 @@ describe('about:newtab tests', function () {
   function * waitForPageLoad (client) {
     yield client
       .windowByUrl(Brave.browserWindowUrl)
-      .waitForExist('.tab[data-frame-key="1"]')
+      .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
       .tabByIndex(0)
   }
 
@@ -87,6 +88,25 @@ describe('about:newtab tests', function () {
     })
   })
 
+  describe('with NEWTAB_MODE === HOMEPAGE', function () {
+    const page1 = 'https://start.duckduckgo.com/'
+    const page2 = 'https://brave.com/'
+
+    Brave.beforeAll(this)
+
+    before(function * () {
+      yield setup(this.app.client)
+      yield this.app.client.changeSetting(settings.NEWTAB_MODE, newTabMode.HOMEPAGE)
+      yield this.app.client.changeSetting(settings.HOMEPAGE, `${page1}|${page2}`)
+    })
+
+    it('multiple homepages', function * () {
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME)
+        .waitForUrl(page1)
+    })
+  })
+
   describe.skip('with NEWTAB_MODE === NEW_TAB_PAGE', function () {
     describe('page content', function () {
       Brave.beforeAll(this)
@@ -100,7 +120,7 @@ describe('about:newtab tests', function () {
 
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
-          .waitForExist('.tab[data-frame-key="1"]')
+          .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
           .tabByIndex(0)
           .waitForVisible('.clock .time')
           .waitUntil(function () {
@@ -169,7 +189,7 @@ describe('about:newtab tests', function () {
       })
 
       it('shows sites that have been visited', function * () {
-        yield this.app.client.clearAppData({browserHistory: true})
+        yield this.app.client.onClearBrowsingData({browserHistory: true})
 
         yield loadPageWithTracker(this.app.client)
 
@@ -180,7 +200,7 @@ describe('about:newtab tests', function () {
       })
 
       it('lets you pin a tile (and shows the pinned icon afterwards)', function * () {
-        yield this.app.client.clearAppData({browserHistory: true})
+        yield this.app.client.onClearBrowsingData({browserHistory: true})
 
         yield loadPageWithTracker(this.app.client)
 
@@ -196,7 +216,7 @@ describe('about:newtab tests', function () {
       })
 
       it('doesn\'t show about pages on topSites grid', function * () {
-        yield this.app.client.clearAppData({browserHistory: true})
+        yield this.app.client.onClearBrowsingData({browserHistory: true})
 
         // Adding about pages shouldn't add them to topSites grid
         yield addDemoAboutPages(this.app.client)
@@ -206,12 +226,12 @@ describe('about:newtab tests', function () {
           .tabByUrl(aboutNewTabUrl)
           .windowParentByUrl(aboutNewTabUrl)
           .waitForVisible(navigator)
-          .moveToObject(navigator)
+          .activateURLMode()
           .waitForVisible(navigatorNotBookmarked)
           .click(navigatorNotBookmarked)
           .waitForVisible(doneButton)
           .click(doneButton)
-          .moveToObject(navigator)
+          .activateURLMode()
           .waitForVisible(navigatorBookmarked)
 
         yield reloadNewTab(this.app.client)
@@ -223,7 +243,7 @@ describe('about:newtab tests', function () {
       it('shows favicon image for topSites', function * () {
         const pageWithFavicon = Brave.server.url('favicon.html')
         yield this.app.client
-          .clearAppData({browserHistory: true})
+          .onClearBrowsingData({browserHistory: true})
           .tabByUrl(Brave.newTabUrl)
           .url(pageWithFavicon)
           .waitForUrl(pageWithFavicon)
@@ -236,7 +256,7 @@ describe('about:newtab tests', function () {
       })
 
       it('replace topSites favicon images with a letter when no icon is found', function * () {
-        yield this.app.client.clearAppData({browserHistory: true})
+        yield this.app.client.onClearBrowsingData({browserHistory: true})
 
         const pageWithoutFavicon = Brave.server.url('page_favicon_not_found.html')
 

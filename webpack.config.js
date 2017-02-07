@@ -27,11 +27,11 @@ function config () {
         },
         {
           test: /\.less$/,
-          loader: 'style-loader!css-loader!less-loader'
+          loader: 'style-loader!css-loader?-minimize!less-loader'
         },
         {
           test: /\.css$/,
-          loader: 'style-loader!css-loader'
+          loader: 'style-loader!css-loader?-minimize'
         },
         {
           test: /\.json$/,
@@ -74,16 +74,27 @@ function config () {
   }
 }
 
-function development () {
+function watchOptions () {
+  return {
+    watchOptions: {
+      ignored: [
+        /node_modules/,
+        'test/**'
+      ]
+    }
+  }
+}
+
+function development () {  // eslint-disable-line
   var dev = config()
   dev.devServer = {
     publicPath: 'http://localhost:' + port + '/gen/',
     headers: { 'Access-Control-Allow-Origin': '*' }
   }
-  return dev
+  return Object.assign(dev, watchOptions())
 }
 
-function production () {
+function production () {  // eslint-disable-line
   var prod = config()
   prod.plugins.push(new webpack.optimize.DedupePlugin())
   prod.plugins.push(new webpack.optimize.OccurrenceOrderPlugin(true))
@@ -96,6 +107,10 @@ function production () {
     }
   }))
   return prod
+}
+
+function test () {  // eslint-disable-line
+  return Object.assign(production(), watchOptions())
 }
 
 function merge (config, env) {
@@ -141,20 +156,9 @@ var webtorrentPage = {
   }
 }
 
-module.exports = {
-  development: [
-    merge(app, development()),
-    merge(devTools, development()),
-    merge(webtorrentPage, development())
-  ],
-  production: [
-    merge(app, production()),
-    merge(devTools, production()),
-    merge(webtorrentPage, production())
-  ],
-  test: [
-    merge(app, production()),
-    merge(devTools, production()),
-    merge(webtorrentPage, production())
-  ]
-}[env]
+const envConfig = eval(env)  // eslint-disable-line
+module.exports = [
+  merge(app, envConfig()),
+  merge(devTools, envConfig()),
+  merge(webtorrentPage, envConfig())
+]

@@ -9,6 +9,8 @@ const winUpdateHost = process.env.BRAVE_WIN_UPDATE_HOST || 'https://brave-downlo
 const crashURL = process.env.BRAVE_CRASH_URL || 'https://brave-laptop-updates.herokuapp.com/1/crashes'
 const adHost = process.env.AD_HOST || 'https://oip.brave.com'
 
+const {fullscreenOption} = require('../../app/common/constants/settingsEnums')
+
 module.exports = {
   name: 'Brave',
   contactUrl: 'mailto:support+laptop@brave.com',
@@ -37,14 +39,12 @@ module.exports = {
     enabled: false,
     installUrl: 'https://get.adobe.com/flashplayer/',
     url: getTargetAboutUrl('about:flash'),
-    resourceId: 'PepperFlashPlayer.plugin',
     shields: false
   },
   widevine: {
     enabled: false,
     moreInfoUrl: 'https://www.eff.org/issues/drm',
     licenseUrl: 'https://www.google.com/policies/terms/',
-    resourceId: 'widevinecdmadapter.plugin',
     shields: false
   },
   adblock: {
@@ -118,6 +118,7 @@ module.exports = {
     'tabs.switch-to-new-tabs': false,
     'tabs.paint-tabs': true,
     'tabs.tabs-per-page': 10,
+    'tabs.close-action': 'parent',
     'tabs.show-tab-previews': true,
     'privacy.history-suggestions': true,
     'privacy.bookmark-suggestions': true,
@@ -143,6 +144,8 @@ module.exports = {
     'security.passwords.one-password-enabled': false,
     'security.passwords.dashlane-enabled': false,
     'security.passwords.last-pass-enabled': false,
+    'security.passwords.enpass-enabled': false,
+    'security.fullscreen.content': fullscreenOption.ALWAYS_ASK,
     'security.flash.installed': false,
     'general.downloads.default-save-path': null,
     'general.disable-title-mode': process.platform === 'linux',
@@ -153,9 +156,11 @@ module.exports = {
     'advanced.smooth-scroll-enabled': false,
     'advanced.send-crash-reports': true,
     'advanced.send-usage-statistics': false,
+    'advanced.hide-excluded-sites': false,
     'advanced.minimum-visit-time': 8,
-    'advanced.minimum-visits': 5,
+    'advanced.minimum-visits': 1,
     'advanced.minimum-percentage': false,
+    'advanced.auto-suggest-sites': true,
     'shutdown.clear-history': false,
     'shutdown.clear-downloads': false,
     'shutdown.clear-cache': false,

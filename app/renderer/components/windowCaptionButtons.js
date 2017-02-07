@@ -5,7 +5,7 @@
 const React = require('react')
 const ImmutableComponent = require('../../../js/components/immutableComponent')
 const locale = require('../../../js/l10n')
-const currentWindow = require('../currentWindow')
+const {currentWindow, isMaximized, isFullScreen} = require('../currentWindow')
 const cx = require('../../../js/lib/classSet')
 
 class WindowCaptionButtons extends ImmutableComponent {
@@ -28,13 +28,13 @@ class WindowCaptionButtons extends ImmutableComponent {
   }
 
   onMaximizeClick (e) {
-    if (currentWindow.isFullScreen()) {
+    if (isFullScreen()) {
       // If full screen, toggle full screen status and restore window (make smaller)
       currentWindow.setFullScreen(false)
-      if (currentWindow.isMaximized()) currentWindow.unmaximize()
+      if (isMaximized()) currentWindow.unmaximize()
       return false
     }
-    return (!currentWindow.isMaximized()) ? currentWindow.maximize() : currentWindow.unmaximize()
+    return (!isMaximized()) ? currentWindow.maximize() : currentWindow.unmaximize()
   }
 
   onCloseClick (e) {

@@ -8,7 +8,7 @@ Follow [@brave](https://twitter.com/brave) on Twitter for important news and ann
 
 For other versions of our browser, please see:
 * iPhone - [brave/browser-ios](https://github.com/brave/browser-ios)
-* Android - [brave/browser-android](https://github.com/brave/browser-android)
+* Android - [brave/browser-android](https://github.com/brave/browser-android-tabs)
 
 ## Downloads
 
@@ -28,6 +28,7 @@ You can also [visit our website](https://brave.com/downloads.html) to get the la
 * See [docs/tests.md](docs/tests.md) for information on testing, including how to run a subset of the tests.
 * See [docs/debugging.md](docs/debugging.md) for information on debugging.
 * See [docs/translations.md](docs/translations.md) to learn how you can help us with translations (localization).
+* See [docs/linuxInstall.md](docs/linuxInstall.md) for information on installing the browser on Linux distributions.
 
 ## Running from source
 
@@ -48,7 +49,7 @@ For other platforms (macOS, Linux) You'll need certain packages installed before
 #### On Debian/Ubuntu
 
 ````
-apt-get install libgnome-keyring-dev build-essential
+apt-get install libgnome-keyring-dev build-essential rpm ninja-build
 ````
 
 #### On Fedora

@@ -23,15 +23,14 @@ describe('bookmark tests', function () {
           .waitForUrl(Brave.newTabUrl)
           .loadUrl(this.page1Url)
           .windowParentByUrl(this.page1Url)
-          .waitForVisible(navigator)
-          .moveToObject(navigator)
+          .activateURLMode()
           .waitForVisible(navigatorNotBookmarked)
           .click(navigatorNotBookmarked)
           .waitForVisible(doneButton)
           .waitForBookmarkDetail(this.page1Url, 'Page 1')
           .waitForEnabled(doneButton)
           .click(doneButton)
-          .moveToObject(navigator)
+          .activateURLMode()
           .waitForVisible(navigatorBookmarked)
           .click(navigatorBookmarked)
           .waitForVisible(doneButton)
@@ -41,6 +40,22 @@ describe('bookmark tests', function () {
         yield this.app.client
           .waitForExist('#bookmarkLocation input')
           .waitForBookmarkDetail(this.page1Url, 'Page 1')
+      })
+      it('add custom title', function * () {
+        yield this.app.client
+          .waitForExist('#bookmarkName input')
+          .waitForBookmarkDetail(this.page1Url, 'Page 1')
+          .setValue('#bookmarkName input', 'Custom Page 1')
+          .waitForEnabled(doneButton)
+          .click(doneButton)
+      })
+      it('check custom title', function * () {
+        yield this.app.client
+          .activateURLMode()
+          .waitForVisible(navigatorBookmarked)
+          .click(navigatorBookmarked)
+          .waitForVisible(doneButton)
+          .getValue('#bookmarkName input').should.eventually.be.equal('Custom Page 1')
       })
     })
 
@@ -57,7 +72,7 @@ describe('bookmark tests', function () {
           .loadUrl(this.page1Url)
           .windowParentByUrl(this.page1Url)
           .waitForVisible(navigator)
-          .moveToObject(navigator)
+          .activateURLMode()
           .waitForVisible(navigatorNotBookmarked)
           .click(navigatorNotBookmarked)
           .waitForVisible(doneButton)
@@ -95,8 +110,7 @@ describe('bookmark tests', function () {
         describe('and then removed', function () {
           before(function * () {
             yield this.app.client
-              .waitForVisible(navigator)
-              .moveToObject(navigator)
+              .activateURLMode()
               .waitForVisible(navigatorNotBookmarked)
               .click(navigatorNotBookmarked)
               .waitForVisible(removeButton)
@@ -122,9 +136,9 @@ describe('bookmark tests', function () {
           .waitForUrl(Brave.newTabUrl)
           .loadUrl(this.pageNoTitle)
           .windowParentByUrl(this.pageNoTitle)
-          .moveToObject(navigator)
+          .activateURLMode()
           .waitForExist(navigatorNotBookmarked)
-          .moveToObject(navigator)
+          .activateURLMode()
           .click(navigatorNotBookmarked)
           .waitForBookmarkDetail(this.pageNoTitle, '')
           .waitForEnabled(doneButton + ':not([disabled]')

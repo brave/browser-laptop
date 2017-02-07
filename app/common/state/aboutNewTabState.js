@@ -49,7 +49,7 @@ const removeDuplicateDomains = (list) => {
       return false
     }
     try {
-      const hostname = require('url').parse(site.get('location')).hostname
+      const hostname = require('../urlParse')(site.get('location')).hostname
       if (!siteDomains.has(hostname)) {
         siteDomains.add(hostname)
         return true
@@ -66,8 +66,9 @@ const removeDuplicateDomains = (list) => {
  */
 const getTopSites = (state) => {
   // remove folders; sort by visit count; enforce a max limit
-  const sites = (state.get('sites') || new Immutable.List())
+  const sites = (state.get('sites') ? state.get('sites').toList() : new Immutable.List())
     .filter((site) => !siteUtil.isFolder(site))
+    .filter((site) => !siteUtil.isImportedBookmark(site))
     .filter((site) => !isSourceAboutUrl(site.get('location')))
     .sort(sortCountDescending)
     .slice(0, aboutNewTabMaxEntries)

@@ -7,7 +7,7 @@ const Dialog = require('./dialog')
 const Button = require('./button')
 const appActions = require('../actions/appActions')
 const KeyCodes = require('../../app/common/constants/keyCodes')
-const url = require('url')
+const urlResolve = require('url').resolve
 
 class LoginRequired extends React.Component {
   constructor () {
@@ -70,7 +70,7 @@ class LoginRequired extends React.Component {
   }
   render () {
     const l10nArgs = {
-      host: url.resolve(this.detail.getIn(['request', 'url']), '/')
+      host: urlResolve(this.detail.getIn(['request', 'url']), '/')
     }
     return <Dialog onHide={this.onClose} isClickDismiss>
       <div className='genericForm' onClick={this.onClick.bind(this)}>
@@ -90,6 +90,7 @@ class LoginRequired extends React.Component {
             : null
           }
           <div className='formRow'>
+            <Button l10nId='cancel' className='whiteButton' onClick={this.onClose} />
             <Button l10nId='ok' className='primaryButton' onClick={this.onSave.bind(this)} />
           </div>
         </div>

@@ -31,7 +31,7 @@ describe('urlBarSuggestions', function () {
       .ipcSend(messages.SHORTCUT_NEW_FRAME)
       .waitForUrl(Brave.newTabUrl)
       .windowByUrl(Brave.browserWindowUrl)
-      .waitForExist('.tab[data-frame-key="2"].active')
+      .waitForExist('[data-test-active-tab][data-frame-key="2"]')
       .waitForElementFocus(urlInput)
   })
 
@@ -82,6 +82,17 @@ describe('urlBarSuggestions', function () {
       .click(urlBarSuggestions + ' li.suggestionItem[data-index="0"]')
       .tabByIndex(1)
       .waitForUrl(this.page1Url)
+      .waitForTabCount(2)
+  })
+
+  it('navigates to non-first suggestion when clicked', function * () {
+    yield this.app.client
+      .setInputText(urlInput, 'Page')
+      .waitForVisible(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
+      .click(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
+      .tabByIndex(1)
+      .waitForUrl(this.page2Url)
+      .waitForTabCount(2)
   })
 
   it('navigates to a suggestion with keyboard', function * () {
@@ -187,6 +198,6 @@ describe('search suggestions', function () {
       .keys(Brave.keys.DOWN)
       .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]:not(.selected)')
       .keys(Brave.keys.ENTER)
-      .waitForInputText(urlInput, /google.*\/.*q=what\+is/)
+      .waitForInputText(urlInput, /google.*\/.*q=what.+is/)
   })
 })

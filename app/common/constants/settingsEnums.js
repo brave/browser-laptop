@@ -21,8 +21,21 @@ const bookmarksToolbarMode = {
   FAVICONS_ONLY: 'faviconsOnly'
 }
 
+const tabCloseAction = {
+  LAST_ACTIVE: 'lastActive',
+  NEXT: 'next',
+  PARENT: 'parent'
+}
+
+const fullscreenOption = {
+  ALWAYS_ASK: 'alwaysAsk',
+  ALWAYS_ALLOW: 'alwaysAllow'
+}
+
 module.exports = {
   startsWithOption,
   newTabMode,
-  bookmarksToolbarMode
+  bookmarksToolbarMode,
+  tabCloseAction,
+  fullscreenOption
 }

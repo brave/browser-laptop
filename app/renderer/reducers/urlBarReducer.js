@@ -8,7 +8,7 @@ const windowConstants = require('../../../js/constants/windowConstants')
 const {getSourceAboutUrl, getSourceMagnetUrl, isIntermediateAboutPage, navigatableTypes} = require('../../../js/lib/appUrlUtil')
 const {isURL, getUrlFromInput} = require('../../../js/lib/urlutil')
 const {activeFrameStatePath, frameStatePath, getFrameByKey, getActiveFrame, tabStatePath} = require('../../../js/state/frameStateUtil')
-const urlParse = require('url').parse
+const urlParse = require('../../common/urlParse')
 
 const updateNavBarInput = (state, loc, framePath) => {
   if (framePath === undefined) {

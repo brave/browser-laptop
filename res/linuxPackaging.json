@@ -16,6 +16,7 @@
  "libnotify4",
  "libnss3",
  "libxtst6",
+ "libxss1",
  "python",
  "xdg-utils",
  "gir1.2-gnomekeyring-1.0",

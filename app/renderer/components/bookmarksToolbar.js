@@ -292,7 +292,7 @@ class BookmarksToolbar extends ImmutableComponent {
     contextMenus.onShowBookmarkFolderMenu(this.bookmarks, bookmark, this.activeFrame, e)
   }
   updateBookmarkData (props) {
-    this.bookmarks = siteUtil.getBookmarks(props.sites)
+    this.bookmarks = siteUtil.getBookmarks(props.sites).toList().sort(siteUtil.siteSort)
 
     const noParentItems = this.bookmarks
       .filter((bookmark) => !bookmark.get('parentFolderId'))
@@ -337,9 +337,9 @@ class BookmarksToolbar extends ImmutableComponent {
         break
       }
     }
-    this.bookmarksForToolbar = noParentItems.take(i)
+    this.bookmarksForToolbar = noParentItems.take(i).sort(siteUtil.siteSort)
     // Show at most 100 items in the overflow menu
-    this.overflowBookmarkItems = noParentItems.skip(i).take(100)
+    this.overflowBookmarkItems = noParentItems.skip(i).take(100).sort(siteUtil.siteSort)
   }
   componentWillMount () {
     this.updateBookmarkData(this.props)

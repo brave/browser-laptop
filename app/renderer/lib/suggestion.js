@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const urlParser = require('url')
+const urlParse = require('../../common/urlParse')
 const appConfig = require('../../../js/constants/appConfig')
 const _ = require('underscore')
 const Immutable = require('immutable')
@@ -95,7 +95,7 @@ module.exports.sortByAccessCountWithAgeDecay = (s1, s2) => {
  *
  */
 module.exports.simpleDomainNameValue = (site) => {
-  const parsed = urlParser.parse(site.get('location'))
+  const parsed = urlParse(site.get('location'))
   if (parsed.hash === null && parsed.search === null && parsed.query === null && parsed.pathname === '/') {
     return 1
   } else {
@@ -179,7 +179,7 @@ var virtualSite = (sites) => {
 module.exports.createVirtualHistoryItems = (historySites) => {
   // parse each history item
   var parsedHistorySites = historySites.map((site) => {
-    return urlParser.parse(site.get('location'))
+    return urlParse(site.get('location'))
   }).toArray()
   // group them by host
   var grouped = _.groupBy(parsedHistorySites, (parsedSite) => {

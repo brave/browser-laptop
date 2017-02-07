@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const urlParse = require('url').parse
+const urlParse = require('../../app/common/urlParse')
 const base64Encode = require('../lib/base64').encode
 
 // Polyfill similar to this: https://github.com/gorhill/uBlock/blob/de1ed89f62bf041416d2a721ec00741667bf3fa8/assets/ublock/resources.txt#L385
@@ -41,6 +41,15 @@ module.exports.localStorageExceptions = [
 module.exports.siteHacks = {
   'sp1.nypost.com': emptyDataURI,
   'sp.nasdaq.com': emptyDataURI,
+  'www.lesechos.fr': {
+    enableForAdblock: true,
+    enableForTrackingProtection: true,
+    onBeforeRequest: function (details) {
+      if (urlParse(details.url).pathname === '/xtcore.js') {
+        return { cancel: true }
+      }
+    }
+  },
   'forbes.com': {
     onBeforeSendHeaders: function(details) {
       return {

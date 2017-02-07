@@ -23,10 +23,11 @@ describe('Preferences component', function () {
     mockery.registerMock('../../less/forms.less', {})
     mockery.registerMock('../../less/button.less', {})
     mockery.registerMock('../../node_modules/font-awesome/css/font-awesome.css', {})
+    mockery.registerMock('../../extensions/brave/img/caret_down_grey.svg', 'caret_down_grey.svg')
     window.chrome = fakeElectron
     window.CustomEvent = {}
 
-    Preferences = require('../../../js/about/preferences')
+    Preferences = require('../../../js/about/preferences').AboutPreferences
   })
   after(function () {
     mockery.disable()

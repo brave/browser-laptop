@@ -13,7 +13,7 @@ const appActions = require('../js/actions/appActions')
 const appConfig = require('../js/constants/appConfig')
 const hostContentSettings = require('./browser/contentSettings/hostContentSettings')
 const downloadStates = require('../js/constants/downloadStates')
-const urlParse = require('url').parse
+const urlParse = require('./common/urlParse')
 const getBaseDomain = require('../js/lib/baseDomain').getBaseDomain
 const getSetting = require('../js/settings').getSetting
 const appUrlUtil = require('../js/lib/appUrlUtil')
@@ -32,6 +32,7 @@ const path = require('path')
 const getOrigin = require('../js/state/siteUtil').getOrigin
 const {adBlockResourceName} = require('./adBlock')
 const {updateElectronDownloadItem} = require('./browser/electronDownloadItem')
+const {fullscreenOption} = require('./common/constants/settingsEnums')
 
 let appStore = null
 
@@ -139,7 +140,10 @@ function registerForBeforeRequest (session, partition) {
             tabId: details.tabId,
             url: details.url
           }))
-        if (details.resourceType === 'image') {
+
+        if (parentResourceName === appConfig.resourceNames.SAFE_BROWSING) {
+          cb({ redirectURL: appUrlUtil.getTargetAboutUrl('about:safebrowsing#' + details.url) })
+        } else if (details.resourceType === 'image') {
           cb({ redirectURL: transparent1pxGif })
         } else {
           cb({ cancel: true })
@@ -222,7 +226,6 @@ function registerForBeforeSendHeaders (session, partition) {
     }
 
     let requestHeaders = details.requestHeaders
-    let parsedUrl = urlParse(details.url || '')
 
     const firstPartyUrl = module.exports.getMainFrameUrl(details)
     // this can happen if the tab is closed and the webContents is no longer available
@@ -251,15 +254,17 @@ function registerForBeforeSendHeaders (session, partition) {
     }
 
     if (module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, firstPartyUrl, isPrivate)) {
-      if (module.exports.isThirdPartyHost(urlParse(firstPartyUrl || '').hostname,
-                                          parsedUrl.hostname)) {
+      const parsedTargetUrl = urlParse(details.url || '')
+      const parsedFirstPartyUrl = urlParse(firstPartyUrl)
+
+      if (module.exports.isThirdPartyHost(parsedFirstPartyUrl.hostname, parsedTargetUrl.hostname)) {
         // Clear cookie and referer on third-party requests
         if (requestHeaders['Cookie'] &&
             getOrigin(firstPartyUrl) !== pdfjsOrigin) {
           requestHeaders['Cookie'] = undefined
         }
         if (requestHeaders['Referer'] &&
-            !refererExceptions.includes(parsedUrl.hostname)) {
+            !refererExceptions.includes(parsedTargetUrl.hostname)) {
           requestHeaders['Referer'] = getOrigin(details.url)
         }
       }
@@ -354,6 +359,13 @@ function registerPermissionHandler (session, partition) {
     // The Torrent Viewer extension is always allowed to show fullscreen media
     if (permission === 'fullscreen' &&
       origin.startsWith('chrome-extension://' + config.torrentExtensionId)) {
+      cb(true)
+      return
+    }
+
+    // Always allow fullscreen if setting is ON
+    const alwaysAllowFullscreen = module.exports.alwaysAllowFullscreen() === fullscreenOption.ALWAYS_ALLOW
+    if (permission === 'fullscreen' && alwaysAllowFullscreen) {
       cb(true)
       return
     }
@@ -487,12 +499,14 @@ function registerForDownloadListener (session) {
     }
 
     const defaultPath = path.join(getSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH) || app.getPath('downloads'), itemFilename)
-    const savePath = dialog.showSaveDialog(win, { defaultPath })
+    const savePath = (process.env.SPECTRON ? defaultPath : dialog.showSaveDialog(win, { defaultPath }))
+
     // User cancelled out of save dialog prompt
     if (!savePath) {
       event.preventDefault()
       return
     }
+
     item.setSavePath(savePath)
     appActions.changeSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH, path.dirname(savePath))
 
@@ -524,7 +538,7 @@ function registerForMagnetHandler (session) {
       session.protocol.unregisterNavigatorHandler('magnet', `${webtorrentUrl}#%s`)
     }
   } catch (e) {
-    console.warn('Could not register magnet URL handler, are oyu using the latest electron?')
+    console.warn('Could not register magnet URL handler. Are you using the latest electron?')
   }
 }
 
@@ -729,4 +743,8 @@ module.exports.getMainFrameUrl = (details) => {
     return tab.getURL()
   }
   return null
+}
+
+module.exports.alwaysAllowFullscreen = () => {
+  return getSetting(settings.FULLSCREEN_CONTENT)
 }

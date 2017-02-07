@@ -151,23 +151,17 @@ const isItemValid = (currentItem, previousItem) => {
       return false
     }
   }
-  return currentItem && (typeof currentItem.label === 'string' || typeof currentItem.type === 'string')
+  return currentItem && (typeof currentItem.l10nLabelId === 'string' || typeof currentItem.label === 'string' || currentItem.type === 'separator')
 }
 
 /**
  * Remove invalid entries from a menu template:
  * - null or falsey entries
  * - extra menu separators
- * - entries which don't have a label or type
+ * - entries which don't have a label (or l10nLabelId) if their type is not 'separator'
  */
 module.exports.sanitizeTemplateItems = (template) => {
-  const reduced = template.reduce((previousValue, currentValue, currentIndex, array) => {
-    const result = currentIndex === 1 ? [] : previousValue
-    if (currentIndex === 1) {
-      if (isItemValid(previousValue)) {
-        result.push(previousValue)
-      }
-    }
+  const reduced = template.reduce((result, currentValue, currentIndex, array) => {
     const previousItem = result.length > 0
       ? result[result.length - 1]
       : undefined
@@ -175,7 +169,7 @@ module.exports.sanitizeTemplateItems = (template) => {
       result.push(currentValue)
     }
     return result
-  })
+  }, [])
 
   const result = Array.isArray(reduced)
     ? reduced

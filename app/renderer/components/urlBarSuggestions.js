@@ -10,8 +10,14 @@ const ImmutableComponent = require('../../../js/components/immutableComponent')
 const suggestionTypes = require('../../../js/constants/suggestionTypes')
 const cx = require('../../../js/lib/classSet')
 const locale = require('../../../js/l10n')
+const {isForSecondaryAction} = require('../../../js/lib/eventUtil')
 
 class UrlBarSuggestions extends ImmutableComponent {
+  constructor () {
+    super()
+    this.onSuggestionClicked = this.onSuggestionClicked.bind(this)
+  }
+
   get activeIndex () {
     if (this.props.suggestionList === null) {
       return -1
@@ -21,6 +27,10 @@ class UrlBarSuggestions extends ImmutableComponent {
 
   blur () {
     windowActions.setUrlBarSuggestions(null, null)
+  }
+
+  onSuggestionClicked (e) {
+    windowActions.activeSuggestionClicked(isForSecondaryAction(e), e.shiftKey)
   }
 
   render () {
@@ -55,7 +65,7 @@ class UrlBarSuggestions extends ImmutableComponent {
         const selected = this.activeIndex === currentIndex || (!this.activeIndex && currentIndex === 0 && this.props.hasLocationValueSuffix)
         return <li data-index={currentIndex}
           onMouseOver={this.onMouseOver.bind(this)}
-          onClick={suggestion.onClick}
+          onClick={this.onSuggestionClicked}
           key={`${suggestion.location}|${index + i}`}
           ref={(node) => { selected && (this.selectedElement = node) }}
           className={cx({

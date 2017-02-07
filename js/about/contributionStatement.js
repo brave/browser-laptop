@@ -280,7 +280,7 @@ class ContributionStatement extends ImmutableComponent {
               <tr className='spacingRow' />
               {
               page.map(function (row, idx) {
-                let publisherSynopsis = this.synopsis[row.siteColumn] || {}
+                let publisherSynopsis = (this.synopsis.filter((entry) => { return entry.site === row[0] }) || [])[0] || {}
 
                 let verified = publisherSynopsis.verified
                 let site = row[0]
@@ -328,9 +328,13 @@ class ContributionStatement extends ImmutableComponent {
   }
 
   get ContributionStatementPageFooter () {
+    const l10nDataArgs = {
+      currentYear: new Date().getFullYear().toString(10)
+    }
+
     return (
       <div className='pageFooterBox'>
-        <span className='pageFooterBody' data-l10n-id='contributionStatementCopyrightFooter' />
+        <span className='pageFooterBody' data-l10n-id='contributionStatementCopyrightFooter' data-l10n-args={JSON.stringify(l10nDataArgs)} />
       </div>
     )
   }

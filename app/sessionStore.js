@@ -37,6 +37,20 @@ const getSetting = require('../js/settings').getSetting
 const promisify = require('../js/lib/promisify')
 const sessionStorageName = `session-store-${sessionStorageVersion}`
 
+const getTopSiteMap = () => {
+  if (Array.isArray(topSites) && topSites.length) {
+    let siteMap = {}
+    let order = 0
+    topSites.forEach((site) => {
+      let key = siteUtil.getSiteKey(Immutable.fromJS(site))
+      site.order = order++
+      siteMap[key] = site
+    })
+    return siteMap
+  }
+  return {}
+}
+
 const getStoragePath = () => {
   return path.join(app.getPath('userData'), sessionStorageName)
 }
@@ -114,11 +128,10 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
   delete perWindowData.bookmarkDetail
   // Don't restore bravery panel
   delete perWindowData.braveryPanelDetail
-  // Don't restore cache clearing popup
-  delete perWindowData.clearBrowsingDataDetail
-  // Don't restore drag data
+  // Don't restore drag data and clearBrowsingDataPanel's visibility
   if (perWindowData.ui) {
     delete perWindowData.ui.dragging
+    delete perWindowData.ui.isClearBrowsingDataPanelVisible
   }
   perWindowData.frames = perWindowData.frames || []
   let newKey = 0
@@ -132,10 +145,6 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
       frame.unloaded = true
     }
     frame.key = newKey
-    // Full history is not saved yet
-    // TODO (bsclifton): remove this when https://github.com/brave/browser-laptop/issues/963 is complete
-    frame.canGoBack = false
-    frame.canGoForward = false
 
     // Set the frame src to the last visited location
     // or else users will see the first visited URL.
@@ -477,6 +486,18 @@ module.exports.loadAppState = () => {
         }
       }
       data = setVersionInformation(data)
+
+      // sites refactoring migration
+      if (Array.isArray(data.sites) && data.sites.length) {
+        let sites = {}
+        let order = 0
+        data.sites.forEach((site) => {
+          let key = siteUtil.getSiteKey(Immutable.fromJS(site))
+          site.order = order++
+          sites[key] = site
+        })
+        data.sites = sites
+      }
     } catch (e) {
       // TODO: Session state is corrupted, maybe we should backup this
       // corrupted value for people to report into support.
@@ -499,7 +520,7 @@ module.exports.loadAppState = () => {
 module.exports.defaultAppState = () => {
   return {
     firstRunTimestamp: new Date().getTime(),
-    sites: topSites,
+    sites: getTopSiteMap(),
     tabs: [],
     windows: [],
     extensions: {},

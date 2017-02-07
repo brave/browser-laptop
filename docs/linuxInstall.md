@@ -8,10 +8,10 @@ To install brave using apt and lsb\_release :
 
 ``` 
 curl https://s3-us-west-2.amazonaws.com/brave-apt/keys.asc | sudo apt-key add -
-echo "deb [arch=amd64] https://s3-us-west-2.amazonaws.com/brave-apt `lsb_release -sc` main" | sudo tee -a /etc/apt/sources.list
+echo "deb [arch=amd64] https://s3-us-west-2.amazonaws.com/brave-apt `lsb_release -sc` main" | sudo tee -a /etc/apt/sources.list.d/brave-`lsb_release -sc`.list
 ```
 
-You will want to make sure the bottom line of /etc/apt/sources.list lists a new repository and doesn not contain the word lsb\_release. If you see the word lsb\_release you might not have lsb\_release installed. Otherwise run
+You will want to make sure the /etc/apt/sources.list.d/brave-\*.list file lists a new repository and does not contain the word lsb\_release. If you see the word lsb\_release you might not have lsb\_release installed. Otherwise run:
 
 ```
 sudo apt update
@@ -23,7 +23,8 @@ Upgrades can be done via:
 apt-get update && apt-get upgrade -y
 ```
 
-Alternatively you can install the deb directly but then you wont get automatic upgrades with apt
+Alternatively you can install the deb directly but then you won't get automatic upgrades:
+
 ```
 wget -O brave.deb https://laptop-updates.brave.com/latest/dev/debian64
 sudo apt-get install -y gdebi && sudo gdebi brave.deb
@@ -43,6 +44,23 @@ sudo dpkg -i ./brave.deb
 
 ## Fedora x86_64:
 
+To install brave using dnf:
+
+```
+sudo dnf config-manager --add-repo https://s3-us-west-2.amazonaws.com/brave-rpm-release/x86_64/
+sudo rpm --import https://s3-us-west-2.amazonaws.com/brave-rpm-release/keys.asc 
+sudo dnf install brave
+```
+
+To update brave using dnf:
+
+```
+dnf upgrade brave
+```
+
+
+Alternatively you can install the rpm directly, but then you won't get automatic upgrades:
+
 ```
 sudo dnf install lsb
 wget -O brave.rpm https://laptop-updates.brave.com/latest/fedora64
@@ -51,8 +69,25 @@ sudo dnf install ./brave.rpm
 
 ## OpenSUSE AMD64:
 
+To install brave using zypper:
+
 ```
 sudo zypper install lsb
+sudo zypper addrepo https://s3-us-west-2.amazonaws.com/brave-rpm-release/x86_64/ brave-rpm-release
+sudo zypper ref
+sudo zypper install brave
+```
+
+To update brave using zypper:
+
+```
+sudo zypper ref
+sudo zypper update brave
+```
+
+Alternatively you can install the rpm directly, but then you won't get automatic upgrades:
+
+```
 wget -O brave.rpm https://laptop-updates.brave.com/latest/openSUSE64
 sudo rpm -i ./brave.rpm
 ```

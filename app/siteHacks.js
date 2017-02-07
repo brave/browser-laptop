@@ -4,7 +4,7 @@
 
 'use strict'
 
-const URL = require('url')
+const urlParse = require('./common/urlParse')
 const Filtering = require('./filtering')
 const {siteHacks} = require('../js/data/siteHacks')
 const appConfig = require('../js/constants/appConfig')
@@ -24,7 +24,7 @@ module.exports.init = () => {
     }
 
     // This filter only applies to top-level requests, so details.url == mainFrameUrl
-    let domain = URL.parse(details.url).hostname.split('.').slice(-2).join('.')
+    let domain = urlParse(details.url).hostname.split('.').slice(-2).join('.')
     let hack = siteHacks[domain]
     let customCookie
     let requestHeaders
@@ -50,7 +50,7 @@ module.exports.init = () => {
   })
 
   Filtering.registerBeforeRequestFilteringCB((details, isPrivate) => {
-    let domain = URL.parse(details.url).hostname
+    let domain = urlParse(details.url).hostname
     let hack = siteHacks[domain]
 
     let redirectURL

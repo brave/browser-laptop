@@ -24,7 +24,7 @@ const {fileUrl} = require('../../js/lib/appUrlUtil')
 const menuUtil = require('../common/lib/menuUtil')
 const getSetting = require('../../js/settings').getSetting
 const locale = require('../locale')
-const {isSiteBookmarked} = require('../../js/state/siteUtil')
+const {isSiteBookmarked, siteSort} = require('../../js/state/siteUtil')
 const isDarwin = process.platform === 'darwin'
 const aboutUrl = 'https://brave.com/'
 
@@ -316,7 +316,7 @@ const createHistorySubmenu = () => {
       label: locale.translation('clearBrowsingData'),
       accelerator: 'Shift+CmdOrCtrl+Delete',
       click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, {browserHistory: true}])
+        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL])
       }
     }
   ]
@@ -362,10 +362,11 @@ const createBookmarksSubmenu = () => {
     CommonMenu.bookmarksManagerMenuItem(),
     CommonMenu.bookmarksToolbarMenuItem(),
     CommonMenu.separatorMenuItem,
-    CommonMenu.importBrowserDataMenuItem()
+    CommonMenu.importBrowserDataMenuItem(),
+    CommonMenu.exportBookmarksMenuItem()
   ]
 
-  const bookmarks = menuUtil.createBookmarkTemplateItems(appStore.getState().get('sites'))
+  const bookmarks = menuUtil.createBookmarkTemplateItems(appStore.getState().get('sites').toList().sort(siteSort))
   if (bookmarks.length > 0) {
     submenu.push(CommonMenu.separatorMenuItem)
     submenu = submenu.concat(bookmarks)
@@ -426,7 +427,6 @@ const createWindowSubmenu = () => {
 
 const createHelpSubmenu = () => {
   const submenu = [
-    CommonMenu.reportAnIssueMenuItem(),
     CommonMenu.separatorMenuItem,
     CommonMenu.submitFeedbackMenuItem(),
     {

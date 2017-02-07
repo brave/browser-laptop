@@ -4,7 +4,7 @@
 
 'use strict'
 
-const URL = require('url')
+const urlParse = require('./common/urlParse')
 const {AdBlockClient, FilterOptions} = require('ad-block')
 const DataFile = require('./dataFile')
 const Filtering = require('./filtering')
@@ -45,9 +45,9 @@ const startAdBlocking = (adblock, resourceName, shouldCheckMainFrame) => {
         resourceName: module.exports.resourceName
       }
     }
-    const firstPartyUrl = URL.parse(mainFrameUrl)
+    const firstPartyUrl = urlParse(mainFrameUrl)
     let firstPartyUrlHost = firstPartyUrl.hostname || ''
-    const urlHost = URL.parse(details.url).hostname
+    const urlHost = urlParse(details.url).hostname
     const cancel = firstPartyUrl.protocol &&
       (shouldCheckMainFrame || (details.resourceType !== 'mainFrame' &&
                                 Filtering.isThirdPartyHost(firstPartyUrlHost, urlHost))) &&

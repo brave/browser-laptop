@@ -45,7 +45,7 @@ describe('about:bookmarks', function () {
       .addSite({ location: 'https://duckduckgo.com', title: 'duckduckgo', tags: bookmarkTag, parentFolderId: folderId, lastAccessedTime: lastVisit }, siteTags.BOOKMARK)
       .addSite({ location: 'https://google.com', title: 'Google', tags: bookmarkTag, parentFolderId: folderId, lastAccessedTime: lastVisit }, siteTags.BOOKMARK)
       .addSite({ location: 'https://bing.com', title: 'Bing', tags: bookmarkTag, parentFolderId: folderId, lastAccessedTime: lastVisit }, siteTags.BOOKMARK)
-      .waitForExist('.tab[data-frame-key="1"]')
+      .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
       .tabByIndex(0)
       .url(aboutBookmarksUrl)
   }
@@ -60,7 +60,7 @@ describe('about:bookmarks', function () {
         parentFolderId: 0,
         lastAccessedTime: lastVisit
       }, siteTags.BOOKMARK)
-      .waitForExist('.tab[data-frame-key="1"]')
+      .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
       .tabByIndex(0)
       .url(aboutBookmarksUrl)
   }

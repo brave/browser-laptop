@@ -4,6 +4,7 @@
 
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const EventEmitter = require('events').EventEmitter
+const appActions = require('../actions/appActions')
 const appConstants = require('../constants/appConstants')
 const windowConstants = require('../constants/windowConstants')
 const config = require('../constants/config')
@@ -16,7 +17,7 @@ const messages = require('../constants/messages')
 const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
 const UrlUtil = require('../lib/urlutil')
-const currentWindow = require('../../app/renderer/currentWindow')
+const {currentWindowId, isFocused} = require('../../app/renderer/currentWindow')
 const {tabFromFrame} = require('../state/frameStateUtil')
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
 const {aboutUrls, newFrameUrl} = require('../lib/appUrlUtil')
@@ -337,15 +338,34 @@ const doAction = (action) => {
       // Use the frameProps we passed in, or default to the active frame
       const frameProps = action.frameProps || frameStateUtil.getActiveFrame(windowState)
       const index = frameStateUtil.getFramePropsIndex(windowState.get('frames'), frameProps)
+      const hoverState = windowState.getIn(['frames', index, 'hoverState'])
       const activeFrameKey = frameStateUtil.getActiveFrame(windowState).get('key')
-      windowState = windowState.merge(frameStateUtil.removeFrame(windowState.get('frames'), windowState.get('tabs'),
-        windowState.get('closedFrames'), frameProps.set('closedAtIndex', index),
-        activeFrameKey))
+      windowState = windowState.merge(frameStateUtil.removeFrame(
+        windowState.get('frames'),
+        windowState.get('tabs'),
+        windowState.get('closedFrames'),
+        frameProps.set('closedAtIndex', index),
+        activeFrameKey,
+        index,
+        getSetting(settings.TAB_CLOSE_ACTION)
+      ))
       // If we reach the limit of opened tabs per page while closing tabs, switch to
       // the active tab's page otherwise the user will hang on empty page
-      let totalOpenTabs = windowState.get('frames').filter((frame) => !frame.get('pinnedLocation')).size
-      if ((totalOpenTabs % getSetting(settings.TABS_PER_PAGE)) === 0) {
+      if (frameStateUtil.getNonPinnedFrameCount(windowState) % getSetting(settings.TABS_PER_PAGE) === 0) {
         updateTabPageIndex(frameStateUtil.getActiveFrame(windowState))
+        windowState = windowState.deleteIn(['ui', 'tabs', 'fixTabWidth'])
+      }
+
+      const nextFrame = frameStateUtil.getFrameByIndex(windowState, index)
+
+      // Copy the hover state if tab closed with mouse as long as we have a next frame
+      // This allow us to have closeTab button visible  for sequential frames closing, until onMouseLeave event happens.
+      if (hoverState && nextFrame) {
+        doAction({
+          actionType: windowConstants.WINDOW_SET_TAB_HOVER_STATE,
+          frameProps: nextFrame,
+          hoverState: hoverState
+        })
       }
       break
     case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
@@ -362,6 +382,9 @@ const doAction = (action) => {
       windowState = windowState.merge({
         activeFrameKey: action.frameProps.get('key'),
         previewFrameKey: null
+      })
+      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+        lastAccessedTime: new Date().getTime()
       })
       windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
       updateTabPageIndex(action.frameProps)
@@ -387,11 +410,13 @@ const doAction = (action) => {
         updateTabPageIndex(action.frameProps)
       }
       break
-    case windowConstants.WINDOW_UPDATE_BACK_FORWARD:
-      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
-        canGoBack: action.canGoBack,
-        canGoForward: action.canGoForward
-      })
+    case windowConstants.WINDOW_SET_TAB_BREAKPOINT:
+      windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'breakpoint'], action.breakpoint)
+      windowState = windowState.setIn(['tabs', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'breakpoint'], action.breakpoint)
+      break
+    case windowConstants.WINDOW_SET_TAB_HOVER_STATE:
+      windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'hoverState'], action.hoverState)
+      windowState = windowState.setIn(['tabs', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'hoverState'], action.hoverState)
       break
     case windowConstants.WINDOW_SET_IS_BEING_DRAGGED_OVER_DETAIL:
       if (!action.dragOverKey) {
@@ -479,6 +504,11 @@ const doAction = (action) => {
     case windowConstants.WINDOW_AUTOFILL_POPUP_HIDDEN:
     case windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL:
       if (!action.detail) {
+        if (windowState.getIn(['contextMenuDetail', 'type']) === 'hamburgerMenu') {
+          windowState = windowState.set('hamburgerMenuWasOpen', true)
+        } else {
+          windowState = windowState.set('hamburgerMenuWasOpen', false)
+        }
         windowState = windowState.delete('contextMenuDetail')
 
         if (windowState.getIn(['contextMenuDetail', 'type']) === 'autofill' &&
@@ -488,7 +518,10 @@ const doAction = (action) => {
           }
         }
       } else {
-        windowState = windowState.set('contextMenuDetail', action.detail)
+        if (!(action.detail.get('type') === 'hamburgerMenu' && windowState.get('hamburgerMenuWasOpen'))) {
+          windowState = windowState.set('contextMenuDetail', action.detail)
+        }
+        windowState = windowState.set('hamburgerMenuWasOpen', false)
       }
       break
     case windowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL:
@@ -573,12 +606,8 @@ const doAction = (action) => {
         })
       }
       break
-    case windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL:
-      if (!action.clearBrowsingDataDetail) {
-        windowState = windowState.delete('clearBrowsingDataDetail')
-      } else {
-        windowState = windowState.set('clearBrowsingDataDetail', Immutable.fromJS(action.clearBrowsingDataDetail))
-      }
+    case windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_VISIBLE:
+      windowState = windowState.setIn(['ui', 'isClearBrowsingDataPanelVisible'], action.isVisible)
       break
     case windowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_DETAIL:
       if (!action.importBrowserDataDetail) {
@@ -689,7 +718,7 @@ const doAction = (action) => {
           : !windowState.getIn(['ui', 'menubar', 'isVisible'])
         // Clear selection when menu is shown
         if (newVisibleStatus) {
-          doAction({ actionType: windowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX, index: [0] })
+          doAction({ actionType: windowConstants.WINDOW_SET_MENUBAR_SELECTED_INDEX, index: 0 })
         }
         windowState = windowState.setIn(['ui', 'menubar', 'isVisible'], newVisibleStatus)
       }
@@ -708,14 +737,18 @@ const doAction = (action) => {
       } else {
         doAction({actionType: windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL})
       }
-      doAction({actionType: windowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX})
+      doAction({actionType: windowConstants.WINDOW_SET_MENUBAR_SELECTED_INDEX})
+      doAction({actionType: windowConstants.WINDOW_SET_CONTEXT_MENU_SELECTED_INDEX})
       doAction({actionType: windowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID})
       break
-    case windowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX:
-      windowState = windowState.setIn(['ui', 'menubar', 'selectedIndex'],
-        Array.isArray(action.index)
-        ? action.index
-        : null)
+    case windowConstants.WINDOW_SET_MENUBAR_SELECTED_INDEX:
+      windowState = windowState.setIn(['ui', 'menubar', 'selectedIndex'], action.index)
+      break
+    case windowConstants.WINDOW_SET_CONTEXT_MENU_SELECTED_INDEX:
+      windowState = windowState.setIn(['ui', 'contextMenu', 'selectedIndex'],
+          Array.isArray(action.index)
+          ? action.index
+          : null)
       break
     case windowConstants.WINDOW_SET_LAST_FOCUSED_SELECTOR:
       windowState = windowState.setIn(['ui', 'menubar', 'lastFocusedSelector'], action.selector)
@@ -735,6 +768,16 @@ const doAction = (action) => {
       break
     case appConstants.APP_NEW_TAB:
       newFrame(action.frameProps, action.frameProps.get('disposition') === 'foreground-tab')
+      break
+    case windowConstants.WINDOW_TAB_CLOSED_WITH_MOUSE:
+      if (frameStateUtil.getNonPinnedFrameCount(windowState) % getSetting(settings.TABS_PER_PAGE) === 0) {
+        windowState = windowState.deleteIn(['ui', 'tabs', 'fixTabWidth'])
+      } else {
+        windowState = windowState.setIn(['ui', 'tabs', 'fixTabWidth'], action.data.fixTabWidth)
+      }
+      break
+    case windowConstants.WINDOW_TAB_MOUSE_LEAVE:
+      windowState = windowState.deleteIn(['ui', 'tabs', 'fixTabWidth'])
       break
     default:
       break
@@ -760,10 +803,10 @@ ipc.on(messages.SHORTCUT_PREV_TAB, () => {
   emitChanges()
 })
 
-ipc.on(messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, (e, clearBrowsingDataDetail) => {
+ipc.on(messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, (e) => {
   doAction({
-    actionType: windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL,
-    clearBrowsingDataDetail
+    actionType: windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_VISIBLE,
+    isVisible: true
   })
 })
 
@@ -771,11 +814,15 @@ const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', '
 frameShortcuts.forEach((shortcut) => {
   // Listen for actions on the active frame
   ipc.on(`shortcut-active-frame-${shortcut}`, (e, args) => {
-    windowState = windowState.mergeIn(activeFrameStatePath(windowState), {
-      activeShortcut: shortcut,
-      activeShortcutDetails: args
-    })
-    emitChanges()
+    if (shortcut === 'toggle-dev-tools') {
+      appActions.toggleDevTools(frameStateUtil.getActiveFrameTabId(windowState))
+    } else {
+      windowState = windowState.mergeIn(activeFrameStatePath(windowState), {
+        activeShortcut: shortcut,
+        activeShortcutDetails: args
+      })
+      emitChanges()
+    }
   })
   // Listen for actions on frame N
   if (['reload', 'mute'].includes(shortcut)) {
@@ -795,11 +842,11 @@ ipc.on(messages.DISPATCH_ACTION, (e, serializedPayload) => {
   let action = Serializer.deserialize(serializedPayload)
   let queryInfo = action.queryInfo || action.frameProps || {}
   queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
-  if (queryInfo.windowId === -2 && currentWindow.isFocused()) {
-    queryInfo.windowId = currentWindow.id
+  if (queryInfo.windowId === -2 && isFocused()) {
+    queryInfo.windowId = currentWindowId
   }
   // handle any ipc dispatches that are targeted to this window
-  if (queryInfo.windowId && queryInfo.windowId === currentWindow.id) {
+  if (queryInfo.windowId && queryInfo.windowId === currentWindowId) {
     doAction(action)
   }
 })

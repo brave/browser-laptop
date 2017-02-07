@@ -249,6 +249,12 @@ describe('menuUtil tests', function () {
       const expectedResult = [{label: 'lol1'}, separator, {label: 'lol2'}]
       assert.deepEqual(result, expectedResult)
     })
+    it('allows l10nLabelId instead of label', function () {
+      const template = [{l10nLabelId: 'lol1'}]
+      const result = menuUtil.sanitizeTemplateItems(template)
+      const expectedResult = [{l10nLabelId: 'lol1'}]
+      assert.deepEqual(result, expectedResult)
+    })
     it('removes items which are missing label or type', function () {
       const template = [{}, {test: 'test'}, {label: 'lol'}]
       const result = menuUtil.sanitizeTemplateItems(template)
@@ -281,6 +287,12 @@ describe('menuUtil tests', function () {
     })
     it('does not allow only a separator', function () {
       const template = [separator]
+      const result = menuUtil.sanitizeTemplateItems(template)
+      const expectedResult = []
+      assert.deepEqual(result, expectedResult)
+    })
+    it('supports empty arrays', function () {
+      const template = []
       const result = menuUtil.sanitizeTemplateItems(template)
       const expectedResult = []
       assert.deepEqual(result, expectedResult)

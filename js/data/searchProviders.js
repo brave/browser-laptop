@@ -80,7 +80,7 @@ module.exports = { "providers" :
       "shortcut" : ":y"
     },
     {
-      "name" : "Youtube",
+      "name" : "YouTube",
       "base" : "https://www.youtube.com",
       "image" : "https://www.youtube.com/favicon.ico",
       "search" : "https://www.youtube.com/results?search_type=search_videos&search_query={searchTerms}&search_sort=relevance&search_category=0&page=",

@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const urlParse = require('url').parse
+const urlParse = require('../../common/urlParse')
 
 const ImmutableComponent = require('../../../js/components/immutableComponent')
 const windowActions = require('../../../js/actions/windowActions')
@@ -323,9 +323,11 @@ class UrlBar extends ImmutableComponent {
   // Keeps track of which part was set for the url suffix and which
   // part was set for the value.
   setValue (val, suffix) {
+    val = val || ''
+    suffix = suffix || ''
     this.lastVal = val
     this.lastSuffix = suffix
-    const newValue = val + (suffix || '')
+    const newValue = val + suffix
     if (this.urlInput.value !== newValue) {
       this.urlInput.value = newValue
     }
@@ -367,6 +369,8 @@ class UrlBar extends ImmutableComponent {
   }
 
   componentWillMount () {
+    this.lastVal = ''
+    this.lastSuffix = ''
     ipc.on(messages.SHORTCUT_FOCUS_URL, (e) => {
       this.focus()
       this.select()
@@ -438,8 +442,7 @@ class UrlBar extends ImmutableComponent {
   get locationValue () {
     const location = this.props.urlbar.get('location')
     const history = this.props.history
-    if (isIntermediateAboutPage(location) && history.size > 0 &&
-        !this.activeFrame.get('canGoForward')) {
+    if (isIntermediateAboutPage(location) && history.size > 0 && !this.props.canGoForward) {
       return history.last()
     }
 
@@ -478,7 +481,10 @@ class UrlBar extends ImmutableComponent {
 
   render () {
     return <form
-      className='urlbarForm'
+      className={cx({
+        urlbarForm: true,
+        noBorderRadius: this.props.noBorderRadius
+      })}
       action='#'
       id='urlbar'
       ref='urlbar'>
@@ -493,6 +499,7 @@ class UrlBar extends ImmutableComponent {
           searchSelectEntry={this.searchSelectEntry}
           title={this.props.title}
           titleMode={this.props.titleMode}
+          isSearching={this.props.location !== this.props.urlbar.get('location')}
         />
       </div>
       {

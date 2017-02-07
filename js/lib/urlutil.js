@@ -9,7 +9,7 @@ const rscheme = /^(?:[a-z\u00a1-\uffff0-9-+]+)(?::(\/\/)?)(?!\d)/i
 const defaultScheme = 'http://'
 const fileScheme = 'file://'
 const os = require('os')
-const urlParse = require('url').parse
+const urlParse = require('../../app/common/urlParse')
 const urlFormat = require('url').format
 const pdfjsExtensionId = require('../constants/config').PDFJSExtensionId
 

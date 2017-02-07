@@ -8,16 +8,20 @@ const { makeImmutable } = require('../common/state/immutableUtil')
 let currentWebContents = {}
 
 const cleanupWebContents = (tabId) => {
-  delete currentWebContents[tabId]
-  setImmediate(() => {
-    appActions.tabClosed({ tabId })
-  })
+  if (currentWebContents[tabId]) {
+    delete currentWebContents[tabId]
+    setImmediate(() => {
+      appActions.tabClosed({ tabId })
+    })
+  }
 }
 
 const getTabValue = function (tabId) {
   let tab = api.getWebContents(tabId)
   if (tab) {
-    const tabValue = makeImmutable(extensions.tabValue(tab))
+    let tabValue = makeImmutable(extensions.tabValue(tab))
+    tabValue = tabValue.set('canGoBack', tab.canGoBack())
+    tabValue = tabValue.set('canGoForward', tab.canGoForward())
     return tabValue.set('tabId', tabId)
   }
 }
@@ -77,6 +81,15 @@ const api = {
         hostWebContents.send(messages.SHORTCUT_NEW_FRAME, location, { frameOpts })
       }
     })
+
+    process.on('chrome-tabs-updated', (e, tabId) => {
+      updateTab(tabId)
+    })
+
+    process.on('chrome-tabs-removed', (e, tabId) => {
+      cleanupWebContents(tabId)
+    })
+
     app.on('web-contents-created', function (event, tab) {
       if (extensions.isBackgroundPage(tab) || !tab.isGuest()) {
         return
@@ -129,6 +142,9 @@ const api = {
       tab.on('did-navigate', function (evt, url) {
         updateTab(tabId)
       })
+      tab.on('did-navigate-in-page', function (evt, url, isMainFrame) {
+        updateTab(tabId)
+      })
       tab.on('load-start', function (evt, url, isMainFrame, isErrorPage) {
         if (isMainFrame) {
           updateTab(tabId)
@@ -168,8 +184,35 @@ const api = {
     return state
   },
 
+  sendToAll: (...args) => {
+    for (let tabId in currentWebContents) {
+      const tab = currentWebContents[tabId]
+      try {
+        if (tab && !tab.isDestroyed()) {
+          tab.send(...args)
+        }
+      } catch (e) {
+        // ignore exceptions
+      }
+    }
+  },
+
   getWebContents: (tabId) => {
     return currentWebContents[tabId]
+  },
+
+  toggleDevTools: (state, action) => {
+    action = makeImmutable(action)
+    const tabId = action.get('tabId')
+    const tab = api.getWebContents(tabId)
+    if (tab && !tab.isDestroyed()) {
+      if (tab.isDevToolsOpened()) {
+        tab.closeDevTools()
+      } else {
+        tab.openDevTools()
+      }
+    }
+    return state
   },
 
   setAudioMuted: (state, action) => {

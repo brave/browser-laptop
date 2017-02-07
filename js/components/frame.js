@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const urlParse = require('url').parse
+const urlParse = require('../../app/common/urlParse')
 const windowActions = require('../actions/windowActions')
 const webviewActions = require('../actions/webviewActions')
 const appActions = require('../actions/appActions')
@@ -26,7 +26,7 @@ const {isFrameError} = require('../../app/common/lib/httpUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
 const {getSiteSettingsForHostPattern} = require('../state/siteSettings')
-const currentWindow = require('../../app/renderer/currentWindow')
+const {currentWindowWebContents, isFocused} = require('../../app/renderer/currentWindow')
 const windowStore = require('../stores/windowStore')
 const appStoreRenderer = require('../stores/appStoreRenderer')
 const siteSettings = require('../state/siteSettings')
@@ -61,13 +61,15 @@ class Frame extends ImmutableComponent {
     return windowStore.getFrame(this.props.frameKey) || Immutable.fromJS({})
   }
 
-  get braveryDefaults () {
-    return siteSettings.braveryDefaults(appStoreRenderer.state, appConfig)
+  get tab () {
+    const frame = this.frame
+    return appStoreRenderer.state.get('tabs').find((tab) => tab.get('tabId') === frame.get('tabId'))
   }
 
-  get frameBraverySettings () {
+  getFrameBraverySettings (props) {
+    props = props || this.props
     const frameSiteSettings =
-      siteSettings.getSiteSettingsForURL(this.props.allSiteSettings, this.props.location)
+      siteSettings.getSiteSettingsForURL(props.allSiteSettings, props.location)
     return Immutable.fromJS(siteSettings.activeSettings(frameSiteSettings,
                                                         appStoreRenderer.state,
                                                         appConfig))
@@ -85,61 +87,95 @@ class Frame extends ImmutableComponent {
    * Send data critical for the given about page via IPC.
    * The page receiving the data typically uses it in component state.
    */
-  updateAboutDetails () {
+  updateAboutDetails (prevProps) {
     let location = getBaseUrl(this.props.location)
     if (location === 'about:preferences' || location === 'about:contributions' || location === aboutUrls.get('about:contributions')) {
-      ipc.send(messages.CHECK_BITCOIN_HANDLER, FrameStateUtil.getPartition(this.frame))
-      const ledgerData = this.props.ledgerInfo.merge(this.props.publisherInfo).merge(this.props.preferencesData).toJS()
-      this.webview.send(messages.LEDGER_UPDATED, ledgerData)
-      this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
-      this.webview.send(messages.SITE_SETTINGS_UPDATED, this.props.allSiteSettings ? this.props.allSiteSettings.toJS() : null)
-      this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.braveryDefaults)
+      if (prevProps.partition !== this.props.partition) {
+        ipc.send(messages.CHECK_BITCOIN_HANDLER, this.props.partition)
+      }
+      if (!Immutable.is(prevProps.ledgerInfo, this.props.ledgerInfo) ||
+          !Immutable.is(prevProps.publisherInfo, this.props.publisherInfo) ||
+          !Immutable.is(prevProps.preferencesData, this.props.preferencesData)) {
+        const ledgerData = this.props.ledgerInfo.merge(this.props.publisherInfo).merge(this.props.preferencesData)
+        this.webview.send(messages.LEDGER_UPDATED, ledgerData.toJS())
+      }
+      if (!Immutable.is(prevProps.settings, this.props.settings)) {
+        this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
+      }
+      if (!Immutable.is(prevProps.allSiteSettings, this.props.allSiteSettings)) {
+        this.webview.send(messages.SITE_SETTINGS_UPDATED, this.props.allSiteSettings ? this.props.allSiteSettings.toJS() : null)
+      }
+      if (!Immutable.is(prevProps.braveryDefaults, this.props.braveryDefaults)) {
+        this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.props.braveryDefaults.toJS())
+      }
     } else if (location === 'about:bookmarks') {
-      this.webview.send(messages.BOOKMARKS_UPDATED, {
-        bookmarks: this.props.bookmarks.toJS(),
-        bookmarkFolders: this.props.bookmarkFolders.toJS()
-      })
+      if (!Immutable.is(prevProps.bookmarks, this.props.bookmarks) ||
+          !Immutable.is(prevProps.bookmarkFolders, this.props.bookmarkFolders)) {
+        this.webview.send(messages.BOOKMARKS_UPDATED, {
+          bookmarks: this.props.bookmarks.toList().sort(siteUtil.siteSort).toJS(),
+          bookmarkFolders: this.props.bookmarkFolders.toList().sort(siteUtil.siteSort).toJS()
+        })
+      }
     } else if (location === 'about:history') {
-      const aboutHistoryState = this.props.history && this.props.history.toJS
-        ? this.props.history.toJS()
-        : {}
-      this.webview.send(messages.HISTORY_UPDATED, aboutHistoryState)
-      this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
+      if (!Immutable.is(prevProps.history, this.props.history)) {
+        const aboutHistoryState = this.props.history && this.props.history.toJS
+          ? this.props.history.toJS()
+          : {}
+        this.webview.send(messages.HISTORY_UPDATED, aboutHistoryState)
+      }
+      if (!Immutable.is(prevProps.settings, this.props.settings)) {
+        this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
+      }
     } else if (location === 'about:extensions') {
-      this.webview.send(messages.EXTENSIONS_UPDATED, {
-        extensions: this.props.extensions.toJS()
-      })
+      if (!Immutable.is(prevProps.extensions, this.props.extensions)) {
+        this.webview.send(messages.EXTENSIONS_UPDATED, {
+          extensions: this.props.extensions.toJS()
+        })
+      }
     } else if (location === 'about:adblock') {
-      this.webview.send(messages.ADBLOCK_UPDATED, {
-        adblock: this.props.adblock.toJS(),
-        settings: this.props.settings ? this.props.settings.toJS() : null,
-        resources: require('ad-block/lib/regions')
-      })
+      if (!Immutable.is(prevProps.adblock, this.props.adblock) ||
+          !Immutable.is(prevProps.settings, this.props.settings)) {
+        this.webview.send(messages.ADBLOCK_UPDATED, {
+          adblock: this.props.adblock.toJS(),
+          settings: this.props.settings ? this.props.settings.toJS() : null,
+          resources: require('ad-block/lib/regions')
+        })
+      }
     } else if (location === 'about:downloads') {
-      this.webview.send(messages.DOWNLOADS_UPDATED, {
-        downloads: this.props.downloads.toJS()
-      })
+      if (!Immutable.is(prevProps.downloads, this.props.downloads)) {
+        this.webview.send(messages.DOWNLOADS_UPDATED, {
+          downloads: this.props.downloads.toJS()
+        })
+      }
     } else if (location === 'about:passwords') {
-      if (this.props.passwords) {
+      if (this.props.passwords && !Immutable.is(prevProps.passwords, this.props.passwords)) {
         this.webview.send(messages.PASSWORD_DETAILS_UPDATED, this.props.passwords.toJS())
       }
-      if (this.props.allSiteSettings) {
+      if (this.props.allSiteSettings && !Immutable.is(prevProps.allSiteSettings, this.props.allSiteSettings)) {
         this.webview.send(messages.PASSWORD_SITE_DETAILS_UPDATED,
                             this.props.allSiteSettings.filter((setting) => setting.get('savePasswords') === false).toJS())
       }
     } else if (location === 'about:flash') {
-      this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.braveryDefaults)
+      if (!Immutable.is(prevProps.braveryDefaults, this.props.braveryDefaults)) {
+        this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.props.braveryDefaults.toJS())
+      }
     } else if (location === 'about:newtab') {
-      this.webview.send(messages.NEWTAB_DATA_UPDATED, {
-        showEmptyPage: getSetting(settings.NEWTAB_MODE) === newTabMode.EMPTY_NEW_TAB,
-        trackedBlockersCount: this.props.trackedBlockersCount,
-        adblockCount: this.props.adblockCount,
-        httpsUpgradedCount: this.props.httpsUpgradedCount,
-        newTabDetail: this.props.newTabDetail ? this.props.newTabDetail.toJS() : null
-      })
+      if (!Immutable.is(prevProps.settings, this.props.settings) ||
+          prevProps.trackedBlockersCount !== this.props.trackedBlockersCount ||
+          prevProps.adblockCount !== this.props.adblockCount ||
+          prevProps.httpsUpgradedCount !== this.props.httpsUpgradedCount ||
+          !Immutable.is(prevProps.newTabDetail, this.props.newTabDetail)) {
+        this.webview.send(messages.NEWTAB_DATA_UPDATED, {
+          showEmptyPage: getSetting(settings.NEWTAB_MODE) === newTabMode.EMPTY_NEW_TAB,
+          trackedBlockersCount: this.props.trackedBlockersCount,
+          adblockCount: this.props.adblockCount,
+          httpsUpgradedCount: this.props.httpsUpgradedCount,
+          newTabDetail: this.props.newTabDetail ? this.props.newTabDetail.toJS() : null
+        })
+      }
     } else if (location === 'about:autofill') {
-      const defaultSession = require('electron').remote.session.defaultSession
-      if (this.props.autofillAddresses) {
+      if (this.props.autofillAddresses && !Immutable.is(prevProps.autofillAddresses, this.props.autofillAddresses)) {
+        const defaultSession = require('electron').remote.session.defaultSession
         const guids = this.props.autofillAddresses.get('guid')
         let list = []
         guids.forEach((entry) => {
@@ -160,7 +196,8 @@ class Frame extends ImmutableComponent {
         })
         this.webview.send(messages.AUTOFILL_ADDRESSES_UPDATED, list)
       }
-      if (this.props.autofillCreditCards) {
+      if (this.props.autofillCreditCards && !Immutable.is(prevProps.autofillCreditCards, this.props.autofillCreditCards)) {
+        const defaultSession = require('electron').remote.session.defaultSession
         const guids = this.props.autofillCreditCards.get('guid')
         let list = []
         guids.forEach((entry) => {
@@ -177,15 +214,17 @@ class Frame extends ImmutableComponent {
         this.webview.send(messages.AUTOFILL_CREDIT_CARDS_UPDATED, list)
       }
     } else if (location === 'about:brave') {
-      const versionInformation = appStoreRenderer.state.getIn(['about', 'brave', 'versionInformation'])
-      if (versionInformation && versionInformation.toJS) {
-        this.webview.send(messages.VERSION_INFORMATION_UPDATED, versionInformation.toJS())
+      if (this.props.versionInformation && this.props.versionInformation.toJS &&
+          !Immutable.is(prevProps.versionInformation, this.props.versionInformation)) {
+        this.webview.send(messages.VERSION_INFORMATION_UPDATED, this.props.versionInformation.toJS())
       }
     }
 
     // send state to about pages
     if (this.isAboutPage() && this.props.aboutDetails) {
-      this.webview.send(messages.STATE_UPDATED, this.props.aboutDetails.toJS())
+      if (!Immutable.is(prevProps.aboutDetails, this.props.aboutDetails)) {
+        this.webview.send(messages.STATE_UPDATED, this.props.aboutDetails.toJS())
+      }
     }
   }
 
@@ -312,7 +351,7 @@ class Frame extends ImmutableComponent {
     const cb = () => {
       this.webview.setActive(this.props.isActive)
       this.webview.setTabIndex(this.props.tabIndex)
-      this.updateAboutDetails()
+      this.updateAboutDetails({})
     }
     this.updateWebview(cb)
   }
@@ -357,14 +396,30 @@ class Frame extends ImmutableComponent {
     }
   }
 
-  componentDidUpdate (prevProps, prevState) {
+  setTitle (title) {
+    if (this.frame.isEmpty()) {
+      return
+    }
+    windowActions.setFrameTitle(this.frame, title)
+  }
+
+  componentDidUpdate (prevProps) {
+    // TODO: This title should be set in app/browser/tabs.js and then we should use the
+    // app state for the tabData everywhere and remove windowState's title completely.
+    if (this.props.tabData && this.frame &&
+        this.props.tabData.get('title') !== this.frame.get('title')) {
+      this.setTitle(this.props.tabData.get('title'))
+    }
+
     const cb = () => {
-      if (this.webRTCPolicy !== this.getWebRTCPolicy()) {
-        this.webview.setWebRTCIPHandlingPolicy(this.getWebRTCPolicy())
+      if (this.getWebRTCPolicy(prevProps) !== this.getWebRTCPolicy(this.props)) {
+        this.webview.setWebRTCIPHandlingPolicy(this.getWebRTCPolicy(this.props))
       }
       this.webview.setActive(this.props.isActive)
       this.webview.setTabIndex(this.props.tabIndex)
-      this.handleShortcut()
+      if (prevProps.activeShortcut !== this.props.activeShortcut) {
+        this.handleShortcut()
+      }
 
       if (this.props.isActive && !prevProps.isActive && !this.props.urlBarFocused) {
         this.webview.focus()
@@ -380,7 +435,7 @@ class Frame extends ImmutableComponent {
           this.exitHtmlFullScreen()
         }
       }
-      this.updateAboutDetails()
+      this.updateAboutDetails(prevProps)
     }
 
     // For cross-origin navigation, clear temp approvals
@@ -417,13 +472,13 @@ class Frame extends ImmutableComponent {
         // This can happen for pages which don't load properly.
         // Some examples are basic http auth and bookmarklets.
         // In this case both the user display and the user think they're on this.props.location.
-        if (this.webview.getURL() !== this.props.location &&
+        if (this.tab.get('url') !== this.props.location &&
           !this.isAboutPage() &&
           !isTorrentViewerURL(this.props.location)) {
           this.webview.loadURL(this.props.location)
         } else if (this.isIntermediateAboutPage() &&
-          this.webview.getURL() !== this.props.location &&
-          this.webview.getURL() !== this.props.aboutDetails.get('url')) {
+          this.tab.get('url') !== this.props.location &&
+          this.tab.get('url') !== this.props.aboutDetails.get('url')) {
           windowActions.setUrl(this.props.aboutDetails.get('url'),
             this.props.aboutDetails.get('frameKey'))
         } else {
@@ -445,15 +500,8 @@ class Frame extends ImmutableComponent {
       case 'zoom-reset':
         this.zoomReset()
         break
-      case 'toggle-dev-tools':
-        if (this.webview.isDevToolsOpened()) {
-          this.webview.closeDevTools()
-        } else {
-          this.webview.openDevTools()
-        }
-        break
       case 'view-source':
-        const sourceLocation = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
+        const sourceLocation = UrlUtil.getViewSourceUrlFromUrl(this.tab.get('url'))
         if (sourceLocation !== null) {
           windowActions.newFrame({
             location: sourceLocation,
@@ -466,8 +514,8 @@ class Frame extends ImmutableComponent {
         break
       case 'save':
         const downloadLocation = getSetting(settings.PDFJS_ENABLED)
-          ? UrlUtil.getLocationIfPDF(this.webview.getURL())
-          : this.webview.getURL()
+          ? UrlUtil.getLocationIfPDF(this.tab.get('url'))
+          : this.tab.get('url')
         // TODO: Sometimes this tries to save in a non-existent directory
         this.webview.downloadURL(downloadLocation)
         break
@@ -478,7 +526,7 @@ class Frame extends ImmutableComponent {
         windowActions.setFindbarShown(this.frame, true)
         break
       case 'fill-password':
-        let currentUrl = urlParse(this.webview.getURL())
+        let currentUrl = urlParse(this.tab.get('url'))
         if (currentUrl &&
             [currentUrl.protocol, currentUrl.host].join('//') === this.props.activeShortcutDetails.get('origin')) {
           this.webview.send(messages.GOT_PASSWORD,
@@ -611,7 +659,7 @@ class Frame extends ImmutableComponent {
       if (this.frame.isEmpty()) {
         return
       }
-      contextMenus.onMainContextMenu(e.params, this.frame)
+      contextMenus.onMainContextMenu(e.params, this.frame, this.tab)
       e.preventDefault()
       e.stopPropagation()
     })
@@ -629,7 +677,7 @@ class Frame extends ImmutableComponent {
       if (this.frame.isEmpty()) {
         return
       }
-      if (e.active && currentWindow.isFocused()) {
+      if (e.active && isFocused()) {
         windowActions.setFocusedFrame(this.frame)
       }
       if (e.active && !this.props.isActive) {
@@ -638,16 +686,17 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('focus', this.onFocus)
     this.webview.addEventListener('mouseenter', (e) => {
-      currentWindow.webContents.send(messages.ENABLE_SWIPE_GESTURE)
+      currentWindowWebContents.send(messages.ENABLE_SWIPE_GESTURE)
     })
     this.webview.addEventListener('mouseleave', (e) => {
-      currentWindow.webContents.send(messages.DISABLE_SWIPE_GESTURE)
+      currentWindowWebContents.send(messages.DISABLE_SWIPE_GESTURE)
     })
     this.webview.addEventListener('did-attach', (e) => {
       if (this.frame.isEmpty()) {
         return
       }
-      let tabId = this.webview.getId()
+      // TODO: Remove webview.getId() part below when everyone is on a newer electron
+      let tabId = e.tabId !== undefined ? e.tabId : this.webview.getId()
       if (this.props.tabId !== tabId) {
         windowActions.setFrameTabId(this.frame, tabId)
       }
@@ -674,12 +723,6 @@ class Frame extends ImmutableComponent {
         })
       }
     })
-    this.webview.addEventListener('page-title-updated', ({title}) => {
-      if (this.frame.isEmpty()) {
-        return
-      }
-      windowActions.setFrameTitle(this.frame, title)
-    })
     this.webview.addEventListener('show-autofill-settings', (e) => {
       windowActions.newFrame({ location: 'about:autofill' }, true)
     })
@@ -690,7 +733,8 @@ class Frame extends ImmutableComponent {
       contextMenus.onShowAutofillMenu(e.suggestions, e.rect, this.frame)
     })
     this.webview.addEventListener('hide-autofill-popup', (e) => {
-      if (this.webview.isFocused()) {
+      if (this.props.contextMenuDetail && this.props.contextMenuDetail.get('type') === 'autofill' &&
+        (this.props.contextMenuDetail.get('tabId') !== this.props.tabId || this.webview.isFocused())) {
         windowActions.autofillPopupHidden(this.props.tabId)
       }
     })
@@ -698,7 +742,7 @@ class Frame extends ImmutableComponent {
       let method = () => {}
       switch (e.channel) {
         case messages.ABOUT_COMPONENT_INITIALIZED:
-          this.updateAboutDetails()
+          this.updateAboutDetails({})
           break
         case messages.GOT_CANVAS_FINGERPRINTING:
           if (this.frame.isEmpty()) {
@@ -721,7 +765,7 @@ class Frame extends ImmutableComponent {
             return
           }
           method = (nodeProps, contextMenuType) => {
-            contextMenus.onMainContextMenu(nodeProps, this.frame, contextMenuType)
+            contextMenus.onMainContextMenu(nodeProps, this.frame, this.tab, contextMenuType)
           }
           break
         case messages.STOP_LOAD:
@@ -743,8 +787,8 @@ class Frame extends ImmutableComponent {
           }
           break
         case messages.CLEAR_BROWSING_DATA_NOW:
-          method = (clearBrowsingDataDetail) =>
-            windowActions.setClearBrowsingDataDetail(clearBrowsingDataDetail)
+          method = () =>
+            windowActions.setClearBrowsingDataPanelVisible(true)
           break
         case messages.AUTOFILL_SET_ADDRESS:
           method = (currentDetail, originalDetail) =>
@@ -773,19 +817,12 @@ class Frame extends ImmutableComponent {
       }
     }
 
-    const loadEnd = (savePage) => {
+    const loadEnd = (savePage, url) => {
       if (this.frame.isEmpty()) {
         return
       }
-      windowActions.onWebviewLoadEnd(
-        this.frame,
-        this.webview.getURL())
-      windowActions.updateBackForwardState(
-        this.frame,
-        this.webview.canGoBack(),
-        this.webview.canGoForward())
-
-      const parsedUrl = urlParse(this.props.location)
+      windowActions.onWebviewLoadEnd(this.frame, url)
+      const parsedUrl = urlParse(url)
       if (!this.allowRunningWidevinePlugin()) {
         this.showWidevineNotification(this.props.location, this.origin, () => {
         }, () => {
@@ -795,13 +832,18 @@ class Frame extends ImmutableComponent {
 
       const protocol = parsedUrl.protocol
       const isError = this.props.aboutDetails && this.props.aboutDetails.get('errorCode')
-      if (!this.props.isPrivate && this.props.provisionalLocation === this.props.location && (protocol === 'http:' || protocol === 'https:') && !isError && savePage) {
+      if (!this.props.isPrivate && (protocol === 'http:' || protocol === 'https:') && !isError && savePage) {
         // Register the site for recent history for navigation bar
-        appActions.addSite(siteUtil.getDetailFromFrame(this.frame))
+        // calling with setTimeout is an ugly hack for a race condition
+        // with setTitle. We either need to delay this call until the title is
+        // or add a way to update it
+        setTimeout(() => {
+          appActions.addSite(siteUtil.getDetailFromFrame(this.frame))
+        }, 250)
       }
 
-      if (this.props.location.startsWith(pdfjsOrigin)) {
-        let displayLocation = UrlUtil.getLocationIfPDF(this.props.location)
+      if (url.startsWith(pdfjsOrigin)) {
+        let displayLocation = UrlUtil.getLocationIfPDF(url)
         windowActions.setSecurityState(this.frame, {
           secure: urlParse(displayLocation).protocol === 'https:',
           runInsecureContent: false
@@ -809,7 +851,7 @@ class Frame extends ImmutableComponent {
       }
     }
 
-    const loadFail = (e, provisionLoadFailure = false) => {
+    const loadFail = (e, provisionLoadFailure, url) => {
       if (this.frame.isEmpty()) {
         return
       }
@@ -839,7 +881,7 @@ class Frame extends ImmutableComponent {
         windowActions.loadUrl(this.frame, 'about:error')
         appActions.removeSite(siteUtil.getDetailFromFrame(this.frame))
       } else if (provisionLoadFailure) {
-        windowActions.setNavigated(this.webview.getURL(), this.props.frameKey, true, this.frame.get('tabId'))
+        windowActions.setNavigated(url, this.props.frameKey, true, this.frame.get('tabId'))
       }
     }
     this.webview.addEventListener('security-style-changed', (e) => {
@@ -892,15 +934,6 @@ class Frame extends ImmutableComponent {
       }
       // force temporary url display for tabnapping protection
       windowActions.setMouseInTitlebar(true)
-
-      // After navigating to the URL via back/forward buttons, set correct frame title
-      if (!e.isRendererInitiated) {
-        let index = this.webview.getCurrentEntryIndex()
-        let title = this.webview.getTitleAtIndex(index)
-        if (!this.frame.isEmpty()) {
-          windowActions.setFrameTitle(this.frame, title)
-        }
-      }
     })
     this.webview.addEventListener('crashed', (e) => {
       if (this.frame.isEmpty()) {
@@ -916,18 +949,18 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('did-fail-provisional-load', (e) => {
       if (e.isMainFrame) {
-        loadEnd(false)
-        loadFail(e, true)
+        loadEnd(false, e.validatedURL)
+        loadFail(e, true, e.currentURL)
       }
     })
     this.webview.addEventListener('did-fail-load', (e) => {
       if (e.isMainFrame) {
-        loadEnd(false)
-        loadFail(e)
+        loadEnd(false, e.validatedURL)
+        loadFail(e, false, e.validatedURL)
       }
     })
-    this.webview.addEventListener('did-finish-load', () => {
-      loadEnd(true)
+    this.webview.addEventListener('did-finish-load', (e) => {
+      loadEnd(true, e.validatedURL)
       if (this.runInsecureContent()) {
         appActions.removeSiteSetting(this.origin, 'runInsecureContent', this.props.isPrivate)
       }
@@ -938,7 +971,7 @@ class Frame extends ImmutableComponent {
       }
       if (e.isMainFrame) {
         windowActions.setNavigated(e.url, this.props.frameKey, true, this.frame.get('tabId'))
-        loadEnd(true)
+        loadEnd(true, e.url)
       }
     })
     this.webview.addEventListener('enter-html-full-screen', () => {
@@ -1107,12 +1140,8 @@ class Frame extends ImmutableComponent {
     }
   }
 
-  get webRTCPolicy () {
-    return this.webview ? this.webview.getWebRTCIPHandlingPolicy() : WEBRTC_DEFAULT
-  }
-
-  getWebRTCPolicy () {
-    const braverySettings = this.frameBraverySettings
+  getWebRTCPolicy (props) {
+    const braverySettings = this.getFrameBraverySettings(props)
     if (!braverySettings || braverySettings.get('fingerprintingProtection') !== true) {
       return WEBRTC_DEFAULT
     } else {

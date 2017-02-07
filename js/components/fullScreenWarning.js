@@ -4,12 +4,12 @@
 
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
-const url = require('url')
+const urlResolve = require('url').resolve
 
 class FullScreenWarning extends ImmutableComponent {
   render () {
     const l10nArgs = {
-      host: url.resolve(this.props.location, '/')
+      host: urlResolve(this.props.location, '/')
     }
     return <div className='fullScreenModeWarning'
       data-l10n-id='fullScreenModeWarning'

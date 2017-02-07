@@ -11,7 +11,7 @@ const messages = require('../constants/messages')
 const siteTags = require('../constants/siteTags')
 const siteUtil = require('../state/siteUtil')
 const UrlUtil = require('../lib/urlutil')
-const currentWindow = require('../../app/renderer/currentWindow')
+const {currentWindow} = require('../../app/renderer/currentWindow')
 const windowStore = require('../stores/windowStore')
 
 function dispatch (action) {
@@ -403,6 +403,34 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a message to the store to set the tab breakpoint.
+   *
+   * @param {Object} frameProps - the frame properties for the webview in question.
+   * @param {string} breakpoint - the tab breakpoint to change to
+   */
+  setTabBreakpoint: function (frameProps, breakpoint) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SET_TAB_BREAKPOINT,
+      frameProps,
+      breakpoint
+    })
+  },
+
+  /**
+   * Dispatches a message to the store to set the current tab hover state.
+   *
+   * @param {Object} frameProps - the frame properties for the webview in question.
+   * @param {boolean} hoverState - whether or not mouse is over tab
+   */
+  setTabHoverState: function (frameProps, hoverState) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SET_TAB_HOVER_STATE,
+      frameProps,
+      hoverState
+    })
+  },
+
+  /**
    * Dispatches a message to the store to set the tab page index being previewed.
    *
    * @param {number} previewTabPageIndex - The tab page index to preview
@@ -423,22 +451,6 @@ const windowActions = {
     dispatch({
       actionType: windowConstants.WINDOW_SET_TAB_PAGE_INDEX,
       frameProps
-    })
-  },
-
-  /**
-   * Dispatches a message to the store to update the back-forward information.
-   *
-   * @param {Object} frameProps - the frame properties for the webview in question.
-   * @param {boolean} canGoBack - Specifies if the active frame has previous entries in its history
-   * @param {boolean} canGoForward - Specifies if the active frame has next entries in its history (i.e. the user pressed back at least once)
-   */
-  updateBackForwardState: function (frameProps, canGoBack, canGoForward) {
-    dispatch({
-      actionType: windowConstants.WINDOW_UPDATE_BACK_FORWARD,
-      frameProps,
-      canGoBack,
-      canGoForward
     })
   },
 
@@ -980,12 +992,13 @@ const windowActions = {
   },
 
   /**
-   * Sets the clear browsing data popup detail
+   * Sets whether the clear browsing data popup is visible
+   * @param {boolean} isVisible
    */
-  setClearBrowsingDataDetail: function (clearBrowsingDataDetail) {
+  setClearBrowsingDataPanelVisible: function (isVisible) {
     dispatch({
-      actionType: windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL,
-      clearBrowsingDataDetail
+      actionType: windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_VISIBLE,
+      isVisible
     })
   },
 
@@ -1108,14 +1121,27 @@ const windowActions = {
 
   /**
    * (Windows only)
-   * Used to track selected index of a context menu
+   * Used to track selected index of a menu bar
    * Needed because arrow keys can be used to navigate the custom menu
    * @param {number} index - zero based index of the item.
    *   Index excludes menu separators and hidden items.
    */
-  setSubmenuSelectedIndex: function (index) {
+  setMenuBarSelectedIndex: function (index) {
     dispatch({
-      actionType: windowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX,
+      actionType: windowConstants.WINDOW_SET_MENUBAR_SELECTED_INDEX,
+      index
+    })
+  },
+
+  /**
+   * Used to track selected index of a context menu
+   * Needed because arrow keys can be used to navigate the context menu
+   * @param {number} index - zero based index of the item.
+   *   Index excludes menu separators and hidden items.
+   */
+  setContextMenuSelectedIndex: function (index) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SET_CONTEXT_MENU_SELECTED_INDEX,
       index
     })
   },
@@ -1200,6 +1226,20 @@ const windowActions = {
       actionType: windowConstants.WINDOW_AUTOFILL_POPUP_HIDDEN,
       tabId,
       notify
+    })
+  },
+
+  onTabClosedWithMouse: function (data) {
+    dispatch({
+      actionType: windowConstants.WINDOW_TAB_CLOSED_WITH_MOUSE,
+      data
+    })
+  },
+
+  onTabMouseLeave: function (data) {
+    dispatch({
+      actionType: windowConstants.WINDOW_TAB_MOUSE_LEAVE,
+      data
     })
   }
 }

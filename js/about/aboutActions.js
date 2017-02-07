@@ -108,12 +108,20 @@ const aboutActions = {
     })
   },
 
+  ledgerRecoverWalletFromFile: function () {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_RECOVER_WALLET,
+      useRecoveryKeyFile: true
+    })
+  },
+
   /**
    * Clear wallet recovery status
    */
   clearRecoveryStatus: function () {
     aboutActions.dispatchAction({
-      actionType: appConstants.APP_CLEAR_RECOVERY
+      actionType: appConstants.APP_LEDGER_RECOVERY_STATUS_CHANGED,
+      recoverySucceeded: undefined
     })
   },
 
@@ -206,12 +214,19 @@ const aboutActions = {
     })
   },
 
-  clearBrowsingDataNow: function (clearBrowsingDataDetail) {
-    ipc.sendToHost(messages.CLEAR_BROWSING_DATA_NOW, clearBrowsingDataDetail)
+  clearBrowsingDataNow: function () {
+    ipc.sendToHost(messages.CLEAR_BROWSING_DATA_NOW)
   },
 
   importBrowserDataNow: function () {
     ipc.send(messages.IMPORT_BROWSER_DATA_NOW)
+  },
+
+  /**
+   * Export bookmarks
+   */
+  exportBookmarks: function () {
+    ipc.send(messages.EXPORT_BOOKMARKS)
   },
 
   createWallet: function () {

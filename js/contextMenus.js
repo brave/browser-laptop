@@ -19,6 +19,7 @@ const dragTypes = require('./constants/dragTypes')
 const siteUtil = require('./state/siteUtil')
 const downloadUtil = require('./state/downloadUtil')
 const menuUtil = require('../app/common/lib/menuUtil')
+const urlUtil = require('./lib/urlutil')
 const CommonMenu = require('../app/common/commonMenu')
 const dnd = require('./dnd')
 const dndData = require('./dndData')
@@ -30,9 +31,9 @@ const settings = require('./constants/settings')
 const textUtils = require('./lib/text')
 const {isIntermediateAboutPage, isUrl, aboutUrls} = require('./lib/appUrlUtil')
 const {getBase64FromImageUrl} = require('./lib/imageUtil')
-const urlParse = require('url').parse
+const urlParse = require('../app/common/urlParse')
 const eventUtil = require('./lib/eventUtil')
-const currentWindow = require('../app/renderer/currentWindow')
+const {currentWindow} = require('../app/renderer/currentWindow')
 const config = require('./constants/config')
 const {bookmarksToolbarMode} = require('../app/common/constants/settingsEnums')
 const extensionState = require('../app/common/state/extensionState')
@@ -358,7 +359,8 @@ function showBookmarkFolderInit (allBookmarkItems, parentBookmarkFolder, activeF
 function bookmarkItemsInit (allBookmarkItems, items, activeFrame) {
   const btbMode = getSetting(settings.BOOKMARKS_TOOLBAR_MODE)
   const showFavicon = (btbMode === bookmarksToolbarMode.TEXT_AND_FAVICONS || btbMode === bookmarksToolbarMode.FAVICONS_ONLY)
-  const template = items.map((site) => {
+  const itemsList = items.toList()
+  const template = itemsList.map((site) => {
     const isFolder = siteUtil.isFolder(site)
     let faIcon
     if (showFavicon && !site.get('favicon')) {
@@ -465,20 +467,32 @@ function autofillTemplateInit (suggestions, frame) {
 }
 
 function flashTemplateInit (frameProps) {
+  const canRunFlash = appStoreRenderer.state.getIn(['flash', 'enabled']) && getSetting(settings.FLASH_INSTALLED)
   const template = []
-  template.push({
-    label: locale.translation('allowFlashOnce'),
-    click: () => {
-      appActions.allowFlashOnce(frameProps.get('tabId'), frameProps.get('location'), frameProps.get('isPrivate'))
-    }
-  })
-  if (!frameProps.get('isPrivate')) {
+  if (!canRunFlash) {
     template.push({
-      label: locale.translation('allowFlashAlways'),
+      label: locale.translation('openFlashPreferences'),
       click: () => {
-        appActions.allowFlashAlways(frameProps.get('tabId'), frameProps.get('location'))
+        windowActions.newFrame({
+          location: 'about:preferences#security'
+        }, true)
       }
     })
+  } else {
+    template.push({
+      label: locale.translation('allowFlashOnce'),
+      click: () => {
+        appActions.allowFlashOnce(frameProps.get('tabId'), frameProps.get('location'), frameProps.get('isPrivate'))
+      }
+    })
+    if (!frameProps.get('isPrivate')) {
+      template.push({
+        label: locale.translation('allowFlashAlways'),
+        click: () => {
+          appActions.allowFlashAlways(frameProps.get('tabId'), frameProps.get('location'))
+        }
+      })
+    }
   }
   return template
 }
@@ -629,7 +643,7 @@ function getMisspelledSuggestions (selection, isMisspelled, suggestions) {
   return menuUtil.sanitizeTemplateItems(template)
 }
 
-function getEditableItems (selection, editFlags) {
+function getEditableItems (selection, editFlags, hasFormat) {
   const hasSelection = selection.length > 0
   const hasClipboard = clipboard.readText().length > 0
   const template = []
@@ -657,6 +671,16 @@ function getEditableItems (selection, editFlags) {
       enabled: hasClipboard,
       role: 'paste'
     })
+    if (hasFormat) {
+      template.push({
+        label: locale.translation('pasteWithoutFormatting'),
+        accelerator: 'Shift+CmdOrCtrl+V',
+        enabled: hasClipboard,
+        click: function (item, focusedWindow) {
+          focusedWindow.webContents.pasteAndMatchStyle()
+        }
+      })
+    }
   }
   return menuUtil.sanitizeTemplateItems(template)
 }
@@ -719,7 +743,6 @@ function hamburgerTemplateInit (location, e) {
         CommonMenu.separatorMenuItem,
         CommonMenu.checkForUpdateMenuItem(),
         CommonMenu.separatorMenuItem,
-        CommonMenu.reportAnIssueMenuItem(),
         CommonMenu.submitFeedbackMenuItem()
       ]
     },
@@ -888,8 +911,32 @@ const showDefinitionMenuItem = (selectionText) => {
   }
 }
 
-function mainTemplateInit (nodeProps, frame) {
+function addLinkMenu (link, frame) {
   const template = []
+  if (!frame.get('isPrivate')) {
+    template.push(openInNewTabMenuItem(link, frame.get('isPrivate'), frame.get('partitionNumber'), frame.get('key')))
+  }
+  template.push(
+    openInNewPrivateTabMenuItem(link, frame.get('key')),
+    openInNewWindowMenuItem(link, frame.get('isPrivate'), frame.get('partitionNumber')),
+    CommonMenu.separatorMenuItem,
+    openInNewSessionTabMenuItem(link, frame.get('key')),
+    CommonMenu.separatorMenuItem)
+
+  if (link.toLowerCase().startsWith('mailto:')) {
+    template.push(copyEmailAddressMenuItem(link))
+  } else {
+    template.push(
+        saveAsMenuItem('saveLinkAs', link),
+        copyAddressMenuItem('copyLinkAddress', link),
+        CommonMenu.separatorMenuItem)
+  }
+
+  return template
+}
+
+function mainTemplateInit (nodeProps, frame, tab) {
+  let template = []
 
   const isLink = nodeProps.linkURL && nodeProps.linkURL !== ''
   const isImage = nodeProps.mediaType === 'image'
@@ -900,24 +947,9 @@ function mainTemplateInit (nodeProps, frame) {
   const isAboutPage = aboutUrls.has(frame.get('location'))
 
   if (isLink) {
-    if (!frame.get('isPrivate')) {
-      template.push(openInNewTabMenuItem(nodeProps.linkURL, frame.get('isPrivate'), frame.get('partitionNumber'), frame.get('key')))
-    }
-    template.push(
-      openInNewPrivateTabMenuItem(nodeProps.linkURL, frame.get('key')),
-      openInNewWindowMenuItem(nodeProps.linkURL, frame.get('isPrivate'), frame.get('partitionNumber')),
-      CommonMenu.separatorMenuItem,
-      openInNewSessionTabMenuItem(nodeProps.linkURL, frame.get('key')),
-      CommonMenu.separatorMenuItem)
-
-    if (nodeProps.linkURL.toLowerCase().startsWith('mailto:')) {
-      template.push(copyEmailAddressMenuItem(nodeProps.linkURL))
-    } else {
-      template.push(
-        saveAsMenuItem('saveLinkAs', nodeProps.linkURL),
-        copyAddressMenuItem('copyLinkAddress', nodeProps.linkURL),
-        CommonMenu.separatorMenuItem)
-    }
+    template = addLinkMenu(nodeProps.linkURL, frame)
+  } else if (isTextSelected && urlUtil.isURL(nodeProps.selectionText)) {
+    template = addLinkMenu(nodeProps.selectionText, frame)
   }
 
   if (isImage) {
@@ -977,7 +1009,7 @@ function mainTemplateInit (nodeProps, frame) {
       }
     }
 
-    const editableItems = getEditableItems(nodeProps.selectionText, nodeProps.editFlags)
+    const editableItems = getEditableItems(nodeProps.selectionText, nodeProps.editFlags, true)
     template.push(...misspelledSuggestions, {
       label: locale.translation('undo'),
       accelerator: 'CmdOrCtrl+Z',
@@ -993,6 +1025,9 @@ function mainTemplateInit (nodeProps, frame) {
     }
 
     if (isTextSelected) {
+      if (isDarwin) {
+        template.push(showDefinitionMenuItem(nodeProps.selectionText), CommonMenu.separatorMenuItem)
+      }
       template.push(searchSelectionMenuItem(nodeProps.selectionText), CommonMenu.separatorMenuItem)
     }
   } else if (isTextSelected) {
@@ -1024,7 +1059,7 @@ function mainTemplateInit (nodeProps, frame) {
         template.push(
           {
             label: locale.translation('back'),
-            enabled: frame.get('canGoBack'),
+            enabled: tab.get('canGoBack'),
             click: (item, focusedWindow) => {
               if (focusedWindow) {
                 focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
@@ -1032,7 +1067,7 @@ function mainTemplateInit (nodeProps, frame) {
             }
           }, {
             label: locale.translation('forward'),
-            enabled: frame.get('canGoForward'),
+            enabled: tab.get('canGoForward'),
             click: (item, focusedWindow) => {
               if (focusedWindow) {
                 focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
@@ -1212,11 +1247,12 @@ function onHamburgerMenu (location, e) {
   windowActions.setContextMenuDetail(Immutable.fromJS({
     right: 0,
     top: rect.bottom,
-    template: menuTemplate
+    template: menuTemplate,
+    type: 'hamburgerMenu'
   }))
 }
 
-function onMainContextMenu (nodeProps, frame, contextMenuType) {
+function onMainContextMenu (nodeProps, frame, tab, contextMenuType) {
   if (contextMenuType === 'bookmark' || contextMenuType === 'bookmark-folder') {
     const activeFrame = Immutable.fromJS({ location: '', title: '', partitionNumber: frame.get('partitionNumber') })
     onSiteDetailContextMenu(Immutable.fromJS(nodeProps), activeFrame)
@@ -1227,7 +1263,7 @@ function onMainContextMenu (nodeProps, frame, contextMenuType) {
   } else if (contextMenuType === 'download') {
     onDownloadsToolbarContextMenu(nodeProps.downloadId, Immutable.fromJS(nodeProps))
   } else {
-    const mainMenu = Menu.buildFromTemplate(mainTemplateInit(nodeProps, frame))
+    const mainMenu = Menu.buildFromTemplate(mainTemplateInit(nodeProps, frame, tab))
     mainMenu.popup(currentWindow)
     mainMenu.destroy()
   }
@@ -1368,7 +1404,8 @@ function onShowUsernameMenu (usernames, origin, action, boundingRect,
 
 function onShowAutofillMenu (suggestions, boundingRect, frame) {
   const menuTemplate = autofillTemplateInit(suggestions, frame)
-  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) ? getDownloadsBarHeight() : 0
+  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) &&
+    appStore.state.get('downloads') && appStore.state.get('downloads').size ? getDownloadsBarHeight() : 0
   const offset = {
     x: (window.innerWidth - boundingRect.clientWidth),
     y: (window.innerHeight - boundingRect.clientHeight)

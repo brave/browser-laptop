@@ -8,21 +8,11 @@ const ImmutableComponent = require('./immutableComponent')
 const windowActions = require('../actions/windowActions')
 const cx = require('../lib/classSet')
 const KeyCodes = require('../../app/common/constants/keyCodes')
-const {formatAccelerator} = require('../../app/common/lib/formatUtil')
+const {formatAccelerator, wrappingClamp} = require('../../app/common/lib/formatUtil')
 const separatorMenuItem = require('../../app/common/commonMenu').separatorMenuItem
+const keyCodes = require('../../app/common/constants/keyCodes')
 
 class ContextMenuItem extends ImmutableComponent {
-  componentDidMount () {
-    window.addEventListener('keydown', this.onKeyDown)
-  }
-  componentWillUnmount () {
-    window.removeEventListener('keydown', this.onKeyDown)
-  }
-  onKeyDown (e) {
-    if (e.keyCode === KeyCodes.ESC || e.keyCode === KeyCodes.TAB) {
-      windowActions.setContextMenuDetail()
-    }
-  }
   get submenu () {
     return this.props.contextMenuItem.get('submenu')
   }
@@ -42,7 +32,7 @@ class ContextMenuItem extends ImmutableComponent {
     e.stopPropagation()
     if (clickAction) {
       if (shouldHide) {
-        windowActions.resetMenuState()
+        setImmediate(() => windowActions.resetMenuState())
       }
       clickAction(e)
     }
@@ -100,10 +90,6 @@ class ContextMenuItem extends ImmutableComponent {
     }
     windowActions.setContextMenuDetail(this.props.contextMenuDetail.set('openedSubmenuDetails', openedSubmenuDetails))
   }
-  onMouseLeave (e) {
-    if (this.hasSubmenu) {
-    }
-  }
   getLabelForItem (item) {
     const label = item.get('label')
     if (label) {
@@ -154,14 +140,22 @@ class ContextMenuItem extends ImmutableComponent {
         }
       </div>
     }
-    return <div className={cx({
-      contextMenuItem: true,
-      hasFaIcon: faIcon,
-      checkedMenuItem: this.props.contextMenuItem.get('checked'),
-      hasIcon: icon || faIcon,
-      selectedByKeyboard: this.props.selected
-    })}
-      role='listitem'
+    const props = {
+      className: cx({
+        contextMenuItem: true,
+        hasFaIcon: faIcon,
+        checkedMenuItem: this.props.contextMenuItem.get('checked'),
+        hasIcon: icon || faIcon,
+        selectedByKeyboard: this.props.selected
+      }),
+      role: 'listitem'
+    }
+
+    if (typeof this.props.dataIndex === 'number') {
+      props['data-index'] = this.props.dataIndex
+    }
+
+    return <div {...props}
       draggable={this.props.contextMenuItem.get('draggable')}
       onDragStart={this.onDragStart.bind(this)}
       onDragEnd={this.onDragEnd.bind(this)}
@@ -170,7 +164,6 @@ class ContextMenuItem extends ImmutableComponent {
       onContextMenu={this.onContextMenu.bind(this)}
       disabled={this.props.contextMenuItem.get('enabled') === false}
       onMouseEnter={this.onMouseEnter.bind(this)}
-      onMouseLeave={this.onMouseLeave.bind(this)}
       onClick={this.onClick.bind(this, this.props.contextMenuItem.get('click'), true)}>
       {
         this.props.contextMenuItem.get('checked')
@@ -238,7 +231,8 @@ class ContextMenuSingle extends ImmutableComponent {
           }
           // don't count separators when finding selectedIndex
           if (contextMenuItem.get('type') !== separatorMenuItem.type) {
-            props.selected = index === this.props.selectedIndex
+            props.dataIndex = index
+            props.selected = (index === this.props.selectedIndex)
             index++
           }
           return <ContextMenuItem {...props} />
@@ -252,13 +246,181 @@ class ContextMenuSingle extends ImmutableComponent {
  * Represents a context menu including all submenus
  */
 class ContextMenu extends ImmutableComponent {
-  onClick () {
-    windowActions.resetMenuState()
+  constructor () {
+    super()
+    this.onKeyDown = this.onKeyDown.bind(this)
   }
+
+  componentDidMount () {
+    window.addEventListener('keydown', this.onKeyDown)
+    window.addEventListener('keyup', this.onKeyUp)
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener('keydown', this.onKeyDown)
+    window.removeEventListener('keyup', this.onKeyUp)
+  }
+
+  onKeyDown (e) {
+    let selectedIndex = null
+    let currentIndex = null
+    let selectedTemplate = null
+    let selectedMenuItem = null
+
+    if (this.props.selectedIndex !== null) {
+      selectedIndex = this.props.selectedIndex
+      currentIndex = selectedIndex[selectedIndex.length - 1]
+      selectedTemplate = this.getMenuByIndex(selectedIndex, this.props.contextMenuDetail.get('template'))
+      selectedMenuItem = selectedTemplate.get(currentIndex)
+    }
+
+    switch (e.keyCode) {
+      case keyCodes.ENTER:
+        e.preventDefault()
+        e.stopPropagation()
+        if (currentIndex !== null) {
+          const action = selectedTemplate.getIn([currentIndex, 'click'])
+          if (action) {
+            action(e)
+          }
+        }
+        windowActions.resetMenuState()
+        break
+
+      case KeyCodes.ESC:
+      case KeyCodes.TAB:
+        windowActions.resetMenuState()
+        break
+
+      case keyCodes.LEFT:
+        // Left arrow inside a sub menu
+        // <= go back one level
+        if (this.hasSubmenuSelection) {
+          const newIndices = selectedIndex.slice()
+          newIndices.pop()
+          windowActions.setContextMenuSelectedIndex(newIndices)
+
+          let openedSubmenuDetails = this.props.contextMenuDetail.get('openedSubmenuDetails')
+            ? this.props.contextMenuDetail.get('openedSubmenuDetails')
+            : new Immutable.List()
+          openedSubmenuDetails = openedSubmenuDetails.pop()
+
+          windowActions.setContextMenuDetail(this.props.contextMenuDetail.set('openedSubmenuDetails', openedSubmenuDetails))
+        }
+        break
+
+      case keyCodes.RIGHT:
+        // Right arrow on a menu item which has a sub menu
+        // => go up one level (default next menu to item 0)
+        const isSubMenu = !!selectedMenuItem.get('submenu')
+
+        if (isSubMenu) {
+          e.stopPropagation()
+          const newIndices = selectedIndex.slice()
+          newIndices.push(0)
+          windowActions.setContextMenuSelectedIndex(newIndices)
+
+          let openedSubmenuDetails = this.props.contextMenuDetail.get('openedSubmenuDetails')
+            ? this.props.contextMenuDetail.get('openedSubmenuDetails')
+            : new Immutable.List()
+
+          const rect = this.getContextMenuItemBounds()
+          const itemHeight = (rect.bottom - rect.top)
+
+          openedSubmenuDetails = openedSubmenuDetails.push(Immutable.fromJS({
+            y: (rect.top - itemHeight),
+            template: selectedMenuItem.get('submenu')
+          }))
+
+          windowActions.setContextMenuDetail(this.props.contextMenuDetail.set('openedSubmenuDetails', openedSubmenuDetails))
+        }
+        break
+
+      case keyCodes.UP:
+      case keyCodes.DOWN:
+        if (this.props.contextMenuDetail) {
+          let newIndices
+
+          if (selectedIndex === null) {
+            newIndices = [0]
+          } else {
+            const nextIndex = wrappingClamp(
+              currentIndex + (e.which === keyCodes.UP ? -1 : 1),
+              0,
+              this.maxIndex(selectedTemplate))
+
+            newIndices = selectedIndex.slice()
+            newIndices[selectedIndex.length - 1] = nextIndex
+          }
+
+          windowActions.setContextMenuSelectedIndex(newIndices)
+        }
+        break
+    }
+  }
+
+  onKeyUp (e) {
+    e.preventDefault()
+  }
+
+  onClick () {
+    setImmediate(() => windowActions.resetMenuState())
+  }
+
+  getTemplateItemsOnly (template) {
+    return template.filter((element) => {
+      if (element.get('type') === separatorMenuItem.type) return false
+      if (element.has('visible')) return element.get('visible')
+      return true
+    })
+  }
+
+  getMenuByIndex (selectedIndex, parentItem, currentDepth) {
+    parentItem = this.getTemplateItemsOnly(parentItem)
+    if (!currentDepth) currentDepth = 0
+
+    const selectedIndices = selectedIndex.slice(1)
+    if (selectedIndices.length === 0) return parentItem
+
+    const submenuIndex = selectedIndex[0]
+    const childItem = parentItem.get(submenuIndex)
+
+    if (childItem && childItem.get('submenu')) {
+      return this.getMenuByIndex(selectedIndices, childItem.get('submenu'), currentDepth + 1)
+    }
+
+    return parentItem
+  }
+
+  getContextMenuItemBounds () {
+    const selected = document.querySelectorAll('.contextMenuItem.selectedByKeyboard')
+    if (selected.length > 0) {
+      return selected.item(selected.length - 1).getBoundingClientRect()
+    }
+    return null
+  }
+
+  /**
+   * Upper bound for the active / focused menu.
+   */
+  maxIndex (template) {
+    return template.filter((element) => {
+      if (element.get('type') === separatorMenuItem.type) return false
+      if (element.has('visible')) return element.get('visible')
+      return true
+    }).size - 1
+  }
+
   get openedSubmenuDetails () {
     return this.props.contextMenuDetail.get('openedSubmenuDetails') || new Immutable.List()
   }
+
+  get hasSubmenuSelection () {
+    return (this.props.selectedIndex === null) ? false : this.props.selectedIndex.length > 1
+  }
+
   render () {
+    const selectedIndex = (this.props.selectedIndex === null) ? [0] : this.props.selectedIndex
     const styles = {}
     if (this.props.contextMenuDetail.get('left') !== undefined) {
       styles.left = this.props.contextMenuDetail.get('left')
@@ -299,8 +461,8 @@ class ContextMenu extends ImmutableComponent {
             template={openedSubmenuDetail.get('template')}
             y={openedSubmenuDetail.get('y')}
             selectedIndex={
-              this.props.selectedIndex && (i + 1) < this.props.selectedIndex.length
-                ? this.props.selectedIndex[i + 1]
+              selectedIndex && (i + 1) < selectedIndex.length
+                ? selectedIndex[i + 1]
                 : null} />)
       }
     </div>

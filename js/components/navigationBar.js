@@ -5,6 +5,7 @@
 const React = require('react')
 const Immutable = require('immutable')
 const ImmutableComponent = require('./immutableComponent')
+const tldjs = require('tldjs')
 
 const cx = require('../lib/classSet')
 const Button = require('./button')
@@ -23,6 +24,7 @@ const getSetting = require('../settings').getSetting
 const windowStore = require('../stores/windowStore')
 const contextMenus = require('../contextMenus')
 const LongPressButton = require('./longPressButton')
+const PublisherToggle = require('../../app/renderer/components/publisherToggle')
 
 class NavigationBar extends ImmutableComponent {
   constructor () {
@@ -46,10 +48,11 @@ class NavigationBar extends ImmutableComponent {
     const editing = this.bookmarked
     // show the AddEditBookmarkHanger control; saving/deleting takes place there
     let siteDetail = siteUtil.getDetailFromFrame(this.activeFrame, siteTags.BOOKMARK)
-    const siteIndex = siteUtil.getSiteIndex(this.props.sites, siteDetail)
+    const key = siteUtil.getSiteKey(siteDetail)
 
-    if (siteIndex > 0) {
-      siteDetail = siteDetail.set('parentFolderId', this.props.sites.getIn([siteIndex]).get('parentFolderId'))
+    if (key !== null) {
+      siteDetail = siteDetail.set('parentFolderId', this.props.sites.getIn([key, 'parentFolderId']))
+      siteDetail = siteDetail.set('customTitle', this.props.sites.getIn([key, 'customTitle']))
     }
     windowActions.setBookmarkDetail(siteDetail, siteDetail, null, editing, true)
   }
@@ -91,8 +94,7 @@ class NavigationBar extends ImmutableComponent {
     return this.props.activeFrameKey !== undefined &&
       siteUtil.isSiteBookmarked(this.props.sites, Immutable.fromJS({
         location: this.props.location,
-        partitionNumber: this.props.partitionNumber,
-        title: this.props.title
+        partitionNumber: this.props.partitionNumber
       }))
   }
 
@@ -105,6 +107,18 @@ class NavigationBar extends ImmutableComponent {
       !this.props.navbar.getIn(['urlbar', 'focused']) &&
       !this.props.navbar.getIn(['urlbar', 'active']) &&
       getSetting(settings.DISABLE_TITLE_MODE) === false
+  }
+
+  get isPublisherButtonEnabled () {
+    const domain = tldjs.getDomain(this.props.location)
+    const hostSettings = this.props.siteSettings.get(`https?://${domain}`)
+    const visiblePublisher = hostSettings && hostSettings.get('ledgerPaymentsShown')
+    const validPublisherSynopsis = this.props.synopsis.map(entry => entry.get('site')).includes(domain)
+
+    if ((hostSettings || validPublisherSynopsis) && visiblePublisher !== false) {
+      return !getSetting(settings.AUTO_SUGGEST_SITES) && !isSourceAboutUrl(this.props.location)
+    }
+    return false
   }
 
   componentDidMount () {
@@ -128,7 +142,8 @@ class NavigationBar extends ImmutableComponent {
   }
 
   render () {
-    if (this.props.activeFrameKey === undefined) {
+    if (this.props.activeFrameKey === undefined ||
+        this.props.siteSettings === undefined) {
       return null
     }
 
@@ -193,6 +208,7 @@ class NavigationBar extends ImmutableComponent {
       </div>
       <UrlBar ref='urlBar'
         activeFrameKey={this.props.activeFrameKey}
+        canGoForward={this.props.canGoForward}
         searchDetail={this.props.searchDetail}
         loading={this.loading}
         location={this.props.location}
@@ -206,6 +222,7 @@ class NavigationBar extends ImmutableComponent {
         urlbar={this.props.navbar.get('urlbar')}
         onStop={this.onStop}
         menubarVisible={this.props.menubarVisible}
+        noBorderRadius={this.isPublisherButtonEnabled}
         />
       {
         isSourceAboutUrl(this.props.location)
@@ -213,6 +230,13 @@ class NavigationBar extends ImmutableComponent {
           <span className='browserButton' />
         </div>
         : <div className='endButtons'>
+          {
+            <PublisherToggle
+              url={this.props.location}
+              hostSettings={this.props.siteSettings}
+              synopsis={this.props.synopsis}
+            />
+          }
           {
             !this.showNoScriptInfo
             ? null

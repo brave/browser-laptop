@@ -9,6 +9,10 @@ let ready = false
 
 // Setup the crash handling
 const CrashHerald = require('./crash-herald')
+const telemetry = require('./telemetry')
+
+// set initial base line checkpoint
+telemetry.setCheckpoint('init')
 
 const handleUncaughtError = (error) => {
   var message, ref, stack
@@ -66,7 +70,7 @@ const HttpsEverywhere = require('./httpsEverywhere')
 const SiteHacks = require('./siteHacks')
 const CmdLine = require('./cmdLine')
 const UpdateStatus = require('../js/constants/updateStatus')
-const urlParse = require('url').parse
+const urlParse = require('./common/urlParse')
 const CryptoUtil = require('../js/lib/cryptoUtil')
 const keytar = require('keytar')
 const siteSettings = require('../js/state/siteSettings')
@@ -77,9 +81,8 @@ const contentSettings = require('../js/state/contentSettings')
 const privacy = require('../js/state/privacy')
 const async = require('async')
 const settings = require('../js/constants/settings')
+const BookmarksExporter = require('./browser/bookmarksExporter')
 
-// temporary fix for #4517, #4518 and #4472
-app.commandLine.appendSwitch('enable-use-zoom-for-dsf', 'false')
 app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferHtmlOverPlugins')
 
 // Used to collect the per window state when shutting down the application
@@ -241,6 +244,7 @@ let loadAppStatePromise = SessionStore.loadAppState()
 
 // Some settings must be set right away on startup, those settings should be handled here.
 loadAppStatePromise.then((initialState) => {
+  telemetry.setCheckpointAndReport('state-loaded')
   const {HARDWARE_ACCELERATION_ENABLED, SMOOTH_SCROLL_ENABLED, SEND_CRASH_REPORTS} = require('../js/constants/settings')
   if (initialState.settings[HARDWARE_ACCELERATION_ENABLED] === false) {
     app.disableHardwareAcceleration()
@@ -722,6 +726,10 @@ app.on('ready', () => {
       Importer.init()
     })
 
+    ipcMain.on(messages.EXPORT_BOOKMARKS, () => {
+      BookmarksExporter.showDialog(AppStore.getState().get('sites'))
+    })
+
     // This loads package.json into an object
     // TODO: Seems like this can be done with app.getVersion() insteand?
     PackageLoader.load((err, pack) => {
@@ -743,6 +751,10 @@ app.on('ready', () => {
       // This is fired by a menu entry
       process.on(messages.IMPORT_BROWSER_DATA_NOW, () => {
         Importer.init()
+      })
+
+      process.on(messages.EXPORT_BOOKMARKS, () => {
+        BookmarksExporter.showDialog(AppStore.getState().get('sites'))
       })
     })
     ready = true
