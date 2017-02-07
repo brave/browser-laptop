@@ -168,6 +168,10 @@ const applySiteSettingRecord = (record) => {
  * @param {Object} record
  */
 module.exports.applySyncRecord = (record) => {
+  if (!record || !record.objectData) {
+    console.log(`Warning: Can't apply empty record: ${record}`)
+    return
+  }
   switch (record.objectData) {
     case 'bookmark':
     case 'historySite':

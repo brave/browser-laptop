@@ -46,6 +46,7 @@ module.exports = {
   },
   braveExtensionId: 'mnojpmjdmbbfmejpflffifhffcmidifd',
   torrentExtensionId: 'fmdpfempfmekjkcfdehndghogpnpjeno',
+  syncExtensionId: 'cjnmeadmgmiihncdidmfiabhenbggfjm',
   PDFJSExtensionId: 'jdbefljfgobbmcidnmpjamcbhnbphjnb',
   PocketExtensionId: 'niloccemoadcdkdjlinkgdfekeahmflj',
   widevineComponentId: 'oimompecagnajdejgnnjijobebaeigek',

@@ -150,6 +150,7 @@ const messages = {
   // Sync
   SYNC_UPDATED: _,
   SAVE_INIT_DATA: _,
+  RELOAD_SYNC_EXTENSION: _,
   // Torrent
   TORRENT_MESSAGE: _
 }

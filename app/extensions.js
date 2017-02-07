@@ -35,7 +35,8 @@ let generateBraveManifest = () => {
     manifest_version: 2,
     version: '1.0',
     background: {
-      scripts: [ 'content/scripts/idleHandler.js', 'content/scripts/sync.js' ]
+      scripts: [ 'content/scripts/idleHandler.js' ],
+      persistent: false
     },
     content_scripts: [
       {
@@ -149,9 +150,7 @@ let generateBraveManifest = () => {
     cspDirectives['default-src'] = '\'self\' http://' + devServer
     cspDirectives['connect-src'] = ['\'self\'',
       'http://' + devServer,
-      'ws://' + devServer,
-      appConfig.sync.serverUrl,
-      appConfig.sync.s3Url].join(' ')
+      'ws://' + devServer].join(' ')
     cspDirectives['style-src'] = '\'self\' \'unsafe-inline\' http://' + devServer
   }
 
@@ -211,6 +210,38 @@ let generateTorrentManifest = () => {
     ],
     incognito: 'split',
     key: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyWl+wMvL0wZX3JUs7GeZAvxMP+LWEh2bwMV1HyuBra/lGZIq3Fmh0+AFnvFPXz1NpQkbLS3QWyqhdIn/lepGwuc2ma0glPzzmieqwctUurMGSGManApGO1MkcbSPhb+R1mx8tMam5+wbme4WoW37PI3oATgOs2NvHYuP60qol3U7b/zB3IWuqtwtqKe2Q1xY17btvPuz148ygWWIHneedt0jwfr6Zp+CSLARB9Heq/jqGXV4dPSVZ5ebBHLQ452iZkHxS6fm4Z+IxjKdYs3HNj/s8xbfEZ2ydnArGdJ0lpSK9jkDGYyUBugq5Qp3FH6zV89WqBvoV1dqUmL9gxbHsQIDAQAB'
+  }
+}
+
+let generateSyncManifest = () => {
+  let cspDirectives = {
+    'default-src': '\'self\'',
+    'form-action': '\'none\'',
+    'style-src': '\'self\' \'unsafe-inline\''
+  }
+  cspDirectives['connect-src'] = ['\'self\'',
+    appConfig.sync.serverUrl,
+    appConfig.sync.s3Url].join(' ')
+
+  if (process.env.NODE_ENV === 'development') {
+    // allow access to webpack dev server resources
+    let devServer = 'localhost:' + process.env.npm_package_config_port
+    cspDirectives['default-src'] += 'http://' + devServer
+    cspDirectives['connect-src'] += ' http://' + devServer + ' ws://' + devServer
+    cspDirectives['style-src'] += 'http://' + devServer
+  }
+
+  return {
+    name: 'Brave Sync',
+    manifest_version: 2,
+    version: '1.0',
+    content_security_policy: concatCSP(cspDirectives),
+    content_scripts: [],
+    background: {
+      scripts: [ 'content/scripts/sync.js' ]
+    },
+    incognito: 'spanning',
+    key: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxOmBmOVzntEY6zrcrGSAyrhzL2FJt4FaP12nb899+SrV0LgpOgyqDjytuXT5IlHS74j7ZK2zTOTQy5/E9hqo6ioi1GA3PQU8E71DTaN6kW+XzP+VyZmgPoQHIxPg8jkYk/H4erfP9kMhkVOtu/XqDTqluNhOT0BvVlBpWd4unTQFWdgpCYlPrI6PsYya4FSuIDe6rCKtJABfuKFEr7U9d9MNAOJEnRS8vdBHWCuhWHqsfAaAPyKHQhnwFSFZ4eB+JznBQf7cQtB3EpOoBElyR9QvmbWFrYu87eGL5XxsojKHCrxlQ4X5ANsALa1Mdd2DHDMVqLMIiEEU42DVB0ZDewIDAQAB'
   }
 }
 
@@ -293,6 +324,11 @@ module.exports.init = () => {
     }
   })
 
+  process.on('reload-sync-extension', () => {
+    console.log('reloading sync')
+    disableExtension(config.syncExtensionId)
+  })
+
   process.on('extension-load-error', (error) => {
     console.error(error)
   })
@@ -300,6 +336,12 @@ module.exports.init = () => {
   process.on('extension-unloaded', (extensionId) => {
     extensionInfo.setState(extensionId, extensionStates.DISABLED)
     extensionActions.extensionDisabled(extensionId)
+    if (extensionId === config.syncExtensionId) {
+      // Reload sync extension to restart the background script
+      setImmediate(() => {
+        enableExtension(config.syncExtensionId)
+      })
+    }
   })
 
   process.on('extension-ready', (installInfo) => {
@@ -314,7 +356,7 @@ module.exports.init = () => {
   let loadExtension = (extensionId, extensionPath, manifest = {}, manifestLocation = 'unpacked') => {
     if (!extensionInfo.isLoaded(extensionId) && !extensionInfo.isLoading(extensionId)) {
       extensionInfo.setState(extensionId, extensionStates.LOADING)
-      if (extensionId === config.braveExtensionId || extensionId === config.torrentExtensionId) {
+      if (extensionId === config.braveExtensionId || extensionId === config.torrentExtensionId || extensionId === config.syncExtensionId) {
         session.defaultSession.extensions.load(extensionPath, manifest, manifestLocation)
         return
       }
@@ -360,6 +402,8 @@ module.exports.init = () => {
   // Manually install the braveExtension and torrentExtension
   extensionInfo.setState(config.braveExtensionId, extensionStates.REGISTERED)
   loadExtension(config.braveExtensionId, getExtensionsPath('brave'), generateBraveManifest(), 'component')
+  extensionInfo.setState(config.syncExtensionId, extensionStates.REGISTERED)
+  loadExtension(config.syncExtensionId, getExtensionsPath('brave'), generateSyncManifest(), 'unpacked')
   if (getSetting(settings.TORRENT_VIEWER_ENABLED)) {
     extensionInfo.setState(config.torrentExtensionId, extensionStates.REGISTERED)
     loadExtension(config.torrentExtensionId, getExtensionsPath('torrent'), generateTorrentManifest(), 'component')
@@ -368,7 +412,7 @@ module.exports.init = () => {
     extensionActions.extensionDisabled(config.torrentExtensionId)
   }
 
-  let registerComponents = () => {
+  let registerComponents = (diff) => {
     if (getSetting(settings.PDFJS_ENABLED)) {
       registerComponent(config.PDFJSExtensionId)
     } else {
