@@ -234,11 +234,12 @@ describe('findBar', function () {
       .showFindbar(true, 2)
       .waitForElementFocus(findBarInput)
       .setValue(findBarInput, 'abc')
-      .click('.tab')
+      .click('[data-test-id="tab"]')
       .waitUntil(function () {
         return this.getValue(findBarInput).then((val) => val === 'test')
       })
-      .click('.closeTab')
+      .click('[data-test-id="tab"]')
+      .click('[data-test-id="closeTabIcon"]')
       .waitUntil(function () {
         return this.getValue(findBarInput).then((val) => val === 'abc')
       })

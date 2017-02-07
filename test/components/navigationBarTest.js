@@ -380,8 +380,8 @@ describe('navigationBar tests', function () {
       const pageWithNoFavicon = Brave.server.url('page_no_favicon.html')
       yield this.app.client.tabByUrl(Brave.newTabUrl).url(pageWithNoFavicon).waitForUrl(pageWithNoFavicon).windowParentByUrl(pageWithNoFavicon)
       yield this.app.client.waitUntil(function () {
-        return this.getAttribute(activeTabFavicon, 'class').then((className) =>
-          className === 'tabIcon bookmarkFile fa fa-file-o')
+        return this.getAttribute('[data-test-id="defaultIcon"]', 'class').then((className) =>
+          className === 'fa fa-file-o')
       })
     })
   })
@@ -759,8 +759,8 @@ describe('navigationBar tests', function () {
     it('Uses the default tab color when one is not specified', function * () {
       const page1Url = Brave.server.url('page1.html')
       yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
-      let background = yield this.app.client.getCssProperty(activeTab, 'background')
-      assert.equal(background.value, 'rgba(0,0,0,0)linear-gradient(white,rgb(243,243,243))repeatscroll0%0%/autopadding-boxborder-box')
+      let background = yield this.app.client.getCssProperty('[data-test-active-tab]', 'background')
+      assert.equal(background.value, 'rgba(0,0,0,0)linear-gradient(rgb(255,255,255),rgb(243,243,243))repeatscroll0%0%/autopadding-boxborder-box')
     })
 
     // We need a newer electron build first
@@ -1089,7 +1089,7 @@ describe('navigationBar tests', function () {
 
       it('focuses on the urlbar', function * () {
         this.app.client
-        .waitForExist('.tab[data-frame-key="1"].active')
+        .waitForExist('[data-test-active-tab][data-frame-key="1"]')
         .waitForElementFocus(urlInput)
       })
     })
