@@ -6,6 +6,7 @@
 const React = require('react')
 const ImmutableComponent = require('../components/immutableComponent')
 const Immutable = require('immutable')
+const UrlUtil = require('../lib/urlutil')
 
 // Components
 const SwitchControl = require('../components/switchControl')
@@ -41,7 +42,6 @@ const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
 const searchProviders = require('../data/searchProviders')
-const punycode = require('punycode')
 const moment = require('moment')
 moment.locale(navigator.language)
 
@@ -650,7 +650,7 @@ class GeneralTab extends ImmutableComponent {
     })
     var homepageValue = getSetting(settings.HOMEPAGE, this.props.settings)
     if (typeof homepageValue === 'string') {
-      homepageValue = punycode.toASCII(homepageValue)
+      homepageValue = UrlUtil.getPunycodeUrl(homepageValue)
     }
     const homepage = homepageValue && homepageValue.trim()
     const disableShowHomeButton = !homepage || !homepage.length
