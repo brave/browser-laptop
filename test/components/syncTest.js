@@ -1,14 +1,18 @@
-/* global describe, it, beforeEach */
+/* global describe, it, before, beforeEach, after */
 
+const crypto = require('crypto')
+const settings = require('../../js/constants/settings')
 const Brave = require('../lib/brave')
 const Immutable = require('immutable')
-const {urlInput, syncTab, syncSwitch} = require('../lib/selectors')
+const {doneButton, navigatorBookmarked, navigatorNotBookmarked, urlInput, removeButton, syncTab, syncSwitch} = require('../lib/selectors')
 
 const prefsUrl = 'about:preferences'
 const startButton = '[data-l10n-id="syncStart"]'
 const addButton = '[data-l10n-id="syncAdd"]'
 const createButton = '[data-l10n-id="syncCreate"]'
 const newDeviceButton = '[data-l10n-id="syncNewDevice"]'
+
+const PANEL_SEED = Immutable.fromJS(Array(32).fill(0))
 
 function toHex (byteArray) {
   let str = ''
@@ -22,14 +26,14 @@ function toHex (byteArray) {
   return str
 }
 
-function * setup (client) {
-  yield client
-    .waitForUrl(Brave.newTabUrl)
-    .waitForBrowserWindow()
-    .waitForVisible(urlInput)
-}
-
 describe('Sync Panel', function () {
+  function * setup (client) {
+    yield client
+      .waitForUrl(Brave.newTabUrl)
+      .waitForBrowserWindow()
+      .waitForVisible(urlInput)
+  }
+
   describe('sync setup', function () {
     Brave.beforeEach(this)
     beforeEach(function * () {
@@ -97,40 +101,7 @@ describe('Sync Panel', function () {
     Brave.beforeEach(this)
     beforeEach(function * () {
       yield setup(this.app.client)
-      yield this.app.client.saveSyncInitData(Immutable.fromJS([
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ]), Immutable.fromJS([0]), 0, 'data:image/png;base64,foo')
+      yield this.app.client.saveSyncInitData(PANEL_SEED, Immutable.fromJS([0]), 0, 'data:image/png;base64,foo')
     })
 
     it('sync can be toggled', function * () {
@@ -197,6 +168,153 @@ describe('Sync Panel', function () {
           return this.getAttribute('#syncQR', 'src').then((text) => {
             return text === 'data:image/png;base64,foo'
           })
+        })
+    })
+  })
+})
+
+describe('Syncing', function () {
+  function * setupBrave (client) {
+    Brave.addCommands()
+  }
+
+  function * setupSync (client, seed) {
+    yield setupBrave(Brave.app.client)
+    yield Brave.app.client.saveSyncInitData(seed, Immutable.fromJS([0]), 0, 'data:image/png;base64,foo')
+
+    yield Brave.app.client
+      .windowByUrl(Brave.browserWindowUrl)
+      .tabByIndex(0)
+      .loadUrl(prefsUrl)
+      .waitForVisible(syncTab)
+      .click(syncTab)
+      .waitForVisible(syncSwitch)
+      .click(syncSwitch)
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitUntil(function () {
+        return this.getAppState().then((val) => {
+          return val.value.settings['sync.enabled'] === true
+        })
+      })
+      .pause(1000) // XXX: Wait for sync init (request AWS credentials from server)
+  }
+
+  describe('bookmarks', function () {
+    Brave.beforeAllServerSetup(this)
+
+    function * bookmarkUrl (url, title) {
+      yield Brave.app.client
+        .tabByIndex(0)
+        .loadUrl(url)
+        .windowParentByUrl(url)
+        .activateURLMode()
+        .waitForVisible(navigatorNotBookmarked)
+        .click(navigatorNotBookmarked)
+        .waitForVisible(doneButton)
+        .setInputText('#bookmarkName input', title)
+        .waitForBookmarkDetail(url, title)
+        .waitForEnabled(doneButton)
+        .click(doneButton)
+    }
+
+    before(function * () {
+      this.page1Url = Brave.server.url('page1.html')
+      this.page1Title = 'Page 1'
+      this.page2Url = Brave.server.url('page2.html')
+      this.page2Title = 'Page 2'
+      this.page2TitleUpdated = 'All shall hail pyramids'
+      this.page3Url = Brave.server.url('page3.html')
+      this.page3Title = 'Page 3'
+      this.seed = new Immutable.List(crypto.randomBytes(32))
+      yield Brave.startApp()
+      yield setupSync(Brave.app.client, this.seed)
+
+      // For Create: Bookmark page 1
+      yield bookmarkUrl(this.page1Url, this.page1Title)
+
+      // For Update: Bookmark page 2 and rename it
+      yield Brave.app.client
+        .tabByIndex(0)
+        .waitForUrl(this.page1Url)
+      yield bookmarkUrl(this.page2Url, this.page2Title)
+      yield Brave.app.client
+        .activateURLMode()
+        .waitForVisible(navigatorBookmarked)
+        .click(navigatorBookmarked)
+        .waitForVisible(doneButton)
+        .waitForExist('#bookmarkName input')
+        .setInputText('#bookmarkName input', this.page2TitleUpdated)
+        .waitForBookmarkDetail(this.page2Url, this.page2TitleUpdated)
+        .waitForEnabled(doneButton)
+        .click(doneButton)
+
+      // For Delete: Bookmark page 3 and delete it
+      yield Brave.app.client
+        .tabByIndex(0)
+        .waitForUrl(this.page2Url)
+      yield bookmarkUrl(this.page3Url, this.page3Title)
+      yield Brave.app.client
+        // .pause(500) // XXX: Wait for sync
+        .activateURLMode()
+        .waitForVisible(navigatorBookmarked)
+        .click(navigatorBookmarked)
+        .waitForExist(removeButton)
+        .click(removeButton)
+
+      // XXX: Wait to upload sync records to S3
+      yield Brave.app.client.pause(1000)
+
+      // Finally start a fresh profile and setup sync
+      yield Brave.stopApp()
+      yield Brave.startApp()
+      yield setupSync(Brave.app.client, this.seed)
+      yield Brave.app.client
+        .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
+    })
+
+    after(function * () {
+      yield Brave.stopApp()
+    })
+
+    it('create', function * () {
+      const pageTitle = this.page1Title
+      yield Brave.app.client
+        .waitUntil(function () {
+          return this.getText('.bookmarksToolbar')
+            .then((allBookmarks) => allBookmarks.includes(pageTitle))
+        })
+    })
+
+    it('update (rename)', function * () {
+      const updatedTitle = this.page2TitleUpdated
+      yield Brave.app.client
+        .waitUntil(function () {
+          return this.getText('.bookmarksToolbar')
+            .then((allBookmarks) => allBookmarks.includes(updatedTitle))
+        })
+    })
+
+    it('delete', function * () {
+      const deletedTitle = this.page3Title
+      yield Brave.app.client
+        .waitUntil(function () {
+          return this.getText('.bookmarksToolbar')
+            .then((allBookmarks) => allBookmarks.includes(deletedTitle) === false)
+        })
+    })
+
+    it('sync order', function * () {
+      const pageTitle = this.page1Title
+      const updatedTitle = this.page2TitleUpdated
+
+      yield Brave.app.client
+        .waitUntil(function () {
+          return this.getText('.bookmarkToolbarButton:nth-child(1) .bookmarkText')
+            .then((title) => title === pageTitle)
+        })
+        .waitUntil(function () {
+          return this.getText('.bookmarkToolbarButton:nth-child(2) .bookmarkText')
+            .then((title) => title === updatedTitle)
         })
     })
   })
