@@ -347,13 +347,17 @@ class Frame extends ImmutableComponent {
     }
   }
 
-  componentDidMount () {
-    const cb = () => {
-      this.webview.setActive(this.props.isActive)
-      this.webview.setTabIndex(this.props.tabIndex)
-      this.updateAboutDetails({})
+  onPropsChanged (prevProps = {}) {
+    this.webview.setActive(this.props.isActive)
+    this.webview.setTabIndex(this.props.tabIndex)
+    if (this.frame && this.props.isActive && isFocused()) {
+      windowActions.setFocusedFrame(this.frame)
     }
-    this.updateWebview(cb)
+    this.updateAboutDetails(prevProps)
+  }
+
+  componentDidMount () {
+    this.updateWebview(this.onPropsChanged)
   }
 
   get zoomLevel () {
@@ -412,11 +416,10 @@ class Frame extends ImmutableComponent {
     }
 
     const cb = () => {
+      this.onPropsChanged(prevProps)
       if (this.getWebRTCPolicy(prevProps) !== this.getWebRTCPolicy(this.props)) {
         this.webview.setWebRTCIPHandlingPolicy(this.getWebRTCPolicy(this.props))
       }
-      this.webview.setActive(this.props.isActive)
-      this.webview.setTabIndex(this.props.tabIndex)
       if (prevProps.activeShortcut !== this.props.activeShortcut) {
         this.handleShortcut()
       }
@@ -435,7 +438,6 @@ class Frame extends ImmutableComponent {
           this.exitHtmlFullScreen()
         }
       }
-      this.updateAboutDetails(prevProps)
     }
 
     // For cross-origin navigation, clear temp approvals
@@ -672,17 +674,6 @@ class Frame extends ImmutableComponent {
       let mouseOnLeft = e.x < (window.innerWidth / 2)
       let showOnRight = nearBottom && mouseOnLeft
       windowActions.setLinkHoverPreview(e.url, showOnRight)
-    })
-    this.webview.addEventListener('set-active', (e) => {
-      if (this.frame.isEmpty()) {
-        return
-      }
-      if (e.active && isFocused()) {
-        windowActions.setFocusedFrame(this.frame)
-      }
-      if (e.active && !this.props.isActive) {
-        windowActions.setActiveFrame(this.frame)
-      }
     })
     this.webview.addEventListener('focus', this.onFocus)
     this.webview.addEventListener('mouseenter', (e) => {
