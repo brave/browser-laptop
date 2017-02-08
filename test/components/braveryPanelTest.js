@@ -268,6 +268,24 @@ describe('Bravery Panel', function () {
         .click(blockAdsOption)
         .waitForTextValue(adsBlockedStat, '2')
     })
+    it('blocks websocket tracking', function * () {
+      const url = Brave.server.url('websockets.html')
+      yield this.app.client
+        .waitForDataFile('adblock')
+        .tabByIndex(0)
+        .loadUrl(url)
+        .waitForTextValue('#result', 'success')
+        .waitForTextValue('#error', 'error')
+        .openBraveMenu(braveMenu, braveryPanel)
+        .waitForTextValue(adsBlockedStat, '1')
+        .click(adsBlockedStat)
+        .waitUntil(function () {
+          return this.getText('.braveryPanelBody li')
+            .then((body) => {
+              return body[0] === 'ws://ag.innovid.com/dv/sync?tid=2'
+            })
+        })
+    })
     // TODO(bridiver) using slashdot won't provide reliable results so we should
     // create our own iframe page with urls we expect to be blocked
     it('detects blocked elements in iframe in private tab', function * () {
