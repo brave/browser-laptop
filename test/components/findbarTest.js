@@ -1,4 +1,4 @@
-/* global describe, it, before */
+/* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
 const {activeWebview, findBarInput, findBarMatches, findBarNextButton, findBarClearButton, urlInput, titleBar} = require('../lib/selectors')
@@ -6,9 +6,8 @@ const messages = require('../../js/constants/messages')
 const assert = require('assert')
 
 describe('findBar', function () {
-  Brave.beforeAll(this)
-
-  before(function * () {
+  Brave.beforeEach(this)
+  beforeEach(function * () {
     yield setup(this.app.client)
     const url = Brave.server.url('find_in_page.html')
     yield this.app.client
