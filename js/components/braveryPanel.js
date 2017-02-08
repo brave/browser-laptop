@@ -293,7 +293,7 @@ class BraveryPanel extends ImmutableComponent {
                     <option data-l10n-id='blockAds' value='blockAds' />
                     <option data-l10n-id='allowAdsAndTracking' value='allowAdsAndTracking' />
                   </FormDropdown>
-                  <SwitchControl onClick={this.onToggleHTTPSE} rightl10nId='httpsEverywhere' checkedOn={httpseEnabled} disabled={!shieldsUp} />
+                  <SwitchControl onClick={this.onToggleHTTPSE} rightl10nId='httpsEverywhere' checkedOn={httpseEnabled} disabled={!shieldsUp} className='httpsEverywhereSwitch' />
                   <SwitchControl onClick={this.onToggleNoScript} rightl10nId='noScript' checkedOn={noScriptEnabled} disabled={!shieldsUp} className='noScriptSwitch' />
                 </div>
                 <div className='braveryControlGroup'>
@@ -301,12 +301,12 @@ class BraveryPanel extends ImmutableComponent {
                     braverySelectTitle: true,
                     disabled: !shieldsUp
                   })} data-l10n-id='cookieControl' />
-                  <FormDropdown value={this.props.braverySettings.cookieControl} onChange={this.onToggleCookieControl} disabled={!shieldsUp}>
+                  <FormDropdown data-test-id='cookieControl' value={this.props.braverySettings.cookieControl} onChange={this.onToggleCookieControl} disabled={!shieldsUp}>
                     <option data-l10n-id='block3rdPartyCookie' value='block3rdPartyCookie' />
                     <option data-l10n-id='allowAllCookies' value='allowAllCookies' />
                   </FormDropdown>
                   <SwitchControl onClick={this.onToggleFp} rightl10nId='fingerprintingProtection' checkedOn={fpEnabled} disabled={!shieldsUp} onInfoClick={this.onInfoClick} infoTitle={config.fingerprintingInfoUrl} className='fingerprintingProtectionSwitch' />
-                  <SwitchControl onClick={this.onToggleSafeBrowsing} rightl10nId='safeBrowsing' checkedOn={this.props.braverySettings.safeBrowsing} disabled={!shieldsUp} />
+                  <SwitchControl onClick={this.onToggleSafeBrowsing} rightl10nId='safeBrowsing' checkedOn={this.props.braverySettings.safeBrowsing} disabled={!shieldsUp} className='safeBrowsingSwitch' />
                 </div>
               </div></span>
             : null
