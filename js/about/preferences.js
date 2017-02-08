@@ -204,7 +204,10 @@ class LedgerTable extends ImmutableComponent {
   }
 
   getVerifiedIcon (synopsis) {
-    return <span className='verified' />
+    return <span className={cx({
+      verified: true,
+      disabled: !this.enabledForSite(synopsis)
+    })} />
   }
 
   enabledForSite (synopsis) {
@@ -254,7 +257,7 @@ class LedgerTable extends ImmutableComponent {
       },
       rank,
       {
-        html: <div className='site'>{verified ? this.getVerifiedIcon() : null}<a href={publisherURL} target='_blank'>{faviconURL ? <img src={faviconURL} alt={site} /> : <span className='fa fa-file-o' />}<span>{site}</span></a></div>,
+        html: <div className='site'>{verified ? this.getVerifiedIcon(synopsis) : null}<a href={publisherURL} target='_blank'>{faviconURL ? <img src={faviconURL} alt={site} /> : <span className='fa fa-file-o' />}<span>{site}</span></a></div>,
         value: site
       },
       {
