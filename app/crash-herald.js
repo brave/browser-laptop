@@ -4,6 +4,7 @@
 
 const appConfig = require('../js/constants/appConfig')
 const crashReporter = require('electron').crashReporter
+const buildConfig = require('../js/constants/buildConfig')
 
 exports.init = () => {
   const options = {
@@ -12,7 +13,8 @@ exports.init = () => {
     submitURL: appConfig.crashes.crashSubmitUrl,
     autoSubmit: true,
     extra: {
-      node_env: process.env.NODE_ENV
+      node_env: process.env.NODE_ENV,
+      rev: buildConfig.BROWSER_LAPTOP_REV || 'unknown'
     }
   }
   crashReporter.start(options)
