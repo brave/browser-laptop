@@ -5,7 +5,7 @@
 const punycode = require('punycode')
 const publicSuffixes = require('./psl')
 
-const LRUCache = require('lru_cache/core').LRUCache
+const LRUCache = require('lru-cache')
 
 let cachedBaseDomain = new LRUCache(50)
 
@@ -71,7 +71,7 @@ module.exports.getBaseDomain = function (hostname) {
     tld--
   }
 
-  cachedBaseDomain.put(curDomain)
+  cachedBaseDomain.set(curDomain)
 
   return curDomain
 }
