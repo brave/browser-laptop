@@ -39,10 +39,10 @@ describe('PublisherToggle component', function () {
     mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_no.svg')
     mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_yes.svg')
     mockery.registerMock('../../../js/settings', { getSetting: (settingKey, settingsCollection, value) => {
-      if (settingKey === settingsConst.AUTO_SUGGEST_SITES) {
-        return false
+      if (settingKey === settingsConst.PAYMENTS_ENABLED) {
+        return true
       }
-      return true
+      return false
     }})
     mockery.registerMock('electron', fakeElectron)
     window.chrome = fakeElectron

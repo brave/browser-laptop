@@ -116,7 +116,7 @@ class NavigationBar extends ImmutableComponent {
     const validPublisherSynopsis = this.props.synopsis.map(entry => entry.get('site')).includes(domain)
 
     if ((hostSettings || validPublisherSynopsis) && visiblePublisher !== false) {
-      return !getSetting(settings.AUTO_SUGGEST_SITES) && !isSourceAboutUrl(this.props.location)
+      return getSetting(settings.PAYMENTS_ENABLED) && !isSourceAboutUrl(this.props.location)
     }
     return false
   }
