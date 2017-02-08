@@ -337,8 +337,8 @@ class BookmarksList extends ImmutableComponent {
       <SortableTable
         ref='bookmarkTable'
         headings={[
-          <BookmarkTitleHeader heading='Title' selectedFolderId={this.props.selectedFolderId} />,
-          'Last Visited'
+          <BookmarkTitleHeader heading='title' selectedFolderId={this.props.selectedFolderId} />,
+          <span data-l10n-id='lastVisited' />
         ]}
         defaultHeading='Title'
         rows={this.props.bookmarks.map((entry) => [
