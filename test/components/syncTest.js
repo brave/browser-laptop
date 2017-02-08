@@ -3,10 +3,12 @@
 const crypto = require('crypto')
 const settings = require('../../js/constants/settings')
 const {newTabMode} = require('../../app/common/constants/settingsEnums')
+const siteTags = require('../../js/constants/siteTags')
 const Brave = require('../lib/brave')
 const Immutable = require('immutable')
-const {adsBlockedControl, allowAllCookiesOption, braveMenu, braveryPanel, cookieControl, doneButton, fpSwitch, httpsEverywhereSwitch, navigatorBookmarked, navigatorNotBookmarked, noScriptSwitch, urlInput, removeButton, safeBrowsingSwitch, showAdsOption, syncTab, syncSwitch} = require('../lib/selectors')
+const {adsBlockedControl, allowAllCookiesOption, bookmarksToolbar, braveMenu, braveryPanel, cookieControl, doneButton, fpSwitch, httpsEverywhereSwitch, navigatorBookmarked, navigatorNotBookmarked, noScriptSwitch, urlInput, removeButton, safeBrowsingSwitch, showAdsOption, syncTab, syncSwitch} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
+const aboutBookmarksUrl = getTargetAboutUrl('about:bookmarks')
 const aboutHistoryUrl = getTargetAboutUrl('about:history')
 
 const prefsUrl = 'about:preferences'
@@ -209,7 +211,7 @@ describe('Syncing bookmarks', function () {
     yield setupSync(Brave.app.client, seed)
   }
 
-  function * bookmarkUrl (url, title) {
+  function * bookmarkUrl (url, title, folderId) {
     yield Brave.app.client
       .tabByIndex(0)
       .loadUrl(url)
@@ -220,6 +222,26 @@ describe('Syncing bookmarks', function () {
       .waitForVisible(doneButton)
       .setInputText('#bookmarkName input', title)
       .waitForBookmarkDetail(url, title)
+    if (folderId) {
+      const folderOption = `#bookmarkParentFolder select option[value="${folderId}"`
+      yield Brave.app.client
+        .click('#bookmarkParentFolder select')
+        .waitForVisible(folderOption)
+        .click(folderOption)
+    }
+    yield Brave.app.client
+      .waitForEnabled(doneButton)
+      .click(doneButton)
+  }
+
+  function * addFolder (title) {
+    yield Brave.app.client
+      .tabByIndex(0)
+      .url(aboutBookmarksUrl)
+      .click('.addBookmarkFolder')
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForExist('#bookmarkName input')
+      .setInputText('#bookmarkName input', title)
       .waitForEnabled(doneButton)
       .click(doneButton)
   }
@@ -228,10 +250,18 @@ describe('Syncing bookmarks', function () {
     this.page1Url = Brave.server.url('page1.html')
     this.page1Title = 'Page 1'
     this.page2Url = Brave.server.url('page2.html')
-    this.page2Title = 'Page 2'
+    this.page2Title = 'Page 2 - to be Renamed'
     this.page2TitleUpdated = 'All shall hail pyramids'
     this.page3Url = Brave.server.url('page3.html')
-    this.page3Title = 'Page 3'
+    this.page3Title = 'Page 3 - to be Deleted'
+    this.folder1Title = 'Folder 1'
+    this.folder1Page1Url = Brave.server.url('page4.html')
+    this.folder1Page1Title = 'Page 1.4'
+    this.folder1Page2Url = Brave.server.url('page5.html')
+    this.folder1Page2Title = 'Page 1.5'
+    this.folder2Title = 'Folder 2 - to be Deleted'
+    this.folder2Page1Url = Brave.server.url('page6.html')
+    this.folder2Page1Title = 'Page - to be Deleted'
     this.seed = new Immutable.List(crypto.randomBytes(32))
     yield setup(this.seed)
 
@@ -268,6 +298,42 @@ describe('Syncing bookmarks', function () {
       .waitForExist(removeButton)
       .click(removeButton)
 
+    // Create folder then add a bookmark
+    yield addFolder(this.folder1Title)
+    const folder1Id = 1 // XXX: Hardcoded
+    yield Brave.app.client
+      .pause(1000) // XXX: Wait for sync to upload record to S3
+    yield bookmarkUrl(this.folder1Page1Url, this.folder1Page1Title, folder1Id)
+    yield Brave.app.client
+      .pause(1000) // XXX: Wait for sync to upload record to S3
+
+    // Update a page to be in the folder
+    yield Brave.app.client
+      .tabByIndex(0)
+      .waitForUrl(this.folder1Page1Url)
+    yield bookmarkUrl(this.folder1Page2Url, this.folder1Page2Title)
+    const folder1Option = `#bookmarkParentFolder select option[value="${folder1Id}"`
+    yield Brave.app.client
+      .pause(1000) // XXX: Helps to correctly order Create and Update
+      .activateURLMode()
+      .waitForVisible(navigatorBookmarked)
+      .click(navigatorBookmarked)
+      .waitForVisible(doneButton)
+      .click('#bookmarkParentFolder select')
+      .waitForVisible(folder1Option)
+      .click(folder1Option)
+      .click(doneButton)
+
+    // Delete folder (Create, add bookmark, Delete)
+    yield addFolder(this.folder2Title)
+    const folder2Id = 2 // XXX: Hardcoded
+    yield Brave.app.client
+      .pause(1000) // XXX: Wait for sync to upload record to S3
+    yield bookmarkUrl(this.folder2Page1Url, this.folder2Page1Title, folder2Id)
+    yield Brave.app.client
+      .pause(1000) // XXX: Wait for sync to upload record to S3
+      .removeSite({ folderId: folder2Id }, siteTags.BOOKMARK_FOLDER)
+
     // XXX: Wait for sync to upload records to S3
     yield Brave.app.client.pause(1000)
 
@@ -286,7 +352,7 @@ describe('Syncing bookmarks', function () {
     const pageTitle = this.page1Title
     yield Brave.app.client
       .waitUntil(function () {
-        return this.getText('.bookmarksToolbar')
+        return this.getText(bookmarksToolbar)
           .then((allBookmarks) => allBookmarks.includes(pageTitle))
       })
   })
@@ -295,7 +361,7 @@ describe('Syncing bookmarks', function () {
     const updatedTitle = this.page2TitleUpdated
     yield Brave.app.client
       .waitUntil(function () {
-        return this.getText('.bookmarksToolbar')
+        return this.getText(bookmarksToolbar)
           .then((allBookmarks) => allBookmarks.includes(updatedTitle))
       })
   })
@@ -304,14 +370,72 @@ describe('Syncing bookmarks', function () {
     const deletedTitle = this.page3Title
     yield Brave.app.client
       .waitUntil(function () {
-        return this.getText('.bookmarksToolbar')
+        return this.getText(bookmarksToolbar)
           .then((allBookmarks) => allBookmarks.includes(deletedTitle) === false)
+      })
+  })
+
+  it('create folder', function * () {
+    const title = this.folder1Title
+    yield Brave.app.client
+      .waitUntil(function () {
+        return this.getText(bookmarksToolbar)
+          .then((allBookmarks) => allBookmarks.includes(title))
+      })
+  })
+
+  it('create bookmark in folder', function * () {
+    const pageNthChild = 1
+    const folderTitle = this.folder1Title
+    const pageTitle = this.folder1Page1Title
+    const folder = `.bookmarkToolbarButton[title="${folderTitle}"]`
+    yield Brave.app.client
+      .waitForVisible(folder)
+      .click(folder)
+      .waitForVisible('.contextMenu')
+      .waitUntil(function () {
+        return this.getText(`.contextMenuItem:nth-child(${pageNthChild})`)
+          .then((bookmark1Title) => bookmark1Title === pageTitle)
+      })
+  })
+
+  it('update bookmark, moving it into the folder', function * () {
+    const pageNthChild = 2
+    const folderTitle = this.folder1Title
+    const pageTitle = this.folder1Page2Title
+    const folder = `.bookmarkToolbarButton[title="${folderTitle}"]`
+    yield Brave.app.client
+      .waitForVisible(folder)
+      .click(folder)
+      .waitForVisible('.contextMenu')
+      .waitUntil(function () {
+        return this.getText(`.contextMenuItem:nth-child(${pageNthChild})`)
+          .then((bookmark1Title) => bookmark1Title === pageTitle)
+      })
+  })
+
+  it('delete folder', function * () {
+    const title = this.folder2Title
+    yield Brave.app.client
+      .waitUntil(function () {
+        return this.getText(bookmarksToolbar)
+          .then((allBookmarks) => allBookmarks.includes(title) === false)
+      })
+  })
+
+  it('delete folder deletes pages within', function * () {
+    const title = this.folder2Page1Title
+    yield Brave.app.client
+      .waitUntil(function () {
+        return this.getText(bookmarksToolbar)
+          .then((allBookmarks) => allBookmarks.includes(title) === false)
       })
   })
 
   it('sync order', function * () {
     const pageTitle = this.page1Title
     const updatedTitle = this.page2TitleUpdated
+    const folder1Title = this.folder1Title
 
     yield Brave.app.client
       .waitUntil(function () {
@@ -321,6 +445,10 @@ describe('Syncing bookmarks', function () {
       .waitUntil(function () {
         return this.getText('.bookmarkToolbarButton:nth-child(2) .bookmarkText')
           .then((title) => title === updatedTitle)
+      })
+      .waitUntil(function () {
+        return this.getText('.bookmarkToolbarButton:nth-child(3) .bookmarkText')
+          .then((title) => title === folder1Title)
       })
   })
 })
