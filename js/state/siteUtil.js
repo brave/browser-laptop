@@ -283,7 +283,7 @@ module.exports.removeSite = function (sites, siteDetail, tag, reorder = true, sy
     childSites.forEach((site) => {
       const tags = site.get('tags')
       tags.forEach((tag) => {
-        sites = module.exports.removeSite(sites, site, tag, false)
+        sites = module.exports.removeSite(sites, site, tag, false, syncCallback)
       })
     })
   }
