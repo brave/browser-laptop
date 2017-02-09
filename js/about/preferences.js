@@ -959,12 +959,12 @@ class SyncTab extends ImmutableComponent {
     return <div className='syncOverlay'>
       {this.deviceNameInputContent}
       <div>
-        <Button l10nId='syncCreate' className='primaryButton' onClick={this.setupSyncProfile.bind(this)} />
+        <Button l10nId='syncCreate' className='primaryButton' onClick={this.setupSyncProfile.bind(this, false)} />
       </div>
     </div>
   }
 
-  setupSyncProfile (isRestoring = false) {
+  setupSyncProfile (isRestoring) {
     if (this.deviceNameInput.value) {
       this.props.onChangeSetting(settings.SYNC_DEVICE_NAME, this.deviceNameInput.value)
     }
