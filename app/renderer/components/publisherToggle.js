@@ -73,8 +73,8 @@ class PublisherToggle extends ImmutableComponent {
 
   get shouldShowAddPublisherButton () {
     if ((!!this.hostSettings || !!this.validPublisherSynopsis) && this.visiblePublisher) {
-      // Only show publisher icon if autoSuggest option is OFF
-      return !getSetting(settings.AUTO_SUGGEST_SITES)
+      // Only show publisher icon if ledger is enabled
+      return getSetting(settings.PAYMENTS_ENABLED)
     }
     return false
   }
@@ -89,11 +89,6 @@ class PublisherToggle extends ImmutableComponent {
   }
 
   onAuthorizePublisher () {
-    // if payments disabled, enable it
-    if (!getSetting(settings.AUTO_SUGGEST_SITES)) {
-      appActions.changeSetting(settings.PAYMENTS_ENABLED, true)
-    }
-
     this.authorizedPublisher
       ? appActions.changeSiteSetting(this.hostPattern, 'ledgerPayments', false)
       : appActions.changeSiteSetting(this.hostPattern, 'ledgerPayments', true)
