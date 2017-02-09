@@ -6,7 +6,7 @@
 const urlParse = require('./common/urlParse')
 const DataFile = require('./dataFile')
 const Filtering = require('./filtering')
-const LRUCache = require('lru_cache/core').LRUCache
+const LRUCache = require('lru-cache')
 const getHostnamePatterns = require('../js/lib/urlutil').getHostnamePatterns
 
 // Map of ruleset ID to ruleset content
@@ -56,7 +56,7 @@ function getRewrittenUrl (url) {
       // Try applying each ruleset
       let result = applyRuleset(url, db[rulesetIds[i]])
       if (result) {
-        cachedRewrites.put(url, result)
+        cachedRewrites.set(url, result)
         // Redirect to the first rewritten URL
         return result
       }

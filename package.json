@@ -98,7 +98,7 @@
     "ledger-client": "^0.8.106",
     "ledger-geoip": "^0.8.75",
     "ledger-publisher": "^0.8.108",
-    "lru_cache": "^1.0.0",
+    "lru-cache": "^1.0.0",
     "moment": "^2.15.1",
     "normalize-url": "^1.7.0",
     "parse-torrent": "^5.8.1",
