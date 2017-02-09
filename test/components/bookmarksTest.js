@@ -56,6 +56,23 @@ describe('bookmark tests', function () {
           .click(navigatorBookmarked)
           .waitForVisible(doneButton)
           .getValue('#bookmarkName input').should.eventually.be.equal('Custom Page 1')
+          .click(doneButton)
+      })
+      it('display punycode custom title and location', function * () {
+        yield this.app.client
+          .activateURLMode()
+          .waitForVisible(navigatorBookmarked)
+          .click(navigatorBookmarked)
+          .waitForVisible(doneButton)
+          .setValue('#bookmarkName input', 'https://www.brave.com/')
+          .keys('\uE010') // send END key
+          .keys('а')
+          .getValue('#bookmarkName input').should.eventually.be.equal('https://www.brave.xn--com-8cd')
+          .setValue('#bookmarkLocation input', 'https://www.brave.com/')
+          .keys('\uE010') // send END key
+          .keys('а')
+          .getValue('#bookmarkLocation input').should.eventually.be.equal('https://www.brave.xn--com-8cd')
+          .click(doneButton)
       })
     })
 
