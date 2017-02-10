@@ -1,6 +1,7 @@
 /* global describe, it, before, beforeEach, after */
 
 const crypto = require('crypto')
+const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
 const {newTabMode} = require('../../app/common/constants/settingsEnums')
 const siteTags = require('../../js/constants/siteTags')
@@ -31,15 +32,23 @@ function toHex (byteArray) {
   return str
 }
 
+const checkSiteSetting = function (hostPattern, setting, value) {
+  return function () {
+    return this.getAppState().then((val) => {
+      return val.value.siteSettings[hostPattern][setting] === value
+    })
+  }
+}
+
 function * setupBrave (client) {
   Brave.addCommands()
 }
 
-function * setupSync (client, seed) {
-  yield client.saveSyncInitData(seed, Immutable.fromJS([0]), 0, 'data:image/png;base64,foo')
-
+function * toggleSync (client, expectedState) {
+  if (typeof expectedState === undefined) {
+    throw new Error('expectedState is required')
+  }
   yield client
-    .windowByUrl(Brave.browserWindowUrl)
     .tabByIndex(0)
     .loadUrl(prefsUrl)
     .waitForVisible(syncTab)
@@ -49,10 +58,58 @@ function * setupSync (client, seed) {
     .windowByUrl(Brave.browserWindowUrl)
     .waitUntil(function () {
       return this.getAppState().then((val) => {
-        return val.value.settings['sync.enabled'] === true
+        return val.value.settings['sync.enabled'] === expectedState
       })
     })
-    .pause(1000) // XXX: Wait for sync init (request AWS credentials from server)
+}
+
+function * setupSync (client, seed) {
+  yield client
+    .saveSyncInitData(seed, Immutable.fromJS([0]), 0, 'data:image/png;base64,foo')
+    .windowByUrl(Brave.browserWindowUrl)
+  yield toggleSync(client, true)
+  // When Sync initializes, it requests AWS credentials from server
+  // then performs an initial sync.
+  yield client.waitUntil(function () {
+    return this.getAppState().then((val) => {
+      return val.value.sync['lastFetchTimestamp'] > 0
+    })
+  })
+}
+
+function * bookmarkUrl (url, title, folderId) {
+  yield Brave.app.client
+    .tabByIndex(0)
+    .loadUrl(url)
+    .windowParentByUrl(url)
+    .activateURLMode()
+    .waitForVisible(navigatorNotBookmarked)
+    .click(navigatorNotBookmarked)
+    .waitForVisible(doneButton)
+    .setInputText('#bookmarkName input', title)
+    .waitForBookmarkDetail(url, title)
+  if (folderId) {
+    const folderOption = `#bookmarkParentFolder select option[value="${folderId}"`
+    yield Brave.app.client
+      .click('#bookmarkParentFolder select')
+      .waitForVisible(folderOption)
+      .click(folderOption)
+  }
+  yield Brave.app.client
+    .waitForEnabled(doneButton)
+    .click(doneButton)
+}
+
+function * addBookmarkFolder (title) {
+  yield Brave.app.client
+    .tabByIndex(0)
+    .url(aboutBookmarksUrl)
+    .click('.addBookmarkFolder')
+    .windowParentByUrl(aboutBookmarksUrl)
+    .waitForExist('#bookmarkName input')
+    .setInputText('#bookmarkName input', title)
+    .waitForEnabled(doneButton)
+    .click(doneButton)
 }
 
 describe('Sync Panel', function () {
@@ -211,41 +268,6 @@ describe('Syncing bookmarks', function () {
     yield setupSync(Brave.app.client, seed)
   }
 
-  function * bookmarkUrl (url, title, folderId) {
-    yield Brave.app.client
-      .tabByIndex(0)
-      .loadUrl(url)
-      .windowParentByUrl(url)
-      .activateURLMode()
-      .waitForVisible(navigatorNotBookmarked)
-      .click(navigatorNotBookmarked)
-      .waitForVisible(doneButton)
-      .setInputText('#bookmarkName input', title)
-      .waitForBookmarkDetail(url, title)
-    if (folderId) {
-      const folderOption = `#bookmarkParentFolder select option[value="${folderId}"`
-      yield Brave.app.client
-        .click('#bookmarkParentFolder select')
-        .waitForVisible(folderOption)
-        .click(folderOption)
-    }
-    yield Brave.app.client
-      .waitForEnabled(doneButton)
-      .click(doneButton)
-  }
-
-  function * addFolder (title) {
-    yield Brave.app.client
-      .tabByIndex(0)
-      .url(aboutBookmarksUrl)
-      .click('.addBookmarkFolder')
-      .windowByUrl(Brave.browserWindowUrl)
-      .waitForExist('#bookmarkName input')
-      .setInputText('#bookmarkName input', title)
-      .waitForEnabled(doneButton)
-      .click(doneButton)
-  }
-
   before(function * () {
     this.page1Url = Brave.server.url('page1.html')
     this.page1Title = 'Page 1'
@@ -299,7 +321,7 @@ describe('Syncing bookmarks', function () {
       .click(removeButton)
 
     // Create folder then add a bookmark
-    yield addFolder(this.folder1Title)
+    yield addBookmarkFolder(this.folder1Title)
     const folder1Id = 1 // XXX: Hardcoded
     yield Brave.app.client
       .pause(1000) // XXX: Wait for sync to upload record to S3
@@ -325,7 +347,7 @@ describe('Syncing bookmarks', function () {
       .click(doneButton)
 
     // Delete folder (Create, add bookmark, Delete)
-    yield addFolder(this.folder2Title)
+    yield addBookmarkFolder(this.folder2Title)
     const folder2Id = 2 // XXX: Hardcoded
     yield Brave.app.client
       .pause(1000) // XXX: Wait for sync to upload record to S3
@@ -472,6 +494,8 @@ describe('Syncing history', function () {
     this.page1Title = 'Page 1'
     this.page2Url = Brave.server.url('page2.html')
     this.page2Title = 'Page 2'
+    this.page3Url = Brave.server.url('fingerprinting.html')
+    this.page3Title = this.page3Url
     this.seed = new Immutable.List(crypto.randomBytes(32))
     yield setup(this.seed)
 
@@ -485,6 +509,13 @@ describe('Syncing history', function () {
       .tabByIndex(0)
       .waitForUrl(this.page1Url)
       .loadUrl(this.page2Url)
+
+    // Private tab should not sync
+    yield Brave.app.client
+      .waitForUrl(this.page2Url)
+      .windowParentByUrl(this.page2Url)
+      .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page3Url, { isPrivate: true })
+      .waitForUrl(this.page3Url)
 
     // XXX: Wait for sync to upload records to S3
     yield Brave.app.client.pause(1000)
@@ -513,13 +544,19 @@ describe('Syncing history', function () {
 
     yield Brave.app.client
       .waitUntil(function () {
-        return this.getText('table.sortableTable tr:nth-child(1) td.title')
+        return this.getText('table.sortableTable tbody tr:nth-child(1) td.title')
           .then((title) => title === page2Title)
       })
       .waitUntil(function () {
-        return this.getText('table.sortableTable tr:nth-child(2) td.title')
+        return this.getText('table.sortableTable tbody tr:nth-child(2) td.title')
           .then((title) => title === page1Title)
       })
+  })
+
+  it('private browsing does not sync', function * () {
+    yield Brave.app.client
+      .waitForElementCount('table.sortableTable tbody tr', 2)
+      .waitForVisible(`table.sortableTable td.title[data-sort="${this.page3Title}"]`, 1000, true)
   })
 })
 
@@ -574,25 +611,14 @@ describe('Syncing site settings', function () {
   it('works', function * () {
     const hostPattern = this.page1HostPattern
     const hostPatternNoScript = this.page1HostPatternNoScript
-    const checkSetting = function (setting, value) {
-      return function () {
-        return this.getAppState().then((val) => {
-          return val.value.siteSettings[hostPattern][setting] === value
-        })
-      }
-    }
     yield Brave.app.client
       .windowByUrl(Brave.browserWindowUrl)
-      .waitUntil(checkSetting('httpsEverywhere', false))
-      .waitUntil(checkSetting('fingerprintingProtection', true))
-      .waitUntil(checkSetting('safeBrowsing', false))
-      .waitUntil(checkSetting('adControl', 'allowAdsAndTracking'))
-      .waitUntil(checkSetting('cookieControl', 'allowAllCookies'))
-      .waitUntil(function () {
-        return this.getAppState().then((val) => {
-          return val.value.siteSettings[hostPatternNoScript].noScript === true
-        })
-      })
+      .waitUntil(checkSiteSetting(hostPattern, 'httpsEverywhere', false))
+      .waitUntil(checkSiteSetting(hostPattern, 'fingerprintingProtection', true))
+      .waitUntil(checkSiteSetting(hostPattern, 'safeBrowsing', false))
+      .waitUntil(checkSiteSetting(hostPattern, 'adControl', 'allowAdsAndTracking'))
+      .waitUntil(checkSiteSetting(hostPattern, 'cookieControl', 'allowAllCookies'))
+      .waitUntil(checkSiteSetting(hostPatternNoScript, 'noScript', true))
   })
 })
 
@@ -623,11 +649,7 @@ describe('Syncing and clearing data prevents it from syncing', function () {
       .openBraveMenu(braveMenu, braveryPanel)
       .waitForVisible(noScriptSwitch)
       .click(noScriptSwitch)
-      .waitUntil(function () {
-        return this.getAppState().then((val) => {
-          return val.value.siteSettings[hostPattern]['noScript'] === true
-        })
-      })
+      .waitUntil(checkSiteSetting(hostPattern, 'noScript', true))
       .pause(1000) // XXX: Wait for sync to upload records to S3
       .onClearBrowsingData({browserHistory: true, savedSiteSettings: true})
       .pause(500) // XXX: Wait for sync to delete records from S3
@@ -657,6 +679,109 @@ describe('Syncing and clearing data prevents it from syncing', function () {
       .waitUntil(function () {
         return this.getAppState().then((val) => {
           return val.value.siteSettings.hasOwnProperty(hostPattern) === false
+        })
+      })
+  })
+})
+
+describe('Syncing then turning it off stops syncing', function () {
+  Brave.beforeAllServerSetup(this)
+
+  function * setup (seed) {
+    yield Brave.startApp()
+    yield setupBrave(Brave.app.client)
+    // New tab sites appear in history; so first clear them out.
+    yield Brave.app.client
+      .onClearBrowsingData({browserHistory: true})
+      .changeSetting(settings.NEWTAB_MODE, newTabMode.EMPTY_NEW_TAB)
+      .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
+      .changeSetting(settings.SYNC_TYPE_HISTORY, true)
+    yield setupSync(Brave.app.client, seed)
+  }
+
+  before(function * () {
+    this.page1Url = Brave.server.url('page1.html')
+    this.page1Title = 'Page 1'
+    this.page2Url = Brave.server.url('page2.html')
+    this.page2Title = 'Page 2'
+    this.page3Url = 'https://www.brave.com/'
+    this.page3HostPattern = 'https?://www.brave.com'
+    this.hostPattern1 = this.page3HostPattern
+    this.page4Url = 'https://www.eff.org/'
+    this.page4HostPattern = 'https?://www.eff.org'
+    this.hostPattern2 = this.page4HostPattern
+    this.siteSettingName = 'fingerprintingProtection'
+    this.seed = new Immutable.List(crypto.randomBytes(32))
+    yield setup(this.seed)
+
+    // Sync On - browsing activity which is synced
+    yield bookmarkUrl(this.page1Url, this.page1Title)
+    yield Brave.app.client
+      .tabByIndex(0)
+      .loadUrl(this.page3Url)
+      .openBraveMenu(braveMenu, braveryPanel)
+      .waitForVisible(fpSwitch)
+      .click(fpSwitch)
+      .waitUntil(checkSiteSetting(this.hostPattern1, this.siteSettingName, true))
+      .keys(Brave.keys.ESCAPE)
+      .pause(1000) // XXX: Wait for Sync to upload records to S3
+
+    // Sync Off - browsing activity NOT synced
+    yield toggleSync(Brave.app.client, false)
+    yield bookmarkUrl(this.page2Url, this.page2Title)
+    yield Brave.app.client
+      .tabByIndex(0)
+      .loadUrl(this.page4Url)
+      .openBraveMenu(braveMenu, braveryPanel)
+      .waitForVisible(fpSwitch)
+      .click(fpSwitch)
+      .waitUntil(checkSiteSetting(this.hostPattern2, this.siteSettingName, true))
+
+    // Finally start a fresh profile and setup sync
+    yield Brave.stopApp()
+    yield setup(this.seed)
+    yield Brave.app.client
+      .tabByIndex(0)
+      .loadUrl(aboutHistoryUrl)
+      .pause(500) // XXX: Wait for history to load
+  })
+
+  after(function * () {
+    yield Brave.stopApp()
+  })
+
+  it('bookmarks', function * () {
+    const title1 = this.page1Title
+    const title2 = this.page2Title
+    yield Brave.app.client
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitUntil(function () {
+        return this.getText(bookmarksToolbar)
+          .then((allBookmarks) => allBookmarks.includes(title1) === true)
+      })
+      .waitUntil(function () {
+        return this.getText(bookmarksToolbar)
+          .then((allBookmarks) => allBookmarks.includes(title2) === false)
+      })
+  })
+
+  it('history', function * () {
+    yield Brave.app.client
+      .tabByIndex(0)
+      .waitForElementCount('table.sortableTable tbody tr', 2)
+      .waitForVisible(`table.sortableTable td.title[data-sort="${this.page1Title}"]`)
+      .waitForVisible(`table.sortableTable td.title[data-sort="${this.page2Title}"]`, 1000, true)
+  })
+
+  it('site settings', function * () {
+    const hostPattern1 = this.hostPattern1
+    const hostPattern2 = this.hostPattern2
+    yield Brave.app.client
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitUntil(checkSiteSetting(hostPattern1, this.siteSettingName, true))
+      .waitUntil(function () {
+        return this.getAppState().then((val) => {
+          return val.value.siteSettings.hasOwnProperty(hostPattern2) === false
         })
       })
   })
