@@ -9,9 +9,8 @@ const Immutable = require('immutable')
 const UrlUtil = require('../lib/urlutil')
 
 // Components
-const SwitchControl = require('../components/switchControl')
 const ModalOverlay = require('../components/modalOverlay')
-const {SettingsList, SettingItem} = require('../../app/renderer/components/settings')
+const {SettingsList, SettingItem, SettingCheckbox, SiteSettingCheckbox} = require('../../app/renderer/components/settings')
 const {SettingTextbox} = require('../../app/renderer/components/textbox')
 const {SettingDropdown} = require('../../app/renderer/components/dropdown')
 const Button = require('../components/button')
@@ -33,6 +32,7 @@ const appConfig = require('../constants/appConfig')
 const preferenceTabs = require('../constants/preferenceTabs')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
+const {changeSetting} = require('../../app/renderer/lib/settingsUtil')
 const coinbaseCountries = require('../constants/coinbaseCountries')
 const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
 const {startsWithOption, newTabMode, bookmarksToolbarMode, tabCloseAction, fullscreenOption} = require('../../app/common/constants/settingsEnums')
@@ -92,91 +92,6 @@ const braveryPermissionNames = {
   'httpsEverywhere': ['boolean'],
   'fingerprintingProtection': ['boolean'],
   'noScript': ['boolean', 'number']
-}
-
-const changeSetting = (cb, key, e) => {
-  if (e.target.type === 'checkbox') {
-    cb(key, e.target.value)
-  } else {
-    let value = e.target.value
-    if (e.target.dataset && e.target.dataset.type === 'number') {
-      value = parseInt(value, 10)
-    } else if (e.target.dataset && e.target.dataset.type === 'float') {
-      value = parseFloat(value)
-    }
-    if (e.target.type === 'number') {
-      value = value.replace(/\D/g, '')
-      value = parseInt(value, 10)
-      if (Number.isNaN(value)) {
-        return
-      }
-      value = Math.min(e.target.getAttribute('max'), Math.max(value, e.target.getAttribute('min')))
-    }
-    cb(key, value)
-  }
-}
-
-class SettingCheckbox extends ImmutableComponent {
-  constructor () {
-    super()
-    this.onClick = this.onClick.bind(this)
-  }
-
-  onClick (e) {
-    if (this.props.disabled) {
-      return
-    }
-    return this.props.onChange ? this.props.onChange(e) : changeSetting(this.props.onChangeSetting, this.props.prefKey, e)
-  }
-
-  render () {
-    const props = {
-      style: this.props.style,
-      className: 'settingItem'
-    }
-    if (this.props.id) {
-      props.id = this.props.id
-    }
-    return <div {...props}>
-      <SwitchControl id={this.props.prefKey}
-        small={this.props.small}
-        disabled={this.props.disabled}
-        onClick={this.onClick}
-        checkedOn={this.props.checked !== undefined ? this.props.checked : getSetting(this.props.prefKey, this.props.settings)} />
-      <label data-l10n-id={this.props.dataL10nId} htmlFor={this.props.prefKey} />
-      {this.props.options}
-    </div>
-  }
-}
-
-class SiteSettingCheckbox extends ImmutableComponent {
-  constructor () {
-    super()
-    this.onClick = this.onClick.bind(this)
-  }
-
-  onClick (e) {
-    if (this.props.disabled || !this.props.hostPattern) {
-      return
-    } else {
-      const value = !!e.target.value
-      value === this.props.defaultValue
-        ? aboutActions.removeSiteSetting(this.props.hostPattern,
-            this.props.prefKey)
-        : aboutActions.changeSiteSetting(this.props.hostPattern,
-            this.props.prefKey, value)
-    }
-  }
-
-  render () {
-    return <div style={this.props.style} className='settingItem siteSettingItem'>
-      <SwitchControl
-        small={this.props.small}
-        disabled={this.props.disabled}
-        onClick={this.onClick}
-        checkedOn={this.props.checked} />
-    </div>
-  }
 }
 
 class LedgerTable extends ImmutableComponent {
@@ -1528,9 +1443,5 @@ module.exports = {
   AboutPreferences: <AboutPreferences />,
   BitcoinDashboard,
   LedgerTable,
-  SettingsList,
-  SettingItem,
-  SettingCheckbox,
-  PaymentHistory,
-  changeSetting
+  PaymentHistory
 }
