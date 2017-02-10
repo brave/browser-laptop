@@ -33,13 +33,13 @@ const ipc = electron.ipcMain
 const session = electron.session
 
 const acorn = require('acorn')
+const moment = require('moment')
 const qr = require('qr-image')
 const querystring = require('querystring')
 const random = require('random-lib')
 const tldjs = require('tldjs')
 const underscore = require('underscore')
 const uuid = require('node-uuid')
-const moment = require('moment')
 
 const appActions = require('../js/actions/appActions')
 const appConfig = require('../js/constants/appConfig')
@@ -85,6 +85,9 @@ const clientOptions = { debugP: process.env.LEDGER_DEBUG,
                       }
 
 var doneTimer
+
+var levelDB
+const levelPath = 'ledger-publisher.leveldb'
 
 /*
  * publisher globals
@@ -647,12 +650,14 @@ eventStore.addChangeListener(() => {
  */
 
 var initialize = (paymentsEnabled) => {
+  var ruleset
+
   enable(paymentsEnabled)
 
+  if (!levelDB) levelDB = require('level')(pathName(levelPath))
+
   // Check if relevant browser notifications should be shown every 15 minutes
-  if (notificationTimeout) {
-    clearInterval(notificationTimeout)
-  }
+  if (notificationTimeout) clearInterval(notificationTimeout)
   notificationTimeout = setInterval(showNotifications, 15 * msecs.minute)
 
   if (!paymentsEnabled) {
@@ -662,7 +667,9 @@ var initialize = (paymentsEnabled) => {
   if (client) return
 
   if (!ledgerPublisher) ledgerPublisher = require('ledger-publisher')
-  cacheRuleSet(ledgerPublisher.rules)
+  ruleset = []
+  ledgerPublisher.rules.forEach(rule => { if (rule.consequent) ruleset.push(rule) })
+  cacheRuleSet(ruleset)
 
   fs.access(pathName(statePath), fs.FF_OK, (err) => {
     if (!err) {
@@ -1272,6 +1279,19 @@ var callback = (err, result, delayTime) => {
     getPaymentInfo()
   }
   cacheRuleSet(result.ruleset)
+  if (result.rulesetV2) {
+    entries = []
+    result.rulesetV2.forEach((rule) => {
+      entries.push({ type: 'put',
+                     key: rule.facet + ':' + rule.publisher,
+                     value: JSON.stringify(underscore.omit(rule, [ 'facet', 'publisher' ]))
+                   })
+    })
+    levelDB.batch(entries, (err) => {
+      if (err) return console.log('levelup error: ' + JSON.stringify(err, null, 2))
+    })
+    delete result.rulesetV2
+  }
 
   atomicWriter(pathName(statePath), result, { flushP: true }, () => {})
   run(delayTime)
