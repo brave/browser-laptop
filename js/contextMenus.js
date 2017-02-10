@@ -474,7 +474,7 @@ function flashTemplateInit (frameProps) {
       label: locale.translation('openFlashPreferences'),
       click: () => {
         windowActions.newFrame({
-          location: 'about:preferences#security'
+          location: 'about:preferences#plugins'
         }, true)
       }
     })
