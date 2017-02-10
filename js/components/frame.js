@@ -165,8 +165,11 @@ class Frame extends ImmutableComponent {
           prevProps.adblockCount !== this.props.adblockCount ||
           prevProps.httpsUpgradedCount !== this.props.httpsUpgradedCount ||
           !Immutable.is(prevProps.newTabDetail, this.props.newTabDetail)) {
+        const showEmptyPage = getSetting(settings.NEWTAB_MODE) === newTabMode.EMPTY_NEW_TAB
+        const showImages = getSetting(settings.SHOW_DASHBOARD_IMAGES) && !showEmptyPage
         this.webview.send(messages.NEWTAB_DATA_UPDATED, {
-          showEmptyPage: getSetting(settings.NEWTAB_MODE) === newTabMode.EMPTY_NEW_TAB,
+          showEmptyPage,
+          showImages,
           trackedBlockersCount: this.props.trackedBlockersCount,
           adblockCount: this.props.adblockCount,
           httpsUpgradedCount: this.props.httpsUpgradedCount,

@@ -20,14 +20,13 @@ body {
   background: #fff;
 }
 
-body, .dynamicBackground {
+body, .dynamicBackground, bgGradient {
   opacity: 0;
   animation: fadeIn 200ms;
   animation-fill-mode: forwards;
 }
 
 .copyrightNotice {
-  visibility: hidden !important;
   -webkit-user-select: none;
   cursor: default;
 }
@@ -43,10 +42,6 @@ ul {
     vertical-align: middle;
     list-style-type: none;
   }
-}
-
-#appContainer > div {
-  height: auto; // overrides default #appContainer > div: 100%
 }
 
 .dynamicBackground {
@@ -67,6 +62,15 @@ ul {
   position: absolute;
   top: 0;
   width: 100%;
+}
+
+.bgGradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+  height: 400px;
 }
 
 .content {
