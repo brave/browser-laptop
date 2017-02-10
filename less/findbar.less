@@ -14,6 +14,11 @@
   justify-content: center;
   padding: 5px 10px;
   animation: slideIn 25ms;
+  cursor: default;
+
+  * {
+    -webkit-user-select: none;
+  }
 
   .findMatchText {
     margin: 0 10px;
@@ -23,7 +28,6 @@
 
   label {
     color: @mediumGray;
-    -webkit-user-select: none;
   }
 
   span.findButton {
@@ -49,7 +53,6 @@
     margin-right: 0;
     opacity: 0.5;
     transform: rotate(45deg);
-    -webkit-user-select: none;
   }
 
   .searchContainer {
@@ -96,10 +99,11 @@
   }
 
   .caseSensitivityContainer {
+    color: @gray;
+    margin-top: 6px;
+
     input {
       margin-right: 6px;
     }
-    color: @gray;
-    margin-top: 6px;
   }
 }
