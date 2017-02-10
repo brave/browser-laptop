@@ -11,6 +11,7 @@ const getSetting = require('../../../../js/settings').getSetting
 const settings = require('../../../../js/constants/settings')
 const ModalOverlay = require('../../../../js/components/modalOverlay')
 const coinbaseCountries = require('../../../../js/constants/coinbaseCountries')
+const {changeSetting} = require('../../lib/settingsUtil')
 const moment = require('moment')
 moment.locale(navigator.language)
 
@@ -18,6 +19,7 @@ moment.locale(navigator.language)
 const Button = require('../../../../js/components/button')
 const {FormTextbox, RecoveryKeyTextbox} = require('../textbox')
 const {FormDropdown, SettingDropdown} = require('../dropdown')
+const {SettingsList, SettingItem, SettingCheckbox} = require('../settings')
 
 class PaymentsTab extends ImmutableComponent {
   constructor () {
@@ -228,7 +230,6 @@ class PaymentsTab extends ImmutableComponent {
   get advancedSettingsContent () {
     const minDuration = this.props.ledgerData.getIn(['synopsisOptions', 'minDuration'])
     const minPublisherVisits = this.props.ledgerData.getIn(['synopsisOptions', 'minPublisherVisits'])
-    const {SettingsList, SettingItem, SettingCheckbox, changeSetting} = require('../../../../js/about/preferences')
 
     return <div className='board'>
       <div className='panel advancedSettings'>
@@ -326,8 +327,6 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get ledgerRecoveryContent () {
-    const {SettingsList, SettingItem} = require('../../../../js/about/preferences')
-
     const l10nDataArgs = {
       balance: this.btcToCurrencyString(this.props.ledgerData.get('balance'))
     }
@@ -476,7 +475,6 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get enabledContent () {
-    const {SettingsList, SettingItem, changeSetting} = require('../../../../js/about/preferences')
     // TODO: report when funds are too low
     // TODO: support non-USD currency
     return <div>
@@ -541,7 +539,6 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   render () {
-    const {SettingCheckbox} = require('../../../../js/about/preferences')
     return <div className='paymentsContainer'>
       {
       this.enabled && this.props.addFundsOverlayVisible
