@@ -3,13 +3,15 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('./immutableComponent')
-const Dialog = require('./dialog')
-const Button = require('./button')
-const appActions = require('../actions/appActions')
-const siteUtil = require('../state/siteUtil')
+const ImmutableComponent = require('../../../js/components/immutableComponent')
+const Dialog = require('../../../js/components/dialog')
+const Button = require('../../../js/components/button')
+const appActions = require('../../../js/actions/appActions')
+const siteUtil = require('../../../js/state/siteUtil')
 const ipc = require('electron').ipcRenderer
-const messages = require('../constants/messages')
+const messages = require('../../../js/constants/messages')
+
+const {StyleSheet, css} = require('aphrodite')
 
 class NoScriptInfo extends ImmutableComponent {
   get numberBlocked () {
@@ -38,12 +40,14 @@ class NoScriptInfo extends ImmutableComponent {
   }
 
   get buttons () {
+    const className = css(styles.allowScriptsButtons)
+
     if (!this.props.noScriptGlobalEnabled) {
       // NoScript is not turned on globally
       return <div><Button l10nId='allow' className='actionButton'
         onClick={this.onAllow.bind(this, false)} /></div>
     } else {
-      return <div className='allowScriptsButtons'>
+      return <div className={className} {...this.props} >
         <Button l10nId='allowScriptsOnce' className='actionButton'
           onClick={this.onAllow.bind(this, 0)} />
         {this.isPrivate
@@ -72,6 +76,14 @@ class NoScriptInfo extends ImmutableComponent {
     </Dialog>
   }
 }
+
+const styles = StyleSheet.create({
+  'allowScriptsButtons': {
+    display: 'flex',
+    flexFlow: 'column nowrap',
+    alignItems: 'center'
+  }
+})
 
 NoScriptInfo.propTypes = {
   noScriptGlobalEnabled: React.PropTypes.bool,
