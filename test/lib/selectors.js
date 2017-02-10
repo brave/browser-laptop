@@ -62,7 +62,7 @@ module.exports = {
   syncTab: '[data-l10n-id="sync"]',
   doneButton: '[data-l10n-id="done"]',
   homepageInput: '[data-l10n-id="homepageInput"]',
-  syncSwitch: '#syncContainer .switchBackground',
+  syncSwitch: '.syncContainer .switchBackground',
   walletSwitch: '.enablePaymentsSwitch .switchBackground',
   addFundsButton: '.addFunds',
   advancedSettings: '.advancedSettings',
