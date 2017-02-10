@@ -15,7 +15,8 @@ class Textbox extends ImmutableComponent {
       styles.textbox,
       this.props['data-isSettings'] && styles.isSettings,
       (this.props.readonly || this.props.readOnly) ? styles.readOnly : styles.outlineable,
-      this.props['data-isRecoveryKeyTextbox'] && styles.recoveryKeys
+      this.props['data-isRecoveryKeyTextbox'] && styles.recoveryKeys,
+      this.props['data-isDeviceName'] && styles.deviceName
     )
 
     return <input type='text' className={className} {...this.props} />
@@ -37,6 +38,12 @@ class SettingTextbox extends ImmutableComponent {
 class RecoveryKeyTextbox extends ImmutableComponent {
   render () {
     return <SettingTextbox data-isRecoveryKey='true' {...this.props} />
+  }
+}
+
+class DeviceNameTextbox extends ImmutableComponent {
+  render () {
+    return <FormTextbox data-isDeviceName='true' {...this.props} />
   }
 }
 
@@ -63,6 +70,10 @@ const styles = StyleSheet.create({
   },
   'recoveryKeys': {
     marginBottom: '20px'
+  },
+  'deviceName': {
+    marginLeft: '0px',
+    marginBottom: '40px'
   }
 })
 
@@ -70,5 +81,6 @@ module.exports = {
   Textbox,
   FormTextbox,
   SettingTextbox,
+  DeviceNameTextbox,
   RecoveryKeyTextbox
 }
