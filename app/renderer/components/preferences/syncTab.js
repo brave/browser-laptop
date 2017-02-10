@@ -11,7 +11,7 @@ const niceware = require('niceware')
 // Components
 const ModalOverlay = require('../../../../js/components/modalOverlay')
 const Button = require('../../../../js/components/button')
-const {DeviceNameTextbox} = require('../textbox')
+const {SettingsList, SettingItem} = require('../settings')
 
 const aboutActions = require('../../../../js/about/aboutActions')
 const getSetting = require('../../../../js/settings').getSetting
@@ -35,7 +35,7 @@ class SyncTab extends ImmutableComponent {
 
   get setupContent () {
     // displayed before a sync userId has been created
-    return <div>
+    return <div className='setupContent'>
       <Button l10nId='syncStart' className='primaryButton' onClick={this.props.showOverlay.bind(this, 'syncStart')} />
       <Button l10nId='syncAdd' className='whiteButton' onClick={this.props.showOverlay.bind(this, 'syncAdd')} />
     </div>
@@ -43,11 +43,20 @@ class SyncTab extends ImmutableComponent {
 
   get postSetupContent () {
     const {SettingCheckbox} = require('../../../../js/about/preferences')
-    return <div><div className='settingsList' id='syncEnableSwitch'>
-      <SettingCheckbox dataL10nId='syncEnable' prefKey={settings.SYNC_ENABLED} settings={this.props.settings} onChangeSetting={this.toggleSync} />
-    </div>
-      <Button l10nId='syncNewDevice' className='whiteButton syncNewDeviceButton' onClick={this.props.showOverlay.bind(this, 'syncNewDevice')} />
-    </div>
+    return <SettingsList>
+      <div className='device'>
+        <SettingCheckbox dataL10nId='syncEnable' id='syncEnableSwitch' prefKey={settings.SYNC_ENABLED} settings={this.props.settings} onChangeSetting={this.toggleSync} />
+        <div>
+          <span className='syncDeviceLabel' data-l10n-id='syncDeviceName' />
+          <div className='deviceName'>
+            {getSetting(settings.SYNC_DEVICE_NAME, this.props.settings)}
+          </div>
+        </div>
+      </div>
+      <SettingItem>
+        <Button l10nId='syncNewDevice' className='whiteButton' onClick={this.props.showOverlay.bind(this, 'syncNewDevice')} />
+      </SettingItem>
+    </SettingsList>
   }
 
   get qrcodeContent () {
@@ -56,7 +65,7 @@ class SyncTab extends ImmutableComponent {
     }
     return this.props.syncQRVisible
       ? <div>
-        <div><Button l10nId='syncHideQR' className='whiteButton syncToggleButton' onClick={this.props.hideQR} /></div>
+        <div><Button l10nId='syncHideQR' className='whiteButton wideButton syncToggleButton' onClick={this.props.hideQR} /></div>
         <img id='syncQR' title='Brave sync QR code' src={this.props.syncData.get('seedQr')} />
       </div>
     : <Button l10nId='syncShowQR' className='whiteButton syncToggleButton' onClick={this.props.showQR} />
@@ -76,7 +85,7 @@ class SyncTab extends ImmutableComponent {
     ]
     return this.props.syncPassphraseVisible
       ? <div>
-        <Button l10nId='syncHidePassphrase' className='whiteButton syncToggleButton' onClick={this.props.hidePassphrase} />
+        <Button l10nId='syncHidePassphrase' className='whiteButton wideButton syncToggleButton' onClick={this.props.hidePassphrase} />
         <pre id='syncPassphrase'>{words.join('\n')}</pre>
       </div>
       : <Button l10nId='syncShowPassphrase' className='whiteButton syncToggleButton' onClick={this.props.showPassphrase} />
@@ -106,34 +115,45 @@ class SyncTab extends ImmutableComponent {
     const placeholder = process.platform
       ? [(osName[process.platform] || process.platform), 'Laptop'].join(' ')
       : getSetting(settings.SYNC_DEVICE_NAME, this.props.settings)
-    return <div>
-      <span data-l10n-id='syncDeviceName' />
-      <DeviceNameTextbox spellCheck='false'
+    return <SettingItem>
+      <span data-l10n-id='syncDeviceNameInput' />
+      <input className='deviceNameInput formControl' spellCheck='false'
         ref={(node) => { this.deviceNameInput = node }}
-        data-isDeviceName
         placeholder={placeholder} />
-    </div>
+    </SettingItem>
   }
 
   get addOverlayContent () {
     return <div className='syncOverlay'>
-      <p data-l10n-id='syncEnterPassphrase' />
-      <textarea spellCheck='false'
-        ref={(node) => { this.passphraseInput = node }}
-        className='form-control' />
-      <div>{this.deviceNameInputContent}</div>
-      <Button l10nId='syncCreate' className='primaryButton'
-        onClick={this.onRestore}
-        disabled={!!this.passphraseInput} />
+      <SettingsList>
+        <SettingItem>
+          <span data-l10n-id='syncEnterPassphrase' />
+          <textarea spellCheck='false'
+            ref={(node) => { this.passphraseInput = node }}
+            className='form-control' />
+        </SettingItem>
+        {this.deviceNameInputContent}
+      </SettingsList>
     </div>
+  }
+
+  get addOverlayFooter () {
+    return <Button l10nId='syncCreate' className='primaryButton'
+      onClick={this.onRestore}
+      disabled={!!this.passphraseInput} />
   }
 
   get startOverlayContent () {
     return <div className='syncOverlay'>
-      {this.deviceNameInputContent}
-      <div>
-        <Button l10nId='syncCreate' className='primaryButton' onClick={this.onSetup} />
-      </div>
+      <SettingsList>
+        {this.deviceNameInputContent}
+      </SettingsList>
+    </div>
+  }
+
+  get startOverlayFooter () {
+    return <div className='panel'>
+      <Button l10nId='syncCreate' className='primaryButton' onClick={this.onSetup} />
     </div>
   }
 
@@ -173,7 +193,7 @@ class SyncTab extends ImmutableComponent {
 
   render () {
     const {SettingsList, SettingCheckbox} = require('../../../../js/about/preferences')
-    return <div id='syncContainer'>
+    return <div className='syncContainer'>
       {
       this.isSetup && this.props.syncNewDeviceOverlayVisible
         ? <ModalOverlay title={'syncNewDevice'} content={this.overlayContent} onHide={this.props.hideOverlay.bind(this, 'syncNewDevice')} />
@@ -181,12 +201,12 @@ class SyncTab extends ImmutableComponent {
       }
       {
       !this.isSetup && this.props.syncStartOverlayVisible
-        ? <ModalOverlay title={'syncStart'} content={this.startOverlayContent} onHide={this.props.hideOverlay.bind(this, 'syncStart')} />
+        ? <ModalOverlay title={'syncStart'} content={this.startOverlayContent} footer={this.startOverlayFooter} onHide={this.props.hideOverlay.bind(this, 'syncStart')} />
         : null
       }
       {
       !this.isSetup && this.props.syncAddOverlayVisible
-        ? <ModalOverlay title={'syncAdd'} content={this.addOverlayContent} onHide={this.props.hideOverlay.bind(this, 'syncAdd')} />
+        ? <ModalOverlay title={'syncAdd'} content={this.addOverlayContent} footer={this.addOverlayFooter} onHide={this.props.hideOverlay.bind(this, 'syncAdd')} />
         : null
       }
       <div className='sectionTitle' data-l10n-id='syncTitle' />

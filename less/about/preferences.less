@@ -276,10 +276,6 @@ a {
   margin: 1.2em 2px 7px;
 }
 
-.syncTitleMessage {
-  display: inline-block;
-}
-
 .settingsList .subtext {
   &.flashText {
     margin-top: 0;
@@ -1561,56 +1557,74 @@ table.sortableTable {
   }
 }
 
-.syncOverlay {
-  input {
-    margin-left: 20px;
-    display: inline;
+.syncContainer {
+  .modal {
+    textarea {
+      width: 80%;
+      height: 100px;
+      font-size: 18px;
+      font-family: monospace;
+    }
+    li {
+      margin: 1em;
+    }
+    .settingsListContainer {
+      margin-bottom: 1.5em;
+    }
+    .dialog-body, .dialog-footer {
+      padding-left: 50px;
+      padding-right: 50px;
+    }
+    .dialog-footer {
+      margin-top: 1.5em;
+      padding-bottom: 2em;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
   }
-  textarea {
-    width: 80%;
-    height: 100px;
-    font-size: 18px;
-    font-family: monospace;
+  .browserButton + .browserButton {
+    margin-left: 0.75em;
   }
-  padding-left: 50px;
-  padding-bottom: 50px;
-  div, input, textarea, span {
-    margin-top: 20px;
+  .setupContent {
+    margin: 1em 0;
   }
-  li {
-    margin: 10px;
+  .deviceNameInput {
+    width: 50%;
   }
-}
-
-#syncEnableSwitch {
-  display: inline-block;
-  margin-right: 20px;
-  margin-top: 20px;
-}
-
-.syncNewDeviceButton {
-  margin-right: 20px;
-}
-
-.syncWarning {
-  color: #ff0400;
-  margin-top: 20px;
-  font-weight: 500;
-}
-
-.syncToggleButton {
-  margin-bottom: 10px;
+  .device {
+    background-color: @lightGray;
+    border-radius: @borderRadiusUIbox;
+    color: @mediumGray;
+    display: table;
+    line-height: 1.8em;
+    margin: 1em 0;
+    padding: 0.5em 1em;
+    width: 500px;
+    & > div, .settingItem {
+      display: table-cell;
+      vertical-align: middle;
+    }
+    #syncEnableSwitch {
+      width: 40%;
+    }
+    .syncDeviceLabel {
+      font-size: 0.9em;
+      margin: 0;
+    }
+    .deviceName {
+      margin-bottom: 0.5em;
+    }
+  }
 }
 
 #syncPassphrase {
-  margin-top: 20px;
-  margin-left: 20px;
+  margin: 1em;
   color: #ff0400;
   font-size: 15px;
   font-family: monospace;
 }
 
 #syncQR {
-  margin-top: 20px;
-  margin-left: 20px;
+  margin: 1em;
 }
