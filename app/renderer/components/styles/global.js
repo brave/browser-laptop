@@ -4,7 +4,15 @@ const globalStyles = {
     breakpointNarrowViewport: '600px',
     breakpointExtensionButtonPadding: '720px',
     breakpointSmallWin32: '650px',
-    breakpointTinyWin32: '500px'
+    breakpointTinyWin32: '500px',
+    tab: {
+      largeMedium: '83px',
+      medium: '66px',
+      mediumSmall: '53px',
+      small: '42px',
+      extraSmall: '33px',
+      smallest: '19px'
+    }
   },
   color: {
     linkColor: '#0099CC',
@@ -79,6 +87,8 @@ const globalStyles = {
     switchNubTopMargin: '2px',
     switchNubLeftMargin: '2px',
     switchNubRightMargin: '2px',
+    buttonHeight: '25px',
+    buttonWidth: '25px',
     navbarHeight: '36px',
     downloadsBarHeight: '50px',
     tabsToolbarHeight: '28px',
@@ -93,7 +103,9 @@ const globalStyles = {
     navbarBraveButtonMarginLeft: '80px',
     navbarLeftMarginDarwin: '76px',
     sideBarWidth: '190px',
-    aboutPageSectionPadding: '24px'
+    aboutPageSectionPadding: '24px',
+    defaultTabPadding: '0 4px',
+    defaultIconPadding: '0 2px'
   },
   shadow: {
     switchShadow: 'inset 0 1px 4px rgba(0, 0, 0, 0.35)',
@@ -134,6 +146,19 @@ const globalStyles = {
     zindexSuggestionText: '3100',
     zindexWindowFullScreen: '4000',
     zindexWindowFullScreenBanner: '4100'
+  },
+  fontSize: {
+    tabIcon: '14px',
+    tabTitle: '12px'
+  },
+  appIcons: {
+    loading: 'fa fa-spinner fa-spin',
+    defaultIcon: 'fa fa-file-o',
+    closeTab: 'fa fa-times-circle',
+    private: 'fa fa-eye',
+    newSession: 'fa fa-user',
+    volumeOn: 'fa fa-volume-up',
+    volumeOff: 'fa fa-volume-off'
   }
 }
 

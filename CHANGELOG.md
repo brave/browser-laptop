@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.13.3](https://github.com/brave/browser-laptop/releases/v0.13.3dev)
+- TODO
+
 ## [0.13.2](https://github.com/brave/browser-laptop/releases/v0.13.2dev)
 - Added a way to keep tabs the same size when closing instead of resizing. ([#6088](https://github.com/brave/browser-laptop/issues/6088))
 - Added import recovery keys feature for Brave Wallet. ([#4806](https://github.com/brave/browser-laptop/issues/4806))

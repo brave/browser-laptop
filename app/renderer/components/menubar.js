@@ -60,7 +60,7 @@ class MenubarItem extends ImmutableComponent {
     }
     // Otherwise, mark item as selected and show its context menu
     windowActions.setMenuBarSelectedIndex(this.props.index)
-    windowActions.setContextMenuSelectedIndex([0])
+    windowActions.setContextMenuSelectedIndex()
     const rect = e.target.getBoundingClientRect()
     showContextMenu(rect, this.props.submenu, this.props.lastFocusedSelector)
   }
@@ -116,7 +116,9 @@ class Menubar extends ImmutableComponent {
     const template = this.props.template
     const contextMenuIndex = this.props.contextMenuSelectedIndex
 
-    if (!template) return
+    if (!template || !template.get(selectedIndex)) {
+      return
+    }
 
     switch (e.which) {
       case keyCodes.LEFT:
@@ -157,7 +159,8 @@ class Menubar extends ImmutableComponent {
       case keyCodes.DOWN:
       case keyCodes.ENTER:
         e.preventDefault()
-        if (contextMenuIndex === null && template.get(selectedIndex).has('submenu')) {
+        if (contextMenuIndex === null &&
+            template.get(selectedIndex).has('submenu')) {
           e.stopPropagation()
           windowActions.setContextMenuSelectedIndex([0])
           showContextMenu(this.getMenubarItemBounds(selectedIndex), template.get(selectedIndex).get('submenu').toJS(), this.props.lastFocusedSelector)

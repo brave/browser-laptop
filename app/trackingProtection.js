@@ -8,7 +8,7 @@ const urlParse = require('./common/urlParse')
 const TrackingProtection = require('tracking-protection').CTPParser
 const DataFile = require('./dataFile')
 const Filtering = require('./filtering')
-const LRUCache = require('lru_cache/core').LRUCache
+const LRUCache = require('lru-cache')
 
 module.exports.resourceName = 'trackingProtection'
 
@@ -36,7 +36,7 @@ const startTrackingProtection = (wnd) => {
     if (firstPartyUrl.protocol && firstPartyUrl.protocol.startsWith('http')) {
       if (!cachedFirstParty.get(firstPartyUrlHost)) {
         let firstPartyHosts = trackingProtection.findFirstPartyHosts(firstPartyUrlHost)
-        cachedFirstParty.put(firstPartyUrlHost, firstPartyHosts && firstPartyHosts.split(',') || [])
+        cachedFirstParty.set(firstPartyUrlHost, firstPartyHosts && firstPartyHosts.split(',') || [])
       }
     }
     const urlHost = urlParse(details.url).hostname

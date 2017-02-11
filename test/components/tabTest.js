@@ -67,7 +67,7 @@ describe('tab tests', function () {
     it('creates a new tab when signaled', function * () {
       yield this.app.client
         .ipcSend(messages.SHORTCUT_NEW_FRAME)
-        .waitForExist('.tab[data-frame-key="2"]')
+        .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
     })
 
     it('makes the non partitioned webview visible', function * () {
@@ -85,7 +85,7 @@ describe('tab tests', function () {
     it('creates a new tab when clicked', function * () {
       yield this.app.client
         .click(newFrameButton)
-        .waitForExist('.tab[data-frame-key="2"]')
+        .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
     })
     it('shows a context menu when long pressed (click and hold)', function * () {
       yield this.app.client
@@ -111,9 +111,9 @@ describe('tab tests', function () {
       it('creates a new tab when signaled', function * () {
         yield this.app.client
           .ipcSend(messages.SHORTCUT_NEW_FRAME, 'about:blank', { openInForeground: false })
-          .waitForExist('.tab[data-frame-key="2"]')
+          .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
           .ipcSend(messages.SHORTCUT_NEW_FRAME, 'about:blank')
-          .waitForExist('.tabArea + .tabArea + .tabArea .tab[data-frame-key="3"')
+          .waitForExist('.tabArea + .tabArea + .tabArea [data-test-id="tab"][data-frame-key="3"]')
       })
     })
     describe('respects parentFrameKey', function () {
@@ -125,9 +125,9 @@ describe('tab tests', function () {
       it('creates a new tab when signaled', function * () {
         yield this.app.client
           .ipcSend(messages.SHORTCUT_NEW_FRAME, 'about:blank', { openInForeground: false })
-          .waitForExist('.tab[data-frame-key="2"]')
+          .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
           .ipcSend(messages.SHORTCUT_NEW_FRAME, 'about:blank', { parentFrameKey: 1 })
-          .waitForExist('.tabArea:nth-child(2) .tab[data-frame-key="3"]')
+          .waitForExist('.tabArea:nth-child(2) [data-test-id="tab"][data-frame-key="3"]')
       })
     })
   })
@@ -144,7 +144,7 @@ describe('tab tests', function () {
     })
     it('creates a new private tab', function * () {
       yield this.app.client
-        .waitForExist('.tab.private[data-frame-key="2"]')
+        .waitForExist('[data-test-private-tab][data-frame-key="2"]')
     })
     it('makes the private webview visible', function * () {
       yield this.app.client
@@ -164,7 +164,7 @@ describe('tab tests', function () {
     })
     it('creates a new session tab', function * () {
       yield this.app.client
-        .waitForExist('.tab[data-frame-key="2"]')
+        .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
     })
     it('makes the new session webview visible', function * () {
       yield this.app.client
@@ -184,7 +184,7 @@ describe('tab tests', function () {
     })
     it('creates a new session tab', function * () {
       yield this.app.client
-        .waitForExist('.tab[data-frame-key="2"]')
+        .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
     })
     it('makes the new session webview visible', function * () {
       yield this.app.client
@@ -202,7 +202,7 @@ describe('tab tests', function () {
     it('can close a normal tab', function * () {
       yield this.app.client
         .waitForBrowserWindow()
-        .waitForExist('.tab.active[data-frame-key="1"]')
+        .waitForExist('[data-test-active-tab][data-frame-key="1"]')
         .ipcSend(messages.SHORTCUT_NEW_FRAME)
         .waitUntil(function () {
           return this.waitForUrl(Brave.newTabUrl)
@@ -221,7 +221,7 @@ describe('tab tests', function () {
         .waitForBrowserWindow()
         .windowByUrl(Brave.browserWindowUrl)
         .ipcSend(messages.SHORTCUT_NEW_FRAME, Brave.server.url('page1.html'), {frameOpts: {unloaded: true, location: Brave.server.url('page1.html'), title: 'hi', tabId: null}, openInForeground: false})
-        .waitForElementCount('.tab', 2)
+        .waitForElementCount('[data-test-id="tab"]', 2)
         // This ensures it's actually unloaded
         .waitForTabCount(1)
         .windowByUrl(Brave.browserWindowUrl)
@@ -231,7 +231,7 @@ describe('tab tests', function () {
     it('should undo last closed tab', function * () {
       yield this.app.client
         .waitForBrowserWindow()
-        .waitForExist('.tab.active[data-frame-key="1"]')
+        .waitForExist('[data-test-active-tab][data-frame-key="1"]')
         .ipcSend(messages.SHORTCUT_NEW_FRAME, Brave.server.url('page1.html'))
         .waitUntil(function () {
           return this.waitForUrl(Brave.newTabUrl)
@@ -265,24 +265,24 @@ describe('tab tests', function () {
         .ipcSend(messages.SHORTCUT_NEW_FRAME, page1)
         .waitForUrl(page1)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist('.tab[data-frame-key="2"]')
+        .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
         .ipcSend(messages.SHORTCUT_NEW_FRAME, page2)
         .waitForUrl(page2)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist('.tab[data-frame-key="3"]')
+        .waitForExist('[data-test-id="tab"][data-frame-key="3"]')
     })
     it('shows a tab preview', function * () {
       yield this.app.client
-        .moveToObject('.tab[data-frame-key="2"]')
-        .moveToObject('.tab[data-frame-key="2"]', 3, 3)
+        .moveToObject('[data-test-id="tab"][data-frame-key="2"]')
+        .moveToObject('[data-test-id="tab"][data-frame-key="2"]', 3, 3)
         .waitForExist('.frameWrapper.isPreview webview[data-frame-key="2"]')
         .moveToObject(urlInput)
     })
     it('does not show tab previews when setting is off', function * () {
       yield this.app.client.changeSetting(settings.SHOW_TAB_PREVIEWS, false)
       yield this.app.client
-        .moveToObject('.tab[data-frame-key="2"]')
-        .moveToObject('.tab[data-frame-key="2"]', 3, 3)
+        .moveToObject('[data-test-id="tab"][data-frame-key="2"]')
+        .moveToObject('[data-test-id="tab"][data-frame-key="2"]', 3, 3)
       try {
         yield this.app.client.waitForExist('.frameWrapper.isPreview webview[data-frame-key="2"]', 1000)
       } catch (e) {
@@ -303,7 +303,7 @@ describe('tab tests', function () {
         .ipcSend(messages.SHORTCUT_NEW_FRAME, url, {openInForeground: false})
         .waitForUrl(url)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist('.tab[data-frame-key="2"]')
+        .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
       yield this.app.client.waitForExist('.frameWrapper:not(.isActive) webview[data-frame-key="2"]')
     })
     it('changing new tab default makes new tabs open in background by default', function * () {
@@ -313,7 +313,7 @@ describe('tab tests', function () {
         .ipcSend(messages.SHORTCUT_NEW_FRAME, url, {openInForeground: false})
         .waitForUrl(url)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist('.tab[data-frame-key="3"]')
+        .waitForExist('[data-test-id="tab"][data-frame-key="3"]')
       yield this.app.client.waitForExist('.frameWrapper.isActive webview[data-frame-key="3"]')
     })
   })
@@ -325,7 +325,7 @@ describe('tab tests', function () {
     })
 
     it('shows tab\'s icon when page is not about:blank or about:newtab ', function * () {
-      var url = Brave.server.url('page1.html')
+      var url = Brave.server.url('favicon.html')
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(url)
@@ -351,9 +351,9 @@ describe('tab tests', function () {
     it('has untitled text right away', function * () {
       yield this.app.client
         .ipcSend(messages.SHORTCUT_NEW_FRAME, 'about:blank', { openInForeground: false })
-        .waitForVisible('.tab[data-frame-key="2"]')
+        .waitForVisible('[data-test-id="tab"][data-frame-key="2"]')
         // This should not be converted to a waitUntil
-        .getText('.tab[data-frame-key="2"]').then((val) => assert.equal(val, 'Untitled'))
+        .getText('[data-test-id="tab"][data-frame-key="2"]').then((val) => assert.equal(val, 'Untitled'))
     })
   })
 })

@@ -82,6 +82,7 @@ const privacy = require('../js/state/privacy')
 const async = require('async')
 const settings = require('../js/constants/settings')
 const sync = require('./sync')
+const BookmarksExporter = require('./browser/bookmarksExporter')
 
 app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferHtmlOverPlugins')
 
@@ -727,6 +728,10 @@ app.on('ready', () => {
       Importer.init()
     })
 
+    ipcMain.on(messages.EXPORT_BOOKMARKS, () => {
+      BookmarksExporter.showDialog(AppStore.getState().get('sites'))
+    })
+
     // This loads package.json into an object
     // TODO: Seems like this can be done with app.getVersion() insteand?
     PackageLoader.load((err, pack) => {
@@ -748,6 +753,10 @@ app.on('ready', () => {
       // This is fired by a menu entry
       process.on(messages.IMPORT_BROWSER_DATA_NOW, () => {
         Importer.init()
+      })
+
+      process.on(messages.EXPORT_BOOKMARKS, () => {
+        BookmarksExporter.showDialog(AppStore.getState().get('sites'))
       })
     })
     ready = true

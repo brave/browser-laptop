@@ -32,6 +32,7 @@ const path = require('path')
 const getOrigin = require('../js/state/siteUtil').getOrigin
 const {adBlockResourceName} = require('./adBlock')
 const {updateElectronDownloadItem} = require('./browser/electronDownloadItem')
+const {fullscreenOption} = require('./common/constants/settingsEnums')
 
 let appStore = null
 
@@ -358,6 +359,13 @@ function registerPermissionHandler (session, partition) {
     // The Torrent Viewer extension is always allowed to show fullscreen media
     if (permission === 'fullscreen' &&
       origin.startsWith('chrome-extension://' + config.torrentExtensionId)) {
+      cb(true)
+      return
+    }
+
+    // Always allow fullscreen if setting is ON
+    const alwaysAllowFullscreen = module.exports.alwaysAllowFullscreen() === fullscreenOption.ALWAYS_ALLOW
+    if (permission === 'fullscreen' && alwaysAllowFullscreen) {
       cb(true)
       return
     }
@@ -735,4 +743,8 @@ module.exports.getMainFrameUrl = (details) => {
     return tab.getURL()
   }
   return null
+}
+
+module.exports.alwaysAllowFullscreen = () => {
+  return getSetting(settings.FULLSCREEN_CONTENT)
 }

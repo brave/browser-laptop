@@ -41,6 +41,39 @@ describe('bookmark tests', function () {
           .waitForExist('#bookmarkLocation input')
           .waitForBookmarkDetail(this.page1Url, 'Page 1')
       })
+      it('add custom title', function * () {
+        yield this.app.client
+          .waitForExist('#bookmarkName input')
+          .waitForBookmarkDetail(this.page1Url, 'Page 1')
+          .setValue('#bookmarkName input', 'Custom Page 1')
+          .waitForEnabled(doneButton)
+          .click(doneButton)
+      })
+      it('check custom title', function * () {
+        yield this.app.client
+          .activateURLMode()
+          .waitForVisible(navigatorBookmarked)
+          .click(navigatorBookmarked)
+          .waitForVisible(doneButton)
+          .getValue('#bookmarkName input').should.eventually.be.equal('Custom Page 1')
+          .click(doneButton)
+      })
+      it('display punycode custom title and location', function * () {
+        yield this.app.client
+          .activateURLMode()
+          .waitForVisible(navigatorBookmarked)
+          .click(navigatorBookmarked)
+          .waitForVisible(doneButton)
+          .setValue('#bookmarkName input', 'https://www.brave.com/')
+          .keys('\uE010') // send END key
+          .keys('а')
+          .getValue('#bookmarkName input').should.eventually.be.equal('https://www.brave.xn--com-8cd')
+          .setValue('#bookmarkLocation input', 'https://www.brave.com/')
+          .keys('\uE010') // send END key
+          .keys('а')
+          .getValue('#bookmarkLocation input').should.eventually.be.equal('https://www.brave.xn--com-8cd')
+          .click(doneButton)
+      })
     })
 
     describe('pages with title', function () {

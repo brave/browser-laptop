@@ -711,6 +711,8 @@ var initialize = (paymentsEnabled) => {
 
         // speed-up browser start-up by delaying the first synchronization action
         setTimeout(() => {
+          if (!client) return
+
           if (client.sync(callback) === true) run(random.randomInt({ min: msecs.minute, max: 10 * msecs.minute }))
           cacheRuleSet(state.ruleset)
         }, 3 * msecs.second)

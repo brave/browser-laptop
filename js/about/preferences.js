@@ -6,13 +6,13 @@
 const React = require('react')
 const ImmutableComponent = require('../components/immutableComponent')
 const Immutable = require('immutable')
+const UrlUtil = require('../lib/urlutil')
 
 // Components
-const SwitchControl = require('../components/switchControl')
 const ModalOverlay = require('../components/modalOverlay')
-const {SettingsList, SettingItem} = require('../../app/renderer/components/settings')
+const {SettingsList, SettingItem, SettingCheckbox, SiteSettingCheckbox} = require('../../app/renderer/components/settings')
 const {SettingTextbox} = require('../../app/renderer/components/textbox')
-const {FormDropdown, SettingDropdown} = require('../../app/renderer/components/dropdown')
+const {SettingDropdown} = require('../../app/renderer/components/dropdown')
 const Button = require('../components/button')
 
 // Tabs
@@ -33,16 +33,16 @@ const appConfig = require('../constants/appConfig')
 const preferenceTabs = require('../constants/preferenceTabs')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
+const {changeSetting} = require('../../app/renderer/lib/settingsUtil')
 const coinbaseCountries = require('../constants/coinbaseCountries')
 const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
-const {startsWithOption, newTabMode, bookmarksToolbarMode, tabCloseAction} = require('../../app/common/constants/settingsEnums')
+const {startsWithOption, newTabMode, bookmarksToolbarMode, tabCloseAction, fullscreenOption} = require('../../app/common/constants/settingsEnums')
 
 const WidevineInfo = require('../../app/renderer/components/widevineInfo')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
 const searchProviders = require('../data/searchProviders')
-const punycode = require('punycode')
 const moment = require('moment')
 moment.locale(navigator.language)
 
@@ -95,91 +95,6 @@ const braveryPermissionNames = {
   'noScript': ['boolean', 'number']
 }
 
-const changeSetting = (cb, key, e) => {
-  if (e.target.type === 'checkbox') {
-    cb(key, e.target.value)
-  } else {
-    let value = e.target.value
-    if (e.target.dataset && e.target.dataset.type === 'number') {
-      value = parseInt(value, 10)
-    } else if (e.target.dataset && e.target.dataset.type === 'float') {
-      value = parseFloat(value)
-    }
-    if (e.target.type === 'number') {
-      value = value.replace(/\D/g, '')
-      value = parseInt(value, 10)
-      if (Number.isNaN(value)) {
-        return
-      }
-      value = Math.min(e.target.getAttribute('max'), Math.max(value, e.target.getAttribute('min')))
-    }
-    cb(key, value)
-  }
-}
-
-class SettingCheckbox extends ImmutableComponent {
-  constructor () {
-    super()
-    this.onClick = this.onClick.bind(this)
-  }
-
-  onClick (e) {
-    if (this.props.disabled) {
-      return
-    }
-    return this.props.onChange ? this.props.onChange(e) : changeSetting(this.props.onChangeSetting, this.props.prefKey, e)
-  }
-
-  render () {
-    const props = {
-      style: this.props.style,
-      className: 'settingItem'
-    }
-    if (this.props.id) {
-      props.id = this.props.id
-    }
-    return <div {...props}>
-      <SwitchControl id={this.props.prefKey}
-        small={this.props.small}
-        disabled={this.props.disabled}
-        onClick={this.onClick}
-        checkedOn={this.props.checked !== undefined ? this.props.checked : getSetting(this.props.prefKey, this.props.settings)} />
-      <label data-l10n-id={this.props.dataL10nId} htmlFor={this.props.prefKey} />
-      {this.props.options}
-    </div>
-  }
-}
-
-class SiteSettingCheckbox extends ImmutableComponent {
-  constructor () {
-    super()
-    this.onClick = this.onClick.bind(this)
-  }
-
-  onClick (e) {
-    if (this.props.disabled || !this.props.hostPattern) {
-      return
-    } else {
-      const value = !!e.target.value
-      value === this.props.defaultValue
-        ? aboutActions.removeSiteSetting(this.props.hostPattern,
-            this.props.prefKey)
-        : aboutActions.changeSiteSetting(this.props.hostPattern,
-            this.props.prefKey, value)
-    }
-  }
-
-  render () {
-    return <div style={this.props.style} className='settingItem siteSettingItem'>
-      <SwitchControl
-        small={this.props.small}
-        disabled={this.props.disabled}
-        onClick={this.onClick}
-        checkedOn={this.props.checked} />
-    </div>
-  }
-}
-
 class LedgerTable extends ImmutableComponent {
   get synopsis () {
     return this.props.ledgerData.get('synopsis')
@@ -205,7 +120,10 @@ class LedgerTable extends ImmutableComponent {
   }
 
   getVerifiedIcon (synopsis) {
-    return <span className='verified' />
+    return <span className={cx({
+      verified: true,
+      disabled: !this.enabledForSite(synopsis)
+    })} />
   }
 
   enabledForSite (synopsis) {
@@ -255,7 +173,7 @@ class LedgerTable extends ImmutableComponent {
       },
       rank,
       {
-        html: <div className='site'>{verified ? this.getVerifiedIcon() : null}<a href={publisherURL} target='_blank'>{faviconURL ? <img src={faviconURL} alt={site} /> : <span className='fa fa-file-o' />}<span>{site}</span></a></div>,
+        html: <div className='site'>{verified ? this.getVerifiedIcon(synopsis) : null}<a href={publisherURL} target='_blank'>{faviconURL ? <img src={faviconURL} alt={site} /> : <span className='fa fa-file-o' />}<span>{site}</span></a></div>,
         value: site
       },
       {
@@ -651,7 +569,7 @@ class GeneralTab extends ImmutableComponent {
     })
     var homepageValue = getSetting(settings.HOMEPAGE, this.props.settings)
     if (typeof homepageValue === 'string') {
-      homepageValue = punycode.toASCII(homepageValue)
+      homepageValue = UrlUtil.getPunycodeUrl(homepageValue)
     }
     const homepage = homepageValue && homepageValue.trim()
     const disableShowHomeButton = !homepage || !homepage.length
@@ -846,18 +764,20 @@ class TabsTab extends ImmutableComponent {
           </SettingDropdown>
         </SettingItem>
         <SettingItem dataL10nId='tabCloseAction'>
-          <FormDropdown
+          <SettingDropdown
             value={getSetting(settings.TAB_CLOSE_ACTION, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TAB_CLOSE_ACTION)}>
             <option data-l10n-id='tabCloseActionLastActive' value={tabCloseAction.LAST_ACTIVE} />
             <option data-l10n-id='tabCloseActionNext' value={tabCloseAction.NEXT} />
-            <option data-l10n-id='tabCloseActionFirst' value={tabCloseAction.FIRST} />
             <option data-l10n-id='tabCloseActionParent' value={tabCloseAction.PARENT} />
-          </FormDropdown>
+          </SettingDropdown>
         </SettingItem>
         <SettingCheckbox dataL10nId='switchToNewTabs' prefKey={settings.SWITCH_TO_NEW_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='paintTabs' prefKey={settings.PAINT_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='showTabPreviews' prefKey={settings.SHOW_TAB_PREVIEWS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingItem dataL10nId='dashboardSettingsTitle'>
+          <SettingCheckbox dataL10nId='dashboardShowImages' prefKey={settings.SHOW_DASHBOARD_IMAGES} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        </SettingItem>
       </SettingsList>
     </div>
   }
@@ -1134,6 +1054,17 @@ class SecurityTab extends ImmutableComponent {
           onClick={aboutActions.newFrame.bind(null, {
             location: 'about:autofill'
           }, true)} disabled={!getSetting(settings.AUTOFILL_ENABLED, this.props.settings)} />
+      </SettingsList>
+      <div className='sectionTitle' data-l10n-id='fullscreenContent' />
+      <SettingsList>
+        <SettingItem>
+          <SettingDropdown
+            value={getSetting(settings.FULLSCREEN_CONTENT, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.FULLSCREEN_CONTENT)}>
+            <option data-l10n-id='alwaysAsk' value={fullscreenOption.ALWAYS_ASK} />
+            <option data-l10n-id='alwaysAllow' value={fullscreenOption.ALWAYS_ALLOW} />
+          </SettingDropdown>
+        </SettingItem>
       </SettingsList>
       <div className='sectionTitle' data-l10n-id='doNotTrackTitle' />
       <SettingsList>
@@ -1558,9 +1489,5 @@ module.exports = {
   AboutPreferences: <AboutPreferences />,
   BitcoinDashboard,
   LedgerTable,
-  SettingsList,
-  SettingItem,
-  SettingCheckbox,
-  PaymentHistory,
-  changeSetting
+  PaymentHistory
 }

@@ -28,6 +28,7 @@ You can also [visit our website](https://brave.com/downloads.html) to get the la
 * See [docs/tests.md](docs/tests.md) for information on testing, including how to run a subset of the tests.
 * See [docs/debugging.md](docs/debugging.md) for information on debugging.
 * See [docs/translations.md](docs/translations.md) to learn how you can help us with translations (localization).
+* See [docs/linuxInstall.md](docs/linuxInstall.md) for information on installing the browser on Linux distributions.
 
 ## Running from source
 

@@ -60,7 +60,7 @@ describe('about:newtab tests', function () {
       .addSite({ location: 'about:preferences' })
       .addSite({ location: 'about:safebrowsing' })
       .addSite({ location: 'about:styles' })
-      .waitForExist('.tab[data-frame-key="1"]')
+      .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
       .tabByIndex(0)
       .url(aboutNewTabUrl)
   }
@@ -68,25 +68,9 @@ describe('about:newtab tests', function () {
   function * waitForPageLoad (client) {
     yield client
       .windowByUrl(Brave.browserWindowUrl)
-      .waitForExist('.tab[data-frame-key="1"]')
+      .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
       .tabByIndex(0)
   }
-
-  describe('with NEWTAB_MODE === EMPTY_NEW_TAB', function () {
-    Brave.beforeAll(this)
-
-    before(function * () {
-      yield setup(this.app.client)
-      yield this.app.client.changeSetting(settings.NEWTAB_MODE, newTabMode.EMPTY_NEW_TAB)
-      yield reloadNewTab(this.app.client)
-    })
-
-    it('returns an empty page', function * () {
-      yield waitForPageLoad(this.app.client)
-
-      yield this.app.client.waitForExist('.empty')
-    })
-  })
 
   describe('with NEWTAB_MODE === HOMEPAGE', function () {
     const page1 = 'https://start.duckduckgo.com/'
@@ -108,36 +92,6 @@ describe('about:newtab tests', function () {
   })
 
   describe.skip('with NEWTAB_MODE === NEW_TAB_PAGE', function () {
-    describe('page content', function () {
-      Brave.beforeAll(this)
-
-      before(function * () {
-        yield setup(this.app.client)
-      })
-
-      it('displays a clock', function * () {
-        yield waitForPageLoad(this.app.client)
-
-        yield this.app.client
-          .windowByUrl(Brave.browserWindowUrl)
-          .waitForExist('.tab[data-frame-key="1"]')
-          .tabByIndex(0)
-          .waitForVisible('.clock .time')
-          .waitUntil(function () {
-            return this.getText('.clock .time')
-              .then((clockTime) => {
-                return !!clockTime.match(/^\d{1,2}.*\d{2}.*/)
-              })
-          })
-      })
-
-      // TODO(bsclifton):
-      // - link check
-      // has link to settings
-      // has link to bookmarks
-      // has link to history
-    })
-
     describe('when displaying stats', function () {
       Brave.beforeEach(this)
       beforeEach(function * () {

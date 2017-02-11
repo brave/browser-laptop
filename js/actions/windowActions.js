@@ -403,6 +403,34 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a message to the store to set the tab breakpoint.
+   *
+   * @param {Object} frameProps - the frame properties for the webview in question.
+   * @param {string} breakpoint - the tab breakpoint to change to
+   */
+  setTabBreakpoint: function (frameProps, breakpoint) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SET_TAB_BREAKPOINT,
+      frameProps,
+      breakpoint
+    })
+  },
+
+  /**
+   * Dispatches a message to the store to set the current tab hover state.
+   *
+   * @param {Object} frameProps - the frame properties for the webview in question.
+   * @param {boolean} hoverState - whether or not mouse is over tab
+   */
+  setTabHoverState: function (frameProps, hoverState) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SET_TAB_HOVER_STATE,
+      frameProps,
+      hoverState
+    })
+  },
+
+  /**
    * Dispatches a message to the store to set the tab page index being previewed.
    *
    * @param {number} previewTabPageIndex - The tab page index to preview

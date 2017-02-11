@@ -1404,7 +1404,8 @@ function onShowUsernameMenu (usernames, origin, action, boundingRect,
 
 function onShowAutofillMenu (suggestions, boundingRect, frame) {
   const menuTemplate = autofillTemplateInit(suggestions, frame)
-  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) ? getDownloadsBarHeight() : 0
+  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) &&
+    appStore.state.get('downloads') && appStore.state.get('downloads').size ? getDownloadsBarHeight() : 0
   const offset = {
     x: (window.innerWidth - boundingRect.clientWidth),
     y: (window.innerHeight - boundingRect.clientHeight)

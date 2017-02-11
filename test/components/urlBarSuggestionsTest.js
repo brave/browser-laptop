@@ -31,7 +31,7 @@ describe('urlBarSuggestions', function () {
       .ipcSend(messages.SHORTCUT_NEW_FRAME)
       .waitForUrl(Brave.newTabUrl)
       .windowByUrl(Brave.browserWindowUrl)
-      .waitForExist('.tab[data-frame-key="2"].active')
+      .waitForExist('[data-test-active-tab][data-frame-key="2"]')
       .waitForElementFocus(urlInput)
   })
 

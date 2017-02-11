@@ -19,6 +19,7 @@ const urlutils = require('../lib/urlutil')
 const siteTags = require('../constants/siteTags')
 const config = require('../constants/config')
 const backgrounds = require('../data/backgrounds')
+const {random} = require('../../app/common/lib/randomUtil')
 
 const ipc = window.chrome.ipcRenderer
 
@@ -30,10 +31,11 @@ class NewTabPage extends React.Component {
     super()
     this.state = {
       showSiteRemovalNotification: false,
-      backgroundImage: this.randomBackgroundImage,
       imageLoadFailed: false,
       updatedStamp: undefined,
-      showEmptyPage: true
+      showEmptyPage: true,
+      showImages: false,
+      backgroundImage: undefined
     }
     ipc.on(messages.NEWTAB_DATA_UPDATED, (e, newTabData) => {
       const data = Immutable.fromJS(newTabData || {})
@@ -46,15 +48,24 @@ class NewTabPage extends React.Component {
         return
       }
 
+      const showEmptyPage = !!data.get('showEmptyPage')
+      const showImages = !!data.get('showImages') && !showEmptyPage
       this.setState({
         newTabData: data,
-        updatedStamp: updatedStamp,
-        showEmptyPage: !!data.get('showEmptyPage')
+        updatedStamp,
+        showEmptyPage,
+        showImages: !!data.get('showImages') && !showEmptyPage,
+        backgroundImage: showImages
+          ? this.state.backgroundImage || this.randomBackgroundImage
+          : undefined
       })
     })
   }
+  get showImages () {
+    return this.state.showImages && !!this.state.backgroundImage
+  }
   get randomBackgroundImage () {
-    const image = Object.assign({}, backgrounds[Math.floor(Math.random() * backgrounds.length)])
+    const image = Object.assign({}, backgrounds[Math.floor(random() * backgrounds.length)])
     image.style = {backgroundImage: 'url(' + image.source + ')'}
     return image
   }
@@ -212,7 +223,7 @@ class NewTabPage extends React.Component {
     this.setState({
       imageLoadFailed: true,
       backgroundImage: this.state.imageLoadFailed
-        ? {}
+        ? undefined
         : this.fallbackImage
     })
   }
@@ -226,17 +237,25 @@ class NewTabPage extends React.Component {
     if (!this.state.newTabData) {
       return null
     }
-
     const getLetterFromUrl = (url) => {
       const hostname = urlutils.getHostname(url.get('location'), true)
       const name = url.get('title') || hostname || '?'
       return name.charAt(0).toUpperCase()
     }
-
     const gridLayout = this.gridLayout
-
-    return <div className='dynamicBackground'>
-      <div className='gradient' />
+    const backgroundProps = {}
+    let gradientClassName = 'gradient'
+    if (this.showImages) {
+      backgroundProps.style = this.state.backgroundImage.style
+      gradientClassName = 'bgGradient'
+    }
+    return <div className='dynamicBackground' {...backgroundProps}>
+      {
+        this.showImages
+          ? <img src={this.state.backgroundImage.source} onError={this.onImageLoadFailed.bind(this)} data-test-id='backgroundImage' />
+          : null
+      }
+      <div className={gradientClassName} />
       <div className='content'>
         <main>
           <div className='statsBar'>
@@ -285,4 +304,7 @@ class NewTabPage extends React.Component {
   }
 }
 
-module.exports = React.createElement(DragDropContext(HTML5Backend)(NewTabPage))
+module.exports = {
+  component: NewTabPage,
+  AboutNewTab: React.createElement(DragDropContext(HTML5Backend)(NewTabPage))
+}

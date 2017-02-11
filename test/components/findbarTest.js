@@ -1,4 +1,4 @@
-/* global describe, it, before */
+/* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
 const {activeWebview, findBarInput, findBarMatches, findBarNextButton, findBarClearButton, urlInput, titleBar} = require('../lib/selectors')
@@ -6,9 +6,8 @@ const messages = require('../../js/constants/messages')
 const assert = require('assert')
 
 describe('findBar', function () {
-  Brave.beforeAll(this)
-
-  before(function * () {
+  Brave.beforeEach(this)
+  beforeEach(function * () {
     yield setup(this.app.client)
     const url = Brave.server.url('find_in_page.html')
     yield this.app.client
@@ -234,11 +233,12 @@ describe('findBar', function () {
       .showFindbar(true, 2)
       .waitForElementFocus(findBarInput)
       .setValue(findBarInput, 'abc')
-      .click('.tab')
+      .click('[data-test-id="tab"]')
       .waitUntil(function () {
         return this.getValue(findBarInput).then((val) => val === 'test')
       })
-      .click('.closeTab')
+      .click('[data-test-id="tab"]')
+      .click('[data-test-id="closeTabIcon"]')
       .waitUntil(function () {
         return this.getValue(findBarInput).then((val) => val === 'abc')
       })

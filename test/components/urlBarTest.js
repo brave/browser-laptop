@@ -413,11 +413,11 @@ describe('urlBar tests', function () {
       .waitUntil(function () {
         return this.getValue(urlInput).then((val) => val === coffee)
       })
-      .click('.tab[data-frame-key="1"]')
+      .click('[data-test-id="tab"][data-frame-key="1"]')
       .waitUntil(function () {
         return this.getValue(urlInput).then((val) => val !== coffee)
       })
-      .click('.tab[data-frame-key="2"]')
+      .click('[data-test-id="tab"][data-frame-key="2"]')
       .waitUntil(function () {
         return this.getValue(urlInput).then((val) => val === coffee)
       })

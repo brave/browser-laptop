@@ -25,6 +25,7 @@ const settings = {
   PAINT_TABS: 'tabs.paint-tabs',
   TABS_PER_PAGE: 'tabs.tabs-per-page',
   SHOW_TAB_PREVIEWS: 'tabs.show-tab-previews',
+  SHOW_DASHBOARD_IMAGES: 'tabs.show-dashboard-images',
   // Privacy Tab
   HISTORY_SUGGESTIONS: 'privacy.history-suggestions',
   BOOKMARK_SUGGESTIONS: 'privacy.bookmark-suggestions',
@@ -42,6 +43,7 @@ const settings = {
   SHUTDOWN_CLEAR_AUTOFILL_DATA: 'shutdown.clear-autofill-data',
   SHUTDOWN_CLEAR_SITE_SETTINGS: 'shutdown.clear-site-settings',
   FLASH_INSTALLED: 'security.flash.installed',
+  FULLSCREEN_CONTENT: 'security.fullscreen.content',
   // Autofill
   AUTOFILL_ENABLED: 'privacy.autofill-enabled',
   // Payments Tab

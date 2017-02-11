@@ -52,6 +52,7 @@ class NavigationBar extends ImmutableComponent {
 
     if (key !== null) {
       siteDetail = siteDetail.set('parentFolderId', this.props.sites.getIn([key, 'parentFolderId']))
+      siteDetail = siteDetail.set('customTitle', this.props.sites.getIn([key, 'customTitle']))
     }
     windowActions.setBookmarkDetail(siteDetail, siteDetail, null, editing, true)
   }
@@ -115,7 +116,7 @@ class NavigationBar extends ImmutableComponent {
     const validPublisherSynopsis = this.props.synopsis.map(entry => entry.get('site')).includes(domain)
 
     if ((hostSettings || validPublisherSynopsis) && visiblePublisher !== false) {
-      return !getSetting(settings.AUTO_SUGGEST_SITES) && !isSourceAboutUrl(this.props.location)
+      return getSetting(settings.PAYMENTS_ENABLED) && !isSourceAboutUrl(this.props.location)
     }
     return false
   }

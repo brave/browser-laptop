@@ -683,8 +683,10 @@ class Main extends ImmutableComponent {
 
   onDrop (e) {
     if (e.dataTransfer.files.length > 0) {
-      Array.from(e.dataTransfer.files).forEach((file) =>
-        windowActions.newFrame({location: file.path, title: file.name}))
+      Array.from(e.dataTransfer.files).forEach((file) => {
+        const path = encodeURI(file.path)
+        return windowActions.newFrame({location: path, title: file.name})
+      })
     } else if (e.dataTransfer.getData('text/plain')) {
       let activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
       if (activeFrame) {

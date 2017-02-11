@@ -74,7 +74,7 @@ switch (getBaseUrl(getSourceAboutUrl(window.location.href))) {
     element = require('./history')
     break
   case 'about:newtab':
-    element = require('./newtab')
+    element = require('./newtab').AboutNewTab
     break
   case 'about:passwords':
     element = require('./passwords')

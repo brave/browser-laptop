@@ -474,9 +474,6 @@ function removeFrame (frames, tabs, closedFrames, frameProps, activeFrameKey, fr
       case tabCloseAction.NEXT:
         activeFrameIndex = ((frames.count() - 1) === framePropsIndex) ? (framePropsIndex - 1) : framePropsIndex
         break
-      case tabCloseAction.FIRST:
-        activeFrameIndex = 0
-        break
       // Default is a parent tab
       default:
         let parentFrameIndex = findIndexForFrameKey(frames, frameProps.get('parentFrameKey'))

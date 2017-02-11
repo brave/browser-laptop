@@ -10,6 +10,7 @@ const crashURL = process.env.BRAVE_CRASH_URL || 'https://brave-laptop-updates.he
 const adHost = process.env.AD_HOST || 'https://oip.brave.com'
 
 const isProduction = process.env.NODE_ENV === 'production'
+const {fullscreenOption} = require('../../app/common/constants/settingsEnums')
 
 module.exports = {
   name: 'Brave',
@@ -127,6 +128,7 @@ module.exports = {
     'tabs.tabs-per-page': 10,
     'tabs.close-action': 'parent',
     'tabs.show-tab-previews': true,
+    'tabs.show-dashboard-images': true,
     'privacy.history-suggestions': true,
     'privacy.bookmark-suggestions': true,
     'privacy.opened-tab-suggestions': true,
@@ -152,6 +154,7 @@ module.exports = {
     'security.passwords.dashlane-enabled': false,
     'security.passwords.last-pass-enabled': false,
     'security.passwords.enpass-enabled': false,
+    'security.fullscreen.content': fullscreenOption.ALWAYS_ASK,
     'security.flash.installed': false,
     // sync
     'sync.enabled': false,

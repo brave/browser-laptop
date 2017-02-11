@@ -23,7 +23,7 @@ describe('content loading', function () {
       .url(page1)
       .windowByUrl(Brave.browserWindowUrl)
       .waitUntil(function () {
-        return this.getText('.tabTitle').then((title) => {
+        return this.getText('[data-test-id="tabTitle"]').then((title) => {
           return title === 'failed'
         })
       })
@@ -36,7 +36,7 @@ describe('content loading', function () {
       .url(page1)
       .windowByUrl(Brave.browserWindowUrl)
       .waitUntil(function () {
-        return this.getText('.tabTitle').then((title) => {
+        return this.getText('[data-test-id="tabTitle"]').then((title) => {
           return title === 'fail'
         })
       })

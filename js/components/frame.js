@@ -168,8 +168,11 @@ class Frame extends ImmutableComponent {
           prevProps.adblockCount !== this.props.adblockCount ||
           prevProps.httpsUpgradedCount !== this.props.httpsUpgradedCount ||
           !Immutable.is(prevProps.newTabDetail, this.props.newTabDetail)) {
+        const showEmptyPage = getSetting(settings.NEWTAB_MODE) === newTabMode.EMPTY_NEW_TAB
+        const showImages = getSetting(settings.SHOW_DASHBOARD_IMAGES) && !showEmptyPage
         this.webview.send(messages.NEWTAB_DATA_UPDATED, {
-          showEmptyPage: getSetting(settings.NEWTAB_MODE) === newTabMode.EMPTY_NEW_TAB,
+          showEmptyPage,
+          showImages,
           trackedBlockersCount: this.props.trackedBlockersCount,
           adblockCount: this.props.adblockCount,
           httpsUpgradedCount: this.props.httpsUpgradedCount,
@@ -350,13 +353,17 @@ class Frame extends ImmutableComponent {
     }
   }
 
-  componentDidMount () {
-    const cb = () => {
-      this.webview.setActive(this.props.isActive)
-      this.webview.setTabIndex(this.props.tabIndex)
-      this.updateAboutDetails({})
+  onPropsChanged (prevProps = {}) {
+    this.webview.setActive(this.props.isActive)
+    this.webview.setTabIndex(this.props.tabIndex)
+    if (this.frame && this.props.isActive && isFocused()) {
+      windowActions.setFocusedFrame(this.frame)
     }
-    this.updateWebview(cb)
+    this.updateAboutDetails(prevProps)
+  }
+
+  componentDidMount () {
+    this.updateWebview(this.onPropsChanged)
   }
 
   get zoomLevel () {
@@ -406,20 +413,19 @@ class Frame extends ImmutableComponent {
     windowActions.setFrameTitle(this.frame, title)
   }
 
-  componentDidUpdate (prevProps, prevState) {
-    if (this.props.tabData) {
-      if (!prevProps.tabData ||
-            prevProps.tabData.get('title') !== this.props.tabData.get('title')) {
-        this.setTitle(this.props.tabData.get('title'))
-      }
+  componentDidUpdate (prevProps) {
+    // TODO: This title should be set in app/browser/tabs.js and then we should use the
+    // app state for the tabData everywhere and remove windowState's title completely.
+    if (this.props.tabData && this.frame &&
+        this.props.tabData.get('title') !== this.frame.get('title')) {
+      this.setTitle(this.props.tabData.get('title'))
     }
 
     const cb = () => {
+      this.onPropsChanged(prevProps)
       if (this.getWebRTCPolicy(prevProps) !== this.getWebRTCPolicy(this.props)) {
         this.webview.setWebRTCIPHandlingPolicy(this.getWebRTCPolicy(this.props))
       }
-      this.webview.setActive(this.props.isActive)
-      this.webview.setTabIndex(this.props.tabIndex)
       if (prevProps.activeShortcut !== this.props.activeShortcut) {
         this.handleShortcut()
       }
@@ -438,7 +444,6 @@ class Frame extends ImmutableComponent {
           this.exitHtmlFullScreen()
         }
       }
-      this.updateAboutDetails(prevProps)
     }
 
     // For cross-origin navigation, clear temp approvals
@@ -675,17 +680,6 @@ class Frame extends ImmutableComponent {
       let mouseOnLeft = e.x < (window.innerWidth / 2)
       let showOnRight = nearBottom && mouseOnLeft
       windowActions.setLinkHoverPreview(e.url, showOnRight)
-    })
-    this.webview.addEventListener('set-active', (e) => {
-      if (this.frame.isEmpty()) {
-        return
-      }
-      if (e.active && isFocused()) {
-        windowActions.setFocusedFrame(this.frame)
-      }
-      if (e.active && !this.props.isActive) {
-        windowActions.setActiveFrame(this.frame)
-      }
     })
     this.webview.addEventListener('focus', this.onFocus)
     this.webview.addEventListener('mouseenter', (e) => {

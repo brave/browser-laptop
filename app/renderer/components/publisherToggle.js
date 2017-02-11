@@ -9,6 +9,8 @@ const appActions = require('../../../js/actions/appActions')
 const settings = require('../../../js/constants/settings')
 const getSetting = require('../../../js/settings').getSetting
 const {StyleSheet, css} = require('aphrodite')
+const globalStyles = require('./styles/global')
+const commonStyles = require('./styles/commonStyles')
 
 const noFundVerifiedPublisherImage = require('../../extensions/brave/img/urlbar/browser_URL_fund_no_verified.svg')
 const fundVerifiedPublisherImage = require('../../extensions/brave/img/urlbar/browser_URL_fund_yes_verified.svg')
@@ -71,8 +73,8 @@ class PublisherToggle extends ImmutableComponent {
 
   get shouldShowAddPublisherButton () {
     if ((!!this.hostSettings || !!this.validPublisherSynopsis) && this.visiblePublisher) {
-      // Only show publisher icon if autoSuggest option is OFF
-      return !getSetting(settings.AUTO_SUGGEST_SITES)
+      // Only show publisher icon if ledger is enabled
+      return getSetting(settings.PAYMENTS_ENABLED)
     }
     return false
   }
@@ -87,11 +89,6 @@ class PublisherToggle extends ImmutableComponent {
   }
 
   onAuthorizePublisher () {
-    // if payments disabled, enable it
-    if (!getSetting(settings.AUTO_SUGGEST_SITES)) {
-      appActions.changeSetting(settings.PAYMENTS_ENABLED, true)
-    }
-
     this.authorizedPublisher
       ? appActions.changeSiteSetting(this.hostPattern, 'ledgerPayments', false)
       : appActions.changeSiteSetting(this.hostPattern, 'ledgerPayments', true)
@@ -107,7 +104,7 @@ class PublisherToggle extends ImmutableComponent {
         <button
           className={
           css(
-            styles.browserButton,
+            commonStyles.browserButton,
             !this.authorizedPublisher && this.verifiedPublisher && styles.noFundVerified,
             this.authorizedPublisher && this.verifiedPublisher && styles.fundVerified,
             !this.authorizedPublisher && !this.verifiedPublisher && styles.noFundUnverified,
@@ -127,10 +124,10 @@ const styles = StyleSheet.create({
     boxSizing: 'border-box',
     display: 'flex',
     alignItems: 'center',
-    height: '25px',
-    width: '25px',
-    minHeight: '25px',
-    minWidth: '25px',
+    height: globalStyles.spacing.buttonHeight,
+    width: globalStyles.spacing.buttonWidth,
+    minHeight: globalStyles.spacing.buttonHeight,
+    minWidth: globalStyles.spacing.buttonWidth,
     WebkitAppRegion: 'no-drag',
     borderWidth: '1px 1px 1px 0px',
     borderStyle: 'solid',
@@ -141,41 +138,26 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(0, 0, 0, 0.1)'
   },
 
-  browserButton: {
-    border: 'none',
-    margin: '0',
-    whiteSpace: 'nowrap',
-    outline: 'none',
-    cursor: 'default',
-    display: 'inline-block',
-    lineHeight: '25px',
-    width: '25px',
-    height: '25px',
-    fontSize: '13px',
-    color: '#5a5a5a',
-    borderRadius: '4px',
-    textAlign: 'center',
-    transition: '.1s opacity, .1s background',
-    WebkitUserSelect: 'none',
-    backgroundSize: '16px',
-    backgroundPosition: 'center center',
-    backgroundRepeat: 'no-repeat'
-  },
-
   noFundVerified: {
-    backgroundImage: `url(${noFundVerifiedPublisherImage})`
+    backgroundImage: `url(${noFundVerifiedPublisherImage})`,
+    backgroundSize: '18px',
+    marginLeft: '2px'
   },
 
   fundVerified: {
-    backgroundImage: `url(${fundVerifiedPublisherImage})`
+    backgroundImage: `url(${fundVerifiedPublisherImage})`,
+    backgroundSize: '18px',
+    marginLeft: '2px'
   },
 
   noFundUnverified: {
-    backgroundImage: `url(${noFundUnverifiedPublisherImage})`
+    backgroundImage: `url(${noFundUnverifiedPublisherImage})`,
+    backgroundSize: '18px'
   },
 
   fundUnverified: {
-    backgroundImage: `url(${fundUnverifiedPublisherImage})`
+    backgroundImage: `url(${fundUnverifiedPublisherImage})`,
+    backgroundSize: '18px'
   }
 })
 
