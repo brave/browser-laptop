@@ -1,7 +1,27 @@
 # Changelog
 
 ## [0.13.3](https://github.com/brave/browser-laptop/releases/v0.13.3dev)
-- TODO
+- Added a way to export bookmarks. ([#1002](https://github.com/brave/browser-laptop/issues/1002))
+- Added preference for background image or gradient for new tab. ([#6965](https://github.com/brave/browser-laptop/issues/6965))
+- Added a preference setting to "always allow" full screen view. ([#5979](https://github.com/brave/browser-laptop/issues/5979))
+- Added Ecosia as search engine. ([#7158](https://github.com/brave/browser-laptop/issues/7158))
+- Added translation for bookmarks manager. ([#7130](https://github.com/brave/browser-laptop/issues/7130))
+- Added new verified state for disabled publishers. ([#6974](https://github.com/brave/browser-laptop/issues/6974))
+- Fixed lookup in dictionary by context menu. ([#7167](https://github.com/brave/browser-laptop/issues/7167))
+- Fixed rapid tab switching. ([#7138](https://github.com/brave/browser-laptop/issues/7138))
+- Fixed various UI issues. ([#7181](https://github.com/brave/browser-laptop/issues/7181))
+- Fixed 'more bookmarks' menu item. ([#7097](https://github.com/brave/browser-laptop/issues/7097))
+- Fixed Brave crash when Brave payment is disabled and enabled frequently. ([#7031](https://github.com/brave/browser-laptop/issues/7031))
+- Fixed stutter/odd jump when tab switching with unloaded tabs. ([#6895](https://github.com/brave/browser-laptop/issues/6895))
+- Fixed disable close button on tabs if tab size is too small. ([#5431](https://github.com/brave/browser-laptop/issues/5431))
+- Fixed viewport regaining focus after closing downloads-bar. ([#3219](https://github.com/brave/browser-laptop/issues/3219))
+- Fixed click target for Audio indicator on/off button. ([#1776](https://github.com/brave/browser-laptop/issues/1776))
+- Fixed three-finger "Look up" tap. ([#1064](https://github.com/brave/browser-laptop/issues/1064))
+- Fixed tabs don't resize with window. ([#100](https://github.com/brave/browser-laptop/issues/100))
+- Upgraded to node 7.4.0. ([#7061](https://github.com/brave/browser-laptop/issues/7061))
+- Upgrade muon to 2.56.2. ([#7173](https://github.com/brave/browser-laptop/issues/7173))
+- Upgrade to Chromium v56. (1 week before potentially) ([#3681](https://github.com/brave/browser-laptop/issues/3681))
+
 
 ## [0.13.2](https://github.com/brave/browser-laptop/releases/v0.13.2dev)
 - Added a way to keep tabs the same size when closing instead of resizing. ([#6088](https://github.com/brave/browser-laptop/issues/6088))
