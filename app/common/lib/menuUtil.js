@@ -153,7 +153,7 @@ const isItemValid = (currentItem, previousItem) => {
   }
 
   return currentItem && (typeof currentItem.l10nLabelId === 'string' || typeof currentItem.label === 'string' ||
-    currentItem.type === 'separator' || typeof currentItem.slice === 'function')
+    currentItem.type === 'separator' || typeof currentItem.slice === 'function' || typeof currentItem.labelDataBind === 'string')
 }
 
 const sanitizeTemplateItems = (template) => {

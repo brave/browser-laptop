@@ -257,9 +257,9 @@ describe('menuUtil tests', function () {
     })
     it('checks submenus recursively', function () {
       const template = [separator, {test: 'test'}, {label: 'lol'},
-        { label: 'submenu', submenu: [separator, {label: 'foo'}] }]
+        { label: 'submenu', submenu: [separator, {label: 'foo'}, {labelDataBind: 'zoomLevel'}] }]
       const result = menuUtil.sanitizeTemplateItems(template)
-      const expectedResult = [{label: 'lol'}, {label: 'submenu', submenu: [{label: 'foo'}]}]
+      const expectedResult = [{label: 'lol'}, {label: 'submenu', submenu: [{label: 'foo'}, {labelDataBind: 'zoomLevel'}]}]
 
       assert.deepEqual(result, expectedResult)
     })
