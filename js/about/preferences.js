@@ -1181,7 +1181,9 @@ class HelpfulHints extends ImmutableComponent {
       </span>
       <div data-l10n-id={`hint${this.props.hintNumber}`} />
       <div className='helpfulHintsBottom'>
-        <a target='_blank' href='https://community.brave.com/' data-l10n-id='submitFeedback' />
+        <span className='link' data-l10n-id='submitFeedback' onClick={aboutActions.newFrame.bind(null, {
+          location: 'https://community.brave.com/'
+        }, true)} />
       </div>
     </div>
   }
