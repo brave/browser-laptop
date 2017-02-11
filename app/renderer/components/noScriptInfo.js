@@ -12,6 +12,7 @@ const ipc = require('electron').ipcRenderer
 const messages = require('../../../js/constants/messages')
 
 const {StyleSheet, css} = require('aphrodite')
+const commonStyles = require('./styles/commonStyles')
 
 class NoScriptInfo extends ImmutableComponent {
   get numberBlocked () {
@@ -47,7 +48,7 @@ class NoScriptInfo extends ImmutableComponent {
       return <div><Button l10nId='allow' className='actionButton'
         onClick={this.onAllow.bind(this, false)} /></div>
     } else {
-      return <div className={className} {...this.props} >
+      return <div className={className}>
         <Button l10nId='allowScriptsOnce' className='actionButton'
           onClick={this.onAllow.bind(this, 0)} />
         {this.isPrivate
@@ -67,9 +68,15 @@ class NoScriptInfo extends ImmutableComponent {
       numberBlocked: this.numberBlocked,
       site: this.props.frameProps.get('location') || 'this page'
     }
+
+    const className = css(
+      commonStyles.flyoutDialog,
+      styles.dialogInner
+    )
+
     return <Dialog onHide={this.props.onHide} className='noScriptInfo' isClickDismiss>
-      <div className='dialogInner'>
-        <div className='truncate' data-l10n-args={JSON.stringify(l10nArgs)}
+      <div className={className}>
+        <div className={css(styles.truncate)} data-l10n-args={JSON.stringify(l10nArgs)}
           data-l10n-id={this.numberBlocked === 1 ? 'scriptBlocked' : 'scriptsBlocked'} />
         {this.buttons}
       </div>
@@ -78,7 +85,22 @@ class NoScriptInfo extends ImmutableComponent {
 }
 
 const styles = StyleSheet.create({
-  'allowScriptsButtons': {
+  dialogInner: {
+    right: '20px',
+    width: 'auto',
+    maxWidth: '350px',
+    textAlign: 'center',
+    fontSize: '15px',
+    cursor: 'default'
+  },
+
+  truncate: {
+    marginBottom: '5px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
+  },
+
+  allowScriptsButtons: {
     display: 'flex',
     flexFlow: 'column nowrap',
     alignItems: 'center'
