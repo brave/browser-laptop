@@ -61,7 +61,7 @@ const applySiteRecord = (record) => {
   const siteTags = require('../constants/siteTags')
   const objectId = new Immutable.List(record.objectId)
   const category = CATEGORY_MAP[record.objectData].categoryName
-  const existingObject = this.getObjectById(objectId, category)
+  const existingObject = module.exports.getObjectById(objectId, category)
   const existingObjectData = existingObject && existingObject[1]
   let tag
 
@@ -138,10 +138,10 @@ const applySiteSettingRecord = (record) => {
     case writeActions.CREATE:
     case writeActions.UPDATE:
       // Set the objectId if needed so we can access the existing object
-      let existingObject = this.getObjectById(objectId, category)
+      let existingObject = module.exports.getObjectById(objectId, category)
       if (!existingObject) {
         appActions.changeSiteSetting(hostPattern, 'objectId', objectId, false, true)
-        existingObject = this.getObjectById(objectId, category)
+        existingObject = module.exports.getObjectById(objectId, category)
       }
       const existingObjectData = existingObject[1]
       applySetting = (key, value) => {
@@ -196,8 +196,8 @@ module.exports.applySyncRecords = (records) => {
   if (!records || records.length === 0) { return }
   setImmediate(() => {
     const record = records.shift()
-    this.applySyncRecord(record)
-    this.applySyncRecords(records)
+    module.exports.applySyncRecord(record)
+    module.exports.applySyncRecords(records)
   })
 }
 
@@ -212,7 +212,7 @@ module.exports.getExistingObject = (categoryName, syncRecord) => {
   const AppStore = require('../stores/appStore')
   const appState = AppStore.getState()
   const objectId = new Immutable.List(syncRecord.objectId)
-  const existingObject = this.getObjectById(objectId, categoryName)
+  const existingObject = module.exports.getObjectById(objectId, categoryName)
   if (!existingObject) { return null }
 
   const existingObjectData = existingObject[1].toJS()
@@ -220,11 +220,11 @@ module.exports.getExistingObject = (categoryName, syncRecord) => {
   switch (categoryName) {
     case 'BOOKMARKS':
     case 'HISTORY_SITES':
-      item = this.createSiteData(existingObjectData)
+      item = module.exports.createSiteData(existingObjectData)
       break
     case 'PREFERENCES':
       const hostPattern = existingObject[0]
-      item = this.createSiteSettingsData(hostPattern, existingObjectData)
+      item = module.exports.createSiteSettingsData(hostPattern, existingObjectData)
       break
     default:
       throw new Error(`Invalid category: ${categoryName}`)
@@ -277,7 +277,7 @@ module.exports.getObjectById = (objectId, category) => {
  * @returns {number|undefined}
  */
 const getFolderIdByObjectId = (objectId) => {
-  const entry = this.getObjectById(objectId, 'BOOKMARKS')
+  const entry = module.exports.getObjectById(objectId, 'BOOKMARKS')
   if (!entry) { return undefined }
   return entry[1].get('folderId')
 }

@@ -11,7 +11,7 @@ const niceware = require('niceware')
 // Components
 const ModalOverlay = require('../../../../js/components/modalOverlay')
 const Button = require('../../../../js/components/button')
-const {SettingsList, SettingItem} = require('../settings')
+const {SettingsList, SettingItem, SettingCheckbox} = require('../settings')
 
 const aboutActions = require('../../../../js/about/aboutActions')
 const getSetting = require('../../../../js/settings').getSetting
@@ -43,7 +43,6 @@ class SyncTab extends ImmutableComponent {
   }
 
   get postSetupContent () {
-    const {SettingCheckbox} = require('../../../../js/about/preferences')
     return <SettingsList>
       <div className='device'>
         <SettingCheckbox dataL10nId='syncEnable' id='syncEnableSwitch' prefKey={settings.SYNC_ENABLED} settings={this.props.settings} onChangeSetting={this.toggleSync} />
@@ -106,21 +105,24 @@ class SyncTab extends ImmutableComponent {
     </div>
   }
 
-  get deviceNameInputContent () {
+  get defaultDeviceName () {
     const osName = {
       darwin: 'Mac',
       freebsd: 'FreeBSD',
       linux: 'Linux',
       win32: 'Windows'
     }
-    const placeholder = process.platform
+    return process.platform
       ? [(osName[process.platform] || process.platform), 'Laptop'].join(' ')
       : getSetting(settings.SYNC_DEVICE_NAME, this.props.settings)
+  }
+
+  get deviceNameInputContent () {
     return <SettingItem>
       <span data-l10n-id='syncDeviceNameInput' />
       <input className='deviceNameInput formControl' spellCheck='false'
         ref={(node) => { this.deviceNameInput = node }}
-        placeholder={placeholder} />
+        placeholder={this.defaultDeviceName} />
     </SettingItem>
   }
 
@@ -168,9 +170,8 @@ class SyncTab extends ImmutableComponent {
   }
 
   setupSyncProfile (isRestoring) {
-    if (this.deviceNameInput.value) {
-      this.props.onChangeSetting(settings.SYNC_DEVICE_NAME, this.deviceNameInput.value)
-    }
+    this.props.onChangeSetting(settings.SYNC_DEVICE_NAME,
+      this.deviceNameInput.value || this.defaultDeviceName)
     this.toggleSync(settings.SYNC_ENABLED, true, isRestoring)
     this.props.hideOverlay('syncStart')
   }
@@ -202,7 +203,6 @@ class SyncTab extends ImmutableComponent {
   }
 
   render () {
-    const {SettingsList, SettingCheckbox} = require('../../../../js/about/preferences')
     return <div className='syncContainer'>
       {
       this.isSetup && this.props.syncNewDeviceOverlayVisible
