@@ -23,6 +23,7 @@ class SyncTab extends ImmutableComponent {
     this.toggleSync = this.toggleSync.bind(this)
     this.onSetup = this.setupSyncProfile.bind(this, false)
     this.onRestore = this.restoreSyncProfile.bind(this)
+    this.enableRestore = this.enableRestore.bind(this)
   }
 
   get isSetup () {
@@ -130,6 +131,7 @@ class SyncTab extends ImmutableComponent {
           <span data-l10n-id='syncEnterPassphrase' />
           <textarea spellCheck='false'
             ref={(node) => { this.passphraseInput = node }}
+            onChange={this.enableRestore}
             className='form-control' />
         </SettingItem>
         {this.deviceNameInputContent}
@@ -140,7 +142,7 @@ class SyncTab extends ImmutableComponent {
   get addOverlayFooter () {
     return <Button l10nId='syncCreate' className='primaryButton'
       onClick={this.onRestore}
-      disabled={!!this.passphraseInput} />
+      disabled={this.props.syncRestoreEnabled === false} />
   }
 
   get startOverlayContent () {
@@ -155,6 +157,14 @@ class SyncTab extends ImmutableComponent {
     return <div className='panel'>
       <Button l10nId='syncCreate' className='primaryButton' onClick={this.onSetup} />
     </div>
+  }
+
+  enableRestore (e) {
+    if (this.props.syncRestoreEnabled === false && e.target.value) {
+      this.props.enableSyncRestore(true)
+    } else if (this.props.syncRestoreEnabled && !e.target.value) {
+      this.props.enableSyncRestore(false)
+    }
   }
 
   setupSyncProfile (isRestoring) {

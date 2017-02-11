@@ -1314,6 +1314,7 @@ class AboutPreferences extends React.Component {
       syncNewDeviceOverlayVisible: false,
       syncQRVisible: false,
       syncPassphraseVisible: false,
+      syncRestoreEnabled: false,
       preferenceTab: this.tabFromCurrentHash,
       hintNumber: this.getNextHintNumber(),
       languageCodes: Immutable.Map(),
@@ -1348,6 +1349,7 @@ class AboutPreferences extends React.Component {
     ipc.send(messages.REQUEST_LANGUAGE)
     this.onChangeSetting = this.onChangeSetting.bind(this)
     this.updateTabFromAnchor = this.updateTabFromAnchor.bind(this)
+    this.enableSyncRestore = this.enableSyncRestore.bind(this)
   }
 
   hideAdvancedOverlays () {
@@ -1357,6 +1359,12 @@ class AboutPreferences extends React.Component {
       ledgerRecoveryOverlayVisible: false
     })
     this.forceUpdate()
+  }
+
+  enableSyncRestore (enabled) {
+    this.setState({
+      syncRestoreEnabled: enabled
+    })
   }
 
   componentDidMount () {
@@ -1469,6 +1477,8 @@ class AboutPreferences extends React.Component {
         tab = <SyncTab
           settings={settings}
           onChangeSetting={this.onChangeSetting}
+          enableSyncRestore={this.enableSyncRestore}
+          syncRestoreEnabled={this.state.syncRestoreEnabled}
           syncData={syncData}
           showOverlay={this.setOverlayVisible.bind(this, true)}
           hideOverlay={this.setOverlayVisible.bind(this, false)}
