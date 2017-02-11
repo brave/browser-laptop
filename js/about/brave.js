@@ -6,6 +6,7 @@ const React = require('react')
 const Immutable = require('immutable')
 const messages = require('../constants/messages')
 const SortableTable = require('../components/sortableTable')
+const ClipboardButton = require('../../app/renderer/components/clipboardButton')
 const aboutActions = require('./aboutActions')
 
 const ipc = window.chrome.ipcRenderer
@@ -43,7 +44,11 @@ class AboutBrave extends React.Component {
       <div className='siteDetailsPageContent aboutAbout'>
         <div className='title'>
           <span className='sectionTitle' data-l10n-id='versionInformation' />
-          <span className='fa fa-clipboard' data-l10n-id='copyToClipboard' onClick={this.onCopy} />
+          <ClipboardButton
+            data-l10n-id='copyToClipboard'
+            className='fa fa-clipboard'
+            copyAction={this.onCopy}
+          />
         </div>
         <SortableTable
           headings={['Name', 'Version']}
