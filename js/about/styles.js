@@ -4,18 +4,37 @@
 
 const React = require('react')
 const ImmutableComponent = require('../components/immutableComponent')
+const {StyleSheet, css} = require('aphrodite')
+const globalStyles = require('../../app/renderer/components/styles/global')
 
 // Stylesheets go here
-require('../../less/about/styles.less')
 require('../../less/button.less')
 require('../../less/forms.less')
 
 const {Textbox, FormTextbox, SettingTextbox, RecoveryKeyTextbox} = require('../../app/renderer/components/textbox')
 const {Dropdown, FormDropdown, SettingDropdown} = require('../../app/renderer/components/dropdown')
 
+class Container extends ImmutableComponent {
+  render () {
+    return <div className={css(styles.container)} {...this.props} />
+  }
+}
+
+class Pre extends ImmutableComponent {
+  render () {
+    return <pre className={css(styles.pre)} {...this.props} />
+  }
+}
+
+class Code extends ImmutableComponent {
+  render () {
+    return <code className={css(styles.code)} {...this.props} />
+  }
+}
+
 class AboutStyle extends ImmutableComponent {
   render () {
-    return <div className='wrapper'>
+    return <div className={css(styles.wrapper)}>
       <h1 data-l10n-id='introTitle' />
       <p data-l10n-id='intro' />
 
@@ -31,150 +50,150 @@ class AboutStyle extends ImmutableComponent {
 
       <h1 data-l10n-id='textboxes' />
 
-      <div className='container'>
+      <Container>
         <h2>Plain textbox</h2>
         <Textbox placeholder='Textbox' />
-        <pre><code>
+        <Pre><Code>
           const { '{Textbox}' } = require('../../app/renderer/components/textbox'){'\n'}
           &lt;Textbox />
-        </code></pre>
-      </div>
+        </Code></Pre>
+      </Container>
 
-      <div className='container'>
+      <Container>
         <h2>Textbox for use in forms</h2>
         <FormTextbox placeholder='FormTextbox' />
-        <pre><code>
+        <Pre><Code>
           const { '{FormTextbox}' } = require('../../app/renderer/components/textbox'){'\n'}
           &lt;FormTextbox />
-        </code></pre>
-      </div>
+        </Code></Pre>
+      </Container>
 
-      <div className='container'>
+      <Container>
         <h2>Texbox used mostly in Preferences; has a fixed width</h2>
         <SettingTextbox placeholder='SettingTextbox' />
-        <pre><code>
+        <Pre><Code>
           const { '{SettingTextbox}' } = require('../../app/renderer/components/textbox'){'\n'}
           &lt;SettingTextbox />
-        </code></pre>
-      </div>
+        </Code></Pre>
+      </Container>
 
-      <div className='container'>
+      <Container>
         <h2>Textbox used on wallet recovery screen in Brave Payments</h2>
         <RecoveryKeyTextbox placeholder='RecoveryKeyTextbox' />
-        <pre><code>
+        <Pre><Code>
           const { '{RecoveryKeyTextbox}' } = require('../../app/renderer/components/textbox'){'\n'}
           &lt;RecoveryKeyTextbox />
-        </code></pre>
-      </div>
+        </Code></Pre>
+      </Container>
 
       <hr />
 
       <h1 data-l10n-id='dropdowns' />
 
-      <div className='container'>
+      <Container>
         <h2>Plain dropdown</h2>
         <Dropdown>
           <option>Select Box</option>
           <option>Second Choice</option>
           <option>Third Choice</option>
         </Dropdown>
-        <pre><code>
+        <Pre><Code>
           const { '{Dropdown}' } = require('../../app/renderer/components/dropdown'){'\n'}
           &lt;Dropdown>{'\n'}
           &nbsp;&nbsp;&lt;option>Select Box&lt;/option>{'\n'}
           &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
           &nbsp;&nbsp;&lt;option>Third Choice&lt;/option>{'\n'}
           &lt;/Dropdown>
-        </code></pre>
-      </div>
+        </Code></Pre>
+      </Container>
 
-      <div className='container'>
+      <Container>
         <h2>Dropdown for use in forms</h2>
         <FormDropdown>
           <option>Select Box</option>
           <option>Second Choice</option>
           <option>Third Choice</option>
         </FormDropdown>
-        <pre><code>
+        <Pre><Code>
           const { '{FormDropdown}' } = require('../../app/renderer/components/dropdown'){'\n'}
           &lt;FormDropdown>{'\n'}
           &nbsp;&nbsp;&lt;option>Select Box&lt;/option>{'\n'}
           &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
           &nbsp;&nbsp;&lt;option>Third Choice&lt;/option>{'\n'}
           &lt;/FormDropdown>
-        </code></pre>
-      </div>
+        </Code></Pre>
+      </Container>
 
-      <div className='container'>
+      <Container>
         <h2>Dropdown used mostly in Preferences; has a fixed width</h2>
         <SettingDropdown>
           <option>Select Box</option>
           <option>Second Choice</option>
           <option>Third Choice</option>
         </SettingDropdown>
-        <pre><code>
+        <Pre><Code>
           const { '{SettingDropdown}' } = require('../../app/renderer/components/dropdown'){'\n'}
           &lt;SettingDropdown>{'\n'}
           &nbsp;&nbsp;&lt;option>Select Box&lt;/option>{'\n'}
           &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
           &nbsp;&nbsp;&lt;option>Third Choice&lt;/option>{'\n'}
           &lt;/SettingDropdown>
-        </code></pre>
-      </div>
+        </Code></Pre>
+      </Container>
 
       <hr />
 
       <h1 data-l10n-id='buttons' />
       <button data-l10n-id='browserButton' className='browserButton' onClick={this.onRemoveBookmark} />
-      <pre><code>
+      <Pre><Code>
         &lt;button data-l10n-id='done' className='browserButton'{'\n'}
         onClick={'{this.onRemoveBookmark}'} />
-      </code></pre>
+      </Code></Pre>
 
       <button data-l10n-id='whiteButton' className='browserButton whiteButton' onClick={this.onRemoveBookmark} />
-      <pre><code>
+      <Pre><Code>
         &lt;button data-l10n-id='cancel' className='browserButton whiteButton'{'\n'}
         onClick={'{this.onRemoveBookmark}'} />
-      </code></pre>
+      </Code></Pre>
 
       <button data-l10n-id='inlineButton' className='browserButton whiteButton inlineButton' onClick={this.onRemoveBookmark} />
-      <pre><code>
+      <Pre><Code>
         &lt;button data-l10n-id='done' className='browserButton whiteButton inlineButton'{'\n'}
         onClick={'{this.onRemoveBookmark}'} />
-      </code></pre>
+      </Code></Pre>
 
       <button data-l10n-id='wideButton' className='browserButton whiteButton wideButton' onClick={this.onRemoveBookmark} />
-      <pre><code>
+      <Pre><Code>
         &lt;button data-l10n-id='cancel' className='browserButton whiteButton wideButton'{'\n'}
         onClick={'{this.onRemoveBookmark}'} />
-      </code></pre>
+      </Code></Pre>
 
       <button data-l10n-id='smallButton' className='browserButton whiteButton smallButton' onClick={this.onRemoveBookmark} />
-      <pre><code>
+      <Pre><Code>
         &lt;button data-l10n-id='done' className='browserButton whiteButton smallButton'{'\n'}
         onClick={'{this.onRemoveBookmark}'} />
-      </code></pre>
+      </Code></Pre>
 
       <button data-l10n-id='primaryButton' className='browserButton primaryButton' onClick={this.onRemoveBookmark} />
-      <pre><code>
+      <Pre><Code>
         &lt;button data-l10n-id='cancel' className='browserButton primaryButton'{'\n'}
         onClick={'{this.onRemoveBookmark}'} />
-      </code></pre>
+      </Code></Pre>
 
       <button data-l10n-id='actionButton' className='browserButton actionButton' onClick={this.onRemoveBookmark} />
-      <pre><code>
+      <Pre><Code>
         &lt;button data-l10n-id='done' className='browserButton actionButton'{'\n'}
         onClick={'{this.onRemoveBookmark}'} />
-      </code></pre>
+      </Code></Pre>
 
       <button data-l10n-id='subtleButton' className='browserButton subtleButton' onClick={this.onRemoveBookmark} />
-      <pre><code>
+      <Pre><Code>
         &lt;button data-l10n-id='cancel' className='browserButton subtleButton'{'\n'}
         onClick={'{this.onRemoveBookmark}'} />
-      </code></pre>
+      </Code></Pre>
 
       <button data-l10n-id='primaryButton' className='browserButton primaryButton' onClick={this.onRemoveBookmark} /><button data-l10n-id='whiteButton' className='browserButton whiteButton' onClick={this.onRemoveBookmark} /><button data-l10n-id='wideButton' className='browserButton whiteButton wideButton' onClick={this.onRemoveBookmark} /><button data-l10n-id='primaryButton' className='browserButton primaryButton' onClick={this.onRemoveBookmark} />
-      <pre><code>
+      <Pre><Code>
         &lt;button data-l10n-id='cancel' className='browserButton primaryButton'{'\n'}
         onClick={'{this.onRemoveBookmark}'} />{'\n'}
         &lt;button data-l10n-id='cancel' className='browserButton whiteButton'{'\n'}
@@ -183,9 +202,32 @@ class AboutStyle extends ImmutableComponent {
         onClick={'{this.onRemoveBookmark}'} />{'\n'}
         &lt;button data-l10n-id='cancel' className='browserButton primaryButton'{'\n'}
         onClick={'{this.onRemoveBookmark}'} />{'\n'}
-      </code></pre>
+      </Code></Pre>
     </div>
   }
 }
+
+const common = {
+  maxWidth: '800px',
+  margin: '0 auto'
+}
+
+const styles = StyleSheet.create({
+  wrapper: common,
+  container: common,
+  pre: {
+    background: '#1d1f21',
+    color: '#FFFFFF',
+    fontSize: '14px',
+    padding: '5px',
+    borderRadius: globalStyles.radius.borderRadius,
+    tabSize: '2',
+    wordBreak: 'normal'
+  },
+  code: {
+    fontFamily: 'monospace',
+    whiteSpace: 'pre'
+  }
+})
 
 module.exports = <AboutStyle />
