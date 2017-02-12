@@ -61,10 +61,11 @@ module.exports.getSiteKey = function (siteDetail) {
     return null
   }
   const folderId = siteDetail.get('folderId')
-  const location = siteDetail.get('location')
+  let location = siteDetail.get('location')
   if (folderId) {
     return folderId.toString()
   } else if (location) {
+    location = UrlUtil.getLocationIfPDF(location)
     return location + '|' +
       (siteDetail.get('partitionNumber') || 0) + '|' +
       (siteDetail.get('parentFolderId') || 0)
@@ -86,7 +87,7 @@ module.exports.isSiteBookmarked = function (sites, siteDetail) {
 
   const site = sites.find((site) =>
     isBookmark(site.get('tags')) &&
-    site.get('location') === siteDetail.get('location') &&
+    site.get('location') === UrlUtil.getLocationIfPDF(siteDetail.get('location')) &&
     (site.get('partitionNumber') || 0) === (siteDetail.get('partitionNumber') || 0)
   )
 
@@ -237,6 +238,8 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
   if (oldSite) {
     sites = sites.delete(oldKey)
   }
+
+  site = site.set('location', UrlUtil.getLocationIfPDF(site.get('location')))
 
   const key = module.exports.getSiteKey(site)
   if (key === null) {

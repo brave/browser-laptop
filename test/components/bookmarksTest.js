@@ -221,6 +221,48 @@ describe('bookmark tests', function () {
         })
       })
     })
+    describe('bookmark pdf', function () {
+      Brave.beforeAll(this)
+
+      before(function * () {
+        yield setup(this.app.client)
+      })
+      it('load pdf', function * () {
+        const page1Url = Brave.server.url('img/test.pdf')
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitUntil(function () {
+            return this.getAppState().then((val) => {
+              return val.value.extensions['jdbefljfgobbmcidnmpjamcbhnbphjnb']
+            })
+          })
+        yield this.app.client.tabByIndex(0).url(page1Url).windowParentByUrl(page1Url)
+        yield this.app.client
+          .activateURLMode()
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => {
+              return val === page1Url
+            })
+          })
+      })
+      it('check location', function * () {
+        const page1Url = Brave.server.url('img/test.pdf')
+        yield this.app.client
+          .windowParentByUrl(page1Url)
+          .activateURLMode()
+          .waitForVisible(navigatorNotBookmarked)
+          .click(navigatorNotBookmarked)
+          .waitForVisible(doneButton)
+          .waitForBookmarkDetail(page1Url, 'test.pdf')
+          .waitForEnabled(doneButton)
+          .click(doneButton)
+          .activateURLMode()
+          .waitForVisible(navigatorBookmarked)
+          .click(navigatorBookmarked)
+          .waitForVisible(doneButton)
+          .getValue('#bookmarkLocation input').should.eventually.be.equal(page1Url)
+      })
+    })
   })
 
   describe('menu behavior', function () {

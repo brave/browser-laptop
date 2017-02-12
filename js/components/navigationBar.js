@@ -20,6 +20,7 @@ const {isSourceAboutUrl} = require('../lib/appUrlUtil')
 const AddEditBookmarkHanger = require('../../app/renderer/components/addEditBookmarkHanger')
 const siteUtil = require('../state/siteUtil')
 const eventUtil = require('../lib/eventUtil')
+const UrlUtil = require('../lib/urlutil')
 const getSetting = require('../settings').getSetting
 const windowStore = require('../stores/windowStore')
 const contextMenus = require('../contextMenus')
@@ -54,6 +55,7 @@ class NavigationBar extends ImmutableComponent {
       siteDetail = siteDetail.set('parentFolderId', this.props.sites.getIn([key, 'parentFolderId']))
       siteDetail = siteDetail.set('customTitle', this.props.sites.getIn([key, 'customTitle']))
     }
+    siteDetail = siteDetail.set('location', UrlUtil.getLocationIfPDF(siteDetail.get('location')))
     windowActions.setBookmarkDetail(siteDetail, siteDetail, null, editing, true)
   }
 
