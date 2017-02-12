@@ -13,6 +13,11 @@ const separatorMenuItem = require('../../app/common/commonMenu').separatorMenuIt
 const keyCodes = require('../../app/common/constants/keyCodes')
 
 class ContextMenuItem extends ImmutableComponent {
+  componentDidMount () {
+    if (this.node) {
+      this.node.addEventListener('auxclick', this.onAuxClick.bind(this))
+    }
+  }
   get submenu () {
     return this.props.contextMenuItem.get('submenu')
   }
@@ -64,6 +69,9 @@ class ContextMenuItem extends ImmutableComponent {
       this.props.contextMenuItem.get('contextMenu')(e)
     }
     windowActions.setContextMenuDetail()
+  }
+  onAuxClick (e) {
+    this.onClick(this.props.contextMenuItem.get('click'), true, e)
   }
 
   onMouseEnter (e) {
@@ -156,6 +164,7 @@ class ContextMenuItem extends ImmutableComponent {
     }
 
     return <div {...props}
+      ref={(node) => { this.node = node }}
       draggable={this.props.contextMenuItem.get('draggable')}
       onDragStart={this.onDragStart.bind(this)}
       onDragEnd={this.onDragEnd.bind(this)}

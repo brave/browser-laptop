@@ -154,13 +154,14 @@ class Tab extends ImmutableComponent {
     windowActions.setTabHoverState(this.frame, true)
   }
 
-  onClickTab (e) {
-    // Middle click should close tab
+  onAuxClick (e) {
     if (e.button === 1) {
       this.onTabClosedWithMouse(e)
-    } else {
-      this.setActiveFrame(e)
     }
+  }
+
+  onClickTab (e) {
+    this.setActiveFrame(e)
   }
 
   get themeColor () {
@@ -203,6 +204,7 @@ class Tab extends ImmutableComponent {
 
   componentDidMount () {
     this.onUpdateTabSize()
+    this.tabNode.addEventListener('auxclick', this.onAuxClick.bind(this))
     window.addEventListener('resize', throttle(this.onUpdateTabSize, tabUpdateFrameRate))
   }
 
