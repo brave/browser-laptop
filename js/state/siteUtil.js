@@ -538,7 +538,7 @@ module.exports.isHistoryEntry = function (siteDetail) {
 module.exports.getFolders = function (sites, folderId, parentId, labelPrefix) {
   parentId = parentId || 0
   let folders = []
-  sites.forEach((site) => {
+  sites.toList().sort(module.exports.siteSort).forEach((site) => {
     if ((site.get('parentFolderId') || 0) === parentId && module.exports.isFolder(site)) {
       if (site.get('folderId') === folderId) {
         return
