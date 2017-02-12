@@ -155,13 +155,15 @@ class Tab extends ImmutableComponent {
   }
 
   onAuxClick (e) {
-    if (e.button === 1) {
-      this.onTabClosedWithMouse(e)
-    }
+    this.onClickTab(e)
   }
 
   onClickTab (e) {
-    this.setActiveFrame(e)
+    if (e.button === 1) {
+      this.onTabClosedWithMouse(e)
+    } else {
+      this.setActiveFrame(e)
+    }
   }
 
   get themeColor () {
