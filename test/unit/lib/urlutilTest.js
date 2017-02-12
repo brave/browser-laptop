@@ -266,8 +266,8 @@ describe('urlutil', function () {
     it('returns empty string if input is not a URL', function () {
       assert.equal(UrlUtil.getPunycodeUrl('invalid-url-goes-here'), 'invalid-url-goes-here')
     })
-    it('returns the default favicon URL when given a valid URL', function () {
-      assert.equal(UrlUtil.getPunycodeUrl('http://ebаy.com'), 'http://xn--eby-7cd.com')
+    it('returns the punycode URL when given a valid URL', function () {
+      assert.equal(UrlUtil.getPunycodeUrl('http://brave:brave@ebаy.com:1234/brave#brave'), 'http://brave:brave@xn--eby-7cd.com:1234/brave#brave')
     })
   })
 })

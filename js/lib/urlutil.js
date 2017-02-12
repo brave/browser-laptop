@@ -339,9 +339,8 @@ const UrlUtil = {
   getPunycodeUrl: function (url) {
     try {
       const parsed = urlParse(url)
-      const protocol = parsed.protocol
-      const hostname = punycode.toASCII(parsed.hostname)
-      return protocol + '//' + hostname
+      parsed.hostname = punycode.toASCII(parsed.hostname)
+      return urlFormat(parsed)
     } catch (e) {
       return url
     }

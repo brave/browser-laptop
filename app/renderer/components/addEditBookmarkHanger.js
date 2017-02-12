@@ -98,7 +98,10 @@ class AddEditBookmarkHanger extends ImmutableComponent {
     let currentDetail = this.props.currentDetail
     let name = e.target.value
     if (typeof name === 'string' && UrlUtil.isURL(name)) {
-      name = UrlUtil.getPunycodeUrl(name)
+      const punycodeUrl = UrlUtil.getPunycodeUrl(name)
+      if (punycodeUrl.replace(/\/$/, '') !== name) {
+        name = punycodeUrl
+      }
     }
     if (currentDetail.get('title') === name && name) {
       currentDetail = currentDetail.delete('customTitle')
@@ -110,7 +113,10 @@ class AddEditBookmarkHanger extends ImmutableComponent {
   onLocationChange (e) {
     let location = e.target.value
     if (typeof location === 'string') {
-      location = UrlUtil.getPunycodeUrl(location)
+      const punycodeUrl = UrlUtil.getPunycodeUrl(location)
+      if (punycodeUrl.replace(/\/$/, '') !== location) {
+        location = punycodeUrl
+      }
     }
     const currentDetail = this.props.currentDetail.set('location', location)
     windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail, this.props.destinationDetail, this.props.shouldShowLocation, !this.props.isModal)
