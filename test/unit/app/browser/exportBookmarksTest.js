@@ -34,13 +34,14 @@ describe('Bookmarks export', function () {
    * +++ website 4
    * ++ folder 3
    * +++ website 5
-   * +website 6
-   *
+   * + website 6
+   * + folder 4
    * Other
    * + website 7
-   * + folder 4
+   * + folder 5
    * ++ website 8
    * ++ website 9
+   * + folder 6
    */
   const sites = Immutable.fromJS([
     { tags: [], title: 'Fake', location: 'https://brave.com' },
@@ -53,10 +54,12 @@ describe('Bookmarks export', function () {
     { tags: [siteTags.BOOKMARK_FOLDER], title: 'folder 3', folderId: 3, parentFolderId: 1 },
     { tags: [siteTags.BOOKMARK], title: 'Website 5', location: 'https://brave.com/5', parentFolderId: 3 },
     { tags: [siteTags.BOOKMARK], title: 'Website 6', location: 'https://brave.com/6' },
+    { tags: [siteTags.BOOKMARK_FOLDER], title: 'folder 4', folderId: 4 },
     { tags: [siteTags.BOOKMARK], title: 'Website 7', location: 'https://brave.com/7', parentFolderId: -1 },
-    { tags: [siteTags.BOOKMARK_FOLDER], title: 'folder 4', folderId: 4, parentFolderId: -1 },
-    { tags: [siteTags.BOOKMARK], title: 'Website 8', location: 'https://brave.com/8', parentFolderId: 4 },
-    { tags: [siteTags.BOOKMARK], title: 'Website 9', location: 'https://brave.com/9', parentFolderId: 4 }
+    { tags: [siteTags.BOOKMARK_FOLDER], title: 'folder 5', folderId: 5, parentFolderId: -1 },
+    { tags: [siteTags.BOOKMARK], title: 'Website 8', location: 'https://brave.com/8', parentFolderId: 5 },
+    { tags: [siteTags.BOOKMARK], title: 'Website 9', location: 'https://brave.com/9', parentFolderId: 5 },
+    { tags: [siteTags.BOOKMARK_FOLDER], title: 'folder 6', folderId: 6, parentFolderId: -1 }
   ])
 
   const personalArray = [
@@ -76,15 +79,21 @@ describe('Bookmarks export', function () {
     '      </DL><p>',
     '    </DL><p>',
     '    <DT><A HREF="https://brave.com/6">Website 6</A>',
+    '    <DT><H3>folder 4</H3>',
+    '    <DL><p>',
+    '    </DL><p>',
     '  </DL><p>'
   ]
 
   const otherArray = [
     '  <DT><A HREF="https://brave.com/7">Website 7</A>',
-    '  <DT><H3>folder 4</H3>',
+    '  <DT><H3>folder 5</H3>',
     '    <DL><p>',
     '      <DT><A HREF="https://brave.com/8">Website 8</A>',
     '      <DT><A HREF="https://brave.com/9">Website 9</A>',
+    '    </DL><p>',
+    '  <DT><H3>folder 6</H3>',
+    '    <DL><p>',
     '    </DL><p>'
   ]
 
