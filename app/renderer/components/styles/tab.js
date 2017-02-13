@@ -82,7 +82,8 @@ const styles = StyleSheet.create({
   },
 
   isPinned: {
-    padding: globalStyles.spacing.defaultIconPadding
+    paddingLeft: globalStyles.spacing.defaultIconPadding,
+    paddingRight: globalStyles.spacing.defaultIconPadding
   },
 
   active: {
