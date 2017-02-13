@@ -503,7 +503,7 @@ module.exports.isBookmark = function (siteDetail) {
  */
 module.exports.isFolder = function (siteDetail) {
   if (siteDetail) {
-    return isBookmarkFolder(siteDetail.get('tags'))
+    return isBookmarkFolder(siteDetail.get('tags')) && siteDetail.get('folderId') !== undefined
   }
   return false
 }
