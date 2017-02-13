@@ -105,7 +105,8 @@ const globalStyles = {
     sideBarWidth: '190px',
     aboutPageSectionPadding: '24px',
     defaultTabPadding: '0 4px',
-    defaultIconPadding: '0 2px'
+    defaultIconPadding: '2px',
+    iconSize: '16px'
   },
   shadow: {
     switchShadow: 'inset 0 1px 4px rgba(0, 0, 0, 0.35)',
