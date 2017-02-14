@@ -210,7 +210,8 @@ module.exports.onSyncReady = (isFirstRun, e) => {
   }
 
   // Sync bookmarks that have not been synced yet.
-  siteUtil.getBookmarks(sites).forEach(syncBookmark)
+  siteUtil.getBookmarks(sites).sortBy(site => site.get('order'))
+    .forEach(syncBookmark)
 
   // Sync site settings that have not been synced yet
   // FIXME: If Sync was disabled and settings were changed, those changes
