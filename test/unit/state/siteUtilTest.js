@@ -546,13 +546,21 @@ describe('siteUtil', function () {
       it('deletes a history entry (has no tags)', function () {
         const siteDetail = {
           tags: [],
-          location: testUrl1
+          location: testUrl1,
+          lastAccessedTime: 123
+        }
+        const expectedSites = {
+          'https://brave.com/|0|0': {
+            tags: [],
+            location: testUrl1,
+            lastAccessedTime: undefined
+          }
         }
         const siteKey = siteUtil.getSiteKey(Immutable.fromJS(siteDetail))
         let sites = {}
         sites[siteKey] = siteDetail
         const processedSites = siteUtil.removeSite(Immutable.fromJS(sites), Immutable.fromJS(siteDetail))
-        assert.deepEqual(processedSites, Immutable.fromJS({}))
+        assert.deepEqual(processedSites.toJS(), expectedSites)
       })
     })
   })
