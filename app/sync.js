@@ -199,8 +199,6 @@ module.exports.onSyncReady = (isFirstRun, e) => {
     }
 
     const record = syncUtil.createSiteData(siteJS)
-    // order currently only used for initial sync
-    if (siteJS.order) { record.value.index = siteJS.order }
     const folderId = site.get('folderId')
     if (typeof folderId === 'number') {
       folderToObjectId[folderId] = record.objectId
