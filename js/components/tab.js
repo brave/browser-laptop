@@ -245,6 +245,8 @@ class Tab extends ImmutableComponent {
       onMouseLeave={this.onMouseLeave}>
       <div className={css(
         styles.tab,
+        // Windows specific style
+        isWindows() && styles.tabForWindows,
         this.isPinned && styles.isPinned,
         this.props.isActive && styles.active,
         this.props.tab.get('isPrivate') && styles.private,
@@ -254,9 +256,7 @@ class Tab extends ImmutableComponent {
         this.props.isActive && this.themeColor && perPageStyles.themeColor,
         !this.isPinned && this.narrowView && styles.tabNarrowView,
         !this.isPinned && this.narrowestView && styles.tabNarrowestView,
-        !this.isPinned && this.props.tab.get('breakpoint') === 'smallest' && styles.tabMinAllowedSize,
-        // Windows specific style
-        isWindows() && styles.tabForWindows
+        !this.isPinned && this.props.tab.get('breakpoint') === 'smallest' && styles.tabMinAllowedSize
         )}
         data-test-active-tab={this.props.isActive}
         data-test-pinned-tab={this.isPinned}
