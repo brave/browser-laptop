@@ -269,7 +269,7 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail, s
  */
 module.exports.removeSite = function (sites, siteDetail, tag, reorder = true, syncCallback) {
   const key = module.exports.getSiteKey(siteDetail)
-  if (key === null) {
+  if (!key) {
     return sites
   }
   if (getSetting(settings.SYNC_ENABLED) === true && syncCallback) {
@@ -287,12 +287,18 @@ module.exports.removeSite = function (sites, siteDetail, tag, reorder = true, sy
       })
     })
   }
-  if (sites.size && reorder) {
-    const order = sites.getIn([key, 'order'])
-    sites = reorderSite(sites, order)
-  }
+  if (isBookmark(tag)) {
+    if (sites.size && reorder) {
+      const order = sites.getIn([key, 'order'])
+      sites = reorderSite(sites, order)
+    }
 
-  return sites.delete(key)
+    return sites.delete(key)
+  } else {
+    let site = sites.get(key)
+    site = site.set('lastAccessedTime', undefined)
+    return sites.set(key, site)
+  }
 }
 
 /**
