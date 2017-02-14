@@ -127,7 +127,8 @@ const globalStyles = {
     transitionFastEase: 'all 100ms ease',
     transitionSlowEase: 'all 1s ease',
     switchBGTransition: 'background-color 100ms',
-    switchNubTransition: 'right 100ms'
+    switchNubTransition: 'right 100ms',
+    tabBackgroundTransition: 'background-color 100ms linear'
   },
   zindex: {
     zindexWindowNotActive: '900',
