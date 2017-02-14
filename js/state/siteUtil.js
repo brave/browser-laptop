@@ -527,7 +527,7 @@ module.exports.isBookmark = function (siteDetail) {
  */
 module.exports.isFolder = function (siteDetail) {
   if (siteDetail) {
-    return isBookmarkFolder(siteDetail.get('tags'))
+    return isBookmarkFolder(siteDetail.get('tags')) && siteDetail.get('folderId') !== undefined
   }
   return false
 }
@@ -551,7 +551,7 @@ module.exports.isHistoryEntry = function (siteDetail) {
     if (siteDetail.get('location').startsWith('about:')) {
       return false
     }
-    return !!siteDetail.get('lastAccessedTime') && !module.exports.isFolder(siteDetail)
+    return !!siteDetail.get('lastAccessedTime') && !isBookmarkFolder(siteDetail.get('tags'))
   }
   return false
 }
@@ -576,7 +576,7 @@ module.exports.getFolder = function (sites, folderId) {
 module.exports.getFolders = function (sites, folderId, parentId, labelPrefix) {
   parentId = parentId || 0
   let folders = []
-  sites.forEach((site) => {
+  sites.toList().sort(module.exports.siteSort).forEach((site) => {
     if ((site.get('parentFolderId') || 0) === parentId && module.exports.isFolder(site)) {
       if (site.get('folderId') === folderId) {
         return

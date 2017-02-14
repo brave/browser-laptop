@@ -1000,7 +1000,8 @@ describe('siteUtil', function () {
         tags: [siteTags.BOOKMARK]
       })
       const siteDetail2 = Immutable.fromJS({
-        tags: [siteTags.BOOKMARK_FOLDER]
+        tags: [siteTags.BOOKMARK_FOLDER],
+        folderId: 1
       })
       assert.equal(siteUtil.isEquivalent(siteDetail1, siteDetail2), false)
     })
@@ -1042,11 +1043,18 @@ describe('siteUtil', function () {
   })
 
   describe('isFolder', function () {
-    it('returns true if the input is a siteDetail and has a `BOOKMARK_FOLDER` tag', function () {
+    it('returns true if the input is a siteDetail and has a `BOOKMARK_FOLDER` tag and a folder ID', function () {
+      const siteDetail = Immutable.fromJS({
+        tags: [siteTags.BOOKMARK_FOLDER],
+        folderId: 1
+      })
+      assert.equal(siteUtil.isFolder(siteDetail), true)
+    })
+    it('returns false if the input does not have a folderId', function () {
       const siteDetail = Immutable.fromJS({
         tags: [siteTags.BOOKMARK_FOLDER]
       })
-      assert.equal(siteUtil.isFolder(siteDetail), true)
+      assert.equal(siteUtil.isFolder(siteDetail), false)
     })
     it('returns false if the input does not have a `BOOKMARK_FOLDER` tag', function () {
       const siteDetail = Immutable.fromJS({

@@ -15,6 +15,10 @@ class LongPressButton extends ImmutableComponent {
     this.onMouseLeave = this.onMouseLeave.bind(this)
   }
 
+  componentDidMount (e) {
+    this.buttonNode.addEventListener('auxclick', this.onAuxClick.bind(this))
+  }
+
   onMouseDown (e) {
     if (e.target.attributes.getNamedItem('disabled')) {
       return
@@ -67,11 +71,16 @@ class LongPressButton extends ImmutableComponent {
     }
   }
 
+  onAuxClick (e) {
+    this.onClick(e)
+  }
+
   render () {
     return <button data-l10n-id={this.props.l10nId}
       className={this.props.className}
       disabled={this.props.disabled}
       onClick={this.onClick}
+      ref={(node) => { this.buttonNode = node }}
       onMouseDown={this.onMouseDown}
       onMouseUp={this.onMouseUp}
       onMouseLeave={this.onMouseLeave} />

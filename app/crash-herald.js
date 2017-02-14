@@ -4,7 +4,15 @@
 
 const appConfig = require('../js/constants/appConfig')
 const crashReporter = require('electron').crashReporter
-const buildConfig = require('../js/constants/buildConfig')
+
+// buildConfig.js is built at package time, we need to require it in a try/catch
+// block to trap for it not existing yet.
+var buildConfig
+try {
+  buildConfig = require('../js/constants/buildConfig')
+} catch (e) {
+  buildConfig = {}
+}
 
 exports.init = () => {
   const options = {

@@ -569,7 +569,10 @@ class GeneralTab extends ImmutableComponent {
     })
     var homepageValue = getSetting(settings.HOMEPAGE, this.props.settings)
     if (typeof homepageValue === 'string') {
-      homepageValue = UrlUtil.getPunycodeUrl(homepageValue)
+      const punycodeUrl = UrlUtil.getPunycodeUrl(homepageValue)
+      if (punycodeUrl.replace(/\/$/, '') !== homepageValue) {
+        homepageValue = UrlUtil.getPunycodeUrl(homepageValue)
+      }
     }
     const homepage = homepageValue && homepageValue.trim()
     const disableShowHomeButton = !homepage || !homepage.length

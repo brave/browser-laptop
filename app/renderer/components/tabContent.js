@@ -19,8 +19,8 @@ class TabIcon extends ImmutableComponent {
       fontSize: 'inherit',
       display: 'flex',
       alignSelf: 'center',
-      width: '16px',
-      height: '16px',
+      width: globalStyles.spacing.iconSize,
+      height: globalStyles.spacing.iconSize,
       alignItems: 'center',
       justifyContent: 'center'
     }
@@ -147,17 +147,32 @@ class TabTitle extends ImmutableComponent {
     return this.props.tabProps.get('audioPlaybackActive') || this.props.tabProps.get('audioMuted')
   }
 
+  get hoveredOnNarrowView () {
+    const sizes = ['mediumSmall', 'small', 'extraSmall', 'smallest']
+    return this.props.tabProps.get('hoverState') && sizes.includes(this.props.tabProps.get('breakpoint'))
+  }
+
   get shouldHideTitle () {
     return (this.props.tabProps.get('breakpoint') === 'largeMedium' && this.pageCanPlayAudio && this.locationHasSecondaryIcon) ||
       (this.props.tabProps.get('breakpoint') === 'mediumSmall' && this.locationHasSecondaryIcon) ||
-      this.props.tabProps.get('breakpoint') === 'extraSmall' || this.props.tabProps.get('breakpoint') === 'smallest'
+      this.props.tabProps.get('breakpoint') === 'extraSmall' || this.props.tabProps.get('breakpoint') === 'smallest' ||
+      this.hoveredOnNarrowView
   }
 
   render () {
+    const titleStyles = StyleSheet.create({
+      reduceTitleSize: {
+        // include a margin gutter with same size
+        // as closeTabIcon to avoid title overflow
+        // when hovering over a tab
+        marginRight: `calc(${globalStyles.spacing.iconSize} + ${globalStyles.spacing.defaultIconPadding})`
+      }
+    })
     return !this.isPinned && !this.shouldHideTitle
     ? <div data-test-id='tabTitle'
       className={css(
       styles.tabTitle,
+      this.props.tabProps.get('hoverState') && titleStyles.reduceTitleSize,
       // Windows specific style
       isWindows() && styles.tabTitleForWindows,
       // Linux specific style
@@ -192,10 +207,10 @@ class CloseTabIcon extends ImmutableComponent {
 
 const styles = StyleSheet.create({
   icon: {
-    width: '16px',
-    minWidth: '16px',
-    height: '16px',
-    backgroundSize: '16px',
+    width: globalStyles.spacing.iconSize,
+    minWidth: globalStyles.spacing.iconSize,
+    height: globalStyles.spacing.iconSize,
+    backgroundSize: globalStyles.spacing.iconSize,
     fontSize: globalStyles.fontSize.tabIcon,
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
@@ -204,7 +219,8 @@ const styles = StyleSheet.create({
     position: 'relative',
     textAlign: 'center',
     justifyContent: 'center',
-    padding: globalStyles.spacing.defaultIconPadding
+    paddingLeft: globalStyles.spacing.defaultIconPadding,
+    paddingRight: globalStyles.spacing.defaultIconPadding
   },
 
   iconNarrowView: {
@@ -225,8 +241,8 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '16px',
-    width: '16px',
+    fontSize: globalStyles.spacing.iconSize,
+    width: globalStyles.spacing.iconSize,
     height: '100%',
     border: '0',
     zIndex: globalStyles.zindex.zindexTabs,
