@@ -527,7 +527,7 @@ module.exports.isHistoryEntry = function (siteDetail) {
     if (siteDetail.get('location').startsWith('about:')) {
       return false
     }
-    return !!siteDetail.get('lastAccessedTime') && !module.exports.isFolder(siteDetail)
+    return !!siteDetail.get('lastAccessedTime') && !isBookmarkFolder(siteDetail.get('tags'))
   }
   return false
 }

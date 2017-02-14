@@ -54,7 +54,9 @@ class AddEditBookmarkHanger extends ImmutableComponent {
       : 'bookmarkAdded'
   }
   get isFolder () {
-    return siteUtil.isFolder(this.props.currentDetail)
+    // Fake a folderId property so that the bookmark is considered a bookmark folder.
+    // This is ImmutableJS so it doesn't actually set a value, it just returns a new one.
+    return siteUtil.isFolder(this.props.currentDetail.set('folderId', 0))
   }
   setDefaultFocus () {
     this.bookmarkName.select()
