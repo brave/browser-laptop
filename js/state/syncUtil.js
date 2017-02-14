@@ -256,10 +256,16 @@ module.exports.getObjectById = (objectId, category) => {
   const appState = AppStore.getState()
   switch (category) {
     case 'BOOKMARKS':
+      return appState.get('sites').findEntry((site, index) => {
+        const itemObjectId = site.get('objectId')
+        const isBookmark = siteUtil.isFolder(site) || siteUtil.isBookmark(site)
+        return (isBookmark && itemObjectId && itemObjectId.equals(objectId))
+      })
     case 'HISTORY_SITES':
       return appState.get('sites').findEntry((site, index) => {
         const itemObjectId = site.get('objectId')
-        return (itemObjectId && itemObjectId.equals(objectId))
+        const isBookmark = siteUtil.isFolder(site) || siteUtil.isBookmark(site)
+        return (!isBookmark && itemObjectId && itemObjectId.equals(objectId))
       })
     case 'PREFERENCES':
       return appState.get('siteSettings').findEntry((siteSetting, hostPattern) => {
