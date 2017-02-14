@@ -8,7 +8,6 @@
 - Added translation for bookmarks manager. ([#7130](https://github.com/brave/browser-laptop/issues/7130))
 - Added new verified state for disabled publishers. ([#6974](https://github.com/brave/browser-laptop/issues/6974))
 - Fixed lookup in dictionary by context menu. ([#7167](https://github.com/brave/browser-laptop/issues/7167))
-- Fixed rapid tab switching. ([#7138](https://github.com/brave/browser-laptop/issues/7138))
 - Fixed various UI issues. ([#7181](https://github.com/brave/browser-laptop/issues/7181))
 - Fixed 'more bookmarks' menu item. ([#7097](https://github.com/brave/browser-laptop/issues/7097))
 - Fixed Brave crash when Brave payment is disabled and enabled frequently. ([#7031](https://github.com/brave/browser-laptop/issues/7031))
@@ -20,7 +19,7 @@
 - Fixed tabs don't resize with window. ([#100](https://github.com/brave/browser-laptop/issues/100))
 - Upgraded to node 7.4.0. ([#7061](https://github.com/brave/browser-laptop/issues/7061))
 - Upgrade muon to 2.56.2. ([#7173](https://github.com/brave/browser-laptop/issues/7173))
-- Upgrade to Chromium v56. (1 week before potentially) ([#3681](https://github.com/brave/browser-laptop/issues/3681))
+- Upgrade to Chromium v56.0.2924.76. ([#3681](https://github.com/brave/browser-laptop/issues/3681))
 
 
 ## [0.13.2](https://github.com/brave/browser-laptop/releases/v0.13.2dev)
