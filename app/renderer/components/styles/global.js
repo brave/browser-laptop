@@ -159,7 +159,8 @@ const globalStyles = {
     private: 'fa fa-eye',
     newSession: 'fa fa-user',
     volumeOn: 'fa fa-volume-up',
-    volumeOff: 'fa fa-volume-off'
+    volumeOff: 'fa fa-volume-off',
+    refresh: 'fa fa-refresh'
   }
 }
 
