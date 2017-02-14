@@ -720,7 +720,8 @@ function hamburgerTemplateInit (location, e) {
         CommonMenu.bookmarksManagerMenuItem(),
         CommonMenu.bookmarksToolbarMenuItem(),
         CommonMenu.separatorMenuItem,
-        CommonMenu.importBrowserDataMenuItem()
+        CommonMenu.importBrowserDataMenuItem(),
+        CommonMenu.exportBookmarksMenuItem()
       ]
     }, {
       label: locale.translation('bravery'),
