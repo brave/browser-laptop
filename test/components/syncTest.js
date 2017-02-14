@@ -304,7 +304,6 @@ describe('Syncing bookmarks', function () {
       .waitForUrl(this.page1Url)
     yield bookmarkUrl(this.page2Url, this.page2Title)
     yield Brave.app.client
-      .pause(1000) // XXX: Helps to correctly order Create and Update
       .activateURLMode()
       .waitForVisible(navigatorBookmarked)
       .click(navigatorBookmarked)
@@ -321,7 +320,6 @@ describe('Syncing bookmarks', function () {
       .waitForUrl(this.page2Url)
     yield bookmarkUrl(this.page3Url, this.page3Title)
     yield Brave.app.client
-      .pause(1000) // XXX: Helps to correctly order Create and Delete
       .activateURLMode()
       .waitForVisible(navigatorBookmarked)
       .click(navigatorBookmarked)
@@ -331,11 +329,7 @@ describe('Syncing bookmarks', function () {
     // Create folder then add a bookmark
     yield addBookmarkFolder(this.folder1Title)
     const folder1Id = 1 // XXX: Hardcoded
-    yield Brave.app.client
-      .pause(1000) // XXX: Wait for sync to upload record to S3
     yield bookmarkUrl(this.folder1Page1Url, this.folder1Page1Title, folder1Id)
-    yield Brave.app.client
-      .pause(1000) // XXX: Wait for sync to upload record to S3
 
     // Update a page to be in the folder
     yield Brave.app.client
@@ -344,7 +338,6 @@ describe('Syncing bookmarks', function () {
     yield bookmarkUrl(this.folder1Page2Url, this.folder1Page2Title)
     const folder1Option = `#bookmarkParentFolder select option[value="${folder1Id}"`
     yield Brave.app.client
-      .pause(1000) // XXX: Helps to correctly order Create and Update
       .activateURLMode()
       .waitForVisible(navigatorBookmarked)
       .click(navigatorBookmarked)
@@ -358,10 +351,8 @@ describe('Syncing bookmarks', function () {
     yield addBookmarkFolder(this.folder2Title)
     const folder2Id = 2 // XXX: Hardcoded
     yield Brave.app.client
-      .pause(1000) // XXX: Wait for sync to upload record to S3
     yield bookmarkUrl(this.folder2Page1Url, this.folder2Page1Title, folder2Id)
     yield Brave.app.client
-      .pause(1000) // XXX: Wait for sync to upload record to S3
       .removeSite({ folderId: folder2Id }, siteTags.BOOKMARK_FOLDER)
 
     // XXX: Wait for sync to upload records to S3
@@ -630,10 +621,11 @@ describe('Syncing history', function () {
     yield Brave.app.client
       .tabByIndex(0)
       .loadUrl(this.page1Url)
+      .windowParentByUrl(this.page1Url)
+      .waitForSiteEntry(this.page1Url)
 
     // For order: Visit page 2
     yield Brave.app.client
-      .tabByIndex(0)
       .waitForUrl(this.page1Url)
       .loadUrl(this.page2Url)
 
