@@ -4,6 +4,8 @@ const siteTags = require('../../../js/constants/siteTags')
 const siteUtil = require('../../../js/state/siteUtil')
 const assert = require('assert')
 const Immutable = require('immutable')
+const mockery = require('mockery')
+const settings = require('../../../js/constants/settings')
 
 describe('siteUtil', function () {
   const testUrl1 = 'https://brave.com/'
@@ -12,6 +14,7 @@ describe('siteUtil', function () {
   const emptySites = Immutable.fromJS({})
   const bookmarkAllFields = Immutable.fromJS({
     lastAccessedTime: 123,
+    objectId: [210, 115, 31, 176, 57, 212, 167, 120, 104, 88, 88, 27, 141, 36, 235, 226],
     tags: [siteTags.BOOKMARK],
     location: testUrl1,
     title: 'sample',
@@ -290,7 +293,9 @@ describe('siteUtil', function () {
           Immutable.fromJS(sites).forEach((site) => {
             processedSites = siteUtil.addSite(processedSites, site)
           })
-          const expectedSites = Immutable.fromJS(sites)
+          const expectedSites = Immutable.fromJS(sites).map((site) => {
+            return site.set('objectId', undefined)
+          })
           assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
         })
       })
@@ -318,18 +323,21 @@ describe('siteUtil', function () {
           customTitle: 'old customTitle',
           partitionNumber: 3,
           parentFolderId: 8,
+          objectId: undefined,
           order: 0,
           favicon: testFavicon1
         })
         const oldSiteKey = siteUtil.getSiteKey(oldSiteDetail)
         const newSiteDetail = Immutable.fromJS({
           lastAccessedTime: 456,
+          objectId: [210, 115, 31, 176, 57, 212, 167, 120, 104, 88, 88, 27, 141, 36, 235, 226],
           tags: [siteTags.BOOKMARK],
           location: testUrl1,
           title: 'same entry also acts as history entry'
         })
         const expectedSiteDetail = Immutable.fromJS({
           lastAccessedTime: newSiteDetail.get('lastAccessedTime'),
+          objectId: newSiteDetail.get('objectId'),
           tags: newSiteDetail.get('tags').toJS(),
           location: newSiteDetail.get('location'),
           title: newSiteDetail.get('title'),
@@ -369,7 +377,7 @@ describe('siteUtil', function () {
         const processedSites = siteUtil.addSite(Immutable.fromJS(sites), newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
         const expectedSites = {}
         const expectedSiteKey = siteUtil.getSiteKey(newSiteDetail)
-        expectedSites[expectedSiteKey] = newSiteDetail.set('order', 0).toJS()
+        expectedSites[expectedSiteKey] = newSiteDetail.set('order', 0).set('objectId', undefined).toJS()
         assert.deepEqual(processedSites.toJS(), expectedSites)
       })
       it('returns oldSiteDetail value for lastAccessedTime when newSite value is undefined', function () {
@@ -425,8 +433,46 @@ describe('siteUtil', function () {
         const processedSites = siteUtil.addSite(Immutable.fromJS(sites), newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
         const expectedSiteKey = siteUtil.getSiteKey(expectedSiteDetail)
         let expectedSites = {}
-        expectedSites[expectedSiteKey] = expectedSiteDetail.toJS()
+        expectedSites[expectedSiteKey] = expectedSiteDetail.set('objectId', undefined).toJS()
         assert.deepEqual(processedSites.toJS(), expectedSites)
+      })
+      it('sets an objectId when syncCallback is provided', function () {
+        mockery.enable({
+          warnOnReplace: false,
+          warnOnUnregistered: false,
+          useCleanCache: true
+        })
+        mockery.registerMock('./stores/appStoreRenderer', {
+          get state () {
+            return Immutable.fromJS({
+              settings: {
+                [settings.SYNC_ENABLED]: true
+              }
+            })
+          }
+        })
+        const oldSiteDetail = Immutable.fromJS({
+          lastAccessedTime: 123,
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1,
+          title: 'old title',
+          customTitle: 'old customTitle'
+        })
+        const newSiteDetail = Immutable.fromJS({
+          lastAccessedTime: 456,
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1,
+          title: 'new title',
+          customTitle: 'new customTitle'
+        })
+        const siteKey = siteUtil.getSiteKey(oldSiteDetail)
+        const sites = Immutable.fromJS({
+          [siteKey]: oldSiteDetail
+        })
+        const processedSites = siteUtil.addSite(sites, newSiteDetail, siteTags.BOOKMARK, oldSiteDetail, () => {})
+        mockery.deregisterMock('./stores/appStoreRenderer')
+        mockery.disable()
+        assert.equal(processedSites.getIn([siteKey, 'objectId']).size, 16)
       })
     })
   })
@@ -1104,6 +1150,24 @@ describe('siteUtil', function () {
       })
       assert.equal(siteUtil.isHistoryEntry(siteDetail), false)
     })
+  })
+
+  describe('getFolder', function () {
+    const folder = Immutable.fromJS({
+      customTitle: 'folder1',
+      folderId: 2,
+      parentFolderId: 0,
+      tags: [siteTags.BOOKMARK_FOLDER]
+    })
+    const bookmark = Immutable.fromJS({
+      location: testUrl1,
+      title: 'sample',
+      parentFolderId: 2
+    })
+    const sites = Immutable.fromJS([folder, bookmark])
+    const result = siteUtil.getFolder(sites, bookmark.get('parentFolderId'))
+    assert.deepEqual(result[0], 0)
+    assert.deepEqual(result[1], folder)
   })
 
   describe('getFolders', function () {

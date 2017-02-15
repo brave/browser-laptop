@@ -73,7 +73,7 @@ Closes an open tab
 
 
 
-### addSite(siteDetail, tag, originalSiteDetail, destinationIsParent) 
+### addSite(siteDetail, tag, originalSiteDetail, destinationIsParent, skipSync) 
 
 Adds a site to the site list
 
@@ -88,6 +88,8 @@ Adds a site to the site list
 **destinationIsParent**: `boolean`, Whether or not the destinationDetail should be considered the new parent.
   The details of the old entries will be modified if this is set, otherwise only the tag will be added.
 
+**skipSync**: `boolean`, Set true if a site isn't eligible for Sync (e.g. if addSite was triggered by Sync)
+
 
 
 ### clearHistory() 
@@ -96,7 +98,7 @@ Clears history (all sites without tags). Indirectly called by appActions.onClear
 
 
 
-### removeSite(siteDetail, tag) 
+### removeSite(siteDetail, tag, skipSync) 
 
 Removes a site from the site list
 
@@ -105,6 +107,8 @@ Removes a site from the site list
 **siteDetail**: `Object`, Properties of the site in question
 
 **tag**: `string`, A tag to associate with the site. e.g. bookmarks.
+
+**skipSync**: `boolean`, Set true if a site isn't eligible for Sync (e.g. if this removal was triggered by Sync)
 
 
 
@@ -287,7 +291,7 @@ Changes an application level setting
 
 
 
-### changeSiteSetting(hostPattern, key, value, temp) 
+### changeSiteSetting(hostPattern, key, value, temp, skipSync) 
 
 Change a hostPattern's config
 
@@ -302,9 +306,11 @@ Change a hostPattern's config
 **temp**: `boolean`, Whether to change temporary or persistent
   settings. defaults to false (persistent).
 
+**skipSync**: `boolean`, Set true if a site isn't eligible for Sync (e.g. if addSite was triggered by Sync)
 
 
-### removeSiteSetting(hostPattern, key, temp) 
+
+### removeSiteSetting(hostPattern, key, temp, skipSync) 
 
 Removes a site setting
 
@@ -316,6 +322,8 @@ Removes a site setting
 
 **temp**: `boolean`, Whether to change temporary or persistent
   settings. defaults to false (persistent).
+
+**skipSync**: `boolean`, Set true if a site isn't eligible for Sync (e.g. if addSite was triggered by Sync)
 
 
 
@@ -649,6 +657,34 @@ Dispatches a message when a tab is being cloned
 **tabId**: `number`, The tabId of the tab to clone
 
 **options**: `object`, object containing options such as acive, back, and forward booleans
+
+
+
+### setObjectId(objectId, objectPath) 
+
+Dispatches a message to set objectId for a syncable object.
+
+**Parameters**
+
+**objectId**: `Array.&lt;number&gt;`, Dispatches a message to set objectId for a syncable object.
+
+**objectPath**: `Array.&lt;string&gt;`, Dispatches a message to set objectId for a syncable object.
+
+
+
+### saveSyncInitData(seed, deviceId, lastFetchTimestamp, seedQr) 
+
+Dispatches a message when sync init data needs to be saved
+
+**Parameters**
+
+**seed**: `Array.&lt;number&gt; | null`, Dispatches a message when sync init data needs to be saved
+
+**deviceId**: `Array.&lt;number&gt; | null`, Dispatches a message when sync init data needs to be saved
+
+**lastFetchTimestamp**: `number | null`, Dispatches a message when sync init data needs to be saved
+
+**seedQr**: `string`, Dispatches a message when sync init data needs to be saved
 
 
 

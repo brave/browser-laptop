@@ -576,6 +576,16 @@ var exports = {
     })
 
     /**
+     * Sets the sync init data
+     */
+    this.app.client.addCommand('saveSyncInitData', function (seed, deviceId, lastFetchTimestamp, qr) {
+      return this
+        .execute(function (seed, deviceId, lastFetchTimestamp, qr) {
+          return devTools('appActions').saveSyncInitData(seed, deviceId, lastFetchTimestamp, qr)
+        }, seed, deviceId, lastFetchTimestamp, qr).then((response) => response.value)
+    })
+
+    /**
      * Changes a site setting
      *
      * @param {string} key - the setting key to change

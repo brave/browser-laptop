@@ -81,6 +81,7 @@ const contentSettings = require('../js/state/contentSettings')
 const privacy = require('../js/state/privacy')
 const async = require('async')
 const settings = require('../js/constants/settings')
+const sync = require('./sync')
 const BookmarksExporter = require('./browser/bookmarksExporter')
 
 app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferHtmlOverPlugins')
@@ -414,6 +415,7 @@ app.on('ready', () => {
     delete initialState.perWindowState
     appActions.setState(Immutable.fromJS(initialState))
     Menu.init(initialState, null)
+    sync.init(initialState.sync || {})
     return loadedPerWindowState
   }).then((loadedPerWindowState) => {
     contentSettings.init()

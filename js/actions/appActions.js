@@ -116,14 +116,16 @@ const appActions = {
    * @param {string} originalSiteDetail - If specified, the original site detail to edit / overwrite.
    * @param {boolean} destinationIsParent - Whether or not the destinationDetail should be considered the new parent.
    *   The details of the old entries will be modified if this is set, otherwise only the tag will be added.
+   * @param {boolean} skipSync - Set true if a site isn't eligible for Sync (e.g. if addSite was triggered by Sync)
    */
-  addSite: function (siteDetail, tag, originalSiteDetail, destinationDetail) {
+  addSite: function (siteDetail, tag, originalSiteDetail, destinationDetail, skipSync) {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_ADD_SITE,
       siteDetail,
       tag,
       originalSiteDetail,
-      destinationDetail
+      destinationDetail,
+      skipSync
     })
   },
 
@@ -140,12 +142,14 @@ const appActions = {
    * Removes a site from the site list
    * @param {Object} siteDetail - Properties of the site in question
    * @param {string} tag - A tag to associate with the site. e.g. bookmarks.
+   * @param {boolean} skipSync - Set true if a site isn't eligible for Sync (e.g. if this removal was triggered by Sync)
    */
-  removeSite: function (siteDetail, tag) {
+  removeSite: function (siteDetail, tag, skipSync) {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_REMOVE_SITE,
       siteDetail,
-      tag
+      tag,
+      skipSync
     })
   },
 
@@ -366,14 +370,16 @@ const appActions = {
    * @param {string|number} value - The value to update to
    * @param {boolean} temp - Whether to change temporary or persistent
    *   settings. defaults to false (persistent).
+   * @param {boolean} skipSync - Set true if a site isn't eligible for Sync (e.g. if addSite was triggered by Sync)
    */
-  changeSiteSetting: function (hostPattern, key, value, temp) {
+  changeSiteSetting: function (hostPattern, key, value, temp, skipSync) {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_CHANGE_SITE_SETTING,
       hostPattern,
       key,
       value,
-      temporary: temp || false
+      temporary: temp || false,
+      skipSync
     })
   },
 
@@ -383,13 +389,15 @@ const appActions = {
    * @param {string} key - The config key to update
    * @param {boolean} temp - Whether to change temporary or persistent
    *   settings. defaults to false (persistent).
+   * @param {boolean} skipSync - Set true if a site isn't eligible for Sync (e.g. if addSite was triggered by Sync)
    */
-  removeSiteSetting: function (hostPattern, key, temp) {
+  removeSiteSetting: function (hostPattern, key, temp, skipSync) {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_REMOVE_SITE_SETTING,
       hostPattern,
       key,
-      temporary: temp || false
+      temporary: temp || false,
+      skipSync
     })
   },
 
@@ -800,8 +808,37 @@ const appActions = {
       tabId,
       options
     })
-  }
+  },
 
+  /**
+   * Dispatches a message to set objectId for a syncable object.
+   * @param {Array.<number>} objectId
+   * @param {Array.<string>} objectPath
+   */
+  setObjectId: function (objectId, objectPath) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_SET_OBJECT_ID,
+      objectId,
+      objectPath
+    })
+  },
+
+  /**
+   * Dispatches a message when sync init data needs to be saved
+   * @param {Array.<number>|null} seed
+   * @param {Array.<number>|null} deviceId
+   * @param {number|null} lastFetchTimestamp
+   * @param {string=} seedQr
+   */
+  saveSyncInitData: function (seed, deviceId, lastFetchTimestamp, seedQr) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_SAVE_SYNC_INIT_DATA,
+      seed,
+      deviceId,
+      lastFetchTimestamp,
+      seedQr
+    })
+  }
 }
 
 module.exports = appActions

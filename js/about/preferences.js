@@ -17,6 +17,7 @@ const Button = require('../components/button')
 
 // Tabs
 const PaymentsTab = require('../../app/renderer/components/preferences/paymentsTab')
+const SyncTab = require('../../app/renderer/components/preferences/syncTab')
 
 const cx = require('../lib/classSet')
 const ledgerExportUtil = require('../../app/common/lib/ledgerExportUtil')
@@ -785,14 +786,6 @@ class TabsTab extends ImmutableComponent {
   }
 }
 
-class SyncTab extends ImmutableComponent {
-  render () {
-    return <div>
-      Sync settings coming soon
-    </div>
-  }
-}
-
 class SitePermissionsPage extends React.Component {
   hasEntryForPermission (name) {
     return this.props.siteSettings.some((value) => {
@@ -1224,8 +1217,7 @@ class PreferenceNavigation extends ImmutableComponent {
         onClick={this.props.changeTab.bind(null, preferenceTabs.PAYMENTS)}
         selected={this.props.preferenceTab === preferenceTabs.PAYMENTS}
       />
-      <PreferenceNavigationButton icon='fa-refresh'
-        className='notImplemented'
+      <PreferenceNavigationButton icon='fa-brave-sync'
         dataL10nId='sync'
         onClick={this.props.changeTab.bind(null, preferenceTabs.SYNC)}
         selected={this.props.preferenceTab === preferenceTabs.SYNC}
@@ -1251,6 +1243,12 @@ class AboutPreferences extends React.Component {
       ledgerBackupOverlayVisible: false,
       ledgerRecoveryOverlayVisible: false,
       addFundsOverlayVisible: false,
+      syncStartOverlayVisible: false,
+      syncAddOverlayVisible: false,
+      syncNewDeviceOverlayVisible: false,
+      syncQRVisible: false,
+      syncPassphraseVisible: false,
+      syncRestoreEnabled: false,
       preferenceTab: this.tabFromCurrentHash,
       hintNumber: this.getNextHintNumber(),
       languageCodes: Immutable.Map(),
@@ -1259,6 +1257,7 @@ class AboutPreferences extends React.Component {
       siteSettings: Immutable.Map(),
       braveryDefaults: Immutable.Map(),
       ledgerData: Immutable.Map(),
+      syncData: Immutable.Map(),
       firstRecoveryKey: '',
       secondRecoveryKey: ''
     }
@@ -1268,6 +1267,9 @@ class AboutPreferences extends React.Component {
     })
     ipc.on(messages.LEDGER_UPDATED, (e, ledgerData) => {
       this.setState({ ledgerData: Immutable.fromJS(ledgerData) })
+    })
+    ipc.on(messages.SYNC_UPDATED, (e, syncData) => {
+      this.setState({ syncData: Immutable.fromJS(syncData) })
     })
     ipc.on(messages.SITE_SETTINGS_UPDATED, (e, siteSettings) => {
       this.setState({ siteSettings: Immutable.fromJS(siteSettings || {}) })
@@ -1281,6 +1283,7 @@ class AboutPreferences extends React.Component {
     ipc.send(messages.REQUEST_LANGUAGE)
     this.onChangeSetting = this.onChangeSetting.bind(this)
     this.updateTabFromAnchor = this.updateTabFromAnchor.bind(this)
+    this.enableSyncRestore = this.enableSyncRestore.bind(this)
   }
 
   hideAdvancedOverlays () {
@@ -1290,6 +1293,12 @@ class AboutPreferences extends React.Component {
       ledgerRecoveryOverlayVisible: false
     })
     this.forceUpdate()
+  }
+
+  enableSyncRestore (enabled) {
+    this.setState({
+      syncRestoreEnabled: enabled
+    })
   }
 
   componentDidMount () {
@@ -1387,6 +1396,7 @@ class AboutPreferences extends React.Component {
     const braveryDefaults = this.state.braveryDefaults
     const languageCodes = this.state.languageCodes
     const ledgerData = this.state.ledgerData
+    const syncData = this.state.syncData
     switch (this.state.preferenceTab) {
       case preferenceTabs.GENERAL:
         tab = <GeneralTab settings={settings} onChangeSetting={this.onChangeSetting} languageCodes={languageCodes} />
@@ -1398,7 +1408,40 @@ class AboutPreferences extends React.Component {
         tab = <TabsTab settings={settings} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.SYNC:
-        tab = <SyncTab settings={settings} onChangeSetting={this.onChangeSetting} />
+        tab = <SyncTab
+          settings={settings}
+          onChangeSetting={this.onChangeSetting}
+          enableSyncRestore={this.enableSyncRestore}
+          syncRestoreEnabled={this.state.syncRestoreEnabled}
+          syncData={syncData}
+          showOverlay={this.setOverlayVisible.bind(this, true)}
+          hideOverlay={this.setOverlayVisible.bind(this, false)}
+          syncStartOverlayVisible={this.state.syncStartOverlayVisible}
+          syncAddOverlayVisible={this.state.syncAddOverlayVisible}
+          syncNewDeviceOverlayVisible={this.state.syncNewDeviceOverlayVisible}
+          syncQRVisible={this.state.syncQRVisible}
+          showQR={() => {
+            this.setState({
+              syncQRVisible: true
+            })
+          }}
+          hideQR={() => {
+            this.setState({
+              syncQRVisible: false
+            })
+          }}
+          syncPassphraseVisible={this.state.syncPassphraseVisible}
+          showPassphrase={() => {
+            this.setState({
+              syncPassphraseVisible: true
+            })
+          }}
+          hidePassphrase={() => {
+            this.setState({
+              syncPassphraseVisible: false
+            })
+          }}
+        />
         break
       case preferenceTabs.SHIELDS:
         tab = <ShieldsTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />

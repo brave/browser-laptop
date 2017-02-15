@@ -151,6 +151,9 @@ body {
         &.i-server {
           background: url('../../img/advanced.svg') 0 0 / contain no-repeat;
         }
+        &.i-brave-sync {
+          background: url('../../img/sync.svg') 0 0 / contain no-repeat;
+        }
       }
 
     }
@@ -1555,4 +1558,76 @@ table.sortableTable {
     margin-left: 5px;
     cursor: pointer;
   }
+}
+
+.syncContainer {
+  .modal {
+    textarea {
+      width: 80%;
+      height: 100px;
+      font-size: 18px;
+      font-family: monospace;
+    }
+    li {
+      margin: 1em;
+    }
+    .settingsListContainer {
+      margin-bottom: 1.5em;
+    }
+    .dialog-body, .dialog-footer {
+      padding-left: 50px;
+      padding-right: 50px;
+    }
+    .dialog-footer {
+      margin-top: 1.5em;
+      padding-bottom: 2em;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+  }
+  .browserButton + .browserButton {
+    margin-left: 0.75em;
+  }
+  .setupContent {
+    margin: 1em 0;
+  }
+  .deviceNameInput {
+    width: 50%;
+  }
+  .device {
+    background-color: @lightGray;
+    border-radius: @borderRadiusUIbox;
+    color: @mediumGray;
+    display: table;
+    line-height: 1.8em;
+    margin: 1em 0;
+    padding: 0.5em 1em;
+    width: 500px;
+    & > div, .settingItem {
+      display: table-cell;
+      vertical-align: middle;
+    }
+    #syncEnableSwitch {
+      width: 50%;
+    }
+    .syncDeviceLabel {
+      font-size: 0.9em;
+      margin: 0;
+    }
+    .deviceName {
+      margin-bottom: 0.5em;
+    }
+  }
+}
+
+#syncPassphrase {
+  margin: 1em;
+  color: #ff0400;
+  font-size: 15px;
+  font-family: monospace;
+}
+
+#syncQR {
+  margin: 1em;
 }
