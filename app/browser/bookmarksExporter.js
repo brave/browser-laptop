@@ -58,13 +58,10 @@ function createBookmarkArray (sites, parentFolderId, first = true, depth = 1) {
       payload.push(`${indentNext}<DT><A HREF="${site.get('location')}">${title}</A>`)
     } else if (siteUtil.isFolder(site)) {
       const folderId = site.get('folderId')
-      const submenuItems = sites.filter((bookmark) => bookmark.get('parentFolderId') === folderId)
 
-      if (submenuItems.count() > 0) {
-        title = site.get('customTitle') || site.get('title')
-        payload.push(`${indentNext}<DT><H3>${title}</H3>`)
-        payload = payload.concat(createBookmarkArray(sites, folderId, true, (depth + 1)))
-      }
+      title = site.get('customTitle') || site.get('title')
+      payload.push(`${indentNext}<DT><H3>${title}</H3>`)
+      payload = payload.concat(createBookmarkArray(sites, folderId, true, (depth + 1)))
     }
   })
 
