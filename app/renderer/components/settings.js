@@ -4,6 +4,7 @@
 
 const React = require('react')
 const ImmutableComponent = require('../../../js/components/immutableComponent')
+const {StyleSheet, css} = require('aphrodite')
 const aboutActions = require('../../../js/about/aboutActions')
 const getSetting = require('../../../js/settings').getSetting
 const {changeSetting} = require('../lib/settingsUtil')
@@ -64,11 +65,17 @@ class SettingCheckbox extends ImmutableComponent {
         disabled={this.props.disabled}
         onClick={this.onClick}
         checkedOn={this.props.checked !== undefined ? this.props.checked : getSetting(this.props.prefKey, this.props.settings)} />
-      <label data-l10n-id={this.props.dataL10nId} htmlFor={this.props.prefKey} />
+      <label className={css(this.props.small && settingCheckboxStyles.label)} data-l10n-id={this.props.dataL10nId} htmlFor={this.props.prefKey} />
       {this.props.options}
     </div>
   }
 }
+
+const settingCheckboxStyles = StyleSheet.create({
+  label: {
+    fontSize: 'smaller'
+  }
+})
 
 class SiteSettingCheckbox extends ImmutableComponent {
   constructor () {
