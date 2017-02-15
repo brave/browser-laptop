@@ -88,7 +88,8 @@ const appConstants = {
   APP_TAB_TOGGLE_DEV_TOOLS: _,
   APP_TAB_CLONED: _,
   APP_SET_OBJECT_ID: _,
-  APP_SAVE_SYNC_INIT_DATA: _
+  APP_SAVE_SYNC_INIT_DATA: _,
+  APP_ADD_NOSCRIPT_EXCEPTIONS: _
 }
 
 module.exports = mapValuesByKeys(appConstants)

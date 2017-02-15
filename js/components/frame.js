@@ -283,6 +283,10 @@ class Frame extends ImmutableComponent {
     if (activeSiteSettings.get('noScript') === 0) {
       appActions.removeSiteSetting(origin, 'noScript', this.props.isPrivate)
     }
+    const noScriptExceptions = activeSiteSettings.get('noScriptExceptions')
+    if (noScriptExceptions) {
+      appActions.noScriptExceptionsAdded(origin, noScriptExceptions.filter((value, host) => value !== 0))
+    }
   }
 
   componentWillUnmount () {

@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const Immutable = require('immutable')
 const ImmutableComponent = require('./immutableComponent')
 const Dialog = require('./dialog')
 const Button = require('./button')
@@ -10,11 +11,37 @@ const appActions = require('../actions/appActions')
 const siteUtil = require('../state/siteUtil')
 const ipc = require('electron').ipcRenderer
 const messages = require('../constants/messages')
+const urlParse = require('url').parse
+
+class NoScriptCheckbox extends ImmutableComponent {
+  toggleCheckbox (e) {
+    this.checkbox.checked = !this.checkbox.checked
+    e.stopPropagation()
+  }
+
+  get id () {
+    return `checkbox-for-${this.props.origin}`
+  }
+
+  render () {
+    return <div className='noScriptCheckbox' id={this.id}>
+      <input type='checkbox' onClick={(e) => { e.stopPropagation() }}
+        ref={(node) => { this.checkbox = node }} defaultChecked
+        origin={this.props.origin} />
+      <label htmlFor={this.id}
+        onClick={this.toggleCheckbox.bind(this)}>{this.props.origin}</label>
+    </div>
+  }
+}
 
 class NoScriptInfo extends ImmutableComponent {
-  get numberBlocked () {
+  get blockedOrigins () {
     const blocked = this.props.frameProps.getIn(['noScript', 'blocked'])
-    return blocked ? blocked.size : 0
+    if (blocked && blocked.size) {
+      return new Immutable.Set(blocked.map(siteUtil.getOrigin))
+    } else {
+      return new Immutable.Set()
+    }
   }
 
   get origin () {
@@ -25,22 +52,47 @@ class NoScriptInfo extends ImmutableComponent {
     return this.props.frameProps.get('isPrivate')
   }
 
+  unselectAll (e) {
+    e.stopPropagation()
+    let checkboxes = this.checkboxes.querySelectorAll('input')
+    if (!checkboxes) {
+      return
+    }
+    checkboxes.forEach((box) => {
+      box.checked = false
+    })
+  }
+
   reload () {
     ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD)
   }
 
-  onAllow (setting) {
+  onAllow (setting, e) {
     if (!this.origin) {
       return
     }
-    appActions.changeSiteSetting(this.origin, 'noScript', setting)
-    this.reload()
+    if (setting === false) {
+      appActions.changeSiteSetting(this.origin, 'noScript', setting)
+      this.reload()
+    } else {
+      let checkedOrigins = new Immutable.Map()
+      this.checkboxes.querySelectorAll('input').forEach((box) => {
+        const origin = box.getAttribute('origin')
+        if (origin) {
+          checkedOrigins = checkedOrigins.set(origin, box.checked ? setting : false)
+        }
+      })
+      if (checkedOrigins.size) {
+        appActions.noScriptExceptionsAdded(this.origin, checkedOrigins)
+        this.reload()
+      }
+    }
   }
 
   get buttons () {
     if (!this.props.noScriptGlobalEnabled) {
       // NoScript is not turned on globally
-      return <div><Button l10nId='allow' className='actionButton'
+      return <div><Button l10nId='allowScripts' className='actionButton'
         onClick={this.onAllow.bind(this, false)} /></div>
     } else {
       return <div>
@@ -48,26 +100,35 @@ class NoScriptInfo extends ImmutableComponent {
           onClick={this.onAllow.bind(this, 0)} />
         {this.isPrivate
           ? null
-          : <div>
-            <div><Button l10nId='allowScriptsTemp' className='subtleButton'
-              onClick={this.onAllow.bind(this, 1)} /></div>
-            <div><Button l10nId='allow' className='subtleButton'
-              onClick={this.onAllow.bind(this, false)} /></div>
-          </div>}
+          : <span><Button l10nId='allowScriptsTemp' className='subtleButton'
+            onClick={this.onAllow.bind(this, 1)} /></span>
+        }
       </div>
     }
   }
 
   render () {
+    if (!this.origin) {
+      return null
+    }
     const l10nArgs = {
-      numberBlocked: this.numberBlocked,
-      site: this.props.frameProps.get('location') || 'this page'
+      site: urlParse(this.props.frameProps.get('location')).host
     }
     return <Dialog onHide={this.props.onHide} className='noScriptInfo' isClickDismiss>
       <div className='dialogInner'>
         <div className='truncate' data-l10n-args={JSON.stringify(l10nArgs)}
-          data-l10n-id={this.numberBlocked === 1 ? 'scriptBlocked' : 'scriptsBlocked'} />
-        {this.buttons}
+          data-l10n-id={'scriptsBlocked'} />
+        {this.blockedOrigins.size
+          ? <div>
+            <div ref={(node) => { this.checkboxes = node }} className='blockedOriginsList'>
+              {this.blockedOrigins.map((origin) => <NoScriptCheckbox origin={origin} />)}
+            </div>
+            <div data-l10n-id={'unselectAll'}
+              className='clickable'
+              onClick={this.unselectAll.bind(this)} />
+            {this.buttons}
+          </div>
+          : null}
       </div>
     </Dialog>
   }
