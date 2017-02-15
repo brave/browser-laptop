@@ -11,6 +11,7 @@ require('../../less/button.less')
 require('../../less/forms.less')
 
 const {Textbox, FormTextbox, SettingTextbox, RecoveryKeyTextbox} = require('../../app/renderer/components/textbox')
+const {TextArea, DefaultTextArea} = require('../../app/renderer/components/textbox')
 const {Dropdown, FormDropdown, SettingDropdown} = require('../../app/renderer/components/dropdown')
 
 class AboutStyle extends ImmutableComponent {
@@ -64,6 +65,24 @@ class AboutStyle extends ImmutableComponent {
         <pre><code>
           const { '{RecoveryKeyTextbox}' } = require('../../app/renderer/components/textbox'){'\n'}
           &lt;RecoveryKeyTextbox />
+        </code></pre>
+      </div>
+
+      <div className='container'>
+        <h2>Plain textarea</h2>
+        <TextArea placeholder='TextArea' />
+        <pre><code>
+          const { '{TextArea}' } = require('../../app/renderer/components/textbox'){'\n'}
+          &lt;TextArea />
+        </code></pre>
+      </div>
+
+      <div className='container'>
+        <h2>Default textarea; font size is specified</h2>
+        <DefaultTextArea placeholder='DefaultTextArea' />
+        <pre><code>
+          const { '{DefaultTextArea}' } = require('../../app/renderer/components/textbox'){'\n'}
+          &lt;DefaultTextArea />
         </code></pre>
       </div>
 

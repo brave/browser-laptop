@@ -2,7 +2,7 @@
 
 const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
-const {urlInput, braveMenu, braveMenuDisabled, adsBlockedStat, adsBlockedControl, showAdsOption, blockAdsOption, braveryPanel, httpsEverywhereStat, noScriptStat, noScriptSwitch, fpSwitch, fpStat, noScriptNavButton} = require('../lib/selectors')
+const {urlInput, braveMenu, braveMenuDisabled, adsBlockedStat, adsBlockedControl, showAdsOption, blockAdsOption, braveryPanel, httpsEverywhereStat, noScriptStat, noScriptSwitch, fpSwitch, fpStat, noScriptNavButton, customFiltersInput} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 
 describe('Bravery Panel', function () {
@@ -205,8 +205,8 @@ describe('Bravery Panel', function () {
         .tabByIndex(0)
         .loadUrl(aboutAdblockURL)
         .url(aboutAdblockURL)
-        .waitForVisible('.customFiltersInput')
-        .setValue('.customFiltersInput', 'testblock.brave.com')
+        .waitForVisible(customFiltersInput)
+        .setValue(customFiltersInput, 'testblock.brave.com')
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
@@ -239,8 +239,8 @@ describe('Bravery Panel', function () {
         .tabByIndex(0)
         .loadUrl(aboutAdblockURL)
         .url(aboutAdblockURL)
-        .waitForVisible('.customFiltersInput')
-        .setValue('.customFiltersInput', 'testblock.brave.com')
+        .waitForVisible(customFiltersInput)
+        .setValue(customFiltersInput, 'testblock.brave.com')
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
           return this.getAppState().then((val) => {

@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
     boxSizing: 'border-box',
     display: 'block',
     color: globalStyles.color.darkGray,
-    fontSize: '14.5px',
+    fontSize: globalStyles.spacing.textAreaFontSize,
     height: '2.25em',
     outline: 'none',
     padding: '0.4em',

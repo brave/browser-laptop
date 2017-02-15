@@ -80,6 +80,7 @@ const globalStyles = {
     defaultSpacing: '12px',
     defaultFontSize: '13px',
     contextMenuFontSize: '14px',
+    textAreaFontSize: '14.5px',
     dragSpacing: '50px',
     switchHeight: '16px',
     switchWidth: '45px',

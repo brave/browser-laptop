@@ -11,6 +11,7 @@ const getSetting = require('../settings').getSetting
 const aboutActions = require('./aboutActions')
 const ImmutableComponent = require('../components/immutableComponent')
 const SwitchControl = require('../components/switchControl')
+const {DefaultTextArea} = require('../../app/renderer/components/textbox')
 
 const ipc = window.chrome.ipcRenderer
 
@@ -90,10 +91,10 @@ class AboutAdBlock extends React.Component {
             </div>
             <h3 data-l10n-id='customFilters' />
             <div className='adblockSubtext' data-l10n-id='customFilterDescription' />
-            <textarea
+            <DefaultTextArea
               onChange={this.onChangeCustomFilters}
               value={getSetting(ADBLOCK_CUSTOM_RULES, this.state.settings) || ''}
-              className='customFiltersInput'
+              data-test-id='customFiltersInput'
               cols='100'
               rows='10'
               spellCheck='false' />
