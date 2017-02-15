@@ -107,7 +107,8 @@ const globalStyles = {
     aboutPageSectionPadding: '24px',
     defaultTabPadding: '0 4px',
     defaultIconPadding: '2px',
-    iconSize: '16px'
+    iconSize: '16px',
+    dialogTopOffset: '30px'
   },
   shadow: {
     switchShadow: 'inset 0 1px 4px rgba(0, 0, 0, 0.35)',

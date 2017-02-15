@@ -6,7 +6,7 @@ const {StyleSheet} = require('aphrodite')
 const globalStyles = require('./global')
 
 const styles = StyleSheet.create({
-  'formControl': {
+  formControl: {
     background: 'white',
     border: `solid 1px ${globalStyles.color.black20}`,
     borderRadius: globalStyles.radius.borderRadius,
@@ -19,6 +19,18 @@ const styles = StyleSheet.create({
     outline: 'none',
     padding: '0.4em',
     width: '100%'
+  },
+
+  flyoutDialog: {
+    backgroundColor: globalStyles.color.toolbarBackground,
+    borderRadius: globalStyles.radius.borderRadius,
+    boxShadow: '2px 2px 8px #3b3b3b',
+    color: '#000',
+    fontSize: '13px',
+    padding: '10px 30px',
+    position: 'absolute',
+    textAlign: 'left',
+    top: globalStyles.spacing.dialogTopOffset
   },
 
   browserButton: {
