@@ -627,6 +627,26 @@ describe('siteUtil', function () {
         const processedSites = siteUtil.removeSite(Immutable.fromJS(sites), Immutable.fromJS(siteDetail), siteTags.PINNED)
         assert.deepEqual(processedSites.toJS(), expectedSites)
       })
+      it('remove a non exist site', function () {
+        const siteDetail = {
+          tags: [],
+          location: testUrl1,
+          lastAccessedTime: 123
+        }
+        const addedSite = {
+          tags: [],
+          location: testUrl2,
+          lastAccessedTime: 456
+        }
+        const expectedSites = {
+          'http://example.com/|0|0': addedSite
+        }
+        const siteKey = siteUtil.getSiteKey(Immutable.fromJS(addedSite))
+        let sites = {}
+        sites[siteKey] = addedSite
+        const processedSites = siteUtil.removeSite(Immutable.fromJS(sites), Immutable.fromJS(siteDetail))
+        assert.deepEqual(processedSites.toJS(), expectedSites)
+      })
     })
   })
 
