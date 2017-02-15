@@ -18,7 +18,7 @@
 - Fixed three-finger "Look up" tap. ([#1064](https://github.com/brave/browser-laptop/issues/1064))
 - Fixed tabs don't resize with window. ([#100](https://github.com/brave/browser-laptop/issues/100))
 - Upgraded to node 7.4.0. ([#7061](https://github.com/brave/browser-laptop/issues/7061))
-- Upgrade muon to 2.56.3. ([#7173](https://github.com/brave/browser-laptop/issues/7173))
+- Upgrade muon to 2.56.4. ([#7173](https://github.com/brave/browser-laptop/issues/7173))
 - Upgrade to Chromium v56.0.2924.76. ([#3681](https://github.com/brave/browser-laptop/issues/3681))
 
 
