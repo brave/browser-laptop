@@ -54,7 +54,9 @@ class AddEditBookmarkHanger extends ImmutableComponent {
       : 'bookmarkAdded'
   }
   get isFolder () {
-    return siteUtil.isFolder(this.props.currentDetail)
+    // Fake a folderId property so that the bookmark is considered a bookmark folder.
+    // This is ImmutableJS so it doesn't actually set a value, it just returns a new one.
+    return siteUtil.isFolder(this.props.currentDetail.set('folderId', 0))
   }
   setDefaultFocus () {
     this.bookmarkName.select()
@@ -98,7 +100,10 @@ class AddEditBookmarkHanger extends ImmutableComponent {
     let currentDetail = this.props.currentDetail
     let name = e.target.value
     if (typeof name === 'string' && UrlUtil.isURL(name)) {
-      name = UrlUtil.getPunycodeUrl(name)
+      const punycodeUrl = UrlUtil.getPunycodeUrl(name)
+      if (punycodeUrl.replace(/\/$/, '') !== name) {
+        name = punycodeUrl
+      }
     }
     if (currentDetail.get('title') === name && name) {
       currentDetail = currentDetail.delete('customTitle')
@@ -110,7 +115,10 @@ class AddEditBookmarkHanger extends ImmutableComponent {
   onLocationChange (e) {
     let location = e.target.value
     if (typeof location === 'string') {
-      location = UrlUtil.getPunycodeUrl(location)
+      const punycodeUrl = UrlUtil.getPunycodeUrl(location)
+      if (punycodeUrl.replace(/\/$/, '') !== location) {
+        location = punycodeUrl
+      }
     }
     const currentDetail = this.props.currentDetail.set('location', location)
     windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail, this.props.destinationDetail, this.props.shouldShowLocation, !this.props.isModal)

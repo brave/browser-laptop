@@ -54,6 +54,7 @@ const addBookmarkMenuItem = (label, siteDetail, closestDestinationDetail, isPare
       if (isParent) {
         siteDetail = siteDetail.set('parentFolderId', closestDestinationDetail && (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
       }
+      siteDetail = siteDetail.set('location', urlUtil.getLocationIfPDF(siteDetail.get('location')))
       windowActions.setBookmarkDetail(siteDetail, siteDetail, closestDestinationDetail, true)
     }
   }
@@ -474,7 +475,7 @@ function flashTemplateInit (frameProps) {
       label: locale.translation('openFlashPreferences'),
       click: () => {
         windowActions.newFrame({
-          location: 'about:preferences#security'
+          location: 'about:preferences#plugins'
         }, true)
       }
     })

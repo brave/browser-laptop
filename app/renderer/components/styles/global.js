@@ -80,6 +80,7 @@ const globalStyles = {
     defaultSpacing: '12px',
     defaultFontSize: '13px',
     contextMenuFontSize: '14px',
+    textAreaFontSize: '14.5px',
     dragSpacing: '50px',
     switchHeight: '16px',
     switchWidth: '45px',
@@ -105,7 +106,8 @@ const globalStyles = {
     sideBarWidth: '190px',
     aboutPageSectionPadding: '24px',
     defaultTabPadding: '0 4px',
-    defaultIconPadding: '0 2px',
+    defaultIconPadding: '2px',
+    iconSize: '16px',
     dialogTopOffset: '30px'
   },
   shadow: {
@@ -127,7 +129,8 @@ const globalStyles = {
     transitionFastEase: 'all 100ms ease',
     transitionSlowEase: 'all 1s ease',
     switchBGTransition: 'background-color 100ms',
-    switchNubTransition: 'right 100ms'
+    switchNubTransition: 'right 100ms',
+    tabBackgroundTransition: 'background-color 100ms linear'
   },
   zindex: {
     zindexWindowNotActive: '900',

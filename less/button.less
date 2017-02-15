@@ -144,9 +144,15 @@ span.buttonSeparator {
 .prefBody {
   .settingsList > .settingItem + button,
   .settingItem > span + button,
-  .paymentsContainer button:not(.close) {
+  .paymentsContainer button:not(.close),
+  .syncContainer button {
     font-size: 0.9rem;
     padding: 8px 20px;
+  }
+
+  .settingsList > .settingItem + button,
+  .settingItem > span + button,
+  .paymentsContainer button:not(.close) {
     margin: 0;
   }
 

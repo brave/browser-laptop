@@ -105,6 +105,9 @@ class Frame extends ImmutableComponent {
       if (!Immutable.is(prevProps.allSiteSettings, this.props.allSiteSettings)) {
         this.webview.send(messages.SITE_SETTINGS_UPDATED, this.props.allSiteSettings ? this.props.allSiteSettings.toJS() : null)
       }
+      if (this.props.sync && !Immutable.is(prevProps.sync, this.props.sync)) {
+        this.webview.send(messages.SYNC_UPDATED, this.props.sync.toJS())
+      }
       if (!Immutable.is(prevProps.braveryDefaults, this.props.braveryDefaults)) {
         this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.props.braveryDefaults.toJS())
       }
@@ -165,8 +168,11 @@ class Frame extends ImmutableComponent {
           prevProps.adblockCount !== this.props.adblockCount ||
           prevProps.httpsUpgradedCount !== this.props.httpsUpgradedCount ||
           !Immutable.is(prevProps.newTabDetail, this.props.newTabDetail)) {
+        const showEmptyPage = getSetting(settings.NEWTAB_MODE) === newTabMode.EMPTY_NEW_TAB
+        const showImages = getSetting(settings.SHOW_DASHBOARD_IMAGES) && !showEmptyPage
         this.webview.send(messages.NEWTAB_DATA_UPDATED, {
-          showEmptyPage: getSetting(settings.NEWTAB_MODE) === newTabMode.EMPTY_NEW_TAB,
+          showEmptyPage,
+          showImages,
           trackedBlockersCount: this.props.trackedBlockersCount,
           adblockCount: this.props.adblockCount,
           httpsUpgradedCount: this.props.httpsUpgradedCount,

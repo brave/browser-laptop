@@ -41,7 +41,8 @@ console.log('Writing buildConfig.js...')
 config.writeBuildConfig(
   {
     channel: env.CHANNEL,
-    BROWSER_LAPTOP_REV: require('git-rev-sync').long()
+    BROWSER_LAPTOP_REV: require('git-rev-sync').long(),
+    nodeEnv: env.NODE_ENV
   },
   'buildConfig.js'
 )

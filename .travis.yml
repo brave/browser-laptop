@@ -7,6 +7,7 @@ before_install:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
 script:
+  - npm run download-sync-client
   - npm run lint && npm test
 notifications:
   slack:

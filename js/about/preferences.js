@@ -9,15 +9,16 @@ const Immutable = require('immutable')
 const UrlUtil = require('../lib/urlutil')
 
 // Components
-const SwitchControl = require('../components/switchControl')
 const ModalOverlay = require('../components/modalOverlay')
-const {SettingsList, SettingItem} = require('../../app/renderer/components/settings')
+const {SettingsList, SettingItem, SettingCheckbox, SiteSettingCheckbox} = require('../../app/renderer/components/settings')
 const {SettingTextbox} = require('../../app/renderer/components/textbox')
 const {SettingDropdown} = require('../../app/renderer/components/dropdown')
 const Button = require('../components/button')
 
 // Tabs
 const PaymentsTab = require('../../app/renderer/components/preferences/paymentsTab')
+const SyncTab = require('../../app/renderer/components/preferences/syncTab')
+const PluginsTab = require('../../app/renderer/components/preferences/pluginsTab')
 
 const cx = require('../lib/classSet')
 const ledgerExportUtil = require('../../app/common/lib/ledgerExportUtil')
@@ -26,6 +27,9 @@ const appUrlUtil = require('../lib/appUrlUtil')
 const aboutUrls = appUrlUtil.aboutUrls
 const aboutContributionsUrl = aboutUrls.get('about:contributions')
 
+// Tabs icons
+const pluginsTabIcon = require('../../app/extensions/brave/img/preferences/browser_prefs_plugins.svg')
+
 const {getZoomValuePercentage} = require('../lib/zoom')
 
 const config = require('../constants/config')
@@ -33,11 +37,11 @@ const appConfig = require('../constants/appConfig')
 const preferenceTabs = require('../constants/preferenceTabs')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
+const {changeSetting} = require('../../app/renderer/lib/settingsUtil')
 const coinbaseCountries = require('../constants/coinbaseCountries')
 const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
 const {startsWithOption, newTabMode, bookmarksToolbarMode, tabCloseAction, fullscreenOption} = require('../../app/common/constants/settingsEnums')
 
-const WidevineInfo = require('../../app/renderer/components/widevineInfo')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
@@ -53,10 +57,8 @@ const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
 const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
 const noScript = appConfig.resourceNames.NOSCRIPT
 const flash = appConfig.resourceNames.FLASH
-const widevine = appConfig.resourceNames.WIDEVINE
 
 const isDarwin = navigator.platform === 'MacIntel'
-const isWindows = navigator.platform && navigator.platform.includes('Win')
 
 const ipc = window.chrome.ipcRenderer
 
@@ -92,91 +94,6 @@ const braveryPermissionNames = {
   'httpsEverywhere': ['boolean'],
   'fingerprintingProtection': ['boolean'],
   'noScript': ['boolean', 'number']
-}
-
-const changeSetting = (cb, key, e) => {
-  if (e.target.type === 'checkbox') {
-    cb(key, e.target.value)
-  } else {
-    let value = e.target.value
-    if (e.target.dataset && e.target.dataset.type === 'number') {
-      value = parseInt(value, 10)
-    } else if (e.target.dataset && e.target.dataset.type === 'float') {
-      value = parseFloat(value)
-    }
-    if (e.target.type === 'number') {
-      value = value.replace(/\D/g, '')
-      value = parseInt(value, 10)
-      if (Number.isNaN(value)) {
-        return
-      }
-      value = Math.min(e.target.getAttribute('max'), Math.max(value, e.target.getAttribute('min')))
-    }
-    cb(key, value)
-  }
-}
-
-class SettingCheckbox extends ImmutableComponent {
-  constructor () {
-    super()
-    this.onClick = this.onClick.bind(this)
-  }
-
-  onClick (e) {
-    if (this.props.disabled) {
-      return
-    }
-    return this.props.onChange ? this.props.onChange(e) : changeSetting(this.props.onChangeSetting, this.props.prefKey, e)
-  }
-
-  render () {
-    const props = {
-      style: this.props.style,
-      className: 'settingItem'
-    }
-    if (this.props.id) {
-      props.id = this.props.id
-    }
-    return <div {...props}>
-      <SwitchControl id={this.props.prefKey}
-        small={this.props.small}
-        disabled={this.props.disabled}
-        onClick={this.onClick}
-        checkedOn={this.props.checked !== undefined ? this.props.checked : getSetting(this.props.prefKey, this.props.settings)} />
-      <label data-l10n-id={this.props.dataL10nId} htmlFor={this.props.prefKey} />
-      {this.props.options}
-    </div>
-  }
-}
-
-class SiteSettingCheckbox extends ImmutableComponent {
-  constructor () {
-    super()
-    this.onClick = this.onClick.bind(this)
-  }
-
-  onClick (e) {
-    if (this.props.disabled || !this.props.hostPattern) {
-      return
-    } else {
-      const value = !!e.target.value
-      value === this.props.defaultValue
-        ? aboutActions.removeSiteSetting(this.props.hostPattern,
-            this.props.prefKey)
-        : aboutActions.changeSiteSetting(this.props.hostPattern,
-            this.props.prefKey, value)
-    }
-  }
-
-  render () {
-    return <div style={this.props.style} className='settingItem siteSettingItem'>
-      <SwitchControl
-        small={this.props.small}
-        disabled={this.props.disabled}
-        onClick={this.onClick}
-        checkedOn={this.props.checked} />
-    </div>
-  }
 }
 
 class LedgerTable extends ImmutableComponent {
@@ -653,7 +570,10 @@ class GeneralTab extends ImmutableComponent {
     })
     var homepageValue = getSetting(settings.HOMEPAGE, this.props.settings)
     if (typeof homepageValue === 'string') {
-      homepageValue = UrlUtil.getPunycodeUrl(homepageValue)
+      const punycodeUrl = UrlUtil.getPunycodeUrl(homepageValue)
+      if (punycodeUrl.replace(/\/$/, '') !== homepageValue) {
+        homepageValue = UrlUtil.getPunycodeUrl(homepageValue)
+      }
     }
     const homepage = homepageValue && homepageValue.trim()
     const disableShowHomeButton = !homepage || !homepage.length
@@ -859,15 +779,10 @@ class TabsTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='switchToNewTabs' prefKey={settings.SWITCH_TO_NEW_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='paintTabs' prefKey={settings.PAINT_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='showTabPreviews' prefKey={settings.SHOW_TAB_PREVIEWS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingItem dataL10nId='dashboardSettingsTitle'>
+          <SettingCheckbox dataL10nId='dashboardShowImages' prefKey={settings.SHOW_DASHBOARD_IMAGES} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        </SettingItem>
       </SettingsList>
-    </div>
-  }
-}
-
-class SyncTab extends ImmutableComponent {
-  render () {
-    return <div>
-      Sync settings coming soon
     </div>
   }
 }
@@ -1085,13 +1000,8 @@ class SecurityTab extends ImmutableComponent {
       })
     }
   }
-  onToggleWidevine (e) {
-    aboutActions.setResourceEnabled(widevine, e.target.value)
-  }
   render () {
     const lastPassPreferencesUrl = ('chrome-extension://' + extensionIds[passwordManagers.LAST_PASS] + '/tabDialog.html?dialog=preferences&cmd=open')
-    const isLinux = navigator.appVersion.indexOf('Linux') !== -1
-    const flashInstalled = getSetting(settings.FLASH_INSTALLED, this.props.settings)
 
     return <div>
       <div className='sectionTitle' data-l10n-id='privateData' />
@@ -1159,43 +1069,6 @@ class SecurityTab extends ImmutableComponent {
       <SettingsList>
         <SettingCheckbox dataL10nId='doNotTrack' prefKey={settings.DO_NOT_TRACK} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
-      <div className='sectionTitle' data-l10n-id='pluginSettings' />
-      <SettingsList>
-        <SettingCheckbox checked={flashInstalled ? this.props.braveryDefaults.get('flash') : false} dataL10nId='enableFlash' onChange={this.onToggleFlash} disabled={!flashInstalled} />
-        <div className='subtext flashText'>
-          {
-            isDarwin || isWindows
-              ? <div>
-                <span className='fa fa-info-circle flashInfoIcon' />
-                <span data-l10n-id='enableFlashSubtext' />&nbsp;
-                <span className='linkText' onClick={aboutActions.newFrame.bind(null, {
-                  location: appConfig.flash.installUrl
-                }, true)} title={appConfig.flash.installUrl}>{'Adobe'}</span>.
-              </div>
-              : <div>
-                <span className='fa fa-info-circle flashInfoIcon' />
-                <span data-l10n-id='enableFlashSubtextLinux' />
-              </div>
-          }
-          <div>
-            <span className='fa fa-info-circle flashInfoIcon' />
-            <span data-l10n-id='flashTroubleshooting' />&nbsp;
-            <span className='linkText' onClick={aboutActions.newFrame.bind(null, {
-              location: 'https://github.com/brave/browser-laptop/wiki/Flash-Support-Deprecation-Proposal#troubleshooting-flash-issues'
-            }, true)} title='https://github.com/brave/browser-laptop/wiki/Flash-Support-Deprecation-Proposal#troubleshooting-flash-issues'>{'wiki'}</span>.
-          </div>
-        </div>
-      </SettingsList>
-      { !isLinux
-      ? <div>
-        <div className='sectionTitle' data-l10n-id='widevineSection' />
-        <SettingsList>
-          <WidevineInfo newFrameAction={aboutActions.newFrame} />
-          <SettingCheckbox checked={this.props.braveryDefaults.get('widevine')} dataL10nId='enableWidevine' onChange={this.onToggleWidevine} />
-        </SettingsList>
-      </div>
-      : null
-      }
       <SitePermissionsPage siteSettings={this.props.siteSettings} names={permissionNames} />
     </div>
   }
@@ -1238,7 +1111,7 @@ class PreferenceNavigationButton extends ImmutableComponent {
           fa: true,
           [this.props.icon]: true
         })}>
-        <i className={this.props.icon.replace('fa-', 'i-')} />
+        <i className={this.props.icon ? this.props.icon.replace('fa-', 'i-') : ''} style={this.props.style} />
         <div className='tabMarkerText'
           data-l10n-id={this.props.dataL10nId} />
       </div>
@@ -1288,6 +1161,17 @@ class PreferenceNavigation extends ImmutableComponent {
         onClick={this.props.changeTab.bind(null, preferenceTabs.TABS)}
         selected={this.props.preferenceTab === preferenceTabs.TABS}
       />
+      <PreferenceNavigationButton
+        dataL10nId='plugins'
+        onClick={this.props.changeTab.bind(null, preferenceTabs.PLUGINS)}
+        selected={this.props.preferenceTab === preferenceTabs.PLUGINS}
+        style={{
+          backgroundImage: `url(${pluginsTabIcon})`,
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: '18px',
+          backgroundPosition: 'top left'
+        }}
+      />
       <PreferenceNavigationButton icon='fa-lock'
         dataL10nId='security'
         onClick={this.props.changeTab.bind(null, preferenceTabs.SECURITY)}
@@ -1303,8 +1187,7 @@ class PreferenceNavigation extends ImmutableComponent {
         onClick={this.props.changeTab.bind(null, preferenceTabs.PAYMENTS)}
         selected={this.props.preferenceTab === preferenceTabs.PAYMENTS}
       />
-      <PreferenceNavigationButton icon='fa-refresh'
-        className='notImplemented'
+      <PreferenceNavigationButton icon='fa-brave-sync'
         dataL10nId='sync'
         onClick={this.props.changeTab.bind(null, preferenceTabs.SYNC)}
         selected={this.props.preferenceTab === preferenceTabs.SYNC}
@@ -1330,6 +1213,12 @@ class AboutPreferences extends React.Component {
       ledgerBackupOverlayVisible: false,
       ledgerRecoveryOverlayVisible: false,
       addFundsOverlayVisible: false,
+      syncStartOverlayVisible: false,
+      syncAddOverlayVisible: false,
+      syncNewDeviceOverlayVisible: false,
+      syncQRVisible: false,
+      syncPassphraseVisible: false,
+      syncRestoreEnabled: false,
       preferenceTab: this.tabFromCurrentHash,
       hintNumber: this.getNextHintNumber(),
       languageCodes: Immutable.Map(),
@@ -1338,6 +1227,7 @@ class AboutPreferences extends React.Component {
       siteSettings: Immutable.Map(),
       braveryDefaults: Immutable.Map(),
       ledgerData: Immutable.Map(),
+      syncData: Immutable.Map(),
       firstRecoveryKey: '',
       secondRecoveryKey: ''
     }
@@ -1347,6 +1237,9 @@ class AboutPreferences extends React.Component {
     })
     ipc.on(messages.LEDGER_UPDATED, (e, ledgerData) => {
       this.setState({ ledgerData: Immutable.fromJS(ledgerData) })
+    })
+    ipc.on(messages.SYNC_UPDATED, (e, syncData) => {
+      this.setState({ syncData: Immutable.fromJS(syncData) })
     })
     ipc.on(messages.SITE_SETTINGS_UPDATED, (e, siteSettings) => {
       this.setState({ siteSettings: Immutable.fromJS(siteSettings || {}) })
@@ -1360,6 +1253,7 @@ class AboutPreferences extends React.Component {
     ipc.send(messages.REQUEST_LANGUAGE)
     this.onChangeSetting = this.onChangeSetting.bind(this)
     this.updateTabFromAnchor = this.updateTabFromAnchor.bind(this)
+    this.enableSyncRestore = this.enableSyncRestore.bind(this)
   }
 
   hideAdvancedOverlays () {
@@ -1369,6 +1263,12 @@ class AboutPreferences extends React.Component {
       ledgerRecoveryOverlayVisible: false
     })
     this.forceUpdate()
+  }
+
+  enableSyncRestore (enabled) {
+    this.setState({
+      syncRestoreEnabled: enabled
+    })
   }
 
   componentDidMount () {
@@ -1466,6 +1366,7 @@ class AboutPreferences extends React.Component {
     const braveryDefaults = this.state.braveryDefaults
     const languageCodes = this.state.languageCodes
     const ledgerData = this.state.ledgerData
+    const syncData = this.state.syncData
     switch (this.state.preferenceTab) {
       case preferenceTabs.GENERAL:
         tab = <GeneralTab settings={settings} onChangeSetting={this.onChangeSetting} languageCodes={languageCodes} />
@@ -1476,8 +1377,44 @@ class AboutPreferences extends React.Component {
       case preferenceTabs.TABS:
         tab = <TabsTab settings={settings} onChangeSetting={this.onChangeSetting} />
         break
+      case preferenceTabs.PLUGINS:
+        tab = <PluginsTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />
+        break
       case preferenceTabs.SYNC:
-        tab = <SyncTab settings={settings} onChangeSetting={this.onChangeSetting} />
+        tab = <SyncTab
+          settings={settings}
+          onChangeSetting={this.onChangeSetting}
+          enableSyncRestore={this.enableSyncRestore}
+          syncRestoreEnabled={this.state.syncRestoreEnabled}
+          syncData={syncData}
+          showOverlay={this.setOverlayVisible.bind(this, true)}
+          hideOverlay={this.setOverlayVisible.bind(this, false)}
+          syncStartOverlayVisible={this.state.syncStartOverlayVisible}
+          syncAddOverlayVisible={this.state.syncAddOverlayVisible}
+          syncNewDeviceOverlayVisible={this.state.syncNewDeviceOverlayVisible}
+          syncQRVisible={this.state.syncQRVisible}
+          showQR={() => {
+            this.setState({
+              syncQRVisible: true
+            })
+          }}
+          hideQR={() => {
+            this.setState({
+              syncQRVisible: false
+            })
+          }}
+          syncPassphraseVisible={this.state.syncPassphraseVisible}
+          showPassphrase={() => {
+            this.setState({
+              syncPassphraseVisible: true
+            })
+          }}
+          hidePassphrase={() => {
+            this.setState({
+              syncPassphraseVisible: false
+            })
+          }}
+        />
         break
       case preferenceTabs.SHIELDS:
         tab = <ShieldsTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />
@@ -1528,9 +1465,5 @@ module.exports = {
   AboutPreferences: <AboutPreferences />,
   BitcoinDashboard,
   LedgerTable,
-  SettingsList,
-  SettingItem,
-  SettingCheckbox,
-  PaymentHistory,
-  changeSetting
+  PaymentHistory
 }

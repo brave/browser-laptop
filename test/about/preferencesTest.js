@@ -39,6 +39,24 @@ describe('General Panel', function () {
           })
         })
     })
+    it('homepage can be backspaced', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(prefsUrl)
+        .waitForVisible(homepageInput)
+        .click(homepageInput)
+        .keys('\uE010') // send END key
+        .keys('/')
+        .keys('1')
+        .keys(Brave.keys.BACKSPACE)
+        .keys(Brave.keys.BACKSPACE)
+        .keys(Brave.keys.BACKSPACE)
+        .waitUntil(function () {
+          return this.getValue(homepageInput).then((val) => {
+            return val === 'https://www.brave.co'
+          })
+        })
+    })
   })
 
   describe('homepage multiple', function () {

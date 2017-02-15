@@ -26,6 +26,13 @@ const isBookmarkFolder = (tags) => {
     tags && typeof tags !== 'string' && tags.includes(siteTags.BOOKMARK_FOLDER)
 }
 
+const isPinnedTab = (tags) => {
+  if (!tags) {
+    return false
+  }
+  return tags.includes(siteTags.PINNED)
+}
+
 const reorderSite = (sites, order) => {
   sites = sites.map((site) => {
     const siteOrder = site.get('order')
@@ -61,10 +68,11 @@ module.exports.getSiteKey = function (siteDetail) {
     return null
   }
   const folderId = siteDetail.get('folderId')
-  const location = siteDetail.get('location')
+  let location = siteDetail.get('location')
   if (folderId) {
     return folderId.toString()
   } else if (location) {
+    location = UrlUtil.getLocationIfPDF(location)
     return location + '|' +
       (siteDetail.get('partitionNumber') || 0) + '|' +
       (siteDetail.get('parentFolderId') || 0)
@@ -86,7 +94,7 @@ module.exports.isSiteBookmarked = function (sites, siteDetail) {
 
   const site = sites.find((site) =>
     isBookmark(site.get('tags')) &&
-    site.get('location') === siteDetail.get('location') &&
+    site.get('location') === UrlUtil.getLocationIfPDF(siteDetail.get('location')) &&
     (site.get('partitionNumber') || 0) === (siteDetail.get('partitionNumber') || 0)
   )
 
@@ -121,11 +129,24 @@ module.exports.getNextFolderId = (sites) => {
   return (maxIdItem ? (maxIdItem.get('folderId') || 0) : 0) + 1
 }
 
+const mergeSiteLastAccessedTime = (oldSiteDetail, newSiteDetail, tag) => {
+  const newTime = newSiteDetail && newSiteDetail.get('lastAccessedTime')
+  const oldTime = oldSiteDetail && oldSiteDetail.get('lastAccessedTime')
+  if (!isBookmark(tag) && !isBookmarkFolder(tag)) {
+    return newTime || new Date().getTime()
+  }
+  if (newTime && newTime !== 0) {
+    return newTime
+  } else if (oldTime && oldTime !== 0) {
+    return oldTime
+  } else {
+    return 0
+  }
+}
+
 // Some details can be copied from the existing siteDetail if null
 // ex: parentFolderId, partitionNumber, and favicon
-
 const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId, order) => {
-  const siteDetailExist = newSiteDetail.get('lastAccessedTime') !== undefined || oldSiteDetail && oldSiteDetail.get('lastAccessedTime')
   let tags = oldSiteDetail && oldSiteDetail.get('tags') || new Immutable.List()
   if (tag) {
     tags = tags.toSet().add(tag).toList()
@@ -135,18 +156,12 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId, order) =>
     ? newSiteDetail.get('customTitle')
     : (newSiteDetail.get('customTitle') || oldSiteDetail && oldSiteDetail.get('customTitle'))
 
-  let lastAccessedTime
-  if (isBookmark(tag) || isBookmarkFolder(tag)) {
-    siteDetailExist
-      ? lastAccessedTime = newSiteDetail.get('lastAccessedTime') || oldSiteDetail && oldSiteDetail.get('lastAccessedTime') || 0
-      : lastAccessedTime = 0
-  } else {
-    lastAccessedTime = newSiteDetail.get('lastAccessedTime') || new Date().getTime()
-  }
+  const lastAccessedTime = mergeSiteLastAccessedTime(oldSiteDetail, newSiteDetail, tag)
 
   let site = makeImmutable({
     lastAccessedTime,
     tags,
+    objectId: newSiteDetail.get('objectId') || (oldSiteDetail ? oldSiteDetail.get('objectId') : undefined),
     title: newSiteDetail.get('title'),
     order
   })
@@ -201,9 +216,10 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId, order) =>
  * @param tag The tag to add for this site
  *   See siteTags.js for supported types. No tag means just a history item
  * @param originalSiteDetail If specified, use when searching site list
+ * @param {Function=} syncCallback specified if this change should be synced
  * @return The new sites Immutable object
  */
-module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
+module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail, syncCallback) {
   // Get tag from siteDetail object if not passed via tag param
   if (tag === undefined) {
     tag = siteDetail.getIn(['tags', 0])
@@ -238,9 +254,15 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
     sites = sites.delete(oldKey)
   }
 
+  site = site.set('location', UrlUtil.getLocationIfPDF(site.get('location')))
+
   const key = module.exports.getSiteKey(site)
   if (key === null) {
     return sites
+  }
+  if (getSetting(settings.SYNC_ENABLED) === true && syncCallback) {
+    site = module.exports.setObjectId(site)
+    syncCallback(site)
   }
   return sites.set(key, site)
 }
@@ -248,13 +270,21 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
 /**
  * Removes the specified tag from a siteDetail
  *
- * @param sites The application state's Immutable sites map
- * @param siteDetail The siteDetail to remove a tag from
- * @param reorder whether to reorder sites (default with reorder)
- * @return The new sites Immutable object
+ * @param {Immutable.Map} sites The application state's Immutable sites map
+ * @param {Immutable.Map} siteDetail The siteDetail to remove a tag from
+ * @param {string} tag
+ * @param {boolean} reorder whether to reorder sites (default with reorder)
+ * @param {Function=} syncCallback
+ * @return {Immutable.Map} The new sites Immutable object
  */
-module.exports.removeSite = function (sites, siteDetail, tag, reorder = true) {
+module.exports.removeSite = function (sites, siteDetail, tag, reorder = true, syncCallback) {
   const key = module.exports.getSiteKey(siteDetail)
+  if (!key) {
+    return sites
+  }
+  if (getSetting(settings.SYNC_ENABLED) === true && syncCallback) {
+    syncCallback(sites.getIn([key]))
+  }
 
   const tags = sites.getIn([key, 'tags'])
   if (isBookmarkFolder(tags)) {
@@ -263,16 +293,26 @@ module.exports.removeSite = function (sites, siteDetail, tag, reorder = true) {
     childSites.forEach((site) => {
       const tags = site.get('tags')
       tags.forEach((tag) => {
-        sites = module.exports.removeSite(sites, site, tag, false)
+        sites = module.exports.removeSite(sites, site, tag, false, syncCallback)
       })
     })
   }
-  if (sites.size && reorder) {
-    const order = sites.getIn([key, 'order'])
-    sites = reorderSite(sites, order)
+  if (isBookmark(tag)) {
+    if (sites.size && reorder) {
+      const order = sites.getIn([key, 'order'])
+      sites = reorderSite(sites, order)
+    }
+    return sites.delete(key)
+  } else if (isPinnedTab(tag)) {
+    let site = sites.get(key)
+    const tags = site.get('tags').filterNot((tag) => tag === siteTags.PINNED)
+    site = site.set('tags', tags)
+    return sites.set(key, site)
+  } else {
+    let site = sites.get(key)
+    site = site.set('lastAccessedTime', undefined)
+    return sites.set(key, site)
   }
-
-  return sites.delete(key)
 }
 
 /**
@@ -321,10 +361,11 @@ module.exports.isMoveAllowed = (sites, sourceDetail, destinationDetail) => {
  * @param prepend Whether the destination detail should be prepended or not, not used if destinationIsParent is true
  * @param destinationIsParent Whether the item should be moved inside of the destinationDetail.
  * @param disallowReparent If set to true, parent folder will not be set
+ * @param {Function=} syncCallback
  * @return The new sites Immutable object
  */
 module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prepend,
-  destinationIsParent, disallowReparent) {
+  destinationIsParent, disallowReparent, syncCallback) {
   if (!module.exports.isMoveAllowed(sites, sourceDetail, destinationDetail)) {
     return sites
   }
@@ -371,6 +412,9 @@ module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prep
     } else if (destinationSite.get('parentFolderId') !== sourceSite.get('parentFolderId')) {
       sourceSite = sourceSite.set('parentFolderId', destinationSite.get('parentFolderId'))
     }
+  }
+  if (getSetting(settings.SYNC_ENABLED) === true && syncCallback) {
+    syncCallback(sourceSite)
   }
   return sites.set(module.exports.getSiteKey(sourceSite), sourceSite)
 }
@@ -503,7 +547,7 @@ module.exports.isBookmark = function (siteDetail) {
  */
 module.exports.isFolder = function (siteDetail) {
   if (siteDetail) {
-    return isBookmarkFolder(siteDetail.get('tags'))
+    return isBookmarkFolder(siteDetail.get('tags')) && siteDetail.get('folderId') !== undefined
   }
   return false
 }
@@ -527,9 +571,23 @@ module.exports.isHistoryEntry = function (siteDetail) {
     if (siteDetail.get('location').startsWith('about:')) {
       return false
     }
-    return !!siteDetail.get('lastAccessedTime') && !module.exports.isFolder(siteDetail)
+    return !!siteDetail.get('lastAccessedTime') && !isBookmarkFolder(siteDetail.get('tags'))
   }
   return false
+}
+
+/**
+ * Get a folder by folderId
+ * @returns {Immutable.List.<Immutable.Map>} sites
+ * @param {number} folderId
+ * @returns {Array[<number>, <Immutable.Map>]|undefined}
+ */
+module.exports.getFolder = function (sites, folderId) {
+  const entry = sites.findEntry((site, _path) => {
+    return module.exports.isFolder(site) && site.get('folderId') === folderId
+  })
+  if (!entry) { return undefined }
+  return entry
 }
 
 /**
@@ -538,7 +596,7 @@ module.exports.isHistoryEntry = function (siteDetail) {
 module.exports.getFolders = function (sites, folderId, parentId, labelPrefix) {
   parentId = parentId || 0
   let folders = []
-  sites.forEach((site) => {
+  sites.toList().sort(module.exports.siteSort).forEach((site) => {
     if ((site.get('parentFolderId') || 0) === parentId && module.exports.isFolder(site)) {
       if (site.get('folderId') === folderId) {
         return
@@ -587,12 +645,16 @@ module.exports.filterSitesRelativeTo = function (sites, relSite) {
  * - filtering out entries which have no tags
  * - setting lastAccessedTime to null for remaining entries (bookmarks)
  * @param sites The application state's Immutable sites list.
+ * @param {function} syncCallback
  */
-module.exports.clearHistory = function (sites) {
+module.exports.clearHistory = function (sites, syncCallback) {
   let bookmarks = sites.filter((site) => site.get('tags') && site.get('tags').size > 0)
   bookmarks.forEach((site, index) => {
     if (site.get('lastAccessedTime')) {
       bookmarks = bookmarks.setIn([index, 'lastAccessedTime'], null)
+      if (getSetting(settings.SYNC_ENABLED) === true && syncCallback && site.get('objectId')) {
+        syncCallback(site.set('lastAccessedTime', null))
+      }
     }
   })
   return bookmarks
@@ -630,4 +692,20 @@ module.exports.getOrigin = function (location) {
   } else {
     return null
   }
+}
+
+/**
+ * Sets object id on a state entry.
+ * @param {Immutable.Map} item
+ * @returns {Immutable.map}
+ */
+module.exports.setObjectId = (item) => {
+  if (!item || !item.toJS) {
+    return
+  }
+  if (item.get('objectId')) {
+    return item
+  }
+  const crypto = require('crypto')
+  return item.set('objectId', new Immutable.List(crypto.randomBytes(16)))
 }

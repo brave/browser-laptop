@@ -52,7 +52,7 @@ function createBookmarkArray (sites, parentFolderId, first = true, depth = 1) {
 
   if (first) payload.push(`${indentFirst}<DL><p>`)
 
-  filteredBookmarks.forEach((site) => {
+  filteredBookmarks.toList().sort(siteUtil.siteSort).forEach((site) => {
     if (site.get('tags').includes(siteTags.BOOKMARK) && site.get('location')) {
       title = site.get('customTitle') || site.get('title') || site.get('location')
       payload.push(`${indentNext}<DT><A HREF="${site.get('location')}">${title}</A>`)

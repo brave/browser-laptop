@@ -8,15 +8,18 @@ const {aboutUrls} = require('../../lib/appUrlUtil')
 
 class FooterInfo extends ImmutableComponent {
   render () {
-    if (!this.props.backgroundImage.name) {
-      return null
-    }
     return <footer className='footerContainer'>
       <div className='copyrightNotice'>
-        <div className='copyrightCredits'>
-          <span className='photoBy' data-l10n-id='photoBy' /> <a className='copyrightOwner' href={this.props.backgroundImage.link} target='_blank'>{this.props.backgroundImage.author}</a>
-        </div>
-        <span className='photoName'>{this.props.backgroundImage.name}</span>
+        {
+          this.props.backgroundImage && this.props.backgroundImage.name
+          ? <div>
+            <div className='copyrightCredits'>
+              <span className='photoBy' data-l10n-id='photoBy' /> <a className='copyrightOwner' href={this.props.backgroundImage.link} target='_blank'>{this.props.backgroundImage.author}</a>
+            </div>
+            <span className='photoName'>{this.props.backgroundImage.name}</span>
+          </div>
+          : null
+        }
       </div>
       <nav className='shortcutsContainer'>
         <a className='shortcutIcon settingsIcon' href={aboutUrls.get('about:preferences')} data-l10n-id='preferencesPage' />

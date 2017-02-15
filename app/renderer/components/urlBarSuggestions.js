@@ -3,10 +3,10 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-
-const windowActions = require('../../../js/actions/windowActions')
 const ImmutableComponent = require('../../../js/components/immutableComponent')
 
+const UrlBarSuggestionItem = require('./urlBarSuggestionItem')
+const windowActions = require('../../../js/actions/windowActions')
 const suggestionTypes = require('../../../js/constants/suggestionTypes')
 const cx = require('../../../js/lib/classSet')
 const locale = require('../../../js/l10n')
@@ -16,6 +16,7 @@ class UrlBarSuggestions extends ImmutableComponent {
   constructor () {
     super()
     this.onSuggestionClicked = this.onSuggestionClicked.bind(this)
+    this.onMouseOver = this.onMouseOver.bind(this)
   }
 
   get activeIndex () {
@@ -63,27 +64,13 @@ class UrlBarSuggestions extends ImmutableComponent {
       items = items.concat(suggestions.map((suggestion, i) => {
         const currentIndex = index + i
         const selected = this.activeIndex === currentIndex || (!this.activeIndex && currentIndex === 0 && this.props.hasLocationValueSuffix)
-        return <li data-index={currentIndex}
-          onMouseOver={this.onMouseOver.bind(this)}
-          onClick={this.onSuggestionClicked}
-          key={`${suggestion.location}|${index + i}`}
-          ref={(node) => { selected && (this.selectedElement = node) }}
-          className={cx({
-            selected,
-            suggestionItem: true,
-            [suggestion.type]: true
-          })}>
-          {
-            suggestion.type !== suggestionTypes.TOP_SITE && suggestion.title
-            ? <div className='suggestionTitle'>{suggestion.title}</div>
-            : null
-          }
-          {
-            suggestion.type !== suggestionTypes.SEARCH && suggestion.type !== suggestionTypes.ABOUT_PAGES
-            ? <div className='suggestionLocation'>{suggestion.location}</div>
-            : null
-          }
-        </li>
+        return <UrlBarSuggestionItem
+          suggestion={suggestion}
+          selected={selected}
+          currentIndex={currentIndex}
+          i={i}
+          onMouseOver={this.onMouseOver}
+          onClick={this.onSuggestionClicked} />
       }))
       index += suggestions.size
     }
@@ -107,12 +94,6 @@ class UrlBarSuggestions extends ImmutableComponent {
   }
 
   componentDidMount () {
-  }
-
-  componentWillUpdate (nextProps) {
-    if (this.selectedElement) {
-      this.selectedElement.scrollIntoView()
-    }
   }
 
   updateSuggestions (newIndex) {

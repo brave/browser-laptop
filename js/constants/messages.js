@@ -148,6 +148,10 @@ const messages = {
   CHECK_BITCOIN_HANDLER: _,
   ADD_FUNDS_CLOSED: _,
   RENDER_URL_TO_PDF: _,
+  // Sync
+  SYNC_UPDATED: _,
+  SAVE_INIT_DATA: _,
+  RELOAD_SYNC_EXTENSION: _,
   // Torrent
   TORRENT_MESSAGE: _
 }

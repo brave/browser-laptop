@@ -64,15 +64,35 @@ describe('bookmark tests', function () {
           .waitForVisible(navigatorBookmarked)
           .click(navigatorBookmarked)
           .waitForVisible(doneButton)
-          .setValue('#bookmarkName input', 'https://www.brave.com/')
+          .setValue('#bookmarkName input', 'https://www.brave.com')
           .keys('\uE010') // send END key
           .keys('а')
-          .getValue('#bookmarkName input').should.eventually.be.equal('https://www.brave.xn--com-8cd')
-          .setValue('#bookmarkLocation input', 'https://www.brave.com/')
+          .getValue('#bookmarkName input').should.eventually.be.equal('https://www.brave.xn--com-8cd/')
+          .setValue('#bookmarkLocation input', 'https://www.brave.com')
           .keys('\uE010') // send END key
           .keys('а')
-          .getValue('#bookmarkLocation input').should.eventually.be.equal('https://www.brave.xn--com-8cd')
-          .click(doneButton)
+          .getValue('#bookmarkLocation input').should.eventually.be.equal('https://www.brave.xn--com-8cd/')
+          .click(removeButton)
+      })
+      it('custom title and location can be backspaced', function * () {
+        yield this.app.client
+          .activateURLMode()
+          .waitForVisible(navigatorBookmarked)
+          .click(navigatorBookmarked)
+          .waitForVisible(doneButton)
+          .setValue('#bookmarkName input', 'https://www.brave.com/1')
+          .keys('\uE010') // send END key
+          .keys(Brave.keys.BACKSPACE)
+          .keys(Brave.keys.BACKSPACE)
+          .keys(Brave.keys.BACKSPACE)
+          .getValue('#bookmarkName input').should.eventually.be.equal('https://www.brave.co')
+          .setValue('#bookmarkLocation input', 'https://www.brave.com/1')
+          .keys('\uE010') // send END key
+          .keys(Brave.keys.BACKSPACE)
+          .keys(Brave.keys.BACKSPACE)
+          .keys(Brave.keys.BACKSPACE)
+          .getValue('#bookmarkLocation input').should.eventually.be.equal('https://www.brave.co')
+          .click(removeButton)
       })
     })
 
@@ -199,6 +219,48 @@ describe('bookmark tests', function () {
               .waitForExist('.bookmarkText', Brave.defaultTimeout, true)
           })
         })
+      })
+    })
+    describe('bookmark pdf', function () {
+      Brave.beforeAll(this)
+
+      before(function * () {
+        yield setup(this.app.client)
+      })
+      it('load pdf', function * () {
+        const page1Url = Brave.server.url('img/test.pdf')
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitUntil(function () {
+            return this.getAppState().then((val) => {
+              return val.value.extensions['jdbefljfgobbmcidnmpjamcbhnbphjnb']
+            })
+          })
+        yield this.app.client.tabByIndex(0).url(page1Url).windowParentByUrl(page1Url)
+        yield this.app.client
+          .activateURLMode()
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => {
+              return val === page1Url
+            })
+          })
+      })
+      it('check location', function * () {
+        const page1Url = Brave.server.url('img/test.pdf')
+        yield this.app.client
+          .windowParentByUrl(page1Url)
+          .activateURLMode()
+          .waitForVisible(navigatorNotBookmarked)
+          .click(navigatorNotBookmarked)
+          .waitForVisible(doneButton)
+          .waitForBookmarkDetail(page1Url, 'test.pdf')
+          .waitForEnabled(doneButton)
+          .click(doneButton)
+          .activateURLMode()
+          .waitForVisible(navigatorBookmarked)
+          .click(navigatorBookmarked)
+          .waitForVisible(doneButton)
+          .getValue('#bookmarkLocation input').should.eventually.be.equal(page1Url)
       })
     })
   })

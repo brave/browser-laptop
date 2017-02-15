@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     height: '23px',
     marginTop: '2px',
-    transition: 'transform 200ms ease',
+    transition: `transform 200ms ease, ${globalStyles.transition.tabBackgroundTransition}`,
     left: '0',
     opacity: '1',
     width: '100%',
@@ -43,9 +43,13 @@ const styles = StyleSheet.create({
   },
 
   narrowViewPlayIndicator: {
-    borderWidth: '2px 0 0',
+    borderWidth: '2px 1px 0',
     borderStyle: 'solid',
-    borderColor: 'lightskyblue'
+    borderColor: 'lightskyblue transparent transparent'
+  },
+
+  activeTabNarrowViewPlayIndicator: {
+    borderColor: `lightskyblue ${globalStyles.color.chromeControlsBackground} ${globalStyles.color.chromeControlsBackground}`
   },
 
   tabNarrowestView: {
@@ -82,7 +86,8 @@ const styles = StyleSheet.create({
   },
 
   isPinned: {
-    padding: globalStyles.spacing.defaultIconPadding
+    paddingLeft: globalStyles.spacing.defaultIconPadding,
+    paddingRight: globalStyles.spacing.defaultIconPadding
   },
 
   active: {

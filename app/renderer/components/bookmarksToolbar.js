@@ -32,8 +32,14 @@ class BookmarkToolbarButton extends ImmutableComponent {
     this.onDragOver = this.onDragOver.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
   }
+  componentDidMount () {
+    this.bookmarkNode.addEventListener('auxclick', this.onAuxClick.bind(this))
+  }
   get activeFrame () {
     return windowStore.getFrame(this.props.activeFrameKey)
+  }
+  onAuxClick (e) {
+    this.onClick(e)
   }
   onClick (e) {
     if (!this.props.clickBookmarkItem(this.props.bookmark, e) &&

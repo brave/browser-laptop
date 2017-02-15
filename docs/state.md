@@ -223,6 +223,7 @@ AppStore
       folderId: number, // set for bookmark folders only
       lastAccessedTime: number, // datetime.getTime()
       location: string,
+      objectId: Array.<number>,
       parentFolderId: number, // set for bookmarks and bookmark folders only
       partitionNumber: number, // optionally specifies a specific session
       tags: [string], // empty, 'bookmark', 'bookmark-folder', 'pinned', or 'reader'
@@ -245,6 +246,7 @@ AppStore
       midiSysexPermission: boolean,
       notificationsPermission: boolean,
       noScript: (number|boolean), // true = block scripts, false = allow, 0 = allow once, 1 = allow until restart
+      objectId: Array.<number>,
       openExternalPermission: boolean,
       pointerLockPermission: boolean,
       protocolRegistrationPermission: boolean,
@@ -255,6 +257,13 @@ AppStore
       widevine: (number|boolean), // false = block widevine, 0 = allow once, 1 = allow always
       zoomLevel: number
     }
+  },
+  sync: {
+    lastFetchTimestamp: integer // the last time new sync records were fetched in seconds
+    deviceId: Array.<number>,
+    objectId: Array.<number>, // objectId for this sync device
+    seed: Array.<number>,
+    seedQr: string, // data URL of QR code representing the seed
   },
   tabs: [{
     // persistent properties

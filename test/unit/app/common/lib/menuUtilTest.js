@@ -255,6 +255,14 @@ describe('menuUtil tests', function () {
       const expectedResult = [{l10nLabelId: 'lol1'}]
       assert.deepEqual(result, expectedResult)
     })
+    it('checks submenus recursively', function () {
+      const template = [separator, {test: 'test'}, {label: 'lol'},
+        { label: 'submenu', submenu: [separator, {label: 'foo'}, {labelDataBind: 'zoomLevel'}] }]
+      const result = menuUtil.sanitizeTemplateItems(template)
+      const expectedResult = [{label: 'lol'}, {label: 'submenu', submenu: [{label: 'foo'}, {labelDataBind: 'zoomLevel'}]}]
+
+      assert.deepEqual(result, expectedResult)
+    })
     it('removes items which are missing label or type', function () {
       const template = [{}, {test: 'test'}, {label: 'lol'}]
       const result = menuUtil.sanitizeTemplateItems(template)

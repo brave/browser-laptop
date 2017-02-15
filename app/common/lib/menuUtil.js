@@ -151,20 +151,19 @@ const isItemValid = (currentItem, previousItem) => {
       return false
     }
   }
-  return currentItem && (typeof currentItem.l10nLabelId === 'string' || typeof currentItem.label === 'string' || currentItem.type === 'separator')
+
+  return currentItem && (typeof currentItem.l10nLabelId === 'string' || typeof currentItem.label === 'string' ||
+    currentItem.type === 'separator' || typeof currentItem.slice === 'function' || typeof currentItem.labelDataBind === 'string')
 }
 
-/**
- * Remove invalid entries from a menu template:
- * - null or falsey entries
- * - extra menu separators
- * - entries which don't have a label (or l10nLabelId) if their type is not 'separator'
- */
-module.exports.sanitizeTemplateItems = (template) => {
+const sanitizeTemplateItems = (template) => {
   const reduced = template.reduce((result, currentValue, currentIndex, array) => {
     const previousItem = result.length > 0
       ? result[result.length - 1]
       : undefined
+    if (currentValue && currentValue.submenu) {
+      currentValue.submenu = sanitizeTemplateItems(currentValue.submenu)
+    }
     if (isItemValid(currentValue, previousItem)) {
       result.push(currentValue)
     }
@@ -185,3 +184,11 @@ module.exports.sanitizeTemplateItems = (template) => {
 
   return result
 }
+
+/**
+ * Remove invalid entries from a menu template:
+ * - null or falsey entries
+ * - extra menu separators
+ * - entries which don't have a label (or l10nLabelId) if their type is not 'separator'
+ */
+module.exports.sanitizeTemplateItems = sanitizeTemplateItems

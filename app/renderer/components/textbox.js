@@ -8,6 +8,7 @@ const {StyleSheet, css} = require('aphrodite')
 const globalStyles = require('./styles/global')
 const commonStyles = require('./styles/commonStyles')
 
+// Textbox
 class Textbox extends ImmutableComponent {
   render () {
     const className = css(
@@ -40,12 +41,31 @@ class RecoveryKeyTextbox extends ImmutableComponent {
   }
 }
 
+// TextArea
+class TextArea extends ImmutableComponent {
+  render () {
+    const className = css(
+      styles.textArea,
+      this.props['data-isDefault'] && styles.isDefault
+    )
+
+    return <textarea className={className} {...this.props} />
+  }
+}
+
+class DefaultTextArea extends ImmutableComponent {
+  render () {
+    return <TextArea data-isDefault='true' {...this.props} />
+  }
+}
+
 const styles = StyleSheet.create({
-  'textbox': {
+  // Textbox
+  textbox: {
     boxSizing: 'border-box',
     width: 'auto'
   },
-  'outlineable': {
+  outlineable: {
     ':focus': {
       outlineColor: globalStyles.color.statsBlue,
       outlineOffset: '-4px',
@@ -53,16 +73,24 @@ const styles = StyleSheet.create({
       outlineWidth: '1px'
     }
   },
-  'isSettings': {
+  isSettings: {
     width: '280px'
   },
-  'readOnly': {
+  readOnly: {
     background: globalStyles.color.veryLightGray,
     boxShadow: 'none',
     outline: 'none'
   },
-  'recoveryKeys': {
+  recoveryKeys: {
     marginBottom: '20px'
+  },
+
+  // TextArea
+  textArea: {
+    padding: '5px'
+  },
+  isDefault: {
+    fontSize: globalStyles.spacing.textAreaFontSize  // Issue #6851
   }
 })
 
@@ -70,5 +98,7 @@ module.exports = {
   Textbox,
   FormTextbox,
   SettingTextbox,
-  RecoveryKeyTextbox
+  RecoveryKeyTextbox,
+  TextArea,
+  DefaultTextArea
 }

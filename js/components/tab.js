@@ -154,8 +154,11 @@ class Tab extends ImmutableComponent {
     windowActions.setTabHoverState(this.frame, true)
   }
 
+  onAuxClick (e) {
+    this.onClickTab(e)
+  }
+
   onClickTab (e) {
-    // Middle click should close tab
     if (e.button === 1) {
       this.onTabClosedWithMouse(e)
     } else {
@@ -203,6 +206,7 @@ class Tab extends ImmutableComponent {
 
   componentDidMount () {
     this.onUpdateTabSize()
+    this.tabNode.addEventListener('auxclick', this.onAuxClick.bind(this))
     window.addEventListener('resize', throttle(this.onUpdateTabSize, tabUpdateFrameRate))
   }
 
@@ -241,17 +245,18 @@ class Tab extends ImmutableComponent {
       onMouseLeave={this.onMouseLeave}>
       <div className={css(
         styles.tab,
+        // Windows specific style
+        isWindows() && styles.tabForWindows,
         this.isPinned && styles.isPinned,
         this.props.isActive && styles.active,
         this.props.tab.get('isPrivate') && styles.private,
         this.props.isActive && this.props.tab.get('isPrivate') && styles.activePrivateTab,
         this.narrowView && this.canPlayAudio && styles.narrowViewPlayIndicator,
+        this.props.isActive && this.narrowView && this.canPlayAudio && styles.activeTabNarrowViewPlayIndicator,
         this.props.isActive && this.themeColor && perPageStyles.themeColor,
         !this.isPinned && this.narrowView && styles.tabNarrowView,
         !this.isPinned && this.narrowestView && styles.tabNarrowestView,
-        !this.isPinned && this.props.tab.get('breakpoint') === 'smallest' && styles.tabMinAllowedSize,
-        // Windows specific style
-        isWindows() && styles.tabForWindows
+        !this.isPinned && this.props.tab.get('breakpoint') === 'smallest' && styles.tabMinAllowedSize
         )}
         data-test-active-tab={this.props.isActive}
         data-test-pinned-tab={this.isPinned}

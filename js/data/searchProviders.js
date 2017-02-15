@@ -136,6 +136,14 @@ module.exports = { "providers" :
         "darwin": 2274776,
         "linux": 2274778
       }
+    },
+    {
+      "name" : "Ecosia",
+      "base" : "https://www.ecosia.org/",
+      "image" : "https://www.ecosia.org/favicon.ico",
+      "search" : "https://www.ecosia.org/search?q={searchTerms}",
+      "autocomplete": "https://ac.ecosia.org/autocomplete?q={searchTerms}&type=list",
+      "shortcut" : ":e"
     }
   ]
 }
