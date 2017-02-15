@@ -9,7 +9,14 @@ const winUpdateHost = process.env.BRAVE_WIN_UPDATE_HOST || 'https://brave-downlo
 const crashURL = process.env.BRAVE_CRASH_URL || 'https://brave-laptop-updates.herokuapp.com/1/crashes'
 const adHost = process.env.AD_HOST || 'https://oip.brave.com'
 
-const isProduction = process.env.NODE_ENV === 'production'
+var buildConfig
+try {
+  buildConfig = require('./buildConfig')
+} catch (e) {
+  buildConfig = {}
+}
+
+const isProduction = buildConfig.nodeEnv === 'production'
 const {fullscreenOption} = require('../../app/common/constants/settingsEnums')
 
 module.exports = {
@@ -104,7 +111,7 @@ module.exports = {
   sync: {
     apiVersion: '0',
     serverUrl: isProduction ? 'https://sync.brave.com' : 'https://sync-staging.brave.com',
-    debug: true,
+    debug: !isProduction,
     s3Url: isProduction ? 'https://brave-sync.s3.dualstack.us-west-2.amazonaws.com' : 'https://brave-sync-staging.s3.dualstack.us-west-2.amazonaws.com',
     fetchInterval: 1000 * 60
   },
