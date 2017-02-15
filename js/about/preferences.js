@@ -14,6 +14,7 @@ const {SettingsList, SettingItem, SettingCheckbox, SiteSettingCheckbox} = requir
 const {SettingTextbox} = require('../../app/renderer/components/textbox')
 const {SettingDropdown} = require('../../app/renderer/components/dropdown')
 const Button = require('../components/button')
+const HelpfulHints = require('../../app/renderer/components/preferences/helpfulHints')
 
 // Tabs
 const PaymentsTab = require('../../app/renderer/components/preferences/paymentsTab')
@@ -1122,22 +1123,6 @@ class PreferenceNavigationButton extends ImmutableComponent {
         </div>
         : null
       }
-    </div>
-  }
-}
-
-class HelpfulHints extends ImmutableComponent {
-  render () {
-    return <div className='helpfulHints'>
-      <span className='hintsTitleContainer'>
-        <span data-l10n-id='hintsTitle' />
-        <span className='hintsRefresh fa fa-refresh'
-          onClick={this.props.refreshHint} />
-      </span>
-      <div data-l10n-id={`hint${this.props.hintNumber}`} />
-      <div className='helpfulHintsBottom'>
-        <a target='_blank' href='https://community.brave.com/' data-l10n-id='submitFeedback' />
-      </div>
     </div>
   }
 }
