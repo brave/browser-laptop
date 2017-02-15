@@ -285,7 +285,11 @@ class ContextMenu extends ImmutableComponent {
 
     switch (e.keyCode) {
       case keyCodes.ENTER:
-        e.preventDefault()
+      case KeyCodes.TAB:
+        if (e.keyCode === keyCodes.ENTER) {
+          e.preventDefault()
+        }
+
         e.stopPropagation()
         if (currentIndex !== null) {
           const action = selectedTemplate.getIn([currentIndex, 'click'])
@@ -297,7 +301,6 @@ class ContextMenu extends ImmutableComponent {
         break
 
       case KeyCodes.ESC:
-      case KeyCodes.TAB:
         windowActions.resetMenuState()
         break
 
