@@ -26,6 +26,13 @@ const isBookmarkFolder = (tags) => {
     tags && typeof tags !== 'string' && tags.includes(siteTags.BOOKMARK_FOLDER)
 }
 
+const isPinnedTab = (tags) => {
+  if (!tags) {
+    return false
+  }
+  return tags.includes(siteTags.PINNED)
+}
+
 const reorderSite = (sites, order) => {
   sites = sites.map((site) => {
     const siteOrder = site.get('order')
@@ -292,8 +299,12 @@ module.exports.removeSite = function (sites, siteDetail, tag, reorder = true, sy
       const order = sites.getIn([key, 'order'])
       sites = reorderSite(sites, order)
     }
-
     return sites.delete(key)
+  } else if (isPinnedTab(tag)) {
+    let site = sites.get(key)
+    const tags = site.get('tags').filterNot((tag) => tag === siteTags.PINNED)
+    site = site.set('tags', tags)
+    return sites.set(key, site)
   } else {
     let site = sites.get(key)
     site = site.set('lastAccessedTime', undefined)
