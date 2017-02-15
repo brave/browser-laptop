@@ -170,6 +170,7 @@ class NewTabPage extends React.Component {
   onToggleBookmark (siteProps) {
     const siteDetail = siteUtil.getDetailFromFrame(siteProps, siteTags.BOOKMARK)
     const editing = this.isBookmarked(siteProps)
+    // PDFJS will not show up in new tab
     aboutActions.setBookmarkDetail(siteDetail, siteDetail, null, editing)
   }
 
