@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.13.4](https://github.com/brave/browser-laptop/releases/v0.13.4dev)
+- Fixed crash when loading an invalid URL. ([#7256](https://github.com/brave/browser-laptop/issues/7256))
+
 ## [0.13.3](https://github.com/brave/browser-laptop/releases/v0.13.3dev)
 - Added a way to export bookmarks. ([#1002](https://github.com/brave/browser-laptop/issues/1002))
 - Added preference for background image or gradient for new tab. ([#6965](https://github.com/brave/browser-laptop/issues/6965))
