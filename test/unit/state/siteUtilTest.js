@@ -608,6 +608,25 @@ describe('siteUtil', function () {
         const processedSites = siteUtil.removeSite(Immutable.fromJS(sites), Immutable.fromJS(siteDetail))
         assert.deepEqual(processedSites.toJS(), expectedSites)
       })
+      it('remove pinned tag when unpinning', function () {
+        const siteDetail = {
+          tags: [siteTags.PINNED],
+          location: testUrl1,
+          lastAccessedTime: 123
+        }
+        const expectedSites = {
+          'https://brave.com/|0|0': {
+            tags: [],
+            location: testUrl1,
+            lastAccessedTime: 123
+          }
+        }
+        const siteKey = siteUtil.getSiteKey(Immutable.fromJS(siteDetail))
+        let sites = {}
+        sites[siteKey] = siteDetail
+        const processedSites = siteUtil.removeSite(Immutable.fromJS(sites), Immutable.fromJS(siteDetail), siteTags.PINNED)
+        assert.deepEqual(processedSites.toJS(), expectedSites)
+      })
     })
   })
 
