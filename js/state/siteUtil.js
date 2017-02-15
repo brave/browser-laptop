@@ -254,7 +254,9 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail, s
     sites = sites.delete(oldKey)
   }
 
-  site = site.set('location', UrlUtil.getLocationIfPDF(site.get('location')))
+  if (site.has('location')) {
+    site = site.set('location', UrlUtil.getLocationIfPDF(site.get('location')))
+  }
 
   const key = module.exports.getSiteKey(site)
   if (key === null) {
