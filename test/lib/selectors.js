@@ -92,5 +92,6 @@ module.exports = {
   tabsToolbar: '.tabsToolbar',
   hamburgerMenu: '.menuButton',
   contextMenu: '.contextMenu',
-  okButton: '[data-l10n-id="ok"]'
+  okButton: '[data-l10n-id="ok"]',
+  customFiltersInput: '[data-test-id="customFiltersInput"]'
 }
