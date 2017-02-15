@@ -18,6 +18,7 @@ const Button = require('../components/button')
 // Tabs
 const PaymentsTab = require('../../app/renderer/components/preferences/paymentsTab')
 const SyncTab = require('../../app/renderer/components/preferences/syncTab')
+const PluginsTab = require('../../app/renderer/components/preferences/pluginsTab')
 
 const cx = require('../lib/classSet')
 const ledgerExportUtil = require('../../app/common/lib/ledgerExportUtil')
@@ -25,6 +26,9 @@ const addExportFilenamePrefixToTransactions = ledgerExportUtil.addExportFilename
 const appUrlUtil = require('../lib/appUrlUtil')
 const aboutUrls = appUrlUtil.aboutUrls
 const aboutContributionsUrl = aboutUrls.get('about:contributions')
+
+// Tabs icons
+const pluginsTabIcon = require('../../app/extensions/brave/img/preferences/browser_prefs_plugins.svg')
 
 const {getZoomValuePercentage} = require('../lib/zoom')
 
@@ -38,7 +42,6 @@ const coinbaseCountries = require('../constants/coinbaseCountries')
 const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
 const {startsWithOption, newTabMode, bookmarksToolbarMode, tabCloseAction, fullscreenOption} = require('../../app/common/constants/settingsEnums')
 
-const WidevineInfo = require('../../app/renderer/components/widevineInfo')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
@@ -54,10 +57,8 @@ const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
 const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
 const noScript = appConfig.resourceNames.NOSCRIPT
 const flash = appConfig.resourceNames.FLASH
-const widevine = appConfig.resourceNames.WIDEVINE
 
 const isDarwin = navigator.platform === 'MacIntel'
-const isWindows = navigator.platform && navigator.platform.includes('Win')
 
 const ipc = window.chrome.ipcRenderer
 
@@ -999,13 +1000,8 @@ class SecurityTab extends ImmutableComponent {
       })
     }
   }
-  onToggleWidevine (e) {
-    aboutActions.setResourceEnabled(widevine, e.target.value)
-  }
   render () {
     const lastPassPreferencesUrl = ('chrome-extension://' + extensionIds[passwordManagers.LAST_PASS] + '/tabDialog.html?dialog=preferences&cmd=open')
-    const isLinux = navigator.appVersion.indexOf('Linux') !== -1
-    const flashInstalled = getSetting(settings.FLASH_INSTALLED, this.props.settings)
 
     return <div>
       <div className='sectionTitle' data-l10n-id='privateData' />
@@ -1073,43 +1069,6 @@ class SecurityTab extends ImmutableComponent {
       <SettingsList>
         <SettingCheckbox dataL10nId='doNotTrack' prefKey={settings.DO_NOT_TRACK} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
-      <div className='sectionTitle' data-l10n-id='pluginSettings' />
-      <SettingsList>
-        <SettingCheckbox checked={flashInstalled ? this.props.braveryDefaults.get('flash') : false} dataL10nId='enableFlash' onChange={this.onToggleFlash} disabled={!flashInstalled} />
-        <div className='subtext flashText'>
-          {
-            isDarwin || isWindows
-              ? <div>
-                <span className='fa fa-info-circle flashInfoIcon' />
-                <span data-l10n-id='enableFlashSubtext' />&nbsp;
-                <span className='linkText' onClick={aboutActions.newFrame.bind(null, {
-                  location: appConfig.flash.installUrl
-                }, true)} title={appConfig.flash.installUrl}>{'Adobe'}</span>.
-              </div>
-              : <div>
-                <span className='fa fa-info-circle flashInfoIcon' />
-                <span data-l10n-id='enableFlashSubtextLinux' />
-              </div>
-          }
-          <div>
-            <span className='fa fa-info-circle flashInfoIcon' />
-            <span data-l10n-id='flashTroubleshooting' />&nbsp;
-            <span className='linkText' onClick={aboutActions.newFrame.bind(null, {
-              location: 'https://github.com/brave/browser-laptop/wiki/Flash-Support-Deprecation-Proposal#troubleshooting-flash-issues'
-            }, true)} title='https://github.com/brave/browser-laptop/wiki/Flash-Support-Deprecation-Proposal#troubleshooting-flash-issues'>{'wiki'}</span>.
-          </div>
-        </div>
-      </SettingsList>
-      { !isLinux
-      ? <div>
-        <div className='sectionTitle' data-l10n-id='widevineSection' />
-        <SettingsList>
-          <WidevineInfo newFrameAction={aboutActions.newFrame} />
-          <SettingCheckbox checked={this.props.braveryDefaults.get('widevine')} dataL10nId='enableWidevine' onChange={this.onToggleWidevine} />
-        </SettingsList>
-      </div>
-      : null
-      }
       <SitePermissionsPage siteSettings={this.props.siteSettings} names={permissionNames} />
     </div>
   }
@@ -1152,7 +1111,7 @@ class PreferenceNavigationButton extends ImmutableComponent {
           fa: true,
           [this.props.icon]: true
         })}>
-        <i className={this.props.icon.replace('fa-', 'i-')} />
+        <i className={this.props.icon ? this.props.icon.replace('fa-', 'i-') : ''} style={this.props.style} />
         <div className='tabMarkerText'
           data-l10n-id={this.props.dataL10nId} />
       </div>
@@ -1201,6 +1160,17 @@ class PreferenceNavigation extends ImmutableComponent {
         dataL10nId='tabs'
         onClick={this.props.changeTab.bind(null, preferenceTabs.TABS)}
         selected={this.props.preferenceTab === preferenceTabs.TABS}
+      />
+      <PreferenceNavigationButton
+        dataL10nId='plugins'
+        onClick={this.props.changeTab.bind(null, preferenceTabs.PLUGINS)}
+        selected={this.props.preferenceTab === preferenceTabs.PLUGINS}
+        style={{
+          backgroundImage: `url(${pluginsTabIcon})`,
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: '18px',
+          backgroundPosition: 'top left'
+        }}
       />
       <PreferenceNavigationButton icon='fa-lock'
         dataL10nId='security'
@@ -1406,6 +1376,9 @@ class AboutPreferences extends React.Component {
         break
       case preferenceTabs.TABS:
         tab = <TabsTab settings={settings} onChangeSetting={this.onChangeSetting} />
+        break
+      case preferenceTabs.PLUGINS:
+        tab = <PluginsTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.SYNC:
         tab = <SyncTab
