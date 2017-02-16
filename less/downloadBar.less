@@ -45,7 +45,7 @@
 
       &:hover {
         height: 62px;
-        top: -24px;
+        top: -23px;
 
         .downloadInfo .downloadArrow {
           display: none;
@@ -58,6 +58,10 @@
 
       &:not(:hover) {
         .downloadActions {
+          display: none;
+        }
+
+        .deleteConfirmation {
           display: none;
         }
       }
@@ -73,6 +77,11 @@
         .downloadState {
           font-weight: bold;
         }
+      }
+
+      &.deleteConfirmationVisible:hover {
+        height: 97px;
+        top: -58px;
       }
 
       .downloadProgress {
@@ -124,6 +133,22 @@
           &:hover {
             color: @highlightBlue;
           }
+        }
+      }
+
+      .deleteConfirmation {
+        line-height: 2;
+        border-bottom: 1px solid #CCC;
+        padding: 5px 0;
+        margin-bottom: auto 0 10px 0;
+        font-size: 12px;
+
+        .confirmDeleteButton {
+          font-weight: normal;
+          padding: 1px;
+          min-width: 50px;
+          float: right;
+          margin-right: -5px;
         }
       }
     }

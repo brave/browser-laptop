@@ -776,6 +776,24 @@ const appActions = {
   },
 
   /**
+   * Shows delete confirmation bar in download item panel
+   */
+  showDownloadDeleteConfirmation: function () {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_SHOW_DOWNLOAD_DELETE_CONFIRMATION
+    })
+  },
+
+  /**
+   * Hides delete confirmation bar in download item panel
+   */
+  hideDownloadDeleteConfirmation: function () {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_HIDE_DOWNLOAD_DELETE_CONFIRMATION
+    })
+  },
+
+  /**
    * Dispatches a message when text is updated to the clipboard
    * @param {string} text - clipboard text which is copied
    */

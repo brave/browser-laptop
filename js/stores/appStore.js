@@ -885,6 +885,12 @@ const handleAppAction = (action) => {
         appState = appState.setIn(['sync', 'seedQr'], action.seedQr)
       }
       break
+    case appConstants.APP_SHOW_DOWNLOAD_DELETE_CONFIRMATION:
+      appState = appState.set('deleteConfirmationVisible', true)
+      break
+    case appConstants.APP_HIDE_DOWNLOAD_DELETE_CONFIRMATION:
+      appState = appState.set('deleteConfirmationVisible', false)
+      break
     default:
   }
 

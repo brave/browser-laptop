@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-/* global describe, before, after, it */
+/* global describe, before, beforeEach, after, it */
 
 const mockery = require('mockery')
 const {mount} = require('enzyme')
@@ -25,6 +25,7 @@ const newDownload = (state) => Immutable.fromJS({
   url: downloadUrl,
   totalBytes: 104729,
   receivedBytes: 96931,
+  deleteConfirmationVisible: false,
   state
 })
 
@@ -39,6 +40,7 @@ describe('downloadItem component', function () {
     DownloadItem = require('../../../../app/renderer/components/downloadItem')
     appActions = require('../../../../js/actions/appActions')
   })
+
   after(function () {
     mockery.disable()
   })
@@ -48,13 +50,19 @@ describe('downloadItem component', function () {
       before(function () {
         this.downloadId = uuid.v4()
         this.download = newDownload(state)
-        this.result = mount(<DownloadItem downloadId={this.downloadId} download={newDownload(state)} />)
+        this.result = mount(
+          <DownloadItem
+            downloadId={this.downloadId}
+            download={this.download}
+            deleteConfirmationVisible={this.download.get('deleteConfirmationVisible')} />
+        )
       })
 
-      const shouldProgressBarExist = [downloadStates.IN_PROGRESS, downloadStates.PAUSED].includes(state)
       it('filename exists and matches download filename', function () {
         assert.equal(this.result.find('.downloadFilename').text(), this.download.get('filename'))
       })
+
+      const shouldProgressBarExist = [downloadStates.IN_PROGRESS, downloadStates.PAUSED].includes(state)
       it(shouldProgressBarExist ? 'progress bar should exist' : 'progress bar should not exist', function () {
         assert.equal(this.result.find('.downloadProgress').length, shouldProgressBarExist ? 1 : 0)
       })
@@ -114,11 +122,39 @@ describe('downloadItem component', function () {
       })
 
       testButton('.deleteButton', [downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.COMPLETED], function (button) {
-        const spy = sinon.spy(appActions, 'downloadDeleted')
-        button.simulate('click')
-        assert(spy.withArgs(this.downloadId).calledOnce)
-        appActions.downloadDeleted.restore()
+        const spy = sinon.spy(appActions, 'showDownloadDeleteConfirmation')
+        try {
+          // Confirmation should NOT be visible by default
+          assert.equal(this.result.find('.confirmDeleteButton').length, 0)
+
+          // Clicking delete should show confirmation
+          button.simulate('click')
+          assert(spy.called)
+        } finally {
+          appActions.showDownloadDeleteConfirmation.restore()
+        }
       })
+
+      if ([downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.COMPLETED].includes(state)) {
+        describe('when delete button has been clicked', function () {
+          beforeEach(function () {
+            this.result.setProps({
+              deleteConfirmationVisible: true
+            })
+          })
+
+          testButton('.confirmDeleteButton', [downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.COMPLETED], function (button) {
+            const spy = sinon.spy(appActions, 'downloadDeleted')
+            try {
+              // Accepting confirmation should delete the item
+              button.simulate('click')
+              assert(spy.withArgs(this.downloadId).calledOnce)
+            } finally {
+              appActions.downloadDeleted.restore()
+            }
+          })
+        })
+      }
     })
   })
 })
