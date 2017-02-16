@@ -31,8 +31,10 @@ const extensionState = {
     tabId = tabId ? tabId.toString() : '-1'
     let extension = extensionState.getExtensionById(state, extensionId)
     if (extension && extension.get('browserAction')) {
+      let icons = extension.getIn(['manifest', 'icons'])
+      let defaultIcons = extension.getIn(['manifest', 'browser_action', 'default_icon'])
       let tabBrowserAction = extension.getIn(['tabs', tabId]) || Immutable.Map()
-      return extension.get('browserAction').merge(tabBrowserAction).merge({base_path: extension.get('base_path')})
+      return extension.get('browserAction').merge({icons, defaultIcons}).merge(tabBrowserAction).merge({base_path: extension.get('base_path')})
     }
     return null
   },
@@ -87,14 +89,35 @@ const extensionState = {
 
   browserActionBackgroundImage: (browserAction, tabId) => {
     tabId = tabId ? tabId.toString() : '-1'
-    if (browserAction.get('base_path')) {
-      if (browserAction.getIn(['tabs', tabId, 'path', '19']) && browserAction.getIn(['tabs', tabId, 'path', '38'])) {
-        return '-webkit-image-set(url(\'' + browserAction.get('base_path') + '/' + browserAction.getIn(['tabs', tabId, 'path', '19']) +
-          '\') 1x, url(\'' + browserAction.get('base_path') + '/' + browserAction.getIn(['tabs', tabId, 'path', '38']) + '\') 2x'
+    let basePath = browserAction.get('base_path')
+    if (basePath) {
+      let baseIcons16 = browserAction.getIn(['icons', '16'])
+      let baseIcons48 = browserAction.getIn(['icons', '48'])
+      if (baseIcons16 && baseIcons48) {
+        return `-webkit-image-set(
+                  url(${basePath}/${baseIcons16}) 1x,
+                  url(${basePath}/${baseIcons48}) 2x`
       }
-      if (browserAction.getIn(['path', '19']) && browserAction.getIn(['path', '38'])) {
-        return '-webkit-image-set(url(\'' + browserAction.get('base_path') + '/' + browserAction.getIn(['path', '19']) +
-          '\') 1x, url(\'' + browserAction.get('base_path') + '/' + browserAction.getIn(['path', '38']) + '\') 2x'
+      let baseIcons19 = browserAction.getIn(['icons', '19'])
+      let baseIcons38 = browserAction.getIn(['icons', '38'])
+      if (baseIcons19 && baseIcons38) {
+        return `-webkit-image-set(
+                  url(${basePath}/${baseIcons19}) 1x,
+                  url(${basePath}/${baseIcons38}) 2x`
+      }
+      let tabsPath19 = browserAction.getIn(['tabs', tabId, 'path', '19'])
+      let tabsPath38 = browserAction.getIn(['tabs', tabId, 'path', '38'])
+      if (tabsPath19 && tabsPath38) {
+        return `-webkit-image-set(
+                  url(${basePath}/${tabsPath19}) 1x,
+                  url(${basePath}/${tabsPath38}) 2x`
+      }
+      let basePath19 = browserAction.getIn(['path', '19'])
+      let basePath38 = browserAction.getIn(['path', '38'])
+      if (basePath19 && basePath38) {
+        return `-webkit-image-set(
+                  url(${basePath}/${basePath19}) 1x,
+                  url(${basePath}/${basePath38}) 2x`
       }
     }
     return ''
