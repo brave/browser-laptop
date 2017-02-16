@@ -427,7 +427,6 @@ const createWindowSubmenu = () => {
 
 const createHelpSubmenu = () => {
   const submenu = [
-    CommonMenu.separatorMenuItem,
     CommonMenu.submitFeedbackMenuItem(),
     {
       label: locale.translation('spreadTheWord'),
