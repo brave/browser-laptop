@@ -141,5 +141,6 @@ execute(cmds, env, (err) => {
     process.exit(1)
     return
   }
+  config.clearBuildConfig()
   console.log('done')
 })

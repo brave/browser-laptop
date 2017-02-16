@@ -16,3 +16,7 @@ exports.writeBuildConfig = (config, filename) => {
   fs.writeFileSync(path.join(__dirname, '..', '..', 'js', 'constants', filename), buf)
   return config
 }
+
+exports.clearBuildConfig = (filename) => {
+  return exports.writeBuildConfig({}, filename)
+}

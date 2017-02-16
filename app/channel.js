@@ -5,12 +5,7 @@
 'use strict'
 
 // The package npm task builds this module
-let config = {}
-try {
-  config = require('../js/constants/buildConfig')
-} catch (e) {
-  // noop here - the buildConfig may not exist in dev mode
-}
+const config = require('../js/constants/buildConfig')
 
 // The current channel is retrieved first from the environment,
 // then the buildConfig constants file and finally defaults to dev

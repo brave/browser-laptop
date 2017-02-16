@@ -3,16 +3,8 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const appConfig = require('../js/constants/appConfig')
+const buildConfig = require('../js/constants/buildConfig')
 const crashReporter = require('electron').crashReporter
-
-// buildConfig.js is built at package time, we need to require it in a try/catch
-// block to trap for it not existing yet.
-var buildConfig
-try {
-  buildConfig = require('../js/constants/buildConfig')
-} catch (e) {
-  buildConfig = {}
-}
 
 exports.init = () => {
   const options = {
