@@ -1,0 +1,8 @@
+Vagrant.configure('2') do |config|
+  vm_ram = ENV['VAGRANT_VM_RAM'] || 10000
+  vm_cpu = ENV['VAGRANT_VM_CPU'] || 10
+
+  config.vm.box = "centos/7"
+  config.vm.provision :shell, :inline => "/vagrant/init"
+
+end

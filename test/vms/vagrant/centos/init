@@ -1,0 +1,6 @@
+#!/bin/bash
+set -exu
+yum update -y
+yum install createrepo yum-utils git wget gcc clang make patch -y
+mkdir /build
+chown -R vagrant /build
