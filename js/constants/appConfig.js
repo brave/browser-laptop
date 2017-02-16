@@ -9,13 +9,7 @@ const winUpdateHost = process.env.BRAVE_WIN_UPDATE_HOST || 'https://brave-downlo
 const crashURL = process.env.BRAVE_CRASH_URL || 'https://brave-laptop-updates.herokuapp.com/1/crashes'
 const adHost = process.env.AD_HOST || 'https://oip.brave.com'
 
-var buildConfig
-try {
-  buildConfig = require('./buildConfig')
-} catch (e) {
-  buildConfig = {}
-}
-
+const buildConfig = require('./buildConfig')
 const isProduction = buildConfig.nodeEnv === 'production'
 const {fullscreenOption} = require('../../app/common/constants/settingsEnums')
 
