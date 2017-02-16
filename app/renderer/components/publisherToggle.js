@@ -23,12 +23,15 @@ class PublisherToggle extends ImmutableComponent {
     this.onAuthorizePublisher = this.onAuthorizePublisher.bind(this)
   }
 
-  get domain () {
+  get publisherId () {
+// @cezaraugusto: publisherIds aren't limited to a domain name
+// when this runs, do you think that app/extensions/brave/content/scripts/pageInformation.js has already run?
+
     return tldjs.getDomain(this.props.url)
   }
 
   get hostPattern () {
-    return `https?://${this.domain}`
+    return `https?://${this.publisherId}`
   }
 
   get hostSettings () {
@@ -40,8 +43,8 @@ class PublisherToggle extends ImmutableComponent {
 
   get validPublisherSynopsis () {
     // If session is clear then siteSettings is undefined and icon will never be shown,
-    // but synopsis may not be empty. In such cases let's check if synopsis matches current domain
-    return this.props.synopsis.map(entry => entry.get('site')).includes(this.domain)
+    // but synopsis may not be empty. In such cases let's check if synopsis matches current publisherId
+    return this.props.synopsis.map(entry => entry.get('site')).includes(this.publisherId)
   }
 
   get authorizedPublisher () {
@@ -53,9 +56,11 @@ class PublisherToggle extends ImmutableComponent {
   }
 
   get verifiedPublisher () {
+// @cezaraugusto: should call `verifiedP` in ledger.js and return the 2nd parameter of the callback
+
     let verifiedPublisher
     this.props.synopsis.map(publisher => {
-      if (publisher.get('site') === this.domain && publisher.get('verified') === true) {
+      if (publisher.get('site') === this.publisherId && publisher.get('verified') === true) {
         verifiedPublisher = !!publisher
         return false
       }
