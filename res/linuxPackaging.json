@@ -1,24 +1,44 @@
 {
+  "productName": "Brave",
+  "genericName": "Web Browser",
+  "homepage": "https://brave.com/",
   "icon": "res/app.png",
   "section": "web",
-  "categories": ["Network","WebBrowser"],
-  "mimeType": ["text/html", "text/xml", "application/xhtml_xml", "image/webp","x-scheme-handler/http", "x-scheme-handler/https", "x-scheme-handler/ftp"],
-  "requires": [ "GConf2", "libXScrnSaver" , "lsb" ],
-  "depends": [  "git",
- "gconf2",
- "gconf-service",
- "gvfs-bin",
- "libc6",
- "libcap2",
- "libgtk2.0-0",
- "libudev0 | libudev1",
- "libgcrypt11 | libgcrypt20",
- "libnotify4",
- "libnss3",
- "libxtst6",
- "libxss1",
- "python",
- "xdg-utils",
- "gir1.2-gnomekeyring-1.0",
- "libgnome-keyring0"]
+  "categories": [
+    "Network",
+    "WebBrowser"
+  ],
+  "mimeType": [
+    "text/html",
+    "text/xml",
+    "application/xhtml_xml",
+    "image/webp",
+    "x-scheme-handler/http",
+    "x-scheme-handler/https",
+    "x-scheme-handler/ftp"
+  ],
+  "requires": [
+    "GConf2",
+    "libXScrnSaver",
+    "lsb"
+  ],
+  "depends": [
+    "git",
+    "gconf2",
+    "gconf-service",
+    "gvfs-bin",
+    "libc6",
+    "libcap2",
+    "libgtk2.0-0",
+    "libudev0 | libudev1",
+    "libgcrypt11 | libgcrypt20",
+    "libnotify4",
+    "libnss3",
+    "libxtst6",
+    "libxss1",
+    "python",
+    "xdg-utils",
+    "gir1.2-gnomekeyring-1.0",
+    "libgnome-keyring0"
+  ]
 }
