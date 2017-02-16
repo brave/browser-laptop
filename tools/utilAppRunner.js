@@ -14,7 +14,7 @@ function runUtilApp (cmd, file, stdioOptions) {
   }
   cmd = cmd.split(' ')
   if (process.env.NODE_ENV === 'development') {
-    cmd.push('--user-data-dir=brave-development')
+    cmd.push('--user-data-dir=../../../brave-development')
   }
   const utilApp = proc.spawnSync('electron', [utilAppDir].concat(cmd), options)
   if (utilApp.error) {
