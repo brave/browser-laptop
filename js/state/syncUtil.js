@@ -357,6 +357,7 @@ module.exports.createSiteData = (site) => {
     location: '',
     title: '',
     customTitle: '',
+    favicon: '',
     lastAccessedTime: 0,
     creationTime: 0
   }

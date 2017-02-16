@@ -20,6 +20,7 @@ describe('syncUtil', () => {
       name: 'historySite',
       objectId,
       value: {
+        favicon: 'https://calendar.google.com/googlecalendar/images/favicon_v2014_18.ico',
         location: 'https://calendar.google.com/calendar/render#main_7',
         title: 'Google Calendar',
         customTitle: '',
