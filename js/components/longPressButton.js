@@ -72,7 +72,9 @@ class LongPressButton extends ImmutableComponent {
   }
 
   onAuxClick (e) {
-    this.onClick(e)
+    if (e.button === 1) {
+      this.onClick(e)
+    }
   }
 
   render () {
