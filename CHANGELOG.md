@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.13.5](https://github.com/brave/browser-laptop/releases/v0.13.5dev)
+- (TODO)
+
 ## [0.13.4](https://github.com/brave/browser-laptop/releases/v0.13.4dev)
 - Fixed crash when loading an invalid URL. ([#7256](https://github.com/brave/browser-laptop/issues/7256))
 
