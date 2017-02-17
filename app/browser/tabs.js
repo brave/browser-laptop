@@ -1,5 +1,6 @@
 const appActions = require('../../js/actions/appActions')
-const messages = require('../..//js/constants/messages')
+const debounce = require('../../js/lib/debounce')
+const messages = require('../../js/constants/messages')
 const Immutable = require('immutable')
 const tabState = require('../common/state/tabState')
 const {app, extensions} = require('electron')
@@ -26,11 +27,13 @@ const getTabValue = function (tabId) {
   }
 }
 
+const tabUpdated = debounce(appActions.tabUpdated.bind(appActions), 5)
+
 const updateTab = (tabId) => {
   let tabValue = getTabValue(tabId)
   if (tabValue) {
     setImmediate(() => {
-      appActions.tabUpdated(tabValue)
+      tabUpdated(tabValue)
     })
   }
 }
