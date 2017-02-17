@@ -712,6 +712,12 @@ Dispatches a message when sync init data needs to be saved
 
 
 
+### resetSyncData() 
+
+Dispatches a message to delete sync data.
+
+
+
 
 * * *
 

@@ -80,7 +80,8 @@ const sendSyncRecords = (sender, action, data) => {
 const validateAction = (action) => {
   const SYNC_ACTIONS_WITHOUT_ITEMS = [
     syncConstants.SYNC_CLEAR_HISTORY,
-    syncConstants.SYNC_CLEAR_SITE_SETTINGS
+    syncConstants.SYNC_CLEAR_SITE_SETTINGS,
+    syncConstants.SYNC_DELETE_USER
   ]
   if (SYNC_ACTIONS.includes(action.actionType) !== true) {
     return false
@@ -145,6 +146,9 @@ const doAction = (sender, action) => {
       break
     case syncConstants.SYNC_CLEAR_SITE_SETTINGS:
       sender.send(messages.DELETE_SYNC_SITE_SETTINGS)
+      break
+    case syncConstants.SYNC_DELETE_USER:
+      sender.send(messages.DELETE_SYNC_USER)
       break
     default:
   }
@@ -250,9 +254,28 @@ module.exports.onSyncReady = (isFirstRun, e) => {
  */
 module.exports.init = function (initialState) {
   const RELOAD_MESSAGE = 'reload-sync-extension'
+  const RESET_SYNC = 'reset-sync'
+  const reset = () => {
+    log('Resetting browser local sync state.')
+    appActions.changeSetting(settings.SYNC_ENABLED, false)
+    appActions.changeSetting(settings.SYNC_DEVICE_NAME, undefined)
+    appActions.resetSyncData()
+  }
   // sent by about:preferences when sync should be reloaded
   ipcMain.on(RELOAD_MESSAGE, () => {
     process.emit(RELOAD_MESSAGE)
+  })
+  // sent by about:preferences when resetting sync
+  ipcMain.on(RESET_SYNC, (e) => {
+    if (dispatcherCallback) {
+      // send DELETE_SYNC_USER to sync client. it replies with DELETED_SYNC_USER
+      dispatcherCallback({actionType: syncConstants.SYNC_DELETE_USER})
+    } else {
+      reset()
+    }
+  })
+  ipcMain.on(messages.DELETED_SYNC_USER, (e) => {
+    reset()
   })
   // GET_INIT_DATA is the first message sent by the sync-client when it starts
   ipcMain.on(messages.GET_INIT_DATA, (e) => {

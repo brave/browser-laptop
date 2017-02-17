@@ -91,6 +91,13 @@ const aboutActions = {
   },
 
   /**
+   * Dispatches a message to reset Sync data on this device and the cloud.
+   */
+  resetSync: function () {
+    ipc.send(messages.RESET_SYNC)
+  },
+
+  /**
    * Loads a URL in a new frame in a safe way.
    * It is important that it is not a simple anchor because it should not
    * preserve the about preload script. See #672

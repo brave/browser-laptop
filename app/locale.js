@@ -212,6 +212,7 @@ var rendererIdentifiers = function () {
     'notificationTryPayments',
     'notificationTryPaymentsYes',
     'prefsRestart',
+    'areYouSure',
     'dismiss',
     'yes',
     'no',

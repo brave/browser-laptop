@@ -1203,6 +1203,7 @@ class AboutPreferences extends React.Component {
       syncNewDeviceOverlayVisible: false,
       syncQRVisible: false,
       syncPassphraseVisible: false,
+      syncResetOverlayVisible: false,
       syncRestoreEnabled: false,
       preferenceTab: this.tabFromCurrentHash,
       hintNumber: this.getNextHintNumber(),
@@ -1399,6 +1400,7 @@ class AboutPreferences extends React.Component {
               syncPassphraseVisible: false
             })
           }}
+          syncResetOverlayVisible={this.state.syncResetOverlayVisible}
         />
         break
       case preferenceTabs.SHIELDS:

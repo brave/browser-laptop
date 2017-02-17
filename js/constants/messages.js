@@ -152,6 +152,7 @@ const messages = {
   SYNC_UPDATED: _,
   SAVE_INIT_DATA: _,
   RELOAD_SYNC_EXTENSION: _,
+  RESET_SYNC: _,
   // Torrent
   TORRENT_MESSAGE: _
 }

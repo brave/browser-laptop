@@ -11,6 +11,7 @@ const syncConstants = {
   SYNC_REMOVE_SITE: _,  /** @param {Immutable.Map} item */
   SYNC_CLEAR_HISTORY: _,
   SYNC_CLEAR_SITE_SETTINGS: _,
+  SYNC_DELETE_USER: _,
   SYNC_ADD_SITE_SETTING: _, /** @param {string} hostPattern, @param {Immutable.Map} item */
   SYNC_UPDATE_SITE_SETTING: _, /** @param {string} hostPattern, @param {Immutable.Map} item */
   SYNC_REMOVE_SITE_SETTING: _  /** @param {string} hostPattern, @param {Immutable.Map} item */
