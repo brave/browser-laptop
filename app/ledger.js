@@ -19,6 +19,17 @@
       addChangeListener - called when tabs render or gain focus
  */
 
+/* internal terminology:
+
+   blockedP: the user has selected 'Never include this site' (site setting 'ledgerPaymentsShown')
+    stickyP: the user has toggled ON the button to the right of the address bar (site setting 'ledgerPayments')
+   excluded: the publisher appears on the list of sites to exclude from automatic inclusion (if auto-include is enabled)
+
+  eligibleP: the current scorekeeper says the publisher has received enough durable visits
+   visibleP: (stickyP OR (!excluded AND eligibleP)) AND !blockedP
+contributeP: (stickyP OR !excluded) AND eligibleP   AND !blockedP
+ */
+
 const crypto = require('crypto')
 const fs = require('fs')
 const os = require('os')
@@ -195,7 +206,6 @@ const doAction = (action) => {
         if (!synopsis.publishers[publisher]) break
 
         if (publisherInfo._internal.verboseP) console.log('\nupdating ' + publisher + ' stickyP=' + action.value)
-        synopsis.publishers[publisher].options.stickyP = action.value
         updatePublisherInfo()
         verifiedP(publisher)
       }
@@ -210,7 +220,6 @@ const doAction = (action) => {
         if (!synopsis.publishers[publisher]) break
 
         if (publisherInfo._internal.verboseP) console.log('\nupdating ' + publisher + ' stickyP=' + true)
-        synopsis.publishers[publisher].options.stickyP = true
         updatePublisherInfo()
       }
       break
@@ -560,7 +569,7 @@ eventStore.addChangeListener(() => {
 
 // NB: in theory we have already seen every element in info except for (perhaps) the last one...
   underscore.rest(info, info.length - 1).forEach((page) => {
-    var entry, faviconURL, pattern, publisher, siteSetting
+    var entry, faviconURL, pattern, publisher
     var location = page.url
 
     if ((location.match(/^about/)) || ((locations[location]) && (locations[location].publisher))) return
@@ -568,10 +577,7 @@ eventStore.addChangeListener(() => {
     if (!page.publisher) {
       try {
         publisher = ledgerPublisher.getPublisher(location, publisherInfo._internal.ruleset.raw)
-        if (publisher) {
-          siteSetting = appStore.getState().get('siteSettings').get(`https?://${publisher}`)
-          if ((siteSetting) && (siteSetting.get('ledgerPaymentsShown') === false)) publisher = null
-        }
+        if ((publisher) && (blockedP(publisher))) publisher = null
         if (publisher) page.publisher = publisher
       } catch (ex) {
         console.log('getPublisher error for ' + location + ': ' + ex.toString())
@@ -777,7 +783,6 @@ var enable = (paymentsEnabled) => {
   fs.readFile(pathName(synopsisPath), (err, data) => {
     var initSynopsis = () => {
       var value
-      var siteSettings = appStore.getState().get('siteSettings')
 
       // cf., the `Synopsis` constructor, https://github.com/brave/ledger-publisher/blob/master/index.js#L167
       value = getSetting(settings.MINIMUM_VISIT_TIME)
@@ -812,14 +817,8 @@ var enable = (paymentsEnabled) => {
       }
 
       underscore.keys(synopsis.publishers).forEach((publisher) => {
-        var siteSetting
-
         excludeP(publisher)
         verifiedP(publisher)
-        if (typeof synopsis.publishers[publisher].options.stickyP !== 'undefined') return
-
-        siteSetting = siteSettings.get(`https?://${publisher}`)
-        synopsis.publishers[publisher].options.stickyP = siteSetting && siteSetting.get('ledgerPayments')
       })
 
       updatePublisherInfo()
@@ -922,6 +921,46 @@ var updatePublisherInfo = () => {
   appActions.updatePublisherInfo(underscore.omit(publisherInfo, [ '_internal' ]))
 }
 
+var blockedP = (publisher) => {
+  var siteSetting = appStore.getState().get('siteSettings').get(`https?://${publisher}`)
+
+  return ((!!siteSetting) && (siteSetting.get('ledgerPaymentsShown') === false))
+}
+
+var stickyP = (publisher) => {
+  var siteSettings = appStore.getState().get('siteSettings')
+  var pattern = `https?://${publisher}`
+  var siteSetting = siteSettings.get(pattern)
+  var result = (siteSetting) && (siteSetting.get('ledgerPayments'))
+
+  // NB: legacy clean-up
+  if ((typeof result === 'undefined') && (typeof synopsis.publishers[publisher].options.stickyP !== 'undefined')) {
+    result = synopsis.publishers[publisher].options.stickyP
+    appActions.changeSiteSetting(pattern, 'ledgerPayments', result)
+  }
+  delete synopsis.publishers[publisher].options.stickyP
+
+  return (result || false)
+}
+
+var eligibleP = (publisher) => {
+  return ((synopsis.publishers[publisher].scores[synopsis.options.scorekeeper] > 0) &&
+          (synopsis.publishers[publisher].duration >= synopsis.options.minPublisherDuration) &&
+          (synopsis.publishers[publisher].visits >= synopsis.options.minPublisherVisits))
+}
+
+var visibleP = (publisher) => {
+  return (((stickyP(publisher)) ||
+           ((synopsis.publishers[publisher].options.exclude !== true) && (eligibleP(publisher)))) &&
+          (!blockedP(publisher)))
+}
+
+var contributeP = (publisher) => {
+  return (((stickyP(publisher)) || (synopsis.publishers[publisher].options.exclude !== true)) &&
+          (eligibleP(publisher)) &&
+          (!blockedP(publisher)))
+}
+
 var synopsisNormalizer = () => {
   var i, duration, minP, n, pct, publisher, results, total
   var data = []
@@ -929,12 +968,7 @@ var synopsisNormalizer = () => {
 
   results = []
   underscore.keys(synopsis.publishers).forEach((publisher) => {
-    if (!synopsis.publishers[publisher].options.stickyP) {
-      if ((synopsis.publishers[publisher].options.exclude === true) ||
-          (synopsis.publishers[publisher].scores[scorekeeper] <= 0) ||
-          (synopsis.options.minPublisherDuration > synopsis.publishers[publisher].duration) ||
-          (synopsis.options.minPublisherVisits > synopsis.publishers[publisher].visits)) return
-    }
+    if (!visibleP(publisher)) return
 
     results.push(underscore.extend({ publisher: publisher }, underscore.omit(synopsis.publishers[publisher], 'window')))
   }, synopsis)
@@ -1510,22 +1544,57 @@ var roundtrip = (params, options, callback) => {
 var runTimeoutId = false
 
 var run = (delayTime) => {
-  if (clientOptions.verboseP) console.log('\nledger client run: clientP=' + (!!client) + ' delayTime=' + delayTime)
+  if (clientOptions.verboseP) {
+    console.log('\nledger client run: clientP=' + (!!client) + ' delayTime=' + delayTime)
+
+    var line = (fields) => {
+      var result = ''
+
+      fields.forEach((field) => {
+        var spaces
+        var max = (result.length > 0) ? 9 : 19
+
+        if (typeof field !== 'string') field = field.toString()
+        if (field.length < max) {
+          spaces = ' '.repeat(max - field.length)
+          field = spaces + field
+        } else {
+          field = field.substr(0, max)
+        }
+        result += ' ' + field
+      })
+
+      console.log(result.substr(1))
+    }
+
+    line([ 'publisher',
+           'blockedP', 'stickyP', 'verified',
+           'excluded', 'eligibleP', 'visibleP',
+           'contribP',
+           'duration', 'visits'
+         ])
+    synopsis.topN().forEach((entry) => {
+      var publisher = entry.publisher
+
+      line([ publisher,
+             blockedP(publisher), stickyP(publisher), synopsis.publishers[publisher].options.verified === true,
+             synopsis.publishers[publisher].options.exclude === true, eligibleP(publisher), visibleP(publisher),
+             contributeP(publisher),
+             Math.round(synopsis.publishers[publisher].duration / 1000), synopsis.publishers[publisher].visits ])
+    })
+  }
 
   if ((typeof delayTime === 'undefined') || (!client)) return
 
   var active, state
   var ballots = client.ballots()
-  var siteSettings = appStore.getState().get('siteSettings')
   var winners = ((synopsis) && (ballots > 0) && (synopsis.winners(ballots))) || []
 
   try {
     winners.forEach((winner) => {
       var result
-      var siteSetting = siteSettings.get(`https?://${winner}`)
 
-      if ((siteSetting) &&
-          (siteSetting.get('ledgerPayments') === false || siteSetting.get('ledgerPaymentsShown') === false)) return
+      if (!contributeP(winner)) return
 
       result = client.vote(winner)
       if (result) state = result
