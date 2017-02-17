@@ -38,7 +38,9 @@ const syncEnabled = () => {
 
 let deviceId = null /** @type {Array|null} */
 let pollIntervalId = null
-let initialized = false
+
+let deviceIdSent = false
+let bookmarksToolbarShown = false
 
 /**
  * Sends sync records of the same category to the sync server.
@@ -154,11 +156,10 @@ const doAction = (sender, action) => {
  * @param {Event} e
  */
 module.exports.onSyncReady = (isFirstRun, e) => {
-  initialized = true
   if (!syncEnabled()) {
     return
   }
-  if (isFirstRun) {
+  if (!deviceIdSent && isFirstRun) {
     // Sync the device id for this device
     sendSyncRecords(e.sender, writeActions.CREATE, [{
       name: 'device',
@@ -167,6 +168,7 @@ module.exports.onSyncReady = (isFirstRun, e) => {
         name: getSetting(settings.SYNC_DEVICE_NAME)
       }
     }])
+    deviceIdSent = true
   }
   const appState = AppStore.getState()
   const sites = appState.get('sites') || new Immutable.List()
@@ -300,7 +302,7 @@ module.exports.init = function (initialState) {
       process.emit(RELOAD_MESSAGE)
     }
   })
-  const isFirstRun = initialized ? false : !initialState.seed && !initialState.deviceId
+  const isFirstRun = !initialState.seed && !initialState.deviceId
   ipcMain.on(messages.SYNC_READY, module.exports.onSyncReady.bind(null,
     isFirstRun))
   ipcMain.on(messages.SYNC_DEBUG, (e, msg) => {
@@ -324,6 +326,19 @@ module.exports.init = function (initialState) {
   ipcMain.on(messages.RESOLVED_SYNC_RECORDS, (event, categoryName, records) => {
     if (!records || !records.length) {
       return
+    }
+    if (!bookmarksToolbarShown && isFirstRun) {
+      // syncing for the first time
+      const bookmarks = siteUtil.getBookmarks(AppStore.getState().get('sites'))
+      if (!bookmarks.size) {
+        for (const record of records) {
+          if (record && record.objectData === 'bookmark') {
+            appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
+            bookmarksToolbarShown = true
+            break
+          }
+        }
+      }
     }
     syncUtil.applySyncRecords(records)
   })
