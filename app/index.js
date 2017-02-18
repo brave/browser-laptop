@@ -76,7 +76,6 @@ const privacy = require('../js/state/privacy')
 const async = require('async')
 const settings = require('../js/constants/settings')
 const BookmarksExporter = require('./browser/bookmarksExporter')
-const MessageBox = require('./browser/messageBox')
 
 app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferHtmlOverPlugins')
 
@@ -286,45 +285,6 @@ app.on('ready', () => {
       lastWindowState = data
     }
   })
-
-  process.on('window-alert',
-    (webContents, extraData, title, message, defaultPromptText,
-        shouldDisplaySuppressCheckbox, isBeforeUnloadDialog, isReload, cb) => {
-      const tabId = webContents.getId()
-      const detail = {
-        message,
-        title,
-        buttons: ['OK'],
-        suppress: false,
-        showSuppress: shouldDisplaySuppressCheckbox
-      }
-
-      MessageBox.show(tabId, detail, cb)
-    })
-
-  process.on('window-confirm',
-    (webContents, extraData, title, message, defaultPromptText,
-        shouldDisplaySuppressCheckbox, isBeforeUnloadDialog, isReload, cb) => {
-      const tabId = webContents.getId()
-      const detail = {
-        message,
-        title,
-        buttons: ['OK', 'Cancel'],
-        cancelId: 1,
-        suppress: false,
-        showSuppress: shouldDisplaySuppressCheckbox
-      }
-
-      MessageBox.show(tabId, detail, cb)
-    })
-
-  process.on('window-prompt',
-    (webContents, extraData, title, message, defaultPromptText,
-        shouldDisplaySuppressCheckbox, isBeforeUnloadDialog, isReload, cb) => {
-      console.warn('window.prompt is not supported yet')
-      let suppress = false
-      cb(false, '', suppress)
-    })
 
   process.on(messages.UNDO_CLOSED_WINDOW, () => {
     if (lastWindowState) {

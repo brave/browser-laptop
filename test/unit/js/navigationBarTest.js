@@ -11,7 +11,7 @@ const Immutable = require('immutable')
 let NavigationBar, UrlBar
 require('../braveUnit')
 
-describe('NavigationBar component', function () {
+describe('NavigationBar component unit tests', function () {
   before(function () {
     mockery.enable({
       warnOnReplace: false,

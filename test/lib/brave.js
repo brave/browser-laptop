@@ -209,7 +209,10 @@ var exports = {
         .then(function (response) {
           var handles = response.value
           return promiseMapSeries(handles, (handle) => {
-            return this.window(handle).getUrl()
+            return this.window(handle).getUrl().catch((err) => {
+              console.error('Error retrieving window handle ' + handle, err)
+              return ''
+            })
           }).then((urls) => {
             var newHandles = []
             for (var i = 0; i < urls.length; i++) {

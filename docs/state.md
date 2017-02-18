@@ -93,7 +93,7 @@ AppStore
     }
   }],
   extensions: {
-    [id]: { 
+    [id]: {
       base_path: string,
       browserAction: {
         icon: (string|object),
@@ -213,7 +213,7 @@ AppStore
     'tabs.paint-tabs': boolean, // true if the page theme color and favicon color should be used for tabs
     'tabs.show-tab-previews': boolean, // true to show tab previews
     'tabs.switch-to-new-tabs': boolean, // true if newly opened tabs should be focused immediately
-    'tabs.tabs-per-page': number // number of tabs per tab page    
+    'tabs.tabs-per-page': number // number of tabs per tab page
   },
   sites: {
     [siteKey]: {
@@ -268,6 +268,7 @@ AppStore
   },
   tabs: [{
     // persistent properties
+    id: number,
     active: boolean,  // whether the tab is selected
     favIconUrl: string,
     index: number,  // the position of the tab in the window
@@ -275,11 +276,11 @@ AppStore
     url: string,
     windowUUID: string,  // the permanent identifier for the window
     // session properties
-    audible: boolean,  // is audio playing (muted or not)
+    audible: boolean, // is audio playing (muted or not)
     canGoBack: boolean, // the tab can be navigated back
-    canGoForward: boolean. // the tab can be navigated forward
-    muted: boolean,  // is the tab muted
-    windowId: number,  // the windowId that contains the tab
+    canGoForward: boolean, // the tab can be navigated forward
+    muted: boolean, // is the tab muted
+    windowId: number, // the windowId that contains the tab
     messageBoxDetail: { // fields used if showing a message box for a tab
       message: string,
       title: string, // title is the source; ex: "brave.com says:"
@@ -493,7 +494,7 @@ WindowStore
     address: string, // the BTC wallet address (in base58)
     amount: number, // fiat amount to contribute per reconciliation period
     balance: string, // confirmed balance in BTC.toFixed(4)
-    bravery: { 
+    bravery: {
       fee: {
         amount: number, // set from `amount` above
         currency: string // set from `currency` above
@@ -505,11 +506,11 @@ WindowStore
     created: boolean, // wallet is created
     creating: boolean, // wallet is being created
     currency: string, // fiat currency denominating the amount
-    error: {                     
+    error: {
       caller: string, // function in which error was handled
       error: object  // error object returned
     }, // non-null if the last updateLedgerInfo happened concurrently with an error
-    exchangeInfo: {              
+    exchangeInfo: {
       exchangeName: string,  // the name of the BTC exchange
       exchangeURL: string // the URL of the BTC exchange
     }, // information about the corresponding "friendliest" BTC exchange (suggestions welcome!)
@@ -521,17 +522,17 @@ WindowStore
     reconcileStamp: number, // timestamp for the next reconcilation
     recoverySucceeded: boolean, // the status of an attempted recovery
     satoshis: number, // confirmed balance as an integer number of satoshis
-    transactions: [{            
-      ballots: {                
+    transactions: [{
+      ballots: {
         [publisher]: number // e.g., "wikipedia.org": 3
       }, // number of ballots cast for each publisher
-      contribution: {           
+      contribution: {
         fee: number, // bitcoin transaction fee
-        fiat: {                 
+        fiat: {
           amount: number, // e.g., 5
           currency: string // e.g., "USD"
         }, // roughly-equivalent fiat amount
-        rates: {               
+        rates: {
           [currency]: number //e.g., { "USD": 575.45 }
         },  // exchange rate
         satoshis: number, // actual number of satoshis transferred
@@ -558,7 +559,7 @@ WindowStore
   },
   previewFrameKey: number,
   publisherInfo: {
-    synopsis: [{ 
+    synopsis: [{
       daysSpent: number, // e.g., 1
       duration: number, // total millisecond-views, e.g., 93784000 = 1 day, 2 hours, 3 minutes, 4 seconds
       faviconURL: string, // i.e., "data:image/...;base64,..."
@@ -619,7 +620,7 @@ WindowStore
     isClearBrowsingDataPanelVisible: boolean, // true if the Clear Browsing Data panel is visible
     isFullScreen: boolean, // true if window is fullscreen
     isMaximized: boolean, // true if window is maximized
-    menubar: { 
+    menubar: {
       isVisible: boolean, // true if Menubar control is visible
       lastFocusedSelector: string, // selector for the last selected element (browser ui, not frame content)
       selectedIndex: Array<number> // indices of the selected menu item(s) (or null for none selected)

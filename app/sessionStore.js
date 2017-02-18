@@ -27,7 +27,6 @@ const sessionStorageVersion = 1
 const filtering = require('./filtering')
 const autofill = require('./autofill')
 const {navigatableTypes} = require('../js/lib/appUrlUtil')
-// const tabState = require('./common/state/tabState')
 const Channel = require('./channel')
 const { makeImmutable } = require('./common/state/immutableUtil')
 const tabState = require('./common/state/tabState')
@@ -247,7 +246,7 @@ module.exports.cleanAppData = (data, isShutdown) => {
   // TODO(bridiver) use immutable
   data = makeImmutable(data).toJS()
 
-  // Don't show notifications from the last session
+  // Don't show notifications or message boxes from the last session
   data.notifications = []
   // Delete temp site settings
   data.temporarySiteSettings = {}

@@ -183,7 +183,6 @@ const api = {
   getPersistentState: (state) => {
     // TODO(bridiver) - handle restoring tabs
     state = makeImmutable(state)
-    // NOTE: if above TODO is implemented, we may not want to save/restore all tab data (ex: alerts, etc)
     return state.delete('tabs')
   }
 }

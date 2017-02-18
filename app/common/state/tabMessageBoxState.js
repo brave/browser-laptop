@@ -7,12 +7,12 @@ const {makeImmutable} = require('./immutableUtil')
 
 const messageBoxDetail = 'messageBoxDetail'
 
-const messageBoxState = {
+const tabMessageBoxState = {
   show: (state, action) => {
     state = makeImmutable(state)
     action = makeImmutable(action)
-    let tabId = action.get('tabId')
-    let detail = action.get('detail')
+    const tabId = action.get('tabId')
+    const detail = action.get('detail')
     let tabValue = tabState.getByTabId(state, tabId)
 
     if (!tabValue) {
@@ -28,23 +28,13 @@ const messageBoxState = {
   },
 
   update: (state, action) => {
-    return messageBoxState.show(state, action)
-  },
-
-  getDetail: (state, tabId) => {
-    if (!tabId) {
-      return
-    }
-
-    state = makeImmutable(state)
-    let tabValue = tabState.getByTabId(state, tabId)
-    return tabValue && tabValue.get(messageBoxDetail)
+    return tabMessageBoxState.show(state, action)
   },
 
   removeDetail: (state, action) => {
     state = makeImmutable(state)
     action = makeImmutable(action)
-    let tabId = action.get('tabId')
+    const tabId = action.get('tabId')
     let tabValue = tabState.getByTabId(state, tabId)
 
     if (!tabValue) {
@@ -56,4 +46,4 @@ const messageBoxState = {
   }
 }
 
-module.exports = messageBoxState
+module.exports = tabMessageBoxState

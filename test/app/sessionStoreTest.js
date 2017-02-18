@@ -2,7 +2,7 @@
 
 const Brave = require('../lib/brave')
 const Immutable = require('immutable')
-const {urlInput, navigatorBookmarked, navigatorNotBookmarked} = require('../lib/selectors')
+const {urlInput, navigatorBookmarked, navigatorNotBookmarked, msgBoxMessage} = require('../lib/selectors')
 const siteTags = require('../../js/constants/siteTags')
 const siteUtil = require('../../js/state/siteUtil')
 
@@ -61,6 +61,57 @@ describe('sessionStore', function () {
       yield Brave.app.client
         .waitForBrowserWindow()
         .waitForExist(navigatorBookmarked)
+    })
+  })
+
+  describe('some state is deleted', function () {
+    Brave.beforeAllServerSetup(this)
+    before(function * () {
+      yield Brave.startApp()
+      yield setup(Brave.app.client)
+    })
+
+    after(function * () {
+      yield Brave.stopApp()
+    })
+
+    it('deletes data.messageBoxDetail', function * () {
+      const modalAlert = Brave.server.url('modal_alert.html')
+
+      // Shutdown while alert is being displayed
+      yield Brave.app.client
+        .tabByUrl(Brave.newTabUrl)
+        .url(modalAlert)
+        .waitForUrl(modalAlert)
+        .waitForVisible('#trigger')
+        .leftClick('#trigger')
+        .waitUntil(function () {
+          return this.alertText().then((response) => {
+            return response
+          }, () => {
+            return false
+          })
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible(msgBoxMessage)
+        .waitUntil(function () {
+          return this.getAppState().then((val) => {
+            return (val.value.messageBoxDetail !== undefined)
+          })
+        })
+
+      // Start app again; verify messageBoxDetail is undefined
+      yield Brave.stopApp(false)
+      yield Brave.startApp()
+      yield setup(Brave.app.client)
+      yield Brave.app.client
+        .waitForUrl(modalAlert)
+        .waitForBrowserWindow()
+        .waitUntil(function () {
+          return this.getAppState().then((val) => {
+            return (val.value.messageBoxDetail === undefined)
+          })
+        })
     })
   })
 

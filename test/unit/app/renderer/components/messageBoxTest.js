@@ -274,8 +274,8 @@ describe('MessageBox component', function () {
   })
 
   describe('Events', function () {
-    it('calls appActions.updateMessageBoxForTab when SwitchControl is toggled', function () {
-      const spy = sinon.spy(appActions, 'updateMessageBoxForTab')
+    it('calls appActions.tabMessageBoxUpdated when SwitchControl is toggled', function () {
+      const spy = sinon.spy(appActions, 'tabMessageBoxUpdated')
       const wrapper = mount(
         <MessageBox
           tabId={tabId}
@@ -284,11 +284,11 @@ describe('MessageBox component', function () {
       )
       wrapper.find('.switchBackground').simulate('click')
       assert.equal(spy.calledOnce, true)
-      appActions.updateMessageBoxForTab.restore()
+      appActions.tabMessageBoxUpdated.restore()
     })
 
-    it('calls appActions.dismissMessageBoxForTab with result=true when OK is clicked', function () {
-      const spy = sinon.spy(appActions, 'dismissMessageBoxForTab')
+    it('calls appActions.tabMessageBoxDismissed with result=true when OK is clicked', function () {
+      const spy = sinon.spy(appActions, 'tabMessageBoxDismissed')
       const wrapper = mount(
         <MessageBox
           tabId={tabId}
@@ -301,11 +301,11 @@ describe('MessageBox component', function () {
       }
       wrapper.find('button[data-l10n-id="OK"].primaryButton').simulate('click')
       assert.equal(spy.withArgs(tabId, response).calledOnce, true)
-      appActions.dismissMessageBoxForTab.restore()
+      appActions.tabMessageBoxDismissed.restore()
     })
 
-    it('calls appActions.dismissMessageBoxForTab with result=false when cancel is clicked', function () {
-      const spy = sinon.spy(appActions, 'dismissMessageBoxForTab')
+    it('calls appActions.tabMessageBoxDismissed with result=false when cancel is clicked', function () {
+      const spy = sinon.spy(appActions, 'tabMessageBoxDismissed')
       const wrapper = mount(
         <MessageBox
           tabId={tabId}
@@ -318,9 +318,7 @@ describe('MessageBox component', function () {
       }
       wrapper.find('button[data-l10n-id="Cancel"].whiteButton').simulate('click')
       assert.equal(spy.withArgs(tabId, response).calledOnce, true)
-      appActions.dismissMessageBoxForTab.restore()
+      appActions.tabMessageBoxDismissed.restore()
     })
-
-    // TODO: need to bind enter/escape keys
   })
 })

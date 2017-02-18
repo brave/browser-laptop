@@ -897,9 +897,9 @@ const appActions = {
    * @param {number} tabId - The tabId
    * @param {Object} detail - Object containing: title, message, buttons to show
    */
-  showMessageBoxForTab: function (tabId, detail) {
+  tabMessageBoxShown: function (tabId, detail) {
     AppDispatcher.dispatch({
-      actionType: appConstants.APP_SHOW_MESSAGE_BOX_FOR_TAB,
+      actionType: appConstants.APP_TAB_MESSAGE_BOX_SHOWN,
       tabId,
       detail
     })
@@ -910,9 +910,9 @@ const appActions = {
    * @param {number} tabId - The tabId
    * @param {Object} detail - Object containing: suppressCheckbox (boolean)
    */
-  dismissMessageBoxForTab: function (tabId, detail) {
+  tabMessageBoxDismissed: function (tabId, detail) {
     AppDispatcher.dispatch({
-      actionType: appConstants.APP_DISMISS_MESSAGE_BOX_FOR_TAB,
+      actionType: appConstants.APP_TAB_MESSAGE_BOX_DISMISSED,
       tabId,
       detail
     })
@@ -923,9 +923,9 @@ const appActions = {
    * @param {number} tabId - The tabId
    * @param {Object} detail - Replacement object
    */
-  updateMessageBoxForTab: function (tabId, detail) {
+  tabMessageBoxUpdated: function (tabId, detail) {
     AppDispatcher.dispatch({
-      actionType: appConstants.APP_UPDATE_MESSAGE_BOX_FOR_TAB,
+      actionType: appConstants.APP_TAB_MESSAGE_BOX_UPDATED,
       tabId,
       detail
     })

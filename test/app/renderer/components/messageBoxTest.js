@@ -1,8 +1,10 @@
 /* global describe, beforeEach, it */
 
 const Brave = require('../../../lib/brave')
+const messages = require('../../../../js/constants/messages')
 const {
-  urlInput, msgBoxMessage, msgBoxTitle
+  urlInput, backButton, forwardButton,
+  msgBoxSuppress, msgBoxSuppressTrue, msgBoxMessage, msgBoxTitle
 } = require('../../../lib/selectors')
 const assert = require('assert')
 
@@ -14,6 +16,17 @@ const getActiveTabState = (appState) => {
   return activeTab
 }
 
+const getBackgroundTabState = (appState) => {
+  const tabs = appState.tabs
+  const nonActiveTab = tabs.find((tab) => {
+    return !tab.active && tab.messageBoxDetail
+  })
+  return nonActiveTab
+}
+
+let modalAlert
+let alertText
+
 describe('MessageBox component tests', function () {
   function * setup (client) {
     yield client
@@ -22,48 +35,19 @@ describe('MessageBox component tests', function () {
       .waitForEnabled(urlInput)
   }
 
-  Brave.beforeEach(this)
-
-  let modalAlert
-  let alertText
-
-  beforeEach(function * () {
-    alertText = undefined
-    modalAlert = Brave.server.url('modal_alert.html')
-
-    yield setup(this.app.client)
-
-    yield this.app.client
-      .tabByUrl(Brave.newTabUrl)
-      .url(modalAlert)
-      .waitForUrl(modalAlert)
-      .waitForVisible('#trigger')
-      .leftClick('#trigger')
-      .waitUntil(function () {
-        return this.alertText().then((response) => {
-          alertText = response
-          return response
-        }, () => {
-          return false
-        })
-      })
-      .windowByUrl(Brave.browserWindowUrl)
-      .waitForVisible(msgBoxMessage)
-  })
-
-  it('shows the expected alert text', function * () {
-    yield this.app.client
+  function * showsExpectedMessage (client) {
+    yield client
       .getText(msgBoxMessage).then((val) => {
         // console.log('expected: ' + alertText + '; actual: ' + val)
         assert(val === alertText)
       })
-  })
+  }
 
-  it('stores the message box details in the appState', function * () {
+  function * storesDetailsInTabState (client) {
     let alertTitle
     let alertMessage
 
-    yield this.app.client
+    yield client
       .getText(msgBoxTitle).then((val) => {
         alertTitle = val
       })
@@ -75,50 +59,288 @@ describe('MessageBox component tests', function () {
         assert(tabState.messageBoxDetail.title === alertTitle)
         assert(tabState.messageBoxDetail.message === alertMessage)
       })
-  })
+  }
 
-  it('closes the alert when you press enter', function * () {
-    yield this.app.client
-      .keys(Brave.keys.ENTER)
-      .waitUntil(function () {
-        return this.getAppState().then((val) => {
-          const tabState = getActiveTabState(val.value)
-          console.log('tabState=' + JSON.stringify(tabState))
-          return tabState.messageBoxDetail === undefined
+  Brave.beforeEach(this)
+
+  describe('alert', function () {
+    beforeEach(function * () {
+      alertText = undefined
+      modalAlert = Brave.server.url('modal_alert.html')
+
+      yield setup(this.app.client)
+
+      yield this.app.client
+        .tabByUrl(Brave.newTabUrl)
+        .url(modalAlert)
+        .waitForUrl(modalAlert)
+        .waitForVisible('#trigger')
+        .leftClick('#trigger')
+        .waitUntil(function () {
+          return this.alertText().then((response) => {
+            alertText = response
+            return response
+          }, () => {
+            return false
+          })
         })
-      })
-  })
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible(msgBoxMessage)
+    })
 
-  it('closes the alert when you press escape', function * () {
-    yield this.app.client
-      .keys(Brave.keys.ESCAPE)
-      .waitUntil(function () {
-        return this.getAppState().then((val) => {
-          const tabState = getActiveTabState(val.value)
-          console.log('tabState=' + JSON.stringify(tabState))
-          return tabState.messageBoxDetail === undefined
+    it('shows the expected message', function * () {
+      yield showsExpectedMessage(this.app.client)
+    })
+
+    it('stores the message box details in the tabState', function * () {
+      yield storesDetailsInTabState(this.app.client)
+    })
+
+    it('closes the alert when you press enter', function * () {
+      yield this.app.client
+        .keys(Brave.keys.ENTER)
+        .waitUntil(function () {
+          return this.getAppState().then((val) => {
+            const tabState = getActiveTabState(val.value)
+            return tabState.messageBoxDetail === undefined
+          })
         })
+    })
+
+    it('closes the alert when you press escape', function * () {
+      yield this.app.client
+        .keys(Brave.keys.ESCAPE)
+        .waitUntil(function () {
+          return this.getAppState().then((val) => {
+            const tabState = getActiveTabState(val.value)
+            return tabState.messageBoxDetail === undefined
+          })
+        })
+    })
+
+    describe('when showing an alerts multiple times', function () {
+      beforeEach(function * () {
+        yield this.app.client
+          .keys(Brave.keys.ENTER)
+          .waitUntil(function () {
+            return this.getAppState().then((val) => {
+              const tabState = getActiveTabState(val.value)
+              return tabState.messageBoxDetail === undefined
+            })
+          })
+          // Show modal a 2nd time
+          .tabByUrl(modalAlert)
+          .leftClick('#trigger')
+          .waitUntil(function () {
+            return this.alertText().then((response) => {
+              alertText = response
+              return response
+            }, () => {
+              return false
+            })
+          })
+          // 2nd time an alert from this source is shown,
+          // we display a "suppress" switch
+          .windowByUrl(Brave.browserWindowUrl)
       })
+
+      it('shows a suppress switch', function * () {
+        yield this.app.client
+          .waitForVisible(msgBoxSuppress)
+      })
+
+      it('lets you suppress future notifications', function * () {
+        yield this.app.client
+          // click to set Suppress = true
+          .click(msgBoxSuppress)
+          .waitForVisible(msgBoxSuppressTrue)
+          // Close alert again
+          .keys(Brave.keys.ENTER)
+          .waitUntil(function () {
+            return this.getAppState().then((val) => {
+              const detail = getActiveTabState(val.value)
+              return detail === undefined
+            })
+          })
+          // Try to show modal a 3rd time
+          .tabByUrl(modalAlert)
+          .leftClick('#trigger')
+          .windowByUrl(Brave.browserWindowUrl)
+          .pause(2000)
+          .waitUntil(function () {
+            return this.getAppState().then((val) => {
+              const tabState = getActiveTabState(val.value)
+              return tabState.messageBoxDetail === undefined
+            })
+          })
+      })
+    })
+
+    describe('when opening a new tab (while alert is showing)', function () {
+      beforeEach(function * () {
+        const page1 = Brave.server.url('page1.html')
+        const page2 = Brave.server.url('page2.html')
+        // open a new tab
+        yield this.app.client
+          .ipcSend(messages.SHORTCUT_NEW_FRAME, page1)
+          .waitForTabCount(2)
+          .waitForVisible('#thelink[href="page2.html"]', 1000)
+
+        // load a basic history for this tab
+        yield this.app.client
+          .url(page2)
+          .waitForVisible('#thelink[href="page1.html"]', 1000)
+          .url(page1)
+          .waitForVisible('#thelink[href="page2.html"]', 1000)
+      })
+
+      it('lets you follow links in the tab', function * () {
+        // click link
+        yield this.app.client
+          .leftClick('#thelink')
+
+        // verify link was followed
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitUntil(function () {
+            return this.getText('[data-test-id="tab"][data-test-active-tab="true"] [data-test-id="tabTitle"]')
+              .then((title) => {
+                return title === 'Page 2'
+              })
+          })
+      })
+
+      it('lets you use the back button', function * () {
+        // click back button
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .leftClick(backButton)
+
+        // verify page is previous
+        yield this.app.client
+          .waitUntil(function () {
+            return this.getText('[data-test-id="tab"][data-test-active-tab="true"] [data-test-id="tabTitle"]')
+              .then((title) => {
+                return title === 'Page 2'
+              })
+          })
+      })
+
+      it('lets you use the forward button', function * () {
+        // click back button
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .leftClick(backButton)
+          .waitForVisible(forwardButton + '[disabled]', 1000, true)
+
+        // click forward button
+        yield this.app.client
+          .leftClick(forwardButton)
+
+        // verify page is previous
+        yield this.app.client
+          .waitUntil(function () {
+            return this.getText('[data-test-id="tab"][data-test-active-tab="true"] [data-test-id="tabTitle"]')
+              .then((title) => {
+                return title === 'Page 1'
+              })
+          })
+      })
+
+      it('original tab does not respond to escape or enter being pressed', function * () {
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .keys(Brave.keys.ENTER)
+          .pause(250)
+          .keys(Brave.keys.ESCAPE)
+          .pause(250)
+          .getAppState().then((val) => {
+            const detail = getBackgroundTabState(val.value)
+            assert(detail)
+          })
+      })
+    })
+
+    // describe('when tab is closed without dismissing alert', function () {
+    //   let tabId
+
+    //   beforeEach(function * () {
+    //     yield this.app.client
+    //       .waitUntil(function () {
+    //         return this.getAppState().then((val) => {
+    //           tabId = getActiveTabId(val.value)
+    //           const detail = getActiveTabState(val.value)
+    //           return tabId !== undefined && detail !== undefined
+    //         })
+    //       })
+
+    //     // open a new tab
+    //     const page1 = Brave.server.url('page1.html')
+    //     yield this.app.client
+    //       .ipcSend(messages.SHORTCUT_NEW_FRAME, page1)
+    //       .waitForTabCount(2)
+    //       .waitForVisible('#thelink[href="page2.html"]', 1000)
+
+    //     // close the tab which is showing an alert
+    //     yield this.app.client
+    //       .windowByUrl(Brave.browserWindowUrl)
+    //       .moveToObject('[data-test-id="tab"][data-test-active-tab="false"] [data-test-id="tabTitle"]')
+    //       .waitForVisible('[data-test-id="closeTabIcon"]', 1000)
+    //       .leftClick('[data-test-id="closeTabIcon"]')
+    //   })
+
+    //   it('removes the entry from the messageBoxDetail map', function * () {
+    //     yield this.app.client
+    //       .windowByUrl(Brave.browserWindowUrl)
+    //       .waitUntil(function () {
+    //         return this.getAppState().then((val) => {
+    //           return val.value.messageBoxDetail[tabId] === undefined
+    //         })
+    //       })
+    //   })
+    // })
+
+    // describe('when window is closed without dismissing alert', function () {
+    // })
+
+    // describe('when tab crashes before dismissing alert', function () {
+    // })
+
+    // describe('when tab navigates away before dismissing alert', function () {
+    // })
   })
 
-  /*
-  TODO:
-  - confirm
-  - dismiss future ones
-  - switching tabs is possible
-  - can't click back button
-  - can't click forward button
-  - can't edit URL in nav bar
-  - can't click reload
-  - can't click lion
+  describe('confirm', function () {
+    beforeEach(function * () {
+      alertText = undefined
+      modalAlert = Brave.server.url('modal_confirm.html')
 
-  we also need to handle the following cases and all of them should clear the
-  messageBox state for the tab and run the callback with false
+      yield setup(this.app.client)
 
-  - Closing the browser
-  - Closing the window
-  - Closing the tab
-  - Tab crash
-  - Tab navigation
-  */
+      yield this.app.client
+        .tabByUrl(Brave.newTabUrl)
+        .url(modalAlert)
+        .waitForUrl(modalAlert)
+        .waitForVisible('#trigger')
+        .leftClick('#trigger')
+        .waitUntil(function () {
+          return this.alertText().then((response) => {
+            alertText = response
+            return response
+          }, () => {
+            return false
+          })
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible(msgBoxMessage)
+    })
+
+    it('shows the expected message', function * () {
+      yield showsExpectedMessage(this.app.client)
+    })
+
+    it('stores the message box details in the tabState', function * () {
+      yield storesDetailsInTabState(this.app.client)
+    })
+  })
 })

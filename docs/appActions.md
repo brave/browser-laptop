@@ -730,7 +730,7 @@ Dispatches a message to delete sync data.
 
 
 
-### dismissMessageBoxForTab(tabId, detail) 
+### tabMessageBoxDismissed(tabId, detail) 
 
 Close a tab's open alert/confirm/etc (triggered by clicking OK/cancel).
 
@@ -742,7 +742,7 @@ Close a tab's open alert/confirm/etc (triggered by clicking OK/cancel).
 
 
 
-### updateMessageBoxForTab(tabId, detail) 
+### tabMessageBoxUpdated(tabId, detail) 
 
 Update the detail object for the open alert/confirm/prompt (triggers re-render)
 

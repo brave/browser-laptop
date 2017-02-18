@@ -76,7 +76,7 @@ class MessageBox extends ImmutableComponent {
   onSuppressChanged (e) {
     const detail = this.props.detail.toJS()
     detail.suppress = !detail.suppress
-    appActions.updateMessageBoxForTab(this.tabId, detail)
+    appActions.tabMessageBoxUpdated(this.tabId, detail)
   }
 
   onDismiss (tabId, buttonId) {
@@ -89,7 +89,7 @@ class MessageBox extends ImmutableComponent {
       response.result = buttonId !== this.cancelId
     }
 
-    appActions.dismissMessageBoxForTab(this.tabId, response)
+    appActions.tabMessageBoxDismissed(this.tabId, response)
   }
 
   get messageBoxButtons () {
@@ -137,7 +137,6 @@ class MessageBox extends ImmutableComponent {
 
 const styles = StyleSheet.create({
   'container': {
-    margin: '3em',
     outline: 'none',
     display: 'block'
   },
@@ -156,6 +155,7 @@ const styles = StyleSheet.create({
   },
   'buttons': {
     float: 'right',
+    marginTop: '1.5em',
     marginBottom: '0.5em'
   }
 })

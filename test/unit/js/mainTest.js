@@ -10,7 +10,7 @@ const Immutable = require('immutable')
 let Main, NavigationBar
 require('../braveUnit')
 
-describe('Main component', function () {
+describe('Main component unit tests', function () {
   before(function () {
     mockery.enable({
       warnOnReplace: false,

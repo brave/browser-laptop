@@ -11,7 +11,7 @@ const Immutable = require('immutable')
 let UrlBar, UrlBarIcon
 require('../../../braveUnit')
 
-describe('UrlBar component', function () {
+describe('UrlBar component unit tests', function () {
   before(function () {
     mockery.enable({
       warnOnReplace: false,

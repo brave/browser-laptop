@@ -36,7 +36,6 @@ const autofill = require('../../app/autofill')
 const nativeImage = require('../../app/nativeImage')
 const Filtering = require('../../app/filtering')
 const basicAuth = require('../../app/browser/basicAuth')
-const messageBox = require('../../app/browser/messageBox')
 const webtorrent = require('../../app/browser/webtorrent')
 const windows = require('../../app/browser/windows')
 const assert = require('assert')
@@ -47,7 +46,6 @@ const extensionState = require('../../app/common/state/extensionState')
 const aboutNewTabState = require('../../app/common/state/aboutNewTabState')
 const aboutHistoryState = require('../../app/common/state/aboutHistoryState')
 const windowState = require('../../app/common/state/windowState')
-const messageBoxState = require('../../app/common/state/messageBoxState')
 
 const isDarwin = process.platform === 'darwin'
 const isWindows = process.platform === 'win32'
@@ -361,7 +359,8 @@ const applyReducers = (state, action) => [
   require('../../app/browser/reducers/tabsReducer'),
   require('../../app/browser/reducers/spellCheckReducer'),
   require('../../app/browser/reducers/clipboardReducer'),
-  require('../../app/browser/reducers/passwordManagerReducer')
+  require('../../app/browser/reducers/passwordManagerReducer'),
+  require('../../app/browser/reducers/tabMessageBoxReducer')
 ].reduce(
     (appState, reducer) => {
       const newState = reducer(appState, action)
@@ -957,15 +956,6 @@ const handleAppAction = (action) => {
       break
     case appConstants.APP_HIDE_DOWNLOAD_DELETE_CONFIRMATION:
       appState = appState.set('deleteConfirmationVisible', false)
-      break
-    case appConstants.APP_SHOW_MESSAGE_BOX_FOR_TAB:
-      appState = messageBoxState.show(appState, action)
-      break
-    case appConstants.APP_DISMISS_MESSAGE_BOX_FOR_TAB:
-      appState = messageBox.close(appState, action)
-      break
-    case appConstants.APP_UPDATE_MESSAGE_BOX_FOR_TAB:
-      appState = messageBoxState.update(appState, action)
       break
     default:
   }
