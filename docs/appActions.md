@@ -712,6 +712,18 @@ Dispatches a message when sync init data needs to be saved
 
 
 
+### applySiteRecords(records) 
+
+Dispatches a message to apply a batch of site records from Brave Sync
+TODO: Refactor this to merge it into addSite/removeSite
+
+**Parameters**
+
+**records**: `Array.&lt;Object&gt;`, Dispatches a message to apply a batch of site records from Brave Sync
+TODO: Refactor this to merge it into addSite/removeSite
+
+
+
 ### resetSyncData() 
 
 Dispatches a message to delete sync data.
