@@ -29,6 +29,7 @@
     "preload-httpse": "node ./preload-httpse.js",
     "start-log": "node ./tools/start.js --user-data-dir=brave-development --debug=5858 --enable-logging=stderr --v=1 --enable-extension-activity-logging --enable-sandbox-logging --enable-dcheck",
     "start": "node ./tools/start.js --user-data-dir=brave-development --debug=5858 --enable-logging --v=0 --enable-extension-activity-logging --enable-sandbox-logging --enable-dcheck",
+    "start2": "node ./tools/start.js --user-data-dir=brave-development-2 --debug=5859 --enable-logging --v=0 --enable-extension-activity-logging --enable-sandbox-logging --enable-dcheck",
     "start-brk": "node ./tools/start.js --debug-brk=5858 -enable-logging --v=0 --enable-dcheck",
     "test": "cross-env NODE_ENV=test mocha --require babel-register --require babel-polyfill --recursive \"test/**/*Test.js\"",
     "unittest": "cross-env NODE_ENV=test mocha --require babel-register --require babel-polyfill --recursive \"test/unit/**/*Test.js\"",
