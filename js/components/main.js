@@ -76,6 +76,8 @@ const {currentWindow, isMaximized, isFocused, isFullScreen} = require('../../app
 const emptyMap = new Immutable.Map()
 const emptyList = new Immutable.List()
 
+const {StyleSheet, css} = require('aphrodite/no-important')
+
 class Main extends ImmutableComponent {
   constructor () {
     super()
@@ -941,7 +943,7 @@ class Main extends ImmutableComponent {
           <div className='navbarMenubarFlexContainer'>
             {
               customTitlebar.menubarVisible
-                ? <div className='menubarContainer'>
+                ? <div className={css(styles.menubarContainer)}>
                   <Menubar
                     template={customTitlebar.menubarTemplate}
                     selectedIndex={customTitlebar.menubarSelectedIndex}
@@ -1305,5 +1307,14 @@ class Main extends ImmutableComponent {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  // Menubar (for use w/ slim titlebar)
+  menubarContainer: {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'row'
+  }
+})
 
 module.exports = Main
