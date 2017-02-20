@@ -142,6 +142,7 @@ class Tabs extends ImmutableComponent {
                 isActive={this.props.activeFrameKey === tab.get('frameKey')}
                 onTabClosedWithMouse={this.onTabClosedWithMouse}
                 tabWidth={this.props.fixTabWidth}
+                hasTabInFullScreen={this.props.hasTabInFullScreen}
                 partOfFullPageSet={this.props.partOfFullPageSet} />)
         }
         {(() => {

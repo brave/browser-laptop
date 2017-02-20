@@ -193,11 +193,8 @@ class Tab extends ImmutableComponent {
 
   onUpdateTabSize () {
     const currentSize = getTabBreakpoint(this.tabSize)
-    // Avoid changing state on unmounted component
-    // when user switch to a new tabSet
-    if (this.tabNode) {
-      windowActions.setTabBreakpoint(this.frame, currentSize)
-    }
+    // Avoid updating breakpoint when user enters fullscreen (see #7301)
+    !this.props.hasTabInFullScreen && windowActions.setTabBreakpoint(this.frame, currentSize)
   }
 
   componentWillMount () {
