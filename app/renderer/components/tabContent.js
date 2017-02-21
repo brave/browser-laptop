@@ -6,7 +6,7 @@ const React = require('react')
 const ImmutableComponent = require('../../../js/components/immutableComponent')
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('./styles/global')
-const {isWindows, isLinux} = require('../../common/lib/platformUtil')
+const {isWindows} = require('../../common/lib/platformUtil')
 
 /**
  * Boilerplate component for all tab icons
@@ -174,9 +174,7 @@ class TabTitle extends ImmutableComponent {
       styles.tabTitle,
       this.props.tabProps.get('hoverState') && titleStyles.reduceTitleSize,
       // Windows specific style
-      isWindows() && styles.tabTitleForWindows,
-      // Linux specific style
-      isLinux() && styles.tabTitleForLinux
+      isWindows() && styles.tabTitleForWindows
     )}>
       {this.props.pageTitle}
     </div>
@@ -259,18 +257,13 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
-    height: '15px',
+    lineHeight: '1.6',
     padding: globalStyles.spacing.defaultTabPadding
   },
 
   tabTitleForWindows: {
     fontWeight: '500',
-    fontSize: globalStyles.fontSize.tabTitle,
-    height: '18px'
-  },
-
-  tabTitleForLinux: {
-    height: globalStyles.fontSize.tabTitle
+    fontSize: globalStyles.fontSize.tabTitle
   }
 })
 
