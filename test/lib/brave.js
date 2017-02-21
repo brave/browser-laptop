@@ -251,7 +251,7 @@ var exports = {
           logVerbose('waitForBrowserWindow() => false')
           return false
         })
-      })
+      }, 5000, null, 100)
     })
 
     this.app.client.addCommand('activateTitleMode', function () {
@@ -278,13 +278,13 @@ var exports = {
           logVerbose('tabByUrl("' + url + '") => false')
           return false
         })
-      })
+      }, 5000, null, 100)
     })
 
     this.app.client.addCommand('waitForSelectedText', function (text) {
       return this.waitUntil(function () {
         return this.getSelectedText(text).then((value) => { return value === text })
-      })
+      }, 5000, null, 100)
     })
 
     this.app.client.addCommand('waitForTextValue', function (selector, text) {
@@ -292,7 +292,7 @@ var exports = {
         .waitForVisible(selector)
         .waitUntil(function () {
           return this.getText(selector).then((value) => { return value === text })
-        })
+        }, 5000, null, 100)
     })
 
     this.app.client.addCommand('waitForTabCount', function (tabCount) {
@@ -301,20 +301,19 @@ var exports = {
         return this.getTabCount().then((count) => {
           return count === tabCount
         })
-      })
+      }, 5000, null, 100)
     })
 
     this.app.client.addCommand('waitForAddressCount', function (addressCount) {
       logVerbose('waitForAddressCount(' + addressCount + ')')
       return this.waitUntil(function () {
         return this.getAppState().then((val) => {
-          console.log(val.value && val.value.autofill)
           const ret = val.value && val.value && val.value.autofill &&
             val.value.autofill.addresses && val.value.autofill.addresses.guid.length || 0
           logVerbose('waitForAddressCount(' + addressCount + ') => ' + ret)
           return ret
         })
-      })
+      }, 5000, null, 100)
     })
 
     this.app.client.addCommand('waitForElementCount', function (selector, count) {
@@ -324,7 +323,7 @@ var exports = {
           logVerbose('waitForElementCount("' + selector + '", ' + count + ') => ' + res.value.length)
           return res.value.length === count
         })
-      })
+      }, 5000, null, 100)
     })
 
     this.app.client.addCommand('waitForResourceReady', function (resourceName) {
@@ -344,7 +343,7 @@ var exports = {
           logVerbose('waitForSettingValue("' + setting + ', ' + value + '") => ' + val.value && val.value.settings && val.value.settings[setting])
           return val.value && val.value.settings && val.value.settings[setting] === value
         })
-      })
+      }, 5000, null, 100)
     })
 
     this.app.client.addCommand('waitForSiteEntry', function (location, waitForTitle = true) {
@@ -357,7 +356,7 @@ var exports = {
           logVerbose('waitForSiteEntry("' + location + ', ' + waitForTitle + '") => ' + ret)
           return ret
         })
-      })
+      }, 5000, null, 100)
     })
 
     this.app.client.addCommand('waitForAddressEntry', function (location, waitForTitle = true) {
@@ -371,7 +370,7 @@ var exports = {
           logVerbose('waitForSiteEntry("' + location + '", ' + waitForTitle + ') => ' + ret)
           return ret
         })
-      })
+      }, 5000, null, 100)
     })
 
     this.app.client.addCommand('waitForBookmarkDetail', function (location, title) {
@@ -387,7 +386,7 @@ var exports = {
             ' (bookmarkDetailLocation = ' + bookmarkDetailLocation + ', bookmarkDetailTitle = ' + bookmarkDetailTitle + ')')
           return ret
         })
-      })
+      }, 5000, null, 100)
     })
 
     this.app.client.addCommand('loadUrl', function (url) {
@@ -436,7 +435,7 @@ var exports = {
             logVerbose('waitForInputText("' + selector + '", "' + input + '") => ' + ret)
             return ret
           })
-        })
+        }, 5000, null, 100)
     })
 
     this.app.client.addCommand('setInputText', function (selector, input) {
@@ -721,7 +720,7 @@ var exports = {
             .then(function (el) {
               return el.value.ELEMENT === activeElement.value.ELEMENT
             })
-        }, timeout)
+        }, timeout, null, 100)
     })
 
     this.app.client.addCommand('waitForDataFile', function (dataFile) {
@@ -750,7 +749,7 @@ var exports = {
       SPECTRON: true
     }
     this.app = new Application({
-      quitTimeout: 0,
+      quitTimeout: 300,
       waitTimeout: exports.defaultTimeout,
       connectionRetryTimeout: exports.defaultTimeout,
       path: process.platform === 'win32'

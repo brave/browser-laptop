@@ -111,7 +111,7 @@ class Frame extends ImmutableComponent {
       if (!Immutable.is(prevProps.braveryDefaults, this.props.braveryDefaults)) {
         this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.props.braveryDefaults.toJS())
       }
-    } else if (location === 'about:bookmarks') {
+    } else if (location === 'about:bookmarks' && this.props.bookmarks) {
       if (!Immutable.is(prevProps.bookmarks, this.props.bookmarks) ||
           !Immutable.is(prevProps.bookmarkFolders, this.props.bookmarkFolders)) {
         this.webview.send(messages.BOOKMARKS_UPDATED, {
@@ -119,7 +119,7 @@ class Frame extends ImmutableComponent {
           bookmarkFolders: this.props.bookmarkFolders.toList().sort(siteUtil.siteSort).toJS()
         })
       }
-    } else if (location === 'about:history') {
+    } else if (location === 'about:history' && this.props.history) {
       if (!Immutable.is(prevProps.history, this.props.history)) {
         const aboutHistoryState = this.props.history && this.props.history.toJS
           ? this.props.history.toJS()
@@ -129,13 +129,13 @@ class Frame extends ImmutableComponent {
       if (!Immutable.is(prevProps.settings, this.props.settings)) {
         this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
       }
-    } else if (location === 'about:extensions') {
+    } else if (location === 'about:extensions' && this.props.extensions) {
       if (!Immutable.is(prevProps.extensions, this.props.extensions)) {
         this.webview.send(messages.EXTENSIONS_UPDATED, {
           extensions: this.props.extensions.toJS()
         })
       }
-    } else if (location === 'about:adblock') {
+    } else if (location === 'about:adblock' && this.props.adblock) {
       if (!Immutable.is(prevProps.adblock, this.props.adblock) ||
           !Immutable.is(prevProps.settings, this.props.settings)) {
         this.webview.send(messages.ADBLOCK_UPDATED, {
@@ -144,13 +144,13 @@ class Frame extends ImmutableComponent {
           resources: require('ad-block/lib/regions')
         })
       }
-    } else if (location === 'about:downloads') {
+    } else if (location === 'about:downloads' && this.props.downloads) {
       if (!Immutable.is(prevProps.downloads, this.props.downloads)) {
         this.webview.send(messages.DOWNLOADS_UPDATED, {
           downloads: this.props.downloads.toJS()
         })
       }
-    } else if (location === 'about:passwords') {
+    } else if (location === 'about:passwords' && this.props.passwords) {
       if (this.props.passwords && !Immutable.is(prevProps.passwords, this.props.passwords)) {
         this.webview.send(messages.PASSWORD_DETAILS_UPDATED, this.props.passwords.toJS())
       }

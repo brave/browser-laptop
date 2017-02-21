@@ -837,17 +837,23 @@ frameShortcuts.forEach((shortcut) => {
   }
 })
 
-// Allows the parent process to dispatch window actions
-ipc.on(messages.DISPATCH_ACTION, (e, serializedPayload) => {
-  let action = Serializer.deserialize(serializedPayload)
-  let queryInfo = action.queryInfo || action.frameProps || {}
+const dispatchEventPayload = (e, payload) => {
+  let queryInfo = payload.queryInfo || payload.frameProps || {}
   queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
   if (queryInfo.windowId === -2 && isFocused()) {
     queryInfo.windowId = currentWindowId
   }
   // handle any ipc dispatches that are targeted to this window
   if (queryInfo.windowId && queryInfo.windowId === currentWindowId) {
-    doAction(action)
+    doAction(payload)
+  }
+}
+
+// Allows the parent process to dispatch window actions
+ipc.on(messages.DISPATCH_ACTION, (e, serializedPayload) => {
+  let payload = Serializer.deserialize(serializedPayload)
+  for (var i = 0; i < payload.length; i++) {
+    dispatchEventPayload(e, payload[i])
   }
 })
 

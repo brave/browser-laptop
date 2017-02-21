@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const messages = require('../constants/messages')
-const serializer = require('../dispatcher/serializer')
+const appDispatcher = require('../dispatcher/appDispatcher')
 const windowConstants = require('../constants/windowConstants')
 const appConstants = require('../constants/appConstants')
 const ipc = window.chrome.ipcRenderer
@@ -15,7 +15,7 @@ const aboutActions = {
    * @param {string} value - The value of the setting to set
    */
   dispatchAction: function (action) {
-    ipc.send(messages.DISPATCH_ACTION, serializer.serialize(action))
+    appDispatcher.dispatch(action)
   },
 
   /**

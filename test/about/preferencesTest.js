@@ -35,7 +35,7 @@ describe('General Panel', function () {
         .keys('а')
         .waitUntil(function () {
           return this.getValue(homepageInput).then((val) => {
-            return val === 'https://www.brave.xn--com-8cd'
+            return val === 'https://www.brave.xn--com-8cd/'
           })
         })
     })
@@ -71,6 +71,7 @@ describe('General Panel', function () {
       const page1 = 'https://start.duckduckgo.com/'
       const page2 = 'https://brave.com/'
 
+      yield setup(Brave.app.client)
       yield Brave.app.client.changeSetting(settings.STARTUP_MODE, startsWithOption.HOMEPAGE)
       // TODO remove when #6920 is fixed
       yield Brave.app.client.changeSetting(settings.NEWTAB_MODE, newTabMode.HOMEPAGE)

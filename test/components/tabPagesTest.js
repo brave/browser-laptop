@@ -1,4 +1,4 @@
-/* global describe, it, before */
+/* global describe, it, before, beforeEach */
 
 const Brave = require('../lib/brave')
 const appConfig = require('../../js/constants/appConfig')
@@ -14,9 +14,9 @@ describe('tab pages', function () {
   }
 
   describe('basic tab page functionality', function () {
-    Brave.beforeAll(this)
+    Brave.beforeEach(this)
 
-    before(function * () {
+    beforeEach(function * () {
       yield setup(this.app.client)
       yield this.app.client
         .waitForElementCount(tabPage, 0)
@@ -47,7 +47,7 @@ describe('tab pages', function () {
     })
 
     describe('allows changing to tab pages', function () {
-      before(function * () {
+      beforeEach(function * () {
         // Make sure there are 2 tab pages
         yield this.app.client
           .click(newFrameButton)
@@ -70,7 +70,7 @@ describe('tab pages', function () {
         const defaultTabsPerPage = appConfig.defaultSettings[settings.TABS_PER_PAGE]
         yield this.app.client
           .changeSetting(settings.TABS_PER_PAGE, 1)
-          .waitForElementCount(tabPage, defaultTabsPerPage + 1)
+          .waitForElementCount(tabPage, defaultTabsPerPage)
       })
     })
   })

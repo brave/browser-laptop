@@ -53,44 +53,42 @@ module.exports.showFlashMessageBox = (location, tabId) => {
   const origin = getOrigin(location)
   const message = locale.translation('allowFlashPlayer', {origin})
 
-  setImmediate(() => {
-    // This is bad, we shouldn't be calling actions from actions
-    // so we need to refactor notifications into a state helper
-    appActions.showMessageBox({
-      buttons: [
-        {text: locale.translation('deny')},
-        {text: locale.translation('allow')}
-      ],
-      message,
-      frameOrigin: origin,
-      options: {
-        persist: true
-      }
-    })
+  // This is bad, we shouldn't be calling actions from actions
+  // so we need to refactor notifications into a state helper
+  appActions.showMessageBox({
+    buttons: [
+      {text: locale.translation('deny')},
+      {text: locale.translation('allow')}
+    ],
+    message,
+    frameOrigin: origin,
+    options: {
+      persist: true
+    }
+  })
 
-    ipcMain.once(messages.NOTIFICATION_RESPONSE, (e, msg, buttonIndex, persist) => {
-      if (msg === message) {
-        appActions.hideMessageBox(message)
-        if (buttonIndex === 1) {
-          if (persist) {
-            appActions.changeSiteSetting(origin, 'flash', Date.now() + 7 * 24 * 1000 * 3600)
-          } else {
-            appActions.changeSiteSetting(origin, 'flash', 1)
-          }
-
-          if (tabId) {
-            const tab = webContents.fromTabID(tabId)
-            if (tab && !tab.isDestroyed()) {
-              return tab.reload()
-            }
-          }
+  ipcMain.once(messages.NOTIFICATION_RESPONSE, (e, msg, buttonIndex, persist) => {
+    if (msg === message) {
+      appActions.hideMessageBox(message)
+      if (buttonIndex === 1) {
+        if (persist) {
+          appActions.changeSiteSetting(origin, 'flash', Date.now() + 7 * 24 * 1000 * 3600)
         } else {
-          if (persist) {
-            appActions.changeSiteSetting(origin, 'flash', false)
+          appActions.changeSiteSetting(origin, 'flash', 1)
+        }
+
+        if (tabId) {
+          const tab = webContents.fromTabID(tabId)
+          if (tab && !tab.isDestroyed()) {
+            return tab.reload()
           }
         }
+      } else {
+        if (persist) {
+          appActions.changeSiteSetting(origin, 'flash', false)
+        }
       }
-    })
+    }
   })
 }
 

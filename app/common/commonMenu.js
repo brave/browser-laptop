@@ -14,13 +14,10 @@ const communityURL = 'https://community.brave.com/'
 const isDarwin = process.platform === 'darwin'
 const electron = require('electron')
 
-let app
 let BrowserWindow
 if (process.type === 'browser') {
-  app = electron.app
   BrowserWindow = electron.BrowserWindow
 } else {
-  app = electron.remote.app
   BrowserWindow = electron.remote.BrowserWindow
 }
 
@@ -57,11 +54,7 @@ module.exports.quitMenuItem = () => ({
   label: locale.translation('quitApp'),
   accelerator: 'CmdOrCtrl+Q',
   click: function () {
-    if (process.type === 'browser') {
-      app.quit()
-    } else {
-      electron.ipcRenderer.send(messages.QUIT_APPLICATION)
-    }
+    appActions.shuttingDown()
   }
 })
 

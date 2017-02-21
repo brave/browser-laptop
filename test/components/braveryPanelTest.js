@@ -204,7 +204,6 @@ describe('Bravery Panel', function () {
         .waitForDataFile('adblock')
         .tabByIndex(0)
         .loadUrl(aboutAdblockURL)
-        .url(aboutAdblockURL)
         .waitForVisible(customFiltersInput)
         .setValue(customFiltersInput, 'testblock.brave.com')
         .windowByUrl(Brave.browserWindowUrl)
@@ -293,7 +292,6 @@ describe('Bravery Panel', function () {
       yield this.app.client
         .ipcSend(messages.SHORTCUT_NEW_FRAME, url, { isPrivate: true })
         .waitForTabCount(2)
-        .waitForUrl(url)
         .windowByUrl(Brave.browserWindowUrl)
         .openBraveMenu(braveMenu, braveryPanel)
         .waitUntil(function () {
@@ -307,7 +305,6 @@ describe('Bravery Panel', function () {
         .keys(Brave.keys.ESCAPE)
         .ipcSend(messages.SHORTCUT_NEW_FRAME, url)
         .waitForTabCount(3)
-        .waitForUrl(url)
         .openBraveMenu(braveMenu, braveryPanel)
         .waitUntil(function () {
           return this.getText(adsBlockedStat)

@@ -72,6 +72,7 @@ function * toggleSync (client, expectedState) {
 
 function * setupSync (client, seed) {
   yield client
+    .waitForBrowserWindow()
     .saveSyncInitData(seed, Immutable.fromJS([0]), 0, 'data:image/png;base64,foo')
     .windowByUrl(Brave.browserWindowUrl)
   yield toggleSync(client, true)
@@ -93,11 +94,13 @@ function * bookmarkUrl (url, title, folderId) {
     .waitForVisible(navigatorNotBookmarked)
     .click(navigatorNotBookmarked)
     .waitForVisible(doneButton)
+    .waitForVisible('#bookmarkName input')
     .setInputText('#bookmarkName input', title)
     .waitForBookmarkDetail(url, title)
   if (folderId) {
     const folderOption = `#bookmarkParentFolder select option[value="${folderId}"`
     yield Brave.app.client
+      .waitForVisible('#bookmarkParentFolder select')
       .click('#bookmarkParentFolder select')
       .waitForVisible(folderOption)
       .click(folderOption)
@@ -467,22 +470,21 @@ describe('Syncing bookmarks from an existing profile', function () {
     this.folder1Page2Title = 'Page 1.5'
     yield Brave.startApp()
     yield setupBrave(Brave.app.client)
-    yield Brave.app.client.windowByUrl(Brave.browserWindowUrl)
+    yield Brave.app.client
+      .waitForUrl(Brave.newTabUrl)
+      .waitForBrowserWindow()
 
     // Bookmark page 1
     yield bookmarkUrl(this.page1Url, this.page1Title)
 
-    // Bookmark page 2 and rename it
-    yield Brave.app.client
-      .tabByIndex(0)
-      .waitForUrl(this.page1Url)
     yield bookmarkUrl(this.page2Url, this.page2Title)
     yield Brave.app.client
+      .waitForBrowserWindow()
       .activateURLMode()
       .waitForVisible(navigatorBookmarked)
       .click(navigatorBookmarked)
       .waitForVisible(doneButton)
-      .waitForExist('#bookmarkName input')
+      .waitForVisible('#bookmarkName input')
       .setInputText('#bookmarkName input', this.page2TitleUpdated)
       .waitForBookmarkDetail(this.page2Url, this.page2TitleUpdated)
       .waitForEnabled(doneButton)
@@ -500,13 +502,16 @@ describe('Syncing bookmarks from an existing profile', function () {
     yield bookmarkUrl(this.folder1Page2Url, this.folder1Page2Title)
     const folder1Option = `#bookmarkParentFolder select option[value="${folder1Id}"`
     yield Brave.app.client
+      .waitForBrowserWindow()
       .activateURLMode()
       .waitForVisible(navigatorBookmarked)
       .click(navigatorBookmarked)
       .waitForVisible(doneButton)
+      .waitForVisible('#bookmarkParentFolder select')
       .click('#bookmarkParentFolder select')
       .waitForVisible(folder1Option)
       .click(folder1Option)
+      .waitForEnabled(doneButton)
       .click(doneButton)
 
     // Enable Sync

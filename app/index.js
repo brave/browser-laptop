@@ -52,7 +52,6 @@ const BrowserWindow = electron.BrowserWindow
 const dialog = electron.dialog
 const ipcMain = electron.ipcMain
 const Immutable = require('immutable')
-const Menu = require('./browser/menu')
 const Updater = require('./updater')
 const Importer = require('./importer')
 const messages = require('../js/constants/messages')
@@ -77,7 +76,6 @@ const contentSettings = require('../js/state/contentSettings')
 const privacy = require('../js/state/privacy')
 const async = require('async')
 const settings = require('../js/constants/settings')
-const sync = require('./sync')
 const BookmarksExporter = require('./browser/bookmarksExporter')
 
 app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferHtmlOverPlugins')
@@ -245,14 +243,18 @@ app.on('ready', () => {
   })
 
   app.on('before-quit', (e) => {
-    appActions.shuttingDown()
-    shuttingDown = true
     if (sessionStateStoreCompleteOnQuit) {
       return
     }
-
     e.preventDefault()
 
+    // before-quit can be triggered multiple times because of the preventDefault call
+    if (shuttingDown) {
+      return
+    }
+    shuttingDown = true
+
+    appActions.shuttingDown()
     clearInterval(sessionStateSaveInterval)
     initiateSessionStateSave(true)
 
@@ -344,10 +346,13 @@ app.on('ready', () => {
     const loadedPerWindowState = initialState.perWindowState
     delete initialState.perWindowState
     appActions.setState(Immutable.fromJS(initialState))
-    Menu.init(initialState, null)
-    sync.init(initialState.sync || {})
-    return loadedPerWindowState
-  }).then((loadedPerWindowState) => {
+    setImmediate(() => perWindowStateLoaded(loadedPerWindowState))
+  })
+
+  const perWindowStateLoaded = (loadedPerWindowState) => {
+    // TODO(bridiver) - this shold be refactored into reducers
+    // DO NOT ADD ANYHING TO THIS LIST
+    // See tabsReducer.js for app state init example
     contentSettings.init()
     privacy.init()
     Autofill.init()
@@ -388,10 +393,6 @@ app.on('ready', () => {
         location: CmdLine.newWindowURL()
       }))
     }
-
-    ipcMain.on(messages.QUIT_APPLICATION, () => {
-      app.quit()
-    })
 
     ipcMain.on(messages.PREFS_RESTART, (e, config, value) => {
       var message = locale.translation('prefsRestart')
@@ -510,5 +511,5 @@ app.on('ready', () => {
       })
     })
     ready = true
-  })
+  }
 })
