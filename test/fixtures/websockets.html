@@ -1,0 +1,14 @@
+<div id='result'></div>
+<div id='error'></div>
+<script>
+  // This should get blocked by adblock if it is on
+  var exampleSocket = new WebSocket("ws://ag.innovid.com/dv/sync?tid=2");
+  exampleSocket.onerror = (e) => {
+    document.getElementById('error').innerText = 'error'
+  }
+  // This should be a valid connection
+  var ws = new WebSocket("wss://wss.websocketstest.com:443/service")
+  ws.onopen = function() {
+    document.getElementById('result').innerText = 'success'
+  }
+</script>

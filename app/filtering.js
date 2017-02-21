@@ -568,7 +568,7 @@ function initForPartition (partition) {
   fns.forEach((fn) => { fn(ses, partition, module.exports.isPrivate(partition)) })
 }
 
-const filterableProtocols = ['http:', 'https:']
+const filterableProtocols = ['http:', 'https:', 'ws:', 'wss:']
 
 function shouldIgnoreUrl (details) {
   // internal requests
