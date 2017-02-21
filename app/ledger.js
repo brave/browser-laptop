@@ -1545,6 +1545,8 @@ var runTimeoutId = false
 
 var run = (delayTime) => {
   if (clientOptions.verboseP) {
+    var entries
+
     console.log('\nledger client run: clientP=' + (!!client) + ' delayTime=' + delayTime)
 
     var line = (fields) => {
@@ -1573,7 +1575,8 @@ var run = (delayTime) => {
            'contribP',
            'duration', 'visits'
          ])
-    synopsis.topN().forEach((entry) => {
+    entries = synopsis.topN() || []
+    entries.forEach((entry) => {
       var publisher = entry.publisher
 
       line([ publisher,
