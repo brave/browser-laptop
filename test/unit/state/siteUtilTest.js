@@ -491,6 +491,40 @@ describe('siteUtil', function () {
         const expectedSites = new Immutable.Map()
         assert.deepEqual(processedSites, expectedSites)
       })
+      it('removes the bookmark tag when it is pinned', function () {
+        const siteDetail = {
+          tags: [siteTags.BOOKMARK, siteTags.PINNED],
+          location: testUrl1
+        }
+        const expectedSites = {
+          'https://brave.com/|0|0': {
+            tags: [siteTags.PINNED],
+            location: testUrl1
+          }
+        }
+        const siteKey = siteUtil.getSiteKey(Immutable.fromJS(siteDetail))
+        let sites = {}
+        sites[siteKey] = siteDetail
+        const processedSites = siteUtil.removeSite(Immutable.fromJS(sites), Immutable.fromJS(siteDetail), siteTags.BOOKMARK)
+        assert.deepEqual(processedSites.toJS(), expectedSites)
+      })
+      it('removes the pinned tag when it is bookmarked', function () {
+        const siteDetail = {
+          tags: [siteTags.BOOKMARK, siteTags.PINNED],
+          location: testUrl1
+        }
+        const expectedSites = {
+          'https://brave.com/|0|0': {
+            tags: [siteTags.BOOKMARK],
+            location: testUrl1
+          }
+        }
+        const siteKey = siteUtil.getSiteKey(Immutable.fromJS(siteDetail))
+        let sites = {}
+        sites[siteKey] = siteDetail
+        const processedSites = siteUtil.removeSite(Immutable.fromJS(sites), Immutable.fromJS(siteDetail), siteTags.PINNED)
+        assert.deepEqual(processedSites.toJS(), expectedSites)
+      })
       it('removes folder and its children', function () {
         let sites = {}
         const site1 = {

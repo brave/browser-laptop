@@ -299,25 +299,26 @@ module.exports.removeSite = function (sites, siteDetail, tag, reorder = true, sy
       })
     })
   }
+  let site = sites.get(key)
+  if (!site) {
+    return sites
+  }
   if (isBookmark(tag)) {
+    if (isPinnedTab(tags)) {
+      const tags = site.get('tags').filterNot((tag) => tag === siteTags.BOOKMARK)
+      site = site.set('tags', tags)
+      return sites.set(key, site)
+    }
     if (sites.size && reorder) {
       const order = sites.getIn([key, 'order'])
       sites = reorderSite(sites, order)
     }
     return sites.delete(key)
   } else if (isPinnedTab(tag)) {
-    let site = sites.get(key)
-    if (!site) {
-      return sites
-    }
     const tags = site.get('tags').filterNot((tag) => tag === siteTags.PINNED)
     site = site.set('tags', tags)
     return sites.set(key, site)
   } else {
-    let site = sites.get(key)
-    if (!site) {
-      return sites
-    }
     site = site.set('lastAccessedTime', undefined)
     return sites.set(key, site)
   }
