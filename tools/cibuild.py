@@ -26,7 +26,7 @@ def write_npmrc():
   'target = %s\n' \
   'target_arch = %s\n' \
   'brave_electron_version = %s\n' \
-  'disturl = http://brave-laptop-binaries.s3.amazonaws.com/atom-shell/dist\n' % (MUON_VERSION, TARGET_ARCH, MUON_VERSION)
+  'disturl = https://brave-laptop-binaries.s3.amazonaws.com/atom-shell/dist\n' % (MUON_VERSION, TARGET_ARCH, MUON_VERSION)
   f = open('.npmrc','wb')
   f.write(data)
   f.close()
