@@ -20,7 +20,7 @@ const cleanupWebContents = (tabId) => {
 const getTabValue = function (tabId) {
   let tab = api.getWebContents(tabId)
   if (tab) {
-    let tabValue = makeImmutable(extensions.tabValue(tab))
+    let tabValue = makeImmutable(tab.tabValue())
     tabValue = tabValue.set('canGoBack', tab.canGoBack())
     tabValue = tabValue.set('canGoForward', tab.canGoForward())
     return tabValue.set('tabId', tabId)
@@ -94,7 +94,7 @@ const api = {
     })
 
     app.on('web-contents-created', function (event, tab) {
-      if (extensions.isBackgroundPage(tab) || !tab.isGuest()) {
+      if (tab.isBackgroundPage() || !tab.isGuest()) {
         return
       }
       let tabId = tab.getId()
