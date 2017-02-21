@@ -361,8 +361,9 @@ describe('Syncing bookmarks', function () {
     // Finally start a fresh profile and setup sync
     yield Brave.stopApp()
     yield setup(this.seed)
+    // The bookmarks toolbar should appear automatically
     yield Brave.app.client
-      .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
+      .waitForSettingValue(settings.SHOW_BOOKMARKS_TOOLBAR, true)
   })
 
   after(function * () {
@@ -519,8 +520,9 @@ describe('Syncing bookmarks from an existing profile', function () {
     yield Brave.startApp()
     yield setupBrave(Brave.app.client)
     yield setupSync(Brave.app.client, this.seed)
+    // The bookmarks toolbar should appear automatically
     yield Brave.app.client
-      .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
+      .waitForSettingValue(settings.SHOW_BOOKMARKS_TOOLBAR, true)
   })
 
   after(function * () {
