@@ -1190,6 +1190,11 @@ class Main extends ImmutableComponent {
           key='tab-bar'
           activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
           onMenu={this.onHamburgerMenu}
+          hasTabInFullScreen={
+            sortedFrames
+              .map((frame) => frame.get('isFullScreen'))
+              .some(fullScreenMode => fullScreenMode === true)
+          }
         />
 
         {

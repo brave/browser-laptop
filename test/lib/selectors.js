@@ -4,6 +4,7 @@ module.exports = {
   closeButton: '.close-btn',
   urlInput: '#urlInput',
   activeWebview: '.frameWrapper.isActive webview',
+  activeTab: '[data-test-active-tab]',
   activeTabTitle: '[data-test-active-tab] [data-test-id="tabTitle"]',
   activeTabFavicon: '[data-test-active-tab] [data-test-favicon]',
   pinnedTabsTabs: '.pinnedTabs [data-test-id="tab"]',

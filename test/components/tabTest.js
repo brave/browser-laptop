@@ -4,7 +4,7 @@ const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
 const assert = require('assert')
 const settings = require('../../js/constants/settings')
-const {urlInput, backButton, forwardButton, activeTabTitle, activeTabFavicon, newFrameButton} = require('../lib/selectors')
+const {urlInput, backButton, forwardButton, activeTab, activeTabTitle, activeTabFavicon, newFrameButton, notificationBar} = require('../lib/selectors')
 
 describe('tab tests', function () {
   function * setup (client) {
@@ -354,6 +354,38 @@ describe('tab tests', function () {
         .waitForVisible('[data-test-id="tab"][data-frame-key="2"]')
         // This should not be converted to a waitUntil
         .getText('[data-test-id="tab"][data-frame-key="2"]').then((val) => assert.equal(val, 'Untitled'))
+    })
+  })
+
+  describe('webview in fullscreen mode', function () {
+    Brave.beforeAll(this)
+    before(function * () {
+      yield setup(this.app.client)
+    })
+
+    it('keep favicon and title after exiting fullscreen mode', function * () {
+      const url1 = Brave.server.url('fullscreen.html')
+
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(url1)
+        .tabByUrl(url1)
+        .waitForExist('#fullscreenImg')
+        .click('#fullscreenImg')
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(notificationBar)
+        .waitForExist('button=Allow')
+        .click('button=Allow')
+        .tabByUrl(url1)
+        .waitForExist('#fullscreenImg')
+        .click('#fullscreenImg')
+        .windowByUrl(Brave.browserWindowUrl)
+        .moveToObject(activeTab)
+        .waitForExist(activeTabFavicon)
+        .waitUntil(function () {
+          return this.getText(activeTabTitle)
+            .then((title) => title === 'fullscreenPage')
+        })
     })
   })
 })
