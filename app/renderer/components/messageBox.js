@@ -9,6 +9,7 @@ const Button = require('../../../js/components/button')
 const SwitchControl = require('../../../js/components/switchControl')
 const appActions = require('../../../js/actions/appActions')
 const KeyCodes = require('../../common/constants/keyCodes')
+const config = require('../../../js/constants/config')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const {StyleSheet, css} = require('aphrodite')
 const commonStyles = require('./styles/commonStyles')
@@ -33,7 +34,8 @@ class MessageBox extends ImmutableComponent {
   }
 
   get title () {
-    return (this.props.detail && this.props.detail.get('title')) || ''
+    const msgBoxTitle = (this.props.detail && this.props.detail.get('title')) || ''
+    return msgBoxTitle.replace(config.braveExtensionId, 'Brave')
   }
 
   get message () {

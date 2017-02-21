@@ -8,10 +8,11 @@ const {mount, shallow} = require('enzyme')
 const sinon = require('sinon')
 const assert = require('assert')
 const Immutable = require('immutable')
+const config = require('../../../../../js/constants/config')
 let MessageBox, appActions
 require('../../../braveUnit')
 
-describe('MessageBox component', function () {
+describe('MessageBox component unit tests', function () {
   before(function () {
     mockery.enable({
       warnOnReplace: false,
@@ -85,6 +86,19 @@ describe('MessageBox component', function () {
         )
         const instance = wrapper.instance()
         assert.equal(instance.title, '')
+      })
+
+      it('replaces the Brave extensionId with "Brave"', function () {
+        const detail2 = Object.assign({}, detail1)
+        detail2.title = config.braveExtensionId + ' says:'
+        const wrapper = shallow(
+          <MessageBox
+            tabId={tabId}
+            detail={Immutable.fromJS(detail2)}
+          />
+        )
+        const instance = wrapper.instance()
+        assert.equal(instance.title, 'Brave says:')
       })
     })
 
