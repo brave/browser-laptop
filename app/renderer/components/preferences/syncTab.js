@@ -22,6 +22,7 @@ class SyncTab extends ImmutableComponent {
     super()
     this.toggleSync = this.toggleSync.bind(this)
     this.onSetup = this.setupSyncProfile.bind(this, false)
+    this.onReset = this.reset.bind(this)
     this.onRestore = this.restoreSyncProfile.bind(this)
     this.enableRestore = this.enableRestore.bind(this)
   }
@@ -32,6 +33,20 @@ class SyncTab extends ImmutableComponent {
 
   get enabled () {
     return getSetting(settings.SYNC_ENABLED, this.props.settings)
+  }
+
+  get clearDataContent () {
+    return <div className='syncClearData'>
+      <div className='sectionTitle' data-l10n-id='syncClearData' />
+      {
+        this.enabled
+          ? <button data-l10n-id='syncResetButton' className='linkButton' onClick={this.props.showOverlay.bind(this, 'syncReset')} />
+          : <div>
+            <button disabled data-l10n-id='syncResetButton' className='linkButton' />
+            <div data-l10n-id='syncResetDataDisabled' className='settingsListTitle' />
+          </div>
+      }
+    </div>
   }
 
   get setupContent () {
@@ -147,6 +162,23 @@ class SyncTab extends ImmutableComponent {
       disabled={this.props.syncRestoreEnabled === false} />
   }
 
+  get resetOverlayContent () {
+    return <div className='syncOverlay'>
+      <ul>
+        <li data-l10n-id='syncResetMessageWhat' />
+        <li data-l10n-id='syncResetMessageWhatNot' />
+        <li data-l10n-id='syncResetMessageOtherDevices' />
+      </ul>
+    </div>
+  }
+
+  get resetOverlayFooter () {
+    return <div className='panel'>
+      <Button l10nId='syncReset' className='primaryButton' onClick={this.onReset} />
+      <Button l10nId='cancel' className='whiteButton' onClick={this.props.hideOverlay.bind(this, 'syncReset')} />
+    </div>
+  }
+
   get startOverlayContent () {
     return <div className='syncOverlay'>
       <SettingsList>
@@ -166,6 +198,15 @@ class SyncTab extends ImmutableComponent {
       this.props.enableSyncRestore(true)
     } else if (this.props.syncRestoreEnabled && !e.target.value) {
       this.props.enableSyncRestore(false)
+    }
+  }
+
+  reset () {
+    const locale = require('../../../../js/l10n')
+    const msg = locale.translation('areYouSure')
+    if (window.confirm(msg)) {
+      aboutActions.resetSync()
+      this.props.hideOverlay('syncReset')
     }
   }
 
@@ -219,6 +260,11 @@ class SyncTab extends ImmutableComponent {
         ? <ModalOverlay title={'syncAdd'} content={this.addOverlayContent} footer={this.addOverlayFooter} onHide={this.props.hideOverlay.bind(this, 'syncAdd')} />
         : null
       }
+      {
+      this.isSetup && this.props.syncResetOverlayVisible
+        ? <ModalOverlay title={'syncReset'} content={this.resetOverlayContent} footer={this.resetOverlayFooter} onHide={this.props.hideOverlay.bind(this, 'syncReset')} />
+        : null
+      }
       <div className='sectionTitle' data-l10n-id='syncTitle' />
       <div className='settingsListContainer'>
         <span className='settingsListTitle syncTitleMessage' data-l10n-id='syncTitleMessage' />
@@ -240,6 +286,11 @@ class SyncTab extends ImmutableComponent {
               <SettingCheckbox dataL10nId='syncHistory' prefKey={settings.SYNC_TYPE_HISTORY} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
             </SettingsList>
           </div>
+          : null
+      }
+      {
+        this.isSetup
+          ? this.clearDataContent
           : null
       }
     </div>

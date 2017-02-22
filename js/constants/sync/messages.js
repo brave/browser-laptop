@@ -76,6 +76,11 @@ const messages = {
    */
   DELETE_SYNC_USER: _,
   /**
+   * webview -> browser
+   * sent after the user is successfully deleted.
+   */
+  DELETED_SYNC_USER: _,
+  /**
    * browser -> webview
    * browser sends this to delete all records in a category.
    */

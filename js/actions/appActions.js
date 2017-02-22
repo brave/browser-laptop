@@ -869,6 +869,15 @@ const appActions = {
       lastFetchTimestamp,
       seedQr
     })
+  },
+
+  /**
+   * Dispatches a message to delete sync data.
+   */
+  resetSyncData: function () {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_RESET_SYNC_DATA
+    })
   }
 }
 

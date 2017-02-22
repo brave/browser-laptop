@@ -89,6 +89,7 @@ const appConstants = {
   APP_TAB_CLONED: _,
   APP_SET_OBJECT_ID: _,
   APP_SAVE_SYNC_INIT_DATA: _,
+  APP_RESET_SYNC_DATA: _,
   APP_ADD_NOSCRIPT_EXCEPTIONS: _
 }
 

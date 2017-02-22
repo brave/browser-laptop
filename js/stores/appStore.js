@@ -899,6 +899,19 @@ const handleAppAction = (action) => {
         appState = appState.setIn(['sync', 'seedQr'], action.seedQr)
       }
       break
+    case appConstants.APP_RESET_SYNC_DATA:
+      const sessionStore = require('../../app/sessionStore')
+      const syncDefault = Immutable.fromJS(sessionStore.defaultAppState().sync)
+      appState = appState.set('sync', syncDefault)
+      appState.get('sites').forEach((site, key) => {
+        if (!site.has('objectId')) { return }
+        appState = appState.setIn(['sites', key], site.delete('objectId'))
+      })
+      appState.get('siteSettings').forEach((site, key) => {
+        if (!site.has('objectId')) { return }
+        appState = appState.setIn(['siteSettings', key], site.delete('objectId'))
+      })
+      break
     case appConstants.APP_SHOW_DOWNLOAD_DELETE_CONFIRMATION:
       appState = appState.set('deleteConfirmationVisible', true)
       break
