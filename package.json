@@ -11,6 +11,7 @@
     "add-simulated-synopsis-visits": "node ./tools/addSimulatedSynopsisVisits.js",
     "build-installer": "node ./tools/buildInstaller.js",
     "build-package": "node ./tools/buildPackage.js",
+    "build-test": "cross-env NODE_ENV=test webpack",
     "check-security": "nsp check",
     "checks": "npm run check-security",
     "clean": "node ./tools/clean.js",
