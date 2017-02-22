@@ -750,6 +750,7 @@ var exports = {
       SPECTRON: true
     }
     this.app = new Application({
+      quitTimeout: 0,
       waitTimeout: exports.defaultTimeout,
       connectionRetryTimeout: exports.defaultTimeout,
       path: process.platform === 'win32'
