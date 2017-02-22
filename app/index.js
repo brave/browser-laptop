@@ -479,12 +479,6 @@ app.on('ready', () => {
       ledger.boot()
     })
 
-    ipcMain.on(messages.HIDE_CONTEXT_MENU, () => {
-      if (BrowserWindow.getFocusedWindow()) {
-        BrowserWindow.getFocusedWindow().webContents.send(messages.HIDE_CONTEXT_MENU)
-      }
-    })
-
     ipcMain.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex, persist) => {
       if (prefsRestartCallbacks[message]) {
         prefsRestartCallbacks[message](buttonIndex, persist)

@@ -799,6 +799,9 @@ class Frame extends ImmutableComponent {
           method = (currentDetail, originalDetail) =>
             windowActions.setAutofillCreditCardDetail(currentDetail, originalDetail)
           break
+        case messages.HIDE_CONTEXT_MENU:
+          method = () => windowActions.setContextMenuDetail()
+          break
       }
       method.apply(this, e.args)
     })

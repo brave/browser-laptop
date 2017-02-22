@@ -73,7 +73,7 @@ if (chrome.contentSettings.passwordManager == 'allow') {
           case KeyEvent.DOM_VK_ESCAPE:
             e.preventDefault()
             e.stopPropagation()
-            chrome.ipcRenderer.send('hide-context-menu')
+            chrome.ipcRenderer.sendToHost('hide-context-menu')
             break
           default:
             let rect = usernameElem.getBoundingClientRect()
@@ -91,7 +91,7 @@ if (chrome.contentSettings.passwordManager == 'allow') {
     form.addEventListener('submit', (e) => {
       if (usernameElem) {
         usernameElem.blur()
-        chrome.ipcRenderer.send('hide-context-menu')
+        chrome.ipcRenderer.sendToHost('hide-context-menu')
       }
       onFormSubmit(form, formOrigin)
     })
