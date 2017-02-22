@@ -158,8 +158,8 @@ describe('MessageBox component tests', function () {
           .keys(Brave.keys.ENTER)
           .waitUntil(function () {
             return this.getAppState().then((val) => {
-              const detail = getActiveTabState(val.value)
-              return detail === undefined
+              const tabState = getActiveTabState(val.value)
+              return tabState.messageBoxDetail === undefined
             })
           })
           // Try to show modal a 3rd time
@@ -260,54 +260,6 @@ describe('MessageBox component tests', function () {
           })
       })
     })
-
-    // describe('when tab is closed without dismissing alert', function () {
-    //   let tabId
-
-    //   beforeEach(function * () {
-    //     yield this.app.client
-    //       .waitUntil(function () {
-    //         return this.getAppState().then((val) => {
-    //           tabId = getActiveTabId(val.value)
-    //           const detail = getActiveTabState(val.value)
-    //           return tabId !== undefined && detail !== undefined
-    //         })
-    //       })
-
-    //     // open a new tab
-    //     const page1 = Brave.server.url('page1.html')
-    //     yield this.app.client
-    //       .ipcSend(messages.SHORTCUT_NEW_FRAME, page1)
-    //       .waitForTabCount(2)
-    //       .waitForVisible('#thelink[href="page2.html"]', 1000)
-
-    //     // close the tab which is showing an alert
-    //     yield this.app.client
-    //       .windowByUrl(Brave.browserWindowUrl)
-    //       .moveToObject('[data-test-id="tab"][data-test-active-tab="false"] [data-test-id="tabTitle"]')
-    //       .waitForVisible('[data-test-id="closeTabIcon"]', 1000)
-    //       .leftClick('[data-test-id="closeTabIcon"]')
-    //   })
-
-    //   it('removes the entry from the messageBoxDetail map', function * () {
-    //     yield this.app.client
-    //       .windowByUrl(Brave.browserWindowUrl)
-    //       .waitUntil(function () {
-    //         return this.getAppState().then((val) => {
-    //           return val.value.messageBoxDetail[tabId] === undefined
-    //         })
-    //       })
-    //   })
-    // })
-
-    // describe('when window is closed without dismissing alert', function () {
-    // })
-
-    // describe('when tab crashes before dismissing alert', function () {
-    // })
-
-    // describe('when tab navigates away before dismissing alert', function () {
-    // })
   })
 
   describe('confirm', function () {

@@ -1021,7 +1021,9 @@ class Main extends ImmutableComponent {
                   allowDragging: shouldAllowWindowDrag
                 })} />
                 {
-                  this.extensionButtons
+                  activeTabShowingMessageBox
+                    ? null
+                    : this.extensionButtons
                 }
                 <Button iconClass='braveMenu'
                   l10nId='braveMenu'
@@ -1031,6 +1033,8 @@ class Main extends ImmutableComponent {
                     braveShieldsDown: !braverySettings.shieldsUp,
                     leftOfCaptionButton: customTitlebar.captionButtonsVisible && !customTitlebar.menubarVisible
                   })}
+                  data-test-id='braveShieldButton'
+                  disabled={activeTabShowingMessageBox}
                   onClick={this.onBraveMenu} />
                 {
                   customTitlebar.captionButtonsVisible && !customTitlebar.menubarVisible

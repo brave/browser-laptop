@@ -13,6 +13,12 @@ const tabMessageBoxReducer = (state, action) => {
     case appConstants.APP_SET_STATE:
       state = tabMessageBox.init(state, action)
       break
+    case appConstants.APP_TAB_UPDATED:
+      state = tabMessageBox.onTabUpdated(state, action)
+      break
+    case appConstants.APP_TAB_CLOSED:
+      state = tabMessageBox.onTabClosed(state, action)
+      break
     case appConstants.APP_TAB_MESSAGE_BOX_SHOWN:
       state = tabMessageBoxState.show(state, action)
       break

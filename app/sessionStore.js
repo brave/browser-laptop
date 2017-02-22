@@ -246,7 +246,7 @@ module.exports.cleanAppData = (data, isShutdown) => {
   // TODO(bridiver) use immutable
   data = makeImmutable(data).toJS()
 
-  // Don't show notifications or message boxes from the last session
+  // Don't show notifications from the last session
   data.notifications = []
   // Delete temp site settings
   data.temporarySiteSettings = {}

@@ -25,11 +25,8 @@ const exampleMessageBox = Immutable.fromJS({
   showSuppress: false
 })
 
-const fakeWebContents = {
-  on: (eventName) => {}
-}
-
 const fakeMessageBoxState = {
+  getDetail: (state, tabId) => {},
   removeDetail: (state, action) => {}
 }
 
@@ -56,29 +53,15 @@ describe('tabMessageBox unit tests', function () {
 
   describe('show', function () {
     let callCount
-    let webContentsSpy
 
     before(function () {
-      webContentsSpy = sinon.spy(fakeWebContents, 'on')
       callCount = tabMessageBoxShownStub.withArgs(exampleTabId, exampleMessageBox).callCount
-      tabMessageBox.show(fakeWebContents, exampleTabId, exampleMessageBox, exampleCallback)
-    })
-
-    after(function () {
-      webContentsSpy.restore()
+      tabMessageBox.show(exampleTabId, exampleMessageBox, exampleCallback)
     })
 
     it('registers a callback', function () {
       const callbacks = tabMessageBox.getCallbacks()
       assert(callbacks[exampleTabId] && callbacks[exampleTabId] === exampleCallback)
-    })
-
-    it('calls sets handler for webContents.destroyed', function () {
-      assert.equal(webContentsSpy.withArgs('destroyed').calledOnce, true)
-    })
-
-    it('calls sets handler for webContents.crashed', function () {
-      assert.equal(webContentsSpy.withArgs('crashed').calledOnce, true)
     })
 
     it('calls appActions.tabMessageBoxShown', function () {
@@ -100,14 +83,14 @@ describe('tabMessageBox unit tests', function () {
       })
       removeSpy = sinon.spy(fakeMessageBoxState, 'removeDetail')
       callbackSpy = sinon.spy()
-      tabMessageBox.show(fakeWebContents, exampleTabId, {}, callbackSpy)
+      tabMessageBox.show(exampleTabId, {}, callbackSpy)
     })
 
     afterEach(function () {
       removeSpy.restore()
     })
 
-    it('calls removes the detail record', function () {
+    it('calls `tabMessageBoxState.removeDetail` to remove the detail record', function () {
       tabMessageBox.close(newAppState, action)
       assert.equal(removeSpy.withArgs(newAppState, action).calledOnce, true)
     })
@@ -145,6 +128,100 @@ describe('tabMessageBox unit tests', function () {
       tabMessageBox.close(newAppState, action)
       const callbacks = tabMessageBox.getCallbacks()
       assert.equal(callbacks[exampleTabId], undefined)
+    })
+  })
+
+  describe('onTabUpdated', function () {
+    let removeSpy
+    let getDetailStub
+    let callbackSpy
+    let newAppState
+    let action
+
+    beforeEach(function () {
+      const exampleMessageBox2 = exampleMessageBox.set('opener', 'https://twitter.com/brave')
+      newAppState = defaultAppState.setIn(['messageBoxDetail', exampleTabId], exampleMessageBox2)
+      action = Immutable.fromJS({
+        actionType: 'app-tab-updated',
+        tabValue: {
+          audible: false,
+          active: true,
+          autoDiscardable: false,
+          windowId: 2,
+          incognito: false,
+          canGoForward: false,
+          url: 'https://twitter.com/brave',
+          tabId: exampleTabId,
+          index: 0,
+          status: 'complete',
+          highlighted: true,
+          title: 'Brave Software (@brave) | Twitter',
+          pinned: false,
+          id: exampleTabId,
+          selected: true,
+          discarded: false,
+          canGoBack: true
+        }
+      })
+      getDetailStub = sinon.stub(fakeMessageBoxState, 'getDetail').returns(exampleMessageBox2)
+      removeSpy = sinon.spy(fakeMessageBoxState, 'removeDetail')
+      callbackSpy = sinon.spy()
+      tabMessageBox.show(exampleTabId, {}, callbackSpy)
+    })
+
+    afterEach(function () {
+      getDetailStub.restore()
+      removeSpy.restore()
+    })
+
+    it('calls `tabMessageBoxState.getDetail` to get the detail record', function () {
+      tabMessageBox.onTabUpdated(newAppState, action)
+      assert.equal(getDetailStub.withArgs(newAppState, exampleTabId).calledOnce, true)
+    })
+
+    describe('when tab url matches `opener` in detail object', function () {
+      it('does NOT call `tabMessageBoxState.removeDetail`', function () {
+        tabMessageBox.onTabUpdated(newAppState, action)
+        assert.equal(removeSpy.called, false)
+      })
+
+      it('does NOT call the callback', function () {
+        tabMessageBox.onTabUpdated(newAppState, action)
+        assert.equal(callbackSpy.called, false)
+      })
+
+      it('does NOT unregister the callback', function () {
+        tabMessageBox.onTabUpdated(newAppState, action)
+        const callbacks = tabMessageBox.getCallbacks()
+        assert.equal(callbacks[exampleTabId], callbackSpy)
+      })
+    })
+
+    describe('when tab url does not match `opener` in detail object', function () {
+      beforeEach(function () {
+        const exampleMessageBox2 = exampleMessageBox.set('opener', 'https://brave.com')
+        newAppState = defaultAppState.setIn(['messageBoxDetail', exampleTabId], exampleMessageBox2)
+        // redo stub to return new opener
+        getDetailStub.restore()
+        getDetailStub = sinon.stub(fakeMessageBoxState, 'getDetail').returns(exampleMessageBox2)
+      })
+
+      it('calls `tabMessageBoxState.removeDetail` to remove the detail record', function () {
+        const removeAction = Immutable.fromJS({tabId: exampleTabId})
+        tabMessageBox.onTabUpdated(newAppState, action)
+        assert.equal(removeSpy.withArgs(newAppState, removeAction).calledOnce, true)
+      })
+
+      it('calls the callback with default params (false, \'\', false)', function () {
+        tabMessageBox.onTabUpdated(newAppState, action)
+        assert.equal(callbackSpy.withArgs(false, '', false).calledOnce, true)
+      })
+
+      it('unregisters the callback', function () {
+        tabMessageBox.onTabUpdated(newAppState, action)
+        const callbacks = tabMessageBox.getCallbacks()
+        assert.equal(callbacks[exampleTabId], undefined)
+      })
     })
   })
 })

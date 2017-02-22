@@ -180,9 +180,22 @@ const api = {
     return state.set('tabs', tabs)
   },
 
-  getPersistentState: (state) => {
-    // TODO(bridiver) - handle restoring tabs
+  removeTabField: (state, field) => {
     state = makeImmutable(state)
+
+    let tabs = state.get('tabs')
+    for (let i = 0; i < tabs.size; i++) {
+      tabs = tabs.deleteIn([i, field])
+    }
+    return state.set('tabs', tabs)
+  },
+
+  getPersistentState: (state) => {
+    state = makeImmutable(state)
+
+    state = api.removeTabField(state, 'messageBoxDetail')
+
+    // TODO(bridiver) - handle restoring tabs
     return state.delete('tabs')
   }
 }

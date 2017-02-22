@@ -12,19 +12,32 @@ const tabMessageBoxState = {
     state = makeImmutable(state)
     action = makeImmutable(action)
     const tabId = action.get('tabId')
-    const detail = action.get('detail')
-    let tabValue = tabState.getByTabId(state, tabId)
+    let tabValue = tabId && tabState.getByTabId(state, tabId)
 
     if (!tabValue) {
       return state
     }
 
+    let detail = action.get('detail')
     if (!detail || detail.size === 0) {
       tabValue = tabValue.delete(messageBoxDetail)
     } else {
+      detail = detail.set('opener', tabValue.get('url'))
       tabValue = tabValue.set(messageBoxDetail, detail)
     }
     return tabState.updateTab(state, {tabValue, replace: true})
+  },
+
+  getDetail: (state, tabId) => {
+    if (typeof tabId !== 'number') {
+      return null
+    }
+
+    const tabValue = tabState.getByTabId(state, tabId)
+    if (tabValue) {
+      return tabValue.get(messageBoxDetail) || null
+    }
+    return null
   },
 
   update: (state, action) => {
@@ -35,7 +48,7 @@ const tabMessageBoxState = {
     state = makeImmutable(state)
     action = makeImmutable(action)
     const tabId = action.get('tabId')
-    let tabValue = tabState.getByTabId(state, tabId)
+    let tabValue = tabId && tabState.getByTabId(state, tabId)
 
     if (!tabValue) {
       return state

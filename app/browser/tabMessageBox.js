@@ -26,7 +26,7 @@ const tabMessageBox = {
         showSuppress: shouldDisplaySuppressCheckbox
       }
 
-      tabMessageBox.show(webContents, tabId, detail, cb)
+      tabMessageBox.show(tabId, detail, cb)
     })
 
     process.on('window-confirm', (webContents, extraData, title, message, defaultPromptText,
@@ -41,7 +41,7 @@ const tabMessageBox = {
         showSuppress: shouldDisplaySuppressCheckbox
       }
 
-      tabMessageBox.show(webContents, tabId, detail, cb)
+      tabMessageBox.show(tabId, detail, cb)
     })
 
     process.on('window-prompt', (webContents, extraData, title, message, defaultPromptText,
@@ -54,23 +54,8 @@ const tabMessageBox = {
     return state
   },
 
-  show: (webContents, tabId, detail, cb) => {
+  show: (tabId, detail, cb) => {
     messageBoxCallbacks[tabId] = cb
-
-    webContents.on('destroyed', () => {
-      // default to false / '' / false when closed
-      if (cleanupCallback(tabId)) {
-        cb(false, '', false)
-      }
-    })
-
-    webContents.on('crashed', () => {
-      // default to false / '' / false for a crash
-      if (cleanupCallback(tabId)) {
-        cb(false, '', false)
-      }
-    })
-
     setImmediate(() => {
       appActions.tabMessageBoxShown(tabId, detail)
     })
@@ -96,6 +81,42 @@ const tabMessageBox = {
         cb(result, '', suppress)
       } else {
         cb(false, '', false)
+      }
+    }
+    return state
+  },
+
+  onTabClosed: (state, action) => {
+    action = makeImmutable(action)
+    const tabId = action.getIn(['tabValue', 'tabId'])
+    if (tabId) {
+      // remove callback; call w/ defaults
+      let cb = messageBoxCallbacks[tabId]
+      if (cb) {
+        cleanupCallback(tabId)
+        cb(false, '', false)
+      }
+    }
+    return state
+  },
+
+  onTabUpdated: (state, action) => {
+    action = makeImmutable(action)
+    const tabId = action.getIn(['tabValue', 'tabId'])
+    const detail = tabMessageBoxState.getDetail(state, tabId)
+    if (detail && detail.get('opener')) {
+      const url = action.getIn(['tabValue', 'url'])
+      // check if user has navigated away from site which opened the alert
+      if (url && url !== detail.get('opener')) {
+        const removeAction = makeImmutable({tabId: tabId})
+        // remove detail from state
+        state = tabMessageBoxState.removeDetail(state, removeAction)
+        // remove callback; call w/ defaults
+        let cb = messageBoxCallbacks[tabId]
+        if (cb) {
+          cleanupCallback(tabId)
+          cb(false, '', false)
+        }
       }
     }
     return state

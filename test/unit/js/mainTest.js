@@ -26,6 +26,7 @@ describe('Main component unit tests', function () {
     Main = require('../../../js/components/main')
     NavigationBar = require('../../../js/components/navigationBar')
   })
+
   after(function () {
     mockery.disable()
   })
@@ -113,6 +114,11 @@ describe('Main component unit tests', function () {
 
     it('disables the forward navigation button', function () {
       const node = wrapper.find('div.backforward > div.navigationButtonContainer > .forwardButton').node
+      assert.equal(node.props.disabled, true)
+    })
+
+    it('disables the lion icon', function () {
+      const node = wrapper.find('[data-test-id="braveShieldButton"]').node
       assert.equal(node.props.disabled, true)
     })
   })
