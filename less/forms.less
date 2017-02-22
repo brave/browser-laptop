@@ -494,13 +494,32 @@ select {
     .flyoutDialog;
     right: 20px;
     width: auto;
-    max-width: 350px;
-    text-align: center;
+    max-width: 400px;
     font-size: 15px;
     cursor: default;
+    text-align: center;
 
     .truncate {
       margin-bottom: 5px;
+    }
+    .noScriptCheckbox {
+      text-align: left;
+    }
+    .clickable {
+      text-align: left;
+      color: #5B5B5B;
+      &:hover {
+        color: #000;
+      }
+      text-decoration: underline;
+      margin-top: 10px;
+    }
+    button {
+      margin: 2px;
+      margin-top: 10px;
+    }
+    label {
+      margin-left: 2px;
     }
   }
 }

@@ -200,6 +200,27 @@ const siteSettingsToContentSettings = (currentSiteSettings, defaultContentSettin
     if (['number', 'boolean'].includes(typeof siteSetting.get('noScript'))) {
       contentSettings = addContentSettings(contentSettings, 'javascript', primaryPattern, '*', siteSetting.get('noScript') === true ? 'block' : 'allow')
     }
+    const noScriptExceptions = siteSetting.get('noScriptExceptions')
+    if (noScriptExceptions && typeof noScriptExceptions.get(hostPattern) === 'number') {
+      // Allow all is needed for inline scripts to run. XXX: this seems like
+      // a muon bug.
+      contentSettings = addContentSettings(contentSettings, 'javascript',
+        primaryPattern, '*', 'allow')
+      // Re-block the origins that aren't excluded
+      noScriptExceptions.forEach((value, origin) => {
+        if (value === false) {
+          contentSettings = addContentSettings(contentSettings, 'javascript',
+            primaryPattern, origin, 'block')
+        }
+      })
+    } else if (noScriptExceptions && noScriptExceptions.size) {
+      noScriptExceptions.forEach((value, origin) => {
+        if (typeof value === 'number') {
+          contentSettings = addContentSettings(contentSettings, 'javascript',
+            primaryPattern, origin, 'allow')
+        }
+      })
+    }
     if (typeof siteSetting.get('runInsecureContent') === 'boolean') {
       contentSettings = addContentSettings(contentSettings, 'runInsecureContent', primaryPattern, '*',
         siteSetting.get('runInsecureContent') ? 'allow' : 'block')
@@ -279,6 +300,7 @@ const doAction = (action) => {
   switch (action.actionType) {
     case appConstants.APP_REMOVE_SITE_SETTING:
     case appConstants.APP_CHANGE_SITE_SETTING:
+    case appConstants.APP_ADD_NOSCRIPT_EXCEPTIONS:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
         userPrefsUpdateTrigger(action.temporary)
         contentSettingsUpdateTrigger(action.temporary)

@@ -246,6 +246,7 @@ AppStore
       midiSysexPermission: boolean,
       notificationsPermission: boolean,
       noScript: (number|boolean), // true = block scripts, false = allow, 0 = allow once, 1 = allow until restart
+      noScriptExceptions: {[hostPattern]: (number|boolean)}, // hosts where scripts are allowed once (0) or until restart (1). false = block
       objectId: Array.<number>,
       openExternalPermission: boolean,
       pointerLockPermission: boolean,

@@ -293,6 +293,8 @@ module.exports.cleanAppData = (data, isShutdown) => {
     if (typeof noScript === 'number') {
       delete data.siteSettings[host].noScript
     }
+    // Don't persist any noScript exceptions
+    delete data.siteSettings[host].noScriptExceptions
     // Don't write runInsecureContent to session
     delete data.siteSettings[host].runInsecureContent
     // If the site setting is empty, delete it for privacy

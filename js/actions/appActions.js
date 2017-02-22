@@ -829,6 +829,19 @@ const appActions = {
   },
 
   /**
+   * Dispatches a message when noscript exceptions are added for an origin
+   * @param {string} hostPattern
+   * @param {Object.<string, (boolean|number)>} origins
+   */
+  noScriptExceptionsAdded: function (hostPattern, origins) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_ADD_NOSCRIPT_EXCEPTIONS,
+      hostPattern,
+      origins
+    })
+  },
+
+  /**
    * Dispatches a message to set objectId for a syncable object.
    * @param {Array.<number>} objectId
    * @param {Array.<string>} objectPath
