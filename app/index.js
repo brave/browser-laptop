@@ -73,7 +73,6 @@ const UpdateStatus = require('../js/constants/updateStatus')
 const urlParse = require('./common/urlParse')
 const spellCheck = require('./spellCheck')
 const locale = require('./locale')
-const ledger = require('./ledger')
 const contentSettings = require('../js/state/contentSettings')
 const privacy = require('../js/state/privacy')
 const async = require('async')
@@ -252,10 +251,6 @@ app.on('ready', () => {
       return
     }
 
-    // When the browser is closing we need to send a signal
-    // to record the currently active location in the ledger
-    ledger.quit()
-
     e.preventDefault()
 
     clearInterval(sessionStateSaveInterval)
@@ -394,6 +389,9 @@ app.on('ready', () => {
       }))
     }
 
+    ipcMain.on(messages.QUIT_APPLICATION, () => {
+      app.quit()
+    })
 
     ipcMain.on(messages.PREFS_RESTART, (e, config, value) => {
       var message = locale.translation('prefsRestart')
@@ -469,9 +467,6 @@ app.on('ready', () => {
 
     // save app state every 5 minutes regardless of update frequency
     sessionStateSaveInterval = setInterval(initiateSessionStateSave, 1000 * 60 * 5)
-
-    ledger.init()
-
 
     ipcMain.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex, persist) => {
       if (prefsRestartCallbacks[message]) {

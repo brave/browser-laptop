@@ -153,6 +153,10 @@ const doAction = (action) => {
   }
 
   switch (action.actionType) {
+    case appConstants.APP_SHUTTING_DOWN:
+      quit()
+      break
+
     case appConstants.APP_IDLE_STATE_CHANGED:
       visit('NOOP', underscore.now(), null)
       break
