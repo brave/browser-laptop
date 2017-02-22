@@ -386,6 +386,9 @@ const handleAppAction = (action) => {
       break
     case appConstants.APP_SHUTTING_DOWN:
       shuttingDown = true
+      // When the browser is closing we need to send a signal
+      // to record the currently active location in the ledger
+      ledger.quit()
       break
     case appConstants.APP_NEW_WINDOW:
       const frameOpts = (action.frameOpts && action.frameOpts.toJS()) || {}

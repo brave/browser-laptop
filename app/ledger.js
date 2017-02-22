@@ -451,6 +451,10 @@ var promptForRecoveryKeyFile = () => {
  */
 
 if (ipc) {
+  ipc.on(messages.LEDGER_CREATE_WALLET, () => {
+    boot()
+  })
+
   ipc.on(messages.LEDGER_PAYMENTS_PRESENT, (event, presentP) => {
     if (presentP) {
       if (!balanceTimeoutId) getBalance()

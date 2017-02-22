@@ -394,9 +394,6 @@ app.on('ready', () => {
       }))
     }
 
-    ipcMain.on(messages.QUIT_APPLICATION, () => {
-      app.quit()
-    })
 
     ipcMain.on(messages.PREFS_RESTART, (e, config, value) => {
       var message = locale.translation('prefsRestart')
@@ -475,9 +472,6 @@ app.on('ready', () => {
 
     ledger.init()
 
-    ipcMain.on(messages.LEDGER_CREATE_WALLET, () => {
-      ledger.boot()
-    })
 
     ipcMain.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex, persist) => {
       if (prefsRestartCallbacks[message]) {
