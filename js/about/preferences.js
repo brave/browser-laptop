@@ -533,6 +533,7 @@ class GeneralTab extends ImmutableComponent {
             settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         </SettingItem>
       </SettingsList>
+      <div data-l10n-id='requiresRestart' className='requiresRestart' />
     </SettingsList>
   }
 }
@@ -938,6 +939,7 @@ class SecurityTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='doNotTrack' prefKey={settings.DO_NOT_TRACK} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
       <SitePermissionsPage siteSettings={this.props.siteSettings} names={permissionNames} />
+      <div data-l10n-id='requiresRestart' className='requiresRestart' />
     </div>
   }
 }
@@ -963,6 +965,7 @@ class AdvancedTab extends ImmutableComponent {
           }, true)} />
         <div data-l10n-id='moreExtensionsComingSoon' className='moreExtensionsComingSoon' />
       </SettingsList>
+      <div data-l10n-id='requiresRestart' className='requiresRestart' />
     </div>
   }
 }
