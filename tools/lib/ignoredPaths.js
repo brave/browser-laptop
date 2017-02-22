@@ -55,7 +55,6 @@ module.exports = [
   'react-addons-perf',
   'react-addons-test-utils',
   'enzyme',
-  'leveldown',
   'git-rev-sync',
   'sqlite3',
   'uglify-js',
