@@ -764,31 +764,33 @@ var exports = {
   },
 
   stopApp: function (cleanSessionStore = true) {
-    let stop = this.app.stop().then((app) => {
+    const promises = []
+
+    if (process.env.BRAVE_TEST_ALL_LOGS || process.env.BRAVE_TEST_BROWSER_LOGS) {
+      promises.push(this.app.client.getMainProcessLogs().then(function (logs) {
+        logs.forEach(function (log) {
+          console.log(log)
+        })
+      }))
+    }
+    if (process.env.BRAVE_TEST_ALL_LOGS || process.env.BRAVE_TEST_RENDERER_LOGS) {
+      promises.push(this.app.client.getRenderProcessLogs().then(function (logs) {
+        logs.forEach(function (log) {
+          console.log(log)
+        })
+      }))
+    }
+
+    promises.push(this.app.stop().then((app) => {
       if (cleanSessionStore) {
         if (!process.env.KEEP_BRAVE_USER_DATA_DIR) {
           userDataDir && rmDir(userDataDir)
         }
         userDataDir = generateUserDataDir()
       }
-      return app
-    })
+    }))
 
-    if (process.env.BRAVE_TEST_ALL_LOGS || process.env.BRAVE_TEST_BROWSER_LOGS) {
-      this.app.client.getMainProcessLogs().then(function (logs) {
-        logs.forEach(function (log) {
-          console.log(log)
-        })
-      })
-    }
-    if (process.env.BRAVE_TEST_ALL_LOGS || process.env.BRAVE_TEST_RENDERER_LOGS) {
-      this.app.client.getRenderProcessLogs().then(function (logs) {
-        logs.forEach(function (log) {
-          console.log(log)
-        })
-      })
-    }
-    return stop
+    return Promise.all(promises)
   }
 }
 
