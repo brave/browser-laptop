@@ -491,16 +491,25 @@ select {
 
 .noScriptInfo {
   .dialogInner {
-    .flyoutDialog;
-    right: 20px;
-    width: auto;
-    max-width: 350px;
-    text-align: center;
-    font-size: 15px;
-    cursor: default;
 
-    .truncate {
-      margin-bottom: 5px;
+    // Issue #6783
+    .allowScriptsButtons {
+
+      > .browserButton {
+        margin: 2px 0;
+
+        &:first-child {
+          margin-top: 0;
+        }
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        + .browserButton {
+          margin-left: 0;
+        }
+      }
     }
   }
 }
