@@ -12,7 +12,6 @@ const niceware = require('niceware')
 const ModalOverlay = require('../../../../js/components/modalOverlay')
 const Button = require('../../../../js/components/button')
 const {SettingsList, SettingItem, SettingCheckbox} = require('../settings')
-const {SettingTextbox} = require('../../../../app/renderer/components/textbox')
 
 const aboutActions = require('../../../../js/about/aboutActions')
 const getSetting = require('../../../../js/settings').getSetting
@@ -136,9 +135,7 @@ class SyncTab extends ImmutableComponent {
   get deviceNameInputContent () {
     return <SettingItem>
       <span data-l10n-id='syncDeviceNameInput' />
-      <SettingTextbox
-        data-test-id='deviceNameInput'
-        spellCheck='false'
+      <input className='deviceNameInput formControl' spellCheck='false'
         ref={(node) => { this.deviceNameInput = node }}
         placeholder={this.defaultDeviceName} />
     </SettingItem>
