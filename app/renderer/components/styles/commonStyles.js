@@ -52,6 +52,37 @@ const styles = StyleSheet.create({
     backgroundSize: '16px',
     backgroundPosition: 'center center',
     backgroundRepeat: 'no-repeat'
+  },
+
+  // itemList.less
+  listItem: {
+    cursor: 'default',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    padding: '8px 12px',
+    WebkitUserSelect: 'none',
+
+    ':hover': {
+      backgroundColor: globalStyles.color.lightGray
+    }
+  },
+  aboutListItem: {
+    display: 'flex'
+  },
+  aboutItemSeparator: {
+    color: '#aaa',
+    padding: '0 4px'
+  },
+  aboutItemTitle: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap'
+  },
+  aboutItemLocation: {
+    color: '#aaa',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap'
   }
 })
 

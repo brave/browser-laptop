@@ -105,6 +105,7 @@ const globalStyles = {
     navbarLeftMarginDarwin: '76px',
     sideBarWidth: '190px',
     aboutPageSectionPadding: '24px',
+    aboutPageSectionMargin: '10px',
     defaultTabPadding: '0 4px',
     defaultIconPadding: '2px',
     iconSize: '16px',

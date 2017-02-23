@@ -12,9 +12,13 @@ const downloadUtil = require('../state/downloadUtil')
 
 const ipc = window.chrome.ipcRenderer
 
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../app/renderer/components/styles/global')
+const commonStyles = require('../../app/renderer/components/styles/commonStyles')
+const {DownloadList} = require('../../app/renderer/components/list')
+
 // Stylesheets
-require('../../less/about/itemList.less')
-require('../../less/about/downloads.less')
+require('../../less/about/common.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 class DownloadItem extends ImmutableComponent {
@@ -26,15 +30,15 @@ class DownloadItem extends ImmutableComponent {
     const contextMenuDownload = this.props.download.toJS()
     contextMenuDownload.downloadId = this.props.downloadId
     return <div role='listitem'
-      className='listItem'
+      className={css(commonStyles.listItem)}
       onContextMenu={aboutActions.contextMenu.bind(this, contextMenuDownload, 'download')}
       data-context-menu-disable
       onDoubleClick={aboutActions.downloadRevealed.bind(this, this.props.downloadId)}>
       {
-        <div className='aboutListItem' title={this.props.download.get('url')}>
-          <div className='aboutItemTitle'>{this.props.download.get('filename')}</div>
-          <div className='aboutItemTitle' data-l10n-id={downloadUtil.getL10nId(this.props.download)} data-l10n-args={JSON.stringify(l10nStateArgs)} />
-          <div className='aboutItemLocation'>{this.props.download.get('url')}</div>
+        <div className={css(commonStyles.aboutListItem, styles.downloadListItem)} title={this.props.download.get('url')}>
+          <div className={css(commonStyles.aboutItemTitle)}>{this.props.download.get('filename')}</div>
+          <div className={css(commonStyles.aboutItemTitle)} data-l10n-id={downloadUtil.getL10nId(this.props.download)} data-l10n-args={JSON.stringify(l10nStateArgs)} />
+          <div className={css(commonStyles.aboutItemLocation)}>{this.props.download.get('url')}</div>
         </div>
       }
     </div>
@@ -43,14 +47,14 @@ class DownloadItem extends ImmutableComponent {
 
 class DownloadsList extends ImmutableComponent {
   render () {
-    return <list className='downloadList'>
+    return <DownloadList>
       {
         this.props.downloads.size > 0
         ? this.props.downloads.map((download, downloadId) =>
           <DownloadItem download={download} downloadId={downloadId} />)
-        : <div className='downloadList' data-l10n-id='noDownloads' />
+        : <div className={css(styles.downloadList)} data-l10n-id='noDownloads' />
       }
-    </list>
+    </DownloadList>
   }
 }
 
@@ -68,13 +72,30 @@ class AboutDownloads extends React.Component {
     })
   }
   render () {
-    return <div className='downloadsPage'>
+    return <div className={css(styles.downloadsPage)}>
       <h2 data-l10n-id='downloads' />
-      <div className='downloadPageContent'>
+      <div className={css(styles.downloadPageContent)}>
         <DownloadsList downloads={this.state.downloads} />
       </div>
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  downloadsPage: {
+    margin: '20px'
+  },
+  downloadPageContent: {
+    borderTop: `1px solid ${globalStyles.color.chromeBorderColor}`,
+    display: 'flex'
+  },
+  downloadList: {
+    marginTop: globalStyles.spacing.aboutPageSectionMargin,
+    overflow: 'hidden'
+  },
+  downloadListItem: {
+    flexDirection: 'column'
+  }
+})
 
 module.exports = <AboutDownloads />
