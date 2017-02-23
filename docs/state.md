@@ -558,6 +558,15 @@ WindowStore
     top: number // the top position of the popup window
   },
   previewFrameKey: number,
+  locationInfo: {
+    [url]: {
+      publisher: string, // url of the publisher in question
+      verified: boolean, // wheter or not site is a verified publisher
+      exclude: boolean, // wheter or not site is in the excluded list
+      stickyP: boolean, // wheter or not site was added using addFunds urlbar toggle
+      timestamp: number // timestamp in milliseconds
+    }
+  },
   publisherInfo: {
     synopsis: [{
       daysSpent: number, // e.g., 1

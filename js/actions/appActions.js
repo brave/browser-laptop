@@ -413,6 +413,17 @@ const appActions = {
   },
 
   /**
+   * Updates location information for the URL bar
+   * @param {object} locationInfo - the current location synopsis
+   */
+  updateLocationInfo: function (locationInfo) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_UPDATE_LOCATION_INFO,
+      locationInfo
+    })
+  },
+
+  /**
    * Updates publisher information for the payments pane
    * @param {object} publisherInfo - the current publisher synopsis
    */
