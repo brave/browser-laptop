@@ -1,4 +1,4 @@
-/* global describe, it, before */
+/* global describe, it, before, beforeEach */
 
 const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
@@ -32,8 +32,8 @@ describe('Autofill', function () {
   }
 
   describe('address', function () {
-    Brave.beforeAll(this)
-    before(function * () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
       yield setup(this.app.client)
       this.autofillPreferences = 'about:autofill'
       this.formfill = Brave.server.url('formfill.html')
@@ -169,7 +169,6 @@ describe('Autofill', function () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(this.autofillPreferences)
-        .url(getTargetAboutUrl(this.autofillPreferences))
         .waitForVisible('[title="Delete address"]')
         .click('[title="Delete address"]')
         .loadUrl(this.autofillPreferences)
@@ -178,8 +177,8 @@ describe('Autofill', function () {
   })
 
   describe('credit card', function () {
-    Brave.beforeAll(this)
-    before(function * () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
       yield setup(this.app.client)
       this.autofillPreferences = 'about:autofill'
       this.formfill = Brave.server.url('formfill.html')
@@ -301,8 +300,8 @@ describe('Autofill', function () {
   })
 
   describe('clear autofill data', function () {
-    Brave.beforeAll(this)
-    before(function * () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
       yield setup(this.app.client)
       this.autofillPreferences = 'about:autofill'
       this.formfill = Brave.server.url('formfill.html')
@@ -615,8 +614,8 @@ describe('Autofill', function () {
     })
   })
   describe('autofill context menu', function () {
-    Brave.beforeAll(this)
-    before(function * () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
       yield setup(this.app.client)
       this.formfill = Brave.server.url('formfill.html')
       yield this.app.client
