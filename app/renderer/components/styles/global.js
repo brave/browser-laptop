@@ -117,7 +117,7 @@ const globalStyles = {
     dialogShadow: '0px 8px 22px 0px rgba(0, 0, 0, .5)',
     softBoxShadow: '0 4px 8px lightGray',
     lightBoxShadow: '0 2px 2px lightGray',
-    insetShadow: 'inset -5px 0 15px black25',
+    insetShadow: 'inset -5px 0 15px rgba(0,0,0,0.25)',
     orangeButtonShadow: '0 2px 0 braveDarkOrange'
   },
   transition: {

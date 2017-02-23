@@ -40,11 +40,15 @@ const styles = StyleSheet.create({
   },
 
   helpfulHints: {
-    width: '100%',
-    height: '100%',
     cursor: 'default',
-    padding: '30px 0',
-    marginTop: '20px'
+    padding: '20px 0 0',
+    overflowY: 'auto',
+
+    '@media (min-height: 620px)': {
+      position: 'absolute',
+      bottom: '0',
+      overflowY: 'none'
+    }
   },
 
   hintsTitleContainer: {
