@@ -226,26 +226,24 @@ const styles = StyleSheet.create({
     WebkitAppRegion: 'no-drag',
 
     ':hover': {
-      backgroundColor: '#e5f3ff',
-      border: '1px solid #cce8ff'
+      backgroundColor: globalStyles.color.menubarItemColor,
+      border: `1px solid ${globalStyles.color.menubarItemBackground}`
     }
   },
 
   menubarItemForWindows: {
-    // breakpointSmallWin32
-    '@media (max-width: 650px)': {
+    [`@media (max-width: ${globalStyles.breakpoint.breakpointSmallWin32})`]: {
       padding: '0 5px 1px'
     },
 
-    // breakpointTinyWin32
-    '@media (max-width: 500px)': {
+    [`@media (max-width: ${globalStyles.breakpoint.breakpointTinyWin32})`]: {
       padding: '0 3px 1px'
     }
   },
 
   menubarItemSelected: {
-    backgroundColor: '#cce8ff',
-    border: '1px solid #99d1ff'
+    backgroundColor: globalStyles.color.menubarItemBackground,
+    border: `1px solid ${globalStyles.color.menubarItemSelectedBorder}`
   }
 })
 

@@ -56,7 +56,7 @@ class WindowCaptionButtons extends ImmutableComponent {
       windowCaptionButtons: true,
       verticallyCenter: this.props.verticallyCenter
     })}
-      style={{flexGlow: 0}}>
+      style={{flexGlow: 0}}> // TODO: Remove this styling by refactoring windowCaptionButtons.js
       <div className='container'>
         <button
           {...props}
