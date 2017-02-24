@@ -9,7 +9,9 @@ const ExtensionConstants = require('../../app/common/constants/extensionConstant
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
+const writeActions = require('../constants/sync/proto').actions
 const siteUtil = require('../state/siteUtil')
+const syncUtil = require('../state/syncUtil')
 const siteSettings = require('../state/siteSettings')
 const appUrlUtil = require('../lib/appUrlUtil')
 const electron = require('electron')
@@ -484,6 +486,34 @@ const handleAppAction = (action) => {
       break
     case appConstants.APP_DATA_URL_COPIED:
       nativeImage.copyDataURL(action.dataURL, action.html, action.text)
+      break
+    case appConstants.APP_APPLY_SITE_RECORDS:
+      action.records.forEach((record) => {
+        const siteData = syncUtil.getSiteDataFromRecord(record, appState)
+        const tag = siteData.tag
+        let siteDetail = siteData.siteDetail
+        const sites = appState.get('sites')
+        if (record.action !== writeActions.DELETE &&
+          !siteDetail.get('folderId') && siteUtil.isFolder(siteDetail)) {
+          siteDetail = siteDetail.set('folderId', siteUtil.getNextFolderId(sites))
+        }
+        switch (record.action) {
+          case writeActions.CREATE:
+            appState = appState.set('sites',
+              siteUtil.addSite(sites, siteDetail, tag))
+            break
+          case writeActions.UPDATE:
+            appState = appState.set('sites',
+              siteUtil.addSite(sites, siteDetail, tag, siteData.existingObjectData))
+            break
+          case writeActions.DELETE:
+            appState = appState.set('sites',
+              siteUtil.removeSite(sites, siteDetail, tag))
+            break
+        }
+      })
+      appState = aboutNewTabState.setSites(appState)
+      appState = aboutHistoryState.setHistory(appState)
       break
     case appConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size

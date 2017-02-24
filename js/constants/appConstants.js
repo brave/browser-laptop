@@ -20,6 +20,7 @@ const appConstants = {
   APP_SET_STATE: _,
   APP_REMOVE_SITE: _,
   APP_MOVE_SITE: _,
+  APP_APPLY_SITE_RECORDS: _,
   APP_MERGE_DOWNLOAD_DETAIL: _, // Sets an individual download detail
   APP_CLEAR_COMPLETED_DOWNLOADS: _, // Removes all completed downloads
   APP_ADD_PASSWORD: _, /** @param {Object} passwordDetail */

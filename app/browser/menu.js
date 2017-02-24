@@ -620,6 +620,13 @@ const doAction = (action) => {
         }
       })
       break
+    case appConstants.APP_APPLY_SITE_RECORDS:
+      if (action.records.find((record) => record.objectData === 'bookmark')) {
+        appDispatcher.waitFor([appStore.dispatchToken], () => {
+          createMenu()
+        })
+      }
+      break
     case appConstants.APP_ADD_SITE:
       if (action.tag === siteTags.BOOKMARK || action.tag === siteTags.BOOKMARK_FOLDER) {
         appDispatcher.waitFor([appStore.dispatchToken], () => {
