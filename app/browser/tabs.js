@@ -1,9 +1,10 @@
 const appActions = require('../../js/actions/appActions')
+const config = require('../../js/constants/config')
 const debounce = require('../../js/lib/debounce')
 const messages = require('../../js/constants/messages')
 const Immutable = require('immutable')
 const tabState = require('../common/state/tabState')
-const {app, extensions} = require('electron')
+const {app, BrowserWindow, extensions} = require('electron')
 const { makeImmutable } = require('../common/state/immutableUtil')
 
 let currentWebContents = {}
@@ -267,6 +268,19 @@ const api = {
     extensions.createTab(createProperties, (tab) => {
       cb && cb(tab)
     })
+  },
+
+  executeScriptInBackground: (script, cb) => {
+    const win = new BrowserWindow({
+      show: false
+    })
+    win.webContents.on('did-finish-load', (e) => {
+      win.webContents.executeScriptInTab(config.braveExtensionId, script, {}, (err, url, result) => {
+        win.close()
+        cb(err, url, result)
+      })
+    })
+    win.loadURL('about:blank')
   }
 }
 
