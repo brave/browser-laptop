@@ -66,7 +66,6 @@ module.exports.getSiteDataFromRecord = (record, appState) => {
   let existingObjectData
 
   if (record.action !== writeActions.CREATE) {
-    // XXX: Is this necessary for CREATEs also?
     const existingObject = module.exports.getObjectById(objectId, category,
       appState)
     existingObjectData = existingObject && existingObject[1]

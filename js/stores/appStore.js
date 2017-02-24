@@ -512,6 +512,8 @@ const handleAppAction = (action) => {
             break
         }
       })
+      appState = aboutNewTabState.setSites(appState)
+      appState = aboutHistoryState.setHistory(appState)
       break
     case appConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size
