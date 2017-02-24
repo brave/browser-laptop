@@ -116,7 +116,7 @@ describe('notificationBar', function () {
       }).click('button=Yes')
       .tabByIndex(0)
       .loadUrl('about:passwords')
-      .waitForExist('tr.passwordItem')
+      .waitForExist('[data-test-id="passwordItem"]')
       .windowByUrl(Brave.browserWindowUrl)
       .tabByIndex(0)
       .loadUrl(this.loginUrl4)

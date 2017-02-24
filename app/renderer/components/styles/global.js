@@ -157,14 +157,16 @@ const globalStyles = {
     tabTitle: '12px'
   },
   appIcons: {
-    loading: 'fa fa-spinner fa-spin',
-    defaultIcon: 'fa fa-file-o',
+    clipboard: 'fa fa-clipboard',
     closeTab: 'fa fa-times-circle',
-    private: 'fa fa-eye',
+    defaultIcon: 'fa fa-file-o',
+    loading: 'fa fa-spinner fa-spin',
     newSession: 'fa fa-user',
-    volumeOn: 'fa fa-volume-up',
+    private: 'fa fa-eye',
+    refresh: 'fa fa-refresh',
+    remove: 'fa fa-times',
     volumeOff: 'fa fa-volume-off',
-    refresh: 'fa fa-refresh'
+    volumeOn: 'fa fa-volume-up'
   }
 }
 
