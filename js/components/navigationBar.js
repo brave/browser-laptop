@@ -79,6 +79,7 @@ class NavigationBar extends ImmutableComponent {
   }
 
   onStop () {
+    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_STOP)
     if (this.props.navbar.getIn(['urlbar', 'focused'])) {
       windowActions.setUrlBarActive(false)
       const shouldRenderSuggestions = this.props.navbar.getIn(['urlbar', 'suggestions', 'shouldRender']) === true
