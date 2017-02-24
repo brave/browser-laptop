@@ -9,7 +9,7 @@ const Immutable = require('immutable')
 const UrlUtil = require('../lib/urlutil')
 
 // Components
-const PreferenceNavigation = require('../../app/renderer/components/preferences/PreferenceNavigation')
+const PreferenceNavigation = require('../../app/renderer/components/preferences/preferenceNavigation')
 const ModalOverlay = require('../components/modalOverlay')
 const {SettingsList, SettingItem, SettingCheckbox, SiteSettingCheckbox} = require('../../app/renderer/components/settings')
 const {SettingTextbox} = require('../../app/renderer/components/textbox')
