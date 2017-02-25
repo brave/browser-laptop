@@ -19,10 +19,6 @@ if (typeof chrome !== 'undefined') { // eslint-disable-line
 
 class AppDispatcher {
 
-  get defaultDispatchPriority () {
-    return 3
-  }
-
   constructor () {
     this.callbacks = []
     this.promises = []
@@ -67,7 +63,7 @@ class AppDispatcher {
     }
 
     if (this.dispatching) {
-      dispatchQueue.push(payload, payload.dispatchPriority || this.defaultDispatchPriority)
+      dispatchCargo.push(payload)
     } else {
       this.dispatching = true
       this.dispatchInternal(payload, doneDispatching)
@@ -111,17 +107,18 @@ class AppDispatcher {
 const appDispatcher = new AppDispatcher()
 
 const doneDispatching = () => {
-  if (dispatchQueue.idle()) {
+  if (dispatchCargo.idle()) {
     appDispatcher.dispatching = false
   }
 }
 
-const dispatchQueue = async.priorityQueue((task, callback) => {
-  appDispatcher.dispatchInternal(task, () => {
-    callback()
-    doneDispatching()
-  })
-}, 1)
+const dispatchCargo = async.cargo((task, callback) => {
+  for (let i = 0; i < task.length; i++) {
+    appDispatcher.dispatchInternal(task[i], () => {})
+  }
+  callback()
+  doneDispatching()
+}, 20)
 
 const ipcCargo = async.cargo((tasks, callback) => {
   ipc.send(messages.DISPATCH_ACTION, Serializer.serialize(tasks))
@@ -178,8 +175,6 @@ if (process.type === 'browser') {
       payload.queryInfo = queryInfo
       payload.senderTabId = event.sender.getId()
     }
-    // set the default priority for incoming ipc payloads to be slightly lower than the default
-    payload.dispatchPriority = payload.dispatchPriority || (appDispatcher.defaultDispatchPriority + 1)
     appDispatcher.dispatch(payload)
   }
 
