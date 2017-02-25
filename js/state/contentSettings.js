@@ -18,12 +18,17 @@ const siteSettings = require('./siteSettings')
 const {registerUserPrefs} = require('./userPrefs')
 const {getSetting} = require('../settings')
 const {getFlashResourceId} = require('../flash')
+const net = require('net')
 
 // backward compatibility with appState siteSettings
 const parseSiteSettingsPattern = (pattern) => {
   let normalizedPattern = pattern.replace('https?', 'https')
   let parsed = urlParse(normalizedPattern)
-  return '[*.]' + parsed.host
+  if (net.isIP(parsed.hostname)) {
+    return parsed.host
+  } else {
+    return '[*.]' + parsed.host
+  }
 }
 
 const toContentSetting = (primaryPattern, secondaryPattern = undefined, setting = 'block', resourceId = undefined) => {
