@@ -26,12 +26,10 @@ const getTabValue = function (tabId) {
   }
 }
 
-const tabUpdated = debounce(appActions.tabUpdated.bind(appActions), 5)
-
 const updateTab = (tabId) => {
   let tabValue = getTabValue(tabId)
   if (tabValue) {
-    tabUpdated(tabValue)
+    appActions.tabUpdated(tabValue)
   }
 }
 
@@ -95,6 +93,8 @@ const api = {
         return
       }
       let tabId = tab.getId()
+      const updateTabDebounce = debounce(updateTab, 5)
+
       tab.once('destroyed', cleanupWebContents.bind(null, tabId))
       tab.once('crashed', cleanupWebContents.bind(null, tabId))
       tab.once('close', cleanupWebContents.bind(null, tabId))
@@ -109,7 +109,7 @@ const api = {
           // tab.setTabValues({
           //   faviconUrl: favicons[0]
           // })
-          // updateTab(tabId)
+          // updateTabDebounce(tabId)
         }
       })
       tab.on('unresponsive', () => {
@@ -119,39 +119,39 @@ const api = {
         console.log('responsive')
       })
       tab.on('did-attach', () => {
-        updateTab(tabId)
+        updateTabDebounce(tabId)
       })
       tab.on('did-detach', () => {
-        updateTab(tabId)
+        updateTabDebounce(tabId)
       })
       tab.on('page-title-updated', function () {
-        updateTab(tabId)
+        updateTabDebounce(tabId)
       })
       tab.on('did-fail-load', function () {
-        updateTab(tabId)
+        updateTabDebounce(tabId)
       })
       tab.on('did-fail-provisional-load', function () {
-        updateTab(tabId)
+        updateTabDebounce(tabId)
       })
       tab.on('did-stop-loading', function () {
-        updateTab(tabId)
+        updateTabDebounce(tabId)
       })
       tab.on('navigation-entry-commited', function (evt, url) {
-        updateTab(tabId)
+        updateTabDebounce(tabId)
       })
       tab.on('did-navigate', function (evt, url) {
-        updateTab(tabId)
+        updateTabDebounce(tabId)
       })
       tab.on('did-navigate-in-page', function (evt, url, isMainFrame) {
-        updateTab(tabId)
+        updateTabDebounce(tabId)
       })
       tab.on('load-start', function (evt, url, isMainFrame, isErrorPage) {
         if (isMainFrame) {
-          updateTab(tabId)
+          updateTabDebounce(tabId)
         }
       })
       tab.on('did-finish-load', function () {
-        updateTab(tabId)
+        updateTabDebounce(tabId)
       })
 
       currentWebContents[tabId] = tab

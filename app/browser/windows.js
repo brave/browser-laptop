@@ -51,12 +51,13 @@ const updateWindow = (windowId) => {
   }
 }
 
-const updateWindowMove = debounce(updateWindow, 1000)
-
 const api = {
   init: (state, action) => {
     app.on('browser-window-created', function (event, win) {
       let windowId = -1
+      const updateWindowMove = debounce(updateWindow, 1000)
+      const updateWindowDebounce = debounce(updateWindow, 5)
+
       win.once('initialized', () => {
         windowId = win.id
         currentWindows[windowId] = win
@@ -67,40 +68,40 @@ const api = {
         cleanupWindow(windowId)
       })
       win.on('blur', () => {
-        updateWindow(windowId)
+        updateWindowDebounce(windowId)
       })
       win.on('focus', () => {
-        updateWindow(windowId)
+        updateWindowDebounce(windowId)
       })
       win.on('show', () => {
-        updateWindow(windowId)
+        updateWindowDebounce(windowId)
       })
       win.on('hide', () => {
-        updateWindow(windowId)
+        updateWindowDebounce(windowId)
       })
       win.on('maximize', () => {
-        updateWindow(windowId)
+        updateWindowDebounce(windowId)
       })
       win.on('unmaximize', () => {
-        updateWindow(windowId)
+        updateWindowDebounce(windowId)
       })
       win.on('minimize', () => {
-        updateWindow(windowId)
+        updateWindowDebounce(windowId)
       })
       win.on('restore', () => {
-        updateWindow(windowId)
+        updateWindowDebounce(windowId)
       })
       win.on('resize', () => {
-        updateWindow(windowId)
+        updateWindowDebounce(windowId)
       })
       win.on('move', () => {
         updateWindowMove(windowId)
       })
       win.on('enter-full-screen', () => {
-        updateWindow(windowId)
+        updateWindowDebounce(windowId)
       })
       win.on('leave-full-screen', () => {
-        updateWindow(windowId)
+        updateWindowDebounce(windowId)
       })
     })
     // TODO(bridiver) - handle restoring windows
