@@ -9,8 +9,51 @@ const aboutActions = require('./aboutActions')
 
 const ipc = window.chrome.ipcRenderer
 
-require('../../less/about/passwords.less')
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../app/renderer/components/styles/global')
+
+require('../../less/about/common.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
+
+class PasswordsTh extends React.Component {
+  render () {
+    return <th className={css(styles.passwordsTh)} {...this.props} />
+  }
+}
+
+class PasswordsTr extends React.Component {
+  render () {
+    const className = css(
+      styles.passwordsTr,
+      this.props['data-isHead'] && styles.isHead
+    )
+
+    return <tr className={className} {...this.props} />
+  }
+}
+
+class HeadTr extends React.Component {
+  render () {
+    return <PasswordsTr data-isHead='true' {...this.props} />
+  }
+}
+
+class PasswordsTd extends React.Component {
+  render () {
+    const className = css(
+      styles.passwordsTd,
+      this.props['data-isAction'] && styles.isAction
+    )
+
+    return <td className={className} {...this.props} />
+  }
+}
+
+class ActionsTd extends React.Component {
+  render () {
+    return <PasswordsTd data-isAction='true' {...this.props} />
+  }
+}
 
 class SiteItem extends React.Component {
   constructor () {
@@ -23,13 +66,18 @@ class SiteItem extends React.Component {
   }
 
   render () {
-    return <tr className='passwordItem'>
-      <td className='passwordActions'>
-        <span className='passwordAction fa fa-times' title='Remove site'
-          onClick={this.onDelete} />
-      </td>
-      <td className='passwordOrigin'>{this.props.site}</td>
-    </tr>
+    return <PasswordsTr data-test-id='passwordItem'>
+      <ActionsTd>
+        <span className={css(styles.passwordAction)}>
+          <span className={globalStyles.appIcons.remove}
+            data-test-id='passwordAction'
+            title='Remove site'
+            onClick={this.onDelete}
+            style={{backgroundColor: 'inherit'}} />
+        </span>
+      </ActionsTd>
+      <PasswordsTd data-test-id='passwordOrigin'>{this.props.site}</PasswordsTd>
+    </PasswordsTr>
   }
 }
 
@@ -84,21 +132,31 @@ class PasswordItem extends React.Component {
 
   render () {
     const password = this.props.password
-    return <tr className='passwordItem'>
-      <td className='passwordActions'>
-        <span className='passwordAction fa fa-times' title='Delete password'
-          onClick={this.onDelete} />
-      </td>
-      <td className='passwordOrigin'>{password.get('origin')}</td>
-      <td className='passwordUsername'>{password.get('username')}</td>
-      <td className='passwordPlaintext'>
+    return <PasswordsTr data-test-id='passwordItem'>
+      <ActionsTd data-test-id='passwordActions'>
+        <span className={css(styles.passwordAction)}>
+          <span className={globalStyles.appIcons.remove}
+            data-test-id='passwordAction'
+            title='Delete password'
+            onClick={this.onDelete}
+            style={{backgroundColor: 'inherit'}} />
+        </span>
+      </ActionsTd>
+      <PasswordsTd data-test-id='passwordOrigin'>{password.get('origin')}</PasswordsTd>
+      <PasswordsTd data-test-id='passwordUsername'>{password.get('username')}</PasswordsTd>
+      <PasswordsTd data-test-id='passwordPlaintext'>
         {'*'.repeat(password.get('encryptedPassword').length)}
-      </td>
-      <td className='passwordActions'>
-        <span className='passwordAction fa fa-clipboard' title='Copy password to clipboard'
-          onClick={this.onCopy} />
-      </td>
-    </tr>
+      </PasswordsTd>
+      <ActionsTd data-test-id='passwordActions'>
+        <span className={css(styles.passwordAction)}>
+          <span className={globalStyles.appIcons.clipboard}
+            data-test-id='passwordAction'
+            title='Copy password to clipboard'
+            onClick={this.onCopy}
+            style={{backgroundColor: 'inherit'}} />
+        </span>
+      </ActionsTd>
+    </PasswordsTr>
   }
 }
 
@@ -154,15 +212,15 @@ class AboutPasswords extends React.Component {
     ? null
     : <div>
       <h2 data-l10n-id='savedPasswords' />
-      <div className='passwordsPageContent'>
-        <table className='passwordsList'>
+      <div className={css(styles.passwordsPageContent)}>
+        <table className={css(styles.passwordsList)}>
           <thead>
-            <tr>
-              <th />
-              <th data-l10n-id='passwordsSite' />
-              <th data-l10n-id='passwordsUsername' />
-              <th data-l10n-id='passwordsPassword' />
-            </tr>
+            <HeadTr>
+              <PasswordsTh />
+              <PasswordsTh data-l10n-id='passwordsSite' />
+              <PasswordsTh data-l10n-id='passwordsUsername' />
+              <PasswordsTh data-l10n-id='passwordsPassword' />
+            </HeadTr>
           </thead>
           <tbody>
             {
@@ -173,8 +231,10 @@ class AboutPasswords extends React.Component {
             }
           </tbody>
         </table>
-        <div className='passwordsPageFooter'>
-          <span data-l10n-id='clearPasswords'
+        <div className={css(styles.passwordsPageFooter)}>
+          <span className={css(styles.passwordsPageFooterClear)}
+            data-test-id='passwordsPageFooterClear'
+            data-l10n-id='clearPasswords'
             onClick={this.onClear} />
         </div>
       </div>
@@ -184,8 +244,8 @@ class AboutPasswords extends React.Component {
     ? null
     : <div>
       <h2 data-l10n-id='passwordSites' />
-      <div className='passwordsPageContent'>
-        <table className='passwordsList'>
+      <div className={css(styles.passwordsPageContent)}>
+        <table className={css(styles.passwordsList)}>
           <tbody>
             {
               this.state.disabledSiteDetails.map((item, site) =>
@@ -196,9 +256,9 @@ class AboutPasswords extends React.Component {
       </div>
     </div>
 
-    return <div className='passwordsPage'>
+    return <div className={css(styles.passwordsPage)}>
       <h1 data-l10n-id='passwordsTitle' />
-      <div className='passwordInstructions' data-l10n-id='passwordDisableInstructions' />
+      <div className={css(styles.passwordInstructions)} data-l10n-id='passwordDisableInstructions' />
       {
         this.isPasswordsEmpty && this.isSitesEmpty
           ? <div data-l10n-id='noPasswordsSaved' />
@@ -207,5 +267,73 @@ class AboutPasswords extends React.Component {
     </div>
   }
 }
+
+const itemPadding = '8px'
+
+const styles = StyleSheet.create({
+  passwordAction: {
+    cursor: 'pointer',
+    padding: itemPadding,
+
+    // lighten(@highlightBlue, 20%);
+    ':hover': {
+      backgroundColor: '#9cd4fe'
+    }
+  },
+  passwordsPage: {
+    margin: '20px'
+  },
+  passwordsPageContent: {
+    borderTop: `1px solid ${globalStyles.color.chromeBorderColor}`
+  },
+  passwordsList: {
+    paddingTop: '10px',
+    overflow: 'hidden'
+  },
+  passwordInstructions: {
+    borderTop: `1px solid ${globalStyles.color.chromeBorderColor}`,
+    paddingTop: '10px',
+    paddingBottom: '20px',
+    fontSize: '18px',
+    color: 'grey'
+  },
+  passwordsPageFooter: {
+    padding: '10px',
+    marginBottom: '20px'
+  },
+  passwordsPageFooterClear: {
+    color: 'grey',
+    cursor: 'pointer',
+    textDecoration: 'underline'
+  },
+
+  passwordsTh: {
+    padding: itemPadding,
+    textAlign: 'left'
+  },
+  passwordsTr: {
+    cursor: 'default',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    padding: '12px',
+    WebkitUserSelect: 'none',
+
+    // lighten(@highlightBlue, 30%);
+    ':hover': {
+      backgroundColor: '#ceeaff'
+    }
+  },
+  isHead: {
+    ':hover': {
+      backgroundColor: 'inherit'
+    }
+  },
+  passwordsTd: {
+    padding: itemPadding
+  },
+  isAction: {
+    padding: 0
+  }
+})
 
 module.exports = <AboutPasswords />
