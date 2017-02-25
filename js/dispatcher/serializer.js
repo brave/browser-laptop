@@ -5,24 +5,35 @@
 'use strict'
 const Immutable = require('immutable')
 
+const deserializeAction = (action) => {
+  for (let property in action) {
+    if (action.hasOwnProperty(property) && action[property] instanceof Object) {
+      action[property] = Immutable.fromJS(action[property])
+    }
+  }
+  return action
+}
+
 /**
  * Converts an action in place to a serializable equivalent which is safe
  * to communicate across processes.  This basically just remoes all of the
  * Immutable JS.
  */
 module.exports.serialize = (action) => {
-  return JSON.stringify(action)
+  if (Array.isArray(action)) {
+    return JSON.stringify(action)
+  } else {
+    return JSON.stringify([action])
+  }
 }
 
 /**
  * Converts a serialized action in place to one using ImmutableJS where possible.
  */
 module.exports.deserialize = (action) => {
-  let newAction = JSON.parse(action)
-  for (let property in newAction) {
-    if (newAction.hasOwnProperty(property) && newAction[property] instanceof Object) {
-      newAction[property] = Immutable.fromJS(newAction[property])
-    }
+  let payload = JSON.parse(action)
+  for (var i = 0; i < payload.length; i++) {
+    payload[i] = deserializeAction(payload[i])
   }
-  return newAction
+  return payload
 }

@@ -252,7 +252,8 @@ module.exports.onSyncReady = (isFirstRun, e) => {
  * Called to initialize sync, regardless of whether it is enabled.
  * @param {Object} initialState - initial appState.sync
  */
-module.exports.init = function (initialState) {
+module.exports.init = function (appState) {
+  const initialState = appState.get('sync') || new Immutable.Map()
   const RELOAD_MESSAGE = 'reload-sync-extension'
   const RESET_SYNC = 'reset-sync'
   const reset = () => {
@@ -325,7 +326,7 @@ module.exports.init = function (initialState) {
       process.emit(RELOAD_MESSAGE)
     }
   })
-  const isFirstRun = !initialState.seed && !initialState.deviceId
+  const isFirstRun = !initialState.get('seed') && !initialState.get('deviceId')
   ipcMain.on(messages.SYNC_READY, module.exports.onSyncReady.bind(null,
     isFirstRun))
   ipcMain.on(messages.SYNC_DEBUG, (e, msg) => {
@@ -365,6 +366,7 @@ module.exports.init = function (initialState) {
     }
     syncUtil.applySyncRecords(records)
   })
+  return appState
 }
 
 /**

@@ -8,9 +8,7 @@ const appActions = require('../js/actions/appActions')
 
 module.exports.init = () => {
   process.on('personal-data-changed', (profileGuids, creditCardGuids) => {
-    setImmediate(() => {
-      appActions.autofillDataChanged(profileGuids, creditCardGuids)
-    })
+    appActions.autofillDataChanged(profileGuids, creditCardGuids)
   })
 }
 

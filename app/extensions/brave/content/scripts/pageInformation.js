@@ -182,9 +182,9 @@
   }
 
   results.url = window.location.href
-  chrome.ipcRenderer.send('dispatch-action', JSON.stringify({
+  chrome.ipcRenderer.send('dispatch-action', JSON.stringify([{
     location: window.location.href,
     actionType: 'event-set-page-info',
     pageInfo: results
-  }))
+  }]))
 } catch (ex) { console.log(ex.toString() + '\n' + ex.stack) } })()

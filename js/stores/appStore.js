@@ -56,9 +56,9 @@ const CHANGE_EVENT = 'app-state-change'
 
 const defaultProtocols = ['https', 'http']
 
-let appState
+let appState = null
 let lastEmittedState
-let shuttingDown = false
+let initialized = false
 
 // TODO cleanup all this createWindow crap
 function isModal (browserOpts) {
@@ -370,25 +370,36 @@ const applyReducers = (state, action) => [
     }, appState)
 
 const handleAppAction = (action) => {
-  if (shuttingDown) {
-    return
+  const ledger = require('../../app/ledger')
+
+  if (action.actionType === appConstants.APP_SET_STATE) {
+    initialized = true
+    appState = action.appState
   }
 
-  const ledger = require('../../app/ledger')
+  if (!initialized) {
+    console.error('Action called before state was initialized: ' + action.actionType)
+    return
+  }
 
   appState = applyReducers(appState, action)
 
   switch (action.actionType) {
     case appConstants.APP_SET_STATE:
-      appState = action.appState
+      // DO NOT ADD TO THIS LIST
+      // See tabsReducer.js for app state init example
+      // TODO(bridiver) - these shold be refactored into reducers
       appState = Filtering.init(appState, action, appStore)
       appState = windows.init(appState, action, appStore)
       appState = basicAuth.init(appState, action, appStore)
       appState = webtorrent.init(appState, action, appStore)
+      appState = require('../../app/browser/menu').init(appState, action, appStore)
+      appState = require('../../app/sync').init(appState, action, appStore)
       ledger.init()
       break
     case appConstants.APP_SHUTTING_DOWN:
-      shuttingDown = true
+      AppDispatcher.shutdown()
+      app.quit()
       break
     case appConstants.APP_NEW_WINDOW:
       const frameOpts = (action.frameOpts && action.frameOpts.toJS()) || {}
@@ -618,8 +629,6 @@ const handleAppAction = (action) => {
     case appConstants.APP_ALLOW_FLASH_ONCE:
       {
         const propertyName = action.isPrivate ? 'temporarySiteSettings' : 'siteSettings'
-        console.log(siteUtil.getOrigin(action.url))
-        console.log(propertyName)
         appState = appState.set(propertyName,
           siteSettings.mergeSiteSetting(appState.get(propertyName), siteUtil.getOrigin(action.url), 'flash', 1))
         break

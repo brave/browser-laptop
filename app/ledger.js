@@ -393,12 +393,10 @@ var recoverKeys = (appState, action) => {
 
   const UUID_REGEX = /^[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12}$/
   if (typeof firstRecoveryKey !== 'string' || !firstRecoveryKey.match(UUID_REGEX) || typeof secondRecoveryKey !== 'string' || !secondRecoveryKey.match(UUID_REGEX)) {
-    setImmediate(() => {
-      // calling logError sets the error object
-      logError(true, 'recoverKeys')
-      appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
-      appActions.ledgerRecoveryFailed()
-    })
+    // calling logError sets the error object
+    logError(true, 'recoverKeys')
+    appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
+    appActions.ledgerRecoveryFailed()
     return appState
   }
 
@@ -411,14 +409,14 @@ var recoverKeys = (appState, action) => {
       // logError sets ledgerInfo.error, so we must we clear it or UI will show an error
       ledgerInfo.error = existingLedgerError
       appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
-      setImmediate(() => appActions.ledgerRecoveryFailed())
+      appActions.ledgerRecoveryFailed()
     } else {
       callback(err, result)
 
       appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
       if (balanceTimeoutId) clearTimeout(balanceTimeoutId)
       getBalance()
-      setImmediate(() => appActions.ledgerRecoverySucceeded())
+      appActions.ledgerRecoverySucceeded()
     }
   })
 
@@ -1891,7 +1889,7 @@ var atomicWriter = (path, obj, options, cb) => {
     delete syncingP[path]
     if (typeof deferred === 'object') {
       if (ledgerInfo._internal.debugP) console.log('\nrestarting ' + path)
-      atomicWriter(path, deferred.obj, deferred.options, deferred.cb)
+      return atomicWriter(path, deferred.obj, deferred.options, deferred.cb)
     }
 
     if (err) {

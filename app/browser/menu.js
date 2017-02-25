@@ -681,4 +681,5 @@ const doAction = (action) => {
 module.exports.init = (appState) => {
   createMenu()
   appDispatcher.register(doAction)
+  return appState
 }

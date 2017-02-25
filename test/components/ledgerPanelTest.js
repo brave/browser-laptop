@@ -1,7 +1,7 @@
 /* global describe, it, beforeEach, before */
 
 const Brave = require('../lib/brave')
-const {urlInput, advancedSettings, addFundsButton, paymentsStatus, paymentsWelcomePage, paymentsTab, walletSwitch, siteSettingItem, ledgerTable} = require('../lib/selectors')
+const {urlInput, advancedSettings, addFundsButton, paymentsWelcomePage, paymentsTab, walletSwitch, siteSettingItem, ledgerTable} = require('../lib/selectors')
 const assert = require('assert')
 
 const prefsUrl = 'about:preferences'
@@ -110,14 +110,7 @@ describe('Regular payment panel tests', function () {
         .waitForVisible(paymentsWelcomePage)
         .waitForVisible(walletSwitch)
         .click(walletSwitch)
-        .waitUntil(function () {
-          return this.getText(paymentsStatus).then((val) => val.includes('Creating'))
-        })
-        .waitUntil(function () {
-          // Note: wallet creation may take a long time, so this test is likely
-          // to time out.
-          return this.getText(addFundsButton).then((val) => val.includes('Add funds'))
-        }, ledgerAPIWaitTimeout)
+        .waitForEnabled(addFundsButton)
     })
   })
 })
@@ -135,9 +128,7 @@ describe('synopsis', function () {
       .waitForVisible(paymentsWelcomePage)
       .waitForVisible(walletSwitch)
       .click(walletSwitch)
-      .waitUntil(function () {
-        return this.getText(paymentsStatus).then((val) => val.includes('Creating'))
-      })
+      .waitForEnabled(addFundsButton)
   })
 
   it('no table if empty synopsis', function * () {
@@ -165,15 +156,15 @@ describe('synopsis', function () {
     var site2 = 'http://example.com/'
     var site3 = 'https://www.eff.org/'
     yield this.app.client
-      .url(site1)
+      .loadUrl(site1)
       .windowByUrl(Brave.browserWindowUrl)
       .waitForSiteEntry(site1, false)
       .tabByUrl(site1)
-      .url(site2)
+      .loadUrl(site2)
       .windowByUrl(Brave.browserWindowUrl)
       .waitForSiteEntry(site2)
       .tabByUrl(site2)
-      .url(site3)
+      .loadUrl(site3)
       .windowByUrl(Brave.browserWindowUrl)
       .waitForSiteEntry(site3)
       .tabByUrl(site3)
@@ -196,11 +187,9 @@ describe('synopsis', function () {
   })
 
   it('can disable site', function * () {
-    var site1 = 'https://eff.org'
+    var site1 = 'https://www.eff.org/'
     yield this.app.client
-      .url(site1)
-      .windowByUrl(Brave.browserWindowUrl)
-      .tabByUrl(site1)
+      .loadUrl(site1)
       .loadUrl(prefsUrl)
       .waitForVisible(paymentsTab)
       .click(paymentsTab)
