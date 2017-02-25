@@ -109,7 +109,9 @@ const globalStyles = {
     defaultTabPadding: '0 4px',
     defaultIconPadding: '2px',
     iconSize: '16px',
-    dialogTopOffset: '30px'
+    dialogTopOffset: '30px',
+    paymentsMargin: '20px',
+    modalPanelHeaderMarginBottom: '.5em'
   },
   shadow: {
     switchShadow: 'inset 0 1px 4px rgba(0, 0, 0, 0.35)',

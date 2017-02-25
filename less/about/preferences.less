@@ -451,6 +451,7 @@ table.sortableTable {
       .dialog-body {
         .board {
           .panel {
+            // globalStyles.spacing.modalPanelHeaderMarginBottom in global.js
             @margin-bottom-header: .5em;
 
             // This removes the margin which increases the size of the dialog-header
@@ -537,28 +538,12 @@ table.sortableTable {
             }
 
             &.ledgerBackupContent {
-              .copyKeyContainer {
-                display: flex;
-                align-items: flex-end;
-                width: 75%;
-                margin: 20px auto;
-
+              // TODO: Refactor button.less
+              div[class^='copyKeyContainer'] {
                 .copyContainer {
                   .copyButton {
                     font-size: 14px;
                     margin: 0;
-                  }
-                }
-
-                .keyContainer {
-                  margin-left: 2em;
-
-                  h3 {
-                    margin-bottom: @margin-bottom-header;
-                  }
-
-                  > span {
-                    white-space: nowrap;
                   }
                 }
               }
