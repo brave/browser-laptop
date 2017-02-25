@@ -19,6 +19,6 @@ describe('about:adblock', function () {
 
   it('lists adblock count', function * () {
     yield this.app.client
-      .getText('.blockedCountTotal').should.eventually.be.equal('0')
+      .getText('[data-test-id="blockedCountTotal"]').should.eventually.be.equal('0')
   })
 })

@@ -1,38 +1,8 @@
-@import "./itemList.less";
+@import "./common.less";
 
-.adblockDetailsPage {
-  margin: 20px;
-  min-width: 704px;
-
-  h2 {
-    margin-bottom: 10px;
-  }
-
-  h3 {
-    margin-top: 20px;
-    margin-bottom: 10px;
-  }
-
-  list .listItem {
-    display: flex;
-    -webkit-user-select: text;
-  }
-
-  .adblockDetailsPageContent {
-    margin-bottom: 10px;
-  }
-
-  .adblockLists {
-    margin-top: 10px;
-  }
-
+// TODO: refactor SwitchControl to remove this
+div[class^="adblockDetailsPage"] {
   .switchControlRightText {
     margin-left: 15px;
-  }
-
-  .adblockSubtext {
-    font-size: smaller;
-    font-weight: bold;
-    margin-bottom: 10px;
   }
 }
