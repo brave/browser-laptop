@@ -272,7 +272,10 @@ const api = {
 
   executeScriptInBackground: (script, cb) => {
     const win = new BrowserWindow({
-      show: false
+      show: false,
+      webPreferences: {
+        partition: 'default'
+      }
     })
     win.webContents.on('did-finish-load', (e) => {
       win.webContents.executeScriptInTab(config.braveExtensionId, script, {}, (err, url, result) => {
