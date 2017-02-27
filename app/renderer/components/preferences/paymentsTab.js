@@ -20,6 +20,7 @@ const Button = require('../../../../js/components/button')
 const {FormTextbox, RecoveryKeyTextbox} = require('../textbox')
 const {FormDropdown, SettingDropdown} = require('../dropdown')
 const {SettingsList, SettingItem, SettingCheckbox} = require('../settings')
+const LedgerTable = require('./ledgerTable')
 
 class PaymentsTab extends ImmutableComponent {
   constructor () {
@@ -168,7 +169,6 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get tableContent () {
-    const {LedgerTable} = require('../../../../js/about/preferences')
     // TODO: This should be sortable. #2497
     return <LedgerTable ledgerData={this.props.ledgerData}
       settings={this.props.settings}

@@ -11,7 +11,7 @@ const UrlUtil = require('../lib/urlutil')
 // Components
 const PreferenceNavigation = require('../../app/renderer/components/preferences/preferenceNavigation')
 const ModalOverlay = require('../components/modalOverlay')
-const {SettingsList, SettingItem, SettingCheckbox, SiteSettingCheckbox} = require('../../app/renderer/components/settings')
+const {SettingsList, SettingItem, SettingCheckbox} = require('../../app/renderer/components/settings')
 const {SettingTextbox} = require('../../app/renderer/components/textbox')
 const {SettingDropdown} = require('../../app/renderer/components/dropdown')
 const Button = require('../components/button')
@@ -21,7 +21,6 @@ const PaymentsTab = require('../../app/renderer/components/preferences/paymentsT
 const SyncTab = require('../../app/renderer/components/preferences/syncTab')
 const PluginsTab = require('../../app/renderer/components/preferences/pluginsTab')
 
-const cx = require('../lib/classSet')
 const ledgerExportUtil = require('../../app/common/lib/ledgerExportUtil')
 const addExportFilenamePrefixToTransactions = ledgerExportUtil.addExportFilenamePrefixToTransactions
 const appUrlUtil = require('../lib/appUrlUtil')
@@ -92,139 +91,6 @@ const braveryPermissionNames = {
   'httpsEverywhere': ['boolean'],
   'fingerprintingProtection': ['boolean'],
   'noScript': ['boolean', 'number']
-}
-
-class LedgerTable extends ImmutableComponent {
-  get synopsis () {
-    return this.props.ledgerData.get('synopsis')
-  }
-
-  getFormattedTime (synopsis) {
-    var d = synopsis.get('daysSpent')
-    var h = synopsis.get('hoursSpent')
-    var m = synopsis.get('minutesSpent')
-    var s = synopsis.get('secondsSpent')
-    if (d << 0 > 364) {
-      return '>1y'
-    }
-    d = (d << 0 === 0) ? '' : (d + 'd ')
-    h = (h << 0 === 0) ? '' : (h + 'h ')
-    m = (m << 0 === 0) ? '' : (m + 'm ')
-    s = (s << 0 === 0) ? '' : (s + 's ')
-    return (d + h + m + s + '')
-  }
-
-  getHostPattern (synopsis) {
-    return `https?://${synopsis.get('site')}`
-  }
-
-  getVerifiedIcon (synopsis) {
-    return <span className={cx({
-      verified: true,
-      disabled: !this.enabledForSite(synopsis)
-    })} />
-  }
-
-  enabledForSite (synopsis) {
-    const hostSettings = this.props.siteSettings.get(this.getHostPattern(synopsis))
-    if (hostSettings) {
-      const result = hostSettings.get('ledgerPayments')
-      if (typeof result === 'boolean') {
-        return result
-      }
-    }
-    return true
-  }
-
-  shouldShow (synopsis) {
-    const hostSettings = this.props.siteSettings.get(this.getHostPattern(synopsis))
-    if (hostSettings) {
-      const result = hostSettings.get('ledgerPaymentsShown')
-      if (typeof result === 'boolean') {
-        return result
-      }
-    }
-    return true
-  }
-
-  banSite (hostPattern) {
-    aboutActions.changeSiteSetting(hostPattern, 'ledgerPaymentsShown', false)
-  }
-
-  getRow (synopsis) {
-    if (!synopsis || !synopsis.get || !this.shouldShow(synopsis)) {
-      return []
-    }
-    const faviconURL = synopsis.get('faviconURL')
-    const rank = synopsis.get('rank')
-    const views = synopsis.get('views')
-    const verified = synopsis.get('verified')
-    const duration = synopsis.get('duration')
-    const publisherURL = synopsis.get('publisherURL')
-    const percentage = synopsis.get('percentage')
-    const site = synopsis.get('site')
-    const defaultSiteSetting = true
-
-    return [
-      {
-        html: <div className='neverShowSiteIcon' onClick={this.banSite.bind(this, this.getHostPattern(synopsis))}><span className='fa fa-ban' /></div>,
-        value: ''
-      },
-      rank,
-      {
-        html: <div className='site'>{verified ? this.getVerifiedIcon(synopsis) : null}<a href={publisherURL} target='_blank'>{faviconURL ? <img src={faviconURL} alt={site} /> : <span className='fa fa-file-o' />}<span>{site}</span></a></div>,
-        value: site
-      },
-      {
-        html: <SiteSettingCheckbox small hostPattern={this.getHostPattern(synopsis)} defaultValue={defaultSiteSetting} prefKey='ledgerPayments' siteSettings={this.props.siteSettings} checked={this.enabledForSite(synopsis)} />,
-        value: this.enabledForSite(synopsis) ? 1 : 0
-      },
-      views,
-      {
-        html: this.getFormattedTime(synopsis),
-        value: duration
-      },
-      percentage
-    ]
-  }
-
-  render () {
-    if (!this.synopsis || !this.synopsis.size) {
-      return null
-    }
-    return <div className='ledgerTable'>
-      <div className='hideExcludedSites'>
-        <SettingCheckbox small
-          dataL10nId='hideExcluded'
-          prefKey={settings.HIDE_EXCLUDED_SITES}
-          settings={this.props.settings}
-          onChangeSetting={this.props.onChangeSetting}
-        />
-      </div>
-      <SortableTable
-        headings={['remove', 'rank', 'publisher', 'include', 'views', 'timeSpent', 'percentage']}
-        defaultHeading='rank'
-        columnClassNames={['', 'alignRight', '', '', 'alignRight', 'alignRight', 'alignRight']}
-        rowClassNames={
-          this.synopsis.map((item) =>
-            this.enabledForSite(item) ? '' : 'paymentsDisabled').toJS()
-        }
-        onContextMenu={aboutActions.contextMenu}
-        contextMenuName='synopsis'
-        rowObjects={this.synopsis.map((entry) => {
-          return {
-            hostPattern: this.getHostPattern(entry),
-            location: entry.get('publisherURL')
-          }
-        }).toJS()}
-        rows={this.synopsis.filter((synopsis) => {
-          return !getSetting(settings.HIDE_EXCLUDED_SITES, this.props.settings) || this.enabledForSite(synopsis)
-        }).map((synopsis) => {
-          return this.getRow(synopsis)
-        }).toJS()}
-        />
-    </div>
-  }
 }
 
 class BitcoinDashboard extends ImmutableComponent {
@@ -1361,6 +1227,5 @@ function formattedDateFromTimestamp (timestamp) {
 module.exports = {
   AboutPreferences: <AboutPreferences />,
   BitcoinDashboard,
-  LedgerTable,
   PaymentHistory
 }

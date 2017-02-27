@@ -318,7 +318,8 @@ class SortableTable extends React.Component {
       {...this.getTableAttributes()}
       className={cx({
         sort: !this.sortingDisabled,
-        sortableTable: !this.props.overrideDefaultStyle
+        sortableTable: !this.props.overrideDefaultStyle,
+        [this.props.tableClassNames]: !!this.props.tableClassNames
       })}
       ref={(node) => { this.table = node }}>
       <thead>
@@ -342,7 +343,10 @@ class SortableTable extends React.Component {
               data-sort-order={this.props.defaultHeadingSortOrder}>
               {
                 isString
-                  ? <div className='th-inner' data-l10n-id={heading} />
+                  ? <div className={cx({
+                    'th-inner': true,
+                    [this.props.headerClassNames]: !!this.props.headerClassNames
+                  })} data-l10n-id={heading} />
                   : heading
               }
             </th>
