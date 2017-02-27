@@ -42,12 +42,12 @@ const styles = StyleSheet.create({
   helpfulHints: {
     cursor: 'default',
     padding: '20px 0 0',
-    overflowY: 'auto',
+    visibility: 'hidden',
 
-    '@media (min-height: 620px)': {
+    '@media (min-height: 680px)': {
       position: 'absolute',
       bottom: '0',
-      overflowY: 'none'
+      visibility: 'visible'
     }
   },
 
