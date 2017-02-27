@@ -96,7 +96,7 @@ function validateRecoveryFile (recoveryFileContents) {
 }
 
 let recoverWalletFromFile = function * (client) {
-  yield setupPaymentsTabAndOpenAdvancedSettings(client, true)
+  yield setupPaymentsTabAndOpenAdvancedSettings(client, false)
 
   // open "Recover your wallet" submodal and click "Import recovery keys"
   yield client
@@ -130,7 +130,7 @@ let generateAndSaveRecoveryFile = function (recoveryFilePath, paymentId, passphr
   return
 }
 
-describe.skip('Advanced payment panel tests', function () {
+describe('Advanced payment panel tests', function () {
   let context = this
   Brave.beforeEach(this)
 
