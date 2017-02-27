@@ -155,8 +155,10 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
     const maxX = Math.max(...displays.map((display) => { return display.bounds.x + display.bounds.width }))
     const maxY = Math.max(...displays.map((display) => { return display.bounds.y + display.bounds.height }))
 
-    browserOpts.x = Math.min(browserOpts.x, maxX - defaults.windowOffset)
-    browserOpts.y = Math.min(browserOpts.y, maxY - defaults.windowOffset)
+    // Windows may be placed off-screen
+    // See https://github.com/brave/browser-laptop/issues/3558
+    browserOpts.x = Math.min(Math.max(0, browserOpts.x), maxX - defaults.windowOffset)
+    browserOpts.y = Math.min(Math.max(0, browserOpts.y), maxY - defaults.windowOffset)
   }
 
   const minWidth = isModal(browserOpts) ? defaults.minModalWidth : defaults.minWidth

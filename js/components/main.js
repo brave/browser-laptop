@@ -511,6 +511,10 @@ class Main extends ImmutableComponent {
 
     const onWindowMove = debounce(function (event) {
       const position = event.sender.getPosition()
+      // Windows may be placed off-screen
+      // See https://github.com/brave/browser-laptop/issues/3558
+      position[0] = Math.max(0, position[0])
+      position[1] = Math.max(0, position[1])
       // NOTE: the default window position is whatever the last window move was
       appActions.defaultWindowParamsChanged(undefined, position)
       windowActions.savePosition(position)
