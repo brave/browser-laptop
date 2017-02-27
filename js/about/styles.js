@@ -4,7 +4,7 @@
 
 const React = require('react')
 const ImmutableComponent = require('../components/immutableComponent')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../../app/renderer/components/styles/global')
 
 // Stylesheets go here
@@ -87,23 +87,23 @@ class AboutStyle extends ImmutableComponent {
         </Code></Pre>
       </Container>
 
-      <div className='container'>
+      <Container>
         <h2>Plain textarea</h2>
         <TextArea placeholder='TextArea' />
-        <pre><code>
+        <Pre><Code>
           const { '{TextArea}' } = require('../../app/renderer/components/textbox'){'\n'}
           &lt;TextArea />
-        </code></pre>
-      </div>
+        </Code></Pre>
+      </Container>
 
-      <div className='container'>
+      <Container>
         <h2>Default textarea; font size is specified</h2>
         <DefaultTextArea placeholder='DefaultTextArea' />
-        <pre><code>
+        <Pre><Code>
           const { '{DefaultTextArea}' } = require('../../app/renderer/components/textbox'){'\n'}
           &lt;DefaultTextArea />
-        </code></pre>
-      </div>
+        </Code></Pre>
+      </Container>
 
       <hr />
 
