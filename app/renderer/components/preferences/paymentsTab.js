@@ -15,6 +15,9 @@ const {changeSetting} = require('../../lib/settingsUtil')
 const moment = require('moment')
 moment.locale(navigator.language)
 
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../styles/global')
+
 // Components
 const Button = require('../../../../js/components/button')
 const {FormTextbox, RecoveryKeyTextbox} = require('../textbox')
@@ -296,22 +299,22 @@ class PaymentsTab extends ImmutableComponent {
     return <div className='board'>
       <div className='panel ledgerBackupContent'>
         <span data-l10n-id='ledgerBackupContent' />
-        <div className='copyKeyContainer'>
+        <div className={css(styles.copyKeyContainer)}>
           <div className='copyContainer'>
             <Button l10nId='copy' className='copyButton whiteButton' onClick={this.copyToClipboard.bind(this, paymentId)} />
           </div>
-          <div className='keyContainer'>
-            <h3 data-l10n-id='firstKey' />
-            <span>{paymentId}</span>
+          <div className={css(styles.keyContainer)}>
+            <h3 className={css(styles.keyContainer__h3)} data-l10n-id='firstKey' />
+            <span className={css(styles.keyContainer__span)}>{paymentId}</span>
           </div>
         </div>
-        <div className='copyKeyContainer'>
+        <div className={css(styles.copyKeyContainer)}>
           <div className='copyContainer'>
             <Button l10nId='copy' className='copyButton whiteButton' onClick={this.copyToClipboard.bind(this, passphrase)} />
           </div>
-          <div className='keyContainer'>
-            <h3 data-l10n-id='secondKey' />
-            <span>{passphrase}</span>
+          <div className={css(styles.keyContainer)}>
+            <h3 className={css(styles.keyContainer__h3)} data-l10n-id='secondKey' />
+            <span className={css(styles.keyContainer__span)}>{passphrase}</span>
           </div>
         </div>
       </div>
@@ -363,8 +366,8 @@ class PaymentsTab extends ImmutableComponent {
         : null
       }
       <div className='panel recoveryContent'>
-        <h4 data-l10n-id='ledgerRecoverySubtitle' />
-        <div className='ledgerRecoveryContent' data-l10n-id='ledgerRecoveryContent' />
+        <h4 className={css(styles.recoveryContent__h4)} data-l10n-id='ledgerRecoverySubtitle' />
+        <div className={css(styles.ledgerRecoveryContent)} data-l10n-id='ledgerRecoveryContent' />
         <SettingsList>
           <SettingItem>
             <h3 data-l10n-id='firstRecoveryKey' />
@@ -607,5 +610,34 @@ class PaymentsTab extends ImmutableComponent {
 function formattedTimeFromNow (timestamp) {
   return moment(new Date(timestamp)).fromNow()
 }
+
+const styles = StyleSheet.create({
+  copyKeyContainer: {
+    display: 'flex',
+    alignItems: 'flex-end',
+    width: '75%',
+    margin: `${globalStyles.spacing.paymentsMargin} auto`
+  },
+
+  keyContainer: {
+    marginLeft: '2em'
+  },
+
+  keyContainer__h3: {
+    marginBottom: globalStyles.spacing.modalPanelHeaderMarginBottom
+  },
+
+  keyContainer__span: {
+    whiteSpace: 'nowrap'
+  },
+
+  recoveryContent__h4: {
+    marginBottom: globalStyles.spacing.paymentsMargin
+  },
+
+  ledgerRecoveryContent: {
+    marginBottom: globalStyles.spacing.paymentsMargin
+  }
+})
 
 module.exports = PaymentsTab
