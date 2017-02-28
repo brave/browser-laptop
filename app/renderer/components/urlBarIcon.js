@@ -6,8 +6,6 @@ const React = require('react')
 const ImmutableComponent = require('../../../js/components/immutableComponent')
 const windowActions = require('../../../js/actions/windowActions')
 const cx = require('../../../js/lib/classSet')
-const dragTypes = require('../../../js/constants/dragTypes')
-const dndData = require('../../../js/dndData')
 const {isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
 const searchIconSize = 16
 
@@ -28,7 +26,6 @@ class UrlBarIcon extends ImmutableComponent {
   constructor () {
     super()
     this.onClick = this.onClick.bind(this)
-    this.onDragStart = this.onDragStart.bind(this)
   }
   get isSecure () {
     return this.props.isHTTPPage &&
@@ -94,14 +91,8 @@ class UrlBarIcon extends ImmutableComponent {
     }
     windowActions.setSiteInfoVisible(true)
   }
-  onDragStart (e) {
-    dndData.setupDataTransferURL(e.dataTransfer, this.props.location, this.props.title)
-    dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.TAB, this.activeFrame)
-  }
   render () {
     return <span
-      onDragStart={this.onDragStart}
-      draggable
       onClick={this.onClick}
       className={this.iconClasses}
       style={this.iconStyles} />
