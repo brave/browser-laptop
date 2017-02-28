@@ -44,7 +44,7 @@ function* setupPaymentsTabAndOpenAdvancedSettings (client, tabAlreadyLoaded) {
       .loadUrl(prefsUrl)
       .waitForVisible(paymentsTab)
       .click(paymentsTab)
-      .waitForVisible(paymentsWelcomePage)
+      .waitForVisible(paymentsWelcomePage, ledgerAPIWaitTimeout)
       .waitForVisible(walletSwitch)
       .click(walletSwitch)
       .waitForVisible(advancedSettingsButton, ledgerAPIWaitTimeout)
