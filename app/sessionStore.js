@@ -27,7 +27,6 @@ const sessionStorageVersion = 1
 const filtering = require('./filtering')
 const autofill = require('./autofill')
 const {navigatableTypes} = require('../js/lib/appUrlUtil')
-// const tabState = require('./common/state/tabState')
 const Channel = require('./channel')
 const { makeImmutable } = require('./common/state/immutableUtil')
 const tabState = require('./common/state/tabState')

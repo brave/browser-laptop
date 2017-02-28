@@ -20,7 +20,6 @@ const styles = StyleSheet.create({
     padding: '0.4em',
     width: '100%'
   },
-
   flyoutDialog: {
     backgroundColor: globalStyles.color.toolbarBackground,
     borderRadius: globalStyles.radius.borderRadius,
@@ -32,7 +31,6 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     top: globalStyles.spacing.dialogTopOffset
   },
-
   browserButton: {
     border: 'none',
     margin: '0',

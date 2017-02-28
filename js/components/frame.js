@@ -32,6 +32,7 @@ const appStoreRenderer = require('../stores/appStoreRenderer')
 const siteSettings = require('../state/siteSettings')
 const {newTabMode} = require('../../app/common/constants/settingsEnums')
 const imageUtil = require('../lib/imageUtil')
+const MessageBox = require('../../app/renderer/components/messageBox')
 
 const WEBRTC_DEFAULT = 'default'
 const WEBRTC_DISABLE_NON_PROXY = 'disable_non_proxied_udp'
@@ -603,7 +604,7 @@ class Frame extends ImmutableComponent {
     if (this.props.widevine && this.props.widevine.get('enabled')) {
       const message = locale.translation('allowWidevine').replace(/{{\s*origin\s*}}/, this.origin)
       // Show Widevine notification bar
-      appActions.showMessageBox({
+      appActions.showNotification({
         buttons: [
           {text: locale.translation('deny')},
           {text: locale.translation('allow')}
@@ -630,7 +631,7 @@ class Frame extends ImmutableComponent {
             appActions.changeSiteSetting(this.origin, 'widevine', false)
           }
         }
-        appActions.hideMessageBox(message)
+        appActions.hideNotification(message)
       }
     } else {
       windowActions.widevineSiteAccessedWithoutInstall()
@@ -924,7 +925,7 @@ class Frame extends ImmutableComponent {
       }
 
       for (let message in this.notificationCallbacks) {
-        appActions.hideMessageBox(message)
+        appActions.hideNotification(message)
       }
       this.notificationCallbacks = {}
       const isNewTabPage = getBaseUrl(e.url) === getTargetAboutUrl('about:newtab')
@@ -1154,6 +1155,7 @@ class Frame extends ImmutableComponent {
   }
 
   render () {
+    const messageBoxDetail = this.props.tabData && this.props.tabData.get('messageBoxDetail')
     return <div
       className={cx({
         frameWrapper: true,
@@ -1178,6 +1180,14 @@ class Frame extends ImmutableComponent {
         })}>
           {this.props.hrefPreview}
         </div>
+        : null
+      }
+      {
+        messageBoxDetail
+        ? <MessageBox
+          isActive={this.props.isActive}
+          tabId={this.frame.get('tabId')}
+          detail={messageBoxDetail} />
         : null
       }
     </div>

@@ -289,7 +289,7 @@ const windowActions = {
     const ipc = require('electron').ipcRenderer
     const origin = siteUtil.getOrigin(frameProps.get('location'))
     if (origin) {
-      appActions.clearMessageBoxes(origin)
+      appActions.clearNotifications(origin)
     }
     // If the frame was full screen, exit
     if (frameProps && frameProps.get('isFullScreen')) {

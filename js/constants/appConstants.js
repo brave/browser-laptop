@@ -43,9 +43,9 @@ const appConstants = {
   APP_UPDATE_LEDGER_INFO: _,
   APP_LEDGER_RECOVERY_STATUS_CHANGED: _,
   APP_UPDATE_PUBLISHER_INFO: _,
-  APP_SHOW_MESSAGE_BOX: _, /** @param {Object} detail */
-  APP_HIDE_MESSAGE_BOX: _, /** @param {string} message */
-  APP_CLEAR_MESSAGE_BOXES: _, /** @param {string} origin */
+  APP_SHOW_NOTIFICATION: _, /** @param {Object} detail */
+  APP_HIDE_NOTIFICATION: _, /** @param {string} message */
+  APP_CLEAR_NOTIFICATIONS: _, /** @param {string} origin */
   APP_ADD_WORD: _, /** @param {string} word, @param {boolean} learn */
   APP_SET_DICTIONARY: _, /** @param {string} locale */
   APP_BACKUP_KEYS: _,
@@ -91,7 +91,10 @@ const appConstants = {
   APP_SET_OBJECT_ID: _,
   APP_SAVE_SYNC_INIT_DATA: _,
   APP_RESET_SYNC_DATA: _,
-  APP_ADD_NOSCRIPT_EXCEPTIONS: _
+  APP_ADD_NOSCRIPT_EXCEPTIONS: _,
+  APP_TAB_MESSAGE_BOX_SHOWN: _,
+  APP_TAB_MESSAGE_BOX_DISMISSED: _,
+  APP_TAB_MESSAGE_BOX_UPDATED: _
 }
 
 module.exports = mapValuesByKeys(appConstants)

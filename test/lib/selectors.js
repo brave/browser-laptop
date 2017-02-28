@@ -98,5 +98,10 @@ module.exports = {
   hamburgerMenu: '.menuButton',
   contextMenu: '.contextMenu',
   okButton: '[data-l10n-id="ok"]',
-  customFiltersInput: '[data-test-id="customFiltersInput"]'
+  customFiltersInput: '[data-test-id="customFiltersInput"]',
+  // used by the MessageBox control
+  msgBoxSuppress: '[data-test-id^="msgBoxTab_"] .switchMiddle',
+  msgBoxSuppressTrue: '[data-test-id^="msgBoxTab_"] .switchMiddle .switchBackground.switchedOn',
+  msgBoxMessage: '[data-test-id="msgBoxMessage"]',
+  msgBoxTitle: '[data-test-id="msgBoxTitle"]'
 }

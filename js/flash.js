@@ -55,7 +55,7 @@ module.exports.showFlashMessageBox = (location, tabId) => {
 
   // This is bad, we shouldn't be calling actions from actions
   // so we need to refactor notifications into a state helper
-  appActions.showMessageBox({
+  appActions.showNotification({
     buttons: [
       {text: locale.translation('deny')},
       {text: locale.translation('allow')}
@@ -69,7 +69,7 @@ module.exports.showFlashMessageBox = (location, tabId) => {
 
   ipcMain.once(messages.NOTIFICATION_RESPONSE, (e, msg, buttonIndex, persist) => {
     if (msg === message) {
-      appActions.hideMessageBox(message)
+      appActions.hideNotification(message)
       if (buttonIndex === 1) {
         if (persist) {
           appActions.changeSiteSetting(origin, 'flash', Date.now() + 7 * 24 * 1000 * 3600)

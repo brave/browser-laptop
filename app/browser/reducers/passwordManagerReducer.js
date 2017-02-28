@@ -211,7 +211,7 @@ const init = () => {
 
     if (!(message in passwordCallbacks)) {
       // Notification not shown already
-      appActions.showMessageBox({
+      appActions.showNotification({
         buttons: [
           {text: locale.translation('yes')},
           {text: locale.translation('no')},
@@ -228,7 +228,7 @@ const init = () => {
 
     passwordCallbacks[message] = (buttonIndex) => {
       delete passwordCallbacks[message]
-      appActions.hideMessageBox(message)
+      appActions.hideNotification(message)
 
       if (buttonIndex === 1) {
         return

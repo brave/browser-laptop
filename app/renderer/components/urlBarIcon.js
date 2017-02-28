@@ -99,10 +99,15 @@ class UrlBarIcon extends ImmutableComponent {
     dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.TAB, this.activeFrame)
   }
   render () {
+    // allow click and drag (unless tab is showing a message box)
+    const props = {}
+    if (!this.props.activeTabShowingMessageBox) {
+      props.draggable = true
+      props.onClick = this.onClick
+      props.onDragStart = this.onDragStart
+    }
     return <span
-      onDragStart={this.onDragStart}
-      draggable
-      onClick={this.onClick}
+      {...props}
       className={this.iconClasses}
       style={this.iconStyles} />
   }

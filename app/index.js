@@ -49,7 +49,6 @@ if (process.platform === 'win32') {
 const electron = require('electron')
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
-const dialog = electron.dialog
 const ipcMain = electron.ipcMain
 const Immutable = require('immutable')
 const Updater = require('./updater')
@@ -287,52 +286,6 @@ app.on('ready', () => {
     }
   })
 
-  process.on('window-alert',
-    (webContents, extraData, title, message, defaultPromptText,
-        shouldDisplaySuppressCheckbox, isBeforeUnloadDialog, isReload, cb) => {
-      let suppress = false
-      const buttons = ['OK']
-      if (!webContents || webContents.isDestroyed()) {
-        cb(false, '', suppress)
-      } else {
-        cb(true, '', suppress)
-      }
-
-      const hostWebContents = webContents.hostWebContents || webContents
-      dialog.showMessageBox(BrowserWindow.fromWebContents(hostWebContents), {
-        message,
-        title,
-        buttons: buttons
-      })
-    })
-
-  process.on('window-confirm',
-    (webContents, extraData, title, message, defaultPromptText,
-        shouldDisplaySuppressCheckbox, isBeforeUnloadDialog, isReload, cb) => {
-      let suppress = false
-      const buttons = ['OK', 'Cancel']
-      if (!webContents || webContents.isDestroyed()) {
-        cb(false, '', suppress)
-      }
-
-      const hostWebContents = webContents.hostWebContents || webContents
-      const response = dialog.showMessageBox(BrowserWindow.fromWebContents(hostWebContents), {
-        message,
-        title,
-        buttons: buttons,
-        cancelId: 1
-      })
-      cb(!response, '', suppress)
-    })
-
-  process.on('window-prompt',
-    (webContents, extraData, title, message, defaultPromptText,
-        shouldDisplaySuppressCheckbox, isBeforeUnloadDialog, isReload, cb) => {
-      console.warn('window.prompt is not supported yet')
-      let suppress = false
-      cb(false, '', suppress)
-    })
-
   process.on(messages.UNDO_CLOSED_WINDOW, () => {
     if (lastWindowState) {
       appActions.newWindow(undefined, undefined, lastWindowState)
@@ -398,9 +351,9 @@ app.on('ready', () => {
       var message = locale.translation('prefsRestart')
       if (prefsRestartLastValue[config] !== undefined && prefsRestartLastValue[config] !== value) {
         delete prefsRestartLastValue[config]
-        appActions.hideMessageBox(message)
+        appActions.hideNotification(message)
       } else {
-        appActions.showMessageBox({
+        appActions.showNotification({
           buttons: [
             {text: locale.translation('yes')},
             {text: locale.translation('no')}
@@ -419,7 +372,7 @@ app.on('ready', () => {
             app.quit()
           } else {
             delete prefsRestartLastValue[config]
-            appActions.hideMessageBox(message)
+            appActions.hideNotification(message)
           }
         }
         if (prefsRestartLastValue[config] === undefined) {

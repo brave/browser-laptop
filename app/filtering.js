@@ -426,7 +426,7 @@ function registerPermissionHandler (session, partition) {
       permissionCallbacks[message](0, false)
     }
 
-    appActions.showMessageBox({
+    appActions.showNotification({
       buttons: [
         {text: locale.translation('deny')},
         {text: locale.translation('allow')}
@@ -440,8 +440,8 @@ function registerPermissionHandler (session, partition) {
 
     permissionCallbacks[message] = (buttonIndex, persist) => {
       permissionCallbacks[message] = null
-      // hide the message box if this was triggered automatically
-      appActions.hideMessageBox(message)
+      // hide the notification if this was triggered automatically
+      appActions.hideNotification(message)
       const result = !!(buttonIndex)
       cb(result)
       if (persist) {

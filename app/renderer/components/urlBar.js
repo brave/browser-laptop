@@ -500,6 +500,7 @@ class UrlBar extends ImmutableComponent {
           title={this.props.title}
           titleMode={this.props.titleMode}
           isSearching={this.props.location !== this.props.urlbar.get('location')}
+          activeTabShowingMessageBox={this.props.activeTabShowingMessageBox}
         />
       </div>
       {
