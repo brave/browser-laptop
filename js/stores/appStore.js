@@ -941,14 +941,16 @@ const handleAppAction = (action) => {
     case appConstants.APP_RESET_SYNC_DATA:
       const sessionStore = require('../../app/sessionStore')
       const syncDefault = Immutable.fromJS(sessionStore.defaultAppState().sync)
+      const originalSeed = appState.getIn(['sync', 'seed'])
       appState = appState.set('sync', syncDefault)
       appState.get('sites').forEach((site, key) => {
-        if (!site.has('objectId')) { return }
-        appState = appState.setIn(['sites', key], site.delete('objectId'))
-      })
-      appState.get('siteSettings').forEach((site, key) => {
-        if (!site.has('objectId')) { return }
-        appState = appState.setIn(['siteSettings', key], site.delete('objectId'))
+        if (site.has('objectId') && syncUtil.isSyncable('bookmark', site)) {
+          // Remember which profile this bookmark was originally synced to.
+          // Since old bookmarks should be synced when a new profile is created,
+          // we have to keep track of which profile already has these bookmarks
+          // or else the old profile may have these bookmarks duplicated. #7405
+          appState = appState.setIn(['sites', key, 'originalSeed'], originalSeed)
+        }
       })
       break
     case appConstants.APP_SHOW_DOWNLOAD_DELETE_CONFIRMATION:
