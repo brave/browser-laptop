@@ -17,7 +17,6 @@ const commonStyles = require('./styles/commonStyles')
 class MessageBox extends ImmutableComponent {
   constructor () {
     super()
-    this.onClick = this.onClick.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
     this.onSuppressChanged = this.onSuppressChanged.bind(this)
   }
@@ -43,7 +42,7 @@ class MessageBox extends ImmutableComponent {
   }
 
   get buttons () {
-    return (this.props.detail && this.props.detail.get('buttons')) || makeImmutable(['OK'])
+    return (this.props.detail && this.props.detail.get('buttons')) || makeImmutable(['ok'])
   }
 
   get cancelId () {
@@ -56,10 +55,6 @@ class MessageBox extends ImmutableComponent {
 
   get showSuppress () {
     return (this.props.detail && this.props.detail.get('showSuppress')) || false
-  }
-
-  onClick (e) {
-    e.stopPropagation()
   }
 
   onKeyDown (e) {
@@ -107,7 +102,7 @@ class MessageBox extends ImmutableComponent {
   }
 
   render () {
-    return <Dialog className='noOutline'>
+    return <Dialog className={css(styles.dialog)}>
       <div data-test-id={'msgBoxTab_' + this.tabId}
         onClick={this.onClick}
         onKeyDown={this.onKeyDown}
@@ -138,24 +133,27 @@ class MessageBox extends ImmutableComponent {
 }
 
 const styles = StyleSheet.create({
-  'container': {
+  dialog: {
+    outline: 'none'
+  },
+  container: {
     outline: 'none',
     display: 'block'
   },
-  'title': {
+  title: {
     fontWeight: 'bold',
     fontSize: '12pt',
     marginBottom: '1em',
     marginTop: '0.5em',
     '-webkit-user-select': 'text'
   },
-  'body': {
+  body: {
     marginTop: '1.5em',
     minWidth: '425px',
     marginBottom: '1.5em',
     '-webkit-user-select': 'text'
   },
-  'buttons': {
+  buttons: {
     float: 'right',
     marginTop: '1.5em',
     marginBottom: '0.5em'

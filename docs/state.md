@@ -268,9 +268,9 @@ AppStore
   },
   tabs: [{
     // persistent properties
-    id: number,
     active: boolean,  // whether the tab is selected
     favIconUrl: string,
+    id: number,
     index: number,  // the position of the tab in the window
     title: string,
     url: string,
@@ -279,16 +279,16 @@ AppStore
     audible: boolean, // is audio playing (muted or not)
     canGoBack: boolean, // the tab can be navigated back
     canGoForward: boolean, // the tab can be navigated forward
-    muted: boolean, // is the tab muted
-    windowId: number, // the windowId that contains the tab
     messageBoxDetail: { // fields used if showing a message box for a tab
-      message: string,
-      title: string, // title is the source; ex: "brave.com says:"
       buttons: [string], // array of buttons as string; code only handles 1 or 2
-      suppress: boolean, // if true, show a suppress checkbox (defaulted to not checked)
-      showSuppress: boolean, // final result of the suppress checkbox
       cancelId: number // optional: used for a confirm message box
-    }
+      message: string,
+      showSuppress: boolean, // final result of the suppress checkbox
+      suppress: boolean, // if true, show a suppress checkbox (defaulted to not checked)
+      title: string, // title is the source; ex: "brave.com says:"
+    },
+    muted: boolean, // is the tab muted
+    windowId: number // the windowId that contains the tab
   }],
   temporarySiteSettings: {
     // Same as siteSettings but never gets written to disk

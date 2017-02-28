@@ -21,7 +21,7 @@ const tabMessageBox = {
       const detail = {
         message,
         title,
-        buttons: ['OK'],
+        buttons: ['ok'],
         suppress: false,
         showSuppress: shouldDisplaySuppressCheckbox
       }
@@ -35,7 +35,7 @@ const tabMessageBox = {
       const detail = {
         message,
         title,
-        buttons: ['OK', 'Cancel'],
+        buttons: ['ok', 'cancel'],
         cancelId: 1,
         suppress: false,
         showSuppress: shouldDisplaySuppressCheckbox
@@ -63,9 +63,9 @@ const tabMessageBox = {
 
   close: (state, action) => {
     action = makeImmutable(action)
-    let tabId = action.get('tabId')
-    let detail = action.get('detail')
-    let cb = messageBoxCallbacks[tabId]
+    const tabId = action.get('tabId')
+    const detail = action.get('detail')
+    const cb = messageBoxCallbacks[tabId]
     let suppress = false
     let result = true
     state = tabMessageBoxState.removeDetail(state, action)
@@ -91,7 +91,7 @@ const tabMessageBox = {
     const tabId = action.getIn(['tabValue', 'tabId'])
     if (tabId) {
       // remove callback; call w/ defaults
-      let cb = messageBoxCallbacks[tabId]
+      const cb = messageBoxCallbacks[tabId]
       if (cb) {
         cleanupCallback(tabId)
         cb(false, '', false)
@@ -112,7 +112,7 @@ const tabMessageBox = {
         // remove detail from state
         state = tabMessageBoxState.removeDetail(state, removeAction)
         // remove callback; call w/ defaults
-        let cb = messageBoxCallbacks[tabId]
+        const cb = messageBoxCallbacks[tabId]
         if (cb) {
           cleanupCallback(tabId)
           cb(false, '', false)
