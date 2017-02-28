@@ -55,7 +55,9 @@ const tabMessageBox = {
   },
 
   show: (tabId, detail, cb) => {
-    messageBoxCallbacks[tabId] = cb
+    if (cb) {
+      messageBoxCallbacks[tabId] = cb
+    }
     setImmediate(() => {
       appActions.tabMessageBoxShown(tabId, detail)
     })
