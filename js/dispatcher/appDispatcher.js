@@ -118,12 +118,12 @@ const dispatchCargo = async.cargo((task, callback) => {
   }
   callback()
   doneDispatching()
-}, 20)
+}, 200)
 
 const ipcCargo = async.cargo((tasks, callback) => {
   ipc.send(messages.DISPATCH_ACTION, Serializer.serialize(tasks))
   callback()
-}, 20)
+}, 200)
 
 if (process.type === 'browser') {
   ipc.on('app-dispatcher-register', (event) => {
