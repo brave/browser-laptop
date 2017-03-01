@@ -7,38 +7,40 @@ const React = require('react')
 class Clock extends React.Component {
   constructor () {
     super()
-    this.state = {
-      time: this.formattedTime,
-      timePeriod: this.formattedTimePeriod
-    }
-  }
-  get currentTime () {
-    const date = new Date()
-    const timeOptions = {hour: '2-digit', minute: '2-digit'}
-    return date.toLocaleTimeString([], timeOptions)
+    this.dateTimeFormat = new Intl.DateTimeFormat([], {hour: '2-digit', minute: '2-digit'})
+    this.state = this.getClockState(new Date())
   }
   get formattedTime () {
-    const time = this.currentTime
+    const time = this.state.currentTime
     return time.replace(' AM', '').replace(' PM', '')
   }
   get formattedTimePeriod () {
-    const time = this.currentTime
+    const time = this.state.currentTime
     if (time.toUpperCase().indexOf(' AM') > -1) return 'AM'
     if (time.toUpperCase().indexOf(' PM') > -1) return 'PM'
     return ''
   }
-  updateClock () {
-    this.setState({
-      time: this.formattedTime,
-      timePeriod: this.formattedTimePeriod
-    })
+  getMinutes (date) {
+    return Math.floor(date / 1000 / 60)
+  }
+  maybeUpdateClock () {
+    const now = new Date()
+    if (this.getMinutes(this.state.date) !== this.getMinutes(now)) {
+      this.setState(this.getClockState(now))
+    }
+  }
+  getClockState (now) {
+    return {
+      date: now,
+      currentTime: this.dateTimeFormat.format(now)
+    }
   }
   componentDidMount () {
-    window.setInterval(this.updateClock.bind(this), 1000)
+    window.setInterval(this.maybeUpdateClock.bind(this), 2000)
   }
   render () {
     return <div className='clock'>
-      <span className='time'>{this.state.time}</span><span className='timePeriod'>{this.state.timePeriod}</span>
+      <span className='time'>{this.formattedTime}</span><span className='timePeriod'>{this.formattedTimePeriod}</span>
     </div>
   }
 }
