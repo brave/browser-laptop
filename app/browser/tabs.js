@@ -1,6 +1,5 @@
 const appActions = require('../../js/actions/appActions')
 const config = require('../../js/constants/config')
-const debounce = require('../../js/lib/debounce')
 const messages = require('../../js/constants/messages')
 const Immutable = require('immutable')
 const tabState = require('../common/state/tabState')
@@ -80,11 +79,15 @@ const api = {
       }
     })
 
-    process.on('chrome-tabs-updated', (e, tabId) => {
+    process.on('chrome-tabs-created', (tabId) => {
       updateTab(tabId)
     })
 
-    process.on('chrome-tabs-removed', (e, tabId) => {
+    process.on('chrome-tabs-updated', (tabId) => {
+      updateTab(tabId)
+    })
+
+    process.on('chrome-tabs-removed', (tabId) => {
       cleanupWebContents(tabId)
     })
 
@@ -93,17 +96,10 @@ const api = {
         return
       }
       let tabId = tab.getId()
-      const updateTabDebounce = debounce(updateTab, 5)
 
       tab.once('destroyed', cleanupWebContents.bind(null, tabId))
       tab.once('crashed', cleanupWebContents.bind(null, tabId))
       tab.once('close', cleanupWebContents.bind(null, tabId))
-      tab.on('set-active', function (evt, active) {
-        updateTab(tabId)
-      })
-      tab.on('set-tab-index', function (evt, index) {
-        updateTab(tabId)
-      })
       tab.on('page-favicon-updated', function (e, favicons) {
         if (favicons && favicons.length > 0) {
           // tab.setTabValues({
@@ -117,41 +113,6 @@ const api = {
       })
       tab.on('responsive', () => {
         console.log('responsive')
-      })
-      tab.on('did-attach', () => {
-        updateTabDebounce(tabId)
-      })
-      tab.on('did-detach', () => {
-        updateTabDebounce(tabId)
-      })
-      tab.on('page-title-updated', function () {
-        updateTabDebounce(tabId)
-      })
-      tab.on('did-fail-load', function () {
-        updateTabDebounce(tabId)
-      })
-      tab.on('did-fail-provisional-load', function () {
-        updateTabDebounce(tabId)
-      })
-      tab.on('did-stop-loading', function () {
-        updateTabDebounce(tabId)
-      })
-      tab.on('navigation-entry-commited', function (evt, url) {
-        updateTabDebounce(tabId)
-      })
-      tab.on('did-navigate', function (evt, url) {
-        updateTabDebounce(tabId)
-      })
-      tab.on('did-navigate-in-page', function (evt, url, isMainFrame) {
-        updateTabDebounce(tabId)
-      })
-      tab.on('load-start', function (evt, url, isMainFrame, isErrorPage) {
-        if (isMainFrame) {
-          updateTabDebounce(tabId)
-        }
-      })
-      tab.on('did-finish-load', function () {
-        updateTabDebounce(tabId)
       })
 
       currentWebContents[tabId] = tab
