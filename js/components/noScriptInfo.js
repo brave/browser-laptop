@@ -24,12 +24,12 @@ class NoScriptCheckbox extends ImmutableComponent {
   }
 
   render () {
-    return <div className='noScriptCheckbox' id={this.id}>
+    return <div className='noScriptCheckbox' id={this.id}
+      onClick={this.toggleCheckbox.bind(this)}>
       <input type='checkbox' onClick={(e) => { e.stopPropagation() }}
         ref={(node) => { this.checkbox = node }} defaultChecked
         origin={this.props.origin} />
-      <label htmlFor={this.id}
-        onClick={this.toggleCheckbox.bind(this)}>{this.props.origin}</label>
+      <label htmlFor={this.id}>{this.props.origin}</label>
     </div>
   }
 }
@@ -52,6 +52,10 @@ class NoScriptInfo extends ImmutableComponent {
     return this.props.frameProps.get('isPrivate')
   }
 
+  onClickInner (e) {
+    e.stopPropagation()
+  }
+
   unselectAll (e) {
     e.stopPropagation()
     let checkboxes = this.checkboxes.querySelectorAll('input')
@@ -71,40 +75,30 @@ class NoScriptInfo extends ImmutableComponent {
     if (!this.origin) {
       return
     }
-    if (setting === false) {
-      appActions.changeSiteSetting(this.origin, 'noScript', setting)
-      this.reload()
-    } else {
-      let checkedOrigins = new Immutable.Map()
-      this.checkboxes.querySelectorAll('input').forEach((box) => {
-        const origin = box.getAttribute('origin')
-        if (origin) {
-          checkedOrigins = checkedOrigins.set(origin, box.checked ? setting : false)
-        }
-      })
-      if (checkedOrigins.size) {
-        appActions.noScriptExceptionsAdded(this.origin, checkedOrigins)
-        this.reload()
+    let checkedOrigins = new Immutable.Map()
+    this.checkboxes.querySelectorAll('input').forEach((box) => {
+      const origin = box.getAttribute('origin')
+      if (origin) {
+        checkedOrigins = checkedOrigins.set(origin, box.checked ? setting : false)
       }
+    })
+    if (checkedOrigins.filter((value) => value !== false).size) {
+      appActions.noScriptExceptionsAdded(this.origin, checkedOrigins)
+      this.reload()
+      this.props.onHide()
     }
   }
 
   get buttons () {
-    if (!this.props.noScriptGlobalEnabled) {
-      // NoScript is not turned on globally
-      return <div><Button l10nId='allowScripts' className='actionButton'
-        onClick={this.onAllow.bind(this, false)} /></div>
-    } else {
-      return <div>
-        <Button l10nId='allowScriptsOnce' className='actionButton'
-          onClick={this.onAllow.bind(this, 0)} />
-        {this.isPrivate
-          ? null
-          : <span><Button l10nId='allowScriptsTemp' className='subtleButton'
-            onClick={this.onAllow.bind(this, 1)} /></span>
-        }
-      </div>
-    }
+    return <div>
+      <Button l10nId='allowScriptsOnce' className='actionButton'
+        onClick={this.onAllow.bind(this, 0)} />
+      {this.isPrivate
+        ? null
+        : <span><Button l10nId='allowScriptsTemp' className='subtleButton'
+          onClick={this.onAllow.bind(this, 1)} /></span>
+      }
+    </div>
   }
 
   render () {
@@ -115,7 +109,7 @@ class NoScriptInfo extends ImmutableComponent {
       site: urlParse(this.props.frameProps.get('location')).host
     }
     return <Dialog onHide={this.props.onHide} className='noScriptInfo' isClickDismiss>
-      <div className='dialogInner'>
+      <div className='dialogInner' onClick={this.onClickInner}>
         <div className='truncate' data-l10n-args={JSON.stringify(l10nArgs)}
           data-l10n-id={'scriptsBlocked'} />
         {this.blockedOrigins.size
@@ -135,7 +129,6 @@ class NoScriptInfo extends ImmutableComponent {
 }
 
 NoScriptInfo.propTypes = {
-  noScriptGlobalEnabled: React.PropTypes.bool,
   frameProps: React.PropTypes.object,
   onHide: React.PropTypes.func
 }
