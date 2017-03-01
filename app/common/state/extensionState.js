@@ -91,13 +91,6 @@ const extensionState = {
     tabId = tabId ? tabId.toString() : '-1'
     let basePath = browserAction.get('base_path')
     if (basePath) {
-      let baseIcons16 = browserAction.getIn(['icons', '16'])
-      let baseIcons48 = browserAction.getIn(['icons', '48'])
-      if (baseIcons16 && baseIcons48) {
-        return `-webkit-image-set(
-                  url(${basePath}/${baseIcons16}) 1x,
-                  url(${basePath}/${baseIcons48}) 2x`
-      }
       let baseIcons19 = browserAction.getIn(['icons', '19'])
       let baseIcons38 = browserAction.getIn(['icons', '38'])
       if (baseIcons19 && baseIcons38) {
@@ -118,6 +111,13 @@ const extensionState = {
         return `-webkit-image-set(
                   url(${basePath}/${basePath19}) 1x,
                   url(${basePath}/${basePath38}) 2x`
+      }
+      let baseIcons16 = browserAction.getIn(['icons', '16'])
+      let baseIcons48 = browserAction.getIn(['icons', '48'])
+      if (baseIcons16 && baseIcons48) {
+        return `-webkit-image-set(
+                  url(${basePath}/${baseIcons16}) 1x,
+                  url(${basePath}/${baseIcons48}) 2x`
       }
     }
     return ''
