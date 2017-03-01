@@ -91,9 +91,6 @@ class Frame extends ImmutableComponent {
   updateAboutDetails (prevProps) {
     let location = getBaseUrl(this.props.location)
     if (location === 'about:preferences' || location === 'about:contributions' || location === aboutUrls.get('about:contributions')) {
-      if (prevProps.partition !== this.props.partition) {
-        ipc.send(messages.CHECK_BITCOIN_HANDLER, this.props.partition)
-      }
       if (!Immutable.is(prevProps.ledgerInfo, this.props.ledgerInfo) ||
           !Immutable.is(prevProps.publisherInfo, this.props.publisherInfo) ||
           !Immutable.is(prevProps.preferencesData, this.props.preferencesData)) {

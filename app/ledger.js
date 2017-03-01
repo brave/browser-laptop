@@ -232,6 +232,11 @@ const doAction = (action) => {
       setTimeout(networkConnected, 1 * msecs.second)
       break
 
+    case appConstants.APP_NAVIGATOR_HANDLER_UPDATE:
+      ledgerInfo.hasBitcoinHandler = (action.register && action.protocol === 'bitcoin')
+      appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
+      break
+
     default:
       break
   }
@@ -463,15 +468,6 @@ if (ipc) {
     } else if (balanceTimeoutId) {
       clearTimeout(balanceTimeoutId)
       balanceTimeoutId = false
-    }
-  })
-
-  ipc.on(messages.CHECK_BITCOIN_HANDLER, (event, partition) => {
-    const protocolHandler = session.fromPartition(partition).protocol
-    // TODO: https://github.com/brave/browser-laptop/issues/3625
-    if (typeof protocolHandler.isNavigatorProtocolHandled === 'function') {
-      ledgerInfo.hasBitcoinHandler = protocolHandler.isNavigatorProtocolHandled('bitcoin')
-      appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
     }
   })
 

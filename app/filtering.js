@@ -561,11 +561,24 @@ function initForPartition (partition) {
     registerForDownloadListener,
     registerForMagnetHandler]
   let options = {}
+
   if (isSessionPartition(partition)) {
     options.parent_partition = ''
   }
+
   let ses = session.fromPartition(partition, options)
-  fns.forEach((fn) => { fn(ses, partition, module.exports.isPrivate(partition)) })
+  fns.forEach((fn) => {
+    fn(ses, partition, module.exports.isPrivate(partition))
+  })
+  ses.on('register-navigator-handler', (e, protocol, location) => {
+    appActions.navigatorHandler(ses.partition, protocol, location, true)
+  })
+  ses.on('unregister-navigator-handler', (e, protocol, location) => {
+    appActions.navigatorHandler(ses.partition, protocol, location, false)
+  })
+  ses.protocol.getNavigatorHandlers().forEach((handler) => {
+    appActions.navigatorHandler(ses.partition, handler.protocol, handler.location, true)
+  })
 }
 
 const filterableProtocols = ['http:', 'https:', 'ws:', 'wss:']
