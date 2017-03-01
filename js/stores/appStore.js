@@ -16,12 +16,9 @@ const siteSettings = require('../state/siteSettings')
 const appUrlUtil = require('../lib/appUrlUtil')
 const electron = require('electron')
 const app = electron.app
-const ipcMain = electron.ipcMain
 const messages = require('../constants/messages')
 const UpdateStatus = require('../constants/updateStatus')
 const BrowserWindow = electron.BrowserWindow
-const LocalShortcuts = require('../../app/localShortcuts')
-const appActions = require('../actions/appActions')
 const syncActions = require('../actions/syncActions')
 const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const dates = require('../../app/dates')
@@ -30,7 +27,6 @@ const EventEmitter = require('events').EventEmitter
 const Immutable = require('immutable')
 const diff = require('immutablediff')
 const debounce = require('../lib/debounce')
-const locale = require('../../app/locale')
 const path = require('path')
 const autofill = require('../../app/autofill')
 const nativeImage = require('../../app/nativeImage')
@@ -111,7 +107,12 @@ const setWindowPosition = (browserOpts, defaults, windowState) => {
   return browserOpts
 }
 
-const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
+const createWindow = (action) => {
+  const frameOpts = (action.frameOpts && action.frameOpts.toJS()) || {}
+  let browserOpts = (action.browserOpts && action.browserOpts.toJS()) || {}
+  const windowState = action.restoredState || {}
+  const defaults = windowDefaults()
+
   browserOpts = setWindowDimensions(browserOpts, defaults, windowState)
   browserOpts = setWindowPosition(browserOpts, defaults, windowState)
 
@@ -185,65 +186,50 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
     windowProps.icon = path.join(__dirname, '..', '..', 'res', 'app.png')
   }
 
-  let mainWindow = new BrowserWindow(Object.assign(windowProps, browserOpts))
+  const homepageSetting = getSetting(settings.HOMEPAGE)
+  const startupSetting = getSetting(settings.STARTUP_MODE)
 
-  mainWindow.setMenuBarVisibility(true)
+  setImmediate(() => {
+    let mainWindow = new BrowserWindow(Object.assign(windowProps, browserOpts))
 
-  if (windowState.ui && windowState.ui.isMaximized) {
-    mainWindow.maximize()
-  }
-
-  if (windowState.ui && windowState.ui.isFullScreen) {
-    mainWindow.setFullScreen(true)
-  }
-
-  mainWindow.on('close', function () {
-    LocalShortcuts.unregister(mainWindow)
-  })
-
-  mainWindow.on('closed', function () {
-    mainWindow = null
-  })
-
-  mainWindow.on('scroll-touch-begin', function (e) {
-    mainWindow.webContents.send('scroll-touch-begin')
-  })
-
-  mainWindow.on('scroll-touch-end', function (e) {
-    mainWindow.webContents.send('scroll-touch-end')
-  })
-
-  mainWindow.on('scroll-touch-edge', function (e) {
-    mainWindow.webContents.send('scroll-touch-edge')
-  })
-
-  mainWindow.on('enter-full-screen', function () {
-    if (mainWindow.isMenuBarVisible()) {
-      mainWindow.setMenuBarVisibility(false)
+    // initialize frames state
+    let frames = []
+    if (frameOpts && Object.keys(frameOpts).length > 0) {
+      if (frameOpts.forEach) {
+        frames = frameOpts
+      } else {
+        frames.push(frameOpts)
+      }
+    } else if (startupSetting === 'homePage' && homepageSetting) {
+      frames = homepageSetting.split('|').map((homepage) => {
+        return {
+          location: homepage
+        }
+      })
     }
+
+    mainWindow.webContents.on('did-finish-load', (e) => {
+      lastEmittedState = appState
+      e.sender.send(messages.INITIALIZE_WINDOW, frameOpts.disposition, appState.toJS(), frames, action.restoredState)
+      if (action.cb) {
+        action.cb()
+      }
+    })
+
+    mainWindow.on('ready-to-show', () => {
+      mainWindow.show()
+
+      if (windowState.ui && windowState.ui.isMaximized) {
+        mainWindow.maximize()
+      }
+
+      if (windowState.ui && windowState.ui.isFullScreen) {
+        mainWindow.setFullScreen(true)
+      }
+    })
+
+    mainWindow.loadURL(appUrlUtil.getBraveExtIndexHTML())
   })
-
-  mainWindow.on('leave-full-screen', function () {
-    mainWindow.webContents.send(messages.LEAVE_FULL_SCREEN)
-
-    if (getSetting(settings.AUTO_HIDE_MENU) === false) {
-      mainWindow.setMenuBarVisibility(true)
-    }
-  })
-
-  mainWindow.on('app-command', function (e, cmd) {
-    switch (cmd) {
-      case 'browser-backward':
-        mainWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
-        return
-      case 'browser-forward':
-        mainWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
-        return
-    }
-  })
-
-  LocalShortcuts.register(mainWindow)
-  return mainWindow
 }
 
 class AppStore extends EventEmitter {
@@ -402,59 +388,7 @@ const handleAppAction = (action) => {
       app.quit()
       break
     case appConstants.APP_NEW_WINDOW:
-      const frameOpts = (action.frameOpts && action.frameOpts.toJS()) || {}
-      const browserOpts = (action.browserOpts && action.browserOpts.toJS()) || {}
-      const newWindowState = action.restoredState || {}
-
-      const mainWindow = createWindow(browserOpts, windowDefaults(), frameOpts, newWindowState)
-      const homepageSetting = getSetting(settings.HOMEPAGE)
-
-      // initialize frames state
-      let frames = []
-      if (frameOpts && Object.keys(frameOpts).length > 0) {
-        if (frameOpts.forEach) {
-          frames = frameOpts
-        } else {
-          frames.push(frameOpts)
-        }
-      } else if (getSetting(settings.STARTUP_MODE) === 'homePage' && homepageSetting) {
-        frames = homepageSetting.split('|').map((homepage) => {
-          return {
-            location: homepage
-          }
-        })
-      }
-
-      mainWindow.webContents.on('did-finish-load', (e) => {
-        lastEmittedState = appState
-        e.sender.send(messages.INITIALIZE_WINDOW, frameOpts.disposition, appState.toJS(), frames, action.restoredState)
-        if (action.cb) {
-          action.cb()
-        }
-      })
-      mainWindow.webContents.on('crashed', (e) => {
-        console.error('Window crashed. Reloading...')
-        mainWindow.loadURL(appUrlUtil.getBraveExtIndexHTML())
-
-        ipcMain.on(messages.NOTIFICATION_RESPONSE, function notificationResponseCallback (e, message, buttonIndex, persist) {
-          if (message === locale.translation('unexpectedErrorWindowReload')) {
-            appActions.hideNotification(message)
-            ipcMain.removeListener(messages.NOTIFICATION_RESPONSE, notificationResponseCallback)
-          }
-        })
-
-        appActions.showNotification({
-          buttons: [
-            {text: locale.translation('ok')}
-          ],
-          options: {
-            persist: false
-          },
-          message: locale.translation('unexpectedErrorWindowReload')
-        })
-      })
-      mainWindow.loadURL(appUrlUtil.getBraveExtIndexHTML())
-      mainWindow.show()
+      createWindow(action)
       break
     case appConstants.APP_CLOSE_WINDOW:
       appState = windows.closeWindow(appState, action)
