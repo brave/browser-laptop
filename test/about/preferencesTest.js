@@ -31,7 +31,7 @@ describe('General Panel', function () {
         .loadUrl(prefsUrl)
         .waitForVisible(homepageInput)
         .click(homepageInput)
-        .keys('\uE010') // send END key
+        .keys(Brave.keys.END)
         .keys('а')
         .waitUntil(function () {
           return this.getValue(homepageInput).then((val) => {
@@ -39,13 +39,14 @@ describe('General Panel', function () {
           })
         })
     })
+
     it('homepage can be backspaced', function * () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(prefsUrl)
         .waitForVisible(homepageInput)
         .click(homepageInput)
-        .keys('\uE010') // send END key
+        .keys(Brave.keys.END)
         .keys('/')
         .keys('1')
         .keys(Brave.keys.BACKSPACE)
@@ -54,6 +55,21 @@ describe('General Panel', function () {
         .waitUntil(function () {
           return this.getValue(homepageInput).then((val) => {
             return val === 'https://www.brave.co'
+          })
+        })
+    })
+
+    it('multiple homepages direct input', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(prefsUrl)
+        .waitForVisible(homepageInput)
+        .click(homepageInput)
+        .keys(Brave.keys.END)
+        .keys('|https://duckduckgo.com')
+        .waitUntil(function () {
+          return this.getValue(homepageInput).then((val) => {
+            return val === 'https://www.brave.com/|https://duckduckgo.com'
           })
         })
     })

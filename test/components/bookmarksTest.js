@@ -65,11 +65,11 @@ describe('bookmark tests', function () {
           .click(navigatorBookmarked)
           .waitForVisible(doneButton)
           .setValue('#bookmarkName input', 'https://www.brave.com')
-          .keys('\uE010') // send END key
+          .keys(Brave.keys.END)
           .keys('а')
           .getValue('#bookmarkName input').should.eventually.be.equal('https://www.brave.xn--com-8cd/')
           .setValue('#bookmarkLocation input', 'https://www.brave.com')
-          .keys('\uE010') // send END key
+          .keys(Brave.keys.END)
           .keys('а')
           .getValue('#bookmarkLocation input').should.eventually.be.equal('https://www.brave.xn--com-8cd/')
           .click(removeButton)
@@ -81,13 +81,13 @@ describe('bookmark tests', function () {
           .click(navigatorBookmarked)
           .waitForVisible(doneButton)
           .setValue('#bookmarkName input', 'https://www.brave.com/1')
-          .keys('\uE010') // send END key
+          .keys(Brave.keys.END)
           .keys(Brave.keys.BACKSPACE)
           .keys(Brave.keys.BACKSPACE)
           .keys(Brave.keys.BACKSPACE)
           .getValue('#bookmarkName input').should.eventually.be.equal('https://www.brave.co')
           .setValue('#bookmarkLocation input', 'https://www.brave.com/1')
-          .keys('\uE010') // send END key
+          .keys(Brave.keys.END)
           .keys(Brave.keys.BACKSPACE)
           .keys(Brave.keys.BACKSPACE)
           .keys(Brave.keys.BACKSPACE)

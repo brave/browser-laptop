@@ -128,10 +128,10 @@ describe('Autofill', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible(autofillAddressPanel)
         .click('#phone')
-        .keys('\uE010') // send END key
+        .keys(Brave.keys.END)
         .keys('123')
         .click('#email')
-        .keys('\uE010') // send END key
+        .keys(Brave.keys.END)
         .keys('mm')
         .click(saveAddressButton)
         .waitUntil(function () {
@@ -254,10 +254,10 @@ describe('Autofill', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible(autofillCreditCardPanel)
         .click('#nameOnCard')
-        .keys('\uE010') // send END key
+        .keys(Brave.keys.END)
         .keys('123')
         .click('#creditCardNumber')
-        .keys('\uE010') // send END key
+        .keys(Brave.keys.END)
         .keys('123')
         .selectByValue('.expMonthSelect', (expMonth + 1).toString())
         .selectByValue('.expYearSelect', (expYear + 1).toString())

@@ -82,7 +82,8 @@ var exports = {
     DELETE: '\ue017',
     DOWN: '\ue015',
     UP: '\ue013',
-    PAGEDOWN: '\uE00F'
+    PAGEDOWN: '\uE00F',
+    END: '\uE010'
   },
 
   defaultTimeout: 10000,
