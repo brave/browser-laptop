@@ -234,8 +234,8 @@ const api = {
     })
     win.webContents.on('did-finish-load', (e) => {
       win.webContents.executeScriptInTab(config.braveExtensionId, script, {}, (err, url, result) => {
-        win.close()
         cb(err, url, result)
+        setImmediate(() => win.close())
       })
     })
     win.loadURL('about:blank')
