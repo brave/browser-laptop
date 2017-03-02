@@ -561,17 +561,21 @@ class GeneralTab extends ImmutableComponent {
   }
 
   render () {
-    var languageOptions = this.props.languageCodes.map(function (lc) {
+    const languageOptions = this.props.languageCodes.map(function (lc) {
       return (
         <option data-l10n-id={lc} value={lc} />
       )
     })
-    var homepageValue = getSetting(settings.HOMEPAGE, this.props.settings)
+
+    let homepageValue = getSetting(settings.HOMEPAGE, this.props.settings)
     if (typeof homepageValue === 'string') {
       const punycodeUrl = UrlUtil.getPunycodeUrl(homepageValue)
       if (punycodeUrl.replace(/\/$/, '') !== homepageValue) {
         homepageValue = UrlUtil.getPunycodeUrl(homepageValue)
       }
+
+      // we use | as a separator for multiple home pages
+      homepageValue = homepageValue.replace(/%7C/g, '|')
     }
     const homepage = homepageValue && homepageValue.trim()
     const disableShowHomeButton = !homepage || !homepage.length
