@@ -940,6 +940,23 @@ const appActions = {
       tabId,
       detail
     })
+  },
+
+  /**
+   * Action triggered by navigation handler
+   * @param partition {string} session partition
+   * @param protocol {string} navigator protocol
+   * @param location {string} location where handler was triggered
+   * @param register {boolean} true if event was registered or false if unregistered
+   */
+  navigatorHandler: function (partition, protocol, location, register) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_NAVIGATOR_HANDLER_UPDATE,
+      partition,
+      protocol,
+      location,
+      register
+    })
   }
 }
 
