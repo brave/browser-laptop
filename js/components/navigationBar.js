@@ -130,11 +130,13 @@ class NavigationBar extends ImmutableComponent {
     const hostPattern = UrlUtil.getHostPattern(this.publisherId)
     const hostSettings = this.props.siteSettings.get(hostPattern)
     const ledgerPaymentsShown = hostSettings && hostSettings.get('ledgerPaymentsShown')
-    return ledgerPaymentsShown !== false
+    return typeof ledgerPaymentsShown === 'boolean'
+      ? ledgerPaymentsShown
+      : true
   }
 
   get isPublisherButtonEnabled () {
-    getSetting(settings.PAYMENTS_ENABLED) && this.visiblePublisher
+    return UrlUtil.isHttpOrHttps(this.props.location) && this.visiblePublisher
   }
 
   componentDidMount () {
