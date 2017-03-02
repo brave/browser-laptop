@@ -150,7 +150,7 @@ describe('MessageBox component unit tests', function () {
           />
         )
         const instance = wrapper.instance()
-        assert.deepEqual(instance.buttons.toJS(), ['OK'])
+        assert.deepEqual(instance.buttons.toJS(), ['ok'])
       })
     })
 
