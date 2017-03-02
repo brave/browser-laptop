@@ -36,7 +36,8 @@ class AddEditBookmarkHanger extends ImmutableComponent {
       : (typeof location === 'string' && location.trim().length > 0)
   }
   get displayBookmarkName () {
-    if (this.props.currentDetail.get('customTitle') !== undefined) {
+    const customTitle = this.props.currentDetail.get('customTitle')
+    if (customTitle !== undefined && customTitle !== '') {
       return this.props.currentDetail.get('customTitle')
     }
     return this.props.currentDetail.get('title') || ''
