@@ -5,7 +5,6 @@
 const React = require('react')
 const Immutable = require('immutable')
 const ImmutableComponent = require('./immutableComponent')
-const tldjs = require('tldjs')
 
 const cx = require('../lib/classSet')
 const Button = require('./button')
@@ -16,7 +15,7 @@ const siteTags = require('../constants/siteTags')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const ipc = require('electron').ipcRenderer
-const {isSourceAboutUrl} = require('../lib/appUrlUtil')
+const {isSourceAboutUrl, getBaseUrl} = require('../lib/appUrlUtil')
 const AddEditBookmarkHanger = require('../../app/renderer/components/addEditBookmarkHanger')
 const siteUtil = require('../state/siteUtil')
 const eventUtil = require('../lib/eventUtil')
@@ -115,16 +114,27 @@ class NavigationBar extends ImmutableComponent {
       )
   }
 
-  get isPublisherButtonEnabled () {
-    const domain = tldjs.getDomain(this.props.location)
-    const hostSettings = this.props.siteSettings.get(`https?://${domain}`)
-    const visiblePublisher = hostSettings && hostSettings.get('ledgerPaymentsShown')
-    const validPublisherSynopsis = this.props.synopsis.map(entry => entry.get('site')).includes(domain)
+  get locationId () {
+    return getBaseUrl(this.props.location)
+  }
 
-    if ((hostSettings || validPublisherSynopsis) && visiblePublisher !== false) {
-      return getSetting(settings.PAYMENTS_ENABLED) && !isSourceAboutUrl(this.props.location)
+  get publisherId () {
+    return this.props.locationInfo.getIn([this.locationId, 'publisher']) || ''
+  }
+
+  get visiblePublisher () {
+    // No publisher is visible if ledger is disabled
+    if (!getSetting(settings.PAYMENTS_ENABLED)) {
+      return false
     }
-    return false
+    const hostPattern = UrlUtil.getHostPattern(this.publisherId)
+    const hostSettings = this.props.siteSettings.get(hostPattern)
+    const ledgerPaymentsShown = hostSettings && hostSettings.get('ledgerPaymentsShown')
+    return ledgerPaymentsShown !== false
+  }
+
+  get isPublisherButtonEnabled () {
+    getSetting(settings.PAYMENTS_ENABLED) && this.visiblePublisher
   }
 
   componentDidMount () {
@@ -239,8 +249,9 @@ class NavigationBar extends ImmutableComponent {
         : <div className='endButtons'>
           {
             <PublisherToggle
-              url={this.props.location}
-              hostSettings={this.props.siteSettings}
+              location={this.props.location}
+              locationInfo={this.props.locationInfo}
+              siteSettings={this.props.siteSettings}
               synopsis={this.props.synopsis}
             />
           }

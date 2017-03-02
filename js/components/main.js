@@ -1014,6 +1014,7 @@ class Main extends ImmutableComponent {
                 siteSettings={this.props.appState.get('siteSettings')}
                 synopsis={this.props.appState.getIn(['publisherInfo', 'synopsis']) || new Immutable.Map()}
                 activeTabShowingMessageBox={activeTabShowingMessageBox}
+                locationInfo={this.props.appState.get('locationInfo')}
               />
               <div className='topLevelEndButtons'>
                 <div className={cx({
