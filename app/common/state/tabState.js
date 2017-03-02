@@ -184,6 +184,9 @@ const api = {
     state = makeImmutable(state)
 
     let tabs = state.get('tabs')
+    if (!tabs) {
+      return state
+    }
     for (let i = 0; i < tabs.size; i++) {
       tabs = tabs.deleteIn([i, field])
     }
