@@ -18,7 +18,6 @@ describe('about:bookmarks', function () {
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
       .waitForVisible(urlInput)
-      .windowByUrl(Brave.browserWindowUrl)
   }
 
   function * addDemoSitesWithAndWithoutFavicon (client) {
@@ -28,10 +27,13 @@ describe('about:bookmarks', function () {
     yield client
       .addSite({ location: siteWithFavicon, title: 'Page with Favicon', favicon: favicon, tags: bookmarkTag, parentFolderId: 0, lastAccessedTime: lastVisit }, siteTags.BOOKMARK)
       .addSite({ location: siteWithoutFavicon, title: 'Page without Favicon', tags: bookmarkTag, parentFolderId: 0, lastAccessedTime: lastVisit }, siteTags.BOOKMARK)
+      .tabByIndex(0)
+      .loadUrl(aboutBookmarksUrl)
   }
 
   function * addDemoSites (client) {
     yield client
+      .waitForBrowserWindow()
       .addSite({
         customTitle: 'demo1',
         folderId: folderId,
@@ -45,14 +47,14 @@ describe('about:bookmarks', function () {
       .addSite({ location: 'https://duckduckgo.com', title: 'duckduckgo', tags: bookmarkTag, parentFolderId: folderId, lastAccessedTime: lastVisit }, siteTags.BOOKMARK)
       .addSite({ location: 'https://google.com', title: 'Google', tags: bookmarkTag, parentFolderId: folderId, lastAccessedTime: lastVisit }, siteTags.BOOKMARK)
       .addSite({ location: 'https://bing.com', title: 'Bing', tags: bookmarkTag, parentFolderId: folderId, lastAccessedTime: lastVisit }, siteTags.BOOKMARK)
-      .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
       .tabByIndex(0)
-      .url(aboutBookmarksUrl)
+      .loadUrl(aboutBookmarksUrl)
   }
 
   function * addBrowseableSite (client) {
     const site = Brave.server.url(browseableSiteUrl)
     yield client
+      .waitForBrowserWindow()
       .addSite({
         location: site,
         title: browseableSiteTitle,
@@ -60,9 +62,8 @@ describe('about:bookmarks', function () {
         parentFolderId: 0,
         lastAccessedTime: lastVisit
       }, siteTags.BOOKMARK)
-      .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
       .tabByIndex(0)
-      .url(aboutBookmarksUrl)
+      .loadUrl(aboutBookmarksUrl)
   }
 
   describe('page content', function () {
@@ -104,12 +105,13 @@ describe('about:bookmarks', function () {
 
     it('opens a new tab with the location of the entry when double clicked', function * () {
       const site = Brave.server.url(browseableSiteUrl)
+      const target = 'table.sortableTable td.title[data-sort="' + browseableSiteTitle + '"]'
       yield this.app.client
-        .tabByUrl(aboutBookmarksUrl)
-        .doubleClick('table.sortableTable td.title[data-sort="' + browseableSiteTitle + '"]')
-        .waitForTabCount(2)
+        .waitForVisible(target)
+        .doubleClick(target)
         .waitForUrl(site)
-        .tabByIndex(0)
+        .waitForBrowserWindow()
+        .waitForTabCount(2)
     })
   })
 
@@ -123,8 +125,6 @@ describe('about:bookmarks', function () {
 
     it('selects multiple rows when clicked with cmd/control', function * () {
       yield this.app.client
-        .tabByUrl(aboutBookmarksUrl)
-        .loadUrl(aboutBookmarksUrl)
         .click('table.sortableTable td.title[data-sort="Brave"]')
         .isDarwin().then((val) => {
           if (val === true) {
@@ -156,8 +156,6 @@ describe('about:bookmarks', function () {
     })
     it('selects multiple contiguous rows when shift clicked', function * () {
       yield this.app.client
-        .tabByUrl(aboutBookmarksUrl)
-        .loadUrl(aboutBookmarksUrl)
         .click('table.sortableTable td.title[data-sort="Brave"]')
         .keys(Brave.keys.SHIFT)
         .click('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
@@ -199,8 +197,6 @@ describe('about:bookmarks', function () {
     })
     it('deselects everything if something other than a row is clicked', function * () {
       yield this.app.client
-        .tabByUrl(aboutBookmarksUrl)
-        .loadUrl(aboutBookmarksUrl)
         // Click one bookmark, to select it
         .click('table.sortableTable td.title[data-sort="Brave"]')
         .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
@@ -220,8 +216,7 @@ describe('about:bookmarks', function () {
 
     it('display favicon for url inside bookmarks toolbar', function * () {
       yield this.app.client
-        .tabByUrl(aboutBookmarksUrl)
-        .loadUrl(aboutBookmarksUrl)
+        .waitForVisible('td.title[data-sort="Page with Favicon"] .bookmarkFavicon')
         .getCssProperty('td.title[data-sort="Page with Favicon"] .bookmarkFavicon', 'background-image')
         .then((val) => {
           return val === `url("${Brave.server.url('img/test.ico')}")`
@@ -230,8 +225,7 @@ describe('about:bookmarks', function () {
 
     it('fallback to default favicon when url has no favicon inside bookmarks toolbar', function * () {
       yield this.app.client
-        .tabByUrl(aboutBookmarksUrl)
-        .loadUrl(aboutBookmarksUrl)
+        .waitForVisible('td.title[data-sort="Page without Favicon"] .bookmarkFavicon')
         .getAttribute('td.title[data-sort="Page without Favicon"] .bookmarkFavicon', 'class')
         .then((val) => {
           return val === 'bookmarkFavicon bookmarkFile fa fa-file-o'

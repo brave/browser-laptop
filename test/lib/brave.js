@@ -86,6 +86,7 @@ var exports = {
   },
 
   defaultTimeout: 10000,
+  defaultInterval: 100,
 
   browserWindowUrl: getBraveExtIndexHTML(),
   newTabUrl: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-newtab.html',
@@ -155,10 +156,19 @@ var exports = {
   },
 
   addCommands: function () {
+    const app = this.app
+    const initialized = []
+
     this.app.client.addCommand('ipcSend', function (message, ...param) {
       return this.execute(function (message, ...param) {
         return devTools('electron').remote.getCurrentWindow().webContents.send(message, ...param)
       }, message, ...param).then((response) => response.value)
+    })
+
+    this.app.client.addCommand('maximize', function () {
+      return this.execute(function () {
+        return devTools('electron').remote.getCurrentWindow().maximize()
+      }).then((response) => response.value)
     })
 
     this.app.client.addCommand('unmaximize', function () {
@@ -178,6 +188,18 @@ var exports = {
         return devTools('electron').ipcRenderer.sendSync(message, ...param)
       }, message, ...param)
     })
+
+    var windowOrig = this.app.client.window
+    Object.getPrototypeOf(this.app.client).window = function (handle) {
+      if (!initialized.includes(handle)) {
+        initialized.push(handle)
+        return windowOrig.apply(this, [handle]).call(() => {
+          return app.api.initialize().then(() => true, () => true)
+        }).then(() => windowOrig.apply(this, [handle]))
+      } else {
+        return windowOrig.apply(this, [handle])
+      }
+    }
 
     var windowHandlesOrig = this.app.client.windowHandles
     Object.getPrototypeOf(this.app.client).windowHandles = function () {
@@ -464,7 +486,8 @@ var exports = {
 
     this.app.client.addCommand('openBraveMenu', function (braveMenu, braveryPanel) {
       logVerbose('openBraveMenu()')
-      return this.windowByUrl(exports.browserWindowUrl)
+      return this
+        .waitForBrowserWindow()
         .waitForVisible(braveMenu)
         .click(braveMenu)
         .waitForVisible(braveryPanel)
@@ -494,6 +517,12 @@ var exports = {
       return this.execute(function () {
         return devTools('appActions').newWindow()
       }, frameOpts, browserOpts).then((response) => response.value)
+    })
+
+    this.app.client.addCommand('quit', function () {
+      return this.execute(function () {
+        return devTools('appActions').shuttingDown()
+      }).then((response) => response.value)
     })
 
     /**
@@ -670,10 +699,12 @@ var exports = {
 
     this.app.client.addCommand('windowByUrl', function (url) {
       var context = this
+      logVerbose('windowByUrl("' + url + '")')
       return this.windowHandles().then((response) => response.value).then(function (handles) {
         return promiseMapSeries(handles, function (handle) {
           return context.window(handle).getUrl()
         }).then(function (response) {
+          logVerbose('windowByUrl("' + url + '") => ' + JSON.stringify(response))
           let index = response.indexOf(url)
           if (index !== -1) {
             return context.window(handles[index])
@@ -754,6 +785,7 @@ var exports = {
     this.app = new Application({
       quitTimeout: 300,
       waitTimeout: exports.defaultTimeout,
+      waitInterval: exports.defaultInterval,
       connectionRetryTimeout: exports.defaultTimeout,
       path: process.platform === 'win32'
         ? 'node_modules/electron-prebuilt/dist/brave.exe'

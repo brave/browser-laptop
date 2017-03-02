@@ -15,7 +15,7 @@ describe('navigationBar tests', function () {
   function * setup (client) {
     yield client
       .waitForUrl(Brave.newTabUrl)
-      .waitForBrowserWindow()
+      .windowByUrl(Brave.browserWindowUrl)
       .waitForEnabled(urlInput)
       .changeSetting('general.disable-title-mode', false)
   }
@@ -57,10 +57,9 @@ describe('navigationBar tests', function () {
       Brave.beforeAll(this)
       before(function * () {
         const page1 = Brave.server.url('page1.html')
-        yield this.app.client.waitForExist(urlInput)
         yield this.app.client
-          .windowByUrl(Brave.browserWindowUrl)
-          .tabByIndex(0)
+          .waitForBrowserWindow()
+          .waitForUrl(Brave.newTabUrl)
           .url(page1)
           .waitForUrl(page1)
           .windowByUrl(Brave.browserWindowUrl)
@@ -218,13 +217,13 @@ describe('navigationBar tests', function () {
         var page1 = Brave.server.url('page1.html')
         yield this.app.client
           .tabByUrl(Brave.newTabUrl)
-          .url(page1)
-          .waitForUrl(page1)
+          .loadUrl(page1)
       })
 
       it('remains cleared when onChange is fired but not onKeyUp', function * () {
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
+          .waitForVisible(urlInput)
           .setValue(urlInput, '')
           .waitUntil(function () {
             return this.getValue(urlInput).then((val) => val === '')
@@ -246,8 +245,10 @@ describe('navigationBar tests', function () {
         this.page1Url = Brave.server.url('page1.html')
         this.host = urlParse(this.page1Url).host
         yield setup(this.app.client)
-        yield this.app.client.tabByUrl(Brave.newTabUrl).url(this.page1Url).waitForUrl(this.page1Url).windowParentByUrl(this.page1Url)
         yield this.app.client
+          .tabByUrl(Brave.newTabUrl)
+          .loadUrl(this.page1Url)
+          .windowParentByUrl(this.page1Url)
           .activateURLMode()
           .waitForValue(urlInput)
       })
@@ -257,6 +258,7 @@ describe('navigationBar tests', function () {
         yield this.app.client
           .moveToObject(activeWebview)
           .click(activeWebview)
+          .windowParentByUrl(this.page1Url)
           .waitForExist(titleBar)
           .waitUntil(function () {
             return this.getText(titleBar).then((val) => val === host + ' | Page 1')
@@ -395,13 +397,16 @@ describe('navigationBar tests', function () {
 
     it('Shows insecure URL icon', function * () {
       const page1Url = Brave.server.url('page1.html')
-      yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
-      yield this.app.client.waitUntil(() =>
-        this.app.client
-          .activateURLMode()
-          .waitForExist(urlbarIcon)
-          .getAttribute(urlbarIcon, 'class').then((classes) =>
-            classes.includes('fa-unlock')
+      yield this.app.client
+        .tabByUrl(Brave.newTabUrl)
+        .loadUrl(page1Url)
+        .windowParentByUrl(page1Url)
+        .waitUntil(() =>
+          this.app.client
+            .activateURLMode()
+            .waitForExist(urlbarIcon)
+            .getAttribute(urlbarIcon, 'class').then((classes) =>
+              classes.includes('fa-unlock')
         ))
         .windowByUrl(Brave.browserWindowUrl)
         .click(urlbarIcon)
@@ -410,11 +415,12 @@ describe('navigationBar tests', function () {
     })
     it('Shows insecure URL icon in title mode', function * () {
       const page1Url = Brave.server.url('page1.html')
-      yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
       yield this.app.client
+        .tabByUrl(Brave.newTabUrl)
+        .loadUrl(page1Url)
+        .windowParentByUrl(page1Url)
         .activateURLMode()
         .waitForValue(urlInput)
-      yield this.app.client
         .moveToObject(activeWebview)
         .click(activeWebview)
         .waitForExist(titleBar)
@@ -440,11 +446,12 @@ describe('navigationBar tests', function () {
     })
     it('Shows secure URL icon in title mode', function * () {
       const page1Url = Brave.server.url('page1.html')
-      yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
       yield this.app.client
+        .tabByUrl(Brave.newTabUrl)
+        .loadUrl(page1Url)
+        .windowParentByUrl(page1Url)
         .activateURLMode()
         .waitForValue(urlInput)
-      yield this.app.client
         .moveToObject(activeWebview)
         .click(activeWebview)
         .waitForExist(titleBar)
@@ -831,7 +838,7 @@ describe('navigationBar tests', function () {
         this.page2 = 'https://bayden.com/test/redir/goscript.aspx'
         yield setup(this.app.client)
         yield this.app.client
-          .windowByUrl(Brave.browserWindowUrl)
+          .waitForBrowserWindow()
           .waitForExist(urlInput)
           .waitForElementFocus(urlInput)
       })
@@ -937,6 +944,7 @@ describe('navigationBar tests', function () {
         // hit enter
         yield this.app.client.keys(Brave.keys.ENTER)
       })
+
       it('filters javascript urls', function * () {
         yield this.app.client.waitUntil(function () {
           return this.getValue(urlInput).then((val) => !val.includes('javascript:'))
@@ -956,7 +964,7 @@ describe('navigationBar tests', function () {
       })
       it('hides auth part of the url', function * () {
         yield this.app.client.waitUntil(function () {
-          return this.windowByUrl(Brave.browserWindowUrl).getValue(urlInput).then((val) => val === 'http://example.com/')
+          return this.getValue(urlInput).then((val) => val === 'http://example.com/')
         })
       })
     })

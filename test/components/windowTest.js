@@ -11,6 +11,7 @@ describe('application window', function () {
     it('opens a window and loads the UI', function * () {
       yield this.app.client
         .waitForUrl(Brave.newTabUrl)
+        .waitForBrowserWindow()
         .windowByIndex(0)
         .waitForVisible(activeWebview)
       yield this.app.client
@@ -44,6 +45,7 @@ describe('application window', function () {
       before(function * () {
         yield this.app.client
           .waitForUrl(Brave.newTabUrl)
+          .waitForBrowserWindow()
           .windowByIndex(0)
           .newWindowAction()
           .waitUntil(function () {
@@ -77,7 +79,7 @@ describe('application window', function () {
       before(function * () {
         yield this.app.client
           .waitForUrl(Brave.newTabUrl)
-          .windowByIndex(0)
+          .waitForBrowserWindow()
           .unmaximize()
           .resizeWindow(600, 700)
           .waitUntil(function () {
@@ -120,8 +122,7 @@ describe('application window', function () {
       before(function * () {
         yield this.app.client
           .waitForUrl(Brave.newTabUrl)
-          .windowByIndex(0)
-          .browserWindow
+          .waitForBrowserWindow()
           .maximize()
           .newWindowAction()
           .waitUntil(function () {
@@ -158,7 +159,7 @@ describe('application window', function () {
       before(function * () {
         yield this.app.client
           .waitForUrl(Brave.newTabUrl)
-          .windowByIndex(0)
+          .waitForBrowserWindow()
           .resizeWindow(600, 700)
       })
 
@@ -179,7 +180,7 @@ describe('application window', function () {
 
       it('should close the new window when close button is clicked', function * () {
         yield this.app.client
-          .windowByIndex(0)
+          .waitForBrowserWindow()
           .newWindowAction()
           .waitUntil(function () {
             return this.getWindowCount().then((count) => {
@@ -205,9 +206,9 @@ describe('application window', function () {
         this.page1 = Brave.server.url('page1.html')
 
         yield this.app.client
-          .windowByUrl(Brave.browserWindowUrl)
+          .waitForBrowserWindow()
           .waitForUrl(Brave.newTabUrl)
-          .url(Brave.server.url('window_open.html'))
+          .loadUrl(Brave.server.url('window_open.html'))
           .execute(function (page1) {
             global.triggerFunction = function () {
               return window.open(page1, 'page1', 'height=300, width=480, top=100, left=0')
@@ -256,8 +257,9 @@ describe('application window', function () {
         this.page1 = Brave.server.url('page1.html')
 
         yield this.app.client
+          .waitForBrowserWindow()
           .waitForUrl(Brave.newTabUrl)
-          .url(Brave.server.url('window_open.html'))
+          .loadUrl(Brave.server.url('window_open.html'))
           .execute(function (page1) {
             global.triggerFunction = function () {
               return window.open(page1, '', 'height=100, width=100')
@@ -288,8 +290,9 @@ describe('application window', function () {
         var page1 = Brave.server.url('page1.html')
 
         yield this.app.client
+          .waitForBrowserWindow()
           .waitForUrl(Brave.newTabUrl)
-          .url(Brave.server.url('window_open.html'))
+          .loadUrl(Brave.server.url('window_open.html'))
           .execute(function (page1) {
             global.triggerFunction = function () {
               return window.open(page1, '_blank')
@@ -324,9 +327,9 @@ describe('application window', function () {
         this.page1 = Brave.server.urlWithIpAddress('page1.html')
 
         yield this.app.client
-          .windowByUrl(Brave.browserWindowUrl)
+          .waitForBrowserWindow()
           .waitForUrl(Brave.newTabUrl)
-          .url(this.window_open_page)
+          .loadUrl(this.window_open_page)
           .execute(function (page1) {
             global.triggerFunction = function () {
               return window.open(page1, 'page1', 'height=300, width=480, top=100, left=0')
@@ -410,9 +413,9 @@ describe('application window', function () {
         var page1 = this.page1 // for wait closure
 
         yield this.app.client
-          .windowByUrl(Brave.browserWindowUrl)
+          .waitForBrowserWindow()
           .waitForUrl(Brave.newTabUrl)
-          .url(this.window_open_page)
+          .loadUrl(this.window_open_page)
           .execute(function (page1) {
             global.triggerFunction = function () {
               return window.open(page1, 'page1', 'height=300, width=480, top=100, left=0')
@@ -528,10 +531,10 @@ describe('application window', function () {
 
       yield this.app.client
         .waitForUrl(Brave.newTabUrl)
-        .windowByUrl(Brave.browserWindowUrl)
+        .waitForBrowserWindow()
         .waitForVisible(activeWebview)
         .tabByIndex(0)
-        .url(this.window_open_page)
+        .loadUrl(this.window_open_page)
         .execute(function (page1) {
           global.triggerFunction = function () {
             return window.open(page1, 'page1', 'height=300, width=480, top=100, left=0')
@@ -564,10 +567,10 @@ describe('application window', function () {
 
         yield this.app.client
           .waitForUrl(Brave.newTabUrl)
-          .windowByUrl(Brave.browserWindowUrl)
+          .waitForBrowserWindow()
           .waitForVisible(activeWebview)
           .tabByIndex(0)
-          .url(Brave.server.url('window_open.html'))
+          .loadUrl(Brave.server.url('window_open.html'))
           .execute(function (page1) {
             window.open(page1, '_blank')
           }, page1)
@@ -605,9 +608,9 @@ describe('application window', function () {
         this.page2 = Brave.server.url('page2.html')
 
         yield this.app.client
-          .windowByUrl(Brave.browserWindowUrl)
+          .waitForBrowserWindow()
           .waitForUrl(Brave.newTabUrl)
-          .url(this.clickWithTargetPage)
+          .loadUrl(this.clickWithTargetPage)
           .waitForVisible('#name')
           .click('#name')
       })
@@ -651,9 +654,9 @@ describe('application window', function () {
         this.page2 = Brave.server.url('page2.html')
 
         yield this.app.client
-          .windowByUrl(Brave.browserWindowUrl)
+          .waitForBrowserWindow()
           .waitForUrl(Brave.newTabUrl)
-          .url(this.clickWithTargetPage)
+          .loadUrl(this.clickWithTargetPage)
           .waitForVisible('#none')
           .click('#none')
       })
@@ -678,9 +681,9 @@ describe('application window', function () {
         this.page2 = Brave.server.url('page2.html')
 
         yield this.app.client
-          .windowByUrl(Brave.browserWindowUrl)
+          .waitForBrowserWindow()
           .waitForUrl(Brave.newTabUrl)
-          .url(this.clickWithTargetPage)
+          .loadUrl(this.clickWithTargetPage)
           .waitForVisible('#_self')
           .click('#_self')
       })
@@ -705,9 +708,9 @@ describe('application window', function () {
         this.page2 = Brave.server.url('page2.html')
 
         yield this.app.client
-          .windowByUrl(Brave.browserWindowUrl)
+          .waitForBrowserWindow()
           .waitForUrl(Brave.newTabUrl)
-          .url(this.clickWithTargetPage)
+          .loadUrl(this.clickWithTargetPage)
           .frame('parent')
           .waitForVisible('#_parent')
           .click('#_parent')
@@ -733,9 +736,9 @@ describe('application window', function () {
         this.page2 = Brave.server.url('page2.html')
 
         yield this.app.client
-          .windowByUrl(Brave.browserWindowUrl)
+          .waitForBrowserWindow()
           .waitForUrl(Brave.newTabUrl)
-          .url(this.clickWithTargetPage)
+          .loadUrl(this.clickWithTargetPage)
           .frame('parent')
           .frame('top')
           .waitForVisible('#_top')
@@ -764,9 +767,9 @@ describe('application window', function () {
       this.page1 = Brave.server.url('close.html')
 
       yield this.app.client
-        .windowByUrl(Brave.browserWindowUrl)
+        .waitForBrowserWindow()
         .waitForUrl(Brave.newTabUrl)
-        .url(this.page1)
+        .loadUrl(this.page1)
         .waitForExist('a')
         .click('a')
         .waitForExist('button')

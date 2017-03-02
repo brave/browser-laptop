@@ -49,6 +49,9 @@ const checkSiteSetting = function (hostPattern, setting, value) {
 
 function * setupBrave (client) {
   Brave.addCommands()
+  yield client
+    .waitForUrl(Brave.newTabUrl)
+    .waitForBrowserWindow()
 }
 
 function * toggleSync (client, expectedState) {
@@ -56,13 +59,16 @@ function * toggleSync (client, expectedState) {
     throw new Error('expectedState is required')
   }
   yield client
+    .getTabCount().then((count) => {
+      return count === 1
+    })
     .tabByIndex(0)
     .loadUrl(prefsUrl)
     .waitForVisible(syncTab)
     .click(syncTab)
     .waitForVisible(syncSwitch)
     .click(syncSwitch)
-    .windowByUrl(Brave.browserWindowUrl)
+    .waitForBrowserWindow()
     .waitUntil(function () {
       return this.getAppState().then((val) => {
         return val.value.settings['sync.enabled'] === expectedState
@@ -74,7 +80,6 @@ function * setupSync (client, seed) {
   yield client
     .waitForBrowserWindow()
     .saveSyncInitData(seed, Immutable.fromJS([0]), 0, 'data:image/png;base64,foo')
-    .windowByUrl(Brave.browserWindowUrl)
   yield toggleSync(client, true)
   // When Sync initializes, it requests AWS credentials from server
   // then performs an initial sync.
@@ -126,7 +131,9 @@ function * addBookmarkFolder (title) {
 describe('Sync Panel', function () {
   function * setup (client) {
     yield client
-      .waitForUrl(Brave.newTabUrl)
+      .getTabCount().then((count) => {
+        return count === 1
+      })
       .waitForBrowserWindow()
       .waitForVisible(urlInput)
   }
@@ -471,7 +478,9 @@ describe('Syncing bookmarks from an existing profile', function () {
     yield Brave.startApp()
     yield setupBrave(Brave.app.client)
     yield Brave.app.client
-      .waitForUrl(Brave.newTabUrl)
+      .getTabCount().then((count) => {
+        return count === 1
+      })
       .waitForBrowserWindow()
 
     // Bookmark page 1
@@ -704,6 +713,9 @@ describe('Syncing site settings', function () {
 
     // Visit page 1 and poke everything
     yield Brave.app.client
+      .getTabCount().then((count) => {
+        return count === 1
+      })
       .tabByIndex(0)
       .loadUrl(this.page1Url)
       .openBraveMenu(braveMenu, braveryPanel)
@@ -726,6 +738,9 @@ describe('Syncing site settings', function () {
     yield Brave.stopApp()
     yield setup(this.seed)
     yield Brave.app.client
+      .getTabCount().then((count) => {
+        return count === 1
+      })
       .tabByIndex(0)
       .loadUrl(this.page1Url)
   })

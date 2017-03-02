@@ -48,9 +48,11 @@ describe('MessageBox component tests', function () {
     let alertMessage
 
     yield client
+      .waitForVisible(msgBoxTitle)
       .getText(msgBoxTitle).then((val) => {
         alertTitle = val
       })
+      .waitForVisible(msgBoxMessage)
       .getText(msgBoxMessage).then((val) => {
         alertMessage = val
       })
@@ -72,8 +74,7 @@ describe('MessageBox component tests', function () {
 
       yield this.app.client
         .tabByUrl(Brave.newTabUrl)
-        .url(modalAlert)
-        .waitForUrl(modalAlert)
+        .loadUrl(modalAlert)
         .waitForVisible('#trigger')
         .leftClick('#trigger')
         .waitUntil(function () {
@@ -188,9 +189,9 @@ describe('MessageBox component tests', function () {
 
         // load a basic history for this tab
         yield this.app.client
-          .url(page2)
+          .loadUrl(page2)
           .waitForVisible('#thelink[href="page1.html"]', 1000)
-          .url(page1)
+          .loadUrl(page1)
           .waitForVisible('#thelink[href="page2.html"]', 1000)
       })
 
@@ -271,8 +272,7 @@ describe('MessageBox component tests', function () {
 
       yield this.app.client
         .tabByUrl(Brave.newTabUrl)
-        .url(modalAlert)
-        .waitForUrl(modalAlert)
+        .loadUrl(modalAlert)
         .waitForVisible('#trigger')
         .leftClick('#trigger')
         .waitUntil(function () {

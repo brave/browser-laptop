@@ -30,6 +30,10 @@ describe('bookmarksToolbar', function () {
   describe('configuration settings', function () {
     Brave.beforeAll(this)
 
+    beforeEach(function * () {
+      yield setup(this.app.client)
+    })
+
     it('shows the bookmarks toolbar if the setting is enabled', function * () {
       yield this.app.client
         .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
