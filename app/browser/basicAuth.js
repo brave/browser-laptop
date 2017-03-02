@@ -7,8 +7,6 @@ const { makeImmutable } = require('../common/state/immutableUtil')
 let authCallbacks = {}
 
 const cleanupAuthCallback = (tabId) => {
-  const cb = authCallbacks[tabId]
-  cb && cb()
   delete authCallbacks[tabId]
 }
 
