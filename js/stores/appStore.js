@@ -640,6 +640,9 @@ const handleAppAction = (action) => {
     case appConstants.APP_UPDATE_LEDGER_INFO:
       appState = appState.set('ledgerInfo', Immutable.fromJS(action.ledgerInfo))
       break
+    case appConstants.APP_UPDATE_LOCATION_INFO:
+      appState = appState.set('locationInfo', Immutable.fromJS(action.locationInfo))
+      break
     case appConstants.APP_UPDATE_PUBLISHER_INFO:
       appState = appState.set('publisherInfo', Immutable.fromJS(action.publisherInfo))
       break

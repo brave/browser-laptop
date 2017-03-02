@@ -344,6 +344,24 @@ const UrlUtil = {
     } catch (e) {
       return url
     }
+  },
+
+  /**
+   * Gets the hostPattern from an URL.
+   * @param {string} url The URL to get the hostPattern from
+   * @return {string} url The URL formmatted as an hostPattern
+   */
+  getHostPattern: function (url) {
+    return `https?://${url}`
+  },
+
+  /**
+   * Checks if URL is based on http protocol.
+   * @param {string} url The URL to get the hostPattern from
+   * @return {string} url The URL formmatted as an hostPattern
+   */
+  isHttpOrHttps: function (url) {
+    return url.startsWith('https://') || url.startsWith('http://')
   }
 }
 

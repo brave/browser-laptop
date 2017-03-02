@@ -337,6 +337,16 @@ Updates ledger information for the payments pane
 
 
 
+### updateLocationInfo(locationInfo) 
+
+Updates location information for the URL bar
+
+**Parameters**
+
+**locationInfo**: `object`, the current location synopsis
+
+
+
 ### updatePublisherInfo(publisherInfo) 
 
 Updates publisher information for the payments pane
