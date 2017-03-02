@@ -1124,7 +1124,6 @@ class Main extends ImmutableComponent {
         {
           noScriptIsVisible
             ? <NoScriptInfo frameProps={activeFrame}
-              noScriptGlobalEnabled={this.props.appState.getIn(['noScript', 'enabled'])}
               onHide={this.onHideNoScript} />
             : null
         }
