@@ -33,8 +33,17 @@ describe('Preferences component', function () {
     mockery.registerMock('../../../extensions/brave/img/preferences/browser_prefs_payments.svg', 'browser_prefs_payments.svg')
     mockery.registerMock('../../../extensions/brave/img/preferences/browser_prefs_sync.svg', 'browser_prefs_sync.svg')
     mockery.registerMock('../../../extensions/brave/img/preferences/browser_prefs_advanced.svg', 'browser_prefs_advanced.svg')
-    mockery.registerMock('../../../extensions/brave/img/ledger/verified_green_icon.svg')
-    mockery.registerMock('../../../extensions/brave/img/ledger/verified_white_icon.svg')
+    mockery.registerMock('../../../../extensions/brave/img/ledger/verified_green_icon.svg')
+    mockery.registerMock('../../../../extensions/brave/img/ledger/verified_white_icon.svg')
+    mockery.registerMock('../../../../extensions/brave/img/private_internet_access.png')
+    mockery.registerMock('../../../../extensions/brave/img/private_internet_access_2x.png')
+    mockery.registerMock('../../../../extensions/brave/img/bitgo.png')
+    mockery.registerMock('../../../../extensions/brave/img/bitgo_2x.png')
+    mockery.registerMock('../../../../extensions/brave/img/coinbase.png')
+    mockery.registerMock('../../../../extensions/brave/img/coinbase_2x.png')
+    mockery.registerMock('../../../../extensions/brave/img/coinbase_logo.png')
+    mockery.registerMock('../../../../extensions/brave/img/android_download.svg')
+    mockery.registerMock('../../../../extensions/brave/img/ios_download.svg')
 
     window.chrome = fakeElectron
     window.CustomEvent = {}

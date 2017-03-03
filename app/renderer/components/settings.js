@@ -9,16 +9,26 @@ const aboutActions = require('../../../js/about/aboutActions')
 const getSetting = require('../../../js/settings').getSetting
 const {changeSetting} = require('../lib/settingsUtil')
 const SwitchControl = require('../../../js/components/switchControl')
+const cx = require('../../../js/lib/classSet')
 
 class SettingsList extends ImmutableComponent {
   render () {
-    return <div className='settingsListContainer'>
+    return <div className={cx({
+      settingsListContainer: true,
+      [this.props.className]: !!this.props.className
+    })}>
       {
         this.props.dataL10nId
-        ? <div className='settingsListTitle' data-l10n-id={this.props.dataL10nId} />
+        ? <div className={cx({
+          settingsListTitle: true,
+          [this.props.titleClassName]: !!this.props.titleClassName
+        })} data-l10n-id={this.props.dataL10nId} />
         : null
       }
-      <div className='settingsList'>
+      <div className={cx({
+        settingsList: true,
+        [this.props.listClassName]: !!this.props.listClassName
+      })}>
         {this.props.children}
       </div>
     </div>
@@ -27,7 +37,10 @@ class SettingsList extends ImmutableComponent {
 
 class SettingItem extends ImmutableComponent {
   render () {
-    return <div className='settingItem'>
+    return <div className={cx({
+      settingItem: true,
+      [this.props.itemClassName]: !!this.props.itemClassName
+    })}>
       {
         this.props.dataL10nId
           ? <span data-l10n-id={this.props.dataL10nId} />
@@ -54,18 +67,34 @@ class SettingCheckbox extends ImmutableComponent {
   render () {
     const props = {
       style: this.props.style,
-      className: 'settingItem'
+      className: cx({
+        settingItem: true,
+        [this.props.className]: !!this.props.className
+      })
     }
+
     if (this.props.id) {
       props.id = this.props.id
     }
+
+    const labelClass = cx({
+      [css(settingCheckboxStyles.label)]: this.props.small,
+      [this.props.labelClassName]: !!this.props.labelClassName
+
+    })
+
     return <div {...props}>
       <SwitchControl id={this.props.prefKey}
         small={this.props.small}
         disabled={this.props.disabled}
         onClick={this.onClick}
-        checkedOn={this.props.checked !== undefined ? this.props.checked : getSetting(this.props.prefKey, this.props.settings)} />
-      <label className={css(this.props.small && settingCheckboxStyles.label)} data-l10n-id={this.props.dataL10nId} htmlFor={this.props.prefKey} />
+        checkedOn={this.props.checked !== undefined ? this.props.checked : getSetting(this.props.prefKey, this.props.settings)}
+        className={this.props.switchClassName}
+      />
+      <label className={labelClass}
+        data-l10n-id={this.props.dataL10nId}
+        htmlFor={this.props.prefKey}
+      />
       {this.props.options}
     </div>
   }
@@ -97,12 +126,18 @@ class SiteSettingCheckbox extends ImmutableComponent {
   }
 
   render () {
-    return <div style={this.props.style} className='settingItem siteSettingItem'>
+    return <div style={this.props.style} className={cx({
+      settingItem: true,
+      siteSettingItem: true,
+      [this.props.className]: !!this.props.className
+    })}>
       <SwitchControl
         small={this.props.small}
         disabled={this.props.disabled}
         onClick={this.onClick}
-        checkedOn={this.props.checked} />
+        checkedOn={this.props.checked}
+        className={this.props.switchClassName}
+      />
     </div>
   }
 }

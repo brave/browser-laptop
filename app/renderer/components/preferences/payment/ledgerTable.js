@@ -3,19 +3,22 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('../../../../js/components/immutableComponent')
 const {StyleSheet, css} = require('aphrodite')
-const globalStyles = require('../styles/global')
 
-const settings = require('../../../../js/constants/settings')
-const getSetting = require('../../../../js/settings').getSetting
-const aboutActions = require('../../../../js/about/aboutActions')
-const {SettingCheckbox, SiteSettingCheckbox} = require('../settings')
-const SortableTable = require('../../../../js/components/sortableTable')
+// components
+const ImmutableComponent = require('../../../../../js/components/immutableComponent')
+const SortableTable = require('../../../../../js/components/sortableTable')
 
-// icons
-const verifiedGreenIcon = require('../../../extensions/brave/img/ledger/verified_green_icon.svg')
-const verifiedWhiteIcon = require('../../../extensions/brave/img/ledger/verified_white_icon.svg')
+// style
+const globalStyles = require('../../styles/global')
+const verifiedGreenIcon = require('../../../../extensions/brave/img/ledger/verified_green_icon.svg')
+const verifiedWhiteIcon = require('../../../../extensions/brave/img/ledger/verified_white_icon.svg')
+
+// other
+const settings = require('../../../../../js/constants/settings')
+const getSetting = require('../../../../../js/settings').getSetting
+const aboutActions = require('../../../../../js/about/aboutActions')
+const {SettingCheckbox, SiteSettingCheckbox} = require('../../settings')
 
 class LedgerTable extends ImmutableComponent {
   get synopsis () {
@@ -147,7 +150,7 @@ class LedgerTable extends ImmutableComponent {
     if (!this.synopsis || !this.synopsis.size) {
       return null
     }
-    return <div>
+    return <div data-test-id='ledgerTable'>
       <div className={css(styles.hideExcludedSites)}>
         <div className={css(styles.columnOffset)} />
         <div className={css(styles.rightColumn)}>
@@ -199,12 +202,12 @@ const styles = StyleSheet.create({
   disabled: verifiedBadge(verifiedWhiteIcon),
 
   neverShowSiteIcon: {
-    opacity: '0',
+    opacity: 0,
     fontSize: '20px',
     textAlign: 'center',
 
     ':hover': {
-      opacity: '1'
+      opacity: 1
     }
   },
 
@@ -254,21 +257,21 @@ const styles = StyleSheet.create({
 
   hideExcludedSites: {
     display: 'flex',
-    flex: '1',
+    flex: 1,
     alignItems: 'center',
     height: '35px'
   },
 
   columnOffset: {
     display: 'flex',
-    flexGrow: '8',
-    flexShrink: '8'
+    flexGrow: 8,
+    flexShrink: 8
   },
 
   rightColumn: {
     display: 'flex',
-    flexGrow: '1',
-    flexShrink: '1'
+    flexGrow: 1,
+    flexShrink: 1
   },
 
   alignRight: {
@@ -276,7 +279,7 @@ const styles = StyleSheet.create({
   },
 
   paymentsDisabled: {
-    opacity: '0.6'
+    opacity: 0.6
   }
 })
 

@@ -32,7 +32,6 @@ const styles = StyleSheet.create({
     top: globalStyles.spacing.dialogTopOffset
   },
   browserButton: {
-    border: 'none',
     margin: '0',
     whiteSpace: 'nowrap',
     outline: 'none',
@@ -81,6 +80,77 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap'
+  },
+  // Buttons
+  buttonPrimary: {
+    background: 'linear-gradient(#FF7A1D, #ff5000)',
+    borderLeft: '2px solid transparent',
+    borderRight: '2px solid transparent',
+    borderTop: '2px solid #FF7A1D',
+    borderBottom: '2px solid #ff5000',
+    boxShadow: '0px 1px 5px -1px rgba(0, 0, 0, 0.5)',
+    fontWeight: '500',
+    fontSize: '0.9rem',
+    padding: '8px 20px',
+    margin: 0,
+    color: '#fff',
+    lineHeight: '1.25',
+    width: 'auto',
+    height: 'auto',
+    minWidth: '78px',
+
+    ':hover': {
+      border: '2px solid white',
+      color: 'white',
+      cursor: 'pointer'
+    }
+  },
+  whiteButton: {
+    background: 'linear-gradient(white, #ececec)',
+    border: '1px solid white',
+    boxShadow: '0px 1px 5px -1px rgba(0, 0, 0, 0.5)',
+    cursor: 'pointer',
+    color: '#444444',
+    lineHeight: 1.25,
+    width: 'auto',
+    height: 'auto',
+    minWidth: '78px',
+    fontSize: '0.9rem',
+    padding: '8px 20px',
+    margin: 0,
+
+    ':hover': {
+      border: `1px solid ${globalStyles.color.gray}`,
+      color: '#000'
+    }
+  },
+  inlineButton: {
+    display: 'inline'
+  },
+  // margin/padding
+  noMarginTop: {
+    marginTop: 0
+  },
+  noMarginBottom: {
+    marginBottom: 0
+  },
+  noMarginLeft: {
+    marginLeft: 0
+  },
+  noMarginRight: {
+    marginRight: 0
+  },
+  noPaddingTop: {
+    paddingTop: 0
+  },
+  noPaddingBottom: {
+    paddingBottom: 0
+  },
+  noPaddingLeft: {
+    paddingLeft: 0
+  },
+  noPaddingRight: {
+    paddingRight: 0
   }
 })
 

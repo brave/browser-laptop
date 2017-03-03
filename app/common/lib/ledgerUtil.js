@@ -5,6 +5,7 @@
 'use strict'
 
 const {responseHasContent} = require('./httpUtil')
+const moment = require('moment')
 
 /**
  * Is page an actual page being viewed by the user? (not an error page, etc)
@@ -38,4 +39,70 @@ module.exports.shouldTrackView = (view, responseList) => {
     }
   }
   return false
+}
+
+module.exports.btcToCurrencyString = (btc, ledgerData) => {
+  const balance = Number(btc || 0)
+  const currency = ledgerData.get('currency') || 'USD'
+
+  if (balance === 0) {
+    return `0 ${currency}`
+  }
+
+  if (ledgerData.get('btc') && typeof ledgerData.get('amount') === 'number') {
+    const btcValue = ledgerData.get('btc') / ledgerData.get('amount')
+    const fiatValue = (balance / btcValue).toFixed(2)
+    let roundedValue = Math.floor(fiatValue)
+    const diff = fiatValue - roundedValue
+
+    if (diff > 0.74) {
+      roundedValue += 0.75
+    } else if (diff > 0.49) {
+      roundedValue += 0.50
+    } else if (diff > 0.24) {
+      roundedValue += 0.25
+    }
+
+    return `${roundedValue.toFixed(2)} ${currency}`
+  }
+
+  return `${balance} BTC`
+}
+
+module.exports.formattedTimeFromNow = (timestamp) => {
+  moment.locale(navigator.language)
+  return moment(new Date(timestamp)).fromNow()
+}
+
+module.exports.formattedDateFromTimestamp = (timestamp) => {
+  moment.locale(navigator.language)
+  return moment(new Date(timestamp)).format('YYYY-MM-DD')
+}
+
+module.exports.walletStatus = (ledgerData) => {
+  let status = {}
+
+  if (ledgerData.get('error')) {
+    status.id = 'statusOnError'
+  } else if (ledgerData.get('created')) {
+    const transactions = ledgerData.get('transactions')
+    const pendingFunds = Number(ledgerData.get('unconfirmed') || 0)
+
+    if (pendingFunds + Number(ledgerData.get('balance') || 0) <
+      0.9 * Number(ledgerData.get('btc') || 0)) {
+      status.id = 'insufficientFundsStatus'
+    } else if (pendingFunds > 0) {
+      status.id = 'pendingFundsStatus'
+      status.args = {funds: module.exports.btcToCurrencyString(pendingFunds, ledgerData)}
+    } else if (transactions && transactions.size > 0) {
+      status.id = 'defaultWalletStatus'
+    } else {
+      status.id = 'createdWalletStatus'
+    }
+  } else if (ledgerData.get('creating')) {
+    status.id = 'creatingWalletStatus'
+  } else {
+    status.id = 'createWalletStatus'
+  }
+  return status
 }

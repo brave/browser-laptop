@@ -4,27 +4,31 @@
 
 // Note that these are webpack requires, not CommonJS node requiring requires
 const React = require('react')
-const ImmutableComponent = require('../../../../js/components/immutableComponent')
-const {l10nErrorText} = require('../../../common/lib/httpUtil')
-const aboutActions = require('../../../../js/about/aboutActions')
-const getSetting = require('../../../../js/settings').getSetting
-const settings = require('../../../../js/constants/settings')
-const ModalOverlay = require('../../../../js/components/modalOverlay')
-const coinbaseCountries = require('../../../../js/constants/coinbaseCountries')
-const {changeSetting} = require('../../lib/settingsUtil')
-const moment = require('moment')
-moment.locale(navigator.language)
-
-const {StyleSheet, css} = require('aphrodite/no-important')
-const globalStyles = require('../styles/global')
+const {StyleSheet, css} = require('aphrodite')
 
 // Components
+const ImmutableComponent = require('../../../../js/components/immutableComponent')
 const Button = require('../../../../js/components/button')
-const {FormTextbox, RecoveryKeyTextbox} = require('../textbox')
-const {FormDropdown, SettingDropdown} = require('../dropdown')
-const {SettingsList, SettingItem, SettingCheckbox} = require('../settings')
-const LedgerTable = require('./ledgerTable')
-const PaymentHistory = require('./paymentHistory')
+const ModalOverlay = require('../../../../js/components/modalOverlay')
+const {SettingCheckbox} = require('../settings')
+const DisabledContent = require('./payment/disabledContent')
+const EnabledContent = require('./payment/enabledContent')
+const BitcoinDashboard = require('./payment/bitcoinDashboard')
+const {AdvancedSettingsContent, AdvancedSettingsFooter} = require('./payment/advancedSettings')
+const {HistoryContent, HistoryFooter} = require('./payment/history')
+const {LedgerBackupContent, LedgerBackupFooter} = require('./payment/ledgerBackup')
+const {LedgerRecoveryContent, LedgerRecoveryFooter} = require('./payment/ledgerRecovery')
+
+// style
+const cx = require('../../../../js/lib/classSet')
+const globalStyles = require('../styles/global')
+const commonStyles = require('../styles/commonStyles')
+const {paymentStyles} = require('../styles/payment')
+
+// other
+const getSetting = require('../../../../js/settings').getSetting
+const settings = require('../../../../js/constants/settings')
+const coinbaseCountries = require('../../../../js/constants/coinbaseCountries')
 
 class PaymentsTab extends ImmutableComponent {
   constructor () {
@@ -34,156 +38,22 @@ class PaymentsTab extends ImmutableComponent {
       SecondRecoveryKey: ''
     }
 
-    this.printKeys = this.printKeys.bind(this)
-    this.saveKeys = this.saveKeys.bind(this)
-    this.createWallet = this.createWallet.bind(this)
-    this.recoverWallet = this.recoverWallet.bind(this)
     this.handleFirstRecoveryKeyChange = this.handleFirstRecoveryKeyChange.bind(this)
     this.handleSecondRecoveryKeyChange = this.handleSecondRecoveryKeyChange.bind(this)
   }
 
-  createWallet () {
-    if (!this.props.ledgerData.get('created')) {
-      aboutActions.createWallet()
-    }
+  handleFirstRecoveryKeyChange (key) {
+    this.setState({FirstRecoveryKey: key})
+    this.forceUpdate()
   }
 
-  handleFirstRecoveryKeyChange (e) {
-    this.setState({FirstRecoveryKey: e.target.value})
-  }
-
-  handleSecondRecoveryKeyChange (e) {
-    this.setState({SecondRecoveryKey: e.target.value})
-  }
-
-  recoverWallet () {
-    aboutActions.ledgerRecoverWallet(this.state.FirstRecoveryKey, this.state.SecondRecoveryKey)
-  }
-
-  recoverWalletFromFile () {
-    aboutActions.ledgerRecoverWalletFromFile()
-  }
-
-  copyToClipboard (text) {
-    aboutActions.setClipboard(text)
-  }
-
-  generateKeyFile (backupAction) {
-    aboutActions.ledgerGenerateKeyFile(backupAction)
-  }
-
-  clearRecoveryStatus () {
-    aboutActions.clearRecoveryStatus()
-    this.props.hideAdvancedOverlays()
-  }
-
-  printKeys () {
-    this.generateKeyFile('print')
-  }
-
-  saveKeys () {
-    this.generateKeyFile('save')
+  handleSecondRecoveryKeyChange (key) {
+    this.setState({SecondRecoveryKey: key})
+    this.forceUpdate()
   }
 
   get enabled () {
     return getSetting(settings.PAYMENTS_ENABLED, this.props.settings)
-  }
-
-  get fundsAmount () {
-    if (!this.props.ledgerData.get('created')) {
-      return null
-    }
-
-    return <div className='balance'>
-      {
-      !(this.props.ledgerData.get('balance') === undefined || this.props.ledgerData.get('balance') === null)
-        ? <FormTextbox data-test-id='fundsAmount' readOnly value={this.btcToCurrencyString(this.props.ledgerData.get('balance'))} />
-        : <span><span data-test-id='accountBalanceLoading' data-l10n-id='accountBalanceLoading' /></span>
-      }
-      <a href='https://brave.com/Payments_FAQ.html' target='_blank'>
-        <span className='fa fa-question-circle fundsFAQ' />
-      </a>
-    </div>
-  }
-
-  get walletButton () {
-    const buttonText = this.props.ledgerData.get('created')
-      ? 'addFundsTitle'
-      : (this.props.ledgerData.get('creating') ? 'creatingWallet' : 'createWallet')
-    const onButtonClick = this.props.ledgerData.get('created')
-      ? this.props.showOverlay.bind(this, 'addFunds')
-      : (this.props.ledgerData.get('creating') ? () => {} : this.createWallet)
-    return <Button data-test-id={buttonText} l10nId={buttonText} className='primaryButton addFunds' onClick={onButtonClick.bind(this)} disabled={this.props.ledgerData.get('creating')} />
-  }
-
-  get paymentHistoryButton () {
-    const walletCreated = this.props.ledgerData.get('created') && !this.props.ledgerData.get('creating')
-    const walletTransactions = this.props.ledgerData.get('transactions')
-    const walletHasTransactions = walletTransactions && walletTransactions.size
-    let buttonText
-
-    if ((!walletCreated) || (!this.nextReconcileDate)) {
-      return null
-    } else if (!walletHasTransactions) {
-      buttonText = 'noPaymentHistory'
-      const now = new Date().getTime()
-      const timestamp = this.props.ledgerData.get('reconcileStamp')
-      if (timestamp <= now) {
-        buttonText = (timestamp <= (now - (24 * 60 * 60 * 1000)))
-                       ? 'noPaymentOverDueHistory' : 'noPaymentDueHistory'
-      }
-    } else {
-      buttonText = 'viewPaymentHistory'
-    }
-
-    const l10nDataArgs = {
-      reconcileDate: this.nextReconcileDate
-    }
-
-    const onButtonClick = this.props.showOverlay.bind(this, 'paymentHistory')
-
-    return <Button
-      className='paymentHistoryButton'
-      l10nId={buttonText}
-      l10nArgs={l10nDataArgs}
-      onClick={onButtonClick.bind(this)}
-      disabled={this.props.ledgerData.get('creating')}
-      />
-  }
-
-  get walletStatus () {
-    const ledgerData = this.props.ledgerData
-    let status = {}
-    if (ledgerData.get('error')) {
-      status.id = 'statusOnError'
-    } else if (ledgerData.get('created')) {
-      const transactions = ledgerData.get('transactions')
-      const pendingFunds = Number(ledgerData.get('unconfirmed') || 0)
-      if (pendingFunds + Number(ledgerData.get('balance') || 0) <
-          0.9 * Number(ledgerData.get('btc') || 0)) {
-        status.id = 'insufficientFundsStatus'
-      } else if (pendingFunds > 0) {
-        status.id = 'pendingFundsStatus'
-        status.args = {funds: this.btcToCurrencyString(pendingFunds)}
-      } else if (transactions && transactions.size > 0) {
-        status.id = 'defaultWalletStatus'
-      } else {
-        status.id = 'createdWalletStatus'
-      }
-    } else if (ledgerData.get('creating')) {
-      status.id = 'creatingWalletStatus'
-    } else {
-      status.id = 'createWalletStatus'
-    }
-    return status
-  }
-
-  get tableContent () {
-    // TODO: This should be sortable. #2497
-    return <LedgerTable ledgerData={this.props.ledgerData}
-      settings={this.props.settings}
-      onChangeSetting={this.props.onChangeSetting}
-      siteSettings={this.props.siteSettings} />
   }
 
   get overlayTitle () {
@@ -195,7 +65,6 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get overlayContent () {
-    const {BitcoinDashboard} = require('../../../../js/about/preferences')
     return <BitcoinDashboard ledgerData={this.props.ledgerData}
       settings={this.props.settings}
       bitcoinOverlayVisible={this.props.bitcoinOverlayVisible}
@@ -207,348 +76,11 @@ class PaymentsTab extends ImmutableComponent {
       hideParentOverlay={this.props.hideOverlay.bind(this, 'addFunds')} />
   }
 
-  get paymentHistoryContent () {
-    return <PaymentHistory ledgerData={this.props.ledgerData} />
-  }
-
-  get paymentHistoryFooter () {
-    let ledgerData = this.props.ledgerData
-    if (!ledgerData.get('reconcileStamp')) {
-      return null
-    }
-    const timestamp = ledgerData.get('reconcileStamp')
-    const now = new Date().getTime()
-    let l10nDataId = 'paymentHistoryFooterText'
-    if (timestamp <= now) {
-      l10nDataId = (timestamp <= (now - (24 * 60 * 60 * 1000)))
-                     ? 'paymentHistoryOverdueFooterText' : 'paymentHistoryDueFooterText'
-    }
-
-    const nextReconcileDateRelative = formattedTimeFromNow(timestamp)
-    const l10nDataArgs = {
-      reconcileDate: nextReconcileDateRelative
-    }
-    return <div className='paymentHistoryFooter'>
-      <div className='nextPaymentSubmission'>
-        <span data-l10n-id={l10nDataId} data-l10n-args={JSON.stringify(l10nDataArgs)} />
-      </div>
-      <Button l10nId='paymentHistoryOKText' className='okButton primaryButton' onClick={this.props.hideOverlay.bind(this, 'paymentHistory')} />
-    </div>
-  }
-
-  get advancedSettingsContent () {
-    const minDuration = this.props.ledgerData.getIn(['synopsisOptions', 'minDuration'])
-    const minPublisherVisits = this.props.ledgerData.getIn(['synopsisOptions', 'minPublisherVisits'])
-
-    return <div className='board'>
-      <div className='panel advancedSettings'>
-        <div className='settingsPanelDivider'>
-          <div className='minimumPageTimeSetting' data-l10n-id='minimumPageTimeSetting' />
-          <SettingsList>
-            <SettingItem>
-              <SettingDropdown
-                data-test-id='durationSelector'
-                defaultValue={minDuration || 8000}
-                onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.MINIMUM_VISIT_TIME)}>>
-                <option value='5000'>5 seconds</option>
-                <option value='8000'>8 seconds</option>
-                <option value='60000'>1 minute</option>
-              </SettingDropdown>
-            </SettingItem>
-          </SettingsList>
-          <div className='minimumVisitsSetting' data-l10n-id='minimumVisitsSetting' />
-          <SettingsList>
-            <SettingItem>
-              <SettingDropdown
-                data-test-id='visitSelector'
-                defaultValue={minPublisherVisits || 1}
-                onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.MINIMUM_VISITS)}>>>
-                <option value='1'>1 visits</option>
-                <option value='5'>5 visits</option>
-                <option value='10'>10 visits</option>
-              </SettingDropdown>
-            </SettingItem>
-          </SettingsList>
-        </div>
-        <div className='settingsPanelDivider'>
-          {this.enabled
-            ? <SettingsList>
-              <SettingCheckbox
-                dataL10nId='minimumPercentage'
-                prefKey={settings.MINIMUM_PERCENTAGE}
-                settings={this.props.settings}
-                onChangeSetting={this.props.onChangeSetting} />
-              <SettingCheckbox
-                dataL10nId='notifications'
-                prefKey={settings.PAYMENTS_NOTIFICATIONS}
-                settings={this.props.settings}
-                onChangeSetting={this.props.onChangeSetting} />
-            </SettingsList>
-            : null}
-        </div>
-      </div>
-    </div>
-  }
-
-  get advancedSettingsFooter () {
-    return <div className='panel advancedSettingsFooter'>
-      <Button l10nId='backupLedger' className='primaryButton' onClick={this.props.showOverlay.bind(this, 'ledgerBackup')} />
-      <Button l10nId='recoverLedger' className='primaryButton' onClick={this.props.showOverlay.bind(this, 'ledgerRecovery')} />
-      <Button l10nId='done' className='whiteButton inlineButton' onClick={this.props.hideOverlay.bind(this, 'advancedSettings')} />
-    </div>
-  }
-
-  get ledgerBackupContent () {
-    const paymentId = this.props.ledgerData.get('paymentId')
-    const passphrase = this.props.ledgerData.get('passphrase')
-
-    return <div className='board'>
-      <div className='panel ledgerBackupContent'>
-        <span data-l10n-id='ledgerBackupContent' />
-        <div className={css(styles.copyKeyContainer)}>
-          <div className='copyContainer'>
-            <Button l10nId='copy' className='copyButton whiteButton' onClick={this.copyToClipboard.bind(this, paymentId)} />
-          </div>
-          <div className={css(styles.keyContainer)}>
-            <h3 className={css(styles.keyContainer__h3)} data-l10n-id='firstKey' />
-            <span className={css(styles.keyContainer__span)}>{paymentId}</span>
-          </div>
-        </div>
-        <div className={css(styles.copyKeyContainer)}>
-          <div className='copyContainer'>
-            <Button l10nId='copy' className='copyButton whiteButton' onClick={this.copyToClipboard.bind(this, passphrase)} />
-          </div>
-          <div className={css(styles.keyContainer)}>
-            <h3 className={css(styles.keyContainer__h3)} data-l10n-id='secondKey' />
-            <span className={css(styles.keyContainer__span)}>{passphrase}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  }
-
-  get ledgerBackupFooter () {
-    return <div className='panel advancedSettingsFooter'>
-      <Button l10nId='printKeys' className='primaryButton' onClick={this.printKeys} />
-      <Button l10nId='saveRecoveryFile' className='primaryButton' onClick={this.saveKeys} />
-      <Button l10nId='done' className='whiteButton inlineButton' onClick={this.props.hideOverlay.bind(this, 'ledgerBackup')} />
-    </div>
-  }
-
-  get ledgerRecoveryContent () {
-    const l10nDataArgs = {
-      balance: this.btcToCurrencyString(this.props.ledgerData.get('balance'))
-    }
-    const recoverySucceeded = this.props.ledgerData.get('recoverySucceeded')
-    const recoveryError = this.props.ledgerData.getIn(['error', 'error'])
-    const isNetworkError = typeof recoveryError === 'object'
-
-    return <div className='board'>
-      {
-        recoverySucceeded === true
-        ? <div className='recoveryOverlay'>
-          <h1 data-l10n-id='ledgerRecoverySucceeded' />
-          <p className='spaceAround' data-l10n-id='balanceRecovered' data-l10n-args={JSON.stringify(l10nDataArgs)} />
-          <Button l10nId='ok' className='whiteButton inlineButton' onClick={this.clearRecoveryStatus.bind(this)} />
-        </div>
-        : null
-      }
-      {
-        (recoverySucceeded === false && recoveryError && isNetworkError)
-        ? <div className='recoveryOverlay'>
-          <h1 data-l10n-id='ledgerRecoveryNetworkFailedTitle' className='recoveryError' />
-          <p data-l10n-id='ledgerRecoveryNetworkFailedMessage' className='spaceAround' />
-          <Button l10nId='ok' className='whiteButton inlineButton' onClick={this.clearRecoveryStatus.bind(this)} />
-        </div>
-        : null
-      }
-      {
-        (recoverySucceeded === false && recoveryError && !isNetworkError)
-        ? <div className='recoveryOverlay'>
-          <h1 data-l10n-id='ledgerRecoveryFailedTitle' />
-          <p data-l10n-id='ledgerRecoveryFailedMessage' className='spaceAround' />
-          <Button l10nId='ok' className='whiteButton inlineButton' onClick={this.clearRecoveryStatus.bind(this)} />
-        </div>
-        : null
-      }
-      <div className='panel recoveryContent'>
-        <h4 className={css(styles.recoveryContent__h4)} data-l10n-id='ledgerRecoverySubtitle' />
-        <div className={css(styles.ledgerRecoveryContent)} data-l10n-id='ledgerRecoveryContent' />
-        <SettingsList>
-          <SettingItem>
-            <h3 data-l10n-id='firstRecoveryKey' />
-            <RecoveryKeyTextbox id='firstRecoveryKey' onChange={this.handleFirstRecoveryKeyChange} />
-            <h3 data-l10n-id='secondRecoveryKey' />
-            <RecoveryKeyTextbox id='secondRecoveryKey' onChange={this.handleSecondRecoveryKeyChange} />
-          </SettingItem>
-        </SettingsList>
-      </div>
-    </div>
-  }
-
-  get ledgerRecoveryFooter () {
-    return <div className='panel advancedSettingsFooter'>
-      <div className='recoveryFooterButtons'>
-        <Button l10nId='recover' className='primaryButton' onClick={this.recoverWallet} />
-        <Button l10nId='recoverFromFile' className='primaryButton' onClick={this.recoverWalletFromFile} />
-        <Button l10nId='cancel' className='whiteButton' onClick={this.props.hideOverlay.bind(this, 'ledgerRecovery')} />
-      </div>
-    </div>
-  }
-
-  get nextReconcileDate () {
-    const ledgerData = this.props.ledgerData
-    if ((ledgerData.get('error')) || (!ledgerData.get('reconcileStamp'))) {
-      return null
-    }
-    const timestamp = ledgerData.get('reconcileStamp')
-    return formattedTimeFromNow(timestamp)
-  }
-
-  get nextReconcileMessage () {
-    const ledgerData = this.props.ledgerData
-    const nextReconcileDateRelative = this.nextReconcileDate
-    if (!nextReconcileDateRelative) {
-      return null
-    }
-
-    const timestamp = ledgerData.get('reconcileStamp')
-    const now = new Date().getTime()
-    let l10nDataId = 'statusNextReconcileDate'
-    if (timestamp <= now) {
-      l10nDataId = (timestamp <= (now - (24 * 60 * 60 * 1000)))
-                     ? 'paymentHistoryOverdueFooterText' : 'statusNextReconcileToday'
-    }
-
-    const l10nDataArgs = {
-      reconcileDate: nextReconcileDateRelative
-    }
-    return <div className='nextReconcileDate' data-l10n-args={JSON.stringify(l10nDataArgs)} data-l10n-id={l10nDataId} />
-  }
-
-  get ledgerDataErrorText () {
-    const ledgerError = this.props.ledgerData.get('error')
-    if (!ledgerError) {
-      return null
-    }
-    // 'error' here is a chromium webRequest error as returned by request.js
-    const errorCode = ledgerError.get('error').get('errorCode')
-    return l10nErrorText(errorCode)
-  }
-
-  btcToCurrencyString (btc) {
-    const balance = Number(btc || 0)
-    const currency = this.props.ledgerData.get('currency') || 'USD'
-    if (balance === 0) {
-      return `0 ${currency}`
-    }
-    if (this.props.ledgerData.get('btc') && typeof this.props.ledgerData.get('amount') === 'number') {
-      const btcValue = this.props.ledgerData.get('btc') / this.props.ledgerData.get('amount')
-      const fiatValue = (balance / btcValue).toFixed(2)
-      let roundedValue = Math.floor(fiatValue)
-      const diff = fiatValue - roundedValue
-
-      if (diff > 0.74) roundedValue += 0.75
-      else if (diff > 0.49) roundedValue += 0.50
-      else if (diff > 0.24) roundedValue += 0.25
-      return `${roundedValue.toFixed(2)} ${currency}`
-    }
-    return `${balance} BTC`
-  }
-
-  get disabledContent () {
-    return <div className='disabledContent'>
-      <div className='paymentsMessage'>
-        <h3 data-l10n-id='paymentsWelcomeTitle' />
-        <div data-l10n-id='paymentsWelcomeText1' />
-        <div className='boldText' data-l10n-id='paymentsWelcomeText2' />
-        <div data-l10n-id='paymentsWelcomeText3' />
-        <div data-l10n-id='paymentsWelcomeText4' />
-        <div data-l10n-id='paymentsWelcomeText5' />
-        <div>
-          <span data-l10n-id='paymentsWelcomeText6' />&nbsp;
-          <a href='https://brave.com/Payments_FAQ.html' target='_blank' data-l10n-id='paymentsWelcomeLink' />&nbsp;
-          <span data-l10n-id='paymentsWelcomeText7' />
-        </div>
-      </div>
-      <div className='paymentsSidebar'>
-        <h2 data-l10n-id='paymentsSidebarText1' />
-        <div data-l10n-id='paymentsSidebarText2' />
-        <a href='https://www.privateinternetaccess.com/' target='_blank'><div className='paymentsSidebarPIA' /></a>
-        <div data-l10n-id='paymentsSidebarText3' />
-        <a href='https://www.bitgo.com/' target='_blank'><div className='paymentsSidebarBitgo' /></a>
-        <div data-l10n-id='paymentsSidebarText4' />
-        <a href='https://www.coinbase.com/' target='_blank'><div className='paymentsSidebarCoinbase' /></a>
-      </div>
-    </div>
-  }
-
-  get enabledContent () {
-    // TODO: report when funds are too low
-    // TODO: support non-USD currency
-    return <div>
-      <div className='walletBar'>
-        <table>
-          <thead>
-            <tr>
-              <th data-l10n-id='monthlyBudget' />
-              <th data-l10n-id='accountBalance' />
-              <th data-l10n-id='status' />
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <SettingsList>
-                  <SettingItem>
-                    <FormDropdown
-                      data-test-id='fundsSelectBox'
-                      value={getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT,
-                        this.props.settings)}
-                      onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)}>
-                      {
-                        [5, 10, 15, 20].map((amount) =>
-                          <option value={amount}>{amount} {this.props.ledgerData.get('currency') || 'USD'}</option>
-                        )
-                      }
-                    </FormDropdown>
-                  </SettingItem>
-                  <SettingItem>
-                    {this.paymentHistoryButton}
-                  </SettingItem>
-                </SettingsList>
-              </td>
-              <td>
-                {
-                  this.props.ledgerData.get('error') && this.props.ledgerData.get('error').get('caller') === 'getWalletProperties'
-                    ? <div>
-                      <div data-l10n-id='accountBalanceConnectionError' />
-                      <div className='accountBalanceError' data-l10n-id={this.ledgerDataErrorText} />
-                    </div>
-                    : <div>
-                      <SettingsList>
-                        <SettingItem>
-                          {this.fundsAmount}
-                          {this.walletButton}
-                        </SettingItem>
-                      </SettingsList>
-                    </div>
-                }
-              </td>
-              <td>
-                <div className='walletStatus' data-l10n-id={this.walletStatus.id} data-l10n-args={this.walletStatus.args ? JSON.stringify(this.walletStatus.args) : null} />
-                {this.nextReconcileMessage}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      {this.tableContent}
-    </div>
-  }
-
   render () {
-    return <div className='paymentsContainer'>
+    return <div className={cx({
+      paymentsContainer: true,
+      [css(styles.paymentsContainer)]: true
+    })} data-test-id='paymentsContainer'>
       {
       this.enabled && this.props.addFundsOverlayVisible
         ? <ModalOverlay title={this.overlayTitle} content={this.overlayContent} onHide={this.props.hideOverlay.bind(this, 'addFunds')} />
@@ -556,49 +88,114 @@ class PaymentsTab extends ImmutableComponent {
       }
       {
         this.enabled && this.props.paymentHistoryOverlayVisible
-        ? <ModalOverlay title={'paymentHistoryTitle'} customTitleClasses={'paymentHistory'} content={this.paymentHistoryContent} footer={this.paymentHistoryFooter} onHide={this.props.hideOverlay.bind(this, 'paymentHistory')} />
-        : null
+          ? <ModalOverlay
+            title={'paymentHistoryTitle'}
+            customTitleClasses={'paymentHistory'}
+            content={<HistoryContent
+              ledgerData={this.props.ledgerData}
+            />}
+            footer={<HistoryFooter
+              ledgerData={this.props.ledgerData}
+              hideOverlay={this.props.hideOverlay}
+            />}
+            onHide={this.props.hideOverlay.bind(this, 'paymentHistory')}
+          />
+          : null
       }
       {
         this.enabled && this.props.advancedSettingsOverlayVisible
-        ? <ModalOverlay title={'advancedSettingsTitle'} content={this.advancedSettingsContent} footer={this.advancedSettingsFooter} onHide={this.props.hideOverlay.bind(this, 'advancedSettings')} />
+        ? <ModalOverlay
+          title={'advancedSettingsTitle'}
+          content={<AdvancedSettingsContent
+            ledgerData={this.props.ledgerData}
+            settings={this.props.settings}
+            onChangeSetting={this.props.onChangeSetting}
+          />}
+          footer={<AdvancedSettingsFooter
+            showOverlay={this.props.showOverlay}
+            hideOverlay={this.props.hideOverlay}
+          />}
+          onHide={this.props.hideOverlay.bind(this, 'advancedSettings')}
+        />
         : null
       }
       {
         this.enabled && this.props.ledgerBackupOverlayVisible
-        ? <ModalOverlay title={'ledgerBackupTitle'} content={this.ledgerBackupContent} footer={this.ledgerBackupFooter} onHide={this.props.hideOverlay.bind(this, 'ledgerBackup')} />
+        ? <ModalOverlay
+          title={'ledgerBackupTitle'}
+          content={<LedgerBackupContent
+            ledgerData={this.props.ledgerData}
+          />}
+          footer={<LedgerBackupFooter
+            hideOverlay={this.props.hideOverlay}
+          />}
+          onHide={this.props.hideOverlay.bind(this, 'ledgerBackup')} />
         : null
       }
       {
         this.enabled && this.props.ledgerRecoveryOverlayVisible
-        ? <ModalOverlay title={'ledgerRecoveryTitle'} content={this.ledgerRecoveryContent} footer={this.ledgerRecoveryFooter} onHide={this.props.hideOverlay.bind(this, 'ledgerRecovery')} />
+        ? <ModalOverlay title={'ledgerRecoveryTitle'}
+          content={<LedgerRecoveryContent
+            ledgerData={this.props.ledgerData}
+            hideAdvancedOverlays={this.props.hideAdvancedOverlays.bind(this)}
+            handleFirstRecoveryKeyChange={this.handleFirstRecoveryKeyChange.bind(this)}
+            handleSecondRecoveryKeyChange={this.handleSecondRecoveryKeyChange.bind(this)}
+          />}
+          footer={<LedgerRecoveryFooter
+            state={this.state}
+            hideOverlay={this.props.hideOverlay}
+          />}
+          onHide={this.props.hideOverlay.bind(this, 'ledgerRecovery')}
+        />
         : null
       }
-      <div className='advancedSettingsWrapper'>
+      <div className={css(styles.advancedSettingsWrapper)}>
         {
           this.props.ledgerData.get('created') && this.enabled
           ? <Button
             l10nId='advancedSettings'
-            className='advancedSettings whiteButton'
-            onClick={this.props.showOverlay.bind(this, 'advancedSettings')} />
+            className={css(commonStyles.whiteButton, styles.button)}
+            onClick={this.props.showOverlay.bind(this, 'advancedSettings')}
+          />
           : null
         }
       </div>
-      <div className='titleBar'>
+      <div className={css(styles.titleBar)}>
         <div className='sectionTitleWrapper pull-left'>
           <span className='sectionTitle'>Brave Payments</span>
           <span className='sectionSubTitle'>beta</span>
         </div>
-        <div className='paymentsSwitches'>
-          <div className='enablePaymentsSwitch'>
+        <div className={css(styles.paymentsSwitches)}>
+          <div className={css(styles.switchWrap)} data-test-id='enablePaymentsSwitch'>
             <span data-l10n-id='off' />
-            <SettingCheckbox dataL10nId='on' prefKey={settings.PAYMENTS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+            <SettingCheckbox dataL10nId='on'
+              prefKey={settings.PAYMENTS_ENABLED}
+              settings={this.props.settings}
+              onChangeSetting={this.props.onChangeSetting}
+              switchClassName={css(styles.switchControl)}
+              labelClassName={css(styles.label)}
+            />
           </div>
           {
             this.props.ledgerData.get('created') && this.enabled
-            ? <div className='autoSuggestSwitch'>
-              <SettingCheckbox dataL10nId='autoSuggestSites' prefKey={settings.AUTO_SUGGEST_SITES} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-              <a className='moreInfoBtn fa fa-question-circle' href='https://brave.com/Payments_FAQ.html' target='_blank' data-l10n-id='paymentsFAQLink' />
+            ? <div className={css(styles.switchWrap, styles.autoSuggestSwitch)}>
+              <SettingCheckbox dataL10nId='autoSuggestSites'
+                prefKey={settings.AUTO_SUGGEST_SITES}
+                settings={this.props.settings}
+                onChangeSetting={this.props.onChangeSetting}
+                switchClassName={css(styles.switchControl)}
+                labelClassName={css(styles.label)}
+              />
+              <a className={cx({
+                fa: true,
+                'fa-question-circle': true,
+                [css(styles.moreInfo)]: true,
+                [css(styles.moreInfoBtnSuggest)]: true
+              })}
+                href='https://brave.com/Payments_FAQ.html'
+                target='_blank'
+                data-l10n-id='paymentsFAQLink'
+              />
             </div>
             : null
           }
@@ -606,43 +203,67 @@ class PaymentsTab extends ImmutableComponent {
       </div>
       {
         this.enabled
-          ? this.enabledContent
-          : this.disabledContent
+          ? <EnabledContent settings={this.props.settings}
+            onChangeSetting={this.props.onChangeSetting}
+            ledgerData={this.props.ledgerData}
+            showOverlay={this.props.showOverlay}
+            siteSettings={this.props.siteSettings}
+          />
+          : <DisabledContent />
       }
     </div>
   }
 }
 
-function formattedTimeFromNow (timestamp) {
-  return moment(new Date(timestamp)).fromNow()
-}
-
 const styles = StyleSheet.create({
-  copyKeyContainer: {
+  paymentsContainer: {
+    position: 'relative',
+    overflowX: 'hidden',
+    width: '805px'
+  },
+  advancedSettingsWrapper: {
+    textAlign: 'right',
+    marginRight: '15px',
+    marginBottom: '7.5px',
+    position: 'relative',
+    left: '3px'
+  },
+  button: {
+    minWidth: '235px'
+  },
+  titleBar: {
+    overflow: 'hidden',
     display: 'flex',
-    alignItems: 'flex-end',
-    width: '75%',
-    margin: `${globalStyles.spacing.paymentsMargin} auto`
+    alignItems: 'center'
   },
-
-  keyContainer: {
-    marginLeft: '2em'
+  paymentsSwitches: {
+    display: 'flex'
   },
-
-  keyContainer__h3: {
-    marginBottom: globalStyles.spacing.modalPanelHeaderMarginBottom
+  switchWrap: {
+    display: 'flex',
+    alignItems: 'center',
+    width: paymentStyles.width.tableCell
   },
-
-  keyContainer__span: {
-    whiteSpace: 'nowrap'
+  switchControl: {
+    paddingTop: 0,
+    paddingBottom: 0
   },
-
-  recoveryContent__h4: {
-    marginBottom: globalStyles.spacing.paymentsMargin
+  autoSuggestSwitch: {
+    position: 'relative',
+    left: '-5px'
   },
-
-  ledgerRecoveryContent: {
-    marginBottom: globalStyles.spacing.paymentsMargin
+  moreInfo: {
+    fontWeight: 'bold',
+    fontSize: paymentStyles.font.regular,
+    color: globalStyles.color.gray
+  },
+  moreInfoBtnSuggest: {
+    marginLeft: '7px',
+    cursor: 'pointer',
+    textDecoration: 'none'
+  },
+  label: {
+    fontWeight: 'bold'
   }
 })
 
