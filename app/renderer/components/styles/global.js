@@ -168,7 +168,8 @@ const globalStyles = {
     refresh: 'fa fa-refresh',
     remove: 'fa fa-times',
     volumeOff: 'fa fa-volume-off',
-    volumeOn: 'fa fa-volume-up'
+    volumeOn: 'fa fa-volume-up',
+    exclude: 'fa fa-ban'
   }
 }
 
