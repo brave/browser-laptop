@@ -483,6 +483,11 @@ describe('tabState unit tests', function () {
       const expectedAppState = defaultAppState.set('tabs', tabsWithoutField)
       assert.deepEqual(newAppState, expectedAppState)
     })
+    it('returns the state (unchanged) if tabs is falsey', function () {
+      const emptyTabState = defaultAppState.delete('tabs')
+      const newAppState = tabState.removeTabField(emptyTabState, 'loginRequiredDetail')
+      assert.equal(newAppState, emptyTabState)
+    })
   })
 
   describe('getPersistentState', function () {
