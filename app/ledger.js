@@ -232,8 +232,13 @@ const doAction = (action) => {
       setTimeout(networkConnected, 1 * msecs.second)
       break
 
-    case appConstants.APP_NAVIGATOR_HANDLER_UPDATE:
-      ledgerInfo.hasBitcoinHandler = (action.register && action.protocol === 'bitcoin')
+    case appConstants.APP_NAVIGATOR_HANDLER_REGISTERED:
+      ledgerInfo.hasBitcoinHandler = (action.protocol === 'bitcoin')
+      appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
+      break
+
+    case appConstants.APP_NAVIGATOR_HANDLER_UNREGISTERED:
+      ledgerInfo.hasBitcoinHandler = false
       appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
       break
 

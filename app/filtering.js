@@ -571,13 +571,13 @@ function initForPartition (partition) {
     fn(ses, partition, module.exports.isPrivate(partition))
   })
   ses.on('register-navigator-handler', (e, protocol, location) => {
-    appActions.navigatorHandler(ses.partition, protocol, location, true)
+    appActions.navigatorHandlerRegistered(ses.partition, protocol, location)
   })
   ses.on('unregister-navigator-handler', (e, protocol, location) => {
-    appActions.navigatorHandler(ses.partition, protocol, location, false)
+    appActions.navigatorHandlerUnregistered(ses.partition, protocol, location)
   })
   ses.protocol.getNavigatorHandlers().forEach((handler) => {
-    appActions.navigatorHandler(ses.partition, handler.protocol, handler.location, true)
+    appActions.navigatorHandlerRegistered(ses.partition, handler.protocol, handler.location)
   })
 }
 

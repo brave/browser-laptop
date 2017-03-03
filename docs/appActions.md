@@ -764,9 +764,9 @@ Update the detail object for the open alert/confirm/prompt (triggers re-render)
 
 
 
-### navigatorHandler(partition, protocol, location, register) 
+### navigatorHandlerRegistered(partition, protocol, location) 
 
-Action triggered by navigation handler
+Action triggered by registering navigation handler
 
 **Parameters**
 
@@ -776,7 +776,19 @@ Action triggered by navigation handler
 
 **location**: `string`, location where handler was triggered
 
-**register**: `boolean`, true if event was registered or false if unregistered
+
+
+### navigatorHandlerUnregistered(partition, protocol, location) 
+
+Action triggered by un-registering navigation handler
+
+**Parameters**
+
+**partition**: `string`, session partition
+
+**protocol**: `string`, navigator protocol
+
+**location**: `string`, location where handler was triggered
 
 
 

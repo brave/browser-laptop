@@ -943,19 +943,32 @@ const appActions = {
   },
 
   /**
-   * Action triggered by navigation handler
+   * Action triggered by registering navigation handler
    * @param partition {string} session partition
    * @param protocol {string} navigator protocol
    * @param location {string} location where handler was triggered
-   * @param register {boolean} true if event was registered or false if unregistered
    */
-  navigatorHandler: function (partition, protocol, location, register) {
+  navigatorHandlerRegistered: function (partition, protocol, location) {
     AppDispatcher.dispatch({
-      actionType: appConstants.APP_NAVIGATOR_HANDLER_UPDATE,
+      actionType: appConstants.APP_NAVIGATOR_HANDLER_REGISTERED,
       partition,
       protocol,
-      location,
-      register
+      location
+    })
+  },
+
+  /**
+   * Action triggered by un-registering navigation handler
+   * @param partition {string} session partition
+   * @param protocol {string} navigator protocol
+   * @param location {string} location where handler was triggered
+   */
+  navigatorHandlerUnregistered: function (partition, protocol, location) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_NAVIGATOR_HANDLER_UNREGISTERED,
+      partition,
+      protocol,
+      location
     })
   }
 }
