@@ -10,6 +10,7 @@ const sinon = require('sinon')
 const assert = require('assert')
 const Immutable = require('immutable')
 const fakeElectron = require('../lib/fakeElectron')
+const _ = require('underscore')
 let NewTabPage, randomSpy, Clock, Stats, FooterInfo
 require('../braveUnit')
 
@@ -46,6 +47,33 @@ describe('NewTab component unit tests', function () {
     style: {
       backgroundImage: 'url(testing123.jpg)'
     }
+  }
+  const TIME_UNIT = {
+    SECOND: 'S',
+    MINUTE: 'M',
+    HOUR: 'H',
+    DAY: 'D'
+  }
+  const calculateSavedCount = function (estimatedTimeValue, estimatedTimeUnit, millisecondsPerItem) {
+    let milliseconds
+    switch (estimatedTimeUnit) {
+      case TIME_UNIT.SECOND:
+        milliseconds = estimatedTimeValue * 1000
+        break
+      case TIME_UNIT.MINUTE:
+        milliseconds = estimatedTimeValue * 60 * 1000
+        break
+      case TIME_UNIT.HOUR:
+        milliseconds = estimatedTimeValue * 60 * 60 * 1000
+        break
+      case TIME_UNIT.DAY:
+        milliseconds = estimatedTimeValue * 24 * 60 * 60 * 1000
+        break
+      default:
+        milliseconds = 0
+        break
+    }
+    return milliseconds / millisecondsPerItem
   }
 
   beforeEach(function () {
@@ -187,6 +215,100 @@ describe('NewTab component unit tests', function () {
         it('does NOT include img element (used to detect onError)', function () {
           assert.equal(wrapper.find('img[data-test-id="backgroundImage"]').length, 0)
         })
+      })
+    })
+  })
+
+  describe('Time saved stats, when time saved', function () {
+    const runs = [{
+      message: '== 1 second',
+      input: {
+        estimatedTimeValue: 1,
+        estimatedTimeUnit: TIME_UNIT.SECOND
+      },
+      expectedOutput: {
+        expectedTimeSaved: 1
+      }
+    }, {
+      message: '== 1.5 seconds',
+      input: {
+        estimatedTimeValue: 1.5,
+        estimatedTimeUnit: TIME_UNIT.SECOND
+      },
+      expectedOutput: {
+        expectedTimeSaved: 2
+      }
+    }, {
+      message: '== 1 minute',
+      input: {
+        estimatedTimeValue: 1,
+        estimatedTimeUnit: TIME_UNIT.MINUTE
+      },
+      expectedOutput: {
+        expectedTimeSaved: 1
+      }
+    }, {
+      message: '== 1.5 minutes',
+      input: {
+        estimatedTimeValue: 1.5,
+        estimatedTimeUnit: TIME_UNIT.MINUTE
+      },
+      expectedOutput: {
+        expectedTimeSaved: 2
+      }
+    }, {
+      message: '== 1 hour',
+      input: {
+        estimatedTimeValue: 1,
+        estimatedTimeUnit: TIME_UNIT.HOUR
+      },
+      expectedOutput: {
+        expectedTimeSaved: 1
+      }
+    }, {
+      message: '== 1.55 hours',
+      input: {
+        estimatedTimeValue: 1.55,
+        estimatedTimeUnit: TIME_UNIT.HOUR
+      },
+      expectedOutput: {
+        expectedTimeSaved: 1.6
+      }
+    }, {
+      message: '== 1 day',
+      input: {
+        estimatedTimeValue: 1,
+        estimatedTimeUnit: TIME_UNIT.DAY
+      },
+      expectedOutput: {
+        expectedTimeSaved: 1
+      }
+    }, {
+      message: '== 2.555 days',
+      input: {
+        estimatedTimeValue: 2.555,
+        estimatedTimeUnit: TIME_UNIT.DAY
+      },
+      expectedOutput: {
+        expectedTimeSaved: 2.56
+      }
+    }]
+    let millisecondsPerItem
+
+    // This is just there to get the millisecondsPerItem in a generic way
+    before(function () {
+      const dummyStatsInstace = shallow(<Stats newTabData={Immutable.fromJS({})} />).instance()
+      millisecondsPerItem = dummyStatsInstace.millisecondsPerItem
+    })
+
+    _.each(runs, function (run) {
+      it(run.message, function () {
+        const timeSavedCount = calculateSavedCount(run.input.estimatedTimeValue, run.input.estimatedTimeUnit, millisecondsPerItem)
+        const newTabData = Immutable.fromJS({
+          adblockCount: timeSavedCount
+        })
+        const statsInstance = shallow(<Stats newTabData={newTabData} />).instance()
+        assert.equal(statsInstance.estimatedTimeSaved.value, run.expectedOutput.expectedTimeSaved)
       })
     })
   })
