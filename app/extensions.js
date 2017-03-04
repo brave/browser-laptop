@@ -36,7 +36,7 @@ let generateBraveManifest = () => {
     version: '1.0',
     background: {
       scripts: [ 'content/scripts/idleHandler.js' ],
-      persistent: false
+      persistent: true
     },
     content_scripts: [
       {
