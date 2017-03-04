@@ -107,7 +107,6 @@ const api = {
               return
             case 'browser-forward':
               win.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
-              return
           }
         })
         win.webContents.on('crashed', (e) => {

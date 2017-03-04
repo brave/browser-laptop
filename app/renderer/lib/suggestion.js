@@ -165,8 +165,6 @@ var virtualSite = (sites) => {
       title: sites[0].host,
       lastAccessedTime: (new Date()).getTime()
     })
-  } else {
-    return
   }
 }
 

@@ -27,9 +27,10 @@ module.exports.request = (options, callback) => {
   params = underscore.defaults(underscore.pick(options, [ 'method', 'headers' ]), { headers: {} })
   params.headers['accept-encoding'] = ''
   if (options.payload) {
-    underscore.extend(params, { payload: JSON.stringify(options.payload),
-                                payload_content_type: params.headers['content-type'] || 'application/json; charset=utf-8'
-                              })
+    underscore.extend(params, {
+      payload: JSON.stringify(options.payload),
+      payload_content_type: params.headers['content-type'] || 'application/json; charset=utf-8'
+    })
   }
 
   if (process.env.NODE_ENV === 'development' &&

@@ -41,4 +41,3 @@ describe('urlParse', function () {
     assert.deepEqual(result1, result2)
   })
 })
-

@@ -35,7 +35,7 @@ function setup (client) {
     .waitForVisible(urlInput)
 }
 
-function* setupPaymentsTabAndOpenAdvancedSettings (client, tabAlreadyLoaded) {
+function * setupPaymentsTabAndOpenAdvancedSettings (client, tabAlreadyLoaded) {
   yield client
     .tabByIndex(0)
 
@@ -126,8 +126,6 @@ let generateAndSaveRecoveryFile = function (recoveryFilePath, paymentId, passphr
   }
 
   fs.writeFileSync(recoveryFilePath, recoveryFileContents)
-
-  return
 }
 
 describe.skip('Advanced payment panel tests', function () {

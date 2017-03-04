@@ -18,7 +18,6 @@ if (typeof chrome !== 'undefined') { // eslint-disable-line
 }
 
 class AppDispatcher {
-
   constructor () {
     this.callbacks = []
     this.promises = []

@@ -138,10 +138,10 @@ module.exports.init = (resourceName, startExtension, onInitDone, forceDownload) 
 }
 
 module.exports.debug = (resourceName, details, shouldBlock) => {
-  if (!shouldBlock) {
-    return
-  }
   /*
+  if (!shouldBlock) {
+
+  }
   console.log('-----')
   console.log(`${resourceName} should block: `, shouldBlock)
   console.log(details.url)
