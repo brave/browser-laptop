@@ -21,12 +21,6 @@ const PaymentsTab = require('../../app/renderer/components/preferences/paymentsT
 const SyncTab = require('../../app/renderer/components/preferences/syncTab')
 const PluginsTab = require('../../app/renderer/components/preferences/pluginsTab')
 
-const ledgerExportUtil = require('../../app/common/lib/ledgerExportUtil')
-const addExportFilenamePrefixToTransactions = ledgerExportUtil.addExportFilenamePrefixToTransactions
-const appUrlUtil = require('../lib/appUrlUtil')
-const aboutUrls = appUrlUtil.aboutUrls
-const aboutContributionsUrl = aboutUrls.get('about:contributions')
-
 const {getZoomValuePercentage} = require('../lib/zoom')
 
 const config = require('../constants/config')
@@ -43,8 +37,6 @@ const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
 const searchProviders = require('../data/searchProviders')
-const moment = require('moment')
-moment.locale(navigator.language)
 
 const adblock = appConfig.resourceNames.ADBLOCK
 const cookieblock = appConfig.resourceNames.COOKIEBLOCK
@@ -308,90 +300,6 @@ class BitcoinDashboard extends ImmutableComponent {
         {this.panelFooter}
       </div>
     </div>
-  }
-}
-
-class PaymentHistory extends ImmutableComponent {
-  get ledgerData () {
-    return this.props.ledgerData
-  }
-
-  render () {
-    const transactions = Immutable.fromJS(
-        addExportFilenamePrefixToTransactions(this.props.ledgerData.get('transactions').toJS())
-    )
-
-    return <div className='paymentHistoryTable'>
-      <table className='sort'>
-        <thead>
-          <tr>
-            <th className='sort-header' data-l10n-id='date' />
-            <th className='sort-header' data-l10n-id='totalAmount' />
-            <th className='sort-header' data-l10n-id='receiptLink' />
-          </tr>
-        </thead>
-        <tbody>
-          {
-            transactions.map(function (row) {
-              return <PaymentHistoryRow transaction={row} ledgerData={this.props.ledgerData} />
-            }.bind(this))
-          }
-        </tbody>
-      </table>
-    </div>
-  }
-}
-
-class PaymentHistoryRow extends ImmutableComponent {
-
-  get transaction () {
-    return this.props.transaction
-  }
-
-  get timestamp () {
-    return this.transaction.get('submissionStamp')
-  }
-
-  get formattedDate () {
-    return formattedDateFromTimestamp(this.timestamp)
-  }
-
-  get ledgerData () {
-    return this.props.ledgerData
-  }
-
-  get satoshis () {
-    return this.transaction.getIn(['contribution', 'satoshis'])
-  }
-
-  get currency () {
-    return this.transaction.getIn(['contribution', 'fiat', 'currency'])
-  }
-
-  get totalAmount () {
-    var fiatAmount = this.transaction.getIn(['contribution', 'fiat', 'amount'])
-    return (fiatAmount && typeof fiatAmount === 'number' ? fiatAmount.toFixed(2) : '0.00')
-  }
-
-  get viewingId () {
-    return this.transaction.get('viewingId')
-  }
-
-  get receiptFileName () {
-    return `${this.transaction.get('exportFilenamePrefix')}.pdf`
-  }
-
-  render () {
-    var date = this.formattedDate
-    var totalAmountStr = `${this.totalAmount} ${this.currency}`
-
-    return <tr>
-      <td className='narrow' data-sort={this.timestamp}>{date}</td>
-      <td className='wide' data-sort={this.satoshis}>{totalAmountStr}</td>
-      <td className='wide'>
-        <a href={aboutContributionsUrl + '#' + this.viewingId} target='_blank'>{this.receiptFileName}</a>
-      </td>
-    </tr>
   }
 }
 
@@ -1227,12 +1135,7 @@ class AboutPreferences extends React.Component {
   }
 }
 
-function formattedDateFromTimestamp (timestamp) {
-  return moment(new Date(timestamp)).format('YYYY-MM-DD')
-}
-
 module.exports = {
   AboutPreferences: <AboutPreferences />,
-  BitcoinDashboard,
-  PaymentHistory
+  BitcoinDashboard
 }

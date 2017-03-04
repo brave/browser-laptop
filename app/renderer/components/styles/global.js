@@ -111,7 +111,8 @@ const globalStyles = {
     iconSize: '16px',
     dialogTopOffset: '30px',
     paymentsMargin: '20px',
-    modalPanelHeaderMarginBottom: '.5em'
+    modalPanelHeaderMarginBottom: '.5em',
+    paddingHorizontal: '30px'
   },
   shadow: {
     switchShadow: 'inset 0 1px 4px rgba(0, 0, 0, 0.35)',

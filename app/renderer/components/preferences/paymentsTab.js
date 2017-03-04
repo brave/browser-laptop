@@ -24,6 +24,7 @@ const {FormTextbox, RecoveryKeyTextbox} = require('../textbox')
 const {FormDropdown, SettingDropdown} = require('../dropdown')
 const {SettingsList, SettingItem, SettingCheckbox} = require('../settings')
 const LedgerTable = require('./ledgerTable')
+const PaymentHistory = require('./paymentHistory')
 
 class PaymentsTab extends ImmutableComponent {
   constructor () {
@@ -201,7 +202,6 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get paymentHistoryContent () {
-    const {PaymentHistory} = require('../../../../js/about/preferences')
     return <PaymentHistory ledgerData={this.props.ledgerData} />
   }
 
