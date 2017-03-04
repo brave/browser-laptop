@@ -30,7 +30,7 @@ class DisabledContent extends ImmutableComponent {
         <div className={css(styles.text)}data-l10n-id='paymentsWelcomeText5' />
         <div className={css(styles.text)}>
           <span data-l10n-id='paymentsWelcomeText6' />&nbsp;
-          <a href='https://brave.com/Payments_FAQ.html' target='_blank' data-l10n-id='paymentsWelcomeLink' />&nbsp;
+          <a className='linkText' href='https://brave.com/Payments_FAQ.html' target='_blank' data-l10n-id='paymentsWelcomeLink' />&nbsp;
           <span data-l10n-id='paymentsWelcomeText7' />
         </div>
       </div>
