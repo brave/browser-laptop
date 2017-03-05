@@ -155,6 +155,7 @@ module.exports = {
     'security.passwords.dashlane-enabled': false,
     'security.passwords.last-pass-enabled': false,
     'security.passwords.enpass-enabled': false,
+    'security.passwords.bitwarden-enabled': false,
     'security.fullscreen.content': fullscreenOption.ALWAYS_ASK,
     'security.flash.installed': false,
     // sync

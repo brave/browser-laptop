@@ -21,6 +21,9 @@ const passwordManagerDefault = (settingKey, settingsCollection) => {
   const enpassEnabled = resolveValue(settings.ENPASS_ENABLED, settingsCollection) === true
   if (enpassEnabled) return passwordManagers.ENPASS
 
+  const bitwardenEnabled = resolveValue(settings.BITWARDEN_ENABLED, settingsCollection) === true
+  if (bitwardenEnabled) return passwordManagers.BITWARDEN
+
   const disabled = resolveValue(settings.PASSWORD_MANAGER_ENABLED, settingsCollection) === false
   if (disabled) return passwordManagers.UNMANAGED
 
