@@ -216,6 +216,18 @@ const createWindow = (action) => {
       }
     })
 
+    let loadTimer = null
+
+    mainWindow.webContents.on('did-navigate', () => {
+      clearTimeout(loadTimer)
+    })
+
+    mainWindow.webContents.on('load-start', (url, mainFrame) => {
+      if (mainFrame) {
+        loadTimer = setTimeout(() => { mainWindow.loadURL(appUrlUtil.getBraveExtIndexHTML()) }, 500)
+      }
+    })
+
     mainWindow.on('ready-to-show', () => {
       mainWindow.show()
 
