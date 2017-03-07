@@ -176,7 +176,7 @@ module.exports = {
     'advanced.hide-excluded-sites': false,
     'advanced.minimum-visit-time': 8,
     'advanced.minimum-visits': 1,
-    'advanced.minimum-percentage': false,
+    'advanced.minimum-percentage': true,
     'advanced.auto-suggest-sites': true,
     'shutdown.clear-history': false,
     'shutdown.clear-downloads': false,
