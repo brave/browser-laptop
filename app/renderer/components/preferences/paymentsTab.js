@@ -126,6 +126,12 @@ class PaymentsTab extends ImmutableComponent {
       return null
     } else if (!walletHasTransactions) {
       buttonText = 'noPaymentHistory'
+      const now = new Date().getTime()
+      const timestamp = this.props.ledgerData.get('reconcileStamp')
+      if (timestamp <= now) {
+        buttonText = (timestamp <= (now - (24 * 60 * 60 * 1000)))
+                       ? 'noPaymentOverDueHistory' : 'noPaymentDueHistory'
+      }
     } else {
       buttonText = 'viewPaymentHistory'
     }
