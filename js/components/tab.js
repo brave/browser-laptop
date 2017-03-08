@@ -278,7 +278,12 @@ class Tab extends ImmutableComponent {
             tabProps={this.props.tab}
             onClick={this.onMuteFrame.bind(this, !this.props.tab.get('audioMuted'))}
           />
-          <TabTitle tabProps={this.props.tab} pageTitle={this.displayValue} />
+          <TabTitle
+            isActive={this.props.isActive}
+            paintTabs={this.props.paintTabs}
+            tabProps={this.props.tab}
+            pageTitle={this.displayValue}
+          />
         </div>
         <PrivateIcon tabProps={this.props.tab} />
         <NewSessionIcon
