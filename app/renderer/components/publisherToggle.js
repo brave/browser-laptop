@@ -29,7 +29,7 @@ class PublisherToggle extends ImmutableComponent {
   }
 
   get publisherId () {
-    return this.props.locationInfo.getIn([this.locationId, 'publisher'])
+    return this.props.locationInfo && this.props.locationInfo.getIn([this.locationId, 'publisher'])
   }
 
   get hostSettings () {
@@ -47,7 +47,7 @@ class PublisherToggle extends ImmutableComponent {
   get enabledForPaymentsPublisher () {
     // All publishers will be enabled by default if AUTO_SUGGEST is ON,
     // excluding publishers defined on ledger's exclusion list
-    const excluded = this.props.locationInfo.getIn([this.locationId, 'exclude'])
+    const excluded = this.props.locationInfo && this.props.locationInfo.getIn([this.locationId, 'exclude'])
     const autoSuggestSites = getSetting(settings.AUTO_SUGGEST_SITES)
 
       // hostSettings is undefined until user hit addFunds button.
@@ -58,7 +58,7 @@ class PublisherToggle extends ImmutableComponent {
   }
 
   get verifiedPublisher () {
-    return this.props.locationInfo.getIn([this.locationId, 'verified'])
+    return this.props.locationInfo && this.props.locationInfo.getIn([this.locationId, 'verified'])
   }
 
   get visiblePublisher () {

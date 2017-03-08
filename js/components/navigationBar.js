@@ -119,7 +119,7 @@ class NavigationBar extends ImmutableComponent {
   }
 
   get publisherId () {
-    return this.props.locationInfo.getIn([this.locationId, 'publisher']) || ''
+    return (this.props.locationInfo && this.props.locationInfo.getIn([this.locationId, 'publisher'])) || ''
   }
 
   get visiblePublisher () {
