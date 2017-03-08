@@ -37,6 +37,8 @@ describe('Preferences component', function () {
     mockery.registerMock('../../../extensions/brave/img/ledger/icon_history.svg')
     mockery.registerMock('../../../../extensions/brave/img/ledger/verified_green_icon.svg')
     mockery.registerMock('../../../../extensions/brave/img/ledger/verified_white_icon.svg')
+    mockery.registerMock('../../../../extensions/brave/img/ledger/icon_remove.svg')
+    mockery.registerMock('../../../../extensions/brave/img/ledger/icon_pin.svg')
     mockery.registerMock('../../../../extensions/brave/img/private_internet_access.png')
     mockery.registerMock('../../../../extensions/brave/img/private_internet_access_2x.png')
     mockery.registerMock('../../../../extensions/brave/img/bitgo.png')

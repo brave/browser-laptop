@@ -1,6 +1,7 @@
 /* globals devTools */
 var Application = require('spectron').Application
 var chai = require('chai')
+const Immutable = require('immutable')
 const {activeWebview, navigator, titleBar, urlInput} = require('./selectors')
 require('./coMocha')
 
@@ -327,6 +328,7 @@ var exports = {
       logVerbose('waitForTabCount(' + tabCount + ')')
       return this.waitUntil(function () {
         return this.getTabCount().then((count) => {
+          logVerbose('waitForTabCount("' + tabCount + '") => ' + count)
           return count === tabCount
         })
       }, 5000, null, 100)
@@ -773,6 +775,20 @@ var exports = {
     // retrieve a map of all the translations per existing IPC message 'translations'
     this.app.client.addCommand('translations', function () {
       return this.ipcSendRendererSync('translations')
+    })
+
+    // get synopsis from the store
+    this.app.client.addCommand('waitUntilSynopsis', function (cb) {
+      return this.waitUntil(function () {
+        return this.getAppState().then((val) => {
+          val = Immutable.fromJS(val)
+          let synopsis = val.getIn(['value', 'publisherInfo', 'synopsis'])
+          if (synopsis !== undefined) {
+            return cb(synopsis)
+          }
+          return false
+        })
+      }, 5000, null, 100)
     })
   },
 

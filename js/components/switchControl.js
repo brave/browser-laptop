@@ -29,7 +29,9 @@ class SwitchControl extends ImmutableComponent {
       large: this.props.large,
       small: this.props.small,
       hasTopText: this.props.topl10nId
-    })}>
+    })}
+      data-switch-status={this.props.checkedOn}
+    >
       {
         this.props.leftl10nId && this.props.topl10nId
         ? <div className='switchControlText'><div className='switchControlLeftText'><div className='switchSpacer'>&nbsp;</div><span className='switchControlLeftText' data-l10n-id={this.props.leftl10nId} /></div></div>
@@ -45,9 +47,13 @@ class SwitchControl extends ImmutableComponent {
         }
         <div className={cx({
           switchBackground: true,
-          switchedOn: this.props.checkedOn
+          switchedOn: this.props.checkedOn,
+          [this.props.backgroundClassName]: !!this.props.backgroundClassName
         })} onClick={this.onClick}>
-          <div className='switchIndicator' />
+          <div className={cx({
+            switchIndicator: true,
+            [this.props.indicatorClassName]: !!this.props.indicatorClassName
+          })} />
         </div>
       </div>
       {

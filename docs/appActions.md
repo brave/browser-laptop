@@ -809,6 +809,16 @@ also change all undefined ledgerPayments to value true
 
 
 
+### changeLedgerPinnedPercentages(publishers) 
+
+Update ledger publishers pinned percentages according to the new synopsis
+
+**Parameters**
+
+**publishers**: `Object`, updated publishers
+
+
+
 
 * * *
 

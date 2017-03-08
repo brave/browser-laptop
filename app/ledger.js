@@ -186,10 +186,6 @@ const doAction = (action) => {
           updatePublisherInfo()
           break
 
-        case settings.MINIMUM_PERCENTAGE:
-          updatePublisherInfo()
-          break
-
         default:
           break
       }
@@ -213,6 +209,10 @@ const doAction = (action) => {
         if (publisherInfo._internal.verboseP) console.log('\nupdating ' + publisher + ' stickyP=' + action.value)
         updatePublisherInfo()
         verifiedP(publisher)
+      } else if (action.key === 'ledgerPinPercentage') {
+        if (!synopsis.publishers[publisher]) break
+        synopsis.publishers[publisher].pinPercentage = action.value
+        updatePublisherInfo()
       }
       break
 
@@ -1000,7 +1000,7 @@ var stickyP = (publisher) => {
     delete synopsis.publishers[publisher].options.stickyP
   }
 
-  return (result || false)
+  return (result === undefined || result)
 }
 
 var eligibleP = (publisher) => {
@@ -1022,9 +1022,69 @@ var contributeP = (publisher) => {
 }
 
 var synopsisNormalizer = () => {
-  var i, duration, minP, n, pct, publisher, results, total
-  var data = []
-  var scorekeeper = synopsis.options.scorekeeper
+  // courtesy of https://stackoverflow.com/questions/13483430/how-to-make-rounded-percentages-add-up-to-100#13485888
+  const roundToTarget = (l, target, property) => {
+    let off = target - underscore.reduce(l, (acc, x) => { return acc + Math.round(x[property]) }, 0)
+
+    return underscore.sortBy(l, (x) => Math.round(x[property]) - x[property])
+      .map((x, i) => {
+        x[property] = Math.round(x[property]) + (off > i) - (i >= (l.length + off))
+        return x
+      })
+  }
+
+  const normalizePinned = (dataPinned, total, target) => dataPinned.map((publisher) => {
+    let newPer = Math.floor((publisher.pinPercentage / total) * target)
+    if (newPer < 1) {
+      newPer = 1
+    }
+
+    publisher.pinPercentage = newPer
+    return publisher
+  })
+
+  const getPublisherData = (result) => {
+    let duration = result.duration
+
+    let data = {
+      verified: result.options.verified || false,
+      site: result.publisher,
+      views: result.visits,
+      duration: duration,
+      daysSpent: 0,
+      hoursSpent: 0,
+      minutesSpent: 0,
+      secondsSpent: 0,
+      faviconURL: result.faviconURL,
+      score: result.scores[scorekeeper],
+      pinPercentage: result.pinPercentage
+    }
+    // HACK: Protocol is sometimes blank here, so default to http:// so we can
+    // still generate publisherURL.
+    data.publisherURL = (result.protocol || 'http:') + '//' + result.publisher
+
+    if (duration >= msecs.day) {
+      data.daysSpent = Math.max(Math.round(duration / msecs.day), 1)
+    } else if (duration >= msecs.hour) {
+      data.hoursSpent = Math.max(Math.floor(duration / msecs.hour), 1)
+      data.minutesSpent = Math.round((duration % msecs.hour) / msecs.minute)
+    } else if (duration >= msecs.minute) {
+      data.minutesSpent = Math.max(Math.round(duration / msecs.minute), 1)
+      data.secondsSpent = Math.round((duration % msecs.minute) / msecs.second)
+    } else {
+      data.secondsSpent = Math.max(Math.round(duration / msecs.second), 1)
+    }
+
+    return data
+  }
+
+  let results
+  let dataPinned = []
+  let dataUnPinned = []
+  let dataExcluded = []
+  let pinnedTotal = 0
+  let unPinnedTotal = 0
+  const scorekeeper = synopsis.options.scorekeeper
 
   results = []
   underscore.keys(synopsis.publishers).forEach((publisher) => {
@@ -1033,81 +1093,54 @@ var synopsisNormalizer = () => {
     results.push(underscore.extend({ publisher: publisher }, underscore.omit(synopsis.publishers[publisher], 'window')))
   }, synopsis)
   results = underscore.sortBy(results, (entry) => { return -entry.scores[scorekeeper] })
-  n = results.length
 
-  total = 0
-  for (i = 0; i < n; i++) { total += results[i].scores[scorekeeper] }
-  if (total === 0) return data
-
-  pct = []
-  for (i = 0; i < n; i++) {
-    publisher = synopsis.publishers[results[i].publisher]
-    duration = results[i].duration
-
-    data[i] = {
-      rank: i + 1,
-      verified: results[i].options.verified || false,
-      site: results[i].publisher,
-      views: results[i].visits,
-      duration: duration,
-      daysSpent: 0,
-      hoursSpent: 0,
-      minutesSpent: 0,
-      secondsSpent: 0,
-      faviconURL: publisher.faviconURL,
-      score: results[i].scores[scorekeeper]
-    }
-    // HACK: Protocol is sometimes blank here, so default to http:// so we can
-    // still generate publisherURL.
-    data[i].publisherURL = (results[i].protocol || 'http:') + '//' + results[i].publisher
-
-    pct[i] = Math.round((results[i].scores[scorekeeper] * 100) / total)
-
-    if (duration >= msecs.day) {
-      data[i].daysSpent = Math.max(Math.round(duration / msecs.day), 1)
-    } else if (duration >= msecs.hour) {
-      data[i].hoursSpent = Math.max(Math.floor(duration / msecs.hour), 1)
-      data[i].minutesSpent = Math.round((duration % msecs.hour) / msecs.minute)
-    } else if (duration >= msecs.minute) {
-      data[i].minutesSpent = Math.max(Math.round(duration / msecs.minute), 1)
-      data[i].secondsSpent = Math.round((duration % msecs.minute) / msecs.second)
+  // move publisher to the correct array and get totals
+  results.forEach((result) => {
+    if (result.pinPercentage && result.pinPercentage > 0) {
+      // pinned
+      pinnedTotal += result.pinPercentage
+      dataPinned.push(getPublisherData(result))
+    } else if (stickyP(result.publisher)) {
+      // unpinned
+      unPinnedTotal += result.scores[scorekeeper]
+      dataUnPinned.push(result)
     } else {
-      data[i].secondsSpent = Math.max(Math.round(duration / msecs.second), 1)
+      // excluded
+      let publisher = getPublisherData(result)
+      publisher.percentage = 0
+      dataExcluded.push(publisher)
     }
+  })
+
+  // round if over 100% of pinned publishers
+  if (pinnedTotal > 100) {
+    dataPinned = roundToTarget(normalizePinned(dataPinned, pinnedTotal, 100), 100, 'pinPercentage')
+    dataUnPinned = dataUnPinned.map((result) => {
+      let publisher = getPublisherData(result)
+      publisher.percentage = 0
+      return publisher
+    })
+
+    // sync synopsis
+    dataPinned.forEach((item) => {
+      synopsis.publishers[item.site].pinPercentage = item.pinPercentage
+    })
+
+    // sync app store
+    appActions.changeLedgerPinnedPercentages(dataPinned)
+  } else {
+    // unpinned publishers
+    dataUnPinned = dataUnPinned.map((result) => {
+      let publisher = getPublisherData(result)
+      publisher.percentage = Math.round((publisher.score / unPinnedTotal) * (100 - pinnedTotal))
+      return publisher
+    })
+
+    // normalize unpinned values
+    dataUnPinned = roundToTarget(dataUnPinned, (100 - pinnedTotal), 'percentage')
   }
 
-  // courtesy of https://stackoverflow.com/questions/13483430/how-to-make-rounded-percentages-add-up-to-100#13485888
-  var foo = (l, target) => {
-    var off = target - underscore.reduce(l, (acc, x) => { return acc + Math.round(x) }, 0)
-
-    return underscore.chain(l)
-                     .sortBy((x) => { return Math.round(x) - x })
-                     .map((x, i) => { return Math.round(x) + (off > i) - (i >= (l.length + off)) })
-                     .value()
-  }
-
-  minP = getSetting(settings.MINIMUM_PERCENTAGE)
-  pct = foo(pct, 100)
-  total = 0
-  for (i = 0; i < n; i++) {
-    if (pct[i] < 0) pct[i] = 0
-    if ((minP) && (pct[i] < 1)) {
-      data = data.slice(0, i)
-      break
-    }
-
-    data[i].percentage = pct[i]
-    total += pct[i]
-  }
-
-  for (i = data.length - 1; (total > 100) && (i >= 0); i--) {
-    if (data[i].percentage < 2) continue
-
-    data[i].percentage--
-    total--
-  }
-
-  return data
+  return dataPinned.concat(dataUnPinned, dataExcluded)
 }
 
 /*
