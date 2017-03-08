@@ -187,7 +187,7 @@ module.exports.createVirtualHistoryItems = (historySites) => {
   })
   // find groups with more than 2 of the same host
   var multiGroupKeys = _.filter(_.keys(grouped), (k) => {
-    return grouped[k].length > 2
+    return grouped[k].length > 0
   })
   // potentially create virtual history items
   var virtualHistorySites = _.map(multiGroupKeys, (location) => {
@@ -196,5 +196,7 @@ module.exports.createVirtualHistoryItems = (historySites) => {
   virtualHistorySites = _.filter(virtualHistorySites, (site) => {
     return !!site
   })
-  return virtualHistorySites
+  return Immutable.fromJS(_.object(virtualHistorySites.map((site) => {
+    return [site.location, site]
+  })))
 }
