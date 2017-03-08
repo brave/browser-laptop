@@ -7,6 +7,7 @@ const ImmutableComponent = require('../../../js/components/immutableComponent')
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('./styles/global')
 const {isWindows} = require('../../common/lib/platformUtil')
+const {getTextColorForBackground} = require('../../../js/lib/color')
 
 /**
  * Boilerplate component for all tab icons
@@ -159,6 +160,14 @@ class TabTitle extends ImmutableComponent {
       this.hoveredOnNarrowView
   }
 
+  get themeColor () {
+    const themeColor = this.props.tabProps.get('themeColor') || this.props.tabProps.get('computedThemeColor')
+    const defaultColor = this.props.tabProps.get('isPrivate') ? globalStyles.color.white100 : globalStyles.color.black100
+    return this.props.isActive && this.props.paintTabs && themeColor
+      ? getTextColorForBackground(themeColor)
+      : defaultColor
+  }
+
   render () {
     const titleStyles = StyleSheet.create({
       reduceTitleSize: {
@@ -166,12 +175,18 @@ class TabTitle extends ImmutableComponent {
         // as closeTabIcon to avoid title overflow
         // when hovering over a tab
         marginRight: `calc(${globalStyles.spacing.iconSize} + ${globalStyles.spacing.defaultIconPadding})`
+      },
+      gradientText: {
+        backgroundImage: `-webkit-linear-gradient(left,
+        ${this.themeColor} 90%, ${globalStyles.color.almostInvisible} 100%)`
       }
     })
+
     return !this.isPinned && !this.shouldHideTitle
     ? <div data-test-id='tabTitle'
       className={css(
       styles.tabTitle,
+      titleStyles.gradientText,
       this.props.tabProps.get('hoverState') && titleStyles.reduceTitleSize,
       // Windows specific style
       isWindows() && styles.tabTitleForWindows
@@ -251,14 +266,17 @@ const styles = StyleSheet.create({
   },
 
   tabTitle: {
+    display: 'flex',
+    flex: '1',
     WebkitUserSelect: 'none',
     boxSizing: 'border-box',
     fontSize: globalStyles.fontSize.tabTitle,
     overflow: 'hidden',
-    textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
     lineHeight: '1.6',
-    padding: globalStyles.spacing.defaultTabPadding
+    padding: globalStyles.spacing.defaultTabPadding,
+    color: 'transparent',
+    WebkitBackgroundClip: 'text'
   },
 
   tabTitleForWindows: {

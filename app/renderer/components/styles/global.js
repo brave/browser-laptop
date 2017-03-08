@@ -51,6 +51,7 @@ const globalStyles = {
     darkGray: 'rgb(68, 68, 68)',
     white25: 'rgba(255, 255, 255, 0.25)',
     white50: 'rgba(255, 255, 255, 0.5)',
+    white100: 'rgba(255, 255, 255, 1)',
     gray25: 'rgba(116, 116, 130, 0.25)',
     gray50: 'rgba(116, 116, 130, 0.5)',
     black10: 'rgba(0, 0, 0, 0.1)',
@@ -64,7 +65,8 @@ const globalStyles = {
     statsRed: '#fe521d',
     statsBlue: '#0796fa',
     statsLightGray: '#999999',
-    defaultIconBackground: '#F7F7F7'
+    defaultIconBackground: '#F7F7F7',
+    almostInvisible: 'rgba(255,255,255,0.01)'
   },
   radius: {
     borderRadius: '4px',
