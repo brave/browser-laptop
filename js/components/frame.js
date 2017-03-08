@@ -892,19 +892,19 @@ class Frame extends ImmutableComponent {
       }
       let isSecure = null
       let runInsecureContent = this.runInsecureContent()
-      // 'warning' and 'passive mixed content' should never upgrade the
-      // security state from insecure to secure
-      if (e.securityState === 'secure' ||
-          (this.props.isSecure !== false &&
-           runInsecureContent !== true &&
-           ['warning', 'passive-mixed-content'].includes(e.securityState))) {
+      if (e.securityState === 'secure') {
         isSecure = true
       } else if (['broken', 'insecure'].includes(e.securityState)) {
         isSecure = false
+      } else if (this.props.isSecure !== false &&
+        ['warning', 'passive-mixed-content'].includes(e.securityState)) {
+        // Passive mixed content should not upgrade an insecure connection to a
+        // partially-secure connection. It can only downgrade a secure
+        // connection.
+        isSecure = 1
       }
-      // TODO: show intermediate UI for 'warning' and 'passive-mixed-content'
       windowActions.setSecurityState(this.frame, {
-        secure: isSecure,
+        secure: runInsecureContent ? false : isSecure,
         runInsecureContent
       })
       if (isSecure) {

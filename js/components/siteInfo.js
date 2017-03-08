@@ -57,17 +57,20 @@ class SiteInfo extends ImmutableComponent {
       partitionNumber: this.partitionNumber
     }
     let secureIcon
-    if (this.isSecure && !this.runInsecureContent) {
+    if (this.isSecure === true && !this.runInsecureContent) {
+      // fully secure
       secureIcon = <li><span
         className={cx({
           fa: true,
           'fa-lock': true,
           extendedValidation: this.isExtendedValidation
         })} /><span data-l10n-id='secureConnection' /></li>
-    } else if (this.isSecure && this.runInsecureContent) {
-      secureIcon = <li><span className='fa fa-unlock' /><span data-l10n-id='mixedConnection' /></li>
+    } else if (this.isSecure === 1 && !this.runInsecureContent) {
+      // passive mixed content loaded
+      secureIcon = <li><span className='fa fa-unlock' /><span data-l10n-id='partiallySecureConnection' /></li>
     } else {
-      secureIcon = <li><span className='fa fa-unlock' /><span data-l10n-id='insecureConnection' data-l10n-args={JSON.stringify(l10nArgs)} /></li>
+      // insecure
+      secureIcon = <li><span className='fa fa-unlock' /><span data-l10n-id='insecureConnection' /></li>
     }
 
     let partitionInfo
@@ -99,9 +102,12 @@ class SiteInfo extends ImmutableComponent {
             </li>
           </ul>
         </li>
-    } else if (this.isSecure) {
+    } else if (this.isSecure === true) {
       connectionInfo =
         <div className='connectionInfo' data-l10n-id='secureConnectionInfo' />
+    } else if (this.isSecure === 1) {
+      connectionInfo =
+        <div className='connectionInfo' data-l10n-id='partiallySecureConnectionInfo' />
     } else {
       connectionInfo =
         <div className='connectionInfo' data-l10n-id='insecureConnectionInfo' />
