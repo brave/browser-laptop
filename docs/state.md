@@ -226,6 +226,7 @@ AppStore
       lastAccessedTime: number, // datetime.getTime()
       location: string,
       objectId: Array.<number>,
+      originalSeed: Array.<number>, // only set for bookmarks that have been synced before a sync profile reset
       parentFolderId: number, // set for bookmarks and bookmark folders only
       partitionNumber: number, // optionally specifies a specific session
       tags: [string], // empty, 'bookmark', 'bookmark-folder', 'pinned', or 'reader'

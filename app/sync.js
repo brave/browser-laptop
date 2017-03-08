@@ -176,6 +176,7 @@ module.exports.onSyncReady = (isFirstRun, e) => {
   }
   const appState = AppStore.getState()
   const sites = appState.get('sites') || new Immutable.List()
+  const seed = appState.get('seed') || new Immutable.List()
 
   /**
    * Sync a bookmark that has not been synced yet, first syncing the parent
@@ -187,7 +188,8 @@ module.exports.onSyncReady = (isFirstRun, e) => {
    */
   const folderToObjectId = {}
   const syncBookmark = (site) => {
-    if (!site || site.get('objectId') || folderToObjectId[site.get('folderId')] || !syncUtil.isSyncable('bookmark', site)) {
+    if (!site || (site.get('objectId') && seed.equals(site.get('originalSeed'))) ||
+      folderToObjectId[site.get('folderId')] || !syncUtil.isSyncable('bookmark', site)) {
       return
     }
 
