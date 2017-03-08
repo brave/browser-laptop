@@ -26,6 +26,7 @@ const getSetting = require('../../js/settings').getSetting
 const locale = require('../locale')
 const {isSiteBookmarked, siteSort} = require('../../js/state/siteUtil')
 const isDarwin = process.platform === 'darwin'
+const isLinux = process.platform === 'linux'
 const aboutUrl = 'https://brave.com/'
 
 let appMenu = null
@@ -437,9 +438,11 @@ const createHelpSubmenu = () => {
     }
   ]
 
-  if (!isDarwin) {
+  if (!isDarwin && !isLinux) {
     submenu.push(CommonMenu.separatorMenuItem)
     submenu.push(CommonMenu.checkForUpdateMenuItem())
+  }
+  if (!isDarwin) {
     submenu.push(CommonMenu.separatorMenuItem)
     submenu.push(CommonMenu.aboutBraveMenuItem())
   }

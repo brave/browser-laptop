@@ -41,6 +41,7 @@ const extensionActions = require('../app/common/actions/extensionActions')
 const appStore = require('./stores/appStoreRenderer')
 
 const isDarwin = process.platform === 'darwin'
+const isLinux = process.platform === 'linux'
 
 /**
  * Obtains an add bookmark menu item
@@ -687,6 +688,19 @@ function getEditableItems (selection, editFlags, hasFormat) {
 }
 
 function hamburgerTemplateInit (location, e) {
+  const helpSubmenu = [
+    CommonMenu.aboutBraveMenuItem(),
+    CommonMenu.separatorMenuItem
+  ]
+
+  if (!isLinux) {
+    helpSubmenu.push(
+      CommonMenu.checkForUpdateMenuItem(),
+      CommonMenu.separatorMenuItem)
+  }
+
+  helpSubmenu.push(CommonMenu.submitFeedbackMenuItem())
+
   const template = [
     CommonMenu.newTabMenuItem(),
     CommonMenu.newPrivateTabMenuItem(),
@@ -740,13 +754,7 @@ function hamburgerTemplateInit (location, e) {
     CommonMenu.separatorMenuItem,
     {
       label: locale.translation('help'),
-      submenu: [
-        CommonMenu.aboutBraveMenuItem(),
-        CommonMenu.separatorMenuItem,
-        CommonMenu.checkForUpdateMenuItem(),
-        CommonMenu.separatorMenuItem,
-        CommonMenu.submitFeedbackMenuItem()
-      ]
+      submenu: helpSubmenu
     },
     CommonMenu.quitMenuItem()
   ]
