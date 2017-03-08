@@ -121,7 +121,7 @@ const api = {
             }
           })
 
-          appActions.showMessageBox({
+          appActions.showNotification({
             buttons: [
               {text: locale.translation('ok')}
             ],
