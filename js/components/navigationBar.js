@@ -119,12 +119,12 @@ class NavigationBar extends ImmutableComponent {
   }
 
   get publisherId () {
-    return (this.props.locationInfo && this.props.locationInfo.getIn([this.locationId, 'publisher'])) || ''
+    return this.props.locationInfo && this.props.locationInfo.getIn([this.locationId, 'publisher'])
   }
 
   get visiblePublisher () {
     // No publisher is visible if ledger is disabled
-    if (!getSetting(settings.PAYMENTS_ENABLED)) {
+    if (!getSetting(settings.PAYMENTS_ENABLED) || !this.publisherId) {
       return false
     }
     const hostPattern = UrlUtil.getHostPattern(this.publisherId)

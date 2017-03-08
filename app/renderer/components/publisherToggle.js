@@ -93,6 +93,9 @@ class PublisherToggle extends ImmutableComponent {
   }
 
   render () {
+    if (!this.props.locationInfo) {
+      return null
+    }
     return this.shouldShowAddPublisherButton
       ? <span
         data-test-id='publisherButton'
