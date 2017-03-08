@@ -6,13 +6,11 @@
 
 .tabs {
   box-sizing: border-box;
-  background: none;
   display: flex;
   flex: 1;
   overflow: auto;
-  padding: 0 4px 0 0;
+  padding: 0;
   height: @tabsToolbarHeight;
-  margin-top: 2px;
   position: relative;
   white-space: nowrap;
   z-index: @zindexTabs;
@@ -41,13 +39,13 @@
   .newFrameButton {
     background: @buttonColor;
     min-width: 25px;
-    min-height: 25px;
+    min-height: 26px;
+    line-height: 26px;
     -webkit-mask-image: url('../img/toolbar/newtab_btn.svg');
     -webkit-mask-repeat: no-repeat;
     -webkit-mask-position: center;
     -webkit-mask-size: 12px 12px;
     -webkit-mask-origin: border;
-    border: 3px solid @tabsBackground;
     &:hover {
       opacity: 1.0;
       background-color: black;
@@ -58,7 +56,6 @@
 .tabArea {
   box-sizing: border-box;
   display: inline-block;
-  padding: 0 4px 0 0;
   position: relative;
   vertical-align: top;
   overflow: hidden;
@@ -71,14 +68,11 @@
   &:not(.isPinned) {
     flex: 1;
     &:first-child {
-      padding-left: 6px;
+      //padding-left: 6px;
     }
   }
 
   &.isPinned {
-    &:last-child {
-      padding-right: 6px;
-    }
     .tabIcon {
       margin: 0;
       padding: 0 4px;
@@ -128,12 +122,11 @@
   background: @tabsBackground;
   display: flex;
   height: @tabsToolbarHeight;
-//  margin-top: 2px;
+  border-top: 1px solid #bbb;
   -webkit-user-select: none;
 }
 
 .tabsToolbarButtons {
-  background: @tabsBackground;
   padding-right: 2px;
   .browserButton {
     display: inline-block;
@@ -142,9 +135,10 @@
 }
 
 .tabPages {
-  background: @tabsBackground;
+  background: none;
   display: flex;
   height: @tabPagesHeight;
+  margin-bottom: 5px;
   justify-content: center;
   position: relative;
   text-align: center;
@@ -157,32 +151,30 @@
   }
 
   &.singlePage {
-    height: 1px;
+    height: 0;
+    margin-bottom: 2px;
   }
 
   >div {
     display: flex
-//    margin-top: 4px;
   }
 }
 
 .tabPage {
   align-items: center;
-  background-color: #aaaaaa;
+  background-color: #fff;
   border-radius: @borderRadius;
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.2);
+  border: 1px solid #bbb;
   box-sizing: border-box;
   display: inline-block;
   margin: auto 2.5px;
-  margin-top: 3px;
-  height: 6px;
-  width: 36px;
+  height: 7px;
+  width: 35px;
   vertical-align: middle;
 
   &:hover {
-    background-color: #f0f0f0;
-    border: 2px solid white;
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.0);
+    background-color: #fff;
+    border: 1px solid @braveOrange;
   }
 
   &.audioPlaybackActive {
@@ -190,52 +182,49 @@
   }
 
   &.active {
-    background-color: @chromePrimary;
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.0);
-
+    background-color: @braveOrange;
+    border-width: 0;
   }
 }
 
 .prevTab,
 .nextTab {
     display: none;
-    color: #a0a0a0;
+    color: @buttonColor;
     font-size: 21px !important;
-    height: 20px;
-    line-height: 19px !important;
+    height: 26px;
+    line-height: 26px !important;
     text-align: center;
     vertical-align: top;
-    margin-top: 4px;
-    margin-left: -5px;
-    margin-right: -5px;
-    width: 30px;
+    margin-top: 0;
+    margin-left: 0;
+    margin-right: 0;
+    width: 22px;
 
   &:not([disabled]) {
     display: block;
-    background: @tabsBackground;
 
     &:hover {
-  //    background: lighten(#eeeeee, 10%);
-            color: white;
+      color: black;
     }
   }
 }
 
 .prevTab {
-  background: linear-gradient(to right, @chromeControlsBackground2, @tabsBackground);
-  border-bottom-left-radius: 0;
-  border-top-left-radius: @borderRadius;
+  border-radius: 0;
+  border-right: 1px solid #bbb;
+  padding-right: 2px;
 }
 
 .nextTab {
-  background: linear-gradient(to left, #afb0b4, #cccccc);
-  border-bottom-right-radius: 0;
-  border-top-right-radius: @borderRadius;
+  border-radius: 0;
+  padding-left: 2px;
 }
 
 .pinnedTabs {
-  margin-left: 9px;
-  margin-top: 2px;
+  margin-left: 0;
+  margin-top: 0;
+  background: @tabsBackgroundInactive;
 }
 
 .segmentedControl {

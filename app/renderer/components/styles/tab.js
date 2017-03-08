@@ -12,16 +12,14 @@ const styles = StyleSheet.create({
   },
 
   tab: {
-    background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1))',
-    borderRadius: `${globalStyles.radius.borderRadiusTabs} ${globalStyles.radius.borderRadiusTabs} 0 0`,
-    borderWidth: '1px 1px 0',
+    borderWidth: '0 1px 0 0',
     borderStyle: 'solid',
-    borderColor: 'transparent',
+    borderColor: '#bbb',
     boxSizing: 'border-box',
-    color: '#3B3B3B',
+    color: '#5a5a5a',
     display: 'flex',
-    height: '23px',
-    marginTop: '2px',
+    height: '24px',
+    marginTop: '0',
     transition: `transform 200ms ease, ${globalStyles.transition.tabBackgroundTransition}`,
     left: '0',
     opacity: '1',
@@ -91,14 +89,13 @@ const styles = StyleSheet.create({
   },
 
   active: {
-    background: `linear-gradient(to bottom, #fff, ${globalStyles.color.chromePrimary})`,
-    height: '25px',
-    marginTop: '1px',
-    boxShadow: '0 -1px 4px 0 rgba(51, 51, 51, 0.12)',
-    borderWidth: '1px 1px 0',
+    background: `rgba(255, 255, 255, 1.0)`,
+    height: '24px',
+    marginTop: '0',
+    borderWidth: '0 1px 0 0',
     borderStyle: 'solid',
     borderColor: '#bbb',
-
+    color: '#000',
     ':hover': {
       background: `linear-gradient(to bottom, #fff, ${globalStyles.color.chromePrimary})`
     }
