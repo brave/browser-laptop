@@ -458,6 +458,12 @@ module.exports.init = () => {
       disableExtension(config.PocketExtensionId)
     }
 
+    if (getSetting(settings.VIMIUM_ENABLED)) {
+      registerComponent(config.vimiumExtensionId)
+    } else {
+      disableExtension(config.vimiumExtensionId)
+    }
+
     if (appStore.getState().getIn(['widevine', 'enabled'])) {
       registerComponent(config.widevineComponentId)
     }

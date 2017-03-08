@@ -186,6 +186,7 @@ module.exports = {
     'shutdown.clear-autofill-data': false,
     'shutdown.clear-site-settings': false,
     'extensions.pocket.enabled': false,
+    'extensions.vimium.enabled': false,
     'general.bookmarks-toolbar-mode': null,
     'general.is-default-browser': null,
     'notification-add-funds-timestamp': null,

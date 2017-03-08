@@ -88,7 +88,8 @@ const settings = {
   // > phased out with 0.12.6
   SHOW_BOOKMARKS_TOOLBAR_FAVICON: 'bookmarks.toolbar.showFavicon',
   SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON: 'bookmarks.toolbar.showOnlyFavicon',
-  POCKET_ENABLED: 'extensions.pocket.enabled'
+  POCKET_ENABLED: 'extensions.pocket.enabled',
+  VIMIUM_ENABLED: 'extensions.vimium.enabled'
 }
 
 module.exports = settings

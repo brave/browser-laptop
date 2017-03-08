@@ -49,6 +49,7 @@ module.exports = {
   syncExtensionId: 'cjnmeadmgmiihncdidmfiabhenbggfjm',
   PDFJSExtensionId: 'jdbefljfgobbmcidnmpjamcbhnbphjnb',
   PocketExtensionId: 'niloccemoadcdkdjlinkgdfekeahmflj',
+  vimiumExtensionId: 'dbepggeogbaibhgnhhndojpepiihcmeb',
   widevineComponentId: 'oimompecagnajdejgnnjijobebaeigek',
   coinbaseOrigin: 'https://buy.coinbase.com',
   newtab: {

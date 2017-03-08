@@ -167,6 +167,7 @@ AppStore
     'bookmarks.toolbar.showFavicon': boolean, // true if bookmark favicons should be shown on the bookmarks toolbar
     'bookmarks.toolbar.showOnlyFavicon': boolean, // true if only favicons should be shown on the bookmarks toolbar
     'extensions.pocket.enabled': boolean, // true if pocket is enabled
+    'extensions.vimium.enabled': boolean, // true if vimium is enabled
     'general.autohide-menu': boolean, // true if the Windows menu should be autohidden
     'general.bookmarks-toolbar-mode': boolean, // true to show bookmakrs toolbar
     'general.check-default-on-startup': boolean, // true to check whether brave is default browser on startup
