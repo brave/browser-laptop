@@ -71,7 +71,9 @@ class ContextMenuItem extends ImmutableComponent {
     windowActions.setContextMenuDetail()
   }
   onAuxClick (e) {
-    this.onClick(this.props.contextMenuItem.get('click'), true, e)
+    if (e.button === 1) {
+      this.onClick(this.props.contextMenuItem.get('click'), true, e)
+    }
   }
 
   onMouseEnter (e) {
