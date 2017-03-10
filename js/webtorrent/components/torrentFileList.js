@@ -19,7 +19,7 @@ class TorrentFileList extends React.Component {
           defaultHeading='num'
           defaultHeadingSortOrder='asc'
           rows={files.map((file, i) => [
-            String(i + 1),
+            i + 1,
             {cell: this.renderFileLink(file, false)},
             {cell: this.renderFileLink(file, true)},
             prettierBytes(file.length)
