@@ -105,7 +105,7 @@ class Main extends ImmutableComponent {
     this.onFind = this.onFind.bind(this)
     this.onFindHide = this.onFindHide.bind(this)
     this.checkForTitleMode = debounce(this.checkForTitleMode.bind(this), 20)
-    this.lastKeyPressed = undefined
+    this.resetAltMenuProcessing()
   }
   registerWindowLevelShortcuts () {
     // For window level shortcuts that don't work as local shortcuts
@@ -131,9 +131,15 @@ class Main extends ImmutableComponent {
           }
           break
       }
-
+      this.keydown[e.which] = true
       this.lastKeyPressed = e.which
     })
+  }
+
+  resetAltMenuProcessing () {
+    this.lastKeyPressed = undefined
+    this.keydown = {}
+    this.keydownHistory = []
   }
 
   registerCustomTitlebarHandlers () {
@@ -142,25 +148,30 @@ class Main extends ImmutableComponent {
         const customTitlebar = this.customTitlebar
         switch (e.which) {
           case keyCodes.ALT:
-            // Ignore right alt (AltGr)
-            if (e.location === keyLocations.DOM_KEY_LOCATION_RIGHT) {
+            /*
+             Only show/hide the menu if:
+             - the left ALT key is pressed (ignore AltGr)
+             - last key pressed was ALT (typing ALT codes should not toggle menu)
+             - no other key is being pushed simultaneously
+             - since initial keydown, ALT has been the only key pressed
+            */
+            if (e.location === keyLocations.DOM_KEY_LOCATION_RIGHT ||
+                this.lastKeyPressed !== keyCodes.ALT ||
+                Object.keys(this.keydown).length > 1 ||
+                this.keydownHistory.length > 0) {
               break
             }
 
-            // Only show/hide the menu if last key pressed was ALT
-            // (typing ALT codes should not toggle menu)
-            if (this.lastKeyPressed === keyCodes.ALT) {
-              e.preventDefault()
+            e.preventDefault()
 
-              if (getSetting(settings.AUTO_HIDE_MENU)) {
-                windowActions.toggleMenubarVisible(null)
+            if (getSetting(settings.AUTO_HIDE_MENU)) {
+              windowActions.toggleMenubarVisible(null)
+            } else {
+              if (customTitlebar.menubarSelectedIndex) {
+                windowActions.setMenuBarSelectedIndex()
+                windowActions.setContextMenuDetail()
               } else {
-                if (customTitlebar.menubarSelectedIndex) {
-                  windowActions.setMenuBarSelectedIndex()
-                  windowActions.setContextMenuDetail()
-                } else {
-                  windowActions.setMenuBarSelectedIndex(0)
-                }
+                windowActions.setMenuBarSelectedIndex(0)
               }
             }
             break
@@ -177,6 +188,14 @@ class Main extends ImmutableComponent {
             }
             break
         }
+
+        // For ALT menu processing
+        if (Object.keys(this.keydown).length > 1) {
+          this.keydownHistory.push(e.which)
+        } else {
+          this.keydownHistory = []
+        }
+        delete this.keydown[e.which]
       })
 
       document.addEventListener('focus', (e) => {
@@ -528,6 +547,7 @@ class Main extends ImmutableComponent {
       windowActions.onFocusChanged(true)
     })
     currentWindow.on('blur', function () {
+      self.resetAltMenuProcessing()
       appActions.windowBlurred(currentWindow.id)
       windowActions.onFocusChanged(false)
     })
