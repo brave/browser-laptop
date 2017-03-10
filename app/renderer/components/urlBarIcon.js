@@ -11,40 +11,28 @@ const dndData = require('../../../js/dndData')
 const {isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
 const searchIconSize = 16
 
-const getIconCssClass = (ctx) => {
-  if (ctx.isSearch) {
-    return 'fa-search'
-  } else if (ctx.isAboutPage && !ctx.props.titleMode) {
-    return 'fa-list'
-  } else if (ctx.isSecure) {
-    // NOTE: EV style not approved yet; see discussion at https://github.com/brave/browser-laptop/issues/791
-    return 'fa-lock'
-  } else if (ctx.isInsecure) {
-    return 'fa-unlock'
-  }
-}
-
 class UrlBarIcon extends ImmutableComponent {
   constructor () {
     super()
     this.onClick = this.onClick.bind(this)
     this.onDragStart = this.onDragStart.bind(this)
   }
-  get isSecure () {
-    return this.props.isHTTPPage &&
-           this.props.isSecure &&
-           !this.props.active
-  }
-  /**
-   * insecure icon does not show when:
-   * - loading
-   * - in title mode
-   * - urlbar is active (ex: you can type)
-   */
-  get isInsecure () {
-    return this.props.isHTTPPage &&
-           this.props.isSecure === false &&
-           !this.props.active
+  get iconCssClasses () {
+    if (this.isSearch) {
+      return ['fa-search']
+    } else if (this.isAboutPage && !this.props.titleMode) {
+      return ['fa-list']
+    } else if (this.props.isHTTPPage && !this.props.active) {
+      // NOTE: EV style not approved yet; see discussion at https://github.com/brave/browser-laptop/issues/791
+      if (this.props.isSecure === true) {
+        return ['fa-lock']
+      } else if (this.props.isSecure === false) {
+        return ['fa-unlock', 'insecure-color']
+      } else if (this.props.isSecure === 1) {
+        return ['fa-unlock']
+      }
+    }
+    return []
   }
   /**
    * search icon:
@@ -55,7 +43,7 @@ class UrlBarIcon extends ImmutableComponent {
   get isSearch () {
     const showSearch = this.props.isSearching && !this.props.titleMode
 
-    const defaultToSearch = (!this.isSecure && !this.isInsecure && !showSearch) &&
+    const defaultToSearch = (!this.props.isHTTPPage || this.props.active) &&
                             !this.props.titleMode &&
                             !this.isAboutPage
 
@@ -69,12 +57,14 @@ class UrlBarIcon extends ImmutableComponent {
     if (this.props.activateSearchEngine) {
       return cx({urlbarIcon: true})
     }
-
-    return cx({
+    const iconClasses = {
       urlbarIcon: true,
-      'fa': true,
-      [ getIconCssClass(this) ]: true
+      fa: true
+    }
+    this.iconCssClasses.forEach((iconClass) => {
+      iconClasses[iconClass] = true
     })
+    return cx(iconClasses)
   }
   get iconStyles () {
     if (!this.props.activateSearchEngine) {
