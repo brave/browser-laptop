@@ -185,14 +185,16 @@ describe('MessageBox component tests', function () {
         yield this.app.client
           .ipcSend(messages.SHORTCUT_NEW_FRAME, page1)
           .waitForTabCount(2)
-          .waitForVisible('#thelink[href="page2.html"]', 1000)
+
+        yield this.app.client
+          .waitForVisible('#thelink[href="page2.html"]', 5000)
 
         // load a basic history for this tab
         yield this.app.client
-          .loadUrl(page2)
-          .waitForVisible('#thelink[href="page1.html"]', 1000)
-          .loadUrl(page1)
-          .waitForVisible('#thelink[href="page2.html"]', 1000)
+          .url(page2)
+          .waitForVisible('#thelink[href="page1.html"]', 5000)
+          .url(page1)
+          .waitForVisible('#thelink[href="page2.html"]', 5000)
       })
 
       it('lets you follow links in the tab', function * () {

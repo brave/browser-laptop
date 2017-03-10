@@ -2,3 +2,6 @@
 --timeout 600s
 --reporter spec
 --check-leaks
+--require babel-register
+--require babel-polyfill
+--recursive
