@@ -65,6 +65,10 @@ class Favicon extends ImmutableComponent {
       : null
   }
 
+  get narrowView () {
+    return this.props.tabProps.get('breakpoint') === 'smallest'
+  }
+
   render () {
     const iconStyles = StyleSheet.create({
       favicon: {backgroundImage: `url(${this.favicon})`}
@@ -73,7 +77,11 @@ class Favicon extends ImmutableComponent {
       ? <TabIcon
         data-test-favicon={this.favicon}
         data-test-id={this.loadingIcon ? 'loading' : 'defaultIcon'}
-        className={css(styles.icon, this.favicon && iconStyles.favicon)}
+        className={css(
+          styles.icon,
+          this.favicon && iconStyles.favicon,
+          this.narrowView && styles.faviconNarrowView
+        )}
         symbol={this.loadingIcon || this.defaultIcon} />
       : null
   }
@@ -272,6 +280,15 @@ const styles = StyleSheet.create({
 
   iconNarrowView: {
     padding: 0
+  },
+
+  faviconNarrowView: {
+    minWidth: globalStyles.spacing.narrowIconSize,
+    width: globalStyles.spacing.narrowIconSize,
+    backgroundSize: globalStyles.spacing.narrowIconSize,
+    padding: '0',
+    fontSize: '10px',
+    backgroundPosition: 'center center'
   },
 
   audioIcon: {
