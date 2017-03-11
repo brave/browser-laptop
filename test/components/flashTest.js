@@ -47,4 +47,26 @@ describe('flash install interception', function () {
         return this.getText(notificationBar).then((val) => val.includes('run Flash Player'))
       })
   })
+  it('shows flash notification bar when small element is loaded', function * () {
+    const flashUrl = Brave.server.url('flash_small.html')
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(flashUrl)
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForExist(notificationBar)
+      .waitUntil(function () {
+        return this.getText(notificationBar).then((val) => val.includes('run Flash Player'))
+      })
+  })
+  it('shows flash notification bar when invisible element is loaded', function * () {
+    const flashUrl = Brave.server.url('flash_invisible.html')
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(flashUrl)
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForExist(notificationBar)
+      .waitUntil(function () {
+        return this.getText(notificationBar).then((val) => val.includes('run Flash Player'))
+      })
+  })
 })
