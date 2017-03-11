@@ -33,11 +33,13 @@ class Stats extends ImmutableComponent {
       counter = Math.ceil(estimatedMillisecondsSaved / 1000 / 60)
       text = 'minutes'
     } else if (hours) {
-      counter = Math.ceil(estimatedMillisecondsSaved / 1000 / 60 / 60)
+      // Refer to http://stackoverflow.com/a/12830454/2950032 for the detailed reasoning behind the + after
+      // toFixed is applied. In a nutshell, + is used to discard unnecessary trailing 0s after calling toFixed
+      counter = +((estimatedMillisecondsSaved / 1000 / 60 / 60).toFixed(1))
       text = 'hours'
     } else {
       // Otherwise the output is in days
-      counter = Math.ceil(estimatedMillisecondsSaved / 1000 / 60 / 60 / 24)
+      counter = +((estimatedMillisecondsSaved / 1000 / 60 / 60 / 24).toFixed(2))
       text = 'days'
     }
 
