@@ -6,6 +6,7 @@ const urlParse = require('../../common/urlParse')
 const appConfig = require('../../../js/constants/appConfig')
 const _ = require('underscore')
 const Immutable = require('immutable')
+const {makeImmutable} = require('../../common/state/immutableUtil')
 
 const sigmoid = (t) => {
   return 1 / (1 + Math.pow(Math.E, -t))
@@ -177,6 +178,8 @@ var virtualSite = (sites) => {
  * @param {ImmutableList[ImmutableMap]} - history
  */
 module.exports.createVirtualHistoryItems = (historySites) => {
+  historySites = makeImmutable(historySites || {})
+
   // parse each history item
   var parsedHistorySites = historySites.map((site) => {
     return urlParse(site.get('location'))
