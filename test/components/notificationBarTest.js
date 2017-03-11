@@ -3,7 +3,7 @@
 const Brave = require('../lib/brave')
 const {notificationBar, titleBar, urlInput} = require('../lib/selectors')
 
-describe('notificationBar', function () {
+describe('notificationBar permissions', function () {
   function * setup (client) {
     yield client
       .waitForBrowserWindow()
@@ -14,12 +14,6 @@ describe('notificationBar', function () {
   Brave.beforeAll(this)
   before(function * () {
     this.notificationUrl = Brave.server.url('notification.html')
-    this.loginUrl1 = Brave.server.url('login1.html')
-    this.loginUrl2 = Brave.server.url('login2.html')
-    this.loginUrl3 = Brave.server.url('login3.html')
-    this.loginUrl4 = Brave.server.url('login4.html')
-    this.loginUrl5 = Brave.server.url('login5.html')
-    this.loginUrl6 = Brave.server.url('login6.html')
     yield setup(this.app.client)
   })
 
@@ -94,22 +88,49 @@ describe('notificationBar', function () {
         return this.getText(titleBar).then((val) => val.includes('granted'))
       })
   })
+})
+
+describe('notificationBar passwords', function () {
+  function * setup (client) {
+    yield client
+      .waitForBrowserWindow()
+      .waitForVisible(urlInput)
+  }
+
+  Brave.beforeAll(this)
+
+  beforeEach(function * () {
+    yield this.app.client
+      .waitForElementCount('.notificationItem', 0)
+  })
+
+  before(function * () {
+    this.loginUrl1 = Brave.server.url('login1.html')
+    this.loginUrl2 = Brave.server.url('login2.html')
+    this.loginUrl3 = Brave.server.url('login3.html')
+    this.loginUrl4 = Brave.server.url('login4.html')
+    this.loginUrl5 = Brave.server.url('login5.html')
+    this.loginUrl6 = Brave.server.url('login6.html')
+    yield setup(this.app.client)
+  })
 
   it('shows notification for login form', function * () {
     yield this.app.client
       .tabByIndex(0)
-      .loadUrl(this.loginUrl1)
+      .url(this.loginUrl1)
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(notificationBar)
       .waitUntil(function () {
-        return this.getText(notificationBar).then((val) => val.includes('localhost') && val.includes('brave_user'))
+        return this.getText(notificationBar).then((val) => {
+          return val.includes('localhost') && val.includes('brave_user')
+        })
       }).click('button=No')
   })
 
   it('does not include a password in the notification bar', function * () {
     yield this.app.client
       .tabByIndex(0)
-      .loadUrl(this.loginUrl6)
+      .url(this.loginUrl6)
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(notificationBar)
       .waitUntil(function () {
@@ -122,7 +143,7 @@ describe('notificationBar', function () {
   it('autofills remembered password on login form', function * () {
     yield this.app.client
       .tabByIndex(0)
-      .loadUrl(this.loginUrl1)
+      .url(this.loginUrl1)
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(notificationBar)
       .waitUntil(function () {
@@ -133,7 +154,7 @@ describe('notificationBar', function () {
       .waitForExist('[data-test-id="passwordItem"]')
       .windowByUrl(Brave.browserWindowUrl)
       .tabByIndex(0)
-      .loadUrl(this.loginUrl4)
+      .url(this.loginUrl4)
       .waitUntil(function () {
         return this.getValue('#user').then((val) => val === 'brave_user') &&
           this.getValue('#password').then((val) => val === 'testing') &&
@@ -145,10 +166,7 @@ describe('notificationBar', function () {
   it('autofills remembered password on login page with multiple forms', function * () {
     yield this.app.client
       .tabByIndex(0)
-      .loadUrl(this.loginUrl1)
-      .windowByUrl(Brave.browserWindowUrl)
-      .tabByIndex(0)
-      .loadUrl(this.loginUrl5)
+      .url(this.loginUrl5)
       .waitUntil(function () {
         return this.getValue('#user').then((val) => val === 'brave_user') &&
           this.getValue('#password').then((val) => val === 'testing') &&
@@ -160,7 +178,7 @@ describe('notificationBar', function () {
   it('does not show login form notification if user turns it off for the site', function * () {
     yield this.app.client
       .tabByIndex(0)
-      .loadUrl(this.loginUrl3)
+      .url(this.loginUrl3)
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(notificationBar)
       .waitUntil(function () {
@@ -168,7 +186,7 @@ describe('notificationBar', function () {
       })
       .click('button=Never for this site')
       .tabByIndex(0)
-      .loadUrl(this.loginUrl2)
+      .url(this.loginUrl2)
       .windowByUrl(Brave.browserWindowUrl)
       .isExisting(notificationBar).should.eventually.be.false
   })
