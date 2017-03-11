@@ -2,6 +2,7 @@
 const suggestion = require('../../../app/renderer/lib/suggestion')
 const assert = require('assert')
 const Immutable = require('immutable')
+const _ = require('underscore')
 
 require('../braveUnit')
 
@@ -68,13 +69,11 @@ const site3 = Immutable.Map({
 describe('suggestion', function () {
   it('shows virtual history item', function () {
     var history = Immutable.List([site1, site2, site3])
-    var virtual = suggestion.createVirtualHistoryItems(history)
-    assert.ok(virtual.length > 0, 'virtual location created')
-    assert.ok(virtual[0].get('location') === 'http://www.foo.com')
-    assert.ok(virtual[0].get('title') === 'www.foo.com')
-    assert.ok(virtual[0].get('lastAccessedTime') > 0)
-    history = Immutable.List([site1, site2])
-    virtual = suggestion.createVirtualHistoryItems(history)
-    assert.ok(virtual.length === 0, 'virtual location not created')
+    var virtual = suggestion.createVirtualHistoryItems(history).toJS()
+    var keys = _.keys(virtual)
+    assert.ok(keys.length > 0, 'virtual location created')
+    assert.ok(virtual[keys[0]].location === 'http://www.foo.com')
+    assert.ok(virtual[keys[0]].title === 'www.foo.com')
+    assert.ok(virtual[keys[0]].lastAccessedTime > 0)
   })
 })
