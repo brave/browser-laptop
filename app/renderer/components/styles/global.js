@@ -9,7 +9,7 @@ const globalStyles = {
       largeMedium: '83px',
       medium: '66px',
       mediumSmall: '53px',
-      small: '42px',
+      small: '46px',
       extraSmall: '33px',
       smallest: '19px'
     }
@@ -166,7 +166,6 @@ const globalStyles = {
     closeTab: 'fa fa-times-circle',
     defaultIcon: 'fa fa-file-o',
     loading: 'fa fa-spinner fa-spin',
-    newSession: 'fa fa-user',
     private: 'fa fa-eye',
     refresh: 'fa fa-refresh',
     remove: 'fa fa-times',

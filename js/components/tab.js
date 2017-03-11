@@ -287,6 +287,8 @@ class Tab extends ImmutableComponent {
         </div>
         <PrivateIcon tabProps={this.props.tab} />
         <NewSessionIcon
+          isActive={this.props.isActive}
+          paintTabs={this.props.paintTabs}
           tabProps={this.props.tab}
           l10nArgs={this.props.tab.get('partitionNumber')}
           l10nId='sessionInfoTab'

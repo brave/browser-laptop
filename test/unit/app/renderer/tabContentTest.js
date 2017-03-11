@@ -9,11 +9,13 @@ const Immutable = require('immutable')
 const assert = require('assert')
 const fakeElectron = require('../../lib/fakeElectron')
 const globalStyles = require('../../../../app/renderer/components/styles/global')
+const {tabs} = require('../../../../app/common/constants/appEnums')
 let Favicon, AudioTabIcon, PrivateIcon, NewSessionIcon, TabTitle, CloseTabIcon
 require('../../braveUnit')
 
 describe('tabContent components', function () {
   before(function () {
+    mockery.registerMock('../../extensions/brave/img/tabs/new_session.svg')
     mockery.enable({
       warnOnReplace: false,
       warnOnUnregistered: false,
@@ -209,11 +211,11 @@ describe('tabContent components', function () {
         <NewSessionIcon
           tabProps={
             Immutable.Map({
-              partitionNumber: true
+              partitionNumber: 1
             })}
         />
       )
-      assert.equal(wrapper.props().symbol, globalStyles.appIcons.newSession)
+      assert.equal(wrapper.props()['data-test-id'], 'newSessionIcon')
     })
     it('should not show new session icon if current tab is not private', function () {
       const wrapper = shallow(
@@ -224,32 +226,54 @@ describe('tabContent components', function () {
             })}
         />
       )
-      assert.notEqual(wrapper.props().symbol, globalStyles.appIcons.newSession)
+      assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
     })
     it('should not show new session icon if mouse is over tab (avoid icon overflow)', function () {
       const wrapper = shallow(
         <NewSessionIcon
           tabProps={
             Immutable.Map({
-              isPrivate: true,
+              partitionNumber: 1,
               hoverState: true
             })}
         />
       )
-      assert.notEqual(wrapper.props().symbol, globalStyles.appIcons.newSession)
+      assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
     })
     it('should not show new session icon if tab size is too small', function () {
       const wrapper = shallow(
         <NewSessionIcon
           tabProps={
             Immutable.Map({
-              isPrivate: true,
+              partitionNumber: 1,
               hoverState: true,
               breakpoint: 'small'
             })}
         />
       )
-      assert.notEqual(wrapper.props().symbol, globalStyles.appIcons.newSession)
+      assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
+    })
+    it('should show partition number for new sessions', function () {
+      const wrapper = shallow(
+        <NewSessionIcon
+          tabProps={
+            Immutable.Map({
+              partitionNumber: 3
+            })}
+        />
+      )
+      assert.equal(wrapper.props().symbolContent, 3)
+    })
+    it('should show max partition number even if session is bigger', function () {
+      const wrapper = shallow(
+        <NewSessionIcon
+          tabProps={
+            Immutable.Map({
+              partitionNumber: 1000
+            })}
+        />
+      )
+      assert.equal(wrapper.props().symbolContent, tabs.MAX_ALLOWED_NEW_SESSIONS)
     })
   })
 
