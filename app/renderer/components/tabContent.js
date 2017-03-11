@@ -8,6 +8,9 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('./styles/global')
 const {isWindows} = require('../../common/lib/platformUtil')
 const {getTextColorForBackground} = require('../../../js/lib/color')
+const {tabs} = require('../../common/constants/appEnums')
+
+const newSessionSvg = require('../../extensions/brave/img/tabs/new_session.svg')
 
 /**
  * Boilerplate component for all tab icons
@@ -17,13 +20,15 @@ class TabIcon extends ImmutableComponent {
     const tabIconStyle = {
       // Currently it's not possible to concatenate Aphrodite generated classes
       // and pre-built classes using default Aphrodite API, so we keep with inline-style
-      fontSize: 'inherit',
+      fontSize: this.props.symbolContent ? '8px' : 'inherit',
       display: 'flex',
       alignSelf: 'center',
       width: globalStyles.spacing.iconSize,
       height: globalStyles.spacing.iconSize,
       alignItems: 'center',
-      justifyContent: 'center'
+      justifyContent: this.props.symbolContent ? 'flex-end' : 'center',
+      fontWeight: this.props.symbolContent ? 'bold' : 'normal',
+      color: this.props.symbolContent ? globalStyles.color.black100 : 'inherit'
     }
     return <div
       className={this.props.className}
@@ -36,7 +41,7 @@ class TabIcon extends ImmutableComponent {
           data-test-id={this.props['data-test-id']}
           data-l10n-id={this.props.l10nId}
           data-l10n-args={JSON.stringify(this.props.l10nArgs || {})}
-          style={tabIconStyle} />
+          style={tabIconStyle}>{this.props.symbolContent}</span>
         : null
       }
     </div>
@@ -128,10 +133,39 @@ class NewSessionIcon extends ImmutableComponent {
     return sizes.includes(this.props.tabProps.get('breakpoint'))
   }
 
+  get partitionNumber () {
+    return this.props.tabProps.get('partitionNumber')
+  }
+
+  get partitionIndicator () {
+    // For now due to UI limitations set session up to 9 visually
+    return this.partitionNumber > tabs.MAX_ALLOWED_NEW_SESSIONS
+      ? tabs.MAX_ALLOWED_NEW_SESSIONS
+      : this.partitionNumber
+  }
+
+  get iconColor () {
+    const themeColor = this.props.tabProps.get('themeColor') || this.props.tabProps.get('computedThemeColor')
+    return this.props.paintTabs && themeColor
+      ? getTextColorForBackground(themeColor)
+      : globalStyles.color.black100
+  }
+
   render () {
-    return this.props.tabProps.get('partitionNumber') && !this.props.tabProps.get('hoverState') && !this.narrowView
-    ? <TabIcon className={css(styles.icon)} symbol={globalStyles.appIcons.newSession} {...this.props} />
-    : null
+    const newSession = StyleSheet.create({
+      indicator: {
+        // Based on getTextColorForBackground() icons can be only black or white.
+        filter: this.props.isActive && this.iconColor === 'white' ? 'invert(100%)' : 'none'
+      }
+    })
+
+    return this.partitionNumber && !this.props.tabProps.get('hoverState') && !this.narrowView
+      ? <TabIcon symbol
+        data-test-id='newSessionIcon'
+        className={css(styles.icon, styles.newSession, newSession.indicator)}
+        symbolContent={this.partitionIndicator}
+        {...this.props} />
+      : null
   }
 }
 
@@ -242,6 +276,12 @@ const styles = StyleSheet.create({
 
   audioIcon: {
     color: globalStyles.color.highlightBlue
+  },
+
+  newSession: {
+    position: 'relative',
+    backgroundImage: `url(${newSessionSvg})`,
+    backgroundPosition: 'left'
   },
 
   closeTab: {
