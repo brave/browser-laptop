@@ -19,6 +19,7 @@ describe('notificationBar', function () {
     this.loginUrl3 = Brave.server.url('login3.html')
     this.loginUrl4 = Brave.server.url('login4.html')
     this.loginUrl5 = Brave.server.url('login5.html')
+    this.loginUrl6 = Brave.server.url('login6.html')
     yield setup(this.app.client)
   })
 
@@ -102,6 +103,19 @@ describe('notificationBar', function () {
       .waitForExist(notificationBar)
       .waitUntil(function () {
         return this.getText(notificationBar).then((val) => val.includes('localhost') && val.includes('brave_user'))
+      }).click('button=No')
+  })
+
+  it('does not include a password in the notification bar', function * () {
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(this.loginUrl6)
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForExist(notificationBar)
+      .waitUntil(function () {
+        return this.getText(notificationBar).then((val) => {
+          return val.includes('your password') && !val.includes('secret')
+        })
       }).click('button=No')
   })
 
