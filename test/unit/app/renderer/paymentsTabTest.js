@@ -35,6 +35,8 @@ describe('PaymentsTab component', function () {
     mockery.registerMock('../../../extensions/brave/img/preferences/browser_prefs_payments.svg', 'browser_prefs_payments.svg')
     mockery.registerMock('../../../extensions/brave/img/preferences/browser_prefs_sync.svg', 'browser_prefs_sync.svg')
     mockery.registerMock('../../../extensions/brave/img/preferences/browser_prefs_advanced.svg', 'browser_prefs_advanced.svg')
+    mockery.registerMock('../../../extensions/brave/img/ledger/icon_settings.svg')
+    mockery.registerMock('../../../extensions/brave/img/ledger/icon_history.svg')
     mockery.registerMock('../../../../extensions/brave/img/ledger/verified_green_icon.svg')
     mockery.registerMock('../../../../extensions/brave/img/ledger/verified_white_icon.svg')
     mockery.registerMock('../../../../extensions/brave/img/private_internet_access.png')
@@ -128,11 +130,12 @@ describe('PaymentsTab component', function () {
     })
 
     it('renders payment history button (requires wallet and reconcileStamp)', function () {
+      const transactions = new Immutable.List().push(Immutable.Map({submissionStamp: '1'}))
       const wrapper = mount(
         <PaymentsTab
           showOverlay={function () {}}
           hideOverlay={function () {}}
-          ledgerData={Immutable.Map({created: true, transactions: {size: 3}, reconcileStamp: 1})} />
+          ledgerData={Immutable.Map({created: true, transactions: transactions, reconcileStamp: 1})} />
       )
       assert.equal(wrapper.find('[data-test-id="paymentHistoryButton"]').length, 1)
     })

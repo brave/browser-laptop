@@ -8,7 +8,6 @@ const {StyleSheet, css} = require('aphrodite')
 
 // Components
 const ImmutableComponent = require('../../../../js/components/immutableComponent')
-const Button = require('../../../../js/components/button')
 const ModalOverlay = require('../../../../js/components/modalOverlay')
 const {SettingCheckbox} = require('../settings')
 const DisabledContent = require('./payment/disabledContent')
@@ -22,8 +21,9 @@ const {LedgerRecoveryContent, LedgerRecoveryFooter} = require('./payment/ledgerR
 // style
 const cx = require('../../../../js/lib/classSet')
 const globalStyles = require('../styles/global')
-const commonStyles = require('../styles/commonStyles')
 const {paymentStyles} = require('../styles/payment')
+const advanceIcon = require('../../../extensions/brave/img/ledger/icon_settings.svg')
+const historyIcon = require('../../../extensions/brave/img/ledger/icon_history.svg')
 
 // other
 const getSetting = require('../../../../js/settings').getSetting
@@ -50,6 +50,16 @@ class PaymentsTab extends ImmutableComponent {
   handleSecondRecoveryKeyChange (key) {
     this.setState({SecondRecoveryKey: key})
     this.forceUpdate()
+  }
+
+  get hasWalletTransaction () {
+    const ledgerData = this.props.ledgerData
+    const walletCreated = ledgerData.get('created') && !ledgerData.get('creating')
+    const walletTransactions = ledgerData.get('transactions')
+    const walletHasReconcile = ledgerData.get('reconcileStamp')
+    const walletHasTransactions = walletTransactions && walletTransactions.size
+
+    return !(!walletCreated || !walletHasTransactions || !walletHasReconcile)
   }
 
   get enabled () {
@@ -149,17 +159,6 @@ class PaymentsTab extends ImmutableComponent {
         />
         : null
       }
-      <div className={css(styles.advancedSettingsWrapper)}>
-        {
-          this.props.ledgerData.get('created') && this.enabled
-          ? <Button
-            l10nId='advancedSettings'
-            className={css(commonStyles.whiteButton, styles.button)}
-            onClick={this.props.showOverlay.bind(this, 'advancedSettings')}
-          />
-          : null
-        }
-      </div>
       <div className={css(styles.titleBar)}>
         <div className='sectionTitleWrapper pull-left'>
           <span className='sectionTitle'>Brave Payments</span>
@@ -167,7 +166,7 @@ class PaymentsTab extends ImmutableComponent {
         </div>
         <div className={css(styles.paymentsSwitches)}>
           <div className={css(styles.switchWrap)} data-test-id='enablePaymentsSwitch'>
-            <span data-l10n-id='off' />
+            <span className={css(styles.switchSpan)} data-l10n-id='off' />
             <SettingCheckbox dataL10nId='on'
               prefKey={settings.PAYMENTS_ENABLED}
               settings={this.props.settings}
@@ -179,23 +178,44 @@ class PaymentsTab extends ImmutableComponent {
           {
             this.props.ledgerData.get('created') && this.enabled
             ? <div className={css(styles.switchWrap, styles.autoSuggestSwitch)}>
-              <SettingCheckbox dataL10nId='autoSuggestSites'
-                prefKey={settings.AUTO_SUGGEST_SITES}
-                settings={this.props.settings}
-                onChangeSetting={this.props.onChangeSetting}
-                switchClassName={css(styles.switchControl)}
-                labelClassName={css(styles.label)}
-              />
-              <a className={cx({
-                fa: true,
-                'fa-question-circle': true,
-                [css(styles.moreInfo)]: true,
-                [css(styles.moreInfoBtnSuggest)]: true
-              })}
-                href='https://brave.com/Payments_FAQ.html'
-                target='_blank'
-                data-l10n-id='paymentsFAQLink'
-              />
+              <div className={css(styles.mainIconsLeft)}>
+                <SettingCheckbox dataL10nId='autoSuggestSites'
+                  prefKey={settings.AUTO_SUGGEST_SITES}
+                  settings={this.props.settings}
+                  onChangeSetting={this.props.onChangeSetting}
+                  switchClassName={css(styles.switchControl)}
+                />
+                <a className={cx({
+                  fa: true,
+                  'fa-question-circle': true,
+                  [css(styles.moreInfo)]: true,
+                  [css(styles.moreInfoBtnSuggest)]: true
+                })}
+                  href='https://brave.com/Payments_FAQ.html'
+                  target='_blank'
+                  data-l10n-id='paymentsFAQLink'
+                />
+              </div>
+              <div className={css(styles.mainIconsRight)}>
+                {
+                  this.hasWalletTransaction && this.enabled
+                    ? <a
+                      data-test-id='paymentHistoryButton'
+                      className={css(styles.mainIcons, styles.historyIcon)}
+                      onClick={this.props.showOverlay.bind(this, 'paymentHistory')}
+                    />
+                    : null
+                }
+                {
+                  this.props.ledgerData.get('created') && this.enabled
+                    ? <a
+                      className={css(styles.mainIcons, styles.advanceIcon)}
+                      data-test-id='advancedSettingsButton'
+                      onClick={this.props.showOverlay.bind(this, 'advancedSettings')}
+                    />
+                    : null
+                }
+              </div>
             </div>
             : null
           }
@@ -221,49 +241,75 @@ const styles = StyleSheet.create({
     overflowX: 'hidden',
     width: '805px'
   },
-  advancedSettingsWrapper: {
-    textAlign: 'right',
-    marginRight: '15px',
-    marginBottom: '7.5px',
-    position: 'relative',
-    left: '3px'
-  },
-  button: {
-    minWidth: '235px'
-  },
   titleBar: {
     overflow: 'hidden',
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginTop: '15px'
   },
   paymentsSwitches: {
-    display: 'flex'
+    display: 'flex',
+    marginTop: '2px',
+    minHeight: '29px'
   },
   switchWrap: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     width: paymentStyles.width.tableCell
   },
   switchControl: {
     paddingTop: 0,
     paddingBottom: 0
   },
+  switchSpan: {
+    color: '#999',
+    fontWeight: 'bold'
+  },
   autoSuggestSwitch: {
     position: 'relative',
-    left: '-5px'
+    left: '-5px',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between'
   },
   moreInfo: {
     fontWeight: 'bold',
     fontSize: paymentStyles.font.regular,
-    color: globalStyles.color.gray
+    color: '#c7c7c7'
   },
   moreInfoBtnSuggest: {
     marginLeft: '7px',
+    marginTop: '4px',
     cursor: 'pointer',
     textDecoration: 'none'
   },
   label: {
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    color: globalStyles.color.braveOrange
+  },
+  mainIcons: {
+    backgroundColor: globalStyles.color.braveOrange,
+    width: '25px',
+    height: '26px',
+    display: 'inline-block',
+    marginLeft: '7px',
+    position: 'relative',
+    top: '7px',
+
+    ':hover': {
+      backgroundColor: globalStyles.color.braveDarkOrange
+    }
+  },
+  mainIconsLeft: {
+    display: 'flex'
+  },
+  mainIconsRight: {
+    paddingRight: '10px'
+  },
+  historyIcon: {
+    '-webkit-mask-image': `url(${historyIcon})`
+  },
+  advanceIcon: {
+    '-webkit-mask-image': `url(${advanceIcon})`
   }
 })
 

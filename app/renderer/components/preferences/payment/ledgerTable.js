@@ -168,9 +168,9 @@ class LedgerTable extends ImmutableComponent {
         defaultHeading='rank'
         headerClassNames={css(styles.tableTh)}
         columnClassNames={this.columnClassNames}
-        rowClassNames={this.synopsis.map(item => this.enabledForSite(item)
-          ? css(styles.tableTr)
-          : css(styles.tableTr, styles.paymentsDisabled)
+        rowClassNames={this.synopsis.map((item, i) => this.enabledForSite(item)
+          ? css(styles.tableTr, i % 2 && styles.tableTdBg)
+          : css(styles.tableTr, styles.paymentsDisabled, i % 2 && styles.tableTdBg)
         ).toJS()}
         onContextMenu={aboutActions.contextMenu}
         contextMenuName='synopsis'
@@ -232,6 +232,10 @@ const styles = StyleSheet.create({
   tableTd: {
     position: 'relative',
     padding: '0 15px'
+  },
+
+  tableTdBg: {
+    background: '#f6f7f7'
   },
 
   siteData: {

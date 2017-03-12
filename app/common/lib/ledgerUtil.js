@@ -74,9 +74,9 @@ module.exports.formattedTimeFromNow = (timestamp) => {
   return moment(new Date(timestamp)).fromNow()
 }
 
-module.exports.formattedDateFromTimestamp = (timestamp) => {
+module.exports.formattedDateFromTimestamp = (timestamp, format) => {
   moment.locale(navigator.language)
-  return moment(new Date(timestamp)).format('YYYY-MM-DD')
+  return moment(new Date(timestamp)).format(format)
 }
 
 module.exports.walletStatus = (ledgerData) => {

@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     width: '280px'
   },
   readOnly: {
-    background: globalStyles.color.veryLightGray,
+    background: globalStyles.color.lightGray,
     boxShadow: 'none',
     outline: 'none'
   },

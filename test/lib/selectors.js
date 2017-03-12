@@ -74,7 +74,7 @@ module.exports = {
   siteSettingItem: '.siteSettingItem',
   ledgerTable: '[data-test-id="ledgerTable"]',
   bitcoinDashboard: '[data-test-id="bitcoinDashboard"]',
-  advancedSettingsButton: '[data-l10n-id="advancedSettings"]',
+  advancedSettingsButton: '[data-test-id="advancedSettingsButton"]',
   backupWallet: '[data-l10n-id="backupLedger"]',
   recoverWallet: '[data-l10n-id="recoverLedger"]',
   recoverWalletFromFileButton: '[data-l10n-id="recoverFromFile"]',
