@@ -144,6 +144,13 @@ module.exports = { "providers" :
       "search" : "https://www.ecosia.org/search?q={searchTerms}",
       "autocomplete": "https://ac.ecosia.org/autocomplete?q={searchTerms}&type=list",
       "shortcut" : ":e"
+    },
+    {
+      "name" : "searx",
+      "base" : "https://searx.me",
+      "image" : "https://searx.me/favicon.ico",
+      "search" : "https://searx.me/?q={searchTerms}&categories=general",
+      "shortcut" : ":x"
     }
   ]
 }
