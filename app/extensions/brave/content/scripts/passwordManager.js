@@ -198,6 +198,16 @@ if (chrome.contentSettings.passwordManager == 'allow') {
     // Last resort: find the first text input in the form
     username = username || form.querySelector('input[type=text i]')
 
+    // If the username turns out to be a password field, just ignore it so
+    // we don't show the password in plaintext.
+    if (username) {
+      let autocomplete = username.getAttribute('autocomplete')
+      if (username.getAttribute('type') === 'password' ||
+        (autocomplete && autocomplete.includes('password'))) {
+        username = null
+      }
+    }
+
     // If not a submission, autofill the first password field and ignore the rest
     if (!isSubmission || passwords.length === 1) {
       return [username instanceof HTMLInputElement ? username : null, passwords[0], null]
