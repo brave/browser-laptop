@@ -94,7 +94,7 @@ class ContextMenuItem extends ImmutableComponent {
       const parentBoundingRect = parentNode.getBoundingClientRect()
       const boundingRect = node.getBoundingClientRect()
       openedSubmenuDetails = openedSubmenuDetails.push(Immutable.fromJS({
-        y: boundingRect.top - parentBoundingRect.top - 1,
+        y: boundingRect.top - parentBoundingRect.top - 1 + parentNode.scrollTop,
         template: this.submenu
       }))
     }
@@ -218,7 +218,7 @@ class ContextMenuSingle extends ImmutableComponent {
   render () {
     const styles = {}
     if (this.props.y) {
-      styles.top = this.props.y
+      styles.marginTop = this.props.y
     }
     const visibleMenuItems = this.props.template.filter((element) => {
       return element.has('visible')
@@ -265,6 +265,10 @@ class ContextMenu extends ImmutableComponent {
   componentDidMount () {
     window.addEventListener('keydown', this.onKeyDown)
     window.addEventListener('keyup', this.onKeyUp)
+
+    if (this.node) {
+      this.node.addEventListener('auxclick', this.onAuxClick.bind(this))
+    }
   }
 
   componentWillUnmount () {
@@ -381,6 +385,10 @@ class ContextMenu extends ImmutableComponent {
     setImmediate(() => windowActions.resetMenuState())
   }
 
+  onAuxClick () {
+    setImmediate(() => windowActions.resetMenuState())
+  }
+
   getTemplateItemsOnly (template) {
     return template.filter((element) => {
       if (element.get('type') === separatorMenuItem.type) return false
@@ -443,7 +451,7 @@ class ContextMenu extends ImmutableComponent {
       styles.right = this.props.contextMenuDetail.get('right')
     }
     if (this.props.contextMenuDetail.get('top') !== undefined) {
-      styles.top = this.props.contextMenuDetail.get('top')
+      styles.marginTop = this.props.contextMenuDetail.get('top')
     }
     if (this.props.contextMenuDetail.get('bottom') !== undefined) {
       styles.bottom = this.props.contextMenuDetail.get('bottom')
@@ -455,6 +463,7 @@ class ContextMenu extends ImmutableComponent {
       styles.maxHeight = this.props.contextMenuDetail.get('maxHeight')
     }
     return <div
+      ref={(node) => { this.node = node }}
       className={cx({
         contextMenu: true,
         reverseExpand: this.props.contextMenuDetail.get('right') !== undefined,
