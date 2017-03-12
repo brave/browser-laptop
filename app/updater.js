@@ -36,7 +36,8 @@ var debug = function (contents) {
 var platforms = {
   'darwin': 'osx',
   'win32x64': 'winx64',
-  'win32ia32': 'winia32'
+  'win32ia32': 'winia32',
+  'linux': 'linux'
 }
 
 // We are storing this as a package variable because a number of functions need access
@@ -52,7 +53,7 @@ exports.updateUrl = function (updates, platform, arch) {
   }
   platformBaseUrl = `${updates.baseUrl}/${Channel.channel()}/${version}/${platforms[platform]}`
   debug(`platformBaseUrl = ${platformBaseUrl}`)
-  if (platform === 'darwin') {
+  if (platform === 'darwin' || platform === 'linux') {
     return platformBaseUrl
   } else {
     if (platform.match(/^win32/)) {
