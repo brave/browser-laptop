@@ -39,7 +39,7 @@ describe('suggestion unit tests', function () {
 
   describe('createVirtualHistoryItems', function () {
     it('handles input being null/undefined', function () {
-      const emptyResult = Immutable.Map().toArray()
+      const emptyResult = Immutable.Map()
       assert.deepEqual(suggestion.createVirtualHistoryItems(), emptyResult)
       assert.deepEqual(suggestion.createVirtualHistoryItems(undefined), emptyResult)
       assert.deepEqual(suggestion.createVirtualHistoryItems(null), emptyResult)
