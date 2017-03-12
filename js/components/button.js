@@ -11,6 +11,8 @@ class Button extends ImmutableComponent {
     if (this.props.iconClass) {
       return <button disabled={this.props.disabled}
         data-l10n-id={this.props.l10nId}
+        data-test-id={this.props.testId}
+        data-test2-id={this.props.test2Id}
         style={this.props.inlineStyles}
         data-button-value={this.props.dataButtonValue}
         className={cx({
@@ -23,6 +25,8 @@ class Button extends ImmutableComponent {
     }
     return <button disabled={this.props.disabled}
       data-l10n-id={this.props.l10nId}
+      data-test-id={this.props.testId}
+      data-test2-id={this.props.test2Id}
       data-l10n-args={JSON.stringify(this.props.l10nArgs || {})}
       style={this.props.inlineStyles}
       className={cx({

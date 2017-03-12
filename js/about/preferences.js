@@ -10,7 +10,6 @@ const UrlUtil = require('../lib/urlutil')
 
 // Components
 const PreferenceNavigation = require('../../app/renderer/components/preferences/preferenceNavigation')
-const ModalOverlay = require('../components/modalOverlay')
 const {SettingsList, SettingItem, SettingCheckbox} = require('../../app/renderer/components/settings')
 const {SettingTextbox} = require('../../app/renderer/components/textbox')
 const {SettingDropdown} = require('../../app/renderer/components/dropdown')
@@ -29,7 +28,6 @@ const preferenceTabs = require('../constants/preferenceTabs')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const {changeSetting} = require('../../app/renderer/lib/settingsUtil')
-const coinbaseCountries = require('../constants/coinbaseCountries')
 const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
 const {startsWithOption, newTabMode, bookmarksToolbarMode, tabCloseAction, fullscreenOption} = require('../../app/common/constants/settingsEnums')
 
@@ -83,224 +81,6 @@ const braveryPermissionNames = {
   'httpsEverywhere': ['boolean'],
   'fingerprintingProtection': ['boolean'],
   'noScript': ['boolean', 'number']
-}
-
-class BitcoinDashboard extends ImmutableComponent {
-  constructor () {
-    super()
-    this.buyCompleted = false
-    this.openBuyURLTab = this.openBuyURLTab.bind(this)
-  }
-  openBuyURLTab () {
-    // close parent dialog
-    this.props.hideParentOverlay()
-  }
-  get ledgerData () {
-    return this.props.ledgerData
-  }
-  get bitcoinOverlayContent () {
-    return <iframe src={this.ledgerData.get('buyURL')} />
-  }
-  get bitcoinPurchaseButton () {
-    if (!this.ledgerData.get('buyURLFrame')) return <Button l10nId='add' className='primaryButton' onClick={this.props.showOverlay.bind(this)} />
-    return <a href={this.ledgerData.get('buyURL')} target='_blank' onClick={this.openBuyURLTab}><Button l10nId='add' className='primaryButton' /></a>
-  }
-  get qrcodeOverlayContent () {
-    return <div>
-      <img src={this.ledgerData.get('paymentIMG')} title='Brave wallet QR code' />
-      <div className='bitcoinQRTitle' data-l10n-id='bitcoinQR' />
-    </div>
-  }
-  get qrcodeOverlayFooter () {
-    if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
-      return <div className='qrcodeOverlayFooter'>
-        <div className='coinbaseLogo' />
-        <a target='_blank' className='appstoreLogo' href='https://itunes.apple.com/us/app/coinbase-bitcoin-wallet/id886427730?mt=8' />
-        <a target='_blank' className='playstoreLogo' href='https://play.google.com/store/apps/details?id=com.coinbase.android' />
-      </div>
-    } else {
-      return null
-    }
-  }
-  get currency () {
-    return this.props.ledgerData.get('currency') || 'USD'
-  }
-  get amount () {
-    return getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, this.props.settings) || 0
-  }
-  get canUseCoinbase () {
-    if (!this.props.ledgerData.get('buyMaximumUSD')) return true
-
-    return this.currency === 'USD' && this.amount < this.props.ledgerData.get('buyMaximumUSD')
-  }
-  get userInAmerica () {
-    const countryCode = this.props.ledgerData.get('countryCode')
-    return !(countryCode && countryCode !== 'US')
-  }
-  get worldWidePanel () {
-    return <div className='panel'>
-      <div className='settingsPanelDivider'>
-        <span className='fa fa-credit-card' />
-        <div className='settingsListTitle' data-l10n-id='outsideUSAPayment' />
-      </div>
-      <div className='settingsPanelDivider'>
-        <a target='_blank' href='https://www.buybitcoinworldwide.com/'>
-          <button className='browserButton primaryButton'>buybitcoinworldwide.com</button>
-        </a>
-      </div>
-    </div>
-  }
-  get coinbasePanel () {
-    if (this.canUseCoinbase) {
-      return <div className='panel'>
-        <div className='settingsPanelDivider'>
-          <span className='fa fa-credit-card' />
-          <div className='settingsListTitle' data-l10n-id='moneyAdd' />
-          <div className='settingsListTitle subTitle' data-l10n-id='moneyAddSubTitle' />
-        </div>
-        <div className='settingsPanelDivider'>
-          {this.bitcoinPurchaseButton}
-          <div className='settingsListTitle subTitle' data-l10n-id='transferTime' />
-        </div>
-      </div>
-    } else {
-      return <div className='panel disabledPanel'>
-        <div className='settingsPanelDivider'>
-          <span className='fa fa-credit-card' />
-          <div className='settingsListTitle' data-l10n-id='moneyAdd' />
-          <div className='settingsListTitle subTitle' data-l10n-id='moneyAddSubTitle' />
-        </div>
-        <div className='settingsPanelDivider'>
-          <div data-l10n-id='coinbaseNotAvailable' />
-        </div>
-      </div>
-    }
-  }
-  get exchangePanel () {
-    const url = this.props.ledgerData.getIn(['exchangeInfo', 'exchangeURL'])
-    const name = this.props.ledgerData.getIn(['exchangeInfo', 'exchangeName'])
-    // Call worldWidePanel if we don't have the URL or Name
-    if (!url || !name) {
-      return this.worldWidePanel
-    } else {
-      return <div className='panel'>
-        <div className='settingsPanelDivider'>
-          <span className='fa fa-credit-card' />
-          <div className='settingsListTitle' data-l10n-id='outsideUSAPayment' />
-        </div>
-        <div className='settingsPanelDivider'>
-          <a target='_blank' href={url}>
-            <button className='browserButton primaryButton'>{name}</button>
-          </a>
-        </div>
-      </div>
-    }
-  }
-  get smartphonePanel () {
-    return <div className='panel'>
-      <div className='settingsPanelDivider'>
-        <span className='fa fa-mobile' />
-        <div className='settingsListTitle' data-l10n-id='smartphoneTitle' />
-      </div>
-      <div className='settingsPanelDivider'>
-        <Button l10nId='displayQRCode' className='primaryButton' onClick={this.props.showQRcode.bind(this)} />
-      </div>
-    </div>
-  }
-  get panelFooter () {
-    if (this.ledgerData.get('buyURLFrame')) {
-      return <div className='panelFooter'>
-        <Button l10nId='done' className='whiteButton' onClick={this.props.hideParentOverlay} />
-      </div>
-    } else if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
-      return <div className='panelFooter coinbaseFooter'>
-        <div className='coinbase'>
-          <div className='coinbaseLogo' />
-          <span className='coinbaseMessage' data-l10n-id='coinbaseMessage' />
-        </div>
-        <Button l10nId='done' className='whiteButton' onClick={this.props.hideParentOverlay} />
-      </div>
-    } else {
-      return <div className='panelFooter'>
-        <Button l10nId='done' className='whiteButton' onClick={this.props.hideParentOverlay} />
-      </div>
-    }
-  }
-  copyToClipboard (text) {
-    aboutActions.setClipboard(text)
-  }
-  onMessage (e) {
-    if (!e.data || e.origin !== config.coinbaseOrigin) {
-      return
-    }
-    if (e.data.event === 'modal_closed') {
-      if (this.buyCompleted) {
-        this.props.hideParentOverlay()
-        this.buyCompleted = false
-      } else {
-        this.props.hideOverlay()
-      }
-    } else if (e.data.event === 'buy_completed') {
-      this.buyCompleted = true
-    }
-  }
-  render () {
-    window.addEventListener('message', this.onMessage.bind(this), false)
-    var emptyDialog = true
-    return <div className='bitcoinDashboard'>
-      {
-      this.props.bitcoinOverlayVisible
-        ? <ModalOverlay title={'bitcoinBuy'} content={this.bitcoinOverlayContent} customTitleClasses={'coinbaseOverlay'} emptyDialog={emptyDialog} onHide={this.props.hideOverlay.bind(this)} />
-        : null
-      }
-      {
-        this.props.qrcodeOverlayVisible
-        ? <ModalOverlay content={this.qrcodeOverlayContent} customTitleClasses={'qrcodeOverlay'} footer={this.qrcodeOverlayFooter} onHide={this.props.hideQRcode.bind(this)} />
-        : null
-      }
-      <div className='board addFundsBoard'>
-        {
-          (this.userInAmerica || this.ledgerData.get('buyURLFrame'))
-          ? this.coinbasePanel
-          : this.exchangePanel
-        }
-        <div className='panel'>
-          <div className='settingsPanelDivider'>
-            <span className='bitcoinIcon fa-stack fa-lg'>
-              <span className='fa fa-circle fa-stack-2x' />
-              <span className='fa fa-bitcoin fa-stack-1x' />
-            </span>
-            <div className='settingsListTitle' data-l10n-id='bitcoinAdd' />
-            <div className='settingsListTitle subTitle' data-l10n-id='bitcoinAddDescription' />
-          </div>
-          {
-            this.ledgerData.get('address')
-              ? <div className='settingsPanelDivider'>
-                {
-                  this.ledgerData.get('hasBitcoinHandler') && this.ledgerData.get('paymentURL')
-                    ? <div className='hasBitcoinHandler'>
-                      <a href={this.ledgerData.get('paymentURL')} target='_blank'>
-                        <Button l10nId='bitcoinVisitAccount' className='primaryButton bitcoinAddressButton' />
-                      </a>
-                      <div data-l10n-id='bitcoinAddress' className='walletLabelText' />
-                    </div>
-                    : <div>
-                      <div data-l10n-id='bitcoinPaymentURL' className='walletLabelText' />
-                    </div>
-                }
-                <div className='walletAddressText'>{this.ledgerData.get('address')}</div>
-                <Button className='primaryButton' l10nId='copyToClipboard' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('address'))} />
-              </div>
-            : <div className='settingsPanelDivider'>
-              <div data-l10n-id='bitcoinWalletNotAvailable' />
-            </div>
-          }
-        </div>
-        {this.smartphonePanel}
-        {this.panelFooter}
-      </div>
-    </div>
-  }
 }
 
 class GeneralTab extends ImmutableComponent {
@@ -1138,6 +918,5 @@ class AboutPreferences extends React.Component {
 }
 
 module.exports = {
-  AboutPreferences: <AboutPreferences />,
-  BitcoinDashboard
+  AboutPreferences: <AboutPreferences />
 }

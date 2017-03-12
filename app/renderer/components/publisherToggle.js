@@ -140,23 +140,27 @@ const styles = StyleSheet.create({
   },
 
   noFundVerified: {
+    border: 'none',
     backgroundImage: `url(${noFundVerifiedPublisherImage})`,
     backgroundSize: '18px',
     marginLeft: '2px'
   },
 
   fundVerified: {
+    border: 'none',
     backgroundImage: `url(${fundVerifiedPublisherImage})`,
     backgroundSize: '18px',
     marginLeft: '2px'
   },
 
   noFundUnverified: {
+    border: 'none',
     backgroundImage: `url(${noFundUnverifiedPublisherImage})`,
     backgroundSize: '18px'
   },
 
   fundUnverified: {
+    border: 'none',
     backgroundImage: `url(${fundUnverifiedPublisherImage})`,
     backgroundSize: '18px'
   }

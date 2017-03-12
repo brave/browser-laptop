@@ -4,20 +4,31 @@
 
 const React = require('react')
 const Immutable = require('immutable')
-const ImmutableComponent = require('../../../../js/components/immutableComponent')
 const {StyleSheet, css} = require('aphrodite')
-const globalStyles = require('../styles/global')
-const {addExportFilenamePrefixToTransactions} = require('../../../common/lib/ledgerExportUtil')
-const appUrlUtil = require('../../../../js/lib/appUrlUtil')
+
+// util
+const {addExportFilenamePrefixToTransactions} = require('../../../../common/lib/ledgerExportUtil')
+const {formattedTimeFromNow} = require('../../../../common/lib/ledgerUtil')
+const appUrlUtil = require('../../../../../js/lib/appUrlUtil')
+
+// components
+const Button = require('../../../../../js/components/button')
+const ImmutableComponent = require('../../../../../js/components/immutableComponent')
+
+// style
+const globalStyles = require('../../styles/global')
+const commonStyles = require('../../styles/commonStyles')
+
+// other
 const aboutUrls = appUrlUtil.aboutUrls
 const aboutContributionsUrl = aboutUrls.get('about:contributions')
 const moment = require('moment')
 moment.locale(navigator.language)
 
-class PaymentHistory extends ImmutableComponent {
+class HistoryContent extends ImmutableComponent {
   render () {
     const transactions = Immutable.fromJS(
-        addExportFilenamePrefixToTransactions(this.props.ledgerData.get('transactions').toJS())
+      addExportFilenamePrefixToTransactions(this.props.ledgerData.get('transactions').toJS())
     )
 
     return <table className={css(styles.paymentHistoryTable)}>
@@ -30,14 +41,14 @@ class PaymentHistory extends ImmutableComponent {
       </thead>
       <tbody>
         {
-          transactions.map(row => <PaymentHistoryRow transaction={row} ledgerData={this.props.ledgerData} />)
+          transactions.map(row => <HistoryRow transaction={row} ledgerData={this.props.ledgerData} />)
         }
       </tbody>
     </table>
   }
 }
 
-class PaymentHistoryRow extends ImmutableComponent {
+class HistoryRow extends ImmutableComponent {
   get transaction () {
     return this.props.transaction
   }
@@ -80,6 +91,37 @@ class PaymentHistoryRow extends ImmutableComponent {
         <a href={`${aboutContributionsUrl}#${this.viewingId}`} target='_blank'>{this.receiptFileName}</a>
       </td>
     </tr>
+  }
+}
+
+class HistoryFooter extends ImmutableComponent {
+  render () {
+    const ledgerData = this.props.ledgerData
+    if (!ledgerData.get('reconcileStamp')) {
+      return null
+    }
+
+    const timestamp = ledgerData.get('reconcileStamp')
+    const now = new Date().getTime()
+    let l10nDataId = 'paymentHistoryFooterText'
+    if (timestamp <= now) {
+      l10nDataId = (timestamp <= (now - (24 * 60 * 60 * 1000)))
+        ? 'paymentHistoryOverdueFooterText' : 'paymentHistoryDueFooterText'
+    }
+
+    const l10nDataArgs = {
+      reconcileDate: formattedTimeFromNow(timestamp)
+    }
+
+    return <div className={css(styles.historyFooter)}>
+      <div className={css(styles.nextPayment)}>
+        <span data-l10n-id={l10nDataId} data-l10n-args={JSON.stringify(l10nDataArgs)} />
+      </div>
+      <Button l10nId='paymentHistoryOKText'
+        className={css(commonStyles.buttonPrimary)}
+        onClick={this.props.hideOverlay.bind(this, 'paymentHistory')}
+      />
+    </div>
   }
 }
 
@@ -139,7 +181,18 @@ const styles = StyleSheet.create({
   wide: {
     color: '#777',
     flex: '4'
+  },
+  historyFooter: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  nextPayment: {
+    fontSize: '14px'
   }
 })
 
-module.exports = PaymentHistory
+module.exports = {
+  HistoryContent,
+  HistoryFooter
+}
