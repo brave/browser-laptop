@@ -6,7 +6,7 @@ const React = require('react')
 const {StyleSheet, css} = require('aphrodite')
 
 // util
-const {btcToCurrencyString, formattedTimeFromNow, walletStatus} = require('../../../../common/lib/ledgerUtil')
+const {btcToCurrencyString, formattedDateFromTimestamp, walletStatus} = require('../../../../common/lib/ledgerUtil')
 const {l10nErrorText} = require('../../../../common/lib/httpUtil')
 const {changeSetting} = require('../../../lib/settingsUtil')
 
@@ -46,44 +46,6 @@ class EnabledContent extends ImmutableComponent {
       test2Id={'addFunds'}
       l10nId={buttonText}
       className={css(commonStyles.buttonPrimary, styles.addFunds)}
-      onClick={onButtonClick.bind(this)}
-      disabled={ledgerData.get('creating')}
-    />
-  }
-
-  paymentHistoryButton () {
-    const ledgerData = this.props.ledgerData
-    const walletCreated = ledgerData.get('created') && !ledgerData.get('creating')
-    const walletTransactions = ledgerData.get('transactions')
-    const walletHasTransactions = walletTransactions && walletTransactions.size
-    const nextReconcileDateValue = this.nextReconcileDate()
-    let buttonText
-
-    if (!walletCreated || !nextReconcileDateValue) {
-      return null
-    } else if (!walletHasTransactions) {
-      buttonText = 'noPaymentHistory'
-      const now = new Date().getTime()
-      const timestamp = this.props.ledgerData.get('reconcileStamp')
-      if (timestamp <= now) {
-        buttonText = (timestamp <= (now - (24 * 60 * 60 * 1000)))
-          ? 'noPaymentOverDueHistory' : 'noPaymentDueHistory'
-      }
-    } else {
-      buttonText = 'viewPaymentHistory'
-    }
-
-    const l10nDataArgs = {
-      reconcileDate: nextReconcileDateValue
-    }
-
-    const onButtonClick = this.props.showOverlay.bind(this, 'paymentHistory')
-
-    return <Button
-      testId='paymentHistoryButton'
-      className={css(styles.paymentHistoryButton)}
-      l10nId={buttonText}
-      l10nArgs={l10nDataArgs}
       onClick={onButtonClick.bind(this)}
       disabled={ledgerData.get('creating')}
     />
@@ -135,13 +97,46 @@ class EnabledContent extends ImmutableComponent {
     </div>
   }
 
+  lastReconcileMessage () {
+    const ledgerData = this.props.ledgerData
+    const walletCreated = ledgerData.get('created') && !ledgerData.get('creating')
+    const walletTransactions = ledgerData.get('transactions')
+    const walletHasTransactions = walletTransactions && walletTransactions.size
+    const walletHasReconcile = ledgerData.get('reconcileStamp')
+    let prevReconcileDateValue
+    let text
+
+    if (!walletCreated || !walletHasReconcile) {
+      return null
+    } else if (!walletHasTransactions) {
+      text = 'noPaymentHistory'
+    } else {
+      text = 'viewPaymentHistory'
+      prevReconcileDateValue = this.lastReconcileDate(walletTransactions.last())
+    }
+
+    const l10nDataArgs = {
+      date: prevReconcileDateValue
+    }
+
+    return <div className={css(styles.contribution, styles.lastContribution)}>
+      <div data-l10n-id='lastContribution' />
+      <div data-l10n-id={text} data-l10n-args={JSON.stringify(l10nDataArgs)} />
+    </div>
+  }
+
+  lastReconcileDate (transaction) {
+    const timestamp = transaction.get('submissionStamp')
+    return formattedDateFromTimestamp(timestamp, 'MMMM Do')
+  }
+
   nextReconcileDate () {
     const ledgerData = this.props.ledgerData
     if ((ledgerData.get('error')) || (!ledgerData.get('reconcileStamp'))) {
       return null
     }
     const timestamp = ledgerData.get('reconcileStamp')
-    return formattedTimeFromNow(timestamp)
+    return formattedDateFromTimestamp(timestamp, 'MMMM Do')
   }
 
   nextReconcileMessage () {
@@ -156,14 +151,17 @@ class EnabledContent extends ImmutableComponent {
     let l10nDataId = 'statusNextReconcileDate'
     if (timestamp <= now) {
       l10nDataId = (timestamp <= (now - (24 * 60 * 60 * 1000)))
-        ? 'paymentHistoryOverdueFooterText' : 'statusNextReconcileToday'
+        ? 'statusNextReconcileOverdue' : 'statusNextReconcileToday'
     }
 
     const l10nDataArgs = {
       reconcileDate: nextReconcileDateRelative
     }
 
-    return <div className={css(styles.nextReconcileDate)} data-l10n-args={JSON.stringify(l10nDataArgs)} data-l10n-id={l10nDataId} />
+    return <div className={css(styles.contribution, styles.nextContribution)}>
+      <div data-l10n-id='nextContribution' />
+      <div data-l10n-args={JSON.stringify(l10nDataArgs)} data-l10n-id={l10nDataId} />
+    </div>
   }
 
   render () {
@@ -177,7 +175,7 @@ class EnabledContent extends ImmutableComponent {
             <tr className={css(styles.tableTr)}>
               <th className={css(styles.tableTh)} data-l10n-id='monthlyBudget' />
               <th className={css(styles.tableTh)} data-l10n-id='accountBalance' />
-              <th className={css(styles.tableTh)} data-l10n-id='status' />
+              <th className={css(styles.tableTh)} />
             </tr>
           </thead>
           <tbody>
@@ -197,7 +195,7 @@ class EnabledContent extends ImmutableComponent {
                     </FormDropdown>
                   </SettingItem>
                   <SettingItem>
-                    {this.paymentHistoryButton()}
+                    {this.lastReconcileMessage()}
                   </SettingItem>
                 </SettingsList>
               </td>
@@ -212,18 +210,21 @@ class EnabledContent extends ImmutableComponent {
                       <SettingsList className={css(styles.listContainer)}>
                         <SettingItem>
                           {this.fundsAmount()}
-                          {this.walletButton()}
+                        </SettingItem>
+                        <SettingItem>
+                          {this.nextReconcileMessage()}
                         </SettingItem>
                       </SettingsList>
                     </div>
                 }
               </td>
               <td className={css(styles.tableTd)}>
-                <div data-test-id='walletStatus'
+                {this.walletButton()}
+                <div className={css(styles.walletStatus)}
+                  data-test-id='walletStatus'
                   data-l10n-id={walletStatusText.id}
                   data-l10n-args={walletStatusText.args ? JSON.stringify(walletStatusText.args) : null}
                 />
-                {this.nextReconcileMessage()}
               </td>
             </tr>
           </tbody>
@@ -269,32 +270,16 @@ const styles = StyleSheet.create({
     marginTop: paymentStyles.margin.barItem
   },
 
-  nextReconcileDate: {
-    marginTop: paymentStyles.margin.barItem,
-    marginBottom: 0
-  },
-
   settingsListContainer: {
     marginBottom: 0
-  },
-
-  paymentHistoryButton: {
-    display: 'block',
-    fontSize: paymentStyles.font.regular,
-    lineHeight: '18px',
-    color: globalStyles.color.braveOrange,
-    height: 'auto',
-    marginTop: paymentStyles.margin.barItem,
-    padding: 0,
-    textAlign: 'left',
-    cursor: 'pointer',
-    whiteSpace: 'normal'
   },
 
   addFunds: {
     minWidth: '180px',
     width: 'auto',
-    marginTop: paymentStyles.margin.barItem
+    marginTop: 0,
+    paddingTop: '6px',
+    paddingBottom: '6px'
   },
 
   balance: {
@@ -328,9 +313,28 @@ const styles = StyleSheet.create({
   },
 
   iconText: {
-    color: globalStyles.color.gray,
+    color: '#c7c7c7',
     margin: '0 0 0 5px',
     fontSize: paymentStyles.font.regular
+  },
+
+  contribution: {
+    lineHeight: 1.5
+  },
+
+  lastContribution: {
+    marginTop: '16px',
+    marginBottom: 0
+  },
+
+  nextContribution: {
+    marginTop: '15px',
+    marginBottom: 0
+  },
+
+  walletStatus: {
+    marginTop: '15px',
+    lineHeight: 1.5
   }
 })
 

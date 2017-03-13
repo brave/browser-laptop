@@ -1,7 +1,7 @@
 /* global describe, it, beforeEach, before */
 
 const Brave = require('../lib/brave')
-const {urlInput, advancedSettings, addFundsButton, paymentsWelcomePage, paymentsTab, walletSwitch, siteSettingItem, ledgerTable} = require('../lib/selectors')
+const {urlInput, advancedSettingsButton, addFundsButton, paymentsWelcomePage, paymentsTab, walletSwitch, siteSettingItem, ledgerTable} = require('../lib/selectors')
 const assert = require('assert')
 
 const prefsUrl = 'about:preferences'
@@ -86,7 +86,7 @@ describe('Regular payment panel tests', function () {
         .click(paymentsTab)
         .waitForVisible(paymentsWelcomePage)
         .waitForVisible(walletSwitch)
-        .waitForVisible(advancedSettings, 100, true)
+        .waitForVisible(advancedSettingsButton, 100, true)
     })
 
     it('advanced settings is visible when payments are enabled', function * () {
@@ -98,7 +98,7 @@ describe('Regular payment panel tests', function () {
         .waitForVisible(paymentsWelcomePage)
         .waitForVisible(walletSwitch)
         .click(walletSwitch)
-        .waitForVisible(advancedSettings, ledgerAPIWaitTimeout)
+        .waitForVisible(advancedSettingsButton, ledgerAPIWaitTimeout)
     })
 
     it('can create wallet', function * () {

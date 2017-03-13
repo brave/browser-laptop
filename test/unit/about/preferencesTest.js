@@ -33,6 +33,8 @@ describe('Preferences component', function () {
     mockery.registerMock('../../../extensions/brave/img/preferences/browser_prefs_payments.svg', 'browser_prefs_payments.svg')
     mockery.registerMock('../../../extensions/brave/img/preferences/browser_prefs_sync.svg', 'browser_prefs_sync.svg')
     mockery.registerMock('../../../extensions/brave/img/preferences/browser_prefs_advanced.svg', 'browser_prefs_advanced.svg')
+    mockery.registerMock('../../../extensions/brave/img/ledger/icon_settings.svg')
+    mockery.registerMock('../../../extensions/brave/img/ledger/icon_history.svg')
     mockery.registerMock('../../../../extensions/brave/img/ledger/verified_green_icon.svg')
     mockery.registerMock('../../../../extensions/brave/img/ledger/verified_white_icon.svg')
     mockery.registerMock('../../../../extensions/brave/img/private_internet_access.png')

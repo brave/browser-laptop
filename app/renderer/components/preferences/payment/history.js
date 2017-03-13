@@ -8,7 +8,7 @@ const {StyleSheet, css} = require('aphrodite')
 
 // util
 const {addExportFilenamePrefixToTransactions} = require('../../../../common/lib/ledgerExportUtil')
-const {formattedTimeFromNow} = require('../../../../common/lib/ledgerUtil')
+const {formattedTimeFromNow, formattedDateFromTimestamp} = require('../../../../common/lib/ledgerUtil')
 const appUrlUtil = require('../../../../../js/lib/appUrlUtil')
 
 // components
@@ -55,7 +55,7 @@ class HistoryRow extends ImmutableComponent {
 
   get formattedDate () {
     const timestamp = this.transaction.get('submissionStamp')
-    return moment(new Date(timestamp)).format('YYYY-MM-DD')
+    return formattedDateFromTimestamp(timestamp, 'YYYY-MM-DD')
   }
 
   get satoshis () {
