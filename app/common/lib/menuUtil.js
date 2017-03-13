@@ -3,7 +3,7 @@
 
 'use strict'
 
-const Immutable = require('immutable')
+const {makeImmutable} = require('../../common/state/immutableUtil')
 const CommonMenu = require('../../common/commonMenu')
 const messages = require('../../../js/constants/messages')
 const siteTags = require('../../../js/constants/siteTags')
@@ -64,7 +64,7 @@ module.exports.setTemplateItemChecked = (template, label, checked) => {
   const menuItem = getTemplateItem(menu, label)
   if (menuItem.checked !== checked) {
     menuItem.checked = checked
-    return Immutable.fromJS(menu)
+    return makeImmutable(menu)
   }
   return null
 }
@@ -120,6 +120,9 @@ module.exports.createBookmarkTemplateItems = (sites) => {
  */
 module.exports.createRecentlyClosedTemplateItems = (lastClosedFrames) => {
   const payload = []
+
+  lastClosedFrames = makeImmutable(lastClosedFrames)
+
   if (lastClosedFrames && lastClosedFrames.size > 0) {
     payload.push(
       CommonMenu.separatorMenuItem,
@@ -128,7 +131,7 @@ module.exports.createRecentlyClosedTemplateItems = (lastClosedFrames) => {
         enabled: false
       })
 
-    const lastTen = (lastClosedFrames.size < 10) ? lastClosedFrames : lastClosedFrames.slice(-10)
+    const lastTen = ((lastClosedFrames.size < 10) ? lastClosedFrames : lastClosedFrames.slice(-10)).reverse()
     lastTen.forEach((closedFrame) => {
       payload.push({
         label: closedFrame.get('title') || closedFrame.get('location'),

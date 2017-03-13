@@ -214,7 +214,8 @@ describe('menuUtil tests', function () {
       assert.equal(menuItems[2].label, windowStateClosedFrames.first().get('title'))
       assert.equal(typeof menuItems[2].click === 'function', true)
     })
-    it('only shows the last 10 items', function () {
+
+    it('shows the last 10 items in reverse order (top == last closed)', function () {
       const windowStateClosedFrames = Immutable.fromJS([
         { title: 'site01', location: 'https://brave01.com' },
         { title: 'site02', location: 'https://brave02.com' },
@@ -231,8 +232,24 @@ describe('menuUtil tests', function () {
       const menuItems = menuUtil.createRecentlyClosedTemplateItems(windowStateClosedFrames)
 
       assert.equal(menuItems.length, 12)
-      assert.equal(menuItems[2].label, windowStateClosedFrames.get(1).get('title'))
-      assert.equal(menuItems[11].label, windowStateClosedFrames.get(10).get('title'))
+      assert.equal(menuItems[11].label, windowStateClosedFrames.get(1).get('title'))
+      assert.equal(menuItems[2].label, windowStateClosedFrames.get(10).get('title'))
+    })
+
+    it('returns an empty array if lastClosedFrames is null, empty, or undefined', function () {
+      assert.deepEqual(menuUtil.createRecentlyClosedTemplateItems(), [])
+      assert.deepEqual(menuUtil.createRecentlyClosedTemplateItems(null), [])
+      assert.deepEqual(menuUtil.createRecentlyClosedTemplateItems(Immutable.fromJS([])), [])
+    })
+
+    it('makes the input immutable if passed as mutable', function () {
+      const windowStateClosedFrames = [{
+        title: 'sample',
+        location: 'https://brave.com'
+      }]
+      const menuItems = menuUtil.createRecentlyClosedTemplateItems(windowStateClosedFrames)
+      assert.equal(Array.isArray(menuItems), true)
+      assert.equal(menuItems.length, 3)
     })
   })
 
