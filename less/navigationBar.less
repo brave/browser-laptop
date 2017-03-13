@@ -354,7 +354,7 @@
 // Styles had to be reworked to properly position the new caption buttons for Windows
 .navbarCaptionButtonContainer {
   display: flex;
-  border-bottom: 1px solid #bbb;
+  //border-bottom: 1px solid #bbb;
 
   &.allowDragging {
     -webkit-app-region: drag;
@@ -659,7 +659,7 @@
   justify-content: center;
   height: @urlbarFormHeight;
   padding: 0 10px 0 3px;
-
+  background: @navigationBarBackgroundActive;
   display: flex;
   flex-grow: 1;
   min-width: 0%; // allow the navigator to shrink
@@ -671,7 +671,7 @@
   input:focus + legend:before {
     content: ' ';
     position: absolute;
-    background: #fff;
+    background: @navigationBarBackgroundActive;
     border-radius: 4px;
     box-shadow: 0 0 1px @focusUrlbarOutline, inset 0 0 2px @focusUrlbarOutline, inset 0 1px 8px rgba(0, 137, 255, 0.1);
     color: #333;
@@ -684,11 +684,11 @@
   }
 
   #navigator:not(.titleMode) & {
-    background: white;
+    background: @navigationBarBackgroundActive;
     border-radius: @borderRadiusURL;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
-    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1), inset 0 1px 0 rgba(0,0,0,0.05), inset 0 1px 1px rgba(0,0,0,0.1);
+    box-shadow: inset 0 0 0 1px rgba(187, 187, 187, 1.0);
     color: @chromeText;
   }
   @media (max-width: @breakpointNarrowViewport) {
@@ -739,8 +739,8 @@
     // Create 25x25 squares and place the buttons at the center of each container
     .bookmarkButtonContainer,
     .addPublisherButtonContainer {
-      border: 1px solid #CBCBCB;
-      border-radius: @borderRadius;
+      border: 1px solid #bbb;
+      border-radius: @borderRadiusURL;
       box-sizing: border-box;
       display: flex;
       align-items: center;
@@ -776,13 +776,19 @@
   &.titleMode {
     &:extend(#navigator:not(.titleMode).urlbarForm);
     animation: fadeIn 1.2s;
+    background: none;
+    // border-radius: @borderRadiusURL;
+    // box-shadow: inset 0 0 0 1px rgba(187, 187, 187, 1.0);
+
+    .urlbarForm {
+      background: none;
+    }
 
     input {
       display: none;
     }
     #titleBar {
       display: inline-block;
-      background:rgba(243, 243, 243, 0);
       color: @chromeText;
       font-size: 13px;
       max-width: 100%;
@@ -828,12 +834,13 @@
   .urlbarForm {
     .loadTime {
       color: @loadTimeColor;
-      background: @navigationBarBackground;
+      // background: @navigationBarBackground;
       font-size: 12px;
       text-align: right;
       cursor: default;
 
       &.onFocus {
+        background: @navigationBarBackgroundActive;
         display: none;
       }
     }
@@ -849,7 +856,7 @@
     }
 
     .inputbar-wrapper {
-      background: white;
+      //background: white;
       display: flex;
       flex: 1 1 0;
       border-radius: 4px;
@@ -858,7 +865,7 @@
     }
 
     input {
-      background: @navigationBarBackground;
+      background: @navigationBarBackgroundActive;
       border: none;
       box-sizing: border-box;
       color: @chromeText;
@@ -871,7 +878,7 @@
       min-width: 0%; // allow the navigator to shrink
 
       &:hover {
-        background: @chromeControlsBackground2;
+        background: @navigationBarBackgroundActive;
       }
 
       &.private {
@@ -880,6 +887,7 @@
       }
 
       &:focus {
+        background: @navigationBarBackgroundActive;
         margin-right: 3px;
       }
     }
