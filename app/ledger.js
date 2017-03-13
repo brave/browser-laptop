@@ -594,9 +594,14 @@ eventStore.addChangeListener(() => {
     pattern = `https?://${publisher}`
     initP = !synopsis.publishers[publisher]
     synopsis.initPublisher(publisher)
-    if ((initP) && (getSetting(settings.AUTO_SUGGEST_SITES))) {
+    if (initP) {
       excludeP(publisher, (unused, exclude) => {
-        appActions.changeSiteSetting(pattern, 'ledgerPayments', !exclude)
+        if (!getSetting(settings.AUTO_SUGGEST_SITES)) {
+          exclude = false
+        } else {
+          exclude = !exclude
+        }
+        appActions.changeSiteSetting(pattern, 'ledgerPayments', exclude)
         updatePublisherInfo()
       })
     }
@@ -849,6 +854,9 @@ var enable = (paymentsEnabled) => {
     })
     updatePublisherInfo()
 
+    // change undefined include publishers to include publishers
+    appActions.enableUndefinedPublishers(synopsis.publishers)
+
     fs.readFile(pathName(publisherPath), (err, data) => {
       if (err) {
         if (err.code !== 'ENOENT') console.log('publisherPath read error: ' + err.toString())
@@ -985,7 +993,12 @@ var stickyP = (publisher) => {
     result = synopsis.publishers[publisher].options.stickyP
     appActions.changeSiteSetting(pattern, 'ledgerPayments', result)
   }
-  delete synopsis.publishers[publisher].options.stickyP
+
+  if (synopsis.publishers[publisher] &&
+    synopsis.publishers[publisher].options &&
+    synopsis.publishers[publisher].options.stickyP) {
+    delete synopsis.publishers[publisher].options.stickyP
+  }
 
   return (result || false)
 }

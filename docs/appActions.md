@@ -798,6 +798,17 @@ Open dialog for default download path setting
 
 
 
+### enableUndefinedPublishers(publishers) 
+
+Change all undefined publishers in site settings to defined sites
+also change all undefined ledgerPayments to value true
+
+**Parameters**
+
+**publishers**: `Object`, publishers from the synopsis
+
+
+
 
 * * *
 

@@ -59,7 +59,7 @@ class LedgerTable extends ImmutableComponent {
         return result
       }
     }
-    return true
+    return getSetting(settings.AUTO_SUGGEST_SITES, this.props.settings)
   }
 
   shouldShow (synopsis) {
@@ -101,7 +101,7 @@ class LedgerTable extends ImmutableComponent {
     const publisherURL = synopsis.get('publisherURL')
     const percentage = synopsis.get('percentage')
     const site = synopsis.get('site')
-    const defaultSiteSetting = true
+    const defaultAutoInclude = this.enabledForSite(synopsis)
 
     return [
       {
@@ -131,7 +131,7 @@ class LedgerTable extends ImmutableComponent {
       {
         html: <SiteSettingCheckbox small
           hostPattern={this.getHostPattern(synopsis)}
-          defaultValue={defaultSiteSetting}
+          defaultValue={defaultAutoInclude}
           prefKey='ledgerPayments'
           siteSettings={this.props.siteSettings}
           checked={this.enabledForSite(synopsis)} />,
