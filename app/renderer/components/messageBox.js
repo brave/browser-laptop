@@ -154,7 +154,8 @@ const styles = StyleSheet.create({
     '-webkit-user-select': 'text'
   },
   buttons: {
-    float: 'right',
+    display: 'flex',
+    justifyContent: 'flex-end',
     marginTop: '1.5em',
     marginBottom: '0.5em'
   }
