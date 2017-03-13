@@ -9,6 +9,7 @@ const messages = require('../../js/constants/messages')
 const Immutable = require('immutable')
 const locale = require('../../js/l10n')
 const settings = require('../../js/constants/settings')
+const {tabs} = require('../../js/constants/config')
 const getSetting = require('../../js/settings').getSetting
 const communityURL = 'https://community.brave.com/'
 const isDarwin = process.platform === 'darwin'
@@ -83,13 +84,22 @@ module.exports.newPrivateTabMenuItem = () => {
 }
 
 module.exports.newPartitionedTabMenuItem = () => {
+  const newPartitionedMenuItem = (partitionNumber) => ({
+    label: `${locale.translation('newSessionTab')} ${partitionNumber}`,
+    click: (item, focusedWindow) => {
+      module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, {
+        isPartitioned: true,
+        partitionNumber: partitionNumber
+      }])
+    }
+  })
+
+  const maxNewSessions = Array(tabs.maxAllowedNewSessions)
+  const newPartitionedSubmenu = Array.from(maxNewSessions, (_, i) => newPartitionedMenuItem(i + 1))
+
   return {
     label: locale.translation('newSessionTab'),
-    accelerator: 'Shift+CmdOrCtrl+S',
-    click: function (item, focusedWindow) {
-      ensureAtLeastOneWindow(Immutable.fromJS({ isPartitioned: true }))
-      module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { isPartitioned: true }])
-    }
+    submenu: newPartitionedSubmenu
   }
 }
 
