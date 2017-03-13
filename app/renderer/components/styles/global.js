@@ -106,6 +106,7 @@ const globalStyles = {
     navbarBraveButtonMarginLeft: '80px',
     navbarLeftMarginDarwin: '76px',
     sideBarWidth: '190px',
+    aboutPageDetailsPageWidth: '704px',
     aboutPageSectionPadding: '24px',
     aboutPageSectionMargin: '10px',
     defaultTabPadding: '0 4px',

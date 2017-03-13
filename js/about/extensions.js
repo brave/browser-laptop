@@ -9,11 +9,14 @@ const ImmutableComponent = require('../components/immutableComponent')
 const messages = require('../constants/messages')
 const aboutActions = require('./aboutActions')
 
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../app/renderer/components/styles/global')
+const commonStyles = require('../../app/renderer/components/styles/commonStyles')
+
 const ipc = window.chrome.ipcRenderer
 
 // Stylesheets
-require('../../less/about/itemList.less')
-require('../../less/about/extensions.less')
+require('../../less/about/common.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 const bravifyText = (text) => text.replace(/Google Chrome/g, 'Brave')
@@ -32,24 +35,31 @@ class ExtensionItem extends ImmutableComponent {
       this.props.extension.getIn(['manifest', 'icons', '16']) ||
       null
   }
+
   render () {
+    const className = css(
+      commonStyles.listItem,
+      styles.listItem,
+      !this.props.extension.get('enabled') && styles.isDisabled
+    )
     const icon = this.icon
     const permissions = this.props.extension.getIn(['manifest', 'permissions'])
+
     return <div role='listitem'
       disabled={!this.props.extension.get('enabled')}
-      className='listItem'
+      className={className}
       data-extension-id={this.props.extension.get('id')}
       onContextMenu={this.onContextMenu}
       data-context-menu-disable>
-      <div className='extensionImage'>
-        <img src={`${this.props.extension.get('base_path')}/${icon}`} />
+      <div className={css(styles.extensionImage)}>
+        <img className={css(styles.img)} src={`${this.props.extension.get('base_path')}/${icon}`} />
       </div>
-      <div className='extensionDetails'>
-        <h3 className='extensionTitle'>{bravifyText(this.props.extension.get('name'))}</h3>
-        <span className='extensionVersion'>{this.props.extension.get('version')}</span>
+      <div data-test-id='extensionDetails'>
+        <h3 className={css(styles.extensionTitle)}>{bravifyText(this.props.extension.get('name'))}</h3>
+        <span className={css(styles.extensionVersion)}>{this.props.extension.get('version')}</span>
         {
           !['__MSG_extDescriptionGoogleChrome__', '__MSG_appDesc__'].includes(this.props.extension.get('description'))
-          ? <div className='extensionDescription'>{bravifyText(this.props.extension.get('description'))}</div>
+          ? <div data-test-id='extensionDescription'>{bravifyText(this.props.extension.get('description'))}</div>
           : null
         }
         <div className='extensionPath'><span data-l10n-id='extensionPathLabel' /> <span>{this.props.extension.get('base_path')}</span></div>
@@ -113,13 +123,48 @@ class AboutExtensions extends React.Component {
     })
   }
   render () {
-    return <div className='extensionDetailsPage'>
+    return <div className={css(styles.extensionDetailsPage)}>
       <h2 data-l10n-id='extensions' />
-      <div className='extensionDetailsPageContent'>
+      <div data-test-id='extensionDetailsPageContent'>
         <ExtensionList extensions={this.state.extensions} />
       </div>
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  extensionDetailsPage: {
+    margin: '20px',
+    minWidth: globalStyles.spacing.aboutPageDetailsPageWidth
+  },
+
+  extensionImage: {
+    paddingRight: '10px'
+  },
+
+  extensionTitle: {
+    display: 'inline-block',
+    marginBottom: '5px'
+  },
+
+  extensionVersion: {
+    color: '#999',
+    fontSize: 'smaller',
+    marginLeft: '20px'
+  },
+
+  listItem: {
+    display: 'flex',
+    WebkitUserSelect: 'text'
+  },
+
+  isDisabled: {
+    opacity: '0.3'
+  },
+
+  img: {
+    width: '48px'
+  }
+})
 
 module.exports = <AboutExtensions />
