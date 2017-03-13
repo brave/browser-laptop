@@ -128,7 +128,7 @@ describe('ContextMenu', function () {
         .getValue(this.input).should.eventually.be.equal(this.values[3])
     })
 
-    it('check left/right on non sub menu item', function *() {
+    it('check left/right on non sub menu item', function * () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(this.formfill)

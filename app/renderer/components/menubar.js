@@ -169,7 +169,6 @@ class Menubar extends ImmutableComponent {
 
       case keyCodes.UP:
         e.preventDefault()
-
     }
   }
   shouldComponentUpdate (nextProps, nextState) {

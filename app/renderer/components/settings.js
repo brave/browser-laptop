@@ -113,9 +113,7 @@ class SiteSettingCheckbox extends ImmutableComponent {
   }
 
   onClick (e) {
-    if (this.props.disabled || !this.props.hostPattern) {
-      return
-    } else {
+    if (!this.props.disabled || this.props.hostPattern) {
       const value = !!e.target.value
       value === this.props.defaultValue
         ? aboutActions.removeSiteSetting(this.props.hostPattern,

@@ -52,7 +52,6 @@ class BookmarkToolbarButton extends ImmutableComponent {
       }
       e.target = ReactDOM.findDOMNode(this)
       this.props.showBookmarkFolderMenu(this.props.bookmark, e)
-      return
     }
   }
 

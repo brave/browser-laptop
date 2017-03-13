@@ -179,7 +179,6 @@ function onBeforeRedirect (details, isPrivate) {
         console.log('blacklisting url from HTTPS Everywhere for too many 307s',
                     canonicalUrl)
         redirectBlacklist.push(canonicalUrl)
-        return
       }
     } else {
       recent307Counter[canonicalUrl] = 1

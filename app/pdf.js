@@ -75,4 +75,3 @@ const renderUrlToPdf = (appState, action, testingMode) => {
 module.exports = {
   renderUrlToPdf
 }
-

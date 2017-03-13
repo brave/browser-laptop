@@ -170,7 +170,7 @@ class ContributionStatement extends ImmutableComponent {
           <span className='sectionTitle smaller pull-right' data-l10n-id='contributionStatement' />
         </div>
       </div>
-     )
+    )
   }
 
   get contributionDate () {

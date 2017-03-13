@@ -13,7 +13,6 @@ var globalInstanceCounter = 0
 var mountedInstances = []
 
 class ModalOverlay extends ImmutableComponent {
-
   componentWillMount () {
     this.instanceId = globalInstanceCounter++
 

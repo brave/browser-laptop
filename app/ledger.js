@@ -90,11 +90,12 @@ const synopsisPath = 'ledger-synopsis.json'
 
 var bootP = false
 var client
-const clientOptions = { debugP: process.env.LEDGER_DEBUG,
-                        loggingP: process.env.LEDGER_LOGGING,
-                        verboseP: process.env.LEDGER_VERBOSE,
-                        server: process.env.LEDGER_SERVER_URL
-                      }
+const clientOptions = {
+  debugP: process.env.LEDGER_DEBUG,
+  loggingP: process.env.LEDGER_LOGGING,
+  verboseP: process.env.LEDGER_VERBOSE,
+  server: process.env.LEDGER_SERVER_URL
+}
 
 var doneTimer
 
@@ -117,12 +118,12 @@ var publishers = {}
  */
 
 const msecs = { year: 365 * 24 * 60 * 60 * 1000,
-                week: 7 * 24 * 60 * 60 * 1000,
-                day: 24 * 60 * 60 * 1000,
-                hour: 60 * 60 * 1000,
-                minute: 60 * 1000,
-                second: 1000
-              }
+  week: 7 * 24 * 60 * 60 * 1000,
+  day: 24 * 60 * 60 * 1000,
+  hour: 60 * 60 * 1000,
+  minute: 60 * 1000,
+  second: 1000
+}
 
 /*
  * notification state globals
@@ -1155,13 +1156,13 @@ var cacheRuleSet = (ruleset) => {
       if (rule.dom) {
         if (rule.dom.publisher) {
           entry.publisher = { selector: rule.dom.publisher.nodeSelector,
-                              consequent: acorn.parse(rule.dom.publisher.consequent)
-                            }
+            consequent: acorn.parse(rule.dom.publisher.consequent)
+          }
         }
         if (rule.dom.faviconURL) {
           entry.faviconURL = { selector: rule.dom.faviconURL.nodeSelector,
-                               consequent: acorn.parse(rule.dom.faviconURL.consequent)
-                             }
+            consequent: acorn.parse(rule.dom.faviconURL.consequent)
+          }
         }
       }
       if (!entry.publisher) entry.consequent = rule.consequent ? acorn.parse(rule.consequent) : rule.consequent
@@ -1385,7 +1386,7 @@ var updateLedgerInfo = () => {
   if (info) {
     underscore.extend(ledgerInfo,
                       underscore.pick(info, [ 'address', 'passphrase', 'balance', 'unconfirmed', 'satoshis', 'btc', 'amount',
-                                              'currency' ]))
+                        'currency' ]))
     if ((!info.buyURLExpires) || (info.buyURLExpires > now)) {
       ledgerInfo.buyURL = info.buyURL
       ledgerInfo.buyMaximumUSD = 6
@@ -1394,8 +1395,8 @@ var updateLedgerInfo = () => {
       ledgerInfo.buyURLFrame = true
       ledgerInfo.buyURL = process.env.ADDFUNDS_URL + '?' +
                           querystring.stringify({ currency: ledgerInfo.currency,
-                                                  amount: getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT),
-                                                  address: ledgerInfo.address })
+                            amount: getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT),
+                            address: ledgerInfo.address })
       ledgerInfo.buyMaximumUSD = false
     }
 
@@ -1482,9 +1483,9 @@ var callback = (err, result, delayTime) => {
     entries = []
     results.forEach((entry) => {
       entries.push({ type: 'put',
-                     key: entry.facet + ':' + entry.publisher,
-                     value: JSON.stringify(underscore.omit(entry, [ 'facet', 'publisher' ]))
-                   })
+        key: entry.facet + ':' + entry.publisher,
+        value: JSON.stringify(underscore.omit(entry, [ 'facet', 'publisher' ]))
+      })
     })
 
     v2RulesetDB.batch(entries, (err) => {
@@ -1500,9 +1501,9 @@ var callback = (err, result, delayTime) => {
     entries = []
     results.forEach((entry) => {
       entries.push({ type: 'put',
-                     key: entry.publisher,
-                     value: JSON.stringify(underscore.omit(entry, [ 'publisher' ]))
-                   })
+        key: entry.publisher,
+        value: JSON.stringify(underscore.omit(entry, [ 'publisher' ]))
+      })
       if ((synopsis.publishers[entry.publisher]) &&
           (synopsis.publishers[entry.publisher].options.verified !== entry.verified)) {
         synopsis.publishers[entry.publisher].options.verified = entry.verified
@@ -1616,20 +1617,20 @@ var run = (delayTime) => {
     }
 
     line([ 'publisher',
-           'blockedP', 'stickyP', 'verified',
-           'excluded', 'eligibleP', 'visibleP',
-           'contribP',
-           'duration', 'visits'
-         ])
+      'blockedP', 'stickyP', 'verified',
+      'excluded', 'eligibleP', 'visibleP',
+      'contribP',
+      'duration', 'visits'
+    ])
     entries = synopsis.topN() || []
     entries.forEach((entry) => {
       var publisher = entry.publisher
 
       line([ publisher,
-             blockedP(publisher), stickyP(publisher), synopsis.publishers[publisher].options.verified === true,
-             synopsis.publishers[publisher].options.exclude === true, eligibleP(publisher), visibleP(publisher),
-             contributeP(publisher),
-             Math.round(synopsis.publishers[publisher].duration / 1000), synopsis.publishers[publisher].visits ])
+        blockedP(publisher), stickyP(publisher), synopsis.publishers[publisher].options.verified === true,
+        synopsis.publishers[publisher].options.exclude === true, eligibleP(publisher), visibleP(publisher),
+        contributeP(publisher),
+        Math.round(synopsis.publishers[publisher].duration / 1000), synopsis.publishers[publisher].visits ])
     })
   }
 

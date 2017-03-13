@@ -58,10 +58,11 @@ var db = new sqlite3.Database('httpse.sqlite', function (err) {
     throw new Error('FATAL: could not open db: ' + err)
   }
 
-  db.exec(['DROP TABLE IF EXISTS rulesets',
-          'CREATE TABLE rulesets (id INTEGER PRIMARY KEY, contents TEXT)',
-          'DROP TABLE IF EXISTS targets',
-          'CREATE TABLE targets (host TEXT UNIQUE, ids TEXT)'].join('; '), function (err) {
+  db.exec([
+    'DROP TABLE IF EXISTS rulesets',
+    'CREATE TABLE rulesets (id INTEGER PRIMARY KEY, contents TEXT)',
+    'DROP TABLE IF EXISTS targets',
+    'CREATE TABLE targets (host TEXT UNIQUE, ids TEXT)'].join('; '), function (err) {
     if (err !== null) {
       throw new Error('FATAL: could not create tables: ' + err)
     }

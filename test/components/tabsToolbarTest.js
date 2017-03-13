@@ -13,11 +13,11 @@ describe('tabs toolbar tests', function () {
 
   describe('hamburgerMenu\'s contextMenu appearance test', function () {
     Brave.beforeAll(this)
-    before(function* () {
+    before(function * () {
       yield setup(this.app.client)
     })
 
-    beforeEach(function* () {
+    beforeEach(function * () {
       yield this.app.client
         .click(tabsToolbar)
     })

@@ -425,10 +425,10 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.BLOCKED_PAGE, (e, blockType, details) => {
-      const frameProps = frameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
-      if (!frameProps) {
-        return
-      }
+      // const frameProps = frameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
+      // if (!frameProps) {
+      //   return
+      // }
     })
 
     ipc.on(messages.HTTPSE_RULE_APPLIED, (e, ruleset, details) => {

@@ -86,8 +86,6 @@ function deltaBetween (checkpoint1, checkpoint2) {
   var ts2 = telemetry.get(checkpoint2)
   if (_.isNumber(ts1) && _.isNumber(ts2)) {
     return Math.abs(ts2 - ts1)
-  } else {
-    return
   }
 }
 

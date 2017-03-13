@@ -13,7 +13,6 @@ const windowActions = require('../actions/windowActions')
  * Represents a popup window
  */
 class PopupWindow extends ImmutableComponent {
-
   componentWillMount () {
     this.width = this.props.detail.get('width')
     this.height = this.props.detail.get('height')

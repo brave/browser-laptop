@@ -260,12 +260,13 @@ module.exports.getTransactionCSVRows = (transactions, viewingIds, addTotalRow, s
       throw new Error('ledgerExportUtil#getTransactionCSVRows does not support mixed currency data (yet)!')
     }
 
-    return [pub,
-            pubRow.votes,
-            pubRow.fraction,
-            rowBTC,
-            pubRow.contribution.fiat.toFixed(2) + ' ' + pubRow.contribution.currency
-           ].join(',')
+    return [
+      pub,
+      pubRow.votes,
+      pubRow.fraction,
+      rowBTC,
+      pubRow.contribution.fiat.toFixed(2) + ' ' + pubRow.contribution.currency
+    ].join(',')
   }))
 
   // note: do NOT add a total row if only header row is present (no data case)
