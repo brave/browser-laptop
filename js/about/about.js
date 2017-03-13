@@ -6,6 +6,9 @@ const React = require('react')
 const ImmutableComponent = require('../components/immutableComponent')
 const {aboutUrls, isNavigatableAboutPage} = require('../lib/appUrlUtil')
 
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../app/renderer/components/styles/global')
+
 require('../../less/about/history.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
@@ -16,9 +19,9 @@ class AboutAbout extends ImmutableComponent {
         <div data-l10n-id='aboutPages' className='sectionTitle' />
       </div>
 
-      <div className='siteDetailsPageContent aboutAbout'>
+      <div className='siteDetailsPageContent'>
         <div className='sectionTitle' data-l10n-id='listOfAboutPages' />
-        <ul>
+        <ul className={css(styles.list)}>
           {
             aboutUrls.keySeq().sort().filter((aboutSourceUrl) => isNavigatableAboutPage(aboutSourceUrl)).map((aboutSourceUrl) =>
               <li>
@@ -32,5 +35,11 @@ class AboutAbout extends ImmutableComponent {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  list: {
+    marginLeft: `calc(${globalStyles.spacing.aboutPageSectionPadding} * 2)`
+  }
+})
 
 module.exports = <AboutAbout />

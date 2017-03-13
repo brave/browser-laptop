@@ -41,7 +41,7 @@ class AboutBrave extends React.Component {
         <div data-l10n-id='aboutBrave' className='sectionTitle' />
       </div>
 
-      <div className='siteDetailsPageContent aboutAbout'>
+      <div className='siteDetailsPageContent aboutBrave'>
         <div className='title'>
           <span className='sectionTitle' data-l10n-id='versionInformation' />
           <ClipboardButton
