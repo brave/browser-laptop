@@ -80,7 +80,7 @@ class Favicon extends ImmutableComponent {
         className={css(
           styles.icon,
           this.favicon && iconStyles.favicon,
-          this.narrowView && styles.faviconNarrowView
+          !this.props.tabProps.get('pinnedLocation') && this.narrowView && styles.faviconNarrowView
         )}
         symbol={this.loadingIcon || this.defaultIcon} />
       : null
@@ -283,9 +283,9 @@ const styles = StyleSheet.create({
   },
 
   faviconNarrowView: {
-    minWidth: globalStyles.spacing.narrowIconSize,
+    minWidth: 'auto',
     width: globalStyles.spacing.narrowIconSize,
-    backgroundSize: globalStyles.spacing.narrowIconSize,
+    backgroundSize: 'contain',
     padding: '0',
     fontSize: '10px',
     backgroundPosition: 'center center'

@@ -208,13 +208,19 @@ class Tab extends ImmutableComponent {
   }
 
   componentDidUpdate () {
-    this.tabSize
     this.onUpdateTabSize()
   }
 
   componentWillUnmount () {
     this.onUpdateTabSize()
     window.removeEventListener('resize', this.onUpdateTabSize)
+  }
+
+  componentWillReceiveProps (nextProps) {
+    // Update breakpoint each time a new tab is open
+    if (this.props.totalTabs !== nextProps.totalTabs) {
+      this.onUpdateTabSize()
+    }
   }
 
   render () {
