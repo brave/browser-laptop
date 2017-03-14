@@ -10,18 +10,7 @@ const iconPath = getBraveExtUrl('img/newtab/defaultTopSitesIcon')
  */
 const now = Date.now()
 
-module.exports.pinnedTopSites = [
-    {
-      "count": 1,
-      "favicon": `${iconPath}/twitter.png`,
-      "lastAccessedTime": now,
-      "location": "https://twitter.com/brave",
-      "partitionNumber": 0,
-      "tags": [],
-      "themeColor": "rgb(255, 255, 255)",
-      "title": "Brave Software (@brave) | Twitter"
-  }
-]
+module.exports.pinnedTopSites = []
 
 module.exports.topSites = [
   {
