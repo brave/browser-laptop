@@ -38,7 +38,7 @@ class AddEditBookmarkHanger extends ImmutableComponent {
   get displayBookmarkName () {
     const customTitle = this.props.currentDetail.get('customTitle')
     if (customTitle !== undefined && customTitle !== '') {
-      return this.props.currentDetail.get('customTitle')
+      return customTitle || ''
     }
     return this.props.currentDetail.get('title') || ''
   }
@@ -109,7 +109,11 @@ class AddEditBookmarkHanger extends ImmutableComponent {
     if (currentDetail.get('title') === name && name) {
       currentDetail = currentDetail.delete('customTitle')
     } else {
-      currentDetail = currentDetail.set('customTitle', name)
+      // '' is reserved for the default customTitle value of synced bookmarks,
+      // so replace '' with 0 if the user is deleting the customTitle.
+      // Note that non-string bookmark titles fail bookmarkNameValid so they
+      // are not saved.
+      currentDetail = currentDetail.set('customTitle', name || 0)
     }
     windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail, this.props.destinationDetail, this.props.shouldShowLocation, !this.props.isModal)
   }

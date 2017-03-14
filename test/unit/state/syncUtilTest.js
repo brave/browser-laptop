@@ -52,6 +52,21 @@ describe('syncUtil', () => {
       }
       assert.deepEqual(syncUtil.createSiteData(bookmark), expectedBookmark)
     })
+
+    it('bookmark with undefined custom title', () => {
+      const bookmark = Object.assign({}, site, {tags: ['bookmark'], customTitle: undefined})
+      const newValue = Object.assign({}, expectedSite.value, {customTitle: undefined})
+      const expectedBookmark = {
+        name: 'bookmark',
+        objectId,
+        value: {
+          site: newValue,
+          isFolder: false,
+          parentFolderObjectId: undefined
+        }
+      }
+      assert.deepEqual(syncUtil.createSiteData(bookmark), expectedBookmark)
+    })
   })
 
   describe('ipcSafeObject()', () => {
