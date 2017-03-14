@@ -58,6 +58,15 @@ describe('bookmark tests', function () {
           .getValue('#bookmarkName input').should.eventually.be.equal('Custom Page 1')
           .click(doneButton)
       })
+      it('can delete custom title', function * () {
+        yield this.app.client
+          .activateURLMode()
+          .waitForVisible(navigatorBookmarked)
+          .click(navigatorBookmarked)
+          .waitForVisible(doneButton)
+          .keys(Brave.keys.BACKSPACE)
+          .getValue('#bookmarkName input').should.eventually.be.equal('')
+      })
       it('display punycode custom title and location', function * () {
         yield this.app.client
           .activateURLMode()
