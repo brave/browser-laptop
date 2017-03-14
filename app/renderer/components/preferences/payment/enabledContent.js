@@ -112,7 +112,9 @@ class EnabledContent extends ImmutableComponent {
       text = 'noPaymentHistory'
     } else {
       text = 'viewPaymentHistory'
-      prevReconcileDateValue = this.lastReconcileDate(walletTransactions.last())
+      const walletHasTransactionsSorted = walletTransactions
+        .sort((first, second) => first.get('submissionStamp') - second.get('submissionStamp'))
+      prevReconcileDateValue = this.lastReconcileDate(walletHasTransactionsSorted.last())
     }
 
     const l10nDataArgs = {

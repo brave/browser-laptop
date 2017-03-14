@@ -201,16 +201,28 @@ class PaymentsTab extends ImmutableComponent {
                   this.hasWalletTransaction && this.enabled
                     ? <a
                       data-test-id='paymentHistoryButton'
+                      data-l10n-id='paymentHistoryIcon'
                       className={css(styles.mainIcons, styles.historyIcon)}
                       onClick={this.props.showOverlay.bind(this, 'paymentHistory')}
                     />
                     : null
                 }
                 {
+                  !this.hasWalletTransaction && this.enabled
+                  ? <a
+                    data-test-id='paymentHistoryButton'
+                    data-l10n-id='paymentHistoryIcon'
+                    className={css(styles.mainIcons, styles.historyIcon, styles.historyDisabled)}
+                    onClick={() => {}}
+                  />
+                  : null
+                }
+                {
                   this.props.ledgerData.get('created') && this.enabled
                     ? <a
                       className={css(styles.mainIcons, styles.advanceIcon)}
                       data-test-id='advancedSettingsButton'
+                      data-l10n-id='advancedSettingsIcon'
                       onClick={this.props.showOverlay.bind(this, 'advancedSettings')}
                     />
                     : null
@@ -307,6 +319,14 @@ const styles = StyleSheet.create({
   },
   historyIcon: {
     '-webkit-mask-image': `url(${historyIcon})`
+  },
+  historyDisabled: {
+    backgroundColor: globalStyles.color.chromeTertiary,
+    cursor: 'default',
+
+    ':hover': {
+      backgroundColor: globalStyles.color.chromeTertiary
+    }
   },
   advanceIcon: {
     '-webkit-mask-image': `url(${advanceIcon})`
