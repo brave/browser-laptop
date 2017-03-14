@@ -23,7 +23,6 @@ module.exports.register = (win) => {
     ['Ctrl+PageUp', messages.SHORTCUT_PREV_TAB],
     ['CmdOrCtrl+9', messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST],
     ['CmdOrCtrl+G', messages.SHORTCUT_ACTIVE_FRAME_FIND_NEXT],
-    ['CmdOrCtrl+Alt+U', messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE],
     ['CmdOrCtrl+Shift+G', messages.SHORTCUT_ACTIVE_FRAME_FIND_PREV],
     ['CmdOrCtrl+Alt+J', messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS],
     ['CmdOrCtrl+Shift+=', messages.SHORTCUT_ACTIVE_FRAME_ZOOM_IN],
@@ -35,6 +34,7 @@ module.exports.register = (win) => {
       ['F5', messages.SHORTCUT_ACTIVE_FRAME_RELOAD],
       ['Ctrl+F5', messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD],
       ['Ctrl+F4', messages.SHORTCUT_CLOSE_FRAME],
+      ['Ctrl+U', messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE],
       ['Alt+D', messages.SHORTCUT_FOCUS_URL],
       ['Alt+Left', messages.SHORTCUT_ACTIVE_FRAME_BACK],
       ['Alt+Right', messages.SHORTCUT_ACTIVE_FRAME_FORWARD])
@@ -42,10 +42,16 @@ module.exports.register = (win) => {
     // We're in Darwin and release or test mode...
     // We disable for development mode because Browser level dev tools copy doesn't work.
     // Workaround for #1060
-    simpleWebContentEvents.push([
-      'Cmd+C',
-      messages.SHORTCUT_ACTIVE_FRAME_COPY
-    ])
+    simpleWebContentEvents.push(
+      ['Cmd+C', messages.SHORTCUT_ACTIVE_FRAME_COPY]
+    )
+  } else {
+    // We're in Darwin any mode
+    // Different shorcut for View Source as is common for Chrome/Safari on macOS
+    // See #7702
+    simpleWebContentEvents.push(
+      ['Cmd+Alt+U', messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE]
+    )
   }
 
   // Tab ordering shortcuts
