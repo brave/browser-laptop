@@ -46,14 +46,14 @@ class TorrentViewer extends React.Component {
           {titleElem}
           <div className='headerActions'>
             <Button
+              l10nId={mainButtonId}
+              className='primaryButton mainButton'
+              disabled={!!torrent}
+              onClick={() => dispatch('start')} />
+            <Button
               l10nId='saveTorrentFile'
               className='whiteButton saveTorrentFile'
               onClick={() => dispatch('saveTorrentFile')} />
-            <Button
-              l10nId={mainButtonId}
-              className='whiteButton mainButton'
-              disabled={!!torrent}
-              onClick={() => dispatch('start')} />
           </div>
         </div>
 
