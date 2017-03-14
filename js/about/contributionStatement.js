@@ -98,11 +98,11 @@ class ContributionStatement extends ImmutableComponent {
     if (transaction) {
       this.setState({transaction: transaction})
 
+      // Pop up the save dialog (but don't close the statement)
       if (!this.state.savedPDF) {
         this.setState({savedPDF: true})
         setTimeout(function () {
           this.renderPdf()
-          window.close()
         }.bind(this), 250)
       }
 
