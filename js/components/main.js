@@ -147,6 +147,12 @@ class Main extends ImmutableComponent {
       document.addEventListener('keyup', (e) => {
         const customTitlebar = this.customTitlebar
         switch (e.which) {
+          case keyCodes.LEFT:
+          case keyCodes.RIGHT:
+          case keyCodes.PRINT_SCREEN:
+            // these keys don't register key down when pressed in combination w/ ALT
+            this.lastKeyPressed = e.which
+            break
           case keyCodes.ALT:
             /*
              Only show/hide the menu if:
