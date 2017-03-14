@@ -97,6 +97,7 @@
     "file-loader": "^0.8.5",
     "font-awesome": "^4.5.0",
     "font-awesome-webpack": "0.0.4",
+    "fs-extra": "^2.1.2",
     "immutable": "^3.7.5",
     "immutablediff": "^0.4.2",
     "immutablepatch": "brave/immutable-js-patch",

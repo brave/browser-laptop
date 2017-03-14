@@ -12,7 +12,7 @@
 // - NODE_ENV of ‘test’ bypassing session state or else they all fail.
 
 const Immutable = require('immutable')
-const fs = require('fs')
+const fs = require('fs-extra')
 const path = require('path')
 const electron = require('electron')
 const app = electron.app
@@ -48,6 +48,14 @@ const getTopSiteMap = () => {
     return siteMap
   }
   return {}
+}
+
+const getTempStoragePath = (filename) => {
+  const epochTimestamp = (new Date()).getTime().toString()
+  filename = filename || 'tmp'
+  return process.env.NODE_ENV !== 'test'
+    ? path.join(app.getPath('userData'), 'session-store-' + filename + '-' + epochTimestamp)
+    : path.join(process.env.HOME, '.brave-test-session-store-' + filename + '-' + epochTimestamp)
 }
 
 const getStoragePath = () => {
@@ -91,10 +99,7 @@ module.exports.saveAppState = (payload, isShutdown) => {
     }
     payload.lastAppVersion = app.getVersion()
 
-    const epochTimestamp = (new Date()).getTime().toString()
-    const tmpStoragePath = process.env.NODE_ENV !== 'test'
-      ? path.join(app.getPath('userData'), 'session-store-tmp-' + epochTimestamp)
-      : path.join(process.env.HOME, '.brave-test-session-store-tmp-' + epochTimestamp)
+    const tmpStoragePath = getTempStoragePath()
 
     let p = promisify(fs.writeFile, tmpStoragePath, JSON.stringify(payload))
       .then(() => promisify(fs.rename, tmpStoragePath, getStoragePath()))
@@ -266,7 +271,11 @@ module.exports.cleanAppData = (data, isShutdown) => {
   }
   const clearAutocompleteData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOCOMPLETE_DATA) === true
   if (clearAutocompleteData) {
-    autofill.clearAutocompleteData()
+    try {
+      autofill.clearAutocompleteData()
+    } catch (e) {
+      console.log('cleanAppData: error calling autofill.clearAutocompleteData: ', e)
+    }
   }
   const clearAutofillData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOFILL_DATA) === true
   if (clearAutofillData) {
@@ -337,8 +346,21 @@ module.exports.cleanAppData = (data, isShutdown) => {
       })
     }
   }
-  data = tabState.getPersistentState(data).toJS()
-  data = windowState.getPersistentState(data).toJS()
+
+  try {
+    data = tabState.getPersistentState(data).toJS()
+  } catch (e) {
+    delete data.tabs
+    console.log('cleanAppData: error calling tabState.getPersistentState: ', e)
+  }
+
+  try {
+    data = windowState.getPersistentState(data).toJS()
+  } catch (e) {
+    delete data.windows
+    console.log('cleanAppData: error calling windowState.getPersistentState: ', e)
+  }
+
   if (data.extensions) {
     Object.keys(data.extensions).forEach((extensionId) => {
       delete data.extensions[extensionId].tabs
@@ -408,6 +430,77 @@ const setVersionInformation = (data) => {
   return data
 }
 
+module.exports.runPreMigrations = (data) => {
+  // autofill data migration
+  if (data.autofill) {
+    if (Array.isArray(data.autofill.addresses)) {
+      let addresses = exports.defaultAppState().autofill.addresses
+      data.autofill.addresses.forEach((guid) => {
+        addresses.guid.push(guid)
+        addresses.timestamp = new Date().getTime()
+      })
+      data.autofill.addresses = addresses
+    }
+    if (Array.isArray(data.autofill.creditCards)) {
+      let creditCards = exports.defaultAppState().autofill.creditCards
+      data.autofill.creditCards.forEach((guid) => {
+        creditCards.guid.push(guid)
+        creditCards.timestamp = new Date().getTime()
+      })
+      data.autofill.creditCards = creditCards
+    }
+    if (data.autofill.addresses.guid) {
+      let guids = []
+      data.autofill.addresses.guid.forEach((guid) => {
+        if (typeof guid === 'object') {
+          guids.push(guid['persist:default'])
+        } else {
+          guids.push(guid)
+        }
+      })
+      data.autofill.addresses.guid = guids
+    }
+    if (data.autofill.creditCards.guid) {
+      let guids = []
+      data.autofill.creditCards.guid.forEach((guid) => {
+        if (typeof guid === 'object') {
+          guids.push(guid['persist:default'])
+        } else {
+          guids.push(guid)
+        }
+      })
+      data.autofill.creditCards.guid = guids
+    }
+  }
+  // xml migration
+  if (data.settings) {
+    if (data.settings[settings.DEFAULT_SEARCH_ENGINE] === 'content/search/google.xml') {
+      data.settings[settings.DEFAULT_SEARCH_ENGINE] = 'Google'
+    }
+    if (data.settings[settings.DEFAULT_SEARCH_ENGINE] === 'content/search/duckduckgo.xml') {
+      data.settings[settings.DEFAULT_SEARCH_ENGINE] = 'DuckDuckGo'
+    }
+  }
+
+  return data
+}
+
+module.exports.runPostMigrations = (data) => {
+  // sites refactoring migration
+  if (Array.isArray(data.sites) && data.sites.length) {
+    let sites = {}
+    let order = 0
+    data.sites.forEach((site) => {
+      let key = siteUtil.getSiteKey(Immutable.fromJS(site))
+      site.order = order++
+      sites[key] = site
+    })
+    data.sites = sites
+  }
+
+  return data
+}
+
 /**
  * Loads the browser state from storage.
  *
@@ -421,64 +514,30 @@ module.exports.loadAppState = () => {
       data = fs.readFileSync(getStoragePath())
     } catch (e) {}
 
+    let loaded = false
     try {
       data = JSON.parse(data)
-      // autofill data migration
-      if (data.autofill) {
-        if (Array.isArray(data.autofill.addresses)) {
-          let addresses = exports.defaultAppState().autofill.addresses
-          data.autofill.addresses.forEach((guid) => {
-            addresses.guid.push(guid)
-            addresses.timestamp = new Date().getTime()
-          })
-          data.autofill.addresses = addresses
-        }
-        if (Array.isArray(data.autofill.creditCards)) {
-          let creditCards = exports.defaultAppState().autofill.creditCards
-          data.autofill.creditCards.forEach((guid) => {
-            creditCards.guid.push(guid)
-            creditCards.timestamp = new Date().getTime()
-          })
-          data.autofill.creditCards = creditCards
-        }
-        if (data.autofill.addresses.guid) {
-          let guids = []
-          data.autofill.addresses.guid.forEach((guid) => {
-            if (typeof guid === 'object') {
-              guids.push(guid['persist:default'])
-            } else {
-              guids.push(guid)
-            }
-          })
-          data.autofill.addresses.guid = guids
-        }
-        if (data.autofill.creditCards.guid) {
-          let guids = []
-          data.autofill.creditCards.guid.forEach((guid) => {
-            if (typeof guid === 'object') {
-              guids.push(guid['persist:default'])
-            } else {
-              guids.push(guid)
-            }
-          })
-          data.autofill.creditCards.guid = guids
-        }
+      loaded = true
+    } catch (e) {
+      // Session state might be corrupted; let's backup this
+      // corrupted value for people to report into support.
+      module.exports.backupSession()
+      if (data) {
+        console.log('could not parse data: ', data, e)
       }
-      // xml migration
-      if (data.settings) {
-        if (data.settings[settings.DEFAULT_SEARCH_ENGINE] === 'content/search/google.xml') {
-          data.settings[settings.DEFAULT_SEARCH_ENGINE] = 'Google'
-        }
-        if (data.settings[settings.DEFAULT_SEARCH_ENGINE] === 'content/search/duckduckgo.xml') {
-          data.settings[settings.DEFAULT_SEARCH_ENGINE] = 'DuckDuckGo'
-        }
-      }
+      data = exports.defaultAppState()
+    }
+
+    if (loaded) {
+      data = module.exports.runPreMigrations(data)
+
       // Clean app data here if it wasn't cleared on shutdown
       if (data.cleanedOnShutdown !== true || data.lastAppVersion !== app.getVersion()) {
         data = module.exports.cleanAppData(data, false)
       }
       data = Object.assign(module.exports.defaultAppState(), data)
       data.cleanedOnShutdown = false
+
       // Always recalculate the update status
       if (data.updates) {
         const updateStatus = data.updates.status
@@ -494,33 +553,34 @@ module.exports.loadAppState = () => {
           return
         }
       }
-      data = setVersionInformation(data)
 
-      // sites refactoring migration
-      if (Array.isArray(data.sites) && data.sites.length) {
-        let sites = {}
-        let order = 0
-        data.sites.forEach((site) => {
-          let key = siteUtil.getSiteKey(Immutable.fromJS(site))
-          site.order = order++
-          sites[key] = site
-        })
-        data.sites = sites
-      }
-    } catch (e) {
-      // TODO: Session state is corrupted, maybe we should backup this
-      // corrupted value for people to report into support.
-      if (data) {
-        console.log('could not parse data: ', data, e)
-      }
-      data = exports.defaultAppState()
-      data = setVersionInformation(data)
+      data = module.exports.runPostMigrations(data)
     }
+
+    data = setVersionInformation(data)
+
     locale.init(data.settings[settings.LANGUAGE]).then((locale) => {
       app.setLocale(locale)
       resolve(data)
     })
   })
+}
+
+/**
+ * Called when session is suspected for corruption; this will move it out of the way
+ */
+module.exports.backupSession = () => {
+  const src = getStoragePath()
+  const dest = getTempStoragePath('backup')
+
+  if (fs.existsSync(src)) {
+    try {
+      fs.copySync(src, dest)
+      console.log('An error occurred. For support purposes, file "' + src + '" has been copied to "' + dest + '".')
+    } catch (e) {
+      console.log('backupSession: error making copy of session file: ', e)
+    }
+  }
 }
 
 /**

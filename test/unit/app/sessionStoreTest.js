@@ -11,6 +11,7 @@ require('../braveUnit')
 
 describe('sessionStore unit tests', function () {
   let sessionStore
+  const fakeElectron = require('../lib/fakeElectron')
   const fakeAutofill = {
     init: () => {},
     addAutofillAddress: () => {},
@@ -28,7 +29,9 @@ describe('sessionStore unit tests', function () {
   }
   const fakeFileSystem = {
     readFileSync: (path) => {
-      return '{"cleanedOnShutdown": false}'
+      return JSON.stringify({
+        cleanedOnShutdown: false
+      })
     },
     writeFile: (path, options, callback) => {
       console.log('calling mocked fs.writeFile')
@@ -37,6 +40,13 @@ describe('sessionStore unit tests', function () {
     rename: (oldPath, newPath, callback) => {
       console.log('calling mocked fs.rename')
       callback()
+    },
+    copySync: (oldPath, newPath) => {
+      console.log('calling mocked fs.copySync')
+    },
+    existsSync: (path) => {
+      console.log('calling mocked fs.existsSync')
+      return true
     }
   }
   const mockSiteUtil = {
@@ -61,8 +71,8 @@ describe('sessionStore unit tests', function () {
       warnOnUnregistered: false,
       useCleanCache: true
     })
-    mockery.registerMock('fs', fakeFileSystem)
-    mockery.registerMock('electron', require('../lib/fakeElectron'))
+    mockery.registerMock('fs-extra', fakeFileSystem)
+    mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('./locale', fakeLocale)
     mockery.registerMock('../js/state/siteUtil', mockSiteUtil)
     mockery.registerMock('./autofill', fakeAutofill)
@@ -97,35 +107,32 @@ describe('sessionStore unit tests', function () {
     it('calls cleanAppData', function () {
       cleanAppDataStub.reset()
       return sessionStore.saveAppState({})
-      .then(function (result) {
-        assert.equal(cleanAppDataStub.calledOnce, true)
-      }, function (result) {
-        console.log('failed: ', result)
-        assert.fail()
-      })
+        .then(function (result) {
+          assert.equal(cleanAppDataStub.calledOnce, true)
+        }, function (result) {
+          assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+        })
     })
 
     describe('with isShutdown', function () {
       it('calls cleanSessionDataOnShutdown if true', function () {
         cleanSessionDataOnShutdownStub.reset()
         return sessionStore.saveAppState({}, true)
-        .then(() => {
-          assert.equal(cleanSessionDataOnShutdownStub.calledOnce, true)
-        }, function (result) {
-          console.log('failed: ', result)
-          assert.fail()
-        })
+          .then(() => {
+            assert.equal(cleanSessionDataOnShutdownStub.calledOnce, true)
+          }, function (result) {
+            assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+          })
       })
 
       it('does not call cleanSessionDataOnShutdown if false', function () {
         cleanSessionDataOnShutdownStub.reset()
         return sessionStore.saveAppState({}, false)
-        .then(() => {
-          assert.equal(cleanSessionDataOnShutdownStub.notCalled, true)
-        }, function (result) {
-          console.log('failed: ', result)
-          assert.fail()
-        })
+          .then(() => {
+            assert.equal(cleanSessionDataOnShutdownStub.notCalled, true)
+          }, function (result) {
+            assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+          })
       })
     })
   })
@@ -201,6 +208,22 @@ describe('sessionStore unit tests', function () {
         sessionStore.cleanAppData(data, true)
         assert.equal(clearAutocompleteDataSpy.calledOnce, true)
         clearAutocompleteDataSpy.restore()
+      })
+
+      describe('exception is thrown', function () {
+        let clearAutocompleteDataStub
+        before(function () {
+          clearAutocompleteDataStub = sinon.stub(fakeAutofill, 'clearAutocompleteData').throws('lame error')
+        })
+        after(function () {
+          clearAutocompleteDataStub.restore()
+        })
+
+        it('swallows exception', function () {
+          const data = {}
+          sessionStore.cleanAppData(data, true)
+          assert.ok(true)
+        })
       })
     })
 
@@ -437,20 +460,40 @@ describe('sessionStore unit tests', function () {
       })
     })
 
-    it('calls tabState.getPersistentState', function () {
-      const getPersistentStateSpy = sinon.spy(fakeTabState, 'getPersistentState')
-      const data = {}
-      sessionStore.cleanAppData(data)
-      assert.equal(getPersistentStateSpy.calledOnce, true)
-      getPersistentStateSpy.restore()
+    describe('with tabState', function () {
+      it('calls getPersistentState', function () {
+        const getPersistentStateSpy = sinon.spy(fakeTabState, 'getPersistentState')
+        const data = {}
+        sessionStore.cleanAppData(data)
+        assert.equal(getPersistentStateSpy.calledOnce, true)
+        getPersistentStateSpy.restore()
+      })
+
+      it('deletes tabState if an exception is thrown', function () {
+        const getPersistentStateSpy = sinon.stub(fakeTabState, 'getPersistentState').throws('oh noes')
+        const data = {tabs: true}
+        const result = sessionStore.cleanAppData(data)
+        assert.equal(result.tabs, undefined)
+        getPersistentStateSpy.restore()
+      })
     })
 
-    it('calls windowState.getPersistentState', function () {
-      const getPersistentStateSpy = sinon.spy(fakeWindowState, 'getPersistentState')
-      const data = {}
-      sessionStore.cleanAppData(data)
-      assert.equal(getPersistentStateSpy.calledOnce, true)
-      getPersistentStateSpy.restore()
+    describe('with windowState', function () {
+      it('calls getPersistentState', function () {
+        const getPersistentStateSpy = sinon.spy(fakeWindowState, 'getPersistentState')
+        const data = {}
+        sessionStore.cleanAppData(data)
+        assert.equal(getPersistentStateSpy.calledOnce, true)
+        getPersistentStateSpy.restore()
+      })
+
+      it('deletes windowState if an exception is thrown', function () {
+        const getPersistentStateSpy = sinon.stub(fakeWindowState, 'getPersistentState').throws('oh noes')
+        const data = {windows: true}
+        const result = sessionStore.cleanAppData(data)
+        assert.equal(result.windows, undefined)
+        getPersistentStateSpy.restore()
+      })
     })
 
     describe('with data.extensions', function () {
@@ -461,22 +504,313 @@ describe('sessionStore unit tests', function () {
   })
 
   describe('loadAppState', function () {
+    let runPreMigrationsSpy
     let cleanAppDataStub
+    let defaultAppStateSpy
+    let runPostMigrationsSpy
+    let localeInitSpy
+    let backupSessionStub
+
     before(function () {
+      runPreMigrationsSpy = sinon.spy(sessionStore, 'runPreMigrations')
       cleanAppDataStub = sinon.stub(sessionStore, 'cleanAppData')
+      defaultAppStateSpy = sinon.spy(sessionStore, 'defaultAppState')
+      runPostMigrationsSpy = sinon.spy(sessionStore, 'runPostMigrations')
+      localeInitSpy = sinon.spy(fakeLocale, 'init')
+      backupSessionStub = sinon.stub(sessionStore, 'backupSession')
     })
 
     after(function () {
       cleanAppDataStub.restore()
+      runPreMigrationsSpy.restore()
+      defaultAppStateSpy.restore()
+      runPostMigrationsSpy.restore()
+      localeInitSpy.restore()
+      backupSessionStub.restore()
     })
 
-    it('calls cleanAppData if data.cleanedOnShutdown !== true', function () {
+    describe('when reading the session file', function () {
+      describe('happy path', function () {
+        let readFileSyncSpy
+
+        before(function () {
+          readFileSyncSpy = sinon.spy(fakeFileSystem, 'readFileSync')
+        })
+
+        after(function () {
+          readFileSyncSpy.restore()
+        })
+
+        it('calls fs.readFileSync', function () {
+          return sessionStore.loadAppState()
+            .then(function (result) {
+              assert.equal(readFileSyncSpy.calledOnce, true)
+            }, function (result) {
+              assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+            })
+        })
+      })
+
+      describe('when exception is thrown', function () {
+        let readFileSyncStub
+
+        before(function () {
+          readFileSyncStub = sinon.stub(fakeFileSystem, 'readFileSync').throws('error reading file')
+        })
+
+        after(function () {
+          readFileSyncStub.restore()
+        })
+
+        it('does not crash when exception thrown during read', function () {
+          return sessionStore.loadAppState()
+            .then(function (result) {
+              assert.ok(result.firstRunTimestamp)
+            }, function (result) {
+              assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+            })
+        })
+      })
+    })
+
+    describe('when calling JSON.parse', function () {
+      describe('exception is thrown', function () {
+        let readFileSyncStub
+
+        before(function () {
+          readFileSyncStub = sinon.stub(fakeFileSystem, 'readFileSync').returns('this is not valid JSON')
+        })
+
+        after(function () {
+          readFileSyncStub.restore()
+        })
+
+        it('does not call runPreMigrations', function () {
+          runPreMigrationsSpy.reset()
+          return sessionStore.loadAppState()
+            .then(function (result) {
+              assert.equal(runPreMigrationsSpy.notCalled, true)
+            }, function (result) {
+              assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+            })
+        })
+
+        it('does not call cleanAppData', function () {
+          cleanAppDataStub.reset()
+          return sessionStore.loadAppState()
+            .then(function (result) {
+              assert.equal(cleanAppDataStub.notCalled, true)
+            }, function (result) {
+              assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+            })
+        })
+
+        it('calls defaultAppState to get a default app state', function () {
+          defaultAppStateSpy.reset()
+          return sessionStore.loadAppState()
+            .then(function (result) {
+              assert.equal(defaultAppStateSpy.calledOnce, true)
+            }, function (result) {
+              assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+            })
+        })
+
+        it('does not call runPostMigrations', function () {
+          runPostMigrationsSpy.reset()
+          return sessionStore.loadAppState()
+            .then(function (result) {
+              assert.equal(runPostMigrationsSpy.notCalled, true)
+            }, function (result) {
+              assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+            })
+        })
+
+        it('calls backupSessionStub', function () {
+          backupSessionStub.reset()
+          return sessionStore.loadAppState()
+            .then(function (result) {
+              assert.equal(backupSessionStub.calledOnce, true)
+            }, function (result) {
+              assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+            })
+        })
+      })
+    })
+
+    it('calls runPreMigrations', function () {
+      runPreMigrationsSpy.reset()
       return sessionStore.loadAppState()
-      .then(function (result) {
-        assert.equal(cleanAppDataStub.calledOnce, true)
-      }, function (result) {
-        console.log('failed: ', result)
-        assert.fail()
+        .then(function (result) {
+          assert.equal(runPreMigrationsSpy.calledOnce, true)
+        }, function (result) {
+          assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+        })
+    })
+
+    describe('when checking data.cleanedOnShutdown', function () {
+      let readFileSyncStub
+
+      describe('when true', function () {
+        before(function () {
+          readFileSyncStub = sinon.stub(fakeFileSystem, 'readFileSync').returns(JSON.stringify({
+            cleanedOnShutdown: true,
+            lastAppVersion: fakeElectron.app.getVersion()
+          }))
+        })
+        after(function () {
+          readFileSyncStub.restore()
+        })
+        it('does not call cleanAppData', function () {
+          cleanAppDataStub.reset()
+          return sessionStore.loadAppState()
+            .then(function (result) {
+              assert.equal(cleanAppDataStub.notCalled, true)
+            }, function (result) {
+              assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+            })
+        })
+      })
+
+      describe('when NOT true', function () {
+        before(function () {
+          readFileSyncStub = sinon.stub(fakeFileSystem, 'readFileSync').returns(JSON.stringify({
+            cleanedOnShutdown: false,
+            lastAppVersion: fakeElectron.app.getVersion()
+          }))
+        })
+        after(function () {
+          readFileSyncStub.restore()
+        })
+        it('calls cleanAppData', function () {
+          cleanAppDataStub.reset()
+          return sessionStore.loadAppState()
+            .then(function (result) {
+              assert.equal(cleanAppDataStub.calledOnce, true)
+            }, function (result) {
+              assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+            })
+        })
+      })
+    })
+
+    describe('when checking data.lastAppVersion', function () {
+      let readFileSyncStub
+
+      describe('when it matches app.getVersion', function () {
+        before(function () {
+          readFileSyncStub = sinon.stub(fakeFileSystem, 'readFileSync').returns(JSON.stringify({
+            cleanedOnShutdown: true,
+            lastAppVersion: fakeElectron.app.getVersion()
+          }))
+        })
+        after(function () {
+          readFileSyncStub.restore()
+        })
+        it('does not call cleanAppData', function () {
+          cleanAppDataStub.reset()
+          return sessionStore.loadAppState()
+            .then(function (result) {
+              assert.equal(cleanAppDataStub.notCalled, true)
+            }, function (result) {
+              assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+            })
+        })
+      })
+
+      describe('when it does NOT match app.getVersion', function () {
+        before(function () {
+          readFileSyncStub = sinon.stub(fakeFileSystem, 'readFileSync').returns(JSON.stringify({
+            cleanedOnShutdown: true,
+            lastAppVersion: 'NOT A REAL VERSION'
+          }))
+        })
+        after(function () {
+          readFileSyncStub.restore()
+        })
+        it('calls cleanAppData', function () {
+          cleanAppDataStub.reset()
+          return sessionStore.loadAppState()
+            .then(function (result) {
+              assert.equal(cleanAppDataStub.calledOnce, true)
+            }, function (result) {
+              assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+            })
+        })
+      })
+    })
+
+    it('calls defaultAppState', function () {
+      defaultAppStateSpy.reset()
+      return sessionStore.loadAppState()
+        .then(function (result) {
+          assert.equal(defaultAppStateSpy.calledOnce, true)
+        }, function (result) {
+          assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+        })
+    })
+
+    it('calls runPostMigrations', function () {
+      runPostMigrationsSpy.reset()
+      return sessionStore.loadAppState()
+        .then(function (result) {
+          assert.equal(runPostMigrationsSpy.calledOnce, true)
+        }, function (result) {
+          assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+        })
+    })
+
+    it('calls locale.init', function () {
+      localeInitSpy.reset()
+      return sessionStore.loadAppState()
+        .then(function (result) {
+          assert.equal(localeInitSpy.calledOnce, true)
+        }, function (result) {
+          assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+        })
+    })
+  })
+
+  describe('backupSession', function () {
+    let copySyncSpy
+    let existsSyncStub
+    before(function () {
+      copySyncSpy = sinon.spy(fakeFileSystem, 'copySync')
+    })
+    after(function () {
+      copySyncSpy.restore()
+    })
+
+    describe('when session exists', function () {
+      before(function () {
+        existsSyncStub = sinon.stub(fakeFileSystem, 'existsSync').returns(true)
+        copySyncSpy.reset()
+        sessionStore.backupSession()
+      })
+      after(function () {
+        existsSyncStub.restore()
+      })
+      it('calls fs.existsSync', function () {
+        assert.equal(existsSyncStub.calledOnce, true)
+      })
+      it('calls fs.copySync', function () {
+        assert.equal(copySyncSpy.calledOnce, true)
+      })
+    })
+
+    describe('when session does not exist', function () {
+      before(function () {
+        existsSyncStub = sinon.stub(fakeFileSystem, 'existsSync').returns(false)
+        copySyncSpy.reset()
+        sessionStore.backupSession()
+      })
+      after(function () {
+        existsSyncStub.restore()
+      })
+      it('calls fs.existsSync', function () {
+        assert.equal(existsSyncStub.calledOnce, true)
+      })
+      it('does not call fs.copySync', function () {
+        assert.equal(copySyncSpy.notCalled, true)
       })
     })
   })

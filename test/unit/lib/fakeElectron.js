@@ -30,7 +30,8 @@ const fakeElectron = {
     },
     getPath: (param) => `${process.cwd()}/${param}`,
     getVersion: () => '0.14.0',
-    setLocale: (locale) => {}
+    setLocale: (locale) => {},
+    exit: () => {}
   },
   clipboard: {
     writeText: function () {
