@@ -131,6 +131,8 @@ const api = {
           })
         })
 
+        LocalShortcuts.register(win)
+
         appActions.windowCreated(windowValue)
       })
       win.once('show', () => {
