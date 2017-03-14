@@ -319,7 +319,7 @@ class TabsTab extends ImmutableComponent {
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TABS_PER_PAGE)}>
             {
               // Sorry, Brad says he hates primes :'(
-              [6, 8, 10, 20].map((x) =>
+              [6, 8, 10, 20, 100].map((x) =>
                 <option value={x} key={x}>{x}</option>)
             }
           </SettingDropdown>

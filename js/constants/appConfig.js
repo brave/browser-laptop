@@ -126,7 +126,7 @@ module.exports = {
     'search.offer-search-suggestions': false, // false by default for privacy reasons
     'tabs.switch-to-new-tabs': false,
     'tabs.paint-tabs': true,
-    'tabs.tabs-per-page': 10,
+    'tabs.tabs-per-page': 20,
     'tabs.close-action': 'parent',
     'tabs.show-tab-previews': true,
     'tabs.show-dashboard-images': true,
