@@ -80,3 +80,5 @@ module.exports.topSites = [
       "title": "Brave Browser: Fast AdBlock – Apps para Android no Google Play"
   }
 ]
+
+module.exports.topSiteLocations = module.exports.topSites.map((site) => site.location)
