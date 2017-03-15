@@ -222,8 +222,7 @@ let generateTorrentManifest = () => {
 let generateSyncManifest = () => {
   let cspDirectives = {
     'default-src': '\'self\'',
-    'form-action': '\'none\'',
-    'style-src': '\'self\' \'unsafe-inline\''
+    'form-action': '\'none\''
   }
   cspDirectives['connect-src'] = ['\'self\'',
     appConfig.sync.serverUrl,
@@ -232,9 +231,8 @@ let generateSyncManifest = () => {
   if (process.env.NODE_ENV === 'development') {
     // allow access to webpack dev server resources
     let devServer = 'localhost:' + process.env.npm_package_config_port
-    cspDirectives['default-src'] += 'http://' + devServer
-    cspDirectives['connect-src'] += ' http://' + devServer + ' ws://' + devServer
-    cspDirectives['style-src'] += 'http://' + devServer
+    cspDirectives['default-src'] += ' http://' + devServer
+    cspDirectives['connect-src'] += ' http://' + devServer + ' ws://' + devServer + ' ' + appConfig.sync.testS3Url
   }
 
   return {
