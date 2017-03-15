@@ -41,6 +41,7 @@ module.exports = {
   blockAdsOption: '[data-l10n-id="blockAds"]',
   cookieControl: '[data-test-id="cookieControl"]',
   allowAllCookiesOption: '[data-l10n-id="allowAllCookies"]',
+  blockAllCookiesOption: '[data-l10n-id="blockAllCookies"]',
   braveryPanel: '.braveryPanel',
   httpsEverywhereStat: '.braveryStat.redirectedResourcesStat',
   httpsEverywhereSwitch: '.httpsEverywhereSwitch .switchMiddle',

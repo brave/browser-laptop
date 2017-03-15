@@ -27,12 +27,16 @@ module.exports = {
     FLASH: 'flash',
     WIDEVINE: 'widevine',
     COOKIEBLOCK: 'cookieblock', // block 3p cookies and referer
+    COOKIEBLOCK_ALL: 'cookieblockAll', // block all cookies and referer
     SITEHACK: 'siteHacks',
     WEBTORRENT: 'webtorrent'
     // ... other optional resource files are identified by uuid such as for regional adblock
   },
   cookieblock: {
     enabled: true
+  },
+  cookieblockAll: {
+    enabled: false
   },
   noScript: {
     enabled: false

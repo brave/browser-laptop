@@ -2,7 +2,7 @@
 
 const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
-const {urlInput, braveMenu, braveMenuDisabled, adsBlockedStat, adsBlockedControl, showAdsOption, blockAdsOption, braveryPanel, httpsEverywhereStat, noScriptStat, noScriptSwitch, fpSwitch, fpStat, noScriptNavButton, customFiltersInput} = require('../lib/selectors')
+const {cookieControl, allowAllCookiesOption, blockAllCookiesOption, urlInput, braveMenu, braveMenuDisabled, adsBlockedStat, adsBlockedControl, showAdsOption, blockAdsOption, braveryPanel, httpsEverywhereStat, noScriptStat, noScriptSwitch, fpSwitch, fpStat, noScriptNavButton, customFiltersInput} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 
 describe('Bravery Panel', function () {
@@ -425,6 +425,48 @@ describe('Bravery Panel', function () {
           // getText returns empty in this case
           return this.getElementSize('noscript')
             .then((size) => size.height > 0)
+        })
+    })
+    it('blocks cookies', function * () {
+      const url = Brave.server.url('cookies.html')
+      const expectedBlocked = ['local storage:',
+        'session storage:',
+        'indexeddb:',
+        'cookies:',
+        '""',
+        'websql:',
+        'filesystem API:'
+      ].join('\n')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(url)
+        .openBraveMenu(braveMenu, braveryPanel)
+        .click(cookieControl)
+        .waitForVisible(blockAllCookiesOption)
+        .click(blockAllCookiesOption)
+        .tabByIndex(0)
+        .loadUrl(url)
+        .waitUntil(function () {
+          return this.getText('body').then((text) => {
+            return text === expectedBlocked
+          })
+        })
+    })
+    it('allows cookies', function * () {
+      const url = Brave.server.url('cookies.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(url)
+        .openBraveMenu(braveMenu, braveryPanel)
+        .click(cookieControl)
+        .waitForVisible(allowAllCookiesOption)
+        .click(allowAllCookiesOption)
+        .tabByIndex(0)
+        .loadUrl(url)
+        .waitUntil(function () {
+          return this.getText('body').then((text) => {
+            return text.includes('abc=123')
+          })
         })
     })
     it('blocks fingerprinting', function * () {

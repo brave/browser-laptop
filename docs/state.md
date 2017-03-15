@@ -67,6 +67,9 @@ AppStore
   cookieblock: {
     enabled: boolean // enable 3p cookie/referer blocking
   },
+  cookieblockAll: {
+    enabled: boolean // enable all cookie/referer blocking
+  },
   defaultBrowserCheckComplete: boolean, // true to indicate default browser check is complete
   defaultWindowHeight: number, // DEPRECATED (0.12.7); replaced w/ defaultWindowParams.height
   defaultWindowParams: {
@@ -237,7 +240,7 @@ AppStore
   siteSettings: {
     [hostPattern]: {
       adControl: string, // (showBraveAds | blockAds | allowAdsAndTracking)
-      cookieControl: string, // (block3rdPartyCookie | allowAllCookies)
+      cookieControl: string, // (block3rdPartyCookie | allowAllCookies | blockAllCookies)
       fingerprintingProtection: boolean,
       flash: (number|boolean), // approval expiration time if allowed, false if never allow
       fullscreenPermission: boolean,
