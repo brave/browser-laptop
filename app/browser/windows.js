@@ -135,9 +135,6 @@ const api = {
 
         appActions.windowCreated(windowValue)
       })
-      win.once('show', () => {
-        LocalShortcuts.register(win)
-      })
       win.once('closed', () => {
         cleanupWindow(windowId)
       })
