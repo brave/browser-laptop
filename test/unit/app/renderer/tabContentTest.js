@@ -264,6 +264,17 @@ describe('tabContent components', function () {
       )
       assert.equal(wrapper.props().symbolContent, 3)
     })
+    it('should read and show partition number for sessions with number set by opener (ex: clicking target=_blank)', function () {
+      const wrapper = shallow(
+        <NewSessionIcon
+          tabProps={
+            Immutable.Map({
+              partitionNumber: 'partition-3'
+            })}
+        />
+      )
+      assert.equal(wrapper.props().symbolContent, 3)
+    })
     it('should show max partition number even if session is bigger', function () {
       const wrapper = shallow(
         <NewSessionIcon

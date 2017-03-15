@@ -147,7 +147,13 @@ class NewSessionIcon extends ImmutableComponent {
   }
 
   get partitionNumber () {
-    return this.props.tabProps.get('partitionNumber')
+    let partition = this.props.tabProps.get('partitionNumber')
+    // Persistent partitions opened by `target="_blank"` will have
+    // *partition-* string first, which causes bad UI. We don't need it for tabs
+    if (typeof partition === 'string') {
+      partition = partition.replace(/^partition-/i, '')
+    }
+    return partition
   }
 
   get partitionIndicator () {
