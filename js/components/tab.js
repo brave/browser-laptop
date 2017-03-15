@@ -262,6 +262,9 @@ class Tab extends ImmutableComponent {
         this.props.isActive && this.props.tab.get('isPrivate') && styles.activePrivateTab,
         playIndicatorBreakpoint && this.canPlayAudio && styles.narrowViewPlayIndicator,
         this.props.isActive && this.themeColor && perPageStyles.themeColor,
+        // Private color should override themeColor
+        this.props.tab.get('isPrivate') && styles.private,
+        this.props.isActive && this.props.tab.get('isPrivate') && styles.activePrivateTab,
         !this.isPinned && this.narrowView && styles.tabNarrowView,
         !this.isPinned && this.narrowestView && styles.tabNarrowestView,
         !this.isPinned && this.props.tab.get('breakpoint') === 'smallest' && styles.tabMinAllowedSize
