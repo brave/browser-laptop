@@ -16,6 +16,7 @@ module.exports.braveryDefaults = (appState, appConfig) => {
   let blockAds = defaults[appConfig.resourceNames.ADBLOCK] || false
   let blockTracking = defaults[appConfig.resourceNames.TRACKING_PROTECTION] || false
   let blockCookies = defaults[appConfig.resourceNames.COOKIEBLOCK] || false
+  let blockCookiesAll = defaults[appConfig.resourceNames.COOKIEBLOCK_ALL] || false
   defaults.adControl = 'allowAdsAndTracking'
   if (blockAds && replaceAds && blockTracking) {
     defaults.adControl = 'showBraveAds'
@@ -23,6 +24,9 @@ module.exports.braveryDefaults = (appState, appConfig) => {
     defaults.adControl = 'blockAds'
   }
   defaults.cookieControl = blockCookies ? 'block3rdPartyCookie' : 'allowAllCookies'
+  if (blockCookiesAll) {
+    defaults.cookieControl = 'blockAllCookies'
+  }
 
   // TODO(bridiver) this should work just like the other bravery settings
   let fingerprintingProtection = appState.get('settings').get('privacy.block-canvas-fingerprinting')

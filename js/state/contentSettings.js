@@ -65,7 +65,7 @@ const getDefaultUserPrefContentSettings = (braveryDefaults, appSettings, appConf
   return Immutable.fromJS({
     cookies: getDefault3rdPartyStorageSettings(braveryDefaults, appSettings, appConfig),
     referer: [{
-      setting: braveryDefaults.get('cookieControl') === 'block3rdPartyCookie' ? 'block' : 'allow',
+      setting: braveryDefaults.get('cookieControl') !== 'allowAllCookies' ? 'block' : 'allow',
       primaryPattern: '*'
     }],
     adInsertion: [{
@@ -182,6 +182,20 @@ const getDefault3rdPartyStorageSettings = (braveryDefaults, appSettings, appConf
       secondaryPattern: exceptionPair[1]
     })))
     return contentSettings
+  } else if (braveryDefaults.get('cookieControl') === 'blockAllCookies') {
+    return [
+      {
+        setting: 'block',
+        primaryPattern: '*',
+        secondaryPattern: '*'
+      },
+      {
+        // Needed for coinbase widget localStorage to work in about:preferences
+        setting: 'allow',
+        primaryPattern: `chrome-extension://${config.braveExtensionId}`,
+        secondaryPattern: config.coinbaseOrigin
+      }
+    ]
   } else {
     return [
       {
@@ -238,6 +252,9 @@ const siteSettingsToContentSettings = (currentSiteSettings, defaultContentSettin
         cookieExceptions.forEach((exceptionPair) => {
           contentSettings = addContentSettings(contentSettings, 'cookies', exceptionPair[0], exceptionPair[1], 'allow')
         })
+      } else if (siteSetting.get('cookieControl') === 'blockAllCookies') {
+        contentSettings = addContentSettings(contentSettings, 'cookies', primaryPattern, '*', 'block')
+        contentSettings = addContentSettings(contentSettings, 'referer', primaryPattern, '*', 'block')
       } else {
         contentSettings = addContentSettings(contentSettings, 'cookies', primaryPattern, '*', 'allow')
         contentSettings = addContentSettings(contentSettings, 'referer', primaryPattern, '*', 'allow')

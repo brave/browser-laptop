@@ -110,7 +110,8 @@ const applySiteSettingRecord = (record) => {
   }
   const cookieControlEnum = {
     0: 'block3rdPartyCookie',
-    1: 'allowAllCookies'
+    1: 'allowAllCookies',
+    2: 'blockAllCookies'
   }
   const getValue = (key, value) => {
     if (key === 'adControl') {
@@ -437,7 +438,8 @@ module.exports.createSiteSettingsData = (hostPattern, setting) => {
   }
   const cookieControlEnum = {
     block3rdPartyCookie: 0,
-    allowAllCookies: 1
+    allowAllCookies: 1,
+    blockAllCookies: 2
   }
   const objectData = {hostPattern}
 

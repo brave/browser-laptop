@@ -253,17 +253,20 @@ function registerForBeforeSendHeaders (session, partition) {
       }
     }
 
-    if (module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, firstPartyUrl, isPrivate)) {
+    const cookieSetting = module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, firstPartyUrl, isPrivate)
+    if (cookieSetting) {
       const parsedTargetUrl = urlParse(details.url || '')
       const parsedFirstPartyUrl = urlParse(firstPartyUrl)
 
-      if (module.exports.isThirdPartyHost(parsedFirstPartyUrl.hostname, parsedTargetUrl.hostname)) {
+      if (cookieSetting === 'blockAllCookies' ||
+        module.exports.isThirdPartyHost(parsedFirstPartyUrl.hostname, parsedTargetUrl.hostname)) {
         // Clear cookie and referer on third-party requests
         if (requestHeaders['Cookie'] &&
             getOrigin(firstPartyUrl) !== pdfjsOrigin) {
           requestHeaders['Cookie'] = undefined
         }
-        if (requestHeaders['Referer'] &&
+        if (cookieSetting !== 'blockAllCookies' &&
+            requestHeaders['Referer'] &&
             !refererExceptions.includes(parsedTargetUrl.hostname)) {
           requestHeaders['Referer'] = getOrigin(details.url)
         }
@@ -656,6 +659,14 @@ module.exports.getSiteSettings = (url, isPrivate) => {
   return siteSettings.getSiteSettingsForURL(settings, url)
 }
 
+/**
+ * Returns whether a resource is enabled for url. For COOKIEBLOCK, returns
+ * the either false or the string value of the cookie setting.
+ * @param {string} resourceName
+ * @param {string} url
+ * @param {boolean=} isPrivate
+ * @returns {boolean|string}
+ */
 module.exports.isResourceEnabled = (resourceName, url, isPrivate) => {
   if (resourceName === 'siteHacks') {
     return true
@@ -700,7 +711,8 @@ module.exports.isResourceEnabled = (resourceName, url, isPrivate) => {
     if (braverySettings.cookieControl === 'allowAllCookies') {
       return false
     } else {
-      return true
+      // Return the cookieControl setting
+      return braverySettings.cookieControl
     }
   }
 

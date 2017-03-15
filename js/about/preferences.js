@@ -38,6 +38,7 @@ const searchProviders = require('../data/searchProviders')
 
 const adblock = appConfig.resourceNames.ADBLOCK
 const cookieblock = appConfig.resourceNames.COOKIEBLOCK
+const cookieblockAll = appConfig.resourceNames.COOKIEBLOCK_ALL
 const adInsertion = appConfig.resourceNames.AD_INSERTION
 const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
 const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
@@ -494,6 +495,7 @@ class ShieldsTab extends ImmutableComponent {
   }
   onChangeCookieControl (e) {
     aboutActions.setResourceEnabled(cookieblock, e.target.value === 'block3rdPartyCookie')
+    aboutActions.setResourceEnabled(cookieblockAll, e.target.value === 'blockAllCookies')
   }
   onToggleSetting (setting, e) {
     aboutActions.setResourceEnabled(setting, e.target.value)
@@ -517,6 +519,7 @@ class ShieldsTab extends ImmutableComponent {
             onChange={this.onChangeCookieControl}>
             <option data-l10n-id='block3rdPartyCookie' value='block3rdPartyCookie' />
             <option data-l10n-id='allowAllCookies' value='allowAllCookies' />
+            <option data-l10n-id='blockAllCookies' value='blockAllCookies' />
           </SettingDropdown>
         </SettingItem>
         <SettingCheckbox checked={this.props.braveryDefaults.get('httpsEverywhere')} dataL10nId='httpsEverywhere' onChange={this.onToggleHTTPSE} />
