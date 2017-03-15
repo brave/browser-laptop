@@ -10,7 +10,7 @@ const styles = require('../components/styles/global')
  * @returns {String} The matching breakpoint.
  */
 module.exports.getTabBreakpoint = (tabWidth) => {
-  const sizes = ['largeMedium', 'medium', 'mediumSmall', 'small', 'extraSmall', 'smallest']
+  const sizes = ['large', 'largeMedium', 'medium', 'mediumSmall', 'small', 'extraSmall', 'smallest']
   let currentSize
 
   sizes.map(size => {

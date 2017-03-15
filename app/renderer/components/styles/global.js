@@ -6,6 +6,7 @@ const globalStyles = {
     breakpointSmallWin32: '650px',
     breakpointTinyWin32: '500px',
     tab: {
+      large: '120px',
       largeMedium: '83px',
       medium: '66px',
       mediumSmall: '53px',

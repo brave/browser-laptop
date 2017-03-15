@@ -305,22 +305,6 @@ describe('tabContent components', function () {
       )
       assert.notEqual(wrapper.text(), pageTitle1)
     })
-    it('should not show text if size is largeMedium and location has audio and a secondary icon', function () {
-      const wrapper = shallow(
-        <TabTitle
-          tabProps={
-            Immutable.Map({
-              location: url1,
-              title: pageTitle1,
-              breakpoint: 'largeMedium',
-              audioPlaybackActive: true,
-              isPrivate: true
-            })}
-          pageTitle={pageTitle1}
-        />
-      )
-      assert.notEqual(wrapper.text(), pageTitle1)
-    })
     it('should not show text if size is mediumSmall and location has a secondary icon', function () {
       const wrapper = shallow(
         <TabTitle

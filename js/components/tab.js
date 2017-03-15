@@ -177,6 +177,11 @@ class Tab extends ImmutableComponent {
     return tab && !this.isPinned ? tab.getBoundingClientRect().width : null
   }
 
+  get mediumView () {
+    const sizes = ['large', 'largeMedium']
+    return sizes.includes(this.props.tab.get('breakpoint'))
+  }
+
   get narrowView () {
     const sizes = ['medium', 'mediumSmall', 'small', 'extraSmall', 'smallest']
     return sizes.includes(this.props.tab.get('breakpoint'))
@@ -224,6 +229,7 @@ class Tab extends ImmutableComponent {
   }
 
   render () {
+    const playIndicatorBreakpoint = this.mediumView || this.narrowView
     const perPageStyles = StyleSheet.create({
       themeColor: {
         color: this.themeColor ? getTextColorForBackground(this.themeColor) : 'inherit',
@@ -254,8 +260,7 @@ class Tab extends ImmutableComponent {
         this.props.isActive && styles.active,
         this.props.tab.get('isPrivate') && styles.private,
         this.props.isActive && this.props.tab.get('isPrivate') && styles.activePrivateTab,
-        this.narrowView && this.canPlayAudio && styles.narrowViewPlayIndicator,
-        this.props.isActive && this.narrowView && this.canPlayAudio && styles.activeTabNarrowViewPlayIndicator,
+        playIndicatorBreakpoint && this.canPlayAudio && styles.narrowViewPlayIndicator,
         this.props.isActive && this.themeColor && perPageStyles.themeColor,
         !this.isPinned && this.narrowView && styles.tabNarrowView,
         !this.isPinned && this.narrowestView && styles.tabNarrowestView,
