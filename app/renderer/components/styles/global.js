@@ -18,7 +18,8 @@ const globalStyles = {
   color: {
     linkColor: '#0099CC',
     highlightBlue: '#37A9FD',
-    privateTabBackground: '#392e54',
+    privateTabBackground: '#665296',
+    privateTabBackgroundActive: '#4b3c6e',
     bitcoinOrange: '#f7931a',
     chromePrimary: '#F3F3F3',
     chromeSecondary: '#d3d3d3',

@@ -99,16 +99,16 @@ const styles = StyleSheet.create({
   },
 
   activePrivateTab: {
-    background: 'rgb(247, 247, 247)',
-    color: 'black'
+    background: globalStyles.color.privateTabBackgroundActive,
+    color: '#fff'
   },
 
   private: {
-    background: '#9c8dc1', // (globalStyles.color.privateTabBackground, 40%)
+    background: globalStyles.color.privateTabBackground,
     color: '#fff',
 
     ':hover': {
-      background: '#665296', // (globalStyles.color.privateTabBackground, 20%)
+      background: globalStyles.color.privateTabBackgroundActive,
       color: '#fff'
     }
   },
