@@ -43,11 +43,7 @@ const styles = StyleSheet.create({
   narrowViewPlayIndicator: {
     borderWidth: '2px 1px 0',
     borderStyle: 'solid',
-    borderColor: 'lightskyblue transparent transparent'
-  },
-
-  activeTabNarrowViewPlayIndicator: {
-    borderColor: `lightskyblue ${globalStyles.color.chromeControlsBackground} ${globalStyles.color.chromeControlsBackground}`
+    borderColor: `lightskyblue ${globalStyles.color.chromeControlsBackground} transparent transparent`
   },
 
   tabNarrowestView: {

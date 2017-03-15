@@ -92,6 +92,11 @@ class AudioTabIcon extends ImmutableComponent {
     return this.props.tabProps.get('audioPlaybackActive') || this.props.tabProps.get('audioMuted')
   }
 
+  get mediumView () {
+    const sizes = ['large', 'largeMedium']
+    return sizes.includes(this.props.tabProps.get('breakpoint'))
+  }
+
   get narrowView () {
     const sizes = ['medium', 'mediumSmall', 'small', 'extraSmall', 'smallest']
     return sizes.includes(this.props.tabProps.get('breakpoint'))
@@ -116,7 +121,7 @@ class AudioTabIcon extends ImmutableComponent {
   }
 
   render () {
-    return this.pageCanPlayAudio && !this.narrowView
+    return this.pageCanPlayAudio && !this.mediumView && !this.narrowView
       ? <TabIcon className={css(styles.icon, styles.audioIcon)} symbol={this.audioIcon} onClick={this.props.onClick} />
       : null
   }
@@ -186,18 +191,13 @@ class TabTitle extends ImmutableComponent {
     return !!this.props.tabProps.get('pinnedLocation')
   }
 
-  get pageCanPlayAudio () {
-    return this.props.tabProps.get('audioPlaybackActive') || this.props.tabProps.get('audioMuted')
-  }
-
   get hoveredOnNarrowView () {
     const sizes = ['mediumSmall', 'small', 'extraSmall', 'smallest']
     return this.props.tabProps.get('hoverState') && sizes.includes(this.props.tabProps.get('breakpoint'))
   }
 
   get shouldHideTitle () {
-    return (this.props.tabProps.get('breakpoint') === 'largeMedium' && this.pageCanPlayAudio && this.locationHasSecondaryIcon) ||
-      (this.props.tabProps.get('breakpoint') === 'mediumSmall' && this.locationHasSecondaryIcon) ||
+    return (this.props.tabProps.get('breakpoint') === 'mediumSmall' && this.locationHasSecondaryIcon) ||
       this.props.tabProps.get('breakpoint') === 'extraSmall' || this.props.tabProps.get('breakpoint') === 'smallest' ||
       this.hoveredOnNarrowView
   }
