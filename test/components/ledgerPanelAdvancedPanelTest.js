@@ -25,14 +25,14 @@ let translationsCache = null
 
 function setup (client) {
   return client
+    .waitForBrowserWindow()
+    .waitForVisible(urlInput)
     .translations().then(function (translations) {
       if (translations && translations.value) {
         translationsCache = translations.value
       }
       return this
     })
-    .waitForBrowserWindow()
-    .waitForVisible(urlInput)
 }
 
 function * setupPaymentsTabAndOpenAdvancedSettings (client, tabAlreadyLoaded) {
@@ -128,7 +128,7 @@ let generateAndSaveRecoveryFile = function (recoveryFilePath, paymentId, passphr
   fs.writeFileSync(recoveryFilePath, recoveryFileContents)
 }
 
-describe.skip('Advanced payment panel tests', function () {
+describe('Advanced payment panel tests', function () {
   let context = this
   Brave.beforeEach(this)
 
