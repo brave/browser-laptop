@@ -210,7 +210,7 @@ class PaymentsTab extends ImmutableComponent {
                 {
                   !this.hasWalletTransaction && this.enabled
                   ? <a
-                    data-test-id='paymentHistoryButton'
+                    data-test-id='disabledPaymentHistoryButton'
                     data-l10n-id='paymentHistoryIcon'
                     className={css(styles.mainIcons, styles.historyIcon, styles.historyDisabled)}
                     onClick={() => {}}
