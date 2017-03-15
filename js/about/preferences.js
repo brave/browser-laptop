@@ -651,7 +651,6 @@ class AdvancedTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='usePDFJS' prefKey={settings.PDFJS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='useTorrentViewer' prefKey={settings.TORRENT_VIEWER_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='enablePocket' prefKey={settings.POCKET_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='enableVimium' prefKey={settings.VIMIUM_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <Button l10nId='viewInstalledExtensions' className='primaryButton viewExtensionsInfo'
           onClick={aboutActions.newFrame.bind(null, {
             location: 'about:extensions'
