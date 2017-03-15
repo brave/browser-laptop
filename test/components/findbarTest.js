@@ -181,7 +181,6 @@ describe('findBar', function () {
       .waitUntil(function () {
         return this.getValue(findBarInput).then((val) => val === 'xyz')
       })
-     .ipcSend(messages.SHORTCUT_CLOSE_FRAME, 2)
   })
 
   it.skip('findbar input remembered but no active ordinals after navigation until RETURN key', function * () {
