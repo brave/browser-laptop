@@ -283,6 +283,7 @@ const siteSettingsToContentSettings = (currentSiteSettings, defaultContentSettin
       contentSettings = addContentSettings(contentSettings, 'adInsertion', primaryPattern, '*', 'block')
       contentSettings = addContentSettings(contentSettings, 'javascript', primaryPattern, '*', 'allow')
       contentSettings = addContentSettings(contentSettings, 'referer', primaryPattern, '*', 'allow')
+      contentSettings = addContentSettings(contentSettings, 'plugins', primaryPattern, '*', 'allow')
     }
   })
   return contentSettings
