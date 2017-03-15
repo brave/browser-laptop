@@ -9,7 +9,7 @@ const Immutable = require('immutable')
 const assert = require('assert')
 const fakeElectron = require('../../lib/fakeElectron')
 const globalStyles = require('../../../../app/renderer/components/styles/global')
-const {tabs} = require('../../../../app/common/constants/appEnums')
+const {tabs} = require('../../../../js/constants/config')
 let Favicon, AudioTabIcon, PrivateIcon, NewSessionIcon, TabTitle, CloseTabIcon
 require('../../braveUnit')
 
@@ -273,7 +273,7 @@ describe('tabContent components', function () {
             })}
         />
       )
-      assert.equal(wrapper.props().symbolContent, tabs.MAX_ALLOWED_NEW_SESSIONS)
+      assert.equal(wrapper.props().symbolContent, tabs.maxAllowedNewSessions)
     })
   })
 

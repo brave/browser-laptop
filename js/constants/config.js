@@ -59,5 +59,8 @@ module.exports = {
       author: 'Darrell Sano',
       link: 'https://dksfoto.smugmug.com'
     }
+  },
+  tabs: {
+    maxAllowedNewSessions: 9
   }
 }

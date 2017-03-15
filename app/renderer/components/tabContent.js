@@ -8,7 +8,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('./styles/global')
 const {isWindows} = require('../../common/lib/platformUtil')
 const {getTextColorForBackground} = require('../../../js/lib/color')
-const {tabs} = require('../../common/constants/appEnums')
+const {tabs} = require('../../../js/constants/config')
 
 const newSessionSvg = require('../../extensions/brave/img/tabs/new_session.svg')
 
@@ -147,8 +147,8 @@ class NewSessionIcon extends ImmutableComponent {
 
   get partitionIndicator () {
     // For now due to UI limitations set session up to 9 visually
-    return this.partitionNumber > tabs.MAX_ALLOWED_NEW_SESSIONS
-      ? tabs.MAX_ALLOWED_NEW_SESSIONS
+    return this.partitionNumber > tabs.maxAllowedNewSessions
+      ? tabs.maxAllowedNewSessions
       : this.partitionNumber
   }
 

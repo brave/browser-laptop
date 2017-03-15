@@ -19,6 +19,7 @@ module.exports.register = (win) => {
     ['CmdOrCtrl+Shift+[', messages.SHORTCUT_PREV_TAB],
     ['CmdOrCtrl+Alt+Right', messages.SHORTCUT_NEXT_TAB],
     ['CmdOrCtrl+Alt+Left', messages.SHORTCUT_PREV_TAB],
+    ['CmdOrCtrl+Shift+S', messages.SHORTCUT_NEW_FRAME, undefined, { isPartitioned: true }],
     ['Ctrl+PageDown', messages.SHORTCUT_NEXT_TAB],
     ['Ctrl+PageUp', messages.SHORTCUT_PREV_TAB],
     ['CmdOrCtrl+9', messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST],
@@ -58,7 +59,7 @@ module.exports.register = (win) => {
     electronLocalshortcut.register(win, shortcutEventName[0], () => {
       let win = BrowserWindow.getFocusedWindow()
       if (win) {
-        win.webContents.send(shortcutEventName[1], shortcutEventName[2])
+        win.webContents.send(shortcutEventName[1], shortcutEventName[2], shortcutEventName[3])
       }
     }))
 
