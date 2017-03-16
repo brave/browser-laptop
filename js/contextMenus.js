@@ -868,7 +868,7 @@ const saveAsMenuItem = (label, location) => {
     label: locale.translation(label),
     click: (item, focusedWindow) => {
       if (focusedWindow && location) {
-        focusedWindow.webContents.downloadURL(location)
+        focusedWindow.webContents.downloadURL(location, true)
       }
     }
   }

@@ -527,7 +527,7 @@ class Frame extends ImmutableComponent {
           ? UrlUtil.getLocationIfPDF(this.tab.get('url'))
           : this.tab.get('url')
         // TODO: Sometimes this tries to save in a non-existent directory
-        this.webview.downloadURL(downloadLocation)
+        this.webview.downloadURL(downloadLocation, true)
         break
       case 'print':
         this.webview.print()

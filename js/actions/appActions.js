@@ -970,6 +970,15 @@ const appActions = {
       protocol,
       location
     })
+  },
+
+  /**
+   * Open dialog for default download path setting
+   */
+  defaultDownloadPath: function () {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_DOWNLOAD_DEFAULT_PATH
+    })
   }
 }
 

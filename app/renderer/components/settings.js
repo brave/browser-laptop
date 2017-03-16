@@ -140,9 +140,71 @@ class SiteSettingCheckbox extends ImmutableComponent {
   }
 }
 
+class SettingItemIcon extends ImmutableComponent {
+  render () {
+    const bg = StyleSheet.create({
+      Icon: {
+        '-webkit-mask-image': `url(${this.props.icon})`
+      }
+    })
+
+    return <div className='settingItem'>
+      {
+        this.props.dataL10nId
+          ? <span data-l10n-id={this.props.dataL10nId} />
+          : null
+      }
+      <div>
+        {
+          this.props.position === 'left'
+            ? <span className={css(bg.Icon, styles.icon, styles.iconLeft)} data-icon-position='left' onClick={this.props.clickAction} />
+            : null
+        }
+        <div className={css(styles.child)}>
+          {this.props.children}
+        </div>
+        {
+          this.props.position === 'right'
+            ? <span className={css(bg.Icon, styles.icon, styles.iconRight)} data-icon-position='right' onClick={this.props.clickAction} />
+            : null
+        }
+      </div>
+    </div>
+  }
+}
+
+const styles = StyleSheet.create({
+  icon: {
+    backgroundColor: '#5a5a5a',
+    height: '16px',
+    width: '16px',
+    display: 'inline-block',
+    verticalAlign: 'top',
+    padding: '0px',
+    '-webkit-mask-repeat': 'no-repeat',
+
+    ':hover': {
+      backgroundColor: '#000'
+    }
+  },
+
+  iconLeft: {
+    margin: '8px 10px 0 0'
+  },
+
+  iconRight: {
+    margin: '8px 0 0 10px'
+  },
+
+  child: {
+    display: 'inline-block'
+  }
+})
+
 module.exports = {
   SettingsList,
   SettingItem,
   SettingCheckbox,
-  SiteSettingCheckbox
+  SiteSettingCheckbox,
+  SettingItemIcon
 }

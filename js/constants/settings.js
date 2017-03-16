@@ -16,6 +16,8 @@ const settings = {
   LANGUAGE: 'general.language',
   CHECK_DEFAULT_ON_STARTUP: 'general.check-default-on-startup',
   IS_DEFAULT_BROWSER: 'general.is-default-browser',
+  DOWNLOAD_DEFAULT_PATH: 'general.download-default-path',
+  DOWNLOAD_ALWAYS_ASK: 'general.download-always-ask',
   // Search tab
   DEFAULT_SEARCH_ENGINE: 'search.default-search-engine',
   OFFER_SEARCH_SUGGESTIONS: 'search.offer-search-suggestions',

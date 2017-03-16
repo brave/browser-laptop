@@ -10,7 +10,7 @@ const UrlUtil = require('../lib/urlutil')
 
 // Components
 const PreferenceNavigation = require('../../app/renderer/components/preferences/preferenceNavigation')
-const {SettingsList, SettingItem, SettingCheckbox} = require('../../app/renderer/components/settings')
+const {SettingsList, SettingItem, SettingCheckbox, SettingItemIcon} = require('../../app/renderer/components/settings')
 const {SettingTextbox} = require('../../app/renderer/components/textbox')
 const {SettingDropdown} = require('../../app/renderer/components/dropdown')
 const Button = require('../components/button')
@@ -32,6 +32,7 @@ const {passwordManagers, extensionIds} = require('../constants/passwordManagers'
 const {startsWithOption, newTabMode, bookmarksToolbarMode, tabCloseAction, fullscreenOption} = require('../../app/common/constants/settingsEnums')
 
 const aboutActions = require('./aboutActions')
+const appActions = require('../actions/appActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
 const searchProviders = require('../data/searchProviders')
@@ -115,6 +116,10 @@ class GeneralTab extends ImmutableComponent {
     return keyArray.every((key) => getSetting(key, this.props.settings) === true)
   }
 
+  openDownloadDialog () {
+    appActions.defaultDownloadPath()
+  }
+
   render () {
     const languageOptions = this.props.languageCodes.map(function (lc) {
       return (
@@ -184,6 +189,17 @@ class GeneralTab extends ImmutableComponent {
           isDarwin ? null : <SettingCheckbox dataL10nId='autoHideMenuBar' prefKey={settings.AUTO_HIDE_MENU} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         }
         <SettingCheckbox dataL10nId='disableTitleMode' prefKey={settings.DISABLE_TITLE_MODE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingItemIcon dataL10nId='downloadDefaultPath' position='right' icon={require('../../img/icon_pencil.svg')} clickAction={this.openDownloadDialog}>
+          <SettingTextbox
+            spellCheck='false'
+            readOnly='true'
+            data-l10n-id='downloadDefaultPathInput'
+            value={getSetting(settings.DOWNLOAD_DEFAULT_PATH, this.props.settings)}
+            onClick={this.openDownloadDialog} />
+        </SettingItemIcon>
+        <SettingCheckbox dataL10nId='downloadAlwaysAsk' prefKey={settings.DOWNLOAD_ALWAYS_ASK}
+          settings={this.props.settings}
+          onChangeSetting={this.props.onChangeSetting} />
         <SettingItem dataL10nId='bookmarkToolbarSettings'>
           <SettingDropdown id='bookmarksBarSelect' value={getSetting(settings.BOOKMARKS_TOOLBAR_MODE, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.BOOKMARKS_TOOLBAR_MODE)}>

@@ -501,8 +501,8 @@ function registerForDownloadListener (session) {
       itemFilename = item.getFilename()
     }
 
-    const defaultPath = path.join(getSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH) || app.getPath('downloads'), itemFilename)
-    const savePath = (process.env.SPECTRON ? defaultPath : dialog.showSaveDialog(win, { defaultPath }))
+    const defaultPath = path.join(getSetting(settings.DOWNLOAD_DEFAULT_PATH) || getSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH) || app.getPath('downloads'), itemFilename)
+    const savePath = ((process.env.SPECTRON || (!getSetting(settings.DOWNLOAD_ALWAYS_ASK) && !item.promptForSaveLocation())) ? defaultPath : dialog.showSaveDialog(win, { defaultPath }))
 
     // User cancelled out of save dialog prompt
     if (!savePath) {

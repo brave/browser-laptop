@@ -792,6 +792,12 @@ Action triggered by un-registering navigation handler
 
 
 
+### defaultDownloadPath() 
+
+Open dialog for default download path setting
+
+
+
 
 * * *
 

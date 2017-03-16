@@ -127,6 +127,8 @@ module.exports = {
     'general.useragent.value': null, // Set at runtime
     'general.autohide-menu': true,
     'general.check-default-on-startup': true,
+    'general.download-default-path': '',
+    'general.download-always-ask': true,
     'search.default-search-engine': 'Google',
     'search.offer-search-suggestions': false, // false by default for privacy reasons
     'tabs.switch-to-new-tabs': false,
