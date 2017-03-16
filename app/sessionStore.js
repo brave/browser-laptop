@@ -36,6 +36,20 @@ const getSetting = require('../js/settings').getSetting
 const promisify = require('../js/lib/promisify')
 const sessionStorageName = `session-store-${sessionStorageVersion}`
 
+const getTopSiteMap = () => {
+  if (Array.isArray(topSites) && topSites.length) {
+    let siteMap = {}
+    let order = 0
+    topSites.forEach((site) => {
+      let key = siteUtil.getSiteKey(Immutable.fromJS(site))
+      site.order = order++
+      siteMap[key] = site
+    })
+    return siteMap
+  }
+  return {}
+}
+
 const getStoragePath = () => {
   return path.join(app.getPath('userData'), sessionStorageName)
 }
@@ -510,7 +524,7 @@ module.exports.defaultAppState = () => {
     sync: {
       lastFetchTimestamp: 0
     },
-    sites: {},
+    sites: getTopSiteMap(),
     tabs: [],
     windows: [],
     extensions: {},

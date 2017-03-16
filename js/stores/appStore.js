@@ -34,7 +34,6 @@ const Filtering = require('../../app/filtering')
 const basicAuth = require('../../app/browser/basicAuth')
 const webtorrent = require('../../app/browser/webtorrent')
 const windows = require('../../app/browser/windows')
-const { topSiteLocations } = require('../data/newTabData')
 const assert = require('assert')
 
 // state helpers
@@ -422,20 +421,9 @@ const handleAppAction = (action) => {
       appState = appState.set('passwords', new Immutable.List())
       break
     case appConstants.APP_CHANGE_NEW_TAB_DETAIL:
-      // If a site is pinned, add it to the sites if it isn't already there.
-      if (action.newTabPageDetail) {
-        let pinnedTopSites = action.newTabPageDetail.get('pinnedTopSites')
-        if (pinnedTopSites) {
-          pinnedTopSites.forEach((site) => {
-            if (site && topSiteLocations.includes(site.get('location'))) {
-              appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), site))
-            }
-          })
-        }
-      }
       appState = aboutNewTabState.mergeDetails(appState, action)
       if (action.refresh) {
-        appState = aboutNewTabState.setSites(appState)
+        appState = aboutNewTabState.setSites(appState, action)
       }
       break
     case appConstants.APP_POPULATE_HISTORY:
