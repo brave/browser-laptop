@@ -12,7 +12,7 @@ class TorrentViewer extends React.Component {
   }
 
   render () {
-    const {torrent, torrentID, name, errorMessage, dispatch} = this.props
+    const {torrent, torrentId, name, errorMessage, dispatch} = this.props
 
     let titleElem, mainButtonId
     if (torrent) {
@@ -62,7 +62,7 @@ class TorrentViewer extends React.Component {
           <TorrentFileList
             torrent={torrent}
             stateOwner={this}
-            torrentID={torrentID} />
+            torrentId={torrentId} />
           {legalNotice}
         </div>
       </div>

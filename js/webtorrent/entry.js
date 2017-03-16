@@ -7,33 +7,32 @@ const React = require('react')
 const ReactDOM = require('react-dom')
 const WebTorrentRemoteClient = require('webtorrent-remote/client')
 
-// React Components
-const MediaViewer = require('./components/mediaViewer')
-const TorrentViewer = require('./components/torrentViewer')
+// React Component
+const App = require('./components/app')
 
 // Stylesheets
 require('../../less/webtorrent.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
-// UI state object. Pure function from `state` -> React element.
-const state = {
-  torrentID: window.decodeURIComponent(window.location.hash.substring(1)),
+// UI state object. Pure function from state -> React element.
+const store = {
+  torrentId: window.decodeURIComponent(window.location.hash.substring(1)),
   parsedTorrent: null,
   client: null,
   torrent: null,
   errorMessage: null
 }
-window.state = state /* for easier debugging */
+window.store = store /* for easier debugging */
 
-state.parsedTorrent = parseTorrent(state.torrentID)
+store.parsedTorrent = parseTorrent(store.torrentId)
 
 // Create the client, set up IPC to the WebTorrentRemoteServer
-state.client = new WebTorrentRemoteClient(send)
-state.client.on('warning', onWarning)
-state.client.on('error', onError)
+store.client = new WebTorrentRemoteClient(send)
+store.client.on('warning', onWarning)
+store.client.on('error', onError)
 
 ipc.on(messages.TORRENT_MESSAGE, function (e, msg) {
-  state.client.receive(msg)
+  store.client.receive(msg)
 })
 
 function send (msg) {
@@ -42,27 +41,29 @@ function send (msg) {
 
 // Clean up the client before the window exits
 window.addEventListener('beforeunload', function () {
-  state.client.destroy({delay: 1000})
+  store.client.destroy({delay: 1000})
 })
 
 // Check whether we're already part of this swarm. If not, show a Start button.
-state.client.get(state.torrentID, function (err, torrent) {
+store.client.get(store.torrentId, function (err, torrent) {
   if (!err) {
-    state.torrent = torrent
+    store.torrent = torrent
     addTorrentEvents(torrent)
   }
-  render()
-})
 
-// Page starts blank, once you call render() it shows a continuously updating torrent UI
-function render () {
+  // Page starts blank. This shows a continuously updating torrent UI
   update()
   setInterval(update, 1000)
-}
+})
 
 function update () {
-  const elem = <App />
+  const elem = <App store={store} dispatch={dispatch} />
   ReactDOM.render(elem, document.querySelector('#appContainer'))
+
+  // Update page title
+  if (store.parsedTorrent && store.parsedTorrent.name) {
+    document.title = store.parsedTorrent.name
+  }
 }
 
 function addTorrentEvents (torrent) {
@@ -75,28 +76,28 @@ function onWarning (err) {
 }
 
 function onError (err) {
-  state.errorMessage = err.message
+  store.errorMessage = err.message
 }
 
 function start () {
-  state.client.add(state.torrentID, onAdded, {server: {}})
+  store.client.add(store.torrentId, onAdded, {server: {}})
 }
 
 function onAdded (err, torrent) {
   if (err) {
-    state.errorMessage = err.message
+    store.errorMessage = err.message
     return console.error(err)
   }
-  state.torrent = torrent
+  store.torrent = torrent
   addTorrentEvents(torrent)
   update()
 }
 
 function saveTorrentFile () {
-  let parsedTorrent = parseTorrent(state.torrentID)
+  let parsedTorrent = parseTorrent(store.torrentId)
   let torrentFile = parseTorrent.toTorrentFile(parsedTorrent)
 
-  let torrentFileName = state.parsedTorrent.name + '.torrent'
+  let torrentFileName = parsedTorrent.name + '.torrent'
   let torrentFileBlobURL = URL.createObjectURL(
     new Blob([torrentFile],
     { type: 'application/x-bittorrent' }
@@ -109,40 +110,13 @@ function saveTorrentFile () {
   a.click()
 }
 
-class App extends React.Component {
-  constructor () {
-    super()
-    this.dispatch = this.dispatch.bind(this)
-  }
-
-  dispatch (action) {
-    switch (action) {
-      case 'start':
-        return start()
-      case 'saveTorrentFile':
-        return saveTorrentFile()
-      default:
-        console.error('Ignoring unknown dispatch type: ' + JSON.stringify(action))
-    }
-  }
-
-  render () {
-    const {torrent, torrentID, errorMessage, parsedTorrent} = state
-    const ix = parsedTorrent && parsedTorrent.ix // Selected file index
-    let name = parsedTorrent && parsedTorrent.name
-    if (name) document.title = name
-
-    if (state.torrent && ix != null) {
-      return <MediaViewer torrent={torrent} ix={ix} />
-    } else {
-      return (
-        <TorrentViewer
-          name={name}
-          torrent={torrent}
-          torrentID={torrentID}
-          errorMessage={errorMessage}
-          dispatch={this.dispatch} />
-      )
-    }
+function dispatch (action) {
+  switch (action) {
+    case 'start':
+      return start()
+    case 'saveTorrentFile':
+      return saveTorrentFile()
+    default:
+      console.error('Ignoring unknown dispatch type: ' + JSON.stringify(action))
   }
 }

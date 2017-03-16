@@ -40,7 +40,7 @@ class TorrentFileList extends React.Component {
   }
 
   renderFileLink (file, isDownload) {
-    const { torrent, torrentID } = this.props
+    const { torrent, torrentId } = this.props
     const ix = torrent.files.indexOf(file)
     if (isDownload) {
       if (torrent.serverURL) {
@@ -50,7 +50,7 @@ class TorrentFileList extends React.Component {
         return <div /> // No download links until the server is ready
       }
     } else {
-      const magnetURL = torrentID + '&ix=' + ix
+      const magnetURL = torrentId + '&ix=' + ix
       return <a href={magnetURL}>{file.name}</a>
     }
   }
