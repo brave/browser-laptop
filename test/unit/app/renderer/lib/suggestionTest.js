@@ -112,8 +112,26 @@ describe('suggestion unit tests', function () {
       assert.deepEqual(suggestion.createVirtualHistoryItems(null), emptyResult)
     })
 
+    it('handles entries with unparseable "location" field', function () {
+      const badInput = makeImmutable({
+        site1: {
+          location: undefined
+        },
+        site2: {
+          location: null
+        },
+        site3: {
+          location: ''
+        },
+        site4: {
+          location: 'httphttp://lol.com'
+        }
+      })
+      assert.ok(suggestion.createVirtualHistoryItems(badInput))
+    })
+
     it('calls immutableUtil.makeImmutable', function () {
-      const callCount = makeImmutableSpy.callCount
+      const callCount = makeImmutableSpy.withArgs({}).callCount
       suggestion.createVirtualHistoryItems()
       assert.equal(makeImmutableSpy.withArgs({}).callCount, callCount + 1)
     })

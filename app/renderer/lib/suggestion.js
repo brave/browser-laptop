@@ -179,9 +179,14 @@ module.exports.createVirtualHistoryItems = (historySites) => {
   historySites = makeImmutable(historySites || {})
 
   // parse each history item
-  var parsedHistorySites = historySites.map((site) => {
-    return urlParse(site.get('location'))
-  }).toArray()
+  const parsedHistorySites = []
+  historySites.forEach((site) => {
+    if (site && site.get('location')) {
+      parsedHistorySites.push(
+        urlParse(site.get('location'))
+      )
+    }
+  })
   // group them by host
   var grouped = _.groupBy(parsedHistorySites, (parsedSite) => {
     return parsedSite.host || 'unknown'
