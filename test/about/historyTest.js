@@ -48,6 +48,11 @@ describe('about:history', function () {
       yield addDemoSites(this.app.client)
     })
 
+    it('does not display Brave default sites', function * () {
+      yield this.app.client
+        .waitForVisible('table.sortableTable td.title[data-sort="Brave"]')
+        .waitForElementCount('td.time', 4)
+    })
     it('displays entries with title as: title or URL', function * () {
       yield this.app.client
         .waitForVisible('table.sortableTable td.title[data-sort="Brave"]')

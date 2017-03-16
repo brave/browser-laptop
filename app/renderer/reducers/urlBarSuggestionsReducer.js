@@ -125,7 +125,11 @@ const updateUrlSuffix = (state, suggestionList) => {
 const generateNewSuggestionsList = (state) => {
   const activeFrameKey = state.get('activeFrameKey')
   const urlLocation = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'location']))
-  const sites = appStoreRenderer.state.get('sites')
+  let sites = appStoreRenderer.state.get('sites')
+  if (sites) {
+    // Filter out Brave default newtab sites
+    sites = sites.filterNot((site) => Immutable.is(site.get('tags'), new Immutable.List(['default'])) && site.get('lastAccessedTime') === 1)
+  }
   const searchResults = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'searchResults']))
   const frameSearchDetail = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'searchDetail']))
   const searchDetail = state.get('searchDetail')

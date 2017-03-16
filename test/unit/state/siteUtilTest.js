@@ -1212,6 +1212,14 @@ describe('siteUtil', function () {
       })
       assert.equal(siteUtil.isHistoryEntry(siteDetail), false)
     })
+    it('returns false for a brave default site', function () {
+      const siteDetail = Immutable.fromJS({
+        location: testUrl1,
+        tags: ['default'],
+        lastAccessedTime: 1
+      })
+      assert.equal(siteUtil.isHistoryEntry(siteDetail), false)
+    })
     it('returns false if input is falsey', function () {
       assert.equal(siteUtil.isHistoryEntry(null), false)
       assert.equal(siteUtil.isHistoryEntry(undefined), false)
