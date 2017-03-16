@@ -1232,8 +1232,8 @@ var excludeP = (publisher, callback) => {
 
       if (doneP) return
 
-      sldP = data.key.indexOf('SLD:') !== 0
-      tldP = data.key.indexOf('TLD:') !== 0
+      sldP = data.key.indexOf('SLD:') === 0
+      tldP = data.key.indexOf('TLD:') === 0
       if ((!tldP) && (!sldP)) return
 
       if (underscore.intersection(data.key.split(''),
