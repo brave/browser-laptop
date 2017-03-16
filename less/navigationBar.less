@@ -706,11 +706,6 @@
   -webkit-user-select: none;
   z-index: @zindexNavigationBar;
 
-  // #6253 #6680
-  > * {
-    -webkit-app-region: no-drag;
-  }
-
   form {
     -webkit-app-region: drag;
     // Disable window dragging so that selecting text and dragging the favicon is possible.
@@ -724,10 +719,16 @@
   }
 
   &:not(.titleMode) {
+
     > * {
       animation: fadeIn .6s;
       opacity: 0;
       animation-fill-mode: forwards;
+
+      // #5792 Apply no-drag to all direct descendants except for .endButtons, which is empty for now
+      &:not(.endButtons) {
+        -webkit-app-region: no-drag;
+      }
     }
 
     .urlbarForm {
