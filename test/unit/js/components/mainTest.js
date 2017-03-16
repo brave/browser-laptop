@@ -8,7 +8,7 @@ const {shallow} = require('enzyme')
 const assert = require('assert')
 const Immutable = require('immutable')
 let Main, NavigationBar
-require('../braveUnit')
+require('../../braveUnit')
 
 describe('Main component unit tests', function () {
   before(function () {
@@ -22,9 +22,10 @@ describe('Main component unit tests', function () {
     mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_no.svg', {})
     mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_yes.svg', {})
     mockery.registerMock('../../extensions/brave/img/caret_down_grey.svg', 'caret_down_grey.svg')
-    mockery.registerMock('electron', require('../lib/fakeElectron'))
-    Main = require('../../../js/components/main')
-    NavigationBar = require('../../../js/components/navigationBar')
+    mockery.registerMock('../../extensions/brave/img/tabs/new_session.svg')
+    mockery.registerMock('electron', require('../../lib/fakeElectron'))
+    Main = require('../../../../js/components/main')
+    NavigationBar = require('../../../../js/components/navigationBar')
   })
 
   after(function () {
