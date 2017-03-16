@@ -74,6 +74,16 @@ describe('tab tests', function () {
       yield this.app.client
         .waitForVisible('webview[partition="persist:default"]')
     })
+
+    it('shows new tab title instead of about:newtab', function * () {
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME)
+        .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
+        .waitUntil(function () {
+          return this.getText('[data-test-id="tab"][data-frame-key="2"]')
+            .then((title) => title === 'New Tab')
+        })
+    })
   })
 
   describe('new tab button', function () {

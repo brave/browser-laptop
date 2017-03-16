@@ -85,6 +85,8 @@ class Tab extends ImmutableComponent {
     // to wait for the title to be parsed.
     if (this.props.tab.get('location') === 'about:blank') {
       return locale.translation('aboutBlankTitle')
+    } else if (this.props.tab.get('location') === 'about:newtab') {
+      return locale.translation('newTab')
     }
     // YouTube tries to change the title to add a play icon when
     // there is audio. Since we have our own audio indicator we get
