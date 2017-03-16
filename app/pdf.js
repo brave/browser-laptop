@@ -32,7 +32,7 @@ const renderUrlToPdf = (appState, action, testingMode) => {
       let listeners = wv.session.listeners('will-download')
       wv.session.removeAllListeners('will-download')
 
-      wv.downloadURL(pdfDataURI)
+      wv.downloadURL(pdfDataURI, true)
       wv.session.once('will-download', function (event, item) {
         if (savePath) {
           item.setSavePath(savePath)

@@ -71,7 +71,7 @@ const downloadsReducer = (state, action) => {
     case appConstants.APP_DOWNLOAD_REDOWNLOADED:
       const win = BrowserWindow.getFocusedWindow()
       if (win) {
-        win.webContents.downloadURL(download.get('url'))
+        win.webContents.downloadURL(download.get('url'), true)
         state = state.deleteIn(['downloads', action.downloadId])
       } else {
         shell.beep()

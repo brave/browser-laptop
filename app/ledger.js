@@ -323,7 +323,7 @@ var backupKeys = (appState, action) => {
         if (action.backupAction === 'print') {
           webContents.print({silent: false, printBackground: false})
         } else {
-          webContents.downloadURL(fileUrl(filePath))
+          webContents.downloadURL(fileUrl(filePath), true)
         }
       })
     }
