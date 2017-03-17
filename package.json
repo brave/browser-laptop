@@ -124,7 +124,7 @@
     "tracking-protection": "1.1.x",
     "underscore": "1.8.3",
     "url-loader": "^0.5.7",
-    "webtorrent-remote": "^1.0.0"
+    "webtorrent-remote": "^2.0.0"
   },
   "devDependencies": {
     "asar": "^0.11.0",
