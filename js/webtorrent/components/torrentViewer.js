@@ -18,6 +18,7 @@ class TorrentViewer extends React.Component {
       torrent,
       serverUrl,
       errorMessage,
+      torrentIdProtocol,
       dispatch
     } = this.props
 
@@ -44,6 +45,24 @@ class TorrentViewer extends React.Component {
       mainButtonId = 'startDownload'
     }
 
+    if (torrentIdProtocol === 'magnet:') {
+      saveButton = (
+        <Button
+          l10nId='copyMagnetLink'
+          className='whiteButton copyMagnetLink'
+          onClick={() => dispatch('copyMagnetLink')}
+        />
+      )
+    } else {
+      saveButton = (
+        <Button
+          l10nId='saveTorrentFile'
+          className='whiteButton saveTorrentFile'
+          onClick={() => dispatch('saveTorrentFile')}
+        />
+      )
+    }
+
     const legalNotice = torrent != null
       ? <a className='legalNotice' data-l10n-id='poweredByWebTorrent' href='https://webtorrent.io' target='_blank' />
       : <div className='legalNotice' data-l10n-id='legalNotice' />
@@ -57,11 +76,9 @@ class TorrentViewer extends React.Component {
               l10nId={mainButtonId}
               className='primaryButton mainButton'
               disabled={!!torrent}
-              onClick={() => dispatch('start')} />
-            <Button
-              l10nId='saveTorrentFile'
-              className='whiteButton saveTorrentFile'
-              onClick={() => dispatch('saveTorrentFile')} />
+              onClick={() => dispatch('start')}
+            />
+            {saveButton}
           </div>
         </div>
 

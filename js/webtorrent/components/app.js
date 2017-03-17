@@ -9,6 +9,7 @@ class App extends React.Component {
       ix,
       name,
       torrentId,
+      torrentIdProtocol,
       torrent,
       serverUrl,
       errorMessage
@@ -21,6 +22,7 @@ class App extends React.Component {
         <TorrentViewer
           name={name}
           torrentId={torrentId}
+          torrentIdProtocol={torrentIdProtocol}
           torrent={torrent}
           serverUrl={serverUrl}
           errorMessage={errorMessage}

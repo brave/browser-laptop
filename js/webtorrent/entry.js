@@ -1,6 +1,6 @@
-/* global Blob, URL */
-
 const ipc = window.chrome.ipcRenderer
+
+const clipboardCopy = require('clipboard-copy')
 const parseTorrent = require('parse-torrent')
 const path = require('path')
 const querystring = require('querystring')
@@ -21,6 +21,7 @@ const store = {
   name: null, // Torrent name
   ix: null, // Selected file index
   torrentId: window.decodeURIComponent(window.location.hash.substring(1)),
+  torrentIdProtocol: null,
   torrent: null,
   serverUrl: null,
   errorMessage: null
@@ -32,13 +33,14 @@ init()
 
 function init () {
   const parsedUrl = url.parse(store.torrentId)
+  store.torrentIdProtocol = parsedUrl.protocol
 
   // `ix` param can be set by query param or hash, e.g. ?ix=1 or #ix=1
   if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
     store.name = path.basename(parsedUrl.pathname)
     store.ix = getIxQuery(parsedUrl)
     if (store.ix == null) store.ix = getIxHash(parsedUrl)
-  } else {
+  } else if (parsedUrl.protocol === 'magnet:') {
     let parsedTorrent
     try {
       parsedTorrent = parseTorrent(store.torrentId)
@@ -48,6 +50,8 @@ function init () {
     store.name = parsedTorrent.name
     store.ix = parsedTorrent.ix
     if (store.ix == null) store.ix = getIxHash(parsedUrl)
+  } else {
+    return onError(new Error('Invalid torrent identifier'))
   }
 
   // Create the client, set up IPC to the WebTorrentRemoteServer
@@ -63,12 +67,15 @@ function init () {
   client.get(store.torrentId, function (err, torrent) {
     if (!err) {
       store.torrent = torrent
-      addTorrentEvents(torrent)
+      initTorrent(torrent)
     }
     update()
   })
 
-  // Clean up the client before the window exits
+  // Clean up the client. Note: Since this does IPC, it's not guaranteed to send
+  // before the page is closed. But that's okay; webtorrent-remote expects regular
+  // heartbeats and assumes clients are dead after 30s without one. So basically,
+  // this is an optimization to destroy the client sooner.
   window.addEventListener('beforeunload', function () {
     client.destroy()
   })
@@ -105,14 +112,8 @@ function update () {
 function onAdded (err, torrent) {
   if (err) return onError(err)
 
-  // Once torrent's canonical name is available, use it
-  if (torrent.name) store.name = torrent.name
-
   store.torrent = torrent
-  addTorrentEvents(torrent)
-
-  server = torrent.createServer()
-  server.listen(onServerListening)
+  initTorrent(torrent)
 
   update()
 }
@@ -122,9 +123,15 @@ function onServerListening () {
   update()
 }
 
-function addTorrentEvents (torrent) {
+function initTorrent (torrent) {
+  // Once torrent's canonical name is available, use it
+  if (torrent.name) store.name = torrent.name
+
   torrent.on('warning', onWarning)
   torrent.on('error', onError)
+
+  server = torrent.createServer()
+  server.listen(onServerListening)
 
   // These event listeners aren't strictly required, but it's better to update the
   // UI immediately when important events happen instead of waiting for the regular
@@ -140,6 +147,8 @@ function dispatch (action) {
       return start()
     case 'saveTorrentFile':
       return saveTorrentFile()
+    case 'copyMagnetLink':
+      return copyMagnetLink()
     default:
       console.error('Ignoring unknown dispatch type: ' + JSON.stringify(action))
   }
@@ -150,17 +159,15 @@ function start () {
 }
 
 function saveTorrentFile () {
-  let torrentFileName = store.name + '.torrent'
-  let torrentFileBlobURL = URL.createObjectURL(
-    new Blob([store.torrent.torrentFile],
-    { type: 'application/x-bittorrent' }
-  ))
-
   let a = document.createElement('a')
   a.target = '_blank'
-  a.download = torrentFileName
-  a.href = torrentFileBlobURL
+  a.download = true
+  a.href = store.torrentId
   a.click()
+}
+
+function copyMagnetLink () {
+  clipboardCopy(store.torrentId)
 }
 
 function onWarning (err) {
