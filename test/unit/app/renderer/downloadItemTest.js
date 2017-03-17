@@ -62,6 +62,10 @@ describe('downloadItem component', function () {
         assert.equal(this.result.find('.downloadFilename').text(), this.download.get('filename'))
       })
 
+      it('origin exists and matches download origin', function () {
+        assert.equal(this.result.find('.downloadOrigin').text(), 'http://www.bradrichter.com')
+      })
+
       const shouldProgressBarExist = [downloadStates.IN_PROGRESS, downloadStates.PAUSED].includes(state)
       it(shouldProgressBarExist ? 'progress bar should exist' : 'progress bar should not exist', function () {
         assert.equal(this.result.find('.downloadProgress').length, shouldProgressBarExist ? 1 : 0)

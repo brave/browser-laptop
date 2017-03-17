@@ -36,7 +36,7 @@
       display: flex;
       font-size: 11px;
       flex-direction: column;
-      height: 36px;
+      height: 46px;
       padding: 0 14px;
       position: relative;
       margin: auto var(--download-item-margin) auto 0;
@@ -44,7 +44,7 @@
       min-width: var(--download-item-width);
 
       &:hover {
-        height: 62px;
+        height: 72px;
         top: -23px;
 
         .downloadInfo .downloadArrow {
@@ -97,7 +97,7 @@
       .downloadInfo {
         display: flex;
         margin: auto 0;
-        .downloadFilename, .downloadState {
+        .downloadFilename, .downloadState, .downloadOrigin {
           margin: auto 0;
           white-space: nowrap;
           overflow: hidden;
@@ -108,6 +108,14 @@
         .downloadArrow {
           width: 14px;
           margin: auto 0 auto auto;
+        }
+
+        .isSecure {
+          color: #15b106;
+        }
+
+        .isInsecure {
+          color: red;
         }
 
         >span {
