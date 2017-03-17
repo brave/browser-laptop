@@ -4,10 +4,11 @@
 
 const React = require('react')
 const ImmutableComponent = require('../../components/immutableComponent')
-const {aboutUrls} = require('../../lib/appUrlUtil')
+const aboutActions = require('../aboutActions')
 
 class FooterInfo extends ImmutableComponent {
   render () {
+    const openUrl = (location) => aboutActions.newFrame.bind(null, {location}, true)
     return <footer className='footerContainer'>
       <div className='copyrightNotice'>
         {
@@ -22,9 +23,9 @@ class FooterInfo extends ImmutableComponent {
         }
       </div>
       <nav className='shortcutsContainer'>
-        <a className='shortcutIcon settingsIcon' href={aboutUrls.get('about:preferences')} data-l10n-id='preferencesPage' />
-        <a className='shortcutIcon bookmarksIcon' href={aboutUrls.get('about:bookmarks')} data-l10n-id='bookmarksPage' />
-        <a className='shortcutIcon historyIcon' href={aboutUrls.get('about:history')} data-l10n-id='historyPage' />
+        <span className='shortcutIcon settingsIcon' onClick={openUrl('about:preferences')} data-l10n-id='preferencesPage' />
+        <span className='shortcutIcon bookmarksIcon' onClick={openUrl('about:bookmarks')} data-l10n-id='bookmarksPage' />
+        <span className='shortcutIcon historyIcon' onClick={openUrl('about:history')} data-l10n-id='historyPage' />
       </nav>
     </footer>
   }
