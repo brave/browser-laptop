@@ -580,6 +580,11 @@ module.exports.isHistoryEntry = function (siteDetail) {
     if (siteDetail.get('location').startsWith('about:')) {
       return false
     }
+    if (Immutable.is(siteDetail.get('tags'), new Immutable.List(['default'])) &&
+      siteDetail.get('lastAccessedTime') === 1) {
+      // This is a Brave default newtab site
+      return false
+    }
     return !!siteDetail.get('lastAccessedTime') && !isBookmarkFolder(siteDetail.get('tags'))
   }
   return false

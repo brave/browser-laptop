@@ -37,13 +37,17 @@ describe('urlBarSuggestions', function () {
       .waitForElementFocus(urlInput)
   })
 
+  it('does not show Brave default sites', function * () {
+    yield this.app.client.ipcSend('shortcut-focus-url')
+      .waitForElementFocus(urlInput)
+      .setValue(urlInput, 'twitter')
+      .waitForElementCount('li.suggestionItem', 1)
+  })
+
   it('show suggestion when single letter is typed in', function * () {
     yield this.app.client.ipcSend('shortcut-focus-url')
       .waitForElementFocus(urlInput)
       .setInputText(urlInput, 'a')
-      .waitUntil(function () {
-        return this.getValue(urlInput).then((val) => val === 'a')
-      })
       .waitForExist(urlBarSuggestions)
   })
 
