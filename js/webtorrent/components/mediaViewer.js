@@ -22,13 +22,14 @@ module.exports = class MediaViewer extends React.Component {
     const { torrent, serverUrl, ix } = this.props
 
     const file = torrent.files[ix]
+    const fileURL = serverUrl && (serverUrl + '/' + ix)
+
     const fileExt = file && getExtension(file.name)
     const isVideo = SUPPORTED_VIDEO_EXTENSIONS.includes(fileExt)
     const isAudio = SUPPORTED_AUDIO_EXTENSIONS.includes(fileExt)
-    const fileURL = serverUrl && (serverUrl + '/' + ix)
 
     let content
-    if (serverUrl == null) {
+    if (!file || !serverUrl) {
       content = <div data-l10n-id='torrentLoadingMedia' />
     } else if (isVideo) {
       content = <video src={fileURL} autoPlay controls />
