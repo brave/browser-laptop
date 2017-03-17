@@ -36,7 +36,8 @@ function init () {
   // `ix` param can be set by query param or hash, e.g. ?ix=1 or #ix=1
   if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
     store.name = path.basename(parsedUrl.pathname)
-    store.ix = getIxQuery(parsedUrl) || getIxHash(parsedUrl)
+    store.ix = getIxQuery(parsedUrl)
+    if (store.ix == null) store.ix = getIxHash(parsedUrl)
   } else {
     let parsedTorrent
     try {
@@ -45,7 +46,8 @@ function init () {
       return onError(new Error('Invalid torrent identifier'))
     }
     store.name = parsedTorrent.name
-    store.ix = parsedTorrent.ix || getIxHash(parsedUrl)
+    store.ix = parsedTorrent.ix
+    if (store.ix == null) store.ix = getIxHash(parsedUrl)
   }
 
   // Create the client, set up IPC to the WebTorrentRemoteServer
