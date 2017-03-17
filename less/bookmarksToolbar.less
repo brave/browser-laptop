@@ -17,7 +17,7 @@
   box-sizing: border-box;
   display: flex;
   flex: 1;
-  padding: 0 var(--bookmarks-toolbar-padding) 8px;
+  padding: 7px var(--bookmarks-toolbar-padding) 8px;
 
   &.allowDragging {
     -webkit-app-region: drag;
@@ -27,7 +27,18 @@
   }
 
   &.showOnlyFavicon {
-    padding: 0 0 7px 10px;
+    padding: 7px 0 7px 10px;
+  }
+
+  // PR #7740
+  + .tabPages {
+    &.singlePage {
+      height: 0;
+    }
+
+    &:not(.singlePage) {
+      padding-top: 0;
+    }
   }
 
   .bookmarkToolbarButton {
