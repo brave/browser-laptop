@@ -97,8 +97,12 @@ const getDefaultUserPrefContentSettings = (braveryDefaults, appSettings, appConf
       setting: 'block',
       primaryPattern: '*'
     }],
-    flashEnabled: [{
+    flashEnabled: [{ // whether flash is installed and enabled
       setting: braveryDefaults.get('flash') ? 'allow' : 'block',
+      primaryPattern: '*'
+    }],
+    flashAllowed: [{ // whether user has expressed intent to run flash
+      setting: 'block',
       primaryPattern: '*'
     }],
     popups: [{
@@ -268,6 +272,7 @@ const siteSettingsToContentSettings = (currentSiteSettings, defaultContentSettin
     }
     if (typeof siteSetting.get('flash') === 'number' && braveryDefaults.get('flash')) {
       contentSettings = addContentSettings(contentSettings, 'plugins', primaryPattern, '*', 'allow', getFlashResourceId())
+      contentSettings = addContentSettings(contentSettings, 'flashAllowed', primaryPattern, '*', 'allow', getFlashResourceId())
     }
     if (typeof siteSetting.get('widevine') === 'number' && braveryDefaults.get('widevine')) {
       contentSettings = addContentSettings(contentSettings, 'plugins', primaryPattern, '*', 'allow', appConfig.widevine.resourceId)
