@@ -62,8 +62,8 @@ function init () {
     if (!err) {
       store.torrent = torrent
       addTorrentEvents(torrent)
-      update()
     }
+    update()
   })
 
   // Clean up the client before the window exits
@@ -71,7 +71,7 @@ function init () {
     client.destroy()
   })
 
-  // Page starts blank. This shows a continuously updating torrent UI
+  // Update the UI (to show download speed) every 1s.
   update()
   setInterval(update, 1000)
 }
@@ -123,6 +123,13 @@ function onServerListening () {
 function addTorrentEvents (torrent) {
   torrent.on('warning', onWarning)
   torrent.on('error', onError)
+
+  // These event listeners aren't strictly required, but it's better to update the
+  // UI immediately when important events happen instead of waiting for the regular
+  // update() call that happens on a 1 second interval.
+  torrent.on('infohash', update)
+  torrent.on('metadata', update)
+  torrent.on('done', update)
 }
 
 function dispatch (action) {
