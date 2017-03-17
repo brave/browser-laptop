@@ -37,7 +37,8 @@ module.exports = class MediaViewer extends React.Component {
       content = <audio src={fileURL} autoPlay controls />
     } else {
       // For security, sandbox and disallow scripts.
-      // We need allow-same-origin so that the iframe can load from http://localhost:...
+      // We need allow-same-origin so that the iframe can load from
+      // http://localhost:...
       content = <iframe src={fileURL} sandbox='allow-same-origin' />
     }
 

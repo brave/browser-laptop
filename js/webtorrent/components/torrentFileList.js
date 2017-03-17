@@ -50,8 +50,11 @@ class TorrentFileList extends React.Component {
         return <div /> // No download links until the server is ready
       }
     } else {
-      const magnetURL = torrentId + '&ix=' + ix
-      return <a href={magnetURL}>{file.name}</a>
+      const suffix = /^https?:/.test(torrentId)
+        ? '#ix=' + ix
+        : '&ix=' + ix
+      const href = torrentId + suffix
+      return <a href={href}>{file.name}</a>
     }
   }
 }

@@ -1,61 +1,94 @@
 /* global Blob, URL */
 
 const ipc = window.chrome.ipcRenderer
-const messages = require('../constants/messages')
 const parseTorrent = require('parse-torrent')
+const path = require('path')
+const querystring = require('querystring')
 const React = require('react')
 const ReactDOM = require('react-dom')
+const url = require('url')
 const WebTorrentRemoteClient = require('webtorrent-remote/client')
 
-// React Component
 const App = require('./components/app')
+const messages = require('../constants/messages')
 
 // Stylesheets
 require('../../less/webtorrent.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
-const torrentId = window.decodeURIComponent(window.location.hash.substring(1))
-const parsedTorrent = parseTorrent(torrentId)
-
 // Pure function from state -> React elements.
 const store = {
-  ix: parsedTorrent && parsedTorrent.ix, // Selected file index
-  name: parsedTorrent && parsedTorrent.name,
-  torrentId: torrentId,
+  name: null, // Torrent name
+  ix: null, // Selected file index
+  torrentId: window.decodeURIComponent(window.location.hash.substring(1)),
   torrent: null,
   serverUrl: null,
   errorMessage: null
 }
 
-// Create the client, set up IPC to the WebTorrentRemoteServer
-const client = new WebTorrentRemoteClient(send)
-client.on('warning', onWarning)
-client.on('error', onError)
+let client, server
 
-ipc.on(messages.TORRENT_MESSAGE, function (e, msg) {
-  client.receive(msg)
-})
+init()
 
-function send (msg) {
-  ipc.send(messages.TORRENT_MESSAGE, msg)
-}
+function init () {
+  const parsedUrl = url.parse(store.torrentId)
 
-// Clean up the client before the window exits
-window.addEventListener('beforeunload', function () {
-  client.destroy()
-})
-
-// Check whether we're already part of this swarm. If not, show a Start button.
-client.get(store.torrentId, function (err, torrent) {
-  if (!err) {
-    store.torrent = torrent
-    addTorrentEvents(torrent)
+  // `ix` param can be set by query param or hash, e.g. ?ix=1 or #ix=1
+  if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+    store.name = path.basename(parsedUrl.pathname)
+    store.ix = getIxQuery(parsedUrl) || getIxHash(parsedUrl)
+  } else {
+    let parsedTorrent
+    try {
+      parsedTorrent = parseTorrent(store.torrentId)
+    } catch (err) {
+      return onError(new Error('Invalid torrent identifier'))
+    }
+    store.name = parsedTorrent.name
+    store.ix = parsedTorrent.ix || getIxHash(parsedUrl)
   }
+
+  // Create the client, set up IPC to the WebTorrentRemoteServer
+  client = new WebTorrentRemoteClient(send)
+  client.on('warning', onWarning)
+  client.on('error', onError)
+
+  ipc.on(messages.TORRENT_MESSAGE, function (e, msg) {
+    client.receive(msg)
+  })
+
+  // Check whether we're already part of this swarm. If not, show a Start button.
+  client.get(store.torrentId, function (err, torrent) {
+    if (!err) {
+      store.torrent = torrent
+      addTorrentEvents(torrent)
+      update()
+    }
+  })
+
+  // Clean up the client before the window exits
+  window.addEventListener('beforeunload', function () {
+    client.destroy()
+  })
 
   // Page starts blank. This shows a continuously updating torrent UI
   update()
   setInterval(update, 1000)
-})
+}
+
+function getIxQuery (parsedUrl) {
+  const ix = Number(querystring.parse(parsedUrl.query).ix)
+  return Number.isNaN(ix) ? null : ix
+}
+
+function getIxHash (parsedUrl) {
+  const ix = Number(querystring.parse((parsedUrl.hash || '').slice(1)).ix)
+  return Number.isNaN(ix) ? null : ix
+}
+
+function send (msg) {
+  ipc.send(messages.TORRENT_MESSAGE, msg)
+}
 
 function update () {
   const elem = <App store={store} dispatch={dispatch} />
@@ -76,13 +109,14 @@ function onAdded (err, torrent) {
   store.torrent = torrent
   addTorrentEvents(torrent)
 
-  const server = torrent.createServer()
-  server.listen(function () {
-    console.log('ON LISTENING')
-    store.serverUrl = 'http://localhost:' + server.address().port
-    update()
-  })
+  server = torrent.createServer()
+  server.listen(onServerListening)
 
+  update()
+}
+
+function onServerListening () {
+  store.serverUrl = 'http://localhost:' + server.address().port
   update()
 }
 
@@ -107,12 +141,9 @@ function start () {
 }
 
 function saveTorrentFile () {
-  let parsedTorrent = parseTorrent(store.torrentId)
-  let torrentFile = parseTorrent.toTorrentFile(parsedTorrent)
-
-  let torrentFileName = parsedTorrent.name + '.torrent'
+  let torrentFileName = store.name + '.torrent'
   let torrentFileBlobURL = URL.createObjectURL(
-    new Blob([torrentFile],
+    new Blob([store.torrent.torrentFile],
     { type: 'application/x-bittorrent' }
   ))
 
@@ -130,8 +161,10 @@ function onWarning (err) {
 function onError (err) {
   store.errorMessage = err.message
   console.error(err.message)
+  update()
 }
 
 /* for easier debugging */
 window.store = store
 window.client = client
+window.server = server
