@@ -4,6 +4,8 @@ const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
 const {urlInput, urlBarSuggestions} = require('../lib/selectors')
+const Immutable = require('immutable')
+const aboutHistoryState = require('../../app/common/state/aboutHistoryState')
 
 describe('urlBarSuggestions', function () {
   function * setup (client) {
@@ -108,11 +110,12 @@ describe('urlBarSuggestions', function () {
   })
 
   it('selects a location auto complete result but not for titles', function * () {
-    const page2Url = Brave.server.url('page2.html')
     yield this.app.client
       .setValue(urlInput, 'http://')
       .waitUntil(function () {
-        return this.getValue(urlInput).then((val) => val === page2Url)
+        return this.getValue(urlInput).then(function (val) {
+          return val === Brave.server.urlOrigin()
+        })
       })
       .waitForExist(urlBarSuggestions + ' li.selected')
       .setValue(urlInput, 'Page')
@@ -150,11 +153,25 @@ describe('urlBarSuggestions', function () {
 
   it('selection is not reset when pressing non-input key', function * () {
     const pagePartialUrl = Brave.server.url('page')
+    const page1Url = Brave.server.url('page1.html')
+    aboutHistoryState.setHistory(Immutable.fromJS({
+      about: {
+        history: {
+          entries: [],
+          updatedStamp: undefined
+        }
+      }
+    }))
+
     yield this.app.client
-      .setInputText(urlInput, pagePartialUrl)
+      .setValue(urlInput, pagePartialUrl)
       .waitForVisible(urlBarSuggestions)
       .keys(Brave.keys.DOWN)
-      .waitForInputText(urlInput, this.page1Url)
+      .waitUntil(function () {
+        return this.getValue(urlInput).then(function (val) {
+          return val === page1Url
+        })
+      })
       .keys(Brave.keys.CONTROL)
       .keys(Brave.keys.CONTROL)
       .waitForSelectedText('1.html')
