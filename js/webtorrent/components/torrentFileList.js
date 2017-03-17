@@ -4,7 +4,7 @@ const SortableTable = require('../../components/sortableTable')
 
 class TorrentFileList extends React.Component {
   render () {
-    const torrent = this.props.torrent
+    const { torrent, stateOwner } = this.props
     const files = torrent && torrent.files
 
     let content
@@ -27,7 +27,7 @@ class TorrentFileList extends React.Component {
           rowObjects={files}
           columnClassNames={['num', 'name', 'downloadFile', 'size']}
           addHoverClass
-          stateOwner={this.props.stateOwner} />
+          stateOwner={stateOwner} />
       ]
     }
 
@@ -40,11 +40,11 @@ class TorrentFileList extends React.Component {
   }
 
   renderFileLink (file, isDownload) {
-    const { torrent, torrentId } = this.props
+    const { torrentId, torrent, serverUrl } = this.props
     const ix = torrent.files.indexOf(file)
     if (isDownload) {
-      if (torrent.serverURL) {
-        const httpURL = torrent.serverURL + '/' + ix
+      if (serverUrl) {
+        const httpURL = serverUrl + '/' + ix
         return <a href={httpURL} download={file.name}>⇩</a>
       } else {
         return <div /> // No download links until the server is ready

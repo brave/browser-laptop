@@ -6,26 +6,25 @@ const TorrentViewer = require('./torrentViewer')
 class App extends React.Component {
   render () {
     const {
-      torrent,
+      ix,
+      name,
       torrentId,
-      errorMessage,
-      parsedTorrent,
-      dispatch
+      torrent,
+      serverUrl,
+      errorMessage
     } = this.props.store
 
-    const ix = parsedTorrent && parsedTorrent.ix // Selected file index
-    const name = parsedTorrent && parsedTorrent.name
-
     if (torrent && ix != null) {
-      return <MediaViewer torrent={torrent} ix={ix} />
+      return <MediaViewer torrent={torrent} serverUrl={serverUrl} ix={ix} />
     } else {
       return (
         <TorrentViewer
           name={name}
-          torrent={torrent}
           torrentId={torrentId}
+          torrent={torrent}
+          serverUrl={serverUrl}
           errorMessage={errorMessage}
-          dispatch={dispatch} />
+          dispatch={this.props.dispatch} />
       )
     }
   }

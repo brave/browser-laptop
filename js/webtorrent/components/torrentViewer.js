@@ -12,9 +12,17 @@ class TorrentViewer extends React.Component {
   }
 
   render () {
-    const {torrent, torrentId, name, errorMessage, dispatch} = this.props
+    const {
+      name,
+      torrentId,
+      torrent,
+      serverUrl,
+      errorMessage,
+      dispatch
+    } = this.props
 
     let titleElem, mainButtonId
+
     if (torrent) {
       if (name) {
         // No localization, just use the torrent name
@@ -60,9 +68,11 @@ class TorrentViewer extends React.Component {
         <div className='siteDetailsPageContent'>
           <TorrentStatus torrent={torrent} errorMessage={errorMessage} />
           <TorrentFileList
+            torrentId={torrentId}
             torrent={torrent}
+            serverUrl={serverUrl}
             stateOwner={this}
-            torrentId={torrentId} />
+          />
           {legalNotice}
         </div>
       </div>
