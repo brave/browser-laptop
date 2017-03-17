@@ -127,8 +127,12 @@ const generateNewSuggestionsList = (state) => {
   const urlLocation = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'location']))
   let sites = appStoreRenderer.state.get('sites')
   if (sites) {
-    // Filter out Brave default newtab sites
-    sites = sites.filterNot((site) => Immutable.is(site.get('tags'), new Immutable.List(['default'])) && site.get('lastAccessedTime') === 1)
+    // Filter out Brave default newtab sites and sites with falsey location
+    sites = sites.filterNot((site) =>
+      Immutable.is(site.get('tags'), new Immutable.List(['default'])) &&
+      site.get('lastAccessedTime') === 1 ||
+      !site.get('location')
+    )
   }
   const searchResults = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'searchResults']))
   const frameSearchDetail = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'searchDetail']))

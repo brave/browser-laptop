@@ -17,6 +17,7 @@ const windowState = Immutable.fromJS({
     location: 'https://www.brave.com',
     navbar: {
       urlbar: {
+        location: 'about:newtab',
         suggestions: {
           shouldRender: true,
           selectedIndex: 2,
@@ -33,7 +34,48 @@ const windowState = Immutable.fromJS({
   }]
 })
 
-describe('urlBarSuggestionsReducer', function () {
+const fakeAppStoreRenderer = {
+  state: Immutable.fromJS({
+    sites: {
+      'key1': {
+        location: 'location1',
+        tags: [],
+        lastAccessedTime: 123
+      },
+      'key2': {
+        location: 'location2',
+        tags: [],
+        lastAccessedTime: 123
+      },
+      'key3': {
+        title: 'about:newtab',
+        location: undefined,
+        tags: [],
+        lastAccessedTime: 123
+      },
+      'key4': {
+        location: 'http://www.foo.com/1',
+        count: 0,
+        lastAccessedTime: 1,
+        title: 'www.foo/com/1'
+      },
+      'key5': {
+        location: 'http://www.foo.com/2',
+        count: 0,
+        lastAccessedTime: 2,
+        title: 'www.foo/com/2'
+      },
+      'key6': {
+        location: 'http://www.foo.com/3',
+        count: 0,
+        lastAccessedTime: 3,
+        title: 'www.foo/com/3'
+      }
+    }
+  })
+}
+
+describe('urlBarSuggestionsReducer unit tests', function () {
   let urlBarSuggestionsReducer
   before(function () {
     mockery.enable({
@@ -42,6 +84,12 @@ describe('urlBarSuggestionsReducer', function () {
       useCleanCache: true
     })
     mockery.registerMock('electron', fakeElectron)
+    mockery.registerMock('../../../js/stores/appStoreRenderer', fakeAppStoreRenderer)
+    mockery.registerMock('../../../js/settings', { getSetting: (settingKey, settingsCollection, value) => {
+      switch (settingKey) {
+        default: return true
+      }
+    }})
     urlBarSuggestionsReducer = require('../../../../../app/renderer/reducers/urlBarSuggestionsReducer')
   })
 

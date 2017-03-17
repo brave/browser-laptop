@@ -41,6 +41,14 @@ describe('suggestion unit tests', function () {
   })
 
   describe('normalizeLocation', function () {
+    it('does nothing when input is not a string', function () {
+      assert.equal(suggestion.normalizeLocation(), undefined)
+      assert.equal(suggestion.normalizeLocation(undefined), undefined)
+      assert.equal(suggestion.normalizeLocation(null), null)
+      assert.equal(suggestion.normalizeLocation(3), 3)
+      assert.equal(suggestion.normalizeLocation(3.3), 3.3)
+    })
+
     it('normalizes location', function () {
       assert.ok(suggestion.normalizeLocation('https://www.site.com') === 'site.com', 'www. prefix removed')
       assert.ok(suggestion.normalizeLocation('http://site.com') === 'site.com', 'location not modified')
