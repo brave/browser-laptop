@@ -54,8 +54,6 @@ function init () {
     return onError(new Error('Invalid torrent identifier'))
   }
 
-  document.title = store.name
-
   // Create the client, set up IPC to the WebTorrentRemoteServer
   client = new WebTorrentRemoteClient(send)
   client.on('warning', onWarning)
@@ -104,6 +102,7 @@ function send (msg) {
 function update () {
   const elem = <App store={store} dispatch={dispatch} />
   ReactDOM.render(elem, document.querySelector('#appContainer'))
+  document.title = store.name || 'WebTorrent'
 }
 
 function onAdded (err, torrent) {
@@ -124,7 +123,6 @@ function initTorrent (torrent) {
   // Once torrent's canonical name is available, use it
   if (torrent.name) {
     store.name = torrent.name
-    document.title = store.name
   }
 
   torrent.on('warning', onWarning)
