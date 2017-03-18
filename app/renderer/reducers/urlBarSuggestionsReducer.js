@@ -129,8 +129,8 @@ const generateNewSuggestionsList = (state) => {
   if (sites) {
     // Filter out Brave default newtab sites and sites with falsey location
     sites = sites.filterNot((site) =>
-      Immutable.is(site.get('tags'), new Immutable.List(['default'])) &&
-      site.get('lastAccessedTime') === 1 ||
+      Immutable.is(site.get('tags'), (new Immutable.List(['default'])) &&
+      site.get('lastAccessedTime') === 1) ||
       !site.get('location')
     )
   }
@@ -278,8 +278,11 @@ const generateNewSuggestionsList = (state) => {
       formatUrl: (frame) => frame.get('location'),
       filterValue: (frame) => !isSourceAboutUrl(frame.get('location')) &&
         frame.get('key') !== activeFrameKey &&
-        (frame.get('title') && frame.get('title').toLowerCase().includes(urlLocationLower) ||
-        frame.get('location') && frame.get('location').toLowerCase().includes(urlLocationLower))}))
+        (
+          (frame.get('title') && frame.get('title').toLowerCase().includes(urlLocationLower)) ||
+          (frame.get('location') && frame.get('location').toLowerCase().includes(urlLocationLower))
+        )
+    }))
   }
 
   // Search suggestions

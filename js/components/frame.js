@@ -1025,8 +1025,8 @@ class Frame extends ImmutableComponent {
           return
         }
         windowActions.setFindDetail(this.frame, Immutable.fromJS({
-          numberOfMatches: e.result.matches || this.props.findDetail && this.props.findDetail.get('numberOfMatches') || 0,
-          activeMatchOrdinal: e.result.activeMatchOrdinal || this.props.findDetail && this.props.findDetail.get('activeMatchOrdinal')
+          numberOfMatches: e.result.matches || (this.props.findDetail && this.props.findDetail.get('numberOfMatches')) || 0,
+          activeMatchOrdinal: e.result.activeMatchOrdinal || (this.props.findDetail && this.props.findDetail.get('activeMatchOrdinal'))
         }))
       }
     })
@@ -1119,7 +1119,7 @@ class Frame extends ImmutableComponent {
     }
     const searchString = this.props.findDetail && this.props.findDetail.get('searchString')
     if (searchString) {
-      webviewActions.findInPage(searchString, this.props.findDetail && this.props.findDetail.get('caseSensitivity') || undefined, forward, this.props.findDetail.get('internalFindStatePresent'), this.webview)
+      webviewActions.findInPage(searchString, (this.props.findDetail && this.props.findDetail.get('caseSensitivity')) || undefined, forward, this.props.findDetail.get('internalFindStatePresent'), this.webview)
     }
   }
 

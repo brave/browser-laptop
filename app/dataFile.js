@@ -69,7 +69,7 @@ module.exports.shouldRedownloadFirst = (resourceName, version) => {
   const lastCheckDate = AppStore.getState().getIn([resourceName, 'lastCheckDate'])
   const lastCheckVersion = AppStore.getState().getIn([resourceName, 'lastCheckVersion'])
   return lastCheckVersion !== version ||
-    lastCheckDate && (new Date().getTime() - lastCheckDate) > appConfig[resourceName].msBetweenRechecks
+    (lastCheckDate && (new Date().getTime() - lastCheckDate) > appConfig[resourceName].msBetweenRechecks)
 }
 
 /**

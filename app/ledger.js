@@ -2027,7 +2027,7 @@ const showEnabledNotifications = () => {
   if (reconcileStamp - underscore.now() < msecs.day) {
     if (sufficientBalanceToReconcile()) {
       if (shouldShowNotificationReviewPublishers()) {
-        showNotificationReviewPublishers(reconcileStamp + (ledgerInfo.reconcileFrequency - 2) * msecs.day)
+        showNotificationReviewPublishers(reconcileStamp + ((ledgerInfo.reconcileFrequency - 2) * msecs.day))
       }
     } else if (shouldShowNotificationAddFunds()) {
       showNotificationAddFunds()
@@ -2052,7 +2052,7 @@ const shouldShowNotificationAddFunds = () => {
 }
 
 const showNotificationAddFunds = () => {
-  const nextTime = underscore.now() + 3 * msecs.day
+  const nextTime = underscore.now() + (3 * msecs.day)
   appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP, nextTime)
 
   addFundsMessage = addFundsMessage || locale.translation('addFundsNotification')

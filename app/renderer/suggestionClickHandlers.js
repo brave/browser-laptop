@@ -15,7 +15,7 @@ const navigateSiteClickHandler = (formatUrl) => (site, isForSecondaryAction, shi
   if (isForSecondaryAction) {
     windowActions.newFrame({
       location,
-      partitionNumber: site && site.get && site.get('partitionNumber') || undefined
+      partitionNumber: (site && site.get && site.get('partitionNumber')) || undefined
     }, !!shiftKey)
   } else {
     const activeFrame = getActiveFrame(windowStore.state)

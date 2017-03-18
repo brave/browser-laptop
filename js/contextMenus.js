@@ -1299,7 +1299,7 @@ function onNewTabContextMenu (target) {
   const containerRect = target.parentNode.getBoundingClientRect()
   const rect = target.getBoundingClientRect()
 
-  const contextMenuMaxVisibleWidth = rect.right + contextMenuSize / 2
+  const contextMenuMaxVisibleWidth = rect.right + (contextMenuSize / 2)
   const contextMenuHasOverflow = contextMenuMaxVisibleWidth > containerRect.right
 
   const menuTemplate = [

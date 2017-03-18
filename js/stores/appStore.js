@@ -570,7 +570,7 @@ const handleAppAction = (action) => {
     case appConstants.APP_ALLOW_FLASH_ALWAYS:
       {
         const propertyName = action.isPrivate ? 'temporarySiteSettings' : 'siteSettings'
-        const expirationTime = Date.now() + 7 * 24 * 3600 * 1000
+        const expirationTime = Date.now() + (7 * 24 * 3600 * 1000)
         appState = appState.set(propertyName,
           siteSettings.mergeSiteSetting(appState.get(propertyName), siteUtil.getOrigin(action.url), 'flash', expirationTime))
         break

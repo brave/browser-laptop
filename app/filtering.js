@@ -107,7 +107,8 @@ function registerForBeforeRequest (session, partition) {
 
     for (let i = 0; i < beforeRequestFilteringFns.length; i++) {
       let results = beforeRequestFilteringFns[i](details, isPrivate)
-      const isAdBlock = results.resourceName === appConfig.resourceNames.ADBLOCK || appConfig[results.resourceName] && appConfig[results.resourceName].resourceType === adBlockResourceName
+      const isAdBlock = (results.resourceName === appConfig.resourceNames.ADBLOCK) ||
+        (appConfig[results.resourceName] && appConfig[results.resourceName].resourceType === adBlockResourceName)
       const isHttpsEverywhere = results.resourceName === appConfig.resourceNames.HTTPS_EVERYWHERE
       const isTracker = results.resourceName === appConfig.resourceNames.TRACKING_PROTECTION
 
@@ -481,7 +482,7 @@ function updateDownloadState (downloadId, item, state) {
     startTime: downloadItemStartTime || new Date().getTime(),
     savePath: item.getSavePath(),
     url: item.getURL(),
-    filename: item.getSavePath() && path.basename(item.getSavePath()) || item.getFilename(),
+    filename: (item.getSavePath() && path.basename(item.getSavePath())) || item.getFilename(),
     totalBytes: item.getTotalBytes(),
     receivedBytes: item.getReceivedBytes(),
     state
@@ -694,9 +695,9 @@ module.exports.isResourceEnabled = (resourceName, url, isPrivate) => {
   }
 
   if (resourceName === appConfig.resourceNames.ADBLOCK ||
-      appConfig[resourceName] &&
+      (appConfig[resourceName] &&
         appConfig[resourceName].enabled &&
-        appConfig[resourceName].resourceType === adBlockResourceName ||
+        appConfig[resourceName].resourceType === adBlockResourceName) ||
       resourceName === appConfig.resourceNames.TRACKING_PROTECTION) {
     // Check the resource vs the ad control setting
     if (braverySettings.adControl === 'allowAdsAndTracking') {

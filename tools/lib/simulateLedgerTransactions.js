@@ -3,7 +3,7 @@ const TxHelpers = require('./transactionHelpers')
 let currentTimestamp = (new Date()).getTime()
 
 const getNthContributionPeriodBack = function (n) {
-  return currentTimestamp - (1000 * 3600 * 24 * 30) * n
+  return currentTimestamp - ((1000 * 3600 * 24 * 30) * n)
 }
 
 function simulateLedgerTransactions (numTx) {

@@ -36,7 +36,7 @@ const startTrackingProtection = (wnd) => {
     if (firstPartyUrl.protocol && firstPartyUrl.protocol.startsWith('http')) {
       if (!cachedFirstParty.get(firstPartyUrlHost)) {
         let firstPartyHosts = trackingProtection.findFirstPartyHosts(firstPartyUrlHost)
-        cachedFirstParty.set(firstPartyUrlHost, firstPartyHosts && firstPartyHosts.split(',') || [])
+        cachedFirstParty.set(firstPartyUrlHost, (firstPartyHosts && firstPartyHosts.split(',')) || [])
       }
     }
     const urlHost = urlParse(details.url).hostname

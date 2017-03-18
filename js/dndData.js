@@ -28,5 +28,5 @@ module.exports.setupDataTransferBraveData = (dataTransfer, dragType, data) => {
 
 module.exports.shouldPrependVerticalItem = (target, clientY) => {
   const boundingRect = target.getBoundingClientRect()
-  return clientY < boundingRect.top + (boundingRect.bottom - boundingRect.top) / 2
+  return clientY < boundingRect.top + ((boundingRect.bottom - boundingRect.top) / 2)
 }
