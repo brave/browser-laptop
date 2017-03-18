@@ -89,7 +89,7 @@ const extensionState = {
     tabId = tabId ? tabId.toString() : '-1'
     let path = browserAction.get('path')
     let basePath = browserAction.get('base_path')
-    if (basePath) {
+    if (path && basePath) {
       // Older extensions may provide a string path
       if (typeof path === 'string') {
         return `-webkit-image-set(
