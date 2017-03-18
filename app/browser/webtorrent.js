@@ -8,7 +8,6 @@ const Filtering = require('../filtering')
 const DEBUG_IPC = false
 if (DEBUG_IPC) console.log('WebTorrent IPC debugging enabled')
 
-// var VIEWER_URL = chrome.extension.getURL('../extensions/torrent/webtorrent.html')
 var VIEWER_URL = appUrlUtil.getTorrentExtUrl('webtorrent.html')
 
 function getViewerURL (torrentUrl) {
