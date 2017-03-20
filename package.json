@@ -36,7 +36,6 @@
     "testsuite": "cross-env NODE_ENV=test mocha \"test/$TEST_DIR/**/*Test.js\"",
     "unittest": "cross-env NODE_ENV=test mocha \"test/unit/**/*Test.js\"",
     "unittest-cov": "node --harmony node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --report html --report text -x \"test/unit/**/*Test.js\" -- \"test/unit/**/*Test.js\"",
-    "uitest": "cross-env NODE_ENV=test mocha \"test/about/**/*Test.js\" \"test/app/**/*Test.js\" \"test/components/**/*Test.js\" \"test/lib/**/*Test.js\"",
     "update-pdfjs": "rm -r app/extensions/pdfjs/; cp -r ../pdf.js/build/chromium/ app/extensions/pdfjs/",
     "update-psl": "./tools/updatepsl.sh",
     "vagrant-destroy-linux": "VAGRANT_CWD=./test/vms/vagrant/ubuntu-14.04 vagrant destroy",
