@@ -896,6 +896,21 @@ const handleAppAction = (action) => {
     case appConstants.APP_HIDE_DOWNLOAD_DELETE_CONFIRMATION:
       appState = appState.set('deleteConfirmationVisible', false)
       break
+    case appConstants.APP_ENABLE_UNDEFINED_PUBLISHERS:
+      const sitesObject = appState.get('siteSettings')
+      Object.keys(action.publishers).map((item) => {
+        const pattern = `https?://${item}`
+        const siteSetting = sitesObject.get(pattern)
+        const result = (siteSetting) && (siteSetting.get('ledgerPayments'))
+
+        if (result === undefined) {
+          let newSiteSettings = siteSettings.mergeSiteSetting(appState.get('siteSettings'), pattern, 'ledgerPayments', true)
+          const syncObject = siteUtil.setObjectId(newSiteSettings.get(pattern))
+          newSiteSettings = newSiteSettings.set(pattern, syncObject)
+          appState = appState.set('siteSettings', newSiteSettings)
+        }
+      })
+      break
     default:
   }
 

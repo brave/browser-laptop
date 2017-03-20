@@ -979,6 +979,18 @@ const appActions = {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_DOWNLOAD_DEFAULT_PATH
     })
+  },
+
+  /**
+   * Change all undefined publishers in site settings to defined sites
+   * also change all undefined ledgerPayments to value true
+   * @param publishers {Object} publishers from the synopsis
+   */
+  enableUndefinedPublishers: function (publishers) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_ENABLE_UNDEFINED_PUBLISHERS,
+      publishers
+    })
   }
 }
 
