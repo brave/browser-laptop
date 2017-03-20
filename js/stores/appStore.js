@@ -208,6 +208,14 @@ const createWindow = (action) => {
       })
     }
 
+    if (windowState.ui && windowState.ui.isMaximized) {
+      mainWindow.maximize()
+    }
+
+    if (windowState.ui && windowState.ui.isFullScreen) {
+      mainWindow.setFullScreen(true)
+    }
+
     mainWindow.webContents.on('did-finish-load', (e) => {
       lastEmittedState = appState
       e.sender.send(messages.INITIALIZE_WINDOW, frameOpts.disposition, appState.toJS(), frames, action.restoredState)
@@ -218,14 +226,6 @@ const createWindow = (action) => {
 
     mainWindow.on('ready-to-show', () => {
       mainWindow.show()
-
-      if (windowState.ui && windowState.ui.isMaximized) {
-        mainWindow.maximize()
-      }
-
-      if (windowState.ui && windowState.ui.isFullScreen) {
-        mainWindow.setFullScreen(true)
-      }
     })
 
     mainWindow.loadURL(appUrlUtil.getBraveExtIndexHTML())
