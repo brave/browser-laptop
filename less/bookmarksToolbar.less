@@ -14,12 +14,10 @@
 }
 
 .bookmarksToolbar {
-  margin-bottom: 5px;
   box-sizing: border-box;
   display: flex;
   flex: 1;
-  padding: 0 var(--bookmarks-toolbar-padding);
-  height: @bookmarksToolbarHeight;
+  padding: 7px var(--bookmarks-toolbar-padding) 8px;
 
   &.allowDragging {
     -webkit-app-region: drag;
@@ -28,13 +26,19 @@
     }
   }
 
-  &.showFavicon {
-    height: @bookmarksToolbarWithFaviconsHeight;
+  &.showOnlyFavicon {
+    padding: 7px 0 7px 10px;
   }
 
-  &.showOnlyFavicon {
-    padding: 0px 0px 0px 10px;
-    margin: 0px;
+  // PR #7740
+  + .tabPages {
+    &.singlePage {
+      height: 0;
+    }
+
+    &:not(.singlePage) {
+      padding-top: 0;
+    }
   }
 
   .bookmarkToolbarButton {
