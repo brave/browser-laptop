@@ -22,7 +22,7 @@ class TorrentViewer extends React.Component {
       dispatch
     } = this.props
 
-    let titleElem, mainButtonId
+    let titleElem, mainButtonId, saveButton
 
     if (torrent) {
       if (name) {
