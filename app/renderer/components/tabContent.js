@@ -50,7 +50,7 @@ class TabIcon extends ImmutableComponent {
 
 class Favicon extends ImmutableComponent {
   get favicon () {
-    return !this.props.isLoading && this.props.tabProps.get('icon')
+    return !this.props.isLoading && this.props.tab.get('icon')
   }
 
   get loadingIcon () {
@@ -66,21 +66,21 @@ class Favicon extends ImmutableComponent {
   }
 
   get narrowView () {
-    return this.props.tabProps.get('breakpoint') === 'smallest'
+    return this.props.tab.get('breakpoint') === 'smallest'
   }
 
   render () {
     const iconStyles = StyleSheet.create({
       favicon: {backgroundImage: `url(${this.favicon})`}
     })
-    return this.props.tabProps.get('location') !== 'about:newtab'
+    return this.props.tab.get('location') !== 'about:newtab'
       ? <TabIcon
         data-test-favicon={this.favicon}
         data-test-id={this.loadingIcon ? 'loading' : 'defaultIcon'}
         className={css(
           styles.icon,
           this.favicon && iconStyles.favicon,
-          !this.props.tabProps.get('pinnedLocation') && this.narrowView && styles.faviconNarrowView
+          !this.props.tab.get('pinnedLocation') && this.narrowView && styles.faviconNarrowView
         )}
         symbol={this.loadingIcon || this.defaultIcon} />
       : null
@@ -89,29 +89,29 @@ class Favicon extends ImmutableComponent {
 
 class AudioTabIcon extends ImmutableComponent {
   get pageCanPlayAudio () {
-    return this.props.tabProps.get('audioPlaybackActive') || this.props.tabProps.get('audioMuted')
+    return this.props.tab.get('audioPlaybackActive') || this.props.tab.get('audioMuted')
   }
 
   get mediumView () {
     const sizes = ['large', 'largeMedium']
-    return sizes.includes(this.props.tabProps.get('breakpoint'))
+    return sizes.includes(this.props.tab.get('breakpoint'))
   }
 
   get narrowView () {
     const sizes = ['medium', 'mediumSmall', 'small', 'extraSmall', 'smallest']
-    return sizes.includes(this.props.tabProps.get('breakpoint'))
+    return sizes.includes(this.props.tab.get('breakpoint'))
   }
 
   get locationHasSecondaryIcon () {
-    return !!this.props.tabProps.get('isPrivate') || !!this.props.tabProps.get('partitionNumber')
+    return !!this.props.tab.get('isPrivate') || !!this.props.tab.get('partitionNumber')
   }
 
   get mutedState () {
-    return this.pageCanPlayAudio && this.props.tabProps.get('audioMuted')
+    return this.pageCanPlayAudio && this.props.tab.get('audioMuted')
   }
 
   get unmutedState () {
-    this.props.tabProps.get('audioPlaybackActive') && !this.props.tabProps.get('audioMuted')
+    this.props.tab.get('audioPlaybackActive') && !this.props.tab.get('audioMuted')
   }
 
   get audioIcon () {
@@ -130,11 +130,11 @@ class AudioTabIcon extends ImmutableComponent {
 class PrivateIcon extends ImmutableComponent {
   get narrowView () {
     const sizes = ['small', 'extraSmall', 'smallest']
-    return sizes.includes(this.props.tabProps.get('breakpoint'))
+    return sizes.includes(this.props.tab.get('breakpoint'))
   }
 
   render () {
-    return this.props.tabProps.get('isPrivate') && !this.props.tabProps.get('hoverState') && !this.narrowView
+    return this.props.tab.get('isPrivate') && !this.props.tab.get('hoverState') && !this.narrowView
       ? <TabIcon className={css(styles.icon)} symbol={globalStyles.appIcons.private} />
       : null
   }
@@ -143,11 +143,11 @@ class PrivateIcon extends ImmutableComponent {
 class NewSessionIcon extends ImmutableComponent {
   get narrowView () {
     const sizes = ['small', 'extraSmall', 'smallest']
-    return sizes.includes(this.props.tabProps.get('breakpoint'))
+    return sizes.includes(this.props.tab.get('breakpoint'))
   }
 
   get partitionNumber () {
-    let partition = this.props.tabProps.get('partitionNumber')
+    let partition = this.props.tab.get('partitionNumber')
     // Persistent partitions opened by `target="_blank"` will have
     // *partition-* string first, which causes bad UI. We don't need it for tabs
     if (typeof partition === 'string') {
@@ -164,7 +164,7 @@ class NewSessionIcon extends ImmutableComponent {
   }
 
   get iconColor () {
-    const themeColor = this.props.tabProps.get('themeColor') || this.props.tabProps.get('computedThemeColor')
+    const themeColor = this.props.tab.get('themeColor') || this.props.tab.get('computedThemeColor')
     return this.props.paintTabs && themeColor
       ? getTextColorForBackground(themeColor)
       : globalStyles.color.black100
@@ -178,7 +178,7 @@ class NewSessionIcon extends ImmutableComponent {
       }
     })
 
-    return this.partitionNumber && !this.props.tabProps.get('hoverState') && !this.narrowView
+    return this.partitionNumber && !this.props.tab.get('hoverState') && !this.narrowView
       ? <TabIcon symbol
         data-test-id='newSessionIcon'
         className={css(styles.icon, styles.newSession, newSession.indicator)}
@@ -190,28 +190,28 @@ class NewSessionIcon extends ImmutableComponent {
 
 class TabTitle extends ImmutableComponent {
   get locationHasSecondaryIcon () {
-    return !!this.props.tabProps.get('isPrivate') || !!this.props.tabProps.get('partitionNumber')
+    return !!this.props.tab.get('isPrivate') || !!this.props.tab.get('partitionNumber')
   }
 
   get isPinned () {
-    return !!this.props.tabProps.get('pinnedLocation')
+    return !!this.props.tab.get('pinnedLocation')
   }
 
   get hoveredOnNarrowView () {
     const sizes = ['mediumSmall', 'small', 'extraSmall', 'smallest']
-    return this.props.tabProps.get('hoverState') && sizes.includes(this.props.tabProps.get('breakpoint'))
+    return this.props.tab.get('hoverState') && sizes.includes(this.props.tab.get('breakpoint'))
   }
 
   get shouldHideTitle () {
-    return (this.props.tabProps.get('breakpoint') === 'mediumSmall' && this.locationHasSecondaryIcon) ||
-      this.props.tabProps.get('breakpoint') === 'extraSmall' || this.props.tabProps.get('breakpoint') === 'smallest' ||
+    return (this.props.tab.get('breakpoint') === 'mediumSmall' && this.locationHasSecondaryIcon) ||
+      this.props.tab.get('breakpoint') === 'extraSmall' || this.props.tab.get('breakpoint') === 'smallest' ||
       this.hoveredOnNarrowView
   }
 
   get themeColor () {
-    const themeColor = this.props.tabProps.get('themeColor') || this.props.tabProps.get('computedThemeColor')
-    const defaultColor = this.props.tabProps.get('isPrivate') ? globalStyles.color.white100 : globalStyles.color.black100
-    const activeNonPrivateTab = !this.props.tabProps.get('isPrivate') && this.props.isActive
+    const themeColor = this.props.tab.get('themeColor') || this.props.tab.get('computedThemeColor')
+    const defaultColor = this.props.tab.get('isPrivate') ? globalStyles.color.white100 : globalStyles.color.black100
+    const activeNonPrivateTab = !this.props.tab.get('isPrivate') && this.props.isActive
 
     return activeNonPrivateTab && this.props.paintTabs && !!themeColor
       ? getTextColorForBackground(themeColor)
@@ -237,7 +237,7 @@ class TabTitle extends ImmutableComponent {
       className={css(
       styles.tabTitle,
       titleStyles.gradientText,
-      this.props.tabProps.get('hoverState') && titleStyles.reduceTitleSize,
+      this.props.tab.get('hoverState') && titleStyles.reduceTitleSize,
       // Windows specific style
       isWindows() && styles.tabTitleForWindows
     )}>
@@ -249,16 +249,16 @@ class TabTitle extends ImmutableComponent {
 
 class CloseTabIcon extends ImmutableComponent {
   get isPinned () {
-    return !!this.props.tabProps.get('pinnedLocation')
+    return !!this.props.tab.get('pinnedLocation')
   }
 
   get narrowView () {
     const sizes = ['extraSmall', 'smallest']
-    return sizes.includes(this.props.tabProps.get('breakpoint'))
+    return sizes.includes(this.props.tab.get('breakpoint'))
   }
 
   render () {
-    return this.props.tabProps.get('hoverState') && !this.narrowView && !this.isPinned
+    return this.props.tab.get('hoverState') && !this.narrowView && !this.isPinned
       ? <TabIcon
         data-test-id='closeTabIcon'
         className={css(styles.closeTab)}

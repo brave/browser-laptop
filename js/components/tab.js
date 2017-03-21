@@ -289,28 +289,28 @@ class Tab extends ImmutableComponent {
           this.narrowView && styles.tabIdNarrowView,
           this.props.tab.get('breakpoint') === 'smallest' && styles.tabIdMinAllowedSize
           )}>
-          <Favicon tabProps={this.props.tab} isLoading={this.loading} isPinned={this.isPinned} />
+          <Favicon tab={this.props.tab} isLoading={this.loading} isPinned={this.isPinned} />
           <AudioTabIcon
-            tabProps={this.props.tab}
+            tab={this.props.tab}
             onClick={this.onMuteFrame.bind(this, !this.props.tab.get('audioMuted'))}
           />
           <TabTitle
             isActive={this.props.isActive}
             paintTabs={this.props.paintTabs}
-            tabProps={this.props.tab}
+            tab={this.props.tab}
             pageTitle={this.displayValue}
           />
         </div>
-        <PrivateIcon tabProps={this.props.tab} />
+        <PrivateIcon tab={this.props.tab} />
         <NewSessionIcon
           isActive={this.props.isActive}
           paintTabs={this.props.paintTabs}
-          tabProps={this.props.tab}
+          tab={this.props.tab}
           l10nArgs={this.props.tab.get('partitionNumber')}
           l10nId='sessionInfoTab'
         />
         <CloseTabIcon
-          tabProps={this.props.tab}
+          tab={this.props.tab}
           onClick={this.onTabClosedWithMouse.bind(this)}
           l10nId='closeTabButton'
         />

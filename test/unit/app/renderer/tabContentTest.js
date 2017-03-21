@@ -41,7 +41,7 @@ describe('tabContent components', function () {
     it('should show favicon if page has one', function () {
       const wrapper = shallow(
         <Favicon
-          tabProps={
+          tab={
             Immutable.Map({
               location: url1,
               icon: favicon1
@@ -53,7 +53,7 @@ describe('tabContent components', function () {
     it('should show a placeholder icon if page has no favicon', function () {
       const wrapper = shallow(
         <Favicon
-          tabProps={
+          tab={
             Immutable.Map({
               location: url1,
               icon: null
@@ -66,7 +66,7 @@ describe('tabContent components', function () {
     it('should show a loading icon if page is still loading', function () {
       const wrapper = shallow(
         <Favicon
-          tabProps={
+          tab={
             Immutable.Map({
               location: url1,
               icon: favicon1
@@ -79,7 +79,7 @@ describe('tabContent components', function () {
     it('should not show favicon for new tab page', function () {
       const wrapper = shallow(
         <Favicon
-          tabProps={
+          tab={
             Immutable.Map({
               location: 'about:newtab'
             })}
@@ -95,7 +95,7 @@ describe('tabContent components', function () {
     it('should not show any audio icon if page has audio disabled', function () {
       const wrapper = shallow(
         <AudioTabIcon
-          tabProps={
+          tab={
             Immutable.Map({
               audioPlaybackActive: false
             })}
@@ -107,7 +107,7 @@ describe('tabContent components', function () {
     it('should show play icon if page has audio enabled', function () {
       const wrapper = shallow(
         <AudioTabIcon
-          tabProps={
+          tab={
             Immutable.Map({
               audioPlaybackActive: true
             })}
@@ -118,7 +118,7 @@ describe('tabContent components', function () {
     it('should not show play audio icon if tab size is too narrow', function () {
       const wrapper = shallow(
         <AudioTabIcon
-          tabProps={
+          tab={
             Immutable.Map({
               audioPlaybackActive: true,
               breakpoint: 'small'
@@ -130,7 +130,7 @@ describe('tabContent components', function () {
     it('should show mute icon if page has audio muted', function () {
       const wrapper = shallow(
         <AudioTabIcon
-          tabProps={
+          tab={
             Immutable.Map({
               audioPlaybackActive: true,
               audioMuted: true
@@ -142,7 +142,7 @@ describe('tabContent components', function () {
     it('should not show mute icon if tab size is too narrow', function () {
       const wrapper = shallow(
         <AudioTabIcon
-          tabProps={
+          tab={
             Immutable.Map({
               audioPlaybackActive: true,
               audioMuted: true,
@@ -159,7 +159,7 @@ describe('tabContent components', function () {
     it('should show private icon if current tab is private', function () {
       const wrapper = shallow(
         <PrivateIcon
-          tabProps={
+          tab={
             Immutable.Map({
               isPrivate: true
             })}
@@ -170,7 +170,7 @@ describe('tabContent components', function () {
     it('should not show private icon if current tab is not private', function () {
       const wrapper = shallow(
         <PrivateIcon
-          tabProps={
+          tab={
             Immutable.Map({
               isPrivate: false
             })}
@@ -181,7 +181,7 @@ describe('tabContent components', function () {
     it('should not show private icon if mouse is over tab (avoid icon overflow)', function () {
       const wrapper = shallow(
         <PrivateIcon
-          tabProps={
+          tab={
             Immutable.Map({
               isPrivate: true,
               hoverState: true
@@ -193,7 +193,7 @@ describe('tabContent components', function () {
     it('should not show private icon if tab size is too small', function () {
       const wrapper = shallow(
         <PrivateIcon
-          tabProps={
+          tab={
             Immutable.Map({
               isPrivate: true,
               hoverState: false,
@@ -209,7 +209,7 @@ describe('tabContent components', function () {
     it('should show new session icon if current tab is a new session tab', function () {
       const wrapper = shallow(
         <NewSessionIcon
-          tabProps={
+          tab={
             Immutable.Map({
               partitionNumber: 1
             })}
@@ -220,7 +220,7 @@ describe('tabContent components', function () {
     it('should not show new session icon if current tab is not private', function () {
       const wrapper = shallow(
         <NewSessionIcon
-          tabProps={
+          tab={
             Immutable.Map({
               partitionNumber: false
             })}
@@ -231,7 +231,7 @@ describe('tabContent components', function () {
     it('should not show new session icon if mouse is over tab (avoid icon overflow)', function () {
       const wrapper = shallow(
         <NewSessionIcon
-          tabProps={
+          tab={
             Immutable.Map({
               partitionNumber: 1,
               hoverState: true
@@ -243,7 +243,7 @@ describe('tabContent components', function () {
     it('should not show new session icon if tab size is too small', function () {
       const wrapper = shallow(
         <NewSessionIcon
-          tabProps={
+          tab={
             Immutable.Map({
               partitionNumber: 1,
               hoverState: true,
@@ -256,7 +256,7 @@ describe('tabContent components', function () {
     it('should show partition number for new sessions', function () {
       const wrapper = shallow(
         <NewSessionIcon
-          tabProps={
+          tab={
             Immutable.Map({
               partitionNumber: 3
             })}
@@ -267,7 +267,7 @@ describe('tabContent components', function () {
     it('should read and show partition number for sessions with number set by opener (ex: clicking target=_blank)', function () {
       const wrapper = shallow(
         <NewSessionIcon
-          tabProps={
+          tab={
             Immutable.Map({
               partitionNumber: 'partition-3'
             })}
@@ -278,7 +278,7 @@ describe('tabContent components', function () {
     it('should show max partition number even if session is bigger', function () {
       const wrapper = shallow(
         <NewSessionIcon
-          tabProps={
+          tab={
             Immutable.Map({
               partitionNumber: 1000
             })}
@@ -292,7 +292,7 @@ describe('tabContent components', function () {
     it('should show text if page has a title', function () {
       const wrapper = shallow(
         <TabTitle
-          tabProps={
+          tab={
             Immutable.Map({
               location: url1,
               title: pageTitle1
@@ -305,7 +305,7 @@ describe('tabContent components', function () {
     it('should not show text if tab is pinned', function () {
       const wrapper = shallow(
         <TabTitle
-          tabProps={
+          tab={
             Immutable.Map({
               location: url1,
               title: pageTitle1,
@@ -319,7 +319,7 @@ describe('tabContent components', function () {
     it('should not show text if size is mediumSmall and location has a secondary icon', function () {
       const wrapper = shallow(
         <TabTitle
-          tabProps={
+          tab={
             Immutable.Map({
               location: url1,
               title: pageTitle1,
@@ -335,7 +335,7 @@ describe('tabContent components', function () {
     it('should not show text if size is too small', function () {
       const wrapper = shallow(
         <TabTitle
-          tabProps={
+          tab={
             Immutable.Map({
               location: url1,
               title: pageTitle1,
@@ -352,7 +352,7 @@ describe('tabContent components', function () {
     it('should show closeTab icon if mouse is over tab', function () {
       const wrapper = shallow(
         <CloseTabIcon
-          tabProps={
+          tab={
             Immutable.Map({
               hoverState: true
             })}
@@ -363,7 +363,7 @@ describe('tabContent components', function () {
     it('should not show closeTab icon if mouse is not over a tab', function () {
       const wrapper = shallow(
         <CloseTabIcon
-          tabProps={
+          tab={
             Immutable.Map({
               hoverState: false
             })}
@@ -374,7 +374,7 @@ describe('tabContent components', function () {
     it('should not show closeTab icon if tab is pinned', function () {
       const wrapper = shallow(
         <CloseTabIcon
-          tabProps={
+          tab={
             Immutable.Map({
               hoverState: false,
               pinnedLocation: true
@@ -386,7 +386,7 @@ describe('tabContent components', function () {
     it('should not show closeTab icon if tab size is too small', function () {
       const wrapper = shallow(
         <CloseTabIcon
-          tabProps={
+          tab={
             Immutable.Map({
               hoverState: true,
               breakpoint: 'extraSmall'
