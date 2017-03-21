@@ -251,7 +251,7 @@ module.exports.cleanAppData = (data, isShutdown) => {
   // Delete temp site settings
   data.temporarySiteSettings = {}
 
-  if (data.settings[settings.CHECK_DEFAULT_ON_STARTUP] === true) {
+  if (data.settings && data.settings[settings.CHECK_DEFAULT_ON_STARTUP] === true) {
     // Delete defaultBrowserCheckComplete state since this is checked on startup
     delete data.defaultBrowserCheckComplete
   }
@@ -272,10 +272,16 @@ module.exports.cleanAppData = (data, isShutdown) => {
   if (clearAutofillData) {
     autofill.clearAutofillData()
     const date = new Date().getTime()
-    data.autofill.addresses.guid = []
-    data.autofill.addresses.timestamp = date
-    data.autofill.creditCards.guid = []
-    data.autofill.creditCards.timestamp = date
+    data.autofill = {
+      addresses: {
+        guid: [],
+        timestamp: date
+      },
+      creditCards: {
+        guid: [],
+        timestamp: date
+      }
+    }
   }
   const clearSiteSettings = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_SITE_SETTINGS) === true
   if (clearSiteSettings) {
@@ -305,8 +311,10 @@ module.exports.cleanAppData = (data, isShutdown) => {
     const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY) === true
     if (clearHistory) {
       data.sites = siteUtil.clearHistory(Immutable.fromJS(data.sites)).toJS()
-      delete data.about.history
-      delete data.about.newtab
+      if (data.about) {
+        delete data.about.history
+        delete data.about.newtab
+      }
     }
   }
   if (data.downloads) {
