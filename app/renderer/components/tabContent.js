@@ -9,6 +9,7 @@ const globalStyles = require('./styles/global')
 const {isWindows} = require('../../common/lib/platformUtil')
 const {getTextColorForBackground} = require('../../../js/lib/color')
 const {tabs} = require('../../../js/constants/config')
+const {hasBreakpoint, hasRelativeCloseIcon, hasFixedCloseIcon} = require('../lib/tabUtil')
 
 const newSessionSvg = require('../../extensions/brave/img/tabs/new_session.svg')
 
@@ -69,11 +70,16 @@ class Favicon extends ImmutableComponent {
     return this.props.tab.get('breakpoint') === 'smallest'
   }
 
+  get shouldHideFavicon () {
+    return (hasBreakpoint(this.props, 'extraSmall') && this.props.isActive) ||
+    this.props.tab.get('location') === 'about:newtab'
+  }
+
   render () {
     const iconStyles = StyleSheet.create({
       favicon: {backgroundImage: `url(${this.favicon})`}
     })
-    return this.props.tab.get('location') !== 'about:newtab'
+    return !this.shouldHideFavicon
       ? <TabIcon
         data-test-favicon={this.favicon}
         data-test-id={this.loadingIcon ? 'loading' : 'defaultIcon'}
@@ -197,15 +203,10 @@ class TabTitle extends ImmutableComponent {
     return !!this.props.tab.get('pinnedLocation')
   }
 
-  get hoveredOnNarrowView () {
-    const sizes = ['mediumSmall', 'small', 'extraSmall', 'smallest']
-    return this.props.tab.get('hoverState') && sizes.includes(this.props.tab.get('breakpoint'))
-  }
-
   get shouldHideTitle () {
     return (this.props.tab.get('breakpoint') === 'mediumSmall' && this.locationHasSecondaryIcon) ||
-      this.props.tab.get('breakpoint') === 'extraSmall' || this.props.tab.get('breakpoint') === 'smallest' ||
-      this.hoveredOnNarrowView
+      hasBreakpoint(this.props, ['extraSmall', 'smallest']) ||
+      hasFixedCloseIcon(this.props)
   }
 
   get themeColor () {
@@ -220,12 +221,6 @@ class TabTitle extends ImmutableComponent {
 
   render () {
     const titleStyles = StyleSheet.create({
-      reduceTitleSize: {
-        // include a margin gutter with same size
-        // as closeTabIcon to avoid title overflow
-        // when hovering over a tab
-        marginRight: `calc(${globalStyles.spacing.iconSize} + ${globalStyles.spacing.defaultIconPadding})`
-      },
       gradientText: {
         backgroundImage: `-webkit-linear-gradient(left,
         ${this.themeColor} 90%, ${globalStyles.color.almostInvisible} 100%)`
@@ -237,7 +232,6 @@ class TabTitle extends ImmutableComponent {
       className={css(
       styles.tabTitle,
       titleStyles.gradientText,
-      this.props.tab.get('hoverState') && titleStyles.reduceTitleSize,
       // Windows specific style
       isWindows() && styles.tabTitleForWindows
     )}>
@@ -252,13 +246,9 @@ class CloseTabIcon extends ImmutableComponent {
     return !!this.props.tab.get('pinnedLocation')
   }
 
-  get narrowView () {
-    const sizes = ['extraSmall', 'smallest']
-    return sizes.includes(this.props.tab.get('breakpoint'))
-  }
-
   render () {
-    return this.props.tab.get('hoverState') && !this.narrowView && !this.isPinned
+    return !this.isPinned &&
+    (hasRelativeCloseIcon(this.props) || hasFixedCloseIcon(this.props))
       ? <TabIcon
         data-test-id='closeTabIcon'
         className={css(styles.closeTab)}
@@ -311,17 +301,17 @@ const styles = StyleSheet.create({
 
   closeTab: {
     opacity: '0.7',
-    position: 'absolute',
+    position: 'relative',
     top: '0',
     right: '0',
-    padding: '0 4px',
-    borderTopRightRadius: globalStyles.radius.borderRadius,
+    padding: '0',
+    borderRadius: globalStyles.radius.borderRadius,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     fontSize: globalStyles.spacing.iconSize,
     width: globalStyles.spacing.iconSize,
-    height: '100%',
+    height: globalStyles.spacing.iconSize,
     border: '0',
     zIndex: globalStyles.zindex.zindexTabs,
 

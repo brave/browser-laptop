@@ -25,3 +25,33 @@ module.exports.getTabBreakpoint = (tabWidth) => {
 
 // Execute resize handler at a rate of 15fps
 module.exports.tabUpdateFrameRate = 66
+
+/**
+ * Check whether or not current breakpoint match defined criteria
+ * @param {Object} props - Object that hosts the tab breakpoint
+ * @param {Array} arr - Array of Strings including breakpoint names to check against
+ * @returns {Boolean} Whether or not the sizing criteria was match
+ */
+module.exports.hasBreakpoint = (props, arr) => {
+  arr = Array.isArray(arr) ? arr : [arr]
+  return arr.includes(props.tab.get('breakpoint'))
+}
+
+/**
+ * Check whether or not closeTab icon is relative to hover state
+ * @param {Object} props - Object that hosts the tab props
+ * @returns {Boolean} Whether or not the tab has a relative closeTab icon
+ */
+module.exports.hasRelativeCloseIcon = (props) => {
+  return props.tab.get('hoverState') &&
+    !module.exports.hasBreakpoint(props, ['small', 'extraSmall', 'smallest'])
+}
+
+/**
+ * Check whether or not closeTab icon is always visible (fixed) in tab
+ * @param {Object} props - Object that hosts the tab props
+ * @returns {Boolean} Whether or not the close icon is always visible (fixed)
+ */
+module.exports.hasFixedCloseIcon = (props) => {
+  return props.isActive && module.exports.hasBreakpoint(props, ['small', 'extraSmall'])
+}
