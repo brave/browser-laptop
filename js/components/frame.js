@@ -732,8 +732,7 @@ class Frame extends ImmutableComponent {
       contextMenus.onShowAutofillMenu(e.suggestions, e.rect, this.frame)
     })
     this.webview.addEventListener('hide-autofill-popup', (e) => {
-      if (this.props.contextMenuDetail && this.props.contextMenuDetail.get('type') === 'autofill' &&
-        (this.props.contextMenuDetail.get('tabId') !== this.props.tabId || this.webview.isFocused())) {
+      if (this.props.contextMenuDetail && this.props.contextMenuDetail.get('type') === 'autofill') {
         windowActions.autofillPopupHidden(this.props.tabId)
       }
     })
