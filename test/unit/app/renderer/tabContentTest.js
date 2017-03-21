@@ -376,14 +376,62 @@ describe('tabContent components', function () {
         <CloseTabIcon
           tab={
             Immutable.Map({
-              hoverState: false,
+              hoverState: true,
               pinnedLocation: true
             })}
         />
       )
       assert.notEqual(wrapper.props().symbol, globalStyles.appIcons.closeTab)
     })
-    it('should not show closeTab icon if tab size is too small', function () {
+    it('should show closeTab icon if tab size is small and tab is active', function () {
+      const wrapper = shallow(
+        <CloseTabIcon isActive
+          tab={
+            Immutable.Map({
+              hoverState: false,
+              breakpoint: 'small'
+            })}
+        />
+      )
+      assert.equal(wrapper.props().symbol, globalStyles.appIcons.closeTab)
+    })
+    it('should not show closeTab icon if tab size is small and tab is not active', function () {
+      const wrapper = shallow(
+        <CloseTabIcon isActive={false}
+          tab={
+            Immutable.Map({
+              hoverState: true,
+              breakpoint: 'small'
+            })}
+        />
+      )
+      assert.notEqual(wrapper.props().symbol, globalStyles.appIcons.closeTab)
+    })
+    it('should show closeTab icon if tab size is extraSmall and tab is active', function () {
+      const wrapper = shallow(
+        <CloseTabIcon isActive
+          tab={
+            Immutable.Map({
+              hoverState: false,
+              breakpoint: 'extraSmall'
+            })}
+        />
+      )
+      assert.equal(wrapper.props().symbol, globalStyles.appIcons.closeTab)
+    })
+    it('should not show closeTab icon if tab size is extraSmall and tab is not active', function () {
+      const wrapper = shallow(
+        <CloseTabIcon isActive={false}
+          tab={
+            Immutable.Map({
+              hoverState: true,
+              breakpoint: 'extraSmall'
+            })}
+        />
+      )
+      assert.notEqual(wrapper.props().symbol, globalStyles.appIcons.closeTab)
+    })
+    it('should not show closeTab icon if tab size is the smallest size', function () {
       const wrapper = shallow(
         <CloseTabIcon
           tab={

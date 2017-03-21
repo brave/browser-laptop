@@ -11,7 +11,7 @@ const globalStyles = {
       medium: '66px',
       mediumSmall: '53px',
       small: '46px',
-      extraSmall: '33px',
+      extraSmall: '40px',
       smallest: '19px'
     }
   },
