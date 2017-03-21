@@ -33,7 +33,7 @@
     "start2": "node ./tools/start.js --user-data-dir=brave-development-2 --debug=5859 --enable-logging --v=0 --enable-extension-activity-logging --enable-sandbox-logging --enable-dcheck",
     "start-brk": "node ./tools/start.js --debug-brk=5858 -enable-logging --v=0 --enable-dcheck",
     "test": "cross-env NODE_ENV=test mocha \"test/**/*Test.js\"",
-    "testsuite": "cross-env NODE_ENV=test mocha \"test/$TEST_DIR/**/*Test.js\"",
+    "testsuite": "node ./tools/test.js",
     "unittest": "cross-env NODE_ENV=test mocha \"test/unit/**/*Test.js\"",
     "unittest-cov": "node --harmony node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --report html --report text -x \"test/unit/**/*Test.js\" -- \"test/unit/**/*Test.js\"",
     "update-pdfjs": "rm -r app/extensions/pdfjs/; cp -r ../pdf.js/build/chromium/ app/extensions/pdfjs/",
