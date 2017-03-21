@@ -4,7 +4,10 @@ var isoWeek = function () {
   date.setHours(0, 0, 0, 0)
   date.setDate(date.getDate() + 3 - ((date.getDay() + 6) % 7))
   var jan4 = new Date(date.getFullYear(), 0, 4)
-  return 1 + Math.round((((date.getTime() - jan4.getTime()) / 86400000) - 3 + ((jan4.getDay() + 6) % 7) / 7))
+  return 1 + Math.round(
+      ((date.getTime() - jan4.getTime()) / 86400000) - 3 +
+      (((jan4.getDay() + 6) % 7) / 7)
+    )
 }
 
 // Local data yyyy-mm-dd (with zero padding)

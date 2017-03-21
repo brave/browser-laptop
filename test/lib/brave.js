@@ -742,7 +742,7 @@ var exports = {
         // Get the internal view instance ID from the selected webview
         var v8Util = process.atomBinding('v8_util')
         var internal = v8Util.getHiddenValue(webview, 'internal')
-        internal.viewInstanceId
+
         // This allows you to send more args than just the event itself like would only
         // be possible with dispatchEvent.
         devTools('electron').ipcRenderer.emit('ELECTRON_GUEST_VIEW_INTERNAL_DISPATCH_EVENT-' + internal.viewInstanceId, ...params)

@@ -104,16 +104,16 @@ const UrlUtil = {
       return true
     }
     // for cases where we have scheme and we dont want spaces in domain names
-    const caseDomain = /^[\w]{2,5}:\/\/[^\s\/]+\//
+    const caseDomain = /^[\w]{2,5}:\/\/[^\s/]+\//
     // for cases, quoted strings
     const case1Reg = /^".*"$/
     // for cases:
     // - starts with "?" or "."
     // - contains "? "
     // - ends with "." (and was not preceded by a domain or /)
-    const case2Reg = /(^\?)|(\?.+\s)|(^\.)|(^[^.+\..+]*[^\/]*\.$)/
+    const case2Reg = /(^\?)|(\?.+\s)|(^\.)|(^[^.+..+]*[^/]*\.$)/
     // for cases, pure string
-    const case3Reg = /[\?\.\/\s:]/
+    const case3Reg = /[?./\s:]/
     // for cases, data:uri, view-source:uri and about
     const case4Reg = /^(data|view-source|mailto|about|chrome-extension|magnet):.*/
 

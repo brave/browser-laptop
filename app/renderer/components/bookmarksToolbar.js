@@ -83,7 +83,6 @@ class BookmarkToolbarButton extends ImmutableComponent {
     if (this.isFolder) {
       e.target = ReactDOM.findDOMNode(this)
       if (dnd.isMiddle(e.target, e.clientX)) {
-        e.target.getBoundingClientRect
         this.props.showBookmarkFolderMenu(this.props.bookmark, e)
         windowActions.setIsBeingDraggedOverDetail(dragTypes.BOOKMARK, this.props.bookmark, {
           expanded: true
