@@ -22,8 +22,8 @@ const isBookmarkFolder = (tags) => {
   if (!tags) {
     return false
   }
-  return typeof tags === 'string' && tags === siteTags.BOOKMARK_FOLDER ||
-    tags && typeof tags !== 'string' && tags.includes(siteTags.BOOKMARK_FOLDER)
+  return (typeof tags === 'string' && tags === siteTags.BOOKMARK_FOLDER) ||
+    (tags && typeof tags !== 'string' && tags.includes(siteTags.BOOKMARK_FOLDER))
 }
 
 const isPinnedTab = (tags) => {
@@ -147,14 +147,14 @@ const mergeSiteLastAccessedTime = (oldSiteDetail, newSiteDetail, tag) => {
 // Some details can be copied from the existing siteDetail if null
 // ex: parentFolderId, partitionNumber, and favicon
 const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId, order) => {
-  let tags = oldSiteDetail && oldSiteDetail.get('tags') || new Immutable.List()
+  let tags = (oldSiteDetail && oldSiteDetail.get('tags')) || new Immutable.List()
   if (tag) {
     tags = tags.toSet().add(tag).toList()
   }
 
   const customTitle = typeof newSiteDetail.get('customTitle') === 'string'
     ? newSiteDetail.get('customTitle')
-    : (newSiteDetail.get('customTitle') || oldSiteDetail && oldSiteDetail.get('customTitle'))
+    : (newSiteDetail.get('customTitle') || (oldSiteDetail && oldSiteDetail.get('customTitle')))
 
   const lastAccessedTime = mergeSiteLastAccessedTime(oldSiteDetail, newSiteDetail, tag)
 
@@ -179,20 +179,20 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId, order) =>
   if (typeof customTitle === 'string') {
     site = site.set('customTitle', customTitle)
   }
-  if (newSiteDetail.get('parentFolderId') !== undefined || oldSiteDetail && oldSiteDetail.get('parentFolderId')) {
+  if (newSiteDetail.get('parentFolderId') !== undefined || (oldSiteDetail && oldSiteDetail.get('parentFolderId'))) {
     let parentFolderId = newSiteDetail.get('parentFolderId') !== undefined
       ? newSiteDetail.get('parentFolderId') : oldSiteDetail.get('parentFolderId')
     site = site.set('parentFolderId', Number(parentFolderId))
   }
-  if (newSiteDetail.get('partitionNumber') !== undefined || oldSiteDetail && oldSiteDetail.get('partitionNumber')) {
+  if (newSiteDetail.get('partitionNumber') !== undefined || (oldSiteDetail && oldSiteDetail.get('partitionNumber'))) {
     let partitionNumber = newSiteDetail.get('partitionNumber') !== undefined
     ? newSiteDetail.get('partitionNumber') : oldSiteDetail.get('partitionNumber')
     site = site.set('partitionNumber', Number(partitionNumber))
   }
-  if (newSiteDetail.get('favicon') || oldSiteDetail && oldSiteDetail.get('favicon')) {
+  if (newSiteDetail.get('favicon') || (oldSiteDetail && oldSiteDetail.get('favicon'))) {
     site = site.set('favicon', newSiteDetail.get('favicon') || oldSiteDetail.get('favicon'))
   }
-  if (newSiteDetail.get('themeColor') || oldSiteDetail && oldSiteDetail.get('themeColor')) {
+  if (newSiteDetail.get('themeColor') || (oldSiteDetail && oldSiteDetail.get('themeColor'))) {
     site = site.set('themeColor', newSiteDetail.get('themeColor') || oldSiteDetail.get('themeColor'))
   }
   if (site.get('tags').size === 0) {

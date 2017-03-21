@@ -16,6 +16,6 @@ module.exports.getTextColorForBackground = (color) => {
     return null
   }
   const [r, g, b] = rgb
-  const yiq = (r * 299 + g * 587 + b * 114) / 1000
+  const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000
   return yiq >= 128 ? 'black' : 'white'
 }

@@ -383,8 +383,8 @@ class AboutBookmarks extends React.Component {
     }
     ipc.on(messages.BOOKMARKS_UPDATED, (e, detail) => {
       this.setState({
-        bookmarks: Immutable.fromJS(detail && detail.bookmarks || {}),
-        bookmarkFolders: Immutable.fromJS(detail && detail.bookmarkFolders || {})
+        bookmarks: Immutable.fromJS((detail && detail.bookmarks) || {}),
+        bookmarkFolders: Immutable.fromJS((detail && detail.bookmarkFolders) || {})
       })
     })
   }

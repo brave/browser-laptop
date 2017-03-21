@@ -32,7 +32,7 @@ const bookmarkActions = {
       if (eventUtil.isForSecondaryAction(e)) {
         windowActions.newFrame({
           location: bookmarkItem.get('location'),
-          partitionNumber: bookmarkItem && bookmarkItem.get && bookmarkItem.get('partitionNumber') || undefined
+          partitionNumber: (bookmarkItem && bookmarkItem.get && bookmarkItem.get('partitionNumber')) || undefined
         }, !!e.shiftKey || getSetting(SWITCH_TO_NEW_TABS))
       } else {
         windowActions.loadUrl(activeFrame, bookmarkItem.get('location'))

@@ -6,7 +6,7 @@ const {zoom} = require('../constants/config')
 
 // Each zoomLevel is multiplied by 20 to get the percentage offset from 100
 module.exports.getZoomValuePercentage = (zoomLevel) =>
-  100 + 20 * zoomLevel
+  100 + (20 * zoomLevel)
 
 module.exports.getNextZoomLevel = (currentZoom, zoomIn) => {
   const zoomLevels = zoom.zoomLevels

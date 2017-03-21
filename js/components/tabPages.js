@@ -97,7 +97,7 @@ class TabPages extends ImmutableComponent {
         Array.from(new Array(tabPageCount)).map((x, i) =>
           <TabPage
             key={`tabPage-${i}`}
-            frames={this.props.frames.slice(i * this.props.tabsPerTabPage, i * this.props.tabsPerTabPage + this.props.tabsPerTabPage)}
+            frames={this.props.frames.slice(i * this.props.tabsPerTabPage, (i * this.props.tabsPerTabPage) + this.props.tabsPerTabPage)}
             previewTabPage={this.props.previewTabPage}
             index={i}
             sourceDragFromPageIndex={sourceDragFromPageIndex}

@@ -58,14 +58,14 @@ module.exports.onDragOver = (dragType, sourceBoundingRect, draggingOverKey, drag
     return
   }
 
-  if (e.clientX > sourceBoundingRect.left && e.clientX < sourceBoundingRect.left + sourceBoundingRect.width / 5 &&
+  if (e.clientX > sourceBoundingRect.left && e.clientX < sourceBoundingRect.left + (sourceBoundingRect.width / 5) &&
     (!draggingOverDetail || !draggingOverDetail.get('draggingOverLeftHalf'))) {
     windowActions.setIsBeingDraggedOverDetail(dragType, draggingOverKey, {
       draggingOverLeftHalf: true,
       draggingOverRightHalf: false
     })
     windowActions.setContextMenuDetail()
-  } else if (e.clientX < sourceBoundingRect.right && e.clientX >= sourceBoundingRect.left + sourceBoundingRect.width / 5 &&
+  } else if (e.clientX < sourceBoundingRect.right && e.clientX >= sourceBoundingRect.left + (sourceBoundingRect.width / 5) &&
     (!draggingOverDetail || !draggingOverDetail.get('draggingOverRightHalf'))) {
     windowActions.setIsBeingDraggedOverDetail(dragType, draggingOverKey, {
       draggingOverLeftHalf: false,
@@ -88,7 +88,7 @@ module.exports.closestFromXOffset = (refs, x) => {
       }
     }
     const rect = refNode.getBoundingClientRect()
-    let currentDistance = Math.abs(x - rect.left + (rect.right - rect.left) / 2)
+    let currentDistance = Math.abs(x - rect.left + ((rect.right - rect.left) / 2))
     if (currentDistance < smallestValue) {
       smallestValue = currentDistance
       selectedRef = ref
@@ -102,13 +102,13 @@ module.exports.closestFromXOffset = (refs, x) => {
 
 module.exports.isLeftSide = (domNode, clientX) => {
   const boundingRect = domNode.getBoundingClientRect()
-  return clientX < boundingRect.left + (boundingRect.right - boundingRect.left) / 2
+  return clientX < boundingRect.left + ((boundingRect.right - boundingRect.left) / 2)
 }
 
 module.exports.isMiddle = (domNode, clientX) => {
   const boundingRect = domNode.getBoundingClientRect()
-  const isLeft = clientX < boundingRect.left + (boundingRect.right - boundingRect.left) / 3
-  const isRight = clientX > boundingRect.right - (boundingRect.right - boundingRect.left) / 3
+  const isLeft = clientX < boundingRect.left + ((boundingRect.right - boundingRect.left) / 3)
+  const isRight = clientX > boundingRect.right - ((boundingRect.right - boundingRect.left) / 3)
   return !isLeft && !isRight
 }
 

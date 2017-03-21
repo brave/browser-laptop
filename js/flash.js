@@ -72,7 +72,7 @@ module.exports.showFlashMessageBox = (location, tabId) => {
       appActions.hideNotification(message)
       if (buttonIndex === 1) {
         if (persist) {
-          appActions.changeSiteSetting(origin, 'flash', Date.now() + 7 * 24 * 1000 * 3600)
+          appActions.changeSiteSetting(origin, 'flash', Date.now() + (7 * 24 * 1000 * 3600))
         } else {
           appActions.changeSiteSetting(origin, 'flash', 1)
         }

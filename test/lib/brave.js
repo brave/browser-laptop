@@ -333,8 +333,8 @@ var exports = {
       logVerbose('waitForAddressCount(' + addressCount + ')')
       return this.waitUntil(function () {
         return this.getAppState().then((val) => {
-          const ret = val.value && val.value && val.value.autofill &&
-            val.value.autofill.addresses && val.value.autofill.addresses.guid.length || 0
+          const ret = (val.value && val.value && val.value.autofill &&
+            val.value.autofill.addresses && val.value.autofill.addresses.guid.length) || 0
           logVerbose('waitForAddressCount(' + addressCount + ') => ' + ret)
           return ret
         })
@@ -377,7 +377,7 @@ var exports = {
         return this.getAppState().then((val) => {
           const ret = val.value && val.value.sites && Array.from(Object.values(val.value.sites)).find(
             (site) => site.location === location &&
-              (!waitForTitle || waitForTitle && site.title))
+              (!waitForTitle || (waitForTitle && site.title)))
           logVerbose('waitForSiteEntry("' + location + ', ' + waitForTitle + '") => ' + ret)
           return ret
         })
@@ -390,7 +390,7 @@ var exports = {
         return this.getAppState().then((val) => {
           const ret = val.value && val.value.sites && Array.from(Object.values(val.value.sites)).find(
             (site) => site.location === location &&
-              (!waitForTitle || waitForTitle && site.title))
+              (!waitForTitle || (waitForTitle && site.title)))
           logVerbose('sites:' + JSON.stringify(val.value.sites))
           logVerbose('waitForSiteEntry("' + location + '", ' + waitForTitle + ') => ' + ret)
           return ret
@@ -404,8 +404,8 @@ var exports = {
         return this.getWindowState().then((val) => {
           const bookmarkDetailLocation = val.value && val.value.bookmarkDetail &&
             val.value.bookmarkDetail.currentDetail && val.value.bookmarkDetail.currentDetail.location
-          const bookmarkDetailTitle = val.value && val.value.bookmarkDetail && val.value.bookmarkDetail.currentDetail &&
-            val.value.bookmarkDetail.currentDetail.customTitle || val.value.bookmarkDetail.currentDetail.title
+          const bookmarkDetailTitle = (val.value && val.value.bookmarkDetail && val.value.bookmarkDetail.currentDetail &&
+            val.value.bookmarkDetail.currentDetail.customTitle) || val.value.bookmarkDetail.currentDetail.title
           const ret = bookmarkDetailLocation === location && bookmarkDetailTitle === title
           logVerbose('waitForBookmarkDetail("' + location + '", "' + title + '") => ' + ret +
             ' (bookmarkDetailLocation = ' + bookmarkDetailLocation + ', bookmarkDetailTitle = ' + bookmarkDetailTitle + ')')

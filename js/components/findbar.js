@@ -87,7 +87,7 @@ class FindBar extends ImmutableComponent {
 
   componentWillUpdate (nextProps) {
     if (nextProps.frameKey !== this.props.frameKey) {
-      this.searchInput.value = nextProps.findDetail && nextProps.findDetail.get('searchString') || ''
+      this.searchInput.value = (nextProps.findDetail && nextProps.findDetail.get('searchString')) || ''
     }
   }
 

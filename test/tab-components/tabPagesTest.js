@@ -88,7 +88,7 @@ describe('tab pages', function () {
         yield this.app.client
           .waitForExist(newFrameButton)
           .click(newFrameButton)
-          .waitForElementCount(tabsTabs, (i + 1) % tabsPerPage + 1)
+          .waitForElementCount(tabsTabs, ((i + 1) % tabsPerPage) + 1)
       }
       yield this.app.client
         .waitForElementCount(tabPage, 2)

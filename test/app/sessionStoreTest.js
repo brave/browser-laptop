@@ -85,7 +85,7 @@ describe('sessionStore', function () {
           return this.getAppState().then((val) => {
             firstRunTimestamp = val.value.firstRunTimestamp
             return (
-              firstRunTimestamp > (timestamp - 30 * 1000) &&
+              firstRunTimestamp > (timestamp - (30 * 1000)) &&
               firstRunTimestamp <= timestamp
             )
           })

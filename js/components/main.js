@@ -341,8 +341,8 @@ class Main extends ImmutableComponent {
     this.loadSearchProviders()
     const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
     const activeFramePrev = frameStateUtil.getActiveFrame(prevProps.windowState)
-    const activeFrameTitle = activeFrame && (activeFrame.get('title') || activeFrame.get('location')) || ''
-    const activeFramePrevTitle = activeFramePrev && (activeFramePrev.get('title') || activeFramePrev.get('location')) || ''
+    const activeFrameTitle = (activeFrame && (activeFrame.get('title') || activeFrame.get('location'))) || ''
+    const activeFramePrevTitle = (activeFramePrev && (activeFramePrev.get('title') || activeFramePrev.get('location'))) || ''
     if (activeFrameTitle !== activeFramePrevTitle) {
       currentWindow.setTitle(activeFrameTitle)
     }
@@ -404,7 +404,7 @@ class Main extends ImmutableComponent {
 
       self.props.windowState.get('frames').forEach((frame, i) => {
         if (!frame.get('pinnedLocation') &&
-            (i < currentIndex && isCloseLeft || i > currentIndex && isCloseRight)) {
+            ((i < currentIndex && isCloseLeft) || (i > currentIndex && isCloseRight))) {
           windowActions.closeFrame(self.props.windowState.get('frames'), frame)
         }
       })
@@ -576,7 +576,7 @@ class Main extends ImmutableComponent {
     const height = navigator.getBoundingClientRect().bottom
     if (this.pageY < height && this.props.windowState.getIn(['ui', 'mouseInTitlebar']) !== true) {
       windowActions.setMouseInTitlebar(true)
-    } else if (this.pageY === undefined || this.pageY >= height && this.props.windowState.getIn(['ui', 'mouseInTitlebar']) !== false) {
+    } else if (this.pageY === undefined || (this.pageY >= height && this.props.windowState.getIn(['ui', 'mouseInTitlebar']) !== false)) {
       windowActions.setMouseInTitlebar(false)
     }
   }
@@ -646,7 +646,7 @@ class Main extends ImmutableComponent {
 
   onHamburgerMenu (e) {
     const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
-    contextMenus.onHamburgerMenu(activeFrame && activeFrame.get('location') || '', e)
+    contextMenus.onHamburgerMenu((activeFrame && activeFrame.get('location')) || '', e)
   }
 
   onHideSiteInfo () {
@@ -1017,17 +1017,17 @@ class Main extends ImmutableComponent {
                 navbar={activeFrame && activeFrame.get('navbar')}
                 sites={appStateSites}
                 canGoForward={activeTab && activeTab.get('canGoForward')}
-                activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
-                location={activeFrame && activeFrame.get('location') || ''}
-                title={activeFrame && activeFrame.get('title') || ''}
+                activeFrameKey={(activeFrame && activeFrame.get('key')) || undefined}
+                location={(activeFrame && activeFrame.get('location')) || ''}
+                title={(activeFrame && activeFrame.get('title')) || ''}
                 scriptsBlocked={activeFrame && activeFrame.getIn(['noScript', 'blocked'])}
-                partitionNumber={activeFrame && activeFrame.get('partitionNumber') || 0}
-                history={activeFrame && activeFrame.get('history') || emptyList}
-                suggestionIndex={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex']) || 0}
+                partitionNumber={(activeFrame && activeFrame.get('partitionNumber')) || 0}
+                history={(activeFrame && activeFrame.get('history')) || emptyList}
+                suggestionIndex={(activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])) || 0}
                 isSecure={activeFrame ? activeFrame.getIn(['security', 'isSecure']) : null}
                 hasLocationValueSuffix={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix'])}
-                startLoadTime={activeFrame && activeFrame.get('startLoadTime') || undefined}
-                endLoadTime={activeFrame && activeFrame.get('endLoadTime') || undefined}
+                startLoadTime={(activeFrame && activeFrame.get('startLoadTime')) || undefined}
+                endLoadTime={(activeFrame && activeFrame.get('endLoadTime')) || undefined}
                 loading={activeFrame && activeFrame.get('loading')}
                 bookmarkDetail={this.props.windowState.get('bookmarkDetail')}
                 mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
@@ -1185,7 +1185,7 @@ class Main extends ImmutableComponent {
             showFavicon={showFavicon}
             showOnlyFavicon={showOnlyFavicon}
             shouldAllowWindowDrag={shouldAllowWindowDrag && !isWindows}
-            activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
+            activeFrameKey={(activeFrame && activeFrame.get('key')) || undefined}
             windowWidth={window.innerWidth}
             contextMenuDetail={contextMenuDetail}
             sites={appStateSites}
@@ -1219,7 +1219,7 @@ class Main extends ImmutableComponent {
           tabs={this.props.windowState.get('tabs')}
           sites={appStateSites}
           key='tab-bar'
-          activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
+          activeFrameKey={(activeFrame && activeFrame.get('key')) || undefined}
           onMenu={this.onHamburgerMenu}
           hasTabInFullScreen={
             sortedFrames

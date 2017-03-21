@@ -169,7 +169,7 @@ class UpdateBar extends ImmutableComponent {
     const verbose = this.props.updates.get('verbose')
     let updateStatus = this.props.updates.get('status')
     if (!updateStatus ||
-        !verbose && updateStatus !== UpdateStatus.UPDATE_AVAILABLE ||
+        (!verbose && updateStatus !== UpdateStatus.UPDATE_AVAILABLE) ||
         updateStatus === UpdateStatus.UPDATE_NONE ||
         updateStatus === UpdateStatus.UPDATE_APPLYING_RESTART ||
         updateStatus === UpdateStatus.UPDATE_APPLYING_NO_RESTART) {

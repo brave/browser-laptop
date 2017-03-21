@@ -66,7 +66,7 @@ class AboutDownloads extends React.Component {
     }
     ipc.on(messages.DOWNLOADS_UPDATED, (e, detail) => {
       this.setState({
-        downloads: Immutable.fromJS(detail && detail.downloads || {})
+        downloads: Immutable.fromJS((detail && detail.downloads) || {})
           .sort((x, y) => y.get('startTime') - x.get('startTime'))
       })
     })

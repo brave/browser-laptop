@@ -183,7 +183,8 @@ class UrlBar extends ImmutableComponent {
           if (!isLocationUrl && e.ctrlKey) {
             windowActions.loadUrl(this.activeFrame, `www.${location}.com`)
           } else if (this.shouldRenderUrlBarSuggestions &&
-              (typeof this.activeIndex === 'number' && this.activeIndex >= 0 || this.locationValueSuffix && this.autocompleteEnabled)) {
+              ((typeof this.activeIndex === 'number' && this.activeIndex >= 0) ||
+              (this.locationValueSuffix && this.autocompleteEnabled))) {
             // Hack to make alt enter open a new tab for url bar suggestions when hitting enter on them.
             const isDarwin = process.platform === 'darwin'
             if (e.altKey) {
@@ -407,8 +408,8 @@ class UrlBar extends ImmutableComponent {
         (this.props.hasLocationValueSuffix !== prevProps.hasLocationValueSuffix ||
          this.props.urlbar.get('location') !== prevProps.urlbar.get('location'))) {
         this.showAutocompleteResult()
-      } else if (this.props.titleMode !== prevProps.titleMode ||
-          !this.isActive && !this.isFocused) {
+      } else if ((this.props.titleMode !== prevProps.titleMode) ||
+          (!this.isActive && !this.isFocused)) {
         this.setValue(this.locationValue)
       } else if (this.props.urlbar.get('location') !== prevProps.urlbar.get('location') &&
           this.urlInput.value !== this.props.urlbar.get('location')) {

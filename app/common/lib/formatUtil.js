@@ -106,5 +106,5 @@ module.exports.toLocaleString = (epoch, defaultValue) => {
  */
 module.exports.wrappingClamp = (value, min, max) => {
   const range = (max - min) + 1
-  return value - Math.floor((value - min) / range) * range
+  return value - (Math.floor((value - min) / range) * range)
 }
