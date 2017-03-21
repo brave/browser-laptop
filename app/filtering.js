@@ -14,7 +14,6 @@ const appConfig = require('../js/constants/appConfig')
 const hostContentSettings = require('./browser/contentSettings/hostContentSettings')
 const downloadStates = require('../js/constants/downloadStates')
 const urlParse = require('./common/urlParse')
-const getBaseDomain = require('../js/lib/baseDomain').getBaseDomain
 const getSetting = require('../js/settings').getSetting
 const appUrlUtil = require('../js/lib/appUrlUtil')
 const promisify = require('../js/lib/promisify')
@@ -33,6 +32,7 @@ const getOrigin = require('../js/state/siteUtil').getOrigin
 const {adBlockResourceName} = require('./adBlock')
 const {updateElectronDownloadItem} = require('./browser/electronDownloadItem')
 const {fullscreenOption} = require('./common/constants/settingsEnums')
+const isThirdPartyHost = require('./browser/isThirdPartyHost')
 
 let appStore = null
 
@@ -260,7 +260,7 @@ function registerForBeforeSendHeaders (session, partition) {
       const parsedFirstPartyUrl = urlParse(firstPartyUrl)
 
       if (cookieSetting === 'blockAllCookies' ||
-        module.exports.isThirdPartyHost(parsedFirstPartyUrl.hostname, parsedTargetUrl.hostname)) {
+        isThirdPartyHost(parsedFirstPartyUrl.hostname, parsedTargetUrl.hostname)) {
         // Clear cookie and referer on third-party requests
         if (requestHeaders['Cookie'] &&
             getOrigin(firstPartyUrl) !== pdfjsOrigin) {
@@ -454,19 +454,6 @@ function registerPermissionHandler (session, partition) {
       }
     }
   })
-}
-
-module.exports.isThirdPartyHost = (baseContextHost, testHost) => {
-  // TODO: Always return true if these are IP addresses that aren't the same
-  if (!testHost || !baseContextHost) {
-    return true
-  }
-  const documentDomain = getBaseDomain(baseContextHost)
-  if (testHost.length > documentDomain.length) {
-    return (testHost.substr(testHost.length - documentDomain.length - 1) !== '.' + documentDomain)
-  } else {
-    return (testHost !== documentDomain)
-  }
 }
 
 function updateDownloadState (downloadId, item, state) {

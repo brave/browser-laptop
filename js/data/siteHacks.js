@@ -135,5 +135,8 @@ module.exports.siteHacks = {
   'player.siriusxm.com': {
     enableFlashCTP: true,
     redirectURL: 'https://player.siriusxm.com'
+  },
+  'www.youtube.com': {
+    allowFirstPartyAdblockChecks: true
   }
 }
