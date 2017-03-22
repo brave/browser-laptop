@@ -1,7 +1,7 @@
 /* global describe, it */
 
 const fs = require('fs')
-const promisify = require('../../js/lib/promisify')
+const promisify = require('../../../js/lib/promisify')
 const assert = require('assert')
 
 describe('promisify', function () {
