@@ -34,7 +34,7 @@ describe('sessionStore', function () {
         .waitUntil(function () {
           return this.getAppState().then((val) => {
             let state = val.value
-            return Immutable.fromJS(state.sites).size === 1 && state.sites[key].location === page1Url
+            return siteUtil.getBookmarks(Immutable.fromJS(state.sites)).size === 1 && state.sites[key].location === page1Url
           })
         })
       yield Brave.stopApp(false)
