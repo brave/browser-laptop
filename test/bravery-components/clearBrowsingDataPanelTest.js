@@ -1,9 +1,9 @@
 /* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
-const Immutable = require('immutable')
 const {urlInput, braveMenu, noScriptSwitch, braveryPanel, notificationBar, clearBrowsingDataButton, securityTab, clearDataButton} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
+const {getHistory} = require('../../app/common/lib/historyUtil')
 const messages = require('../../js/constants/messages')
 
 describe('Clear Browsing Panel', function () {
@@ -55,7 +55,7 @@ describe('Clear Browsing Panel', function () {
         .click(clearDataButton)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return Object.keys(val.value.sites).length === 0
+            return getHistory(val.value.sites).size === 0
           })
         })
       yield this.app.client
@@ -64,7 +64,7 @@ describe('Clear Browsing Panel', function () {
         .waitForBrowserWindow()
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return Object.keys(val.value.sites).length === 1
+            return getHistory(val.value.sites).size === 1
           })
         })
       yield openClearBrowsingDataPanel(this.app.client)
@@ -74,7 +74,7 @@ describe('Clear Browsing Panel', function () {
         .click(clearDataButton)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return Object.keys(val.value.sites).length === 0
+            return getHistory(val.value.sites).size === 0
           })
         })
     })
@@ -92,9 +92,9 @@ describe('Clear Browsing Panel', function () {
         .waitForBrowserWindow()
         .waitUntil(function () {
           return this.getAppState().then((val) =>
-              Immutable.fromJS(val.value.sites).size === 1 &&
-              val.value.about.history.entries.length === 1 &&
-              val.value.about.newtab.sites.length === 1)
+            getHistory(val.value.sites).size === 1 &&
+            val.value.about.history.entries.length === 1 &&
+            getHistory(val.value.about.newtab.sites).size === 1)
         })
     })
 
@@ -122,7 +122,7 @@ describe('Clear Browsing Panel', function () {
         .click(clearDataButton)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return Immutable.fromJS(val.value.sites).size === 0
+            return getHistory(val.value.sites).size === 0
           })
         })
     })
@@ -140,7 +140,7 @@ describe('Clear Browsing Panel', function () {
         .waitForBrowserWindow()
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return Immutable.fromJS(val.value.sites).size === 1
+            return getHistory(val.value.sites).size === 1
           })
         })
     })
