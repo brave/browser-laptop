@@ -31,25 +31,6 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     top: globalStyles.spacing.dialogTopOffset
   },
-  browserButton: {
-    margin: '0',
-    whiteSpace: 'nowrap',
-    outline: 'none',
-    cursor: 'default',
-    display: 'inline-block',
-    lineHeight: globalStyles.spacing.buttonHeight,
-    height: globalStyles.spacing.buttonHeight,
-    width: globalStyles.spacing.buttonWidth,
-    fontSize: globalStyles.spacing.defaultFontSize,
-    color: globalStyles.color.buttonColor,
-    borderRadius: globalStyles.radius.borderRadius,
-    textAlign: 'center',
-    transition: '.1s opacity, .1s background',
-    WebkitUserSelect: 'none',
-    backgroundSize: '16px',
-    backgroundPosition: 'center center',
-    backgroundRepeat: 'no-repeat'
-  },
 
   // itemList.less
   listItem: {
@@ -81,8 +62,28 @@ const styles = StyleSheet.create({
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap'
   },
+
   // Buttons
-  buttonPrimary: {
+  browserButton: {
+    margin: '0',
+    whiteSpace: 'nowrap',
+    outline: 'none',
+    cursor: 'default',
+    display: 'inline-block',
+    lineHeight: globalStyles.spacing.buttonHeight,
+    height: globalStyles.spacing.buttonHeight,
+    width: globalStyles.spacing.buttonWidth,
+    fontSize: globalStyles.spacing.defaultFontSize,
+    color: globalStyles.color.buttonColor,
+    borderRadius: globalStyles.radius.borderRadius,
+    textAlign: 'center',
+    transition: '.1s opacity, .1s background',
+    WebkitUserSelect: 'none',
+    backgroundSize: '16px',
+    backgroundPosition: 'center center',
+    backgroundRepeat: 'no-repeat'
+  },
+  primaryButton: {
     background: 'linear-gradient(#FF7A1D, #ff5000)',
     borderLeft: '2px solid transparent',
     borderRight: '2px solid transparent',
@@ -127,6 +128,7 @@ const styles = StyleSheet.create({
   inlineButton: {
     display: 'inline'
   },
+
   // margin/padding
   noMarginTop: {
     marginTop: 0
@@ -151,6 +153,55 @@ const styles = StyleSheet.create({
   },
   noPaddingRight: {
     paddingRight: 0
+  },
+
+  // notificationBar
+  notificationBar: {
+    display: 'inline-block',
+    boxSizing: 'border-box',
+    width: '100%',
+    cursor: 'default',
+    WebkitUserSelect: 'none',
+    marginTop: globalStyles.spacing.navbarMenubarMargin
+  },
+  notificationBar__notificationItem: {
+    backgroundColor: '#ffefc0',
+    boxSizing: 'border-box',
+    borderTop: `1px solid ${globalStyles.color.tabsToolbarBorderColor}`,
+    borderBottom: `1px solid ${globalStyles.color.tabsToolbarBorderColor}`,
+    lineHeight: '24px',
+    padding: '8px 20px'
+  },
+  notificationBar__greetingStyle: {
+    backgroundColor: '#fff',
+    padding: '8px 20px',
+    width: '100%'
+  },
+  notificationItem__greeting: {
+    color: globalStyles.color.braveOrange,
+    fontSize: '16px',
+    margin: 'auto 10px auto 0',
+    userSelect: 'none'
+  },
+  notificationItem__message: {
+    color: '#000',
+    fontSize: '15px',
+    margin: 'auto 6px auto 0',
+    userSelect: 'none',
+    cursor: 'default'
+  },
+  notificationItem__secondaryMessage: {
+    color: '#888',
+    fontSize: '14px',
+    padding: '0',
+    margin: 'auto 0 auto 10px'
+  },
+  notificationItem__button: {
+    fontSize: '13px',
+    marginRight: '10px',
+    padding: '2px 15px',
+    textTransform: 'capitalize',
+    width: 'auto'
   }
 })
 

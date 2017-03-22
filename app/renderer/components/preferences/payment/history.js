@@ -118,7 +118,7 @@ class HistoryFooter extends ImmutableComponent {
         <span data-l10n-id={l10nDataId} data-l10n-args={JSON.stringify(l10nDataArgs)} />
       </div>
       <Button l10nId='paymentHistoryOKText'
-        className={css(commonStyles.buttonPrimary)}
+        className={css(commonStyles.primaryButton)}
         onClick={this.props.hideOverlay.bind(this, 'paymentHistory')}
       />
     </div>

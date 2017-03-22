@@ -13,6 +13,9 @@ const remote = require('electron').remote
 const path = require('path')
 const cx = require('../lib/classSet')
 
+const {StyleSheet, css} = require('aphrodite/no-important')
+const commonStyles = require('../../app/renderer/components/styles/commonStyles')
+
 class UpdateHello extends ImmutableComponent {
   onSpinnerClick () {
     // To make testing of updates easier in dev mode,
@@ -45,7 +48,7 @@ class UpdateHello extends ImmutableComponent {
   }
 
   render () {
-    return <span className='greeting'>
+    return <span className={css(commonStyles.notificationItem__greeting)} data-test-id='greeting'>
       <span onClick={this.onSpinnerClick.bind(this)}
         className={cx({
           fa: this.loading,
@@ -59,7 +62,8 @@ class UpdateHello extends ImmutableComponent {
 
 class UpdateHide extends ImmutableComponent {
   render () {
-    return <Button className='button secondary'
+    return <Button className={css(commonStyles.notificationItem__button) + ' ' + 'whiteButton'}
+      data-test-id='updateHide'
       l10nId='updateHide'
       onClick={appActions.setUpdateStatus.bind(null, this.props.reset ? UpdateStatus.UPDATE_NONE : undefined, false, undefined)} />
   }
@@ -70,7 +74,8 @@ class UpdateLog extends ImmutableComponent {
     remote.shell.openItem(path.join(remote.app.getPath('userData'), 'updateLog.log'))
   }
   render () {
-    return <Button className='button updateViewLogButton secondary'
+    return <Button className={css(commonStyles.notificationItem__button) + ' ' + 'whiteButton'}
+      data-test-id='updateViewLogButton'
       l10nId='updateViewLog'
       onClick={this.onViewLog.bind(this)} />
   }
@@ -78,81 +83,89 @@ class UpdateLog extends ImmutableComponent {
 
 class UpdateAvailable extends ImmutableComponent {
   render () {
-    return <div>
-      <span className='options'>
+    return <div className={css(styles.flexJustifyBetween, styles.flexAlignCenter)}>
+      <div>
+        <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateHello' />
+        <span className={css(commonStyles.notificationItem__message)} data-l10n-id='updateAvail' />
+        <span className={css(commonStyles.notificationItem__secondaryMessage)} data-l10n-id='updateRequiresRelaunch' />
+      </div>
+      <span className={css(styles.flexAlignCenter)} data-test-id='notificationOptions'>
         {
           this.props.metadata && this.props.metadata.get('notes')
-          ? <Button className='button updateDetails secondary'
+          ? <Button className={css(commonStyles.notificationItem__button) + ' ' + 'whiteButton'}
+            data-test-id='updateDetails'
             l10nId='updateDetails'
             onClick={windowActions.setReleaseNotesVisible.bind(null, true)} />
           : null
         }
-        <Button className='button updateLaterButton secondary'
+        <Button className={css(commonStyles.notificationItem__button) + ' ' + 'whiteButton'}
+          data-test-id='updateLater'
           l10nId='updateLater'
           onClick={appActions.setUpdateStatus.bind(null, UpdateStatus.UPDATE_AVAILABLE_DEFERRED, false, undefined)} />
-        <Button className='button primary'
+        <Button className={css(commonStyles.notificationItem__button) + ' ' + 'primaryButton'}
+          data-test-id='updateNow'
           l10nId='updateNow'
           onClick={appActions.setUpdateStatus.bind(null, UpdateStatus.UPDATE_APPLYING_RESTART, false, undefined)} />
       </span>
-      <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateHello' />
-      <span className='message' data-l10n-id='updateAvail' />
-      <span className='message secondary' data-l10n-id='updateRequiresRelaunch' />
-      <span className='spacer' />
     </div>
   }
 }
 
 class UpdateChecking extends ImmutableComponent {
   render () {
-    return <div>
-      <span className='options'>
+    return <div className={css(styles.flexJustifyBetween)}>
+      <div>
+        <UpdateHello updateStatus={this.props.updateStatus} />
+        <span className={css(commonStyles.notificationItem__message)} data-l10n-id='updateChecking' />
+      </div>
+      <span className={css(styles.flexAlignCenter)} data-test-id='notificationOptions'>
         <UpdateLog />
         <UpdateHide />
       </span>
-      <UpdateHello updateStatus={this.props.updateStatus} />
-      <span className='message' data-l10n-id='updateChecking' />
-      <span className='spacer' />
     </div>
   }
 }
 
 class UpdateDownloading extends ImmutableComponent {
   render () {
-    return <div>
-      <span className='options'>
+    return <div className={css(styles.flexJustifyBetween)}>
+      <div>
+        <UpdateHello updateStatus={this.props.updateStatus} />
+        <span className={css(commonStyles.notificationItem__message)} data-l10n-id='updateDownloading' />
+      </div>
+      <span className={css(styles.flexAlignCenter)} data-test-id='notificationOptions'>
         <UpdateLog />
         <UpdateHide />
       </span>
-      <UpdateHello updateStatus={this.props.updateStatus} />
-      <span className='message' data-l10n-id='updateDownloading' />
-      <span className='spacer' />
     </div>
   }
 }
 
 class UpdateError extends ImmutableComponent {
   render () {
-    return <div>
-      <span className='options'>
+    return <div className={css(styles.flexJustifyBetween)}>
+      <div>
+        <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateOops' />
+        <span className={css(commonStyles.notificationItem__message)} data-l10n-id='updateError' />
+      </div>
+      <span className={css(styles.flexAlignCenter)} data-test-id='notificationOptions'>
         <UpdateLog />
         <UpdateHide reset />
       </span>
-      <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateOops' />
-      <span className='message' data-l10n-id='updateError' />
-      <span className='spacer' />
     </div>
   }
 }
 
 class UpdateNotAvailable extends ImmutableComponent {
   render () {
-    return <div>
-      <span className='options'>
+    return <div className={css(styles.flexJustifyBetween)}>
+      <div>
+        <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateNotYet' />
+        <span className={css(commonStyles.notificationItem__message)} data-l10n-id='updateNotAvail' />
+      </div>
+      <span className={css(styles.flexAlignCenter)} data-test-id='notificationOptions'>
         <UpdateHide reset />
       </span>
-      <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateNotYet' />
-      <span className='message' data-l10n-id='updateNotAvail' />
-      <span className='spacer' />
     </div>
   }
 }
@@ -182,7 +195,8 @@ class UpdateBar extends ImmutableComponent {
       updateStatus = UpdateStatus.UPDATE_AVAILABLE
     }
 
-    return <div className='updateBar'>
+    // 'notificationItem' for styling with notificationBar.less
+    return <div className={updateBarStyle + ' ' + 'notificationItem'} data-test-id='updateBar'>
       {
         updateStatus === UpdateStatus.UPDATE_AVAILABLE ? <UpdateAvailable metadata={this.props.updates.get('metadata')} updateStatus={updateStatus} /> : null
       }
@@ -201,5 +215,23 @@ class UpdateBar extends ImmutableComponent {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  flexJustifyBetween: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    flexFlow: 'row wrap'
+  },
+  flexAlignCenter: {
+    display: 'flex',
+    alignItems: 'center'
+  }
+})
+
+const updateBarStyle = css(
+  commonStyles.notificationBar,
+  commonStyles.notificationBar__notificationItem,
+  commonStyles.notificationBar__greetingStyle
+)
 
 module.exports = UpdateBar

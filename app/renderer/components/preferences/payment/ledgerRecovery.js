@@ -128,11 +128,11 @@ class LedgerRecoveryFooter extends ImmutableComponent {
     return <div className={css(paymentCommon.advanceFooter)}>
       <div className={css(styles.recoveryFooterButtons)}>
         <Button l10nId='recover'
-          className={css(commonStyles.buttonPrimary)}
+          className={css(commonStyles.primaryButton)}
           onClick={this.recoverWallet}
         />
         <Button l10nId='recoverFromFile'
-          className={css(commonStyles.buttonPrimary, paymentCommon.marginButtons)}
+          className={css(commonStyles.primaryButton, paymentCommon.marginButtons)}
           onClick={this.recoverWalletFromFile}
         />
         <Button l10nId='cancel'

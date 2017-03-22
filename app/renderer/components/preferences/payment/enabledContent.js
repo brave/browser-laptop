@@ -45,7 +45,7 @@ class EnabledContent extends ImmutableComponent {
       testId={buttonText}
       test2Id={'addFunds'}
       l10nId={buttonText}
-      className={css(commonStyles.buttonPrimary, styles.addFunds)}
+      className={css(commonStyles.primaryButton, styles.addFunds)}
       onClick={onButtonClick.bind(this)}
       disabled={ledgerData.get('creating')}
     />
