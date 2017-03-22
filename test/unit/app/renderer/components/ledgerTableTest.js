@@ -191,36 +191,6 @@ describe('LedgerTable component', function () {
     assert.equal(wrapper.find('[data-tbody-index="1"] [data-test-id="siteName"]').length, 1, '1 unpinned')
   })
 
-  it('two pinned tabs, 3 unpinned (show all button, 1 hidden unpinned)', function () {
-    const wrapper = mount(
-      <LedgerTable
-        ledgerData={Immutable.Map({synopsis: fivePublishers.synopsis})}
-        settings={Immutable.Map()}
-        onChangeSetting={function () {}}
-        siteSettings={fivePublishers.siteSettings}
-      />
-    )
-    assert.equal(wrapper.find('[data-tbody-index="0"] [data-test-id="siteName"]').length, 2, '2 pinned')
-    assert.equal(wrapper.find('[data-tbody-index="1"] [data-test-id="siteName"]').length, 2, '2 unpinned, 1 hidden')
-    assert.equal(wrapper.find('[data-l10n-id="showAll"]').length, 1, 'show all button visible')
-  })
-
-  it('two pinned tabs, 3 unpinned (hide less button, all visible)', function () {
-    const wrapper = mount(
-      <LedgerTable
-        ledgerData={Immutable.Map({synopsis: fivePublishers.synopsis})}
-        settings={Immutable.Map({
-          'advanced.hide-lower-sites': false
-        })}
-        onChangeSetting={function () {}}
-        siteSettings={fivePublishers.siteSettings}
-      />
-    )
-    assert.equal(wrapper.find('[data-tbody-index="0"] [data-test-id="siteName"]').length, 2, '2 pinned')
-    assert.equal(wrapper.find('[data-tbody-index="1"] [data-test-id="siteName"]').length, 3, '3 unpinned')
-    assert.equal(wrapper.find('[data-l10n-id="showAll"]').length, 0, 'show all button hidden')
-  })
-
   it('two pinned tabs, 1 unpinned tab (show all button is not necessary', function () {
     const siteSettings = Immutable.Map([
       [
@@ -540,5 +510,29 @@ describe('LedgerTable component', function () {
     )
     assert.equal(wrapper.find('[data-tbody-index="0"] [data-test-id="siteName"]').length, 1, '1 pinned')
     assert.equal(wrapper.find('[data-tbody-index="1"] [data-test-id="siteName"]').length, 2, '2 unpinned')
+  })
+
+  it('8 pinned tabs, 12 unpinned (show all button, 2 hidden unpinned)', function () {
+    const siteSettings = fivePublishers.siteSettings
+      .concat(fivePublishers.siteSettings)
+      .concat(fivePublishers.siteSettings)
+      .concat(fivePublishers.siteSettings)
+
+    const synopsis = fivePublishers.synopsis
+      .concat(fivePublishers.synopsis)
+      .concat(fivePublishers.synopsis)
+      .concat(fivePublishers.synopsis)
+
+    const wrapper = mount(
+      <LedgerTable
+        ledgerData={Immutable.Map({synopsis: synopsis})}
+        settings={Immutable.Map()}
+        onChangeSetting={function () {}}
+        siteSettings={siteSettings}
+      />
+    )
+    assert.equal(wrapper.find('[data-tbody-index="0"] [data-test-id="siteName"]').length, 8, '8 pinned')
+    assert.equal(wrapper.find('[data-tbody-index="1"] [data-test-id="siteName"]').length, 10, '10 unpinned, 2 hidden')
+    assert.equal(wrapper.find('[data-l10n-id="showAll"]').length, 1, 'show all button visible')
   })
 })

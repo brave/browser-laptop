@@ -287,13 +287,13 @@ describe('synopsis', function () {
       .waitForVisible('[data-l10n-id="publisher"]')
       .click('[data-l10n-id="publisher"]')
       .waitUntil(function () {
-        return this.getText(ledgerTable + ' a').then((text) => {
+        return this.getText(`${ledgerTable} a`).then((text) => {
           return text[0] === 'eff.org' && text[2] === 'mit.edu'
         })
       })
       .click('[data-l10n-id="publisher"]')
       .waitUntil(function () {
-        return this.getText(ledgerTable + ' a').then((text) => {
+        return this.getText(`${ledgerTable} a`).then((text) => {
           return text[2] === 'eff.org' && text[0] === 'mit.edu'
         })
       })

@@ -246,7 +246,7 @@ class LedgerTable extends ImmutableComponent {
     const totalUnPinnedRows = unPinnedRows.size
     const hideLower = getSetting(settings.HIDE_LOWER_SITES, this.props.settings)
 
-    if (hideLower && totalUnPinnedRows > 2) {
+    if (hideLower && totalUnPinnedRows > 10) {
       let sumUnPinned = 0
       let threshold = 90
       const limit = 0.9 // show only 90th of publishers
@@ -301,7 +301,7 @@ class LedgerTable extends ImmutableComponent {
         ]}
       />
       {
-        totalUnPinnedRows > 1 || (totalUnPinnedRows !== unPinnedRows.size && hideLower)
+        (totalUnPinnedRows !== unPinnedRows.size && hideLower)
         ? <div className={css(styles.showAllWrap)}>
           <Button
             l10nId={hideLower ? 'showAll' : 'hideLower'}
@@ -344,12 +344,7 @@ const styles = StyleSheet.create({
   },
 
   tableTh: {
-    fontSize: '14px',
-
-    ':hover': {
-      cursor: 'pointer',
-      textDecoration: 'underline'
-    }
+    fontSize: '14px'
   },
 
   tableTr: {

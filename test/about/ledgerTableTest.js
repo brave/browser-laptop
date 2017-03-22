@@ -15,7 +15,6 @@ const sites2 = [
   'https://brianbondy.com/',
   'https://clifton.io/'
 ]
-const showAllLedger = '[data-l10n-id="showAll"]'
 const firstTable = '[data-tbody-index="0"]'
 const firstTableFirstRow = `${firstTable} [data-row-index="0"]`
 const firstTableSecondRow = `${firstTable} [data-row-index="1"]`
@@ -76,7 +75,6 @@ describe('Ledger table', function () {
     it('check if all sites are on the unpinned by default', function * () {
       yield this.app.client
         .tabByIndex(0)
-        .click(showAllLedger)
         .waitForElementCount(`${secondTable} tr`, sites.length)
     })
 
@@ -111,8 +109,9 @@ describe('Ledger table', function () {
         .click(`${secondTableFirstRow} [data-test-pinned="false"]`)
         .waitForVisible(`${firstTableFirstRow} [data-test-pinned="true"]`)
         .click(`${firstTableFirstRow} [data-test-id="pinnedInput"]`)
-        .keys([Brave.keys.DELETE, Brave.keys.DELETE, '40'])
-        .click(showAllLedger)
+        .pause(100)
+        .keys([Brave.keys.DELETE, Brave.keys.DELETE, '40', Brave.keys.ENTER])
+        .waitForInputText(`${firstTableFirstRow} [data-test-id="pinnedInput"]`, '40')
         .waitForTextValue(`${secondTableSecondRow} [data-test-id="percentageValue"]`, '60')
     })
 
@@ -122,8 +121,7 @@ describe('Ledger table', function () {
         .click(`${secondTableFirstRow} [data-test-pinned="false"]`)
         .waitForVisible(`${firstTableFirstRow} [data-test-pinned="true"]`)
         .click(`${firstTableFirstRow} [data-test-id="pinnedInput"]`)
-        .keys([Brave.keys.DELETE, Brave.keys.DELETE, '150'])
-        .click(showAllLedger)
+        .keys([Brave.keys.DELETE, Brave.keys.DELETE, '150', Brave.keys.ENTER])
         .waitForInputText(`${firstTableFirstRow} [data-test-id="pinnedInput"]`, '100')
         .waitForTextValue(`${secondTableSecondRow} [data-test-id="percentageValue"]`, '0')
     })
@@ -133,7 +131,6 @@ describe('Ledger table', function () {
 
       yield this.app.client
         .tabByIndex(0)
-        .click(showAllLedger)
         .click(`${secondTableFirstRow} .switchBackground`)
         .waitForVisible(`${secondTableSecondRow} [data-switch-status="false"]`)
         .click(`${secondTableSecondRow} [data-test-pinned="false"]`)
@@ -164,14 +161,12 @@ describe('Ledger table', function () {
     it('check if all sites are on the unpinned list', function * () {
       yield this.app.client
         .tabByIndex(0)
-        .click(showAllLedger)
         .waitForElementCount(`${secondTable} tr`, sites2.length)
     })
 
     it('pin 3 publishers', function * () {
       yield this.app.client
         .tabByIndex(0)
-        .click(showAllLedger)
         .click(`${secondTableFirstRow} [data-test-pinned="false"]`)
         .waitForElementCount(`${firstTable} tr`, 1)
         .click(`${secondTableSecondRow} [data-test-pinned="false"]`)
@@ -185,7 +180,6 @@ describe('Ledger table', function () {
       let pinnedSum = 0
       yield this.app.client
         .tabByIndex(0)
-        .click(showAllLedger)
         .click(`${secondTableFirstRow} [data-test-pinned="false"]`)
         .waitForElementCount(`${firstTable} tr`, 1)
         .click(`${secondTableSecondRow} [data-test-pinned="false"]`)
@@ -214,7 +208,6 @@ describe('Ledger table', function () {
     it('pin 3 publishers custom value and check unpinned value', function * () {
       yield this.app.client
         .tabByIndex(0)
-        .click(showAllLedger)
         .click(`${secondTableFirstRow} [data-test-pinned="false"]`)
         .waitForElementCount(`${firstTable} tr`, 1)
         .click(`${secondTableSecondRow} [data-test-pinned="false"]`)
@@ -238,7 +231,6 @@ describe('Ledger table', function () {
     it('pin 3 publishers over 100 value and check unpinned value', function * () {
       yield this.app.client
         .tabByIndex(0)
-        .click(showAllLedger)
         .click(`${secondTableFirstRow} [data-test-pinned="false"]`)
         .waitForElementCount(`${firstTable} tr`, 1)
         .click(`${secondTableSecondRow} [data-test-pinned="false"]`)

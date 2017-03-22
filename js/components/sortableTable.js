@@ -381,7 +381,6 @@ class SortableTable extends React.Component {
         }
       }
       if (this.stateOwner.state.selection.includes(this.getGlobalIndex(currentIndex))) classes.push('selected')
-      if (this.sortingDisabled) classes.push('no-sort')
 
       return row.length
         ? <tr {...rowAttributes}
@@ -436,10 +435,12 @@ class SortableTable extends React.Component {
               'sort-default': this.sortingDisabled || heading === this.props.defaultHeading
             }
             const isString = typeof heading === 'string'
+            const sortMethod = this.sortingDisabled ? 'none' : (dataType === 'number' ? 'number' : undefined)
             if (isString) headerClasses['heading-' + heading] = true
             return <th className={cx(headerClasses)}
-              data-sort-method={dataType === 'number' ? 'number' : undefined}
-              data-sort-order={this.props.defaultHeadingSortOrder}>
+              data-sort-method={sortMethod}
+              data-sort-order={this.props.defaultHeadingSortOrder}
+            >
               {
                 isString
                   ? <div className={cx({
