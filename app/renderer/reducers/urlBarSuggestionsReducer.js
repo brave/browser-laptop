@@ -129,7 +129,7 @@ const generateNewSuggestionsList = (state) => {
   if (sites) {
     // Filter out Brave default newtab sites and sites with falsey location
     sites = sites.filterNot((site) =>
-      Immutable.is(site.get('tags'), (new Immutable.List(['default'])) &&
+      (Immutable.is(site.get('tags'), new Immutable.List(['default'])) &&
       site.get('lastAccessedTime') === 1) ||
       !site.get('location')
     )
