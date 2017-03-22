@@ -1,4 +1,13 @@
-[![Build Status](https://travis-ci.org/brave/browser-laptop.svg?branch=master)](https://travis-ci.org/brave/browser-laptop)
+[![Lint](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=lint&label=lint)](https://travis-ci.org/brave/browser-laptop)
+[![Unit Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=unit&label=unit-tests)](https://travis-ci.org/brave/browser-laptop)
+[![About Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=about&label=about-tests)](https://travis-ci.org/brave/browser-laptop)
+[![App Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=app&label=app-tests)](https://travis-ci.org/brave/browser-laptop)
+[![Bookmark Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=bookmark-components&label=bookmark-component-tests)](https://travis-ci.org/brave/browser-laptop)
+[![Bravery Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=bravery-components&label=bravery-component-tests)](https://travis-ci.org/brave/browser-laptop)
+[![Contents Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=contents&label=contents-tests)](https://travis-ci.org/brave/browser-laptop)
+[![Misc Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=misc-components&label=misc-components-tests)](https://travis-ci.org/brave/browser-laptop)
+[![Navbar Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=navbar-components&label=navbar-components-tests)](https://travis-ci.org/brave/browser-laptop)
+[![Tab Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=tab-components&label=tab-components-tests)](https://travis-ci.org/brave/browser-laptop)
 
 # Brave Browser
 
