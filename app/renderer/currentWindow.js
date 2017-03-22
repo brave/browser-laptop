@@ -2,7 +2,7 @@ const currentWindow = require('electron').remote.getCurrentWindow()
 const currentWindowId = currentWindow.id
 let isFocused = currentWindow.isFocused()
 let isMaximized = currentWindow.isMaximized()
-let isFullScreen = currentWindow.isMaximized()
+let isFullScreen = currentWindow.isFullScreen()
 
 currentWindow.on('maximize', function (wnd) {
   isMaximized = true
