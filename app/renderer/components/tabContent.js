@@ -290,7 +290,8 @@ const styles = StyleSheet.create({
   },
 
   audioIcon: {
-    color: globalStyles.color.highlightBlue
+    color: globalStyles.color.highlightBlue,
+    fontSize: '16px'
   },
 
   newSession: {
