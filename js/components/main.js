@@ -6,6 +6,7 @@ const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
 const electron = require('electron')
+const {StyleSheet, css} = require('aphrodite')
 const ipc = electron.ipcRenderer
 // const systemPreferences = electron.remote.systemPreferences
 
@@ -880,6 +881,14 @@ class Main extends ImmutableComponent {
     return null
   }
 
+  getTotalBlocks (frames) {
+    const ads = frames.getIn(['adblock', 'blocked'])
+    const trackers = frames.getIn(['trackingProtection', 'blocked'])
+    const blocked = (ads ? ads.size : 0) + (trackers ? trackers.size : 0)
+
+    return (blocked > 99) ? '99+' : blocked
+  }
+
   render () {
     const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
@@ -1065,6 +1074,13 @@ class Main extends ImmutableComponent {
                 {
                   customTitlebar.captionButtonsVisible && !customTitlebar.menubarVisible
                   ? <span className='buttonSeparator' />
+                  : null
+                }
+                {
+                  !this.braveShieldsDisabled
+                  ? <div className={css(styles.lionBadge)} data-test-id='lionBadge'>
+                    {this.getTotalBlocks(activeFrame)}
+                  </div>
                   : null
                 }
               </div>
@@ -1341,5 +1357,21 @@ class Main extends ImmutableComponent {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  lionBadge: {
+    right: '2px',
+    position: 'absolute',
+    top: '15px',
+    color: '#FFF',
+    borderRadius: '2px',
+    padding: '1px 2px',
+    pointerEvents: 'none',
+    font: '7pt "Arial Narrow"',
+    textAlign: 'center',
+    border: '.5px solid #FFF',
+    background: '#555555'
+  }
+})
 
 module.exports = Main

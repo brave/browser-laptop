@@ -316,7 +316,10 @@ var exports = {
       return this
         .waitForVisible(selector)
         .waitUntil(function () {
-          return this.getText(selector).then((value) => { return value === text })
+          return this.getText(selector).then((value) => {
+            logVerbose('waitForTextValue("' + selector + '", ' + text + ') => ' + value)
+            return value === text
+          })
         }, 5000, null, 100)
     })
 
