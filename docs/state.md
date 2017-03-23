@@ -589,7 +589,8 @@ WindowStore
       secondsSpent: number, // e.g., 4
       site: string, // publisher name, e.g., "wikipedia.org"
       verified: boolean, // there is a verified wallet for this publisher
-      views: number // total page-views
+      views: number, // total page-views,
+      weight: number // float indication of the ration
     }], // one entry for each publisher having a non-zero `score`
     synopsisOptions: {
       minDuration: number, // e.g., 8000 for 8 seconds

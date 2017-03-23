@@ -1034,11 +1034,13 @@ var synopsisNormalizer = () => {
   }
 
   const normalizePinned = (dataPinned, total, target) => dataPinned.map((publisher) => {
-    let newPer = Math.floor((publisher.pinPercentage / total) * target)
+    const floatNumber = (publisher.pinPercentage / total) * target
+    let newPer = Math.floor(floatNumber)
     if (newPer < 1) {
       newPer = 1
     }
 
+    publisher.weight = floatNumber
     publisher.pinPercentage = newPer
     return publisher
   })
@@ -1057,7 +1059,8 @@ var synopsisNormalizer = () => {
       secondsSpent: 0,
       faviconURL: result.faviconURL,
       score: result.scores[scorekeeper],
-      pinPercentage: result.pinPercentage
+      pinPercentage: result.pinPercentage,
+      weight: result.pinPercentage
     }
     // HACK: Protocol is sometimes blank here, so default to http:// so we can
     // still generate publisherURL.
@@ -1108,6 +1111,7 @@ var synopsisNormalizer = () => {
       // excluded
       let publisher = getPublisherData(result)
       publisher.percentage = 0
+      publisher.weight = 0
       dataExcluded.push(publisher)
     }
   })
@@ -1118,12 +1122,8 @@ var synopsisNormalizer = () => {
     dataUnPinned = dataUnPinned.map((result) => {
       let publisher = getPublisherData(result)
       publisher.percentage = 0
+      publisher.weight = 0
       return publisher
-    })
-
-    // sync synopsis
-    dataPinned.forEach((item) => {
-      synopsis.publishers[item.site].pinPercentage = item.pinPercentage
     })
 
     // sync app store
@@ -1132,7 +1132,9 @@ var synopsisNormalizer = () => {
     // unpinned publishers
     dataUnPinned = dataUnPinned.map((result) => {
       let publisher = getPublisherData(result)
-      publisher.percentage = Math.round((publisher.score / unPinnedTotal) * (100 - pinnedTotal))
+      const floatNumber = (publisher.score / unPinnedTotal) * (100 - pinnedTotal)
+      publisher.percentage = Math.round(floatNumber)
+      publisher.weight = floatNumber
       return publisher
     })
 
@@ -1140,7 +1142,15 @@ var synopsisNormalizer = () => {
     dataUnPinned = roundToTarget(dataUnPinned, (100 - pinnedTotal), 'percentage')
   }
 
-  return dataPinned.concat(dataUnPinned, dataExcluded)
+  const newData = dataPinned.concat(dataUnPinned, dataExcluded)
+
+  // sync synopsis
+  newData.forEach((item) => {
+    synopsis.publishers[item.site].weight = item.weight
+    synopsis.publishers[item.site].pinPercentage = item.pinPercentage
+  })
+
+  return newData
 }
 
 /*
