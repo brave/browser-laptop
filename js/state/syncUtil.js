@@ -29,7 +29,7 @@ module.exports.CATEGORY_MAP = CATEGORY_MAP
 
 const siteSettingDefaults = {
   hostPattern: '',
-  zoomLevel: 0,
+  zoomLevel: 0, // deprecated
   shieldsUp: true,
   adControl: 1,
   cookieControl: 0,
