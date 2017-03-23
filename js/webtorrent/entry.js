@@ -54,16 +54,16 @@ function init () {
     return onError(new Error('Invalid torrent identifier'))
   }
 
-  // Create the client, set up IPC to the WebTorrentRemoteServer
-  client = new WebTorrentRemoteClient(send)
-  client.on('warning', onWarning)
-  client.on('error', onError)
-
+  // Setup IPC to webtorrent-remote server
   ipc.on(messages.TORRENT_MESSAGE, function (e, msg) {
-    client.receive(msg)
+    if (client) client.receive(msg)
   })
 
-  // Check whether we're already part of this swarm. If not, show a Start button.
+  // Create a webtorrent-remote client
+  initClient()
+
+  // Check whether torrent is already added by another webtorrent-remote client.
+  // If it's not, a 'Start Download' button will be shown.
   client.get(store.torrentId, function (err, torrent) {
     if (!err) initTorrent(torrent)
     update()
@@ -73,9 +73,7 @@ function init () {
   // before the page is closed. But that's okay; webtorrent-remote expects regular
   // heartbeats and assumes clients are dead after 30s without one. So basically,
   // this is an optimization to destroy the client sooner.
-  window.addEventListener('beforeunload', function () {
-    client.destroy()
-  })
+  window.addEventListener('beforeunload', destroyClient)
 
   // Update the UI (to show download speed) every 1s.
   update()
@@ -102,9 +100,20 @@ function update () {
   document.title = store.name || 'WebTorrent'
 }
 
-function onServerListening () {
-  store.serverUrl = 'http://localhost:' + server.address().port
-  update()
+function initClient () {
+  if (client) return
+  client = new WebTorrentRemoteClient(send)
+  client.on('warning', onWarning)
+  client.on('error', onError)
+}
+
+function destroyClient () {
+  client.destroy()
+  client.removeListener('warning', onWarning)
+  client.removeListener('error', onError)
+  client = null
+  store.torrent = null
+  store.serverUrl = null
 }
 
 function initTorrent (torrent) {
@@ -129,10 +138,17 @@ function initTorrent (torrent) {
   torrent.on('done', update)
 }
 
+function onServerListening () {
+  store.serverUrl = 'http://localhost:' + server.address().port
+  update()
+}
+
 function dispatch (action) {
   switch (action) {
     case 'start':
       return start()
+    case 'stop':
+      return stop()
     case 'saveTorrentFile':
       return saveTorrentFile()
     case 'copyMagnetLink':
@@ -143,11 +159,17 @@ function dispatch (action) {
 }
 
 function start () {
+  initClient()
   client.add(store.torrentId, function (err, torrent) {
     if (err) return onError(err)
     initTorrent(torrent)
     update()
   })
+}
+
+function stop () {
+  destroyClient()
+  update()
 }
 
 function saveTorrentFile () {
