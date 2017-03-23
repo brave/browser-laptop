@@ -29,6 +29,15 @@ describe('Bravery Panel', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible(braveMenu)
     })
+    it('lion badge', function * () {
+      const url = Brave.server.url('tracking.html')
+      yield this.app.client
+        .waitForDataFile('trackingProtection')
+        .tabByIndex(0)
+        .loadUrl(url)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForTextValue('[data-test-id="lionBadge"]', '2')
+    })
   })
   describe('Stats', function () {
     Brave.beforeEach(this)
