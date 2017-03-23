@@ -358,7 +358,7 @@ describe('tabContent components', function () {
             })}
         />
       )
-      assert.equal(wrapper.props().symbol, globalStyles.appIcons.closeTab)
+      assert.equal(wrapper.props()['data-test-id'], 'closeTabIcon')
     })
     it('should not show closeTab icon if mouse is not over a tab', function () {
       const wrapper = shallow(
@@ -369,7 +369,7 @@ describe('tabContent components', function () {
             })}
         />
       )
-      assert.notEqual(wrapper.props().symbol, globalStyles.appIcons.closeTab)
+      assert.notEqual(wrapper.props()['data-test-id'], 'closeTabIcon')
     })
     it('should not show closeTab icon if tab is pinned', function () {
       const wrapper = shallow(
@@ -381,7 +381,7 @@ describe('tabContent components', function () {
             })}
         />
       )
-      assert.notEqual(wrapper.props().symbol, globalStyles.appIcons.closeTab)
+      assert.notEqual(wrapper.props()['data-test-id'], 'closeTabIcon')
     })
     it('should show closeTab icon if tab size is small and tab is active', function () {
       const wrapper = shallow(
@@ -393,7 +393,7 @@ describe('tabContent components', function () {
             })}
         />
       )
-      assert.equal(wrapper.props().symbol, globalStyles.appIcons.closeTab)
+      assert.equal(wrapper.props()['data-test-id'], 'closeTabIcon')
     })
     it('should not show closeTab icon if tab size is small and tab is not active', function () {
       const wrapper = shallow(
@@ -405,7 +405,7 @@ describe('tabContent components', function () {
             })}
         />
       )
-      assert.notEqual(wrapper.props().symbol, globalStyles.appIcons.closeTab)
+      assert.notEqual(wrapper.props()['data-test-id'], 'closeTabIcon')
     })
     it('should show closeTab icon if tab size is extraSmall and tab is active', function () {
       const wrapper = shallow(
@@ -417,7 +417,7 @@ describe('tabContent components', function () {
             })}
         />
       )
-      assert.equal(wrapper.props().symbol, globalStyles.appIcons.closeTab)
+      assert.equal(wrapper.props()['data-test-id'], 'closeTabIcon')
     })
     it('should not show closeTab icon if tab size is extraSmall and tab is not active', function () {
       const wrapper = shallow(
@@ -429,7 +429,7 @@ describe('tabContent components', function () {
             })}
         />
       )
-      assert.notEqual(wrapper.props().symbol, globalStyles.appIcons.closeTab)
+      assert.notEqual(wrapper.props()['data-test-id'], 'closeTabIcon')
     })
     it('should not show closeTab icon if tab size is the smallest size', function () {
       const wrapper = shallow(
@@ -441,7 +441,7 @@ describe('tabContent components', function () {
             })}
         />
       )
-      assert.notEqual(wrapper.props().symbol, globalStyles.appIcons.closeTab)
+      assert.notEqual(wrapper.props()['data-test-id'], 'closeTabIcon')
     })
   })
 })

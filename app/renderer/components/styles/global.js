@@ -114,6 +114,7 @@ const globalStyles = {
     defaultTabPadding: '0 4px',
     defaultIconPadding: '2px',
     iconSize: '16px',
+    closeIconSize: '13px',
     narrowIconSize: '12px',
     dialogTopOffset: '30px',
     paymentsMargin: '20px',
