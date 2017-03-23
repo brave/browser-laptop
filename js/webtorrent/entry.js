@@ -65,10 +65,7 @@ function init () {
 
   // Check whether we're already part of this swarm. If not, show a Start button.
   client.get(store.torrentId, function (err, torrent) {
-    if (!err) {
-      store.torrent = torrent
-      initTorrent(torrent)
-    }
+    if (!err) initTorrent(torrent)
     update()
   })
 
@@ -105,21 +102,14 @@ function update () {
   document.title = store.name || 'WebTorrent'
 }
 
-function onAdded (err, torrent) {
-  if (err) return onError(err)
-
-  store.torrent = torrent
-  initTorrent(torrent)
-
-  update()
-}
-
 function onServerListening () {
   store.serverUrl = 'http://localhost:' + server.address().port
   update()
 }
 
 function initTorrent (torrent) {
+  store.torrent = torrent
+
   // Once torrent's canonical name is available, use it
   if (torrent.name) {
     store.name = torrent.name
@@ -153,7 +143,11 @@ function dispatch (action) {
 }
 
 function start () {
-  client.add(store.torrentId, onAdded)
+  client.add(store.torrentId, function (err, torrent) {
+    if (err) return onError(err)
+    initTorrent(torrent)
+    update()
+  })
 }
 
 function saveTorrentFile () {
