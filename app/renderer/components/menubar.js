@@ -10,6 +10,10 @@ const separatorMenuItem = require('../../common/commonMenu').separatorMenuItem
 const keyCodes = require('../../common/constants/keyCodes')
 const {wrappingClamp} = require('../../common/lib/formatUtil')
 
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('./styles/global')
+const {isWindows} = require('../../common/lib/platformUtil')
+
 const bindClickHandler = (contextMenu, lastFocusedSelector) => {
   if (contextMenu.type === separatorMenuItem.type) {
     return contextMenu
@@ -70,9 +74,14 @@ class MenubarItem extends ImmutableComponent {
       this.onClick(e)
     }
   }
+
   render () {
     return <span
-      className={'menubarItem' + (this.props.selected ? ' selected' : '')}
+      className={css(
+        styles.menubarItem,
+        isWindows() && styles.menubarItemForWindows,
+        this.props.selected && styles.menubarItemSelected
+      )}
       onClick={this.onClick}
       onMouseOver={this.onMouseOver}
       data-index={this.props.index}>
@@ -177,7 +186,7 @@ class Menubar extends ImmutableComponent {
   }
   render () {
     let i = 0
-    return <div className='menubar'>
+    return <div className={css(styles.menubar)}>
       {
         this.props.template.map((menubarItem) => {
           let props = {
@@ -196,5 +205,45 @@ class Menubar extends ImmutableComponent {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  menubar: {
+    display: 'flex',
+    flexGrow: 1,
+    cursor: 'default',
+    marginTop: '2px',
+    height: globalStyles.spacing.menubarHeight,
+    WebkitUserSelect: 'none'
+  },
+
+  menubarItem: {
+    color: 'black',
+    font: 'menu',
+    fontSize: globalStyles.fontSize.menubarFontSize,
+    padding: '0 10px 1px',
+    border: '1px solid transparent',
+    WebkitAppRegion: 'no-drag',
+
+    ':hover': {
+      backgroundColor: globalStyles.color.menubarItemColor,
+      border: `1px solid ${globalStyles.color.menubarItemBackground}`
+    }
+  },
+
+  menubarItemForWindows: {
+    [`@media (max-width: ${globalStyles.breakpoint.breakpointSmallWin32})`]: {
+      padding: '0 5px 1px'
+    },
+
+    [`@media (max-width: ${globalStyles.breakpoint.breakpointTinyWin32})`]: {
+      padding: '0 3px 1px'
+    }
+  },
+
+  menubarItemSelected: {
+    backgroundColor: globalStyles.color.menubarItemBackground,
+    border: `1px solid ${globalStyles.color.menubarItemSelectedBorder}`
+  }
+})
 
 module.exports = Menubar

@@ -31,6 +31,9 @@ const globalStyles = {
     chromeControlsBackground2: 'white',
     toolbarBackground: '#eee',
     toolbarBorderColor: '#ccc',
+    menubarItemColor: '#e5f3ff',
+    menubarItemSelectedBorder: '#99d1ff',
+    menubarItemBackground: '#cce8ff',
     menuSelectionColor: '#2F7AFB',
     errorTextColor: '#999',
     progressBarColor: '#3498DB',
@@ -82,7 +85,6 @@ const globalStyles = {
   spacing: {
     navigatorHeight: '48px',
     defaultSpacing: '12px',
-    defaultFontSize: '13px',
     contextMenuFontSize: '14px',
     textAreaFontSize: '14.5px',
     dragSpacing: '50px',
@@ -98,6 +100,7 @@ const globalStyles = {
     downloadsBarHeight: '50px',
     tabsToolbarHeight: '28px',
     tabPagesHeight: '9px',
+    menubarHeight: '19px',
     bookmarksToolbarHeight: '24px',
     bookmarksToolbarWithFaviconsHeight: '28px',
     bookmarksFileIconSize: '13px',
@@ -163,6 +166,8 @@ const globalStyles = {
     zindexWindowFullScreenBanner: '4100'
   },
   fontSize: {
+    defaultFontSize: '13px',
+    menubarFontSize: '12px',
     tabIcon: '14px',
     tabTitle: '12px'
   },

@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     lineHeight: globalStyles.spacing.buttonHeight,
     height: globalStyles.spacing.buttonHeight,
     width: globalStyles.spacing.buttonWidth,
-    fontSize: globalStyles.spacing.defaultFontSize,
+    fontSize: globalStyles.fontSize.defaultFontSize,
     color: globalStyles.color.buttonColor,
     borderRadius: globalStyles.radius.borderRadius,
     textAlign: 'center',

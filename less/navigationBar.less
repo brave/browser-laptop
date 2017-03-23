@@ -57,23 +57,9 @@
   }
   @media (max-width: @breakpointSmallWin32) {
     #titleBar { width: 100px; }
-    .menubarContainer {
-      .menubar {
-        .menubarItem {
-          padding: 0 5px 1px;
-        }
-      }
-    }
   }
   @media (max-width: @breakpointTinyWin32) {
     .loadTime { display: none; }
-    .menubarContainer {
-      .menubar {
-        .menubarItem {
-          padding: 0 3px 1px;
-        }
-      }
-    }
   }
 
   // Windows 7 specific styles
@@ -399,45 +385,6 @@
     display: flex;
     flex-grow: 0;
     -webkit-app-region: no-drag;
-  }
-}
-
-// Menubar (for use w/ slim titlebar)
-.menubarContainer {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-
-  .menubar {
-    display: flex;
-    cursor: default;
-    -webkit-user-select: none;
-    flex-grow: 1;
-    margin-top: 2px;
-    height: 19px;
-
-    .menubarItem {
-      color: black;
-      font: menu;
-      font-size: 12px;
-      -webkit-app-region: no-drag;
-      padding: 0 10px 1px;
-      border: 1px solid transparent;
-
-      &:hover {
-        background-color: #e5f3ff;
-        border: 1px solid #cce8ff;
-      }
-    }
-
-    .selected {
-      background-color: #cce8ff !important;
-      border: 1px solid #99d1ff !important;
-    }
-  }
-
-  .windowCaptionButtons {
-    flex-grow: 0;
   }
 }
 

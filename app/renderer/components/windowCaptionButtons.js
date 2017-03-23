@@ -55,7 +55,8 @@ class WindowCaptionButtons extends ImmutableComponent {
       fullscreen: this.props.windowMaximized,
       windowCaptionButtons: true,
       verticallyCenter: this.props.verticallyCenter
-    })}>
+    })}
+      style={{flexGlow: 0}}> // TODO: Remove this styling by refactoring windowCaptionButtons.js
       <div className='container'>
         <button
           {...props}
