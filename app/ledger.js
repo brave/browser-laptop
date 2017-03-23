@@ -1692,9 +1692,16 @@ var run = (delayTime) => {
 
   if ((typeof delayTime === 'undefined') || (!client)) return
 
-  var active, state
+  var active, state, weights, winners
   var ballots = client.ballots()
-  var winners = ((synopsis) && (ballots > 0) && (synopsis.winners(ballots))) || []
+  var data = (synopsis) && (ballots > 0) && synopsisNormalizer()
+
+  if (data) {
+    weights = []
+    data.forEach((datum) => { weights.push({ publisher: datum.site, weight: datum.weight / 100.0 }) })
+    winners = synopsis.winners(ballots, weights)
+  }
+  if (!winners) winners = []
 
   try {
     winners.forEach((winner) => {
