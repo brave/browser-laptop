@@ -12,6 +12,8 @@ const {tabs} = require('../../../js/constants/config')
 const {hasBreakpoint, hasRelativeCloseIcon, hasFixedCloseIcon} = require('../lib/tabUtil')
 
 const newSessionSvg = require('../../extensions/brave/img/tabs/new_session.svg')
+const closeTabSvg = require('../../extensions/brave/img/tabs/close_btn_normal.svg')
+const closeTabHoverSvg = require('../../extensions/brave/img/tabs/close_btn_hover.svg')
 
 /**
  * Boilerplate component for all tab icons
@@ -248,11 +250,10 @@ class CloseTabIcon extends ImmutableComponent {
 
   render () {
     return !this.isPinned &&
-    (hasRelativeCloseIcon(this.props) || hasFixedCloseIcon(this.props))
+      (hasRelativeCloseIcon(this.props) || hasFixedCloseIcon(this.props))
       ? <TabIcon
         data-test-id='closeTabIcon'
         className={css(styles.closeTab)}
-        symbol={globalStyles.appIcons.closeTab}
         {...this.props} />
       : null
   }
@@ -300,23 +301,23 @@ const styles = StyleSheet.create({
   },
 
   closeTab: {
-    opacity: '0.7',
     position: 'relative',
-    top: '0',
-    right: '0',
     padding: '0',
-    borderRadius: globalStyles.radius.borderRadius,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: globalStyles.spacing.iconSize,
-    width: globalStyles.spacing.iconSize,
-    height: globalStyles.spacing.iconSize,
+    width: globalStyles.spacing.closeIconSize,
+    height: globalStyles.spacing.closeIconSize,
     border: '0',
     zIndex: globalStyles.zindex.zindexTabs,
+    backgroundImage: `url(${closeTabSvg})`,
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: globalStyles.spacing.closeIconSize,
+    backgroundPosition: 'center center',
 
     ':hover': {
-      opacity: '1'
+      opacity: '1',
+      backgroundImage: `url(${closeTabHoverSvg})`
     }
   },
 
