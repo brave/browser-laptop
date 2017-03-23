@@ -36,8 +36,16 @@ class PluginsTab extends ImmutableComponent {
     aboutActions.setResourceEnabled(widevine, e.target.value)
   }
 
+  infoCircle (location) {
+    return <span className='fa fa-info-circle flashInfoIcon'
+      onClick={aboutActions.newFrame.bind(null, {
+        location
+      }, true)} />
+  }
+
   render () {
     const braveWikiLink = 'https://github.com/brave/browser-laptop/wiki'
+    const flashInfoLink = `${braveWikiLink}/Flash-Support-Deprecation-Proposal#troubleshooting-flash-issues`
     return <div>
       <div className='sectionTitle' data-l10n-id='pluginSettings' />
       <SettingsList>
@@ -46,7 +54,7 @@ class PluginsTab extends ImmutableComponent {
           {
             isDarwin() || isWindows()
             ? <div>
-              <span className='fa fa-info-circle flashInfoIcon' />
+              {this.infoCircle(appConfig.flash.installUrl)}
               <span data-l10n-id='enableFlashSubtext' />&nbsp;
               <span className='linkText' onClick={aboutActions.newFrame.bind(null, {
                 location: appConfig.flash.installUrl
@@ -58,13 +66,13 @@ class PluginsTab extends ImmutableComponent {
             </div>
           }
           <div>
-            <span className='fa fa-info-circle flashInfoIcon' />
+            {this.infoCircle(flashInfoLink)}
             <span data-l10n-id='flashTroubleshooting' />&nbsp;
             <span className='linkText'
               onClick={aboutActions.newFrame.bind(null, {
-                location: `${braveWikiLink}/Flash-Support-Deprecation-Proposal#troubleshooting-flash-issues`
+                location: flashInfoLink
               }, true)}
-              title={`${braveWikiLink}/Flash-Support-Deprecation-Proposal#troubleshooting-flash-issues`}>{'wiki'}</span>.
+              title={flashInfoLink}>{'wiki'}</span>.
           </div>
         </div>
       </SettingsList>
