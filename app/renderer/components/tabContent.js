@@ -207,6 +207,7 @@ class TabTitle extends ImmutableComponent {
 
   get shouldHideTitle () {
     return (this.props.tab.get('breakpoint') === 'mediumSmall' && this.locationHasSecondaryIcon) ||
+      (hasBreakpoint(this.props, 'mediumSmall') && this.props.tab.get('hoverState')) ||
       hasBreakpoint(this.props, ['extraSmall', 'smallest']) ||
       hasFixedCloseIcon(this.props)
   }
@@ -250,7 +251,7 @@ class CloseTabIcon extends ImmutableComponent {
 
   render () {
     return !this.isPinned &&
-      (hasRelativeCloseIcon(this.props) || hasFixedCloseIcon(this.props))
+     (hasRelativeCloseIcon(this.props) || hasFixedCloseIcon(this.props))
       ? <TabIcon
         data-test-id='closeTabIcon'
         className={css(styles.closeTab)}
@@ -302,10 +303,12 @@ const styles = StyleSheet.create({
 
   closeTab: {
     position: 'relative',
-    padding: '0',
+    paddingLeft: globalStyles.spacing.defaultIconPadding,
+    paddingRight: globalStyles.spacing.defaultIconPadding,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    minWidth: globalStyles.spacing.closeIconSize,
     width: globalStyles.spacing.closeIconSize,
     height: globalStyles.spacing.closeIconSize,
     border: '0',
@@ -316,7 +319,6 @@ const styles = StyleSheet.create({
     backgroundPosition: 'center center',
 
     ':hover': {
-      opacity: '1',
       backgroundImage: `url(${closeTabHoverSvg})`
     }
   },
