@@ -22,7 +22,7 @@ module.exports = {
   navigatorBookmarked: '#navigator .removeBookmarkButton',
   navigatorNotBookmarked: '#navigator .bookmarkButton',
   bookmarksToolbar: '.bookmarksToolbar',
-  notificationBar: '.notificationBar',
+  notificationBar: '[data-test-id="notificationBar"]',
   errorContent: '.errorContent',
   errorUrl: '.errorUrl',
   errorText: '.errorText',

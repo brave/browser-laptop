@@ -9,6 +9,9 @@ const ipc = require('electron').ipcRenderer
 const messages = require('../constants/messages')
 const getOrigin = require('../state/siteUtil').getOrigin
 
+const {StyleSheet, css} = require('aphrodite/no-important')
+const commonStyles = require('../../app/renderer/components/styles/commonStyles')
+
 class NotificationItem extends ImmutableComponent {
   clickHandler (buttonIndex, e) {
     const nonce = this.props.detail.get('options').get('nonce')
@@ -34,38 +37,42 @@ class NotificationItem extends ImmutableComponent {
     let i = 0
     const options = this.props.detail.get('options')
     const greeting = this.props.detail.get('greeting')
-    return <div className={'notificationItem ' + (options.get('style') || '')}>
-      <span className='options'>
-        {
-          options.get('persist')
-            ? <span id='rememberOption'>
-              <input type='checkbox' ref={(node) => { this.checkbox = node }} />
-              <label htmlFor='rememberOption' data-l10n-id='rememberDecision' onClick={this.toggleCheckbox.bind(this)} />
-            </span>
-            : null
-        }
-        {
-          this.props.detail.get('buttons').map((button) =>
-            <button
-              type='button'
-              className={'button ' + (button.get('className') || '')}
-              onClick={this.clickHandler.bind(this, i++)}>{button.get('text')}</button>
-          )
-        }
-      </span>
-      {
-        greeting
-          ? <span className='greeting'>{greeting}</span>
-          : null
-      }
-      <span className='message'>{this.props.detail.get('message')}</span>
-      <span className='notificationAdvanced'>
-        {
-          options.get('advancedText') && options.get('advancedLink')
-            ? <span onClick={this.openAdvanced.bind(this)}>{options.get('advancedText')}</span>
-            : null
-        }
-      </span>
+    return <div className={css(commonStyles.notificationBar__notificationItem) + ' ' + 'notificationItem' + ' ' + (options.get('style') || '')}>
+      <div className={css(styles.flexJustifyBetween, styles.flexAlignCenter)}>
+        <div className={css(styles.marginRight)}>
+          {
+            greeting
+              ? <span className={css(commonStyles.notificationItem__greeting)} data-test-id='greeting'>{greeting}</span>
+              : null
+          }
+          <span className={css(commonStyles.notificationItem__message)}>{this.props.detail.get('message')}</span>
+          <span className={css(styles.advanced)}>
+            {
+              options.get('advancedText') && options.get('advancedLink')
+                ? <span onClick={this.openAdvanced.bind(this)}>{options.get('advancedText')}</span>
+                : null
+            }
+          </span>
+        </div>
+        <span className={css(styles.flexAlignCenter)} data-test-id='notificationOptions'>
+          {
+            options.get('persist')
+              ? <span id='rememberOption'>
+                <input className={css(styles.checkbox)} type='checkbox' ref={(node) => { this.checkbox = node }} />
+                <label className={css(styles.label)} htmlFor='rememberOption' data-l10n-id='rememberDecision' onClick={this.toggleCheckbox.bind(this)} />
+              </span>
+              : null
+          }
+          {
+            this.props.detail.get('buttons').map((button) =>
+              <button
+                type='button'
+                className={'browserButton' + ' ' + css(commonStyles.notificationItem__button) + ' ' + (button.get('className') || 'whiteButton')}
+                onClick={this.clickHandler.bind(this, i++)}>{button.get('text')}</button>
+            )
+          }
+        </span>
+      </div>
     </div>
   }
 }
@@ -83,7 +90,7 @@ class NotificationBar extends ImmutableComponent {
       return null
     }
 
-    return <div className='notificationBar'>
+    return <div className={css(commonStyles.notificationBar)} data-test-id='notificationBar'>
       {
         activeNotifications.takeLast(3).map((notificationDetail) =>
           <NotificationItem detail={notificationDetail} />
@@ -92,5 +99,35 @@ class NotificationBar extends ImmutableComponent {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  flexJustifyBetween: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    flexFlow: 'row wrap'
+  },
+  flexAlignCenter: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  marginRight: {
+    marginRight: '6px'
+  },
+  label: {
+    fontSize: '15px',
+    padding: '0 10px 0 0',
+    color: '#666'
+  },
+  checkbox: {
+    marginRight: '3px'
+  },
+  advanced: {
+    color: 'grey',
+    cursor: 'pointer',
+    textDecoration: 'underline',
+    fontSize: '13px',
+    margin: '5px'
+  }
+})
 
 module.exports = NotificationBar

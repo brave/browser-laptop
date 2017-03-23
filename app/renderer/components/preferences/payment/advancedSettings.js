@@ -90,11 +90,11 @@ class AdvancedSettingsFooter extends ImmutableComponent {
   render () {
     return <div className={css(paymentCommon.advanceFooter)}>
       <Button l10nId='backupLedger'
-        className={css(commonStyles.buttonPrimary)}
+        className={css(commonStyles.primaryButton)}
         onClick={this.props.showOverlay.bind(this, 'ledgerBackup')}
       />
       <Button l10nId='recoverLedger'
-        className={css(commonStyles.buttonPrimary, paymentCommon.marginButtons)}
+        className={css(commonStyles.primaryButton, paymentCommon.marginButtons)}
         onClick={this.props.showOverlay.bind(this, 'ledgerRecovery')}
       />
       <Button l10nId='done'

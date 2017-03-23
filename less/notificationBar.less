@@ -3,108 +3,61 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 @import "variables.less";
-@import (reference) "button.less";
 
-.notificationBar {
-  display: inline-block;
-  width: 100%;
-  cursor: default;
-  -webkit-user-select: none;
+// TODO: refactor notificationBar.js and updateBar.js
+.notificationItem {
 
-  .notificationItem {
-    background-color: #ffefc0;
-    border-bottom: 1px solid #888;
-    line-height: 24px;
-    padding: 6px 12px 6px 20px;
+  // TODO: refactor button.less
+  .browserButton {
+    border: none;
+    box-shadow: none;
+    line-height: 1;
 
-    &.greetingStyle {
-      background-color: #fff;
-      padding: 8px 20px 6px 20px;
+    &:hover {
+      border: none;
+    }
 
-      .button {
-        .browserButton();
+    &.whiteButton {
+      border: 1px solid @gray;
+    }
 
-        background-color: #eee;
-        border-style: none;
-        font-size: 14px;
-        height: 25px;
-        line-height: 27px;
-        margin: auto 0 auto 4px;
-        padding: 0px 25px;
-        width: auto;
+    &.primaryButton {
+      background: @braveOrange;
+      border: 1px solid @braveOrange;
+      box-shadow: none;
+      font-weight: normal;
 
-        &.primary {
-          background-color: @braveOrange;
-          color: #fff;
-          margin-right: 0px;
+      &:hover {
+        background: lighten(@braveOrange, 10%);
+        border: 1px solid lighten(@braveOrange, 10%);
+      }
 
-          &:hover {
-            background-color: lighten(@braveOrange, 10%);
-            color: #fff !important;
-          }
-          &:active {
-            background-color: darken(@braveOrange, 10%);
-            color: #fff !important;
-          }
-        }
+      &:active {
+        background: darken(@braveOrange, 10%);
+        border: 1px solid darken(@braveOrange, 10%);
       }
     }
+  }
 
-    label {
-      font-size: 15px;
-      padding: 0 10px 0 0;
-      color: #666;
-    }
+  // Copied to commonStyles.js - notificationItem__greetingStyle
+  // TODO: refactor app/ledger.js (style: 'greetingStyle')
+  &.greetingStyle {
+    background: #fff;
+    padding: 8px 20px;
+    width: 100%;
+  }
+}
 
-    input[type="checkbox"] {
-      margin: 0 3px;
-    }
+// TODO: remove
+div[class*='notificationBar'] {
+  // Cancel the top margin of notificationBar (except the 1st one)
+  + div[class*='notificationBar'] {
+    margin-top: 0;
+    border-top: 0;
 
-    .button {
-      font-size: 13px;
-      margin-right: 10px;
-      padding: 2px 15px;
-      text-transform: capitalize;
-      width: auto;
-    }
-
-    .greeting {
-      color: @braveOrange;
-      font-size: 16px;
-      margin: auto 10px auto 0;
-      user-select: none;
-    }
-
-    .message {
-      color: #000;
-      font-size: 15px;
-      margin: auto 0;
-      user-select: none;
-      cursor: default;
-
-      &.secondary {
-        color: #888;
-        font-size: 14px;
-        padding: 0;
-        margin: auto 0 auto 10px;
-      }
-    }
-
-    .options {
-      float: right;
-      margin-left: 6px;
-    }
-
-    .spacer {
-      flex-grow: 1;
-    }
-
-    .notificationAdvanced {
-      color: grey;
-      cursor: pointer;
-      text-decoration: underline;
-      font-size: 13px;
-      margin: 5px;
+    // Cancel the top border of notificationItem (except the 1st one)
+    > div[class*='notificationItem'] {
+      border-top: 0;
     }
   }
 }

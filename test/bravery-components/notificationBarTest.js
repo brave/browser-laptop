@@ -40,7 +40,7 @@ describe('notificationBar permissions', function () {
       .loadUrl(this.notificationUrl)
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(notificationBar)
-      .element('.notificationItem:nth-Child(1) .options')
+      .element('.notificationItem:nth-Child(1) [data-test-id="notificationOptions"]')
       .click('button=Deny')
       .activateTitleMode()
       .waitUntil(function () {

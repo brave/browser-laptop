@@ -2003,7 +2003,7 @@ const showDisabledNotifications = () => {
       message: notificationTryPaymentsMessage,
       buttons: [
         {text: locale.translation('noThanks')},
-        {text: locale.translation('notificationTryPaymentsYes'), className: 'primary'}
+        {text: locale.translation('notificationTryPaymentsYes'), className: 'primaryButton'}
       ],
       options: {
         style: 'greetingStyle',
@@ -2062,7 +2062,7 @@ const showNotificationAddFunds = () => {
     buttons: [
       {text: locale.translation('turnOffNotifications')},
       {text: locale.translation('updateLater')},
-      {text: locale.translation('addFunds'), className: 'primary'}
+      {text: locale.translation('addFunds'), className: 'primaryButton'}
     ],
     options: {
       style: 'greetingStyle',
@@ -2086,7 +2086,7 @@ const showNotificationReviewPublishers = (nextTime) => {
     buttons: [
       {text: locale.translation('turnOffNotifications')},
       {text: locale.translation('dismiss')},
-      {text: locale.translation('reviewSites'), className: 'primary'}
+      {text: locale.translation('reviewSites'), className: 'primaryButton'}
     ],
     options: {
       style: 'greetingStyle',
@@ -2107,7 +2107,7 @@ const showNotificationPaymentDone = (transactionContributionFiat) => {
     message: notificationPaymentDoneMessage,
     buttons: [
       {text: locale.translation('turnOffNotifications')},
-      {text: locale.translation('Ok'), className: 'primary'}
+      {text: locale.translation('Ok'), className: 'primaryButton'}
     ],
     options: {
       style: 'greetingStyle',

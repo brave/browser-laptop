@@ -76,11 +76,11 @@ class LedgerBackupFooter extends ImmutableComponent {
   render () {
     return <div className={css(paymentCommon.advanceFooter)}>
       <Button l10nId='printKeys'
-        className={css(commonStyles.buttonPrimary)}
+        className={css(commonStyles.primaryButton)}
         onClick={this.printKeys}
       />
       <Button l10nId='saveRecoveryFile'
-        className={css(commonStyles.buttonPrimary, paymentCommon.marginButtons)}
+        className={css(commonStyles.primaryButton, paymentCommon.marginButtons)}
         onClick={this.saveKeys}
       />
       <Button l10nId='done'

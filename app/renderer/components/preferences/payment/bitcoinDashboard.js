@@ -54,11 +54,11 @@ class BitcoinDashboard extends ImmutableComponent {
 
   bitcoinPurchaseButton () {
     if (!this.props.ledgerData.get('buyURLFrame')) {
-      return <Button l10nId='add' className={css(commonStyles.buttonPrimary, styles.panelButton)} onClick={this.props.showOverlay.bind(this)} />
+      return <Button l10nId='add' className={css(commonStyles.primaryButton, styles.panelButton)} onClick={this.props.showOverlay.bind(this)} />
     }
 
     return <a href={this.props.ledgerData.get('buyURL')} target='_blank' onClick={this.openBuyURLTab}>
-      <Button l10nId='add' className={css(commonStyles.buttonPrimary, styles.panelButton)} />
+      <Button l10nId='add' className={css(commonStyles.primaryButton, styles.panelButton)} />
     </a>
   }
 
@@ -137,7 +137,7 @@ class BitcoinDashboard extends ImmutableComponent {
         </div>
         <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerLast)}>
           <a target='_blank' href={url}>
-            <button className={css(commonStyles.browserButton, commonStyles.buttonPrimary, styles.panelButton)}>{name}</button>
+            <button className={css(commonStyles.browserButton, commonStyles.primaryButton, styles.panelButton)}>{name}</button>
           </a>
         </div>
       </div>
@@ -156,7 +156,7 @@ class BitcoinDashboard extends ImmutableComponent {
         <div className={css(styles.settingsListTitle)} data-l10n-id='smartphoneTitle' />
       </div>
       <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerLast, styles.alignMiddle)}>
-        <Button className={css(commonStyles.buttonPrimary, styles.panelButton)} l10nId='displayQRCode' onClick={this.props.showQRcode.bind(this)} />
+        <Button className={css(commonStyles.primaryButton, styles.panelButton)} l10nId='displayQRCode' onClick={this.props.showQRcode.bind(this)} />
       </div>
     </div>
   }
@@ -205,7 +205,7 @@ class BitcoinDashboard extends ImmutableComponent {
         <a target='_blank' href='https://www.buybitcoinworldwide.com/'>
           <button className={cx({
             browserButton: true,
-            [css(commonStyles.buttonPrimary)]: true,
+            [css(commonStyles.primaryButton)]: true,
             [css(styles.panelButton)]: true
           })}>buybitcoinworldwide.com</button>
         </a>
@@ -299,7 +299,7 @@ class BitcoinDashboard extends ImmutableComponent {
                     ? <div className={css(styles.hasBitcoinHandler)}>
                       <a href={ledgerData.get('paymentURL')} target='_blank'>
                         <Button l10nId='bitcoinVisitAccount'
-                          className={css(commonStyles.buttonPrimary, styles.bitcoinAddressButton)}
+                          className={css(commonStyles.primaryButton, styles.bitcoinAddressButton)}
                         />
                       </a>
                       <div data-l10n-id='bitcoinAddress' className={css(styles.walletLabelText)} />
@@ -309,7 +309,7 @@ class BitcoinDashboard extends ImmutableComponent {
                     </div>
                 }
                 <div className={css(styles.walletAddressText)}>{ledgerData.get('address')}</div>
-                <Button className={css(commonStyles.buttonPrimary, styles.panelButton)}
+                <Button className={css(commonStyles.primaryButton, styles.panelButton)}
                   l10nId='copyToClipboard'
                   onClick={this.copyToClipboard.bind(this, ledgerData.get('address'))}
                 />
