@@ -270,4 +270,22 @@ describe('urlutil', function () {
       assert.equal(UrlUtil.getPunycodeUrl('http://brave:brave@ebаy.com:1234/brave#brave'), 'http://brave:brave@xn--eby-7cd.com:1234/brave#brave')
     })
   })
+
+  describe('isPotentialPhishingUrl', function () {
+    it('returns false if input is not a URL', function () {
+      assert.equal(UrlUtil.isPotentialPhishingUrl(null), false)
+    })
+    it('returns false if input is a regular URL', function () {
+      assert.equal(UrlUtil.isPotentialPhishingUrl(' https://google.com'), false)
+    })
+    it('returns true if input is a data URL', function () {
+      assert.equal(UrlUtil.isPotentialPhishingUrl('data:text/html,<script>alert("no crash")</script>'), true)
+    })
+    it('returns true if input is a js URL', function () {
+      assert.equal(UrlUtil.isPotentialPhishingUrl('   JAVASCRIPT:alert(1)'), true)
+    })
+    it('returns true if input is a blob URL', function () {
+      assert.equal(UrlUtil.isPotentialPhishingUrl('   blob:foo '), true)
+    })
+  })
 })

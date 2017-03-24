@@ -413,6 +413,24 @@ describe('navigationBar tests', function () {
         .waitForVisible('[data-l10n-id="insecureConnection"]')
         .keys(Brave.keys.ESCAPE)
     })
+    it('Shows phishing URL warning', function * () {
+      const page1Url = 'data:text/html,<body>i am google</body>'
+      yield this.app.client
+        .waitForElementFocus(urlInput)
+        .keys(page1Url)
+        .keys(Brave.keys.ENTER)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitUntil(() =>
+          this.app.client
+            .activateURLMode()
+            .waitForExist(urlbarIcon)
+            .getAttribute(urlbarIcon, 'class').then((classes) =>
+              classes.includes('fa-exclamation-triangle') && classes.includes('insecure-color')
+        ))
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible('[data-l10n-id="phishingConnectionInfo"]')
+        .keys(Brave.keys.ESCAPE)
+    })
     it('Shows insecure URL icon in title mode', function * () {
       const page1Url = Brave.server.url('page1.html')
       yield this.app.client

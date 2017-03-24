@@ -9,6 +9,7 @@ const cx = require('../../../js/lib/classSet')
 const dragTypes = require('../../../js/constants/dragTypes')
 const dndData = require('../../../js/dndData')
 const {isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
+const {isPotentialPhishingUrl} = require('../../../js/lib/urlutil')
 const searchIconSize = 16
 
 class UrlBarIcon extends ImmutableComponent {
@@ -18,7 +19,9 @@ class UrlBarIcon extends ImmutableComponent {
     this.onDragStart = this.onDragStart.bind(this)
   }
   get iconCssClasses () {
-    if (this.isSearch) {
+    if (isPotentialPhishingUrl(this.props.location)) {
+      return ['fa-exclamation-triangle', 'insecure-color']
+    } else if (this.isSearch) {
       return ['fa-search']
     } else if (this.isAboutPage && !this.props.titleMode) {
       return ['fa-list']

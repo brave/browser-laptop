@@ -207,6 +207,17 @@ const UrlUtil = {
   },
 
   /**
+   * Checks if a url is a phishable url.
+   * @param {String} input The input url.
+   * @returns {Boolean}
+   */
+  isPotentialPhishingUrl: function (url) {
+    if (typeof url !== 'string') { return false }
+    const protocol = urlParse(url.trim().toLowerCase()).protocol
+    return ['data:', 'blob:', 'javascript:'].includes(protocol)
+  },
+
+  /**
    * Checks if a url is an image data url.
    * @param {String} input The input url.
    * @returns {Boolean} Whether or not this is an image data url.
