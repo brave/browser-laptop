@@ -42,6 +42,16 @@ const webviewActions = {
   },
 
   /**
+   * Shows the certificate infomation
+   */
+  showCertificate: function () {
+    const webview = getWebview()
+    if (webview) {
+      webview.showCertificate()
+    }
+  },
+
+  /**
    * Shows the definition of the selected text in a pop-up window (macOS only)
    */
   showDefinitionForSelection: function () {
