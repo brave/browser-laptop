@@ -518,6 +518,31 @@ describe('Bravery Panel', function () {
             .then((stat) => stat === '2' || stat === '3')
         })
     })
+    it('block device enumeration', function * () {
+      const url = Brave.server.url('enumerate_devices.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(url)
+        .waitUntil(function () {
+          return this.getText('body')
+            .then((body) => {
+              return body.includes('default')
+            })
+        })
+        .openBraveMenu(braveMenu, braveryPanel)
+        .click(fpSwitch)
+        .waitUntil(function () {
+          return this.getText(fpStat)
+            .then((stat) => stat === '1')
+        })
+        .tabByUrl(url)
+        .waitUntil(function () {
+          return this.getText('body')
+            .then((body) => {
+              return body === ''
+            })
+        })
+    })
     it('allows fingerprinting when setting is off in private tab', function * () {
       const url = Brave.server.url('fingerprinting.html')
       yield this.app.client
