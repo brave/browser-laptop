@@ -118,14 +118,14 @@ class SiteInfo extends ImmutableComponent {
     } else if (this.isSecure === true) {
       connectionInfo =
         <div>
-        <div className='connectionInfo' data-l10n-id='secureConnectionInfo' />
-        {viewCertificateButton}
+          <div className='connectionInfo' data-l10n-id='secureConnectionInfo' />
+          {viewCertificateButton}
         </div>
     } else if (this.isSecure === 1) {
       connectionInfo =
         <div>
-        <div className='connectionInfo' data-l10n-id='partiallySecureConnectionInfo' />
-        {viewCertificateButton}
+          <div className='connectionInfo' data-l10n-id='partiallySecureConnectionInfo' />
+          {viewCertificateButton}
         </div>
     } else {
       connectionInfo =
