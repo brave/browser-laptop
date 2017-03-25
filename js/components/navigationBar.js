@@ -140,8 +140,7 @@ class NavigationBar extends ImmutableComponent {
   }
 
   componentDidMount () {
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, () => this.onToggleBookmark())
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark())
+    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_BOOKMARK, () => this.onToggleBookmark())
   }
 
   get showNoScriptInfo () {

@@ -343,14 +343,10 @@ const isCurrentLocationBookmarked = () => {
 const createBookmarksSubmenu = () => {
   let submenu = [
     {
-      label: locale.translation('bookmarkPage'),
-      type: 'checkbox',
+      label: isCurrentLocationBookmarked() ? locale.translation('editBookmark') : locale.translation('bookmarkPage'),
       accelerator: 'CmdOrCtrl+D',
-      checked: isCurrentLocationBookmarked(),
       click: function (item, focusedWindow) {
-        var msg = item.checked
-          ? messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK
-          : messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK
+        var msg = messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_BOOKMARK
         CommonMenu.sendToFocusedWindow(focusedWindow, [msg])
       }
     },
@@ -580,13 +576,16 @@ const createMenu = () => {
 const setMenuItemChecked = (label, checked) => {
   // Update electron menu (Mac / Linux)
   const systemMenuItem = menuUtil.getMenuItem(appMenu, label)
-  systemMenuItem.checked = checked
 
-  // Update in-memory menu template (Windows)
-  const oldTemplate = appStore.getState().getIn(['menu', 'template'])
-  const newTemplate = menuUtil.setTemplateItemChecked(oldTemplate, label, checked)
-  if (newTemplate) {
-    appActions.setMenubarTemplate(newTemplate)
+  if (systemMenuItem) {
+    systemMenuItem.checked = checked
+
+    // Update in-memory menu template (Windows)
+    const oldTemplate = appStore.getState().getIn(['menu', 'template'])
+    const newTemplate = menuUtil.setTemplateItemChecked(oldTemplate, label, checked)
+    if (newTemplate) {
+      appActions.setMenubarTemplate(newTemplate)
+    }
   }
 }
 
