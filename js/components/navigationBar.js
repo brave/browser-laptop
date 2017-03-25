@@ -70,7 +70,11 @@ class NavigationBar extends ImmutableComponent {
     contextMenus.onReloadContextMenu(target)
   }
 
-  onHome () {
+  onHome (e) {
+    if (eventUtil.isForSecondaryAction(e)) {
+      windowActions.newFrame()
+      return
+    }
     getSetting(settings.HOMEPAGE).split('|')
       .forEach((homepage, i) => {
         ipc.emit(i === 0 ? messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL : messages.SHORTCUT_NEW_FRAME, {}, homepage)
