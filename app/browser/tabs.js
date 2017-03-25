@@ -48,6 +48,15 @@ const api = {
         return
       }
 
+      if (newTab.isBackgroundPage()) {
+        if (newTab.isDevToolsOpened()) {
+          newTab.devToolsWebContents.focus()
+        } else {
+          newTab.openDevTools()
+        }
+        return
+      }
+
       let location = newTab.getURL()
       if (!location || location === '') {
         location = 'about:blank'

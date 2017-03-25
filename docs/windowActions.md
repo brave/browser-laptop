@@ -64,6 +64,18 @@ Dispatches a message to the store to let it know a page has been navigated.
 
 
 
+### navigationAborted(tabId, location) 
+
+Dispatches a message to the store to let it know the page navigation was aborted
+
+**Parameters**
+
+**tabId**: `number`, Dispatches a message to the store to let it know the page navigation was aborted
+
+**location**: `string`, the last committed location if available
+
+
+
 ### setSecurityState(frameProps, securityState) 
 
 Dispatches a message to set the security state.

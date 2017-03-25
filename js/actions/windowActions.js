@@ -109,6 +109,20 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a message to the store to let it know the page navigation was aborted
+   *
+   * @param {number} tabId
+   * @param {string} location the last committed location if available
+   */
+  navigationAborted: function (tabId, location) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SET_NAVIGATION_ABORTED,
+      tabId,
+      location
+    })
+  },
+
+  /**
    * Dispatches a message to set the security state.
    * @param {Object} frameProps - The frame properties to modify.
    * @param {Object} securityState - The security state properties that have
