@@ -34,6 +34,7 @@ class PinnedInput extends ImmutableComponent {
     }
 
     aboutActions.changeSiteSetting(hostPattern, 'ledgerPinPercentage', value)
+    this.forceUpdate()
   }
   render () {
     return <input type='text'

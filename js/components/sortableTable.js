@@ -33,7 +33,7 @@ class SortableTable extends React.Component {
     return this.sortTable
   }
 
-  componentWillUpdate () {
+  componentDidUpdate () {
     this.sortTable.refresh()
   }
   /**

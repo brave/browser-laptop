@@ -165,7 +165,7 @@ class LedgerTable extends ImmutableComponent {
       },
       {
         html: <div>
-          <a className={css(styles.siteData)} href={publisherURL} target='_blank'>
+          <a className={css(styles.siteData)} href={publisherURL} target='_blank' tabIndex={-1}>
             {
               faviconURL
                 ? <img className={css(styles.favicon)} src={faviconURL} alt={site} />

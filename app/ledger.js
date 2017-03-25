@@ -212,7 +212,7 @@ const doAction = (action) => {
       } else if (action.key === 'ledgerPinPercentage') {
         if (!synopsis.publishers[publisher]) break
         synopsis.publishers[publisher].pinPercentage = action.value
-        updatePublisherInfo()
+        updatePublisherInfo(publisher)
       }
       break
 
@@ -940,7 +940,7 @@ var publisherInfo = {
   }
 }
 
-var updatePublisherInfo = () => {
+var updatePublisherInfo = (changedPublisher) => {
   var data = {}
   var then = underscore.now() - msecs.week
 
@@ -961,7 +961,7 @@ var updatePublisherInfo = () => {
   atomicWriter(pathName(synopsisPath), synopsis, () => {})
   if (!publisherInfo._internal.enabled) return
 
-  publisherInfo.synopsis = synopsisNormalizer()
+  publisherInfo.synopsis = synopsisNormalizer(changedPublisher)
   publisherInfo.synopsisOptions = synopsis.options
 
   if (publisherInfo._internal.debugP) {
@@ -1021,7 +1021,7 @@ var contributeP = (publisher) => {
           (!blockedP(publisher)))
 }
 
-var synopsisNormalizer = () => {
+var synopsisNormalizer = (changedPublisher) => {
   // courtesy of https://stackoverflow.com/questions/13483430/how-to-make-rounded-percentages-add-up-to-100#13485888
   const roundToTarget = (l, target, property) => {
     let off = target - underscore.reduce(l, (acc, x) => { return acc + Math.round(x[property]) }, 0)
@@ -1033,11 +1033,19 @@ var synopsisNormalizer = () => {
       })
   }
 
-  const normalizePinned = (dataPinned, total, target) => dataPinned.map((publisher) => {
-    const floatNumber = (publisher.pinPercentage / total) * target
-    let newPer = Math.floor(floatNumber)
-    if (newPer < 1) {
+  const normalizePinned = (dataPinned, total, target, setOne) => dataPinned.map((publisher) => {
+    let newPer
+    let floatNumber
+
+    if (setOne) {
       newPer = 1
+      floatNumber = 1
+    } else {
+      floatNumber = (publisher.pinPercentage / total) * target
+      newPer = Math.floor(floatNumber)
+      if (newPer < 1) {
+        newPer = 1
+      }
     }
 
     publisher.weight = floatNumber
@@ -1118,13 +1126,27 @@ var synopsisNormalizer = () => {
 
   // round if over 100% of pinned publishers
   if (pinnedTotal > 100) {
-    dataPinned = roundToTarget(normalizePinned(dataPinned, pinnedTotal, 100), 100, 'pinPercentage')
+    const changedObject = dataPinned.filter(publisher => publisher.site === changedPublisher)[0]
+    const setOne = changedObject.pinPercentage > (100 - dataPinned.length - 1)
+
+    if (setOne) {
+      changedObject.pinPercentage = 100 - dataPinned.length + 1
+      changedObject.weight = changedObject.pinPercentage
+    }
+
+    const pinnedRestTotal = pinnedTotal - changedObject.pinPercentage
+    dataPinned = dataPinned.filter(publisher => publisher.site !== changedPublisher)
+    dataPinned = normalizePinned(dataPinned, pinnedRestTotal, (100 - changedObject.pinPercentage), setOne)
+    dataPinned = roundToTarget(dataPinned, (100 - changedObject.pinPercentage), 'pinPercentage')
+
     dataUnPinned = dataUnPinned.map((result) => {
       let publisher = getPublisherData(result)
       publisher.percentage = 0
       publisher.weight = 0
       return publisher
     })
+
+    dataPinned.push(changedObject)
 
     // sync app store
     appActions.changeLedgerPinnedPercentages(dataPinned)
