@@ -1459,7 +1459,7 @@ function onBackButtonHistoryMenu (activeFrame, history, target) {
           if (eventUtil.isForSecondaryAction(e)) {
             windowActions.newFrame({
               location: url,
-              partitionNumber: activeFrame.props.frame.get('partitionNumber')
+              partitionNumber: activeFrame.props.partitionNumber
             }, !!e.shiftKey)
           } else {
             activeFrame.goToIndex(index)
@@ -1503,7 +1503,7 @@ function onForwardButtonHistoryMenu (activeFrame, history, target) {
           if (eventUtil.isForSecondaryAction(e)) {
             windowActions.newFrame({
               location: url,
-              partitionNumber: activeFrame.props.frame.get('partitionNumber')
+              partitionNumber: activeFrame.props.partitionNumber
             }, !!e.shiftKey)
           } else {
             activeFrame.goToIndex(index)

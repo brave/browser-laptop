@@ -4,7 +4,7 @@ const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
 const assert = require('assert')
 const settings = require('../../js/constants/settings')
-const {urlInput, backButton, forwardButton, activeTab, activeTabTitle, activeTabFavicon, newFrameButton, notificationBar} = require('../lib/selectors')
+const {urlInput, backButton, forwardButton, activeTab, activeTabTitle, activeTabFavicon, newFrameButton, notificationBar, contextMenu} = require('../lib/selectors')
 
 describe('tab tests', function () {
   function * setup (client) {
@@ -55,6 +55,40 @@ describe('tab tests', function () {
           return this.getText(activeTabTitle)
             .then((title) => title === 'Page 2')
         })
+    })
+
+    it('middle click opens in the new tab', function * () {
+      var page1 = Brave.server.url('page1.html')
+      var page2 = Brave.server.url('page2.html')
+
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(page1)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitUntil(function () {
+          return this.getText(activeTabTitle)
+            .then((title) => title === 'Page 1')
+        })
+        .tabByIndex(0)
+        .loadUrl(page2)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitUntil(function () {
+          return this.getText(activeTabTitle)
+            .then((title) => title === 'Page 2')
+        })
+        .waitForExist(backButton)
+        .click(backButton)
+        .waitForUrl(page1)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitUntil(function () {
+          return this.getText(activeTabTitle)
+            .then((title) => title === 'Page 1')
+        })
+        .waitForExist('.forwardButton')
+        .rightClick(forwardButton)
+        .waitForExist(contextMenu)
+        .middleClick(`${contextMenu} [data-index="0"]`)
+        .waitForTabCount(2)
     })
   })
 
