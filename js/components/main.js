@@ -886,7 +886,7 @@ class Main extends ImmutableComponent {
     const trackers = frames.getIn(['trackingProtection', 'blocked'])
     const blocked = (ads ? ads.size : 0) + (trackers ? trackers.size : 0)
 
-    return (blocked > 99) ? '99+' : blocked
+    return (blocked.size === 0) ? false : ((blocked > 99) ? '99+' : blocked)
   }
 
   render () {
@@ -945,6 +945,7 @@ class Main extends ImmutableComponent {
 
     const appStateSites = this.props.appState.get('sites')
     const activeTabShowingMessageBox = !!(activeTab && activeTab.get('messageBoxDetail'))
+    const totalBlocks = this.getTotalBlocks(activeFrame)
 
     return <div id='window'
       className={cx({
@@ -1077,9 +1078,9 @@ class Main extends ImmutableComponent {
                   : null
                 }
                 {
-                  !this.braveShieldsDisabled
+                  !this.braveShieldsDisabled && totalBlocks
                   ? <div className={css(styles.lionBadge)} data-test-id='lionBadge'>
-                    {this.getTotalBlocks(activeFrame)}
+                    {totalBlocks}
                   </div>
                   : null
                 }
@@ -1370,7 +1371,8 @@ const styles = StyleSheet.create({
     font: '7pt "Arial Narrow"',
     textAlign: 'center',
     border: '.5px solid #FFF',
-    background: '#555555'
+    background: '#555555',
+    minWidth: '9px'
   }
 })
 
