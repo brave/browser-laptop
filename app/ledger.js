@@ -570,14 +570,20 @@ eventStore.addChangeListener(() => {
 
 // NB: in theory we have already seen every element in info except for (perhaps) the last one...
   underscore.rest(info, info.length - 1).forEach((page) => {
-    var entry, faviconURL, pattern, publisher
-    var location = page.url
+    let pattern, publisher
+    let location = page.url
 
     if (location.match(/^about/)) return
 
     location = urlFormat(underscore.pick(urlParse(location), [ 'protocol', 'host', 'hostname', 'port', 'pathname' ]))
     publisher = locations[location] && locations[location].publisher
-    if (publisher) return updateLocation(location, publisher)
+    if (publisher) {
+      if (synopsis.publishers[publisher] &&
+        (typeof synopsis.publishers[publisher].faviconURL === 'undefined' || synopsis.publishers[publisher].faviconURL === null)) {
+        getFavIcon(synopsis.publishers[publisher], page, location)
+      }
+      return updateLocation(location, publisher)
+    }
 
     if (!page.publisher) {
       try {
@@ -607,73 +613,7 @@ eventStore.addChangeListener(() => {
       })
     }
     updateLocation(location, publisher)
-    entry = synopsis.publishers[publisher]
-    if ((page.protocol) && (!entry.protocol)) entry.protocol = page.protocol
-
-    if ((typeof entry.faviconURL === 'undefined') && ((page.faviconURL) || (entry.protocol))) {
-      var fetch = (url, redirects) => {
-        if (typeof redirects === 'undefined') redirects = 0
-
-        request.request({ url: url, responseType: 'blob' }, (err, response, blob) => {
-          var matchP, prefix, tail
-
-          if ((response) && (publisherInfo._internal.verboseP)) {
-            console.log('[ response for ' + url + ' ]')
-            console.log('>>> HTTP/' + response.httpVersionMajor + '.' + response.httpVersionMinor + ' ' + response.statusCode +
-                       ' ' + (response.statusMessage || ''))
-            underscore.keys(response.headers).forEach((header) => { console.log('>>> ' + header + ': ' + response.headers[header]) })
-            console.log('>>>')
-            console.log('>>> ' + (blob || '').substr(0, 80))
-          }
-
-          if (publisherInfo._internal.debugP) {
-            console.log('\nresponse: ' + url +
-                        ' errP=' + (!!err) + ' blob=' + (blob || '').substr(0, 80) + '\nresponse=' +
-                        JSON.stringify(response, null, 2))
-          }
-
-          if (err) return console.log('response error: ' + err.toString() + '\n' + err.stack)
-
-          if ((response.statusCode === 301) && (response.headers.location)) {
-            if (redirects < 3) fetch(response.headers.location, redirects++)
-            return
-          }
-
-          if ((response.statusCode !== 200) || (response.headers['content-length'] === '0')) return
-
-          tail = blob.indexOf(';base64,')
-          if (blob.indexOf('data:image/') !== 0) {
-            // NB: for some reason, some sites return an image, but with the wrong content-type...
-            if (tail <= 0) return
-
-            prefix = new Buffer(blob.substr(tail + 8, signatureMax), 'base64')
-            underscore.keys(fileTypes).forEach((fileType) => {
-              if (matchP) return
-              if ((prefix.length >= fileTypes[fileType].length) ||
-                  (fileTypes[fileType].compare(prefix, 0, fileTypes[fileType].length) !== 0)) return
-
-              blob = 'data:image/' + fileType + blob.substr(tail)
-              matchP = true
-            })
-            if (!matchP) return
-          } else if ((tail > 0) && (tail + 8 >= blob.length)) return
-
-          entry.faviconURL = blob
-          updatePublisherInfo()
-          if (publisherInfo._internal.debugP) {
-            console.log('\n' + publisher + ' synopsis=' +
-                        JSON.stringify(underscore.extend(underscore.omit(entry, [ 'faviconURL', 'window' ]),
-                                                         { faviconURL: entry.faviconURL && '... ' }), null, 2))
-          }
-        })
-      }
-
-      faviconURL = page.faviconURL || entry.protocol + '//' + urlParse(location).host + '/favicon.ico'
-      entry.faviconURL = null
-
-      if (publisherInfo._internal.debugP) console.log('\nrequest: ' + faviconURL)
-      fetch(faviconURL)
-    }
+    getFavIcon(synopsis.publishers[publisher], page, location)
   })
 
   view = underscore.last(view) || {}
@@ -939,6 +879,89 @@ var publisherInfo = {
 
     ruleset: { raw: [], cooked: [] }
   }
+}
+
+const getFavIcon = (entry, page, location) => {
+  if ((page.protocol) && (!entry.protocol)) {
+    entry.protocol = page.protocol
+  }
+
+  if ((typeof entry.faviconURL === 'undefined') && ((page.faviconURL) || (entry.protocol))) {
+    let faviconURL = page.faviconURL || entry.protocol + '//' + urlParse(location).host + '/favicon.ico'
+    if (publisherInfo._internal.debugP) {
+      console.log('\nrequest: ' + faviconURL)
+    }
+
+    entry.faviconURL = null
+    fetchFavIcon(entry, faviconURL)
+  }
+}
+
+const fetchFavIcon = (entry, url, redirects) => {
+  if (typeof redirects === 'undefined') redirects = 0
+
+  request.request({ url: url, responseType: 'blob' }, (err, response, blob) => {
+    let matchP, prefix, tail
+
+    if ((response) && (publisherInfo._internal.verboseP)) {
+      console.log('[ response for ' + url + ' ]')
+      console.log('>>> HTTP/' + response.httpVersionMajor + '.' + response.httpVersionMinor + ' ' + response.statusCode +
+        ' ' + (response.statusMessage || ''))
+      underscore.keys(response.headers).forEach((header) => { console.log('>>> ' + header + ': ' + response.headers[header]) })
+      console.log('>>>')
+      console.log('>>> ' + (blob || '').substr(0, 80))
+    }
+
+    if (publisherInfo._internal.debugP) {
+      console.log('\nresponse: ' + url +
+        ' errP=' + (!!err) + ' blob=' + (blob || '').substr(0, 80) + '\nresponse=' +
+        JSON.stringify(response, null, 2))
+    }
+
+    if (err) {
+      console.log('response error: ' + err.toString() + '\n' + err.stack)
+      return null
+    }
+
+    if ((response.statusCode === 301) && (response.headers.location)) {
+      if (redirects < 3) fetchFavIcon(entry, response.headers.location, redirects++)
+      return null
+    }
+
+    if ((response.statusCode !== 200) || (response.headers['content-length'] === '0')) {
+      return null
+    }
+
+    tail = blob.indexOf(';base64,')
+    if (blob.indexOf('data:image/') !== 0) {
+      // NB: for some reason, some sites return an image, but with the wrong content-type...
+      if (tail <= 0) {
+        return null
+      }
+
+      prefix = new Buffer(blob.substr(tail + 8, signatureMax), 'base64')
+      underscore.keys(fileTypes).forEach((fileType) => {
+        if (matchP) return
+        if ((prefix.length >= fileTypes[fileType].length) ||
+          (fileTypes[fileType].compare(prefix, 0, fileTypes[fileType].length) !== 0)) return
+
+        blob = 'data:image/' + fileType + blob.substr(tail)
+        matchP = true
+      })
+      if (!matchP) {
+        return
+      }
+    } else if ((tail > 0) && (tail + 8 >= blob.length)) return
+
+    if (publisherInfo._internal.debugP) {
+      console.log('\n' + entry.site + ' synopsis=' +
+        JSON.stringify(underscore.extend(underscore.omit(entry, [ 'faviconURL', 'window' ]),
+          { faviconURL: entry.faviconURL && '... ' }), null, 2))
+    }
+
+    entry.faviconURL = blob
+    updatePublisherInfo()
+  })
 }
 
 var updatePublisherInfo = (changedPublisher) => {
