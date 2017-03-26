@@ -6,6 +6,7 @@ const React = require('react')
 const ipc = require('electron').ipcRenderer
 const ImmutableComponent = require('./immutableComponent')
 const cx = require('../lib/classSet')
+const {isPotentialPhishingUrl} = require('../lib/urlutil')
 const Dialog = require('./dialog')
 const Button = require('./button')
 const appActions = require('../actions/appActions')
@@ -58,6 +59,9 @@ class SiteInfo extends ImmutableComponent {
   get location () {
     return this.props.frameProps.getIn(['location'])
   }
+  get maybePhishingLocation () {
+    return isPotentialPhishingUrl(this.props.frameProps.getIn(['location']))
+  }
   render () {
     // Figure out the partition info display
     let l10nArgs = {
@@ -93,7 +97,11 @@ class SiteInfo extends ImmutableComponent {
       viewCertificateButton =
         <Button l10nId='viewCertificate' className='primaryButton viewCertificate' onClick={this.onViewCertificate} />
     }
-    if (this.isBlockedRunInsecureContent) {
+
+    if (this.maybePhishingLocation) {
+      connectionInfo =
+        <div className='connectionInfo' data-l10n-id='phishingConnectionInfo' />
+    } else if (this.isBlockedRunInsecureContent) {
       connectionInfo =
         <li>
           <ul>

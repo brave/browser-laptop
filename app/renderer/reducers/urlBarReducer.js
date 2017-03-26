@@ -6,7 +6,7 @@
 
 const windowConstants = require('../../../js/constants/windowConstants')
 const {getSourceAboutUrl, getSourceMagnetUrl, isIntermediateAboutPage, navigatableTypes} = require('../../../js/lib/appUrlUtil')
-const {isURL, getUrlFromInput} = require('../../../js/lib/urlutil')
+const {isURL, isPotentialPhishingUrl, getUrlFromInput} = require('../../../js/lib/urlutil')
 const {activeFrameStatePath, frameStatePath, getFrameByKey, getActiveFrame, tabStatePath} = require('../../../js/state/frameStateUtil')
 const urlParse = require('../../common/urlParse')
 
@@ -27,6 +27,11 @@ const urlBarReducer = (state, action) => {
       const frame = getFrameByKey(state, action.key)
       const currentLocation = frame.get('location')
       const parsedUrl = urlParse(action.location)
+
+      // For potential phishing pages, show a warning
+      if (isPotentialPhishingUrl(action.location)) {
+        state = state.setIn(['ui', 'siteInfo', 'isVisible'], true)
+      }
 
       // For types that are not navigatable, just do a loadUrl on them
       if (!navigatableTypes.includes(parsedUrl.protocol)) {
