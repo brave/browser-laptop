@@ -8,7 +8,7 @@ const Immutable = require('immutable')
 const electron = require('electron')
 const {StyleSheet, css} = require('aphrodite')
 const ipc = electron.ipcRenderer
-// const systemPreferences = electron.remote.systemPreferences
+const systemPreferences = electron.remote.systemPreferences
 
 // Actions
 const appActions = require('../actions/appActions')
@@ -233,7 +233,8 @@ class Main extends ImmutableComponent {
     // Navigates back/forward on macOS two-finger swipe
     var trackingFingers = false
     var swipeGesture = false
-    var isSwipeOnEdge = false
+    var isSwipeOnLeftEdge = false
+    var isSwipeOnRightEdge = false
     var deltaX = 0
     var deltaY = 0
     var startTime = 0
@@ -279,19 +280,17 @@ class Main extends ImmutableComponent {
       swipeGesture = false
     })
     ipc.on('scroll-touch-begin', function () {
-      if (swipeGesture) {
-        // TODO(Anthony): respecting system settings on cr54
-        // systemPreferences.isSwipeTrackingFromScrollEventsEnabled()) {
+      if (swipeGesture &&
+        systemPreferences.isSwipeTrackingFromScrollEventsEnabled()) {
         trackingFingers = true
-        isSwipeOnEdge = false
         startTime = (new Date()).getTime()
       }
     })
     ipc.on('scroll-touch-end', function () {
-      if (time > 50 && trackingFingers && Math.abs(deltaY) < 50 && isSwipeOnEdge) {
-        if (deltaX > 70) {
+      if (time > 50 && trackingFingers && Math.abs(deltaY) < 50) {
+        if (deltaX > 70 && isSwipeOnRightEdge) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
-        } else if (deltaX < -70) {
+        } else if (deltaX < -70 && isSwipeOnLeftEdge) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_BACK)
         }
       }
@@ -301,7 +300,17 @@ class Main extends ImmutableComponent {
       startTime = 0
     })
     ipc.on('scroll-touch-edge', function () {
-      isSwipeOnEdge = true
+      if (deltaX > 0 && !isSwipeOnRightEdge) {
+        isSwipeOnRightEdge = true
+        isSwipeOnLeftEdge = false
+        time = 0
+        deltaX = 0
+      } else if (deltaX < 0 && !isSwipeOnLeftEdge) {
+        isSwipeOnLeftEdge = true
+        isSwipeOnRightEdge = false
+        time = 0
+        deltaX = 0
+      }
     })
     ipc.on(messages.LEAVE_FULL_SCREEN, this.exitFullScreen.bind(this))
   }
