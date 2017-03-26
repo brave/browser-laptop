@@ -6,15 +6,43 @@
 
 const windowConstants = require('../../../js/constants/windowConstants')
 const {getSourceAboutUrl, getSourceMagnetUrl, isIntermediateAboutPage, navigatableTypes} = require('../../../js/lib/appUrlUtil')
-const {isURL, isPotentialPhishingUrl, getUrlFromInput} = require('../../../js/lib/urlutil')
-const {activeFrameStatePath, frameStatePath, getFrameByKey, getActiveFrame, tabStatePath} = require('../../../js/state/frameStateUtil')
+const {isURL, getUrlFromInput} = require('../../../js/lib/urlutil')
+const {activeFrameStatePath, frameStatePath, frameStatePathForFrame, getFrameByKey, getActiveFrame, tabStatePath, getFrameByTabId} = require('../../../js/state/frameStateUtil')
 const urlParse = require('../../common/urlParse')
+
+const getLocation = (location) => {
+  location = location.trim()
+  location = getSourceAboutUrl(location) ||
+    getSourceMagnetUrl(location) ||
+    location
+
+  if (isURL(location)) {
+    location = getUrlFromInput(location)
+  }
+
+  return location
+}
 
 const updateNavBarInput = (state, loc, framePath) => {
   if (framePath === undefined) {
     framePath = activeFrameStatePath(state)
   }
   state = state.setIn(framePath.concat(['navbar', 'urlbar', 'location']), loc)
+  return state
+}
+
+const navigationAborted = (state, action) => {
+  const frame = getFrameByTabId(state, action.tabId)
+  if (frame) {
+    let location = action.location || frame.get('provisionalLocation')
+    if (location) {
+      location = getLocation(location)
+      state = updateNavBarInput(state, location)
+      state = state.mergeIn(frameStatePathForFrame(state, frame), {
+        location
+      })
+    }
+  }
   return state
 }
 
@@ -77,16 +105,9 @@ const urlBarReducer = (state, action) => {
       }
       break
     case windowConstants.WINDOW_SET_NAVIGATED:
-      action.location = action.location.trim()
       // For about: URLs, make sure we store the URL as about:something
       // and not what we map to.
-      action.location = getSourceAboutUrl(action.location) ||
-        getSourceMagnetUrl(action.location) ||
-        action.location
-
-      if (isURL(action.location)) {
-        action.location = getUrlFromInput(action.location)
-      }
+      action.location = getLocation(action.location)
 
       const key = action.key || state.get('activeFrameKey')
       state = state.mergeIn(frameStatePath(state, key), {
@@ -126,6 +147,9 @@ const urlBarReducer = (state, action) => {
         const key = action.key || state.get('activeFrameKey')
         state = updateNavBarInput(state, action.location, frameStatePath(state, key))
       }
+      break
+    case windowConstants.WINDOW_SET_NAVIGATION_ABORTED:
+      state = navigationAborted(state, action)
       break
   }
   return state

@@ -21,6 +21,11 @@ module.exports.isFrameError = function (errorCode) {
   return errorCode >= 100 && errorCode <= 899
 }
 
+module.exports.isAborted = function (errorCode) {
+  errorCode = Math.abs(errorCode)
+  return errorCode === 3
+}
+
 /**
  * Gets the l10n id for the chrome error code
  * @param {number} errorCode the error code
@@ -56,6 +61,8 @@ module.exports.l10nErrorText = function (errorCode) {
 }
 
 module.exports.errorMap = {
+  // An operation was aborted (due to user action).
+  3: 'aborted',
   // A connection was reset (corresponding to a TCP RST).
   101: 'connectionReset',
   // A connection attempt was refused.

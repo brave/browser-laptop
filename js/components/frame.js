@@ -22,7 +22,7 @@ const getSetting = require('../settings').getSetting
 const config = require('../constants/config')
 const settings = require('../constants/settings')
 const {aboutUrls, isSourceMagnetUrl, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
-const {isFrameError} = require('../../app/common/lib/httpUtil')
+const {isFrameError, isAborted} = require('../../app/common/lib/httpUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
 const {getSiteSettingsForHostPattern} = require('../state/siteSettings')
@@ -881,6 +881,9 @@ class Frame extends ImmutableComponent {
         })
         windowActions.loadUrl(this.frame, 'about:error')
         appActions.removeSite(siteUtil.getDetailFromFrame(this.frame))
+      } else if (isAborted(e.errorCode)) {
+        // just stay put
+        windowActions.navigationAborted(this.frame.get('tabId'), url)
       } else if (provisionLoadFailure) {
         windowActions.setNavigated(url, this.props.frameKey, true, this.frame.get('tabId'))
       }
