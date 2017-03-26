@@ -6,7 +6,7 @@
 
 const windowConstants = require('../../../js/constants/windowConstants')
 const {getSourceAboutUrl, getSourceMagnetUrl, isIntermediateAboutPage, navigatableTypes} = require('../../../js/lib/appUrlUtil')
-const {isURL, getUrlFromInput} = require('../../../js/lib/urlutil')
+const {isURL, isPotentialPhishingUrl, getUrlFromInput} = require('../../../js/lib/urlutil')
 const {activeFrameStatePath, frameStatePath, frameStatePathForFrame, getFrameByKey, getActiveFrame, tabStatePath, getFrameByTabId} = require('../../../js/state/frameStateUtil')
 const urlParse = require('../../common/urlParse')
 
