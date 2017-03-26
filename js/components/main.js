@@ -954,7 +954,7 @@ class Main extends ImmutableComponent {
 
     const appStateSites = this.props.appState.get('sites')
     const activeTabShowingMessageBox = !!(activeTab && activeTab.get('messageBoxDetail'))
-    const totalBlocks = this.getTotalBlocks(activeFrame)
+    const totalBlocks = activeFrame ? this.getTotalBlocks(activeFrame) : false
 
     return <div id='window'
       className={cx({
