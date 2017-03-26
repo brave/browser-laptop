@@ -17,7 +17,7 @@
   box-sizing: border-box;
   display: flex;
   flex: 1;
-  padding: 7px var(--bookmarks-toolbar-padding) 8px;
+  padding: @navbarMenubarMargin var(--bookmarks-toolbar-padding);
 
   &.allowDragging {
     -webkit-app-region: drag;
@@ -27,7 +27,7 @@
   }
 
   &.showOnlyFavicon {
-    padding: 7px 0 7px 10px;
+    padding: @navbarMenubarMargin 0 @tabPagesHeight 10px;
   }
 
   // PR #7740

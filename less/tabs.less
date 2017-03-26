@@ -137,12 +137,12 @@
 .tabPages {
   background: none;
   display: flex;
-  height: @tabPagesHeight;
-  padding: 7px 0;
   justify-content: center;
+  height: @tabPagesHeight;
+  padding: @tabPagesHeight 0 @navbarMenubarMargin 0;
   position: relative;
-  text-align: center;
   z-index: @zindexTabs;
+
   &.allowDragging {
     -webkit-app-region: drag;
     >* {
