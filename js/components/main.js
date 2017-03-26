@@ -893,7 +893,9 @@ class Main extends ImmutableComponent {
   getTotalBlocks (frames) {
     const ads = frames.getIn(['adblock', 'blocked'])
     const trackers = frames.getIn(['trackingProtection', 'blocked'])
-    const blocked = (ads ? ads.size : 0) + (trackers ? trackers.size : 0)
+    const scripts = frames.getIn(['noScript', 'blocked'])
+    const fingerprint = frames.getIn(['fingerprintingProtection', 'blocked'])
+    const blocked = (ads ? ads.size : 0) + (trackers ? trackers.size : 0) + (scripts ? scripts.size : 0) + (fingerprint ? fingerprint.size : 0)
 
     return (blocked.size === 0) ? false : ((blocked > 99) ? '99+' : blocked)
   }
