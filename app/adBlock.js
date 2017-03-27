@@ -42,8 +42,7 @@ const startAdBlocking = (adblock, resourceName, shouldCheckMainFrame) => {
     }
     const firstPartyUrl = urlParse(mainFrameUrl)
     const url = urlParse(details.url)
-    const cancel = (details.resourceType !== 'mainFrame' || shouldCheckMainFrame) &&
-      shouldDoAdBlockCheck(details.resourceType, firstPartyUrl, url) &&
+    const cancel = shouldDoAdBlockCheck(details.resourceType, firstPartyUrl, url, shouldCheckMainFrame) &&
       adblock.matches(details.url, mapFilterType[details.resourceType], firstPartyUrl.host)
 
     return {
