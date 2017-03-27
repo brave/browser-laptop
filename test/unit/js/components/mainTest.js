@@ -123,4 +123,79 @@ describe('Main component unit tests', function () {
       assert.equal(node.props.disabled, true)
     })
   })
+
+  describe('getTotalBlocks', function () {
+    let instance
+
+    before(function () {
+      let wrapper = shallow(
+        <Main windowState={windowState} appState={appState} />
+      )
+      instance = wrapper.instance()
+    })
+
+    it('returns false if there are no units blocked', function () {
+      const frames = Immutable.fromJS({
+        adblock: { blocked: [] },
+        trackingProtection: { blocked: [] },
+        noScript: { blocked: [] },
+        fingerprintingProtection: { blocked: [] }
+      })
+      const result = instance.getTotalBlocks(frames)
+      assert.equal(result, false)
+    })
+
+    it('returns total of items (ads / trackers / scripts / fingerprints) blocked', function () {
+      const frames = Immutable.fromJS({
+        adblock: { blocked: [1] },
+        trackingProtection: { blocked: [1, 2] },
+        noScript: { blocked: [1, 2, 3, 4] },
+        fingerprintingProtection: { blocked: [1, 2, 3, 4, 5, 6, 7, 8] }
+      })
+      const result = instance.getTotalBlocks(frames)
+      assert.equal(result, 15)
+    })
+
+    it('defaults values to 0 if element is not a list or is not present', function () {
+      const frames = Immutable.fromJS({
+        adblock: { blocked: 'not a list' },
+        trackingProtection: {},
+        noScript: { blocked: [1] },
+        fingerprintingProtection: { blocked: {} }
+      })
+      const result = instance.getTotalBlocks(frames)
+      assert.equal(result, 1)
+    })
+
+    it('returns false if the input is falsey', function () {
+      assert.equal(instance.getTotalBlocks(), false)
+      assert.equal(instance.getTotalBlocks(undefined), false)
+      assert.equal(instance.getTotalBlocks(null), false)
+      assert.equal(instance.getTotalBlocks(false), false)
+    })
+
+    it('converts the input to an immutable object', function () {
+      const mutableFrames = {
+        adblock: { blocked: [1] },
+        trackingProtection: { blocked: [1, 2] },
+        noScript: { blocked: [1, 2, 3, 4] },
+        fingerprintingProtection: { blocked: [1, 2, 3, 4, 5, 6, 7, 8] }
+      }
+      const result = instance.getTotalBlocks(mutableFrames)
+      assert.equal(result, 15)
+    })
+
+    it('returns "99+" if tracker count is > 99', function () {
+      const mutableFrames = {
+        adblock: { blocked: [] }
+      }
+
+      for (let i = 1; i < 101; i++) {
+        mutableFrames.adblock.blocked.push(i)
+      }
+
+      const result = instance.getTotalBlocks(mutableFrames)
+      assert.equal(result, '99+')
+    })
+  })
 })

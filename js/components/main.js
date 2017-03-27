@@ -46,6 +46,7 @@ const LongPressButton = require('./longPressButton')
 const Menubar = require('../../app/renderer/components/menubar')
 const WindowCaptionButtons = require('../../app/renderer/components/windowCaptionButtons')
 const CheckDefaultBrowserDialog = require('../../app/renderer/components/checkDefaultBrowserDialog')
+
 // Constants
 const appConfig = require('../constants/appConfig')
 const messages = require('../constants/messages')
@@ -76,6 +77,7 @@ const debounce = require('../lib/debounce')
 const {currentWindow, isMaximized, isFocused, isFullScreen} = require('../../app/renderer/currentWindow')
 const emptyMap = new Immutable.Map()
 const emptyList = new Immutable.List()
+const {makeImmutable} = require('../../app/common/state/immutableUtil')
 
 class Main extends ImmutableComponent {
   constructor () {
@@ -891,13 +893,26 @@ class Main extends ImmutableComponent {
   }
 
   getTotalBlocks (frames) {
+    if (!frames) {
+      return false
+    }
+
+    frames = makeImmutable(frames)
+
     const ads = frames.getIn(['adblock', 'blocked'])
     const trackers = frames.getIn(['trackingProtection', 'blocked'])
     const scripts = frames.getIn(['noScript', 'blocked'])
     const fingerprint = frames.getIn(['fingerprintingProtection', 'blocked'])
-    const blocked = (ads ? ads.size : 0) + (trackers ? trackers.size : 0) + (scripts ? scripts.size : 0) + (fingerprint ? fingerprint.size : 0)
+    const blocked = (ads && ads.size ? ads.size : 0) +
+      (trackers && trackers.size ? trackers.size : 0) +
+      (scripts && scripts.size ? scripts.size : 0) +
+      (fingerprint && fingerprint.size ? fingerprint.size : 0)
 
-    return (blocked.size === 0) ? false : ((blocked > 99) ? '99+' : blocked)
+    return (blocked === 0)
+      ? false
+      : ((blocked > 99)
+        ? '99+'
+        : blocked)
   }
 
   render () {
