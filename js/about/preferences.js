@@ -601,7 +601,7 @@ class SecurityTab extends ImmutableComponent {
             <option data-l10n-id='onePassword' value={passwordManagers.ONE_PASSWORD} />
             <option data-l10n-id='dashlane' value={passwordManagers.DASHLANE} />
             <option data-l10n-id='lastPass' value={passwordManagers.LAST_PASS} />
-            <option data-l10n-id='bitwarden' value={passwordManagers.BITWARDEN} />
+            { /* <option data-l10n-id='bitwarden' value={passwordManagers.BITWARDEN} /> */ }
             { /* <option data-l10n-id='enpass' value={passwordManagers.ENPASS} /> */ }
             <option data-l10n-id='doNotManageMyPasswords' value={passwordManagers.UNMANAGED} />
           </SettingDropdown>
