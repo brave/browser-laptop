@@ -4,7 +4,6 @@ import os
 import subprocess
 import sys
 import os.path
-
 MUON_VERSION = '2.57.6'
 CHROMEDRIVER_VERSION = '2.27'
 SOURCE_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
@@ -20,7 +19,6 @@ def execute(argv, env=os.environ):
   except subprocess.CalledProcessError as e:
     print e.output
     raise e
-
 
 def write_npmrc():
   data = 'runtime = node\n' \
@@ -72,10 +70,10 @@ write_npmrc()
 npm = 'npm.cmd' if is_windows else 'npm'
 execute([npm, 'install'])
 
-if is_darwin:
-  execute(['node', './tools/electronBuilderHack.js'])
+execute(['node', './tools/electronBuilderHack.js'])
+
 # For whatever reason on linux pstinstall webpack isn't running
-elif is_linux:
+if is_linux:
   execute([npm, 'run', 'webpack'])
 
 execute([npm, 'run', 'build-package'])
