@@ -21,7 +21,7 @@ module.exports = {
   titleBar: '#titleBar',
   navigatorBookmarked: '#navigator .removeBookmarkButton',
   navigatorNotBookmarked: '#navigator .bookmarkButton',
-  bookmarksToolbar: '.bookmarksToolbar',
+  bookmarksToolbar: '[data-test-id="bookmarksToolbar"]',
   notificationBar: '[data-test-id="notificationBar"]',
   errorContent: '.errorContent',
   errorUrl: '.errorUrl',

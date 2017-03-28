@@ -20,6 +20,9 @@ const calculateTextWidth = require('../../../js/lib/textCalculator').calculateTe
 const windowStore = require('../../../js/stores/windowStore')
 const iconSize = require('../../common/lib/faviconUtil').iconSize
 
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('./styles/global')
+
 class BookmarkToolbarButton extends ImmutableComponent {
   constructor () {
     super()
@@ -180,13 +183,14 @@ class BookmarkToolbarButton extends ImmutableComponent {
     }
 
     return <span
-      className={cx({
-        bookmarkToolbarButton: true,
-        draggingOverLeft: this.isDraggingOverLeft && !this.isExpanded,
-        draggingOverRight: this.isDraggingOverRight && !this.isExpanded,
-        isDragging: this.isDragging,
-        showOnlyFavicon: this.props.showFavicon && this.props.showOnlyFavicon
-      })}
+      className={css(
+        styles.bookmarkToolbarButton,
+        (this.isDraggingOverLeft && !this.isExpanded && !this.isDragging) && styles.bookmarkToolbarButton__draggingOverLeft,
+        (this.isDraggingOverRight && !this.isExpanded && !this.isDragging) && styles.bookmarkToolbarButton__draggingOverRight,
+        this.isDragging && styles.bookmarkToolbarButton__isDragging,
+        (this.props.showFavicon && this.props.showOnlyFavicon) && styles.bookmarkToolbarButton__showOnlyFavicon
+      )}
+      data-test-id='bookmarkToolbarButton'
       draggable
       ref={(node) => { this.bookmarkNode = node }}
       title={hoverTitle}
@@ -200,19 +204,41 @@ class BookmarkToolbarButton extends ImmutableComponent {
       onContextMenu={this.onContextMenu}>
       {
         this.isFolder && this.props.showFavicon
-        ? <span className='bookmarkFavicon bookmarkFolder fa fa-folder-o' style={iconStyle} />
+        ? <span className={cx({
+          fa: true,
+          'fa-folder-o': true,
+          [css(styles.bookmarkToolbarButton__bookmarkFavicon)]: true,
+          [css(styles.bookmarkToolbarButton__bookmarkFolder)]: true
+        })}
+          data-test-id='bookmarkFavicon'
+          style={iconStyle} />
         : null
       }
       {
         // Fill in a favicon if we want one but there isn't one
         !this.isFolder && this.props.showFavicon && !showingFavicon
-        ? <span className='bookmarkFavicon bookmarkFile fa fa-file-o' style={iconStyle} />
+        ? <span className={cx({
+          bookmarkFile: true,
+          fa: true,
+          'fa-file-o': true,
+          [css(styles.bookmarkToolbarButton__bookmarkFavicon)]: true,
+          [css(styles.bookmarkToolbarButton__bookmarkFile)]: true,
+          [css(this.props.showOnlyFavicon && styles.bookmarkToolbarButton__marginRightZero)]: true
+        })}
+          data-test-id='bookmarkFavicon'
+          style={iconStyle} />
         : null
       }
       {
-        !this.isFolder && showingFavicon ? <span className='bookmarkFavicon' style={iconStyle} /> : null
+        !this.isFolder && showingFavicon
+        ? <span className={css(
+            styles.bookmarkToolbarButton__bookmarkFavicon,
+            this.props.showOnlyFavicon && styles.bookmarkToolbarButton__marginRightZero
+          )}
+          data-test-id='bookmarkFavicon'
+          style={iconStyle} /> : null
       }
-      <span className='bookmarkText'>
+      <span className={css(styles.bookmarkToolbarButton__bookmarkText)} data-test-id='bookmarkText'>
         {
           (this.isFolder ? false : (this.props.showFavicon && this.props.showOnlyFavicon))
           ? ''
@@ -221,7 +247,12 @@ class BookmarkToolbarButton extends ImmutableComponent {
       </span>
       {
         this.isFolder
-        ? <span className='bookmarkFolderChevron fa fa-chevron-down' />
+        ? <span className={cx({
+          fa: true,
+          'fa-chevron-down': true,
+          [css(styles.bookmarkToolbarButton__bookmarkFolderChevron)]: true
+        })}
+          data-test-id='bookmarkFolderChevron' />
         : null
       }
     </span>
@@ -394,14 +425,15 @@ class BookmarksToolbar extends ImmutableComponent {
 
     this.bookmarkRefs = []
     return <div
-      className={
-        cx({
-          bookmarksToolbar: true,
-          allowDragging: this.props.shouldAllowWindowDrag,
-          showFavicon,
-          showOnlyFavicon
-        })
-      }
+      className={cx({
+        bookmarksToolbar: true,
+        showFavicon,
+        showOnlyFavicon,
+        [css(styles.bookmarksToolbar)]: true,
+        [css(this.props.shouldAllowWindowDrag && styles.bookmarksToolbar__allowDragging)]: true,
+        [css(styles.bookmarksToolbar__showOnlyFavicon)]: true
+      })}
+      data-test-id='bookmarksToolbar'
       onDrop={this.onDrop}
       onDragEnter={this.onDragEnter}
       onDragOver={this.onDragOver}
@@ -424,13 +456,121 @@ class BookmarksToolbar extends ImmutableComponent {
       }
       {
         this.overflowBookmarkItems.size !== 0
-        ? <Button iconClass='overflowIndicator fa-angle-double-right'
+        ? <Button iconClass='fa-angle-double-right'
           onClick={this.onMoreBookmarksMenu}
-          className='bookmarkButton' />
+          className={cx({
+            bookmarkButton: true,
+            [css(styles.bookmarksToolbar__bookmarkButton)]: true,
+            [css(styles.bookmarksToolbar__overflowIndicator)]: true
+          })} />
         : null
       }
     </div>
   }
 }
+
+const bookmarkItemMaxWidth = '100px'
+const bookmarkItemPadding = '4px'
+const bookmarkItemMargin = '3px'
+const bookmarkItemChevronMargin = '4px'
+const bookmarksToolbarPadding = '10px'
+
+const bookmarkToolbarButtonDraggingMargin = '25px'
+
+const styles = StyleSheet.create({
+  bookmarksToolbar: {
+    boxSizing: 'border-box',
+    display: 'flex',
+    flex: 1,
+    padding: `${globalStyles.spacing.navbarMenubarMargin} ${bookmarksToolbarPadding}`
+  },
+  bookmarksToolbar__allowDragging: {
+    WebkitAppRegion: 'drag'
+  },
+  bookmarksToolbar__showOnlyFavicon: {
+    padding: `${globalStyles.spacing.navbarMenubarMargin} 0 ${globalStyles.spacing.tabPagesHeight} 10px`
+  },
+  bookmarksToolbar__bookmarkButton: {
+    boxSizing: 'border-box',
+    fontSize: '14px',
+    height: 'auto',
+    lineHeight: '12px',
+    marginLeft: 'auto',
+    marginRight: '5px',
+    width: 'auto',
+    WebkitUserSelect: 'none'
+  },
+  bookmarksToolbar__overflowIndicator: {
+    paddingLeft: '6px',
+    paddingRight: '11px',
+    margin: 'auto 0 auto auto',
+    WebkitAppRegion: 'no-drag'
+  },
+
+  bookmarkToolbarButton: {
+    display: 'flex',
+    alignItems: 'center',
+    boxSizing: 'border-box',
+    borderRadius: '3px',
+    color: globalStyles.color.mediumGray,
+    cursor: 'default',
+    fontSize: '11px',
+    lineHeight: '1.3',
+    margin: `auto ${bookmarkItemMargin}`,
+    maxWidth: bookmarkItemMaxWidth,
+    padding: `2px ${bookmarkItemPadding}`,
+    textOverflow: 'ellipsis',
+    userSelect: 'none',
+    whiteSpace: 'nowrap',
+    WebkitAppRegion: 'no-drag',
+    WebkitUserSelect: 'none',
+
+    ':hover': {
+      background: '#fff',
+      boxShadow: '0 1px 5px 0 rgba(0, 0, 0, 0.1)'
+    }
+  },
+  bookmarkToolbarButton__draggingOverLeft: {
+    marginLeft: bookmarkToolbarButtonDraggingMargin
+  },
+  bookmarkToolbarButton__draggingOverRight: {
+    marginRight: bookmarkToolbarButtonDraggingMargin
+  },
+  bookmarkToolbarButton__isDragging: {
+    opacity: '0.2'
+  },
+  bookmarkToolbarButton__showOnlyFavicon: {
+    padding: '2px 4px',
+    margin: 'auto 0'
+  },
+  bookmarkToolbarButton__marginRightZero: {
+    marginRight: 0
+  },
+  bookmarkToolbarButton__bookmarkFavicon: {
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    display: 'inline-block',
+    marginRight: '4px'
+  },
+  bookmarkToolbarButton__bookmarkFolder: {
+    fontSize: globalStyles.spacing.bookmarksFolderIconSize,
+    textAlign: 'center',
+    color: globalStyles.color.darkGray
+  },
+  bookmarkToolbarButton__bookmarkFile: {
+    fontSize: globalStyles.spacing.bookmarksFileIconSize,
+    textAlign: 'center',
+    color: globalStyles.color.darkGray
+  },
+  bookmarkToolbarButton__bookmarkText: {
+    textOverflow: 'ellipsis',
+    overflow: 'hidden'
+  },
+  bookmarkToolbarButton__bookmarkFolderChevron: {
+    color: '#676767',
+    fontSize: '8px',
+    marginLeft: bookmarkItemChevronMargin
+  }
+})
 
 module.exports = BookmarksToolbar
