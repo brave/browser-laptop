@@ -26,12 +26,15 @@ const mapFilterType = {
  * @param resourceType {string} The resource type from the web request API
  * @param firstPartyUrl {Url} The parsed URL of the main frame URL loading the url
  * @param url {Url} The parsed URL of the resource for consideration
+ * @param shouldCheckMainFrame {boolean} Whether check main frame
  */
-const shouldDoAdBlockCheck = (resourceType, firstPartyUrl, url) =>
+const shouldDoAdBlockCheck = (resourceType, firstPartyUrl, url, shouldCheckMainFrame) =>
   firstPartyUrl.protocol &&
     // By default first party hosts are allowed, but enable the check if a flag is specified in siteHacks
-    (isThirdPartyHost(firstPartyUrl.hostname || '', url.hostname) ||
-      siteHacks[firstPartyUrl.hostname] && siteHacks[firstPartyUrl.hostname].allowFirstPartyAdblockChecks) &&
+    shouldCheckMainFrame ||
+    (resourceType !== 'mainFrame' &&
+      isThirdPartyHost(firstPartyUrl.hostname || '', url.hostname) ||
+       siteHacks[firstPartyUrl.hostname] && siteHacks[firstPartyUrl.hostname].allowFirstPartyAdblockChecks) &&
     // Only check http and https for now
     firstPartyUrl.protocol.startsWith('http') &&
     // Only do adblock if the host isn't in the whitelist
