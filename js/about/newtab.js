@@ -234,6 +234,11 @@ class NewTabPage extends React.Component {
     if (this.state.showEmptyPage) {
       return <div className='empty' />
     }
+
+    if (window.chrome.extension.inIncognitoContext) {
+      return <div className='empty' />
+    }
+
     // don't render until object is found
     if (!this.state.newTabData) {
       return null

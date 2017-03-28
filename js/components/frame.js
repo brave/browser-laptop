@@ -166,7 +166,9 @@ class Frame extends ImmutableComponent {
           prevProps.adblockCount !== this.props.adblockCount ||
           prevProps.httpsUpgradedCount !== this.props.httpsUpgradedCount ||
           !Immutable.is(prevProps.newTabDetail, this.props.newTabDetail)) {
-        const showEmptyPage = getSetting(settings.NEWTAB_MODE) === newTabMode.EMPTY_NEW_TAB
+        const showEmptyPage = getSetting(settings.NEWTAB_MODE) === newTabMode.EMPTY_NEW_TAB ||
+              // TODO: This can be removed once we're on muon 2.57.8 or above
+              this.props.isPrivate
         const showImages = getSetting(settings.SHOW_DASHBOARD_IMAGES) && !showEmptyPage
         this.webview.send(messages.NEWTAB_DATA_UPDATED, {
           showEmptyPage,

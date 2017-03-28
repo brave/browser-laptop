@@ -129,6 +129,11 @@
 
   if (window.top !== window.self) return
 
+  // Don't allow ledger to run in incognito
+  if (chrome.extension.inIncognitoContext) {
+    return
+  }
+
   var results = { timestamp: new Date().getTime(), protocol: document.location.protocol }
 
   var node = document.head.querySelector("link[rel='icon']")
