@@ -78,6 +78,7 @@ const {currentWindow, isMaximized, isFocused, isFullScreen} = require('../../app
 const emptyMap = new Immutable.Map()
 const emptyList = new Immutable.List()
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
+const platformUtil = require('../../app/common/lib/platformUtil')
 
 class Main extends ImmutableComponent {
   constructor () {
@@ -112,7 +113,7 @@ class Main extends ImmutableComponent {
   }
   registerWindowLevelShortcuts () {
     // For window level shortcuts that don't work as local shortcuts
-    const isDarwin = process.platform === 'darwin'
+    const isDarwin = platformUtil.isDarwin()
     document.addEventListener('keydown', (e) => {
       switch (e.which) {
         case keyCodes.ESC:
@@ -1087,27 +1088,29 @@ class Main extends ImmutableComponent {
                     ? null
                     : this.extensionButtons
                 }
-                <Button iconClass='braveMenu'
-                  l10nId='braveMenu'
-                  className={cx({
-                    navbutton: true,
-                    braveShieldsDisabled,
-                    braveShieldsDown: !braverySettings.shieldsUp,
-                    leftOfCaptionButton: customTitlebar.captionButtonsVisible && !customTitlebar.menubarVisible
-                  })}
-                  data-test-id='braveShieldButton'
-                  disabled={activeTabShowingMessageBox}
-                  onClick={this.onBraveMenu} />
+                <div className={css(styles.braveMenuContainer)}>
+                  <Button iconClass='braveMenu'
+                    l10nId='braveMenu'
+                    className={cx({
+                      navbutton: true,
+                      braveShieldsDisabled,
+                      braveShieldsDown: !braverySettings.shieldsUp,
+                      leftOfCaptionButton: customTitlebar.captionButtonsVisible && !customTitlebar.menubarVisible
+                    })}
+                    data-test-id='braveShieldButton'
+                    disabled={activeTabShowingMessageBox}
+                    onClick={this.onBraveMenu} />
+                  {
+                    !this.braveShieldsDisabled && totalBlocks
+                    ? <div className={css(styles.lionBadge)} data-test-id='lionBadge'>
+                      {totalBlocks}
+                    </div>
+                    : null
+                  }
+                </div>
                 {
                   customTitlebar.captionButtonsVisible && !customTitlebar.menubarVisible
                   ? <span className='buttonSeparator' />
-                  : null
-                }
-                {
-                  !this.braveShieldsDisabled && totalBlocks
-                  ? <div className={css(styles.lionBadge)} data-test-id='lionBadge'>
-                    {totalBlocks}
-                  </div>
                   : null
                 }
               </div>
@@ -1385,21 +1388,26 @@ class Main extends ImmutableComponent {
   }
 }
 
-const styles = StyleSheet.create({
+let styling = {
   lionBadge: {
-    right: '2px',
-    position: 'absolute',
+    left: 'calc(50% - 1px)',
     top: '14px',
+    position: 'absolute',
     color: '#FFF',
-    borderRadius: '3px',
-    padding: '1px 1px 1px 2px',
+    borderRadius: '2.5px',
+    padding: '1px 2px',
     pointerEvents: 'none',
     font: '6pt "Arial Narrow"',
     textAlign: 'center',
     border: '0px solid #FFF',
     background: '#555555',
     minWidth: '10px'
+  },
+  braveMenuContainer: {
+    position: 'relative'
   }
-})
+}
+
+const styles = StyleSheet.create(styling)
 
 module.exports = Main
