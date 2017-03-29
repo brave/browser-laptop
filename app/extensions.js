@@ -227,13 +227,14 @@ let generateSyncManifest = () => {
   }
   cspDirectives['connect-src'] = ['\'self\'',
     appConfig.sync.serverUrl,
+    appConfig.sync.s3Url.replace('us-west-2', 'us-east-1'),
     appConfig.sync.s3Url].join(' ')
 
   if (process.env.NODE_ENV === 'development') {
     // allow access to webpack dev server resources
     let devServer = 'localhost:' + process.env.npm_package_config_port
     cspDirectives['default-src'] += ' http://' + devServer
-    cspDirectives['connect-src'] += ' http://' + devServer + ' ws://' + devServer + ' ' + appConfig.sync.testS3Url
+    cspDirectives['connect-src'] += ' http://' + devServer + ' ws://' + devServer + ' ' + appConfig.sync.testS3Url + ' ' + appConfig.sync.testS3Url.replace('us-west-2', 'us-east-1')
   }
 
   return {
