@@ -42,7 +42,7 @@ describe('NewTab component unit tests', function () {
     randomSpy.restore()
   })
 
-  let wrapper
+  let wrapper, incognitoWrapper
   const backgroundImage = {
     style: {
       backgroundImage: 'url(testing123.jpg)'
@@ -79,6 +79,9 @@ describe('NewTab component unit tests', function () {
   beforeEach(function () {
     wrapper = shallow(
       <NewTabPage />
+    )
+    incognitoWrapper = shallow(
+      <NewTabPage isIncognito />
     )
   })
 
@@ -147,6 +150,10 @@ describe('NewTab component unit tests', function () {
       it('renders an empty div if `this.state.showEmptyPage` is true', function () {
         wrapper.setState({showEmptyPage: true})
         assert.equal(wrapper.find('div.empty').length, 1)
+      })
+
+      it('renders an empty div if isIncognito props is true', function () {
+        assert.equal(incognitoWrapper.find('div.empty').length, 1)
       })
     })
 

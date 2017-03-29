@@ -235,7 +235,7 @@ class NewTabPage extends React.Component {
       return <div className='empty' />
     }
 
-    if (window.chrome.extension.inIncognitoContext) {
+    if (this.props.isIncognito) {
       return <div className='empty' />
     }
 
@@ -312,5 +312,7 @@ class NewTabPage extends React.Component {
 
 module.exports = {
   component: NewTabPage,
-  AboutNewTab: React.createElement(DragDropContext(HTML5Backend)(NewTabPage))
+  AboutNewTab: React.createElement(DragDropContext(HTML5Backend)(NewTabPage), {
+    isIncognito: window.chrome && window.chrome.extension && window.chrome.extension.inIncognitoContext
+  })
 }
