@@ -54,6 +54,5 @@ module.exports = [
   'sqlite3',
   'uglify-js',
   'webdriverio',
-  'webpack-dev-server',
-  'node_modules/.*/node_modules'
+  'webpack-dev-server'
 ]
