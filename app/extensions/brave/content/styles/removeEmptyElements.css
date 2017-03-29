@@ -8,6 +8,7 @@
   .ytp-ad-progress-list,
   .ad-container,
   #video-masthead,
-  #watch-channel-brand-div {
+  #watch-channel-brand-div,
+  ytd-video-masthead-ad {
     display: none !important;
 }
