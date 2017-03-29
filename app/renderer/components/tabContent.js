@@ -223,7 +223,7 @@ class TabTitle extends ImmutableComponent {
   get themeColor () {
     const themeColor = this.props.tab.get('themeColor') || this.props.tab.get('computedThemeColor')
     const activeNonPrivateTab = !this.props.tab.get('isPrivate') && this.props.isActive
-    const activePrivateTab = this.props.tab.get('isPrivate') && this.props.isActive
+    const activePrivateTab = (this.props.tab.get('isPrivate') && this.props.isActive) || this.props.isHover
     const defaultColor = activePrivateTab ? globalStyles.color.white100 : globalStyles.color.black100
 
     return activeNonPrivateTab && this.props.paintTabs && !!themeColor
