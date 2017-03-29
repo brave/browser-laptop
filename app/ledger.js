@@ -93,6 +93,7 @@ var client
 const clientOptions = {
   debugP: process.env.LEDGER_DEBUG,
   loggingP: process.env.LEDGER_LOGGING,
+  rulesTestP: process.env.LEDGER_RULES_TESTING,
   verboseP: process.env.LEDGER_VERBOSE,
   server: process.env.LEDGER_SERVER_URL
 }
