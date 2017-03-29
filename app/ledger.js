@@ -1232,6 +1232,8 @@ var excludeP = (publisher, callback) => {
     if (callback) callback(err, result)
   }
 
+  if (!v2RulesetDB) return setTimeout(() => { excludeP(publisher, callback) }, 5 * msecs.second)
+
   inspectP(v2RulesetDB, v2RulesetPath, publisher, 'exclude', 'domain:' + publisher, (err, result) => {
     var props
 
@@ -1495,16 +1497,26 @@ var callback = (err, result, delayTime) => {
 
     entries = []
     results.forEach((entry) => {
-      entries.push({ type: 'put',
-        key: entry.facet + ':' + entry.publisher,
-        value: JSON.stringify(underscore.omit(entry, [ 'facet', 'publisher' ]))
-      })
+      var key = entry.facet + ':' + entry.publisher
+
+      if (entry.exclude !== false) {
+        entries.push({ type: 'put', key: key, value: JSON.stringify(underscore.omit(entry, [ 'facet', 'publisher' ])) })
+      } else {
+        entries.push({ type: 'del', key: key })
+      }
     })
 
     v2RulesetDB.batch(entries, (err) => {
       if (err) return console.log(v2RulesetPath + ' error: ' + JSON.stringify(err, null, 2))
 
-      underscore.keys(synopsis.publishers).forEach((publisher) => { excludeP(publisher) })
+      if (entries.length === 0) return
+
+      underscore.keys(synopsis.publishers).forEach((publisher) => {
+// be safe...
+        if (synopsis.publishers[publisher]) delete synopsis.publishers[publisher].options.exclude
+
+        excludeP(publisher)
+      })
     })
   }
   if (result.publishersV2) {
@@ -1700,6 +1712,31 @@ var run = (delayTime) => {
 /*
  * ledger client utilities
  */
+
+/* code that may never be needed...
+
+var rulesV2Reset = (callback) => {
+  if (clientOptions.verboseP) console.log('\n\nreset rulesets')
+  if (!v2RulesetDB) return
+
+  if (client) {
+    delete client.state.rulesV2Stamp
+    client.state.updatesStamp = underscore.now()
+  }
+  v2RulesetDB.close((err) => {
+    if (err) console.log(v2RulesetPath + ' close error: ' + err.toString())
+
+    v2RulesetDB = null
+    require('leveldown').destroy(pathName(v2RulesetPath), (err) => {
+      if (err) console.log(v2RulesetPath + ' destroy error: ' + err.toString())
+
+      v2RulesetDB = levelup(pathName(v2RulesetPath))
+      callback()
+    })
+  })
+}
+
+*/
 
 var getStateInfo = (state) => {
   var ballots, i, transaction
