@@ -100,16 +100,9 @@ const styles = StyleSheet.create({
 
   activePrivateTab: {
     background: globalStyles.color.privateTabBackgroundActive,
-    color: '#fff'
-  },
-
-  private: {
-    background: globalStyles.color.privateTabBackground,
-    color: '#fff',
 
     ':hover': {
-      background: globalStyles.color.privateTabBackgroundActive,
-      color: '#fff'
+      background: globalStyles.color.privateTabBackgroundActive
     }
   },
 
