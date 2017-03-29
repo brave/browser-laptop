@@ -550,7 +550,7 @@ describe('application window', function () {
         .getWindowCount().should.become(1) // still just one window
 
       // still just one frame
-      yield this.app.client.isExisting('.frameWrapper:nth-child(2) webview').should.eventually.be.false
+      yield this.app.client.waitForElementCount('.frameWrapper:nth-child(2) webview', 0)
     })
 
     // https://app.asana.com/0/79517354322876/79040692096404
@@ -582,7 +582,7 @@ describe('application window', function () {
         // tab/window opens. Is there something else we can check?
         yield this.app.client
           .getWindowCount().should.become(1) // still just one window
-        yield this.app.client.isExisting('.frameWrapper:nth-child(2) webview').should.eventually.be.false // still just one frame
+        yield this.app.client.waitForElementCount('.frameWrapper:nth-child(2) webview', 0) // still just one frame
       })
 
       // https://app.asana.com/0/79517354322876/79040692096404
@@ -641,7 +641,7 @@ describe('application window', function () {
           .waitForUrl(clickWithTargetPage)
           .tabByIndex(1)
           .waitForUrl(this.page2)
-          .isExisting('.frameWrapper:nth-child(3) webview').should.eventually.be.false // same tab
+          .waitForElementCount('.frameWrapper:nth-child(3) webview', 0) // same tab
       })
     })
 
@@ -668,7 +668,7 @@ describe('application window', function () {
 
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
-          .isExisting('.frameWrapper:nth-child(2) webview').should.eventually.be.false // still just one frame
+          .waitForElementCount('.frameWrapper:nth-child(2) webview', 0) // still just one frame
       })
     })
 
@@ -695,7 +695,7 @@ describe('application window', function () {
 
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
-          .isExisting('.frameWrapper:nth-child(2) webview').should.eventually.be.false // still just one frame
+          .waitForElementCount('.frameWrapper:nth-child(2) webview', 0) // still just one frame
       })
     })
 
@@ -723,7 +723,7 @@ describe('application window', function () {
 
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
-          .isExisting('.frameWrapper:nth-child(2) webview').should.eventually.be.false // still just one frame
+          .waitForElementCount('.frameWrapper:nth-child(2) webview', 0) // still just one frame
       })
     })
 
@@ -755,7 +755,7 @@ describe('application window', function () {
         yield this.app.client
           .getWindowCount().should.become(1) // still just one window
 
-        yield this.app.client.isExisting('.frameWrapper:nth-child(2) webview').should.eventually.be.false // still just one frame
+        yield this.app.client.waitForElementCount('.frameWrapper:nth-child(2) webview', 0) // still just one frame
       })
     })
   })

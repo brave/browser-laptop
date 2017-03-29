@@ -455,11 +455,7 @@ describe('Bravery Panel', function () {
         .click(blockAllCookiesOption)
         .tabByIndex(0)
         .loadUrl(url)
-        .waitUntil(function () {
-          return this.getText('body').then((text) => {
-            return text === expectedBlocked
-          })
-        })
+        .waitForTextValue('body', expectedBlocked)
     })
     it('allows cookies', function * () {
       const url = Brave.server.url('cookies.html')

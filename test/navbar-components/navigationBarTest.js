@@ -121,9 +121,7 @@ describe('navigationBar tests', function () {
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
           .ipcSend('shortcut-focus-url')
-          .waitUntil(function () {
-            return this.getValue(urlInput).then((val) => val === 'data:text/html;,%3Ctitle%3ETabnapping%20Target%3C/title%3E')
-          })
+          .waitForInputText(urlInput, 'data:text/html;,%3Ctitle%3ETabnapping%20Target%3C/title%3E')
       })
     })
 
@@ -144,11 +142,7 @@ describe('navigationBar tests', function () {
       it('updates the location in the navbar to blank', function * () {
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
-          .waitUntil(function () {
-            return this.getValue(urlInput).then((val) => {
-              return val === 'about:blank'
-            })
-          })
+          .waitForInputText(urlInput, 'about:blank')
       })
     })
 
@@ -202,11 +196,7 @@ describe('navigationBar tests', function () {
         var page1 = Brave.server.url('in_page_nav.html')
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
-          .waitUntil(function () {
-            return this.getValue(urlInput).then((val) => {
-              return val === page1
-            })
-          })
+          .waitForInputText(urlInput, page1)
       })
     })
 
@@ -225,16 +215,11 @@ describe('navigationBar tests', function () {
           .windowByUrl(Brave.browserWindowUrl)
           .waitForVisible(urlInput)
           .setValue(urlInput, '')
-          .waitUntil(function () {
-            return this.getValue(urlInput).then((val) => val === '')
-          })
           .moveToObject(activeWebview)
           .click(activeWebview)
           .activateURLMode()
           .click(urlInput)
-          .waitUntil(function () {
-            return this.getValue(urlInput).then((val) => val === '')
-          })
+          .waitForInputText(urlInput, '')
       })
     })
 
@@ -254,15 +239,12 @@ describe('navigationBar tests', function () {
       })
 
       it('has title mode', function * () {
-        const host = this.host
         yield this.app.client
-          .moveToObject(activeWebview)
+          .activateTitleMode()
           .click(activeWebview)
           .windowParentByUrl(this.page1Url)
           .waitForExist(titleBar)
-          .waitUntil(function () {
-            return this.getText(titleBar).then((val) => val === host + ' | Page 1')
-          })
+          .waitForTextValue(titleBar, `${this.host} | Page 1`)
           .isExisting(navigatorLoadTime).then((isExisting) => assert(!isExisting))
       })
 
@@ -272,8 +254,7 @@ describe('navigationBar tests', function () {
           .click(activeWebview)
           .moveToObject(titleBar)
           .waitForExist(navigatorLoadTime)
-          .getValue(urlInput)
-          .should.eventually.be.equal(this.page1Url)
+          .waitForValue(urlInput, this.page1Url)
       })
 
       it('exits title mode when focused', function * () {
@@ -281,9 +262,7 @@ describe('navigationBar tests', function () {
         yield this.app.client
           .ipcSend('shortcut-focus-url')
           .moveToObject(activeWebview)
-          .waitUntil(function () {
-            return this.isExisting(titleBar).then((exists) => exists === false)
-          })
+          .waitForElementCount(titleBar, 0)
         yield selectsText(this.app.client, page1Url)
       })
     })
@@ -311,9 +290,7 @@ describe('navigationBar tests', function () {
       it('does not have title mode', function * () {
         yield this.app.client
           .moveToObject(activeWebview)
-          .waitUntil(function () {
-            return this.isExisting(titleBar).then((exists) => exists === false)
-          })
+          .waitForElementCount(titleBar, 0)
           .waitForExist(navigatorLoadTime)
       })
     })
@@ -323,16 +300,13 @@ describe('navigationBar tests', function () {
 
       before(function * () {
         this.page = Brave.server.url('url_fragments.html')
-        var page = this.page
         yield setup(this.app.client)
         // Navigate to a page with a title first to ensure it gets reset
         yield this.app.client
           .tabByUrl(Brave.newTabUrl).url(this.page).waitForUrl(this.page).windowParentByUrl(this.page)
           .activateURLMode()
           .waitForValue(urlInput)
-          .waitUntil(function () {
-            return this.getValue(urlInput).then((val) => val === page)
-          })
+          .waitForInputText(urlInput, this.page)
           .tabByUrl(this.page)
           .waitForExist('#bottom_link')
           .leftClick('#bottom_link')
@@ -342,14 +316,12 @@ describe('navigationBar tests', function () {
       it('updates the location in the navbar', function * () {
         var page = this.page
         yield this.app.client
-          .moveToObject(activeWebview)
+          .activateTitleMode()
           .click(activeWebview)
           .waitForExist(titleBar)
           .moveToObject(titleBar)
           .waitForExist(urlInput)
-          .waitUntil(function () {
-            return this.getValue(urlInput).then((val) => val === page + '#bottom')
-          })
+          .waitForInputText(urlInput, `${page}#bottom`)
       })
 
       it('scrolls to the url fragment', function * () {
@@ -357,7 +329,7 @@ describe('navigationBar tests', function () {
           .tabByUrl(this.page)
           // should scroll to bottom and top will not be visible because the div height is 99999px
           .waitForVisible('#bottom', 1000)
-          .waitForVisible('#top', 500, false)
+          .waitForVisible('#top', 500)
       })
     })
   })
@@ -439,10 +411,10 @@ describe('navigationBar tests', function () {
         .windowParentByUrl(page1Url)
         .activateURLMode()
         .waitForValue(urlInput)
-        .moveToObject(activeWebview)
+        .activateTitleMode()
         .click(activeWebview)
         .waitForExist(titleBar)
-        .isExisting(urlbarIcon).then((isExisting) => assert(isExisting))
+        .waitForVisible(urlbarIcon, 1)
         .getAttribute(urlbarIcon, 'class').then((classes) =>
           classes.includes('fa-unlock') && classes.includes('insecure-color')
         )
@@ -470,10 +442,10 @@ describe('navigationBar tests', function () {
         .windowParentByUrl(page1Url)
         .activateURLMode()
         .waitForValue(urlInput)
-        .moveToObject(activeWebview)
+        .activateTitleMode()
         .click(activeWebview)
         .waitForExist(titleBar)
-        .isExisting(urlbarIcon).then((isExisting) => assert(isExisting))
+        .waitForVisible(urlbarIcon, 1)
         .getAttribute(urlbarIcon, 'class').then((classes) =>
           classes.includes('fa-lock')
         )
@@ -526,11 +498,7 @@ describe('navigationBar tests', function () {
       yield this.app.client.tabByIndex(0).url(page1Url).windowParentByUrl(page1Url)
       yield this.app.client
         .activateURLMode()
-        .waitUntil(function () {
-          return this.getValue(urlInput).then((val) => {
-            return val === page1Url
-          })
-        })
+        .waitForInputText(urlInput, page1Url)
         .waitForExist(urlbarIcon)
         .waitUntil(() =>
           this.app.client.getAttribute(urlbarIcon, 'class').then((classes) =>
@@ -550,11 +518,7 @@ describe('navigationBar tests', function () {
       yield this.app.client.tabByIndex(0).url(page1Url).windowParentByUrl(page1Url)
       yield this.app.client
         .activateURLMode()
-        .waitUntil(function () {
-          return this.getValue(urlInput).then((val) => {
-            return val === page1Url
-          })
-        })
+        .waitForInputText(urlInput, page1Url)
         .waitForExist(urlbarIcon)
         .waitUntil(() =>
           this.app.client.getAttribute(urlbarIcon, 'class').then((classes) =>
@@ -867,11 +831,7 @@ describe('navigationBar tests', function () {
         const page2 = this.page2
         yield this.app.client.keys([this.page2, Brave.keys.ENTER])
         yield this.app.client
-          .waitUntil(function () {
-            return this.getValue(urlInput).then((val) => {
-              return val === page2
-            })
-          })
+          .waitForInputText(urlInput, page2)
       })
 
       it('resets URL to previous location if page does not load', function * () {
@@ -881,7 +841,7 @@ describe('navigationBar tests', function () {
           .url(page1)
           .waitForUrl(page1)
           .windowParentByUrl(page1)
-          .moveToObject(activeWebview)
+          .activateTitleMode()
           .click(activeWebview)
           .activateURLMode()
           .click(urlInput)
@@ -889,11 +849,7 @@ describe('navigationBar tests', function () {
         yield this.app.client
           .keys(this.page2)
           .keys(Brave.keys.ENTER)
-          .waitUntil(function () {
-            return this.getValue(urlInput).then((val) => {
-              return val === page1
-            })
-          })
+          .waitForInputText(urlInput, page1)
       })
     })
 
@@ -939,11 +895,7 @@ describe('navigationBar tests', function () {
           const url = 'https://brave.com/page/cc?_ri_=3vv-8-e.'
           yield this.app.client.keys(url)
           yield this.app.client.keys(Brave.keys.ENTER)
-          yield this.app.client.waitUntil(function () {
-            return this.getValue(urlInput).then((val) => {
-              return val === url
-            })
-          })
+            .waitForInputText(urlInput, url)
         })
       })
     })
@@ -982,9 +934,8 @@ describe('navigationBar tests', function () {
         yield this.app.client.keys(Brave.keys.ENTER)
       })
       it('hides auth part of the url', function * () {
-        yield this.app.client.waitUntil(function () {
-          return this.getValue(urlInput).then((val) => val === 'http://example.com/')
-        })
+        yield this.app.client
+          .waitForInputText(urlInput, 'http://example.com/')
       })
     })
 
@@ -999,17 +950,13 @@ describe('navigationBar tests', function () {
         yield this.app.client
           .tabByUrl(this.newTabUrl)
           .windowByUrl(Brave.browserWindowUrl)
-          .waitUntil(function () {
-            return this.getValue(urlInput).then((val) => val === '')
-          })
+          .waitForInputText(urlInput, '')
       })
       it('shows "about:blank" in the URL bar', function * () {
         yield this.app.client
           .keys('about:blank')
           .keys(Brave.keys.ENTER)
-          .waitUntil(function () {
-            return this.getValue(urlInput).then((val) => val === 'about:blank')
-          })
+          .waitForInputText(urlInput, 'about:blank')
       })
       it('shows the search icon in URL bar for "about:newtab"', function * () {
         yield this.app.client
@@ -1022,9 +969,7 @@ describe('navigationBar tests', function () {
           .windowByUrl(Brave.browserWindowUrl)
           .keys('about:about')
           .keys(Brave.keys.ENTER)
-          .waitUntil(function () {
-            return this.getValue(urlInput).then((val) => val === 'about:about')
-          })
+          .waitForInputText(urlInput, 'about:about')
           .waitForExist('.urlbarIcon.fa-list')
       })
     })
@@ -1046,9 +991,8 @@ describe('navigationBar tests', function () {
       yield this.app.client
         .waitForTabCount(2)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitUntil(function () {
-          return this.keys('a').getValue(urlInput).then((val) => val === 'a')
-        })
+        .keys('a')
+        .waitForInputText(urlInput, 'a')
       // tab with loaded url
       yield newFrame(this.app.client, 3)
       yield this.app.client
@@ -1086,9 +1030,7 @@ describe('navigationBar tests', function () {
 
       it('preserves typing state', function * () {
         yield this.app.client
-          .waitUntil(function () {
-            return this.getValue(urlInput).then((val) => val === 'a')
-          })
+          .waitForInputText(urlInput, 'a')
           .waitUntil(function () {
             return this.getSelectedText().then(function (value) { return value === '' })
           })

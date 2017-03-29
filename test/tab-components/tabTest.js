@@ -2,7 +2,6 @@
 
 const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
-const assert = require('assert')
 const settings = require('../../js/constants/settings')
 const {urlInput, backButton, forwardButton, activeTab, activeTabTitle, activeTabFavicon, newFrameButton, notificationBar, contextMenu} = require('../lib/selectors')
 
@@ -18,72 +17,47 @@ describe('tab tests', function () {
     Brave.beforeAll(this)
     before(function * () {
       yield setup(this.app.client)
+      this.page1 = Brave.server.url('page1.html')
+      this.page2 = Brave.server.url('page2.html')
     })
 
     it('sets correct title', function * () {
-      var page1 = Brave.server.url('page1.html')
-      var page2 = Brave.server.url('page2.html')
-
       yield this.app.client
         .tabByIndex(0)
-        .loadUrl(page1)
+        .loadUrl(this.page1)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitUntil(function () {
-          return this.getText(activeTabTitle)
-            .then((title) => title === 'Page 1')
-        })
+        .waitForTextValue(activeTabTitle, 'Page 1')
         .tabByIndex(0)
-        .loadUrl(page2)
+        .loadUrl(this.page2)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitUntil(function () {
-          return this.getText(activeTabTitle)
-            .then((title) => title === 'Page 2')
-        })
+        .waitForTextValue(activeTabTitle, 'Page 2')
         .waitForExist(backButton)
         .click(backButton)
-        .waitForUrl(page1)
+        .waitForUrl(this.page1)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitUntil(function () {
-          return this.getText(activeTabTitle)
-            .then((title) => title === 'Page 1')
-        })
+        .waitForTextValue(activeTabTitle, 'Page 1')
         .waitForExist(forwardButton)
         .click(forwardButton)
-        .waitForUrl(page2)
+        .waitForUrl(this.page2)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitUntil(function () {
-          return this.getText(activeTabTitle)
-            .then((title) => title === 'Page 2')
-        })
+        .waitForTextValue(activeTabTitle, 'Page 2')
     })
 
     it('middle click opens in the new tab', function * () {
-      var page1 = Brave.server.url('page1.html')
-      var page2 = Brave.server.url('page2.html')
-
       yield this.app.client
         .tabByIndex(0)
-        .loadUrl(page1)
+        .loadUrl(this.page1)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitUntil(function () {
-          return this.getText(activeTabTitle)
-            .then((title) => title === 'Page 1')
-        })
+        .waitForTextValue(activeTabTitle, 'Page 1')
         .tabByIndex(0)
-        .loadUrl(page2)
+        .loadUrl(this.page2)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitUntil(function () {
-          return this.getText(activeTabTitle)
-            .then((title) => title === 'Page 2')
-        })
+        .waitForTextValue(activeTabTitle, 'Page 2')
         .waitForExist(backButton)
         .click(backButton)
-        .waitForUrl(page1)
+        .waitForUrl(this.page1)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitUntil(function () {
-          return this.getText(activeTabTitle)
-            .then((title) => title === 'Page 1')
-        })
+        .waitForTextValue(activeTabTitle, 'Page 1')
         .waitForExist('.forwardButton')
         .rightClick(forwardButton)
         .waitForExist(contextMenu)
@@ -113,10 +87,7 @@ describe('tab tests', function () {
       yield this.app.client
         .ipcSend(messages.SHORTCUT_NEW_FRAME)
         .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
-        .waitUntil(function () {
-          return this.getText('[data-test-id="tab"][data-frame-key="2"]')
-            .then((title) => title === 'New Tab')
-        })
+        .waitForTextValue('[data-test-id="tab"][data-frame-key="2"]', 'New Tab')
     })
   })
 
@@ -179,11 +150,11 @@ describe('tab tests', function () {
   describe('new private tab signal', function () {
     Brave.beforeAll(this)
     before(function * () {
+      const page1 = Brave.server.url('page1.html')
       yield setup(this.app.client)
-      var url = Brave.server.url('page1.html')
       yield this.app
-        .client.ipcSend(messages.SHORTCUT_NEW_FRAME, url, { isPrivate: true })
-        .waitForUrl(url)
+        .client.ipcSend(messages.SHORTCUT_NEW_FRAME, page1, { isPrivate: true })
+        .waitForUrl(page1)
         .windowByUrl(Brave.browserWindowUrl)
     })
     it('creates a new private tab', function * () {
@@ -199,11 +170,11 @@ describe('tab tests', function () {
   describe('new session tab signal', function () {
     Brave.beforeAll(this)
     before(function * () {
+      const page1 = Brave.server.url('page1.html')
       yield setup(this.app.client)
-      var url = Brave.server.url('page1.html')
       yield this.app
-        .client.ipcSend(messages.SHORTCUT_NEW_FRAME, url, { isPartitioned: true })
-        .waitForUrl(url)
+        .client.ipcSend(messages.SHORTCUT_NEW_FRAME, page1, { isPartitioned: true })
+        .waitForUrl(page1)
         .windowByUrl(Brave.browserWindowUrl)
     })
     it('creates a new session tab', function * () {
@@ -219,11 +190,11 @@ describe('tab tests', function () {
   describe('specific session tab signal', function () {
     Brave.beforeAll(this)
     before(function * () {
+      const page1 = Brave.server.url('page1.html')
       yield setup(this.app.client)
-      var url = Brave.server.url('page1.html')
       yield this.app
-        .client.ipcSend(messages.SHORTCUT_NEW_FRAME, url, { partitionNumber: 3 })
-        .waitForUrl(url)
+        .client.ipcSend(messages.SHORTCUT_NEW_FRAME, page1, { partitionNumber: 3 })
+        .waitForUrl(page1)
         .windowByUrl(Brave.browserWindowUrl)
     })
     it('creates a new session tab', function * () {
@@ -237,10 +208,11 @@ describe('tab tests', function () {
   })
 
   describe('close tab', function () {
-    var tabCountBeforeTabClose = 2
-    var tabCountAfterTabClose = 1
+    const tabCountBeforeTabClose = 2
+    const tabCountAfterTabClose = 1
     Brave.beforeAll(this)
     before(function * () {
+      this.page1 = Brave.server.url('page1.html')
       yield setup(this.app.client)
     })
     it('can close a normal tab', function * () {
@@ -264,7 +236,7 @@ describe('tab tests', function () {
       yield this.app.client
         .waitForBrowserWindow()
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, Brave.server.url('page1.html'), {frameOpts: {unloaded: true, location: Brave.server.url('page1.html'), title: 'hi', tabId: null}, openInForeground: false})
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page1, {frameOpts: {unloaded: true, location: this.page1, title: 'hi', tabId: null}, openInForeground: false})
         .waitForElementCount('[data-test-id="tab"]', 2)
         // This ensures it's actually unloaded
         .waitForTabCount(1)
@@ -276,7 +248,7 @@ describe('tab tests', function () {
       yield this.app.client
         .waitForBrowserWindow()
         .waitForExist('[data-test-active-tab][data-frame-key="1"]')
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, Brave.server.url('page1.html'))
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page1)
         .waitUntil(function () {
           return this.waitForUrl(Brave.newTabUrl)
             .waitForTabCount(tabCountBeforeTabClose)
@@ -301,9 +273,8 @@ describe('tab tests', function () {
   describe('webview previews when tab is hovered', function () {
     Brave.beforeAll(this)
     before(function * () {
-      var page1 = Brave.server.url('page1.html')
-      var page2 = Brave.server.url('page2.html')
-
+      const page1 = Brave.server.url('page1.html')
+      const page2 = Brave.server.url('page2.html')
       yield setup(this.app.client)
       yield this.app.client
         .ipcSend(messages.SHORTCUT_NEW_FRAME, page1)
@@ -340,22 +311,22 @@ describe('tab tests', function () {
     Brave.beforeAll(this)
     before(function * () {
       yield setup(this.app.client)
+      this.page1 = Brave.server.url('page1.html')
+      this.page2 = Brave.server.url('page2.html')
     })
     it('new tab opens in background by default', function * () {
-      var url = Brave.server.url('page1.html')
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, url, {openInForeground: false})
-        .waitForUrl(url)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page1, {openInForeground: false})
+        .waitForUrl(this.page1)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
       yield this.app.client.waitForExist('.frameWrapper:not(.isActive) webview[data-frame-key="2"]')
     })
     it('changing new tab default makes new tabs open in background by default', function * () {
-      var url = Brave.server.url('page2.html')
       yield this.app.client.changeSetting(settings.SWITCH_TO_NEW_TABS, true)
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, url, {openInForeground: false})
-        .waitForUrl(url)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page2, {openInForeground: false})
+        .waitForUrl(this.page2)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('[data-test-id="tab"][data-frame-key="3"]')
       yield this.app.client.waitForExist('.frameWrapper.isActive webview[data-frame-key="3"]')
@@ -369,7 +340,7 @@ describe('tab tests', function () {
     })
 
     it('shows tab\'s icon when page is not about:blank or about:newtab ', function * () {
-      var url = Brave.server.url('favicon.html')
+      const url = Brave.server.url('favicon.html')
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(url)
@@ -397,7 +368,7 @@ describe('tab tests', function () {
         .ipcSend(messages.SHORTCUT_NEW_FRAME, 'about:blank', { openInForeground: false })
         .waitForVisible('[data-test-id="tab"][data-frame-key="2"]')
         // This should not be converted to a waitUntil
-        .getText('[data-test-id="tab"][data-frame-key="2"]').then((val) => assert.equal(val, 'Untitled'))
+        .waitForTextValue('[data-test-id="tab"][data-frame-key="2"]', 'Untitled')
     })
   })
 
@@ -426,10 +397,7 @@ describe('tab tests', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .moveToObject(activeTab)
         .waitForExist(activeTabFavicon)
-        .waitUntil(function () {
-          return this.getText(activeTabTitle)
-            .then((title) => title === 'fullscreenPage')
-        })
+        .waitForTextValue(activeTabTitle, 'fullscreenPage')
     })
   })
 })

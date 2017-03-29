@@ -19,6 +19,6 @@ describe('about:styles', function () {
 
   it('displays the title', function * () {
     yield this.app.client
-      .getText('.typography').should.eventually.be.equal('Typography')
+      .waitForTextValue('.typography', 'Typography')
   })
 })

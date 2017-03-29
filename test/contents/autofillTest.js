@@ -75,15 +75,15 @@ describe('Autofill', function () {
     it('adds an autofill address', function * () {
       yield this.app.client
         .waitForVisible('.autofillPage')
-        .getText('.addressName').should.eventually.be.equal(name)
-        .getText('.organization').should.eventually.be.equal(organization)
-        .getText('.streetAddress').should.eventually.be.equal(streetAddress)
-        .getText('.city').should.eventually.be.equal(city)
-        .getText('.state').should.eventually.be.equal(state)
-        .getText('.postalCode').should.eventually.be.equal(postalCode)
-        .getText('.country').should.eventually.be.equal(country)
-        .getText('.phone').should.eventually.be.equal(phone)
-        .getText('.email').should.eventually.be.equal(email)
+        .waitForTextValue('.addressName', name)
+        .waitForTextValue('.organization', organization)
+        .waitForTextValue('.streetAddress', streetAddress)
+        .waitForTextValue('.city', city)
+        .waitForTextValue('.state', state)
+        .waitForTextValue('.postalCode', postalCode)
+        .waitForTextValue('.country', country)
+        .waitForTextValue('.phone', phone)
+        .waitForTextValue('.email', email)
     })
     it('autofills the address', function * () {
       yield this.app.client
@@ -96,9 +96,9 @@ describe('Autofill', function () {
         .waitForVisible('.contextMenuItemText')
         .click('.contextMenuItemText')
         .tabByUrl(this.formfill)
-        .getValue('[name="04fullname"]').should.eventually.be.equal(name)
-        .getValue('[name="23cellphon"]').should.eventually.be.equal(phone)
-        .getValue('[name="24emailadr"]').should.eventually.be.equal(email)
+        .waitForInputText('[name="04fullname"]', name)
+        .waitForInputText('[name="23cellphon"]', phone)
+        .waitForInputText('[name="24emailadr"]', email)
         // TODO(bridiver) - this needs to check all fields
     })
     it('autofills the address in a private tab', function * () {
@@ -113,9 +113,9 @@ describe('Autofill', function () {
         .waitForVisible('.contextMenuItemText')
         .click('.contextMenuItemText')
         .tabByUrl(this.formfill)
-        .getValue('[name="04fullname"]').should.eventually.be.equal(name)
-        .getValue('[name="23cellphon"]').should.eventually.be.equal(phone)
-        .getValue('[name="24emailadr"]').should.eventually.be.equal(email)
+        .waitForInputText('[name="04fullname"]', name)
+        .waitForInputText('[name="23cellphon"]', phone)
+        .waitForInputText('[name="24emailadr"]', email)
         // TODO(bridiver) - this needs to check all fields
     })
     it('autofills the updated address when edited', function * () {
@@ -142,15 +142,15 @@ describe('Autofill', function () {
         .tabByIndex(0)
         .loadUrl(this.autofillPreferences)
         .waitForVisible('.autofillPage')
-        .getText('.addressName').should.eventually.be.equal(name)
-        .getText('.organization').should.eventually.be.equal(organization)
-        .getText('.streetAddress').should.eventually.be.equal(streetAddress)
-        .getText('.city').should.eventually.be.equal(city)
-        .getText('.state').should.eventually.be.equal(state)
-        .getText('.postalCode').should.eventually.be.equal(postalCode)
-        .getText('.country').should.eventually.be.equal(country)
-        .getText('.phone').should.eventually.be.equal(phone + '123')
-        .getText('.email').should.eventually.be.equal(email + 'mm')
+        .waitForTextValue('.addressName', name)
+        .waitForTextValue('.organization', organization)
+        .waitForTextValue('.streetAddress', streetAddress)
+        .waitForTextValue('.city', city)
+        .waitForTextValue('.state', state)
+        .waitForTextValue('.postalCode', postalCode)
+        .waitForTextValue('.country', country)
+        .waitForTextValue('.phone', phone + '123')
+        .waitForTextValue('.email', email + 'mm')
         // fill out the form
         .loadUrl(this.formfill)
         .waitForVisible('<form>')
@@ -160,9 +160,9 @@ describe('Autofill', function () {
         .waitForVisible('.contextMenuItemText')
         .click('.contextMenuItemText')
         .tabByUrl(this.formfill)
-        .getValue('[name="04fullname"]').should.eventually.be.equal(name)
-        .getValue('[name="23cellphon"]').should.eventually.be.equal(phone + '123')
-        .getValue('[name="24emailadr"]').should.eventually.be.equal(email + 'mm')
+        .waitForInputText('[name="04fullname"]', name)
+        .waitForInputText('[name="23cellphon"]', phone + '123')
+        .waitForInputText('[name="24emailadr"]', email + 'mm')
         // TODO(bridiver) - this needs to check all fields
     })
     it('deletes the address', function * () {
@@ -208,9 +208,9 @@ describe('Autofill', function () {
     it('adds an autofill credit card', function * () {
       yield this.app.client
         .waitForVisible('.autofillPage')
-        .getText('.creditCardName').should.eventually.be.equal(cardName)
-        .getText('.creditCardNumber').should.eventually.be.equal('***' + cardNumber.slice(-4))
-        .getText('.creditCardPExpirationDate').should.eventually.be.equal(
+        .waitForTextValue('.creditCardName', cardName)
+        .waitForTextValue('.creditCardNumber', '***' + cardNumber.slice(-4))
+        .waitForTextValue('.creditCardPExpirationDate',
           (expMonth < 10 ? '0' + expMonth.toString() : expMonth.toString()) + '/' + expYear.toString())
     })
     it('autofills the credit card', function * () {
@@ -224,9 +224,9 @@ describe('Autofill', function () {
         .waitForVisible('.contextMenuItemText')
         .click('.contextMenuItemText')
         .tabByUrl(this.formfill)
-        .getValue('[name="41ccnumber"]').should.eventually.be.equal(cardNumber)
-        .getValue('[name="42ccexp_mm"]').should.eventually.be.equal(expMonth.toString())
-        .getValue('[name="43ccexp_yy"]').should.eventually.be.equal(expYear.toString())
+        .waitForInputText('[name="41ccnumber"]', cardNumber)
+        .waitForInputText('[name="42ccexp_mm"]', expMonth.toString())
+        .waitForInputText('[name="43ccexp_yy"]', expYear.toString())
     })
     it('autofills the credit card in a private tab', function * () {
       yield this.app.client
@@ -240,9 +240,9 @@ describe('Autofill', function () {
         .waitForVisible('.contextMenuItemText')
         .click('.contextMenuItemText')
         .tabByUrl(this.formfill)
-        .getValue('[name="41ccnumber"]').should.eventually.be.equal(cardNumber)
-        .getValue('[name="42ccexp_mm"]').should.eventually.be.equal(expMonth.toString())
-        .getValue('[name="43ccexp_yy"]').should.eventually.be.equal(expYear.toString())
+        .waitForInputText('[name="41ccnumber"]', cardNumber)
+        .waitForInputText('[name="42ccexp_mm"]', expMonth.toString())
+        .waitForInputText('[name="43ccexp_yy"]', expYear.toString())
     })
     it('autofills the updated credit card when edited', function * () {
       yield this.app.client
@@ -270,10 +270,9 @@ describe('Autofill', function () {
         .tabByIndex(0)
         .loadUrl(this.autofillPreferences)
         .waitForVisible('.autofillPage')
-        .getText('.creditCardName').should.eventually.be.equal(cardName + 123)
-        .getText('.creditCardNumber').should.eventually.be.equal('***' + (cardNumber + 123).slice(-4))
-        .getText('.creditCardPExpirationDate').should.eventually.be.equal(
-          (expMonth + 1).toString() + '/' + (expYear + 1).toString())
+        .waitForTextValue('.creditCardName', cardName + 123)
+        .waitForTextValue('.creditCardNumber', '***' + (cardNumber + 123).slice(-4))
+        .waitForTextValue('.creditCardPExpirationDate', (expMonth + 1).toString() + '/' + (expYear + 1).toString())
         .tabByIndex(0)
         .loadUrl(this.formfill)
         .waitForVisible('<form>')
@@ -283,9 +282,9 @@ describe('Autofill', function () {
         .waitForVisible('.contextMenuItemText')
         .click('.contextMenuItemText')
         .tabByUrl(this.formfill)
-        .getValue('[name="41ccnumber"]').should.eventually.be.equal(cardNumber + '123')
-        .getValue('[name="42ccexp_mm"]').should.eventually.be.equal((expMonth + 1).toString())
-        .getValue('[name="43ccexp_yy"]').should.eventually.be.equal((expYear + 1).toString())
+        .waitForInputText('[name="41ccnumber"]', cardNumber + '123')
+        .waitForInputText('[name="42ccexp_mm"]', (expMonth + 1).toString())
+        .waitForInputText('[name="43ccexp_yy"]', (expYear + 1).toString())
         // TODO(bridiver) this needs to check all fields
     })
     it('deletes the credit card', function * () {
@@ -361,22 +360,22 @@ describe('Autofill', function () {
     it('adds an autofill address', function * () {
       yield this.app.client
         .waitForVisible('.autofillPage')
-        .getText('.addressName').should.eventually.be.equal(name)
-        .getText('.organization').should.eventually.be.equal(organization)
-        .getText('.streetAddress').should.eventually.be.equal(streetAddress)
-        .getText('.city').should.eventually.be.equal(city)
-        .getText('.state').should.eventually.be.equal(state)
-        .getText('.postalCode').should.eventually.be.equal(postalCode)
-        .getText('.country').should.eventually.be.equal(country)
-        .getText('.phone').should.eventually.be.equal(phone)
-        .getText('.email').should.eventually.be.equal(email)
+        .waitForTextValue('.addressName', name)
+        .waitForTextValue('.organization', organization)
+        .waitForTextValue('.streetAddress', streetAddress)
+        .waitForTextValue('.city', city)
+        .waitForTextValue('.state', state)
+        .waitForTextValue('.postalCode', postalCode)
+        .waitForTextValue('.country', country)
+        .waitForTextValue('.phone', phone)
+        .waitForTextValue('.email', email)
     })
     it('adds an autofill credit card', function * () {
       yield this.app.client
         .waitForVisible('.autofillPage')
-        .getText('.creditCardName').should.eventually.be.equal(cardName)
-        .getText('.creditCardNumber').should.eventually.be.equal('***' + cardNumber.slice(-4))
-        .getText('.creditCardPExpirationDate').should.eventually.be.equal(
+        .waitForTextValue('.creditCardName', cardName)
+        .waitForTextValue('.creditCardNumber', '***' + cardNumber.slice(-4))
+        .waitForTextValue('.creditCardPExpirationDate',
           (expMonth < 10 ? '0' + expMonth.toString() : expMonth.toString()) + '/' + expYear.toString())
     })
     it('autofills the address', function * () {
@@ -390,9 +389,9 @@ describe('Autofill', function () {
         .waitForVisible('.contextMenuItemText')
         .click('.contextMenuItemText')
         .tabByUrl(this.formfill)
-        .getValue('[name="04fullname"]').should.eventually.be.equal(name)
-        .getValue('[name="23cellphon"]').should.eventually.be.equal(phone)
-        .getValue('[name="24emailadr"]').should.eventually.be.equal(email)
+        .waitForInputText('[name="04fullname"]', name)
+        .waitForInputText('[name="23cellphon"]', phone)
+        .waitForInputText('[name="24emailadr"]', email)
         // TODO(bridiver) - this needs to check all fields
     })
     it('autofills the credit card', function * () {
@@ -406,9 +405,9 @@ describe('Autofill', function () {
         .waitForVisible('.contextMenuItemText')
         .click('.contextMenuItemText')
         .tabByUrl(this.formfill)
-        .getValue('[name="41ccnumber"]').should.eventually.be.equal(cardNumber)
-        .getValue('[name="42ccexp_mm"]').should.eventually.be.equal(expMonth.toString())
-        .getValue('[name="43ccexp_yy"]').should.eventually.be.equal(expYear.toString())
+        .waitForInputText('[name="41ccnumber"]', cardNumber)
+        .waitForInputText('[name="42ccexp_mm"]', expMonth.toString())
+        .waitForInputText('[name="43ccexp_yy"]', expYear.toString())
     })
     it('clear data now', function * () {
       yield this.app.client
@@ -433,14 +432,14 @@ describe('Autofill', function () {
         .click('[name="04fullname"]')
         .click('[name="04fullname"]')
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist('contextMenuItemText', 500, true)
+        .waitForElementCount('contextMenuItemText', 0)
         .tabByIndex(1)
-        .getValue('[name="04fullname"]').should.eventually.be.equal('')
+        .waitForInputText('[name="04fullname"]', '')
         .click('[name="41ccnumber"]')
         .click('[name="41ccnumber"]')
-        .waitForExist('contextMenuItemText', 500, true)
+        .waitForElementCount('contextMenuItemText', 0)
         .tabByIndex(1)
-        .getValue('[name="41ccnumber"]').should.eventually.be.equal('')
+        .waitForInputText('[name="41ccnumber"]', '')
     })
   })
 
@@ -467,7 +466,7 @@ describe('Autofill', function () {
           .waitForVisible('.contextMenuItemText')
           .click('.contextMenuItemText')
           .tabByIndex(0)
-          .getValue('[name="04fullname"]').should.eventually.be.equal('test')
+          .waitForInputText('[name="04fullname"]', 'test')
       })
       it('autofills in private tab', function * () {
         yield this.app.client
@@ -481,7 +480,7 @@ describe('Autofill', function () {
           .waitForVisible('.contextMenuItemText')
           .click('.contextMenuItemText')
           .tabByIndex(0)
-          .getValue('[name="04fullname"]').should.eventually.be.equal('test')
+          .waitForInputText('[name="04fullname"]', 'test')
       })
     })
     describe('session tab', function () {
@@ -506,7 +505,7 @@ describe('Autofill', function () {
           .waitForVisible('.contextMenuItemText')
           .click('.contextMenuItemText')
           .tabByIndex(0)
-          .getValue('[name="04fullname"]').should.eventually.be.equal('test')
+          .waitForInputText('[name="04fullname"]', 'test')
       })
       it('autofills in session tab', function * () {
         yield this.app.client
@@ -520,7 +519,7 @@ describe('Autofill', function () {
           .waitForVisible('.contextMenuItemText')
           .click('.contextMenuItemText')
           .tabByIndex(1)
-          .getValue('[name="04fullname"]').should.eventually.be.equal('test')
+          .waitForInputText('[name="04fullname"]', 'test')
       })
     })
     describe('private tab', function () {
@@ -543,9 +542,9 @@ describe('Autofill', function () {
           .click('[name="04fullname"]')
           .click('[name="04fullname"]')
           .windowByUrl(Brave.browserWindowUrl)
-          .waitForExist('contextMenuItemText', 500, true)
+          .waitForElementCount('contextMenuItemText', 0)
           .tabByIndex(1)
-          .getValue('[name="04fullname"]').should.eventually.be.equal('')
+          .waitForInputText('[name="04fullname"]', '')
       })
       it('does not autofill in regular tab', function * () {
         yield this.app.client
@@ -555,9 +554,9 @@ describe('Autofill', function () {
           .click('[name="04fullname"]')
           .click('[name="04fullname"]')
           .windowByUrl(Brave.browserWindowUrl)
-          .waitForExist('contextMenuItemText', 500, true)
+          .waitForElementCount('contextMenuItemText', 0)
           .tabByIndex(0)
-          .getValue('[name="04fullname"]').should.eventually.be.equal('')
+          .waitForInputText('[name="04fullname"]', '')
       })
     })
     describe('clear autocomplete data', function () {
@@ -582,7 +581,7 @@ describe('Autofill', function () {
           .waitForVisible('.contextMenuItemText')
           .click('.contextMenuItemText')
           .tabByIndex(0)
-          .getValue('[name="04fullname"]').should.eventually.be.equal('test')
+          .waitForInputText('[name="04fullname"]', 'test')
       })
       it('clear data now', function * () {
         yield this.app.client
@@ -607,9 +606,9 @@ describe('Autofill', function () {
           .click('[name="04fullname"]')
           .click('[name="04fullname"]')
           .windowByUrl(Brave.browserWindowUrl)
-          .waitForExist('contextMenuItemText', 500, true)
+          .waitForElementCount('contextMenuItemText', 0)
           .tabByIndex(1)
-          .getValue('[name="04fullname"]').should.eventually.be.equal('')
+          .waitForInputText('[name="04fullname"]', '')
       })
     })
   })
@@ -634,7 +633,7 @@ describe('Autofill', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible('.contextMenuItemText')
         .keys(Brave.keys.PAGEDOWN)
-        .waitForVisible('.contextMenuItemText', 1000, true)
+        .waitForElementCount('.contextMenuItemText', 0)
     })
     it('hide when new tab', function * () {
       yield this.app.client
@@ -645,7 +644,7 @@ describe('Autofill', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible('.contextMenuItemText')
         .ipcSend(messages.SHORTCUT_NEW_FRAME, this.formfill + '?2')
-        .waitForVisible('.contextMenuItemText', 1000, true)
+        .waitForElementCount('.contextMenuItemText', 0)
     })
   })
 })

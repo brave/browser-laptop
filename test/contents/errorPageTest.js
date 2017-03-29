@@ -28,9 +28,9 @@ describe('errorPage', function () {
         .waitForVisible('span[data-l10n-id=nameNotResolved]')
         .waitForVisible('button[data-l10n-id=errorReload]')
         .waitForVisible(errorUrl)
-        .getText(errorUrl).should.eventually.be.equal(this.url)
-        .isVisible('button[data-l10n-id=errorReload]').should.eventually.be.true
-        .isVisible('button[data-l10n-id=back]').should.eventually.be.true
+        .waitForTextValue(errorUrl, this.url)
+        .waitForVisible('button[data-l10n-id=errorReload]')
+        .waitForVisible('button[data-l10n-id=back]')
     })
 
     it('should go back to newtab when back is clicked', function * () {
@@ -50,8 +50,8 @@ describe('errorPage', function () {
         .waitForUrl(getTargetAboutUrl('about:error'))
         // still no back button for the url
         .waitForVisible(errorUrl)
-        .getText(errorUrl).should.eventually.be.equal(this.url)
-        .isVisible('button[data-l10n-id=back]').should.eventually.be.false
+        .waitForTextValue(errorUrl, this.url)
+        .waitForElementCount('button[data-l10n-id=back]', 0)
     })
   })
 })

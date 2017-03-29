@@ -66,8 +66,8 @@ describe('ContextMenu', function () {
         .waitForExist(contextMenuIndexOf(1))
         .keys(Brave.keys.ENTER)
         .tabByUrl(this.formfill)
-        .getValue('[name="02frstname"]').should.eventually.be.equal('Test value')
-        .getValue(this.input).should.eventually.be.equal(this.values[1])
+        .waitForInputText('[name="02frstname"]', 'Test value')
+        .waitForInputText(this.input, this.values[1])
     })
 
     it('click on item', function * () {
@@ -81,7 +81,7 @@ describe('ContextMenu', function () {
         .waitForVisible('.contextMenu')
         .click('.contextMenuItem')
         .tabByUrl(this.formfill)
-        .getValue(this.input).should.eventually.be.equal(this.values[0])
+        .waitForInputText(this.input, this.values[0])
     })
 
     it('select item via click and keys', function * () {
@@ -99,7 +99,7 @@ describe('ContextMenu', function () {
         .waitForExist(contextMenuIndexOf(1))
         .keys(Brave.keys.ENTER)
         .tabByUrl(this.formfill)
-        .getValue(this.input).should.eventually.be.equal(this.values[1])
+        .waitForInputText(this.input, this.values[1])
     })
 
     it('select item via keys only', function * () {
@@ -125,7 +125,7 @@ describe('ContextMenu', function () {
         .waitForExist(contextMenuIndexOf(3))
         .keys(Brave.keys.ENTER)
         .tabByUrl(this.formfill)
-        .getValue(this.input).should.eventually.be.equal(this.values[3])
+        .waitForInputText(this.input, this.values[3])
     })
 
     it('check left/right on non sub menu item', function * () {
@@ -154,7 +154,7 @@ describe('ContextMenu', function () {
         .keys('\uE007')
         .pause(10)
         .tabByUrl(this.formfill)
-        .getValue(this.input).should.eventually.be.equal(this.values[2])
+        .waitForInputText(this.input, this.values[2])
     })
   })
 })

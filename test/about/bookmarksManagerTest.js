@@ -202,7 +202,7 @@ describe('about:bookmarks', function () {
         .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
         // Click the header; this should dismiss and release selection
         .click('table.sortableTable th')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]', 5000, true)
+        .waitForElementCount('table.sortableTable tr.selected td.title[data-sort="Brave"]', 0)
     })
   })
 

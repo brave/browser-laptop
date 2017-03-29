@@ -193,11 +193,7 @@ describe('Sync Panel', function () {
         .waitForExist(newDeviceButton)
         .click(newDeviceButton)
         .click('[data-l10n-id="syncShowPassphrase"]')
-        .waitUntil(function () {
-          return this.getText('#syncPassphrase').then((text) => {
-            return text === 'idyllic undergrowth sheepman chez\nwishy undergrounder verseman plyer\na a a a\na a a a'
-          })
-        })
+        .waitForTextValue('#syncPassphrase', 'idyllic undergrowth sheepman chez\nwishy undergrounder verseman plyer\na a a a\na a a a')
     })
   })
 
@@ -262,11 +258,7 @@ describe('Sync Panel', function () {
         .waitForExist(newDeviceButton)
         .click(newDeviceButton)
         .click('[data-l10n-id="syncShowPassphrase"]')
-        .waitUntil(function () {
-          return this.getText('#syncPassphrase').then((text) => {
-            return text === 'a a a a\na a a a\na a a a\na a a a'
-          })
-        })
+        .waitForTextValue('#syncPassphrase', 'a a a a\na a a a\na a a a\na a a a')
         .click('[data-l10n-id="syncShowQR"]')
         .waitUntil(function () {
           return this.getAttribute('#syncQR', 'src').then((text) => {
@@ -409,10 +401,7 @@ describe('Syncing bookmarks', function () {
       .waitForVisible(folder)
       .click(folder)
       .waitForVisible('.contextMenu')
-      .waitUntil(function () {
-        return this.getText(`.contextMenuItem:nth-child(${pageNthChild})`)
-          .then((bookmark1Title) => bookmark1Title === pageTitle)
-      })
+      .waitForTextValue(`.contextMenuItem:nth-child(${pageNthChild})`, pageTitle)
   })
 
   it('update bookmark, moving it into the folder', function * () {
@@ -424,10 +413,7 @@ describe('Syncing bookmarks', function () {
       .waitForVisible(folder)
       .click(folder)
       .waitForVisible('.contextMenu')
-      .waitUntil(function () {
-        return this.getText(`.contextMenuItem:nth-child(${pageNthChild})`)
-          .then((bookmark1Title) => bookmark1Title === pageTitle)
-      })
+      .waitForTextValue(`.contextMenuItem:nth-child(${pageNthChild})`, pageTitle)
   })
 
   it('delete folder', function * () {
@@ -446,18 +432,9 @@ describe('Syncing bookmarks', function () {
     const folder1Title = this.folder1Title
 
     yield Brave.app.client
-      .waitUntil(function () {
-        return this.getText('.bookmarkToolbarButton:nth-child(1) .bookmarkText')
-          .then((title) => title === pageTitle)
-      })
-      .waitUntil(function () {
-        return this.getText('.bookmarkToolbarButton:nth-child(2) .bookmarkText')
-          .then((title) => title === updatedTitle)
-      })
-      .waitUntil(function () {
-        return this.getText('.bookmarkToolbarButton:nth-child(3) .bookmarkText')
-          .then((title) => title === folder1Title)
-      })
+      .waitForTextValue('.bookmarkToolbarButton:nth-child(1) .bookmarkText', pageTitle)
+      .waitForTextValue('.bookmarkToolbarButton:nth-child(2) .bookmarkText', updatedTitle)
+      .waitForTextValue('.bookmarkToolbarButton:nth-child(3) .bookmarkText', folder1Title)
   })
 })
 
@@ -567,10 +544,7 @@ describe('Syncing bookmarks from an existing profile', function () {
       .waitForVisible(folder)
       .click(folder)
       .waitForVisible('.contextMenu')
-      .waitUntil(function () {
-        return this.getText(`.contextMenuItem:nth-child(${pageNthChild})`)
-          .then((bookmark1Title) => bookmark1Title === pageTitle)
-      })
+      .waitForTextValue(`.contextMenuItem:nth-child(${pageNthChild})`, pageTitle)
   })
 
   it('update bookmark, moving it into the folder', function * () {
@@ -582,10 +556,7 @@ describe('Syncing bookmarks from an existing profile', function () {
       .waitForVisible(folder)
       .click(folder)
       .waitForVisible('.contextMenu')
-      .waitUntil(function () {
-        return this.getText(`.contextMenuItem:nth-child(${pageNthChild})`)
-          .then((bookmark1Title) => bookmark1Title === pageTitle)
-      })
+      .waitForTextValue(`.contextMenuItem:nth-child(${pageNthChild})`, pageTitle)
   })
 
   it('sync order', function * () {
@@ -594,18 +565,9 @@ describe('Syncing bookmarks from an existing profile', function () {
     const folder1Title = this.folder1Title
 
     yield Brave.app.client
-      .waitUntil(function () {
-        return this.getText('.bookmarkToolbarButton:nth-child(1) .bookmarkText')
-          .then((title) => title === pageTitle)
-      })
-      .waitUntil(function () {
-        return this.getText('.bookmarkToolbarButton:nth-child(2) .bookmarkText')
-          .then((title) => title === updatedTitle)
-      })
-      .waitUntil(function () {
-        return this.getText('.bookmarkToolbarButton:nth-child(3) .bookmarkText')
-          .then((title) => title === folder1Title)
-      })
+      .waitForTextValue('.bookmarkToolbarButton:nth-child(1) .bookmarkText', pageTitle)
+      .waitForTextValue('.bookmarkToolbarButton:nth-child(2) .bookmarkText', updatedTitle)
+      .waitForTextValue('.bookmarkToolbarButton:nth-child(3) .bookmarkText', folder1Title)
   })
 })
 
@@ -678,20 +640,14 @@ describe('Syncing history', function () {
     const page2Title = this.page2Title
 
     yield Brave.app.client
-      .waitUntil(function () {
-        return this.getText('table.sortableTable tbody tr:nth-child(1) td.title')
-          .then((title) => title === page2Title)
-      })
-      .waitUntil(function () {
-        return this.getText('table.sortableTable tbody tr:nth-child(2) td.title')
-          .then((title) => title === page1Title)
-      })
+      .waitForTextValue('table.sortableTable tbody tr:nth-child(1) td.title', page2Title)
+      .waitForTextValue('table.sortableTable tbody tr:nth-child(2) td.title', page1Title)
   })
 
   it('private browsing does not sync', function * () {
     yield Brave.app.client
       .waitForElementCount('table.sortableTable tbody tr', 2)
-      .waitForVisible(`table.sortableTable td.title[data-sort="${this.page3Title}"]`, 1000, true)
+      .waitForElementCount(`table.sortableTable td.title[data-sort="${this.page3Title}"]`, 0)
   })
 })
 
@@ -810,7 +766,7 @@ describe('Syncing and clearing data prevents it from syncing', function () {
 
   it('history', function * () {
     yield Brave.app.client
-      .waitForVisible('table.sortableTable', 1000, true)
+      .waitForElementCount('table.sortableTable', 0)
   })
 
   it('site settings', function * () {
@@ -903,7 +859,7 @@ describe('Syncing then turning it off stops syncing', function () {
       .tabByIndex(0)
       .waitForElementCount('table.sortableTable tbody tr', 2)
       .waitForVisible(`table.sortableTable td.title[data-sort="${this.page1Title}"]`)
-      .waitForVisible(`table.sortableTable td.title[data-sort="${this.page2Title}"]`, 1000, true)
+      .waitForElementCount(`table.sortableTable td.title[data-sort="${this.page2Title}"]`, 0)
   })
 
   it('site settings', function * () {

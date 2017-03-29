@@ -33,11 +33,7 @@ describe('General Panel', function () {
         .click(homepageInput)
         .keys(Brave.keys.END)
         .keys('а')
-        .waitUntil(function () {
-          return this.getValue(homepageInput).then((val) => {
-            return val === 'https://www.brave.xn--com-8cd/'
-          })
-        })
+        .waitForInputText(homepageInput, 'https://www.brave.xn--com-8cd/')
     })
 
     it('homepage can be backspaced', function * () {
@@ -52,11 +48,7 @@ describe('General Panel', function () {
         .keys(Brave.keys.BACKSPACE)
         .keys(Brave.keys.BACKSPACE)
         .keys(Brave.keys.BACKSPACE)
-        .waitUntil(function () {
-          return this.getValue(homepageInput).then((val) => {
-            return val === 'https://www.brave.co'
-          })
-        })
+        .waitForInputText(homepageInput, 'https://www.brave.co')
     })
 
     it('multiple homepages direct input', function * () {
@@ -67,11 +59,7 @@ describe('General Panel', function () {
         .click(homepageInput)
         .keys(Brave.keys.END)
         .keys('|https://duckduckgo.com')
-        .waitUntil(function () {
-          return this.getValue(homepageInput).then((val) => {
-            return val === 'https://www.brave.com/|https://duckduckgo.com'
-          })
-        })
+        .waitForInputText(homepageInput, 'https://www.brave.com/|https://duckduckgo.com')
     })
   })
 
