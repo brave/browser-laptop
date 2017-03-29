@@ -1389,16 +1389,16 @@ const styles = StyleSheet.create({
   lionBadge: {
     right: '2px',
     position: 'absolute',
-    top: '15px',
+    top: '14px',
     color: '#FFF',
-    borderRadius: '2px',
-    padding: '1px 2px',
+    borderRadius: '3px',
+    padding: '1px 1px 1px 2px',
     pointerEvents: 'none',
-    font: '7pt "Arial Narrow"',
+    font: '6pt "Arial Narrow"',
     textAlign: 'center',
-    border: '.5px solid #FFF',
+    border: '0px solid #FFF',
     background: '#555555',
-    minWidth: '9px'
+    minWidth: '10px'
   }
 })
 
