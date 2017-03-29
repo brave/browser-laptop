@@ -16,6 +16,8 @@ require('../../braveUnit')
 describe('tabContent components', function () {
   before(function () {
     mockery.registerMock('../../extensions/brave/img/tabs/new_session.svg')
+    mockery.registerMock('../../extensions/brave/img/tabs/close_btn_normal.svg')
+    mockery.registerMock('../../extensions/brave/img/tabs/close_btn_hover.svg')
     mockery.enable({
       warnOnReplace: false,
       warnOnUnregistered: false,
