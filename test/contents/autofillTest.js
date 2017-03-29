@@ -213,7 +213,7 @@ describe('Autofill', function () {
         .waitForTextValue('.creditCardPExpirationDate',
           (expMonth < 10 ? '0' + expMonth.toString() : expMonth.toString()) + '/' + expYear.toString())
     })
-    it('autofills the credit card', function * () {
+    it.skip('autofills the credit card', function * () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(this.formfill)
@@ -228,7 +228,7 @@ describe('Autofill', function () {
         .waitForInputText('[name="42ccexp_mm"]', expMonth.toString())
         .waitForInputText('[name="43ccexp_yy"]', expYear.toString())
     })
-    it('autofills the credit card in a private tab', function * () {
+    it.skip('autofills the credit card in a private tab', function * () {
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
         .ipcSend(messages.SHORTCUT_NEW_FRAME, this.formfill + '?2', { isPrivate: true })
@@ -244,7 +244,7 @@ describe('Autofill', function () {
         .waitForInputText('[name="42ccexp_mm"]', expMonth.toString())
         .waitForInputText('[name="43ccexp_yy"]', expYear.toString())
     })
-    it('autofills the updated credit card when edited', function * () {
+    it.skip('autofills the updated credit card when edited', function * () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(this.autofillPreferences)
@@ -394,7 +394,7 @@ describe('Autofill', function () {
         .waitForInputText('[name="24emailadr"]', email)
         // TODO(bridiver) - this needs to check all fields
     })
-    it('autofills the credit card', function * () {
+    it.skip('autofills the credit card', function * () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(this.formfill)
@@ -643,7 +643,9 @@ describe('Autofill', function () {
         .click('[name="04fullname"]')
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible('.contextMenuItemText')
+        .windowByUrl(Brave.browserWindowUrl)
         .ipcSend(messages.SHORTCUT_NEW_FRAME, this.formfill + '?2')
+        .waitForUrl(this.formfill + '?2')
         .waitForElementCount('.contextMenuItemText', 0)
     })
   })

@@ -31,8 +31,7 @@ describe('General Panel', function () {
         .loadUrl(prefsUrl)
         .waitForVisible(homepageInput)
         .click(homepageInput)
-        .keys(Brave.keys.END)
-        .keys('а')
+        .keys([Brave.keys.END, 'а'])
         .waitForInputText(homepageInput, 'https://www.brave.xn--com-8cd/')
     })
 
@@ -43,11 +42,7 @@ describe('General Panel', function () {
         .waitForVisible(homepageInput)
         .click(homepageInput)
         .keys(Brave.keys.END)
-        .keys('/')
-        .keys('1')
-        .keys(Brave.keys.BACKSPACE)
-        .keys(Brave.keys.BACKSPACE)
-        .keys(Brave.keys.BACKSPACE)
+        .typeText(homepageInput, ['/', '1', Brave.keys.BACKSPACE, Brave.keys.BACKSPACE, Brave.keys.BACKSPACE], 'https://www.brave.com')
         .waitForInputText(homepageInput, 'https://www.brave.co')
     })
 
@@ -58,8 +53,7 @@ describe('General Panel', function () {
         .waitForVisible(homepageInput)
         .click(homepageInput)
         .keys(Brave.keys.END)
-        .keys('|https://duckduckgo.com')
-        .waitForInputText(homepageInput, 'https://www.brave.com/|https://duckduckgo.com')
+        .typeText(homepageInput, '|https://duckduckgo.com', 'https://www.brave.com/')
     })
   })
 

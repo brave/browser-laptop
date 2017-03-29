@@ -162,7 +162,7 @@ describe('urlBar tests', function () {
 
       // now type something
       yield this.app.client
-        .setInputText(urlInput, 'b')
+        .setValue(urlInput, 'b')
         .waitForExist(urlBarSuggestions + ' li')
     })
 

@@ -59,9 +59,7 @@ function * toggleSync (client, expectedState) {
     throw new Error('expectedState is required')
   }
   yield client
-    .getTabCount().then((count) => {
-      return count === 1
-    })
+    .waitForTabCount(1)
     .tabByIndex(0)
     .loadUrl(prefsUrl)
     .waitForVisible(syncTab)
@@ -131,9 +129,7 @@ function * addBookmarkFolder (title) {
 describe('Sync Panel', function () {
   function * setup (client) {
     yield client
-      .getTabCount().then((count) => {
-        return count === 1
-      })
+      .waitForTabCount(1)
       .waitForBrowserWindow()
       .waitForVisible(urlInput)
   }
@@ -455,9 +451,7 @@ describe('Syncing bookmarks from an existing profile', function () {
     yield Brave.startApp()
     yield setupBrave(Brave.app.client)
     yield Brave.app.client
-      .getTabCount().then((count) => {
-        return count === 1
-      })
+      .waitForTabCount(1)
       .waitForBrowserWindow()
 
     // Bookmark page 1
@@ -669,9 +663,7 @@ describe('Syncing site settings', function () {
 
     // Visit page 1 and poke everything
     yield Brave.app.client
-      .getTabCount().then((count) => {
-        return count === 1
-      })
+      .waitForTabCount(1)
       .tabByIndex(0)
       .loadUrl(this.page1Url)
       .openBraveMenu(braveMenu, braveryPanel)
@@ -694,9 +686,7 @@ describe('Syncing site settings', function () {
     yield Brave.stopApp()
     yield setup(this.seed)
     yield Brave.app.client
-      .getTabCount().then((count) => {
-        return count === 1
-      })
+      .waitForTabCount(1)
       .tabByIndex(0)
       .loadUrl(this.page1Url)
   })

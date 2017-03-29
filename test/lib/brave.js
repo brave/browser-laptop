@@ -56,6 +56,31 @@ const rmDir = (dirPath) => {
   }
 }
 
+const handleTypedText = (prevValue, text) => {
+  if (typeof text === 'string') {
+    return `${prevValue}${text}`
+  } else {
+    for (let val of text) {
+      prevValue = executeType(prevValue, val)
+    }
+
+    return prevValue
+  }
+}
+
+const executeType = (current, next) => {
+  switch (next) {
+    case exports.keys.BACKSPACE:
+      current = current.slice(0, -1)
+      break
+    default:
+      current += next
+      break
+  }
+
+  return current
+}
+
 var promiseMapSeries = function (array, iterator) {
   var length = array.length
   var current = Promise.resolve()
@@ -328,7 +353,7 @@ var exports = {
       logVerbose('waitForTabCount(' + tabCount + ')')
       return this.waitUntil(function () {
         return this.getTabCount().then((count) => {
-          logVerbose('waitForTabCount("' + tabCount + '") => ' + count)
+          logVerbose(`waitForTabCount(${tabCount}) => ${count}`)
           return count === tabCount
         })
       }, 5000, null, 100)
@@ -789,6 +814,37 @@ var exports = {
           return false
         })
       }, 5000, null, 100)
+    })
+
+    this.app.client.addCommand('typeText', function (selector, text, prevValue) {
+      logVerbose(`typeText(${selector}, ${text}, ${prevValue})`)
+      prevValue = (prevValue === undefined) ? '' : prevValue
+      let current = prevValue
+      let finalValue = handleTypedText(prevValue, text)
+      let i = 0
+
+      return this.waitUntil(function () {
+        current = executeType(current, text[i])
+
+        return this.keys(text[i])
+          .waitUntil(function () {
+            return this.getValue(selector).then(function (val) {
+              return val === current
+            })
+          }).then(function (valid) {
+            if (valid) {
+              i++
+            }
+
+            if (current === finalValue) {
+              return this.getValue(selector).then(function (val) {
+                return val === finalValue
+              })
+            } else {
+              return false
+            }
+          })
+      }, 10000)
     })
   },
 
