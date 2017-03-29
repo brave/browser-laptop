@@ -95,7 +95,7 @@ class BitcoinDashboard extends ImmutableComponent {
           <div className={css(styles.settingsListTitle, styles.subTitle)} data-l10n-id='moneyAddSubTitle' />
         </div>
         <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerLast)}>
-          {this.bitcoinPurchaseButton}
+          {this.bitcoinPurchaseButton()}
           <div className={css(styles.settingsListTitle, styles.subTitle)} data-l10n-id='transferTime' />
         </div>
       </div>
