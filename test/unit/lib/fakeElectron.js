@@ -23,6 +23,11 @@ const fakeElectron = {
         isMaximized: () => false,
         webContents: {}
       }
+    },
+    Menu: {
+      buildFromTemplate: (template) => {
+        return require('./fakeElectronMenu')
+      }
     }
   },
   app: {

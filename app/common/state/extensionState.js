@@ -18,9 +18,13 @@ const extensionState = {
   },
 
   getEnabledExtensions: (state) => {
-    return state.get('extensions').filter((installInfo, extensionId) => {
-      return installInfo.get('enabled') === true
-    })
+    const extensions = state.get('extensions')
+    if (extensions) {
+      return extensions.filter((installInfo, extensionId) => {
+        return installInfo.get('enabled') === true
+      })
+    }
+    return Immutable.fromJS([])
   },
 
   getExtensionById: (state, extensionId) => {
