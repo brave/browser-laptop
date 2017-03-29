@@ -865,11 +865,10 @@ describe('navigationBar tests', function () {
 
       it('sets location to new URL', function * () {
         const page2 = this.page2
-        yield this.app.client.keys(this.page2)
-        yield this.app.client.keys(Brave.keys.ENTER)
+        yield this.app.client.keys([this.page2, Brave.keys.ENTER])
         yield this.app.client
           .waitUntil(function () {
-            return this.windowByUrl(Brave.browserWindowUrl).getValue(urlInput).then((val) => {
+            return this.getValue(urlInput).then((val) => {
               return val === page2
             })
           })
@@ -1247,6 +1246,7 @@ describe('navigationBar tests', function () {
         .waitForBookmarkDetail(page2Url, 'Page 2')
         .waitForEnabled(doneButton)
         .click(doneButton)
+        .activateURLMode()
         .waitForExist(navigatorBookmarked)
         .waitForElementCount(bookmarksToolbar, 0)
     })
