@@ -127,7 +127,6 @@
     "tldjs": "1.6.2",
     "tracking-protection": "1.1.x",
     "underscore": "1.8.3",
-    "underscore.string": "^3.3.4",
     "url-loader": "^0.5.7",
     "webtorrent-remote": "^1.0.0"
   },
