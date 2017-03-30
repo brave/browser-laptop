@@ -186,30 +186,35 @@ var exports = {
     const initialized = []
 
     this.app.client.addCommand('ipcSend', function (message, ...param) {
+      logVerbose('ipcSend(' + message + ')')
       return this.execute(function (message, ...param) {
         return devTools('electron').remote.getCurrentWindow().webContents.send(message, ...param)
       }, message, ...param).then((response) => response.value)
     })
 
     this.app.client.addCommand('maximize', function () {
+      logVerbose('maximize()')
       return this.execute(function () {
         return devTools('electron').remote.getCurrentWindow().maximize()
       }).then((response) => response.value)
     })
 
     this.app.client.addCommand('unmaximize', function () {
+      logVerbose('unmaximize()')
       return this.execute(function () {
         return devTools('electron').remote.getCurrentWindow().unmaximize()
       }).then((response) => response.value)
     })
 
     this.app.client.addCommand('ipcSendRenderer', function (message, ...param) {
+      logVerbose('ipcSendRenderer(' + message + ')')
       return this.execute(function (message, ...param) {
         return devTools('electron').ipcRenderer.send(message, ...param)
       }, message, ...param).then((response) => response.value)
     })
 
     this.app.client.addCommand('ipcSendRendererSync', function (message, ...param) {
+      logVerbose('ipcSendRenderer(' + message + ')')
       return this.execute(function (message, ...param) {
         return devTools('electron').ipcRenderer.sendSync(message, ...param)
       }, message, ...param)
@@ -252,7 +257,8 @@ var exports = {
         })
     }
 
-    this.app.client.addCommand('tabHandles', function (index) {
+    this.app.client.addCommand('tabHandles', function () {
+      logVerbose('tabHandles()')
       return windowHandlesOrig.apply(this)
         .then(function (response) {
           var handles = response.value
@@ -286,6 +292,7 @@ var exports = {
     })
 
     this.app.client.addCommand('getTabCount', function () {
+      logVerbose('getTabCount()')
       return this.tabHandles().then((response) => response.value).then(function (handles) {
         logVerbose('getTabCount() => ' + handles.length)
         return handles.length
@@ -293,8 +300,8 @@ var exports = {
     })
 
     this.app.client.addCommand('waitForBrowserWindow', function () {
+      logVerbose('waitForBrowserWindow()')
       return this.waitUntil(function () {
-        logVerbose('waitForBrowserWindow()')
         return this.windowByUrl(exports.browserWindowUrl).then((response) => {
           logVerbose('waitForBrowserWindow() => ' + JSON.stringify(response))
           return response
@@ -306,6 +313,7 @@ var exports = {
     })
 
     this.app.client.addCommand('activateTitleMode', function () {
+      logVerbose('activateTitleMode()')
       return this
         .setMouseInTitlebar(false)
         .moveToObject(activeWebview)
@@ -313,6 +321,7 @@ var exports = {
     })
 
     this.app.client.addCommand('activateURLMode', function () {
+      logVerbose('activateURLMode()')
       return this
         .setMouseInTitlebar(true)
         .moveToObject(navigator)
@@ -320,8 +329,8 @@ var exports = {
     })
 
     this.app.client.addCommand('waitForUrl', function (url) {
+      logVerbose('waitForUrl("' + url + '")')
       return this.waitUntil(function () {
-        logVerbose('waitForUrl("' + url + '")')
         return this.tabByUrl(url).then((response) => {
           logVerbose('tabByUrl("' + url + '") => ' + JSON.stringify(response))
           return response
@@ -333,12 +342,14 @@ var exports = {
     })
 
     this.app.client.addCommand('waitForSelectedText', function (text) {
+      logVerbose('waitForSelectedText("' + text + '")')
       return this.waitUntil(function () {
         return this.getSelectedText(text).then((value) => { return value === text })
       }, 5000, null, 100)
     })
 
     this.app.client.addCommand('waitForTextValue', function (selector, text) {
+      logVerbose('waitForSelectedText("' + selector + '", "' + text + '")')
       return this
         .waitForVisible(selector)
         .waitUntil(function () {
@@ -458,18 +469,21 @@ var exports = {
     })
 
     this.app.client.addCommand('getAppState', function () {
+      logVerbose('getAppState()')
       return this.execute(function () {
         return devTools('electron').testData.appStoreRenderer.state.toJS()
       })
     })
 
     this.app.client.addCommand('getWindowState', function () {
+      logVerbose('getWindowState()')
       return this.execute(function () {
         return devTools('electron').testData.windowStore.state.toJS()
       })
     })
 
     this.app.client.addCommand('setContextMenuDetail', function () {
+      logVerbose('setContextMenuDetail()')
       return this.execute(function () {
         return devTools('electron').testData.windowActions.setContextMenuDetail()
       })
@@ -494,6 +508,7 @@ var exports = {
     })
 
     this.app.client.addCommand('setInputText', function (selector, input) {
+      logVerbose('setInputText("' + selector + '", "' + input + '")')
       return this
         .activateURLMode()
         .setValue(selector, input)
@@ -501,6 +516,7 @@ var exports = {
     })
 
     this.app.client.addCommand('showFindbar', function (show, key = 1) {
+      logVerbose('showFindbar("' + show + '", "' + key + '")')
       return this.execute(function (show, key) {
         devTools('electron').testData.windowActions.setFindbarShown(Object.assign({
           key
@@ -509,6 +525,7 @@ var exports = {
     })
 
     this.app.client.addCommand('setMouseInTitlebar', function (mouseInTitleBar) {
+      logVerbose('showFindbar("' + mouseInTitleBar + '")')
       return this.execute(function (mouseInTitleBar) {
         devTools('electron').testData.windowActions.setMouseInTitlebar(mouseInTitleBar)
       }, mouseInTitleBar)
@@ -524,6 +541,7 @@ var exports = {
     })
 
     this.app.client.addCommand('setPinned', function (location, isPinned, options = {}) {
+      logVerbose('setPinned("' + location + '", "' + isPinned + '", "' + options + '")')
       return this.execute(function (location, isPinned, options) {
         devTools('electron').testData.windowActions.setPinned(devTools('immutable').fromJS(Object.assign({
           location
@@ -532,24 +550,28 @@ var exports = {
     })
 
     this.app.client.addCommand('ipcOn', function (message, fn) {
+      logVerbose('ipcOn("' + message + '")')
       return this.execute(function (message, fn) {
         return devTools('electron').remote.getCurrentWindow().webContents.on(message, fn)
       }, message, fn).then((response) => response.value)
     })
 
     this.app.client.addCommand('ipcOnce', function (message, fn) {
+      logVerbose('ipcOnce("' + message + '")')
       return this.execute(function (message, fn) {
         return devTools('electron').remote.getCurrentWindow().webContents.once(message, fn)
       }, message, fn).then((response) => response.value)
     })
 
     this.app.client.addCommand('newWindowAction', function (frameOpts, browserOpts) {
+      logVerbose('newWindowAction("' + frameOpts + '", "' + browserOpts + '")')
       return this.execute(function () {
         return devTools('appActions').newWindow()
       }, frameOpts, browserOpts).then((response) => response.value)
     })
 
     this.app.client.addCommand('quit', function () {
+      logVerbose('quit()')
       return this.execute(function () {
         return devTools('appActions').shuttingDown()
       }).then((response) => response.value)
@@ -562,6 +584,7 @@ var exports = {
      * @param {string} tag - A site tag from js/constants/siteTags.js
      */
     this.app.client.addCommand('addSite', function (siteDetail, tag) {
+      logVerbose('addSite("' + siteDetail + '", "' + tag + '")')
       let waitUrl = siteDetail.location
       if (isSourceAboutUrl(waitUrl)) {
         waitUrl = getTargetAboutUrl(waitUrl)
@@ -578,6 +601,7 @@ var exports = {
      * @param {object} siteDetail - Properties for the siteDetail to add
      */
     this.app.client.addCommand('addSiteList', function (siteDetail) {
+      logVerbose('addSiteList("' + siteDetail + '")')
       return this.execute(function (siteDetail) {
         return devTools('appActions').addSite(siteDetail)
       }, siteDetail).then((response) => response.value)
@@ -590,6 +614,7 @@ var exports = {
      * @param {boolean} enabled - Whether to enable or disable the resource
      */
     this.app.client.addCommand('setResourceEnabled', function (resourceName, enabled) {
+      logVerbose('setResourceEnabled("' + resourceName + '", "' + enabled + '")')
       return this.execute(function (resourceName, enabled) {
         return devTools('appActions').setResourceEnabled(resourceName, enabled)
       }, resourceName, enabled).then((response) => response.value)
@@ -602,6 +627,7 @@ var exports = {
      * @param {Object} options - options to pass to clone
      */
     this.app.client.addCommand('cloneTabByIndex', function (index, options) {
+      logVerbose('cloneTabByIndex("' + index + '", "' + options + '")')
       return this.getWindowState().then((val) => {
         const tabId = val.value.frames[index].tabId
         return this.execute(function (tabId, options) {
@@ -617,6 +643,7 @@ var exports = {
      * @param {string} tag - A site tag from js/constants/siteTags.js
      */
     this.app.client.addCommand('removeSite', function (siteDetail, tag) {
+      logVerbose('removeSite("' + siteDetail + '", "' + tag + '")')
       return this.execute(function (siteDetail, tag) {
         return devTools('appActions').removeSite(siteDetail, tag)
       }, siteDetail, tag).then((response) => response.value)
@@ -629,6 +656,7 @@ var exports = {
      * @param value - The setting value to change to
      */
     this.app.client.addCommand('changeSetting', function (key, value) {
+      logVerbose('changeSetting("' + key + '", "' + value + '")')
       return this
         .execute(function (key, value) {
           return devTools('appActions').changeSetting(key, value)
@@ -640,6 +668,7 @@ var exports = {
      * Sets the sync init data
      */
     this.app.client.addCommand('saveSyncInitData', function (seed, deviceId, lastFetchTimestamp, qr) {
+      logVerbose('saveSyncInitData("' + seed + '", "' + deviceId + '", "' + lastFetchTimestamp + '")')
       return this
         .execute(function (seed, deviceId, lastFetchTimestamp, qr) {
           return devTools('appActions').saveSyncInitData(seed, deviceId, lastFetchTimestamp, qr)
@@ -653,6 +682,7 @@ var exports = {
      * @param value - The setting value to change to
      */
     this.app.client.addCommand('changeSiteSetting', function (hostPattern, key, value) {
+      logVerbose('changeSiteSetting("' + hostPattern + '", "' + key + '", "' + value + '")')
       return this.execute(function (hostPattern, key, value) {
         return devTools('appActions').changeSiteSetting(hostPattern, key, value)
       }, hostPattern, key, value).then((response) => response.value)
@@ -664,12 +694,14 @@ var exports = {
      * @param {object} clearDataDetail - the options to use for clearing
      */
     this.app.client.addCommand('onClearBrowsingData', function (clearDataDetail) {
+      logVerbose('onClearBrowsingData("' + clearDataDetail + '")')
       return this.execute(function (clearDataDetail) {
         return devTools('appActions').onClearBrowsingData(clearDataDetail)
       }, clearDataDetail).then((response) => response.value)
     })
 
     this.app.client.addCommand('getDefaultWindowHeight', function () {
+      logVerbose('getDefaultWindowHeight()')
       return this.execute(function () {
         let screen = devTools('electron').remote.screen
         let primaryDisplay = screen.getPrimaryDisplay()
@@ -678,6 +710,7 @@ var exports = {
     })
 
     this.app.client.addCommand('getDefaultWindowWidth', function () {
+      logVerbose('getDefaultWindowWidth()')
       return this.execute(function () {
         let screen = devTools('electron').remote.screen
         let primaryDisplay = screen.getPrimaryDisplay()
@@ -686,6 +719,7 @@ var exports = {
     })
 
     this.app.client.addCommand('getPrimaryDisplayHeight', function () {
+      logVerbose('getPrimaryDisplayHeight()')
       return this.execute(function () {
         let screen = devTools('electron').remote.screen
         return screen.getPrimaryDisplay().bounds.height
@@ -699,6 +733,7 @@ var exports = {
     })
 
     this.app.client.addCommand('getPrimaryDisplayWidth', function () {
+      logVerbose('getPrimaryDisplayWidth()')
       return this.execute(function () {
         let screen = devTools('electron').remote.screen
         return screen.getPrimaryDisplay().bounds.width
@@ -706,12 +741,14 @@ var exports = {
     })
 
     this.app.client.addCommand('resizeWindow', function (width, height) {
+      logVerbose('resizeWindow("' + width + '", "' + height + '")')
       return this.execute(function (width, height) {
         return devTools('electron').remote.getCurrentWindow().setSize(width, height)
       }, width, height).then((response) => response.value)
     })
 
     this.app.client.addCommand('windowParentByUrl', function (url, childSelector = 'webview') {
+      logVerbose('windowParentByUrl("' + url + '", "' + childSelector + '")')
       var context = this
       return this.windowHandles().then((response) => response.value).then(function (handles) {
         return promiseMapSeries(handles, function (handle) {
@@ -728,8 +765,8 @@ var exports = {
     })
 
     this.app.client.addCommand('windowByUrl', function (url) {
-      var context = this
       logVerbose('windowByUrl("' + url + '")')
+      var context = this
       return this.windowHandles().then((response) => response.value).then(function (handles) {
         return promiseMapSeries(handles, function (handle) {
           return context.window(handle).getUrl()
@@ -746,6 +783,7 @@ var exports = {
     })
 
     this.app.client.addCommand('tabByUrl', function (url) {
+      logVerbose('tabByUrl("' + url + '")')
       var context = this
       return this.tabHandles().then((response) => response.value).then(function (handles) {
         return promiseMapSeries(handles, function (handle) {
@@ -762,6 +800,7 @@ var exports = {
     })
 
     this.app.client.addCommand('sendWebviewEvent', function (frameKey, eventName, ...params) {
+      logVerbose('sendWebviewEvent("' + frameKey + '", "' + eventName + '")')
       return this.execute(function (frameKey, eventName, ...params) {
         const webview = document.querySelector('webview[data-frame-key="' + frameKey + '"]')
         // Get the internal view instance ID from the selected webview
@@ -775,6 +814,7 @@ var exports = {
     })
 
     this.app.client.addCommand('waitForElementFocus', function (selector, timeout) {
+      logVerbose('waitForElementFocus("' + selector + '", "' + timeout + '")')
       let activeElement
       return this.waitForVisible(selector, timeout)
         .element(selector)
@@ -799,6 +839,7 @@ var exports = {
 
     // retrieve a map of all the translations per existing IPC message 'translations'
     this.app.client.addCommand('translations', function () {
+      logVerbose('translations()')
       return this.ipcSendRendererSync('translations')
     })
 

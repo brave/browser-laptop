@@ -341,6 +341,7 @@ describe('bookmark tests', function () {
       ])
       yield this.app.client
         .addSiteList(sites)
+        .waitForBrowserWindow()
         .waitUntil(function () {
           return this.getAppState().then((val) => {
             const bookmarksMenu = val.value.menu.template.find((item) => {
