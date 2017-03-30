@@ -88,7 +88,7 @@ module.exports = {
   paymentQRCode: '[title="Brave wallet QR code"]',
   removeButton: '[data-l10n-id="remove"]',
   paymentHistoryButton: '[data-test-id="paymentHistoryButton"]',
-  paymentsWelcomePage: '[data-test-id="paymentsMessage"',
+  paymentsWelcomePage: '[data-test-id="paymentsMessage"]',
   autofillAddressPanel: '.autofillAddressPanel',
   autofillCreditCardPanel: '.autofillCreditCardPanel',
   allowRunInsecureContentButton: '.allowRunInsecureContentButton',
