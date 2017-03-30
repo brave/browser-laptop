@@ -1102,7 +1102,10 @@ class Main extends ImmutableComponent {
                     onClick={this.onBraveMenu} />
                   {
                     !this.braveShieldsDisabled && totalBlocks
-                    ? <div className={css(styles.lionBadge)} data-test-id='lionBadge'>
+                    ? <div className={css(
+                        styles.lionBadge,
+                        (customTitlebar.menubarVisible || !platformUtil.isWindows()) && styles.lionBadgeRight
+                      )} data-test-id='lionBadge'>
                       {totalBlocks}
                     </div>
                     : null
@@ -1402,6 +1405,10 @@ let styling = {
     border: '0px solid #FFF',
     background: '#555555',
     minWidth: '10px'
+  },
+  lionBadgeRight: {
+    left: 'auto',
+    right: '2px'
   },
   braveMenuContainer: {
     position: 'relative'
