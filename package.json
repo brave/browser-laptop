@@ -104,7 +104,7 @@
     "keytar": "^3.0.0",
     "l20n": "^3.5.1",
     "ledger-balance": "^0.8.64",
-    "ledger-client": "^0.9.7",
+    "ledger-client": "^0.9.9",
     "ledger-geoip": "^0.8.75",
     "ledger-publisher": "^0.9.0",
     "lru-cache": "^1.0.0",
