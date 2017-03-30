@@ -36,7 +36,7 @@
 - Fixed Alt+PrtSc key combination is not recognized by Brave. ([#7566](https://github.com/brave/browser-laptop/issues/7566))
 - Fixed Flash discovery for sites if shields are down. ([#7549](https://github.com/brave/browser-laptop/issues/7549))
 - Fixed closed order for tabs in History menu. ([#7548](https://github.com/brave/browser-laptop/issues/7548))
-- Fixed header bar and tab styles (follow up to flat interface). ([#7546](https://github.com/brave/browser-laptop/issues/7546))
+- Fixed header bar and tab styles (new flat interface look & feel). ([#7546](https://github.com/brave/browser-laptop/issues/7546))
 - Fixed tab UI - fade tab on the right-hand side instead of using ellipsis. ([#7535](https://github.com/brave/browser-laptop/issues/7535))
 - Fixed urlbar suggestions to show base domain along with deep linked history suggestions. ([#7533](https://github.com/brave/browser-laptop/issues/7533))
 - Fixed 'hide sites with <1% usage' should be default on in about:preferences#payments. ([#7520](https://github.com/brave/browser-laptop/issues/7520))
