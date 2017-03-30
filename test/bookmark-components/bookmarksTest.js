@@ -218,7 +218,7 @@ describe('bookmark tests', function () {
           })
           it('removes the bookmark from the toolbar', function * () {
             yield this.app.client
-              .waitForElementCount('[data-test-id="bookmarkText"]', 0)
+              .waitForExist('[data-test-id="bookmarkText"]', Brave.defaultTimeout, true)
           })
         })
       })
@@ -247,11 +247,12 @@ describe('bookmark tests', function () {
         const page1Url = Brave.server.url('img/test.pdf')
         yield this.app.client
           .windowParentByUrl(page1Url)
+          .windowByUrl(page1Url)
           .activateURLMode()
           .waitForVisible(navigatorNotBookmarked)
           .click(navigatorNotBookmarked)
           .waitForVisible(doneButton)
-          .waitForBookmarkDetail(page1Url, 'test.pdf')
+          .waitForBookmarkDetail(page1Url, 'test.ico - test.pdf')
           .waitForEnabled(doneButton)
           .click(doneButton)
           .activateURLMode()
