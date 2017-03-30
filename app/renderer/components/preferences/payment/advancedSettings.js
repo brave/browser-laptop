@@ -62,15 +62,6 @@ class AdvancedSettingsContent extends ImmutableComponent {
             listClassName={css(styles.list)}
           >
             <SettingCheckbox
-              dataL10nId='minimumPercentage'
-              prefKey={settings.MINIMUM_PERCENTAGE}
-              settings={this.props.settings}
-              onChangeSetting={this.props.onChangeSetting}
-              className={css(styles.listItem)}
-              switchClassName={css(styles.checkboxSwitch)}
-              labelClassName={css(commonStyles.noMarginBottom)}
-            />
-            <SettingCheckbox
               dataL10nId='notifications'
               prefKey={settings.PAYMENTS_NOTIFICATIONS}
               settings={this.props.settings}

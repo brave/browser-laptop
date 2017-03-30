@@ -8,11 +8,17 @@ const {StyleSheet, css} = require('aphrodite')
 // components
 const ImmutableComponent = require('../../../../../js/components/immutableComponent')
 const SortableTable = require('../../../../../js/components/sortableTable')
+const SwitchControl = require('../../../../../js/components/switchControl')
+const Button = require('../../../../../js/components/button')
+const PinnedInput = require('./pinnedInput')
 
 // style
 const globalStyles = require('../../styles/global')
+const commonStyles = require('../../styles/commonStyles')
 const verifiedGreenIcon = require('../../../../extensions/brave/img/ledger/verified_green_icon.svg')
 const verifiedWhiteIcon = require('../../../../extensions/brave/img/ledger/verified_white_icon.svg')
+const removeIcon = require('../../../../extensions/brave/img/ledger/icon_remove.svg')
+const pinIcon = require('../../../../extensions/brave/img/ledger/icon_pin.svg')
 
 // other
 const settings = require('../../../../../js/constants/settings')
@@ -21,8 +27,13 @@ const aboutActions = require('../../../../../js/about/aboutActions')
 const {SettingCheckbox, SiteSettingCheckbox} = require('../../settings')
 
 class LedgerTable extends ImmutableComponent {
+
   get synopsis () {
     return this.props.ledgerData.get('synopsis')
+  }
+
+  showAll (value) {
+    this.props.onChangeSetting(settings.HIDE_LOWER_SITES, value)
   }
 
   getFormattedTime (synopsis) {
@@ -73,68 +84,114 @@ class LedgerTable extends ImmutableComponent {
     return true
   }
 
+  isPinned (synopsis) {
+    return synopsis.get('pinPercentage') > 0
+  }
+
+  pinPercentageValue (synopsis) {
+    return synopsis.get('pinPercentage')
+  }
+
   banSite (hostPattern) {
     aboutActions.changeSiteSetting(hostPattern, 'ledgerPaymentsShown', false)
   }
 
+  togglePinSite (hostPattern, pinned, percentage) {
+    if (pinned) {
+      if (percentage < 1) {
+        percentage = 1
+      } else {
+        percentage = Math.floor(percentage)
+      }
+
+      aboutActions.changeSiteSetting(hostPattern, 'ledgerPinPercentage', percentage)
+      aboutActions.changeSiteSetting(hostPattern, 'ledgerPayments', true)
+    } else {
+      aboutActions.changeSiteSetting(hostPattern, 'ledgerPinPercentage', 0)
+    }
+  }
+
   get columnClassNames () {
     return [
-      css(styles.tableTd),
-      css(styles.tableTd, styles.alignRight),
-      css(styles.tableTd),
-      css(styles.tableTd),
-      css(styles.tableTd, styles.alignRight),
-      css(styles.tableTd, styles.alignRight),
-      css(styles.tableTd, styles.alignRight)
+      css(styles.tableTd, styles.alignRight, styles.verifiedTd), // verified
+      css(styles.tableTd, styles.alignRight), // sites
+      css(styles.tableTd),                    // include
+      css(styles.tableTd, styles.alignRight), // views
+      css(styles.tableTd, styles.alignRight), // time spent
+      css(styles.tableTd, styles.alignRight, styles.percTd), // percentage
+      css(styles.tableTd, styles.alignLeft)   // actions
+    ]
+  }
+
+  rowClassNames (pinnedRows, unPinnedRows) {
+    let j = -1
+
+    return [
+      pinnedRows.map(item => {
+        j++
+        return this.enabledForSite(item)
+          ? css(styles.tableTr, j % 2 && styles.tableTdBg)
+          : css(styles.tableTr, styles.paymentsDisabled, j % 2 && styles.tableTdBg)
+      }).toJS(),
+      unPinnedRows.map(item => {
+        j++
+        return this.enabledForSite(item)
+          ? css(styles.tableTr, j % 2 && styles.tableTdBg)
+          : css(styles.tableTr, styles.paymentsDisabled, j % 2 && styles.tableTdBg)
+      }).toJS()
     ]
   }
 
   getRow (synopsis) {
-    if (!synopsis || !synopsis.get || !this.shouldShow(synopsis)) {
-      return []
-    }
     const faviconURL = synopsis.get('faviconURL')
-    const rank = synopsis.get('rank')
     const views = synopsis.get('views')
     const verified = synopsis.get('verified')
+    const pinned = this.isPinned(synopsis)
     const duration = synopsis.get('duration')
     const publisherURL = synopsis.get('publisherURL')
-    const percentage = synopsis.get('percentage')
+    const percentage = pinned ? this.pinPercentageValue(synopsis) : synopsis.get('percentage')
     const site = synopsis.get('site')
     const defaultAutoInclude = this.enabledForSite(synopsis)
 
+    const rowRefName = 'rowPercentage_' + site
+    if (this.refs[rowRefName]) {
+      this.refs[rowRefName].value = percentage
+    }
+
     return [
       {
-        html: <div className={css(styles.neverShowSiteIcon)}
-          onClick={this.banSite.bind(this, this.getHostPattern(synopsis))}>
-          <span className={globalStyles.appIcons.exclude} />
-        </div>,
+        html: verified && this.getVerifiedIcon(synopsis),
         value: ''
       },
-      rank,
       {
         html: <div>
-          {
-            verified && this.getVerifiedIcon(synopsis)
-          }
-          <a className={css(styles.siteData)} href={publisherURL} target='_blank'>
+          <a className={css(styles.siteData)} href={publisherURL} target='_blank' tabIndex={-1}>
             {
               faviconURL
                 ? <img className={css(styles.favicon)} src={faviconURL} alt={site} />
                 : <span className={css(styles.defaultIcon)}><span className={globalStyles.appIcons.defaultIcon} /></span>
             }
-            <span className={css(styles.url)}>{site}</span>
+            <span className={css(styles.url)} data-test-id='siteName'>{site}</span>
           </a>
         </div>,
         value: site
       },
       {
-        html: <SiteSettingCheckbox small
-          hostPattern={this.getHostPattern(synopsis)}
-          defaultValue={defaultAutoInclude}
-          prefKey='ledgerPayments'
-          siteSettings={this.props.siteSettings}
-          checked={this.enabledForSite(synopsis)} />,
+        html: pinned
+          ? <SwitchControl
+            small
+            disabled
+            checkedOn
+            indicatorClassName={css(styles.pinnedToggle)}
+            onClick={() => {}}
+          />
+          : <SiteSettingCheckbox small
+            hostPattern={this.getHostPattern(synopsis)}
+            defaultValue={defaultAutoInclude}
+            prefKey='ledgerPayments'
+            siteSettings={this.props.siteSettings}
+            checked={this.enabledForSite(synopsis)}
+          />,
         value: this.enabledForSite(synopsis) ? 1 : 0
       },
       views,
@@ -142,7 +199,31 @@ class LedgerTable extends ImmutableComponent {
         html: this.getFormattedTime(synopsis),
         value: duration
       },
-      percentage
+      {
+        html: <span data-test-id='percentageValue'>
+          {
+            pinned
+            ? <PinnedInput
+              defaultValue={percentage}
+              patern={this.getHostPattern(synopsis)}
+            />
+            : percentage
+          }
+        </span>,
+        value: percentage
+      },
+      {
+        html: <span>
+          <span className={css(styles.mainIcon, styles.pinIcon, pinned && styles.pinnedIcon)}
+            onClick={this.togglePinSite.bind(this, this.getHostPattern(synopsis), !pinned, percentage)}
+            data-test-pinned={pinned}
+          />
+          <span className={css(styles.mainIcon, styles.removeIcon)}
+            onClick={this.banSite.bind(this, this.getHostPattern(synopsis))}
+          />
+        </span>,
+        value: ''
+      }
     ]
   }
 
@@ -150,6 +231,33 @@ class LedgerTable extends ImmutableComponent {
     if (!this.synopsis || !this.synopsis.size) {
       return null
     }
+
+    const allRows = this.synopsis.filter(synopsis => {
+      return (!getSetting(settings.HIDE_EXCLUDED_SITES, this.props.settings) || this.enabledForSite(synopsis)) &&
+        this.shouldShow(synopsis)
+    })
+    const pinnedRows = allRows.filter(synopsis => {
+      return this.isPinned(synopsis)
+    })
+    let unPinnedRows = allRows.filter(synopsis => {
+      return !this.isPinned(synopsis)
+    })
+
+    const totalUnPinnedRows = unPinnedRows.size
+    const hideLower = getSetting(settings.HIDE_LOWER_SITES, this.props.settings)
+
+    if (hideLower && totalUnPinnedRows > 10) {
+      let sumUnPinned = 0
+      let threshold = 90
+      const limit = 0.9 // show only 90th of publishers
+
+      threshold = unPinnedRows.reduce((value, publisher) => value + publisher.get('percentage'), 0) * limit
+      unPinnedRows = unPinnedRows.filter(publisher => {
+        sumUnPinned += publisher.get('percentage')
+        return !(sumUnPinned >= threshold)
+      })
+    }
+
     return <div data-test-id='ledgerTable'>
       <div className={css(styles.hideExcludedSites)}>
         <div className={css(styles.columnOffset)} />
@@ -164,36 +272,54 @@ class LedgerTable extends ImmutableComponent {
       </div>
       <SortableTable
         tableClassNames={css(styles.tableClass)}
-        headings={['remove', 'rank', 'publisher', 'include', 'views', 'timeSpent', 'percentage']}
-        defaultHeading='rank'
+        headings={['', 'publisher', 'include', 'views', 'timeSpent', 'percentage', 'actions']}
+        defaultHeading='percentage'
+        defaultHeadingSortOrder='desc'
         headerClassNames={css(styles.tableTh)}
         columnClassNames={this.columnClassNames}
-        rowClassNames={this.synopsis.map((item, i) => this.enabledForSite(item)
-          ? css(styles.tableTr, i % 2 && styles.tableTdBg)
-          : css(styles.tableTr, styles.paymentsDisabled, i % 2 && styles.tableTdBg)
-        ).toJS()}
+        rowClassNames={this.rowClassNames(pinnedRows, unPinnedRows)}
+        bodyClassNames={[css(unPinnedRows.size > 0 && styles.pinnedBody), '']}
         onContextMenu={aboutActions.contextMenu}
         contextMenuName='synopsis'
-        rowObjects={this.synopsis.map(entry => {
-          return {
-            hostPattern: this.getHostPattern(entry),
-            location: entry.get('publisherURL')
-          }
-        }).toJS()}
-        rows={this.synopsis.filter(synopsis => {
-          return !getSetting(settings.HIDE_EXCLUDED_SITES, this.props.settings) || this.enabledForSite(synopsis)
-        }).map((synopsis) => this.getRow(synopsis)).toJS()}
+        rowObjects={[
+          pinnedRows.map(entry => {
+            return {
+              hostPattern: this.getHostPattern(entry),
+              location: entry.get('publisherURL')
+            }
+          }).toJS(),
+          unPinnedRows.map(entry => {
+            return {
+              hostPattern: this.getHostPattern(entry),
+              location: entry.get('publisherURL')
+            }
+          }).toJS()
+        ]}
+        rows={[
+          pinnedRows.map((synopsis) => this.getRow(synopsis)).toJS(),
+          unPinnedRows.map((synopsis) => this.getRow(synopsis)).toJS()
+        ]}
       />
+      {
+        (totalUnPinnedRows !== unPinnedRows.size && hideLower)
+        ? <div className={css(styles.showAllWrap)}>
+          <Button
+            l10nId={hideLower ? 'showAll' : 'hideLower'}
+            className={css(commonStyles.whiteButton)}
+            onClick={this.showAll.bind(this, !hideLower)}
+          />
+        </div>
+        : null
+      }
     </div>
   }
 }
 
 const verifiedBadge = (icon) => ({
-  position: 'absolute',
   height: '20px',
   width: '20px',
-  left: '-10px',
-  top: '3px',
+  marginRight: '-10px',
+  display: 'block',
   background: `url(${icon}) center no-repeat`
 })
 
@@ -213,16 +339,12 @@ const styles = StyleSheet.create({
 
   tableClass: {
     width: '100%',
-    textAlign: 'left'
+    textAlign: 'left',
+    borderCollapse: 'collapse'
   },
 
   tableTh: {
-    fontSize: '14px',
-
-    ':hover': {
-      cursor: 'pointer',
-      textDecoration: 'underline'
-    }
+    fontSize: '14px'
   },
 
   tableTr: {
@@ -236,6 +358,24 @@ const styles = StyleSheet.create({
 
   tableTdBg: {
     background: '#f6f7f7'
+  },
+
+  verifiedTd: {
+    padding: '0 0 0 15px'
+  },
+
+  percTd: {
+    width: '45px',
+    paddingLeft: '5px'
+  },
+
+  hideTd: {
+    display: 'none'
+  },
+
+  pinnedBody: {
+    borderBottom: `1px solid ${globalStyles.color.braveOrange}`,
+    borderCollapse: 'collapse'
   },
 
   siteData: {
@@ -282,8 +422,51 @@ const styles = StyleSheet.create({
     textAlign: 'right'
   },
 
+  alignLeft: {
+    textAlign: 'left'
+  },
+
   paymentsDisabled: {
     opacity: 0.6
+  },
+
+  mainIcon: {
+    backgroundColor: '#c4c5c5',
+    width: '15px',
+    height: '16px',
+    display: 'inline-block',
+    marginRight: '10px',
+    marginTop: '6px',
+
+    ':hover': {
+      backgroundColor: globalStyles.color.buttonColor
+    }
+  },
+
+  pinIcon: {
+    '-webkit-mask-image': `url(${pinIcon})`
+  },
+
+  pinnedIcon: {
+    backgroundColor: globalStyles.color.braveOrange,
+
+    ':hover': {
+      backgroundColor: globalStyles.color.braveDarkOrange
+    }
+  },
+
+  removeIcon: {
+    '-webkit-mask-image': `url(${removeIcon})`
+  },
+
+  pinnedToggle: {
+    right: '2px'
+  },
+
+  showAllWrap: {
+    textAlign: 'center',
+    paddingBottom: '10px',
+    marginTop: '-20px'
   }
 })
 

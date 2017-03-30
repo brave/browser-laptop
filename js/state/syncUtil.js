@@ -38,7 +38,8 @@ const siteSettingDefaults = {
   httpsEverywhere: true,
   fingerprintingProtection: false,
   ledgerPayments: true,
-  ledgerPaymentsShown: true
+  ledgerPaymentsShown: true,
+  ledgerPinPercentage: 0
 }
 
 // Whitelist of valid browser-laptop site fields. In browser-laptop, site

@@ -982,6 +982,7 @@ const appActions = {
   },
 
   /**
+
    * Change all undefined publishers in site settings to defined sites
    * also change all undefined ledgerPayments to value true
    * @param publishers {Object} publishers from the synopsis
@@ -989,6 +990,17 @@ const appActions = {
   enableUndefinedPublishers: function (publishers) {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_ENABLE_UNDEFINED_PUBLISHERS,
+      publishers
+    })
+  },
+
+  /**
+   * Update ledger publishers pinned percentages according to the new synopsis
+   * @param publishers {Object} updated publishers
+   */
+  changeLedgerPinnedPercentages: function (publishers) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_CHANGE_LEDGER_PINNED_PERCENTAGES,
       publishers
     })
   }

@@ -65,9 +65,9 @@ const settings = {
   SEND_USAGE_STATISTICS: 'advanced.send-usage-statistics',
   ADBLOCK_CUSTOM_RULES: 'adblock.customRules',
   HIDE_EXCLUDED_SITES: 'advanced.hide-excluded-sites',
+  HIDE_LOWER_SITES: 'advanced.hide-lower-sites',
   MINIMUM_VISIT_TIME: 'advanced.minimum-visit-time',
   MINIMUM_VISITS: 'advanced.minimum-visits',
-  MINIMUM_PERCENTAGE: 'advanced.minimum-percentage',
   AUTO_SUGGEST_SITES: 'advanced.auto-suggest-sites',
   // Sync settings
   SYNC_ENABLED: 'sync.enabled',

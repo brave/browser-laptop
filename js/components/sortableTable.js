@@ -25,9 +25,16 @@ class SortableTable extends React.Component {
     this.state = {
       selection: Immutable.Set()
     }
+    this.counter = 0
+    this.sortTable = null
   }
-  componentDidMount (event) {
-    return tableSort(this.table)
+  componentDidMount () {
+    this.sortTable = tableSort(this.table)
+    return this.sortTable
+  }
+
+  componentDidUpdate () {
+    this.sortTable.refresh()
   }
   /**
    * If you want multi-select to span multiple tables, you can
@@ -220,19 +227,42 @@ class SortableTable extends React.Component {
     return this.props.columnClassNames &&
       this.props.columnClassNames.length === this.props.headings.length
   }
-  get hasRowClassNames () {
-    return this.props.rowClassNames &&
-      this.props.rowClassNames.length === this.props.rows.length
+  get hasBodyClassNames () {
+    return this.props.bodyClassNames &&
+      this.props.bodyClassNames.length === this.props.rows.length
   }
   get hasContextMenu () {
     return typeof this.props.onContextMenu === 'function' &&
       typeof this.props.contextMenuName === 'string'
+  }
+  get isMultiDimensioned () {
+    return this.props.rows &&
+      Array.isArray(this.props.rows[0]) &&
+      (Array.isArray(this.props.rows[0][0]) || this.props.rows[0].length === 0)
+  }
+  get entryMultiDimension () {
+    for (let i = 0; i < this.props.rows.length; i++) {
+      if (this.props.rows[i].length > 0) {
+        return this.props.rows[i]
+      }
+    }
+
+    return undefined
   }
   get sortingDisabled () {
     if (typeof this.props.sortingDisabled === 'boolean') {
       return this.props.sortingDisabled
     }
     return false
+  }
+  hasRowClassNames (bodyIndex) {
+    if (this.isMultiDimensioned) {
+      return this.props.rowClassNames &&
+        this.props.rowClassNames[bodyIndex].length === this.props.rows[bodyIndex].length
+    }
+
+    return this.props.rowClassNames &&
+      this.props.rowClassNames.length === this.props.rows.length
   }
   getTableAttributes () {
     const tableAttributes = {}
@@ -244,18 +274,31 @@ class SortableTable extends React.Component {
     }
     return tableAttributes
   }
-  getRowAttributes (row, index) {
+  getRowAttributes (row, index, bodyIndex) {
     const rowAttributes = {}
+    let handlerInput
 
     // Object bound to this row. Not passed to multi-select handlers.
-    const handlerInput = this.props.rowObjects &&
+    if (this.isMultiDimensioned) {
+      // Object bound to this row. Not passed to multi-select handlers.
+      handlerInput = this.props.rowObjects[bodyIndex] &&
+      (this.props.rowObjects[bodyIndex].size > 0 || this.props.rowObjects[bodyIndex].length > 0)
+        ? (typeof this.props.rowObjects[bodyIndex].toJS === 'function'
+          ? this.props.rowObjects[bodyIndex].get(index).toJS()
+          : (typeof this.props.rowObjects[bodyIndex][index].toJS === 'function'
+            ? this.props.rowObjects[bodyIndex][index].toJS()
+            : this.props.rowObjects[bodyIndex][index]))
+        : row
+    } else {
+      handlerInput = this.props.rowObjects &&
       (this.props.rowObjects.size > 0 || this.props.rowObjects.length > 0)
-      ? (typeof this.props.rowObjects.toJS === 'function'
-        ? this.props.rowObjects.get(index).toJS()
-        : (typeof this.props.rowObjects[index].toJS === 'function'
-          ? this.props.rowObjects[index].toJS()
-          : this.props.rowObjects[index]))
-      : row
+        ? (typeof this.props.rowObjects.toJS === 'function'
+          ? this.props.rowObjects.get(index).toJS()
+          : (typeof this.props.rowObjects[index].toJS === 'function'
+            ? this.props.rowObjects[index].toJS()
+            : this.props.rowObjects[index]))
+        : row
+    }
 
     // Allow parent control to optionally specify context
     const thisArg = this.props.thisArg || this
@@ -310,6 +353,60 @@ class SortableTable extends React.Component {
 
     return rowAttributes
   }
+  generateTableRows (rows, bodyIndex) {
+    return rows.map((row, i) => {
+      const entry = row.map((item, j) => {
+        const value = typeof item === 'object' ? item.value : item
+        const html = typeof item === 'object' ? item.html : item
+        const cell = typeof item === 'object' ? item.cell : item
+        return <td className={this.hasColumnClassNames ? this.props.columnClassNames[j] : undefined} data-sort={value} data-td-index={`${j}`}>
+          {
+            cell || (value === true ? '✕' : html)
+          }
+        </td>
+      })
+      const currentIndex = this.counter
+      this.counter ++
+      const rowAttributes = row.length
+        ? this.getRowAttributes(row, i, bodyIndex)
+        : null
+
+      const classes = []
+      if (rowAttributes) classes.push(rowAttributes.className)
+      if (this.hasRowClassNames(bodyIndex)) {
+        if (this.isMultiDimensioned) {
+          classes.push(this.props.rowClassNames[bodyIndex][i])
+        } else {
+          classes.push(this.props.rowClassNames[i])
+        }
+      }
+      if (this.stateOwner.state.selection.includes(this.getGlobalIndex(currentIndex))) classes.push('selected')
+
+      return row.length
+        ? <tr {...rowAttributes}
+          data-context-menu-disable={rowAttributes && rowAttributes.onContextMenu ? true : undefined}
+          data-table-id={this.tableID}
+          data-row-index={`${currentIndex}`}
+          className={classes.join(' ')}>{entry}</tr>
+        : null
+    })
+  }
+  generateTableBody () {
+    this.counter = 0
+
+    if (this.isMultiDimensioned) {
+      return this.props.rows.map((rows, i) => {
+        const content = this.generateTableRows(rows, i)
+        return (content.length > 0)
+          ? <tbody className={this.hasBodyClassNames ? this.props.bodyClassNames[i] : undefined} data-tbody-index={`${i}`}>
+            {content}
+          </tbody>
+        : null
+      })
+    } else {
+      return <tbody>{this.generateTableRows(this.props.rows)}</tbody>
+    }
+  }
   render () {
     if (!this.props.headings || !this.props.rows) {
       return false
@@ -325,8 +422,9 @@ class SortableTable extends React.Component {
       <thead>
         <tr>
           {this.props.headings.map((heading, j) => {
+            const firstRow = this.isMultiDimensioned ? this.entryMultiDimension[0] : this.props.rows[0]
             const firstEntry = this.props.rows.length > 0
-              ? this.props.rows[0][j]
+              ? firstRow[j]
               : undefined
             let dataType = typeof firstEntry
             if (dataType === 'object' && firstEntry.value) {
@@ -337,10 +435,12 @@ class SortableTable extends React.Component {
               'sort-default': this.sortingDisabled || heading === this.props.defaultHeading
             }
             const isString = typeof heading === 'string'
+            const sortMethod = this.sortingDisabled ? 'none' : (dataType === 'number' ? 'number' : undefined)
             if (isString) headerClasses['heading-' + heading] = true
             return <th className={cx(headerClasses)}
-              data-sort-method={dataType === 'number' ? 'number' : undefined}
-              data-sort-order={this.props.defaultHeadingSortOrder}>
+              data-sort-method={sortMethod}
+              data-sort-order={this.props.defaultHeadingSortOrder}
+            >
               {
                 isString
                   ? <div className={cx({
@@ -353,39 +453,7 @@ class SortableTable extends React.Component {
           })}
         </tr>
       </thead>
-      <tbody>
-        {
-          this.props.rows.map((row, i) => {
-            const entry = row.map((item, j) => {
-              const value = typeof item === 'object' ? item.value : item
-              const html = typeof item === 'object' ? item.html : item
-              const cell = typeof item === 'object' ? item.cell : item
-              return <td className={this.hasColumnClassNames ? this.props.columnClassNames[j] : undefined} data-sort={value}>
-                {
-                  cell || (value === true ? '✕' : html)
-                }
-              </td>
-            })
-            const rowAttributes = row.length
-              ? this.getRowAttributes(row, i)
-              : null
-
-            const classes = []
-            if (rowAttributes) classes.push(rowAttributes.className)
-            if (this.hasRowClassNames) classes.push(this.props.rowClassNames[i])
-            if (this.stateOwner.state.selection.includes(this.getGlobalIndex(i))) classes.push('selected')
-            if (this.sortingDisabled) classes.push('no-sort')
-
-            return row.length
-              ? <tr {...rowAttributes}
-                data-context-menu-disable={rowAttributes && rowAttributes.onContextMenu ? true : undefined}
-                data-table-id={this.tableID}
-                data-row-index={i}
-                className={classes.join(' ')}>{entry}</tr>
-              : null
-          })
-        }
-      </tbody>
+      {this.generateTableBody()}
     </table>
   }
 }

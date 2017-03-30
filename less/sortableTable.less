@@ -45,11 +45,11 @@ table.sortableTable {
         float: right;
       }
 
-      &.sort-up:after {
+      &[aria-sort="ascending"]:after {
         content: "\f077";
       }
 
-      &.sort-down:after {
+      &[aria-sort="descending"]:after {
         content: "\f078";
       }
     }
@@ -111,11 +111,11 @@ table.sortableTable {
   }
 
   &:not(.sort) {
-    th.sort-up:after {
+    th[aria-sort="ascending"]:after {
       content: '';
     }
 
-    th.sort-down:after {
+    th[aria-sort="descending"]after {
       content: '';
     }
   }

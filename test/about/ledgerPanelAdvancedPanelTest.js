@@ -217,6 +217,7 @@ describe('Advanced payment panel tests', function () {
   it('shows an error popover if the file is empty', function * () {
     generateAndSaveRecoveryFile(context.recoveryFilePathname)
     yield recoverWalletFromFile(this.app.client)
+    context.cleanSessionStoreAfterEach = true
     yield this.app.client
       .waitForVisible(balanceNotRecovered, ledgerAPIWaitTimeout)
   })

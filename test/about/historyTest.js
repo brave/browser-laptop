@@ -66,7 +66,7 @@ describe('about:history', function () {
 
     it('defaults to sorting table by time DESC', function * () {
       yield this.app.client
-        .waitForVisible('table.sortableTable thead tr th.sort-up div[data-l10n-id="time"]')
+        .waitForVisible('table.sortableTable .sort-default[data-sort-order="desc"] div[data-l10n-id="time"]')
     })
   })
 

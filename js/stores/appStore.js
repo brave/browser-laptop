@@ -911,6 +911,15 @@ const handleAppAction = (action) => {
         }
       })
       break
+    case appConstants.APP_CHANGE_LEDGER_PINNED_PERCENTAGES:
+      Object.keys(action.publishers).map((item) => {
+        const pattern = `https?://${item}`
+        let newSiteSettings = siteSettings.mergeSiteSetting(appState.get('siteSettings'), pattern, 'ledgerPinPercentage', action.publishers[item].pinPercentage)
+        const syncObject = siteUtil.setObjectId(newSiteSettings.get(pattern))
+        newSiteSettings = newSiteSettings.set(pattern, syncObject)
+        appState = appState.set('siteSettings', newSiteSettings)
+      })
+      break
     default:
   }
 

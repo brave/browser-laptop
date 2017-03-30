@@ -100,6 +100,7 @@ module.exports = {
   contextMenu: '.contextMenu',
   okButton: '[data-l10n-id="ok"]',
   customFiltersInput: '[data-test-id="customFiltersInput"]',
+  showAllLedger: '[data-l10n-id="showAll"]',
   // used by the MessageBox control
   msgBoxSuppress: '[data-test-id^="msgBoxTab_"] .switchMiddle',
   msgBoxSuppressTrue: '[data-test-id^="msgBoxTab_"] .switchMiddle .switchBackground.switchedOn',

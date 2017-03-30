@@ -248,6 +248,7 @@ AppStore
       httpsEverywhere: boolean,
       ledgerPayments: boolean, // false if site should not be paid by the ledger. Defaults to true.
       ledgerPaymentsShown: boolean, // false if site should not be paid by the ledger and should not be shown in the UI. Defaults to true.
+      ledgerPinPercentage: number, // 0 if not pinned, otherwise is pinned with defined percentage
       mediaPermission: boolean,
       midiSysexPermission: boolean,
       notificationsPermission: boolean,
@@ -581,13 +582,15 @@ WindowStore
       hoursSpent: number, // e.g., 2
       minutesSpent: number, // e.g., 3
       percentage: number, // i.e., 0, 1, ... 100
+      pinPercentage: number, // i.e., 0, 1, ... 100
       publisherURL: string, // publisher site, e.g., "https://wikipedia.org/"
       rank: number, // i.e., 1, 2, 3, ...
       score: number, // float indicating the current score
       secondsSpent: number, // e.g., 4
       site: string, // publisher name, e.g., "wikipedia.org"
       verified: boolean, // there is a verified wallet for this publisher
-      views: number // total page-views
+      views: number, // total page-views,
+      weight: number // float indication of the ration
     }], // one entry for each publisher having a non-zero `score`
     synopsisOptions: {
       minDuration: number, // e.g., 8000 for 8 seconds
