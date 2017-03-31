@@ -106,6 +106,14 @@ const styles = StyleSheet.create({
     }
   },
 
+  private: {
+    background: 'rgba(75, 60, 110, 0.3)',
+
+    ':hover': {
+      background: globalStyles.color.privateTabBackgroundActive
+    }
+  },
+
   dragging: {
     ':hover': {
       closeTab: {
