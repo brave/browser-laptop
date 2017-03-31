@@ -374,9 +374,6 @@ const urlBarSuggestionsReducer = (state, action) => {
       state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), action.selectedIndex)
       state = setUrlSuggestions(state, action.suggestionList)
       break
-    case windowConstants.WINDOW_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS:
-      state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'searchResults']), action.searchResults)
-      break
     case windowConstants.WINDOW_SET_URL_BAR_ACTIVE:
       state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'active']), action.isActive)
       if (!action.isActive) {

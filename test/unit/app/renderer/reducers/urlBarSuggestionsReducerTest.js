@@ -160,14 +160,6 @@ describe('urlBarSuggestionsReducer unit tests', function () {
     })
   })
 
-  describe('WINDOW_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS', function () {
-    it('search results can be updated', function () {
-      const searchResults = Immutable.fromJS(['0.577215'])
-      const newState = urlBarSuggestionsReducer(windowState, {actionType: windowConstants.WINDOW_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS, searchResults})
-      assert.deepEqual(newState.getIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'searchResults']).toJS(), searchResults.toJS())
-    })
-  })
-
   describe('WINDOW_SET_URL_BAR_ACTIVE', function () {
     it('active state can be toggled', function () {
       let newState = urlBarSuggestionsReducer(windowState, {actionType: windowConstants.WINDOW_SET_URL_BAR_ACTIVE, isActive: true})
