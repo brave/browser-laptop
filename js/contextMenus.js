@@ -650,7 +650,7 @@ function getMisspelledSuggestions (selection, isMisspelled, suggestions) {
 }
 
 function getEditableItems (selection, editFlags, hasFormat) {
-  const hasSelection = selection.length > 0
+  const hasSelection = selection && selection.length > 0
   const hasClipboard = clipboard.readText().length > 0
   const template = []
 
@@ -1026,10 +1026,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
       }
     }
 
-    const editableItems = nodeProps.selectionText
-      ? getEditableItems(nodeProps.selectionText, nodeProps.editFlags, true)
-      : []
-
+    const editableItems = getEditableItems(nodeProps.selectionText, nodeProps.editFlags, true)
     template.push(...misspelledSuggestions, {
       label: locale.translation('undo'),
       accelerator: 'CmdOrCtrl+Z',

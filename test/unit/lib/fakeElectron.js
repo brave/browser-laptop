@@ -15,6 +15,9 @@ const fakeElectron = {
       on: function () {
       }
     },
+    clipboard: {
+      readText: function () { return '' }
+    },
     getCurrentWindow: function () {
       return {
         on: () => {},
