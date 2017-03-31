@@ -33,7 +33,6 @@ class Tab extends ImmutableComponent {
     this.onMouseEnter = this.onMouseEnter.bind(this)
     this.onMouseLeave = this.onMouseLeave.bind(this)
     this.onUpdateTabSize = this.onUpdateTabSize.bind(this)
-    this.isHover = false
   }
   get frame () {
     return windowStore.getFrame(this.props.tab.get('frameKey'))
@@ -140,8 +139,6 @@ class Tab extends ImmutableComponent {
       windowActions.setPreviewFrame(null)
     }
     windowActions.setTabHoverState(this.frame, false)
-
-    this.isHover = false
   }
 
   onMouseEnter (e) {
@@ -157,8 +154,6 @@ class Tab extends ImmutableComponent {
         window.setTimeout(windowActions.setPreviewFrame.bind(null, this.frame), previewMode ? 0 : 200)
     }
     windowActions.setTabHoverState(this.frame, true)
-
-    this.isHover = true
   }
 
   onAuxClick (e) {
@@ -306,7 +301,6 @@ class Tab extends ImmutableComponent {
           <TabTitle
             isActive={this.props.isActive}
             paintTabs={this.props.paintTabs}
-            isHover={this.isHover}
             tab={this.props.tab}
             pageTitle={this.displayValue}
           />
