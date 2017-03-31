@@ -1401,7 +1401,8 @@ let styling = {
     textAlign: 'center',
     border: '0px solid #FFF',
     background: '#555555',
-    minWidth: '10px'
+    minWidth: '10px',
+    WebkitUserSelect: 'none'
   },
   braveMenuContainer: {
     position: 'relative'
