@@ -1548,6 +1548,10 @@ var ledgerInfo = {
   countryCode: undefined,
   exchangeInfo: undefined,
 
+  // customer auto-renewal info
+  customer: undefined,
+  customerRequested: false,
+
   _internal: {
     exchangeExpiry: 0,
     exchanges: {},
@@ -1574,10 +1578,19 @@ var updateLedgerInfo = () => {
                           querystring.stringify({ currency: ledgerInfo.currency,
                             amount: getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT),
                             address: ledgerInfo.address })
+      ledgerInfo.customerURL = process.env.ADDFUNDS_URL + '/customers/' + ledgerInfo.address
       ledgerInfo.buyMaximumUSD = false
     }
 
     underscore.extend(ledgerInfo, ledgerInfo._internal.cache || {})
+    if (process.env.ADDFUNDS_URL && !ledgerInfo.customer && !ledgerInfo.customerRequested) {
+      ledgerInfo.customerRequested = true
+      retrieveCustomerInfo({ address: ledgerInfo.address }, (customer) => {
+        ledgerInfo.customer = customer
+        ledgerInfo.customer.ago = moment(customer.lastChargeTimestamp).fromNow()
+        updateLedgerInfo()
+      })
+    }
   }
 
   if ((client) && (now > ledgerInfo._internal.geoipExpiry)) {
@@ -1690,6 +1703,22 @@ var callback = (err, result, delayTime) => {
 
   muonWriter(pathName(statePath), result)
   run(delayTime)
+}
+
+var retrieveCustomerInfo = (params, callback) => {
+  var options = {
+    url: process.env.ADDFUNDS_URL + '/v1/customers/' + params.address,
+    method: params.method || 'GET',
+    responseType: 'text',
+    headers: underscore.defaults(params.headers || {}, { 'content-type': 'application/json; charset=utf-8' }),
+    verboseP: params.verboseP || false
+  }
+
+  request.request(options, (err, response, body) => {
+    if (err) return null
+    var customer = response.statusCode === 200 ? JSON.parse(body) : null
+    callback(customer)
+  })
 }
 
 var roundtrip = (params, options, callback) => {
@@ -2138,6 +2167,7 @@ const showNotifications = () => {
   } else {
     showDisabledNotifications()
   }
+  // TODO - check last time I did this 3 days of reconciliation & autorenewal & balance insufficient & more than 1 day since last charge
 }
 
 // When Payments is disabled
@@ -2173,6 +2203,8 @@ const showEnabledNotifications = () => {
   const reconcileStamp = ledgerInfo.reconcileStamp
 
   if (!reconcileStamp) return
+
+  // TODO - if insufficient and three days
 
   if (reconcileStamp - underscore.now() < msecs.day) {
     if (sufficientBalanceToReconcile()) {

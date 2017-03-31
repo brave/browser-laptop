@@ -32,6 +32,23 @@ const aboutActions = require('../../../../../js/about/aboutActions')
 // TODO: report when funds are too low
 // TODO: support non-USD currency
 class EnabledContent extends ImmutableComponent {
+  customerButton () {
+    const ledgerData = this.props.ledgerData.toJSON()
+    const buttonText = 'manageAutorenewal'
+    const URL = ledgerData.customerURL
+    return <div
+      className={cx({
+        [css(styles.autoRenewalLinkContainer)]: true
+      })}>
+      <a href={URL}
+        target='_blank'
+        data-l10n-id={buttonText}
+        className={cx({
+          [css(styles.autoRenewalLink)]: true
+        })} />
+    </div>
+  }
+
   walletButton () {
     const ledgerData = this.props.ledgerData
     const buttonText = ledgerData.get('created')
@@ -218,6 +235,7 @@ class EnabledContent extends ImmutableComponent {
               </td>
               <td className={css(styles.tableTd)}>
                 {this.walletButton()}
+                {ledgerData.get('customer') ? this.customerButton() : '' }
                 <div className={css(styles.walletStatus)}
                   data-test-id='walletStatus'
                   data-l10n-id={walletStatusText.id}
@@ -323,6 +341,15 @@ const styles = StyleSheet.create({
   walletStatus: {
     marginTop: '15px',
     lineHeight: 1.5
+  },
+
+  autoRenewalLinkContainer: {
+    marginTop: '8px'
+  },
+
+  autoRenewalLink: {
+    marginTop: '8px',
+    color: globalStyles.color.braveOrange
   }
 })
 
