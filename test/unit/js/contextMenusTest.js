@@ -6,6 +6,7 @@
 const mockery = require('mockery')
 const assert = require('assert')
 const sinon = require('sinon')
+const fakeElectron = require('../lib/fakeElectron')
 let fakeElectronMenu
 let contextMenus
 require('../braveUnit')
@@ -21,7 +22,7 @@ describe('Context menu module unit tests', function () {
       warnOnUnregistered: false,
       useCleanCache: true
     })
-    mockery.registerMock('electron', require('../lib/fakeElectron'))
+    mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('../js/l10n', fakeLocale)
     contextMenus = require('../../../js/contextMenus')
     fakeElectronMenu = require('../lib/fakeElectronMenu')
@@ -33,16 +34,35 @@ describe('Context menu module unit tests', function () {
 
   describe('onMainContextMenu', function () {
     describe('when calling mainTemplateInit', function () {
+      let clipboardReadTextSpy
+      let menuBuildFromTemplateSpy
       let menuPopupSpy
       let menuDestroySpy
 
       before(function () {
+        clipboardReadTextSpy = sinon.spy(fakeElectron.remote.clipboard, 'readText')
+        menuBuildFromTemplateSpy = sinon.spy(fakeElectron.remote.Menu, 'buildFromTemplate')
         menuPopupSpy = sinon.spy(fakeElectronMenu, 'popup')
         menuDestroySpy = sinon.spy(fakeElectronMenu, 'destroy')
       })
 
       after(function () {
+        clipboardReadTextSpy.restore()
+        menuBuildFromTemplateSpy.restore()
         menuPopupSpy.restore()
+        menuDestroySpy.restore()
+      })
+
+      it('calls clipboard.readText', function () {
+        clipboardReadTextSpy.reset()
+        contextMenus.onMainContextMenu()
+        assert.equal(clipboardReadTextSpy.calledOnce, true)
+      })
+
+      it('calls Menu.buildFromTemplate', function () {
+        menuBuildFromTemplateSpy.reset()
+        contextMenus.onMainContextMenu()
+        assert.equal(menuBuildFromTemplateSpy.calledOnce, true)
       })
 
       it('calls menu.popup', function () {
