@@ -91,7 +91,7 @@ class DownloadItem extends ImmutableComponent {
       })}>
       {
         this.props.deleteConfirmationVisible
-        ? <div className='deleteConfirmation'>Delete?<Button l10nId='ok' className='primaryButton confirmDeleteButton' onClick={this.onDeleteDownload} /></div>
+        ? <div className='deleteConfirmation'><span data-l10n-id='downloadDeleteConfirmation' /><Button l10nId='ok' className='primaryButton confirmDeleteButton' onClick={this.onDeleteDownload} /></div>
         : null
       }
       <div className='downloadActions'>
