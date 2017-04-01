@@ -23,7 +23,8 @@ const aboutActions = require('./aboutActions')
 
 const ipc = window.chrome.ipcRenderer
 
-require('../../less/contributionStatement.less')
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../app/renderer/components/styles/global')
 
 class ContributionStatement extends ImmutableComponent {
   constructor () {
@@ -116,7 +117,7 @@ class ContributionStatement extends ImmutableComponent {
 
   get htmlDataURL () {
     let generatedStylesheet = document.head.querySelector('style').outerHTML
-    let dataURL = 'data:text/html,' + encodeURIComponent('<html><head><meta charset="utf-8">' + generatedStylesheet + '</head><body style="-webkit-print-color-adjust:exact">' + ReactDOM.findDOMNode(this).outerHTML + '</body></html>')
+    let dataURL = 'data:text/html,' + encodeURIComponent('<html><head><meta charset="utf-8">' + generatedStylesheet + '</head><body>' + ReactDOM.findDOMNode(this).outerHTML + '</body></html>')
 
     return dataURL
   }
@@ -160,14 +161,14 @@ class ContributionStatement extends ImmutableComponent {
 
   get ContributionStatementHeader () {
     return (
-      <div className='titleBar contributionStatementHeader'>
-        <div className='sectionTitleWrapper pull-left'>
-          <div id='braveLogo' />
-          <span className='sectionTitle' data-l10n-id='bravePayments' />
-          <span className='sectionSubTitle' data-l10n-id='beta' />
+      <div className={css(styles.flexJustifyBetween, styles.statement__header)} data-test-id='contributionStatementHeader'>
+        <div className={css(styles.flexAlignCenter, styles.header__titleWrapper)}>
+          <div id='braveLogo' className={css(styles.braveLogo, styles.titleWrapper__braveLogo)} />
+          <span className={css(styles.titleWrapper__sectionTitle, styles.sectionTitle__bravePayments)} data-l10n-id='bravePayments' />
+          <sup className={css(styles.titleWrapper__sectionSubTitle)} data-l10n-id='beta' />
         </div>
-        <div className='sectionTitleWrapper pull-right'>
-          <span className='sectionTitle smaller pull-right' data-l10n-id='contributionStatement' />
+        <div className={css(styles.header__titleWrapper)}>
+          <span className={css(styles.titleWrapper__sectionTitle)} data-l10n-id='contributionStatement' />
         </div>
       </div>
     )
@@ -189,12 +190,22 @@ class ContributionStatement extends ImmutableComponent {
 
   get ContributionStatementSummaryBox () {
     return (
-      <div className='contributionStatementSummaryBox pull-right'>
-        <table className='contributionStatementSummaryBoxTable'>
+      <div className={css(styles.flexJustifyEnd, styles.statement__summaryBox)}
+        data-test-id='contributionStatementSummaryBox'>
+        <table className={css(styles.statement__summaryBoxTable)} data-test-id='contributionStatementSummaryBoxTable'>
           <tbody>
-            <tr><td className='leftColumn' data-l10n-id='contributionDate' /><td className='rightColumn'>{this.contributionDate}</td></tr>
-            <tr><td className='leftColumn' data-l10n-id='contributionTime' /><td className='rightColumn'>{this.contributionTime}</td></tr>
-            <tr><td className='leftColumn' data-l10n-id='contributionAmount' /><td className='rightColumn'>{this.contributionAmount}</td></tr>
+            <tr>
+              <td className={css(styles.summaryBoxTable__leftColumn)} data-l10n-id='contributionDate' />
+              <td className={css(styles.summaryBoxTable__rightColumn)}>{this.contributionDate}</td>
+            </tr>
+            <tr>
+              <td className={css(styles.summaryBoxTable__leftColumn)} data-l10n-id='contributionTime' />
+              <td className={css(styles.summaryBoxTable__rightColumn)}>{this.contributionTime}</td>
+            </tr>
+            <tr>
+              <td className={css(styles.summaryBoxTable__leftColumn)} data-l10n-id='contributionAmount' />
+              <td className={css(styles.summaryBoxTable__rightColumn)}>{this.contributionAmount}</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -264,27 +275,31 @@ class ContributionStatement extends ImmutableComponent {
 
   get contributionDateRangeString () {
     if (this.lastContributionHumanFormattedDate !== '') {
-      return (this.lastContributionHumanFormattedDate + ' - ' + this.thisContributionHumanFormattedDate)
+      return (
+        <div className={css(styles.statement__dates)}>
+          { this.lastContributionHumanFormattedDate + ' - ' + this.thisContributionHumanFormattedDate }
+        </div>
+      )
     }
     return null
   }
 
   ContributionStatementDetailTable (page, pageIdx, totalPages) {
     return (
-      <div className='contributionStatementDetailTableContainer'>
+      <div className={css(styles.detailTable__container)}>
         <div>
-          <span className='statementDatesCoveredText pull-right'>
+          <div className={css(styles.flexJustifyEnd)}>
             { this.contributionDateRangeString }
-          </span>
-          <table className='contributionStatementDetailTable'>
+          </div>
+          <table className={css(styles.detailTable__table)}>
             <tbody>
-              <tr className='headingRow detailTableRow'>
-                <td className='rankColumn' data-l10n-id='rank' />
-                <td className='siteColumn' data-l10n-id='site' />
-                <td className='fractionColumn' data-l10n-id='percentPaid' />
-                <td className='fiatColumn' data-l10n-id='dollarsPaid' />
+              <tr className={css(styles.textAlignRight, styles.table__tr, styles.table__headingRow)}>
+                <th className={css(styles.table__th)} data-test-id='rankColumn' data-l10n-id='rank' />
+                <th className={css(styles.table__th, styles.table__siteColumn)} data-test-id='siteColumnTh' data-l10n-id='site' />
+                <th className={css(styles.table__th)} data-test-id='fractionColumn' data-l10n-id='percentPaid' />
+                <th className={css(styles.table__th)} data-test-id='fiatColumn' data-l10n-id='dollarsPaid' />
               </tr>
-              <tr className='spacingRow' />
+              <tr className={css(styles.table__tr, styles.table__spacingRow)} />
               {
               page.map(function (row, idx) {
                 let publisherSynopsis = (this.synopsis.filter((entry) => { return entry.site === row[0] }) || [])[0] || {}
@@ -295,9 +310,16 @@ class ContributionStatement extends ImmutableComponent {
                 let fiatStr = row[4]
 
                 return (
-                  <tr className='detailTableRow'>
+                  <tr className={css(styles.textAlignRight, styles.table__tr)}>
                     <td className='rankColumn'>{(pageIdx * this.PER_PAGE) + idx + 1}</td>
-                    <td className='siteColumn'>{verified ? <span className='verified' /> : null}<span className='site'>{site}</span></td>
+                    <td className={css(
+                      styles.flexJustifyStart,
+                      styles.flexAlignCenter,
+                      styles.table__siteColumn)}
+                      data-test-id='siteColumnTr'>
+                      {verified ? <span className={css(styles.verified, styles.table__verified)} /> : null}
+                      <span className={verified ? css(styles.table__verifiedSite) : site}>{site}</span>
+                    </td>
                     <td className='fractionColumn'>{fractionStr}</td>
                     <td className='fiatColumn'>{fiatStr}</td>
                   </tr>
@@ -307,8 +329,17 @@ class ContributionStatement extends ImmutableComponent {
               <tr className='spacingRow' />
             </tbody>
           </table>
-          <div className='verifiedExplainer'><span className='verified' /> <span data-l10n-id='verifiedExplainerText' /></div>
-          <div className='pageIndicator pull-right' data-l10n-id='pageNofMText' data-l10n-args={JSON.stringify({ n: (pageIdx + 1), m: totalPages })} />
+          <div className={css(styles.flexAlignCenter, styles.verifiedExplainer__wrapper)}>
+            <div className={css(styles.flexAlignCenter)} data-test-id='verifiedExplainer'>
+              <span className={css(styles.verified)} />
+              <span className={css(styles.verifiedExplainer__text)} data-l10n-id='verifiedExplainerText' />
+            </div>
+            <div className={css(styles.verifiedExplainer__pageIndicator)}
+              data-test-id='pageIndicator'
+              data-l10n-id='pageNofMText'
+              data-l10n-args={JSON.stringify({ n: (pageIdx + 1), m: totalPages })}
+            />
+          </div>
         </div>
       </div>
     )
@@ -326,10 +357,12 @@ class ContributionStatement extends ImmutableComponent {
     ]
 
     return (
-      <div className='footerNoteBox'>
-        <span className='noteHeading' data-l10n-id={headingIds[pageIdx % headingIds.length]} />
-        <br />
-        <span className='noteBody' data-l10n-id={messageIds[pageIdx % messageIds.length]} />
+      <div className={css(styles.footer__noteWrapper)}>
+        <div className={css(styles.noteWrapper__heading)}
+          data-test-id='noteHeading'
+          data-l10n-id={headingIds[pageIdx % headingIds.length]}
+        />
+        <div className='noteBody' data-l10n-id={messageIds[pageIdx % messageIds.length]} />
       </div>
     )
   }
@@ -340,8 +373,12 @@ class ContributionStatement extends ImmutableComponent {
     }
 
     return (
-      <div className='pageFooterBox'>
-        <span className='pageFooterBody' data-l10n-id='contributionStatementCopyrightFooter' data-l10n-args={JSON.stringify(l10nDataArgs)} />
+      <div className={css(styles.footer__footerWrapper)} data-test-id='pageFooterBox'>
+        <span className={css(styles.footerWrapper__body)}
+          data-test-id='pageFooterBody'
+          data-l10n-id='contributionStatementCopyrightFooter'
+          data-l10n-args={JSON.stringify(l10nDataArgs)}
+        />
       </div>
     )
   }
@@ -349,27 +386,15 @@ class ContributionStatement extends ImmutableComponent {
   ContributionStatementPage (page, pageIdx, pages) {
     let totalPages = pages.length
     let pageContent = [
-      <div className='contributionStatementSection'>
-        {this.ContributionStatementHeader}
-      </div>,
-      pageIdx ? null : (
-        <div className='contributionStatementSection'>
-          {this.ContributionStatementSummaryBox}
-        </div>
-      ),
-      <div className='contributionStatementSection'>
-        {this.ContributionStatementDetailTable(page, pageIdx, totalPages)}
-      </div>,
-      <div className='contributionStatementSection'>
-        {this.ContributionStatementFooterNoteBox(pageIdx)}
-      </div>,
-      <div className='contributionStatementSection'>
-        {this.ContributionStatementPageFooter}
-      </div>
+      (this.ContributionStatementHeader),
+      (pageIdx ? null : (this.ContributionStatementSummaryBox)),
+      (this.ContributionStatementDetailTable(page, pageIdx, totalPages)),
+      (this.ContributionStatementFooterNoteBox(pageIdx)),
+      (this.ContributionStatementPageFooter)
     ]
 
     return (
-      <div className='contributionStatementPage'>
+      <div className={css(styles.statement__page)} data-test-id='contributionStatementPage'>
         {pageContent}
       </div>
     )
@@ -383,16 +408,16 @@ class ContributionStatement extends ImmutableComponent {
 
     if (!transaction && transactions && transactions.toJS().length) {
       return (
-        <div className='contributionList'>
-          <div className='sectionTitleHeader' data-l10n-id='contributionStatements' />
-          <div className='sectionTitle' data-l10n-id='listOfContributionStatements' />
+        <div className={css(styles.list)} data-test-id='contributionList'>
+          <div className={css(styles.list__sectionTitleHeader)} data-l10n-id='contributionStatements' />
+          <div className={css(styles.list__sectionTitle)} data-l10n-id='listOfContributionStatements' />
           <div>
-            <ul>
+            <ul className={css(styles.list__ul)}>
               {
                 transactions.map(function (tx) {
                   return (
                     <li>
-                      <a href={aboutContributionsUrl + '#' + tx.get('viewingId')} target='_blank'>
+                      <a className={css(styles.list__anchor)} href={aboutContributionsUrl + '#' + tx.get('viewingId')} target='_blank'>
                         {this.receiptFileName(tx)}
                       </a>
                     </li>
@@ -405,7 +430,7 @@ class ContributionStatement extends ImmutableComponent {
       )
     } else {
       return (
-        <div className='contributionStatementContainer'>
+        <div className={css(styles.statement__container)} data-test-id='contributionStatementContainer'>
           { pages.map(this.ContributionStatementPage.bind(this)) }
         </div>
       )
@@ -429,5 +454,243 @@ function longFormattedDateFromTimestamp (timestamp) {
   // e.g. June 15th at 4:00pm
   return `${momentDate.format('MMMM Do')} at ${momentDate.format('h:mma')}`
 }
+
+const containerMargin = '25px'
+const boxMargin = '15px'
+const summaryBoxTableBorder = '10px'
+const summaryBoxTableMargin = '10px'
+const summaryBoxTablePadding = '10px'
+const lightGray = '#f7f7f7'
+const braveLogoWidth = '50px'
+const braveLogoHeight = '50px'
+const braveLogo = require('../../app/extensions/brave/img/braveAbout.png')
+const verifiedIcon = require('../../app/extensions/brave/img/ledger/verified_green_icon.svg')
+
+const styles = StyleSheet.create({
+  flexAlignCenter: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  flexJustifyBetween: {
+    display: 'flex',
+    justifyContent: 'space-between'
+  },
+  flexJustifyStart: {
+    display: 'flex',
+    justifyContent: 'flex-start'
+  },
+  flexJustifyEnd: {
+    display: 'flex',
+    justifyContent: 'flex-end'
+  },
+  textAlignRight: {
+    textAlign: 'right'
+  },
+  braveLogo: {
+    background: `url(${braveLogo})`
+  },
+  verified: {
+    height: '20px',
+    width: '20px',
+    background: `url(${verifiedIcon}) center no-repeat`,
+    position: 'relative'
+  },
+
+  // ContributionStatementHeader
+  statement__header: {
+    flexFlow: 'row wrap',
+    alignItems: 'center',
+    marginBottom: '25px'
+  },
+  header__titleWrapper: {
+    position: 'relative'
+  },
+  titleWrapper__braveLogo: {
+    backgroundSize: `${braveLogoWidth} ${braveLogoHeight}`,
+    width: braveLogoWidth,
+    height: braveLogoHeight
+  },
+  titleWrapper__sectionTitle: {
+    color: '#3B3B3B',
+    fontSize: '28px'
+  },
+  sectionTitle__bravePayments: {
+    position: 'relative'
+  },
+  titleWrapper__sectionSubTitle: {
+    color: '#ff5000',
+    fontSize: '15px',
+    position: 'absolute',
+    bottom: '36px',
+    right: '-20px'
+  },
+
+  // ContributionStatementSummaryBox
+  statement__summaryBox: {
+    marginBottom: '25px'
+  },
+  statement__summaryBoxTable: {
+    borderSpacing: summaryBoxTableBorder,
+    position: 'relative',
+    left: summaryBoxTableBorder
+  },
+  summaryBoxTable__leftColumn: {
+    textAlign: 'right',
+    padding: summaryBoxTablePadding,
+    margin: summaryBoxTableMargin,
+    backgroundColor: lightGray
+  },
+  summaryBoxTable__rightColumn: {
+    textAlign: 'center',
+    padding: summaryBoxTablePadding,
+    margin: summaryBoxTableMargin,
+    border: 'solid 3px #e7e7e7',
+    fontWeight: 'bold'
+  },
+
+  // contributionDateRangeString
+  statement__dates: {
+    marginBottom: boxMargin
+  },
+
+  // ContributionStatementDetailTable
+  detailTable__container: {
+    marginTop: boxMargin,
+    marginBottom: boxMargin
+  },
+  detailTable__table: {
+    width: '100%',
+    border: `5px solid ${lightGray}`
+  },
+  table__siteColumn: {
+    paddingLeft: '40px',
+    textAlign: 'left'
+  },
+  table__headingRow: {
+    background: lightGray
+  },
+  table__spacingRow: {
+    ':before': {
+      lineHeight: '16px',
+      content: "'_'",
+      display: 'block',
+      color: 'white'
+    }
+  },
+  table__th: {
+    whiteSpace: 'nowrap',
+    fontWeight: 'normal'
+  },
+  table__tr: {
+    height: '22px'
+  },
+  table__verified: {
+    left: '-25px'
+  },
+  table__verifiedSite: {
+    position: 'relative',
+    left: '-20px'
+  },
+  verifiedExplainer__wrapper: {
+    marginTop: boxMargin,
+    justifyContent: 'space-between',
+    flexFlow: 'row wrap',
+    paddingLeft: '10px',
+    paddingRight: '10px'
+  },
+  verifiedExplainer__text: {
+    marginLeft: '.5em'
+  },
+  verifiedExplainer__pageIndicator: {
+    marginLeft: '.5em'
+  },
+
+  // ContributionStatementFooterNoteBox
+  footer__noteWrapper: {
+    background: lightGray,
+    padding: containerMargin
+  },
+  noteWrapper__heading: {
+    color: '#ff5000',
+    marginBottom: '5px'
+  },
+
+  // ContributionStatementPageFooter
+  footer__footerWrapper: {
+    margin: `${containerMargin} ${containerMargin} 0`
+  },
+  footerWrapper__body: {
+    color: globalStyles.color.gray
+  },
+
+  // ContributionStatementPage
+  statement__page: {
+    display: 'flex',
+    flexFlow: 'column nowrap',
+    pageBreakAfter: 'always'
+  },
+
+  list: {
+    fontFamily: 'Arial',
+    color: '#3B3B3B',
+    margin: '0',
+    padding: '0 24px'
+  },
+  list__sectionTitleHeader: {
+    fontSize: '24px',
+    fontWeight: '200',
+    display: 'inline-block',
+    color: '#ff5000',
+    cursor: 'default'
+  },
+  list__sectionTitle: {
+    marginTop: '24px',
+    marginBottom: '12px',
+    fontSize: '16px',
+    color: '#ff5000',
+    cursor: 'default',
+    WebkitUserSelect: 'none'
+  },
+  list__anchor: {
+    color: '#3B3B3B',
+    fontSize: '16px',
+    fontWeight: '200',
+
+    ':-webkit-any-link': {
+      textDecoration: 'underline',
+      cursor: 'auto'
+    },
+
+    ':focus': {
+      outline: '-webkit-focus-ring-color auto 5px'
+    }
+  },
+  list__ul: {
+    marginLeft: '48px',
+    display: 'block',
+    listStyleType: 'disc',
+    WebkitMarginBefore: '1em',
+    WebkitMarginAfter: '1em',
+    WebkitMarginStart: 0,
+    WebkitMarginEnd: 0,
+    WebkitPaddingStart: '40px'
+  },
+  statement__container: {
+    background: '#fff',
+    color: '#3B3B3B',
+    display: 'block',
+    fontFamily: 'Arial',
+    fontSize: '16px',
+    hyphens: 'auto',
+    margin: `${containerMargin} 0`,
+    overflowX: 'hidden',
+    padding: '10px',
+    position: 'relative',
+    WebkitFontSmoothing: 'antialiased',
+    WebkitPrintColorAdjust: 'exact',
+    WebkitUserSelect: 'none',
+    width: '805px'
+  }
+})
 
 module.exports = <ContributionStatement />
