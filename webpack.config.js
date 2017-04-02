@@ -14,7 +14,7 @@ function config () {
     devtool: '#source-map',
     cache: true,
     module: {
-      loaders: [
+      rules: [
         {
           test: /\.js?$/,
           exclude: [
@@ -23,7 +23,7 @@ function config () {
             path.resolve(__dirname, 'app', 'browser', '*'),
             path.resolve(__dirname, 'app', 'extensions', '*')
           ],
-          loader: 'babel'
+          loader: 'babel-loader'
         },
         {
           test: /\.less$/,
@@ -32,10 +32,6 @@ function config () {
         {
           test: /\.css$/,
           loader: 'style-loader!css-loader?-minimize'
-        },
-        {
-          test: /\.json$/,
-          loader: 'json'
         },
         // Loads font files for Font Awesome
         {
@@ -49,7 +45,7 @@ function config () {
       ]
     },
     resolve: {
-      extensions: ['', '.js', '.jsx']
+      extensions: ['.js', '.jsx']
     },
     externals: {
       'electron': 'chrome'
