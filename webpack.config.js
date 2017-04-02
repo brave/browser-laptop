@@ -14,7 +14,7 @@ function config () {
     devtool: '#source-map',
     cache: true,
     module: {
-      loaders: [
+      rules: [
         {
           test: /\.js?$/,
           exclude: [
@@ -23,7 +23,7 @@ function config () {
             path.resolve(__dirname, 'app', 'browser', '*'),
             path.resolve(__dirname, 'app', 'extensions', '*')
           ],
-          loader: 'babel'
+          loader: 'babel-loader'
         },
         {
           test: /\.less$/,
@@ -32,10 +32,6 @@ function config () {
         {
           test: /\.css$/,
           loader: 'style-loader!css-loader?-minimize'
-        },
-        {
-          test: /\.json$/,
-          loader: 'json'
         },
         // Loads font files for Font Awesome
         {
@@ -49,7 +45,7 @@ function config () {
       ]
     },
     resolve: {
-      extensions: ['', '.js', '.jsx']
+      extensions: ['.js', '.jsx']
     },
     externals: {
       'electron': 'chrome'
@@ -89,7 +85,11 @@ function watchOptions () {
 
 function development () {  // eslint-disable-line
   var dev = config()
+  dev.plugins.push(new webpack.HotModuleReplacementPlugin())
   dev.devServer = {
+    contentBase: path.resolve(__dirname, 'app', 'extensions', 'brave'),
+    hot: true,
+    inline: true,
     publicPath: 'http://localhost:' + port + '/gen/',
     headers: { 'Access-Control-Allow-Origin': '*' }
   }
@@ -98,15 +98,17 @@ function development () {  // eslint-disable-line
 
 function production () {  // eslint-disable-line
   var prod = config()
-  prod.plugins.push(new webpack.optimize.DedupePlugin())
+  var UglifyJsPlugin = require('uglifyjs-webpack-plugin')
   prod.plugins.push(new webpack.optimize.OccurrenceOrderPlugin(true))
   if (env !== 'test') {
-    prod.plugins.push(new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      },
-      mangle: {
-        except: ['module', 'exports', 'require']
+    prod.plugins.push(new UglifyJsPlugin({
+      uglifyOptions: {
+        compress: {
+          warnings: false
+        },
+        mangle: {
+          reserved: ['module', 'exports', 'require']
+        }
       }
     }))
   }
@@ -117,9 +119,14 @@ function test () {  // eslint-disable-line
   return Object.assign(production(), watchOptions())
 }
 
-function merge (config, env) {
-  var merged = Object.assign({}, env, config)
-  merged.plugins = (config.plugins || []).concat(env.plugins || [])
+function merge (config, envConfig) {
+  var merged = Object.assign({}, envConfig, config)
+  merged.plugins = (config.plugins || []).concat(envConfig.plugins || [])
+  // In development we overwrite the output path so the dev server serves everything from the gen subdir
+  if (env === 'development') {
+    // Note that this directory will never be created since the dev server does not write out to files
+    merged.output.path = path.resolve(__dirname, 'app', 'extensions', 'gen')
+  }
   return merged
 }
 

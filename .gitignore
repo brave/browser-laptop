@@ -51,6 +51,7 @@ dist-ia32
 win64-dist
 Brave.tar.bz2
 
+app/extensions/gen
 app/extensions/brave/gen
 app/extensions/torrent/gen
 *.pfx
