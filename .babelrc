@@ -3,7 +3,7 @@
     "react",
     ["env", {
       "targets": {
-        "chrome": 54
+        "chrome": 57
       }
     }]
   ],
