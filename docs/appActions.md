@@ -333,32 +333,6 @@ Sets the update status
 
 
 
-### savePassword(passwordDetail) 
-
-Saves login credentials
-
-**Parameters**
-
-**passwordDetail**: `Object`, login details
-
-
-
-### deletePassword(passwordDetail) 
-
-Deletes login credentials
-
-**Parameters**
-
-**passwordDetail**: `Object`, login details
-
-
-
-### clearPasswords() 
-
-Deletes all saved login credentials
-
-
-
 ### changeSetting(key, value) 
 
 Changes an application level setting
@@ -1032,6 +1006,28 @@ Notifies autoplay has been blocked
 **Parameters**
 
 **tabId**: `number`, Tab id of current frame
+
+
+
+### deletePassword(passwordDetail) 
+
+Deletes login credentials
+
+**Parameters**
+
+**passwordDetail**: `Object`, login details
+
+
+
+### clearPasswords() 
+
+Deletes all saved login credentials
+
+
+
+### deletePasswordSite() 
+
+Delete legacy "never saved password" list
 
 
 

@@ -21,9 +21,6 @@ const appConstants = {
   APP_APPLY_SITE_RECORDS: _,
   APP_MERGE_DOWNLOAD_DETAIL: _, // Sets an individual download detail
   APP_CLEAR_COMPLETED_DOWNLOADS: _, // Removes all completed downloads
-  APP_ADD_PASSWORD: _, /** @param {Object} passwordDetail */
-  APP_REMOVE_PASSWORD: _, /** @param {Object} passwordDetail */
-  APP_CLEAR_PASSWORDS: _,
   APP_DEFAULT_WINDOW_PARAMS_CHANGED: _,
   APP_SET_DATA_FILE_ETAG: _,
   APP_SET_DATA_FILE_LAST_CHECK: _,
@@ -122,7 +119,13 @@ const appConstants = {
   APP_ON_GO_TO_INDEX: _,
   APP_ON_GO_BACK_LONG: _,
   APP_ON_GO_FORWARD_LONG: _,
-  APP_AUTOPLAY_BLOCKED: _
+  APP_AUTOPLAY_BLOCKED: _,
+  APP_SAVE_PASSWORD: _,
+  APP_UPDATE_PASSWORD: _,
+  APP_ADD_PASSWORD: _, /** @param {Object} passwordDetail */
+  APP_REMOVE_PASSWORD: _, /** @param {Object} passwordDetail */
+  APP_REMOVE_PASSWORD_SITE: _, /** @param {Object} passwordDetail */
+  APP_CLEAR_PASSWORDS: _
 }
 
 module.exports = mapValuesByKeys(appConstants)
