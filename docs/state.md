@@ -145,6 +145,16 @@ AppStore
     enabled: boolean // enable noscript
   },
   passwords: [{
+    // not being used anymore
+    action: string, // URL of the form action
+    authTag: string, // AES-GCM authentication data, binary-encoded
+    encryptedPassword: string, // encrypted by master password, binary-encoded
+    iv: string, // AES-GCM initialization vector, binary-encoded
+    origin: string, // origin of the form
+    username: string
+  }],
+  legacyPasswords: [{
+    // backup of passwords migration
     action: string, // URL of the form action
     authTag: string, // AES-GCM authentication data, binary-encoded
     encryptedPassword: string, // encrypted by master password, binary-encoded

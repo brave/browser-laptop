@@ -71,18 +71,10 @@ const messages = {
   GO_FORWARD: _,
   RELOAD: _,
   DETACH: _,
-  // Password manager
-  GET_PASSWORDS: _, /** @arg {string} formOrigin, @arg {string} action */
-  GOT_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action, @arg {boolean} isUnique */
-  SAVE_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} formOrigin, @arg {string} action */
   IS_MISSPELLED: _, /** @arg {string} word, the word to check */
   GET_MISSPELLING_INFO: _, /** @arg {string} word, the word to lookup */
-  SHOW_USERNAME_LIST: _, /** @arg {string} formOrigin, @arg {string} action, @arg {Object} boundingRect, @arg {string} usernameValue */
-  FILL_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action */
   PASSWORD_DETAILS_UPDATED: _, /** @arg {Object} passwords app state */
   PASSWORD_SITE_DETAILS_UPDATED: _, /** @arg {Object} passwords app state */
-  DECRYPT_PASSWORD: _, /** @arg {string} encrypted pw, @arg {string} iv, @arg {string} authTag, @arg {number} id */
-  DECRYPTED_PASSWORD: _, /** @arg {number} decrypted pw, @arg {number} id */
   // Init
   INITIALIZE_WINDOW: _,
   // Session restore

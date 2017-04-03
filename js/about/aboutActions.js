@@ -205,10 +205,6 @@ const aboutActions = {
     })
   },
 
-  decryptPassword: function (encryptedPassword, authTag, iv, id) {
-    ipc.send(messages.DECRYPT_PASSWORD, encryptedPassword, authTag, iv, id)
-  },
-
   setClipboard: function (text) {
     ipc.send(messages.SET_CLIPBOARD, text)
   },
@@ -228,11 +224,10 @@ const aboutActions = {
     })
   },
 
-  deletePasswordSite: function (origin) {
+  deletePasswordSite: function (password) {
     aboutActions.dispatchAction({
-      actionType: appConstants.APP_CHANGE_SITE_SETTING,
-      hostPattern: origin,
-      key: 'savePasswords'
+      actionType: appConstants.APP_REMOVE_PASSWORD_SITE,
+      passwordDetail: password
     })
   },
 
