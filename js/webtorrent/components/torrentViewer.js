@@ -22,7 +22,7 @@ class TorrentViewer extends React.Component {
       dispatch
     } = this.props
 
-    let titleElem, mainButtonId, saveButton
+    let titleElem, mainButton, saveButton, legalNotice
 
     if (torrent) {
       if (name) {
@@ -30,9 +30,28 @@ class TorrentViewer extends React.Component {
         titleElem = <div className='sectionTitle'>{name}</div>
       } else {
         // 'Loading torrent information...'
-        titleElem = <div className='sectionTitle' data-l10n-id='torrentLoadingInfo' />
+        titleElem = (
+          <div
+            className='sectionTitle'
+            data-l10n-id='torrentLoadingInfo'
+          />
+        )
       }
-      mainButtonId = torrent.progress < 1 ? 'downloading' : 'seeding'
+      mainButton = (
+        <Button
+          l10nId='stopDownload'
+          className='primaryButton mainButton'
+          onClick={() => dispatch('stop')}
+        />
+      )
+      legalNotice = (
+        <a
+          className='legalNotice'
+          data-l10n-id='poweredByWebTorrent'
+          href='https://webtorrent.io'
+          target='_blank'
+        />
+      )
     } else {
       const l10nStart = name ? 'startPrompt' : 'startPromptUntitled'
       const l10nArgs = {name}
@@ -42,7 +61,14 @@ class TorrentViewer extends React.Component {
           data-l10n-args={JSON.stringify(l10nArgs)}
           className='sectionTitle' />
       )
-      mainButtonId = 'startDownload'
+      mainButton = (
+        <Button
+          l10nId='startDownload'
+          className='primaryButton mainButton'
+          onClick={() => dispatch('start')}
+        />
+      )
+      legalNotice = <div className='legalNotice' data-l10n-id='legalNotice' />
     }
 
     if (torrentIdProtocol === 'magnet:') {
@@ -63,21 +89,13 @@ class TorrentViewer extends React.Component {
       )
     }
 
-    const legalNotice = torrent != null
-      ? <a className='legalNotice' data-l10n-id='poweredByWebTorrent' href='https://webtorrent.io' target='_blank' />
-      : <div className='legalNotice' data-l10n-id='legalNotice' />
-
     return (
       <div className='siteDetailsPage'>
         <div className='siteDetailsPageHeader'>
           {titleElem}
+
           <div className='headerActions'>
-            <Button
-              l10nId={mainButtonId}
-              className='primaryButton mainButton'
-              disabled={!!torrent}
-              onClick={() => dispatch('start')}
-            />
+            {mainButton}
             {saveButton}
           </div>
         </div>
@@ -90,6 +108,7 @@ class TorrentViewer extends React.Component {
             serverUrl={serverUrl}
             stateOwner={this}
           />
+
           {legalNotice}
         </div>
       </div>
