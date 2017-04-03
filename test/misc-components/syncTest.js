@@ -55,7 +55,7 @@ function * setupBrave (client) {
 }
 
 function * toggleSync (client, expectedState) {
-  if (typeof expectedState === undefined) {
+  if (typeof expectedState === 'undefined') {
     throw new Error('expectedState is required')
   }
   yield client

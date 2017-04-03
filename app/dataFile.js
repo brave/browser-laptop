@@ -55,7 +55,7 @@ module.exports.readDataFile = (resourceName, url) => {
     fs.readFile(storagePath(url), (err, data) => {
       if (err || !data || data.length === 0) {
         // console.log('rejecting for read for resource:', resourceName)
-        reject()
+        reject(new Error('unable to read data file'))
       } else {
         // console.log('resolving for read for resource:', resourceName)
         resolve(data)

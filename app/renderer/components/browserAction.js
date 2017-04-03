@@ -8,7 +8,6 @@ const electron = require('electron')
 const ipc = electron.ipcRenderer
 const Button = require('../../../js/components/button')
 const BrowserActionBadge = require('../../renderer/components/browserActionBadge')
-const cx = require('../../../js/lib/classSet')
 const extensionState = require('../../common/state/extensionState')
 const windowActions = require('../../../js/actions/windowActions')
 const {StyleSheet, css} = require('aphrodite')

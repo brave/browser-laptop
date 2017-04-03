@@ -119,10 +119,6 @@ class AudioTabIcon extends ImmutableComponent {
     return this.pageCanPlayAudio && this.props.tab.get('audioMuted')
   }
 
-  get unmutedState () {
-    this.props.tab.get('audioPlaybackActive') && !this.props.tab.get('audioMuted')
-  }
-
   get audioIcon () {
     return !this.mutedState
       ? globalStyles.appIcons.volumeOn

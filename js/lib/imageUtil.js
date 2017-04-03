@@ -6,7 +6,7 @@ module.exports.getBase64FromImageUrl = (url) => {
   return new Promise((resolve, reject) => {
     const img = new window.Image()
     img.onerror = function () {
-      reject()
+      reject(new Error('unable to load image'))
     }
     img.onload = function () {
       const canvas = document.createElement('canvas')
