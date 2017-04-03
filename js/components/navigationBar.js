@@ -138,10 +138,6 @@ class NavigationBar extends ImmutableComponent {
       : true
   }
 
-  get isPublisherButtonEnabled () {
-    return UrlUtil.isHttpOrHttps(this.props.location) && this.visiblePublisher
-  }
-
   componentDidMount () {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, () => this.onToggleBookmark())
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark())
@@ -243,7 +239,7 @@ class NavigationBar extends ImmutableComponent {
         urlbar={this.props.navbar.get('urlbar')}
         onStop={this.onStop}
         menubarVisible={this.props.menubarVisible}
-        noBorderRadius={this.isPublisherButtonEnabled}
+        noBorderRadius={!isSourceAboutUrl(this.props.location)}
         activeTabShowingMessageBox={this.props.activeTabShowingMessageBox}
         />
       {

@@ -70,7 +70,8 @@ const globalStyles = {
     statsBlue: '#0796fa',
     statsLightGray: '#999999',
     defaultIconBackground: '#F7F7F7',
-    almostInvisible: 'rgba(255,255,255,0.01)'
+    almostInvisible: 'rgba(255,255,255,0.01)',
+    urlBarOutline: '#bbb'
   },
   radius: {
     borderRadius: '4px',
