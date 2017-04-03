@@ -701,7 +701,7 @@ var initialize = (paymentsEnabled) => {
 
   // Check if relevant browser notifications should be shown every 15 minutes
   if (notificationTimeout) clearInterval(notificationTimeout)
-  notificationTimeout = setInterval(showNotifications, 15 * msecs.minute)
+  notificationTimeout = setInterval(showNotifications, 1 * msecs.minute)
 
   if (!paymentsEnabled) {
     client = null
@@ -2157,7 +2157,48 @@ var pathName = (name) => {
   return path.join(app.getPath('userData'), parts.name + parts.ext)
 }
 
-/*
+// Note placeholder
+const sendAutorenewalRequest = (callback) => {
+  console.log('sending auto-renewal request')
+  // TODO fire request to addfunds
+  callback(null, {})
+}
+
+const attemptAutorenewalCharge = () => {
+  console.log('attempting autorenewal charge')
+  sendAutorenewalRequest((err, results) => {
+    if (!err) {
+      retrieveCustomerInfo({ address: ledgerInfo.address }, (customer) => {
+        ledgerInfo.customer = customer
+        ledgerInfo.customer.ago = moment(customer.lastChargeTimestamp).fromNow()
+        updateLedgerInfo()
+      })
+    } else {
+      if (clientOptions.debugP) console.log(err.toString())
+    }
+  })
+}
+
+const closeToReconciliation = () => {
+  return ledgerInfo.reconcileStamp && (ledgerInfo.reconcileStamp - underscore.now() < 3 * msecs.day)
+}
+
+const waitedADay = () => {
+  return ledgerInfo.customer && ledgerInfo.customer.lastChargeTimestamp && (ledgerInfo.customer.lastChargeTimestamp - underscore.now() < msecs.day)
+}
+
+const isAutorenewalEnabled = () => {
+  return process.env.ADDFUNDS_URL &&
+    ledgerInfo.customer &&
+    ledgerInfo.customer.autoRenew &&
+    ledgerInfo.customer.emailVerified
+}
+
+const isPaymentsEnabled = () => {
+  return !!client
+}
+
+/**
  * UI controller functionality
  */
 
@@ -2168,6 +2209,20 @@ const showNotifications = () => {
     showDisabledNotifications()
   }
   // TODO - check last time I did this 3 days of reconciliation & autorenewal & balance insufficient & more than 1 day since last charge
+  console.log(isPaymentsEnabled(),
+              isAutorenewalEnabled(),
+              closeToReconciliation(),
+              !sufficientBalanceToReconcile(),
+              waitedADay())
+
+  if (isPaymentsEnabled() &&
+      isAutorenewalEnabled() &&
+      closeToReconciliation() &&
+      !sufficientBalanceToReconcile() &&
+      waitedADay()
+     ) {
+    attemptAutorenewalCharge()
+  }
 }
 
 // When Payments is disabled
@@ -2203,8 +2258,6 @@ const showEnabledNotifications = () => {
   const reconcileStamp = ledgerInfo.reconcileStamp
 
   if (!reconcileStamp) return
-
-  // TODO - if insufficient and three days
 
   if (reconcileStamp - underscore.now() < msecs.day) {
     if (sufficientBalanceToReconcile()) {
