@@ -7,6 +7,7 @@ const Immutable = require('immutable')
 const writeActions = require('../constants/sync/proto').actions
 const siteTags = require('../constants/siteTags')
 const siteUtil = require('./siteUtil')
+const {isDataUrl} = require('../lib/urlutil')
 
 const CATEGORY_MAP = {
   bookmark: {
@@ -394,7 +395,7 @@ module.exports.createSiteData = (site, appState) => {
     creationTime: 0
   }
   for (let field in site) {
-    if (field in siteData) {
+    if (field in siteData && !isDataUrl(site[field])) {
       siteData[field] = site[field]
     }
   }
