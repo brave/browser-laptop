@@ -20,16 +20,24 @@
   }
   // This is a reasonable max height and also solves problems for bookmarks menu
   // and bookmarks overflow menu reaching down too low.
-  height: 100%;
-  width: 100%;
+  min-width: 225px;
   @usedUpChrome: @navbarHeight + @bookmarksToolbarWithFaviconsHeight;
   max-height: calc(~'100% - @{usedUpChrome}');
   overflow: auto;
   position: absolute;
   z-index: @zindexContextMenu;
+  padding-right: 10px;
+  padding-bottom: 10px;
   -webkit-user-select: none;
+
+  &::-webkit-scrollbar {
+    background-color: transparent;
+  }
+
   &.reverseExpand {
     flex-direction: row-reverse;
+    padding-right: 0;
+    padding-left: 10px;
   }
 
   .contextMenuSingle {
