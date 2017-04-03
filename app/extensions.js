@@ -355,6 +355,7 @@ module.exports.init = () => {
   })
 
   process.on('extension-ready', (installInfo) => {
+    installInfo = insertLocaleStrings(installInfo)
     extensionInfo.setState(installInfo.id, extensionStates.ENABLED)
     extensionInfo.setInstallInfo(installInfo.id, installInfo)
     installInfo.filePath = installInfo.base_path
@@ -362,6 +363,25 @@ module.exports.init = () => {
     extensionActions.extensionInstalled(installInfo.id, installInfo)
     extensionActions.extensionEnabled(installInfo.id)
   })
+
+  let insertLocaleStrings = (installInfo) => {
+    let pattern = /^__MSG_(.*)__$/
+    let properties = ['name', 'description']
+    let defaultLocale = installInfo.manifest.default_locale
+    if (defaultLocale) {
+      let msgPath = path.join(installInfo.base_path, '_locales', defaultLocale, 'messages.json')
+      if (fs.existsSync(msgPath)) {
+        let messages = JSON.parse(fs.readFileSync(msgPath).toString())
+        properties.forEach((property) => {
+          let matches = installInfo[property].match(pattern)
+          if (matches) {
+            installInfo[property] = messages[matches[1]].message
+          }
+        })
+      }
+    }
+    return installInfo
+  }
 
   let loadExtension = (extensionId, extensionPath, manifest = {}, manifestLocation = 'unpacked') => {
     if (!extensionInfo.isLoaded(extensionId) && !extensionInfo.isLoading(extensionId)) {
