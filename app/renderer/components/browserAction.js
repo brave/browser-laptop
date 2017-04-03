@@ -7,11 +7,13 @@ const ImmutableComponent = require('../../../js/components/immutableComponent')
 const electron = require('electron')
 const ipc = electron.ipcRenderer
 const Button = require('../../../js/components/button')
+const BrowserActionBadge = require('../../renderer/components/browserActionBadge')
 const cx = require('../../../js/lib/classSet')
 const extensionState = require('../../common/state/extensionState')
 const windowActions = require('../../../js/actions/windowActions')
+const {StyleSheet, css} = require('aphrodite')
 
-class BrowserActionButton extends ImmutableComponent {
+class BrowserAction extends ImmutableComponent {
   constructor () {
     super()
     this.onClick = this.onClick.bind(this)
@@ -34,19 +36,38 @@ class BrowserActionButton extends ImmutableComponent {
   }
 
   render () {
+    const browserBadgeText = this.props.browserAction.get('text')
+    const browserBadgeColor = this.props.browserAction.get('color')
     // TODO(bridiver) should have some visual notification of hover/press
-    return <Button iconClass='extensionBrowserAction'
-      className={cx({
-        extensionButton: true
-      })}
-      inlineStyles={{
-        backgroundImage: extensionState.browserActionBackgroundImage(this.props.browserAction, this.props.tabId),
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center'
-      }}
-      dataButtonValue={this.props.extensionId}
-      onClick={this.onClick} />
+    return <div className={css(styles.browserActionButton)}>
+      <Button iconClass='extensionBrowserAction'
+        className={css(styles.extensionButton)}
+        inlineStyles={{
+          backgroundImage: extensionState.browserActionBackgroundImage(this.props.browserAction, this.props.tabId)
+        }}
+        dataButtonValue={this.props.extensionId}
+        onClick={this.onClick} />
+      { browserBadgeText
+        ? <BrowserActionBadge text={browserBadgeText} color={browserBadgeColor} />
+        : null
+      }
+    </div>
   }
 }
 
-module.exports = BrowserActionButton
+const styles = StyleSheet.create({
+  browserActionButton: {
+    position: 'relative'
+  },
+  extensionButton: {
+    '-webkit-app-region': 'no-drag',
+    backgroundSize: 'contain',
+    height: '17px',
+    margin: '4px 0 0 0',
+    opacity: '0.85',
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center'
+  }
+})
+
+module.exports = BrowserAction
