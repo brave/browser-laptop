@@ -30,17 +30,26 @@ const mapFilterType = {
  */
 const shouldDoAdBlockCheck = (resourceType, firstPartyUrl, url, shouldCheckMainFrame) =>
   firstPartyUrl.protocol &&
-    // By default first party hosts are allowed, but enable the check if a flag is specified in siteHacks
+  // By default first party hosts are allowed, but enable the check if a flag is specified in siteHacks
+  (
     shouldCheckMainFrame ||
-    (resourceType !== 'mainFrame' &&
-      isThirdPartyHost(firstPartyUrl.hostname || '', url.hostname) ||
-       siteHacks[firstPartyUrl.hostname] && siteHacks[firstPartyUrl.hostname].allowFirstPartyAdblockChecks) &&
-    // Only check http and https for now
-    firstPartyUrl.protocol.startsWith('http') &&
-    // Only do adblock if the host isn't in the whitelist
-    !whitelistHosts.find((whitelistHost) => whitelistHost === url.hostname || url.hostname.endsWith('.' + whitelistHost)) &&
-    // Make sure there's a valid resource type before trying to use adblock
-    mapFilterType[resourceType] !== undefined
+    (
+      (
+        resourceType !== 'mainFrame' &&
+        isThirdPartyHost(firstPartyUrl.hostname || '', url.hostname)
+      ) ||
+      (
+        siteHacks[firstPartyUrl.hostname] &&
+        siteHacks[firstPartyUrl.hostname].allowFirstPartyAdblockChecks
+      )
+    )
+  ) &&
+  // Only check http and https for now
+  firstPartyUrl.protocol.startsWith('http') &&
+  // Only do adblock if the host isn't in the whitelist
+  !whitelistHosts.find((whitelistHost) => whitelistHost === url.hostname || url.hostname.endsWith('.' + whitelistHost)) &&
+  // Make sure there's a valid resource type before trying to use adblock
+  mapFilterType[resourceType] !== undefined
 
 module.exports = {
   mapFilterType,

@@ -54,7 +54,7 @@ const addPageView = (url, tabId) => {
     tab.isDestroyed() ||
     !tab.session.partition.startsWith('persist:')
 
-  if (url && isSourceAboutUrl(url) || isPrivate) {
+  if ((url && isSourceAboutUrl(url)) || isPrivate) {
     url = null
   }
 

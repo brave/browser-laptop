@@ -109,7 +109,8 @@ describe('NewTab component unit tests', function () {
     describe('randomBackgroundImage', function () {
       it('calls random to get a random index', function () {
         randomSpy.reset()
-        wrapper.instance().randomBackgroundImage
+        const result = wrapper.instance().randomBackgroundImage
+        assert.notEqual(result, undefined)
         assert.equal(randomSpy.calledOnce, true)
       })
 

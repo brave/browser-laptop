@@ -27,7 +27,6 @@ const aboutActions = require('../../../../../js/about/aboutActions')
 const {SettingCheckbox, SiteSettingCheckbox} = require('../../settings')
 
 class LedgerTable extends ImmutableComponent {
-
   get synopsis () {
     return this.props.ledgerData.get('synopsis')
   }
