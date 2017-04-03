@@ -91,6 +91,7 @@
     "ad-block": "^2.0.0",
     "aphrodite": "^1.0.0",
     "async": "^2.0.1",
+    "clipboard-copy": "^1.0.0",
     "electron-localshortcut": "^0.6.0",
     "electron-prebuilt": "brave/electron-prebuilt",
     "electron-squirrel-startup": "brave/electron-squirrel-startup",
@@ -128,7 +129,7 @@
     "tracking-protection": "1.1.x",
     "underscore": "1.8.3",
     "url-loader": "^0.5.7",
-    "webtorrent-remote": "^1.0.0"
+    "webtorrent-remote": "^2.0.0"
   },
   "devDependencies": {
     "asar": "^0.11.0",

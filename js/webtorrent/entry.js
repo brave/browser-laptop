@@ -1,73 +1,165 @@
-/* global Blob, URL */
-
 const ipc = window.chrome.ipcRenderer
-const messages = require('../constants/messages')
+
+const clipboardCopy = require('clipboard-copy')
 const parseTorrent = require('parse-torrent')
+const path = require('path')
+const querystring = require('querystring')
 const React = require('react')
 const ReactDOM = require('react-dom')
+const url = require('url')
 const WebTorrentRemoteClient = require('webtorrent-remote/client')
 
-// React Components
-const MediaViewer = require('./components/mediaViewer')
-const TorrentViewer = require('./components/torrentViewer')
+const App = require('./components/app')
+const messages = require('../constants/messages')
 
 // Stylesheets
 require('../../less/webtorrent.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
-// UI state object. Pure function from `state` -> React element.
-const state = {
-  torrentID: window.decodeURIComponent(window.location.hash.substring(1)),
-  parsedTorrent: null,
-  client: null,
+// Pure function from state -> React elements.
+const store = {
+  name: null, // Torrent name
+  ix: null, // Selected file index
+  torrentId: window.decodeURIComponent(window.location.hash.substring(1)),
+  torrentIdProtocol: null,
   torrent: null,
+  serverUrl: null,
   errorMessage: null
 }
-window.state = state /* for easier debugging */
 
-state.parsedTorrent = parseTorrent(state.torrentID)
+let client, server
 
-// Create the client, set up IPC to the WebTorrentRemoteServer
-state.client = new WebTorrentRemoteClient(send)
-state.client.on('warning', onWarning)
-state.client.on('error', onError)
+init()
 
-ipc.on(messages.TORRENT_MESSAGE, function (e, msg) {
-  state.client.receive(msg)
-})
+function init () {
+  const parsedUrl = url.parse(store.torrentId)
+  store.torrentIdProtocol = parsedUrl.protocol
+
+  // `ix` param can be set by query param or hash, e.g. ?ix=1 or #ix=1
+  if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+    store.name = path.basename(parsedUrl.pathname)
+    store.ix = getIxQuery(parsedUrl)
+    if (store.ix == null) store.ix = getIxHash(parsedUrl)
+  } else if (parsedUrl.protocol === 'magnet:') {
+    let parsedTorrent
+    try {
+      parsedTorrent = parseTorrent(store.torrentId)
+    } catch (err) {
+      return onError(new Error('Invalid torrent identifier'))
+    }
+    store.name = parsedTorrent.name
+    store.ix = parsedTorrent.ix
+    if (store.ix == null) store.ix = getIxHash(parsedUrl)
+  } else {
+    return onError(new Error('Invalid torrent identifier'))
+  }
+
+  // Create the client, set up IPC to the WebTorrentRemoteServer
+  client = new WebTorrentRemoteClient(send)
+  client.on('warning', onWarning)
+  client.on('error', onError)
+
+  ipc.on(messages.TORRENT_MESSAGE, function (e, msg) {
+    client.receive(msg)
+  })
+
+  // Check whether we're already part of this swarm. If not, show a Start button.
+  client.get(store.torrentId, function (err, torrent) {
+    if (!err) initTorrent(torrent)
+    update()
+  })
+
+  // Clean up the client. Note: Since this does IPC, it's not guaranteed to send
+  // before the page is closed. But that's okay; webtorrent-remote expects regular
+  // heartbeats and assumes clients are dead after 30s without one. So basically,
+  // this is an optimization to destroy the client sooner.
+  window.addEventListener('beforeunload', function () {
+    client.destroy()
+  })
+
+  // Update the UI (to show download speed) every 1s.
+  update()
+  setInterval(update, 1000)
+}
+
+function getIxQuery (parsedUrl) {
+  const ix = Number(querystring.parse(parsedUrl.query).ix)
+  return Number.isNaN(ix) ? null : ix
+}
+
+function getIxHash (parsedUrl) {
+  const ix = Number(querystring.parse((parsedUrl.hash || '').slice(1)).ix)
+  return Number.isNaN(ix) ? null : ix
+}
 
 function send (msg) {
   ipc.send(messages.TORRENT_MESSAGE, msg)
 }
 
-// Clean up the client before the window exits
-window.addEventListener('beforeunload', function () {
-  state.client.destroy({delay: 1000})
-})
-
-// Check whether we're already part of this swarm. If not, show a Start button.
-state.client.get(state.torrentID, function (err, torrent) {
-  if (!err) {
-    state.torrent = torrent
-    addTorrentEvents(torrent)
-  }
-  render()
-})
-
-// Page starts blank, once you call render() it shows a continuously updating torrent UI
-function render () {
-  update()
-  setInterval(update, 1000)
-}
-
 function update () {
-  const elem = <App />
+  const elem = <App store={store} dispatch={dispatch} />
   ReactDOM.render(elem, document.querySelector('#appContainer'))
+  document.title = store.name || 'WebTorrent'
 }
 
-function addTorrentEvents (torrent) {
+function onServerListening () {
+  store.serverUrl = 'http://localhost:' + server.address().port
+  update()
+}
+
+function initTorrent (torrent) {
+  store.torrent = torrent
+
+  // Once torrent's canonical name is available, use it
+  if (torrent.name) {
+    store.name = torrent.name
+  }
+
   torrent.on('warning', onWarning)
   torrent.on('error', onError)
+
+  server = torrent.createServer()
+  server.listen(onServerListening)
+
+  // These event listeners aren't strictly required, but it's better to update the
+  // UI immediately when important events happen instead of waiting for the regular
+  // update() call that happens on a 1 second interval.
+  torrent.on('infohash', update)
+  torrent.on('metadata', update)
+  torrent.on('done', update)
+}
+
+function dispatch (action) {
+  switch (action) {
+    case 'start':
+      return start()
+    case 'saveTorrentFile':
+      return saveTorrentFile()
+    case 'copyMagnetLink':
+      return copyMagnetLink()
+    default:
+      console.error('Ignoring unknown dispatch type: ' + JSON.stringify(action))
+  }
+}
+
+function start () {
+  client.add(store.torrentId, function (err, torrent) {
+    if (err) return onError(err)
+    initTorrent(torrent)
+    update()
+  })
+}
+
+function saveTorrentFile () {
+  let a = document.createElement('a')
+  a.target = '_blank'
+  a.download = true
+  a.href = store.torrentId
+  a.click()
+}
+
+function copyMagnetLink () {
+  clipboardCopy(store.torrentId)
 }
 
 function onWarning (err) {
@@ -75,74 +167,12 @@ function onWarning (err) {
 }
 
 function onError (err) {
-  state.errorMessage = err.message
-}
-
-function start () {
-  state.client.add(state.torrentID, onAdded, {server: {}})
-}
-
-function onAdded (err, torrent) {
-  if (err) {
-    state.errorMessage = err.message
-    return console.error(err)
-  }
-  state.torrent = torrent
-  addTorrentEvents(torrent)
+  store.errorMessage = err.message
+  console.error(err.message)
   update()
 }
 
-function saveTorrentFile () {
-  let parsedTorrent = parseTorrent(state.torrentID)
-  let torrentFile = parseTorrent.toTorrentFile(parsedTorrent)
-
-  let torrentFileName = state.parsedTorrent.name + '.torrent'
-  let torrentFileBlobURL = URL.createObjectURL(
-    new Blob([torrentFile],
-    { type: 'application/x-bittorrent' }
-  ))
-
-  let a = document.createElement('a')
-  a.target = '_blank'
-  a.download = torrentFileName
-  a.href = torrentFileBlobURL
-  a.click()
-}
-
-class App extends React.Component {
-  constructor () {
-    super()
-    this.dispatch = this.dispatch.bind(this)
-  }
-
-  dispatch (action) {
-    switch (action) {
-      case 'start':
-        return start()
-      case 'saveTorrentFile':
-        return saveTorrentFile()
-      default:
-        console.error('Ignoring unknown dispatch type: ' + JSON.stringify(action))
-    }
-  }
-
-  render () {
-    const {torrent, torrentID, errorMessage, parsedTorrent} = state
-    const ix = parsedTorrent && parsedTorrent.ix // Selected file index
-    let name = parsedTorrent && parsedTorrent.name
-    if (name) document.title = name
-
-    if (state.torrent && ix != null) {
-      return <MediaViewer torrent={torrent} ix={ix} />
-    } else {
-      return (
-        <TorrentViewer
-          name={name}
-          torrent={torrent}
-          torrentID={torrentID}
-          errorMessage={errorMessage}
-          dispatch={this.dispatch} />
-      )
-    }
-  }
-}
+/* for easier debugging */
+window.store = store
+window.client = client
+window.server = server

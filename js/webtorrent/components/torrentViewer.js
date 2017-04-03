@@ -12,9 +12,18 @@ class TorrentViewer extends React.Component {
   }
 
   render () {
-    const {torrent, torrentID, name, errorMessage, dispatch} = this.props
+    const {
+      name,
+      torrentId,
+      torrent,
+      serverUrl,
+      errorMessage,
+      torrentIdProtocol,
+      dispatch
+    } = this.props
 
-    let titleElem, mainButtonId
+    let titleElem, mainButtonId, saveButton
+
     if (torrent) {
       if (name) {
         // No localization, just use the torrent name
@@ -36,6 +45,24 @@ class TorrentViewer extends React.Component {
       mainButtonId = 'startDownload'
     }
 
+    if (torrentIdProtocol === 'magnet:') {
+      saveButton = (
+        <Button
+          l10nId='copyMagnetLink'
+          className='whiteButton copyMagnetLink'
+          onClick={() => dispatch('copyMagnetLink')}
+        />
+      )
+    } else {
+      saveButton = (
+        <Button
+          l10nId='saveTorrentFile'
+          className='whiteButton saveTorrentFile'
+          onClick={() => dispatch('saveTorrentFile')}
+        />
+      )
+    }
+
     const legalNotice = torrent != null
       ? <a className='legalNotice' data-l10n-id='poweredByWebTorrent' href='https://webtorrent.io' target='_blank' />
       : <div className='legalNotice' data-l10n-id='legalNotice' />
@@ -49,20 +76,20 @@ class TorrentViewer extends React.Component {
               l10nId={mainButtonId}
               className='primaryButton mainButton'
               disabled={!!torrent}
-              onClick={() => dispatch('start')} />
-            <Button
-              l10nId='saveTorrentFile'
-              className='whiteButton saveTorrentFile'
-              onClick={() => dispatch('saveTorrentFile')} />
+              onClick={() => dispatch('start')}
+            />
+            {saveButton}
           </div>
         </div>
 
         <div className='siteDetailsPageContent'>
           <TorrentStatus torrent={torrent} errorMessage={errorMessage} />
           <TorrentFileList
+            torrentId={torrentId}
             torrent={torrent}
+            serverUrl={serverUrl}
             stateOwner={this}
-            torrentID={torrentID} />
+          />
           {legalNotice}
         </div>
       </div>
