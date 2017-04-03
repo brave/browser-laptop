@@ -203,7 +203,7 @@ const UrlUtil = {
    * @returns {Boolean} Whether or not this is a data url.
    */
   isDataUrl: function (url) {
-    return url.toLowerCase().startsWith('data:')
+    return typeof url === 'string' && url.toLowerCase().startsWith('data:')
   },
 
   /**
