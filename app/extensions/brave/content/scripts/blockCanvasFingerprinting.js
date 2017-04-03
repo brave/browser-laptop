@@ -67,12 +67,10 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     return script_url.replace(/:\d+:\d+$/, '')
   }
 
-  function reportBlock (item) {
+  function reportBlock (type) {
     var script_url = getOriginatingScriptUrl()
     var msg = {
-      type: item.type,
-      obj: item.objName,
-      prop: item.propName,
+      type,
       scriptUrl: stripLineAndColumnNumbers(script_url)
     }
 
@@ -85,7 +83,11 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
    * @param item special item objects
    */
   function trapInstanceMethod (item) {
-    chrome.webFrame.setGlobal(item.objName + ".prototype." + item.propName, reportBlock.bind(null, item))
+    if (!item.methodName) {
+      chrome.webFrame.setGlobal(item.objName + ".prototype." + item.propName, reportBlock.bind(null, item.type))
+    } else {
+      chrome.webFrame.setGlobal(item.methodName, reportBlock.bind(null, item.type))
+    }
   }
 
   var methods = []
@@ -94,8 +96,7 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     var item = {
       type: 'Canvas',
       objName: 'CanvasRenderingContext2D',
-      propName: method,
-      obj: CanvasRenderingContext2D
+      propName: method
     }
 
     methods.push(item)
@@ -106,8 +107,7 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     var item = {
       type: 'Canvas',
       objName: 'HTMLCanvasElement',
-      propName: method,
-      obj: HTMLCanvasElement
+      propName: method
     }
     methods.push(item)
   })
@@ -118,8 +118,7 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     var item = {
       type: 'WebGL',
       objName: 'WebGLRenderingContext',
-      propName: method,
-      obj: WebGLRenderingContext
+      propName: method
     }
     methods.push(item)
   })
@@ -129,8 +128,7 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     var item = {
       type: 'AudioContext',
       objName: 'AudioBuffer',
-      propName: method,
-      obj: AudioBuffer
+      propName: method
     }
     methods.push(item)
   })
@@ -141,8 +139,7 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     var item = {
       type: 'AudioContext',
       objName: 'AnalyserNode',
-      propName: method,
-      obj: AnalyserNode
+      propName: method
     }
     methods.push(item)
   })
@@ -153,11 +150,16 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     var item = {
       type: 'WebRTC',
       objName: 'webkitRTCPeerConnection',
-      propName: method,
-      obj: webkitRTCPeerConnection
+      propName: method
     }
     methods.push(item)
   })
 
   methods.forEach(trapInstanceMethod)
+
+  // Block WebRTC device enumeration
+  trapInstanceMethod({
+    type: 'WebRTC',
+    methodName: 'navigator.mediaDevices.enumerateDevices'
+  })
 }
