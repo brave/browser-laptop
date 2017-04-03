@@ -589,6 +589,7 @@ class Frame extends ImmutableComponent {
     // https://www.nfl.com is said to be a widevine site but it actually uses Flash for me Oct 10, 2016
     const widevineSites = ['https://www.netflix.com',
       'http://bitmovin.com',
+      'https://www.primevideo.com',
       'https://shaka-player-demo.appspot.com']
     const isForWidevineTest = process.env.NODE_ENV === 'test' && location.endsWith('/drm.html')
     if (!isForWidevineTest && (!origin || !widevineSites.includes(origin))) {
