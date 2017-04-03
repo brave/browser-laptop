@@ -10,6 +10,7 @@ const downloadStates = require('../../../js/constants/downloadStates')
 const {PAUSE, RESUME, CANCEL} = require('../../common/constants/electronDownloadItemActions')
 const appActions = require('../../../js/actions/appActions')
 const downloadUtil = require('../../../js/state/downloadUtil')
+const {getOrigin} = require('../../../js/state/siteUtil')
 const cx = require('../../../js/lib/classSet')
 
 class DownloadItem extends ImmutableComponent {
@@ -71,6 +72,7 @@ class DownloadItem extends ImmutableComponent {
     return this.props.download.get('state') === downloadStates.PAUSED
   }
   render () {
+    const origin = getOrigin(this.props.download.get('url'))
     const progressStyle = {
       width: downloadUtil.getPercentageComplete(this.props.download)
     }
@@ -149,6 +151,15 @@ class DownloadItem extends ImmutableComponent {
               this.props.download.get('filename')
             }
           </div>
+          {
+            origin
+              ? <div className={cx({
+                downloadOrigin: true,
+                isSecure: origin.startsWith('https://'),
+                isInsecure: origin.startsWith('http://')
+              })} title={origin}>{origin}</div>
+              : null
+          }
           {
             this.isCancelled || this.isInterrupted || this.isCompleted || this.isPaused || this.isInProgress
             ? <div className='downloadState' data-l10n-id={downloadUtil.getL10nId(this.props.download)} data-l10n-args={JSON.stringify(l10nStateArgs)} />
