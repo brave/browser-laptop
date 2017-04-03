@@ -1,7 +1,6 @@
 /* global describe, it, before, beforeEach, after */
 
 const crypto = require('crypto')
-const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
 const {newTabMode} = require('../../app/common/constants/settingsEnums')
 const siteTags = require('../../js/constants/siteTags')
@@ -667,7 +666,7 @@ describe('Syncing history', function () {
     yield Brave.app.client
       .waitForUrl(this.page2Url)
       .windowParentByUrl(this.page2Url)
-      .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page3Url, { isPrivate: true })
+      .newTab({ url: this.page3Url, isPrivate: true })
       .waitForUrl(this.page3Url)
 
     // XXX: Wait for sync to upload records to S3

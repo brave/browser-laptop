@@ -2,7 +2,7 @@ const appActions = require('../../js/actions/appActions')
 const config = require('../../js/constants/config')
 const Immutable = require('immutable')
 const tabState = require('../common/state/tabState')
-const {app, BrowserWindow, extensions} = require('electron')
+const {app, BrowserWindow, extensions, session} = require('electron')
 const {makeImmutable} = require('../common/state/immutableUtil')
 const {getTargetAboutUrl, isSourceAboutUrl, newFrameUrl} = require('../../js/lib/appUrlUtil')
 const {isURL, getUrlFromInput} = require('../../js/lib/urlutil')
@@ -43,16 +43,16 @@ const updateTab = (tabId) => {
  * global next partition number if isPartitioned is passed into the create options.
  */
 const getPartition = (createProperties) => {
-  let partition = 'persist:default'
+  let partition = session.defaultSession.partition
   const openerTab = currentWebContents[createProperties.openerTabId]
   if (createProperties.partition) {
     partition = createProperties.partition
   } else if (createProperties.isPrivate) {
     partition = 'default'
-  } else if (createProperties.isPartitioned) {
-    partition = `persist:partition-${incrementPartitionNumber()}`
   } else if (createProperties.partitionNumber) {
     partition = `persist:partition-${createProperties.partitionNumber}`
+  } else if (createProperties.isPartitioned) {
+    partition = `persist:partition-${incrementPartitionNumber()}`
   } else if (openerTab) {
     partition = openerTab.session.partition
   }

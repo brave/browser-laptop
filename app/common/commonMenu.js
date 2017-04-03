@@ -102,10 +102,9 @@ module.exports.newPartitionedTabMenuItem = () => {
   const newPartitionedMenuItem = (partitionNumber) => ({
     label: `${locale.translation('newSessionTab')} ${partitionNumber}`,
     click: (item, focusedWindow) => {
-      module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, {
-        isPartitioned: true,
-        partitionNumber: partitionNumber
-      }])
+      appActions.createTabRequested({
+        partitionNumber
+      })
     }
   })
 

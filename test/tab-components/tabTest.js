@@ -85,7 +85,7 @@ describe('tab tests', function () {
 
     it('shows new tab title instead of about:newtab', function * () {
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME)
+        .newTab()
         .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
         .waitForTextValue('[data-test-id="tab"][data-frame-key="2"]', 'New Tab')
     })

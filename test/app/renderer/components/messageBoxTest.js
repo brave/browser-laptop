@@ -1,7 +1,6 @@
 /* global describe, beforeEach, it */
 
 const Brave = require('../../../lib/brave')
-const messages = require('../../../../js/constants/messages')
 const {
   urlInput, backButton, forwardButton,
   msgBoxSuppress, msgBoxSuppressTrue, msgBoxMessage, msgBoxTitle
@@ -180,7 +179,7 @@ describe('MessageBox component tests', function () {
         const page2 = Brave.server.url('page2.html')
         // open a new tab
         yield this.app.client
-          .ipcSend(messages.SHORTCUT_NEW_FRAME, page1)
+          .newTab({ url: page1 })
           .waitForTabCount(2)
 
         yield this.app.client
