@@ -148,7 +148,7 @@ describe('bookmark tests', function () {
         it('displays title', function * () {
           yield this.app.client
             .waitUntil(function () {
-              return this.getText('.bookmarkText')
+              return this.getText('[data-test-id="bookmarkText"]')
                 .then((val) => val === 'Page 1')
             })
         })
@@ -164,7 +164,7 @@ describe('bookmark tests', function () {
           })
           it('removes the bookmark from the toolbar', function * () {
             yield this.app.client
-              .waitForExist('.bookmarkText', Brave.defaultTimeout, true)
+              .waitForExist('[data-test-id="bookmarkText"]', Brave.defaultTimeout, true)
           })
         })
       })
@@ -212,7 +212,7 @@ describe('bookmark tests', function () {
           const pageNoTitle = this.pageNoTitle
           yield this.app.client
             .waitUntil(function () {
-              return this.getText('.bookmarkText')
+              return this.getText('[data-test-id="bookmarkText"]')
                 .then((val) => val === pageNoTitle)
             })
         })
@@ -225,7 +225,7 @@ describe('bookmark tests', function () {
           })
           it('removes the bookmark from the toolbar', function * () {
             yield this.app.client
-              .waitForExist('.bookmarkText', Brave.defaultTimeout, true)
+              .waitForExist('[data-test-id="bookmarkText"]', Brave.defaultTimeout, true)
           })
         })
       })

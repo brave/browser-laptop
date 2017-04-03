@@ -2,8 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-@import "variables.less";
-
+// Copied to bookmaksToolbar.js
 :root {
   --bookmark-item-max-width: 100px;
   --bookmark-item-padding: 4px;
@@ -13,23 +12,8 @@
   --bookmarks-toolbar-padding: 10px;
 }
 
-.bookmarksToolbar {
-  box-sizing: border-box;
-  display: flex;
-  flex: 1;
-  padding: @navbarMenubarMargin var(--bookmarks-toolbar-padding);
 
-  &.allowDragging {
-    -webkit-app-region: drag;
-    >* {
-      -webkit-app-region: no-drag;
-    }
-  }
-
-  &.showOnlyFavicon {
-    padding: @navbarMenubarMargin 0 @tabPagesHeight 10px;
-  }
-
+div[class^='bookmarksToolbar'] {
   // PR #7740
   + .tabPages {
     &.singlePage {
@@ -41,103 +25,11 @@
     }
   }
 
-  .bookmarkToolbarButton {
-    border-radius: 3px;
-    color: @mediumGray;
-    cursor: default;
-    font-size: 11px;
-    line-height: 1.3;
-    margin: auto var(--bookmark-item-margin);
-    padding: 2px var(--bookmark-item-padding);
-    text-overflow: ellipsis;
-    user-select: none;
-    white-space: nowrap;
-    max-width: var(--bookmark-item-max-width);
-    box-sizing: border-box;
-    -webkit-user-select: none;
-    align-items: center;
-    display: flex;
-
-    &:hover {
-      background: white;
-      box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.1);
-    }
-
-    &.draggingOverLeft {
-      &:not(.isDragging) {
-        margin-left: 25px;
-      }
-    }
-
-    &.draggingOverRight {
-      &:not(.isDragging) {
-        margin-right: 25px;
-      }
-    }
-
-    &.isDragging {
-      opacity: 0.2;
-    }
-
-    &.showOnlyFavicon {
-      padding: 2px 4px;
-      margin: auto 0px;
-
-      .bookmarkFavicon, .bookmarkFile {
-        &:not(.bookmarkFolder) {
-          margin-right: 0px;
-        }
-      }
-    }
-
-    .bookmarkFavicon {
-      background-position: center;
-      background-repeat: no-repeat;
-      display: inline-block;
-      margin-right: 4px;
-    }
-
-    .bookmarkText {
-      text-overflow: ellipsis;
-      overflow: hidden;
-    }
-
-    .bookmarkFolder {
-      font-size: @bookmarksFolderIconSize;
-      text-align: center;
-      color: @darkGray;
-    }
-
-    .bookmarkFile {
-      font-size: @bookmarksFileIconSize;
-      text-align: center;
-      color: @darkGray;
-    }
-
-    .bookmarkFolderChevron {
-      color: #676767;
-      margin-left: var(--bookmark-item-chevron-margin);
-      font-size: 8px;
-    }
-  }
-
-  .bookmarkButton {
-    box-sizing: border-box;
-    font-size: 14px;
-    height: auto;
-    line-height: 12px;
+  // Issue #7920
+  // TODO: refactor.button.less
+  button[class*='overflowIndicator']{
     margin-left: auto;
     margin-right: 5px;
-    width: auto;
-    -webkit-user-select: none;
-  }
-
-  .overflowIndicator {
-    padding-left: 6px;
-    padding-right: 11px;
-    margin-left: auto;
-    margin-right: 0;
-    margin-bottom: auto;
-    margin-top: auto;
+    margin: auto 0 auto auto;
   }
 }
