@@ -23,6 +23,7 @@
     "lsb"
   ],
   "depends": [
+    "gawk",
     "git",
     "gconf2",
     "gconf-service",
