@@ -232,6 +232,9 @@ module.exports.onSyncReady = (isFirstRun, e) => {
         return syncUtil.createSiteSettingsData(item, siteSettings[item])
       }))
   }
+
+  appActions.createSyncCache()
+
   // Periodically poll for new records
   let startAt = appState.getIn(['sync', 'lastFetchTimestamp']) || 0
   const poll = () => {

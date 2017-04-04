@@ -234,6 +234,7 @@ module.exports.getExistingObject = (categoryName, syncRecord) => {
   const existingObject = module.exports.getObjectById(objectId, categoryName, appState)
   if (!existingObject) { return null }
 
+  const existingObjectKeyPath = existingObject[0]
   const existingObjectData = existingObject[1].toJS()
   let item
   switch (categoryName) {
@@ -242,7 +243,7 @@ module.exports.getExistingObject = (categoryName, syncRecord) => {
       item = module.exports.createSiteData(existingObjectData, appState)
       break
     case 'PREFERENCES':
-      const hostPattern = existingObject[0]
+      const hostPattern = existingObjectKeyPath[existingObjectKeyPath.length - 1]
       item = module.exports.createSiteSettingsData(hostPattern, existingObjectData)
       break
     default:
@@ -257,6 +258,46 @@ module.exports.getExistingObject = (categoryName, syncRecord) => {
     objectData: item.name,
     objectId: item.objectId,
     [item.name]: item.value
+  }
+}
+
+/**
+ * Cache sync objects' key paths by objectIds.
+ * NOTE: Deletes current cache entries.
+ * XXX: Currently only caches sites (history and bookmarks).
+ * @param {Immutable.Map} appState application state
+ * @returns {Immutable.Map} new app state
+ */
+module.exports.createSiteCache = (appState) => {
+  const objectsById = new Immutable.Map().withMutations(objectsById => {
+    appState.get('sites').forEach((site, siteKey) => {
+      const objectId = site.get('objectId')
+      if (!objectId) { return true }
+      const cacheKey = objectId.toJS().join('|')
+      objectsById = objectsById.set(cacheKey, ['sites', siteKey])
+    })
+  })
+  return appState.setIn(['sync', 'objectsById'], objectsById)
+}
+
+/**
+ * Cache a sync object's key path by objectId.
+ * XXX: Currently only caches sites (history and bookmarks).
+ * @param {Immutable.Map} appState application state
+ * @param {Immutable.Map} siteDetail
+ * @returns {Immutable.Map} new app state
+ */
+module.exports.updateSiteCache = (appState, siteDetail) => {
+  if (!siteDetail) { return appState }
+  const siteKey = siteUtil.getSiteKey(siteDetail)
+  const object = appState.getIn(['sites', siteKey])
+  const objectId = (object && object.get('objectId')) || siteDetail.get('objectId')
+  if (!objectId) { return appState }
+  const cacheKey = ['sync', 'objectsById', objectId.toJS().join('|')]
+  if (object) {
+    return appState.setIn(cacheKey, ['sites', siteKey])
+  } else {
+    return appState.deleteIn(cacheKey)
   }
 }
 
@@ -278,17 +319,14 @@ module.exports.getObjectById = (objectId, category, appState) => {
   }
   switch (category) {
     case 'BOOKMARKS':
-      return appState.get('sites').findEntry((site, index) => {
-        const itemObjectId = site.get('objectId')
-        const isBookmark = siteUtil.isFolder(site) || siteUtil.isBookmark(site)
-        return (isBookmark && itemObjectId && itemObjectId.equals(objectId))
-      })
     case 'HISTORY_SITES':
-      return appState.get('sites').findEntry((site, index) => {
-        const itemObjectId = site.get('objectId')
-        const isBookmark = siteUtil.isFolder(site) || siteUtil.isBookmark(site)
-        return (!isBookmark && itemObjectId && itemObjectId.equals(objectId))
-      })
+      const objectKey = appState.getIn(['sync', 'objectsById', objectId.toJS().join('|')])
+      const object = objectKey && appState.getIn(objectKey)
+      if (!object) {
+        return null
+      } else {
+        return [objectKey, object]
+      }
     case 'PREFERENCES':
       return appState.get('siteSettings').findEntry((siteSetting, hostPattern) => {
         const itemObjectId = siteSetting.get('objectId')

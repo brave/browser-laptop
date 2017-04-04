@@ -590,7 +590,8 @@ module.exports.defaultAppState = () => {
   return {
     firstRunTimestamp: new Date().getTime(),
     sync: {
-      lastFetchTimestamp: 0
+      lastFetchTimestamp: 0,
+      objectsById: {}
     },
     sites: getTopSiteMap(),
     tabs: [],

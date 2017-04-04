@@ -895,6 +895,15 @@ const appActions = {
   },
 
   /**
+   * Dispatch to populate the sync object id -> appState key path mapping cache
+   */
+  createSyncCache: function () {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_CREATE_SYNC_CACHE
+    })
+  },
+
+  /**
    * Dispatches a message to delete sync data.
    */
   resetSyncData: function () {
