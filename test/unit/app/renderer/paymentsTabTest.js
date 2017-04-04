@@ -176,17 +176,6 @@ describe('PaymentsTab component', function () {
       assert.equal(inst.fundsAmount, null)
     })
 
-    it('handles missing balance', function () {
-      fakeSettings.mockReturnValue = true
-      const wrapper = mount(
-        <PaymentsTab
-          showOverlay={function () {}}
-          hideOverlay={function () {}}
-          ledgerData={Immutable.Map({created: true, balance: null})} />
-      )
-      assert.equal(wrapper.find('[data-test-id="accountBalanceLoading"]').length, 1)
-    })
-
     it('handles expected balance', function () {
       fakeSettings.mockReturnValue = true
       const wrapper = mount(

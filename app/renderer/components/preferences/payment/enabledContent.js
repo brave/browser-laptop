@@ -4,6 +4,7 @@
 
 const React = require('react')
 const {StyleSheet, css} = require('aphrodite')
+const moment = require('moment')
 
 // util
 const {btcToCurrencyString, formattedDateFromTimestamp, walletStatus} = require('../../../../common/lib/ledgerUtil')
@@ -75,18 +76,14 @@ class EnabledContent extends ImmutableComponent {
 
   fundsAmount () {
     const ledgerData = this.props.ledgerData
-    if (!ledgerData.get('created')) {
-      return null
+    let value = 0
+
+    if (!(ledgerData.get('balance') === undefined || ledgerData.get('balance') === null)) {
+      value = ledgerData.get('balance')
     }
 
     return <div className={css(styles.balance)}>
-      {
-        !(ledgerData.get('balance') === undefined || ledgerData.get('balance') === null)
-          ? <FormTextbox data-test-id='fundsAmount' readOnly value={btcToCurrencyString(ledgerData.get('balance'), ledgerData)} />
-          : <span className={css(styles.loading)}>
-            <span className={css(styles.loadingText)} data-test-id='accountBalanceLoading' data-l10n-id='accountBalanceLoading' />
-          </span>
-      }
+      <FormTextbox data-test-id='fundsAmount' readOnly value={btcToCurrencyString(value, ledgerData)} />
       <a className={css(styles.iconLink)} href='https://brave.com/Payments_FAQ.html' target='_blank'>
         <span className={cx({
           fa: true,
@@ -106,9 +103,7 @@ class EnabledContent extends ImmutableComponent {
     let prevReconcileDateValue
     let text
 
-    if (!walletCreated || !walletHasReconcile) {
-      return null
-    } else if (!walletHasTransactions) {
+    if (!walletCreated || !walletHasReconcile || !walletHasTransactions) {
       text = 'noPaymentHistory'
     } else {
       text = 'viewPaymentHistory'
@@ -143,17 +138,19 @@ class EnabledContent extends ImmutableComponent {
 
   nextReconcileMessage () {
     const ledgerData = this.props.ledgerData
-    const nextReconcileDateRelative = this.nextReconcileDate()
-    if (!nextReconcileDateRelative) {
-      return null
-    }
-
-    const timestamp = ledgerData.get('reconcileStamp')
-    const now = new Date().getTime()
+    let nextReconcileDateRelative = this.nextReconcileDate()
     let l10nDataId = 'statusNextReconcileDate'
-    if (timestamp <= now) {
-      l10nDataId = (timestamp <= (now - (24 * 60 * 60 * 1000)))
-        ? 'statusNextReconcileOverdue' : 'statusNextReconcileToday'
+
+    if (!nextReconcileDateRelative) {
+      nextReconcileDateRelative = formattedDateFromTimestamp(moment().add(1, 'months'), 'MMMM Do')
+    } else {
+      const timestamp = ledgerData.get('reconcileStamp')
+      const now = new Date().getTime()
+
+      if (timestamp <= now) {
+        l10nDataId = (timestamp <= (now - (24 * 60 * 60 * 1000)))
+          ? 'statusNextReconcileOverdue' : 'statusNextReconcileToday'
+      }
     }
 
     const l10nDataArgs = {
@@ -290,20 +287,6 @@ const styles = StyleSheet.create({
     verticalAlign: 0,
     height: '100%',
     marginBottom: 0
-  },
-
-  loading: {
-    height: '2.25em',
-    display: 'flex',
-    alignItems: 'center',
-    margin: 0,
-    padding: 0
-  },
-
-  loadingText: {
-    fontSize: paymentStyles.font.regular,
-    margin: 0,
-    padding: 0
   },
 
   iconLink: {
