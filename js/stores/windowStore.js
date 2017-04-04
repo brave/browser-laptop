@@ -311,40 +311,6 @@ const doAction = (action) => {
     case windowConstants.WINDOW_VIEW_KEY:
       newFrame(action.frameOpts, action.openInForeground)
       break
-    case windowConstants.WINDOW_CLOSE_FRAME:
-      // Use the frameProps we passed in, or default to the active frame
-      const frameProps = action.frameProps || frameStateUtil.getActiveFrame(windowState)
-      const index = frameStateUtil.getFramePropsIndex(windowState.get('frames'), frameProps)
-      const hoverState = windowState.getIn(['frames', index, 'hoverState'])
-      const activeFrameKey = frameStateUtil.getActiveFrame(windowState).get('key')
-      windowState = windowState.merge(frameStateUtil.removeFrame(
-        windowState.get('frames'),
-        windowState.get('tabs'),
-        windowState.get('closedFrames'),
-        frameProps.set('closedAtIndex', index),
-        activeFrameKey,
-        index,
-        getSetting(settings.TAB_CLOSE_ACTION)
-      ))
-      // If we reach the limit of opened tabs per page while closing tabs, switch to
-      // the active tab's page otherwise the user will hang on empty page
-      if (frameStateUtil.getNonPinnedFrameCount(windowState) % getSetting(settings.TABS_PER_PAGE) === 0) {
-        windowState = updateTabPageIndex(windowState, frameStateUtil.getActiveFrame(windowState))
-        windowState = windowState.deleteIn(['ui', 'tabs', 'fixTabWidth'])
-      }
-
-      const nextFrame = frameStateUtil.getFrameByIndex(windowState, index)
-
-      // Copy the hover state if tab closed with mouse as long as we have a next frame
-      // This allow us to have closeTab button visible  for sequential frames closing, until onMouseLeave event happens.
-      if (hoverState && nextFrame) {
-        doAction({
-          actionType: windowConstants.WINDOW_SET_TAB_HOVER_STATE,
-          frameProps: nextFrame,
-          hoverState: hoverState
-        })
-      }
-      break
     case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
       windowState = windowState.merge(frameStateUtil.undoCloseFrame(windowState, windowState.get('closedFrames')))
       focusWebview(activeFrameStatePath(windowState))

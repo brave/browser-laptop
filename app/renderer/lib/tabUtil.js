@@ -66,7 +66,7 @@ module.exports.hasFixedCloseIcon = (props) => {
 module.exports.updateTabPageIndex = (state, frameProps) => {
   // No need to update tab page index if we are given a pinned frame
   if (frameProps.get('pinnedLocation')) {
-    return
+    return state
   }
 
   const index = frameStateUtil.getFrameTabPageIndex(state.get('frames')
