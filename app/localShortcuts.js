@@ -40,20 +40,20 @@ module.exports.register = (win) => {
       ['Alt+Left', messages.SHORTCUT_ACTIVE_FRAME_BACK],
       ['Alt+Right', messages.SHORTCUT_ACTIVE_FRAME_FORWARD])
   } else {
-      // Different shorcut for View Source as is common for Chrome/Safari on macOS
-      // See #7702
-      simpleWebContentEvents.push(
-        ['Cmd+Alt+U', messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE]
-      )
+    // Different shorcut for View Source as is common for Chrome/Safari on macOS
+    // See #7702
+    simpleWebContentEvents.push(
+      ['Cmd+Alt+U', messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE]
+    )
 
-      if (process.env.NODE_ENV !== 'development') {
-        // We're in Darwin and release or test mode...
-        // We disable for development mode because Browser level dev tools copy doesn't work.
-        // Workaround for #1060
-        simpleWebContentEvents.push(
-          ['Cmd+C', messages.SHORTCUT_ACTIVE_FRAME_COPY]
-        )
-      }
+    if (process.env.NODE_ENV !== 'development') {
+      // We're in Darwin and release or test mode...
+      // We disable for development mode because Browser level dev tools copy doesn't work.
+      // Workaround for #1060
+      simpleWebContentEvents.push(
+        ['Cmd+C', messages.SHORTCUT_ACTIVE_FRAME_COPY]
+      )
+    }
   }
 
   // Tab ordering shortcuts

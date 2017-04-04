@@ -38,22 +38,25 @@ class AboutBrave extends React.Component {
   render () {
     return <div className='siteDetailsPage'>
       <div className='siteDetailsPageHeader'>
-        <div data-l10n-id='aboutBrave' className='sectionTitle' />        
+        <div data-l10n-id='aboutBrave' className='sectionTitle' />
         <div data-l10n-id='braveInfo' className='title' />
-      </div>
-    
-      <div className='siteDetailsPage'>
-        <div className='siteDetailsPageHeader'>
-          <div data-l10n-id='releaseNotes' className='sectionTitle' />
-          <div className='title'>
-            <span data-l10n-id='relNotesInfo1' />&nbsp;
-            <a className='linkText' href={`https://github.com/brave/browser-laptop/releases/tag/v${this.state.versionInformation.getIn([0,'version'])}dev`} target='_blank' data-l10n-id='relNotesInfo2' />&nbsp;
-            <span data-l10n-id='relNotesInfo3' />
-          </div>
-        </div>
       </div>
 
       <div className='siteDetailsPageContent aboutBrave'>
+        <div>
+          <div className='title'>
+            <div data-l10n-id='releaseNotes' className='sectionTitle' />
+          </div>
+
+          <div className='title releaseNotes'>
+            <span data-l10n-id='relNotesInfo1' />
+            &nbsp;
+            <a className='linkText' href={`https://github.com/brave/browser-laptop/releases/tag/v${this.state.versionInformation.getIn([0, 'version'])}dev`} target='_blank' data-l10n-id='relNotesInfo2' />
+            &nbsp;
+            <span data-l10n-id='relNotesInfo3' />
+          </div>
+        </div>
+
         <div className='title'>
           <span className='sectionTitle' data-l10n-id='versionInformation' />
           <ClipboardButton
@@ -62,6 +65,7 @@ class AboutBrave extends React.Component {
             copyAction={this.onCopy}
           />
         </div>
+
         <SortableTable
           headings={['Name', 'Version']}
           rows={this.state.versionInformation.map((entry) => [
