@@ -245,6 +245,7 @@ describe('bookmark tests', function () {
       })
       it('check location', function * () {
         const page1Url = Brave.server.url('img/test.pdf')
+        let title = 'test.ico - test.pdf'
         yield this.app.client
           .windowParentByUrl(page1Url)
           .windowByUrl(page1Url)
@@ -252,7 +253,13 @@ describe('bookmark tests', function () {
           .waitForVisible(navigatorNotBookmarked)
           .click(navigatorNotBookmarked)
           .waitForVisible(doneButton)
-          .waitForBookmarkDetail(page1Url, 'test.ico - test.pdf')
+          .waitUntil(function () {
+            return this.getAppState().then((val) => {
+              title = val.value.tabs[0].title
+              return title !== undefined
+            })
+          })
+          .waitForBookmarkDetail(page1Url, title)
           .waitForEnabled(doneButton)
           .click(doneButton)
           .activateURLMode()
