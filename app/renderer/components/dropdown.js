@@ -4,7 +4,7 @@
 
 const React = require('react')
 const ImmutableComponent = require('../../../js/components/immutableComponent')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('./styles/global')
 const commonStyles = require('./styles/commonStyles')
 
@@ -15,6 +15,7 @@ class Dropdown extends ImmutableComponent {
     const className = css(
       this.props['data-isFormControl'] && commonStyles.formControl,
       styles.dropdown,
+      this.props['data-isCommonForm'] && styles.commonForm,
       this.props['data-isSettings'] && styles.settings
     )
 
@@ -30,6 +31,12 @@ class FormDropdown extends ImmutableComponent {
   }
 }
 
+class CommonFormDropdown extends ImmutableComponent {
+  render () {
+    return <FormDropdown data-isCommonForm='true' {...this.props} />
+  }
+}
+
 class SettingDropdown extends ImmutableComponent {
   render () {
     return <FormDropdown data-isSettings='true' {...this.props} />
@@ -39,7 +46,7 @@ class SettingDropdown extends ImmutableComponent {
 const selectPadding = '0.4em'
 
 const styles = StyleSheet.create({
-  'dropdown': {
+  dropdown: {
     background: `url(${caretDownGrey}) calc(100% - ${selectPadding}) 50% / contain no-repeat`,
     backgroundColor: '#fbfbfb',
     backgroundSize: '12px 12px',
@@ -51,7 +58,7 @@ const styles = StyleSheet.create({
     '-webkit-appearance': 'none',
     width: 'auto'
   },
-  'outlineable': {
+  outlineable: {
     ':focus': {
       outlineColor: globalStyles.color.statsBlue,
       outlineOffset: '-4px',
@@ -59,7 +66,10 @@ const styles = StyleSheet.create({
       outlineWidth: '1px'
     }
   },
-  'settings': {
+  commonForm: {
+    fontSize: globalStyles.fontSize.flyoutDialog
+  },
+  settings: {
     width: '280px'
   }
 })
@@ -67,5 +77,6 @@ const styles = StyleSheet.create({
 module.exports = {
   Dropdown,
   FormDropdown,
+  CommonFormDropdown,
   SettingDropdown
 }

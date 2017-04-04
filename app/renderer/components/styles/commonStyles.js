@@ -7,7 +7,7 @@ const globalStyles = require('./global')
 
 const styles = StyleSheet.create({
   formControl: {
-    background: 'white',
+    background: '#fff',
     border: `solid 1px ${globalStyles.color.black20}`,
     borderRadius: globalStyles.radius.borderRadius,
     boxShadow: `inset 0 1px 1px ${globalStyles.color.black10}`,
@@ -21,14 +21,13 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   flyoutDialog: {
-    backgroundColor: globalStyles.color.toolbarBackground,
+    background: globalStyles.color.toolbarBackground,
     borderRadius: globalStyles.radius.borderRadius,
     boxShadow: '2px 2px 8px #3b3b3b',
     color: '#000',
     fontSize: '13px',
     padding: '10px 30px',
     position: 'absolute',
-    textAlign: 'left',
     top: globalStyles.spacing.dialogTopOffset
   },
 

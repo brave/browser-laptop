@@ -95,7 +95,6 @@ select {
   .commonForm {
     .flyoutDialog;
     background-color: #f7f7f7;
-    border-radius: @borderRadius;
     max-width: 422px;
     padding: 0;
     text-align: left;
@@ -115,6 +114,7 @@ select {
 
     .formSection {
       padding: 16px 30px;
+
       &.commonFormTitle {
         color: #ff5000;
         font-size: 1.2em;
@@ -129,56 +129,6 @@ select {
       .commonFormButtonGroup {
         margin: 0 auto;
         display: inline-block;
-      }
-    }
-  }
-}
-
-// TODO: Make this use commonDialog
-.importBrowserDataPanel {
-  .importBrowserData {
-    .flyoutDialog;
-    background-color: #f7f7f7;
-    border-radius: @borderRadius;
-    max-width: 422px;
-    padding: 0;
-    text-align: left;
-    width: 614px;
-    -webkit-user-select: none;
-    cursor: default;
-    color: #3B3B3B;
-    overflow-y: auto;
-    max-height: 100%;
-
-    .clickable {
-      color: #5B5B5B;
-      &:hover {
-        color: #000;
-      }
-    }
-
-    .formSection {
-      padding: 16px 30px;
-      &.importBrowserDataWarning {
-        background-color: #dddee0;
-      }
-
-      &.importBrowserDataTitle {
-        color: #ff5000;
-        font-size: 1.2em;
-      }
-
-      &.importBrowserDataOptions {
-        padding: 0 30px;
-      }
-
-      &.importBrowserSubDataOptions {
-        padding: 0 0 0 20px;
-      }
-
-      &.importBrowserDataButtons {
-        text-align: right;
-        padding: 16px 10px;
       }
     }
   }
