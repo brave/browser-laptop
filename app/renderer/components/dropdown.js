@@ -31,12 +31,6 @@ class FormDropdown extends ImmutableComponent {
   }
 }
 
-class CommonFormDropdown extends ImmutableComponent {
-  render () {
-    return <FormDropdown data-isCommonForm='true' {...this.props} />
-  }
-}
-
 class SettingDropdown extends ImmutableComponent {
   render () {
     return <FormDropdown data-isSettings='true' {...this.props} />
@@ -77,6 +71,5 @@ const styles = StyleSheet.create({
 module.exports = {
   Dropdown,
   FormDropdown,
-  CommonFormDropdown,
   SettingDropdown
 }

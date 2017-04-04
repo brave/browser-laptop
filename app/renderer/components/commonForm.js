@@ -9,9 +9,17 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('./styles/global')
 const commonStyles = require('./styles/commonStyles')
 
+const {FormDropdown} = require('./dropdown')
+
 class CommonForm extends ImmutableComponent {
   render () {
     return <div className={css(commonStyles.flyoutDialog, styles.CommonForm)} {...this.props} />
+  }
+}
+
+class CommonFormDropdown extends ImmutableComponent {
+  render () {
+    return <FormDropdown data-isCommonForm='true' {...this.props} />
   }
 }
 
@@ -103,6 +111,7 @@ const styles = StyleSheet.create({
 
 module.exports = {
   CommonForm,
+  CommonFormDropdown,
   CommonFormClickable,
   CommonFormSection,
   CommonFormTitle,

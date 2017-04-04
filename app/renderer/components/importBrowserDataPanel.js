@@ -15,14 +15,13 @@ const globalStyles = require('./styles/global')
 
 const {
   CommonForm,
+  CommonFormDropdown,
   CommonFormSection,
   CommonFormTitle,
   CommonFormSubSection,
   CommonFormButtonWrapper,
   CommonFormBottomWrapper
 } = require('./commonForm')
-
-const {CommonFormDropdown} = require('./dropdown')
 
 class ImportBrowserDataPanel extends ImmutableComponent {
   constructor () {
