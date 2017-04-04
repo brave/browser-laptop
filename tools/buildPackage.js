@@ -95,9 +95,9 @@ cmds = cmds.concat([
     ' --build-version=' + VersionInfo.electronVersion +
     ' --protocol="http" --protocol-name="HTTP Handler"' +
     ' --protocol="https" --protocol-name="HTTPS Handler"' +
-    ' --version-string.CompanyName="Brave Inc."' +
+    ' --version-string.CompanyName="Brave Software"' +
     ' --version-string.ProductName="Brave"' +
-    ' --version-string.Copyright="Copyright 2016, Brave Inc."' +
+    ' --version-string.Copyright="Copyright 2017, Brave Software"' +
     ' --version-string.FileDescription="Brave"'
 ])
 
