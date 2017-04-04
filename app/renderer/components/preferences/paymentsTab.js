@@ -4,7 +4,7 @@
 
 // Note that these are webpack requires, not CommonJS node requiring requires
 const React = require('react')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ImmutableComponent = require('../../../../js/components/immutableComponent')
@@ -22,7 +22,7 @@ const {LedgerRecoveryContent, LedgerRecoveryFooter} = require('./payment/ledgerR
 const cx = require('../../../../js/lib/classSet')
 const globalStyles = require('../styles/global')
 const {paymentStyles} = require('../styles/payment')
-const advanceIcon = require('../../../extensions/brave/img/ledger/icon_settings.svg')
+const settingIcon = require('../../../extensions/brave/img/ledger/icon_settings.svg')
 const historyIcon = require('../../../extensions/brave/img/ledger/icon_history.svg')
 
 // other
@@ -160,55 +160,74 @@ class PaymentsTab extends ImmutableComponent {
         />
         : null
       }
-      <div className={css(styles.titleBar)}>
-        <div className='sectionTitleWrapper pull-left'>
+
+      <div className={css(styles.flexAlignEnd)}>
+        <div className='sectionTitleWrapper'>
           <span className='sectionTitle'>Brave Payments</span>
           <span className='sectionSubTitle'>beta</span>
         </div>
-        <div className={css(styles.paymentsSwitches)}>
-          <div className={css(styles.switchWrap)} data-test-id='enablePaymentsSwitch'>
-            <span className={css(styles.switchSpan)} data-l10n-id='off' />
+
+        <div className={css(
+          styles.flexAlignCenter,
+          styles.paymentsSwitches
+        )}>
+          <div className={css(styles.flexAlignEnd, styles.switchWrap)} data-test-id='enablePaymentsSwitch'>
+            <span className={css(styles.switchWrap__switchSpan)} data-l10n-id='off' />
             <SettingCheckbox dataL10nId='on'
               prefKey={settings.PAYMENTS_ENABLED}
               settings={this.props.settings}
               onChangeSetting={this.props.onChangeSetting}
-              switchClassName={css(styles.switchControl)}
-              labelClassName={css(styles.label)}
+              switchClassName={css(styles.switchWrap__switchControl)}
+              labelClassName={css(styles.switchWrap__label)}
             />
           </div>
           {
             this.enabled
-            ? <div className={css(styles.switchWrap, styles.autoSuggestSwitch)}>
-              <div className={css(styles.mainIconsLeft)}>
-                <SettingCheckbox dataL10nId='autoSuggestSites'
-                  prefKey={settings.AUTO_SUGGEST_SITES}
-                  settings={this.props.settings}
-                  disabled={!enabled}
-                  onChangeSetting={this.props.onChangeSetting}
-                  switchClassName={css(styles.switchControl)}
-                />
-                <a className={cx({
-                  fa: true,
-                  'fa-question-circle': true,
-                  [css(styles.moreInfo)]: true,
-                  [css(styles.moreInfoBtnSuggest)]: true
-                })}
-                  href='https://brave.com/Payments_FAQ.html'
-                  target='_blank'
-                  data-l10n-id='paymentsFAQLink'
-                />
+            ? <div className={css(
+                styles.flexAlignCenter,
+                styles.switchWrap,
+                styles.switchWrap__right
+              )}>
+              <div className={css(styles.switchWrap__autoSuggestSwitch)}>
+                <div className={css(styles.flexAlignCenter, styles.autoSuggestSwitch__subtext)}>
+                  <SettingCheckbox dataL10nId='autoSuggestSites'
+                    prefKey={settings.AUTO_SUGGEST_SITES}
+                    settings={this.props.settings}
+                    disabled={!enabled}
+                    onChangeSetting={this.props.onChangeSetting}
+                    switchClassName={css(styles.switchWrap__switchControl)}
+                  />
+                  <a className={cx({
+                    fa: true,
+                    'fa-question-circle': true,
+                    [css(styles.autoSuggestSwitch__moreInfo)]: true,
+                    [css(styles.autoSuggestSwitch__moreInfoBtnSuggest)]: true
+                  })}
+                    href='https://brave.com/Payments_FAQ.html'
+                    target='_blank'
+                    data-l10n-id='paymentsFAQLink'
+                  />
+                </div>
               </div>
-              <div className={css(styles.mainIconsRight)}>
+              <div className={css(styles.switchWrap__mainIconsRight)}>
                 <a
                   data-test-id={this.hasWalletTransaction ? 'paymentHistoryButton' : 'disabledPaymentHistoryButton'}
                   data-l10n-id='paymentHistoryIcon'
-                  className={css(styles.mainIcons, styles.historyIcon, !this.hasWalletTransaction && styles.historyDisabled)}
+                  className={css(
+                    styles.switchWrap__mainIcons,
+                    styles.mainIcons__historyIcon,
+                    !this.hasWalletTransaction && styles.mainIcons__historyDisabled
+                  )}
                   onClick={(enabled && this.hasWalletTransaction) ? this.props.showOverlay.bind(this, 'paymentHistory') : () => {}}
                 />
                 <a
-                  className={css(styles.mainIcons, styles.advanceIcon, !enabled && styles.advanceIconDisabled)}
                   data-test-id={!enabled ? 'advancedSettingsButtonLoading' : 'advancedSettingsButton'}
                   data-l10n-id='advancedSettingsIcon'
+                  className={css(
+                    styles.switchWrap__mainIcons,
+                    styles.mainIcons__settingIcon,
+                    !enabled && styles.mainIcons__settingIconDisabled
+                  )}
                   onClick={enabled ? this.props.showOverlay.bind(this, 'advancedSettings') : () => {}}
                 />
               </div>
@@ -232,79 +251,98 @@ class PaymentsTab extends ImmutableComponent {
 }
 
 const styles = StyleSheet.create({
+  flexAlignCenter: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  flexAlignEnd: {
+    display: 'flex',
+    alignItems: 'flex-end'
+  },
+
   paymentsContainer: {
     position: 'relative',
     overflowX: 'hidden',
-    width: '805px'
-  },
-  titleBar: {
-    overflow: 'hidden',
-    display: 'flex',
-    alignItems: 'center',
+    width: '805px',
     marginTop: '15px'
   },
   paymentsSwitches: {
     display: 'flex',
-    marginTop: '2px',
+    position: 'relative',
+    bottom: '2px',
     minHeight: '29px'
   },
+
   switchWrap: {
-    display: 'flex',
-    alignItems: 'flex-end',
     width: paymentStyles.width.tableCell
   },
-  switchControl: {
-    paddingTop: 0,
-    paddingBottom: 0
+  switchWrap__switchControl: {
+    // TODO: Refactor switchControls.less
+    paddingTop: '0 !important',
+    paddingBottom: '0 !important'
   },
-  switchSpan: {
+  switchWrap__switchSpan: {
     color: '#999',
     fontWeight: 'bold'
   },
-  autoSuggestSwitch: {
-    position: 'relative',
-    left: '-5px',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between'
-  },
-  moreInfo: {
-    fontWeight: 'bold',
-    fontSize: paymentStyles.font.regular,
-    color: '#c7c7c7'
-  },
-  moreInfoBtnSuggest: {
-    marginLeft: '7px',
-    marginTop: '4px',
-    cursor: 'pointer',
-    textDecoration: 'none'
-  },
-  label: {
+  switchWrap__label: {
     fontWeight: 'bold',
     color: globalStyles.color.braveOrange
   },
-  mainIcons: {
+  switchWrap__right: {
+    justifyContent: 'space-between',
+    position: 'relative'
+  },
+
+  switchWrap__autoSuggestSwitch: {
+    // TODO: Refactor switchControls.less
+    position: 'relative',
+    right: '5px',
+    top: '1px'
+  },
+  autoSuggestSwitch__subtext: {
+    fontSize: globalStyles.fontSize.settingItemSubtext
+  },
+  autoSuggestSwitch__moreInfo: {
+    color: globalStyles.color.commonTextColor
+  },
+  autoSuggestSwitch__moreInfoBtnSuggest: {
+    position: 'relative',
+    left: '5px',
+    cursor: 'pointer',
+
+    // TODO: refactor preferences.less to remove !important
+    ':hover': {
+      textDecoration: 'none !important'
+    }
+  },
+
+  switchWrap__mainIconsRight: {
+    position: 'relative',
+    right: '12px',
+    top: '3.5px'
+  },
+  switchWrap__mainIcons: {
     backgroundColor: globalStyles.color.braveOrange,
     width: '25px',
     height: '26px',
     display: 'inline-block',
-    marginLeft: '7px',
     position: 'relative',
-    top: '7px',
 
     ':hover': {
       backgroundColor: globalStyles.color.braveDarkOrange
     }
   },
-  mainIconsLeft: {
-    display: 'flex'
+
+  mainIcons__historyIcon: {
+    right: '5px',
+    WebkitMaskImage: `url(${historyIcon})`,
+
+    ':hover': {
+      backgroundColor: globalStyles.color.braveDarkOrange
+    }
   },
-  mainIconsRight: {
-    paddingRight: '10px'
-  },
-  historyIcon: {
-    '-webkit-mask-image': `url(${historyIcon})`
-  },
-  historyDisabled: {
+  mainIcons__historyDisabled: {
     backgroundColor: globalStyles.color.chromeTertiary,
     cursor: 'default',
 
@@ -312,12 +350,20 @@ const styles = StyleSheet.create({
       backgroundColor: globalStyles.color.chromeTertiary
     }
   },
-  advanceIcon: {
-    '-webkit-mask-image': `url(${advanceIcon})`
+  mainIcons__settingIcon: {
+    WebkitMaskImage: `url(${settingIcon})`,
+
+    ':hover': {
+      backgroundColor: globalStyles.color.braveDarkOrange
+    }
   },
-  advanceIconDisabled: {
+  mainIcons__settingIconDisabled: {
     backgroundColor: globalStyles.color.chromeTertiary,
-    cursor: 'default'
+    cursor: 'default',
+
+    ':hover': {
+      backgroundColor: globalStyles.color.chromeTertiary
+    }
   }
 })
 

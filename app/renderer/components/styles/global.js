@@ -16,6 +16,7 @@ const globalStyles = {
     }
   },
   color: {
+    commonTextColor: '#3b3b3b',
     linkColor: '#0099CC',
     highlightBlue: '#37A9FD',
     privateTabBackground: '#665296',
@@ -167,7 +168,8 @@ const globalStyles = {
   },
   fontSize: {
     tabIcon: '14px',
-    tabTitle: '12px'
+    tabTitle: '12px',
+    settingItemSubtext: '.95rem'
   },
   appIcons: {
     clipboard: 'fa fa-clipboard',

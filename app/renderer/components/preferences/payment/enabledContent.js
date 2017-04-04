@@ -298,9 +298,11 @@ const styles = StyleSheet.create({
   },
 
   iconText: {
-    color: '#c7c7c7',
+    color: globalStyles.color.mediumGray,
     margin: '0 0 0 5px',
-    fontSize: paymentStyles.font.regular
+
+    // TODO: refactor preferences.less to remove !important
+    fontSize: `${globalStyles.fontSize.settingItemSubtext} !important`
   },
 
   contribution: {
