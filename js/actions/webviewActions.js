@@ -86,16 +86,6 @@ const webviewActions = {
       return
     }
     webview.stopFindInPage('keepSelection')
-  },
-
-  guestAttached: function (frame, cb) {
-    getWebview(frame.get('key'))
-      .attachGuest(frame.get('guestInstanceId'))
-  },
-
-  guestDetached: function (frame, cb) {
-    getWebview(frame.get('key'))
-      .detachGuest(cb)
   }
 }
 

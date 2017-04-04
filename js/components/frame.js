@@ -328,13 +328,7 @@ class Frame extends ImmutableComponent {
         this.webview.addEventListener('did-attach', eventCallback)
       }
 
-      if (this.props.guestInstanceId) {
-        if (!this.frame.get('pinnedLocation') || isFocused()) {
-          if (!this.webview.attachGuest(this.props.guestInstanceId)) {
-            console.error('could not set guestInstanceId ' + this.props.guestInstanceId)
-          }
-        }
-      } else {
+      if (!this.props.guestInstanceId || !this.webview.attachGuest(this.props.guestInstanceId)) {
         // The partition is guaranteed to be initialized by now by the browser process
         this.webview.setAttribute('partition', frameStateUtil.getPartition(this.frame))
         this.webview.setAttribute('src', newSrc)
@@ -346,17 +340,26 @@ class Frame extends ImmutableComponent {
   }
 
   onPropsChanged (prevProps = {}) {
-    if (!prevProps.isActive && this.props.isActive) {
+    if (this.props.isActive && !prevProps.isActive) {
       windowActions.setActiveFrame(this.frame)
     }
-    this.webview.setTabIndex(this.props.tabIndex)
-    if (this.frame && this.props.isActive && isFocused()) {
+    if (this.props.tabIndex !== prevProps.tabIndex) {
+      this.webview.setTabIndex(this.props.tabIndex)
+    }
+    if (this.props.isActive && isFocused()) {
       windowActions.setFocusedFrame(this.frame)
     }
     this.updateAboutDetails(prevProps)
   }
 
   componentDidMount () {
+    appStoreRenderer.addChangeListener(() => {
+      if (!this.frame.isEmpty() && this.tab && !this.tab.delete('frame').equals(this.lastTab)) {
+        windowActions.tabDataChanged(this.frame, this.tab)
+      }
+      this.lastTab = this.tab && this.tab.delete('frame')
+    })
+
     if (this.props.isActive) {
       windowActions.setActiveFrame(this.frame)
     }
@@ -406,31 +409,18 @@ class Frame extends ImmutableComponent {
     }
   }
 
-  setTitle (title) {
-    if (this.frame.isEmpty()) {
-      return
-    }
-    windowActions.setFrameTitle(this.frame, title)
-  }
-
   componentDidUpdate (prevProps) {
     // TODO: This title should be set in app/browser/tabs.js and then we should use the
     // app state for the tabData everywhere and remove windowState's title completely.
-    if (this.props.tabData && this.frame &&
-        this.props.tabData.get('title') !== this.frame.get('title')) {
-      this.setTitle(this.props.tabData.get('title'))
-    }
-    if (prevProps.activeShortcut !== this.props.activeShortcut) {
+    if (this.props.activeShortcut !== prevProps.activeShortcut) {
       this.handleShortcut()
     }
 
-    const isTabPinned = this.props.tabData && this.props.tabData.get('pinned')
-    if (this.props.tabData && this.frame &&
-        isTabPinned !== !!this.frame.get('pinnedLocation')) {
-      if (isTabPinned || (!isTabPinned && isFocused())) {
-        windowActions.framePinned(this.frame, isTabPinned)
-      }
+    if (!this.frame.isEmpty() && !this.frame.delete('lastAccessedTime').equals(this.lastFrame)) {
+      appActions.frameChanged(this.frame)
     }
+
+    this.lastFrame = this.frame.delete('lastAccessedTime')
 
     const cb = () => {
       this.onPropsChanged(prevProps)
@@ -653,10 +643,14 @@ class Frame extends ImmutableComponent {
         return
       }
 
-      let tabId = e.tabID
-      if (this.props.tabId !== tabId) {
-        windowActions.setFrameTabId(this.frame, tabId)
+      windowActions.frameTabIdChanged(this.frame, this.props.tabId, e.tabID)
+    })
+    this.webview.addEventListener('guest-ready', (e) => {
+      if (this.frame.isEmpty()) {
+        return
       }
+
+      windowActions.frameGuestInstanceIdChanged(this.frame, this.props.guestInstanceId, e.guestInstanceId)
     })
     this.webview.addEventListener('content-blocked', (e) => {
       if (this.frame.isEmpty()) {
@@ -709,7 +703,7 @@ class Frame extends ImmutableComponent {
       if (this.frame.isEmpty()) {
         return
       }
-      this.props.onCloseFrame(this.frame)
+      this.props.onCloseFrame(this.frame, true)
     })
     this.webview.addEventListener('close', () => {
       if (this.frame.isEmpty()) {
@@ -1165,7 +1159,7 @@ class Frame extends ImmutableComponent {
   }
 
   render () {
-    const messageBoxDetail = this.props.tabData && this.props.tabData.get('messageBoxDetail')
+    const messageBoxDetail = this.tab && this.tab.get('messageBoxDetail')
     return <div
       data-partition={frameStateUtil.getPartition(this.frame)}
       className={cx({

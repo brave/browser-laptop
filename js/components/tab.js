@@ -8,7 +8,6 @@ const ImmutableComponent = require('./immutableComponent')
 const {StyleSheet, css} = require('aphrodite')
 
 const windowActions = require('../actions/windowActions')
-const webviewActions = require('../actions/webviewActions')
 const appActions = require('../actions/appActions')
 const locale = require('../l10n')
 const dragTypes = require('../constants/dragTypes')
@@ -115,29 +114,21 @@ class Tab extends ImmutableComponent {
     dnd.onDragEnd(dragTypes.TAB, this.frame, e)
     // If there's no dropWindowId that means the user dropped it outside of Brave completely and we should
     // create a new window with the tab.
+
+    // TODO(bridiver) - a window with a single tab should not be draggable
     if (!dnd.isDraggingInsideWindow()) {
       const frameOpts = frameOptsFromFrame(this.frame).toJS()
-      frameOpts.disposition = 'foreground-tab'
       const browserOpts = { positionByMouseCursor: true }
+      let dropWindowId = -1
       if (this.props.dragData) {
         frameOpts.indexByFrameKey = this.props.dragData.getIn(['dragOverData', 'draggingOverKey'])
-        frameOpts.prependIndexByFrameKey = this.props.dragData.getIn(['dragOverData', 'draggingOverLeftHalf'])
-        const dropWindowId = this.props.dragData.get('dropWindowId') || this.props.dragData.getIn(['dragOverData', 'draggingOverWindowId'])
-        if (currentWindowId !== dropWindowId && dropWindowId !== undefined) {
-          webviewActions.guestDetached(this.frame, () => {
-            appActions.newWebContentsAdded(dropWindowId, frameOpts)
-          })
-        } else if (windowStore.getFrameCount() > 1) {
-          webviewActions.guestDetached(this.frame, () => {
-            appActions.newWindow(frameOpts, browserOpts)
-          })
+        const prependIndexByFrameKey = this.props.dragData.getIn(['dragOverData', 'draggingOverLeftHalf'])
+        if (prependIndexByFrameKey === false) {
+          frameOpts.indexByFrameKey++
         }
-      // If there's only 1 frame we don't want to detach when dropped outside of a window
-      } else if (windowStore.getFrameCount() > 1) {
-        webviewActions.guestDetached(this.frame, () => {
-          appActions.newWindow(frameOpts, browserOpts)
-        })
+        dropWindowId = this.props.dragData.get('dropWindowId') || this.props.dragData.getIn(['dragOverData', 'draggingOverWindowId']) || dropWindowId
       }
+      appActions.tabMoved(this.frame.get('tabId'), frameOpts, browserOpts, dropWindowId)
     }
   }
 

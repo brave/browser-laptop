@@ -73,30 +73,45 @@ const windowActions = {
   },
 
   /**
-   * Dispatches a message to set the frame tab id
+   * Dispatches a message to change the frame tabId
    * @param {Object} frameProps - The frame properties
-   * @param {Number} tabId - the tab id to set
-   * @param {Number} guestInstanceId - the guest instance id to set
+   * @param {Number} oldTabId - the current tabId
+   * @param {Number} newTabId - the new tabId
    */
-  setFrameTabId: function (frameProps, tabId, guestInstanceId) {
+  frameTabIdChanged: function (frameProps, oldTabId, newTabId) {
     dispatch({
-      actionType: windowConstants.WINDOW_SET_FRAME_TAB_ID,
+      actionType: windowConstants.WINDOW_FRAME_TAB_ID_CHANGED,
       frameProps,
-      tabId,
-      guestInstanceId
+      oldTabId,
+      newTabId
     })
   },
 
   /**
-   * Dispatches a message to pin a tab
+   * Dispatches a message when the guestInstanceId changes for a frame
    * @param {Object} frameProps - The frame properties
-   * @param {boolean} pinned - true if pinned, otherwise false
+   * @param {Number} oldGuestInstanceId - the current guestInstanceId
+   * @param {Number} newGuestInstanceId - the new guestInstanceId
    */
-  framePinned: function (frameProps, pinned) {
+  frameGuestInstanceIdChanged: function (frameProps, oldGuestInstanceId, newGuestInstanceId) {
     dispatch({
-      actionType: windowConstants.WINDOW_FRAME_PINNED,
+      actionType: windowConstants.WINDOW_FRAME_GUEST_INSTANCE_ID_CHANGED,
       frameProps,
-      pinned
+      oldGuestInstanceId,
+      newGuestInstanceId
+    })
+  },
+
+  /**
+   * Dispatches a message when tab data changes
+   * @param {Object} frameProps - The frame properties
+   * @param {Object} tabData - the tab properties
+   */
+  tabDataChanged: function (frameProps, tabData) {
+    dispatch({
+      actionType: windowConstants.WINDOW_TAB_DATA_CHANGED,
+      frameProps,
+      tabData
     })
   },
 
@@ -124,21 +139,6 @@ const windowActions = {
     dispatch({
       actionType: windowConstants.WINDOW_SET_NAVBAR_INPUT,
       location
-    })
-  },
-
-  /**
-   * Dispatches a message to the store to set the current frame's title.
-   * This should be called in response to the webview encountering a `<title>` tag.
-   *
-   * @param {Object} frameProps - The frame properties to modify
-   * @param {string} title - The title to set for the frame
-   */
-  setFrameTitle: function (frameProps, title) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_FRAME_TITLE,
-      frameProps,
-      title
     })
   },
 

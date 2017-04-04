@@ -14,6 +14,7 @@ const appStore = require('../../js/stores/appStore')
 const windowConstants = require('../../js/constants/windowConstants')
 const Menu = electron.Menu
 const CommonMenu = require('../common/commonMenu')
+const { makeImmutable } = require('../common/state/immutableUtil')
 const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
 const siteTags = require('../../js/constants/siteTags')
@@ -22,6 +23,7 @@ const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 const {fileUrl} = require('../../js/lib/appUrlUtil')
 const menuUtil = require('../common/lib/menuUtil')
+const {getByTabId} = require('../common/state/tabState')
 const getSetting = require('../../js/settings').getSetting
 const locale = require('../locale')
 const {isSiteBookmarked, siteSort} = require('../../js/state/siteUtil')
@@ -31,6 +33,7 @@ const isLinux = process.platform === 'linux'
 let appMenu = null
 // TODO(bridiver) - these should be handled in the appStore
 let closedFrames = {}
+let lastClosedUrl = null
 let currentLocation = null
 
 // Submenu initialization
@@ -611,21 +614,27 @@ const doAction = (action) => {
       break
     case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
       appDispatcher.waitFor([appStore.dispatchToken], () => {
-        delete closedFrames[action.frameProps.get('location')]
+        delete closedFrames[lastClosedUrl]
         createMenu()
       })
       break
     case windowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
       appDispatcher.waitFor([appStore.dispatchToken], () => {
         closedFrames = {}
+        lastClosedUrl = null
         createMenu()
       })
       break
-    case windowConstants.WINDOW_CLOSE_FRAME:
+    case appConstants.APP_TAB_CLOSED:
       appDispatcher.waitFor([appStore.dispatchToken], () => {
-        if (!action.frameProps.get('isPrivate') && action.frameProps.get('location') !== 'about:newtab') {
-          closedFrames[action.frameProps.get('location')] = action.frameProps
-          createMenu()
+        action = makeImmutable(action)
+        const tab = getByTabId(appStore.getState(), action.getIn(['tabValue', 'tabId']))
+        if (tab && !tab.get('incognito') && tab.get('url') !== 'about:newtab') {
+          if (tab.get('frame')) {
+            lastClosedUrl = tab.get('url')
+            closedFrames[tab.get('url')] = tab.get('frame')
+            createMenu()
+          }
         }
       })
       break

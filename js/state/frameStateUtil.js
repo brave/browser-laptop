@@ -8,6 +8,9 @@ const {tabCloseAction} = require('../../app/common/constants/settingsEnums')
 const urlParse = require('../../app/common/urlParse')
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
 
+const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
+      ? 1 : b.get('key') > a.get('key') ? -1 : 0
+
 const matchFrame = (queryInfo, frame) => {
   queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
   return !Object.keys(queryInfo).map((queryKey) => (frame.get(queryKey) === queryInfo[queryKey])).includes(false)
@@ -29,6 +32,22 @@ function getFrameDisplayIndex (windowState, frame) {
   return findDisplayIndexForFrameKey(windowState.get('frames'), frame)
 }
 
+function getFrames (windowState) {
+  return windowState.get('frames')
+}
+
+function getSortedFrames (windowState) {
+  return windowState.get('frames').sort(comparatorByKeyAsc)
+}
+
+function getPinnedFrames (windowState) {
+  return windowState.get('frames').filter((frame) => frame.get('pinnedLocation'))
+}
+
+function getNonPinnedFrames (windowState) {
+  return windowState.get('frames').filter((frame) => !frame.get('pinnedLocation'))
+}
+
 function getFrameIndex (windowState, frame) {
   return findIndexForFrameKey(windowState.get('frames'), frame)
 }
@@ -39,6 +58,38 @@ function getActiveFrameDisplayIndex (windowState) {
 
 function getActiveFrameIndex (windowState) {
   return getFrameIndex(windowState, windowState.get('activeFrameKey'))
+}
+
+// TODO(bridiver) - will be used for pinned tab transfer
+function restoreFramePropsFromTab (tab) {
+  let frame = (tab && tab.get('frame')) || new Immutable.Map()
+  return frame.delete('activeShortcut')
+      .delete('activeShortcutDetails')
+      .delete('guestInstanceId')
+      .delete('key')
+      .delete('tabId')
+      .delete('parentFrameKey')
+}
+
+function getFramePropsFromTab (tab) {
+  let frame = new Immutable.Map()
+  if (tab) {
+    const isTabPinned = tab.get('pinned')
+    const url = tab.get('url')
+    let pinnedLocation = 'about:blank'
+
+    if (isTabPinned && url !== 'about:blank' && url !== '') {
+      pinnedLocation = url
+    }
+
+    if (!isTabPinned) {
+      pinnedLocation = null
+    }
+
+    frame = frame.set('pinnedLocation', pinnedLocation)
+    frame = frame.set('title', tab.get('title'))
+  }
+  return frame
 }
 
 function getActiveFrameTabId (windowState) {
@@ -624,8 +675,14 @@ module.exports = {
   getNonPinnedFrameCount,
   isPrivatePartition,
   isSessionPartition,
+  getFrames,
+  getSortedFrames,
+  getPinnedFrames,
+  getNonPinnedFrames,
   getFrameIndex,
   getFrameDisplayIndex,
+  restoreFramePropsFromTab,
+  getFramePropsFromTab,
   getActiveFrameIndex,
   getActiveFrameDisplayIndex,
   getActiveFrameTabId,

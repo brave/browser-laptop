@@ -95,15 +95,6 @@ const tabState = {
     return state.set('tabs', state.get('tabs').delete(index))
   },
 
-  closeFrame: (state, action) => {
-    const frameProps = makeImmutable(action).getIn(['frameProps'])
-    // Unloaded tabs have no tab state because the webcontents isn't created yet.
-    if (frameProps.get('unloaded')) {
-      return state
-    }
-    return tabState.removeTabByTabId(state, frameProps.get('tabId'))
-  },
-
   removeTab: (state, action) => {
     action = validateAction(action)
     state = validateState(state)
@@ -143,6 +134,12 @@ const tabState = {
     return state.get('tabs').filter((tab) => tab.get('pinned'))
   },
 
+  getPinnedTabsByWindowId: (state, windowId) => {
+    state = validateState(state)
+    windowId = validateId('windowId', windowId)
+    return tabState.getPinnedTabs(state).filter((tab) => tab.get('windowId') === windowId)
+  },
+
   getMatchingTab: (state, createProperties) => {
     state = validateState(state)
     const windowId = validateId('windowId', createProperties.get('windowId'))
@@ -160,7 +157,9 @@ const tabState = {
   },
 
   getByTabId: (state, tabId) => {
-    tabId = validateId('tabId', tabId)
+    if (parseInt(tabId) < 0) {
+      return null
+    }
     state = validateState(state)
 
     return state.get('tabs').find((tab) => tab.get('tabId') === tabId)
@@ -176,9 +175,24 @@ const tabState = {
   updateTab: (state, action) => {
     state = validateAction(state)
     action = validateAction(action)
-    let tabValue = validateTabValue(action.get('tabValue'))
-    let tabs = state.get('tabs')
-    let index = tabState.getTabIndex(state, tabValue)
+    return tabState.updateTabValue(state, action.get('tabValue'), action.get('replace'))
+  },
+
+  getTabs: (state) => {
+    state = validateState(state)
+    return state.get('tabs')
+  },
+
+  setTabs: (state, tabs) => {
+    state = validateState(state)
+    tabs = validateTabs(tabs)
+    return state.set('tabs', tabs)
+  },
+
+  updateTabValue: (state, tabValue, replace = false) => {
+    tabValue = validateTabValue(tabValue)
+    const tabs = state.get('tabs')
+    const index = tabState.getTabIndex(state, tabValue)
     if (index === -1) {
       return state
     }
@@ -193,21 +207,11 @@ const tabState = {
         assert.ok(tabId === currentTabId, 'Changing a tabId is not allowed')
       }
     }
-    if (!action.get('replace')) {
+    if (!replace) {
       tabValue = currentTabValue.mergeDeep(tabValue)
     }
+
     return state.set('tabs', tabs.delete(index).insert(index, tabValue))
-  },
-
-  getTabs: (state) => {
-    state = validateState(state)
-    return state.get('tabs')
-  },
-
-  setTabs: (state, tabs) => {
-    state = validateState(state)
-    tabs = validateTabs(tabs)
-    return state.set('tabs', tabs)
   },
 
   removeTabField: (state, field) => {
@@ -223,16 +227,28 @@ const tabState = {
     return state.set('tabs', tabs)
   },
 
+  updateFrame: (state, action) => {
+    state = validateState(state)
+    action = validateAction(action)
+    const tabId = action.getIn(['frame', 'tabId'])
+    if (!tabId) {
+      return state
+    }
+
+    let tabValue = tabState.getByTabId(state, tabId)
+    if (!tabValue) {
+      return state
+    }
+
+    tabValue = tabValue.set('frame', makeImmutable(action.get('frame')))
+    return tabState.updateTabValue(state, tabValue)
+  },
+
   getPersistentState: (state) => {
     state = makeImmutable(state)
 
     state = tabState.removeTabField(state, 'messageBoxDetail')
-
-    // TOOD: Once we persist tabs, we can refactor this away
-    state = state.set('pinnedTabs', state.get('tabs')
-      .filter((tab) => tab.get('pinned')))
-
-    // TODO(bridiver) - handle restoring tabs
+    state = tabState.removeTabField(state, 'frame')
     return state.delete('tabs')
   }
 }

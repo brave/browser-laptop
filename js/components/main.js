@@ -406,8 +406,8 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.SHORTCUT_CLOSE_FRAME, (e, i) => typeof i !== 'undefined' && i !== null
-      ? windowActions.closeFrame(self.props.windowState.get('frames'), frameStateUtil.getFrameByKey(self.props.windowState, i))
-      : windowActions.closeFrame(self.props.windowState.get('frames'), frameStateUtil.getActiveFrame(this.props.windowState)))
+      ? windowActions.closeFrame(frameStateUtil.getFrames(self.props.windowState), frameStateUtil.getFrameByKey(self.props.windowState, i))
+      : windowActions.closeFrame(frameStateUtil.getFrames(self.props.windowState), frameStateUtil.getActiveFrame(this.props.windowState)))
     ipc.on(messages.SHORTCUT_UNDO_CLOSED_FRAME, () => windowActions.undoClosedFrame())
 
     ipc.on(messages.SHORTCUT_CLOSE_OTHER_FRAMES, (e, key, isCloseRight, isCloseLeft) => {
@@ -416,10 +416,10 @@ class Main extends ImmutableComponent {
         return
       }
 
-      self.props.windowState.get('frames').forEach((frame, i) => {
+      frameStateUtil.getFrames(self.props.windowState).forEach((frame, i) => {
         if (!frame.get('pinnedLocation') &&
             ((i < currentIndex && isCloseLeft) || (i > currentIndex && isCloseRight))) {
-          windowActions.closeFrame(self.props.windowState.get('frames'), frame)
+          windowActions.closeFrame(frameStateUtil.getFrames(self.props.windowState), frame)
         }
       })
     })
@@ -437,7 +437,7 @@ class Main extends ImmutableComponent {
       windowActions.setActiveFrame(frameStateUtil.getFrameByDisplayIndex(self.props.windowState, i)))
 
     ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST, () =>
-      windowActions.setActiveFrame(self.props.windowState.getIn(['frames', self.props.windowState.get('frames').size - 1])))
+      windowActions.setActiveFrame(self.props.windowState.getIn(['frames', frameStateUtil.getFrames(self.props.windowState).size - 1])))
 
     ipc.on(messages.BLOCKED_RESOURCE, (e, blockType, details) => {
       const frameProps = frameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
@@ -559,17 +559,9 @@ class Main extends ImmutableComponent {
     currentWindow.on('resize', onWindowResize)
     currentWindow.on('move', onWindowMove)
     currentWindow.on('focus', () => {
-      const pinnedFrames = this.props.windowState.get('frames').filter((frame) => frame.get('pinnedLocation'))
-      pinnedFrames.forEach((frame) => {
-        webviewActions.guestAttached(frame)
-      })
       windowActions.onFocusChanged(true)
     })
     currentWindow.on('blur', () => {
-      const pinnedFrames = this.props.windowState.get('frames').filter((frame) => frame.get('pinnedLocation'))
-      pinnedFrames.forEach((frame) => {
-        webviewActions.guestDetached(frame)
-      })
       self.resetAltMenuProcessing()
       appActions.windowBlurred(currentWindow.id)
       windowActions.onFocusChanged(false)
@@ -713,8 +705,8 @@ class Main extends ImmutableComponent {
     return siteSettings.activeSettings(settings, this.props.appState, appConfig).noScript === true
   }
 
-  onCloseFrame (activeFrameProps) {
-    windowActions.closeFrame(this.props.windowState.get('frames'), activeFrameProps, false)
+  onCloseFrame (activeFrameProps, forceClose = false) {
+    windowActions.closeFrame(frameStateUtil.getFrames(this.props.windowState), activeFrameProps, forceClose)
   }
 
   onDragOver (e) {
@@ -922,19 +914,16 @@ class Main extends ImmutableComponent {
   }
 
   render () {
-    const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
-      ? 1 : b.get('key') > a.get('key') ? -1 : 0
-
     // Sort frames by key so that the order of the frames do not change which could
     // cause unexpected reloading when a user moves tabs.
     // All frame operations work off of frame keys and not index though so unsorted frames
     // can be passed everywhere other than the Frame elements.
-    const sortedFrames = this.props.windowState.get('frames').sort(comparatorByKeyAsc)
+    const sortedFrames = frameStateUtil.getSortedFrames(this.props.windowState)
     const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
     this.frames = {}
     const allSiteSettings = this.allSiteSettings
     const activeSiteSettings = this.activeSiteSettings
-    const nonPinnedFrames = this.props.windowState.get('frames').filter((frame) => !frame.get('pinnedLocation'))
+    const nonPinnedFrames = frameStateUtil.getNonPinnedFrames(this.props.windowState)
     const tabsPerPage = Number(getSetting(settings.TABS_PER_PAGE))
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
     const btbMode = getSetting(settings.BOOKMARKS_TOOLBAR_MODE)

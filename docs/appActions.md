@@ -33,6 +33,16 @@ Dispatches an event to the main process to create a new window.
 
 
 
+### frameChanged(frame) 
+
+Frame props changed
+
+**Parameters**
+
+**frame**: `Object`, Frame props changed
+
+
+
 ### tabCreated(tabValue) 
 
 A new tab has been created
@@ -40,6 +50,22 @@ A new tab has been created
 **Parameters**
 
 **tabValue**: `Object`, A new tab has been created
+
+
+
+### tabMoved(tabId, frameOpts, browserOpts, windowId) 
+
+A tab has been moved to another window
+
+**Parameters**
+
+**tabId**: `Number`, A tab has been moved to another window
+
+**frameOpts**: `Object`, A tab has been moved to another window
+
+**browserOpts**: `Object`, A tab has been moved to another window
+
+**windowId**: `Number`, A tab has been moved to another window
 
 
 
@@ -98,13 +124,15 @@ A tab has been updated
 
 
 
-### tabClosed(tabId) 
+### tabClosed(tabId, force) 
 
 Closes an open tab
 
 **Parameters**
 
 **tabId**: `number`, Closes an open tab
+
+**force**: `boolean`, closing the tab
 
 
 

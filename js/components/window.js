@@ -13,8 +13,7 @@ const appActions = require('../actions/appActions')
 const Main = require('./main')
 const cx = require('../lib/classSet')
 const {getPlatformStyles} = require('../../app/common/lib/platformUtil')
-const alreadyPinnedTabIds = new Set()
-const {currentWindowId, isFocused} = require('../../app/renderer/currentWindow')
+const {currentWindowId} = require('../../app/renderer/currentWindow')
 
 window.appActions = appActions
 
@@ -35,86 +34,10 @@ class Window extends React.Component {
       windowActions.setState(this.windowState)
     }
 
-    this.syncPinnedTabs()
-
     this.onChange = this.onChange.bind(this)
     this.onAppStateChange = this.onAppStateChange.bind(this)
     windowStore.addChangeListener(this.onChange)
     appStoreRenderer.addChangeListener(this.onAppStateChange)
-  }
-
-  removeTransferredTabs () {
-    /*
-    const tabIdsForWindow = this.appState.get('tabs')
-      .filter((tab) => tab.get('windowId') === currentWindowId)
-      .map((tab) => tab.get('tabId'))
-    const tabsToRemove = this.windowState.get('frames')
-      .filter((frame) => !tabIdsForWindow.includes(frame.get('tabId')))
-
-    console.log('----tabs to remove:', tabsToRemove.toJS())
-    tabsToRemove.forEach((frame) => {
-      console.log('remove frame:', frame.toJS())
-     // windowActions.closeFrame(windowStore.getState().get('frames'), frame, false)
-    })
-    */
-  }
-
-  syncPinnedTabs () {
-    if (!isFocused) {
-      return
-    }
-
-    // Shortcut to only do this when the number of pinned tabs in app storage changes
-    const pinnedTabSize = this.appState.get('tabs').filter((tab) => tab.get('pinned')).size
-    if (pinnedTabSize === this.lastPinnedTabSize) {
-      return
-    }
-
-    // Get the pinned tabs which haven't been pinned on this window yet
-    const pinnedTabs = this.appState.get('tabs')
-      .filter((tab) => tab.get('pinned'))
-      .filter((tab) => !alreadyPinnedTabIds.has(tab.get('tabId')))
-
-    // Preload current app tabs that are pinned into already pinned locations
-    pinnedTabs
-      .forEach((tab) => {
-        const tabId = tab.get('tabId')
-        const url = tab.get('url')
-        alreadyPinnedTabIds.add(tabId)
-        const site = this.appState.get('sites').find(function (element) { return element.get('location') === url })
-        const icon = (site && site.get('favicon')) || undefined
-        // Make sure that the tab's windowId comes from somewhere other than ourselves.
-        // If the windowId is the same tha tmeans it's a tab originally from this window
-        // which was converted to a pinned tab.
-        if (tab.get('windowId') !== currentWindowId) {
-          appActions.newWebContentsAdded(currentWindowId, {
-            location: url,
-            partition: tab.get('partition'),
-            guestInstanceId: tab.get('guestInstanceId'),
-            pinnedLocation: url,
-            icon
-          })
-        }
-      })
-
-    const tabsToRemove = this.appState.get('tabs').filter(
-      (tab) => {
-        return !tab.get('pinned') &&
-          alreadyPinnedTabIds.has(tab.get('tabId'))
-      })
-
-    // Close each of the frames which are no longer pinned
-    this.windowState.get('frames')
-      .filter((frame) => tabsToRemove.find((tab) => tab.get('tabId') === frame.get('tabId')))
-      .forEach((frame) => {
-        const tab = tabsToRemove.find((tab) => tab.get('tabId') === frame.get('tabId'))
-        if (tab.get('windowId') !== currentWindowId) {
-          windowActions.closeFrame(this.windowState.get('frames'), frame, true)
-        }
-        alreadyPinnedTabIds.delete(frame.get('tabId'))
-      })
-
-    this.lastPinnedTabSize = pinnedTabSize
   }
 
   componentWillMount () {
@@ -160,6 +83,10 @@ class Window extends React.Component {
     </div>
   }
 
+  componentDidMount () {
+    appActions.windowReady(currentWindowId)
+  }
+
   componentWillUnmount () {
     windowStore.removeChangeListener(this.onChange)
     appStoreRenderer.removeChangeListener(this.onAppStateChange)
@@ -187,15 +114,9 @@ class Window extends React.Component {
         appState: this.appState
       }
     })
-
-    if (!this.props.includePinnedSites) {
-      return
-    }
-
-    this.syncPinnedTabs()
-    this.removeTransferredTabs()
   }
 }
+
 Window.propTypes = { appState: React.PropTypes.object, frames: React.PropTypes.array, initWindowState: React.PropTypes.object }
 
 module.exports = Window

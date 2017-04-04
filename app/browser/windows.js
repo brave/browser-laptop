@@ -9,10 +9,14 @@ const debounce = require('../../js/lib/debounce')
 const {getSetting} = require('../../js/settings')
 const locale = require('../locale')
 const LocalShortcuts = require('../localShortcuts')
-const { makeImmutable } = require('../common/state/immutableUtil')
+const {makeImmutable} = require('../common/state/immutableUtil')
+const {getPinnedTabsByWindowId} = require('../common/state/tabState')
+const {siteSort} = require('../../js/state/siteUtil')
 const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
+const siteTags = require('../../js/constants/siteTags')
 const windowState = require('../common/state/windowState')
+const Immutable = require('immutable')
 
 // TODO(bridiver) - set window uuid
 let currentWindows = {}
@@ -57,26 +61,67 @@ const updateWindow = (windowId) => {
   }
 }
 
+const siteProps = (site) => {
+  return Immutable.fromJS({
+    location: site.get('location'),
+    partitionNumber: site.get('partitionNumber') || 0
+  })
+}
+
+const updatePinnedTabs = (win) => {
+  if (win.webContents.browserWindowOptions.disposition === 'new-popup') {
+    return
+  }
+
+  const appStore = require('../../js/stores/appStore')
+  const state = appStore.getState()
+  const windowId = win.id
+  const pinnedSites = state.get('sites').toList().filter((site) =>
+    site.get('tags').includes(siteTags.PINNED)).map((site) => siteProps(site))
+  const pinnedTabs = getPinnedTabsByWindowId(state, windowId)
+
+  pinnedSites.filter((site) =>
+    pinnedTabs.find((tab) =>
+      tab.get('url') === site.get('location') &&
+      (tab.get('partitionNumber') || 0) === (site.get('partitionNumber') || 0))).forEach((site) => {
+        win.__alreadyPinnedSites = win.__alreadyPinnedSites.add(site)
+      })
+
+  const sitesToAdd = pinnedSites.filter((site) =>
+    !win.__alreadyPinnedSites.find((pinned) => pinned.equals(site)))
+
+  sitesToAdd.sort(siteSort).forEach((site) => {
+    win.__alreadyPinnedSites = win.__alreadyPinnedSites.add(site)
+    appActions.createTabRequested({
+      url: site.get('location'),
+      partitionNumber: site.get('partitionNumber'),
+      pinned: true,
+      active: false,
+      windowId
+    })
+  })
+
+  const sitesToClose = win.__alreadyPinnedSites.filter((pinned) =>
+    !pinnedSites.find((site) => pinned.equals(site)))
+
+  sitesToClose
+    .forEach((site) => {
+      const tab = pinnedTabs.find((tab) =>
+        tab.get('url') === site.get('location') &&
+        (tab.get('partitionNumber') || 0) === (site.get('partitionNumber') || 0))
+      if (tab) {
+        appActions.tabClosed(tab, true)
+      }
+      win.__alreadyPinnedSites = win.__alreadyPinnedSites.remove(site)
+    })
+}
+
 const api = {
   init: (state, action) => {
     app.on('browser-window-created', function (event, win) {
       let windowId = -1
-      const initialPinnedTabs = state.get('pinnedTabs')
       const updateWindowMove = debounce(updateWindow, 100)
       const updateWindowDebounce = debounce(updateWindow, 5)
-
-      win.once('show', () => {
-        if (BrowserWindow.getAllWindows().length === 1 && initialPinnedTabs) {
-          initialPinnedTabs
-            .forEach((tab) => {
-              appActions.createTabRequested({
-                url: tab.get('url'),
-                windowId,
-                partition: tab.get('partition')
-              })
-            })
-        }
-      })
 
       win.once('initialized', () => {
         windowId = win.id
@@ -197,6 +242,23 @@ const api = {
     //   // restore window
     // })
     return state
+  },
+
+  pinnedTabsChanged: () => {
+    for (let windowId in currentWindows) {
+      if (currentWindows[windowId].__ready) {
+        updatePinnedTabs(currentWindows[windowId])
+      }
+    }
+  },
+
+  windowReady: (windowId) => {
+    const win = currentWindows[windowId]
+    if (win && !win.isDestroyed()) {
+      win.__alreadyPinnedSites = new Immutable.Set()
+      updatePinnedTabs(win)
+      win.__ready = true
+    }
   },
 
   closeWindow: (state, action) => {

@@ -540,12 +540,9 @@ function tabTemplateInit (frameProps) {
     template.push({
       label: locale.translation('detach'),
       click: (item) => {
-        webviewActions.guestDetached(frameProps, () => {
-          const browserOpts = { positionByMouseCursor: true }
-          const frameOpts = frameOptsFromFrame(frameProps).toJS()
-          frameOpts.disposition = 'foreground-tab'
-          appActions.newWindow(frameOpts, browserOpts)
-        })
+        const browserOpts = { positionByMouseCursor: true }
+        const frameOpts = frameOptsFromFrame(frameProps).toJS()
+        appActions.tabMoved(frameProps.get('tabId'), frameOpts, browserOpts, -1)
       }
     })
   }
