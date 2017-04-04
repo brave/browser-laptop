@@ -2157,15 +2157,22 @@ var pathName = (name) => {
   return path.join(app.getPath('userData'), parts.name + parts.ext)
 }
 
-// Note placeholder
 const sendAutorenewalRequest = (callback) => {
-  console.log('sending auto-renewal request')
-  // TODO fire request to addfunds
-  callback(null, {})
+  var params = { address: ledgerInfo.address }
+  var options = {
+    method: 'POST',
+    url: process.env.ADDFUNDS_URL + '/v1/purchases/autorenew/' + params.address,
+    responseType: 'text',
+    headers: underscore.defaults(params.headers || {}, { 'content-type': 'application/json; charset=utf-8' }),
+    verboseP: params.verboseP || false
+  }
+  request.request(options, (err, response, body) => {
+    // TODO - messaging in browser?
+    callback(err, body)
+  })
 }
 
 const attemptAutorenewalCharge = () => {
-  console.log('attempting autorenewal charge')
   sendAutorenewalRequest((err, results) => {
     if (!err) {
       retrieveCustomerInfo({ address: ledgerInfo.address }, (customer) => {
