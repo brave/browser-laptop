@@ -132,11 +132,10 @@ const styles = StyleSheet.create({
     WebkitAppRegion: 'no-drag',
     borderWidth: '1px 1px 1px 0px',
     borderStyle: 'solid',
-    borderColor: '#CBCBCB',
+    borderColor: globalStyles.color.urlBarOutline,
     borderRadius: '0 4px 4px 0',
     borderTopLeftRadius: '0',
-    borderBottomLeftRadius: '0',
-    borderBottomColor: 'rgba(0, 0, 0, 0.1)'
+    borderBottomLeftRadius: '0'
   },
 
   noFundVerified: {

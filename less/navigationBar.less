@@ -660,19 +660,24 @@
     z-index: @zindexUrlbarNotLegend;
   }
 
-  input:focus + legend:before {
+  legend:before {
     content: ' ';
     position: absolute;
     background: @navigationBarBackgroundActive;
-    border-radius: 4px;
-    box-shadow: 0 0 1px @focusUrlbarOutline, inset 0 0 2px @focusUrlbarOutline, inset 0 1px 8px rgba(0, 137, 255, 0.1);
+    border-radius: 0 4px 4px 0;
     color: #333;
+    box-shadow: inset 0 0 0 1px @urlBarOutline, inset 0 0 0 3px @focusUrlbarOutline;
     outline: none;
     top: 0;
     bottom: 0;
     right: 0;
     left: 0;
     z-index: @zindexNavigationBar;
+    display: none;
+  }
+
+  input:focus + legend:before {
+    display: block;
   }
 
   #navigator:not(.titleMode) & {
@@ -718,20 +723,22 @@
   &:not(.titleMode) {
     > * {
       animation: fadeIn .6s;
-      opacity: 0;
-      animation-fill-mode: forwards;
     }
 
     .urlbarForm {
         &.noBorderRadius {
         border-radius: 0;
+
+        legend:before {
+          border-radius: 0;
+        }
       }
     }
 
     // Create 25x25 squares and place the buttons at the center of each container
     .bookmarkButtonContainer,
     .addPublisherButtonContainer {
-      border: 1px solid #bbb;
+      border: 1px solid @urlBarOutline;
       border-radius: @borderRadiusURL;
       box-sizing: border-box;
       display: flex;
