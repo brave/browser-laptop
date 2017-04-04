@@ -22,6 +22,7 @@ const {tabFromFrame} = require('../state/frameStateUtil')
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
 const {aboutUrls, newFrameUrl} = require('../lib/appUrlUtil')
 const Serializer = require('../dispatcher/serializer')
+const {updateTabPageIndex} = require('../../app/renderer/lib/tabUtil')
 const assert = require('assert')
 
 let windowState = Immutable.fromJS({
@@ -41,25 +42,6 @@ let windowState = Immutable.fromJS({
 let lastEmittedState
 
 const CHANGE_EVENT = 'change'
-
-/**
- * Updates the tab page index to the specified frameProps
- * @param frameProps Any frame belonging to the page
- */
-const updateTabPageIndex = (frameProps) => {
-  // No need to update tab page index if we are given a pinned frame
-  if (frameProps.get('pinnedLocation')) {
-    return
-  }
-
-  const index = frameStateUtil.getFrameTabPageIndex(windowState.get('frames')
-      .filter((frame) => !frame.get('pinnedLocation')), frameProps, getSetting(settings.TABS_PER_PAGE))
-  if (index === -1) {
-    return
-  }
-  windowState = windowState.setIn(['ui', 'tabs', 'tabPageIndex'], index)
-  windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
-}
 
 const focusWebview = (framePath) => {
   windowState = windowState.mergeIn(framePath, {
@@ -209,7 +191,7 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
 
   if (openInForeground) {
     const activeFrame = frameStateUtil.getActiveFrame(windowState)
-    updateTabPageIndex(activeFrame)
+    windowState = updateTabPageIndex(windowState, activeFrame)
     // For about:newtab we want to have the urlbar focused, not the new frame.
     // Otherwise we want to focus the new tab when it is a new frame in the foreground.
     if (activeFrame.get('location') !== 'about:newtab') {
@@ -223,7 +205,8 @@ const emitChanges = debounce(windowStore.emitChanges.bind(windowStore), 5)
 
 const applyReducers = (state, action) => [
   require('../../app/renderer/reducers/urlBarReducer'),
-  require('../../app/renderer/reducers/urlBarSuggestionsReducer')
+  require('../../app/renderer/reducers/urlBarSuggestionsReducer'),
+  require('../../app/renderer/reducers/frameReducer')
 ].reduce(
     (windowState, reducer) => {
       const newState = reducer(windowState, action)
@@ -322,12 +305,6 @@ const doAction = (action) => {
         loading: false
       })
       break
-    case windowConstants.WINDOW_SET_FULL_SCREEN:
-      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
-        isFullScreen: action.isFullScreen !== undefined ? action.isFullScreen : windowState.getIn(['frames', frameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)].concat('isFullScreen')),
-        showFullScreenWarning: action.showFullScreenWarning
-      })
-      break
     case windowConstants.WINDOW_NEW_FRAME:
       newFrame(action.frameOpts, action.openInForeground)
       break
@@ -352,7 +329,7 @@ const doAction = (action) => {
       // If we reach the limit of opened tabs per page while closing tabs, switch to
       // the active tab's page otherwise the user will hang on empty page
       if (frameStateUtil.getNonPinnedFrameCount(windowState) % getSetting(settings.TABS_PER_PAGE) === 0) {
-        updateTabPageIndex(frameStateUtil.getActiveFrame(windowState))
+        windowState = updateTabPageIndex(windowState, frameStateUtil.getActiveFrame(windowState))
         windowState = windowState.deleteIn(['ui', 'tabs', 'fixTabWidth'])
       }
 
@@ -367,20 +344,6 @@ const doAction = (action) => {
           hoverState: hoverState
         })
       }
-      break
-    case windowConstants.WINDOW_CLOSE_FRAMES:
-      windowState = windowState.merge(frameStateUtil.removeFrames(
-        windowState.get('frames'),
-        windowState.get('tabs'),
-        windowState.get('closedFrames'),
-        action.framePropsList,
-        action.activeFrameRemoved,
-        windowState.get('activeFrameKey'),
-        getSetting(settings.TAB_CLOSE_ACTION)
-      ))
-
-      updateTabPageIndex(frameStateUtil.getActiveFrame(windowState))
-      windowState = windowState.deleteIn(['ui', 'tabs', 'fixTabWidth'])
       break
     case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
       windowState = windowState.merge(frameStateUtil.undoCloseFrame(windowState, windowState.get('closedFrames')))
@@ -401,7 +364,7 @@ const doAction = (action) => {
         lastAccessedTime: new Date().getTime()
       })
       windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
-      updateTabPageIndex(action.frameProps)
+      windowState = updateTabPageIndex(windowState, action.frameProps)
       break
     case windowConstants.WINDOW_SET_PREVIEW_FRAME:
       windowState = windowState.merge({
@@ -421,7 +384,7 @@ const doAction = (action) => {
         windowState = windowState.setIn(['ui', 'tabs', 'tabPageIndex'], action.index)
         windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
       } else {
-        updateTabPageIndex(action.frameProps)
+        windowState = updateTabPageIndex(windowState, action.frameProps)
       }
       break
     case windowConstants.WINDOW_SET_TAB_BREAKPOINT:
@@ -452,7 +415,7 @@ const doAction = (action) => {
       windowState = windowState.set('frames', frames)
       windowState = windowState.set('tabs', tabs)
       // Since the tab could have changed pages, update the tab page as well
-      updateTabPageIndex(frameStateUtil.getActiveFrame(windowState))
+      windowState = updateTabPageIndex(windowState, frameStateUtil.getActiveFrame(windowState))
       break
     case windowConstants.WINDOW_SET_LINK_HOVER_PREVIEW:
       windowState = windowState.mergeIn(activeFrameStatePath(windowState), {
@@ -809,13 +772,13 @@ const doAction = (action) => {
 
 ipc.on(messages.SHORTCUT_NEXT_TAB, () => {
   windowState = frameStateUtil.makeNextFrameActive(windowState)
-  updateTabPageIndex(frameStateUtil.getActiveFrame(windowState))
+  windowState = updateTabPageIndex(windowState, frameStateUtil.getActiveFrame(windowState))
   emitChanges()
 })
 
 ipc.on(messages.SHORTCUT_PREV_TAB, () => {
   windowState = frameStateUtil.makePrevFrameActive(windowState)
-  updateTabPageIndex(frameStateUtil.getActiveFrame(windowState))
+  windowState = updateTabPageIndex(windowState, frameStateUtil.getActiveFrame(windowState))
   emitChanges()
 })
 
