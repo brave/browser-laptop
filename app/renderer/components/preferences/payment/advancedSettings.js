@@ -7,6 +7,7 @@ const {StyleSheet, css} = require('aphrodite')
 
 // util
 const {changeSetting} = require('../../../lib/settingsUtil')
+const appConfig = require('../../../../../js/constants/appConfig')
 
 // components
 const Button = require('../../../../../js/components/button')
@@ -24,7 +25,7 @@ const settings = require('../../../../../js/constants/settings')
 
 class AdvancedSettingsContent extends ImmutableComponent {
   render () {
-    const minDuration = this.props.ledgerData.getIn(['synopsisOptions', 'minDuration'])
+    const minPublisherDuration = this.props.ledgerData.getIn(['synopsisOptions', 'minPublisherDuration'])
     const minPublisherVisits = this.props.ledgerData.getIn(['synopsisOptions', 'minPublisherVisits'])
 
     return <div className={css(paymentCommon.board)}>
@@ -35,7 +36,7 @@ class AdvancedSettingsContent extends ImmutableComponent {
             <SettingItem>
               <SettingDropdown
                 data-test-id='durationSelector'
-                defaultValue={minDuration || 8000}
+                defaultValue={minPublisherDuration || appConfig.defaultSettings[settings.MINIMUM_VISIT_TIME]}
                 onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.MINIMUM_VISIT_TIME)}>
                 <option data-l10n-id='minimumPageTimeLow' value='5000' />
                 <option data-l10n-id='minimumPageTimeMedium' value='8000' />
