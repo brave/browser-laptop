@@ -33,8 +33,7 @@ describe('tabs toolbar tests', function () {
         .click(hamburgerMenu)
         .waitForExist(contextMenu)
         .click(hamburgerMenu)
-        // The third parameter reverses the functionality of waitForExist, meaning it will wait for it to not exist
-        .waitForExist(contextMenu, null, true)
+        .waitForElementCount(contextMenu, 0)
         .then(() => true)
     })
 
@@ -43,7 +42,7 @@ describe('tabs toolbar tests', function () {
         .click(hamburgerMenu)
         .waitForExist(contextMenu)
         .click(tabsToolbar)
-        .waitForExist(contextMenu, null, true)
+        .waitForElementCount(contextMenu, 0)
         .click(hamburgerMenu)
         .waitForExist(contextMenu)
     })

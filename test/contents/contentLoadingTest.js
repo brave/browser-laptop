@@ -17,28 +17,20 @@ describe('content loading', function () {
   })
 
   it('does not allow local files to load other other files', function * () {
-    var page1 = Brave.fixtureUrl('localFileAccess.html')
+    const page1 = Brave.fixtureUrl('localFileAccess.html')
     yield this.app.client
       .tabByIndex(0)
       .url(page1)
       .windowByUrl(Brave.browserWindowUrl)
-      .waitUntil(function () {
-        return this.getText('[data-test-id="tabTitle"]').then((title) => {
-          return title === 'failed'
-        })
-      })
+      .waitForTextValue('[data-test-id="tabTitle"]', 'failed')
   })
 
   it('does not support battery status API', function * () {
-    var page1 = Brave.fixtureUrl('battery.html')
+    const page1 = Brave.fixtureUrl('battery.html')
     yield this.app.client
       .tabByIndex(0)
       .url(page1)
       .windowByUrl(Brave.browserWindowUrl)
-      .waitUntil(function () {
-        return this.getText('[data-test-id="tabTitle"]').then((title) => {
-          return title === 'fail'
-        })
-      })
+      .waitForTextValue('[data-test-id="tabTitle"]', 'fail')
   })
 })

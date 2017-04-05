@@ -61,7 +61,7 @@ describe('about:history', function () {
 
     it('does NOT use customTitle when displaying entries', function * () {
       yield this.app.client
-        .waitForVisible('table.sortableTable td.title[data-sort="customTest"]', 1000, true)
+        .waitForElementCount('table.sortableTable td.title[data-sort="customTest"]', 0)
     })
 
     it('defaults to sorting table by time DESC', function * () {
@@ -182,7 +182,7 @@ describe('about:history', function () {
         .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
         // Click the search box; this should dismiss and release selection
         .click('input#historySearch')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]', 5000, true)
+        .waitForElementCount('table.sortableTable tr.selected td.title[data-sort="Brave"]', 0)
     })
     it('does not lose selection if table is sorted', function * () {
       yield this.app.client

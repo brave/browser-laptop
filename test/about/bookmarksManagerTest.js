@@ -5,6 +5,7 @@ const {urlInput} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 const siteTags = require('../../js/constants/siteTags')
 const aboutBookmarksUrl = getTargetAboutUrl('about:bookmarks')
+const Immutable = require('immutable')
 
 describe('about:bookmarks', function () {
   const folderId = Math.random()
@@ -24,29 +25,99 @@ describe('about:bookmarks', function () {
     const siteWithFavicon = Brave.server.url('favicon.html')
     const favicon = Brave.server.url('img/test.ico')
     const siteWithoutFavicon = Brave.server.url('page_favicon_not_found.html')
+    const sites = Immutable.fromJS([
+      {
+        location: siteWithFavicon,
+        title: 'Page with Favicon',
+        favicon: favicon,
+        tags: bookmarkTag,
+        parentFolderId: 0,
+        lastAccessedTime: lastVisit
+      },
+      {
+        location: siteWithoutFavicon,
+        title: 'Page without Favicon',
+        tags: bookmarkTag,
+        parentFolderId: 0,
+        lastAccessedTime: lastVisit
+      }
+    ])
     yield client
-      .addSite({ location: siteWithFavicon, title: 'Page with Favicon', favicon: favicon, tags: bookmarkTag, parentFolderId: 0, lastAccessedTime: lastVisit }, siteTags.BOOKMARK)
-      .addSite({ location: siteWithoutFavicon, title: 'Page without Favicon', tags: bookmarkTag, parentFolderId: 0, lastAccessedTime: lastVisit }, siteTags.BOOKMARK)
+      .addSiteList(sites)
       .tabByIndex(0)
       .loadUrl(aboutBookmarksUrl)
   }
 
   function * addDemoSites (client) {
-    yield client
-      .waitForBrowserWindow()
-      .addSite({
+    const sites = Immutable.fromJS([
+      {
         customTitle: 'demo1',
         folderId: folderId,
         parentFolderId: 0,
         tags: [siteTags.BOOKMARK_FOLDER]
-      }, siteTags.BOOKMARK_FOLDER)
-      .addSite({ location: 'https://brave.com', title: 'Brave', tags: bookmarkTag, parentFolderId: 0, lastAccessedTime: lastVisit }, siteTags.BOOKMARK)
-      .addSite({ location: 'https://brave.com/test', title: 'Test', customTitle: 'customTest', tags: bookmarkTag, parentFolderId: 0, lastAccessedTime: lastVisit }, siteTags.BOOKMARK)
-      .addSite({ location: 'https://www.youtube.com', tags: bookmarkTag, parentFolderId: 0, lastAccessedTime: lastVisit }, siteTags.BOOKMARK)
-      .addSite({ location: 'https://www.facebook.com', title: 'facebook', tags: bookmarkTag, parentFolderId: 0, lastAccessedTime: lastVisit }, siteTags.BOOKMARK)
-      .addSite({ location: 'https://duckduckgo.com', title: 'duckduckgo', tags: bookmarkTag, parentFolderId: folderId, lastAccessedTime: lastVisit }, siteTags.BOOKMARK)
-      .addSite({ location: 'https://google.com', title: 'Google', tags: bookmarkTag, parentFolderId: folderId, lastAccessedTime: lastVisit }, siteTags.BOOKMARK)
-      .addSite({ location: 'https://bing.com', title: 'Bing', tags: bookmarkTag, parentFolderId: folderId, lastAccessedTime: lastVisit }, siteTags.BOOKMARK)
+      },
+      {
+        location: 'https://brave.com',
+        title: 'Brave',
+        tags: bookmarkTag,
+        parentFolderId: 0,
+        lastAccessedTime: lastVisit
+      },
+      {
+        location: 'https://brave.com/test',
+        title: 'Test',
+        customTitle: 'customTest',
+        tags: bookmarkTag,
+        parentFolderId: 0,
+        lastAccessedTime: lastVisit
+      },
+      {
+        location: 'https://brave.com/test',
+        title: 'Test',
+        customTitle: 'customTest',
+        tags: bookmarkTag,
+        parentFolderId: 0,
+        lastAccessedTime: lastVisit
+      },
+      {
+        location: 'https://www.youtube.com',
+        tags: bookmarkTag,
+        parentFolderId: 0,
+        lastAccessedTime: lastVisit
+      },
+      {
+        location: 'https://www.facebook.com',
+        title: 'facebook',
+        tags: bookmarkTag,
+        parentFolderId: 0,
+        lastAccessedTime: lastVisit
+      },
+      {
+        location: 'https://duckduckgo.com',
+        title: 'duckduckgo',
+        tags: bookmarkTag,
+        parentFolderId: folderId,
+        lastAccessedTime: lastVisit
+      },
+      {
+        location: 'https://google.com',
+        title: 'Google',
+        tags: bookmarkTag,
+        parentFolderId: folderId,
+        lastAccessedTime: lastVisit
+      },
+      {
+        location: 'https://bing.com',
+        title: 'Bing',
+        tags: bookmarkTag,
+        parentFolderId: folderId,
+        lastAccessedTime: lastVisit
+      }
+    ])
+
+    yield client
+      .waitForBrowserWindow()
+      .addSiteList(sites)
       .tabByIndex(0)
       .loadUrl(aboutBookmarksUrl)
   }
@@ -202,7 +273,7 @@ describe('about:bookmarks', function () {
         .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
         // Click the header; this should dismiss and release selection
         .click('table.sortableTable th')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]', 5000, true)
+        .waitForElementCount('table.sortableTable tr.selected td.title[data-sort="Brave"]', 0)
     })
   })
 

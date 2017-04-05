@@ -155,24 +155,20 @@ describe('notificationBar passwords', function () {
       .windowByUrl(Brave.browserWindowUrl)
       .tabByIndex(0)
       .url(this.loginUrl4)
-      .waitUntil(function () {
-        return this.getValue('#user').then((val) => val === 'brave_user') &&
-          this.getValue('#password').then((val) => val === 'testing') &&
-          this.getValue('#user2').then((val) => val === '') &&
-          this.getValue('#password2').then((val) => val === '')
-      })
+      .waitForInputText('#user', 'brave_user')
+      .waitForInputText('#password', 'testing')
+      .waitForInputText('#user2', '')
+      .waitForInputText('#password2', '')
   })
 
   it('autofills remembered password on login page with multiple forms', function * () {
     yield this.app.client
       .tabByIndex(0)
       .url(this.loginUrl5)
-      .waitUntil(function () {
-        return this.getValue('#user').then((val) => val === 'brave_user') &&
-          this.getValue('#password').then((val) => val === 'testing') &&
-          this.getValue('#user2').then((val) => val === 'brave_user') &&
-          this.getValue('#password2').then((val) => val === 'testing')
-      })
+      .waitForInputText('#user', 'brave_user')
+      .waitForInputText('#password', 'testing')
+      .waitForInputText('#user2', 'brave_user')
+      .waitForInputText('#password2', 'testing')
   })
 
   it('does not show login form notification if user turns it off for the site', function * () {
@@ -188,7 +184,7 @@ describe('notificationBar passwords', function () {
       .tabByIndex(0)
       .url(this.loginUrl2)
       .windowByUrl(Brave.browserWindowUrl)
-      .isExisting(notificationBar).should.eventually.be.false
+      .waitForElementCount(notificationBar, 0)
   })
 })
 

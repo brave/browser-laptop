@@ -87,7 +87,7 @@ describe('Regular payment panel tests', function () {
         .click(paymentsTab)
         .waitForVisible(paymentsWelcomePage)
         .waitForVisible(walletSwitch)
-        .waitForVisible(advancedSettingsButton, 100, true)
+        .waitForElementCount(advancedSettingsButton, 0)
     })
 
     it('advanced settings is visible when payments are enabled', function * () {
@@ -246,16 +246,14 @@ describe('synopsis', function () {
 
   it('no table if empty synopsis', function * () {
     yield this.app.client
-      .isExisting(ledgerTable).then((isExisting) => isExisting === false)
+      .waitForElementCount(ledgerTable, 0)
   })
 
   it('creates synopsis table after visiting a site', function * () {
-    var site1 = 'http://web.mit.edu/zyan/Public/wait.html'
+    const site1 = 'http://web.mit.edu/zyan/Public/wait.html'
     yield this.app.client
       .url(site1)
-      .waitUntil(function () {
-        return this.getText('div').then((val) => val === 'done')
-      })
+      .waitForTextValue('div', 'done')
       .windowByUrl(Brave.browserWindowUrl)
       .tabByUrl(site1)
       .loadUrl(prefsUrl)
@@ -265,9 +263,9 @@ describe('synopsis', function () {
   })
 
   it('can sort synopsis table', function * () {
-    var site1 = 'http://web.mit.edu/zyan/Public/wait.html'
-    var site2 = 'http://example.com/'
-    var site3 = 'https://www.eff.org/'
+    const site1 = 'http://web.mit.edu/zyan/Public/wait.html'
+    const site2 = 'http://example.com/'
+    const site3 = 'https://www.eff.org/'
     yield this.app.client
       .loadUrl(site1)
       .windowByUrl(Brave.browserWindowUrl)
@@ -300,7 +298,7 @@ describe('synopsis', function () {
   })
 
   it('can disable site', function * () {
-    var site1 = 'https://www.eff.org/'
+    const site1 = 'https://www.eff.org/'
     yield this.app.client
       .loadUrl(site1)
       .loadUrl(prefsUrl)

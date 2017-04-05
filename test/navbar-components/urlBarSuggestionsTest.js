@@ -56,9 +56,7 @@ describe('urlBarSuggestions', function () {
       .setInputText(urlInput, 'Page 1')
       .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]')
       .keys(Brave.keys.ESCAPE)
-      .waitUntil(function () {
-        return this.isExisting(urlBarSuggestions).then((exists) => exists === false)
-      })
+      .waitForElementCount(urlBarSuggestions, 0)
   })
 
   it('deactivates suggestions on backspace', function * () {
@@ -66,9 +64,7 @@ describe('urlBarSuggestions', function () {
       .setInputText(urlInput, 'Page 1')
       .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]')
       .keys(Brave.keys.BACKSPACE)
-      .waitUntil(function () {
-        return this.isExisting(urlBarSuggestions).then((exists) => exists === false)
-      })
+      .waitForElementCount(urlBarSuggestions, 0)
   })
 
   it('deactivates suggestions on delete', function * () {
@@ -76,9 +72,7 @@ describe('urlBarSuggestions', function () {
       .setInputText(urlInput, 'Page 1')
       .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]')
       .keys(Brave.keys.DELETE)
-      .waitUntil(function () {
-        return this.isExisting(urlBarSuggestions).then((exists) => exists === false)
-      })
+      .waitForElementCount(urlBarSuggestions, 0)
   })
 
   it('navigates to a suggestion when clicked', function * () {
@@ -116,14 +110,10 @@ describe('urlBarSuggestions', function () {
   it('selects a location auto complete result but not for titles', function * () {
     yield this.app.client
       .setValue(urlInput, 'http://')
-      .waitUntil(function () {
-        return this.getValue(urlInput).then(function (val) {
-          return val === Brave.server.urlOrigin()
-        })
-      })
+      .waitForInputText(urlInput, Brave.server.urlOrigin())
       .waitForExist(urlBarSuggestions + ' li.selected')
       .setValue(urlInput, 'Page')
-      .waitForExist(urlBarSuggestions + ' li.selected', 1000, true)
+      .waitForElementCount(urlBarSuggestions + ' li.selected', 0)
   })
 
   it('on suggestion mouseover, appends autocomplete URLs without interrupting typing', function * () {
@@ -135,24 +125,12 @@ describe('urlBarSuggestions', function () {
     // so that finally, if the rest of the 1st option is entered via keyboard, it overwrites the suggestion from the mouse
     yield this.app.client
       .keys(pagePartialUrl)
-      .waitUntil(function () {
-        return this.getValue(urlInput).then(function (val) {
-          return val === page2Url // after entering partial URL matching two options, 1st is tentatively filled in (_without_ moving cursor to end)
-        })
-      })
+      .waitForInputText(urlInput, page2Url) // after entering partial URL matching two options, 1st is tentatively filled in (_without_ moving cursor to end)
       .waitForExist(urlBarSuggestions + ' li.suggestionItem')
       .moveToObject(urlBarSuggestions + ' li.suggestionItem:not(.selected)')
-      .waitUntil(function () {
-        return this.getValue(urlInput).then(function (val) {
-          return val === page1Url // mousing over 2nd option tentatively completes URL with 2nd option (_without_ moving cursor to end)
-        })
-      })
+      .waitForInputText(urlInput, page1Url) // mousing over 2nd option tentatively completes URL with 2nd option (_without_ moving cursor to end)
       .keys('2.html')
-      .waitUntil(function () {
-        return this.getValue(urlInput).then(function (val) {
-          return val === page2Url // without moving mouse, typing rest of 1st option URL overwrites the autocomplete from mouseover
-        })
-      })
+      .waitForInputText(urlInput, page2Url) // without moving mouse, typing rest of 1st option URL overwrites the autocomplete from mouseover
   })
 
   it('selection is not reset when pressing non-input key', function * () {
@@ -171,11 +149,7 @@ describe('urlBarSuggestions', function () {
       .setValue(urlInput, pagePartialUrl)
       .waitForVisible(urlBarSuggestions)
       .keys(Brave.keys.DOWN)
-      .waitUntil(function () {
-        return this.getValue(urlInput).then(function (val) {
-          return val === page1Url
-        })
-      })
+      .waitForInputText(urlInput, page1Url)
       .keys(Brave.keys.CONTROL)
       .keys(Brave.keys.CONTROL)
       .waitForSelectedText('1.html')

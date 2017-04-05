@@ -52,9 +52,7 @@ describe('sessionStore', function () {
         .waitForUrl(page1Url)
         .waitForBrowserWindow()
         .moveToObject(urlInput)
-        .waitUntil(function () {
-          return this.getValue(urlInput).then((val) => val === page1Url)
-        })
+        .waitForInputText(urlInput, page1Url)
     })
 
     it('appstate by preserving a bookmark', function * () {

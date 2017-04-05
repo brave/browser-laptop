@@ -55,7 +55,7 @@ describe('bookmark tests', function () {
           .waitForVisible(navigatorBookmarked)
           .click(navigatorBookmarked)
           .waitForVisible(doneButton)
-          .getValue('#bookmarkName input').should.eventually.be.equal('Custom Page 1')
+          .waitForInputText('#bookmarkName input', 'Custom Page 1')
           .click(doneButton)
       })
       it('can delete custom title', function * () {
@@ -65,7 +65,7 @@ describe('bookmark tests', function () {
           .click(navigatorBookmarked)
           .waitForVisible(doneButton)
           .keys(Brave.keys.BACKSPACE)
-          .getValue('#bookmarkName input').should.eventually.be.equal('')
+          .waitForInputText('#bookmarkName input', '')
       })
       it('display punycode custom title and location', function * () {
         yield this.app.client
@@ -76,11 +76,11 @@ describe('bookmark tests', function () {
           .setValue('#bookmarkName input', 'https://www.brave.com')
           .keys(Brave.keys.END)
           .keys('а')
-          .getValue('#bookmarkName input').should.eventually.be.equal('https://www.brave.xn--com-8cd/')
+          .waitForInputText('#bookmarkName input', 'https://www.brave.xn--com-8cd/')
           .setValue('#bookmarkLocation input', 'https://www.brave.com')
           .keys(Brave.keys.END)
           .keys('а')
-          .getValue('#bookmarkLocation input').should.eventually.be.equal('https://www.brave.xn--com-8cd/')
+          .waitForInputText('#bookmarkLocation input', 'https://www.brave.xn--com-8cd/')
           .click(removeButton)
       })
       it('custom title and location can be backspaced', function * () {
@@ -94,13 +94,13 @@ describe('bookmark tests', function () {
           .keys(Brave.keys.BACKSPACE)
           .keys(Brave.keys.BACKSPACE)
           .keys(Brave.keys.BACKSPACE)
-          .getValue('#bookmarkName input').should.eventually.be.equal('https://www.brave.co')
+          .waitForInputText('#bookmarkName input', 'https://www.brave.co')
           .setValue('#bookmarkLocation input', 'https://www.brave.com/1')
           .keys(Brave.keys.END)
           .keys(Brave.keys.BACKSPACE)
           .keys(Brave.keys.BACKSPACE)
           .keys(Brave.keys.BACKSPACE)
-          .getValue('#bookmarkLocation input').should.eventually.be.equal('https://www.brave.co')
+          .waitForInputText('#bookmarkLocation input', 'https://www.brave.co')
           .click(removeButton)
       })
     })
@@ -129,12 +129,12 @@ describe('bookmark tests', function () {
           .waitForExist('#bookmarkName input')
           .waitForBookmarkDetail(this.page1Url, 'Page 1')
           .waitForEnabled(doneButton)
-          .getValue('#bookmarkName input').should.eventually.be.equal('Page 1')
+          .waitForInputText('#bookmarkName input', 'Page 1')
       })
 
       it('does not show the url field', function * () {
         yield this.app.client
-          .waitForExist('#bookmarkLocation input', Brave.defaultTimeout, true)
+          .waitForElementCount('#bookmarkLocation input', 0)
       })
 
       describe('saved with a title', function () {
@@ -147,10 +147,7 @@ describe('bookmark tests', function () {
 
         it('displays title', function * () {
           yield this.app.client
-            .waitUntil(function () {
-              return this.getText('[data-test-id="bookmarkText"]')
-                .then((val) => val === 'Page 1')
-            })
+            .waitForTextValue('[data-test-id="bookmarkText"]', 'Page 1')
         })
 
         describe('and then removed', function () {
@@ -164,7 +161,7 @@ describe('bookmark tests', function () {
           })
           it('removes the bookmark from the toolbar', function * () {
             yield this.app.client
-              .waitForExist('[data-test-id="bookmarkText"]', Brave.defaultTimeout, true)
+              .waitForElementCount('[data-test-id="bookmarkText"]', 0)
           })
         })
       })
@@ -193,12 +190,12 @@ describe('bookmark tests', function () {
       it('leaves the title field blank', function * () {
         yield this.app.client
           .waitForExist('#bookmarkName input')
-          .getValue('#bookmarkName input').should.eventually.be.equal('')
+          .waitForInputText('#bookmarkName input', '')
       })
 
       it('does not show the url field', function * () {
         yield this.app.client
-          .waitForExist('#bookmarkLocation input', Brave.defaultTimeout, true)
+          .waitForElementCount('#bookmarkLocation input', 0)
       })
 
       describe('saved without a title', function () {
@@ -209,12 +206,8 @@ describe('bookmark tests', function () {
             .click(doneButton)
         })
         it('displays URL', function * () {
-          const pageNoTitle = this.pageNoTitle
           yield this.app.client
-            .waitUntil(function () {
-              return this.getText('[data-test-id="bookmarkText"]')
-                .then((val) => val === pageNoTitle)
-            })
+            .waitForTextValue('[data-test-id="bookmarkText"]', this.pageNoTitle)
         })
         describe('and then removed', function () {
           before(function * () {
@@ -248,28 +241,32 @@ describe('bookmark tests', function () {
         yield this.app.client.tabByIndex(0).url(page1Url).windowParentByUrl(page1Url)
         yield this.app.client
           .activateURLMode()
-          .waitUntil(function () {
-            return this.getValue(urlInput).then((val) => {
-              return val === page1Url
-            })
-          })
+          .waitForInputText(urlInput, page1Url)
       })
       it('check location', function * () {
         const page1Url = Brave.server.url('img/test.pdf')
+        let title = 'test.ico - test.pdf'
         yield this.app.client
           .windowParentByUrl(page1Url)
+          .windowByUrl(page1Url)
           .activateURLMode()
           .waitForVisible(navigatorNotBookmarked)
           .click(navigatorNotBookmarked)
           .waitForVisible(doneButton)
-          .waitForBookmarkDetail(page1Url, 'test.pdf')
+          .waitUntil(function () {
+            return this.getAppState().then((val) => {
+              title = val.value.tabs[0].title
+              return title !== undefined
+            })
+          })
+          .waitForBookmarkDetail(page1Url, title)
           .waitForEnabled(doneButton)
           .click(doneButton)
           .activateURLMode()
           .waitForVisible(navigatorBookmarked)
           .click(navigatorBookmarked)
           .waitForVisible(doneButton)
-          .getValue('#bookmarkLocation input').should.eventually.be.equal(page1Url)
+          .waitForInputText('#bookmarkLocation input', page1Url)
       })
     })
   })
@@ -352,6 +349,7 @@ describe('bookmark tests', function () {
       ])
       yield this.app.client
         .addSiteList(sites)
+        .waitForBrowserWindow()
         .waitUntil(function () {
           return this.getAppState().then((val) => {
             const bookmarksMenu = val.value.menu.template.find((item) => {

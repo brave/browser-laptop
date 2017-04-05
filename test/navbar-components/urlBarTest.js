@@ -38,9 +38,7 @@ describe('urlBar tests', function () {
         const input = 'brave.com'
         yield this.app.client
           .keys(Brave.keys.ESCAPE)
-          .waitUntil(function () {
-            return this.getValue(urlInput).then((val) => val === '')
-          })
+          .waitForInputText(urlInput, '')
           .waitForSelectedText('')
         for (let i = 0; i < input.length; i++) {
           yield this.app.client
@@ -49,10 +47,7 @@ describe('urlBar tests', function () {
         }
         yield this.app.client
           .waitForSelectedText('')
-          .waitUntil(function () {
-            return this.getValue(urlInput)
-              .then((val) => val === 'brave.com')
-          })
+          .waitForInputText(urlInput, 'brave.com')
           .keys(Brave.keys.ESCAPE)
       })
     })
@@ -65,9 +60,8 @@ describe('urlBar tests', function () {
       yield setup(this.app.client)
       yield this.app.client.waitForExist(urlInput)
       yield this.app.client.waitForElementFocus(urlInput)
-      yield this.app.client.waitUntil(function () {
-        return this.getValue(urlInput).then((val) => val === '')
-      })
+        .waitForInputText(urlInput, '')
+
       yield this.app.client
         .onClearBrowsingData({browserHistory: true})
         .addSite({ location: 'https://brave.com', title: 'Brave' })
@@ -87,74 +81,49 @@ describe('urlBar tests', function () {
       yield this.app.client
         .setInputText(urlInput, '')
         .keys('br')
-        .waitUntil(function () {
-          return this.getValue(urlInput)
-            .then((val) => val === 'brave.com')
-        })
+        .waitForInputText(urlInput, 'brave.com')
     })
 
     it('autocompletes with protocol', function * () {
       // now type something
       yield this.app.client
         .keys('https://br')
-        .waitUntil(function () {
-          return this.getValue(urlInput)
-            .then((val) => val === 'https://brave.com')
-        })
+        .waitForInputText(urlInput, 'https://brave.com')
     })
 
     it('autocompletes without www.', function * () {
       // now type something
       yield this.app.client
         .keys('you')
-        .waitUntil(function () {
-          return this.getValue(urlInput)
-            .then((val) => val === 'youtube.com')
-        })
+        .waitForInputText(urlInput, 'youtube.com')
     })
 
     it('autofills from selected suggestion', function * () {
       // now type something
       yield this.app.client
         .keys('https://br')
-        .waitUntil(function () {
-          return this.getValue(urlInput)
-            .then((val) => val === 'https://brave.com')
-        })
+        .waitForInputText(urlInput, 'https://brave.com')
         // hit down
         .keys(Brave.keys.DOWN)
-        .waitUntil(function () {
-          return this.getValue(urlInput)
-            .then((val) => val === 'https://brave.com/test')
-        })
+        .waitForInputText(urlInput, 'https://brave.com/test')
         // hit up
         .keys(Brave.keys.UP)
-        .waitUntil(function () {
-          return this.getValue(urlInput)
-            .then((val) => val === 'https://brave.com')
-        })
+        .waitForInputText(urlInput, 'https://brave.com')
     })
 
     it('autocompletes without losing characters', function * () {
       yield this.app.client
         .keys('a\uE008\uE008b\uE008\uE008o\uE008\uE008u\uE008\uE008t\uE008\uE008x')
-        .waitUntil(function () {
-          return this.getValue(urlInput)
-            .then((val) => val === 'aboutx')
-        })
+        .waitForInputText(urlInput, 'aboutx')
     })
 
     it('does not show suggestions on focus', function * () {
       yield this.app.client
         .keys('brave')
-        .waitUntil(function () {
-          return this.isExisting(urlBarSuggestions).then((exists) => exists === true)
-        })
+        .waitForVisible(urlBarSuggestions, 1)
         .ipcSend('shortcut-focus-url')
         .waitForElementFocus(urlInput)
-        .waitUntil(function () {
-          return this.isExisting(urlBarSuggestions).then((exists) => exists === false)
-        })
+        .waitForElementCount(urlBarSuggestions, 0)
     })
 
     describe('with scrolling match', function () {
@@ -186,9 +155,7 @@ describe('urlBar tests', function () {
       yield setup(this.app.client)
       yield this.app.client.waitForExist(urlInput)
       yield this.app.client.waitForElementFocus(urlInput)
-      yield this.app.client.waitUntil(function () {
-        return this.getValue(urlInput).then((val) => val === '')
-      })
+        .waitForInputText(urlInput, '')
 
       yield this.app.client
         .addSite({ location: 'https://brave.com', title: 'Brave' })
@@ -196,16 +163,11 @@ describe('urlBar tests', function () {
       // now type something
       yield this.app.client
         .setValue(urlInput, 'b')
-        .waitUntil(function () {
-          return this.getValue(urlInput).then((val) => val.startsWith('b'))
-        })
         .waitForExist(urlBarSuggestions + ' li')
     })
 
     it('sets the value to "b"', function * () {
-      yield this.app.client.waitUntil(function () {
-        return this.getValue(urlInput).then((val) => val === 'brave.com')
-      })
+      yield this.app.client.waitForInputText(urlInput, 'brave.com')
     })
 
     it('clears the selected text', function * () {
@@ -256,7 +218,7 @@ describe('urlBar tests', function () {
       })
 
       it('does revert the urlbar text', function * () {
-        yield this.app.client.getValue(urlInput).should.eventually.be.equal(this.page)
+        yield this.app.client.waitForInputText(urlInput, this.page)
       })
     })
 
@@ -270,7 +232,6 @@ describe('urlBar tests', function () {
           .ipcSend('shortcut-focus-url')
           .waitForElementFocus(urlInput)
           .setValue(urlInput, 'random-uuid-d63ecb78-eec8-4c08-973b-fb39cb5a6f1a')
-
           .keys(Brave.keys.ESCAPE)
           .waitForElementFocus(urlInput)
       })
@@ -279,7 +240,7 @@ describe('urlBar tests', function () {
       })
 
       it('does revert the urlbar text', function * () {
-        yield this.app.client.getValue(urlInput).should.eventually.be.equal(this.page)
+        yield this.app.client.waitForInputText(urlInput, this.page)
       })
     })
 
@@ -304,7 +265,7 @@ describe('urlBar tests', function () {
       })
 
       it('sets the urlbar text to the webview src', function * () {
-        yield this.app.client.getValue(urlInput).should.eventually.be.equal(this.page)
+        yield this.app.client.waitForInputText(urlInput, this.page)
       })
     })
 
@@ -403,24 +364,18 @@ describe('urlBar tests', function () {
     })
   })
 
-  const tabLoadingTest = function * () {
+  const tabLoadingTest = function * (value) {
     const coffee = 'coffee'
     yield this.app.client
       .windowByUrl(Brave.browserWindowUrl)
       .ipcSend('shortcut-focus-url')
       .waitForElementFocus(urlInput)
       .keys(coffee)
-      .waitUntil(function () {
-        return this.getValue(urlInput).then((val) => val === coffee)
-      })
+      .waitForInputText(urlInput, coffee)
       .click('[data-test-id="tab"][data-frame-key="1"]')
-      .waitUntil(function () {
-        return this.getValue(urlInput).then((val) => val !== coffee)
-      })
+      .waitForInputText(urlInput, value)
       .click('[data-test-id="tab"][data-frame-key="2"]')
-      .waitUntil(function () {
-        return this.getValue(urlInput).then((val) => val === coffee)
-      })
+      .waitForInputText(urlInput, coffee)
   }
 
   describe('location bar with loaded tabs', function () {
@@ -432,20 +387,20 @@ describe('urlBar tests', function () {
       yield setup(this.app.client)
       yield this.app.client.waitForExist(urlInput)
       yield this.app.client.waitForElementFocus(urlInput)
-      yield this.app.client.waitUntil(function () {
-        return this.getValue(urlInput).then((val) => val === '')
-      })
-      .tabByIndex(0)
-      .loadUrl(this.page1Url)
-      .windowByUrl(Brave.browserWindowUrl)
-      .ipcSend(messages.SHORTCUT_NEW_FRAME)
-      .waitForUrl(Brave.newTabUrl)
-      .tabByIndex(1)
-      .loadUrl(this.page2Url)
-      .waitForUrl(this.page2Url)
+        .waitForInputText(urlInput, '')
+        .tabByIndex(0)
+        .loadUrl(this.page1Url)
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME)
+        .waitForUrl(Brave.newTabUrl)
+        .tabByIndex(1)
+        .loadUrl(this.page2Url)
+        .waitForUrl(this.page2Url)
     })
 
-    it('Retains user input on tab switches', tabLoadingTest)
+    it('Retains user input on tab switches', function () {
+      tabLoadingTest(this.page1Url)
+    })
   })
 
   describe('location bar with new tabs', function () {
@@ -455,16 +410,17 @@ describe('urlBar tests', function () {
       yield setup(this.app.client)
       yield this.app.client.waitForExist(urlInput)
       yield this.app.client.waitForElementFocus(urlInput)
-      yield this.app.client.waitUntil(function () {
-        return this.getValue(urlInput).then((val) => val === '')
-      })
-      .windowByUrl(Brave.browserWindowUrl)
-      .ipcSend(messages.SHORTCUT_NEW_FRAME)
-      .waitForUrl(Brave.newTabUrl)
-      .tabByIndex(1)
+      yield this.app.client
+        .waitForInputText(urlInput, '')
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME)
+        .waitForUrl(Brave.newTabUrl)
+        .tabByIndex(1)
     })
 
-    it('Retains user input on tab switches', tabLoadingTest)
+    it('Retains user input on tab switches', function () {
+      tabLoadingTest('')
+    })
   })
 
   describe('loading same URL as current page with changed input', function () {
@@ -480,21 +436,14 @@ describe('urlBar tests', function () {
         .loadUrl(this.page1Url)
         .windowByUrl(Brave.browserWindowUrl)
         .setInputText(urlInput, '')
-        .waitUntil(function () {
-          return this.getValue(urlInput).then((val) => val === '')
-        })
+        .waitForInputText(urlInput, '')
         .windowByUrl(Brave.browserWindowUrl)
         .click(reloadButton)
     })
 
     it('reverts the URL', function * () {
-      const page1Url = this.page1Url
       yield this.app.client
-        .waitUntil(function () {
-          return this.getValue(urlInput).then((val) => {
-            return val === page1Url
-          })
-        })
+        .waitForInputText(urlInput, this.page1Url)
     })
   })
 
@@ -519,13 +468,8 @@ describe('urlBar tests', function () {
     })
 
     it('reverts the URL', function * () {
-      const page2Url = this.page2Url
       yield this.app.client
-        .waitUntil(function () {
-          return this.getValue(urlInput).then((val) => {
-            return val === page2Url
-          })
-        })
+        .waitForInputText(urlInput, this.page2Url)
     })
   })
 })

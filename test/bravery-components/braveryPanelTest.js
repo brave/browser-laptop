@@ -214,7 +214,8 @@ describe('Bravery Panel', function () {
         .tabByIndex(0)
         .loadUrl(aboutAdblockURL)
         .waitForVisible(customFiltersInput)
-        .setValue(customFiltersInput, 'testblock.brave.com')
+        .click(customFiltersInput)
+        .typeText(customFiltersInput, 'testblock.brave.com')
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
@@ -248,7 +249,8 @@ describe('Bravery Panel', function () {
         .loadUrl(aboutAdblockURL)
         .url(aboutAdblockURL)
         .waitForVisible(customFiltersInput)
-        .setValue(customFiltersInput, 'testblock.brave.com')
+        .click(customFiltersInput)
+        .typeText(customFiltersInput, 'testblock.brave.com')
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
@@ -455,11 +457,7 @@ describe('Bravery Panel', function () {
         .click(blockAllCookiesOption)
         .tabByIndex(0)
         .loadUrl(url)
-        .waitUntil(function () {
-          return this.getText('body').then((text) => {
-            return text === expectedBlocked
-          })
-        })
+        .waitForTextValue('body', expectedBlocked)
     })
     it('allows cookies', function * () {
       const url = Brave.server.url('cookies.html')
@@ -496,7 +494,6 @@ describe('Bravery Panel', function () {
         .waitForTabCount(2)
         .waitForUrl(url)
         .openBraveMenu(braveMenu, braveryPanel)
-        .click(fpSwitch)
         .waitUntil(function () {
           // TOOD: This should be 3, but see:
           // https://github.com/brave/browser-laptop/issues/3227

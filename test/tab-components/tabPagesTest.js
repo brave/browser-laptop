@@ -37,8 +37,7 @@ describe('tab pages', function () {
     it('shows no tab pages when you have only 1 page', function * () {
       yield this.app.client
         .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
-        .click('[data-test-active-tab]')
-        .click('[data-test-id="closeTabIcon"]')
+        .middleClick('[data-test-active-tab]')
         .waitForElementCount(tabPage, 0)
     })
 
