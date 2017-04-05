@@ -75,7 +75,7 @@ class UpdateLog extends ImmutableComponent {
   }
   render () {
     return <Button className={css(commonStyles.notificationItem__button) + ' ' + 'whiteButton'}
-      data-test-id='updateViewLogButton'
+      testId='updateViewLogButton'
       l10nId='updateViewLog'
       onClick={this.onViewLog.bind(this)} />
   }

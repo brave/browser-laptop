@@ -1114,13 +1114,13 @@ class Main extends ImmutableComponent {
                 <div className={css(styles.braveMenuContainer)}>
                   <Button iconClass='braveMenu'
                     l10nId='braveMenu'
+                    testId='braveShieldButton'
                     className={cx({
                       navbutton: true,
                       braveShieldsDisabled,
                       braveShieldsDown: !braverySettings.shieldsUp,
                       leftOfCaptionButton: customTitlebar.captionButtonsVisible && !customTitlebar.menubarVisible
                     })}
-                    data-test-id='braveShieldButton'
                     disabled={activeTabShowingMessageBox}
                     onClick={this.onBraveMenu} />
                   {
