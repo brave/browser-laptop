@@ -883,6 +883,17 @@ const appActions = {
   },
 
   /**
+   * Sets the sync setup error, or null for no error.
+   * @param {string|null} error
+   */
+  setSyncSetupError: function (error) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_SET_SYNC_SETUP_ERROR,
+      error
+    })
+  },
+
+  /**
    * Dispatches a message to apply a batch of site records from Brave Sync
    * TODO: Refactor this to merge it into addSite/removeSite
    * @param {Array.<Object>} records

@@ -168,6 +168,7 @@ module.exports = {
     // sync
     'sync.enabled': false,
     'sync.device-name': 'browser-laptop',
+    'sync.network.disabled': false,
     'sync.type.bookmark': true,
     'sync.type.history': false,
     'sync.type.siteSetting': true,

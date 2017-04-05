@@ -193,6 +193,50 @@ describe('Sync Panel', function () {
     })
   })
 
+  describe('sync setup failure', function () {
+    Brave.beforeAll(this)
+    before(function * () {
+      yield setup(this.app.client)
+    })
+
+    it('shows error when sync fails', function * () {
+      yield this.app.client
+        .changeSetting(settings.SYNC_NETWORK_DISABLED, true)
+        .tabByIndex(0)
+        .loadUrl(prefsUrl)
+        .waitForVisible(syncTab)
+        .click(syncTab)
+        .waitForVisible(startButton)
+        .click(startButton)
+        .waitForVisible(createButton)
+        .click(createButton)
+        .waitUntil(function () {
+          return this.getText('.setupError').then((val) => {
+            return val.includes('connection failed')
+          })
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+    })
+
+    it('can retry sync connection', function * () {
+      const retryButton = '[data-l10n-id="syncRetryButton"]'
+      yield this.app.client
+        .changeSetting(settings.SYNC_NETWORK_DISABLED, true)
+        .tabByIndex(0)
+        .loadUrl(prefsUrl)
+        .waitForVisible(syncTab)
+        .click(syncTab)
+        .waitForVisible(retryButton)
+        .click(retryButton)
+        .windowByUrl(Brave.browserWindowUrl)
+        .changeSetting(settings.SYNC_NETWORK_DISABLED, false)
+        .tabByIndex(0)
+        .waitForVisible(retryButton)
+        .click(retryButton)
+        .waitForVisible(syncSwitch)
+    })
+  })
+
   describe('sync post-setup', function () {
     Brave.beforeEach(this)
     beforeEach(function * () {
