@@ -119,7 +119,7 @@ describe('Main component unit tests', function () {
     })
 
     it('disables the lion icon', function () {
-      const node = wrapper.find('[data-test-id="braveShieldButton"]').node
+      const node = wrapper.find('[testId="braveShieldButton"]').node
       assert.equal(node.props.disabled, true)
     })
   })
