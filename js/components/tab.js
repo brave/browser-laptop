@@ -232,7 +232,8 @@ class Tab extends ImmutableComponent {
 
   render () {
     const playIndicatorBreakpoint = this.mediumView || this.narrowView
-    const perPageStyles = StyleSheet.create({
+    // we don't want themeColor if tab is private
+    const perPageStyles = !this.props.tab.get('isPrivate') && StyleSheet.create({
       themeColor: {
         color: this.themeColor ? getTextColorForBackground(this.themeColor) : 'inherit',
         background: this.themeColor ? this.themeColor : 'inherit',
@@ -260,8 +261,6 @@ class Tab extends ImmutableComponent {
         isWindows() && styles.tabForWindows,
         this.isPinned && styles.isPinned,
         this.props.isActive && styles.active,
-        this.props.tab.get('isPrivate') && styles.private,
-        this.props.isActive && this.props.tab.get('isPrivate') && styles.activePrivateTab,
         playIndicatorBreakpoint && this.canPlayAudio && styles.narrowViewPlayIndicator,
         this.props.isActive && this.themeColor && perPageStyles.themeColor,
         // Private color should override themeColor
@@ -306,7 +305,10 @@ class Tab extends ImmutableComponent {
             pageTitle={this.displayValue}
           />
         </div>
-        <PrivateIcon tab={this.props.tab} />
+        <PrivateIcon
+          tab={this.props.tab}
+          isActive={this.props.isActive}
+         />
         <NewSessionIcon
           isActive={this.props.isActive}
           paintTabs={this.props.paintTabs}

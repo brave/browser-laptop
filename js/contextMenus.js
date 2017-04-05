@@ -39,6 +39,7 @@ const {bookmarksToolbarMode} = require('../app/common/constants/settingsEnums')
 const extensionState = require('../app/common/state/extensionState')
 const extensionActions = require('../app/common/actions/extensionActions')
 const appStore = require('./stores/appStoreRenderer')
+const {makeImmutable} = require('../app/common/state/immutableUtil')
 
 const isDarwin = process.platform === 'darwin'
 const isLinux = process.platform === 'linux'
@@ -951,12 +952,15 @@ function addLinkMenu (link, frame) {
 function mainTemplateInit (nodeProps, frame, tab) {
   let template = []
 
+  nodeProps = nodeProps || {}
+  frame = makeImmutable(frame || {})
+
   const isLink = nodeProps.linkURL && nodeProps.linkURL !== ''
   const isImage = nodeProps.mediaType === 'image'
   const isVideo = nodeProps.mediaType === 'video'
   const isAudio = nodeProps.mediaType === 'audio'
   const isInputField = nodeProps.isEditable || nodeProps.inputFieldType !== 'none'
-  const isTextSelected = nodeProps.selectionText.length > 0
+  const isTextSelected = nodeProps.selectionText && nodeProps.selectionText.length > 0
   const isAboutPage = aboutUrls.has(frame.get('location'))
 
   if (isLink) {
@@ -1022,7 +1026,10 @@ function mainTemplateInit (nodeProps, frame, tab) {
       }
     }
 
-    const editableItems = getEditableItems(nodeProps.selectionText, nodeProps.editFlags, true)
+    const editableItems = nodeProps.selectionText
+      ? getEditableItems(nodeProps.selectionText, nodeProps.editFlags, true)
+      : []
+
     template.push(...misspelledSuggestions, {
       label: locale.translation('undo'),
       accelerator: 'CmdOrCtrl+Z',

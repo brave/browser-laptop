@@ -16,6 +16,9 @@ require('../../braveUnit')
 describe('tabContent components', function () {
   before(function () {
     mockery.registerMock('../../extensions/brave/img/tabs/new_session.svg')
+    mockery.registerMock('../../extensions/brave/img/tabs/close_btn_normal.svg')
+    mockery.registerMock('../../extensions/brave/img/tabs/close_btn_hover.svg')
+    mockery.registerMock('../../extensions/brave/img/tabs/private.svg')
     mockery.enable({
       warnOnReplace: false,
       warnOnUnregistered: false,
@@ -165,7 +168,7 @@ describe('tabContent components', function () {
             })}
         />
       )
-      assert.equal(wrapper.props().symbol, globalStyles.appIcons.private)
+      assert.equal(wrapper.props()['data-test-id'], 'privateIcon')
     })
     it('should not show private icon if current tab is not private', function () {
       const wrapper = shallow(
@@ -176,7 +179,7 @@ describe('tabContent components', function () {
             })}
         />
       )
-      assert.notEqual(wrapper.props().symbol, globalStyles.appIcons.private)
+      assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
     })
     it('should not show private icon if mouse is over tab (avoid icon overflow)', function () {
       const wrapper = shallow(
@@ -188,7 +191,7 @@ describe('tabContent components', function () {
             })}
         />
       )
-      assert.notEqual(wrapper.props().symbol, globalStyles.appIcons.private)
+      assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
     })
     it('should not show private icon if tab size is too small', function () {
       const wrapper = shallow(
@@ -201,7 +204,7 @@ describe('tabContent components', function () {
             })}
         />
       )
-      assert.notEqual(wrapper.props().symbol, globalStyles.appIcons.private)
+      assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
     })
   })
 

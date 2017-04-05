@@ -234,6 +234,11 @@ class NewTabPage extends React.Component {
     if (this.state.showEmptyPage) {
       return <div className='empty' />
     }
+
+    if (this.props.isIncognito) {
+      return <div className='empty' />
+    }
+
     // don't render until object is found
     if (!this.state.newTabData) {
       return null
@@ -307,5 +312,7 @@ class NewTabPage extends React.Component {
 
 module.exports = {
   component: NewTabPage,
-  AboutNewTab: React.createElement(DragDropContext(HTML5Backend)(NewTabPage))
+  AboutNewTab: React.createElement(DragDropContext(HTML5Backend)(NewTabPage), {
+    isIncognito: window.chrome && window.chrome.extension && window.chrome.extension.inIncognitoContext
+  })
 }

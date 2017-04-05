@@ -12,6 +12,7 @@ const {tabs} = require('../../../js/constants/config')
 const {hasBreakpoint, hasRelativeCloseIcon, hasFixedCloseIcon} = require('../lib/tabUtil')
 
 const newSessionSvg = require('../../extensions/brave/img/tabs/new_session.svg')
+const privateSvg = require('../../extensions/brave/img/tabs/private.svg')
 const closeTabSvg = require('../../extensions/brave/img/tabs/close_btn_normal.svg')
 const closeTabHoverSvg = require('../../extensions/brave/img/tabs/close_btn_hover.svg')
 
@@ -142,8 +143,15 @@ class PrivateIcon extends ImmutableComponent {
   }
 
   render () {
+    const privateStyles = StyleSheet.create({
+      icon: {
+        WebkitMaskImage: `url(${privateSvg})`,
+        backgroundColor: this.props.isActive ? globalStyles.color.white100 : globalStyles.color.black100
+      }
+    })
     return this.props.tab.get('isPrivate') && !this.props.tab.get('hoverState') && !this.narrowView
-      ? <TabIcon className={css(styles.icon)} symbol={globalStyles.appIcons.private} />
+      ? <TabIcon data-test-id='privateIcon'
+        className={css(styles.icon, styles.secondaryIcon, privateStyles.icon)} />
       : null
   }
 }
@@ -214,8 +222,9 @@ class TabTitle extends ImmutableComponent {
 
   get themeColor () {
     const themeColor = this.props.tab.get('themeColor') || this.props.tab.get('computedThemeColor')
-    const defaultColor = this.props.tab.get('isPrivate') ? globalStyles.color.white100 : globalStyles.color.black100
     const activeNonPrivateTab = !this.props.tab.get('isPrivate') && this.props.isActive
+    const activePrivateTab = this.props.tab.get('isPrivate') && this.props.isActive
+    const defaultColor = activePrivateTab ? globalStyles.color.white100 : globalStyles.color.black100
 
     return activeNonPrivateTab && this.props.paintTabs && !!themeColor
       ? getTextColorForBackground(themeColor)
@@ -294,6 +303,11 @@ const styles = StyleSheet.create({
   audioIcon: {
     color: globalStyles.color.highlightBlue,
     fontSize: '16px'
+  },
+
+  secondaryIcon: {
+    WebkitMaskRepeat: 'no-repeat',
+    WebkitMaskPosition: 'center'
   },
 
   newSession: {
