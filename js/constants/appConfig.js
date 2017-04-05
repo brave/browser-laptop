@@ -181,7 +181,7 @@ module.exports = {
     'advanced.send-crash-reports': true,
     'advanced.send-usage-statistics': false,
     'advanced.hide-excluded-sites': false,
-    'advanced.minimum-visit-time': 8,
+    'advanced.minimum-visit-time': 8000,
     'advanced.minimum-visits': 1,
     'advanced.auto-suggest-sites': true,
     'advanced.hide-lower-sites': true,

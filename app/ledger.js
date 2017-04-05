@@ -176,7 +176,7 @@ const doAction = (action) => {
         case settings.MINIMUM_VISIT_TIME:
           if (action.value <= 0) break
 
-          synopsis.options.minDuration = action.value
+          synopsis.options.minPublisherDuration = action.value
           updatePublisherInfo()
           break
 
@@ -741,8 +741,9 @@ var enable = (paymentsEnabled) => {
         value = 8 * 1000
         appActions.changeSetting(settings.MINIMUM_VISIT_TIME, value)
       }
+
       // for earlier versions of the code...
-      if ((value > 0) && (value < 1000)) synopsis.options.minDuration = value * 1000
+      if ((value > 0) && (value < 1000)) synopsis.options.minPublisherDuration = value * 1000
 
       value = getSetting(settings.MINIMUM_VISITS)
       if (!value) {
@@ -752,13 +753,10 @@ var enable = (paymentsEnabled) => {
       if (value > 0) synopsis.options.minPublisherVisits = value
 
       if (process.env.NODE_ENV === 'test') {
-        synopsis.options.minDuration = 0
+        synopsis.options.minDuration = 0 // TODO remove when we update publisher
         synopsis.options.minPublisherDuration = 0
         synopsis.options.minPublisherVisits = 0
       } else {
-        if (process.env.LEDGER_PUBLISHER_VISIT_DURATION) {
-          synopsis.options.minDuration = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_VISIT_DURATION)
-        }
         if (process.env.LEDGER_PUBLISHER_MIN_DURATION) {
           synopsis.options.minPublisherDuration = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_MIN_DURATION)
         }
@@ -1028,15 +1026,24 @@ var stickyP = (publisher) => {
 }
 
 var eligibleP = (publisher) => {
+  if (!synopsis.options.minPublisherDuration && process.env.NODE_ENV !== 'test') {
+    synopsis.options.minPublisherDuration = getSetting(settings.MINIMUM_VISIT_TIME)
+  }
+
   return ((synopsis.publishers[publisher].scores[synopsis.options.scorekeeper] > 0) &&
           (synopsis.publishers[publisher].duration >= synopsis.options.minPublisherDuration) &&
           (synopsis.publishers[publisher].visits >= synopsis.options.minPublisherVisits))
 }
 
 var visibleP = (publisher) => {
-  return (((stickyP(publisher)) ||
-           ((synopsis.publishers[publisher].options.exclude !== true) && (eligibleP(publisher)))) &&
-          (!blockedP(publisher)))
+  return (
+      eligibleP(publisher) &&
+      (
+        synopsis.publishers[publisher].options.exclude !== true ||
+        stickyP(publisher)
+      )
+    ) &&
+    !blockedP(publisher)
 }
 
 var contributeP = (publisher) => {
@@ -1466,7 +1473,7 @@ var ledgerInfo = {
   passphrase: undefined,
 
   // advanced ledger settings
-  minDuration: undefined,
+  minPublisherDuration: undefined,
   minPublisherVisits: undefined,
 
   hasBitcoinHandler: false,

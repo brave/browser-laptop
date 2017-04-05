@@ -593,7 +593,7 @@ WindowStore
       weight: number // float indication of the ration
     }], // one entry for each publisher having a non-zero `score`
     synopsisOptions: {
-      minDuration: number, // e.g., 8000 for 8 seconds
+      minPublisherDuration: number, // e.g., 8000 for 8 seconds
       minPublisherVisits: number // e.g., 0
     }
   },
