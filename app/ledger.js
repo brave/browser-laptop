@@ -753,7 +753,6 @@ var enable = (paymentsEnabled) => {
       if (value > 0) synopsis.options.minPublisherVisits = value
 
       if (process.env.NODE_ENV === 'test') {
-        synopsis.options.minDuration = 0 // TODO remove when we update publisher
         synopsis.options.minPublisherDuration = 0
         synopsis.options.minPublisherVisits = 0
       } else {

@@ -107,7 +107,7 @@
     "ledger-balance": "^0.8.64",
     "ledger-client": "^0.9.9",
     "ledger-geoip": "^0.8.75",
-    "ledger-publisher": "^0.9.0",
+    "ledger-publisher": "^0.9.1",
     "lru-cache": "^1.0.0",
     "moment": "^2.15.1",
     "niceware": "^1.0.4",
