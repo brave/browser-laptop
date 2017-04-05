@@ -11,7 +11,7 @@ const assert = require('assert')
 const Immutable = require('immutable')
 const fakeElectron = require('../lib/fakeElectron')
 const _ = require('underscore')
-let NewTabPage, randomSpy, Clock, Stats, FooterInfo
+let NewTabPage, randomSpy, Clock, Stats, FooterInfo, NewPrivateTab
 require('../braveUnit')
 
 const randomWrapper = {
@@ -35,6 +35,7 @@ describe('NewTab component unit tests', function () {
     Clock = require('../../../js/about/newTabComponents/clock')
     Stats = require('../../../js/about/newTabComponents/stats')
     FooterInfo = require('../../../js/about/newTabComponents/footerInfo')
+    NewPrivateTab = require('../../../js/about/newprivatetab')
   })
 
   after(function () {
@@ -151,8 +152,8 @@ describe('NewTab component unit tests', function () {
         assert.equal(wrapper.find('div.empty').length, 1)
       })
 
-      it('renders an empty div if isIncognito props is true', function () {
-        assert.equal(incognitoWrapper.find('div.empty').length, 1)
+      it('renders newPrivateTab page if isIncognito props is true', function () {
+        assert.equal(incognitoWrapper.find(NewPrivateTab).length, 1)
       })
     })
 

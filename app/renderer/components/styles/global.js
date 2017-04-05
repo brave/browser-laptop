@@ -5,6 +5,7 @@ const globalStyles = {
     breakpointExtensionButtonPadding: '720px',
     breakpointSmallWin32: '650px',
     breakpointTinyWin32: '500px',
+    breakpointNewPrivateTab: '890px',
     tab: {
       large: '120px',
       largeMedium: '83px',
@@ -72,7 +73,8 @@ const globalStyles = {
     statsLightGray: '#999999',
     defaultIconBackground: '#F7F7F7',
     almostInvisible: 'rgba(255,255,255,0.01)',
-    urlBarOutline: '#bbb'
+    urlBarOutline: '#bbb',
+    alphaWhite: 'rgba(255,255,255,0.8)'
   },
   radius: {
     borderRadius: '4px',
@@ -124,7 +126,8 @@ const globalStyles = {
     dialogTopOffset: '30px',
     paymentsMargin: '20px',
     modalPanelHeaderMarginBottom: '.5em',
-    paddingHorizontal: '30px'
+    paddingHorizontal: '30px',
+    privateTabPadding: '40px'
   },
   shadow: {
     switchShadow: 'inset 0 1px 4px rgba(0, 0, 0, 0.35)',

@@ -20,6 +20,7 @@ const siteTags = require('../constants/siteTags')
 const config = require('../constants/config')
 const backgrounds = require('../data/backgrounds')
 const {random} = require('../../app/common/lib/randomUtil')
+const NewPrivateTab = require('./newprivatetab')
 
 const ipc = window.chrome.ipcRenderer
 
@@ -231,12 +232,12 @@ class NewTabPage extends React.Component {
 
   render () {
     // don't render if user prefers an empty page
-    if (this.state.showEmptyPage) {
+    if (this.state.showEmptyPage && !this.props.isIncognito) {
       return <div className='empty' />
     }
 
     if (this.props.isIncognito) {
-      return <div className='empty' />
+      return <NewPrivateTab newTabData={this.state.newTabData} />
     }
 
     // don't render until object is found
