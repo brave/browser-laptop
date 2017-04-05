@@ -97,7 +97,7 @@ class UrlBarSuggestions extends ImmutableComponent {
   }
 
   updateSuggestions (newIndex) {
-    const suggestions = this.suggestionList || this.props.suggestionList
+    const suggestions = this.props.suggestionList
     if (!suggestions) {
       return
     }

@@ -5,6 +5,7 @@
 const React = require('react')
 const Immutable = require('immutable')
 const ImmutableComponent = require('./immutableComponent')
+const ReduxComponent = require('../../app/renderer/components/reduxComponent')
 
 const cx = require('../lib/classSet')
 const Button = require('./button')
@@ -21,10 +22,15 @@ const siteUtil = require('../state/siteUtil')
 const eventUtil = require('../lib/eventUtil')
 const UrlUtil = require('../lib/urlutil')
 const getSetting = require('../settings').getSetting
-const windowStore = require('../stores/windowStore')
 const contextMenus = require('../contextMenus')
 const LongPressButton = require('./longPressButton')
 const PublisherToggle = require('../../app/renderer/components/publisherToggle')
+
+// state helpers
+const frameState = require('../../app/common/state/frameState')
+const navigationBarState = require('../../app/common/state/navigationBarState')
+const tabState = require('../../app/common/state/tabState')
+const frameStateUtil = require('../state/frameStateUtil')
 
 class NavigationBar extends ImmutableComponent {
   constructor () {
@@ -36,18 +42,10 @@ class NavigationBar extends ImmutableComponent {
     this.onNoScript = this.onNoScript.bind(this)
   }
 
-  get activeFrame () {
-    return windowStore.getFrame(this.props.activeFrameKey)
-  }
-
-  get loading () {
-    return this.props.activeFrameKey !== undefined && this.props.loading
-  }
-
   onToggleBookmark () {
     const editing = this.bookmarked
     // show the AddEditBookmarkHanger control; saving/deleting takes place there
-    let siteDetail = siteUtil.getDetailFromFrame(this.activeFrame, siteTags.BOOKMARK)
+    let siteDetail = siteUtil.getDetailFromFrame(this.props.activeFrame, siteTags.BOOKMARK)
     const key = siteUtil.getSiteKey(siteDetail)
 
     if (key !== null) {
@@ -60,7 +58,7 @@ class NavigationBar extends ImmutableComponent {
 
   onReload (e) {
     if (eventUtil.isForSecondaryAction(e)) {
-      appActions.tabCloned(this.activeFrame.get('tabId'), {active: !!e.shiftKey})
+      appActions.tabCloned(this.props.activeFrame.get('tabId'), {active: !!e.shiftKey})
     } else {
       ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
     }
@@ -82,10 +80,10 @@ class NavigationBar extends ImmutableComponent {
 
   onStop () {
     ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_STOP)
-    if (this.props.navbar.getIn(['urlbar', 'focused'])) {
+    if (this.props.urlbar.get('focused')) {
       windowActions.setUrlBarActive(false)
-      const shouldRenderSuggestions = this.props.navbar.getIn(['urlbar', 'suggestions', 'shouldRender']) === true
-      const suggestionList = this.props.navbar.getIn(['urlbar', 'suggestions', 'suggestionList'])
+      const shouldRenderSuggestions = this.props.urlbar.getIn(['suggestions', 'shouldRender']) === true
+      const suggestionList = this.props.urlbarSuggestionList
       if (!shouldRenderSuggestions ||
           // TODO: Once we take out suggestion generation from within URLBarSuggestions we can remove this check
           // and put it in shouldRenderUrlBarSuggestions where it belongs.  See https://github.com/brave/browser-laptop/issues/3151
@@ -101,20 +99,6 @@ class NavigationBar extends ImmutableComponent {
         location: this.props.location,
         partitionNumber: this.props.partitionNumber
       }))
-  }
-
-  get titleMode () {
-    return this.props.activeTabShowingMessageBox ||
-      (
-        this.props.mouseInTitlebar === false &&
-        !this.props.bookmarkDetail &&
-        this.props.title &&
-        !['about:blank', 'about:newtab'].includes(this.props.location) &&
-        !this.loading &&
-        !this.props.navbar.getIn(['urlbar', 'focused']) &&
-        !this.props.navbar.getIn(['urlbar', 'active']) &&
-        getSetting(settings.DISABLE_TITLE_MODE) === false
-      )
   }
 
   get locationId () {
@@ -143,6 +127,31 @@ class NavigationBar extends ImmutableComponent {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark())
   }
 
+  mergeProps (state, dispatchProps, ownProps) {
+    // TODO(bridiver) - add state helpers
+    const currentWindow = state.get('currentWindow')
+    const activeFrame = frameStateUtil.getActiveFrame(currentWindow)
+    const activeFrameKey = activeFrame.get('key')
+    const bookmarkDetail = currentWindow.get('bookmarkDetail')
+
+    const tabId = frameState.getTabIdByFrameKey(state, activeFrameKey)
+    const location = tabState.getLocation(state, tabId)
+
+    const props = {
+      activeFrame,
+      activeFrameKey,
+      bookmarkDetail,
+      loading: tabState.isLoading(state, tabId),
+      location,
+      title: tabState.getTitle(state, tabId),
+      titleMode: navigationBarState.isTitleMode(state, tabId, bookmarkDetail),
+      urlbar: navigationBarState.getUrlBar(state, tabId),
+      urlbarSuggestionList: navigationBarState.getSuggestionList(state, tabId)
+    }
+
+    return Object.assign({}, ownProps, props)
+  }
+
   get showNoScriptInfo () {
     return this.props.enableNoScript && this.props.scriptsBlocked && this.props.scriptsBlocked.size
   }
@@ -168,7 +177,7 @@ class NavigationBar extends ImmutableComponent {
       ref='navigator'
       data-frame-key={this.props.activeFrameKey}
       className={cx({
-        titleMode: this.titleMode
+        titleMode: this.props.titleMode
       })}>
       {
         this.props.bookmarkDetail && this.props.bookmarkDetail.get('isBookmarkHanger')
@@ -182,9 +191,9 @@ class NavigationBar extends ImmutableComponent {
         : null
       }
       {
-        this.titleMode
+        this.props.titleMode
         ? null
-        : this.loading
+        : this.props.loading
           ? <span className='navigationButtonContainer'>
             <button data-l10n-id='stopButton'
               className='navigationButton stopButton'
@@ -199,7 +208,7 @@ class NavigationBar extends ImmutableComponent {
           </span>
       }
       {
-        !this.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
+        !this.props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
         ? <span className='navigationButtonContainer'>
           <button data-l10n-id='homeButton'
             className='navigationButton homeButton'
@@ -209,7 +218,7 @@ class NavigationBar extends ImmutableComponent {
       }
       <div className='startButtons'>
         {
-          !this.titleMode
+          !this.props.titleMode
           ? <span className='bookmarkButtonContainer'>
             <button data-l10n-id={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
               className={cx({
@@ -223,24 +232,9 @@ class NavigationBar extends ImmutableComponent {
           : null
         }
       </div>
-      <UrlBar ref='urlBar'
-        activeFrameKey={this.props.activeFrameKey}
-        canGoForward={this.props.canGoForward}
-        searchDetail={this.props.searchDetail}
-        loading={this.loading}
-        location={this.props.location}
-        title={this.props.title}
-        history={this.props.history}
-        isSecure={this.props.isSecure}
-        hasLocationValueSuffix={this.props.hasLocationValueSuffix}
-        startLoadTime={this.props.startLoadTime}
-        endLoadTime={this.props.endLoadTime}
-        titleMode={this.titleMode}
-        urlbar={this.props.navbar.get('urlbar')}
+      <UrlBar
         onStop={this.onStop}
         menubarVisible={this.props.menubarVisible}
-        noBorderRadius={!isSourceAboutUrl(this.props.location)}
-        activeTabShowingMessageBox={this.props.activeTabShowingMessageBox}
         />
       {
         isSourceAboutUrl(this.props.location)
@@ -274,4 +268,4 @@ class NavigationBar extends ImmutableComponent {
   }
 }
 
-module.exports = NavigationBar
+module.exports = ReduxComponent.connect(NavigationBar)

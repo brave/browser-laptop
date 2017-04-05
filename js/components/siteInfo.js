@@ -12,6 +12,7 @@ const Button = require('./button')
 const appActions = require('../actions/appActions')
 const webviewActions = require('../actions/webviewActions')
 const messages = require('../constants/messages')
+const frameStateUtil = require('../state/frameStateUtil')
 const siteUtil = require('../state/siteUtil')
 const platformUtil = require('../../app/common/lib/platformUtil')
 
@@ -46,7 +47,7 @@ class SiteInfo extends ImmutableComponent {
     return this.props.frameProps.getIn(['security', 'isExtendedValidation'])
   }
   get isSecure () {
-    return this.props.frameProps.getIn(['security', 'isSecure'])
+    return frameStateUtil.isFrameSecure(this.props.frameProps)
   }
   get isPrivate () {
     return this.props.frameProps.getIn(['isPrivate'])

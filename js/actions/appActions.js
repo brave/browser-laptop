@@ -596,6 +596,20 @@ const appActions = {
   },
 
   /**
+   * Dispatches a message to indicate if the mouse is in the titlebar
+   *
+   * @param {Number} windowId - the unique id of the window
+   * @param {boolean} mouseInTitlebar - true if the mouse is in the titlebar
+   */
+  mouseInTitlebar: function (windowId, mouseInTitlebar) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_WINDOW_MOUSE_IN_TITLEBAR,
+      windowId,
+      mouseInTitlebar
+    })
+  },
+
+  /**
    * Dispatches a message when appWindowId loses focus
    * Dispatches a message when windowId loses focus
    *

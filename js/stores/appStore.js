@@ -392,6 +392,9 @@ const handleAppAction = (action) => {
       AppDispatcher.shutdown()
       app.quit()
       break
+    case appConstants.APP_WINDOW_MOUSE_IN_TITLEBAR:
+      appState = windowState.setMouseInTitlebar(appState, action)
+      break
     case appConstants.APP_NEW_WINDOW:
       createWindow(action)
       break

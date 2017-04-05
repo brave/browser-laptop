@@ -332,7 +332,10 @@ AppStore
     type: string,  // "normal", "popup", or "devtools"
     width: number,
     // session properties
-    id: number  // the electron id for the window
+    id: number,  // the electron id for the window
+    ui: {
+      mouseInTitlebar: boolean, // whether or not the mouse is in the titlebar
+    }
   }]
 }
 ```
@@ -646,7 +649,6 @@ WindowStore
       lastFocusedSelector: string, // selector for the last selected element (browser ui, not frame content)
       selectedIndex: Array<number> // indices of the selected menu item(s) (or null for none selected)
     }, // windows only
-    mouseInTitlebar: boolean, // whether or not the mouse is in the titlebar
     noScriptInfo: {
       isVisible: boolean // Whether the noscript infobox is visible
     },

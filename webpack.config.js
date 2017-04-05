@@ -98,14 +98,14 @@ function production () {  // eslint-disable-line
   var prod = config()
   prod.plugins.push(new webpack.optimize.DedupePlugin())
   prod.plugins.push(new webpack.optimize.OccurrenceOrderPlugin(true))
-  prod.plugins.push(new webpack.optimize.UglifyJsPlugin({
-    compress: {
-      warnings: false
-    },
-    mangle: {
-      except: ['module', 'exports', 'require']
-    }
-  }))
+  // prod.plugins.push(new webpack.optimize.UglifyJsPlugin({
+  //   compress: {
+  //     warnings: false
+  //   },
+  //   mangle: {
+  //     except: ['module', 'exports', 'require']
+  //   }
+  // }))
   return prod
 }
 

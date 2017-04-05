@@ -26,7 +26,7 @@ const {isFrameError, isAborted} = require('../../app/common/lib/httpUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
 const {getSiteSettingsForHostPattern} = require('../state/siteSettings')
-const {currentWindowWebContents, isFocused} = require('../../app/renderer/currentWindow')
+const {currentWindowWebContents, currentWindowId, isFocused} = require('../../app/renderer/currentWindow')
 const windowStore = require('../stores/windowStore')
 const appStoreRenderer = require('../stores/appStoreRenderer')
 const siteSettings = require('../state/siteSettings')
@@ -940,7 +940,7 @@ class Frame extends ImmutableComponent {
         windowActions.setNavigated(e.url, this.props.frameKey, false, this.frame.get('tabId'))
       }
       // force temporary url display for tabnapping protection
-      windowActions.setMouseInTitlebar(true)
+      appActions.mouseInTitlebar(currentWindowId, true)
     })
     this.webview.addEventListener('crashed', (e) => {
       if (this.frame.isEmpty()) {

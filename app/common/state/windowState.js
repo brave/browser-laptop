@@ -34,6 +34,8 @@ const validateAction = function (action) {
 }
 
 const api = {
+  WINDOW_ID_NONE: -1,
+
   getWindowIndex: (state, windowValue) => {
     state = validateState(state)
 
@@ -138,9 +140,32 @@ const api = {
     return state.get('windows')
   },
 
+  setMouseInTitlebar: (state, action) => {
+    action = validateAction(action)
+    state = validateState(state)
+    const windowId = validateId('windowId', action.get('windowId'))
+    return api.updateWindow(state, {
+      windowValue: {
+        windowId,
+        ui: {
+          mouseInTitlebar: !!action.get('mouseInTitlebar')
+        }
+      }
+    })
+  },
+
+  isMouseInTitlebar: (state, windowId) => {
+    const win = api.getByWindowId(state, windowId)
+    if (!win) {
+      return false
+    }
+    return win.getIn(['ui', 'mouseInTitlebar'])
+  },
+
   getPersistentState: (state) => {
     // TODO(bridiver) handle restoring state
     state = makeImmutable(state)
+    state = state.deleteIn(['windows', 'ui'])
     return state.delete('windows')
   }
 }
