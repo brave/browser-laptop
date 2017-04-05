@@ -68,6 +68,7 @@ const searchProviders = require('../data/searchProviders')
 const defaultBrowserState = require('../../app/common/state/defaultBrowserState')
 
 // Util
+const _ = require('underscore')
 const cx = require('../lib/classSet')
 const eventUtil = require('../lib/eventUtil')
 const {isIntermediateAboutPage, getBaseUrl, isNavigatableAboutPage} = require('../lib/appUrlUtil')
@@ -233,15 +234,31 @@ class Main extends ImmutableComponent {
   }
 
   registerSwipeListener () {
-    // Navigates back/forward on macOS two-finger swipe
-    var trackingFingers = false
-    var swipeGesture = false
-    var isSwipeOnLeftEdge = false
-    var isSwipeOnRightEdge = false
-    var deltaX = 0
-    var deltaY = 0
-    var startTime = 0
-    var time
+    // Navigates back/forward on macOS two- and or three-finger swipe
+    let swipeGesture = false
+    let trackingFingers = false
+    let startTime = 0
+    let isSwipeOnLeftEdge = false
+    let isSwipeOnRightEdge = false
+    let deltaX = 0
+    let deltaY = 0
+    let time
+
+    ipc.on(messages.ENABLE_SWIPE_GESTURE, (e) => {
+      swipeGesture = true
+    })
+
+    ipc.on(messages.DISABLE_SWIPE_GESTURE, (e) => {
+      swipeGesture = false
+    })
+
+    // isSwipeTrackingFromScrollEventsEnabled is only true if "two finger scroll to swipe" is enabled
+    ipc.on('scroll-touch-begin', () => {
+      if (swipeGesture && systemPreferences.isSwipeTrackingFromScrollEventsEnabled()) {
+        trackingFingers = true
+        startTime = (new Date()).getTime()
+      }
+    })
 
     this.mainWindow.addEventListener('wheel', (e) => {
       if (trackingFingers) {
@@ -250,47 +267,9 @@ class Main extends ImmutableComponent {
         time = (new Date()).getTime() - startTime
       }
     }, { passive: true })
-    ipc.on(messages.DEBUG_REACT_PROFILE, (e, args) => {
-      window.perf = require('react-addons-perf')
-      if (!window.perf.isRunning()) {
-        if (!window.isFirstProfiling) {
-          window.isFirstProfiling = true
-          console.info('See this blog post for more information on profiling: http://benchling.engineering/performance-engineering-with-react/')
-        }
-        currentWindow.openDevTools()
-        console.log('starting to profile...')
-        window.perf.start()
-      } else {
-        window.perf.stop()
-        console.log('profiling stopped. Wasted:')
-        window.perf.printWasted()
-      }
-    })
-    ipc.on(messages.OPEN_BRAVERY_PANEL, (e) => {
-      if (!this.braveShieldsDisabled) {
-        this.onBraveMenu()
-      } else {
-        windowActions.newFrame({
-          location: 'about:preferences#shields',
-          singleFrame: true
-        }, true)
-      }
-    })
-    ipc.on(messages.ENABLE_SWIPE_GESTURE, (e) => {
-      swipeGesture = true
-    })
-    ipc.on(messages.DISABLE_SWIPE_GESTURE, (e) => {
-      swipeGesture = false
-    })
-    ipc.on('scroll-touch-begin', function () {
-      if (swipeGesture &&
-        systemPreferences.isSwipeTrackingFromScrollEventsEnabled()) {
-        trackingFingers = true
-        startTime = (new Date()).getTime()
-      }
-    })
-    ipc.on('scroll-touch-end', function () {
-      if (time > 50 && trackingFingers && Math.abs(deltaY) < 50) {
+
+    ipc.on('scroll-touch-end', () => {
+      if (trackingFingers && time > 30 && Math.abs(deltaY) < 80) {
         if (deltaX > 70 && isSwipeOnRightEdge) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
         } else if (deltaX < -70 && isSwipeOnLeftEdge) {
@@ -302,20 +281,34 @@ class Main extends ImmutableComponent {
       deltaY = 0
       startTime = 0
     })
-    ipc.on('scroll-touch-edge', function () {
-      if (deltaX > 0 && !isSwipeOnRightEdge) {
-        isSwipeOnRightEdge = true
-        isSwipeOnLeftEdge = false
-        time = 0
-        deltaX = 0
-      } else if (deltaX < 0 && !isSwipeOnLeftEdge) {
-        isSwipeOnLeftEdge = true
-        isSwipeOnRightEdge = false
-        time = 0
-        deltaX = 0
+
+    ipc.on('scroll-touch-edge', () => {
+      if (trackingFingers) {
+        if (!isSwipeOnRightEdge && deltaX > 0) {
+          isSwipeOnRightEdge = true
+          isSwipeOnLeftEdge = false
+          time = 0
+          deltaX = 0
+        } else if (!isSwipeOnLeftEdge && deltaX < 0) {
+          isSwipeOnLeftEdge = true
+          isSwipeOnRightEdge = false
+          time = 0
+          deltaX = 0
+        }
       }
     })
-    ipc.on(messages.LEAVE_FULL_SCREEN, this.exitFullScreen.bind(this))
+
+    const throttledSwipe = _.throttle(direction => {
+      if (swipeGesture) {
+        if (direction === 'left') {
+          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_BACK)
+        } else if (direction === 'right') {
+          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
+        }
+      }
+    }, 500, {leading: true, trailing: false})
+    // the swipe gesture handler will only fire if the three finger swipe setting is on, so the complete off setting and three and two finger together is also taken care of
+    currentWindow.on('swipe', (e, direction) => { throttledSwipe(direction) })
   }
 
   loadSearchProviders () {
@@ -372,6 +365,36 @@ class Main extends ImmutableComponent {
     this.registerSwipeListener()
     this.registerWindowLevelShortcuts()
     this.registerCustomTitlebarHandlers()
+
+    ipc.on(messages.LEAVE_FULL_SCREEN, this.exitFullScreen.bind(this))
+
+    ipc.on(messages.DEBUG_REACT_PROFILE, (e, args) => {
+      window.perf = require('react-addons-perf')
+      if (!window.perf.isRunning()) {
+        if (!window.isFirstProfiling) {
+          window.isFirstProfiling = true
+          console.info('See this blog post for more information on profiling: http://benchling.engineering/performance-engineering-with-react/')
+        }
+        currentWindow.openDevTools()
+        console.log('starting to profile...')
+        window.perf.start()
+      } else {
+        window.perf.stop()
+        console.log('profiling stopped. Wasted:')
+        window.perf.printWasted()
+      }
+    })
+
+    ipc.on(messages.OPEN_BRAVERY_PANEL, (e) => {
+      if (!this.braveShieldsDisabled) {
+        this.onBraveMenu()
+      } else {
+        windowActions.newFrame({
+          location: 'about:preferences#shields',
+          singleFrame: true
+        }, true)
+      }
+    })
 
     ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url, options = {}) => {
       if (options.singleFrame) {
