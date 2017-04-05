@@ -10,6 +10,19 @@ const SwitchControl = require('../../../js/components/switchControl')
 const windowActions = require('../../../js/actions/windowActions')
 const appActions = require('../../../js/actions/appActions')
 
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('./styles/global')
+
+const {
+  CommonForm,
+  CommonFormDropdown,
+  CommonFormSection,
+  CommonFormTitle,
+  CommonFormSubSection,
+  CommonFormButtonWrapper,
+  CommonFormBottomWrapper
+} = require('./commonForm')
+
 class ImportBrowserDataPanel extends ImmutableComponent {
   constructor () {
     super()
@@ -111,39 +124,66 @@ class ImportBrowserDataPanel extends ImmutableComponent {
         browsers.push(<option value={browser.index}>{browser.name}</option>)
       })
     }
-    return <Dialog onHide={this.props.onHide} className='importBrowserDataPanel' isClickDismiss>
-      <div className='importBrowserData' onClick={(e) => e.stopPropagation()}>
-        <div className='formSection importBrowserDataTitle' data-l10n-id='importBrowserData' />
-        <div className='formSection importBrowserDataOptions'>
-          <select value={this.selectedBrowser}
-            onChange={this.onChange} >
-            {browsers}
-          </select>
-          <SwitchControl rightl10nId='browserHistory' checkedOn={this.props.importBrowserDataSelected.get('history')}
-            onClick={this.onToggleHistory} disabled={!this.supportHistory} />
-          <SwitchControl rightl10nId='favoritesOrBookmarks' checkedOn={this.props.importBrowserDataSelected.get('favorites')}
-            onClick={this.onToggleFavorites} disabled={!this.supportFavorites} />
-          <div className='formSection importBrowserSubDataOptions'>
-            <SwitchControl rightl10nId='mergeIntoBookmarksToolbar'
-              checkedOn={this.props.importBrowserDataSelected.get('mergeFavorites')}
-              onClick={this.onToggleMergeFavorites} disabled={!this.props.importBrowserDataSelected.get('favorites')} />
+    return <Dialog onHide={this.props.onHide} data-test-id='importBrowserDataPanel' isClickDismiss>
+      <CommonForm data-test-id='importBrowserData' onClick={(e) => e.stopPropagation()}>
+        <CommonFormTitle
+          data-test-id='importBrowserDataTitle'
+          data-l10n-id='importBrowserData'
+        />
+        <CommonFormSection data-test-id='importBrowserDataOptions'>
+          <div className={css(styles.dropdownWrapper)}>
+            <CommonFormDropdown
+              value={this.selectedBrowser}
+              onChange={this.onChange} >
+              {browsers}
+            </CommonFormDropdown>
           </div>
-          <SwitchControl rightl10nId='cookies' checkedOn={this.props.importBrowserDataSelected.get('cookies')}
-            onClick={this.onToggleCookies} disabled={!this.supportCookies} />
-        </div>
-        <div className='formSection'>
+          <SwitchControl
+            rightl10nId='browserHistory'
+            checkedOn={this.props.importBrowserDataSelected.get('history')}
+            onClick={this.onToggleHistory}
+            disabled={!this.supportHistory}
+          />
+          <SwitchControl
+            rightl10nId='favoritesOrBookmarks'
+            checkedOn={this.props.importBrowserDataSelected.get('favorites')}
+            onClick={this.onToggleFavorites}
+            disabled={!this.supportFavorites}
+          />
+          <CommonFormSubSection data-test-id='importBrowserSubDataOptions'>
+            <SwitchControl
+              rightl10nId='mergeIntoBookmarksToolbar'
+              checkedOn={this.props.importBrowserDataSelected.get('mergeFavorites')}
+              onClick={this.onToggleMergeFavorites}
+              disabled={!this.props.importBrowserDataSelected.get('favorites')}
+            />
+          </CommonFormSubSection>
+          <SwitchControl
+            rightl10nId='cookies'
+            checkedOn={this.props.importBrowserDataSelected.get('cookies')}
+            onClick={this.onToggleCookies}
+            disabled={!this.supportCookies}
+          />
+        </CommonFormSection>
+        <CommonFormSection>
           <div data-l10n-id='importDataCloseBrowserWarning' />
-        </div>
-        <div className='formSection importBrowserDataButtons'>
+        </CommonFormSection>
+        <CommonFormButtonWrapper data-test-id='importBrowserDataButtons'>
           <Button l10nId='cancel' className='whiteButton' onClick={this.props.onHide} />
           <Button l10nId='import' className='primaryButton' onClick={this.onImport} />
-        </div>
-        <div className='formSection importBrowserDataWarning'>
+        </CommonFormButtonWrapper>
+        <CommonFormBottomWrapper data-test-id='importBrowserDataWarning'>
           <div data-l10n-id='importDataWarning' />
-        </div>
-      </div>
+        </CommonFormBottomWrapper>
+      </CommonForm>
     </Dialog>
   }
 }
+
+const styles = StyleSheet.create({
+  dropdownWrapper: {
+    marginBottom: `calc(${globalStyles.spacing.dialogInsideMargin} / 2)`
+  }
+})
 
 module.exports = ImportBrowserDataPanel

@@ -26,12 +26,14 @@ const globalStyles = {
     chromeSecondary: '#d3d3d3',
     chromeTertiary: '#c7c7c7',
     chromeText: '#555555',
-    tabsBackground: '#ddd',
-    tabsBackgroundInactive: '#ddd',
-    tabsToolbarBorderColor: '#bbb',
     navigationBarBackground: 'white',
     chromeControlsBackground: '#bbb',
     chromeControlsBackground2: 'white',
+    tabsToolbarBorderColor: '#bbb',
+    tabsBackground: '#ddd',
+    tabsBackgroundInactive: '#ddd',
+    commonFormBottomWrapperBackground: '#ddd',
+    commonFormBackgroundColor: '#f7f7f7',
     toolbarBackground: '#eee',
     toolbarBorderColor: '#ccc',
     menuSelectionColor: '#2F7AFB',
@@ -122,6 +124,7 @@ const globalStyles = {
     closeIconSize: '13px',
     narrowIconSize: '12px',
     dialogTopOffset: '30px',
+    dialogInsideMargin: '18px',
     paymentsMargin: '20px',
     modalPanelHeaderMarginBottom: '.5em',
     paddingHorizontal: '30px'
@@ -170,7 +173,8 @@ const globalStyles = {
   fontSize: {
     tabIcon: '14px',
     tabTitle: '12px',
-    settingItemSubtext: '.95rem'
+    settingItemSubtext: '.95rem',
+    flyoutDialog: '13px'
   },
   appIcons: {
     clipboard: 'fa fa-clipboard',
