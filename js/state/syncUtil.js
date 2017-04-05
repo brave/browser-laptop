@@ -61,8 +61,9 @@ let folderIdMap = new Immutable.Map()
  * Converts sync records into a form that can be consumed by AppStore.
  * @param {Object} record
  * @param {Immutable.Map} appState
+ * @param {Immutable.List=} records - batch of records possibly not yet applied
  */
-module.exports.getSiteDataFromRecord = (record, appState) => {
+module.exports.getSiteDataFromRecord = (record, appState, records) => {
   const objectId = new Immutable.List(record.objectId)
   const category = CATEGORY_MAP[record.objectData].categoryName
   let existingObjectData
@@ -96,7 +97,7 @@ module.exports.getSiteDataFromRecord = (record, appState) => {
     const parentFolderObjectId = siteProps.parentFolderObjectId
     if (parentFolderObjectId && parentFolderObjectId.length > 0) {
       siteProps.parentFolderId =
-        getFolderIdByObjectId(new Immutable.List(parentFolderObjectId), appState)
+        getFolderIdByObjectId(new Immutable.List(parentFolderObjectId), appState, records)
     }
   }
   const siteDetail = new Immutable.Map(pickFields(siteProps, SITE_FIELDS))
@@ -341,16 +342,30 @@ module.exports.getObjectById = (objectId, category, appState) => {
  * Given an bookmark folder objectId, find the folder and return its folderId.
  * @param {Immutable.List} objectId
  * @param {Immutable.Map=} appState
+ * @param {Immutable.List=} records
  * @returns {number|undefined}
  */
-const getFolderIdByObjectId = (objectId, appState) => {
+const getFolderIdByObjectId = (objectId, appState, records) => {
   if (folderIdMap.has(objectId)) {
     return folderIdMap.get(objectId)
   }
+  let folderId
   const entry = module.exports.getObjectById(objectId, 'BOOKMARKS', appState)
-  if (!entry) { return undefined }
-  const folderId = entry[1].get('folderId')
-  folderIdMap = folderIdMap.set(objectId, folderId)
+  if (entry) {
+    folderId = entry[1].get('folderId')
+  } else if (records) {
+    // Look for a folder record with a matching object ID in this record batch
+    const matchingFolder = records.find((record) => {
+      record = Immutable.fromJS(record)
+      return record && objectId.equals(record.get('objectId')) && typeof record.getIn(['bookmark', 'site', 'folderId']) === 'number'
+    })
+    if (matchingFolder) {
+      folderId = matchingFolder.bookmark.site.folderId
+    }
+  }
+  if (folderId) {
+    folderIdMap = folderIdMap.set(objectId, folderId)
+  }
   return folderId
 }
 

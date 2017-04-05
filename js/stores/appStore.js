@@ -9,7 +9,6 @@ const ExtensionConstants = require('../../app/common/constants/extensionConstant
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
-const siteTags = require('../constants/siteTags')
 const writeActions = require('../constants/sync/proto').actions
 const siteUtil = require('../state/siteUtil')
 const syncUtil = require('../state/syncUtil')
@@ -438,16 +437,23 @@ const handleAppAction = (action) => {
       nativeImage.copyDataURL(action.dataURL, action.html, action.text)
       break
     case appConstants.APP_APPLY_SITE_RECORDS:
+      let nextFolderId = siteUtil.getNextFolderId(appState.get('sites'))
+      // Ensure that all folders are assigned folderIds
+      action.records.forEach((record, i) => {
+        if (record.action !== writeActions.DELETE &&
+          record.bookmark && record.bookmark.isFolder &&
+          record.bookmark.site &&
+          typeof record.bookmark.site.folderId !== 'number') {
+          record.bookmark.site.folderId = nextFolderId
+          action.records.set(i, record)
+          nextFolderId = nextFolderId + 1
+        }
+      })
       action.records.forEach((record) => {
-        const siteData = syncUtil.getSiteDataFromRecord(record, appState)
+        const siteData = syncUtil.getSiteDataFromRecord(record, appState, action.records)
         const tag = siteData.tag
         let siteDetail = siteData.siteDetail
         const sites = appState.get('sites')
-        if (record.action !== writeActions.DELETE &&
-          tag === siteTags.BOOKMARK_FOLDER &&
-          !siteDetail.get('folderId')) {
-          siteDetail = siteDetail.set('folderId', siteUtil.getNextFolderId(sites))
-        }
         switch (record.action) {
           case writeActions.CREATE:
             appState = appState.set('sites',
