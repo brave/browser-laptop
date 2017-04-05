@@ -693,15 +693,18 @@ eventStore.addChangeListener(() => {
  */
 
 var initialize = (paymentsEnabled) => {
-  var ruleset
+  var ruleset, timeout
 
   if (!v2RulesetDB) v2RulesetDB = levelup(pathName(v2RulesetPath))
   if (!v2PublishersDB) v2PublishersDB = levelup(pathName(v2PublishersPath))
   enable(paymentsEnabled)
 
-  // Check if relevant browser notifications should be shown every 15 minutes
+  // Check if relevant browser notifications should be shown every 15 (default) minutes
+  timeout = 15 // minutes
+  if (process.env.LEDGER_NOTIFICATIONS_TIMEOUT) timeout = parseInt(process.env.LEDGER_NOTIFICATIONS_TIMEOUT)
+
   if (notificationTimeout) clearInterval(notificationTimeout)
-  notificationTimeout = setInterval(showNotifications, 1 * msecs.minute)
+  notificationTimeout = setInterval(showNotifications, timeout * msecs.minute)
 
   if (!paymentsEnabled) {
     client = null
@@ -1587,7 +1590,6 @@ var updateLedgerInfo = () => {
       ledgerInfo.customerRequested = true
       retrieveCustomerInfo({ address: ledgerInfo.address }, (customer) => {
         ledgerInfo.customer = customer
-        ledgerInfo.customer.ago = moment(customer.lastChargeTimestamp).fromNow()
         updateLedgerInfo()
       })
     }
@@ -1713,10 +1715,13 @@ var retrieveCustomerInfo = (params, callback) => {
     headers: underscore.defaults(params.headers || {}, { 'content-type': 'application/json; charset=utf-8' }),
     verboseP: params.verboseP || false
   }
-
   request.request(options, (err, response, body) => {
     if (err) return null
     var customer = response.statusCode === 200 ? JSON.parse(body) : null
+    if (customer && clientOptions.debugP) {
+      customer.lastCharged = moment(customer.lastChargeTimestamp).format('YYYY-MM-DD HH:mm:ss')
+      console.log(customer)
+    }
     callback(customer)
   })
 }
@@ -2177,7 +2182,6 @@ const attemptAutorenewalCharge = () => {
     if (!err) {
       retrieveCustomerInfo({ address: ledgerInfo.address }, (customer) => {
         ledgerInfo.customer = customer
-        ledgerInfo.customer.ago = moment(customer.lastChargeTimestamp).fromNow()
         updateLedgerInfo()
       })
     } else {
@@ -2191,7 +2195,9 @@ const closeToReconciliation = () => {
 }
 
 const waitedADay = () => {
-  return ledgerInfo.customer && ledgerInfo.customer.lastChargeTimestamp && (ledgerInfo.customer.lastChargeTimestamp - underscore.now() < msecs.day)
+  return ledgerInfo.customer &&
+    ledgerInfo.customer.lastChargeTimestamp &&
+    (ledgerInfo.customer.lastChargeTimestamp - underscore.now() > 1 * msecs.day)
 }
 
 const isAutorenewalEnabled = () => {
@@ -2215,12 +2221,14 @@ const showNotifications = () => {
   } else {
     showDisabledNotifications()
   }
-  // TODO - check last time I did this 3 days of reconciliation & autorenewal & balance insufficient & more than 1 day since last charge
-  console.log(isPaymentsEnabled(),
-              isAutorenewalEnabled(),
-              closeToReconciliation(),
-              !sufficientBalanceToReconcile(),
-              waitedADay())
+
+  if (clientOptions.debugP) {
+    console.log('payments enabled = ' + isPaymentsEnabled())
+    console.log('autorenewal enabled = ' + isAutorenewalEnabled())
+    console.log('close to reconciliation time = ' + closeToReconciliation())
+    console.log('insufficient balance = ' + !sufficientBalanceToReconcile())
+    console.log('waited a day since last attempt = ' + waitedADay())
+  }
 
   if (isPaymentsEnabled() &&
       isAutorenewalEnabled() &&
