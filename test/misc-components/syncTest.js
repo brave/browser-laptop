@@ -392,7 +392,7 @@ describe('Syncing bookmarks', function () {
     const pageNthChild = 1
     const folderTitle = this.folder1Title
     const pageTitle = this.folder1Page1Title
-    const folder = `.bookmarkToolbarButton[title="${folderTitle}"]`
+    const folder = `[data-test-id="bookmarkToolbarButton"][title="${folderTitle}"]`
     yield Brave.app.client
       .waitForVisible(folder)
       .click(folder)
@@ -404,7 +404,7 @@ describe('Syncing bookmarks', function () {
     const pageNthChild = 2
     const folderTitle = this.folder1Title
     const pageTitle = this.folder1Page2Title
-    const folder = `.bookmarkToolbarButton[title="${folderTitle}"]`
+    const folder = `[data-test-id="bookmarkToolbarButton"][title="${folderTitle}"]`
     yield Brave.app.client
       .waitForVisible(folder)
       .click(folder)
@@ -428,9 +428,18 @@ describe('Syncing bookmarks', function () {
     const folder1Title = this.folder1Title
 
     yield Brave.app.client
-      .waitForTextValue('.bookmarkToolbarButton:nth-child(1) .bookmarkText', pageTitle)
-      .waitForTextValue('.bookmarkToolbarButton:nth-child(2) .bookmarkText', updatedTitle)
-      .waitForTextValue('.bookmarkToolbarButton:nth-child(3) .bookmarkText', folder1Title)
+      .waitUntil(function () {
+        return this.getText('[data-test-id="bookmarkToolbarButton"]:nth-child(1) [data-test-id="bookmarkText"]')
+          .then((title) => title === pageTitle)
+      })
+      .waitUntil(function () {
+        return this.getText('[data-test-id="bookmarkToolbarButton"]:nth-child(2) [data-test-id="bookmarkText"]')
+          .then((title) => title === updatedTitle)
+      })
+      .waitUntil(function () {
+        return this.getText('[data-test-id="bookmarkToolbarButton"]:nth-child(3) [data-test-id="bookmarkText"]')
+          .then((title) => title === folder1Title)
+      })
   })
 })
 
@@ -533,7 +542,7 @@ describe('Syncing bookmarks from an existing profile', function () {
     const pageNthChild = 1
     const folderTitle = this.folder1Title
     const pageTitle = this.folder1Page1Title
-    const folder = `.bookmarkToolbarButton[title="${folderTitle}"]`
+    const folder = `[data-test-id="bookmarkToolbarButton"][title="${folderTitle}"]`
     yield Brave.app.client
       .waitForVisible(folder)
       .click(folder)
@@ -545,7 +554,7 @@ describe('Syncing bookmarks from an existing profile', function () {
     const pageNthChild = 2
     const folderTitle = this.folder1Title
     const pageTitle = this.folder1Page2Title
-    const folder = `.bookmarkToolbarButton[title="${folderTitle}"]`
+    const folder = `[data-test-id="bookmarkToolbarButton"][title="${folderTitle}"]`
     yield Brave.app.client
       .waitForVisible(folder)
       .click(folder)
@@ -559,9 +568,18 @@ describe('Syncing bookmarks from an existing profile', function () {
     const folder1Title = this.folder1Title
 
     yield Brave.app.client
-      .waitForTextValue('.bookmarkToolbarButton:nth-child(1) .bookmarkText', pageTitle)
-      .waitForTextValue('.bookmarkToolbarButton:nth-child(2) .bookmarkText', updatedTitle)
-      .waitForTextValue('.bookmarkToolbarButton:nth-child(3) .bookmarkText', folder1Title)
+      .waitUntil(function () {
+        return this.getText('[data-test-id="bookmarkToolbarButton"]:nth-child(1) [data-test-id="bookmarkText"]')
+          .then((title) => title === pageTitle)
+      })
+      .waitUntil(function () {
+        return this.getText('[data-test-id="bookmarkToolbarButton"]:nth-child(2) [data-test-id="bookmarkText"]')
+          .then((title) => title === updatedTitle)
+      })
+      .waitUntil(function () {
+        return this.getText('[data-test-id="bookmarkToolbarButton"]:nth-child(3) [data-test-id="bookmarkText"]')
+          .then((title) => title === folder1Title)
+      })
   })
 })
 

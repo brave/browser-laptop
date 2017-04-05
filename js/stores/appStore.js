@@ -9,6 +9,7 @@ const ExtensionConstants = require('../../app/common/constants/extensionConstant
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
+const siteTags = require('../constants/siteTags')
 const writeActions = require('../constants/sync/proto').actions
 const siteUtil = require('../state/siteUtil')
 const syncUtil = require('../state/syncUtil')
@@ -339,6 +340,10 @@ function handleChangeSettingAction (settingKey, settingValue) {
   }
 }
 
+const syncEnabled = () => {
+  return getSetting(settings.SYNC_ENABLED) === true
+}
+
 const applyReducers = (state, action) => [
   require('../../app/browser/reducers/downloadsReducer'),
   require('../../app/browser/reducers/flashReducer'),
@@ -439,7 +444,8 @@ const handleAppAction = (action) => {
         let siteDetail = siteData.siteDetail
         const sites = appState.get('sites')
         if (record.action !== writeActions.DELETE &&
-          !siteDetail.get('folderId') && siteUtil.isFolder(siteDetail)) {
+          tag === siteTags.BOOKMARK_FOLDER &&
+          !siteDetail.get('folderId')) {
           siteDetail = siteDetail.set('folderId', siteUtil.getNextFolderId(sites))
         }
         switch (record.action) {
@@ -456,6 +462,7 @@ const handleAppAction = (action) => {
               siteUtil.removeSite(sites, siteDetail, tag))
             break
         }
+        appState = syncUtil.updateSiteCache(appState, siteDetail)
       })
       appState = aboutNewTabState.setSites(appState)
       appState = aboutHistoryState.setHistory(appState)
@@ -482,12 +489,18 @@ const handleAppAction = (action) => {
       if (oldSiteSize !== appState.get('sites').size) {
         filterOutNonRecents()
       }
+      if (syncEnabled()) {
+        appState = syncUtil.updateSiteCache(appState, action.destinationDetail || action.siteDetail)
+      }
       appState = aboutNewTabState.setSites(appState, action)
       appState = aboutHistoryState.setHistory(appState, action)
       break
     case appConstants.APP_REMOVE_SITE:
       const removeSiteSyncCallback = action.skipSync ? undefined : syncActions.removeSite
       appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag, true, removeSiteSyncCallback))
+      if (syncEnabled()) {
+        appState = syncUtil.updateSiteCache(appState, action.siteDetail)
+      }
       appState = aboutNewTabState.setSites(appState, action)
       appState = aboutHistoryState.setHistory(appState, action)
       break
@@ -496,6 +509,9 @@ const handleAppAction = (action) => {
         appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'),
           action.sourceDetail, action.destinationDetail, action.prepend,
           action.destinationIsParent, false, syncActions.updateSite))
+        if (syncEnabled()) {
+          appState = syncUtil.updateSiteCache(appState, action.destinationDetail)
+        }
         break
       }
     case appConstants.APP_CLEAR_HISTORY:
@@ -875,6 +891,9 @@ const handleAppAction = (action) => {
         appState = appState.setIn(['sync', 'seedQr'], action.seedQr)
       }
       break
+    case appConstants.APP_CREATE_SYNC_CACHE:
+      appState = syncUtil.createSiteCache(appState)
+      break
     case appConstants.APP_RESET_SYNC_DATA:
       const sessionStore = require('../../app/sessionStore')
       const syncDefault = Immutable.fromJS(sessionStore.defaultAppState().sync)
@@ -889,6 +908,7 @@ const handleAppAction = (action) => {
           appState = appState.setIn(['sites', key, 'originalSeed'], originalSeed)
         }
       })
+      appState.setIn(['sync', 'objectsById'], {})
       break
     case appConstants.APP_SHOW_DOWNLOAD_DELETE_CONFIRMATION:
       appState = appState.set('deleteConfirmationVisible', true)

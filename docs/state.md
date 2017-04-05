@@ -270,6 +270,9 @@ AppStore
     lastFetchTimestamp: integer // the last time new sync records were fetched in seconds
     deviceId: Array.<number>,
     objectId: Array.<number>, // objectId for this sync device
+    objectsById: {
+      [string of objectId joined by pipes |]: Array.<string> // array key path within appState, so we can do appState.getIn({key path})
+    },
     seed: Array.<number>,
     seedQr: string, // data URL of QR code representing the seed
   },
