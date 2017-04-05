@@ -795,7 +795,7 @@ describe('navigationBar tests', function () {
     })
   })
 
-  describe('new tab from ipc', function () {
+  describe('new tab', function () {
     Brave.beforeAll(this)
 
     before(function * () {

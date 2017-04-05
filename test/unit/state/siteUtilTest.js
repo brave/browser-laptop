@@ -1065,6 +1065,51 @@ describe('siteUtil', function () {
         }
       )
     })
+    it('returns a properly formed siteDetail with partition number', function () {
+      const tab = Immutable.fromJS({
+        url: 'https://brave.com/3',
+        title: '41',
+        partitionNumber: 7
+      })
+      assert.deepEqual(
+        siteUtil.getDetailFromTab(tab, siteTags.PINNED).toJS(),
+        {
+          location: tab.get('url'),
+          title: tab.get('title'),
+          tags: [siteTags.PINNED],
+          partitionNumber: 7
+        }
+      )
+    })
+  })
+
+  describe('getDetailFromCreateProperties', function () {
+    it('returns a properly formed siteDetail', function () {
+      const createProperties = Immutable.fromJS({
+        url: 'https://brave.com/2'
+      })
+      assert.deepEqual(
+        siteUtil.getDetailFromCreateProperties(createProperties, siteTags.BOOKMARK).toJS(),
+        {
+          location: createProperties.get('url'),
+          tags: [siteTags.BOOKMARK]
+        }
+      )
+    })
+    it('returns a properly formed siteDetail with partition number', function () {
+      const createProperties = Immutable.fromJS({
+        url: 'https://brave.com/3',
+        partitionNumber: 7
+      })
+      assert.deepEqual(
+        siteUtil.getDetailFromCreateProperties(createProperties, siteTags.PINNED).toJS(),
+        {
+          location: createProperties.get('url'),
+          tags: [siteTags.PINNED],
+          partitionNumber: 7
+        }
+      )
+    })
   })
 
   describe('toCreateProperties', function () {

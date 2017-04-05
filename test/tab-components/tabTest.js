@@ -131,19 +131,25 @@ describe('tab tests', function () {
           .waitForExist('.tabArea + .tabArea + .tabArea [data-test-id="tab"][data-frame-key="3"]')
       })
     })
-    describe('respects openerTabId', function () {
+    describe('new tabs with openerTabId', function () {
       Brave.beforeAll(this)
       before(function * () {
         yield setup(this.app.client)
       })
 
-      it('creates a new tab when signaled', function * () {
+      it('respects window tab ordering', function * () {
+        const data = {}
         yield this.app.client
           .newTab({ url: 'about:blank', active: false })
           .waitForTabCount(2)
           .windowByUrl(Brave.browserWindowUrl)
           .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
-          .newTab({ url: 'about:blank', openerTabId: 1 })
+          .getTabIdByIndex(0).then((tabId) => {
+            data.tabId = tabId
+          })
+
+        yield this.app.client
+          .newTab({ url: 'about:blank', openerTabId: data.tabId })
           .waitForTabCount(3)
           .windowByUrl(Brave.browserWindowUrl)
           .waitForExist('.tabArea:nth-child(2) [data-test-id="tab"][data-frame-key="3"]')
@@ -175,6 +181,7 @@ describe('tab tests', function () {
     Brave.beforeAll(this)
     before(function * () {
       const page1 = Brave.server.url('page1.html')
+      yield setup(this.app.client)
       yield this.app.client
         .newTab({ url: page1, isPartitioned: true })
         .waitForUrl(page1)
@@ -239,11 +246,9 @@ describe('tab tests', function () {
       yield this.app.client
         .waitForBrowserWindow()
         .windowByUrl(Brave.browserWindowUrl)
-        .newFrame({
-          url: this.page1,
-          unloaded: true,
-          active: false
-        })
+        .unloadedTabCreated({
+          location: this.page1
+        }, false)
         .waitForElementCount('[data-test-id="tab"]', 2)
         // This ensures it's actually unloaded
         .waitForTabCount(1)
@@ -327,16 +332,17 @@ describe('tab tests', function () {
         .waitForUrl(this.page1)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
-      yield this.app.client.waitForExist('.frameWrapper:not(.isActive) webview[data-frame-key="2"]')
+        .waitForExist('.frameWrapper:not(.isActive) webview[data-frame-key="2"]')
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForTab({index: 1, active: false})
     })
     it('changing new tab default makes new tabs open in background by default', function * () {
-      yield this.app.client.changeSetting(settings.SWITCH_TO_NEW_TABS, true)
       yield this.app.client
+        .changeSetting(settings.SWITCH_TO_NEW_TABS, true)
         .newTab({ url: this.page2, active: false })
-        .waitForUrl(this.pgae2)
+        .waitForUrl(this.page2)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist('[data-test-id="tab"][data-frame-key="3"]')
-      yield this.app.client.waitForExist('.frameWrapper.isActive webview[data-frame-key="3"]')
+        .waitForTab({index: 2, active: true})
     })
   })
 
@@ -405,6 +411,52 @@ describe('tab tests', function () {
         .moveToObject(activeTab)
         .waitForExist(activeTabFavicon)
         .waitForTextValue(activeTabTitle, 'fullscreenPage')
+    })
+  })
+
+  describe('tab transfer', function () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
+      yield setup(this.app.client)
+      this.page1 = Brave.server.url('page1.html')
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+    })
+
+    it('can detach into new windows', function * () {
+      yield this.app.client
+        .newTab({ url: this.page1 })
+        .waitForUrl(this.page1)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForTab({index: 1, url: this.page1, windowId: 1})
+        .detachTabByIndex(1)
+        .waitForWindowCount(2)
+        .waitForTab({index: 0, url: this.page1, windowId: 2})
+    })
+
+    it('can move into an existing window', function * () {
+      yield this.app.client
+        .newTab({ url: this.page1 })
+        .waitForUrl(this.page1)
+        .windowByUrl(Brave.browserWindowUrl)
+        .newWindowAction()
+        .waitForWindowCount(2)
+        .waitForTab({index: 1, url: this.page1, windowId: 1})
+        .detachTabByIndex(1, 2)
+        .waitForTab({index: 1, url: this.page1, windowId: 2})
+    })
+
+    it('can detach the last tab into an existing window', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(this.page1)
+        .waitForUrl(this.page1)
+        .windowByUrl(Brave.browserWindowUrl)
+        .newWindowAction()
+        .waitForWindowCount(2)
+        .waitForTab({index: 0, url: this.page1, windowId: 1})
+        .detachTabByIndex(0, 2)
+        .waitForTab({index: 1, url: this.page1, windowId: 2})
     })
   })
 })

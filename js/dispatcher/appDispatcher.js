@@ -89,15 +89,21 @@ class AppDispatcher {
 
   dispatchInternal (payload, cb) {
     if (process.type === 'renderer') {
-      const {currentWindowId} = require('../../app/renderer/currentWindow')
-      if (!payload.queryInfo || !payload.queryInfo.windowId || payload.queryInfo.windowId === currentWindowId) {
-        this.dispatchToOwnRegisteredCallbacks(payload)
-      }
-      cb()
-      if (!payload.queryInfo || !payload.queryInfo.windowId || payload.queryInfo.windowId !== currentWindowId) {
+      if (window.location.protocol === 'chrome-extension:') {
+        cb()
         ipcCargo.push(payload)
+        return
+      } else {
+        const {currentWindowId} = require('../../app/renderer/currentWindow')
+        if (!payload.queryInfo || !payload.queryInfo.windowId || payload.queryInfo.windowId === currentWindowId) {
+          this.dispatchToOwnRegisteredCallbacks(payload)
+        }
+        cb()
+        if (!payload.queryInfo || !payload.queryInfo.windowId || payload.queryInfo.windowId !== currentWindowId) {
+          ipcCargo.push(payload)
+        }
+        return
       }
-      return
     }
 
     this.dispatchToOwnRegisteredCallbacks(payload)

@@ -211,6 +211,21 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a message to the store to create a new unloaded frame
+   *
+   * @param {Object} frameOpts - An object of frame options such as isPrivate, element, and tab features.
+   *                  These may not all be hooked up in Electron yet.
+   * @param {boolean} openInForeground - true if the new frame should become the new active frame
+   */
+  unloadedTabCreated: function (frameOpts, openInForeground) {
+    dispatch({
+      actionType: windowConstants.WINDOW_UNLOADED_TAB_CREATED,
+      frameOpts: frameOpts,
+      openInForeground
+    })
+  },
+
+  /**
    * Dispatches a message to close a frame
    *
    * @param {Object[]} frames - Immutable list of of all the frames

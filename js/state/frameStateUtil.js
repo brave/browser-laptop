@@ -303,7 +303,7 @@ function isAncestorFrameKey (frames, frame, parentFrameKey) {
 function getPartitionNumber (partition) {
   const regex = /(?:persist:)?partition-(\d+)/
   const matches = regex.exec(partition)
-  return matches && matches[1]
+  return Number((matches && matches[1]) || 0)
 }
 
 function isPrivatePartition (partition) {

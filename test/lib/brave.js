@@ -370,6 +370,15 @@ var exports = {
       }, 5000, null, 100)
     })
 
+    this.app.client.addCommand('waitForWindowCount', function (windowCount) {
+      logVerbose('waitForWindowCount(' + windowCount + ')')
+      return this.waitUntil(function () {
+        return this.getWindowCount().then((count) => {
+          return count === windowCount
+        })
+      })
+    })
+
     this.app.client.addCommand('waitForAddressCount', function (addressCount) {
       logVerbose('waitForAddressCount(' + addressCount + ')')
       return this.waitUntil(function () {
@@ -378,6 +387,21 @@ var exports = {
             val.value.autofill.addresses && val.value.autofill.addresses.guid.length) || 0
           logVerbose('waitForAddressCount(' + addressCount + ') => ' + ret)
           return ret
+        })
+      }, 5000, null, 100)
+    })
+
+    this.app.client.addCommand('waitForTab', function (props) {
+      logVerbose('waitForTab(' + JSON.stringify(props) + ')')
+      return this.waitUntil(function () {
+        return this.getAppState().then((val) => {
+          const tabs = val && val.value && val.value.tabs
+          if (!tabs) {
+            return false
+          }
+          return tabs.reduce((tabAcc, tab) =>
+            tabAcc || Object.keys(props).reduce((acc, prop) =>
+              acc && tab[prop] === props[prop], true), false)
         })
       }, 5000, null, 100)
     })
@@ -475,6 +499,12 @@ var exports = {
       })
     })
 
+    this.app.client.addCommand('getTabIdByIndex', function (index) {
+      logVerbose('getTabIdByIndex()')
+      return this.waitForTab({index})
+        .getAppState().then((val) => val.value.tabs[index].tabId)
+    })
+
     this.app.client.addCommand('getWindowState', function () {
       logVerbose('getWindowState()')
       return this.execute(function () {
@@ -487,6 +517,13 @@ var exports = {
       return this.execute(function () {
         return devTools('electron').testData.windowActions.setContextMenuDetail()
       })
+    })
+
+    this.app.client.addCommand('unloadedTabCreated', function (frameOpts, active) {
+      logVerbose('unloadedTabCreated()')
+      return this.execute(function (frameOpts, active) {
+        return devTools('electron').testData.windowActions.unloadedTabCreated(frameOpts, active)
+      }, frameOpts, active)
     })
 
     this.app.client.addCommand('waitForInputText', function (selector, input) {
@@ -541,11 +578,30 @@ var exports = {
     })
 
     this.app.client.addCommand('pinTabByIndex', function (index, isPinned) {
-      return this.getWindowState().then((val) => {
-        const tabId = val.value.frames[index].tabId
+      return this.waitForTab({index}).getAppState().then((val) => {
+        const tab = val.value.tabs.find((tab) => tab.index === index)
         return this.execute(function (tabId, isPinned) {
-          devTools('electron').testData.appActions.tabPinned(tabId, isPinned)
-        }, tabId, isPinned)
+          devTools('appActions').tabPinned(tabId, isPinned)
+        }, tab.tabId, isPinned)
+      })
+    })
+
+    this.app.client.addCommand('detachTabByIndex', function (index, windowId = -1) {
+      return this.waitForTab({index}).getAppState().then((val) => {
+        const tab = val.value.tabs.find((tab) => tab.index === index)
+        return this.execute(function (tabId, windowId, location, guestInstanceId) {
+          const browserOpts = { positionByMouseCursor: true }
+          devTools('appActions').tabMoved(tabId, {location, guestInstanceId}, browserOpts, windowId)
+        }, tab.tabId, windowId, tab.url, tab.guestInstanceId)
+      })
+    })
+
+    this.app.client.addCommand('closeTabByIndex', function (index) {
+      return this.waitForTab({index}).getAppState().then((val) => {
+        const tab = val.value.tabs.find((tab) => tab.index === index)
+        return this.execute(function (tabId) {
+          devTools('appActions').tabClosed({tabId})
+        }, tab.tabId)
       })
     })
 

@@ -6,7 +6,7 @@
 
 const windowConstants = require('../../../js/constants/windowConstants')
 const {getSourceAboutUrl, getSourceMagnetUrl} = require('../../../js/lib/appUrlUtil')
-const {isURL, getUrlFromInput} = require('../../../js/lib/urlutil')
+const {isURL, isPotentialPhishingUrl, getUrlFromInput} = require('../../../js/lib/urlutil')
 const {activeFrameStatePath, frameStatePath, frameStatePathForFrame, getActiveFrame, tabStatePath, getFrameByTabId} = require('../../../js/state/frameStateUtil')
 
 const getLocation = (location) => {
@@ -92,6 +92,11 @@ const urlBarReducer = (state, action) => {
       if (!(action.location === 'about:newtab' && !getActiveFrame(state).get('canGoForward'))) {
         const key = action.key || state.get('activeFrameKey')
         state = updateNavBarInput(state, action.location, frameStatePath(state, key))
+      }
+
+      // For potential phishing pages, show a warning
+      if (isPotentialPhishingUrl(action.location)) {
+        state = state.setIn(['ui', 'siteInfo', 'isVisible'], true)
       }
       break
     case windowConstants.WINDOW_SET_NAVIGATION_ABORTED:

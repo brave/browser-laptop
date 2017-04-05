@@ -8,7 +8,15 @@ const appConstants = require('../../../js/constants/appConstants')
 const siteTags = require('../../../js/constants/siteTags')
 const siteUtil = require('../../../js/state/siteUtil')
 const syncActions = require('../../../js/actions/syncActions')
+const syncUtil = require('../../../js/state/syncUtil')
 const Immutable = require('immutable')
+const {makeImmutable} = require('../../common/state/immutableUtil')
+const settings = require('../../../js/constants/settings')
+const {getSetting} = require('../../../js/settings')
+
+const syncEnabled = () => {
+  return getSetting(settings.SYNC_ENABLED) === true
+}
 
 const sitesReducer = (state, action, emitChanges) => {
   switch (action.actionType) {
@@ -44,9 +52,9 @@ const sitesReducer = (state, action, emitChanges) => {
       state = state.set('sites', siteUtil.moveSite(state.get('sites'),
         action.sourceDetail, action.destinationDetail, action.prepend,
         action.destinationIsParent, false, syncActions.updateSite))
-        if (syncEnabled()) {
-          state = syncUtil.updateSiteCache(state, action.destinationDetail)
-        }
+      if (syncEnabled()) {
+        state = syncUtil.updateSiteCache(state, action.destinationDetail)
+      }
       break
     case appConstants.APP_TAB_PINNED:
       const tab = state.get('tabs').find((tab) => tab.get('tabId') === action.tabId)
@@ -64,6 +72,17 @@ const sitesReducer = (state, action, emitChanges) => {
         state = syncUtil.updateSiteCache(state, siteDetail)
       }
       break
+
+    case appConstants.APP_MAYBE_CREATE_TAB_REQUESTED:
+    case appConstants.APP_CREATE_TAB_REQUESTED: {
+      action = makeImmutable(action)
+      const createProperties = action.get('createProperties')
+      if (createProperties.get('pinned')) {
+        state = state.set('sites', siteUtil.addSite(state.get('sites'),
+          siteUtil.getDetailFromCreateProperties(createProperties), siteTags.PINNED))
+      }
+      break
+    }
   }
   return state
 }

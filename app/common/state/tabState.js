@@ -157,11 +157,8 @@ const tabState = {
   },
 
   getByTabId: (state, tabId) => {
-    if (parseInt(tabId) < 0) {
-      return null
-    }
+    validateId('tabId', tabId)
     state = validateState(state)
-
     return state.get('tabs').find((tab) => tab.get('tabId') === tabId)
   },
 

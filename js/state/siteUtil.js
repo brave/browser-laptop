@@ -446,11 +446,26 @@ module.exports.getDetailFromFrame = function (frame, tag) {
 }
 
 module.exports.getDetailFromTab = function (tab, tag) {
-  return Immutable.fromJS({
+  const siteDetail = {
     location: tab.get('url'),
     title: tab.get('title'),
     tags: tag ? [tag] : []
-  })
+  }
+  if (tab.get('partitionNumber') !== undefined) {
+    siteDetail.partitionNumber = tab.get('partitionNumber')
+  }
+  return Immutable.fromJS(siteDetail)
+}
+
+module.exports.getDetailFromCreateProperties = function (createProperties, tag) {
+  const siteDetail = {
+    location: createProperties.get('url'),
+    tags: tag ? [tag] : []
+  }
+  if (createProperties.get('partitionNumber') !== undefined) {
+    siteDetail.partitionNumber = createProperties.get('partitionNumber')
+  }
+  return Immutable.fromJS(siteDetail)
 }
 
 /**

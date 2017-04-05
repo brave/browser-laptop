@@ -7,6 +7,9 @@ const {makeImmutable} = require('../common/state/immutableUtil')
 const {getTargetAboutUrl, isSourceAboutUrl, newFrameUrl} = require('../../js/lib/appUrlUtil')
 const {isURL, getUrlFromInput} = require('../../js/lib/urlutil')
 const {isSessionPartition} = require('../../js/state/frameStateUtil')
+const {getOrigin} = require('../../js/state/siteUtil')
+const {getSetting} = require('../../js/settings')
+const settings = require('../../js/constants/settings')
 
 let currentWebContents = {}
 let currentPartitionNumber = 0
@@ -17,6 +20,16 @@ const cleanupWebContents = (tabId) => {
     delete currentWebContents[tabId]
     appActions.tabClosed({ tabId })
   }
+}
+
+const normalizeUrl = function (url) {
+  if (isSourceAboutUrl(url)) {
+    url = getTargetAboutUrl(url)
+  }
+  if (isURL(url)) {
+    url = getUrlFromInput(url)
+  }
+  return url
 }
 
 const getTabValue = function (tabId) {
@@ -40,7 +53,7 @@ const updateTab = (tabId) => {
 }
 
 const getPartitionNumber = (partition) => {
-  return partition.split('persist:partition-')[1] || 0
+  return Number(partition.split('persist:partition-')[1] || 0)
 }
 
 /**
@@ -242,13 +255,18 @@ const api = {
     const tabId = action.get('tabId')
     const tab = api.getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
-      let url = action.get('url')
-      if (isSourceAboutUrl(url)) {
-        url = getTargetAboutUrl(url)
+      let url = normalizeUrl(action.get('url'))
+      // We only allow loading URLs explicitly when the origin is
+      // the same for pinned tabs.  This is to help preserve a users
+      // pins.
+      if (tab.pinned && getOrigin(tab.getURL()) !== getOrigin(url)) {
+        api.create({
+          url,
+          partition: tab.session.partition
+        })
+        return state
       }
-      if (isURL(url)) {
-        url = getUrlFromInput(url)
-      }
+
       tab.loadURL(url)
     }
     return state
@@ -260,13 +278,7 @@ const api = {
     const tabValue = tabState.getActiveTabValue(state, windowId)
     const tab = tabValue && api.getWebContents(tabValue.get('tabId'))
     if (tab && !tab.isDestroyed()) {
-      let url = action.get('url')
-      if (isSourceAboutUrl(url)) {
-        url = getTargetAboutUrl(url)
-      }
-      if (isURL(url)) {
-        url = getUrlFromInput(url)
-      }
+      const url = normalizeUrl(action.get('url'))
       tab.loadURL(url)
     }
     return state
@@ -310,14 +322,14 @@ const api = {
     if (tab && !tab.isDestroyed()) {
       const url = tab.getURL()
       // For now we only support 1 tab pin per URL
-      const alreadyPinnedTab = tabState.queryTab(state, { url, pinned: true })
+      const alreadyPinnedTab = tabState.queryTab(state, { url, pinned: true, partition: tab.session.partition })
       if (pinned && alreadyPinnedTab) {
         tab.close(tab)
         return tabState.removeTabByTabId(state, tabId)
       }
 
       tab.setPinned(pinned)
-      return tabState.updateTabValue(state, getTabValue(tabId))
+      state = tabState.updateTabValue(state, getTabValue(tabId))
     }
     return state
   },
@@ -350,15 +362,14 @@ const api = {
 
   create: (createProperties, cb = null) => {
     createProperties = makeImmutable(createProperties).toJS()
+    const switchToNewTabsImmediately = getSetting(settings.SWITCH_TO_NEW_TABS) === true
+    if (switchToNewTabsImmediately) {
+      createProperties.active = true
+    }
     if (!createProperties.url) {
       createProperties.url = newFrameUrl()
     }
-    if (isSourceAboutUrl(createProperties.url)) {
-      createProperties.url = getTargetAboutUrl(createProperties.url)
-    }
-    if (isURL(createProperties.url)) {
-      createProperties.url = getUrlFromInput(createProperties.url)
-    }
+    createProperties.url = normalizeUrl(createProperties.url)
     if (!createProperties.openerTabId) {
       createProperties.partition = getPartition(createProperties)
       if (isSessionPartition(createProperties.partition)) {
@@ -425,12 +436,9 @@ const api = {
   maybeCreateTab: (state, action) => {
     action = makeImmutable(action)
     let createProperties = makeImmutable(action.get('createProperties'))
-    let url = createProperties.get('url')
+    const url = normalizeUrl(createProperties.get('url'))
+    createProperties = createProperties.set('url', url)
     const windowId = createProperties.get('windowId')
-    if (isSourceAboutUrl(url)) {
-      url = getTargetAboutUrl(url)
-      createProperties = createProperties.set('url', url)
-    }
     const tabData = tabState.getMatchingTab(state, createProperties, windowId, url)
     if (tabData) {
       const tab = api.getWebContents(tabData.get('id'))

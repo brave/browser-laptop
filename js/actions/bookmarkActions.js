@@ -19,12 +19,19 @@ const bookmarkActions = {
 
     // Only load the first 25 tabs as loaded
     bookmarks
-      .forEach((bookmark, i) =>
-         appActions.createTabRequested(
-           Object.assign(siteUtil.toCreateProperties(bookmark), {
-             unloaded: i > 25,
-             active: false
-           }), getSetting(SWITCH_TO_NEW_TABS)))
+      .forEach((bookmark, i) => {
+        if (i <= 25) {
+          appActions.createTabRequested(
+            Object.assign(siteUtil.toCreateProperties(bookmark), {
+              active: false
+            }), getSetting(SWITCH_TO_NEW_TABS))
+        } else {
+          windowActions.unloadedTabCreated({
+            location: bookmark.get('location'),
+            partitionNumber: bookmark.get('partitionNumber')
+          }, false)
+        }
+      })
   },
 
   /**

@@ -345,10 +345,6 @@ function handleChangeSettingAction (settingKey, settingValue) {
   }
 }
 
-const syncEnabled = () => {
-  return getSetting(settings.SYNC_ENABLED) === true
-}
-
 const applyReducers = (state, action) => [
   require('../../app/browser/reducers/downloadsReducer'),
   require('../../app/browser/reducers/flashReducer'),

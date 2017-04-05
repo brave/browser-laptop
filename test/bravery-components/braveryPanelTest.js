@@ -1,4 +1,4 @@
-/* global describe, it, before, beforeEach */
+/* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
 const {cookieControl, allowAllCookiesOption, blockAllCookiesOption, urlInput, braveMenu, braveMenuDisabled, adsBlockedStat, adsBlockedControl, showAdsOption, blockAdsOption, braveryPanel, httpsEverywhereStat, noScriptStat, noScriptSwitch, fpSwitch, fpStat, noScriptNavButton, customFiltersInput} = require('../lib/selectors')
@@ -13,8 +13,8 @@ describe('Bravery Panel', function () {
   }
 
   describe('General', function () {
-    Brave.beforeAll(this)
-    before(function * () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
       yield setup(this.app.client)
     })
     it('shows disabled brave button for about:newpage', function * () {
@@ -38,15 +38,16 @@ describe('Bravery Panel', function () {
         .waitForTextValue('[data-test-id="lionBadge"]', '2')
     })
   })
-  describe('Stats', function () {
+  describe('Tracking Protection stats', function () {
     Brave.beforeEach(this)
     beforeEach(function * () {
       yield setup(this.app.client)
+      yield this.app.client
+        .waitForDataFile('trackingProtection')
     })
     it('detects blocked elements in private tab', function * () {
       const url = Brave.server.url('tracking.html')
       yield this.app.client
-        .waitForDataFile('trackingProtection')
         .newTab({ url, isPrivate: true })
         .waitForTabCount(2)
         .waitForUrl(url)
@@ -57,17 +58,10 @@ describe('Bravery Panel', function () {
         .waitForVisible(showAdsOption)
         .click(showAdsOption)
         .waitForTextValue(adsBlockedStat, '0')
-        .keys(Brave.keys.ESCAPE)
-        .newTab({ url })
-        .waitForTabCount(3)
-        .waitForUrl(url)
-        .openBraveMenu(braveMenu, braveryPanel)
-        .waitForTextValue(adsBlockedStat, '2')
     })
     it('detects blocked elements', function * () {
       const url = Brave.server.url('tracking.html')
       yield this.app.client
-        .waitForDataFile('trackingProtection')
         .tabByIndex(0)
         .loadUrl(url)
         .openBraveMenu(braveMenu, braveryPanel)
@@ -76,23 +70,22 @@ describe('Bravery Panel', function () {
         .waitForVisible(showAdsOption)
         .click(showAdsOption)
         .waitForTextValue(adsBlockedStat, '0')
-        .keys(Brave.keys.ESCAPE)
-        .newTab({ url, isPrivate: true })
-        .waitForTabCount(2)
-        .waitForUrl(url)
-        .openBraveMenu(braveMenu, braveryPanel)
-        .waitForTextValue(adsBlockedStat, '0')
-        .click(adsBlockedControl)
-        .waitForVisible(blockAdsOption)
-        .click(blockAdsOption)
-        .waitForTextValue(adsBlockedStat, '2')
     })
+  })
+
+  describe('Adblock stats', function () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
+      yield setup(this.app.client)
+      yield this.app.client
+        .waitForDataFile('adblock')
+    })
+
     it('downloads and detects regional adblock resources in private tab', function * () {
       const url = Brave.server.url('adblock.html')
       const aboutAdblockURL = getTargetAboutUrl('about:adblock')
       const adblockUUID = '48796273-E783-431E-B864-44D3DCEA66DC'
       yield this.app.client
-        .waitForDataFile('adblock')
         .tabByIndex(0)
         .loadUrl(aboutAdblockURL)
         .url(aboutAdblockURL)
@@ -114,19 +107,12 @@ describe('Bravery Panel', function () {
         .waitForVisible(showAdsOption)
         .click(showAdsOption)
         .waitForTextValue(adsBlockedStat, '0')
-        .keys(Brave.keys.ESCAPE)
-        .newTab({ url })
-        .waitForTabCount(3)
-        .waitForUrl(url)
-        .openBraveMenu(braveMenu, braveryPanel)
-        .waitForTextValue(adsBlockedStat, '2')
     })
     it('downloads and detects regional adblock resources', function * () {
       const url = Brave.server.url('adblock.html')
       const aboutAdblockURL = getTargetAboutUrl('about:adblock')
       const adblockUUID = '48796273-E783-431E-B864-44D3DCEA66DC'
       yield this.app.client
-        .waitForDataFile('adblock')
         .tabByIndex(0)
         .loadUrl(aboutAdblockURL)
         .url(aboutAdblockURL)
@@ -147,21 +133,10 @@ describe('Bravery Panel', function () {
         .waitForVisible(showAdsOption)
         .click(showAdsOption)
         .waitForTextValue(adsBlockedStat, '0')
-        .keys(Brave.keys.ESCAPE)
-        .newTab({ url, isPrivate: true })
-        .waitForTabCount(2)
-        .waitForUrl(url)
-        .openBraveMenu(braveMenu, braveryPanel)
-        .waitForTextValue(adsBlockedStat, '0')
-        .click(adsBlockedControl)
-        .waitForVisible(blockAdsOption)
-        .click(blockAdsOption)
-        .waitForTextValue(adsBlockedStat, '2')
     })
     it('detects adblock resources in private tab', function * () {
       const url = Brave.server.url('adblock.html')
       yield this.app.client
-        .waitForDataFile('adblock')
         .newTab({ url, isPrivate: true })
         .waitForTabCount(2)
         .waitForUrl(url)
@@ -172,12 +147,6 @@ describe('Bravery Panel', function () {
         .waitForVisible(showAdsOption)
         .click(showAdsOption)
         .waitForTextValue(adsBlockedStat, '0')
-        .keys(Brave.keys.ESCAPE)
-        .newTab({ url })
-        .waitForTabCount(3)
-        .waitForUrl(url)
-        .openBraveMenu(braveMenu, braveryPanel)
-        .waitForTextValue(adsBlockedStat, '1')
     })
     it('detects adblock resources', function * () {
       const url = Brave.server.url('adblock.html')
@@ -193,23 +162,12 @@ describe('Bravery Panel', function () {
         .waitForVisible(showAdsOption)
         .click(showAdsOption)
         .waitForTextValue(adsBlockedStat, '0')
-        .keys(Brave.keys.ESCAPE)
-        .newTab({ url, isPrivate: true })
-        .waitForTabCount(3)
-        .waitForUrl(url)
-        .openBraveMenu(braveMenu, braveryPanel)
-        .waitForTextValue(adsBlockedStat, '0')
-        .click(adsBlockedControl)
-        .waitForVisible(blockAdsOption)
-        .click(blockAdsOption)
-        .waitForTextValue(adsBlockedStat, '1')
     })
     it('blocks custom adblock resources in private tab', function * () {
       const customFilterRulesUUID = 'CE61F035-9F0A-4999-9A5A-D4E46AF676F7'
       const url = Brave.server.url('adblock.html')
       const aboutAdblockURL = getTargetAboutUrl('about:adblock')
       yield this.app.client
-        .waitForDataFile('adblock')
         .tabByIndex(0)
         .loadUrl(aboutAdblockURL)
         .waitForVisible(customFiltersInput)
@@ -231,19 +189,12 @@ describe('Bravery Panel', function () {
         .waitForVisible(showAdsOption)
         .click(showAdsOption)
         .waitForTextValue(adsBlockedStat, '0')
-        .keys(Brave.keys.ESCAPE)
-        .newTab({ url })
-        .waitForTabCount(3)
-        .waitForUrl(url)
-        .openBraveMenu(braveMenu, braveryPanel)
-        .waitForTextValue(adsBlockedStat, '2')
     })
     it('blocks custom adblock resources', function * () {
       const customFilterRulesUUID = 'CE61F035-9F0A-4999-9A5A-D4E46AF676F7'
       const url = Brave.server.url('adblock.html')
       const aboutAdblockURL = getTargetAboutUrl('about:adblock')
       yield this.app.client
-        .waitForDataFile('adblock')
         .tabByIndex(0)
         .loadUrl(aboutAdblockURL)
         .url(aboutAdblockURL)
@@ -266,16 +217,6 @@ describe('Bravery Panel', function () {
         .waitForVisible(showAdsOption)
         .click(showAdsOption)
         .waitForTextValue(adsBlockedStat, '0')
-        .keys(Brave.keys.ESCAPE)
-        .newTab({ url, isPrivate: true })
-        .waitForTabCount(3)
-        .waitForUrl(url)
-        .openBraveMenu(braveMenu, braveryPanel)
-        .waitForTextValue(adsBlockedStat, '0')
-        .click(adsBlockedControl)
-        .waitForVisible(blockAdsOption)
-        .click(blockAdsOption)
-        .waitForTextValue(adsBlockedStat, '2')
     })
     it('blocks websocket tracking', function * () {
       const url = Brave.server.url('websockets.html')

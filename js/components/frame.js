@@ -64,6 +64,9 @@ class Frame extends ImmutableComponent {
 
   get tab () {
     const frame = this.frame
+    if (!appStoreRenderer.state.get('tabs')) {
+      return undefined
+    }
     return appStoreRenderer.state.get('tabs').find((tab) => tab.get('tabId') === frame.get('tabId'))
   }
 
@@ -293,7 +296,7 @@ class Frame extends ImmutableComponent {
     this.expireContentSettings(this.origin)
   }
 
-  updateWebview (cb, newSrc) {
+  updateWebview (cb, prevProps, newSrc) {
     // lazy load webview
     if (!this.webview && !this.props.isActive && !this.props.isPreview &&
         // allow force loading of new frames
@@ -335,7 +338,7 @@ class Frame extends ImmutableComponent {
       }
       this.webviewContainer.appendChild(this.webview)
     } else {
-      cb && cb()
+      cb && cb(prevProps)
     }
   }
 
@@ -422,7 +425,7 @@ class Frame extends ImmutableComponent {
 
     this.lastFrame = this.frame.delete('lastAccessedTime')
 
-    const cb = () => {
+    const cb = (prevProps = {}) => {
       this.onPropsChanged(prevProps)
       if (this.getWebRTCPolicy(prevProps) !== this.getWebRTCPolicy(this.props)) {
         this.webview.setWebRTCIPHandlingPolicy(this.getWebRTCPolicy(this.props))
@@ -451,11 +454,11 @@ class Frame extends ImmutableComponent {
     }
 
     if (this.props.src !== prevProps.src) {
-      this.updateWebview(cb)
+      this.updateWebview(cb, prevProps)
     } else if (this.shouldCreateWebview()) {
       // plugin/insecure-content allow state has changed. recreate with the current
       // location, not the src.
-      this.updateWebview(cb, this.props.location)
+      this.updateWebview(cb, prevProps, this.props.location)
     } else {
       if (this.runOnDomReady) {
         // there is already a callback waiting for did-attach
@@ -463,7 +466,7 @@ class Frame extends ImmutableComponent {
         // mount callback which is a subset of the update callback
         this.runOnDomReady = cb
       } else {
-        cb()
+        cb(prevProps)
       }
     }
   }
