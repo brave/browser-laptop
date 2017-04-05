@@ -237,8 +237,7 @@ class SortableTable extends React.Component {
   }
   get isMultiDimensioned () {
     return this.props.rows &&
-      Array.isArray(this.props.rows[0]) &&
-      (Array.isArray(this.props.rows[0][0]) || this.props.rows[0].length === 0)
+      Array.isArray(this.props.rows[0]) && this.entryMultiDimension
   }
   get entryMultiDimension () {
     for (let i = 0; i < this.props.rows.length; i++) {
@@ -423,7 +422,7 @@ class SortableTable extends React.Component {
         <tr>
           {this.props.headings.map((heading, j) => {
             const firstRow = this.isMultiDimensioned ? this.entryMultiDimension[0] : this.props.rows[0]
-            const firstEntry = this.props.rows.length > 0
+            const firstEntry = (firstRow && firstRow.length > 0)
               ? firstRow[j]
               : undefined
             let dataType = typeof firstEntry
