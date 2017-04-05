@@ -7,11 +7,9 @@
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const windowConstants = require('../constants/windowConstants')
 const appActions = require('../actions/appActions')
-const messages = require('../constants/messages')
 const siteTags = require('../constants/siteTags')
 const siteUtil = require('../state/siteUtil')
 const UrlUtil = require('../lib/urlutil')
-const {currentWindow} = require('../../app/renderer/currentWindow')
 const windowStore = require('../stores/windowStore')
 
 function dispatch (action) {
@@ -298,52 +296,26 @@ const windowActions = {
    *
    * @param {Object[]} frames - Immutable list of of all the frames
    * @param {Object} frameProps - The properties of the frame to close
+   * @param {boolean} forceClosePinned - Should we force close pinned tab
    */
   closeFrame: function (frames, frameProps, forceClosePinned) {
-    const ipc = require('electron').ipcRenderer
-    const origin = siteUtil.getOrigin(frameProps.get('location'))
-    if (origin) {
-      appActions.clearNotifications(origin)
-    }
-    // If the frame was full screen, exit
-    if (frameProps && frameProps.get('isFullScreen')) {
-      this.setFullScreen(frameProps, false)
-    }
-    // Unless a caller explicitly specifies to close a pinned frame, then
-    // ignore the call.
-    const nonPinnedFrames = frames.filter((frame) => !frame.get('pinnedLocation'))
-    if (frameProps && frameProps.get('pinnedLocation')) {
-      // Check for no frames at all, and if that's the case the user
-      // only has pinned frames and tried to close, so close the
-      // whole app.
-      if (nonPinnedFrames.size === 0) {
-        appActions.closeWindow(currentWindow.id)
-        return
-      }
+    dispatch({
+      actionType: windowConstants.WINDOW_CLOSE_FRAME,
+      frames,
+      frameProps,
+      forceClosePinned
+    })
+  },
 
-      const frameKey = frameProps ? frameProps.get('key') : null
-      const activeFrameKey = windowStore.getState().get('activeFrameKey')
-      const isActiveFrame = frameKey === activeFrameKey
-
-      if (!forceClosePinned && isActiveFrame) {
-        // Go to next frame if the user tries to close a pinned tab
-        ipc.emit(messages.SHORTCUT_NEXT_TAB)
-        return
-      }
-    }
-
-    const pinnedFrames = frames.filter((frame) => frame.get('pinnedLocation'))
-
-    // If there is at least 1 pinned frame don't close the window until subsequent
-    // close attempts
-    if (nonPinnedFrames.size > 1 || pinnedFrames.size > 0) {
-      dispatch({
-        actionType: windowConstants.WINDOW_CLOSE_FRAME,
-        frameProps
-      })
-    } else {
-      appActions.closeWindow(currentWindow.id)
-    }
+  /**
+   * Dispatches a message to close multiple frames
+   * @param {Object[]} framePropsList - The properties of all frames to close
+   */
+  closeFrames: function (framePropsList) {
+    dispatch({
+      actionType: windowConstants.WINDOW_CLOSE_FRAMES,
+      framePropsList
+    })
   },
 
   /**

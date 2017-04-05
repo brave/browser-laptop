@@ -235,6 +235,16 @@ Dispatches a message to close a frame
 
 
 
+### closeFrames(framePropsList) 
+
+Dispatches a message to close multiple frames
+
+**Parameters**
+
+**framePropsList**: `Array.&lt;Object&gt;`, The properties of all frames to close
+
+
+
 ### undoClosedFrame() 
 
 Dispatches a message to the store to undo a closed frame

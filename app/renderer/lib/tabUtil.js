@@ -3,6 +3,9 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const styles = require('../components/styles/global')
+const frameStateUtil = require('../../../js/state/frameStateUtil')
+const settings = require('../../../js/constants/settings')
+const getSetting = require('../../../js/settings').getSetting
 
 /**
  * Get tab's breakpoint name for current tab size.
@@ -54,4 +57,27 @@ module.exports.hasRelativeCloseIcon = (props) => {
  */
 module.exports.hasFixedCloseIcon = (props) => {
   return props.isActive && module.exports.hasBreakpoint(props, ['small', 'extraSmall'])
+}
+
+/**
+ * Updates the tab page index to the specified frameProps
+ * @param frameProps Any frame belonging to the page
+ */
+module.exports.updateTabPageIndex = (state, frameProps) => {
+  // No need to update tab page index if we are given a pinned frame
+  if (frameProps.get('pinnedLocation')) {
+    return state
+  }
+
+  const index = frameStateUtil.getFrameTabPageIndex(state.get('frames')
+      .filter((frame) => !frame.get('pinnedLocation')), frameProps, getSetting(settings.TABS_PER_PAGE))
+
+  if (index === -1) {
+    return state
+  }
+
+  state = state.setIn(['ui', 'tabs', 'tabPageIndex'], index)
+  state = state.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
+
+  return state
 }

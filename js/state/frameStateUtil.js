@@ -6,6 +6,7 @@ const Immutable = require('immutable')
 const config = require('../constants/config')
 const {tabCloseAction} = require('../../app/common/constants/settingsEnums')
 const urlParse = require('../../app/common/urlParse')
+const {makeImmutable} = require('../../app/common/state/immutableUtil')
 
 const matchFrame = (queryInfo, frame) => {
   queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
@@ -47,6 +48,10 @@ function getActiveFrameTabId (windowState) {
 
 function getFrameByIndex (windowState, i) {
   return windowState.getIn(['frames', i])
+}
+
+function findFrameInList (frames, key) {
+  return frames.find(matchFrame.bind(null, {key}))
 }
 
 // This will eventually go away fully when we replace frameKey by tabId
@@ -493,6 +498,67 @@ function removeFrame (frames, tabs, closedFrames, frameProps, activeFrameKey, fr
     frames: newFrames
   }
 }
+/**
+ * Removes a frames specified by framePropsList
+ * @return Immutable top level application state ready to merge back in
+ */
+function removeFrames (frames, tabs, closedFrames, framePropsList, activeFrameRemoved, activeFrameKey, closeAction) {
+  function getLastTab (newFrames) {
+    const sorted = newFrames
+      .filter((frame) => !frame.get('pinnedLocation'))
+      .sortBy((item) => item.get('key'))
+
+    return (sorted.size === 0) ? 0 : sorted.last().get('key')
+  }
+
+  function getLastActiveTab (newFrames) {
+    const sorted = newFrames
+      .filter((frame) => !frame.get('pinnedLocation'))
+      .sortBy((item) => item.get('lastAccessedTime') || 0)
+
+    return (sorted.size === 0) ? 0 : sorted.last().get('key')
+  }
+
+  let newFrames = makeImmutable(frames)
+  let newTabs = makeImmutable(tabs)
+
+  framePropsList.forEach((frameProps) => {
+    if (!frameProps.get('isPrivate') && frameProps.get('location') !== 'about:newtab') {
+      frameProps = frameProps.set('isFullScreen', false)
+      closedFrames = closedFrames.push(frameProps)
+      if (frameProps.get('thumbnailBlob')) {
+        window.URL.revokeObjectURL(frameProps.get('thumbnailBlob'))
+      }
+      if (closedFrames.size > config.maxClosedFrames) {
+        closedFrames = closedFrames.shift()
+      }
+    }
+
+    let framePropsIndex = getFramePropsIndex(newFrames, frameProps)
+    newFrames = newFrames.splice(framePropsIndex, 1)
+    newTabs = newTabs.splice(framePropsIndex, 1)
+  })
+
+  // return last non pinned frame index if active frame was removed
+  if (activeFrameRemoved) {
+    switch (closeAction) {
+      case tabCloseAction.LAST_ACTIVE:
+        activeFrameKey = getLastActiveTab(newFrames)
+        break
+      default:
+        activeFrameKey = getLastTab(newFrames)
+        break
+    }
+  }
+
+  return {
+    previewFrameKey: null,
+    activeFrameKey,
+    closedFrames,
+    tabs: newTabs,
+    frames: newFrames
+  }
+}
 
 /**
  * Removes all but the specified frameProps
@@ -568,12 +634,14 @@ module.exports = {
   getFramePropPath,
   findIndexForFrameKey,
   findDisplayIndexForFrameKey,
+  findFrameInList,
   getFramePropsIndex,
   getFrameKeysByDisplayIndex,
   getPartition,
   addFrame,
   undoCloseFrame,
   removeFrame,
+  removeFrames,
   removeOtherFrames,
   tabFromFrame,
   getFrameKeyByTabId,

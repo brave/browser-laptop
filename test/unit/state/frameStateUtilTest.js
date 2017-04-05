@@ -283,4 +283,75 @@ describe('frameStateUtil', function () {
       })
     })
   })
+
+  describe('removeFrames', function () {
+    let frames, tabs, closedFrames, framePropsList, activeFrameKey, activeFrameRemoved, activeFrameKeyKeep
+
+    beforeEach(function () {
+      frames = Immutable.fromJS([
+        { key: 2 },
+        { key: 3, parentFrameKey: 2 },
+        { key: 4 },
+        { key: 5, pinnedLocation: 'https://twitter.com/', lastAccessedTime: 1488184050731 },
+        { key: 6, lastAccessedTime: 1488184050721 },
+        { key: 7, lastAccessedTime: undefined },
+        { key: 8, lastAccessedTime: 1488184050711 },
+        { key: 9, pinnedLocation: 'https://brave.com/' }
+      ])
+      tabs = Immutable.fromJS([
+        { key: 2 },
+        { key: 3 },
+        { key: 4 },
+        { key: 5, pinnedLocation: 'https://twitter.com/' },
+        { key: 6 },
+        { key: 7 },
+        { key: 8 },
+        { key: 9, pinnedLocation: 'https://brave.com/' }
+      ])
+      closedFrames = Immutable.fromJS([
+        { key: 1 }
+      ])
+      framePropsList = Immutable.fromJS([
+        { key: 2 },
+        { key: 3 },
+        { key: 4 }
+      ])
+      activeFrameRemoved = Immutable.fromJS({ key: 2 })
+      activeFrameKey = 2
+      activeFrameKeyKeep = 6
+    })
+
+    it('removes frames from `frames`', function () {
+      const result = frameStateUtil.removeFrames(frames, tabs, closedFrames, framePropsList, undefined, activeFrameKeyKeep)
+      assert.equal(5, result.frames.size)
+    })
+
+    it('removed frames are in `closedFrame`', function () {
+      const result = frameStateUtil.removeFrames(frames, tabs, closedFrames, framePropsList, activeFrameRemoved, activeFrameKey)
+      assert.equal((framePropsList.size + closedFrames.size), result.closedFrames.size)
+    })
+
+    it('active frame is the same', function () {
+      const result = frameStateUtil.removeFrames(frames, tabs, closedFrames, framePropsList, undefined, activeFrameKeyKeep)
+      assert.equal(activeFrameKeyKeep, result.activeFrameKey)
+    })
+
+    describe('when active frame is removed', function () {
+      it('removes frames from `frames`', function () {
+        const result = frameStateUtil.removeFrames(frames, tabs, closedFrames, framePropsList, activeFrameRemoved, activeFrameKey)
+        const inFrames = result.frames.find((frame) => frame.get('key') === activeFrameRemoved.get('key'))
+        assert.equal(true, inFrames === undefined)
+      })
+
+      it('new active frame (last tab)', function () {
+        const result = frameStateUtil.removeFrames(frames, tabs, closedFrames, framePropsList, activeFrameRemoved, activeFrameKey)
+        assert.equal(8, result.activeFrameKey)
+      })
+
+      it('new active frame (last active tab)', function () {
+        const result = frameStateUtil.removeFrames(frames, tabs, closedFrames, framePropsList, activeFrameRemoved, activeFrameKey, tabCloseAction.LAST_ACTIVE)
+        assert.equal(6, result.activeFrameKey)
+      })
+    })
+  })
 })
