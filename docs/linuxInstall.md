@@ -75,6 +75,7 @@ sudo dnf install ./brave.rpm
 To install brave using zypper:
 
 ```
+sudo rpmkeys --import https://s3-us-west-2.amazonaws.com/brave-rpm-release/keys.asc
 sudo zypper install lsb
 sudo zypper addrepo https://s3-us-west-2.amazonaws.com/brave-rpm-release/x86_64/ brave-rpm-release
 sudo zypper ref
