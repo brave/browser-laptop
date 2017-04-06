@@ -281,11 +281,8 @@ describe('urlutil', function () {
     it('returns true if input is a data URL', function () {
       assert.equal(UrlUtil.isPotentialPhishingUrl('data:text/html,<script>alert("no crash")</script>'), true)
     })
-    it('returns true if input is a js URL', function () {
-      assert.equal(UrlUtil.isPotentialPhishingUrl('   JAVASCRIPT:alert(1)'), true)
-    })
     it('returns true if input is a blob URL', function () {
-      assert.equal(UrlUtil.isPotentialPhishingUrl('   blob:foo '), true)
+      assert.equal(UrlUtil.isPotentialPhishingUrl('   BLOB:foo '), true)
     })
   })
 })
