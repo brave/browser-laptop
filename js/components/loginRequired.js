@@ -10,16 +10,17 @@ const appActions = require('../actions/appActions')
 const KeyCodes = require('../../app/common/constants/keyCodes')
 const urlResolve = require('url').resolve
 
+const {StyleSheet, css} = require('aphrodite/no-important')
+const commonStyles = require('../../app/renderer/components/styles/commonStyles')
+
 const {
   CommonForm,
   CommonFormSection,
   CommonFormTitle,
-  CommonFormButtonWrapper
+  CommonFormTextbox,
+  CommonFormButtonWrapper,
+  commonFormStyles
 } = require('../../app/renderer/components/commonForm')
-
-const {StyleSheet, css} = require('aphrodite/no-important')
-const globalStyles = require('../../app/renderer/components/styles/global')
-const commonStyles = require('../../app/renderer/components/styles/commonStyles')
 
 class LoginRequired extends React.Component {
   constructor () {
@@ -90,18 +91,24 @@ class LoginRequired extends React.Component {
         <CommonFormSection data-l10n-id='basicAuthMessage' data-l10n-args={JSON.stringify(l10nArgs)} />
         <CommonFormSection>
           <div className={css(styles.sectionWrapper)}>
-            <div data-test-id='loginLabel' className={css(styles.inputWrapper, styles.inputWrapper__label)}>
+            <div data-test-id='loginLabel'
+              className={css(commonFormStyles.inputWrapper,
+              commonFormStyles.inputWrapper__label
+            )}>
               <label data-l10n-id='basicAuthUsernameLabel' htmlFor='loginUsername' />
-              <label className={css(styles.input__bottomRow)} data-l10n-id='basicAuthPasswordLabel' htmlFor='loginPassword' />
+              <label className={css(commonFormStyles.input__bottomRow)} data-l10n-id='basicAuthPasswordLabel' htmlFor='loginPassword' />
             </div>
             {
               !this.isFolder
-              ? <div id='loginInput' className={css(styles.inputWrapper, styles.inputWrapper__input)}>
+              ? <div id='loginInput' className={css(
+                  commonFormStyles.inputWrapper,
+                  commonFormStyles.inputWrapper__input
+                )}>
                 <input className={css(
                   commonStyles.formControl,
                   commonStyles.textbox,
                   commonStyles.textbox__outlineable,
-                  styles.input__box
+                  commonFormStyles.input__box
                 )}
                   spellCheck='false'
                   onKeyDown={this.onKeyDown}
@@ -109,19 +116,15 @@ class LoginRequired extends React.Component {
                   value={this.state.username}
                   ref={(loginUsername) => { this.loginUsername = loginUsername }}
                 />
-                <input className={css(
-                  commonStyles.formControl,
-                  commonStyles.textbox,
-                  commonStyles.textbox__outlineable,
-                  styles.input__box,
-                  styles.input__bottomRow
-                )}
-                  spellCheck='false'
-                  type='password'
-                  onKeyDown={this.onKeyDown}
-                  onChange={this.onPasswordChange}
-                  value={this.state.password}
-                />
+                <div className={css(commonFormStyles.input__marginRow)}>
+                  <CommonFormTextbox
+                    spellCheck='false'
+                    type='password'
+                    onKeyDown={this.onKeyDown}
+                    onChange={this.onPasswordChange}
+                    value={this.state.password}
+                  />
+                </div>
               </div>
               : null
             }
@@ -142,23 +145,6 @@ const styles = StyleSheet.create({
   sectionWrapper: {
     display: 'flex',
     justifyContent: 'space-between'
-  },
-  inputWrapper: {
-    display: 'flex',
-    flexFlow: 'column',
-    justifyContent: 'space-around'
-  },
-  inputWrapper__label: {
-    marginRight: `calc(${globalStyles.spacing.dialogInsideMargin} / 2)`
-  },
-  inputWrapper__input: {
-    flexGrow: 1
-  },
-  input__bottomRow: {
-    marginTop: `calc(${globalStyles.spacing.dialogInsideMargin} / 3)`
-  },
-  input__box: {
-    fontSize: globalStyles.fontSize.flyoutDialog
   }
 })
 

@@ -10,6 +10,7 @@ const globalStyles = require('./styles/global')
 const commonStyles = require('./styles/commonStyles')
 
 const {FormDropdown} = require('./dropdown')
+const {FormTextbox} = require('./textbox')
 
 class CommonForm extends ImmutableComponent {
   render () {
@@ -20,6 +21,12 @@ class CommonForm extends ImmutableComponent {
 class CommonFormDropdown extends ImmutableComponent {
   render () {
     return <FormDropdown data-isCommonForm='true' {...this.props} />
+  }
+}
+
+class CommonFormTextbox extends ImmutableComponent {
+  render () {
+    return <FormTextbox data-isCommonForm='true' {...this.props} />
   }
 }
 
@@ -71,6 +78,7 @@ const styles = StyleSheet.create({
     padding: 0,
     top: '40px',
     cursor: 'default',
+    width: '100%',
     maxWidth: '422px',
     userSelect: 'none'
 
@@ -109,13 +117,42 @@ const styles = StyleSheet.create({
   }
 })
 
+const commonFormStyles = StyleSheet.create({
+  sectionWrapper: {
+    display: 'flex',
+    justifyContent: 'space-between'
+  },
+  inputWrapper: {
+    display: 'flex',
+    flexFlow: 'column',
+    justifyContent: 'space-around'
+  },
+  inputWrapper__label: {
+    marginRight: `calc(${globalStyles.spacing.dialogInsideMargin} / 2)`
+  },
+  inputWrapper__input: {
+    flexGrow: 1
+  },
+  input__bottomRow: {
+    marginTop: `calc(${globalStyles.spacing.dialogInsideMargin} / 3)`
+  },
+  input__marginRow: {
+    marginTop: `calc(${globalStyles.spacing.dialogInsideMargin} / 3)`
+  },
+  input__box: {
+    fontSize: globalStyles.fontSize.flyoutDialog
+  }
+})
+
 module.exports = {
   CommonForm,
   CommonFormDropdown,
+  CommonFormTextbox,
   CommonFormClickable,
   CommonFormSection,
   CommonFormTitle,
   CommonFormSubSection,
   CommonFormButtonWrapper,
-  CommonFormBottomWrapper
+  CommonFormBottomWrapper,
+  commonFormStyles
 }
