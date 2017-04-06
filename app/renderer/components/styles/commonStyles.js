@@ -20,13 +20,16 @@ const styles = StyleSheet.create({
     padding: '0.4em',
     width: '100%'
   },
+
+  // Dialogs
   flyoutDialog: {
     background: globalStyles.color.toolbarBackground,
     borderRadius: globalStyles.radius.borderRadius,
     boxShadow: '2px 2px 8px #3b3b3b',
     color: '#000',
     fontSize: '13px',
-    padding: '10px 30px',
+    // Issue #7949
+    padding: `${globalStyles.spacing.dialogInsideMargin} 30px`,
     position: 'absolute',
     top: globalStyles.spacing.dialogTopOffset
   },
