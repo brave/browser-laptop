@@ -57,20 +57,6 @@ const extensionState = {
   browserActionUpdated: (state, action) => {
     action = makeImmutable(action)
     state = makeImmutable(state)
-    if (action.get('actionType') === windowConstants.WINDOW_SET_NAVIGATED &&
-      action.get('tabId')) {
-      let tabId = action.get('tabId')
-      let extensions = extensionState.getEnabledExtensions(state)
-      extensions && extensions.forEach((extension) => {
-        let tabs = extension.getIn(['browserAction', 'tabs'])
-        if (tabs && tabs.get(tabId)) {
-          tabs = tabs.set(tabId, Immutable.Map())
-          extension = extension.setIn(['browserAction', 'tabs'], tabs)
-          state = state.setIn(['extensions', extension.get('id')], extension)
-        }
-      })
-      return state
-    }
     let extensionId = action.get('extensionId').toString()
     let extension = extensionState.getExtensionById(state, extensionId)
     if (extension && extension.get('browserAction')) {
