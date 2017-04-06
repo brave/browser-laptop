@@ -4,7 +4,6 @@
 
 const { makeImmutable } = require('./immutableUtil')
 const Immutable = require('immutable')
-const windowConstants = require('../../../js/constants/windowConstants')
 const platformUtil = require('../lib/platformUtil')
 
 const browserActionDefaults = Immutable.fromJS({
