@@ -24,7 +24,6 @@ const React = require('react')
 const ReactDOM = require('react-dom')
 const Window = require('./components/window')
 const electron = require('electron')
-const {currentWindowWebContents} = require('../app/renderer/currentWindow')
 const ipc = electron.ipcRenderer
 const webFrame = electron.webFrame
 const windowStore = require('./stores/windowStore')
@@ -38,8 +37,6 @@ const l10n = require('./l10n')
 // don't allow scaling or zooming of the ui
 webFrame.setPageScaleLimits(1, 1)
 webFrame.setZoomLevelLimits(0, 0)
-// override any default zoom level changes
-currentWindowWebContents.setZoomLevel(0.0)
 
 l10n.init()
 

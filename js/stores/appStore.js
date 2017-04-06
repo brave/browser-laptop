@@ -228,6 +228,7 @@ const createWindow = (action) => {
       mainWindow.show()
     })
 
+    mainWindow.webContents.setZoomLevel(0.0)
     mainWindow.loadURL(appUrlUtil.getBraveExtIndexHTML())
   })
 }
