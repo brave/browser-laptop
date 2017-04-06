@@ -30,7 +30,7 @@ class TabIcon extends ImmutableComponent {
       width: globalStyles.spacing.iconSize,
       height: globalStyles.spacing.iconSize,
       alignItems: 'center',
-      justifyContent: this.props.symbolContent ? 'flex-end' : 'center',
+      justifyContent: this.props.symbolContent ? 'flex-end' : 'left',
       fontWeight: this.props.symbolContent ? 'bold' : 'normal',
       color: this.props.symbolContent ? globalStyles.color.black100 : 'inherit'
     }
