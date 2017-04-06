@@ -223,7 +223,7 @@ Dispatches a message to the store to create a new frame
 
 
 
-### closeFrame(frames, frameProps) 
+### closeFrame(frames, frameProps, forceClosePinned) 
 
 Dispatches a message to close a frame
 
@@ -232,6 +232,8 @@ Dispatches a message to close a frame
 **frames**: `Array.&lt;Object&gt;`, Immutable list of of all the frames
 
 **frameProps**: `Object`, The properties of the frame to close
+
+**forceClosePinned**: `boolean`, Should we force close pinned tab
 
 
 

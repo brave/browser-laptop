@@ -734,6 +734,12 @@ TODO: Refactor this to merge it into addSite/removeSite
 
 
 
+### createSyncCache() 
+
+Dispatch to populate the sync object id -> appState key path mapping cache
+
+
+
 ### resetSyncData() 
 
 Dispatches a message to delete sync data.
