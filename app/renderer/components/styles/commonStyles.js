@@ -21,6 +21,20 @@ const styles = StyleSheet.create({
     width: '100%'
   },
 
+  // Textbox -- copied from textbox.js
+  textbox: {
+    boxSizing: 'border-box',
+    width: 'auto'
+  },
+  textbox__outlineable: {
+    ':focus': {
+      outlineColor: globalStyles.color.statsBlue,
+      outlineOffset: '-4px',
+      outlineStyle: 'solid',
+      outlineWidth: '1px'
+    }
+  },
+
   // Dialogs
   flyoutDialog: {
     background: globalStyles.color.toolbarBackground,

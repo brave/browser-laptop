@@ -10,6 +10,17 @@ const appActions = require('../actions/appActions')
 const KeyCodes = require('../../app/common/constants/keyCodes')
 const urlResolve = require('url').resolve
 
+const {
+  CommonForm,
+  CommonFormSection,
+  CommonFormTitle,
+  CommonFormButtonWrapper
+} = require('../../app/renderer/components/commonForm')
+
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../app/renderer/components/styles/global')
+const commonStyles = require('../../app/renderer/components/styles/commonStyles')
+
 class LoginRequired extends React.Component {
   constructor () {
     super()
@@ -74,31 +85,81 @@ class LoginRequired extends React.Component {
       host: urlResolve(this.detail.getIn(['request', 'url']), '/')
     }
     return <Dialog onHide={this.onClose} isClickDismiss>
-      <div className='genericForm' onClick={this.onClick.bind(this)}>
-        <h2 data-l10n-id='basicAuthRequired' />
-        <div className='genericFormSubtitle' data-l10n-id='basicAuthMessage' data-l10n-args={JSON.stringify(l10nArgs)} />
-        <div className='genericFormTable'>
-          <div id='loginUsername' className='formRow'>
-            <label data-l10n-id='basicAuthUsernameLabel' htmlFor='loginUsername' />
-            <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onUsernameChange} value={this.state.username} ref={(loginUsername) => { this.loginUsername = loginUsername }} />
-          </div>
-          {
-            !this.isFolder
-            ? <div id='loginPassword' className='formRow'>
-              <label data-l10n-id='basicAuthPasswordLabel' htmlFor='loginPassword' />
-              <input spellCheck='false' type='password' onKeyDown={this.onKeyDown} onChange={this.onPasswordChange} value={this.state.password} />
+      <CommonForm onClick={this.onClick.bind(this)}>
+        <CommonFormTitle data-l10n-id='basicAuthRequired' />
+        <CommonFormSection data-l10n-id='basicAuthMessage' data-l10n-args={JSON.stringify(l10nArgs)} />
+        <CommonFormSection>
+          <div className={css(styles.sectionWrapper)}>
+            <div data-test-id='loginLabel' className={css(styles.inputWrapper, styles.inputWrapper__label)}>
+              <label data-l10n-id='basicAuthUsernameLabel' htmlFor='loginUsername' />
+              <label className={css(styles.input__bottomRow)} data-l10n-id='basicAuthPasswordLabel' htmlFor='loginPassword' />
             </div>
-            : null
-          }
-          <div className='formRow'>
-            <Button l10nId='cancel' className='whiteButton' onClick={this.onClose} />
-            <Button l10nId='ok' className='primaryButton' onClick={this.onSave.bind(this)} />
+            {
+              !this.isFolder
+              ? <div id='loginInput' className={css(styles.inputWrapper, styles.inputWrapper__input)}>
+                <input className={css(
+                  commonStyles.formControl,
+                  commonStyles.textbox,
+                  commonStyles.textbox__outlineable,
+                  styles.input__box
+                )}
+                  spellCheck='false'
+                  onKeyDown={this.onKeyDown}
+                  onChange={this.onUsernameChange}
+                  value={this.state.username}
+                  ref={(loginUsername) => { this.loginUsername = loginUsername }}
+                />
+                <input className={css(
+                  commonStyles.formControl,
+                  commonStyles.textbox,
+                  commonStyles.textbox__outlineable,
+                  styles.input__box,
+                  styles.input__bottomRow
+                )}
+                  spellCheck='false'
+                  type='password'
+                  onKeyDown={this.onKeyDown}
+                  onChange={this.onPasswordChange}
+                  value={this.state.password}
+                />
+              </div>
+              : null
+            }
           </div>
-        </div>
-      </div>
+        </CommonFormSection>
+        <CommonFormButtonWrapper>
+          <Button l10nId='cancel' className='whiteButton' onClick={this.onClose} />
+          <Button l10nId='ok' className='primaryButton' onClick={this.onSave.bind(this)} />
+        </CommonFormButtonWrapper>
+      </CommonForm>
     </Dialog>
   }
 }
 
 LoginRequired.propTypes = { frameProps: PropTypes.object }
+
+const styles = StyleSheet.create({
+  sectionWrapper: {
+    display: 'flex',
+    justifyContent: 'space-between'
+  },
+  inputWrapper: {
+    display: 'flex',
+    flexFlow: 'column',
+    justifyContent: 'space-around'
+  },
+  inputWrapper__label: {
+    marginRight: `calc(${globalStyles.spacing.dialogInsideMargin} / 2)`
+  },
+  inputWrapper__input: {
+    flexGrow: 1
+  },
+  input__bottomRow: {
+    marginTop: `calc(${globalStyles.spacing.dialogInsideMargin} / 3)`
+  },
+  input__box: {
+    fontSize: globalStyles.fontSize.flyoutDialog
+  }
+})
+
 module.exports = LoginRequired
