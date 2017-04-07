@@ -76,7 +76,7 @@ const extensionState = {
 
   browserActionBackgroundImage: (browserAction, tabId) => {
     tabId = tabId ? tabId.toString() : '-1'
-    let path = browserAction.get('path')
+    let path = browserAction.getIn(['tabs', tabId, 'path']) || browserAction.get('path')
     let basePath = browserAction.get('base_path')
     if (path && basePath) {
       // Older extensions may provide a string path

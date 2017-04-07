@@ -519,6 +519,12 @@ module.exports.init = () => {
       disableExtension(config.vimiumExtensionId)
     }
 
+    if (getSetting(settings.HONEY_ENABLED)) {
+      registerComponent(config.honeyExtensionId)
+    } else {
+      disableExtension(config.honeyExtensionId)
+    }
+
     if (appStore.getState().getIn(['widevine', 'enabled'])) {
       registerComponent(config.widevineComponentId)
     }

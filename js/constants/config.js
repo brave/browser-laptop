@@ -50,6 +50,7 @@ module.exports = {
   PDFJSExtensionId: 'jdbefljfgobbmcidnmpjamcbhnbphjnb',
   PocketExtensionId: 'niloccemoadcdkdjlinkgdfekeahmflj',
   vimiumExtensionId: 'dbepggeogbaibhgnhhndojpepiihcmeb',
+  honeyExtensionId: 'bmnlcjabgnpnenekpadlanbbkooimhnj',
   widevineComponentId: 'oimompecagnajdejgnnjijobebaeigek',
   coinbaseOrigin: 'https://buy.coinbase.com',
   newtab: {

@@ -18,6 +18,7 @@ const pocket = config.PocketExtensionId
 const sync = config.syncExtensionId
 const webtorrent = config.torrentExtensionId
 const vimium = config.vimiumExtensionId
+const honey = config.honeyExtensionId
 
 /**
  * Stores dummy data for all known extensions based on vault-updater extension manifest.
@@ -49,6 +50,12 @@ const dummyData = [
     name: 'saveToPocket',
     description: 'saveToPocketDesc',
     icon: 'img/extensions/pocket-128.png'
+  },
+  {
+    id: honey,
+    name: 'honey',
+    description: 'honeyDesc',
+    icon: 'img/extensions/honey-128.png'
   }
   // { id: 'vimium' // TBD }
 ]
@@ -131,6 +138,9 @@ module.exports.getExtensionKey = (extensionId) => {
       break
     case vimium:
       extensionSetting = settings.VIMIUM_ENABLED
+      break
+    case honey:
+      extensionSetting = settings.HONEY_ENABLED
       break
     default:
       break

@@ -49,6 +49,19 @@ describe('about:extensions', function () {
         .url(pocketURL)
     })
   })
+  describe('Honey', function () {
+    Brave.beforeAll(this)
+    before(function * () {
+      yield setup(this.app.client)
+    })
+    it('installs when preference is enabled', function * () {
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+        .changeSetting(settingsConst.HONEY_ENABLED, true)
+        .tabByIndex(0)
+        .waitForVisible('[data-extension-id="bmnlcjabgnpnenekpadlanbbkooimhnj"]', extensionDownloadWaitTime)
+    })
+  })
   describe('Vimium', function () {
     Brave.beforeAll(this)
     before(function * () {
