@@ -778,6 +778,18 @@ Dispatches a message to set objectId for a syncable object.
 
 
 
+### saveSyncDevices(devices) 
+
+Dispatch to update sync devices cache.
+NOTE: deviceId is a string! Normally it's Array.<number> but that can't
+be an object key. Use syncUtil.deviceIdToString()
+
+**Parameters**
+
+**devices**: `Object`, {[deviceId]: {lastRecordTimestamp=, name=}}
+
+
+
 ### saveSyncInitData(seed, deviceId, lastFetchTimestamp, seedQr) 
 
 Dispatches a message when sync init data needs to be saved

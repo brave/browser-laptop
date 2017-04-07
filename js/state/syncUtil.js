@@ -54,6 +54,16 @@ const pickFields = (object, fields) => {
   }, {})
 }
 
+/**
+ * Convert deviceId to a type better suited for object keys.
+ * @param {Array.<number>} deviceId
+ * @returns {string}
+ */
+const deviceIdString = (deviceId) => {
+  return deviceId.join('|')
+}
+module.exports.deviceIdString = deviceIdString
+
 // Cache of bookmark folder object IDs mapped to folder IDs
 let folderIdMap = new Immutable.Map()
 
@@ -191,7 +201,10 @@ const applySyncRecord = (record) => {
       applySiteSettingRecord(record)
       break
     case 'device':
-      // TODO
+      const device = Object.assign({}, record.device, {lastRecordTimestamp: record.syncTimestamp})
+      require('../actions/appActions').saveSyncDevices({
+        [deviceIdString(record.deviceId)]: device
+      })
       break
     default:
       throw new Error(`Invalid record objectData: ${record.objectData}`)

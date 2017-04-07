@@ -855,6 +855,17 @@ const handleAppAction = (action) => {
           action.objectId)
       }
       break
+    case appConstants.APP_SAVE_SYNC_DEVICES:
+      for (let deviceId of Object.keys(action.devices)) {
+        const device = action.devices[deviceId]
+        if (device.lastRecordTimestamp) {
+          appState = appState.setIn(['sync', 'devices', deviceId, 'lastRecordTimestamp'], device.lastRecordTimestamp)
+        }
+        if (device.name) {
+          appState = appState.setIn(['sync', 'devices', deviceId, 'name'], device.name)
+        }
+      }
+      break
     case appConstants.APP_SAVE_SYNC_INIT_DATA:
       if (action.deviceId) {
         appState = appState.setIn(['sync', 'deviceId'], action.deviceId)
@@ -889,6 +900,7 @@ const handleAppAction = (action) => {
           appState = appState.setIn(['sites', key, 'originalSeed'], originalSeed)
         }
       })
+      appState.setIn(['sync', 'devices'], {})
       appState.setIn(['sync', 'objectsById'], {})
       break
     case appConstants.APP_SHOW_DOWNLOAD_DELETE_CONFIRMATION:
