@@ -275,6 +275,7 @@ AppStore
     },
     seed: Array.<number>,
     seedQr: string, // data URL of QR code representing the seed
+    setupError: string? // indicates that an error occurred during sync setup
   },
   tabs: [{
     // persistent properties

@@ -8,6 +8,7 @@ const Immutable = require('immutable')
 const electron = require('electron')
 const qr = require('qr-image')
 const ipcMain = electron.ipcMain
+const locale = require('./locale')
 const messages = require('../js/constants/sync/messages')
 const categories = require('../js/constants/sync/proto').categories
 const writeActions = require('../js/constants/sync/proto').actions
@@ -160,6 +161,7 @@ const doAction = (sender, action) => {
  * @param {Event} e
  */
 module.exports.onSyncReady = (isFirstRun, e) => {
+  appActions.setSyncSetupError(null)
   if (!syncEnabled()) {
     return
   }
@@ -285,6 +287,8 @@ module.exports.init = function (appState) {
   })
   // GET_INIT_DATA is the first message sent by the sync-client when it starts
   ipcMain.on(messages.GET_INIT_DATA, (e) => {
+    // Clear any old errors
+    appActions.setSyncSetupError(null)
     // Unregister the previous dispatcher cb
     if (dispatcherCallback) {
       appDispatcher.unregister(dispatcherCallback)
@@ -297,7 +301,14 @@ module.exports.init = function (appState) {
       const appState = AppStore.getState().get('sync')
       const seed = appState.get('seed') ? Array.from(appState.get('seed')) : null
       deviceId = appState.get('deviceId') ? Array.from(appState.get('deviceId')) : null
-      e.sender.send(messages.GOT_INIT_DATA, seed, deviceId, config)
+      const syncConfig = {
+        apiVersion: config.apiVersion,
+        debug: config.debug,
+        serverUrl: getSetting(settings.SYNC_NETWORK_DISABLED)
+          ? 'http://localhost' // set during tests to simulate network failure
+          : config.serverUrl
+      }
+      e.sender.send(messages.GOT_INIT_DATA, seed, deviceId, syncConfig)
     }
   })
   // SAVE_INIT_DATA is sent by about:preferences before sync is enabled
@@ -336,6 +347,13 @@ module.exports.init = function (appState) {
     isFirstRun))
   ipcMain.on(messages.SYNC_DEBUG, (e, msg) => {
     log(msg)
+  })
+  ipcMain.on(messages.SYNC_SETUP_ERROR, (e, error) => {
+    if (error === 'Failed to fetch') {
+      // This is probably the most common error, so give it a more useful message.
+      error = locale.translation('connectionError')
+    }
+    appActions.setSyncSetupError(error || locale.translation('unknownError'))
   })
   ipcMain.on(messages.GET_EXISTING_OBJECTS, (event, categoryName, records) => {
     if (!syncEnabled()) {
@@ -381,4 +399,5 @@ module.exports.stop = function () {
   if (pollIntervalId !== null) {
     clearInterval(pollIntervalId)
   }
+  appActions.setSyncSetupError(null)
 }

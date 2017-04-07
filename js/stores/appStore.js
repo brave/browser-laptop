@@ -898,6 +898,9 @@ const handleAppAction = (action) => {
         appState = appState.setIn(['sync', 'seedQr'], action.seedQr)
       }
       break
+    case appConstants.APP_SET_SYNC_SETUP_ERROR:
+      appState = appState.setIn(['sync', 'setupError'], action.error)
+      break
     case appConstants.APP_CREATE_SYNC_CACHE:
       appState = syncUtil.createSiteCache(appState)
       break
