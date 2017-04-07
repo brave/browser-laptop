@@ -5,8 +5,8 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
 const Immutable = require('immutable')
-const ImmutableComponent = require('../components/immutableComponent')
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
+const {getBase64FromImageUrl} = require('../lib/imageUtil')
 
 const ledgerExportUtil = require('../../app/common/lib/ledgerExportUtil')
 const getTransactionCSVRows = ledgerExportUtil.getTransactionCSVRows
@@ -26,7 +26,10 @@ const ipc = window.chrome.ipcRenderer
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../../app/renderer/components/styles/global')
 
-class ContributionStatement extends ImmutableComponent {
+const braveLogo = require('../../app/extensions/brave/img/braveAbout.png')
+const verifiedIcon = require('../../app/extensions/brave/img/ledger/verified_green_icon.svg')
+
+class ContributionStatement extends React.Component {
   constructor () {
     super()
 
@@ -36,7 +39,9 @@ class ContributionStatement extends ImmutableComponent {
       ledgerData: Immutable.Map(),
       publisherSynopsisMap: {},
       synopsis: [],
-      savedPDF: false
+      savedPDF: false,
+      braveLogo: '',
+      verifiedIcon: ''
     }
 
     ipc.on(messages.LEDGER_UPDATED, function (e, ledgerData) {
@@ -115,6 +120,15 @@ class ContributionStatement extends ImmutableComponent {
     }
   }
 
+  componentDidMount () {
+    const aboutContributionsOrigin = new window.URL(aboutContributionsUrl).origin
+    const imgSource = (source) => `${aboutContributionsOrigin}/${source.replace('.', '')}`
+
+    // Convert images to base64 so it can be seen if PDF is saved as HTML
+    getBase64FromImageUrl(imgSource(braveLogo)).then(src => this.setState({braveLogo: src}))
+    getBase64FromImageUrl(verifiedIcon).then(src => this.setState({verifiedIcon: src}))
+  }
+
   get htmlDataURL () {
     let generatedStylesheet = document.head.querySelector('style').outerHTML
     let dataURL = 'data:text/html,' + encodeURIComponent('<html><head><meta charset="utf-8">' + generatedStylesheet + '</head><body>' + ReactDOM.findDOMNode(this).outerHTML + '</body></html>')
@@ -160,10 +174,19 @@ class ContributionStatement extends ImmutableComponent {
   }
 
   get ContributionStatementHeader () {
+    const imgStyle = StyleSheet.create({
+      titleWrapper__braveLogo: {
+        background: `url(${this.state.braveLogo})`,
+        backgroundSize: 'contain',
+        backgroundRepeat: 'no-repeat',
+        width: '50px',
+        height: '50px'
+      }
+    })
     return (
       <div className={css(styles.flexJustifyBetween, styles.statement__header)} data-test-id='contributionStatementHeader'>
         <div className={css(styles.flexAlignCenter, styles.header__titleWrapper)}>
-          <div id='braveLogo' className={css(styles.braveLogo, styles.titleWrapper__braveLogo)} />
+          <div id='braveLogo' className={css(imgStyle.titleWrapper__braveLogo)} />
           <span className={css(styles.titleWrapper__sectionTitle, styles.sectionTitle__bravePayments)} data-l10n-id='bravePayments' />
           <sup className={css(styles.titleWrapper__sectionSubTitle)} data-l10n-id='beta' />
         </div>
@@ -285,6 +308,17 @@ class ContributionStatement extends ImmutableComponent {
   }
 
   ContributionStatementDetailTable (page, pageIdx, totalPages) {
+    const imgStyle = StyleSheet.create({
+      verified: {
+        height: '20px',
+        width: '20px',
+        background: `url(${this.state.verifiedIcon})`,
+        position: 'relative',
+        backgroundSize: 'contain',
+        backgroundRepeat: 'no-repeat'
+      }
+    })
+
     return (
       <div className={css(styles.detailTable__container)}>
         <div>
@@ -317,7 +351,7 @@ class ContributionStatement extends ImmutableComponent {
                       styles.flexAlignCenter,
                       styles.table__siteColumn)}
                       data-test-id='siteColumnTr'>
-                      {verified ? <span className={css(styles.verified, styles.table__verified)} /> : null}
+                      {verified ? <span className={css(imgStyle.verified, styles.table__verified)} /> : null}
                       <span className={verified ? css(styles.table__verifiedSite) : site}>{site}</span>
                     </td>
                     <td className='fractionColumn'>{fractionStr}</td>
@@ -331,7 +365,7 @@ class ContributionStatement extends ImmutableComponent {
           </table>
           <div className={css(styles.flexAlignCenter, styles.verifiedExplainer__wrapper)}>
             <div className={css(styles.flexAlignCenter)} data-test-id='verifiedExplainer'>
-              <span className={css(styles.verified)} />
+              <span className={css(imgStyle.verified)} />
               <span className={css(styles.verifiedExplainer__text)} data-l10n-id='verifiedExplainerText' />
             </div>
             <div className={css(styles.verifiedExplainer__pageIndicator)}
@@ -461,10 +495,6 @@ const summaryBoxTableBorder = '10px'
 const summaryBoxTableMargin = '10px'
 const summaryBoxTablePadding = '10px'
 const lightGray = '#f7f7f7'
-const braveLogoWidth = '50px'
-const braveLogoHeight = '50px'
-const braveLogo = require('../../app/extensions/brave/img/braveAbout.png')
-const verifiedIcon = require('../../app/extensions/brave/img/ledger/verified_green_icon.svg')
 
 const styles = StyleSheet.create({
   flexAlignCenter: {
@@ -486,15 +516,6 @@ const styles = StyleSheet.create({
   textAlignRight: {
     textAlign: 'right'
   },
-  braveLogo: {
-    background: `url(${braveLogo})`
-  },
-  verified: {
-    height: '20px',
-    width: '20px',
-    background: `url(${verifiedIcon}) center no-repeat`,
-    position: 'relative'
-  },
 
   // ContributionStatementHeader
   statement__header: {
@@ -504,11 +525,6 @@ const styles = StyleSheet.create({
   },
   header__titleWrapper: {
     position: 'relative'
-  },
-  titleWrapper__braveLogo: {
-    backgroundSize: `${braveLogoWidth} ${braveLogoHeight}`,
-    width: braveLogoWidth,
-    height: braveLogoHeight
   },
   titleWrapper__sectionTitle: {
     color: '#3B3B3B',
