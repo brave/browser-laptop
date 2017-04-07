@@ -51,7 +51,12 @@ const messages = {
    * with new records, do
    * GET_EXISTING_OBJECTS -> RESOLVE_SYNC_RECORDS -> RESOLVED_SYNC_RECORDS
    */
-  FETCH_SYNC_RECORDS: _, /* @param Array.<string> categoryNames, @param {number} startAt (in seconds) */
+  FETCH_SYNC_RECORDS: _, /* @param Array.<string> categoryNames, @param {number} startAt (in seconds or milliseconds), @param {boolean=} limitResponse true to limit response to 1000 records */
+  /**
+   * browser -> webview
+   * sent to fetch all sync devices. webview responds with RESOLVED_SYNC_RECORDS.
+   */
+  FETCH_SYNC_DEVICES: _,
   /**
    * webview -> browser
    * after sync gets records, it requests the browser's existing objects so sync

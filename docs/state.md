@@ -270,6 +270,12 @@ AppStore
   sync: {
     lastFetchTimestamp: integer // the last time new sync records were fetched in seconds
     deviceId: Array.<number>,
+    devices: {
+      [deviceId]: {
+        name: string,
+        lastRecordTimestamp: number // last seen Sync record from this device
+      }
+    },
     objectId: Array.<number>, // objectId for this sync device
     objectsById: {
       [string of objectId joined by pipes |]: Array.<string> // array key path within appState, so we can do appState.getIn({key path})
