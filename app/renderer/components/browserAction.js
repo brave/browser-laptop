@@ -23,9 +23,17 @@ class BrowserAction extends ImmutableComponent {
       windowActions.setPopupWindowDetail()
       return
     }
+    let centerX
+    let centerY
+    if (!e.nativeEvent.x || !e.nativeEvent.y) {
+      // Handles case where user focuses button, and presses Enter
+      let { top: offsetTop, left: offsetLeft } = e.target.getBoundingClientRect()
+      centerX = offsetLeft + (e.target.offsetWidth * 0.5)
+      centerY = offsetTop + (e.target.offsetHeight * 0.5)
+    }
     let props = {
-      x: e.nativeEvent.x,
-      y: e.nativeEvent.y,
+      x: e.nativeEvent.x || centerX,
+      y: e.nativeEvent.y || centerY,
       screenX: e.nativeEvent.screenX,
       screenY: e.nativeEvent.screenY,
       offsetX: e.nativeEvent.offsetX,
