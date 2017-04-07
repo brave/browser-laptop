@@ -654,6 +654,9 @@ class SecurityTab extends ImmutableComponent {
 
 class AdvancedTab extends ImmutableComponent {
   render () {
+    const pocketL10nArgs = {
+      extensionName: 'Pocket'
+    }
     return <div>
       <div className='sectionTitle' data-l10n-id='contentSettings' />
       <SettingsList>
@@ -666,7 +669,7 @@ class AdvancedTab extends ImmutableComponent {
       <SettingsList>
         <SettingCheckbox dataL10nId='usePDFJS' prefKey={settings.PDFJS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='useTorrentViewer' prefKey={settings.TORRENT_VIEWER_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='enablePocket' prefKey={settings.POCKET_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='enableExtension' dataL10nArgs={JSON.stringify(pocketL10nArgs)} prefKey={settings.POCKET_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <Button l10nId='viewInstalledExtensions' className='primaryButton viewExtensionsInfo'
           onClick={aboutActions.newFrame.bind(null, {
             location: 'about:extensions'
