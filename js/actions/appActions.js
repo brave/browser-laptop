@@ -1023,6 +1023,28 @@ const appActions = {
       actionType: appConstants.APP_CHANGE_LEDGER_PINNED_PERCENTAGES,
       publishers
     })
+  },
+
+  /**
+   * Shows a modal in the modals container
+   * @param id {string} modal id
+   */
+  showModal: function (id) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_SHOW_MODAL,
+      id
+    })
+  },
+
+  /**
+   * Hide a modal from the modals container
+   * @param id {string} modal id
+   */
+  hideModal: function (id) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_HIDE_MODAL,
+      id
+    })
   }
 }
 

@@ -126,6 +126,11 @@ AppStore
   menu: {
     template: object // used on Windows and by our tests: template object with Menubar control
   },
+  modals: [{
+    closeOnClose: Array<string>, // modal id's that should be closed when this modal is closed
+    closeOnOpen: Array<string>|boolean, // modal id's that should be closed when this modal is opened, true to close all
+    id: string // modal id
+  }],
   notifications: [{
     buttons: [{
       className: string, // button class e.g. 'primary'. see notificationBar.less

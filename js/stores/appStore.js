@@ -950,6 +950,17 @@ const handleAppAction = (action) => {
         appState = appState.set('siteSettings', newSiteSettings)
       })
       break
+    case appConstants.APP_SHOW_MODAL:
+      const foo = appState.get('modals') || Immutable.List()
+      appState = appState.set('modals', foo.push(Immutable.fromJS({
+        id: action.id
+      })))
+      break
+    case appConstants.APP_HIDE_MODAL:
+      appState = appState.set('modals', appState.get('modals').filterNot((modal) => {
+        return modal.get('id') === action.id
+      }))
+      break
     default:
   }
 
