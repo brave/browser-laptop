@@ -640,4 +640,46 @@ describe('extensionState', function () {
       commonTests()
     })
   })
+
+  describe('extensionUninstalled', function () {
+    describe('extensionId has been uninstalled', function () {
+      before(function () {
+        this.state = defaultAppState.setIn(['extensions', 'androidDragon'], Immutable.fromJS({
+          name: 'android dragon dinossaur',
+          id: 'androidDragon',
+          url: 'some_url',
+          path: 'some/path',
+          version: '1.0',
+          description: 'epic game about an android dragon dinossaur',
+          manifest: {
+            manifest_value: 'dinossaur'
+          },
+          enabled: true,
+          excluded: false
+        }))
+        this.state = extensionState.extensionUninstalled(this.state, Immutable.fromJS({
+          extensionId: 'androidDragon'
+        }))
+      })
+
+      it('should set the excluded property to true', function () {
+        let extension = this.state.getIn(['extensions', 'androidDragon'])
+        assert.equal(extension.get('excluded'), true)
+      })
+
+      it('should not alter any other properties', function () {
+        let extension = this.state.getIn(['extensions', 'androidDragon'])
+        assert.equal(extension.get('name'), 'android dragon dinossaur')
+        assert.equal(extension.get('id'), 'androidDragon')
+        assert.equal(extension.get('url'), 'some_url')
+        assert.equal(extension.get('path'), 'some/path')
+        assert.equal(extension.get('version'), '1.0')
+        assert.equal(extension.get('description'), 'epic game about an android dragon dinossaur')
+        assert(Immutable.is(extension.get('manifest'), Immutable.fromJS({manifest_value: 'dinossaur'})))
+        assert.equal(extension.get('enabled'), true)
+      })
+
+      commonTests()
+    })
+  })
 })
