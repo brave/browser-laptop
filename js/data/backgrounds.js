@@ -69,7 +69,7 @@ module.exports = [
     "author": "Serge Ramelli",
     "link": "https://www.photoserge.com/"
   }, {
-    "name": "Downtown Griffith",
+    "name": "Griffith Park Observatory (Downtown Los Angeles)",
     "source": "https://s3.amazonaws.com/brave-backgrounds/Phoyoserge_DowntownGriffith.jpg",
     "author": "Serge Ramelli",
     "link": "https://www.photoserge.com/"
