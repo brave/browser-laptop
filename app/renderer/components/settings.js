@@ -93,6 +93,7 @@ class SettingCheckbox extends ImmutableComponent {
       />
       <label className={labelClass}
         data-l10n-id={this.props.dataL10nId}
+        data-l10n-args={this.props.dataL10nArgs}
         htmlFor={this.props.prefKey}
       />
       {this.props.options}
