@@ -6,6 +6,7 @@ const styles = require('../components/styles/global')
 const frameStateUtil = require('../../../js/state/frameStateUtil')
 const settings = require('../../../js/constants/settings')
 const getSetting = require('../../../js/settings').getSetting
+const {getTextColorForBackground} = require('../../../js/lib/color')
 
 /**
  * Get tab's breakpoint name for current tab size.
@@ -67,6 +68,22 @@ module.exports.hasVisibleSecondaryIcon = (props) => {
  */
 module.exports.hasFixedCloseIcon = (props) => {
   return props.isActive && module.exports.hasBreakpoint(props, ['small', 'extraSmall'])
+}
+
+/**
+ * Gets the icon color based on tab's background
+ * @param {Object} props - Object that hosts the tab props
+ * @returns {String} Contrasting color to use based on tab's color
+ */
+module.exports.getTabIconColor = (props) => {
+  const themeColor = props.tab.get('themeColor') || props.tab.get('computedThemeColor')
+  const activeNonPrivateTab = !props.tab.get('isPrivate') && props.isActive
+  const isPrivateTab = props.tab.get('isPrivate') && (props.isActive || props.tab.get('hoverState'))
+  const defaultColor = isPrivateTab ? styles.color.white100 : styles.color.black100
+
+  return activeNonPrivateTab && props.paintTabs && !!themeColor
+    ? getTextColorForBackground(themeColor)
+    : defaultColor
 }
 
 /**
