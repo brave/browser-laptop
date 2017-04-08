@@ -29,6 +29,10 @@ document.addEventListener('dragenter', () => {
 document.addEventListener('dragleave', (e) => {
   if (!e.clientX && !e.clientY) {
     isDraggingInsideWindow = false
+    appActions.draggedOver({
+      draggingOverKey: -1,
+      draggingOverWindowId: -1
+    })
   }
 }, true)
 
