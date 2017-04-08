@@ -290,6 +290,7 @@ class SyncTab extends ImmutableComponent {
         <a href='https://github.com/brave/sync/wiki/Design' target='_blank'>
           <span className='fa fa-question-circle fundsFAQ' />
         </a>
+        <div className='settingsListTitle syncBetaMessage' data-l10n-id='syncBetaMessage' />
         {
           this.setupError
           ? this.errorContent
