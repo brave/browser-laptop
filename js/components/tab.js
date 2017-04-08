@@ -129,7 +129,8 @@ class Tab extends ImmutableComponent {
         dropWindowId = this.props.dragData.get('dropWindowId') || this.props.dragData.getIn(['dragOverData', 'draggingOverWindowId']) || dropWindowId
       }
       // Disallow dragging a tab into a new window if the window you're dragging from has only 1 tab
-      if (dropWindowId === -1 && windowStore.getFrames().size === 1) {
+      // Also dragging out a pin is not cool, so not allowed!
+      if ((dropWindowId === -1 && windowStore.getFrames().size === 1) || this.frame.get('pinnedLocation')) {
         return
       }
       appActions.tabMoved(this.frame.get('tabId'), frameOpts, browserOpts, dropWindowId)
