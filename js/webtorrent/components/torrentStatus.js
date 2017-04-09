@@ -1,5 +1,9 @@
 const prettierBytes = require('prettier-bytes')
 const React = require('react')
+const cx = require('../../lib/classSet')
+
+const {css} = require('aphrodite/no-important')
+const commonStyles = require('../../../app/renderer/components/styles/commonStyles')
 
 class TorrentStats extends React.Component {
   render () {
@@ -16,7 +20,10 @@ class TorrentStats extends React.Component {
 
     return <div>
       <div data-l10n-id='torrentStatus' className='sectionTitle' />
-      <div className='torrentStats'>
+      <div className={cx({
+        torrentStats: true,
+        [css(commonStyles.userSelectNone)]: true
+      })}>
         {renderStatus()}
         {renderPercentage()}
         {renderSpeeds()}
