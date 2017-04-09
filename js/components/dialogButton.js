@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const PropTypes = require('prop-types')
 const ReactDOM = require('react-dom')
 const ImmutableComponent = require('./immutableComponent')
 
@@ -30,11 +31,11 @@ class DialogButton extends ImmutableComponent {
 }
 
 DialogButton.propTypes = {
-  'data-l10n-id': React.PropTypes.string,
-  onClick: React.PropTypes.func,
-  returnValue: React.PropTypes.bool,
-  returnValueCallback: React.PropTypes.func,
-  text: React.PropTypes.string
+  'data-l10n-id': PropTypes.string,
+  onClick: PropTypes.func,
+  returnValue: PropTypes.bool,
+  returnValueCallback: PropTypes.func,
+  text: PropTypes.string
 }
 
 module.exports = DialogButton

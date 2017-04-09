@@ -5,6 +5,7 @@
 // Controller view which manages the top level immutable state for the app
 
 const React = require('react')
+const PropTypes = require('prop-types')
 const Immutable = require('immutable')
 const windowStore = require('../stores/windowStore')
 const appStoreRenderer = require('../stores/appStoreRenderer')
@@ -117,6 +118,6 @@ class Window extends React.Component {
   }
 }
 
-Window.propTypes = { appState: React.PropTypes.object, frames: React.PropTypes.array, initWindowState: React.PropTypes.object }
+Window.propTypes = { appState: PropTypes.object, frames: PropTypes.array, initWindowState: PropTypes.object }
 
 module.exports = Window
