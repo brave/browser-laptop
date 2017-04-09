@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     whiteSpace: 'nowrap',
     padding: '12px',
-    WebkitUserSelect: 'none',
+    userSelect: 'none',
 
     // lighten(@highlightBlue, 30%);
     ':hover': {

@@ -665,7 +665,7 @@ const styles = StyleSheet.create({
     fontSize: '16px',
     color: '#ff5000',
     cursor: 'default',
-    WebkitUserSelect: 'none'
+    userSelect: 'none'
   },
   list__anchor: {
     color: '#3B3B3B',
@@ -704,7 +704,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     WebkitFontSmoothing: 'antialiased',
     WebkitPrintColorAdjust: 'exact',
-    WebkitUserSelect: 'none',
+    userSelect: 'none',
     width: '805px'
   }
 })

@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     top: '40px',
     cursor: 'default',
     maxWidth: '422px',
-    WebkitUserSelect: 'none'
+    userSelect: 'none'
 
     // Need a general solution
     // See: #7930

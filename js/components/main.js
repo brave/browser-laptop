@@ -1428,7 +1428,7 @@ let styling = {
     border: '0px solid #FFF',
     background: '#555555',
     minWidth: '10px',
-    WebkitUserSelect: 'none'
+    userSelect: 'none'
   },
   lionBadgeRight: {
     left: 'auto',

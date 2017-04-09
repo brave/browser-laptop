@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   },
 
   hintsTitleContainer: {
-    WebkitUserSelect: 'none',
+    userSelect: 'none',
     WebkitAppRegion: 'no-drag',
     fontSize: 'inherit',
     fontWeight: 'normal',

@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
     marginLeft: 'auto',
     marginRight: '5px',
     width: 'auto',
-    WebkitUserSelect: 'none'
+    userSelect: 'none'
   },
   bookmarksToolbar__overflowIndicator: {
     paddingLeft: '6px',
@@ -522,7 +522,6 @@ const styles = StyleSheet.create({
     userSelect: 'none',
     whiteSpace: 'nowrap',
     WebkitAppRegion: 'no-drag',
-    WebkitUserSelect: 'none',
 
     ':hover': {
       background: '#fff',

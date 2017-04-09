@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
 
   listItem: {
     display: 'flex',
-    WebkitUserSelect: 'text'
+    userSelect: 'text'
   },
 
   isDisabled: {
