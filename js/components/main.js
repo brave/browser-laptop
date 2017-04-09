@@ -46,6 +46,7 @@ const LongPressButton = require('./longPressButton')
 const Menubar = require('../../app/renderer/components/menubar')
 const WindowCaptionButtons = require('../../app/renderer/components/windowCaptionButtons')
 const CheckDefaultBrowserDialog = require('../../app/renderer/components/checkDefaultBrowserDialog')
+const ModalsContainer = require('../../app/renderer/components/modals/container')
 
 // Constants
 const appConfig = require('../constants/appConfig')
@@ -365,6 +366,8 @@ class Main extends ImmutableComponent {
     this.registerSwipeListener()
     this.registerWindowLevelShortcuts()
     this.registerCustomTitlebarHandlers()
+
+    appActions.showModal('ledgerBackup')
 
     ipc.on(messages.LEAVE_FULL_SCREEN, this.exitFullScreen.bind(this))
 
@@ -1249,6 +1252,11 @@ class Main extends ImmutableComponent {
           ? <NotificationBar notifications={this.props.appState.get('notifications')}
             activeFrame={activeFrame} />
           : null
+        }
+        {
+          this.props.appState.get('modals') && this.props.appState.get('modals').size
+            ? <ModalsContainer modals={this.props.appState.get('modals')} />
+            : null
         }
         {
           showBookmarksToolbar

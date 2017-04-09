@@ -835,6 +835,26 @@ Update ledger publishers pinned percentages according to the new synopsis
 
 
 
+### showModal(id) 
+
+Shows a modal in the modals container
+
+**Parameters**
+
+**id**: `string`, modal id
+
+
+
+### hideModal(id) 
+
+Hide a modal from the modals container
+
+**Parameters**
+
+**id**: `string`, modal id
+
+
+
 
 * * *
 
