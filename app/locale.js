@@ -239,7 +239,9 @@ var rendererIdentifiers = function () {
     'importSuccess',
     'licenseTextOk',
     'closeFirefoxWarningOk',
-    'importSuccessOk'
+    'importSuccessOk',
+    'connectionError',
+    'unknownError'
   ]
 }
 

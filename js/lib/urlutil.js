@@ -214,7 +214,7 @@ const UrlUtil = {
   isPotentialPhishingUrl: function (url) {
     if (typeof url !== 'string') { return false }
     const protocol = urlParse(url.trim().toLowerCase()).protocol
-    return ['data:', 'blob:', 'javascript:'].includes(protocol)
+    return ['data:', 'blob:'].includes(protocol)
   },
 
   /**

@@ -18,6 +18,12 @@ const messages = {
   SYNC_DEBUG: _, /* @param {string} message */
   /**
    * webview -> browser
+   * indicates that a fatal error occurred during sync setup, meaning that sync
+   * is not running.
+   */
+  SYNC_SETUP_ERROR: _, /* @param {string} error */
+  /**
+   * webview -> browser
    * browser sends GOT_INIT_DATA with the saved values
    */
   GET_INIT_DATA: _,

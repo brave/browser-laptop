@@ -27,12 +27,23 @@ class SyncTab extends ImmutableComponent {
     this.enableRestore = this.enableRestore.bind(this)
   }
 
+  get setupError () {
+    return this.props.syncData.get('setupError')
+  }
+
   get isSetup () {
-    return this.props.syncData.get('seed') instanceof Immutable.List && this.props.syncData.get('seed').size === 32
+    return !this.setupError && this.props.syncData.get('seed') instanceof Immutable.List && this.props.syncData.get('seed').size === 32
   }
 
   get enabled () {
     return getSetting(settings.SYNC_ENABLED, this.props.settings)
+  }
+
+  get errorContent () {
+    return <div className='errorContainer'>
+      <div className='setupError'>{this.setupError}</div>
+      <Button l10nId='syncRetryButton' className='primaryButton' onClick={this.retry.bind(this)} />
+    </div>
   }
 
   get clearDataContent () {
@@ -50,6 +61,9 @@ class SyncTab extends ImmutableComponent {
   }
 
   get setupContent () {
+    if (this.setupError) {
+      return null
+    }
     // displayed before a sync userId has been created
     return <div className='setupContent'>
       <Button l10nId='syncStart' className='primaryButton' onClick={this.props.showOverlay.bind(this, 'syncStart')} />
@@ -210,6 +224,11 @@ class SyncTab extends ImmutableComponent {
     }
   }
 
+  retry () {
+    aboutActions.reloadSyncExtension()
+    window.location.reload()
+  }
+
   setupSyncProfile (isRestoring) {
     this.props.onChangeSetting(settings.SYNC_DEVICE_NAME,
       this.deviceNameInput.value || this.defaultDeviceName)
@@ -272,7 +291,9 @@ class SyncTab extends ImmutableComponent {
           <span className='fa fa-question-circle fundsFAQ' />
         </a>
         {
-          this.isSetup
+          this.setupError
+          ? this.errorContent
+          : this.isSetup
             ? this.postSetupContent
             : this.setupContent
         }

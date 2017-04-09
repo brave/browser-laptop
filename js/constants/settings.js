@@ -75,6 +75,7 @@ const settings = {
   SYNC_TYPE_BOOKMARK: 'sync.type.bookmark',
   SYNC_TYPE_HISTORY: 'sync.type.history',
   SYNC_TYPE_SITE_SETTING: 'sync.type.siteSetting',
+  SYNC_NETWORK_DISABLED: 'sync.network.disabled', // disable network connection to sync server. only used in testing.
   // DEPRECATED settings
   // ########################
   // these constants should not appear outside of this file, ../settings.js, and our tests

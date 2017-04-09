@@ -1131,7 +1131,7 @@ var synopsisNormalizer = (changedPublisher) => {
   underscore.keys(synopsis.publishers).forEach((publisher) => {
     if (!visibleP(publisher)) return
 
-    results.push(underscore.extend({ publisher: publisher }, underscore.omit(synopsis.publishers[publisher], 'window')))
+    results.push(underscore.extend({publisher: publisher}, underscore.omit(synopsis.publishers[publisher], 'window')))
   }, synopsis)
   results = underscore.sortBy(results, (entry) => { return -entry.scores[scorekeeper] })
 
@@ -1177,6 +1177,13 @@ var synopsisNormalizer = (changedPublisher) => {
     })
 
     dataPinned.push(changedObject)
+
+    // sync app store
+    appActions.changeLedgerPinnedPercentages(dataPinned)
+  } else if (dataUnPinned.length === 0 && pinnedTotal < 100) {
+    // when you don't have any unpinned sites and pinned total is less then 100 %
+    dataPinned = normalizePinned(dataPinned, pinnedTotal, 100, false)
+    dataPinned = roundToTarget(dataPinned, 100, 'pinPercentage')
 
     // sync app store
     appActions.changeLedgerPinnedPercentages(dataPinned)

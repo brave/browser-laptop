@@ -734,6 +734,16 @@ Dispatches a message when sync init data needs to be saved
 
 
 
+### setSyncSetupError(error) 
+
+Sets the sync setup error, or null for no error.
+
+**Parameters**
+
+**error**: `string | null`, Sets the sync setup error, or null for no error.
+
+
+
 ### applySiteRecords(records) 
 
 Dispatches a message to apply a batch of site records from Brave Sync
