@@ -7,6 +7,7 @@ const config = require('../constants/config')
 const {tabCloseAction} = require('../../app/common/constants/settingsEnums')
 const urlParse = require('../../app/common/urlParse')
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
+const {isIntermediateAboutPage} = require('../lib/appUrlUtil')
 
 const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
@@ -188,6 +189,27 @@ function getFrameByTabId (windowState, tabId) {
 function getActiveFrame (windowState) {
   const activeFrameIndex = getActiveFrameIndex(windowState)
   return windowState.get('frames').get(activeFrameIndex)
+}
+
+// Returns the same as the active frame's location, but returns the requested
+// URL if it's safe browsing, a cert error page or an error page.
+function getLastCommittedURL (frame) {
+  frame = makeImmutable(frame)
+  if (!frame) {
+    return undefined
+  }
+
+  let location = frame.get('location')
+  const history = getHistory(frame)
+  if (isIntermediateAboutPage(location)) {
+    const parsedUrl = urlParse(location)
+    if (parsedUrl.hash) {
+      location = parsedUrl.hash.split('#')[1]
+    } else if (history.size > 0) {
+      location = history.last()
+    }
+  }
+  return location
 }
 
 function setActiveFrameDisplayIndex (windowState, i) {
@@ -753,5 +775,6 @@ module.exports = {
   activeFrameStatePath,
   frameStatePathForFrame,
   tabStatePath,
-  tabStatePathForFrame
+  tabStatePathForFrame,
+  getLastCommittedURL
 }
