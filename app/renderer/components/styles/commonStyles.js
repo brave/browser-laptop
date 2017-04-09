@@ -157,6 +157,16 @@ const styles = StyleSheet.create({
     paddingRight: 0
   },
 
+  // User select
+  userSelect: {
+    userSelect: 'initial',
+    cursor: 'text'
+  },
+  userSelectNone: {
+    userSelect: 'none',
+    cursor: 'default'
+  },
+
   // notificationBar
   notificationBar: {
     display: 'inline-block',
