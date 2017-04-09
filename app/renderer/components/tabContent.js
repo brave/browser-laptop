@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
   tabTitle: {
     display: 'flex',
     flex: '1',
-    WebkitUserSelect: 'none',
+    userSelect: 'none',
     boxSizing: 'border-box',
     fontSize: globalStyles.fontSize.tabTitle,
     overflow: 'hidden',

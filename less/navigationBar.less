@@ -411,7 +411,7 @@
   .menubar {
     display: flex;
     cursor: default;
-    -webkit-user-select: none;
+    user-select: none;
     flex-grow: 1;
     margin-top: 2px;
     height: 19px;
@@ -516,7 +516,7 @@
       width: @navbarBraveButtonWidth;
       margin-right: @navbarButtonSpacing;
       -webkit-app-region: no-drag;
-      -webkit-user-select: none;
+      user-select: none;
 
       &.braveShieldsDown {
         -webkit-filter: grayscale(100%);
@@ -627,7 +627,7 @@
     transition: margin @transitionDuration ease-in-out;
 
     button {
-      -webkit-user-select: none;
+      user-select: none;
       color: @buttonColor;
       cursor: default;
       border-radius: 4px;
@@ -700,7 +700,7 @@
   box-sizing: border-box;
   padding: 0;
   position: relative;
-  -webkit-user-select: none;
+  user-select: none;
   z-index: @zindexNavigationBar;
 
   // #6253 #6680
@@ -846,7 +846,7 @@
 
     /* Disable selection of button text */
     > span {
-       -webkit-user-select: none;
+       user-select: none;
     }
 
     .inputbar-wrapper {

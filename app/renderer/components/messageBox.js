@@ -148,13 +148,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: '12pt',
     marginBottom: globalStyles.spacing.dialogInsideMargin,
-    '-webkit-user-select': 'text'
+    userSelect: 'text'
   },
   body: {
     marginTop: globalStyles.spacing.dialogInsideMargin,
     minWidth: '425px',
     marginBottom: globalStyles.spacing.dialogInsideMargin,
-    '-webkit-user-select': 'text'
+    userSelect: 'text'
   },
   buttons: {
     display: 'flex',
