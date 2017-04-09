@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const PropTypes = require('prop-types')
 const messages = require('../constants/messages')
 const Immutable = require('immutable')
 const aboutActions = require('./aboutActions')
@@ -82,7 +83,7 @@ class SiteItem extends React.Component {
 }
 
 SiteItem.propTypes = {
-  site: React.PropTypes.string
+  site: PropTypes.string
 }
 
 class PasswordItem extends React.Component {
@@ -161,8 +162,8 @@ class PasswordItem extends React.Component {
 }
 
 PasswordItem.propTypes = {
-  password: React.PropTypes.object,
-  id: React.PropTypes.number
+  password: PropTypes.object,
+  id: PropTypes.number
 }
 
 class AboutPasswords extends React.Component {

@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const PropTypes = require('prop-types')
 const Immutable = require('immutable')
 const ImmutableComponent = require('./immutableComponent')
 const Dialog = require('./dialog')
@@ -129,8 +130,8 @@ class NoScriptInfo extends ImmutableComponent {
 }
 
 NoScriptInfo.propTypes = {
-  frameProps: React.PropTypes.object,
-  onHide: React.PropTypes.func
+  frameProps: PropTypes.object,
+  onHide: PropTypes.func
 }
 
 module.exports = NoScriptInfo

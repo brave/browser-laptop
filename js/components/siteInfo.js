@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const PropTypes = require('prop-types')
 const ImmutableComponent = require('./immutableComponent')
 const cx = require('../lib/classSet')
 const {isPotentialPhishingUrl} = require('../lib/urlutil')
@@ -228,8 +229,8 @@ class SiteInfo extends ImmutableComponent {
 }
 
 SiteInfo.propTypes = {
-  frameProps: React.PropTypes.object,
-  onHide: React.PropTypes.func
+  frameProps: PropTypes.object,
+  onHide: PropTypes.func
 }
 
 const styles = StyleSheet.create({
