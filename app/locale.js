@@ -231,6 +231,7 @@ var rendererIdentifiers = function () {
     'downloadItemClear',
     'downloadToolbarHide',
     'downloadItemClearCompleted',
+    'l10nWebtorrentDesc',
     // Caption buttons in titlebar (min/max/close - Windows only)
     'windowCaptionButtonMinimize',
     'windowCaptionButtonMaximize',
