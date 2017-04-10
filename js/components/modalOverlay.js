@@ -47,21 +47,20 @@ class ModalOverlay extends ImmutableComponent {
     var button = null
     var title = null
 
-    let customHeaderClassesStr = (this.props.customHeaderClasses ? this.props.customHeaderClasses : '')
+    let customTitleClassesStr = (this.props.customTitleClasses ? this.props.customTitleClasses : '')
+    let customDialogClassesStr = (this.props.customDialogClasses ? this.props.customDialogClasses : '')
 
     if (!this.props.emptyDialog) {
       close = (this.props.onHide ? <button type='button' className='close' onClick={this.props.onHide} /> : null)
       title = (this.props.title ? <div className={cx({
         sectionTitle: true,
-        [customHeaderClassesStr]: true
+        [customTitleClassesStr]: true
       })} data-l10n-id={this.props.title} /> : null)
     }
 
-    let customTitleClassesStr = (this.props.customTitleClasses ? this.props.customTitleClasses : '')
-
     return <div className={cx({
       dialog: true,
-      [customTitleClassesStr]: true
+      [customDialogClassesStr]: true
     })}>
       <div className='dialog-header'>
         {close}
@@ -77,7 +76,12 @@ class ModalOverlay extends ImmutableComponent {
   }
 
   render () {
-    return <div className={'modal fade' + (this.state.last ? ' last' : '') + (this.props.transparentBackground ? ' transparentBackground' : '')} role='alert'>
+    return <div className={cx({
+      modal: true,
+      fade: true,
+      last: this.state.last,
+      transparentBackground: this.props.transparentBackground
+    })} role='alert'>
       {this.dialogContent}
     </div>
   }

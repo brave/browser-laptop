@@ -101,8 +101,8 @@ class PaymentsTab extends ImmutableComponent {
         this.enabled && this.props.paymentHistoryOverlayVisible
           ? <ModalOverlay
             title={'paymentHistoryTitle'}
-            customHeaderClasses={css(styles.paymentHistoryOverlay__title)}
-            customTitleClasses={'paymentHistory'}
+            customDialogClasses={'paymentHistory'}
+            customTitleClasses={css(styles.paymentHistoryOverlay__title)}
             content={<HistoryContent
               ledgerData={this.props.ledgerData}
             />}
