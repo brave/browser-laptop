@@ -14,6 +14,7 @@ const extensionState = require('./common/state/extensionState')
 const appActions = require('../js/actions/appActions')
 const fs = require('fs')
 const path = require('path')
+const l10n = require('../js/l10n')
 
 // Takes Content Security Policy flags, for example { 'default-src': '*' }
 // Returns a CSP string, for example 'default-src: *;'
@@ -193,6 +194,7 @@ let generateTorrentManifest = () => {
 
   return {
     name: 'Torrent Viewer',
+    description: l10n.translation('l10nWebtorrentDesc'),
     manifest_version: 2,
     version: '1.0',
     content_security_policy: concatCSP(cspDirectives),
