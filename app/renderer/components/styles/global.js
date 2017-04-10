@@ -141,9 +141,10 @@ const globalStyles = {
     switchNubShadow: '1px 1px 5px -2px black',
     buttonShadow: '0px 1px 5px -1px rgba(0, 0, 0, 1.0)',
     dialogShadow: '0px 8px 22px 0px rgba(0, 0, 0, .5)',
+    flyoutDialogBoxShadow: '2px 2px 8px rgba(59, 59, 59, 1.0)',
     softBoxShadow: '0 4px 8px lightGray',
     lightBoxShadow: '0 2px 2px lightGray',
-    insetShadow: 'inset -5px 0 15px rgba(0,0,0,0.25)',
+    insetShadow: 'inset -5px 0 15px rgba(0, 0, 0, 0.25)',
     orangeButtonShadow: '0 2px 0 braveDarkOrange'
   },
   transition: {
