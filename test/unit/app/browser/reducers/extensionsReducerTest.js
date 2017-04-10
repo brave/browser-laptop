@@ -39,7 +39,7 @@ describe('extensionsReducer', function () {
       useCleanCache: true
     })
     mockery.registerMock('electron', fakeElectron)
-    mockery.registerMock('../../../tools/lib/rimraf', fakeRimraf)
+    mockery.registerMock('rimraf', fakeRimraf)
     extensionsReducer = require('../../../../../app/browser/reducers/extensionsReducer')
   })
 
