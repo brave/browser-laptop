@@ -8,7 +8,7 @@ const electron = require('electron')
 const app = electron.app
 
 const path = require('path')
-const rimraf = require('../../../tools/lib/rimraf')
+const rimraf = require('rimraf')
 
 const extensionState = require('../../common/state/extensionState')
 const ExtensionConstants = require('../../common/constants/extensionConstants')
