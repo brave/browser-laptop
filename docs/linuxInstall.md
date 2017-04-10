@@ -38,11 +38,23 @@ wget -O brave.deb https://laptop-updates.brave.com/latest/dev/ubuntu64
 sudo dpkg -i ./brave.deb
 ```
 
+If there are dependency errors during `dpkg -i`, the following command will
+install the dependency for you:
+```
+sudo apt-get -f install
+```
+
 ## Mint AMD64:
 
 ```
 wget -O brave.deb https://laptop-updates.brave.com/latest/mint64
 sudo dpkg -i ./brave.deb
+```
+
+If there are dependency errors during `dpkg -i`, the following command will
+install the dependency for you:
+```
+sudo apt-get -f install
 ```
 
 ## Fedora x86_64:
