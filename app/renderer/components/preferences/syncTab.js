@@ -284,11 +284,14 @@ class SyncTab extends ImmutableComponent {
         ? <ModalOverlay title={'syncReset'} content={this.resetOverlayContent} footer={this.resetOverlayFooter} onHide={this.props.hideOverlay.bind(this, 'syncReset')} />
         : null
       }
-      <div className='sectionTitle' data-l10n-id='syncTitle' />
+      <div className='sectionTitleWrapper'>
+        <span className='sectionTitle' data-l10n-id='syncTitle' />
+        <span className='sectionSubTitle'>beta</span>
+      </div>
       <div className='settingsListContainer'>
         <span className='settingsListTitle syncTitleMessage' data-l10n-id='syncTitleMessage' />
         <a href='https://github.com/brave/sync/wiki/Design' target='_blank'>
-          <span className='fa fa-question-circle fundsFAQ' />
+          <span className='fa fa-question-circle' />
         </a>
         <div className='settingsListTitle syncBetaMessage' data-l10n-id='syncBetaMessage' />
         {
