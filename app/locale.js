@@ -220,6 +220,7 @@ var rendererIdentifiers = function () {
     'noThanks',
     'neverForThisSite',
     'passwordsManager',
+    'extensionsManager',
     'downloadItemPause',
     'downloadItemResume',
     'downloadItemCancel',

@@ -250,6 +250,24 @@ module.exports.downloadsMenuItem = () => {
   }
 }
 
+module.exports.extensionsMenuItem = () => {
+  return {
+    label: locale.translation('extensionsManager'),
+    click: (item, focusedWindow) => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        appActions.newWindow(Immutable.fromJS({
+          location: 'about:preferences#extensions'
+        }))
+      } else {
+        appActions.maybeCreateTabRequested({
+          url: 'about:preferences#extensions',
+          windowId: getCurrentWindowId()
+        })
+      }
+    }
+  }
+}
+
 module.exports.passwordsMenuItem = () => {
   return {
     label: locale.translation('passwordsManager'),
