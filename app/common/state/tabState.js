@@ -4,6 +4,10 @@
 
 const { makeImmutable, isMap, isList } = require('./immutableUtil')
 const assert = require('assert')
+const frameState = require('./frameState')
+const windowState = require('./windowState')
+// this file should eventually replace frameStateUtil
+const frameStateUtil = require('../../../js/state/frameStateUtil')
 
 const validateId = function (propName, id) {
   assert.ok(id, `${propName} cannot be null`)
@@ -55,6 +59,12 @@ const tabState = {
   queryTab: (state, queryInfo) => {
     state = validateState(state)
     return state.get('tabs').filter(matchTab.bind(null, queryInfo)).get(0)
+  },
+
+  TAB_ID_NONE: -1,
+
+  validateTabId: (tabId) => {
+    validateId('tabId', tabId)
   },
 
   getTabIndex: (state, tabValue) => {
@@ -156,10 +166,26 @@ const tabState = {
     return state.get('tabs').filter((tab) => tab.get('windowId') === windowId)
   },
 
-  getByTabId: (state, tabId) => {
-    validateId('tabId', tabId)
+  getPathByTabId: (state, tabId) => {
+    tabId = validateId('tabId', tabId)
     state = validateState(state)
-    return state.get('tabs').find((tab) => tab.get('tabId') === tabId)
+
+    const index = state.get('tabs').findIndex((tab) => tab.get('tabId') === tabId)
+    if (index === -1) {
+      return makeImmutable(['nosuchpath'])
+    }
+    return makeImmutable(['tabs', index])
+  },
+
+  getByTabId: (state, tabId) => {
+    tabId = validateId('tabId', tabId)
+    state = validateState(state)
+
+    if (tabId === tabState.TAB_ID_NONE) {
+      return null
+    }
+
+    return state.getIn(tabState.getPathByTabId(state, tabId))
   },
 
   getTab: (state, tabValue) => {
@@ -239,6 +265,88 @@ const tabState = {
 
     tabValue = tabValue.set('frame', makeImmutable(action.get('frame')))
     return tabState.updateTabValue(state, tabValue)
+  },
+
+  getTabPropertyByTabId: (state, tabId, property) => {
+    state = validateState(state)
+    tabId = validateId('tabId', tabId)
+    const tab = tabState.getByTabId(state, tabId)
+    assert.ok(tab, `Could not find tab for ${tabId}`)
+    return tab.get(property)
+  },
+
+  windowId: (state, tabId) => {
+    return tabState.getTabPropertyByTabId(state, tabId, 'windowId') || windowState.WINDOW_ID_NONE
+  },
+
+  canGoForward: (state, tabId) => {
+    return tabState.getTabPropertyByTabId(state, tabId, 'canGoForward') || false
+  },
+
+  canGoBack: (state, tabId) => {
+    return tabState.getTabPropertyByTabId(state, tabId, 'canGoBack') || false
+  },
+
+  isShowingMessageBox: (state, tabId) => {
+    return tabState.getTabPropertyByTabId(state, tabId, 'messageBoxDetail') || false
+  },
+
+  getTitle: (state, tabId) => {
+    return tabState.getTabPropertyByTabId(state, tabId, 'title') || ''
+  },
+
+  isActive: (state, tabId) => {
+    return tabState.getTabPropertyByTabId(state, tabId, 'active') || false
+  },
+
+  getFramePathByTabId: (state, tabId) => {
+    state = makeImmutable(state)
+    tabId = validateId('tabId', tabId)
+    if (state.get('tabs')) {
+      return tabState.getPathByTabId(state, tabId).push('frame')
+    } else {
+      return frameState.getPathByTabId(state, tabId)
+    }
+  },
+
+  getActiveTabId: (state) => {
+    state = validateState(state)
+    const tab = state.get('tabs').find((tab) => tab.get('active') === true)
+    return tab ? tab.get('tabId') : tabState.TAB_ID_NONE
+  },
+
+  getFrameByTabId: (state, tabId) => {
+    return state.getIn(tabState.getFramePathByTabId(state, tabId))
+  },
+
+  isSecure: (state, tabId) => {
+    const frame = tabState.getFrameByTabId(state, tabId)
+    return frameStateUtil.isFrameSecure(frame)
+  },
+
+  isLoading: (state, tabId) => {
+    const frame = tabState.getFrameByTabId(state, tabId)
+    return frameStateUtil.isFrameLoading(frame)
+  },
+
+  startLoadTime: (state, tabId) => {
+    const frame = tabState.getFrameByTabId(state, tabId)
+    return frameStateUtil.startLoadTime(frame)
+  },
+
+  endLoadTime: (state, tabId) => {
+    const frame = tabState.getFrameByTabId(state, tabId)
+    return frameStateUtil.endLoadTime(frame)
+  },
+
+  getHistory: (state, tabId) => {
+    const frame = tabState.getFrameByTabId(state, tabId)
+    return frameStateUtil.getHistory(frame)
+  },
+
+  getLocation: (state, tabId) => {
+    const frame = tabState.getFrameByTabId(state, tabId)
+    return (frame && frame.get('location')) || ''
   },
 
   getPersistentState: (state) => {
