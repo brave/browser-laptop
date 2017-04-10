@@ -3,26 +3,26 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const urlParse = require('../../common/urlParse')
+const urlParse = require('../../../common/urlParse')
 
-const ImmutableComponent = require('../../../js/components/immutableComponent')
-const windowActions = require('../../../js/actions/windowActions')
-const appActions = require('../../../js/actions/appActions')
-const KeyCodes = require('../../common/constants/keyCodes')
-const cx = require('../../../js/lib/classSet')
-const debounce = require('../../../js/lib/debounce')
+const ImmutableComponent = require('../../../../js/components/immutableComponent')
+const windowActions = require('../../../../js/actions/windowActions')
+const appActions = require('../../../../js/actions/appActions')
+const KeyCodes = require('../../../common/constants/keyCodes')
+const cx = require('../../../../js/lib/classSet')
+const debounce = require('../../../../js/lib/debounce')
 const ipc = require('electron').ipcRenderer
 
 const UrlBarSuggestions = require('./urlBarSuggestions')
 const UrlBarIcon = require('./urlBarIcon')
-const messages = require('../../../js/constants/messages')
-const {getSetting} = require('../../../js/settings')
-const settings = require('../../../js/constants/settings')
-const contextMenus = require('../../../js/contextMenus')
-const windowStore = require('../../../js/stores/windowStore')
-const UrlUtil = require('../../../js/lib/urlutil')
-const {eventElHasAncestorWithClasses, isForSecondaryAction} = require('../../../js/lib/eventUtil')
-const {isUrl, isIntermediateAboutPage} = require('../../../js/lib/appUrlUtil')
+const messages = require('../../../../js/constants/messages')
+const {getSetting} = require('../../../../js/settings')
+const settings = require('../../../../js/constants/settings')
+const contextMenus = require('../../../../js/contextMenus')
+const windowStore = require('../../../../js/stores/windowStore')
+const UrlUtil = require('../../../../js/lib/urlutil')
+const {eventElHasAncestorWithClasses, isForSecondaryAction} = require('../../../../js/lib/eventUtil')
+const {isUrl, isIntermediateAboutPage} = require('../../../../js/lib/appUrlUtil')
 
 class UrlBar extends ImmutableComponent {
   constructor () {
@@ -104,7 +104,7 @@ class UrlBar extends ImmutableComponent {
   getPlatformClientId (provider) {
     try {
       if (provider.get('platformClientId')) {
-        const platformUtil = require('../../common/lib/platformUtil')
+        const platformUtil = require('../../../common/lib/platformUtil')
         if (platformUtil.isWindows()) {
           return provider.getIn(['platformClientId', 'win32']) || ''
         } else if (platformUtil.isDarwin()) {

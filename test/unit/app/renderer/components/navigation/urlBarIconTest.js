@@ -9,7 +9,7 @@ const {mount} = require('enzyme')
 const sinon = require('sinon')
 const assert = require('assert')
 let UrlBarIcon, windowActions
-require('../../../braveUnit')
+require('../../../../braveUnit')
 
 describe('UrlBarIcon component unit tests', function () {
   before(function () {
@@ -18,9 +18,9 @@ describe('UrlBarIcon component unit tests', function () {
       warnOnUnregistered: false,
       useCleanCache: true
     })
-    mockery.registerMock('electron', require('../../../lib/fakeElectron'))
-    UrlBarIcon = require('../../../../../app/renderer/components/urlBarIcon')
-    windowActions = require('../../../../../js/actions/windowActions')
+    mockery.registerMock('electron', require('../../../../lib/fakeElectron'))
+    UrlBarIcon = require('../../../../../../app/renderer/components/navigation/urlBarIcon')
+    windowActions = require('../../../../../../js/actions/windowActions')
   })
 
   after(function () {

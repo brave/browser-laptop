@@ -7,10 +7,10 @@ const mockery = require('mockery')
 const {mount} = require('enzyme')
 const assert = require('assert')
 const sinon = require('sinon')
-const fakeElectron = require('../../../lib/fakeElectron')
-const suggestionTypes = require('../../../../../js/constants/suggestionTypes')
+const fakeElectron = require('../../../../lib/fakeElectron')
+const suggestionTypes = require('../../../../../../js/constants/suggestionTypes')
 let UrlBarSuggestionItem
-require('../../../braveUnit')
+require('../../../../braveUnit')
 
 describe('UrlBarSuggestionItem component', function () {
   before(function () {
@@ -20,7 +20,7 @@ describe('UrlBarSuggestionItem component', function () {
       useCleanCache: true
     })
     mockery.registerMock('electron', fakeElectron)
-    UrlBarSuggestionItem = require('../../../../../app/renderer/components/urlBarSuggestionItem')
+    UrlBarSuggestionItem = require('../../../../../../app/renderer/components/navigation/urlBarSuggestionItem')
   })
   after(function () {
     mockery.disable()
