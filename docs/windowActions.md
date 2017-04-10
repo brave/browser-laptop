@@ -675,16 +675,6 @@ Sets the fullscreen state of the window
 
 
 
-### setMouseInTitlebar(mouseInTitlebar) 
-
-Dispatches a message to indicate if the mouse is in the titlebar
-
-**Parameters**
-
-**mouseInTitlebar**: `boolean`, true if the mouse is in the titlebar
-
-
-
 ### setSiteInfoVisible(isVisible) 
 
 Dispatches a message to indicate the site info, such as # of blocked ads, should be shown

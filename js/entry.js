@@ -48,7 +48,8 @@ if (process.env.NODE_ENV === 'test') {
   electron.testData = {
     appStoreRenderer,
     windowActions,
-    windowStore
+    windowStore,
+    currentWindowId: require('../app/renderer/currentWindow').currentWindowId
   }
 }
 

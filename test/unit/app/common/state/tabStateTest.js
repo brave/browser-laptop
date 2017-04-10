@@ -11,6 +11,10 @@ const defaultAppState = Immutable.fromJS({
   otherProp: true
 })
 
+const defaultWindowState = Immutable.fromJS({
+  frames: []
+})
+
 const shouldValidateId = function (cb) {
   it('throws an AssertionError if tabId is not a number', function () {
     assert.throws(
@@ -693,6 +697,166 @@ describe('tabState unit tests', function () {
 
     shouldValidateTabState((state) => {
       tabState.setTabs(state, [])
+    })
+  })
+
+  describe('canGoForward', function () {
+    before(function () {
+      this.appState = defaultAppState.set('tabs', Immutable.fromJS([
+        { tabId: 1, canGoForward: true },
+        { tabId: 2, canGoForward: false },
+        { tabId: 3 }
+      ]))
+    })
+
+    it('returns the value of `canGoForward` for the tab matching `tabId`', function () {
+      assert.equal(tabState.canGoForward(this.appState, 1), true)
+      assert.equal(tabState.canGoForward(this.appState, 2), false)
+    })
+
+    it('returns false if `canGoForward` is missing the tab matching `tabId`', function () {
+      assert.equal(tabState.canGoForward(this.appState, 3), false)
+    })
+
+    it('returns false if `tabId` does not exist', function () {
+      assert.equal(tabState.canGoForward(this.appState, 4), false)
+    })
+
+    shouldValidateTabState((state) => {
+      tabState.canGoForward(state, 1)
+    })
+
+    shouldValidateId((tabId) => {
+      tabState.canGoForward(defaultAppState, tabId)
+    })
+  })
+
+  describe('canGoBack', function () {
+    before(function () {
+      this.appState = defaultAppState.set('tabs', Immutable.fromJS([
+        { tabId: 1, canGoBack: true },
+        { tabId: 2, canGoBack: false },
+        { tabId: 3 }
+      ]))
+    })
+
+    it('returns the value of `canGoBack` for the tab matching `tabId`', function () {
+      assert.equal(tabState.canGoBack(this.appState, 1), true)
+      assert.equal(tabState.canGoBack(this.appState, 2), false)
+    })
+
+    it('returns false if `canGoBack` is missing the tab matching `tabId`', function () {
+      assert.equal(tabState.canGoBack(this.appState, 3), false)
+    })
+
+    it('returns false if `tabId` does not exist', function () {
+      assert.equal(tabState.canGoBack(this.appState, 4), false)
+    })
+
+    shouldValidateTabState((state) => {
+      tabState.canGoBack(state, 1)
+    })
+
+    shouldValidateId((tabId) => {
+      tabState.canGoBack(defaultAppState, tabId)
+    })
+  })
+
+  describe('canGoBack', function () {
+    before(function () {
+      this.appState = defaultAppState.set('tabs', Immutable.fromJS([
+        { tabId: 1, canGoBack: true },
+        { tabId: 2, canGoBack: false },
+        { tabId: 3 }
+      ]))
+    })
+
+    it('returns the value of `canGoBack` for the tab matching `tabId`', function () {
+      assert.equal(tabState.canGoBack(this.appState, 1), true)
+      assert.equal(tabState.canGoBack(this.appState, 2), false)
+    })
+
+    it('returns false if `canGoBack` is missing the tab matching `tabId`', function () {
+      assert.equal(tabState.canGoBack(this.appState, 3), false)
+    })
+
+    it('returns false if `tabId` does not exist', function () {
+      assert.equal(tabState.canGoBack(this.appState, 4), false)
+    })
+
+    shouldValidateTabState((state) => {
+      tabState.canGoBack(state, 1)
+    })
+
+    shouldValidateId((tabId) => {
+      tabState.canGoBack(defaultAppState, tabId)
+    })
+  })
+
+  describe('isSecure', function () {
+    before(function () {
+      this.appState = defaultAppState.set('tabs', Immutable.fromJS([
+        { tabId: 1, frame: { security: { isSecure: 1 } } },
+        { tabId: 2, frame: { security: { isSecure: false } } },
+        { tabId: 3, frame: { security: { isSecure: true } } },
+        { tabId: 4, frame: { security: { blah: true } } },
+        { tabId: 5 }
+      ]))
+    })
+
+    it('returns the value of `isSecure` for the frame with `tabId`', function () {
+      assert.equal(tabState.isSecure(this.appState, 1), 1)
+      assert.equal(tabState.isSecure(this.appState, 2), false)
+      assert.equal(tabState.isSecure(this.appState, 3), true)
+    })
+
+    it('returns false for the frame with `tabId` if `isSecure` is not set', function () {
+      assert.equal(tabState.isSecure(this.appState, 4), false)
+      assert.equal(tabState.isSecure(this.appState, 5), false)
+    })
+
+    it('returns false if a frame with `tabId` does not exist', function () {
+      assert.equal(tabState.isSecure(this.appState, 6), false)
+    })
+  })
+
+  describe('getFrameByTabid', function () {
+    before(function () {
+      this.appState = defaultWindowState.set('tabs', Immutable.fromJS([
+        { tabId: 1, frame: { loading: true } },
+        { tabId: 2, frame: { } },
+        { tabId: 3 }
+      ]))
+    })
+
+    describe('no currentWindow', function () {
+      it('returns the frame for the tab matching `tabId`', function () {
+        assert.deepEqual(tabState.getFrameByTabId(this.appState, 1), Immutable.fromJS({ loading: true }))
+        assert.deepEqual(tabState.getFrameByTabId(this.appState, 2), Immutable.fromJS({ }))
+      })
+
+      it('returns null if there is no frame for `tabId`', function () {
+        assert.equal(tabState.getFrameByTabId(this.appState, 3), null)
+        assert.equal(tabState.getFrameByTabId(this.appState, 4), null)
+      })
+    })
+
+    describe('with currentWindow', function () {
+      before(function () {
+        this.appStateWithCurrentWindow = this.appState.setIn(['currentWindow', 'frames'], Immutable.fromJS([
+          { tabId: 1, loading: false },
+          { tabId: 2 }
+        ]))
+      })
+
+      it('returns the frame from currentWindow matching `tabId`', function () {
+        assert.deepEqual(tabState.getFrameByTabId(this.appStateWithCurrentWindow, 1), Immutable.fromJS({ tabId: 1, loading: false }))
+        assert.deepEqual(tabState.getFrameByTabId(this.appStateWithCurrentWindow, 2), Immutable.fromJS({ tabId: 2 }))
+      })
+
+      it('returns null if there is no frame for `tabId`', function () {
+        assert.equal(tabState.getFrameByTabId(this.appStateWithCurrentWindow, 3), null)
+      })
     })
   })
 })

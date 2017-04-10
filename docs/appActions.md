@@ -497,6 +497,18 @@ Autofill data changed
 
 
 
+### mouseInTitlebar(windowId, mouseInTitlebar) 
+
+Dispatches a message to indicate if the mouse is in the titlebar
+
+**Parameters**
+
+**windowId**: `Number`, the unique id of the window
+
+**mouseInTitlebar**: `boolean`, true if the mouse is in the titlebar
+
+
+
 ### windowBlurred(windowId) 
 
 Dispatches a message when appWindowId loses focus

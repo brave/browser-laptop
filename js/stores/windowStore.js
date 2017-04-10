@@ -33,7 +33,6 @@ let windowState = Immutable.fromJS({
   ui: {
     tabs: {
     },
-    mouseInTitlebar: false,
     menubar: {
     }
   },
@@ -93,7 +92,7 @@ class WindowStore extends EventEmitter {
 }
 
 const addToHistory = (frameProps) => {
-  let history = frameProps.get('history') || Immutable.fromJS([])
+  let history = frameStateUtil.getHistory(frameProps)
   if (!aboutUrls.get(frameProps.get('location'))) {
     history = history.push(frameProps.get('location'))
   }
@@ -528,9 +527,6 @@ const doAction = (action) => {
       break
     case windowConstants.WINDOW_SET_FULLSCREEN_STATE:
       windowState = windowState.setIn(['ui', 'isFullScreen'], action.isFullScreen)
-      break
-    case windowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR:
-      windowState = windowState.setIn(['ui', 'mouseInTitlebar'], action.mouseInTitlebar)
       break
     case windowConstants.WINDOW_SET_NOSCRIPT_VISIBLE:
       windowState = windowState.setIn(['ui', 'noScriptInfo', 'isVisible'], action.isVisible)

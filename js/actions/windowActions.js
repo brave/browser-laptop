@@ -837,18 +837,6 @@ const windowActions = {
   },
 
   /**
-   * Dispatches a message to indicate if the mouse is in the titlebar
-   *
-   * @param {boolean} mouseInTitlebar - true if the mouse is in the titlebar
-   */
-  setMouseInTitlebar: function (mouseInTitlebar) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR,
-      mouseInTitlebar
-    })
-  },
-
-  /**
    * Dispatches a message to indicate the site info, such as # of blocked ads, should be shown
    *
    * @param {boolean} isVisible - true if the site info should be shown

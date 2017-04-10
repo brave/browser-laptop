@@ -26,6 +26,7 @@ const {Favicon, AudioTabIcon, NewSessionIcon,
       PrivateIcon, TabTitle, CloseTabIcon} = require('../../app/renderer/components/tabContent')
 const {getTabBreakpoint, tabUpdateFrameRate} = require('../../app/renderer/lib/tabUtil')
 const {isWindows} = require('../../app/common/lib/platformUtil')
+const frameStateUtil = require('../state/frameStateUtil')
 
 class Tab extends ImmutableComponent {
   constructor () {
@@ -127,7 +128,7 @@ class Tab extends ImmutableComponent {
 
   get loading () {
     return this.frame &&
-    (this.props.tab.get('loading') ||
+    (frameStateUtil.isFrameLoading(this.frame) ||
      this.props.tab.get('location') === 'about:blank') &&
     (!this.props.tab.get('provisionalLocation') ||
     !this.props.tab.get('provisionalLocation').startsWith('chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/'))

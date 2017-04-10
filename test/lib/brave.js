@@ -524,11 +524,11 @@ var exports = {
       }, show, key)
     })
 
-    this.app.client.addCommand('setMouseInTitlebar', function (mouseInTitleBar) {
-      logVerbose('showFindbar("' + mouseInTitleBar + '")')
-      return this.execute(function (mouseInTitleBar) {
-        devTools('electron').testData.windowActions.setMouseInTitlebar(mouseInTitleBar)
-      }, mouseInTitleBar)
+    this.app.client.addCommand('setMouseInTitlebar', function (mouseInTitlebar) {
+      logVerbose('showFindbar("' + mouseInTitlebar + '")')
+      return this.execute(function (mouseInTitlebar) {
+        devTools('appActions').mouseInTitlebar(devTools('electron').testData.currentWindowId, mouseInTitlebar)
+      }, mouseInTitlebar)
     })
 
     this.app.client.addCommand('openBraveMenu', function (braveMenu, braveryPanel) {
