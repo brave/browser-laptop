@@ -9,7 +9,7 @@ const {shallow} = require('enzyme')
 const assert = require('assert')
 const Immutable = require('immutable')
 let NavigationBar, UrlBar
-require('../../braveUnit')
+require('../../../../braveUnit')
 
 describe('NavigationBar component unit tests', function () {
   before(function () {
@@ -22,9 +22,9 @@ describe('NavigationBar component unit tests', function () {
     mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_yes_verified.svg', {})
     mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_no.svg', {})
     mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_yes.svg', {})
-    mockery.registerMock('electron', require('../../lib/fakeElectron'))
-    NavigationBar = require('../../../../js/components/navigationBar')
-    UrlBar = require('../../../../app/renderer/components/urlBar')
+    mockery.registerMock('electron', require('../../../../lib/fakeElectron'))
+    NavigationBar = require('../../../../../../app/renderer/components/navigation/navigationBar')
+    UrlBar = require('../../../../../../app/renderer/components/navigation/urlBar')
   })
 
   after(function () {

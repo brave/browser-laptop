@@ -9,7 +9,7 @@ const {shallow} = require('enzyme')
 const assert = require('assert')
 const Immutable = require('immutable')
 let UrlBar, UrlBarIcon
-require('../../../braveUnit')
+require('../../../../braveUnit')
 
 describe('UrlBar component unit tests', function () {
   before(function () {
@@ -22,9 +22,9 @@ describe('UrlBar component unit tests', function () {
     mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_yes_verified.svg', {})
     mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_no.svg', {})
     mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_yes.svg', {})
-    mockery.registerMock('electron', require('../../../lib/fakeElectron'))
-    UrlBar = require('../../../../../app/renderer/components/urlBar')
-    UrlBarIcon = require('../../../../../app/renderer/components/urlBarIcon')
+    mockery.registerMock('electron', require('../../../../lib/fakeElectron'))
+    UrlBar = require('../../../../../../app/renderer/components/navigation/urlBar')
+    UrlBarIcon = require('../../../../../../app/renderer/components/navigation/urlBarIcon')
   })
 
   after(function () {

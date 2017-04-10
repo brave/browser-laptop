@@ -25,7 +25,7 @@ describe('Main component unit tests', function () {
     mockery.registerMock('../../extensions/brave/img/tabs/new_session.svg')
     mockery.registerMock('electron', require('../../lib/fakeElectron'))
     Main = require('../../../../js/components/main')
-    NavigationBar = require('../../../../js/components/navigationBar')
+    NavigationBar = require('../../../../app/renderer/components/navigation/navigationBar')
   })
 
   after(function () {

@@ -3,15 +3,15 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('../../../js/components/immutableComponent')
-const windowActions = require('../../../js/actions/windowActions')
-const cx = require('../../../js/lib/classSet')
-const dragTypes = require('../../../js/constants/dragTypes')
-const dndData = require('../../../js/dndData')
-const {isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
-const {isPotentialPhishingUrl} = require('../../../js/lib/urlutil')
-const windowStore = require('../../../js/stores/windowStore')
-const {getActiveFrame} = require('../../../js/state/frameStateUtil')
+const ImmutableComponent = require('../../../../js/components/immutableComponent')
+const windowActions = require('../../../../js/actions/windowActions')
+const cx = require('../../../../js/lib/classSet')
+const dragTypes = require('../../../../js/constants/dragTypes')
+const dndData = require('../../../../js/dndData')
+const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
+const {isPotentialPhishingUrl} = require('../../../../js/lib/urlutil')
+const windowStore = require('../../../../js/stores/windowStore')
+const {getActiveFrame} = require('../../../../js/state/frameStateUtil')
 const searchIconSize = 16
 
 class UrlBarIcon extends ImmutableComponent {
