@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     flex: '1',
     alignItems: 'center',
     background: 'transparent',
-    WebkitUserSelect: 'none',
+    userSelect: 'none',
     padding: '11px 11px 11px 17px',
     cursor: 'pointer',
 

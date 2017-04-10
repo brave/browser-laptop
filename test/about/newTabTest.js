@@ -6,7 +6,6 @@ const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 const settings = require('../../js/constants/settings')
 const {newTabMode} = require('../../app/common/constants/settingsEnums')
 const aboutNewTabUrl = getTargetAboutUrl('about:newtab')
-const messages = require('../../js/constants/messages')
 
 describe('about:newtab tests', function () {
   function * setup (client) {
@@ -86,7 +85,7 @@ describe('about:newtab tests', function () {
 
     it('multiple homepages', function * () {
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME)
+        .newTab()
         .waitForUrl(page1)
     })
   })

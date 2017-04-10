@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     cursor: 'default',
     visibility: 'hidden',
 
-    '@media (min-height: 700px)': {
+    '@media (min-height: 750px)': {
       position: 'absolute',
       bottom: '0',
       visibility: 'visible'
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   },
 
   hintsTitleContainer: {
-    WebkitUserSelect: 'none',
+    userSelect: 'none',
     WebkitAppRegion: 'no-drag',
     fontSize: 'inherit',
     fontWeight: 'normal',

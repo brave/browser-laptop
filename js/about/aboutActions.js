@@ -6,6 +6,7 @@ const messages = require('../constants/messages')
 const appDispatcher = require('../dispatcher/appDispatcher')
 const windowConstants = require('../constants/windowConstants')
 const appConstants = require('../constants/appConstants')
+const ExtensionConstants = require('../../app/common/constants/extensionConstants')
 const ipc = window.chrome.ipcRenderer
 
 const aboutActions = {
@@ -98,15 +99,27 @@ const aboutActions = {
   },
 
   /**
+   * Dispatched when an extension has been uninstalled
+   *
+   * @param {string} extensionId - the extension id
+   */
+  extensionUninstalled: function (extensionId) {
+    aboutActions.dispatchAction({
+      actionType: ExtensionConstants.EXTENSION_UNINSTALLED,
+      extensionId
+    })
+  },
+
+  /**
    * Loads a URL in a new frame in a safe way.
    * It is important that it is not a simple anchor because it should not
    * preserve the about preload script. See #672
+   * Opens a new tab and loads the specified URL.
    */
-  newFrame: function (frameOpts, openInForeground = true) {
+  createTabRequested: function (createProperties) {
     aboutActions.dispatchAction({
-      actionType: windowConstants.WINDOW_NEW_FRAME,
-      frameOpts,
-      openInForeground
+      actionType: appConstants.APP_CREATE_TAB_REQUESTED,
+      createProperties
     })
   },
 

@@ -6,6 +6,7 @@ const styles = require('../components/styles/global')
 const frameStateUtil = require('../../../js/state/frameStateUtil')
 const settings = require('../../../js/constants/settings')
 const getSetting = require('../../../js/settings').getSetting
+const {getTextColorForBackground} = require('../../../js/lib/color')
 
 /**
  * Get tab's breakpoint name for current tab size.
@@ -51,6 +52,16 @@ module.exports.hasRelativeCloseIcon = (props) => {
 }
 
 /**
+ * Check whether or not private or newSession icon should be visible
+ * @param {Object} props - Object that hosts the tab props
+ * @returns {Boolean} Whether or not private or newSession icon should be visible
+ */
+module.exports.hasVisibleSecondaryIcon = (props) => {
+  return !props.tab.get('hoverState') &&
+    !module.exports.hasBreakpoint(props, ['small', 'extraSmall', 'smallest'])
+}
+
+/**
  * Check whether or not closeTab icon is always visible (fixed) in tab
  * @param {Object} props - Object that hosts the tab props
  * @returns {Boolean} Whether or not the close icon is always visible (fixed)
@@ -60,12 +71,28 @@ module.exports.hasFixedCloseIcon = (props) => {
 }
 
 /**
+ * Gets the icon color based on tab's background
+ * @param {Object} props - Object that hosts the tab props
+ * @returns {String} Contrasting color to use based on tab's color
+ */
+module.exports.getTabIconColor = (props) => {
+  const themeColor = props.tab.get('themeColor') || props.tab.get('computedThemeColor')
+  const activeNonPrivateTab = !props.tab.get('isPrivate') && props.isActive
+  const isPrivateTab = props.tab.get('isPrivate') && (props.isActive || props.tab.get('hoverState'))
+  const defaultColor = isPrivateTab ? styles.color.white100 : styles.color.black100
+
+  return activeNonPrivateTab && props.paintTabs && !!themeColor
+    ? getTextColorForBackground(themeColor)
+    : defaultColor
+}
+
+/**
  * Updates the tab page index to the specified frameProps
  * @param frameProps Any frame belonging to the page
  */
 module.exports.updateTabPageIndex = (state, frameProps) => {
   // No need to update tab page index if we are given a pinned frame
-  if (frameProps.get('pinnedLocation')) {
+  if (!frameProps || frameProps.get('pinnedLocation')) {
     return state
   }
 

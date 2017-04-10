@@ -10,6 +10,7 @@ const getSetting = require('../../../js/settings').getSetting
 const {changeSetting} = require('../lib/settingsUtil')
 const SwitchControl = require('../../../js/components/switchControl')
 const cx = require('../../../js/lib/classSet')
+const settings = require('../../../js/constants/settings')
 
 class SettingsList extends ImmutableComponent {
   render () {
@@ -58,10 +59,20 @@ class SettingCheckbox extends ImmutableComponent {
   }
 
   onClick (e) {
+    if (this.props.forPassword) {
+      // You can only have one active password manager
+      // if user decide to disable all,
+      // switch back password to unmanaged (null)
+      e.target.value
+        ? aboutActions.changeSetting(settings.ACTIVE_PASSWORD_MANAGER, this.props.prefKey)
+        : aboutActions.changeSetting(settings.ACTIVE_PASSWORD_MANAGER, void (0))
+    }
     if (this.props.disabled) {
       return
     }
-    return this.props.onChange ? this.props.onChange(e) : changeSetting(this.props.onChangeSetting, this.props.prefKey, e)
+    return this.props.onChange
+      ? this.props.onChange(e)
+      : changeSetting(this.props.onChangeSetting, this.props.prefKey, e)
   }
 
   render () {
@@ -93,6 +104,7 @@ class SettingCheckbox extends ImmutableComponent {
       />
       <label className={labelClass}
         data-l10n-id={this.props.dataL10nId}
+        data-l10n-args={this.props.dataL10nArgs}
         htmlFor={this.props.prefKey}
       />
       {this.props.options}

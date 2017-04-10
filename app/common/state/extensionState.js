@@ -4,7 +4,6 @@
 
 const { makeImmutable } = require('./immutableUtil')
 const Immutable = require('immutable')
-const windowConstants = require('../../../js/constants/windowConstants')
 const platformUtil = require('../lib/platformUtil')
 
 const browserActionDefaults = Immutable.fromJS({
@@ -57,20 +56,6 @@ const extensionState = {
   browserActionUpdated: (state, action) => {
     action = makeImmutable(action)
     state = makeImmutable(state)
-    if (action.get('actionType') === windowConstants.WINDOW_SET_NAVIGATED &&
-      action.get('tabId')) {
-      let tabId = action.get('tabId')
-      let extensions = extensionState.getEnabledExtensions(state)
-      extensions && extensions.forEach((extension) => {
-        let tabs = extension.getIn(['browserAction', 'tabs'])
-        if (tabs && tabs.get(tabId)) {
-          tabs = tabs.set(tabId, Immutable.Map())
-          extension = extension.setIn(['browserAction', 'tabs'], tabs)
-          state = state.setIn(['extensions', extension.get('id')], extension)
-        }
-      })
-      return state
-    }
     let extensionId = action.get('extensionId').toString()
     let extension = extensionState.getExtensionById(state, extensionId)
     if (extension && extension.get('browserAction')) {
@@ -115,6 +100,20 @@ const extensionState = {
     state = makeImmutable(state)
     let extensionId = action.get('extensionId').toString()
     return state.setIn(['extensions', extensionId], action.get('installInfo'))
+  },
+
+  extensionUninstalled: (state, action) => {
+    action = makeImmutable(action)
+    state = makeImmutable(state)
+    let extensionId = action.get('extensionId').toString()
+    let extension = extensionState.getExtensionById(state, extensionId)
+    // Since we populate uninstalled extensions with dummyContent,
+    // removing installInfo would just add dummy data instead of removing it
+    // so we add a prop called 'excluded' and use it to hide extension on UI
+    if (extension) {
+      return state.setIn(['extensions', extensionId], extension.set('excluded', true))
+    }
+    return state
   },
 
   extensionEnabled: (state, action) => {

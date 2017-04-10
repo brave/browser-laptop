@@ -22,7 +22,7 @@ describe('navigationBar tests', function () {
 
   function * newFrame (client, frameKey = 2) {
     yield client
-      .ipcSend('shortcut-new-frame')
+      .newTab()
       // wait for correct urlInput based on frameKey
       .waitForTabCount(frameKey)
       .windowByUrl(Brave.browserWindowUrl)
@@ -82,7 +82,7 @@ describe('navigationBar tests', function () {
 
       it('newtab hasfocus in urlbar', function * () {
         yield this.app.client
-          .ipcSend(messages.SHORTCUT_NEW_FRAME)
+          .newTab()
           .waitUntil(function () {
             return this.getWindowState().then((val) => {
               return val.value.frames.length === 2
@@ -94,7 +94,7 @@ describe('navigationBar tests', function () {
       it('newtab with page has focus in webview', function * () {
         var page1Url = Brave.server.url('tabnapping.html')
         yield this.app.client
-          .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
+          .newTab({ url: page1Url })
           .waitUntil(function () {
             return this.getWindowState().then((val) => {
               return val.value.frames.length === 2
@@ -382,7 +382,7 @@ describe('navigationBar tests', function () {
         ))
         .windowByUrl(Brave.browserWindowUrl)
         .click(urlbarIcon)
-        .waitForVisible('[data-l10n-id="insecureConnection"]')
+        .waitForVisible('[data-test-id="insecureConnection"]')
         .keys(Brave.keys.ESCAPE)
     })
     it('Shows phishing URL warning', function * () {
@@ -400,7 +400,7 @@ describe('navigationBar tests', function () {
               classes.includes('fa-exclamation-triangle') && classes.includes('insecure-color')
         ))
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForVisible('[data-l10n-id="phishingConnectionInfo"]')
+        .waitForVisible('[data-test-id="phishingConnectionInfo"]')
         .keys(Brave.keys.ESCAPE)
     })
     it('Shows insecure URL icon in title mode', function * () {
@@ -431,7 +431,7 @@ describe('navigationBar tests', function () {
           ))
         .windowByUrl(Brave.browserWindowUrl)
         .click(urlbarIcon)
-        .waitForVisible('[data-l10n-id="secureConnection"]')
+        .waitForVisible('[data-test-id="secureConnection"]')
         .keys(Brave.keys.ESCAPE)
     })
     it('Shows secure URL icon in title mode', function * () {
@@ -472,7 +472,7 @@ describe('navigationBar tests', function () {
           )
         )
         .click(urlbarIcon)
-        .waitForVisible('[data-l10n-id="partiallySecureConnection"]')
+        .waitForVisible('[data-test-id="partiallySecureConnection"]')
     })
     it('shows insecure icon on a site with a sha-1 cert', function * () {
       const page1Url = 'https://sha1-2017.badssl.com/'
@@ -539,10 +539,10 @@ describe('navigationBar tests', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist(urlbarIcon + '.fa-lock')
         .click(urlbarIcon)
-        .waitForVisible('.runInsecureContentWarning')
+        .waitForVisible('[data-test-id="runInsecureContentWarning"]')
         .waitForVisible(dismissAllowRunInsecureContentButton)
         .waitForVisible(allowRunInsecureContentButton)
-        .waitForVisible('[data-l10n-id="secureConnection"]')
+        .waitForVisible('[data-test-id="secureConnection"]')
         .click(dismissAllowRunInsecureContentButton)
         // TODO(bridiver) there is a race condition here because we are waiting for a non-change
         // and we need some way to verify that the page does not reload and allow insecure content
@@ -568,8 +568,8 @@ describe('navigationBar tests', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist(urlbarIcon + '.fa-lock')
         .click(urlbarIcon)
-        .waitForVisible('[data-l10n-id="secureConnection"]')
-        .waitForVisible('.runInsecureContentWarning')
+        .waitForVisible('[data-test-id="secureConnection"]')
+        .waitForVisible('[data-test-id="runInsecureContentWarning"]')
         .waitForVisible(dismissAllowRunInsecureContentButton)
         .waitForVisible(allowRunInsecureContentButton)
         .click(allowRunInsecureContentButton)
@@ -582,8 +582,8 @@ describe('navigationBar tests', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist(urlbarIcon)
         .click(urlbarIcon)
-        .waitForVisible('[data-l10n-id="insecureConnection"]')
-        .waitForVisible('.denyRunInsecureContentWarning')
+        .waitForVisible('[data-test-id="insecureConnection"]')
+        .waitForVisible('[data-test-id="denyRunInsecureContentWarning"]')
         .waitForVisible(dismissDenyRunInsecureContentButton)
         .waitForVisible(denyRunInsecureContentButton)
         .click(denyRunInsecureContentButton)
@@ -610,8 +610,8 @@ describe('navigationBar tests', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist(urlbarIcon + '.fa-lock')
         .click(urlbarIcon)
-        .waitForVisible('[data-l10n-id="secureConnection"]')
-        .waitForVisible('.runInsecureContentWarning')
+        .waitForVisible('[data-test-id="secureConnection"]')
+        .waitForVisible('[data-test-id="runInsecureContentWarning"]')
         .waitForVisible(dismissAllowRunInsecureContentButton)
         .waitForVisible(allowRunInsecureContentButton)
         .click(allowRunInsecureContentButton)
@@ -622,7 +622,7 @@ describe('navigationBar tests', function () {
           )
         })
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
+        .newTab({ url: page1Url })
         .waitUntil(function () {
           return this.getWindowState().then((val) => {
             return val.value.frames.length === 2
@@ -636,7 +636,7 @@ describe('navigationBar tests', function () {
           )
         })
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { isPrivate: true })
+        .newTab({ url: page1Url, isPrivate: true })
         .waitUntil(function () {
           return this.getWindowState().then((val) => {
             return val.value.frames.length === 3
@@ -650,7 +650,7 @@ describe('navigationBar tests', function () {
           )
         })
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { partitionNumber: 1 })
+        .newTab({ url: page1Url, partitionNumber: 1 })
         .waitUntil(function () {
           return this.getWindowState().then((val) => {
             return val.value.frames.length === 4
@@ -667,7 +667,7 @@ describe('navigationBar tests', function () {
     it('Limit effect of running insecure content in private frame', function * () {
       const page1Url = 'https://mixed-script.badssl.com/'
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { isPrivate: true })
+        .newTab({ url: page1Url, isPrivate: true })
         .waitUntil(function () {
           return this.getWindowState().then((val) => {
             return val.value.frames.length === 2
@@ -684,8 +684,8 @@ describe('navigationBar tests', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist(urlbarIcon + '.fa-lock')
         .click(urlbarIcon)
-        .waitForVisible('[data-l10n-id="secureConnection"]')
-        .waitForVisible('.runInsecureContentWarning')
+        .waitForVisible('[data-test-id="secureConnection"]')
+        .waitForVisible('[data-test-id="runInsecureContentWarning"]')
         .waitForVisible(dismissAllowRunInsecureContentButton)
         .waitForVisible(allowRunInsecureContentButton)
         .click(allowRunInsecureContentButton)
@@ -696,7 +696,7 @@ describe('navigationBar tests', function () {
           )
         })
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
+        .newTab({ url: page1Url })
         .waitUntil(function () {
           return this.getWindowState().then((val) => {
             return val.value.frames.length === 3
@@ -710,7 +710,7 @@ describe('navigationBar tests', function () {
           )
         })
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { isPrivate: true })
+        .newTab({ url: page1Url, isPrivate: true })
         .waitUntil(function () {
           return this.getWindowState().then((val) => {
             return val.value.frames.length === 4
@@ -724,7 +724,7 @@ describe('navigationBar tests', function () {
           )
         })
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { partitionNumber: 1 })
+        .newTab({ url: page1Url, partitionNumber: 1 })
         .waitUntil(function () {
           return this.getWindowState().then((val) => {
             return val.value.frames.length === 5
@@ -795,7 +795,7 @@ describe('navigationBar tests', function () {
     })
   })
 
-  describe('new tab from ipc', function () {
+  describe('new tab', function () {
     Brave.beforeAll(this)
 
     before(function * () {

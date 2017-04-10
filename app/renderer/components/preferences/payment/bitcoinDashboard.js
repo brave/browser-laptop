@@ -54,11 +54,24 @@ class BitcoinDashboard extends ImmutableComponent {
 
   bitcoinPurchaseButton () {
     if (!this.props.ledgerData.get('buyURLFrame')) {
-      return <Button l10nId='add' className={css(commonStyles.primaryButton, styles.panelButton)} onClick={this.props.showOverlay.bind(this)} />
+      /* TODO refactor button */
+      return <Button className={cx({
+        primaryButton: true,
+        [css(styles.panelButton)]: true
+      })}
+        l10nId='add'
+        testId='bitcoinPurchaseButton'
+        onClick={this.props.showOverlay.bind(this)} />
     }
 
     return <a href={this.props.ledgerData.get('buyURL')} target='_blank' onClick={this.openBuyURLTab}>
-      <Button l10nId='add' className={css(commonStyles.primaryButton, styles.panelButton)} />
+      {/* TODO: refactor button.js */}
+      <Button className={cx({
+        primaryButton: true,
+        [css(styles.panelButton)]: true
+      })}
+        l10nId='add'
+        testId='bitcoinPurchaseButton' />
     </a>
   }
 
@@ -137,7 +150,13 @@ class BitcoinDashboard extends ImmutableComponent {
         </div>
         <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerLast)}>
           <a target='_blank' href={url}>
-            <button className={css(commonStyles.browserButton, commonStyles.primaryButton, styles.panelButton)}>{name}</button>
+            {/* TODO: refactor button.js */}
+            <Button className={cx({
+              primaryButton: true,
+              [css(styles.panelButton)]: true
+            })}
+              testId='exchangePanelButton'
+              label={name} />
           </a>
         </div>
       </div>
@@ -156,7 +175,14 @@ class BitcoinDashboard extends ImmutableComponent {
         <div className={css(styles.settingsListTitle)} data-l10n-id='smartphoneTitle' />
       </div>
       <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerLast, styles.alignMiddle)}>
-        <Button className={css(commonStyles.primaryButton, styles.panelButton)} l10nId='displayQRCode' onClick={this.props.showQRcode.bind(this)} />
+        {/* TODO: refactor button.js */}
+        <Button className={cx({
+          primaryButton: true,
+          [css(styles.panelButton)]: true
+        })}
+          l10nId='displayQRCode'
+          testId='displayQRCode'
+          onClick={this.props.showQRcode.bind(this)} />
       </div>
     </div>
   }
@@ -164,7 +190,11 @@ class BitcoinDashboard extends ImmutableComponent {
   panelFooter () {
     if (this.props.ledgerData.get('buyURLFrame')) {
       return <div className={css(paymentCommon.panelFooter, styles.panelFooter)}>
-        <Button l10nId='done' className={css(commonStyles.whiteButton)} onClick={this.props.hideParentOverlay} />
+        {/* TODO: refactor button.js */}
+        <Button className='whiteButton'
+          l10nId='done'
+          testId='panelDoneButton'
+          onClick={this.props.hideParentOverlay} />
       </div>
     } else if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
       return <div className={css(paymentCommon.panelFooter, styles.panelFooter, styles.coinbaseFooter)}>
@@ -172,11 +202,19 @@ class BitcoinDashboard extends ImmutableComponent {
           <div className={css(styles.coinbaseLogo)} />
           <span className={css(styles.coinbaseMessage)} data-l10n-id='coinbaseMessage' />
         </div>
-        <Button l10nId='done' className={css(commonStyles.whiteButton)} onClick={this.props.hideParentOverlay} />
+        {/* TODO: refactor button.js */}
+        <Button className='whiteButton'
+          l10nId='done'
+          testId='panelDoneButton'
+          onClick={this.props.hideParentOverlay} />
       </div>
     } else {
       return <div className={css(paymentCommon.panelFooter, styles.panelFooter)}>
-        <Button l10nId='done' className={css(commonStyles.whiteButton)} onClick={this.props.hideParentOverlay} />
+        {/* TODO: refactor button.js */}
+        <Button className='whiteButton'
+          l10nId='done'
+          testId='panelDoneButton'
+          onClick={this.props.hideParentOverlay} />
       </div>
     }
   }
@@ -203,11 +241,13 @@ class BitcoinDashboard extends ImmutableComponent {
       </div>
       <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerLast)}>
         <a target='_blank' href='https://www.buybitcoinworldwide.com/'>
-          <button className={cx({
-            browserButton: true,
-            [css(commonStyles.primaryButton)]: true,
+          {/* TODO: refactor button.js */}
+          <Button className={cx({
+            primaryButton: true,
             [css(styles.panelButton)]: true
-          })}>buybitcoinworldwide.com</button>
+          })}
+            testId='worldWidePanelButton'
+            label='buybitcoinworldwide.com' />
         </a>
       </div>
     </div>
@@ -298,8 +338,13 @@ class BitcoinDashboard extends ImmutableComponent {
                   ledgerData.get('hasBitcoinHandler') && ledgerData.get('paymentURL')
                     ? <div className={css(styles.hasBitcoinHandler)}>
                       <a href={ledgerData.get('paymentURL')} target='_blank'>
-                        <Button l10nId='bitcoinVisitAccount'
-                          className={css(commonStyles.primaryButton, styles.bitcoinAddressButton)}
+                        {/* TODO: refactor button.js */}
+                        <Button className={cx({
+                          primaryButton: true,
+                          [css(globalStyles.spacing.dialogInsideMargin)]: true
+                        })}
+                          l10nId='bitcoinVisitAccount'
+                          testId='bitcoinVisitAccountButton'
                         />
                       </a>
                       <div data-l10n-id='bitcoinAddress' className={css(styles.walletLabelText)} />
@@ -309,10 +354,14 @@ class BitcoinDashboard extends ImmutableComponent {
                     </div>
                 }
                 <div className={css(styles.walletAddressText)}>{ledgerData.get('address')}</div>
-                <Button className={css(commonStyles.primaryButton, styles.panelButton)}
+                {/* TODO: refactor button.js */}
+                <Button className={cx({
+                  primaryButton: true,
+                  [css(styles.panelButton)]: true
+                })}
                   l10nId='copyToClipboard'
-                  onClick={this.copyToClipboard.bind(this, ledgerData.get('address'))}
-                />
+                  testId='copyToClipboardButton'
+                  onClick={this.copyToClipboard.bind(this, ledgerData.get('address'))} />
               </div>
               : <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerLast)}>
                 <div data-l10n-id='bitcoinWalletNotAvailable' />
@@ -420,9 +469,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: '-5px',
     top: 0
-  },
-  bitcoinAddressButton: {
-    marginBottom: '15px'
   },
   walletLabelText: {
     fontSize: '1em',

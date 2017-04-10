@@ -12,7 +12,7 @@ require('../../braveUnit')
 
 describe('Frame component unit tests', function () {
   const fakeWindowActions = {
-    setActiveFrameShortcut: () => {},
+    frameShortcutChanged: () => {},
     setFindbarShown: () => {}
   }
 
@@ -92,12 +92,12 @@ describe('Frame component unit tests', function () {
       expectCall('find-prev', 'onFindAgain', false)
     })
 
-    it('calls windowActions.setActiveFrameShortcut when truthy', function () {
-      expectWindowActionCall('not-a-real-value', 'setActiveFrameShortcut')
+    it('calls windowActions.frameShortcutChanged when truthy', function () {
+      expectWindowActionCall('not-a-real-value', 'frameShortcutChanged')
     })
 
-    it('does not call windowActions.setActiveFrameShortcut if falsey', function () {
-      expectWindowActionCall(undefined, 'setActiveFrameShortcut', true)
+    it('does not call windowActions.frameShortcutChanged if falsey', function () {
+      expectWindowActionCall(undefined, 'frameShortcutChanged', true)
     })
   })
 })

@@ -18,7 +18,7 @@ body {
   cursor: default;
   font-size: 1.2em;
   margin-bottom: 0.7em;
-  -webkit-user-select: none;
+  user-select: none;
 }
 
 .prefTabContainer {
@@ -632,11 +632,19 @@ table.sortableTable {
   .browserButton + .browserButton {
     margin-left: 0.75em;
   }
-  .setupContent {
+  .setupContent, .setupError {
     margin: 1em 0;
+  }
+  .setupError {
+    color: red;
+    font-weight: bold;
   }
   .deviceNameInput {
     width: 50%;
+  }
+  .syncBetaMessage {
+    color: grey;
+    margin-top: 8px;
   }
   .device {
     background-color: @lightGray;

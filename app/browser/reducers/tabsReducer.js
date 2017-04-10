@@ -20,14 +20,20 @@ const tabsReducer = (state, action) => {
     case appConstants.APP_TAB_CREATED:
       state = tabState.maybeCreateTab(state, action)
       break
+    case appConstants.APP_TAB_MOVED:
+      state = tabs.moveTo(state, action)
+      break
+    case appConstants.APP_CREATE_TAB_REQUESTED:
+      state = tabs.createTab(state, action)
+      break
+    case appConstants.APP_MAYBE_CREATE_TAB_REQUESTED:
+      state = tabs.maybeCreateTab(state, action)
+      break
     case appConstants.APP_TAB_UPDATED:
       state = tabState.maybeCreateTab(state, action)
       break
-    case appConstants.APP_CLOSE_TAB:
-      state = tabs.removeTab(state, action)
-      break
     case appConstants.APP_TAB_CLOSED:
-      state = tabState.removeTab(state, action)
+      state = tabs.removeTab(state, action)
       break
     case appConstants.APP_ALLOW_FLASH_ONCE:
     case appConstants.APP_ALLOW_FLASH_ALWAYS:
@@ -41,14 +47,26 @@ const tabsReducer = (state, action) => {
     case appConstants.APP_TAB_CLONED:
       state = tabs.clone(state, action)
       break
+    case appConstants.APP_TAB_PINNED:
+      state = tabs.pin(state, action)
+      break
     case windowConstants.WINDOW_SET_AUDIO_MUTED:
       state = tabs.setAudioMuted(state, action)
       break
-    case windowConstants.WINDOW_CLOSE_FRAME:
-      state = tabState.closeFrame(state, action)
+    case windowConstants.WINDOW_SET_ACTIVE_FRAME:
+      state = tabs.setActive(state, action)
       break
     case appConstants.APP_TAB_TOGGLE_DEV_TOOLS:
       state = tabs.toggleDevTools(state, action)
+      break
+    case appConstants.APP_LOAD_URL_REQUESTED:
+      state = tabs.loadURL(state, action)
+      break
+    case appConstants.APP_LOAD_URL_IN_ACTIVE_TAB_REQUESTED:
+      state = tabs.loadURLInActiveTab(state, action)
+      break
+    case appConstants.APP_FRAME_CHANGED:
+      state = tabState.updateFrame(state, action)
       break
   }
   return state

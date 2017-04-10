@@ -11,8 +11,10 @@ const appActions = require('../../../js/actions/appActions')
 const KeyCodes = require('../../common/constants/keyCodes')
 const config = require('../../../js/constants/config')
 const {makeImmutable} = require('../../common/state/immutableUtil')
+
 const {StyleSheet, css} = require('aphrodite')
 const commonStyles = require('./styles/commonStyles')
+const globalStyles = require('./styles/global')
 
 class MessageBox extends ImmutableComponent {
   constructor () {
@@ -119,6 +121,8 @@ class MessageBox extends ImmutableComponent {
         {
           this.showSuppress
             ? <SwitchControl
+              // TODO: refactor SwitchControl
+              className={css(commonStyles.noPaddingLeft)}
               rightl10nId='preventMoreAlerts'
               checkedOn={this.suppress}
               onClick={this.onSuppressChanged} />
@@ -143,21 +147,19 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: 'bold',
     fontSize: '12pt',
-    marginBottom: '1em',
-    marginTop: '0.5em',
-    '-webkit-user-select': 'text'
+    marginBottom: globalStyles.spacing.dialogInsideMargin,
+    userSelect: 'text'
   },
   body: {
-    marginTop: '1.5em',
+    marginTop: globalStyles.spacing.dialogInsideMargin,
     minWidth: '425px',
-    marginBottom: '1.5em',
-    '-webkit-user-select': 'text'
+    marginBottom: globalStyles.spacing.dialogInsideMargin,
+    userSelect: 'text'
   },
   buttons: {
     display: 'flex',
     justifyContent: 'flex-end',
-    marginTop: '1.5em',
-    marginBottom: '0.5em'
+    marginTop: globalStyles.spacing.dialogInsideMargin
   }
 })
 

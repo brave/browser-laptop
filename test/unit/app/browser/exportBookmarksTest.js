@@ -110,8 +110,11 @@ describe('Bookmarks export', function () {
   it('generated html', function () {
     const personal = exporter.createBookmarkArray(sites)
     const other = exporter.createBookmarkArray(sites, -1, false)
-    const result = exporter.createBookmarkHTML(personal, other)
-    const expected = fs.readFileSync('./test/fixtures/bookmarkExport.html', 'utf8')
+    let result = exporter.createBookmarkHTML(personal, other)
+    let expected = fs.readFileSync('./test/fixtures/bookmarkExport.html', 'utf8')
+
+    result = result.replace(/\s+/g, ' ')
+    expected = expected.replace(/\s+/g, ' ')
 
     assert.equal(result, expected)
   })

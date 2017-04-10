@@ -10,6 +10,8 @@ const dragTypes = require('../../../js/constants/dragTypes')
 const dndData = require('../../../js/dndData')
 const {isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
 const {isPotentialPhishingUrl} = require('../../../js/lib/urlutil')
+const windowStore = require('../../../js/stores/windowStore')
+const {getActiveFrame} = require('../../../js/state/frameStateUtil')
 const searchIconSize = 16
 
 class UrlBarIcon extends ImmutableComponent {
@@ -89,7 +91,8 @@ class UrlBarIcon extends ImmutableComponent {
   }
   onDragStart (e) {
     dndData.setupDataTransferURL(e.dataTransfer, this.props.location, this.props.title)
-    dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.TAB, this.activeFrame)
+    const activeFrame = getActiveFrame(windowStore.state)
+    dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.TAB, activeFrame)
   }
   render () {
     // allow click and drag (unless tab is showing a message box)

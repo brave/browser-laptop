@@ -2,7 +2,6 @@
 
 const Brave = require('../lib/brave')
 const appConfig = require('../../js/constants/appConfig')
-const messages = require('../../js/constants/messages')
 const assert = require('assert')
 const {urlInput, noScriptNavButton, noScriptInfo, noScriptAllowTempButton, noScriptAllowOnceButton} = require('../lib/selectors')
 
@@ -67,7 +66,7 @@ describe('noscript info', function () {
 
   it('only shows allow once in private tab', function * () {
     yield this.app.client
-      .ipcSend(messages.SHORTCUT_NEW_FRAME, this.url, { isPrivate: true })
+      .newTab({ url: this.url, isPrivate: true })
       .waitForTabCount(2)
       .windowByUrl(Brave.browserWindowUrl)
       .waitForVisible(noScriptNavButton)

@@ -1,4 +1,8 @@
 const React = require('react')
+const cx = require('../../lib/classSet')
+
+const {css} = require('aphrodite/no-important')
+const commonStyles = require('../../../app/renderer/components/styles/commonStyles')
 
 // Components
 const Button = require('../../components/button')
@@ -31,22 +35,21 @@ class TorrentViewer extends React.Component {
       } else {
         // 'Loading torrent information...'
         titleElem = (
-          <div
-            className='sectionTitle'
-            data-l10n-id='torrentLoadingInfo'
-          />
+          <div className='sectionTitle' data-l10n-id='torrentLoadingInfo' />
         )
       }
       mainButton = (
-        <Button
+        <Button className='primaryButton mainButton'
           l10nId='stopDownload'
-          className='primaryButton mainButton'
+          testId='stopDownload'
           onClick={() => dispatch('stop')}
         />
       )
       legalNotice = (
-        <a
-          className='legalNotice'
+        <a className={cx({
+          legalNotice: true,
+          [css(commonStyles.userSelectNone)]: true
+        })}
           data-l10n-id='poweredByWebTorrent'
           href='https://webtorrent.io'
           target='_blank'
@@ -56,34 +59,37 @@ class TorrentViewer extends React.Component {
       const l10nStart = name ? 'startPrompt' : 'startPromptUntitled'
       const l10nArgs = {name}
       titleElem = (
-        <div
+        <div className='sectionTitle'
           data-l10n-id={l10nStart}
           data-l10n-args={JSON.stringify(l10nArgs)}
-          className='sectionTitle' />
+        />
       )
       mainButton = (
-        <Button
+        <Button className='primaryButton mainButton'
           l10nId='startDownload'
-          className='primaryButton mainButton'
+          testId='startDownload'
           onClick={() => dispatch('start')}
         />
       )
-      legalNotice = <div className='legalNotice' data-l10n-id='legalNotice' />
+      legalNotice = <div className={cx({
+        legalNotice: true,
+        [css(commonStyles.userSelectNone)]: true
+      })} data-l10n-id='legalNotice' />
     }
 
     if (torrentIdProtocol === 'magnet:') {
       saveButton = (
-        <Button
+        <Button className='whiteButton copyMagnetLink'
           l10nId='copyMagnetLink'
-          className='whiteButton copyMagnetLink'
+          testId='copyMagnetLink'
           onClick={() => dispatch('copyMagnetLink')}
         />
       )
     } else {
       saveButton = (
-        <Button
+        <Button className='whiteButton saveTorrentFile'
           l10nId='saveTorrentFile'
-          className='whiteButton saveTorrentFile'
+          testId='saveTorrentFile'
           onClick={() => dispatch('saveTorrentFile')}
         />
       )

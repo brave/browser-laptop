@@ -27,7 +27,7 @@ body, .dynamicBackground, bgGradient {
 }
 
 .copyrightNotice {
-  -webkit-user-select: none;
+  user-select: none;
   cursor: default;
 }
 
@@ -86,84 +86,6 @@ ul {
   height: 100%;
   min-height: 100vh;
   padding: 40px 60px;
-
-  .statsBar {
-    padding: 40px 0;
-    display: flex;
-    justify-content: space-between;
-
-    .statsBlock {
-      margin-right: 40px;
-      margin-bottom: 20px;
-
-      span {
-        display: block;
-      }
-
-      .counter {
-        font-size: 44px;
-        line-height: 53px;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-        max-width: 200px;
-
-        &.trackers {
-          color: @statsOrange;
-        }
-        &.ads {
-          color: @statsRed;
-        }
-        &.https {
-          color: @statsBlue;
-        }
-        &.timeSaved {
-          color: @statsLightGray;
-          display: flex;
-          align-items: baseline;
-        }
-
-        .text {
-          display: inline;
-          color: @statsLightGray;
-          font-size: 20px;
-          line-height: 24px;
-          margin-left: 3px;
-        }
-      }
-
-      .statsText {
-        font-size: 13px;
-        color: #fff;
-      }
-    }
-
-    .clock {
-      line-height: 1;
-      -webkit-user-select: none;
-      cursor: default;
-
-      .time {
-        font-size: 75px;
-        font-weight: 200;
-        color: #fff;
-      }
-
-      .timePeriod {
-        color: #fff;
-        display: inline-block;
-        font-size: 20px;
-        font-weight: 400;
-        margin-top: 6px;
-        vertical-align: top;
-      }
-
-      .dayTime {
-        font-size: 51px;
-        color: #fff;
-      }
-    }
-  }
 
   .topSitesContainer {
     width: 100%;
@@ -332,7 +254,7 @@ ul {
     margin: auto;
 
     .notification {
-      -webkit-user-select: none;
+      user-select: none;
       cursor: default;
     }
 
@@ -421,6 +343,86 @@ ul {
   }
 }
 
+.statsBar {
+  width: 100%;
+  padding: 40px 0;
+  display: flex;
+  justify-content: space-between;
+
+  .statsBlock {
+    margin-right: 40px;
+    margin-bottom: 20px;
+
+    span {
+      display: block;
+    }
+
+    .counter {
+      font-size: 44px;
+      line-height: 53px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      max-width: 200px;
+
+      &.trackers {
+        color: @statsOrange;
+      }
+      &.ads {
+        color: @statsRed;
+      }
+      &.https {
+        color: @statsBlue;
+      }
+      &.timeSaved {
+        color: @statsLightGray;
+        display: flex;
+        align-items: baseline;
+      }
+
+      .text {
+        display: inline;
+        color: @statsLightGray;
+        font-size: 20px;
+        line-height: 24px;
+        margin-left: 3px;
+      }
+    }
+
+    .statsText {
+      font-size: 13px;
+      color: #fff;
+    }
+  }
+
+  .clock {
+    line-height: 1;
+    user-select: none;
+    cursor: default;
+
+    .time {
+      font-size: 75px;
+      font-weight: 200;
+      color: #fff;
+    }
+
+    .timePeriod {
+      color: #fff;
+      display: inline-block;
+      font-size: 20px;
+      font-weight: 400;
+      margin-top: 6px;
+      vertical-align: top;
+    }
+
+    .dayTime {
+      font-size: 51px;
+      color: #fff;
+    }
+  }
+}
+
+
 @media (max-width: 730px) {
   .dynamicBackground {
     min-height: 100%;
@@ -434,26 +436,26 @@ ul {
       margin-bottom: 20px;
     }
 
-    .statsBar {
-      flex-direction: column-reverse;
-      padding-top: 0;
-
-      .statsBlock {
-        margin: 0 0 15px;
-        width: 50%;
-        padding-right: 20px;
-      }
-
-      .clock {
-        display: flex;
-        flex: 1;
-        justify-content: center;
-        padding-bottom: 20px;
-      }
-    }
-
     .topSitesContainer {
       text-align: center;
+      padding-bottom: 20px;
+    }
+  }
+
+  .statsBar {
+    flex-direction: column-reverse;
+    padding-top: 0;
+
+    .statsBlock {
+      margin: 0 0 15px;
+      width: 50%;
+      padding-right: 20px;
+    }
+
+    .clock {
+      display: flex;
+      flex: 1;
+      justify-content: center;
       padding-bottom: 20px;
     }
   }

@@ -42,7 +42,8 @@ const styles = StyleSheet.create({
     boxShadow: '2px 2px 8px #3b3b3b',
     color: '#000',
     fontSize: '13px',
-    padding: '10px 30px',
+    // Issue #7949
+    padding: `${globalStyles.spacing.dialogInsideMargin} 30px`,
     position: 'absolute',
     top: globalStyles.spacing.dialogTopOffset
   },
@@ -53,7 +54,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     whiteSpace: 'nowrap',
     padding: '8px 12px',
-    WebkitUserSelect: 'none',
+    userSelect: 'none',
 
     ':hover': {
       backgroundColor: globalStyles.color.lightGray
@@ -93,7 +94,7 @@ const styles = StyleSheet.create({
     borderRadius: globalStyles.radius.borderRadius,
     textAlign: 'center',
     transition: '.1s opacity, .1s background',
-    WebkitUserSelect: 'none',
+    userSelect: 'none',
     backgroundSize: '16px',
     backgroundPosition: 'center center',
     backgroundRepeat: 'no-repeat'
@@ -170,13 +171,23 @@ const styles = StyleSheet.create({
     paddingRight: 0
   },
 
+  // User select
+  userSelect: {
+    userSelect: 'initial',
+    cursor: 'text'
+  },
+  userSelectNone: {
+    userSelect: 'none',
+    cursor: 'default'
+  },
+
   // notificationBar
   notificationBar: {
     display: 'inline-block',
     boxSizing: 'border-box',
     width: '100%',
     cursor: 'default',
-    WebkitUserSelect: 'none',
+    userSelect: 'none',
     marginTop: globalStyles.spacing.navbarMenubarMargin
   },
   notificationBar__notificationItem: {

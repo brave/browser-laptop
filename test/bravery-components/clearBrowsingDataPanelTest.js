@@ -149,7 +149,7 @@ describe('Clear Browsing Panel', function () {
       const page2Url = Brave.server.url('page2.html')
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page2Url)
+        .newTab({ url: page2Url })
         .waitUntil(function () {
           return this.getWindowState().then((val) => {
             return val.value.frames.length === 2

@@ -5,6 +5,7 @@ const globalStyles = {
     breakpointExtensionButtonPadding: '720px',
     breakpointSmallWin32: '650px',
     breakpointTinyWin32: '500px',
+    breakpointNewPrivateTab: '890px',
     tab: {
       large: '120px',
       largeMedium: '83px',
@@ -74,7 +75,11 @@ const globalStyles = {
     statsLightGray: '#999999',
     defaultIconBackground: '#F7F7F7',
     almostInvisible: 'rgba(255,255,255,0.01)',
-    urlBarOutline: '#bbb'
+    urlBarOutline: '#bbb',
+    alphaWhite: 'rgba(255,255,255,0.8)'
+  },
+  filter: {
+    makeWhite: 'brightness(0) invert(1)'
   },
   radius: {
     borderRadius: '4px',
@@ -127,7 +132,8 @@ const globalStyles = {
     dialogInsideMargin: '18px',
     paymentsMargin: '20px',
     modalPanelHeaderMarginBottom: '.5em',
-    paddingHorizontal: '30px'
+    paddingHorizontal: '30px',
+    privateTabPadding: '40px'
   },
   shadow: {
     switchShadow: 'inset 0 1px 4px rgba(0, 0, 0, 0.35)',
@@ -174,7 +180,8 @@ const globalStyles = {
     tabIcon: '14px',
     tabTitle: '12px',
     settingItemSubtext: '.95rem',
-    flyoutDialog: '13px'
+    flyoutDialog: '13px',
+    prefsPanelHeading: '23px'
   },
   appIcons: {
     clipboard: 'fa fa-clipboard',
@@ -186,7 +193,9 @@ const globalStyles = {
     remove: 'fa fa-times',
     volumeOff: 'fa fa-volume-off',
     volumeOn: 'fa fa-volume-up',
-    exclude: 'fa fa-ban'
+    exclude: 'fa fa-ban',
+    trash: 'fa fa-trash',
+    moreInfo: 'fa fa-info-circle'
   }
 }
 

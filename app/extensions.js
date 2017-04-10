@@ -225,15 +225,18 @@ let generateSyncManifest = () => {
     'default-src': '\'self\'',
     'form-action': '\'none\''
   }
-  cspDirectives['connect-src'] = ['\'self\'',
-    appConfig.sync.serverUrl,
-    appConfig.sync.s3Url].join(' ')
+  const connectSources = ['\'self\'', appConfig.sync.serverUrl, appConfig.sync.s3Url]
+  if (process.env.NODE_ENV === 'development') {
+    connectSources.push(appConfig.sync.testS3Url)
+  }
+
+  cspDirectives['connect-src'] = connectSources.join(' ')
 
   if (process.env.NODE_ENV === 'development') {
     // allow access to webpack dev server resources
     let devServer = 'localhost:' + process.env.npm_package_config_port
     cspDirectives['default-src'] += ' http://' + devServer
-    cspDirectives['connect-src'] += ' http://' + devServer + ' ws://' + devServer + ' ' + appConfig.sync.testS3Url
+    cspDirectives['connect-src'] += ' http://' + devServer + ' ws://' + devServer
   }
 
   return {

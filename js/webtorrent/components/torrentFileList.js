@@ -2,6 +2,9 @@ const prettierBytes = require('prettier-bytes')
 const React = require('react')
 const SortableTable = require('../../components/sortableTable')
 
+const {css} = require('aphrodite/no-important')
+const commonStyles = require('../../../app/renderer/components/styles/commonStyles')
+
 class TorrentFileList extends React.Component {
   render () {
     const { torrent, stateOwner } = this.props
@@ -9,9 +12,9 @@ class TorrentFileList extends React.Component {
 
     let content
     if (files == null) {
-      content = <div data-l10n-id='missingFilesList' />
+      content = <div className={css(commonStyles.userSelectNone)} data-l10n-id='missingFilesList' />
     } else if (files.length === 0) {
-      content = <div data-l10n-id='loadingFilesList' />
+      content = <div className={css(commonStyles.userSelectNone)} data-l10n-id='loadingFilesList' />
     } else {
       content = [
         <SortableTable
@@ -45,7 +48,7 @@ class TorrentFileList extends React.Component {
     if (isDownload) {
       if (serverUrl) {
         const httpURL = serverUrl + '/' + ix
-        return <a href={httpURL} download={file.name}>⇩</a>
+        return <a className={css(commonStyles.userSelect)} href={httpURL} download={file.name}>⇩</a>
       } else {
         return <div /> // No download links until the server is ready
       }
@@ -54,7 +57,7 @@ class TorrentFileList extends React.Component {
         ? '#ix=' + ix
         : '&ix=' + ix
       const href = torrentId + suffix
-      return <a href={href}>{file.name}</a>
+      return <a className={css(commonStyles.userSelect)} href={href}>{file.name}</a>
     }
   }
 }
