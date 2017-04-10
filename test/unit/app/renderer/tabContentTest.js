@@ -193,7 +193,7 @@ describe('tabContent components', function () {
       )
       assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
     })
-    it('should not show private icon if tab size is too small', function () {
+    it('should not show private icon if tab size is small', function () {
       const wrapper = shallow(
         <PrivateIcon
           tab={
@@ -201,6 +201,32 @@ describe('tabContent components', function () {
               isPrivate: true,
               hoverState: false,
               breakpoint: 'small'
+            })}
+        />
+      )
+      assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
+    })
+    it('should not show private icon if tab size is extraSmall', function () {
+      const wrapper = shallow(
+        <PrivateIcon
+          tab={
+            Immutable.Map({
+              isPrivate: true,
+              hoverState: false,
+              breakpoint: 'extraSmall'
+            })}
+        />
+      )
+      assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
+    })
+    it('should not show private icon if tab size is the smallest', function () {
+      const wrapper = shallow(
+        <PrivateIcon
+          tab={
+            Immutable.Map({
+              isPrivate: true,
+              hoverState: false,
+              breakpoint: 'smallest'
             })}
         />
       )
@@ -243,7 +269,7 @@ describe('tabContent components', function () {
       )
       assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
     })
-    it('should not show new session icon if tab size is too small', function () {
+    it('should not show new session icon if tab size is small', function () {
       const wrapper = shallow(
         <NewSessionIcon
           tab={
@@ -251,6 +277,32 @@ describe('tabContent components', function () {
               partitionNumber: 1,
               hoverState: true,
               breakpoint: 'small'
+            })}
+        />
+      )
+      assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
+    })
+    it('should not show new session icon if tab size is extraSmall', function () {
+      const wrapper = shallow(
+        <NewSessionIcon
+          tab={
+            Immutable.Map({
+              partitionNumber: 1,
+              hoverState: true,
+              breakpoint: 'extraSmall'
+            })}
+        />
+      )
+      assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
+    })
+    it('should not show new session icon if tab size is the smallest', function () {
+      const wrapper = shallow(
+        <NewSessionIcon
+          tab={
+            Immutable.Map({
+              partitionNumber: 1,
+              hoverState: true,
+              breakpoint: 'smallest'
             })}
         />
       )

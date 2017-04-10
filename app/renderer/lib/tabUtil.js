@@ -51,6 +51,16 @@ module.exports.hasRelativeCloseIcon = (props) => {
 }
 
 /**
+ * Check whether or not private or newSession icon should be visible
+ * @param {Object} props - Object that hosts the tab props
+ * @returns {Boolean} Whether or not private or newSession icon should be visible
+ */
+module.exports.hasVisibleSecondaryIcon = (props) => {
+  return !props.tab.get('hoverState') &&
+    !module.exports.hasBreakpoint(props, ['small', 'extraSmall', 'smallest'])
+}
+
+/**
  * Check whether or not closeTab icon is always visible (fixed) in tab
  * @param {Object} props - Object that hosts the tab props
  * @returns {Boolean} Whether or not the close icon is always visible (fixed)

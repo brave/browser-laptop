@@ -9,8 +9,8 @@ const globalStyles = require('./styles/global')
 const {isWindows} = require('../../common/lib/platformUtil')
 const {getTextColorForBackground} = require('../../../js/lib/color')
 const {tabs} = require('../../../js/constants/config')
-const {hasBreakpoint, hasRelativeCloseIcon, hasFixedCloseIcon} = require('../lib/tabUtil')
-
+const {hasBreakpoint, hasRelativeCloseIcon,
+      hasFixedCloseIcon, hasVisibleSecondaryIcon} = require('../lib/tabUtil')
 const newSessionSvg = require('../../extensions/brave/img/tabs/new_session.svg')
 const privateSvg = require('../../extensions/brave/img/tabs/private.svg')
 const closeTabSvg = require('../../extensions/brave/img/tabs/close_btn_normal.svg')
@@ -133,11 +133,6 @@ class AudioTabIcon extends ImmutableComponent {
 }
 
 class PrivateIcon extends ImmutableComponent {
-  get narrowView () {
-    const sizes = ['small', 'extraSmall', 'smallest']
-    return sizes.includes(this.props.tab.get('breakpoint'))
-  }
-
   render () {
     const privateStyles = StyleSheet.create({
       icon: {
@@ -145,7 +140,7 @@ class PrivateIcon extends ImmutableComponent {
         backgroundColor: this.props.isActive ? globalStyles.color.white100 : globalStyles.color.black100
       }
     })
-    return this.props.tab.get('isPrivate') && !this.props.tab.get('hoverState') && !this.narrowView
+    return this.props.tab.get('isPrivate') && hasVisibleSecondaryIcon(this.props)
       ? <TabIcon data-test-id='privateIcon'
         className={css(styles.icon, styles.secondaryIcon, privateStyles.icon)} />
       : null
@@ -153,11 +148,6 @@ class PrivateIcon extends ImmutableComponent {
 }
 
 class NewSessionIcon extends ImmutableComponent {
-  get narrowView () {
-    const sizes = ['small', 'extraSmall', 'smallest']
-    return sizes.includes(this.props.tab.get('breakpoint'))
-  }
-
   get partitionNumber () {
     let partition = this.props.tab.get('partitionNumber')
     // Persistent partitions opened by `target="_blank"` will have
@@ -190,7 +180,7 @@ class NewSessionIcon extends ImmutableComponent {
       }
     })
 
-    return this.partitionNumber && !this.props.tab.get('hoverState') && !this.narrowView
+    return this.partitionNumber && hasVisibleSecondaryIcon(this.props)
       ? <TabIcon symbol
         data-test-id='newSessionIcon'
         className={css(styles.icon, styles.newSession, newSession.indicator)}
