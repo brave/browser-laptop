@@ -60,7 +60,7 @@ class AboutBrave extends React.Component {
         <div className='title'>
           <span className='sectionTitle' data-l10n-id='versionInformation' />
           <ClipboardButton
-            data-l10n-id='copyToClipboard'
+            dataL10nId='copyToClipboard'
             className='fa fa-clipboard'
             copyAction={this.onCopy}
           />
