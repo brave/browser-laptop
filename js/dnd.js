@@ -9,17 +9,34 @@ const dndData = require('./dndData')
 const dragTypes = require('./constants/dragTypes')
 const siteTags = require('./constants/siteTags')
 const siteUtil = require('./state/siteUtil')
+const appStoreRenderer = require('./stores/appStoreRenderer')
+const {currentWindowId} = require('../app/renderer/currentWindow')
 
-let inProcessDragData
-let inProcessDragType
+let isDraggingInsideWindow = false
 
-module.exports.getInProcessDragData = () => {
-  return inProcessDragData
+module.exports.getInterBraveDragData = () => {
+  return appStoreRenderer.state.getIn(['dragData', 'data'])
 }
 
-module.exports.getInProcessDragType = () => {
-  return inProcessDragType
+module.exports.getInterBraveDragType = () => {
+  return appStoreRenderer.state.getIn(['dragData', 'type'])
 }
+
+document.addEventListener('dragenter', () => {
+  isDraggingInsideWindow = true
+}, true)
+
+document.addEventListener('dragleave', (e) => {
+  if (!e.clientX && !e.clientY) {
+    isDraggingInsideWindow = false
+    appActions.draggedOver({
+      draggingOverKey: -1,
+      draggingOverWindowId: -1
+    })
+  }
+}, true)
+
+module.exports.isDraggingInsideWindow = () => isDraggingInsideWindow
 
 module.exports.onDragStart = (dragType, data, e) => {
   e.dataTransfer.effectAllowed = 'all'
@@ -27,19 +44,16 @@ module.exports.onDragStart = (dragType, data, e) => {
   if (dragType === dragTypes.BOOKMARK) {
     dndData.setupDataTransferURL(e.dataTransfer, data.get('location'), data.get('customTitle') || data.get('title'))
   }
-  inProcessDragData = data
-  inProcessDragType = dragType
+  appActions.dragStarted(currentWindowId, dragType, data)
 }
 
 module.exports.onDragEnd = (dragType, key) => {
-  windowActions.setIsBeingDraggedOverDetail(dragType)
   windowActions.setContextMenuDetail()
-  inProcessDragData = undefined
-  inProcessDragType = undefined
+  appActions.dragEnded()
 }
 
 module.exports.onDragOver = (dragType, sourceBoundingRect, draggingOverKey, draggingOverDetail, e) => {
-  if (inProcessDragType !== dragType) {
+  if (module.exports.getInterBraveDragType() !== dragType) {
     return
   }
 
@@ -47,9 +61,12 @@ module.exports.onDragOver = (dragType, sourceBoundingRect, draggingOverKey, drag
   e.dataTransfer.dropEffect = 'move'
   // Otherwise, only accept it if we have some frameProps
   if (!dndData.hasDragData(e.dataTransfer, dragType)) {
-    windowActions.setIsBeingDraggedOverDetail(dragType, draggingOverKey, {
+    appActions.draggedOver({
+      draggingOverKey,
+      draggingOverType: dragType,
       draggingOverLeftHalf: false,
-      draggingOverRightHalf: false
+      draggingOverRightHalf: false,
+      draggingOverWindowId: currentWindowId
     })
     return
   }
@@ -60,16 +77,22 @@ module.exports.onDragOver = (dragType, sourceBoundingRect, draggingOverKey, drag
 
   if (e.clientX > sourceBoundingRect.left && e.clientX < sourceBoundingRect.left + (sourceBoundingRect.width / 5) &&
     (!draggingOverDetail || !draggingOverDetail.get('draggingOverLeftHalf'))) {
-    windowActions.setIsBeingDraggedOverDetail(dragType, draggingOverKey, {
+    appActions.draggedOver({
+      draggingOverKey,
+      draggingOverType: dragType,
       draggingOverLeftHalf: true,
-      draggingOverRightHalf: false
+      draggingOverRightHalf: false,
+      draggingOverWindowId: currentWindowId
     })
     windowActions.setContextMenuDetail()
   } else if (e.clientX < sourceBoundingRect.right && e.clientX >= sourceBoundingRect.left + (sourceBoundingRect.width / 5) &&
     (!draggingOverDetail || !draggingOverDetail.get('draggingOverRightHalf'))) {
-    windowActions.setIsBeingDraggedOverDetail(dragType, draggingOverKey, {
+    appActions.draggedOver({
+      draggingOverKey,
+      draggingOverType: dragType,
       draggingOverLeftHalf: false,
-      draggingOverRightHalf: true
+      draggingOverRightHalf: true,
+      draggingOverWindowId: currentWindowId
     })
     windowActions.setContextMenuDetail()
   }

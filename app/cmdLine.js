@@ -27,7 +27,7 @@ const focusOrOpenWindow = function (url) {
 
   let win = BrowserWindow.getFocusedWindow()
   if (!win) {
-    win = BrowserWindow.getAllWindows()[0]
+    win = BrowserWindow.getActiveWindow() || BrowserWindow.getAllWindows()[0]
     if (win) {
       if (win.isMinimized()) {
         win.restore()
@@ -41,7 +41,10 @@ const focusOrOpenWindow = function (url) {
       location: url
     }))
   } else if (url) {
-    win.webContents.send(messages.SHORTCUT_NEW_FRAME, url)
+    appActions.createTabRequested({
+      url,
+      windowId: win.id
+    })
   }
 
   return true

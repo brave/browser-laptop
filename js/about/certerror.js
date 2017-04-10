@@ -5,9 +5,9 @@
 const React = require('react')
 const Button = require('../components/button')
 const aboutActions = require('./aboutActions')
-const windowConstants = require('../constants/windowConstants')
 const messages = require('../constants/messages')
 const ipc = window.chrome.ipcRenderer
+const {isSourceAboutUrl, getTargetAboutUrl} = require('../lib/appUrlUtil')
 
 require('../../less/button.less')
 require('../../less/window.less')
@@ -71,21 +71,20 @@ class CertErrorPage extends React.Component {
     })
   }
 
+  loadUrl (url) {
+    if (isSourceAboutUrl(url)) {
+      url = getTargetAboutUrl(url)
+    }
+    window.location = url
+  }
+
   onAccept () {
     aboutActions.acceptCertError(this.state.url)
-    aboutActions.dispatchAction({
-      actionType: windowConstants.WINDOW_SET_URL,
-      location: this.state.url,
-      key: this.state.frameKey
-    })
+    this.loadUrl(this.state.url)
   }
 
   onSafety () {
-    aboutActions.dispatchAction({
-      actionType: windowConstants.WINDOW_SET_URL,
-      location: this.state.previousLocation,
-      key: this.state.frameKey
-    })
+    this.loadUrl(this.state.previousLocation)
   }
 
   onAdvanced () {

@@ -4,12 +4,11 @@
 
 const React = require('react')
 const Button = require('../components/button')
-const aboutActions = require('./aboutActions')
-const windowConstants = require('../constants/windowConstants')
 
 require('../../less/button.less')
 require('../../less/window.less')
 require('../../less/about/error.less')
+const {isSourceAboutUrl, getTargetAboutUrl} = require('../lib/appUrlUtil')
 
 class ErrorPage extends React.Component {
   constructor () {
@@ -17,20 +16,19 @@ class ErrorPage extends React.Component {
     this.state = {}
   }
 
+  loadUrl (url) {
+    if (isSourceAboutUrl(url)) {
+      url = getTargetAboutUrl(url)
+    }
+    window.location = url
+  }
+
   reloadPrevious () {
-    aboutActions.dispatchAction({
-      actionType: windowConstants.WINDOW_SET_URL,
-      location: this.state.previousLocation,
-      key: this.state.frameKey
-    })
+    this.loadUrl(this.state.previousLocation)
   }
 
   reload () {
-    aboutActions.dispatchAction({
-      actionType: windowConstants.WINDOW_SET_URL,
-      location: this.state.url,
-      key: this.state.frameKey
-    })
+    this.loadUrl(this.state.url)
   }
 
   get showBackButton () {

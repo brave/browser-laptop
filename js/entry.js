@@ -62,13 +62,13 @@ ipc.on(messages.CLEAR_CLOSED_FRAMES, () => {
   windowActions.clearClosedFrames()
 })
 
-window.addEventListener('beforeunload', function () {
+window.addEventListener('beforeunload', function (e) {
   ipc.send(messages.LAST_WINDOW_STATE, windowStore.getState().toJS())
 })
 
 ipc.on(messages.INITIALIZE_WINDOW, (e, disposition, appState, frames, initWindowState) => {
   appStoreRenderer.state = Immutable.fromJS(appState)
   ReactDOM.render(
-    <Window includePinnedSites={disposition !== 'new-popup'} frames={frames} initWindowState={initWindowState} />,
+    <Window frames={frames} initWindowState={initWindowState} />,
     document.getElementById('appContainer'))
 })

@@ -16,38 +16,6 @@ Dispatches an event to the main process to replace the window state
 
 
 
-### loadUrl(frame, location) 
-
-Dispatches a message to the store to load a new URL.
-Both the frame's src and location properties will be updated accordingly.
-
-If the frame is a pinned site and the origin of the pinned site does
-not match the origin of the passed in location, then a new frame will be
-created for the load.
-
-In general, an iframe's src should not be updated when navigating within the frame to a new page,
-but the location should. For user entered new URLs, both should be updated.
-
-**Parameters**
-
-**frame**: `object`, The frame props
-
-**location**: `string`, The URL of the page to load
-
-
-
-### setUrl(location, key) 
-
-Dispatches a message to the store to set the new URL.
-
-**Parameters**
-
-**location**: `string`, Dispatches a message to the store to set the new URL.
-
-**key**: `number`, Dispatches a message to the store to set the new URL.
-
-
-
 ### setNavigated(location, key, isNavigatedInPage, tabId) 
 
 Dispatches a message to the store to let it know a page has been navigated.
@@ -89,15 +57,43 @@ Dispatches a message to set the security state.
 
 
 
-### setFrameTabId(frameProps, tabId) 
+### frameTabIdChanged(frameProps, oldTabId, newTabId) 
 
-Dispatches a message to set the frame tab id
+Dispatches a message to change the frame tabId
 
 **Parameters**
 
 **frameProps**: `Object`, The frame properties
 
-**tabId**: `Number`, the tab id to set
+**oldTabId**: `Number`, the current tabId
+
+**newTabId**: `Number`, the new tabId
+
+
+
+### frameGuestInstanceIdChanged(frameProps, oldGuestInstanceId, newGuestInstanceId) 
+
+Dispatches a message when the guestInstanceId changes for a frame
+
+**Parameters**
+
+**frameProps**: `Object`, The frame properties
+
+**oldGuestInstanceId**: `Number`, the current guestInstanceId
+
+**newGuestInstanceId**: `Number`, the new guestInstanceId
+
+
+
+### tabDataChanged(frameProps, tabData) 
+
+Dispatches a message when tab data changes
+
+**Parameters**
+
+**frameProps**: `Object`, The frame properties
+
+**tabData**: `Object`, the tab properties
 
 
 
@@ -125,19 +121,6 @@ Unlike setLocation and loadUrl, this does not modify the state of src and locati
 
 
 
-### setFrameTitle(frameProps, title) 
-
-Dispatches a message to the store to set the current frame's title.
-This should be called in response to the webview encountering a `<title>` tag.
-
-**Parameters**
-
-**frameProps**: `Object`, The frame properties to modify
-
-**title**: `string`, The title to set for the frame
-
-
-
 ### setFindbarShown(frameProps, shown) 
 
 Shows/hides the find-in-page bar.
@@ -159,18 +142,6 @@ Highlight text in the findbar
 **frameProps**: `Object`, The frame properties to modify
 
 **selected**: `boolean`, Whether to select the findbar search text
-
-
-
-### setPinned(frameProps, isPinned) 
-
-Sets a frame as pinned
-
-**Parameters**
-
-**frameProps**: `Object`, The frame properties to modify
-
-**isPinned**: `boolean`, Whether to pin or not
 
 
 
@@ -210,9 +181,9 @@ Dispatches a message to the store to indicate that the webview entered full scre
 
 
 
-### newFrame(frameOpts, openInForeground) 
+### unloadedTabCreated(frameOpts, openInForeground) 
 
-Dispatches a message to the store to create a new frame
+Dispatches a message to the store to create a new unloaded frame
 
 **Parameters**
 
@@ -345,20 +316,6 @@ Dispatches a message to the store to set the tab page index.
 
 
 
-### setIsBeingDraggedOverDetail(dragType, dragOverKey, dragDetail) 
-
-Dispatches a message to the store to indicate that something is dragging over this item.
-
-**Parameters**
-
-**dragType**: `string`, The type of drag operation being performed
-
-**dragOverKey**: `Object`, A unique identifier for the storage for the item being dragged over
-
-**dragDetail**: `Object`, detail about the item drag operation
-
-
-
 ### moveTab(sourceFrameProps, destinationFrameProps, prepend) 
 
 Dispatches a message to the store to indicate that the specified frame should move locations.
@@ -470,7 +427,7 @@ Marks the URL bar as focused or not.
 
 
 
-### setActiveFrameShortcut(frameProps, activeShortcut, activeShortcutDetails) 
+### frameShortcutChanged(frameProps, activeShortcut, activeShortcutDetails) 
 
 Dispatches a message to the store to indicate that the pending frame shortcut info should be updated.
 

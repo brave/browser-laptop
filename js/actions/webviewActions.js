@@ -4,8 +4,10 @@
 
 'use strict'
 
-const getWebview = () =>
-  document.querySelector('.frameWrapper.isActive webview')
+const getWebview = (key) =>
+  key
+  ? document.querySelector(`webview[data-frame-key="${key}"]`)
+  : document.querySelector('.frameWrapper.isActive webview')
 
 const webviewActions = {
   /**

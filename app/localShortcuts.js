@@ -6,6 +6,7 @@ const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
 const electronLocalshortcut = require('electron-localshortcut')
 const messages = require('../js/constants/messages')
+const appActions = require('../js/actions/appActions')
 const isDarwin = process.platform === 'darwin'
 
 module.exports.register = (win) => {
@@ -19,7 +20,6 @@ module.exports.register = (win) => {
     ['CmdOrCtrl+Shift+[', messages.SHORTCUT_PREV_TAB],
     ['CmdOrCtrl+Alt+Right', messages.SHORTCUT_NEXT_TAB],
     ['CmdOrCtrl+Alt+Left', messages.SHORTCUT_PREV_TAB],
-    ['CmdOrCtrl+Shift+S', messages.SHORTCUT_NEW_FRAME, undefined, { isPartitioned: true }],
     ['Ctrl+PageDown', messages.SHORTCUT_NEXT_TAB],
     ['Ctrl+PageUp', messages.SHORTCUT_PREV_TAB],
     ['CmdOrCtrl+9', messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST],
@@ -75,6 +75,12 @@ module.exports.register = (win) => {
     if (win) {
       win.toggleDevTools()
     }
+  })
+
+  electronLocalshortcut.register(win, 'CmdOrCtrl+Shift+S', () => {
+    appActions.createTabRequested({
+      isPartitioned: true
+    })
   })
 }
 

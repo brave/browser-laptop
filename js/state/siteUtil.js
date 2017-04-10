@@ -32,6 +32,7 @@ const isPinnedTab = (tags) => {
   }
   return tags.includes(siteTags.PINNED)
 }
+module.exports.isPinnedTab = isPinnedTab
 
 const reorderSite = (sites, order) => {
   sites = sites.map((site) => {
@@ -444,6 +445,29 @@ module.exports.getDetailFromFrame = function (frame, tag) {
   })
 }
 
+module.exports.getDetailFromTab = function (tab, tag) {
+  const siteDetail = {
+    location: tab.get('url'),
+    title: tab.get('title'),
+    tags: tag ? [tag] : []
+  }
+  if (tab.get('partitionNumber') !== undefined) {
+    siteDetail.partitionNumber = tab.get('partitionNumber')
+  }
+  return Immutable.fromJS(siteDetail)
+}
+
+module.exports.getDetailFromCreateProperties = function (createProperties, tag) {
+  const siteDetail = {
+    location: createProperties.get('url'),
+    tags: tag ? [tag] : []
+  }
+  if (createProperties.get('partitionNumber') !== undefined) {
+    siteDetail.partitionNumber = createProperties.get('partitionNumber')
+  }
+  return Immutable.fromJS(siteDetail)
+}
+
 /**
  * Update the favicon URL for all entries in the sites list
  * which match a given location. Currently, there should only be
@@ -506,13 +530,13 @@ function normURL (url) {
 }
 
 /**
- * Converts a siteDetail to frameOpts format
+ * Converts a siteDetail to createProperties format
  * @param {Object} siteDetail - A site detail as per app state
- * @return {Object} A frameOpts plain JS object, not ImmutableJS
+ * @return {Object} A createProperties plain JS object, not ImmutableJS
  */
-module.exports.toFrameOpts = function (siteDetail) {
+module.exports.toCreateProperties = function (siteDetail) {
   return {
-    location: siteDetail.get('location'),
+    url: siteDetail.get('location'),
     partitionNumber: siteDetail.get('partitionNumber')
   }
 }

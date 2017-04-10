@@ -5,13 +5,13 @@
 const React = require('react')
 const urlParse = require('../../app/common/urlParse')
 const windowActions = require('../actions/windowActions')
-const webviewActions = require('../actions/webviewActions')
 const appActions = require('../actions/appActions')
+const webviewActions = require('../actions/webviewActions')
 const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
 const cx = require('../lib/classSet')
 const siteUtil = require('../state/siteUtil')
-const FrameStateUtil = require('../state/frameStateUtil')
+const frameStateUtil = require('../state/frameStateUtil')
 const UrlUtil = require('../lib/urlutil')
 const messages = require('../constants/messages')
 const contextMenus = require('../contextMenus')
@@ -64,6 +64,9 @@ class Frame extends ImmutableComponent {
 
   get tab () {
     const frame = this.frame
+    if (!appStoreRenderer.state.get('tabs')) {
+      return undefined
+    }
     return appStoreRenderer.state.get('tabs').find((tab) => tab.get('tabId') === frame.get('tabId'))
   }
 
@@ -293,7 +296,7 @@ class Frame extends ImmutableComponent {
     this.expireContentSettings(this.origin)
   }
 
-  updateWebview (cb, newSrc) {
+  updateWebview (cb, prevProps, newSrc) {
     // lazy load webview
     if (!this.webview && !this.props.isActive && !this.props.isPreview &&
         // allow force loading of new frames
@@ -311,24 +314,11 @@ class Frame extends ImmutableComponent {
       newSrc = getTargetAboutUrl(newSrc)
     }
 
-    let guestInstanceId = null
-
     // Create the webview dynamically because React doesn't whitelist all
     // of the attributes we need
-    let webviewAdded = false
     if (this.shouldCreateWebview()) {
-      guestInstanceId = this.props.guestInstanceId
       this.webview = document.createElement('webview')
-      if (guestInstanceId != null) {
-        if (!this.webview.attachGuest(guestInstanceId)) {
-          console.error('could not set guestInstanceId ' + guestInstanceId)
-          guestInstanceId = null
-        }
-      } else {
-        let partition = FrameStateUtil.getPartition(this.frame)
-        ipc.sendSync(messages.INITIALIZE_PARTITION, partition)
-        this.webview.setAttribute('partition', partition)
-      }
+      this.webview.setAttribute('data-frame-key', this.props.frameKey)
 
       this.addEventListeners()
       if (cb) {
@@ -341,38 +331,45 @@ class Frame extends ImmutableComponent {
         this.webview.addEventListener('did-attach', eventCallback)
       }
 
-      webviewAdded = true
-    }
-
-    if (!guestInstanceId || newSrc !== getTargetAboutUrl('about:blank')) {
-      this.webview.setAttribute('src', newSrc)
-    }
-
-    this.webview.setAttribute('data-frame-key', this.props.frameKey)
-
-    if (webviewAdded) {
+      if (!this.props.guestInstanceId || !this.webview.attachGuest(this.props.guestInstanceId)) {
+        // The partition is guaranteed to be initialized by now by the browser process
+        this.webview.setAttribute('partition', frameStateUtil.getPartition(this.frame))
+        this.webview.setAttribute('src', newSrc)
+      }
       this.webviewContainer.appendChild(this.webview)
     } else {
-      cb && cb()
+      cb && cb(prevProps)
     }
   }
 
   onPropsChanged (prevProps = {}) {
-    if (!prevProps.isActive && this.props.isActive) {
+    if (this.props.isActive && !prevProps.isActive) {
       windowActions.setActiveFrame(this.frame)
     }
-    this.webview.setTabIndex(this.props.tabIndex)
-    if (this.frame && this.props.isActive && isFocused()) {
+    if (this.props.tabIndex !== prevProps.tabIndex) {
+      this.webview.setTabIndex(this.props.tabIndex)
+    }
+    if (this.props.isActive && isFocused()) {
       windowActions.setFocusedFrame(this.frame)
     }
     this.updateAboutDetails(prevProps)
   }
 
   componentDidMount () {
+    appStoreRenderer.addChangeListener(() => {
+      if (!this.frame.isEmpty() && this.tab && !this.tab.delete('frame').equals(this.lastTab)) {
+        windowActions.tabDataChanged(this.frame, this.tab)
+      }
+      this.lastTab = this.tab && this.tab.delete('frame')
+    })
+
     if (this.props.isActive) {
       windowActions.setActiveFrame(this.frame)
     }
     this.updateWebview(this.onPropsChanged)
+    if (this.props.activeShortcut) {
+      this.handleShortcut()
+    }
   }
 
   get zoomLevel () {
@@ -415,28 +412,23 @@ class Frame extends ImmutableComponent {
     }
   }
 
-  setTitle (title) {
-    if (this.frame.isEmpty()) {
-      return
-    }
-    windowActions.setFrameTitle(this.frame, title)
-  }
-
   componentDidUpdate (prevProps) {
     // TODO: This title should be set in app/browser/tabs.js and then we should use the
     // app state for the tabData everywhere and remove windowState's title completely.
-    if (this.props.tabData && this.frame &&
-        this.props.tabData.get('title') !== this.frame.get('title')) {
-      this.setTitle(this.props.tabData.get('title'))
+    if (this.props.activeShortcut !== prevProps.activeShortcut) {
+      this.handleShortcut()
     }
 
-    const cb = () => {
+    if (!this.frame.isEmpty() && !this.frame.delete('lastAccessedTime').equals(this.lastFrame)) {
+      appActions.frameChanged(this.frame)
+    }
+
+    this.lastFrame = this.frame.delete('lastAccessedTime')
+
+    const cb = (prevProps = {}) => {
       this.onPropsChanged(prevProps)
       if (this.getWebRTCPolicy(prevProps) !== this.getWebRTCPolicy(this.props)) {
         this.webview.setWebRTCIPHandlingPolicy(this.getWebRTCPolicy(this.props))
-      }
-      if (prevProps.activeShortcut !== this.props.activeShortcut) {
-        this.handleShortcut()
       }
 
       if (this.props.isActive && !prevProps.isActive && !this.props.urlBarFocused) {
@@ -462,11 +454,11 @@ class Frame extends ImmutableComponent {
     }
 
     if (this.props.src !== prevProps.src) {
-      this.updateWebview(cb)
+      this.updateWebview(cb, prevProps)
     } else if (this.shouldCreateWebview()) {
       // plugin/insecure-content allow state has changed. recreate with the current
       // location, not the src.
-      this.updateWebview(cb, this.props.location)
+      this.updateWebview(cb, prevProps, this.props.location)
     } else {
       if (this.runOnDomReady) {
         // there is already a callback waiting for did-attach
@@ -474,7 +466,7 @@ class Frame extends ImmutableComponent {
         // mount callback which is a subset of the update callback
         this.runOnDomReady = cb
       } else {
-        cb()
+        cb(prevProps)
       }
     }
   }
@@ -496,7 +488,7 @@ class Frame extends ImmutableComponent {
         } else if (this.isIntermediateAboutPage() &&
           this.tab.get('url') !== this.props.location &&
           this.tab.get('url') !== this.props.aboutDetails.get('url')) {
-          windowActions.setUrl(this.props.aboutDetails.get('url'),
+          appActions.loadURLRequested(this.props.aboutDetails.get('url'),
             this.props.aboutDetails.get('frameKey'))
         } else {
           this.webview.reload()
@@ -520,12 +512,13 @@ class Frame extends ImmutableComponent {
       case 'view-source':
         const sourceLocation = UrlUtil.getViewSourceUrlFromUrl(this.tab.get('url'))
         if (sourceLocation !== null) {
-          windowActions.newFrame({
-            location: sourceLocation,
+          appActions.createTabRequested({
+            url: sourceLocation,
             isPrivate: this.frame.get('isPrivate'),
             partitionNumber: this.frame.get('partitionNumber'),
-            parentFrameKey: this.frame.get('key')
-          }, true)
+            openerTabId: this.frame.get('tabId'),
+            active: true
+          })
         }
         // TODO: Make the URL bar show the view-source: prefix
         break
@@ -557,9 +550,6 @@ class Frame extends ImmutableComponent {
       case 'focus-webview':
         setImmediate(() => this.webview.focus())
         break
-      case 'load-non-navigatable-url':
-        this.webview.loadURL(this.props.activeShortcutDetails)
-        break
       case 'copy':
         let selection = window.getSelection()
         if (selection && selection.toString()) {
@@ -576,7 +566,7 @@ class Frame extends ImmutableComponent {
         break
     }
     if (this.props.activeShortcut) {
-      windowActions.setActiveFrameShortcut(this.frame, null, null)
+      windowActions.frameShortcutChanged(this.frame, null, null)
     }
   }
 
@@ -656,10 +646,14 @@ class Frame extends ImmutableComponent {
         return
       }
 
-      let tabId = e.tabID
-      if (this.props.tabId !== tabId) {
-        windowActions.setFrameTabId(this.frame, tabId)
+      windowActions.frameTabIdChanged(this.frame, this.props.tabId, e.tabID)
+    })
+    this.webview.addEventListener('guest-ready', (e) => {
+      if (this.frame.isEmpty()) {
+        return
       }
+
+      windowActions.frameGuestInstanceIdChanged(this.frame, this.props.guestInstanceId, e.guestInstanceId)
     })
     this.webview.addEventListener('content-blocked', (e) => {
       if (this.frame.isEmpty()) {
@@ -712,7 +706,7 @@ class Frame extends ImmutableComponent {
       if (this.frame.isEmpty()) {
         return
       }
-      this.props.onCloseFrame(this.frame)
+      this.props.onCloseFrame(this.frame, true)
     })
     this.webview.addEventListener('close', () => {
       if (this.frame.isEmpty()) {
@@ -731,7 +725,10 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('show-autofill-settings', (e) => {
-      windowActions.newFrame({ location: 'about:autofill' }, true)
+      appActions.createTabRequested({
+        url: 'about:autofill',
+        active: true
+      })
     })
     this.webview.addEventListener('show-autofill-popup', (e) => {
       if (this.frame.isEmpty()) {
@@ -835,7 +832,7 @@ class Frame extends ImmutableComponent {
       if (!this.allowRunningWidevinePlugin()) {
         this.showWidevineNotification(this.props.location, this.origin, () => {
         }, () => {
-          windowActions.loadUrl(this.frame, this.props.provisionalLocation)
+          appActions.loadURLRequested(this.frame.get('tabId'), this.props.provisionalLocation)
         })
       }
 
@@ -878,7 +875,10 @@ class Frame extends ImmutableComponent {
           // open a new tab for other about urls
           // and send this tab back to wherever it came from
           this.goBack()
-          windowActions.newFrame({location: e.validatedURL}, true)
+          appActions.createTabRequested({
+            url: e.validatedURL,
+            active: true
+          })
           return
         }
 
@@ -887,7 +887,7 @@ class Frame extends ImmutableComponent {
           errorCode: e.errorCode,
           url: e.validatedURL
         })
-        windowActions.loadUrl(this.frame, 'about:error')
+        appActions.loadURLRequested(this.frame.get('tabId'), 'about:error')
         appActions.removeSite(siteUtil.getDetailFromFrame(this.frame))
       } else if (isAborted(e.errorCode)) {
         // just stay put
@@ -956,7 +956,7 @@ class Frame extends ImmutableComponent {
         title: 'unexpectedError',
         url: this.props.location
       })
-      windowActions.loadUrl(this.frame, 'about:error')
+      appActions.loadURLRequested(this.frame.get('tabId'), 'about:error')
       this.webview = false
     })
     this.webview.addEventListener('did-fail-provisional-load', (e) => {
@@ -1162,8 +1162,9 @@ class Frame extends ImmutableComponent {
   }
 
   render () {
-    const messageBoxDetail = this.props.tabData && this.props.tabData.get('messageBoxDetail')
+    const messageBoxDetail = this.tab && this.tab.get('messageBoxDetail')
     return <div
+      data-partition={frameStateUtil.getPartition(this.frame)}
       className={cx({
         frameWrapper: true,
         isPreview: this.props.isPreview,

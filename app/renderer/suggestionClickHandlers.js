@@ -4,22 +4,24 @@
 
 'use strict'
 
+const appActions = require('../../js/actions/appActions')
 const windowActions = require('../../js/actions/windowActions')
 const windowStore = require('../../js/stores/windowStore')
 const {getActiveFrame} = require('../../js/state/frameStateUtil')
 
 const navigateSiteClickHandler = (formatUrl) => (site, isForSecondaryAction, shiftKey) => {
-  const location = formatUrl(site)
+  const url = formatUrl(site)
   // When clicked make sure to hide autocomplete
   windowActions.setRenderUrlBarSuggestions(false)
   if (isForSecondaryAction) {
-    windowActions.newFrame({
-      location,
-      partitionNumber: (site && site.get && site.get('partitionNumber')) || undefined
-    }, !!shiftKey)
+    appActions.createTabRequested({
+      url,
+      partitionNumber: (site && site.get && site.get('partitionNumber')) || undefined,
+      active: !!shiftKey
+    })
   } else {
     const activeFrame = getActiveFrame(windowStore.state)
-    windowActions.loadUrl(activeFrame, location)
+    appActions.loadURLRequested(activeFrame.get('tabId'), url)
     windowActions.setUrlBarActive(false)
   }
 }

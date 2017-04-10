@@ -37,6 +37,13 @@ const appActions = {
     })
   },
 
+  windowReady: function (windowId) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_WINDOW_READY,
+      windowId
+    })
+  },
+
   closeWindow: function (windowId) {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_CLOSE_WINDOW,
@@ -66,13 +73,13 @@ const appActions = {
   },
 
   /**
-   * A new tab has been requested
-   * @param {Object} createProperties - windowId, url, active, openerTabId
+   * Frame props changed
+   * @param {Object} frame
    */
-  newTab: function (frameProps) {
+  frameChanged: function (frame) {
     AppDispatcher.dispatch({
-      actionType: appConstants.APP_NEW_TAB,
-      frameProps
+      actionType: appConstants.APP_FRAME_CHANGED,
+      frame
     })
   },
 
@@ -84,6 +91,73 @@ const appActions = {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_TAB_CREATED,
       tabValue
+    })
+  },
+
+  /**
+   * A tab has been moved to another window
+   * @param {Number} tabId
+   * @param {Object} frameOpts
+   * @param {Object} browserOpts
+   * @param {Number} windowId
+   */
+  tabMoved: function (tabId, frameOpts, browserOpts, windowId) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_TAB_MOVED,
+      tabId,
+      frameOpts,
+      browserOpts,
+      windowId
+    })
+  },
+
+  /**
+   * A request for a new tab has been made with the specified createProperties
+   * @param {Object} createProperties
+   */
+  createTabRequested: function (createProperties) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_CREATE_TAB_REQUESTED,
+      createProperties
+    })
+  },
+
+  /**
+   * A request for a URL load
+   * @param {number} tabId - the tab ID to load the URL inside of
+   * @param {string} url - The url to load
+   */
+  loadURLRequested: function (tabId, url) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_LOAD_URL_REQUESTED,
+      tabId,
+      url
+    })
+  },
+
+  /**
+   * A request for a URL load for the active tab of the specified window
+   * @param {number} windowId - the window ID to load the URL inside of
+   * @param {string} url - The url to load
+   */
+  loadURLInActiveTabRequested: function (windowId, url) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_LOAD_URL_IN_ACTIVE_TAB_REQUESTED,
+      windowId,
+      url
+    })
+  },
+
+  /**
+   * A request for a "maybe" new tab has been made with the specified createProperties
+   * If a tab is already opened it will instead set it as active.
+   *
+   * @param {Object} createProperties - these are only used if a new tab is being created
+   */
+  maybeCreateTabRequested: function (createProperties) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_MAYBE_CREATE_TAB_REQUESTED,
+      createProperties
     })
   },
 
@@ -101,11 +175,13 @@ const appActions = {
   /**
    * Closes an open tab
    * @param {number} tabId
+   * @param {boolean} force closing the tab
    */
-  tabClosed: function (tabValue) {
+  tabClosed: function (tabValue, forceClose = false) {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_TAB_CLOSED,
-      tabValue
+      tabValue,
+      forceClose
     })
   },
 
@@ -596,7 +672,6 @@ const appActions = {
   },
 
   /**
-   * Dispatches a message when appWindowId loses focus
    * Dispatches a message when windowId loses focus
    *
    * @param {Number} windowId - the unique id of the window
@@ -604,6 +679,18 @@ const appActions = {
   windowBlurred: function (windowId) {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_WINDOW_BLURRED,
+      windowId: windowId
+    })
+  },
+
+  /**
+   * Dispatches a message when windowId gains focus
+   *
+   * @param {Number} windowId - the unique id of the window
+   */
+  windowFocused: function (windowId) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_WINDOW_FOCUSED,
       windowId: windowId
     })
   },
@@ -1022,6 +1109,81 @@ const appActions = {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_CHANGE_LEDGER_PINNED_PERCENTAGES,
       publishers
+    })
+  },
+
+  /**
+   * Update ledger publishers pinned percentages according to the new synopsis
+   * Open dialog for default download path setting
+   * Dispatches a message when a tab is being pinned
+   * @param {number} tabId - The tabId of the tab to pin
+   */
+  tabPinned: function (tabId, pinned) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_TAB_PINNED,
+      tabId,
+      pinned
+    })
+  },
+
+  /*
+   * Dispatches a message when a web contents is added
+   * @param {number} windowId - The windowId of the host window
+   * @param {object} frameOpts - frame options for the added web contents
+   */
+  newWebContentsAdded: function (windowId, frameOpts) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_NEW_WEB_CONTENTS_ADDED,
+      queryInfo: {
+        windowId
+      },
+      frameOpts
+    })
+  },
+
+  /*
+   * Notifies the app that a drag operation started from within the app
+   * @param {number} windowId - The source windowId the drag is starting from
+   * @param {string} dragType - The type of data
+   * @param {object} dragData - Data being transfered
+   */
+  dragStarted: function (windowId, dragType, dragData) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_DRAG_STARTED,
+      windowId,
+      dragType,
+      dragData
+    })
+  },
+
+  /**
+   * Notifies the app that a drag operation stopped from within the app
+   * @param {string} dragType - The type of data
+   * @param {object} dragData - Data being transfered
+   */
+  dragEnded: function () {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_DRAG_STOPPED
+    })
+  },
+
+  /**
+   * Notifies the app that a drop operation occurred
+   */
+  dataDropped: function (dropWindowId) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_DATA_DROPPED,
+      dropWindowId
+    })
+  },
+
+  /**
+   * Notifies the app that a drop operation occurred
+   */
+  draggedOver: function (draggedOverData) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_DRAGGED_OVER,
+      draggedOverData
     })
   }
 }

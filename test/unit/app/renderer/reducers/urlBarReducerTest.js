@@ -61,14 +61,6 @@ describe('urlBarReducer', function () {
     })
   })
 
-  describe('WINDOW_SET_URL', function () {
-    it('updates navbar navbar for URL navigation', function () {
-      this.location = 'https:/www.brave.com/4'
-      this.newState = urlBarReducer(windowState, {actionType: windowConstants.WINDOW_SET_URL, location: this.location, key: 2})
-      assert.equal(this.newState.getIn(['frames', 1, 'navbar', 'urlbar', 'location']), this.location)
-    })
-  })
-
   describe('WINDOW_SET_NAVIGATED', function () {
     describe('Basic', function () {
       it('updates navbar navbar for URL navigation', function () {
