@@ -211,7 +211,10 @@ class UpdateBar extends ImmutableComponent {
     }
 
     // 'notificationItem' for styling with notificationBar.less
-    return <div className={updateBarStyle + ' ' + 'notificationItem'} data-test-id='updateBar'>
+    return <div className={cx({
+      [updateBarStyle]: true,
+      notificationItem: true
+    })} data-test-id='updateBar'>
       {
         updateStatus === UpdateStatus.UPDATE_AVAILABLE ? <UpdateAvailable metadata={this.props.updates.get('metadata')} updateStatus={updateStatus} /> : null
       }
