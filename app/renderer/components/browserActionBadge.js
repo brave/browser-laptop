@@ -39,17 +39,19 @@ class BrowserActionBadge extends ImmutableComponent {
 
 const styles = StyleSheet.create({
   browserActionBadge: {
+    left: 'calc(50% - 1px)',
+    top: '14px',
+    position: 'absolute',
     color: '#FFF',
-    borderRadius: '2px',
+    borderRadius: '2.5px',
     padding: '1px 2px',
     pointerEvents: 'none',
-    font: '7pt "Arial Narrow"',
+    font: '6pt "Arial Narrow"',
     textAlign: 'center',
-    position: 'absolute',
-    top: '50%',
-    left: '40%',
-    border: '.5px solid #FFF',
-    minWidth: '8px'
+    border: '0px solid #FFF',
+    background: '#555555',
+    minWidth: '10px',
+    userSelect: 'none'
   },
   centered: {
     left: '50%',
