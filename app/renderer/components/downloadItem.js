@@ -82,6 +82,7 @@ class DownloadItem extends ImmutableComponent {
     } else if (downloadUtil.isPendingState(this.props.download)) {
       l10nStateArgs.downloadPercent = downloadUtil.getPercentageComplete(this.props.download)
     }
+    const isInsecure = origin.startsWith('http://')
     return <span
       onContextMenu={contextMenus.onDownloadsToolbarContextMenu.bind(null, this.props.downloadId, this.props.download)}
       onDoubleClick={this.onOpenDownload}
@@ -153,11 +154,14 @@ class DownloadItem extends ImmutableComponent {
           </div>
           {
             origin
-              ? <div className={cx({
-                downloadOrigin: true,
-                isSecure: origin.startsWith('https://'),
-                isInsecure: origin.startsWith('http://')
-              })} title={origin}>{origin}</div>
+              ? <div className='downloadOrigin'>
+                {
+                  isInsecure
+                    ? <span className='fa fa-unlock isInsecure' />
+                    : null
+                }
+                <span title={origin}>{origin}</span>
+              </div>
               : null
           }
           {
