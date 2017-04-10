@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.14.2](https://github.com/brave/browser-laptop/releases/v0.14.2dev)
+ - Update muon to 2.57.9. ([#8161](https://github.com/brave/browser-laptop/issues/8161))
+
 ## [0.14.1](https://github.com/brave/browser-laptop/releases/v0.14.1dev)
  - Fixed paste not detected issue with context menus. ([#8000](https://github.com/brave/browser-laptop/issues/8000))
  - Fixed accidental selection of lion badge numbers. ([#7994](https://github.com/brave/browser-laptop/issues/7994))
