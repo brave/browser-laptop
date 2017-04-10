@@ -1310,7 +1310,7 @@ class Main extends ImmutableComponent {
                         .includes(siteTags.BOOKMARK)) || emptyMap
                   : null}
                 history={this.bindHistory(frame)}
-                extensions={frame.get('location') === 'about:extensions'
+                extensions={['about:extensions', 'about:preferences'].includes(getBaseUrl(frame.get('location')))
                   ? this.props.appState.get('extensions') || emptyMap
                   : null}
                 preferencesData={frame.get('location') === 'about:preferences#payments'

@@ -6,6 +6,7 @@ const messages = require('../constants/messages')
 const appDispatcher = require('../dispatcher/appDispatcher')
 const windowConstants = require('../constants/windowConstants')
 const appConstants = require('../constants/appConstants')
+const ExtensionConstants = require('../../app/common/constants/extensionConstants')
 const ipc = window.chrome.ipcRenderer
 
 const aboutActions = {
@@ -95,6 +96,18 @@ const aboutActions = {
    */
   resetSync: function () {
     ipc.send(messages.RESET_SYNC)
+  },
+
+  /**
+   * Dispatched when an extension has been uninstalled
+   *
+   * @param {string} extensionId - the extension id
+   */
+  extensionUninstalled: function (extensionId) {
+    aboutActions.dispatchAction({
+      actionType: ExtensionConstants.EXTENSION_UNINSTALLED,
+      extensionId
+    })
   },
 
   /**

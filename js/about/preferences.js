@@ -19,7 +19,8 @@ const Button = require('../components/button')
 const PaymentsTab = require('../../app/renderer/components/preferences/paymentsTab')
 const SyncTab = require('../../app/renderer/components/preferences/syncTab')
 const PluginsTab = require('../../app/renderer/components/preferences/pluginsTab')
-
+const ExtensionsTab = require('../../app/renderer/components/preferences/extensionsTab')
+const {populateDefaultExtensions} = require('../../app/renderer/lib/extensionsUtil')
 const {getZoomValuePercentage} = require('../lib/zoom')
 
 const config = require('../constants/config')
@@ -727,6 +728,10 @@ class AboutPreferences extends React.Component {
     ipc.on(messages.BRAVERY_DEFAULTS_UPDATED, (e, braveryDefaults) => {
       this.setState({ braveryDefaults: Immutable.fromJS(braveryDefaults || {}) })
     })
+    ipc.on(messages.EXTENSIONS_UPDATED, (e, extensionsData) => {
+      const extensions = populateDefaultExtensions(extensionsData)
+      this.setState({ extensions: Immutable.fromJS(extensions || {}) })
+    })
     ipc.on(messages.LANGUAGE, (e, {langCode, languageCodes}) => {
       this.setState({ languageCodes })
     })
@@ -847,6 +852,7 @@ class AboutPreferences extends React.Component {
     const languageCodes = this.state.languageCodes
     const ledgerData = this.state.ledgerData
     const syncData = this.state.syncData
+    const extensions = this.state.extensions
     switch (this.state.preferenceTab) {
       case preferenceTabs.GENERAL:
         tab = <GeneralTab settings={settings} onChangeSetting={this.onChangeSetting} languageCodes={languageCodes} />
@@ -916,6 +922,9 @@ class AboutPreferences extends React.Component {
           showOverlay={this.setOverlayVisible.bind(this, true)}
           hideOverlay={this.setOverlayVisible.bind(this, false)}
           hideAdvancedOverlays={this.hideAdvancedOverlays.bind(this)} />
+        break
+      case preferenceTabs.EXTENSIONS:
+        tab = <ExtensionsTab extensions={extensions} settings={settings} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.SECURITY:
         tab = <SecurityTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />

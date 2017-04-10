@@ -97,6 +97,7 @@ AppStore
   }],
   extensions: {
     [id]: {
+      excluded: boolean, // true if extension was excluded by the user
       base_path: string,
       browserAction: {
         icon: (string|object),

@@ -32,9 +32,14 @@ displayNames[passwordManagers.ENPASS] = 'Enpass'
 displayNames[passwordManagers.BITWARDEN] = 'bitwarden'
 displayNames[passwordManagers.UNMANAGED] = null
 
+const thirdPartyPasswordManagers = Object.keys(extensionIds)
+  .map(key => key && extensionIds[key])
+  .filter(key => key !== null)
+
 module.exports = {
   passwordManagers,
   defaultPasswordManager,
   extensionIds,
-  displayNames
+  displayNames,
+  thirdPartyPasswordManagers
 }
