@@ -158,4 +158,6 @@ module.exports.isPasswordManager = (extensionId) => {
  * @param {String} text - The text to check against
  * @returns {String} Text with replaced string
  */
-module.exports.bravifyText = (text) => text && text.replace(/Chrome|Google Chrome/g, 'Brave')
+module.exports.bravifyText = (text) => {
+  return text && text.replace(/Chrome|Google ?Chrome/g, 'Brave')
+}
