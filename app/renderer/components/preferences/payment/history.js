@@ -4,7 +4,7 @@
 
 const React = require('react')
 const Immutable = require('immutable')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // util
 const {addExportFilenamePrefixToTransactions} = require('../../../../common/lib/ledgerExportUtil')
@@ -17,7 +17,7 @@ const ImmutableComponent = require('../../../../../js/components/immutableCompon
 
 // style
 const globalStyles = require('../../styles/global')
-const commonStyles = require('../../styles/commonStyles')
+const {paymentStylesVariables} = require('../../styles/payment')
 
 // other
 const aboutUrls = appUrlUtil.aboutUrls
@@ -32,11 +32,11 @@ class HistoryContent extends ImmutableComponent {
     )
 
     return <table className={css(styles.paymentHistoryTable)}>
-      <thead>
-        <tr className={css(styles.rowContainer, styles.headerContainer)}>
-          <th className={css(styles.header, styles.narrow)} data-l10n-id='date' />
-          <th className={css(styles.header, styles.medium)} data-l10n-id='totalAmount' />
-          <th className={css(styles.header, styles.wide)} data-l10n-id='receiptLink' />
+      <thead className={css(styles.headerContainer__wrapper)}>
+        <tr className={css(styles.flex, styles.headerContainer)}>
+          <th className={css(styles.header, styles.column, styles.leftRow, styles.column__narrow)} data-l10n-id='date' />
+          <th className={css(styles.header, styles.column, styles.column__narrow)} data-l10n-id='totalAmount' />
+          <th className={css(styles.header, styles.column, styles.column__wide)} data-l10n-id='receiptLink' />
         </tr>
       </thead>
       <tbody>
@@ -84,10 +84,10 @@ class HistoryRow extends ImmutableComponent {
   }
 
   render () {
-    return <tr className={css(styles.rowContainer, styles.rowData)}>
-      <td className={css(styles.column, styles.narrow)} data-sort={this.timestamp}>{this.formattedDate}</td>
-      <td className={css(styles.column, styles.medium)} data-sort={this.satoshis}>{this.totalAmountStr}</td>
-      <td className={css(styles.column, styles.wide)}>
+    return <tr className={css(styles.flex, styles.rowData)}>
+      <td className={css(styles.flexAlignCenter, styles.column, styles.leftRow, styles.column__narrow)} data-sort={this.timestamp}>{this.formattedDate}</td>
+      <td className={css(styles.flexAlignCenter, styles.column, styles.column__amount, styles.column__narrow)} data-sort={this.satoshis}>{this.totalAmountStr}</td>
+      <td className={css(styles.flexAlignCenter, styles.column, styles.column__wide)}>
         <a href={`${aboutContributionsUrl}#${this.viewingId}`} target='_blank'>{this.receiptFileName}</a>
       </td>
     </tr>
@@ -113,44 +113,84 @@ class HistoryFooter extends ImmutableComponent {
       reconcileDate: formattedTimeFromNow(timestamp)
     }
 
-    return <div className={css(styles.historyFooter)}>
-      <div className={css(styles.nextPayment)}>
+    return <div className={css(styles.flexAlignCenter, styles.historyFooter)}>
+      <div className={css(styles.historyFooter__nextPayment)}>
         <span data-l10n-id={l10nDataId} data-l10n-args={JSON.stringify(l10nDataArgs)} />
       </div>
-      <Button l10nId='paymentHistoryOKText'
-        className={css(commonStyles.primaryButton)}
+      {/* TODO: refactor button.less */}
+      <Button className='primaryButton'
+        l10nId='paymentHistoryOKText'
+        testId='paymentHistoryOKText'
         onClick={this.props.hideOverlay.bind(this, 'paymentHistory')}
       />
     </div>
   }
 }
 
+const columnHeight = '1.5rem'
+const columnPadding = '.25rem'
+const headerBorderWidth = '2px'
+
 const styles = StyleSheet.create({
+  flex: {
+    display: 'flex'
+  },
+  flexAlignCenter: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  // TODO: refactor modalOverlay and preferences.less
+  // See: .paymentsContainer .modal .dialog.paymentHistory .dialog-footer in preferences.less
+  leftRow: {
+    paddingLeft: paymentStylesVariables.spacing.paymentHistoryTablePadding
+  },
+
   paymentHistoryTable: {
     display: 'flex',
-    flexDirection: 'column',
-    flex: '1',
-    borderSpacing: '0',
-    margin: '1em 0'
+    flexFlow: 'column nowrap',
+    borderSpacing: '0'
   },
 
+  headerContainer__wrapper: {
+    position: 'sticky',
+    top: 0,
+    background: paymentStylesVariables.color.paymentHistoryTableBackgroundColor
+  },
   headerContainer: {
-    borderBottom: `2px solid ${globalStyles.color.lightGray}`
+    paddingTop: columnPadding,
+    paddingBottom: columnPadding,
+    borderBottom: `${headerBorderWidth} solid ${globalStyles.color.lightGray}`,
+    height: columnHeight,
+    alignItems: 'center',
+    cursor: 'default',
+    userSelect: 'none'
   },
-
   header: {
-    display: 'flex',
     color: globalStyles.color.darkGray,
     fontWeight: '500',
-    paddingBottom: '.25em'
+    textAlign: 'left',
+
+    // cancel border-bottom of headerContainer
+    position: 'relative',
+    top: headerBorderWidth
   },
 
-  rowContainer: {
-    display: 'flex',
+  column: {
+    height: columnHeight
+  },
+  column__narrow: {
     flex: '1'
+  },
+  column__amount: {
+    color: globalStyles.color.mediumGray
+  },
+  column__wide: {
+    flex: '2'
   },
 
   rowData: {
+    padding: `${columnPadding} 0`,
+
     ':nth-child(even)': {
       backgroundColor: globalStyles.color.veryLightGray
     },
@@ -159,36 +199,14 @@ const styles = StyleSheet.create({
     }
   },
 
-  column: {
-    display: 'flex',
-    alignItems: 'center',
-    whiteSpace: 'nowrap',
-    height: '1.5em',
-    padding: '.125em 0'
-  },
-
-  narrow: {
-    color: globalStyles.color.darkGray,
-    justifyContent: 'center',
-    flex: '2'
-  },
-
-  medium: {
-    color: globalStyles.color.darkGray,
-    flex: '3'
-  },
-
-  wide: {
-    color: '#777',
-    flex: '4'
-  },
   historyFooter: {
-    display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center'
+    cursor: 'default',
+    userSelect: 'none'
   },
-  nextPayment: {
-    fontSize: '14px'
+  historyFooter__nextPayment: {
+    // 16px * 0.875 = 14px
+    fontSize: '0.875rem'
   }
 })
 

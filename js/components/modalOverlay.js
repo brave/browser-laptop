@@ -4,6 +4,7 @@
 
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
+const cx = require('../lib/classSet')
 
 /**
  * Represents a modal overlay
@@ -45,13 +46,23 @@ class ModalOverlay extends ImmutableComponent {
     var close = null
     var button = null
     var title = null
+
+    let customHeaderClassesStr = (this.props.customHeaderClasses ? this.props.customHeaderClasses : '')
+
     if (!this.props.emptyDialog) {
       close = (this.props.onHide ? <button type='button' className='close' onClick={this.props.onHide} /> : null)
-      title = (this.props.title ? <div className='sectionTitle' data-l10n-id={this.props.title} /> : null)
+      title = (this.props.title ? <div className={cx({
+        sectionTitle: true,
+        [customHeaderClassesStr]: true
+      })} data-l10n-id={this.props.title} /> : null)
     }
+
     let customTitleClassesStr = (this.props.customTitleClasses ? this.props.customTitleClasses : '')
 
-    return <div className={'dialog ' + customTitleClassesStr}>
+    return <div className={cx({
+      dialog: true,
+      [customTitleClassesStr]: true
+    })}>
       <div className='dialog-header'>
         {close}
         {title}
