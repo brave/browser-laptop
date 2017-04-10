@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const PropTypes = require('prop-types')
 const ImmutableComponent = require('./immutableComponent')
 const KeyCodes = require('../../app/common/constants/keyCodes')
 
@@ -41,13 +42,13 @@ class Dialog extends ImmutableComponent {
 }
 
 Dialog.propTypes = {
-  children: React.PropTypes.oneOfType([
-    React.PropTypes.element,
-    React.PropTypes.array
+  children: PropTypes.oneOfType([
+    PropTypes.element,
+    PropTypes.array
   ]),
-  className: React.PropTypes.string,
-  isClickDismiss: React.PropTypes.bool,
-  onHide: React.PropTypes.func
+  className: PropTypes.string,
+  isClickDismiss: PropTypes.bool,
+  onHide: PropTypes.func
 }
 
 module.exports = Dialog
