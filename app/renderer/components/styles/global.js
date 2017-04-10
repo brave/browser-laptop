@@ -78,6 +78,9 @@ const globalStyles = {
     urlBarOutline: '#bbb',
     alphaWhite: 'rgba(255,255,255,0.8)'
   },
+  filter: {
+    makeWhite: 'brightness(0) invert(1)'
+  },
   radius: {
     borderRadius: '4px',
     borderRadiusTabs: '4px',

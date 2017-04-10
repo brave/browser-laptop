@@ -7,10 +7,12 @@ const ImmutableComponent = require('../../../js/components/immutableComponent')
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('./styles/global')
 const {isWindows} = require('../../common/lib/platformUtil')
-const {getTextColorForBackground} = require('../../../js/lib/color')
 const {tabs} = require('../../../js/constants/config')
 const {hasBreakpoint, hasRelativeCloseIcon,
-      hasFixedCloseIcon, hasVisibleSecondaryIcon} = require('../lib/tabUtil')
+      hasFixedCloseIcon, hasVisibleSecondaryIcon, getTabIconColor} = require('../lib/tabUtil')
+const {spinKeyframes} = require('./styles/animations')
+
+const loadingIconSvg = require('../../extensions/brave/img/tabs/loading.svg')
 const newSessionSvg = require('../../extensions/brave/img/tabs/new_session.svg')
 const privateSvg = require('../../extensions/brave/img/tabs/private.svg')
 const closeTabSvg = require('../../extensions/brave/img/tabs/close_btn_normal.svg')
@@ -57,12 +59,6 @@ class Favicon extends ImmutableComponent {
     return !this.props.isLoading && this.props.tab.get('icon')
   }
 
-  get loadingIcon () {
-    return this.props.isLoading
-      ? globalStyles.appIcons.loading
-      : null
-  }
-
   get defaultIcon () {
     return (!this.props.isLoading && !this.favicon)
       ? globalStyles.appIcons.defaultIcon
@@ -80,18 +76,25 @@ class Favicon extends ImmutableComponent {
 
   render () {
     const iconStyles = StyleSheet.create({
-      favicon: {backgroundImage: `url(${this.favicon})`}
+      favicon: {backgroundImage: `url(${this.favicon})`},
+      loadingIconColor: {
+        // Don't change icon color unless when it should be white
+        filter: getTabIconColor(this.props) === 'white' ? globalStyles.filter.makeWhite : 'none'
+      }
     })
     return !this.shouldHideFavicon
       ? <TabIcon
         data-test-favicon={this.favicon}
-        data-test-id={this.loadingIcon ? 'loading' : 'defaultIcon'}
+        data-test-id={this.props.isLoading ? 'loading' : 'defaultIcon'}
         className={css(
           styles.icon,
           this.favicon && iconStyles.favicon,
           !this.props.tab.get('pinnedLocation') && this.narrowView && styles.faviconNarrowView
         )}
-        symbol={this.loadingIcon || this.defaultIcon} />
+        symbol={
+          (this.props.isLoading && css(styles.loadingIcon, iconStyles.loadingIconColor)) ||
+          this.defaultIcon
+        } />
       : null
   }
 }
@@ -166,10 +169,7 @@ class NewSessionIcon extends ImmutableComponent {
   }
 
   get iconColor () {
-    const themeColor = this.props.tab.get('themeColor') || this.props.tab.get('computedThemeColor')
-    return this.props.paintTabs && themeColor
-      ? getTextColorForBackground(themeColor)
-      : globalStyles.color.black100
+    return getTabIconColor(this.props)
   }
 
   render () {
@@ -206,22 +206,11 @@ class TabTitle extends ImmutableComponent {
       hasFixedCloseIcon(this.props)
   }
 
-  get themeColor () {
-    const themeColor = this.props.tab.get('themeColor') || this.props.tab.get('computedThemeColor')
-    const activeNonPrivateTab = !this.props.tab.get('isPrivate') && this.props.isActive
-    const isPrivateTab = this.props.tab.get('isPrivate') && (this.props.isActive || this.props.tab.get('hoverState'))
-    const defaultColor = isPrivateTab ? globalStyles.color.white100 : globalStyles.color.black100
-
-    return activeNonPrivateTab && this.props.paintTabs && !!themeColor
-      ? getTextColorForBackground(themeColor)
-      : defaultColor
-  }
-
   render () {
     const titleStyles = StyleSheet.create({
       gradientText: {
         backgroundImage: `-webkit-linear-gradient(left,
-        ${this.themeColor} 90%, ${globalStyles.color.almostInvisible} 100%)`
+        ${getTabIconColor(this.props)} 90%, ${globalStyles.color.almostInvisible} 100%)`
       }
     })
 
@@ -284,6 +273,14 @@ const styles = StyleSheet.create({
     padding: '0',
     fontSize: '10px',
     backgroundPosition: 'center center'
+  },
+
+  loadingIcon: {
+    backgroundImage: `url(${loadingIconSvg})`,
+    animationName: spinKeyframes,
+    animationTimingFunction: 'linear',
+    animationDuration: '1200ms',
+    animationIterationCount: 'infinite'
   },
 
   audioIcon: {

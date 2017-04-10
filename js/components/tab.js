@@ -324,6 +324,7 @@ class Tab extends ImmutableComponent {
           )}>
           <Favicon
             isActive={this.props.isActive}
+            paintTabs={this.props.paintTabs}
             tab={this.props.tab}
             isLoading={this.loading}
             isPinned={this.isPinned}

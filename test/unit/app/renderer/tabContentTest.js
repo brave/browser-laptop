@@ -15,6 +15,7 @@ require('../../braveUnit')
 
 describe('tabContent components', function () {
   before(function () {
+    mockery.registerMock('../../extensions/brave/img/tabs/loading.svg')
     mockery.registerMock('../../extensions/brave/img/tabs/new_session.svg')
     mockery.registerMock('../../extensions/brave/img/tabs/close_btn_normal.svg')
     mockery.registerMock('../../extensions/brave/img/tabs/close_btn_hover.svg')
@@ -77,7 +78,7 @@ describe('tabContent components', function () {
           isLoading
         />
       )
-      assert.equal(wrapper.props().symbol, globalStyles.appIcons.loading)
+      assert.equal(wrapper.props()['data-test-id'], 'loading')
     })
     it('should not show favicon for new tab page', function () {
       const wrapper = shallow(
