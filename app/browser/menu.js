@@ -421,6 +421,7 @@ const createWindowSubmenu = () => {
     CommonMenu.separatorMenuItem,
     CommonMenu.bookmarksManagerMenuItem(),
     CommonMenu.downloadsMenuItem(),
+    CommonMenu.extensionsMenuItem(),
     CommonMenu.passwordsMenuItem()
   ]
 
