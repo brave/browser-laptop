@@ -180,7 +180,8 @@ const globalStyles = {
     tabIcon: '14px',
     tabTitle: '12px',
     settingItemSubtext: '.95rem',
-    flyoutDialog: '13px'
+    flyoutDialog: '13px',
+    prefsPanelHeading: '23px'
   },
   appIcons: {
     clipboard: 'fa fa-clipboard',
@@ -192,7 +193,9 @@ const globalStyles = {
     remove: 'fa fa-times',
     volumeOff: 'fa fa-volume-off',
     volumeOn: 'fa fa-volume-up',
-    exclude: 'fa fa-ban'
+    exclude: 'fa fa-ban',
+    trash: 'fa fa-trash',
+    moreInfo: 'fa fa-info-circle'
   }
 }
 

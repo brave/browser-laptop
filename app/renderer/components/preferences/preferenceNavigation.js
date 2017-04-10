@@ -10,7 +10,7 @@ const globalStyles = require('../styles/global')
 const iconGeneral = require('../../../extensions/brave/img/preferences/browser_prefs_general.svg')
 const iconSearch = require('../../../extensions/brave/img/preferences/browser_prefs_search.svg')
 const iconTabs = require('../../../extensions/brave/img/preferences/browser_prefs_tabs.svg')
-// const iconExtensions = require('../../../extensions/brave/img/preferences/browser_prefs_extensions.svg')
+const iconExtensions = require('../../../extensions/brave/img/preferences/browser_prefs_extensions.svg')
 const iconPlugins = require('../../../extensions/brave/img/preferences/browser_prefs_plugins.svg')
 const iconSecurity = require('../../../extensions/brave/img/preferences/browser_prefs_security.svg')
 const iconShields = require('../../../extensions/brave/img/preferences/browser_prefs_shields.svg')
@@ -53,9 +53,11 @@ class PreferenceNavigation extends ImmutableComponent {
           onClick={this.props.changeTab.bind(null, preferenceTabs.PAYMENTS)}
           selected={this.props.preferenceTab === preferenceTabs.PAYMENTS}
         />
-        {
-          /* TODO @cezaraugusto add extensions panel */
-        }
+        <PreferenceNavigationButton icon={styles.extensions}
+          dataL10nId='extensions'
+          onClick={this.props.changeTab.bind(null, preferenceTabs.EXTENSIONS)}
+          selected={this.props.preferenceTab === preferenceTabs.EXTENSIONS}
+        />
         <PreferenceNavigationButton icon={styles.plugins}
           dataL10nId='plugins'
           onClick={this.props.changeTab.bind(null, preferenceTabs.PLUGINS)}
@@ -106,6 +108,7 @@ const styles = StyleSheet.create({
   shields: navIcon(iconShields),
   payments: navIcon(iconPayments),
   sync: navIcon(iconSync),
+  extensions: navIcon(iconExtensions),
   advanced: navIcon(iconAdvanced)
 })
 

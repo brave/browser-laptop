@@ -102,6 +102,20 @@ const extensionState = {
     return state.setIn(['extensions', extensionId], action.get('installInfo'))
   },
 
+  extensionUninstalled: (state, action) => {
+    action = makeImmutable(action)
+    state = makeImmutable(state)
+    let extensionId = action.get('extensionId').toString()
+    let extension = extensionState.getExtensionById(state, extensionId)
+    // Since we populate uninstalled extensions with dummyContent,
+    // removing installInfo would just add dummy data instead of removing it
+    // so we add a prop called 'excluded' and use it to hide extension on UI
+    if (extension) {
+      return state.setIn(['extensions', extensionId], extension.set('excluded', true))
+    }
+    return state
+  },
+
   extensionEnabled: (state, action) => {
     action = makeImmutable(action)
     state = makeImmutable(state)

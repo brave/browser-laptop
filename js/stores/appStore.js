@@ -357,7 +357,8 @@ const applyReducers = (state, action) => [
   require('../../app/browser/reducers/clipboardReducer'),
   require('../../app/browser/reducers/passwordManagerReducer'),
   require('../../app/browser/reducers/tabMessageBoxReducer'),
-  require('../../app/browser/reducers/dragDropReducer')
+  require('../../app/browser/reducers/dragDropReducer'),
+  require('../../app/browser/reducers/extensionsReducer')
 ].reduce(
     (appState, reducer) => {
       const newState = reducer(appState, action)
