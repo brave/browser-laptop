@@ -18,7 +18,7 @@ const contextMenus = require('../contextMenus')
 const getSetting = require('../settings').getSetting
 
 // Components
-const NavigationBar = require('./navigationBar')
+const NavigationBar = require('./../../app/renderer/components/navigation/navigationBar')
 const Frame = require('./frame')
 const TabPages = require('./tabPages')
 const TabsToolbar = require('./tabsToolbar')

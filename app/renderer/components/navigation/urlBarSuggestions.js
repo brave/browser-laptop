@@ -3,14 +3,14 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('../../../js/components/immutableComponent')
+const ImmutableComponent = require('../../../../js/components/immutableComponent')
 
 const UrlBarSuggestionItem = require('./urlBarSuggestionItem')
-const windowActions = require('../../../js/actions/windowActions')
-const suggestionTypes = require('../../../js/constants/suggestionTypes')
-const cx = require('../../../js/lib/classSet')
-const locale = require('../../../js/l10n')
-const {isForSecondaryAction} = require('../../../js/lib/eventUtil')
+const windowActions = require('../../../../js/actions/windowActions')
+const suggestionTypes = require('../../../../js/constants/suggestionTypes')
+const cx = require('../../../../js/lib/classSet')
+const locale = require('../../../../js/l10n')
+const {isForSecondaryAction} = require('../../../../js/lib/eventUtil')
 
 class UrlBarSuggestions extends ImmutableComponent {
   constructor () {
