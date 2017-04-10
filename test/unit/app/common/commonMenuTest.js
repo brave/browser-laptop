@@ -144,6 +144,12 @@ describe('Common menu module unit tests', function () {
     })
   })
 
+  describe('extensionsMenuItem', function () {
+    it('has the expected defaults set', function () {
+      checkExpectedDefaults(commonMenu.extensionsMenuItem, false)
+    })
+  })
+
   describe('importBrowserDataMenuItem', function () {
     it('has the expected defaults set', function () {
       checkExpectedDefaults(commonMenu.importBrowserDataMenuItem, false)
