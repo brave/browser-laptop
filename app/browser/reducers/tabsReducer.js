@@ -47,6 +47,9 @@ const tabsReducer = (state, action) => {
     case windowConstants.WINDOW_CLOSE_FRAME:
       state = tabState.closeFrame(state, action)
       break
+    case windowConstants.WINDOW_SET_ACTIVE_FRAME:
+      state = tabs.setActive(state, action)
+      break
     case appConstants.APP_TAB_TOGGLE_DEV_TOOLS:
       state = tabs.toggleDevTools(state, action)
       break

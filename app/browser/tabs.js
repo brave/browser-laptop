@@ -183,6 +183,19 @@ const api = {
     return state
   },
 
+  setActive: (state, action) => {
+    action = makeImmutable(action)
+    let frameProps = action.get('frameProps')
+    let tabId = frameProps.get('tabId')
+    let tab = api.getWebContents(tabId)
+    if (tab && !tab.isDestroyed()) {
+      tab.setActive(true)
+      let tabValue = getTabValue(tabId)
+      return tabState.updateTab(state, { tabValue })
+    }
+    return state
+  },
+
   setAudioMuted: (state, action) => {
     action = makeImmutable(action)
     let frameProps = action.get('frameProps')

@@ -319,8 +319,8 @@ class Frame extends ImmutableComponent {
     if (this.shouldCreateWebview()) {
       guestInstanceId = this.props.guestInstanceId
       this.webview = document.createElement('webview')
-      if (guestInstanceId) {
-        if (!this.webview.setGuestInstanceId(guestInstanceId)) {
+      if (guestInstanceId != null) {
+        if (!this.webview.attachGuest(guestInstanceId)) {
           console.error('could not set guestInstanceId ' + guestInstanceId)
           guestInstanceId = null
         }
@@ -358,7 +358,9 @@ class Frame extends ImmutableComponent {
   }
 
   onPropsChanged (prevProps = {}) {
-    this.webview.setActive(this.props.isActive)
+    if (!prevProps.isActive && this.props.isActive) {
+      windowActions.setActiveFrame(this.frame)
+    }
     this.webview.setTabIndex(this.props.tabIndex)
     if (this.frame && this.props.isActive && isFocused()) {
       windowActions.setFocusedFrame(this.frame)
@@ -367,6 +369,9 @@ class Frame extends ImmutableComponent {
   }
 
   componentDidMount () {
+    if (this.props.isActive) {
+      windowActions.setActiveFrame(this.frame)
+    }
     this.updateWebview(this.onPropsChanged)
   }
 
@@ -646,6 +651,16 @@ class Frame extends ImmutableComponent {
   }
 
   addEventListeners () {
+    this.webview.addEventListener('tab-id-changed', (e) => {
+      if (this.frame.isEmpty()) {
+        return
+      }
+
+      let tabId = e.tabID
+      if (this.props.tabId !== tabId) {
+        windowActions.setFrameTabId(this.frame, tabId)
+      }
+    })
     this.webview.addEventListener('content-blocked', (e) => {
       if (this.frame.isEmpty()) {
         return
@@ -692,16 +707,6 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('mouseleave', (e) => {
       currentWindowWebContents.send(messages.DISABLE_SWIPE_GESTURE)
-    })
-    this.webview.addEventListener('did-attach', (e) => {
-      if (this.frame.isEmpty()) {
-        return
-      }
-      // TODO: Remove webview.getId() part below when everyone is on a newer electron
-      let tabId = e.tabId !== undefined ? e.tabId : this.webview.getId()
-      if (this.props.tabId !== tabId) {
-        windowActions.setFrameTabId(this.frame, tabId)
-      }
     })
     this.webview.addEventListener('destroyed', (e) => {
       if (this.frame.isEmpty()) {

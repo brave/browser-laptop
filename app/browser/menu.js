@@ -467,6 +467,11 @@ const createDebugSubmenu = () => {
         process.crash()
       }
     }, {
+      label: 'Send memory pressure alert',
+      click: function () {
+        app.sendMemoryPressureAlert()
+      }
+    }, {
       label: 'Relaunch',
       accelerator: 'Command+Alt+R',
       click: function () {
