@@ -1718,6 +1718,9 @@ var retrieveCustomerInfo = (params, callback) => {
   request.request(options, (err, response, body) => {
     if (err) return null
     var customer = response.statusCode === 200 ? JSON.parse(body) : null
+    if (customer && process.env.LEDGER_LAST_PURCHASE_DAYS_AGO) {
+      customer.lastChargeTimestamp = parseInt(moment().subtract(parseInt(process.env.LEDGER_LAST_PURCHASE_DAYS_AGO), 'days').format('x'))
+    }
     if (customer && clientOptions.debugP) {
       customer.lastCharged = moment(customer.lastChargeTimestamp).format('YYYY-MM-DD HH:mm:ss')
       console.log(customer)
