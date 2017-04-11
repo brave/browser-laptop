@@ -421,13 +421,6 @@ function addFrame (windowState, tabs, frameOpts, newKey, partitionNumber, active
   // Only add pin requests if it's not already added
   const isPinned = frameOpts.isPinned
   delete frameOpts.isPinned
-  if (isPinned) {
-    const alreadyPinnedFrameProps = frames.find((frame) =>
-      frame.get('pinnedLocation') === location && frame.get('partitionNumber') === partitionNumber)
-    if (alreadyPinnedFrameProps) {
-      return {}
-    }
-  }
 
   // TODO: longer term get rid of parentFrameKey completely instead of
   // calculating it here.
