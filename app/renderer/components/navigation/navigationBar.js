@@ -132,16 +132,18 @@ class NavigationBar extends ImmutableComponent {
   }
 
   get visiblePublisher () {
-    // No publisher is visible if ledger is disabled
-    if (!getSetting(settings.PAYMENTS_ENABLED) || !this.publisherId) {
-      return false
-    }
     const hostPattern = UrlUtil.getHostPattern(this.publisherId)
     const hostSettings = this.props.siteSettings.get(hostPattern)
     const ledgerPaymentsShown = hostSettings && hostSettings.get('ledgerPaymentsShown')
     return typeof ledgerPaymentsShown === 'boolean'
       ? ledgerPaymentsShown
       : true
+  }
+
+  get isPublisherButtonEnabled () {
+    return getSetting(settings.PAYMENTS_ENABLED) &&
+      UrlUtil.isHttpOrHttps(this.props.location) &&
+      this.visiblePublisher
   }
 
   componentDidMount () {
@@ -245,7 +247,7 @@ class NavigationBar extends ImmutableComponent {
         urlbar={this.props.navbar.get('urlbar')}
         onStop={this.onStop}
         menubarVisible={this.props.menubarVisible}
-        noBorderRadius={!isSourceAboutUrl(this.props.location)}
+        noBorderRadius={this.isPublisherButtonEnabled}
         activeTabShowingMessageBox={this.props.activeTabShowingMessageBox}
         />
       {
