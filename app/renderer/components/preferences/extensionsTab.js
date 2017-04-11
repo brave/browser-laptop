@@ -105,6 +105,7 @@ class ExtensionsTab extends ImmutableComponent {
           <h1 className={css(styles.extensionsHeading)} data-l10n-id='extensions' />
         </header>
         <SortableTable
+          sortingDisabled
           tableClassNames={css(styles.extensionsTable)}
           headings={['icon', 'name', 'description', 'version', 'enabled', 'exclude']}
           columnClassNames={this.columnClassNames}
