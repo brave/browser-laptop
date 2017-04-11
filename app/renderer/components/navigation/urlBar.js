@@ -3,11 +3,13 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const urlParse = require('../../../common/urlParse')
 
 const ImmutableComponent = require('../../../../js/components/immutableComponent')
+const {StyleSheet, css} = require('aphrodite')
+
 const windowActions = require('../../../../js/actions/windowActions')
 const appActions = require('../../../../js/actions/appActions')
+const urlParse = require('../../../common/urlParse')
 const KeyCodes = require('../../../common/constants/keyCodes')
 const cx = require('../../../../js/lib/classSet')
 const debounce = require('../../../../js/lib/debounce')
@@ -23,6 +25,9 @@ const windowStore = require('../../../../js/stores/windowStore')
 const UrlUtil = require('../../../../js/lib/urlutil')
 const {eventElHasAncestorWithClasses, isForSecondaryAction} = require('../../../../js/lib/eventUtil')
 const {isUrl, isIntermediateAboutPage} = require('../../../../js/lib/appUrlUtil')
+
+// Icons
+const iconNoScript = require('../../../../img/url-bar-no-script.svg')
 
 class UrlBar extends ImmutableComponent {
   constructor () {
@@ -47,6 +52,7 @@ class UrlBar extends ImmutableComponent {
         this.urlInput.setSelectionRange(len, len + suffixLen)
       }
     }, 10)
+    this.onNoScript = this.onNoScript.bind(this)
   }
 
   get locationValueSuffix () {
@@ -421,9 +427,15 @@ class UrlBar extends ImmutableComponent {
         this.setValue(this.locationValue)
       }
     }
+
     if (this.isSelected() && !prevProps.urlbar.get('selected')) {
       this.select()
       windowActions.setUrlBarSelected(false)
+    }
+
+    if (this.props.noScriptIsVisible && !this.showNoScriptInfo) {
+      // There are no blocked scripts, so hide the noscript dialog.
+      windowActions.setNoScriptVisible(false)
     }
   }
 
@@ -479,6 +491,14 @@ class UrlBar extends ImmutableComponent {
   get shouldRenderUrlBarSuggestions () {
     return this.props.urlbar.getIn(['suggestions', 'shouldRender']) === true &&
       this.suggestionList && this.suggestionList.size > 0
+  }
+
+  get showNoScriptInfo () {
+    return this.props.enableNoScript && this.props.scriptsBlocked && this.props.scriptsBlocked.size
+  }
+
+  onNoScript () {
+    windowActions.setNoScriptVisible(!this.props.noScriptIsVisible)
   }
 
   onContextMenu (e) {
@@ -545,7 +565,17 @@ class UrlBar extends ImmutableComponent {
           'onFocus': this.props.urlbar.get('active')
         })}>{this.loadTime}</span>
       }
-
+      {
+        !this.showNoScriptInfo
+        ? null
+        : <span className={css(styles.noScriptContainer)}>
+          <button
+            data-l10n-id='noScriptButton'
+            data-test-id='noScriptButton'
+            className={css(styles.noScriptButton)}
+            onClick={this.onNoScript} />
+        </span>
+      }
       {
           this.shouldRenderUrlBarSuggestions
           ? <UrlBarSuggestions
@@ -558,5 +588,21 @@ class UrlBar extends ImmutableComponent {
     </form>
   }
 }
+
+const styles = StyleSheet.create({
+  noScriptContainer: {
+    display: 'flex',
+    paddingLeft: '5px',
+    marginRight: '-3px',
+    WebkitAppRegion: 'drag'
+  },
+  noScriptButton: {
+    WebkitAppRegion: 'no-drag',
+    backgroundImage: `url(${iconNoScript})`,
+    width: '14px',
+    height: '14px',
+    border: '0px'
+  }
+})
 
 module.exports = UrlBar
