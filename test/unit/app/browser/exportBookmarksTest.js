@@ -113,8 +113,8 @@ describe('Bookmarks export', function () {
     let result = exporter.createBookmarkHTML(personal, other)
     let expected = fs.readFileSync('./test/fixtures/bookmarkExport.html', 'utf8')
 
-    result = result.replace(/\s+/g,' ')
-    expected = expected.replace(/\s+/g,' ')
+    result = result.replace(/\s+/g, ' ')
+    expected = expected.replace(/\s+/g, ' ')
 
     assert.equal(result, expected)
   })
