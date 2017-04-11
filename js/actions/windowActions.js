@@ -143,13 +143,13 @@ const windowActions = {
 
   /**
    * Shows/hides the find-in-page bar.
-   * @param {Object} frameProps - The frame properties to modify
-   * @param {boolean} shown - Whether to show the findbar
+   * @param {number} frameKey - Key of the frame that we want to modify
+   * @param {boolean} shown - Whether to show the find bar
    */
-  setFindbarShown: function (frameProps, shown) {
+  setFindbarShown: function (frameKey, shown) {
     dispatch({
       actionType: windowConstants.WINDOW_SET_FINDBAR_SHOWN,
-      frameProps,
+      frameKey,
       shown
     })
   },
@@ -545,13 +545,13 @@ const windowActions = {
 
   /**
    * Dispatches a message to set the find-in-page details.
-   * @param {Object} frameProps - Properties of the frame in question
+   * @param {Object} frameKey - Frame key of the frame in question
    * @param {Object} findDetail - the find details
    */
-  setFindDetail: function (frameProps, findDetail) {
+  setFindDetail: function (frameKey, findDetail) {
     dispatch({
       actionType: windowConstants.WINDOW_SET_FIND_DETAIL,
-      frameProps,
+      frameKey,
       findDetail
     })
   },

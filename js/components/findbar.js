@@ -33,14 +33,14 @@ class FindBar extends ImmutableComponent {
   }
 
   onInput (e) {
-    windowActions.setFindDetail(this.frame, Immutable.fromJS({
+    windowActions.setFindDetail(this.props.frameKey, Immutable.fromJS({
       searchString: e.target.value,
       caseSensitivity: this.isCaseSensitive
     }))
   }
 
   onCaseSensitivityChange (e) {
-    windowActions.setFindDetail(this.frame, Immutable.fromJS({
+    windowActions.setFindDetail(this.props.frameKey, Immutable.fromJS({
       searchString: this.searchString,
       caseSensitivity: !this.isCaseSensitive
     }))
@@ -134,7 +134,7 @@ class FindBar extends ImmutableComponent {
 
   onClear () {
     this.searchInput.value = ''
-    windowActions.setFindDetail(this.frame, Immutable.fromJS({
+    windowActions.setFindDetail(this.props.frameKey, Immutable.fromJS({
       searchString: '',
       caseSensitivity: this.isCaseSensitive
     }))

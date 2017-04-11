@@ -57,8 +57,8 @@ const siteUtil = require('../state/siteUtil')
 const searchProviders = require('../data/searchProviders')
 const defaultBrowserState = require('../../app/common/state/defaultBrowserState')
 const shieldState = require('../../app/common/state/shieldState')
-const siteSettingsState = require('../../app/common/state/siteSettingsState')
 const tabState = require('../../app/common/state/tabState')
+const siteSettingsState = require('../../app/common/state/siteSettingsState')
 
 // Util
 const _ = require('underscore')
@@ -622,20 +622,14 @@ class Main extends ImmutableComponent {
 
   onFindHide () {
     const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
-    windowActions.setFindbarShown(activeFrame, false)
-    webviewActions.stopFindInPage()
-    windowActions.setFindDetail(activeFrame, Immutable.fromJS({
-      internalFindStatePresent: false,
-      numberOfMatches: -1,
-      activeMatchOrdinal: 0
-    }))
+    frameStateUtil.onFindBarHide(activeFrame.get('key'))
   }
 
   onFind (searchString, caseSensitivity, forward, findNext) {
     const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
     webviewActions.findInPage(searchString, caseSensitivity, forward, findNext)
     if (!findNext) {
-      windowActions.setFindDetail(activeFrame, Immutable.fromJS({
+      windowActions.setFindDetail(activeFrame.get('key'), Immutable.fromJS({
         internalFindStatePresent: true
       }))
     }
@@ -648,10 +642,7 @@ class Main extends ImmutableComponent {
 
   get allSiteSettings () {
     const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
-    if (activeFrame && activeFrame.get('isPrivate')) {
-      return this.props.appState.get('siteSettings').mergeDeep(this.props.appState.get('temporarySiteSettings'))
-    }
-    return this.props.appState.get('siteSettings')
+    return siteSettingsState.getAllSiteSettings(this.props.appState, activeFrame)
   }
 
   frameSiteSettings (location) {
@@ -687,7 +678,6 @@ class Main extends ImmutableComponent {
     // can be passed everywhere other than the Frame elements.
     const sortedFrames = frameStateUtil.getSortedFrames(this.props.windowState)
     const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
-    const allSiteSettings = this.allSiteSettings
     const lastCommittedURL = frameStateUtil.getLastCommittedURL(activeFrame)
     const activeSiteSettings = this.frameSiteSettings(lastCommittedURL)
     const nonPinnedFrames = frameStateUtil.getNonPinnedFrames(this.props.windowState)
@@ -712,7 +702,6 @@ class Main extends ImmutableComponent {
     const braverySettings = siteSettings.activeSettings(activeSiteSettings, this.props.appState, appConfig)
     const loginRequiredDetail = activeFrame ? basicAuthState.getLoginRequiredDetail(this.props.appState, activeFrame.get('tabId')) : null
     const customTitlebar = this.customTitlebar
-    const braveryDefaults = Immutable.fromJS(siteSettings.braveryDefaults(this.props.appState, appConfig))
     const contextMenuDetail = this.props.windowState.get('contextMenuDetail')
     const shouldAllowWindowDrag = !contextMenuDetail &&
       !this.props.windowState.get('bookmarkDetail') &&
@@ -939,43 +928,8 @@ class Main extends ImmutableComponent {
           {
             sortedFrames.map((frame) =>
               <Frame
-                urlBarFocused={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'focused'])}
-                tabIndex={frameStateUtil.getFrameIndex(this.props.windowState, frame.get('key'))}
-                prefOpenInForeground={getSetting(settings.SWITCH_TO_NEW_TABS)}
                 frameKey={frame.get('key')}
-                contextMenuDetail={contextMenuDetail}
-                partition={frameStateUtil.getPartition(frame)}
                 key={frame.get('key')}
-                isFullScreen={frame.get('isFullScreen')}
-                isSecure={frame.getIn(['security', 'isSecure'])}
-                showFullScreenWarning={frame.get('showFullScreenWarning')}
-                findbarShown={frame.get('findbarShown')}
-                findDetail={frame.get('findDetail')}
-                hrefPreview={frame.get('hrefPreview')}
-                showOnRight={frame.get('showOnRight')}
-                location={frame.get('location')}
-                isPrivate={frame.get('isPrivate')}
-                partitionNumber={frame.get('partitionNumber')}
-                activeShortcut={frame.get('activeShortcut')}
-                activeShortcutDetails={frame.get('activeShortcutDetails')}
-                provisionalLocation={frame.get('provisionalLocation')}
-                pinnedLocation={frame.get('pinnedLocation')}
-                src={frame.get('src')}
-                guestInstanceId={frame.get('guestInstanceId')}
-                tabId={frame.get('tabId')}
-                aboutDetails={frame.get('aboutDetails')}
-                unloaded={frame.get('unloaded')}
-                audioMuted={frame.get('audioMuted')}
-                noScript={this.props.appState.get('noScript')}
-                flash={this.props.appState.get('flash')}
-                widevine={this.props.appState.get('widevine')}
-                allSiteSettings={allSiteSettings}
-                frameSiteSettings={this.frameSiteSettings(frame.get('location'))}
-                onFindHide={this.onFindHide}
-                enableNoScript={siteSettingsState.isNoScriptEnabled(this.props.appState, this.frameSiteSettings(frame.get('location')))}
-                braveryDefaults={braveryDefaults}
-                isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
-                isActive={frameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
               />)
           }
         </div>

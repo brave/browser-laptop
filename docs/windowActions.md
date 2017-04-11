@@ -121,15 +121,15 @@ Unlike setLocation and loadUrl, this does not modify the state of src and locati
 
 
 
-### setFindbarShown(frameProps, shown) 
+### setFindbarShown(frameKey, shown) 
 
 Shows/hides the find-in-page bar.
 
 **Parameters**
 
-**frameProps**: `Object`, The frame properties to modify
+**frameKey**: `number`, Key of the frame that we want to modify
 
-**shown**: `boolean`, Whether to show the findbar
+**shown**: `boolean`, Whether to show the find bar
 
 
 
@@ -452,13 +452,13 @@ Dispatches a message to set the search engine details.
 
 
 
-### setFindDetail(frameProps, findDetail) 
+### setFindDetail(frameKey, findDetail) 
 
 Dispatches a message to set the find-in-page details.
 
 **Parameters**
 
-**frameProps**: `Object`, Properties of the frame in question
+**frameKey**: `Object`, Frame key of the frame in question
 
 **findDetail**: `Object`, the find details
 
