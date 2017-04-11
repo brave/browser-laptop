@@ -11,6 +11,8 @@ const UrlUtil = require('../lib/urlutil')
 const urlParse = require('../../app/common/urlParse')
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
 
+const defaultTags = new Immutable.List([siteTags.DEFAULT])
+
 const isBookmark = (tags) => {
   if (!tags) {
     return false
@@ -604,14 +606,23 @@ module.exports.isHistoryEntry = function (siteDetail) {
     if (siteDetail.get('location').startsWith('about:')) {
       return false
     }
-    if (Immutable.is(siteDetail.get('tags'), new Immutable.List(['default'])) &&
-      siteDetail.get('lastAccessedTime') === 1) {
+    if (module.exports.isDefaultEntry(siteDetail)) {
       // This is a Brave default newtab site
       return false
     }
     return !!siteDetail.get('lastAccessedTime') && !isBookmarkFolder(siteDetail.get('tags'))
   }
   return false
+}
+
+/**
+ * Determines if the site detail is one of default sites in about:newtab.
+ * @param {Immutable.Map} siteDetail The site detail to check.
+ * @returns {boolean} if the site detail is a default newtab entry.
+ */
+module.exports.isDefaultEntry = function (siteDetail) {
+  return Immutable.is(siteDetail.get('tags'), defaultTags) &&
+    siteDetail.get('lastAccessedTime') === 1
 }
 
 /**

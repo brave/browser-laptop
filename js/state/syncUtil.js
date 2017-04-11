@@ -396,9 +396,8 @@ module.exports.now = () => {
  * @returns {boolean}
  */
 module.exports.isSyncable = (type, item) => {
-  if (type === 'bookmark' && item.get('tags')) {
-    return (item.get('tags').includes('bookmark') ||
-      item.get('tags').includes('bookmark-folder'))
+  if (type === 'bookmark') {
+    return siteUtil.isBookmark(item) || siteUtil.isFolder(item)
   } else if (type === 'siteSetting') {
     for (let field in siteSettingDefaults) {
       if (item.has(field)) {
@@ -465,11 +464,12 @@ module.exports.createSiteData = (site, appState) => {
       siteData[field] = site[field]
     }
   }
-  const siteKey = siteUtil.getSiteKey(Immutable.fromJS(site)) || siteUtil.getSiteKey(Immutable.fromJS(siteData))
+  const immutableSite = Immutable.fromJS(site)
+  const siteKey = siteUtil.getSiteKey(immutableSite) || siteUtil.getSiteKey(Immutable.fromJS(siteData))
   if (siteKey === null) {
     throw new Error('Sync could not create siteKey')
   }
-  if (module.exports.isSyncable('bookmark', Immutable.fromJS(site))) {
+  if (module.exports.isSyncable('bookmark', immutableSite)) {
     const objectId = site.objectId || module.exports.newObjectId(['sites', siteKey])
     const parentFolderObjectId = site.parentFolderObjectId ||
       (site.parentFolderId && findOrCreateFolderObjectId(site.parentFolderId, appState))
@@ -478,18 +478,18 @@ module.exports.createSiteData = (site, appState) => {
       objectId,
       value: {
         site: siteData,
-        isFolder: site.tags.includes('bookmark-folder'),
+        isFolder: siteUtil.isFolder(immutableSite),
         parentFolderObjectId
       }
     }
-  } else if (!site.tags || !site.tags.length || site.tags.includes('pinned')) {
+  } else if (siteUtil.isHistoryEntry(immutableSite)) {
     return {
       name: 'historySite',
       objectId: site.objectId || module.exports.newObjectId(['sites', siteKey]),
       value: siteData
     }
   }
-  console.log(`Warning: Can't create site data: ${site}`)
+  console.log(`Warning: Can't create site data: ${JSON.stringify(site)}`)
 }
 
 /**
