@@ -285,6 +285,7 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
 
       template.push(openInNewTabMenuItem(location, undefined, siteDetail.get('partitionNumber')),
         openInNewPrivateTabMenuItem(location),
+        openInNewWindowMenuItem(location, undefined, siteDetail.get('partitionNumber')),
         openInNewSessionTabMenuItem(location),
         copyAddressMenuItem('copyLinkAddress', location),
         CommonMenu.separatorMenuItem)
