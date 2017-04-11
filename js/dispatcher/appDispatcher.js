@@ -94,12 +94,12 @@ class AppDispatcher {
         ipcCargo.push(payload)
         return
       } else {
-        const {currentWindowId} = require('../../app/renderer/currentWindow')
-        if (!payload.queryInfo || !payload.queryInfo.windowId || payload.queryInfo.windowId === currentWindowId) {
+        const {getCurrentWindowId} = require('../../app/renderer/currentWindow')
+        if (!payload.queryInfo || !payload.queryInfo.windowId || payload.queryInfo.windowId === getCurrentWindowId()) {
           this.dispatchToOwnRegisteredCallbacks(payload)
         }
         cb()
-        if (!payload.queryInfo || !payload.queryInfo.windowId || payload.queryInfo.windowId !== currentWindowId) {
+        if (!payload.queryInfo || !payload.queryInfo.windowId || payload.queryInfo.windowId !== getCurrentWindowId()) {
           ipcCargo.push(payload)
         }
         return

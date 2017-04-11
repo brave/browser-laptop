@@ -711,17 +711,6 @@ const windowActions = {
   },
 
   /**
-   * Sets the maximize state of the window
-   * @param {boolean} isMaximized - true if window is maximized
-   */
-  setMaximizeState: function (isMaximized) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_MAXIMIZE_STATE,
-      isMaximized
-    })
-  },
-
-  /**
    * Saves the position of the window in the window state
    * @param {Array} position - [x, y]
    */
@@ -729,28 +718,6 @@ const windowActions = {
     dispatch({
       actionType: windowConstants.WINDOW_SAVE_POSITION,
       position
-    })
-  },
-
-  /**
-   * Saves the size (width, height) of the window in the window state
-   * @param {Array} size - [x, y]
-   */
-  saveSize: function (size) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SAVE_SIZE,
-      size
-    })
-  },
-
-  /**
-   * Sets the fullscreen state of the window
-   * @param {boolean} isFullScreen - true if window is fullscreen
-   */
-  setWindowFullScreen: function (isFullScreen) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_FULLSCREEN_STATE,
-      isFullScreen
     })
   },
 
@@ -1092,17 +1059,6 @@ const windowActions = {
   },
 
   /**
-   * Fired when window receives or loses focus
-   * @param {boolean} hasFocus - true if focused, false if blurred
-   */
-  onFocusChanged: function (hasFocus) {
-    dispatch({
-      actionType: windowConstants.WINDOW_ON_FOCUS_CHANGED,
-      hasFocus
-    })
-  },
-
-  /**
    * Set Modal Dialog detail
    * @param {string} className - name of modal dialog
    * @param {Object} props - properties of the modal dialog
@@ -1144,6 +1100,106 @@ const windowActions = {
     dispatch({
       actionType: windowConstants.WINDOW_TAB_MOUSE_LEAVE,
       data
+    })
+  },
+
+  onFrameMouseEnter: function (tabId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_FRAME_MOUSE_ENTER,
+      tabId
+    })
+  },
+
+  onFrameMouseLeave: function (tabId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_FRAME_MOUSE_LEAVE,
+      tabId
+    })
+  },
+
+  onMaximize: function (windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_MAXIMIZE,
+      windowId
+    })
+  },
+
+  onMinimize: function (windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_MINIMIZE,
+      windowId
+    })
+  },
+
+  // TODO(bridiver) - refactor these as declarative
+  shouldSetTitle: function (windowId, title) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SHOULD_SET_TITLE,
+      windowId,
+      title
+    })
+  },
+
+  shouldMinimize: function (windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SHOULD_MINIMIZE,
+      windowId
+    })
+  },
+
+  shouldMaximize: function (windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SHOULD_MAXIMIZE,
+      windowId
+    })
+  },
+
+  shouldUnmaximize: function (windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SHOULD_UNMAXIMIZE,
+      windowId
+    })
+  },
+
+  shouldExitFullScreen: function (windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SHOULD_EXIT_FULL_SCREEN,
+      windowId
+    })
+  },
+
+  shouldOpenDevTools: function (windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SHOULD_OPEN_DEV_TOOLS,
+      windowId
+    })
+  },
+
+  onFocus: function (windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_FOCUS,
+      windowId
+    })
+  },
+
+  onBlur: function (windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_BLUR,
+      windowId
+    })
+  },
+
+  onEnterFullScreen: function (windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_ENTER_FULL_SCREEN,
+      windowId
+    })
+  },
+
+  onExitFullScreen: function (windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_EXIT_FULL_SCREEN,
+      windowId
     })
   }
 }

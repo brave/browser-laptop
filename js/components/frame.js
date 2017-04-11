@@ -26,7 +26,7 @@ const {isFrameError, isAborted} = require('../../app/common/lib/httpUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
 const {getSiteSettingsForHostPattern} = require('../state/siteSettings')
-const {currentWindowWebContents, isFocused} = require('../../app/renderer/currentWindow')
+const {isFocused} = require('../../app/renderer/currentWindow')
 const windowStore = require('../stores/windowStore')
 const appStoreRenderer = require('../stores/appStoreRenderer')
 const siteSettings = require('../state/siteSettings')
@@ -548,10 +548,10 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('focus', this.onFocus)
     this.webview.addEventListener('mouseenter', (e) => {
-      currentWindowWebContents.send(messages.ENABLE_SWIPE_GESTURE)
+      windowActions.onFrameMouseEnter(this.props.tabId)
     })
     this.webview.addEventListener('mouseleave', (e) => {
-      currentWindowWebContents.send(messages.DISABLE_SWIPE_GESTURE)
+      windowActions.onFrameMouseLeave(this.props.tabId)
     })
     this.webview.addEventListener('destroyed', (e) => {
       if (this.frame.isEmpty()) {

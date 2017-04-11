@@ -32,8 +32,8 @@ const getCurrentWindowId = () => {
   if (process.type === 'browser') {
     return BrowserWindow.getActiveWindow().id
   } else {
-    const {currentWindowId} = require('../renderer/currentWindow')
-    return currentWindowId
+    const currentWindow = require('../renderer/currentWindow')
+    return currentWindow.getCurrentWindowId()
   }
 }
 

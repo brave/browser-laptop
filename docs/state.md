@@ -638,7 +638,7 @@ WindowStore
     downloadsToolbar: {
       isVisible: boolean // whether or not the downloads toolbar is visible
     },
-    hasFocus: boolean, // true if window has focus
+    isFocused: boolean, // true if window has focus
     isClearBrowsingDataPanelVisible: boolean, // true if the Clear Browsing Data panel is visible
     isFullScreen: boolean, // true if window is fullscreen
     isMaximized: boolean, // true if window is maximized

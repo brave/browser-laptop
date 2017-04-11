@@ -13,7 +13,7 @@ const windowActions = require('../../../js/actions/windowActions')
 const settings = require('../../../js/constants/settings')
 const getSetting = require('../../../js/settings').getSetting
 const {updateTabPageIndex} = require('../lib/tabUtil')
-const {currentWindowId} = require('../currentWindow')
+const {getCurrentWindowId} = require('../currentWindow')
 const messages = require('../../../js/constants/messages')
 
 const setFullScreen = (state, action) => {
@@ -112,7 +112,7 @@ const frameReducer = (state, action) => {
         // only has pinned frames and tried to close, so close the
         // whole app.
         if (nonPinnedFrames.size === 0) {
-          appActions.closeWindow(currentWindowId)
+          appActions.closeWindow(getCurrentWindowId())
           return state
         }
 
@@ -132,7 +132,7 @@ const frameReducer = (state, action) => {
       if (nonPinnedFrames.size > 1 || pinnedFrames.size > 0) {
         state = closeFrame(state, action)
       } else {
-        appActions.closeWindow(currentWindowId)
+        appActions.closeWindow(getCurrentWindowId())
       }
       break
 

@@ -71,8 +71,6 @@ const messages = {
   GO_FORWARD: _,
   RELOAD: _,
   DETACH: _,
-  ENABLE_SWIPE_GESTURE: _,
-  DISABLE_SWIPE_GESTURE: _,
   // Password manager
   GET_PASSWORDS: _, /** @arg {string} formOrigin, @arg {string} action */
   GOT_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action, @arg {boolean} isUnique */

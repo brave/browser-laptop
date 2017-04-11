@@ -135,6 +135,9 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
   // Don't restore drag data and clearBrowsingDataPanel's visibility
   if (perWindowData.ui) {
     // This is no longer stored, we can remove this line eventually
+    delete perWindowData.ui.isFocused
+    delete perWindowData.ui.mouseInTitlebar
+    delete perWindowData.ui.mouseInFrame
     delete perWindowData.ui.dragging
     delete perWindowData.ui.isClearBrowsingDataPanelVisible
   }

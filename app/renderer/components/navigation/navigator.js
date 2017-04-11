@@ -27,7 +27,7 @@ const extensionState = require('../../../common/state/extensionState')
 const siteSettingsState = require('../../../common/state/siteSettingsState')
 
 // Util
-const {currentWindow, isMaximized} = require('../../currentWindow')
+const {getCurrentWindowId, isMaximized} = require('../../currentWindow')
 const {makeImmutable} = require('../../../common/state/immutableUtil')
 const platformUtil = require('../../../common/lib/platformUtil')
 const {braveShieldsEnabled} = require('../../../common/state/shieldState')
@@ -169,7 +169,7 @@ class Navigator extends ImmutableComponent {
     if (!e.target.className.includes('navigatorWrapper')) {
       return
     }
-    return !isMaximized() ? currentWindow.maximize() : currentWindow.unmaximize()
+    return !isMaximized() ? windowActions.shouldMaximize(getCurrentWindowId()) : windowActions.shouldMinimize(getCurrentWindowId())
   }
 
   render () {

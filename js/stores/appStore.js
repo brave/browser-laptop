@@ -33,7 +33,6 @@ const nativeImage = require('../../app/nativeImage')
 const filtering = require('../../app/filtering')
 const basicAuth = require('../../app/browser/basicAuth')
 const webtorrent = require('../../app/browser/webtorrent')
-const windows = require('../../app/browser/windows')
 const assert = require('assert')
 const profiles = require('../../app/browser/profiles')
 
@@ -42,7 +41,6 @@ const basicAuthState = require('../../app/common/state/basicAuthState')
 const extensionState = require('../../app/common/state/extensionState')
 const aboutNewTabState = require('../../app/common/state/aboutNewTabState')
 const aboutHistoryState = require('../../app/common/state/aboutHistoryState')
-const windowState = require('../../app/common/state/windowState')
 
 const isDarwin = process.platform === 'darwin'
 const isWindows = process.platform === 'win32'
@@ -224,7 +222,14 @@ const createWindow = (action) => {
     mainWindow.webContents.on('did-finish-load', (e) => {
       lastEmittedState = appState
       mainWindow.webContents.setZoomLevel(0.0)
-      e.sender.send(messages.INITIALIZE_WINDOW, frameOpts.disposition, appState.toJS(), frames, action.restoredState)
+      e.sender.send(messages.INITIALIZE_WINDOW,
+        {
+          disposition: frameOpts.disposition,
+          id: mainWindow.id
+        },
+        appState.toJS(),
+        frames,
+        action.restoredState)
       if (action.cb) {
         action.cb()
       }
@@ -401,18 +406,6 @@ const handleAppAction = (action) => {
       break
     case appConstants.APP_NEW_WINDOW:
       createWindow(action)
-      break
-    case appConstants.APP_CLOSE_WINDOW:
-      appState = windows.closeWindow(appState, action)
-      break
-    case appConstants.APP_WINDOW_CLOSED:
-      appState = windowState.removeWindow(appState, action)
-      break
-    case appConstants.APP_WINDOW_CREATED:
-      appState = windowState.maybeCreateWindow(appState, action)
-      break
-    case appConstants.APP_WINDOW_UPDATED:
-      appState = windowState.maybeCreateWindow(appState, action)
       break
     case appConstants.APP_ADD_PASSWORD:
       // If there is already an entry for this exact origin, action, and
