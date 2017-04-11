@@ -11,6 +11,8 @@
   --download-bar-buttons: 22px;
 }
 
+@downloadItemHeight: 46px;
+
 .downloadsBar {
   user-select: none;
   box-sizing: border-box;
@@ -36,7 +38,7 @@
       display: flex;
       font-size: 11px;
       flex-direction: column;
-      height: 46px;
+      height: @downloadItemHeight;
       padding: 0 14px;
       position: relative;
       margin: auto var(--download-item-margin) auto 0;
@@ -90,7 +92,7 @@
         left: 0;
         opacity: 0.5;
         position: absolute;
-        height: 35px;
+        height: @downloadItemHeight;
         width: 100%;
       }
 
