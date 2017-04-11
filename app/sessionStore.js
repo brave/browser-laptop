@@ -170,7 +170,6 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
     delete frame.httpsEverywhere
     delete frame.adblock
     delete frame.noScript
-    delete frame.trackingProtection
 
     // Guest instance ID's are not valid after restarting.
     // Electron won't know about them.
@@ -631,6 +630,15 @@ module.exports.defaultAppState = () => {
         ignoredTopSites: [],
         pinnedTopSites: pinnedTopSites
       }
+    },
+    trackingProtection: {
+      count: 0
+    },
+    adblock: {
+      count: 0
+    },
+    httpsEverywhere: {
+      count: 0
     },
     defaultWindowParams: {}
   }

@@ -45,7 +45,6 @@ const CheckDefaultBrowserDialog = require('../../app/renderer/components/checkDe
 const appConfig = require('../constants/appConfig')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
-const siteTags = require('../constants/siteTags')
 const dragTypes = require('../constants/dragTypes')
 const keyCodes = require('../../app/common/constants/keyCodes')
 const keyLocations = require('../../app/common/constants/keyLocations')
@@ -54,7 +53,6 @@ const {bookmarksToolbarMode} = require('../../app/common/constants/settingsEnums
 
 // State handling
 const basicAuthState = require('../../app/common/state/basicAuthState')
-const aboutHistoryState = require('../../app/common/state/aboutHistoryState')
 const frameStateUtil = require('../state/frameStateUtil')
 const siteUtil = require('../state/siteUtil')
 const searchProviders = require('../data/searchProviders')
@@ -66,11 +64,9 @@ const siteSettingsState = require('../../app/common/state/siteSettingsState')
 const _ = require('underscore')
 const cx = require('../lib/classSet')
 const eventUtil = require('../lib/eventUtil')
-const {getBaseUrl} = require('../lib/appUrlUtil')
 const siteSettings = require('../state/siteSettings')
 const debounce = require('../lib/debounce')
 const {currentWindow, isMaximized, isFocused, isFullScreen} = require('../../app/renderer/currentWindow')
-const emptyMap = new Immutable.Map()
 const platformUtil = require('../../app/common/lib/platformUtil')
 const tabUtil = require('../../app/renderer/lib/tabUtil')
 
@@ -732,17 +728,6 @@ class Main extends ImmutableComponent {
     }
   }
 
-  bindHistory (frame) {
-    if (frame.get('location') === 'about:history') {
-      const history = aboutHistoryState.getHistory(this.props.appState)
-      if (history) {
-        return history
-      }
-      appActions.populateHistory()
-    }
-    return null
-  }
-
   render () {
     // Sort frames by key so that the order of the frames do not change which could
     // cause unexpected reloading when a user moves tabs.
@@ -776,7 +761,6 @@ class Main extends ImmutableComponent {
     const braverySettings = siteSettings.activeSettings(activeSiteSettings, this.props.appState, appConfig)
     const loginRequiredDetail = activeFrame ? basicAuthState.getLoginRequiredDetail(this.props.appState, activeFrame.get('tabId')) : null
     const customTitlebar = this.customTitlebar
-    const versionInformation = this.props.appState.getIn(['about', 'brave', 'versionInformation'])
     const braveryDefaults = Immutable.fromJS(siteSettings.braveryDefaults(this.props.appState, appConfig))
     const contextMenuDetail = this.props.windowState.get('contextMenuDetail')
     const shouldAllowWindowDrag = !contextMenuDetail &&
@@ -1011,27 +995,6 @@ class Main extends ImmutableComponent {
                 contextMenuDetail={contextMenuDetail}
                 partition={frameStateUtil.getPartition(frame)}
                 key={frame.get('key')}
-                settings={['about:preferences', 'about:history', 'about:adblock'].includes(getBaseUrl(frame.get('location')))
-                  ? this.props.appState.get('settings') || emptyMap
-                  : null}
-                bookmarks={frame.get('location') === 'about:bookmarks'
-                  ? appStateSites
-                      .filter((site) => site.get('tags')
-                        .includes(siteTags.BOOKMARK)) || emptyMap
-                  : null}
-                history={this.bindHistory(frame)}
-                extensions={['about:extensions', 'about:preferences'].includes(getBaseUrl(frame.get('location')))
-                  ? this.props.appState.get('extensions') || emptyMap
-                  : null}
-                preferencesData={frame.get('location') === 'about:preferences#payments'
-                  ? this.props.appState.getIn(['about', 'preferences']) || emptyMap
-                  : null}
-                downloads={this.props.appState.get('downloads') || emptyMap}
-                bookmarkFolders={frame.get('location') === 'about:bookmarks'
-                  ? appStateSites
-                      .filter((site) => site.get('tags')
-                        .includes(siteTags.BOOKMARK_FOLDER)) || emptyMap
-                  : null}
                 isFullScreen={frame.get('isFullScreen')}
                 isSecure={frame.getIn(['security', 'isSecure'])}
                 showFullScreenWarning={frame.get('showFullScreenWarning')}
@@ -1052,33 +1015,16 @@ class Main extends ImmutableComponent {
                 aboutDetails={frame.get('aboutDetails')}
                 unloaded={frame.get('unloaded')}
                 audioMuted={frame.get('audioMuted')}
-                passwords={this.props.appState.get('passwords')}
-                adblock={this.props.appState.get('adblock')}
-                safeBrowsing={this.props.appState.get('safeBrowsing')}
-                httpsEverywhere={this.props.appState.get('httpsEverywhere')}
-                trackingProtection={this.props.appState.get('trackingProtection')}
-                adInsertion={this.props.appState.get('adInsertion')}
                 noScript={this.props.appState.get('noScript')}
                 flash={this.props.appState.get('flash')}
                 widevine={this.props.appState.get('widevine')}
-                cookieblock={this.props.appState.get('cookieblock')}
                 allSiteSettings={allSiteSettings}
-                sync={this.props.appState.get('sync') || new Immutable.Map()}
-                ledgerInfo={this.props.appState.get('ledgerInfo') || new Immutable.Map()}
-                publisherInfo={this.props.appState.get('publisherInfo') || new Immutable.Map()}
                 frameSiteSettings={this.frameSiteSettings(frame.get('location'))}
                 onFindHide={this.onFindHide}
                 enableNoScript={siteSettingsState.isNoScriptEnabled(this.frameSiteSettings(frame.get('location')), this.props.appState)}
-                versionInformation={versionInformation}
                 braveryDefaults={braveryDefaults}
                 isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
                 isActive={frameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
-                autofillCreditCards={this.props.appState.getIn(['autofill', 'creditCards'])}
-                autofillAddresses={this.props.appState.getIn(['autofill', 'addresses'])}
-                adblockCount={this.props.appState.getIn(['adblock', 'count'])}
-                trackedBlockersCount={this.props.appState.getIn(['trackingProtection', 'count'])}
-                httpsUpgradedCount={this.props.appState.getIn(['httpsEverywhere', 'count'])}
-                newTabDetail={frame.get('location') === 'about:newtab' ? this.props.appState.getIn(['about', 'newtab']) : null}
               />)
           }
         </div>
