@@ -53,7 +53,7 @@ const sendSyncRecords = (sender, action, data) => {
   if (!deviceId) {
     throw new Error('Cannot build a sync record because deviceId is not set')
   }
-  if (!data || !data.length) {
+  if (!data || !data.length || !data[0]) {
     return
   }
   const category = CATEGORY_MAP[data[0].name]

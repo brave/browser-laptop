@@ -6,6 +6,7 @@ const mapValuesByKeys = require('../lib/functional').mapValuesByKeys
 
 const _ = null
 const siteTags = {
+  DEFAULT: _,
   BOOKMARK: _,
   BOOKMARK_FOLDER: _,
   PINNED: _,

@@ -6,6 +6,7 @@
 
 const windowConstants = require('../../../js/constants/windowConstants')
 const getSetting = require('../../../js/settings').getSetting
+const {isDefaultEntry} = require('../../../js/state/siteUtil')
 const fetchSearchSuggestions = require('../fetchSearchSuggestions')
 const {activeFrameStatePath, frameStatePath, getFrameByKey, getFrameKeyByTabId, getActiveFrame} = require('../../../js/state/frameStateUtil')
 const searchProviders = require('../../../js/data/searchProviders')
@@ -128,11 +129,7 @@ const generateNewSuggestionsList = (state) => {
   let sites = appStoreRenderer.state.get('sites')
   if (sites) {
     // Filter out Brave default newtab sites and sites with falsey location
-    sites = sites.filterNot((site) =>
-      (Immutable.is(site.get('tags'), new Immutable.List(['default'])) &&
-      site.get('lastAccessedTime') === 1) ||
-      !site.get('location')
-    )
+    sites = sites.filter((site) => !isDefaultEntry(site) && site.get('location'))
   }
   const searchResults = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'searchResults']))
   const frameSearchDetail = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'searchDetail']))
