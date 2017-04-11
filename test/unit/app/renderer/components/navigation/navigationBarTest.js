@@ -22,6 +22,7 @@ describe('NavigationBar component unit tests', function () {
     mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_yes_verified.svg', {})
     mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_no.svg', {})
     mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_yes.svg', {})
+    mockery.registerMock('../../../../img/url-bar-no-script.svg', {})
     mockery.registerMock('electron', require('../../../../lib/fakeElectron'))
     NavigationBar = require('../../../../../../app/renderer/components/navigation/navigationBar')
     UrlBar = require('../../../../../../app/renderer/components/navigation/urlBar')

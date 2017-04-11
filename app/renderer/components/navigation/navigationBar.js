@@ -7,7 +7,6 @@ const Immutable = require('immutable')
 const ImmutableComponent = require('./../../../../js/components/immutableComponent')
 
 const cx = require('../../../../js/lib/classSet')
-const Button = require('./../../../../js/components/button')
 const UrlBar = require('./urlBar')
 const windowActions = require('../../../../js/actions/windowActions')
 const appActions = require('../../../../js/actions/appActions')
@@ -34,7 +33,6 @@ class NavigationBar extends ImmutableComponent {
     this.onReload = this.onReload.bind(this)
     this.onHome = this.onHome.bind(this)
     this.onReloadLongPress = this.onReloadLongPress.bind(this)
-    this.onNoScript = this.onNoScript.bind(this)
   }
 
   get activeFrame () {
@@ -151,21 +149,6 @@ class NavigationBar extends ImmutableComponent {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark())
   }
 
-  get showNoScriptInfo () {
-    return this.props.enableNoScript && this.props.scriptsBlocked && this.props.scriptsBlocked.size
-  }
-
-  onNoScript () {
-    windowActions.setNoScriptVisible(!this.props.noScriptIsVisible)
-  }
-
-  componentDidUpdate (prevProps) {
-    if (this.props.noScriptIsVisible && !this.showNoScriptInfo) {
-      // There are no blocked scripts, so hide the noscript dialog.
-      windowActions.setNoScriptVisible(false)
-    }
-  }
-
   render () {
     if (this.props.activeFrameKey === undefined ||
         this.props.siteSettings === undefined) {
@@ -249,12 +232,12 @@ class NavigationBar extends ImmutableComponent {
         menubarVisible={this.props.menubarVisible}
         noBorderRadius={this.isPublisherButtonEnabled}
         activeTabShowingMessageBox={this.props.activeTabShowingMessageBox}
+        enableNoScript={this.props.enableNoScript}
+        scriptsBlocked={this.props.scriptsBlocked}
         />
       {
         isSourceAboutUrl(this.props.location)
-        ? <div className='endButtons'>
-          <span className='browserButton' />
-        </div>
+        ? null
         : <div className='endButtons'>
           {
             <PublisherToggle
@@ -263,18 +246,6 @@ class NavigationBar extends ImmutableComponent {
               siteSettings={this.props.siteSettings}
               synopsis={this.props.synopsis}
             />
-          }
-          {
-            !this.showNoScriptInfo
-            ? null
-            : <span className='noScriptButtonContainer'>
-              <Button iconClass='fa-ban'
-                l10nId='noScriptButton'
-                className={cx({
-                  'noScript': true
-                })}
-                onClick={this.onNoScript} />
-            </span>
           }
         </div>
       }
