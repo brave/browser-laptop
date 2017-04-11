@@ -236,6 +236,7 @@ module.exports.onSyncReady = (isFirstRun, e) => {
   }
 
   appActions.createSyncCache()
+  e.sender.send(messages.FETCH_SYNC_DEVICES)
 
   // Periodically poll for new records
   let startAt = appState.getIn(['sync', 'lastFetchTimestamp']) || 0
@@ -355,20 +356,25 @@ module.exports.init = function (appState) {
     }
     appActions.setSyncSetupError(error || locale.translation('unknownError'))
   })
-  ipcMain.on(messages.GET_EXISTING_OBJECTS, (event, categoryName, records) => {
+  ipcMain.on(messages.GET_EXISTING_OBJECTS, (event, categoryName, records, lastRecordTimestamp) => {
     if (!syncEnabled()) {
       return
     }
+    let devices = {}
     log(`getting existing objects for ${records.length} ${categoryName}`)
     if (!CATEGORY_NAMES.includes(categoryName) || !records || !records.length) {
       return
     }
     const recordsAndExistingObjects = records.map((record) => {
       const safeRecord = syncUtil.ipcSafeObject(record)
+      const deviceId = syncUtil.deviceIdString(safeRecord.deviceId)
+      devices[deviceId] = {lastRecordTimestamp: record.syncTimestamp}
       const existingObject = syncUtil.getExistingObject(categoryName, record)
       return [safeRecord, existingObject]
     })
     event.sender.send(messages.RESOLVE_SYNC_RECORDS, categoryName, recordsAndExistingObjects)
+    // For each device we saw, update its last record timestamp.
+    appActions.saveSyncDevices(devices)
   })
   ipcMain.on(messages.RESOLVED_SYNC_RECORDS, (event, categoryName, records) => {
     if (!records || !records.length) {

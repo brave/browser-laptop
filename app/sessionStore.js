@@ -595,6 +595,7 @@ module.exports.defaultAppState = () => {
   return {
     firstRunTimestamp: new Date().getTime(),
     sync: {
+      devices: {},
       lastFetchTimestamp: 0,
       objectsById: {}
     },
