@@ -78,7 +78,10 @@ class NavigationBar extends ImmutableComponent {
         if (i === 0 && !eventUtil.isForSecondaryAction(e)) {
           appActions.loadURLRequested(tabId, homepage)
         } else {
-          appActions.createTabRequested({ url: homepage })
+          appActions.createTabRequested({
+            url: homepage,
+            active: false
+          })
         }
       })
   }
