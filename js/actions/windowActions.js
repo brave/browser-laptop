@@ -232,10 +232,9 @@ const windowActions = {
    * @param {Object} frameProps - The properties of the frame to close
    * @param {boolean} forceClosePinned - Should we force close pinned tab
    */
-  closeFrame: function (frames, frameProps, forceClosePinned) {
+  closeFrame: function (frameProps, forceClosePinned) {
     dispatch({
       actionType: windowConstants.WINDOW_CLOSE_FRAME,
-      frames,
       frameProps,
       forceClosePinned
     })
