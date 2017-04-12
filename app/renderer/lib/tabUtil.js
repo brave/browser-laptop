@@ -108,13 +108,3 @@ module.exports.updateTabPageIndex = (state, frameProps) => {
 
   return state
 }
-
-module.exports.activeTab = (state, windowState) => {
-  const activeFrame = frameStateUtil.getActiveFrame(windowState)
-  return activeFrame ? state.get('tabs').find((tab) => tab.get('tabId') === activeFrame.get('tabId')) : null
-}
-
-module.exports.activeTabId = (windowState) => {
-  const activeFrame = frameStateUtil.getActiveFrame(windowState)
-  return activeFrame && activeFrame.get('tabId')
-}

@@ -4,7 +4,7 @@
 
 const React = require('react')
 const Immutable = require('immutable')
-const ImmutableComponent = require('./../../../../js/components/immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 
 const cx = require('../../../../js/lib/classSet')
 const UrlBar = require('./urlBar')
@@ -24,10 +24,15 @@ const windowStore = require('../../../../js/stores/windowStore')
 const contextMenus = require('../../../../js/contextMenus')
 const LongPressButton = require('./../../../../js/components/longPressButton')
 const PublisherToggle = require('../publisherToggle')
+const {getCurrentWindowId} = require('../../currentWindow')
 
-class NavigationBar extends ImmutableComponent {
-  constructor () {
-    super()
+// State
+const tabState = require('../../../common/state/tabState')
+const frameStateUtil = require('../../../../js/state/frameStateUtil')
+
+class NavigationBar extends React.Component {
+  constructor (props) {
+    super(props)
     this.onToggleBookmark = this.onToggleBookmark.bind(this)
     this.onStop = this.onStop.bind(this)
     this.onReload = this.onReload.bind(this)
@@ -149,6 +154,43 @@ class NavigationBar extends ImmutableComponent {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark())
   }
 
+  mergeProps (state, dispatchProps, ownProps) {
+    const windowState = state.get('currentWindow')
+    const activeFrame = frameStateUtil.getActiveFrame(windowState) || Immutable.Map()
+    const activeTab = tabState.getActiveTabValue(state, getCurrentWindowId()) || Immutable.Map()
+    const activeTabId = tabState.getActiveTabId(state, getCurrentWindowId())
+    const props = {}
+
+    props.navbar = activeFrame.get('navbar')
+    props.sites = state.get('sites')
+    props.canGoForward = activeTab.get('canGoForward') || false
+    props.activeFrameKey = activeFrame.get('key')
+    props.location = activeFrame.get('location') || ''
+    props.title = activeFrame.get('title') || ''
+    props.scriptsBlocked = activeFrame.getIn(['noScript', 'blocked'])
+    props.partitionNumber = activeFrame.get('partitionNumber') || 0
+    props.history = activeFrame.get('history') || new Immutable.List()
+    props.suggestionIndex = activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex']) || 0
+    props.isSecure = activeFrame.getIn(['security', 'isSecure'])
+    props.hasLocationValueSuffix = activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix'])
+    props.startLoadTime = activeFrame.get('startLoadTime')
+    props.endLoadTime = activeFrame.get('endLoadTime')
+    props.loading = activeFrame.get('loading')
+    props.bookmarkDetail = windowState.get('bookmarkDetail')
+    props.mouseInTitlebar = windowState.getIn(['ui', 'mouseInTitlebar'])
+    props.searchDetail = windowState.get('searchDetail')
+    props.enableNoScript = ownProps.enableNoScript
+    props.settings = state.get('settings')
+    props.noScriptIsVisible = windowState.getIn(['ui', 'noScriptInfo', 'isVisible']) || false
+    props.menubarVisible = ownProps.menubarVisible
+    props.siteSettings = state.get('siteSettings')
+    props.synopsis = state.getIn(['publisherInfo', 'synopsis']) || new Immutable.Map()
+    props.activeTabShowingMessageBox = tabState.isShowingMessageBox(state, activeTabId)
+    props.locationInfo = state.get('locationInfo')
+
+    return props
+  }
+
   render () {
     if (this.props.activeFrameKey === undefined ||
         this.props.siteSettings === undefined) {
@@ -253,4 +295,4 @@ class NavigationBar extends ImmutableComponent {
   }
 }
 
-module.exports = NavigationBar
+module.exports = ReduxComponent.connect(NavigationBar)

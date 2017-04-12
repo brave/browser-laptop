@@ -19,6 +19,7 @@ const getSetting = require('../js/settings').getSetting
 const locale = require('./locale')
 const tabMessageBox = require('./browser/tabMessageBox')
 const {makeImmutable} = require('./common/state/immutableUtil')
+const tabState = require('./common/state/tabState')
 
 var isMergeFavorites = false
 var isImportingBookmarks = false
@@ -229,9 +230,7 @@ importer.on('add-cookies', (e, cookies) => {
 })
 
 const getActiveTabId = () => {
-  const tabs = makeImmutable(AppStore.getState()).get('tabs')
-  const activeTab = tabs.find((tab) => tab.get('active'))
-  return activeTab && activeTab.get('id')
+  return tabState.getActiveTabId(AppStore.getState())
 }
 
 const showImportWarning = function () {

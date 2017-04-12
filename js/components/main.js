@@ -59,6 +59,7 @@ const searchProviders = require('../data/searchProviders')
 const defaultBrowserState = require('../../app/common/state/defaultBrowserState')
 const shieldState = require('../../app/common/state/shieldState')
 const siteSettingsState = require('../../app/common/state/siteSettingsState')
+const tabState = require('../../app/common/state/tabState')
 
 // Util
 const _ = require('underscore')
@@ -68,7 +69,6 @@ const siteSettings = require('../state/siteSettings')
 const debounce = require('../lib/debounce')
 const {getCurrentWindowId, isMaximized, isFocused, isFullScreen} = require('../../app/renderer/currentWindow')
 const platformUtil = require('../../app/common/lib/platformUtil')
-const tabUtil = require('../../app/renderer/lib/tabUtil')
 
 class Main extends ImmutableComponent {
   constructor () {
@@ -715,7 +715,7 @@ class Main extends ImmutableComponent {
     const autofillAddressPanelIsVisible = this.props.windowState.get('autofillAddressDetail')
     const autofillCreditCardPanelIsVisible = this.props.windowState.get('autofillCreditCardDetail')
     const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
-    const activeTab = tabUtil.activeTab(this.props.appState, this.props.windowState)
+    const activeTab = tabState.getActiveTabValue(this.props.appState, getCurrentWindowId())
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
     const checkDefaultBrowserDialogIsVisible =
       isFocused() && defaultBrowserState.shouldDisplayDialog(this.props.appState)
@@ -982,7 +982,7 @@ class Main extends ImmutableComponent {
                 allSiteSettings={allSiteSettings}
                 frameSiteSettings={this.frameSiteSettings(frame.get('location'))}
                 onFindHide={this.onFindHide}
-                enableNoScript={siteSettingsState.isNoScriptEnabled(this.frameSiteSettings(frame.get('location')), this.props.appState)}
+                enableNoScript={siteSettingsState.isNoScriptEnabled(this.props.appState, this.frameSiteSettings(frame.get('location')))}
                 braveryDefaults={braveryDefaults}
                 isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
                 isActive={frameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
