@@ -26,9 +26,9 @@ class NewPrivateTab extends React.Component {
         <div className={css(styles.lionImage)} />
         <div className={css(styles.textWrapper)}>
           <h1 className={css(styles.title)} data-l10n-id='privateTabTitle' />
-          <p className={css(styles.text, styles.alphaWhite)} data-l10n-id='privateTabText1' />
-          <p className={css(styles.text, styles.alphaWhite)} data-l10n-id='privateTabText2' />
-          <p className={css(styles.text, styles.alphaWhite)} data-l10n-id='privateTabText3' />
+          <p className={css(styles.text)} data-l10n-id='privateTabText1' />
+          <p className={css(styles.text)} data-l10n-id='privateTabText2' />
+          <p className={css(styles.text, styles.italic)} data-l10n-id='privateTabText3' />
         </div>
       </div>
     </div>
@@ -45,20 +45,15 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
-    height: '100%',
-    minHeight: '100vh',
-    padding: '40px 60px', // same as newtab
-
-    [atBreakpoint]: {
-      minHeight: '100%',
-      height: 'initial'
-    }
+    minHeight: '100%',
+    height: 'initial',
+    padding: '40px 60px' // same as newtab
   },
 
   wrapper: {
     display: 'flex',
     alignSelf: 'center',
-    maxWidth: '840px',
+    maxWidth: '780px',
     padding: `${globalStyles.spacing.paddingHorizontal} 0`,
 
     [atBreakpoint]: {
@@ -99,11 +94,12 @@ const styles = StyleSheet.create({
   text: {
     paddingBottom: globalStyles.spacing.paddingHorizontal,
     lineHeight: '1.5',
-    fontSize: '17px'
+    fontSize: '17px',
+    color: globalStyles.color.alphaWhite
   },
 
-  alphaWhite: {
-    color: globalStyles.color.alphaWhite
+  italic: {
+    fontStyle: 'italic'
   }
 })
 
