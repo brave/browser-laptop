@@ -10,9 +10,16 @@ require('../../../braveUnit')
 const windowState = Immutable.fromJS({
   activeFrameKey: 2,
   frames: [{
-    key: 1
+    key: 1,
+    tabId: 1,
+    navbar: {
+      urlbar: {
+        location: 'https://www.twitter.com'
+      }
+    }
   }, {
     key: 2,
+    tabId: 2,
     title: 'test',
     adblock: {blocked: []},
     audioPlaybackActive: true,
@@ -20,6 +27,11 @@ const windowState = Immutable.fromJS({
     httpsEverywhere: {a: '1'},
     icon: 'https://www.brave.com/favicon.ico',
     location: 'https://www.brave.com/2',
+    navbar: {
+      urlbar: {
+        location: 'https://www.brave.com/2'
+      }
+    },
     noScript: {blocked: []},
     themeColor: '#ffffff',
     trackingProtection: {blocked: []},
@@ -41,7 +53,6 @@ describe('urlBarReducer', function () {
     mockery.registerMock('electron', fakeElectron)
     urlBarReducer = require('../../../../../app/renderer/reducers/urlBarReducer')
   })
-
   after(function () {
     mockery.disable()
   })
@@ -57,7 +68,7 @@ describe('urlBarReducer', function () {
     })
 
     it('Does not change url bar state of non active frame key', function () {
-      assert.equal(this.newState.getIn(['frames', 0, 'navbar', 'urlbar', 'location']), undefined)
+      assert.equal(this.newState.getIn(['frames', 0, 'navbar', 'urlbar', 'location']), 'https://www.twitter.com')
     })
   })
 
@@ -111,6 +122,22 @@ describe('urlBarReducer', function () {
         assert.deepEqual(this.newState.getIn(['frames', 1, 'trackingProtection']).toJS(), {})
         assert.deepEqual(this.newState.getIn(['frames', 1, 'fingerprintingProtection']).toJS(), {})
       })
+    })
+  })
+
+  describe('WINDOW_SET_NAVIGATION_ABORTED', function () {
+    before(function () {
+    })
+    it('sets the correct frame\'s text', function () {
+      // Active frame key is 2 but let's update tabId 1 (frameKey 1 too)
+      const action = {
+        actionType: windowConstants.WINDOW_SET_NAVIGATION_ABORTED,
+        tabId: 1,
+        location: 'https://facebook.com/'
+      }
+      this.newState = urlBarReducer(windowState, action)
+      assert.equal(this.newState.getIn(['frames', 0, 'navbar', 'urlbar', 'location']), action.location)
+      assert.equal(this.newState.getIn(['frames', 0, 'location']), action.location)
     })
   })
 })
