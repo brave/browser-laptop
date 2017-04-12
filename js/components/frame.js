@@ -114,7 +114,7 @@ class Frame extends ImmutableComponent {
         this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.props.braveryDefaults.toJS())
       }
       if (!Immutable.is(prevProps.extensions, this.props.extensions)) {
-        this.webview.send(messages.EXTENSIONS_UPDATED, this.props.extensions.toJS())
+        this.webview.send(messages.EXTENSIONS_UPDATED, this.props.extensions ? this.props.extensions.toJS() : null)
       }
     } else if (location === 'about:bookmarks' && this.props.bookmarks) {
       if (!Immutable.is(prevProps.bookmarks, this.props.bookmarks) ||
