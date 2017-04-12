@@ -3,38 +3,52 @@ const ImmutableComponent = require('../../../js/components/immutableComponent')
 const React = require('react')
 const windowStore = require('../../../js/stores/windowStore')
 
+const mergePropsImpl = (stateProps, dispatchProps, ownProps) => {
+  return Object.assign({}, stateProps, dispatchProps, ownProps)
+}
+
+const buildPropsImpl = (props, componentType) => {
+  const fn = componentType.prototype.mergeProps || mergePropsImpl
+  const state = appStore.state.set('currentWindow', windowStore.state)
+  return fn(state, {}, props)
+}
+
 class ReduxComponent extends ImmutableComponent {
   constructor (props) {
     super(props)
     this.componentType = props.componentType
+    this.state = buildPropsImpl(props, this.componentType)
   }
 
   componentDidMount () {
     appStore.addChangeListener(() => {
-      if (this.shouldComponentUpdate(this.buildProps(), this.state)) {
+      if (this.shouldComponentUpdate(this.props, this.buildProps())) {
         this.forceUpdate()
       }
     })
 
     windowStore.addChangeListener(() => {
-      if (this.shouldComponentUpdate(this.buildProps(), this.state)) {
+      if (this.shouldComponentUpdate(this.props, this.buildProps())) {
         this.forceUpdate()
       }
     })
   }
 
+  componentWillReceiveProps (nextProps) {
+    this.setState(this.buildProps(nextProps))
+  }
+
   shouldComponentUpdate (nextProps, nextState) {
-    return super.shouldComponentUpdate(this.buildProps(nextProps), nextState)
+    return Object.keys(nextState).some((prop) => nextState[prop] !== this.state[prop]) ||
+      Object.keys(nextProps).some((prop) => nextProps[prop] !== this.props[prop])
   }
 
   mergeProps (stateProps, dispatchProps, ownProps) {
-    return Object.assign({}, stateProps, dispatchProps, ownProps)
+    return mergePropsImpl(stateProps, dispatchProps, ownProps)
   }
 
   buildProps (props = this.props) {
-    const fn = this.componentType.prototype.mergeProps || this.mergeProps
-    const state = appStore.state.set('currentWindow', windowStore.state)
-    return fn(state, {}, props)
+    return buildPropsImpl(props, this.componentType)
   }
 
   render () {
