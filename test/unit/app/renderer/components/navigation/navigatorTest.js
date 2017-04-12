@@ -26,14 +26,14 @@ describe('Navigator component unit tests', function () {
     mockery.registerMock('electron', require('../../../../lib/fakeElectron'))
     Navigator = require('../../../../../../app/renderer/components/navigation/navigator')
     NavigationBar = require('../../../../../../app/renderer/components/navigation/navigationBar')
-    appStoreRenderer = require('../../../../js/stores/appStoreRenderer')
+    appStoreRenderer = require('../../../../../../js/stores/appStoreRenderer')
   })
 
   after(function () {
     mockery.disable()
   })
 
-  let appStoreRenderer = require('../../../../js/stores/appStoreRenderer')
+  let appStoreRenderer = require('../../../../../../js/stores/appStoreRenderer')
 
   const windowState = Immutable.fromJS({
     activeFrameKey: 0,
