@@ -6,7 +6,7 @@ const React = require('react')
 const ImmutableComponent = require('../../../js/components/immutableComponent')
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('./styles/global')
-const {isWindows} = require('../../common/lib/platformUtil')
+const {isWindows, isDarwin} = require('../../common/lib/platformUtil')
 const {tabs} = require('../../../js/constants/config')
 const {hasBreakpoint, hasRelativeCloseIcon,
       hasFixedCloseIcon, hasVisibleSecondaryIcon, getTabIconColor} = require('../lib/tabUtil')
@@ -207,6 +207,8 @@ class TabTitle extends ImmutableComponent {
   }
 
   render () {
+    // Brad said that tabs with white title on macOS look too thin
+    const enforceFontVisibilty = isDarwin() && getTabIconColor(this.props) === 'white'
     const titleStyles = StyleSheet.create({
       gradientText: {
         backgroundImage: `-webkit-linear-gradient(left,
@@ -219,6 +221,7 @@ class TabTitle extends ImmutableComponent {
       className={css(
       styles.tabTitle,
       titleStyles.gradientText,
+      enforceFontVisibilty && styles.enforceFontVisibilty,
       // Windows specific style
       isWindows() && styles.tabTitleForWindows
     )}>
@@ -333,6 +336,10 @@ const styles = StyleSheet.create({
     padding: globalStyles.spacing.defaultTabPadding,
     color: 'transparent',
     WebkitBackgroundClip: 'text'
+  },
+
+  enforceFontVisibilty: {
+    fontWeight: '600'
   },
 
   tabTitleForWindows: {
