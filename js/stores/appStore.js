@@ -575,13 +575,11 @@ const handleAppAction = (action) => {
       {
         let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
         let newSiteSettings = siteSettings.mergeSiteSetting(appState.get(propertyName), action.hostPattern, action.key, action.value)
-        if (!action.temporary) {
-          let syncObject = siteUtil.setObjectId(newSiteSettings.get(action.hostPattern))
-          if (!action.skipSync) {
-            const objectId = syncObject.get('objectId')
-            const item = new Immutable.Map({objectId, [action.key]: action.value})
-            syncActions.updateSiteSetting(action.hostPattern, item)
-          }
+        if (!action.temporary && !action.skipSync) {
+          const syncObject = siteUtil.setObjectId(newSiteSettings.get(action.hostPattern))
+          const objectId = syncObject.get('objectId')
+          const item = new Immutable.Map({objectId, [action.key]: action.value})
+          syncActions.updateSiteSetting(action.hostPattern, item)
           newSiteSettings = newSiteSettings.set(action.hostPattern, syncObject)
         }
         appState = appState.set(propertyName, newSiteSettings)
@@ -592,13 +590,11 @@ const handleAppAction = (action) => {
         let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
         let newSiteSettings = siteSettings.removeSiteSetting(appState.get(propertyName),
           action.hostPattern, action.key)
-        if (!action.temporary) {
-          let syncObject = siteUtil.setObjectId(newSiteSettings.get(action.hostPattern))
-          if (!action.skipSync) {
-            const objectId = syncObject.get('objectId')
-            const item = new Immutable.Map({objectId, [action.key]: null})
-            syncActions.removeSiteSetting(action.hostPattern, item)
-          }
+        if (!action.temporary && !action.skipSync) {
+          const syncObject = siteUtil.setObjectId(newSiteSettings.get(action.hostPattern))
+          const objectId = syncObject.get('objectId')
+          const item = new Immutable.Map({objectId, [action.key]: null})
+          syncActions.removeSiteSetting(action.hostPattern, item)
           newSiteSettings = newSiteSettings.set(action.hostPattern, syncObject)
         }
         appState = appState.set(propertyName, newSiteSettings)
@@ -610,7 +606,7 @@ const handleAppAction = (action) => {
         let newSiteSettings = new Immutable.Map()
         appState.get(propertyName).map((entry, hostPattern) => {
           let newEntry = entry.delete(action.key)
-          if (!action.skipSync) {
+          if (!action.temporary && !action.skipSync) {
             newEntry = siteUtil.setObjectId(newEntry)
             const objectId = newEntry.get('objectId')
             const item = new Immutable.Map({objectId, [action.key]: null})
@@ -918,8 +914,6 @@ const handleAppAction = (action) => {
 
         if (result === undefined) {
           let newSiteSettings = siteSettings.mergeSiteSetting(appState.get('siteSettings'), pattern, 'ledgerPayments', true)
-          const syncObject = siteUtil.setObjectId(newSiteSettings.get(pattern))
-          newSiteSettings = newSiteSettings.set(pattern, syncObject)
           appState = appState.set('siteSettings', newSiteSettings)
         }
       })
@@ -928,8 +922,6 @@ const handleAppAction = (action) => {
       Object.keys(action.publishers).map((item) => {
         const pattern = `https?://${item}`
         let newSiteSettings = siteSettings.mergeSiteSetting(appState.get('siteSettings'), pattern, 'ledgerPinPercentage', action.publishers[item].pinPercentage)
-        const syncObject = siteUtil.setObjectId(newSiteSettings.get(pattern))
-        newSiteSettings = newSiteSettings.set(pattern, syncObject)
         appState = appState.set('siteSettings', newSiteSettings)
       })
       break

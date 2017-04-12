@@ -136,8 +136,6 @@ const applySiteSettingRecord = (record) => {
     }
   }
   const appActions = require('../actions/appActions')
-  const objectId = new Immutable.List(record.objectId)
-  const category = CATEGORY_MAP[record.objectData].categoryName
   const hostPattern = record.siteSetting.hostPattern
   if (!hostPattern) {
     throw new Error('siteSetting.hostPattern is required.')
@@ -147,16 +145,8 @@ const applySiteSettingRecord = (record) => {
   switch (record.action) {
     case writeActions.CREATE:
     case writeActions.UPDATE:
-      // Set the objectId if needed so we can access the existing object
-      let existingObject = module.exports.getObjectById(objectId, category)
-      if (!existingObject) {
-        appActions.changeSiteSetting(hostPattern, 'objectId', objectId, false, true)
-        existingObject = module.exports.getObjectById(objectId, category)
-      }
-      const existingObjectData = existingObject[1]
       applySetting = (key, value) => {
         const applyValue = getValue(key, value)
-        if (existingObjectData.get(key) === applyValue) { return }
         appActions.changeSiteSetting(hostPattern, key, applyValue, false, true)
       }
       break
@@ -167,6 +157,8 @@ const applySiteSettingRecord = (record) => {
       break
   }
 
+  // Set the record objectId if it doesn't exist already
+  appActions.changeSiteSetting(hostPattern, 'objectId', new Immutable.List(record.objectId), false, true)
   for (let key in record.siteSetting) {
     if (key === 'hostPattern') { continue }
     applySetting(key, record.siteSetting[key])
