@@ -10,6 +10,8 @@ const getSetting = require('../settings').getSetting
 const UrlUtil = require('../lib/urlutil')
 const urlParse = require('../../app/common/urlParse')
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
+const siteSettings = require('../state/siteSettings')
+const appConfig = require('../constants/appConfig')
 
 const defaultTags = new Immutable.List([siteTags.DEFAULT])
 
@@ -757,4 +759,8 @@ module.exports.setObjectId = (item) => {
   }
   const crypto = require('crypto')
   return item.set('objectId', new Immutable.List(crypto.randomBytes(16)))
+}
+
+module.exports.enableNoScript = (settings, state) => {
+  return siteSettings.activeSettings(settings, state, appConfig).noScript === true
 }
