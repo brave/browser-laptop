@@ -170,6 +170,7 @@ const styles = StyleSheet.create({
   },
 
   extensionsRow: {
+    fontSize: '15px',
     background: '#fff',
     height: '56px',
 
