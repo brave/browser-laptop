@@ -6,7 +6,6 @@ const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
 const electron = require('electron')
-const {StyleSheet, css} = require('aphrodite')
 const ipc = electron.ipcRenderer
 const systemPreferences = electron.remote.systemPreferences
 
@@ -18,7 +17,7 @@ const contextMenus = require('../contextMenus')
 const getSetting = require('../settings').getSetting
 
 // Components
-const NavigationBar = require('./../../app/renderer/components/navigation/navigationBar')
+const Navigator = require('../../app/renderer/components/navigation/navigator')
 const Frame = require('./frame')
 const TabPages = require('./tabPages')
 const TabsToolbar = require('./tabsToolbar')
@@ -26,8 +25,6 @@ const FindBar = require('./findbar')
 const UpdateBar = require('./updateBar')
 const NotificationBar = require('./notificationBar')
 const DownloadsBar = require('../../app/renderer/components/downloadsBar')
-const Button = require('./button')
-const BrowserAction = require('../../app/renderer/components/browserAction')
 const SiteInfo = require('./siteInfo')
 const BraveryPanel = require('./braveryPanel')
 const ClearBrowsingDataPanel = require('./clearBrowsingDataPanel')
@@ -42,9 +39,6 @@ const BookmarksToolbar = require('../../app/renderer/components/bookmarksToolbar
 const ContextMenu = require('./contextMenu')
 const PopupWindow = require('./popupWindow')
 const NoScriptInfo = require('./noScriptInfo')
-const LongPressButton = require('./longPressButton')
-const Menubar = require('../../app/renderer/components/menubar')
-const WindowCaptionButtons = require('../../app/renderer/components/windowCaptionButtons')
 const CheckDefaultBrowserDialog = require('../../app/renderer/components/checkDefaultBrowserDialog')
 
 // Constants
@@ -60,40 +54,32 @@ const {bookmarksToolbarMode} = require('../../app/common/constants/settingsEnums
 
 // State handling
 const basicAuthState = require('../../app/common/state/basicAuthState')
-const extensionState = require('../../app/common/state/extensionState')
 const aboutHistoryState = require('../../app/common/state/aboutHistoryState')
 const frameStateUtil = require('../state/frameStateUtil')
 const siteUtil = require('../state/siteUtil')
 const searchProviders = require('../data/searchProviders')
 const defaultBrowserState = require('../../app/common/state/defaultBrowserState')
+const shieldState = require('../../app/common/state/shieldState')
+const siteSettingsState = require('../../app/common/state/siteSettingsState')
 
 // Util
 const _ = require('underscore')
 const cx = require('../lib/classSet')
 const eventUtil = require('../lib/eventUtil')
-const {isIntermediateAboutPage, getBaseUrl, isNavigatableAboutPage} = require('../lib/appUrlUtil')
+const {getBaseUrl} = require('../lib/appUrlUtil')
 const siteSettings = require('../state/siteSettings')
-const urlParse = require('../../app/common/urlParse')
 const debounce = require('../lib/debounce')
 const {currentWindow, isMaximized, isFocused, isFullScreen} = require('../../app/renderer/currentWindow')
 const emptyMap = new Immutable.Map()
-const emptyList = new Immutable.List()
-const {makeImmutable} = require('../../app/common/state/immutableUtil')
 const platformUtil = require('../../app/common/lib/platformUtil')
+const tabUtil = require('../../app/renderer/lib/tabUtil')
 
 class Main extends ImmutableComponent {
   constructor () {
     super()
     this.onCloseFrame = this.onCloseFrame.bind(this)
-    this.onBack = this.onBack.bind(this)
-    this.onForward = this.onForward.bind(this)
-    this.onBackLongPress = this.onBackLongPress.bind(this)
-    this.onForwardLongPress = this.onForwardLongPress.bind(this)
     this.onMouseDown = this.onMouseDown.bind(this)
     this.onClickWindow = this.onClickWindow.bind(this)
-    this.onDoubleClick = this.onDoubleClick.bind(this)
-    this.onDragOver = this.onDragOver.bind(this)
-    this.onDrop = this.onDrop.bind(this)
     this.onHideSiteInfo = this.onHideSiteInfo.bind(this)
     this.onHideBraveryPanel = this.onHideBraveryPanel.bind(this)
     this.onHideClearBrowsingDataPanel = this.onHideClearBrowsingDataPanel.bind(this)
@@ -104,7 +90,6 @@ class Main extends ImmutableComponent {
     this.onHideNoScript = this.onHideNoScript.bind(this)
     this.onHideReleaseNotes = this.onHideReleaseNotes.bind(this)
     this.onHideCheckDefaultBrowserDialog = this.onHideCheckDefaultBrowserDialog.bind(this)
-    this.onBraveMenu = this.onBraveMenu.bind(this)
     this.onHamburgerMenu = this.onHamburgerMenu.bind(this)
     this.onTabContextMenu = this.onTabContextMenu.bind(this)
     this.onFind = this.onFind.bind(this)
@@ -385,8 +370,9 @@ class Main extends ImmutableComponent {
       }
     })
 
-    ipc.on(messages.OPEN_BRAVERY_PANEL, (e) => {
-      if (!this.braveShieldsDisabled) {
+    ipc.on(messages.OPEN_BRAVERY_PANEL, () => {
+      const activeFrame = frameStateUtil.getActiveFrame(self.props.windowState)
+      if (shieldState.braveShieldsEnabled(activeFrame)) {
         this.onBraveMenu()
       } else {
         appActions.maybeCreateTabRequested({
@@ -591,65 +577,9 @@ class Main extends ImmutableComponent {
     }
   }
 
-  get activeFrame () {
-    return this.frames[this.props.windowState.get('activeFrameKey')]
-  }
-
-  // Returns the same as the active frame's location, but returns the requested
-  // URL if it's safe browsing, a cert error page or an error page.
-  get activeRequestedLocation () {
-    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
-    if (!activeFrame) {
-      return undefined
-    }
-    let location = activeFrame.get('location')
-    const history = activeFrame.get('history')
-    if (isIntermediateAboutPage(location)) {
-      const parsedUrl = urlParse(location)
-      if (parsedUrl.hash) {
-        location = parsedUrl.hash.split('#')[1]
-      } else if (history.size > 0) {
-        location = history.last()
-      }
-    }
-    return location
-  }
-
-  onNav (e, navCheckProp, navType, navAction) {
-    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
-    const activeTabId = activeFrame.get('tabId')
-    const activeTab = activeFrame ? this.props.appState.get('tabs').find((tab) => tab.get('tabId') === activeTabId) : null
-    const isNavigatable = isNavigatableAboutPage(getBaseUrl(activeFrame.get('location')))
-    if (e && eventUtil.isForSecondaryAction(e) && isNavigatable) {
-      if (activeTab && activeTab.get(navCheckProp)) {
-        appActions.tabCloned(activeTabId, {
-          [navType]: true,
-          active: !!e.shiftKey
-        })
-      }
-    } else {
-      navAction.call(this.activeFrame)
-    }
-  }
-
-  onBack (e) {
-    this.onNav(e, 'canGoBack', 'back', this.activeFrame.goBack)
-  }
-
-  onForward (e) {
-    this.onNav(e, 'canGoForward', 'forward', this.activeFrame.goForward)
-  }
-
-  onBackLongPress (target) {
-    contextMenus.onBackButtonHistoryMenu(this.activeFrame, this.activeFrame.getHistory(this.props.appState), target)
-  }
-
-  onForwardLongPress (target) {
-    contextMenus.onForwardButtonHistoryMenu(this.activeFrame, this.activeFrame.getHistory(this.props.appState), target)
-  }
-
   onBraveMenu () {
-    if (!this.braveShieldsDisabled) {
+    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
+    if (shieldState.braveShieldsEnabled(activeFrame)) {
       windowActions.setBraveryPanelDetail({})
     }
   }
@@ -701,41 +631,8 @@ class Main extends ImmutableComponent {
     windowActions.setModalDialogDetail('checkDefaultBrowserDialog')
   }
 
-  enableNoScript (settings) {
-    return siteSettings.activeSettings(settings, this.props.appState, appConfig).noScript === true
-  }
-
-  onCloseFrame (activeFrameProps, forceClose = false) {
-    windowActions.closeFrame(frameStateUtil.getFrames(this.props.windowState), activeFrameProps, forceClose)
-  }
-
-  onDragOver (e) {
-    let intersection = e.dataTransfer.types.filter((x) => ['Files'].includes(x))
-    if (intersection.length > 0 || e.dataTransfer.getData('text/plain')) {
-      e.dataTransfer.dropEffect = 'copy'
-      e.preventDefault()
-    }
-  }
-
-  onDrop (e) {
-    if (e.dataTransfer.files.length > 0) {
-      Array.from(e.dataTransfer.files).forEach((file) => {
-        const url = encodeURI(file.path)
-        appActions.createTabRequested({ url })
-      })
-    } else if (e.dataTransfer.getData('text/plain')) {
-      let activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
-      if (activeFrame) {
-        windowActions.loadUrl(activeFrame, e.dataTransfer.getData('text/plain'))
-      }
-    }
-  }
-
-  onDoubleClick (e) {
-    if (!e.target.className.includes('navigatorWrapper')) {
-      return
-    }
-    return !isMaximized() ? currentWindow.maximize() : currentWindow.unmaximize()
+  onCloseFrame (activeFrameProps) {
+    windowActions.closeFrame(this.props.windowState.get('frames'), activeFrameProps)
   }
 
   onMouseDown (e) {
@@ -816,50 +713,6 @@ class Main extends ImmutableComponent {
     return siteSettings.getSiteSettingsForURL(this.allSiteSettings, location)
   }
 
-  frameBraverySettings (location) {
-    return Immutable.fromJS(siteSettings.activeSettings(this.frameSiteSettings(location),
-                                                        this.props.appState,
-                                                        appConfig))
-  }
-
-  get activeTabId () {
-    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
-    return activeFrame && activeFrame.get('tabId')
-  }
-
-  get activeSiteSettings () {
-    return this.frameSiteSettings(this.activeRequestedLocation)
-  }
-
-  get braveShieldsDisabled () {
-    const activeRequestedLocation = this.activeRequestedLocation
-    if (!activeRequestedLocation) {
-      return true
-    }
-
-    const parsedUrl = urlParse(activeRequestedLocation)
-    return parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:' && (parsedUrl.protocol + parsedUrl.host) !== 'about:safebrowsing'
-  }
-
-  get extensionButtons () {
-    const enabledExtensions = extensionState.getEnabledExtensions(this.props.appState)
-    const extensionBrowserActions = enabledExtensions
-      .map((extension) => extensionState.getBrowserActionByTabId(this.props.appState, extension.get('id'), this.activeTabId))
-      .filter((browserAction) => browserAction)
-    let buttons = extensionBrowserActions.map((browserAction, id) =>
-      <BrowserAction
-        browserAction={browserAction}
-        extensionId={id}
-        tabId={this.activeTabId}
-        popupWindowSrc={this.props.windowState.getIn(['popupWindowDetail', 'src'])} />
-    ).values()
-    buttons = Array.from(buttons)
-    if (buttons.length > 0) {
-      buttons.push(<span className='buttonSeparator' />)
-    }
-    return buttons
-  }
-
   get customTitlebar () {
     const customTitlebarEnabled = isWindows
     const captionButtonsVisible = customTitlebarEnabled
@@ -890,29 +743,6 @@ class Main extends ImmutableComponent {
     return null
   }
 
-  getTotalBlocks (frames) {
-    if (!frames) {
-      return false
-    }
-
-    frames = makeImmutable(frames)
-
-    const ads = frames.getIn(['adblock', 'blocked'])
-    const trackers = frames.getIn(['trackingProtection', 'blocked'])
-    const scripts = frames.getIn(['noScript', 'blocked'])
-    const fingerprint = frames.getIn(['fingerprintingProtection', 'blocked'])
-    const blocked = (ads && ads.size ? ads.size : 0) +
-      (trackers && trackers.size ? trackers.size : 0) +
-      (scripts && scripts.size ? scripts.size : 0) +
-      (fingerprint && fingerprint.size ? fingerprint.size : 0)
-
-    return (blocked === 0)
-      ? false
-      : ((blocked > 99)
-        ? '99+'
-        : blocked)
-  }
-
   render () {
     // Sort frames by key so that the order of the frames do not change which could
     // cause unexpected reloading when a user moves tabs.
@@ -922,7 +752,8 @@ class Main extends ImmutableComponent {
     const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
     this.frames = {}
     const allSiteSettings = this.allSiteSettings
-    const activeSiteSettings = this.activeSiteSettings
+    const lastCommittedURL = frameStateUtil.getLastCommittedURL(activeFrame)
+    const activeSiteSettings = this.frameSiteSettings(lastCommittedURL)
     const nonPinnedFrames = frameStateUtil.getNonPinnedFrames(this.props.windowState)
     const tabsPerPage = Number(getSetting(settings.TABS_PER_PAGE))
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
@@ -930,16 +761,15 @@ class Main extends ImmutableComponent {
     const showFavicon = (btbMode === bookmarksToolbarMode.TEXT_AND_FAVICONS || btbMode === bookmarksToolbarMode.FAVICONS_ONLY)
     const showOnlyFavicon = btbMode === bookmarksToolbarMode.FAVICONS_ONLY
     const siteInfoIsVisible = this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
-    const braveShieldsDisabled = this.braveShieldsDisabled
-    const braveryPanelIsVisible = !braveShieldsDisabled && this.props.windowState.get('braveryPanelDetail')
+    const braveryPanelIsVisible = shieldState.braveShieldsEnabled(activeFrame) &&
+      this.props.windowState.get('braveryPanelDetail')
     const clearBrowsingDataPanelIsVisible = this.props.windowState.getIn(['ui', 'isClearBrowsingDataPanelVisible'])
     const importBrowserDataPanelIsVisible = this.props.windowState.get('importBrowserDataDetail')
     const widevinePanelIsVisible = this.props.windowState.getIn(['widevinePanelDetail', 'shown'])
     const autofillAddressPanelIsVisible = this.props.windowState.get('autofillAddressDetail')
     const autofillCreditCardPanelIsVisible = this.props.windowState.get('autofillCreditCardDetail')
-    const activeRequestedLocation = this.activeRequestedLocation
     const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
-    const activeTab = activeFrame ? this.props.appState.get('tabs').find((tab) => tab.get('tabId') === activeFrame.get('tabId')) : null
+    const activeTab = tabUtil.activeTab(this.props.appState, this.props.windowState)
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
     const checkDefaultBrowserDialogIsVisible =
       isFocused() && defaultBrowserState.shouldDisplayDialog(this.props.appState)
@@ -965,8 +795,6 @@ class Main extends ImmutableComponent {
       !customTitlebar.menubarSelectedIndex
 
     const appStateSites = this.props.appState.get('sites')
-    const activeTabShowingMessageBox = !!(activeTab && activeTab.get('messageBoxDetail'))
-    const totalBlocks = activeFrame ? this.getTotalBlocks(activeFrame) : false
 
     return <div id='window'
       className={cx({
@@ -992,133 +820,15 @@ class Main extends ImmutableComponent {
         : null
       }
       <div className='top'>
-        <div className={cx({
-          navbarCaptionButtonContainer: true,
-          allowDragging: shouldAllowWindowDrag
-        })}>
-          <div className='navbarMenubarFlexContainer'>
-            {
-              customTitlebar.menubarVisible
-                ? <div className='menubarContainer'>
-                  <Menubar
-                    template={customTitlebar.menubarTemplate}
-                    selectedIndex={customTitlebar.menubarSelectedIndex}
-                    contextMenuSelectedIndex={customTitlebar.contextMenuSelectedIndex}
-                    contextMenuDetail={contextMenuDetail}
-                    autohide={getSetting(settings.AUTO_HIDE_MENU)}
-                    lastFocusedSelector={customTitlebar.lastFocusedSelector} />
-                  <WindowCaptionButtons windowMaximized={customTitlebar.isMaximized} />
-                </div>
-                : null
-            }
-            <div className='navigatorWrapper'
-              onDoubleClick={this.onDoubleClick}
-              onDragOver={this.onDragOver}
-              onDrop={this.onDrop}>
-              <div className='backforward'>
-                <div className={cx({
-                  navigationButtonContainer: true,
-                  nav: true,
-                  disabled: !activeTab || !activeTab.get('canGoBack') || activeTabShowingMessageBox
-                })}>
-                  <LongPressButton
-                    l10nId='backButton'
-                    className='navigationButton backButton'
-                    disabled={!activeTab || !activeTab.get('canGoBack') || activeTabShowingMessageBox}
-                    onClick={this.onBack}
-                    onLongPress={this.onBackLongPress}
-                  />
-                </div>
-                <div className={cx({
-                  navigationButtonContainer: true,
-                  nav: true,
-                  disabled: !activeTab || !activeTab.get('canGoForward') || activeTabShowingMessageBox
-                })}>
-                  <LongPressButton
-                    l10nId='forwardButton'
-                    className='navigationButton forwardButton'
-                    disabled={!activeTab || !activeTab.get('canGoForward') || activeTabShowingMessageBox}
-                    onClick={this.onForward}
-                    onLongPress={this.onForwardLongPress}
-                  />
-                </div>
-              </div>
-              <NavigationBar
-                ref={(node) => { this.navBar = node }}
-                navbar={activeFrame && activeFrame.get('navbar')}
-                sites={appStateSites}
-                canGoForward={activeTab && activeTab.get('canGoForward')}
-                activeFrameKey={(activeFrame && activeFrame.get('key')) || undefined}
-                location={(activeFrame && activeFrame.get('location')) || ''}
-                title={(activeFrame && activeFrame.get('title')) || ''}
-                scriptsBlocked={activeFrame && activeFrame.getIn(['noScript', 'blocked'])}
-                partitionNumber={(activeFrame && activeFrame.get('partitionNumber')) || 0}
-                history={(activeFrame && activeFrame.get('history')) || emptyList}
-                suggestionIndex={(activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])) || 0}
-                isSecure={activeFrame ? activeFrame.getIn(['security', 'isSecure']) : null}
-                hasLocationValueSuffix={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix'])}
-                startLoadTime={(activeFrame && activeFrame.get('startLoadTime')) || undefined}
-                endLoadTime={(activeFrame && activeFrame.get('endLoadTime')) || undefined}
-                loading={activeFrame && activeFrame.get('loading')}
-                bookmarkDetail={this.props.windowState.get('bookmarkDetail')}
-                mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
-                searchDetail={this.props.windowState.get('searchDetail')}
-                enableNoScript={this.enableNoScript(activeSiteSettings)}
-                settings={this.props.appState.get('settings')}
-                noScriptIsVisible={noScriptIsVisible}
-                menubarVisible={customTitlebar.menubarVisible}
-                siteSettings={this.props.appState.get('siteSettings')}
-                synopsis={this.props.appState.getIn(['publisherInfo', 'synopsis']) || new Immutable.Map()}
-                activeTabShowingMessageBox={activeTabShowingMessageBox}
-                locationInfo={this.props.appState.get('locationInfo')}
-              />
-              <div className='topLevelEndButtons'>
-                <div className={cx({
-                  extraDragArea: !customTitlebar.menubarVisible,
-                  allowDragging: shouldAllowWindowDrag
-                })} />
-                {
-                  activeTabShowingMessageBox
-                    ? null
-                    : this.extensionButtons
-                }
-                <div className={css(styles.braveMenuContainer)}>
-                  <Button iconClass='braveMenu'
-                    l10nId='braveMenu'
-                    testId='braveShieldButton'
-                    className={cx({
-                      navbutton: true,
-                      braveShieldsDisabled,
-                      braveShieldsDown: !braverySettings.shieldsUp,
-                      leftOfCaptionButton: customTitlebar.captionButtonsVisible && !customTitlebar.menubarVisible
-                    })}
-                    disabled={activeTabShowingMessageBox}
-                    onClick={this.onBraveMenu} />
-                  {
-                    !this.braveShieldsDisabled && totalBlocks
-                    ? <div className={css(
-                        styles.lionBadge,
-                        (customTitlebar.menubarVisible || !platformUtil.isWindows()) && styles.lionBadgeRight
-                      )} data-test-id='lionBadge'>
-                      {totalBlocks}
-                    </div>
-                    : null
-                  }
-                </div>
-                {
-                  customTitlebar.captionButtonsVisible && !customTitlebar.menubarVisible
-                  ? <span className='buttonSeparator' />
-                  : null
-                }
-              </div>
-            </div>
-          </div>
-          {
-            customTitlebar.captionButtonsVisible && !customTitlebar.menubarVisible
-              ? <WindowCaptionButtons windowMaximized={customTitlebar.isMaximized} verticallyCenter='true' />
-              : null
-          }
-        </div>
+        <Navigator
+          appState={this.props.appState}
+          windowState={this.props.windowState}
+          frames={this.frames}
+          activeTab={activeTab}
+          shouldAllowWindowDrag={shouldAllowWindowDrag}
+          customTitlebar={customTitlebar}
+          activeSiteSettings={activeSiteSettings}
+        />
         {
           siteInfoIsVisible
           ? <SiteInfo frameProps={activeFrame}
@@ -1128,7 +838,7 @@ class Main extends ImmutableComponent {
         {
           braveryPanelIsVisible
           ? <BraveryPanel frameProps={activeFrame}
-            activeRequestedLocation={activeRequestedLocation}
+            lastCommittedURL={lastCommittedURL}
             braveryPanelDetail={this.props.windowState.get('braveryPanelDetail')}
             braverySettings={braverySettings}
             activeSiteSettings={activeSiteSettings}
@@ -1358,7 +1068,7 @@ class Main extends ImmutableComponent {
                 publisherInfo={this.props.appState.get('publisherInfo') || new Immutable.Map()}
                 frameSiteSettings={this.frameSiteSettings(frame.get('location'))}
                 onFindHide={this.onFindHide}
-                enableNoScript={this.enableNoScript(this.frameSiteSettings(frame.get('location')))}
+                enableNoScript={siteSettingsState.isNoScriptEnabled(this.frameSiteSettings(frame.get('location')), this.props.appState)}
                 versionInformation={versionInformation}
                 braveryDefaults={braveryDefaults}
                 isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
@@ -1384,32 +1094,5 @@ class Main extends ImmutableComponent {
     </div>
   }
 }
-
-let styling = {
-  lionBadge: {
-    left: 'calc(50% - 1px)',
-    top: '14px',
-    position: 'absolute',
-    color: '#FFF',
-    borderRadius: '2.5px',
-    padding: '1px 2px',
-    pointerEvents: 'none',
-    font: '6pt "Arial Narrow"',
-    textAlign: 'center',
-    border: '0px solid #FFF',
-    background: '#555555',
-    minWidth: '10px',
-    userSelect: 'none'
-  },
-  lionBadgeRight: {
-    left: 'auto',
-    right: '2px'
-  },
-  braveMenuContainer: {
-    position: 'relative'
-  }
-}
-
-const styles = StyleSheet.create(styling)
 
 module.exports = Main
