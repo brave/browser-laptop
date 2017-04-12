@@ -223,6 +223,7 @@ const createWindow = (action) => {
 
     mainWindow.webContents.on('did-finish-load', (e) => {
       lastEmittedState = appState
+      mainWindow.webContents.setZoomLevel(0.0)
       e.sender.send(messages.INITIALIZE_WINDOW, frameOpts.disposition, appState.toJS(), frames, action.restoredState)
       if (action.cb) {
         action.cb()
@@ -233,7 +234,6 @@ const createWindow = (action) => {
       mainWindow.show()
     })
 
-    mainWindow.webContents.setZoomLevel(0.0)
     mainWindow.loadURL(appUrlUtil.getBraveExtIndexHTML())
   })
 }
