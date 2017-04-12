@@ -81,9 +81,15 @@ module.exports.populateDefaultExtensions = (extensionsState) => {
       }
     })
 
-  // At the time of this writing we don't have access to any extension data
-  // unless it's installed. In such cases populate extensions state
-  // with our dummy content.
+    // We don't store manifest for excluded extensions
+    // then if excluded, delete saved state so we can fallback to dummyData below
+    if (newState.hasIn([data.id, 'excluded'])) {
+      newState = newState.delete(data.id)
+    }
+
+    // At the time of this writing we don't have access to any extension data
+    // unless it's installed. In such cases populate extensions state
+    // with our dummy content. Also populate excluded extensions deleted above
     if (!newState.get(data.id)) {
       newState = newState.set(data.id, dummyExtensionManifest.get(data.id))
     }

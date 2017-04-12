@@ -34,6 +34,18 @@ class ExtensionsTab extends ImmutableComponent {
     aboutActions.extensionUninstalled(extensionId)
   }
 
+  onToggleExtension (extension, e) {
+    // You can only have one active password manager.
+    // If user decide to disable all, switch back password to unmanaged (null)
+    if (thirdPartyPasswordManagers.includes(extension.get('id'))) {
+      e.target.value
+        ? aboutActions.changeSetting(settings.ACTIVE_PASSWORD_MANAGER, getExtensionKey(extension.get('id')))
+        : aboutActions.changeSetting(settings.ACTIVE_PASSWORD_MANAGER, void (0))
+    } else {
+      aboutActions.changeSetting(getExtensionKey(extension.get('id')), e.target.value)
+    }
+  }
+
   getCheckedExtension (extensionId) {
     const activePwManager = getSetting(settings.ACTIVE_PASSWORD_MANAGER, this.props.settings)
     return isPasswordManager(extensionId)
@@ -42,13 +54,14 @@ class ExtensionsTab extends ImmutableComponent {
   }
 
   isRemovableExtension (extension) {
-    // do not allow built-in extensions from being uninstalled
-    return extension.get('excluded') && !isBuiltInExtension(extension.get('id'))
+    return !extension.get('isDummy') &&
+      !isBuiltInExtension(extension.get('id')) &&
+      !extension.get('excluded')
   }
 
   getRow (extension) {
-    if ([config.braveExtensionId, config.syncExtensionId].includes(extension.get('id')) ||
-    (!extension.get('dummy') && this.isRemovableExtension(extension))) {
+    // We don't want Brave and Sync on this list
+    if ([config.braveExtensionId, config.syncExtensionId].includes(extension.get('id'))) {
       return []
     }
 
@@ -69,14 +82,13 @@ class ExtensionsTab extends ImmutableComponent {
       },
       { // Enable/Disable toggle
         html: <SettingCheckbox
-          forPassword={thirdPartyPasswordManagers.includes(extension.get('id'))}
           prefKey={getExtensionKey(extension.get('id'))}
           settings={this.props.settings}
           checked={this.getCheckedExtension(extension.get('id'))}
-          onChangeSetting={this.props.onChangeSetting} />
+          onChange={this.onToggleExtension.bind(this, extension)} />
       },
       { // Exclude option
-        html: !extension.get('isDummy') && !isBuiltInExtension(extension.get('id'))
+        html: this.isRemovableExtension(extension)
         ? <div className={globalStyles.appIcons.trash}
           onClick={this.onRemoveExtension.bind(this, extension.get('id'))} />
         : <span data-l10n-id={isBuiltInExtension(extension.get('id')) ? 'integrated' : 'notInstalled'} />
