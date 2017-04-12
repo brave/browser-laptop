@@ -17,7 +17,7 @@ const messages = require('../constants/messages')
 const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
 const UrlUtil = require('../lib/urlutil')
-const {currentWindowId, isFocused} = require('../../app/renderer/currentWindow')
+const {getCurrentWindowId, isFocused} = require('../../app/renderer/currentWindow')
 const {tabFromFrame} = require('../state/frameStateUtil')
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
 const { makeImmutable } = require('../../app/common/state/immutableUtil')
@@ -508,18 +508,6 @@ const doAction = (action) => {
     case windowConstants.WINDOW_SET_LAST_ZOOM_PERCENTAGE:
       windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps), 'lastZoomPercentage'], action.percentage)
       break
-    case windowConstants.WINDOW_SET_MAXIMIZE_STATE:
-      windowState = windowState.setIn(['ui', 'isMaximized'], action.isMaximized)
-      break
-    case windowConstants.WINDOW_SAVE_POSITION:
-      windowState = windowState.setIn(['ui', 'position'], action.position)
-      break
-    case windowConstants.WINDOW_SAVE_SIZE:
-      windowState = windowState.setIn(['ui', 'size'], action.size)
-      break
-    case windowConstants.WINDOW_SET_FULLSCREEN_STATE:
-      windowState = windowState.setIn(['ui', 'isFullScreen'], action.isFullScreen)
-      break
     case windowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR:
       windowState = windowState.setIn(['ui', 'mouseInTitlebar'], action.mouseInTitlebar)
       break
@@ -692,9 +680,6 @@ const doAction = (action) => {
     case windowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID:
       windowState = windowState.setIn(['ui', 'bookmarksToolbar', 'selectedFolderId'], action.folderId)
       break
-    case windowConstants.WINDOW_ON_FOCUS_CHANGED:
-      windowState = windowState.setIn(['ui', 'hasFocus'], action.hasFocus)
-      break
     case windowConstants.WINDOW_SET_MODAL_DIALOG_DETAIL:
       if (action.className && action.props === undefined) {
         windowState = windowState.deleteIn(['modalDialogDetail', action.className])
@@ -718,6 +703,30 @@ const doAction = (action) => {
     case appConstants.APP_NEW_WEB_CONTENTS_ADDED:
       newFrame(action.frameOpts, action.frameOpts.openInForeground)
       updateTabPageIndex(frameStateUtil.getActiveFrame(windowState))
+      break
+    case windowConstants.WINDOW_FRAME_MOUSE_ENTER:
+      windowState = windowState.setIn(['ui', 'mouseInFrame'], true)
+      break
+    case windowConstants.WINDOW_FRAME_MOUSE_LEAVE:
+      windowState = windowState.setIn(['ui', 'mouseInFrame'], false)
+      break
+    case windowConstants.WINDOW_ON_MAXIMIZE:
+      windowState = windowState.setIn(['ui', 'isMaximized'], true)
+      break
+    case windowConstants.WINDOW_ON_MINIMIZE:
+      windowState = windowState.setIn(['ui', 'isMaximized'], false)
+      break
+    case windowConstants.WINDOW_ON_FOCUS:
+      windowState = windowState.setIn(['ui', 'isFocused'], true)
+      break
+    case windowConstants.WINDOW_ON_BLUR:
+      windowState = windowState.setIn(['ui', 'isFocused'], false)
+      break
+    case windowConstants.WINDOW_ON_ENTER_FULL_SCREEN:
+      windowState = windowState.setIn(['ui', 'isFullScreen'], true)
+      break
+    case windowConstants.WINDOW_ON_EXIT_FULL_SCREEN:
+      windowState = windowState.setIn(['ui', 'isFullScreen'], false)
       break
     default:
       break
@@ -781,10 +790,10 @@ const dispatchEventPayload = (e, payload) => {
   let queryInfo = payload.queryInfo || payload.frameProps || {}
   queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
   if (queryInfo.windowId === -2 && isFocused()) {
-    queryInfo.windowId = currentWindowId
+    queryInfo.windowId = getCurrentWindowId()
   }
   // handle any ipc dispatches that are targeted to this window
-  if (queryInfo.windowId && queryInfo.windowId === currentWindowId) {
+  if (queryInfo.windowId && queryInfo.windowId === getCurrentWindowId()) {
     doAction(payload)
   }
 }

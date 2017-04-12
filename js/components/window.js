@@ -14,7 +14,7 @@ const appActions = require('../actions/appActions')
 const Main = require('./main')
 const cx = require('../lib/classSet')
 const {getPlatformStyles} = require('../../app/common/lib/platformUtil')
-const {currentWindowId} = require('../../app/renderer/currentWindow')
+const {getCurrentWindowId} = require('../../app/renderer/currentWindow')
 
 window.appActions = appActions
 
@@ -48,7 +48,7 @@ class Window extends React.Component {
       } else {
         this.props.frames.forEach((frame, i) => {
           if (frame.guestInstanceId) {
-            appActions.newWebContentsAdded(currentWindowId, frame)
+            appActions.newWebContentsAdded(getCurrentWindowId(), frame)
             return
           }
           appActions.createTabRequested({
@@ -75,7 +75,7 @@ class Window extends React.Component {
     // For Windows 10, this defaults to blue. When window
     // becomes inactive it needs to change to gray.
     if (classes['win10']) {
-      classes['inactive'] = !this.windowState.getIn(['ui', 'hasFocus'])
+      classes['inactive'] = !this.windowState.getIn(['ui', 'isFocused'])
     }
 
     return <div id='windowContainer' className={cx(classes)} >
@@ -85,7 +85,7 @@ class Window extends React.Component {
   }
 
   componentDidMount () {
-    appActions.windowReady(currentWindowId)
+    appActions.windowReady(getCurrentWindowId())
   }
 
   componentWillUnmount () {

@@ -32,7 +32,7 @@ const shouldValidateId = function (cb) {
     )
   })
 
-  it('throws an AssertionError if windowId < 1', function () {
+  it('throws an AssertionError if windowId < 1 and windowId != -1', function () {
     assert.throws(
       () => {
         cb(0)
@@ -41,7 +41,7 @@ const shouldValidateId = function (cb) {
     )
     assert.throws(
       () => {
-        cb(-1)
+        cb(-2)
       },
       AssertionError
     )

@@ -26,11 +26,14 @@ describe('Navigator component unit tests', function () {
     mockery.registerMock('electron', require('../../../../lib/fakeElectron'))
     Navigator = require('../../../../../../app/renderer/components/navigation/navigator')
     NavigationBar = require('../../../../../../app/renderer/components/navigation/navigationBar')
+    appStoreRenderer = require('../../../../js/stores/appStoreRenderer')
   })
 
   after(function () {
     mockery.disable()
   })
+
+  let appStoreRenderer = require('../../../../js/stores/appStoreRenderer')
 
   const windowState = Immutable.fromJS({
     activeFrameKey: 0,
@@ -56,7 +59,8 @@ describe('Navigator component unit tests', function () {
       tabId: 1,
       canGoBack: true,
       canGoForward: true
-    }]
+    }],
+    windows: []
   })
 
   const customTitlebar = {
@@ -76,6 +80,7 @@ describe('Navigator component unit tests', function () {
     let wrapper
 
     before(function () {
+      appStoreRenderer.state = Immutable.fromJS(appState)
       wrapper = shallow(
         <Navigator
           windowState={windowState}
@@ -114,6 +119,7 @@ describe('Navigator component unit tests', function () {
         }
       })
 
+      appStoreRenderer.state = Immutable.fromJS(appState2)
       wrapper = shallow(
         <Navigator
           windowState={windowState}
@@ -155,6 +161,7 @@ describe('Navigator component unit tests', function () {
     let instance
 
     before(function () {
+      appStoreRenderer.state = Immutable.fromJS(appState)
       let wrapper = shallow(
         <Navigator
           windowState={windowState}

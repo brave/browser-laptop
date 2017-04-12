@@ -33,6 +33,7 @@ const messages = require('./constants/messages')
 const Immutable = require('immutable')
 const patch = require('immutablepatch')
 const l10n = require('./l10n')
+const currentWindow = require('../app/renderer/currentWindow')
 
 // don't allow scaling or zooming of the ui
 webFrame.setPageScaleLimits(1, 1)
@@ -66,7 +67,8 @@ window.addEventListener('beforeunload', function (e) {
   ipc.send(messages.LAST_WINDOW_STATE, windowStore.getState().toJS())
 })
 
-ipc.on(messages.INITIALIZE_WINDOW, (e, disposition, appState, frames, initWindowState) => {
+ipc.on(messages.INITIALIZE_WINDOW, (e, windowValue, appState, frames, initWindowState) => {
+  currentWindow.setWindowId(windowValue.id)
   appStoreRenderer.state = Immutable.fromJS(appState)
   ReactDOM.render(
     <Window frames={frames} initWindowState={initWindowState} />,

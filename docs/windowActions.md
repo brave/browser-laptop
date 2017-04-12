@@ -592,16 +592,6 @@ This is mainly just used to trigger updates throughout React.
 
 
 
-### setMaximizeState(isMaximized) 
-
-Sets the maximize state of the window
-
-**Parameters**
-
-**isMaximized**: `boolean`, true if window is maximized
-
-
-
 ### savePosition(position) 
 
 Saves the position of the window in the window state
@@ -609,26 +599,6 @@ Saves the position of the window in the window state
 **Parameters**
 
 **position**: `Array`, [x, y]
-
-
-
-### saveSize(size) 
-
-Saves the size (width, height) of the window in the window state
-
-**Parameters**
-
-**size**: `Array`, [x, y]
-
-
-
-### setWindowFullScreen(isFullScreen) 
-
-Sets the fullscreen state of the window
-
-**Parameters**
-
-**isFullScreen**: `boolean`, true if window is fullscreen
 
 
 
@@ -926,16 +896,6 @@ Fired when the mouse clicks or hovers over a bookmark folder in the bookmarks to
 
 **folderId**: `number`, from the siteDetail for the bookmark folder
   If set to null, no menu is open. If set to -1, mouse is over a bookmark, not a folder
-
-
-
-### onFocusChanged(hasFocus) 
-
-Fired when window receives or loses focus
-
-**Parameters**
-
-**hasFocus**: `boolean`, true if focused, false if blurred
 
 
 

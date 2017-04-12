@@ -66,7 +66,7 @@ const cx = require('../lib/classSet')
 const eventUtil = require('../lib/eventUtil')
 const siteSettings = require('../state/siteSettings')
 const debounce = require('../lib/debounce')
-const {currentWindow, isMaximized, isFocused, isFullScreen} = require('../../app/renderer/currentWindow')
+const {getCurrentWindowId, isMaximized, isFocused, isFullScreen} = require('../../app/renderer/currentWindow')
 const platformUtil = require('../../app/common/lib/platformUtil')
 const tabUtil = require('../../app/renderer/lib/tabUtil')
 
@@ -289,7 +289,7 @@ class Main extends ImmutableComponent {
       }
     }, 500, {leading: true, trailing: false})
     // the swipe gesture handler will only fire if the three finger swipe setting is on, so the complete off setting and three and two finger together is also taken care of
-    currentWindow.on('swipe', (e, direction) => { throttledSwipe(direction) })
+    ipc.on('swipe', (e, direction) => { throttledSwipe(direction) })
   }
 
   loadSearchProviders () {
@@ -331,7 +331,7 @@ class Main extends ImmutableComponent {
     const activeFrameTitle = (activeFrame && (activeFrame.get('title') || activeFrame.get('location'))) || ''
     const activeFramePrevTitle = (activeFramePrev && (activeFramePrev.get('title') || activeFramePrev.get('location'))) || ''
     if (activeFrameTitle !== activeFramePrevTitle) {
-      currentWindow.setTitle(activeFrameTitle)
+      windowActions.shouldSetTitle(getCurrentWindowId(), activeFrameTitle)
     }
 
     // If the tab changes or was closed, exit out of full screen to give a better
@@ -356,7 +356,7 @@ class Main extends ImmutableComponent {
           window.isFirstProfiling = true
           console.info('See this blog post for more information on profiling: http://benchling.engineering/performance-engineering-with-react/')
         }
-        currentWindow.openDevTools()
+        windowActions.shouldOpenDevTools()
         console.log('starting to profile...')
         window.perf.start()
       } else {
@@ -511,51 +511,12 @@ class Main extends ImmutableComponent {
 
     const activeFrame = frameStateUtil.getActiveFrame(self.props.windowState)
     if (activeFrame && activeFrame.get('title')) {
-      currentWindow.setTitle(activeFrame.get('title'))
+      windowActions.shouldSetTitle(getCurrentWindowId(), activeFrame.get('title'))
     }
 
-    // Handlers for saving window state
-    // TODO: revisit this code when window state moves to appStore
-    const slidingTimerMilliseconds = 1000
-
-    const onWindowResize = debounce(function (event) {
-      const size = event.sender.getSize()
-      // NOTE: the default window size is whatever the last window resize was
-      appActions.defaultWindowParamsChanged(size)
-      windowActions.saveSize(size)
-    }, slidingTimerMilliseconds)
-
-    const onWindowMove = debounce(function (event) {
-      const position = event.sender.getPosition()
-      // NOTE: the default window position is whatever the last window move was
-      appActions.defaultWindowParamsChanged(undefined, position)
-      windowActions.savePosition(position)
-    }, slidingTimerMilliseconds)
-
-    currentWindow.on('maximize', function () {
-      windowActions.setMaximizeState(true)
-    })
-    currentWindow.on('unmaximize', function () {
-      windowActions.setMaximizeState(false)
-    })
-    currentWindow.on('resize', onWindowResize)
-    currentWindow.on('move', onWindowMove)
-    currentWindow.on('focus', () => {
-      windowActions.onFocusChanged(true)
-    })
-    currentWindow.on('blur', () => {
+    window.onblur = () => {
       self.resetAltMenuProcessing()
-      appActions.windowBlurred(currentWindow.id)
-      windowActions.onFocusChanged(false)
-    })
-
-    // Full screen as in F11 (not full screen on a video)
-    currentWindow.on('enter-full-screen', function (event) {
-      windowActions.setWindowFullScreen(true)
-    })
-    currentWindow.on('leave-full-screen', function (event) {
-      windowActions.setWindowFullScreen(false)
-    })
+    }
   }
 
   checkForTitleMode () {

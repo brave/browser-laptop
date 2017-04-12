@@ -27,7 +27,7 @@ const {Favicon, AudioTabIcon, NewSessionIcon,
       PrivateIcon, TabTitle, CloseTabIcon} = require('../../app/renderer/components/tabContent')
 const {getTabBreakpoint, tabUpdateFrameRate} = require('../../app/renderer/lib/tabUtil')
 const {isWindows} = require('../../app/common/lib/platformUtil')
-const {currentWindowId} = require('../../app/renderer/currentWindow')
+const {getCurrentWindowId} = require('../../app/renderer/currentWindow')
 const {frameOptsFromFrame} = require('../state/frameStateUtil')
 
 class Tab extends ImmutableComponent {
@@ -48,7 +48,7 @@ class Tab extends ImmutableComponent {
     const draggingOverData = this.props.dragData && this.props.dragData.get('dragOverData')
     if (!draggingOverData ||
         draggingOverData.get('draggingOverKey') !== this.props.tab.get('frameKey') ||
-        draggingOverData.get('draggingOverWindowId') !== currentWindowId) {
+        draggingOverData.get('draggingOverWindowId') !== getCurrentWindowId()) {
       return
     }
 
@@ -71,7 +71,7 @@ class Tab extends ImmutableComponent {
     const sourceDragData = dnd.getInterBraveDragData()
     return sourceDragData &&
       sourceDragData.get('key') === this.props.tab.get('frameKey') &&
-      sourceDragData.get('draggingOverWindowId') === currentWindowId
+      sourceDragData.get('draggingOverWindowId') === getCurrentWindowId()
   }
 
   get isDraggingOverLeft () {

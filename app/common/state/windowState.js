@@ -9,7 +9,7 @@ const assert = require('assert')
 const validateId = function (propName, id) {
   assert.ok(id, `${propName} cannot be null`)
   id = parseInt(id)
-  assert.ok(id > 0, `${propName} must be positive`)
+  assert.ok(id === -1 || id >= 1, `${propName} must be positive or -1`)
   return id
 }
 
