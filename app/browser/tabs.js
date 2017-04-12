@@ -123,7 +123,7 @@ const updateAboutDetails = (tab, tabValue) => {
   if (tabValue.get('incognito') === true) {
     allSiteSettings = allSiteSettings.mergeDeep(appState.get('temporarySiteSettings'))
   }
-  const extensions = appState.get('extensions')
+  const extensionsValue = appState.get('extensions')
   const bookmarks = appState.get('sites').filter((site) => site.get('tags').includes(siteTags.BOOKMARK)).toList().sort(siteUtil.siteSort)
   const bookmarkFolders = appState.get('sites').filter((site) => site.get('tags').includes(siteTags.BOOKMARK_FOLDER)).toList().sort(siteUtil.siteSort)
   const sync = appState.get('sync')
@@ -147,7 +147,7 @@ const updateAboutDetails = (tab, tabValue) => {
     tab.send(messages.SITE_SETTINGS_UPDATED, allSiteSettings.toJS())
     tab.send(messages.SYNC_UPDATED, sync.toJS())
     tab.send(messages.BRAVERY_DEFAULTS_UPDATED, braveryDefaults)
-    tab.send(messages.EXTENSIONS_UPDATED, extensions.toJS())
+    tab.send(messages.EXTENSIONS_UPDATED, extensionsValue.toJS())
   } else if (location === 'about:bookmarks' && bookmarks) {
     tab.send(messages.BOOKMARKS_UPDATED, {
       bookmarks: bookmarks.toJS(),
@@ -158,7 +158,7 @@ const updateAboutDetails = (tab, tabValue) => {
     tab.send(messages.HISTORY_UPDATED, aboutHistoryState.toJS())
     tab.send(messages.SETTINGS_UPDATED, appSettings.toJS())
   } else if (location === 'about:extensions' && extensions) {
-    tab.send(messages.EXTENSIONS_UPDATED, extensions.toJS())
+    tab.send(messages.EXTENSIONS_UPDATED, extensionsValue.toJS())
   } else if (location === 'about:adblock' && adblock) {
     tab.send(messages.ADBLOCK_UPDATED, {
       adblock: adblock.toJS(),

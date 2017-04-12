@@ -95,11 +95,11 @@ class AboutExtensions extends React.Component {
       if (!detail) {
         return
       }
-      const extensions = Object.keys(detail.extensions)
+      const extensions = Object.keys(detail)
         // Exclude the Brave Extension becuase it looks strange in this list
         .filter((extensionID) => extensionID !== 'mnojpmjdmbbfmejpflffifhffcmidifd')
         // Sort enabled things first
-        .map((extensionID) => detail.extensions[extensionID])
+        .map((extensionID) => detail[extensionID])
         .sort((extension, extension2) => (extension2.enabled || false) - (extension.enabled || false))
       this.setState({
         extensions: Immutable.fromJS(extensions)
