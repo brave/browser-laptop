@@ -14,7 +14,7 @@ const siteTags = require('../../../../js/constants/siteTags')
 const messages = require('../../../../js/constants/messages')
 const settings = require('../../../../js/constants/settings')
 const ipc = require('electron').ipcRenderer
-const {isSourceAboutUrl, getBaseUrl} = require('../../../../js/lib/appUrlUtil')
+const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
 const AddEditBookmarkHanger = require('../addEditBookmarkHanger')
 const siteUtil = require('../../../../js/state/siteUtil')
 const eventUtil = require('../../../../js/lib/eventUtil')
@@ -126,29 +126,6 @@ class NavigationBar extends React.Component {
       )
   }
 
-  get locationId () {
-    return getBaseUrl(this.props.location)
-  }
-
-  get publisherId () {
-    return this.props.locationInfo && this.props.locationInfo.getIn([this.locationId, 'publisher'])
-  }
-
-  get visiblePublisher () {
-    const hostPattern = UrlUtil.getHostPattern(this.publisherId)
-    const hostSettings = this.props.siteSettings.get(hostPattern)
-    const ledgerPaymentsShown = hostSettings && hostSettings.get('ledgerPaymentsShown')
-    return typeof ledgerPaymentsShown === 'boolean'
-      ? ledgerPaymentsShown
-      : true
-  }
-
-  get isPublisherButtonEnabled () {
-    return getSetting(settings.PAYMENTS_ENABLED) &&
-      UrlUtil.isHttpOrHttps(this.props.location) &&
-      this.visiblePublisher
-  }
-
   componentDidMount () {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, () => this.onToggleBookmark())
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark())
@@ -157,31 +134,21 @@ class NavigationBar extends React.Component {
   mergeProps (state, dispatchProps, ownProps) {
     const windowState = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(windowState) || Immutable.Map()
-    const activeTab = tabState.getActiveTabValue(state, getCurrentWindowId()) || Immutable.Map()
     const activeTabId = tabState.getActiveTabId(state, getCurrentWindowId())
     const props = {}
 
     props.navbar = activeFrame.get('navbar')
     props.sites = state.get('sites')
-    props.canGoForward = activeTab.get('canGoForward') || false
     props.activeFrameKey = activeFrame.get('key')
     props.location = activeFrame.get('location') || ''
     props.title = activeFrame.get('title') || ''
-    props.scriptsBlocked = activeFrame.getIn(['noScript', 'blocked'])
     props.partitionNumber = activeFrame.get('partitionNumber') || 0
-    props.history = activeFrame.get('history') || new Immutable.List()
-    props.suggestionIndex = activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex']) || 0
     props.isSecure = activeFrame.getIn(['security', 'isSecure'])
-    props.hasLocationValueSuffix = activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix'])
-    props.startLoadTime = activeFrame.get('startLoadTime')
-    props.endLoadTime = activeFrame.get('endLoadTime')
     props.loading = activeFrame.get('loading')
     props.bookmarkDetail = windowState.get('bookmarkDetail')
     props.mouseInTitlebar = windowState.getIn(['ui', 'mouseInTitlebar'])
-    props.searchDetail = windowState.get('searchDetail')
     props.enableNoScript = ownProps.enableNoScript
     props.settings = state.get('settings')
-    props.noScriptIsVisible = windowState.getIn(['ui', 'noScriptInfo', 'isVisible']) || false
     props.menubarVisible = ownProps.menubarVisible
     props.siteSettings = state.get('siteSettings')
     props.synopsis = state.getIn(['publisherInfo', 'synopsis']) || new Immutable.Map()
@@ -257,25 +224,10 @@ class NavigationBar extends React.Component {
         }
       </div>
       <UrlBar ref='urlBar'
-        activeFrameKey={this.props.activeFrameKey}
-        canGoForward={this.props.canGoForward}
-        searchDetail={this.props.searchDetail}
-        loading={this.loading}
-        location={this.props.location}
-        title={this.props.title}
-        history={this.props.history}
-        isSecure={this.props.isSecure}
-        hasLocationValueSuffix={this.props.hasLocationValueSuffix}
-        startLoadTime={this.props.startLoadTime}
-        endLoadTime={this.props.endLoadTime}
         titleMode={this.titleMode}
-        urlbar={this.props.navbar.get('urlbar')}
         onStop={this.onStop}
         menubarVisible={this.props.menubarVisible}
-        noBorderRadius={this.isPublisherButtonEnabled}
-        activeTabShowingMessageBox={this.props.activeTabShowingMessageBox}
         enableNoScript={this.props.enableNoScript}
-        scriptsBlocked={this.props.scriptsBlocked}
         />
       {
         isSourceAboutUrl(this.props.location)
