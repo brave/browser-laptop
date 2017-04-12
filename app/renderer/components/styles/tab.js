@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     boxSizing: 'border-box',
     color: '#5a5a5a',
     display: 'flex',
-    height: '24px',
+    height: '26px',
     marginTop: '0',
     transition: `transform 200ms ease, ${globalStyles.transition.tabBackgroundTransition}`,
     left: '0',
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
 
   active: {
     background: `rgba(255, 255, 255, 1.0)`,
-    height: '24px',
+    height: '26px',
     marginTop: '0',
     borderWidth: '0 1px 0 0',
     borderStyle: 'solid',
