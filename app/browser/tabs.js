@@ -2,14 +2,23 @@ const appActions = require('../../js/actions/appActions')
 const config = require('../../js/constants/config')
 const Immutable = require('immutable')
 const tabState = require('../common/state/tabState')
-const {app, BrowserWindow, extensions, session} = require('electron')
+const {app, BrowserWindow, extensions, session, ipcMain} = require('electron')
 const {makeImmutable} = require('../common/state/immutableUtil')
-const {getTargetAboutUrl, isSourceAboutUrl, newFrameUrl} = require('../../js/lib/appUrlUtil')
+const {getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl} = require('../../js/lib/appUrlUtil')
 const {isURL, getUrlFromInput} = require('../../js/lib/urlutil')
 const {isSessionPartition} = require('../../js/state/frameStateUtil')
 const {getOrigin} = require('../../js/state/siteUtil')
 const {getSetting} = require('../../js/settings')
 const settings = require('../../js/constants/settings')
+const {getBaseUrl, aboutUrls} = require('../../js/lib/appUrlUtil')
+const siteSettings = require('../../js/state/siteSettings')
+const messages = require('../../js/constants/messages')
+const siteUtil = require('../../js/state/siteUtil')
+const aboutHistoryState = require('../common/state/aboutHistoryState')
+const appStore = require('../../js/stores/appStore')
+const appConfig = require('../../js/constants/appConfig')
+const siteTags = require('../../js/constants/siteTags')
+const {newTabMode} = require('../common/constants/settingsEnums')
 
 let currentWebContents = {}
 let currentPartitionNumber = 0
@@ -74,6 +83,157 @@ const getPartition = (createProperties) => {
   }
 
   return partition
+}
+
+// TODO(bridiver) - refactor this into an action
+ipcMain.on(messages.ABOUT_COMPONENT_INITIALIZED, (e) => {
+  const tab = e.sender
+  const listener = () => {
+    if (!tab.isDestroyed()) {
+      const tabValue = tabState.getByTabId(appStore.getState(), tab.getId())
+      if (tabValue.get('active') === true) {
+        updateAboutDetails(tab, tabValue)
+      }
+    } else {
+      appStore.removeChangeListener(listener)
+    }
+  }
+  listener()
+
+  appStore.addChangeListener(listener)
+  tab.on('set-active', () => {
+    listener()
+  })
+  tab.on('did-navigate', () => {
+    appStore.removeChangeListener(listener)
+  })
+})
+
+const updateAboutDetails = (tab, tabValue) => {
+  const appState = appStore.getState()
+  const url = getSourceAboutUrl(tab.getURL())
+  let location = getBaseUrl(url)
+
+  // TODO(bridiver) - refactor these to use state helpers
+  const ledgerInfo = appState.get('ledgerInfo')
+  const publisherInfo = appState.get('publisherInfo')
+  const preferencesData = appState.getIn(['about', 'preferences'])
+  const appSettings = appState.get('settings')
+  let allSiteSettings = appState.get('siteSettings')
+  if (tabValue.get('incognito') === true) {
+    allSiteSettings = allSiteSettings.mergeDeep(appState.get('temporarySiteSettings'))
+  }
+  const extensions = appState.get('extensions')
+  const bookmarks = appState.get('sites').filter((site) => site.get('tags').includes(siteTags.BOOKMARK)).toList().sort(siteUtil.siteSort)
+  const bookmarkFolders = appState.get('sites').filter((site) => site.get('tags').includes(siteTags.BOOKMARK_FOLDER)).toList().sort(siteUtil.siteSort)
+  const sync = appState.get('sync')
+  const braveryDefaults = siteSettings.braveryDefaults(appState, appConfig)
+  const history = aboutHistoryState.getHistory(appState)
+  const adblock = appState.get('adblock')
+  const downloads = appState.get('downloads')
+  const passwords = appState.get('passwords')
+  const trackedBlockersCount = appState.getIn(['trackingProtection', 'count'])
+  const adblockCount = appState.getIn(['adblock', 'count'])
+  const httpsUpgradedCount = appState.getIn(['httpsEverywhere', 'count'])
+  const newTabDetail = appState.getIn(['about', 'newtab'])
+  const autofillCreditCards = appState.getIn(['autofill', 'creditCards'])
+  const autofillAddresses = appState.getIn(['autofill', 'addresses'])
+  const versionInformation = appState.getIn(['about', 'brave', 'versionInformation'])
+  const aboutDetails = tabValue.get('aboutDetails')
+  if (location === 'about:preferences' || location === 'about:contributions' || location === aboutUrls.get('about:contributions')) {
+    const ledgerData = ledgerInfo.merge(publisherInfo).merge(preferencesData)
+    tab.send(messages.LEDGER_UPDATED, ledgerData.toJS())
+    tab.send(messages.SETTINGS_UPDATED, appSettings.toJS())
+    tab.send(messages.SITE_SETTINGS_UPDATED, allSiteSettings.toJS())
+    tab.send(messages.SYNC_UPDATED, sync.toJS())
+    tab.send(messages.BRAVERY_DEFAULTS_UPDATED, braveryDefaults)
+    tab.send(messages.EXTENSIONS_UPDATED, extensions.toJS())
+  } else if (location === 'about:bookmarks' && bookmarks) {
+    tab.send(messages.BOOKMARKS_UPDATED, {
+      bookmarks: bookmarks.toJS(),
+      bookmarkFolders: bookmarkFolders.toJS()
+    })
+  } else if (location === 'about:history' && history) {
+    appActions.populateHistory()
+    tab.send(messages.HISTORY_UPDATED, aboutHistoryState.toJS())
+    tab.send(messages.SETTINGS_UPDATED, appSettings.toJS())
+  } else if (location === 'about:extensions' && extensions) {
+    tab.send(messages.EXTENSIONS_UPDATED, extensions.toJS())
+  } else if (location === 'about:adblock' && adblock) {
+    tab.send(messages.ADBLOCK_UPDATED, {
+      adblock: adblock.toJS(),
+      settings: appSettings.toJS(),
+      resources: require('ad-block/lib/regions')
+    })
+  } else if (location === 'about:downloads' && downloads) {
+    tab.send(messages.DOWNLOADS_UPDATED, {
+      downloads: downloads.toJS()
+    })
+  } else if (location === 'about:passwords' && passwords) {
+    tab.send(messages.PASSWORD_DETAILS_UPDATED, passwords.toJS())
+    tab.send(messages.PASSWORD_SITE_DETAILS_UPDATED,
+        allSiteSettings.filter((setting) => setting.get('savePasswords') === false).toJS())
+  } else if (location === 'about:flash') {
+    tab.send(messages.BRAVERY_DEFAULTS_UPDATED, braveryDefaults.toJS())
+  } else if (location === 'about:newtab') {
+    const showEmptyPage = getSetting(settings.NEWTAB_MODE) === newTabMode.EMPTY_NEW_TAB ||
+          // TODO: This can be removed once we're on muon 2.57.8 or above
+          tabValue.get('incognito') === true
+    const showImages = getSetting(settings.SHOW_DASHBOARD_IMAGES) && !showEmptyPage
+    tab.send(messages.NEWTAB_DATA_UPDATED, {
+      showEmptyPage,
+      showImages,
+      trackedBlockersCount,
+      adblockCount,
+      httpsUpgradedCount,
+      newTabDetail: newTabDetail.toJS()
+    })
+  } else if (location === 'about:autofill') {
+    const defaultSession = session.defaultSession
+    {
+      const guids = autofillAddresses.get('guid')
+      let list = []
+      guids.forEach((entry) => {
+        const address = defaultSession.autofill.getProfile(entry)
+        let addressDetail = {
+          name: address.full_name,
+          organization: address.company_name,
+          streetAddress: address.street_address,
+          city: address.city,
+          state: address.state,
+          postalCode: address.postal_code,
+          country: address.country_code,
+          phone: address.phone,
+          email: address.email,
+          guid: entry
+        }
+        list.push(addressDetail)
+      })
+      tab.send(messages.AUTOFILL_ADDRESSES_UPDATED, list)
+    }
+    {
+      const guids = autofillCreditCards.get('guid')
+      let list = []
+      guids.forEach((entry) => {
+        const creditCard = defaultSession.autofill.getCreditCard(entry)
+        let creditCardDetail = {
+          name: creditCard.name,
+          card: creditCard.card_number,
+          month: creditCard.expiration_month,
+          year: creditCard.expiration_year,
+          guid: entry
+        }
+        list.push(creditCardDetail)
+      })
+      tab.send(messages.AUTOFILL_CREDIT_CARDS_UPDATED, list)
+    }
+  } else if (location === 'about:brave') {
+    tab.send(messages.VERSION_INFORMATION_UPDATED, versionInformation.toJS())
+  }
+  // send state to about pages
+  if (aboutUrls.get(location) && aboutDetails) {
+    tab.send(messages.STATE_UPDATED, aboutDetails.toJS())
+  }
 }
 
 const api = {

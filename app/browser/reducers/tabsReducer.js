@@ -10,6 +10,7 @@ const tabState = require('../../common/state/tabState')
 const windowConstants = require('../../../js/constants/windowConstants')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const {getFlashResourceId} = require('../../../js/flash')
+const {l10nErrorText} = require('../../common/lib/httpUtil')
 
 const tabsReducer = (state, action) => {
   action = makeImmutable(action)
@@ -67,6 +68,28 @@ const tabsReducer = (state, action) => {
       break
     case appConstants.APP_FRAME_CHANGED:
       state = tabState.updateFrame(state, action)
+      break
+    case windowConstants.WINDOW_SET_FRAME_ERROR:
+      {
+        const tabId = action.getIn(['frameProps', 'tabId'])
+        const tab = tabs.getWebContents(tabId)
+        if (tab) {
+          let currentIndex = tab.getCurrentEntryIndex()
+          let previousLocation = tab.getURL()
+          while (previousLocation === action.getIn(['errorDetails', 'url'])) {
+            previousLocation = tab.getURLAtIndex(--currentIndex)
+          }
+          let tabValue = tabState.getByTabId(state, tabId)
+          if (tabValue) {
+            tabValue = tabValue.set('aboutDetails', makeImmutable({
+              title: action.getIn(['errorDetails', 'title']) || l10nErrorText(action.getIn(['errorDetails', 'errorCode'])),
+              message: action.getIn(['errorDetails', 'message']),
+              previousLocation
+            }).merge(action.get('errorDetails')))
+            state = tabState.updateTabValue(state, tabValue)
+          }
+        }
+      }
       break
   }
   return state
