@@ -155,7 +155,7 @@ const updateAboutDetails = (tab, tabValue) => {
     })
   } else if (location === 'about:history' && history) {
     appActions.populateHistory()
-    tab.send(messages.HISTORY_UPDATED, aboutHistoryState.toJS())
+    tab.send(messages.HISTORY_UPDATED, history.toJS())
     tab.send(messages.SETTINGS_UPDATED, appSettings.toJS())
   } else if (location === 'about:extensions' && extensions) {
     tab.send(messages.EXTENSIONS_UPDATED, extensionsValue.toJS())
