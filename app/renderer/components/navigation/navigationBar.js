@@ -223,7 +223,7 @@ class NavigationBar extends React.Component {
           : null
         }
       </div>
-      <UrlBar ref='urlBar'
+      <UrlBar
         titleMode={this.titleMode}
         onStop={this.onStop}
         menubarVisible={this.props.menubarVisible}
