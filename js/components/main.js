@@ -73,7 +73,6 @@ const platformUtil = require('../../app/common/lib/platformUtil')
 class Main extends ImmutableComponent {
   constructor () {
     super()
-    this.onCloseFrame = this.onCloseFrame.bind(this)
     this.onMouseDown = this.onMouseDown.bind(this)
     this.onClickWindow = this.onClickWindow.bind(this)
     this.onHideSiteInfo = this.onHideSiteInfo.bind(this)
@@ -388,8 +387,8 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.SHORTCUT_CLOSE_FRAME, (e, i) => typeof i !== 'undefined' && i !== null
-      ? windowActions.closeFrame(frameStateUtil.getFrames(self.props.windowState), frameStateUtil.getFrameByKey(self.props.windowState, i))
-      : windowActions.closeFrame(frameStateUtil.getFrames(self.props.windowState), frameStateUtil.getActiveFrame(this.props.windowState)))
+      ? windowActions.closeFrame(frameStateUtil.getFrameByKey(self.props.windowState, i))
+      : windowActions.closeFrame(frameStateUtil.getActiveFrame(this.props.windowState)))
     ipc.on(messages.SHORTCUT_UNDO_CLOSED_FRAME, () => windowActions.undoClosedFrame())
 
     ipc.on(messages.SHORTCUT_CLOSE_OTHER_FRAMES, (e, key, isCloseRight, isCloseLeft) => {
@@ -401,7 +400,7 @@ class Main extends ImmutableComponent {
       frameStateUtil.getFrames(self.props.windowState).forEach((frame, i) => {
         if (!frame.get('pinnedLocation') &&
             ((i < currentIndex && isCloseLeft) || (i > currentIndex && isCloseRight))) {
-          windowActions.closeFrame(frameStateUtil.getFrames(self.props.windowState), frame)
+          windowActions.closeFrame(frame)
         }
       })
     })
@@ -586,10 +585,6 @@ class Main extends ImmutableComponent {
 
   onHideCheckDefaultBrowserDialog () {
     windowActions.setModalDialogDetail('checkDefaultBrowserDialog')
-  }
-
-  onCloseFrame (activeFrameProps) {
-    windowActions.closeFrame(this.props.windowState.get('frames'), activeFrameProps)
   }
 
   onMouseDown (e) {
@@ -947,11 +942,9 @@ class Main extends ImmutableComponent {
             sortedFrames.map((frame) =>
               <Frame
                 ref={(node) => { this.frames[frame.get('key')] = node }}
-                tabData={this.props.appState.get('tabs').find((tab) => tab.get('tabId') === frame.get('tabId'))}
                 urlBarFocused={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'focused'])}
                 tabIndex={frameStateUtil.getFrameIndex(this.props.windowState, frame.get('key'))}
                 prefOpenInForeground={getSetting(settings.SWITCH_TO_NEW_TABS)}
-                onCloseFrame={this.onCloseFrame}
                 frameKey={frame.get('key')}
                 contextMenuDetail={contextMenuDetail}
                 partition={frameStateUtil.getPartition(frame)}

@@ -106,7 +106,8 @@ const frameReducer = (state, action) => {
       }
       // Unless a caller explicitly specifies to close a pinned frame, then
       // ignore the call.
-      const nonPinnedFrames = action.frames.filter((frame) => !frame.get('pinnedLocation'))
+      const frames = frameStateUtil.getFrames(state)
+      const nonPinnedFrames = frames.filter((frame) => !frame.get('pinnedLocation'))
       if (action.frameProps && action.frameProps.get('pinnedLocation')) {
         // Check for no frames at all, and if that's the case the user
         // only has pinned frames and tried to close, so close the
@@ -126,7 +127,7 @@ const frameReducer = (state, action) => {
         }
       }
 
-      const pinnedFrames = action.frames.filter((frame) => frame.get('pinnedLocation'))
+      const pinnedFrames = frames.filter((frame) => frame.get('pinnedLocation'))
       // If there is at least 1 pinned frame don't close the window until subsequent
       // close attempts
       if (nonPinnedFrames.size > 1 || pinnedFrames.size > 0) {

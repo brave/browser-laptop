@@ -49,6 +49,7 @@ function isTorrentViewerURL (url) {
 class Frame extends ImmutableComponent {
   constructor () {
     super()
+    this.onCloseFrame = this.onCloseFrame.bind(this)
     this.onUpdateWheelZoom = debounce(this.onUpdateWheelZoom.bind(this), 20)
     this.onFocus = this.onFocus.bind(this)
     this.onAppStateChange = this.onAppStateChange.bind(this)
@@ -68,6 +69,10 @@ class Frame extends ImmutableComponent {
       return undefined
     }
     return appStoreRenderer.state.get('tabs').find((tab) => tab.get('tabId') === frame.get('tabId'))
+  }
+
+  onCloseFrame () {
+    windowActions.closeFrame(this.frame)
   }
 
   getFrameBraverySettings (props) {
@@ -558,13 +563,13 @@ class Frame extends ImmutableComponent {
       if (this.frame.isEmpty()) {
         return
       }
-      this.props.onCloseFrame(this.frame, true)
+      this.onCloseFrame(this.frame, true)
     })
     this.webview.addEventListener('close', () => {
       if (this.frame.isEmpty()) {
         return
       }
-      this.props.onCloseFrame(this.frame)
+      this.onCloseFrame(this.frame)
     })
     this.webview.addEventListener('page-favicon-updated', (e) => {
       if (this.frame.isEmpty()) {
