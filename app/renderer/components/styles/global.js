@@ -7,6 +7,7 @@ const globalStyles = {
     breakpointTinyWin32: '500px',
     breakpointNewPrivateTab: '890px',
     tab: {
+      default: '184px', // match tabArea max-width
       large: '120px',
       largeMedium: '83px',
       medium: '66px',

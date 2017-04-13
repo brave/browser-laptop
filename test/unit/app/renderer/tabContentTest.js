@@ -101,7 +101,8 @@ describe('tabContent components', function () {
         <AudioTabIcon
           tab={
             Immutable.Map({
-              audioPlaybackActive: false
+              audioPlaybackActive: false,
+              breakpoint: 'default'
             })}
         />
       )
@@ -113,18 +114,20 @@ describe('tabContent components', function () {
         <AudioTabIcon
           tab={
             Immutable.Map({
-              audioPlaybackActive: true
+              audioPlaybackActive: true,
+              breakpoint: 'default'
             })}
         />
       )
       assert.equal(wrapper.props().symbol, globalStyles.appIcons.volumeOn)
     })
-    it('should not show play audio icon if tab size is too narrow', function () {
+    it('should not show play audio icon if tab size is different than default', function () {
       const wrapper = shallow(
         <AudioTabIcon
           tab={
             Immutable.Map({
               audioPlaybackActive: true,
+              audioMuted: false,
               breakpoint: 'small'
             })}
         />
@@ -137,13 +140,14 @@ describe('tabContent components', function () {
           tab={
             Immutable.Map({
               audioPlaybackActive: true,
-              audioMuted: true
+              audioMuted: true,
+              breakpoint: 'default'
             })}
         />
       )
       assert.equal(wrapper.props().symbol, globalStyles.appIcons.volumeOff)
     })
-    it('should not show mute icon if tab size is too narrow', function () {
+    it('should not show mute icon if tab size is different than default', function () {
       const wrapper = shallow(
         <AudioTabIcon
           tab={
@@ -152,7 +156,6 @@ describe('tabContent components', function () {
               audioMuted: true,
               breakpoint: 'small'
             })}
-
         />
       )
       assert.notEqual(wrapper.props().symbol, globalStyles.appIcons.volumeOff)
