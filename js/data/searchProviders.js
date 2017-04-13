@@ -129,13 +129,8 @@ module.exports = { "providers" :
       "name" : "Yandex",
       "base" : "https://yandex.com",
       "image" : "https://www.yandex.com/favicon.ico",
-      "search" : "https://yandex.com/search/?text={searchTerms}&clid={platformClientId}",
-      "shortcut" : ":ya",
-      "platformClientId": {
-        "win32": 2274777,
-        "darwin": 2274776,
-        "linux": 2274778
-      }
+      "search" : "https://yandex.com/search/?text={searchTerms}&clid=2274777",
+      "shortcut" : ":ya"
     },
     {
       "name" : "Ecosia",

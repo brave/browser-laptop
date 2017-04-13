@@ -29,7 +29,7 @@ const locale = require('../js/l10n')
 const {getSetting} = require('./settings')
 const settings = require('./constants/settings')
 const textUtils = require('./lib/text')
-const {getPartitionFromNumber, frameOptsFromFrame} = require('./state/frameStateUtil')
+const {getPartitionFromNumber, frameOptsFromFrame, getActiveFrame} = require('./state/frameStateUtil')
 const {isIntermediateAboutPage, isUrl, aboutUrls} = require('./lib/appUrlUtil')
 const {getBase64FromImageUrl} = require('./lib/imageUtil')
 const urlParse = require('../app/common/urlParse')
@@ -1387,8 +1387,11 @@ function onTabPageContextMenu (framePropsList, e) {
   tabPageMenu.destroy()
 }
 
-function onUrlBarContextMenu (searchDetail, activeFrame, e) {
+function onUrlBarContextMenu (e) {
   e.stopPropagation()
+  const windowState = windowStore.getState()
+  const searchDetail = windowStore.getState().get('searchDetail')
+  const activeFrame = getActiveFrame(windowState)
   const inputMenu = Menu.buildFromTemplate(urlBarTemplateInit(searchDetail, activeFrame, e))
   inputMenu.popup(getCurrentWindow())
   inputMenu.destroy()

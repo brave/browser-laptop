@@ -64,7 +64,7 @@ class NavigationBar extends React.Component {
 
   onReload (e) {
     if (eventUtil.isForSecondaryAction(e)) {
-      appActions.tabCloned(this.activeFrame.get('tabId'), {active: !!e.shiftKey})
+      appActions.tabCloned(this.props.activeTabId, {active: !!e.shiftKey})
     } else {
       ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
     }
@@ -75,11 +75,10 @@ class NavigationBar extends React.Component {
   }
 
   onHome (e) {
-    const tabId = this.activeFrame.get('tabId')
     getSetting(settings.HOMEPAGE).split('|')
       .forEach((homepage, i) => {
         if (i === 0 && !eventUtil.isForSecondaryAction(e)) {
-          appActions.loadURLRequested(tabId, homepage)
+          appActions.loadURLRequested(this.props.activeTabId, homepage)
         } else {
           appActions.createTabRequested({
             url: homepage,

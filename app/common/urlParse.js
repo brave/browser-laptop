@@ -10,7 +10,8 @@ let cachedUrlParse = new LRUCache(config.cache.urlParse)
 module.exports = (url, ...args) => {
   let parsedUrl = cachedUrlParse.get(url)
   if (parsedUrl) {
-    return parsedUrl
+    // make a copy so we don't alter the cached object with any changes
+    return Object.assign({}, parsedUrl)
   }
 
   parsedUrl = urlParse(url, ...args)
