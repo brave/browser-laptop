@@ -8,7 +8,7 @@ const mockery = require('mockery')
 const {shallow} = require('enzyme')
 const assert = require('assert')
 const Immutable = require('immutable')
-let Navigator, NavigationBar
+let Navigator
 
 describe('Navigator component unit tests', function () {
   before(function () {
@@ -23,9 +23,9 @@ describe('Navigator component unit tests', function () {
     mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_yes.svg', {})
     mockery.registerMock('../../extensions/brave/img/caret_down_grey.svg', 'caret_down_grey.svg')
     mockery.registerMock('../../extensions/brave/img/tabs/new_session.svg')
+    mockery.registerMock('../../../../img/url-bar-no-script.svg', {})
     mockery.registerMock('electron', require('../../../../lib/fakeElectron'))
     Navigator = require('../../../../../../app/renderer/components/navigation/navigator')
-    NavigationBar = require('../../../../../../app/renderer/components/navigation/navigationBar')
     appStoreRenderer = require('../../../../../../js/stores/appStoreRenderer')
   })
 
@@ -130,11 +130,6 @@ describe('Navigator component unit tests', function () {
           activeSiteSettings={null}
         />
       )
-    })
-
-    it('passes activeTabShowingMessageBox to NavigationBar', function () {
-      const navigationBar = wrapper.find(NavigationBar).node
-      assert.equal(navigationBar.props.activeTabShowingMessageBox, true)
     })
 
     it('disables both back/forward navigationButtonContainers', function () {
