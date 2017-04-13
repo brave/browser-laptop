@@ -3,7 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const Immutable = require('immutable')
 const {StyleSheet, css} = require('aphrodite')
 
 // Actions
@@ -31,7 +30,6 @@ const {getCurrentWindowId, isMaximized} = require('../../currentWindow')
 const {makeImmutable} = require('../../../common/state/immutableUtil')
 const platformUtil = require('../../../common/lib/platformUtil')
 const {braveShieldsEnabled} = require('../../../common/state/shieldState')
-const tabUtil = require('../../lib/tabUtil')
 const eventUtil = require('../../../../js/lib/eventUtil')
 const {isNavigatableAboutPage, getBaseUrl} = require('./../../../../js/lib/appUrlUtil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
@@ -57,8 +55,8 @@ class Navigator extends ImmutableComponent {
 
   onNav (e, navCheckProp, navType, navAction) {
     const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
-    const activeTabId = tabUtil.activeTabId(this.props.windowState)
-    const activeTab = activeFrame ? this.props.appState.get('tabs').find((tab) => tab.get('tabId') === activeTabId) : null
+    const activeTab = tabState.getActiveTab(this.props.appState)
+    const activeTabId = tabState.getActiveTabId(this.props.appState)
     const isNavigable = isNavigatableAboutPage(getBaseUrl(activeFrame.get('location')))
     if (e && eventUtil.isForSecondaryAction(e) && isNavigable) {
       if (activeTab && activeTab.get(navCheckProp)) {
@@ -96,7 +94,7 @@ class Navigator extends ImmutableComponent {
   }
 
   get extensionButtons () {
-    const activeTabId = tabUtil.activeTabId(this.props.windowState)
+    const activeTabId = tabState.getActiveTabId(this.props.appState)
     const enabledExtensions = extensionState.getEnabledExtensions(this.props.appState)
     const extensionBrowserActions = enabledExtensions
       .map((extension) => extensionState.getBrowserActionByTabId(this.props.appState, extension.get('id'), activeTabId))
@@ -178,7 +176,6 @@ class Navigator extends ImmutableComponent {
     const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
     const totalBlocks = activeFrame ? this.getTotalBlocks(activeFrame) : false
     const contextMenuDetail = this.props.windowState.get('contextMenuDetail')
-    const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
     const braverySettings = siteSettings.activeSettings(this.props.activeSiteSettings, this.props.appState, appConfig)
     const shieldEnabled = braveShieldsEnabled(activeFrame)
 
@@ -235,32 +232,8 @@ class Navigator extends ImmutableComponent {
             </div>
           </div>
           <NavigationBar
-            navbar={activeFrame && activeFrame.get('navbar')}
-            sites={this.props.appState.get('sites')}
-            canGoForward={activeTab && activeTab.get('canGoForward')}
-            activeFrameKey={(activeFrame && activeFrame.get('key')) || undefined}
-            location={(activeFrame && activeFrame.get('location')) || ''}
-            title={(activeFrame && activeFrame.get('title')) || ''}
-            scriptsBlocked={activeFrame && activeFrame.getIn(['noScript', 'blocked'])}
-            partitionNumber={(activeFrame && activeFrame.get('partitionNumber')) || 0}
-            history={(activeFrame && activeFrame.get('history')) || new Immutable.List()}
-            suggestionIndex={(activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])) || 0}
-            isSecure={activeFrame ? activeFrame.getIn(['security', 'isSecure']) : null}
-            hasLocationValueSuffix={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix'])}
-            startLoadTime={(activeFrame && activeFrame.get('startLoadTime')) || undefined}
-            endLoadTime={(activeFrame && activeFrame.get('endLoadTime')) || undefined}
-            loading={activeFrame && activeFrame.get('loading')}
-            bookmarkDetail={this.props.windowState.get('bookmarkDetail')}
-            mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
-            searchDetail={this.props.windowState.get('searchDetail')}
-            enableNoScript={siteSettingsState.isNoScriptEnabled(this.props.activeSiteSettings, this.props.appState)}
-            settings={this.props.appState.get('settings')}
-            noScriptIsVisible={noScriptIsVisible}
+            enableNoScript={siteSettingsState.isNoScriptEnabled(this.props.appState, this.props.activeSiteSettings)}
             menubarVisible={this.props.customTitlebar.menubarVisible}
-            siteSettings={this.props.appState.get('siteSettings')}
-            synopsis={this.props.appState.getIn(['publisherInfo', 'synopsis']) || new Immutable.Map()}
-            activeTabShowingMessageBox={activeTabShowingMessageBox}
-            locationInfo={this.props.appState.get('locationInfo')}
           />
           <div className='topLevelEndButtons'>
             <div className={cx({

@@ -4,7 +4,7 @@
 
 const React = require('react')
 const Immutable = require('immutable')
-const ImmutableComponent = require('./../../../../js/components/immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 
 const cx = require('../../../../js/lib/classSet')
 const UrlBar = require('./urlBar')
@@ -14,7 +14,7 @@ const siteTags = require('../../../../js/constants/siteTags')
 const messages = require('../../../../js/constants/messages')
 const settings = require('../../../../js/constants/settings')
 const ipc = require('electron').ipcRenderer
-const {isSourceAboutUrl, getBaseUrl} = require('../../../../js/lib/appUrlUtil')
+const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
 const AddEditBookmarkHanger = require('../addEditBookmarkHanger')
 const siteUtil = require('../../../../js/state/siteUtil')
 const eventUtil = require('../../../../js/lib/eventUtil')
@@ -24,10 +24,15 @@ const windowStore = require('../../../../js/stores/windowStore')
 const contextMenus = require('../../../../js/contextMenus')
 const LongPressButton = require('./../../../../js/components/longPressButton')
 const PublisherToggle = require('../publisherToggle')
+const {getCurrentWindowId} = require('../../currentWindow')
 
-class NavigationBar extends ImmutableComponent {
-  constructor () {
-    super()
+// State
+const tabState = require('../../../common/state/tabState')
+const frameStateUtil = require('../../../../js/state/frameStateUtil')
+
+class NavigationBar extends React.Component {
+  constructor (props) {
+    super(props)
     this.onToggleBookmark = this.onToggleBookmark.bind(this)
     this.onStop = this.onStop.bind(this)
     this.onReload = this.onReload.bind(this)
@@ -121,32 +126,36 @@ class NavigationBar extends ImmutableComponent {
       )
   }
 
-  get locationId () {
-    return getBaseUrl(this.props.location)
-  }
-
-  get publisherId () {
-    return this.props.locationInfo && this.props.locationInfo.getIn([this.locationId, 'publisher'])
-  }
-
-  get visiblePublisher () {
-    const hostPattern = UrlUtil.getHostPattern(this.publisherId)
-    const hostSettings = this.props.siteSettings.get(hostPattern)
-    const ledgerPaymentsShown = hostSettings && hostSettings.get('ledgerPaymentsShown')
-    return typeof ledgerPaymentsShown === 'boolean'
-      ? ledgerPaymentsShown
-      : true
-  }
-
-  get isPublisherButtonEnabled () {
-    return getSetting(settings.PAYMENTS_ENABLED) &&
-      UrlUtil.isHttpOrHttps(this.props.location) &&
-      this.visiblePublisher
-  }
-
   componentDidMount () {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, () => this.onToggleBookmark())
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark())
+  }
+
+  mergeProps (state, dispatchProps, ownProps) {
+    const windowState = state.get('currentWindow')
+    const activeFrame = frameStateUtil.getActiveFrame(windowState) || Immutable.Map()
+    const activeTabId = tabState.getActiveTabId(state, getCurrentWindowId())
+    const props = {}
+
+    props.navbar = activeFrame.get('navbar')
+    props.sites = state.get('sites')
+    props.activeFrameKey = activeFrame.get('key')
+    props.location = activeFrame.get('location') || ''
+    props.title = activeFrame.get('title') || ''
+    props.partitionNumber = activeFrame.get('partitionNumber') || 0
+    props.isSecure = activeFrame.getIn(['security', 'isSecure'])
+    props.loading = activeFrame.get('loading')
+    props.bookmarkDetail = windowState.get('bookmarkDetail')
+    props.mouseInTitlebar = windowState.getIn(['ui', 'mouseInTitlebar'])
+    props.enableNoScript = ownProps.enableNoScript
+    props.settings = state.get('settings')
+    props.menubarVisible = ownProps.menubarVisible
+    props.siteSettings = state.get('siteSettings')
+    props.synopsis = state.getIn(['publisherInfo', 'synopsis']) || new Immutable.Map()
+    props.activeTabShowingMessageBox = tabState.isShowingMessageBox(state, activeTabId)
+    props.locationInfo = state.get('locationInfo')
+
+    return props
   }
 
   render () {
@@ -214,26 +223,11 @@ class NavigationBar extends ImmutableComponent {
           : null
         }
       </div>
-      <UrlBar ref='urlBar'
-        activeFrameKey={this.props.activeFrameKey}
-        canGoForward={this.props.canGoForward}
-        searchDetail={this.props.searchDetail}
-        loading={this.loading}
-        location={this.props.location}
-        title={this.props.title}
-        history={this.props.history}
-        isSecure={this.props.isSecure}
-        hasLocationValueSuffix={this.props.hasLocationValueSuffix}
-        startLoadTime={this.props.startLoadTime}
-        endLoadTime={this.props.endLoadTime}
+      <UrlBar
         titleMode={this.titleMode}
-        urlbar={this.props.navbar.get('urlbar')}
         onStop={this.onStop}
         menubarVisible={this.props.menubarVisible}
-        noBorderRadius={this.isPublisherButtonEnabled}
-        activeTabShowingMessageBox={this.props.activeTabShowingMessageBox}
         enableNoScript={this.props.enableNoScript}
-        scriptsBlocked={this.props.scriptsBlocked}
         />
       {
         isSourceAboutUrl(this.props.location)
@@ -253,4 +247,4 @@ class NavigationBar extends ImmutableComponent {
   }
 }
 
-module.exports = NavigationBar
+module.exports = ReduxComponent.connect(NavigationBar)

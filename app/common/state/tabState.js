@@ -288,6 +288,9 @@ const tabState = {
   },
 
   isShowingMessageBox: (state, tabId) => {
+    if (tabId === tabState.TAB_ID_NONE) {
+      return false
+    }
     return tabState.getTabPropertyByTabId(state, tabId, 'messageBoxDetail') || false
   },
 
@@ -309,9 +312,14 @@ const tabState = {
     }
   },
 
-  getActiveTabId: (state) => {
+  getActiveTab: (state, windowId = windowState.getActiveWindowId(state)) => {
     state = validateState(state)
-    const tab = state.get('tabs').find((tab) => tab.get('active') === true)
+    windowId = validateId('windowId', windowId)
+    return state.get('tabs').find((tab) => tab.get('active') === true && tab.get('windowId') === windowId)
+  },
+
+  getActiveTabId: (state, windowId = windowState.getActiveWindowId(state)) => {
+    const tab = tabState.getActiveTab(state, windowId)
     return tab ? tab.get('tabId') : tabState.TAB_ID_NONE
   },
 

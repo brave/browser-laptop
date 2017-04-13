@@ -34,6 +34,9 @@ const validateAction = function (action) {
 }
 
 const api = {
+  WINDOW_ID_NONE: -1,
+  WINDOW_ID_CURRENT: -2,
+
   getWindowIndex: (state, windowValue) => {
     state = validateState(state)
 
@@ -66,6 +69,16 @@ const api = {
     } else {
       return api.insertWindow(state, action)
     }
+  },
+
+  getActiveWindow: (state) => {
+    state = validateState(state)
+    return state.get('windows').find((win) => win.get('focused') === true)
+  },
+
+  getActiveWindowId: (state) => {
+    const win = api.getActiveWindow(state)
+    return (win && win.get('windowId')) || api.WINDOW_ID_NONE
   },
 
   getByWindowId: (state, windowId) => {

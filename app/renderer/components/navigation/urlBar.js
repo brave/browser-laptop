@@ -4,8 +4,9 @@
 
 const React = require('react')
 
-const ImmutableComponent = require('../../../../js/components/immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 const {StyleSheet, css} = require('aphrodite')
+const Immutable = require('immutable')
 
 const windowActions = require('../../../../js/actions/windowActions')
 const appActions = require('../../../../js/actions/appActions')
@@ -18,20 +19,26 @@ const ipc = require('electron').ipcRenderer
 const UrlBarSuggestions = require('./urlBarSuggestions')
 const UrlBarIcon = require('./urlBarIcon')
 const messages = require('../../../../js/constants/messages')
+const siteSettings = require('../../../../js/state/siteSettings')
 const {getSetting} = require('../../../../js/settings')
 const settings = require('../../../../js/constants/settings')
 const contextMenus = require('../../../../js/contextMenus')
 const windowStore = require('../../../../js/stores/windowStore')
 const UrlUtil = require('../../../../js/lib/urlutil')
 const {eventElHasAncestorWithClasses, isForSecondaryAction} = require('../../../../js/lib/eventUtil')
-const {isUrl, isIntermediateAboutPage} = require('../../../../js/lib/appUrlUtil')
+const {getBaseUrl, isUrl, isIntermediateAboutPage} = require('../../../../js/lib/appUrlUtil')
+const {getCurrentWindowId} = require('../../currentWindow')
 
 // Icons
 const iconNoScript = require('../../../../img/url-bar-no-script.svg')
 
-class UrlBar extends ImmutableComponent {
-  constructor () {
-    super()
+// State
+const frameStateUtil = require('../../../../js/state/frameStateUtil')
+const tabState = require('../../../common/state/tabState')
+
+class UrlBar extends React.Component {
+  constructor (props) {
+    super(props)
     this.onFocus = this.onFocus.bind(this)
     this.onBlur = this.onBlur.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
@@ -505,6 +512,47 @@ class UrlBar extends ImmutableComponent {
     contextMenus.onUrlBarContextMenu(this.props.searchDetail, this.activeFrame, e)
   }
 
+  mergeProps (state, dispatchProps, ownProps) {
+    const windowState = state.get('currentWindow')
+    const activeFrame = frameStateUtil.getActiveFrame(windowState) || Immutable.Map()
+    const activeTabId = tabState.getActiveTabId(state, getCurrentWindowId())
+
+    const location = activeFrame.get('location') || ''
+    const baseUrl = getBaseUrl(location)
+
+    // TODO(bridiver) - this definitely needs a helper
+    const publisherId = state.getIn(['locationInfo', baseUrl, 'publisher'])
+    const hostPattern = UrlUtil.getHostPattern(publisherId)
+    const hostSettings = siteSettings.getSiteSettingsForHostPattern(state.get('settings'), hostPattern)
+    const ledgerPaymentsShown = hostSettings && hostSettings.get('ledgerPaymentsShown')
+    const visiblePublisher = typeof ledgerPaymentsShown === 'boolean' ? ledgerPaymentsShown : true
+    const isPublisherButtonEnabled = getSetting(settings.PAYMENTS_ENABLED) &&
+        UrlUtil.isHttpOrHttps(location) && visiblePublisher
+
+    const props = {}
+
+    props.activeFrameKey = activeFrame.get('key')
+    props.location = location
+    props.title = activeFrame.get('title') || ''
+    props.scriptsBlocked = activeFrame.getIn(['noScript', 'blocked'])
+    props.history = activeFrame.get('history') || new Immutable.List()
+    props.isSecure = activeFrame.getIn(['security', 'isSecure'])
+    props.hasLocationValueSuffix = activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix'])
+    props.startLoadTime = activeFrame.get('startLoadTime')
+    props.endLoadTime = activeFrame.get('endLoadTime')
+    props.loading = activeFrame.get('loading')
+    props.searchDetail = windowState.get('searchDetail')
+    props.enableNoScript = ownProps.enableNoScript
+    props.noScriptIsVisible = windowState.getIn(['ui', 'noScriptInfo', 'isVisible']) || false
+    props.menubarVisible = ownProps.menubarVisible
+    props.activeTabShowingMessageBox = tabState.isShowingMessageBox(state, activeTabId)
+    props.noBorderRadius = isPublisherButtonEnabled
+    props.urlbar = activeFrame.getIn(['navbar', 'urlbar'])
+    props.onStop = ownProps.onStop
+    props.titleMode = ownProps.titleMode
+    return props
+  }
+
   render () {
     return <form
       className={cx({
@@ -605,4 +653,4 @@ const styles = StyleSheet.create({
   }
 })
 
-module.exports = UrlBar
+module.exports = ReduxComponent.connect(UrlBar)
