@@ -101,25 +101,16 @@ class Favicon extends ImmutableComponent {
 
 class AudioTabIcon extends ImmutableComponent {
   get pageCanPlayAudio () {
-    return this.props.tab.get('audioPlaybackActive') || this.props.tab.get('audioMuted')
+    return !!this.props.tab.get('audioPlaybackActive')
   }
 
-  get mediumView () {
-    const sizes = ['large', 'largeMedium']
-    return sizes.includes(this.props.tab.get('breakpoint'))
-  }
-
-  get narrowView () {
-    const sizes = ['medium', 'mediumSmall', 'small', 'extraSmall', 'smallest']
-    return sizes.includes(this.props.tab.get('breakpoint'))
-  }
-
-  get locationHasSecondaryIcon () {
-    return !!this.props.tab.get('isPrivate') || !!this.props.tab.get('partitionNumber')
+  get shouldShowAudioIcon () {
+    // We switch to blue top bar for all breakpoints but default
+    return this.props.tab.get('breakpoint') === 'default'
   }
 
   get mutedState () {
-    return this.pageCanPlayAudio && this.props.tab.get('audioMuted')
+    return this.pageCanPlayAudio && !!this.props.tab.get('audioMuted')
   }
 
   get audioIcon () {
@@ -129,8 +120,10 @@ class AudioTabIcon extends ImmutableComponent {
   }
 
   render () {
-    return this.pageCanPlayAudio && !this.mediumView && !this.narrowView
-      ? <TabIcon className={css(styles.icon, styles.audioIcon)} symbol={this.audioIcon} onClick={this.props.onClick} />
+    return this.pageCanPlayAudio && this.shouldShowAudioIcon
+      ? <TabIcon
+        className={css(styles.icon, styles.audioIcon)}
+        symbol={this.audioIcon} onClick={this.props.onClick} />
       : null
   }
 }

@@ -14,7 +14,7 @@ const {getTextColorForBackground} = require('../../../js/lib/color')
  * @returns {String} The matching breakpoint.
  */
 module.exports.getTabBreakpoint = (tabWidth) => {
-  const sizes = ['large', 'largeMedium', 'medium', 'mediumSmall', 'small', 'extraSmall', 'smallest']
+  const sizes = ['default', 'large', 'largeMedium', 'medium', 'mediumSmall', 'small', 'extraSmall', 'smallest']
   let currentSize
 
   sizes.map(size => {
