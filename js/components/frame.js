@@ -436,6 +436,7 @@ class Frame extends ImmutableComponent {
     const widevineSites = ['https://www.netflix.com',
       'http://bitmovin.com',
       'https://www.primevideo.com',
+      'https://www.spotify.com',
       'https://shaka-player-demo.appspot.com']
     const isForWidevineTest = process.env.NODE_ENV === 'test' && location.endsWith('/drm.html')
     if (!isForWidevineTest && (!origin || !widevineSites.includes(origin))) {
