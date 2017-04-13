@@ -85,6 +85,14 @@ const getPartition = (createProperties) => {
   return partition
 }
 
+const needsPartitionAssigned = (createProperties) => {
+  return !createProperties.openerTabId ||
+    createProperties.isPrivate ||
+    createProperties.isPartitioned ||
+    createProperties.partitionNumber ||
+    createProperties.partition
+}
+
 // TODO(bridiver) - refactor this into an action
 ipcMain.on(messages.ABOUT_COMPONENT_INITIALIZED, (e) => {
   const tab = e.sender
@@ -530,7 +538,7 @@ const api = {
       createProperties.url = newFrameUrl()
     }
     createProperties.url = normalizeUrl(createProperties.url)
-    if (!createProperties.openerTabId) {
+    if (needsPartitionAssigned(createProperties)) {
       createProperties.partition = getPartition(createProperties)
       if (isSessionPartition(createProperties.partition)) {
         createProperties.parent_partition = ''
