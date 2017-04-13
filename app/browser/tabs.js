@@ -76,6 +76,14 @@ const getPartition = (createProperties) => {
   return partition
 }
 
+const needsPartitionAssigned = (createProperties) => {
+  return !createProperties.openerTabId ||
+    createProperties.isPrivate ||
+    createProperties.isPartitioned ||
+    createProperties.partitionNumber ||
+    createProperties.partition
+}
+
 const api = {
   init: (state, action) => {
     process.on('open-url-from-tab', (e, source, targetUrl, disposition) => {
@@ -370,7 +378,7 @@ const api = {
       createProperties.url = newFrameUrl()
     }
     createProperties.url = normalizeUrl(createProperties.url)
-    if (!createProperties.openerTabId) {
+    if (needsPartitionAssigned(createProperties)) {
       createProperties.partition = getPartition(createProperties)
       if (isSessionPartition(createProperties.partition)) {
         createProperties.parent_partition = ''
