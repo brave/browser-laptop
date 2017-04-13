@@ -75,7 +75,6 @@ module.exports.newTabMenuItem = (openerTabId) => {
     click: function (item, focusedWindow) {
       ensureAtLeastOneWindow(Immutable.fromJS({}))
       appActions.createTabRequested({
-        url: 'about:newtab',
         windowId: getCurrentWindowId(),
         openerTabId
       })
