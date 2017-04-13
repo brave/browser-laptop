@@ -108,7 +108,7 @@ const globalStyles = {
     buttonWidth: '25px',
     navbarHeight: '36px',
     downloadsBarHeight: '50px',
-    tabsToolbarHeight: '28px',
+    tabsToolbarHeight: '26px',
     tabPagesHeight: '7px',
     bookmarksToolbarHeight: '24px',
     bookmarksToolbarWithFaviconsHeight: '24px',
@@ -209,5 +209,7 @@ globalStyles.color.loadTimeColor = globalStyles.color.highlightBlue
 globalStyles.color.activeTabDefaultColor = globalStyles.color.chromePrimary
 globalStyles.color.switchBG_on = globalStyles.color.braveOrange
 globalStyles.color.statsGray = globalStyles.color.chromeText
+
+globalStyles.spacing.tabHeight = globalStyles.spacing.tabsToolbarHeight
 
 module.exports = globalStyles
