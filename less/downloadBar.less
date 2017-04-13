@@ -11,7 +11,7 @@
   --download-bar-buttons: 22px;
 }
 
-@downloadItemHeight: 46px;
+@downloadItemHeight: 50px;
 
 .downloadsBar {
   user-select: none;
@@ -46,7 +46,7 @@
       min-width: var(--download-item-width);
 
       &:hover {
-        height: 72px;
+        height: 73px;
         top: -23px;
 
         .downloadInfo .downloadArrow {
@@ -55,6 +55,7 @@
 
         .downloadProgress {
           bottom: 0;
+          height: 47px;
         }
       }
 
@@ -82,7 +83,7 @@
       }
 
       &.deleteConfirmationVisible:hover {
-        height: 97px;
+        height: 108px;
         top: -58px;
       }
 
@@ -92,8 +93,8 @@
         left: 0;
         opacity: 0.5;
         position: absolute;
-        height: @downloadItemHeight;
         width: 100%;
+        height: 100%;
       }
 
       .downloadInfo {
@@ -124,7 +125,7 @@
       }
 
       .downloadActions {
-        margin: auto 0;
+        margin: 8px 0 0;
         .browserButton {
           font-size: 14px;
           height: auto;
