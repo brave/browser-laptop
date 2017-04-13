@@ -119,6 +119,7 @@
 }
 
 .tabsToolbar {
+  box-sizing: border-box;
   background: @tabsBackground;
   display: flex;
   height: @tabsToolbarHeight;
@@ -127,7 +128,10 @@
 }
 
 .tabsToolbarButtons {
+  box-sizing: border-box;
+  height: @tabHeight;
   padding-right: 2px;
+
   .browserButton {
     display: inline-block;
     line-height: 26px;
