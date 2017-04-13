@@ -194,7 +194,7 @@ let generateTorrentManifest = () => {
 
   return {
     name: 'Torrent Viewer',
-    description: l10n.translation('l10nWebtorrentDesc'),
+    description: l10n.translation('torrentDesc'),
     manifest_version: 2,
     version: '1.0',
     content_security_policy: concatCSP(cspDirectives),
