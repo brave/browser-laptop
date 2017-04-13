@@ -371,18 +371,23 @@ module.exports.init = () => {
 
   let insertLocaleStrings = (installInfo) => {
     let pattern = /^__MSG_(.*)__$/
-    let properties = ['name', 'description']
     let defaultLocale = installInfo.manifest.default_locale
     if (defaultLocale) {
       let msgPath = path.join(installInfo.base_path, '_locales', defaultLocale, 'messages.json')
       if (fs.existsSync(msgPath)) {
         let messages = JSON.parse(fs.readFileSync(msgPath).toString())
-        properties.forEach((property) => {
-          let matches = installInfo[property].match(pattern)
-          if (matches) {
-            installInfo[property] = messages[matches[1]].message
-          }
-        })
+        if (installInfo.name) {
+          let name = installInfo.name.match(pattern)
+          name && (installInfo.name = messages[name[1]].message)
+        }
+        if (installInfo.description) {
+          let description = installInfo.name.match(pattern)
+          description && (installInfo.description = messages[description[1]].message)
+        }
+        if (installInfo.manifest.browser_action.default_title) {
+          let defaultTitle = installInfo.manifest.browser_action.default_title.match(pattern)
+          defaultTitle && (installInfo.manifest.browser_action.default_title = messages[defaultTitle[1]].message)
+        }
       }
     }
     return installInfo
