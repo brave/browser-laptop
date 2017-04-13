@@ -13,6 +13,7 @@ class Button extends ImmutableComponent {
         data-l10n-id={this.props.l10nId}
         data-test-id={this.props.testId}
         data-test2-id={this.props.test2Id}
+        data-l10n-args={JSON.stringify(this.props.l10nArgs || {})}
         style={this.props.inlineStyles}
         data-button-value={this.props.dataButtonValue}
         className={cx({
