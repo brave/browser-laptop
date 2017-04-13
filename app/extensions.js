@@ -381,7 +381,7 @@ module.exports.init = () => {
           name && (installInfo.name = messages[name[1]].message)
         }
         if (installInfo.description) {
-          let description = installInfo.name.match(pattern)
+          let description = installInfo.description.match(pattern)
           description && (installInfo.description = messages[description[1]].message)
         }
         if (installInfo.manifest.browser_action.default_title) {
