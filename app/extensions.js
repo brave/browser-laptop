@@ -15,6 +15,7 @@ const appActions = require('../js/actions/appActions')
 const fs = require('fs')
 const path = require('path')
 const l10n = require('../js/l10n')
+const {bravifyText} = require('./renderer/lib/extensionsUtil')
 
 // Takes Content Security Policy flags, for example { 'default-src': '*' }
 // Returns a CSP string, for example 'default-src: *;'
@@ -370,27 +371,34 @@ module.exports.init = () => {
   })
 
   let insertLocaleStrings = (installInfo) => {
-    let pattern = /^__MSG_(.*)__$/
     let defaultLocale = installInfo.manifest.default_locale
     if (defaultLocale) {
       let msgPath = path.join(installInfo.base_path, '_locales', defaultLocale, 'messages.json')
       if (fs.existsSync(msgPath)) {
         let messages = JSON.parse(fs.readFileSync(msgPath).toString())
-        if (installInfo.name) {
-          let name = installInfo.name.match(pattern)
-          name && (installInfo.name = messages[name[1]].message)
-        }
-        if (installInfo.description) {
-          let description = installInfo.description.match(pattern)
-          description && (installInfo.description = messages[description[1]].message)
-        }
-        if (installInfo.manifest.browser_action.default_title) {
-          let defaultTitle = installInfo.manifest.browser_action.default_title.match(pattern)
-          defaultTitle && (installInfo.manifest.browser_action.default_title = messages[defaultTitle[1]].message)
-        }
+        installInfo = insertPredefinedMessages(installInfo, messages, /^__MSG_(.*)__$/)
       }
     }
     return installInfo
+  }
+
+  let insertPredefinedMessages = function (object, dictionary, pattern) {
+    Object.keys(object).forEach(key => {
+      let value = object[key]
+      let type = typeof value
+      if (type === 'object' && !Array.isArray(value)) {
+        object[key] = insertPredefinedMessages(value, dictionary, pattern)
+        return
+      }
+      if (typeof value === 'string') {
+        let match = value.match(pattern)
+        if (match) {
+          let message = dictionary[match[1]]
+          object[key] = message ? bravifyText(message.message) : value
+        }
+      }
+    })
+    return object
   }
 
   let loadExtension = (extensionId, extensionPath, manifest = {}, manifestLocation = 'unpacked') => {
