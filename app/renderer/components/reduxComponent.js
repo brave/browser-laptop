@@ -18,20 +18,23 @@ class ReduxComponent extends ImmutableComponent {
     super(props)
     this.componentType = props.componentType
     this.state = buildPropsImpl(props, this.componentType)
+    this.checkForUpdates = this.checkForUpdates.bind(this)
+  }
+
+  checkForUpdates () {
+    if (this.shouldComponentUpdate(this.props, this.buildProps())) {
+      this.forceUpdate()
+    }
   }
 
   componentDidMount () {
-    appStore.addChangeListener(() => {
-      if (this.shouldComponentUpdate(this.props, this.buildProps())) {
-        this.forceUpdate()
-      }
-    })
+    appStore.addChangeListener(this.checkForUpdates)
+    windowStore.addChangeListener(this.checkForUpdates)
+  }
 
-    windowStore.addChangeListener(() => {
-      if (this.shouldComponentUpdate(this.props, this.buildProps())) {
-        this.forceUpdate()
-      }
-    })
+  componentWillUnmount () {
+    appStore.removeChangeListener(this.checkForUpdates)
+    windowStore.removeChangeListener(this.checkForUpdates)
   }
 
   componentWillReceiveProps (nextProps) {
