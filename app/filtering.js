@@ -307,6 +307,10 @@ function registerForHeadersReceived (session, partition) {
       if (!module.exports.isResourceEnabled(results.resourceName, firstPartyUrl, isPrivate)) {
         continue
       }
+      if (results.cancel) {
+        cb({ cancel: true })
+        return
+      }
       if (results.responseHeaders) {
         cb({
           responseHeaders: results.responseHeaders,
@@ -528,6 +532,10 @@ function registerForMagnetHandler (session) {
   const webtorrentUrl = appUrlUtil.getTorrentExtUrl('webtorrent.html')
   try {
     if (getSetting(settings.TORRENT_VIEWER_ENABLED)) {
+      // Loading webtorrentUrl from external sources will fail since it is
+      // not whitelisted in web_accessible_resources. However the protocol
+      // registration is needed so that onBeforeRequest can handle magnet:
+      // requests.
       session.protocol.registerNavigatorHandler('magnet', `${webtorrentUrl}#%s`)
     } else {
       session.protocol.unregisterNavigatorHandler('magnet', `${webtorrentUrl}#%s`)
@@ -585,7 +593,7 @@ const initPartition = (partition) => {
 }
 module.exports.initPartition = initPartition
 
-const filterableProtocols = ['http:', 'https:', 'ws:', 'wss:']
+const filterableProtocols = ['http:', 'https:', 'ws:', 'wss:', 'magnet:']
 
 function shouldIgnoreUrl (details) {
   // internal requests
@@ -669,6 +677,10 @@ module.exports.isResourceEnabled = (resourceName, url, isPrivate) => {
     return true
   }
 
+  if (resourceName === 'webtorrent') {
+    return getSetting(settings.TORRENT_VIEWER_ENABLED)
+  }
+
   const appState = appStore.getState()
 
   if (resourceName === 'webtorrent') {
@@ -676,10 +688,10 @@ module.exports.isResourceEnabled = (resourceName, url, isPrivate) => {
     return extension !== undefined ? extension.get('enabled') : false
   }
 
-  const settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
+  const savedSettings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
   const tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), url)
 
-  let braverySettings = siteSettings.activeSettings(settings, appState, appConfig)
+  let braverySettings = siteSettings.activeSettings(savedSettings, appState, appConfig)
   if (isPrivate && tempSettings) {
     braverySettings = siteSettings.activeSettings(tempSettings, appState, appConfig)
   }

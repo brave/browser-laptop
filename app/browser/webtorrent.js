@@ -1,9 +1,10 @@
 const electron = require('electron')
 const ipc = electron.ipcMain
 const appUrlUtil = require('../../js/lib/appUrlUtil')
+const appActions = require('../../js/actions/appActions')
 const messages = require('../../js/constants/messages')
 const Filtering = require('../filtering')
-const url = require('url')
+const urlParse = require('url').parse
 
 // Set to see communication between WebTorrent and torrent viewer tabs
 const DEBUG_IPC = false
@@ -52,7 +53,27 @@ function send (msg) {
   channel.send(messages.TORRENT_MESSAGE, msg)
 }
 
+/**
+ * Intercepts a request that should be redirected to the webtorrent viewer
+ * @param {Object} details - Details returned by the filtering callback
+ * @return {Object}
+ */
+function getInterceptedRequest (details) {
+  const viewerUrl = getViewerURL(details.url)
+  appActions.loadURLRequested(details.tabId, viewerUrl)
+  return {
+    resourceName: 'webtorrent',
+    cancel: true
+  }
+}
+
 function setupFiltering () {
+  Filtering.registerBeforeRequestFilteringCB(function (details) {
+    if (isMagnetURL(details)) {
+      return getInterceptedRequest(details)
+    }
+    return {}
+  })
   Filtering.registerHeadersReceivedFilteringCB(function (details, isPrivate) {
     if (details.method !== 'GET') {
       return {}
@@ -61,21 +82,14 @@ function setupFiltering () {
       return {}
     }
 
-    const parsedUrl = url.parse(details.url)
-    const directDownload = parsedUrl && parsedUrl.query && parsedUrl.query.includes('download=ok')
+    const parsedUrl = urlParse(details.url)
+    const directDownload = parsedUrl && parsedUrl.query && parsedUrl.query.includes('download=true')
+
     if (directDownload) {
       return {}
     }
 
-    const viewerUrl = getViewerURL(details.url)
-
-    return {
-      responseHeaders: {
-        'Location': [ viewerUrl ]
-      },
-      statusLine: 'HTTP/1.1 301 Moved Permanently',
-      resourceName: 'webtorrent'
-    }
+    return getInterceptedRequest(details)
   })
 }
 
@@ -105,6 +119,19 @@ function isTorrentFile (details) {
     }
   }
   return false
+}
+
+/**
+ * Checks if request is a magnet URL
+ * @param {Object} details
+ * @return {boolean}
+ */
+function isMagnetURL (details) {
+  try {
+    return urlParse(details.url).protocol === 'magnet:'
+  } catch (e) {
+    return false
+  }
 }
 
 function getHeader (headers, headerName) {
