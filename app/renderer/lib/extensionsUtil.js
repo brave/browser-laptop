@@ -30,24 +30,24 @@ const dummyData = [
   // { id: bitwarden, // TBD },
   {
     id: dashlane,
-    name: 'l10nDashlane',
-    description: 'l10nDashlaneDesc',
+    name: 'dashlane',
+    description: 'dashlaneDesc',
     icon: 'img/extensions/dashlane-128.png'
   // { id: enpass // TBD },
   }, {
     id: lastpass,
-    name: 'l10nLastpass',
-    description: 'l10nLastpassDesc',
+    name: 'lastpass',
+    description: 'lastpassDesc',
     icon: 'img/extensions/lastpass-128.png'
   }, {
     id: onepassword,
-    name: 'l10nOnepassword',
-    description: 'l10nOnepasswordDesc',
+    name: '1password',
+    description: '1passwordDesc',
     icon: 'img/extensions/1password-128.png'
   }, {
     id: pocket,
-    name: 'l10nPocket',
-    description: 'l10nPocketDesc',
+    name: 'saveToPocket',
+    description: 'saveToPocketDesc',
     icon: 'img/extensions/pocket-128.png'
   }
   // { id: 'vimium' // TBD }
@@ -91,7 +91,7 @@ module.exports.populateDefaultExtensions = (extensionsState) => {
 
   // TODO: @cezaraugusto convert to list or use valueSeq to avoid
   // warning about Using Maps as children
-  return newState
+  return newState.sort((a, b) => a.get('name').localeCompare(b.get('name')))
 }
 
 /**
