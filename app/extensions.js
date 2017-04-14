@@ -390,7 +390,7 @@ module.exports.init = () => {
         object[key] = insertPredefinedMessages(value, dictionary, pattern)
         return
       }
-      if (type === 'string') {
+      if (typeof value === 'string') {
         let match = value.match(pattern)
         if (match) {
           let message = dictionary[match[1]]
