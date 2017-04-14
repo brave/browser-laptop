@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   },
 
   private: {
-    background: 'rgba(75, 60, 110, 0.3)',
+    background: 'rgba(75, 60, 110, 0.2)',
 
     ':hover': {
       background: globalStyles.color.privateTabBackgroundActive
