@@ -955,6 +955,62 @@ Notifies the app that a drop operation occurred
 
 
 
+### onNavigateBack(tabId) 
+
+Go back in a history for a given tab
+
+**Parameters**
+
+**tabId**: `number`, Tab id used for an action
+
+
+
+### onNavigateForward(tabId) 
+
+Go forward in a history for a given tab
+
+**Parameters**
+
+**tabId**: `number`, Tab id used for an action
+
+
+
+### onNavigateIndex(tabId, index) 
+
+Go to specific item in a history for a given tab
+
+**Parameters**
+
+**tabId**: `number`, Tab id used for an action
+
+**index**: `number`, Index in the history
+
+
+
+### onNavigateBackLong(tabId, rect) 
+
+Go back in a history for a given tab
+
+**Parameters**
+
+**tabId**: `number`, Tab id used for an action
+
+**rect**: `ClientRect`, Parent element position for this action
+
+
+
+### onNavigateForwardLong(tabId, rect) 
+
+Go forward in a history for a given tab
+
+**Parameters**
+
+**tabId**: `number`, Tab id used for an action
+
+**rect**: `ClientRect`, Parent element position for this action
+
+
+
 
 * * *
 

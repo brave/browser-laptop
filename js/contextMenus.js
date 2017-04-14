@@ -33,9 +33,7 @@ const {getPartitionFromNumber, frameOptsFromFrame, getActiveFrame} = require('./
 const {isIntermediateAboutPage, isUrl, aboutUrls} = require('./lib/appUrlUtil')
 const {getBase64FromImageUrl} = require('./lib/imageUtil')
 const urlParse = require('../app/common/urlParse')
-const eventUtil = require('./lib/eventUtil')
 const {getCurrentWindow} = require('../app/renderer/currentWindow')
-const config = require('./constants/config')
 const {bookmarksToolbarMode} = require('../app/common/constants/settingsEnums')
 const extensionState = require('../app/common/state/extensionState')
 const extensionActions = require('../app/common/actions/extensionActions')
@@ -1513,100 +1511,6 @@ function onMoreBookmarksMenu (activeFrame, allBookmarkItems, overflowItems, e) {
   }))
 }
 
-function onBackButtonHistoryMenu (activeFrame, history, target) {
-  const rect = target.parentNode.getBoundingClientRect()
-  const menuTemplate = []
-
-  if (activeFrame && history && history.entries.length > 0) {
-    const stopIndex = Math.max(((history.currentIndex - config.navigationBar.maxHistorySites) - 1), -1)
-    for (let index = (history.currentIndex - 1); index > stopIndex; index--) {
-      const url = history.entries[index].url
-
-      menuTemplate.push({
-        label: history.entries[index].display,
-        icon: history.entries[index].icon,
-        click: (e) => {
-          if (eventUtil.isForSecondaryAction(e)) {
-            appActions.createTabRequested({
-              url,
-              partitionNumber: activeFrame.props.partitionNumber,
-              active: !!e.shiftKey
-            })
-          } else {
-            activeFrame.goToIndex(index)
-          }
-        }
-      })
-    }
-
-    // Always display "Show History" link
-    menuTemplate.push(
-      CommonMenu.separatorMenuItem,
-      {
-        label: locale.translation('showAllHistory'),
-        click: (e) => {
-          appActions.createTabRequested({
-            url: 'about:history'
-          })
-          windowActions.setContextMenuDetail()
-        }
-      })
-  }
-
-  windowActions.setContextMenuDetail(Immutable.fromJS({
-    left: rect.left,
-    top: rect.bottom,
-    template: menuTemplate
-  }))
-}
-
-function onForwardButtonHistoryMenu (activeFrame, history, target) {
-  const rect = target.parentNode.getBoundingClientRect()
-  const menuTemplate = []
-
-  if (activeFrame && history && history.entries.length > 0) {
-    const stopIndex = Math.min(((history.currentIndex + config.navigationBar.maxHistorySites) + 1), history.entries.length)
-    for (let index = (history.currentIndex + 1); index < stopIndex; index++) {
-      const url = history.entries[index].url
-
-      menuTemplate.push({
-        label: history.entries[index].display,
-        icon: history.entries[index].icon,
-        click: (e) => {
-          if (eventUtil.isForSecondaryAction(e)) {
-            appActions.createTabRequested({
-              url,
-              partitionNumber: activeFrame.props.partitionNumber,
-              active: !!e.shiftKey
-            })
-          } else {
-            activeFrame.goToIndex(index)
-          }
-        }
-      })
-    }
-
-    // Always display "Show History" link
-    menuTemplate.push(
-      CommonMenu.separatorMenuItem,
-      {
-        label: locale.translation('showAllHistory'),
-        click: (e) => {
-          appActions.createTabRequested({
-            url: 'about:history'
-          })
-          windowActions.setContextMenuDetail()
-        }
-      })
-  }
-
-  windowActions.setContextMenuDetail(Immutable.fromJS({
-    left: rect.left,
-    top: rect.bottom,
-    template: menuTemplate
-  }))
-}
-
 function onReloadContextMenu (target) {
   const rect = target.getBoundingClientRect()
   const menuTemplate = [
@@ -1637,7 +1541,5 @@ module.exports = {
   onShowUsernameMenu,
   onShowAutofillMenu,
   onMoreBookmarksMenu,
-  onBackButtonHistoryMenu,
-  onForwardButtonHistoryMenu,
   onReloadContextMenu
 }

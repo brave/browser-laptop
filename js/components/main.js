@@ -688,7 +688,6 @@ class Main extends ImmutableComponent {
     // can be passed everywhere other than the Frame elements.
     const sortedFrames = frameStateUtil.getSortedFrames(this.props.windowState)
     const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
-    this.frames = {}
     const allSiteSettings = this.allSiteSettings
     const lastCommittedURL = frameStateUtil.getLastCommittedURL(activeFrame)
     const activeSiteSettings = this.frameSiteSettings(lastCommittedURL)
@@ -760,7 +759,6 @@ class Main extends ImmutableComponent {
         <Navigator
           appState={this.props.appState}
           windowState={this.props.windowState}
-          frames={this.frames}
           activeTab={activeTab}
           shouldAllowWindowDrag={shouldAllowWindowDrag}
           customTitlebar={customTitlebar}
@@ -938,7 +936,6 @@ class Main extends ImmutableComponent {
           {
             sortedFrames.map((frame) =>
               <Frame
-                ref={(node) => { this.frames[frame.get('key')] = node }}
                 urlBarFocused={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'focused'])}
                 tabIndex={frameStateUtil.getFrameIndex(this.props.windowState, frame.get('key'))}
                 prefOpenInForeground={getSetting(settings.SWITCH_TO_NEW_TABS)}

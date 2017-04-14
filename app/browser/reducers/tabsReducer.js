@@ -8,6 +8,7 @@ const appConstants = require('../../../js/constants/appConstants')
 const tabs = require('../tabs')
 const tabState = require('../../common/state/tabState')
 const windowConstants = require('../../../js/constants/windowConstants')
+const windowAction = require('../../../js/actions/windowActions.js')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const {getFlashResourceId} = require('../../../js/flash')
 const {l10nErrorText} = require('../../common/lib/httpUtil')
@@ -71,6 +72,51 @@ const tabsReducer = (state, action) => {
     case appConstants.APP_LOAD_URL_IN_ACTIVE_TAB_REQUESTED:
       state = tabs.loadURLInActiveTab(state, action)
       break
+    case appConstants.APP_ON_NAVIGATE_BACK:
+      state = tabs.goBack(state, action)
+      break
+    case appConstants.APP_ON_NAVIGATE_FORWARD:
+      state = tabs.goForward(state, action)
+      break
+    case appConstants.APP_ON_NAVIGATE_INDEX:
+      state = tabs.goToIndex(state, action)
+      break
+    case appConstants.APP_ON_NAVIGATE_BACK_LONG:
+      {
+        const history = tabs.getHistoryEntries(state, action)
+        const tabValue = tabState.getByTabId(state, action.get('tabId'))
+        const windowId = tabs.getWindowId()
+
+        if (history !== null) {
+          windowAction.onLongBackHistory(
+            history,
+            action.getIn(['rect', 'left']),
+            action.getIn(['rect', 'bottom']),
+            tabValue.get('partitionNumber'),
+            action.get('tabId'),
+            windowId
+          )
+        }
+        break
+      }
+    case appConstants.APP_ON_NAVIGATE_FORWARD_LONG:
+      {
+        const history = tabs.getHistoryEntries(state, action)
+        const tabValue = tabState.getByTabId(state, action.get('tabId'))
+        const windowId = tabs.getWindowId()
+
+        if (history !== null) {
+          windowAction.onLongForwardHistory(
+            history,
+            action.getIn(['rect', 'left']),
+            action.getIn(['rect', 'bottom']),
+            tabValue.get('partitionNumber'),
+            action.get('tabId'),
+            windowId
+          )
+        }
+        break
+      }
     case appConstants.APP_FRAME_CHANGED:
       state = tabState.updateFrame(state, action)
       break

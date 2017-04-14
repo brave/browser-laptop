@@ -1198,6 +1198,67 @@ const appActions = {
       actionType: appConstants.APP_DRAGGED_OVER,
       draggedOverData
     })
+  },
+
+  /**
+   * Go back in a history for a given tab
+   * @param {number} tabId - Tab id used for an action
+   */
+  onNavigateBack: function (tabId) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_ON_NAVIGATE_BACK,
+      tabId
+    })
+  },
+
+  /**
+   * Go forward in a history for a given tab
+   * @param {number} tabId - Tab id used for an action
+   */
+  onNavigateForward: function (tabId) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_ON_NAVIGATE_FORWARD,
+      tabId
+    })
+  },
+
+  /**
+   * Go to specific item in a history for a given tab
+   * @param {number} tabId - Tab id used for an action
+   * @param {number} index - Index in the history
+   */
+  onNavigateIndex: function (tabId, index) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_ON_NAVIGATE_INDEX,
+      tabId,
+      index
+    })
+  },
+
+  /**
+   * Go back in a history for a given tab
+   * @param {number} tabId - Tab id used for an action
+   * @param {ClientRect} rect - Parent element position for this action
+   */
+  onNavigateBackLong: function (tabId, rect) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_ON_NAVIGATE_BACK_LONG,
+      tabId,
+      rect
+    })
+  },
+
+  /**
+   * Go forward in a history for a given tab
+   * @param {number} tabId - Tab id used for an action
+   * @param {ClientRect} rect - Parent element position for this action
+   */
+  onNavigateForwardLong: function (tabId, rect) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_ON_NAVIGATE_FORWARD_LONG,
+      tabId,
+      rect
+    })
   }
 }
 

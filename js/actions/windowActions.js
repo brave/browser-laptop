@@ -1179,6 +1179,34 @@ const windowActions = {
       actionType: windowConstants.WINDOW_ON_EXIT_FULL_SCREEN,
       windowId
     })
+  },
+
+  onLongBackHistory: function (history, left, top, partition, tabId, windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_NAVIGATE_BACK_LONG,
+      queryInfo: {
+        windowId
+      },
+      history,
+      left,
+      top,
+      partition,
+      tabId
+    })
+  },
+
+  onLongForwardHistory: function (history, left, top, partition, tabId, windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_NAVIGATE_FORWARD_LONG,
+      queryInfo: {
+        windowId
+      },
+      history,
+      left,
+      top,
+      partition,
+      tabId
+    })
   }
 }
 

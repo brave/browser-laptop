@@ -353,7 +353,7 @@ const UrlUtil = {
    * @return {string} url The base favicon URL
    */
   getDefaultFaviconUrl: function (url) {
-    if (UrlUtil.isURL(url)) {
+    if (typeof window !== 'undefined' && UrlUtil.isURL(url)) {
       const loc = new window.URL(url)
       return loc.protocol + '//' + loc.host + '/favicon.ico'
     }
