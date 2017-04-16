@@ -270,6 +270,12 @@ AppStore
   sync: {
     lastFetchTimestamp: integer // the last time new sync records were fetched in seconds
     deviceId: Array.<number>,
+    devices: {
+      [deviceId]: {
+        name: string,
+        lastRecordTimestamp: number // last seen Sync record from this device
+      }
+    },
     objectId: Array.<number>, // objectId for this sync device
     objectsById: {
       [string of objectId joined by pipes |]: Array.<string> // array key path within appState, so we can do appState.getIn({key path})
@@ -632,7 +638,7 @@ WindowStore
     downloadsToolbar: {
       isVisible: boolean // whether or not the downloads toolbar is visible
     },
-    hasFocus: boolean, // true if window has focus
+    isFocused: boolean, // true if window has focus
     isClearBrowsingDataPanelVisible: boolean, // true if the Clear Browsing Data panel is visible
     isFullScreen: boolean, // true if window is fullscreen
     isMaximized: boolean, // true if window is maximized

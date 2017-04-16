@@ -3,9 +3,9 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('../../../js/components/immutableComponent')
-const suggestionTypes = require('../../../js/constants/suggestionTypes')
-const cx = require('../../../js/lib/classSet')
+const ImmutableComponent = require('../../../../js/components/immutableComponent')
+const suggestionTypes = require('../../../../js/constants/suggestionTypes')
+const cx = require('../../../../js/lib/classSet')
 
 class UrlBarSuggestionItem extends ImmutableComponent {
   componentDidMount () {

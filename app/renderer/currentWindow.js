@@ -1,38 +1,36 @@
-const currentWindow = require('electron').remote.getCurrentWindow()
-const currentWindowId = currentWindow.id
-let isFocused = currentWindow.isFocused()
-let isMaximized = currentWindow.isMaximized()
-let isFullScreen = currentWindow.isFullScreen()
+const appStoreRenderer = require('../../js/stores/appStoreRenderer')
+const windowState = require('../common/state/windowState')
 
-currentWindow.on('maximize', function (wnd) {
-  isMaximized = true
-})
+let currentWindowId = -1
+let currentWindow = null
 
-currentWindow.on('unmaximize', function (wnd) {
-  isMaximized = false
-})
+const isMaximized = () => {
+  const win = windowState.getByWindowId(appStoreRenderer.state, currentWindowId)
+  return win && win.get('state') === 'maximized'
+}
 
-currentWindow.on('focus', function (wnd) {
-  isFocused = true
-})
+const isFullScreen = () => {
+  const win = windowState.getByWindowId(appStoreRenderer.state, currentWindowId)
+  return win && win.get('state') === 'fullscreen'
+}
 
-currentWindow.on('blur', function (wnd) {
-  isFocused = false
-})
-
-currentWindow.on('enter-full-screen', function (wnd) {
-  isFullScreen = true
-})
-
-currentWindow.on('leave-full-screen', function (wnd) {
-  isFullScreen = false
-})
+const isFocused = () => {
+  const win = windowState.getByWindowId(appStoreRenderer.state, currentWindowId)
+  return (win && win.get('focused')) || false
+}
 
 module.exports = {
-  currentWindow,
-  currentWindowId,
-  currentWindowWebContents: currentWindow.webContents,
-  isMaximized: () => isMaximized,
-  isFocused: () => isFocused,
-  isFullScreen: () => isFullScreen
+  getCurrentWindowId: () => {
+    return currentWindowId
+  },
+  setWindowId: (windowId) => {
+    currentWindowId = windowId
+  },
+  // lazy load this
+  getCurrentWindow: () => {
+    return currentWindow || (currentWindow = require('electron').remote.getCurrentWindow())
+  },
+  isMaximized,
+  isFocused,
+  isFullScreen
 }

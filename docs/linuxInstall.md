@@ -6,7 +6,7 @@ want to try installing `git` using the package manager for your distro._
 **NOTE**: _If Brave does not start and shows an error about sandboxing, you may need
 to [enable userns in your kernel](https://superuser.com/questions/1094597/enable-user-namespaces-in-debian-kernel#1122977). Running with the `--no-sandbox` flag is NOT recommended!_
 
-## Debian (jessie) and Ubuntu (Trusty and Xenial) AMD64:
+## Debian (jessie) and Ubuntu (Zesty, Yakkety, Xenial, and Trusty) AMD64:
 To install brave using apt and lsb\_release :
 
 ``` 
@@ -38,11 +38,23 @@ wget -O brave.deb https://laptop-updates.brave.com/latest/dev/ubuntu64
 sudo dpkg -i ./brave.deb
 ```
 
+If there are dependency errors during `dpkg -i`, the following command will
+install the dependency for you:
+```
+sudo apt-get -f install
+```
+
 ## Mint AMD64:
 
 ```
 wget -O brave.deb https://laptop-updates.brave.com/latest/mint64
 sudo dpkg -i ./brave.deb
+```
+
+If there are dependency errors during `dpkg -i`, the following command will
+install the dependency for you:
+```
+sudo apt-get -f install
 ```
 
 ## Fedora x86_64:

@@ -3,6 +3,7 @@ const ipc = electron.ipcMain
 const appUrlUtil = require('../../js/lib/appUrlUtil')
 const messages = require('../../js/constants/messages')
 const Filtering = require('../filtering')
+const url = require('url')
 
 // Set to see communication between WebTorrent and torrent viewer tabs
 const DEBUG_IPC = false
@@ -60,7 +61,13 @@ function setupFiltering () {
       return {}
     }
 
-    var viewerUrl = getViewerURL(details.url)
+    const parsedUrl = url.parse(details.url)
+    const directDownload = parsedUrl && parsedUrl.query && parsedUrl.query.includes('download=true')
+    if (directDownload) {
+      return {}
+    }
+
+    const viewerUrl = getViewerURL(details.url)
 
     return {
       responseHeaders: {

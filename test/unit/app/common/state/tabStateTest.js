@@ -695,4 +695,34 @@ describe('tabState unit tests', function () {
       tabState.setTabs(state, [])
     })
   })
+
+  describe('getTabPropertyByTabId', function () {
+    before(function () {
+      this.appState = defaultAppState.set('tabs', Immutable.fromJS([
+        { tabId: 1, prop1: 'test1', prop2: 'test2' },
+        { tabId: 2, prop1: 'test3' },
+        { tabId: 3, prop2: 'test4' }
+      ]))
+    })
+
+    it('returns the value for `tabId`.`key`', function () {
+      assert.equal(tabState.getTabPropertyByTabId(this.appState, 1, 'prop1'), 'test1')
+      assert.equal(tabState.getTabPropertyByTabId(this.appState, 1, 'prop2'), 'test2')
+      assert.equal(tabState.getTabPropertyByTabId(this.appState, 2, 'prop1'), 'test3')
+      assert.equal(tabState.getTabPropertyByTabId(this.appState, 3, 'prop2'), 'test4')
+    })
+
+    it('returns null if `key` does not exist for `tabId`', function () {
+      assert.equal(tabState.getTabPropertyByTabId(this.appState, 1, 'prop3'), null)
+    })
+
+    it('throws assertion error if `tabId` does not exist', function () {
+      assert.throws(
+        () => {
+          tabState.getTabPropertyByTabId(this.appState, 4, 'prop1')
+        },
+        AssertionError
+      )
+    })
+  })
 })

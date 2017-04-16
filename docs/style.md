@@ -1,130 +1,519 @@
-# Style guidelines
+# :tophat: Style guidelines
+
+> How we do inline-styles that work® at :lion: Brave
 
 All applicable styles should be colocated with their corresponding JavaScript component using [Aphrodite](https://github.com/Khan/aphrodite).
 
 ## Legacy
 
-All legacy styles are processed with [Less](http://lesscss.org/) and can be found in the /less directory. These should still be maintained but all future CSS should be written in JavaScript and kept inside the appropriate component file. **For further information regarding how to refactor legacy code to Aphrodite, check this [Wiki page](https://github.com/brave/browser-laptop/wiki/Refactoring-styles-to-Aphrodite).**
+All legacy styles are processed with [LESS](http://lesscss.org/) and can be found in the `/less` directory. These should still be maintained but all future CSS should be written in JavaScript and kept inside the appropriate component file. 
 
-## Example
 
-Here is an example of a React component styled with Aphrodite.
+## Note
+This page is regarding how we make use of Aphrodite in our codebase, if you need guidance on how to refactor components, please refer to our [wiki page](https://github.com/brave/browser-laptop/wiki/Refactoring-styles-to-Aphrodite).
 
-Aphrodite will automatically create a single `<style>` tag in the document `<head>` to put its generated styles in.
+Also, note that this style guide was re-made after some code has being refactored. If you see something already _Aphroditized_ that doesn't follow patterns described here, please consider sending a PR :)
+
+## Table of Contents
+
+* [Architecturing styles](#architecturing-styles)
+  * [Where to put my code](#where-to-put-my-code)
+    * [The global file](#the-global-file)
+    * [The commonStyles file](#the-commonstyles-file)
+    * [The animations file](#the-animations-file)
+  * [Sharing styles across components](#sharing-styles-across-components)
+    * [Styles specific for a given component](#styles-specific-for-a-given-component)
+  * [Naming styles](#naming-styles)
+    * [Naming styles objects](#naming-styles-objects)
+    * [Naming styles themselves](#naming-styles-themselves)
+  * [Styles are the last thing](#styles-are-the-last-thing)
+  * [Important is evil](#important-is-evil)
+* [Best practices](#best-practices)
+  * [Dealing with pseudo-states](#dealing-with-pseudo-states)
+  * [Dealing with media-queries](#dealing-with-media-queries)
+  * [Dealing with keyframes](#dealing-with-keyframes)
+  * [Dealing with vendor prefixes](#dealing-with-vendor-prefixes)
+  * [Dealing with numbers](#dealing-with-numbers)
+    * [To-quote-or-not-to-quote](#to-quote-or-not-to-quote)
+    * [Having to parse integers](#having-to-parse-integers)
+  * [Dealing with conditionally applied styles](#dealing-with-conditionally-applied-styles)
+  * [There will be dragons](#there-will-be-dragons)
+    * [Dealing with OS-specific styles](#dealing-with-os-specific-styles)
+    * [Descendant selection of pseudo-state](#descendant-selection-of-pseudo-state)
+    * [Dealing with `cx({})` and legacy code](#dealing-with-cx-and-legacy-code)
+    * [Dealing with `font-awesome`](#dealing-with-font-awesome)
+  * [Testing styled-components](#testing-styled-components)
+  * [All set, where do I start?](#all-set-where-do-i-start)
+
+## Architecturing styles
+
+### Where to put my code
+
+The best practice regarding components is to split them into separate files, and that's what you should do with styles as well. Styles should be bound to the component whenever possible. For places where several styles apply (such as tab), that's OK to create a separated file for that. Styles files lives inside `app/renderer/components/styles`. 
+
+#### The global file
+
+We have a global file to share common style properties such as colors, spacing, and shadows. If there's a class that is used multiple times across our application, they should live here.
+
+#### The commonStyles file
+
+This file is specific for class-patterns. If there's a class that is used multiple times across our application, they should live here.
+
+#### The animations file
+This file is just a POJO (plain old JavaScript object), and that's how Aphrodite deals with keyframes - and where they all should live. Use it if you want to animate something complex. You can see a simple usage of it at [`tabContent.js`](https://github.com/brave/browser-laptop/blob/master/app/renderer/components/tabContent.js), where we make use of `spinKeyframes` for our tab loading animation.
+
+### Sharing styles across components
+
+Shared styles should be pretty straight-forward. To follow a pattern and for better consistency, only share styles with one component:
+
+```js
+// This is our style file, awesomeStyle.js
+const {StyleSheet} = require('aphrodite/no-important')
+const globalStyles = require('./global')
+
+const styles = StyleSheet.create({
+  soBlue: {
+    color: 'blue'
+  }
+}
+
+module.exports = styles
+```
 
 ```jsx
-const React = require('react')
-const ImmutableComponent = require('./immutableComponent')
-const {StyleSheet, css} = require('aphrodite')
+// This is our component
 
-class Button extends ImmutableComponent {
-  render () {
-    return <span className={css(styles.browserButton)}
-      disabled={this.props.disabled}
-      data-l10n-id={this.props.l10nId}
-      data-button-value={this.props.dataButtonValue}
-      onClick={this.props.onClick} />
+const styles = require('../../app/renderer/components/styles/awesomeStyle.js')
+
+class BlueComponent extends ImmutableComponent {
+  render() {
+    return <div className={css(styles.soBlue)} />
+  }
+}
+```
+
+#### Styles specific for a given component
+
+Ideally, styles should live together with components. Why? This practice makes it easier to change styles without affecting other components. If there's a pattern for a given property/class, it should live inside `global.js` (properties) or `commonStyles.js` (classes).
+
+### Naming styles
+
+#### Naming styles objects
+
+All names should be written as `styles`, no matter if they live in the same component or in a different file (example below). This makes styles consistent across our app:
+
+```js
+const styles = StyleSheet.create({
+  something: {
+    backgroundColor: 'pink'
+  }
+})
+```
+
+Same applies for exporting/importing:
+
+```js
+// export
+module.exports = styles
+
+// import
+const styles = require('./something')
+```
+
+#### Naming styles themselves
+
+* Always camel-cased
+* Never quoted
+
+
+**Bad**
+
+```js
+styles = StyleSheet.create({
+  // Uppercased, quoted :(
+  'StyleName': {
+    color: 'green'
+  }
+})
+```
+
+**Good**
+```js
+styles = StyleSheet.create({
+  // no quotes, camelCased :)
+  styleName: {
+    color: 'green'
+  }
+})
+```
+
+### Styles are the last thing
+
+Inside a component, you should always put styles as the last part of your component. This makes it easier for other contributors to deal with code other than styles and if you're refactoring, it's better to see which component should be changed before seeing which classes it has.
+
+**Good**
+```jsx
+const styles = require('../../app/renderer/components/styles/awesomeStyle.js')
+
+class Tab extends ImmutableComponent {
+  render() {
+    return <div className={css(styles.soBlue)} />
   }
 }
 
 const styles = StyleSheet.create({
-  browserButton: {
-    cursor: 'default',
-    display: 'inline-block',
-    lineHeight: '25px',
-    width: '25px',
-    height: '25px',
+  soBlue: {
+    color: 'blue'
+  }
+}
 
-    ':hover': {
-      color: 'black'
-    },
+```
 
-    '@media (min-width: 500px)': {
-      width: '100px'
+**Bad (this will be rejected)**
+```jsx
+const styles = require('../../app/renderer/components/styles/awesomeStyle.js')
+
+// Look ma', I'm first!!
+const styles = StyleSheet.create({
+  soBlue: {
+    color: 'blue'
+  }
+}
+
+class Tab extends ImmutableComponent {
+  render() {
+    return <div className={css(styles.soBlue)} />
+  }
+}
+```
+
+### Important is evil
+
+By default, importing Aphrodite will make all styles applied as `!important`. However, we can flag against that by using `/no-important`. We should whenever possible prefer that flag:
+
+```js
+const {StyleSheet, css} = require('aphrodite/no-important')
+```
+
+## Best practices
+
+### Dealing with pseudo-states
+
+Aphrodite works ok with pseudo-states like `:hover` and `:active`, `:before`, `:after`, as well with `:nth-child()`. 
+
+There's no strict rule here, but you should avoid calling numbered children, being the only exception `:nth-child(even)` or `:nth-child(odd)`.
+
+**Bad:**
+
+```js
+// if child have different properties, they should have their own class
+wrapper: {
+  fontSize: '15px',
+
+  ':nth-child(1)': {
+    background: 'purple'
+  },
+  ':nth-child(2)'
+    background: 'orange'
+  }
+}
+```
+
+**Good:**
+
+```js
+  // we can't control how many items we'll have, but we want them styled differently
+wrapper: {
+  fontSize: '15px',
+  background: 'orange',
+
+  ':nth-child(even)': {
+    background: 'purple'
+  }
+}
+```
+
+### Dealing with media-queries
+
+Media queries usually have a long name. To make it reusable and easier to read the breakpoint should be defined under `global.js`, under `breakpoints` object. Media queries can be nested inside a component - and that's how you should use it. Breakpoint should follow `[at]BreakpointOrsizeHere` naming convention. If there will be only one breakpoint, `atBreakpoint` is a readable name:
+
+**Suggestions:**
+
+* `atBreakpoint600`
+* `atNarrowView`
+* `atLargeView`
+* `atBreakpoint`
+
+```js
+// global.js
+
+breakpoint: {
+  newBreakpoint: '600px'
+}
+```
+
+```js
+// component
+
+// That's big.
+const atNarrowView = `@media screen and (max-width: ${globalStyles.breakpoint.breakpointNewPrivateTab})`
+
+
+const styles = StyleSheet.create({
+  myComponent: {
+    maxWidth: '700px',
+
+    // Nice and clean ;)
+    [atNarrowView]: {
+      maxWidth: '380px'
     }
   }
-})
-
-module.exports = Button
+}
 ```
 
-A few things to note:
+### Dealing with keyframes
 
-1. All multi-word properties become camel cased (lineHeight instead of line-height).
-2. Pseudo selectors and media queries can be given their own class or be nested within a selector.
+Keyframes have their own file and should live there (`animations.js`). Their names should match `[type_of_animation]Keyframes` convention. Below an example extracted of our loading animation:
 
-## Sharing Styles
 
-Shared styles go in the `app/styles` directory. For example, we could create a Buttons.js file in `app/styles` with something like:
+```js
 
-```jsx
-import { StyleSheet } from 'aphrodite'
-
-export default StyleSheet.create({
-  Button: {
-    background: 'red'
-  }
-})
-```
-
-And then in a component file we could:
-
-```jsx
-import ButtonStyles from './styles/Buttons'
+const {spinKeyframes} = require('./styles/animations')
 
 ...
 
-<button className={css(ButtonStyles.Button)}>Click Me</button>
+const styles = StyleSheet.create({
+  loadingIcon: {
+    backgroundImage: `url(${loadingIconSvg})`,
+    animationName: spinKeyframes, // here's our hero.
+    animationTimingFunction: 'linear',
+    animationDuration: '1200ms',
+    animationIterationCount: 'infinite'
+  }
+}
 ```
 
+### Dealing with vendor prefixes
 
-### Passing Styles to Child Components
+Sometimes we'll need to flag `-webkit-` prefix. Prever camel-case instead of quoted objects (more below):
 
-Alternatively, styles can be treated as props and passed down from parent to child. Here is an example:
+**Bad**
+```js
+const privateStyles = StyleSheet.create({
+  icon: {
+    '-webkit-mask-image': `url(${imageUrl})`
+  }
+}
+```
+
+**Good**
+```js
+const privateStyles = StyleSheet.create({
+  icon: {
+    WebkitMaskImage: `url(${imageUrl})`
+  }
+}
+```
+
+By default React will take care of naming coercion so you shouldn't worry about that.
+
+### Dealing with numbers
+
+As a general rule numbers should be hosted inside our `global.js` styles file unless they're too specific (trust your gut here - we trust you ;P). There are some gotchas that you should be aware:
+
+#### To-quote-or-not-to-quote
+
+Before this style was created there wasn't a pattern regarding that, so on our codebase we have both examples. Starting from now, there's no need to quote numbers since they'll be coerced as needed by React/Aphrodite:
+
+**Bad**
+
+```js
+styles = StyleSheet.create({
+  opacity: '0.5'
+})
+```
+
+**Good**
+
+```js
+styles = StyleSheet.create({
+  opacity: 0.5 // Look ma'! no quotes here
+})
+```
+
+#### Having to parse integers
+
+Sometimes you'll have to get the number of a given property written in pixels. You're incouraged of parsing that value instead of creating a new class:
+
+```js
+// global.js
+
+const globalStyles = {
+  // 1000px is a valid value but not a valid number, ok to quote
+  someClass: {
+    something: '1000px'
+  }
+}
+```
+
+**Bad**
+
+```js
+// other component
+
+someClassINeed: {
+  // hard-coded, but we have that value already
+  something: 1000 
+}
+```
+
+**Good**
+
+```js
+// other component
+
+someClassINeed: {
+  // re-used. Will be converted to 1000
+  something: Number.parseInt(globalStyles.someClass.something, 10)
+}
+```
+
+### Dealing with conditionally applied styles
+
+If your style is conditional and has more than one condition, consider putting them in a constant to make it clearer/more readable. Variable names should be declarative rather than imperative:
+
+**Bad**
+```jsx
+<Component
+  className={css(this.navBar && this.braveLogo && styles.braveLogoImage)} />
+```
+
+**Good**
+```jsx
+const navBarBraveLogo = this.navBar && this.braveLogo
+
+<Component
+  className={css(navBarBraveLogo && styles.braveLogoImage)} />
+```
+
+The overall pattern to apply styles conditionally is:
 
 ```jsx
-// addEditBookmarkHanger.js
+<Component
+  className={css(conditional && style.componentStyle)} />
+```
 
-const React = require('react')
-const ImmutableComponent = require('../../../js/components/immutableComponent')
-const Button = require('../../../js/components/button')
-const {StyleSheet, css} = require('aphrodite')
+or for something a little more complex:
 
-class AddEditBookmarkHanger extends ImmutableComponent {
-  render () {
-    <Button styles={[styles.hangerButton, styles.hangerText]} />
-  }
+```jsx
+<Component
+  className={css((conditional || otherConditional) && style.componentStyle)} />
+```
+
+## There will be dragons
+
+### Dealing with OS-specific styles
+
+At some point you'll want to apply a style for a given OS. For those cases we make use of our `platformUtil` method:
+
+
+```jsx
+const {isWindows} = require('../../app/common/lib/platformUtil')
+
+<Component className={
+  // Only windows will be affected
+  css(isWindows() && styles.tabForWindows)
+}>
+```
+
+### Descendant selection of pseudo-state
+
+Aphrodite don't deal well with that. However, that's a good thing and makes codebase more consise avoiding nested-styles hell. 
+
+If that's strictly necessary, please make use of an `action` to dispatch changes you need so your className can be changed. A good example can be found looking at `windowActions.setTabHoverState()`, which we use to check if a tab is being hovered. If so, our closeTab icon is fired. 
+
+If you look at how it was done before using Aphrodite:
+
+
+```less
+.closeIcon {
+  opacity: 0; // Hide closeIcon by default
 }
 
-const styles = StyleSheet.create({
-  hangerButton: {
-    width: '50px',
-    height: '25px',
-
-    ':hover': {
-      color: orange
+.tab {
+  &:hover {
+    .closeIcon {
+      opacity: 1; // If mouse is hovering tab, show close icon
     }
-  },
-
-  hangerText: {
-    fontSize: '20px'
-  }
-})
-
-// button.js
-
-const React = require('react')
-const ImmutableComponent = require('./immutableComponent')
-const {StyleSheet, css} = require('aphrodite')
-
-class Button extends ImmutableComponent {
-  render () {
-    return <span className={css(this.props.styles)} />
   }
 }
 ```
 
-## Testing
+It may be seem as overkill at first, but that's the only way you can manipulate descendants of pseudo-states with Aphrodite. If you have any questions regarding that please fill an issue and we'll happily assist.
+
+### Dealing with `cx({})` and legacy code
+
+Before making use of Aphrodite, we relied on className (`cx()`) module to conditionally apply styles:
+
+```jsx
+<div
+  className={cx({
+    mainClass: true, // mainClass will always be shown
+    // Below will be applied only if condition match
+    conditionalClass: this.canBeApplied && this.isValid})} />
+```
+
+At some point you can deal with classes using with `cx()` that can't be changed (maybe you're dealing with a child-component). For those cases, add another property to make use of Aphrodite, and leave it as-is until you can refactor the full component:
+
+
+```jsx
+<div
+  className={cx({
+    mainClass: true, // mainClass will always be shown
+    // Below will be applied only if condition match
+    conditionalClass: this.canBeApplied && this.isValid})} />
+    [css(styles.awesomeAphroditeStyleHere]: true
+```
+
+
+### Dealing with `font-awesome`
+
+Font awesome is a set of icons that we use across our app. Most of it is already replaced, but not all.
+
+If you have to include another icon, please put it under `global.js` file. This way we can check which icons we are really using, so we can replace as needed.
+
+```js
+// under global.js
+  appIcons: {
+    clipboard: 'fa fa-clipboard',
+    someIconYouNeed: 'fa fa-something'
+  }
+```
+
+The main gotcha of font-awesome is that it can't be included together with Aphrodite, consider the following case:
+
+```jsx
+// I have a span with font-awesome that I want to change colors
+
+// no-op.
+<span className={css(globalStyles.appIcons.clipboard, styles.makeItGreen)} />
+```
+
+That's because Aphrodite concatenate all strings after compiling, making `fa-` class useless.
+
+Once we have our own set of icons we can remove that, but for now you'll need to apply another element to have your icon:
+
+
+```jsx
+// I have a span with font-awesome that I want to change colors
+
+// works
+<span className={css(styles.makeItGreen)}>
+  <span className={globalStyles.appIcons.clipboard} />
+</span>
+```
+
+## Testing styled-components
 
 As styles are converted from LESS to Aphrodite, we will lose the ability to control the generated class names. This means for our webdriver tests will no longer be able to use class names as selectors. Instead we will be adding the attribute `data-test-id` to elements. This approach gives us the added benefit of differentiating between code meant for presentation and code meant for testing.
 
@@ -139,3 +528,7 @@ to:
 ```jsx
 <Button className={css(paymentButton)} data-test-id='paymentHistoryButton' l10nId={buttonText} onClick={onButtonClick.bind(this)} />
 ```
+
+## All set, where do I start?
+
+Please refer to our tag [`Refactoring/Aphrodite`](https://github.com/brave/browser-laptop/issues?q=is%3Aopen+is%3Aissue+label%3Arefactoring%2Faphrodite) for open issues. If you want to track what we are doing regarding it, please refer to our [Styles Refactor Task-Force](https://github.com/brave/browser-laptop/projects/7).

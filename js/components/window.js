@@ -5,6 +5,7 @@
 // Controller view which manages the top level immutable state for the app
 
 const React = require('react')
+const PropTypes = require('prop-types')
 const Immutable = require('immutable')
 const windowStore = require('../stores/windowStore')
 const appStoreRenderer = require('../stores/appStoreRenderer')
@@ -13,7 +14,7 @@ const appActions = require('../actions/appActions')
 const Main = require('./main')
 const cx = require('../lib/classSet')
 const {getPlatformStyles} = require('../../app/common/lib/platformUtil')
-const {currentWindowId} = require('../../app/renderer/currentWindow')
+const {getCurrentWindowId} = require('../../app/renderer/currentWindow')
 
 window.appActions = appActions
 
@@ -47,7 +48,7 @@ class Window extends React.Component {
       } else {
         this.props.frames.forEach((frame, i) => {
           if (frame.guestInstanceId) {
-            appActions.newWebContentsAdded(currentWindowId, frame)
+            appActions.newWebContentsAdded(getCurrentWindowId(), frame)
             return
           }
           appActions.createTabRequested({
@@ -74,7 +75,7 @@ class Window extends React.Component {
     // For Windows 10, this defaults to blue. When window
     // becomes inactive it needs to change to gray.
     if (classes['win10']) {
-      classes['inactive'] = !this.windowState.getIn(['ui', 'hasFocus'])
+      classes['inactive'] = !this.windowState.getIn(['ui', 'isFocused'])
     }
 
     return <div id='windowContainer' className={cx(classes)} >
@@ -84,7 +85,7 @@ class Window extends React.Component {
   }
 
   componentDidMount () {
-    appActions.windowReady(currentWindowId)
+    appActions.windowReady(getCurrentWindowId())
   }
 
   componentWillUnmount () {
@@ -117,6 +118,6 @@ class Window extends React.Component {
   }
 }
 
-Window.propTypes = { appState: React.PropTypes.object, frames: React.PropTypes.array, initWindowState: React.PropTypes.object }
+Window.propTypes = { appState: PropTypes.object, frames: PropTypes.array, initWindowState: PropTypes.object }
 
 module.exports = Window

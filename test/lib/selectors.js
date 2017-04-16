@@ -49,7 +49,7 @@ module.exports = {
   fpStat: '.braveryStat.fpStat',
   fpSwitch: '.fingerprintingProtectionSwitch .switchMiddle',
   noScriptSwitch: '.noScriptSwitch .switchMiddle',
-  noScriptNavButton: '#navigator .noScript',
+  noScriptNavButton: '[data-test-id="noScriptButton"]',
   noScriptInfo: '.noScriptInfo',
   noScriptAllowTempButton: '[data-l10n-id="allowScriptsTemp"]',
   noScriptAllowOnceButton: '[data-l10n-id="allowScriptsOnce"]',

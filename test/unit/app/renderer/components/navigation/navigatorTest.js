@@ -3,14 +3,14 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 /* global describe, before, after, it */
 
+require('../../../../braveUnit')
 const mockery = require('mockery')
 const {shallow} = require('enzyme')
 const assert = require('assert')
 const Immutable = require('immutable')
-let Main, NavigationBar
-require('../../braveUnit')
+let Navigator
 
-describe('Main component unit tests', function () {
+describe('Navigator component unit tests', function () {
   before(function () {
     mockery.enable({
       warnOnReplace: false,
@@ -23,14 +23,17 @@ describe('Main component unit tests', function () {
     mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_yes.svg', {})
     mockery.registerMock('../../extensions/brave/img/caret_down_grey.svg', 'caret_down_grey.svg')
     mockery.registerMock('../../extensions/brave/img/tabs/new_session.svg')
-    mockery.registerMock('electron', require('../../lib/fakeElectron'))
-    Main = require('../../../../js/components/main')
-    NavigationBar = require('../../../../js/components/navigationBar')
+    mockery.registerMock('../../../../img/url-bar-no-script.svg', {})
+    mockery.registerMock('electron', require('../../../../lib/fakeElectron'))
+    Navigator = require('../../../../../../app/renderer/components/navigation/navigator')
+    appStoreRenderer = require('../../../../../../js/stores/appStoreRenderer')
   })
 
   after(function () {
     mockery.disable()
   })
+
+  let appStoreRenderer = require('../../../../../../js/stores/appStoreRenderer')
 
   const windowState = Immutable.fromJS({
     activeFrameKey: 0,
@@ -56,15 +59,37 @@ describe('Main component unit tests', function () {
       tabId: 1,
       canGoBack: true,
       canGoForward: true
-    }]
+    }],
+    windows: []
   })
+
+  const customTitlebar = {
+    enabled: false,
+    captionButtonsVisible: false,
+    menubarVisible: false,
+    menubarTemplate: null,
+    menubarSelectedIndex: undefined,
+    contextMenuSelectedIndex: null,
+    lastFocusedSelector: undefined,
+    isMaximized: false
+  }
+
+  const activeTab = appState.getIn(['tabs', 0])
 
   describe('when user has history going forwards and backwards', function () {
     let wrapper
 
     before(function () {
+      appStoreRenderer.state = Immutable.fromJS(appState)
       wrapper = shallow(
-        <Main windowState={windowState} appState={appState} />
+        <Navigator
+          windowState={windowState}
+          appState={appState}
+          activeTab={activeTab}
+          shouldAllowWindowDrag={false}
+          customTitlebar={customTitlebar}
+          activeSiteSettings={null}
+        />
       )
     })
 
@@ -94,14 +119,17 @@ describe('Main component unit tests', function () {
         }
       })
 
+      appStoreRenderer.state = Immutable.fromJS(appState2)
       wrapper = shallow(
-        <Main windowState={windowState} appState={appState2} />
+        <Navigator
+          windowState={windowState}
+          appState={appState2}
+          activeTab={activeTab}
+          shouldAllowWindowDrag={false}
+          customTitlebar={customTitlebar}
+          activeSiteSettings={null}
+        />
       )
-    })
-
-    it('passes activeTabShowingMessageBox to NavigationBar', function () {
-      const navigationBar = wrapper.find(NavigationBar).node
-      assert.equal(navigationBar.props.activeTabShowingMessageBox, true)
     })
 
     it('disables both back/forward navigationButtonContainers', function () {
@@ -128,8 +156,16 @@ describe('Main component unit tests', function () {
     let instance
 
     before(function () {
+      appStoreRenderer.state = Immutable.fromJS(appState)
       let wrapper = shallow(
-        <Main windowState={windowState} appState={appState} />
+        <Navigator
+          windowState={windowState}
+          appState={appState}
+          activeTab={activeTab}
+          shouldAllowWindowDrag={false}
+          customTitlebar={customTitlebar}
+          activeSiteSettings={null}
+        />
       )
       instance = wrapper.instance()
     })

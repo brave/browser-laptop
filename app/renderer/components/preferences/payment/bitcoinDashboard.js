@@ -284,7 +284,7 @@ class BitcoinDashboard extends ImmutableComponent {
           ? <ModalOverlay
             title={'bitcoinBuy'}
             content={this.bitcoinOverlayContent()}
-            customTitleClasses={'coinbaseOverlay'}
+            customDialogClasses={'coinbaseOverlay'}
             emptyDialog
             onHide={this.props.hideOverlay.bind(this)}
           />
@@ -294,7 +294,7 @@ class BitcoinDashboard extends ImmutableComponent {
         this.props.qrcodeOverlayVisible
           ? <ModalOverlay
             content={this.qrcodeOverlayContent()}
-            customTitleClasses={'qrcodeOverlay'}
+            customDialogClasses={'qrcodeOverlay'}
             footer={this.qrcodeOverlayFooter()}
             onHide={this.props.hideQRcode.bind(this)}
           />

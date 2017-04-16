@@ -20,7 +20,7 @@ const dndData = require('../../../js/dndData')
 const calculateTextWidth = require('../../../js/lib/textCalculator').calculateTextWidth
 const windowStore = require('../../../js/stores/windowStore')
 const iconSize = require('../../common/lib/faviconUtil').iconSize
-const {currentWindowId} = require('../currentWindow')
+const {getCurrentWindowId} = require('../currentWindow')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('./styles/global')
@@ -92,7 +92,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
         appActions.draggedOver({
           draggingOverKey: this.props.bookmark,
           draggingOverType: dragTypes.BOOKMARK,
-          draggingOverWindowId: currentWindowId,
+          draggingOverWindowId: getCurrentWindowId(),
           expanded: true
         })
       }
@@ -105,7 +105,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
       appActions.draggedOver({
         draggingOverKey: this.props.bookmark,
         draggingOverType: dragTypes.BOOKMARK,
-        draggingOverWindowId: currentWindowId,
+        draggingOverWindowId: getCurrentWindowId(),
         expanded: false
       })
     }

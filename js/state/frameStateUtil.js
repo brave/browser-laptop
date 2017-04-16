@@ -7,6 +7,7 @@ const config = require('../constants/config')
 const {tabCloseAction} = require('../../app/common/constants/settingsEnums')
 const urlParse = require('../../app/common/urlParse')
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
+const {isIntermediateAboutPage} = require('../lib/appUrlUtil')
 
 const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
@@ -140,6 +141,35 @@ function getFrameByKey (windowState, key) {
   return find(windowState, {key})
 }
 
+function isFrameSecure (frame) {
+  frame = makeImmutable(frame)
+  if (frame && frame.getIn(['security', 'isSecure']) != null) {
+    return frame.getIn(['security', 'isSecure'])
+  } else {
+    return false
+  }
+}
+
+function isFrameLoading (frame) {
+  frame = makeImmutable(frame)
+  return frame && frame.get('loading')
+}
+
+function startLoadTime (frame) {
+  frame = makeImmutable(frame)
+  return frame && frame.get('startLoadTime')
+}
+
+function endLoadTime (frame) {
+  frame = makeImmutable(frame)
+  return frame && frame.get('endLoadTime')
+}
+
+function getHistory (frame) {
+  frame = makeImmutable(frame)
+  return (frame && frame.get('history')) || Immutable.fromJS([])
+}
+
 function isFrameKeyPinned (frames, key) {
   if (typeof key !== 'number') {
     return false
@@ -159,6 +189,27 @@ function getFrameByTabId (windowState, tabId) {
 function getActiveFrame (windowState) {
   const activeFrameIndex = getActiveFrameIndex(windowState)
   return windowState.get('frames').get(activeFrameIndex)
+}
+
+// Returns the same as the active frame's location, but returns the requested
+// URL if it's safe browsing, a cert error page or an error page.
+function getLastCommittedURL (frame) {
+  frame = makeImmutable(frame)
+  if (!frame) {
+    return undefined
+  }
+
+  let location = frame.get('location')
+  const history = getHistory(frame)
+  if (isIntermediateAboutPage(location)) {
+    const parsedUrl = urlParse(location)
+    if (parsedUrl.hash) {
+      location = parsedUrl.hash.split('#')[1]
+    } else if (history.size > 0) {
+      location = history.last()
+    }
+  }
+  return location
 }
 
 function setActiveFrameDisplayIndex (windowState, i) {
@@ -343,7 +394,7 @@ const tabFromFrame = (frame) => {
     isPrivate: frame.get('isPrivate'),
     partitionNumber: frame.get('partitionNumber'),
     frameKey: frame.get('key'),
-    loading: frame.get('loading'),
+    loading: isFrameLoading(frame),
     provisionalLocation: frame.get('provisionalLocation'),
     pinnedLocation: frame.get('pinnedLocation'),
     location: frame.get('location')
@@ -392,13 +443,6 @@ function addFrame (windowState, tabs, frameOpts, newKey, partitionNumber, active
   // Only add pin requests if it's not already added
   const isPinned = frameOpts.isPinned
   delete frameOpts.isPinned
-  if (isPinned) {
-    const alreadyPinnedFrameProps = frames.find((frame) =>
-      frame.get('pinnedLocation') === location && frame.get('partitionNumber') === partitionNumber)
-    if (alreadyPinnedFrameProps) {
-      return {}
-    }
-  }
 
   // TODO: longer term get rid of parentFrameKey completely instead of
   // calculating it here.
@@ -671,6 +715,11 @@ module.exports = {
   find,
   isAncestorFrameKey,
   isFrameKeyActive,
+  isFrameSecure,
+  isFrameLoading,
+  startLoadTime,
+  endLoadTime,
+  getHistory,
   isFrameKeyPinned,
   getNonPinnedFrameCount,
   isPrivatePartition,
@@ -719,5 +768,6 @@ module.exports = {
   activeFrameStatePath,
   frameStatePathForFrame,
   tabStatePath,
-  tabStatePathForFrame
+  tabStatePathForFrame,
+  getLastCommittedURL
 }

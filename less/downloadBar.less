@@ -11,6 +11,8 @@
   --download-bar-buttons: 22px;
 }
 
+@downloadItemHeight: 50px;
+
 .downloadsBar {
   user-select: none;
   box-sizing: border-box;
@@ -36,7 +38,7 @@
       display: flex;
       font-size: 11px;
       flex-direction: column;
-      height: 46px;
+      height: @downloadItemHeight;
       padding: 0 14px;
       position: relative;
       margin: auto var(--download-item-margin) auto 0;
@@ -44,7 +46,7 @@
       min-width: var(--download-item-width);
 
       &:hover {
-        height: 72px;
+        height: 73px;
         top: -23px;
 
         .downloadInfo .downloadArrow {
@@ -53,6 +55,7 @@
 
         .downloadProgress {
           bottom: 0;
+          height: 47px;
         }
       }
 
@@ -80,7 +83,7 @@
       }
 
       &.deleteConfirmationVisible:hover {
-        height: 97px;
+        height: 108px;
         top: -58px;
       }
 
@@ -90,8 +93,8 @@
         left: 0;
         opacity: 0.5;
         position: absolute;
-        height: 35px;
         width: 100%;
+        height: 100%;
       }
 
       .downloadInfo {
@@ -110,12 +113,9 @@
           margin: auto 0 auto auto;
         }
 
-        .isSecure {
-          color: #15b106;
-        }
-
         .isInsecure {
-          color: red;
+          color: @siteInsecureColor;
+          margin-right: 2px;
         }
 
         >span {
@@ -125,7 +125,7 @@
       }
 
       .downloadActions {
-        margin: auto 0;
+        margin: 8px 0 0;
         .browserButton {
           font-size: 14px;
           height: auto;

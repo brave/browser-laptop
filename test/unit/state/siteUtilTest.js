@@ -1259,6 +1259,14 @@ describe('siteUtil', function () {
       })
       assert.equal(siteUtil.isHistoryEntry(siteDetail), true)
     })
+    it('returns false for a default site', function () {
+      const siteDetail = Immutable.fromJS({
+        location: testUrl1,
+        tags: [siteTags.DEFAULT],
+        lastAccessedTime: 1
+      })
+      assert.equal(siteUtil.isHistoryEntry(siteDetail), false)
+    })
     it('returns false for a bookmark entry with falsey lastAccessedTime', function () {
       const siteDetail = Immutable.fromJS({
         location: testUrl1,
@@ -1277,7 +1285,7 @@ describe('siteUtil', function () {
     it('returns false for a brave default site', function () {
       const siteDetail = Immutable.fromJS({
         location: testUrl1,
-        tags: ['default'],
+        tags: [siteTags.DEFAULT],
         lastAccessedTime: 1
       })
       assert.equal(siteUtil.isHistoryEntry(siteDetail), false)
@@ -1292,6 +1300,41 @@ describe('siteUtil', function () {
         lastAccessedTime: 123
       })
       assert.equal(siteUtil.isHistoryEntry(siteDetail), false)
+    })
+  })
+
+  describe('isDefaultEntry', function () {
+    it('returns false for history entry which has lastAccessedTime', function () {
+      const siteDetail = Immutable.fromJS({
+        location: 'https://brave.com/',
+        tags: [siteTags.DEFAULT],
+        lastAccessedTime: 123
+      })
+      assert.equal(siteUtil.isDefaultEntry(siteDetail), false)
+    })
+    it('returns false for bookmark entry', function () {
+      const siteDetail = Immutable.fromJS({
+        location: 'https://brave.com/',
+        tags: [siteTags.BOOKMARK],
+        lastAccessedTime: 1
+      })
+      assert.equal(siteUtil.isDefaultEntry(siteDetail), false)
+    })
+    it('returns false for entry without lastAccessedTime', function () {
+      const siteDetail = Immutable.fromJS({
+        location: 'https://brave.com/',
+        tags: [siteTags.DEFAULT]
+      })
+      assert.equal(siteUtil.isDefaultEntry(siteDetail), false)
+    })
+    it('returns true for default entry', function () {
+      const siteDetail = Immutable.fromJS({
+        tags: [siteTags.DEFAULT],
+        lastAccessedTime: 1,
+        objectId: [210, 115, 31, 176, 57, 212, 167, 120, 104, 88, 88, 27, 141, 36, 235, 226],
+        location: testUrl1
+      })
+      assert.equal(siteUtil.isDefaultEntry(siteDetail), true)
     })
   })
 

@@ -13,7 +13,7 @@ const windowStore = require('../stores/windowStore')
 const dragTypes = require('../constants/dragTypes')
 const cx = require('../lib/classSet')
 const contextMenus = require('../contextMenus')
-const {currentWindowId} = require('../../app/renderer/currentWindow')
+const {getCurrentWindowId} = require('../../app/renderer/currentWindow')
 
 const LongPressButton = require('./longPressButton')
 const Tab = require('./tab')
@@ -64,7 +64,7 @@ class Tabs extends ImmutableComponent {
   }
 
   onDrop (e) {
-    appActions.dataDropped(currentWindowId)
+    appActions.dataDropped(getCurrentWindowId())
     const clientX = e.clientX
     const sourceDragData = dndData.getDragData(e.dataTransfer, dragTypes.TAB)
     if (sourceDragData) {
@@ -79,7 +79,7 @@ class Tabs extends ImmutableComponent {
 
           // If this is a different window ID than where the drag started, then
           // the tear off will be done by tab.js
-          if (this.props.dragData.get('windowId') !== currentWindowId) {
+          if (this.props.dragData.get('windowId') !== getCurrentWindowId()) {
             return
           }
 

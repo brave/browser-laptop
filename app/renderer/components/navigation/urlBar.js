@@ -3,30 +3,41 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const urlParse = require('../../common/urlParse')
 
-const ImmutableComponent = require('../../../js/components/immutableComponent')
-const windowActions = require('../../../js/actions/windowActions')
-const appActions = require('../../../js/actions/appActions')
-const KeyCodes = require('../../common/constants/keyCodes')
-const cx = require('../../../js/lib/classSet')
-const debounce = require('../../../js/lib/debounce')
+const ReduxComponent = require('../reduxComponent')
+const {StyleSheet, css} = require('aphrodite')
+const Immutable = require('immutable')
+
+const windowActions = require('../../../../js/actions/windowActions')
+const appActions = require('../../../../js/actions/appActions')
+const urlParse = require('../../../common/urlParse')
+const KeyCodes = require('../../../common/constants/keyCodes')
+const cx = require('../../../../js/lib/classSet')
+const debounce = require('../../../../js/lib/debounce')
 const ipc = require('electron').ipcRenderer
 
 const UrlBarSuggestions = require('./urlBarSuggestions')
 const UrlBarIcon = require('./urlBarIcon')
-const messages = require('../../../js/constants/messages')
-const {getSetting} = require('../../../js/settings')
-const settings = require('../../../js/constants/settings')
-const contextMenus = require('../../../js/contextMenus')
-const windowStore = require('../../../js/stores/windowStore')
-const UrlUtil = require('../../../js/lib/urlutil')
-const {eventElHasAncestorWithClasses, isForSecondaryAction} = require('../../../js/lib/eventUtil')
-const {isUrl, isIntermediateAboutPage} = require('../../../js/lib/appUrlUtil')
+const messages = require('../../../../js/constants/messages')
+const siteSettings = require('../../../../js/state/siteSettings')
+const {getSetting} = require('../../../../js/settings')
+const settings = require('../../../../js/constants/settings')
+const contextMenus = require('../../../../js/contextMenus')
+const UrlUtil = require('../../../../js/lib/urlutil')
+const {eventElHasAncestorWithClasses, isForSecondaryAction} = require('../../../../js/lib/eventUtil')
+const {getBaseUrl, isUrl, isIntermediateAboutPage} = require('../../../../js/lib/appUrlUtil')
+const {getCurrentWindowId} = require('../../currentWindow')
 
-class UrlBar extends ImmutableComponent {
-  constructor () {
-    super()
+// Icons
+const iconNoScript = require('../../../../img/url-bar-no-script.svg')
+
+// State
+const frameStateUtil = require('../../../../js/state/frameStateUtil')
+const tabState = require('../../../common/state/tabState')
+
+class UrlBar extends React.Component {
+  constructor (props) {
+    super(props)
     this.onFocus = this.onFocus.bind(this)
     this.onBlur = this.onBlur.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
@@ -37,44 +48,17 @@ class UrlBar extends ImmutableComponent {
     this.onContextMenu = this.onContextMenu.bind(this)
     this.keyPressed = false
     this.showAutocompleteResult = debounce(() => {
-      if (!this.urlInput || this.keyPressed || this.locationValue.length === 0) {
+      if (!this.urlInput || this.keyPressed || this.props.locationValue.length === 0) {
         return
       }
-      const suffixLen = this.locationValueSuffix.length
-      if (suffixLen > 0 && this.urlInput.value !== this.locationValue + this.locationValueSuffix) {
-        this.setValue(this.locationValue, this.locationValueSuffix)
-        const len = this.locationValue.length
+      const suffixLen = this.props.locationValueSuffix.length
+      if (suffixLen > 0 && this.urlInput.value !== this.props.locationValue + this.props.locationValueSuffix) {
+        this.setValue(this.props.locationValue, this.props.locationValueSuffix)
+        const len = this.props.locationValue.length
         this.urlInput.setSelectionRange(len, len + suffixLen)
       }
     }, 10)
-  }
-
-  get locationValueSuffix () {
-    return this.activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix'])
-  }
-
-  get activeFrame () {
-    return windowStore.getFrame(this.props.activeFrameKey)
-  }
-
-  get isActive () {
-    return this.props.urlbar.get('active')
-  }
-
-  isSelected () {
-    return this.props.urlbar.get('selected')
-  }
-
-  isFocused () {
-    return this.props.urlbar.get('focused')
-  }
-
-  get activateSearchEngine () {
-    return this.props.urlbar.getIn(['searchDetail', 'activateSearchEngine'])
-  }
-
-  get searchSelectEntry () {
-    return this.props.urlbar.get('searchDetail')
+    this.onNoScript = this.onNoScript.bind(this)
   }
 
   // restores the url bar to the current location
@@ -84,36 +68,6 @@ class UrlBar extends ImmutableComponent {
       this.setValue(location)
     }
     windowActions.setNavBarUserInput(location)
-  }
-
-  // Temporarily disable the autocomplete when a user is pressing backspace.
-  // Otherwise, they'd have to hit backspace twice for each character they wanted
-  // to delete.
-  hideAutoComplete () {
-    if (this.autocompleteEnabled) {
-      windowActions.urlBarAutocompleteEnabled(false)
-    }
-    windowActions.setUrlBarSuggestions(undefined, null)
-    windowActions.setRenderUrlBarSuggestions(false)
-  }
-
-  /**
-   * Assign client ID based on user's os/platform.
-   * `platformClientId` must be populated for this entry in `searchProviders.js`.
-   */
-  getPlatformClientId (provider) {
-    try {
-      if (provider.get('platformClientId')) {
-        const platformUtil = require('../../common/lib/platformUtil')
-        if (platformUtil.isWindows()) {
-          return provider.getIn(['platformClientId', 'win32']) || ''
-        } else if (platformUtil.isDarwin()) {
-          return provider.getIn(['platformClientId', 'darwin']) || ''
-        }
-        return provider.getIn(['platformClientId', 'linux']) || ''
-      }
-    } catch (e) { }
-    return ''
   }
 
   /**
@@ -126,53 +80,36 @@ class UrlBar extends ImmutableComponent {
    * - http verb
    */
   buildSearchUrl (searchTerms) {
-    let provider = this.props.searchDetail.toJS()
-    let url = provider.searchURL
-
-    // remove shortcut from the search terms
-    if (this.activateSearchEngine && this.searchSelectEntry !== null) {
-      provider = this.searchSelectEntry
-      const shortcut = new RegExp('^' + provider.get('shortcut') + ' ', 'g')
-      searchTerms = searchTerms.replace(shortcut, '')
-      url = provider.get('search')
-    }
-
-    // required: populate the search terms (URL encoded)
-    url = url.replace('{searchTerms}',
-      encodeURIComponent(searchTerms))
-
-    // optional: populate the client id
-    // some search engines have a different clientId depending on the platform
-    if (url.indexOf('{platformClientId}') > -1) {
-      url = url.replace('{platformClientId}',
-        this.getPlatformClientId(provider))
-    }
-    return url
+    searchTerms = searchTerms.replace(this.props.searchShortcut, '')
+    return this.props.searchURL.replace('{searchTerms}', encodeURIComponent(searchTerms))
   }
 
-  get suggestionList () {
-    return this.props.urlbar.getIn(['suggestions', 'suggestionList'])
-  }
-
-  get selectedIndex () {
-    return this.props.urlbar.getIn(['suggestions', 'selectedIndex'])
+  // Temporarily disable the autocomplete when a user is pressing backspace.
+  // Otherwise, they'd have to hit backspace twice for each character they wanted
+  // to delete.
+  hideAutoComplete () {
+    if (this.props.autocompleteEnabled) {
+      windowActions.urlBarAutocompleteEnabled(false)
+    }
+    windowActions.setUrlBarSuggestions(undefined, null)
+    windowActions.setRenderUrlBarSuggestions(false)
   }
 
   get activeIndex () {
-    if (this.suggestionList === null) {
+    if (this.props.suggestionList === null) {
       return -1
     }
-    return this.selectedIndex
+    return this.props.selectedIndex
   }
 
   onKeyDown (e) {
-    if (!this.isActive) {
+    if (!this.props.isActive) {
       windowActions.setUrlBarActive(true)
     }
     switch (e.keyCode) {
       case KeyCodes.ENTER:
         e.preventDefault()
-        let location = this.urlInput ? this.urlInput.value : this.props.urlbar.get('location')
+        let location = this.urlInput ? this.urlInput.value : this.props.urlbarLocation
 
         if (location === null || location.length === 0) {
           windowActions.setUrlBarSelected(true)
@@ -181,10 +118,10 @@ class UrlBar extends ImmutableComponent {
           location = location.replace(/^(\s*javascript:)+/i, '')
           const isLocationUrl = isUrl(location)
           if (!isLocationUrl && e.ctrlKey) {
-            appActions.loadURLRequested(this.activeFrame.get('tabId'), `www.${location}.com`)
+            appActions.loadURLRequested(this.props.activeTabId, `www.${location}.com`)
           } else if (this.shouldRenderUrlBarSuggestions &&
               ((typeof this.activeIndex === 'number' && this.activeIndex >= 0) ||
-              (this.locationValueSuffix && this.autocompleteEnabled))) {
+              (this.props.locationValueSuffix && this.props.autocompleteEnabled))) {
             // Hack to make alt enter open a new tab for url bar suggestions when hitting enter on them.
             const isDarwin = process.platform === 'darwin'
             if (e.altKey) {
@@ -210,7 +147,7 @@ class UrlBar extends ImmutableComponent {
                 active: !!e.shiftKey
               })
             } else {
-              appActions.loadURLRequested(this.activeFrame.get('tabId'), location)
+              appActions.loadURLRequested(this.props.activeTabId, location)
             }
           }
         }
@@ -237,9 +174,9 @@ class UrlBar extends ImmutableComponent {
         break
       case KeyCodes.DELETE:
         if (e.shiftKey) {
-          const selectedIndex = this.locationValueSuffix.length > 0 ? 1 : this.activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])
+          const selectedIndex = this.props.locationValueSuffix.length > 0 ? 1 : this.props.selectedIndex
           if (selectedIndex !== undefined) {
-            const suggestionLocation = this.activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'suggestionList', selectedIndex - 1]).location
+            const suggestionLocation = this.props.suggestion.location
             appActions.removeSite({ location: suggestionLocation })
           }
         } else {
@@ -263,14 +200,14 @@ class UrlBar extends ImmutableComponent {
         this.keyPressed = true
         windowActions.setRenderUrlBarSuggestions(true)
         // Any other keydown is fair game for autocomplete to be enabled.
-        if (!this.autocompleteEnabled) {
+        if (!this.props.autocompleteEnabled) {
           windowActions.urlBarAutocompleteEnabled(true)
         }
     }
   }
 
   onClick (e) {
-    if (this.isSelected()) {
+    if (this.props.isSelected) {
       windowActions.setUrlBarActive(true)
     }
   }
@@ -278,9 +215,7 @@ class UrlBar extends ImmutableComponent {
   onBlur (e) {
     // We intentionally do not setUrlBarFocused(false) here because
     // that state is for managing when it should be set if it is active.
-    if (!this.isActive) {
-      windowActions.setNavBarUserInput(e.target.value)
-    }
+    windowActions.setNavBarUserInput(e.target.value)
 
     if (!eventElHasAncestorWithClasses(e, ['urlBarSuggestions', 'urlbarForm'])) {
       this.updateLocationToSuggestion()
@@ -288,15 +223,15 @@ class UrlBar extends ImmutableComponent {
   }
 
   updateLocationToSuggestion () {
-    if (this.locationValueSuffix.length > 0) {
-      windowActions.setNavBarUserInput(this.locationValue + this.locationValueSuffix)
+    if (this.props.locationValueSuffix.length > 0) {
+      windowActions.setNavBarUserInput(this.props.locationValue + this.props.locationValueSuffix)
     }
   }
 
   get suggestionLocation () {
-    const selectedIndex = this.activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])
+    const selectedIndex = this.props.selectedIndex
     if (typeof selectedIndex === 'number') {
-      const suggestion = this.activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'suggestionList', selectedIndex - 1])
+      const suggestion = this.props.suggestion
       if (suggestion) {
         return suggestion.location
       }
@@ -346,11 +281,11 @@ class UrlBar extends ImmutableComponent {
       case KeyCodes.ESC:
         return
     }
-    if (this.isSelected()) {
+    if (this.props.isSelected) {
       windowActions.setUrlBarSelected(false)
     }
     // We never want to set the full navbar user input to include the suffix
-    if (this.locationValue + this.locationValueSuffix !== e.target.value) {
+    if (this.props.locationValue + this.props.locationValueSuffix !== e.target.value) {
       windowActions.setNavBarUserInput(this.lastVal)
     }
     this.keyPressed = false
@@ -399,9 +334,9 @@ class UrlBar extends ImmutableComponent {
     if (this.urlInput) {
       if (this.props.activeFrameKey !== prevProps.activeFrameKey) {
         // The user just changed tabs
-        this.setValue(UrlUtil.getDisplayLocation(this.props.urlbar.get('location'), getSetting(settings.PDFJS_ENABLED)))
+        this.setValue(this.props.locationValue)
         // Each tab has a focused state stored separately
-        if (this.isFocused()) {
+        if (this.props.isFocused) {
           this.focus()
         }
         windowActions.setUrlBarSuggestions(undefined, null)
@@ -409,21 +344,27 @@ class UrlBar extends ImmutableComponent {
       } else if (this.props.location !== prevProps.location) {
         // This is a url nav change
         this.setValue(UrlUtil.getDisplayLocation(this.props.location, getSetting(settings.PDFJS_ENABLED)))
-      } else if (this.props.hasLocationValueSuffix && this.isActive &&
+      } else if (this.props.hasLocationValueSuffix && this.props.isActive &&
         (this.props.hasLocationValueSuffix !== prevProps.hasLocationValueSuffix ||
-         this.props.urlbar.get('location') !== prevProps.urlbar.get('location'))) {
+         this.props.urlbarLocation !== prevProps.urlbarLocation)) {
         this.showAutocompleteResult()
       } else if ((this.props.titleMode !== prevProps.titleMode) ||
-          (!this.isActive && !this.isFocused)) {
-        this.setValue(this.locationValue)
-      } else if (this.props.urlbar.get('location') !== prevProps.urlbar.get('location') &&
-          this.urlInput.value !== this.props.urlbar.get('location')) {
-        this.setValue(this.locationValue)
+          (!this.props.isActive && !this.props.isFocused)) {
+        this.setValue(this.props.locationValue)
+      } else if (this.props.urlbarLocation !== prevProps.urlbarLocation &&
+          this.urlInput.value !== this.props.urlbarLocation) {
+        this.setValue(this.props.locationValue)
       }
     }
-    if (this.isSelected() && !prevProps.urlbar.get('selected')) {
+
+    if (this.props.isSelected && !prevProps.isSelected) {
       this.select()
       windowActions.setUrlBarSelected(false)
+    }
+
+    if (this.props.noScriptIsVisible && !this.showNoScriptInfo) {
+      // There are no blocked scripts, so hide the noscript dialog.
+      windowActions.setNoScriptVisible(false)
     }
   }
 
@@ -437,22 +378,8 @@ class UrlBar extends ImmutableComponent {
   get titleValue () {
     // For about:newtab we don't want the top of the browser saying New Tab
     // Instead just show "Brave"
-    return ['about:blank', 'about:newtab'].includes(this.props.urlbar.get('location'))
+    return ['about:blank', 'about:newtab'].includes(this.props.urlbarLocation)
       ? '' : this.props.title
-  }
-
-  get autocompleteEnabled () {
-    return this.props.urlbar.getIn(['suggestions', 'autocompleteEnabled'])
-  }
-
-  get locationValue () {
-    const location = this.props.urlbar.get('location')
-    const history = this.props.history
-    if (isIntermediateAboutPage(location) && history.size > 0 && !this.props.canGoForward) {
-      return history.last()
-    }
-
-    return UrlUtil.getDisplayLocation(location, getSetting(settings.PDFJS_ENABLED))
   }
 
   get loadTime () {
@@ -477,12 +404,93 @@ class UrlBar extends ImmutableComponent {
   }
 
   get shouldRenderUrlBarSuggestions () {
-    return this.props.urlbar.getIn(['suggestions', 'shouldRender']) === true &&
-      this.suggestionList && this.suggestionList.size > 0
+    return this.props.shouldRender === true &&
+      this.props.suggestionList && this.props.suggestionList.size > 0
+  }
+
+  get showNoScriptInfo () {
+    return this.props.enableNoScript && this.props.scriptsBlocked && this.props.scriptsBlocked.size
+  }
+
+  onNoScript () {
+    windowActions.setNoScriptVisible(!this.props.noScriptIsVisible)
   }
 
   onContextMenu (e) {
-    contextMenus.onUrlBarContextMenu(this.props.searchDetail, this.activeFrame, e)
+    contextMenus.onUrlBarContextMenu(e)
+  }
+
+  mergeProps (state, dispatchProps, ownProps) {
+    const windowState = state.get('currentWindow')
+    const activeFrame = frameStateUtil.getActiveFrame(windowState) || Immutable.Map()
+    const activeTabId = tabState.getActiveTabId(state, getCurrentWindowId())
+
+    const location = activeFrame.get('location') || ''
+    const baseUrl = getBaseUrl(location)
+    const urlbar = activeFrame.getIn(['navbar', 'urlbar']) || Immutable.Map()
+    const history = (activeFrame.get('history') || new Immutable.List())
+    const canGoForward = activeTabId === tabState.TAB_ID_NONE ? false : tabState.canGoForward(state, activeTabId)
+    const urlbarLocation = urlbar.get('location')
+    const locationValue = (isIntermediateAboutPage(urlbarLocation) && history.size() > 0 && !canGoForward)
+        ? history.last() : UrlUtil.getDisplayLocation(urlbarLocation, getSetting(settings.PDFJS_ENABLED))
+    const selectedIndex = activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])
+
+    // TODO(bridiver) - these definitely needs a helpers
+    const publisherId = state.getIn(['locationInfo', baseUrl, 'publisher'])
+    const hostPattern = UrlUtil.getHostPattern(publisherId)
+    const hostSettings = siteSettings.getSiteSettingsForHostPattern(state.get('settings'), hostPattern)
+    const ledgerPaymentsShown = hostSettings && hostSettings.get('ledgerPaymentsShown')
+    const visiblePublisher = typeof ledgerPaymentsShown === 'boolean' ? ledgerPaymentsShown : true
+    const isPublisherButtonEnabled = getSetting(settings.PAYMENTS_ENABLED) &&
+        UrlUtil.isHttpOrHttps(location) && visiblePublisher
+
+    const activateSearchEngine = urlbar.getIn(['searchDetail', 'activateSearchEngine'])
+    const urlbarSearchDetail = urlbar.get('searchDetail')
+    let searchURL = windowState.getIn(['searchDetail', 'searchURL'])
+    let searchShortcut = ''
+    // remove shortcut from the search terms
+    if (activateSearchEngine && urlbarSearchDetail !== null) {
+      const provider = urlbarSearchDetail
+      searchShortcut = new RegExp('^' + provider.get('shortcut') + ' ', 'g')
+      searchURL = provider.get('search')
+    }
+
+    const props = {}
+
+    props.activeTabId = activeTabId
+    props.activeFrameKey = activeFrame.get('key')
+    props.location = location
+    props.title = activeFrame.get('title') || ''
+    props.scriptsBlocked = activeFrame.getIn(['noScript', 'blocked'])
+    props.isSecure = activeFrame.getIn(['security', 'isSecure'])
+    props.hasLocationValueSuffix = activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix'])
+    props.startLoadTime = activeFrame.get('startLoadTime')
+    props.endLoadTime = activeFrame.get('endLoadTime')
+    props.loading = activeFrame.get('loading')
+    props.enableNoScript = ownProps.enableNoScript
+    props.noScriptIsVisible = windowState.getIn(['ui', 'noScriptInfo', 'isVisible']) || false
+    props.menubarVisible = ownProps.menubarVisible
+    props.activeTabShowingMessageBox = tabState.isShowingMessageBox(state, activeTabId)
+    props.noBorderRadius = isPublisherButtonEnabled
+    props.onStop = ownProps.onStop
+    props.titleMode = ownProps.titleMode
+    props.locationValue = locationValue
+    props.locationValueSuffix = activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix'])
+    props.selectedIndex = selectedIndex
+    props.suggestionList = urlbar.getIn(['suggestions', 'suggestionList'])
+    props.suggestion = activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'suggestionList', selectedIndex - 1])
+    props.shouldRender = urlbar.getIn(['suggestions', 'shouldRender'])
+    props.urlbarLocation = urlbarLocation
+    props.isActive = urlbar.get('active')
+    props.isSelected = urlbar.get('selected')
+    props.isFocused = urlbar.get('focused')
+    props.activateSearchEngine = activateSearchEngine
+    props.searchSelectEntry = urlbarSearchDetail
+    props.autocompleteEnabled = urlbar.getIn(['suggestions', 'autocompleteEnabled'])
+    props.searchURL = searchURL
+    props.searchShortcut = searchShortcut
+
+    return props
   }
 
   render () {
@@ -496,16 +504,16 @@ class UrlBar extends ImmutableComponent {
       ref='urlbar'>
       <div className='urlbarIconContainer'>
         <UrlBarIcon
-          activateSearchEngine={this.activateSearchEngine}
-          active={this.props.urlbar.get('active')}
+          activateSearchEngine={this.props.activateSearchEngine}
+          active={this.props.isActive}
           isSecure={this.props.isSecure}
           isHTTPPage={this.isHTTPPage}
           loading={this.props.loading}
           location={this.props.location}
-          searchSelectEntry={this.searchSelectEntry}
+          searchSelectEntry={this.props.searchSelectEntry}
           title={this.props.title}
           titleMode={this.props.titleMode}
-          isSearching={this.props.location !== this.props.urlbar.get('location')}
+          isSearching={this.props.location !== this.props.urlbarLocation}
           activeTabShowingMessageBox={this.props.activeTabShowingMessageBox}
         />
       </div>
@@ -542,15 +550,25 @@ class UrlBar extends ImmutableComponent {
         ? null
         : <span className={cx({
           'loadTime': true,
-          'onFocus': this.props.urlbar.get('active')
+          'onFocus': this.props.isActive
         })}>{this.loadTime}</span>
       }
-
+      {
+        !this.showNoScriptInfo
+        ? null
+        : <span className={css(styles.noScriptContainer)}>
+          <button
+            data-l10n-id='noScriptButton'
+            data-test-id='noScriptButton'
+            className={css(styles.noScriptButton)}
+            onClick={this.onNoScript} />
+        </span>
+      }
       {
           this.shouldRenderUrlBarSuggestions
           ? <UrlBarSuggestions
-            selectedIndex={this.props.urlbar.getIn(['suggestions', 'selectedIndex'])}
-            suggestionList={this.props.urlbar.getIn(['suggestions', 'suggestionList'])}
+            selectedIndex={this.props.selectedIndex}
+            suggestionList={this.props.suggestionList}
             hasLocationValueSuffix={this.props.hasLocationValueSuffix}
             menubarVisible={this.props.menubarVisible} />
           : null
@@ -559,4 +577,20 @@ class UrlBar extends ImmutableComponent {
   }
 }
 
-module.exports = UrlBar
+const styles = StyleSheet.create({
+  noScriptContainer: {
+    display: 'flex',
+    paddingLeft: '5px',
+    marginRight: '-3px',
+    WebkitAppRegion: 'drag'
+  },
+  noScriptButton: {
+    WebkitAppRegion: 'no-drag',
+    backgroundImage: `url(${iconNoScript})`,
+    width: '14px',
+    height: '14px',
+    border: '0px'
+  }
+})
+
+module.exports = ReduxComponent.connect(UrlBar)

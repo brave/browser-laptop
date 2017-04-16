@@ -10,6 +10,9 @@ const messages = require('../constants/messages')
 const appActions = require('../actions/appActions')
 const getOrigin = require('../state/siteUtil').getOrigin
 
+const cx = require('../lib/classSet')
+const Button = require('./button')
+
 const {StyleSheet, css} = require('aphrodite/no-important')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
 
@@ -40,7 +43,11 @@ class NotificationItem extends ImmutableComponent {
     let i = 0
     const options = this.props.detail.get('options')
     const greeting = this.props.detail.get('greeting')
-    return <div className={css(commonStyles.notificationBar__notificationItem) + ' ' + 'notificationItem' + ' ' + (options.get('style') || '')}>
+    return <div className={cx({
+      notificationItem: true,
+      [css(commonStyles.notificationBar__notificationItem)]: true,
+      [options.get('style')]: options.get('style')
+    })}>
       <div className={css(styles.flexJustifyBetween, styles.flexAlignCenter)}>
         <div className={css(styles.marginRight)}>
           {
@@ -68,10 +75,15 @@ class NotificationItem extends ImmutableComponent {
           }
           {
             this.props.detail.get('buttons').map((button) =>
-              <button
-                type='button'
-                className={'browserButton' + ' ' + css(commonStyles.notificationItem__button) + ' ' + (button.get('className') || 'whiteButton')}
-                onClick={this.clickHandler.bind(this, i++)}>{button.get('text')}</button>
+              <Button className={cx({
+                [css(commonStyles.notificationItem__button)]: true,
+                [button.get('className')]: button.get('className'),
+                whiteButton: !button.get('className')
+              })}
+                testId='notificationButton'
+                label={button.get('text')}
+                onClick={this.clickHandler.bind(this, i++)}
+              />
             )
           }
         </span>

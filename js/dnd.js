@@ -10,7 +10,7 @@ const dragTypes = require('./constants/dragTypes')
 const siteTags = require('./constants/siteTags')
 const siteUtil = require('./state/siteUtil')
 const appStoreRenderer = require('./stores/appStoreRenderer')
-const {currentWindowId} = require('../app/renderer/currentWindow')
+const {getCurrentWindowId} = require('../app/renderer/currentWindow')
 
 let isDraggingInsideWindow = false
 
@@ -44,7 +44,7 @@ module.exports.onDragStart = (dragType, data, e) => {
   if (dragType === dragTypes.BOOKMARK) {
     dndData.setupDataTransferURL(e.dataTransfer, data.get('location'), data.get('customTitle') || data.get('title'))
   }
-  appActions.dragStarted(currentWindowId, dragType, data)
+  appActions.dragStarted(getCurrentWindowId(), dragType, data)
 }
 
 module.exports.onDragEnd = (dragType, key) => {
@@ -66,7 +66,7 @@ module.exports.onDragOver = (dragType, sourceBoundingRect, draggingOverKey, drag
       draggingOverType: dragType,
       draggingOverLeftHalf: false,
       draggingOverRightHalf: false,
-      draggingOverWindowId: currentWindowId
+      draggingOverWindowId: getCurrentWindowId()
     })
     return
   }
@@ -82,7 +82,7 @@ module.exports.onDragOver = (dragType, sourceBoundingRect, draggingOverKey, drag
       draggingOverType: dragType,
       draggingOverLeftHalf: true,
       draggingOverRightHalf: false,
-      draggingOverWindowId: currentWindowId
+      draggingOverWindowId: getCurrentWindowId()
     })
     windowActions.setContextMenuDetail()
   } else if (e.clientX < sourceBoundingRect.right && e.clientX >= sourceBoundingRect.left + (sourceBoundingRect.width / 5) &&
@@ -92,7 +92,7 @@ module.exports.onDragOver = (dragType, sourceBoundingRect, draggingOverKey, drag
       draggingOverType: dragType,
       draggingOverLeftHalf: false,
       draggingOverRightHalf: true,
-      draggingOverWindowId: currentWindowId
+      draggingOverWindowId: getCurrentWindowId()
     })
     windowActions.setContextMenuDetail()
   }

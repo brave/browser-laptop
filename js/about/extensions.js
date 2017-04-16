@@ -12,6 +12,7 @@ const aboutActions = require('./aboutActions')
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../../app/renderer/components/styles/global')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
+const { bravifyText } = require('../../app/renderer/lib/extensionsUtil')
 
 const ipc = window.chrome.ipcRenderer
 
@@ -19,7 +20,6 @@ const ipc = window.chrome.ipcRenderer
 require('../../less/about/common.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
-const bravifyText = (text) => text.replace(/Google Chrome/g, 'Brave')
 class ExtensionItem extends ImmutableComponent {
   constructor () {
     super()
@@ -59,7 +59,7 @@ class ExtensionItem extends ImmutableComponent {
         <span className={css(styles.extensionVersion)}>{this.props.extension.get('version')}</span>
         {
           !['__MSG_extDescriptionGoogleChrome__', '__MSG_appDesc__'].includes(this.props.extension.get('description'))
-          ? <div data-test-id='extensionDescription'>{bravifyText(this.props.extension.get('description'))}</div>
+          ? <div data-test-id='extensionDescription' data-l10n-id={this.props.extension.get('description')} />
           : null
         }
         <div className='extensionPath'><span data-l10n-id='extensionPathLabel' /> <span>{this.props.extension.get('base_path')}</span></div>
@@ -95,11 +95,11 @@ class AboutExtensions extends React.Component {
       if (!detail) {
         return
       }
-      const extensions = Object.keys(detail.extensions)
+      const extensions = Object.keys(detail)
         // Exclude the Brave Extension becuase it looks strange in this list
         .filter((extensionID) => extensionID !== 'mnojpmjdmbbfmejpflffifhffcmidifd')
         // Sort enabled things first
-        .map((extensionID) => detail.extensions[extensionID])
+        .map((extensionID) => detail[extensionID])
         .sort((extension, extension2) => (extension2.enabled || false) - (extension.enabled || false))
       this.setState({
         extensions: Immutable.fromJS(extensions)

@@ -35,9 +35,10 @@ const navigationAborted = (state, action) => {
   if (frame) {
     let location = action.location || frame.get('provisionalLocation')
     if (location) {
+      const frameStatePath = frameStatePathForFrame(state, frame)
       location = getLocation(location)
-      state = updateNavBarInput(state, location)
-      state = state.mergeIn(frameStatePathForFrame(state, frame), {
+      state = updateNavBarInput(state, location, frameStatePath)
+      state = state.mergeIn(frameStatePath, {
         location
       })
     }

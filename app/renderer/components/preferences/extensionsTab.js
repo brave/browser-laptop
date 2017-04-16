@@ -76,10 +76,13 @@ class ExtensionsTab extends ImmutableComponent {
           onChangeSetting={this.props.onChangeSetting} />
       },
       { // Exclude option
+        /* TODO @cezaraugusto reenable it once we can be able
+         * to recover from an excluded->re-enabled extension state
         html: !extension.get('isDummy') && !isBuiltInExtension(extension.get('id'))
         ? <div className={globalStyles.appIcons.trash}
           onClick={this.onRemoveExtension.bind(this, extension.get('id'))} />
         : <span data-l10n-id={isBuiltInExtension(extension.get('id')) ? 'integrated' : 'notInstalled'} />
+        */
       }
     ]
   }
@@ -90,8 +93,8 @@ class ExtensionsTab extends ImmutableComponent {
       css(styles.extensionsColumn),
       css(styles.extensionsColumn),
       css(styles.extensionsColumn),
-      css(styles.extensionsColumn, styles.center),
       css(styles.extensionsColumn, styles.center)
+      // css(styles.extensionsColumn, styles.center)
     ]
   }
 
@@ -105,8 +108,9 @@ class ExtensionsTab extends ImmutableComponent {
           <h1 className={css(styles.extensionsHeading)} data-l10n-id='extensions' />
         </header>
         <SortableTable
+          sortingDisabled
           tableClassNames={css(styles.extensionsTable)}
-          headings={['icon', 'name', 'description', 'version', 'enabled', 'exclude']}
+          headings={['icon', 'name', 'description', 'version', 'enabled'] /* 'exclude' */}
           columnClassNames={this.columnClassNames}
           rowClassNames={
             this.props.extensions.map(entry => (entry = css(styles.extensionsRow))).toJS()
@@ -118,7 +122,7 @@ class ExtensionsTab extends ImmutableComponent {
           <span data-l10n-id='community'
             className={css(styles.moreInfoLink)}
             onClick={aboutActions.createTabRequested.bind(null, {
-              url: 'https://community.brave.com'
+              url: 'https://community.brave.com/c/feature-requests/extension-requests'
             }, true)} />.
         </HelpfulText>
       </footer>
@@ -166,6 +170,7 @@ const styles = StyleSheet.create({
   },
 
   extensionsRow: {
+    fontSize: '15px',
     background: '#fff',
     height: '56px',
 

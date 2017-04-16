@@ -147,6 +147,9 @@ const api = {
         win.on('scroll-touch-edge', function (e) {
           win.webContents.send('scroll-touch-edge')
         })
+        win.on('swipe', function (e, direction) {
+          win.webContents.send('swipe', direction)
+        })
         win.on('enter-full-screen', function () {
           if (win.isMenuBarVisible()) {
             win.setMenuBarVisibility(false)
@@ -225,9 +228,15 @@ const api = {
       })
       win.on('resize', () => {
         updateWindowDebounce(windowId)
+        const size = win.getSize()
+        // NOTE: the default window size is whatever the last window resize was
+        appActions.defaultWindowParamsChanged(size)
       })
       win.on('move', () => {
         updateWindowMove(windowId)
+        const position = win.getPosition()
+        // NOTE: the default window position is whatever the last window move was
+        appActions.defaultWindowParamsChanged(undefined, position)
       })
       win.on('enter-full-screen', () => {
         updateWindowDebounce(windowId)
@@ -249,6 +258,48 @@ const api = {
       if (currentWindows[windowId].__ready) {
         updatePinnedTabs(currentWindows[windowId])
       }
+    }
+  },
+
+  minimize: (windowId) => {
+    const win = currentWindows[windowId]
+    if (win && !win.isDestroyed()) {
+      win.minimize()
+    }
+  },
+
+  maximize: (windowId) => {
+    const win = currentWindows[windowId]
+    if (win && !win.isDestroyed()) {
+      win.maximize()
+    }
+  },
+
+  unmaximize: (windowId) => {
+    const win = currentWindows[windowId]
+    if (win && !win.isDestroyed()) {
+      win.unmaximize()
+    }
+  },
+
+  setTitle: (windowId, title) => {
+    const win = currentWindows[windowId]
+    if (win && !win.isDestroyed()) {
+      win.setTitle(title)
+    }
+  },
+
+  setFullScreen: (windowId, fullScreen) => {
+    const win = currentWindows[windowId]
+    if (win && !win.isDestroyed()) {
+      win.setFullScreen(fullScreen)
+    }
+  },
+
+  openDevTools: (windowId, fullScreen) => {
+    const win = currentWindows[windowId]
+    if (win && !win.isDestroyed()) {
+      win.webContents.openDevTools()
     }
   },
 

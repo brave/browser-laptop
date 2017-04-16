@@ -48,6 +48,8 @@ class BrowserAction extends ImmutableComponent {
     // TODO(bridiver) should have some visual notification of hover/press
     return <div className={css(styles.browserActionButton)}>
       <Button iconClass='extensionBrowserAction'
+        l10nId='browserActionButton'
+        l10nArgs={{ name: this.props.browserAction.get('title') }}
         className={css(styles.extensionButton)}
         inlineStyles={{
           backgroundImage: extensionState.browserActionBackgroundImage(this.props.browserAction, this.props.tabId)

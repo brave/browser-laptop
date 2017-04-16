@@ -32,8 +32,8 @@ const getCurrentWindowId = () => {
   if (process.type === 'browser') {
     return BrowserWindow.getActiveWindow().id
   } else {
-    const {currentWindowId} = require('../renderer/currentWindow')
-    return currentWindowId
+    const currentWindow = require('../renderer/currentWindow')
+    return currentWindow.getCurrentWindowId()
   }
 }
 
@@ -75,7 +75,6 @@ module.exports.newTabMenuItem = (openerTabId) => {
     click: function (item, focusedWindow) {
       ensureAtLeastOneWindow(Immutable.fromJS({}))
       appActions.createTabRequested({
-        url: 'about:newtab',
         windowId: getCurrentWindowId(),
         openerTabId
       })
@@ -243,6 +242,24 @@ module.exports.downloadsMenuItem = () => {
         module.exports.sendToFocusedWindow(focusedWindow, [messages.HIDE_DOWNLOADS_TOOLBAR])
         appActions.maybeCreateTabRequested({
           url: 'about:downloads',
+          windowId: getCurrentWindowId()
+        })
+      }
+    }
+  }
+}
+
+module.exports.extensionsMenuItem = () => {
+  return {
+    label: locale.translation('extensionsManager'),
+    click: (item, focusedWindow) => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        appActions.newWindow(Immutable.fromJS({
+          location: 'about:preferences#extensions'
+        }))
+      } else {
+        appActions.maybeCreateTabRequested({
+          url: 'about:preferences#extensions',
           windowId: getCurrentWindowId()
         })
       }

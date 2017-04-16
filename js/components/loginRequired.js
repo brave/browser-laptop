@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const PropTypes = require('prop-types')
 const Dialog = require('./dialog')
 const Button = require('./button')
 const appActions = require('../actions/appActions')
@@ -138,7 +139,7 @@ class LoginRequired extends React.Component {
   }
 }
 
-LoginRequired.propTypes = { frameProps: React.PropTypes.object }
+LoginRequired.propTypes = { frameProps: PropTypes.object }
 
 const styles = StyleSheet.create({
   sectionWrapper: {

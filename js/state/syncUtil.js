@@ -54,6 +54,16 @@ const pickFields = (object, fields) => {
   }, {})
 }
 
+/**
+ * Convert deviceId to a type better suited for object keys.
+ * @param {Array.<number>} deviceId
+ * @returns {string}
+ */
+const deviceIdString = (deviceId) => {
+  return deviceId.join('|')
+}
+module.exports.deviceIdString = deviceIdString
+
 // Cache of bookmark folder object IDs mapped to folder IDs
 let folderIdMap = new Immutable.Map()
 
@@ -126,8 +136,6 @@ const applySiteSettingRecord = (record) => {
     }
   }
   const appActions = require('../actions/appActions')
-  const objectId = new Immutable.List(record.objectId)
-  const category = CATEGORY_MAP[record.objectData].categoryName
   const hostPattern = record.siteSetting.hostPattern
   if (!hostPattern) {
     throw new Error('siteSetting.hostPattern is required.')
@@ -137,16 +145,8 @@ const applySiteSettingRecord = (record) => {
   switch (record.action) {
     case writeActions.CREATE:
     case writeActions.UPDATE:
-      // Set the objectId if needed so we can access the existing object
-      let existingObject = module.exports.getObjectById(objectId, category)
-      if (!existingObject) {
-        appActions.changeSiteSetting(hostPattern, 'objectId', objectId, false, true)
-        existingObject = module.exports.getObjectById(objectId, category)
-      }
-      const existingObjectData = existingObject[1]
       applySetting = (key, value) => {
         const applyValue = getValue(key, value)
-        if (existingObjectData.get(key) === applyValue) { return }
         appActions.changeSiteSetting(hostPattern, key, applyValue, false, true)
       }
       break
@@ -157,6 +157,8 @@ const applySiteSettingRecord = (record) => {
       break
   }
 
+  // Set the record objectId if it doesn't exist already
+  appActions.changeSiteSetting(hostPattern, 'objectId', new Immutable.List(record.objectId), false, true)
   for (let key in record.siteSetting) {
     if (key === 'hostPattern') { continue }
     applySetting(key, record.siteSetting[key])
@@ -191,7 +193,10 @@ const applySyncRecord = (record) => {
       applySiteSettingRecord(record)
       break
     case 'device':
-      // TODO
+      const device = Object.assign({}, record.device, {lastRecordTimestamp: record.syncTimestamp})
+      require('../actions/appActions').saveSyncDevices({
+        [deviceIdString(record.deviceId)]: device
+      })
       break
     default:
       throw new Error(`Invalid record objectData: ${record.objectData}`)
@@ -383,9 +388,8 @@ module.exports.now = () => {
  * @returns {boolean}
  */
 module.exports.isSyncable = (type, item) => {
-  if (type === 'bookmark' && item.get('tags')) {
-    return (item.get('tags').includes('bookmark') ||
-      item.get('tags').includes('bookmark-folder'))
+  if (type === 'bookmark') {
+    return siteUtil.isBookmark(item) || siteUtil.isFolder(item)
   } else if (type === 'siteSetting') {
     for (let field in siteSettingDefaults) {
       if (item.has(field)) {
@@ -452,11 +456,12 @@ module.exports.createSiteData = (site, appState) => {
       siteData[field] = site[field]
     }
   }
-  const siteKey = siteUtil.getSiteKey(Immutable.fromJS(site)) || siteUtil.getSiteKey(Immutable.fromJS(siteData))
+  const immutableSite = Immutable.fromJS(site)
+  const siteKey = siteUtil.getSiteKey(immutableSite) || siteUtil.getSiteKey(Immutable.fromJS(siteData))
   if (siteKey === null) {
     throw new Error('Sync could not create siteKey')
   }
-  if (module.exports.isSyncable('bookmark', Immutable.fromJS(site))) {
+  if (module.exports.isSyncable('bookmark', immutableSite)) {
     const objectId = site.objectId || module.exports.newObjectId(['sites', siteKey])
     const parentFolderObjectId = site.parentFolderObjectId ||
       (site.parentFolderId && findOrCreateFolderObjectId(site.parentFolderId, appState))
@@ -465,18 +470,18 @@ module.exports.createSiteData = (site, appState) => {
       objectId,
       value: {
         site: siteData,
-        isFolder: site.tags.includes('bookmark-folder'),
+        isFolder: siteUtil.isFolder(immutableSite),
         parentFolderObjectId
       }
     }
-  } else if (!site.tags || !site.tags.length || site.tags.includes('pinned')) {
+  } else if (siteUtil.isHistoryEntry(immutableSite)) {
     return {
       name: 'historySite',
       objectId: site.objectId || module.exports.newObjectId(['sites', siteKey]),
       value: siteData
     }
   }
-  console.log(`Warning: Can't create site data: ${site}`)
+  console.log(`Warning: Can't create site data: ${JSON.stringify(site)}`)
 }
 
 /**

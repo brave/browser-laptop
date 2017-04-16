@@ -135,6 +135,9 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
   // Don't restore drag data and clearBrowsingDataPanel's visibility
   if (perWindowData.ui) {
     // This is no longer stored, we can remove this line eventually
+    delete perWindowData.ui.isFocused
+    delete perWindowData.ui.mouseInTitlebar
+    delete perWindowData.ui.mouseInFrame
     delete perWindowData.ui.dragging
     delete perWindowData.ui.isClearBrowsingDataPanelVisible
   }
@@ -170,7 +173,6 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
     delete frame.httpsEverywhere
     delete frame.adblock
     delete frame.noScript
-    delete frame.trackingProtection
 
     // Guest instance ID's are not valid after restarting.
     // Electron won't know about them.
@@ -595,6 +597,7 @@ module.exports.defaultAppState = () => {
   return {
     firstRunTimestamp: new Date().getTime(),
     sync: {
+      devices: {},
       lastFetchTimestamp: 0,
       objectsById: {}
     },
@@ -630,6 +633,15 @@ module.exports.defaultAppState = () => {
         ignoredTopSites: [],
         pinnedTopSites: pinnedTopSites
       }
+    },
+    trackingProtection: {
+      count: 0
+    },
+    adblock: {
+      count: 0
+    },
+    httpsEverywhere: {
+      count: 0
     },
     defaultWindowParams: {}
   }

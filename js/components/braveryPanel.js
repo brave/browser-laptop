@@ -129,7 +129,7 @@ class BraveryPanel extends ImmutableComponent {
     })
   }
   onReload () {
-    appActions.loadURLRequested(this.props.frameProps.get('tabId'), this.props.activeRequestedLocation)
+    appActions.loadURLRequested(this.props.frameProps.get('tabId'), this.props.lastCommittedURL)
   }
   onEditGlobal () {
     appActions.createTabRequested({
@@ -145,8 +145,8 @@ class BraveryPanel extends ImmutableComponent {
     if (setting !== 'shieldsUp' && !this.props.braverySettings.shieldsUp) {
       return
     }
-    let ruleKey = siteUtil.getOrigin(this.props.activeRequestedLocation)
-    const parsedUrl = urlParse(this.props.activeRequestedLocation)
+    let ruleKey = siteUtil.getOrigin(this.props.lastCommittedURL)
+    const parsedUrl = urlParse(this.props.lastCommittedURL)
     if (setting !== 'noScript' && (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:')) {
       ruleKey = `https?://${parsedUrl.host}`
     }
@@ -154,11 +154,11 @@ class BraveryPanel extends ImmutableComponent {
     this.onReload()
   }
   get displayHost () {
-    const parsedUrl = urlParse(this.props.activeRequestedLocation)
+    const parsedUrl = urlParse(this.props.lastCommittedURL)
     if (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:') {
       return parsedUrl.host
     }
-    return this.props.activeRequestedLocation
+    return this.props.lastCommittedURL
   }
   render () {
     const shieldsUp = this.props.braverySettings.shieldsUp

@@ -6,7 +6,7 @@ const React = require('react')
 const ImmutableComponent = require('../../../js/components/immutableComponent')
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('./styles/global')
-const {isWindows} = require('../../common/lib/platformUtil')
+const {isWindows, isDarwin} = require('../../common/lib/platformUtil')
 const {tabs} = require('../../../js/constants/config')
 const {hasBreakpoint, hasRelativeCloseIcon,
       hasFixedCloseIcon, hasVisibleSecondaryIcon, getTabIconColor} = require('../lib/tabUtil')
@@ -101,25 +101,16 @@ class Favicon extends ImmutableComponent {
 
 class AudioTabIcon extends ImmutableComponent {
   get pageCanPlayAudio () {
-    return this.props.tab.get('audioPlaybackActive') || this.props.tab.get('audioMuted')
+    return !!this.props.tab.get('audioPlaybackActive')
   }
 
-  get mediumView () {
-    const sizes = ['large', 'largeMedium']
-    return sizes.includes(this.props.tab.get('breakpoint'))
-  }
-
-  get narrowView () {
-    const sizes = ['medium', 'mediumSmall', 'small', 'extraSmall', 'smallest']
-    return sizes.includes(this.props.tab.get('breakpoint'))
-  }
-
-  get locationHasSecondaryIcon () {
-    return !!this.props.tab.get('isPrivate') || !!this.props.tab.get('partitionNumber')
+  get shouldShowAudioIcon () {
+    // We switch to blue top bar for all breakpoints but default
+    return this.props.tab.get('breakpoint') === 'default'
   }
 
   get mutedState () {
-    return this.pageCanPlayAudio && this.props.tab.get('audioMuted')
+    return this.pageCanPlayAudio && !!this.props.tab.get('audioMuted')
   }
 
   get audioIcon () {
@@ -129,8 +120,10 @@ class AudioTabIcon extends ImmutableComponent {
   }
 
   render () {
-    return this.pageCanPlayAudio && !this.mediumView && !this.narrowView
-      ? <TabIcon className={css(styles.icon, styles.audioIcon)} symbol={this.audioIcon} onClick={this.props.onClick} />
+    return this.pageCanPlayAudio && this.shouldShowAudioIcon
+      ? <TabIcon
+        className={css(styles.icon, styles.audioIcon)}
+        symbol={this.audioIcon} onClick={this.props.onClick} />
       : null
   }
 }
@@ -207,6 +200,8 @@ class TabTitle extends ImmutableComponent {
   }
 
   render () {
+    // Brad said that tabs with white title on macOS look too thin
+    const enforceFontVisibilty = isDarwin() && getTabIconColor(this.props) === 'white'
     const titleStyles = StyleSheet.create({
       gradientText: {
         backgroundImage: `-webkit-linear-gradient(left,
@@ -219,6 +214,7 @@ class TabTitle extends ImmutableComponent {
       className={css(
       styles.tabTitle,
       titleStyles.gradientText,
+      enforceFontVisibilty && styles.enforceFontVisibilty,
       // Windows specific style
       isWindows() && styles.tabTitleForWindows
     )}>
@@ -333,6 +329,10 @@ const styles = StyleSheet.create({
     padding: globalStyles.spacing.defaultTabPadding,
     color: 'transparent',
     WebkitBackgroundClip: 'text'
+  },
+
+  enforceFontVisibilty: {
+    fontWeight: '600'
   },
 
   tabTitleForWindows: {

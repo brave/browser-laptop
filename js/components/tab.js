@@ -27,7 +27,7 @@ const {Favicon, AudioTabIcon, NewSessionIcon,
       PrivateIcon, TabTitle, CloseTabIcon} = require('../../app/renderer/components/tabContent')
 const {getTabBreakpoint, tabUpdateFrameRate} = require('../../app/renderer/lib/tabUtil')
 const {isWindows} = require('../../app/common/lib/platformUtil')
-const {currentWindowId} = require('../../app/renderer/currentWindow')
+const {getCurrentWindowId} = require('../../app/renderer/currentWindow')
 const {frameOptsFromFrame} = require('../state/frameStateUtil')
 
 class Tab extends ImmutableComponent {
@@ -48,7 +48,7 @@ class Tab extends ImmutableComponent {
     const draggingOverData = this.props.dragData && this.props.dragData.get('dragOverData')
     if (!draggingOverData ||
         draggingOverData.get('draggingOverKey') !== this.props.tab.get('frameKey') ||
-        draggingOverData.get('draggingOverWindowId') !== currentWindowId) {
+        draggingOverData.get('draggingOverWindowId') !== getCurrentWindowId()) {
       return
     }
 
@@ -71,7 +71,7 @@ class Tab extends ImmutableComponent {
     const sourceDragData = dnd.getInterBraveDragData()
     return sourceDragData &&
       sourceDragData.get('key') === this.props.tab.get('frameKey') &&
-      sourceDragData.get('draggingOverWindowId') === currentWindowId
+      sourceDragData.get('draggingOverWindowId') === getCurrentWindowId()
   }
 
   get isDraggingOverLeft () {
@@ -98,12 +98,27 @@ class Tab extends ImmutableComponent {
     } else if (this.props.tab.get('location') === 'about:newtab') {
       return locale.translation('newTab')
     }
+
+    // NOTE(bsclifton): this can't use a simple falsey check with fallback values
+    // since properties are involved. I believe the title is populated page is loaded
+    // (which means it uses location first). When title is truthy, React gets confused
+    // and renders the location (but shows the title in the DOM). This may be a bug in React.
+    //
+    // Here's a demo of the syntax which causes the problem:
+    // return this.props.tab.get('title') || this.props.tab.get('location') || ''
+
+    const title = this.props.tab && this.props.tab.get('title')
+    const location = this.props.tab && this.props.tab.get('location')
+    const display = typeof title === 'undefined'
+      ? typeof location === 'undefined'
+        ? ''
+        : location
+      : title
+
     // YouTube tries to change the title to add a play icon when
     // there is audio. Since we have our own audio indicator we get
     // rid of it.
-    return (this.props.tab.get('title') ||
-      this.props.tab.get('location') ||
-      '').replace('▶ ', '')
+    return display.replace('▶ ', '')
   }
 
   onDragStart (e) {
@@ -148,9 +163,9 @@ class Tab extends ImmutableComponent {
 
   onTabClosedWithMouse (event) {
     event.stopPropagation()
-    if (this.props.onTabClosedWithMouse) {
+    if (this.props.onTabClosedWithMouse && this.frame && !this.frame.isEmpty()) {
       this.props.onTabClosedWithMouse(this.tabNode.parentNode.getBoundingClientRect())
-      windowActions.closeFrame(windowStore.getFrames(), this.frame)
+      windowActions.closeFrame(this.frame)
     }
   }
 

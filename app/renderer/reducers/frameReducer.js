@@ -13,7 +13,7 @@ const windowActions = require('../../../js/actions/windowActions')
 const settings = require('../../../js/constants/settings')
 const getSetting = require('../../../js/settings').getSetting
 const {updateTabPageIndex} = require('../lib/tabUtil')
-const {currentWindowId} = require('../currentWindow')
+const {getCurrentWindowId} = require('../currentWindow')
 const messages = require('../../../js/constants/messages')
 
 const setFullScreen = (state, action) => {
@@ -106,13 +106,14 @@ const frameReducer = (state, action) => {
       }
       // Unless a caller explicitly specifies to close a pinned frame, then
       // ignore the call.
-      const nonPinnedFrames = action.frames.filter((frame) => !frame.get('pinnedLocation'))
+      const frames = frameStateUtil.getFrames(state)
+      const nonPinnedFrames = frames.filter((frame) => !frame.get('pinnedLocation'))
       if (action.frameProps && action.frameProps.get('pinnedLocation')) {
         // Check for no frames at all, and if that's the case the user
         // only has pinned frames and tried to close, so close the
         // whole app.
         if (nonPinnedFrames.size === 0) {
-          appActions.closeWindow(currentWindowId)
+          appActions.closeWindow(getCurrentWindowId())
           return state
         }
 
@@ -126,13 +127,13 @@ const frameReducer = (state, action) => {
         }
       }
 
-      const pinnedFrames = action.frames.filter((frame) => frame.get('pinnedLocation'))
+      const pinnedFrames = frames.filter((frame) => frame.get('pinnedLocation'))
       // If there is at least 1 pinned frame don't close the window until subsequent
       // close attempts
       if (nonPinnedFrames.size > 1 || pinnedFrames.size > 0) {
         state = closeFrame(state, action)
       } else {
-        appActions.closeWindow(currentWindowId)
+        appActions.closeWindow(getCurrentWindowId())
       }
       break
 

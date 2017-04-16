@@ -14,6 +14,8 @@ const extensionState = require('./common/state/extensionState')
 const appActions = require('../js/actions/appActions')
 const fs = require('fs')
 const path = require('path')
+const l10n = require('../js/l10n')
+const {bravifyText} = require('./renderer/lib/extensionsUtil')
 
 // Takes Content Security Policy flags, for example { 'default-src': '*' }
 // Returns a CSP string, for example 'default-src: *;'
@@ -193,6 +195,7 @@ let generateTorrentManifest = () => {
 
   return {
     name: 'Torrent Viewer',
+    description: l10n.translation('torrentDesc'),
     manifest_version: 2,
     version: '1.0',
     content_security_policy: concatCSP(cspDirectives),
@@ -368,22 +371,34 @@ module.exports.init = () => {
   })
 
   let insertLocaleStrings = (installInfo) => {
-    let pattern = /^__MSG_(.*)__$/
-    let properties = ['name', 'description']
     let defaultLocale = installInfo.manifest.default_locale
     if (defaultLocale) {
       let msgPath = path.join(installInfo.base_path, '_locales', defaultLocale, 'messages.json')
       if (fs.existsSync(msgPath)) {
         let messages = JSON.parse(fs.readFileSync(msgPath).toString())
-        properties.forEach((property) => {
-          let matches = installInfo[property].match(pattern)
-          if (matches) {
-            installInfo[property] = messages[matches[1]].message
-          }
-        })
+        installInfo = insertPredefinedMessages(installInfo, messages, /^__MSG_(.*)__$/)
       }
     }
     return installInfo
+  }
+
+  let insertPredefinedMessages = function (object, dictionary, pattern) {
+    Object.keys(object).forEach(key => {
+      let value = object[key]
+      let type = typeof value
+      if (type === 'object' && !Array.isArray(value)) {
+        object[key] = insertPredefinedMessages(value, dictionary, pattern)
+        return
+      }
+      if (typeof value === 'string') {
+        let match = value.match(pattern)
+        if (match) {
+          let message = dictionary[match[1]]
+          object[key] = message ? bravifyText(message.message) : value
+        }
+      }
+    })
+    return object
   }
 
   let loadExtension = (extensionId, extensionPath, manifest = {}, manifestLocation = 'unpacked') => {

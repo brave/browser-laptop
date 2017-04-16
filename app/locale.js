@@ -220,6 +220,7 @@ var rendererIdentifiers = function () {
     'noThanks',
     'neverForThisSite',
     'passwordsManager',
+    'extensionsManager',
     'downloadItemPause',
     'downloadItemResume',
     'downloadItemCancel',
@@ -230,6 +231,7 @@ var rendererIdentifiers = function () {
     'downloadItemClear',
     'downloadToolbarHide',
     'downloadItemClearCompleted',
+    'torrentDesc',
     // Caption buttons in titlebar (min/max/close - Windows only)
     'windowCaptionButtonMinimize',
     'windowCaptionButtonMaximize',

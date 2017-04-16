@@ -4,8 +4,10 @@
 
 const React = require('react')
 const ImmutableComponent = require('../../../js/components/immutableComponent')
+const appActions = require('../../../js/actions/appActions')
+const windowActions = require('../../../js/actions/windowActions')
 const locale = require('../../../js/l10n')
-const {currentWindow, isMaximized, isFullScreen} = require('../currentWindow')
+const {getCurrentWindowId, isMaximized, isFullScreen} = require('../currentWindow')
 const cx = require('../../../js/lib/classSet')
 
 class WindowCaptionButtons extends ImmutableComponent {
@@ -24,21 +26,21 @@ class WindowCaptionButtons extends ImmutableComponent {
   }
 
   onMinimizeClick (e) {
-    currentWindow.minimize()
+    windowActions.shouldMinimize(getCurrentWindowId())
   }
 
   onMaximizeClick (e) {
     if (isFullScreen()) {
       // If full screen, toggle full screen status and restore window (make smaller)
-      currentWindow.setFullScreen(false)
-      if (isMaximized()) currentWindow.unmaximize()
+      windowActions.shouldExitFullScreen(getCurrentWindowId())
+      if (isMaximized()) windowActions.shouldUnmaximize(getCurrentWindowId())
       return false
     }
-    return (!isMaximized()) ? currentWindow.maximize() : currentWindow.unmaximize()
+    return (!isMaximized()) ? windowActions.shouldMaximize(getCurrentWindowId()) : windowActions.shouldUnmaximize(getCurrentWindowId())
   }
 
   onCloseClick (e) {
-    currentWindow.close()
+    appActions.closeWindow(getCurrentWindowId())
   }
 
   onDoubleClick (e) {

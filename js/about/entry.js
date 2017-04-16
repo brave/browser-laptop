@@ -100,5 +100,5 @@ if (element) {
       component.setState(detail)
     }
   })
-  ipc.sendToHost(ABOUT_COMPONENT_INITIALIZED)
+  ipc.send(ABOUT_COMPONENT_INITIALIZED)
 }

@@ -5,6 +5,8 @@
 'use strict'
 
 const appConstants = require('../../../js/constants/appConstants')
+const windowConstants = require('../../../js/constants/windowConstants')
+const windowState = require('../../common/state/windowState')
 const windows = require('../windows')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 
@@ -22,6 +24,36 @@ const windowsReducer = (state, action) => {
         // check after the state has been updated
         windows.pinnedTabsChanged()
       })
+      break
+    case appConstants.APP_CLOSE_WINDOW:
+      state = windows.closeWindow(state, action)
+      break
+    case appConstants.APP_WINDOW_CLOSED:
+      state = windowState.removeWindow(state, action)
+      break
+    case appConstants.APP_WINDOW_CREATED:
+      state = windowState.maybeCreateWindow(state, action)
+      break
+    case appConstants.APP_WINDOW_UPDATED:
+      state = windowState.maybeCreateWindow(state, action)
+      break
+    case windowConstants.WINDOW_SHOULD_SET_TITLE:
+      windows.setTitle(action.get('windowId'), action.get('title'))
+      break
+    case windowConstants.WINDOW_SHOULD_MINIMIZE:
+      windows.minimize(action.get('windowId'))
+      break
+    case windowConstants.WINDOW_SHOULD_MAXIMIZE:
+      windows.maximize(action.get('windowId'))
+      break
+    case windowConstants.WINDOW_SHOULD_UNMAXIMIZE:
+      windows.unmaximize(action.get('windowId'))
+      break
+    case windowConstants.WINDOW_SHOULD_EXIT_FULL_SCREEN:
+      windows.setFullScreen(action.get('windowId'), false)
+      break
+    case windowConstants.WINDOW_SHOULD_OPEN_DEV_TOOLS:
+      windows.openDevTools(action.get('windowId'))
       break
   }
   return state

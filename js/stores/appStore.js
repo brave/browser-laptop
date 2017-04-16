@@ -33,7 +33,6 @@ const nativeImage = require('../../app/nativeImage')
 const filtering = require('../../app/filtering')
 const basicAuth = require('../../app/browser/basicAuth')
 const webtorrent = require('../../app/browser/webtorrent')
-const windows = require('../../app/browser/windows')
 const assert = require('assert')
 const profiles = require('../../app/browser/profiles')
 
@@ -42,7 +41,6 @@ const basicAuthState = require('../../app/common/state/basicAuthState')
 const extensionState = require('../../app/common/state/extensionState')
 const aboutNewTabState = require('../../app/common/state/aboutNewTabState')
 const aboutHistoryState = require('../../app/common/state/aboutHistoryState')
-const windowState = require('../../app/common/state/windowState')
 
 const isDarwin = process.platform === 'darwin'
 const isWindows = process.platform === 'win32'
@@ -223,7 +221,15 @@ const createWindow = (action) => {
 
     mainWindow.webContents.on('did-finish-load', (e) => {
       lastEmittedState = appState
-      e.sender.send(messages.INITIALIZE_WINDOW, frameOpts.disposition, appState.toJS(), frames, action.restoredState)
+      mainWindow.webContents.setZoomLevel(0.0)
+      e.sender.send(messages.INITIALIZE_WINDOW,
+        {
+          disposition: frameOpts.disposition,
+          id: mainWindow.id
+        },
+        appState.toJS(),
+        frames,
+        action.restoredState)
       if (action.cb) {
         action.cb()
       }
@@ -233,7 +239,6 @@ const createWindow = (action) => {
       mainWindow.show()
     })
 
-    mainWindow.webContents.setZoomLevel(0.0)
     mainWindow.loadURL(appUrlUtil.getBraveExtIndexHTML())
   })
 }
@@ -402,18 +407,6 @@ const handleAppAction = (action) => {
     case appConstants.APP_NEW_WINDOW:
       createWindow(action)
       break
-    case appConstants.APP_CLOSE_WINDOW:
-      appState = windows.closeWindow(appState, action)
-      break
-    case appConstants.APP_WINDOW_CLOSED:
-      appState = windowState.removeWindow(appState, action)
-      break
-    case appConstants.APP_WINDOW_CREATED:
-      appState = windowState.maybeCreateWindow(appState, action)
-      break
-    case appConstants.APP_WINDOW_UPDATED:
-      appState = windowState.maybeCreateWindow(appState, action)
-      break
     case appConstants.APP_ADD_PASSWORD:
       // If there is already an entry for this exact origin, action, and
       // username if it exists, update the password instead of creating a new entry
@@ -575,13 +568,11 @@ const handleAppAction = (action) => {
       {
         let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
         let newSiteSettings = siteSettings.mergeSiteSetting(appState.get(propertyName), action.hostPattern, action.key, action.value)
-        if (!action.temporary) {
-          let syncObject = siteUtil.setObjectId(newSiteSettings.get(action.hostPattern))
-          if (!action.skipSync) {
-            const objectId = syncObject.get('objectId')
-            const item = new Immutable.Map({objectId, [action.key]: action.value})
-            syncActions.updateSiteSetting(action.hostPattern, item)
-          }
+        if (!action.temporary && !action.skipSync) {
+          const syncObject = siteUtil.setObjectId(newSiteSettings.get(action.hostPattern))
+          const objectId = syncObject.get('objectId')
+          const item = new Immutable.Map({objectId, [action.key]: action.value})
+          syncActions.updateSiteSetting(action.hostPattern, item)
           newSiteSettings = newSiteSettings.set(action.hostPattern, syncObject)
         }
         appState = appState.set(propertyName, newSiteSettings)
@@ -592,13 +583,11 @@ const handleAppAction = (action) => {
         let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
         let newSiteSettings = siteSettings.removeSiteSetting(appState.get(propertyName),
           action.hostPattern, action.key)
-        if (!action.temporary) {
-          let syncObject = siteUtil.setObjectId(newSiteSettings.get(action.hostPattern))
-          if (!action.skipSync) {
-            const objectId = syncObject.get('objectId')
-            const item = new Immutable.Map({objectId, [action.key]: null})
-            syncActions.removeSiteSetting(action.hostPattern, item)
-          }
+        if (!action.temporary && !action.skipSync) {
+          const syncObject = siteUtil.setObjectId(newSiteSettings.get(action.hostPattern))
+          const objectId = syncObject.get('objectId')
+          const item = new Immutable.Map({objectId, [action.key]: null})
+          syncActions.removeSiteSetting(action.hostPattern, item)
           newSiteSettings = newSiteSettings.set(action.hostPattern, syncObject)
         }
         appState = appState.set(propertyName, newSiteSettings)
@@ -610,7 +599,7 @@ const handleAppAction = (action) => {
         let newSiteSettings = new Immutable.Map()
         appState.get(propertyName).map((entry, hostPattern) => {
           let newEntry = entry.delete(action.key)
-          if (!action.skipSync) {
+          if (!action.temporary && !action.skipSync) {
             newEntry = siteUtil.setObjectId(newEntry)
             const objectId = newEntry.get('objectId')
             const item = new Immutable.Map({objectId, [action.key]: null})
@@ -855,6 +844,17 @@ const handleAppAction = (action) => {
           action.objectId)
       }
       break
+    case appConstants.APP_SAVE_SYNC_DEVICES:
+      for (let deviceId of Object.keys(action.devices)) {
+        const device = action.devices[deviceId]
+        if (device.lastRecordTimestamp) {
+          appState = appState.setIn(['sync', 'devices', deviceId, 'lastRecordTimestamp'], device.lastRecordTimestamp)
+        }
+        if (device.name) {
+          appState = appState.setIn(['sync', 'devices', deviceId, 'name'], device.name)
+        }
+      }
+      break
     case appConstants.APP_SAVE_SYNC_INIT_DATA:
       if (action.deviceId) {
         appState = appState.setIn(['sync', 'deviceId'], action.deviceId)
@@ -889,6 +889,7 @@ const handleAppAction = (action) => {
           appState = appState.setIn(['sites', key, 'originalSeed'], originalSeed)
         }
       })
+      appState.setIn(['sync', 'devices'], {})
       appState.setIn(['sync', 'objectsById'], {})
       break
     case appConstants.APP_SHOW_DOWNLOAD_DELETE_CONFIRMATION:
@@ -906,8 +907,6 @@ const handleAppAction = (action) => {
 
         if (result === undefined) {
           let newSiteSettings = siteSettings.mergeSiteSetting(appState.get('siteSettings'), pattern, 'ledgerPayments', true)
-          const syncObject = siteUtil.setObjectId(newSiteSettings.get(pattern))
-          newSiteSettings = newSiteSettings.set(pattern, syncObject)
           appState = appState.set('siteSettings', newSiteSettings)
         }
       })
@@ -916,8 +915,6 @@ const handleAppAction = (action) => {
       Object.keys(action.publishers).map((item) => {
         const pattern = `https?://${item}`
         let newSiteSettings = siteSettings.mergeSiteSetting(appState.get('siteSettings'), pattern, 'ledgerPinPercentage', action.publishers[item].pinPercentage)
-        const syncObject = siteUtil.setObjectId(newSiteSettings.get(pattern))
-        newSiteSettings = newSiteSettings.set(pattern, syncObject)
         appState = appState.set('siteSettings', newSiteSettings)
       })
       break

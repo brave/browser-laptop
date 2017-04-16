@@ -655,9 +655,6 @@ class SecurityTab extends ImmutableComponent {
 
 class AdvancedTab extends ImmutableComponent {
   render () {
-    const pocketL10nArgs = {
-      extensionName: 'Pocket'
-    }
     return <div>
       <div className='sectionTitle' data-l10n-id='contentSettings' />
       <SettingsList>
@@ -665,17 +662,6 @@ class AdvancedTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='useSmoothScroll' prefKey={settings.SMOOTH_SCROLL_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='sendCrashReports' prefKey={settings.SEND_CRASH_REPORTS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='sendUsageStatistics' prefKey={settings.SEND_USAGE_STATISTICS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-      </SettingsList>
-      <div className='sectionTitle' data-l10n-id='extensions' />
-      <SettingsList>
-        <SettingCheckbox dataL10nId='usePDFJS' prefKey={settings.PDFJS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='useTorrentViewer' prefKey={settings.TORRENT_VIEWER_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='enableExtension' dataL10nArgs={JSON.stringify(pocketL10nArgs)} prefKey={settings.POCKET_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <Button l10nId='viewInstalledExtensions' className='primaryButton viewExtensionsInfo'
-          onClick={aboutActions.createTabRequested.bind(null, {
-            url: 'about:extensions'
-          })} />
-        <div data-l10n-id='moreExtensionsComingSoon' className='moreExtensionsComingSoon' />
       </SettingsList>
       <div data-l10n-id='requiresRestart' className='requiresRestart' />
     </div>
