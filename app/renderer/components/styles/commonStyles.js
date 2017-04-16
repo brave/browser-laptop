@@ -146,6 +146,9 @@ const styles = StyleSheet.create({
   },
 
   // margin/padding
+  noMargin: {
+    margin: 0
+  },
   noMarginTop: {
     marginTop: 0
   },
@@ -157,6 +160,9 @@ const styles = StyleSheet.create({
   },
   noMarginRight: {
     marginRight: 0
+  },
+  noPadding: {
+    padding: 0
   },
   noPaddingTop: {
     paddingTop: 0
