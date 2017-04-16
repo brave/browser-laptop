@@ -3,14 +3,21 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('./immutableComponent')
-const cx = require('../lib/classSet')
-const appActions = require('../actions/appActions')
-const windowActions = require('../actions/windowActions')
-const dragTypes = require('../constants/dragTypes')
-const {onTabPageContextMenu} = require('../contextMenus')
-const dnd = require('../dnd')
-const dndData = require('../dndData')
+
+// Components
+const ImmutableComponent = require('../../../../js/components/immutableComponent')
+
+// Actions
+const appActions = require('../../../../js/actions/appActions')
+const windowActions = require('../../../../js/actions/windowActions')
+
+// Constants
+const dragTypes = require('../../../../js/constants/dragTypes')
+
+// Utils
+const cx = require('../../../../js/lib/classSet')
+const {onTabPageContextMenu} = require('../../../../js/contextMenus')
+const dndData = require('../../../../js/dndData')
 
 class TabPage extends ImmutableComponent {
   constructor () {
@@ -80,31 +87,4 @@ class TabPage extends ImmutableComponent {
   }
 }
 
-class TabPages extends ImmutableComponent {
-  render () {
-    const tabPageCount = Math.ceil(this.props.frames.size / this.props.tabsPerTabPage)
-    let sourceDragFromPageIndex
-    const sourceDragData = dnd.getInterBraveDragData()
-    if (sourceDragData) {
-      sourceDragFromPageIndex = this.props.frames.findIndex((frame) => frame.get('key') === sourceDragData.get('key'))
-      if (sourceDragFromPageIndex !== -1) {
-        sourceDragFromPageIndex /= this.props.tabsPerTabPage
-      }
-    }
-    return <div className='tabPageWrap'>
-      {
-        tabPageCount > 1 &&
-        Array.from(new Array(tabPageCount)).map((x, i) =>
-          <TabPage
-            key={`tabPage-${i}`}
-            tabPageFrames={this.props.frames.slice(i * this.props.tabsPerTabPage, (i * this.props.tabsPerTabPage) + this.props.tabsPerTabPage)}
-            previewTabPage={this.props.previewTabPage}
-            index={i}
-            sourceDragFromPageIndex={sourceDragFromPageIndex}
-            active={this.props.tabPageIndex === i} />)
-      }
-    </div>
-  }
-}
-
-module.exports = TabPages
+module.exports = TabPage

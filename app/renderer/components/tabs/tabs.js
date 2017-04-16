@@ -5,20 +5,27 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
 
-const ImmutableComponent = require('./immutableComponent')
-
-const appActions = require('../actions/appActions')
-const windowActions = require('../actions/windowActions')
-const windowStore = require('../stores/windowStore')
-const dragTypes = require('../constants/dragTypes')
-const cx = require('../lib/classSet')
-const contextMenus = require('../contextMenus')
-const {getCurrentWindowId} = require('../../app/renderer/currentWindow')
-
-const LongPressButton = require('./longPressButton')
+// Components
+const ImmutableComponent = require('../../../../js/components/immutableComponent')
+const LongPressButton = require('../../../../js/components/longPressButton')
 const Tab = require('./tab')
-const dnd = require('../dnd')
-const dndData = require('../dndData')
+
+// Actions
+const appActions = require('../../../../js/actions/appActions')
+const windowActions = require('../../../../js/actions/windowActions')
+
+// Store
+const windowStore = require('../../../../js/stores/windowStore')
+
+// Constants
+const dragTypes = require('../../../../js/constants/dragTypes')
+
+// Utils
+const cx = require('../../../../js/lib/classSet')
+const contextMenus = require('../../../../js/contextMenus')
+const {getCurrentWindowId} = require('../../currentWindow')
+const dnd = require('../../../../js/dnd')
+const dndData = require('../../../../js/dndData')
 
 class Tabs extends ImmutableComponent {
   constructor () {
