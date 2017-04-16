@@ -28,7 +28,7 @@ const paymentCommon = StyleSheet.create({
     clear: 'both'
   },
   panel: {
-    background: '#FFFFFF',
+    background: '#fff',
     position: 'relative',
     marginTop: '8px',
     marginBottom: '8px',
@@ -51,7 +51,18 @@ const paymentCommon = StyleSheet.create({
   }
 })
 
+const paymentStylesVariables = {
+  color: {
+    // See: .paymentsContainer .modal .dialog.paymentHistory .dialog-body
+    paymentHistoryTableBackgroundColor: '#fff'
+  },
+  spacing: {
+    paymentHistoryTablePadding: '30px'
+  }
+}
+
 module.exports = {
   paymentStyles,
-  paymentCommon
+  paymentCommon,
+  paymentStylesVariables
 }

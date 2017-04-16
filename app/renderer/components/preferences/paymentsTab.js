@@ -7,6 +7,7 @@ const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
+const cx = require('../../../../js/lib/classSet')
 const ImmutableComponent = require('../../../../js/components/immutableComponent')
 const ModalOverlay = require('../../../../js/components/modalOverlay')
 const {SettingCheckbox} = require('../settings')
@@ -19,9 +20,8 @@ const {LedgerBackupContent, LedgerBackupFooter} = require('./payment/ledgerBacku
 const {LedgerRecoveryContent, LedgerRecoveryFooter} = require('./payment/ledgerRecovery')
 
 // style
-const cx = require('../../../../js/lib/classSet')
 const globalStyles = require('../styles/global')
-const {paymentStyles} = require('../styles/payment')
+const {paymentStyles, paymentStylesVariables} = require('../styles/payment')
 const settingIcon = require('../../../extensions/brave/img/ledger/icon_settings.svg')
 const historyIcon = require('../../../extensions/brave/img/ledger/icon_history.svg')
 
@@ -101,7 +101,8 @@ class PaymentsTab extends ImmutableComponent {
         this.enabled && this.props.paymentHistoryOverlayVisible
           ? <ModalOverlay
             title={'paymentHistoryTitle'}
-            customTitleClasses={'paymentHistory'}
+            customDialogClasses={'paymentHistory'}
+            customTitleClasses={css(styles.paymentHistoryOverlay__title)}
             content={<HistoryContent
               ledgerData={this.props.ledgerData}
             />}
@@ -364,6 +365,15 @@ const styles = StyleSheet.create({
     ':hover': {
       backgroundColor: globalStyles.color.chromeTertiary
     }
+  },
+
+  paymentHistoryOverlay__title: {
+    // TODO: refactor preferences.less to remove !important
+    // See: .paymentsContainer .modal .dialog .dialog-header .sectionTitle and .modal .dialog .sectionTitle
+
+    color: `${globalStyles.color.braveMediumOrange} !important`,
+    padding: `25px 0 25px ${paymentStylesVariables.spacing.paymentHistoryTablePadding} !important`,
+    textIndent: '0 !important'
   }
 })
 
