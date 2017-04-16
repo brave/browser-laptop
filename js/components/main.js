@@ -592,7 +592,7 @@ class Main extends ImmutableComponent {
     let node = e.target
     while (node) {
       if (node.classList &&
-          (node.classList.contains('popupWindow') ||
+          (node.matches('[class^="popupWindow"]') ||
             node.classList.contains('contextMenu') ||
             node.matches('[class*="extensionButton_"]') ||
             node.classList.contains('menubarItem') ||

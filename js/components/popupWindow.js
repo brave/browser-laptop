@@ -5,7 +5,6 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
 const ImmutableComponent = require('./immutableComponent')
-const cx = require('../lib/classSet')
 const KeyCodes = require('../../app/common/constants/keyCodes')
 const windowActions = require('../actions/windowActions')
 
@@ -95,11 +94,10 @@ class PopupWindow extends ImmutableComponent {
     }
 
     return <div
-      className={cx({
-        popupWindow: true,
-        [css(styles.popupWindow)]: true,
-        [css((style.right !== undefined) && styles.reverseExpand)]: true
-      })}
+      className={css(
+        styles.popupWindow,
+        style.right !== undefined && styles.reverseExpand
+      )}
       style={style} />
   }
 }
