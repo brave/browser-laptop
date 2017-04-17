@@ -3,17 +3,25 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('../../../js/components/immutableComponent')
-const Button = require('../../../js/components/button')
-const cx = require('../../../js/lib/classSet')
-const windowActions = require('../../../js/actions/windowActions')
-const appActions = require('../../../js/actions/appActions')
-const KeyCodes = require('../../common/constants/keyCodes')
-const siteTags = require('../../../js/constants/siteTags')
-const settings = require('../../../js/constants/settings')
-const siteUtil = require('../../../js/state/siteUtil')
-const UrlUtil = require('../../../js/lib/urlutil')
-const getSetting = require('../../../js/settings').getSetting
+
+// Components
+const ImmutableComponent = require('../../../../js/components/immutableComponent')
+const Button = require('../../../../js/components/button')
+
+// Actions
+const appActions = require('../../../../js/actions/appActions')
+const windowActions = require('../../../../js/actions/windowActions')
+
+// Constants
+const KeyCodes = require('../../../common/constants/keyCodes')
+const siteTags = require('../../../../js/constants/siteTags')
+const settings = require('../../../../js/constants/settings')
+
+// Utils
+const cx = require('../../../../js/lib/classSet')
+const siteUtil = require('../../../../js/state/siteUtil')
+const UrlUtil = require('../../../../js/lib/urlutil')
+const getSetting = require('../../../../js/settings').getSetting
 
 class AddEditBookmarkHanger extends ImmutableComponent {
   constructor () {

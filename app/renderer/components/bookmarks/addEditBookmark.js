@@ -3,10 +3,14 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('./immutableComponent')
-const Dialog = require('./dialog')
-const windowActions = require('../actions/windowActions')
-const AddEditBookmarkHanger = require('../../app/renderer/components/addEditBookmarkHanger')
+
+// Components
+const ImmutableComponent = require('../../../../js/components/immutableComponent')
+const Dialog = require('../../../../js/components/dialog')
+const AddEditBookmarkHanger = require('./addEditBookmarkHanger')
+
+// Actions
+const windowActions = require('../../../../js/actions/windowActions')
 
 class AddEditBookmark extends ImmutableComponent {
   constructor () {
