@@ -3,21 +3,17 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('./immutableComponent')
+
+// Components
+const ImmutableComponent = require('../../../../js/components/immutableComponent')
 const Tabs = require('./tabs')
 const PinnedTabs = require('./pinnedTabs')
-const contextMenus = require('../contextMenus')
-const windowStore = require('../stores/windowStore')
 
-class TabsToolbarButtons extends ImmutableComponent {
-  render () {
-    return <div className='tabsToolbarButtons'>
-      <span data-l10n-id='menuButton'
-        className='navbutton menuButton'
-        onClick={this.props.onMenu} />
-    </div>
-  }
-}
+// Store
+const windowStore = require('../../../../js/stores/windowStore')
+
+// Utils
+const contextMenus = require('../../../../js/contextMenus')
 
 class TabsToolbar extends ImmutableComponent {
   constructor () {
@@ -73,9 +69,12 @@ class TabsToolbar extends ImmutableComponent {
         partOfFullPageSet={currentTabs.size === this.props.tabsPerTabPage}
         fixTabWidth={this.props.fixTabWidth}
       />
-      <TabsToolbarButtons
-        noFrames={currentTabs.size === 0}
-        onMenu={this.props.onMenu} />
+      <div className='tabsToolbarButtons'>
+        <span data-l10n-id='menuButton'
+          className='navbutton menuButton'
+          onClick={this.props.onMenu}
+        />
+      </div>
     </div>
   }
 }

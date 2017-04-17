@@ -19,8 +19,8 @@ const getSetting = require('../settings').getSetting
 // Components
 const Navigator = require('../../app/renderer/components/navigation/navigator')
 const Frame = require('./frame')
-const TabPages = require('./tabPages')
-const TabsToolbar = require('./tabsToolbar')
+const TabPages = require('../../app/renderer/components/tabs/tabPages')
+const TabsToolbar = require('../../app/renderer/components/tabs/tabsToolbar')
 const FindBar = require('./findbar')
 const UpdateBar = require('./updateBar')
 const NotificationBar = require('./notificationBar')

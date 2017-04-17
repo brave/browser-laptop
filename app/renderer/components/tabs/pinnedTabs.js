@@ -4,17 +4,27 @@
 
 const React = require('react')
 const ReactDOM = require('react-dom')
-const ImmutableComponent = require('./immutableComponent')
+
+// Components
+const ImmutableComponent = require('../../../../js/components/immutableComponent')
 const Tab = require('./tab')
-const appActions = require('../actions/appActions')
-const windowActions = require('../actions/windowActions')
-const windowStore = require('../stores/windowStore')
-const siteTags = require('../constants/siteTags')
-const dragTypes = require('../constants/dragTypes')
-const siteUtil = require('../state/siteUtil')
-const dnd = require('../dnd')
-const dndData = require('../dndData')
-const {isIntermediateAboutPage} = require('../lib/appUrlUtil')
+
+// Actions
+const appActions = require('../../../../js/actions/appActions')
+const windowActions = require('../../../../js/actions/windowActions')
+
+// Store
+const windowStore = require('../../../../js/stores/windowStore')
+
+// Constants
+const siteTags = require('../../../../js/constants/siteTags')
+const dragTypes = require('../../../../js/constants/dragTypes')
+
+// Utils
+const siteUtil = require('../../../../js/state/siteUtil')
+const dnd = require('../../../../js/dnd')
+const dndData = require('../../../../js/dndData')
+const {isIntermediateAboutPage} = require('../../../../js/lib/appUrlUtil')
 
 class PinnedTabs extends ImmutableComponent {
   constructor () {

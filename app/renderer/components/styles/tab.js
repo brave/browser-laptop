@@ -35,7 +35,6 @@ const styles = StyleSheet.create({
   },
 
   // Custom classes based on tab's width and behaviour
-
   tabNarrowView: {
     padding: '0 2px'
   },
@@ -127,6 +126,23 @@ const styles = StyleSheet.create({
         opacity: '0'
       }
     }
+  },
+
+  icon: {
+    width: globalStyles.spacing.iconSize,
+    minWidth: globalStyles.spacing.iconSize,
+    height: globalStyles.spacing.iconSize,
+    backgroundSize: globalStyles.spacing.iconSize,
+    fontSize: globalStyles.fontSize.tabIcon,
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    display: 'flex',
+    alignSelf: 'center',
+    position: 'relative',
+    textAlign: 'center',
+    justifyContent: 'center',
+    paddingLeft: globalStyles.spacing.defaultIconPadding,
+    paddingRight: globalStyles.spacing.defaultIconPadding
   }
 })
 
