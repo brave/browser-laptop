@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
   flyoutDialog: {
     background: globalStyles.color.toolbarBackground,
     borderRadius: globalStyles.radius.borderRadius,
-    boxShadow: '2px 2px 8px #3b3b3b',
+    boxShadow: globalStyles.shadow.flyoutDialogBoxShadow,
     color: '#000',
     fontSize: '13px',
     // Issue #7949

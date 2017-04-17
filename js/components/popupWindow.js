@@ -5,9 +5,11 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
 const ImmutableComponent = require('./immutableComponent')
-const cx = require('../lib/classSet')
 const KeyCodes = require('../../app/common/constants/keyCodes')
 const windowActions = require('../actions/windowActions')
+
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../app/renderer/components/styles/global')
 
 /**
  * Represents a popup window
@@ -69,35 +71,59 @@ class PopupWindow extends ImmutableComponent {
   }
 
   render () {
-    let styles = {}
-    if (parseInt(this.width)) {
-      styles.width = (parseInt(this.width) + 2)
+    let style = {}
+    let width = parseInt(this.width)
+    let height = parseInt(this.height)
+    let top = parseInt(this.top)
+    let left = parseInt(this.left)
+
+    if (width) {
+      style.width = width + 2
     }
-    if (parseInt(this.height)) {
-      styles.height = (parseInt(this.height) + 2)
+    if (height) {
+      style.height = height + 2
     }
-    if (parseInt(this.top)) {
-      if (this.top + this.height < window.innerHeight) {
-        styles.top = this.top
+    if (top) {
+      if (top + height < window.innerHeight) {
+        style.top = top
       } else {
-        styles.bottom = 0
+        style.bottom = 0
       }
     }
-    if (parseInt(this.left)) {
-      if (this.left + this.width < window.innerWidth) {
-        styles.left = this.left
+    if (left) {
+      if (left + width < window.innerWidth) {
+        style.left = left
       } else {
-        styles.right = 0
+        style.right = '1em'
       }
     }
 
     return <div
-      className={cx({
-        popupWindow: true,
-        reverseExpand: styles.right !== undefined
-      })}
-      style={styles} />
+      className={css(
+        styles.popupWindow,
+        style.right !== undefined && styles.reverseExpand
+      )}
+      style={style} />
   }
 }
+
+const styles = StyleSheet.create({
+  popupWindow: {
+    border: `solid 1px ${globalStyles.color.gray}`,
+    boxShadow: globalStyles.shadow.flyoutDialogBoxShadow,
+    boxSizing: 'border-box',
+    color: 'black',
+    cursor: 'default',
+    display: 'flex',
+    fontSize: '11px',
+    padding: 0,
+    position: 'absolute',
+    userSelect: 'none',
+    zIndex: globalStyles.zindex.zindexPopupWindow
+  },
+  reverseExpand: {
+    flexDirection: 'row-reverse'
+  }
+})
 
 module.exports = PopupWindow
