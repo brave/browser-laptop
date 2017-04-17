@@ -132,6 +132,8 @@ const globalStyles = {
     iconSize: '16px',
     closeIconSize: '13px',
     narrowIconSize: '12px',
+    dialogWidth: '422px',
+    dialogLargeWidth: '600px',
     dialogTopOffset: '30px',
     dialogInsideMargin: '18px',
     paymentsMargin: '20px',

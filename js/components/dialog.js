@@ -33,6 +33,8 @@ class Dialog extends ImmutableComponent {
   render () {
     return <div className={'dialog ' + (this.props.className || '')}
       tabIndex='-1'
+      data-test-id={this.props.testId}
+      data-test2-id={this.props.test2Id}
       ref={(node) => { this.dialog = node }}
       onKeyDown={this.onKeyDown.bind(this)}
       onClick={this.onClick.bind(this)}>

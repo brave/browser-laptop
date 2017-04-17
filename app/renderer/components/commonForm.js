@@ -18,6 +18,12 @@ class CommonForm extends ImmutableComponent {
   }
 }
 
+class CommonFormLarge extends ImmutableComponent {
+  render () {
+    return <div className={css(commonStyles.flyoutDialog, styles.CommonForm, styles.CommonFormLarge)} {...this.props} />
+  }
+}
+
 class CommonFormDropdown extends ImmutableComponent {
   render () {
     return <FormDropdown data-isCommonForm='true' {...this.props} />
@@ -79,13 +85,17 @@ const styles = StyleSheet.create({
     top: '40px',
     cursor: 'default',
     width: '100%',
-    maxWidth: '422px',
+    maxWidth: globalStyles.spacing.dialogWidth,
     userSelect: 'none'
 
     // Need a general solution
     // See: #7930
     // overflowY: 'auto',
     // maxHeight: '100%'
+  },
+
+  CommonFormLarge: {
+    maxWidth: globalStyles.spacing.dialogLargeWidth
   },
 
   CommonFormClickable: {
@@ -146,6 +156,7 @@ const commonFormStyles = StyleSheet.create({
 
 module.exports = {
   CommonForm,
+  CommonFormLarge,
   CommonFormDropdown,
   CommonFormTextbox,
   CommonFormClickable,
