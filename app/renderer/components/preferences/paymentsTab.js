@@ -181,6 +181,16 @@ class PaymentsTab extends ImmutableComponent {
               switchClassName={css(styles.switchWrap__switchControl)}
               labelClassName={css(styles.switchWrap__label)}
             />
+            <a className={cx({
+              fa: true,
+              'fa-question-circle': true,
+              [css(styles.autoSuggestSwitch__moreInfo)]: true,
+              [css(styles.autoSuggestSwitch__moreInfoBtnSuggest)]: true
+            })}
+              href='https://brave.com/Payments_FAQ.html'
+              target='_blank'
+              data-l10n-id='paymentsFAQLink'
+            />
           </div>
           {
             this.enabled
@@ -197,16 +207,6 @@ class PaymentsTab extends ImmutableComponent {
                     disabled={!enabled}
                     onChangeSetting={this.props.onChangeSetting}
                     switchClassName={css(styles.switchWrap__switchControl)}
-                  />
-                  <a className={cx({
-                    fa: true,
-                    'fa-question-circle': true,
-                    [css(styles.autoSuggestSwitch__moreInfo)]: true,
-                    [css(styles.autoSuggestSwitch__moreInfoBtnSuggest)]: true
-                  })}
-                    href='https://brave.com/Payments_FAQ.html'
-                    target='_blank'
-                    data-l10n-id='paymentsFAQLink'
                   />
                 </div>
               </div>
@@ -309,7 +309,8 @@ const styles = StyleSheet.create({
   },
   autoSuggestSwitch__moreInfoBtnSuggest: {
     position: 'relative',
-    left: '5px',
+    top: '-1px',
+    left: '8px',
     cursor: 'pointer',
 
     // TODO: refactor preferences.less to remove !important
