@@ -72,22 +72,27 @@ class PopupWindow extends ImmutableComponent {
 
   render () {
     let style = {}
-    if (parseInt(this.width)) {
-      style.width = this.width + 2
+    let width = parseInt(this.width)
+    let height = parseInt(this.height)
+    let top = parseInt(this.top)
+    let left = parseInt(this.left)
+
+    if (width) {
+      style.width = width + 2
     }
-    if (parseInt(this.height)) {
-      style.height = this.height + 2
+    if (height) {
+      style.height = height + 2
     }
-    if (parseInt(this.top)) {
-      if (this.top + this.height < window.innerHeight) {
-        style.top = this.top
+    if (top) {
+      if (top + height < window.innerHeight) {
+        style.top = top
       } else {
         style.bottom = 0
       }
     }
-    if (parseInt(this.left)) {
-      if (this.left + this.width < window.innerWidth) {
-        style.left = this.left
+    if (left) {
+      if (left + width < window.innerWidth) {
+        style.left = left
       } else {
         style.right = '1em'
       }
