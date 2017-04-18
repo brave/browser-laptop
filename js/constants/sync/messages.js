@@ -61,8 +61,10 @@ const messages = {
    * webview -> browser
    * after sync gets records, it requests the browser's existing objects so sync
    * can perform conflict resolution.
+   * isTruncated is true if limitResponse was used and the total number of
+   * records exceeds the limit (1000).
    */
-  GET_EXISTING_OBJECTS: _, /* @param {string} categoryName, @param {Array.<Object>} records */
+  GET_EXISTING_OBJECTS: _, /* @param {string} categoryName, @param {Array.<Object>} records, @param {lastRecordTimeStamp} number, @param {boolean} isTruncated */
   /**
    * browser -> webview
    * webview resolves sync records against matching browser objects and returns
