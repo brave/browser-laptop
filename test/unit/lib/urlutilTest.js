@@ -189,6 +189,22 @@ describe('urlutil', function () {
     })
   })
 
+  describe('toPDFJSLocation', function () {
+    const baseUrl = 'chrome-extension://jdbefljfgobbmcidnmpjamcbhnbphjnb/'
+    it('pdf', function () {
+      assert.equal(UrlUtil.toPDFJSLocation('http://abc.com/test.pdf'), baseUrl + 'http://abc.com/test.pdf')
+    })
+    it('non-pdf', function () {
+      assert.equal(UrlUtil.toPDFJSLocation('http://abc.com/test.pdf.txt'), 'http://abc.com/test.pdf.txt')
+    })
+    it('file url', function () {
+      assert.equal(UrlUtil.toPDFJSLocation('file://abc.com/test.pdf.txt'), 'file://abc.com/test.pdf.txt')
+    })
+    it('empty', function () {
+      assert.equal(UrlUtil.toPDFJSLocation(''), '')
+    })
+  })
+
   describe('getHostname', function () {
     it('returns undefined if the URL is invalid', function () {
       assert.equal(UrlUtil.getHostname(null), undefined)
