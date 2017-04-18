@@ -901,12 +901,8 @@ class Frame extends ImmutableComponent {
   onFocus () {
     if (!this.frame.isEmpty()) {
       windowActions.setTabPageIndexByFrame(this.frame)
+      windowActions.tabOnFocus(this.frame.get('tabId'))
     }
-
-    // Make sure urlBar focused state is updated so that on tab
-    // changes the focus state doesn't go back to the urlBar
-    windowActions.setUrlBarFocused(false)
-    windowActions.setUrlBarActive(false)
 
     windowActions.setContextMenuDetail()
     windowActions.setPopupWindowDetail()

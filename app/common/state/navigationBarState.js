@@ -40,7 +40,11 @@ const api = {
     state = validateState(state)
     tabState.validateTabId(tabId)
 
-    return tabState.getFramePathByTabId(state, tabId).concat('navbar')
+    const path = tabState.getFramePathByTabId(state, tabId)
+    if (path == null) {
+      return null
+    }
+    return path.push('navbar')
   },
 
   getNavigationBar: (state, tabId) => {
@@ -51,15 +55,25 @@ const api = {
       return defaultState
     }
 
-    return state.getIn(api.getNavigationBarPath(state, tabId)) || defaultState
+    const path = api.getNavigationBarPath(state, tabId)
+    if (path == null) {
+      return defaultState
+    }
+
+    return state.getIn(path) || defaultState
   },
 
   getUrlBarPath: (state, tabId) => {
-    return api.getNavigationBarPath(state, tabId).concat('urlbar')
+    const path = api.getNavigationBarPath(state, tabId)
+    return path == null ? null : path.push('urlbar')
   },
 
   getUrlBar: (state, tabId) => {
-    return state.getIn(api.getUrlBarPath(state, tabId)) || defaultState.get('urlbar')
+    const path = api.getUrlBarPath(state, tabId)
+    if (path == null) {
+      return defaultState.get('urlbar')
+    }
+    return state.getIn(path) || defaultState.get('urlbar')
   },
 
   locationValueSuffix: (state, tabId) => {
@@ -103,7 +117,11 @@ const api = {
 
   setSelectedIndex: (state, tabId, index = -1) => {
     state = validateState(state)
-    return state.setIn(api.getUrlBarPath(state, tabId).concat(['suggestions', 'selectedIndex']), index)
+    const path = api.getUrlBarPath(state, tabId)
+    if (path == null) {
+      return state
+    }
+    return state.setIn(path.concat(['suggestions', 'selectedIndex']), index)
   },
 
   getSelectedIndex: (state, tabId) => {
@@ -113,8 +131,12 @@ const api = {
 
   setSuggestionList: (state, tabId, suggestionList = []) => {
     state = validateState(state)
+    const path = api.getUrlBarPath(state, tabId)
+    if (path == null) {
+      return state
+    }
     suggestionList = makeImmutable(suggestionList)
-    return state.setIn(api.getUrlBarPath(state, tabId).concat(['suggestions', 'suggestionList']), suggestionList)
+    return state.setIn(path.concat(['suggestions', 'suggestionList']), suggestionList)
   },
 
   getSuggestionList: (state, tabId) => {
@@ -133,7 +155,11 @@ const api = {
 
   setAutocompleteEnabled: (state, tabId, enabled = false) => {
     state = validateState(state)
-    return state.setIn(api.getUrlBarPath(state, tabId).concat(['suggestions', 'autocompleteEnabled']), enabled)
+    const path = api.getUrlBarPath(state, tabId)
+    if (path == null) {
+      return state
+    }
+    return state.setIn(path.concat(['suggestions', 'autocompleteEnabled']), enabled)
   },
 
   isAutocompleteEnabled: (state, tabId) => {
@@ -142,7 +168,11 @@ const api = {
 
   setLocation: (state, tabId, location, counter) => {
     state = validateState(state)
-    return state.setIn(api.getUrlBarPath(state, tabId).push('location'), location)
+    const path = api.getUrlBarPath(state, tabId)
+    if (path == null) {
+      return state
+    }
+    return state.setIn(path.push('location'), location)
   },
 
   getLocation: (state, tabId) => {
@@ -150,8 +180,13 @@ const api = {
   },
 
   setKeyCounter: (state, tabId, counter) => {
+    const path = api.getUrlBarPath(state, tabId)
+    if (path == null) {
+      return state
+    }
+
     if (counter) {
-      state = state.setIn(api.getUrlBarPath(state, tabId).push('keyCounter'), counter)
+      state = state.setIn(path.push('keyCounter'), counter)
     }
     return state
   },
@@ -162,9 +197,13 @@ const api = {
 
   setShouldRenderUrlBarSuggestions: (state, tabId, enabled = false) => {
     state = validateState(state)
-    state = state.setIn(api.getUrlBarPath(state, tabId).concat(['suggestions', 'shouldRender']), enabled)
+    const path = api.getUrlBarPath(state, tabId)
+    if (path == null) {
+      return state
+    }
+    state = state.setIn(path.concat(['suggestions', 'shouldRender']), enabled)
     if (!enabled) {
-      state = state.mergeIn(api.getUrlBarPath(state, tabId).push('suggestions'), defaultState.getIn(['urlbar', 'suggestions']))
+      state = state.mergeIn(path.push('suggestions'), defaultState.getIn(['urlbar', 'suggestions']))
     }
     return state
   },
@@ -175,39 +214,13 @@ const api = {
         suggestionList && suggestionList.size > 0
   },
 
-  setPreviousUrlBarSuggestionSelected: (state, tabId) => {
-    if (api.shouldRenderUrlBarSuggestions(state, tabId)) {
-      const selectedIndex = api.getSelectedIndex(state, tabId)
-      const lastSuffix = api.locationValueSuffix(state, tabId)
-
-      if (selectedIndex !== 0 && !lastSuffix) {
-        state = api.setSelectedIndex(state, tabId, 0)
-      } else if (selectedIndex > 0) {
-        state = api.setSelectedIndex(state, tabId, selectedIndex - 1)
-      }
-      // state = updateUrlSuffix(state, state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), suggestionList))
-    }
-    return state
-  },
-
-  setNextUrlBarSuggestionSelected: (state, tabId) => {
-    if (api.shouldRenderUrlBarSuggestions(state, tabId)) {
-      const selectedIndex = api.getSelectedIndex(state, tabId)
-      const lastSuffix = api.locationValueSuffix(state, tabId)
-
-      if (selectedIndex !== 0 && !lastSuffix) {
-        state = api.setSelectedIndex(state, tabId, 0)
-      } else if (selectedIndex > 0) {
-        state = api.setSelectedIndex(state, tabId, selectedIndex - 1)
-      }
-      // state = updateUrlSuffix(state, state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), suggestionList))
-    }
-    return state
-  },
-
   setActive: (state, tabId, active = false) => {
     state = validateState(state)
-    return state.setIn(api.getUrlBarPath(state, tabId).push('active'), active)
+    const path = api.getUrlBarPath(state, tabId)
+    if (path == null) {
+      return state
+    }
+    return state.setIn(path.push('active'), active)
   },
 
   isActive: (state, tabId) => {
@@ -216,7 +229,11 @@ const api = {
 
   setFocused: (state, tabId, focused = false) => {
     state = validateState(state)
-    return state.setIn(api.getUrlBarPath(state, tabId).push('focused'), focused)
+    const path = api.getUrlBarPath(state, tabId)
+    if (path == null) {
+      return state
+    }
+    return state.setIn(path.push('focused'), focused)
   },
 
   isFocused: (state, tabId) => {
@@ -225,11 +242,15 @@ const api = {
 
   setSelected: (state, tabId, selected = false) => {
     state = validateState(state)
+    const path = api.getUrlBarPath(state, tabId)
+    if (path == null) {
+      return state
+    }
     if (selected) {
       // selection implies focus
       state = state = api.setFocused(state, tabId, true)
     }
-    return state.setIn(api.getUrlBarPath(state, tabId).push('selected'), selected)
+    return state.setIn(path.push('selected'), selected)
   },
 
   isSelected: (state, tabId) => {

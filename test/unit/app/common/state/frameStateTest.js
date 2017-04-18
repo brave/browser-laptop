@@ -92,7 +92,7 @@ describe('frameState', function () {
 
     it('returns null if the frame for `tabId` does not exist', function () {
       const path = frameState.getPathByTabId(this.windowState, 3)
-      assert.deepEqual(path.toJS(), ['nosuchframe'])
+      assert.equal(path, null)
     })
 
     shouldValidateId('tabId', (tabId) => {

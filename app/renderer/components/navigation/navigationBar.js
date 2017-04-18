@@ -44,10 +44,6 @@ class NavigationBar extends React.Component {
     return windowStore.getFrame(this.props.activeFrameKey)
   }
 
-  get loading () {
-    return this.props.activeFrameKey !== undefined && this.props.loading
-  }
-
   onToggleBookmark () {
     const editing = this.bookmarked
     // show the AddEditBookmarkHanger control; saving/deleting takes place there
@@ -111,21 +107,6 @@ class NavigationBar extends React.Component {
       }))
   }
 
-  get titleMode () {
-    const hasTitle = this.props.title && this.props.location && this.props.title !== this.props.location.replace(/^https?:\/\//, '')
-    return this.props.activeTabShowingMessageBox ||
-      (
-        this.props.mouseInTitlebar === false &&
-        !this.props.bookmarkDetail &&
-        hasTitle &&
-        !['about:blank', 'about:newtab'].includes(this.props.location) &&
-        !this.loading &&
-        !this.props.navbar.getIn(['urlbar', 'focused']) &&
-        !this.props.navbar.getIn(['urlbar', 'active']) &&
-        getSetting(settings.DISABLE_TITLE_MODE) === false
-      )
-  }
-
   componentDidMount () {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, () => this.onToggleBookmark())
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark())
@@ -134,26 +115,50 @@ class NavigationBar extends React.Component {
   mergeProps (state, dispatchProps, ownProps) {
     const windowState = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(windowState) || Immutable.Map()
+    const activeFrameKey = activeFrame.get('key')
     const activeTabId = tabState.getActiveTabId(state, getCurrentWindowId())
+
+    const activeTabShowingMessageBox = tabState.isShowingMessageBox(state, activeTabId)
+    const bookmarkDetail = windowState.get('bookmarkDetail')
+    const mouseInTitlebar = windowState.getIn(['ui', 'mouseInTitlebar'])
+    const title = activeFrame.get('title') || ''
+    const loading = activeFrame.get('loading')
+    const location = activeFrame.get('location') || ''
+    const navbar = activeFrame.get('navbar') || Immutable.Map()
+
+    const hasTitle = title && location && title !== location.replace(/^https?:\/\//, '')
+    const titleMode = activeTabShowingMessageBox ||
+      (
+        mouseInTitlebar === false &&
+        !bookmarkDetail &&
+        hasTitle &&
+        !['about:blank', 'about:newtab'].includes(location) &&
+        !loading &&
+        !navbar.getIn(['urlbar', 'focused']) &&
+        !navbar.getIn(['urlbar', 'active']) &&
+        getSetting(settings.DISABLE_TITLE_MODE) === false
+      )
+
     const props = {}
 
-    props.navbar = activeFrame.get('navbar')
+    props.navbar = navbar
     props.sites = state.get('sites')
-    props.activeFrameKey = activeFrame.get('key')
-    props.location = activeFrame.get('location') || ''
-    props.title = activeFrame.get('title') || ''
+    props.activeFrameKey = activeFrameKey
+    props.location = location
+    props.title = title
     props.partitionNumber = activeFrame.get('partitionNumber') || 0
     props.isSecure = activeFrame.getIn(['security', 'isSecure'])
-    props.loading = activeFrame.get('loading')
-    props.bookmarkDetail = windowState.get('bookmarkDetail')
-    props.mouseInTitlebar = windowState.getIn(['ui', 'mouseInTitlebar'])
+    props.loading = loading
+    props.bookmarkDetail = bookmarkDetail
+    props.mouseInTitlebar = mouseInTitlebar
     props.enableNoScript = ownProps.enableNoScript
     props.settings = state.get('settings')
     props.menubarVisible = ownProps.menubarVisible
     props.siteSettings = state.get('siteSettings')
     props.synopsis = state.getIn(['publisherInfo', 'synopsis']) || new Immutable.Map()
-    props.activeTabShowingMessageBox = tabState.isShowingMessageBox(state, activeTabId)
+    props.activeTabShowingMessageBox = activeTabShowingMessageBox
     props.locationInfo = state.get('locationInfo')
+    props.titleMode = titleMode
 
     return props
   }
@@ -168,7 +173,7 @@ class NavigationBar extends React.Component {
       ref='navigator'
       data-frame-key={this.props.activeFrameKey}
       className={cx({
-        titleMode: this.titleMode
+        titleMode: this.props.titleMode
       })}>
       {
         this.props.bookmarkDetail && this.props.bookmarkDetail.get('isBookmarkHanger')
@@ -182,9 +187,9 @@ class NavigationBar extends React.Component {
         : null
       }
       {
-        this.titleMode
+        this.props.titleMode
         ? null
-        : this.loading
+        : this.props.loading
           ? <span className='navigationButtonContainer'>
             <button data-l10n-id='stopButton'
               className='navigationButton stopButton'
@@ -199,7 +204,7 @@ class NavigationBar extends React.Component {
           </span>
       }
       {
-        !this.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
+        !this.props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
         ? <span className='navigationButtonContainer'>
           <button data-l10n-id='homeButton'
             className='navigationButton homeButton'
@@ -209,7 +214,7 @@ class NavigationBar extends React.Component {
       }
       <div className='startButtons'>
         {
-          !this.titleMode
+          !this.props.titleMode
           ? <span className='bookmarkButtonContainer'>
             <button data-l10n-id={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
               className={cx({
@@ -224,7 +229,7 @@ class NavigationBar extends React.Component {
         }
       </div>
       <UrlBar
-        titleMode={this.titleMode}
+        titleMode={this.props.titleMode}
         onStop={this.onStop}
         menubarVisible={this.props.menubarVisible}
         enableNoScript={this.props.enableNoScript}

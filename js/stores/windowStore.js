@@ -248,7 +248,6 @@ const emitChanges = debounce(windowStore.emitChanges.bind(windowStore), 5)
 
 const applyReducers = (state, action) => [
   require('../../app/renderer/reducers/urlBarReducer'),
-  require('../../app/renderer/reducers/urlBarSuggestionsReducer'),
   require('../../app/renderer/reducers/frameReducer'),
   require('../../app/renderer/reducers/contextMenuReducer')
 ].reduce(
@@ -438,19 +437,6 @@ const doAction = (action) => {
       if (action.computedThemeColor !== undefined) {
         windowState = windowState.setIn(frameStatePathForFrame(windowState, action.frameProps).concat(['computedThemeColor']), action.computedThemeColor)
         windowState = windowState.setIn(tabStatePathForFrame(windowState, action.frameProps).concat(['computedThemeColor']), action.computedThemeColor)
-      }
-      break
-    case windowConstants.WINDOW_SET_URL_BAR_FOCUSED:
-      windowState = windowState.setIn(activeFrameStatePath(windowState).concat(['navbar', 'urlbar', 'focused']), action.isFocused)
-      break
-    case windowConstants.WINDOW_SET_URL_BAR_SELECTED:
-      const urlBarPath = activeFrameStatePath(windowState).concat(['navbar', 'urlbar'])
-      windowState = windowState.mergeIn(urlBarPath, {
-        selected: action.selected
-      })
-      // selection implies focus
-      if (action.selected) {
-        windowState = windowState.setIn(activeFrameStatePath(windowState).concat(['navbar', 'urlbar', 'focused']), true)
       }
       break
     case windowConstants.WINDOW_FRAME_SHORTCUT_CHANGED:
