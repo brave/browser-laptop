@@ -124,7 +124,7 @@ class ImportBrowserDataPanel extends ImmutableComponent {
         browsers.push(<option value={browser.index}>{browser.name}</option>)
       })
     }
-    return <Dialog onHide={this.props.onHide} data-test-id='importBrowserDataPanel' isClickDismiss>
+    return <Dialog onHide={this.props.onHide} testId='importBrowserDataPanel' isClickDismiss>
       <CommonForm data-test-id='importBrowserData' onClick={(e) => e.stopPropagation()}>
         <CommonFormTitle
           data-test-id='importBrowserDataTitle'

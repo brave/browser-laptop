@@ -10,6 +10,20 @@ const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
 const KeyCodes = require('../../app/common/constants/keyCodes')
 
+const {StyleSheet, css} = require('aphrodite/no-important')
+const commonStyles = require('../../app/renderer/components/styles/commonStyles')
+const globalStyles = require('../../app/renderer/components/styles/global')
+
+const {
+  CommonForm,
+  CommonFormSection,
+  CommonFormTitle,
+  CommonFormDropdown,
+  CommonFormTextbox,
+  CommonFormButtonWrapper,
+  commonFormStyles
+} = require('../../app/renderer/components/commonForm')
+
 class AutofillCreditCardPanel extends ImmutableComponent {
   constructor () {
     super()
@@ -77,40 +91,111 @@ class AutofillCreditCardPanel extends ImmutableComponent {
       ExpYear.push(<option value={i}>{i}</option>)
     }
 
-    return <Dialog onHide={this.props.onHide} className='manageAutofillDataPanel autofillCreditCardPanel' isClickDismiss>
-      <div className='genericForm manageAutofillData' onClick={this.onClick}>
-        <div className='formRow manageAutofillDataTitle' data-l10n-id='editCreditCard' />
-        <div className='genericFormTable'>
-          <div id='nameOnCard' className='formRow manageAutofillDataOptions'>
-            <label data-l10n-id='name' htmlFor='nameOnCard' />
-            <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onNameChange}
-              value={this.props.currentDetail.get('name')} ref={(nameOnCard) => { this.nameOnCard = nameOnCard }} />
+    return <Dialog onHide={this.props.onHide} testId='autofillCreditCardPanel' isClickDismiss>
+      <CommonForm onClick={this.onClick}>
+        <CommonFormTitle
+          data-test-id='manageAutofillDataTitle'
+          data-l10n-id='editCreditCard'
+        />
+        <CommonFormSection>
+          <div className={css(commonFormStyles.sectionWrapper)}>
+            <div className={css(commonFormStyles.inputWrapper, commonFormStyles.inputWrapper__label)}>
+              <label data-l10n-id='name' htmlFor='nameOnCard' />
+              <label className={css(commonFormStyles.input__marginRow)} data-l10n-id='creditCardNumber' htmlFor='creditCardNumber' />
+            </div>
+            <div className={css(commonFormStyles.inputWrapper, commonFormStyles.inputWrapper__input)}>
+              <div data-test-id='creditCardNameWrapper'>
+                <input className={css(
+                  commonStyles.formControl,
+                  commonStyles.textbox,
+                  commonStyles.textbox__outlineable,
+                  commonFormStyles.input__box,
+                  styles.input
+                )}
+                  spellCheck='false'
+                  onKeyDown={this.onKeyDown}
+                  onChange={this.onNameChange}
+                  value={this.props.currentDetail.get('name')}
+                  ref={(nameOnCard) => { this.nameOnCard = nameOnCard }}
+                />
+              </div>
+              <div data-test-id='creditCardNumberWrapper'
+                className={css(commonFormStyles.input__marginRow)
+              }>
+                <CommonFormTextbox
+                  spellCheck='false'
+                  onKeyDown={this.onKeyDown}
+                  onChange={this.onCardChange}
+                  value={this.props.currentDetail.get('card')}
+                />
+              </div>
+            </div>
           </div>
-          <div id='creditCardNumber' className='formRow manageAutofillDataOptions'>
-            <label data-l10n-id='creditCardNumber' htmlFor='creditCardNumber' />
-            <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onCardChange}
-              value={this.props.currentDetail.get('card')} />
+          <div className={css(
+            commonFormStyles.sectionWrapper,
+            styles.sectionWrapper__expirationDate
+          )}>
+            <div className={css(
+              commonFormStyles.inputWrapper__label,
+              commonFormStyles.input__marginRow
+            )}>
+              <label data-l10n-id='expirationDate' htmlFor='expirationDate' />
+            </div>
+            <div className={css(
+              commonFormStyles.input__marginRow,
+              styles.expirationDate__dropdowns
+            )}>
+              <CommonFormDropdown
+                value={this.props.currentDetail.get('month')}
+                onChange={this.onExpMonthChange}
+                data-test-id='expMonthSelect'>
+                {ExpMonth}
+              </CommonFormDropdown>
+              <div className={css(styles.dropdown__right)}>
+                <CommonFormDropdown
+                  value={this.props.currentDetail.get('year')}
+                  onChange={this.onExpYearChange}
+                  data-test-id='expYearSelect'>
+                  {ExpYear}
+                </CommonFormDropdown>
+              </div>
+            </div>
           </div>
-          <div id='expirationDate' className='formRow manageAutofillDataOptions'>
-            <label data-l10n-id='expirationDate' htmlFor='expirationDate' />
-            <select value={this.props.currentDetail.get('month')}
-              onChange={this.onExpMonthChange} className='expMonthSelect' >
-              {ExpMonth}
-            </select>
-            <select value={this.props.currentDetail.get('year')}
-              onChange={this.onExpYearChange} className='expYearSelect' >
-              {ExpYear}
-            </select>
-          </div>
-          <div className='formRow manageAutofillDataButtons'>
-            <Button l10nId='cancel' className='whiteButton' onClick={this.props.onHide} />
-            <Button l10nId='save' className='primaryButton saveCreditCardButton' onClick={this.onSave}
-              disabled={this.disableSaveButton} />
-          </div>
-        </div>
-      </div>
+        </CommonFormSection>
+        <CommonFormButtonWrapper>
+          <Button className='whiteButton'
+            l10nId='cancel'
+            testId='cancelCreditCardButton'
+            onClick={this.props.onHide}
+          />
+          <Button className='primaryButton'
+            disabled={this.disableSaveButton}
+            l10nId='save'
+            testId='saveCreditCardButton'
+            onClick={this.onSave}
+          />
+        </CommonFormButtonWrapper>
+      </CommonForm>
     </Dialog>
   }
 }
+
+const styles = StyleSheet.create({
+  // Copied from textbox.js
+  input: {
+    width: '100%'
+  },
+
+  sectionWrapper__expirationDate: {
+    alignItems: 'center',
+    justifyContent: 'flex-end'
+  },
+  expirationDate__dropdowns: {
+    display: 'flex'
+  },
+  dropdown__right: {
+    marginLeft: `calc(${globalStyles.spacing.dialogInsideMargin} / 3)`
+  }
+})
 
 module.exports = AutofillCreditCardPanel

@@ -130,7 +130,7 @@ const globalStyles = {
     closeIconSize: '13px',
     narrowIconSize: '12px',
     dialogWidth: '422px',
-    dialogLargeWidth: '600px',
+    dialogLargeWidth: '600px', // temporary workaround
     dialogTopOffset: '30px',
     dialogInsideMargin: '18px',
     paymentsMargin: '20px',
