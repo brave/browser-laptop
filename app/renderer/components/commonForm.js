@@ -20,7 +20,11 @@ class CommonForm extends ImmutableComponent {
 
 class CommonFormLarge extends ImmutableComponent {
   render () {
-    return <div className={css(commonStyles.flyoutDialog, styles.CommonForm, styles.CommonFormLarge)} {...this.props} />
+    return <div className={css(
+      commonStyles.flyoutDialog,
+      styles.CommonForm,
+      styles.CommonFormLarge
+    )} {...this.props} />
   }
 }
 
