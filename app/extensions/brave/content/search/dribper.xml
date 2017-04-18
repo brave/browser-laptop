@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <ShortName>Dribper</ShortName>
+  <Description>Dribper Search</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <LongName>Dribper</LongName>
+  <Image height="16" width="16">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuNvyMY98AAAGSSURBVDhPjVNLSwJRFHY5P6WFSwmCVkE/oVWroMCFvyEIomgR0iZatAiLoNok4ipr1yKU7KlCpSQVPsuSRp3rdLrfYe54dTRafMy953vMuS8fEQ2DIRGQCDnAGDWPdrBgNEyxKewf8VD+Ng9TZRvA2OraHXDQ6B7d7G+2uy/njw0xHU7T+EqyD1Prl3SSqQtopHZM+ZTZALFxWvQYB7EcL5ATwp1wAFrDn5VoIZKl2HWVgdCZrdu+kLPcu3CWwwEG1qy3vRTLyzLR60ebv5LnUMVDC4+kDAQEsEmK1AOCezma3b6jtrCpUDNdHshXzRa8CAhhp3VSBcxHMjxPZOs817uMXlVsWQpxwEGy5BIAAo5SvVqx3uJlTKz2NPCoAM8S5nbu+RvczVK6+AUhHacrLg/AA6+7iThnXRBOPLOx1rRo/6JEk2spl4O2I2wLXgTwMeKS6AF/IX5Ts/Rj5C4+W+INl2SYQcdi9ImghUcPAPwgcElGXWX82TF7rrJC32PCTgMYY81O2yMfkw6I/vGcyfcL/qkLTWzFoskAAAAASUVORK5CYII=</Image>
+  <Url type="text/html" method="get" template="https://dribper.com/?q={searchTerms}"/>
+  <Url type="application/x-suggestions+json" template="https://dribper.com/auto?q={searchTerms}"/>
+</OpenSearchDescription>
