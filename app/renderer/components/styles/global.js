@@ -80,7 +80,8 @@ const globalStyles = {
     alphaWhite: 'rgba(255,255,255,0.8)'
   },
   filter: {
-    makeWhite: 'brightness(0) invert(1)'
+    makeWhite: 'brightness(0) invert(1)',
+    whiteShadow: 'drop-shadow(0px 0px 2px rgb(255, 255, 255))'
   },
   radius: {
     borderRadius: '4px',
