@@ -107,7 +107,8 @@ module.exports.aboutUrls = new Immutable.Map({
   'about:preferences': module.exports.getBraveExtUrl('about-preferences.html'),
   'about:safebrowsing': module.exports.getBraveExtUrl('about-safebrowsing.html'),
   'about:styles': module.exports.getBraveExtUrl('about-styles.html'),
-  'about:contributions': module.exports.getBraveExtUrl('about-contributions.html')
+  'about:contributions': module.exports.getBraveExtUrl('about-contributions.html'),
+  'about:welcome': module.exports.getBraveExtUrl('about-welcome.html')
 })
 
 module.exports.isIntermediateAboutPage = (location) =>

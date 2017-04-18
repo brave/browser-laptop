@@ -155,7 +155,7 @@ let generateBraveManifest = () => {
     'referrer': 'no-referrer',
     'style-src': '\'self\' \'unsafe-inline\'',
     'img-src': '* data: file://*',
-    'frame-src': '\'self\' https://buy.coinbase.com'
+    'frame-src': '\'self\' https://buy.coinbase.com https://brave.com'
   }
 
   if (process.env.NODE_ENV === 'development') {
