@@ -41,7 +41,8 @@ class Favicon extends ImmutableComponent {
   render () {
     const iconStyles = StyleSheet.create({
       favicon: {
-        backgroundImage: `url(${this.favicon})`
+        backgroundImage: `url(${this.favicon})`,
+        filter: getTabIconColor(this.props) === 'white' ? globalStyles.filter.whiteShadow : 'none'
       },
       loadingIconColor: {
         // Don't change icon color unless when it should be white
