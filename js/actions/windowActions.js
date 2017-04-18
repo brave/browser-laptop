@@ -6,7 +6,6 @@
 
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const windowConstants = require('../constants/windowConstants')
-const windowStore = require('../stores/windowStore')
 
 function dispatch (action) {
   AppDispatcher.dispatch(action)
@@ -604,48 +603,28 @@ const windowActions = {
   /**
    * Dispatches a message to indicate that the frame should be muted
    *
-   * @param {Object} frameProps - Properties of the frame in question
+   * @param {number} frameKey - Key of the frame in question
+   * @param {number} tabId - Id of the tab in question
    * @param {boolean} muted - true if the frame is muted
    */
-  setAudioMuted: function (frameProps, muted) {
+  setAudioMuted: function (frameKey, tabId, muted) {
     dispatch({
       actionType: windowConstants.WINDOW_SET_AUDIO_MUTED,
-      frameProps,
+      frameKey,
+      tabId,
       muted
     })
   },
 
   /**
-   * Dispatches a mute/unmute call to all frames in a provided list (used by TabList).
+   * Dispatches a mute/unmute call to all frames in a provided list.
    *
-   * @param {Object} framePropsList - List of frame properties to consider
-   * @param {boolean} muted - true if the frames should be muted
+   * @param {Object} frameList - List of frames to consider (frameKey and tabId)
    */
-  muteAllAudio: function (framePropsList, mute) {
-    framePropsList.forEach((frameProps) => {
-      if (mute && frameProps.get('audioPlaybackActive') && !frameProps.get('audioMuted')) {
-        this.setAudioMuted(frameProps, true)
-      } else if (!mute && frameProps.get('audioMuted')) {
-        this.setAudioMuted(frameProps, false)
-      }
-    })
-  },
-
-  /**
-   * Dispatches a mute call to all frames except the one provided.
-   * The provided frame will have its audio unmuted.
-   *
-   * @param {Object} frameToSkip - Properties of the frame to keep audio
-   */
-  muteAllAudioExcept: function (frameToSkip) {
-    let framePropsList = windowStore.getState().get('frames')
-
-    framePropsList.forEach((frameProps) => {
-      if (frameProps.get('key') !== frameToSkip.get('key') && frameProps.get('audioPlaybackActive') && !frameProps.get('audioMuted')) {
-        this.setAudioMuted(frameProps, true)
-      } else {
-        this.setAudioMuted(frameProps, false)
-      }
+  muteAllAudio: function (frameList) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SET_ALL_AUDIO_MUTED,
+      frameList
     })
   },
 

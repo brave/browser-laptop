@@ -494,8 +494,18 @@ const doAction = (action) => {
       }
       break
     case windowConstants.WINDOW_SET_AUDIO_MUTED:
-      windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps), 'audioMuted'], action.muted)
-      windowState = windowState.setIn(['tabs', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps), 'audioMuted'], action.muted)
+      {
+        const index = frameStateUtil.getFrameIndex(windowState, action.frameKey)
+        windowState = windowState.setIn(['frames', index, 'audioMuted'], action.muted)
+        windowState = windowState.setIn(['tabs', index, 'audioMuted'], action.muted)
+      }
+      break
+    case windowConstants.WINDOW_SET_ALL_AUDIO_MUTED:
+      action.frameList.forEach((frameProp) => {
+        let index = frameStateUtil.getFrameIndex(windowState, frameProp.frameKey)
+        windowState = windowState.setIn(['frames', index, 'audioMuted'], frameProp.muted)
+        windowState = windowState.setIn(['tabs', index, 'audioMuted'], frameProp.muted)
+      })
       break
     case windowConstants.WINDOW_SET_AUDIO_PLAYBACK_ACTIVE:
       windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps), 'audioPlaybackActive'], action.audioPlaybackActive)

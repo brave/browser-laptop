@@ -457,9 +457,8 @@ const api = {
 
   setAudioMuted: (state, action) => {
     action = makeImmutable(action)
-    const frameProps = action.get('frameProps')
     const muted = action.get('muted')
-    const tabId = frameProps.get('tabId')
+    const tabId = action.get('tabId')
     const tab = api.getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
       tab.setAudioMuted(muted)
