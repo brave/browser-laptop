@@ -3,6 +3,7 @@ const contextMenus = require('./browser/extensions/contextMenus')
 const extensionActions = require('./common/actions/extensionActions')
 const config = require('../js/constants/config')
 const appConfig = require('../js/constants/appConfig')
+const messages = require('../js/constants/messages')
 const {fileUrl} = require('../js/lib/appUrlUtil')
 const {getExtensionsPath, getBraveExtUrl, getBraveExtIndexHTML} = require('../js/lib/appUrlUtil')
 const {getSetting} = require('../js/settings')
@@ -16,6 +17,7 @@ const fs = require('fs')
 const path = require('path')
 const l10n = require('../js/l10n')
 const {bravifyText} = require('./renderer/lib/extensionsUtil')
+const ipcMain = require('electron').ipcMain
 
 // Takes Content Security Policy flags, for example { 'default-src': '*' }
 // Returns a CSP string, for example 'default-src: *;'
@@ -338,6 +340,10 @@ module.exports.init = () => {
       extensionInfo.setState(extensionId, extensionStates.REGISTERED)
       loadExtension(extensionId, extensionPath)
     }
+  })
+
+  ipcMain.on(messages.LOAD_URL_REQUESTED, (e, tabId, url) => {
+    appActions.loadURLRequested(tabId, url)
   })
 
   process.on('reload-sync-extension', () => {

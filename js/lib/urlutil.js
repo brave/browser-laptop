@@ -315,6 +315,19 @@ const UrlUtil = {
   },
 
   /**
+   * Converts a potential PDF URL to the PDFJS URL.
+   * XXX: This only looks at the URL file extension, not MIME types.
+   * @param {string} url
+   * @return {string}
+   */
+  toPDFJSLocation: function (url) {
+    if (url && UrlUtil.isHttpOrHttps(url) && UrlUtil.isFileType(url, 'pdf')) {
+      return `chrome-extension://${pdfjsExtensionId}/${url}`
+    }
+    return url
+  },
+
+  /**
    * Gets location to display in the urlbar
    * @param {string} url
    * @param {boolean} pdfjsEnabled
