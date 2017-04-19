@@ -4,6 +4,8 @@
 
 const React = require('react')
 const {StyleSheet, css} = require('aphrodite')
+const electron = require('electron')
+const ipc = electron.ipcRenderer
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
@@ -37,6 +39,7 @@ const siteSettings = require('../../../../js/state/siteSettings')
 const cx = require('../../../../js/lib/classSet')
 
 // Constants
+const messages = require('../../../../js/constants/messages')
 const settings = require('../../../../js/constants/settings')
 const appConfig = require('../../../../js/constants/appConfig')
 
@@ -168,6 +171,16 @@ class Navigator extends ImmutableComponent {
       return
     }
     return !isMaximized() ? windowActions.shouldMaximize(getCurrentWindowId()) : windowActions.shouldMinimize(getCurrentWindowId())
+  }
+
+  componentDidMount () {
+    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BACK, this.onBack)
+    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_FORWARD, this.onForward)
+  }
+
+  componentWillUnmount () {
+    ipc.off(messages.SHORTCUT_ACTIVE_FRAME_BACK, this.onBack)
+    ipc.off(messages.SHORTCUT_ACTIVE_FRAME_FORWARD, this.onForward)
   }
 
   render () {

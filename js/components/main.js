@@ -437,9 +437,6 @@ class Main extends ImmutableComponent {
       frameProps && windowActions.setRedirectedBy(frameProps, ruleset, details.url)
     })
 
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BACK, this.onBack)
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_FORWARD, this.onForward)
-
     ipc.on(messages.CERT_ERROR, (e, details) => {
       const frame = frameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
       if (frame && (frame.get('location') === details.url ||
