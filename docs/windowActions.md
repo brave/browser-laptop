@@ -505,38 +505,27 @@ If set, also indicates that the popup window is shown.
 
 
 
-### setAudioMuted(frameProps, muted) 
+### setAudioMuted(frameKey, tabId, muted) 
 
 Dispatches a message to indicate that the frame should be muted
 
 **Parameters**
 
-**frameProps**: `Object`, Properties of the frame in question
+**frameKey**: `number`, Key of the frame in question
+
+**tabId**: `number`, Id of the tab in question
 
 **muted**: `boolean`, true if the frame is muted
 
 
 
-### muteAllAudio(framePropsList, muted) 
+### muteAllAudio(frameList) 
 
-Dispatches a mute/unmute call to all frames in a provided list (used by TabList).
-
-**Parameters**
-
-**framePropsList**: `Object`, List of frame properties to consider
-
-**muted**: `boolean`, true if the frames should be muted
-
-
-
-### muteAllAudioExcept(frameToSkip) 
-
-Dispatches a mute call to all frames except the one provided.
-The provided frame will have its audio unmuted.
+Dispatches a mute/unmute call to all frames in a provided list.
 
 **Parameters**
 
-**frameToSkip**: `Object`, Properties of the frame to keep audio
+**frameList**: `Object`, List of frames to consider (frameKey and tabId)
 
 
 

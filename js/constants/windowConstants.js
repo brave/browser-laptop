@@ -100,7 +100,8 @@ const windowConstants = {
   WINDOW_SHOULD_MAXIMIZE: _,
   WINDOW_SHOULD_UNMAXIMIZE: _,
   WINDOW_SHOULD_EXIT_FULL_SCREEN: _,
-  WINDOW_SHOULD_OPEN_DEV_TOOLS: _
+  WINDOW_SHOULD_OPEN_DEV_TOOLS: _,
+  WINDOW_SET_ALL_AUDIO_MUTED: _
 }
 
 module.exports = mapValuesByKeys(windowConstants)

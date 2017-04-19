@@ -169,7 +169,8 @@ class Tab extends ImmutableComponent {
 
   onMuteFrame (muted, event) {
     event.stopPropagation()
-    windowActions.setAudioMuted(this.frame, muted)
+    const frame = this.frame
+    windowActions.setAudioMuted(frame.get('key'), frame.get('tabId'), muted)
   }
 
   get loading () {

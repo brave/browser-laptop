@@ -87,13 +87,13 @@ const getDownloadsBarHeight = () => {
 function tabPageTemplateInit (framePropsList) {
   return [{
     label: locale.translation('unmuteTabs'),
-    click: (item) => {
-      windowActions.muteAllAudio(framePropsList, false)
+    click: () => {
+      windowActions.muteAllAudio(generateMuteFrameList(framePropsList, false))
     }
   }, {
     label: locale.translation('muteTabs'),
-    click: (item) => {
-      windowActions.muteAllAudio(framePropsList, true)
+    click: () => {
+      windowActions.muteAllAudio(generateMuteFrameList(framePropsList, true))
     }
   }, {
     label: locale.translation('closeTabPage'),
@@ -101,6 +101,16 @@ function tabPageTemplateInit (framePropsList) {
       windowActions.closeFrames(framePropsList)
     }
   }]
+}
+
+function generateMuteFrameList (framePropsList, muted) {
+  return framePropsList.map((frameProp) => {
+    return {
+      frameKey: frameProp.get('key'),
+      tabId: frameProp.get('tabId'),
+      muted: muted && frameProp.get('audioPlaybackActive') && !frameProp.get('audioMuted')
+    }
+  })
 }
 
 function urlBarTemplateInit (searchDetail, activeFrame, e) {
@@ -516,8 +526,11 @@ function flashTemplateInit (frameProps) {
 
 function tabTemplateInit (frameProps) {
   const frameKey = frameProps.get('key')
+  const tabId = frameProps.get('tabId')
   const template = [CommonMenu.newTabMenuItem(frameProps.get('tabId'))]
   const location = frameProps.get('location')
+  const store = windowStore.getState()
+
   if (location !== 'about:newtab') {
     template.push(
       CommonMenu.separatorMenuItem,
@@ -531,7 +544,7 @@ function tabTemplateInit (frameProps) {
       }, {
         label: locale.translation('clone'),
         click: (item) => {
-          appActions.tabCloned(frameProps.get('tabId'))
+          appActions.tabCloned(tabId)
         }
       })
   }
@@ -543,7 +556,7 @@ function tabTemplateInit (frameProps) {
       click: (item) => {
         const browserOpts = { positionByMouseCursor: true }
         const frameOpts = frameOptsFromFrame(frameProps).toJS()
-        appActions.tabMoved(frameProps.get('tabId'), frameOpts, browserOpts, -1)
+        appActions.tabMoved(tabId, frameOpts, browserOpts, -1)
       }
     })
   }
@@ -555,7 +568,7 @@ function tabTemplateInit (frameProps) {
         label: locale.translation(isPinned ? 'unpinTab' : 'pinTab'),
         click: (item) => {
           // Handle converting the current tab window into a pinned site
-          appActions.tabPinned(frameProps.get('tabId'), !isPinned)
+          appActions.tabPinned(tabId, !isPinned)
         }
       })
     }
@@ -569,11 +582,21 @@ function tabTemplateInit (frameProps) {
   //   }
   // })
 
+  const frames = windowStore.getState().get('frames')
+  const frameToSkip = frameProps.get('key')
+  const frameList = frames.map((frame) => {
+    return {
+      frameKey: frame.get('key'),
+      tabId: frame.get('tabId'),
+      muted: frame.get('key') !== frameToSkip && frame.get('audioPlaybackActive')
+    }
+  })
+
   template.push(CommonMenu.separatorMenuItem,
     {
       label: locale.translation('muteOtherTabs'),
-      click: (item) => {
-        windowActions.muteAllAudioExcept(frameProps)
+      click: () => {
+        windowActions.muteAllAudio(frameList)
       }
     })
 
@@ -583,7 +606,7 @@ function tabTemplateInit (frameProps) {
     template.push({
       label: locale.translation(isMuted ? 'unmuteTab' : 'muteTab'),
       click: (item) => {
-        windowActions.setAudioMuted(frameProps, !isMuted)
+        windowActions.setAudioMuted(frameKey, tabId, !isMuted)
       }
     })
   }
@@ -627,7 +650,7 @@ function tabTemplateInit (frameProps) {
 
   template.push(Object.assign({},
     CommonMenu.reopenLastClosedTabItem(),
-    { enabled: windowStore.getState().get('closedFrames').size > 0 }
+    { enabled: store.get('closedFrames').size > 0 }
   ))
 
   return menuUtil.sanitizeTemplateItems(template)
