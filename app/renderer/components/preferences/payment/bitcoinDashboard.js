@@ -8,7 +8,7 @@ const {StyleSheet, css} = require('aphrodite')
 // components
 const Button = require('../../../../../js/components/button')
 const ModalOverlay = require('../../../../../js/components/modalOverlay')
-const ImmutableComponent = require('../../../../../js/components/immutableComponent')
+const ImmutableComponent = require('../../immutableComponent')
 
 // styles
 const commonStyles = require('../../styles/commonStyles')
@@ -341,7 +341,7 @@ class BitcoinDashboard extends ImmutableComponent {
                         {/* TODO: refactor button.js */}
                         <Button className={cx({
                           primaryButton: true,
-                          [css(globalStyles.spacing.dialogInsideMargin)]: true
+                          [css(styles.dialogInsideMargin__bottom)]: true
                         })}
                           l10nId='bitcoinVisitAccount'
                           testId='bitcoinVisitAccountButton'
@@ -505,6 +505,9 @@ const styles = StyleSheet.create({
   fa: {
     position: 'absolute',
     left: '-45px'
+  },
+  dialogInsideMargin__bottom: {
+    marginBottom: globalStyles.spacing.dialogInsideMargin
   }
 })
 

@@ -54,6 +54,11 @@ const tabsReducer = (state, action) => {
     case windowConstants.WINDOW_SET_AUDIO_MUTED:
       state = tabs.setAudioMuted(state, action)
       break
+    case windowConstants.WINDOW_SET_ALL_AUDIO_MUTED:
+      action.get('frameList').forEach((frameProp) => {
+        state = tabs.setAudioMuted(state, frameProp)
+      })
+      break
     case windowConstants.WINDOW_SET_ACTIVE_FRAME:
       state = tabs.setActive(state, action)
       break

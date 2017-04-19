@@ -4,7 +4,7 @@
 
 const React = require('react')
 const Immutable = require('immutable')
-const ImmutableComponent = require('../../../js/components/immutableComponent')
+const ImmutableComponent = require('./immutableComponent')
 const windowActions = require('../../../js/actions/windowActions')
 const separatorMenuItem = require('../../common/commonMenu').separatorMenuItem
 const keyCodes = require('../../common/constants/keyCodes')

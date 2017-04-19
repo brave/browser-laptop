@@ -1,4 +1,4 @@
-const ImmutableComponent = require('../../../../js/components/immutableComponent')
+const ImmutableComponent = require('../immutableComponent')
 const preferenceTabs = require('../../../../js/constants/preferenceTabs')
 const PreferenceNavigationButton = require('./preferenceNavigationButton')
 const HelpfulHints = require('./helpfulHints')

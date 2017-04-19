@@ -9,7 +9,7 @@ const {StyleSheet, css} = require('aphrodite')
 const {btcToCurrencyString} = require('../../../../common/lib/ledgerUtil')
 
 // components
-const ImmutableComponent = require('../../../../../js/components/immutableComponent')
+const ImmutableComponent = require('../../immutableComponent')
 const Button = require('../../../../../js/components/button')
 const {RecoveryKeyTextbox} = require('../../textbox')
 const {SettingsList, SettingItem} = require('../../settings')

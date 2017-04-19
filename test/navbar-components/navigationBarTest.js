@@ -355,7 +355,7 @@ describe('navigationBar tests', function () {
       yield this.app.client.tabByUrl(Brave.newTabUrl).url(pageWithNoFavicon).waitForUrl(pageWithNoFavicon).windowParentByUrl(pageWithNoFavicon)
       yield this.app.client.waitUntil(function () {
         return this.getAttribute('[data-test-id="defaultIcon"]', 'class').then((className) =>
-          className === 'fa fa-file-o')
+          className.includes('fa fa-file-o'))
       })
     })
   })

@@ -1,4 +1,4 @@
-const ImmutableComponent = require('../../../../js/components/immutableComponent')
+const ImmutableComponent = require('../immutableComponent')
 const {StyleSheet, css} = require('aphrodite')
 const globalStyles = require('../styles/global')
 

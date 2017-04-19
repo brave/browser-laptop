@@ -9,7 +9,7 @@
  */
 
 const React = require('react')
-const ImmutableComponent = require('../../../js/components/immutableComponent')
+const ImmutableComponent = require('./immutableComponent')
 const appConfig = require('../../../js/constants/appConfig')
 const cx = require('../../../js/lib/classSet')
 

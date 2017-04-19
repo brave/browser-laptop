@@ -147,6 +147,8 @@ const messages = {
   SAVE_INIT_DATA: _,
   RELOAD_SYNC_EXTENSION: _,
   RESET_SYNC: _,
+  // PDFJS
+  LOAD_URL_REQUESTED: _,
   // Torrent
   TORRENT_MESSAGE: _
 }

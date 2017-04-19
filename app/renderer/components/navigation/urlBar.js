@@ -431,7 +431,7 @@ class UrlBar extends React.Component {
     const history = (activeFrame.get('history') || new Immutable.List())
     const canGoForward = activeTabId === tabState.TAB_ID_NONE ? false : tabState.canGoForward(state, activeTabId)
     const urlbarLocation = urlbar.get('location')
-    const locationValue = (isIntermediateAboutPage(urlbarLocation) && history.size() > 0 && !canGoForward)
+    const locationValue = (isIntermediateAboutPage(urlbarLocation) && history.size > 0 && !canGoForward)
         ? history.last() : UrlUtil.getDisplayLocation(urlbarLocation, getSetting(settings.PDFJS_ENABLED))
     const selectedIndex = activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])
 

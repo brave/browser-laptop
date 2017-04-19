@@ -22,6 +22,7 @@ Brave welcomes contributions via [pull requests](https://github.com/brave/browse
     Fix #206
 ````
 
+* If you update the npm dependencies, run `npm shrinkwrap --dev` before committing changes.
 * Run the tests by running `npm run watch-test` and `npm test` in separate terminals.
 * Make sure [Flow](http://flowtype.org/) type checking passes: `npm run-script flow`. BONUS: Help us out by adding more [Flow type annotations](http://flowtype.org/blog/2015/02/20/Flow-Comments.html) to new and existing Brave code!
 * When making style changes, please be sure that you are [following our style guidelines](https://github.com/brave/browser-laptop/blob/master/docs/style.md).

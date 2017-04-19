@@ -1,5 +1,5 @@
 const appStore = require('../../../js/stores/appStoreRenderer')
-const ImmutableComponent = require('../../../js/components/immutableComponent')
+const ImmutableComponent = require('./immutableComponent')
 const React = require('react')
 const windowStore = require('../../../js/stores/windowStore')
 

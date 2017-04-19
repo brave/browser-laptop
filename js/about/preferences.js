@@ -4,7 +4,7 @@
 
 // Note that these are webpack requires, not CommonJS node requiring requires
 const React = require('react')
-const ImmutableComponent = require('../components/immutableComponent')
+const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
 const Immutable = require('immutable')
 const UrlUtil = require('../lib/urlutil')
 

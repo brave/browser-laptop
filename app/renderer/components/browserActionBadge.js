@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('../../../js/components/immutableComponent')
+const ImmutableComponent = require('./immutableComponent')
 const {StyleSheet, css} = require('aphrodite')
 const commonStyles = require('./styles/global')
 
@@ -49,7 +49,6 @@ const styles = StyleSheet.create({
     font: '6pt "Arial Narrow"',
     textAlign: 'center',
     border: '0px solid #FFF',
-    background: '#555555',
     minWidth: '10px',
     userSelect: 'none'
   },

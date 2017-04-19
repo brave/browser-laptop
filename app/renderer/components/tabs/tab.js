@@ -3,32 +3,44 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-
-const ImmutableComponent = require('./immutableComponent')
 const {StyleSheet, css} = require('aphrodite')
-
-const windowActions = require('../actions/windowActions')
-const appActions = require('../actions/appActions')
-const locale = require('../l10n')
-const dragTypes = require('../constants/dragTypes')
-const messages = require('../constants/messages')
-const cx = require('../lib/classSet')
-const {getTextColorForBackground} = require('../lib/color')
-const {isIntermediateAboutPage} = require('../lib/appUrlUtil')
-
-const contextMenus = require('../contextMenus')
-const dnd = require('../dnd')
-const windowStore = require('../stores/windowStore')
 const ipc = require('electron').ipcRenderer
-const throttle = require('../lib/throttle')
 
-const styles = require('../../app/renderer/components/styles/tab')
-const {Favicon, AudioTabIcon, NewSessionIcon,
-      PrivateIcon, TabTitle, CloseTabIcon} = require('../../app/renderer/components/tabContent')
-const {getTabBreakpoint, tabUpdateFrameRate} = require('../../app/renderer/lib/tabUtil')
-const {isWindows} = require('../../app/common/lib/platformUtil')
-const {getCurrentWindowId} = require('../../app/renderer/currentWindow')
-const {frameOptsFromFrame} = require('../state/frameStateUtil')
+// Components
+const ImmutableComponent = require('../immutableComponent')
+const Favicon = require('./content/favIcon')
+const AudioTabIcon = require('./content/audioTabIcon')
+const NewSessionIcon = require('./content/newSessionIcon')
+const PrivateIcon = require('./content/privateIcon')
+const TabTitle = require('./content/tabTitle')
+const CloseTabIcon = require('./content/closeTabIcon')
+
+// Actions
+const windowActions = require('../../../../js/actions/windowActions')
+const appActions = require('../../../../js/actions/appActions')
+
+// Store
+const windowStore = require('../../../../js/stores/windowStore')
+const {frameOptsFromFrame} = require('../../../../js/state/frameStateUtil')
+
+// Constants
+const dragTypes = require('../../../../js/constants/dragTypes')
+const messages = require('../../../../js/constants/messages')
+
+// Styles
+const styles = require('../styles/tab')
+
+// Utils
+const locale = require('../../../../js/l10n')
+const cx = require('../../../../js/lib/classSet')
+const {getTextColorForBackground} = require('../../../../js/lib/color')
+const {isIntermediateAboutPage} = require('../../../../js/lib/appUrlUtil')
+const contextMenus = require('../../../../js/contextMenus')
+const dnd = require('../../../../js/dnd')
+const throttle = require('../../../../js/lib/throttle')
+const {getTabBreakpoint, tabUpdateFrameRate} = require('../../lib/tabUtil')
+const {isWindows} = require('../../../common/lib/platformUtil')
+const {getCurrentWindowId} = require('../../currentWindow')
 
 class Tab extends ImmutableComponent {
   constructor () {
@@ -99,26 +111,12 @@ class Tab extends ImmutableComponent {
       return locale.translation('newTab')
     }
 
-    // NOTE(bsclifton): this can't use a simple falsey check with fallback values
-    // since properties are involved. I believe the title is populated page is loaded
-    // (which means it uses location first). When title is truthy, React gets confused
-    // and renders the location (but shows the title in the DOM). This may be a bug in React.
-    //
-    // Here's a demo of the syntax which causes the problem:
-    // return this.props.tab.get('title') || this.props.tab.get('location') || ''
-
-    const title = this.props.tab && this.props.tab.get('title')
-    const location = this.props.tab && this.props.tab.get('location')
-    const display = typeof title === 'undefined'
-      ? typeof location === 'undefined'
-        ? ''
-        : location
-      : title
-
     // YouTube tries to change the title to add a play icon when
     // there is audio. Since we have our own audio indicator we get
     // rid of it.
-    return display.replace('▶ ', '')
+    return (this.props.tab.get('title') ||
+      this.props.tab.get('location') ||
+      '').replace('▶ ', '')
   }
 
   onDragStart (e) {
@@ -171,7 +169,8 @@ class Tab extends ImmutableComponent {
 
   onMuteFrame (muted, event) {
     event.stopPropagation()
-    windowActions.setAudioMuted(this.frame, muted)
+    const frame = this.frame
+    windowActions.setAudioMuted(frame.get('key'), frame.get('tabId'), muted)
   }
 
   get loading () {
@@ -378,8 +377,8 @@ class Tab extends ImmutableComponent {
 }
 
 const paymentsEnabled = () => {
-  const getSetting = require('../settings').getSetting
-  const settings = require('../constants/settings')
+  const getSetting = require('../../../../js/settings').getSetting
+  const settings = require('../../../../js/constants/settings')
   return getSetting(settings.PAYMENTS_ENABLED)
 }
 

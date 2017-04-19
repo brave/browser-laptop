@@ -4,7 +4,7 @@
 
 const React = require('react')
 const PropTypes = require('prop-types')
-const ImmutableComponent = require('./immutableComponent')
+const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
 const KeyCodes = require('../../app/common/constants/keyCodes')
 
 /**

@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('./immutableComponent')
+const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
 const Immutable = require('immutable')
 const electron = require('electron')
 const ipc = electron.ipcRenderer
@@ -19,8 +19,8 @@ const getSetting = require('../settings').getSetting
 // Components
 const Navigator = require('../../app/renderer/components/navigation/navigator')
 const Frame = require('./frame')
-const TabPages = require('./tabPages')
-const TabsToolbar = require('./tabsToolbar')
+const TabPages = require('../../app/renderer/components/tabs/tabPages')
+const TabsToolbar = require('../../app/renderer/components/tabs/tabsToolbar')
 const FindBar = require('./findbar')
 const UpdateBar = require('./updateBar')
 const NotificationBar = require('./notificationBar')
@@ -32,10 +32,10 @@ const ImportBrowserDataPanel = require('../../app/renderer/components/importBrow
 const WidevinePanel = require('../../app/renderer/components/widevinePanel')
 const AutofillAddressPanel = require('./autofillAddressPanel')
 const AutofillCreditCardPanel = require('./autofillCreditCardPanel')
-const AddEditBookmark = require('./addEditBookmark')
+const AddEditBookmark = require('../../app/renderer/components/bookmarks/addEditBookmark')
 const LoginRequired = require('./loginRequired')
 const ReleaseNotes = require('../../app/renderer/components/releaseNotes')
-const BookmarksToolbar = require('../../app/renderer/components/bookmarksToolbar')
+const BookmarksToolbar = require('../../app/renderer/components/bookmarks/bookmarksToolbar')
 const ContextMenu = require('./contextMenu')
 const PopupWindow = require('./popupWindow')
 const NoScriptInfo = require('./noScriptInfo')
@@ -437,9 +437,6 @@ class Main extends ImmutableComponent {
       frameProps && windowActions.setRedirectedBy(frameProps, ruleset, details.url)
     })
 
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BACK, this.onBack)
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_FORWARD, this.onForward)
-
     ipc.on(messages.CERT_ERROR, (e, details) => {
       const frame = frameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
       if (frame && (frame.get('location') === details.url ||
@@ -592,7 +589,7 @@ class Main extends ImmutableComponent {
     let node = e.target
     while (node) {
       if (node.classList &&
-          (node.classList.contains('popupWindow') ||
+          (node.matches('[class^="popupWindow"]') ||
             node.classList.contains('contextMenu') ||
             node.matches('[class*="extensionButton_"]') ||
             node.classList.contains('menubarItem') ||
