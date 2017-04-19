@@ -356,7 +356,7 @@ module.exports.init = function (appState) {
     }
     appActions.setSyncSetupError(error || locale.translation('unknownError'))
   })
-  ipcMain.on(messages.GET_EXISTING_OBJECTS, (event, categoryName, records, lastRecordTimestamp) => {
+  ipcMain.on(messages.GET_EXISTING_OBJECTS, (event, categoryName, records) => {
     if (!syncEnabled()) {
       return
     }
