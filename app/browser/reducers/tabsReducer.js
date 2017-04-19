@@ -12,6 +12,7 @@ const windowAction = require('../../../js/actions/windowActions.js')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const {getFlashResourceId} = require('../../../js/flash')
 const {l10nErrorText} = require('../../common/lib/httpUtil')
+const windows = require('../windows')
 
 const tabsReducer = (state, action) => {
   action = makeImmutable(action)
@@ -72,20 +73,20 @@ const tabsReducer = (state, action) => {
     case appConstants.APP_LOAD_URL_IN_ACTIVE_TAB_REQUESTED:
       state = tabs.loadURLInActiveTab(state, action)
       break
-    case appConstants.APP_ON_NAVIGATE_BACK:
+    case appConstants.APP_ON_GO_BACK:
       state = tabs.goBack(state, action)
       break
-    case appConstants.APP_ON_NAVIGATE_FORWARD:
+    case appConstants.APP_ON_GO_FORWARD:
       state = tabs.goForward(state, action)
       break
-    case appConstants.APP_ON_NAVIGATE_INDEX:
+    case appConstants.APP_ON_GO_TO_INDEX:
       state = tabs.goToIndex(state, action)
       break
-    case appConstants.APP_ON_NAVIGATE_BACK_LONG:
+    case appConstants.APP_ON_GO_BACK_LONG:
       {
         const history = tabs.getHistoryEntries(state, action)
         const tabValue = tabState.getByTabId(state, action.get('tabId'))
-        const windowId = tabs.getWindowId()
+        const windowId = windows.getActiveWindowId()
 
         if (history !== null) {
           windowAction.onLongBackHistory(
@@ -99,11 +100,11 @@ const tabsReducer = (state, action) => {
         }
         break
       }
-    case appConstants.APP_ON_NAVIGATE_FORWARD_LONG:
+    case appConstants.APP_ON_GO_FORWARD_LONG:
       {
         const history = tabs.getHistoryEntries(state, action)
         const tabValue = tabState.getByTabId(state, action.get('tabId'))
-        const windowId = tabs.getWindowId()
+        const windowId = windows.getActiveWindowId()
 
         if (history !== null) {
           windowAction.onLongForwardHistory(

@@ -328,6 +328,14 @@ const api = {
 
   getWindow: (windowId) => {
     return currentWindows[windowId]
+  },
+
+  getActiveWindowId: () => {
+    if (BrowserWindow.getFocusedWindow()) {
+      return BrowserWindow.getFocusedWindow().id
+    }
+
+    return windowState.WINDOW_ID_NONE
   }
 }
 

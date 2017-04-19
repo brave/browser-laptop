@@ -955,7 +955,7 @@ Notifies the app that a drop operation occurred
 
 
 
-### onNavigateBack(tabId) 
+### onGoBack(tabId) 
 
 Go back in a history for a given tab
 
@@ -965,7 +965,7 @@ Go back in a history for a given tab
 
 
 
-### onNavigateForward(tabId) 
+### onGoForward(tabId) 
 
 Go forward in a history for a given tab
 
@@ -975,7 +975,7 @@ Go forward in a history for a given tab
 
 
 
-### onNavigateIndex(tabId, index) 
+### onGoToIndex(tabId, index) 
 
 Go to specific item in a history for a given tab
 
@@ -987,7 +987,7 @@ Go to specific item in a history for a given tab
 
 
 
-### onNavigateBackLong(tabId, rect) 
+### onGoBackLong(tabId, rect) 
 
 Go back in a history for a given tab
 
@@ -999,7 +999,7 @@ Go back in a history for a given tab
 
 
 
-### onNavigateForwardLong(tabId, rect) 
+### onGoForwardLong(tabId, rect) 
 
 Go forward in a history for a given tab
 

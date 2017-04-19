@@ -121,17 +121,17 @@ class Navigator extends ImmutableComponent {
   }
 
   onBack (e) {
-    this.onNav(e, 'canGoBack', 'back', appActions.onNavigateBack)
+    this.onNav(e, 'canGoBack', 'back', appActions.onGoBack)
   }
 
   onForward (e) {
-    this.onNav(e, 'canGoForward', 'forward', appActions.onNavigateForward)
+    this.onNav(e, 'canGoForward', 'forward', appActions.onGoForward)
   }
 
   onBackLongPress (target) {
     const activeTab = this.props.activeTab
     const rect = target.parentNode.getBoundingClientRect()
-    appActions.onNavigateBackLong(activeTab.get('tabId'), {
+    appActions.onGoBackLong(activeTab.get('tabId'), {
       left: rect.left,
       bottom: rect.bottom
     })
@@ -140,7 +140,7 @@ class Navigator extends ImmutableComponent {
   onForwardLongPress (target) {
     const activeTab = this.props.activeTab
     const rect = target.parentNode.getBoundingClientRect()
-    appActions.onNavigateForwardLong(activeTab.get('tabId'), {
+    appActions.onGoForwardLong(activeTab.get('tabId'), {
       left: rect.left,
       bottom: rect.bottom
     })

@@ -629,10 +629,10 @@ class Frame extends ImmutableComponent {
           method = () => this.webview.stop()
           break
         case messages.GO_BACK:
-          method = () => appActions.onNavigateBack(this.props.tabId)
+          method = () => appActions.onGoBack(this.props.tabId)
           break
         case messages.GO_FORWARD:
-          method = () => appActions.onNavigateForward(this.props.tabId)
+          method = () => appActions.onGoForward(this.props.tabId)
           break
         case messages.RELOAD:
           method = () => {
@@ -728,7 +728,7 @@ class Frame extends ImmutableComponent {
         } else if (isTargetAboutUrl(e.validatedURL)) {
           // open a new tab for other about urls
           // and send this tab back to wherever it came from
-          appActions.tabNavigateBack(this.props.tabId)
+          appActions.onGoBack(this.props.tabId)
           appActions.createTabRequested({
             url: e.validatedURL,
             active: true

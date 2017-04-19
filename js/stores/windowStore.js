@@ -238,7 +238,8 @@ const emitChanges = debounce(windowStore.emitChanges.bind(windowStore), 5)
 const applyReducers = (state, action) => [
   require('../../app/renderer/reducers/urlBarReducer'),
   require('../../app/renderer/reducers/urlBarSuggestionsReducer'),
-  require('../../app/renderer/reducers/frameReducer')
+  require('../../app/renderer/reducers/frameReducer'),
+  require('../../app/renderer/reducers/contextMenuReducer')
 ].reduce(
     (windowState, reducer) => {
       const newState = reducer(windowState, action)
@@ -473,13 +474,7 @@ const doAction = (action) => {
       }
       break
     case windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL:
-      windowState = contextMenuState.setContextMenu(windowState, action)
-      break
-    case windowConstants.WINDOW_ON_NAVIGATE_BACK_LONG:
-      windowState = contextMenuState.onLongBacHistory(windowState, action)
-      break
-    case windowConstants.WINDOW_ON_NAVIGATE_FORWARD_LONG:
-      windowState = contextMenuState.onLongForwardHistory(windowState, action)
+      windowState = contextMenuState.setContextMenu(windowState, action.detail)
       break
     case windowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL:
       if (!action.detail) {

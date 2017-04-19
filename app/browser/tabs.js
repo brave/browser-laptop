@@ -8,7 +8,7 @@ const Immutable = require('immutable')
 const tabState = require('../common/state/tabState')
 const {app, BrowserWindow, extensions, session, ipcMain} = require('electron')
 const {makeImmutable} = require('../common/state/immutableUtil')
-const {getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl} = require('../../js/lib/appUrlUtil')
+const {getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl, isTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 const {isURL, getUrlFromInput, toPDFJSLocation, getDefaultFaviconUrl} = require('../../js/lib/urlutil')
 const {isSessionPartition} = require('../../js/state/frameStateUtil')
 const {getOrigin} = require('../../js/state/siteUtil')
@@ -652,14 +652,6 @@ const api = {
     return state
   },
 
-  getWindowId: () => {
-    if (BrowserWindow.getFocusedWindow()) {
-      return BrowserWindow.getFocusedWindow().id
-    }
-
-    return -1
-  },
-
   getHistoryEntries: (state, action) => {
     const tab = api.getWebContents(action.get('tabId'))
     const sites = state ? state.get('sites') : null
@@ -682,7 +674,7 @@ const api = {
           icon: null
         }
 
-        if (url.startsWith('chrome-extension://')) {
+        if (isTargetAboutUrl(url)) {
           // TODO: return brave lion (or better: get icon from extension if possible as data URI)
         } else {
           if (sites) {

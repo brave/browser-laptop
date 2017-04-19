@@ -1183,7 +1183,7 @@ const windowActions = {
 
   onLongBackHistory: function (history, left, top, partition, tabId, windowId) {
     dispatch({
-      actionType: windowConstants.WINDOW_ON_NAVIGATE_BACK_LONG,
+      actionType: windowConstants.WINDOW_ON_GO_BACK_LONG,
       queryInfo: {
         windowId
       },
@@ -1197,7 +1197,7 @@ const windowActions = {
 
   onLongForwardHistory: function (history, left, top, partition, tabId, windowId) {
     dispatch({
-      actionType: windowConstants.WINDOW_ON_NAVIGATE_FORWARD_LONG,
+      actionType: windowConstants.WINDOW_ON_GO_FORWARD_LONG,
       queryInfo: {
         windowId
       },

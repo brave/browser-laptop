@@ -1204,9 +1204,9 @@ const appActions = {
    * Go back in a history for a given tab
    * @param {number} tabId - Tab id used for an action
    */
-  onNavigateBack: function (tabId) {
+  onGoBack: function (tabId) {
     AppDispatcher.dispatch({
-      actionType: appConstants.APP_ON_NAVIGATE_BACK,
+      actionType: appConstants.APP_ON_GO_BACK,
       tabId
     })
   },
@@ -1215,9 +1215,9 @@ const appActions = {
    * Go forward in a history for a given tab
    * @param {number} tabId - Tab id used for an action
    */
-  onNavigateForward: function (tabId) {
+  onGoForward: function (tabId) {
     AppDispatcher.dispatch({
-      actionType: appConstants.APP_ON_NAVIGATE_FORWARD,
+      actionType: appConstants.APP_ON_GO_FORWARD,
       tabId
     })
   },
@@ -1227,10 +1227,11 @@ const appActions = {
    * @param {number} tabId - Tab id used for an action
    * @param {number} index - Index in the history
    */
-  onNavigateIndex: function (tabId, index) {
+  onGoToIndex: function (tabId, index) {
     AppDispatcher.dispatch({
-      actionType: appConstants.APP_ON_NAVIGATE_INDEX,
+      actionType: appConstants.APP_ON_GO_TO_INDEX,
       tabId,
+
       index
     })
   },
@@ -1240,9 +1241,9 @@ const appActions = {
    * @param {number} tabId - Tab id used for an action
    * @param {ClientRect} rect - Parent element position for this action
    */
-  onNavigateBackLong: function (tabId, rect) {
+  onGoBackLong: function (tabId, rect) {
     AppDispatcher.dispatch({
-      actionType: appConstants.APP_ON_NAVIGATE_BACK_LONG,
+      actionType: appConstants.APP_ON_GO_BACK_LONG,
       tabId,
       rect
     })
@@ -1253,9 +1254,9 @@ const appActions = {
    * @param {number} tabId - Tab id used for an action
    * @param {ClientRect} rect - Parent element position for this action
    */
-  onNavigateForwardLong: function (tabId, rect) {
+  onGoForwardLong: function (tabId, rect) {
     AppDispatcher.dispatch({
-      actionType: appConstants.APP_ON_NAVIGATE_FORWARD_LONG,
+      actionType: appConstants.APP_ON_GO_FORWARD_LONG,
       tabId,
       rect
     })
