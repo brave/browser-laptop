@@ -7,7 +7,7 @@ const {StyleSheet, css} = require('aphrodite')
 const ipc = require('electron').ipcRenderer
 
 // Components
-const ImmutableComponent = require('../../../../js/components/immutableComponent')
+const ImmutableComponent = require('../immutableComponent')
 const Favicon = require('./content/favIcon')
 const AudioTabIcon = require('./content/audioTabIcon')
 const NewSessionIcon = require('./content/newSessionIcon')

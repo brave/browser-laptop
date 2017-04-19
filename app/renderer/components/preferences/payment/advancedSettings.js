@@ -13,7 +13,7 @@ const appConfig = require('../../../../../js/constants/appConfig')
 const Button = require('../../../../../js/components/button')
 const {SettingsList, SettingItem, SettingCheckbox} = require('../../settings')
 const {SettingDropdown} = require('../../dropdown')
-const ImmutableComponent = require('../../../../../js/components/immutableComponent')
+const ImmutableComponent = require('../../immutableComponent')
 
 // style
 const commonStyles = require('../../styles/commonStyles')

@@ -4,7 +4,7 @@
 
 const React = require('react')
 const ReactDOM = require('react-dom')
-const ImmutableComponent = require('./immutableComponent')
+const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
 const KeyCodes = require('../../app/common/constants/keyCodes')
 const windowActions = require('../actions/windowActions')
 

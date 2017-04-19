@@ -4,7 +4,7 @@
 
 // Note that these are webpack requires, not CommonJS node requiring requires
 const React = require('react')
-const ImmutableComponent = require('../../../../js/components/immutableComponent')
+const ImmutableComponent = require('../immutableComponent')
 const Immutable = require('immutable')
 const niceware = require('niceware')
 

@@ -6,7 +6,7 @@ const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
-const ImmutableComponent = require('../../../../../js/components/immutableComponent')
+const ImmutableComponent = require('../../immutableComponent')
 
 // Utils
 const cx = require('../../../../../js/lib/classSet')

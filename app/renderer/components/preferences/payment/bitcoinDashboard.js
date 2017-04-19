@@ -8,7 +8,7 @@ const {StyleSheet, css} = require('aphrodite')
 // components
 const Button = require('../../../../../js/components/button')
 const ModalOverlay = require('../../../../../js/components/modalOverlay')
-const ImmutableComponent = require('../../../../../js/components/immutableComponent')
+const ImmutableComponent = require('../../immutableComponent')
 
 // styles
 const commonStyles = require('../../styles/commonStyles')

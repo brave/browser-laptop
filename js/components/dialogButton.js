@@ -5,7 +5,7 @@
 const React = require('react')
 const PropTypes = require('prop-types')
 const ReactDOM = require('react-dom')
-const ImmutableComponent = require('./immutableComponent')
+const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
 
 /**
  * Represents a button in a Dialog

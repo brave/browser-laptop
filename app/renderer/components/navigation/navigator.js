@@ -14,7 +14,7 @@ const contextMenus = require('../../../../js/contextMenus')
 const getSetting = require('../../../../js/settings').getSetting
 
 // Components
-const ImmutableComponent = require('../../../../js/components/immutableComponent')
+const ImmutableComponent = require('../immutableComponent')
 const NavigationBar = require('./navigationBar')
 const LongPressButton = require('../../../../js/components/longPressButton')
 const Menubar = require('../menubar')

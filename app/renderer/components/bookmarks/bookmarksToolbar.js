@@ -7,7 +7,7 @@ const ReactDOM = require('react-dom')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
-const ImmutableComponent = require('../../../../js/components/immutableComponent')
+const ImmutableComponent = require('../immutableComponent')
 const Button = require('../../../../js/components/button')
 const BookmarkToolbarButton = require('./bookmarkToolbarButton')
 

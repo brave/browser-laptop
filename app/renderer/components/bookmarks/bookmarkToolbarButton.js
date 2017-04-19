@@ -8,7 +8,7 @@ const Immutable = require('immutable')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
-const ImmutableComponent = require('../../../../js/components/immutableComponent')
+const ImmutableComponent = require('../immutableComponent')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')

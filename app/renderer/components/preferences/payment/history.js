@@ -13,7 +13,7 @@ const appUrlUtil = require('../../../../../js/lib/appUrlUtil')
 
 // components
 const Button = require('../../../../../js/components/button')
-const ImmutableComponent = require('../../../../../js/components/immutableComponent')
+const ImmutableComponent = require('../../immutableComponent')
 
 // style
 const globalStyles = require('../../styles/global')

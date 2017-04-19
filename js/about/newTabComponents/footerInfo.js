@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('../../components/immutableComponent')
+const ImmutableComponent = require('../../../app/renderer/components/immutableComponent')
 const aboutActions = require('../aboutActions')
 
 class FooterInfo extends ImmutableComponent {

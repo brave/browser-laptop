@@ -5,7 +5,7 @@
 const React = require('react')
 const messages = require('../constants/messages')
 const Immutable = require('immutable')
-const ImmutableComponent = require('../components/immutableComponent')
+const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
 const aboutActions = require('./aboutActions')
 const Button = require('../components/button')
 

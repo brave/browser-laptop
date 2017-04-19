@@ -12,7 +12,7 @@ const {l10nErrorText} = require('../../../../common/lib/httpUtil')
 const {changeSetting} = require('../../../lib/settingsUtil')
 
 // components
-const ImmutableComponent = require('../../../../../js/components/immutableComponent')
+const ImmutableComponent = require('../../immutableComponent')
 const Button = require('../../../../../js/components/button')
 const {FormTextbox} = require('../../textbox')
 const {FormDropdown} = require('../../dropdown')

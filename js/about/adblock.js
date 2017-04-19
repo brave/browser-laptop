@@ -9,7 +9,7 @@ const messages = require('../constants/messages')
 const {ADBLOCK_CUSTOM_RULES} = require('../constants/settings')
 const getSetting = require('../settings').getSetting
 const aboutActions = require('./aboutActions')
-const ImmutableComponent = require('../components/immutableComponent')
+const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
 const SwitchControl = require('../components/switchControl')
 const {DefaultTextArea} = require('../../app/renderer/components/textbox')
 

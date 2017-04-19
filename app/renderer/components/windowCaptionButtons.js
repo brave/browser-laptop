@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('../../../js/components/immutableComponent')
+const ImmutableComponent = require('./immutableComponent')
 const appActions = require('../../../js/actions/appActions')
 const windowActions = require('../../../js/actions/windowActions')
 const locale = require('../../../js/l10n')

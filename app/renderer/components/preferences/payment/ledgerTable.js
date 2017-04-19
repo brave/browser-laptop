@@ -6,7 +6,7 @@ const React = require('react')
 const {StyleSheet, css} = require('aphrodite')
 
 // components
-const ImmutableComponent = require('../../../../../js/components/immutableComponent')
+const ImmutableComponent = require('../../immutableComponent')
 const SortableTable = require('../../../../../js/components/sortableTable')
 const SwitchControl = require('../../../../../js/components/switchControl')
 const Button = require('../../../../../js/components/button')

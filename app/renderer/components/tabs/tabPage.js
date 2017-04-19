@@ -5,7 +5,7 @@
 const React = require('react')
 
 // Components
-const ImmutableComponent = require('../../../../js/components/immutableComponent')
+const ImmutableComponent = require('../immutableComponent')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')

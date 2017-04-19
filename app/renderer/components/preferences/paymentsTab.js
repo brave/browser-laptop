@@ -8,7 +8,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const cx = require('../../../../js/lib/classSet')
-const ImmutableComponent = require('../../../../js/components/immutableComponent')
+const ImmutableComponent = require('../immutableComponent')
 const ModalOverlay = require('../../../../js/components/modalOverlay')
 const {SettingCheckbox} = require('../settings')
 const DisabledContent = require('./payment/disabledContent')
