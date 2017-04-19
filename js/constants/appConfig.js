@@ -149,6 +149,7 @@ module.exports = {
     'bookmarks.toolbar.showOnlyFavicon': false,
     'payments.enabled': false,
     'payments.notifications': false,
+    'payments.allow-non-verified-publishers': true,
     // "Add funds to your wallet" -- Limit to once every n days to reduce nagging.
     'payments.notification-add-funds-timestamp': null,
     // "Out of money, pls add" / "In 24h we'll pay publishers [Review]"

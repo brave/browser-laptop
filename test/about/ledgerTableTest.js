@@ -1,13 +1,21 @@
 /* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
-const {urlInput, addFundsButton, paymentsWelcomePage, paymentsTab, walletSwitch} = require('../lib/selectors')
+const {
+  urlInput,
+  addFundsButton,
+  paymentsWelcomePage,
+  paymentsTab,
+  walletSwitch,
+  advancedSettingsDialog,
+  advancedSettingsButton
+} = require('../lib/selectors')
 
 const ledgerAPIWaitTimeout = 20000
 const prefsUrl = 'about:preferences'
 const sites = [
   'http://example.com/',
-  'https://www.eff.org/'
+  'https://brianbondy.com/'
 ]
 const sites2 = [
   'http://example.com/',
@@ -160,6 +168,17 @@ describe('Ledger table', function () {
         .waitForTextValue(`${secondTableSecondRow} [data-test-id="percentageValue"]`, '40')
         .click(`${secondTableSecondRow} .switchBackground`)
         .waitForInputText(`${firstTableFirstRow} [data-test-id="pinnedInput"]`, '100')
+    })
+
+    it('toggle non-verified option', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .click(advancedSettingsButton)
+        .waitForVisible(advancedSettingsDialog)
+        .click('[data-test-id="payment-advance-nonverified"] .switchBackground')
+        .click('[data-l10n-id="done"]')
+        .waitForElementCount(advancedSettingsDialog, 0)
+        .waitForElementCount(`${secondTable} tr`, 1)
     })
   })
 

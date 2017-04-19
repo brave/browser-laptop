@@ -10,6 +10,8 @@ const Immutable = require('immutable')
 const fakeElectron = require('../../lib/fakeElectron')
 const fakeSettings = require('../../lib/fakeSettings')
 const {btcToCurrencyString} = require('../../../../app/common/lib/ledgerUtil')
+const {advancedSettingsDialog} = require('../../../lib/selectors')
+
 let PaymentsTab, EnabledContent
 require('../../braveUnit')
 
@@ -221,7 +223,7 @@ describe('PaymentsTab component', function () {
           hideOverlay={function () {}}
           ledgerData={Immutable.Map()} />
       )
-      assert.equal(wrapper.find('[data-test-id="advancedSettings"]').length, 1)
+      assert.equal(wrapper.find(advancedSettingsDialog).length, 1)
       assert.equal(wrapper.find('[data-test-id="durationSelector"]').node.value, 8000)
     })
 
@@ -234,7 +236,7 @@ describe('PaymentsTab component', function () {
           hideOverlay={function () {}}
           ledgerData={Immutable.Map()} />
       )
-      assert.equal(wrapper.find('[data-test-id="advancedSettings"]').length, 1)
+      assert.equal(wrapper.find(advancedSettingsDialog).length, 1)
       assert.equal(wrapper.find('[data-test-id="visitSelector"]').node.value, 1)
     })
   })

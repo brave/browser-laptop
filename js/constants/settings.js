@@ -55,6 +55,7 @@ const settings = {
   PAYMENTS_NOTIFICATION_RECONCILE_SOON_TIMESTAMP: 'notification-reconcile-soon-timestamp',
   PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED: 'payments.notificationTryPaymentsDismissed',
   PAYMENTS_CONTRIBUTION_AMOUNT: 'payments.contribution-amount',
+  PAYMENTS_NON_VERIFIED: 'payments.allow-non-verified-publishers',
   // Advanced settings
   HARDWARE_ACCELERATION_ENABLED: 'advanced.hardware-acceleration-enabled',
   PDFJS_ENABLED: 'advanced.pdfjs-enabled',
