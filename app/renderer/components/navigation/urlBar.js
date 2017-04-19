@@ -52,7 +52,6 @@ class UrlBar extends ImmutableComponent {
         this.urlInput.setSelectionRange(len, len + suffixLen)
       }
     }, 10)
-    this.onNoScript = this.onNoScript.bind(this)
   }
 
   get locationValueSuffix () {
@@ -498,7 +497,7 @@ class UrlBar extends ImmutableComponent {
   }
 
   onNoScript () {
-    windowActions.setNoScriptVisible(!this.props.noScriptIsVisible)
+    windowActions.setNoScriptVisible()
   }
 
   onContextMenu (e) {
@@ -568,12 +567,12 @@ class UrlBar extends ImmutableComponent {
       {
         !this.showNoScriptInfo
         ? null
-        : <span className={css(styles.noScriptContainer)}>
-          <button
+        : <span className={css(styles.noScriptContainer)}
+          onClick={this.onNoScript}>
+          <span
             data-l10n-id='noScriptButton'
             data-test-id='noScriptButton'
-            className={css(styles.noScriptButton)}
-            onClick={this.onNoScript} />
+            className={css(styles.noScriptButton)} />
         </span>
       }
       {
@@ -592,8 +591,8 @@ class UrlBar extends ImmutableComponent {
 const styles = StyleSheet.create({
   noScriptContainer: {
     display: 'flex',
-    paddingLeft: '5px',
-    marginRight: '-3px',
+    padding: '5px',
+    marginRight: '-8px',
     WebkitAppRegion: 'drag'
   },
   noScriptButton: {
