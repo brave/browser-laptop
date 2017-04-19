@@ -505,7 +505,6 @@ WindowStore
     favorites: boolean,
     history: boolean,
     index: string,
-    mergeFavorites: boolean,
     type: number
   },
   lastAppVersion: string, // version of the last file that was saved

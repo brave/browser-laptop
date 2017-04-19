@@ -132,6 +132,26 @@ module.exports.getNextFolderId = (sites) => {
   return (maxIdItem ? (maxIdItem.get('folderId') || 0) : 0) + 1
 }
 
+module.exports.getNextFolderName = (sites, name) => {
+  if (!sites) {
+    return name
+  }
+  const site = sites.find((site) =>
+    isBookmarkFolder(site.get('tags')) &&
+    site.get('customTitle') === name
+  )
+  if (!site) {
+    return name
+  }
+  const filenameFormat = /(.*) \((\d+)\)/
+  let result = filenameFormat.exec(name)
+  if (!result) {
+    return module.exports.getNextFolderName(sites, name + ' (1)')
+  }
+  const nextNum = parseInt(result[2]) + 1
+  return module.exports.getNextFolderName(sites, result[1] + ' (' + nextNum + ')')
+}
+
 const mergeSiteLastAccessedTime = (oldSiteDetail, newSiteDetail, tag) => {
   const newTime = newSiteDetail && newSiteDetail.get('lastAccessedTime')
   const oldTime = oldSiteDetail && oldSiteDetail.get('lastAccessedTime')
