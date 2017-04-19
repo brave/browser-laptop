@@ -1,11 +1,15 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 const appActions = require('../../js/actions/appActions')
 const config = require('../../js/constants/config')
 const Immutable = require('immutable')
 const tabState = require('../common/state/tabState')
 const {app, BrowserWindow, extensions, session, ipcMain} = require('electron')
 const {makeImmutable} = require('../common/state/immutableUtil')
-const {getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl} = require('../../js/lib/appUrlUtil')
-const {isURL, getUrlFromInput, toPDFJSLocation} = require('../../js/lib/urlutil')
+const {getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl, isTargetAboutUrl} = require('../../js/lib/appUrlUtil')
+const {isURL, getUrlFromInput, toPDFJSLocation, getDefaultFaviconUrl} = require('../../js/lib/urlutil')
 const {isSessionPartition} = require('../../js/state/frameStateUtil')
 const {getOrigin} = require('../../js/state/siteUtil')
 const {getSetting} = require('../../js/settings')
@@ -69,7 +73,7 @@ const getPartitionNumber = (partition) => {
 }
 
 /**
- * Obtains the curent partition.
+ * Obtains the current partition.
  * Warning: This function has global side effects in that it increments the
  * global next partition number if isPartitioned is passed into the create options.
  */
@@ -619,6 +623,79 @@ const api = {
       api.createTab(state, action)
     }
     return state
+  },
+
+  goBack: (state, action) => {
+    action = makeImmutable(action)
+    const tab = api.getWebContents(action.get('tabId'))
+    if (tab && !tab.isDestroyed()) {
+      tab.goBack()
+    }
+    return state
+  },
+
+  goForward: (state, action) => {
+    action = makeImmutable(action)
+    const tab = api.getWebContents(action.get('tabId'))
+    if (tab && !tab.isDestroyed()) {
+      tab.goForward()
+    }
+    return state
+  },
+
+  goToIndex: (state, action) => {
+    action = makeImmutable(action)
+    const tab = api.getWebContents(action.get('tabId'))
+    if (tab && !tab.isDestroyed()) {
+      tab.goToIndex(action.get('index'))
+    }
+    return state
+  },
+
+  getHistoryEntries: (state, action) => {
+    const tab = api.getWebContents(action.get('tabId'))
+    const sites = state ? state.get('sites') : null
+
+    if (tab && !tab.isDestroyed()) {
+      let history = {
+        count: tab.getEntryCount(),
+        currentIndex: tab.getCurrentEntryIndex(),
+        entries: []
+      }
+
+      for (let index = 0; index < history.count; index++) {
+        const url = tab.getURLAtIndex(index)
+        const title = tab.getTitleAtIndex(index)
+
+        let entry = {
+          index: index,
+          url: url,
+          display: title || url,
+          icon: null
+        }
+
+        if (isTargetAboutUrl(url)) {
+          // TODO: return brave lion (or better: get icon from extension if possible as data URI)
+        } else {
+          if (sites) {
+            const site = sites.find(function (element) { return element.get('location') === url })
+            if (site) {
+              entry.icon = site.get('favicon')
+            }
+          }
+
+          if (!entry.icon) {
+            entry.icon = getDefaultFaviconUrl(url)
+          }
+        }
+
+        history.entries.push(entry)
+      }
+
+      return history
+    }
+
+    return null
   }
 }
 

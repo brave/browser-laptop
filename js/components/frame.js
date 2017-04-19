@@ -629,10 +629,10 @@ class Frame extends ImmutableComponent {
           method = () => this.webview.stop()
           break
         case messages.GO_BACK:
-          method = () => this.webview.goBack()
+          method = () => appActions.onGoBack(this.props.tabId)
           break
         case messages.GO_FORWARD:
-          method = () => this.webview.goForward()
+          method = () => appActions.onGoForward(this.props.tabId)
           break
         case messages.RELOAD:
           method = () => {
@@ -728,7 +728,7 @@ class Frame extends ImmutableComponent {
         } else if (isTargetAboutUrl(e.validatedURL)) {
           // open a new tab for other about urls
           // and send this tab back to wherever it came from
-          this.goBack()
+          appActions.onGoBack(this.props.tabId)
           appActions.createTabRequested({
             url: e.validatedURL,
             active: true
@@ -902,61 +902,6 @@ class Frame extends ImmutableComponent {
     })
     // Handle zoom using Ctrl/Cmd and the mouse wheel.
     this.webview.addEventListener('mousewheel', this.onMouseWheel.bind(this))
-  }
-
-  goBack () {
-    this.webview.goBack()
-  }
-
-  getHistoryEntry (sites, index) {
-    const url = this.webview.getURLAtIndex(index)
-    const title = this.webview.getTitleAtIndex(index)
-
-    let entry = {
-      index: index,
-      url: url,
-      display: title || url,
-      icon: null
-    }
-
-    if (url.startsWith('chrome-extension://')) {
-      // TODO: return brave lion (or better: get icon from extension if possible as data URI)
-    } else {
-      if (sites) {
-        const site = sites.find(function (element) { return element.get('location') === url })
-        if (site) { entry.icon = site.get('favicon') }
-      }
-
-      if (!entry.icon) { entry.icon = UrlUtil.getDefaultFaviconUrl(url) }
-    }
-
-    return entry
-  }
-
-  getHistory (appState) {
-    const historyCount = this.webview.getEntryCount()
-    const currentIndex = this.webview.getCurrentEntryIndex()
-    const sites = appState ? appState.get('sites') : null
-
-    let history = {
-      count: historyCount,
-      currentIndex,
-      entries: []
-    }
-
-    for (let index = 0; index < historyCount; index++) {
-      history.entries.push(this.getHistoryEntry(sites, index))
-    }
-
-    return history
-  }
-
-  goToIndex (index) {
-    this.webview.goToIndex(index)
-  }
-
-  goForward () {
-    this.webview.goForward()
   }
 
   get origin () {

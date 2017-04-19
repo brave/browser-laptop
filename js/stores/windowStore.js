@@ -25,6 +25,7 @@ const {aboutUrls, getTargetAboutUrl, newFrameUrl} = require('../lib/appUrlUtil')
 const Serializer = require('../dispatcher/serializer')
 const {updateTabPageIndex} = require('../../app/renderer/lib/tabUtil')
 const assert = require('assert')
+const contextMenuState = require('../../app/common/state/contextMenuState.js')
 
 let windowState = Immutable.fromJS({
   activeFrameKey: null,
@@ -237,7 +238,8 @@ const emitChanges = debounce(windowStore.emitChanges.bind(windowStore), 5)
 const applyReducers = (state, action) => [
   require('../../app/renderer/reducers/urlBarReducer'),
   require('../../app/renderer/reducers/urlBarSuggestionsReducer'),
-  require('../../app/renderer/reducers/frameReducer')
+  require('../../app/renderer/reducers/frameReducer'),
+  require('../../app/renderer/reducers/contextMenuReducer')
 ].reduce(
     (windowState, reducer) => {
       const newState = reducer(windowState, action)
@@ -472,19 +474,7 @@ const doAction = (action) => {
       }
       break
     case windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL:
-      if (!action.detail) {
-        if (windowState.getIn(['contextMenuDetail', 'type']) === 'hamburgerMenu') {
-          windowState = windowState.set('hamburgerMenuWasOpen', true)
-        } else {
-          windowState = windowState.set('hamburgerMenuWasOpen', false)
-        }
-        windowState = windowState.delete('contextMenuDetail')
-      } else {
-        if (!(action.detail.get('type') === 'hamburgerMenu' && windowState.get('hamburgerMenuWasOpen'))) {
-          windowState = windowState.set('contextMenuDetail', action.detail)
-        }
-        windowState = windowState.set('hamburgerMenuWasOpen', false)
-      }
+      windowState = contextMenuState.setContextMenu(windowState, action.detail)
       break
     case windowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL:
       if (!action.detail) {

@@ -115,7 +115,12 @@ const appConstants = {
   APP_DRAG_STARTED: _,
   APP_DRAG_STOPPED: _,
   APP_DATA_DROPPED: _,
-  APP_DRAGGED_OVER: _
+  APP_DRAGGED_OVER: _,
+  APP_ON_GO_BACK: _,
+  APP_ON_GO_FORWARD: _,
+  APP_ON_GO_TO_INDEX: _,
+  APP_ON_GO_BACK_LONG: _,
+  APP_ON_GO_FORWARD_LONG: _
 }
 
 module.exports = mapValuesByKeys(appConstants)
