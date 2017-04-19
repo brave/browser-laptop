@@ -39,7 +39,8 @@ module.exports = {
     enabled: false
   },
   noScript: {
-    enabled: false
+    enabled: false,
+    twitterRedirectUrl: 'https://mobile.twitter.com/i/nojs_router'
   },
   flash: {
     enabled: false,

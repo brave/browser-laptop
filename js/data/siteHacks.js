@@ -4,6 +4,7 @@
 
 const urlParse = require('../../app/common/urlParse')
 const base64Encode = require('../lib/base64').encode
+const appConfig = require('../constants/appConfig')
 
 // Polyfill similar to this: https://github.com/gorhill/uBlock/blob/de1ed89f62bf041416d2a721ec00741667bf3fa8/assets/ublock/resources.txt#L385
 const googleTagManagerRedirect = 'data:application/javascript;base64,' + base64Encode(`(function() { var noopfn = function() { ; }; window.ga = window.ga || noopfn; })();`)
@@ -119,7 +120,7 @@ module.exports.siteHacks = {
     onBeforeSendHeaders: function(details) {
       if (details.requestHeaders.Referer &&
         details.requestHeaders.Referer.startsWith('https://twitter.com/') &&
-        details.url.startsWith('https://mobile.twitter.com/')) {
+        details.url.startsWith(appConfig.noScript.twitterRedirectUrl)) {
         return {
           cancel: true
         }

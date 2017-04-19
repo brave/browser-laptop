@@ -667,13 +667,14 @@ class Frame extends ImmutableComponent {
         return
       }
       if (e.isMainFrame && !e.isErrorPage && !e.isFrameSrcDoc) {
+        if (e.url && e.url.startsWith(appConfig.noScript.twitterRedirectUrl) &&
+          this.getFrameBraverySettings(this.props).get('noScript') === true) {
+          // This result will be canceled immediately by sitehacks, so don't
+          // update the load state; otherwise it will not show the security
+          // icon.
+          return
+        }
         windowActions.onWebviewLoadStart(this.frame, e.url)
-        // Clear security state
-        windowActions.setBlockedRunInsecureContent(this.frame)
-        windowActions.setSecurityState(this.frame, {
-          secure: null,
-          runInsecureContent: false
-        })
       }
     }
 

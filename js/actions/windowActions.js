@@ -806,21 +806,8 @@ const windowActions = {
   },
 
   /**
-   * Sets which scripts were blocked on a page.
-   * @param {Object} frameProps - The frame to set blocked info on
-   * @param {string} source - Source of blocked js
-   */
-  setNoScript: function (frameProps, source) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_NOSCRIPT,
-      frameProps,
-      source
-    })
-  },
-
-  /**
-   * Sets whether the noscript icon is visible.
-   * @param {boolean} isVisible
+   * Sets/toggles whether the noscriptinfo dialog is visible.
+   * @param {boolean=} isVisible - if undefined, toggle the current state
    */
   setNoScriptVisible: function (isVisible) {
     dispatch({
