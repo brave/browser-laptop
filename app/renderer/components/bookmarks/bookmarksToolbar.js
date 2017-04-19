@@ -30,7 +30,7 @@ const cx = require('../../../../js/lib/classSet')
 const dnd = require('../../../../js/dnd')
 const dndData = require('../../../../js/dndData')
 const calculateTextWidth = require('../../../../js/lib/textCalculator').calculateTextWidth
-const iconSize = require('../../../common/lib/faviconUtil').iconSize
+const {iconSize} = require('../../../common/state/tabContentState')
 
 // Styles
 const globalStyles = require('../styles/global')

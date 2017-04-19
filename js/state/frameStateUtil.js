@@ -3,16 +3,32 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Immutable = require('immutable')
+
+// Constants
 const config = require('../constants/config')
-const {makeImmutable} = require('../../app/common/state/immutableUtil')
-const {isIntermediateAboutPage} = require('../lib/appUrlUtil')
-const urlParse = require('../../app/common/urlParse')
-const windowActions = require('../actions/windowActions.js')
-const webviewActions = require('../actions/webviewActions.js')
+const settings = require('../constants/settings')
+const {tabCloseAction} = require('../../app/common/constants/settingsEnums')
+
+// Actions
+const windowActions = require('../actions/windowActions')
+const webviewActions = require('../actions/webviewActions')
 const appActions = require('../actions/appActions')
 
+// State
+const {makeImmutable} = require('../../app/common/state/immutableUtil')
+
+// Utils
+const {getSetting} = require('../settings')
+const {isIntermediateAboutPage} = require('../lib/appUrlUtil')
+const urlParse = require('../../app/common/urlParse')
+const {getTextColorForBackground} = require('../lib/color')
+const {hasBreakpoint} = require('../../app/renderer/lib/tabUtil')
+
+// Styles
+const styles = require('../../app/renderer/components/styles/global')
+
 const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
-      ? 1 : b.get('key') > a.get('key') ? -1 : 0
+  ? 1 : b.get('key') > a.get('key') ? -1 : 0
 
 const matchFrame = (queryInfo, frame) => {
   queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
@@ -435,6 +451,148 @@ function getTotalBlocks (frame) {
     : ((blocked > 99) ? '99+' : blocked)
 }
 
+function hasTabInFullScreen (state) {
+  return state.get('frames')
+    .map((frame) => frame.get('isFullScreen'))
+    .some(fullScreenMode => fullScreenMode === true)
+}
+
+function getPageIndex (state) {
+  const tabPageIndex = state.getIn(['ui', 'tabs', 'tabPageIndex'])
+  const previewTabPageIndex = state.getIn(['ui', 'tabs', 'previewTabPageIndex'])
+
+  return previewTabPageIndex !== undefined ? previewTabPageIndex : tabPageIndex
+}
+
+function getThemeColor (state, frameKey) {
+  const frame = getFrameByKey(state, frameKey)
+  return getSetting(settings.PAINT_TABS) && (frame.get('themeColor') || frame.get('computedThemeColor'))
+}
+
+function canPlayAudio (state, frameKey) {
+  const frame = getFrameByKey(state, frameKey)
+  return frame.get('audioPlaybackActive') || frame.get('audioMuted')
+}
+
+function isTabLoading (state, frameKey) {
+  const frame = getFrameByKey(state, frameKey)
+  return frame &&
+    (
+      frame.get('loading') ||
+      frame.get('location') === 'about:blank'
+    ) &&
+    (
+      !frame.get('provisionalLocation') ||
+      !frame.get('provisionalLocation').startsWith('chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/')
+    )
+}
+
+function isMediumView (state, frameKey) {
+  const frame = getFrameByKey(state, frameKey)
+  const sizes = ['large', 'largeMedium']
+
+  return sizes.includes(frame.get('breakpoint'))
+}
+
+function isNarrowView (state, frameKey) {
+  const frame = getFrameByKey(state, frameKey)
+  const sizes = ['medium', 'mediumSmall', 'small', 'extraSmall', 'smallest']
+
+  return sizes.includes(frame.get('breakpoint'))
+}
+
+function isNarrowestView (state, frameKey) {
+  const frame = getFrameByKey(state, frameKey)
+  const sizes = ['extraSmall', 'smallest']
+
+  return sizes.includes(frame.get('breakpoint'))
+}
+
+function getTabIconColor (state, frameKey) {
+  const frame = getFrameByKey(state, frameKey)
+  const isActive = isFrameKeyActive(state, frameKey)
+
+  if (!frame) {
+    return ''
+  }
+
+  const themeColor = frame.get('themeColor') || frame.get('computedThemeColor')
+  const activeNonPrivateTab = !frame.get('isPrivate') && isActive
+  const isPrivateTab = frame.get('isPrivate') && (isActive || frame.get('hoverState'))
+  const defaultColor = isPrivateTab ? styles.color.white100 : styles.color.black100
+  const isPaintTabs = getSetting(settings.PAINT_TABS)
+
+  return activeNonPrivateTab && isPaintTabs && !!themeColor
+    ? getTextColorForBackground(themeColor)
+    : defaultColor
+}
+
+/**
+ * Check whether or not closeTab icon is always visible (fixed) in tab
+ */
+function hasFixedCloseIcon (state, frameKey) {
+  const frame = getFrameByKey(state, frameKey)
+  const isActive = isFrameKeyActive(state, frameKey)
+
+  return (
+    isActive &&
+    // Larger sizes still have a relative closeIcon
+    // We don't resize closeIcon as we do with favicon so don't show it (smallest)
+    !hasBreakpoint(frame.get('breakpoint'), ['default', 'large', 'smallest'])
+  )
+}
+
+/**
+ * Check whether or not closeTab icon is relative to hover state
+ */
+function hasRelativeCloseIcon (state, frameKey) {
+  const frame = getFrameByKey(state, frameKey)
+
+  return frame.get('hoverState') && hasBreakpoint(frame.get('breakpoint'), ['default', 'large'])
+}
+
+/**
+ * Check whether or not private or newSession icon should be visible
+ */
+function hasVisibleSecondaryIcon (state, frameKey) {
+  const frame = getFrameByKey(state, frameKey)
+
+  return (
+    // Hide icon on hover
+    !hasRelativeCloseIcon(state, frameKey) &&
+    // If closeIcon is fixed then there's no room for another icon
+    !hasFixedCloseIcon(state, frameKey) &&
+    // completely hide it for small sizes
+    !hasBreakpoint(frame.get('breakpoint'), ['mediumSmall', 'small', 'extraSmall', 'smallest'])
+  )
+}
+
+/**
+ * Check if frame is pinned or not
+ */
+function isPinned (state, frameKey) {
+  const frame = getFrameByKey(state, frameKey)
+
+  return !!frame.get('pinnedLocation')
+}
+
+/**
+ * Updates the tab page index to the specified frameProps
+ * @param frameProps Any frame belonging to the page
+ */
+function updateTabPageIndex (state, frameProps) {
+  const index = getFrameTabPageIndex(state, frameProps, getSetting(settings.TABS_PER_PAGE))
+
+  if (index === -1) {
+    return state
+  }
+
+  state = state.setIn(['ui', 'tabs', 'tabPageIndex'], index)
+  state = state.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
+
+  return state
+}
+
 const frameStatePath = (state, frameKey) =>
   ['frames', getFrameIndex(state, frameKey)]
 
@@ -530,5 +688,19 @@ module.exports = {
   activeFrameStatePath,
   getLastCommittedURL,
   onFindBarHide,
-  getTotalBlocks
+  getTotalBlocks,
+  hasTabInFullScreen,
+  getPageIndex,
+  hasVisibleSecondaryIcon,
+  hasRelativeCloseIcon,
+  hasFixedCloseIcon,
+  getTabIconColor,
+  isNarrowestView,
+  isNarrowView,
+  isMediumView,
+  isTabLoading,
+  canPlayAudio,
+  getThemeColor,
+  isPinned,
+  updateTabPageIndex
 }

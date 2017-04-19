@@ -95,7 +95,7 @@ describe('Navigator component unit tests', function () {
   })
 
   after(function () {
-    mockery.disable()
+    mockery.deregisterAll()
   })
 
   describe('when user has history going forwards and backwards', function () {

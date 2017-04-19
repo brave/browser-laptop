@@ -1,7 +1,10 @@
-/* global describe, before, it, beforeEach */
+/* global describe, before, it, beforeEach, after */
 const frameStateUtil = require('../../../js/state/frameStateUtil')
 const Immutable = require('immutable')
+const mockery = require('mockery')
 const assert = require('assert')
+const {tabCloseAction} = require('../../../app/common/constants/settingsEnums')
+const fakeElectron = require('../lib/fakeElectron')
 
 require('../braveUnit')
 
@@ -12,8 +15,21 @@ const defaultWindowStore = Immutable.fromJS({
 })
 
 describe('frameStateUtil', function () {
+  let frameStateUtil
+
   before(function () {
+    mockery.enable({
+      warnOnReplace: false,
+      warnOnUnregistered: false,
+      useCleanCache: true
+    })
+    mockery.registerMock('electron', fakeElectron)
+    frameStateUtil = require('../../../js/state/frameStateUtil')
     this.windowState = Immutable.fromJS(Object.assign({}, defaultWindowStore.toJS()))
+  })
+
+  after(function () {
+    mockery.disable()
   })
 
   describe('query', function () {

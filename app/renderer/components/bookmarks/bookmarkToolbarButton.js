@@ -25,7 +25,7 @@ const dragTypes = require('../../../../js/constants/dragTypes')
 const siteUtil = require('../../../../js/state/siteUtil')
 const {getCurrentWindowId} = require('../../currentWindow')
 const dnd = require('../../../../js/dnd')
-const iconSize = require('../../../common/lib/faviconUtil').iconSize
+const {iconSize} = require('../../../common/state/tabContentState')
 const cx = require('../../../../js/lib/classSet')
 
 // Styles

@@ -1,8 +1,9 @@
-/* global describe, it, before */
-const windowState = require('../../../../app/common/state/windowState')
+/* global describe, it, before, after */
 const Immutable = require('immutable')
+const mockery = require('mockery')
 const assert = require('chai').assert
 const AssertionError = require('assert').AssertionError
+const fakeElectron = require('../../lib/fakeElectron')
 
 const defaultAppState = Immutable.fromJS({
   tabs: [],
@@ -167,6 +168,22 @@ const shouldValidateAction = function (cb) {
 }
 
 describe('windowState', function () {
+  let windowState
+
+  before(function () {
+    mockery.enable({
+      warnOnReplace: false,
+      warnOnUnregistered: false,
+      useCleanCache: true
+    })
+    mockery.registerMock('electron', fakeElectron)
+    windowState = require('../../../../app/common/state/windowState')
+  })
+
+  after(function () {
+    mockery.disable()
+  })
+
   describe('getWindowIndexByWindowId', function () {
     before(function () {
       this.appState = defaultAppState.set('windows', Immutable.fromJS([

@@ -17,7 +17,8 @@ const fakeElectron = {
   },
   ipcRenderer: {
     on: function () { },
-    send: function () { }
+    send: function () { },
+    sendSync: function () { }
   },
   remote: {
     app: {

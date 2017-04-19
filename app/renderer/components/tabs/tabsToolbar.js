@@ -5,81 +5,67 @@
 const React = require('react')
 
 // Components
-const ImmutableComponent = require('../immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 const Tabs = require('./tabs')
 const PinnedTabs = require('./pinnedTabs')
 
-// Store
-const windowStore = require('../../../../js/stores/windowStore')
-
 // Utils
 const contextMenus = require('../../../../js/contextMenus')
+const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
-class TabsToolbar extends ImmutableComponent {
+class TabsToolbar extends React.Component {
   constructor () {
     super()
     this.onContextMenu = this.onContextMenu.bind(this)
+    this.onHamburgerMenu = this.onHamburgerMenu.bind(this)
   }
 
   onContextMenu (e) {
-    if (this.refs.tabs.wasNewTabClicked(e.target)) {
-      // Don't show the tabs menu if the new tab "+"" was clicked
+    if (e.target.tagName === 'BUTTON') {
       return
     }
-    const activeFrame = windowStore.getFrame(this.props.activeFrameKey)
-    contextMenus.onTabsToolbarContextMenu(activeFrame.get('title'), activeFrame.get('location'), undefined, undefined, e)
+
+    contextMenus.onTabsToolbarContextMenu(this.props.activeFrame, undefined, undefined, e)
+  }
+
+  onHamburgerMenu (e) {
+    contextMenus.onHamburgerMenu(this.props.activeFrameLocation, e)
+  }
+
+  mergeProps (state, dispatchProps, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const activeFrame = frameStateUtil.getActiveFrame(currentWindow)
+    const pinnedTabs = frameStateUtil.getPinnedFrames(currentWindow)
+
+    const props = {}
+    // used in renderer
+    props.hasPinnedTabs = pinnedTabs.size > 0
+
+    // used in other functions
+    props.activeFrame = activeFrame
+    props.activeFrameLocation = (activeFrame && activeFrame.get('location')) || ''
+
+    return props
   }
 
   render () {
-    const index = this.props.previewTabPageIndex !== undefined
-      ? this.props.previewTabPageIndex : this.props.tabPageIndex
-    const startingFrameIndex = index * this.props.tabsPerTabPage
-    const pinnedTabs = this.props.frames.filter((tab) => tab.get('pinnedLocation'))
-    const unpinnedTabs = this.props.frames.filter((tab) => !tab.get('pinnedLocation'))
-    const currentTabs = unpinnedTabs
-      .slice(startingFrameIndex, startingFrameIndex + this.props.tabsPerTabPage)
-    return <div className='tabsToolbar'
+    return <div
+      className='tabsToolbar'
       onContextMenu={this.onContextMenu}>
       {
-        pinnedTabs.size > 0
-        ? <PinnedTabs sites={this.props.sites}
-          activeFrameKey={this.props.activeFrameKey}
-          paintTabs={this.props.paintTabs}
-          previewTabs={this.props.previewTabs}
-          dragData={this.props.dragData}
-          tabPageIndex={this.props.tabPageIndex}
-          pinnedTabs={pinnedTabs}
-          notificationBarActive={this.props.notificationBarActive}
-          />
+        this.props.hasPinnedTabs
+        ? <PinnedTabs />
         : null
       }
-      <Tabs
-        ref='tabs'
-        tabs={unpinnedTabs}
-        shouldAllowWindowDrag={this.props.shouldAllowWindowDrag}
-        dragData={this.props.dragData}
-        paintTabs={this.props.paintTabs}
-        previewTabs={this.props.previewTabs}
-        tabsPerTabPage={this.props.tabsPerTabPage}
-        activeFrameKey={this.props.activeFrameKey}
-        tabPageIndex={this.props.tabPageIndex}
-        hasTabInFullScreen={this.props.hasTabInFullScreen}
-        tabBreakpoint={this.props.tabBreakpoint}
-        currentTabs={currentTabs}
-        previewTabPageIndex={this.props.previewTabPageIndex}
-        startingFrameIndex={startingFrameIndex}
-        partOfFullPageSet={currentTabs.size === this.props.tabsPerTabPage}
-        fixTabWidth={this.props.fixTabWidth}
-        notificationBarActive={this.props.notificationBarActive}
-      />
+      <Tabs />
       <div className='tabsToolbarButtons'>
         <span data-l10n-id='menuButton'
           className='navbutton menuButton'
-          onClick={this.props.onMenu}
+          onClick={this.onHamburgerMenu}
         />
       </div>
     </div>
   }
 }
 
-module.exports = TabsToolbar
+module.exports = ReduxComponent.connect(TabsToolbar)
