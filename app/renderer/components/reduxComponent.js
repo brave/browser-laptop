@@ -19,10 +19,11 @@ class ReduxComponent extends ImmutableComponent {
     this.componentType = props.componentType
     this.state = buildPropsImpl(props, this.componentType)
     this.checkForUpdates = this.checkForUpdates.bind(this)
+    this.dontCheck = false
   }
 
   checkForUpdates () {
-    if (this.shouldComponentUpdate(this.props, this.buildProps())) {
+    if (!this.dontCheck && this.shouldComponentUpdate(this.props, this.buildProps())) {
       this.forceUpdate()
     }
   }
@@ -33,6 +34,7 @@ class ReduxComponent extends ImmutableComponent {
   }
 
   componentWillUnmount () {
+    this.dontCheck = true
     appStore.removeChangeListener(this.checkForUpdates)
     windowStore.removeChangeListener(this.checkForUpdates)
   }
