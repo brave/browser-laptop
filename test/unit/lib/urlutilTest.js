@@ -301,4 +301,23 @@ describe('urlutil', function () {
       assert.equal(UrlUtil.isPotentialPhishingUrl('   BLOB:foo '), true)
     })
   })
+
+  describe('isFileScheme', function () {
+    describe('returns true when input:', function () {
+      it('is an absolute file path with scheme', function () {
+        assert.equal(UrlUtil.isFileScheme('file:///file/path/to/file'), true);
+      })
+    })
+    describe('returns false when input:', function () {
+      it('is an absolute file path without scheme', function () {
+        assert.equal(UrlUtil.isFileScheme('/file/path/to/file'), false)
+      })
+      it('is a URL', function () {
+        assert.equal(UrlUtil.isFileScheme('http://brave.com'), false)
+      })
+      it('has custom protocol', function () {
+        assert.equal(UrlUtil.isFileScheme('brave://test'), false)
+      })
+    })
+  })
 })

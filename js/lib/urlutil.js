@@ -6,8 +6,10 @@
 
 // characters, then : with optional //
 const rscheme = /^(?:[a-z\u00a1-\uffff0-9-+]+)(?::(\/\/)?)(?!\d)/i
-const defaultScheme = 'http://'
+const httpScheme = 'http://'
+const httpsScheme = 'https://'
 const fileScheme = 'file://'
+const defaultScheme = httpScheme
 const os = require('os')
 const punycode = require('punycode')
 const urlParse = require('../../app/common/urlParse')
@@ -87,10 +89,6 @@ const UrlUtil = {
     return (url.match(/\.(jpeg|jpg|gif|png|bmp)$/))
   },
 
-  isHttpAddress (url) {
-    return (url.match(/^https?:\/\/(.*)/))
-  },
-
   /**
    * Checks if a string is not a URL.
    * @param {String} input The input value.
@@ -133,7 +131,7 @@ const UrlUtil = {
     if (case4Reg.test(str)) {
       return !UrlUtil.canParseURL(str)
     }
-    if (scheme && (scheme !== 'file://')) {
+    if (scheme && (scheme !== fileScheme)) {
       return !caseDomain.test(str + '/')
     }
     str = UrlUtil.prependScheme(str)
@@ -244,7 +242,7 @@ const UrlUtil = {
    * @returns {String} The view-source URL.
    */
   getViewSourceUrlFromUrl: function (input) {
-    if (UrlUtil.isImageAddress(input) || !UrlUtil.isHttpAddress(input)) {
+    if (!UrlUtil.isHttpOrHttps(input) && !UrlUtil.isFileScheme(input) || UrlUtil.isImageAddress(input)) {
       return null
     }
     if (UrlUtil.isViewSourceUrl(input)) {
@@ -381,11 +379,20 @@ const UrlUtil = {
 
   /**
    * Checks if URL is based on http protocol.
-   * @param {string} url The URL to get the hostPattern from
-   * @return {string} url The URL formmatted as an hostPattern
+   * @param {string} url - URL to check
+   * @return {boolean}
    */
   isHttpOrHttps: function (url) {
-    return url.startsWith('https://') || url.startsWith('http://')
+    return url.startsWith(httpScheme) || url.startsWith(httpsScheme)
+  },
+
+  /**
+   * Checks if URL is based on file protocol.
+   * @param {string} url - URL to check
+   * @return {boolean}
+   */
+  isFileScheme: function (url) {
+    return this.getScheme(url) === fileScheme
   },
 
   /**
