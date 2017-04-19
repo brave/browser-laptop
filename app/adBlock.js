@@ -87,7 +87,7 @@ const registerAppConfigForResource = (uuid, enabled, version) => {
  * @param uuid - The uuid of the adblock datafile resource
  * @param forAdblock - true if main frame URLs should be blocked
  */
-module.exports.updateAdblockDataFiles = (uuid, enabled, version = 2, shouldCheckMainFrame = false) => {
+module.exports.updateAdblockDataFiles = (uuid, enabled, version = Number(appConfig.adblock.version), shouldCheckMainFrame = false) => {
   registerAppConfigForResource(uuid, enabled, version)
   if (!adblockInstances.has(uuid)) {
     const adBlockClient = new AdBlockClient()
