@@ -88,7 +88,14 @@ module.exports.saveAppState = (payload, isShutdown) => {
         wndPayload.tabs = wndPayload.tabs.filter((tab) => !tab.isPrivate)
       })
     } else {
-      delete payload.perWindowState
+      // Reset the window state except for the ui data
+      payload.perWindowState.forEach((wndPayload) => {
+        Object.keys(wndPayload).forEach((key) => {
+          if (key !== 'ui') {
+            delete wndPayload[key]
+          }
+        })
+      })
     }
 
     try {
