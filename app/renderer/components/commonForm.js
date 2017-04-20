@@ -14,7 +14,10 @@ const {FormTextbox} = require('./textbox')
 
 class CommonForm extends ImmutableComponent {
   render () {
-    return <div className={css(commonStyles.flyoutDialog, styles.CommonForm)} {...this.props} />
+    return <div className={css(
+      commonStyles.flyoutDialog,
+      styles.commonForm
+    )} {...this.props} />
   }
 }
 
@@ -22,8 +25,18 @@ class CommonFormLarge extends ImmutableComponent {
   render () {
     return <div className={css(
       commonStyles.flyoutDialog,
-      styles.CommonForm,
-      styles.CommonFormLarge
+      styles.commonForm,
+      styles.commonFormLarge
+    )} {...this.props} />
+  }
+}
+
+class CommonFormBookmarkHanger extends ImmutableComponent {
+  render () {
+    return <div className={css(
+      commonStyles.flyoutDialog,
+      styles.commonForm,
+      styles.commonFormBookmarkHanger
     )} {...this.props} />
   }
 }
@@ -42,37 +55,49 @@ class CommonFormTextbox extends ImmutableComponent {
 
 class CommonFormClickable extends ImmutableComponent {
   render () {
-    return <div className={css(styles.CommonFormClickable)} {...this.props} />
+    return <div className={css(styles.commonFormClickable)} {...this.props} />
   }
 }
 
 class CommonFormSection extends ImmutableComponent {
   render () {
-    return <div className={css(styles.CommonFormSection)} {...this.props} />
+    return <div className={css(styles.commonFormSection)} {...this.props} />
   }
 }
 
 class CommonFormTitle extends ImmutableComponent {
   render () {
-    return <div className={css(styles.CommonFormSection, styles.CommonFormTitle)} {...this.props} />
+    return <div className={css(
+      styles.commonFormSection,
+      styles.commonFormTitle
+    )} {...this.props} />
   }
 }
 
 class CommonFormSubSection extends ImmutableComponent {
   render () {
-    return <div className={css(styles.CommonFormSection, styles.CommonFormSubSection)} {...this.props} />
+    return <div className={css(
+      styles.commonFormSection,
+      styles.commonFormSubSection
+    )} {...this.props} />
   }
 }
 
 class CommonFormButtonWrapper extends ImmutableComponent {
   render () {
-    return <div className={css(styles.CommonFormSection, styles.flexJustifyEnd)} {...this.props} />
+    return <div className={css(
+      styles.commonFormSection,
+      styles.flexJustifyEnd
+    )} {...this.props} />
   }
 }
 
 class CommonFormBottomWrapper extends ImmutableComponent {
   render () {
-    return <div className={css(styles.CommonFormSection, styles.CommonFormBottomWrapper)} {...this.props} />
+    return <div className={css(
+      styles.commonFormSection,
+      styles.commonFormBottomWrapper
+    )} {...this.props} />
   }
 }
 
@@ -82,9 +107,9 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end'
   },
 
-  CommonForm: {
+  commonForm: {
     background: globalStyles.color.commonFormBackgroundColor,
-    color: '#3b3b3b',
+    color: globalStyles.color.commonTextColor,
     padding: 0,
     top: '40px',
     cursor: 'default',
@@ -98,11 +123,18 @@ const styles = StyleSheet.create({
     // maxHeight: '100%'
   },
 
-  CommonFormLarge: {
+  commonFormLarge: {
     maxWidth: globalStyles.spacing.dialogLargeWidth
   },
 
-  CommonFormClickable: {
+  commonFormBookmarkHanger: {
+    maxWidth: globalStyles.spacing.bookmarkHangerMaxWidth,
+
+    // Cancel the inherited value from .navbarMenubarFlexContainer, which is 'nowrap'.
+    whiteSpace: 'normal'
+  },
+
+  commonFormClickable: {
     color: '#5b5b5b',
 
     ':hover': {
@@ -110,21 +142,21 @@ const styles = StyleSheet.create({
     }
   },
 
-  CommonFormTitle: {
+  commonFormTitle: {
     color: globalStyles.color.braveOrange,
     fontSize: '1.2em'
   },
 
-  CommonFormSection: {
+  commonFormSection: {
     // PR #7985
     margin: `${globalStyles.spacing.dialogInsideMargin} 30px`
   },
 
-  CommonFormSubSection: {
+  commonFormSubSection: {
     margin: `0 0 ${globalStyles.spacing.dialogInsideMargin} ${globalStyles.spacing.dialogInsideMargin}`
   },
 
-  CommonFormBottomWrapper: {
+  commonFormBottomWrapper: {
     margin: 0,
     padding: `${globalStyles.spacing.dialogInsideMargin} 30px`,
     background: globalStyles.color.commonFormBottomWrapperBackground
@@ -161,6 +193,7 @@ const commonFormStyles = StyleSheet.create({
 module.exports = {
   CommonForm,
   CommonFormLarge,
+  CommonFormBookmarkHanger,
   CommonFormDropdown,
   CommonFormTextbox,
   CommonFormClickable,

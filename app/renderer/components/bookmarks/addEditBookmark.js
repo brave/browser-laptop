@@ -6,7 +6,6 @@ const React = require('react')
 
 // Components
 const ImmutableComponent = require('../immutableComponent')
-const Dialog = require('../../../../js/components/dialog')
 const AddEditBookmarkHanger = require('./addEditBookmarkHanger')
 
 // Actions
@@ -24,17 +23,15 @@ class AddEditBookmark extends ImmutableComponent {
     this.refs.bookmarkHanger.setDefaultFocus()
   }
   render () {
-    return <Dialog onHide={this.onClose} isClickDismiss>
-      <AddEditBookmarkHanger
-        ref='bookmarkHanger'
-        isModal
-        sites={this.props.sites}
-        currentDetail={this.props.currentDetail}
-        originalDetail={this.props.originalDetail}
-        destinationDetail={this.props.destinationDetail}
-        shouldShowLocation={this.props.shouldShowLocation}
-      />
-    </Dialog>
+    return <AddEditBookmarkHanger
+      ref='bookmarkHanger'
+      isModal
+      sites={this.props.sites}
+      currentDetail={this.props.currentDetail}
+      originalDetail={this.props.originalDetail}
+      destinationDetail={this.props.destinationDetail}
+      shouldShowLocation={this.props.shouldShowLocation}
+    />
   }
 }
 

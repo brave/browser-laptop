@@ -22,6 +22,8 @@ module.exports = {
   navigatorBookmarked: '#navigator .removeBookmarkButton',
   navigatorNotBookmarked: '#navigator .bookmarkButton',
   bookmarksToolbar: '[data-test-id="bookmarksToolbar"]',
+  bookmarkNameInput: '[data-test-id="bookmarkNameInput"]',
+  bookmarkLocationInput: '[data-test-id="bookmarkLocationInput"]',
   notificationBar: '[data-test-id="notificationBar"]',
   errorContent: '.errorContent',
   errorUrl: '.errorUrl',

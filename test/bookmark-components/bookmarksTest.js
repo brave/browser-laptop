@@ -2,7 +2,7 @@
 
 const Brave = require('../lib/brave')
 const Immutable = require('immutable')
-const {urlInput, navigator, navigatorBookmarked, navigatorNotBookmarked, doneButton, removeButton} = require('../lib/selectors')
+const {urlInput, navigator, navigatorBookmarked, navigatorNotBookmarked, doneButton, removeButton, bookmarkNameInput, bookmarkLocationInput} = require('../lib/selectors')
 const siteTags = require('../../js/constants/siteTags')
 
 describe('bookmark tests', function () {
@@ -38,14 +38,14 @@ describe('bookmark tests', function () {
 
       it('fills in the url field', function * () {
         yield this.app.client
-          .waitForExist('#bookmarkLocation input')
+          .waitForExist(bookmarkLocationInput)
           .waitForBookmarkDetail(this.page1Url, 'Page 1')
       })
       it('add custom title', function * () {
         yield this.app.client
-          .waitForExist('#bookmarkName input')
+          .waitForExist(bookmarkNameInput)
           .waitForBookmarkDetail(this.page1Url, 'Page 1')
-          .setValue('#bookmarkName input', 'Custom Page 1')
+          .setValue(bookmarkNameInput, 'Custom Page 1')
           .waitForEnabled(doneButton)
           .click(doneButton)
       })
@@ -55,7 +55,7 @@ describe('bookmark tests', function () {
           .waitForVisible(navigatorBookmarked)
           .click(navigatorBookmarked)
           .waitForVisible(doneButton)
-          .waitForInputText('#bookmarkName input', 'Custom Page 1')
+          .waitForInputText(bookmarkNameInput, 'Custom Page 1')
           .click(doneButton)
       })
       it('can delete custom title', function * () {
@@ -65,7 +65,7 @@ describe('bookmark tests', function () {
           .click(navigatorBookmarked)
           .waitForVisible(doneButton)
           .keys(Brave.keys.BACKSPACE)
-          .waitForInputText('#bookmarkName input', '')
+          .waitForInputText(bookmarkNameInput, '')
       })
       it('display punycode custom title and location', function * () {
         yield this.app.client
@@ -73,14 +73,14 @@ describe('bookmark tests', function () {
           .waitForVisible(navigatorBookmarked)
           .click(navigatorBookmarked)
           .waitForVisible(doneButton)
-          .setValue('#bookmarkName input', 'https://www.brave.com')
+          .setValue(bookmarkNameInput, 'https://www.brave.com')
           .keys(Brave.keys.END)
           .keys('а')
-          .waitForInputText('#bookmarkName input', 'https://www.brave.xn--com-8cd/')
-          .setValue('#bookmarkLocation input', 'https://www.brave.com')
+          .waitForInputText(bookmarkNameInput, 'https://www.brave.xn--com-8cd/')
+          .setValue(bookmarkLocationInput, 'https://www.brave.com')
           .keys(Brave.keys.END)
           .keys('а')
-          .waitForInputText('#bookmarkLocation input', 'https://www.brave.xn--com-8cd/')
+          .waitForInputText(bookmarkLocationInput, 'https://www.brave.xn--com-8cd/')
           .click(removeButton)
       })
       it('custom title and location can be backspaced', function * () {
@@ -89,18 +89,18 @@ describe('bookmark tests', function () {
           .waitForVisible(navigatorBookmarked)
           .click(navigatorBookmarked)
           .waitForVisible(doneButton)
-          .setValue('#bookmarkName input', 'https://www.brave.com/1')
+          .setValue(bookmarkNameInput, 'https://www.brave.com/1')
           .keys(Brave.keys.END)
           .keys(Brave.keys.BACKSPACE)
           .keys(Brave.keys.BACKSPACE)
           .keys(Brave.keys.BACKSPACE)
-          .waitForInputText('#bookmarkName input', 'https://www.brave.co')
-          .setValue('#bookmarkLocation input', 'https://www.brave.com/1')
+          .waitForInputText(bookmarkNameInput, 'https://www.brave.co')
+          .setValue(bookmarkLocationInput, 'https://www.brave.com/1')
           .keys(Brave.keys.END)
           .keys(Brave.keys.BACKSPACE)
           .keys(Brave.keys.BACKSPACE)
           .keys(Brave.keys.BACKSPACE)
-          .waitForInputText('#bookmarkLocation input', 'https://www.brave.co')
+          .waitForInputText(bookmarkLocationInput, 'https://www.brave.co')
           .click(removeButton)
       })
     })
@@ -126,15 +126,15 @@ describe('bookmark tests', function () {
 
       it('fills in the title field', function * () {
         yield this.app.client
-          .waitForExist('#bookmarkName input')
+          .waitForExist(bookmarkNameInput)
           .waitForBookmarkDetail(this.page1Url, 'Page 1')
           .waitForEnabled(doneButton)
-          .waitForInputText('#bookmarkName input', 'Page 1')
+          .waitForInputText(bookmarkNameInput, 'Page 1')
       })
 
       it('does not show the url field', function * () {
         yield this.app.client
-          .waitForElementCount('#bookmarkLocation input', 0)
+          .waitForElementCount(bookmarkLocationInput, 0)
       })
 
       describe('saved with a title', function () {
@@ -189,13 +189,13 @@ describe('bookmark tests', function () {
 
       it('leaves the title field blank', function * () {
         yield this.app.client
-          .waitForExist('#bookmarkName input')
-          .waitForInputText('#bookmarkName input', '')
+          .waitForExist(bookmarkNameInput)
+          .waitForInputText(bookmarkNameInput, '')
       })
 
       it('does not show the url field', function * () {
         yield this.app.client
-          .waitForElementCount('#bookmarkLocation input', 0)
+          .waitForElementCount(bookmarkLocationInput, 0)
       })
 
       describe('saved without a title', function () {
@@ -266,7 +266,7 @@ describe('bookmark tests', function () {
           .waitForVisible(navigatorBookmarked)
           .click(navigatorBookmarked)
           .waitForVisible(doneButton)
-          .waitForInputText('#bookmarkLocation input', page1Url)
+          .waitForInputText(bookmarkLocationInput, page1Url)
       })
     })
   })
