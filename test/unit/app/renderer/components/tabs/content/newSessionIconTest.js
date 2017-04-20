@@ -48,21 +48,126 @@ describe('Tabs content - NewSessionIcon', function () {
     )
     assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
   })
-  it('should not show new session icon if mouse is over tab (avoid icon overflow)', function () {
+  it('should not show new session icon if mouse is over tab and breakpoint is default', function () {
     const wrapper = shallow(
       <NewSessionIcon
         tab={
           Immutable.Map({
             partitionNumber: 1,
-            hoverState: true
+            hoverState: true,
+            breakpoint: 'default'
           })}
       />
     )
     assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
   })
-  it('should not show new session icon if tab size is small', function () {
+  it('should show new session icon if mouse is not over tab and breakpoint is default', function () {
     const wrapper = shallow(
       <NewSessionIcon
+        tab={
+          Immutable.Map({
+            partitionNumber: 1,
+            hoverState: false,
+            breakpoint: 'default'
+          })}
+      />
+    )
+    assert.equal(wrapper.props()['data-test-id'], 'newSessionIcon')
+  })
+  it('should not show new session icon if mouse is over tab and breakpoint is large', function () {
+    const wrapper = shallow(
+      <NewSessionIcon
+        tab={
+          Immutable.Map({
+            partitionNumber: 1,
+            hoverState: true,
+            breakpoint: 'large'
+          })}
+      />
+    )
+    assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
+  })
+  it('should show new session icon if mouse is not over tab and breakpoint is large', function () {
+    const wrapper = shallow(
+      <NewSessionIcon
+        tab={
+          Immutable.Map({
+            partitionNumber: 1,
+            hoverState: false,
+            breakpoint: 'large'
+          })}
+      />
+    )
+    assert.equal(wrapper.props()['data-test-id'], 'newSessionIcon')
+  })
+  it('should not show new session icon if tab is active and breakpoint is largeMedium', function () {
+    const wrapper = shallow(
+      <NewSessionIcon isActive
+        tab={
+          Immutable.Map({
+            partitionNumber: 1,
+            hoverState: true,
+            breakpoint: 'largeMedium'
+          })}
+      />
+    )
+    assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
+  })
+  it('should show new session icon if tab is not active and breakpoint is largeMedium', function () {
+    const wrapper = shallow(
+      <NewSessionIcon isActive={false}
+        tab={
+          Immutable.Map({
+            partitionNumber: 1,
+            hoverState: false,
+            breakpoint: 'largeMedium'
+          })}
+      />
+    )
+    assert.equal(wrapper.props()['data-test-id'], 'newSessionIcon')
+  })
+  it('should not show new session icon if tab is active and breakpoint is medium', function () {
+    const wrapper = shallow(
+      <NewSessionIcon isActive
+        tab={
+          Immutable.Map({
+            partitionNumber: 1,
+            hoverState: true,
+            breakpoint: 'medium'
+          })}
+      />
+    )
+    assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
+  })
+  it('should show new session icon if tab is not active and breakpoint is medium', function () {
+    const wrapper = shallow(
+      <NewSessionIcon isActive={false}
+        tab={
+          Immutable.Map({
+            partitionNumber: 1,
+            hoverState: false,
+            breakpoint: 'medium'
+          })}
+      />
+    )
+    assert.equal(wrapper.props()['data-test-id'], 'newSessionIcon')
+  })
+  it('should not show new session icon if breakpoint is mediumSmall', function () {
+    const wrapper = shallow(
+      <NewSessionIcon isActive
+        tab={
+          Immutable.Map({
+            partitionNumber: 1,
+            hoverState: false,
+            breakpoint: 'mediumSmall'
+          })}
+      />
+    )
+    assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
+  })
+  it('should not show new session icon if breakpoint is small', function () {
+    const wrapper = shallow(
+      <NewSessionIcon isActive
         tab={
           Immutable.Map({
             partitionNumber: 1,
@@ -73,9 +178,9 @@ describe('Tabs content - NewSessionIcon', function () {
     )
     assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
   })
-  it('should not show new session icon if tab size is extraSmall', function () {
+  it('should not show new session icon if breakpoint is extraSmall', function () {
     const wrapper = shallow(
-      <NewSessionIcon
+      <NewSessionIcon isActive
         tab={
           Immutable.Map({
             partitionNumber: 1,
@@ -86,7 +191,7 @@ describe('Tabs content - NewSessionIcon', function () {
     )
     assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
   })
-  it('should not show new session icon if tab size is the smallest', function () {
+  it('should not show new session icon if breakpoint is the smallest', function () {
     const wrapper = shallow(
       <NewSessionIcon
         tab={
