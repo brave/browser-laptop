@@ -10,6 +10,18 @@ const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
 const KeyCodes = require('../../app/common/constants/keyCodes')
 
+const {css} = require('aphrodite/no-important')
+const commonStyles = require('../../app/renderer/components/styles/commonStyles')
+
+const {
+  CommonFormLarge,
+  CommonFormSection,
+  CommonFormTitle,
+  CommonFormTextbox,
+  CommonFormButtonWrapper,
+  commonFormStyles
+} = require('../../app/renderer/components/commonForm')
+
 class AutofillAddressPanel extends ImmutableComponent {
   constructor () {
     super()
@@ -99,63 +111,98 @@ class AutofillAddressPanel extends ImmutableComponent {
   }
 
   render () {
-    return <Dialog onHide={this.props.onHide} className='manageAutofillDataPanel autofillAddressPanel' isClickDismiss>
-      <div className='genericForm manageAutofillData' onClick={this.onClick}>
-        <div className='formRow manageAutofillDataTitle' data-l10n-id='editAddress' />
-        <div className='genericFormTable'>
-          <div id='nameOnAddress' className='formRow manageAutofillDataOptions'>
-            <label data-l10n-id='name' htmlFor='nameOnAddress' />
-            <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onNameChange}
-              value={this.props.currentDetail.get('name')}
-              ref={(nameOnAddress) => { this.nameOnAddress = nameOnAddress }} />
+    return <Dialog onHide={this.props.onHide} testId='autofillAddressPanel' isClickDismiss>
+      <CommonFormLarge onClick={this.onClick}>
+        <CommonFormTitle data-l10n-id='editAddress' />
+        <CommonFormSection>
+          <div className={css(commonFormStyles.sectionWrapper)}>
+            <div className={css(commonFormStyles.inputWrapper, commonFormStyles.inputWrapper__label)}>
+              <label data-l10n-id='name' htmlFor='nameOnAddress' />
+              <label className={css(commonFormStyles.input__marginRow)} data-l10n-id='organization' htmlFor='organization' />
+              <label className={css(commonFormStyles.input__marginRow)} data-l10n-id='streetAddress' htmlFor='streetAddress' />
+              <label className={css(commonFormStyles.input__marginRow)} data-l10n-id='city' htmlFor='city' />
+              <label className={css(commonFormStyles.input__marginRow)} data-l10n-id='state' htmlFor='state' />
+              <label className={css(commonFormStyles.input__marginRow)} data-l10n-id='postalCode' htmlFor='postalCode' />
+              <label className={css(commonFormStyles.input__marginRow)} data-l10n-id='country' htmlFor='country' />
+              <label className={css(commonFormStyles.input__marginRow)} data-l10n-id='phone' htmlFor='phone' />
+              <label className={css(commonFormStyles.input__marginRow)} data-l10n-id='email' htmlFor='email' />
+            </div>
+            <div className={css(commonFormStyles.inputWrapper, commonFormStyles.inputWrapper__input)}>
+              <input className={css(
+                commonStyles.formControl,
+                commonStyles.textbox,
+                commonStyles.textbox__outlineable,
+                commonFormStyles.input__box
+              )}
+                data-test-id='nameOnAddress'
+                spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onNameChange}
+                value={this.props.currentDetail.get('name')}
+                ref={(nameOnAddress) => { this.nameOnAddress = nameOnAddress }} />
+              <div className={css(commonFormStyles.input__marginRow)}>
+                <CommonFormTextbox
+                  data-test-id='organization'
+                  spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onOrganizationChange}
+                  value={this.props.currentDetail.get('organization')} />
+              </div>
+              <div className={css(commonFormStyles.input__marginRow)}>
+                <CommonFormTextbox
+                  data-test-id='streetAddress'
+                  spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onStreetAddressChange}
+                  value={this.props.currentDetail.get('streetAddress')} />
+              </div>
+              <div className={css(commonFormStyles.input__marginRow)}>
+                <CommonFormTextbox
+                  data-test-id='city'
+                  spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onCityChange}
+                  value={this.props.currentDetail.get('city')} />
+              </div>
+              <div className={css(commonFormStyles.input__marginRow)}>
+                <CommonFormTextbox
+                  data-test-id='state'
+                  spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onStateChange}
+                  value={this.props.currentDetail.get('state')} />
+              </div>
+              <div className={css(commonFormStyles.input__marginRow)}>
+                <CommonFormTextbox
+                  data-test-id='postalCode'
+                  spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onPostalCodeChange}
+                  value={this.props.currentDetail.get('postalCode')} />
+              </div>
+              <div className={css(commonFormStyles.input__marginRow)}>
+                <CommonFormTextbox
+                  data-test-id='country'
+                  spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onCountryChange}
+                  value={this.props.currentDetail.get('country')} />
+              </div>
+              <div className={css(commonFormStyles.input__marginRow)}>
+                <CommonFormTextbox
+                  data-test-id='phone'
+                  spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onPhoneChange}
+                  value={this.props.currentDetail.get('phone')} />
+              </div>
+              <div className={css(commonFormStyles.input__marginRow)}>
+                <CommonFormTextbox
+                  data-test-id='email'
+                  spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onEmailChange}
+                  value={this.props.currentDetail.get('email')} />
+              </div>
+            </div>
           </div>
-          <div id='organization' className='formRow manageAutofillDataOptions'>
-            <label data-l10n-id='organization' htmlFor='organization' />
-            <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onOrganizationChange}
-              value={this.props.currentDetail.get('organization')} />
-          </div>
-          <div id='streetAddress' className='formRow manageAutofillDataOptions'>
-            <label data-l10n-id='streetAddress' htmlFor='streetAddress' />
-            <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onStreetAddressChange}
-              value={this.props.currentDetail.get('streetAddress')} />
-          </div>
-          <div id='city' className='formRow manageAutofillDataOptions'>
-            <label data-l10n-id='city' htmlFor='city' />
-            <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onCityChange}
-              value={this.props.currentDetail.get('city')} />
-          </div>
-          <div id='state' className='formRow manageAutofillDataOptions'>
-            <label data-l10n-id='state' htmlFor='state' />
-            <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onStateChange}
-              value={this.props.currentDetail.get('state')} />
-          </div>
-          <div id='postalCode' className='formRow manageAutofillDataOptions'>
-            <label data-l10n-id='postalCode' htmlFor='postalCode' />
-            <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onPostalCodeChange}
-              value={this.props.currentDetail.get('postalCode')} />
-          </div>
-          <div id='country' className='formRow manageAutofillDataOptions'>
-            <label data-l10n-id='country' htmlFor='country' />
-            <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onCountryChange}
-              value={this.props.currentDetail.get('country')} />
-          </div>
-          <div id='phone' className='formRow manageAutofillDataOptions'>
-            <label data-l10n-id='phone' htmlFor='phone' />
-            <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onPhoneChange}
-              value={this.props.currentDetail.get('phone')} />
-          </div>
-          <div id='email' className='formRow manageAutofillDataOptions'>
-            <label data-l10n-id='email' htmlFor='email' />
-            <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onEmailChange}
-              value={this.props.currentDetail.get('email')} />
-          </div>
-          <div className='formRow manageAutofillDataButtons'>
-            <Button l10nId='cancel' className='whiteButton' onClick={this.props.onHide} />
-            <Button l10nId='save' className='primaryButton saveAddressButton' onClick={this.onSave}
-              disabled={this.disableSaveButton} />
-          </div>
-        </div>
-      </div>
+        </CommonFormSection>
+        <CommonFormButtonWrapper>
+          <Button className='whiteButton'
+            l10nId='cancel'
+            testId='cancelAddressButton'
+            onClick={this.props.onHide}
+          />
+          <Button className='primaryButton'
+            disabled={this.disableSaveButton}
+            l10nId='save'
+            testId='saveAddressButton'
+            onClick={this.onSave}
+          />
+        </CommonFormButtonWrapper>
+      </CommonFormLarge>
     </Dialog>
   }
 }
