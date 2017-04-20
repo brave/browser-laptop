@@ -21,6 +21,16 @@ class CommonForm extends ImmutableComponent {
   }
 }
 
+class CommonFormMedium extends ImmutableComponent {
+  render () {
+    return <div className={css(
+      commonStyles.flyoutDialog,
+      styles.commonForm,
+      styles.commonFormMedium,
+    )} {...this.props} />
+  }
+}
+
 class CommonFormLarge extends ImmutableComponent {
   render () {
     return <div className={css(
@@ -123,6 +133,10 @@ const styles = StyleSheet.create({
     // maxHeight: '100%'
   },
 
+  commonFormMedium: {
+    maxWidth: globalStyles.spacing.dialogMediumWidth
+  },
+
   commonFormLarge: {
     maxWidth: globalStyles.spacing.dialogLargeWidth
   },
@@ -168,6 +182,7 @@ const commonFormStyles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'space-between'
   },
+
   inputWrapper: {
     display: 'flex',
     flexFlow: 'column',
@@ -179,6 +194,7 @@ const commonFormStyles = StyleSheet.create({
   inputWrapper__input: {
     flexGrow: 1
   },
+
   input__bottomRow: {
     marginTop: `calc(${globalStyles.spacing.dialogInsideMargin} / 3)`
   },
@@ -192,6 +208,7 @@ const commonFormStyles = StyleSheet.create({
 
 module.exports = {
   CommonForm,
+  CommonFormMedium,
   CommonFormLarge,
   CommonFormBookmarkHanger,
   CommonFormDropdown,
