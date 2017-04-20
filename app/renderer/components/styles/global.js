@@ -75,6 +75,8 @@ const globalStyles = {
     statsBlue: '#0796fa',
     statsLightGray: '#999999',
     defaultIconBackground: '#F7F7F7',
+    notificationItemColor: '#f1e9e5',
+    notificationBottomBorderColor: '#ff5500',
     almostInvisible: 'rgba(255,255,255,0.01)',
     urlBarOutline: '#bbb',
     alphaWhite: 'rgba(255,255,255,0.8)'

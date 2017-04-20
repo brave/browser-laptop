@@ -15,6 +15,7 @@ const Button = require('./button')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
+const globalStyles = require('../../app/renderer/components/styles/global')
 
 class NotificationItem extends ImmutableComponent {
   clickHandler (buttonIndex, e) {
@@ -115,6 +116,14 @@ class NotificationBar extends ImmutableComponent {
   }
 }
 
+class NotificationBarCaret extends ImmutableComponent {
+  render () {
+    return <div className={css(styles.caretWrapper)}>
+      <div className={css(styles.caret)} />
+    </div>
+  }
+}
+
 const styles = StyleSheet.create({
   flexJustifyBetween: {
     display: 'flex',
@@ -142,7 +151,32 @@ const styles = StyleSheet.create({
     textDecoration: 'underline',
     fontSize: '13px',
     margin: '5px'
+  },
+  caretWrapper: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: globalStyles.zindex.zindexTabs,
+    filter: 'drop-shadow(rgba(0,0,0,0.25) 0px 0px 1px)'
+  },
+  caret: {
+    position: 'relative',
+    margin: 'auto',
+    width: '16px',
+    ':before': {
+      content: '""',
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      borderBottom: `6px solid ${globalStyles.color.notificationItemColor}`,
+      borderLeft: '8px solid transparent',
+      borderRight: '8px solid transparent'
+    }
   }
 })
 
-module.exports = NotificationBar
+module.exports = {
+  NotificationBar,
+  NotificationBarCaret
+}
