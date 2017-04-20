@@ -40,6 +40,7 @@
     .urlbarForm {
       input {
         font-weight: 500;
+        line-height: 1.4;
         margin: 0; // #5624
         top: 0; // #5624
       }
@@ -848,10 +849,11 @@
       background: @navigationBarBackgroundActive;
       border: none;
       box-sizing: border-box;
-      color: @chromeText;
+      color: #333;
+      letter-spacing: -0.125px;
       cursor: text;
       flex-grow: 1;
-      font-size: @defaultFontSize;
+      font-size: 13.5px;
       font-weight: normal;
       outline: none;
       text-overflow: ellipsis;
@@ -884,20 +886,23 @@
 
       .urlbarIcon {
         color: @siteSecureColor;
-        font-size: 13px;
+        font-size: 12px;
         background-repeat: no-repeat;
         background-position: center;
+        position: relative;
+        bottom: -1px;
 
         // about:newtab
         &.fa-search {
           position: relative;
-          bottom: 1px;
+          bottom: 0;
         }
 
         &.fa-lock,
         &.fa-unlock,
         &.fa-exclamation-triangle {
           font-size: 16px;
+          bottom: 0;
         }
 
         &.insecure-color {
