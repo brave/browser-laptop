@@ -9,15 +9,16 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const ImmutableComponent = require('../../immutableComponent')
 
 // Utils
-const {hasBreakpoint, hasFixedCloseIcon, getTabIconColor} = require('../../../lib/tabUtil')
+const {hasBreakpoint, getTabIconColor} = require('../../../lib/tabUtil')
 const {isWindows, isDarwin} = require('../../../../common/lib/platformUtil')
 
 // Styles
 const globalStyles = require('../../styles/global')
 
 class TabTitle extends ImmutableComponent {
-  get locationHasSecondaryIcon () {
-    return !!this.props.tab.get('isPrivate') || !!this.props.tab.get('partitionNumber')
+  get isActiveOrHasSecondaryIcon () {
+    return this.props.isActive ||
+      (!!this.props.tab.get('isPrivate') || !!this.props.tab.get('partitionNumber'))
   }
 
   get isPinned () {
@@ -25,10 +26,8 @@ class TabTitle extends ImmutableComponent {
   }
 
   get shouldHideTitle () {
-    return (this.props.tab.get('breakpoint') === 'mediumSmall' && this.locationHasSecondaryIcon) ||
-      (hasBreakpoint(this.props, 'mediumSmall') && this.props.tab.get('hoverState')) ||
-      hasBreakpoint(this.props, ['extraSmall', 'smallest']) ||
-      hasFixedCloseIcon(this.props)
+    return (hasBreakpoint(this.props, 'small') && this.props.isActive) ||
+      hasBreakpoint(this.props, ['extraSmall', 'smallest'])
   }
 
   render () {
