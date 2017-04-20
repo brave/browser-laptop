@@ -1361,29 +1361,15 @@ function onTabContextMenu (frameProps, e) {
 }
 
 function onNewTabContextMenu (target) {
-  const rootElement = window.getComputedStyle(document.querySelector(':root'))
-  const contextMenuSize = Number.parseInt(rootElement.getPropertyValue('--context-menu-single-max-width'), 10)
-
-  const containerRect = target.parentNode.getBoundingClientRect()
-  const rect = target.getBoundingClientRect()
-
-  const contextMenuMaxVisibleWidth = rect.right + (contextMenuSize / 2)
-  const contextMenuHasOverflow = contextMenuMaxVisibleWidth > containerRect.right
-
   const menuTemplate = [
     CommonMenu.newTabMenuItem(),
     CommonMenu.newPrivateTabMenuItem(),
     CommonMenu.newPartitionedTabMenuItem(),
     CommonMenu.newWindowMenuItem()
   ]
-
-  windowActions.setContextMenuDetail(Immutable.fromJS({
-    left: contextMenuHasOverflow
-      ? contextMenuMaxVisibleWidth - contextMenuSize - rect.width
-      : rect.left,
-    top: rect.bottom + 2,
-    template: menuTemplate
-  }))
+  const menu = Menu.buildFromTemplate(menuTemplate)
+  menu.popup(getCurrentWindow())
+  menu.destroy()
 }
 
 function onTabsToolbarContextMenu (activeFrame, closestDestinationDetail, isParent, e) {
