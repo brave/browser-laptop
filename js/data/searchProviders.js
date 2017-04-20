@@ -36,6 +36,12 @@ module.exports = { "providers" :
       "shortcut" : ":gh"
     },
     {
+      "name" : "GitHub",
+      "image" : "https://assets-cdn.github.com/favicon.ico",
+      "search" : "https://github.com/search?q={searchTerms}",
+      "shortcut" : "gh"
+    },
+    {
       "name" : "Google",
       "base" : "https://www.google.com",
       "image" : "https://www.google.com/favicon.ico",
@@ -56,6 +62,18 @@ module.exports = { "providers" :
       "image" : "https://developer.cdn.mozilla.net/static/img/favicon32.png",
       "search" : "https://developer.mozilla.org/search?q={searchTerms}",
       "shortcut" : ":m"
+    },
+    {
+      "name" : "Stack Overflow",
+      "image" : "https://cdn.sstatic.net/Sites/stackoverflow/img/favicon.ico",
+      "search" : "https://stackoverflow.com/search?q={searchTerms}",
+      "shortcut" : "s"
+    },
+    {
+      "name" : "Mozilla Developer Network (MDN)",
+      "image" : "https://developer.cdn.mozilla.net/static/img/favicon32.png",
+      "search" : "https://developer.mozilla.org/search?q={searchTerms}",
+      "shortcut" : "m"
     },
     {
       "name" : "Twitter",
