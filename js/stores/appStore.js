@@ -175,14 +175,12 @@ const createWindow = (action) => {
     // smaller min size for "modal" windows
     minWidth,
     minHeight,
-    // Neither a frame nor a titlebar
-    // frame: false,
     // A frame but no title bar and windows buttons in titlebar 10.10 OSX and up only?
     titleBarStyle: 'hidden-inset',
     autoHideMenuBar: autoHideMenuBarSetting,
     title: appConfig.name,
     webPreferences: defaults.webPreferences,
-    frame: !isWindows
+    frame: true
   }
 
   if (process.platform === 'linux') {
