@@ -308,22 +308,33 @@ const doAction = (action) => {
       })
       break
     case windowConstants.WINDOW_WEBVIEW_LOAD_START:
-      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps)], {
-        loading: true,
-        provisionalLocation: action.location,
-        startLoadTime: new Date().getTime(),
-        endLoadTime: null
-      })
-      windowState = windowState.mergeIn(['tabs', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps)], {
-        loading: true,
-        provisionalLocation: action.location
-      })
-      // For about:newtab we want to have the urlbar focused, not the new frame.
-      // Otherwise we want to focus the new tab when it is a new frame in the foreground.
-      if (action.location !== getTargetAboutUrl('about:newtab')) {
-        focusWebview(activeFrameStatePath(windowState))
+      {
+        const framePath = ['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps)]
+        // Reset security state
+        windowState =
+          windowState.deleteIn(framePath.concat(['security', 'blockedRunInsecureContent']))
+        windowState = windowState.mergeIn(framePath.concat(['security']), {
+          isSecure: null,
+          runInsecureContent: false
+        })
+        // Update loading UI
+        windowState = windowState.mergeIn(framePath, {
+          loading: true,
+          provisionalLocation: action.location,
+          startLoadTime: new Date().getTime(),
+          endLoadTime: null
+        })
+        windowState = windowState.mergeIn(['tabs'].concat(framePath), {
+          loading: true,
+          provisionalLocation: action.location
+        })
+        // For about:newtab we want to have the urlbar focused, not the new frame.
+        // Otherwise we want to focus the new tab when it is a new frame in the foreground.
+        if (action.location !== getTargetAboutUrl('about:newtab')) {
+          focusWebview(activeFrameStatePath(windowState))
+        }
+        break
       }
-      break
     case windowConstants.WINDOW_WEBVIEW_LOAD_END:
       windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps)], {
         loading: false,
@@ -512,7 +523,9 @@ const doAction = (action) => {
       windowState = windowState.setIn(['ui', 'mouseInTitlebar'], action.mouseInTitlebar)
       break
     case windowConstants.WINDOW_SET_NOSCRIPT_VISIBLE:
-      windowState = windowState.setIn(['ui', 'noScriptInfo', 'isVisible'], action.isVisible)
+      const noScriptInfoPath = ['ui', 'noScriptInfo', 'isVisible']
+      windowState = windowState.setIn(noScriptInfoPath,
+        typeof action.isVisible === 'boolean' ? action.isVisible : !windowState.getIn(noScriptInfoPath))
       break
     case windowConstants.WINDOW_SET_SITE_INFO_VISIBLE:
       windowState = windowState.setIn(['ui', 'siteInfo', 'isVisible'], action.isVisible)
@@ -597,10 +610,6 @@ const doAction = (action) => {
       if (action.securityState.runInsecureContent !== undefined) {
         windowState = windowState.setIn(path.concat(['security', 'runInsecureContent']),
                                         action.securityState.runInsecureContent)
-      }
-      if (action.securityState.certDetails) {
-        windowState = windowState.setIn(path.concat(['security', 'certDetails']),
-                                        action.securityState.certDetails)
       }
       break
     case windowConstants.WINDOW_SET_BLOCKED_BY:
