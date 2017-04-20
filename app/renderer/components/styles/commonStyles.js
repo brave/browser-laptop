@@ -174,13 +174,20 @@ const styles = StyleSheet.create({
     width: '100%',
     cursor: 'default',
     userSelect: 'none',
-    marginTop: globalStyles.spacing.navbarMenubarMargin
+    // if there's more than one notification per site,
+    // ensure border is on the last only
+    ':last-child': {
+      borderBottom: `5px solid ${globalStyles.color.notificationBottomBorderColor}`
+    },
+    // last-child will always be orange, but others can be gray
+    ':not(:last-child)': {
+      borderBottom: `1px solid ${globalStyles.color.tabsToolbarBorderColor}`
+    }
   },
   notificationBar__notificationItem: {
-    backgroundColor: '#ffefc0',
+    backgroundColor: globalStyles.color.notificationItemColor,
     boxSizing: 'border-box',
     borderTop: `1px solid ${globalStyles.color.tabsToolbarBorderColor}`,
-    borderBottom: `1px solid ${globalStyles.color.tabsToolbarBorderColor}`,
     lineHeight: '24px',
     padding: '8px 20px'
   },
