@@ -281,6 +281,8 @@ class Tab extends ImmutableComponent {
   }
 
   render () {
+    const notificationBarActive = !!this.props.notificationBarActive &&
+      this.props.notificationBarActive.includes(UrlUtil.getUrlOrigin(this.props.tab.get('location')))
     const playIndicatorBreakpoint = this.mediumView || this.narrowView
     // we don't want themeColor if tab is private
     const perPageStyles = !this.props.tab.get('isPrivate') && StyleSheet.create({
@@ -306,9 +308,7 @@ class Tab extends ImmutableComponent {
       onMouseEnter={this.onMouseEnter}
       onMouseLeave={this.onMouseLeave}>
       {
-        this.props.isActive &&
-        this.props.notificationBarActive
-          .includes(UrlUtil.getUrlOrigin(this.props.tab.get('location')))
+        this.props.isActive && notificationBarActive
           ? <NotificationBarCaret />
           : null
       }
