@@ -11,6 +11,8 @@
 
 # Brave Browser
 
+# You give us code and rules but no instructions.
+
 Desktop browser for macOS, Windows, and Linux.
 
 Follow [@brave](https://twitter.com/brave) on Twitter for important news and announcements.
