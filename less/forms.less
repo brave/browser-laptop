@@ -102,65 +102,6 @@ select {
   }
 }
 
-// TODO: Make this use commonDialog
-.checkDefaultBrowserDialog {
-  .checkDefaultBrowser {
-    .flyoutDialog;
-    background-color: #f7f7f7;
-    border-radius: @borderRadius;
-    max-width: 422px;
-    padding: 1;
-    text-align: left;
-    width: 614px;
-    height: 120px;
-    user-select: none;
-    cursor: default;
-    color: #3B3B3B;
-    overflow-x: hidden;
-    overflow-y: hidden;
-    max-height: 100%;
-
-    .clickable {
-      color: #5B5B5B;
-      &:hover {
-        color: #000;
-      }
-    }
-
-    .checkDefaultBrowserButtons {
-      text-align: right;
-      padding: 16px 10px;
-      position: relative;
-      top: -30px;
-    }
-
-    .makeBraveDefault {
-      font-weight: bold;
-      display: inline-block;
-      position: relative;
-      top: -35px;
-      margin-left: 15px;
-    }
-
-    .braveIcon {
-      background-image: -webkit-image-set(url(../app/extensions/brave/img/braveAbout.png) 2x);
-      background-repeat: no-repeat;
-      height: 64px;
-      width: 64px;
-      display: inline-block;
-      position: relative;
-      top: 10px;
-    }
-
-    .checkDefaultOnStartup {
-      left: 75px;
-      position: relative;
-      top: -25px;
-    }
-  }
-}
-
-
 .braveryPanelContainer {
   .braveryPanel {
     .flyoutDialog;
