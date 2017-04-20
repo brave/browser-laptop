@@ -61,6 +61,7 @@ const styles = StyleSheet.create({
     }
   },
   commonForm: {
+    backgroundColor: '#fff',
     fontSize: globalStyles.fontSize.flyoutDialog
   },
   settings: {
