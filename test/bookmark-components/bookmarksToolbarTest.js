@@ -1,7 +1,7 @@
 /* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
-const {urlInput, bookmarksToolbar, navigator, navigatorNotBookmarked, doneButton} = require('../lib/selectors')
+const {urlInput, bookmarksToolbar, navigator, navigatorNotBookmarked, doneButton, bookmarkNameInput} = require('../lib/selectors')
 const settings = require('../../js/constants/settings')
 const siteTags = require('../../js/constants/siteTags')
 
@@ -111,7 +111,7 @@ describe('bookmarksToolbar', function () {
         .waitForVisible(doneButton)
         .waitForBookmarkDetail(this.page1Url, 'Page 1')
         .waitForEnabled(doneButton)
-        .selectByValue('#bookmarkParentFolder select', folderId2)
+        .selectByValue('[data-test-id="bookmarkParentFolder"]', folderId2)
         .click(doneButton)
         .click('[data-test-id="bookmarkToolbarButton"][title=demo1]')
         .moveToObject('[data-test-id="bookmarkToolbarButton"][title=demo2]')
@@ -144,7 +144,7 @@ describe('bookmarksToolbar', function () {
         .click(navigatorNotBookmarked)
         .waitForVisible(doneButton)
         .waitForBookmarkDetail(this.page1Url, 'Page 1')
-        .setInputText('#bookmarkName input', 'test1')
+        .setInputText(bookmarkNameInput, 'test1')
         .waitForBookmarkDetail(this.page1Url, 'test1')
         .waitForEnabled(doneButton)
         .click(doneButton)
