@@ -6,6 +6,7 @@ import sys
 import os.path
 MUON_VERSION = '2.58.3'
 CHROMEDRIVER_VERSION = '2.27'
+NODE_VERSION = '7.4.0'
 SOURCE_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 TARGET_ARCH= os.environ['TARGET_ARCH'] if os.environ.has_key('TARGET_ARCH') else 'x64'
 os.environ['npm_config_arch'] = TARGET_ARCH
@@ -24,7 +25,8 @@ def write_npmrc():
   data = 'runtime = node\n' \
   'target_arch = %s\n' \
   'brave_electron_version = %s\n' \
-  'chromedriver_version = %s\n' % (TARGET_ARCH, MUON_VERSION, CHROMEDRIVER_VERSION)
+  'chromedriver_version = %s\n' \
+  'target = v%s\n' % (TARGET_ARCH, MUON_VERSION, CHROMEDRIVER_VERSION, NODE_VERSION)
   f = open('.npmrc','wb')
   f.write(data)
   f.close()
