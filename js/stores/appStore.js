@@ -350,7 +350,7 @@ function handleChangeSettingAction (settingKey, settingValue) {
   }
 }
 
-const applyReducers = (state, action) => [
+const reducers = [
   require('../../app/browser/reducers/downloadsReducer'),
   require('../../app/browser/reducers/flashReducer'),
   // tabs, sites and windows reducers need to stay in that order
@@ -364,7 +364,9 @@ const applyReducers = (state, action) => [
   require('../../app/browser/reducers/tabMessageBoxReducer'),
   require('../../app/browser/reducers/dragDropReducer'),
   require('../../app/browser/reducers/extensionsReducer')
-].reduce(
+]
+
+const applyReducers = (state, action) => reducers.reduce(
     (appState, reducer) => {
       const newState = reducer(appState, action)
       assert.ok(action.actionType === appConstants.APP_SET_STATE || Immutable.Map.isMap(newState),
