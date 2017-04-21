@@ -12,6 +12,7 @@ const adHost = process.env.AD_HOST || 'https://oip.brave.com'
 const buildConfig = require('./buildConfig')
 const isProduction = buildConfig.nodeEnv === 'production'
 const {fullscreenOption} = require('../../app/common/constants/settingsEnums')
+const ABPDatVersion = '3'
 
 module.exports = {
   name: 'Brave',
@@ -39,7 +40,8 @@ module.exports = {
     enabled: false
   },
   noScript: {
-    enabled: false
+    enabled: false,
+    twitterRedirectUrl: 'https://mobile.twitter.com/i/nojs_router'
   },
   flash: {
     enabled: false,
@@ -56,13 +58,13 @@ module.exports = {
   adblock: {
     alternateDataFiles: 'https://s3.amazonaws.com/adblock-data/{version}/{uuid}.dat',
     url: 'https://s3.amazonaws.com/adblock-data/{version}/ABPFilterParserData.dat',
-    version: '2',
+    version: ABPDatVersion,
     msBetweenRechecks: 1000 * 60 * 60 * 2, // 2 hours
     enabled: true
   },
   safeBrowsing: {
     url: 'https://s3.amazonaws.com/adblock-data/{version}/SafeBrowsingData.dat',
-    version: '2',
+    version: ABPDatVersion,
     msBetweenRechecks: 1000 * 60 * 60 * 2, // 2 hours
     enabled: true
   },

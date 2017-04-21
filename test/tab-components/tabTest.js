@@ -102,14 +102,14 @@ describe('tab tests', function () {
         .click(newFrameButton)
         .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
     })
-    it('shows a context menu when long pressed (click and hold)', function * () {
+    it.skip('shows a context menu when long pressed (click and hold)', function * () {
       yield this.app.client
         .moveToObject(newFrameButton)
         .buttonDown(0)
         .waitForExist('.contextMenu .contextMenuItem .contextMenuItemText')
         .buttonUp(0)
     })
-    it('shows a context menu when right clicked', function * () {
+    it.skip('shows a context menu when right clicked', function * () {
       yield this.app.client
         .rightClick(newFrameButton)
         .waitForExist('.contextMenu .contextMenuItem .contextMenuItemText')

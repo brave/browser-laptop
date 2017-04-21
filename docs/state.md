@@ -474,7 +474,6 @@ WindowStore
     security: {
       blockedRunInsecureContent: Array<string>, // sources of blocked active mixed content
       isSecure: (boolean|number), // true = fully secure, false = fully insecure, 1 = partially secure
-      isExtendedValidation: boolean, // is using https ev. not currently used.
       loginRequiredDetail: {
         isProxy: boolean,
         host: string,

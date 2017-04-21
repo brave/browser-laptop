@@ -1198,6 +1198,68 @@ const appActions = {
       actionType: appConstants.APP_DRAGGED_OVER,
       draggedOverData
     })
+  },
+
+  /**
+   * Go back in a history for a given tab
+   * @param {number} tabId - Tab id used for an action
+   */
+  onGoBack: function (tabId) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_ON_GO_BACK,
+      tabId
+    })
+  },
+
+  /**
+   * Go forward in a history for a given tab
+   * @param {number} tabId - Tab id used for an action
+   */
+  onGoForward: function (tabId) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_ON_GO_FORWARD,
+      tabId
+    })
+  },
+
+  /**
+   * Go to specific item in a history for a given tab
+   * @param {number} tabId - Tab id used for an action
+   * @param {number} index - Index in the history
+   */
+  onGoToIndex: function (tabId, index) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_ON_GO_TO_INDEX,
+      tabId,
+
+      index
+    })
+  },
+
+  /**
+   * Go back in a history for a given tab
+   * @param {number} tabId - Tab id used for an action
+   * @param {ClientRect} rect - Parent element position for this action
+   */
+  onGoBackLong: function (tabId, rect) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_ON_GO_BACK_LONG,
+      tabId,
+      rect
+    })
+  },
+
+  /**
+   * Go forward in a history for a given tab
+   * @param {number} tabId - Tab id used for an action
+   * @param {ClientRect} rect - Parent element position for this action
+   */
+  onGoForwardLong: function (tabId, rect) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_ON_GO_FORWARD_LONG,
+      tabId,
+      rect
+    })
   }
 }
 

@@ -14,6 +14,7 @@ const NewSessionIcon = require('./content/newSessionIcon')
 const PrivateIcon = require('./content/privateIcon')
 const TabTitle = require('./content/tabTitle')
 const CloseTabIcon = require('./content/closeTabIcon')
+const {NotificationBarCaret} = require('../../../../js/components/notificationBar')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
@@ -41,6 +42,7 @@ const throttle = require('../../../../js/lib/throttle')
 const {getTabBreakpoint, tabUpdateFrameRate} = require('../../lib/tabUtil')
 const {isWindows} = require('../../../common/lib/platformUtil')
 const {getCurrentWindowId} = require('../../currentWindow')
+const UrlUtil = require('../../../../js/lib/urlutil')
 
 class Tab extends ImmutableComponent {
   constructor () {
@@ -279,6 +281,8 @@ class Tab extends ImmutableComponent {
   }
 
   render () {
+    const notificationBarActive = !!this.props.notificationBarActive &&
+      this.props.notificationBarActive.includes(UrlUtil.getUrlOrigin(this.props.tab.get('location')))
     const playIndicatorBreakpoint = this.mediumView || this.narrowView
     // we don't want themeColor if tab is private
     const perPageStyles = !this.props.tab.get('isPrivate') && StyleSheet.create({
@@ -303,6 +307,11 @@ class Tab extends ImmutableComponent {
       style={this.props.tabWidth ? { flex: `0 0 ${this.props.tabWidth}px` } : {}}
       onMouseEnter={this.onMouseEnter}
       onMouseLeave={this.onMouseLeave}>
+      {
+        this.props.isActive && notificationBarActive
+          ? <NotificationBarCaret />
+          : null
+      }
       <div className={css(
         styles.tab,
         // Windows specific style

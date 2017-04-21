@@ -68,6 +68,7 @@ class TabsToolbar extends ImmutableComponent {
         startingFrameIndex={startingFrameIndex}
         partOfFullPageSet={currentTabs.size === this.props.tabsPerTabPage}
         fixTabWidth={this.props.fixTabWidth}
+        notificationBarActive={this.props.notificationBarActive}
       />
       <div className='tabsToolbarButtons'>
         <span data-l10n-id='menuButton'

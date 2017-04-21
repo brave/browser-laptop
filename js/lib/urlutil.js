@@ -354,7 +354,7 @@ const UrlUtil = {
    */
   getDefaultFaviconUrl: function (url) {
     if (UrlUtil.isURL(url)) {
-      const loc = new window.URL(url)
+      const loc = urlParse(url)
       return loc.protocol + '//' + loc.host + '/favicon.ico'
     }
     return ''
@@ -386,6 +386,15 @@ const UrlUtil = {
    */
   isHttpOrHttps: function (url) {
     return url.startsWith('https://') || url.startsWith('http://')
+  },
+
+  /**
+   * Gets the origin of a given URL
+   * @param {string} url The URL to get the origin from
+   * @return {string} url The origin of the given URL
+   */
+  getUrlOrigin: function (url) {
+    return new window.URL(url).origin
   }
 }
 

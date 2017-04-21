@@ -143,7 +143,7 @@ function getFrameByKey (windowState, key) {
 
 function isFrameSecure (frame) {
   frame = makeImmutable(frame)
-  if (frame && frame.getIn(['security', 'isSecure']) != null) {
+  if (frame && typeof frame.getIn(['security', 'isSecure']) === 'boolean') {
     return frame.getIn(['security', 'isSecure'])
   } else {
     return false
@@ -487,8 +487,7 @@ function addFrame (windowState, tabs, frameOpts, newKey, partitionNumber, active
       caseSensitivity: false
     },
     security: {
-      isSecure: urlParse(url).protocol === 'https:',
-      certDetails: null
+      isSecure: null
     },
     unloaded: frameOpts.unloaded,
     parentFrameKey,

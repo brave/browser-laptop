@@ -10,7 +10,6 @@ const ipc = electron.ipcRenderer
 // Actions
 const appActions = require('../../../../js/actions/appActions')
 const windowActions = require('../../../../js/actions/windowActions')
-const contextMenus = require('../../../../js/contextMenus')
 const getSetting = require('../../../../js/settings').getSetting
 
 // Components
@@ -69,7 +68,7 @@ class Navigator extends ImmutableComponent {
         })
       }
     } else {
-      navAction.call(this.activeFrame)
+      navAction.call(this, this.props.activeTab.get('tabId'))
     }
   }
 
@@ -122,19 +121,29 @@ class Navigator extends ImmutableComponent {
   }
 
   onBack (e) {
-    this.onNav(e, 'canGoBack', 'back', this.activeFrame.goBack)
+    this.onNav(e, 'canGoBack', 'back', appActions.onGoBack)
   }
 
   onForward (e) {
-    this.onNav(e, 'canGoForward', 'forward', this.activeFrame.goForward)
+    this.onNav(e, 'canGoForward', 'forward', appActions.onGoForward)
   }
 
   onBackLongPress (target) {
-    contextMenus.onBackButtonHistoryMenu(this.activeFrame, this.activeFrame.getHistory(this.props.appState), target)
+    const activeTab = this.props.activeTab
+    const rect = target.parentNode.getBoundingClientRect()
+    appActions.onGoBackLong(activeTab.get('tabId'), {
+      left: rect.left,
+      bottom: rect.bottom
+    })
   }
 
   onForwardLongPress (target) {
-    contextMenus.onForwardButtonHistoryMenu(this.activeFrame, this.activeFrame.getHistory(this.props.appState), target)
+    const activeTab = this.props.activeTab
+    const rect = target.parentNode.getBoundingClientRect()
+    appActions.onGoForwardLong(activeTab.get('tabId'), {
+      left: rect.left,
+      bottom: rect.bottom
+    })
   }
 
   onDragOver (e) {

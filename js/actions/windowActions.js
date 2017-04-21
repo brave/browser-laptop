@@ -806,21 +806,8 @@ const windowActions = {
   },
 
   /**
-   * Sets which scripts were blocked on a page.
-   * @param {Object} frameProps - The frame to set blocked info on
-   * @param {string} source - Source of blocked js
-   */
-  setNoScript: function (frameProps, source) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_NOSCRIPT,
-      frameProps,
-      source
-    })
-  },
-
-  /**
-   * Sets whether the noscript icon is visible.
-   * @param {boolean} isVisible
+   * Sets/toggles whether the noscriptinfo dialog is visible.
+   * @param {boolean=} isVisible - if undefined, toggle the current state
    */
   setNoScriptVisible: function (isVisible) {
     dispatch({
@@ -1178,6 +1165,34 @@ const windowActions = {
     dispatch({
       actionType: windowConstants.WINDOW_ON_EXIT_FULL_SCREEN,
       windowId
+    })
+  },
+
+  onLongBackHistory: function (history, left, top, partition, tabId, windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_GO_BACK_LONG,
+      queryInfo: {
+        windowId
+      },
+      history,
+      left,
+      top,
+      partition,
+      tabId
+    })
+  },
+
+  onLongForwardHistory: function (history, left, top, partition, tabId, windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_GO_FORWARD_LONG,
+      queryInfo: {
+        windowId
+      },
+      history,
+      left,
+      top,
+      partition,
+      tabId
     })
   }
 }

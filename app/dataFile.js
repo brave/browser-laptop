@@ -85,8 +85,9 @@ module.exports.init = (resourceName, startExtension, onInitDone, forceDownload) 
   const version = appConfig[resourceName].version
 
   let versionFolder = version
-  if (process.env.NODE_ENV === 'development' && resourceName === appConfig.resourceNames.ADBLOCK) {
-    versionFolder = 'test'
+  const hasStagedDatFile = [appConfig.resourceNames.ADBLOCK, appConfig.resourceNames.SAFE_BROWSING].includes(resourceName)
+  if (process.env.NODE_ENV === 'development' && hasStagedDatFile) {
+    versionFolder = `test/${versionFolder}`
   }
   const url = appConfig[resourceName].url.replace('{version}', versionFolder)
 

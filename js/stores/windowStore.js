@@ -25,6 +25,7 @@ const {aboutUrls, getTargetAboutUrl, newFrameUrl} = require('../lib/appUrlUtil')
 const Serializer = require('../dispatcher/serializer')
 const {updateTabPageIndex} = require('../../app/renderer/lib/tabUtil')
 const assert = require('assert')
+const contextMenuState = require('../../app/common/state/contextMenuState.js')
 
 let windowState = Immutable.fromJS({
   activeFrameKey: null,
@@ -237,7 +238,8 @@ const emitChanges = debounce(windowStore.emitChanges.bind(windowStore), 5)
 const applyReducers = (state, action) => [
   require('../../app/renderer/reducers/urlBarReducer'),
   require('../../app/renderer/reducers/urlBarSuggestionsReducer'),
-  require('../../app/renderer/reducers/frameReducer')
+  require('../../app/renderer/reducers/frameReducer'),
+  require('../../app/renderer/reducers/contextMenuReducer')
 ].reduce(
     (windowState, reducer) => {
       const newState = reducer(windowState, action)
@@ -306,22 +308,33 @@ const doAction = (action) => {
       })
       break
     case windowConstants.WINDOW_WEBVIEW_LOAD_START:
-      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps)], {
-        loading: true,
-        provisionalLocation: action.location,
-        startLoadTime: new Date().getTime(),
-        endLoadTime: null
-      })
-      windowState = windowState.mergeIn(['tabs', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps)], {
-        loading: true,
-        provisionalLocation: action.location
-      })
-      // For about:newtab we want to have the urlbar focused, not the new frame.
-      // Otherwise we want to focus the new tab when it is a new frame in the foreground.
-      if (action.location !== getTargetAboutUrl('about:newtab')) {
-        focusWebview(activeFrameStatePath(windowState))
+      {
+        const framePath = ['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps)]
+        // Reset security state
+        windowState =
+          windowState.deleteIn(framePath.concat(['security', 'blockedRunInsecureContent']))
+        windowState = windowState.mergeIn(framePath.concat(['security']), {
+          isSecure: null,
+          runInsecureContent: false
+        })
+        // Update loading UI
+        windowState = windowState.mergeIn(framePath, {
+          loading: true,
+          provisionalLocation: action.location,
+          startLoadTime: new Date().getTime(),
+          endLoadTime: null
+        })
+        windowState = windowState.mergeIn(['tabs'].concat(framePath), {
+          loading: true,
+          provisionalLocation: action.location
+        })
+        // For about:newtab we want to have the urlbar focused, not the new frame.
+        // Otherwise we want to focus the new tab when it is a new frame in the foreground.
+        if (action.location !== getTargetAboutUrl('about:newtab')) {
+          focusWebview(activeFrameStatePath(windowState))
+        }
+        break
       }
-      break
     case windowConstants.WINDOW_WEBVIEW_LOAD_END:
       windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps)], {
         loading: false,
@@ -472,19 +485,7 @@ const doAction = (action) => {
       }
       break
     case windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL:
-      if (!action.detail) {
-        if (windowState.getIn(['contextMenuDetail', 'type']) === 'hamburgerMenu') {
-          windowState = windowState.set('hamburgerMenuWasOpen', true)
-        } else {
-          windowState = windowState.set('hamburgerMenuWasOpen', false)
-        }
-        windowState = windowState.delete('contextMenuDetail')
-      } else {
-        if (!(action.detail.get('type') === 'hamburgerMenu' && windowState.get('hamburgerMenuWasOpen'))) {
-          windowState = windowState.set('contextMenuDetail', action.detail)
-        }
-        windowState = windowState.set('hamburgerMenuWasOpen', false)
-      }
+      windowState = contextMenuState.setContextMenu(windowState, action.detail)
       break
     case windowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL:
       if (!action.detail) {
@@ -522,7 +523,9 @@ const doAction = (action) => {
       windowState = windowState.setIn(['ui', 'mouseInTitlebar'], action.mouseInTitlebar)
       break
     case windowConstants.WINDOW_SET_NOSCRIPT_VISIBLE:
-      windowState = windowState.setIn(['ui', 'noScriptInfo', 'isVisible'], action.isVisible)
+      const noScriptInfoPath = ['ui', 'noScriptInfo', 'isVisible']
+      windowState = windowState.setIn(noScriptInfoPath,
+        typeof action.isVisible === 'boolean' ? action.isVisible : !windowState.getIn(noScriptInfoPath))
       break
     case windowConstants.WINDOW_SET_SITE_INFO_VISIBLE:
       windowState = windowState.setIn(['ui', 'siteInfo', 'isVisible'], action.isVisible)
@@ -607,10 +610,6 @@ const doAction = (action) => {
       if (action.securityState.runInsecureContent !== undefined) {
         windowState = windowState.setIn(path.concat(['security', 'runInsecureContent']),
                                         action.securityState.runInsecureContent)
-      }
-      if (action.securityState.certDetails) {
-        windowState = windowState.setIn(path.concat(['security', 'certDetails']),
-                                        action.securityState.certDetails)
       }
       break
     case windowConstants.WINDOW_SET_BLOCKED_BY:
