@@ -63,45 +63,6 @@ select {
   }
 }
 
-.commonDialog {
-  .commonForm {
-    .flyoutDialog;
-    background-color: #f7f7f7;
-    max-width: 422px;
-    padding: 0;
-    text-align: left;
-    max-width: 600px;
-    user-select: none;
-    cursor: default;
-    color: #3B3B3B;
-    overflow-y: auto;
-    max-height: 100%;
-
-    .clickable {
-      color: #5B5B5B;
-      &:hover {
-        color: #000;
-      }
-    }
-
-    .formSection {
-      padding: 16px 30px;
-
-      &.commonFormTitle {
-        color: #ff5000;
-        font-size: 1.2em;
-      }
-      &.commonFormButtons {
-        text-align: center;
-      }
-      &.commonFormBottom {
-        background-color: #dddee0;
-        text-align: center;
-      }
-    }
-  }
-}
-
 .braveryPanelContainer {
   .braveryPanel {
     .flyoutDialog;
@@ -339,50 +300,6 @@ select {
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.genericForm {
-  .flyoutDialog;
-  display: table;
-  text-align: left;
-  width: auto;
-
-  .genericFormSubtitle {
-    margin-bottom: 6px;
-  }
-
-  h2 {
-    font-size: 14px;
-    margin-bottom: 8px;
-  }
-
-  .genericFormTable {
-    display: flex;
-    flex-flow: column nowrap;
-    min-width: 350px;
-
-    > div {
-      &:not(.formHeader) {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        margin: 2px;
-      }
-
-      > label {
-        padding-right: 4px;
-        width: 20%;
-        text-align: right;
-      }
-
-      > input, select {
-        padding: 2px;
-        margin: 0;
-        width: 80%;
-      }
-
-    }
-  }
 }
 
 #navigator {
