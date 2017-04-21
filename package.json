@@ -184,7 +184,6 @@
     "react-test-renderer": "^15.5.4",
     "sinon": "^1.17.6",
     "spectron": "brave/spectron#chromium56",
-    "sqlite3": "^3.1.1",
     "standard": "9.0.0",
     "style-loader": "^0.13.0",
     "uglify-js-harmony": "^2.7.5",

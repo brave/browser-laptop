@@ -5,7 +5,6 @@
 const Immutable = require('immutable')
 const config = require('../constants/config')
 const {tabCloseAction} = require('../../app/common/constants/settingsEnums')
-const urlParse = require('../../app/common/urlParse')
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
 const {isIntermediateAboutPage} = require('../lib/appUrlUtil')
 
