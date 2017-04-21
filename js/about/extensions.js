@@ -76,12 +76,12 @@ class ExtensionItem extends ImmutableComponent {
 
 class ExtensionList extends ImmutableComponent {
   render () {
-    return <list className='extensionDetailsList'>
+    return <div className='extensionDetailsList'>
       {
         this.props.extensions.map((entry) =>
           <ExtensionItem extension={entry} />)
       }
-    </list>
+    </div>
   }
 }
 
