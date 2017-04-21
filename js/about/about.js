@@ -13,9 +13,9 @@ const globalStyles = require('../../app/renderer/components/styles/global')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
 
 const {
-  AboutPagesSectionTitle,
-  AboutPagesSectionSubTitle
-} = require('../../app/renderer/components/sectionTitle')
+  AboutPageSectionTitle,
+  AboutPageSectionSubTitle
+} = require('../../app/renderer/components/common/sectionTitle')
 
 require('../../less/about/history.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
@@ -24,14 +24,14 @@ class AboutAbout extends ImmutableComponent {
   render () {
     return <div className='siteDetailsPage'>
       <div className='siteDetailsPageHeader'>
-        <AboutPagesSectionTitle data-l10n-id='aboutPages' />
+        <AboutPageSectionTitle data-l10n-id='aboutPages' />
       </div>
 
       <div className={cx({
         siteDetailsPageContent: true,
         [css(commonStyles.siteDetailsPageContent)]: true
       })}>
-        <AboutPagesSectionSubTitle data-l10n-id='listOfAboutPages' />
+        <AboutPageSectionSubTitle data-l10n-id='listOfAboutPages' />
         <ul className={css(styles.list)}>
           {
             aboutUrls.keySeq().sort().filter((aboutSourceUrl) => isNavigatableAboutPage(aboutSourceUrl)).map((aboutSourceUrl) =>

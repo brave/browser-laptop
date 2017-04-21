@@ -5,7 +5,7 @@ const cx = require('../../lib/classSet')
 const {css} = require('aphrodite/no-important')
 const commonStyles = require('../../../app/renderer/components/styles/commonStyles')
 
-const {AboutPagesSectionSubTitle} = require('../../../app/renderer/components/sectionTitle')
+const {AboutPageSectionSubTitle} = require('../../../app/renderer/components/common/sectionTitle')
 
 class TorrentStats extends React.Component {
   render () {
@@ -21,7 +21,7 @@ class TorrentStats extends React.Component {
     }
 
     return <div>
-      <AboutPagesSectionSubTitle data-l10n-id='torrentStatus' />
+      <AboutPageSectionSubTitle data-l10n-id='torrentStatus' />
 
       <div className={cx({
         torrentStats: true,

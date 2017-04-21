@@ -15,7 +15,7 @@ const {getSetting} = require('../../../../js/settings')
 const {SettingCheckbox} = require('../settings')
 const {isPasswordManager, getExtensionKey, isBuiltInExtension, bravifyText} = require('../../lib/extensionsUtil')
 
-const {DefaultSectionTitle} = require('../sectionTitle')
+const {DefaultSectionTitle} = require('../common/sectionTitle')
 
 const HelpfulText = require('../helpfulText')
 const SortableTable = require('../../../../js/components/sortableTable')

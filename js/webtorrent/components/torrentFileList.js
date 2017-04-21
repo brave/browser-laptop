@@ -5,7 +5,7 @@ const SortableTable = require('../../components/sortableTable')
 const {css} = require('aphrodite/no-important')
 const commonStyles = require('../../../app/renderer/components/styles/commonStyles')
 
-const {AboutPagesSectionSubTitle} = require('../../../app/renderer/components/sectionTitle')
+const {AboutPageSectionSubTitle} = require('../../../app/renderer/components/common/sectionTitle')
 
 class TorrentFileList extends React.Component {
   render () {
@@ -38,7 +38,7 @@ class TorrentFileList extends React.Component {
 
     return (
       <div>
-        <AboutPagesSectionSubTitle data-l10n-id='files' />
+        <AboutPageSectionSubTitle data-l10n-id='files' />
         {content}
       </div>
     )

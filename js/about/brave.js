@@ -16,9 +16,9 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
 
 const {
-  AboutPagesSectionTitle,
-  AboutPagesSectionSubTitle
-} = require('../../app/renderer/components/sectionTitle')
+  AboutPageSectionTitle,
+  AboutPageSectionSubTitle
+} = require('../../app/renderer/components/common/sectionTitle')
 
 require('../../less/about/history.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
@@ -46,7 +46,7 @@ class AboutBrave extends React.Component {
   render () {
     return <div className='siteDetailsPage'>
       <div className='siteDetailsPageHeader'>
-        <AboutPagesSectionTitle data-l10n-id='aboutBrave' />
+        <AboutPageSectionTitle data-l10n-id='aboutBrave' />
         <div data-l10n-id='braveInfo' />
       </div>
 
@@ -55,7 +55,7 @@ class AboutBrave extends React.Component {
         aboutBrave: true,
         [css(commonStyles.siteDetailsPageContent)]: true
       })}>
-        <AboutPagesSectionSubTitle data-l10n-id='releaseNotes' />
+        <AboutPageSectionSubTitle data-l10n-id='releaseNotes' />
 
         <div>
           <span data-l10n-id='relNotesInfo1' />
@@ -66,7 +66,7 @@ class AboutBrave extends React.Component {
         </div>
 
         <div className={css(styles.versionInformationWrapper)}>
-          <AboutPagesSectionSubTitle data-l10n-id='versionInformation' />
+          <AboutPageSectionSubTitle data-l10n-id='versionInformation' />
           <ClipboardButton
             dataL10nId='copyToClipboard'
             className='fa fa-clipboard'

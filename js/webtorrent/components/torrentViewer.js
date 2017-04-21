@@ -9,7 +9,7 @@ const Button = require('../../components/button')
 const TorrentFileList = require('./torrentFileList')
 const TorrentStatus = require('./torrentStatus')
 
-const {AboutPagesSectionTitle} = require('../../../app/renderer/components/sectionTitle')
+const {AboutPageSectionTitle} = require('../../../app/renderer/components/common/sectionTitle')
 
 class TorrentViewer extends React.Component {
   constructor () {
@@ -33,11 +33,11 @@ class TorrentViewer extends React.Component {
     if (torrent) {
       if (name) {
         // No localization, just use the torrent name
-        titleElem = <AboutPagesSectionTitle>{name}</AboutPagesSectionTitle>
+        titleElem = <AboutPageSectionTitle>{name}</AboutPageSectionTitle>
       } else {
         // 'Loading torrent information...'
         titleElem = (
-          <AboutPagesSectionTitle data-l10n-id='torrentLoadingInfo' />
+          <AboutPageSectionTitle data-l10n-id='torrentLoadingInfo' />
         )
       }
       mainButton = (
@@ -61,7 +61,7 @@ class TorrentViewer extends React.Component {
       const l10nStart = name ? 'startPrompt' : 'startPromptUntitled'
       const l10nArgs = {name}
       titleElem = (
-        <AboutPagesSectionTitle
+        <AboutPageSectionTitle
           data-l10n-id={l10nStart}
           data-l10n-args={JSON.stringify(l10nArgs)}
         />

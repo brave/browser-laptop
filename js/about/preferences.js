@@ -13,7 +13,7 @@ const PreferenceNavigation = require('../../app/renderer/components/preferences/
 const {SettingsList, SettingItem, SettingCheckbox, SettingItemIcon} = require('../../app/renderer/components/settings')
 const {SettingTextbox} = require('../../app/renderer/components/textbox')
 const {SettingDropdown} = require('../../app/renderer/components/dropdown')
-const {DefaultSectionTitle} = require('../../app/renderer/components/sectionTitle')
+const {DefaultSectionTitle} = require('../../app/renderer/components/common/sectionTitle')
 const Button = require('../components/button')
 
 // Tabs

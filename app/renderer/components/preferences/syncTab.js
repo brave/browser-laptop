@@ -15,11 +15,11 @@ const {SettingsList, SettingItem, SettingCheckbox} = require('../settings')
 const SortableTable = require('../../../../js/components/sortableTable')
 
 const {
-  BetaSectionTitleWrapper,
-  AboutPagesSectionTitle,
+  SectionTitleLabelWrapper,
+  AboutPageSectionTitle,
   DefaultSectionTitle,
-  SectionSubTitle
-} = require('../sectionTitle')
+  SectionLabelTitle
+} = require('../common/sectionTitle')
 
 const aboutActions = require('../../../../js/about/aboutActions')
 const getSetting = require('../../../../js/settings').getSetting
@@ -325,10 +325,10 @@ class SyncTab extends ImmutableComponent {
         ? <ModalOverlay title={'syncReset'} content={this.resetOverlayContent} footer={this.resetOverlayFooter} onHide={this.props.hideOverlay.bind(this, 'syncReset')} />
         : null
       }
-      <BetaSectionTitleWrapper>
-        <AboutPagesSectionTitle data-l10n-id='syncTitle' />
-        <SectionSubTitle>beta</SectionSubTitle>
-      </BetaSectionTitleWrapper>
+      <SectionTitleLabelWrapper>
+        <AboutPageSectionTitle data-l10n-id='syncTitle' />
+        <SectionLabelTitle>beta</SectionLabelTitle>
+      </SectionTitleLabelWrapper>
       <div className='settingsListContainer'>
         <span className='settingsListTitle syncTitleMessage' data-l10n-id='syncTitleMessage' />
         <a href='https://github.com/brave/sync/wiki/Design' target='_blank'>

@@ -15,9 +15,9 @@ const {SettingCheckbox} = require('../settings')
 const {
   sectionTitleStyles,
   SectionTitleWrapper,
-  AboutPagesSectionTitle,
-  SectionSubTitle
-} = require('../sectionTitle')
+  AboutPageSectionTitle,
+  SectionLabelTitle
+} = require('../common/sectionTitle')
 
 const DisabledContent = require('./payment/disabledContent')
 const EnabledContent = require('./payment/enabledContent')
@@ -171,13 +171,13 @@ class PaymentsTab extends ImmutableComponent {
       }
 
       <SectionTitleWrapper>
-        { /* Note: This div cannot be replaced with BetaSectionTitleWrapper */ }
+        { /* Note: This div cannot be replaced with SectionTitleLabelWrapper */ }
         <div className={cx({
           [css(styles.titleWrapper)]: true,
           [css(sectionTitleStyles.beta)]: true
         })}>
-          <AboutPagesSectionTitle>Brave Payments</AboutPagesSectionTitle>
-          <SectionSubTitle>beta</SectionSubTitle>
+          <AboutPageSectionTitle>Brave Payments</AboutPageSectionTitle>
+          <SectionLabelTitle>beta</SectionLabelTitle>
         </div>
 
         <div className={css(

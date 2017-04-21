@@ -15,7 +15,7 @@ const flash = appConfig.resourceNames.FLASH
 const widevine = appConfig.resourceNames.WIDEVINE
 
 const {SettingsList, SettingCheckbox} = require('../../components/settings')
-const {DefaultSectionTitle} = require('../../components/sectionTitle')
+const {DefaultSectionTitle} = require('../common/sectionTitle')
 
 class PluginsTab extends ImmutableComponent {
   get flashInstalled () {

@@ -3,11 +3,11 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('../../../js/components/immutableComponent')
+const ImmutableComponent = require('../immutableComponent')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
-const globalStyles = require('./styles/global')
-const commonStyles = require('./styles/commonStyles')
+const globalStyles = require('../styles/global')
+const commonStyles = require('../styles/commonStyles')
 
 class SectionTitleWrapper extends ImmutableComponent {
   render () {
@@ -19,7 +19,7 @@ class SectionTitleWrapper extends ImmutableComponent {
   }
 }
 
-class BetaSectionTitleWrapper extends ImmutableComponent {
+class SectionTitleLabelWrapper extends ImmutableComponent {
   render () {
     return <SectionTitleWrapper data-beta='true' {...this.props} />
   }
@@ -30,45 +30,36 @@ class DefaultSectionTitle extends ImmutableComponent {
     return <header className={css(styles.sectionTitleWrapper)}>
       <h1 className={css(
         commonStyles.userSelectNone,
-        styles.sectionTitle)} {...this.props} />
+        styles.sectionTitle
+      )} {...this.props} />
     </header>
   }
 }
 
-class PrefSectionTitle extends ImmutableComponent {
-  render () {
-    return <header className={css(styles.sectionTitleWrapper)}>
-      <h1 className={css(
-        commonStyles.userSelectNone,
-        styles.sectionTitle,
-        styles.prefSectionTitle)} {...this.props} />
-    </header>
-  }
-}
-
-class AboutPagesSectionTitle extends ImmutableComponent {
+class AboutPageSectionTitle extends ImmutableComponent {
   render () {
     return <div className={css(
       commonStyles.userSelectNone,
       styles.sectionTitle,
       styles.prefSectionTitle,
-      styles.aboutPagesSectionTitle,
-      this.props['data-subTitle'] && styles.aboutPagesSectionSubTitle
+      styles.aboutPageSectionTitle,
+      this.props['data-subTitle'] && styles.aboutPageSectionSubTitle
     )} {...this.props} />
   }
 }
 
-class AboutPagesSectionSubTitle extends ImmutableComponent {
+class AboutPageSectionSubTitle extends ImmutableComponent {
   render () {
-    return <AboutPagesSectionTitle data-subTitle='true' {...this.props} />
+    return <AboutPageSectionTitle data-subTitle='true' {...this.props} />
   }
 }
 
-class SectionSubTitle extends ImmutableComponent {
+class SectionLabelTitle extends ImmutableComponent {
   render () {
     return <sup className={css(
       commonStyles.userSelectNone,
-      styles.sectionSubTitle)} {...this.props} />
+      styles.sectionLabelTitle
+    )} {...this.props} />
   }
 }
 
@@ -82,30 +73,31 @@ const styles = StyleSheet.create({
   sectionTitle: {
     color: globalStyles.color.darkGray,
     cursor: 'default',
-    fontSize: '1.2rem'
+    fontSize: '1.2rem',
+    margin: 0,
+
+    // Copied from common.less
+    fontWeight: 400,
+    WebkitFontSmoothing: 'antialiased'
   },
   prefSectionTitle: {
     color: globalStyles.color.braveOrange,
-    fontSize: '1.75rem',
-    marginBottom: '8px'
+    fontSize: '1.75rem'
+  },
+  sectionLabelTitle: {
+    color: '#999',
+    fontSize: '15px'
   },
 
-  aboutPagesSectionTitle: {
-    display: 'inline-block',
-    marginBottom: 0
+  aboutPageSectionTitle: {
+    display: 'inline-block'
   },
-
-  aboutPagesSectionSubTitle: {
+  aboutPageSectionSubTitle: {
     fontSize: '16px',
     marginBottom: '12px',
 
     // cf: .siteDetailsPage .siteDetailsPageContent
     marginTop: '24px'
-  },
-
-  sectionSubTitle: {
-    color: '#999',
-    fontSize: '15px'
   }
 })
 
@@ -120,12 +112,10 @@ module.exports = {
   sectionTitleStyles,
 
   SectionTitleWrapper,
-  BetaSectionTitleWrapper,
+  SectionTitleLabelWrapper,
 
   DefaultSectionTitle,
-  PrefSectionTitle,
-  AboutPagesSectionTitle,
-  AboutPagesSectionSubTitle,
-
-  SectionSubTitle
+  SectionLabelTitle,
+  AboutPageSectionTitle,
+  AboutPageSectionSubTitle
 }

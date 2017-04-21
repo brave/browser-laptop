@@ -25,9 +25,9 @@ const globalStyles = require('../../app/renderer/components/styles/global')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
 
 const {
-  AboutPagesSectionTitle,
-  AboutPagesSectionSubTitle
-} = require('../../app/renderer/components/sectionTitle')
+  AboutPageSectionTitle,
+  AboutPageSectionSubTitle
+} = require('../../app/renderer/components/common/sectionTitle')
 
 // Stylesheets
 require('../../less/about/history.less')
@@ -76,7 +76,7 @@ class HistoryDay extends ImmutableComponent {
   render () {
     return <div>
       <div className={css(styles.subTitleMargin)}>
-        <AboutPagesSectionSubTitle>{this.props.date}</AboutPagesSectionSubTitle>
+        <AboutPageSectionSubTitle>{this.props.date}</AboutPageSectionSubTitle>
       </div>
       <SortableTable headings={['time', 'title', 'domain']}
         defaultHeading='time'
@@ -206,7 +206,7 @@ class AboutHistory extends React.Component {
   render () {
     return <div className='siteDetailsPage' onClick={this.onClick}>
       <div className='siteDetailsPageHeader'>
-        <AboutPagesSectionTitle data-l10n-id='history' />
+        <AboutPageSectionTitle data-l10n-id='history' />
         <div className='headerActions'>
           <div className='searchWrapper'>
             <input type='text' className='searchInput' ref='historySearch' id='historySearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='historySearch' />
