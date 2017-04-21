@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   },
 
   CommonFormSubSection: {
-    margin: `0 0 0 ${globalStyles.spacing.dialogInsideMargin}`
+    margin: `0 0 ${globalStyles.spacing.dialogInsideMargin} ${globalStyles.spacing.dialogInsideMargin}`
   },
 
   CommonFormBottomWrapper: {
