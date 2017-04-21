@@ -4,7 +4,7 @@ import os
 import subprocess
 import sys
 import os.path
-MUON_VERSION = '2.58.3'
+MUON_VERSION = '2.58.4'
 CHROMEDRIVER_VERSION = '2.27'
 NODE_VERSION = '7.4.0'
 SOURCE_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
