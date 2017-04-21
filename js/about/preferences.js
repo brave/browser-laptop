@@ -13,6 +13,7 @@ const PreferenceNavigation = require('../../app/renderer/components/preferences/
 const {SettingsList, SettingItem, SettingCheckbox, SettingItemIcon} = require('../../app/renderer/components/settings')
 const {SettingTextbox} = require('../../app/renderer/components/textbox')
 const {SettingDropdown} = require('../../app/renderer/components/dropdown')
+const {DefaultSectionTitle} = require('../../app/renderer/components/sectionTitle')
 const Button = require('../components/button')
 
 // Tabs
@@ -150,7 +151,7 @@ class GeneralTab extends ImmutableComponent {
 
     const defaultZoomSetting = getSetting(settings.DEFAULT_ZOOM_LEVEL, this.props.settings)
     return <SettingsList>
-      <div className='sectionTitle' data-l10n-id='generalSettings' />
+      <DefaultSectionTitle data-l10n-id='generalSettings' />
       <SettingsList>
         <SettingItem dataL10nId='startsWith'>
           <SettingDropdown value={getSetting(settings.STARTUP_MODE, this.props.settings)}
@@ -309,12 +310,12 @@ class SearchTab extends ImmutableComponent {
 
   render () {
     return <div>
-      <div className='sectionTitle' data-l10n-id='searchSettings' />
+      <DefaultSectionTitle data-l10n-id='searchSettings' />
       <SortableTable headings={['default', 'searchEngine', 'engineGoKey']} rows={this.searchProviders}
         defaultHeading='searchEngine'
         addHoverClass onClick={this.hoverCallback.bind(this)}
         columnClassNames={['default', 'searchEngine', 'engineGoKey']} />
-      <div className='sectionTitle' data-l10n-id='locationBarSettings' />
+      <DefaultSectionTitle data-l10n-id='locationBarSettings' />
       <SettingsList>
         <SettingCheckbox dataL10nId='showOpenedTabMatches' prefKey={settings.OPENED_TAB_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='showHistoryMatches' prefKey={settings.HISTORY_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
@@ -328,7 +329,7 @@ class SearchTab extends ImmutableComponent {
 class TabsTab extends ImmutableComponent {
   render () {
     return <div>
-      <div className='sectionTitle' data-l10n-id='tabSettings' />
+      <DefaultSectionTitle data-l10n-id='tabSettings' />
       <SettingsList>
         <SettingItem dataL10nId='tabsPerTabPage'>
           <SettingDropdown
@@ -399,8 +400,7 @@ class SitePermissionsPage extends React.Component {
   render () {
     return this.isPermissionsNonEmpty()
     ? <div id='sitePermissionsPage'>
-      <div className='sectionTitle'
-        data-l10n-id={this.props.defaults ? 'sitePermissionsExceptions' : 'sitePermissions'} />
+      <DefaultSectionTitle data-l10n-id={this.props.defaults ? 'sitePermissionsExceptions' : 'sitePermissions'} />
       <ul className='sitePermissions'>
         {
           Object.keys(this.props.names).map((name) =>
@@ -519,7 +519,7 @@ class ShieldsTab extends ImmutableComponent {
   }
   render () {
     return <div id='shieldsContainer'>
-      <div className='sectionTitle' data-l10n-id='braveryDefaults' />
+      <DefaultSectionTitle data-l10n-id='braveryDefaults' />
       <SettingsList>
         <SettingItem dataL10nId='adControl'>
           <SettingDropdown
@@ -581,7 +581,7 @@ class SecurityTab extends ImmutableComponent {
     const lastPassPreferencesUrl = ('chrome-extension://' + extensionIds[passwordManagers.LAST_PASS] + '/tabDialog.html?dialog=preferences&cmd=open')
 
     return <div>
-      <div className='sectionTitle' data-l10n-id='privateData' />
+      <DefaultSectionTitle data-l10n-id='privateData' />
       <SettingsList dataL10nId='privateDataMessage'>
         <SettingCheckbox dataL10nId='browsingHistory' prefKey={settings.SHUTDOWN_CLEAR_HISTORY} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='downloadHistory' prefKey={settings.SHUTDOWN_CLEAR_DOWNLOADS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
@@ -592,7 +592,7 @@ class SecurityTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='savedSiteSettings' prefKey={settings.SHUTDOWN_CLEAR_SITE_SETTINGS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <Button l10nId='clearBrowsingDataNow' className='primaryButton clearBrowsingDataButton' onClick={this.clearBrowsingDataNow} />
       </SettingsList>
-      <div className='sectionTitle' data-l10n-id='passwordsAndForms' />
+      <DefaultSectionTitle data-l10n-id='passwordsAndForms' />
       <SettingsList>
         <SettingItem dataL10nId='passwordManager'>
           <SettingDropdown
@@ -624,7 +624,7 @@ class SecurityTab extends ImmutableComponent {
           : null
         }
       </SettingsList>
-      <div className='sectionTitle' data-l10n-id='autofillSettings' />
+      <DefaultSectionTitle data-l10n-id='autofillSettings' />
       <SettingsList>
         <SettingCheckbox dataL10nId='enableAutofill' prefKey={settings.AUTOFILL_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <Button l10nId='manageAutofillData' className='primaryButton manageAutofillDataButton'
@@ -632,7 +632,7 @@ class SecurityTab extends ImmutableComponent {
             url: 'about:autofill'
           })} disabled={!getSetting(settings.AUTOFILL_ENABLED, this.props.settings)} />
       </SettingsList>
-      <div className='sectionTitle' data-l10n-id='fullscreenContent' />
+      <DefaultSectionTitle data-l10n-id='fullscreenContent' />
       <SettingsList>
         <SettingItem>
           <SettingDropdown
@@ -643,7 +643,7 @@ class SecurityTab extends ImmutableComponent {
           </SettingDropdown>
         </SettingItem>
       </SettingsList>
-      <div className='sectionTitle' data-l10n-id='doNotTrackTitle' />
+      <DefaultSectionTitle data-l10n-id='doNotTrackTitle' />
       <SettingsList>
         <SettingCheckbox dataL10nId='doNotTrack' prefKey={settings.DO_NOT_TRACK} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
@@ -656,7 +656,7 @@ class SecurityTab extends ImmutableComponent {
 class AdvancedTab extends ImmutableComponent {
   render () {
     return <div>
-      <div className='sectionTitle' data-l10n-id='contentSettings' />
+      <DefaultSectionTitle data-l10n-id='contentSettings' />
       <SettingsList>
         <SettingCheckbox dataL10nId='useHardwareAcceleration' prefKey={settings.HARDWARE_ACCELERATION_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='useSmoothScroll' prefKey={settings.SMOOTH_SCROLL_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />

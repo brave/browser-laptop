@@ -14,6 +14,13 @@ const Button = require('../../../../js/components/button')
 const {SettingsList, SettingItem, SettingCheckbox} = require('../settings')
 const SortableTable = require('../../../../js/components/sortableTable')
 
+const {
+  BetaSectionTitleWrapper,
+  AboutPagesSectionTitle,
+  DefaultSectionTitle,
+  SectionSubTitle
+} = require('../sectionTitle')
+
 const aboutActions = require('../../../../js/about/aboutActions')
 const getSetting = require('../../../../js/settings').getSetting
 const settings = require('../../../../js/constants/settings')
@@ -49,7 +56,7 @@ class SyncTab extends ImmutableComponent {
 
   get clearDataContent () {
     return <div className='syncClearData'>
-      <div className='sectionTitle' data-l10n-id='syncClearData' />
+      <DefaultSectionTitle data-l10n-id='syncClearData' />
       {
         this.enabled
           ? <button data-l10n-id='syncResetButton' className='linkButton' onClick={this.props.showOverlay.bind(this, 'syncReset')} />
@@ -111,7 +118,7 @@ class SyncTab extends ImmutableComponent {
 
   get devicesContent () {
     return <div className='devices'>
-      <div className='sectionTitle' data-l10n-id='syncDevices' data-test-id='syncDevices' />
+      <DefaultSectionTitle data-l10n-id='syncDevices' data-test-id='syncDevices' />
       <SortableTable
         headings={['id', 'syncDeviceName', 'syncDeviceLastActive']}
         defaultHeading='syncDeviceLastActive'
@@ -318,10 +325,10 @@ class SyncTab extends ImmutableComponent {
         ? <ModalOverlay title={'syncReset'} content={this.resetOverlayContent} footer={this.resetOverlayFooter} onHide={this.props.hideOverlay.bind(this, 'syncReset')} />
         : null
       }
-      <div className='sectionTitleWrapper'>
-        <span className='sectionTitle' data-l10n-id='syncTitle' />
-        <span className='sectionSubTitle'>beta</span>
-      </div>
+      <BetaSectionTitleWrapper>
+        <AboutPagesSectionTitle data-l10n-id='syncTitle' />
+        <SectionSubTitle>beta</SectionSubTitle>
+      </BetaSectionTitleWrapper>
       <div className='settingsListContainer'>
         <span className='settingsListTitle syncTitleMessage' data-l10n-id='syncTitleMessage' />
         <a href='https://github.com/brave/sync/wiki/Design' target='_blank'>
@@ -338,7 +345,8 @@ class SyncTab extends ImmutableComponent {
       </div>
       {
         this.isSetup && this.enabled
-          ? <div id='syncData'><div className='sectionTitle' data-l10n-id='syncData' />
+          ? <div id='syncData'>
+            <DefaultSectionTitle data-l10n-id='syncData' />
             <SettingsList dataL10nId='syncDataMessage'>
               <SettingCheckbox dataL10nId='syncBookmarks' prefKey={settings.SYNC_TYPE_BOOKMARK} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
               <SettingCheckbox dataL10nId='syncSiteSettings' prefKey={settings.SYNC_TYPE_SITE_SETTING} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />

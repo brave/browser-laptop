@@ -9,10 +9,13 @@ const getSetting = require('../../../../js/settings').getSetting
 const settings = require('../../../../js/constants/settings')
 const appConfig = require('../../../../js/constants/appConfig')
 const {isWindows, isDarwin, isLinux} = require('../../../common/lib/platformUtil')
-const {SettingsList, SettingCheckbox} = require('../../components/settings')
+
 const WidevineInfo = require('../../components/widevineInfo')
 const flash = appConfig.resourceNames.FLASH
 const widevine = appConfig.resourceNames.WIDEVINE
+
+const {SettingsList, SettingCheckbox} = require('../../components/settings')
+const {DefaultSectionTitle} = require('../../components/sectionTitle')
 
 class PluginsTab extends ImmutableComponent {
   get flashInstalled () {
@@ -47,7 +50,7 @@ class PluginsTab extends ImmutableComponent {
     const braveWikiLink = 'https://github.com/brave/browser-laptop/wiki'
     const flashInfoLink = `${braveWikiLink}/Flash-Support-Deprecation-Proposal#troubleshooting-flash-issues`
     return <div>
-      <div className='sectionTitle' data-l10n-id='pluginSettings' />
+      <DefaultSectionTitle data-l10n-id='pluginSettings' />
       <SettingsList>
         <SettingCheckbox checked={this.flashInstalled ? this.props.braveryDefaults.get('flash') : false} dataL10nId='enableFlash' onChange={this.onToggleFlash} disabled={!this.flashInstalled} />
         <div className='subtext flashText'>
@@ -80,7 +83,7 @@ class PluginsTab extends ImmutableComponent {
       {
         !isLinux()
           ? <div>
-            <div className='sectionTitle' data-l10n-id='widevineSection' />
+            <DefaultSectionTitle data-l10n-id='widevineSection' />
             <SettingsList>
               <WidevineInfo createTabRequestedAction={aboutActions.createTabRequested} />
               <SettingCheckbox checked={this.props.braveryDefaults.get('widevine')} dataL10nId='enableWidevine' onChange={this.onToggleWidevine} />
