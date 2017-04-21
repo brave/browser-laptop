@@ -7,6 +7,8 @@ const React = require('react')
 const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
 const Immutable = require('immutable')
 const UrlUtil = require('../lib/urlutil')
+const {css} = require('aphrodite/no-important')
+const commonStyles = require('../../app/renderer/components/styles/commonStyles')
 
 // Components
 const PreferenceNavigation = require('../../app/renderer/components/preferences/preferenceNavigation')
@@ -21,6 +23,7 @@ const PaymentsTab = require('../../app/renderer/components/preferences/paymentsT
 const SyncTab = require('../../app/renderer/components/preferences/syncTab')
 const PluginsTab = require('../../app/renderer/components/preferences/pluginsTab')
 const ExtensionsTab = require('../../app/renderer/components/preferences/extensionsTab')
+const AdvancedTab = require('../../app/renderer/components/preferences/advancedTab')
 const {populateDefaultExtensions} = require('../../app/renderer/lib/extensionsUtil')
 const {getZoomValuePercentage} = require('../lib/zoom')
 
@@ -240,7 +243,7 @@ class GeneralTab extends ImmutableComponent {
             settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         </SettingItem>
       </SettingsList>
-      <div data-l10n-id='requiresRestart' className='requiresRestart' />
+      <div data-l10n-id='requiresRestart' className={css(commonStyles.requiresRestart)} />
     </SettingsList>
   }
 }
@@ -648,22 +651,7 @@ class SecurityTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='doNotTrack' prefKey={settings.DO_NOT_TRACK} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
       <SitePermissionsPage siteSettings={this.props.siteSettings} names={permissionNames} />
-      <div data-l10n-id='requiresRestart' className='requiresRestart' />
-    </div>
-  }
-}
-
-class AdvancedTab extends ImmutableComponent {
-  render () {
-    return <div>
-      <DefaultSectionTitle data-l10n-id='contentSettings' />
-      <SettingsList>
-        <SettingCheckbox dataL10nId='useHardwareAcceleration' prefKey={settings.HARDWARE_ACCELERATION_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='useSmoothScroll' prefKey={settings.SMOOTH_SCROLL_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='sendCrashReports' prefKey={settings.SEND_CRASH_REPORTS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='sendUsageStatistics' prefKey={settings.SEND_USAGE_STATISTICS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-      </SettingsList>
-      <div data-l10n-id='requiresRestart' className='requiresRestart' />
+      <div data-l10n-id='requiresRestart' className={css(commonStyles.requiresRestart)} />
     </div>
   }
 }

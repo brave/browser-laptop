@@ -34,9 +34,7 @@ const patch = require('immutablepatch')
 const l10n = require('./l10n')
 const currentWindow = require('../app/renderer/currentWindow')
 
-// don't allow scaling or zooming of the ui
 webFrame.setPageScaleLimits(1, 1)
-webFrame.setZoomLevelLimits(0, 0)
 
 l10n.init()
 
