@@ -671,6 +671,7 @@ var initialize = (paymentsEnabled) => {
         getStateInfo(state)
 
         try {
+          var timeUntilReconcile
           clientprep()
           client = ledgerClient(state.personaId,
                                 underscore.extend(state.options, { roundtrip: roundtrip }, clientOptions),
@@ -679,7 +680,7 @@ var initialize = (paymentsEnabled) => {
           // Scenario: User enables Payments, disables it, waits 30+ days, then
           // enables it again -> reconcileStamp is in the past.
           // In this case reset reconcileStamp to the future.
-          let timeUntilReconcile = client.timeUntilReconcile()
+          try { timeUntilReconcile = client.timeUntilReconcile() } catch (ex) {}
           let ledgerWindow = (synopsis.options.numFrames - 1) * synopsis.options.frameSize
           if (typeof timeUntilReconcile === 'number' && timeUntilReconcile < -ledgerWindow) {
             client.setTimeUntilReconcile(null, (err, stateResult) => {
@@ -1855,6 +1856,8 @@ var getStateInfo = (state) => {
   var ballots, i, transaction
   var info = state.paymentInfo
   var then = underscore.now() - msecs.year
+
+  if (!state.properties.wallet) return
 
   ledgerInfo.paymentId = state.properties.wallet.paymentId
   ledgerInfo.passphrase = state.properties.wallet.keychains.passphrase
