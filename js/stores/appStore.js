@@ -350,21 +350,7 @@ function handleChangeSettingAction (settingKey, settingValue) {
   }
 }
 
-const reducers = [
-  require('../../app/browser/reducers/downloadsReducer'),
-  require('../../app/browser/reducers/flashReducer'),
-  // tabs, sites and windows reducers need to stay in that order
-  // until we have a better way to manage dependencies
-  require('../../app/browser/reducers/tabsReducer'),
-  require('../../app/browser/reducers/sitesReducer'),
-  require('../../app/browser/reducers/windowsReducer'),
-  require('../../app/browser/reducers/spellCheckReducer'),
-  require('../../app/browser/reducers/clipboardReducer'),
-  require('../../app/browser/reducers/passwordManagerReducer'),
-  require('../../app/browser/reducers/tabMessageBoxReducer'),
-  require('../../app/browser/reducers/dragDropReducer'),
-  require('../../app/browser/reducers/extensionsReducer')
-]
+let reducers = []
 
 const applyReducers = (state, action) => reducers.reduce(
     (appState, reducer) => {
@@ -378,6 +364,21 @@ const handleAppAction = (action) => {
   const ledger = require('../../app/ledger')
 
   if (action.actionType === appConstants.APP_SET_STATE) {
+    reducers = [
+      require('../../app/browser/reducers/downloadsReducer'),
+      require('../../app/browser/reducers/flashReducer'),
+      // tabs, sites and windows reducers need to stay in that order
+      // until we have a better way to manage dependencies
+      require('../../app/browser/reducers/tabsReducer'),
+      require('../../app/browser/reducers/sitesReducer'),
+      require('../../app/browser/reducers/windowsReducer'),
+      require('../../app/browser/reducers/spellCheckReducer'),
+      require('../../app/browser/reducers/clipboardReducer'),
+      require('../../app/browser/reducers/passwordManagerReducer'),
+      require('../../app/browser/reducers/tabMessageBoxReducer'),
+      require('../../app/browser/reducers/dragDropReducer'),
+      require('../../app/browser/reducers/extensionsReducer')
+    ]
     initialized = true
     appState = action.appState
   }
