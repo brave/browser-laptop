@@ -590,7 +590,11 @@ class SecurityTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='autocompleteData' prefKey={settings.SHUTDOWN_CLEAR_AUTOCOMPLETE_DATA} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='autofillData' prefKey={settings.SHUTDOWN_CLEAR_AUTOFILL_DATA} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='savedSiteSettings' prefKey={settings.SHUTDOWN_CLEAR_SITE_SETTINGS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <Button l10nId='clearBrowsingDataNow' className='primaryButton clearBrowsingDataButton' onClick={this.clearBrowsingDataNow} />
+        <Button className='primaryButton'
+          l10nId='clearBrowsingDataNow'
+          testId='clearBrowsingDataButton'
+          onClick={this.clearBrowsingDataNow}
+        />
       </SettingsList>
       <DefaultSectionTitle data-l10n-id='passwordsAndForms' />
       <SettingsList>

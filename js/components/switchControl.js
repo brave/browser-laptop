@@ -31,6 +31,7 @@ class SwitchControl extends ImmutableComponent {
       hasTopText: this.props.topl10nId
     })}
       data-switch-status={this.props.checkedOn}
+      data-test-id={this.props.testId}
     >
       {
         this.props.leftl10nId && this.props.topl10nId

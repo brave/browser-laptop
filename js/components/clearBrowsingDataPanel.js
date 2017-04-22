@@ -11,6 +11,14 @@ const appActions = require('../actions/appActions')
 const ipc = require('electron').ipcRenderer
 const messages = require('../constants/messages')
 
+const {
+  CommonFormSmall,
+  CommonFormSection,
+  CommonFormTitle,
+  CommonFormButtonWrapper,
+  CommonFormBottomWrapper
+} = require('../../app/renderer/components/commonForm')
+
 class ClearBrowsingDataPanel extends React.Component {
   constructor (props) {
     super()
@@ -42,27 +50,63 @@ class ClearBrowsingDataPanel extends React.Component {
     }
   }
   render () {
-    return <Dialog onHide={this.props.onHide} className='clearBrowsingDataPanel' isClickDismiss>
-      <div className='clearBrowsingData' onClick={(e) => e.stopPropagation()}>
-        <div className='formSection clearBrowsingDataTitle' data-l10n-id='clearBrowsingData' />
-        <div className='formSection clearBrowsingDataOptions'>
-          <SwitchControl className='browserHistorySwitch' rightl10nId='browserHistory' checkedOn={this.state.clearBrowsingDataDetail.get('browserHistory')} onClick={this.onToggleBrowserHistory} />
-          <SwitchControl rightl10nId='downloadHistory' checkedOn={this.state.clearBrowsingDataDetail.get('downloadHistory')} onClick={this.onToggleDownloadHistory} />
-          <SwitchControl rightl10nId='cachedImagesAndFiles' checkedOn={this.state.clearBrowsingDataDetail.get('cachedImagesAndFiles')} onClick={this.onToggleCachedImagesAndFiles} />
-          <SwitchControl rightl10nId='savedPasswords' checkedOn={this.state.clearBrowsingDataDetail.get('savedPasswords')} onClick={this.onToggleSavedPasswords} />
-          <SwitchControl rightl10nId='allSiteCookies' checkedOn={this.state.clearBrowsingDataDetail.get('allSiteCookies')} onClick={this.onToggleAllSiteCookies} />
-          <SwitchControl className='autocompleteDataSwitch' rightl10nId='autocompleteData' checkedOn={this.state.clearBrowsingDataDetail.get('autocompleteData')} onClick={this.onToggleAutocompleteData} />
-          <SwitchControl className='autofillDataSwitch' rightl10nId='autofillData' checkedOn={this.state.clearBrowsingDataDetail.get('autofillData')} onClick={this.onToggleAutofillData} />
-          <SwitchControl className='siteSettingsSwitch' rightl10nId='savedSiteSettings' checkedOn={this.state.clearBrowsingDataDetail.get('savedSiteSettings')} onClick={this.onToggleSavedSiteSettings} />
-        </div>
-        <div className='formSection clearBrowsingDataButtons'>
-          <Button l10nId='cancel' className='whiteButton' onClick={this.props.onHide} />
-          <Button l10nId='clear' className='primaryButton clearDataButton' onClick={this.onClear} />
-        </div>
-        <div className='formSection clearBrowsingDataWarning'>
+    return <Dialog onHide={this.props.onHide} testId='clearBrowsingDataPanel' isClickDismiss>
+      <CommonFormSmall onClick={(e) => e.stopPropagation()}>
+        <CommonFormTitle data-l10n-id='clearBrowsingData' />
+        <CommonFormSection>
+          <SwitchControl
+            rightl10nId='browserHistory'
+            testId='browserHistorySwitch'
+            checkedOn={this.state.clearBrowsingDataDetail.get('browserHistory')}
+            onClick={this.onToggleBrowserHistory} />
+          <SwitchControl
+            rightl10nId='downloadHistory'
+            checkedOn={this.state.clearBrowsingDataDetail.get('downloadHistory')}
+            onClick={this.onToggleDownloadHistory} />
+          <SwitchControl
+            rightl10nId='cachedImagesAndFiles'
+            checkedOn={this.state.clearBrowsingDataDetail.get('cachedImagesAndFiles')}
+            onClick={this.onToggleCachedImagesAndFiles} />
+          <SwitchControl
+            rightl10nId='savedPasswords'
+            checkedOn={this.state.clearBrowsingDataDetail.get('savedPasswords')}
+            onClick={this.onToggleSavedPasswords} />
+          <SwitchControl
+            rightl10nId='allSiteCookies'
+            checkedOn={this.state.clearBrowsingDataDetail.get('allSiteCookies')}
+            onClick={this.onToggleAllSiteCookies} />
+          <SwitchControl
+            rightl10nId='autocompleteData'
+            testId='autocompleteDataSwitch'
+            checkedOn={this.state.clearBrowsingDataDetail.get('autocompleteData')}
+            onClick={this.onToggleAutocompleteData} />
+          <SwitchControl
+            rightl10nId='autofillData'
+            testId='autofillDataSwitch'
+            checkedOn={this.state.clearBrowsingDataDetail.get('autofillData')}
+            onClick={this.onToggleAutofillData} />
+          <SwitchControl
+            rightl10nId='savedSiteSettings'
+            testId='siteSettingsSwitch'
+            checkedOn={this.state.clearBrowsingDataDetail.get('savedSiteSettings')}
+            onClick={this.onToggleSavedSiteSettings} />
+        </CommonFormSection>
+        <CommonFormButtonWrapper>
+          <Button className='whiteButton'
+            l10nId='cancel'
+            testId='cancelButton'
+            onClick={this.props.onHide}
+          />
+          <Button className='primaryButton'
+            l10nId='clear'
+            testId='clearDataButton'
+            onClick={this.onClear}
+          />
+        </CommonFormButtonWrapper>
+        <CommonFormBottomWrapper>
           <div data-l10n-id='clearDataWarning' />
-        </div>
-      </div>
+        </CommonFormBottomWrapper>
+      </CommonFormSmall>
     </Dialog>
   }
 }
