@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 const appActions = require('../../js/actions/appActions')
 const config = require('../../js/constants/config')
 const Immutable = require('immutable')
@@ -10,17 +14,10 @@ const {isSessionPartition} = require('../../js/state/frameStateUtil')
 const {getOrigin} = require('../../js/state/siteUtil')
 const {getSetting} = require('../../js/settings')
 const settings = require('../../js/constants/settings')
+const {cleanupWebContents, currentWebContents, getWebContents, updateWebContents} = require('./webContentsCache')
 
-let currentWebContents = {}
 let currentPartitionNumber = 0
 const incrementPartitionNumber = () => ++currentPartitionNumber
-
-const cleanupWebContents = (tabId) => {
-  if (currentWebContents[tabId]) {
-    delete currentWebContents[tabId]
-    appActions.tabClosed({ tabId })
-  }
-}
 
 const normalizeUrl = function (url) {
   if (isSourceAboutUrl(url)) {
@@ -36,7 +33,7 @@ const normalizeUrl = function (url) {
 }
 
 const getTabValue = function (tabId) {
-  let tab = api.getWebContents(tabId)
+  let tab = getWebContents(tabId)
   if (tab) {
     let tabValue = makeImmutable(tab.tabValue())
     tabValue = tabValue.set('canGoBack', tab.canGoBack())
@@ -189,7 +186,7 @@ const api = {
         console.log('responsive')
       })
 
-      currentWebContents[tabId] = tab
+      updateWebContents(tabId, tab)
       let tabValue = getTabValue(tabId)
       if (tabValue) {
         appActions.tabCreated(tabValue)
@@ -230,14 +227,10 @@ const api = {
     }
   },
 
-  getWebContents: (tabId) => {
-    return currentWebContents[tabId]
-  },
-
   toggleDevTools: (state, action) => {
     action = makeImmutable(action)
     const tabId = action.get('tabId')
-    const tab = api.getWebContents(tabId)
+    const tab = getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
       if (tab.isDevToolsOpened()) {
         tab.closeDevTools()
@@ -252,7 +245,7 @@ const api = {
     action = makeImmutable(action)
     let frameProps = action.get('frameProps')
     let tabId = frameProps.get('tabId')
-    let tab = api.getWebContents(tabId)
+    let tab = getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
       tab.setActive(true)
       let tabValue = getTabValue(tabId)
@@ -264,7 +257,7 @@ const api = {
   loadURL: (state, action) => {
     action = makeImmutable(action)
     const tabId = action.get('tabId')
-    const tab = api.getWebContents(tabId)
+    const tab = getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
       let url = normalizeUrl(action.get('url'))
       // We only allow loading URLs explicitly when the origin is
@@ -287,7 +280,7 @@ const api = {
     action = makeImmutable(action)
     const windowId = action.get('windowId')
     const tabValue = tabState.getActiveTabValue(state, windowId)
-    const tab = tabValue && api.getWebContents(tabValue.get('tabId'))
+    const tab = tabValue && getWebContents(tabValue.get('tabId'))
     if (tab && !tab.isDestroyed()) {
       const url = normalizeUrl(action.get('url'))
       tab.loadURL(url)
@@ -300,7 +293,7 @@ const api = {
     const frameProps = action.get('frameProps')
     const muted = action.get('muted')
     const tabId = frameProps.get('tabId')
-    const tab = api.getWebContents(tabId)
+    const tab = getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
       tab.setAudioMuted(muted)
       const tabValue = getTabValue(tabId)
@@ -317,7 +310,7 @@ const api = {
     if (tabValue && tabValue.get('index') !== undefined) {
       options = options.set('index', tabValue.get('index') + 1)
     }
-    const tab = api.getWebContents(tabId)
+    const tab = getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
       tab.clone(options.toJS(), (newTab) => {
       })
@@ -329,7 +322,7 @@ const api = {
     action = makeImmutable(action)
     const tabId = action.get('tabId')
     const pinned = action.get('pinned')
-    const tab = api.getWebContents(tabId)
+    const tab = getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
       const url = tab.getURL()
       // For now we only support 1 tab pin per URL
@@ -357,7 +350,7 @@ const api = {
   },
 
   closeTab: (tabId, forceClose) => {
-    const tab = api.getWebContents(tabId)
+    const tab = getWebContents(tabId)
     try {
       if (tab && !tab.isDestroyed()) {
         if (forceClose) {
@@ -414,14 +407,10 @@ const api = {
     return state
   },
 
-  moveTo: (state, action) => {
-    action = makeImmutable(action)
-    const tabId = action.get('tabId')
-    const frameOpts = action.get('frameOpts')
-    const browserOpts = action.get('browserOpts') || new Immutable.Map()
-    // positionByMouseCursor: true
-    const windowId = action.get('windowId') || -1
-    const tab = api.getWebContents(tabId)
+  moveTo: (state, tabId, frameOpts, browserOpts, windowId) => {
+    frameOpts = makeImmutable(frameOpts)
+    browserOpts = makeImmutable(browserOpts)
+    const tab = getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
       const tabValue = getTabValue(tabId)
       const guestInstanceId = tabValue && tabValue.get('guestInstanceId')
@@ -433,6 +422,21 @@ const api = {
       if (windowId != null && currentWindowId === windowId) {
         return state
       }
+
+      if (windowId == null || windowId === -1) {
+        // If there's only one tab and we're dragging outside the window, then disallow
+        // a new window to be created.
+        const windowTabCount = tabState.getTabsByWindowId(state, currentWindowId).size
+        if (windowTabCount === 1) {
+          return state
+        }
+      }
+
+      if (tabValue.get('pinned')) {
+        // If the current tab is pinned, then don't allow to drag out
+        return state
+      }
+
       tab.detach(() => {
         if (windowId == null || windowId === -1) {
           appActions.newWindow(makeImmutable(frameOpts), browserOpts)
@@ -452,7 +456,7 @@ const api = {
     const windowId = createProperties.get('windowId')
     const tabData = tabState.getMatchingTab(state, createProperties, windowId, url)
     if (tabData) {
-      const tab = api.getWebContents(tabData.get('id'))
+      const tab = getWebContents(tabData.get('id'))
       if (tab && !tab.isDestroyed()) {
         tab.setActive(true)
       }

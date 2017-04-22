@@ -9,7 +9,7 @@ const EventEmitter = require('events').EventEmitter
 const Immutable = require('immutable')
 const windowConstants = require('../constants/windowConstants')
 const debounce = require('../lib/debounce')
-const tabs = require('../../app/browser/tabs')
+const {getWebContents} = require('../../app/browser/webContentsCache')
 const {isSourceAboutUrl} = require('../lib/appUrlUtil')
 const {responseHasContent} = require('../../app/common/lib/httpUtil')
 
@@ -49,7 +49,7 @@ let lastActivePageUrl = null
 let lastActiveTabId = null
 
 const addPageView = (url, tabId) => {
-  const tab = tabs.getWebContents(tabId)
+  const tab = getWebContents(tabId)
   const isPrivate = !tab ||
     tab.isDestroyed() ||
     !tab.session.partition.startsWith('persist:')
