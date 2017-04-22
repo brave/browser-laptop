@@ -4,12 +4,12 @@
 
 const React = require('react')
 const Immutable = require('immutable')
-const Dialog = require('./dialog')
-const Button = require('./button')
-const SwitchControl = require('./switchControl')
-const appActions = require('../actions/appActions')
+const Dialog = require('../../../js/components/dialog')
+const Button = require('../../../js/components/button')
+const SwitchControl = require('../../../js/components/switchControl')
+const appActions = require('../../../js/actions/appActions')
 const ipc = require('electron').ipcRenderer
-const messages = require('../constants/messages')
+const messages = require('../../../js/constants/messages')
 
 const {
   CommonFormSmall,
@@ -17,7 +17,7 @@ const {
   CommonFormTitle,
   CommonFormButtonWrapper,
   CommonFormBottomWrapper
-} = require('../../app/renderer/components/commonForm')
+} = require('./commonForm')
 
 class ClearBrowsingDataPanel extends React.Component {
   constructor (props) {
