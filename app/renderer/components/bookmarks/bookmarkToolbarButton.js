@@ -305,10 +305,10 @@ const styles = StyleSheet.create({
     }
   },
   bookmarkToolbarButton__draggingOverLeft: {
-    marginLeft: bookmarkToolbarButtonDraggingMargin
+    paddingLeft: bookmarkToolbarButtonDraggingMargin
   },
   bookmarkToolbarButton__draggingOverRight: {
-    marginRight: bookmarkToolbarButtonDraggingMargin
+    paddingRight: bookmarkToolbarButtonDraggingMargin
   },
   bookmarkToolbarButton__isDragging: {
     opacity: '0.2'
