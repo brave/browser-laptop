@@ -4,14 +4,14 @@
 
 const React = require('react')
 const PropTypes = require('prop-types')
-const Dialog = require('./dialog')
-const Button = require('./button')
-const appActions = require('../actions/appActions')
-const KeyCodes = require('../../app/common/constants/keyCodes')
+const Dialog = require('../../../js/components/dialog')
+const Button = require('../../../js/components/button')
+const appActions = require('../../../js/actions/appActions')
+const KeyCodes = require('../../common/constants/keyCodes')
 const urlResolve = require('url').resolve
 
 const {StyleSheet, css} = require('aphrodite/no-important')
-const commonStyles = require('../../app/renderer/components/styles/commonStyles')
+const commonStyles = require('./styles/commonStyles')
 
 const {
   CommonForm,
