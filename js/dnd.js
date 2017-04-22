@@ -12,8 +12,6 @@ const siteUtil = require('./state/siteUtil')
 const appStoreRenderer = require('./stores/appStoreRenderer')
 const {getCurrentWindowId} = require('../app/renderer/currentWindow')
 
-let isDraggingInsideWindow = false
-
 module.exports.getInterBraveDragData = () => {
   return appStoreRenderer.state.getIn(['dragData', 'data'])
 }
@@ -21,22 +19,6 @@ module.exports.getInterBraveDragData = () => {
 module.exports.getInterBraveDragType = () => {
   return appStoreRenderer.state.getIn(['dragData', 'type'])
 }
-
-document.addEventListener('dragenter', () => {
-  isDraggingInsideWindow = true
-}, true)
-
-document.addEventListener('dragleave', (e) => {
-  if (!e.clientX && !e.clientY) {
-    isDraggingInsideWindow = false
-    appActions.draggedOver({
-      draggingOverKey: -1,
-      draggingOverWindowId: -1
-    })
-  }
-}, true)
-
-module.exports.isDraggingInsideWindow = () => isDraggingInsideWindow
 
 module.exports.onDragStart = (dragType, data, e) => {
   e.dataTransfer.effectAllowed = 'all'

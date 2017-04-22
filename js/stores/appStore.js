@@ -368,7 +368,8 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/downloadsReducer'),
       require('../../app/browser/reducers/flashReducer'),
       // tabs, sites and windows reducers need to stay in that order
-      // until we have a better way to manage dependencies
+      // until we have a better way to manage dependencies.
+      // tabsReducer must be above dragDropReducer.
       require('../../app/browser/reducers/tabsReducer'),
       require('../../app/browser/reducers/sitesReducer'),
       require('../../app/browser/reducers/windowsReducer'),
