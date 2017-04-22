@@ -5,6 +5,8 @@ const SortableTable = require('../../components/sortableTable')
 const {css} = require('aphrodite/no-important')
 const commonStyles = require('../../../app/renderer/components/styles/commonStyles')
 
+const {AboutPageSectionSubTitle} = require('../../../app/renderer/components/common/sectionTitle')
+
 class TorrentFileList extends React.Component {
   render () {
     const { torrent, stateOwner } = this.props
@@ -35,8 +37,8 @@ class TorrentFileList extends React.Component {
     }
 
     return (
-      <div className='torrentFileList'>
-        <div data-l10n-id='files' className='sectionTitle' />
+      <div>
+        <AboutPageSectionSubTitle data-l10n-id='files' />
         {content}
       </div>
     )

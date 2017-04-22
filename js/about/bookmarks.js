@@ -19,6 +19,8 @@ const iconSize = require('../../app/common/lib/faviconUtil').iconSize
 
 const ipc = window.chrome.ipcRenderer
 
+const {AboutPageSectionTitle} = require('../../app/renderer/components/common/sectionTitle')
+
 // Stylesheets
 require('../../less/about/bookmarks.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
@@ -448,7 +450,7 @@ class AboutBookmarks extends React.Component {
   render () {
     return <div className='siteDetailsPage' onClick={this.onClick}>
       <div className='siteDetailsPageHeader'>
-        <div data-l10n-id='bookmarkManager' className='sectionTitle' />
+        <AboutPageSectionTitle data-l10n-id='bookmarkManager' />
         <div className='headerActions'>
           <div className='searchWrapper'>
             <span data-l10n-id='importBrowserData' className='importBrowserData' onClick={this.importBrowserData} />

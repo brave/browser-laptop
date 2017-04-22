@@ -5,6 +5,8 @@ const cx = require('../../lib/classSet')
 const {css} = require('aphrodite/no-important')
 const commonStyles = require('../../../app/renderer/components/styles/commonStyles')
 
+const {AboutPageSectionSubTitle} = require('../../../app/renderer/components/common/sectionTitle')
+
 class TorrentStats extends React.Component {
   render () {
     const torrent = this.props.torrent
@@ -19,7 +21,8 @@ class TorrentStats extends React.Component {
     }
 
     return <div>
-      <div data-l10n-id='torrentStatus' className='sectionTitle' />
+      <AboutPageSectionSubTitle data-l10n-id='torrentStatus' />
+
       <div className={cx({
         torrentStats: true,
         [css(commonStyles.userSelectNone)]: true

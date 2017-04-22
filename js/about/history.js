@@ -16,7 +16,18 @@ const Button = require('../components/button')
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
 const historyUtil = require('../../app/common/lib/historyUtil')
 
+const cx = require('../lib/classSet')
+
 const ipc = window.chrome.ipcRenderer
+
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../app/renderer/components/styles/global')
+const commonStyles = require('../../app/renderer/components/styles/commonStyles')
+
+const {
+  AboutPageSectionTitle,
+  AboutPageSectionSubTitle
+} = require('../../app/renderer/components/common/sectionTitle')
 
 // Stylesheets
 require('../../less/about/history.less')
@@ -64,7 +75,9 @@ class HistoryDay extends ImmutableComponent {
   }
   render () {
     return <div>
-      <div className='sectionTitle historyDayName'>{this.props.date}</div>
+      <div className={css(styles.subTitleMargin)}>
+        <AboutPageSectionSubTitle>{this.props.date}</AboutPageSectionSubTitle>
+      </div>
       <SortableTable headings={['time', 'title', 'domain']}
         defaultHeading='time'
         defaultHeadingSortOrder='desc'
@@ -193,7 +206,7 @@ class AboutHistory extends React.Component {
   render () {
     return <div className='siteDetailsPage' onClick={this.onClick}>
       <div className='siteDetailsPageHeader'>
-        <div data-l10n-id='history' className='sectionTitle' />
+        <AboutPageSectionTitle data-l10n-id='history' />
         <div className='headerActions'>
           <div className='searchWrapper'>
             <input type='text' className='searchInput' ref='historySearch' id='historySearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='historySearch' />
@@ -207,7 +220,11 @@ class AboutHistory extends React.Component {
         </div>
       </div>
 
-      <div className='siteDetailsPageContent'>
+      <div className={cx({
+        siteDetailsPageContent: true,
+        [css(commonStyles.siteDetailsPageContent)]: true,
+        [css(commonStyles.noMarginLeft)]: true
+      })}>
         <GroupedHistoryList
           languageCodes={this.state.languageCodes}
           settings={this.state.settings}
@@ -221,5 +238,11 @@ class AboutHistory extends React.Component {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  subTitleMargin: {
+    marginLeft: globalStyles.spacing.aboutPageSectionPadding
+  }
+})
 
 module.exports = <AboutHistory />

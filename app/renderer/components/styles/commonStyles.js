@@ -221,6 +221,12 @@ const styles = StyleSheet.create({
     padding: '2px 15px',
     textTransform: 'capitalize',
     width: 'auto'
+  },
+
+  siteDetailsPageContent: {
+    /* TODO: refactor siteDetails.less */
+    marginTop: '0 !important',
+    marginLeft: globalStyles.spacing.aboutPageSectionPadding
   }
 })
 

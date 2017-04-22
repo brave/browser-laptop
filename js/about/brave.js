@@ -11,8 +11,16 @@ const aboutActions = require('./aboutActions')
 
 const ipc = window.chrome.ipcRenderer
 
+const cx = require('../lib/classSet')
+const {StyleSheet, css} = require('aphrodite/no-important')
+const commonStyles = require('../../app/renderer/components/styles/commonStyles')
+
+const {
+  AboutPageSectionTitle,
+  AboutPageSectionSubTitle
+} = require('../../app/renderer/components/common/sectionTitle')
+
 require('../../less/about/history.less')
-require('../../less/about/brave.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 const tranformVersionInfoToString = (versionInformation) =>
@@ -38,27 +46,27 @@ class AboutBrave extends React.Component {
   render () {
     return <div className='siteDetailsPage'>
       <div className='siteDetailsPageHeader'>
-        <div data-l10n-id='aboutBrave' className='sectionTitle' />
-        <div data-l10n-id='braveInfo' className='title' />
+        <AboutPageSectionTitle data-l10n-id='aboutBrave' />
+        <div data-l10n-id='braveInfo' />
       </div>
 
-      <div className='siteDetailsPageContent aboutBrave'>
-        <div>
-          <div className='title'>
-            <div data-l10n-id='releaseNotes' className='sectionTitle' />
-          </div>
+      <div className={cx({
+        siteDetailsPageContent: true,
+        aboutBrave: true,
+        [css(commonStyles.siteDetailsPageContent)]: true
+      })}>
+        <AboutPageSectionSubTitle data-l10n-id='releaseNotes' />
 
-          <div className='title releaseNotes'>
-            <span data-l10n-id='relNotesInfo1' />
-            &nbsp;
-            <a className='linkText' href={`https://github.com/brave/browser-laptop/releases/tag/v${this.state.versionInformation.getIn([0, 'version'])}dev`} target='_blank' data-l10n-id='relNotesInfo2' />
-            &nbsp;
-            <span data-l10n-id='relNotesInfo3' />
-          </div>
+        <div>
+          <span data-l10n-id='relNotesInfo1' />
+          &nbsp;
+          <a className='linkText' href={`https://github.com/brave/browser-laptop/releases/tag/v${this.state.versionInformation.getIn([0, 'version'])}dev`} target='_blank' data-l10n-id='relNotesInfo2' />
+          &nbsp;
+          <span data-l10n-id='relNotesInfo3' />
         </div>
 
-        <div className='title'>
-          <span className='sectionTitle' data-l10n-id='versionInformation' />
+        <div className={css(styles.versionInformationWrapper)}>
+          <AboutPageSectionSubTitle data-l10n-id='versionInformation' />
           <ClipboardButton
             dataL10nId='copyToClipboard'
             className='fa fa-clipboard'
@@ -85,5 +93,14 @@ class AboutBrave extends React.Component {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  versionInformationWrapper: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    width: '400px'
+  }
+})
 
 module.exports = <AboutBrave />

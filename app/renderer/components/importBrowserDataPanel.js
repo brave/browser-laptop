@@ -18,7 +18,6 @@ const {
   CommonFormDropdown,
   CommonFormSection,
   CommonFormTitle,
-  CommonFormSubSection,
   CommonFormButtonWrapper,
   CommonFormBottomWrapper
 } = require('./commonForm')
@@ -150,14 +149,14 @@ class ImportBrowserDataPanel extends ImmutableComponent {
             onClick={this.onToggleFavorites}
             disabled={!this.supportFavorites}
           />
-          <CommonFormSubSection data-test-id='importBrowserSubDataOptions'>
+          <div className={css(styles.subSectionMargin)} data-test-id='importBrowserSubDataOptions'>
             <SwitchControl
               rightl10nId='mergeIntoBookmarksToolbar'
               checkedOn={this.props.importBrowserDataSelected.get('mergeFavorites')}
               onClick={this.onToggleMergeFavorites}
               disabled={!this.props.importBrowserDataSelected.get('favorites')}
             />
-          </CommonFormSubSection>
+          </div>
           <SwitchControl
             rightl10nId='cookies'
             checkedOn={this.props.importBrowserDataSelected.get('cookies')}
@@ -183,6 +182,9 @@ class ImportBrowserDataPanel extends ImmutableComponent {
 const styles = StyleSheet.create({
   dropdownWrapper: {
     marginBottom: `calc(${globalStyles.spacing.dialogInsideMargin} / 2)`
+  },
+  subSectionMargin: {
+    marginLeft: globalStyles.spacing.dialogInsideMargin
   }
 })
 

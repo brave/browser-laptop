@@ -10,7 +10,15 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const cx = require('../../../../js/lib/classSet')
 const ImmutableComponent = require('../immutableComponent')
 const ModalOverlay = require('../../../../js/components/modalOverlay')
+
 const {SettingCheckbox} = require('../settings')
+const {
+  sectionTitleStyles,
+  SectionTitleWrapper,
+  AboutPageSectionTitle,
+  SectionLabelTitle
+} = require('../common/sectionTitle')
+
 const DisabledContent = require('./payment/disabledContent')
 const EnabledContent = require('./payment/enabledContent')
 const BitcoinDashboard = require('./payment/bitcoinDashboard')
@@ -162,10 +170,14 @@ class PaymentsTab extends ImmutableComponent {
         : null
       }
 
-      <div className={css(styles.flexAlignEnd)}>
-        <div className='sectionTitleWrapper'>
-          <span className='sectionTitle'>Brave Payments</span>
-          <span className='sectionSubTitle'>beta</span>
+      <SectionTitleWrapper>
+        { /* Note: This div cannot be replaced with SectionTitleLabelWrapper */ }
+        <div className={cx({
+          [css(styles.titleWrapper)]: true,
+          [css(sectionTitleStyles.beta)]: true
+        })}>
+          <AboutPageSectionTitle>Brave Payments</AboutPageSectionTitle>
+          <SectionLabelTitle>beta</SectionLabelTitle>
         </div>
 
         <div className={css(
@@ -236,7 +248,7 @@ class PaymentsTab extends ImmutableComponent {
             : null
           }
         </div>
-      </div>
+      </SectionTitleWrapper>
       {
         this.enabled
           ? <EnabledContent settings={this.props.settings}
@@ -264,14 +276,19 @@ const styles = StyleSheet.create({
   paymentsContainer: {
     position: 'relative',
     overflowX: 'hidden',
-    width: '805px',
-    marginTop: '15px'
+    width: '805px'
   },
   paymentsSwitches: {
     display: 'flex',
     position: 'relative',
     bottom: '2px',
     minHeight: '29px'
+  },
+
+  titleWrapper: {
+    position: 'relative',
+    marginRight: '49px',
+    minWidth: '240px'
   },
 
   switchWrap: {

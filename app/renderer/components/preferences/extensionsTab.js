@@ -15,6 +15,8 @@ const {getSetting} = require('../../../../js/settings')
 const {SettingCheckbox} = require('../settings')
 const {isPasswordManager, getExtensionKey, isBuiltInExtension, bravifyText} = require('../../lib/extensionsUtil')
 
+const {DefaultSectionTitle} = require('../common/sectionTitle')
+
 const HelpfulText = require('../helpfulText')
 const SortableTable = require('../../../../js/components/sortableTable')
 
@@ -104,9 +106,7 @@ class ExtensionsTab extends ImmutableComponent {
     }
     return <div className={css(styles.extensionsContainer)}>
       <main className={css(styles.extensionsMain)}>
-        <header className={css(styles.extensionsOption)}>
-          <h1 className={css(styles.extensionsHeading)} data-l10n-id='extensions' />
-        </header>
+        <DefaultSectionTitle data-l10n-id='extensions' />
         <SortableTable
           sortingDisabled
           tableClassNames={css(styles.extensionsTable)}
