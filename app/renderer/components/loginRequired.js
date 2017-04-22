@@ -20,7 +20,7 @@ const {
   CommonFormTextbox,
   CommonFormButtonWrapper,
   commonFormStyles
-} = require('../../app/renderer/components/commonForm')
+} = require('./commonForm')
 
 class LoginRequired extends React.Component {
   constructor () {

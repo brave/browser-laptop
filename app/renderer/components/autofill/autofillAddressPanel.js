@@ -3,15 +3,15 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
-const Dialog = require('./dialog')
-const Button = require('./button')
-const windowActions = require('../actions/windowActions')
-const appActions = require('../actions/appActions')
-const KeyCodes = require('../../app/common/constants/keyCodes')
+const ImmutableComponent = require('../immutableComponent')
+const Dialog = require('../../../../js/components/dialog')
+const Button = require('../../../../js/components/button')
+const windowActions = require('../../../../js/actions/windowActions')
+const appActions = require('../../../../js/actions/appActions')
+const KeyCodes = require('../../../common/constants/keyCodes')
 
 const {css} = require('aphrodite/no-important')
-const commonStyles = require('../../app/renderer/components/styles/commonStyles')
+const commonStyles = require('../styles/commonStyles')
 
 const {
   CommonFormLarge,
@@ -20,7 +20,7 @@ const {
   CommonFormTextbox,
   CommonFormButtonWrapper,
   commonFormStyles
-} = require('../../app/renderer/components/commonForm')
+} = require('../commonForm')
 
 class AutofillAddressPanel extends ImmutableComponent {
   constructor () {
