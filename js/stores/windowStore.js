@@ -154,7 +154,10 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
   // a different ancestor frame key.
   const frames = frameStateUtil.getFrames(windowState)
   if (insertionIndex === undefined) {
-    insertionIndex = frameStateUtil.findIndexForFrameKey(frames, parentFrameKey || frameOpts.indexByFrameKey)
+    insertionIndex = frameStateUtil.findIndexForFrameKey(frames, frameOpts.indexByFrameKey || parentFrameKey)
+    if (frameOpts.prependIndexByFrameKey === false) {
+      insertionIndex++
+    }
     if (insertionIndex === -1) {
       insertionIndex = frames.size
     // frameOpts.indexByFrameKey is used when the insertionIndex should be used exactly

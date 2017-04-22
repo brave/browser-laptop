@@ -160,10 +160,7 @@ const tabsReducer = (state, action) => {
         const browserOpts = { positionByMouseCursor: true }
         if (dragData) {
           frameOpts.indexByFrameKey = dragData.getIn(['dragOverData', 'draggingOverKey'])
-          const prependIndexByFrameKey = dragData.getIn(['dragOverData', 'draggingOverLeftHalf'])
-          if (prependIndexByFrameKey === false) {
-            frameOpts.indexByFrameKey++
-          }
+          frameOpts.prependIndexByFrameKey = dragData.getIn(['dragOverData', 'draggingOverLeftHalf'])
         }
         state = tabs.moveTo(state, frame.get('tabId'), frameOpts, browserOpts, dragData.get('dropWindowId'))
       }
