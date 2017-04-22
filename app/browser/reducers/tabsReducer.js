@@ -152,16 +152,14 @@ const tabsReducer = (state, action) => {
         }
       }
       break
-    case appConstants.APP_DRAG_STOPPED: {
+    case appConstants.APP_DRAG_ENDED: {
       const dragData = state.get('dragData')
-      if (dragData.get('type') === dragTypes.TAB) {
+      if (dragData && dragData.get('type') === dragTypes.TAB) {
         const frame = dragData.get('data')
         const frameOpts = frameOptsFromFrame(frame).toJS()
         const browserOpts = { positionByMouseCursor: true }
-        if (dragData) {
-          frameOpts.indexByFrameKey = dragData.getIn(['dragOverData', 'draggingOverKey'])
-          frameOpts.prependIndexByFrameKey = dragData.getIn(['dragOverData', 'draggingOverLeftHalf'])
-        }
+        frameOpts.indexByFrameKey = dragData.getIn(['dragOverData', 'draggingOverKey'])
+        frameOpts.prependIndexByFrameKey = dragData.getIn(['dragOverData', 'draggingOverLeftHalf'])
         state = tabs.moveTo(state, frame.get('tabId'), frameOpts, browserOpts, dragData.get('dropWindowId'))
       }
       break

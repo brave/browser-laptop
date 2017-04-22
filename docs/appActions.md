@@ -1011,6 +1011,13 @@ Go forward in a history for a given tab
 
 
 
+### dragCancelled() 
+
+Notifies the app that a drop operation was cancelled
+because ESC was pressed.
+
+
+
 
 * * *
 

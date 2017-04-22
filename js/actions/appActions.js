@@ -1176,7 +1176,7 @@ const appActions = {
    */
   dragEnded: function () {
     AppDispatcher.dispatch({
-      actionType: appConstants.APP_DRAG_STOPPED
+      actionType: appConstants.APP_DRAG_ENDED
     })
   },
 
@@ -1259,6 +1259,16 @@ const appActions = {
       actionType: appConstants.APP_ON_GO_FORWARD_LONG,
       tabId,
       rect
+    })
+  },
+
+  /**
+   * Notifies the app that a drop operation was cancelled
+   * because ESC was pressed.
+   */
+  dragCancelled: function () {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_DRAG_CANCELLED
     })
   }
 }

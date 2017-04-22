@@ -172,9 +172,9 @@ describe('tabsReducer', function () {
     })
   })
 
-  describe('APP_DRAG_STOPPED', function () {
+  describe('APP_DRAG_ENDED', function () {
     const action = {
-      actionType: appConstants.APP_DRAG_STOPPED
+      actionType: appConstants.APP_DRAG_ENDED
     }
     it('moves tab to a new window', function () {
       const state = this.state.set('dragData', Immutable.fromJS({

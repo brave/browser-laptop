@@ -32,7 +32,7 @@ describe('dragDropReducer', function () {
       assert.deepEqual(newState.dragData.data, action.dragData)
     })
   })
-  describe('APP_DRAG_STOPPED', function () {
+  describe('APP_DRAG_ENDED', function () {
     it('deletes drag data from the action', function () {
       const state = Immutable.fromJS({
         dragData: {
@@ -48,7 +48,29 @@ describe('dragDropReducer', function () {
         }
       })
       const action = {
-        actionType: appConstants.APP_DRAG_STOPPED
+        actionType: appConstants.APP_DRAG_ENDED
+      }
+      const newState = dragDropReducer(state, action).toJS()
+      assert.equal(newState.dragData, undefined)
+    })
+  })
+  describe('APP_DRAG_CANCELLED', function () {
+    it('deletes drag data from the action', function () {
+      const state = Immutable.fromJS({
+        dragData: {
+          windowId: 7,
+          type: dragTypes.BOOKMARK,
+          data: {
+            meaningOfLife: 42
+          },
+          dropWindowId: 73,
+          dragOverData: {
+            twinOf73: 71
+          }
+        }
+      })
+      const action = {
+        actionType: appConstants.APP_DRAG_CANCELLED
       }
       const newState = dragDropReducer(state, action).toJS()
       assert.equal(newState.dragData, undefined)
