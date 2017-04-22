@@ -134,6 +134,7 @@ const globalStyles = {
     closeIconSize: '13px',
     narrowIconSize: '12px',
     dialogWidth: '422px',
+    dialogSmallWidth: '350px',
     dialogMediumWidth: '500px',
     dialogLargeWidth: '600px',
     dialogTopOffset: '30px',

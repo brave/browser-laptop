@@ -91,10 +91,10 @@ class LoginRequired extends React.Component {
         <CommonFormSection data-l10n-id='basicAuthMessage' data-l10n-args={JSON.stringify(l10nArgs)} />
         <CommonFormSection>
           <div className={css(styles.sectionWrapper)}>
-            <div data-test-id='loginLabel'
-              className={css(commonFormStyles.inputWrapper,
+            <div className={css(
+              commonFormStyles.inputWrapper,
               commonFormStyles.inputWrapper__label
-            )}>
+            )} data-test-id='loginLabel'>
               <label data-l10n-id='basicAuthUsernameLabel' htmlFor='loginUsername' />
               <label className={css(commonFormStyles.input__bottomRow)} data-l10n-id='basicAuthPasswordLabel' htmlFor='loginPassword' />
             </div>

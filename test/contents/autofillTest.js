@@ -1,7 +1,7 @@
 /* global describe, it, before, beforeEach */
 
 const Brave = require('../lib/brave')
-const {urlInput, autofillAddressPanel, autofillCreditCardPanel, clearBrowsingDataButton, securityTab} = require('../lib/selectors')
+const {urlInput, autofillAddressPanel, autofillCreditCardPanel, clearBrowsingDataButton, clearDataButton, securityTab} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 
 const addAddressButton = '[data-test-id="addAddressButton"]'
@@ -417,10 +417,10 @@ describe('Autofill', function () {
         .waitForVisible(clearBrowsingDataButton)
         .click(clearBrowsingDataButton)
         .waitForBrowserWindow()
-        .waitForVisible('.autofillDataSwitch')
-        .click('.autofillDataSwitch .switchMiddle')
-        .waitForVisible('.clearDataButton')
-        .click('.clearDataButton')
+        .waitForVisible('[data-test-id="autofillDataSwitch"]')
+        .click('[data-test-id="autofillDataSwitch"] .switchMiddle')
+        .waitForVisible(clearDataButton)
+        .click(clearDataButton)
     })
     it('does not autofill in regular tab', function * () {
       yield this.app.client
@@ -591,10 +591,10 @@ describe('Autofill', function () {
         .waitForVisible(clearBrowsingDataButton)
         .click(clearBrowsingDataButton)
         .waitForBrowserWindow()
-        .waitForVisible('.autocompleteDataSwitch')
-        .click('.autocompleteDataSwitch .switchMiddle')
-        .waitForVisible('.clearDataButton')
-        .click('.clearDataButton')
+        .waitForVisible('[data-test-id="autocompleteDataSwitch"]')
+        .click('[data-test-id="autocompleteDataSwitch"] .switchMiddle')
+        .waitForVisible(clearDataButton)
+        .click(clearDataButton)
       })
       it('does not autofill in regular tab', function * () {
         yield this.app.client

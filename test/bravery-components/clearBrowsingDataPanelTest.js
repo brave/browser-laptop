@@ -3,6 +3,7 @@
 const Brave = require('../lib/brave')
 const {urlInput, braveMenu, noScriptSwitch, braveryPanel, notificationBar, clearBrowsingDataButton, securityTab, clearDataButton} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
+const aboutPreferencesUrl = getTargetAboutUrl('about:preferences')
 const {getHistory} = require('../../app/common/lib/historyUtil')
 const messages = require('../../js/constants/messages')
 
@@ -25,7 +26,7 @@ describe('Clear Browsing Panel', function () {
   function * openClearBrowsingDataPanel (client) {
     return client
       .tabByIndex(0)
-      .loadUrl(getTargetAboutUrl('about:preferences'))
+      .loadUrl(aboutPreferencesUrl)
       .waitForVisible(securityTab)
       .click(securityTab)
       .waitForVisible(clearBrowsingDataButton)
@@ -46,12 +47,11 @@ describe('Clear Browsing Panel', function () {
 
     it('saves the history switch state', function * () {
       const page1Url = Brave.server.url('page1.html')
-      const browserHistorySwitch = '.browserHistorySwitch'
       yield openClearBrowsingDataPanel(this.app.client)
       yield this.app.client
-        .waitForVisible(browserHistorySwitch)
+        .waitForVisible('[data-test-id="browserHistorySwitch"]')
         .waitForVisible(clearDataButton)
-        .click(`${browserHistorySwitch} .switchBackground`)
+        .click('[data-test-id="browserHistorySwitch"] .switchBackground')
         .click(clearDataButton)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
@@ -69,7 +69,7 @@ describe('Clear Browsing Panel', function () {
         })
       yield openClearBrowsingDataPanel(this.app.client)
       yield this.app.client
-        .waitForVisible(`${browserHistorySwitch} .switchedOn`)
+        .waitForVisible('[data-test-id="browserHistorySwitch"] .switchedOn')
         .waitForVisible(clearDataButton)
         .click(clearDataButton)
         .waitUntil(function () {
@@ -99,10 +99,9 @@ describe('Clear Browsing Panel', function () {
     })
 
     it('shows clearing options', function * () {
-      const clearBrowsingDataButton = '.clearBrowsingDataButton'
       yield this.app.client
         .tabByIndex(0)
-        .loadUrl(getTargetAboutUrl('about:preferences'))
+        .loadUrl(aboutPreferencesUrl)
         .waitForVisible(securityTab)
         .click(securityTab)
         .waitForVisible(clearBrowsingDataButton)
@@ -111,13 +110,13 @@ describe('Clear Browsing Panel', function () {
     it('clears the browsing history', function * () {
       yield this.app.client
         .tabByIndex(0)
-        .loadUrl(getTargetAboutUrl('about:preferences'))
+        .loadUrl(aboutPreferencesUrl)
         .waitForVisible(securityTab)
         .click(securityTab)
         .waitForVisible(clearBrowsingDataButton)
         .click(clearBrowsingDataButton)
         .waitForBrowserWindow()
-        .waitForVisible('.browserHistorySwitch')
+        .waitForVisible('[data-test-id="browserHistorySwitch"]')
         .waitForVisible(clearDataButton)
         .click(clearDataButton)
         .waitUntil(function () {
@@ -200,14 +199,14 @@ describe('Clear Browsing Panel', function () {
     it('clears site settings and permissions', function * () {
       yield this.app.client
         .tabByIndex(0)
-        .loadUrl(getTargetAboutUrl('about:preferences'))
+        .loadUrl(aboutPreferencesUrl)
         .waitForVisible(securityTab)
         .click(securityTab)
         .waitForVisible(clearBrowsingDataButton)
         .click(clearBrowsingDataButton)
         .waitForBrowserWindow()
-        .waitForVisible('.siteSettingsSwitch')
-        .click('.siteSettingsSwitch .switchBackground')
+        .waitForVisible('[data-test-id="siteSettingsSwitch"]')
+        .click('[data-test-id="siteSettingsSwitch"] .switchBackground')
         .waitForVisible(clearDataButton)
         .click(clearDataButton)
         .waitUntil(function () {
