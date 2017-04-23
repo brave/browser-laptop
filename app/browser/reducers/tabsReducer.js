@@ -6,10 +6,14 @@
 
 const appConstants = require('../../../js/constants/appConstants')
 const tabs = require('../tabs')
+const {getWebContents} = require('../webContentsCache')
 const tabState = require('../../common/state/tabState')
 const windowConstants = require('../../../js/constants/windowConstants')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const {getFlashResourceId} = require('../../../js/flash')
+const Immutable = require('immutable')
+const dragTypes = require('../../../js/constants/dragTypes')
+const {frameOptsFromFrame} = require('../../../js/state/frameStateUtil')
 
 const tabsReducer = (state, action) => {
   action = makeImmutable(action)
@@ -20,9 +24,14 @@ const tabsReducer = (state, action) => {
     case appConstants.APP_TAB_CREATED:
       state = tabState.maybeCreateTab(state, action)
       break
-    case appConstants.APP_TAB_MOVED:
-      state = tabs.moveTo(state, action)
+    case appConstants.APP_TAB_MOVED: {
+      const tabId = action.get('tabId')
+      const frameOpts = action.get('frameOpts')
+      const browserOpts = action.get('browserOpts') || new Immutable.Map()
+      const windowId = action.get('windowId') || -1
+      state = tabs.moveTo(state, tabId, frameOpts, browserOpts, windowId)
       break
+    }
     case appConstants.APP_CREATE_TAB_REQUESTED:
       state = tabs.createTab(state, action)
       break
@@ -38,7 +47,7 @@ const tabsReducer = (state, action) => {
     case appConstants.APP_ALLOW_FLASH_ONCE:
     case appConstants.APP_ALLOW_FLASH_ALWAYS:
       {
-        const webContents = tabs.getWebContents(action.get('tabId'))
+        const webContents = getWebContents(action.get('tabId'))
         if (webContents && !webContents.isDestroyed() && webContents.getURL() === action.get('url')) {
           webContents.authorizePlugin(getFlashResourceId())
         }
@@ -68,6 +77,18 @@ const tabsReducer = (state, action) => {
     case appConstants.APP_FRAME_CHANGED:
       state = tabState.updateFrame(state, action)
       break
+    case appConstants.APP_DRAG_ENDED: {
+      const dragData = state.get('dragData')
+      if (dragData && dragData.get('type') === dragTypes.TAB) {
+        const frame = dragData.get('data')
+        const frameOpts = frameOptsFromFrame(frame).toJS()
+        const browserOpts = { positionByMouseCursor: true }
+        frameOpts.indexByFrameKey = dragData.getIn(['dragOverData', 'draggingOverKey'])
+        frameOpts.prependIndexByFrameKey = dragData.getIn(['dragOverData', 'draggingOverLeftHalf'])
+        state = tabs.moveTo(state, frame.get('tabId'), frameOpts, browserOpts, dragData.get('dropWindowId'))
+      }
+      break
+    }
   }
   return state
 }

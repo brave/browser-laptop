@@ -955,6 +955,13 @@ Notifies the app that a drop operation occurred
 
 
 
+### dragCancelled() 
+
+Notifies the app that a drop operation was cancelled
+because ESC was pressed.
+
+
+
 
 * * *
 

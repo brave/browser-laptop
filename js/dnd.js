@@ -12,8 +12,6 @@ const siteUtil = require('./state/siteUtil')
 const appStoreRenderer = require('./stores/appStoreRenderer')
 const {currentWindowId} = require('../app/renderer/currentWindow')
 
-let isDraggingInsideWindow = false
-
 module.exports.getInterBraveDragData = () => {
   return appStoreRenderer.state.getIn(['dragData', 'data'])
 }
@@ -21,22 +19,6 @@ module.exports.getInterBraveDragData = () => {
 module.exports.getInterBraveDragType = () => {
   return appStoreRenderer.state.getIn(['dragData', 'type'])
 }
-
-document.addEventListener('dragenter', () => {
-  isDraggingInsideWindow = true
-}, true)
-
-document.addEventListener('dragleave', (e) => {
-  if (!e.clientX && !e.clientY) {
-    isDraggingInsideWindow = false
-    appActions.draggedOver({
-      draggingOverKey: -1,
-      draggingOverWindowId: -1
-    })
-  }
-}, true)
-
-module.exports.isDraggingInsideWindow = () => isDraggingInsideWindow
 
 module.exports.onDragStart = (dragType, data, e) => {
   e.dataTransfer.effectAllowed = 'all'
@@ -47,9 +29,25 @@ module.exports.onDragStart = (dragType, data, e) => {
   appActions.dragStarted(currentWindowId, dragType, data)
 }
 
+document.addEventListener('keyup', (e) => {
+  if (e.keyCode === 27) {
+    appActions.dragCancelled()
+  }
+}, true)
+
 module.exports.onDragEnd = (dragType, key) => {
   windowActions.setContextMenuDetail()
-  appActions.dragEnded()
+  // TODO: This timeout is a hack to give time for the keyup event to fire.
+  // The keydown event is not fired currently for dragend events that
+  // are canceled with Escape because Chromium calls stopPropagation
+  // on the event.  We should patch chromium, then we can remove
+  // the hack below and allow keydown Escape to be propagated during a drag.
+  // This hack can lead to a user sometimes getting an accidental detached
+  // tab when they press escape if they hold down escape. But it works
+  // most of the time and that's not commonly done.
+  setTimeout(() => {
+    appActions.dragEnded()
+  }, 100)
 }
 
 module.exports.onDragOver = (dragType, sourceBoundingRect, draggingOverKey, draggingOverDetail, e) => {

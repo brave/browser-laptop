@@ -8,7 +8,6 @@ const ImmutableComponent = require('./immutableComponent')
 const {StyleSheet, css} = require('aphrodite')
 
 const windowActions = require('../actions/windowActions')
-const appActions = require('../actions/appActions')
 const locale = require('../l10n')
 const dragTypes = require('../constants/dragTypes')
 const messages = require('../constants/messages')
@@ -28,7 +27,6 @@ const {Favicon, AudioTabIcon, NewSessionIcon,
 const {getTabBreakpoint, tabUpdateFrameRate} = require('../../app/renderer/lib/tabUtil')
 const {isWindows} = require('../../app/common/lib/platformUtil')
 const {currentWindowId} = require('../../app/renderer/currentWindow')
-const {frameOptsFromFrame} = require('../state/frameStateUtil')
 
 class Tab extends ImmutableComponent {
   constructor () {
@@ -74,6 +72,15 @@ class Tab extends ImmutableComponent {
       sourceDragData.get('draggingOverWindowId') === currentWindowId
   }
 
+  get isDraggingOverSelf () {
+    const draggingOverData = this.props.dragData && this.props.dragData.get('dragOverData')
+    const sourceDragData = dnd.getInterBraveDragData()
+    if (!draggingOverData || !sourceDragData) {
+      return false
+    }
+    return draggingOverData.get('draggingOverKey') === sourceDragData.get('key')
+  }
+
   get isDraggingOverLeft () {
     if (!this.draggingOverData) {
       return false
@@ -113,29 +120,6 @@ class Tab extends ImmutableComponent {
 
   onDragEnd (e) {
     dnd.onDragEnd(dragTypes.TAB, this.frame, e)
-    // If there's no dropWindowId that means the user dropped it outside of Brave completely and we should
-    // create a new window with the tab.
-
-    // TODO(bridiver) - a window with a single tab should not be draggable
-    if (!dnd.isDraggingInsideWindow()) {
-      const frameOpts = frameOptsFromFrame(this.frame).toJS()
-      const browserOpts = { positionByMouseCursor: true }
-      let dropWindowId = -1
-      if (this.props.dragData) {
-        frameOpts.indexByFrameKey = this.props.dragData.getIn(['dragOverData', 'draggingOverKey'])
-        const prependIndexByFrameKey = this.props.dragData.getIn(['dragOverData', 'draggingOverLeftHalf'])
-        if (prependIndexByFrameKey === false) {
-          frameOpts.indexByFrameKey++
-        }
-        dropWindowId = this.props.dragData.get('dropWindowId') || this.props.dragData.getIn(['dragOverData', 'draggingOverWindowId']) || dropWindowId
-      }
-      // Disallow dragging a tab into a new window if the window you're dragging from has only 1 tab
-      // Also dragging out a pin is not cool, so not allowed!
-      if ((dropWindowId === -1 && windowStore.getFrames().size === 1) || this.frame.get('pinnedLocation')) {
-        return
-      }
-      appActions.tabMoved(this.frame.get('tabId'), frameOpts, browserOpts, dropWindowId)
-    }
   }
 
   onDragOver (e) {
@@ -281,8 +265,8 @@ class Tab extends ImmutableComponent {
     return <div
       className={cx({
         tabArea: true,
-        draggingOverLeft: this.isDraggingOverLeft,
-        draggingOverRight: this.isDraggingOverRight,
+        draggingOverLeft: this.isDraggingOverLeft && !this.isDraggingOverSelf,
+        draggingOverRight: this.isDraggingOverRight && !this.isDraggingOverSelf,
         isDragging: this.isDragging,
         isPinned: this.isPinned,
         partOfFullPageSet: this.props.partOfFullPageSet || !!this.props.tabWidth
