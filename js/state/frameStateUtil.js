@@ -7,6 +7,7 @@ const config = require('../constants/config')
 const {tabCloseAction} = require('../../app/common/constants/settingsEnums')
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
 const {isIntermediateAboutPage} = require('../lib/appUrlUtil')
+const urlParse = require('../../app/common/urlParse')
 
 const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
