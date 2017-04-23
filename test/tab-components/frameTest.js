@@ -208,6 +208,33 @@ describe('frame tests', function () {
     })
   })
 
+  describe('view source for file scheme', function () {
+    Brave.beforeAll(this)
+
+    before(function * () {
+      this.url = Brave.fixtureUrl('viewSourceForFileScheme.html')
+
+      this.webview1 = '.frameWrapper:nth-child(1) webview'
+      this.webview2 = '.frameWrapper:nth-child(2) webview'
+
+      yield setup(this.app.client)
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(this.url)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
+        .waitForExist(this.webview1)
+    })
+
+    it('should open in new tab', function * () {
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
+        .waitForTabCount(2)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(this.webview2)
+    })
+  })
+
   describe('resource loading', function () {
     Brave.beforeAll(this)
     before(function * () {
