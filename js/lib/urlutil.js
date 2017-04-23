@@ -242,7 +242,7 @@ const UrlUtil = {
    * @returns {String} The view-source URL.
    */
   getViewSourceUrlFromUrl: function (input) {
-    if (!UrlUtil.isHttpOrHttps(input) && !UrlUtil.isFileScheme(input) || UrlUtil.isImageAddress(input)) {
+    if ((!UrlUtil.isHttpOrHttps(input) && !UrlUtil.isFileScheme(input)) || UrlUtil.isImageAddress(input)) {
       return null
     }
     if (UrlUtil.isViewSourceUrl(input)) {

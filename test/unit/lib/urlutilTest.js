@@ -305,7 +305,7 @@ describe('urlutil', function () {
   describe('isFileScheme', function () {
     describe('returns true when input:', function () {
       it('is an absolute file path with scheme', function () {
-        assert.equal(UrlUtil.isFileScheme('file:///file/path/to/file'), true);
+        assert.equal(UrlUtil.isFileScheme('file:///file/path/to/file'), true)
       })
     })
     describe('returns false when input:', function () {
