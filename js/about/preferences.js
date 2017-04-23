@@ -11,7 +11,7 @@ const UrlUtil = require('../lib/urlutil')
 // Components
 const PreferenceNavigation = require('../../app/renderer/components/preferences/preferenceNavigation')
 const {SettingsList, SettingItem, SettingCheckbox, SettingItemIcon} = require('../../app/renderer/components/settings')
-const {SettingTextbox} = require('../../app/renderer/components/textbox')
+const {SettingTextbox} = require('../../app/renderer/components/common/textbox')
 const {SettingDropdown} = require('../../app/renderer/components/common/dropdown')
 const {DefaultSectionTitle} = require('../../app/renderer/components/common/sectionTitle')
 const Button = require('../components/button')
