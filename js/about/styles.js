@@ -11,8 +11,8 @@ const globalStyles = require('../../app/renderer/components/styles/global')
 require('../../less/button.less')
 require('../../less/forms.less')
 
-const {Textbox, FormTextbox, SettingTextbox, RecoveryKeyTextbox} = require('../../app/renderer/components/textbox')
-const {TextArea, DefaultTextArea} = require('../../app/renderer/components/textbox')
+const {Textbox, FormTextbox, SettingTextbox, RecoveryKeyTextbox} = require('../../app/renderer/components/common/textbox')
+const {TextArea, DefaultTextArea} = require('../../app/renderer/components/common/textbox')
 const {Dropdown, FormDropdown, SettingDropdown} = require('../../app/renderer/components/common/dropdown')
 
 const {
@@ -118,7 +118,7 @@ class AboutStyle extends ImmutableComponent {
           <h2>Plain textbox</h2>
           <Textbox placeholder='Textbox' />
           <Pre><Code>
-            const { '{Textbox}' } = require('../../app/renderer/components/textbox'){'\n'}
+            const { '{Textbox}' } = require('../../app/renderer/components/common/textbox'){'\n'}
             &lt;Textbox />
           </Code></Pre>
         </Container>
@@ -127,7 +127,7 @@ class AboutStyle extends ImmutableComponent {
           <h2>Textbox for use in forms</h2>
           <FormTextbox placeholder='FormTextbox' />
           <Pre><Code>
-            const { '{FormTextbox}' } = require('../../app/renderer/components/textbox'){'\n'}
+            const { '{FormTextbox}' } = require('../../app/renderer/components/common/textbox'){'\n'}
             &lt;FormTextbox />
           </Code></Pre>
         </Container>
@@ -136,7 +136,7 @@ class AboutStyle extends ImmutableComponent {
           <h2>Texbox used mostly in Preferences; has a fixed width</h2>
           <SettingTextbox placeholder='SettingTextbox' />
           <Pre><Code>
-            const { '{SettingTextbox}' } = require('../../app/renderer/components/textbox'){'\n'}
+            const { '{SettingTextbox}' } = require('../../app/renderer/components/common/textbox'){'\n'}
             &lt;SettingTextbox />
           </Code></Pre>
         </Container>
@@ -145,7 +145,7 @@ class AboutStyle extends ImmutableComponent {
           <h2>Textbox used on wallet recovery screen in Brave Payments</h2>
           <RecoveryKeyTextbox placeholder='RecoveryKeyTextbox' />
           <Pre><Code>
-            const { '{RecoveryKeyTextbox}' } = require('../../app/renderer/components/textbox'){'\n'}
+            const { '{RecoveryKeyTextbox}' } = require('../../app/renderer/components/common/textbox'){'\n'}
             &lt;RecoveryKeyTextbox />
           </Code></Pre>
         </Container>
@@ -154,7 +154,7 @@ class AboutStyle extends ImmutableComponent {
           <h2>Plain textarea</h2>
           <TextArea placeholder='TextArea' />
           <Pre><Code>
-            const { '{TextArea}' } = require('../../app/renderer/components/textbox'){'\n'}
+            const { '{TextArea}' } = require('../../app/renderer/components/common/textbox'){'\n'}
             &lt;TextArea />
           </Code></Pre>
         </Container>
@@ -163,7 +163,7 @@ class AboutStyle extends ImmutableComponent {
           <h2>Default textarea; font size is specified</h2>
           <DefaultTextArea placeholder='DefaultTextArea' />
           <Pre><Code>
-            const { '{DefaultTextArea}' } = require('../../app/renderer/components/textbox'){'\n'}
+            const { '{DefaultTextArea}' } = require('../../app/renderer/components/common/textbox'){'\n'}
             &lt;DefaultTextArea />
           </Code></Pre>
         </Container>

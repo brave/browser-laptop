@@ -11,7 +11,7 @@ const getSetting = require('../settings').getSetting
 const aboutActions = require('./aboutActions')
 const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
 const SwitchControl = require('../components/switchControl')
-const {DefaultTextArea} = require('../../app/renderer/components/textbox')
+const {DefaultTextArea} = require('../../app/renderer/components/common/textbox')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 

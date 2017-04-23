@@ -10,7 +10,7 @@ const globalStyles = require('../styles/global')
 const commonStyles = require('../styles/commonStyles')
 
 const {FormDropdown} = require('./dropdown')
-const {FormTextbox} = require('../textbox')
+const {FormTextbox} = require('./textbox')
 
 class CommonForm extends ImmutableComponent {
   render () {
