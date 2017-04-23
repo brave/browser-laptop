@@ -18,7 +18,7 @@ const {
   CommonFormTitle,
   CommonFormButtonWrapper,
   CommonFormBottomWrapper
-} = require('./commonForm')
+} = require('./common/commonForm')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 const commonStyles = require('./styles/commonStyles')

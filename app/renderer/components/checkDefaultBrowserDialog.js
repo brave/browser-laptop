@@ -26,7 +26,7 @@ const {
   CommonFormMedium,
   CommonFormSection,
   CommonFormButtonWrapper
-} = require('./commonForm')
+} = require('./common/commonForm')
 
 class CheckDefaultBrowserDialog extends ImmutableComponent {
   constructor () {

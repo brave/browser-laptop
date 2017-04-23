@@ -15,7 +15,7 @@ const cx = require('../../../js/lib/classSet')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 
-const {CommonFormSection} = require('./commonForm')
+const {CommonFormSection} = require('./common/commonForm')
 
 class WidevineInfo extends ImmutableComponent {
   constructor () {

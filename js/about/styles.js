@@ -33,7 +33,7 @@ const {
   CommonFormSubSection,
   CommonFormButtonWrapper,
   CommonFormBottomWrapper
-} = require('../../app/renderer/components/commonForm')
+} = require('../../app/renderer/components/common/commonForm')
 
 class Container extends ImmutableComponent {
   render () {
@@ -350,7 +350,7 @@ class AboutStyle extends ImmutableComponent {
             <Tab>CommonFormSubSection,{'\n'}</Tab>
             <Tab>CommonFormButtonWrapper,{'\n'}</Tab>
             <Tab>CommonFormBottomWrapper{'\n'}</Tab>
-            &#125; = require('../../app/renderer/components/commonForm'){'\n'}
+            &#125; = require('../../app/renderer/components/common/commonForm'){'\n'}
             {'\n'}
             &lt;CommonForm&gt;{'\n'}
             <Tab>&lt;CommonFormTitle&gt;CommonFormTitle&lt;/CommonFormTitle&gt;{'\n'}</Tab>
@@ -402,7 +402,7 @@ class AboutStyle extends ImmutableComponent {
             const &#123;{'\n'}
             <Tab>CommonForm,{'\n'}</Tab>
             <Tab>CommonFormTitle{'\n'}</Tab>
-            &#125; = require('../../app/renderer/components/commonForm'){'\n'}
+            &#125; = require('../../app/renderer/components/common/commonForm'){'\n'}
             {'\n'}
             &lt;CommonForm&gt;{'\n'}
             <Tab>&lt;CommonFormTitle&gt;CommonFormTitle&lt;/CommonFormTitle&gt;{'\n'}</Tab>
@@ -429,7 +429,7 @@ class AboutStyle extends ImmutableComponent {
             const &#123;{'\n'}
             <Tab>CommonForm,{'\n'}</Tab>
             <Tab>CommonFormSection{'\n'}</Tab>
-            &#125; = require('../../app/renderer/components/commonForm'){'\n'}
+            &#125; = require('../../app/renderer/components/common/commonForm'){'\n'}
             {'\n'}
             &lt;CommonForm&gt;{'\n'}
             <Tab>&lt;CommonFormSection&gt;{'\n'}</Tab>
@@ -461,7 +461,7 @@ class AboutStyle extends ImmutableComponent {
             <Tab>CommonForm,{'\n'}</Tab>
             <Tab>CommonFormSection,{'\n'}</Tab>
             <Tab>CommonFormDropdown{'\n'}</Tab>
-            &#125; = require('../../app/renderer/components/commonForm'){'\n'}
+            &#125; = require('../../app/renderer/components/common/commonForm'){'\n'}
             {'\n'}
             &lt;CommonForm&gt;{'\n'}
             <Tab>&lt;CommonFormSection&gt;{'\n'}</Tab>
@@ -498,7 +498,7 @@ class AboutStyle extends ImmutableComponent {
             <Tab>CommonFormSection,{'\n'}</Tab>
             <Tab>CommonFormSubSection,{'\n'}</Tab>
             <Tab>CommonFormDropdown{'\n'}</Tab>
-            &#125; = require('../../app/renderer/components/commonForm'){'\n'}
+            &#125; = require('../../app/renderer/components/common/commonForm'){'\n'}
             {'\n'}
             &lt;CommonForm&gt;{'\n'}
             <Tab>&lt;CommonFormSection&gt;{'\n'}</Tab>
@@ -532,7 +532,7 @@ class AboutStyle extends ImmutableComponent {
             const &#123;{'\n'}
             <Tab>CommonForm,{'\n'}</Tab>
             <Tab>CommonFormButtonWrapper{'\n'}</Tab>
-            &#125; = require('../../app/renderer/components/commonForm'){'\n'}
+            &#125; = require('../../app/renderer/components/common/commonForm'){'\n'}
             {'\n'}
             &lt;CommonForm&gt;{'\n'}
             <Tab>&lt;CommonFormButtonWrapper&gt;{'\n'}</Tab>
@@ -562,7 +562,7 @@ class AboutStyle extends ImmutableComponent {
             <Tab>CommonForm,{'\n'}</Tab>
             <Tab>CommonFormBottomWrapper,{'\n'}</Tab>
             <Tab>CommonFormClickable{'\n'}</Tab>
-            &#125; = require('../../app/renderer/components/commonForm'){'\n'}
+            &#125; = require('../../app/renderer/components/common/commonForm'){'\n'}
             {'\n'}
             &lt;CommonForm&gt;{'\n'}
             <Tab>&lt;CommonFormBottomWrapper&gt;{'\n'}</Tab>

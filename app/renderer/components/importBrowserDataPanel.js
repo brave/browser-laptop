@@ -20,7 +20,7 @@ const {
   CommonFormTitle,
   CommonFormButtonWrapper,
   CommonFormBottomWrapper
-} = require('./commonForm')
+} = require('./common/commonForm')
 
 class ImportBrowserDataPanel extends ImmutableComponent {
   constructor () {

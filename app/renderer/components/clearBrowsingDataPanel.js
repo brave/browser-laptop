@@ -17,7 +17,7 @@ const {
   CommonFormTitle,
   CommonFormButtonWrapper,
   CommonFormBottomWrapper
-} = require('./commonForm')
+} = require('./common/commonForm')
 
 class ClearBrowsingDataPanel extends React.Component {
   constructor (props) {

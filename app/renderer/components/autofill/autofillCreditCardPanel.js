@@ -22,7 +22,7 @@ const {
   CommonFormTextbox,
   CommonFormButtonWrapper,
   commonFormStyles
-} = require('../commonForm')
+} = require('../common/commonForm')
 
 class AutofillCreditCardPanel extends ImmutableComponent {
   constructor () {

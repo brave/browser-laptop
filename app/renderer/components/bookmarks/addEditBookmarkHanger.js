@@ -36,7 +36,7 @@ const {
   CommonFormButtonWrapper,
   CommonFormBottomWrapper,
   commonFormStyles
-} = require('../commonForm')
+} = require('../common/commonForm')
 
 class AddEditBookmarkHanger extends ImmutableComponent {
   constructor () {
