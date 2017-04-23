@@ -13,7 +13,7 @@ require('../../less/forms.less')
 
 const {Textbox, FormTextbox, SettingTextbox, RecoveryKeyTextbox} = require('../../app/renderer/components/textbox')
 const {TextArea, DefaultTextArea} = require('../../app/renderer/components/textbox')
-const {Dropdown, FormDropdown, SettingDropdown} = require('../../app/renderer/components/dropdown')
+const {Dropdown, FormDropdown, SettingDropdown} = require('../../app/renderer/components/common/dropdown')
 
 const {
   SectionTitleWrapper,
@@ -183,7 +183,7 @@ class AboutStyle extends ImmutableComponent {
             <option>Third Choice</option>
           </Dropdown>
           <Pre><Code>
-            const { '{Dropdown}' } = require('../../app/renderer/components/dropdown'){'\n'}
+            const { '{Dropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
             &lt;Dropdown>{'\n'}
             &nbsp;&nbsp;&lt;option>Select Box&lt;/option>{'\n'}
             &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
@@ -200,7 +200,7 @@ class AboutStyle extends ImmutableComponent {
             <option>Third Choice</option>
           </FormDropdown>
           <Pre><Code>
-            const { '{FormDropdown}' } = require('../../app/renderer/components/dropdown'){'\n'}
+            const { '{FormDropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
             &lt;FormDropdown>{'\n'}
             &nbsp;&nbsp;&lt;option>Select Box&lt;/option>{'\n'}
             &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
@@ -217,7 +217,7 @@ class AboutStyle extends ImmutableComponent {
             <option>Third Choice</option>
           </SettingDropdown>
           <Pre><Code>
-            const { '{SettingDropdown}' } = require('../../app/renderer/components/dropdown'){'\n'}
+            const { '{SettingDropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
             &lt;SettingDropdown>{'\n'}
             &nbsp;&nbsp;&lt;option>Select Box&lt;/option>{'\n'}
             &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}

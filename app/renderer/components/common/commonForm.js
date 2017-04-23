@@ -9,7 +9,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../styles/global')
 const commonStyles = require('../styles/commonStyles')
 
-const {FormDropdown} = require('../dropdown')
+const {FormDropdown} = require('./dropdown')
 const {FormTextbox} = require('../textbox')
 
 class CommonForm extends ImmutableComponent {

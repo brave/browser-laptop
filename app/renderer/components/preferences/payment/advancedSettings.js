@@ -12,7 +12,7 @@ const appConfig = require('../../../../../js/constants/appConfig')
 // components
 const Button = require('../../../../../js/components/button')
 const {SettingsList, SettingItem, SettingCheckbox} = require('../../settings')
-const {SettingDropdown} = require('../../dropdown')
+const {SettingDropdown} = require('../../common/dropdown')
 const ImmutableComponent = require('../../immutableComponent')
 
 // style
