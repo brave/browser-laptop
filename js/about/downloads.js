@@ -15,7 +15,7 @@ const ipc = window.chrome.ipcRenderer
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../../app/renderer/components/styles/global')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
-const {DownloadList} = require('../../app/renderer/components/list')
+const {DownloadList} = require('../../app/renderer/components/common/list')
 
 // Stylesheets
 require('../../less/about/common.less')
