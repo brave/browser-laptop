@@ -62,7 +62,7 @@ function setupFiltering () {
     }
 
     const parsedUrl = url.parse(details.url)
-    const directDownload = parsedUrl && parsedUrl.query && parsedUrl.query.includes('download=true')
+    const directDownload = parsedUrl && parsedUrl.query && parsedUrl.query.includes('download=ok')
     if (directDownload) {
       return {}
     }
