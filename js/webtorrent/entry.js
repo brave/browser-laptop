@@ -176,8 +176,7 @@ function saveTorrentFile () {
   let a = document.createElement('a')
   a.target = '_blank'
   a.download = true
-  a.href = `${store.torrentId}?download=true`
-  a.href = store.torrentId
+  a.href = `${store.torrentId}?download=ok`
   a.click()
 }
 
