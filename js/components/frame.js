@@ -13,6 +13,7 @@ const cx = require('../lib/classSet')
 const siteUtil = require('../state/siteUtil')
 const frameStateUtil = require('../state/frameStateUtil')
 const UrlUtil = require('../lib/urlutil')
+const {getZoomLevel} = require('../lib/zoom')
 const messages = require('../constants/messages')
 const contextMenus = require('../contextMenus')
 const ipc = require('electron').ipcRenderer
@@ -184,7 +185,18 @@ class Frame extends ImmutableComponent {
           this.runOnDomReady()
           delete this.runOnDomReady
         }
+        let zoomCallback = (e) => {
+          if (!e.isMainFrame) {
+            return
+          }
+          this.webview.removeEventListener(e.type, zoomCallback)
+          const zoomPercentage = this.frame && this.frame.get('lastZoomPercentage')
+          if (zoomPercentage !== this.webview.getZoomPercent()) {
+            this.webview.setZoomLevel(getZoomLevel(zoomPercentage))
+          }
+        }
         this.webview.addEventListener('did-attach', eventCallback)
+        this.webview.addEventListener('load-commit', zoomCallback)
       }
 
       if (!this.props.guestInstanceId || !this.webview.attachGuest(this.props.guestInstanceId)) {
@@ -226,12 +238,6 @@ class Frame extends ImmutableComponent {
     if (this.props.activeShortcut) {
       this.handleShortcut()
     }
-  }
-
-  get zoomLevel () {
-    const zoom = this.props.frameSiteSettings && this.props.frameSiteSettings.get('zoomLevel')
-    appActions.removeSiteSetting(this.origin, 'zoomLevel', this.props.isPrivate)
-    return zoom
   }
 
   zoomIn () {

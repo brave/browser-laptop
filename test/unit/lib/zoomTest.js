@@ -1,6 +1,6 @@
 /* global describe, it */
 
-const {getZoomValuePercentage, getNextZoomLevel} = require('../../../js/lib/zoom')
+const {getZoomValuePercentage, getZoomLevel, getNextZoomLevel} = require('../../../js/lib/zoom')
 const {zoom} = require('../../../js/constants/config')
 const assert = require('assert')
 
@@ -14,6 +14,17 @@ describe('zoom', function () {
     })
     it('formats negative 20% decrements', function * () {
       assert.equal(getZoomValuePercentage(-3.75), 25)
+    })
+  })
+  describe('getZoomLevel', function () {
+    it('formats 100 to 0', function * () {
+      assert.equal(getZoomLevel(100), 0)
+    })
+    it('formats positive value', function * () {
+      assert.equal(getZoomLevel(120), 1)
+    })
+    it('formats negative value', function * () {
+      assert.equal(getZoomLevel(25), -3.75)
     })
   })
   describe('getNextZoomLevel', function () {

@@ -264,7 +264,7 @@ AppStore
       savePasswords: boolean, // only false or undefined/null
       shieldsUp: boolean,
       widevine: (number|boolean), // false = block widevine, 0 = allow once, 1 = allow always
-      zoomLevel: number
+      zoomLevel: number // deprecated
     }
   },
   sync: {

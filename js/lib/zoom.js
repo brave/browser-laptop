@@ -8,6 +8,11 @@ const {zoom} = require('../constants/config')
 module.exports.getZoomValuePercentage = (zoomLevel) =>
   100 + (20 * zoomLevel)
 
+// Convert zoom percentage to zoom level
+module.exports.getZoomLevel = (percentage) => {
+  return (percentage - 100) / 20
+}
+
 module.exports.getNextZoomLevel = (currentZoom, zoomIn) => {
   const zoomLevels = zoom.zoomLevels
   // First find the closet value to what we allow

@@ -452,7 +452,6 @@ function addFrame (windowState, tabs, frameOpts, newKey, partitionNumber, active
   }
 
   const frame = Immutable.fromJS(Object.assign({
-    zoomLevel: config.zoom.defaultValue,
     audioMuted: false, // frame is muted
     location,
     aboutDetails: undefined,
