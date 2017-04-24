@@ -189,6 +189,7 @@ module.exports = {
     'advanced.minimum-visits': 1,
     'advanced.auto-suggest-sites': true,
     'advanced.hide-lower-sites': true,
+    'advanced.toolbar-ui-scale': 'normal',
     'shutdown.clear-history': false,
     'shutdown.clear-downloads': false,
     'shutdown.clear-cache': false,

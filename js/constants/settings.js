@@ -70,6 +70,7 @@ const settings = {
   MINIMUM_VISIT_TIME: 'advanced.minimum-visit-time',
   MINIMUM_VISITS: 'advanced.minimum-visits',
   AUTO_SUGGEST_SITES: 'advanced.auto-suggest-sites',
+  TOOLBAR_UI_SCALE: 'advanced.toolbar-ui-scale',
   // Sync settings
   SYNC_ENABLED: 'sync.enabled',
   SYNC_DEVICE_NAME: 'sync.device-name',

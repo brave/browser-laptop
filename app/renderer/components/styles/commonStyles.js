@@ -156,6 +156,10 @@ const styles = StyleSheet.create({
   noPaddingRight: {
     paddingRight: 0
   },
+  requiresRestart: {
+    fontStyle: 'italic',
+    marginBottom: '2em'
+  },
 
   // User select
   userSelect: {

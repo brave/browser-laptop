@@ -35,6 +35,7 @@ const basicAuth = require('../../app/browser/basicAuth')
 const webtorrent = require('../../app/browser/webtorrent')
 const assert = require('assert')
 const profiles = require('../../app/browser/profiles')
+const {zoomLevel} = require('../../app/common/constants/toolbarUserInterfaceScale')
 
 // state helpers
 const basicAuthState = require('../../app/common/state/basicAuthState')
@@ -191,6 +192,7 @@ const createWindow = (action) => {
 
   const homepageSetting = getSetting(settings.HOMEPAGE)
   const startupSetting = getSetting(settings.STARTUP_MODE)
+  const toolbarUserInterfaceScale = getSetting(settings.TOOLBAR_UI_SCALE)
 
   setImmediate(() => {
     let mainWindow = new BrowserWindow(Object.assign(windowProps, browserOpts, {disposition: frameOpts.disposition}))
@@ -221,7 +223,7 @@ const createWindow = (action) => {
 
     mainWindow.webContents.on('did-finish-load', (e) => {
       lastEmittedState = appState
-      mainWindow.webContents.setZoomLevel(0.0)
+      mainWindow.webContents.setZoomLevel(zoomLevel[toolbarUserInterfaceScale] || 0.0)
       e.sender.send(messages.INITIALIZE_WINDOW,
         {
           disposition: frameOpts.disposition,
@@ -346,6 +348,12 @@ function handleChangeSettingAction (settingKey, settingValue) {
     case settings.DEFAULT_ZOOM_LEVEL:
       filtering.setDefaultZoomLevel(settingValue)
       break
+    case settings.TOOLBAR_UI_SCALE: {
+      const newZoomLevel = zoomLevel[settingValue] || 0
+      BrowserWindow.getAllWindows().forEach(function (wnd) {
+        wnd.webContents.setZoomLevel(newZoomLevel)
+      })
+    } break
     default:
   }
 }
