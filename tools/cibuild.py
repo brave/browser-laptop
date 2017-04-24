@@ -4,7 +4,7 @@ import os
 import subprocess
 import sys
 import os.path
-MUON_VERSION = '2.58.4'
+MUON_VERSION = '2.58.5'
 CHROMEDRIVER_VERSION = '2.27'
 NODE_VERSION = '7.4.0'
 SOURCE_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
@@ -22,11 +22,13 @@ def execute(argv, env=os.environ):
     raise e
 
 def write_npmrc():
-  data = 'runtime = node\n' \
+  data = 'runtime = electron\n' \
   'target_arch = %s\n' \
   'brave_electron_version = %s\n' \
   'chromedriver_version = %s\n' \
-  'target = v%s\n' % (TARGET_ARCH, MUON_VERSION, CHROMEDRIVER_VERSION, NODE_VERSION)
+  'target = v%s\n' \
+  'disturl=http://brave-laptop-binaries.s3.amazonaws.com/atom-shell/dist/\n' \
+  'build_from_source = true' % (TARGET_ARCH, MUON_VERSION, CHROMEDRIVER_VERSION, MUON_VERSION)
   f = open('.npmrc','wb')
   f.write(data)
   f.close()
