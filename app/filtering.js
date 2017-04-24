@@ -33,6 +33,7 @@ const {adBlockResourceName} = require('./adBlock')
 const {updateElectronDownloadItem} = require('./browser/electronDownloadItem')
 const {fullscreenOption} = require('./common/constants/settingsEnums')
 const isThirdPartyHost = require('./browser/isThirdPartyHost')
+var extensionState = require('./common/state/extensionState.js')
 
 let appStore = null
 
@@ -664,11 +665,17 @@ module.exports.isResourceEnabled = (resourceName, url, isPrivate) => {
   // TODO(bridiver) - need to clean up the rest of this so web can
   // remove this because it duplicates checks made in siteSettings
   // and not all resources  are controlled by shields up/down
-  if (resourceName === 'flash' || resourceName === 'webtorrent') {
+  if (resourceName === 'flash') {
     return true
   }
 
   const appState = appStore.getState()
+
+  if (resourceName === 'webtorrent') {
+    const extension = extensionState.getExtensionById(appState, config.torrentExtensionId)
+    return extension !== undefined ? extension.get('enabled') : false
+  }
+
   const settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
   const tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), url)
 
