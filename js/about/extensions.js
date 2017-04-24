@@ -58,8 +58,9 @@ class ExtensionItem extends ImmutableComponent {
         <h3 className={css(styles.extensionTitle)}>{bravifyText(this.props.extension.get('name'))}</h3>
         <span className={css(styles.extensionVersion)}>{this.props.extension.get('version')}</span>
         {
+          // SAMPSON: Revisit to see if we can remove this Array.prototype.includes call
           !['__MSG_extDescriptionGoogleChrome__', '__MSG_appDesc__'].includes(this.props.extension.get('description'))
-          ? <div data-test-id='extensionDescription' data-l10n-id={this.props.extension.get('description')} />
+          ? <div data-test-id='extensionDescription' data-l10n-id={bravifyText(this.props.extension.get('description'))} />
           : null
         }
         <div className='extensionPath'><span data-l10n-id='extensionPathLabel' /> <span>{this.props.extension.get('base_path')}</span></div>
