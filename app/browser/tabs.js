@@ -627,7 +627,7 @@ const api = {
 
   goBack: (state, action) => {
     action = makeImmutable(action)
-    const tab = api.getWebContents(action.get('tabId'))
+    const tab = getWebContents(action.get('tabId'))
     if (tab && !tab.isDestroyed()) {
       tab.goBack()
     }
@@ -636,7 +636,7 @@ const api = {
 
   goForward: (state, action) => {
     action = makeImmutable(action)
-    const tab = api.getWebContents(action.get('tabId'))
+    const tab = getWebContents(action.get('tabId'))
     if (tab && !tab.isDestroyed()) {
       tab.goForward()
     }
@@ -645,7 +645,7 @@ const api = {
 
   goToIndex: (state, action) => {
     action = makeImmutable(action)
-    const tab = api.getWebContents(action.get('tabId'))
+    const tab = getWebContents(action.get('tabId'))
     if (tab && !tab.isDestroyed()) {
       tab.goToIndex(action.get('index'))
     }
@@ -653,7 +653,7 @@ const api = {
   },
 
   getHistoryEntries: (state, action) => {
-    const tab = api.getWebContents(action.get('tabId'))
+    const tab = getWebContents(action.get('tabId'))
     const sites = state ? state.get('sites') : null
 
     if (tab && !tab.isDestroyed()) {
