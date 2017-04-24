@@ -75,6 +75,12 @@ let ledgerClient = null
 let ledgerGeoIP = null
 let ledgerPublisher = null
 
+// testing data
+const testVerifiedPublishers = [
+  'brianbondy.com',
+  'clifton.io'
+]
+
 // TBD: remove these post beta [MTR]
 const logPath = 'ledger-log.json'
 const publisherPath = 'ledger-publisher.json'
@@ -184,6 +190,11 @@ const doAction = (action) => {
           if (action.value <= 0) break
 
           synopsis.options.minPublisherVisits = action.value
+          updatePublisherInfo()
+          break
+
+        case settings.PAYMENTS_NON_VERIFIED:
+          synopsis.options.showOnlyVerified = action.value
           updatePublisherInfo()
           break
 
@@ -1040,11 +1051,21 @@ var eligibleP = (publisher) => {
 }
 
 var visibleP = (publisher) => {
+  if (synopsis.options.showOnlyVerified === undefined) {
+    synopsis.options.showOnlyVerified = getSetting(settings.PAYMENTS_NON_VERIFIED)
+  }
+
+  const onlyVerified = !synopsis.options.showOnlyVerified
+
   return (
       eligibleP(publisher) &&
       (
         synopsis.publishers[publisher].options.exclude !== true ||
         stickyP(publisher)
+      ) &&
+      (
+        (onlyVerified && synopsis.publishers[publisher].options && synopsis.publishers[publisher].options.verified) ||
+        !onlyVerified
       )
     ) &&
     !blockedP(publisher)
@@ -1161,18 +1182,25 @@ var synopsisNormalizer = (changedPublisher) => {
 
   // round if over 100% of pinned publishers
   if (pinnedTotal > 100) {
-    const changedObject = dataPinned.filter(publisher => publisher.site === changedPublisher)[0]
-    const setOne = changedObject.pinPercentage > (100 - dataPinned.length - 1)
+    if (changedPublisher) {
+      const changedObject = dataPinned.filter(publisher => publisher.site === changedPublisher)[0]
+      const setOne = changedObject.pinPercentage > (100 - dataPinned.length - 1)
 
-    if (setOne) {
-      changedObject.pinPercentage = 100 - dataPinned.length + 1
-      changedObject.weight = changedObject.pinPercentage
+      if (setOne) {
+        changedObject.pinPercentage = 100 - dataPinned.length + 1
+        changedObject.weight = changedObject.pinPercentage
+      }
+
+      const pinnedRestTotal = pinnedTotal - changedObject.pinPercentage
+      dataPinned = dataPinned.filter(publisher => publisher.site !== changedPublisher)
+      dataPinned = normalizePinned(dataPinned, pinnedRestTotal, (100 - changedObject.pinPercentage), setOne)
+      dataPinned = roundToTarget(dataPinned, (100 - changedObject.pinPercentage), 'pinPercentage')
+
+      dataPinned.push(changedObject)
+    } else {
+      dataPinned = normalizePinned(dataPinned, pinnedTotal, 100)
+      dataPinned = roundToTarget(dataPinned, 100, 'pinPercentage')
     }
-
-    const pinnedRestTotal = pinnedTotal - changedObject.pinPercentage
-    dataPinned = dataPinned.filter(publisher => publisher.site !== changedPublisher)
-    dataPinned = normalizePinned(dataPinned, pinnedRestTotal, (100 - changedObject.pinPercentage), setOne)
-    dataPinned = roundToTarget(dataPinned, (100 - changedObject.pinPercentage), 'pinPercentage')
 
     dataUnPinned = dataUnPinned.map((result) => {
       let publisher = getPublisherData(result)
@@ -1180,8 +1208,6 @@ var synopsisNormalizer = (changedPublisher) => {
       publisher.weight = 0
       return publisher
     })
-
-    dataPinned.push(changedObject)
 
     // sync app store
     appActions.changeLedgerPinnedPercentages(dataPinned)
@@ -1388,6 +1414,19 @@ var excludeP = (publisher, callback) => {
 
 var verifiedP = (publisher, callback) => {
   inspectP(v2PublishersDB, v2PublishersPath, publisher, 'verified', null, callback)
+
+  if (process.env.NODE_ENV === 'test') {
+    testVerifiedPublishers.forEach((publisher) => {
+      if (synopsis.publishers[publisher]) {
+        if (!synopsis.publishers[publisher].options) {
+          synopsis.publishers[publisher].options = {}
+        }
+
+        synopsis.publishers[publisher].options.verified = true
+      }
+    })
+    updatePublisherInfo()
+  }
 }
 
 var inspectP = (db, path, publisher, property, key, callback) => {
@@ -1486,6 +1525,7 @@ var ledgerInfo = {
   // advanced ledger settings
   minPublisherDuration: undefined,
   minPublisherVisits: undefined,
+  showOnlyVerified: undefined,
 
   hasBitcoinHandler: false,
 
