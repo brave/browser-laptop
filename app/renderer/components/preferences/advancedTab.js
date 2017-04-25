@@ -12,7 +12,7 @@ const {getSetting} = require('../../../../js/settings')
 
 // Components
 const {SettingsList, SettingItem, SettingCheckbox} = require('../settings')
-const {SettingDropdown} = require('../dropdown')
+const {SettingDropdown} = require('../common/dropdown')
 const {DefaultSectionTitle} = require('../common/sectionTitle')
 
 // Constants
