@@ -1018,6 +1018,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
   const isInputField = nodeProps.isEditable || nodeProps.inputFieldType !== 'none'
   const isTextSelected = nodeProps.selectionText && nodeProps.selectionText.length > 0
   const isAboutPage = aboutUrls.has(frame.get('location'))
+  const isPrivate = frame.get('isPrivate')
 
   if (isLink) {
     template = addLinkMenu(nodeProps.linkURL, frame)
@@ -1034,7 +1035,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
             appActions.createTabRequested({
               url: nodeProps.srcURL,
               openerTabId: frame.get('tabId'),
-              partition: getPartitionFromNumber(frame.get('partitionNumber'), frame.get('isPrivate'))
+              partition: getPartitionFromNumber(frame.get('partitionNumber'), isPrivate)
             })
           }
         }
@@ -1068,7 +1069,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
               .replace('?q', 'byimage?image_url')
             appActions.createTabRequested({
               url: searchUrl,
-              isPrivate: frame.get('isPrivate'),
+              isPrivate,
               partitionNumber: frame.get('partitionNumber')
             })
           }
@@ -1220,8 +1221,9 @@ function mainTemplateInit (nodeProps, frame, tab) {
     })
   }
 
-  const extensionContextMenus =
-    extensionState.getContextMenusProperties(appStore.state)
+  const extensionContextMenus = isPrivate
+    ? undefined
+    : extensionState.getContextMenusProperties(appStore.state)
   if (extensionContextMenus !== undefined &&
     extensionContextMenus.length) {
     template.push(CommonMenu.separatorMenuItem)
