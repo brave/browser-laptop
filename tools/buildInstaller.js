@@ -38,13 +38,12 @@ if (isDarwin) {
 
     // Package it into a dmg
     'cd ..',
-    'electron-builder "' + buildDir + '/Brave.app"' +
-      ' --platform=osx ' +
-      ' --out="' + outDir + '" ' +
-      ' --config=res/builderConfig.json ' +
-      ' --overwrite',
+    'build ' +
+      '--prepackaged="' + buildDir + '/Brave.app" ' +
+      '--mac=dmg ' +
+      ' --config=res/builderConfig.json ',
 
-     // Create an update zip
+    // Create an update zip
     'ditto -c -k --sequesterRsrc --keepParent ' + buildDir + '/Brave.app dist/Brave-' + VersionInfo.braveVersion + '.zip'
   ]
   execute(cmds, {}, console.log.bind(null, 'done'))
