@@ -1,12 +1,29 @@
 /* global describe, it, beforeEach, before */
 
 const Brave = require('../lib/brave')
-const {urlInput, advancedSettingsButton, addFundsButton, paymentsWelcomePage, paymentsTab, walletSwitch, siteSettingItem, ledgerTable} = require('../lib/selectors')
+const {
+  urlInput,
+  advancedSettingsButton,
+  addFundsButton,
+  paymentsWelcomePage,
+  paymentsTab,
+  walletSwitch,
+  siteSettingItem,
+  ledgerTable,
+  securityTab
+} = require('../lib/selectors')
 const assert = require('assert')
 const settings = require('../../js/constants/settings')
 
 const prefsUrl = 'about:preferences'
 const ledgerAPIWaitTimeout = 20000
+const site1 = 'http://example.com/'
+const site2 = 'https://www.eff.org/'
+const site3 = 'http://web.mit.edu/zyan/Public/wait.html'
+
+function * setupBrave () {
+  Brave.addCommands()
+}
 
 function * setup (client) {
   yield client
@@ -115,6 +132,149 @@ describe('Regular payment panel tests', function () {
     })
   })
 
+  describe('ledger history', function () {
+    Brave.beforeAllServerSetup(this)
+
+    beforeEach(function * () {
+      yield Brave.startApp()
+      yield setupBrave(Brave.app.client)
+    })
+
+    it('is NOT cleared if payment is disabled before the close and clear history is false', function * () {
+      yield setup(Brave.app.client)
+      yield Brave.app.client
+        .tabByIndex(0)
+        .loadUrl(prefsUrl)
+        .waitForVisible(paymentsTab)
+        .click(paymentsTab)
+        .waitForVisible(paymentsWelcomePage)
+        .waitForVisible(walletSwitch)
+        .click(walletSwitch)
+        .waitForEnabled(addFundsButton, ledgerAPIWaitTimeout)
+        .tabByIndex(0)
+        .loadUrl(site1)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForSiteEntry(site1)
+        .tabByUrl(site1)
+        .loadUrl(site2)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForSiteEntry(site2)
+        .tabByUrl(site2)
+        .loadUrl(prefsUrl)
+        .waitForVisible(paymentsTab)
+        .click(paymentsTab)
+        .waitForElementCount('[data-tbody-index="1"] tr', 2)
+        .click(walletSwitch)
+        .waitForElementCount(addFundsButton, 0)
+      yield Brave.stopApp(false)
+
+      yield Brave.startApp()
+      yield setupBrave(Brave.app.client)
+      yield Brave.app.client
+        .waitForBrowserWindow()
+        .waitForVisible(urlInput)
+        .tabByIndex(0)
+        .waitForVisible(paymentsWelcomePage)
+        .waitForVisible(walletSwitch)
+        .click(walletSwitch)
+        .waitForEnabled(addFundsButton, ledgerAPIWaitTimeout)
+        .waitForElementCount('[data-tbody-index="1"] tr', 2)
+
+      yield Brave.stopApp()
+    })
+
+    it('is NOT cleared if payment is enabled before the close and clear history is true', function * () {
+      yield setup(Brave.app.client)
+      yield Brave.app.client
+        .tabByIndex(0)
+        .loadUrl(prefsUrl)
+        .waitForVisible(paymentsTab)
+        .click(paymentsTab)
+        .waitForVisible(paymentsWelcomePage)
+        .waitForVisible(walletSwitch)
+        .click(walletSwitch)
+        .waitForEnabled(addFundsButton, ledgerAPIWaitTimeout)
+        .tabByIndex(0)
+        .loadUrl(site1)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForSiteEntry(site1)
+        .tabByUrl(site1)
+        .loadUrl(site2)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForSiteEntry(site2)
+        .tabByUrl(site2)
+        .loadUrl(prefsUrl)
+        .waitForVisible(paymentsTab)
+        .click(paymentsTab)
+        .waitForElementCount('[data-tbody-index="1"] tr', 2)
+        .click(securityTab)
+        .waitForVisible('[data-test-id="clearBrowsingHistory"]')
+        .click('[data-test-id="clearBrowsingHistory"] .switchBackground')
+      yield Brave.stopApp(false)
+
+      yield Brave.startApp()
+      yield setupBrave(Brave.app.client)
+      yield Brave.app.client
+        .waitForBrowserWindow()
+        .waitForVisible(urlInput)
+        .tabByIndex(0)
+        .waitForVisible('[data-test-id="clearBrowsingHistory"]')
+        .click(paymentsTab)
+        .waitForEnabled(addFundsButton)
+        .waitForElementCount('[data-tbody-index="1"] tr', 2)
+
+      yield Brave.stopApp()
+    })
+
+    it('is CLEARED if payment is disabled before the close and clear history is true', function * () {
+      yield setup(Brave.app.client)
+      yield Brave.app.client
+        .tabByIndex(0)
+        .loadUrl(prefsUrl)
+        .waitForVisible(paymentsTab)
+        .click(paymentsTab)
+        .waitForVisible(paymentsWelcomePage)
+        .waitForVisible(walletSwitch)
+        .click(walletSwitch, ledgerAPIWaitTimeout)
+        .waitForEnabled(addFundsButton)
+        .tabByIndex(0)
+        .loadUrl(site1)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForSiteEntry(site1)
+        .tabByUrl(site1)
+        .loadUrl(site2)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForSiteEntry(site2)
+        .tabByUrl(site2)
+        .loadUrl(prefsUrl)
+        .waitForVisible(paymentsTab)
+        .click(paymentsTab)
+        .waitForElementCount('[data-tbody-index="1"] tr', 2)
+        .click(walletSwitch)
+        .waitForElementCount(addFundsButton, 0)
+        .click(securityTab)
+        .waitForVisible('[data-test-id="clearBrowsingHistory"]')
+        .click('[data-test-id="clearBrowsingHistory"] .switchBackground')
+      yield Brave.stopApp(false)
+
+      yield Brave.startApp()
+      yield setupBrave(Brave.app.client)
+      yield Brave.app.client
+        .waitForBrowserWindow()
+        .waitForVisible(urlInput)
+        .tabByIndex(0)
+        .waitForVisible('[data-test-id="clearBrowsingHistory"]')
+        .click(paymentsTab)
+        .waitForVisible(paymentsWelcomePage)
+        .waitForVisible(walletSwitch)
+        .click(walletSwitch, ledgerAPIWaitTimeout)
+        .waitForEnabled(addFundsButton)
+        .waitForElementCount('[data-tbody-index="1"] tr', 0)
+
+      yield Brave.stopApp()
+    })
+  })
+
   describe('auto include', function () {
     Brave.beforeEach(this)
 
@@ -133,8 +293,6 @@ describe('Regular payment panel tests', function () {
     })
 
     it('site is added automatically', function * () {
-      const site1 = 'http://example.com/'
-      const site2 = 'https://www.eff.org/'
       yield this.app.client
         .loadUrl(site1)
         .windowByUrl(Brave.browserWindowUrl)
@@ -162,8 +320,6 @@ describe('Regular payment panel tests', function () {
     })
 
     it('site is not added automatically', function * () {
-      const site1 = 'http://example.com/'
-      const site2 = 'https://www.eff.org/'
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
         .changeSetting(settings.AUTO_SUGGEST_SITES, false)
@@ -194,8 +350,6 @@ describe('Regular payment panel tests', function () {
     })
 
     it('first site included, second site excluded', function * () {
-      const site1 = 'http://example.com/'
-      const site2 = 'https://www.eff.org/'
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(site1)
@@ -250,12 +404,11 @@ describe('synopsis', function () {
   })
 
   it('creates synopsis table after visiting a site', function * () {
-    const site1 = 'http://web.mit.edu/zyan/Public/wait.html'
     yield this.app.client
-      .url(site1)
+      .url(site3)
       .waitForTextValue('div', 'done')
       .windowByUrl(Brave.browserWindowUrl)
-      .tabByUrl(site1)
+      .tabByUrl(site3)
       .loadUrl(prefsUrl)
       .waitForVisible(paymentsTab)
       .click(paymentsTab)
@@ -263,22 +416,19 @@ describe('synopsis', function () {
   })
 
   it('can sort synopsis table', function * () {
-    const site1 = 'http://web.mit.edu/zyan/Public/wait.html'
-    const site2 = 'http://example.com/'
-    const site3 = 'https://www.eff.org/'
     yield this.app.client
+      .loadUrl(site3)
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForSiteEntry(site3, false)
+      .tabByUrl(site3)
       .loadUrl(site1)
       .windowByUrl(Brave.browserWindowUrl)
-      .waitForSiteEntry(site1, false)
+      .waitForSiteEntry(site1)
       .tabByUrl(site1)
       .loadUrl(site2)
       .windowByUrl(Brave.browserWindowUrl)
       .waitForSiteEntry(site2)
       .tabByUrl(site2)
-      .loadUrl(site3)
-      .windowByUrl(Brave.browserWindowUrl)
-      .waitForSiteEntry(site3)
-      .tabByUrl(site3)
       .loadUrl(prefsUrl)
       .waitForVisible(paymentsTab)
       .click(paymentsTab)
@@ -298,9 +448,8 @@ describe('synopsis', function () {
   })
 
   it('can disable site', function * () {
-    const site1 = 'https://www.eff.org/'
     yield this.app.client
-      .loadUrl(site1)
+      .loadUrl(site2)
       .loadUrl(prefsUrl)
       .waitForVisible(paymentsTab)
       .click(paymentsTab)
