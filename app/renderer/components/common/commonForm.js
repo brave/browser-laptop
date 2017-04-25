@@ -12,21 +12,13 @@ const commonStyles = require('../styles/commonStyles')
 const {FormDropdown} = require('./dropdown')
 const {FormTextbox} = require('./textbox')
 
+/* See about:styles for templates */
+
 class CommonForm extends ImmutableComponent {
   render () {
     return <div className={css(
       commonStyles.flyoutDialog,
       styles.commonForm
-    )} {...this.props} />
-  }
-}
-
-class CommonFormMedium extends ImmutableComponent {
-  render () {
-    return <div className={css(
-      commonStyles.flyoutDialog,
-      styles.commonForm,
-      styles.commonFormMedium,
     )} {...this.props} />
   }
 }
@@ -37,6 +29,16 @@ class CommonFormSmall extends ImmutableComponent {
       commonStyles.flyoutDialog,
       styles.commonForm,
       styles.commonFormSmall
+    )} {...this.props} />
+  }
+}
+
+class CommonFormMedium extends ImmutableComponent {
+  render () {
+    return <div className={css(
+      commonStyles.flyoutDialog,
+      styles.commonForm,
+      styles.commonFormMedium,
     )} {...this.props} />
   }
 }
