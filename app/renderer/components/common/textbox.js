@@ -3,10 +3,11 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('./immutableComponent')
-const {StyleSheet, css} = require('aphrodite')
-const globalStyles = require('./styles/global')
-const commonStyles = require('./styles/commonStyles')
+const ImmutableComponent = require('../immutableComponent')
+const {StyleSheet, css} = require('aphrodite/no-important')
+
+const globalStyles = require('../styles/global')
+const commonStyles = require('../styles/commonStyles')
 
 // Textbox
 class Textbox extends ImmutableComponent {
@@ -14,8 +15,9 @@ class Textbox extends ImmutableComponent {
     const className = css(
       this.props['data-isFormControl'] && commonStyles.formControl,
       styles.textbox,
-      this.props['data-isSettings'] && styles.isSettings,
       (this.props.readonly || this.props.readOnly) ? styles.readOnly : styles.outlineable,
+      this.props['data-isCommonForm'] && styles.isCommonForm,
+      this.props['data-isSettings'] && styles.isSettings,
       this.props['data-isRecoveryKeyTextbox'] && styles.recoveryKeys
     )
 
@@ -72,6 +74,10 @@ const styles = StyleSheet.create({
       outlineStyle: 'solid',
       outlineWidth: '1px'
     }
+  },
+  isCommonForm: {
+    fontSize: globalStyles.fontSize.flyoutDialog,
+    width: '100%'
   },
   isSettings: {
     width: '280px'

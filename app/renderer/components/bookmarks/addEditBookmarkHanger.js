@@ -6,6 +6,7 @@ const React = require('react')
 
 // Components
 const ImmutableComponent = require('../immutableComponent')
+const Dialog = require('../../../../js/components/dialog')
 const Button = require('../../../../js/components/button')
 
 // Actions
@@ -22,6 +23,20 @@ const cx = require('../../../../js/lib/classSet')
 const siteUtil = require('../../../../js/state/siteUtil')
 const UrlUtil = require('../../../../js/lib/urlutil')
 const getSetting = require('../../../../js/settings').getSetting
+
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../styles/global')
+const commonStyles = require('../styles/commonStyles')
+
+const {
+  CommonFormBookmarkHanger,
+  CommonFormSection,
+  CommonFormDropdown,
+  CommonFormTextbox,
+  CommonFormButtonWrapper,
+  CommonFormBottomWrapper,
+  commonFormStyles
+} = require('../common/commonForm')
 
 class AddEditBookmarkHanger extends ImmutableComponent {
   constructor () {
@@ -170,71 +185,187 @@ class AddEditBookmarkHanger extends ImmutableComponent {
     appActions.createTabRequested({url: 'about:bookmarks'})
   }
   render () {
-    const props = this.props.isModal
-      ? {
-        className: 'fa fa-close',
-        onClick: this.onClose
-      }
+    const arrowUp = this.props.isModal
+      ? null
       : {
         className: cx({
-          arrowUp: true,
+          [css(styles.bookmarkHanger__arrowUp)]: true,
+          [css(styles.bookmarkHanger__withHomeButton)]: this.props.withHomeButton,
           withStopButton: this.props.withStopButton,
-          withHomeButton: this.props.withHomeButton,
           withoutButtons: this.props.withoutButtons
         })
       }
-    return <div className={cx({
-      bookmarkDialog: this.props.isModal,
-      bookmarkHanger: !this.props.isModal
-    })}>
-      <div className='bookmarkForm' onClick={this.onClick}>
-        <div {...props} />
 
-        <div className='bookmarkFormInner'>
-          <h2 data-l10n-id={this.heading} />
-          <div className='bookmarkFormTable'>
-            <div id='bookmarkName' className='bookmarkFormRow'>
-              <label data-l10n-id='nameField' htmlFor='bookmarkName' />
-              <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onNameChange} value={this.displayBookmarkName} ref={(bookmarkName) => { this.bookmarkName = bookmarkName }} />
-            </div>
+    return <Dialog className={cx({
+      bookmarkDialog: this.props.isModal,
+      bookmarkHanger: !this.props.isModal,
+      [css(styles.bookmarkHanger)]: !this.props.isModal
+    })} onHide={this.onClose} isClickDismiss>
+      <CommonFormBookmarkHanger onClick={this.onClick}>
+        <div {...arrowUp} />
+        <div className={cx({
+          [css(styles.commonFormSection)]: true,
+          [css(styles.commonFormTitle)]: true
+        })} data-l10n-id={this.heading} />
+        <CommonFormSection>
+          <div className={css(styles.bookmark__sectionWrapper)}>
+            <section>
+              <label className={css(styles.bookmarkHanger__label)}
+                data-l10n-id='nameField' htmlFor='bookmarkName' />
+              <div className={css(
+                commonFormStyles.inputWrapper,
+                commonFormStyles.inputWrapper__input
+              )}>
+                <input className={css(
+                  commonStyles.formControl,
+                  commonStyles.textbox,
+                  commonStyles.textbox__outlineable,
+                  commonFormStyles.input__box,
+                )}
+                  data-test-id='bookmarkNameInput'
+                  spellCheck='false'
+                  onKeyDown={this.onKeyDown}
+                  onChange={this.onNameChange}
+                  value={this.displayBookmarkName}
+                  ref={(bookmarkName) => { this.bookmarkName = bookmarkName }}
+                />
+              </div>
+            </section>
             {
               !this.isFolder && this.props.shouldShowLocation
-              ? <div id='bookmarkLocation' className='bookmarkFormRow'>
-                <label data-l10n-id='locationField' htmlFor='bookmarkLocation' />
-                <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onLocationChange} value={this.props.currentDetail.get('location')} />
-              </div>
+              ? <section className={css(styles.bookmarkHanger__marginRow)}>
+                <div className={css(
+                  commonFormStyles.inputWrapper,
+                  commonFormStyles.inputWrapper__input
+                )}>
+                  <label className={css(styles.bookmarkHanger__label)}
+                    data-l10n-id='locationField' htmlFor='bookmarkLocation' />
+                  <CommonFormTextbox
+                    data-test-id='bookmarkLocationInput'
+                    spellCheck='false'
+                    onKeyDown={this.onKeyDown}
+                    onChange={this.onLocationChange}
+                    value={this.props.currentDetail.get('location')}
+                  />
+                </div>
+              </section>
               : null
             }
-            <div id='bookmarkParentFolder' className='bookmarkFormRow'>
-              <label data-l10n-id='parentFolderField' htmlFor='bookmarkParentFolder' />
-              <select value={this.props.currentDetail.get('parentFolderId')}
+            <div className={css(
+              commonFormStyles.inputWrapper,
+              commonFormStyles.inputWrapper__input,
+              styles.bookmarkHanger__marginRow,
+            )}>
+              <label className={css(styles.bookmarkHanger__label)}
+                data-l10n-id='parentFolderField' htmlFor='bookmarkParentFolder' />
+              <CommonFormDropdown
+                data-test-id='bookmarkParentFolder'
+                value={this.props.currentDetail.get('parentFolderId')}
                 onChange={this.onParentFolderChange} >
                 <option value='0' data-l10n-id='bookmarksToolbar' />
                 {
                   this.folders.map((folder) => <option value={folder.folderId}>{folder.label}</option>)
                 }
-              </select>
-            </div>
-            <div className='bookmarkButtons'>
-              {
-                this.props.originalDetail
-                ? <Button l10nId='remove' className='whiteButton wideButton' onClick={this.onRemoveBookmark} />
-                : null
-              }
-              <Button l10nId='done' disabled={!this.bookmarkNameValid} className='primaryButton wideButton' onClick={this.onSave} />
+              </CommonFormDropdown>
             </div>
           </div>
-        </div>
+        </CommonFormSection>
+        <CommonFormButtonWrapper>
+          {
+            this.props.originalDetail
+            ? <Button className='whiteButton'
+              l10nId='remove'
+              testId='bookmarkHangerRemoveButton'
+              onClick={this.onRemoveBookmark}
+            />
+            : <Button className='whiteButton'
+              l10nId='cancel'
+              testId='bookmarkHangerCancelButton'
+              onClick={this.onClose}
+            />
+          }
+          <Button className='primaryButton'
+            l10nId='done'
+            testId='bookmarkHangerDoneButton'
+            disabled={!this.bookmarkNameValid}
+            onClick={this.onSave}
+          />
+        </CommonFormButtonWrapper>
         {
           !this.props.isModal
-            ? <div className='bookmarkFormFooter'>
-              <Button l10nId='viewBookmarks' onClick={this.onViewBookmarks} />
-            </div>
+            ? <CommonFormBottomWrapper>
+              <div className={css(styles.bookmark__bottomWrapper, styles.bottomWrapper__cursor)}
+                data-test-id='viewBookmarks'
+                data-l10n-id='viewBookmarks'
+                onClick={this.onViewBookmarks} />
+            </CommonFormBottomWrapper>
             : null
         }
-      </div>
-    </div>
+      </CommonFormBookmarkHanger>
+    </Dialog>
   }
 }
+
+const styles = StyleSheet.create({
+  // Copied from commonForm.js
+  commonFormSection: {
+    // PR #7985
+    margin: `${globalStyles.spacing.dialogInsideMargin} 30px`
+  },
+  commonFormTitle: {
+    color: globalStyles.color.braveOrange,
+    fontSize: '1.2em'
+  },
+
+  bookmarkHanger: {
+    justifyContent: 'flex-start',
+    background: 'none',
+
+    // TODO: refactor navigationBar.less to remove !important
+    animation: 'none !important',
+    zIndex: `${globalStyles.zindex.zindexDialogs} !important`,
+
+    ':focus': {
+      outline: 'none'
+    }
+  },
+  bookmarkHanger__arrowUp: {
+    position: 'relative',
+    left: '54px',
+
+    '::after': {
+      content: '""',
+      position: 'absolute',
+      width: 0,
+      height: 0,
+      border: `8px solid ${globalStyles.color.commonFormBackgroundColor}`,
+      boxShadow: globalStyles.shadow.bookmarkHangerArrowUpShadow,
+      transformOrigin: '0 0',
+      transform: 'rotate(135deg)'
+    }
+  },
+  bookmarkHanger__withHomeButton: {
+    left: '83px'
+  },
+  bookmarkHanger__label: {
+    display: 'block',
+    marginBottom: `calc(${globalStyles.spacing.dialogInsideMargin} / 3)`
+  },
+  bookmarkHanger__marginRow: {
+    marginTop: `calc(${globalStyles.spacing.dialogInsideMargin} / 2)`
+  },
+
+  bookmark__sectionWrapper: {
+    display: 'flex',
+    flexFlow: 'column nowrap'
+  },
+  bookmark__bottomWrapper: {
+    display: 'flex',
+    justifyContent: 'center'
+  },
+  bottomWrapper__cursor: {
+    cursor: 'pointer'
+  }
+})
 
 module.exports = AddEditBookmarkHanger

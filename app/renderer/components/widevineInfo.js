@@ -11,6 +11,11 @@
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 const appConfig = require('../../../js/constants/appConfig')
+const cx = require('../../../js/lib/classSet')
+
+const {StyleSheet, css} = require('aphrodite/no-important')
+
+const {CommonFormSection} = require('./common/commonForm')
 
 class WidevineInfo extends ImmutableComponent {
   constructor () {
@@ -29,23 +34,39 @@ class WidevineInfo extends ImmutableComponent {
     })
   }
   render () {
-    return <div className='widevineInfo'>
-      <div className='subtext'>
+    return <div data-test-id='widevineInfo'>
+      <CommonFormSection>
         <span data-l10n-id='enableWidevineSubtext' />
-        <span className='fa fa-info-circle'
+        <span className={cx({
+          fa: true,
+          'fa-info-circle': true,
+          [css(styles.cursor)]: true
+        })}
+          data-test-id='onMoreInfo'
           onClick={this.onMoreInfo}
           title={appConfig.widevine.moreInfoUrl}
         />
-      </div>
-      <div className='subtext'>
+      </CommonFormSection>
+      <CommonFormSection>
         <span data-l10n-id='enableWidevineSubtext2' />
-        <span className='fa fa-info-circle'
+        <span className={cx({
+          fa: true,
+          'fa-info-circle': true,
+          [css(styles.cursor)]: true
+        })}
+          data-test-id='onViewLicense'
           onClick={this.onViewLicense}
           title={appConfig.widevine.licenseUrl}
         />
-      </div>
+      </CommonFormSection>
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  cursor: {
+    cursor: 'pointer'
+  }
+})
 
 module.exports = WidevineInfo

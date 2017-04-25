@@ -3,9 +3,9 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('./immutableComponent')
+const ImmutableComponent = require('../immutableComponent')
 const {StyleSheet, css} = require('aphrodite/no-important')
-const globalStyles = require('./styles/global')
+const globalStyles = require('../styles/global')
 
 class List extends ImmutableComponent {
   render () {

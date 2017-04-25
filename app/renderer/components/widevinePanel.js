@@ -13,6 +13,16 @@ const windowActions = require('../../../js/actions/windowActions')
 const appActions = require('../../../js/actions/appActions')
 const siteUtil = require('../../../js/state/siteUtil')
 
+const {
+  CommonFormLarge,
+  CommonFormTitle,
+  CommonFormButtonWrapper,
+  CommonFormBottomWrapper
+} = require('./common/commonForm')
+
+const {StyleSheet, css} = require('aphrodite/no-important')
+const commonStyles = require('./styles/commonStyles')
+
 class ImportBrowserDataPanel extends ImmutableComponent {
   constructor () {
     super()
@@ -38,28 +48,49 @@ class ImportBrowserDataPanel extends ImmutableComponent {
     if (isLinux) {
       return null
     }
-    return <Dialog onHide={this.props.onHide} className='commonDialog' isClickDismiss>
-      <div className='commonForm' onClick={(e) => e.stopPropagation()}>
-        <h2 className='formSection commonFormTitle' data-l10n-id='widevinePanelTitle' />
-        <div className='formSection'>
-          <WidevineInfo createTabRequestedAction={appActions.createTabRequested} />
-        </div>
-        <div className='formSection commonFormButtons'>
-          <Button l10nId='cancel' className='whiteButton' onClick={this.props.onHide} />
-          <Button l10nId='installAndAllow' className='primaryButton' onClick={this.onInstallAndAllow} />
-        </div>
-        <div className='formSection commonFormBottom'>
-          <div className='commonFormButtonGroup'>
+    /*
+       Removed 'isClickDismiss' from Dialog.
+       Installing Widevine influences globally, not specific to a tab,
+       like Adobe Flash. Removing isClickDismiss would make it clear that
+       the third party software which we discourage from using is going
+       to be installed on the computer.
+    */
+    return <Dialog onHide={this.props.onHide} testId='widevinePanelDialog'>
+      <CommonFormLarge onClick={(e) => e.stopPropagation()}>
+        <CommonFormTitle data-l10n-id='widevinePanelTitle' />
+        <WidevineInfo createTabRequestedAction={appActions.createTabRequested} />
+        <CommonFormButtonWrapper>
+          <Button className='whiteButton'
+            l10nId='cancel'
+            testId='cancelButton'
+            onClick={this.props.onHide}
+          />
+          <Button className='primaryButton'
+            l10nId='installAndAllow'
+            testId='installAndAllowButton'
+            onClick={this.onInstallAndAllow} />
+        </CommonFormButtonWrapper>
+        <CommonFormBottomWrapper>
+          <div className={css(styles.flexJustifyCenter)}>
+            {/* TODO: refactor switchControl.js to remove commonStyles.noPadding */}
             <SwitchControl id={this.props.prefKey}
+              className={css(commonStyles.noPadding)}
               rightl10nId='rememberThisDecision'
               rightl10nArgs={JSON.stringify({origin: this.origin})}
               onClick={this.onClickRememberForNetflix}
               checkedOn={this.props.widevinePanelDetail.get('alsoAddRememberSiteSetting')} />
           </div>
-        </div>
-      </div>
+        </CommonFormBottomWrapper>
+      </CommonFormLarge>
     </Dialog>
   }
 }
+
+const styles = StyleSheet.create({
+  flexJustifyCenter: {
+    display: 'flex',
+    justifyContent: 'center'
+  }
+})
 
 module.exports = ImportBrowserDataPanel

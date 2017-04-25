@@ -113,6 +113,7 @@ const globalStyles = {
     downloadsBarHeight: '50px',
     tabsToolbarHeight: '26px',
     tabPagesHeight: '7px',
+    bookmarkHangerMaxWidth: '350px',
     bookmarksToolbarHeight: '24px',
     bookmarksToolbarWithFaviconsHeight: '24px',
     bookmarksFileIconSize: '13px',
@@ -132,6 +133,10 @@ const globalStyles = {
     iconSize: '16px',
     closeIconSize: '13px',
     narrowIconSize: '12px',
+    dialogWidth: '422px',
+    dialogSmallWidth: '350px',
+    dialogMediumWidth: '500px',
+    dialogLargeWidth: '600px',
     dialogTopOffset: '30px',
     dialogInsideMargin: '18px',
     paymentsMargin: '20px',
@@ -148,7 +153,8 @@ const globalStyles = {
     softBoxShadow: '0 4px 8px lightGray',
     lightBoxShadow: '0 2px 2px lightGray',
     insetShadow: 'inset -5px 0 15px rgba(0, 0, 0, 0.25)',
-    orangeButtonShadow: '0 2px 0 braveDarkOrange'
+    orangeButtonShadow: '0 2px 0 braveDarkOrange',
+    bookmarkHangerArrowUpShadow: '-2px 2px 3px 0px rgba(0, 0, 0, 0.1)'
   },
   transition: {
     transitionDuration: '100ms',

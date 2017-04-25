@@ -21,6 +21,20 @@ const styles = StyleSheet.create({
     width: '100%'
   },
 
+  // Textbox -- copied from textbox.js
+  textbox: {
+    boxSizing: 'border-box',
+    width: 'auto'
+  },
+  textbox__outlineable: {
+    ':focus': {
+      outlineColor: globalStyles.color.statsBlue,
+      outlineOffset: '-4px',
+      outlineStyle: 'solid',
+      outlineWidth: '1px'
+    }
+  },
+
   // Dialogs
   flyoutDialog: {
     background: globalStyles.color.toolbarBackground,
@@ -132,6 +146,9 @@ const styles = StyleSheet.create({
   },
 
   // margin/padding
+  noMargin: {
+    margin: 0
+  },
   noMarginTop: {
     marginTop: 0
   },
@@ -143,6 +160,9 @@ const styles = StyleSheet.create({
   },
   noMarginRight: {
     marginRight: 0
+  },
+  noPadding: {
+    padding: 0
   },
   noPaddingTop: {
     paddingTop: 0

@@ -216,7 +216,11 @@ class AboutHistory extends React.Component {
               : <span className='fa fa-search searchInputPlaceholder' />
             }
           </div>
-          <Button l10nId='clearBrowsingDataNow' className='primaryButton clearBrowsingDataButton' onClick={this.clearBrowsingDataNow} />
+          <Button className='primaryButton'
+            l10nId='clearBrowsingDataNow'
+            testId='clearBrowsingDataButton'
+            onClick={this.clearBrowsingDataNow}
+          />
         </div>
       </div>
 

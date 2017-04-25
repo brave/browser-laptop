@@ -11,9 +11,9 @@ const globalStyles = require('../../app/renderer/components/styles/global')
 require('../../less/button.less')
 require('../../less/forms.less')
 
-const {Textbox, FormTextbox, SettingTextbox, RecoveryKeyTextbox} = require('../../app/renderer/components/textbox')
-const {TextArea, DefaultTextArea} = require('../../app/renderer/components/textbox')
-const {Dropdown, FormDropdown, SettingDropdown} = require('../../app/renderer/components/dropdown')
+const {Textbox, FormTextbox, SettingTextbox, RecoveryKeyTextbox} = require('../../app/renderer/components/common/textbox')
+const {TextArea, DefaultTextArea} = require('../../app/renderer/components/common/textbox')
+const {Dropdown, FormDropdown, SettingDropdown} = require('../../app/renderer/components/common/dropdown')
 
 const {
   SectionTitleWrapper,
@@ -33,7 +33,7 @@ const {
   CommonFormSubSection,
   CommonFormButtonWrapper,
   CommonFormBottomWrapper
-} = require('../../app/renderer/components/commonForm')
+} = require('../../app/renderer/components/common/commonForm')
 
 class Container extends ImmutableComponent {
   render () {
@@ -118,7 +118,7 @@ class AboutStyle extends ImmutableComponent {
           <h2>Plain textbox</h2>
           <Textbox placeholder='Textbox' />
           <Pre><Code>
-            const { '{Textbox}' } = require('../../app/renderer/components/textbox'){'\n'}
+            const { '{Textbox}' } = require('../../app/renderer/components/common/textbox'){'\n'}
             &lt;Textbox />
           </Code></Pre>
         </Container>
@@ -127,7 +127,7 @@ class AboutStyle extends ImmutableComponent {
           <h2>Textbox for use in forms</h2>
           <FormTextbox placeholder='FormTextbox' />
           <Pre><Code>
-            const { '{FormTextbox}' } = require('../../app/renderer/components/textbox'){'\n'}
+            const { '{FormTextbox}' } = require('../../app/renderer/components/common/textbox'){'\n'}
             &lt;FormTextbox />
           </Code></Pre>
         </Container>
@@ -136,7 +136,7 @@ class AboutStyle extends ImmutableComponent {
           <h2>Texbox used mostly in Preferences; has a fixed width</h2>
           <SettingTextbox placeholder='SettingTextbox' />
           <Pre><Code>
-            const { '{SettingTextbox}' } = require('../../app/renderer/components/textbox'){'\n'}
+            const { '{SettingTextbox}' } = require('../../app/renderer/components/common/textbox'){'\n'}
             &lt;SettingTextbox />
           </Code></Pre>
         </Container>
@@ -145,7 +145,7 @@ class AboutStyle extends ImmutableComponent {
           <h2>Textbox used on wallet recovery screen in Brave Payments</h2>
           <RecoveryKeyTextbox placeholder='RecoveryKeyTextbox' />
           <Pre><Code>
-            const { '{RecoveryKeyTextbox}' } = require('../../app/renderer/components/textbox'){'\n'}
+            const { '{RecoveryKeyTextbox}' } = require('../../app/renderer/components/common/textbox'){'\n'}
             &lt;RecoveryKeyTextbox />
           </Code></Pre>
         </Container>
@@ -154,7 +154,7 @@ class AboutStyle extends ImmutableComponent {
           <h2>Plain textarea</h2>
           <TextArea placeholder='TextArea' />
           <Pre><Code>
-            const { '{TextArea}' } = require('../../app/renderer/components/textbox'){'\n'}
+            const { '{TextArea}' } = require('../../app/renderer/components/common/textbox'){'\n'}
             &lt;TextArea />
           </Code></Pre>
         </Container>
@@ -163,7 +163,7 @@ class AboutStyle extends ImmutableComponent {
           <h2>Default textarea; font size is specified</h2>
           <DefaultTextArea placeholder='DefaultTextArea' />
           <Pre><Code>
-            const { '{DefaultTextArea}' } = require('../../app/renderer/components/textbox'){'\n'}
+            const { '{DefaultTextArea}' } = require('../../app/renderer/components/common/textbox'){'\n'}
             &lt;DefaultTextArea />
           </Code></Pre>
         </Container>
@@ -183,7 +183,7 @@ class AboutStyle extends ImmutableComponent {
             <option>Third Choice</option>
           </Dropdown>
           <Pre><Code>
-            const { '{Dropdown}' } = require('../../app/renderer/components/dropdown'){'\n'}
+            const { '{Dropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
             &lt;Dropdown>{'\n'}
             &nbsp;&nbsp;&lt;option>Select Box&lt;/option>{'\n'}
             &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
@@ -200,7 +200,7 @@ class AboutStyle extends ImmutableComponent {
             <option>Third Choice</option>
           </FormDropdown>
           <Pre><Code>
-            const { '{FormDropdown}' } = require('../../app/renderer/components/dropdown'){'\n'}
+            const { '{FormDropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
             &lt;FormDropdown>{'\n'}
             &nbsp;&nbsp;&lt;option>Select Box&lt;/option>{'\n'}
             &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
@@ -217,7 +217,7 @@ class AboutStyle extends ImmutableComponent {
             <option>Third Choice</option>
           </SettingDropdown>
           <Pre><Code>
-            const { '{SettingDropdown}' } = require('../../app/renderer/components/dropdown'){'\n'}
+            const { '{SettingDropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
             &lt;SettingDropdown>{'\n'}
             &nbsp;&nbsp;&lt;option>Select Box&lt;/option>{'\n'}
             &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
@@ -350,7 +350,7 @@ class AboutStyle extends ImmutableComponent {
             <Tab>CommonFormSubSection,{'\n'}</Tab>
             <Tab>CommonFormButtonWrapper,{'\n'}</Tab>
             <Tab>CommonFormBottomWrapper{'\n'}</Tab>
-            &#125; = require('../../app/renderer/components/commonForm'){'\n'}
+            &#125; = require('../../app/renderer/components/common/commonForm'){'\n'}
             {'\n'}
             &lt;CommonForm&gt;{'\n'}
             <Tab>&lt;CommonFormTitle&gt;CommonFormTitle&lt;/CommonFormTitle&gt;{'\n'}</Tab>
@@ -402,7 +402,7 @@ class AboutStyle extends ImmutableComponent {
             const &#123;{'\n'}
             <Tab>CommonForm,{'\n'}</Tab>
             <Tab>CommonFormTitle{'\n'}</Tab>
-            &#125; = require('../../app/renderer/components/commonForm'){'\n'}
+            &#125; = require('../../app/renderer/components/common/commonForm'){'\n'}
             {'\n'}
             &lt;CommonForm&gt;{'\n'}
             <Tab>&lt;CommonFormTitle&gt;CommonFormTitle&lt;/CommonFormTitle&gt;{'\n'}</Tab>
@@ -429,7 +429,7 @@ class AboutStyle extends ImmutableComponent {
             const &#123;{'\n'}
             <Tab>CommonForm,{'\n'}</Tab>
             <Tab>CommonFormSection{'\n'}</Tab>
-            &#125; = require('../../app/renderer/components/commonForm'){'\n'}
+            &#125; = require('../../app/renderer/components/common/commonForm'){'\n'}
             {'\n'}
             &lt;CommonForm&gt;{'\n'}
             <Tab>&lt;CommonFormSection&gt;{'\n'}</Tab>
@@ -461,7 +461,7 @@ class AboutStyle extends ImmutableComponent {
             <Tab>CommonForm,{'\n'}</Tab>
             <Tab>CommonFormSection,{'\n'}</Tab>
             <Tab>CommonFormDropdown{'\n'}</Tab>
-            &#125; = require('../../app/renderer/components/commonForm'){'\n'}
+            &#125; = require('../../app/renderer/components/common/commonForm'){'\n'}
             {'\n'}
             &lt;CommonForm&gt;{'\n'}
             <Tab>&lt;CommonFormSection&gt;{'\n'}</Tab>
@@ -498,7 +498,7 @@ class AboutStyle extends ImmutableComponent {
             <Tab>CommonFormSection,{'\n'}</Tab>
             <Tab>CommonFormSubSection,{'\n'}</Tab>
             <Tab>CommonFormDropdown{'\n'}</Tab>
-            &#125; = require('../../app/renderer/components/commonForm'){'\n'}
+            &#125; = require('../../app/renderer/components/common/commonForm'){'\n'}
             {'\n'}
             &lt;CommonForm&gt;{'\n'}
             <Tab>&lt;CommonFormSection&gt;{'\n'}</Tab>
@@ -532,7 +532,7 @@ class AboutStyle extends ImmutableComponent {
             const &#123;{'\n'}
             <Tab>CommonForm,{'\n'}</Tab>
             <Tab>CommonFormButtonWrapper{'\n'}</Tab>
-            &#125; = require('../../app/renderer/components/commonForm'){'\n'}
+            &#125; = require('../../app/renderer/components/common/commonForm'){'\n'}
             {'\n'}
             &lt;CommonForm&gt;{'\n'}
             <Tab>&lt;CommonFormButtonWrapper&gt;{'\n'}</Tab>
@@ -562,7 +562,7 @@ class AboutStyle extends ImmutableComponent {
             <Tab>CommonForm,{'\n'}</Tab>
             <Tab>CommonFormBottomWrapper,{'\n'}</Tab>
             <Tab>CommonFormClickable{'\n'}</Tab>
-            &#125; = require('../../app/renderer/components/commonForm'){'\n'}
+            &#125; = require('../../app/renderer/components/common/commonForm'){'\n'}
             {'\n'}
             &lt;CommonForm&gt;{'\n'}
             <Tab>&lt;CommonFormBottomWrapper&gt;{'\n'}</Tab>

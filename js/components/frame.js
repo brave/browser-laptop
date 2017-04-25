@@ -31,7 +31,7 @@ const windowStore = require('../stores/windowStore')
 const appStoreRenderer = require('../stores/appStoreRenderer')
 const siteSettings = require('../state/siteSettings')
 const imageUtil = require('../lib/imageUtil')
-const MessageBox = require('../../app/renderer/components/messageBox')
+const MessageBox = require('../../app/renderer/components/common/messageBox')
 
 const WEBRTC_DEFAULT = 'default'
 const WEBRTC_DISABLE_NON_PROXY = 'disable_non_proxied_udp'

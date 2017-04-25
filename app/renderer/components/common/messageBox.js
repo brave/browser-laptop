@@ -3,18 +3,18 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('./immutableComponent')
-const Dialog = require('../../../js/components/dialog')
-const Button = require('../../../js/components/button')
-const SwitchControl = require('../../../js/components/switchControl')
-const appActions = require('../../../js/actions/appActions')
-const KeyCodes = require('../../common/constants/keyCodes')
-const config = require('../../../js/constants/config')
-const {makeImmutable} = require('../../common/state/immutableUtil')
+const ImmutableComponent = require('../immutableComponent')
+const Dialog = require('../../../../js/components/dialog')
+const Button = require('../../../../js/components/button')
+const SwitchControl = require('../../../../js/components/switchControl')
+const appActions = require('../../../../js/actions/appActions')
+const KeyCodes = require('../../../common/constants/keyCodes')
+const config = require('../../../../js/constants/config')
+const {makeImmutable} = require('../../../common/state/immutableUtil')
 
 const {StyleSheet, css} = require('aphrodite')
-const commonStyles = require('./styles/commonStyles')
-const globalStyles = require('./styles/global')
+const commonStyles = require('../styles/commonStyles')
+const globalStyles = require('../styles/global')
 
 class MessageBox extends ImmutableComponent {
   constructor () {

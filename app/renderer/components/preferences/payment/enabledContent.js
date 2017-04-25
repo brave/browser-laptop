@@ -14,8 +14,8 @@ const {changeSetting} = require('../../../lib/settingsUtil')
 // components
 const ImmutableComponent = require('../../immutableComponent')
 const Button = require('../../../../../js/components/button')
-const {FormTextbox} = require('../../textbox')
-const {FormDropdown} = require('../../dropdown')
+const {FormTextbox} = require('../../common/textbox')
+const {FormDropdown} = require('../../common/dropdown')
 const {SettingsList, SettingItem} = require('../../settings')
 const LedgerTable = require('./ledgerTable')
 

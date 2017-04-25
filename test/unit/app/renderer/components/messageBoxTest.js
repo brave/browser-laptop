@@ -20,7 +20,7 @@ describe('MessageBox component unit tests', function () {
       useCleanCache: true
     })
     mockery.registerMock('electron', require('../../../lib/fakeElectron'))
-    MessageBox = require('../../../../../app/renderer/components/messageBox')
+    MessageBox = require('../../../../../app/renderer/components/common/messageBox')
     appActions = require('../../../../../js/actions/appActions')
   })
   after(function () {

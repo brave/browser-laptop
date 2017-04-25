@@ -3,12 +3,12 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('./immutableComponent')
+const ImmutableComponent = require('../immutableComponent')
 const {StyleSheet, css} = require('aphrodite/no-important')
-const globalStyles = require('./styles/global')
-const commonStyles = require('./styles/commonStyles')
+const globalStyles = require('../styles/global')
+const commonStyles = require('../styles/commonStyles')
 
-const caretDownGrey = require('../../extensions/brave/img/caret_down_grey.svg')
+const caretDownGrey = require('../../../extensions/brave/img/caret_down_grey.svg')
 
 class Dropdown extends ImmutableComponent {
   render () {
@@ -61,6 +61,7 @@ const styles = StyleSheet.create({
     }
   },
   commonForm: {
+    backgroundColor: '#fff',
     fontSize: globalStyles.fontSize.flyoutDialog
   },
   settings: {

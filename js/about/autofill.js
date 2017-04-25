@@ -6,6 +6,7 @@ const React = require('react')
 const messages = require('../constants/messages')
 const Immutable = require('immutable')
 const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
+const cx = require('../lib/classSet')
 const aboutActions = require('./aboutActions')
 const Button = require('../components/button')
 
@@ -33,20 +34,32 @@ class AddressItem extends ImmutableComponent {
     const address = this.props.address
     return <tr className='autofillItem'>
       <td className='autofillActions'>
-        <span className='autofillAction fa fa-times' title='Delete address'
+        <span className={cx({
+          fa: true,
+          'fa-times': true,
+          autofillAction: true
+        })}
+          data-test-id='DeleteAddress'
+          title='Delete address'
           onClick={this.onDelete} />
       </td>
-      <td className='addressName'>{address.get('name')}</td>
-      <td className='organization'>{address.get('organization')}</td>
-      <td className='streetAddress'>{address.get('streetAddress')}</td>
-      <td className='city'>{address.get('city')}</td>
-      <td className='state'>{address.get('state')}</td>
-      <td className='postalCode'>{address.get('postalCode')}</td>
-      <td className='country'>{address.get('country')}</td>
-      <td className='phone'>{address.get('phone')}</td>
-      <td className='email'>{address.get('email')}</td>
-      <td className='autofillActions'>
-        <span className='autofillAction fa fa-pencil-square-o' title='Edit address'
+      <td data-test-id='addressName'>{address.get('name')}</td>
+      <td data-test-id='organization'>{address.get('organization')}</td>
+      <td data-test-id='streetAddress'>{address.get('streetAddress')}</td>
+      <td data-test-id='city'>{address.get('city')}</td>
+      <td data-test-id='state'>{address.get('state')}</td>
+      <td data-test-id='postalCode'>{address.get('postalCode')}</td>
+      <td data-test-id='country'>{address.get('country')}</td>
+      <td data-test-id='phone'>{address.get('phone')}</td>
+      <td data-test-id='email'>{address.get('email')}</td>
+      <td className='autofillActions' data-test-id='autofillActions'>
+        <span className={cx({
+          fa: true,
+          'fa-pencil-square-o': true,
+          autofillAction: true
+        })}
+          data-test-id='EditAddress'
+          title='Edit address'
           onClick={this.onEdit} />
       </td>
     </tr>
@@ -72,18 +85,32 @@ class CreditCardItem extends ImmutableComponent {
     const creditCard = this.props.creditCard
     return <tr className='autofillItem'>
       <td className='autofillActions'>
-        <span className='autofillAction fa fa-times' title='Delete creditCard'
+        <span className={cx({
+          fa: true,
+          'fa-times': true,
+          autofillAction: true
+        })}
+          data-test-id='DeleteCreditCard'
+          title='Delete creditCard'
           onClick={this.onDelete} />
       </td>
-      <td className='creditCardName'>{creditCard.get('name')}</td>
-      <td className='creditCardNumber'>{
-        creditCard.get('card') !== undefined ? '***' + creditCard.get('card').slice(-4) : null
-      }</td>
-      <td className='creditCardPExpirationDate'>
+      <td data-test-id='creditCardName'>
+        {creditCard.get('name')}
+      </td>
+      <td data-test-id='creditCardNumber'>
+        {creditCard.get('card') !== undefined ? '***' + creditCard.get('card').slice(-4) : null}
+      </td>
+      <td data-test-id='creditCardPExpirationDate'>
         {creditCard.get('month') + '/' + creditCard.get('year')}
       </td>
       <td className='autofillActions'>
-        <span className='autofillAction fa fa-pencil-square-o' title='Edit creditCard'
+        <span className={cx({
+          fa: true,
+          'fa-pencil-square-o': true,
+          autofillAction: true
+        })}
+          data-test-id='EditCreditCard'
+          title='Edit creditCard'
           onClick={this.onEdit} />
       </td>
     </tr>
@@ -133,7 +160,7 @@ class AboutAutofill extends React.Component {
 
   render () {
     var savedAddresssPage = this.isAddresssEmpty
-    ? <div><span className='notSaved' data-l10n-id='noAddressesSaved' /></div>
+    ? <div><span className='notSaved' data-l10n-id='noAddressesSaved' data-test-id='noAddressesSaved' /></div>
     : <div>
       <table className='autofillList'>
         <thead>
@@ -162,7 +189,7 @@ class AboutAutofill extends React.Component {
     </div>
 
     var savedCreditCardsPage = this.isCreditCardsEmpty
-    ? <div><span className='notSaved' data-l10n-id='noCreditCardsSaved' /></div>
+    ? <div><span className='notSaved' data-l10n-id='noCreditCardsSaved' data-test-id='noCreditCardsSaved' /></div>
     : <div>
       <table className='autofillList'>
         <thead>
@@ -183,20 +210,28 @@ class AboutAutofill extends React.Component {
         </tbody>
       </table>
     </div>
-    return <div className='autofillPage'>
+    return <div className='autofillPage' data-test-id='autofillPage'>
       <h1 data-l10n-id='autofillTitle' />
       <div className='autofillPageContent'>
         <div className='autofillPageFooter' />
         <h2 data-l10n-id='addresses' />
         <div className='autofillPageContent'>
           {savedAddresssPage}
-          <Button l10nId='addAddress' className='primaryButton addAddressButton' onClick={this.onAddAddress} />
+          <Button className='primaryButton'
+            l10nId='addAddress'
+            testId='addAddressButton'
+            onClick={this.onAddAddress}
+          />
         </div>
         <div className='autofillPageFooter' />
         <h2 data-l10n-id='creditCards' />
         <div className='autofillPageContent'>
           {savedCreditCardsPage}
-          <Button l10nId='addCreditCard' className='primaryButton addCreditCardButton' onClick={this.onAddCreditCard} />
+          <Button className='primaryButton'
+            l10nId='addCreditCard'
+            testId='addCreditCardButton'
+            onClick={this.onAddCreditCard}
+          />
         </div>
       </div>
     </div>
