@@ -219,10 +219,11 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId, order) =>
  * @param tag The tag to add for this site
  *   See siteTags.js for supported types. No tag means just a history item
  * @param originalSiteDetail If specified, use when searching site list
- * @param {Function=} syncCallback specified if this change should be synced
+ * @param {boolean=} skipSync - True if this site was downloaded by sync and
+ *   does not to be re-uploaded
  * @return The new sites Immutable object
  */
-module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail, syncCallback) {
+module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail, skipSync) {
   // Get tag from siteDetail object if not passed via tag param
   if (tag === undefined) {
     tag = siteDetail.getIn(['tags', 0])
@@ -261,13 +262,13 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail, s
     site = site.set('location', UrlUtil.getLocationIfPDF(site.get('location')))
   }
 
+  if (skipSync) {
+    site = site.set('skipSync', true)
+  }
+
   const key = module.exports.getSiteKey(site)
   if (key === null) {
     return sites
-  }
-  if (getSetting(settings.SYNC_ENABLED) === true && syncCallback) {
-    site = module.exports.setObjectId(site)
-    syncCallback(site)
   }
   return sites.set(key, site)
 }
@@ -373,11 +374,10 @@ module.exports.isMoveAllowed = (sites, sourceDetail, destinationDetail) => {
  * @param prepend Whether the destination detail should be prepended or not, not used if destinationIsParent is true
  * @param destinationIsParent Whether the item should be moved inside of the destinationDetail.
  * @param disallowReparent If set to true, parent folder will not be set
- * @param {Function=} syncCallback
  * @return The new sites Immutable object
  */
 module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prepend,
-  destinationIsParent, disallowReparent, syncCallback) {
+  destinationIsParent, disallowReparent) {
   if (!module.exports.isMoveAllowed(sites, sourceDetail, destinationDetail)) {
     return sites
   }
@@ -424,9 +424,6 @@ module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prep
     } else if (destinationSite.get('parentFolderId') !== sourceSite.get('parentFolderId')) {
       sourceSite = sourceSite.set('parentFolderId', destinationSite.get('parentFolderId'))
     }
-  }
-  if (getSetting(settings.SYNC_ENABLED) === true && syncCallback) {
-    syncCallback(sourceSite)
   }
   return sites.set(module.exports.getSiteKey(sourceSite), sourceSite)
 }
@@ -694,16 +691,12 @@ module.exports.filterSitesRelativeTo = function (sites, relSite) {
  * - filtering out entries which have no tags
  * - setting lastAccessedTime to null for remaining entries (bookmarks)
  * @param sites The application state's Immutable sites list.
- * @param {function} syncCallback
  */
-module.exports.clearHistory = function (sites, syncCallback) {
+module.exports.clearHistory = function (sites) {
   let bookmarks = sites.filter((site) => site.get('tags') && site.get('tags').size > 0)
   bookmarks.forEach((site, index) => {
     if (site.get('lastAccessedTime')) {
       bookmarks = bookmarks.setIn([index, 'lastAccessedTime'], null)
-      if (getSetting(settings.SYNC_ENABLED) === true && syncCallback && site.get('objectId')) {
-        syncCallback(site.set('lastAccessedTime', null))
-      }
     }
   })
   return bookmarks

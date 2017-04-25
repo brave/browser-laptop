@@ -13,6 +13,7 @@ const Immutable = require('immutable')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const settings = require('../../../js/constants/settings')
 const {getSetting} = require('../../../js/settings')
+const writeActions = require('../../../js/constants/sync/proto').actions
 
 const syncEnabled = () => {
   return getSetting(settings.SYNC_ENABLED) === true
@@ -21,17 +22,16 @@ const syncEnabled = () => {
 const sitesReducer = (state, action, emitChanges) => {
   switch (action.actionType) {
     case appConstants.APP_ADD_SITE:
-      const addSiteSyncCallback = action.skipSync ? undefined : syncActions.updateSite
       if (action.siteDetail.constructor === Immutable.List) {
         action.siteDetail.forEach((s) => {
-          state = state.set('sites', siteUtil.addSite(state.get('sites'), s, action.tag, undefined, addSiteSyncCallback))
+          state = state.set('sites', siteUtil.addSite(state.get('sites'), s, action.tag, undefined, action.skipSync))
         })
       } else {
         let sites = state.get('sites')
         if (!action.siteDetail.get('folderId') && siteUtil.isFolder(action.siteDetail)) {
           action.siteDetail = action.siteDetail.set('folderId', siteUtil.getNextFolderId(sites))
         }
-        state = state.set('sites', siteUtil.addSite(sites, action.siteDetail, action.tag, action.originalSiteDetail, addSiteSyncCallback))
+        state = state.set('sites', siteUtil.addSite(sites, action.siteDetail, action.tag, action.originalSiteDetail, action.skipSync))
       }
       if (action.destinationDetail) {
         state = state.set('sites', siteUtil.moveSite(state.get('sites'),
@@ -51,10 +51,45 @@ const sitesReducer = (state, action, emitChanges) => {
     case appConstants.APP_MOVE_SITE:
       state = state.set('sites', siteUtil.moveSite(state.get('sites'),
         action.sourceDetail, action.destinationDetail, action.prepend,
-        action.destinationIsParent, false, syncActions.updateSite))
+        action.destinationIsParent, false))
       if (syncEnabled()) {
         state = syncUtil.updateSiteCache(state, action.destinationDetail)
       }
+      break
+    case appConstants.APP_APPLY_SITE_RECORDS:
+      let nextFolderId = siteUtil.getNextFolderId(state.get('sites'))
+      // Ensure that all folders are assigned folderIds
+      action.records.forEach((record, i) => {
+        if (record.action !== writeActions.DELETE &&
+          record.bookmark && record.bookmark.isFolder &&
+          record.bookmark.site &&
+          typeof record.bookmark.site.folderId !== 'number') {
+          record.bookmark.site.folderId = nextFolderId
+          action.records.set(i, record)
+          nextFolderId = nextFolderId + 1
+        }
+      })
+      action.records.forEach((record) => {
+        const siteData = syncUtil.getSiteDataFromRecord(record, state, action.records)
+        const tag = siteData.tag
+        let siteDetail = siteData.siteDetail
+        const sites = state.get('sites')
+        switch (record.action) {
+          case writeActions.CREATE:
+            state = state.set('sites',
+              siteUtil.addSite(sites, siteDetail, tag, undefined, true))
+            break
+          case writeActions.UPDATE:
+            state = state.set('sites',
+              siteUtil.addSite(sites, siteDetail, tag, siteData.existingObjectData, true))
+            break
+          case writeActions.DELETE:
+            state = state.set('sites',
+              siteUtil.removeSite(sites, siteDetail, tag))
+            break
+        }
+        state = syncUtil.updateSiteCache(state, siteDetail)
+      })
       break
     case appConstants.APP_TAB_PINNED:
       const tab = state.get('tabs').find((tab) => tab.get('tabId') === action.tabId)

@@ -26,7 +26,8 @@ const CATEGORY_MAP = syncUtil.CATEGORY_MAP
 const CATEGORY_NAMES = Object.keys(categories)
 const SYNC_ACTIONS = Object.values(syncConstants)
 
-let dispatcherCallback = null
+// The sync background script message sender
+let backgroundSender = null
 
 const log = (message) => {
   if (!config.debug) { return }
@@ -42,6 +43,65 @@ let pollIntervalId = null
 
 let deviceIdSent = false
 let bookmarksToolbarShown = false
+
+// Determines what to sync
+const appStoreChangeCallback = function (diffs) {
+  if (!backgroundSender) {
+    return
+  }
+
+  // Fields that should trigger a sync SEND when changed
+  const syncFields = {
+    sites: ['location', 'tags', 'customTitle', 'folderId', 'parentFolderId'],
+    siteSettings: Object.keys(syncUtil.siteSettingDefaults)
+  }
+  diffs.forEach((diff) => {
+    if (!diff || !diff.path) {
+      return
+    }
+    const path = diff.path.split('/')
+    if (path.length < 3) {
+      // We are looking for paths like ['', 'sites', 'https://brave.com/', 'title']
+      return
+    }
+    const type = path[1]
+    const fieldsToPick = syncFields[type]
+    if (!fieldsToPick) {
+      return
+    }
+
+    const isInsert = diff.op === 'add' && path.length === 3
+    const isUpdate = fieldsToPick.includes(path[3]) // Ignore insignicant updates
+
+    // DELETES are handled in appState because the old object is no longer
+    // available by the time emitChanges is received
+    if (isInsert || isUpdate) {
+      // Get the item's path and entry in appStore
+      const statePath = path.slice(1, 3).map((item) => item.replace(/~1/g, '/'))
+      const entry = AppStore.getState().getIn(statePath)
+      if (!entry || !entry.toJS) {
+        return
+      }
+
+      let action = null
+
+      if (isInsert && !entry.get('skipSync')) {
+        action = writeActions.CREATE
+      } else if (isUpdate) {
+        action = writeActions.UPDATE
+      }
+
+      if (action !== null) {
+        // Set the object ID if there is not already one
+        const entryJS = entry.toJS()
+        entryJS.objectId = entryJS.objectId || syncUtil.newObjectId(statePath)
+
+        sendSyncRecords(backgroundSender, action,
+          [type === 'sites' ? syncUtil.createSiteData(entryJS) : syncUtil.createSiteSettingsData(statePath[1], entryJS)])
+      }
+    }
+  })
+}
 
 /**
  * Sends sync records of the same category to the sync server.
@@ -81,8 +141,7 @@ const sendSyncRecords = (sender, action, data) => {
 const validateAction = (action) => {
   const SYNC_ACTIONS_WITHOUT_ITEMS = [
     syncConstants.SYNC_CLEAR_HISTORY,
-    syncConstants.SYNC_CLEAR_SITE_SETTINGS,
-    syncConstants.SYNC_DELETE_USER
+    syncConstants.SYNC_CLEAR_SITE_SETTINGS
   ]
   if (SYNC_ACTIONS.includes(action.actionType) !== true) {
     return false
@@ -103,53 +162,30 @@ const validateAction = (action) => {
   return true
 }
 
-const doAction = (sender, action) => {
+const dispatcherCallback = (action) => {
+  if (!backgroundSender) {
+    return
+  }
+
   if (action.key === settings.SYNC_ENABLED) {
     if (action.value === false) {
       module.exports.stop()
     }
   }
   // If sync is not enabled, the following actions should be ignored.
-  if (!syncEnabled() || validateAction(action) !== true || sender.isDestroyed()) {
+  if (!syncEnabled() || validateAction(action) !== true || backgroundSender.isDestroyed()) {
     return
   }
   switch (action.actionType) {
-    case syncConstants.SYNC_ADD_SITE:
-      sendSyncRecords(sender, writeActions.CREATE,
-        [syncUtil.createSiteData(action.item.toJS())])
-      break
-    case syncConstants.SYNC_UPDATE_SITE:
-      sendSyncRecords(sender, writeActions.UPDATE,
-        [syncUtil.createSiteData(action.item.toJS())])
-      break
     case syncConstants.SYNC_REMOVE_SITE:
-      sendSyncRecords(sender, writeActions.DELETE,
+      sendSyncRecords(backgroundSender, writeActions.DELETE,
         [syncUtil.createSiteData(action.item.toJS())])
       break
     case syncConstants.SYNC_CLEAR_HISTORY:
-      sender.send(messages.DELETE_SYNC_CATEGORY, CATEGORY_MAP.historySite.categoryName)
-      break
-    case syncConstants.SYNC_ADD_SITE_SETTING:
-      if (syncUtil.isSyncable('siteSetting', action.item)) {
-        sendSyncRecords(sender, writeActions.CREATE,
-          [syncUtil.createSiteSettingsData(action.hostPattern, action.item.toJS())])
-      }
-      break
-    case syncConstants.SYNC_UPDATE_SITE_SETTING:
-      if (syncUtil.isSyncable('siteSetting', action.item)) {
-        sendSyncRecords(sender, writeActions.UPDATE,
-          [syncUtil.createSiteSettingsData(action.hostPattern, action.item.toJS())])
-      }
-      break
-    case syncConstants.SYNC_REMOVE_SITE_SETTING:
-      sendSyncRecords(sender, writeActions.DELETE,
-        [syncUtil.createSiteSettingsData(action.hostPattern, action.item.toJS())])
+      backgroundSender.send(messages.DELETE_SYNC_CATEGORY, CATEGORY_MAP.historySite.categoryName)
       break
     case syncConstants.SYNC_CLEAR_SITE_SETTINGS:
-      sender.send(messages.DELETE_SYNC_SITE_SETTINGS)
-      break
-    case syncConstants.SYNC_DELETE_USER:
-      sender.send(messages.DELETE_SYNC_USER)
+      backgroundSender.send(messages.DELETE_SYNC_SITE_SETTINGS)
       break
     default:
   }
@@ -165,6 +201,8 @@ module.exports.onSyncReady = (isFirstRun, e) => {
   if (!syncEnabled()) {
     return
   }
+  AppStore.addChangeListener(appStoreChangeCallback)
+
   if (!deviceIdSent && isFirstRun) {
     // Sync the device id for this device
     sendSyncRecords(e.sender, writeActions.CREATE, [{
@@ -283,9 +321,9 @@ module.exports.init = function (appState) {
   })
   // sent by about:preferences when resetting sync
   ipcMain.on(RESET_SYNC, (e) => {
-    if (dispatcherCallback) {
+    if (backgroundSender) {
       // send DELETE_SYNC_USER to sync client. it replies with DELETED_SYNC_USER
-      dispatcherCallback({actionType: syncConstants.SYNC_DELETE_USER})
+      backgroundSender.send(messages.DELETE_SYNC_USER)
     } else {
       reset()
     }
@@ -295,6 +333,8 @@ module.exports.init = function (appState) {
   })
   // GET_INIT_DATA is the first message sent by the sync-client when it starts
   ipcMain.on(messages.GET_INIT_DATA, (e) => {
+    // Set the message sender
+    backgroundSender = e.sender
     // Clear any old errors
     appActions.setSyncSetupError(null)
     // Unregister the previous dispatcher cb
@@ -302,7 +342,6 @@ module.exports.init = function (appState) {
       appDispatcher.unregister(dispatcherCallback)
     }
     // Register the dispatcher callback now that we have a valid sender
-    dispatcherCallback = doAction.bind(null, e.sender)
     appDispatcher.register(dispatcherCallback)
     // Send the initial data
     if (syncEnabled()) {
@@ -413,4 +452,5 @@ module.exports.stop = function () {
     clearInterval(pollIntervalId)
   }
   appActions.setSyncSetupError(null)
+  AppStore.removeChangeListener(appStoreChangeCallback)
 }

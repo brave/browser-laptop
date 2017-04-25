@@ -9,7 +9,6 @@ const ExtensionConstants = require('../../app/common/constants/extensionConstant
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
-const writeActions = require('../constants/sync/proto').actions
 const siteUtil = require('../state/siteUtil')
 const syncUtil = require('../state/syncUtil')
 const siteSettings = require('../state/siteSettings')
@@ -449,43 +448,6 @@ const handleAppAction = (action) => {
     case appConstants.APP_DATA_URL_COPIED:
       nativeImage.copyDataURL(action.dataURL, action.html, action.text)
       break
-    case appConstants.APP_APPLY_SITE_RECORDS:
-      let nextFolderId = siteUtil.getNextFolderId(appState.get('sites'))
-      // Ensure that all folders are assigned folderIds
-      action.records.forEach((record, i) => {
-        if (record.action !== writeActions.DELETE &&
-          record.bookmark && record.bookmark.isFolder &&
-          record.bookmark.site &&
-          typeof record.bookmark.site.folderId !== 'number') {
-          record.bookmark.site.folderId = nextFolderId
-          action.records.set(i, record)
-          nextFolderId = nextFolderId + 1
-        }
-      })
-      action.records.forEach((record) => {
-        const siteData = syncUtil.getSiteDataFromRecord(record, appState, action.records)
-        const tag = siteData.tag
-        let siteDetail = siteData.siteDetail
-        const sites = appState.get('sites')
-        switch (record.action) {
-          case writeActions.CREATE:
-            appState = appState.set('sites',
-              siteUtil.addSite(sites, siteDetail, tag))
-            break
-          case writeActions.UPDATE:
-            appState = appState.set('sites',
-              siteUtil.addSite(sites, siteDetail, tag, siteData.existingObjectData))
-            break
-          case writeActions.DELETE:
-            appState = appState.set('sites',
-              siteUtil.removeSite(sites, siteDetail, tag))
-            break
-        }
-        appState = syncUtil.updateSiteCache(appState, siteDetail)
-      })
-      appState = aboutNewTabState.setSites(appState)
-      appState = aboutHistoryState.setHistory(appState)
-      break
     case appConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size
       appState = aboutNewTabState.setSites(appState, action)
@@ -495,13 +457,14 @@ const handleAppAction = (action) => {
         filterOutNonRecents()
       }
       break
+    case appConstants.APP_APPLY_SITE_RECORDS:
     case appConstants.APP_REMOVE_SITE:
       appState = aboutNewTabState.setSites(appState, action)
       appState = aboutHistoryState.setHistory(appState, action)
       break
     case appConstants.APP_CLEAR_HISTORY:
       appState = appState.set('sites',
-        siteUtil.clearHistory(appState.get('sites'), syncActions.updateSite))
+        siteUtil.clearHistory(appState.get('sites')))
       appState = aboutNewTabState.setSites(appState, action)
       appState = aboutHistoryState.setHistory(appState, action)
       syncActions.clearHistory()
@@ -580,12 +543,8 @@ const handleAppAction = (action) => {
       {
         let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
         let newSiteSettings = siteSettings.mergeSiteSetting(appState.get(propertyName), action.hostPattern, action.key, action.value)
-        if (!action.temporary && !action.skipSync) {
-          const syncObject = siteUtil.setObjectId(newSiteSettings.get(action.hostPattern))
-          const objectId = syncObject.get('objectId')
-          const item = new Immutable.Map({objectId, [action.key]: action.value})
-          syncActions.updateSiteSetting(action.hostPattern, item)
-          newSiteSettings = newSiteSettings.set(action.hostPattern, syncObject)
+        if (action.skipSync) {
+          newSiteSettings = newSiteSettings.setIn([action.hostPattern, 'skipSync'], true)
         }
         appState = appState.set(propertyName, newSiteSettings)
         break
@@ -595,12 +554,8 @@ const handleAppAction = (action) => {
         let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
         let newSiteSettings = siteSettings.removeSiteSetting(appState.get(propertyName),
           action.hostPattern, action.key)
-        if (!action.temporary && !action.skipSync) {
-          const syncObject = siteUtil.setObjectId(newSiteSettings.get(action.hostPattern))
-          const objectId = syncObject.get('objectId')
-          const item = new Immutable.Map({objectId, [action.key]: null})
-          syncActions.removeSiteSetting(action.hostPattern, item)
-          newSiteSettings = newSiteSettings.set(action.hostPattern, syncObject)
+        if (action.skipSync) {
+          newSiteSettings = newSiteSettings.setIn([action.hostPattern, 'skipSync'], true)
         }
         appState = appState.set(propertyName, newSiteSettings)
         break
@@ -611,11 +566,8 @@ const handleAppAction = (action) => {
         let newSiteSettings = new Immutable.Map()
         appState.get(propertyName).map((entry, hostPattern) => {
           let newEntry = entry.delete(action.key)
-          if (!action.temporary && !action.skipSync) {
-            newEntry = siteUtil.setObjectId(newEntry)
-            const objectId = newEntry.get('objectId')
-            const item = new Immutable.Map({objectId, [action.key]: null})
-            syncActions.removeSiteSetting(hostPattern, item)
+          if (action.skipSync) {
+            newEntry = newEntry.set('skipSync', true)
           }
           newSiteSettings = newSiteSettings.set(hostPattern, newEntry)
         })

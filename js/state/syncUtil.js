@@ -28,7 +28,7 @@ const CATEGORY_MAP = {
 }
 module.exports.CATEGORY_MAP = CATEGORY_MAP
 
-const siteSettingDefaults = {
+module.exports.siteSettingDefaults = {
   hostPattern: '',
   zoomLevel: 0,
   shieldsUp: true,
@@ -391,7 +391,7 @@ module.exports.isSyncable = (type, item) => {
   if (type === 'bookmark') {
     return siteUtil.isBookmark(item) || siteUtil.isFolder(item)
   } else if (type === 'siteSetting') {
-    for (let field in siteSettingDefaults) {
+    for (let field in module.exports.siteSettingDefaults) {
       if (item.has(field)) {
         return true
       }
@@ -510,7 +510,7 @@ module.exports.createSiteSettingsData = (hostPattern, setting) => {
       objectData[key] = adControlEnum[value]
     } else if (key === 'cookieControl' && typeof cookieControlEnum[value] !== 'undefined') {
       objectData[key] = cookieControlEnum[value]
-    } else if (key in siteSettingDefaults) {
+    } else if (key in module.exports.siteSettingDefaults) {
       objectData[key] = value
     }
   }
