@@ -44,23 +44,91 @@ describe('Tabs content - Title', function () {
     )
     assert.notEqual(wrapper.text(), pageTitle1)
   })
-  it('should not show text if size is mediumSmall and location has a secondary icon', function () {
+  it('should show text if breakpoint is default', function () {
     const wrapper = shallow(
       <TabTitle
         tab={
           Immutable.Map({
             location: url1,
             title: pageTitle1,
-            breakpoint: 'mediumSmall',
-            audioPlaybackActive: false,
-            isPrivate: true
+            breakpoint: 'default'
+          })}
+        pageTitle={pageTitle1}
+      />
+    )
+    assert.equal(wrapper.text(), pageTitle1)
+  })
+  it('should show text if breakpoint is large', function () {
+    const wrapper = shallow(
+      <TabTitle
+        tab={
+          Immutable.Map({
+            location: url1,
+            title: pageTitle1,
+            breakpoint: 'large'
+          })}
+        pageTitle={pageTitle1}
+      />
+    )
+    assert.equal(wrapper.text(), pageTitle1)
+  })
+  it('should show text if breakpoint is medium', function () {
+    const wrapper = shallow(
+      <TabTitle
+        tab={
+          Immutable.Map({
+            location: url1,
+            title: pageTitle1,
+            breakpoint: 'medium'
+          })}
+        pageTitle={pageTitle1}
+      />
+    )
+    assert.equal(wrapper.text(), pageTitle1)
+  })
+  it('should show text if breakpoint is mediumSmall', function () {
+    const wrapper = shallow(
+      <TabTitle
+        tab={
+          Immutable.Map({
+            location: url1,
+            title: pageTitle1,
+            breakpoint: 'mediumSmall'
+          })}
+        pageTitle={pageTitle1}
+      />
+    )
+    assert.equal(wrapper.text(), pageTitle1)
+  })
+  it('should show text if breakpoint is small and tab is not active', function () {
+    const wrapper = shallow(
+      <TabTitle isActive={false}
+        tab={
+          Immutable.Map({
+            location: url1,
+            title: pageTitle1,
+            breakpoint: 'small'
+          })}
+        pageTitle={pageTitle1}
+      />
+    )
+    assert.equal(wrapper.text(), pageTitle1)
+  })
+  it('should not show text if breakpoint is small and tab is active', function () {
+    const wrapper = shallow(
+      <TabTitle isActive
+        tab={
+          Immutable.Map({
+            location: url1,
+            title: pageTitle1,
+            breakpoint: 'small'
           })}
         pageTitle={pageTitle1}
       />
     )
     assert.notEqual(wrapper.text(), pageTitle1)
   })
-  it('should not show text if size is too small', function () {
+  it('should not show text if breakpoint is extraSmall', function () {
     const wrapper = shallow(
       <TabTitle
         tab={
@@ -68,6 +136,20 @@ describe('Tabs content - Title', function () {
             location: url1,
             title: pageTitle1,
             breakpoint: 'extraSmall'
+          })}
+        pageTitle={pageTitle1}
+      />
+    )
+    assert.notEqual(wrapper.text(), pageTitle1)
+  })
+  it('should not show text if breakpoint is the smallest', function () {
+    const wrapper = shallow(
+      <TabTitle
+        tab={
+          Immutable.Map({
+            location: url1,
+            title: pageTitle1,
+            breakpoint: 'smallest'
           })}
         pageTitle={pageTitle1}
       />

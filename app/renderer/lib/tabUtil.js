@@ -48,7 +48,7 @@ module.exports.hasBreakpoint = (props, arr) => {
  */
 module.exports.hasRelativeCloseIcon = (props) => {
   return props.tab.get('hoverState') &&
-    !module.exports.hasBreakpoint(props, ['small', 'extraSmall', 'smallest'])
+    module.exports.hasBreakpoint(props, ['default', 'large'])
 }
 
 /**
@@ -57,8 +57,14 @@ module.exports.hasRelativeCloseIcon = (props) => {
  * @returns {Boolean} Whether or not private or newSession icon should be visible
  */
 module.exports.hasVisibleSecondaryIcon = (props) => {
-  return !props.tab.get('hoverState') &&
-    !module.exports.hasBreakpoint(props, ['small', 'extraSmall', 'smallest'])
+  return (
+    // Hide icon on hover
+    !module.exports.hasRelativeCloseIcon(props) &&
+    // If closeIcon is fixed then there's no room for another icon
+    !module.exports.hasFixedCloseIcon(props) &&
+    // completely hide it for small sizes
+    !module.exports.hasBreakpoint(props, ['mediumSmall', 'small', 'extraSmall', 'smallest'])
+    )
 }
 
 /**
@@ -67,7 +73,13 @@ module.exports.hasVisibleSecondaryIcon = (props) => {
  * @returns {Boolean} Whether or not the close icon is always visible (fixed)
  */
 module.exports.hasFixedCloseIcon = (props) => {
-  return props.isActive && module.exports.hasBreakpoint(props, ['small', 'extraSmall'])
+  return (
+    props.isActive &&
+    // larger sizes still have a relative closeIcon
+    !module.exports.hasBreakpoint(props, ['default', 'large']) &&
+    // We don't resize closeIcon as we do with favicon so don't show it
+    !module.exports.hasBreakpoint(props, 'smallest')
+  )
 }
 
 /**

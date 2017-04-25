@@ -47,51 +47,156 @@ describe('Tabs content - PrivateIcon', function () {
     )
     assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
   })
-  it('should not show private icon if mouse is over tab (avoid icon overflow)', function () {
+  it('should not show private icon if mouse is over tab and breakpoint is default', function () {
     const wrapper = shallow(
       <PrivateIcon
         tab={
           Immutable.Map({
             isPrivate: true,
-            hoverState: true
+            hoverState: true,
+            breakpoint: 'default'
           })}
       />
     )
     assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
   })
-  it('should not show private icon if tab size is small', function () {
+  it('should show private icon if mouse is not over tab and breakpoint is default', function () {
     const wrapper = shallow(
       <PrivateIcon
         tab={
           Immutable.Map({
             isPrivate: true,
             hoverState: false,
+            breakpoint: 'default'
+          })}
+      />
+    )
+    assert.equal(wrapper.props()['data-test-id'], 'privateIcon')
+  })
+  it('should not show private icon if mouse is over tab and breakpoint is large', function () {
+    const wrapper = shallow(
+      <PrivateIcon
+        tab={
+          Immutable.Map({
+            isPrivate: 1,
+            hoverState: true,
+            breakpoint: 'large'
+          })}
+      />
+    )
+    assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
+  })
+  it('should show private icon if mouse is not over tab and breakpoint is large', function () {
+    const wrapper = shallow(
+      <PrivateIcon
+        tab={
+          Immutable.Map({
+            isPrivate: 1,
+            hoverState: false,
+            breakpoint: 'large'
+          })}
+      />
+    )
+    assert.equal(wrapper.props()['data-test-id'], 'privateIcon')
+  })
+  it('should not show private icon if tab is active and breakpoint is largeMedium', function () {
+    const wrapper = shallow(
+      <PrivateIcon isActive
+        tab={
+          Immutable.Map({
+            isPrivate: 1,
+            hoverState: true,
+            breakpoint: 'largeMedium'
+          })}
+      />
+    )
+    assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
+  })
+  it('should show private icon if tab is not active and breakpoint is largeMedium', function () {
+    const wrapper = shallow(
+      <PrivateIcon isActive={false}
+        tab={
+          Immutable.Map({
+            isPrivate: 1,
+            hoverState: false,
+            breakpoint: 'largeMedium'
+          })}
+      />
+    )
+    assert.equal(wrapper.props()['data-test-id'], 'privateIcon')
+  })
+  it('should not show private icon if tab is active and breakpoint is medium', function () {
+    const wrapper = shallow(
+      <PrivateIcon isActive
+        tab={
+          Immutable.Map({
+            isPrivate: 1,
+            hoverState: true,
+            breakpoint: 'medium'
+          })}
+      />
+    )
+    assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
+  })
+  it('should show private icon if tab is not active and breakpoint is medium', function () {
+    const wrapper = shallow(
+      <PrivateIcon isActive={false}
+        tab={
+          Immutable.Map({
+            isPrivate: 1,
+            hoverState: false,
+            breakpoint: 'medium'
+          })}
+      />
+    )
+    assert.equal(wrapper.props()['data-test-id'], 'privateIcon')
+  })
+  it('should not show private icon if breakpoint is mediumSmall', function () {
+    const wrapper = shallow(
+      <PrivateIcon isActive
+        tab={
+          Immutable.Map({
+            isPrivate: 1,
+            hoverState: false,
+            breakpoint: 'mediumSmall'
+          })}
+      />
+    )
+    assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
+  })
+  it('should not show private icon if breakpoint is small', function () {
+    const wrapper = shallow(
+      <PrivateIcon isActive
+        tab={
+          Immutable.Map({
+            isPrivate: 1,
+            hoverState: true,
             breakpoint: 'small'
           })}
       />
     )
     assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
   })
-  it('should not show private icon if tab size is extraSmall', function () {
+  it('should not show private icon if breakpoint is extraSmall', function () {
     const wrapper = shallow(
-      <PrivateIcon
+      <PrivateIcon isActive
         tab={
           Immutable.Map({
-            isPrivate: true,
-            hoverState: false,
+            isPrivate: 1,
+            hoverState: true,
             breakpoint: 'extraSmall'
           })}
       />
     )
     assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
   })
-  it('should not show private icon if tab size is the smallest', function () {
+  it('should not show private icon if breakpoint is the smallest', function () {
     const wrapper = shallow(
       <PrivateIcon
         tab={
           Immutable.Map({
-            isPrivate: true,
-            hoverState: false,
+            isPrivate: 1,
+            hoverState: true,
             breakpoint: 'smallest'
           })}
       />

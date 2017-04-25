@@ -26,27 +26,29 @@ describe('Tabs content - CloseTabIcon', function () {
     mockery.disable()
   })
 
-  it('should show closeTab icon if mouse is over tab', function () {
+  it('should show closeTab icon if mouse is over tab and breakpoint is default', function () {
     const wrapper = shallow(
       <CloseTabIcon
         tab={
           Immutable.Map({
-            hoverState: true
+            hoverState: true,
+            breakpoint: 'default'
           })}
       />
     )
     assert.equal(wrapper.props()['data-test-id'], 'closeTabIcon')
   })
-  it('should not show closeTab icon if mouse is not over a tab', function () {
+  it('should show closeTab icon if mouse is over tab and breakpoint is large', function () {
     const wrapper = shallow(
       <CloseTabIcon
         tab={
           Immutable.Map({
-            hoverState: false
+            hoverState: true,
+            breakpoint: 'large'
           })}
       />
     )
-    assert.notEqual(wrapper.props()['data-test-id'], 'closeTabIcon')
+    assert.equal(wrapper.props()['data-test-id'], 'closeTabIcon')
   })
   it('should not show closeTab icon if tab is pinned', function () {
     const wrapper = shallow(
@@ -55,6 +57,80 @@ describe('Tabs content - CloseTabIcon', function () {
           Immutable.Map({
             hoverState: true,
             pinnedLocation: true
+          })}
+      />
+    )
+    assert.notEqual(wrapper.props()['data-test-id'], 'closeTabIcon')
+  })
+  it('should show closeTab icon if tab size is largeMedium and tab is active', function () {
+    const wrapper = shallow(
+      <CloseTabIcon isActive
+        tab={
+          Immutable.Map({
+            hoverState: false,
+            breakpoint: 'largeMedium'
+          })}
+      />
+    )
+    assert.equal(wrapper.props()['data-test-id'], 'closeTabIcon')
+  })
+  it('should not show closeTab icon if tab size is largeMedium and tab is not active', function () {
+    const wrapper = shallow(
+      <CloseTabIcon isActive={false}
+        tab={
+          Immutable.Map({
+            hoverState: true,
+            breakpoint: 'largeMedium'
+          })}
+      />
+    )
+    assert.notEqual(wrapper.props()['data-test-id'], 'closeTabIcon')
+  })
+
+  it('should show closeTab icon if tab size is medium and tab is active', function () {
+    const wrapper = shallow(
+      <CloseTabIcon isActive
+        tab={
+          Immutable.Map({
+            hoverState: false,
+            breakpoint: 'medium'
+          })}
+      />
+    )
+    assert.equal(wrapper.props()['data-test-id'], 'closeTabIcon')
+  })
+  it('should not show closeTab icon if tab size is medium and tab is not active', function () {
+    const wrapper = shallow(
+      <CloseTabIcon isActive={false}
+        tab={
+          Immutable.Map({
+            hoverState: true,
+            breakpoint: 'medium'
+          })}
+      />
+    )
+    assert.notEqual(wrapper.props()['data-test-id'], 'closeTabIcon')
+  })
+
+  it('should show closeTab icon if tab size is mediumSmall and tab is active', function () {
+    const wrapper = shallow(
+      <CloseTabIcon isActive
+        tab={
+          Immutable.Map({
+            hoverState: false,
+            breakpoint: 'mediumSmall'
+          })}
+      />
+    )
+    assert.equal(wrapper.props()['data-test-id'], 'closeTabIcon')
+  })
+  it('should not show closeTab icon if tab size is mediumSmall and tab is not active', function () {
+    const wrapper = shallow(
+      <CloseTabIcon isActive={false}
+        tab={
+          Immutable.Map({
+            hoverState: true,
+            breakpoint: 'mediumSmall'
           })}
       />
     )
