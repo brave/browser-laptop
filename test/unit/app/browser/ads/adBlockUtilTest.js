@@ -1,15 +1,26 @@
-/* global describe, it */
+/* global before, describe, it */
 
 require('../../../braveUnit')
 const assert = require('assert')
 const {URL} = require('url')
+const fakeAdBlock = require('../../../lib/fakeAdBlock')
+const mockery = require('mockery')
 
 const site = new URL('https://www.brave.com')
 const thirdPartyResource = new URL('https://www.coffee.com/logo.png')
 const firstPartyResource = new URL('https://www.brave.com/logo.png')
-const {shouldDoAdBlockCheck} = require('../../../../../app/browser/ads/adBlockUtil')
 
 describe('adBlockUtil test', function () {
+  let shouldDoAdBlockCheck
+  before(function () {
+    mockery.enable({
+      warnOnReplace: false,
+      warnOnUnregistered: false,
+      useCleanCache: true
+    })
+    mockery.registerMock('ad-block', fakeAdBlock)
+    shouldDoAdBlockCheck = require('../../../../../app/browser/ads/adBlockUtil').shouldDoAdBlockCheck
+  })
   describe('shouldDoAdBlockCheck', function () {
     it('http protocol allows ad block checks', function () {
       assert.ok(shouldDoAdBlockCheck('script', new URL('https://www.brave.com'), thirdPartyResource, false))

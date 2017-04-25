@@ -36,6 +36,7 @@ describe('tabsReducer', function () {
       }]
     })
     mockery.registerMock('electron', fakeElectron)
+    mockery.registerMock('leveldown', {})
     mockery.registerMock('./webContentsCache', {
       getWebContents: (tabId) => ({
         canGoBack: () => true,
