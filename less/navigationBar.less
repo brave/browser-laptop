@@ -19,6 +19,10 @@
 .platform--darwin .navigatorWrapper .backforward {
   margin-left: @navbarLeftMarginDarwin;
 
+  &.fullscreen {
+    margin-left: 0;
+  }
+
   // Since we want to keep the navigator centered, we need to calculate the
   // difference between the width of the left box and the width of the right box.
   @centerOffset: @navbarLeftMarginDarwin + 2 * (@navbarButtonWidth + @navbarButtonSpacing) // width area on the left
