@@ -153,6 +153,7 @@ var rendererIdentifiers = function () {
     'newWindow',
     'reopenLastClosedTab',
     'print',
+    'emailPageLink',
     'findOnPage',
     'find',
     'checkForUpdates',

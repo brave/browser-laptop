@@ -108,6 +108,8 @@ const createFileSubmenu = () => {
       ]
       */
     },
+    // Move inside share menu when it's enabled
+    CommonMenu.emailPageLinkMenuItem(),
     CommonMenu.separatorMenuItem,
     CommonMenu.printMenuItem()
   ]

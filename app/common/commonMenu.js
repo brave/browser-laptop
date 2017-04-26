@@ -148,6 +148,16 @@ module.exports.printMenuItem = () => {
   }
 }
 
+module.exports.emailPageLinkMenuItem = () => {
+  return {
+    label: locale.translation('emailPageLink'),
+    accelerator: 'CmdOrCtrl+Shift+I',
+    click: function (item, focusedWindow) {
+      appActions.emailActiveTabRequested(getCurrentWindowId())
+    }
+  }
+}
+
 module.exports.findOnPageMenuItem = () => {
   return {
     label: locale.translation('findOnPage'),

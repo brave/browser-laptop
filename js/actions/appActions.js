@@ -149,6 +149,17 @@ const appActions = {
   },
 
   /**
+   * A request for a URL email share occurred
+   * @param {number} windowId - the window ID to use for the active tab
+   */
+  emailActiveTabRequested: function (windowId) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_EMAIL_ACTIVE_TAB_REQUESTED,
+      windowId
+    })
+  },
+
+  /**
    * A request for a "maybe" new tab has been made with the specified createProperties
    * If a tab is already opened it will instead set it as active.
    *

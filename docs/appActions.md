@@ -103,6 +103,16 @@ A request for a URL load for the active tab of the specified window
 
 
 
+### emailActiveTabRequested(windowId) 
+
+A request for a URL email share occurred
+
+**Parameters**
+
+**windowId**: `number`, the window ID to use for the active tab
+
+
+
 ### maybeCreateTabRequested(createProperties) 
 
 A request for a "maybe" new tab has been made with the specified createProperties

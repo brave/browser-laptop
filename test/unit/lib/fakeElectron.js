@@ -49,6 +49,8 @@ const fakeElectron = {
     showOpenDialog: function () { }
   },
   shell: {
+    openExternal: function () {
+    },
     showItemInFolder: function () {
     },
     openItem: function () {

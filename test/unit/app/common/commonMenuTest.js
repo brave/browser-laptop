@@ -102,6 +102,12 @@ describe('Common menu module unit tests', function () {
     })
   })
 
+  describe('emailPageLinkMenuItem', function () {
+    it('has the expected defaults set', function () {
+      checkExpectedDefaults(commonMenu.emailPageLinkMenuItem)
+    })
+  })
+
   describe('findOnPageMenuItem', function () {
     it('has the expected defaults set', function () {
       checkExpectedDefaults(commonMenu.findOnPageMenuItem)
