@@ -9,11 +9,12 @@
    module entry points:
      init()   - called by app/index.js   to start module
      quit()   -   ..   ..   ..     ..    prior to browser quitting
-     boot()   -   ..   ..   ..      ..   to create wallet
+     boot()   -   ..   ..   ..     ..    to create wallet
+     reset()  -   ..   ..   ..     ..    to remove state
 
    IPC entry point:
-      LEDGER_PUBLISHER - called synchronously by app/extensions/brave/content/scripts/pageInformation.js
-      CHANGE_SETTING - called asynchronously to record a settings change
+      LEDGER_PUBLISHER  - called synchronously by app/extensions/brave/content/scripts/pageInformation.js
+      CHANGE_SETTING    - called asynchronously to record a settings change
 
    eventStore entry point:
       addChangeListener - called when tabs render or gain focus
@@ -105,6 +106,7 @@ const clientOptions = {
 }
 
 var doneTimer
+var quitP
 
 var v2RulesetDB
 const v2RulesetPath = 'ledger-rulesV2.leveldb'
@@ -163,6 +165,10 @@ const doAction = (action) => {
   switch (action.actionType) {
     case appConstants.APP_SHUTTING_DOWN:
       quit()
+      break
+
+    case appConstants.APP_CLEAR_HISTORY:
+      if (!getSetting(settings.PAYMENTS_ENABLED)) reset(true)
       break
 
     case appConstants.APP_IDLE_STATE_CHANGED:
@@ -263,19 +269,23 @@ const doAction = (action) => {
 /*
  * module entry points
  */
+
 var init = () => {
   try {
     appDispatcher.register(doAction)
     initialize(getSetting(settings.PAYMENTS_ENABLED))
 
-    doneTimer = setInterval(doneWriter, 1 * msecs.hour)
+    doneTimer = setInterval(doneWriter, 1 * msecs.minute)
   } catch (ex) { console.log('ledger.js initialization failed: ' + ex.toString() + '\n' + ex.stack) }
 }
 
 var quit = () => {
+  quitP = true
   visit('NOOP', underscore.now(), null)
   clearInterval(doneTimer)
   doneWriter()
+
+  if ((!getSetting(settings.PAYMENTS_ENABLED)) && (getSetting(settings.SHUTDOWN_CLEAR_HISTORY))) reset(true)
 }
 
 var boot = () => {
@@ -302,6 +312,17 @@ var boot = () => {
     getBalance()
 
     bootP = false
+  })
+}
+
+var reset = (doneP) => {
+  var files = [ logPath, publisherPath, scoresPath, synopsisPath ]
+
+  if (!doneP) files.push(statePath)
+  files.forEach((file) => {
+    fs.unlink(pathName(file), (err) => {
+      if ((err) && (err.code !== 'ENOENT')) console.log(err)
+    })
   })
 }
 
@@ -811,29 +832,8 @@ var enable = (paymentsEnabled) => {
     // change undefined include publishers to include publishers
     appActions.enableUndefinedPublishers(synopsis.publishers)
 
-    fs.readFile(pathName(publisherPath), (err, data) => {
-      if (err) {
-        if (err.code !== 'ENOENT') console.log('publisherPath read error: ' + err.toString())
-        return
-      }
-
-      if (publisherInfo._internal.verboseP) console.log('\nfound ' + pathName(publisherPath))
-      try {
-        data = JSON.parse(data)
-        underscore.keys(data).sort().forEach((publisher) => {
-          var entries = data[publisher]
-
-          publishers[publisher] = {}
-          entries.forEach((entry) => {
-            locations[entry.location] = entry
-            publishers[publisher][entry.location] = { timestamp: entry.when, tabIds: [] }
-            updateLocation(entry.location, publisher)
-          })
-        })
-      } catch (ex) {
-        console.log('publishersPath parse error: ' + ex.toString())
-      }
-    })
+    fs.unlink(pathName(publisherPath), (err) => { if ((err) && (err.code !== 'ENOENT')) console.log(err) })
+    fs.unlink(pathName(scoresPath), (err) => { if ((err) && (err.code !== 'ENOENT')) console.log(err) })
   })
 }
 
@@ -978,22 +978,7 @@ const fetchFavIcon = (entry, url, redirects) => {
 }
 
 var updatePublisherInfo = (changedPublisher) => {
-  var data = {}
-  var then = underscore.now() - msecs.week
-
-  underscore.keys(publishers).sort().forEach((publisher) => {
-    var entries = []
-
-    underscore.keys(publishers[publisher]).forEach((location) => {
-      var when = publishers[publisher][location].timestamp
-
-      if (when > then) entries.push({ location: location, when: when })
-    })
-
-    if (entries.length > 0) data[publisher] = entries
-  })
-  atomicWriter(pathName(publisherPath), data, () => {})
-  atomicWriter(pathName(scoresPath), synopsis.allN(), () => {})
+  var data
 
   atomicWriter(pathName(synopsisPath), synopsis, () => {})
   if (!publisherInfo._internal.enabled) return
@@ -2144,6 +2129,15 @@ var atomicWriter = (path, obj, options, cb) => {
       return cb(err)
     }
 
+    if ((quitP) && (!getSetting(settings.PAYMENTS_ENABLED)) && (getSetting(settings.SHUTDOWN_CLEAR_HISTORY))) {
+      if (ledgerInfo._internal.debugP) console.log('\ndeleting ' + path + suffix)
+      fs.unlink(path + suffix, (err) => {
+        if (err) console.log('unlink error: ' + err.toString())
+        cb(err)
+      })
+      return
+    }
+
     if (ledgerInfo._internal.debugP) console.log('\nrenaming ' + path + suffix)
     fs.rename(path + suffix, path, (err) => {
       if (err) console.log('rename error: ' + err.toString())
@@ -2171,7 +2165,7 @@ var pathName = (name) => {
   return path.join(app.getPath('userData'), parts.name + parts.ext)
 }
 
-/**
+/*
  * UI controller functionality
  */
 
@@ -2314,5 +2308,6 @@ module.exports = {
   recoverKeys: recoverKeys,
   backupKeys: backupKeys,
   quit: quit,
-  boot: boot
+  boot: boot,
+  reset: reset
 }
