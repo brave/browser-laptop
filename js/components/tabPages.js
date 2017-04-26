@@ -11,6 +11,7 @@ const dragTypes = require('../constants/dragTypes')
 const {onTabPageContextMenu} = require('../contextMenus')
 const dnd = require('../dnd')
 const dndData = require('../dndData')
+const {currentWindowId} = require('../../app/renderer/currentWindow')
 
 class TabPage extends ImmutableComponent {
   constructor () {
@@ -39,6 +40,9 @@ class TabPage extends ImmutableComponent {
     if (this.props.tabPageFrames.size === 0) {
       return
     }
+
+    appActions.dataDropped(currentWindowId)
+
     const moveToFrame = this.props.tabPageFrames.get(0)
     const sourceDragData = dndData.getDragData(e.dataTransfer, dragTypes.TAB)
     const sourceDragFromPageIndex = this.props.sourceDragFromPageIndex
