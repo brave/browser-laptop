@@ -21,9 +21,16 @@ class ContextMenuItem extends ImmutableComponent {
   get submenu () {
     return this.props.contextMenuItem.get('submenu')
   }
+  get items () {
+    return this.props.contextMenuItem.get('items')
+  }
   get hasSubmenu () {
     return this.submenu && this.submenu.size > 0
   }
+  get isMulti () {
+    return this.items && this.items.size > 0
+  }
+
   get accelerator () {
     const accelerator = this.props.contextMenuItem.get('accelerator')
     return accelerator && typeof accelerator === 'string'
@@ -138,17 +145,6 @@ class ContextMenuItem extends ImmutableComponent {
       return <div className='contextMenuItem contextMenuSeparator' role='listitem'>
         <hr />
       </div>
-    } else if (this.props.contextMenuItem.get('type') === 'multi') {
-      return <div className='contextMenuItem multiContextMenuItem'>
-        <span className='multiItemTitle' data-l10n-id={this.props.contextMenuItem.get('l10nLabelId')} />
-        {
-          this.props.contextMenuItem.get('submenu').map((subItem) =>
-            <div className='contextMenuSubItem'
-              onClick={this.onClick.bind(this, subItem.get('click'), false)}>
-              <span data-l10n-id={subItem.get('l10nLabelId')}>{this.getLabelForItem(subItem)}</span>
-            </div>)
-        }
-      </div>
     }
     const props = {
       className: cx({
@@ -156,7 +152,8 @@ class ContextMenuItem extends ImmutableComponent {
         hasFaIcon: faIcon,
         checkedMenuItem: this.props.contextMenuItem.get('checked'),
         hasIcon: icon || faIcon,
-        selectedByKeyboard: this.props.selected
+        selectedByKeyboard: this.props.selected,
+        multiContextMenuItem: this.isMulti
       }),
       role: 'listitem'
     }
@@ -194,6 +191,13 @@ class ContextMenuItem extends ImmutableComponent {
       }
       <span className='contextMenuItemText'
         data-l10n-id={this.props.contextMenuItem.get('l10nLabelId')}>{this.props.contextMenuItem.get('label')}</span>
+      {
+        this.isMulti && this.props.contextMenuItem.get('items').map((subItem) =>
+          <div className='contextMenuSubItem'
+            onClick={this.onClick.bind(this, subItem.get('click'), false)}>
+            <span data-l10n-id={subItem.get('l10nLabelId')}>{this.getLabelForItem(subItem)}</span>
+          </div>)
+      }
       {
         this.hasSubmenu
         ? <span className='submenuIndicatorContainer'>

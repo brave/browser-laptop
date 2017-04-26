@@ -755,8 +755,7 @@ function hamburgerTemplateInit (location, e) {
     CommonMenu.separatorMenuItem,
     {
       l10nLabelId: 'zoom',
-      type: 'multi',
-      submenu: [{
+      items: [{
         label: '-',
         click: () => {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_ZOOM_OUT)
