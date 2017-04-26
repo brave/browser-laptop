@@ -1027,6 +1027,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
   }
 
   if (isImage) {
+    const active = getSetting(settings.SWITCH_TO_NEW_TABS) === true
     template.push(
       {
         label: locale.translation('openImageInNewTab'),
@@ -1035,7 +1036,8 @@ function mainTemplateInit (nodeProps, frame, tab) {
             appActions.createTabRequested({
               url: nodeProps.srcURL,
               openerTabId: frame.get('tabId'),
-              partition: getPartitionFromNumber(frame.get('partitionNumber'), isPrivate)
+              partition: getPartitionFromNumber(frame.get('partitionNumber'), isPrivate),
+              active: active
             })
           }
         }
