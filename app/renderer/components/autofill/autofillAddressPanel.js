@@ -109,7 +109,9 @@ class AutofillAddressPanel extends ImmutableComponent {
       !currentDetail.get('phone') && !currentDetail.get('email')) return true
     return false
   }
-
+  componentDidMount () {
+    this.nameOnAddress.focus()
+  }
   render () {
     return <Dialog onHide={this.props.onHide} testId='autofillAddressPanel' isClickDismiss>
       <CommonFormLarge onClick={this.onClick}>
@@ -136,7 +138,7 @@ class AutofillAddressPanel extends ImmutableComponent {
               )}
                 data-test-id='nameOnAddress'
                 spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onNameChange}
-                value={this.props.currentDetail.get('name')}
+                value={this.props.currentDetail.get('name') || ''}
                 ref={(nameOnAddress) => { this.nameOnAddress = nameOnAddress }} />
               <div className={css(commonFormStyles.input__marginRow)}>
                 <CommonFormTextbox
