@@ -4,7 +4,7 @@
 'use strict'
 
 const urlParse = require('./common/urlParse')
-const DataFile = require('./dataFile')
+const dataFile = require('./dataFile')
 const Filtering = require('./filtering')
 const LRUCache = require('lru-cache')
 const getHostnamePatterns = require('../js/lib/urlutil').getHostnamePatterns
@@ -203,5 +203,5 @@ function canonicalizeUrl (url) {
  * Loads HTTPS Everywhere
  */
 module.exports.init = () => {
-  DataFile.init(module.exports.resourceName, startHttpsEverywhere, loadRulesets)
+  dataFile.init(module.exports.resourceName, undefined, startHttpsEverywhere, loadRulesets)
 }
