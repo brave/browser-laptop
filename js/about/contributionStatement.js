@@ -633,7 +633,7 @@ const styles = StyleSheet.create({
 
   // ContributionStatementPageFooter
   footer__footerWrapper: {
-    margin: `${containerMargin} ${containerMargin} 0`
+    margin: containerMargin
   },
   footerWrapper__body: {
     color: globalStyles.color.gray
