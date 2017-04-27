@@ -137,6 +137,10 @@ class SiteInfo extends ImmutableComponent {
     let connectionInfo = null
     let viewCertificateButton = null
 
+    const certErrl10nArgs = {
+      site: this.location
+    }
+
     // TODO(Anthony): Hide it until muon support linux
     if (!platformUtil.isLinux()) {
       viewCertificateButton =
@@ -170,6 +174,7 @@ class SiteInfo extends ImmutableComponent {
               onClick={this.props.onHide}
             />
           </div>
+          {viewCertificateButton}
         </div>
     } else if (this.runInsecureContent) {
       connectionInfo =
@@ -187,6 +192,7 @@ class SiteInfo extends ImmutableComponent {
               onClick={this.onDenyRunInsecureContent}
             />
           </div>
+          {viewCertificateButton}
         </div>
     } else if (this.isSecure === true) {
       connectionInfo =
@@ -198,6 +204,12 @@ class SiteInfo extends ImmutableComponent {
       connectionInfo =
         <div className={css(styles.connectionInfo__wrapper)}>
           <div data-l10n-id='partiallySecureConnectionInfo' />
+          {viewCertificateButton}
+        </div>
+    } else if (this.isSecure === 2) {
+      connectionInfo =
+        <div className={css(styles.connectionInfo__wrapper)}>
+          <div data-l10n-id='certErrConnectionInfo' data-l10n-args={JSON.stringify(certErrl10nArgs)} />
           {viewCertificateButton}
         </div>
     } else {

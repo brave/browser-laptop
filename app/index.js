@@ -399,11 +399,9 @@ app.on('ready', () => {
     ipcMain.on(messages.CHECK_CERT_ERROR_ACCEPTED, (event, host, frameKey) => {
       // If the host is associated with a URL with a cert error, update the
       // security state to insecure
-      if (acceptCertDomains[host]) {
-        event.sender.send(messages.SET_SECURITY_STATE, frameKey, {
-          secure: false
-        })
-      }
+      event.sender.send(messages.SET_SECURITY_STATE, frameKey, {
+        secure: 2
+      })
     })
 
     ipcMain.on(messages.GET_CERT_ERROR_DETAIL, (event, url) => {

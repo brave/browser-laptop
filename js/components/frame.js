@@ -759,8 +759,12 @@ class Frame extends ImmutableComponent {
       let runInsecureContent = this.runInsecureContent()
       if (e.securityState === 'secure') {
         isSecure = true
-      } else if (['broken', 'insecure'].includes(e.securityState)) {
+      } else if (e.securityState === 'insecure') {
         isSecure = false
+      } else if (e.securityState === 'broken') {
+        isSecure = false
+        const parsedUrl = urlParse(this.props.location)
+        ipc.send(messages.CHECK_CERT_ERROR_ACCEPTED, parsedUrl.host, this.props.frameKey)
       } else if (this.props.isSecure !== false &&
         ['warning', 'passive-mixed-content'].includes(e.securityState)) {
         // Passive mixed content should not upgrade an insecure connection to a
@@ -772,11 +776,6 @@ class Frame extends ImmutableComponent {
         secure: runInsecureContent ? false : isSecure,
         runInsecureContent
       })
-      if (isSecure) {
-        // Check that there isn't a cert error.
-        const parsedUrl = urlParse(this.props.location)
-        ipc.send(messages.CHECK_CERT_ERROR_ACCEPTED, parsedUrl.host, this.props.frameKey)
-      }
     })
     this.webview.addEventListener('load-start', (e) => {
       loadStart(e)
