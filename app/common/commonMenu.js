@@ -134,15 +134,6 @@ module.exports.reopenLastClosedTabItem = () => {
   }
 }
 
-module.exports.muteAllTabsMenuItem = () => {
-  return {
-    label: locale.translation('muteTabs'),
-    click: (item) => {
-      windowActions.muteAllAudio(framePropsList, true)
-    }
-  }
-}
-
 module.exports.separatorMenuItem = {
   type: 'separator'
 }

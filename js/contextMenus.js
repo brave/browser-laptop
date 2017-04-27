@@ -654,17 +654,16 @@ function tabTemplateInit (frameProps) {
   return menuUtil.sanitizeTemplateItems(template)
 }
 
-function tabsTemplateInit () {
-
+function tabsBarTemplateInit (framePropsList) {
   const template = []
 
-  template.push( CommonMenu.newTabMenuItem(),
+  template.push(
+    CommonMenu.newTabMenuItem(),
     CommonMenu.separatorMenuItem,
     CommonMenu.newPrivateTabMenuItem(),
     CommonMenu.newPartitionedTabMenuItem(),
     CommonMenu.newWindowMenuItem(),
     CommonMenu.separatorMenuItem,
-    CommonMenu.muteAllTabsMenuItem(),
     CommonMenu.showTabPreviewsMenuItem(),
     CommonMenu.separatorMenuItem,
     CommonMenu.bookmarksManagerMenuItem(),
@@ -1388,9 +1387,9 @@ function onTabContextMenu (frameProps, e) {
   tabMenu.destroy()
 }
 
-function onTabsContextMenu (frameProps, e) {
+function onTabsBarContextMenu (framePropsList, e) {
   e.stopPropagation()
-  const tabsMenu = Menu.buildFromTemplate(tabsTemplateInit(frameProps))
+  const tabsMenu = Menu.buildFromTemplate(tabsBarTemplateInit(framePropsList))
   tabsMenu.popup(getCurrentWindow())
   tabsMenu.destroy()
 }
@@ -1551,7 +1550,7 @@ module.exports = {
   onFlashContextMenu,
   onMainContextMenu,
   onTabContextMenu,
-  onTabsContextMenu,
+  onTabsBarContextMenu,
   onNewTabContextMenu,
   onTabsToolbarContextMenu,
   onDownloadsToolbarContextMenu,
