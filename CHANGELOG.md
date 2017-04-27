@@ -61,7 +61,7 @@
  - Updated 1Password description on extensions page. ([#8465](https://github.com/brave/browser-laptop/issues/8465))
  - Updated webtorrent description on extensions page. ([#8208](https://github.com/brave/browser-laptop/issues/8208))
  - Upgraded to Chromium 58.0.3029.81. ([#8353](https://github.com/brave/browser-laptop/issues/8353))
- - Upgraded to muon 2.58.6. ([#8161](https://github.com/brave/browser-laptop/issues/8161))
+ - Upgraded to muon 2.58.7. ([#8161](https://github.com/brave/browser-laptop/issues/8161))
  - Upgraded to Node v7.9.0. ([#8483](https://github.com/brave/browser-laptop/issues/8483))
 
 ## [0.14.1](https://github.com/brave/browser-laptop/releases/v0.14.1dev)
