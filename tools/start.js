@@ -7,7 +7,7 @@ const options = {
   stdio: 'inherit',
   shell: true
 }
-const muon = spawn('electron', [path.join(__dirname, '..')].concat(process.argv.slice(2)), options)
+const muon = spawn('electron', [`"${path.join(__dirname, '..')}"`].concat(process.argv.slice(2)), options)
 
 muon.on('error', (err) => {
   console.error(`could not start muon ${err}`)
