@@ -11,6 +11,7 @@ const siteTags = require('./constants/siteTags')
 const siteUtil = require('./state/siteUtil')
 const appStoreRenderer = require('./stores/appStoreRenderer')
 const {getCurrentWindowId} = require('../app/renderer/currentWindow')
+const {ESC} = require('../app/common/constants/keyCodes.js')
 
 module.exports.getInterBraveDragData = () => {
   return appStoreRenderer.state.getIn(['dragData', 'data'])
@@ -30,7 +31,7 @@ module.exports.onDragStart = (dragType, data, e) => {
 }
 
 document.addEventListener('keyup', (e) => {
-  if (e.keyCode === 27) {
+  if (e.keyCode === ESC) {
     appActions.dragCancelled()
   }
 }, true)
