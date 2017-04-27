@@ -233,6 +233,7 @@ AppStore
       originalSeed: Array.<number>, // only set for bookmarks that have been synced before a sync profile reset
       parentFolderId: number, // set for bookmarks and bookmark folders only
       partitionNumber: number, // optionally specifies a specific session
+      skipSync: boolean, // Set for objects FETCHed by sync
       tags: [string], // empty, 'bookmark', 'bookmark-folder', 'default', or 'reader'
       themeColor: string, // CSS compatible color string
       title: string
@@ -259,6 +260,7 @@ AppStore
       openExternalPermission: boolean,
       pointerLockPermission: boolean,
       protocolRegistrationPermission: boolean,
+      skipSync: boolean, // Set for objects FETCHed by sync
       runInsecureContent: boolean, // allow active mixed content
       safeBrowsing: boolean,
       savePasswords: boolean, // only false or undefined/null

@@ -436,7 +436,7 @@ describe('siteUtil', function () {
         expectedSites[expectedSiteKey] = expectedSiteDetail.set('objectId', undefined).toJS()
         assert.deepEqual(processedSites.toJS(), expectedSites)
       })
-      it('sets an objectId when syncCallback is provided', function () {
+      it('sets skipSync when skipSync is provided', function () {
         mockery.enable({
           warnOnReplace: false,
           warnOnUnregistered: false,
@@ -469,10 +469,10 @@ describe('siteUtil', function () {
         const sites = Immutable.fromJS({
           [siteKey]: oldSiteDetail
         })
-        const processedSites = siteUtil.addSite(sites, newSiteDetail, siteTags.BOOKMARK, oldSiteDetail, () => {})
+        const processedSites = siteUtil.addSite(sites, newSiteDetail, siteTags.BOOKMARK, oldSiteDetail, true)
         mockery.deregisterMock('./stores/appStoreRenderer')
         mockery.disable()
-        assert.equal(processedSites.getIn([siteKey, 'objectId']).size, 16)
+        assert.equal(processedSites.getIn([siteKey, 'skipSync']), true)
       })
     })
   })

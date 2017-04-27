@@ -50,8 +50,8 @@ describe('sessionStore unit tests', function () {
     }
   }
   const mockSiteUtil = {
-    clearHistory: (sites, syncCallback) => {
-      return siteUtil.clearHistory(sites, syncCallback)
+    clearHistory: (sites) => {
+      return siteUtil.clearHistory(sites)
     },
     getSiteKey: (siteDetail) => {
       return siteUtil.getSiteKey(siteDetail)
