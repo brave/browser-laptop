@@ -103,13 +103,15 @@ A request for a URL load for the active tab of the specified window
 
 
 
-### emailActiveTabRequested(windowId) 
+### simpleShareActiveTabRequested(windowId, shareType) 
 
 A request for a URL email share occurred
 
 **Parameters**
 
 **windowId**: `number`, the window ID to use for the active tab
+
+**shareType**: `string`, The type of share to do, must be one of: "email", "facebook", "pinterest", "twitter", "googlePlus", "linkedIn", "buffer", "reddit", or "digg"
 
 
 
