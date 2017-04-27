@@ -80,7 +80,7 @@ const tabsReducer = (state, action) => {
       state = tabs.loadURL(state, action)
       break
     case appConstants.APP_LOAD_URL_IN_ACTIVE_TAB_REQUESTED:
-      state = tabs.loadURLInActiveTab(state, action)
+      state = tabs.loadURLInActiveTab(state, action.get('windowId'), action.get('url'))
       break
     case appConstants.APP_ON_GO_BACK:
       state = tabs.goBack(state, action)

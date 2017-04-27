@@ -148,6 +148,16 @@ module.exports.printMenuItem = () => {
   }
 }
 
+module.exports.simpleShareActiveTabMenuItem = (l10nId, type, accelerator) => {
+  return {
+    label: locale.translation(l10nId),
+    accelerator,
+    click: function (item, focusedWindow) {
+      appActions.simpleShareActiveTabRequested(getCurrentWindowId(), type)
+    }
+  }
+}
+
 module.exports.findOnPageMenuItem = () => {
   return {
     label: locale.translation('findOnPage'),

@@ -385,7 +385,8 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/passwordManagerReducer'),
       require('../../app/browser/reducers/tabMessageBoxReducer'),
       require('../../app/browser/reducers/dragDropReducer'),
-      require('../../app/browser/reducers/extensionsReducer')
+      require('../../app/browser/reducers/extensionsReducer'),
+      require('../../app/browser/reducers/shareReducer')
     ]
     initialized = true
     appState = action.appState

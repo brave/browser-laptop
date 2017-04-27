@@ -49,6 +49,8 @@ const fakeElectron = {
     showOpenDialog: function () { }
   },
   shell: {
+    openExternal: function () {
+    },
     showItemInFolder: function () {
     },
     openItem: function () {
@@ -56,6 +58,11 @@ const fakeElectron = {
     beep: function () {
     },
     moveItemToTrash: function () {
+    }
+  },
+  session: {
+    defaultSession: {
+      partition: 'default'
     }
   }
 }

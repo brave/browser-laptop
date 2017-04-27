@@ -149,6 +149,19 @@ const appActions = {
   },
 
   /**
+   * A request for a URL email share occurred
+   * @param {number} windowId - the window ID to use for the active tab
+   * @param {string} shareType - The type of share to do, must be one of: "email", "facebook", "pinterest", "twitter", "googlePlus", "linkedIn", "buffer", "reddit", or "digg"
+   */
+  simpleShareActiveTabRequested: function (windowId, shareType) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_SIMPLE_SHARE_ACTIVE_TAB_REQUESTED,
+      windowId,
+      shareType
+    })
+  },
+
+  /**
    * A request for a "maybe" new tab has been made with the specified createProperties
    * If a tab is already opened it will instead set it as active.
    *

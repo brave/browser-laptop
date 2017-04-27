@@ -436,13 +436,18 @@ const api = {
     return state
   },
 
-  loadURLInActiveTab: (state, action) => {
-    action = makeImmutable(action)
-    const windowId = action.get('windowId')
+  loadURLInActiveTab: (state, windowId, url) => {
     const tabValue = tabState.getActiveTabValue(state, windowId)
-    const tab = tabValue && getWebContents(tabValue.get('tabId'))
+    if (tabValue) {
+      api.loadURLInTab(state, tabValue.get('tabId'), url)
+    }
+    return state
+  },
+
+  loadURLInTab: (state, tabId, url) => {
+    const tab = getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
-      const url = normalizeUrl(action.get('url'))
+      url = normalizeUrl(url)
       tab.loadURL(url)
     }
     return state

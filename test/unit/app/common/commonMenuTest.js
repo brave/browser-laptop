@@ -102,6 +102,20 @@ describe('Common menu module unit tests', function () {
     })
   })
 
+  describe('simpleShareActiveTabMenuItem', function () {
+    it('has the expected defaults set', function () {
+      checkExpectedDefaults(commonMenu.simpleShareActiveTabMenuItem.bind(null, 'emailPageLink', 'email', 'CmdOrCtrl+Shift+I'), true)
+      checkExpectedDefaults(commonMenu.simpleShareActiveTabMenuItem.bind(null, 'tweetPageLink', 'twitter'), false)
+      checkExpectedDefaults(commonMenu.simpleShareActiveTabMenuItem.bind(null, 'facebookPageLink', 'facebook'), false)
+      checkExpectedDefaults(commonMenu.simpleShareActiveTabMenuItem.bind(null, 'pinterestPageLink', 'pinterest'), false)
+      checkExpectedDefaults(commonMenu.simpleShareActiveTabMenuItem.bind(null, 'googlePlusPageLink', 'googlePlus'), false)
+      checkExpectedDefaults(commonMenu.simpleShareActiveTabMenuItem.bind(null, 'linkedInPageLink', 'linkedIn'), false)
+      checkExpectedDefaults(commonMenu.simpleShareActiveTabMenuItem.bind(null, 'bufferPageLink', 'buffer'), false)
+      checkExpectedDefaults(commonMenu.simpleShareActiveTabMenuItem.bind(null, 'redditPageLink', 'reddit'), false)
+      checkExpectedDefaults(commonMenu.simpleShareActiveTabMenuItem.bind(null, 'diggPageLink', 'digg'), false)
+    })
+  })
+
   describe('findOnPageMenuItem', function () {
     it('has the expected defaults set', function () {
       checkExpectedDefaults(commonMenu.findOnPageMenuItem)
