@@ -440,6 +440,9 @@ const createWindowSubmenu = () => {
 
 const createHelpSubmenu = () => {
   const submenu = [
+    CommonMenu.braveLaptopHelpMenuItem(),
+    CommonMenu.braveIOSHelpMenuItem(),
+    CommonMenu.braveAndroidTabsHelpMenuItem(),
     CommonMenu.submitFeedbackMenuItem()
   ]
 

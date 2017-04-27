@@ -12,6 +12,9 @@ const settings = require('../../js/constants/settings')
 const {tabs} = require('../../js/constants/config')
 const getSetting = require('../../js/settings').getSetting
 const communityURL = 'https://community.brave.com/'
+const browserLaptopWikiURL = 'https://github.com/brave/browser-laptop/wiki'
+const browserIOSWikiURL = 'https://github.com/brave/browser-ios/wiki'
+const browserAndroidTabsWikiURL = 'https://github.com/brave/browser-android-tabs/wiki'
 const isDarwin = process.platform === 'darwin'
 const electron = require('electron')
 
@@ -317,6 +320,42 @@ module.exports.submitFeedbackMenuItem = () => {
     click: function (item, focusedWindow) {
       appActions.maybeCreateTabRequested({
         url: communityURL,
+        windowId: getCurrentWindowId()
+      })
+    }
+  }
+}
+
+module.exports.braveLaptopHelpMenuItem = () => {
+  return {
+    label: locale.translation('braveHelpLaptop'),
+    click: function (item, focusedWindow) {
+      appActions.maybeCreateTabRequested({
+        url: browserLaptopWikiURL,
+        windowId: getCurrentWindowId()
+      })
+    }
+  }
+}
+
+module.exports.braveIOSHelpMenuItem = () => {
+  return {
+    label: locale.translation('braveHelpIOS'),
+    click: function (item, focusedWindow) {
+      appActions.maybeCreateTabRequested({
+        url: browserIOSWikiURL,
+        windowId: getCurrentWindowId()
+      })
+    }
+  }
+}
+
+module.exports.braveAndroidTabsHelpMenuItem = () => {
+  return {
+    label: locale.translation('braveHelpAndroidTabs'),
+    click: function (item, focusedWindow) {
+      appActions.maybeCreateTabRequested({
+        url: browserAndroidTabsWikiURL,
         windowId: getCurrentWindowId()
       })
     }
