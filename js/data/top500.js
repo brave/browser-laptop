@@ -345,7 +345,6 @@ const top500 = Immutable.fromJS([
   'hudong.com',
   'kooora.com',
   'histats.com',
-  'beeg.com',
   'caijing.com.cn',
   'xing.com',
   'americanexpress.com',
