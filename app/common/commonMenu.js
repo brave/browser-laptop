@@ -344,6 +344,17 @@ module.exports.bookmarksToolbarMenuItem = () => {
   }
 }
 
+module.exports.showTabPreviewsMenuItem = () => {
+  return {
+    label: locale.translation('showTabPreviews'),
+    type: 'checkbox',
+    checked: getSetting(settings.SHOW_TAB_PREVIEWS),
+    click: (item, focusedWindow) => {
+      appActions.changeSetting(settings.SHOW_TAB_PREVIEWS, !getSetting(settings.SHOW_TAB_PREVIEWS))
+    }
+  }
+}
+
 module.exports.autoHideMenuBarMenuItem = () => {
   const autoHideMenuBar = getSetting(settings.AUTO_HIDE_MENU)
   return {
