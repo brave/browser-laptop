@@ -448,7 +448,7 @@ class AboutBookmarks extends React.Component {
     this.refs.bookmarkSearch.focus()
   }
   render () {
-    return <div className='siteDetailsPage' onClick={this.onClick}>
+    return <div className='siteDetailsPage bookmarksManager' onClick={this.onClick}>
       <div className='siteDetailsPageHeader'>
         <AboutPageSectionTitle data-l10n-id='bookmarkManager' />
         <div className='headerActions'>
