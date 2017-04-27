@@ -148,12 +148,12 @@ module.exports.printMenuItem = () => {
   }
 }
 
-module.exports.emailPageLinkMenuItem = () => {
+module.exports.simpleShareActiveTabMenuItem = (l10nId, type, accelerator) => {
   return {
-    label: locale.translation('emailPageLink'),
-    accelerator: 'CmdOrCtrl+Shift+I',
+    label: locale.translation(l10nId),
+    accelerator,
     click: function (item, focusedWindow) {
-      appActions.emailActiveTabRequested(getCurrentWindowId())
+      appActions.simpleShareActiveTabRequested(getCurrentWindowId(), type)
     }
   }
 }

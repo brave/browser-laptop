@@ -59,6 +59,11 @@ const fakeElectron = {
     },
     moveItemToTrash: function () {
     }
+  },
+  session: {
+    defaultSession: {
+      partition: 'default'
+    }
   }
 }
 

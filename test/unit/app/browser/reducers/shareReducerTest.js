@@ -18,7 +18,7 @@ describe('shareReducer', function () {
     })
     mockery.registerMock('electron', fakeElectron)
     this.shareStub = {
-      emailActiveTab: sinon.stub()
+      simpleShareActiveTab: sinon.stub()
     }
     mockery.registerMock('../share', this.shareStub)
     shareReducer = require('../../../../../app/browser/reducers/shareReducer')
@@ -28,14 +28,15 @@ describe('shareReducer', function () {
     mockery.disable()
   })
 
-  describe('APP_EMAIL_ACTIVE_TAB_REQUESTED', function () {
+  describe('APP_SIMPLE_SHARE_ACTIVE_TAB_REQUESTED', function () {
     before(function () {
       this.state = Immutable.Map()
       this.windowId = 2
-      this.newState = shareReducer(this.state, {actionType: appConstants.APP_EMAIL_ACTIVE_TAB_REQUESTED, windowId: this.windowId})
+      this.shareType = 'email'
+      this.newState = shareReducer(this.state, {actionType: appConstants.APP_SIMPLE_SHARE_ACTIVE_TAB_REQUESTED, windowId: this.windowId, shareType: this.shareType})
     })
-    it('calls emailActiveTab once with the correct args', function () {
-      const callCount = this.shareStub.emailActiveTab.withArgs(this.state, this.windowId).callCount
+    it('calls simpleShareActiveTab once with the correct args', function () {
+      const callCount = this.shareStub.simpleShareActiveTab.withArgs(this.state, this.windowId, this.shareType).callCount
       assert.equal(callCount, 1)
     })
   })

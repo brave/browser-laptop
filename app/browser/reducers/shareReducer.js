@@ -6,13 +6,13 @@
 
 const appConstants = require('../../../js/constants/appConstants')
 const {makeImmutable} = require('../../common/state/immutableUtil')
-const {emailActiveTab} = require('../share')
+const {simpleShareActiveTab} = require('../share')
 
 const shareReducer = (state, action) => {
   action = makeImmutable(action)
   switch (action.get('actionType')) {
-    case appConstants.APP_EMAIL_ACTIVE_TAB_REQUESTED:
-      state = emailActiveTab(state, action.get('windowId'))
+    case appConstants.APP_SIMPLE_SHARE_ACTIVE_TAB_REQUESTED:
+      state = simpleShareActiveTab(state, action.get('windowId'), action.get('shareType'))
       break
   }
   return state

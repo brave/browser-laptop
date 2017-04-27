@@ -16,6 +16,11 @@ describe('share API', function () {
       useCleanCache: true
     })
     mockery.registerMock('electron', fakeElectron)
+
+    this.mockTabs = {
+      create: sinon.stub()
+    }
+    mockery.registerMock('./tabs', this.mockTabs)
     share = require('../../../../app/browser/share')
   })
 
@@ -23,7 +28,7 @@ describe('share API', function () {
     mockery.disable()
   })
 
-  describe('emailActiveTab', function () {
+  describe('simpleShareActiveTab', function () {
     before(function () {
       this.state = Immutable.fromJS({
         tabs: [{
@@ -50,18 +55,41 @@ describe('share API', function () {
     })
     afterEach(function () {
       this.openExternalSpy.reset()
+      this.mockTabs.create.reset()
     })
-    it('calls openExternal with the correct args', function () {
-      share.emailActiveTab(this.state, 2)
-      const expectedUrl = 'mailto:?subject=title%202&body=https%3A%2F%2Fwww.brave.com%2F2'
-      const callCount = this.openExternalSpy.withArgs(expectedUrl).callCount
-      assert.equal(callCount, 1)
+    describe('email', function () {
+      it('calls openExternal with the correct args', function () {
+        share.simpleShareActiveTab(this.state, 2, 'email')
+        const expectedUrl = 'mailto:?subject=title%202&body=https%3A%2F%2Fwww.brave.com%2F2'
+        const callCount = this.openExternalSpy.withArgs(expectedUrl).callCount
+        assert.equal(callCount, 1)
+        assert.equal(this.mockTabs.create.withArgs(expectedUrl).callCount, 0)
+      })
+      it('takes active tab windowId into consideration', function () {
+        share.simpleShareActiveTab(this.state, 5, 'email')
+        const expectedUrl = 'mailto:?subject=title%205&body=https%3A%2F%2Fwww.brave.com%2F5'
+        const callCount = this.openExternalSpy.withArgs(expectedUrl).callCount
+        assert.equal(callCount, 1)
+        assert.equal(this.mockTabs.create.withArgs(expectedUrl).callCount, 0)
+      })
     })
-    it('takes active tab windowId into consideration', function () {
-      share.emailActiveTab(this.state, 5)
-      const expectedUrl = 'mailto:?subject=title%205&body=https%3A%2F%2Fwww.brave.com%2F5'
-      const callCount = this.openExternalSpy.withArgs(expectedUrl).callCount
-      assert.equal(callCount, 1)
+    describe('other', function () {
+      it('calls createTabRequested with correct args', function () {
+        Object.entries(share.templateUrls).forEach(([shareType, template]) => {
+          if (shareType === 'email') {
+            return
+          }
+          share.simpleShareActiveTab(this.state, 5, shareType)
+          const expectedUrl = template
+            .replace('{url}', 'https%3A%2F%2Fwww.brave.com%2F5')
+            .replace('{title}', 'title%205')
+          assert.equal(this.openExternalSpy.withArgs({url: expectedUrl}).callCount, 0)
+          assert.equal(this.mockTabs.create.callCount, 1)
+          assert.equal(this.mockTabs.create.args[0][0].url, expectedUrl)
+          this.openExternalSpy.reset()
+          this.mockTabs.create.reset()
+        })
+      })
     })
   })
 })

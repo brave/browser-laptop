@@ -97,19 +97,19 @@ const createFileSubmenu = () => {
       }
     }, {
       label: locale.translation('share'),
-      visible: false
-      /*
       submenu: [
-        {label: 'Email Page Link...'},
+        CommonMenu.simpleShareActiveTabMenuItem('emailPageLink', 'email', 'CmdOrCtrl+Shift+I'),
         CommonMenu.separatorMenuItem,
-        {label: 'Tweet Page...'},
-        {label: 'Share on Facebook...'},
-        {label: 'More...'}
+        CommonMenu.simpleShareActiveTabMenuItem('tweetPageLink', 'twitter'),
+        CommonMenu.simpleShareActiveTabMenuItem('facebookPageLink', 'facebook'),
+        CommonMenu.simpleShareActiveTabMenuItem('pinterestPageLink', 'pinterest'),
+        CommonMenu.simpleShareActiveTabMenuItem('googlePlusPageLink', 'googlePlus'),
+        CommonMenu.simpleShareActiveTabMenuItem('linkedInPageLink', 'linkedIn'),
+        CommonMenu.simpleShareActiveTabMenuItem('bufferPageLink', 'buffer'),
+        CommonMenu.simpleShareActiveTabMenuItem('redditPageLink', 'reddit')
       ]
-      */
     },
     // Move inside share menu when it's enabled
-    CommonMenu.emailPageLinkMenuItem(),
     CommonMenu.separatorMenuItem,
     CommonMenu.printMenuItem()
   ]

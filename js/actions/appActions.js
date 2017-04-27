@@ -151,11 +151,13 @@ const appActions = {
   /**
    * A request for a URL email share occurred
    * @param {number} windowId - the window ID to use for the active tab
+   * @param {string} shareType - The type of share to do, must be one of: "email", "facebook", "pinterest", "twitter", "googlePlus", "linkedIn", "buffer", "reddit", or "digg"
    */
-  emailActiveTabRequested: function (windowId) {
+  simpleShareActiveTabRequested: function (windowId, shareType) {
     AppDispatcher.dispatch({
-      actionType: appConstants.APP_EMAIL_ACTIVE_TAB_REQUESTED,
-      windowId
+      actionType: appConstants.APP_SIMPLE_SHARE_ACTIVE_TAB_REQUESTED,
+      windowId,
+      shareType
     })
   },
 
