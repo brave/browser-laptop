@@ -244,6 +244,10 @@ describe('urlutil', function () {
       assert.equal(UrlUtil.getLocationIfPDF('chrome-extension://jdbefljfgobbmcidnmpjamcbhnbphjnb/https://www.blackhat.co…king-Kernel-Address-Space-Layout-Randomization-KASLR-With-Intel-TSX-wp.pdf'),
         'https://www.blackhat.co…king-Kernel-Address-Space-Layout-Randomization-KASLR-With-Intel-TSX-wp.pdf')
     })
+    it('does not remove wayback machine url location for PDF JS URL', function () {
+      assert.equal(UrlUtil.getLocationIfPDF('chrome-extension://jdbefljfgobbmcidnmpjamcbhnbphjnb/https://web.archive.org/web/20160106152308/http://stlab.adobe.com/wiki/images/d/d3/Test.pdf'),
+        'https://web.archive.org/web/20160106152308/http://stlab.adobe.com/wiki/images/d/d3/Test.pdf')
+    })
     it('does not modify location for non-pdf URL', function () {
       assert.equal(UrlUtil.getLocationIfPDF('https://www.blackhat.co…king-Kernel-Address-Space-Layout-Randomization-KASLR-With-Intel-TSX-wp.pdf'),
         'https://www.blackhat.co…king-Kernel-Address-Space-Layout-Randomization-KASLR-With-Intel-TSX-wp.pdf')
