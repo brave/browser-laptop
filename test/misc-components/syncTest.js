@@ -6,7 +6,7 @@ const {newTabMode} = require('../../app/common/constants/settingsEnums')
 const siteTags = require('../../js/constants/siteTags')
 const Brave = require('../lib/brave')
 const Immutable = require('immutable')
-const {adsBlockedControl, allowAllCookiesOption, bookmarksToolbar, braveMenu, braveryPanel, cookieControl, doneButton, fpSwitch, httpsEverywhereSwitch, navigatorBookmarked, navigatorNotBookmarked, noScriptSwitch, urlInput, removeButton, safeBrowsingSwitch, showAdsOption, syncTab, syncSwitch, bookmarkNameInput} = require('../lib/selectors')
+const {adsBlockedControl, allowAllCookiesOption, bookmarksToolbar, braveMenu, braveryPanel, braveryPanelContainer, cookieControl, doneButton, fpSwitch, httpsEverywhereSwitch, navigatorBookmarked, navigatorNotBookmarked, noScriptSwitch, urlInput, removeButton, safeBrowsingSwitch, showAdsOption, syncTab, syncSwitch, bookmarkNameInput} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 const aboutBookmarksUrl = getTargetAboutUrl('about:bookmarks')
 const aboutHistoryUrl = getTargetAboutUrl('about:history')
@@ -871,7 +871,7 @@ describe('Syncing then turning it off stops syncing', function () {
       .waitForVisible(fpSwitch)
       .click(fpSwitch)
       .waitUntil(checkSiteSetting(this.hostPattern1, this.siteSettingName, true))
-      .keys(Brave.keys.ESCAPE)
+      .click(braveryPanelContainer)
       .pause(1000) // XXX: Wait for Sync to upload records to S3
 
     // Sync Off - browsing activity NOT synced
