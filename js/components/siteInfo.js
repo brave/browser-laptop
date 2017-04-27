@@ -7,6 +7,7 @@ const PropTypes = require('prop-types')
 const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
 const cx = require('../lib/classSet')
 const {isPotentialPhishingUrl} = require('../lib/urlutil')
+const {isSourceAboutUrl} = require('../lib/appUrlUtil')
 const Dialog = require('./dialog')
 const Button = require('./button')
 const appActions = require('../actions/appActions')
@@ -66,6 +67,10 @@ class SiteInfo extends ImmutableComponent {
     return isPotentialPhishingUrl(this.props.frameProps.getIn(['location']))
   }
   render () {
+    if (isSourceAboutUrl(this.location)) {
+      return null
+    }
+
     // Figure out the partition info display
     let l10nArgs = {
       partitionNumber: this.partitionNumber
