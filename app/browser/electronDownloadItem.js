@@ -3,6 +3,8 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const downloadStates = require('../../js/constants/downloadStates')
+const electron = require('electron')
+const app = electron.app
 
 /**
  * Maps downloadId to an electron download-item
@@ -11,6 +13,9 @@ const downloadMap = {}
 
 module.exports.updateElectronDownloadItem = (downloadId, item, state) => {
   if (state === downloadStates.INTERRUPTED || state === downloadStates.CANCELLED || state === downloadStates.COMPLETED) {
+    if (state === downloadStates.COMPLETED) {
+      app.dock.downloadFinished(item.getSavePath())
+    }
     delete downloadMap[downloadId]
   } else {
     downloadMap[downloadId] = item

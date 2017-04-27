@@ -1,7 +1,6 @@
 /* global describe, it, before */
 
 /* jshint asi: true, node: true, laxbreak: true, laxcomma: true, undef: true, unused: true */
-const levelup = require('level')
 const assert = require('assert')
 
 const includes = (db, domain, done) => {
@@ -62,8 +61,12 @@ let dbHandle
 
 // https://github.com/Level/levelup
 
-describe('smoketest for our exclusion list', function () {
+// Disabled until we have a way to run tests with different leveldown ABI
+// from what is installed for muon.
+describe.skip('smoketest for our exclusion list', function () {
   before(function (done) {
+    const levelup = require('level')
+
     // TODO(bsclifton): only works on macOS at the moment
     const filepath =
       require('os').homedir() +

@@ -81,8 +81,8 @@ module.exports.shouldRedownloadFirst = (resourceName, version) => {
  *   Takes either the data itself as an argument or the pathname on disk of the
  *   directory where the data was downloaded.
  */
-module.exports.init = (resourceName, startExtension, onInitDone, forceDownload) => {
-  const version = appConfig[resourceName].version
+module.exports.init = (resourceName, version, startExtension, onInitDone, forceDownload) => {
+  version = version || appConfig[resourceName].version
 
   let versionFolder = version
   const hasStagedDatFile = [appConfig.resourceNames.ADBLOCK, appConfig.resourceNames.SAFE_BROWSING].includes(resourceName)

@@ -6,7 +6,7 @@
 
 const urlParse = require('./common/urlParse')
 const TrackingProtection = require('tracking-protection').CTPParser
-const DataFile = require('./dataFile')
+const dataFile = require('./dataFile')
 const Filtering = require('./filtering')
 const isThirdPartyHost = require('./browser/isThirdPartyHost')
 const LRUCache = require('lru-cache')
@@ -51,7 +51,7 @@ const startTrackingProtection = (wnd) => {
       !cachedFirstParty.get(firstPartyUrlHost).find((baseHost) =>
         !isThirdPartyHost(baseHost, urlHost))
 
-    DataFile.debug(module.exports.resourceName, details, cancel)
+    dataFile.debug(module.exports.resourceName, details, cancel)
     return {
       cancel,
       resourceName: module.exports.resourceName
@@ -61,6 +61,6 @@ const startTrackingProtection = (wnd) => {
 
 module.exports.init = () => {
   trackingProtection = new TrackingProtection()
-  DataFile.init(module.exports.resourceName, startTrackingProtection,
+  dataFile.init(module.exports.resourceName, undefined, startTrackingProtection,
                 (data) => trackingProtection.deserialize(data))
 }

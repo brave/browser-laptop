@@ -970,7 +970,7 @@ var exports = {
         ? 'node_modules/electron-prebuilt/dist/brave.exe'
         : './node_modules/.bin/electron',
       env,
-      args: ['./', '--debug=5858', '--enable-logging', '--v=1'],
+      args: ['./', '--enable-logging', '--v=1'],
       requireName: 'devTools'
     })
     return this.app.start()

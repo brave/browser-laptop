@@ -5,8 +5,8 @@
 'use strict'
 
 const urlParse = require('./common/urlParse')
-const {AdBlockClient} = require('ad-block')
-const DataFile = require('./dataFile')
+const {adBlockDataFileVersion, AdBlockClient} = require('ad-block')
+const dataFile = require('./dataFile')
 const Filtering = require('./filtering')
 const appConfig = require('../js/constants/appConfig')
 const debounce = require('../js/lib/debounce')
@@ -53,7 +53,7 @@ const startAdBlocking = (adblock, resourceName, shouldCheckMainFrame) => {
 }
 
 module.exports.initInstance = (adBlockClient, resourceName, shouldCheckMainFrame) => {
-  DataFile.init(resourceName, startAdBlocking.bind(null, adBlockClient, resourceName, shouldCheckMainFrame),
+  dataFile.init(resourceName, adBlockDataFileVersion, startAdBlocking.bind(null, adBlockClient, resourceName, shouldCheckMainFrame),
                 (data) => adBlockClient.deserialize(data))
   return module.exports
 }
@@ -87,7 +87,7 @@ const registerAppConfigForResource = (uuid, enabled, version) => {
  * @param uuid - The uuid of the adblock datafile resource
  * @param forAdblock - true if main frame URLs should be blocked
  */
-module.exports.updateAdblockDataFiles = (uuid, enabled, version = Number(appConfig.adblock.version), shouldCheckMainFrame = false) => {
+module.exports.updateAdblockDataFiles = (uuid, enabled, version = adBlockDataFileVersion, shouldCheckMainFrame = false) => {
   registerAppConfigForResource(uuid, enabled, version)
   if (!adblockInstances.has(uuid)) {
     const adBlockClient = new AdBlockClient()
