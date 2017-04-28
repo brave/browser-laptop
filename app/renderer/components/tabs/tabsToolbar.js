@@ -26,7 +26,8 @@ class TabsToolbar extends ImmutableComponent {
       // Don't show the tabs menu if the new tab "+"" was clicked
       return
     }
-    contextMenus.onTabsToolbarContextMenu(windowStore.getFrame(this.props.activeFrameKey), undefined, undefined, e)
+    const activeFrame = windowStore.getFrame(this.props.activeFrameKey)
+    contextMenus.onTabsToolbarContextMenu(activeFrame.get('title'), activeFrame.get('location'), undefined, undefined, e)
   }
 
   render () {
