@@ -1,5 +1,14 @@
 # Linux install instructions
 
+## Snap
+
+Install <project> in seconds on [Ubuntu and other snap supported Linux distributions](https://snapcraft.io/docs/core/install) with:
+
+    snap install brave --beta
+
+Installing a snap is very quick. Snaps are secure. They are isolated with all of their dependencies. Snaps also auto update when a new version is released.
+
+
 **NOTE**: _If you experience a problem with dependencies while installing, you may
 want to try installing `git` using the package manager for your distro._
 
