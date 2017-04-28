@@ -618,6 +618,9 @@ const api = {
     const url = normalizeUrl(createProperties.get('url'))
     createProperties = createProperties.set('url', url)
     const windowId = createProperties.get('windowId')
+    if (!windowId) {
+      return state
+    }
     const tabData = tabState.getMatchingTab(state, createProperties, windowId, url)
     if (tabData) {
       const tab = getWebContents(tabData.get('id'))
