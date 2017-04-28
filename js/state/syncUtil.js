@@ -79,7 +79,7 @@ module.exports.getSiteDataFromRecord = (record, appState, records) => {
   let existingObjectData
 
   if (record.action !== writeActions.CREATE) {
-    const existingObject = module.exports.getObjectById(objectId, category,
+    const existingObject = getObjectById(objectId, category,
       appState)
     existingObjectData = existingObject && existingObject[1]
   }
@@ -237,7 +237,7 @@ module.exports.getExistingObject = (categoryName, syncRecord) => {
   const AppStore = require('../stores/appStore')
   const appState = AppStore.getState()
   const objectId = new Immutable.List(syncRecord.objectId)
-  const existingObject = module.exports.getObjectById(objectId, categoryName, appState)
+  const existingObject = getObjectById(objectId, categoryName, appState)
   if (!existingObject) { return null }
 
   const existingObjectKeyPath = existingObject[0]
@@ -256,7 +256,8 @@ module.exports.getExistingObject = (categoryName, syncRecord) => {
       throw new Error(`Invalid category: ${categoryName}`)
   }
   if (!item) {
-    throw new Error(`Can't create JS from existingObject! ${existingObjectData}`)
+    console.log(`Warning: Can't create JS from existingObject! ${JSON.stringify(existingObjectData)}`)
+    return null
   }
   return {
     action: writeActions.CREATE,
@@ -314,7 +315,7 @@ module.exports.updateSiteCache = (appState, siteDetail) => {
  * @param {Immutable.Map=} appState
  * @returns {Array} [<Array>, <Immutable.Map>] array is AppStore searchKeyPath e.g. ['sites', 10] for use with updateIn
  */
-module.exports.getObjectById = (objectId, category, appState) => {
+const getObjectById = (objectId, category, appState) => {
   if (!(objectId instanceof Immutable.List)) {
     throw new Error('objectId must be an Immutable.List')
   }
@@ -355,7 +356,7 @@ const getFolderIdByObjectId = (objectId, appState, records) => {
     return folderIdMap.get(objectId)
   }
   let folderId
-  const entry = module.exports.getObjectById(objectId, 'BOOKMARKS', appState)
+  const entry = getObjectById(objectId, 'BOOKMARKS', appState)
   if (entry) {
     folderId = entry[1].get('folderId')
   } else if (records) {
