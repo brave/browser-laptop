@@ -118,18 +118,20 @@ class MessageBox extends ImmutableComponent {
         <div className={css(styles.body)} data-test-id='msgBoxMessage'>
           {this.message}
         </div>
-        {
-          this.showSuppress
-            ? <SwitchControl
-              // TODO: refactor SwitchControl
-              className={css(commonStyles.noPaddingLeft)}
-              rightl10nId='preventMoreAlerts'
-              checkedOn={this.suppress}
-              onClick={this.onSuppressChanged} />
-            : null
-        }
-        <div className={css(styles.buttons)} data-test-id='msgBoxButtons'>
-          {this.messageBoxButtons}
+        <div className={css(this.showSuppress && styles.actions)}>
+          {
+            this.showSuppress
+              ? <SwitchControl
+                // TODO: refactor SwitchControl
+                className={css(commonStyles.noPaddingLeft)}
+                rightl10nId='preventMoreAlerts'
+                checkedOn={this.suppress}
+                onClick={this.onSuppressChanged} />
+              : null
+          }
+          <div className={css(styles.buttons)} data-test-id='msgBoxButtons'>
+            {this.messageBoxButtons}
+          </div>
         </div>
       </div>
     </Dialog>
@@ -142,24 +144,31 @@ const styles = StyleSheet.create({
   },
   container: {
     outline: 'none',
-    display: 'block'
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between'
   },
   title: {
     fontWeight: 'bold',
     fontSize: '12pt',
-    marginBottom: globalStyles.spacing.dialogInsideMargin,
     userSelect: 'text'
   },
   body: {
     marginTop: globalStyles.spacing.dialogInsideMargin,
     minWidth: '425px',
     marginBottom: globalStyles.spacing.dialogInsideMargin,
-    userSelect: 'text'
+    userSelect: 'text',
+    maxHeight: 'calc(80vh - 220px)',
+    overflowY: 'auto',
+    overflowX: 'hidden'
+  },
+  actions: {
+    display: 'flex',
+    justifyContent: 'space-between'
   },
   buttons: {
     display: 'flex',
-    justifyContent: 'flex-end',
-    marginTop: globalStyles.spacing.dialogInsideMargin
+    justifyContent: 'flex-end'
   }
 })
 

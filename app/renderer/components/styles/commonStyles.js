@@ -45,7 +45,11 @@ const styles = StyleSheet.create({
     // Issue #7949
     padding: `${globalStyles.spacing.dialogInsideMargin} 30px`,
     position: 'absolute',
-    top: globalStyles.spacing.dialogTopOffset
+    top: globalStyles.spacing.dialogTopOffset,
+    // Issue #7930
+    boxSizing: 'border-box',
+    maxWidth: '600px',
+    maxHeight: `calc(80vh - ${globalStyles.spacing.downloadsBarHeight})`
   },
 
   // itemList.less
