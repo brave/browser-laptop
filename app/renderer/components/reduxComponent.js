@@ -3,6 +3,7 @@ const ImmutableComponent = require('./immutableComponent')
 const React = require('react')
 const windowStore = require('../../../js/stores/windowStore')
 const debounce = require('../../../js/lib/debounce')
+const {isList, isSameHashCode} = require('../../common/state/immutableUtil')
 
 const mergePropsImpl = (stateProps, dispatchProps, ownProps) => {
   return Object.assign({}, stateProps, dispatchProps, ownProps)
@@ -44,9 +45,15 @@ class ReduxComponent extends ImmutableComponent {
     this.setState(this.buildProps(nextProps))
   }
 
+  checkParam (old, next, prop) {
+    return isList(next[prop])
+      ? !isSameHashCode(next[prop], old[prop])
+      : next[prop] !== old[prop]
+  }
+
   shouldComponentUpdate (nextProps, nextState) {
-    return Object.keys(nextState).some((prop) => nextState[prop] !== this.state[prop]) ||
-      Object.keys(nextProps).some((prop) => nextProps[prop] !== this.props[prop])
+    return Object.keys(nextState).some((prop) => this.checkParam(this.state, nextState, prop)) ||
+      Object.keys(nextProps).some((prop) => this.checkParam(this.props, nextProps, prop))
   }
 
   mergeProps (stateProps, dispatchProps, ownProps) {

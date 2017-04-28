@@ -17,6 +17,14 @@ const api = {
     return Immutable.List.isList(obj)
   },
 
+  isSameHashCode: (first, second) => {
+    if (first === null && second === null) {
+      return true
+    }
+
+    return second !== null ? first.hashCode() === second.hashCode() : false
+  },
+
   makeImmutable: (obj) => {
     return api.isImmutable(obj) ? obj : Immutable.fromJS(obj)
   }
