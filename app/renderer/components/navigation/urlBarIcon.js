@@ -31,7 +31,7 @@ class UrlBarIcon extends ImmutableComponent {
       // NOTE: EV style not approved yet; see discussion at https://github.com/brave/browser-laptop/issues/791
       if (this.props.isSecure === true) {
         return ['fa-lock']
-      } else if (this.props.isSecure === false) {
+      } else if (this.props.isSecure === false || this.props.isSecure === 2) {
         return ['fa-unlock', 'insecure-color']
       } else if (this.props.isSecure === 1) {
         return ['fa-unlock']

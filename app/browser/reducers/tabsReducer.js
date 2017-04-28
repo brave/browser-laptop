@@ -133,7 +133,7 @@ const tabsReducer = (state, action) => {
     case windowConstants.WINDOW_SET_FRAME_ERROR:
       {
         const tabId = action.getIn(['frameProps', 'tabId'])
-        const tab = tabs.getWebContents(tabId)
+        const tab = getWebContents(tabId)
         if (tab) {
           let currentIndex = tab.getCurrentEntryIndex()
           let previousLocation = tab.getURL()

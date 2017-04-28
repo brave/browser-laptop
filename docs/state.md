@@ -475,7 +475,7 @@ WindowStore
     showFullScreenWarning: boolean, // true if a warning should be shown about full screen
     security: {
       blockedRunInsecureContent: Array<string>, // sources of blocked active mixed content
-      isSecure: (boolean|number), // true = fully secure, false = fully insecure, 1 = partially secure
+      isSecure: (boolean|number), // true = fully secure, false = fully insecure, 1 = partially secure, 2 = cert error
       loginRequiredDetail: {
         isProxy: boolean,
         host: string,
