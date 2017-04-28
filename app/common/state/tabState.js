@@ -105,10 +105,10 @@ const tabState = {
     return state.set('tabs', state.get('tabs').delete(index))
   },
 
-  removeTab: (state, action) => {
-    action = validateAction(action)
+  removeTab: (state, tabValue) => {
     state = validateState(state)
-    let tabValue = validateTabValue(action.get('tabValue'))
+    tabValue = makeImmutable(tabValue)
+    tabValue = validateTabValue(tabValue)
     let tabId = validateId('tabId', tabValue.get('tabId'))
     return tabState.removeTabByTabId(state, tabId)
   },

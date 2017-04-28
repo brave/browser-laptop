@@ -27,6 +27,7 @@ const {getByTabId} = require('../common/state/tabState')
 const getSetting = require('../../js/settings').getSetting
 const locale = require('../locale')
 const {isSiteBookmarked, siteSort} = require('../../js/state/siteUtil')
+const tabState = require('../../app/common/state/tabState')
 const isDarwin = process.platform === 'darwin'
 const isLinux = process.platform === 'linux'
 
@@ -70,16 +71,14 @@ const createFileSubmenu = () => {
     },
     CommonMenu.separatorMenuItem,
     {
-      // this should be disabled when
-      // no windows are active
+      // This should be disabled when no windows are active.
       label: locale.translation('closeTab'),
       accelerator: 'CmdOrCtrl+W',
       click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_CLOSE_FRAME])
+        appActions.activeWebContentsClosed()
       }
     }, {
-      // this should be disabled when
-      // no windows are active
+      // This should be disabled when no windows are active.
       label: locale.translation('closeWindow'),
       accelerator: 'CmdOrCtrl+Shift+W',
       click: function (item, focusedWindow) {
@@ -260,8 +259,10 @@ const createViewSubmenu = () => {
     {
       label: locale.translation('toggleDeveloperTools'),
       accelerator: isDarwin ? 'Cmd+Alt+I' : 'Ctrl+Shift+I',
-      click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS])
+      click: function (item) {
+        const win = BrowserWindow.getActiveWindow()
+        const activeTab = tabState.getActiveTabValue(appStore.getState(), win.id)
+        appActions.toggleDevTools(activeTab.get('tabId'))
       }
     },
     CommonMenu.separatorMenuItem,
