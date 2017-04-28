@@ -82,6 +82,32 @@ describe('syncUtil', () => {
       }
       assert.deepEqual(syncUtil.createSiteData(bookmark), expectedBookmark)
     })
+
+    it('site without lastAccessedTime', () => {
+      const site = {
+        order: 1207,
+        count: 15,
+        partitionNumber: 0,
+        location: 'https://parsecpizzadelivery.com/',
+        title: "Parsec Pizza Delivery trailer - A pixelated deliver 'em up",
+        tags: [],
+        objectId: [0, 63, 197, 156, 48, 17, 112, 109, 247, 175, 79, 57, 151, 123, 29, 198],
+        themeColor: 'rgb(5, 5, 5)'
+      }
+      const expectedSite = {
+        name: 'historySite',
+        objectId: [0, 63, 197, 156, 48, 17, 112, 109, 247, 175, 79, 57, 151, 123, 29, 198],
+        value: {
+          creationTime: 0,
+          customTitle: '',
+          favicon: '',
+          lastAccessedTime: 0,
+          location: 'https://parsecpizzadelivery.com/',
+          title: "Parsec Pizza Delivery trailer - A pixelated deliver 'em up"
+        }
+      }
+      assert.deepEqual(syncUtil.createSiteData(site), expectedSite)
+    })
   })
 
   describe('ipcSafeObject()', () => {
