@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.15.1](https://github.com/brave/browser-laptop/releases/v0.15.1dev)
+ - Update muon to 2.58.8. ([#8563](https://github.com/brave/browser-laptop/issues/8563))
+
 ## [0.15.0](https://github.com/brave/browser-laptop/releases/v0.15.0dev)
  - Update muon to 2.58.7. ([#8161](https://github.com/brave/browser-laptop/issues/8161))
 
