@@ -178,10 +178,15 @@ function stop () {
 }
 
 function saveTorrentFile () {
-  let a = document.createElement('a')
+  const parsedUrl = url.parse(store.torrentId, true)
+  parsedUrl.query.download = true
+  const name = path.basename(parsedUrl.pathname) || 'untitled.torrent'
+  const href = url.format(parsedUrl)
+
+  const a = document.createElement('a')
   a.target = '_blank'
-  a.download = true
-  a.href = `${store.torrentId}?download=ok`
+  a.download = name
+  a.href = href
   a.click()
 }
 
