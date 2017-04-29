@@ -20,7 +20,7 @@ require('../../node_modules/font-awesome/css/font-awesome.css')
 const store = {
   name: null, // Torrent name
   ix: null, // Selected file index
-  torrentId: window.decodeURIComponent(window.location.hash.substring(1)),
+  torrentId: null,
   torrentIdProtocol: null,
   torrent: null,
   serverUrl: null,
@@ -31,7 +31,12 @@ let client, server
 
 init()
 
+// Fix for issue: https://github.com/brave/browser-laptop/pull/8325#issuecomment-298134616
+window.addEventListener('hashchange', init)
+
 function init () {
+  store.torrentId = window.decodeURIComponent(window.location.hash.substring(1))
+
   const parsedUrl = url.parse(store.torrentId)
   store.torrentIdProtocol = parsedUrl.protocol
 
