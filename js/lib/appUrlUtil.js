@@ -221,7 +221,7 @@ function getHash (input) {
   return (typeof input === 'string') ? input.split('#')[1] : ''
 }
 
-module.exports.navigatableTypes = ['http:', 'https:', 'about:', 'chrome:', 'chrome-extension:', 'file:', 'view-source:', 'ftp:', 'magnet:']
+module.exports.navigatableTypes = ['http:', 'https:', 'about:', 'chrome:', 'chrome-extension:', 'chrome-devtools:', 'file:', 'view-source:', 'ftp:', 'magnet:']
 
 /**
  * Determine the URL to use when creating a new tab
