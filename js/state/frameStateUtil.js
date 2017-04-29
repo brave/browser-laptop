@@ -308,7 +308,7 @@ function getFramePropsIndex (frames, frameProps) {
 function getFrameByLastAccessedTime (frames) {
   const frameProps = frames.toJS()
     .reduce((pre, cur) => {
-      return (cur.pinnedLocation === undefined &&
+      return ([undefined, null].includes(cur.pinnedLocation) &&
         cur.lastAccessedTime &&
         cur.lastAccessedTime > pre.lastAccessedTime
       ) ? cur : pre
@@ -768,5 +768,6 @@ module.exports = {
   frameStatePathForFrame,
   tabStatePath,
   tabStatePathForFrame,
-  getLastCommittedURL
+  getLastCommittedURL,
+  getFrameByLastAccessedTime
 }

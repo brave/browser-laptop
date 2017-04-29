@@ -354,4 +354,42 @@ describe('frameStateUtil', function () {
       })
     })
   })
+
+  describe('getFrameByLastAccessedTime', function () {
+    let framesWithLastAccessedTime, framesWithoutLastAccessedTime, framesWithNullifiedLastAccessedTime
+
+    beforeEach(function () {
+      framesWithLastAccessedTime = Immutable.fromJS([
+        { key: 2, lastAccessedTime: null },
+        { key: 3, lastAccessedTime: 1488184050731 },
+        { key: 4, lastAccessedTime: 1488184050711 },
+        { key: 5 }
+      ])
+      framesWithoutLastAccessedTime = Immutable.fromJS([
+        { key: 2 },
+        { key: 3 },
+        { key: 4 }
+      ])
+      framesWithNullifiedLastAccessedTime = Immutable.fromJS([
+        { key: 2, lastAccessedTime: null },
+        { key: 3, lastAccessedTime: null },
+        { key: 4, lastAccessedTime: null }
+      ])
+    })
+
+    it('gets correct frame by last accessed time', function () {
+      const result = frameStateUtil.getFrameByLastAccessedTime(framesWithLastAccessedTime)
+      assert.equal(1, result)
+    })
+
+    it('returns -1 for frames without last accessed time', function () {
+      const result = frameStateUtil.getFrameByLastAccessedTime(framesWithoutLastAccessedTime)
+      assert.equal(-1, result)
+    })
+
+    it('returns -1 for frames with nullified last accessed time', function () {
+      const result = frameStateUtil.getFrameByLastAccessedTime(framesWithNullifiedLastAccessedTime)
+      assert.equal(-1, result)
+    })
+  })
 })
