@@ -328,6 +328,8 @@ const urlBarSuggestionsReducer = (state, action) => {
         state = state.setIn(selectedIndexPath, 0)
       } else if (selectedIndex > 0) {
         state = state.setIn(selectedIndexPath, selectedIndex - 1)
+      } else {
+        state = state.setIn(selectedIndexPath, suggestionList.size - 1)
       }
       state = updateUrlSuffix(state, state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), suggestionList))
       break
@@ -341,6 +343,8 @@ const urlBarSuggestionsReducer = (state, action) => {
         state = state.setIn(selectedIndexPath, 0)
       } else if (selectedIndex < suggestionList.size - 1) {
         state = state.setIn(selectedIndexPath, selectedIndex + 1)
+      } else if (selectedIndex === suggestionList.size - 1) {
+        state = state.setIn(selectedIndexPath, 0)
       }
       state = updateUrlSuffix(state, state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), suggestionList))
       break
