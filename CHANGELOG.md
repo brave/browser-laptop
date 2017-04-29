@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.15.1](https://github.com/brave/browser-laptop/releases/v0.15.1dev)
+ - Update muon to 2.58.8. ([#8563](https://github.com/brave/browser-laptop/issues/8563))
+
 ## [0.15.0](https://github.com/brave/browser-laptop/releases/v0.15.0dev)
  - Added tear off tabs - Ability to tear off tabs and to combine them back into other windows. ([#4402](https://github.com/brave/browser-laptop/issues/4402))
  - Added Widevine support for Amazon Prime Video. ([#5233](https://github.com/brave/browser-laptop/issues/5233))
