@@ -307,7 +307,7 @@ const UrlUtil = {
    */
   getLocationIfPDF: function (url) {
     if (url && url.startsWith(`chrome-extension://${pdfjsExtensionId}/`)) {
-      return url.replace(/^chrome-extension:\/\/.+\/(\w+:\/\/.+)/, '$1')
+      return url.replace(`chrome-extension://${pdfjsExtensionId}/`, '')
     }
     return url
   },
