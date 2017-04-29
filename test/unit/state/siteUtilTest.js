@@ -1274,6 +1274,13 @@ describe('siteUtil', function () {
       })
       assert.equal(siteUtil.isHistoryEntry(siteDetail), false)
     })
+    it('returns true for a history entry with falsey lastAccessedTime', function () {
+      const siteDetail = Immutable.fromJS({
+        location: testUrl1,
+        tags: []
+      })
+      assert.equal(siteUtil.isHistoryEntry(siteDetail), true)
+    })
     it('returns false for a bookmarks folder', function () {
       const siteDetail = Immutable.fromJS({
         location: testUrl1,

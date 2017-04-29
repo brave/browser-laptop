@@ -600,14 +600,13 @@ module.exports.isImportedBookmark = function (siteDetail) {
  */
 module.exports.isHistoryEntry = function (siteDetail) {
   if (siteDetail && typeof siteDetail.get('location') === 'string') {
-    if (siteDetail.get('location').startsWith('about:')) {
+    const tags = siteDetail.get('tags')
+    if (siteDetail.get('location').startsWith('about:') ||
+      module.exports.isDefaultEntry(siteDetail) ||
+      isBookmarkFolder(tags)) {
       return false
     }
-    if (module.exports.isDefaultEntry(siteDetail)) {
-      // This is a Brave default newtab site
-      return false
-    }
-    return !!siteDetail.get('lastAccessedTime') && !isBookmarkFolder(siteDetail.get('tags'))
+    return !!siteDetail.get('lastAccessedTime') || !tags || tags.size === 0
   }
   return false
 }
