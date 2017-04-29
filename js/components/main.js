@@ -7,7 +7,6 @@ const ImmutableComponent = require('../../app/renderer/components/immutableCompo
 const Immutable = require('immutable')
 const electron = require('electron')
 const ipc = electron.ipcRenderer
-const systemPreferences = electron.remote.systemPreferences
 
 // Actions
 const appActions = require('../actions/appActions')
@@ -234,7 +233,7 @@ class Main extends ImmutableComponent {
 
     // isSwipeTrackingFromScrollEventsEnabled is only true if "two finger scroll to swipe" is enabled
     ipc.on('scroll-touch-begin', () => {
-      if (swipeGesture && systemPreferences.isSwipeTrackingFromScrollEventsEnabled()) {
+      if (swipeGesture) {
         trackingFingers = true
         startTime = (new Date()).getTime()
       }
