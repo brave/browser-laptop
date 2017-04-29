@@ -444,14 +444,69 @@ module.exports.getDetailFromFrame = function (frame, tag) {
   })
 }
 
-module.exports.getDetailFromTab = function (tab, tag) {
+const getSitesBySubkey = (sites, siteKey, tag) => {
+  if (!sites || !siteKey) {
+    return makeImmutable([])
+  }
+  const splitKey = siteKey.split('|', 2)
+  const partialKey = splitKey.join('|')
+  const matches = sites.filter((site, key) => {
+    if (key.indexOf(partialKey) > -1 && (!tag || (tag && site.get('tags').includes(tag)))) {
+      return true
+    }
+    return false
+  })
+  return matches.toList()
+}
+
+module.exports.getDetailFromTab = function (tab, tag, sites) {
+  let location = tab.get('url')
+  const partitionNumber = tab.get('partitionNumber') !== undefined
+    ? tab.get('partitionNumber')
+    : undefined
+  let parentFolderId
+
+  // if site map is available, look up extra information:
+  // - original url (if redirected)
+  // - parent folder id
+  if (sites) {
+    let results = makeImmutable([])
+
+    // get all sites matching URL and partition (disregarding parentFolderId)
+    let siteKey = module.exports.getSiteKey(makeImmutable({location, partitionNumber}))
+    results = results.merge(getSitesBySubkey(sites, siteKey, tag))
+
+    // only check for provisional location if entry is not found
+    if (results.size === 0) {
+      // if provisional location is different, grab any results which have that URL
+      // this may be different if the site was redirected
+      const provisionalLocation = tab.getIn(['frame', 'provisionalLocation'])
+      if (provisionalLocation && provisionalLocation !== location) {
+        siteKey = module.exports.getSiteKey(makeImmutable({
+          location: provisionalLocation,
+          partitionNumber
+        }))
+        results = results.merge(getSitesBySubkey(sites, siteKey, tag))
+      }
+    }
+
+    // update details which get returned below
+    if (results.size > 0) {
+      location = results.getIn([0, 'location'])
+      parentFolderId = results.getIn([0, 'parentFolderId'])
+    }
+  }
+
   const siteDetail = {
-    location: tab.get('url'),
+    location: location,
     title: tab.get('title'),
     tags: tag ? [tag] : []
   }
-  if (tab.get('partitionNumber') !== undefined) {
-    siteDetail.partitionNumber = tab.get('partitionNumber')
+  if (partitionNumber) {
+    siteDetail.partitionNumber = partitionNumber
+  }
+  if (parentFolderId) {
+    siteDetail.parentFolderId = parentFolderId
   }
   return Immutable.fromJS(siteDetail)
 }
