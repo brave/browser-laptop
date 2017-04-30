@@ -9,6 +9,7 @@ const debounce = require('../../js/lib/debounce')
 const {getSetting} = require('../../js/settings')
 const locale = require('../locale')
 const LocalShortcuts = require('../localShortcuts')
+const {getSiteProps} = require('../common/lib/windowsUtil')
 const {makeImmutable} = require('../common/state/immutableUtil')
 const {getPinnedTabsByWindowId} = require('../common/state/tabState')
 const {siteSort} = require('../../js/state/siteUtil')
@@ -61,13 +62,6 @@ const updateWindow = (windowId) => {
   }
 }
 
-const siteProps = (site) => {
-  return Immutable.fromJS({
-    location: site.get('location'),
-    partitionNumber: site.get('partitionNumber') || 0
-  })
-}
-
 const updatePinnedTabs = (win) => {
   if (win.webContents.browserWindowOptions.disposition === 'new-popup') {
     return
@@ -77,7 +71,7 @@ const updatePinnedTabs = (win) => {
   const state = appStore.getState()
   const windowId = win.id
   const pinnedSites = state.get('sites').toList().filter((site) =>
-    site.get('tags').includes(siteTags.PINNED)).map((site) => siteProps(site))
+    site.get('tags').includes(siteTags.PINNED)).map(site => getSiteProps(site))
   const pinnedTabs = getPinnedTabsByWindowId(state, windowId)
 
   pinnedSites.filter((site) =>
