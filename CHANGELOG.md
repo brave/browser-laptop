@@ -1,7 +1,12 @@
 # Changelog
 
 ## [0.15.1](https://github.com/brave/browser-laptop/releases/v0.15.1dev)
- - Update muon to 2.58.8. ([#8563](https://github.com/brave/browser-laptop/issues/8563))
+ - Fixed navigating to a PDF may crash the tab. ([#8422](https://github.com/brave/browser-laptop/issues/8422))
+ - Fixed crash on startup (possibly related to recovering tabs). ([#8552](https://github.com/brave/browser-laptop/issues/8552))
+ - Fixed when Brave Payment is enabled, accessing Shield Settings on a blank page will crash the browser. ([#8545](https://github.com/brave/browser-laptop/issues/8545))
+ - Fixed Webview crash on http://www.jewsnews.co.il/. ([#8526](https://github.com/brave/browser-laptop/issues/8526))
+ - Fixed windowscentral.com crashes renderer on Windows 7. ([#6989](https://github.com/brave/browser-laptop/issues/6989))
+ - Upgrade to Muon 2.58.8. ([#8563](https://github.com/brave/browser-laptop/issues/8563))
 
 ## [0.15.0](https://github.com/brave/browser-laptop/releases/v0.15.0dev)
  - Added tear off tabs - Ability to tear off tabs and to combine them back into other windows. ([#4402](https://github.com/brave/browser-laptop/issues/4402))
