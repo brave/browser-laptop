@@ -4,6 +4,7 @@ const Brave = require('../lib/brave')
 const {urlInput} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 const aboutHistoryUrl = getTargetAboutUrl('about:history')
+const Immutable = require('immutable')
 
 describe('about:history', function () {
   const browseableSiteUrl = 'page1.html'
@@ -14,30 +15,34 @@ describe('about:history', function () {
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
       .waitForVisible(urlInput)
-      .windowByUrl(Brave.browserWindowUrl)
   }
 
   function * addDemoSites (client) {
+    const sites = Immutable.fromJS([
+      { location: 'https://brave.com', title: 'Brave' },
+      { location: 'https://brave.com/test', customTitle: 'customTest' },
+      { location: 'https://www.youtube.com' },
+      { location: 'https://www.facebook.com' }
+    ])
+
     yield client
-      .addSite({ location: 'https://brave.com', title: 'Brave' })
-      .addSite({ location: 'https://brave.com/test', customTitle: 'customTest' })
-      .addSite({ location: 'https://www.youtube.com' })
-      .addSite({ location: 'https://www.facebook.com' })
-      .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
+      .waitForBrowserWindow()
+      .addSiteList(sites)
       .tabByIndex(0)
-      .url(aboutHistoryUrl)
+      .loadUrl(aboutHistoryUrl)
   }
 
   function * addBrowseableSite (client) {
-    const site = Brave.server.url(browseableSiteUrl)
+    const location = Brave.server.url(browseableSiteUrl)
+    const sites = Immutable.fromJS([{
+      location,
+      title: browseableSiteTitle
+    }])
     yield client
-      .addSite({
-        location: site,
-        title: 'Page 1'
-      })
-      .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
+      .waitForBrowserWindow()
+      .addSiteList(sites)
       .tabByIndex(0)
-      .url(aboutHistoryUrl)
+      .loadUrl(aboutHistoryUrl)
   }
 
   describe('page content', function () {
@@ -80,12 +85,13 @@ describe('about:history', function () {
 
     it('opens a new tab with the location of the entry when double clicked', function * () {
       const site = Brave.server.url(browseableSiteUrl)
+      const target = 'table.sortableTable td.title[data-sort="' + browseableSiteTitle + '"]'
       yield this.app.client
-        .tabByUrl(aboutHistoryUrl)
-        .doubleClick('table.sortableTable td.title[data-sort="' + browseableSiteTitle + '"]')
-        .waitForTabCount(2)
+        .waitForVisible(target)
+        .doubleClick(target)
         .waitForUrl(site)
-        .tabByIndex(0)
+        .waitForBrowserWindow()
+        .waitForTabCount(2)
     })
   })
 
@@ -99,8 +105,6 @@ describe('about:history', function () {
 
     it('selects multiple rows when clicked with cmd/control', function * () {
       yield this.app.client
-        .tabByUrl(aboutHistoryUrl)
-        .loadUrl(aboutHistoryUrl)
         .click('table.sortableTable td.title[data-sort="Brave"]')
         .isDarwin().then((val) => {
           if (val === true) {
@@ -132,14 +136,12 @@ describe('about:history', function () {
     })
     it('selects multiple contiguous rows when shift clicked', function * () {
       yield this.app.client
-        .tabByUrl(aboutHistoryUrl)
-        .loadUrl(aboutHistoryUrl)
         .click('table.sortableTable td.title[data-sort="Brave"]')
         .keys(Brave.keys.SHIFT)
         .click('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
         .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
         .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://www.youtube.com"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://brave.com/test"]')
+        .waitForVisible('table.sortableTable td.title[data-sort="https://brave.com/test"]')
         .waitForVisible('table.sortableTable td.title[data-sort="https://www.facebook.com"]')
         // key depressed
         .keys(Brave.keys.SHIFT)
@@ -153,7 +155,7 @@ describe('about:history', function () {
           }
         })
         .click('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://www.youtube.com"]')
+        .waitForVisible('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
         // key depressed
         .isDarwin().then((val) => {
           if (val === true) {
@@ -164,14 +166,14 @@ describe('about:history', function () {
         })
         .keys(Brave.keys.SHIFT)
         .click('table.sortableTable td.title[data-sort="Brave"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
+        .waitForVisible('table.sortableTable td.title[data-sort="Brave"]')
         .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://www.youtube.com"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://brave.com/test"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://www.facebook.com"]')
+        .waitForVisible('table.sortableTable td.title[data-sort="https://brave.com/test"]')
+        .waitForVisible('table.sortableTable td.title[data-sort="https://www.facebook.com"]')
         // reset state
         // key depressed
         .keys(Brave.keys.SHIFT)
-        .click('table.sortableTable td.title[data-sort="Brave"]')
+        .click('table.sortableTable tr.selected td.title[data-sort="Brave"]')
     })
     it('deselects everything if something other than the table is clicked', function * () {
       yield this.app.client
