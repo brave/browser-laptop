@@ -11,6 +11,11 @@
   height: 100%;
   min-height: 100vh;
 
+  &.bookmarksManager {
+    position: fixed;
+    width: 100%;
+  }
+
   .siteDetailsPageHeader {
     display: flex;
     padding: 24px;
@@ -51,6 +56,11 @@
 
       > .bookmarkFolderList {
         display: block;
+        overflow-x: auto;
+        overflow-y: auto;
+        max-width: 410px;
+        // viewport - header size - header size
+        max-height: calc(~"100vh - 84px - 35px");
 
         .listItem >* {
           color: @buttonColor;
@@ -76,6 +86,8 @@
     .organizeView {
       flex-grow: 5;
       border-left: 1px solid @braveOrange;
+      overflow: auto;
+      max-height: 100vh;
 
       .sortableTable {
         user-select: none;
@@ -101,8 +113,10 @@
           }
         }
         .title {
-          overflow: hidden;
-          text-overflow: ellipsis;
+          div {
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
           span {
             vertical-align: middle;
           }
@@ -114,7 +128,9 @@
         }
         tr:hover {
           .bookmarkLocation {
-            display: inline-block;
+            display: inline;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
         }
         tr.selected:hover {
@@ -184,4 +200,28 @@
 
 .exportBookmarks {
   -webkit-mask-image: url('../../img/toolbar/bookmarks_export.svg');
+}
+
+// Reset styles for small breakpoints
+@media (max-width: @breakpointForBookmarksPage) {
+  .siteDetailsPage.bookmarksManager {
+    position: static;
+  }
+
+  .siteDetailsPage {
+    .siteDetailsPageContent {
+      .organizeView {
+        overflow: visible;
+        max-height: inherit;
+      }
+      .folderView {
+        > .bookmarkFolderList {
+          overflow-x: visible;
+          overflow-y: visible;
+          max-width: inherit;
+          max-height: inherit;
+        }
+      }
+    }
+  }
 }
