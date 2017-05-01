@@ -4,7 +4,7 @@
 
 const Immutable = require('immutable')
 
-module.exports.getSiteProps = site => {
+module.exports.getPinnedSiteProps = site => {
   return Immutable.fromJS({
     location: site.get('location'),
     order: site.get('order'),

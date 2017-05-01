@@ -16,7 +16,7 @@ describe('windowsUtil', () => {
   })
   let site
 
-  describe('getSiteProps', () => {
+  describe('getPinnedSiteProps', () => {
     beforeEach(() => {
       site = Immutable.fromJS({
         favicon: 'https://css-tricks.com/favicon.ico',
@@ -28,12 +28,12 @@ describe('windowsUtil', () => {
       })
     })
     it('returns object with necessary fields', () => {
-      const result = windowsUtil.getSiteProps(site)
+      const result = windowsUtil.getPinnedSiteProps(site)
       assert.deepEqual(expectedSiteProps, result)
     })
     it('set partitionNumber field to 0 in case of missing this field', () => {
       site = site.delete('partitionNumber')
-      const result = windowsUtil.getSiteProps(site)
+      const result = windowsUtil.getPinnedSiteProps(site)
       assert.equal(0, result.get('partitionNumber'))
     })
   })
