@@ -56,7 +56,7 @@ a {
 }
 
 .settingsListContainer {
-  margin-bottom: 2em;
+  margin-bottom: @settingsListContainerMargin;
 }
 
 .settingsListTitle,
@@ -286,6 +286,7 @@ table.sortableTable {
   }
 
   // This defines the styling of modal dialogs on "Add funds..." and "Advanced Settings..."
+  // TODO: Use modalOverlay in commonStyles.js
   .modal {
     .dialog {
       background: linear-gradient(@modalVeryLightGray, @modalLightGray);
@@ -564,97 +565,4 @@ table.sortableTable {
     margin-left: 5px;
     cursor: pointer;
   }
-}
-
-.syncContainer {
-  .modal {
-    textarea {
-      width: 80%;
-      height: 100px;
-      font-size: 18px;
-      font-family: monospace;
-    }
-    li {
-      margin: 1em;
-    }
-    .settingsListContainer {
-      margin-bottom: 1.5em;
-    }
-    .dialog-body, .dialog-footer {
-      padding-left: 50px;
-      padding-right: 50px;
-    }
-    .dialog-footer {
-      margin-top: 1.5em;
-      padding-bottom: 2em;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: flex-start;
-    }
-  }
-  .browserButton + .browserButton {
-    margin-left: 0.75em;
-  }
-  .setupContent, .setupError {
-    margin: 1em 0;
-  }
-  .setupError {
-    color: red;
-    font-weight: bold;
-  }
-  .deviceNameInput {
-    width: 50%;
-  }
-  .syncBetaMessage {
-    color: grey;
-    margin-top: 8px;
-  }
-  .device {
-    background-color: @lightGray;
-    border-radius: @borderRadiusUIbox;
-    color: @mediumGray;
-    display: table;
-    line-height: 1.8em;
-    margin: 1em 0;
-    padding: 0.5em 1em;
-    width: 32em;
-    & > div, .settingItem {
-      display: table-cell;
-      vertical-align: middle;
-    }
-    #syncEnableSwitch {
-      width: 50%;
-    }
-    .syncDeviceLabel {
-      font-size: 0.9em;
-      margin: 0;
-    }
-    .deviceName {
-      margin-bottom: 0.5em;
-    }
-  }
-  .devices {
-    margin: 1em 0;
-  }
-  .devicesList {
-    width: 34em;
-    margin-bottom: 1em;
-    td {
-      padding: 4px 8px;
-    }
-  }
-  .settingsListContainer {
-    margin-bottom: 1.5em;
-  }
-}
-
-#syncPassphrase {
-  margin: 1em;
-  color: #ff0400;
-  font-size: 15px;
-  font-family: monospace;
-}
-
-#syncQR {
-  margin: 1em;
 }

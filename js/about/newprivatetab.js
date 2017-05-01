@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignSelf: 'center',
     maxWidth: '780px',
-    padding: `${globalStyles.spacing.paddingHorizontal} 0`,
+    padding: `${globalStyles.spacing.privateTabPaddingHorizontal} 0`,
 
     [atBreakpoint]: {
       flexDirection: 'column'

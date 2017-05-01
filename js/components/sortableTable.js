@@ -360,7 +360,15 @@ class SortableTable extends React.Component {
         const value = typeof item === 'object' ? item.value : item
         const html = typeof item === 'object' ? item.html : item
         const cell = typeof item === 'object' ? item.cell : item
-        return <td className={this.hasColumnClassNames ? this.props.columnClassNames[j] : undefined} data-sort={value} data-td-index={`${j}`}>
+
+        let hasColumnClassNames = (this.hasColumnClassNames ? this.props.columnClassNames[j] : '')
+        let customCellClassesStr = (this.props.customCellClasses ? this.props.customCellClasses : '')
+
+        return <td className={cx({
+          [hasColumnClassNames]: true,
+          [customCellClassesStr]: true
+        })}
+          data-sort={value} data-td-index={`${j}`}>
           {
             cell || (value === true ? '✕' : html)
           }

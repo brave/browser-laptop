@@ -91,7 +91,7 @@ class AdvancedSettingsContent extends ImmutableComponent {
 
 class AdvancedSettingsFooter extends ImmutableComponent {
   render () {
-    return <div className={css(paymentCommon.advanceFooter)}>
+    return <div className={css(commonStyles.modalOverlay__footer, commonStyles.modalOverlay__footerButton)}>
       <Button l10nId='backupLedger'
         className={css(commonStyles.primaryButton)}
         onClick={this.props.showOverlay.bind(this, 'ledgerBackup')}

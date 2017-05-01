@@ -12,10 +12,10 @@ const aboutBookmarksUrl = getTargetAboutUrl('about:bookmarks')
 const aboutHistoryUrl = getTargetAboutUrl('about:history')
 
 const prefsUrl = 'about:preferences'
-const startButton = '[data-l10n-id="syncStart"]'
-const addButton = '[data-l10n-id="syncAdd"]'
-const createButton = '[data-l10n-id="syncCreate"]'
-const newDeviceButton = '[data-l10n-id="syncNewDevice"]'
+const startButton = '[data-test-id="syncStartButton"]'
+const addButton = '[data-test-id="syncAddButton"]'
+const createButton = '[data-test-id="syncCreateButton"]'
+const newDeviceButton = '[data-test-id="syncNewDeviceButton"]'
 
 const PANEL_SEED = Immutable.fromJS(Array(32).fill(0))
 
@@ -187,8 +187,8 @@ describe('Sync Panel', function () {
         .click(syncTab)
         .waitForExist(newDeviceButton)
         .click(newDeviceButton)
-        .click('[data-l10n-id="syncShowPassphrase"]')
-        .waitForTextValue('#syncPassphrase', 'idyllic undergrowth sheepman chez\nwishy undergrounder verseman plyer\na a a a\na a a a')
+        .click('[data-test-id="syncShowPassphraseButton"]')
+        .waitForTextValue('[data-test-id="syncPassphrase"]', 'idyllic undergrowth sheepman chez\nwishy undergrounder verseman plyer\na a a a\na a a a')
     })
   })
 
@@ -210,7 +210,7 @@ describe('Sync Panel', function () {
         .waitForVisible(createButton)
         .click(createButton)
         .waitUntil(function () {
-          return this.getText('.setupError').then((val) => {
+          return this.getText('[data-test-id="syncSetupError"]').then((val) => {
             return val.includes('connection failed')
           })
         })
@@ -276,8 +276,8 @@ describe('Sync Panel', function () {
         .click(syncTab)
         .waitForVisible(syncSwitch)
         .click(syncSwitch)
-        .waitForExist('#syncData .switchBackground')
-        .click('#syncData .switchBackground')
+        .waitForExist('[data-test-id="syncDataSection"] .switchBackground')
+        .click('[data-test-id="syncDataSection"] .switchBackground')
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
@@ -296,11 +296,11 @@ describe('Sync Panel', function () {
         .click(syncSwitch)
         .waitForExist(newDeviceButton)
         .click(newDeviceButton)
-        .click('[data-l10n-id="syncShowPassphrase"]')
-        .waitForTextValue('#syncPassphrase', 'a a a a\na a a a\na a a a\na a a a')
-        .click('[data-l10n-id="syncShowQR"]')
+        .click('[data-test-id="syncShowPassphraseButton"]')
+        .waitForTextValue('[data-test-id="syncPassphrase"]', 'a a a a\na a a a\na a a a\na a a a')
+        .click('[data-test-id="syncShowQRButton"]')
         .waitUntil(function () {
-          return this.getAttribute('#syncQR', 'src').then((text) => {
+          return this.getAttribute('[data-test-id="syncQRImg"]', 'src').then((text) => {
             return text === 'data:image/png;base64,foo'
           })
         })

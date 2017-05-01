@@ -241,8 +241,8 @@ const styles = StyleSheet.create({
   walletBar: {
     background: globalStyles.color.lightGray,
     borderRadius: globalStyles.radius.borderRadiusUIbox,
-    padding: paymentStyles.padding.bar,
-    margin: `${paymentStyles.margin.bar} 0`
+    padding: globalStyles.spacing.panelPadding,
+    margin: `${globalStyles.spacing.panelMargin} 0`
   },
 
   listContainer: {
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
   },
 
   accountBalanceError: {
-    marginTop: paymentStyles.margin.barItem
+    marginTop: globalStyles.spacing.panelItemMargin
   },
 
   settingsListContainer: {
