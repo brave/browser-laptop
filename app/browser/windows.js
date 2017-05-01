@@ -223,14 +223,16 @@ const api = {
       win.on('resize', () => {
         updateWindowDebounce(windowId)
         const size = win.getSize()
+        const position = win.getPosition()
         // NOTE: the default window size is whatever the last window resize was
-        appActions.defaultWindowParamsChanged(size)
+        appActions.defaultWindowParamsChanged(size, position)
       })
       win.on('move', () => {
         updateWindowMove(windowId)
+        const size = win.getSize()
         const position = win.getPosition()
         // NOTE: the default window position is whatever the last window move was
-        appActions.defaultWindowParamsChanged(undefined, position)
+        appActions.defaultWindowParamsChanged(size, position)
       })
       win.on('enter-full-screen', () => {
         updateWindowDebounce(windowId)

@@ -969,6 +969,8 @@ describe('navigationBar tests', function () {
           .windowByUrl(Brave.browserWindowUrl)
           .keys('about:about')
           .keys(Brave.keys.ENTER)
+          .tabByUrl('about:about')
+          .windowByUrl(Brave.browserWindowUrl)
           .waitForInputText(urlInput, 'about:about')
           .waitForExist('.urlbarIcon.fa-list')
       })

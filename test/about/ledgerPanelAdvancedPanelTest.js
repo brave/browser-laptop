@@ -50,7 +50,9 @@ function * setupPaymentsTabAndOpenAdvancedSettings (client, tabAlreadyLoaded) {
       .waitForVisible(advancedSettingsButton, ledgerAPIWaitTimeout)
   }
 
-  yield client.click(advancedSettingsButton)
+  yield client
+    .waitForVisible(advancedSettingsButton, ledgerAPIWaitTimeout)
+    .click(advancedSettingsButton)
 }
 
 function validateRecoveryFile (recoveryFileContents) {

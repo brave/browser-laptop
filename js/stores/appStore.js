@@ -470,16 +470,6 @@ const handleAppAction = (action) => {
       appState = aboutHistoryState.setHistory(appState, action)
       syncActions.clearHistory()
       break
-    case appConstants.APP_DEFAULT_WINDOW_PARAMS_CHANGED:
-      if (action.size && action.size.size === 2) {
-        appState = appState.setIn(['defaultWindowParams', 'width'], action.size.get(0))
-        appState = appState.setIn(['defaultWindowParams', 'height'], action.size.get(1))
-      }
-      if (action.position && action.position.size === 2) {
-        appState = appState.setIn(['defaultWindowParams', 'x'], action.position.get(0))
-        appState = appState.setIn(['defaultWindowParams', 'y'], action.position.get(1))
-      }
-      break
     case appConstants.APP_SET_DATA_FILE_ETAG:
       appState = appState.setIn([action.resourceName, 'etag'], action.etag)
       break

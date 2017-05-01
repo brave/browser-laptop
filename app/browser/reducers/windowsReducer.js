@@ -37,6 +37,16 @@ const windowsReducer = (state, action) => {
     case appConstants.APP_WINDOW_UPDATED:
       state = windowState.maybeCreateWindow(state, action)
       break
+    case appConstants.APP_DEFAULT_WINDOW_PARAMS_CHANGED:
+      if (action.get('size')) {
+        state = state.setIn(['defaultWindowParams', 'width'], action.getIn(['size', 0]))
+        state = state.setIn(['defaultWindowParams', 'height'], action.getIn(['size', 1]))
+      }
+      if (action.get('position')) {
+        state = state.setIn(['defaultWindowParams', 'x'], action.getIn(['position', 0]))
+        state = state.setIn(['defaultWindowParams', 'y'], action.getIn(['position', 1]))
+      }
+      break
     case windowConstants.WINDOW_SHOULD_SET_TITLE:
       windows.setTitle(action.get('windowId'), action.get('title'))
       break
