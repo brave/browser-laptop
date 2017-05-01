@@ -15,7 +15,7 @@ const templateUrls = {
   googlePlus: 'https://plus.google.com/share?url={url}',
   linkedIn: 'https://www.linkedin.com/shareArticle?url={url}&title={title}',
   buffer: 'https://buffer.com/add?text={title}&url={url}',
-  digg: 'http://digg.com/submit?url={url}&title={title}',
+  digg: 'https://digg.com/submit?url={url}&title={title}',
   reddit: 'https://reddit.com/submit?url={url}&title={title}'
 }
 
