@@ -114,18 +114,22 @@ Now actually run Brave in another terminal
 
     npm start
 
-To run the webdriver tests:
-
-    npm run watch-test  or  npm run watch-all
-
-    npm test
-
 Some errors related to [brave/electron](https://github.com/brave/electron) update can be fixed by doing a clean install:
 
     rm -rf node_modules/
     npm install
 
 If this does not work, please clear out your ~/.electron first and try again.
+
+### Running webdriver tests
+
+To run the webdriver tests
+
+    npm run watch-test  or  npm run watch-all
+
+Now run tests in another terminal
+
+    npm test
 
 ### Port
 
