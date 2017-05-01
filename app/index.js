@@ -81,7 +81,9 @@ app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferH
 
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
-let sessionStateStoreCompleteOnQuit = false
+let sessionStateStoreComplete = false
+let sessionStateStoreCompleteCallback = null
+let requestId = 0
 let shuttingDown = false
 let lastWindowState
 let lastWindowClosed = false
@@ -99,56 +101,59 @@ const sessionStoreQueue = async.queue((task, callback) => {
   task(callback)
 }, 1)
 
-const saveIfAllCollected = (forceSave) => {
+const logSaveAppStateError = (e) => {
+  console.error('Error saving app state: ', e)
+}
+
+const saveAppState = (forceSave = false) => {
   // If we're shutting down early and can't access the state, it's better
   // to not try to save anything at all and just quit.
   if (shuttingDown && !AppStore.getState()) {
     app.exit(0)
   }
-  if (forceSave || perWindowState.length === BrowserWindow.getAllWindows().length) {
-    const appState = AppStore.getState().toJS()
-    appState.perWindowState = perWindowState
 
-    if (shuttingDown) {
-      // If the status is still UPDATE_AVAILABLE then the user wants to quit
-      // and not restart
-      if (appState.updates && (appState.updates.status === UpdateStatus.UPDATE_AVAILABLE ||
-          appState.updates.status === UpdateStatus.UPDATE_AVAILABLE_DEFERRED)) {
-        // In this case on win32, the process doesn't try to auto restart, so avoid the user
-        // having to open the app twice.  Maybe squirrel detects the app is already shutting down.
-        if (process.platform === 'win32') {
-          appState.updates.status = UpdateStatus.UPDATE_APPLYING_RESTART
-        } else {
-          appState.updates.status = UpdateStatus.UPDATE_APPLYING_NO_RESTART
-        }
-      }
-    }
-    sessionStoreQueue.push(saveAppState.bind(null, appState))
+  const appState = AppStore.getState().toJS()
+  appState.perWindowState = perWindowState
+
+  const receivedAllWindows = perWindowState.length === BrowserWindow.getAllWindows().length
+  if (!forceSave && !receivedAllWindows) {
+    return
   }
-}
 
-const logSaveAppStateError = (e) => {
-  console.error('Error saving app state: ', e)
-}
-
-const saveAppState = (appState, cb) => {
-  SessionStore.saveAppState(appState, shuttingDown).catch((e) => {
+  return SessionStore.saveAppState(appState, shuttingDown).catch((e) => {
     logSaveAppStateError(e)
-    cb()
   }).then(() => {
-    if (shuttingDown) {
-      sessionStateStoreCompleteOnQuit = true
-      // If there's an update to apply, then do it here.
-      // Otherwise just quit.
-      if (appState.updates && (appState.updates.status === UpdateStatus.UPDATE_APPLYING_NO_RESTART ||
-          appState.updates.status === UpdateStatus.UPDATE_APPLYING_RESTART)) {
-        Updater.quitAndInstall()
+    if (receivedAllWindows || forceSave) {
+      sessionStateStoreComplete = true
+    }
+
+    if (sessionStateStoreComplete) {
+      if (shuttingDown) {
+        // If the status is still UPDATE_AVAILABLE then the user wants to quit
+        // and not restart
+        if (appState.updates && (appState.updates.status === UpdateStatus.UPDATE_AVAILABLE ||
+            appState.updates.status === UpdateStatus.UPDATE_AVAILABLE_DEFERRED)) {
+          // In this case on win32, the process doesn't try to auto restart, so avoid the user
+          // having to open the app twice.  Maybe squirrel detects the app is already shutting down.
+          if (process.platform === 'win32') {
+            appState.updates.status = UpdateStatus.UPDATE_APPLYING_RESTART
+          } else {
+            appState.updates.status = UpdateStatus.UPDATE_APPLYING_NO_RESTART
+          }
+        }
+
+        // If there's an update to apply, then do it here.
+        // Otherwise just quit.
+        if (appState.updates && (appState.updates.status === UpdateStatus.UPDATE_APPLYING_NO_RESTART ||
+            appState.updates.status === UpdateStatus.UPDATE_APPLYING_RESTART)) {
+          Updater.quitAndInstall()
+        } else {
+          app.quit()
+        }
       } else {
-        app.quit()
+        sessionStateStoreCompleteCallback()
+        sessionStateStoreCompleteCallback = null
       }
-      // no callback here because we don't want to get a partial write during shutdown
-    } else {
-      cb()
     }
   })
 }
@@ -156,20 +161,27 @@ const saveAppState = (appState, cb) => {
 /**
  * Saves the session storage for all windows
  */
-const initiateSessionStateSave = (beforeQuit) => {
-  if (shuttingDown && !beforeQuit) {
-    return
-  }
+const initiateSessionStateSave = () => {
+  sessionStoreQueue.push((cb) => {
+    sessionStateStoreComplete = false
+    sessionStateStoreCompleteCallback = cb
 
-  perWindowState.length = 0
-  // quit triggered by window-all-closed should save last window state
-  if (lastWindowClosed && lastWindowState) {
-    perWindowState.push(lastWindowState)
-    saveIfAllCollected(true)
-  } else {
-    BrowserWindow.getAllWindows().forEach((win) => win.webContents.send(messages.REQUEST_WINDOW_STATE))
-    saveIfAllCollected()
-  }
+    perWindowState.length = 0
+    // quit triggered by window-all-closed should save last window state
+    if (lastWindowClosed && lastWindowState) {
+      perWindowState.push(lastWindowState)
+    } else if (BrowserWindow.getAllWindows().length > 0) {
+      ++requestId
+      BrowserWindow.getAllWindows().forEach((win) => win.webContents.send(messages.REQUEST_WINDOW_STATE, requestId))
+      // Just in case a window is not responsive, we don't want to wait forever.
+      // In this case just save session store for the windows that we have already.
+      setTimeout(() => {
+        saveAppState(true)
+      }, appConfig.quitTimeout)
+    } else {
+      saveAppState()
+    }
+  })
 }
 
 let loadAppStatePromise = SessionStore.loadAppState()
@@ -242,26 +254,22 @@ app.on('ready', () => {
   })
 
   app.on('before-quit', (e) => {
-    if (sessionStateStoreCompleteOnQuit) {
+    if (shuttingDown && sessionStateStoreComplete) {
       return
     }
+
     e.preventDefault()
 
     // before-quit can be triggered multiple times because of the preventDefault call
     if (shuttingDown) {
       return
+    } else {
+      shuttingDown = true
     }
-    shuttingDown = true
 
     appActions.shuttingDown()
     clearInterval(sessionStateSaveInterval)
-    initiateSessionStateSave(true)
-
-    // Just in case a window is not responsive, we don't want to wait forever.
-    // In this case just save session store for the windows that we have already.
-    setTimeout(() => {
-      saveIfAllCollected(true)
-    }, appConfig.quitTimeout)
+    initiateSessionStateSave()
   })
 
   app.on('network-connected', () => {
@@ -273,14 +281,18 @@ app.on('ready', () => {
   })
 
   // User initiated exit using File->Quit
-  ipcMain.on(messages.RESPONSE_WINDOW_STATE, (wnd, data) => {
+  ipcMain.on(messages.RESPONSE_WINDOW_STATE, (evt, data, id) => {
+    if (id !== requestId) {
+      return
+    }
+
     if (data) {
       perWindowState.push(data)
     }
-    saveIfAllCollected()
+    saveAppState()
   })
 
-  ipcMain.on(messages.LAST_WINDOW_STATE, (wnd, data) => {
+  ipcMain.on(messages.LAST_WINDOW_STATE, (evt, data) => {
     if (data) {
       lastWindowState = data
     }

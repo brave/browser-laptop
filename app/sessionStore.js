@@ -33,7 +33,6 @@ const tabState = require('./common/state/tabState')
 const windowState = require('./common/state/windowState')
 
 const getSetting = require('../js/settings').getSetting
-const promisify = require('../js/lib/promisify')
 const sessionStorageName = `session-store-${sessionStorageVersion}`
 
 const getTopSiteMap = () => {
@@ -72,11 +71,8 @@ const getStoragePath = () => {
 module.exports.saveAppState = (payload, isShutdown) => {
   return new Promise((resolve, reject) => {
     // Don't persist private frames
-    let startupModeSettingValue
-    if (require('../js/stores/appStore').getState()) {
-      startupModeSettingValue = getSetting(settings.STARTUP_MODE)
-    }
-    const savePerWindowState = startupModeSettingValue === undefined ||
+    let startupModeSettingValue = getSetting(settings.STARTUP_MODE)
+    const savePerWindowState = startupModeSettingValue == null ||
       startupModeSettingValue === 'lastTime'
     if (payload.perWindowState && savePerWindowState) {
       payload.perWindowState.forEach((wndPayload) => {
@@ -99,15 +95,17 @@ module.exports.saveAppState = (payload, isShutdown) => {
     }
     payload.lastAppVersion = app.getVersion()
 
-    const tmpStoragePath = getTempStoragePath()
-
-    let p = promisify(fs.writeFile, tmpStoragePath, JSON.stringify(payload))
-      .then(() => promisify(fs.rename, tmpStoragePath, getStoragePath()))
     if (isShutdown) {
-      p = p.then(module.exports.cleanSessionDataOnShutdown())
+      module.exports.cleanSessionDataOnShutdown()
     }
-    p.then(resolve)
-      .catch(reject)
+
+    muon.file.writeImportant(getStoragePath(), JSON.stringify(payload), (success) => {
+      if (success) {
+        resolve()
+      } else {
+        reject(new Error('Could not save app state to ' + getStoragePath()))
+      }
+    })
   })
 }
 
@@ -381,14 +379,12 @@ module.exports.cleanAppData = (data, isShutdown) => {
  * @return a promise which resolve when the work is done.
  */
 module.exports.cleanSessionDataOnShutdown = () => {
-  let p = Promise.resolve()
   if (getSetting(settings.SHUTDOWN_CLEAR_ALL_SITE_COOKIES) === true) {
-    p = p.then(filtering.clearStorageData())
+    filtering.clearStorageData()
   }
   if (getSetting(settings.SHUTDOWN_CLEAR_CACHE) === true) {
-    p = p.then(filtering.clearCache())
+    filtering.clearCache()
   }
-  return p
 }
 
 const safeGetVersion = (fieldName, getFieldVersion) => {
