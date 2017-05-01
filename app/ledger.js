@@ -31,7 +31,6 @@
 contributeP: (stickyP OR !excluded) AND eligibleP   AND !blockedP
  */
 
-const crypto = require('crypto')
 const fs = require('fs')
 const os = require('os')
 const path = require('path')
@@ -274,8 +273,6 @@ var init = () => {
   try {
     appDispatcher.register(doAction)
     initialize(getSetting(settings.PAYMENTS_ENABLED))
-
-    doneTimer = setInterval(doneWriter, 1 * msecs.minute)
   } catch (ex) { console.log('ledger.js initialization failed: ' + ex.toString() + '\n' + ex.stack) }
 }
 
@@ -283,7 +280,6 @@ var quit = () => {
   quitP = true
   visit('NOOP', underscore.now(), null)
   clearInterval(doneTimer)
-  doneWriter()
 
   if ((!getSetting(settings.PAYMENTS_ENABLED)) && (getSetting(settings.SHUTDOWN_CLEAR_HISTORY))) reset(true)
 }
@@ -723,7 +719,7 @@ var initialize = (paymentsEnabled) => {
               }
               getStateInfo(stateResult)
 
-              atomicWriter(pathName(statePath), stateResult, { flushP: true }, () => {})
+              muonWriter(pathName(statePath), stateResult)
             })
           }
         } catch (ex) {
@@ -980,7 +976,7 @@ const fetchFavIcon = (entry, url, redirects) => {
 var updatePublisherInfo = (changedPublisher) => {
   var data
 
-  atomicWriter(pathName(synopsisPath), synopsis, () => {})
+  muonWriter(pathName(synopsisPath), synopsis)
   if (!publisherInfo._internal.enabled) return
 
   publisherInfo.synopsis = synopsisNormalizer(changedPublisher)
@@ -1584,27 +1580,13 @@ var updateLedgerInfo = () => {
  * ledger client callbacks
  */
 
-var logs = []
-
 var callback = (err, result, delayTime) => {
-  var i, results, then
+  var results
   var entries = client && client.report()
-  var now = underscore.now()
 
   if (clientOptions.verboseP) {
     console.log('\nledger client callback: clientP=' + (!!client) + ' errP=' + (!!err) + ' resultP=' + (!!result) +
                 ' delayTime=' + delayTime)
-  }
-
-  if (entries) {
-    then = now - msecs.week
-    logs = logs.concat(entries)
-
-    for (i = 0; i < logs.length; i++) if (logs[i].when > then) break
-    if ((i !== 0) && (i !== logs.length)) logs = logs.slice(i)
-    if (result) entries.push({ who: 'callback', what: result, when: underscore.now() })
-
-    atomicWriter(pathName(logPath), entries, { flag: 'a' }, () => {})
   }
 
   if (err) {
@@ -1672,7 +1654,7 @@ var callback = (err, result, delayTime) => {
     })
   }
 
-  atomicWriter(pathName(statePath), result, { flushP: true }, () => {})
+  muonWriter(pathName(statePath), result)
   run(delayTime)
 }
 
@@ -1813,7 +1795,7 @@ var run = (delayTime) => {
       result = client.vote(winner)
       if (result) state = result
     })
-    if (state) atomicWriter(pathName(statePath), state, { flushP: true }, () => {})
+    if (state) muonWriter(pathName(statePath), state)
   } catch (ex) {
     console.log('ledger client error(2): ' + ex.toString() + (ex.stack ? ('\n' + ex.stack) : ''))
   }
@@ -2045,7 +2027,7 @@ var setPaymentInfo = (amount) => {
   client.setBraveryProperties(bravery, (err, result) => {
     if (err) return console.log('ledger setBraveryProperties: ' + err.toString())
 
-    if (result) atomicWriter(pathName(statePath), result, { flushP: true }, () => {})
+    if (result) muonWriter(pathName(statePath), result)
   })
   if (ledgerInfo.created) getPaymentInfo()
 }
@@ -2093,69 +2075,16 @@ var networkConnected = underscore.debounce(() => {
  * low-level utilities
  */
 
-var syncingP = {}
-
-var atomicWriter = (path, obj, options, cb) => {
-  var data, suffix
-
-  if (typeof options === 'function') {
-    cb = options
-    options = null
-  }
-  options = underscore.defaults(options || {}, { encoding: 'utf8', mode: parseInt('644', 8) })
-
-  if ((!options.flushP) && (!syncingP[path])) syncingP[path] = true
-  if (syncingP[path]) {
-    syncingP[path] = { obj: obj, options: options, cb: cb }
-    if (ledgerInfo._internal.debugP) console.log('\ndeferring ' + path)
-    return
-  }
-  syncingP[path] = true
-
-  data = JSON.stringify(obj, null, 2)
-  suffix = '-' + crypto.createHash('md5').update(data).digest('hex')
-  if (ledgerInfo._internal.debugP) console.log('\nwriting ' + path + suffix)
-  fs.writeFile(path + suffix, data, options, (err) => {
-    var deferred = syncingP[path]
-
-    delete syncingP[path]
-    if (typeof deferred === 'object') {
-      if (ledgerInfo._internal.debugP) console.log('\nrestarting ' + path)
-      return atomicWriter(path, deferred.obj, deferred.options, deferred.cb)
-    }
-
-    if (err) {
-      console.log('write error: ' + err.toString())
-      return cb(err)
-    }
+var muonWriter = (path, payload) => {
+  muon.file.writeImportant(path, JSON.stringify(payload, null, 2), (success) => {
+    if (!success) return console.log('write error: ' + path)
 
     if ((quitP) && (!getSetting(settings.PAYMENTS_ENABLED)) && (getSetting(settings.SHUTDOWN_CLEAR_HISTORY))) {
-      if (ledgerInfo._internal.debugP) console.log('\ndeleting ' + path + suffix)
-      fs.unlink(path + suffix, (err) => {
-        if (err) console.log('unlink error: ' + err.toString())
-        cb(err)
-      })
-      return
+      if (ledgerInfo._internal.debugP) console.log('\ndeleting ' + path)
+      return fs.unlink(path, (err) => { if (err) console.log('unlink error: ' + err.toString()) })
     }
 
-    if (ledgerInfo._internal.debugP) console.log('\nrenaming ' + path + suffix)
-    fs.rename(path + suffix, path, (err) => {
-      if (err) console.log('rename error: ' + err.toString())
-      cb(err)
-    })
-  })
-}
-
-var doneWriter = () => {
-  underscore.keys(syncingP).forEach((path) => {
-    var deferred = syncingP[path]
-
-    if (typeof deferred !== 'object') return
-
-    delete syncingP[path]
-    if (ledgerInfo._internal.debugP) console.log('\nflushing ' + path)
-    deferred.options.flushP = true
-    atomicWriter(path, deferred.obj, deferred.options, deferred.cb)
+    if (ledgerInfo._internal.debugP) console.log('\nwrote ' + path)
   })
 }
 
