@@ -103,14 +103,12 @@ const windowActions = {
 
   /**
    * Dispatches a message when tab data changes
-   * @param {Object} frameProps - The frame properties
-   * @param {Object} tabData - the tab properties
+   * @param {Object} tabs - the tab properties
    */
-  tabDataChanged: function (frameProps, tabData) {
+  tabDataChanged: function (tabs) {
     dispatch({
       actionType: windowConstants.WINDOW_TAB_DATA_CHANGED,
-      frameProps,
-      tabData
+      tabs
     })
   },
 

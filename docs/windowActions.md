@@ -85,15 +85,13 @@ Dispatches a message when the guestInstanceId changes for a frame
 
 
 
-### tabDataChanged(frameProps, tabData) 
+### tabDataChanged(tabs) 
 
 Dispatches a message when tab data changes
 
 **Parameters**
 
-**frameProps**: `Object`, The frame properties
-
-**tabData**: `Object`, the tab properties
+**tabs**: `Object`, the tab properties
 
 
 

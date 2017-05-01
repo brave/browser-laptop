@@ -52,7 +52,6 @@ class Frame extends ImmutableComponent {
     this.onCloseFrame = this.onCloseFrame.bind(this)
     this.onUpdateWheelZoom = debounce(this.onUpdateWheelZoom.bind(this), 20)
     this.onFocus = this.onFocus.bind(this)
-    this.onAppStateChange = this.onAppStateChange.bind(this)
     // Maps notification message to its callback
     this.notificationCallbacks = {}
     // Counter for detecting PDF URL redirect loops
@@ -148,7 +147,6 @@ class Frame extends ImmutableComponent {
   }
 
   componentWillUnmount () {
-    appStoreRenderer.removeChangeListener(this.onAppStateChange)
     this.expireContentSettings(this.origin)
   }
 
@@ -210,15 +208,7 @@ class Frame extends ImmutableComponent {
     }
   }
 
-  onAppStateChange () {
-    if (!this.frame.isEmpty() && this.tab && !this.tab.delete('frame').equals(this.lastTab)) {
-      windowActions.tabDataChanged(this.frame, this.tab)
-    }
-    this.lastTab = this.tab && this.tab.delete('frame')
-  }
-
   componentDidMount () {
-    appStoreRenderer.addChangeListener(this.onAppStateChange)
     if (this.props.isActive) {
       windowActions.setActiveFrame(this.frame)
     }

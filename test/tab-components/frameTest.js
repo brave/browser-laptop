@@ -60,14 +60,20 @@ describe('frame tests', function () {
           .ipcSend('shortcut-set-active-frame-by-index', 0)
           .windowByUrl(Brave.browserWindowUrl)
           .cloneTabByIndex(0)
-          .waitForTabCount(3)
       })
 
       it('inserts after the tab to clone', function * () {
         this.tab1 = '.tabArea:nth-child(1) [data-test-id="tab"][data-frame-key="1"]'
         this.tab2 = '.tabArea:nth-child(2) [data-test-id="tab"][data-frame-key="3"]'
         this.tab3 = '.tabArea:nth-child(3) [data-test-id="tab"][data-frame-key="2"]'
+        const tabUrl = this.clickWithTargetPage
         yield this.app.client
+          .waitForTabCount(3)
+          .waitUntil(function () {
+            return this.tabByIndex(2).getUrl().then((url) => {
+              return url === tabUrl
+            })
+          })
           .windowByUrl(Brave.browserWindowUrl)
           .waitForExist(this.tab1)
           .waitForExist(this.tab2)
