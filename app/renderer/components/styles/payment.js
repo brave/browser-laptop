@@ -9,16 +9,18 @@ const paymentStyles = {
   font: {
     regular: '14.5px'
   },
+  width: {
+    tableRow: '235px',
+    tableCell: '265px' // width.tableRow + 30px
+  },
+
+  // Copied to global.js
   margin: {
     bar: '15px',
     barItem: '12px'
   },
   padding: {
     bar: '18px' // margin.barItem * 1.5
-  },
-  width: {
-    tableRow: '235px',
-    tableCell: '265px' // width.tableRow + 30px
   }
 }
 
@@ -41,13 +43,7 @@ const paymentCommon = StyleSheet.create({
     padding: '20px 20px 20px 50px'
   },
   marginButtons: {
-    marginLeft: '8px'
-  },
-  advanceFooter: {
-    padding: '20px',
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-end'
+    marginLeft: globalStyles.spacing.overlayButtonMargin
   }
 })
 

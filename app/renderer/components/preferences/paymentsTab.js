@@ -30,7 +30,7 @@ const {LedgerRecoveryContent, LedgerRecoveryFooter} = require('./payment/ledgerR
 // style
 const globalStyles = require('../styles/global')
 const {paymentStyles, paymentStylesVariables} = require('../styles/payment')
-const settingIcon = require('../../../extensions/brave/img/ledger/icon_settings.svg')
+const settingsIcon = require('../../../extensions/brave/img/ledger/icon_settings.svg')
 const historyIcon = require('../../../extensions/brave/img/ledger/icon_history.svg')
 
 // other
@@ -238,8 +238,8 @@ class PaymentsTab extends ImmutableComponent {
                   data-l10n-id='advancedSettingsIcon'
                   className={css(
                     styles.switchWrap__mainIcons,
-                    styles.mainIcons__settingIcon,
-                    !enabled && styles.mainIcons__settingIconDisabled
+                    styles.mainIcons__settingsIcon,
+                    !enabled && styles.mainIcons__settingsIconDisabled
                   )}
                   onClick={enabled ? this.props.showOverlay.bind(this, 'advancedSettings') : () => {}}
                 />
@@ -312,6 +312,7 @@ const styles = StyleSheet.create({
     position: 'relative'
   },
 
+  // Auto suggest switch
   switchWrap__autoSuggestSwitch: {
     // TODO: Refactor switchControls.less
     position: 'relative',
@@ -336,6 +337,7 @@ const styles = StyleSheet.create({
     }
   },
 
+  // History and settings icons
   switchWrap__mainIconsRight: {
     position: 'relative',
     right: '12px',
@@ -352,7 +354,6 @@ const styles = StyleSheet.create({
       backgroundColor: globalStyles.color.braveDarkOrange
     }
   },
-
   mainIcons__historyIcon: {
     right: '5px',
     WebkitMaskImage: `url(${historyIcon})`,
@@ -369,14 +370,14 @@ const styles = StyleSheet.create({
       backgroundColor: globalStyles.color.chromeTertiary
     }
   },
-  mainIcons__settingIcon: {
-    WebkitMaskImage: `url(${settingIcon})`,
+  mainIcons__settingsIcon: {
+    WebkitMaskImage: `url(${settingsIcon})`,
 
     ':hover': {
       backgroundColor: globalStyles.color.braveDarkOrange
     }
   },
-  mainIcons__settingIconDisabled: {
+  mainIcons__settingsIconDisabled: {
     backgroundColor: globalStyles.color.chromeTertiary,
     cursor: 'default',
 

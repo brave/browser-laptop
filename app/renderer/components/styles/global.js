@@ -58,6 +58,8 @@ const globalStyles = {
     gray: 'rgb(153, 153, 153)',
     mediumGray: 'rgb(101, 101, 101)',
     darkGray: 'rgb(68, 68, 68)',
+    modalVeryLightGray: 'rgb(247, 247, 247)',
+    modalLightGray: 'rgb(231, 231, 231)',
     white25: 'rgba(255, 255, 255, 0.25)',
     white50: 'rgba(255, 255, 255, 0.5)',
     white100: 'rgba(255, 255, 255, 1)',
@@ -90,6 +92,7 @@ const globalStyles = {
     borderRadiusTabs: '4px',
     borderRadiusURL: '4px',
     borderRadiusUIbox: '8px',
+    borderRadiusModal: '8px',
     bigBorderRadius: '14px',
     switchRadius: '10px',
     carotRadius: '8px'
@@ -140,9 +143,14 @@ const globalStyles = {
     dialogTopOffset: '30px',
     dialogInsideMargin: '18px',
     paymentsMargin: '20px',
-    modalPanelHeaderMarginBottom: '.5em',
-    paddingHorizontal: '30px',
-    privateTabPadding: '40px'
+    privateTabPaddingHorizontal: '30px',
+    privateTabPadding: '40px',
+    settingsListContainerMargin: '2rem',
+    modalPanelHeaderMarginBottom: '.5rem',
+    overlayButtonMargin: '8px',
+    panelMargin: '15px',
+    panelItemMargin: '12px',
+    panelPadding: '18px'
   },
   shadow: {
     switchShadow: 'inset 0 1px 4px rgba(0, 0, 0, 0.35)',

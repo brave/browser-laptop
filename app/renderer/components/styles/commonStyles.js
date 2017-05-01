@@ -34,6 +34,17 @@ const styles = StyleSheet.create({
       outlineWidth: '1px'
     }
   },
+  textbox__isSettings: {
+    width: '280px'
+  },
+
+  // TextArea -- copied from textbox.js
+  textArea: {
+    padding: '5px'
+  },
+  textArea__isDefault: {
+    fontSize: globalStyles.spacing.textAreaFontSize
+  },
 
   // Dialogs
   flyoutDialog: {
@@ -50,6 +61,29 @@ const styles = StyleSheet.create({
     boxSizing: 'border-box',
     maxWidth: '600px',
     maxHeight: `calc(80vh - ${globalStyles.spacing.downloadsBarHeight})`
+  },
+
+  // modalOverlay
+  // TODO: refactor modalOverlay
+  modalOverlay__dialog: {
+    // TODO: refactor preferences.less to remove !important
+    background: `linear-gradient(${globalStyles.color.modalVeryLightGray}, ${globalStyles.color.modalLightGray}) !important`,
+    borderRadius: `${globalStyles.radius.borderRadiusModal} !important`
+  },
+  modalOverlay__title: {
+    marginBottom: 0,
+
+    // TODO: refactor modalOverlay.less to remove !important
+    padding: '25px 0 !important'
+  },
+
+  modalOverlay__footer: {
+    padding: '20px'
+  },
+  modalOverlay__footerButton: {
+    display: 'flex',
+    flexFlow: 'nowrap',
+    justifyContent: 'flex-end'
   },
 
   // itemList.less

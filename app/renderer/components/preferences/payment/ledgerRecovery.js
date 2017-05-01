@@ -125,7 +125,7 @@ class LedgerRecoveryFooter extends ImmutableComponent {
   }
 
   render () {
-    return <div className={css(paymentCommon.advanceFooter)}>
+    return <div className={css(commonStyles.modalOverlay__footer, commonStyles.modalOverlay__footerButton)}>
       <div className={css(styles.recoveryFooterButtons)}>
         <Button l10nId='recover'
           className={css(commonStyles.primaryButton)}
