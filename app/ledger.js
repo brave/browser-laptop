@@ -167,8 +167,8 @@ const doAction = (action) => {
       quit()
       break
 
-    case appConstants.APP_CLEAR_HISTORY:
-      if (!getSetting(settings.PAYMENTS_ENABLED)) reset(true)
+    case appConstants.APP_ON_CLEAR_BROWSING_DATA:
+      if (action.clearDataDetail.get('browserHistory') && !getSetting(settings.PAYMENTS_ENABLED)) reset(true)
       break
 
     case appConstants.APP_IDLE_STATE_CHANGED:

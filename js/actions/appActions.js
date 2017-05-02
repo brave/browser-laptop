@@ -219,15 +219,6 @@ const appActions = {
   },
 
   /**
-   * Clears history (all sites without tags). Indirectly called by appActions.onClearBrowsingData().
-   */
-  clearHistory: function () {
-    AppDispatcher.dispatch({
-      actionType: appConstants.APP_CLEAR_HISTORY
-    })
-  },
-
-  /**
    * Removes a site from the site list
    * @param {Object} siteDetail - Properties of the site in question
    * @param {string} tag - A tag to associate with the site. e.g. bookmarks.

@@ -676,8 +676,8 @@ const doAction = (action) => {
         })
       }
       break
-    case appConstants.APP_CLEAR_HISTORY:
-      if (action.tag === siteTags.BOOKMARK) {
+    case appConstants.APP_ON_CLEAR_BROWSING_DATA:
+      if (action.clearDataDetail.get('browserHistory')) {
         appDispatcher.waitFor([appStore.dispatchToken], () => {
           createMenu()
         })
