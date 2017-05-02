@@ -177,7 +177,7 @@ describe('bookmarksToolbar', function () {
         .waitForVisible(navigatorNotBookmarked)
         .click(navigatorNotBookmarked)
         .waitForVisible(doneButton)
-        .waitForBookmarkDetail(pageWithFavicon, '')
+        .waitForBookmarkDetail(pageWithFavicon, pageWithFavicon.replace(/http:\/\//, ''))
         .waitForEnabled(doneButton)
         .click(doneButton)
 

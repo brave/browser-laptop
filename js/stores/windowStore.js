@@ -6,6 +6,7 @@ const AppDispatcher = require('../dispatcher/appDispatcher')
 const EventEmitter = require('events').EventEmitter
 const appActions = require('../actions/appActions')
 const appConstants = require('../constants/appConstants')
+const windowActions = require('../actions/windowActions')
 const windowConstants = require('../constants/windowConstants')
 const config = require('../constants/config')
 const settings = require('../constants/settings')
@@ -25,7 +26,11 @@ const {aboutUrls, getTargetAboutUrl, newFrameUrl} = require('../lib/appUrlUtil')
 const Serializer = require('../dispatcher/serializer')
 const {updateTabPageIndex} = require('../../app/renderer/lib/tabUtil')
 const assert = require('assert')
-const contextMenuState = require('../../app/common/state/contextMenuState.js')
+const contextMenuState = require('../../app/common/state/contextMenuState')
+const tabState = require('../../app/common/state/tabState')
+const appStoreRenderer = require('./appStoreRenderer')
+
+let previousTabs = new Immutable.List()
 
 let windowState = Immutable.fromJS({
   activeFrameKey: null,
@@ -225,13 +230,16 @@ const frameGuestInstanceIdChanged = (state, action) => {
 
 const tabDataChanged = (state, action) => {
   action = makeImmutable(action)
-  const tabData = action.get('tabData')
-  const frameProps = action.get('frameProps')
+  const tabs = action.get('tabs')
 
-  const newProps = frameStateUtil.getFramePropsFromTab(tabData)
-  state = state.mergeIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(state), frameProps)], newProps)
-  state = state.mergeIn(['tabs', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(state), frameProps)], newProps)
-
+  tabs.forEach((tab) => {
+    const newProps = frameStateUtil.getFramePropsFromTab(tab)
+    const frameProps = frameStateUtil.getFrameByTabId(state, tab.get('tabId'))
+    if (frameProps) {
+      state = state.mergeIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(state), frameProps)], newProps)
+      state = state.mergeIn(['tabs', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(state), frameProps)], newProps)
+    }
+  })
   return state
 }
 
@@ -817,6 +825,20 @@ ipc.on(messages.DISPATCH_ACTION, (e, serializedPayload) => {
     dispatchEventPayload(e, payload[i])
   }
 })
+
+const onAppStateChange = () => {
+  setImmediate(() => {
+    const tabs = tabState.getTabs(appStoreRenderer.state).map((tab) => {
+      return tab.delete('frame')
+    })
+    if (tabs.hashCode() !== previousTabs.hashCode()) {
+      previousTabs = tabs
+      windowActions.tabDataChanged(tabs)
+    }
+  })
+}
+
+appStoreRenderer.addChangeListener(onAppStateChange)
 
 AppDispatcher.register(doAction)
 

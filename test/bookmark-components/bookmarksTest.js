@@ -172,6 +172,7 @@ describe('bookmark tests', function () {
 
       before(function * () {
         this.pageNoTitle = Brave.server.url('page_no_title.html')
+        this.title = this.pageNoTitle.replace(/http:\/\//, '')
 
         yield setup(this.app.client)
 
@@ -181,48 +182,23 @@ describe('bookmark tests', function () {
           .windowParentByUrl(this.pageNoTitle)
           .activateURLMode()
           .waitForExist(navigatorNotBookmarked)
-          .activateURLMode()
           .click(navigatorNotBookmarked)
-          .waitForBookmarkDetail(this.pageNoTitle, '')
+          .waitForBookmarkDetail(this.pageNoTitle, this.title)
           .waitForEnabled(doneButton + ':not([disabled]')
       })
 
-      it('leaves the title field blank', function * () {
+      it('sets the title to the url', function * () {
         yield this.app.client
           .waitForExist(bookmarkNameInput)
-          .waitForInputText(bookmarkNameInput, '')
+          .waitForInputText(bookmarkNameInput, this.title)
       })
 
       it('does not show the url field', function * () {
         yield this.app.client
           .waitForElementCount(bookmarkLocationInput, 0)
       })
-
-      describe('saved without a title', function () {
-        before(function * () {
-          yield this.app.client
-            .waitForBookmarkDetail(this.pageNoTitle, '')
-            .waitForEnabled(doneButton)
-            .click(doneButton)
-        })
-        it('displays URL', function * () {
-          yield this.app.client
-            .waitForTextValue('[data-test-id="bookmarkText"]', this.pageNoTitle)
-        })
-        describe('and then removed', function () {
-          before(function * () {
-            yield this.app.client
-              .click(navigatorNotBookmarked)
-              .waitForExist(removeButton)
-              .click(removeButton)
-          })
-          it('removes the bookmark from the toolbar', function * () {
-            yield this.app.client
-              .waitForExist('[data-test-id="bookmarkText"]', Brave.defaultTimeout, true)
-          })
-        })
-      })
     })
+
     describe('bookmark pdf', function () {
       Brave.beforeAll(this)
 

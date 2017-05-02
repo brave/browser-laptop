@@ -112,11 +112,12 @@ class NavigationBar extends React.Component {
   }
 
   get titleMode () {
+    const hasTitle = this.props.title && this.props.location && this.props.title !== this.props.location.replace(/^https?:\/\//, '')
     return this.props.activeTabShowingMessageBox ||
       (
         this.props.mouseInTitlebar === false &&
         !this.props.bookmarkDetail &&
-        this.props.title &&
+        hasTitle &&
         !['about:blank', 'about:newtab'].includes(this.props.location) &&
         !this.loading &&
         !this.props.navbar.getIn(['urlbar', 'focused']) &&
