@@ -17,6 +17,7 @@ const windows = require('../windows')
 const Immutable = require('immutable')
 const dragTypes = require('../../../js/constants/dragTypes')
 const {frameOptsFromFrame} = require('../../../js/state/frameStateUtil')
+const {BrowserWindow} = require('electron')
 
 const tabsReducer = (state, action) => {
   action = makeImmutable(action)
@@ -44,9 +45,26 @@ const tabsReducer = (state, action) => {
     case appConstants.APP_TAB_UPDATED:
       state = tabState.maybeCreateTab(state, action)
       break
-    case appConstants.APP_TAB_CLOSED:
-      state = tabs.removeTab(state, action)
+    case appConstants.APP_ACTIVE_WEB_CONTENTS_CLOSED: {
+      const tabValue = tabState.getActiveTabValue(state, BrowserWindow.getActiveWindow().id)
+      if (tabValue) {
+        const tabId = tabValue.get('tabId')
+        if (tabs.isDevToolsFocused(tabId)) {
+          state = tabs.toggleDevTools(state, tabId)
+        } else {
+          state = tabs.closeTab(state, tabId, false)
+        }
+      }
       break
+    }
+    case appConstants.APP_TAB_CLOSED: {
+      const tabId = action.getIn(['tabValue', 'tabId'])
+      const forceClose = action.get('forceClose')
+      if (tabId) {
+        state = tabs.closeTab(state, tabId, forceClose)
+      }
+      break
+    }
     case appConstants.APP_ALLOW_FLASH_ONCE:
     case appConstants.APP_ALLOW_FLASH_ALWAYS:
       {
@@ -74,7 +92,7 @@ const tabsReducer = (state, action) => {
       state = tabs.setActive(state, action)
       break
     case appConstants.APP_TAB_TOGGLE_DEV_TOOLS:
-      state = tabs.toggleDevTools(state, action)
+      state = tabs.toggleDevTools(state, action.get('tabId'))
       break
     case appConstants.APP_LOAD_URL_REQUESTED:
       state = tabs.loadURL(state, action)

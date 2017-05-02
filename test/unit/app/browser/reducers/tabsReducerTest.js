@@ -1,4 +1,4 @@
-/* global describe, it, before, after, beforeEach, afterEach */
+/* global describe, it, before, after, afterEach */
 const Immutable = require('immutable')
 const assert = require('assert')
 const mockery = require('mockery')
@@ -6,25 +6,23 @@ const sinon = require('sinon')
 const appConstants = require('../../../../../js/constants/appConstants')
 const dragTypes = require('../../../../../js/constants/dragTypes')
 const fakeElectron = require('../../../lib/fakeElectron')
+const fakeAdBlock = require('../../../lib/fakeAdBlock')
 require('../../../braveUnit')
 
 describe('tabsReducer', function () {
   let tabsReducer
-  let appActions
   before(function () {
     mockery.enable({
       warnOnReplace: false,
       warnOnUnregistered: false,
       useCleanCache: true
     })
-    this.notPinnedTabIndex = 0
-    this.pinnedTabIndex = 1
-    this.singleTabWindowIndex = 2
     this.state = Immutable.fromJS({
       tabs: [{
         tabId: 1,
         windowId: 1,
-        pinned: false
+        pinned: false,
+        active: true
       }, {
         tabId: 2,
         pinned: true,
@@ -32,40 +30,30 @@ describe('tabsReducer', function () {
       }, {
         tabId: 3,
         pinned: false,
-        windowId: 2
+        windowId: 2,
+        active: true
       }]
     })
     mockery.registerMock('electron', fakeElectron)
+    mockery.registerMock('ad-block', fakeAdBlock)
     mockery.registerMock('leveldown', {})
-    mockery.registerMock('./webContentsCache', {
-      getWebContents: (tabId) => ({
-        canGoBack: () => true,
-        canGoForward: () => true,
-        session: {
-          partition: 'default'
-        },
-        tabValue: () =>
-          this.state.get('tabs').find((tab) => tab.get('tabId') === tabId),
-        isDestroyed: () => false,
-        detach: (cb) => cb()
-      })
-    })
+
+    this.tabsAPI = {
+      isDevToolsFocused: (tabId) => {
+        return tabId === 1
+      },
+      toggleDevTools: sinon.mock(),
+      closeTab: sinon.mock(),
+      moveTo: sinon.mock()
+    }
+
+    mockery.registerMock('tabs', this.tabsAPI)
+    mockery.registerMock('../tabs', this.tabsAPI)
     tabsReducer = require('../../../../../app/browser/reducers/tabsReducer')
-    appActions = require('../../../../../js/actions/appActions')
   })
 
   after(function () {
     mockery.disable()
-  })
-
-  beforeEach(function () {
-    this.newWindowSpy = sinon.spy(appActions, 'newWindow')
-    this.newWebContentsAddedSpy = sinon.spy(appActions, 'newWebContentsAdded')
-  })
-
-  afterEach(function () {
-    this.newWindowSpy.restore()
-    this.newWebContentsAddedSpy.restore()
   })
 
   describe.skip('APP_SET_STATE', function () {
@@ -155,6 +143,30 @@ describe('tabsReducer', function () {
     })
   })
 
+  describe('APP_ACTIVE_WEB_CONTENTS_CLOSED', function () {
+    const action = {
+      actionType: appConstants.APP_ACTIVE_WEB_CONTENTS_CLOSED
+    }
+    afterEach(function () {
+      this.tabsAPI.toggleDevTools.reset()
+      this.tabsAPI.closeTab.reset()
+      this.tabsAPI.moveTo.reset()
+      this.tabsAPI.isDevToolsFocused.restore()
+    })
+    it('closes devtools when opened and focused', function () {
+      this.isDevToolsFocused = sinon.stub(this.tabsAPI, 'isDevToolsFocused', () => true)
+      tabsReducer(this.state, action)
+      assert(this.tabsAPI.toggleDevTools.withArgs(this.state, 1).calledOnce)
+      assert(this.tabsAPI.closeTab.notCalled)
+    })
+    it('closes tab when tab is focused with no devtools', function () {
+      this.isDevToolsFocused = sinon.stub(this.tabsAPI, 'isDevToolsFocused', () => false)
+      tabsReducer(this.state, action)
+      assert(this.tabsAPI.toggleDevTools.notCalled)
+      assert(this.tabsAPI.closeTab.withArgs(this.state, 1).calledOnce)
+    })
+  })
+
   describe.skip('APP_LOAD_URL_REQUESTED', function () {
     it('loads the specified URL', function () {
       // TODO
@@ -177,77 +189,49 @@ describe('tabsReducer', function () {
     const action = {
       actionType: appConstants.APP_DRAG_ENDED
     }
-    it('moves tab to a new window', function () {
+    before(function () {
+      tabsReducer = require('../../../../../app/browser/reducers/tabsReducer')
+    })
+    afterEach(function () {
+      this.tabsAPI.moveTo.reset()
+    })
+
+    it('calls into tabs.moveTo for tabs', function () {
       const state = this.state.set('dragData', Immutable.fromJS({
         windowId: 1,
         type: dragTypes.TAB,
-        data: this.state.getIn(['tabs', this.notPinnedTabIndex]),
+        data: this.state.getIn(['tabs', 0]),
         dropWindowId: -1
       }))
-      const newState = tabsReducer(state, action)
-      assert.equal(this.newWindowSpy.calledOnce, true)
-      assert.equal(this.newWebContentsAddedSpy.notCalled, true)
-      assert(Immutable.is(newState, state))
+      tabsReducer(state, action)
+      const args = this.tabsAPI.moveTo.args[0]
+      assert.equal(args.length, 5)  // Function signature has 5 args
+      assert.equal(args[0], state)  // State is passed in as first arg
+      assert.equal(args[1], 1)  // tabId is 1 for first tab
+      // frameOpts being dragged is for the first tab
+      assert.deepEqual(args[2], { tabId: 1,
+        windowId: 1,
+        pinned: false,
+        active: true,
+        indexByFrameKey: undefined,
+        prependIndexByFrameKey: undefined
+      })
+      // Passes browser options for position by mouse cursor
+      assert.deepEqual(args[3], {
+        positionByMouseCursor: true
+      })
+      // Dropping on window ID is -1
+      assert.equal(args[4], -1)
     })
-    it('moves tab to an existing window', function () {
+    it('does not call into tabs.moveTo for other drop types', function () {
       const state = this.state.set('dragData', Immutable.fromJS({
         windowId: 1,
-        type: dragTypes.TAB,
-        data: this.state.getIn(['tabs', this.notPinnedTabIndex]),
-        dropWindowId: 11
-      }))
-      const newState = tabsReducer(state, action)
-      assert.equal(this.newWindowSpy.notCalled, true)
-      assert.equal(this.newWebContentsAddedSpy.calledOnce, true)
-      assert(Immutable.is(newState, state))
-    })
-    it('does not move pinned tabs', function () {
-      const state = this.state.set('dragData', Immutable.fromJS({
-        windowId: 2,
-        type: dragTypes.TAB,
-        data: this.state.getIn(['tabs', this.pinnedTabIndex]),
+        type: dragTypes.BOOKMARK,
+        data: this.state.getIn(['tabs', 0]),
         dropWindowId: -1
       }))
-      const newState = tabsReducer(state, action)
-      assert.equal(this.newWindowSpy.notCalled, true)
-      assert.equal(this.newWebContentsAddedSpy.notCalled, true)
-      assert(Immutable.is(newState, state))
-    })
-    it('does not move pinned tabs to alt window', function () {
-      const state = this.state.set('dragData', Immutable.fromJS({
-        windowId: 2,
-        type: dragTypes.TAB,
-        data: this.state.getIn(['tabs', this.pinnedTabIndex]),
-        dropWindowId: 89
-      }))
-      const newState = tabsReducer(state, action)
-      assert.equal(this.newWindowSpy.notCalled, true)
-      assert.equal(this.newWebContentsAddedSpy.notCalled, true)
-      assert(Immutable.is(newState, state))
-    })
-    it('does not move single tab windows into new window', function () {
-      const state = this.state.set('dragData', Immutable.fromJS({
-        windowId: 1,
-        type: dragTypes.TAB,
-        data: this.state.getIn(['tabs', this.singleTabWindowIndex]),
-        dropWindowId: -1
-      }))
-      const newState = tabsReducer(state, action)
-      assert.equal(this.newWindowSpy.notCalled, true)
-      assert.equal(this.newWebContentsAddedSpy.notCalled, true)
-      assert(Immutable.is(newState, state))
-    })
-    it('allows combining single tab into alt window', function () {
-      const state = this.state.set('dragData', Immutable.fromJS({
-        windowId: 2,
-        type: dragTypes.TAB,
-        data: this.state.getIn(['tabs', this.singleTabWindowIndex]),
-        dropWindowId: 41
-      }))
-      const newState = tabsReducer(state, action)
-      assert.equal(this.newWindowSpy.notCalled, true)
-      assert.equal(this.newWebContentsAddedSpy.calledOnce, true)
-      assert(Immutable.is(newState, state))
+      tabsReducer(state, action)
+      assert(this.tabsAPI.moveTo.notCalled)
     })
   })
 })

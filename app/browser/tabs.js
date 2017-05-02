@@ -99,7 +99,7 @@ ipcMain.on(messages.ABOUT_COMPONENT_INITIALIZED, (e) => {
   const listener = () => {
     if (!tab.isDestroyed()) {
       const tabValue = tabState.getByTabId(appStore.getState(), tab.getId())
-      if (tabValue.get('active') === true) {
+      if (tabValue && tabValue.get('active') === true) {
         updateAboutDetails(tab, tabValue)
       }
     } else {
@@ -387,9 +387,7 @@ const api = {
     }
   },
 
-  toggleDevTools: (state, action) => {
-    action = makeImmutable(action)
-    const tabId = action.get('tabId')
+  toggleDevTools: (state, tabId) => {
     const tab = getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
       if (tab.isDevToolsOpened()) {
@@ -502,18 +500,19 @@ const api = {
     return state
   },
 
-  removeTab: (state, action) => {
-    action = makeImmutable(action)
-    const tabId = action.getIn(['tabValue', 'tabId'])
-    const forceClose = action.get('forceClose')
-    if (tabId) {
-      api.closeTab(tabId, forceClose)
-      return tabState.removeTab(state, action)
-    }
-    return state
+  isDevToolsFocused: (tabId) => {
+    const tab = getWebContents(tabId)
+    return tab &&
+      !tab.isDestroyed() &&
+      tab.isDevToolsOpened() &&
+      tab.isDevToolsFocused()
   },
 
-  closeTab: (tabId, forceClose) => {
+  closeTab: (state, tabId, forceClose) => {
+    const tabValue = getTabValue(tabId)
+    if (!tabValue) {
+      return state
+    }
     const tab = getWebContents(tabId)
     try {
       if (tab && !tab.isDestroyed()) {
@@ -526,6 +525,7 @@ const api = {
     } catch (e) {
       // ignore
     }
+    return tabState.removeTab(state, tabValue)
   },
 
   create: (createProperties, cb = null) => {

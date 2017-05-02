@@ -1,6 +1,15 @@
 const fakeElectron = {
   BrowserWindow: {
-    getFocusedWindow: function () {}
+    getFocusedWindow: function () {
+      return {
+        id: 1
+      }
+    },
+    getActiveWindow: function () {
+      return {
+        id: 1
+      }
+    }
   },
   ipcMain: {
     on: function () { },
