@@ -871,7 +871,9 @@ describe('Syncing then turning it off stops syncing', function () {
       .waitForVisible(fpSwitch)
       .click(fpSwitch)
       .waitUntil(checkSiteSetting(this.hostPattern1, this.siteSettingName, true))
-      .click(braveryPanelContainer)
+      .moveToObject(navigatorNotBookmarked)
+      .leftClick()
+      .waitForVisible(braveryPanelContainer, 1000, true)
       .pause(1000) // XXX: Wait for Sync to upload records to S3
 
     // Sync Off - browsing activity NOT synced
