@@ -181,6 +181,7 @@
     "react-addons-perf": "^15.2.1",
     "react-addons-test-utils": "^15.4.1",
     "react-test-renderer": "^15.5.4",
+    "request": "^2.81.0",
     "sinon": "^1.17.6",
     "spectron": "brave/spectron#chromium56",
     "standard": "9.0.0",
