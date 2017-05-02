@@ -5,6 +5,7 @@
 'use strict'
 
 const appConstants = require('../../../js/constants/appConstants')
+const filtering = require('../../filtering')
 const siteTags = require('../../../js/constants/siteTags')
 const siteUtil = require('../../../js/state/siteUtil')
 const syncActions = require('../../../js/actions/syncActions')
@@ -21,8 +22,15 @@ const syncEnabled = () => {
 
 const sitesReducer = (state, action, emitChanges) => {
   switch (action.actionType) {
+    case appConstants.APP_ON_CLEAR_BROWSING_DATA:
+      action = makeImmutable(action)
+      if (action.getIn(['clearDataDetail', 'browserHistory'])) {
+        state = state.set('sites', siteUtil.clearHistory(state.get('sites')))
+        filtering.clearHistory()
+      }
+      break
     case appConstants.APP_ADD_SITE:
-      if (action.siteDetail.constructor === Immutable.List) {
+      if (Immutable.List.isList(action.siteDetail)) {
         action.siteDetail.forEach((s) => {
           state = state.set('sites', siteUtil.addSite(state.get('sites'), s, action.tag, undefined, action.skipSync))
         })

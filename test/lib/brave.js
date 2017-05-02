@@ -4,6 +4,7 @@ var chai = require('chai')
 const Immutable = require('immutable')
 const {activeWebview, navigator, titleBar, urlInput} = require('./selectors')
 require('./coMocha')
+const series = require('async/series')
 
 const path = require('path')
 const fs = require('fs')
@@ -122,6 +123,10 @@ var exports = {
 
   beforeAllServerSetup: function (context) {
     context.beforeAll(function (done) {
+      if (exports.server) {
+        return
+      }
+
       Server.create(`${__dirname}/../fixtures/`, (err, _server) => {
         if (err) {
           console.log(err.stack)
@@ -129,6 +134,15 @@ var exports = {
         exports.server = _server
         done()
       })
+    })
+
+    context.afterAll(function () {
+      if (!exports.server) {
+        return
+      }
+
+      exports.server.stop()
+      exports.server = null
     })
   },
 
@@ -143,18 +157,14 @@ var exports = {
       exports.addCommands.call(this)
     })
 
+    context.afterAll(function () {
+      return exports.stopApp.call(this)
+    })
+
     exports.beforeAllServerSetup(context)
 
     context.beforeEach(function () {
       chaiAsPromised.transferPromiseness = this.app.client.transferPromiseness
-    })
-
-    context.afterAll(function () {
-      exports.server.stop()
-    })
-
-    context.afterAll(function () {
-      return exports.stopApp.call(this)
     })
   },
 
@@ -962,7 +972,7 @@ var exports = {
       SPECTRON: true
     }
     this.app = new Application({
-      quitTimeout: 300,
+      quitTimeout: 0,
       waitTimeout: exports.defaultTimeout,
       waitInterval: exports.defaultInterval,
       connectionRetryTimeout: exports.defaultTimeout,
@@ -980,30 +990,56 @@ var exports = {
     const promises = []
 
     if (process.env.BRAVE_TEST_ALL_LOGS || process.env.BRAVE_TEST_BROWSER_LOGS) {
-      promises.push(this.app.client.getMainProcessLogs().then(function (logs) {
-        logs.forEach(function (log) {
-          console.log(log)
+      promises.push((callback) => {
+        this.app.client.getMainProcessLogs().then(function (logs) {
+          logs.forEach(function (log) {
+            console.log(log)
+          })
+          callback()
         })
-      }))
-    }
-    if (process.env.BRAVE_TEST_ALL_LOGS || process.env.BRAVE_TEST_RENDERER_LOGS) {
-      promises.push(this.app.client.getRenderProcessLogs().then(function (logs) {
-        logs.forEach(function (log) {
-          console.log(log)
-        })
-      }))
+      })
     }
 
-    promises.push(this.app.stop().then((app) => {
+    if (process.env.BRAVE_TEST_ALL_LOGS || process.env.BRAVE_TEST_RENDERER_LOGS) {
+      promises.push((callback) => {
+        this.app.client.getRenderProcessLogs().then(function (logs) {
+          logs.forEach(function (log) {
+            console.log(log)
+          })
+          callback()
+        })
+      })
+    }
+
+    const cleanup = (callback) => {
       if (cleanSessionStore) {
         if (!process.env.KEEP_BRAVE_USER_DATA_DIR) {
           userDataDir && rmDir(userDataDir)
         }
         userDataDir = generateUserDataDir()
       }
-    }))
+      callback()
+    }
 
-    return Promise.all(promises)
+    promises.push((callback) => {
+      callback = setTimeout(cleanup.bind(this, callback), 100)
+      this.app.client.waitForBrowserWindow().quit()
+        .then(callback)
+        .catch((err) => {
+          console.error('Quit failed: ', err)
+          this.app.stop.then(callback)
+        })
+    })
+
+    return new Promise((resolve, reject) => {
+      series(promises, (err) => {
+        if (err) {
+          console.log(err)
+          reject(new Error(err))
+        }
+        resolve()
+      })
+    })
   }
 }
 

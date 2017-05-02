@@ -760,6 +760,13 @@ module.exports.clearCache = () => {
   }
 }
 
+module.exports.clearHistory = () => {
+  for (let partition in registeredSessions) {
+    let ses = registeredSessions[partition]
+    setImmediate(ses.clearHistory.bind(ses))
+  }
+}
+
 module.exports.setDefaultZoomLevel = (zoom) => {
   for (let partition in registeredSessions) {
     let ses = registeredSessions[partition]

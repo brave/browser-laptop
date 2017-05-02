@@ -167,12 +167,6 @@ Adds a site to the site list
 
 
 
-### clearHistory() 
-
-Clears history (all sites without tags). Indirectly called by appActions.onClearBrowsingData().
-
-
-
 ### removeSite(siteDetail, tag, skipSync) 
 
 Removes a site from the site list
