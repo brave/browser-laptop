@@ -385,6 +385,9 @@ module.exports.cleanSessionDataOnShutdown = () => {
   if (getSetting(settings.SHUTDOWN_CLEAR_CACHE) === true) {
     filtering.clearCache()
   }
+  if (getSetting(settings.SHUTDOWN_CLEAR_HISTORY) === true) {
+    filtering.clearHistory()
+  }
 }
 
 const safeGetVersion = (fieldName, getFieldVersion) => {

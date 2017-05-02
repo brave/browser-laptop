@@ -466,13 +466,6 @@ const handleAppAction = (action) => {
       appState = aboutNewTabState.setSites(appState, action)
       appState = aboutHistoryState.setHistory(appState, action)
       break
-    case appConstants.APP_CLEAR_HISTORY:
-      appState = appState.set('sites',
-        siteUtil.clearHistory(appState.get('sites')))
-      appState = aboutNewTabState.setSites(appState, action)
-      appState = aboutHistoryState.setHistory(appState, action)
-      syncActions.clearHistory()
-      break
     case appConstants.APP_SET_DATA_FILE_ETAG:
       appState = appState.setIn([action.resourceName, 'etag'], action.etag)
       break
@@ -661,7 +654,9 @@ const handleAppAction = (action) => {
       // TODO: Maybe make storing this state optional?
       appState = appState.set('clearBrowsingDataDefaults', action.clearDataDetail)
       if (action.clearDataDetail.get('browserHistory')) {
-        handleAppAction({actionType: appConstants.APP_CLEAR_HISTORY})
+        appState = aboutNewTabState.setSites(appState, action)
+        appState = aboutHistoryState.setHistory(appState, action)
+        syncActions.clearHistory()
         BrowserWindow.getAllWindows().forEach((wnd) => wnd.webContents.send(messages.CLEAR_CLOSED_FRAMES))
       }
       if (action.clearDataDetail.get('downloadHistory')) {

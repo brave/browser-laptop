@@ -1,6 +1,8 @@
 /* global describe, it, before, after */
 const Immutable = require('immutable')
+const mockery = require('mockery')
 const assert = require('assert')
+const sinon = require('sinon')
 
 const appConstants = require('../../../../../js/constants/appConstants')
 const siteTags = require('../../../../../js/constants/siteTags')
@@ -17,10 +19,38 @@ const initState = Immutable.fromJS({
 describe('sitesReducerTest', function () {
   let sitesReducer
   before(function () {
+    this.fakeFiltering = {
+      clearHistory: () => {}
+    }
+    mockery.enable({
+      warnOnReplace: false,
+      warnOnUnregistered: false,
+      useCleanCache: true
+    })
+    mockery.registerMock('../../filtering', this.fakeFiltering)
     sitesReducer = require('../../../../../app/browser/reducers/sitesReducer')
   })
 
   after(function () {
+  })
+
+  describe('APP_ON_CLEAR_BROWSING_DATA', function () {
+    before(function () {
+      this.action = {
+        actionType: appConstants.APP_ON_CLEAR_BROWSING_DATA,
+        clearDataDetail: {browserHistory: true}
+      }
+      this.clearHistory = sinon.stub(this.fakeFiltering, 'clearHistory')
+      this.state = sitesReducer(initState, this.action)
+    })
+
+    after(function () {
+      this.clearHistory.restore()
+    })
+
+    it('calls `filtering.clearHistory`', function () {
+      assert.ok(this.clearHistory.calledOnce)
+    })
   })
 
   describe('APP_ADD_SITE', function () {

@@ -15,7 +15,6 @@ const appConstants = {
   APP_TAB_CLOSED: _,
   APP_TAB_UPDATED: _,
   APP_ADD_SITE: _,
-  APP_CLEAR_HISTORY: _,
   APP_SET_STATE: _,
   APP_REMOVE_SITE: _,
   APP_MOVE_SITE: _,
