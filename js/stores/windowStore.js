@@ -324,22 +324,24 @@ const doAction = (action) => {
       break
     case windowConstants.WINDOW_WEBVIEW_LOAD_START:
       {
-        const framePath = ['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps)]
+        const statePath = path =>
+          [path, frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps)]
+
         // Reset security state
         windowState =
-          windowState.deleteIn(framePath.concat(['security', 'blockedRunInsecureContent']))
-        windowState = windowState.mergeIn(framePath.concat(['security']), {
+          windowState.deleteIn(statePath('frames').concat(['security', 'blockedRunInsecureContent']))
+        windowState = windowState.mergeIn(statePath('frames').concat(['security']), {
           isSecure: null,
           runInsecureContent: false
         })
         // Update loading UI
-        windowState = windowState.mergeIn(framePath, {
+        windowState = windowState.mergeIn(statePath('frames'), {
           loading: true,
           provisionalLocation: action.location,
           startLoadTime: new Date().getTime(),
           endLoadTime: null
         })
-        windowState = windowState.mergeIn(['tabs'].concat(framePath), {
+        windowState = windowState.mergeIn(statePath('tabs'), {
           loading: true,
           provisionalLocation: action.location
         })
