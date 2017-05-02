@@ -102,14 +102,14 @@ function tabPageTemplateInit (framePropsList) {
 }
 
 function generateMuteFrameList (framePropsList, muted) {
-  return framePropsList.map((frameProp) => {
-    return {
-      frameKey: frameProp.get('key'),
-      tabId: frameProp.get('tabId'),
-      muted: muted && frameProp.get('audioPlaybackActive') && !frameProp.get('audioMuted')
-    }
-  })
-}
+   return framePropsList.map((frameProp) => {
+     return {
+       frameKey: frameProp.get('key'),
+       tabId: frameProp.get('tabId'),
+       muted: muted
+     }
+   })
+ }
 
 function urlBarTemplateInit (searchDetail, activeFrame, e) {
   const items = getEditableItems(window.getSelection().toString())
@@ -598,16 +598,15 @@ function tabTemplateInit (frameProps) {
       }
     })
 
-  if (frameProps.get('audioPlaybackActive')) {
-    const isMuted = frameProps.get('audioMuted')
+  const isMuted = frameProps.get('audioMuted')
 
-    template.push({
+  template.push({
       label: locale.translation(isMuted ? 'unmuteTab' : 'muteTab'),
       click: (item) => {
         windowActions.setAudioMuted(frameKey, tabId, !isMuted)
       }
     })
-  }
+  
 
   template.push(CommonMenu.separatorMenuItem)
 
@@ -665,6 +664,12 @@ function tabsBarTemplateInit (framePropsList) {
     CommonMenu.newWindowMenuItem(),
     CommonMenu.separatorMenuItem,
     CommonMenu.showTabPreviewsMenuItem(),
+    {
+       label: locale.translation('muteTabs'),
+       click: () => {
+         windowActions.muteAllAudio(generateMuteFrameList(framePropsList, true))
+       }
+     },
     CommonMenu.separatorMenuItem,
     CommonMenu.bookmarksManagerMenuItem(),
     CommonMenu.bookmarksToolbarMenuItem(),
