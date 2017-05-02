@@ -25,6 +25,17 @@
                  - (@navbarBraveButtonWidth + 2 * @navbarButtonSpacing);
 }
 
+// Linux specific styles
+.platform--linux {
+  #navigator {
+    &:not(.titleMode) {
+      .bookmarkButtonContainer {
+        margin-top: 1px;
+      }
+    }
+  }
+}
+
 // Windows specific styles
 .platform--win32 {
   div#window.frameless:not(.isFullScreen):not(.isMaximized) {
