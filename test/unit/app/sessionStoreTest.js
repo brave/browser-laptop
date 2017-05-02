@@ -21,6 +21,20 @@ describe('sessionStore unit tests', function () {
     clearAutocompleteData: () => {},
     clearAutofillData: () => {}
   }
+  global.muon = {
+    file: {
+      writeImportant: (path, data, cb) => {
+        // simulate running on another thread
+        setImmediate(() => {
+          cb(true)
+        })
+      }
+    }
+  }
+  const fakeFiltering = {
+    clearStorageData: () => {},
+    clearCache: () => {}
+  }
   const fakeTabState = {
     getPersistentState: (data) => { return makeImmutable(data) }
   }
@@ -83,6 +97,7 @@ describe('sessionStore unit tests', function () {
         default: return true
       }
     }})
+    mockery.registerMock('./filtering', fakeFiltering)
     sessionStore = require('../../../app/sessionStore')
   })
 
@@ -109,8 +124,8 @@ describe('sessionStore unit tests', function () {
       return sessionStore.saveAppState({})
         .then(function (result) {
           assert.equal(cleanAppDataStub.calledOnce, true)
-        }, function (result) {
-          assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+        }, function (err) {
+          assert(!err)
         })
     })
 
@@ -120,8 +135,8 @@ describe('sessionStore unit tests', function () {
         return sessionStore.saveAppState({}, true)
           .then(() => {
             assert.equal(cleanSessionDataOnShutdownStub.calledOnce, true)
-          }, function (result) {
-            assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+          }, function (err) {
+            assert(!err)
           })
       })
 
@@ -130,8 +145,8 @@ describe('sessionStore unit tests', function () {
         return sessionStore.saveAppState({}, false)
           .then(() => {
             assert.equal(cleanSessionDataOnShutdownStub.notCalled, true)
-          }, function (result) {
-            assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+          }, function (err) {
+            assert(!err)
           })
       })
     })

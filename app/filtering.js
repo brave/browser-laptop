@@ -16,7 +16,6 @@ const downloadStates = require('../js/constants/downloadStates')
 const urlParse = require('./common/urlParse')
 const getSetting = require('../js/settings').getSetting
 const appUrlUtil = require('../js/lib/appUrlUtil')
-const promisify = require('../js/lib/promisify')
 const siteSettings = require('../js/state/siteSettings')
 const settings = require('../js/constants/settings')
 const userPrefs = require('../js/state/userPrefs')
@@ -739,12 +738,10 @@ module.exports.isResourceEnabled = (resourceName, url, isPrivate) => {
  * @return a promise that always resolves (called on app shutdon so must always)
  */
 module.exports.clearStorageData = () => {
-  let p = Promise.resolve()
   for (let partition in registeredSessions) {
     let ses = registeredSessions[partition]
-    p = p.then(promisify(ses.clearStorageData.bind(ses)).catch(() => {}))
+    setImmediate(ses.clearStorageData.bind(ses))
   }
-  return p
 }
 
 /**
@@ -752,12 +749,10 @@ module.exports.clearStorageData = () => {
  * @return a promise that always resolves (called on app shutdon so must always)
  */
 module.exports.clearCache = () => {
-  let p = Promise.resolve()
   for (let partition in registeredSessions) {
     let ses = registeredSessions[partition]
-    p = p.then(promisify(ses.clearCache.bind(ses)).catch(() => {}))
+    setImmediate(ses.clearCache.bind(ses))
   }
-  return p
 }
 
 module.exports.setDefaultZoomLevel = (zoom) => {

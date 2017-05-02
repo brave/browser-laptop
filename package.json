@@ -198,6 +198,10 @@
     "electron-installer-redhat": "^0.3.0"
   },
   "standard": {
+    "global": [
+      "chrome",
+      "muon"
+    ],
     "ignore": [
       "app/extensions/**",
       "app/browser/ads/adDivCandidates.js",
