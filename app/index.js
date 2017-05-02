@@ -106,6 +106,10 @@ const logSaveAppStateError = (e) => {
 }
 
 const saveAppState = (forceSave = false) => {
+  if (!sessionStateStoreCompleteCallback) {
+    return
+  }
+
   // If we're shutting down early and can't access the state, it's better
   // to not try to save anything at all and just quit.
   if (shuttingDown && !AppStore.getState()) {
@@ -151,8 +155,9 @@ const saveAppState = (forceSave = false) => {
           app.quit()
         }
       } else {
-        sessionStateStoreCompleteCallback()
+        const cb = sessionStateStoreCompleteCallback
         sessionStateStoreCompleteCallback = null
+        cb()
       }
     }
   })
