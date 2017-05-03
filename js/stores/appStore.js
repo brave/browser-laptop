@@ -38,6 +38,7 @@ const assert = require('assert')
 const profiles = require('../../app/browser/profiles')
 
 // state helpers
+const {makeImmutable} = require('../../app/common/state/immutableUtil')
 const basicAuthState = require('../../app/common/state/basicAuthState')
 const extensionState = require('../../app/common/state/extensionState')
 const aboutNewTabState = require('../../app/common/state/aboutNewTabState')
@@ -347,9 +348,9 @@ function handleChangeSettingAction (settingKey, settingValue) {
 
 let reducers = []
 
-const applyReducers = (state, action) => reducers.reduce(
+const applyReducers = (state, action, immutableAction) => reducers.reduce(
     (appState, reducer) => {
-      const newState = reducer(appState, action)
+      const newState = reducer(appState, action, immutableAction)
       assert.ok(action.actionType === appConstants.APP_SET_STATE || Immutable.Map.isMap(newState),
         `Oops! action ${action.actionType} didn't return valid state for reducer:\n\n${reducer}`)
       return newState
@@ -384,7 +385,8 @@ const handleAppAction = (action) => {
     return
   }
 
-  appState = applyReducers(appState, action)
+  // maintain backwards compatibility for now by adding an additional param for immutableAction
+  appState = applyReducers(appState, action, makeImmutable(action))
 
   switch (action.actionType) {
     case appConstants.APP_SET_STATE:

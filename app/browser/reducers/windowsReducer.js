@@ -8,8 +8,8 @@ const appConstants = require('../../../js/constants/appConstants')
 const windows = require('../windows')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 
-const windowsReducer = (state, action) => {
-  action = makeImmutable(action)
+const windowsReducer = (state, action, immutableAction) => {
+  action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
     case appConstants.APP_SET_STATE:
       state = windows.init(state, action)

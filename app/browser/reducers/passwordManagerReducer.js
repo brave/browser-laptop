@@ -253,8 +253,8 @@ const init = () => {
   })
 }
 
-const passwordManagerReducer = (state, action) => {
-  action = makeImmutable(action)
+const passwordManagerReducer = (state, action, immutableAction) => {
+  action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
     case appConstants.APP_SET_STATE:
       init()

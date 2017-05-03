@@ -8,8 +8,8 @@ const appConstants = require('../../../js/constants/appConstants')
 const tabs = require('../tabs')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 
-const spellCheckReducer = (state, action) => {
-  action = makeImmutable(action)
+const spellCheckReducer = (state, action, immutableAction) => {
+  action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
     case appConstants.APP_ADD_WORD:
       tabs.sendToAll('add-word', action.get('word'))

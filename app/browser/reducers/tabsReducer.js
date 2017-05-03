@@ -15,8 +15,8 @@ const Immutable = require('immutable')
 const dragTypes = require('../../../js/constants/dragTypes')
 const {frameOptsFromFrame} = require('../../../js/state/frameStateUtil')
 
-const tabsReducer = (state, action) => {
-  action = makeImmutable(action)
+const tabsReducer = (state, action, immutableAction) => {
+  action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
     case appConstants.APP_SET_STATE:
       state = tabs.init(state, action)
