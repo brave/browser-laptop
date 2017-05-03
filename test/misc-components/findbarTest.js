@@ -133,7 +133,7 @@ describe('findBar', function () {
       .showFindbar()
       .waitForElementFocus(findBarInput)
       .newTab({ url: url2, active: false })
-      .setValue(findBarInput, 'test')
+      .setValue(findBarInput, '')
       .showFindbar()
       .waitForElementFocus(findBarInput)
       .keys('x')
