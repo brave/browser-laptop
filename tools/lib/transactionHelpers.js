@@ -76,7 +76,7 @@ const generateTransaction = function () {
 }
 
 /** code for generating transaction object components **/
-const uuid = require('node-uuid')
+const uuid = require('uuid')
 const crypto = require('crypto')
 const randomBytes = crypto.randomBytes
 

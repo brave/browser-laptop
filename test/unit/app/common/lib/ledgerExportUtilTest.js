@@ -1,7 +1,7 @@
 /* global describe, it, before */
 const assert = require('assert')
 const underscore = require('underscore')
-const uuid = require('node-uuid')
+const uuid = require('uuid')
 const moment = require('moment')
 
 require('../../../braveUnit')
