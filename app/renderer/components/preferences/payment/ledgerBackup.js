@@ -11,8 +11,6 @@ const Button = require('../../../../../js/components/button')
 
 // style
 const globalStyles = require('../../styles/global')
-const commonStyles = require('../../styles/commonStyles')
-const {paymentCommon} = require('../../styles/payment')
 
 // other
 const aboutActions = require('../../../../../js/about/aboutActions')

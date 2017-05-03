@@ -7,14 +7,14 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 
 // components
 const Button = require('../../../../../js/components/button')
+const cx = require('../../../../../js/lib/classSet')
 const ModalOverlay = require('../../../../../js/components/modalOverlay')
 const ImmutableComponent = require('../../immutableComponent')
 
 // styles
 const commonStyles = require('../../styles/commonStyles')
 const globalStyles = require('../../styles/global')
-const {paymentCommon} = require('../../styles/payment')
-const cx = require('../../../../../js/lib/classSet')
+
 const CoinBase = require('../../../../extensions/brave/img/coinbase_logo.png')
 const Andorid = require('../../../../extensions/brave/img/android_download.svg')
 const IOS = require('../../../../extensions/brave/img/ios_download.svg')
@@ -96,7 +96,7 @@ class BitcoinDashboard extends ImmutableComponent {
 
   coinbasePanel () {
     if (this.canUseCoinbase) {
-      return <div className={css(paymentCommon.panel, styles.panel, commonStyles.noMarginTop)}>
+      return <div className={css(styles.panel, styles.cleanup__coinbasePanel__panel)}>
         <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerFirst)}>
           <span className={cx({
             fa: true,
@@ -113,7 +113,7 @@ class BitcoinDashboard extends ImmutableComponent {
         </div>
       </div>
     } else {
-      return <div className={css(paymentCommon.panel, styles.panel)}>
+      return <div className={css(styles.panel, styles.cleanup__coinbasePanel__panel)}>
         <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerFirst)}>
           <span className={cx({
             fa: true,
@@ -138,7 +138,7 @@ class BitcoinDashboard extends ImmutableComponent {
     if (!url || !name) {
       return this.worldWidePanel()
     } else {
-      return <div className={css(paymentCommon.panel, styles.panel, commonStyles.noMarginTop)}>
+      return <div className={css(styles.panel, styles.cleanup__coinbasePanel__panel)}>
         <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerFirst)}>
           <span className={cx({
             fa: true,
@@ -164,7 +164,7 @@ class BitcoinDashboard extends ImmutableComponent {
   }
 
   smartphonePanel () {
-    return <div className={css(paymentCommon.panel, styles.panel, commonStyles.noMarginBottom)}>
+    return <div className={css(styles.panel, styles.cleanup__smartphonePanel)}>
       <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerFirst, styles.alignMiddle)}>
         <span className={cx({
           fa: true,
@@ -197,7 +197,7 @@ class BitcoinDashboard extends ImmutableComponent {
   }
 
   worldWidePanel () {
-    return <div className={css(paymentCommon.panel, styles.panel)}>
+    return <div className={css(styles.panel)}>
       <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerFirst)}>
         <span className={cx({
           fa: true,
@@ -277,7 +277,7 @@ class BitcoinDashboard extends ImmutableComponent {
             ? this.coinbasePanel()
             : this.exchangePanel()
         }
-        <div className={css(paymentCommon.panel, styles.panel)}>
+        <div className={css(styles.panel, styles.cleanup__bitcoinPanel)}>
           <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerFirst)}>
             <span className={cx({
               'fa-stack': true,

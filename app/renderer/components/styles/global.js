@@ -142,7 +142,6 @@ const globalStyles = {
     dialogLargeWidth: '600px',
     dialogTopOffset: '30px',
     dialogInsideMargin: '18px',
-    paymentsMargin: '20px',
     privateTabPaddingHorizontal: '30px',
     privateTabPadding: '40px',
     settingsListContainerMargin: '2rem',

@@ -100,13 +100,11 @@ class PaymentsTab extends ImmutableComponent {
       paymentsContainer: true,
       [css(styles.paymentsContainer)]: true
     })} data-test-id='paymentsContainer'>
-      {/* TODO: Refactor panelFooter on bitcoinDashboard to remove the customFooterClasses, based on modalOverlay.js */}
       {
       this.enabled && this.props.addFundsOverlayVisible
         ? <ModalOverlay
           title={this.overlayTitle}
           content={this.overlayContent}
-          customDialogFooterClasses={css(styles.temp__displayNone)}
           footer={
             <BitcoinDashboardFooter
               ledgerData={this.props.ledgerData}
@@ -421,11 +419,6 @@ const styles = StyleSheet.create({
     color: `${globalStyles.color.braveMediumOrange} !important`,
     textIndent: '0 !important'
   }
-
-  // TODO: Refactor panelFooter on bitcoinDashboard with <ModalOverlay> to remove this
-  // temp__displayNone: {
-  //   display: 'none !important'
-  // }
 })
 
 module.exports = PaymentsTab

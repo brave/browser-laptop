@@ -2,9 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const {StyleSheet} = require('aphrodite')
-const globalStyles = require('./global')
-
 const paymentStyles = {
   font: {
     regular: '14.5px'
@@ -24,28 +21,7 @@ const paymentStyles = {
   }
 }
 
-const paymentCommon = StyleSheet.create({
-  board: {
-    overflowX: 'hidden',
-    clear: 'both'
-  },
-  panel: {
-    background: '#fff',
-    position: 'relative',
-    marginTop: '8px',
-    marginBottom: '8px',
-    padding: '25px 20px'
-  },
-  marginButtons: {
-    marginLeft: globalStyles.spacing.overlayButtonMargin
-  }
-})
-
 const paymentStylesVariables = {
-  color: {
-    // See: .paymentsContainer .modal .dialog.paymentHistory .dialog-body
-    paymentHistoryTableBackgroundColor: '#fff'
-  },
   spacing: {
     paymentHistoryTablePadding: '30px'
   }
@@ -53,6 +29,5 @@ const paymentStylesVariables = {
 
 module.exports = {
   paymentStyles,
-  paymentCommon,
   paymentStylesVariables
 }

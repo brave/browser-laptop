@@ -18,7 +18,6 @@ const ImmutableComponent = require('../../immutableComponent')
 // style
 const commonStyles = require('../../styles/commonStyles')
 const globalStyles = require('../../styles/global')
-const {paymentCommon} = require('../../styles/payment')
 
 // other
 const settings = require('../../../../../js/constants/settings')

@@ -96,18 +96,16 @@ class LedgerRecoveryContent extends ImmutableComponent {
           </div>
           : null
       }
-      <div>
-        <h4 className={css(styles.recoveryContent__h4)} data-l10n-id='ledgerRecoverySubtitle' />
-        <div className={css(styles.ledgerRecoveryContent)} data-l10n-id='ledgerRecoveryContent' />
-        <SettingsList className={css(commonStyles.noMarginBottom)}>
-          <SettingItem>
-            <h3 data-l10n-id='firstRecoveryKey' />
-            <RecoveryKeyTextbox id='firstRecoveryKey' onChange={this.handleFirstRecoveryKeyChange} />
-            <h3 className={css(styles.recoveryContent__h3)} data-l10n-id='secondRecoveryKey' />
-            <RecoveryKeyTextbox id='secondRecoveryKey' onChange={this.handleSecondRecoveryKeyChange} />
-          </SettingItem>
-        </SettingsList>
-      </div>
+      <h4 className={css(styles.recoveryContent__h4)} data-l10n-id='ledgerRecoverySubtitle' />
+      <div className={css(styles.ledgerRecoveryContent)} data-l10n-id='ledgerRecoveryContent' />
+      <SettingsList className={css(commonStyles.noMarginBottom)}>
+        <SettingItem>
+          <h3 data-l10n-id='firstRecoveryKey' />
+          <RecoveryKeyTextbox id='firstRecoveryKey' onChange={this.handleFirstRecoveryKeyChange} />
+          <h3 className={css(styles.recoveryContent__h3)} data-l10n-id='secondRecoveryKey' />
+          <RecoveryKeyTextbox id='secondRecoveryKey' onChange={this.handleSecondRecoveryKeyChange} />
+        </SettingItem>
+      </SettingsList>
     </div>
   }
 }
@@ -149,13 +147,13 @@ class LedgerRecoveryFooter extends ImmutableComponent {
 
 const styles = StyleSheet.create({
   recoveryContent__h4: {
-    marginBottom: globalStyles.spacing.paymentsMargin
+    marginBottom: globalStyles.spacing.dialogInsideMargin
   },
   recoveryContent__h3: {
     marginBottom: globalStyles.spacing.modalPanelHeaderMarginBottom
   },
   ledgerRecoveryContent: {
-    marginBottom: globalStyles.spacing.paymentsMargin
+    marginBottom: globalStyles.spacing.dialogInsideMargin
   },
 
   recoveryOverlay: {

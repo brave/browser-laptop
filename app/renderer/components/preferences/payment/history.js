@@ -153,8 +153,7 @@ const styles = StyleSheet.create({
 
   headerContainer__wrapper: {
     position: 'sticky',
-    top: 0,
-    background: paymentStylesVariables.color.paymentHistoryTableBackgroundColor
+    top: 0
   },
   headerContainer: {
     paddingTop: columnPadding,
