@@ -97,11 +97,12 @@ const sitesReducer = (state, action, emitChanges) => {
         console.warn('Trying to pin a tabId which does not exist:', action.tabId, 'tabs: ', state.get('tabs').toJS())
         break
       }
-      const siteDetail = siteUtil.getDetailFromTab(tab, siteTags.PINNED)
+      const sites = state.get('sites')
+      const siteDetail = siteUtil.getDetailFromTab(tab, siteTags.PINNED, sites)
       if (action.pinned) {
-        state = state.set('sites', siteUtil.addSite(state.get('sites'), siteDetail, siteTags.PINNED))
+        state = state.set('sites', siteUtil.addSite(sites, siteDetail, siteTags.PINNED))
       } else {
-        state = state.set('sites', siteUtil.removeSite(state.get('sites'), siteDetail, siteTags.PINNED))
+        state = state.set('sites', siteUtil.removeSite(sites, siteDetail, siteTags.PINNED))
       }
       if (syncEnabled()) {
         state = syncUtil.updateSiteCache(state, siteDetail)

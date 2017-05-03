@@ -1081,6 +1081,125 @@ describe('siteUtil', function () {
         }
       )
     })
+
+    describe('when considering provisional location', function () {
+      const originalUrl = 'https://brave.com/oldUrl'
+      const newUrl = 'https://brave.com/newUrl'
+      const tab = Immutable.fromJS({
+        url: newUrl,
+        frame: {
+          src: 'about:blank',
+          provisionalLocation: originalUrl
+        },
+        title: '41',
+        partitionNumber: 7
+      })
+      const oldNotPinned = Immutable.fromJS({
+        tags: [],
+        location: originalUrl,
+        title: 'site title',
+        partitionNumber: 7,
+        lastAccessedTime: 123
+      })
+      const oldPinned = oldNotPinned.set('tags', [siteTags.PINNED])
+      const newNotPinned = oldNotPinned.set('location', newUrl)
+      const newPinned = newNotPinned.set('tags', [siteTags.PINNED])
+
+      it('returns `url` if both it and `provisionalLocation` are pinned', function () {
+        let sites = siteUtil.addSite(emptySites, oldPinned, siteTags.PINNED)
+        sites = siteUtil.addSite(sites, newPinned, siteTags.PINNED)
+        assert.deepEqual(
+          siteUtil.getDetailFromTab(tab, siteTags.PINNED, sites).toJS(),
+          {
+            location: newUrl,
+            title: tab.get('title'),
+            tags: [siteTags.PINNED],
+            partitionNumber: tab.get('partitionNumber')
+          }
+        )
+      })
+      it('returns `url` if that was pinned (and `provisionalLocation` is not pinned)', function () {
+        let sites = siteUtil.addSite(emptySites, oldNotPinned)
+        sites = siteUtil.addSite(sites, newPinned, siteTags.PINNED)
+        assert.deepEqual(
+          siteUtil.getDetailFromTab(tab, siteTags.PINNED, sites).toJS(),
+          {
+            location: newUrl,
+            title: tab.get('title'),
+            tags: [siteTags.PINNED],
+            partitionNumber: tab.get('partitionNumber')
+          }
+        )
+      })
+      it('returns `provisionalLocation` if it was pinned (and `url` (redirected) is not pinned)', function () {
+        let sites = siteUtil.addSite(emptySites, oldPinned, siteTags.PINNED)
+        sites = siteUtil.addSite(sites, newNotPinned)
+        assert.deepEqual(
+          siteUtil.getDetailFromTab(tab, siteTags.PINNED, sites).toJS(),
+          {
+            location: originalUrl,
+            title: tab.get('title'),
+            tags: [siteTags.PINNED],
+            partitionNumber: tab.get('partitionNumber')
+          }
+        )
+      })
+      it('returns `url` if `provisionalLocation` is falsey', function () {
+        const tab2 = tab.setIn(['frame', 'provisionalLocation'], undefined)
+        let sites = siteUtil.addSite(emptySites, oldPinned, siteTags.PINNED)
+        sites = siteUtil.addSite(sites, newNotPinned)
+        assert.deepEqual(
+          siteUtil.getDetailFromTab(tab2, siteTags.PINNED, sites).toJS(),
+          {
+            location: newUrl,
+            title: tab2.get('title'),
+            tags: [siteTags.PINNED],
+            partitionNumber: tab.get('partitionNumber')
+          }
+        )
+      })
+      it('returns `url` if `sites` is falsey', function () {
+        assert.deepEqual(
+          siteUtil.getDetailFromTab(tab, siteTags.PINNED).toJS(),
+          {
+            location: newUrl,
+            title: tab.get('title'),
+            tags: [siteTags.PINNED],
+            partitionNumber: tab.get('partitionNumber')
+          }
+        )
+      })
+    })
+
+    describe('when considering parentFolderId', function () {
+      const siteUrl = 'https://brave.com/oldUrl'
+      const tab = Immutable.fromJS({
+        url: siteUrl,
+        title: '41',
+        partitionNumber: 7
+      })
+      const siteWithFolder = Immutable.fromJS({
+        location: siteUrl,
+        title: 'site title',
+        partitionNumber: 7,
+        lastAccessedTime: 123,
+        tags: [siteTags.PINNED],
+        parentFolderId: 10
+      })
+      it('returns parentFolderId', function () {
+        const sites = siteUtil.addSite(emptySites, siteWithFolder, siteTags.PINNED)
+        assert.deepEqual(
+          siteUtil.getDetailFromTab(tab, siteTags.PINNED, sites).toJS(),
+          {
+            location: siteUrl,
+            title: tab.get('title'),
+            tags: [siteTags.PINNED],
+            partitionNumber: tab.get('partitionNumber'),
+            parentFolderId: siteWithFolder.get('parentFolderId')
+          }
+        )
+      })
+    })
   })
 
   describe('getDetailFromCreateProperties', function () {
