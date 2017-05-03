@@ -5,7 +5,7 @@
 const React = require('react')
 
 // Components
-const ImmutableComponent = require('../immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
@@ -13,7 +13,7 @@ const windowActions = require('../../../../js/actions/windowActions')
 // Utils
 const {showContextMenu} = require('../../../common/lib/menuUtil')
 
-class MenuBarItem extends ImmutableComponent {
+class MenuBarItem extends React.Component {
   constructor () {
     super()
     this.onClick = this.onClick.bind(this)
@@ -24,25 +24,43 @@ class MenuBarItem extends ImmutableComponent {
     if (e && e.stopPropagation) {
       e.stopPropagation()
     }
+
     // If clicking on an already selected item, deselect it
-    const selected = this.props.menubar.props.selectedIndex
-    if (selected && selected === this.props.index) {
+    if (this.props.selected) {
       windowActions.setContextMenuDetail()
       windowActions.setMenuBarSelectedIndex()
       return
     }
+
     // Otherwise, mark item as selected and show its context menu
+    const rect = e.target.getBoundingClientRect()
     windowActions.setMenuBarSelectedIndex(this.props.index)
     windowActions.setContextMenuSelectedIndex()
-    const rect = e.target.getBoundingClientRect()
     showContextMenu(rect, this.props.submenu, this.props.lastFocusedSelector)
   }
 
   onMouseOver (e) {
-    const selected = this.props.menubar.props.selectedIndex
-    if (typeof selected === 'number' && selected !== this.props.index) {
+    if (typeof this.props.selectedIndex === 'number' && !this.props.selected) {
       this.onClick(e)
     }
+  }
+
+  mergeProps (state, dispatchProps, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const selectedIndex = currentWindow.getIn(['ui', 'menubar', 'selectedIndex'])
+    const template = state.getIn(['menu', 'template', ownProps.index])
+
+    const props = {}
+    // used in renderer
+    props.selected = ownProps.index === selectedIndex
+    props.label = template.get('label')
+
+    // used in other functions
+    props.submenu = template.get('submenu') && template.get('submenu').toJS()
+    props.lastFocusedSelector = currentWindow.getIn(['ui', 'menubar', 'lastFocusedSelector'])
+    props.selectedIndex = selectedIndex
+
+    return Object.assign({}, ownProps, props)
   }
 
   render () {
@@ -56,4 +74,4 @@ class MenuBarItem extends ImmutableComponent {
   }
 }
 
-module.exports = MenuBarItem
+module.exports = ReduxComponent.connect(MenuBarItem)
