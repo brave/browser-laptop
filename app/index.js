@@ -65,6 +65,7 @@ const TrackingProtection = require('./trackingProtection')
 const AdBlock = require('./adBlock')
 const AdInsertion = require('./browser/ads/adInsertion')
 const HttpsEverywhere = require('./httpsEverywhere')
+const PDFJS = require('./pdfJS')
 const SiteHacks = require('./siteHacks')
 const CmdLine = require('./cmdLine')
 const UpdateStatus = require('../js/constants/updateStatus')
@@ -333,6 +334,7 @@ app.on('ready', () => {
     TrackingProtection.init()
     AdBlock.init()
     AdInsertion.init()
+    PDFJS.init()
 
     if (!loadedPerWindowState || loadedPerWindowState.length === 0) {
       if (!CmdLine.newWindowURL()) {

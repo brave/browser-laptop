@@ -592,7 +592,7 @@ const initPartition = (partition) => {
 }
 module.exports.initPartition = initPartition
 
-const filterableProtocols = ['http:', 'https:', 'ws:', 'wss:', 'magnet:']
+const filterableProtocols = ['http:', 'https:', 'ws:', 'wss:', 'magnet:', 'file:']
 
 function shouldIgnoreUrl (details) {
   // internal requests
@@ -676,6 +676,9 @@ module.exports.isResourceEnabled = (resourceName, url, isPrivate) => {
     return true
   }
 
+  if (resourceName === 'pdfjs') {
+    return getSetting(settings.PDFJS_ENABLED)
+  }
   if (resourceName === 'webtorrent') {
     return getSetting(settings.TORRENT_VIEWER_ENABLED)
   }

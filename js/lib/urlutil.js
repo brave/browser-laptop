@@ -306,8 +306,16 @@ const UrlUtil = {
    * @return {string}
    */
   getLocationIfPDF: function (url) {
-    if (url && url.startsWith(`chrome-extension://${pdfjsExtensionId}/`)) {
-      return url.replace(`chrome-extension://${pdfjsExtensionId}/`, '')
+    const fileUrl = require('./appUrlUtil').fileUrl
+    const pdfjsBaseUrl = `chrome-extension://${pdfjsExtensionId}/`
+    if (url && url.startsWith(pdfjsBaseUrl)) {
+      url = url.replace(pdfjsBaseUrl, '')
+      if (url.startsWith(`${pdfjsBaseUrl}tmp/`)) {
+        // This is a file: URL loaded by PDFJS. The url hash is the actual
+        // file path on disk.
+        let hash = urlParse(url).hash
+        url = hash ? fileUrl(hash.replace('#', '')) : url
+      }
     }
     return url
   },
