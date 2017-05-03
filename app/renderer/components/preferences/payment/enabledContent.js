@@ -82,7 +82,7 @@ class EnabledContent extends ImmutableComponent {
       value = ledgerData.get('balance')
     }
 
-    return <div className={css(styles.balance)}>
+    return <section className={css(styles.balance)}>
       <FormTextbox data-test-id='fundsAmount' readOnly value={btcToCurrencyString(value, ledgerData)} />
       <a className={css(styles.iconLink)} href='https://brave.com/Payments_FAQ.html' target='_blank'>
         <span className={cx({
@@ -91,7 +91,7 @@ class EnabledContent extends ImmutableComponent {
           [css(styles.iconText)]: true
         })} />
       </a>
-    </div>
+    </section>
   }
 
   lastReconcileMessage () {
@@ -116,10 +116,10 @@ class EnabledContent extends ImmutableComponent {
       date: prevReconcileDateValue
     }
 
-    return <div className={css(styles.contribution, styles.lastContribution)}>
+    return <section className={css(styles.contribution, styles.lastContribution)}>
       <div data-l10n-id='lastContribution' />
       <div data-l10n-id={text} data-l10n-args={JSON.stringify(l10nDataArgs)} />
-    </div>
+    </section>
   }
 
   lastReconcileDate (transaction) {
@@ -157,17 +157,17 @@ class EnabledContent extends ImmutableComponent {
       reconcileDate: nextReconcileDateRelative
     }
 
-    return <div className={css(styles.contribution, styles.nextContribution)}>
+    return <section className={css(styles.contribution, styles.nextContribution)}>
       <div data-l10n-id='nextContribution' />
       <div data-l10n-args={JSON.stringify(l10nDataArgs)} data-l10n-id={l10nDataId} />
-    </div>
+    </section>
   }
 
   render () {
     const ledgerData = this.props.ledgerData
     const walletStatusText = walletStatus(ledgerData)
 
-    return <div>
+    return <section>
       <div className={css(styles.walletBar)} data-test-id='walletBar'>
         <table>
           <thead>
@@ -233,7 +233,7 @@ class EnabledContent extends ImmutableComponent {
         settings={this.props.settings}
         onChangeSetting={this.props.onChangeSetting}
         siteSettings={this.props.siteSettings} />
-    </div>
+    </section>
   }
 }
 

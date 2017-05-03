@@ -24,7 +24,7 @@ class LedgerBackupContent extends ImmutableComponent {
     const paymentId = this.props.ledgerData.get('paymentId')
     const passphrase = this.props.ledgerData.get('passphrase')
 
-    return <div>
+    return <section>
       <span data-l10n-id='ledgerBackupContent' />
       <div className={css(styles.copyKeyContainer)}>
         {/* TODO: refactor button */}
@@ -50,7 +50,7 @@ class LedgerBackupContent extends ImmutableComponent {
           <span className={css(styles.keyContainer__span)}>{passphrase}</span>
         </div>
       </div>
-    </div>
+    </section>
   }
 }
 
@@ -74,7 +74,7 @@ class LedgerBackupFooter extends ImmutableComponent {
   }
 
   render () {
-    return <div>
+    return <section>
       <Button className='primaryButton'
         l10nId='printKeys'
         testId='printKeysButton'
@@ -90,7 +90,7 @@ class LedgerBackupFooter extends ImmutableComponent {
         testId='doneButton'
         onClick={this.props.hideOverlay.bind(this, 'ledgerBackup')}
       />
-    </div>
+    </section>
   }
 }
 

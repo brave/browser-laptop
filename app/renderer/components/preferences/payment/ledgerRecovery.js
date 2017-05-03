@@ -49,10 +49,10 @@ class LedgerRecoveryContent extends ImmutableComponent {
     const recoveryError = this.props.ledgerData.getIn(['error', 'error'])
     const isNetworkError = typeof recoveryError === 'object'
 
-    return <div>
+    return <section>
       {
         recoverySucceeded === true
-          ? <div className={css(styles.recoveryOverlay)}>
+          ? <section className={css(styles.recoveryOverlay)}>
             <h1 className={css(styles.recoveryOverlay__textColor)} data-l10n-id='ledgerRecoverySucceeded' />
             <p className={css(styles.recoveryOverlay__textColor, styles.recoveryOverlay__spaceAround)}
               data-l10n-id='balanceRecovered'
@@ -63,12 +63,12 @@ class LedgerRecoveryContent extends ImmutableComponent {
               testId='okButton'
               onClick={this.clearRecoveryStatus.bind(this)}
             />
-          </div>
+          </section>
           : null
       }
       {
         (recoverySucceeded === false && recoveryError && isNetworkError)
-          ? <div className={css(styles.recoveryOverlay)}>
+          ? <section className={css(styles.recoveryOverlay)}>
             <h1 className={css(styles.recoveryOverlay__textColor)} data-l10n-id='ledgerRecoveryNetworkFailedTitle' data-test-id='recoveryError' />
             <p className={css(styles.recoveryOverlay__textColor, styles.recoveryOverlay__spaceAround)}
               data-l10n-id='ledgerRecoveryNetworkFailedMessage'
@@ -78,12 +78,12 @@ class LedgerRecoveryContent extends ImmutableComponent {
               testId='okButton'
               onClick={this.clearRecoveryStatus.bind(this)}
             />
-          </div>
+          </section>
           : null
       }
       {
         (recoverySucceeded === false && recoveryError && !isNetworkError)
-          ? <div className={css(styles.recoveryOverlay)}>
+          ? <section className={css(styles.recoveryOverlay)}>
             <h1 className={css(styles.recoveryOverlay__textColor)} data-l10n-id='ledgerRecoveryFailedTitle' />
             <p className={css(styles.recoveryOverlay__textColor, styles.recoveryOverlay__spaceAround)}
               data-l10n-id='ledgerRecoveryFailedMessage'
@@ -93,7 +93,7 @@ class LedgerRecoveryContent extends ImmutableComponent {
               testId='okButton'
               onClick={this.clearRecoveryStatus.bind(this)}
             />
-          </div>
+          </section>
           : null
       }
       <h4 className={css(styles.recoveryContent__h4)} data-l10n-id='ledgerRecoverySubtitle' />
@@ -106,7 +106,7 @@ class LedgerRecoveryContent extends ImmutableComponent {
           <RecoveryKeyTextbox id='secondRecoveryKey' onChange={this.handleSecondRecoveryKeyChange} />
         </SettingItem>
       </SettingsList>
-    </div>
+    </section>
   }
 }
 

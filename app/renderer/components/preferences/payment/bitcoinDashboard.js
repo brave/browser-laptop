@@ -118,7 +118,7 @@ class BitcoinDashboard extends ImmutableComponent {
 
   coinbasePanel () {
     if (this.canUseCoinbase) {
-      return <div className={css(styles.panel, styles.panel__coinbase)}>
+      return <section className={css(styles.panel, styles.panel__coinbase)}>
         <div className={css(styles.panel__divider, styles.panel__divider_left)}>
           <div className={css(styles.panel__divider_left__titleWrapper)}>
             <div className={css(styles.panel__divider_left__titleWrapper__iconWrapper)}>
@@ -140,9 +140,9 @@ class BitcoinDashboard extends ImmutableComponent {
             styles.panel__divider_right__subTitle
           )} data-l10n-id='transferTime' />
         </div>
-      </div>
+      </section>
     } else {
-      return <div className={css(styles.panel, styles.panel__coinbase)}>
+      return <section className={css(styles.panel, styles.panel__coinbase)}>
         <div className={css(styles.panel__divider, styles.panel__divider_left)}>
           <div className={css(styles.panel__divider_left__titleWrapper)}>
             <div className={css(styles.panel__divider_left__titleWrapper__iconWrapper)}>
@@ -160,7 +160,7 @@ class BitcoinDashboard extends ImmutableComponent {
         <div className={css(styles.panel__divider, styles.panel__divider_right)}>
           <div data-l10n-id='coinbaseNotAvailable' />
         </div>
-      </div>
+      </section>
     }
   }
   exchangePanel () {
@@ -170,7 +170,7 @@ class BitcoinDashboard extends ImmutableComponent {
     if (!url || !name) {
       return this.worldWidePanel()
     } else {
-      return <div className={css(styles.panel, styles.panel__coinbase)}>
+      return <section className={css(styles.panel, styles.panel__coinbase)}>
         <div className={css(styles.panel__divider, styles.panel__divider_left)}>
           <div className={css(styles.panel__divider_left__titleWrapper)}>
             <div className={css(styles.panel__divider_left__titleWrapper__iconWrapper)}>
@@ -193,11 +193,11 @@ class BitcoinDashboard extends ImmutableComponent {
             />
           </a>
         </div>
-      </div>
+      </section>
     }
   }
   worldWidePanel () {
-    return <div className={css(styles.panel)}>
+    return <section className={css(styles.panel)}>
       <div className={css(styles.panel__divider, styles.panel__divider_left)}>
         <div className={css(styles.panel__divider_left__titleWrapper)}>
           <div className={css(styles.panel__divider_left__titleWrapper__iconWrapper)}>
@@ -220,13 +220,13 @@ class BitcoinDashboard extends ImmutableComponent {
           />
         </a>
       </div>
-    </div>
+    </section>
   }
 
   bitcoinPanel () {
     const ledgerData = this.props.ledgerData
 
-    return <div className={css(styles.panel, styles.panel__bitcoinPanel)}>
+    return <section className={css(styles.panel, styles.panel__bitcoinPanel)}>
       <div className={css(styles.panel__divider, styles.panel__divider_left)}>
         <div className={css(styles.panel__divider_left__titleWrapper)}>
           <div className={css(styles.panel__divider_left__titleWrapper__iconWrapper)}>
@@ -276,11 +276,11 @@ class BitcoinDashboard extends ImmutableComponent {
             <div data-l10n-id='bitcoinWalletNotAvailable' />
           </div>
       }
-    </div>
+    </section>
   }
 
   smartphonePanel () {
-    return <div className={css(styles.panel, styles.panel__smartphonePanel)}>
+    return <section className={css(styles.panel, styles.panel__smartphonePanel)}>
       <div className={css(styles.panel__divider, styles.panel__divider_left)}>
         <div className={css(
           styles.panel__divider_left__titleWrapper,
@@ -305,11 +305,11 @@ class BitcoinDashboard extends ImmutableComponent {
           onClick={this.props.showQRcode.bind(this)}
         />
       </div>
-    </div>
+    </section>
   }
 
   qrcodeOverlayContent () {
-    return <div className={css(styles.modalOverlay__qrcodeOverlay__content)}>
+    return <section className={css(styles.modalOverlay__qrcodeOverlay__content)}>
       <img
         src={this.props.ledgerData.get('paymentIMG')}
         data-l10n-id='bitcoinQRImg'
@@ -317,11 +317,11 @@ class BitcoinDashboard extends ImmutableComponent {
       <div className={css(styles.modalOverlay__qrcodeOverlay__content__bitcoinQR)}
         data-l10n-id='bitcoinQR'
       />
-    </div>
+    </section>
   }
   qrcodeOverlayFooter () {
     if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
-      return <div className={css(styles.modalOverlay__qrcodeOverlay__footerWrapper__footer)}>
+      return <section className={css(styles.modalOverlay__qrcodeOverlay__footerWrapper__footer)}>
         <div className={css(styles.coinbaseLogo)} />
         <a target='_blank'
           className={css(
@@ -337,7 +337,7 @@ class BitcoinDashboard extends ImmutableComponent {
           )}
           href='https://play.google.com/store/apps/details?id=com.coinbase.android'
         />
-      </div>
+      </section>
     }
     return null
   }
@@ -372,7 +372,7 @@ class BitcoinDashboard extends ImmutableComponent {
     window.addEventListener('message', this.onMessage.bind(this), false)
     const ledgerData = this.props.ledgerData
 
-    return <div data-test-id='bitcoinDashboard'>
+    return <section data-test-id='bitcoinDashboard'>
       {
         this.props.bitcoinOverlayVisible
           ? <ModalOverlay
@@ -410,7 +410,7 @@ class BitcoinDashboard extends ImmutableComponent {
       }
       {this.bitcoinPanel()}
       {this.smartphonePanel()}
-    </div>
+    </section>
   }
 }
 
@@ -420,14 +420,14 @@ class BitcoinDashboardFooter extends ImmutableComponent {
   }
 
   get coinbaseMessageWrapper () {
-    return <div className={css(styles.dashboardFooter_coinbaseFooter__coinbaseMessageWrapper)}>
+    return <section className={css(styles.dashboardFooter_coinbaseFooter__coinbaseMessageWrapper)}>
       <div className={css(this.coinbaseCountries && styles.coinbaseLogo)} />
       <span className={css(styles.dashboardFooter_coinbaseFooter__coinbaseMessageWrapper__message)} data-l10n-id='coinbaseMessage' />
-    </div>
+    </section>
   }
 
   render () {
-    return <div className={css(
+    return <section className={css(
       styles.dashboardFooter,
       this.coinbaseCountries && styles.dashboardFooter_coinbaseFooter
     )}>
@@ -444,7 +444,7 @@ class BitcoinDashboardFooter extends ImmutableComponent {
         testId='panelDoneButton'
         onClick={this.props.hideParentOverlay}
       />
-    </div>
+    </section>
   }
 }
 

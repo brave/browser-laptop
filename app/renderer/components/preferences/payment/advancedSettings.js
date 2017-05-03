@@ -27,7 +27,7 @@ class AdvancedSettingsContent extends ImmutableComponent {
     const minPublisherDuration = this.props.ledgerData.getIn(['synopsisOptions', 'minPublisherDuration'])
     const minPublisherVisits = this.props.ledgerData.getIn(['synopsisOptions', 'minPublisherVisits'])
 
-    return <div className={css(styles.advancedSettings)} data-test-id='advancedSettings'>
+    return <section className={css(styles.advancedSettings)} data-test-id='advancedSettings'>
       <div className={css(styles.settingsPanelDivider)}>
         <div className={css(styles.minimumSetting)} data-l10n-id='minimumPageTimeSetting' />
         <SettingsList>
@@ -82,13 +82,13 @@ class AdvancedSettingsContent extends ImmutableComponent {
           />
         </SettingsList>
       </div>
-    </div>
+    </section>
   }
 }
 
 class AdvancedSettingsFooter extends ImmutableComponent {
   render () {
-    return <div>
+    return <section>
       <Button className='primaryButton'
         l10nId='backupLedger'
         testId='backupLedgerButton'
@@ -104,7 +104,7 @@ class AdvancedSettingsFooter extends ImmutableComponent {
         testId='doneButton'
         onClick={this.props.hideOverlay.bind(this, 'advancedSettings')}
       />
-    </div>
+    </section>
   }
 }
 
