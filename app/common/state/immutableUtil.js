@@ -18,11 +18,13 @@ const api = {
   },
 
   isSameHashCode: (first, second) => {
-    if (first === null && second === null) {
+    if (first == null && second == null) {
       return true
+    } else if (first == null || second == null) {
+      return false
     }
 
-    return second !== null ? first.hashCode() === second.hashCode() : false
+    return first.hashCode() === second.hashCode()
   },
 
   makeImmutable: (obj) => {
