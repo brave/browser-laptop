@@ -115,6 +115,7 @@ class AutofillCreditCardPanel extends ImmutableComponent {
                   commonFormStyles.input__box,
                   styles.input
                 )}
+                  data-test-id='creditCardName'
                   spellCheck='false'
                   onKeyDown={this.onKeyDown}
                   onChange={this.onNameChange}
@@ -126,6 +127,7 @@ class AutofillCreditCardPanel extends ImmutableComponent {
                 className={css(commonFormStyles.input__marginRow)
               }>
                 <CommonFormTextbox
+                  data-test-id='creditCardNumber'
                   spellCheck='false'
                   onKeyDown={this.onKeyDown}
                   onChange={this.onCardChange}
