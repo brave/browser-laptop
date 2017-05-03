@@ -8,8 +8,8 @@ const appConstants = require('../../../js/constants/appConstants')
 const flash = require('../../../js/flash')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 
-const flashReducer = (state, action) => {
-  action = makeImmutable(action)
+const flashReducer = (state, action, immutableAction) => {
+  action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
     case appConstants.APP_SET_STATE:
       flash.init()

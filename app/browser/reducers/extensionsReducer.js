@@ -14,8 +14,8 @@ const extensionState = require('../../common/state/extensionState')
 const ExtensionConstants = require('../../common/constants/extensionConstants')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 
-const extensionsReducer = (state, action) => {
-  action = makeImmutable(action)
+const extensionsReducer = (state, action, immutableAction) => {
+  action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
     case ExtensionConstants.EXTENSION_UNINSTALLED:
       let extensionId = action.get('extensionId').toString()
