@@ -26,17 +26,13 @@ If you'd prefer to only run the unit tests, you can do that using:
 
     npm run unittest
 
-If you only need to run the Spectron tests (used for UI testing), you can run:
-
-    npm run uitest
-
 ## Running a subset of tests
 
 You can run a subset of tests which match a `description` or `it` with:
 
     npm run test -- --grep="expression"
 
-Where `expression` could be for example `^tabs` to match all tests which start with the word tabs. This works for all testing modes (test, unittest, uitest).
+Where `expression` could be for example `^tabs` to match all tests which start with the word tabs. This works for all testing modes (test, unittest).
 
 ## Best practices for writing tests
 
