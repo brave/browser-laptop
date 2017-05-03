@@ -27,7 +27,7 @@ const extensionState = require('../../../common/state/extensionState')
 const siteSettingsState = require('../../../common/state/siteSettingsState')
 
 // Util
-const {getCurrentWindowId, isMaximized} = require('../../currentWindow')
+const {getCurrentWindowId, isMaximized, isFullScreen} = require('../../currentWindow')
 const {makeImmutable} = require('../../../common/state/immutableUtil')
 const platformUtil = require('../../../common/lib/platformUtil')
 const {braveShieldsEnabled} = require('../../../common/state/shieldState')
@@ -225,7 +225,10 @@ class Navigator extends ImmutableComponent {
           onDragOver={this.onDragOver}
           onDrop={this.onDrop}
         >
-          <div className='backforward'>
+          <div className={cx({
+            backforward: true,
+            fullscreen: isFullScreen()
+          })}>
             <div className={cx({
               navigationButtonContainer: true,
               nav: true,
