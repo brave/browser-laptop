@@ -189,7 +189,8 @@ const styles = StyleSheet.create({
   commonFormBottomWrapper: {
     margin: 0,
     padding: `${globalStyles.spacing.dialogInsideMargin} 30px`,
-    background: globalStyles.color.commonFormBottomWrapperBackground
+    background: globalStyles.color.commonFormBottomWrapperBackground,
+    borderRadius: `0 0 ${globalStyles.radius.borderRadius} ${globalStyles.radius.borderRadius}`
   }
 })
 
