@@ -461,9 +461,7 @@ const getSitesBySubkey = (sites, siteKey, tag) => {
 
 module.exports.getDetailFromTab = function (tab, tag, sites) {
   let location = tab.get('url')
-  const partitionNumber = tab.get('partitionNumber') !== undefined
-    ? tab.get('partitionNumber')
-    : undefined
+  const partitionNumber = tab.get('partitionNumber')
   let parentFolderId
 
   // if site map is available, look up extra information:
