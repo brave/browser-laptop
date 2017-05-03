@@ -78,6 +78,9 @@ class AutofillCreditCardPanel extends ImmutableComponent {
     if (!currentDetail.get('name') && !currentDetail.get('card')) return true
     return false
   }
+  componentDidMount () {
+    this.nameOnCard.focus()
+  }
   render () {
     var ExpMonth = []
     for (let i = 1; i <= 12; ++i) {
@@ -112,10 +115,11 @@ class AutofillCreditCardPanel extends ImmutableComponent {
                   commonFormStyles.input__box,
                   styles.input
                 )}
+                  data-test-id='creditCardName'
                   spellCheck='false'
                   onKeyDown={this.onKeyDown}
                   onChange={this.onNameChange}
-                  value={this.props.currentDetail.get('name')}
+                  value={this.props.currentDetail.get('name') || ''}
                   ref={(nameOnCard) => { this.nameOnCard = nameOnCard }}
                 />
               </div>
@@ -123,6 +127,7 @@ class AutofillCreditCardPanel extends ImmutableComponent {
                 className={css(commonFormStyles.input__marginRow)
               }>
                 <CommonFormTextbox
+                  data-test-id='creditCardNumber'
                   spellCheck='false'
                   onKeyDown={this.onKeyDown}
                   onChange={this.onCardChange}
