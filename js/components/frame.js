@@ -3,50 +3,71 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const urlParse = require('../../app/common/urlParse')
-const windowActions = require('../actions/windowActions')
-const appActions = require('../actions/appActions')
-const webviewActions = require('../actions/webviewActions')
-const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
 const Immutable = require('immutable')
-const cx = require('../lib/classSet')
-const siteUtil = require('../state/siteUtil')
-const frameStateUtil = require('../state/frameStateUtil')
-const UrlUtil = require('../lib/urlutil')
-const messages = require('../constants/messages')
-const contextMenus = require('../contextMenus')
 const ipc = require('electron').ipcRenderer
-const FullScreenWarning = require('../../app/renderer/components/fullScreenWarning')
-const debounce = require('../lib/debounce')
+
+// Actions
+const appActions = require('../actions/appActions')
+const windowActions = require('../actions/windowActions')
+const webviewActions = require('../actions/webviewActions')
 const getSetting = require('../settings').getSetting
-const config = require('../constants/config')
-const settings = require('../constants/settings')
-const {aboutUrls, isSourceMagnetUrl, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
-const {isFrameError, isAborted} = require('../../app/common/lib/httpUtil')
-const locale = require('../l10n')
-const appConfig = require('../constants/appConfig')
-const {getSiteSettingsForHostPattern} = require('../state/siteSettings')
-const {isFocused} = require('../../app/renderer/currentWindow')
-const windowStore = require('../stores/windowStore')
-const appStoreRenderer = require('../stores/appStoreRenderer')
-const siteSettings = require('../state/siteSettings')
-const imageUtil = require('../lib/imageUtil')
+
+// Components
+const ReduxComponent = require('../../app/renderer/components/reduxComponent')
+const FullScreenWarning = require('../../app/renderer/components/fullScreenWarning')
 const MessageBox = require('../../app/renderer/components/common/messageBox')
 
+// Store
+const windowStore = require('../stores/windowStore')
+const appStoreRenderer = require('../stores/appStoreRenderer')
+
+// State
+const siteSettings = require('../state/siteSettings')
+const siteSettingsState = require('../../app/common/state/siteSettingsState')
+const tabState = require('../../app/common/state/tabState')
+
+// Utils
+const frameStateUtil = require('../state/frameStateUtil')
+const siteUtil = require('../state/siteUtil')
+const UrlUtil = require('../lib/urlutil')
+const cx = require('../lib/classSet')
+const urlParse = require('../../app/common/urlParse')
+const contextMenus = require('../contextMenus')
+const domUtil = require('../../app/renderer/lib/domUtil')
+const {
+  aboutUrls,
+  isSourceMagnetUrl,
+  isSourceAboutUrl,
+  isTargetAboutUrl,
+  getTargetAboutUrl,
+  getBaseUrl,
+  isIntermediateAboutPage
+} = require('../lib/appUrlUtil')
+const {isFrameError, isAborted} = require('../../app/common/lib/httpUtil')
+const {isFocused} = require('../../app/renderer/currentWindow')
+const debounce = require('../lib/debounce')
+const locale = require('../l10n')
+const imageUtil = require('../lib/imageUtil')
+
+// Constants
+const settings = require('../constants/settings')
+const appConfig = require('../constants/appConfig')
+const messages = require('../constants/messages')
+const config = require('../constants/config')
+
+const pdfjsOrigin = `chrome-extension://${config.PDFJSExtensionId}/`
 const WEBRTC_DEFAULT = 'default'
 const WEBRTC_DISABLE_NON_PROXY = 'disable_non_proxied_udp'
 // Looks like Brave leaks true public IP from behind system proxy when this option
 // is on.
 // const WEBRTC_PUBLIC_ONLY = 'default_public_interface_only'
 
-const pdfjsOrigin = `chrome-extension://${config.PDFJSExtensionId}/`
-
 function isTorrentViewerURL (url) {
   const isEnabled = getSetting(settings.TORRENT_VIEWER_ENABLED)
   return isEnabled && isSourceMagnetUrl(url)
 }
 
-class Frame extends ImmutableComponent {
+class Frame extends React.Component {
   constructor () {
     super()
     this.onCloseFrame = this.onCloseFrame.bind(this)
@@ -96,13 +117,13 @@ class Frame extends ImmutableComponent {
   }
 
   runInsecureContent () {
-    const activeSiteSettings = getSiteSettingsForHostPattern(this.props.allSiteSettings, this.origin)
+    const activeSiteSettings = siteSettings.getSiteSettingsForHostPattern(this.props.allSiteSettings, this.origin)
     return activeSiteSettings === undefined
       ? false : activeSiteSettings.get('runInsecureContent')
   }
 
   allowRunningWidevinePlugin (url) {
-    if (!this.props.widevine || !this.props.widevine.get('enabled')) {
+    if (!this.props.isWidevineEnabled) {
       return false
     }
     const origin = url ? siteUtil.getOrigin(url) : this.origin
@@ -113,8 +134,7 @@ class Frame extends ImmutableComponent {
     if (!this.props.allSiteSettings) {
       return false
     }
-    const activeSiteSettings = getSiteSettingsForHostPattern(this.props.allSiteSettings,
-                                                             origin)
+    const activeSiteSettings = siteSettings.getSiteSettingsForHostPattern(this.props.allSiteSettings, origin)
     if (activeSiteSettings && typeof activeSiteSettings.get('widevine') === 'number') {
       return true
     }
@@ -124,8 +144,7 @@ class Frame extends ImmutableComponent {
   expireContentSettings (origin) {
     // Expired Flash settings should be deleted when the webview is
     // navigated or closed. Same for NoScript's allow-once option.
-    const activeSiteSettings = getSiteSettingsForHostPattern(this.props.allSiteSettings,
-                                                             origin)
+    const activeSiteSettings = siteSettings.getSiteSettingsForHostPattern(this.props.allSiteSettings, origin)
     if (!activeSiteSettings) {
       return
     }
@@ -153,12 +172,12 @@ class Frame extends ImmutableComponent {
   updateWebview (cb, prevProps, newSrc) {
     // lazy load webview
     if (!this.webview && !this.props.isActive && !this.props.isPreview &&
-        // allow force loading of new frames
-        this.props.unloaded === true &&
-        // don't lazy load about pages
-        !aboutUrls.get(getBaseUrl(this.props.src)) &&
-        // pinned tabs don't serialize their state so the icon is lost for lazy loading
-        !this.props.pinnedLocation) {
+      // allow force loading of new frames
+      this.props.unloaded === true &&
+      // don't lazy load about pages
+      !aboutUrls.get(getBaseUrl(this.props.src)) &&
+      // pinned tabs don't serialize their state so the icon is lost for lazy loading
+      !this.props.pinnedLocation) {
       return
     }
 
@@ -171,7 +190,7 @@ class Frame extends ImmutableComponent {
     // Create the webview dynamically because React doesn't whitelist all
     // of the attributes we need
     if (this.shouldCreateWebview()) {
-      this.webview = document.createElement('webview')
+      this.webview = domUtil.createWebView()
       this.webview.setAttribute('data-frame-key', this.props.frameKey)
 
       this.addEventListeners()
@@ -190,7 +209,7 @@ class Frame extends ImmutableComponent {
         this.webview.setAttribute('partition', frameStateUtil.getPartition(this.frame))
         this.webview.setAttribute('src', newSrc)
       }
-      this.webviewContainer.appendChild(this.webview)
+      domUtil.appendChild(this.webviewContainer, this.webview)
     } else {
       cb && cb(prevProps)
     }
@@ -219,7 +238,7 @@ class Frame extends ImmutableComponent {
   }
 
   get zoomLevel () {
-    const zoom = this.props.frameSiteSettings && this.props.frameSiteSettings.get('zoomLevel')
+    const zoom = this.props.siteZoomLevel
     appActions.removeSiteSetting(this.origin, 'zoomLevel', this.props.isPrivate)
     return zoom
   }
@@ -284,7 +303,7 @@ class Frame extends ImmutableComponent {
       // make sure the webview content updates to
       // match the fullscreen state of the frame
       if (prevProps.isFullScreen !== this.props.isFullScreen ||
-          (this.props.isFullScreen && !this.props.isActive)) {
+        (this.props.isFullScreen && !this.props.isActive)) {
         if (this.props.isFullScreen && this.props.isActive) {
           this.enterHtmlFullScreen()
         } else {
@@ -327,15 +346,15 @@ class Frame extends ImmutableComponent {
         // This can happen for pages which don't load properly.
         // Some examples are basic http auth and bookmarklets.
         // In this case both the user display and the user think they're on this.props.location.
-        if (this.tab.get('url') !== this.props.location &&
+        if (this.props.tabUrl !== this.props.location &&
           !this.isAboutPage() &&
           !isTorrentViewerURL(this.props.location)) {
           this.webview.loadURL(this.props.location)
         } else if (this.isIntermediateAboutPage() &&
-          this.tab.get('url') !== this.props.location &&
-          this.tab.get('url') !== this.props.aboutDetails.get('url')) {
-          appActions.loadURLRequested(this.props.aboutDetails.get('url'),
-            this.props.aboutDetails.get('frameKey'))
+          this.props.tabUrl !== this.props.location &&
+          this.props.tabUrl !== this.props.aboutDetailsUrl) {
+          appActions.loadURLRequested(this.props.aboutDetailsUrl,
+            this.props.aboutDetailsFrameKey)
         } else {
           this.webview.reload()
         }
@@ -356,7 +375,7 @@ class Frame extends ImmutableComponent {
         this.zoomReset()
         break
       case 'view-source':
-        const sourceLocation = UrlUtil.getViewSourceUrlFromUrl(this.tab.get('url'))
+        const sourceLocation = UrlUtil.getViewSourceUrlFromUrl(this.props.tabUrl)
         if (sourceLocation !== null) {
           appActions.createTabRequested({
             url: sourceLocation,
@@ -370,8 +389,8 @@ class Frame extends ImmutableComponent {
         break
       case 'save':
         const downloadLocation = getSetting(settings.PDFJS_ENABLED)
-          ? UrlUtil.getLocationIfPDF(this.tab.get('url'))
-          : this.tab.get('url')
+          ? UrlUtil.getLocationIfPDF(this.props.tabUrl)
+          : this.props.tabUrl
         // TODO: Sometimes this tries to save in a non-existent directory
         this.webview.downloadURL(downloadLocation, true)
         break
@@ -379,17 +398,17 @@ class Frame extends ImmutableComponent {
         this.webview.print()
         break
       case 'show-findbar':
-        windowActions.setFindbarShown(this.frame, true)
+        windowActions.setFindbarShown(this.props.frameKey, true)
         break
       case 'fill-password':
-        let currentUrl = urlParse(this.tab.get('url'))
+        let currentUrl = urlParse(this.props.tabUrl)
         if (currentUrl &&
-            [currentUrl.protocol, currentUrl.host].join('//') === this.props.activeShortcutDetails.get('origin')) {
+            [currentUrl.protocol, currentUrl.host].join('//') === this.props.shortcutDetailsOrigin) {
           this.webview.send(messages.GOT_PASSWORD,
-                            this.props.activeShortcutDetails.get('username'),
-                            this.props.activeShortcutDetails.get('password'),
-                            this.props.activeShortcutDetails.get('origin'),
-                            this.props.activeShortcutDetails.get('action'),
+                            this.props.shortcutDetailsUsername,
+                            this.props.shortcutDetailsPassword,
+                            this.props.shortcutDetailsOrigin,
+                            this.props.shortcutDetailsAction,
                             true)
         }
         break
@@ -443,7 +462,7 @@ class Frame extends ImmutableComponent {
     // cryptographically random.
     const nonce = Math.random().toString()
 
-    if (this.props.widevine && this.props.widevine.get('enabled')) {
+    if (this.props.isWidevineEnabled) {
       const message = locale.translation('allowWidevine').replace(/{{\s*origin\s*}}/, this.origin)
       // Show Widevine notification bar
       appActions.showNotification({
@@ -584,7 +603,7 @@ class Frame extends ImmutableComponent {
       contextMenus.onShowAutofillMenu(e.suggestions, e.rect, this.frame)
     })
     this.webview.addEventListener('hide-autofill-popup', (e) => {
-      if (this.props.contextMenuDetail && this.props.contextMenuDetail.get('type') === 'autofill') {
+      if (this.props.isAutFillContextMenu) {
         windowActions.autofillPopupHidden(this.props.tabId)
       }
     })
@@ -682,7 +701,7 @@ class Frame extends ImmutableComponent {
       }
 
       const protocol = parsedUrl.protocol
-      const isError = this.props.aboutDetails && this.props.aboutDetails.get('errorCode')
+      const isError = this.props.aboutDetailsErrorCode
       if (!this.props.isPrivate && (protocol === 'http:' || protocol === 'https:') && !isError && savePage) {
         // Register the site for recent history for navigation bar
         // calling with setTimeout is an ugly hack for a race condition
@@ -772,7 +791,7 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('did-navigate', (e) => {
       if (this.props.findbarShown) {
-        this.props.onFindHide()
+        frameStateUtil.onFindBarHide(this.props.activeFrameKey)
       }
 
       for (let message in this.notificationCallbacks) {
@@ -872,15 +891,15 @@ class Frame extends ImmutableComponent {
       }
       if (e.result !== undefined && (e.result.matches !== undefined || e.result.activeMatchOrdinal !== undefined)) {
         if (e.result.matches === 0) {
-          windowActions.setFindDetail(this.frame, Immutable.fromJS({
+          windowActions.setFindDetail(this.props.frameKey, Immutable.fromJS({
             numberOfMatches: 0,
             activeMatchOrdinal: 0
           }))
           return
         }
-        windowActions.setFindDetail(this.frame, Immutable.fromJS({
-          numberOfMatches: e.result.matches || (this.props.findDetail && this.props.findDetail.get('numberOfMatches')) || 0,
-          activeMatchOrdinal: e.result.activeMatchOrdinal || (this.props.findDetail && this.props.findDetail.get('activeMatchOrdinal'))
+        windowActions.setFindDetail(this.props.frameKey, Immutable.fromJS({
+          numberOfMatches: e.result.matches || this.props.findDetailNumberOfMatches,
+          activeMatchOrdinal: e.result.activeMatchOrdinal || this.props.findDetailActiveMatchOrdinal
         }))
       }
     })
@@ -914,11 +933,11 @@ class Frame extends ImmutableComponent {
 
   onFindAgain (forward) {
     if (!this.props.findbarShown) {
-      windowActions.setFindbarShown(this.frame, true)
+      windowActions.setFindbarShown(this.props.frameKey, true)
     }
-    const searchString = this.props.findDetail && this.props.findDetail.get('searchString')
+    const searchString = this.props.findDetailSearchString
     if (searchString) {
-      webviewActions.findInPage(searchString, (this.props.findDetail && this.props.findDetail.get('caseSensitivity')) || undefined, forward, this.props.findDetail.get('internalFindStatePresent'), this.webview)
+      webviewActions.findInPage(searchString, this.props.findDetailCaseSensitivity, forward, this.props.findDetailInternalFindStatePresent, this.webview)
     }
   }
 
@@ -950,10 +969,68 @@ class Frame extends ImmutableComponent {
     }
   }
 
+  mergeProps (state, dispatchProps, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey)
+    const activeFrame = frameStateUtil.getActiveFrame(currentWindow)
+    const allSiteSettings = siteSettingsState.getAllSiteSettings(state, activeFrame)
+    const frameSiteSettings = frame.get('location')
+      ? siteSettings.getSiteSettingsForURL(allSiteSettings, frame.get('location'))
+      : undefined
+    const contextMenu = currentWindow.get('contextMenuDetail')
+    const tabId = frame.get('tabId')
+    const tab = tabId && tabId > -1 && tabState.getByTabId(state, tabId)
+
+    const props = {}
+    // used in renderer
+    props.partition = frameStateUtil.getPartition(frame)
+    props.isFullScreen = frame.get('isFullScreen')
+    props.isPreview = frame.get('key') === currentWindow.get('previewFrameKey')
+    props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frame.get('key'))
+    props.showFullScreenWarning = frame.get('showFullScreenWarning')
+    props.location = frame.get('location')
+    props.hrefPreview = frame.get('hrefPreview')
+    props.showOnRight = frame.get('showOnRight')
+    props.tabId = tabId
+    props.showMessageBox = tab && tab.get('messageBoxDetail')
+
+    // used in other functions
+    props.activeFrameKey = activeFrame.get('key')
+    props.tabIndex = frameStateUtil.getFrameIndex(currentWindow, frame.get('key'))
+    props.urlBarFocused = activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'focused'])
+    props.isAutFillContextMenu = contextMenu && contextMenu.get('type') === 'autofill'
+    props.isSecure = frame.getIn(['security', 'isSecure'])
+    props.findbarShown = frame.get('findbarShown')
+    props.findDetailCaseSensitivity = frame.getIn(['findDetail', 'caseSensitivity']) || undefined
+    props.findDetailNumberOfMatches = frame.getIn(['findDetail', 'numberOfMatches']) || 0
+    props.findDetailSearchString = frame.getIn(['findDetail', 'searchString'])
+    props.findDetailInternalFindStatePresent = frame.getIn(['findDetail', 'internalFindStatePresent'])
+    props.findDetailActiveMatchOrdinal = frame.getIn(['findDetail', 'activeMatchOrdinal'])
+    props.isPrivate = frame.get('isPrivate')
+    props.activeShortcut = frame.get('activeShortcut')
+    props.shortcutDetailsUsername = frame.getIn(['activeShortcutDetails', 'username'])
+    props.shortcutDetailsPassword = frame.getIn(['activeShortcutDetails', 'password'])
+    props.shortcutDetailsOrigin = frame.getIn(['activeShortcutDetails', 'origin'])
+    props.shortcutDetailsAction = frame.getIn(['activeShortcutDetails', 'action'])
+    props.provisionalLocation = frame.get('provisionalLocation')
+    props.pinnedLocation = frame.get('pinnedLocation')
+    props.src = frame.get('src')
+    props.guestInstanceId = frame.get('guestInstanceId')
+    props.aboutDetailsUrl = frame.getIn(['aboutDetails', 'url'])
+    props.aboutDetailsFrameKey = frame.getIn(['aboutDetails', 'frameKey'])
+    props.aboutDetailsErrorCode = frame.getIn(['aboutDetails', 'errorCode'])
+    props.unloaded = frame.get('unloaded')
+    props.isWidevineEnabled = state.get('widevine') && state.getIn(['widevine', 'enabled'])
+    props.siteZoomLevel = frameSiteSettings && frameSiteSettings.get('zoomLevel')
+    props.allSiteSettings = allSiteSettings // TODO (nejc) can be improved even more
+    props.tabUrl = tab && tab.get('url')
+
+    return Object.assign({}, ownProps, props)
+  }
+
   render () {
-    const messageBoxDetail = this.tab && this.tab.get('messageBoxDetail')
     return <div
-      data-partition={frameStateUtil.getPartition(this.frame)}
+      data-partition={this.props.partition}
       className={cx({
         frameWrapper: true,
         isPreview: this.props.isPreview,
@@ -980,15 +1057,13 @@ class Frame extends ImmutableComponent {
         : null
       }
       {
-        messageBoxDetail
+        this.props.showMessageBox
         ? <MessageBox
-          isActive={this.props.isActive}
-          tabId={this.frame.get('tabId')}
-          detail={messageBoxDetail} />
+          tabId={this.props.tabId} />
         : null
       }
     </div>
   }
 }
 
-module.exports = Frame
+module.exports = ReduxComponent.connect(Frame)

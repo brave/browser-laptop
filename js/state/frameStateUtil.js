@@ -8,6 +8,8 @@ const {tabCloseAction} = require('../../app/common/constants/settingsEnums')
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
 const {isIntermediateAboutPage} = require('../lib/appUrlUtil')
 const urlParse = require('../../app/common/urlParse')
+const windowActions = require('../actions/windowActions.js')
+const webviewActions = require('../actions/webviewActions.js')
 
 const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
@@ -695,6 +697,16 @@ function getFrameTabPageIndex (frames, frameProps, tabsPerTabPage) {
   return Math.floor(index / tabsPerTabPage)
 }
 
+function onFindBarHide (frameKey) {
+  windowActions.setFindbarShown(frameKey, false)
+  webviewActions.stopFindInPage()
+  windowActions.setFindDetail(frameKey, Immutable.fromJS({
+    internalFindStatePresent: false,
+    numberOfMatches: -1,
+    activeMatchOrdinal: 0
+  }))
+}
+
 const frameStatePath = (windowState, key) =>
   ['frames', findIndexForFrameKey(windowState.get('frames'), key)]
 
@@ -769,5 +781,6 @@ module.exports = {
   tabStatePath,
   tabStatePathForFrame,
   getLastCommittedURL,
-  getFrameByLastAccessedTime
+  getFrameByLastAccessedTime,
+  onFindBarHide
 }

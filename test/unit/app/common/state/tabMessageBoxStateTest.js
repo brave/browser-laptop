@@ -1,6 +1,7 @@
 /* global describe, it, before, after */
 const tabMessageBoxState = require('../../../../../app/common/state/tabMessageBoxState')
 const tabState = require('../../../../../app/common/state/tabState')
+const {makeImmutable} = require('../../../../../app/common/state/immutableUtil')
 const sinon = require('sinon')
 const Immutable = require('immutable')
 const assert = require('assert')
@@ -17,8 +18,8 @@ const exampleMessageBox = Immutable.fromJS({
   message: 'example message',
   title: 'example title',
   buttons: ['OK'],
-  suppress: false,
-  showSuppress: false
+  suppress: true,
+  showSuppress: true
 })
 
 const defaultTabId = 1
@@ -177,6 +178,109 @@ describe('tabMessageBoxState unit tests', function () {
         const newAppState = tabMessageBoxState.removeDetail(defaultAppState, {tabId: defaultTabId})
         assert.equal(newAppState, defaultAppState)
       })
+    })
+  })
+
+  describe('getSuppress', function () {
+    it('when data exists', function () {
+      const appState = defaultAppState.set('tabs', Immutable.fromJS([defaultTab]))
+      const suppress = tabMessageBoxState.getSuppress(appState, defaultTabId)
+      assert.equal(suppress, defaultTab.getIn(['messageBoxDetail', 'suppress']))
+    })
+
+    it('when tab is missing', function () {
+      const suppress = tabMessageBoxState.getSuppress(defaultAppState, defaultTabId)
+      assert.equal(suppress, false)
+    })
+
+    it('when data is missing', function () {
+      let appState = defaultAppState.set('tabs', Immutable.fromJS([defaultTab]))
+      appState = appState.deleteIn(['tabs', 0, 'messageBoxDetail', 'suppress'])
+      const suppress = tabMessageBoxState.getSuppress(appState, defaultTabId)
+      assert.equal(suppress, false)
+    })
+  })
+
+  describe('getShowSuppress', function () {
+    it('when data exists', function () {
+      const appState = defaultAppState.set('tabs', Immutable.fromJS([defaultTab]))
+      const getShowSuppress = tabMessageBoxState.getShowSuppress(appState, defaultTabId)
+      assert.equal(getShowSuppress, defaultTab.getIn(['messageBoxDetail', 'showSuppress']))
+    })
+
+    it('when tab is missing', function () {
+      const getShowSuppress = tabMessageBoxState.getShowSuppress(defaultAppState, defaultTabId)
+      assert.equal(getShowSuppress, false)
+    })
+
+    it('when data is missing', function () {
+      let appState = defaultAppState.set('tabs', Immutable.fromJS([defaultTab]))
+      appState = appState.deleteIn(['tabs', 0, 'messageBoxDetail', 'showSuppress'])
+      const getShowSuppress = tabMessageBoxState.getShowSuppress(appState, defaultTabId)
+      assert.equal(getShowSuppress, false)
+    })
+  })
+
+  describe('getTitle', function () {
+    it('when data exists', function () {
+      const appState = defaultAppState.set('tabs', Immutable.fromJS([defaultTab]))
+      const title = tabMessageBoxState.getTitle(appState, defaultTabId)
+      assert.equal(title, defaultTab.getIn(['messageBoxDetail', 'title']))
+    })
+
+    it('when tab is missing', function () {
+      const title = tabMessageBoxState.getTitle(defaultAppState, defaultTabId)
+      assert.equal(title, '')
+    })
+
+    it('when data is missing', function () {
+      let appState = defaultAppState.set('tabs', Immutable.fromJS([defaultTab]))
+      appState = appState.deleteIn(['tabs', 0, 'messageBoxDetail', 'title'])
+      const title = tabMessageBoxState.getTitle(appState, defaultTabId)
+      assert.equal(title, '')
+    })
+  })
+
+  describe('getButtons', function () {
+    let defaultValue = makeImmutable(['ok'])
+
+    it('when data exists', function () {
+      const appState = defaultAppState.set('tabs', Immutable.fromJS([defaultTab]))
+      const buttons = tabMessageBoxState.getButtons(appState, defaultTabId)
+      assert.equal(buttons, defaultTab.getIn(['messageBoxDetail', 'buttons']))
+    })
+
+    it('when tab is missing', function () {
+      const buttons = tabMessageBoxState.getButtons(defaultAppState, defaultTabId)
+      assert.deepEqual(buttons, defaultValue)
+    })
+
+    it('when data is missing', function () {
+      let appState = defaultAppState.set('tabs', Immutable.fromJS([defaultTab]))
+      appState = appState.deleteIn(['tabs', 0, 'messageBoxDetail', 'buttons'])
+      const buttons = tabMessageBoxState.getButtons(appState, defaultTabId)
+      assert.deepEqual(buttons, defaultValue)
+    })
+  })
+
+  describe('getPropertyByTabId', function () {
+    it('when everything is correct', function () {
+      let appState = defaultAppState.set('tabs', Immutable.fromJS([defaultTab]))
+      const property = tabMessageBoxState.getPropertyByTabId(appState, defaultTabId, 'suppress')
+      assert.deepEqual(property, exampleMessageBox.get('suppress'))
+    })
+
+    it('when tab is wrong', function () {
+      let appState = defaultAppState.set('tabs', Immutable.fromJS([defaultTab]))
+      const property = tabMessageBoxState.getPropertyByTabId(appState, 3, 'message')
+      assert.deepEqual(property, undefined)
+    })
+
+    it('when property is missing', function () {
+      let appState = defaultAppState.set('tabs', Immutable.fromJS([defaultTab]))
+      appState = appState.deleteIn(['tabs', 0, 'messageBoxDetail', 'suppress'])
+      const property = tabMessageBoxState.getPropertyByTabId(appState, defaultTabId, 'suppress')
+      assert.deepEqual(property, undefined)
     })
   })
 })

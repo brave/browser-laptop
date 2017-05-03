@@ -3,20 +3,33 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('../immutableComponent')
+const {StyleSheet, css} = require('aphrodite')
+
+// Components
+const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../../../../js/components/dialog')
 const Button = require('../../../../js/components/button')
 const SwitchControl = require('../../../../js/components/switchControl')
+
+// Actions
 const appActions = require('../../../../js/actions/appActions')
+
+// Constants
 const KeyCodes = require('../../../common/constants/keyCodes')
-const config = require('../../../../js/constants/config')
+
+// State
+const tabState = require('../../../common/state/tabState')
+const tabMessageBoxState = require('../../../common/state/tabMessageBoxState')
+const frameStateUtil = require('../../../../js/state/frameStateUtil.js')
+
+// Utils
 const {makeImmutable} = require('../../../common/state/immutableUtil')
 
-const {StyleSheet, css} = require('aphrodite')
+// Styles
 const commonStyles = require('../styles/commonStyles')
 const globalStyles = require('../styles/global')
 
-class MessageBox extends ImmutableComponent {
+class MessageBox extends React.Component {
   constructor () {
     super()
     this.onKeyDown = this.onKeyDown.bind(this)
@@ -26,106 +39,107 @@ class MessageBox extends ImmutableComponent {
   componentWillMount () {
     document.addEventListener('keydown', this.onKeyDown)
   }
+
   componentWillUnmount () {
     document.removeEventListener('keydown', this.onKeyDown)
-  }
-
-  get tabId () {
-    return this.props.tabId || ''
-  }
-
-  get title () {
-    const msgBoxTitle = (this.props.detail && this.props.detail.get('title')) || ''
-    return msgBoxTitle.replace(config.braveExtensionId, 'Brave')
-  }
-
-  get message () {
-    return (this.props.detail && this.props.detail.get('message')) || ''
-  }
-
-  get buttons () {
-    return (this.props.detail && this.props.detail.get('buttons')) || makeImmutable(['ok'])
-  }
-
-  get cancelId () {
-    return this.props.detail && this.props.detail.get('cancelId')
-  }
-
-  get suppress () {
-    return (this.props.detail && this.props.detail.get('suppress')) || false
-  }
-
-  get showSuppress () {
-    return (this.props.detail && this.props.detail.get('showSuppress')) || false
   }
 
   onKeyDown (e) {
     if (this.props.isActive) {
       switch (e.keyCode) {
         case KeyCodes.ENTER:
-          this.onDismiss(this.tabId)
+          this.onDismiss(this.props.tabId)
           break
         case KeyCodes.ESC:
-          this.onDismiss(this.tabId, this.cancelId)
+          this.onDismiss(this.props.tabId, this.props.cancelId)
           break
       }
     }
   }
 
-  onSuppressChanged (e) {
-    const detail = this.props.detail.toJS()
-    detail.suppress = !detail.suppress
-    appActions.tabMessageBoxUpdated(this.tabId, detail)
+  onSuppressChanged () {
+    const detail = {
+      buttons: this.props.buttons,
+      cancelId: this.props.cancelId,
+      message: this.props.message,
+      showSuppress: this.props.showSuppress,
+      suppress: !this.props.suppress,
+      title: this.props.title
+    }
+
+    appActions.tabMessageBoxUpdated(this.props.tabId, detail)
   }
 
   onDismiss (tabId, buttonId) {
     const response = {
-      suppress: this.suppress,
+      suppress: this.props.suppress,
       result: true
     }
 
-    if (typeof this.cancelId === 'number') {
-      response.result = buttonId !== this.cancelId
+    if (typeof this.props.cancelId === 'number') {
+      response.result = buttonId !== this.props.cancelId
     }
 
-    appActions.tabMessageBoxDismissed(this.tabId, response)
+    appActions.tabMessageBoxDismissed(tabId, response)
   }
 
   get messageBoxButtons () {
-    const buttons = []
+    const buttons = this.props.buttons || makeImmutable(['ok'])
+    const newButtons = []
 
-    for (let index = (this.buttons.size - 1); index > -1; index--) {
-      buttons.push(<Button l10nId={this.buttons.get(index)}
+    for (let index = (buttons.size - 1); index > -1; index--) {
+      newButtons.push(<Button l10nId={buttons.get(index)}
         className={index === 0 ? 'primaryButton' : 'whiteButton'}
-        onClick={this.onDismiss.bind(this, this.tabId, index)} />)
+        onClick={this.onDismiss.bind(this, this.props.tabId, index)} />)
     }
 
-    return buttons
+    return newButtons
+  }
+
+  mergeProps (state, dispatchProps, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const tabId = ownProps.tabId
+    const tab = tabState.getByTabId(state, tabId)
+    const messageBoxDetail = tab.get('messageBoxDetail')
+
+    const props = {}
+    // used in renderer
+    props.tabId = tabId
+    props.message = messageBoxDetail.get('message')
+    props.suppress = tabMessageBoxState.getSuppress(state, tabId)
+    props.title = tabMessageBoxState.getTitle(state, tabId)
+    props.showSuppress = tabMessageBoxState.getShowSuppress(state, tabId)
+    props.buttons = tabMessageBoxState.getButtons(state, tabId)
+
+    // used in other functions
+    props.cancelId = messageBoxDetail.get('cancelId')
+    props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, tab.getIn(['frame', 'key']))
+
+    return Object.assign({}, ownProps, props)
   }
 
   render () {
     return <Dialog className={css(styles.dialog)}>
-      <div data-test-id={'msgBoxTab_' + this.tabId}
-        onClick={this.onClick}
+      <div data-test-id={'msgBoxTab_' + this.props.tabId}
         onKeyDown={this.onKeyDown}
         className={css(
           commonStyles.flyoutDialog,
           styles.container
         )}>
         <div className={css(styles.title)} data-test-id='msgBoxTitle'>
-          {this.title}
+          {this.props.title}
         </div>
         <div className={css(styles.body)} data-test-id='msgBoxMessage'>
-          {this.message}
+          {this.props.message}
         </div>
         <div className={css(this.showSuppress && styles.actions)}>
           {
-            this.showSuppress
+            this.props.showSuppress
               ? <SwitchControl
                 // TODO: refactor SwitchControl
                 className={css(commonStyles.noPaddingLeft)}
                 rightl10nId='preventMoreAlerts'
-                checkedOn={this.suppress}
+                checkedOn={this.props.suppress}
                 onClick={this.onSuppressChanged} />
               : null
           }
@@ -172,4 +186,4 @@ const styles = StyleSheet.create({
   }
 })
 
-module.exports = MessageBox
+module.exports = ReduxComponent.connect(MessageBox)

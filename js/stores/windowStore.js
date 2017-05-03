@@ -69,6 +69,10 @@ class WindowStore extends EventEmitter {
     return windowState
   }
 
+  set state (newWindowState) {
+    windowState = newWindowState
+  }
+
   getFrames () {
     return frameStateUtil.getFrames(this.state)
   }
@@ -306,10 +310,11 @@ const doAction = (action) => {
       })
       break
     case windowConstants.WINDOW_SET_FINDBAR_SHOWN:
-      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps)], {
+      const frameIndex = frameStateUtil.findIndexForFrameKey(windowState.get('frames'), action.frameKey)
+      windowState = windowState.mergeIn(['frames', frameIndex], {
         findbarShown: action.shown
       })
-      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps)], {
+      windowState = windowState.mergeIn(['frames', frameIndex], {
         findbarSelected: action.shown
       })
       break
@@ -466,8 +471,11 @@ const doAction = (action) => {
       })
       break
     case windowConstants.WINDOW_SET_FIND_DETAIL:
-      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps), 'findDetail'], action.findDetail)
-      break
+      {
+        const frameIndex = frameStateUtil.findIndexForFrameKey(windowState.get('frames'), action.frameKey)
+        windowState = windowState.mergeIn(['frames', frameIndex, 'findDetail'], action.findDetail)
+        break
+      }
     case windowConstants.WINDOW_SET_BOOKMARK_DETAIL:
       if (!action.currentDetail && !action.originalDetail) {
         windowState = windowState.delete('bookmarkDetail')
