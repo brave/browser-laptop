@@ -3,97 +3,37 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const Immutable = require('immutable')
-const ImmutableComponent = require('./immutableComponent')
-const windowActions = require('../../../js/actions/windowActions')
-const separatorMenuItem = require('../../common/commonMenu').separatorMenuItem
-const keyCodes = require('../../common/constants/keyCodes')
-const {wrappingClamp} = require('../../common/lib/formatUtil')
 
-const bindClickHandler = (contextMenu, lastFocusedSelector) => {
-  if (contextMenu.type === separatorMenuItem.type) {
-    return contextMenu
-  }
-  contextMenu.click = function (e) {
-    e.preventDefault()
-    if (lastFocusedSelector) {
-      // Send focus back to the active web frame
-      const results = document.querySelectorAll(lastFocusedSelector)
-      if (results.length === 1) results[0].focus()
-    }
-    windowActions.clickMenubarSubmenu(contextMenu.label)
-  }
-  if (contextMenu.submenu) {
-    contextMenu.submenu = contextMenu.submenu.map((submenuItem) => {
-      return bindClickHandler(submenuItem, lastFocusedSelector)
-    })
-  }
-  return contextMenu
-}
+// Components
+const ImmutableComponent = require('../immutableComponent')
+const MenuBarItem = require('./menuBarItem')
 
-const showContextMenu = (rect, submenu, lastFocusedSelector) => {
-  windowActions.setContextMenuDetail(Immutable.fromJS({
-    left: rect.left,
-    top: rect.bottom,
-    template: submenu.map((submenuItem) => {
-      return bindClickHandler(submenuItem, lastFocusedSelector)
-    })
-  }))
-}
+// Constants
+const keyCodes = require('../../../common/constants/keyCodes')
 
-class MenubarItem extends ImmutableComponent {
-  constructor () {
-    super()
-    this.onClick = this.onClick.bind(this)
-    this.onMouseOver = this.onMouseOver.bind(this)
-  }
-  onClick (e) {
-    if (e && e.stopPropagation) {
-      e.stopPropagation()
-    }
-    // If clicking on an already selected item, deselect it
-    const selected = this.props.menubar.props.selectedIndex
-    if (selected && selected === this.props.index) {
-      windowActions.setContextMenuDetail()
-      windowActions.setMenuBarSelectedIndex()
-      return
-    }
-    // Otherwise, mark item as selected and show its context menu
-    windowActions.setMenuBarSelectedIndex(this.props.index)
-    windowActions.setContextMenuSelectedIndex()
-    const rect = e.target.getBoundingClientRect()
-    showContextMenu(rect, this.props.submenu, this.props.lastFocusedSelector)
-  }
-  onMouseOver (e) {
-    const selected = this.props.menubar.props.selectedIndex
-    if (typeof selected === 'number' && selected !== this.props.index) {
-      this.onClick(e)
-    }
-  }
-  render () {
-    return <span
-      className={'menubarItem' + (this.props.selected ? ' selected' : '')}
-      onClick={this.onClick}
-      onMouseOver={this.onMouseOver}
-      data-index={this.props.index}>
-      { this.props.label }
-    </span>
-  }
-}
+// Actions
+const windowActions = require('../../../../js/actions/windowActions')
+
+// Utils
+const {separatorMenuItem} = require('../../../common/commonMenu')
+const {showContextMenu} = require('../../../common/lib/menuUtil')
+const {wrappingClamp} = require('../../../common/lib/formatUtil')
 
 /**
  * Menubar that can be optionally be displayed at the top of a window (in favor of the system menu).
  * First intended use is with Windows to enable a slim titlebar.
  * NOTE: the system menu is still created and used in order to keep the accelerators working.
  */
-class Menubar extends ImmutableComponent {
+class MenuBar extends ImmutableComponent {
   constructor () {
     super()
     this.onKeyDown = this.onKeyDown.bind(this)
   }
+
   componentWillMount () {
     document.addEventListener('keydown', this.onKeyDown)
   }
+
   componentWillUnmount () {
     document.removeEventListener('keydown', this.onKeyDown)
   }
@@ -171,10 +111,12 @@ class Menubar extends ImmutableComponent {
         e.preventDefault()
     }
   }
+
   shouldComponentUpdate (nextProps, nextState) {
     return this.props.selectedIndex !== nextProps.selectedIndex ||
       this.props.template !== nextProps.template
   }
+
   render () {
     let i = 0
     return <div className='menubar'>
@@ -190,11 +132,11 @@ class Menubar extends ImmutableComponent {
           if (props.index === this.props.selectedIndex) {
             props.selected = true
           }
-          return <MenubarItem {...props} />
+          return <MenuBarItem {...props} />
         })
       }
     </div>
   }
 }
 
-module.exports = Menubar
+module.exports = MenuBar

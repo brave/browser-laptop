@@ -10,6 +10,8 @@ const eventUtil = require('../../../js/lib/eventUtil')
 const siteUtil = require('../../../js/state/siteUtil')
 const locale = require('../../locale')
 const appActions = require('../../../js/actions/appActions')
+const {separatorMenuItem} = require('../../common/commonMenu')
+const windowActions = require('../../../js/actions/windowActions')
 
 /**
  * Get the an electron MenuItem object from a Menu based on its label
@@ -203,3 +205,34 @@ const sanitizeTemplateItems = (template) => {
  * - entries which don't have a label (or l10nLabelId) if their type is not 'separator'
  */
 module.exports.sanitizeTemplateItems = sanitizeTemplateItems
+
+const bindClickHandler = (contextMenu, lastFocusedSelector) => {
+  if (contextMenu.type === separatorMenuItem.type) {
+    return contextMenu
+  }
+  contextMenu.click = function (e) {
+    e.preventDefault()
+    if (lastFocusedSelector) {
+      // Send focus back to the active web frame
+      const results = document.querySelectorAll(lastFocusedSelector)
+      if (results.length === 1) results[0].focus()
+    }
+    windowActions.clickMenubarSubmenu(contextMenu.label)
+  }
+  if (contextMenu.submenu) {
+    contextMenu.submenu = contextMenu.submenu.map((submenuItem) => {
+      return bindClickHandler(submenuItem, lastFocusedSelector)
+    })
+  }
+  return contextMenu
+}
+
+module.exports.showContextMenu = (rect, submenu, lastFocusedSelector) => {
+  windowActions.setContextMenuDetail(makeImmutable({
+    left: rect.left,
+    top: rect.bottom,
+    template: submenu.map((submenuItem) => {
+      return bindClickHandler(submenuItem, lastFocusedSelector)
+    })
+  }))
+}

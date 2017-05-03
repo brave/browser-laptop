@@ -16,7 +16,7 @@ const getSetting = require('../../../../js/settings').getSetting
 const ImmutableComponent = require('../immutableComponent')
 const NavigationBar = require('./navigationBar')
 const LongPressButton = require('../../../../js/components/longPressButton')
-const Menubar = require('../menubar')
+const MenuBar = require('./menuBar')
 const WindowCaptionButtons = require('../windowCaptionButtons')
 const Button = require('../../../../js/components/button')
 const BrowserAction = require('../browserAction')
@@ -209,7 +209,7 @@ class Navigator extends ImmutableComponent {
         {
           this.props.customTitlebar.menubarVisible
             ? <div className='menubarContainer'>
-              <Menubar
+              <MenuBar
                 template={this.props.customTitlebar.menubarTemplate}
                 selectedIndex={this.props.customTitlebar.menubarSelectedIndex}
                 contextMenuSelectedIndex={this.props.customTitlebar.contextMenuSelectedIndex}
