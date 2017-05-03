@@ -284,7 +284,11 @@ const styles = StyleSheet.create({
   siteInfo__wrapper: {
     maxHeight: '300px',
     maxWidth: '400px',
-    width: 'auto'
+    width: 'auto',
+
+    // Issue #8650
+    userSelect: 'none',
+    cursor: 'default'
   },
   siteInfo__wrapper__large: {
     // temporary workaround
