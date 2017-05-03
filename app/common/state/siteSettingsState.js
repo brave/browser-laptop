@@ -2,8 +2,8 @@ const appConfig = require('../../../js/constants/appConfig')
 const siteSettings = require('../../../js/state/siteSettings')
 
 const siteSettingsState = {
-  getAllSiteSettings: (state, frame) => {
-    if (frame && frame.get('isPrivate')) {
+  getAllSiteSettings: (state, isPrivate) => {
+    if (isPrivate) {
       return state.get('siteSettings').mergeDeep(state.get('temporarySiteSettings'))
     }
     return state.get('siteSettings')

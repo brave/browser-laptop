@@ -641,8 +641,8 @@ class Main extends ImmutableComponent {
   }
 
   get allSiteSettings () {
-    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
-    return siteSettingsState.getAllSiteSettings(this.props.appState, activeFrame)
+    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState) || Immutable.Map()
+    return siteSettingsState.getAllSiteSettings(this.props.appState, activeFrame.get('isPrivate'))
   }
 
   frameSiteSettings (location) {

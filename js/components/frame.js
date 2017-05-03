@@ -791,7 +791,7 @@ class Frame extends React.Component {
     })
     this.webview.addEventListener('did-navigate', (e) => {
       if (this.props.findbarShown) {
-        frameStateUtil.onFindBarHide(this.props.activeFrameKey)
+        frameStateUtil.onFindBarHide(this.props.frameKey)
       }
 
       for (let message in this.notificationCallbacks) {
@@ -971,9 +971,8 @@ class Frame extends React.Component {
 
   mergeProps (state, dispatchProps, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey)
-    const activeFrame = frameStateUtil.getActiveFrame(currentWindow)
-    const allSiteSettings = siteSettingsState.getAllSiteSettings(state, activeFrame)
+    const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey) || Immutable.Map()
+    const allSiteSettings = siteSettingsState.getAllSiteSettings(state, frame.get('isPrivate'))
     const frameSiteSettings = frame.get('location')
       ? siteSettings.getSiteSettingsForURL(allSiteSettings, frame.get('location'))
       : undefined
@@ -995,9 +994,8 @@ class Frame extends React.Component {
     props.showMessageBox = tab && tab.get('messageBoxDetail')
 
     // used in other functions
-    props.activeFrameKey = activeFrame.get('key')
     props.tabIndex = frameStateUtil.getFrameIndex(currentWindow, frame.get('key'))
-    props.urlBarFocused = activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'focused'])
+    props.urlBarFocused = frame && frame.getIn(['navbar', 'urlbar', 'focused'])
     props.isAutFillContextMenu = contextMenu && contextMenu.get('type') === 'autofill'
     props.isSecure = frame.getIn(['security', 'isSecure'])
     props.findbarShown = frame.get('findbarShown')
