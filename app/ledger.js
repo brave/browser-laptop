@@ -1716,7 +1716,9 @@ var retrieveCustomerInfo = (params, callback) => {
     verboseP: params.verboseP || false
   }
   request.request(options, (err, response, body) => {
-    if (err) return null
+    if (err) {
+      return callback(null)
+    }
     var customer = response.statusCode === 200 ? JSON.parse(body) : null
     if (customer && process.env.LEDGER_LAST_PURCHASE_DAYS_AGO) {
       customer.lastChargeTimestamp = parseInt(moment().subtract(parseInt(process.env.LEDGER_LAST_PURCHASE_DAYS_AGO), 'days').format('x'))
