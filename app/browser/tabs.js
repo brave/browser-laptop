@@ -109,8 +109,13 @@ ipcMain.on(messages.ABOUT_COMPONENT_INITIALIZED, (e) => {
   listener()
 
   appStore.addChangeListener(listener)
-  tab.on('set-active', () => {
-    listener()
+  tab.on('set-active', (evt, active) => {
+    if (active) {
+      listener()
+    }
+  })
+  tab.on('destroyed', () => {
+    appStore.removeChangeListener(listener)
   })
   tab.on('did-navigate', () => {
     appStore.removeChangeListener(listener)
