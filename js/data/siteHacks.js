@@ -52,14 +52,14 @@ module.exports.siteHacks = {
     }
   },
   'forbes.com': {
-    onBeforeSendHeaders: function(details) {
+    onBeforeSendHeaders: function (details) {
       return {
         customCookie: details.requestHeaders.Cookie + `; forbes_ab=true; welcomeAd=true; adblock_session=Off; dailyWelcomeCookie=true`
       }
-    },
+    }
   },
   'adobe.com': {
-    onBeforeSendHeaders: function(details) {
+    onBeforeSendHeaders: function (details) {
       let userAgent = details.requestHeaders['User-Agent']
       userAgent = [userAgent.split('Chrome')[0], 'Brave Chrome', userAgent.split('Chrome')[1]].join('')
       details.requestHeaders['User-Agent'] = userAgent
@@ -69,7 +69,7 @@ module.exports.siteHacks = {
     }
   },
   'cityam.com': {
-    onBeforeSendHeaders: function(details) {
+    onBeforeSendHeaders: function (details) {
       details.requestHeaders['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36 Googlebot'
       return {
         requestHeaders: details.requestHeaders
@@ -95,7 +95,7 @@ module.exports.siteHacks = {
   'www.googletagmanager.com': {
     enableForAdblock: true,
     enableForTrackingProtection: true,
-    onBeforeRequest: function(details) {
+    onBeforeRequest: function (details) {
       if (urlParse(details.url).pathname !== '/gtm.js') {
         return
       }
@@ -107,7 +107,7 @@ module.exports.siteHacks = {
   'www.googletagservices.com': {
     enableForAdblock: true,
     enableForTrackingProtection: true,
-    onBeforeRequest: function(details) {
+    onBeforeRequest: function (details) {
       if (urlParse(details.url).pathname !== '/tag/js/gpt.js') {
         return
       }
@@ -117,7 +117,7 @@ module.exports.siteHacks = {
     }
   },
   'twitter.com': {
-    onBeforeSendHeaders: function(details) {
+    onBeforeSendHeaders: function (details) {
       if (details.requestHeaders.Referer &&
         details.requestHeaders.Referer.startsWith('https://twitter.com/') &&
         details.url.startsWith(appConfig.noScript.twitterRedirectUrl)) {
