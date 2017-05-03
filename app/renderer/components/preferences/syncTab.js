@@ -91,7 +91,7 @@ class SyncTab extends ImmutableComponent {
       return null
     }
     // displayed before a sync userId has been created
-    return <div className={css(styles.setupContent)}>
+    return <section className={css(styles.setupContent)}>
       <Button className='primaryButton'
         l10nId='syncStart'
         testId='syncStartButton'
@@ -102,7 +102,7 @@ class SyncTab extends ImmutableComponent {
         testId='syncAddButton'
         onClick={this.props.showOverlay.bind(this, 'syncAdd')}
       />
-    </div>
+    </section>
   }
 
   get postSetupContent () {
@@ -151,7 +151,7 @@ class SyncTab extends ImmutableComponent {
   }
 
   get devicesContent () {
-    return <div className={css(styles.settingsListContainerMargin__top)}>
+    return <section className={css(styles.settingsListContainerMargin__top)}>
       <DefaultSectionTitle data-l10n-id='syncDevices' data-test-id='syncDevices' />
       <SortableTable
         headings={['id', 'syncDeviceName', 'syncDeviceLastActive']}
@@ -161,7 +161,7 @@ class SyncTab extends ImmutableComponent {
         customCellClasses={css(styles.devices__devicesListCell)}
         tableClassNames={css(styles.devices__devicesList)}
       />
-    </div>
+    </section>
   }
 
   get qrcodeContent () {
@@ -169,7 +169,7 @@ class SyncTab extends ImmutableComponent {
       return null
     }
     return this.props.syncQRVisible
-      ? <div>
+      ? <section>
         <ul className={css(styles.syncOverlayBody__listWrapper)}>
           <li className={css(
             styles.syncOverlayBody__listItem,
@@ -187,7 +187,7 @@ class SyncTab extends ImmutableComponent {
           data-l10n-id='syncQRImg'
           data-test-id='syncQRImg'
         />
-      </div>
+      </section>
     : <ul className={css(styles.syncOverlayBody__listWrapper)}>
       <li className={css(
         styles.syncOverlayBody__listItem,
@@ -250,31 +250,31 @@ class SyncTab extends ImmutableComponent {
   }
 
   get newOverlayContent () {
-    return <div className='syncOverlay'>
-      <div>
-        <ol>
-          <li className={css(styles.syncOverlayBody__listItem, commonStyles.noMarginTop)} data-l10n-id='syncNewDevice1' />
-          <li className={css(styles.syncOverlayBody__listItem)}>
-            <div data-l10n-id='syncNewDevice2' />
-            {this.qrcodeContent}
-          </li>
-          <li className={css(styles.syncOverlayBody__listItem)}>
-            <div data-l10n-id='syncNewDevice3' />
-            {this.passphraseContent}
-          </li>
-        </ol>
-      </div>
-    </div>
+    return <ol>
+      <li className={css(
+        styles.syncOverlayBody__listItem,
+        commonStyles.noMarginTop
+      )} data-l10n-id='syncNewDevice1' />
+      <li className={css(styles.syncOverlayBody__listItem)}>
+        <div data-l10n-id='syncNewDevice2' />
+        {this.qrcodeContent}
+      </li>
+      <li className={css(
+        styles.syncOverlayBody__listItem,
+        commonStyles.noMarginBottom
+      )}>
+        <div data-l10n-id='syncNewDevice3' />
+        {this.passphraseContent}
+      </li>
+    </ol>
   }
 
   get newOverlayFooter () {
-    return <div>
-      <Button className='whiteButton'
-        l10nId='done'
-        testId='doneButton'
-        onClick={this.props.hideOverlay.bind(this, 'syncNewDevice')}
-      />
-    </div>
+    return <Button className='whiteButton'
+      l10nId='done'
+      testId='doneButton'
+      onClick={this.props.hideOverlay.bind(this, 'syncNewDevice')}
+    />
   }
 
   get defaultDeviceName () {
@@ -292,40 +292,34 @@ class SyncTab extends ImmutableComponent {
   get deviceNameInputContent () {
     return <SettingItem>
       <div className={css(styles.syncOverlayBody__label)} data-l10n-id='syncDeviceNameInput' />
-      <div>
-        <input className={css(
-          commonStyles.formControl,
-          commonStyles.textbox,
-          commonStyles.textbox__outlineable,
-          commonStyles.textbox__isSettings
-        )}
-          spellCheck='false'
-          ref={(node) => { this.deviceNameInput = node }}
-          placeholder={this.defaultDeviceName} />
-      </div>
+      <input className={css(
+        commonStyles.formControl,
+        commonStyles.textbox,
+        commonStyles.textbox__outlineable,
+        commonStyles.textbox__isSettings
+      )}
+        spellCheck='false'
+        ref={(node) => { this.deviceNameInput = node }}
+        placeholder={this.defaultDeviceName} />
     </SettingItem>
   }
 
   get startOverlayContent () {
-    return <div>
-      <div className={css(styles.syncOverlayBody__formBottomMargin)}>
-        {this.deviceNameInputContent}
-      </div>
-    </div>
+    return <section className={css(styles.syncOverlayBody__formBottomMargin)}>
+      {this.deviceNameInputContent}
+    </section>
   }
 
   get startOverlayFooter () {
-    return <div>
-      <Button className='primaryButton'
-        l10nId='syncCreate'
-        testId='syncCreateButton'
-        onClick={this.onSetup}
-      />
-    </div>
+    return <Button className='primaryButton'
+      l10nId='syncCreate'
+      testId='syncCreateButton'
+      onClick={this.onSetup}
+    />
   }
 
   get addOverlayContent () {
-    return <div>
+    return <section>
       <div className={css(styles.syncOverlayBody__label)} data-l10n-id='syncEnterPassphrase' />
       <div className={css(styles.syncOverlayBody__form)}>
         <textarea className={css(
@@ -342,38 +336,34 @@ class SyncTab extends ImmutableComponent {
       <div className={css(styles.syncOverlayBody__formBottomMargin)}>
         {this.deviceNameInputContent}
       </div>
-    </div>
+    </section>
   }
 
   get addOverlayFooter () {
-    return <div>
-      <Button className='primaryButton'
-        l10nId='syncCreate'
-        testId='syncCreateButton'
-        onClick={this.onRestore}
-        disabled={this.props.syncRestoreEnabled === false}
-      />
-    </div>
+    return <Button className='primaryButton'
+      l10nId='syncCreate'
+      testId='syncCreateButton'
+      onClick={this.onRestore}
+      disabled={this.props.syncRestoreEnabled === false}
+    />
   }
 
   get resetOverlayContent () {
-    return <div>
-      <ul>
-        <li className={css(
-          styles.syncOverlayBody__listItem,
-          commonStyles.noMarginTop
-        )} data-l10n-id='syncResetMessageWhat' />
-        <li className={css(styles.syncOverlayBody__listItem)} data-l10n-id='syncResetMessageWhatNot' />
-        <li className={css(
-          styles.syncOverlayBody__listItem,
-          commonStyles.noMarginBottom
-        )} data-l10n-id='syncResetMessageOtherDevices' />
-      </ul>
-    </div>
+    return <ul>
+      <li className={css(
+        styles.syncOverlayBody__listItem,
+        commonStyles.noMarginTop
+      )} data-l10n-id='syncResetMessageWhat' />
+      <li className={css(styles.syncOverlayBody__listItem)} data-l10n-id='syncResetMessageWhatNot' />
+      <li className={css(
+        styles.syncOverlayBody__listItem,
+        commonStyles.noMarginBottom
+      )} data-l10n-id='syncResetMessageOtherDevices' />
+    </ul>
   }
 
   get resetOverlayFooter () {
-    return <div>
+    return <section>
       <Button className='whiteButton'
         l10nId='cancel'
         testId='cancelButton'
@@ -387,7 +377,7 @@ class SyncTab extends ImmutableComponent {
         testId='syncResetButton'
         onClick={this.onReset}
       />
-    </div>
+    </section>
   }
 
   enableRestore (e) {
@@ -446,7 +436,7 @@ class SyncTab extends ImmutableComponent {
   }
 
   render () {
-    return <div className='syncContainer'>
+    return <section className='syncContainer'>
       {
       this.isSetup && this.props.syncNewDeviceOverlayVisible
         ? <ModalOverlay
@@ -542,7 +532,7 @@ class SyncTab extends ImmutableComponent {
           ? this.clearDataContent
           : null
       }
-    </div>
+    </section>
   }
 }
 
@@ -582,7 +572,8 @@ const styles = StyleSheet.create({
     color: globalStyles.color.mediumGray,
     margin: `${globalStyles.spacing.panelMargin} 0`,
     padding: globalStyles.spacing.panelPadding,
-    width: '500px'
+    boxSizing: 'border-box',
+    width: '600px'
   },
   device__item: {
     flex: 1
@@ -597,7 +588,8 @@ const styles = StyleSheet.create({
   devices__devicesList: {
     // TODO: refactor sortableTable to remove !important
     marginBottom: `${globalStyles.spacing.dialogInsideMargin} !important`,
-    width: '34em !important'
+    boxSizing: 'border-box',
+    width: '600px !important'
   },
   devices__devicesListCell: {
     padding: '4px 8px'
@@ -610,15 +602,11 @@ const styles = StyleSheet.create({
 
   listItem__passphrase: {
     margin: `${globalStyles.spacing.dialogInsideMargin} 0`,
-    color: globalStyles.color.braveDarkOrange
+    color: globalStyles.color.braveDarkOrange,
+    userSelect: 'initial',
+    cursor: 'initial'
   },
 
-  syncOverlayBody__wrapper: {
-    padding: `${globalStyles.spacing.dialogInsideMargin} 50px`,
-    background: '#fff',
-    userSelect: 'none'
-
-  },
   syncOverlayBody__listWrapper: {
     listStyle: 'none'
   },
