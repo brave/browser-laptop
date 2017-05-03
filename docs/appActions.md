@@ -754,6 +754,12 @@ Dispatches a message to toogle the dev tools on/off for the specified tabId
 
 
 
+### activeWebContentsClosed() 
+
+Dispatches a message to toogle the dev tools on/off or close the tab, depending on what's active.
+
+
+
 ### tabCloned(tabId, options) 
 
 Dispatches a message when a tab is being cloned
