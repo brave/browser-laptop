@@ -9,31 +9,8 @@
 }
 
 .modal {
-  opacity: 1;
-  overflow: auto;
-  position: fixed;
-  background: transparent;
-  width: 100vw;
-  height: 100vh;
-  left: 0;
-  top: 0;
-  z-index: 8999;
-
   +.modal {
     background: transparent;
-  }
-
-  &.last {
-    background: @black25;
-
-    &.transparentBackground {
-      background: transparent;
-    }
-  }
-
-  &.hidden {
-    opacity: 0;
-    z-index: -1;
   }
 
   .modal {
@@ -58,60 +35,6 @@
         padding: 0;
         overflow: hidden;
       }
-    }
-  }
-
-  .dialog {
-    width: 700px;
-    margin: 0 auto;
-    margin-top: 50px;
-    background: linear-gradient(#FFFFFF, #DEDEDE);
-    border: solid 1px @lightGray;
-    border-radius: @borderRadius;
-    box-shadow: @dialogShadow;
-    position: relative;
-    z-index: 9000;
-    box-sizing: border-box;
-
-    &.fade {
-      transition: @transitionFast;
-    }
-
-    /* Copied to siteDetails.js */
-    .sectionTitle {
-      font-size: 22px;
-      padding: 35px 0 10px 0;
-      text-indent: 50px;
-      color: @darkGray;
-    }
-  }
-
-  button {
-    &.close {
-      display: inline-block;
-      background: url('../img/toolbar/stoploading_btn.svg') center no-repeat;
-      background-size: 15px 15px;
-      height: 15px;
-      width: 15px;
-      cursor: pointer;
-      border: none;
-      position: absolute;
-      right: 15px;
-      top: 15px;
-
-      &:focus {
-        outline: none;
-      }
-
-      span {
-        font-size: 2.5em;
-        color: @gray;
-      }
-    }
-
-    &.alt {
-      background: @gray;
-      border: solid 1px @gray;
     }
   }
 }

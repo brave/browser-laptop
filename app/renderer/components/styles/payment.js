@@ -36,12 +36,6 @@ const paymentCommon = StyleSheet.create({
     marginBottom: '8px',
     padding: '25px 20px'
   },
-  panelFooter: {
-    color: globalStyles.color.darkGray,
-    fontSize: '13px',
-    fontStyle: 'italic',
-    padding: '20px 20px 20px 50px'
-  },
   marginButtons: {
     marginLeft: globalStyles.spacing.overlayButtonMargin
   }

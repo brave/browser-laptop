@@ -189,6 +189,7 @@ const globalStyles = {
     zindexPopUp: '3000',
     zindexContextMenu: '3000',
     zindexDialogs: '3000',
+    zindexModal: '3000',
     zindexPopupWindow: '3000',
     zindexForms: '3000',
     zindexSuggestionText: '3100',

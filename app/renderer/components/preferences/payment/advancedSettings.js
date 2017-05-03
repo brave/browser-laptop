@@ -91,7 +91,7 @@ class AdvancedSettingsContent extends ImmutableComponent {
 
 class AdvancedSettingsFooter extends ImmutableComponent {
   render () {
-    return <div className={css(commonStyles.modalOverlay__footer, commonStyles.modalOverlay__footerButton)}>
+    return <div>
       <Button l10nId='backupLedger'
         className={css(commonStyles.primaryButton)}
         onClick={this.props.showOverlay.bind(this, 'ledgerBackup')}
@@ -110,8 +110,6 @@ class AdvancedSettingsFooter extends ImmutableComponent {
 
 const styles = StyleSheet.create({
   advancedSettings: {
-    paddingLeft: '50px',
-    paddingRight: '50px',
     display: 'flex',
     flexWrap: 'nowrap'
   },

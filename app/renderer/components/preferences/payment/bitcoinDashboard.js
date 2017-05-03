@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // components
 const Button = require('../../../../../js/components/button')
@@ -189,7 +189,7 @@ class BitcoinDashboard extends ImmutableComponent {
 
   panelFooter () {
     if (this.props.ledgerData.get('buyURLFrame')) {
-      return <div className={css(paymentCommon.panelFooter, styles.panelFooter)}>
+      return <div className={css(styles.dashboardFooter, styles.temp__panelFooter)}>
         {/* TODO: refactor button.js */}
         <Button className='whiteButton'
           l10nId='done'
@@ -197,7 +197,7 @@ class BitcoinDashboard extends ImmutableComponent {
           onClick={this.props.hideParentOverlay} />
       </div>
     } else if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
-      return <div className={css(paymentCommon.panelFooter, styles.panelFooter, styles.coinbaseFooter)}>
+      return <div className={css(styles.dashboardFooter, styles.temp__panelFooter, styles.coinbaseFooter)}>
         <div className={css(styles.coinbase)}>
           <div className={css(styles.coinbaseLogo)} />
           <span className={css(styles.coinbaseMessage)} data-l10n-id='coinbaseMessage' />
@@ -209,7 +209,7 @@ class BitcoinDashboard extends ImmutableComponent {
           onClick={this.props.hideParentOverlay} />
       </div>
     } else {
-      return <div className={css(paymentCommon.panelFooter, styles.panelFooter)}>
+      return <div className={css(styles.dashboardFooter, styles.temp__panelFooter)}>
         {/* TODO: refactor button.js */}
         <Button className='whiteButton'
           l10nId='done'
@@ -294,7 +294,10 @@ class BitcoinDashboard extends ImmutableComponent {
         this.props.qrcodeOverlayVisible
           ? <ModalOverlay
             content={this.qrcodeOverlayContent()}
-            customDialogClasses={'qrcodeOverlay'}
+            customDialogClasses={cx({
+              qrcodeOverlay: true,
+              [css(styles.modalOverlay__qrcodeOverlay)]: true
+            })}
             footer={this.qrcodeOverlayFooter()}
             onHide={this.props.hideQRcode.bind(this)}
           />
@@ -369,6 +372,9 @@ class BitcoinDashboard extends ImmutableComponent {
           }
         </div>
         {this.smartphonePanel()}
+
+        {/* TODO: Move panelFooter() to dialog's footer
+        to remove temp__panelFooter and temp__displayNone on paymentsTab.js */}
         {this.panelFooter()}
       </div>
     </div>
@@ -380,16 +386,13 @@ const styles = StyleSheet.create({
     display: 'flex',
     paddingLeft: '100px'
   },
-  panelFooter: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end'
+  dashboardFooter: {
+    color: globalStyles.color.darkGray,
+    fontSize: '13px',
+    fontStyle: 'italic'
   },
   disabledPanel: {
     padding: '15px 0'
-  },
-  panelButton: {
-    minWidth: '180px'
   },
   settingsPanelDivider: {
     width: '50%',
@@ -506,8 +509,30 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: '-45px'
   },
+
   dialogInsideMargin__bottom: {
     marginBottom: globalStyles.spacing.dialogInsideMargin
+  },
+
+  modalOverlay__qrcodeOverlay: {
+    border: 0,
+    width: '350px',
+    height: 'auto',
+    margin: '100px auto 0 auto',
+    background: '#fff',
+    boxShadow: globalStyles.shadow.dialogShadow
+  },
+
+  // TODO: Refactor button to remove !important
+  panelButton: {
+    minWidth: '180px !important'
+  },
+
+  // TODO: Refactor panelFooter on bitcoinDashboard with <ModalOverlay> to remove this
+  temp__panelFooter: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    margin: '20px'
   }
 })
 

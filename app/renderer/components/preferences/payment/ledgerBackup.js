@@ -74,7 +74,7 @@ class LedgerBackupFooter extends ImmutableComponent {
   }
 
   render () {
-    return <div className={css(commonStyles.modalOverlay__footer, commonStyles.modalOverlay__footerButton)}>
+    return <div>
       <Button l10nId='printKeys'
         className={css(commonStyles.primaryButton)}
         onClick={this.printKeys}

@@ -249,9 +249,9 @@ class SyncTab extends ImmutableComponent {
       </ul>
   }
 
-  get overlayContent () {
+  get newOverlayContent () {
     return <div className='syncOverlay'>
-      <div className={css(styles.syncOverlayBody__wrapper)}>
+      <div>
         <ol>
           <li className={css(styles.syncOverlayBody__listItem, commonStyles.noMarginTop)} data-l10n-id='syncNewDevice1' />
           <li className={css(styles.syncOverlayBody__listItem)}>
@@ -264,16 +264,16 @@ class SyncTab extends ImmutableComponent {
           </li>
         </ol>
       </div>
-      <div className={css(
-        commonStyles.modalOverlay__footer,
-        commonStyles.modalOverlay__footerButton
-      )}>
-        <Button className='whiteButton'
-          l10nId='done'
-          testId='doneButton'
-          onClick={this.props.hideOverlay.bind(this, 'syncNewDevice')}
-        />
-      </div>
+    </div>
+  }
+
+  get newOverlayFooter () {
+    return <div>
+      <Button className='whiteButton'
+        l10nId='done'
+        testId='doneButton'
+        onClick={this.props.hideOverlay.bind(this, 'syncNewDevice')}
+      />
     </div>
   }
 
@@ -307,7 +307,7 @@ class SyncTab extends ImmutableComponent {
   }
 
   get startOverlayContent () {
-    return <div className={css(styles.syncOverlayBody__wrapper)}>
+    return <div>
       <div className={css(styles.syncOverlayBody__formBottomMargin)}>
         {this.deviceNameInputContent}
       </div>
@@ -315,10 +315,7 @@ class SyncTab extends ImmutableComponent {
   }
 
   get startOverlayFooter () {
-    return <div className={css(
-      commonStyles.modalOverlay__footer,
-      commonStyles.modalOverlay__footerButton
-    )}>
+    return <div>
       <Button className='primaryButton'
         l10nId='syncCreate'
         testId='syncCreateButton'
@@ -328,7 +325,7 @@ class SyncTab extends ImmutableComponent {
   }
 
   get addOverlayContent () {
-    return <div className={css(styles.syncOverlayBody__wrapper)}>
+    return <div>
       <div className={css(styles.syncOverlayBody__label)} data-l10n-id='syncEnterPassphrase' />
       <div className={css(styles.syncOverlayBody__form)}>
         <textarea className={css(
@@ -349,10 +346,7 @@ class SyncTab extends ImmutableComponent {
   }
 
   get addOverlayFooter () {
-    return <div className={css(
-      commonStyles.modalOverlay__footer,
-      commonStyles.modalOverlay__footerButton
-    )}>
+    return <div>
       <Button className='primaryButton'
         l10nId='syncCreate'
         testId='syncCreateButton'
@@ -363,7 +357,7 @@ class SyncTab extends ImmutableComponent {
   }
 
   get resetOverlayContent () {
-    return <div className={css(styles.syncOverlayBody__wrapper)}>
+    return <div>
       <ul>
         <li className={css(
           styles.syncOverlayBody__listItem,
@@ -379,10 +373,7 @@ class SyncTab extends ImmutableComponent {
   }
 
   get resetOverlayFooter () {
-    return <div className={css(
-      commonStyles.modalOverlay__footer,
-      commonStyles.modalOverlay__footerButton
-    )}>
+    return <div>
       <Button className='whiteButton'
         l10nId='cancel'
         testId='cancelButton'
@@ -460,9 +451,8 @@ class SyncTab extends ImmutableComponent {
       this.isSetup && this.props.syncNewDeviceOverlayVisible
         ? <ModalOverlay
           title={'syncNewDevice'}
-          customDialogClasses={css(commonStyles.modalOverlay__dialog)}
-          customTitleClasses={css(commonStyles.modalOverlay__title)}
-          content={this.overlayContent}
+          content={this.newOverlayContent}
+          footer={this.newOverlayFooter}
           onHide={this.props.hideOverlay.bind(this, 'syncNewDevice')} />
         : null
       }
@@ -470,8 +460,6 @@ class SyncTab extends ImmutableComponent {
       !this.isSetup && this.props.syncStartOverlayVisible
         ? <ModalOverlay
           title={'syncStart'}
-          customDialogClasses={css(commonStyles.modalOverlay__dialog)}
-          customTitleClasses={css(commonStyles.modalOverlay__title)}
           content={this.startOverlayContent}
           footer={this.startOverlayFooter}
           onHide={this.props.hideOverlay.bind(this, 'syncStart')} />
@@ -481,8 +469,6 @@ class SyncTab extends ImmutableComponent {
       !this.isSetup && this.props.syncAddOverlayVisible
         ? <ModalOverlay
           title={'syncAdd'}
-          customDialogClasses={css(commonStyles.modalOverlay__dialog)}
-          customTitleClasses={css(commonStyles.modalOverlay__title)}
           content={this.addOverlayContent}
           footer={this.addOverlayFooter}
           onHide={this.props.hideOverlay.bind(this, 'syncAdd')} />
@@ -492,8 +478,6 @@ class SyncTab extends ImmutableComponent {
       this.isSetup && this.props.syncResetOverlayVisible
         ? <ModalOverlay
           title={'syncReset'}
-          customDialogClasses={css(commonStyles.modalOverlay__dialog)}
-          customTitleClasses={css(commonStyles.modalOverlay__title)}
           content={this.resetOverlayContent}
           footer={this.resetOverlayFooter}
           onHide={this.props.hideOverlay.bind(this, 'syncReset')} />
@@ -631,7 +615,9 @@ const styles = StyleSheet.create({
 
   syncOverlayBody__wrapper: {
     padding: `${globalStyles.spacing.dialogInsideMargin} 50px`,
-    background: '#fff'
+    background: '#fff',
+    userSelect: 'none'
+
   },
   syncOverlayBody__listWrapper: {
     listStyle: 'none'
