@@ -50,6 +50,7 @@ describe('Preferences component', function () {
     mockery.registerMock('../../../../extensions/brave/img/android_download.svg')
     mockery.registerMock('../../../../extensions/brave/img/ios_download.svg')
     mockery.registerMock('../../img/icon_pencil.svg')
+    mockery.registerMock('../../img/toolbar/stoploading_btn.svg')
 
     window.chrome = fakeElectron
     window.CustomEvent = {}

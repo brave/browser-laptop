@@ -142,6 +142,7 @@ const globalStyles = {
     dialogLargeWidth: '600px',
     dialogTopOffset: '30px',
     dialogInsideMargin: '18px',
+    modalDialogPaddingHorizontal: '50px',
     privateTabPaddingHorizontal: '30px',
     privateTabPadding: '40px',
     settingsListContainerMargin: '2rem',

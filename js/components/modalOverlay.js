@@ -52,12 +52,12 @@ class ModalOverlay extends ImmutableComponent {
     var close = null
     var title = null
 
-    let customDialogClassesStr = (this.props.customDialogClasses ? this.props.customDialogClasses : '')
-    let customDialogHeaderClassesStr = (this.props.customDialogHeaderClasses ? this.props.customDialogHeaderClasses : '')
-    let customDialogBodyWrapperClassesStr = (this.props.customDialogBodyWrapperClasses ? this.props.customDialogBodyWrapperClasses : '')
-    let customDialogBodyClassesStr = (this.props.customDialogBodyClasses ? this.props.customDialogBodyClasses : '')
-    let customDialogFooterClassesStr = (this.props.customDialogFooterClasses ? this.props.customDialogFooterClasses : '')
-    let customTitleClassesStr = (this.props.customTitleClasses ? this.props.customTitleClasses : '')
+    const customDialogClassesStr = this.props.customDialogClasses ? this.props.customDialogClasses : ''
+    const customDialogHeaderClassesStr = this.props.customDialogHeaderClasses ? this.props.customDialogHeaderClasses : ''
+    const customDialogBodyWrapperClassesStr = this.props.customDialogBodyWrapperClasses ? this.props.customDialogBodyWrapperClasses : ''
+    const customDialogBodyClassesStr = this.props.customDialogBodyClasses ? this.props.customDialogBodyClasses : ''
+    const customDialogFooterClassesStr = this.props.customDialogFooterClasses ? this.props.customDialogFooterClasses : ''
+    const customTitleClassesStr = this.props.customTitleClasses ? this.props.customTitleClasses : ''
 
     if (!this.props.emptyDialog) {
       close = (this.props.onHide
@@ -73,20 +73,20 @@ class ModalOverlay extends ImmutableComponent {
         /> : null)
     }
 
-    return <div className={cx({
+    return <section className={cx({
       [css(styles.dialog)]: true,
       [customDialogClassesStr]: true
     })}>
 
-      <div className={cx({
+      <header className={cx({
         [css(styles.dialog__header)]: true,
         [customDialogHeaderClassesStr]: true
       })}>
         {title}
         {close}
-      </div>
+      </header>
 
-      <div className={cx({
+      <section className={cx({
         [css(styles.dialog__body__wrapper)]: true,
         [customDialogBodyWrapperClassesStr]: true
       })}>
@@ -96,15 +96,15 @@ class ModalOverlay extends ImmutableComponent {
         })}>
           {this.props.content}
         </div>
-      </div>
+      </section>
 
-      <div className={cx({
+      <footer className={cx({
         [css(styles.dialog__footer)]: true,
         [customDialogFooterClassesStr]: true
       })}>
         {this.props.footer}
-      </div>
-    </div>
+      </footer>
+    </section>
   }
 
   render () {
@@ -155,8 +155,7 @@ const styles = StyleSheet.create({
   },
 
   dialog__header: {
-    padding: '25px',
-    paddingLeft: '50px'
+    padding: `25px ${globalStyles.spacing.modalDialogPaddingHorizontal}`
   },
   dialog__header__close: {
     display: 'inline-block',
@@ -187,12 +186,12 @@ const styles = StyleSheet.create({
   },
   dialog__body: {
     background: '#fff',
-    padding: `${globalStyles.spacing.dialogInsideMargin} 50px`
+    padding: `${globalStyles.spacing.dialogInsideMargin} ${globalStyles.spacing.modalDialogPaddingHorizontal}`
   },
 
   dialog__footer: {
     padding: '20px',
-    paddingLeft: '50px',
+    paddingLeft: globalStyles.spacing.modalDialogPaddingHorizontal,
     display: 'flex',
     flexFlow: 'nowrap',
     justifyContent: 'flex-end'
