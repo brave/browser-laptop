@@ -241,17 +241,13 @@ const api = {
     return state
   },
 
-  setActive: (state, action) => {
-    action = makeImmutable(action)
-    let frameProps = action.get('frameProps')
-    let tabId = frameProps.get('tabId')
-    let tab = getWebContents(tabId)
-    if (tab && !tab.isDestroyed()) {
-      tab.setActive(true)
-      let tabValue = getTabValue(tabId)
-      return tabState.updateTab(state, { tabValue })
-    }
-    return state
+  setActive: (tabId) => {
+    setImmediate(() => {
+      let tab = getWebContents(tabId)
+      if (tab && !tab.isDestroyed()) {
+        tab.setActive(true)
+      }
+    })
   },
 
   loadURL: (state, action) => {
@@ -365,23 +361,25 @@ const api = {
   },
 
   create: (createProperties, cb = null) => {
-    createProperties = makeImmutable(createProperties).toJS()
-    const switchToNewTabsImmediately = getSetting(settings.SWITCH_TO_NEW_TABS) === true
-    if (switchToNewTabsImmediately) {
-      createProperties.active = true
-    }
-    if (!createProperties.url) {
-      createProperties.url = newFrameUrl()
-    }
-    createProperties.url = normalizeUrl(createProperties.url)
-    if (needsPartitionAssigned(createProperties)) {
-      createProperties.partition = getPartition(createProperties)
-      if (isSessionPartition(createProperties.partition)) {
-        createProperties.parent_partition = ''
+    setImmediate(() => {
+      createProperties = makeImmutable(createProperties).toJS()
+      const switchToNewTabsImmediately = getSetting(settings.SWITCH_TO_NEW_TABS) === true
+      if (switchToNewTabsImmediately) {
+        createProperties.active = true
       }
-    }
-    extensions.createTab(createProperties, (tab) => {
-      cb && cb(tab)
+      if (!createProperties.url) {
+        createProperties.url = newFrameUrl()
+      }
+      createProperties.url = normalizeUrl(createProperties.url)
+      if (needsPartitionAssigned(createProperties)) {
+        createProperties.partition = getPartition(createProperties)
+        if (isSessionPartition(createProperties.partition)) {
+          createProperties.parent_partition = ''
+        }
+      }
+      extensions.createTab(createProperties, (tab) => {
+        cb && cb(tab)
+      })
     })
   },
 
@@ -401,10 +399,9 @@ const api = {
     win.loadURL('about:blank')
   },
 
-  createTab: (state, action) => {
+  createTab: (action) => {
     action = makeImmutable(action)
     api.create(action.get('createProperties'))
-    return state
   },
 
   moveTo: (state, tabId, frameOpts, browserOpts, windowId) => {
@@ -459,12 +456,9 @@ const api = {
     }
     const tabData = tabState.getMatchingTab(state, createProperties, windowId, url)
     if (tabData) {
-      const tab = getWebContents(tabData.get('id'))
-      if (tab && !tab.isDestroyed()) {
-        tab.setActive(true)
-      }
+      api.setActive(tabData.get('id'))
     } else {
-      api.createTab(state, action)
+      api.createTab(action)
     }
     return state
   }
