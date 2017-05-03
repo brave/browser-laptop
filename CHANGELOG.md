@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.15.2](https://github.com/brave/browser-laptop/releases/v0.15.2dev)
+ - Update libchromiumcontent to 58.0.3029.96. ([#8638](https://github.com/brave/browser-laptop/issues/8638))
+ - Update muon to 2.58.9. ([#8660](https://github.com/brave/browser-laptop/issues/8660))
+
 ## [0.15.1](https://github.com/brave/browser-laptop/releases/v0.15.1dev)
  - Update muon to 2.58.8. ([#8563](https://github.com/brave/browser-laptop/issues/8563))
 
