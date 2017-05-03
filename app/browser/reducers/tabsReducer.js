@@ -37,7 +37,7 @@ const tabsReducer = (state, action, immutableAction) => {
       break
     }
     case appConstants.APP_CREATE_TAB_REQUESTED:
-      state = tabs.createTab(state, action)
+      tabs.createTab(action)
       break
     case appConstants.APP_MAYBE_CREATE_TAB_REQUESTED:
       state = tabs.maybeCreateTab(state, action)
@@ -89,7 +89,7 @@ const tabsReducer = (state, action, immutableAction) => {
       })
       break
     case windowConstants.WINDOW_SET_ACTIVE_FRAME:
-      state = tabs.setActive(state, action)
+      tabs.setActive(action.getIn(['frameProps', 'tabId']))
       break
     case appConstants.APP_TAB_TOGGLE_DEV_TOOLS:
       state = tabs.toggleDevTools(state, action.get('tabId'))

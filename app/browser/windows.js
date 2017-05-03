@@ -250,62 +250,78 @@ const api = {
   },
 
   pinnedTabsChanged: () => {
-    for (let windowId in currentWindows) {
-      if (currentWindows[windowId].__ready) {
-        updatePinnedTabs(currentWindows[windowId])
+    setImmediate(() => {
+      for (let windowId in currentWindows) {
+        if (currentWindows[windowId].__ready) {
+          updatePinnedTabs(currentWindows[windowId])
+        }
       }
-    }
+    })
   },
 
   minimize: (windowId) => {
-    const win = currentWindows[windowId]
-    if (win && !win.isDestroyed()) {
-      win.minimize()
-    }
+    setImmediate(() => {
+      const win = currentWindows[windowId]
+      if (win && !win.isDestroyed()) {
+        win.minimize()
+      }
+    })
   },
 
   maximize: (windowId) => {
-    const win = currentWindows[windowId]
-    if (win && !win.isDestroyed()) {
-      win.maximize()
-    }
+    setImmediate(() => {
+      const win = currentWindows[windowId]
+      if (win && !win.isDestroyed()) {
+        win.maximize()
+      }
+    })
   },
 
   unmaximize: (windowId) => {
-    const win = currentWindows[windowId]
-    if (win && !win.isDestroyed()) {
-      win.unmaximize()
-    }
+    setImmediate(() => {
+      const win = currentWindows[windowId]
+      if (win && !win.isDestroyed()) {
+        win.unmaximize()
+      }
+    })
   },
 
   setTitle: (windowId, title) => {
-    const win = currentWindows[windowId]
-    if (win && !win.isDestroyed()) {
-      win.setTitle(title)
-    }
+    setImmediate(() => {
+      const win = currentWindows[windowId]
+      if (win && !win.isDestroyed()) {
+        win.setTitle(title)
+      }
+    })
   },
 
   setFullScreen: (windowId, fullScreen) => {
-    const win = currentWindows[windowId]
-    if (win && !win.isDestroyed()) {
-      win.setFullScreen(fullScreen)
-    }
+    setImmediate(() => {
+      const win = currentWindows[windowId]
+      if (win && !win.isDestroyed()) {
+        win.setFullScreen(fullScreen)
+      }
+    })
   },
 
   openDevTools: (windowId, fullScreen) => {
-    const win = currentWindows[windowId]
-    if (win && !win.isDestroyed()) {
-      win.webContents.openDevTools()
-    }
+    setImmediate(() => {
+      const win = currentWindows[windowId]
+      if (win && !win.isDestroyed()) {
+        win.webContents.openDevTools()
+      }
+    })
   },
 
   windowReady: (windowId) => {
-    const win = currentWindows[windowId]
-    if (win && !win.isDestroyed()) {
-      win.__alreadyPinnedSites = new Immutable.Set()
-      updatePinnedTabs(win)
-      win.__ready = true
-    }
+    setImmediate(() => {
+      const win = currentWindows[windowId]
+      if (win && !win.isDestroyed()) {
+        win.__alreadyPinnedSites = new Immutable.Set()
+        updatePinnedTabs(win)
+        win.__ready = true
+      }
+    })
   },
 
   closeWindow: (state, action) => {
@@ -313,9 +329,11 @@ const api = {
     let windowId = action.get('windowId')
     let win = api.getWindow(windowId)
     try {
-      if (!win.isDestroyed()) {
-        win.close()
-      }
+      setImmediate(() => {
+        if (!win.isDestroyed()) {
+          win.close()
+        }
+      })
     } catch (e) {
       // ignore
     }
