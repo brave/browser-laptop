@@ -187,38 +187,6 @@ class BitcoinDashboard extends ImmutableComponent {
     </div>
   }
 
-  panelFooter () {
-    if (this.props.ledgerData.get('buyURLFrame')) {
-      return <div className={css(styles.dashboardFooter, styles.temp__panelFooter)}>
-        {/* TODO: refactor button.js */}
-        <Button className='whiteButton'
-          l10nId='done'
-          testId='panelDoneButton'
-          onClick={this.props.hideParentOverlay} />
-      </div>
-    } else if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
-      return <div className={css(styles.dashboardFooter, styles.temp__panelFooter, styles.coinbaseFooter)}>
-        <div className={css(styles.coinbase)}>
-          <div className={css(styles.coinbaseLogo)} />
-          <span className={css(styles.coinbaseMessage)} data-l10n-id='coinbaseMessage' />
-        </div>
-        {/* TODO: refactor button.js */}
-        <Button className='whiteButton'
-          l10nId='done'
-          testId='panelDoneButton'
-          onClick={this.props.hideParentOverlay} />
-      </div>
-    } else {
-      return <div className={css(styles.dashboardFooter, styles.temp__panelFooter)}>
-        {/* TODO: refactor button.js */}
-        <Button className='whiteButton'
-          l10nId='done'
-          testId='panelDoneButton'
-          onClick={this.props.hideParentOverlay} />
-      </div>
-    }
-  }
-
   openBuyURLTab () {
     // close parent dialog
     this.props.hideParentOverlay()
@@ -372,11 +340,38 @@ class BitcoinDashboard extends ImmutableComponent {
           }
         </div>
         {this.smartphonePanel()}
-
-        {/* TODO: Move panelFooter() to dialog's footer
-        to remove temp__panelFooter and temp__displayNone on paymentsTab.js */}
-        {this.panelFooter()}
       </div>
+    </div>
+  }
+}
+
+class BitcoinDashboardFooter extends ImmutableComponent {
+  get coinbaseCountries () {
+    return coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1
+  }
+
+  get coinbaseStyles () {
+    return <div className={css(styles.coinbase)}>
+      <div className={css(this.coinbaseCountries && styles.coinbaseLogo)} />
+      <span className={css(styles.coinbaseMessage)} data-l10n-id='coinbaseMessage' />
+    </div>
+  }
+
+  render () {
+    return <div className={css(
+      styles.dashboardFooter,
+      styles.temp__panelFooter,
+      this.coinbaseCountries && styles.coinbaseFooter
+      )}>
+      {
+        this.coinbaseCountries
+          ? this.coinbaseStyles
+          : null
+      }
+      <Button className='whiteButton'
+        l10nId='done'
+        testId='panelDoneButton'
+        onClick={this.props.hideParentOverlay} />
     </div>
   }
 }
@@ -536,4 +531,7 @@ const styles = StyleSheet.create({
   }
 })
 
-module.exports = BitcoinDashboard
+module.exports = {
+  BitcoinDashboard,
+  BitcoinDashboardFooter
+}

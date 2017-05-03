@@ -21,7 +21,7 @@ const {
 
 const DisabledContent = require('./payment/disabledContent')
 const EnabledContent = require('./payment/enabledContent')
-const BitcoinDashboard = require('./payment/bitcoinDashboard')
+const {BitcoinDashboard, BitcoinDashboardFooter} = require('./payment/bitcoinDashboard')
 const {AdvancedSettingsContent, AdvancedSettingsFooter} = require('./payment/advancedSettings')
 const {HistoryContent, HistoryFooter} = require('./payment/history')
 const {LedgerBackupContent, LedgerBackupFooter} = require('./payment/ledgerBackup')
@@ -107,6 +107,11 @@ class PaymentsTab extends ImmutableComponent {
           title={this.overlayTitle}
           content={this.overlayContent}
           customDialogFooterClasses={css(styles.temp__displayNone)}
+          footer={
+            <BitcoinDashboardFooter
+              ledgerData={this.props.ledgerData}
+              hideParentOverlay={this.props.hideOverlay.bind(this, 'addFunds')} />
+          }
           onHide={this.props.hideOverlay.bind(this, 'addFunds')}
         />
         : null
@@ -415,12 +420,12 @@ const styles = StyleSheet.create({
 
     color: `${globalStyles.color.braveMediumOrange} !important`,
     textIndent: '0 !important'
-  },
+  }
 
   // TODO: Refactor panelFooter on bitcoinDashboard with <ModalOverlay> to remove this
-  temp__displayNone: {
-    display: 'none !important'
-  }
+  // temp__displayNone: {
+  //   display: 'none !important'
+  // }
 })
 
 module.exports = PaymentsTab
