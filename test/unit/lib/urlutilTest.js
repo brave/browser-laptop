@@ -254,6 +254,10 @@ describe('urlutil', function () {
       assert.equal(UrlUtil.getLocationIfPDF('chrome-extension://blank'), 'chrome-extension://blank')
       assert.equal(UrlUtil.getLocationIfPDF(null), null)
     })
+    it('gets location for file: PDF URL', function () {
+      let url = 'chrome-extension://jdbefljfgobbmcidnmpjamcbhnbphjnb/file:///Users/yan/Downloads/test.pdf'
+      assert.equal(UrlUtil.getLocationIfPDF(url), 'file:///Users/yan/Downloads/test.pdf')
+    })
   })
 
   describe('getDisplayLocation', function () {
