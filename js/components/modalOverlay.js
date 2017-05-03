@@ -183,9 +183,10 @@ const styles = StyleSheet.create({
   },
 
   dialog__body__wrapper: {
-    background: '#fff'
+    borderRadius: globalStyles.radius.borderRadiusModal
   },
   dialog__body: {
+    background: '#fff',
     padding: `${globalStyles.spacing.dialogInsideMargin} 50px`
   },
 

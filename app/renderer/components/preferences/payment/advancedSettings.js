@@ -28,7 +28,7 @@ class AdvancedSettingsContent extends ImmutableComponent {
     const minPublisherVisits = this.props.ledgerData.getIn(['synopsisOptions', 'minPublisherVisits'])
 
     return <div className={css(styles.advancedSettings)} data-test-id='advancedSettings'>
-      <div className={css(styles.settingsPanelDivider, styles.deviderFirst)}>
+      <div className={css(styles.settingsPanelDivider)}>
         <div className={css(styles.minimumSetting)} data-l10n-id='minimumPageTimeSetting' />
         <SettingsList>
           <SettingItem>
