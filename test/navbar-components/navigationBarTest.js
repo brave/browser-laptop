@@ -904,6 +904,36 @@ describe('navigationBar tests', function () {
 
     })
 
+    describe('with no url input value', function () {
+      Brave.beforeAll(this)
+
+      before(function * () {
+        this.page1 = Brave.server.url('page1.html')
+        yield setup(this.app.client)
+        yield this.app.client
+          .waitForExist(urlInput)
+        yield this.app.client
+          .keys(this.page1)
+        yield this.app.client
+          .keys(Brave.keys.ENTER)
+      })
+
+      it('shows search icon when input is empty', function * () {
+        // test that url is shown with proper icon
+        // before getting cleared
+        yield this.app.client
+          .waitForExist(urlbarIcon)
+          .getAttribute(urlbarIcon, 'class').then(classes => classes.includes('fa-unlock'))
+
+        // ensure that once cleaned, search icon
+        // is shown instead of protocol icon
+        yield this.app.client
+          .setValue(urlInput, '')
+          .waitForExist(urlbarIcon)
+          .getAttribute(urlbarIcon, 'class').then(classes => classes.includes('fa-search'))
+      })
+    })
+
     describe('with javascript url input value', function () {
       Brave.beforeAll(this)
 

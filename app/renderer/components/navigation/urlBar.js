@@ -258,6 +258,11 @@ class UrlBar extends React.Component {
     if (this.suggestionLocation) {
       windowActions.setUrlBarSuggestions(undefined, null)
     }
+    // onChange is fired if text is cut from contextMenu
+    // for such cases we have to trigger render again to update urlIcon
+    if (e.target.value === '') {
+      windowActions.setNavBarUserInput('')
+    }
   }
 
   // Keeps track of which part was set for the url suffix and which
