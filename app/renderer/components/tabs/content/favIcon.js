@@ -20,7 +20,7 @@ const loadingIconSvg = require('../../../../extensions/brave/img/tabs/loading.sv
 
 class Favicon extends ImmutableComponent {
   get favicon () {
-    return !this.props.isLoading && this.props.tab.get('icon')
+    return !this.props.isLoading && this.props.frame.get('icon')
   }
 
   get defaultIcon () {
@@ -30,12 +30,12 @@ class Favicon extends ImmutableComponent {
   }
 
   get narrowView () {
-    return this.props.tab.get('breakpoint') === 'smallest'
+    return this.props.frame.get('breakpoint') === 'smallest'
   }
 
   get shouldHideFavicon () {
     return (hasBreakpoint(this.props, 'extraSmall') && this.props.isActive) ||
-      this.props.tab.get('location') === 'about:newtab'
+      this.props.frame.get('location') === 'about:newtab'
   }
 
   render () {
@@ -57,7 +57,7 @@ class Favicon extends ImmutableComponent {
         className={css(
           tabStyles.icon,
           this.favicon && iconStyles.favicon,
-          !this.props.tab.get('pinnedLocation') && this.narrowView && styles.faviconNarrowView
+          !this.props.frame.get('pinnedLocation') && this.narrowView && styles.faviconNarrowView
         )}
         symbol={
           (this.props.isLoading && css(styles.loadingIcon, iconStyles.loadingIconColor)) ||

@@ -38,7 +38,7 @@ module.exports.tabUpdateFrameRate = 66
  */
 module.exports.hasBreakpoint = (props, arr) => {
   arr = Array.isArray(arr) ? arr : [arr]
-  return arr.includes(props.tab.get('breakpoint'))
+  return arr.includes(props.frame.get('breakpoint'))
 }
 
 /**
@@ -47,7 +47,7 @@ module.exports.hasBreakpoint = (props, arr) => {
  * @returns {Boolean} Whether or not the tab has a relative closeTab icon
  */
 module.exports.hasRelativeCloseIcon = (props) => {
-  return props.tab.get('hoverState') &&
+  return props.frame.get('hoverState') &&
     module.exports.hasBreakpoint(props, ['default', 'large'])
 }
 
@@ -84,13 +84,13 @@ module.exports.hasFixedCloseIcon = (props) => {
 
 /**
  * Gets the icon color based on tab's background
- * @param {Object} props - Object that hosts the tab props
+ * @param {Object} props - Object that hosts the frame props
  * @returns {String} Contrasting color to use based on tab's color
  */
 module.exports.getTabIconColor = (props) => {
-  const themeColor = props.tab.get('themeColor') || props.tab.get('computedThemeColor')
-  const activeNonPrivateTab = !props.tab.get('isPrivate') && props.isActive
-  const isPrivateTab = props.tab.get('isPrivate') && (props.isActive || props.tab.get('hoverState'))
+  const themeColor = props.frame.get('themeColor') || props.frame.get('computedThemeColor')
+  const activeNonPrivateTab = !props.frame.get('isPrivate') && props.isActive
+  const isPrivateTab = props.frame.get('isPrivate') && (props.isActive || props.frame.get('hoverState'))
   const defaultColor = isPrivateTab ? styles.color.white100 : styles.color.black100
 
   return activeNonPrivateTab && props.paintTabs && !!themeColor

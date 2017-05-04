@@ -12,14 +12,13 @@ const config = require('../constants/config')
 const settings = require('../constants/settings')
 const Immutable = require('immutable')
 const frameStateUtil = require('../state/frameStateUtil')
-const {activeFrameStatePath, frameStatePathForFrame, tabStatePathForFrame} = frameStateUtil
+const {activeFrameStatePath, frameStatePathForFrame} = frameStateUtil
 const ipc = require('electron').ipcRenderer
 const messages = require('../constants/messages')
 const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
 const UrlUtil = require('../lib/urlutil')
 const {getCurrentWindowId, isFocused} = require('../../app/renderer/currentWindow')
-const {tabFromFrame} = require('../state/frameStateUtil')
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
 const { makeImmutable } = require('../../app/common/state/immutableUtil')
 const {aboutUrls, getTargetAboutUrl, newFrameUrl} = require('../lib/appUrlUtil')
@@ -35,7 +34,6 @@ let previousTabs = new Immutable.List()
 let windowState = Immutable.fromJS({
   activeFrameKey: null,
   frames: [],
-  tabs: [],
   closedFrames: [],
   ui: {
     tabs: {
@@ -79,10 +77,6 @@ class WindowStore extends EventEmitter {
 
   getFrame (key) {
     return frameStateUtil.getFrameByKey(windowState, key)
-  }
-
-  getFrameCount () {
-    return this.getFrames().size
   }
 
   emitChanges () {
@@ -189,7 +183,7 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
 
   windowState = windowState.merge(
     frameStateUtil.addFrame(
-      windowState, windowState.get('tabs'), frameOpts,
+      windowState, frameOpts,
       nextKey, frameOpts.partitionNumber, openInForeground || typeof windowState.get('activeFrameKey') !== 'number' ? nextKey : windowState.get('activeFrameKey'), insertionIndex))
 
   if (openInForeground) {
@@ -241,7 +235,6 @@ const tabDataChanged = (state, action) => {
     const frameProps = frameStateUtil.getFrameByTabId(state, tab.get('tabId'))
     if (frameProps) {
       state = state.mergeIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(state), frameProps)], newProps)
-      state = state.mergeIn(['tabs', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(state), frameProps)], newProps)
       if (tab.get('active') === true && tab.get('windowId') === getCurrentWindowId()) {
         state = state.merge({
           activeFrameKey: frameProps.get('key'),
@@ -321,9 +314,7 @@ const doAction = (action) => {
     case windowConstants.WINDOW_SET_FINDBAR_SHOWN:
       const frameIndex = frameStateUtil.findIndexForFrameKey(windowState.get('frames'), action.frameKey)
       windowState = windowState.mergeIn(['frames', frameIndex], {
-        findbarShown: action.shown
-      })
-      windowState = windowState.mergeIn(['frames', frameIndex], {
+        findbarShown: action.shown,
         findbarSelected: action.shown
       })
       break
@@ -351,10 +342,6 @@ const doAction = (action) => {
           startLoadTime: new Date().getTime(),
           endLoadTime: null
         })
-        windowState = windowState.mergeIn(statePath('tabs'), {
-          loading: true,
-          provisionalLocation: action.location
-        })
         // For about:newtab we want to have the urlbar focused, not the new frame.
         // Otherwise we want to focus the new tab when it is a new frame in the foreground.
         if (action.location !== getTargetAboutUrl('about:newtab')) {
@@ -367,9 +354,6 @@ const doAction = (action) => {
         loading: false,
         endLoadTime: new Date().getTime(),
         history: addToHistory(action.frameProps)
-      })
-      windowState = windowState.mergeIn(['tabs', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps)], {
-        loading: false
       })
       break
     case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
@@ -414,24 +398,19 @@ const doAction = (action) => {
       break
     case windowConstants.WINDOW_SET_TAB_BREAKPOINT:
       windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps), 'breakpoint'], action.breakpoint)
-      windowState = windowState.setIn(['tabs', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps), 'breakpoint'], action.breakpoint)
       break
     case windowConstants.WINDOW_SET_TAB_HOVER_STATE:
       windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps), 'hoverState'], action.hoverState)
-      windowState = windowState.setIn(['tabs', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps), 'hoverState'], action.hoverState)
       break
     case windowConstants.WINDOW_TAB_MOVE:
       const sourceFramePropsIndex = frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.sourceFrameProps)
       let newIndex = frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.destinationFrameProps) + (action.prepend ? 0 : 1)
       let frames = frameStateUtil.getFrames(windowState).splice(sourceFramePropsIndex, 1)
-      let tabs = windowState.get('tabs').splice(sourceFramePropsIndex, 1)
       if (newIndex > sourceFramePropsIndex) {
         newIndex--
       }
       frames = frames.splice(newIndex, 0, action.sourceFrameProps)
-      tabs = tabs.splice(newIndex, 0, tabFromFrame(action.sourceFrameProps))
       windowState = windowState.set('frames', frames)
-      windowState = windowState.set('tabs', tabs)
       // Since the tab could have changed pages, update the tab page as well
       windowState = updateTabPageIndex(windowState, frameStateUtil.getActiveFrame(windowState))
       break
@@ -444,11 +423,9 @@ const doAction = (action) => {
     case windowConstants.WINDOW_SET_THEME_COLOR:
       if (action.themeColor !== undefined) {
         windowState = windowState.setIn(frameStatePathForFrame(windowState, action.frameProps).concat(['themeColor']), action.themeColor)
-        windowState = windowState.setIn(tabStatePathForFrame(windowState, action.frameProps).concat(['themeColor']), action.themeColor)
       }
       if (action.computedThemeColor !== undefined) {
         windowState = windowState.setIn(frameStatePathForFrame(windowState, action.frameProps).concat(['computedThemeColor']), action.computedThemeColor)
-        windowState = windowState.setIn(tabStatePathForFrame(windowState, action.frameProps).concat(['computedThemeColor']), action.computedThemeColor)
       }
       break
     case windowConstants.WINDOW_FRAME_SHORTCUT_CHANGED:
@@ -510,23 +487,19 @@ const doAction = (action) => {
       {
         const index = frameStateUtil.getFrameIndex(windowState, action.frameKey)
         windowState = windowState.setIn(['frames', index, 'audioMuted'], action.muted)
-        windowState = windowState.setIn(['tabs', index, 'audioMuted'], action.muted)
       }
       break
     case windowConstants.WINDOW_SET_ALL_AUDIO_MUTED:
       action.frameList.forEach((frameProp) => {
         let index = frameStateUtil.getFrameIndex(windowState, frameProp.frameKey)
         windowState = windowState.setIn(['frames', index, 'audioMuted'], frameProp.muted)
-        windowState = windowState.setIn(['tabs', index, 'audioMuted'], frameProp.muted)
       })
       break
     case windowConstants.WINDOW_SET_AUDIO_PLAYBACK_ACTIVE:
       windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps), 'audioPlaybackActive'], action.audioPlaybackActive)
-      windowState = windowState.setIn(['tabs', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps), 'audioPlaybackActive'], action.audioPlaybackActive)
       break
     case windowConstants.WINDOW_SET_FAVICON:
       windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps), 'icon'], action.favicon)
-      windowState = windowState.setIn(['tabs', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps), 'icon'], action.favicon)
       break
     case windowConstants.WINDOW_SET_LAST_ZOOM_PERCENTAGE:
       windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps), 'lastZoomPercentage'], action.percentage)

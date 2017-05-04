@@ -79,10 +79,10 @@ class Tabs extends ImmutableComponent {
       // will cause the onDragEnd to never run
       setTimeout(() => {
         const key = sourceDragData.get('key')
-        let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter((node) => node && node.props.tab.get('frameKey') !== key), clientX).selectedRef
+        let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter((node) => node && node.props.frame.get('key') !== key), clientX).selectedRef
         if (droppedOnTab) {
           const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), clientX)
-          const droppedOnFrameProps = windowStore.getFrame(droppedOnTab.props.tab.get('frameKey'))
+          const droppedOnFrameProps = windowStore.getFrame(droppedOnTab.props.frame.get('key'))
 
           // If this is a different window ID than where the drag started, then
           // the tear off will be done by tab.js
@@ -149,14 +149,14 @@ class Tabs extends ImmutableComponent {
         })()}
         {
           this.props.currentTabs
-            .map((tab) =>
+            .map((frame) =>
               <Tab ref={(node) => this.tabRefs.push(node)}
                 dragData={this.props.dragData}
-                tab={tab}
-                key={'tab-' + tab.get('frameKey')}
+                frame={frame}
+                key={'tab-' + frame.get('key')}
                 paintTabs={this.props.paintTabs}
                 previewTabs={this.props.previewTabs}
-                isActive={this.props.activeFrameKey === tab.get('frameKey')}
+                isActive={this.props.activeFrameKey === frame.get('key')}
                 onTabClosedWithMouse={this.onTabClosedWithMouse}
                 tabWidth={this.props.fixTabWidth}
                 hasTabInFullScreen={this.props.hasTabInFullScreen}

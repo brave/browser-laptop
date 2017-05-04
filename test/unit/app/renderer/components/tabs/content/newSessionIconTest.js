@@ -29,7 +29,7 @@ describe('Tabs content - NewSessionIcon', function () {
   it('should show new session icon if current tab is a new session tab', function () {
     const wrapper = shallow(
       <NewSessionIcon
-        tab={
+        frame={
           Immutable.Map({
             partitionNumber: 1
           })}
@@ -40,7 +40,7 @@ describe('Tabs content - NewSessionIcon', function () {
   it('should not show new session icon if current tab is not private', function () {
     const wrapper = shallow(
       <NewSessionIcon
-        tab={
+        frame={
           Immutable.Map({
             partitionNumber: false
           })}
@@ -51,7 +51,7 @@ describe('Tabs content - NewSessionIcon', function () {
   it('should not show new session icon if mouse is over tab and breakpoint is default', function () {
     const wrapper = shallow(
       <NewSessionIcon
-        tab={
+        frame={
           Immutable.Map({
             partitionNumber: 1,
             hoverState: true,
@@ -64,7 +64,7 @@ describe('Tabs content - NewSessionIcon', function () {
   it('should show new session icon if mouse is not over tab and breakpoint is default', function () {
     const wrapper = shallow(
       <NewSessionIcon
-        tab={
+        frame={
           Immutable.Map({
             partitionNumber: 1,
             hoverState: false,
@@ -77,7 +77,7 @@ describe('Tabs content - NewSessionIcon', function () {
   it('should not show new session icon if mouse is over tab and breakpoint is large', function () {
     const wrapper = shallow(
       <NewSessionIcon
-        tab={
+        frame={
           Immutable.Map({
             partitionNumber: 1,
             hoverState: true,
@@ -90,7 +90,7 @@ describe('Tabs content - NewSessionIcon', function () {
   it('should show new session icon if mouse is not over tab and breakpoint is large', function () {
     const wrapper = shallow(
       <NewSessionIcon
-        tab={
+        frame={
           Immutable.Map({
             partitionNumber: 1,
             hoverState: false,
@@ -103,7 +103,7 @@ describe('Tabs content - NewSessionIcon', function () {
   it('should not show new session icon if tab is active and breakpoint is largeMedium', function () {
     const wrapper = shallow(
       <NewSessionIcon isActive
-        tab={
+        frame={
           Immutable.Map({
             partitionNumber: 1,
             hoverState: true,
@@ -116,7 +116,7 @@ describe('Tabs content - NewSessionIcon', function () {
   it('should show new session icon if tab is not active and breakpoint is largeMedium', function () {
     const wrapper = shallow(
       <NewSessionIcon isActive={false}
-        tab={
+        frame={
           Immutable.Map({
             partitionNumber: 1,
             hoverState: false,
@@ -129,7 +129,7 @@ describe('Tabs content - NewSessionIcon', function () {
   it('should not show new session icon if tab is active and breakpoint is medium', function () {
     const wrapper = shallow(
       <NewSessionIcon isActive
-        tab={
+        frame={
           Immutable.Map({
             partitionNumber: 1,
             hoverState: true,
@@ -142,7 +142,7 @@ describe('Tabs content - NewSessionIcon', function () {
   it('should show new session icon if tab is not active and breakpoint is medium', function () {
     const wrapper = shallow(
       <NewSessionIcon isActive={false}
-        tab={
+        frame={
           Immutable.Map({
             partitionNumber: 1,
             hoverState: false,
@@ -155,7 +155,7 @@ describe('Tabs content - NewSessionIcon', function () {
   it('should not show new session icon if breakpoint is mediumSmall', function () {
     const wrapper = shallow(
       <NewSessionIcon isActive
-        tab={
+        frame={
           Immutable.Map({
             partitionNumber: 1,
             hoverState: false,
@@ -168,7 +168,7 @@ describe('Tabs content - NewSessionIcon', function () {
   it('should not show new session icon if breakpoint is small', function () {
     const wrapper = shallow(
       <NewSessionIcon isActive
-        tab={
+        frame={
           Immutable.Map({
             partitionNumber: 1,
             hoverState: true,
@@ -181,7 +181,7 @@ describe('Tabs content - NewSessionIcon', function () {
   it('should not show new session icon if breakpoint is extraSmall', function () {
     const wrapper = shallow(
       <NewSessionIcon isActive
-        tab={
+        frame={
           Immutable.Map({
             partitionNumber: 1,
             hoverState: true,
@@ -194,7 +194,7 @@ describe('Tabs content - NewSessionIcon', function () {
   it('should not show new session icon if breakpoint is the smallest', function () {
     const wrapper = shallow(
       <NewSessionIcon
-        tab={
+        frame={
           Immutable.Map({
             partitionNumber: 1,
             hoverState: true,
@@ -207,7 +207,7 @@ describe('Tabs content - NewSessionIcon', function () {
   it('should show partition number for new sessions', function () {
     const wrapper = shallow(
       <NewSessionIcon
-        tab={
+        frame={
           Immutable.Map({
             partitionNumber: 3
           })}
@@ -218,7 +218,7 @@ describe('Tabs content - NewSessionIcon', function () {
   it('should read and show partition number for sessions with number set by opener (ex: clicking target=_blank)', function () {
     const wrapper = shallow(
       <NewSessionIcon
-        tab={
+        frame={
           Immutable.Map({
             partitionNumber: 'partition-3'
           })}
@@ -229,7 +229,7 @@ describe('Tabs content - NewSessionIcon', function () {
   it('should show max partition number even if session is bigger', function () {
     const wrapper = shallow(
       <NewSessionIcon
-        tab={
+        frame={
           Immutable.Map({
             partitionNumber: 1000
           })}
