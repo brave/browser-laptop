@@ -18,6 +18,8 @@ const settings = {
   IS_DEFAULT_BROWSER: 'general.is-default-browser',
   DOWNLOAD_DEFAULT_PATH: 'general.download-default-path',
   DOWNLOAD_ALWAYS_ASK: 'general.download-always-ask',
+  // Shields Tab
+  BLOCKED_COUNT_BADGE: 'general.blocked-count-badge',
   // Search tab
   DEFAULT_SEARCH_ENGINE: 'search.default-search-engine',
   OFFER_SEARCH_SUGGESTIONS: 'search.offer-search-suggestions',
