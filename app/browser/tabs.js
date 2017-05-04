@@ -199,7 +199,7 @@ const updateAboutDetails = (tab, tabValue) => {
       trackedBlockersCount,
       adblockCount,
       httpsUpgradedCount,
-      newTabDetail: newTabDetail.toJS()
+      newTabDetail: newTabDetail && newTabDetail.toJS()
     })
   } else if (location === 'about:autofill') {
     const defaultSession = session.defaultSession
