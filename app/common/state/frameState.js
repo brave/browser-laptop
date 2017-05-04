@@ -34,14 +34,14 @@ const api = {
       // in WindowState
       const index = state.get('frames').findIndex((frame) => frame.get('key') === frameKey)
       if (index === -1) {
-        return path.concat('nosuchframe')
+        return null
       }
       return path.concat(['frames', index])
     } else {
       // in AppState
       const index = state.get('tabs').findIndex((tab) => tab.getIn(['frame', 'key']) === frameKey)
       if (index === -1) {
-        return path.concat('nosuchtab')
+        return null
       }
       return makeImmutable(['tabs', index, 'frame'])
     }
@@ -61,21 +61,33 @@ const api = {
     // in WindowState
     const index = state.get('frames').findIndex((frame) => frame.get('tabId') === tabId)
     if (index === -1) {
-      return makeImmutable(['nosuchframe'])
+      return null
     }
     return path.concat(['frames', index])
   },
 
   getByFrameKey: (state, frameKey) => {
-    return state.getIn(api.getPathByFrameKey(state, frameKey))
+    const path = api.getPathByFrameKey(state, frameKey)
+    if (path == null) {
+      return null
+    }
+    return state.getIn(path)
   },
 
   getByTabId: (state, tabId) => {
-    return state.getIn(api.getPathByTabId(state, tabId))
+    const path = api.getPathByTabId(state, tabId)
+    if (path == null) {
+      return null
+    }
+    return state.getIn(path)
   },
 
   getTabIdByFrameKey: (state, frameKey) => {
-    return state.getIn(api.getPathByFrameKey(state, frameKey).concat('tabId')) || -1
+    const path = api.getPathByFrameKey(state, frameKey)
+    if (path == null) {
+      return null
+    }
+    return state.getIn(path.concat('tabId')) || -1
   }
 }
 

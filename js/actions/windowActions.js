@@ -502,17 +502,30 @@ const windowActions = {
     })
   },
 
-  /**
-   * Marks the URL bar as focused or not.
-   *
-   * @param {boolean} isFocused - Whether or not the URL bar should be marked as focused
-   */
-  setUrlBarFocused: function (isFocused) {
+  urlBarOnFocus: function (windowId) {
     dispatch({
-      actionType: windowConstants.WINDOW_SET_URL_BAR_FOCUSED,
-      isFocused
+      actionType: windowConstants.WINDOW_URL_BAR_ON_FOCUS,
+      windowId
     })
   },
+
+  urlBarOnBlur: function (windowId, targetValue, locationValue, fromSuggestion) {
+    dispatch({
+      actionType: windowConstants.WINDOW_URL_BAR_ON_BLUR,
+      windowId,
+      targetValue,
+      locationValue,
+      fromSuggestion
+    })
+  },
+
+  tabOnFocus: function (tabId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_TAB_ON_FOCUS,
+      tabId
+    })
+  },
+
   /**
    * Dispatches a message to the store to indicate that the pending frame shortcut info should be updated.
    *
