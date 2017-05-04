@@ -10,7 +10,6 @@ const ipc = electron.ipcRenderer
 // Actions
 const appActions = require('../../../../js/actions/appActions')
 const windowActions = require('../../../../js/actions/windowActions')
-const getSetting = require('../../../../js/settings').getSetting
 
 // Components
 const ImmutableComponent = require('../immutableComponent')
@@ -39,7 +38,6 @@ const cx = require('../../../../js/lib/classSet')
 
 // Constants
 const messages = require('../../../../js/constants/messages')
-const settings = require('../../../../js/constants/settings')
 const appConfig = require('../../../../js/constants/appConfig')
 
 class Navigator extends ImmutableComponent {
@@ -197,7 +195,6 @@ class Navigator extends ImmutableComponent {
     const activeTabShowingMessageBox = !!(activeTab && tabState.isShowingMessageBox(this.props.appState, activeTab.get('tabId')))
     const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
     const totalBlocks = activeFrame ? this.getTotalBlocks(activeFrame) : false
-    const contextMenuDetail = this.props.windowState.get('contextMenuDetail')
     const braverySettings = siteSettings.activeSettings(this.props.activeSiteSettings, this.props.appState, appConfig)
     const shieldEnabled = braveShieldsEnabled(activeFrame)
 
@@ -209,13 +206,7 @@ class Navigator extends ImmutableComponent {
         {
           this.props.customTitlebar.menubarVisible
             ? <div className='menubarContainer'>
-              <MenuBar
-                template={this.props.customTitlebar.menubarTemplate}
-                selectedIndex={this.props.customTitlebar.menubarSelectedIndex}
-                contextMenuSelectedIndex={this.props.customTitlebar.contextMenuSelectedIndex}
-                contextMenuDetail={contextMenuDetail}
-                autohide={getSetting(settings.AUTO_HIDE_MENU)}
-                lastFocusedSelector={this.props.customTitlebar.lastFocusedSelector} />
+              <MenuBar />
               <WindowCaptionButtons windowMaximized={this.props.customTitlebar.isMaximized} />
             </div>
             : null

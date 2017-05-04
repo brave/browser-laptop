@@ -47,7 +47,6 @@ const settings = require('../constants/settings')
 const dragTypes = require('../constants/dragTypes')
 const keyCodes = require('../../app/common/constants/keyCodes')
 const keyLocations = require('../../app/common/constants/keyLocations')
-const isWindows = process.platform === 'win32'
 const {bookmarksToolbarMode} = require('../../app/common/constants/settingsEnums')
 
 // State handling
@@ -59,6 +58,7 @@ const defaultBrowserState = require('../../app/common/state/defaultBrowserState'
 const shieldState = require('../../app/common/state/shieldState')
 const tabState = require('../../app/common/state/tabState')
 const siteSettingsState = require('../../app/common/state/siteSettingsState')
+const menuBarState = require('../../app/common/state/menuBarState')
 
 // Util
 const _ = require('underscore')
@@ -67,7 +67,7 @@ const eventUtil = require('../lib/eventUtil')
 const siteSettings = require('../state/siteSettings')
 const debounce = require('../lib/debounce')
 const {getCurrentWindowId, isMaximized, isFocused, isFullScreen} = require('../../app/renderer/currentWindow')
-const platformUtil = require('../../app/common/lib/platformUtil')
+const {isDarwin, isWindows} = require('../../app/common/lib/platformUtil')
 
 class Main extends ImmutableComponent {
   constructor () {
@@ -93,14 +93,13 @@ class Main extends ImmutableComponent {
   }
   registerWindowLevelShortcuts () {
     // For window level shortcuts that don't work as local shortcuts
-    const isDarwin = platformUtil.isDarwin()
     document.addEventListener('keydown', (e) => {
       switch (e.which) {
         case keyCodes.ESC:
           this.exitFullScreen()
           break
         case keyCodes.F12:
-          if (!isDarwin) {
+          if (!isDarwin()) {
             ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS)
           }
           break
@@ -653,13 +652,11 @@ class Main extends ImmutableComponent {
   }
 
   get customTitlebar () {
-    const customTitlebarEnabled = isWindows
-    const captionButtonsVisible = customTitlebarEnabled
-    const menubarVisible = customTitlebarEnabled && (!getSetting(settings.AUTO_HIDE_MENU) || this.props.windowState.getIn(['ui', 'menubar', 'isVisible']))
+    const menubarVisible = menuBarState.isMenuBarVisible(this.props.windowState)
     const selectedIndex = this.props.windowState.getIn(['ui', 'contextMenu', 'selectedIndex'])
     return {
-      enabled: customTitlebarEnabled,
-      captionButtonsVisible: captionButtonsVisible,
+      enabled: isWindows(),
+      captionButtonsVisible: isWindows(),
       menubarVisible: menubarVisible,
       menubarTemplate: menubarVisible ? this.props.appState.getIn(['menu', 'template']) : null,
       menubarSelectedIndex: this.props.windowState.getIn(['ui', 'menubar', 'selectedIndex']),
@@ -858,7 +855,7 @@ class Main extends ImmutableComponent {
             draggingOverData={this.props.appState.getIn(['dragData', 'dragOverData', 'draggingOverType']) === dragTypes.BOOKMARK && this.props.appState.getIn(['dragData', 'dragOverData'])}
             showFavicon={showFavicon}
             showOnlyFavicon={showOnlyFavicon}
-            shouldAllowWindowDrag={shouldAllowWindowDrag && !isWindows}
+            shouldAllowWindowDrag={shouldAllowWindowDrag && !isWindows()}
             activeFrameKey={(activeFrame && activeFrame.get('key')) || undefined}
             windowWidth={window.innerWidth}
             contextMenuDetail={contextMenuDetail}

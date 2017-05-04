@@ -11,27 +11,36 @@ const validateState = function (state) {
   return state
 }
 
-const contextMenuState = {
-  setContextMenu: (state, detail) => {
+const api = {
+  setContextMenu: (windowState, detail) => {
     detail = makeImmutable(detail)
-    state = validateState(state)
+    windowState = validateState(windowState)
 
     if (!detail) {
-      if (state.getIn(['contextMenuDetail', 'type']) === 'hamburgerMenu') {
-        state = state.set('hamburgerMenuWasOpen', true)
+      if (windowState.getIn(['contextMenuDetail', 'type']) === 'hamburgerMenu') {
+        windowState = windowState.set('hamburgerMenuWasOpen', true)
       } else {
-        state = state.set('hamburgerMenuWasOpen', false)
+        windowState = windowState.set('hamburgerMenuWasOpen', false)
       }
-      state = state.delete('contextMenuDetail')
+      windowState = windowState.delete('contextMenuDetail')
     } else {
-      if (!(detail.get('type') === 'hamburgerMenu' && state.get('hamburgerMenuWasOpen'))) {
-        state = state.set('contextMenuDetail', detail)
+      if (!(detail.get('type') === 'hamburgerMenu' && windowState.get('hamburgerMenuWasOpen'))) {
+        windowState = windowState.set('contextMenuDetail', detail)
       }
-      state = state.set('hamburgerMenuWasOpen', false)
+      windowState = windowState.set('hamburgerMenuWasOpen', false)
     }
 
-    return state
+    return windowState
+  },
+
+  selectedIndex: (windowState) => {
+    const selectedIndex = windowState.getIn(['ui', 'contextMenu', 'selectedIndex'])
+    return (typeof selectedIndex === 'object' &&
+      Array.isArray(selectedIndex) &&
+      selectedIndex.length > 0)
+      ? selectedIndex
+      : null
   }
 }
 
-module.exports = contextMenuState
+module.exports = api
