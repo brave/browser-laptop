@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // util
 const {btcToCurrencyString} = require('../../../../common/lib/ledgerUtil')
@@ -17,7 +17,6 @@ const {SettingsList, SettingItem} = require('../../settings')
 // style
 const globalStyles = require('../../styles/global')
 const commonStyles = require('../../styles/commonStyles')
-const {paymentCommon} = require('../../styles/payment')
 
 // other
 const aboutActions = require('../../../../../js/about/aboutActions')
@@ -50,63 +49,64 @@ class LedgerRecoveryContent extends ImmutableComponent {
     const recoveryError = this.props.ledgerData.getIn(['error', 'error'])
     const isNetworkError = typeof recoveryError === 'object'
 
-    return <div className={css(paymentCommon.board)}>
+    return <section>
       {
         recoverySucceeded === true
-          ? <div className={css(styles.recoveryOverlay)}>
-            <h1 className={css(styles.recoveryOverlay__h1)} data-l10n-id='ledgerRecoverySucceeded' />
-            <p className={css(styles.recoveryOverlay__p, styles.spaceAround)}
+          ? <section className={css(styles.recoveryOverlay)}>
+            <h1 className={css(styles.recoveryOverlay__textColor)} data-l10n-id='ledgerRecoverySucceeded' />
+            <p className={css(styles.recoveryOverlay__textColor, styles.recoveryOverlay__spaceAround)}
               data-l10n-id='balanceRecovered'
               data-l10n-args={JSON.stringify(l10nDataArgs)}
             />
-            <Button l10nId='ok'
-              className={css(commonStyles.whiteButton, commonStyles.inlineButton)}
+            <Button className='whiteButton'
+              l10nId='ok'
+              testId='okButton'
               onClick={this.clearRecoveryStatus.bind(this)}
             />
-          </div>
+          </section>
           : null
       }
       {
         (recoverySucceeded === false && recoveryError && isNetworkError)
-          ? <div className={css(styles.recoveryOverlay)}>
-            <h1 className={css(styles.recoveryOverlay__h1)} data-l10n-id='ledgerRecoveryNetworkFailedTitle' data-test-id='recoveryError' />
-            <p className={css(styles.recoveryOverlay__p, styles.spaceAround)}
+          ? <section className={css(styles.recoveryOverlay)}>
+            <h1 className={css(styles.recoveryOverlay__textColor)} data-l10n-id='ledgerRecoveryNetworkFailedTitle' data-test-id='recoveryError' />
+            <p className={css(styles.recoveryOverlay__textColor, styles.recoveryOverlay__spaceAround)}
               data-l10n-id='ledgerRecoveryNetworkFailedMessage'
             />
-            <Button l10nId='ok'
-              className={css(commonStyles.whiteButton, commonStyles.inlineButton)}
+            <Button className='whiteButton'
+              l10nId='ok'
+              testId='okButton'
               onClick={this.clearRecoveryStatus.bind(this)}
             />
-          </div>
+          </section>
           : null
       }
       {
         (recoverySucceeded === false && recoveryError && !isNetworkError)
-          ? <div className={css(styles.recoveryOverlay)}>
-            <h1 className={css(styles.recoveryOverlay__h1)} data-l10n-id='ledgerRecoveryFailedTitle' />
-            <p className={css(styles.recoveryOverlay__p, styles.spaceAround)}
+          ? <section className={css(styles.recoveryOverlay)}>
+            <h1 className={css(styles.recoveryOverlay__textColor)} data-l10n-id='ledgerRecoveryFailedTitle' />
+            <p className={css(styles.recoveryOverlay__textColor, styles.recoveryOverlay__spaceAround)}
               data-l10n-id='ledgerRecoveryFailedMessage'
             />
-            <Button l10nId='ok'
-              className={css(commonStyles.whiteButton, commonStyles.inlineButton)}
+            <Button className='whiteButton'
+              l10nId='ok'
+              testId='okButton'
               onClick={this.clearRecoveryStatus.bind(this)}
             />
-          </div>
+          </section>
           : null
       }
-      <div className={css(paymentCommon.panel, styles.recoveryContent)}>
-        <h4 className={css(styles.recoveryContent__h4)} data-l10n-id='ledgerRecoverySubtitle' />
-        <div className={css(styles.ledgerRecoveryContent)} data-l10n-id='ledgerRecoveryContent' />
-        <SettingsList className={css(commonStyles.noMarginBottom)}>
-          <SettingItem>
-            <h3 data-l10n-id='firstRecoveryKey' />
-            <RecoveryKeyTextbox id='firstRecoveryKey' onChange={this.handleFirstRecoveryKeyChange} />
-            <h3 className={css(styles.recoveryContent__h3)} data-l10n-id='secondRecoveryKey' />
-            <RecoveryKeyTextbox id='secondRecoveryKey' onChange={this.handleSecondRecoveryKeyChange} />
-          </SettingItem>
-        </SettingsList>
-      </div>
-    </div>
+      <h4 className={css(styles.recoveryContent__h4)} data-l10n-id='ledgerRecoverySubtitle' />
+      <div className={css(styles.ledgerRecoveryContent)} data-l10n-id='ledgerRecoveryContent' />
+      <SettingsList className={css(commonStyles.noMarginBottom)}>
+        <SettingItem>
+          <h3 data-l10n-id='firstRecoveryKey' />
+          <RecoveryKeyTextbox id='firstRecoveryKey' onChange={this.handleFirstRecoveryKeyChange} />
+          <h3 className={css(styles.recoveryContent__h3)} data-l10n-id='secondRecoveryKey' />
+          <RecoveryKeyTextbox id='secondRecoveryKey' onChange={this.handleSecondRecoveryKeyChange} />
+        </SettingItem>
+      </SettingsList>
+    </section>
   }
 }
 
@@ -125,43 +125,42 @@ class LedgerRecoveryFooter extends ImmutableComponent {
   }
 
   render () {
-    return <div className={css(commonStyles.modalOverlay__footer, commonStyles.modalOverlay__footerButton)}>
-      <div className={css(styles.recoveryFooterButtons)}>
-        <Button l10nId='recover'
-          className={css(commonStyles.primaryButton)}
-          onClick={this.recoverWallet}
-        />
-        <Button l10nId='recoverFromFile'
-          className={css(commonStyles.primaryButton, paymentCommon.marginButtons)}
-          onClick={this.recoverWalletFromFile}
-        />
-        <Button l10nId='cancel'
-          className={css(commonStyles.whiteButton, commonStyles.inlineButton, paymentCommon.marginButtons)}
-          onClick={this.props.hideOverlay.bind(this, 'ledgerRecovery')}
-        />
-      </div>
+    return <div>
+      <Button className='primaryButton'
+        l10nId='recover'
+        testId='recoverButton'
+        onClick={this.recoverWallet}
+      />
+      <Button className='primaryButton'
+        l10nId='recoverFromFile'
+        testId='recoverFromFileButton'
+        onClick={this.recoverWalletFromFile}
+      />
+      <Button className='whiteButton'
+        l10nId='cancel'
+        testId='cancelButton'
+        onClick={this.props.hideOverlay.bind(this, 'ledgerRecovery')}
+      />
     </div>
   }
 }
 
 const styles = StyleSheet.create({
-  recoveryContent: {
-    paddingLeft: '50px',
-    paddingRight: '50px',
-    marginTop: 0,
-    marginBottom: 0
-  },
   recoveryContent__h4: {
-    marginBottom: globalStyles.spacing.paymentsMargin
+    marginBottom: globalStyles.spacing.dialogInsideMargin
   },
   recoveryContent__h3: {
     marginBottom: globalStyles.spacing.modalPanelHeaderMarginBottom
   },
   ledgerRecoveryContent: {
-    marginBottom: globalStyles.spacing.paymentsMargin
+    marginBottom: globalStyles.spacing.dialogInsideMargin
   },
 
   recoveryOverlay: {
+    display: 'flex',
+    flexFlow: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: globalStyles.color.black75,
     border: `1px solid ${globalStyles.color.black75}`,
     position: 'absolute',
@@ -169,21 +168,13 @@ const styles = StyleSheet.create({
     left: '-1px',
     width: '100%',
     height: '100%',
-    textAlign: 'center',
     zIndex: 999
   },
-  recoveryOverlay__h1: {
-    color: '#fff',
-    marginTop: '120px'
-  },
-  recoveryOverlay__p: {
+  recoveryOverlay__textColor: {
     color: '#fff'
   },
-  spaceAround: {
+  recoveryOverlay__spaceAround: {
     margin: '50px auto'
-  },
-  recoveryFooterButtons: {
-    float: 'right'
   }
 })
 

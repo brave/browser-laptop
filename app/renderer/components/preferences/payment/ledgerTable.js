@@ -257,7 +257,7 @@ class LedgerTable extends ImmutableComponent {
       })
     }
 
-    return <div data-test-id='ledgerTable'>
+    return <section data-test-id='ledgerTable'>
       <div className={css(styles.hideExcludedSites)}>
         <div className={css(styles.columnOffset)} />
         <div className={css(styles.rightColumn)}>
@@ -310,7 +310,7 @@ class LedgerTable extends ImmutableComponent {
         </div>
         : null
       }
-    </div>
+    </section>
   }
 }
 

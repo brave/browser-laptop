@@ -3,18 +3,18 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // components
 const Button = require('../../../../../js/components/button')
+const cx = require('../../../../../js/lib/classSet')
 const ModalOverlay = require('../../../../../js/components/modalOverlay')
 const ImmutableComponent = require('../../immutableComponent')
 
 // styles
-const commonStyles = require('../../styles/commonStyles')
 const globalStyles = require('../../styles/global')
-const {paymentCommon} = require('../../styles/payment')
-const cx = require('../../../../../js/lib/classSet')
+const commonStyles = require('../../styles/commonStyles')
+
 const CoinBase = require('../../../../extensions/brave/img/coinbase_logo.png')
 const Andorid = require('../../../../extensions/brave/img/android_download.svg')
 const IOS = require('../../../../extensions/brave/img/ios_download.svg')
@@ -52,6 +52,45 @@ class BitcoinDashboard extends ImmutableComponent {
     return !(countryCode && countryCode !== 'US')
   }
 
+  openBuyURLTab () {
+    // close parent dialog
+    this.props.hideParentOverlay()
+  }
+
+  faCreditCard () {
+    return <span className={cx({
+      fa: true,
+      'fa-credit-card': true,
+      [css(styles.faCreditCard)]: true
+    })} />
+  }
+  faBitcoin () {
+    return <span className={cx({
+      'fa-stack': true,
+      'fa-lg': true
+    })}>
+      <span className={cx({
+        fa: true,
+        'fa-circle': true,
+        'fa-stack-2x': true,
+        [css(styles.faCircle)]: true
+      })} />
+      <span className={cx({
+        fa: true,
+        'fa-bitcoin': true,
+        'fa-stack-1x': true,
+        [css(styles.faBitcoin)]: true
+      })} />
+    </span>
+  }
+  faSmartphone () {
+    return <span className={cx({
+      fa: true,
+      'fa-mobile': true,
+      [css(styles.faMobile)]: true
+    })} />
+  }
+
   bitcoinPurchaseButton () {
     if (!this.props.ledgerData.get('buyURLFrame')) {
       /* TODO refactor button */
@@ -61,7 +100,8 @@ class BitcoinDashboard extends ImmutableComponent {
       })}
         l10nId='add'
         testId='bitcoinPurchaseButton'
-        onClick={this.props.showOverlay.bind(this)} />
+        onClick={this.props.showOverlay.bind(this)}
+      />
     }
 
     return <a href={this.props.ledgerData.get('buyURL')} target='_blank' onClick={this.openBuyURLTab}>
@@ -71,66 +111,58 @@ class BitcoinDashboard extends ImmutableComponent {
         [css(styles.panelButton)]: true
       })}
         l10nId='add'
-        testId='bitcoinPurchaseButton' />
+        testId='bitcoinPurchaseButton'
+      />
     </a>
-  }
-
-  qrcodeOverlayContent () {
-    return <div>
-      <img className={css(styles.qrcodeImage)} src={this.props.ledgerData.get('paymentIMG')} title='Brave wallet QR code' />
-      <div className={css(styles.bitcoinQRTitle)} data-l10n-id='bitcoinQR' />
-    </div>
-  }
-
-  qrcodeOverlayFooter () {
-    if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
-      return <div className={css(styles.qrcodeOverlayFooter)}>
-        <div className={css(styles.coinbaseLogo)} />
-        <a target='_blank' className={css(styles.qrcodeLogo, styles.appstoreLogo)} href='https://itunes.apple.com/us/app/coinbase-bitcoin-wallet/id886427730?mt=8' />
-        <a target='_blank' className={css(styles.qrcodeLogo, styles.playstoreLogo)} href='https://play.google.com/store/apps/details?id=com.coinbase.android' />
-      </div>
-    }
-
-    return null
   }
 
   coinbasePanel () {
     if (this.canUseCoinbase) {
-      return <div className={css(paymentCommon.panel, styles.panel, commonStyles.noMarginTop)}>
-        <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerFirst)}>
-          <span className={cx({
-            fa: true,
-            'fa-credit-card': true,
-            [css(styles.fa)]: true,
-            [css(styles.faCreditCard)]: true
-          })} />
-          <div className={css(styles.settingsListTitle)} data-l10n-id='moneyAdd' />
-          <div className={css(styles.settingsListTitle, styles.subTitle)} data-l10n-id='moneyAddSubTitle' />
+      return <section className={css(styles.panel, styles.panel__coinbase)}>
+        <div className={css(styles.panel__divider, styles.panel__divider_left)}>
+          <div className={css(styles.panel__divider_left__titleWrapper)}>
+            <div className={css(styles.panel__divider_left__titleWrapper__iconWrapper)}>
+              {this.faCreditCard()}
+            </div>
+            <div className={css(styles.panel__divider_left__listTitleWrapper)}>
+              <div className={css(styles.panel__divider_left__listTitleWrapper__title)} data-l10n-id='moneyAdd' />
+              <div className={css(
+                styles.panel__divider_left__listTitleWrapper__title,
+                styles.panel__divider_left__listTitleWrapper__subTitle
+              )} data-l10n-id='moneyAddSubTitle' />
+            </div>
+          </div>
         </div>
-        <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerLast)}>
+        <div className={css(styles.panel__divider, styles.panel__divider_right)}>
           {this.bitcoinPurchaseButton()}
-          <div className={css(styles.settingsListTitle, styles.subTitle)} data-l10n-id='transferTime' />
+          <div className={css(
+            styles.panel__divider_right__title,
+            styles.panel__divider_right__subTitle
+          )} data-l10n-id='transferTime' />
         </div>
-      </div>
+      </section>
     } else {
-      return <div className={css(paymentCommon.panel, styles.panel)}>
-        <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerFirst)}>
-          <span className={cx({
-            fa: true,
-            'fa-credit-card': true,
-            [css(styles.fa)]: true,
-            [css(styles.faCreditCard)]: true
-          })} />
-          <div className={css(styles.settingsListTitle)} data-l10n-id='moneyAdd' />
-          <div className={css(styles.settingsListTitle, styles.subTitle)} data-l10n-id='moneyAddSubTitle' />
+      return <section className={css(styles.panel, styles.panel__coinbase)}>
+        <div className={css(styles.panel__divider, styles.panel__divider_left)}>
+          <div className={css(styles.panel__divider_left__titleWrapper)}>
+            <div className={css(styles.panel__divider_left__titleWrapper__iconWrapper)}>
+              {this.faCreditCard()}
+            </div>
+            <div className={css(styles.panel__divider_left__listTitleWrapper)}>
+              <div className={css(styles.panel__divider_left__listTitleWrapper__title)} data-l10n-id='moneyAdd' />
+              <div className={css(
+                styles.panel__divider_left__listTitleWrapper__title,
+                styles.panel__divider_left__listTitleWrapper__subTitle
+              )} data-l10n-id='moneyAddSubTitle' />
+            </div>
+          </div>
         </div>
-        <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerLast)}>
+        <div className={css(styles.panel__divider, styles.panel__divider_right)}>
           <div data-l10n-id='coinbaseNotAvailable' />
         </div>
-      </div>
+      </section>
     }
   }
-
   exchangePanel () {
     const url = this.props.ledgerData.getIn(['exchangeInfo', 'exchangeURL'])
     const name = this.props.ledgerData.getIn(['exchangeInfo', 'exchangeName'])
@@ -138,17 +170,18 @@ class BitcoinDashboard extends ImmutableComponent {
     if (!url || !name) {
       return this.worldWidePanel()
     } else {
-      return <div className={css(paymentCommon.panel, styles.panel, commonStyles.noMarginTop)}>
-        <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerFirst)}>
-          <span className={cx({
-            fa: true,
-            'fa-credit-card': true,
-            [css(styles.fa)]: true,
-            [css(styles.faCreditCard)]: true
-          })} />
-          <div className={css(styles.settingsListTitle)} data-l10n-id='outsideUSAPayment' />
+      return <section className={css(styles.panel, styles.panel__coinbase)}>
+        <div className={css(styles.panel__divider, styles.panel__divider_left)}>
+          <div className={css(styles.panel__divider_left__titleWrapper)}>
+            <div className={css(styles.panel__divider_left__titleWrapper__iconWrapper)}>
+              {this.faCreditCard()}
+            </div>
+            <div className={css(styles.panel__divider_left__listTitleWrapper)}>
+              <div className={css(styles.panel__divider_left__listTitleWrapper__title)} data-l10n-id='outsideUSAPayment' />
+            </div>
+          </div>
         </div>
-        <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerLast)}>
+        <div className={css(styles.panel__divider, styles.panel__divider_right)}>
           <a target='_blank' href={url}>
             {/* TODO: refactor button.js */}
             <Button className={cx({
@@ -156,90 +189,26 @@ class BitcoinDashboard extends ImmutableComponent {
               [css(styles.panelButton)]: true
             })}
               testId='exchangePanelButton'
-              label={name} />
+              label={name}
+            />
           </a>
         </div>
-      </div>
+      </section>
     }
   }
-
-  smartphonePanel () {
-    return <div className={css(paymentCommon.panel, styles.panel, commonStyles.noMarginBottom)}>
-      <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerFirst, styles.alignMiddle)}>
-        <span className={cx({
-          fa: true,
-          'fa-mobile': true,
-          [css(styles.faMobile)]: true,
-          [css(styles.fa)]: true
-        })} />
-        <div className={css(styles.settingsListTitle)} data-l10n-id='smartphoneTitle' />
-      </div>
-      <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerLast, styles.alignMiddle)}>
-        {/* TODO: refactor button.js */}
-        <Button className={cx({
-          primaryButton: true,
-          [css(styles.panelButton)]: true
-        })}
-          l10nId='displayQRCode'
-          testId='displayQRCode'
-          onClick={this.props.showQRcode.bind(this)} />
-      </div>
-    </div>
-  }
-
-  panelFooter () {
-    if (this.props.ledgerData.get('buyURLFrame')) {
-      return <div className={css(paymentCommon.panelFooter, styles.panelFooter)}>
-        {/* TODO: refactor button.js */}
-        <Button className='whiteButton'
-          l10nId='done'
-          testId='panelDoneButton'
-          onClick={this.props.hideParentOverlay} />
-      </div>
-    } else if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
-      return <div className={css(paymentCommon.panelFooter, styles.panelFooter, styles.coinbaseFooter)}>
-        <div className={css(styles.coinbase)}>
-          <div className={css(styles.coinbaseLogo)} />
-          <span className={css(styles.coinbaseMessage)} data-l10n-id='coinbaseMessage' />
-        </div>
-        {/* TODO: refactor button.js */}
-        <Button className='whiteButton'
-          l10nId='done'
-          testId='panelDoneButton'
-          onClick={this.props.hideParentOverlay} />
-      </div>
-    } else {
-      return <div className={css(paymentCommon.panelFooter, styles.panelFooter)}>
-        {/* TODO: refactor button.js */}
-        <Button className='whiteButton'
-          l10nId='done'
-          testId='panelDoneButton'
-          onClick={this.props.hideParentOverlay} />
-      </div>
-    }
-  }
-
-  openBuyURLTab () {
-    // close parent dialog
-    this.props.hideParentOverlay()
-  }
-
-  bitcoinOverlayContent () {
-    return <iframe src={this.props.ledgerData.get('buyURL')} />
-  }
-
   worldWidePanel () {
-    return <div className={css(paymentCommon.panel, styles.panel)}>
-      <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerFirst)}>
-        <span className={cx({
-          fa: true,
-          'fa-credit-card': true,
-          [css(styles.fa)]: true,
-          [css(styles.faCreditCard)]: true
-        })} />
-        <div className={css(styles.settingsListTitle)} data-l10n-id='outsideUSAPayment' />
+    return <section className={css(styles.panel)}>
+      <div className={css(styles.panel__divider, styles.panel__divider_left)}>
+        <div className={css(styles.panel__divider_left__titleWrapper)}>
+          <div className={css(styles.panel__divider_left__titleWrapper__iconWrapper)}>
+            {this.faCreditCard()}
+          </div>
+          <div className={css(styles.panel__divider_left__listTitleWrapper)}>
+            <div className={css(styles.panel__divider_left__listTitleWrapper__title)} data-l10n-id='outsideUSAPayment' />
+          </div>
+        </div>
       </div>
-      <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerLast)}>
+      <div className={css(styles.panel__divider, styles.panel__divider_right)}>
         <a target='_blank' href='https://www.buybitcoinworldwide.com/'>
           {/* TODO: refactor button.js */}
           <Button className={cx({
@@ -247,10 +216,136 @@ class BitcoinDashboard extends ImmutableComponent {
             [css(styles.panelButton)]: true
           })}
             testId='worldWidePanelButton'
-            label='buybitcoinworldwide.com' />
+            label='buybitcoinworldwide.com'
+          />
         </a>
       </div>
-    </div>
+    </section>
+  }
+
+  bitcoinPanel () {
+    const ledgerData = this.props.ledgerData
+
+    return <section className={css(styles.panel, styles.panel__bitcoinPanel)}>
+      <div className={css(styles.panel__divider, styles.panel__divider_left)}>
+        <div className={css(styles.panel__divider_left__titleWrapper)}>
+          <div className={css(styles.panel__divider_left__titleWrapper__iconWrapper)}>
+            {this.faBitcoin()}
+          </div>
+          <div className={css(styles.panel__divider_left__listTitleWrapper)}>
+            <div className={css(styles.panel__divider_left__listTitleWrapper__title)} data-l10n-id='bitcoinAdd' />
+            <div className={css(
+              styles.panel__divider_left__listTitleWrapper__title,
+              styles.panel__divider_left__listTitleWrapper__subTitle
+            )} data-l10n-id='bitcoinAddDescription' />
+          </div>
+        </div>
+      </div>
+      {
+        ledgerData.get('address')
+          ? <div className={css(styles.panel__divider, styles.panel__divider_right)}>
+            {
+              ledgerData.get('hasBitcoinHandler') && ledgerData.get('paymentURL')
+                ? <div className={css(styles.panel__divider_right__bitcoinPanel__paymentURL)}>
+                  <a href={ledgerData.get('paymentURL')} target='_blank'>
+                    {/* TODO: refactor button.js */}
+                    <Button className={cx({
+                      primaryButton: true,
+                      [css(styles.panelButton)]: true
+                    })}
+                      l10nId='bitcoinVisitAccount'
+                      testId='bitcoinVisitAccountButton'
+                    />
+                  </a>
+                </div>
+                : null
+            }
+            <div data-l10n-id='bitcoinPaymentURL' className={css(styles.panel__divider_right__bitcoinPanel__walletLabelText)} />
+            <div className={css(styles.panel__divider_right__bitcoinPanel__walletAddressText)}>{ledgerData.get('address')}</div>
+            {/* TODO: refactor button.js */}
+            <Button className={cx({
+              primaryButton: true,
+              [css(styles.panelButton)]: true
+            })}
+              l10nId='copyToClipboard'
+              testId='copyToClipboardButton'
+              onClick={this.copyToClipboard.bind(this, ledgerData.get('address'))}
+            />
+          </div>
+          : <div className={css(styles.panel__divider, styles.panel__divider_right)}>
+            <div data-l10n-id='bitcoinWalletNotAvailable' />
+          </div>
+      }
+    </section>
+  }
+
+  smartphonePanel () {
+    return <section className={css(styles.panel, styles.panel__smartphonePanel)}>
+      <div className={css(styles.panel__divider, styles.panel__divider_left)}>
+        <div className={css(
+          styles.panel__divider_left__titleWrapper,
+          styles.panel__divider_left__titleWrapper_noSubTitle
+        )}>
+          <div className={css(styles.panel__divider_left__titleWrapper__iconWrapper)}>
+            {this.faSmartphone()}
+          </div>
+          <div className={css(styles.panel__divider_left__listTitleWrapper)}>
+            <div className={css(styles.panel__divider_left__listTitleWrapper__title)} data-l10n-id='smartphoneTitle' />
+          </div>
+        </div>
+      </div>
+      <div className={css(styles.panel__divider, styles.panel__divider_right)}>
+        {/* TODO: refactor button.js */}
+        <Button className={cx({
+          primaryButton: true,
+          [css(styles.panelButton)]: true
+        })}
+          l10nId='displayQRCode'
+          testId='displayQRCode'
+          onClick={this.props.showQRcode.bind(this)}
+        />
+      </div>
+    </section>
+  }
+
+  qrcodeOverlayContent () {
+    return <section className={css(styles.modalOverlay__qrcodeOverlay__content)}>
+      <img
+        src={this.props.ledgerData.get('paymentIMG')}
+        data-l10n-id='bitcoinQRImg'
+      />
+      <div className={css(styles.modalOverlay__qrcodeOverlay__content__bitcoinQR)}
+        data-l10n-id='bitcoinQR'
+      />
+    </section>
+  }
+  qrcodeOverlayFooter () {
+    if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
+      return <section className={css(styles.modalOverlay__qrcodeOverlay__footerWrapper__footer)}>
+        <div className={css(styles.coinbaseLogo)} />
+        <a target='_blank'
+          className={css(
+            styles.modalOverlay__qrcodeOverlay__footerWrapper__footer__qrcodeLogo,
+            styles.modalOverlay__qrcodeOverlay__footerWrapper__footer__appstoreLogo
+          )}
+          href='https://itunes.apple.com/us/app/coinbase-bitcoin-wallet/id886427730?mt=8'
+        />
+        <a target='_blank'
+          className={css(
+            styles.modalOverlay__qrcodeOverlay__footerWrapper__footer__qrcodeLogo,
+            styles.modalOverlay__qrcodeOverlay__footerWrapper__footer__playstoreLogo
+          )}
+          href='https://play.google.com/store/apps/details?id=com.coinbase.android'
+        />
+      </section>
+    }
+    return null
+  }
+
+  bitcoinOverlayContent () {
+    return <iframe className={css(styles.modalOverlay__coinbaseOverlay__bodyWrapper__body__iframe)}
+      src={this.props.ledgerData.get('buyURL')}
+    />
   }
 
   copyToClipboard (text) {
@@ -277,14 +372,17 @@ class BitcoinDashboard extends ImmutableComponent {
     window.addEventListener('message', this.onMessage.bind(this), false)
     const ledgerData = this.props.ledgerData
 
-    // TODO remove bitcoinDashboard class
-    return <div className='bitcoinDashboard' data-test-id='bitcoinDashboard'>
+    return <section data-test-id='bitcoinDashboard'>
       {
         this.props.bitcoinOverlayVisible
           ? <ModalOverlay
             title={'bitcoinBuy'}
             content={this.bitcoinOverlayContent()}
-            customDialogClasses={'coinbaseOverlay'}
+            customDialogClasses={css(styles.modalOverlay__coinbaseOverlay)}
+            customDialogHeaderClasses={css(styles.modalOverlay__coinbaseOverlay__header)}
+            customDialogBodyWrapperClasses={css(styles.modalOverlay__coinbaseOverlay__bodyWrapper)}
+            customDialogBodyClasses={css(styles.modalOverlay__coinbaseOverlay__bodyWrapper__body)}
+            customDialogFooterClasses={css(styles.modalOverlay__coinbaseOverlay__footer)}
             emptyDialog
             onHide={this.props.hideOverlay.bind(this)}
           />
@@ -294,221 +392,289 @@ class BitcoinDashboard extends ImmutableComponent {
         this.props.qrcodeOverlayVisible
           ? <ModalOverlay
             content={this.qrcodeOverlayContent()}
-            customDialogClasses={'qrcodeOverlay'}
+            customDialogClasses={css(styles.modalOverlay__qrcodeOverlay)}
+            customDialogHeaderClasses={css(commonStyles.noPadding)}
+            customDialogFooterClasses={css(
+              commonStyles.noPadding,
+              styles.modalOverlay__qrcodeOverlay__footerWrapper
+            )}
             footer={this.qrcodeOverlayFooter()}
             onHide={this.props.hideQRcode.bind(this)}
           />
           : null
       }
-      <div className={css(paymentCommon.board)}>
-        {
-          (this.userInAmerica || ledgerData.get('buyURLFrame'))
-            ? this.coinbasePanel()
-            : this.exchangePanel()
-        }
-        <div className={css(paymentCommon.panel, styles.panel)}>
-          <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerFirst)}>
-            <span className={cx({
-              'fa-stack': true,
-              'fa-lg': true,
-              [css(styles.bitcoinIcon)]: true
-            })}>
-              <span className={cx({
-                fa: true,
-                'fa-circle': true,
-                'fa-stack-2x': true,
-                [css(styles.faCircle)]: true,
-                [css(styles.fa)]: true
-              })} />
-              <span className={cx({
-                fa: true,
-                'fa-bitcoin': true,
-                'fa-stack-1x': true,
-                [css(styles.faBitcoin)]: true,
-                [css(styles.fa)]: true
-              })} />
-            </span>
-            <div className={css(styles.settingsListTitle)} data-l10n-id='bitcoinAdd' />
-            <div className={css(styles.settingsListTitle, styles.subTitle)} data-l10n-id='bitcoinAddDescription' />
-          </div>
-          {
-            ledgerData.get('address')
-              ? <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerLast)}>
-                {
-                  ledgerData.get('hasBitcoinHandler') && ledgerData.get('paymentURL')
-                    ? <div className={css(styles.hasBitcoinHandler)}>
-                      <a href={ledgerData.get('paymentURL')} target='_blank'>
-                        {/* TODO: refactor button.js */}
-                        <Button className={cx({
-                          primaryButton: true,
-                          [css(styles.dialogInsideMargin__bottom)]: true
-                        })}
-                          l10nId='bitcoinVisitAccount'
-                          testId='bitcoinVisitAccountButton'
-                        />
-                      </a>
-                      <div data-l10n-id='bitcoinAddress' className={css(styles.walletLabelText)} />
-                    </div>
-                    : <div>
-                      <div data-l10n-id='bitcoinPaymentURL' className={css(styles.walletLabelText)} />
-                    </div>
-                }
-                <div className={css(styles.walletAddressText)}>{ledgerData.get('address')}</div>
-                {/* TODO: refactor button.js */}
-                <Button className={cx({
-                  primaryButton: true,
-                  [css(styles.panelButton)]: true
-                })}
-                  l10nId='copyToClipboard'
-                  testId='copyToClipboardButton'
-                  onClick={this.copyToClipboard.bind(this, ledgerData.get('address'))} />
-              </div>
-              : <div className={css(styles.settingsPanelDivider, styles.settingsPanelDividerLast)}>
-                <div data-l10n-id='bitcoinWalletNotAvailable' />
-              </div>
-          }
-        </div>
-        {this.smartphonePanel()}
-        {this.panelFooter()}
-      </div>
-    </div>
+      {
+        (this.userInAmerica || ledgerData.get('buyURLFrame'))
+          ? this.coinbasePanel()
+          : this.exchangePanel()
+      }
+      {this.bitcoinPanel()}
+      {this.smartphonePanel()}
+    </section>
   }
 }
 
+class BitcoinDashboardFooter extends ImmutableComponent {
+  get coinbaseCountries () {
+    return coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1
+  }
+
+  get coinbaseMessageWrapper () {
+    return <section className={css(styles.dashboardFooter_coinbaseFooter__coinbaseMessageWrapper)}>
+      <div className={css(this.coinbaseCountries && styles.coinbaseLogo)} />
+      <span className={css(styles.dashboardFooter_coinbaseFooter__coinbaseMessageWrapper__message)} data-l10n-id='coinbaseMessage' />
+    </section>
+  }
+
+  render () {
+    return <section className={css(
+      styles.dashboardFooter,
+      this.coinbaseCountries && styles.dashboardFooter_coinbaseFooter
+    )}>
+      {
+        this.coinbaseCountries
+          ? this.coinbaseMessageWrapper
+          : null
+      }
+      <Button className={cx({
+        whiteButton: true,
+        [css(styles.dashboardFooter_coinbaseFooter__doneButton)]: this.coinbaseCountries
+      })}
+        l10nId='done'
+        testId='panelDoneButton'
+        onClick={this.props.hideParentOverlay}
+      />
+    </section>
+  }
+}
+
+const qrcodeLogoWidth = '130.5px'
+const qrcodeLogoHeight = '42.75px'
+const panelPadding = '25px'
+const panelPaddingBody = `calc(${panelPadding} - ${globalStyles.spacing.dialogInsideMargin})`
+const iconWrapperWidth = '55px'
+
 const styles = StyleSheet.create({
-  panel: {
-    display: 'flex',
-    paddingLeft: '100px'
-  },
-  panelFooter: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end'
-  },
-  disabledPanel: {
-    padding: '15px 0'
-  },
-  panelButton: {
-    minWidth: '180px'
-  },
-  settingsPanelDivider: {
-    width: '50%',
-    position: 'relative',
-    display: 'flex',
-    flexFlow: 'column'
-  },
-  settingsPanelDividerFirst: {
-    alignItems: 'flex-start'
-  },
-  settingsPanelDividerLast: {
-    alignItems: 'flex-end'
-  },
-  bitcoinQRTitle: {
-    color: globalStyles.color.braveOrange,
-    textAlign: 'center'
-  },
-  qrcodeOverlayFooter: {
-    display: 'flex',
-    justifyContent: 'center',
-    background: globalStyles.color.gray,
-    padding: '15px 0'
-  },
-  qrcodeLogo: {
-    width: '130.5px',
-    height: '42.75px',
-    display: 'inline-block'
-  },
-  qrcodeImage: {
-    clear: 'both',
-    display: 'block',
-    margin: '0 auto'
-  },
-  appstoreLogo: {
-    background: `url(${IOS})`,
-    backgroundSize: '130.5px 42.75px',
-    marginRight: '5px'
-  },
-  playstoreLogo: {
-    background: `url(${Andorid})`,
-    backgroundSize: '130.5px 42.75px'
-  },
-  coinbaseLogo: {
-    width: '40px',
-    height: '40px',
-    display: 'inlineBlock',
-    marginTop: '1px',
-    marginRight: '10px',
-    background: `url(${CoinBase}) 0 0 / contain no-repeat`
-  },
-  settingsListTitle: {
-    color: '#444444',
-    fontWeight: 'bold',
-    fontSize: '15px',
-    margin: '0'
-  },
-  subTitle: {
-    clear: 'both',
-    fontWeight: 'normal',
-    fontSize: '14px',
-    fontStyle: 'italic',
-    lineHeight: '1.3em',
-    marginTop: '20px'
-  },
-  coinbaseFooter: {
-    justifyContent: 'space-between'
-  },
-  coinbase: {
-    display: 'flex',
-    alignItems: 'center'
-  },
-  coinbaseMessage: {
-    display: 'inline-block',
-    maxWidth: '450px'
-  },
-  bitcoinIcon: {
-    position: 'absolute',
-    left: '-5px',
-    top: 0
-  },
-  walletLabelText: {
-    fontSize: '1em',
-    color: globalStyles.color.braveOrange,
-    marginBottom: '5px'
-  },
-  walletAddressText: {
-    fontSize: '12px',
-    color: 'black',
-    marginBottom: '15px'
-  },
-  hasBitcoinHandler: {
-    display: 'flex',
-    flexFlow: 'column',
-    alignItems: 'flex-end'
-  },
-  alignMiddle: {
-    justifyContent: 'center'
-  },
-  faCircle: {
-    color: globalStyles.color.bitcoinOrange
-  },
   faBitcoin: {
     color: 'white',
     transform: 'rotate(12deg)'
+  },
+  faCircle: {
+    color: globalStyles.color.bitcoinOrange
   },
   faCreditCard: {
     fontSize: '30px'
   },
   faMobile: {
-    fontSize: '50px',
-    left: '-40px'
+    fontSize: '50px'
   },
-  fa: {
-    position: 'absolute',
-    left: '-45px'
+
+  coinbaseLogo: {
+    width: '40px',
+    height: '40px',
+    display: 'inline-block',
+    marginTop: '1px',
+    marginRight: '10px',
+    background: `url(${CoinBase}) 0 0 / contain no-repeat`
   },
-  dialogInsideMargin__bottom: {
+
+  // TODO: Refactor button to remove !important
+  panelButton: {
+    minWidth: '180px !important'
+  },
+
+  panel: {
+    display: 'flex'
+  },
+  panel__divider: {
+    width: '50%',
+    boxSizing: 'border-box',
+    display: 'flex',
+    flexFlow: 'column'
+  },
+  panel__divider_left: {
+    alignItems: 'flex-start'
+  },
+  panel__divider_right: {
+    alignItems: 'flex-end'
+  },
+
+  panel__divider_right__bitcoinPanel__walletLabelText: {
+    fontSize: '1em',
+    color: globalStyles.color.braveOrange,
+    marginBottom: '5px'
+  },
+  panel__divider_right__bitcoinPanel__walletAddressText: {
+    fontSize: '13px',
+    color: 'black',
+    marginBottom: globalStyles.spacing.dialogInsideMargin,
+    cursor: 'initial',
+    userSelect: 'initial'
+  },
+  panel__divider_right__bitcoinPanel__paymentURL: {
     marginBottom: globalStyles.spacing.dialogInsideMargin
+  },
+
+  panel__divider_left__titleWrapper: {
+    display: 'flex',
+    alignItems: 'flex-start'
+  },
+  panel__divider_left__titleWrapper_noSubTitle: {
+    alignItems: 'center'
+  },
+  panel__divider_left__titleWrapper__iconWrapper: {
+    display: 'flex',
+    justifyContent: 'center',
+    width: iconWrapperWidth
+  },
+  panel__divider_left__listTitleWrapper: {
+    maxWidth: `calc(100% - ${iconWrapperWidth})`
+  },
+  panel__divider_left__listTitleWrapper__title: {
+    color: '#444',
+    fontWeight: 'bold',
+    fontSize: '15px'
+  },
+  panel__divider_left__listTitleWrapper__subTitle: {
+    fontWeight: 'normal',
+    fontSize: '14px',
+    fontStyle: 'italic',
+    lineHeight: '1.3em',
+    marginTop: globalStyles.spacing.dialogInsideMargin
+  },
+  panel__divider_right__title: {
+    color: '#444',
+    fontWeight: 'bold',
+    fontSize: '15px'
+  },
+  panel__divider_right__subTitle: {
+    fontWeight: 'normal',
+    fontSize: '14px',
+    fontStyle: 'italic',
+    lineHeight: '1.3em',
+    marginTop: globalStyles.spacing.dialogInsideMargin
+  },
+
+  panel__coinbase: {
+    background: 'initial',
+    padding: `${panelPaddingBody} 0 ${panelPadding}`,
+    borderBottom: `3px solid ${globalStyles.color.modalLightGray}`
+  },
+  panel__bitcoinPanel: {
+    padding: `${panelPadding} 0`,
+    borderBottom: `3px solid ${globalStyles.color.modalLightGray}`
+  },
+  panel__smartphonePanel: {
+    padding: `${panelPadding} 0 ${panelPaddingBody}`
+  },
+
+  modalOverlay__qrcodeOverlay: {
+    display: 'flex',
+    flexFlow: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    border: 0,
+    width: '350px',
+    height: '350px',
+    margin: '100px auto 0 auto',
+    background: '#fff'
+  },
+  modalOverlay__qrcodeOverlay__content: {
+    textAlign: 'center'
+  },
+  modalOverlay__qrcodeOverlay__content__bitcoinQR: {
+    color: globalStyles.color.braveOrange
+  },
+  modalOverlay__qrcodeOverlay__footerWrapper: {
+    width: '100%'
+  },
+  modalOverlay__qrcodeOverlay__footerWrapper__footer: {
+    display: 'flex',
+    justifyContent: 'center',
+    background: globalStyles.color.gray,
+    padding: '15px 0',
+    width: '100%'
+  },
+  modalOverlay__qrcodeOverlay__footerWrapper__footer__qrcodeLogo: {
+    width: qrcodeLogoWidth,
+    height: qrcodeLogoHeight,
+    display: 'inline-block'
+  },
+  modalOverlay__qrcodeOverlay__footerWrapper__footer__appstoreLogo: {
+    background: `url(${IOS})`,
+    backgroundSize: `${qrcodeLogoWidth} ${qrcodeLogoHeight}`,
+    marginRight: '5px'
+  },
+  modalOverlay__qrcodeOverlay__footerWrapper__footer__playstoreLogo: {
+    background: `url(${Andorid})`,
+    backgroundSize: `${qrcodeLogoWidth} ${qrcodeLogoHeight}`
+  },
+
+  modalOverlay__coinbaseOverlay: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%',
+    width: '100%',
+    padding: 0,
+    margin: 0,
+    border: 0,
+    borderRadius: 0,
+    background: 'transparent',
+    boxShadow: 'none'
+  },
+  modalOverlay__coinbaseOverlay__header: {
+    padding: 0
+  },
+  modalOverlay__coinbaseOverlay__bodyWrapper: {
+    height: '100%',
+    width: '100%'
+  },
+  modalOverlay__coinbaseOverlay__bodyWrapper__body: {
+    padding: 0,
+    height: '100%',
+    width: '100%',
+    background: 'transparent'
+  },
+  modalOverlay__coinbaseOverlay__bodyWrapper__body__iframe: {
+    display: 'block',
+    width: '100%',
+    height: '100%',
+    border: 'none',
+    boxSizing: 'border-box',
+    margin: 0,
+    padding: 0,
+    overflow: 'hidden'
+  },
+  modalOverlay__coinbaseOverlay__footer: {
+    padding: 0
+  },
+
+  dashboardFooter: {
+    fontSize: '13px',
+    fontStyle: 'italic'
+  },
+  dashboardFooter_coinbaseFooter: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%'
+  },
+  dashboardFooter_coinbaseFooter__coinbaseMessageWrapper: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  dashboardFooter_coinbaseFooter__coinbaseMessageWrapper__message: {
+    display: 'inline-block',
+    maxWidth: '450px'
+  },
+  dashboardFooter_coinbaseFooter__doneButton: {
+    // TODO (Cezar): Remove !important once button components are refactored
+    marginRight: '30px !important' // 20px + 30px -> align the done button with other panelButtons
   }
 })
 
-module.exports = BitcoinDashboard
+module.exports = {
+  BitcoinDashboard,
+  BitcoinDashboardFooter
+}

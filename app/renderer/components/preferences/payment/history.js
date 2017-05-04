@@ -113,7 +113,7 @@ class HistoryFooter extends ImmutableComponent {
       reconcileDate: formattedTimeFromNow(timestamp)
     }
 
-    return <div className={css(styles.flexAlignCenter, styles.historyFooter)}>
+    return <section className={css(styles.flexAlignCenter, styles.historyFooter)}>
       <div className={css(styles.historyFooter__nextPayment)}>
         <span data-l10n-id={l10nDataId} data-l10n-args={JSON.stringify(l10nDataArgs)} />
       </div>
@@ -123,7 +123,7 @@ class HistoryFooter extends ImmutableComponent {
         testId='paymentHistoryOKText'
         onClick={this.props.hideOverlay.bind(this, 'paymentHistory')}
       />
-    </div>
+    </section>
   }
 }
 
@@ -153,8 +153,7 @@ const styles = StyleSheet.create({
 
   headerContainer__wrapper: {
     position: 'sticky',
-    top: 0,
-    background: paymentStylesVariables.color.paymentHistoryTableBackgroundColor
+    top: 0
   },
   headerContainer: {
     paddingTop: columnPadding,
