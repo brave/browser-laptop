@@ -56,9 +56,9 @@ const siteUtil = require('../state/siteUtil')
 const searchProviders = require('../data/searchProviders')
 const defaultBrowserState = require('../../app/common/state/defaultBrowserState')
 const shieldState = require('../../app/common/state/shieldState')
-const tabState = require('../../app/common/state/tabState')
 const siteSettingsState = require('../../app/common/state/siteSettingsState')
 const menuBarState = require('../../app/common/state/menuBarState')
+const windowState = require('../../app/common/state/windowState.js')
 
 // Util
 const _ = require('underscore')
@@ -658,12 +658,10 @@ class Main extends ImmutableComponent {
       enabled: isWindows(),
       captionButtonsVisible: isWindows(),
       menubarVisible: menubarVisible,
-      menubarTemplate: menubarVisible ? this.props.appState.getIn(['menu', 'template']) : null,
       menubarSelectedIndex: this.props.windowState.getIn(['ui', 'menubar', 'selectedIndex']),
       contextMenuSelectedIndex: typeof selectedIndex === 'object' && Array.isArray(selectedIndex) && selectedIndex.length > 0
         ? selectedIndex
         : null,
-      lastFocusedSelector: this.props.windowState.getIn(['ui', 'menubar', 'lastFocusedSelector']),
       isMaximized: isMaximized() || isFullScreen()
     }
   }
@@ -692,7 +690,6 @@ class Main extends ImmutableComponent {
     const autofillAddressPanelIsVisible = this.props.windowState.get('autofillAddressDetail')
     const autofillCreditCardPanelIsVisible = this.props.windowState.get('autofillCreditCardDetail')
     const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
-    const activeTab = tabState.getActiveTabValue(this.props.appState, getCurrentWindowId())
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
     const checkDefaultBrowserDialogIsVisible =
       isFocused() && defaultBrowserState.shouldDisplayDialog(this.props.appState)
@@ -700,20 +697,7 @@ class Main extends ImmutableComponent {
     const loginRequiredDetail = activeFrame ? basicAuthState.getLoginRequiredDetail(this.props.appState, activeFrame.get('tabId')) : null
     const customTitlebar = this.customTitlebar
     const contextMenuDetail = this.props.windowState.get('contextMenuDetail')
-    const shouldAllowWindowDrag = !contextMenuDetail &&
-      !this.props.windowState.get('bookmarkDetail') &&
-      !siteInfoIsVisible &&
-      !braveryPanelIsVisible &&
-      !clearBrowsingDataPanelIsVisible &&
-      !importBrowserDataPanelIsVisible &&
-      !widevinePanelIsVisible &&
-      !autofillAddressPanelIsVisible &&
-      !autofillCreditCardPanelIsVisible &&
-      !releaseNotesIsVisible &&
-      !checkDefaultBrowserDialogIsVisible &&
-      !noScriptIsVisible &&
-      activeFrame && !activeFrame.getIn(['security', 'loginRequiredDetail']) &&
-      !customTitlebar.menubarSelectedIndex
+    const shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(this.props.appState, this.props.windowState, activeFrame, isFocused())
 
     const appStateSites = this.props.appState.get('sites')
 
@@ -745,14 +729,7 @@ class Main extends ImmutableComponent {
         : null
       }
       <div className='top'>
-        <Navigator
-          appState={this.props.appState}
-          windowState={this.props.windowState}
-          activeTab={activeTab}
-          shouldAllowWindowDrag={shouldAllowWindowDrag}
-          customTitlebar={customTitlebar}
-          activeSiteSettings={activeSiteSettings}
-        />
+        <Navigator />
         {
           siteInfoIsVisible
           ? <SiteInfo frameProps={activeFrame}

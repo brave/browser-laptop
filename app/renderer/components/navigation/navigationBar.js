@@ -29,6 +29,8 @@ const {getCurrentWindowId} = require('../../currentWindow')
 // State
 const tabState = require('../../../common/state/tabState')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
+const menuBarState = require('../../../common/state/menuBarState')
+const siteSettingsState = require('../../../common/state/siteSettingsState')
 
 class NavigationBar extends React.Component {
   constructor (props) {
@@ -125,6 +127,7 @@ class NavigationBar extends React.Component {
     const loading = activeFrame.get('loading')
     const location = activeFrame.get('location') || ''
     const navbar = activeFrame.get('navbar') || Immutable.Map()
+    const isPrivate = activeFrame.get('isPrivate') || false
 
     const hasTitle = title && location && title !== location.replace(/^https?:\/\//, '')
     const titleMode = activeTabShowingMessageBox ||
@@ -151,9 +154,9 @@ class NavigationBar extends React.Component {
     props.loading = loading
     props.bookmarkDetail = bookmarkDetail
     props.mouseInTitlebar = mouseInTitlebar
-    props.enableNoScript = ownProps.enableNoScript
+    props.enableNoScript = siteSettingsState.isNoScriptEnabled(state, isPrivate)
     props.settings = state.get('settings')
-    props.menubarVisible = ownProps.menubarVisible
+    props.menubarVisible = menuBarState.isMenuBarVisible(windowState)
     props.siteSettings = state.get('siteSettings')
     props.synopsis = state.getIn(['publisherInfo', 'synopsis']) || new Immutable.Map()
     props.activeTabShowingMessageBox = activeTabShowingMessageBox

@@ -4,6 +4,8 @@
 
 const { makeImmutable, isMap, isList } = require('./immutableUtil')
 const assert = require('assert')
+const defaultBrowserState = require('./defaultBrowserState')
+const shieldState = require('./shieldState')
 
 // TODO(bridiver) - make these generic validation functions
 const validateId = function (propName, id) {
@@ -155,6 +157,30 @@ const api = {
     // TODO(bridiver) handle restoring state
     state = makeImmutable(state)
     return state.delete('windows')
+  },
+
+  // TODO (nejc) we should only pass in one state
+  // refactor when window state is merged into app state
+  shouldAllowWindowDrag: (state, windowState, frame, isFocused) => {
+    const braveryPanelIsVisible = shieldState.braveShieldsEnabled(frame) &&
+      windowState.get('braveryPanelDetail')
+    const checkDefaultBrowserDialogIsVisible = isFocused &&
+      defaultBrowserState.shouldDisplayDialog(state)
+
+    return !state.get('contextMenuDetail') &&
+      !windowState.get('bookmarkDetail') &&
+      !windowState.getIn(['ui', 'siteInfo', 'isVisible']) &&
+      !braveryPanelIsVisible &&
+      !windowState.getIn(['ui', 'isClearBrowsingDataPanelVisible']) &&
+      !windowState.get('importBrowserDataDetail') &&
+      !windowState.getIn(['widevinePanelDetail', 'shown']) &&
+      !windowState.get('autofillAddressDetail') &&
+      !windowState.get('autofillCreditCardDetail') &&
+      !windowState.getIn(['ui', 'releaseNotes', 'isVisible']) &&
+      !checkDefaultBrowserDialogIsVisible &&
+      !windowState.getIn(['ui', 'noScriptInfo', 'isVisible']) &&
+      frame && !frame.getIn(['security', 'loginRequiredDetail']) &&
+      !windowState.getIn(['ui', 'menubar', 'selectedIndex'])
   }
 }
 
