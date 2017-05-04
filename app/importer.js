@@ -21,7 +21,6 @@ const tabMessageBox = require('./browser/tabMessageBox')
 const {makeImmutable} = require('./common/state/immutableUtil')
 const tabState = require('./common/state/tabState')
 
-var isMergeFavorites = false
 var isImportingBookmarks = false
 var hasBookmarks
 var importedSites
@@ -31,9 +30,6 @@ exports.init = () => {
 }
 
 exports.importData = (selected) => {
-  if (selected.get('mergeFavorites')) {
-    isMergeFavorites = true
-  }
   if (selected.get('favorites')) {
     isImportingBookmarks = true
     const sites = AppStore.getState().get('sites')
@@ -48,9 +44,6 @@ exports.importData = (selected) => {
 
 exports.importHTML = (selected) => {
   isImportingBookmarks = true
-  if (selected.get('mergeFavorites')) {
-    isMergeFavorites = true
-  }
   const sites = AppStore.getState().get('sites')
   hasBookmarks = sites.find(
     (site) => siteUtil.isBookmark(site) || siteUtil.isFolder(site)
@@ -69,7 +62,6 @@ exports.importHTML = (selected) => {
 }
 
 importer.on('update-supported-browsers', (e, detail) => {
-  isMergeFavorites = false
   isImportingBookmarks = false
   if (BrowserWindow.getFocusedWindow()) {
     BrowserWindow.getFocusedWindow().webContents.send(messages.IMPORTER_LIST, detail)
@@ -124,27 +116,15 @@ importer.on('add-bookmarks', (e, bookmarks, topLevelFolder) => {
   let pathMap = {}
   let sites = []
   let topLevelFolderId = 0
-  if (!isMergeFavorites) {
-    topLevelFolderId = nextFolderIdObject.id++
-    sites.push({
-      customTitle: topLevelFolder,
-      folderId: topLevelFolderId,
-      parentFolderId: 0,
-      lastAccessedTime: 0,
-      creationTime: (new Date()).getTime(),
-      tags: [siteTags.BOOKMARK_FOLDER]
-    })
-  } else {
-    // Merge into existing bookmark toolbar
-    pathMap[topLevelFolder] = topLevelFolderId
-    pathMap['Bookmarks Toolbar'] = 0 // Firefox
-    pathMap['Bookmarks Bar'] = 0 // Chrome on mac
-    pathMap['Other Bookmarks'] = -1 // Chrome on mac
-    pathMap['Bookmarks bar'] = 0 // Chrome on win/linux
-    pathMap['Other bookmarks'] = -1 // Chrome on win/linux
-    pathMap['Bookmark Bar'] = 0 // Safari
-    pathMap['Links'] = 0 // Edge, IE
-  }
+  topLevelFolderId = nextFolderIdObject.id++
+  sites.push({
+    customTitle: siteUtil.getNextFolderName(AppStore.getState().get('sites'), topLevelFolder),
+    folderId: topLevelFolderId,
+    parentFolderId: 0,
+    lastAccessedTime: 0,
+    creationTime: (new Date()).getTime(),
+    tags: [siteTags.BOOKMARK_FOLDER]
+  })
   for (let i = 0; i < bookmarks.length; ++i) {
     let path = bookmarks[i].path
     let parentFolderId = getParentFolderId(path, pathMap, sites, topLevelFolderId, nextFolderIdObject)
