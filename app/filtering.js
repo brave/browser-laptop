@@ -736,12 +736,12 @@ module.exports.isResourceEnabled = (resourceName, url, isPrivate) => {
  * This includes: appcache, cookies, filesystem, indexdb, local storage,
  * shadercache, websql, and serviceworkers.
  */
-var clear = (ses, f) => { return () => { try { ses[f]() } catch (ex) {} } }
-
 module.exports.clearStorageData = () => {
   for (let partition in registeredSessions) {
     let ses = registeredSessions[partition]
-    setImmediate(clear(ses, 'clearStorageData').bind(ses))
+    setImmediate(() => {
+      ses.clearStorageData(() => {})
+    })
   }
 }
 
@@ -751,7 +751,9 @@ module.exports.clearStorageData = () => {
 module.exports.clearCache = () => {
   for (let partition in registeredSessions) {
     let ses = registeredSessions[partition]
-    setImmediate(clear(ses, 'clearCache').bind(ses))
+    setImmediate(() => {
+      ses.clearCache(() => {})
+    })
   }
 }
 
