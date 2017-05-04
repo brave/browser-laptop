@@ -7,7 +7,7 @@
 const windowConstants = require('../../../js/constants/windowConstants')
 const {aboutUrls, isNavigatableAboutPage, isSourceAboutUrl, isUrl, getSourceAboutUrl, getSourceMagnetUrl} = require('../../../js/lib/appUrlUtil')
 const {isURL, isPotentialPhishingUrl, getUrlFromInput} = require('../../../js/lib/urlutil')
-const {getFrameByKey, getFrameKeyByTabId, activeFrameStatePath, frameStatePath, frameStatePathForFrame, getActiveFrame, tabStatePath, getFrameByTabId} = require('../../../js/state/frameStateUtil')
+const {getFrameByKey, getFrameKeyByTabId, activeFrameStatePath, frameStatePath, frameStatePathForFrame, getActiveFrame, getFrameByTabId} = require('../../../js/state/frameStateUtil')
 const getSetting = require('../../../js/settings').getSetting
 const {isBookmark, isDefaultEntry, isHistoryEntry} = require('../../../js/state/siteUtil')
 const fetchSearchSuggestions = require('../fetchSearchSuggestions')
@@ -400,9 +400,6 @@ const urlBarReducer = (state, action) => {
       state = state.mergeIn(frameStatePath(state, key), {
         location: action.location
       })
-      state = state.mergeIn(tabStatePath(state, key), {
-        location: action.location
-      })
       if (!action.isNavigatedInPage) {
         state = state.mergeIn(frameStatePath(state, key), {
           adblock: {},
@@ -416,15 +413,6 @@ const urlBarReducer = (state, action) => {
           title: '',
           trackingProtection: {},
           fingerprintingProtection: {}
-        })
-        // TODO: This should be moved into a tabs reducer
-        state = state.mergeIn(tabStatePath(state, key), {
-          audioPlaybackActive: false,
-          themeColor: undefined,
-          location: action.location,
-          computedThemeColor: undefined,
-          icon: undefined,
-          title: ''
         })
       }
 

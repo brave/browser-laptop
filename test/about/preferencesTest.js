@@ -82,9 +82,9 @@ describe('General Panel', function () {
         .waitForBrowserWindow()
         .waitUntil(function () {
           return this.getWindowState().then((val) => {
-            return (val.value.tabs.length === 2 &&
-              val.value.tabs[0].location === page1 &&
-              val.value.tabs[1].location === page2
+            return (val.value.frames.length === 2 &&
+              val.value.frames[0].location === page1 &&
+              val.value.frames[1].location === page2
             )
           })
         })

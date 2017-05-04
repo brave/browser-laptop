@@ -32,7 +32,7 @@ describe('Tabs content - Favicon', function () {
   it('should show favicon if page has one', function () {
     const wrapper = shallow(
       <Favicon
-        tab={
+        frame={
           Immutable.Map({
             location: url1,
             icon: favicon1
@@ -44,7 +44,7 @@ describe('Tabs content - Favicon', function () {
   it('should show a placeholder icon if page has no favicon', function () {
     const wrapper = shallow(
       <Favicon
-        tab={
+        frame={
           Immutable.Map({
             location: url1,
             icon: null
@@ -57,7 +57,7 @@ describe('Tabs content - Favicon', function () {
   it('should show a loading icon if page is still loading', function () {
     const wrapper = shallow(
       <Favicon
-        tab={
+        frame={
           Immutable.Map({
             location: url1,
             icon: favicon1
@@ -70,7 +70,7 @@ describe('Tabs content - Favicon', function () {
   it('should not show favicon for new tab page', function () {
     const wrapper = shallow(
       <Favicon
-        tab={
+        frame={
           Immutable.Map({
             location: 'about:newtab'
           })}

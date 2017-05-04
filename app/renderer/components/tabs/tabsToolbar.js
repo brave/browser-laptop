@@ -34,8 +34,8 @@ class TabsToolbar extends ImmutableComponent {
     const index = this.props.previewTabPageIndex !== undefined
       ? this.props.previewTabPageIndex : this.props.tabPageIndex
     const startingFrameIndex = index * this.props.tabsPerTabPage
-    const pinnedTabs = this.props.tabs.filter((tab) => tab.get('pinnedLocation'))
-    const unpinnedTabs = this.props.tabs.filter((tab) => !tab.get('pinnedLocation'))
+    const pinnedTabs = this.props.frames.filter((tab) => tab.get('pinnedLocation'))
+    const unpinnedTabs = this.props.frames.filter((tab) => !tab.get('pinnedLocation'))
     const currentTabs = unpinnedTabs
       .slice(startingFrameIndex, startingFrameIndex + this.props.tabsPerTabPage)
     return <div className='tabsToolbar'

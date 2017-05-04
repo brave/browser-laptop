@@ -119,12 +119,6 @@ describe('Window store unit tests', function () {
             assert.equal(windowState.getIn(['frames', 0, 'endLoadTime']), null)
           })
         })
-
-        describe('for tabs', function () {
-          it('sets loading=true for tab', function () {
-            assert.equal(windowState.getIn(['tabs', 0, 'loading']), true)
-          })
-        })
       })
     })
 

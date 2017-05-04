@@ -25,7 +25,7 @@ class PrivateIcon extends ImmutableComponent {
       }
     })
 
-    return this.props.tab.get('isPrivate') && hasVisibleSecondaryIcon(this.props)
+    return this.props.frame.get('isPrivate') && hasVisibleSecondaryIcon(this.props)
       ? <TabIcon data-test-id='privateIcon'
         className={css(tabStyles.icon, styles.secondaryIcon, privateStyles.icon)}
       />

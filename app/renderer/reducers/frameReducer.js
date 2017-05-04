@@ -33,7 +33,6 @@ const closeFrame = (state, action) => {
   const activeFrameKey = frameStateUtil.getActiveFrame(state).get('key')
   state = state.merge(frameStateUtil.removeFrame(
     state.get('frames'),
-    state.get('tabs'),
     state.get('closedFrames'),
     frameProps.set('closedAtIndex', index),
     activeFrameKey,

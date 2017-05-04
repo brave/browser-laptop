@@ -382,44 +382,6 @@ function getPartitionFromNumber (partitionNumber, incognito) {
   return `persist:partition-${partitionNumber}`
 }
 
-/**
- * Returns an object in the same format that was passed to it (ImmutableJS/POD)
- * for the subset of frame data that is used for tabs.
- */
-const tabFromFrame = (frame) => {
-  return frame.toJS
-  ? Immutable.fromJS({
-    themeColor: frame.get('themeColor'),
-    computedThemeColor: frame.get('computedThemeColor'),
-    icon: frame.get('icon'),
-    audioPlaybackActive: frame.get('audioPlaybackActive'),
-    audioMuted: frame.get('audioMuted'),
-    title: frame.get('title'),
-    isPrivate: frame.get('isPrivate'),
-    partitionNumber: frame.get('partitionNumber'),
-    frameKey: frame.get('key'),
-    loading: isFrameLoading(frame),
-    provisionalLocation: frame.get('provisionalLocation'),
-    pinnedLocation: frame.get('pinnedLocation'),
-    location: frame.get('location')
-  })
-  : {
-    themeColor: frame.themeColor,
-    computedThemeColor: frame.computedThemeColor,
-    icon: frame.icon,
-    audioPlaybackActive: frame.audioPlaybackActive,
-    audioMuted: frame.audioMuted,
-    title: frame.title,
-    isPrivate: frame.isPrivate,
-    partitionNumber: frame.partitionNumber,
-    frameKey: frame.key,
-    loading: frame.loading,
-    provisionalLocation: frame.provisionalLocation,
-    pinnedLocation: frame.pinnedLocation,
-    location: frame.location
-  }
-}
-
 const frameOptsFromFrame = (frame) => {
   return frame
     .delete('key')
@@ -433,7 +395,7 @@ const frameOptsFromFrame = (frame) => {
  * Adds a frame specified by frameOpts and newKey and sets the activeFrameKey
  * @return Immutable top level application state ready to merge back in
  */
-function addFrame (windowState, tabs, frameOpts, newKey, partitionNumber, activeFrameKey, insertionIndex) {
+function addFrame (windowState, frameOpts, newKey, partitionNumber, activeFrameKey, insertionIndex) {
   const frames = windowState.get('frames')
   const url = frameOpts.location || config.defaultUrl
 
@@ -499,7 +461,6 @@ function addFrame (windowState, tabs, frameOpts, newKey, partitionNumber, active
   }, frameOpts))
 
   return {
-    tabs: tabs.splice(insertionIndex, 0, tabFromFrame(frame)),
     frames: frames.splice(insertionIndex, 0, frame),
     activeFrameKey
   }
@@ -509,7 +470,7 @@ function addFrame (windowState, tabs, frameOpts, newKey, partitionNumber, active
  * Removes a frame specified by frameProps
  * @return Immutable top level application state ready to merge back in
  */
-function removeFrame (frames, tabs, closedFrames, frameProps, activeFrameKey, framePropsIndex, closeAction) {
+function removeFrame (frames, closedFrames, frameProps, activeFrameKey, framePropsIndex, closeAction) {
   function getNewActiveFrame (activeFrameIndex) {
     // Go to the next frame if it exists.
     let index = activeFrameIndex
@@ -550,7 +511,6 @@ function removeFrame (frames, tabs, closedFrames, frameProps, activeFrameKey, fr
   }
 
   const newFrames = frames.splice(framePropsIndex, 1)
-  const newTabs = tabs.splice(framePropsIndex, 1)
   let newActiveFrameKey = activeFrameKey
 
   // If the frame being removed IS ACTIVE
@@ -581,7 +541,6 @@ function removeFrame (frames, tabs, closedFrames, frameProps, activeFrameKey, fr
     previewFrameKey: null,
     activeFrameKey: newActiveFrameKey,
     closedFrames,
-    tabs: newTabs,
     frames: newFrames
   }
 }
@@ -633,12 +592,6 @@ const activeFrameStatePath = (windowState) => frameStatePath(windowState, window
 const frameStatePathForFrame = (windowState, frameProps) =>
   ['frames', getFramePropsIndex(windowState.get('frames'), frameProps)]
 
-const tabStatePath = (windowState, frameKey) =>
-  ['tabs', findIndexForFrameKey(windowState.get('frames'), frameKey)]
-
-const tabStatePathForFrame = (windowState, frameProps) =>
-  ['tabs', getFramePropsIndex(windowState.get('frames'), frameProps)]
-
 module.exports = {
   query,
   find,
@@ -686,15 +639,12 @@ module.exports = {
   getPartitionFromNumber,
   addFrame,
   removeFrame,
-  tabFromFrame,
   frameOptsFromFrame,
   getFrameKeyByTabId,
   getFrameTabPageIndex,
   frameStatePath,
   activeFrameStatePath,
   frameStatePathForFrame,
-  tabStatePath,
-  tabStatePathForFrame,
   getLastCommittedURL,
   getFrameByLastAccessedTime,
   onFindBarHide,
