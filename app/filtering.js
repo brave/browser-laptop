@@ -740,7 +740,7 @@ module.exports.clearStorageData = () => {
   for (let partition in registeredSessions) {
     let ses = registeredSessions[partition]
     setImmediate(() => {
-      ses.clearStorageData(() => {})
+      ses.clearStorageData.bind(ses)(() => {})
     })
   }
 }
@@ -752,7 +752,7 @@ module.exports.clearCache = () => {
   for (let partition in registeredSessions) {
     let ses = registeredSessions[partition]
     setImmediate(() => {
-      ses.clearCache(() => {})
+      ses.clearCache.bind(ses)(() => {})
     })
   }
 }
