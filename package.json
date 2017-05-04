@@ -188,8 +188,8 @@
     "style-loader": "^0.13.0",
     "uglify-js-harmony": "^2.7.5",
     "webdriverio": "4.2.5",
-    "webpack": "^1.12.9",
-    "webpack-dev-server": "^1.14.0",
+    "webpack": "^2.3.2",
+    "webpack-dev-server": "^2.4.2",
     "webpack-notifier": "^1.2.1",
     "xml2js": "^0.4.15"
   },
