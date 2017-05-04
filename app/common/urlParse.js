@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const LRUCache = require('lru-cache')
-const urlParse = require('url').parse
+const urlParse = require('fast-url-parser').parse
 const config = require('../../js/constants/config')
 let cachedUrlParse = new LRUCache(config.cache.urlParse)
 
@@ -14,7 +14,23 @@ module.exports = (url, ...args) => {
     return Object.assign({}, parsedUrl)
   }
 
-  parsedUrl = urlParse(url, ...args)
+  // In fast-url-parser href, port, prependSlash, protocol, and query
+  // are lazy so access them.
+  const raw = urlParse(url, ...args)
+  parsedUrl = {
+    auth: raw.auth,
+    hash: raw.hash,
+    host: raw.host,
+    hostname: raw.hostname,
+    href: raw.href,
+    path: raw.path,
+    pathname: raw.pathname,
+    port: raw.port,
+    protocol: raw.protocol,
+    query: raw.query,
+    search: raw.search,
+    slashes: raw.slashes
+  }
   cachedUrlParse.set(url, parsedUrl)
   return parsedUrl
 }
