@@ -9,14 +9,13 @@ const {aboutUrls, isNavigatableAboutPage, isSourceAboutUrl, isUrl, getSourceAbou
 const {isURL, isPotentialPhishingUrl, getUrlFromInput} = require('../../../js/lib/urlutil')
 const {getFrameByKey, getFrameKeyByTabId, activeFrameStatePath, frameStatePath, frameStatePathForFrame, getActiveFrame, tabStatePath, getFrameByTabId} = require('../../../js/state/frameStateUtil')
 const getSetting = require('../../../js/settings').getSetting
-const {isDefaultEntry} = require('../../../js/state/siteUtil')
+const {isBookmark, isDefaultEntry, isHistoryEntry} = require('../../../js/state/siteUtil')
 const fetchSearchSuggestions = require('../fetchSearchSuggestions')
 const searchProviders = require('../../../js/data/searchProviders')
 const settings = require('../../../js/constants/settings')
 const Immutable = require('immutable')
 const config = require('../../../js/constants/config')
 const top500 = require('../../../js/data/top500')
-const siteTags = require('../../../js/constants/siteTags')
 const suggestion = require('../lib/suggestion')
 const suggestionTypes = require('../../../js/constants/suggestionTypes')
 const {navigateSiteClickHandler, frameClickHandler} = require('../suggestionClickHandlers')
@@ -129,11 +128,6 @@ const updateUrlSuffix = (state, suggestionList) => {
 const generateNewSuggestionsList = (state) => {
   const activeFrameKey = state.get('activeFrameKey')
   const urlLocation = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'location']))
-  let sites = appStoreRenderer.state.get('sites')
-  if (sites) {
-    // Filter out Brave default newtab sites and sites with falsey location
-    sites = sites.filter((site) => !isDefaultEntry(site) && site.get('location'))
-  }
   const searchResults = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'searchResults']))
   const frameSearchDetail = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'searchDetail']))
   const searchDetail = state.get('searchDetail')
@@ -148,27 +142,32 @@ const generateNewSuggestionsList = (state) => {
   const mapListToElements = ({data, maxResults, type, clickHandler = navigateSiteClickHandler.bind(this),
       sortHandler = defaultme, formatTitle = defaultme, formatUrl = defaultme,
       filterValue = (site) => {
-        return site.toLowerCase().includes(urlLocationLower)
+        return site.toLowerCase().indexOf(urlLocationLower) !== -1
       }
-  }) => // Filter out things which are already in our own list at a smaller index
-    data
-    // Per suggestion provider filter
-    .filter(filterValue)
+  }) => {
+    // Filter out things which are already in our own list at a smaller index
     // Filter out things which are already in the suggestions list
-    .filter((site) =>
+    let filteredData = data.filter((site) =>
       suggestionsList.findIndex((x) => (x.location || '').toLowerCase() === (formatUrl(site) || '').toLowerCase()) === -1 ||
         // Tab autosuggestions should always be included since they will almost always be in history
         type === suggestionTypes.TAB)
-    .sort(sortHandler)
-    .take(maxResults)
-    .map((site) => {
-      return {
-        onClick: clickHandler.bind(null, site),
-        title: formatTitle(site),
-        location: formatUrl(site),
-        type
-      }
-    })
+    // Per suggestion provider filter
+    if (filterValue) {
+      filteredData = filteredData.filter(filterValue)
+    }
+
+    return filteredData
+      .sort(sortHandler)
+      .take(maxResults)
+      .map((site) => {
+        return {
+          onClick: clickHandler.bind(null, site),
+          title: formatTitle(site),
+          location: formatUrl(site),
+          type
+        }
+      })
+  }
 
   const shouldNormalize = suggestion.shouldNormalizeLocation(urlLocationLower)
   const urlLocationLowerNormalized = suggestion.normalizeLocation(urlLocationLower)
@@ -201,62 +200,73 @@ const generateNewSuggestionsList = (state) => {
     }
   }
 
-  const historyFilter = (site) => {
-    if (!site) {
-      return false
-    }
-    const title = site.get('title') || ''
-    const location = site.get('location') || ''
+  // NOTE: Iterating sites can take a long time! Please be mindful when
+  // working with the history and bookmark suggestion code.
+  const historySuggestionsOn = getSetting(settings.HISTORY_SUGGESTIONS)
+  const bookmarkSuggestionsOn = getSetting(settings.BOOKMARK_SUGGESTIONS)
+  const shouldIterateSites = historySuggestionsOn || bookmarkSuggestionsOn
+  if (shouldIterateSites) {
     // Note: Bookmark sites are now included in history. This will allow
     // sites to appear in the auto-complete regardless of their bookmark
     // status. If history is turned off, bookmarked sites will appear
     // in the bookmark section.
-    return (title.toLowerCase().includes(urlLocationLower) ||
-            location.toLowerCase().includes(urlLocationLower)) &&
-            site.get('lastAccessedTime')
-  }
-  var historySites = sites.filter(historyFilter)
-
-  // potentially append virtual history items (such as www.google.com when
-  // searches have been made but the root site has not been visited)
-  historySites = historySites.concat(suggestion.createVirtualHistoryItems(historySites))
-
-  // history
-  if (getSetting(settings.HISTORY_SUGGESTIONS)) {
-    suggestionsList = suggestionsList.concat(mapListToElements({
-      data: historySites,
-      maxResults: config.urlBarSuggestions.maxHistorySites,
-      type: suggestionTypes.HISTORY,
-      clickHandler: navigateSiteClickHandler((site) => {
-        return site.get('location')
-      }),
-      sortHandler: sortBasedOnLocationPos,
-      formatTitle: (site) => site.get('title'),
-      formatUrl: (site) => site.get('location'),
-      filterValue: historyFilter
-    }))
-  }
-
-  // bookmarks
-  if (getSetting(settings.BOOKMARK_SUGGESTIONS)) {
-    suggestionsList = suggestionsList.concat(mapListToElements({
-      data: sites,
-      maxResults: config.urlBarSuggestions.maxBookmarkSites,
-      type: suggestionTypes.BOOKMARK,
-      clickHandler: navigateSiteClickHandler((site) => {
-        return site.get('location')
-      }),
-      sortHandler: sortBasedOnLocationPos,
-      formatTitle: (site) => site.get('title'),
-      formatUrl: (site) => site.get('location'),
-      filterValue: (site) => {
-        const title = site.get('title') || ''
-        const location = site.get('location') || ''
-        return (title.toLowerCase().includes(urlLocationLower) ||
-          location.toLowerCase().includes(urlLocationLower)) &&
-          site.get('tags') && site.get('tags').includes(siteTags.BOOKMARK)
+    const sitesFilter = (site) => {
+      const location = site.get('location')
+      if (!location) {
+        return false
       }
-    }))
+      const title = site.get('title')
+      return location.toLowerCase().indexOf(urlLocationLower) !== -1 ||
+        (title && title.toLowerCase().indexOf(urlLocationLower) !== -1)
+    }
+
+    let historySites = new Immutable.List()
+    let bookmarkSites = new Immutable.List()
+    const sites = appStoreRenderer.state.get('sites')
+    sites.forEach(site => {
+      if (!sitesFilter(site)) {
+        return
+      }
+      if (historySuggestionsOn && isHistoryEntry(site) && !isDefaultEntry(site)) {
+        historySites = historySites.push(site)
+        return
+      }
+      if (bookmarkSuggestionsOn && isBookmark(site) && !isDefaultEntry(site)) {
+        bookmarkSites = bookmarkSites.push(site)
+      }
+    })
+
+    if (historySites.size > 0) {
+      historySites = historySites.concat(suggestion.createVirtualHistoryItems(historySites))
+
+      suggestionsList = suggestionsList.concat(mapListToElements({
+        data: historySites,
+        maxResults: config.urlBarSuggestions.maxHistorySites,
+        type: suggestionTypes.HISTORY,
+        clickHandler: navigateSiteClickHandler((site) => {
+          return site.get('location')
+        }),
+        sortHandler: sortBasedOnLocationPos,
+        formatTitle: (site) => site.get('title'),
+        formatUrl: (site) => site.get('location'),
+        filterValue: null
+      }))
+    }
+
+    if (bookmarkSites.size > 0) {
+      suggestionsList = suggestionsList.concat(mapListToElements({
+        data: bookmarkSites,
+        maxResults: config.urlBarSuggestions.maxBookmarkSites,
+        type: suggestionTypes.BOOKMARK,
+        clickHandler: navigateSiteClickHandler((site) => {
+          return site.get('location')
+        }),
+        sortHandler: sortBasedOnLocationPos,
+        formatTitle: (site) => site.get('title'),
+        formatUrl: (site) => site.get('location'),
+        filterValue: null
+      }))
+    }
   }
 
   // about pages
@@ -279,8 +289,8 @@ const generateNewSuggestionsList = (state) => {
       filterValue: (frame) => !isSourceAboutUrl(frame.get('location')) &&
         frame.get('key') !== activeFrameKey &&
         (
-          (frame.get('title') && frame.get('title').toLowerCase().includes(urlLocationLower)) ||
-          (frame.get('location') && frame.get('location').toLowerCase().includes(urlLocationLower))
+          (frame.get('title') && frame.get('title').toLowerCase().indexOf(urlLocationLower) !== -1) ||
+          (frame.get('location') && frame.get('location').toLowerCase().indexOf(urlLocationLower) !== -1)
         )
     }))
   }
