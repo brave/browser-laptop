@@ -751,7 +751,9 @@ module.exports.clearStorageData = () => {
 module.exports.clearCache = () => {
   for (let partition in registeredSessions) {
     let ses = registeredSessions[partition]
-    setImmediate(ses.clearCache.bind(ses))
+    setImmediate(() => {
+      ses.clearCache(() => {})
+    })
   }
 }
 
