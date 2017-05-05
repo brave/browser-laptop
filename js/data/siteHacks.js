@@ -139,5 +139,9 @@ module.exports.siteHacks = {
   },
   'www.youtube.com': {
     allowFirstPartyAdblockChecks: true
-  }
+  },
+   'www.theatlantic.com': {
+    allowFirstPartyAdblockChecks: true
+  } 
 }
+
