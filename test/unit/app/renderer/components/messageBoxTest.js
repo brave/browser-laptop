@@ -84,13 +84,13 @@ describe('MessageBox component unit tests', function () {
       assert.equal(wrapper.find('button[data-l10n-id="OK"].primaryButton').length, 1)
     })
 
-    it('renders the button index 1 as whiteButton', function () {
+    it('renders the button index 1 as secondaryButton', function () {
       const wrapper = mount(
         <MessageBox
           tabId={tabId}
         />
       )
-      assert.equal(wrapper.find('button[data-l10n-id="Cancel"].whiteButton').length, 1)
+      assert.equal(wrapper.find('button[data-l10n-id="Cancel"][data-test-id="secondaryColor"]').length, 1)
     })
 
     it('hides the suppress checkbox if showSuppress is false', function () {
@@ -133,7 +133,7 @@ describe('MessageBox component unit tests', function () {
         suppress: detail1.suppress,
         result: true
       }
-      wrapper.find('button[data-l10n-id="OK"].primaryButton').simulate('click')
+      wrapper.find('button[data-l10n-id="OK"][data-test-id="primaryColor"]').simulate('click')
       assert.equal(spy.withArgs(tabId, response).calledOnce, true)
       appActions.tabMessageBoxDismissed.restore()
     })
@@ -149,7 +149,7 @@ describe('MessageBox component unit tests', function () {
         suppress: detail1.suppress,
         result: false
       }
-      wrapper.find('button[data-l10n-id="Cancel"].whiteButton').simulate('click')
+      wrapper.find('button[data-l10n-id="Cancel"][data-test-id="secondaryColor"]').simulate('click')
       assert.equal(spy.withArgs(tabId, response).calledOnce, true)
       appActions.tabMessageBoxDismissed.restore()
     })

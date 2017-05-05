@@ -7,7 +7,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 
 // components
 const ImmutableComponent = require('../../immutableComponent')
-const Button = require('../../../../../js/components/button')
+const BrowserButton = require('../../common/browserButton')
 
 // style
 const globalStyles = require('../../styles/global')
@@ -27,8 +27,7 @@ class LedgerBackupContent extends ImmutableComponent {
     return <section>
       <span data-l10n-id='ledgerBackupContent' />
       <div className={css(styles.copyKeyContainer)}>
-        {/* TODO: refactor button */}
-        <Button className='whiteButton'
+        <BrowserButton secondaryColor
           l10nId='copy'
           testId='copyButtonFirst'
           onClick={this.copyToClipboard.bind(this, paymentId)}
@@ -39,8 +38,7 @@ class LedgerBackupContent extends ImmutableComponent {
         </div>
       </div>
       <div className={css(styles.copyKeyContainer)}>
-        {/* TODO: refactor button */}
-        <Button className='whiteButton'
+        <BrowserButton secondaryColor
           l10nId='copy'
           testId='copyButtonSecond'
           onClick={this.copyToClipboard.bind(this, passphrase)}
@@ -75,17 +73,17 @@ class LedgerBackupFooter extends ImmutableComponent {
 
   render () {
     return <section>
-      <Button className='primaryButton'
+      <BrowserButton primaryColor
         l10nId='printKeys'
         testId='printKeysButton'
         onClick={this.printKeys}
       />
-      <Button className='primaryButton'
+      <BrowserButton primaryColor
         l10nId='saveRecoveryFile'
         testId='saveRecoveryFileButton'
         onClick={this.saveKeys}
       />
-      <Button className='whiteButton'
+      <BrowserButton secondaryColor
         l10nId='done'
         testId='doneButton'
         onClick={this.props.hideOverlay.bind(this, 'ledgerBackup')}

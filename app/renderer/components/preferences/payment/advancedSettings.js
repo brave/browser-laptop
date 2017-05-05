@@ -10,7 +10,7 @@ const {changeSetting} = require('../../../lib/settingsUtil')
 const appConfig = require('../../../../../js/constants/appConfig')
 
 // components
-const Button = require('../../../../../js/components/button')
+const BrowserButton = require('../../common/browserButton')
 const {SettingsList, SettingItem, SettingCheckbox} = require('../../settings')
 const {SettingDropdown} = require('../../common/dropdown')
 const ImmutableComponent = require('../../immutableComponent')
@@ -89,17 +89,17 @@ class AdvancedSettingsContent extends ImmutableComponent {
 class AdvancedSettingsFooter extends ImmutableComponent {
   render () {
     return <section>
-      <Button className='primaryButton'
+      <BrowserButton groupedItem primaryColor
         l10nId='backupLedger'
         testId='backupLedgerButton'
         onClick={this.props.showOverlay.bind(this, 'ledgerBackup')}
       />
-      <Button className='primaryButton'
+      <BrowserButton groupedItem primaryColor
         l10nId='recoverLedger'
         testId='recoverLedgerButton'
         onClick={this.props.showOverlay.bind(this, 'ledgerRecovery')}
       />
-      <Button className='whiteButton'
+      <BrowserButton groupedItem secondaryColor
         l10nId='done'
         testId='doneButton'
         onClick={this.props.hideOverlay.bind(this, 'advancedSettings')}

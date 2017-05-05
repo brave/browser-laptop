@@ -13,7 +13,7 @@ const {changeSetting} = require('../../../lib/settingsUtil')
 
 // components
 const ImmutableComponent = require('../../immutableComponent')
-const Button = require('../../../../../js/components/button')
+const BrowserButton = require('../../common/browserButton')
 const {FormTextbox} = require('../../common/textbox')
 const {FormDropdown} = require('../../common/dropdown')
 const {SettingsList, SettingItem} = require('../../settings')
@@ -22,7 +22,6 @@ const LedgerTable = require('./ledgerTable')
 // style
 const globalStyles = require('../../styles/global')
 const {paymentStyles} = require('../../styles/payment')
-const commonStyles = require('../../styles/commonStyles')
 const cx = require('../../../../../js/lib/classSet')
 
 // other
@@ -42,11 +41,11 @@ class EnabledContent extends ImmutableComponent {
       ? this.props.showOverlay.bind(this, 'addFunds')
       : (ledgerData.get('creating') ? () => {} : this.createWallet())
 
-    return <Button
+    return <BrowserButton primaryColor
       testId={buttonText}
       test2Id={'addFunds'}
       l10nId={buttonText}
-      className={css(commonStyles.primaryButton, styles.addFunds)}
+      custom={styles.addFunds}
       onClick={onButtonClick.bind(this)}
       disabled={ledgerData.get('creating')}
     />

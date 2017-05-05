@@ -9,12 +9,11 @@ const {StyleSheet, css} = require('aphrodite')
 const ImmutableComponent = require('../../immutableComponent')
 const SortableTable = require('../../../../../js/components/sortableTable')
 const SwitchControl = require('../../../../../js/components/switchControl')
-const Button = require('../../../../../js/components/button')
+const BrowserButton = require('../../common/browserButton')
 const PinnedInput = require('./pinnedInput')
 
 // style
 const globalStyles = require('../../styles/global')
-const commonStyles = require('../../styles/commonStyles')
 const verifiedGreenIcon = require('../../../../extensions/brave/img/ledger/verified_green_icon.svg')
 const verifiedWhiteIcon = require('../../../../extensions/brave/img/ledger/verified_white_icon.svg')
 const removeIcon = require('../../../../extensions/brave/img/ledger/icon_remove.svg')
@@ -302,9 +301,8 @@ class LedgerTable extends ImmutableComponent {
       {
         (totalUnPinnedRows !== unPinnedRows.size && hideLower)
         ? <div className={css(styles.showAllWrap)}>
-          <Button
+          <BrowserButton secondaryColor
             l10nId={hideLower ? 'showAll' : 'hideLower'}
-            className={css(commonStyles.whiteButton)}
             onClick={this.showAll.bind(this, !hideLower)}
           />
         </div>

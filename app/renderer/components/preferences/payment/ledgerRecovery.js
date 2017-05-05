@@ -10,7 +10,7 @@ const {btcToCurrencyString} = require('../../../../common/lib/ledgerUtil')
 
 // components
 const ImmutableComponent = require('../../immutableComponent')
-const Button = require('../../../../../js/components/button')
+const BrowserButton = require('../../common/browserButton')
 const {RecoveryKeyTextbox} = require('../../common/textbox')
 const {SettingsList, SettingItem} = require('../../settings')
 
@@ -58,7 +58,7 @@ class LedgerRecoveryContent extends ImmutableComponent {
               data-l10n-id='balanceRecovered'
               data-l10n-args={JSON.stringify(l10nDataArgs)}
             />
-            <Button className='whiteButton'
+            <BrowserButton secondaryColor
               l10nId='ok'
               testId='okButton'
               onClick={this.clearRecoveryStatus.bind(this)}
@@ -73,7 +73,7 @@ class LedgerRecoveryContent extends ImmutableComponent {
             <p className={css(styles.recoveryOverlay__textColor, styles.recoveryOverlay__spaceAround)}
               data-l10n-id='ledgerRecoveryNetworkFailedMessage'
             />
-            <Button className='whiteButton'
+            <BrowserButton secondaryColor
               l10nId='ok'
               testId='okButton'
               onClick={this.clearRecoveryStatus.bind(this)}
@@ -88,7 +88,7 @@ class LedgerRecoveryContent extends ImmutableComponent {
             <p className={css(styles.recoveryOverlay__textColor, styles.recoveryOverlay__spaceAround)}
               data-l10n-id='ledgerRecoveryFailedMessage'
             />
-            <Button className='whiteButton'
+            <BrowserButton secondaryColor
               l10nId='ok'
               testId='okButton'
               onClick={this.clearRecoveryStatus.bind(this)}
@@ -126,17 +126,17 @@ class LedgerRecoveryFooter extends ImmutableComponent {
 
   render () {
     return <div>
-      <Button className='primaryButton'
+      <BrowserButton primaryColor groupedItem
         l10nId='recover'
         testId='recoverButton'
         onClick={this.recoverWallet}
       />
-      <Button className='primaryButton'
+      <BrowserButton primaryColor groupedItem
         l10nId='recoverFromFile'
         testId='recoverFromFileButton'
         onClick={this.recoverWalletFromFile}
       />
-      <Button className='whiteButton'
+      <BrowserButton secondaryColor groupedItem
         l10nId='cancel'
         testId='cancelButton'
         onClick={this.props.hideOverlay.bind(this, 'ledgerRecovery')}

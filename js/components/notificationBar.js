@@ -11,7 +11,7 @@ const appActions = require('../actions/appActions')
 const getOrigin = require('../state/siteUtil').getOrigin
 
 const cx = require('../lib/classSet')
-const Button = require('./button')
+const BrowserButton = require('../../app/renderer/components/common/browserButton')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
@@ -76,11 +76,8 @@ class NotificationItem extends ImmutableComponent {
           }
           {
             this.props.detail.get('buttons').map((button) =>
-              <Button className={cx({
-                [css(commonStyles.notificationItem__button)]: true,
-                [button.get('className')]: button.get('className'),
-                whiteButton: !button.get('className')
-              })}
+              <BrowserButton notificationItem secondaryColor
+                iconClass={button.get('className')}
                 testId='notificationButton'
                 label={button.get('text')}
                 onClick={this.clickHandler.bind(this, i++)}

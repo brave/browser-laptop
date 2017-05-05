@@ -227,7 +227,7 @@ class Navigator extends ImmutableComponent {
             })}>
               <LongPressButton
                 l10nId='backButton'
-                className='navigationButton backButton'
+                className='normalizeButton navigationButton backButton'
                 disabled={!activeTab || !activeTab.get('canGoBack') || activeTabShowingMessageBox}
                 onClick={this.onBack}
                 onLongPress={this.onBackLongPress}
@@ -240,7 +240,7 @@ class Navigator extends ImmutableComponent {
             })}>
               <LongPressButton
                 l10nId='forwardButton'
-                className='navigationButton forwardButton'
+                className='normalizeButton navigationButton forwardButton'
                 disabled={!activeTab || !activeTab.get('canGoForward') || activeTabShowingMessageBox}
                 onClick={this.onForward}
                 onLongPress={this.onForwardLongPress}
