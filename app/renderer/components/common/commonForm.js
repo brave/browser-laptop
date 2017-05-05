@@ -137,6 +137,9 @@ const styles = StyleSheet.create({
     cursor: 'default',
     width: '100%',
     maxWidth: globalStyles.spacing.dialogWidth,
+    minWidth: '310px',
+    height: 'auto',
+    maxHeight: '100vh', // #8634: commonStyles.flyoutDialog,
     userSelect: 'none'
 
     // Need a general solution
@@ -159,6 +162,7 @@ const styles = StyleSheet.create({
 
   commonFormBookmarkHanger: {
     maxWidth: globalStyles.spacing.bookmarkHangerMaxWidth,
+    height: 'initial', // #8634
 
     // Cancel the inherited value from .navbarMenubarFlexContainer, which is 'nowrap'.
     whiteSpace: 'normal'
