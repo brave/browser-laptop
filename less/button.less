@@ -4,7 +4,12 @@
 
 @import "variables.less";
 
-button[class*="Button"] {
+// Remove this class from buttons as soon as
+// they have been refactored.
+// Only use it for default HTML <button> elements
+// Otherwise please keep with BrowserButton and
+// this class is unecessary.
+.normalizeButton {
   background: none;
   outline: none;
   border: none;
@@ -48,6 +53,14 @@ span.buttonSeparator {
   transition: .1s opacity, .1s background;
   user-select: none;
   user-select: none;
+
+  // Inhehit from global [*=Button] selector
+  background: none;
+  outline: none;
+  border: none;
+  margin: 0;
+  white-space: nowrap;
+
 
   & + .browserButton {
     margin-left: 5px;

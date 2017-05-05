@@ -7,7 +7,7 @@ const React = require('react')
 // Components
 const ImmutableComponent = require('./immutableComponent')
 const Dialog = require('../../../js/components/dialog')
-const Button = require('../../../js/components/button')
+const BrowserButton = require('./common/browserButton')
 const SwitchControl = require('../../../js/components/switchControl')
 
 // Actions
@@ -67,12 +67,12 @@ class CheckDefaultBrowserDialog extends ImmutableComponent {
           </div>
         </CommonFormSection>
         <CommonFormButtonWrapper>
-          <Button className='whiteButton'
+          <BrowserButton secondaryColor
             l10nId='notNow'
             testId='notNowButton'
             onClick={this.onNotNow}
           />
-          <Button className='primaryButton'
+          <BrowserButton primaryColor
             l10nId='useBrave'
             testId='useBraveButton'
             onClick={this.onUseBrave}

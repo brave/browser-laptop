@@ -7,7 +7,7 @@ const React = require('react')
 // Components
 const ImmutableComponent = require('../immutableComponent')
 const Dialog = require('../../../../js/components/dialog')
-const Button = require('../../../../js/components/button')
+const BrowserButton = require('../common/browserButton')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
@@ -273,18 +273,18 @@ class AddEditBookmarkHanger extends ImmutableComponent {
         <CommonFormButtonWrapper>
           {
             this.props.originalDetail
-            ? <Button className='whiteButton'
+            ? <BrowserButton secondaryColor
               l10nId='remove'
               testId='bookmarkHangerRemoveButton'
               onClick={this.onRemoveBookmark}
             />
-            : <Button className='whiteButton'
+            : <BrowserButton secondaryColor
               l10nId='cancel'
               testId='bookmarkHangerCancelButton'
               onClick={this.onClose}
             />
           }
-          <Button className='primaryButton'
+          <BrowserButton primaryColor
             l10nId='done'
             testId='bookmarkHangerDoneButton'
             disabled={!this.bookmarkNameValid}

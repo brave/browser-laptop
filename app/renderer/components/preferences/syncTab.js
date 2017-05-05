@@ -10,7 +10,7 @@ const niceware = require('niceware')
 
 // Components
 const ModalOverlay = require('../../../../js/components/modalOverlay')
-const Button = require('../../../../js/components/button')
+const BrowserButton = require('../common/browserButton')
 const {SettingsList, SettingItem, SettingCheckbox} = require('../settings')
 const SortableTable = require('../../../../js/components/sortableTable')
 
@@ -56,7 +56,7 @@ class SyncTab extends ImmutableComponent {
   get errorContent () {
     return <section className={css(styles.settingsListContainerMargin__bottom)}>
       <div className={css(styles.errorContent__setupError)} data-test-id='syncSetupError'>{this.setupError}</div>
-      <Button className='primaryButton'
+      <BrowserButton primaryColor
         l10nId='syncRetryButton'
         testId='syncRetryButton'
         onClick={this.retry.bind(this)}
@@ -69,13 +69,13 @@ class SyncTab extends ImmutableComponent {
       <DefaultSectionTitle data-l10n-id='syncClearData' />
       {
         this.enabled
-          ? <Button className='primaryButton'
+          ? <BrowserButton primaryColor
             l10nId='syncResetButton'
             testId='clearDataButton'
             onClick={this.props.showOverlay.bind(this, 'syncReset')}
           />
           : <div>
-            <Button className='primaryButton'
+            <BrowserButton primaryColor
               disabled
               l10nId='syncResetButton'
               testId='clearDataButton'
@@ -92,12 +92,12 @@ class SyncTab extends ImmutableComponent {
     }
     // displayed before a sync userId has been created
     return <section className={css(styles.setupContent)}>
-      <Button className='primaryButton'
+      <BrowserButton primaryColor
         l10nId='syncStart'
         testId='syncStartButton'
         onClick={this.props.showOverlay.bind(this, 'syncStart')}
       />
-      <Button className='whiteButton'
+      <BrowserButton secondaryColor
         l10nId='syncAdd'
         testId='syncAddButton'
         onClick={this.props.showOverlay.bind(this, 'syncAdd')}
@@ -123,7 +123,7 @@ class SyncTab extends ImmutableComponent {
         </div>
       </div>
       {this.enabled ? this.devicesContent : null}
-      <Button className='primaryButton'
+      <BrowserButton primaryColor
         l10nId='syncNewDevice'
         testId='syncNewDeviceButton'
         onClick={this.props.showOverlay.bind(this, 'syncNewDevice')}
@@ -175,7 +175,7 @@ class SyncTab extends ImmutableComponent {
             styles.syncOverlayBody__listItem,
             commonStyles.noMarginLeft
           )}>
-            <Button className='whiteButton'
+            <BrowserButton secondaryColor
               l10nId='syncHideQR'
               testId='syncHideQRButton'
               onClick={this.props.hideQR}
@@ -193,7 +193,7 @@ class SyncTab extends ImmutableComponent {
         styles.syncOverlayBody__listItem,
         commonStyles.noMarginLeft
       )}>
-        <Button className='whiteButton'
+        <BrowserButton secondaryColor
           l10nId='syncShowQR'
           testId='syncShowQRButton'
           onClick={this.props.showQR}
@@ -221,7 +221,7 @@ class SyncTab extends ImmutableComponent {
           commonStyles.noMarginBottom,
           commonStyles.noMarginLeft
         )}>
-          <Button className='whiteButton'
+          <BrowserButton secondaryColor
             l10nId='syncHidePassphrase'
             testId='syncHidePassphraseButton'
             onClick={this.props.hidePassphrase}
@@ -240,7 +240,7 @@ class SyncTab extends ImmutableComponent {
           commonStyles.noMarginBottom,
           commonStyles.noMarginLeft
         )}>
-          <Button className='whiteButton'
+          <BrowserButton secondaryColor
             l10nId='syncShowPassphrase'
             testId='syncShowPassphraseButton'
             onClick={this.props.showPassphrase}
@@ -270,7 +270,7 @@ class SyncTab extends ImmutableComponent {
   }
 
   get newOverlayFooter () {
-    return <Button className='whiteButton'
+    return <BrowserButton secondaryColor
       l10nId='done'
       testId='doneButton'
       onClick={this.props.hideOverlay.bind(this, 'syncNewDevice')}
@@ -311,7 +311,7 @@ class SyncTab extends ImmutableComponent {
   }
 
   get startOverlayFooter () {
-    return <Button className='primaryButton'
+    return <BrowserButton primaryColor
       l10nId='syncCreate'
       testId='syncCreateButton'
       onClick={this.onSetup}
@@ -340,7 +340,7 @@ class SyncTab extends ImmutableComponent {
   }
 
   get addOverlayFooter () {
-    return <Button className='primaryButton'
+    return <BrowserButton primaryColor
       l10nId='syncCreate'
       testId='syncCreateButton'
       onClick={this.onRestore}
@@ -364,15 +364,12 @@ class SyncTab extends ImmutableComponent {
 
   get resetOverlayFooter () {
     return <section>
-      <Button className='whiteButton'
+      <BrowserButton secondaryColor groupedItem
         l10nId='cancel'
         testId='cancelButton'
         onClick={this.props.hideOverlay.bind(this, 'syncReset')}
       />
-      <Button className={cx({
-        primaryButton: true,
-        [css(styles.marginButton)]: true
-      })}
+      <BrowserButton primaryColor groupedItem
         l10nId='syncReset'
         testId='syncResetButton'
         onClick={this.onReset}
@@ -537,9 +534,6 @@ class SyncTab extends ImmutableComponent {
 }
 
 const styles = StyleSheet.create({
-  marginButton: {
-    marginLeft: globalStyles.spacing.overlayButtonMargin
-  },
   settingsListContainerMargin__top: {
     marginTop: globalStyles.spacing.settingsListContainerMargin
   },

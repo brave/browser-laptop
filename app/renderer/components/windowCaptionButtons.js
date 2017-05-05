@@ -62,6 +62,7 @@ class WindowCaptionButtons extends ImmutableComponent {
         <button
           {...props}
           className={cx({
+            normalizeButton: true,
             fullscreen: this.props.windowMaximized,
             captionButton: true,
             minimize: true
@@ -73,6 +74,7 @@ class WindowCaptionButtons extends ImmutableComponent {
         <button
           {...props}
           className={cx({
+            normalizeButton: true,
             fullscreen: this.props.windowMaximized,
             captionButton: true,
             maximize: true
@@ -88,6 +90,7 @@ class WindowCaptionButtons extends ImmutableComponent {
         <button
           {...props}
           className={cx({
+            normalizeButton: true,
             fullscreen: this.props.windowMaximized,
             captionButton: true,
             close: true

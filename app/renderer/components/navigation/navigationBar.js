@@ -192,13 +192,13 @@ class NavigationBar extends React.Component {
         : this.props.loading
           ? <span className='navigationButtonContainer'>
             <button data-l10n-id='stopButton'
-              className='navigationButton stopButton'
+              className='normalizeButton navigationButton stopButton'
               onClick={this.onStop} />
           </span>
           : <span className='navigationButtonContainer'>
             <LongPressButton
               l10nId='reloadButton'
-              className='navigationButton reloadButton'
+              className='normalizeButton navigationButton reloadButton'
               onClick={this.onReload}
               onLongPress={this.onReloadLongPress} />
           </span>
@@ -207,7 +207,7 @@ class NavigationBar extends React.Component {
         !this.props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
         ? <span className='navigationButtonContainer'>
           <button data-l10n-id='homeButton'
-            className='navigationButton homeButton'
+            className='normalizeButton navigationButton homeButton'
             onClick={this.onHome} />
         </span>
         : null
@@ -221,7 +221,8 @@ class NavigationBar extends React.Component {
                 navigationButton: true,
                 bookmarkButton: true,
                 removeBookmarkButton: this.bookmarked,
-                withHomeButton: getSetting(settings.SHOW_HOME_BUTTON)
+                withHomeButton: getSetting(settings.SHOW_HOME_BUTTON),
+                normalizeButton: true
               })}
               onClick={this.onToggleBookmark} />
           </span>

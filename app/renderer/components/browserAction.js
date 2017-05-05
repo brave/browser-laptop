@@ -6,7 +6,7 @@ const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 const electron = require('electron')
 const ipc = electron.ipcRenderer
-const Button = require('../../../js/components/button')
+const BrowserButton = require('./common/browserButton')
 const BrowserActionBadge = require('../../renderer/components/browserActionBadge')
 const extensionState = require('../../common/state/extensionState')
 const windowActions = require('../../../js/actions/windowActions')
@@ -47,12 +47,16 @@ class BrowserAction extends ImmutableComponent {
     const browserBadgeColor = this.props.browserAction.get('color')
     // TODO(bridiver) should have some visual notification of hover/press
     return <div className={css(styles.browserActionButton)}>
-      <Button iconClass='extensionBrowserAction'
+      <BrowserButton extensionItem
         l10nId='browserActionButton'
+        testId='extensionBrowserAction'
         l10nArgs={{ name: this.props.browserAction.get('title') }}
-        className={css(styles.extensionButton)}
         inlineStyles={{
-          backgroundImage: extensionState.browserActionBackgroundImage(this.props.browserAction, this.props.tabId)
+          backgroundImage: extensionState
+            .browserActionBackgroundImage(this.props.browserAction, this.props.tabId),
+          backgroundPosition: 'center',
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat'
         }}
         dataButtonValue={this.props.extensionId}
         onClick={this.onClick} />
@@ -67,15 +71,6 @@ class BrowserAction extends ImmutableComponent {
 const styles = StyleSheet.create({
   browserActionButton: {
     position: 'relative'
-  },
-  extensionButton: {
-    '-webkit-app-region': 'no-drag',
-    backgroundSize: 'contain',
-    height: '17px',
-    margin: '4px 0 0 0',
-    opacity: '0.85',
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: 'center'
   }
 })
 
