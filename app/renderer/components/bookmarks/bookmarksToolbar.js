@@ -192,7 +192,7 @@ class BookmarksToolbar extends ImmutableComponent {
   }
   onContextMenu (e) {
     const closest = dnd.closestFromXOffset(this.bookmarkRefs.filter((x) => !!x), e.clientX).selectedRef
-    contextMenus.onTabsToolbarContextMenu(this.activeFrame, (closest && closest.props.bookmark) || undefined, closest && closest.isDroppedOn, e)
+    contextMenus.onTabsToolbarContextMenu(this.activeFrame.get('title'), this.activeFrame.get('location'), (closest && closest.props.bookmark) || undefined, closest && closest.isDroppedOn, e)
   }
   render () {
     let showFavicon = this.props.showFavicon

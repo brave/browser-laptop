@@ -636,7 +636,7 @@ class Main extends ImmutableComponent {
 
   onTabContextMenu (e) {
     const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
-    contextMenus.onTabsToolbarContextMenu(activeFrame, undefined, undefined, e)
+    contextMenus.onTabsToolbarContextMenu(activeFrame.get('title'), activeFrame.get('location'), undefined, undefined, e)
   }
 
   get allSiteSettings () {

@@ -144,7 +144,7 @@ function findBarTemplateInit () {
   return getEditableItems(window.getSelection().toString())
 }
 
-function tabsToolbarTemplateInit (activeFrame, closestDestinationDetail, isParent) {
+function tabsToolbarTemplateInit (bookmarkTitle, bookmarkLink, closestDestinationDetail, isParent) {
   const template = [
     CommonMenu.bookmarksManagerMenuItem(),
     CommonMenu.bookmarksToolbarMenuItem(),
@@ -156,8 +156,12 @@ function tabsToolbarTemplateInit (activeFrame, closestDestinationDetail, isParen
       CommonMenu.separatorMenuItem)
   }
 
-  template.push(addBookmarkMenuItem('addBookmark', siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), closestDestinationDetail, isParent),
-    addFolderMenuItem(closestDestinationDetail, isParent))
+  template.push(addBookmarkMenuItem('addBookmark', {
+    title: bookmarkTitle,
+    location: bookmarkLink,
+    tags: [siteTags.BOOKMARK]
+  }, closestDestinationDetail, isParent))
+  template.push(addFolderMenuItem(closestDestinationDetail, isParent))
 
   return menuUtil.sanitizeTemplateItems(template)
 }
@@ -1407,9 +1411,9 @@ function onNewTabContextMenu (target) {
   menu.destroy()
 }
 
-function onTabsToolbarContextMenu (activeFrame, closestDestinationDetail, isParent, e) {
+function onTabsToolbarContextMenu (bookmarkTitle, bookmarkLink, closestDestinationDetail, isParent, e) {
   e.stopPropagation()
-  const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(activeFrame, closestDestinationDetail, isParent))
+  const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(bookmarkTitle, bookmarkLink, closestDestinationDetail, isParent))
   tabsToolbarMenu.popup(getCurrentWindow())
   tabsToolbarMenu.destroy()
 }
