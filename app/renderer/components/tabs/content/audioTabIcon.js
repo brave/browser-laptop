@@ -14,7 +14,7 @@ const globalStyles = require('../../styles/global')
 const tabStyles = require('../../styles/tab')
 
 class AudioTabIcon extends ImmutableComponent {
-  get pageCanPlayAudio () {
+  get pageAudioActive () {
     return !!this.props.tab.get('audioPlaybackActive')
   }
 
@@ -24,7 +24,7 @@ class AudioTabIcon extends ImmutableComponent {
   }
 
   get mutedState () {
-    return this.pageCanPlayAudio && !!this.props.tab.get('audioMuted')
+    return !!this.props.tab.get('audioMuted')
   }
 
   get audioIcon () {
@@ -34,11 +34,11 @@ class AudioTabIcon extends ImmutableComponent {
   }
 
   render () {
-    return this.pageCanPlayAudio && this.shouldShowAudioIcon
-      ? <TabIcon
-        className={css(tabStyles.icon, styles.audioIcon)}
-        symbol={this.audioIcon} onClick={this.props.onClick} />
-      : null
+        return this.mutedState || (!this.mutedState && this.pageAudioActive)
+        ? <TabIcon
+          className={css(tabStyles.icon, styles.audioIcon)}
+          symbol={this.audioIcon} onClick={this.props.onClick} />
+        : null
   }
 }
 
