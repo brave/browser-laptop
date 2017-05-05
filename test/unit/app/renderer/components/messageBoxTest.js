@@ -81,7 +81,7 @@ describe('MessageBox component unit tests', function () {
           tabId={tabId}
         />
       )
-      assert.equal(wrapper.find('button[data-l10n-id="OK"].primaryButton').length, 1)
+      assert.equal(wrapper.find('button[data-l10n-id="OK"][data-test-id="primaryColor"]').length, 1)
     })
 
     it('renders the button index 1 as secondaryButton', function () {

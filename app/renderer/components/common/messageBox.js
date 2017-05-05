@@ -89,6 +89,7 @@ class MessageBox extends React.Component {
 
     for (let index = (buttons.size - 1); index > -1; index--) {
       newButtons.push(<BrowserButton l10nId={buttons.get(index)}
+        testId={index === 0 ? 'primaryColor' : 'secondaryColor'}
         primaryColor={index === 0}
         secondaryColor={index !== 0}
         onClick={this.onDismiss.bind(this, this.props.tabId, index)} />)
@@ -138,10 +139,7 @@ class MessageBox extends React.Component {
             this.props.showSuppress
               ? <SwitchControl
                 // TODO: refactor SwitchControl
-                className={css(
-                  commonStyles.noPaddingLeft,
-                  styles.switchControl_marginBottom
-                )}
+                className={css(commonStyles.noPaddingLeft)}
                 rightl10nId='preventMoreAlerts'
                 checkedOn={this.props.suppress}
                 onClick={this.onSuppressChanged} />
@@ -182,16 +180,11 @@ const styles = StyleSheet.create({
   },
   actions: {
     display: 'flex',
-    flexFlow: 'column nowrap',
     justifyContent: 'space-between'
   },
   buttons: {
     display: 'flex',
     justifyContent: 'flex-end'
-  },
-
-  switchControl_marginBottom: {
-    marginBottom: `calc(${globalStyles.spacing.dialogInsideMargin} - 5px)` // 5px = padding of SwitchControl
   }
 })
 
