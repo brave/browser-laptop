@@ -3,9 +3,9 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('./immutableComponent')
 const {StyleSheet, css} = require('aphrodite')
-const commonStyles = require('./styles/global')
+const ImmutableComponent = require('../immutableComponent')
+const commonStyles = require('../styles/global')
 
 class BrowserActionBadge extends ImmutableComponent {
   constructor () {

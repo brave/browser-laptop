@@ -18,7 +18,7 @@ const LongPressButton = require('../../../../js/components/longPressButton')
 const MenuBar = require('./menuBar')
 const WindowCaptionButtons = require('../windowCaptionButtons')
 const Button = require('../../../../js/components/button')
-const BrowserAction = require('../browserAction')
+const BrowserAction = require('./browserAction')
 
 // State
 const tabState = require('../../../common/state/tabState')

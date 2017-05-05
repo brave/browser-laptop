@@ -8,19 +8,19 @@ const ipc = electron.ipcRenderer
 const {StyleSheet, css} = require('aphrodite')
 
 // Components
-const ReduxComponent = require('./reduxComponent')
-const BrowserButton = require('./common/browserButton')
-const BrowserActionBadge = require('../../renderer/components/browserActionBadge')
+const ReduxComponent = require('../reduxComponent')
+const BrowserButton = require('../common/browserButton')
+const BrowserActionBadge = require('./browserActionBadge')
 
 // State
-const extensionState = require('../../common/state/extensionState')
-const tabState = require('../../common/state/tabState')
+const extensionState = require('../../../common/state/extensionState')
+const tabState = require('../../../common/state/tabState')
 
 // Actions
-const windowActions = require('../../../js/actions/windowActions')
+const windowActions = require('../../../../js/actions/windowActions')
 
 // Utils
-const {getCurrentWindowId} = require('../currentWindow')
+const {getCurrentWindowId} = require('../../currentWindow')
 
 class BrowserAction extends React.Component {
   constructor () {
