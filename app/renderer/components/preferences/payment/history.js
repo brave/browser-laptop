@@ -165,8 +165,8 @@ const styles = StyleSheet.create({
     userSelect: 'none'
   },
   header: {
-    color: globalStyles.color.darkGray,
-    fontWeight: '500',
+    color: paymentStylesVariables.tableHeader.fontColor,
+    fontWeight: paymentStylesVariables.tableHeader.fontWeight,
     textAlign: 'left',
 
     // cancel border-bottom of headerContainer

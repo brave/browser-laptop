@@ -48,6 +48,14 @@ body {
   display: flex;
   height: 100%;
   margin-left: @sideBarWidth;
+
+  a {
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 a {
@@ -257,32 +265,6 @@ table.sortableTable {
   .engineGoKey {
     padding-left: 4px;
     width: 250px;
-  }
-}
-
-// about:preferences#payments
-.paymentsContainer {
-  // General properties on about:preferences#payments.
-  // Make sure any change here could cause unexpected regressions.
-  a {
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
-  th {
-    color: @darkGray;
-    font-weight: 600;
-  }
-
-  & > table,
-  & > table tbody {
-    border: none;
-    padding: 50px;
-    margin: 0 auto;
-    width: 80%;
   }
 }
 

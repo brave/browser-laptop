@@ -14,6 +14,7 @@ const PinnedInput = require('./pinnedInput')
 
 // style
 const globalStyles = require('../../styles/global')
+const {paymentStylesVariables} = require('../../styles/payment')
 const verifiedGreenIcon = require('../../../../extensions/brave/img/ledger/verified_green_icon.svg')
 const verifiedWhiteIcon = require('../../../../extensions/brave/img/ledger/verified_white_icon.svg')
 const removeIcon = require('../../../../extensions/brave/img/ledger/icon_remove.svg')
@@ -336,12 +337,15 @@ const styles = StyleSheet.create({
 
   tableClass: {
     width: '100%',
-    textAlign: 'left',
-    borderCollapse: 'collapse'
+    borderCollapse: 'collapse',
+    border: 'none',
+    margin: '0 auto'
   },
 
   tableTh: {
-    fontSize: '14px'
+    color: paymentStylesVariables.tableHeader.fontColor,
+    fontSize: '14px',
+    fontWeight: paymentStylesVariables.tableHeader.fontWeight
   },
 
   tableTr: {

@@ -21,7 +21,7 @@ const LedgerTable = require('./ledgerTable')
 
 // style
 const globalStyles = require('../../styles/global')
-const {paymentStyles} = require('../../styles/payment')
+const {paymentStyles, paymentStylesVariables} = require('../../styles/payment')
 const cx = require('../../../../../js/lib/classSet')
 
 // other
@@ -171,9 +171,9 @@ class EnabledContent extends ImmutableComponent {
         <table>
           <thead>
             <tr className={css(styles.tableTr)}>
-              <th className={css(styles.tableTh)} data-l10n-id='monthlyBudget' />
-              <th className={css(styles.tableTh)} data-l10n-id='accountBalance' />
-              <th className={css(styles.tableTh)} />
+              <th className={css(styles.walletBar__tableTr__tableTh)} data-l10n-id='monthlyBudget' />
+              <th className={css(styles.walletBar__tableTr__tableTh)} data-l10n-id='accountBalance' />
+              <th className={css(styles.walletBar__tableTr__tableTh)} />
             </tr>
           </thead>
           <tbody>
@@ -248,7 +248,9 @@ const styles = StyleSheet.create({
     marginBottom: 0
   },
 
-  tableTh: {
+  walletBar__tableTr__tableTh: {
+    color: paymentStylesVariables.tableHeader.fontColor,
+    fontWeight: paymentStylesVariables.tableHeader.fontWeight,
     textAlign: 'left'
   },
 
