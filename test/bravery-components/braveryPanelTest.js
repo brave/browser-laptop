@@ -1,7 +1,7 @@
 /* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
-const {cookieControl, allowAllCookiesOption, blockAllCookiesOption, urlInput, braveMenu, braveMenuDisabled, adsBlockedStat, adsBlockedControl, showAdsOption, blockAdsOption, braveryPanel, httpsEverywhereStat, noScriptStat, noScriptSwitch, fpSwitch, fpStat, noScriptNavButton, customFiltersInput} = require('../lib/selectors')
+const {cookieControl, allowAllCookiesOption, blockAllCookiesOption, urlInput, braveMenu, braveMenuDisabled, adsBlockedStat, adsBlockedControl, showAdsOption, blockAdsOption, braveryPanel, httpsEverywhereStat, noScriptStat, noScriptSwitch, fpSwitch, autoplaySwitch, fpStat, noScriptNavButton, customFiltersInput} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 
 describe('Bravery Panel', function () {
@@ -498,6 +498,72 @@ describe('Bravery Panel', function () {
         .waitForTextValue('body', 'fingerprinting test')
         .openBraveMenu(braveMenu, braveryPanel)
         .waitForTextValue(fpStat, '0')
+    })
+  })
+
+  describe('Autoplay test', function () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
+      yield setup(this.app.client)
+    })
+
+    it('default block', function * () {
+      const url = Brave.server.url('autoplay.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(url)
+        .waitUntil(function () {
+          return this.getText('div[id="status"]')
+            .then((status) => {
+              return status === ''
+            })
+        })
+    })
+
+    it('allow autoplay in regular tab', function * () {
+      const url = Brave.server.url('autoplay.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(url)
+        .waitUntil(function () {
+          return this.getText('div[id="status"]')
+            .then((status) => {
+              return status === ''
+            })
+        })
+        .openBraveMenu(braveMenu, braveryPanel)
+        .click(autoplaySwitch)
+        .keys(Brave.keys.ESCAPE)
+        .tabByUrl(url)
+        .waitUntil(function () {
+          return this.getText('div[id="status"]')
+            .then((status) => {
+              return status === 'Autoplay playing'
+            })
+        })
+    })
+
+    it('allow autoplay in private tab', function * () {
+      const url = Brave.server.url('autoplay.html')
+      yield this.app.client
+        .newTab({ url, isPrivate: true })
+        .waitForUrl(url)
+        .waitUntil(function () {
+          return this.getText('div[id="status"]')
+            .then((status) => {
+              return status === ''
+            })
+        })
+        .openBraveMenu(braveMenu, braveryPanel)
+        .click(autoplaySwitch)
+        .keys(Brave.keys.ESCAPE)
+        .tabByUrl(url)
+        .waitUntil(function () {
+          return this.getText('div[id="status"]')
+            .then((status) => {
+              return status === 'Autoplay playing'
+            })
+        })
     })
   })
 })
