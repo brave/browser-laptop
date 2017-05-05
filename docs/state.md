@@ -183,7 +183,8 @@ AppStore
     'extensions.pocket.enabled': boolean, // true if pocket is enabled
     'extensions.vimium.enabled': boolean, // true if vimium is enabled
     'general.autohide-menu': boolean, // true if the Windows menu should be autohidden
-    'general.bookmarks-toolbar-mode': boolean, // true to show bookmakrs toolbar
+    'general.wide-url-bar': boolean, // true to use wide URL bar
+    'general.bookmarks-toolbar-mode': boolean, // true to show bookmarks toolbar
     'general.check-default-on-startup': boolean, // true to check whether brave is default browser on startup
     'general.disable-title-mode': boolean, // true if title mode should always be disabled
     'general.downloads.default-save-path': string, // default path for saving files

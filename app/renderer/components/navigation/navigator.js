@@ -182,6 +182,7 @@ class Navigator extends React.Component {
     props.isCounterEnabled = getSetting(settings.BLOCKED_COUNT_BADGE) &&
       props.totalBlocks &&
       props.shieldEnabled
+    props.isWideURLbarEnabled = getSetting(settings.WIDE_URL_BAR)
 
     // used in other functions
     props.isNavigable = activeFrame && isNavigatableAboutPage(getBaseUrl(activeFrame.get('location')))
@@ -241,10 +242,14 @@ class Navigator extends React.Component {
             </div>
           </div>
           <NavigationBar />
-          <div className='topLevelEndButtons'>
+          <div className={cx({
+            topLevelEndButtons: true,
+            [css(styles.navigatorWrapper__topLevelEndButtons_isWideURLbarEnabled)]: this.props.isWideURLbarEnabled
+          })}>
             <div className={cx({
               extraDragArea: !this.props.menuBarVisible,
-              allowDragging: this.props.shouldAllowWindowDrag
+              allowDragging: this.props.shouldAllowWindowDrag,
+              [css(styles.navigatorWrapper__topLevelEndButtons__extraDragArea_disabled)]: this.props.isWideURLbarEnabled
             })} />
             {
               this.props.showBrowserActions
@@ -317,5 +322,13 @@ const styles = StyleSheet.create({
   },
   braveMenuContainer: {
     position: 'relative'
+  },
+
+  // TODO: Refactor navigator.js with Aphrodite to remove !important
+  navigatorWrapper__topLevelEndButtons_isWideURLbarEnabled: {
+    marginLeft: '6px !important'
+  },
+  navigatorWrapper__topLevelEndButtons__extraDragArea_disabled: {
+    display: 'none'
   }
 })

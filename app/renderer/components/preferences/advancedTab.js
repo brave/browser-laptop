@@ -24,7 +24,7 @@ const {changeSetting} = require('../../lib/settingsUtil')
 
 class AdvancedTab extends ImmutableComponent {
   render () {
-    return <div>
+    return <section>
       <main className={css(styles.advancedTabMain)}>
         <DefaultSectionTitle data-l10n-id='contentSettings' />
         <SettingsList>
@@ -35,22 +35,30 @@ class AdvancedTab extends ImmutableComponent {
         </SettingsList>
 
         <DefaultSectionTitle data-l10n-id='toolbarUserInterfaceScale' />
-        <SettingItem>
-          <SettingDropdown
-            value={getSetting(settings.TOOLBAR_UI_SCALE, this.props.settings)}
-            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TOOLBAR_UI_SCALE)}>
-            data-type='float'>
-            <option data-l10n-id='scaleSizeSmaller' value={scaleSize.SMALLER} />
-            <option data-l10n-id='scaleSizeNormal' value={scaleSize.NORMAL} />
-            <option data-l10n-id='scaleSizeLarger' value={scaleSize.LARGER} />
-            <option data-l10n-id='scaleSizeSuper' value={scaleSize.SUPERSIZE} />
-          </SettingDropdown>
-        </SettingItem>
+        <SettingsList>
+          <SettingItem>
+            <SettingDropdown
+              value={getSetting(settings.TOOLBAR_UI_SCALE, this.props.settings)}
+              onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TOOLBAR_UI_SCALE)}>
+              data-type='float'>
+              <option data-l10n-id='scaleSizeSmaller' value={scaleSize.SMALLER} />
+              <option data-l10n-id='scaleSizeNormal' value={scaleSize.NORMAL} />
+              <option data-l10n-id='scaleSizeLarger' value={scaleSize.LARGER} />
+              <option data-l10n-id='scaleSizeSuper' value={scaleSize.SUPERSIZE} />
+            </SettingDropdown>
+          </SettingItem>
+        </SettingsList>
+
+        <DefaultSectionTitle data-l10n-id='urlBarOptions' />
+        <SettingsList>
+          <SettingCheckbox dataL10nId='disableTitleMode' prefKey={settings.DISABLE_TITLE_MODE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+          <SettingCheckbox dataL10nId='wideURLbar' prefKey={settings.WIDE_URL_BAR} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        </SettingsList>
       </main>
       <footer className={css(styles.moreInfo)}>
         <div data-l10n-id='requiresRestart' className={css(commonStyles.requiresRestart)} />
       </footer>
-    </div>
+    </section>
   }
 }
 
