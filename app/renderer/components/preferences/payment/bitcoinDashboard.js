@@ -116,52 +116,40 @@ class BitcoinDashboard extends ImmutableComponent {
     </a>
   }
 
-  coinbasePanel () {
+  coinbaseAvailability () {
     if (this.canUseCoinbase) {
-      return <section className={css(styles.panel, styles.panel__coinbase)}>
-        <div className={css(styles.panel__divider, styles.panel__divider_left)}>
-          <div className={css(styles.panel__divider_left__titleWrapper)}>
-            <div className={css(styles.panel__divider_left__titleWrapper__iconWrapper)}>
-              {this.faCreditCard()}
-            </div>
-            <div className={css(styles.panel__divider_left__listTitleWrapper)}>
-              <div className={css(styles.panel__divider_left__listTitleWrapper__title)} data-l10n-id='moneyAdd' />
-              <div className={css(
-                styles.panel__divider_left__listTitleWrapper__title,
-                styles.panel__divider_left__listTitleWrapper__subTitle
-              )} data-l10n-id='moneyAddSubTitle' />
-            </div>
-          </div>
-        </div>
-        <div className={css(styles.panel__divider, styles.panel__divider_right)}>
-          {this.bitcoinPurchaseButton()}
-          <div className={css(
-            styles.panel__divider_right__title,
-            styles.panel__divider_right__subTitle
-          )} data-l10n-id='transferTime' />
-        </div>
+      return <section className={css(styles.panel__divider, styles.panel__divider_right)}>
+        {this.bitcoinPurchaseButton()}
+        <div className={css(
+          styles.panel__divider_right__title,
+          styles.panel__divider_right__subTitle
+        )} data-l10n-id='transferTime' />
       </section>
     } else {
-      return <section className={css(styles.panel, styles.panel__coinbase)}>
-        <div className={css(styles.panel__divider, styles.panel__divider_left)}>
-          <div className={css(styles.panel__divider_left__titleWrapper)}>
-            <div className={css(styles.panel__divider_left__titleWrapper__iconWrapper)}>
-              {this.faCreditCard()}
-            </div>
-            <div className={css(styles.panel__divider_left__listTitleWrapper)}>
-              <div className={css(styles.panel__divider_left__listTitleWrapper__title)} data-l10n-id='moneyAdd' />
-              <div className={css(
-                styles.panel__divider_left__listTitleWrapper__title,
-                styles.panel__divider_left__listTitleWrapper__subTitle
-              )} data-l10n-id='moneyAddSubTitle' />
-            </div>
-          </div>
-        </div>
-        <div className={css(styles.panel__divider, styles.panel__divider_right)}>
-          <div data-l10n-id='coinbaseNotAvailable' />
-        </div>
+      return <section className={css(styles.panel__divider, styles.panel__divider_right)}>
+        <div data-l10n-id='coinbaseNotAvailable' />
       </section>
     }
+  }
+
+  coinbasePanel () {
+    return <section className={css(styles.panel, styles.panel__coinbase)}>
+      <div className={css(styles.panel__divider, styles.panel__divider_left)}>
+        <div className={css(styles.panel__divider_left__titleWrapper)}>
+          <div className={css(styles.panel__divider_left__titleWrapper__iconWrapper)}>
+            {this.faCreditCard()}
+          </div>
+          <div className={css(styles.panel__divider_left__listTitleWrapper)}>
+            <div className={css(styles.panel__divider_left__listTitleWrapper__title)} data-l10n-id='moneyAdd' />
+            <div className={css(
+              styles.panel__divider_left__listTitleWrapper__title,
+              styles.panel__divider_left__listTitleWrapper__subTitle
+            )} data-l10n-id='moneyAddSubTitle' />
+          </div>
+        </div>
+      </div>
+      {this.coinbaseAvailability()}
+    </section>
   }
   exchangePanel () {
     const url = this.props.ledgerData.getIn(['exchangeInfo', 'exchangeURL'])
