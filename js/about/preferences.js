@@ -49,6 +49,7 @@ const adInsertion = appConfig.resourceNames.AD_INSERTION
 const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
 const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
 const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
+const autoplay = appConfig.resourceNames.AUTOPLAY
 const noScript = appConfig.resourceNames.NOSCRIPT
 const flash = appConfig.resourceNames.FLASH
 
@@ -496,6 +497,7 @@ class ShieldsTab extends ImmutableComponent {
     this.onChangeAdControl = this.onChangeAdControl.bind(this)
     this.onToggleHTTPSE = this.onToggleSetting.bind(this, httpsEverywhere)
     this.onToggleSafeBrowsing = this.onToggleSetting.bind(this, safeBrowsing)
+    this.onToggleAutoplay = this.onToggleSetting.bind(this, autoplay)
     this.onToggleNoScript = this.onToggleSetting.bind(this, noScript)
   }
   onChangeAdControl (e) {
@@ -546,6 +548,7 @@ class ShieldsTab extends ImmutableComponent {
         <SettingCheckbox checked={this.props.braveryDefaults.get('safeBrowsing')} dataL10nId='safeBrowsing' onChange={this.onToggleSafeBrowsing} />
         <SettingCheckbox checked={this.props.braveryDefaults.get('noScript')} dataL10nId='noScriptPref' onChange={this.onToggleNoScript} />
         <SettingCheckbox dataL10nId='blockCanvasFingerprinting' prefKey={settings.BLOCK_CANVAS_FINGERPRINTING} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox checked={this.props.braveryDefaults.get('autoplay')} dataL10nId='allowAutoplay' onChange={this.onToggleAutoplay} />
         <Button l10nId='manageAdblockSettings' className='primaryButton manageAdblockSettings'
           onClick={aboutActions.createTabRequested.bind(null, {
             url: 'about:adblock'

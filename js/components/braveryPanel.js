@@ -31,6 +31,7 @@ class BraveryPanel extends ImmutableComponent {
     this.onToggleCookieControl = this.onToggleSiteSetting.bind(this, 'cookieControl')
     this.onToggleHTTPSE = this.onToggleSiteSetting.bind(this, 'httpsEverywhere')
     this.onToggleFp = this.onToggleSiteSetting.bind(this, 'fingerprintingProtection')
+    this.onToggleAutoplay = this.onToggleSiteSetting.bind(this, 'autoplay')
     this.onReload = this.onReload.bind(this)
     this.onEditGlobal = this.onEditGlobal.bind(this)
     this.onInfoClick = this.onInfoClick.bind(this)
@@ -164,6 +165,7 @@ class BraveryPanel extends ImmutableComponent {
     const shieldsUp = this.props.braverySettings.shieldsUp
     const noScriptEnabled = this.props.braverySettings.noScript
     const httpseEnabled = this.props.braverySettings.httpsEverywhere
+    const autoplayEnabled = this.props.braverySettings.autoplay
     const adControl = this.props.braverySettings.adControl
     const fpEnabled = this.props.braverySettings.fingerprintingProtection
     const adsBlockedStat = (this.blockedAds ? this.blockedAds.size : 0) + (this.blockedByTrackingList ? this.blockedByTrackingList.size : 0)
@@ -297,6 +299,7 @@ class BraveryPanel extends ImmutableComponent {
                   </FormDropdown>
                   <SwitchControl onClick={this.onToggleHTTPSE} rightl10nId='httpsEverywhere' checkedOn={httpseEnabled} disabled={!shieldsUp} className='httpsEverywhereSwitch' />
                   <SwitchControl onClick={this.onToggleNoScript} rightl10nId='noScript' checkedOn={noScriptEnabled} disabled={!shieldsUp} className='noScriptSwitch' />
+                  <SwitchControl onClick={this.onToggleAutoplay} rightl10nId='allowAutoplay' checkedOn={autoplayEnabled} disabled={!shieldsUp} className='allowAutoplay' />
                 </div>
                 <div className='braveryControlGroup'>
                   <div className={cx({
