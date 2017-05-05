@@ -84,7 +84,10 @@ module.exports.populateDefaultExtensions = (extensionsState) => {
   // At the time of this writing we don't have access to any extension data
   // unless it's installed. In such cases populate extensions state
   // with our dummy content.
-    if (!newState.get(data.id)) {
+  // If extension is disabled then chrome-extension URL is no longer valid,
+  // so image and description will break. For such case we need to fallback
+  // to dummy again to avoid bad UI.
+    if (!newState.get(data.id) || !newState.getIn([data.id, 'enabled'])) {
       newState = newState.set(data.id, dummyExtensionManifest.get(data.id))
     }
   })
