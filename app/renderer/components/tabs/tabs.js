@@ -132,8 +132,7 @@ class Tabs extends ImmutableComponent {
     const index = this.props.previewTabPageIndex !== undefined
       ? this.props.previewTabPageIndex : this.props.tabPageIndex
     return <div className='tabs'
-      onMouseLeave={this.props.fixTabWidth ? this.onMouseLeave : null}
-      onContextMenu={contextMenus.onTabsBarContextMenu.bind(this, windowStore.getFrames())}>
+      onMouseLeave={this.props.fixTabWidth ? this.onMouseLeave : null}>
       <span className={cx({
         tabStripContainer: true,
         isPreview: this.props.previewTabPageIndex !== undefined,

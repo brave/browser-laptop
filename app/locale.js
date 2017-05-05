@@ -180,7 +180,6 @@ var rendererIdentifiers = function () {
     'learnSpelling',
     'ignoreSpelling',
     'lookupSelection',
-    'showTabPreviews',
     // Other identifiers
     'aboutBlankTitle',
     'urlCopied',
