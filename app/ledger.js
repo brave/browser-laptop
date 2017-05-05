@@ -51,7 +51,7 @@ const querystring = require('querystring')
 const random = require('random-lib')
 const tldjs = require('tldjs')
 const underscore = require('underscore')
-const uuid = require('node-uuid')
+const uuid = require('uuid')
 
 const appActions = require('../js/actions/appActions')
 const appConfig = require('../js/constants/appConfig')
