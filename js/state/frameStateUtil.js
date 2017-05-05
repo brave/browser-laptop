@@ -707,6 +707,27 @@ function onFindBarHide (frameKey) {
   }))
 }
 
+function getTotalBlocks (frame) {
+  if (!frame) {
+    return false
+  }
+
+  frame = makeImmutable(frame)
+
+  const ads = frame.getIn(['adblock', 'blocked'])
+  const trackers = frame.getIn(['trackingProtection', 'blocked'])
+  const scripts = frame.getIn(['noScript', 'blocked'])
+  const fingerprint = frame.getIn(['fingerprintingProtection', 'blocked'])
+  const blocked = (ads && ads.size ? ads.size : 0) +
+    (trackers && trackers.size ? trackers.size : 0) +
+    (scripts && scripts.size ? scripts.size : 0) +
+    (fingerprint && fingerprint.size ? fingerprint.size : 0)
+
+  return (blocked === 0)
+    ? false
+    : ((blocked > 99) ? '99+' : blocked)
+}
+
 const frameStatePath = (windowState, key) =>
   ['frames', findIndexForFrameKey(windowState.get('frames'), key)]
 
@@ -782,5 +803,6 @@ module.exports = {
   tabStatePathForFrame,
   getLastCommittedURL,
   getFrameByLastAccessedTime,
-  onFindBarHide
+  onFindBarHide,
+  getTotalBlocks
 }

@@ -5,10 +5,53 @@
 
 require('../../../../braveUnit')
 const mockery = require('mockery')
-const {shallow} = require('enzyme')
+const {mount} = require('enzyme')
 const assert = require('assert')
 const Immutable = require('immutable')
-let Navigator
+let Navigator, windowStore, appStore
+let settingDefaultValue = true
+
+const defaultWindowStore = Immutable.fromJS({
+  activeFrameKey: 0,
+  frames: [{
+    key: 0,
+    tabId: 1,
+    location: 'http://brave.com',
+    title: 'Brave'
+  }],
+  tabs: []
+})
+
+const appStoreRenderer = Immutable.fromJS({
+  extensions: {
+  },
+  settings: {
+  },
+  siteSettings: {
+    'https?://brave.com': {
+      example3: true
+    }
+  },
+  tabs: [{
+    active: true,
+    tabId: 1,
+    canGoBack: true,
+    canGoForward: true,
+    windowId: 1
+  }],
+  windows: []
+})
+
+const fakeWindowState = {
+  shouldAllowWindowDrag: () => false
+}
+
+const fakeCurrentWindow = {
+  isMaximized: () => false,
+  isFullScreen: () => false,
+  isFocused: () => false,
+  getCurrentWindowId: () => 1
+}
 
 describe('Navigator component unit tests', function () {
   before(function () {
@@ -25,72 +68,38 @@ describe('Navigator component unit tests', function () {
     mockery.registerMock('../../../extensions/brave/img/caret_down_grey.svg')
     mockery.registerMock('../../../../img/url-bar-no-script.svg', {})
     mockery.registerMock('electron', require('../../../../lib/fakeElectron'))
+    mockery.registerMock('../../../common/state/windowState', fakeWindowState)
+    mockery.registerMock('../../currentWindow', fakeCurrentWindow)
+    mockery.registerMock('./navigationBar', () => null)
+    mockery.registerMock('../../../../js/state/frameStateUtil', {
+      getActiveFrame: () => defaultWindowStore.getIn(['frames', 0]),
+      getTotalBlocks: () => 2
+    })
+    mockery.registerMock('../../../common/state/shieldState', {
+      braveShieldsEnabled: () => true
+    })
+
+    mockery.registerMock('../../../../js/settings', {
+      getSetting: () => {
+        return settingDefaultValue
+      }
+    })
+    appStore = require('../../../../../../js/stores/appStoreRenderer')
+    windowStore = require('../../../../../../js/stores/windowStore')
     Navigator = require('../../../../../../app/renderer/components/navigation/navigator')
-    appStoreRenderer = require('../../../../../../js/stores/appStoreRenderer')
   })
 
   after(function () {
     mockery.disable()
   })
 
-  let appStoreRenderer = require('../../../../../../js/stores/appStoreRenderer')
-
-  const windowState = Immutable.fromJS({
-    activeFrameKey: 0,
-    frames: [{
-      key: 0,
-      tabId: 1,
-      location: 'http://brave.com'
-    }],
-    tabs: []
-  })
-
-  const appState = Immutable.fromJS({
-    extensions: {
-    },
-    settings: {
-    },
-    siteSettings: {
-      'https?://brave.com': {
-        example3: true
-      }
-    },
-    tabs: [{
-      tabId: 1,
-      canGoBack: true,
-      canGoForward: true
-    }],
-    windows: []
-  })
-
-  const customTitlebar = {
-    enabled: false,
-    captionButtonsVisible: false,
-    menubarVisible: false,
-    menubarTemplate: null,
-    menubarSelectedIndex: undefined,
-    contextMenuSelectedIndex: null,
-    lastFocusedSelector: undefined,
-    isMaximized: false
-  }
-
-  const activeTab = appState.getIn(['tabs', 0])
-
   describe('when user has history going forwards and backwards', function () {
     let wrapper
 
     before(function () {
-      appStoreRenderer.state = Immutable.fromJS(appState)
-      wrapper = shallow(
-        <Navigator
-          windowState={windowState}
-          appState={appState}
-          activeTab={activeTab}
-          shouldAllowWindowDrag={false}
-          customTitlebar={customTitlebar}
-          activeSiteSettings={null}
-        />
-      )
+      appStore.state = appStoreRenderer
+      windowStore.state = defaultWindowStore
+      wrapper = mount(<Navigator />)
     })
 
     it('both back/forward navigationButtonContainers are enabled', function () {
@@ -98,13 +107,13 @@ describe('Navigator component unit tests', function () {
     })
 
     it('back navigation button is enabled', function () {
-      const node = wrapper.find('div.backforward > div.navigationButtonContainer > .backButton').node
-      assert.equal(node.props.disabled, false)
+      const node = wrapper.find('div.backforward > div.navigationButtonContainer .backButton').getDOMNode()
+      assert.equal(node.disabled, false)
     })
 
     it('forward navigation button is enabled', function () {
-      const node = wrapper.find('div.backforward > div.navigationButtonContainer > .forwardButton').node
-      assert.equal(node.props.disabled, false)
+      const node = wrapper.find('div.backforward > div.navigationButtonContainer .forwardButton').getDOMNode()
+      assert.equal(node.disabled, false)
     })
   })
 
@@ -112,24 +121,16 @@ describe('Navigator component unit tests', function () {
     let wrapper
 
     before(function () {
-      const appState2 = appState.mergeIn(['tabs', 0], {
+      const appState2 = appStoreRenderer.mergeIn(['tabs', 0], {
         messageBoxDetail: {
           message: 'sample message',
           title: 'sample title'
         }
       })
 
-      appStoreRenderer.state = Immutable.fromJS(appState2)
-      wrapper = shallow(
-        <Navigator
-          windowState={windowState}
-          appState={appState2}
-          activeTab={activeTab}
-          shouldAllowWindowDrag={false}
-          customTitlebar={customTitlebar}
-          activeSiteSettings={null}
-        />
-      )
+      appStore.state = appState2
+      windowStore.state = defaultWindowStore
+      wrapper = mount(<Navigator />)
     })
 
     it('disables both back/forward navigationButtonContainers', function () {
@@ -137,101 +138,42 @@ describe('Navigator component unit tests', function () {
     })
 
     it('disables the back navigation button', function () {
-      const node = wrapper.find('div.backforward > div.navigationButtonContainer > .backButton').node
-      assert.equal(node.props.disabled, true)
+      const node = wrapper.find('div.backforward > div.navigationButtonContainer .backButton').getDOMNode()
+      assert.equal(node.disabled, true)
     })
 
     it('disables the forward navigation button', function () {
-      const node = wrapper.find('div.backforward > div.navigationButtonContainer > .forwardButton').node
-      assert.equal(node.props.disabled, true)
+      const node = wrapper.find('div.backforward > div.navigationButtonContainer .forwardButton').getDOMNode()
+      assert.equal(node.disabled, true)
     })
 
     it('disables the lion icon', function () {
-      const node = wrapper.find('[testId="braveShieldButton"]').node
-      assert.equal(node.props.disabled, true)
+      const node = wrapper.find('[data-test-id="braveShieldButton"]').getDOMNode()
+      assert.equal(node.disabled, true)
     })
   })
 
-  describe('getTotalBlocks', function () {
-    let instance
-
+  describe('lion badge', function () {
     before(function () {
-      appStoreRenderer.state = Immutable.fromJS(appState)
-      let wrapper = shallow(
-        <Navigator
-          windowState={windowState}
-          appState={appState}
-          activeTab={activeTab}
-          shouldAllowWindowDrag={false}
-          customTitlebar={customTitlebar}
-          activeSiteSettings={null}
-        />
-      )
-      instance = wrapper.instance()
+      appStore.state = appStoreRenderer
+      windowStore.state = defaultWindowStore
     })
 
-    it('returns false if there are no units blocked', function () {
-      const frames = Immutable.fromJS({
-        adblock: { blocked: [] },
-        trackingProtection: { blocked: [] },
-        noScript: { blocked: [] },
-        fingerprintingProtection: { blocked: [] }
-      })
-      const result = instance.getTotalBlocks(frames)
-      assert.equal(result, false)
+    it('lion icon is shown by default', function () {
+      const wrapper = mount(<Navigator />)
+      const node = wrapper.find('[data-test-id="braveShieldButton"]').getDOMNode()
+      assert.equal(node.disabled, false)
     })
 
-    it('returns total of items (ads / trackers / scripts / fingerprints) blocked', function () {
-      const frames = Immutable.fromJS({
-        adblock: { blocked: [1] },
-        trackingProtection: { blocked: [1, 2] },
-        noScript: { blocked: [1, 2, 3, 4] },
-        fingerprintingProtection: { blocked: [1, 2, 3, 4, 5, 6, 7, 8] }
-      })
-      const result = instance.getTotalBlocks(frames)
-      assert.equal(result, 15)
+    it('counter is shown by default', function () {
+      const wrapper = mount(<Navigator />)
+      assert.equal(wrapper.find('[data-test-id="lionBadge"]').length, 1)
     })
 
-    it('defaults values to 0 if element is not a list or is not present', function () {
-      const frames = Immutable.fromJS({
-        adblock: { blocked: 'not a list' },
-        trackingProtection: {},
-        noScript: { blocked: [1] },
-        fingerprintingProtection: { blocked: {} }
-      })
-      const result = instance.getTotalBlocks(frames)
-      assert.equal(result, 1)
-    })
-
-    it('returns false if the input is falsey', function () {
-      assert.equal(instance.getTotalBlocks(), false)
-      assert.equal(instance.getTotalBlocks(undefined), false)
-      assert.equal(instance.getTotalBlocks(null), false)
-      assert.equal(instance.getTotalBlocks(false), false)
-    })
-
-    it('converts the input to an immutable object', function () {
-      const mutableFrames = {
-        adblock: { blocked: [1] },
-        trackingProtection: { blocked: [1, 2] },
-        noScript: { blocked: [1, 2, 3, 4] },
-        fingerprintingProtection: { blocked: [1, 2, 3, 4, 5, 6, 7, 8] }
-      }
-      const result = instance.getTotalBlocks(mutableFrames)
-      assert.equal(result, 15)
-    })
-
-    it('returns "99+" if tracker count is > 99', function () {
-      const mutableFrames = {
-        adblock: { blocked: [] }
-      }
-
-      for (let i = 1; i < 101; i++) {
-        mutableFrames.adblock.blocked.push(i)
-      }
-
-      const result = instance.getTotalBlocks(mutableFrames)
-      assert.equal(result, '99+')
+    it('counter is not shown when disabled via settings', function () {
+      settingDefaultValue = false
+      const wrapper = mount(<Navigator />)
+      assert.equal(wrapper.find('[data-test-id="lionBadge"]').length, 0)
     })
   })
 })
