@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   },
 
   walletBarMargin: {
-    marginTop: paymentStyles.margin.bar
+    marginTop: globalStyles.spacing.panelMargin
   },
 
   h3: {
