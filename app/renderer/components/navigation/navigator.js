@@ -35,10 +35,12 @@ const {isNavigatableAboutPage, getBaseUrl} = require('./../../../../js/lib/appUr
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const siteSettings = require('../../../../js/state/siteSettings')
 const cx = require('../../../../js/lib/classSet')
+const {getSetting} = require('../../../../js/settings')
 
 // Constants
 const messages = require('../../../../js/constants/messages')
 const appConfig = require('../../../../js/constants/appConfig')
+const settings = require('../../../../js/constants/settings')
 
 class Navigator extends ImmutableComponent {
   constructor () {
@@ -197,6 +199,7 @@ class Navigator extends ImmutableComponent {
     const totalBlocks = activeFrame ? this.getTotalBlocks(activeFrame) : false
     const braverySettings = siteSettings.activeSettings(this.props.activeSiteSettings, this.props.appState, appConfig)
     const shieldEnabled = braveShieldsEnabled(activeFrame)
+    const blockedCountBadgeEnabled = getSetting(settings.BLOCKED_COUNT_BADGE)
 
     return <div className={cx({
       navbarCaptionButtonContainer: true,
@@ -275,7 +278,7 @@ class Navigator extends ImmutableComponent {
                 onClick={this.onBraveMenu}
               />
               {
-                shieldEnabled && totalBlocks
+                shieldEnabled && blockedCountBadgeEnabled && totalBlocks
                   ? <div className={css(
                       styles.lionBadge,
                       (this.props.customTitlebar.menubarVisible || !platformUtil.isWindows()) && styles.lionBadgeRight
