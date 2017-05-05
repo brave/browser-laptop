@@ -735,24 +735,24 @@ module.exports.isResourceEnabled = (resourceName, url, isPrivate) => {
  * Clears all storage data.
  * This includes: appcache, cookies, filesystem, indexdb, local storage,
  * shadercache, websql, and serviceworkers.
- * @return a promise that always resolves (called on app shutdon so must always)
  */
 module.exports.clearStorageData = () => {
   for (let partition in registeredSessions) {
     let ses = registeredSessions[partition]
-    setImmediate(ses.clearStorageData.bind(ses))
+    setImmediate(() => {
+      ses.clearStorageData.bind(ses)(() => {})
+    })
   }
 }
 
 /**
- * Clears all session cache.
- * @return a promise that always resolves (called on app shutdon so must always)
+ * Clears all session caches.
  */
 module.exports.clearCache = () => {
   for (let partition in registeredSessions) {
     let ses = registeredSessions[partition]
     setImmediate(() => {
-      ses.clearCache(() => {})
+      ses.clearCache.bind(ses)(() => {})
     })
   }
 }
