@@ -169,6 +169,62 @@ describe('siteUtil', function () {
     })
   })
 
+  describe('getNextFolderName', function () {
+    it('returns original name when no duplicate', function () {
+      const sites = Immutable.fromJS({
+        'key1': {
+          folderId: 0,
+          customTitle: 'abc',
+          tags: [siteTags.BOOKMARK_FOLDER]
+        }
+      })
+      assert.equal(siteUtil.getNextFolderName(sites, 'def'), 'def')
+    })
+    it('returns original name if sites is falsey', function () {
+      assert.equal(siteUtil.getNextFolderName(null, 'abc'), 'abc')
+    })
+    it('returns first duplicate name', function () {
+      const sites = Immutable.fromJS({
+        'key1': {
+          folderId: 0,
+          customTitle: 'abc',
+          tags: [siteTags.BOOKMARK_FOLDER]
+        }
+      })
+      assert.equal(siteUtil.getNextFolderName(sites, 'abc'), 'abc (1)')
+    })
+    it('returns non first duplicate name', function () {
+      const sites = Immutable.fromJS({
+        'key1': {
+          folderId: 0,
+          customTitle: 'abc',
+          tags: [siteTags.BOOKMARK_FOLDER]
+        },
+        'key2': {
+          folderId: 1,
+          customTitle: 'abc (1)',
+          tags: [siteTags.BOOKMARK_FOLDER]
+        }
+      })
+      assert.equal(siteUtil.getNextFolderName(sites, 'abc'), 'abc (2)')
+    })
+    it('returns non first duplicate name from duplicate name', function () {
+      const sites = Immutable.fromJS({
+        'key1': {
+          folderId: 0,
+          customTitle: 'abc',
+          tags: [siteTags.BOOKMARK_FOLDER]
+        },
+        'key2': {
+          folderId: 1,
+          customTitle: 'abc (1)',
+          tags: [siteTags.BOOKMARK_FOLDER]
+        }
+      })
+      assert.equal(siteUtil.getNextFolderName(sites, 'abc (1)'), 'abc (2)')
+    })
+  })
+
   describe('addSite', function () {
     it('gets the tag from siteDetail if not provided', function () {
       const processedSites = siteUtil.addSite(emptySites, bookmarkAllFields)

@@ -9,9 +9,9 @@ const settings = require('../../../js/constants/settings')
 const getSetting = require('../../../js/settings').getSetting
 const {StyleSheet, css} = require('aphrodite')
 const globalStyles = require('./styles/global')
-const commonStyles = require('./styles/commonStyles')
 const {getHostPattern, isHttpOrHttps} = require('../../../js/lib/urlutil')
 const {getBaseUrl} = require('../../../js/lib/appUrlUtil')
+const BrowserButton = require('./common/browserButton')
 
 const noFundVerifiedPublisherImage = require('../../extensions/brave/img/urlbar/browser_URL_fund_no_verified.svg')
 const fundVerifiedPublisherImage = require('../../extensions/brave/img/urlbar/browser_URL_fund_yes_verified.svg')
@@ -102,16 +102,13 @@ class PublisherToggle extends ImmutableComponent {
         data-test-authorized={this.enabledForPaymentsPublisher}
         data-test-verified={this.verifiedPublisher}
         className={css(styles.addPublisherButtonContainer)}>
-        <button
-          className={
-          css(
-            commonStyles.browserButton,
+        <BrowserButton
+          custom={[
             !this.enabledForPaymentsPublisher && this.verifiedPublisher && styles.noFundVerified,
             this.enabledForPaymentsPublisher && this.verifiedPublisher && styles.fundVerified,
             !this.enabledForPaymentsPublisher && !this.verifiedPublisher && styles.noFundUnverified,
             this.enabledForPaymentsPublisher && !this.verifiedPublisher && styles.fundUnverified
-            )
-          }
+          ]}
           data-l10n-id={this.l10nString}
           onClick={this.onAuthorizePublisher}
         />
@@ -139,27 +136,23 @@ const styles = StyleSheet.create({
   },
 
   noFundVerified: {
-    border: 'none',
     backgroundImage: `url(${noFundVerifiedPublisherImage})`,
     backgroundSize: '18px',
     marginLeft: '2px'
   },
 
   fundVerified: {
-    border: 'none',
     backgroundImage: `url(${fundVerifiedPublisherImage})`,
     backgroundSize: '18px',
     marginLeft: '2px'
   },
 
   noFundUnverified: {
-    border: 'none',
     backgroundImage: `url(${noFundUnverifiedPublisherImage})`,
     backgroundSize: '18px'
   },
 
   fundUnverified: {
-    border: 'none',
     backgroundImage: `url(${fundUnverifiedPublisherImage})`,
     backgroundSize: '18px'
   }

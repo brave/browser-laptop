@@ -6,6 +6,15 @@ const React = require('react')
 const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
 const cx = require('../lib/classSet')
 
+/**
+ * ************************************************************
+ * THIS FILE WILL BE DEPRECATED IN FAVOR OF
+ * /app/renderer/components/common/browserButton
+ * PLEASE USE THE FORMER FOR NEWLY INTRODUCED CODE
+ * ************************************************************
+ * THIS FILE WILL BE REMOVED ONCE ALL BUTTONS WERE REFACTORED
+ * ************************************************************
+ */
 class Button extends ImmutableComponent {
   render () {
     if (this.props.iconClass) {

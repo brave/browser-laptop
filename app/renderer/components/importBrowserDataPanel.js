@@ -27,16 +27,11 @@ class ImportBrowserDataPanel extends ImmutableComponent {
     super()
     this.onToggleHistory = this.onToggleSetting.bind(this, 'history')
     this.onToggleFavorites = this.onToggleSetting.bind(this, 'favorites')
-    this.onToggleMergeFavorites = this.onToggleSetting.bind(this, 'mergeFavorites')
     this.onToggleCookies = this.onToggleSetting.bind(this, 'cookies')
     this.onImport = this.onImport.bind(this)
     this.onChange = this.onChange.bind(this)
   }
   onToggleSetting (setting, e) {
-    if (setting === 'favorites') {
-      this.props.importBrowserDataSelected =
-        this.props.importBrowserDataSelected.set('mergeFavorites', e.target.value)
-    }
     windowActions.setImportBrowserDataSelected(this.props.importBrowserDataSelected.set(setting, e.target.value))
   }
   get browserData () {
@@ -84,7 +79,6 @@ class ImportBrowserDataPanel extends ImmutableComponent {
     this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('index', e.target.value)
     this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('history', false)
     this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('favorites', false)
-    this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('mergeFavorites', false)
     this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('cookies', false)
     let importBrowserDataSelected = this.props.importBrowserDataSelected
     if (this.supportHistory) {
@@ -92,7 +86,6 @@ class ImportBrowserDataPanel extends ImmutableComponent {
     }
     if (this.supportFavorites) {
       importBrowserDataSelected = importBrowserDataSelected.set('favorites', true)
-      importBrowserDataSelected = importBrowserDataSelected.set('mergeFavorites', true)
     }
     if (this.supportCookies) {
       importBrowserDataSelected = importBrowserDataSelected.set('cookies', true)
@@ -108,7 +101,6 @@ class ImportBrowserDataPanel extends ImmutableComponent {
       }
       if (this.supportFavorites) {
         this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('favorites', true)
-        this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('mergeFavorites', true)
       }
       if (this.supportCookies) {
         this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('cookies', true)
@@ -149,14 +141,6 @@ class ImportBrowserDataPanel extends ImmutableComponent {
             onClick={this.onToggleFavorites}
             disabled={!this.supportFavorites}
           />
-          <div className={css(styles.subSectionMargin)} data-test-id='importBrowserSubDataOptions'>
-            <SwitchControl
-              rightl10nId='mergeIntoBookmarksToolbar'
-              checkedOn={this.props.importBrowserDataSelected.get('mergeFavorites')}
-              onClick={this.onToggleMergeFavorites}
-              disabled={!this.props.importBrowserDataSelected.get('favorites')}
-            />
-          </div>
           <SwitchControl
             rightl10nId='cookies'
             checkedOn={this.props.importBrowserDataSelected.get('cookies')}
@@ -182,9 +166,6 @@ class ImportBrowserDataPanel extends ImmutableComponent {
 const styles = StyleSheet.create({
   dropdownWrapper: {
     marginBottom: `calc(${globalStyles.spacing.dialogInsideMargin} / 2)`
-  },
-  subSectionMargin: {
-    marginLeft: globalStyles.spacing.dialogInsideMargin
   }
 })
 

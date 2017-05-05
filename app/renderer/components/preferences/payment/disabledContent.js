@@ -20,7 +20,7 @@ const CoinBase2 = require('../../../../extensions/brave/img/coinbase_2x.png')
 
 class DisabledContent extends ImmutableComponent {
   render () {
-    return <div data-test-id='disabledContent'>
+    return <section data-test-id='disabledContent'>
       <div className={css(styles.paymentsMessage, styles.walletBarMargin)} data-test-id='paymentsMessage'>
         <h3 className={css(styles.h3)} data-l10n-id='paymentsWelcomeTitle' />
         <div className={css(styles.text)} data-l10n-id='paymentsWelcomeText1' />
@@ -43,7 +43,7 @@ class DisabledContent extends ImmutableComponent {
         <div className={css(styles.textSide)} data-l10n-id='paymentsSidebarText4' />
         <a href='https://www.coinbase.com/' target='_blank'><span className={css(styles.paymentsSidebarCoinbase)} /></a>
       </div>
-    </div>
+    </section>
   }
 }
 

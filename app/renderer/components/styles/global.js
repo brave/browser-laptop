@@ -1,3 +1,25 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/**
+ * Historically this file includes styles with no defined criteria.
+ * Imagine this file as a future reference for theming, in a way
+ * that each component should be an object wrapping all properties
+ * that would change in a dark mode, for example.
+ *
+ * Valid as well for things that needs to be fully global,
+ * i.e. breakpoints, icons and zIndexes.
+ *
+ * Thus said, please take preference for inlined styles in the component itself.
+ * If you really feel repetitve writing the same style for a given component,
+ * consider including a variable inside component.
+ *
+ * TODO:
+ * remove unnecessary styles properties (as items get refactored)
+ * Remove fully global items and take preference for component properties (@see button)
+ */
+
 const globalStyles = {
   breakpoint: {
     breakpointWideViewport: '1000px',
@@ -142,7 +164,7 @@ const globalStyles = {
     dialogLargeWidth: '600px',
     dialogTopOffset: '30px',
     dialogInsideMargin: '18px',
-    paymentsMargin: '20px',
+    modalDialogPaddingHorizontal: '50px',
     privateTabPaddingHorizontal: '30px',
     privateTabPadding: '40px',
     settingsListContainerMargin: '2rem',
@@ -189,6 +211,7 @@ const globalStyles = {
     zindexPopUp: '3000',
     zindexContextMenu: '3000',
     zindexDialogs: '3000',
+    zindexModal: '3000',
     zindexPopupWindow: '3000',
     zindexForms: '3000',
     zindexSuggestionText: '3100',
@@ -214,7 +237,32 @@ const globalStyles = {
     volumeOn: 'fa fa-volume-up',
     exclude: 'fa fa-ban',
     trash: 'fa fa-trash',
-    moreInfo: 'fa fa-info-circle'
+    moreInfo: 'fa fa-info-circle',
+    angleDoubleRight: 'fa fa-angle-double-right'
+  },
+  button: {
+    default: {
+      color: '#5a5a5a',
+      backgroundColor: 'transparent',
+      hoverColor: '#000',
+      boxShadow: '0px 1px 5px -1px rgba(0, 0, 0, 0.5)'
+    },
+    primary: {
+      gradientColor1: '#FF7A1D',
+      gradientColor2: '#ff5000',
+      background: 'linear-gradient(#FF7A1D, #ff5000)',
+      color: '#fff',
+      hoverColor: '#fff',
+      borderHoverColor: '#fff'
+    },
+    secondary: {
+      gradientColor1: '#fff',
+      gradientColor2: '#ececec',
+      background: 'linear-gradient(#fff, #ececec)',
+      color: '#444',
+      hoverColor: '#000',
+      borderHoverColor: 'rgb(153, 153, 153)'
+    }
   }
 }
 

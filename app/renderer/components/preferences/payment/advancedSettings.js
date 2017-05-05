@@ -10,7 +10,7 @@ const {changeSetting} = require('../../../lib/settingsUtil')
 const appConfig = require('../../../../../js/constants/appConfig')
 
 // components
-const Button = require('../../../../../js/components/button')
+const BrowserButton = require('../../common/browserButton')
 const {SettingsList, SettingItem, SettingCheckbox} = require('../../settings')
 const {SettingDropdown} = require('../../common/dropdown')
 const ImmutableComponent = require('../../immutableComponent')
@@ -18,7 +18,6 @@ const ImmutableComponent = require('../../immutableComponent')
 // style
 const commonStyles = require('../../styles/commonStyles')
 const globalStyles = require('../../styles/global')
-const {paymentCommon} = require('../../styles/payment')
 
 // other
 const settings = require('../../../../../js/constants/settings')
@@ -28,90 +27,89 @@ class AdvancedSettingsContent extends ImmutableComponent {
     const minPublisherDuration = this.props.ledgerData.getIn(['synopsisOptions', 'minPublisherDuration'])
     const minPublisherVisits = this.props.ledgerData.getIn(['synopsisOptions', 'minPublisherVisits'])
 
-    return <div className={css(paymentCommon.board)}>
-      <div className={css(paymentCommon.panel, styles.advancedSettings, commonStyles.noMarginTop, commonStyles.noMarginBottom)} data-test-id='advancedSettings'>
-        <div className={css(styles.settingsPanelDivider, styles.deviderFirst)}>
-          <div className={css(styles.minimumSetting)} data-l10n-id='minimumPageTimeSetting' />
-          <SettingsList>
-            <SettingItem>
-              <SettingDropdown
-                data-test-id='durationSelector'
-                defaultValue={minPublisherDuration || appConfig.defaultSettings[settings.MINIMUM_VISIT_TIME]}
-                onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.MINIMUM_VISIT_TIME)}>
-                <option data-l10n-id='minimumPageTimeLow' value='5000' />
-                <option data-l10n-id='minimumPageTimeMedium' value='8000' />
-                <option data-l10n-id='minimumPageTimeHigh' value='60000' />
-              </SettingDropdown>
-            </SettingItem>
-          </SettingsList>
-          <div className={css(styles.minimumSetting)} data-l10n-id='minimumVisitsSetting' />
-          <SettingsList className={css(commonStyles.noMarginBottom)}>
-            <SettingItem>
-              <SettingDropdown
-                data-test-id='visitSelector'
-                defaultValue={minPublisherVisits || 1}
-                onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.MINIMUM_VISITS)}>
-                <option data-l10n-id='minimumVisitsLow' value='1' />
-                <option data-l10n-id='minimumVisitsMedium' value='5' />
-                <option data-l10n-id='minimumVisitsHigh' value='10' />
-              </SettingDropdown>
-            </SettingItem>
-          </SettingsList>
-        </div>
-        <div className={css(styles.settingsPanelDivider, styles.lastDivider)}>
-          <SettingsList className={css(commonStyles.noMarginBottom)}
-            listClassName={css(styles.list)}
-          >
-            <SettingCheckbox
-              dataTestId='payment-advance-notifications'
-              dataL10nId='notifications'
-              prefKey={settings.PAYMENTS_NOTIFICATIONS}
-              settings={this.props.settings}
-              onChangeSetting={this.props.onChangeSetting}
-              className={css(styles.listItem)}
-              switchClassName={css(styles.checkboxSwitch)}
-              labelClassName={css(commonStyles.noMarginBottom)}
-            />
-            <SettingCheckbox
-              dataTestId='payment-advance-nonverified'
-              dataL10nId='nonVerifiedPublishers'
-              prefKey={settings.PAYMENTS_NON_VERIFIED}
-              settings={this.props.settings}
-              onChangeSetting={this.props.onChangeSetting}
-              className={css(styles.listItem, commonStyles.noMarginBottom)}
-              switchClassName={css(styles.checkboxSwitch)}
-              labelClassName={css(commonStyles.noMarginBottom)}
-            />
-          </SettingsList>
-        </div>
+    return <section className={css(styles.advancedSettings)} data-test-id='advancedSettings'>
+      <div className={css(styles.settingsPanelDivider)}>
+        <div className={css(styles.minimumSetting)} data-l10n-id='minimumPageTimeSetting' />
+        <SettingsList>
+          <SettingItem>
+            <SettingDropdown
+              data-test-id='durationSelector'
+              defaultValue={minPublisherDuration || appConfig.defaultSettings[settings.MINIMUM_VISIT_TIME]}
+              onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.MINIMUM_VISIT_TIME)}>
+              <option data-l10n-id='minimumPageTimeLow' value='5000' />
+              <option data-l10n-id='minimumPageTimeMedium' value='8000' />
+              <option data-l10n-id='minimumPageTimeHigh' value='60000' />
+            </SettingDropdown>
+          </SettingItem>
+        </SettingsList>
+        <div className={css(styles.minimumSetting)} data-l10n-id='minimumVisitsSetting' />
+        <SettingsList className={css(commonStyles.noMarginBottom)}>
+          <SettingItem>
+            <SettingDropdown
+              data-test-id='visitSelector'
+              defaultValue={minPublisherVisits || 1}
+              onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.MINIMUM_VISITS)}>
+              <option data-l10n-id='minimumVisitsLow' value='1' />
+              <option data-l10n-id='minimumVisitsMedium' value='5' />
+              <option data-l10n-id='minimumVisitsHigh' value='10' />
+            </SettingDropdown>
+          </SettingItem>
+        </SettingsList>
       </div>
-    </div>
+      <div className={css(styles.settingsPanelDivider, styles.lastDivider)}>
+        <SettingsList className={css(commonStyles.noMarginBottom)}
+          listClassName={css(styles.list)}
+        >
+          <SettingCheckbox
+            dataTestId='payment-advance-notifications'
+            dataL10nId='notifications'
+            prefKey={settings.PAYMENTS_NOTIFICATIONS}
+            settings={this.props.settings}
+            onChangeSetting={this.props.onChangeSetting}
+            className={css(styles.listItem)}
+            switchClassName={css(styles.checkboxSwitch)}
+            labelClassName={css(commonStyles.noMarginBottom)}
+          />
+          <SettingCheckbox
+            dataTestId='payment-advance-nonverified'
+            dataL10nId='nonVerifiedPublishers'
+            prefKey={settings.PAYMENTS_NON_VERIFIED}
+            settings={this.props.settings}
+            onChangeSetting={this.props.onChangeSetting}
+            className={css(styles.listItem, commonStyles.noMarginBottom)}
+            switchClassName={css(styles.checkboxSwitch)}
+            labelClassName={css(commonStyles.noMarginBottom)}
+          />
+        </SettingsList>
+      </div>
+    </section>
   }
 }
 
 class AdvancedSettingsFooter extends ImmutableComponent {
   render () {
-    return <div className={css(commonStyles.modalOverlay__footer, commonStyles.modalOverlay__footerButton)}>
-      <Button l10nId='backupLedger'
-        className={css(commonStyles.primaryButton)}
+    return <section>
+      <BrowserButton groupedItem primaryColor
+        l10nId='backupLedger'
+        testId='backupLedgerButton'
         onClick={this.props.showOverlay.bind(this, 'ledgerBackup')}
       />
-      <Button l10nId='recoverLedger'
-        className={css(commonStyles.primaryButton, paymentCommon.marginButtons)}
+      <BrowserButton groupedItem primaryColor
+        l10nId='recoverLedger'
+        testId='recoverLedgerButton'
         onClick={this.props.showOverlay.bind(this, 'ledgerRecovery')}
       />
-      <Button l10nId='done'
-        className={css(commonStyles.whiteButton, commonStyles.inlineButton, paymentCommon.marginButtons)}
+      <BrowserButton groupedItem secondaryColor
+        l10nId='done'
+        testId='doneButton'
         onClick={this.props.hideOverlay.bind(this, 'advancedSettings')}
       />
-    </div>
+    </section>
   }
 }
 
 const styles = StyleSheet.create({
   advancedSettings: {
-    paddingLeft: '50px',
-    paddingRight: '50px',
     display: 'flex',
     flexWrap: 'nowrap'
   },

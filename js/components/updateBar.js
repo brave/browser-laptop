@@ -5,7 +5,7 @@
 const React = require('react')
 const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
 
-const Button = require('./button')
+const BrowserButton = require('../../app/renderer/components/common/browserButton')
 const appActions = require('../actions/appActions')
 const windowActions = require('../actions/windowActions')
 const UpdateStatus = require('../constants/updateStatus')
@@ -62,10 +62,7 @@ class UpdateHello extends ImmutableComponent {
 
 class UpdateHide extends ImmutableComponent {
   render () {
-    return <Button className={cx({
-      [css(commonStyles.notificationItem__button)]: true,
-      whiteButton: true
-    })}
+    return <BrowserButton notificationItem secondaryColor
       testId='updateHide'
       l10nId='updateHide'
       onClick={appActions.setUpdateStatus.bind(null, this.props.reset ? UpdateStatus.UPDATE_NONE : undefined, false, undefined)} />
@@ -77,10 +74,7 @@ class UpdateLog extends ImmutableComponent {
     remote.shell.openItem(path.join(remote.app.getPath('userData'), 'updateLog.log'))
   }
   render () {
-    return <Button className={cx({
-      [css(commonStyles.notificationItem__button)]: true,
-      whiteButton: true
-    })}
+    return <BrowserButton notificationItem secondaryColor
       testId='updateViewLogButton'
       l10nId='updateViewLog'
       onClick={this.onViewLog.bind(this)} />
@@ -98,26 +92,17 @@ class UpdateAvailable extends ImmutableComponent {
       <span className={css(styles.flexAlignCenter)} data-test-id='notificationOptions'>
         {
           this.props.metadata && this.props.metadata.get('notes')
-          ? <Button className={cx({
-            [css(commonStyles.notificationItem__button)]: true,
-            whiteButton: true
-          })}
+          ? <BrowserButton notificationItem secondaryColor
             testId='updateDetails'
             l10nId='updateDetails'
             onClick={windowActions.setReleaseNotesVisible.bind(null, true)} />
           : null
         }
-        <Button className={cx({
-          [css(commonStyles.notificationItem__button)]: true,
-          whiteButton: true
-        })}
+        <BrowserButton notificationItem secondaryColor
           testId='updateLater'
           l10nId='updateLater'
           onClick={appActions.setUpdateStatus.bind(null, UpdateStatus.UPDATE_AVAILABLE_DEFERRED, false, undefined)} />
-        <Button className={cx({
-          [css(commonStyles.notificationItem__button)]: true,
-          primaryButton: true
-        })}
+        <BrowserButton notificationItem primaryColor
           testId='updateNow'
           l10nId='updateNow'
           onClick={appActions.setUpdateStatus.bind(null, UpdateStatus.UPDATE_APPLYING_RESTART, false, undefined)} />

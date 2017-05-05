@@ -5,7 +5,7 @@
 const React = require('react')
 
 // Components
-const ImmutableComponent = require('../immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 const MenuBarItem = require('./menuBarItem')
 
 // Constants
@@ -13,6 +13,9 @@ const keyCodes = require('../../../common/constants/keyCodes')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
+
+// State
+const contextMenuState = require('../../../common/state/contextMenuState.js')
 
 // Utils
 const {separatorMenuItem} = require('../../../common/commonMenu')
@@ -24,7 +27,7 @@ const {wrappingClamp} = require('../../../common/lib/formatUtil')
  * First intended use is with Windows to enable a slim titlebar.
  * NOTE: the system menu is still created and used in order to keep the accelerators working.
  */
-class MenuBar extends ImmutableComponent {
+class MenuBar extends React.Component {
   constructor () {
     super()
     this.onKeyDown = this.onKeyDown.bind(this)
@@ -43,11 +46,15 @@ class MenuBar extends ImmutableComponent {
    * Used to position the context menu object.
    */
   getMenubarItemBounds (index) {
-    if (typeof index !== 'number') index = this.props.selectedIndex
+    if (typeof index !== 'number') {
+      index = this.props.selectedIndex
+    }
+
     const selected = document.querySelectorAll('.menubar .menubarItem[data-index=\'' + index + '\']')
     if (selected.length === 1) {
       return selected.item(0).getBoundingClientRect()
     }
+
     return null
   }
 
@@ -112,31 +119,32 @@ class MenuBar extends ImmutableComponent {
     }
   }
 
-  shouldComponentUpdate (nextProps, nextState) {
-    return this.props.selectedIndex !== nextProps.selectedIndex ||
-      this.props.template !== nextProps.template
+  mergeProps (state, dispatchProps, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const contextMenuDetail = currentWindow.get('contextMenuDetail')
+
+    const props = {}
+    // used in renderer
+    props.template = state.getIn(['menu', 'template'])
+
+    // used in other functions
+    props.selectedIndex = currentWindow.getIn(['ui', 'menubar', 'selectedIndex'])
+    props.contextMenuSelectedIndex = contextMenuState.selectedIndex(currentWindow)
+    props.contextMenuDetail = !!contextMenuDetail
+    props.lastFocusedSelector = currentWindow.getIn(['ui', 'menubar', 'lastFocusedSelector'])
+
+    return Object.assign({}, ownProps, props)
   }
 
   render () {
-    let i = 0
     return <div className='menubar'>
       {
-        this.props.template.map((menubarItem) => {
-          let props = {
-            label: menubarItem.get('label'),
-            index: i++,
-            submenu: menubarItem.get('submenu').toJS(),
-            lastFocusedSelector: this.props.lastFocusedSelector,
-            menubar: this
-          }
-          if (props.index === this.props.selectedIndex) {
-            props.selected = true
-          }
-          return <MenuBarItem {...props} />
+        this.props.template.map((item, i) => {
+          return <MenuBarItem index={i} />
         })
       }
     </div>
   }
 }
 
-module.exports = MenuBar
+module.exports = ReduxComponent.connect(MenuBar)

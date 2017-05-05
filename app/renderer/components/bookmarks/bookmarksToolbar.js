@@ -8,7 +8,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ImmutableComponent = require('../immutableComponent')
-const Button = require('../../../../js/components/button')
+const BrowserButton = require('../common/browserButton')
 const BookmarkToolbarButton = require('./bookmarkToolbarButton')
 
 // Actions
@@ -231,13 +231,13 @@ class BookmarksToolbar extends ImmutableComponent {
       }
       {
         this.overflowBookmarkItems.size !== 0
-        ? <Button iconClass='fa-angle-double-right'
+        ? <BrowserButton
+          iconClass={globalStyles.appIcons.angleDoubleRight}
           onClick={this.onMoreBookmarksMenu}
-          className={cx({
-            bookmarkButton: true,
-            [css(styles.bookmarksToolbar__bookmarkButton)]: true,
-            [css(styles.bookmarksToolbar__overflowIndicator)]: true
-          })} />
+          custom={[
+            styles.bookmarksToolbar__bookmarkButton,
+            styles.bookmarksToolbar__overflowIndicator
+          ]} />
         : null
       }
     </div>

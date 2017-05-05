@@ -171,8 +171,8 @@ const tabState = {
     state = validateState(state)
 
     const index = state.get('tabs').findIndex((tab) => tab.get('tabId') === tabId)
-    if (index === -1) {
-      return makeImmutable(['nosuchpath'])
+    if (index === tabState.TAB_ID_NONE) {
+      return null
     }
     return makeImmutable(['tabs', index])
   },
@@ -185,7 +185,11 @@ const tabState = {
       return null
     }
 
-    return state.getIn(tabState.getPathByTabId(state, tabId))
+    const path = tabState.getPathByTabId(state, tabId)
+    if (path == null) {
+      return null
+    }
+    return state.getIn(path)
   },
 
   getTab: (state, tabValue) => {
@@ -305,8 +309,17 @@ const tabState = {
   getFramePathByTabId: (state, tabId) => {
     state = makeImmutable(state)
     tabId = validateId('tabId', tabId)
-    if (state.get('tabs')) {
-      return tabState.getPathByTabId(state, tabId).push('frame')
+
+    if (tabId === tabState.TAB_ID_NONE) {
+      return null
+    }
+
+    if (state.get('tabs') && !state.get('frames')) {
+      const path = tabState.getPathByTabId(state, tabId)
+      if (path == null) {
+        return null
+      }
+      return path.push('frame')
     } else {
       return frameState.getPathByTabId(state, tabId)
     }
@@ -324,32 +337,36 @@ const tabState = {
   },
 
   getFrameByTabId: (state, tabId) => {
+    const path = tabState.getFramePathByTabId(state, tabId)
+    if (path == null) {
+      return null
+    }
     return state.getIn(tabState.getFramePathByTabId(state, tabId))
   },
 
   isSecure: (state, tabId) => {
     const frame = tabState.getFrameByTabId(state, tabId)
-    return frameStateUtil.isFrameSecure(frame)
+    return frame ? frameStateUtil.isFrameSecure(frame) : null
   },
 
   isLoading: (state, tabId) => {
     const frame = tabState.getFrameByTabId(state, tabId)
-    return frameStateUtil.isFrameLoading(frame)
+    return frame ? frameStateUtil.isFrameLoading(frame) : null
   },
 
   startLoadTime: (state, tabId) => {
     const frame = tabState.getFrameByTabId(state, tabId)
-    return frameStateUtil.startLoadTime(frame)
+    return frame ? frameStateUtil.startLoadTime(frame) : null
   },
 
   endLoadTime: (state, tabId) => {
     const frame = tabState.getFrameByTabId(state, tabId)
-    return frameStateUtil.endLoadTime(frame)
+    return frame ? frameStateUtil.endLoadTime(frame) : null
   },
 
   getHistory: (state, tabId) => {
     const frame = tabState.getFrameByTabId(state, tabId)
-    return frameStateUtil.getHistory(frame)
+    return frame ? frameStateUtil.getHistory(frame) : null
   },
 
   getLocation: (state, tabId) => {

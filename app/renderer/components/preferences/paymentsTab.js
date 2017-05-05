@@ -21,7 +21,7 @@ const {
 
 const DisabledContent = require('./payment/disabledContent')
 const EnabledContent = require('./payment/enabledContent')
-const BitcoinDashboard = require('./payment/bitcoinDashboard')
+const {BitcoinDashboard, BitcoinDashboardFooter} = require('./payment/bitcoinDashboard')
 const {AdvancedSettingsContent, AdvancedSettingsFooter} = require('./payment/advancedSettings')
 const {HistoryContent, HistoryFooter} = require('./payment/history')
 const {LedgerBackupContent, LedgerBackupFooter} = require('./payment/ledgerBackup')
@@ -102,7 +102,16 @@ class PaymentsTab extends ImmutableComponent {
     })} data-test-id='paymentsContainer'>
       {
       this.enabled && this.props.addFundsOverlayVisible
-        ? <ModalOverlay title={this.overlayTitle} content={this.overlayContent} onHide={this.props.hideOverlay.bind(this, 'addFunds')} />
+        ? <ModalOverlay
+          title={this.overlayTitle}
+          content={this.overlayContent}
+          footer={
+            <BitcoinDashboardFooter
+              ledgerData={this.props.ledgerData}
+              hideParentOverlay={this.props.hideOverlay.bind(this, 'addFunds')} />
+          }
+          onHide={this.props.hideOverlay.bind(this, 'addFunds')}
+        />
         : null
       }
       {
@@ -110,6 +119,9 @@ class PaymentsTab extends ImmutableComponent {
           ? <ModalOverlay
             title={'paymentHistoryTitle'}
             customDialogClasses={'paymentHistory'}
+            customDialogHeaderClasses={css(styles.paymentHistoryOverlay__header)}
+            customDialogBodyClasses={css(styles.paymentHistoryOverlay__body)}
+            customDialogFooterClasses={css(styles.paymentHistoryOverlay__footer)}
             customTitleClasses={css(styles.paymentHistoryOverlay__title)}
             content={<HistoryContent
               ledgerData={this.props.ledgerData}
@@ -386,12 +398,25 @@ const styles = StyleSheet.create({
     }
   },
 
+  paymentHistoryOverlay__header: {
+    paddingLeft: `${paymentStylesVariables.spacing.paymentHistoryTablePadding} !important`
+  },
+  paymentHistoryOverlay__body: {
+    background: '#fff',
+    height: '300px',
+    overflowY: 'auto',
+    padding: '0 !important'
+  },
+  paymentHistoryOverlay__footer: {
+    display: 'block !important',
+    paddingLeft: `${paymentStylesVariables.spacing.paymentHistoryTablePadding} !important`,
+    paddingTop: '10px !important',
+    paddingBottom: '10px !important'
+  },
   paymentHistoryOverlay__title: {
     // TODO: refactor preferences.less to remove !important
-    // See: .paymentsContainer .modal .dialog .dialog-header .sectionTitle and .modal .dialog .sectionTitle
 
     color: `${globalStyles.color.braveMediumOrange} !important`,
-    padding: `25px 0 25px ${paymentStylesVariables.spacing.paymentHistoryTablePadding} !important`,
     textIndent: '0 !important'
   }
 })

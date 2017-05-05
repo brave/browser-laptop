@@ -63,29 +63,6 @@ const styles = StyleSheet.create({
     maxHeight: `calc(80vh - ${globalStyles.spacing.downloadsBarHeight})`
   },
 
-  // modalOverlay
-  // TODO: refactor modalOverlay
-  modalOverlay__dialog: {
-    // TODO: refactor preferences.less to remove !important
-    background: `linear-gradient(${globalStyles.color.modalVeryLightGray}, ${globalStyles.color.modalLightGray}) !important`,
-    borderRadius: `${globalStyles.radius.borderRadiusModal} !important`
-  },
-  modalOverlay__title: {
-    marginBottom: 0,
-
-    // TODO: refactor modalOverlay.less to remove !important
-    padding: '25px 0 !important'
-  },
-
-  modalOverlay__footer: {
-    padding: '20px'
-  },
-  modalOverlay__footerButton: {
-    display: 'flex',
-    flexFlow: 'nowrap',
-    justifyContent: 'flex-end'
-  },
-
   // itemList.less
   listItem: {
     cursor: 'default',
@@ -115,72 +92,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap'
-  },
-
-  // Buttons
-  browserButton: {
-    margin: '0',
-    whiteSpace: 'nowrap',
-    outline: 'none',
-    cursor: 'default',
-    display: 'inline-block',
-    lineHeight: globalStyles.spacing.buttonHeight,
-    height: globalStyles.spacing.buttonHeight,
-    width: globalStyles.spacing.buttonWidth,
-    fontSize: globalStyles.spacing.defaultFontSize,
-    color: globalStyles.color.buttonColor,
-    borderRadius: globalStyles.radius.borderRadius,
-    textAlign: 'center',
-    transition: '.1s opacity, .1s background',
-    userSelect: 'none',
-    backgroundSize: '16px',
-    backgroundPosition: 'center center',
-    backgroundRepeat: 'no-repeat'
-  },
-  primaryButton: {
-    background: 'linear-gradient(#FF7A1D, #ff5000)',
-    borderLeft: '2px solid transparent',
-    borderRight: '2px solid transparent',
-    borderTop: '2px solid #FF7A1D',
-    borderBottom: '2px solid #ff5000',
-    boxShadow: '0px 1px 5px -1px rgba(0, 0, 0, 0.5)',
-    fontWeight: '500',
-    fontSize: '0.9rem',
-    padding: '8px 20px',
-    margin: 0,
-    color: '#fff',
-    lineHeight: '1.25',
-    width: 'auto',
-    height: 'auto',
-    minWidth: '78px',
-
-    ':hover': {
-      border: '2px solid white',
-      color: 'white',
-      cursor: 'pointer'
-    }
-  },
-  whiteButton: {
-    background: 'linear-gradient(white, #ececec)',
-    border: '1px solid white',
-    boxShadow: '0px 1px 5px -1px rgba(0, 0, 0, 0.5)',
-    cursor: 'pointer',
-    color: '#444444',
-    lineHeight: 1.25,
-    width: 'auto',
-    height: 'auto',
-    minWidth: '78px',
-    fontSize: '0.9rem',
-    padding: '8px 20px',
-    margin: 0,
-
-    ':hover': {
-      border: `1px solid ${globalStyles.color.gray}`,
-      color: '#000'
-    }
-  },
-  inlineButton: {
-    display: 'inline'
   },
 
   // margin/padding
@@ -276,13 +187,6 @@ const styles = StyleSheet.create({
     fontSize: '14px',
     padding: '0',
     margin: 'auto 0 auto 10px'
-  },
-  notificationItem__button: {
-    fontSize: '13px',
-    marginRight: '10px',
-    padding: '2px 15px',
-    textTransform: 'capitalize',
-    width: 'auto'
   },
 
   siteDetailsPageContent: {

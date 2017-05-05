@@ -14,6 +14,7 @@ require('../../less/forms.less')
 const {Textbox, FormTextbox, SettingTextbox, RecoveryKeyTextbox} = require('../../app/renderer/components/common/textbox')
 const {TextArea, DefaultTextArea} = require('../../app/renderer/components/common/textbox')
 const {Dropdown, FormDropdown, SettingDropdown} = require('../../app/renderer/components/common/dropdown')
+const BrowserButton = require('../../app/renderer/components/common/browserButton')
 
 const {
   SectionTitleWrapper,
@@ -233,40 +234,36 @@ class AboutStyle extends ImmutableComponent {
 
       <div id='buttons'>
         <h1 data-l10n-id='buttons' />
-        <button data-l10n-id='browserButton' className='browserButton' onClick={this.onRemoveBookmark} />
+        <BrowserButton l10nId='browserButton' onClick={this.onRemoveBookmark} />
         <Pre><Code>
-          &lt;button data-l10n-id='done' className='browserButton'{'\n'}
-          onClick={'{this.onRemoveBookmark}'} />
+          &lt;BrowserButton l10nId='browserButton' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
-        <button data-l10n-id='whiteButton' className='browserButton whiteButton' onClick={this.onRemoveBookmark} />
+        <BrowserButton secondaryColor l10nId='secondaryColor' onClick={this.onRemoveBookmark} />
         <Pre><Code>
-          &lt;button data-l10n-id='cancel' className='browserButton whiteButton'{'\n'}
-          onClick={'{this.onRemoveBookmark}'} />
+          &lt;BrowserButton secondaryColor l10nId='secondaryColor' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
+        {
+          /* TODO: I don't think we really need it. Once we confirm by removing
+            legacy button styles, remove this as well */
+        }
         <button data-l10n-id='inlineButton' className='browserButton whiteButton inlineButton' onClick={this.onRemoveBookmark} />
         <Pre><Code>
-          &lt;button data-l10n-id='done' className='browserButton whiteButton inlineButton'{'\n'}
+          &lt;button data-l10n-id='inlineButton' className='browserButton whiteButton inlineButton'{'\n'}
           onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
-        <button data-l10n-id='wideButton' className='browserButton whiteButton wideButton' onClick={this.onRemoveBookmark} />
-        <Pre><Code>
-          &lt;button data-l10n-id='cancel' className='browserButton whiteButton wideButton'{'\n'}
-          onClick={'{this.onRemoveBookmark}'} />
-        </Code></Pre>
-
+        {/* TODO: This button size doesn't match its name */}
         <button data-l10n-id='smallButton' className='browserButton whiteButton smallButton' onClick={this.onRemoveBookmark} />
         <Pre><Code>
           &lt;button data-l10n-id='done' className='browserButton whiteButton smallButton'{'\n'}
           onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
-        <button data-l10n-id='primaryButton' className='browserButton primaryButton' onClick={this.onRemoveBookmark} />
+        <BrowserButton primaryColor l10nId='primaryColor' onClick={this.onRemoveBookmark} />
         <Pre><Code>
-          &lt;button data-l10n-id='cancel' className='browserButton primaryButton'{'\n'}
-          onClick={'{this.onRemoveBookmark}'} />
+          &lt;BrowserButton l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
         <button data-l10n-id='actionButton' className='browserButton actionButton' onClick={this.onRemoveBookmark} />
@@ -281,16 +278,25 @@ class AboutStyle extends ImmutableComponent {
           onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
-        <button data-l10n-id='primaryButton' className='browserButton primaryButton' onClick={this.onRemoveBookmark} /><button data-l10n-id='whiteButton' className='browserButton whiteButton' onClick={this.onRemoveBookmark} /><button data-l10n-id='wideButton' className='browserButton whiteButton wideButton' onClick={this.onRemoveBookmark} /><button data-l10n-id='primaryButton' className='browserButton primaryButton' onClick={this.onRemoveBookmark} />
+        <BrowserButton primaryColor groupedItem l10nId='primaryButton' onClick={this.onRemoveBookmark} />
+        <BrowserButton secondaryColor groupedItem l10nId='whiteButton' onClick={this.onRemoveBookmark} />
+        <BrowserButton secondaryColor groupedItem l10nId='wideButton' onClick={this.onRemoveBookmark} />
+        <BrowserButton primaryColor groupedItem l10nId='primaryButton' onClick={this.onRemoveBookmark} />
         <Pre><Code>
-          &lt;button data-l10n-id='cancel' className='browserButton primaryButton'{'\n'}
-          onClick={'{this.onRemoveBookmark}'} />{'\n'}
-          &lt;button data-l10n-id='cancel' className='browserButton whiteButton'{'\n'}
-          onClick={'{this.onRemoveBookmark}'} />{'\n'}
-          &lt;button data-l10n-id='cancel' className='browserButton whiteButton wideButton'{'\n'}
-          onClick={'{this.onRemoveBookmark}'} />{'\n'}
-          &lt;button data-l10n-id='cancel' className='browserButton primaryButton'{'\n'}
-          onClick={'{this.onRemoveBookmark}'} />{'\n'}
+          &lt;BrowserButton primaryColor groupedItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
+          &lt;BrowserButton secondaryColor groupedItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
+          &lt;BrowserButton secondaryColor groupedItem wideItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
+          &lt;BrowserButton primaryColor groupedItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
+        </Code></Pre>
+
+        <BrowserButton extensionItem l10nId='extensionItem' onClick={this.onRemoveBookmark} />
+        <Pre><Code>
+          &lt;BrowserButton extensionItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
+        </Code></Pre>
+
+        <BrowserButton notificationItem l10nId='notificationItem' onClick={this.onRemoveBookmark} />
+        <Pre><Code>
+          &lt;BrowserButton notificationItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
         <GoTop />
@@ -331,8 +337,8 @@ class AboutStyle extends ImmutableComponent {
                 labore et dolore magna aliqua.
               </CommonFormSection>
               <CommonFormButtonWrapper>
-                <button data-l10n-id='Cancel' className='browserButton whiteButton' />
-                <button data-l10n-id='Done' className='browserButton primaryButton' />
+                <BrowserButton secondaryColor l10nId='Cancel' />
+                <BrowserButton primaryColor l10nId='Done' />
               </CommonFormButtonWrapper>
               <CommonFormBottomWrapper>
                 <CommonFormClickable>CommonFormClickable</CommonFormClickable>
@@ -522,8 +528,8 @@ class AboutStyle extends ImmutableComponent {
           }}>
             <CommonForm>
               <CommonFormButtonWrapper>
-                <button data-l10n-id='Cancel' className='browserButton whiteButton' />
-                <button data-l10n-id='Done' className='browserButton primaryButton' />
+                <BrowserButton secondaryColor l10nId='Cancel' />
+                <BrowserButton primaryColor l10nId='Done' />
               </CommonFormButtonWrapper>
             </CommonForm>
           </div>

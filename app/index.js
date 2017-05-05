@@ -83,6 +83,7 @@ app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferH
 let perWindowState = []
 let sessionStateStoreComplete = false
 let sessionStateStoreCompleteCallback = null
+let saveAppStateTimeout = null
 let requestId = 0
 let shuttingDown = false
 let lastWindowState
@@ -120,6 +121,10 @@ const saveAppState = (forceSave = false) => {
   appState.perWindowState = perWindowState
 
   const receivedAllWindows = perWindowState.length === BrowserWindow.getAllWindows().length
+  if (receivedAllWindows) {
+    clearTimeout(saveAppStateTimeout)
+  }
+
   if (!forceSave && !receivedAllWindows) {
     return
   }
@@ -180,7 +185,7 @@ const initiateSessionStateSave = () => {
       BrowserWindow.getAllWindows().forEach((win) => win.webContents.send(messages.REQUEST_WINDOW_STATE, requestId))
       // Just in case a window is not responsive, we don't want to wait forever.
       // In this case just save session store for the windows that we have already.
-      setTimeout(() => {
+      saveAppStateTimeout = setTimeout(() => {
         saveAppState(true)
       }, appConfig.quitTimeout)
     } else {
