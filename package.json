@@ -143,6 +143,7 @@
     "babel-preset-react": "^6.1.18",
     "babel-register": "^6.3.13",
     "babel-runtime": "^6.3.13",
+    "base64-js": "^1.2.0",
     "chai": "^3.4.1",
     "chai-as-promised": "^5.1.0",
     "co-mocha": "^1.1.2",
