@@ -73,17 +73,17 @@ class LedgerBackupFooter extends ImmutableComponent {
 
   render () {
     return <section>
-      <BrowserButton primaryColor
+      <BrowserButton primaryColor groupedItem
         l10nId='printKeys'
         testId='printKeysButton'
         onClick={this.printKeys}
       />
-      <BrowserButton primaryColor
+      <BrowserButton primaryColor groupedItem
         l10nId='saveRecoveryFile'
         testId='saveRecoveryFileButton'
         onClick={this.saveKeys}
       />
-      <BrowserButton secondaryColor
+      <BrowserButton secondaryColor groupedItem
         l10nId='done'
         testId='doneButton'
         onClick={this.props.hideOverlay.bind(this, 'ledgerBackup')}
