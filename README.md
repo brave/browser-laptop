@@ -17,7 +17,7 @@ Follow [@brave](https://twitter.com/brave) on Twitter for important news and ann
 
 For other versions of our browser, please see:
 * iPhone - [brave/browser-ios](https://github.com/brave/browser-ios)
-* Android - [brave/browser-android](https://github.com/brave/browser-android-tabs)
+* Android - [brave/browser-android-tabs](https://github.com/brave/browser-android-tabs)
 
 ## Downloads
 
