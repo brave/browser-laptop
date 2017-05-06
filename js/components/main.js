@@ -213,7 +213,7 @@ class Main extends ImmutableComponent {
 
   registerSwipeListener () {
     // Navigates back/forward on macOS two- and or three-finger swipe
-    let swipeGesture = false
+    let mouseInFrame = false
     let trackingFingers = false
     let startTime = 0
     let isSwipeOnLeftEdge = false
@@ -222,17 +222,10 @@ class Main extends ImmutableComponent {
     let deltaY = 0
     let time
 
-    ipc.on(messages.ENABLE_SWIPE_GESTURE, (e) => {
-      swipeGesture = true
-    })
-
-    ipc.on(messages.DISABLE_SWIPE_GESTURE, (e) => {
-      swipeGesture = false
-    })
-
     // isSwipeTrackingFromScrollEventsEnabled is only true if "two finger scroll to swipe" is enabled
     ipc.on('scroll-touch-begin', () => {
-      if (swipeGesture) {
+      mouseInFrame = this.props.windowState.getIn(['ui', 'mouseInFrame'])
+      if (mouseInFrame) {
         trackingFingers = true
         startTime = (new Date()).getTime()
       }
@@ -277,7 +270,7 @@ class Main extends ImmutableComponent {
     })
 
     const throttledSwipe = _.throttle(direction => {
-      if (swipeGesture) {
+      if (mouseInFrame) {
         if (direction === 'left') {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_BACK)
         } else if (direction === 'right') {
