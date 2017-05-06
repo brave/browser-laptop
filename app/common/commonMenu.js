@@ -25,16 +25,19 @@ if (process.type === 'browser') {
 const ensureAtLeastOneWindow = (frameOpts) => {
   if (BrowserWindow.getAllWindows().length === 0) {
     appActions.newWindow(frameOpts)
+    return false
   }
+  return true
 }
 
 const getCurrentWindowId = () => {
   if (process.type === 'browser') {
-    return BrowserWindow.getActiveWindow().id
-  } else {
-    const currentWindow = require('../renderer/currentWindow')
-    return currentWindow.getCurrentWindowId()
+    const activeWindow = BrowserWindow.getActiveWindow()
+    return activeWindow && activeWindow.id
   }
+
+  const currentWindow = require('../renderer/currentWindow')
+  return currentWindow.getCurrentWindowId()
 }
 
 /**
@@ -73,11 +76,12 @@ module.exports.newTabMenuItem = (openerTabId) => {
     label: locale.translation('newTab'),
     accelerator: 'CmdOrCtrl+T',
     click: function (item, focusedWindow) {
-      ensureAtLeastOneWindow(Immutable.fromJS({}))
-      appActions.createTabRequested({
-        windowId: getCurrentWindowId(),
-        openerTabId
-      })
+      if (ensureAtLeastOneWindow(Immutable.fromJS({}))) {
+        appActions.createTabRequested({
+          windowId: getCurrentWindowId(),
+          openerTabId
+        })
+      }
     }
   }
 }
@@ -87,12 +91,13 @@ module.exports.newPrivateTabMenuItem = () => {
     label: locale.translation('newPrivateTab'),
     accelerator: 'Shift+CmdOrCtrl+P',
     click: function (item, focusedWindow) {
-      ensureAtLeastOneWindow(Immutable.fromJS({ isPrivate: true }))
-      appActions.createTabRequested({
-        url: 'about:newtab',
-        windowId: getCurrentWindowId(),
-        isPrivate: true
-      })
+      if (ensureAtLeastOneWindow(Immutable.fromJS({ isPrivate: true }))) {
+        appActions.createTabRequested({
+          url: 'about:newtab',
+          windowId: getCurrentWindowId(),
+          isPrivate: true
+        })
+      }
     }
   }
 }
@@ -101,9 +106,11 @@ module.exports.newPartitionedTabMenuItem = () => {
   const newPartitionedMenuItem = (partitionNumber) => ({
     label: `${locale.translation('newSessionTab')} ${partitionNumber}`,
     click: (item, focusedWindow) => {
-      appActions.createTabRequested({
-        partitionNumber
-      })
+      if (ensureAtLeastOneWindow(Immutable.fromJS({ partitionNumber }))) {
+        appActions.createTabRequested({
+          partitionNumber
+        })
+      }
     }
   })
 
