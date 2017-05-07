@@ -3,25 +3,35 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-
-const ReduxComponent = require('../reduxComponent')
 const {StyleSheet, css} = require('aphrodite')
 const Immutable = require('immutable')
-
-const windowActions = require('../../../../js/actions/windowActions')
-const appActions = require('../../../../js/actions/appActions')
-const urlParse = require('../../../common/urlParse')
-const KeyCodes = require('../../../common/constants/keyCodes')
-const cx = require('../../../../js/lib/classSet')
-const debounce = require('../../../../js/lib/debounce')
 const ipc = require('electron').ipcRenderer
 
+// Components
+const ReduxComponent = require('../reduxComponent')
 const UrlBarSuggestions = require('./urlBarSuggestions')
 const UrlBarIcon = require('./urlBarIcon')
+
+// Actions
+const windowActions = require('../../../../js/actions/windowActions')
+const appActions = require('../../../../js/actions/appActions')
+
+// Constants
 const messages = require('../../../../js/constants/messages')
-const siteSettings = require('../../../../js/state/siteSettings')
-const {getSetting} = require('../../../../js/settings')
 const settings = require('../../../../js/constants/settings')
+const KeyCodes = require('../../../common/constants/keyCodes')
+
+// State
+const frameStateUtil = require('../../../../js/state/frameStateUtil')
+const siteSettings = require('../../../../js/state/siteSettings')
+const tabState = require('../../../common/state/tabState')
+const siteSettingsState = require('../../../common/state/siteSettingsState')
+
+// Utils
+const urlParse = require('../../../common/urlParse')
+const cx = require('../../../../js/lib/classSet')
+const debounce = require('../../../../js/lib/debounce')
+const {getSetting} = require('../../../../js/settings')
 const contextMenus = require('../../../../js/contextMenus')
 const UrlUtil = require('../../../../js/lib/urlutil')
 const {eventElHasAncestorWithClasses, isForSecondaryAction} = require('../../../../js/lib/eventUtil')
@@ -30,10 +40,6 @@ const {getCurrentWindowId} = require('../../currentWindow')
 
 // Icons
 const iconNoScript = require('../../../../img/url-bar-no-script.svg')
-
-// State
-const frameStateUtil = require('../../../../js/state/frameStateUtil')
-const tabState = require('../../../common/state/tabState')
 
 class UrlBar extends React.Component {
   constructor (props) {
@@ -416,6 +422,8 @@ class UrlBar extends React.Component {
     const locationValue = (isIntermediateAboutPage(urlbarLocation) && history.size > 0 && !canGoForward)
         ? history.last() : UrlUtil.getDisplayLocation(urlbarLocation, getSetting(settings.PDFJS_ENABLED))
     const selectedIndex = activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])
+    const allSiteSettings = siteSettingsState.getAllSiteSettings(state, activeFrame.get('isPrivate'))
+    const braverySettings = siteSettings.getSiteSettingsForURL(allSiteSettings, location)
 
     // TODO(bridiver) - these definitely needs a helpers
     const publisherId = state.getIn(['locationInfo', baseUrl, 'publisher'])
@@ -455,7 +463,7 @@ class UrlBar extends React.Component {
     props.startLoadTime = activeFrame.get('startLoadTime')
     props.endLoadTime = activeFrame.get('endLoadTime')
     props.loading = activeFrame.get('loading')
-    props.enableNoScript = ownProps.enableNoScript
+    props.enableNoScript = siteSettingsState.isNoScriptEnabled(state, braverySettings)
     props.noScriptIsVisible = windowState.getIn(['ui', 'noScriptInfo', 'isVisible']) || false
     props.menubarVisible = ownProps.menubarVisible
     props.activeTabShowingMessageBox = tabState.isShowingMessageBox(state, activeTabId)
