@@ -123,7 +123,8 @@ const appConstants = {
   APP_ON_GO_FORWARD: _,
   APP_ON_GO_TO_INDEX: _,
   APP_ON_GO_BACK_LONG: _,
-  APP_ON_GO_FORWARD_LONG: _
+  APP_ON_GO_FORWARD_LONG: _,
+  APP_AUTOPLAY_BLOCKED: _
 }
 
 module.exports = mapValuesByKeys(appConstants)
