@@ -32,7 +32,10 @@ if (adobeRegex.test(window.location.href)) {
 
 if (chrome.contentSettings.flashEnabled == 'allow') {
   document.addEventListener('click', (e) => {
-    let href = e.target.href || (e.target.parentNode && e.target.parentNode.href)
+    let node = e.target
+    while (!node.href && node.parentNode)
+      node = node.parentNode
+    const href = node.href
     if (href && href.match(adobeRegex)) {
       e.preventDefault()
       chrome.ipcRenderer.send('dispatch-action', JSON.stringify([{
