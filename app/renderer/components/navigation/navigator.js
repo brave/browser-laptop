@@ -113,7 +113,7 @@ class Navigator extends React.Component {
     if (e.dataTransfer.files.length > 0) {
       Array.from(e.dataTransfer.files).forEach((file) => {
         const path = encodeURI(file.path)
-        return windowActions.newFrame({location: path, title: file.name})
+        appActions.createTabRequested({ url: path })
       })
     } else if (e.dataTransfer.getData('text/plain')) {
       if (this.props.activeTabId) {
