@@ -39,6 +39,9 @@
     flex: 1;
 
     .folderView {
+      /* TODO: once refactoring to Aphrodite, make
+      it more flexible with relative units */
+      max-width: 410px;
       min-width: 220px;
       flex-grow: 1;
 
@@ -215,6 +218,7 @@
         max-height: inherit;
       }
       .folderView {
+        max-width: 100%;
         > .bookmarkFolderList {
           overflow-x: visible;
           overflow-y: visible;
