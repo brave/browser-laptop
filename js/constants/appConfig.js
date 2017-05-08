@@ -186,6 +186,7 @@ module.exports = {
     'advanced.smooth-scroll-enabled': false,
     'advanced.send-crash-reports': true,
     'advanced.send-usage-statistics': false,
+    'advanced.update-to-preview-releases': false,
     'advanced.hide-excluded-sites': false,
     'advanced.minimum-visit-time': 8000,
     'advanced.minimum-visits': 1,

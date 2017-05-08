@@ -44,6 +44,7 @@ var platforms = {
 // It is set in the init function
 var platformBaseUrl = null
 var version = null
+var updateToPreviewReleases = false
 
 // build the complete update url from the base, platform and version
 exports.updateUrl = function (updates, platform, arch) {
@@ -84,21 +85,26 @@ var scheduleUpdates = () => {
 }
 
 // set the feed url for the auto-update system
-exports.init = (platform, arch, ver) => {
+exports.init = (platform, arch, ver, updateToPreview) => {
   // When starting up we should not expect an update to be available
   appActions.setUpdateStatus(UpdateStatus.UPDATE_NONE)
 
   // Browser version X.X.X
   version = ver
 
+  // Flag controlling whether preview releases are accepted
+  updateToPreviewReleases = updateToPreview
+
   var baseUrl = exports.updateUrl(appConfig.updates, platform, arch)
+  var query = { accept_preview: updateToPreviewReleases ? 'true' : 'false' }
 
   if (baseUrl) {
     debug(`updateUrl = ${baseUrl}`)
     scheduleUpdates()
     // This will fail if we are in dev
     try {
-      autoUpdater.setFeedURL(baseUrl)
+      // add the preview flag to the base feed url
+      autoUpdater.setFeedURL(`${baseUrl}?${querystring.stringify(query)}`)
     } catch (err) {
       console.log(err)
     }
@@ -145,6 +151,7 @@ var requestVersionInfo = (done, pingOnly) => {
     lastCheckMonth,
     firstCheckMade
   )
+  query.accept_preview = updateToPreviewReleases ? 'true' : 'false'
   var queryString = `${platformBaseUrl}?${querystring.stringify(query)}`
   debug(queryString)
 

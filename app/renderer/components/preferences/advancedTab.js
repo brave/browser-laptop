@@ -28,6 +28,7 @@ class AdvancedTab extends ImmutableComponent {
       <main className={css(styles.advancedTabMain)}>
         <DefaultSectionTitle data-l10n-id='contentSettings' />
         <SettingsList>
+          <SettingCheckbox dataL10nId='updateToPreviewReleases' prefKey={settings.UPDATE_TO_PREVIEW_RELEASES} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
           <SettingCheckbox dataL10nId='useHardwareAcceleration' prefKey={settings.HARDWARE_ACCELERATION_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
           <SettingCheckbox dataL10nId='useSmoothScroll' prefKey={settings.SMOOTH_SCROLL_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
           <SettingCheckbox dataL10nId='sendCrashReports' prefKey={settings.SEND_CRASH_REPORTS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />

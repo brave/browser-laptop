@@ -58,7 +58,6 @@ const appConfig = require('../js/constants/appConfig')
 const appActions = require('../js/actions/appActions')
 const SessionStore = require('./sessionStore')
 const AppStore = require('../js/stores/appStore')
-const PackageLoader = require('./package-loader')
 const Autofill = require('./autofill')
 const Extensions = require('./extensions')
 const TrackingProtection = require('./trackingProtection')
@@ -459,33 +458,33 @@ app.on('ready', () => {
       BookmarksExporter.showDialog(AppStore.getState().get('sites'))
     })
 
-    // This loads package.json into an object
-    // TODO: Seems like this can be done with app.getVersion() insteand?
-    PackageLoader.load((err, pack) => {
-      if (err) throw new Error('package.json could not be accessed')
+    // We need the initial state to read the UPDATE_TO_PREVIEW_RELEASES preference
+    loadAppStatePromise.then((initialState) => {
+      Updater.init(
+        process.platform,
+        process.arch,
+        process.env.BRAVE_UPDATE_VERSION || app.getVersion(),
+        initialState.settings[settings.UPDATE_TO_PREVIEW_RELEASES]
+      )
 
-      // Setup the auto updater, check the env variable first because it's
-      // used to check the update channel before releases.
-      Updater.init(process.platform, process.arch, process.env.BRAVE_UPDATE_VERSION || pack.version)
-
-      // This is fired by a menu entry (for now - will be scheduled)
+      // This is fired by a menu entry
       process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
-      ipcMain.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
 
       // This is fired from a auto-update metadata call
       process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => {
         console.log(metadata)
       })
-
-      // This is fired by a menu entry
-      process.on(messages.IMPORT_BROWSER_DATA_NOW, () => {
-        Importer.init()
-      })
-
-      process.on(messages.EXPORT_BOOKMARKS, () => {
-        BookmarksExporter.showDialog(AppStore.getState().get('sites'))
-      })
     })
+
+    // This is fired by a menu entry
+    process.on(messages.IMPORT_BROWSER_DATA_NOW, () => {
+      Importer.init()
+    })
+
+    process.on(messages.EXPORT_BOOKMARKS, () => {
+      BookmarksExporter.showDialog(AppStore.getState().get('sites'))
+    })
+
     ready = true
   }
 })
