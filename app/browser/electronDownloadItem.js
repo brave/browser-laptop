@@ -13,7 +13,7 @@ const downloadMap = {}
 
 module.exports.updateElectronDownloadItem = (downloadId, item, state) => {
   if (state === downloadStates.INTERRUPTED || state === downloadStates.CANCELLED || state === downloadStates.COMPLETED) {
-    if (state === downloadStates.COMPLETED) {
+    if (app.dock && state === downloadStates.COMPLETED) {
       app.dock.downloadFinished(item.getSavePath())
     }
     delete downloadMap[downloadId]
