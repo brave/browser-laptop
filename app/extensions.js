@@ -408,6 +408,9 @@ module.exports.init = () => {
   }
 
   let loadExtension = (extensionId, extensionPath, manifest = {}, manifestLocation = 'unpacked') => {
+    if (extensionId === config.PDFJSExtensionId) {
+      manifestLocation = 'component'
+    }
     if (!extensionInfo.isLoaded(extensionId) && !extensionInfo.isLoading(extensionId)) {
       extensionInfo.setState(extensionId, extensionStates.LOADING)
       if (extensionId === config.braveExtensionId || extensionId === config.torrentExtensionId || extensionId === config.syncExtensionId) {
