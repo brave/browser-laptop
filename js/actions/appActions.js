@@ -1296,13 +1296,11 @@ const appActions = {
 
   /**
    * Notifies autoplay has been blocked
-   * @param {string} location - Location of current frame
    * @param {number} tabId - Tab id of current frame
    */
-  autoplayBlocked: function (location, tabId) {
+  autoplayBlocked: function (tabId) {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_AUTOPLAY_BLOCKED,
-      location,
       tabId
     })
   }

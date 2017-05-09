@@ -529,7 +529,7 @@ class Frame extends React.Component {
         windowActions.setBlockedBy(this.frame, 'noScript', e.details[1])
       }
       if (e.details[0] === 'autoplay') {
-        appActions.autoplayBlocked(this.frame.get('location'), this.frame.get('tabId'))
+        appActions.autoplayBlocked(this.frame.get('tabId'))
       }
     })
     this.webview.addEventListener('did-block-run-insecure-content', (e) => {
