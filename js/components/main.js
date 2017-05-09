@@ -470,11 +470,13 @@ class Main extends ImmutableComponent {
     window.addEventListener('focus', () => {
       const activeFrame = frameStateUtil.getActiveFrame(self.props.windowState)
       windowActions.setFocusedFrame(activeFrame)
+      windowActions.onFocus(getCurrentWindowId())
       // For whatever reason other elements are preserved but webviews are not.
       if (document.activeElement && document.activeElement.tagName === 'BODY') {
         webviewActions.setWebviewFocused()
       }
     })
+    windowActions.onFocus(getCurrentWindowId())
 
     // disable dnd by default
     window.addEventListener('dragover', function (event) {
@@ -503,6 +505,7 @@ class Main extends ImmutableComponent {
 
     window.onblur = () => {
       self.resetAltMenuProcessing()
+      windowActions.onBlur(getCurrentWindowId())
     }
   }
 
