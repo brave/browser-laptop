@@ -73,7 +73,8 @@ describe('Bravery Panel', function () {
     })
   })
 
-  describe('Adblock stats', function () {
+  // See: #8760
+  describe('Adblock stats without iframe tests', function () {
     Brave.beforeEach(this)
     beforeEach(function * () {
       yield setup(this.app.client)
@@ -236,60 +237,9 @@ describe('Bravery Panel', function () {
             })
         })
     })
-    // TODO(bridiver) using slashdot won't provide reliable results so we should
-    // create our own iframe page with urls we expect to be blocked
-    it('detects blocked elements in iframe in private tab', function * () {
-      const url = Brave.server.url('slashdot.html')
-      yield this.app.client
-        .newTab({ url, isPrivate: true })
-        .waitForTabCount(2)
-        .windowByUrl(Brave.browserWindowUrl)
-        .openBraveMenu(braveMenu, braveryPanel)
-        .waitUntil(function () {
-          return this.getText(adsBlockedStat)
-            .then((blocked) => Number(blocked) > 1)
-        })
-        .click(adsBlockedControl)
-        .waitForVisible(showAdsOption)
-        .click(showAdsOption)
-        .waitForTextValue(adsBlockedStat, '0')
-        .keys(Brave.keys.ESCAPE)
-        .newTab({ url })
-        .waitForTabCount(3)
-        .openBraveMenu(braveMenu, braveryPanel)
-        .waitUntil(function () {
-          return this.getText(adsBlockedStat)
-            .then((blocked) => Number(blocked) > 1)
-        })
-    })
-    it('detects blocked elements in iframe', function * () {
-      const url = Brave.server.url('slashdot.html')
-      yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(url)
-        .openBraveMenu(braveMenu, braveryPanel)
-        .waitUntil(function () {
-          return this.getText(adsBlockedStat)
-            .then((blocked) => Number(blocked) > 1)
-        })
-        .click(adsBlockedControl)
-        .waitForVisible(showAdsOption)
-        .click(showAdsOption)
-        .waitForTextValue(adsBlockedStat, '0')
-        .keys(Brave.keys.ESCAPE)
-        .newTab({ url, isPrivate: true })
-        .waitForTabCount(1)
-        .waitForUrl(url)
-        .openBraveMenu(braveMenu, braveryPanel)
-        .waitForTextValue(adsBlockedStat, '0')
-        .click(adsBlockedControl)
-        .waitForVisible(blockAdsOption)
-        .click(blockAdsOption)
-        .waitUntil(function () {
-          return this.getText(adsBlockedStat)
-            .then((blocked) => Number(blocked) > 1)
-        })
-    })
+
+    // TODO: Fix iframe tests (See: #8760)
+
     it('detects https upgrades in private tab', function * () {
       const url = Brave.server.url('httpsEverywhere.html')
       yield this.app.client
@@ -498,6 +448,70 @@ describe('Bravery Panel', function () {
         .waitForTextValue('body', 'fingerprinting test')
         .openBraveMenu(braveMenu, braveryPanel)
         .waitForTextValue(fpStat, '0')
+    })
+  })
+
+  // TODO: Fix iframe tests (See: #8760)
+  describe('Adblock stats iframe tests', function () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
+      yield setup(this.app.client)
+      yield this.app.client
+        .waitForDataFile('adblock')
+    })
+    // TODO(bridiver) using slashdot won't provide reliable results so we should
+    // create our own iframe page with urls we expect to be blocked
+    it('detects blocked elements in iframe in private tab', function * () {
+      const url = Brave.server.url('slashdot.html')
+      yield this.app.client
+        .newTab({ url, isPrivate: true })
+        .waitForTabCount(2)
+        .windowByUrl(Brave.browserWindowUrl)
+        .openBraveMenu(braveMenu, braveryPanel)
+        .waitUntil(function () {
+          return this.getText(adsBlockedStat)
+            .then((blocked) => Number(blocked) > 1)
+        })
+        .click(adsBlockedControl)
+        .waitForVisible(showAdsOption)
+        .click(showAdsOption)
+        .waitForTextValue(adsBlockedStat, '0')
+        .keys(Brave.keys.ESCAPE)
+        .newTab({ url })
+        .waitForTabCount(3)
+        .openBraveMenu(braveMenu, braveryPanel)
+        .waitUntil(function () {
+          return this.getText(adsBlockedStat)
+            .then((blocked) => Number(blocked) > 1)
+        })
+    })
+    it('detects blocked elements in iframe', function * () {
+      const url = Brave.server.url('slashdot.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(url)
+        .openBraveMenu(braveMenu, braveryPanel)
+        .waitUntil(function () {
+          return this.getText(adsBlockedStat)
+            .then((blocked) => Number(blocked) > 1)
+        })
+        .click(adsBlockedControl)
+        .waitForVisible(showAdsOption)
+        .click(showAdsOption)
+        .waitForTextValue(adsBlockedStat, '0')
+        .keys(Brave.keys.ESCAPE)
+        .newTab({ url, isPrivate: true })
+        .waitForTabCount(1)
+        .waitForUrl(url)
+        .openBraveMenu(braveMenu, braveryPanel)
+        .waitForTextValue(adsBlockedStat, '0')
+        .click(adsBlockedControl)
+        .waitForVisible(blockAdsOption)
+        .click(blockAdsOption)
+        .waitUntil(function () {
+          return this.getText(adsBlockedStat)
+            .then((blocked) => Number(blocked) > 1)
+        })
     })
   })
 
