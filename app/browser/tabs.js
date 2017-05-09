@@ -166,7 +166,7 @@ const updateAboutDetails = (tab, tabValue) => {
       bookmarks: bookmarks.toJS(),
       bookmarkFolders: bookmarkFolders.toJS()
     })
-  } else if (location === 'about:history' && history) {
+  } else if (location === 'about:history') {
     if (!history) {
       appActions.populateHistory()
     }
