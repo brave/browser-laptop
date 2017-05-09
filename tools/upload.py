@@ -7,14 +7,13 @@ import requests
 
 BROWSER_LAPTOP_REPO = 'brave/browser-laptop'
 TARGET_ARCH= os.environ['TARGET_ARCH'] if os.environ.has_key('TARGET_ARCH') else 'x64'
-RELEASE_NAME = ('PRE (DO NOT DOWNLOAD UNLESS YOU ARE TESTING '
-  'THIS RELEASE CANDIDATE) Dev Channel Beta')
+RELEASE_NAME = 'Dev Channel Beta'
 
 def main():
   github = GitHub(auth_token())
   releases = github.repos(BROWSER_LAPTOP_REPO).releases.get()
   tag = ('v' + json.load(open('package.json'))['version'] +
-    release_channel() + '-' + build_label())
+    release_channel())
   tag_exists = False
   for release in releases:
     if not release['draft'] and release['tag_name'] == tag:
@@ -93,15 +92,6 @@ def release_channel():
              'environment variable, which is your release channel')
   assert channel, message
   return channel
-
-def build_label():
-  build = os.environ['BUILD']
-  message = ('Error: Please set the $BUILD '
-             'environment variable, which is your build label '
-             'Examples: beta5, or RC1')
-  assert build, message
-  return build
-
 
 if __name__ == '__main__':
   import sys
