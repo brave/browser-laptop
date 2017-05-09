@@ -15,7 +15,12 @@ const locale = require('../../locale')
 const messages = require('../../../js/constants/messages')
 const urlParse = require('../../common/urlParse')
 
-const showAutoplayMessageBox = (location, tabId) => {
+const showAutoplayMessageBox = (tabId) => {
+  const tab = webContents.fromTabID(tabId)
+  if (!tab || tab.isDestroyed()) {
+    return
+  }
+  const location = tab.getURL()
   const origin = getOrigin(location)
   const originSettings = siteSettings.getSiteSettingsForURL(AppStore.getState().get('siteSettings'), origin)
   if (originSettings && originSettings.get('noAutoplay') === true) {
@@ -46,11 +51,8 @@ const showAutoplayMessageBox = (location, tabId) => {
       if (buttonIndex === 0) {
         appActions.changeSiteSetting(ruleKey, 'noAutoplay', false)
 
-        if (tabId) {
-          const tab = webContents.fromTabID(tabId)
-          if (tab && !tab.isDestroyed()) {
-            return tab.reload()
-          }
+        if (tab && !tab.isDestroyed()) {
+          tab.reload()
         }
       } else {
         if (persist) {
@@ -65,7 +67,7 @@ const autoplayReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
     case appConstants.APP_AUTOPLAY_BLOCKED:
-      showAutoplayMessageBox(action.get('location'), action.get('tabId'))
+      showAutoplayMessageBox(action.get('tabId'))
       break
   }
   return state
