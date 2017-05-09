@@ -1,7 +1,7 @@
 /* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
-const {cookieControl, allowAllCookiesOption, blockAllCookiesOption, urlInput, braveMenu, braveMenuDisabled, adsBlockedStat, adsBlockedControl, showAdsOption, blockAdsOption, braveryPanel, httpsEverywhereStat, noScriptStat, noScriptSwitch, fpSwitch, autoplaySwitch, fpStat, noScriptNavButton, customFiltersInput} = require('../lib/selectors')
+const {cookieControl, allowAllCookiesOption, blockAllCookiesOption, urlInput, braveMenu, braveMenuDisabled, adsBlockedStat, adsBlockedControl, showAdsOption, blockAdsOption, braveryPanel, httpsEverywhereStat, noScriptStat, noScriptSwitch, fpSwitch, noAutoplaySwitch, fpStat, noScriptNavButton, customFiltersInput, notificationBar, reloadButton} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 
 describe('Bravery Panel', function () {
@@ -518,6 +518,11 @@ describe('Bravery Panel', function () {
               return status === ''
             })
         })
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(notificationBar)
+        .waitUntil(function () {
+          return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
+        })
     })
 
     it('allow autoplay in regular tab', function * () {
@@ -531,8 +536,13 @@ describe('Bravery Panel', function () {
               return status === ''
             })
         })
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(notificationBar)
+        .waitUntil(function () {
+          return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
+        })
         .openBraveMenu(braveMenu, braveryPanel)
-        .click(autoplaySwitch)
+        .click(noAutoplaySwitch)
         .keys(Brave.keys.ESCAPE)
         .tabByUrl(url)
         .waitUntil(function () {
@@ -554,8 +564,13 @@ describe('Bravery Panel', function () {
               return status === ''
             })
         })
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(notificationBar)
+        .waitUntil(function () {
+          return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
+        })
         .openBraveMenu(braveMenu, braveryPanel)
-        .click(autoplaySwitch)
+        .click(noAutoplaySwitch)
         .keys(Brave.keys.ESCAPE)
         .tabByUrl(url)
         .waitUntil(function () {
@@ -564,6 +579,63 @@ describe('Bravery Panel', function () {
               return status === 'Autoplay playing'
             })
         })
+    })
+
+    it('allow autoplay in notification bar', function * () {
+      const url = Brave.server.url('autoplay.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(url)
+        .waitUntil(function () {
+          return this.getText('div[id="status"]')
+            .then((status) => {
+              return status === ''
+            })
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(notificationBar)
+        .waitUntil(function () {
+          return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
+        })
+        .click('button=Yes')
+        .tabByUrl(url)
+        .waitUntil(function () {
+          return this.getText('div[id="status"]')
+            .then((status) => {
+              return status === 'Autoplay playing'
+            })
+        })
+    })
+
+    it('Remember block autoplay in notification bar', function * () {
+      const url = Brave.server.url('autoplay.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(url)
+        .waitUntil(function () {
+          return this.getText('div[id="status"]')
+            .then((status) => {
+              return status === ''
+            })
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(notificationBar)
+        .waitUntil(function () {
+          return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
+        })
+        .click('[data-l10n-id=rememberDecision]')
+        .click('button=No')
+        .windowByUrl(Brave.browserWindowUrl)
+        .click(reloadButton)
+        .tabByUrl(url)
+        .waitUntil(function () {
+          return this.getText('div[id="status"]')
+            .then((status) => {
+              return status === ''
+            })
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForElementCount('.notificationItem', 0)
     })
   })
 })

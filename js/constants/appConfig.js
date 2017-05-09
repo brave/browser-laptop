@@ -19,7 +19,7 @@ module.exports = {
   quitTimeout: 10 * 1000,
   resourceNames: {
     ADBLOCK: 'adblock',
-    AUTOPLAY: 'autoplay',
+    NOAUTOPLAY: 'noAutoplay',
     SAFE_BROWSING: 'safeBrowsing',
     HTTPS_EVERYWHERE: 'httpsEverywhere',
     TRACKING_PROTECTION: 'trackingProtection',
@@ -36,8 +36,8 @@ module.exports = {
   cookieblock: {
     enabled: true
   },
-  autoplay: {
-    enabled: false
+  noAutoplay: {
+    enabled: true
   },
   cookieblockAll: {
     enabled: false

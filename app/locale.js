@@ -251,7 +251,8 @@ var rendererIdentifiers = function () {
     'closeFirefoxWarningOk',
     'importSuccessOk',
     'connectionError',
-    'unknownError'
+    'unknownError',
+    'allowAutoplay'
   ]
 }
 

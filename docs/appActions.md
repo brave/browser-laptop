@@ -1036,6 +1036,18 @@ because ESC was pressed.
 
 
 
+### autoplayBlocked(location, tabId) 
+
+Notifies autoplay has been blocked
+
+**Parameters**
+
+**location**: `string`, Location of current frame
+
+**tabId**: `number`, Tab id of current frame
+
+
+
 
 * * *
 
