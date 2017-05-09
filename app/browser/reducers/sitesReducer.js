@@ -75,10 +75,12 @@ const sitesReducer = (state, action, immutableAction) => {
           state = syncUtil.updateSiteCache(state, action.destinationDetail || action.siteDetail)
         }
       }
+      state = state.set('sites', state.get('sites').sort(siteUtil.siteSort))
       state = updateActiveTabBookmarked(state)
       break
     case appConstants.APP_REMOVE_SITE:
       state = siteUtil.removeSite(state, action.siteDetail, action.tag, true)
+      state = state.set('sites', state.get('sites').sort(siteUtil.siteSort))
       if (syncEnabled()) {
         state = syncUtil.updateSiteCache(state, action.siteDetail)
       }
@@ -88,6 +90,7 @@ const sitesReducer = (state, action, immutableAction) => {
       state = siteUtil.moveSite(state,
         action.sourceKey, action.destinationKey, action.prepend,
         action.destinationIsParent, false)
+      state = state.set('sites', state.get('sites').sort(siteUtil.siteSort))
       if (syncEnabled()) {
         const destinationDetail = state.getIn(['sites', action.destinationKey])
         state = syncUtil.updateSiteCache(state, destinationDetail)
