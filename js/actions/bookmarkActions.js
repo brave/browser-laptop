@@ -26,9 +26,10 @@ const bookmarkActions = {
               active: false
             }), getSetting(SWITCH_TO_NEW_TABS))
         } else {
-          windowActions.unloadedTabCreated({
+          appActions.createTabRequested({
             location: bookmark.get('location'),
-            partitionNumber: bookmark.get('partitionNumber')
+            partitionNumber: bookmark.get('partitionNumber'),
+            discarded: true
           }, false)
         }
       })

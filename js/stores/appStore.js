@@ -42,6 +42,7 @@ const basicAuthState = require('../../app/common/state/basicAuthState')
 const extensionState = require('../../app/common/state/extensionState')
 const aboutNewTabState = require('../../app/common/state/aboutNewTabState')
 const aboutHistoryState = require('../../app/common/state/aboutHistoryState')
+const tabState = require('../../app/common/state/tabState')
 
 const isDarwin = process.platform === 'darwin'
 const isWindows = process.platform === 'win32'
@@ -199,18 +200,28 @@ const createWindow = (action) => {
 
     // initialize frames state
     let frames = []
-    if (frameOpts && Object.keys(frameOpts).length > 0) {
-      if (frameOpts.forEach) {
-        frames = frameOpts
-      } else {
-        frames.push(frameOpts)
-      }
-    } else if (startupSetting === 'homePage' && homepageSetting) {
-      frames = homepageSetting.split('|').map((homepage) => {
-        return {
-          location: homepage
+    if (action.restoredState) {
+      frames = action.restoredState.frames
+      action.restoredState.frames = []
+      action.restoredState.tabs = []
+    } else {
+      if (frameOpts && Object.keys(frameOpts).length > 0) {
+        if (frameOpts.forEach) {
+          frames = frameOpts
+        } else {
+          frames.push(frameOpts)
         }
-      })
+      } else if (startupSetting === 'homePage' && homepageSetting) {
+        frames = homepageSetting.split('|').map((homepage) => {
+          return {
+            location: homepage
+          }
+        })
+      }
+    }
+
+    if (frames.length === 0) {
+      frames = [{}]
     }
 
     if (windowState.ui && windowState.ui.isMaximized) {
@@ -400,7 +411,8 @@ const handleAppAction = (action) => {
   }
 
   // maintain backwards compatibility for now by adding an additional param for immutableAction
-  appState = applyReducers(appState, action, makeImmutable(action))
+  const immutableAction = makeImmutable(action)
+  appState = applyReducers(appState, action, immutableAction)
 
   switch (action.actionType) {
     case appConstants.APP_SET_STATE:
@@ -618,10 +630,22 @@ const handleAppAction = (action) => {
         return notification.get('message') === action.message
       }))
       break
-    case appConstants.APP_CLEAR_NOTIFICATIONS:
-      appState = appState.set('notifications', appState.get('notifications').filterNot((notification) => {
-        return notification.get('frameOrigin') === action.origin
-      }))
+    case appConstants.APP_TAB_CLOSE_REQUESTED:
+      const tabValue = tabState.getByTabId(appState, immutableAction.get('tabId'))
+      if (!tabValue) {
+        break
+      }
+      const origin = siteUtil.getOrigin(tabValue.get('url'))
+
+      if (origin) {
+        const tabsInOrigin = tabState.getTabs(appState).find((tabValue) =>
+          siteUtil.getOrigin(tabValue.get('url')) === origin && tabValue.get('tabId') !== immutableAction.get('tabId'))
+        if (!tabsInOrigin) {
+          appState = appState.set('notifications', appState.get('notifications').filterNot((notification) => {
+            return notification.get('frameOrigin') === origin
+          }))
+        }
+      }
       break
     case appConstants.APP_ADD_WORD:
       let listType = 'ignoredWords'

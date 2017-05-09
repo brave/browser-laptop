@@ -362,18 +362,26 @@ const doAction = (action) => {
         loading: false
       })
       break
-    case windowConstants.WINDOW_UNLOADED_TAB_CREATED:
-      action.frameOpts.unloaded = true
-      newFrame(action.frameOpts, action.openInForeground)
-      break
     case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
-      windowState = windowState.merge(frameStateUtil.undoCloseFrame(windowState, windowState.get('closedFrames')))
-      focusWebview(activeFrameStatePath(windowState))
+      {
+        const closedFrames = windowState.get('closedFrames')
+        if (closedFrames.size === 0) {
+          break
+        }
+        const frame = closedFrames.last()
+        windowState = windowState.set('closedFrames', closedFrames.pop())
+        appActions.createTabRequested({
+          url: frame.get('location'),
+          partitionNumber: frame.get('partitionNumber'),
+          active: true,
+          index: frame.get('closedAtIndex')
+        })
+      }
       break
     case windowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
       windowState = windowState.set('closedFrames', new Immutable.List())
       break
-    case windowConstants.WINDOW_SET_ACTIVE_FRAME:
+    case windowConstants.WINDOW_ACTIVE_FRAME_CHANGED:
       if (!action.frameProps) {
         break
       }
@@ -756,16 +764,32 @@ const doAction = (action) => {
   }
 }
 
+ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_BY_INDEX, (e, i) => {
+  const frameProps = frameStateUtil.getFrameByDisplayIndex(windowState, i)
+  if (frameProps) {
+    appActions.tabActivateRequested(frameProps.get('tabId'))
+  }
+})
+
+ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST, () => {
+  const frameProps = windowState.getIn(['frames', frameStateUtil.getFrames(windowState).size - 1])
+  if (frameProps) {
+    appActions.tabActivateRequested(frameProps.get('tabId'))
+  }
+})
+
 ipc.on(messages.SHORTCUT_NEXT_TAB, () => {
-  windowState = frameStateUtil.makeNextFrameActive(windowState)
-  windowState = updateTabPageIndex(windowState, frameStateUtil.getActiveFrame(windowState))
-  emitChanges()
+  const frame = frameStateUtil.getNextFrame(windowState)
+  if (frame && frame.get('tabId') !== -1) {
+    appActions.tabActivateRequested(frame.get('tabId'))
+  }
 })
 
 ipc.on(messages.SHORTCUT_PREV_TAB, () => {
-  windowState = frameStateUtil.makePrevFrameActive(windowState)
-  windowState = updateTabPageIndex(windowState, frameStateUtil.getActiveFrame(windowState))
-  emitChanges()
+  const frame = frameStateUtil.getPreviousFrame(windowState)
+  if (frame && frame.get('tabId') !== -1) {
+    appActions.tabActivateRequested(frame.get('tabId'))
+  }
 })
 
 ipc.on(messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, (e) => {

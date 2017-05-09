@@ -529,13 +529,6 @@ var exports = {
       })
     })
 
-    this.app.client.addCommand('unloadedTabCreated', function (frameOpts, active) {
-      logVerbose('unloadedTabCreated()')
-      return this.execute(function (frameOpts, active) {
-        return devTools('electron').testData.windowActions.unloadedTabCreated(frameOpts, active)
-      }, frameOpts, active)
-    })
-
     this.app.client.addCommand('waitForInputText', function (selector, input) {
       logVerbose('waitForInputText("' + selector + '", "' + input + '")')
       return this
@@ -610,7 +603,7 @@ var exports = {
       return this.waitForTab({index}).getAppState().then((val) => {
         const tab = val.value.tabs.find((tab) => tab.index === index)
         return this.execute(function (tabId) {
-          devTools('appActions').tabClosed({tabId})
+          devTools('appActions').tabCloseRequested(tabId)
         }, tab.tabId)
       })
     })

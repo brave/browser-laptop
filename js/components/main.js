@@ -377,9 +377,14 @@ class Main extends ImmutableComponent {
       }))
     })
 
-    ipc.on(messages.SHORTCUT_CLOSE_FRAME, (e, i) => typeof i !== 'undefined' && i !== null
-      ? windowActions.closeFrame(frameStateUtil.getFrameByKey(self.props.windowState, i))
-      : windowActions.closeFrame(frameStateUtil.getActiveFrame(this.props.windowState)))
+    ipc.on(messages.SHORTCUT_CLOSE_FRAME, (e, i) => {
+      const frame = i == null
+        ? frameStateUtil.getActiveFrame(this.props.windowState)
+        : frameStateUtil.getFrameByKey(self.props.windowState, i)
+      if (frame) {
+        appActions.tabCloseRequested(frame.get('tabId'))
+      }
+    })
     ipc.on(messages.SHORTCUT_UNDO_CLOSED_FRAME, () => windowActions.undoClosedFrame())
 
     ipc.on(messages.SHORTCUT_CLOSE_OTHER_FRAMES, (e, key, isCloseRight, isCloseLeft) => {
@@ -391,7 +396,9 @@ class Main extends ImmutableComponent {
       frameStateUtil.getFrames(self.props.windowState).forEach((frame, i) => {
         if (!frame.get('pinnedLocation') &&
             ((i < currentIndex && isCloseLeft) || (i > currentIndex && isCloseRight))) {
-          windowActions.closeFrame(frame)
+          if (frame) {
+            appActions.tabCloseRequested(frame.get('tabId'))
+          }
         }
       })
     })
@@ -405,12 +412,6 @@ class Main extends ImmutableComponent {
     })
 
     const self = this
-    ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_BY_INDEX, (e, i) =>
-      windowActions.setActiveFrame(frameStateUtil.getFrameByDisplayIndex(self.props.windowState, i)))
-
-    ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST, () =>
-      windowActions.setActiveFrame(self.props.windowState.getIn(['frames', frameStateUtil.getFrames(self.props.windowState).size - 1])))
-
     ipc.on(messages.BLOCKED_RESOURCE, (e, blockType, details) => {
       const frameProps = frameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
       frameProps && windowActions.setBlockedBy(frameProps, blockType, details.url)

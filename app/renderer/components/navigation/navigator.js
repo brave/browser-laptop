@@ -6,6 +6,7 @@ const React = require('react')
 const {StyleSheet, css} = require('aphrodite')
 const electron = require('electron')
 const ipc = electron.ipcRenderer
+const Immutable = require('immutable')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
@@ -147,10 +148,10 @@ class Navigator extends React.Component {
 
   mergeProps (state, dispatchProps, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const activeTab = tabState.getActiveTabValue(state, getCurrentWindowId())
-    const activeTabId = activeTab && activeTab.get('tabId')
+    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
+    const activeTabId = activeFrame.get('tabId') || tabState.TAB_ID_NONE
+    const activeTab = tabState.getByTabId(state, activeTabId)
     const activeTabShowingMessageBox = !!(activeTab && tabState.isShowingMessageBox(state, activeTabId))
-    const activeFrame = frameStateUtil.getActiveFrame(currentWindow)
     const allSiteSettings = siteSettingsState.getAllSiteSettings(state, activeFrame)
     const braverySettings = siteSettings.activeSettings(allSiteSettings, state, appConfig)
     const enabledExtensions = extensionState.getEnabledExtensions(state)
