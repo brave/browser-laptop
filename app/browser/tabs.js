@@ -96,7 +96,7 @@ const needsPartitionAssigned = (createProperties) => {
 // TODO(bridiver) - refactor this into an action
 ipcMain.on(messages.ABOUT_COMPONENT_INITIALIZED, (e) => {
   const tab = e.sender
-  const listener = () => {
+  const listener = (_diffs) => {
     if (!tab.isDestroyed()) {
       const tabValue = tabState.getByTabId(appStore.getState(), tab.getId())
       if (tabValue && tabValue.get('active') === true) {
@@ -167,7 +167,9 @@ const updateAboutDetails = (tab, tabValue) => {
       bookmarkFolders: bookmarkFolders.toJS()
     })
   } else if (location === 'about:history' && history) {
-    appActions.populateHistory()
+    if (!history) {
+      appActions.populateHistory()
+    }
     tab.send(messages.HISTORY_UPDATED, history.toJS())
     tab.send(messages.SETTINGS_UPDATED, appSettings.toJS())
   } else if (location === 'about:extensions' && extensions) {
