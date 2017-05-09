@@ -104,7 +104,7 @@ const updatePinnedTabs = (win) => {
         tab.get('url') === site.get('location') &&
         (tab.get('partitionNumber') || 0) === (site.get('partitionNumber') || 0))
       if (tab) {
-        appActions.tabClosed(tab, true)
+        appActions.tabCloseRequested(tab.get('tabId'), true)
       }
       win.__alreadyPinnedSites = win.__alreadyPinnedSites.remove(site)
     })

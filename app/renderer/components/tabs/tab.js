@@ -17,6 +17,7 @@ const CloseTabIcon = require('./content/closeTabIcon')
 const {NotificationBarCaret} = require('../../../../js/components/notificationBar')
 
 // Actions
+const appActions = require('../../../../js/actions/appActions')
 const windowActions = require('../../../../js/actions/windowActions')
 
 // Store
@@ -140,16 +141,11 @@ class Tab extends ImmutableComponent {
     dnd.onDragOver(dragTypes.TAB, this.tabNode.getBoundingClientRect(), this.props.tab.get('frameKey'), this.draggingOverData, e)
   }
 
-  setActiveFrame (event) {
-    event.stopPropagation()
-    windowActions.setActiveFrame(this.frame)
-  }
-
   onTabClosedWithMouse (event) {
     event.stopPropagation()
     if (this.props.onTabClosedWithMouse && this.frame && !this.frame.isEmpty()) {
       this.props.onTabClosedWithMouse(this.tabNode.parentNode.getBoundingClientRect())
-      windowActions.closeFrame(this.frame)
+      appActions.tabCloseRequested(this.frame.get('tabId'))
     }
   }
 
@@ -198,7 +194,8 @@ class Tab extends ImmutableComponent {
     if (e.button === 1) {
       this.onTabClosedWithMouse(e)
     } else {
-      this.setActiveFrame(e)
+      e.stopPropagation()
+      appActions.tabActivateRequested(this.frame.get('tabId'))
     }
   }
 

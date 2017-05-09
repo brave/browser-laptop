@@ -6,6 +6,7 @@ const React = require('react')
 const electron = require('electron')
 const ipc = electron.ipcRenderer
 const {StyleSheet, css} = require('aphrodite')
+const Immutable = require('immutable')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
@@ -15,12 +16,10 @@ const BrowserActionBadge = require('./browserActionBadge')
 // State
 const extensionState = require('../../../common/state/extensionState')
 const tabState = require('../../../common/state/tabState')
+const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
-
-// Utils
-const {getCurrentWindowId} = require('../../currentWindow')
 
 class BrowserAction extends React.Component {
   constructor () {
@@ -54,8 +53,8 @@ class BrowserAction extends React.Component {
 
   mergeProps (state, dispatchProps, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const activeTab = tabState.getActiveTabValue(state, getCurrentWindowId())
-    const activeTabId = activeTab && activeTab.get('tabId')
+    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
+    const activeTabId = activeFrame.get('tabId') || tabState.TAB_ID_NONE
     const browserActions = extensionState.getBrowserActionByTabId(state, ownProps.extensionId, activeTabId)
 
     const props = {}

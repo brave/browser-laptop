@@ -208,32 +208,15 @@ const windowActions = {
   },
 
   /**
-   * Dispatches a message to the store to create a new unloaded frame
-   *
-   * @param {Object} frameOpts - An object of frame options such as isPrivate, element, and tab features.
-   *                  These may not all be hooked up in Electron yet.
-   * @param {boolean} openInForeground - true if the new frame should become the new active frame
-   */
-  unloadedTabCreated: function (frameOpts, openInForeground) {
-    dispatch({
-      actionType: windowConstants.WINDOW_UNLOADED_TAB_CREATED,
-      frameOpts: frameOpts,
-      openInForeground
-    })
-  },
-
-  /**
    * Dispatches a message to close a frame
    *
    * @param {Object[]} frames - Immutable list of of all the frames
    * @param {Object} frameProps - The properties of the frame to close
-   * @param {boolean} forceClosePinned - Should we force close pinned tab
    */
-  closeFrame: function (frameProps, forceClosePinned) {
+  closeFrame: function (frameProps) {
     dispatch({
       actionType: windowConstants.WINDOW_CLOSE_FRAME,
-      frameProps,
-      forceClosePinned
+      frameProps
     })
   },
 
@@ -267,14 +250,9 @@ const windowActions = {
     })
   },
 
-  /**
-   * Dispatches a message to the store to set a new frame as the active frame.
-   *
-   * @param {Object} frameProps - the frame properties for the webview in question.
-   */
-  setActiveFrame: function (frameProps) {
+  activeFrameChanged: function (frameProps) {
     dispatch({
-      actionType: windowConstants.WINDOW_SET_ACTIVE_FRAME,
+      actionType: windowConstants.WINDOW_ACTIVE_FRAME_CHANGED,
       frameProps: frameProps
     })
   },

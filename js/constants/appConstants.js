@@ -44,7 +44,6 @@ const appConstants = {
   APP_UPDATE_PUBLISHER_INFO: _,
   APP_SHOW_NOTIFICATION: _, /** @param {Object} detail */
   APP_HIDE_NOTIFICATION: _, /** @param {string} message */
-  APP_CLEAR_NOTIFICATIONS: _, /** @param {string} origin */
   APP_ADD_WORD: _, /** @param {string} word, @param {boolean} learn */
   APP_SET_DICTIONARY: _, /** @param {string} locale */
   APP_BACKUP_KEYS: _,
@@ -65,8 +64,9 @@ const appConstants = {
   APP_FRAME_CHANGED: _,
   APP_TAB_CREATED: _,
   APP_TAB_MOVED: _,
+  APP_TAB_ACTIVATE_REQUESTED: _,
+  APP_TAB_CLOSE_REQUESTED: _,
   APP_CREATE_TAB_REQUESTED: _,
-  APP_MAYBE_CREATE_TAB_REQUESTED: _,
   APP_LOAD_URL_REQUESTED: _,
   APP_LOAD_URL_IN_ACTIVE_TAB_REQUESTED: _,
   APP_SIMPLE_SHARE_ACTIVE_TAB_REQUESTED: _,
@@ -96,7 +96,6 @@ const appConstants = {
   APP_SHUTTING_DOWN: _,
   APP_CLIPBOARD_TEXT_UPDATED: _,
   APP_TAB_TOGGLE_DEV_TOOLS: _,
-  APP_ACTIVE_WEB_CONTENTS_CLOSED: _,
   APP_TAB_CLONED: _,
   APP_SET_OBJECT_ID: _,
   APP_CREATE_SYNC_CACHE: _,

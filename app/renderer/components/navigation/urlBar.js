@@ -409,9 +409,9 @@ class UrlBar extends React.Component {
   }
 
   mergeProps (state, dispatchProps, ownProps) {
-    const windowState = state.get('currentWindow')
-    const activeFrame = frameStateUtil.getActiveFrame(windowState) || Immutable.Map()
-    const activeTabId = tabState.getActiveTabId(state, getCurrentWindowId())
+    const currentWindow = state.get('currentWindow')
+    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
+    const activeTabId = activeFrame.get('tabId') || tabState.TAB_ID_NONE
 
     const location = activeFrame.get('location') || ''
     const baseUrl = getBaseUrl(location)
@@ -436,7 +436,7 @@ class UrlBar extends React.Component {
 
     const activateSearchEngine = urlbar.getIn(['searchDetail', 'activateSearchEngine'])
     const urlbarSearchDetail = urlbar.get('searchDetail')
-    let searchURL = windowState.getIn(['searchDetail', 'searchURL'])
+    let searchURL = currentWindow.getIn(['searchDetail', 'searchURL'])
     let searchShortcut = ''
     // remove shortcut from the search terms
     if (activateSearchEngine && urlbarSearchDetail !== null) {
@@ -464,7 +464,7 @@ class UrlBar extends React.Component {
     props.endLoadTime = activeFrame.get('endLoadTime')
     props.loading = activeFrame.get('loading')
     props.enableNoScript = siteSettingsState.isNoScriptEnabled(state, braverySettings)
-    props.noScriptIsVisible = windowState.getIn(['ui', 'noScriptInfo', 'isVisible']) || false
+    props.noScriptIsVisible = currentWindow.getIn(['ui', 'noScriptInfo', 'isVisible']) || false
     props.menubarVisible = ownProps.menubarVisible
     props.activeTabShowingMessageBox = tabState.isShowingMessageBox(state, activeTabId)
     props.noBorderRadius = isPublisherButtonEnabled

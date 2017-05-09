@@ -246,8 +246,9 @@ describe('tab tests', function () {
       yield this.app.client
         .waitForBrowserWindow()
         .windowByUrl(Brave.browserWindowUrl)
-        .unloadedTabCreated({
-          location: this.page1
+        .newTab({
+          location: this.page1,
+          discarded: true
         }, false)
         .waitForElementCount('[data-test-id="tab"]', 2)
         // This ensures it's actually unloaded
