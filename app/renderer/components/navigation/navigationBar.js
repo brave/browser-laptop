@@ -100,11 +100,16 @@ class NavigationBar extends React.Component {
   }
 
   get bookmarked () {
-    return this.props.activeFrameKey !== undefined &&
-      siteUtil.isSiteBookmarked(this.props.sites, Immutable.fromJS({
-        location: this.props.location,
-        partitionNumber: this.props.partitionNumber
-      }))
+    if (typeof this.props.activeFrameKey === 'undefined') {
+      return false
+    }
+    const siteDetail = Immutable.fromJS({
+      location: this.props.location,
+      partitionNumber: this.props.partitionNumber
+    })
+    const siteKey = siteUtil.getSiteKey(siteDetail)
+    const site = this.props.sites.getIn([siteKey])
+    return siteUtil.isBookmark(site)
   }
 
   componentDidMount () {
