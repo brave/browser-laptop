@@ -113,13 +113,15 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
   })
 
   var webglMethods = ['getSupportedExtensions', 'getParameter', 'getContextAttributes',
-    'getShaderPrecisionFormat', 'getExtension']
+    'getShaderPrecisionFormat', 'getExtension', 'readPixels']
   webglMethods.forEach(function (method) {
     var item = {
       type: 'WebGL',
       objName: 'WebGLRenderingContext',
       propName: method
     }
+    methods.push(item)
+    item.objName = 'WebGL2RenderingContext',
     methods.push(item)
   })
 
