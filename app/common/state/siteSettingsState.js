@@ -9,8 +9,7 @@ const api = {
     return state.get('siteSettings')
   },
 
-  isNoScriptEnabled (state, isPrivate) {
-    const settings = api.getAllSiteSettings(state, isPrivate)
+  isNoScriptEnabled (state, settings) {
     return siteSettings.activeSettings(settings, state, appConfig).noScript === true
   }
 }
