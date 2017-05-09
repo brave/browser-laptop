@@ -80,7 +80,7 @@ module.exports.showFlashMessageBox = (location, tabId) => {
         if (tabId) {
           const tab = webContents.fromTabID(tabId)
           if (tab && !tab.isDestroyed()) {
-            return tab.reload()
+            tab.reload()
           }
         }
       } else {
