@@ -115,10 +115,11 @@ const appActions = {
    * A request for a new tab has been made with the specified createProperties
    * @param {Object} createProperties
    */
-  createTabRequested: function (createProperties) {
+  createTabRequested: function (createProperties, activateIfOpen) {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_CREATE_TAB_REQUESTED,
-      createProperties
+      createProperties,
+      activateIfOpen
     })
   },
 
@@ -162,39 +163,55 @@ const appActions = {
   },
 
   /**
-   * A request for a "maybe" new tab has been made with the specified createProperties
-   * If a tab is already opened it will instead set it as active.
-   *
-   * @param {Object} createProperties - these are only used if a new tab is being created
-   */
-  maybeCreateTabRequested: function (createProperties) {
-    AppDispatcher.dispatch({
-      actionType: appConstants.APP_MAYBE_CREATE_TAB_REQUESTED,
-      createProperties
-    })
-  },
-
-  /**
    * A tab has been updated
    * @param {Object} tabValue
+   * @param {Object} changeInfo from chrome-tabs-updated
    */
-  tabUpdated: function (tabValue) {
+  tabUpdated: function (tabValue, changeInfo) {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_TAB_UPDATED,
-      tabValue
+      tabValue,
+      changeInfo
     })
   },
 
   /**
-   * Closes an open tab
-   * @param {number} tabId
-   * @param {boolean} force closing the tab
+   * Dispatches a message to the store to set a new frame as the active frame.
+   *
+   * @param {Number} tabId - the tabId to activate
    */
-  tabClosed: function (tabValue, forceClose = false) {
+  tabActivateRequested: function (tabId) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_TAB_ACTIVATE_REQUESTED,
+      tabId
+    })
+  },
+
+  /**
+   * Dispatches a message to close the tabId
+   *
+   * @param {Number} tabId - the tabId to close
+   * @param {Boolean} forceClosePinned - force close if pinned
+   */
+  tabCloseRequested: function (tabId, forceClosePinned = false) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_TAB_CLOSE_REQUESTED,
+      tabId,
+      forceClosePinned
+    })
+  },
+
+  /**
+   * Notifies that a tab has been closed
+   * @param {number} tabId
+   */
+  tabClosed: function (tabId, windowId) {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_TAB_CLOSED,
-      tabValue,
-      forceClose
+      tabId,
+      queryInfo: {
+        windowId
+      }
     })
   },
 
@@ -533,17 +550,6 @@ const appActions = {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_HIDE_NOTIFICATION,
       message
-    })
-  },
-
-  /**
-   * Clears all notifications for a given origin.
-   * @param {string} origin
-   */
-  clearNotifications: function (origin) {
-    AppDispatcher.dispatch({
-      actionType: appConstants.APP_CLEAR_NOTIFICATIONS,
-      origin
     })
   },
 
@@ -914,15 +920,6 @@ const appActions = {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_TAB_TOGGLE_DEV_TOOLS,
       tabId
-    })
-  },
-
-  /**
-   * Dispatches a message to toogle the dev tools on/off or close the tab, depending on what's active.
-   */
-  activeWebContentsClosed: function () {
-    AppDispatcher.dispatch({
-      actionType: appConstants.APP_ACTIVE_WEB_CONTENTS_CLOSED
     })
   },
 

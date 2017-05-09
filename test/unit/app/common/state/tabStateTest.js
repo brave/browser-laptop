@@ -33,7 +33,7 @@ const shouldValidateId = function (cb) {
     )
   })
 
-  it('throws an AssertionError if tabId < 1 and !== -1', function () {
+  it('throws an AssertionError if tabId < 1 and !== -1 and !== -2', function () {
     assert.throws(
       () => {
         cb(0)
@@ -41,6 +41,12 @@ const shouldValidateId = function (cb) {
       AssertionError
     )
     assert.throws(
+      () => {
+        cb(-3)
+      },
+      AssertionError
+    )
+    assert.doesNotThrow(
       () => {
         cb(-2)
       },
@@ -313,33 +319,6 @@ describe('tabState unit tests', function () {
 
     shouldValidateTabState((state) => {
       tabState.removeTabByIndex(state, 1)
-    })
-  })
-
-  describe('removeTab', function () {
-    before(function () {
-      this.appState = defaultAppState.set('tabs', Immutable.fromJS([
-        { tabId: 1 },
-        { tabId: 2 }
-      ]))
-    })
-
-    it('returns a new immutable state with the tab removed by `tabId`', function () {
-      assert.deepEqual(
-        tabState.removeTab(this.appState, { tabId: 2 }).get('tabs').toJS(),
-        [{ tabId: 1 }])
-    })
-
-    shouldValidateTabValue((tabValue) => {
-      tabState.removeTab(defaultAppState, tabValue)
-    })
-
-    shouldValidateId((tabId) => {
-      tabState.removeTab(defaultAppState, { tabId })
-    })
-
-    shouldValidateTabState((state) => {
-      tabState.removeTab(state, { tabId: 1 })
     })
   })
 

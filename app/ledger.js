@@ -535,7 +535,8 @@ if (ipc) {
         appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
       } else if (buttonIndex === 2 && win) {
         // Add funds: Open payments panel
-        appActions.maybeCreateTabRequested({
+        appActions.createTabRequested({
+          activateIfOpen: true,
           url: 'about:preferences#payments',
           windowId: win.id
         })
@@ -546,7 +547,8 @@ if (ipc) {
       if (buttonIndex === 0) {
         appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
       } else if (buttonIndex === 2 && win) {
-        appActions.maybeCreateTabRequested({
+        appActions.createTabRequested({
+          activateIfOpen: true,
           url: 'about:preferences#payments',
           windowId: win.id
         })
@@ -559,7 +561,8 @@ if (ipc) {
     } else if (message === notificationTryPaymentsMessage) {
       appActions.hideNotification(message)
       if (buttonIndex === 1 && win) {
-        appActions.maybeCreateTabRequested({
+        appActions.createTabRequested({
+          activateIfOpen: true,
           url: 'about:preferences#payments',
           windowId: win.id
         })

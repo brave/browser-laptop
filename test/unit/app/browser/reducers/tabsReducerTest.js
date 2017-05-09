@@ -131,7 +131,7 @@ describe('tabsReducer', function () {
     })
   })
 
-  describe.skip('WINDOW_SET_ACTIVE_FRAME', function () {
+  describe.skip('APP_TAB_ACTIVATED', function () {
     it('sets the frame as active', function () {
       // TODO
     })
@@ -140,30 +140,6 @@ describe('tabsReducer', function () {
   describe.skip('APP_TAB_TOGGLE_DEV_TOOLS', function () {
     it('toggles dev tools for the tab', function () {
       // TODO
-    })
-  })
-
-  describe('APP_ACTIVE_WEB_CONTENTS_CLOSED', function () {
-    const action = {
-      actionType: appConstants.APP_ACTIVE_WEB_CONTENTS_CLOSED
-    }
-    afterEach(function () {
-      this.tabsAPI.toggleDevTools.reset()
-      this.tabsAPI.closeTab.reset()
-      this.tabsAPI.moveTo.reset()
-      this.tabsAPI.isDevToolsFocused.restore()
-    })
-    it('closes devtools when opened and focused', function () {
-      this.isDevToolsFocused = sinon.stub(this.tabsAPI, 'isDevToolsFocused', () => true)
-      tabsReducer(this.state, action)
-      assert(this.tabsAPI.toggleDevTools.withArgs(this.state, 1).calledOnce)
-      assert(this.tabsAPI.closeTab.notCalled)
-    })
-    it('closes tab when tab is focused with no devtools', function () {
-      this.isDevToolsFocused = sinon.stub(this.tabsAPI, 'isDevToolsFocused', () => false)
-      tabsReducer(this.state, action)
-      assert(this.tabsAPI.toggleDevTools.notCalled)
-      assert(this.tabsAPI.closeTab.withArgs(this.state, 1).calledOnce)
     })
   })
 

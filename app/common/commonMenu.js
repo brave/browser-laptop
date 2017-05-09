@@ -199,7 +199,8 @@ module.exports.preferencesMenuItem = () => {
           location: 'about:preferences'
         }))
       } else {
-        appActions.maybeCreateTabRequested({
+        appActions.createTabRequested({
+          activateIfOpen: true,
           url: 'about:preferences',
           windowId: getCurrentWindowId()
         })
@@ -218,7 +219,8 @@ module.exports.bookmarksManagerMenuItem = () => {
           location: 'about:bookmarks'
         }))
       } else {
-        appActions.maybeCreateTabRequested({
+        appActions.createTabRequested({
+          activateIfOpen: true,
           url: 'about:bookmarks',
           windowId: getCurrentWindowId()
         })
@@ -237,7 +239,8 @@ module.exports.historyMenuItem = () => {
           location: 'about:history'
         }))
       } else {
-        appActions.maybeCreateTabRequested({
+        appActions.createTabRequested({
+          activateIfOpen: true,
           url: 'about:history',
           windowId: getCurrentWindowId()
         })
@@ -257,7 +260,8 @@ module.exports.downloadsMenuItem = () => {
         }))
       } else {
         module.exports.sendToFocusedWindow(focusedWindow, [messages.HIDE_DOWNLOADS_TOOLBAR])
-        appActions.maybeCreateTabRequested({
+        appActions.createTabRequested({
+          activateIfOpen: true,
           url: 'about:downloads',
           windowId: getCurrentWindowId()
         })
@@ -275,7 +279,8 @@ module.exports.extensionsMenuItem = () => {
           location: 'about:preferences#extensions'
         }))
       } else {
-        appActions.maybeCreateTabRequested({
+        appActions.createTabRequested({
+          activateIfOpen: true,
           url: 'about:preferences#extensions',
           windowId: getCurrentWindowId()
         })
@@ -293,7 +298,8 @@ module.exports.passwordsMenuItem = () => {
           location: 'about:passwords'
         }))
       } else {
-        appActions.maybeCreateTabRequested({
+        appActions.createTabRequested({
+          activateIfOpen: true,
           url: 'about:passwords',
           windowId: getCurrentWindowId()
         })
@@ -332,7 +338,8 @@ module.exports.submitFeedbackMenuItem = () => {
   return {
     label: locale.translation('submitFeedback'),
     click: function (item, focusedWindow) {
-      appActions.maybeCreateTabRequested({
+      appActions.createTabRequested({
+        activateIfOpen: true,
         url: communityURL,
         windowId: getCurrentWindowId()
       })
@@ -367,7 +374,8 @@ module.exports.aboutBraveMenuItem = () => {
   return {
     label: locale.translation('aboutApp'),
     click: (item, focusedWindow) => {
-      appActions.maybeCreateTabRequested({
+      appActions.createTabRequested({
+        activateIfOpen: true,
         url: 'about:brave',
         windowId: getCurrentWindowId()
       })
@@ -393,7 +401,8 @@ module.exports.braveryGlobalMenuItem = () => {
           location: 'about:preferences#shields'
         }))
       } else {
-        appActions.maybeCreateTabRequested({
+        appActions.createTabRequested({
+          activateIfOpen: true,
           url: 'about:preferences#shields',
           windowId: getCurrentWindowId()
         })
@@ -415,7 +424,8 @@ module.exports.braveryPaymentsMenuItem = () => {
           location: 'about:preferences#payments'
         }))
       } else {
-        appActions.maybeCreateTabRequested({
+        appActions.createTabRequested({
+          activateIfOpen: true,
           url: 'about:preferences#payments',
           windowId: getCurrentWindowId()
         })

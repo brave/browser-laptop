@@ -174,21 +174,26 @@ if (process.type === 'browser') {
   const dispatchEventPayload = (event, payload) => {
     let queryInfo = payload.queryInfo || payload.frameProps || (payload.queryInfo = {})
     queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
-    if (!event.sender.isDestroyed() && event.sender.hostWebContents) {
-      // received from an extension
-      // only extension messages will have a hostWebContents
-      // because other messages come from the main window
+    let sender = event.sender
+    if (!sender.isDestroyed()) {
+      const hostWebContents = sender.hostWebContents
+      sender = hostWebContents || sender
+      const win = require('electron').BrowserWindow.fromWebContents(sender)
 
-      // default to the windowId of the hostWebContents
-      if (!queryInfo.windowId) {
-        let win = require('electron').BrowserWindow.fromWebContents(event.sender.hostWebContents)
-        if (!win) {
-          return
+      if (hostWebContents) {
+        // received from an extension
+        // only extension messages will have a hostWebContents
+        // because other messages come from the main window
+
+        // default to the windowId of the hostWebContents
+        if (!queryInfo.windowId && win) {
+          queryInfo.windowId = win.id
         }
-        queryInfo.windowId = win.id
       }
-      // add queryInfo if we only had frameProps before
       payload.queryInfo = queryInfo
+      if (win) {
+        payload.senderWindowId = win.id
+      }
       payload.senderTabId = event.sender.getId()
     }
     appDispatcher.dispatch(payload)
