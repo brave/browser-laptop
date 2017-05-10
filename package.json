@@ -89,6 +89,7 @@
     "ad-block": "^3.0.2",
     "aphrodite": "^1.0.0",
     "async": "^2.0.1",
+    "bloodhound-js": "^1.2.1",
     "clipboard-copy": "^1.0.0",
     "electron-localshortcut": "^0.6.0",
     "electron-squirrel-startup": "brave/electron-squirrel-startup",
