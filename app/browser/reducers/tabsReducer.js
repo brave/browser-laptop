@@ -217,7 +217,7 @@ const tabsReducer = (state, action, immutableAction) => {
         const browserOpts = { positionByMouseCursor: true }
         frameOpts.indexByFrameKey = dragData.getIn(['dragOverData', 'draggingOverKey'])
         frameOpts.prependIndexByFrameKey = dragData.getIn(['dragOverData', 'draggingOverLeftHalf'])
-        state = tabs.moveTo(state, frame.get('tabId'), frameOpts, browserOpts, dragData.get('dropWindowId'))
+        tabs.moveTo(state, frame.get('tabId'), frameOpts, browserOpts, dragData.get('dropWindowId'))
       }
       break
     }
