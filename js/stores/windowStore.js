@@ -729,7 +729,7 @@ const doAction = (action) => {
         break
       }
 
-      action.frameOpts = action.frameOpts.toJS()
+      action.frameOpts = makeImmutable(action.frameOpts).toJS()
       if (action.tabValue) {
         const tabValue = makeImmutable(action.tabValue)
 
