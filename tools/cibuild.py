@@ -26,8 +26,8 @@ def write_npmrc():
   'brave_electron_version = %s\n' \
   'chromedriver_version = %s\n' \
   'target = v%s\n' \
-  'disturl=http://brave-laptop-binaries.s3.amazonaws.com/atom-shell/dist/\n' \
-  'build_from_source = true' % (TARGET_ARCH, MUON_VERSION, CHROMEDRIVER_VERSION, MUON_VERSION)
+  'disturl=https://brave-laptop-binaries.s3.amazonaws.com/atom-shell/dist/\n' \
+  'build_from_source = true\n' % (TARGET_ARCH, MUON_VERSION, CHROMEDRIVER_VERSION, MUON_VERSION)
   f = open('.npmrc','wb')
   f.write(data)
   f.close()
