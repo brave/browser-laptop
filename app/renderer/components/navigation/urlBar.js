@@ -265,6 +265,8 @@ class UrlBar extends React.Component {
   onChange (e) {
     if (e.target.value !== this.lastVal + this.lastSuffix) {
       e.preventDefault()
+      // clear any current arrow or mouse hover selection
+      windowActions.setUrlBarSuggestions(undefined, null)
       this.setValue(e.target.value)
     }
   }
@@ -301,6 +303,8 @@ class UrlBar extends React.Component {
     if (this.props.isSelected) {
       windowActions.setUrlBarSelected(false)
     }
+    // clear any current arrow or mouse hover selection
+    windowActions.setUrlBarSuggestions(undefined, null)
     this.keyPressed = false
     windowActions.setNavBarUserInput(this.lastVal)
   }
