@@ -44,6 +44,8 @@ const iconNoScript = require('../../../../img/url-bar-no-script.svg')
 class UrlBar extends React.Component {
   constructor (props) {
     super(props)
+    this.lastVal = ''
+    this.lastSuffix = ''
     this.onFocus = this.onFocus.bind(this)
     this.onBlur = this.onBlur.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
@@ -245,14 +247,16 @@ class UrlBar extends React.Component {
       this.lastSuffix = ''
     }
 
+    const selectionStart = this.urlInput.selectionStart
     const newValue = [
-      this.lastVal.splice(0, this.urlInput.selectionStart),
+      this.lastVal.slice(0, selectionStart),
       String.fromCharCode(e.which),
-      this.lastVal.splice(this.urlInput.selectionEnd)
+      this.lastVal.slice(this.urlInput.selectionEnd)
     ].join('')
 
     if (!this.updateAutocomplete(newValue)) {
       this.setValue(newValue)
+      this.urlInput.setSelectionRange(selectionStart + 1, selectionStart + 1)
     }
 
     e.preventDefault()
@@ -260,8 +264,8 @@ class UrlBar extends React.Component {
 
   onChange (e) {
     if (e.target.value !== this.lastVal + this.lastSuffix) {
-      this.setValue(e.target.value)
       e.preventDefault()
+      this.setValue(e.target.value)
     }
   }
 
@@ -319,8 +323,6 @@ class UrlBar extends React.Component {
   }
 
   componentWillMount () {
-    this.lastVal = ''
-    this.lastSuffix = ''
     ipc.on(messages.SHORTCUT_FOCUS_URL, (e) => {
       this.focus()
       this.select()
@@ -355,7 +357,7 @@ class UrlBar extends React.Component {
         this.setValue(UrlUtil.getDisplayLocation(this.props.location, getSetting(settings.PDFJS_ENABLED)))
       } else if (this.props.hasLocationValueSuffix &&
                 this.props.isActive &&
-                this.props.hasLocationValueSuffix !== this.lastSuffix) {
+                this.props.locationValueSuffix !== this.lastSuffix) {
         this.showAutocompleteResult()
       } else if ((this.props.titleMode !== prevProps.titleMode) ||
           (!this.props.isActive && !this.props.isFocused)) {
