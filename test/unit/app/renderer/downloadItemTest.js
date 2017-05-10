@@ -18,11 +18,22 @@ require('../../braveUnit')
 
 const savePath = path.join(require('os').tmpdir(), 'mostHatedPrimes.txt')
 const downloadUrl = 'http://www.bradrichter.com/mostHatedPrimes.txt'
+const localFileDownloadUrl = 'file:///Users/foobar/Library/abc.txt'
 const newDownload = (state) => Immutable.fromJS({
   startTime: new Date().getTime(),
   filename: 'mostHatedPrimes.txt',
   savePath,
   url: downloadUrl,
+  totalBytes: 104729,
+  receivedBytes: 96931,
+  deleteConfirmationVisible: false,
+  state
+})
+const newDownloadLocalFile = (state) => Immutable.fromJS({
+  startTime: new Date().getTime(),
+  filename: 'abc.txt',
+  savePath,
+  url: localFileDownloadUrl,
   totalBytes: 104729,
   receivedBytes: 96931,
   deleteConfirmationVisible: false,
@@ -46,6 +57,27 @@ describe('downloadItem component', function () {
   })
 
   Object.values(downloadStates).forEach(function (state) {
+    describe(`${state} download local item`, function () {
+      before(function () {
+        this.downloadId = uuid.v4()
+        this.download = newDownloadLocalFile(state)
+        this.result = mount(
+          <DownloadItem
+            downloadId={this.downloadId}
+            download={this.download}
+            deleteConfirmationVisible={this.download.get('deleteConfirmationVisible')} />
+        )
+      })
+
+      it('filename exists and matches download filename', function () {
+        assert.equal(this.result.find('.downloadFilename').text(), this.download.get('filename'))
+      })
+
+      it('has local origin i.e file: and matches to "Local file" origin', function () {
+        assert.equal(this.result.find('.downloadOrigin').text(), '')
+      })
+    })
+
     describe(`${state} download item`, function () {
       before(function () {
         this.downloadId = uuid.v4()
