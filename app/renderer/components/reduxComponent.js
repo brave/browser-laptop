@@ -19,7 +19,7 @@ class ReduxComponent extends ImmutableComponent {
   constructor (props) {
     super(props)
     this.componentType = props.componentType
-    this.state = buildPropsImpl(props, this.componentType)
+    this.state = {}
     this.checkForUpdates = debounce(this.checkForUpdates.bind(this), 5)
     this.dontCheck = false
   }
@@ -33,6 +33,7 @@ class ReduxComponent extends ImmutableComponent {
   componentDidMount () {
     appStore.addChangeListener(this.checkForUpdates)
     windowStore.addChangeListener(this.checkForUpdates)
+    this.internalState = this.buildProps(this.props)
   }
 
   componentWillUnmount () {
@@ -41,8 +42,8 @@ class ReduxComponent extends ImmutableComponent {
     windowStore.removeChangeListener(this.checkForUpdates)
   }
 
-  componentWillReceiveProps (nextProps) {
-    this.setState(this.buildProps(nextProps))
+  componentDidUpdate () {
+    this.internalState = this.buildProps(this.props)
   }
 
   checkParam (old, next, prop) {
@@ -52,8 +53,8 @@ class ReduxComponent extends ImmutableComponent {
   }
 
   shouldComponentUpdate (nextProps, nextState) {
-    return Object.keys(nextState).some((prop) => this.checkParam(this.state, nextState, prop)) ||
-      Object.keys(nextProps).some((prop) => this.checkParam(this.props, nextProps, prop))
+    nextState = this.buildProps(nextProps)
+    return Object.keys(nextState).some((prop) => this.checkParam(this.internalState, nextState, prop))
   }
 
   mergeProps (stateProps, dispatchProps, ownProps) {
@@ -71,7 +72,7 @@ class ReduxComponent extends ImmutableComponent {
 
 module.exports.connect = (componentType) => {
   return (props) => {
-    const component = React.createElement(ReduxComponent, Object.assign({componentType}, props))
+    const component = React.createElement(ReduxComponent, Object.assign({componentType}, buildPropsImpl(props, componentType)))
     return component
   }
 }
