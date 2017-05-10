@@ -88,6 +88,7 @@ class UrlBar extends React.Component {
   // Otherwise, they'd have to hit backspace twice for each character they wanted
   // to delete.
   hideAutoComplete () {
+    this.lastSuffix = ''
     if (this.props.autocompleteEnabled) {
       windowActions.urlBarAutocompleteEnabled(false)
     }
@@ -255,9 +256,7 @@ class UrlBar extends React.Component {
 
   onChange (e) {
     if (e.target.value !== this.lastVal + this.lastSuffix) {
-      if (!this.updateAutocomplete(e.target.value)) {
-        this.setValue(e.target.value)
-      }
+      this.setValue(e.target.value)
       e.preventDefault()
     }
   }
