@@ -97,7 +97,7 @@ const createFileSubmenu = () => {
     }, {
       label: locale.translation('share'),
       submenu: [
-        CommonMenu.simpleShareActiveTabMenuItem('emailPageLink', 'email', 'CmdOrCtrl+Shift+I'),
+        CommonMenu.simpleShareActiveTabMenuItem('emailPageLink', 'email'),
         CommonMenu.separatorMenuItem,
         CommonMenu.simpleShareActiveTabMenuItem('tweetPageLink', 'twitter'),
         CommonMenu.simpleShareActiveTabMenuItem('facebookPageLink', 'facebook'),
