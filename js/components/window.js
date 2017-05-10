@@ -56,7 +56,7 @@ class Window extends React.Component {
           title: frame.title,
           faviconUrl: frame.icon,
           index: i
-        })
+        }, false, true /* isRestore */)
       }
     })
   }
