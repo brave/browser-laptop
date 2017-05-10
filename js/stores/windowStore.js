@@ -725,6 +725,17 @@ const doAction = (action) => {
       windowState = tabDataChanged(windowState, action)
       break
     case appConstants.APP_NEW_WEB_CONTENTS_ADDED:
+      if (!action.frameOpts) {
+        break
+      }
+
+      action.frameOpts = action.frameOpts.toJS()
+      if (action.tabValue) {
+        const tabValue = makeImmutable(action.tabValue)
+
+        action.frameOpts.tabId = tabValue.get('tabId')
+        action.frameOpts.icon = action.frameOpts.icon || tabValue.get('favIconUrl')
+      }
       newFrame(action.frameOpts, action.frameOpts.openInForeground)
       updateTabPageIndex(frameStateUtil.getActiveFrame(windowState))
       break

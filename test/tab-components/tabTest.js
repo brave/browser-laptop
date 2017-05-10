@@ -378,6 +378,25 @@ describe('tab tests', function () {
         .windowByUrl('about:newtab')
         .waitForElementCount(activeTabFavicon, 0)
     })
+
+    describe('unloaded tabs', function () {
+      before(function * () {
+        this.faviconUrl = Brave.server.url('img/test.ico')
+        const url = Brave.server.url('favicon.html')
+        yield this.app.client
+          .newTab({
+            location: url,
+            faviconUrl: this.faviconUrl,
+            discarded: true,
+            active: false
+          }, false)
+      })
+
+      it('should display the specified favicon', function * () {
+        yield this.app.client
+          .waitForExist('[data-frame-key="2"] [data-test-favicon="' + this.faviconUrl + '"]')
+      })
+    })
   })
 
   describe('about:blank tab', function () {

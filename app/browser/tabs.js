@@ -321,7 +321,7 @@ const api = {
         const windowOpts = makeImmutable(size)
         appActions.newWindow(makeImmutable(frameOpts), windowOpts)
       } else {
-        appActions.newWebContentsAdded(windowId, frameOpts)
+        appActions.newWebContentsAdded(windowId, frameOpts, newTabValue)
       }
     })
 

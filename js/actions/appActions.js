@@ -1154,14 +1154,16 @@ const appActions = {
    * Dispatches a message when a web contents is added
    * @param {number} windowId - The windowId of the host window
    * @param {object} frameOpts - frame options for the added web contents
+   * @param {object} tabValue - the created tab state
    */
-  newWebContentsAdded: function (windowId, frameOpts) {
+  newWebContentsAdded: function (windowId, frameOpts, tabValue) {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_NEW_WEB_CONTENTS_ADDED,
       queryInfo: {
         windowId
       },
-      frameOpts
+      frameOpts,
+      tabValue
     })
   },
 
