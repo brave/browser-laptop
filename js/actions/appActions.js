@@ -943,12 +943,14 @@ const appActions = {
    * Dispatches a message when noscript exceptions are added for an origin
    * @param {string} hostPattern
    * @param {Object.<string, (boolean|number)>} origins
+   * @param {boolean} temporary
    */
-  noScriptExceptionsAdded: function (hostPattern, origins) {
+  noScriptExceptionsAdded: function (hostPattern, origins, temporary) {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_ADD_NOSCRIPT_EXCEPTIONS,
       hostPattern,
-      origins
+      origins,
+      temporary
     })
   },
 
