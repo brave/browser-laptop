@@ -245,7 +245,11 @@ class UrlBar extends React.Component {
       this.lastSuffix = ''
     }
 
-    const newValue = this.lastVal + String.fromCharCode(e.which)
+    const newValue = [
+      this.lastVal.splice(0, this.urlInput.selectionStart),
+      String.fromCharCode(e.which),
+      this.lastVal.splice(this.urlInput.selectionEnd)
+    ].join('')
 
     if (!this.updateAutocomplete(newValue)) {
       this.setValue(newValue)
