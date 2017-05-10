@@ -126,7 +126,7 @@ describe('urlBar tests', function () {
     })
 
     describe('with scrolling match', function () {
-      it('does not show suggestions on focus', function * () {
+      it('typing in the urlbar should override mouse hover for suggestions', function * () {
         yield this.app.client
           .addSite({ location: 'https://brave.com/test2' })
           .addSite({ location: 'https://brave.com/test3' })
@@ -135,9 +135,9 @@ describe('urlBar tests', function () {
           .resizeWindow(500, 300)
           .setValue(urlInput, 'b')
           .waitForVisible(urlBarSuggestions)
-          .moveToObject(urlBarSuggestions, 0, 50)
+          // highlight for autocomplete brianbondy.com
           .moveToObject(urlBarSuggestions, 0, 100)
-          .moveToObject(urlBarSuggestions, 0, 150)
+        yield selectsText(this.app.client, 'rianbondy.com')
           .keys('ra')
           .execute(function (urlBarSuggestions) {
             document.querySelector(urlBarSuggestions).scrollTop = 200
