@@ -248,7 +248,8 @@ describe('tab tests', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .newTab({
           location: this.page1,
-          discarded: true
+          discarded: true,
+          active: false
         }, false)
         .waitForElementCount('[data-test-id="tab"]', 2)
         // This ensures it's actually unloaded
@@ -326,10 +327,11 @@ describe('tab tests', function () {
       yield setup(this.app.client)
       this.page1 = Brave.server.url('page1.html')
       this.page2 = Brave.server.url('page2.html')
-    })
-    it('new tab opens in background by default', function * () {
       yield this.app.client
         .newTab({ url: this.page1, active: false })
+    })
+    it('new tab opens in background when `active == false`', function * () {
+      yield this.app.client
         .waitForUrl(this.page1)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
@@ -337,13 +339,20 @@ describe('tab tests', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitForTab({index: 1, active: false})
     })
-    it('changing new tab default makes new tabs open in background by default', function * () {
-      yield this.app.client
-        .changeSetting(settings.SWITCH_TO_NEW_TABS, true)
-        .newTab({ url: this.page2, active: false })
-        .waitForUrl(this.page2)
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForTab({index: 2, active: true})
+    describe('change setting to SWITCH_TO_NEW_TABS', function * () {
+      before(function * () {
+        yield this.app.client
+          .changeSetting(settings.SWITCH_TO_NEW_TABS, true)
+          .newTab({ url: this.page2, active: false })
+      })
+      it('forces `active == false` to open in the foreground', function * () {
+        yield this.app.client
+          .waitForUrl(this.page2)
+          .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
+          .waitForExist('.frameWrapper .isActive webview[data-frame-key="2"]')
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitForTab({index: 1, active: true})
+      })
     })
   })
 

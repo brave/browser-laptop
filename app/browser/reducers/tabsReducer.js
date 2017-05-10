@@ -46,9 +46,9 @@ const tabsReducer = (state, action, immutableAction) => {
 
       setImmediate(() => {
         if (action.get('activateIfOpen')) {
-          tabs.maybeCreateTab(state, action)
+          tabs.maybeCreateTab(state, action, action.get('createProperties'))
         } else {
-          tabs.createTab(action)
+          tabs.create(action.get('createProperties'), null, action.get('isRestore'))
         }
       })
       break

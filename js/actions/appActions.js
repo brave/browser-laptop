@@ -115,11 +115,12 @@ const appActions = {
    * A request for a new tab has been made with the specified createProperties
    * @param {Object} createProperties
    */
-  createTabRequested: function (createProperties, activateIfOpen) {
+  createTabRequested: function (createProperties, activateIfOpen = false, isRestore = false) {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_CREATE_TAB_REQUESTED,
       createProperties,
-      activateIfOpen
+      activateIfOpen,
+      isRestore
     })
   },
 

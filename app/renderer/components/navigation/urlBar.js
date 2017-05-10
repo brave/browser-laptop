@@ -277,6 +277,8 @@ class UrlBar extends React.Component {
     if (this.urlInput.value !== newValue) {
       this.urlInput.value = newValue
       if (!this.keyPress) {
+        // if this is a key press don't sent the update until keyUp so
+        // showAutocompleteResult can handle the result
         windowActions.setNavBarUserInput(val)
       }
     }
