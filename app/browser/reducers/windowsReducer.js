@@ -19,11 +19,12 @@ const windowsReducer = (state, action, immutableAction) => {
     case appConstants.APP_WINDOW_READY:
       windows.windowReady(action.get('windowId'))
       break
-    case appConstants.APP_TAB_PINNED:
-      setImmediate(() => {
-        // check after the state has been updated
-        windows.pinnedTabsChanged()
-      })
+    case appConstants.APP_TAB_UPDATED:
+      if (immutableAction.getIn(['changeInfo', 'pinned']) != null) {
+        setImmediate(() => {
+          windows.pinnedTabsChanged()
+        })
+      }
       break
     case appConstants.APP_CLOSE_WINDOW:
       state = windows.closeWindow(state, action)

@@ -110,7 +110,7 @@ describe('tabs API', function () {
 
   describe('toggleDevTools', function () {
     it('opens dev tools if closed', function () {
-      tabs.toggleDevTools(Immutable.Map(), 1)
+      tabs.toggleDevTools(1)
       assert(this.tabWithDevToolsClosed.openDevTools.calledOnce)
       assert(this.tabWithDevToolsClosed.closeDevTools.notCalled)
       // Also check it leaves other tabs alone
@@ -120,7 +120,7 @@ describe('tabs API', function () {
       assert(this.tabWithDevToolsOpenedAndFocused.closeDevTools.notCalled)
     })
     it('closes dev tools if opened', function () {
-      tabs.toggleDevTools(Immutable.Map(), 2)
+      tabs.toggleDevTools(2)
       assert(this.tabWithDevToolsOpened.openDevTools.notCalled)
       assert(this.tabWithDevToolsOpened.closeDevTools.calledOnce)
       // Also check it leaves other tabs alone
@@ -128,10 +128,6 @@ describe('tabs API', function () {
       assert(this.tabWithDevToolsClosed.closeDevTools.notCalled)
       assert(this.tabWithDevToolsOpenedAndFocused.openDevTools.notCalled)
       assert(this.tabWithDevToolsOpenedAndFocused.closeDevTools.notCalled)
-    })
-    it('does not modify state', function () {
-      const state = Immutable.Map()
-      assert.equal(state, tabs.toggleDevTools(state, 2))
     })
   })
   describe('isDevToolsFocused', function () {
@@ -166,10 +162,9 @@ describe('tabs API', function () {
         indexByFrameKey: undefined,
         prependIndexByFrameKey: undefined
       }
-      const newState = tabs.moveTo(state, frameOpts.tabId, frameOpts, this.browserOpts, state.getIn(['dragData', 'dropWindowId']))
+      tabs.moveTo(state, frameOpts.tabId, frameOpts, this.browserOpts, state.getIn(['dragData', 'dropWindowId']))
       assert.equal(this.newWindowSpy.calledOnce, true)
       assert.equal(this.newWebContentsAddedSpy.notCalled, true)
-      assert(Immutable.is(newState, state))
     })
     it('moves tab to an existing window', function () {
       const state = this.state.set('dragData', Immutable.fromJS({
@@ -186,10 +181,9 @@ describe('tabs API', function () {
         indexByFrameKey: undefined,
         prependIndexByFrameKey: undefined
       }
-      const newState = tabs.moveTo(state, frameOpts.tabId, frameOpts, this.browserOpts, state.getIn(['dragData', 'dropWindowId']))
+      tabs.moveTo(state, frameOpts.tabId, frameOpts, this.browserOpts, state.getIn(['dragData', 'dropWindowId']))
       assert.equal(this.newWindowSpy.notCalled, true)
       assert.equal(this.newWebContentsAddedSpy.calledOnce, true)
-      assert(Immutable.is(newState, state))
     })
     it('does not move pinned tabs', function () {
       const state = this.state.set('dragData', Immutable.fromJS({
@@ -206,10 +200,9 @@ describe('tabs API', function () {
         indexByFrameKey: undefined,
         prependIndexByFrameKey: undefined
       }
-      const newState = tabs.moveTo(state, frameOpts.tabId, frameOpts, this.browserOpts, state.getIn(['dragData', 'dropWindowId']))
+      tabs.moveTo(state, frameOpts.tabId, frameOpts, this.browserOpts, state.getIn(['dragData', 'dropWindowId']))
       assert.equal(this.newWindowSpy.notCalled, true)
       assert.equal(this.newWebContentsAddedSpy.notCalled, true)
-      assert(Immutable.is(newState, state))
     })
     it('does not move pinned tabs to alt window', function () {
       const state = this.state.set('dragData', Immutable.fromJS({
@@ -226,10 +219,9 @@ describe('tabs API', function () {
         indexByFrameKey: undefined,
         prependIndexByFrameKey: undefined
       }
-      const newState = tabs.moveTo(state, frameOpts.tabId, frameOpts, this.browserOpts, state.getIn(['dragData', 'dropWindowId']))
+      tabs.moveTo(state, frameOpts.tabId, frameOpts, this.browserOpts, state.getIn(['dragData', 'dropWindowId']))
       assert.equal(this.newWindowSpy.notCalled, true)
       assert.equal(this.newWebContentsAddedSpy.notCalled, true)
-      assert(Immutable.is(newState, state))
     })
     it('does not move single tab windows into new window', function () {
       const state = this.state.set('dragData', Immutable.fromJS({
@@ -246,10 +238,9 @@ describe('tabs API', function () {
         indexByFrameKey: undefined,
         prependIndexByFrameKey: undefined
       }
-      const newState = tabs.moveTo(state, frameOpts.tabId, frameOpts, this.browserOpts, state.getIn(['dragData', 'dropWindowId']))
+      tabs.moveTo(state, frameOpts.tabId, frameOpts, this.browserOpts, state.getIn(['dragData', 'dropWindowId']))
       assert.equal(this.newWindowSpy.notCalled, true)
       assert.equal(this.newWebContentsAddedSpy.notCalled, true)
-      assert(Immutable.is(newState, state))
     })
     it('allows combining single tab into alt window', function () {
       const state = this.state.set('dragData', Immutable.fromJS({
@@ -266,10 +257,9 @@ describe('tabs API', function () {
         indexByFrameKey: undefined,
         prependIndexByFrameKey: undefined
       }
-      const newState = tabs.moveTo(state, frameOpts.tabId, frameOpts, this.browserOpts, state.getIn(['dragData', 'dropWindowId']))
+      tabs.moveTo(state, frameOpts.tabId, frameOpts, this.browserOpts, state.getIn(['dragData', 'dropWindowId']))
       assert.equal(this.newWindowSpy.notCalled, true)
       assert.equal(this.newWebContentsAddedSpy.calledOnce, true)
-      assert(Immutable.is(newState, state))
     })
   })
 

@@ -239,14 +239,16 @@ function setActiveFrameKey (windowState, activeFrameKey) {
   })
 }
 
-function makeNextFrameActive (windowState) {
+function getNextFrame (windowState) {
   const activeFrameIndex = getActiveFrameDisplayIndex(windowState)
-  return setActiveFrameDisplayIndex(windowState, (activeFrameIndex + 1) % windowState.get('frames').size)
+  const index = (activeFrameIndex + 1) % windowState.get('frames').size
+  return getFrameByDisplayIndex(windowState, index)
 }
 
-function makePrevFrameActive (windowState) {
+function getPreviousFrame (windowState) {
   const activeFrameIndex = getActiveFrameDisplayIndex(windowState)
-  return setActiveFrameDisplayIndex(windowState, (windowState.get('frames').size + activeFrameIndex - 1) % windowState.get('frames').size)
+  const index = (windowState.get('frames').size + activeFrameIndex - 1) % windowState.get('frames').size
+  return getFrameByDisplayIndex(windowState, index)
 }
 
 /**
@@ -504,27 +506,6 @@ function addFrame (windowState, tabs, frameOpts, newKey, partitionNumber, active
 }
 
 /**
- * Undoes a frame close and inserts it at the last index
- * @return Immutable top level application state ready to merge back in
- */
-function undoCloseFrame (windowState, closedFrames) {
-  if (closedFrames.size === 0) {
-    return {}
-  }
-  const closedFrame = closedFrames.last()
-  const insertIndex = closedFrame.get('closedAtIndex')
-  return {
-    closedFrames: closedFrames.pop(),
-    tabs: windowState.get('tabs').splice(insertIndex, 0, tabFromFrame(closedFrame)),
-    frames: windowState.get('frames').splice(insertIndex, 0,
-          closedFrame
-          .delete('guestInstanceId')
-          .set('src', closedFrame.get('location'))),
-    activeFrameKey: closedFrame.get('key')
-  }
-}
-
-/**
  * Removes a frame specified by frameProps
  * @return Immutable top level application state ready to merge back in
  */
@@ -602,90 +583,6 @@ function removeFrame (frames, tabs, closedFrames, frameProps, activeFrameKey, fr
     closedFrames,
     tabs: newTabs,
     frames: newFrames
-  }
-}
-/**
- * Removes a frames specified by framePropsList
- * @return Immutable top level application state ready to merge back in
- */
-function removeFrames (frames, tabs, closedFrames, framePropsList, activeFrameRemoved, activeFrameKey, closeAction) {
-  function getLastTab (newFrames) {
-    const sorted = newFrames
-      .filter((frame) => !frame.get('pinnedLocation'))
-      .sortBy((item) => item.get('key'))
-
-    return (sorted.size === 0) ? 0 : sorted.last().get('key')
-  }
-
-  function getLastActiveTab (newFrames) {
-    const sorted = newFrames
-      .filter((frame) => !frame.get('pinnedLocation'))
-      .sortBy((item) => item.get('lastAccessedTime') || 0)
-
-    return (sorted.size === 0) ? 0 : sorted.last().get('key')
-  }
-
-  let newFrames = makeImmutable(frames)
-  let newTabs = makeImmutable(tabs)
-
-  framePropsList.forEach((frameProps) => {
-    if (!frameProps.get('isPrivate') && frameProps.get('location') !== 'about:newtab') {
-      frameProps = frameProps.set('isFullScreen', false)
-      closedFrames = closedFrames.push(frameProps)
-      if (frameProps.get('thumbnailBlob')) {
-        window.URL.revokeObjectURL(frameProps.get('thumbnailBlob'))
-      }
-      if (closedFrames.size > config.maxClosedFrames) {
-        closedFrames = closedFrames.shift()
-      }
-    }
-
-    let framePropsIndex = getFramePropsIndex(newFrames, frameProps)
-    newFrames = newFrames.splice(framePropsIndex, 1)
-    newTabs = newTabs.splice(framePropsIndex, 1)
-  })
-
-  // return last non pinned frame index if active frame was removed
-  if (activeFrameRemoved) {
-    switch (closeAction) {
-      case tabCloseAction.LAST_ACTIVE:
-        activeFrameKey = getLastActiveTab(newFrames)
-        break
-      default:
-        activeFrameKey = getLastTab(newFrames)
-        break
-    }
-  }
-
-  return {
-    previewFrameKey: null,
-    activeFrameKey,
-    closedFrames,
-    tabs: newTabs,
-    frames: newFrames
-  }
-}
-
-/**
- * Removes all but the specified frameProps
- * @return Immutable top level application state ready to merge back in
- */
-function removeOtherFrames (frames, tabs, closedFrames, frameProps) {
-  closedFrames = closedFrames.concat(frames.filter((currentFrameProps) => !currentFrameProps.get('isPrivate') && currentFrameProps.get('key') !== frameProps.get('key')))
-    .take(config.maxClosedFrames)
-  closedFrames.forEach((currentFrameProps) => {
-    if (currentFrameProps.get('thumbnailBlob')) {
-      window.URL.revokeObjectURL(currentFrameProps.get('thumbnailBlob'))
-    }
-  })
-
-  frames = Immutable.fromJS([frameProps])
-  tabs = tabFromFrame(frames.get(0))
-  return {
-    activeFrameKey: frameProps.get('key'),
-    closedFrames,
-    tabs,
-    frames
   }
 }
 
@@ -776,8 +673,8 @@ module.exports = {
   setActiveFrameDisplayIndex,
   setActiveFrameIndex,
   setActiveFrameKey,
-  makeNextFrameActive,
-  makePrevFrameActive,
+  getNextFrame,
+  getPreviousFrame,
   getFramePropValue,
   getFramePropPath,
   findIndexForFrameKey,
@@ -788,10 +685,7 @@ module.exports = {
   getPartition,
   getPartitionFromNumber,
   addFrame,
-  undoCloseFrame,
   removeFrame,
-  removeFrames,
-  removeOtherFrames,
   tabFromFrame,
   frameOptsFromFrame,
   getFrameKeyByTabId,

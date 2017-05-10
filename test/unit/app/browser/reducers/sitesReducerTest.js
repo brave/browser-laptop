@@ -6,6 +6,7 @@ const sinon = require('sinon')
 
 const appConstants = require('../../../../../js/constants/appConstants')
 const siteTags = require('../../../../../js/constants/siteTags')
+const { makeImmutable } = require('../../../../../app/common/state/immutableUtil')
 require('../../../braveUnit')
 
 const initState = Immutable.fromJS({
@@ -41,7 +42,7 @@ describe('sitesReducerTest', function () {
         clearDataDetail: {browserHistory: true}
       }
       this.clearHistory = sinon.stub(this.fakeFiltering, 'clearHistory')
-      this.state = sitesReducer(initState, this.action)
+      this.state = sitesReducer(initState, this.action, makeImmutable(this.action))
     })
 
     after(function () {

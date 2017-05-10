@@ -13,11 +13,9 @@ const windowAction = require('../../../js/actions/windowActions.js')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const {getFlashResourceId} = require('../../../js/flash')
 const {l10nErrorText} = require('../../common/lib/httpUtil')
-const windows = require('../windows')
 const Immutable = require('immutable')
 const dragTypes = require('../../../js/constants/dragTypes')
 const {frameOptsFromFrame} = require('../../../js/state/frameStateUtil')
-const {BrowserWindow} = require('electron')
 
 const tabsReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
@@ -29,91 +27,132 @@ const tabsReducer = (state, action, immutableAction) => {
       state = tabState.maybeCreateTab(state, action)
       break
     case appConstants.APP_TAB_MOVED: {
-      const tabId = action.get('tabId')
-      const frameOpts = action.get('frameOpts')
-      const browserOpts = action.get('browserOpts') || new Immutable.Map()
-      const windowId = action.get('windowId') || -1
-      state = tabs.moveTo(state, tabId, frameOpts, browserOpts, windowId)
+      setImmediate(() => {
+        const tabId = action.get('tabId')
+        const frameOpts = action.get('frameOpts')
+        const browserOpts = action.get('browserOpts') || new Immutable.Map()
+        const windowId = action.get('windowId') || -1
+        tabs.moveTo(state, tabId, frameOpts, browserOpts, windowId)
+      })
       break
     }
     case appConstants.APP_CREATE_TAB_REQUESTED:
-      tabs.createTab(action)
-      break
-    case appConstants.APP_MAYBE_CREATE_TAB_REQUESTED:
-      state = tabs.maybeCreateTab(state, action)
+      if (!action.getIn(['createProperties', 'windowId'])) {
+        const senderWindowId = action.getIn(['senderWindowId'])
+        if (senderWindowId) {
+          action = action.setIn(['createProperties', 'windowId'], senderWindowId)
+        }
+      }
+
+      setImmediate(() => {
+        if (action.get('activateIfOpen')) {
+          tabs.maybeCreateTab(state, action, action.get('createProperties'))
+        } else {
+          tabs.create(action.get('createProperties'), null, action.get('isRestore'))
+        }
+      })
       break
     case appConstants.APP_TAB_UPDATED:
       state = tabState.maybeCreateTab(state, action)
       break
-    case appConstants.APP_ACTIVE_WEB_CONTENTS_CLOSED: {
-      const tabValue = tabState.getActiveTabValue(state, BrowserWindow.getActiveWindow().id)
-      if (tabValue) {
-        const tabId = tabValue.get('tabId')
-        if (tabs.isDevToolsFocused(tabId)) {
-          state = tabs.toggleDevTools(state, tabId)
-        } else {
-          state = tabs.closeTab(state, tabId, false)
+    case appConstants.APP_TAB_CLOSE_REQUESTED:
+      {
+        const tabId = tabState.resolveTabId(state, action.get('tabId'))
+        if (tabId === tabState.TAB_ID_NONE) {
+          break
         }
+
+        setImmediate(() => {
+          if (tabId) {
+            if (tabs.isDevToolsFocused(tabId)) {
+              tabs.toggleDevTools(tabId)
+            } else {
+              tabs.closeTab(tabId, action.get('forceClosePinned'))
+            }
+          }
+        })
       }
       break
-    }
-    case appConstants.APP_TAB_CLOSED: {
-      const tabId = action.getIn(['tabValue', 'tabId'])
-      const forceClose = action.get('forceClose')
-      if (tabId) {
-        state = tabs.closeTab(state, tabId, forceClose)
+    case appConstants.APP_TAB_CLOSED:
+      {
+        const tabId = action.get('tabId')
+        if (tabId === tabState.TAB_ID_NONE) {
+          break
+        }
+        state = tabState.removeTabByTabId(state, tabId)
       }
       break
-    }
     case appConstants.APP_ALLOW_FLASH_ONCE:
     case appConstants.APP_ALLOW_FLASH_ALWAYS:
-      {
+      setImmediate(() => {
         const webContents = getWebContents(action.get('tabId'))
         if (webContents && !webContents.isDestroyed() && webContents.getURL() === action.get('url')) {
           webContents.authorizePlugin(getFlashResourceId())
         }
-        break
-      }
+      })
+      break
     case appConstants.APP_TAB_CLONED:
-      state = tabs.clone(state, action)
+      setImmediate(() => {
+        tabs.clone(action)
+      })
       break
     case appConstants.APP_TAB_PINNED:
-      state = tabs.pin(state, action)
+      setImmediate(() => {
+        tabs.pin(state, action.get('tabId'), action.get('pinned'))
+      })
       break
     case windowConstants.WINDOW_SET_AUDIO_MUTED:
-      state = tabs.setAudioMuted(state, action)
+      setImmediate(() => {
+        tabs.setAudioMuted(action)
+      })
       break
     case windowConstants.WINDOW_SET_ALL_AUDIO_MUTED:
       action.get('frameList').forEach((frameProp) => {
-        state = tabs.setAudioMuted(state, frameProp)
+        setImmediate(() => {
+          tabs.setAudioMuted(frameProp)
+        })
       })
       break
-    case windowConstants.WINDOW_SET_ACTIVE_FRAME:
-      tabs.setActive(action.getIn(['frameProps', 'tabId']))
+    case appConstants.APP_TAB_ACTIVATE_REQUESTED:
+      setImmediate(() => {
+        tabs.setActive(action.get('tabId'))
+      })
       break
     case appConstants.APP_TAB_TOGGLE_DEV_TOOLS:
-      state = tabs.toggleDevTools(state, action.get('tabId'))
+      setImmediate(() => {
+        tabs.toggleDevTools(action.get('tabId'))
+      })
       break
     case appConstants.APP_LOAD_URL_REQUESTED:
-      state = tabs.loadURL(state, action)
+      setImmediate(() => {
+        tabs.loadURL(action)
+      })
       break
     case appConstants.APP_LOAD_URL_IN_ACTIVE_TAB_REQUESTED:
-      state = tabs.loadURLInActiveTab(state, action.get('windowId'), action.get('url'))
+      setImmediate(() => {
+        tabs.loadURLInActiveTab(state, action.get('windowId'), action.get('url'))
+      })
       break
     case appConstants.APP_ON_GO_BACK:
-      state = tabs.goBack(state, action)
+      setImmediate(() => {
+        tabs.goBack(action.get('tabId'))
+      })
       break
     case appConstants.APP_ON_GO_FORWARD:
-      state = tabs.goForward(state, action)
+      setImmediate(() => {
+        tabs.goForward(action.get('tabId'))
+      })
       break
     case appConstants.APP_ON_GO_TO_INDEX:
-      state = tabs.goToIndex(state, action)
+      setImmediate(() => {
+        tabs.goToIndex(action.get('tabId'), action.get('index'))
+      })
       break
     case appConstants.APP_ON_GO_BACK_LONG:
       {
         const history = tabs.getHistoryEntries(state, action)
         const tabValue = tabState.getByTabId(state, action.get('tabId'))
-        const windowId = windows.getActiveWindowId()
+        const windowId = tabValue.get('windowId')
 
         if (history !== null) {
           windowAction.onLongBackHistory(
@@ -131,7 +170,7 @@ const tabsReducer = (state, action, immutableAction) => {
       {
         const history = tabs.getHistoryEntries(state, action)
         const tabValue = tabState.getByTabId(state, action.get('tabId'))
-        const windowId = windows.getActiveWindowId()
+        const windowId = tabValue.get('windowId')
 
         if (history !== null) {
           windowAction.onLongForwardHistory(

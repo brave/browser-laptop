@@ -115,18 +115,7 @@ A request for a URL email share occurred
 
 
 
-### maybeCreateTabRequested(createProperties) 
-
-A request for a "maybe" new tab has been made with the specified createProperties
-If a tab is already opened it will instead set it as active.
-
-**Parameters**
-
-**createProperties**: `Object`, these are only used if a new tab is being created
-
-
-
-### tabUpdated(tabValue) 
+### tabUpdated(tabValue, changeInfo) 
 
 A tab has been updated
 
@@ -134,17 +123,39 @@ A tab has been updated
 
 **tabValue**: `Object`, A tab has been updated
 
+**changeInfo**: `Object`, from chrome-tabs-updated
 
 
-### tabClosed(tabId, force) 
 
-Closes an open tab
+### tabActivateRequested(tabId) 
+
+Dispatches a message to the store to set a new frame as the active frame.
 
 **Parameters**
 
-**tabId**: `number`, Closes an open tab
+**tabId**: `Number`, the tabId to activate
 
-**force**: `boolean`, closing the tab
+
+
+### tabCloseRequested(tabId, forceClosePinned) 
+
+Dispatches a message to close the tabId
+
+**Parameters**
+
+**tabId**: `Number`, the tabId to close
+
+**forceClosePinned**: `Boolean`, force close if pinned
+
+
+
+### tabClosed(tabId) 
+
+Notifies that a tab has been closed
+
+**Parameters**
+
+**tabId**: `number`, Notifies that a tab has been closed
 
 
 
@@ -446,16 +457,6 @@ Hides a message in the notification bar
 
 
 
-### clearNotifications(origin) 
-
-Clears all notifications for a given origin.
-
-**Parameters**
-
-**origin**: `string`, Clears all notifications for a given origin.
-
-
-
 ### addWord(word, learn) 
 
 Adds a word to the dictionary
@@ -745,12 +746,6 @@ Dispatches a message to toogle the dev tools on/off for the specified tabId
 **Parameters**
 
 **tabId**: `number`, The tabId
-
-
-
-### activeWebContentsClosed() 
-
-Dispatches a message to toogle the dev tools on/off or close the tab, depending on what's active.
 
 
 

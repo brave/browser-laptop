@@ -24,7 +24,6 @@ const windowStore = require('../../../../js/stores/windowStore')
 const contextMenus = require('../../../../js/contextMenus')
 const LongPressButton = require('./../../../../js/components/longPressButton')
 const PublisherToggle = require('../publisherToggle')
-const {getCurrentWindowId} = require('../../currentWindow')
 
 // State
 const tabState = require('../../../common/state/tabState')
@@ -114,14 +113,14 @@ class NavigationBar extends React.Component {
   }
 
   mergeProps (state, dispatchProps, ownProps) {
-    const windowState = state.get('currentWindow')
-    const activeFrame = frameStateUtil.getActiveFrame(windowState) || Immutable.Map()
+    const currentWindow = state.get('currentWindow')
+    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const activeFrameKey = activeFrame.get('key')
-    const activeTabId = tabState.getActiveTabId(state, getCurrentWindowId())
+    const activeTabId = activeFrame.get('tabId') || tabState.TAB_ID_NONE
 
     const activeTabShowingMessageBox = tabState.isShowingMessageBox(state, activeTabId)
-    const bookmarkDetail = windowState.get('bookmarkDetail')
-    const mouseInTitlebar = windowState.getIn(['ui', 'mouseInTitlebar'])
+    const bookmarkDetail = currentWindow.get('bookmarkDetail')
+    const mouseInTitlebar = currentWindow.getIn(['ui', 'mouseInTitlebar'])
     const title = activeFrame.get('title') || ''
     const loading = activeFrame.get('loading')
     const location = activeFrame.get('location') || ''
@@ -153,7 +152,7 @@ class NavigationBar extends React.Component {
     props.bookmarkDetail = bookmarkDetail
     props.mouseInTitlebar = mouseInTitlebar
     props.settings = state.get('settings')
-    props.menubarVisible = menuBarState.isMenuBarVisible(windowState)
+    props.menubarVisible = menuBarState.isMenuBarVisible(currentWindow)
     props.siteSettings = state.get('siteSettings')
     props.synopsis = state.getIn(['publisherInfo', 'synopsis']) || new Immutable.Map()
     props.activeTabShowingMessageBox = activeTabShowingMessageBox

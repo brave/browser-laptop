@@ -90,7 +90,7 @@ const tabMessageBox = {
 
   onTabClosed: (state, action) => {
     action = makeImmutable(action)
-    const tabId = action.getIn(['tabValue', 'tabId'])
+    const tabId = action.get('tabId')
     if (tabId) {
       // remove callback; call w/ defaults
       const cb = messageBoxCallbacks[tabId]

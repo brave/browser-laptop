@@ -37,7 +37,6 @@ const domUtil = require('../../app/renderer/lib/domUtil')
 const {
   aboutUrls,
   isSourceMagnetUrl,
-  isSourceAboutUrl,
   isTargetAboutUrl,
   getTargetAboutUrl,
   getBaseUrl,
@@ -169,22 +168,13 @@ class Frame extends React.Component {
     this.expireContentSettings(this.origin)
   }
 
-  updateWebview (cb, prevProps, newSrc) {
-    // lazy load webview
-    if (!this.webview && !this.props.isActive && !this.props.isPreview &&
-      // allow force loading of new frames
-      this.props.unloaded === true &&
-      // don't lazy load about pages
-      !aboutUrls.get(getBaseUrl(this.props.src)) &&
-      // pinned tabs don't serialize their state so the icon is lost for lazy loading
-      !this.props.pinnedLocation) {
+  updateWebview (cb, prevProps = {}) {
+    if (cb && this.runOnDomReady) {
+      // there is already a callback waiting for did-attach
+      // so replace it with this callback because it might be a
+      // mount callback which is a subset of the update callback
+      this.runOnDomReady = cb
       return
-    }
-
-    newSrc = newSrc || this.props.src
-
-    if (isSourceAboutUrl(newSrc)) {
-      newSrc = getTargetAboutUrl(newSrc)
     }
 
     // Create the webview dynamically because React doesn't whitelist all
@@ -207,7 +197,7 @@ class Frame extends React.Component {
       if (!this.props.guestInstanceId || !this.webview.attachGuest(this.props.guestInstanceId)) {
         // The partition is guaranteed to be initialized by now by the browser process
         this.webview.setAttribute('partition', frameStateUtil.getPartition(this.frame))
-        this.webview.setAttribute('src', newSrc)
+        this.webview.setAttribute('src', this.frame.get('location'))
       }
       domUtil.appendChild(this.webviewContainer, this.webview)
     } else {
@@ -216,8 +206,8 @@ class Frame extends React.Component {
   }
 
   onPropsChanged (prevProps = {}) {
-    if (this.props.isActive && !prevProps.isActive) {
-      windowActions.setActiveFrame(this.frame)
+    if (this.props.isTabActive && !prevProps.isTabActive) {
+      windowActions.activeFrameChanged(this.frame)
     }
     if (this.props.tabIndex !== prevProps.tabIndex) {
       this.webview.setTabIndex(this.props.tabIndex)
@@ -228,8 +218,8 @@ class Frame extends React.Component {
   }
 
   componentDidMount () {
-    if (this.props.isActive) {
-      windowActions.setActiveFrame(this.frame)
+    if (this.props.isTabActive) {
+      windowActions.activeFrameChanged(this.frame)
     }
     this.updateWebview(this.onPropsChanged)
     if (this.props.activeShortcut) {
@@ -318,22 +308,7 @@ class Frame extends React.Component {
       this.expireContentSettings(prevOrigin)
     }
 
-    if (this.props.src !== prevProps.src) {
-      this.updateWebview(cb, prevProps)
-    } else if (this.shouldCreateWebview()) {
-      // plugin/insecure-content allow state has changed. recreate with the current
-      // location, not the src.
-      this.updateWebview(cb, prevProps, this.props.location)
-    } else {
-      if (this.runOnDomReady) {
-        // there is already a callback waiting for did-attach
-        // so replace it with this callback because it might be a
-        // mount callback which is a subset of the update callback
-        this.runOnDomReady = cb
-      } else {
-        cb(prevProps)
-      }
-    }
+    this.updateWebview(cb, prevProps)
   }
 
   handleShortcut () {
@@ -571,17 +546,11 @@ class Frame extends React.Component {
     this.webview.addEventListener('mouseleave', (e) => {
       windowActions.onFrameMouseLeave(this.props.tabId)
     })
-    this.webview.addEventListener('destroyed', (e) => {
+    this.webview.addEventListener('will-destroy', (e) => {
       if (this.frame.isEmpty()) {
         return
       }
       this.onCloseFrame(this.frame, true)
-    })
-    this.webview.addEventListener('close', () => {
-      if (this.frame.isEmpty()) {
-        return
-      }
-      this.onCloseFrame(this.frame)
     })
     this.webview.addEventListener('page-favicon-updated', (e) => {
       if (this.frame.isEmpty()) {
@@ -985,6 +954,7 @@ class Frame extends React.Component {
     props.isFullScreen = frame.get('isFullScreen')
     props.isPreview = frame.get('key') === currentWindow.get('previewFrameKey')
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frame.get('key'))
+    props.isTabActive = tab ? tabState.isActive(state, tabId) : false
     props.showFullScreenWarning = frame.get('showFullScreenWarning')
     props.location = frame.get('location')
     props.hrefPreview = frame.get('hrefPreview')

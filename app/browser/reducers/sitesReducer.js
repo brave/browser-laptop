@@ -11,7 +11,6 @@ const siteUtil = require('../../../js/state/siteUtil')
 const syncActions = require('../../../js/actions/syncActions')
 const syncUtil = require('../../../js/state/syncUtil')
 const Immutable = require('immutable')
-const {makeImmutable} = require('../../common/state/immutableUtil')
 const settings = require('../../../js/constants/settings')
 const {getSetting} = require('../../../js/settings')
 const writeActions = require('../../../js/constants/sync/proto').actions
@@ -20,11 +19,10 @@ const syncEnabled = () => {
   return getSetting(settings.SYNC_ENABLED) === true
 }
 
-const sitesReducer = (state, action, emitChanges) => {
+const sitesReducer = (state, action, immutableAction) => {
   switch (action.actionType) {
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
-      action = makeImmutable(action)
-      if (action.getIn(['clearDataDetail', 'browserHistory'])) {
+      if (immutableAction.getIn(['clearDataDetail', 'browserHistory'])) {
         state = state.set('sites', siteUtil.clearHistory(state.get('sites')))
         filtering.clearHistory()
       }
@@ -99,28 +97,29 @@ const sitesReducer = (state, action, emitChanges) => {
         state = syncUtil.updateSiteCache(state, siteDetail)
       })
       break
-    case appConstants.APP_TAB_PINNED:
-      const tab = state.get('tabs').find((tab) => tab.get('tabId') === action.tabId)
-      if (!tab) {
-        console.warn('Trying to pin a tabId which does not exist:', action.tabId, 'tabs: ', state.get('tabs').toJS())
-        break
-      }
-      const sites = state.get('sites')
-      const siteDetail = siteUtil.getDetailFromTab(tab, siteTags.PINNED, sites)
-      if (action.pinned) {
-        state = state.set('sites', siteUtil.addSite(sites, siteDetail, siteTags.PINNED))
-      } else {
-        state = state.set('sites', siteUtil.removeSite(sites, siteDetail, siteTags.PINNED))
-      }
-      if (syncEnabled()) {
-        state = syncUtil.updateSiteCache(state, siteDetail)
+    case appConstants.APP_TAB_UPDATED:
+      if (immutableAction.getIn(['changeInfo', 'pinned']) != null) {
+        const pinned = immutableAction.getIn(['changeInfo', 'pinned'])
+        const tabId = immutableAction.getIn(['tabValue', 'tabId'])
+        const tab = state.get('tabs').find((tab) => tab.get('tabId') === tabId)
+        if (!tab) {
+          console.warn('Trying to pin a tabId which does not exist:', tabId, 'tabs: ', state.get('tabs').toJS())
+          break
+        }
+        const sites = state.get('sites')
+        const siteDetail = siteUtil.getDetailFromTab(tab, siteTags.PINNED, sites)
+        if (pinned) {
+          state = state.set('sites', siteUtil.addSite(sites, siteDetail, siteTags.PINNED))
+        } else {
+          state = state.set('sites', siteUtil.removeSite(sites, siteDetail, siteTags.PINNED))
+        }
+        if (syncEnabled()) {
+          state = syncUtil.updateSiteCache(state, siteDetail)
+        }
       }
       break
-
-    case appConstants.APP_MAYBE_CREATE_TAB_REQUESTED:
     case appConstants.APP_CREATE_TAB_REQUESTED: {
-      action = makeImmutable(action)
-      const createProperties = action.get('createProperties')
+      const createProperties = immutableAction.get('createProperties')
       if (createProperties.get('pinned')) {
         state = state.set('sites', siteUtil.addSite(state.get('sites'),
           siteUtil.getDetailFromCreateProperties(createProperties), siteTags.PINNED))

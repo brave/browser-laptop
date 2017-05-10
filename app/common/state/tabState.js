@@ -12,7 +12,7 @@ const frameStateUtil = require('../../../js/state/frameStateUtil')
 const validateId = function (propName, id) {
   assert.ok(id, `${propName} cannot be null`)
   id = parseInt(id)
-  assert.ok(id === -1 || id > 0, `${propName} must be positive`)
+  assert.ok(id >= -2, `${propName} must be a valid`)
   return id
 }
 
@@ -62,6 +62,7 @@ const tabState = {
   },
 
   TAB_ID_NONE: -1,
+  TAB_ID_ACTIVE: -2,
 
   validateTabId: (tabId) => {
     validateId('tabId', tabId)
@@ -167,7 +168,7 @@ const tabState = {
   },
 
   getPathByTabId: (state, tabId) => {
-    tabId = validateId('tabId', tabId)
+    tabId = tabState.resolveTabId(state, tabId)
     state = validateState(state)
 
     const index = state.get('tabs').findIndex((tab) => tab.get('tabId') === tabId)
@@ -178,9 +179,6 @@ const tabState = {
   },
 
   getByTabId: (state, tabId) => {
-    tabId = validateId('tabId', tabId)
-    state = validateState(state)
-
     if (tabId === tabState.TAB_ID_NONE) {
       return null
     }
@@ -306,9 +304,17 @@ const tabState = {
     return tabState.getTabPropertyByTabId(state, tabId, 'active') || false
   },
 
+  // TOOD(bridiver) - make everything work with TAB_ID_ACTIVE
+  resolveTabId: (state, tabId) => {
+    if (tabId === tabState.TAB_ID_ACTIVE) {
+      tabId = tabState.getActiveTabId(state)
+    }
+    return validateId('tabId', tabId)
+  },
+
   getFramePathByTabId: (state, tabId) => {
+    tabId = tabState.resolveTabId(state, tabId)
     state = makeImmutable(state)
-    tabId = validateId('tabId', tabId)
 
     if (tabId === tabState.TAB_ID_NONE) {
       return null

@@ -42,24 +42,23 @@ class Window extends React.Component {
   }
 
   componentWillMount () {
-    if (!this.props.initWindowState || this.props.initWindowState.frames.length === 0) {
-      if (this.props.frames.length === 0) {
-        appActions.createTabRequested({})
+    const activeFrameKey = this.state.immutableData.windowState.get('activeFrameKey')
+    this.props.frames.forEach((frame, i) => {
+      if (frame.guestInstanceId) {
+        appActions.newWebContentsAdded(getCurrentWindowId(), frame)
       } else {
-        this.props.frames.forEach((frame, i) => {
-          if (frame.guestInstanceId) {
-            appActions.newWebContentsAdded(getCurrentWindowId(), frame)
-            return
-          }
-          appActions.createTabRequested({
-            url: frame.location,
-            partitionNumber: frame.partitionNumber,
-            isPrivate: frame.isPrivate,
-            active: i === 0
-          })
-        })
+        appActions.createTabRequested({
+          url: frame.location || frame.src || frame.provisionalLocation,
+          partitionNumber: frame.partitionNumber,
+          isPrivate: frame.isPrivate,
+          active: activeFrameKey ? frame.key === activeFrameKey : true,
+          discarded: frame.unloaded,
+          title: frame.title,
+          faviconUrl: frame.icon,
+          index: i
+        }, false, true /* isRestore */)
       }
-    }
+    })
   }
 
   render () {

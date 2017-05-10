@@ -9,7 +9,7 @@ const tabState = require('../common/state/tabState')
 const {app, BrowserWindow, extensions, session, ipcMain} = require('electron')
 const {makeImmutable} = require('../common/state/immutableUtil')
 const {getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl, isTargetAboutUrl} = require('../../js/lib/appUrlUtil')
-const {isURL, getUrlFromInput, toPDFJSLocation, getDefaultFaviconUrl} = require('../../js/lib/urlutil')
+const {isURL, getUrlFromInput, toPDFJSLocation, getDefaultFaviconUrl, isHttpOrHttps} = require('../../js/lib/urlutil')
 const {isSessionPartition} = require('../../js/state/frameStateUtil')
 const {getOrigin} = require('../../js/state/siteUtil')
 const {getSetting} = require('../../js/settings')
@@ -54,10 +54,10 @@ const getTabValue = function (tabId) {
   }
 }
 
-const updateTab = (tabId) => {
+const updateTab = (tabId, changeInfo = {}) => {
   let tabValue = getTabValue(tabId)
   if (tabValue) {
-    appActions.tabUpdated(tabValue)
+    appActions.tabUpdated(tabValue, makeImmutable(changeInfo))
   }
 }
 
@@ -91,6 +91,14 @@ const needsPartitionAssigned = (createProperties) => {
     createProperties.isPartitioned ||
     createProperties.partitionNumber ||
     createProperties.partition
+}
+
+const isAutoDiscardable = (createProperties) => {
+  if (createProperties.pinned) {
+    return false
+  }
+
+  return isHttpOrHttps(createProperties.url)
 }
 
 // TODO(bridiver) - refactor this into an action
@@ -285,7 +293,7 @@ const api = {
       let newTabValue = getTabValue(newTab.getId())
 
       let index
-      if (newTabValue && parseInt(newTabValue.get('index')) > -1) {
+      if (parseInt(newTabValue.get('index')) > -1) {
         index = newTabValue.get('index')
       }
 
@@ -300,12 +308,13 @@ const api = {
       const frameOpts = {
         location,
         partition: newTab.session.partition,
-        openInForeground: newTab.active,
+        openInForeground: !!newTabValue.get('active'),
         guestInstanceId: newTab.guestInstanceId,
         isPinned: !!newTabValue.get('pinned'),
         openerTabId,
         disposition,
-        index
+        index,
+        unloaded: !!newTabValue.get('discarded')
       }
 
       if (disposition === 'new-window' || disposition === 'new-popup') {
@@ -320,11 +329,12 @@ const api = {
       updateTab(tabId)
     })
 
-    process.on('chrome-tabs-updated', (tabId) => {
-      updateTab(tabId)
+    process.on('chrome-tabs-updated', (tabId, changeInfo) => {
+      updateTab(tabId, changeInfo)
     })
 
-    process.on('chrome-tabs-removed', (tabId) => {
+    process.on('chrome-tabs-removed', (tabId, windowId) => {
+      appActions.tabClosed(tabId, windowId)
       cleanupWebContents(tabId)
     })
 
@@ -334,18 +344,6 @@ const api = {
       }
       let tabId = tab.getId()
 
-      tab.once('destroyed', cleanupWebContents.bind(null, tabId))
-      tab.once('crashed', cleanupWebContents.bind(null, tabId))
-      tab.once('close', cleanupWebContents.bind(null, tabId))
-
-      tab.on('page-favicon-updated', function (e, favicons) {
-        if (favicons && favicons.length > 0) {
-          // tab.setTabValues({
-          //   faviconUrl: favicons[0]
-          // })
-          // updateTabDebounce(tabId)
-        }
-      })
       tab.on('unresponsive', () => {
         console.log('unresponsive')
       })
@@ -363,10 +361,6 @@ const api = {
     process.on('on-tab-created', (tab, options) => {
       if (tab.isDestroyed()) {
         return
-      }
-
-      if (options.index !== undefined) {
-        tab.setTabIndex(options.index)
       }
 
       tab.once('did-attach', () => {
@@ -394,7 +388,7 @@ const api = {
     }
   },
 
-  toggleDevTools: (state, tabId) => {
+  toggleDevTools: (tabId) => {
     const tab = getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
       if (tab.isDevToolsOpened()) {
@@ -403,7 +397,6 @@ const api = {
         tab.openDevTools()
       }
     }
-    return state
   },
 
   setActive: (tabId) => {
@@ -415,7 +408,7 @@ const api = {
     })
   },
 
-  loadURL: (state, action) => {
+  loadURL: (action) => {
     action = makeImmutable(action)
     const tabId = action.get('tabId')
     const tab = getWebContents(tabId)
@@ -429,12 +422,11 @@ const api = {
           url,
           partition: tab.session.partition
         })
-        return state
+        return
       }
 
       tab.loadURL(url)
     }
-    return state
   },
 
   loadURLInActiveTab: (state, windowId, url) => {
@@ -442,7 +434,6 @@ const api = {
     if (tabValue) {
       api.loadURLInTab(state, tabValue.get('tabId'), url)
     }
-    return state
   },
 
   loadURLInTab: (state, tabId, url) => {
@@ -454,20 +445,17 @@ const api = {
     return state
   },
 
-  setAudioMuted: (state, action) => {
+  setAudioMuted: (action) => {
     action = makeImmutable(action)
     const muted = action.get('muted')
     const tabId = action.get('tabId')
     const tab = getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
       tab.setAudioMuted(muted)
-      const tabValue = getTabValue(tabId)
-      return tabState.updateTab(state, { tabValue })
     }
-    return state
   },
 
-  clone: (state, action) => {
+  clone: (action) => {
     action = makeImmutable(action)
     const tabId = action.get('tabId')
     let options = action.get('options') || Immutable.Map()
@@ -480,27 +468,21 @@ const api = {
       tab.clone(options.toJS(), (newTab) => {
       })
     }
-    return state
   },
 
-  pin: (state, action) => {
-    action = makeImmutable(action)
-    const tabId = action.get('tabId')
-    const pinned = action.get('pinned')
+  pin: (state, tabId, pinned) => {
     const tab = getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
       const url = tab.getURL()
       // For now we only support 1 tab pin per URL
       const alreadyPinnedTab = tabState.queryTab(state, { url, pinned: true, partition: tab.session.partition })
       if (pinned && alreadyPinnedTab) {
-        tab.close(tab)
-        return tabState.removeTabByTabId(state, tabId)
+        api.closeTab(tabId)
+        return
       }
 
       tab.setPinned(pinned)
-      state = tabState.updateTabValue(state, getTabValue(tabId))
     }
-    return state
   },
 
   isDevToolsFocused: (tabId) => {
@@ -511,31 +493,39 @@ const api = {
       tab.isDevToolsFocused()
   },
 
-  closeTab: (state, tabId, forceClose) => {
+  closeTab: (tabId, forceClosePinned = false) => {
     const tabValue = getTabValue(tabId)
     if (!tabValue) {
-      return state
+      return false
     }
     const tab = getWebContents(tabId)
     try {
       if (tab && !tab.isDestroyed()) {
-        if (forceClose) {
-          tab.forceClose()
+        if (tabValue.get('pinned') && !forceClosePinned) {
+          tab.hostWebContents.send(messages.SHORTCUT_NEXT_TAB)
+          return false
         } else {
-          tab.close(tab)
+          tab.forceClose()
         }
       }
     } catch (e) {
-      // ignore
+      return false
     }
-    return tabState.removeTab(state, tabValue)
+    return true
   },
 
-  create: (createProperties, cb = null) => {
+  create: (createProperties, cb = null, isRestore = false) => {
     setImmediate(() => {
       createProperties = makeImmutable(createProperties).toJS()
+
+      // handle deprecated `location` property
+      if (createProperties.location) {
+        console.warn('Using `location` in createProperties is deprecated. Please use `url` instead')
+        createProperties.url = createProperties.location
+        delete createProperties.location
+      }
       const switchToNewTabsImmediately = getSetting(settings.SWITCH_TO_NEW_TABS) === true
-      if (switchToNewTabsImmediately) {
+      if (!isRestore && switchToNewTabsImmediately) {
         createProperties.active = true
       }
       if (!createProperties.url) {
@@ -547,6 +537,10 @@ const api = {
         if (isSessionPartition(createProperties.partition)) {
           createProperties.parent_partition = ''
         }
+      }
+      if (!isAutoDiscardable(createProperties)) {
+        createProperties.discarded = false
+        createProperties.autoDiscardable = false
       }
       extensions.createTab(createProperties, (tab) => {
         cb && cb(tab)
@@ -570,11 +564,6 @@ const api = {
     win.loadURL('about:blank')
   },
 
-  createTab: (action) => {
-    action = makeImmutable(action)
-    api.create(action.get('createProperties'))
-  },
-
   moveTo: (state, tabId, frameOpts, browserOpts, windowId) => {
     frameOpts = makeImmutable(frameOpts)
     browserOpts = makeImmutable(browserOpts)
@@ -588,7 +577,7 @@ const api = {
 
       const currentWindowId = tabValue && tabValue.get('windowId')
       if (windowId != null && currentWindowId === windowId) {
-        return state
+        return
       }
 
       if (windowId == null || windowId === -1) {
@@ -596,13 +585,13 @@ const api = {
         // a new window to be created.
         const windowTabCount = tabState.getTabsByWindowId(state, currentWindowId).size
         if (windowTabCount === 1) {
-          return state
+          return
         }
       }
 
       if (tabValue.get('pinned')) {
         // If the current tab is pinned, then don't allow to drag out
-        return state
+        return
       }
 
       tab.detach(() => {
@@ -613,52 +602,43 @@ const api = {
         }
       })
     }
-    return state
   },
 
-  maybeCreateTab: (state, action) => {
-    action = makeImmutable(action)
-    let createProperties = makeImmutable(action.get('createProperties'))
+  maybeCreateTab: (state, createProperties) => {
+    createProperties = makeImmutable(createProperties)
     const url = normalizeUrl(createProperties.get('url'))
     createProperties = createProperties.set('url', url)
     const windowId = createProperties.get('windowId')
     if (!windowId) {
-      return state
+      return
     }
     const tabData = tabState.getMatchingTab(state, createProperties, windowId, url)
     if (tabData) {
       api.setActive(tabData.get('id'))
     } else {
-      api.createTab(action)
+      api.create(createProperties)
     }
-    return state
   },
 
-  goBack: (state, action) => {
-    action = makeImmutable(action)
-    const tab = getWebContents(action.get('tabId'))
+  goBack: (tabId) => {
+    const tab = getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
       tab.goBack()
     }
-    return state
   },
 
-  goForward: (state, action) => {
-    action = makeImmutable(action)
-    const tab = getWebContents(action.get('tabId'))
+  goForward: (tabId) => {
+    const tab = getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
       tab.goForward()
     }
-    return state
   },
 
-  goToIndex: (state, action) => {
-    action = makeImmutable(action)
-    const tab = getWebContents(action.get('tabId'))
+  goToIndex: (tabId, index) => {
+    const tab = getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
-      tab.goToIndex(action.get('index'))
+      tab.goToIndex(index)
     }
-    return state
   },
 
   getHistoryEntries: (state, action) => {

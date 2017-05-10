@@ -75,7 +75,7 @@ const createFileSubmenu = () => {
       label: locale.translation('closeTab'),
       accelerator: 'CmdOrCtrl+W',
       click: function (item, focusedWindow) {
-        appActions.activeWebContentsClosed()
+        appActions.tabCloseRequested(tabState.TAB_ID_ACTIVE)
       }
     }, {
       // This should be disabled when no windows are active.
@@ -629,10 +629,10 @@ const doAction = (action) => {
         createMenu()
       })
       break
-    case appConstants.APP_TAB_CLOSED:
+    case appConstants.APP_TAB_CLOSE_REQUESTED:
       appDispatcher.waitFor([appStore.dispatchToken], () => {
         action = makeImmutable(action)
-        const tab = getByTabId(appStore.getState(), action.getIn(['tabValue', 'tabId']))
+        const tab = getByTabId(appStore.getState(), action.get('tabId'))
         if (tab && !tab.get('incognito') && tab.get('url') !== 'about:newtab') {
           if (tab.get('frame')) {
             lastClosedUrl = tab.get('url')

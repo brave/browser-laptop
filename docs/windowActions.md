@@ -179,20 +179,7 @@ Dispatches a message to the store to indicate that the webview entered full scre
 
 
 
-### unloadedTabCreated(frameOpts, openInForeground) 
-
-Dispatches a message to the store to create a new unloaded frame
-
-**Parameters**
-
-**frameOpts**: `Object`, An object of frame options such as isPrivate, element, and tab features.
-                 These may not all be hooked up in Electron yet.
-
-**openInForeground**: `boolean`, true if the new frame should become the new active frame
-
-
-
-### closeFrame(frames, frameProps, forceClosePinned) 
+### closeFrame(frames, frameProps) 
 
 Dispatches a message to close a frame
 
@@ -201,8 +188,6 @@ Dispatches a message to close a frame
 **frames**: `Array.&lt;Object&gt;`, Immutable list of of all the frames
 
 **frameProps**: `Object`, The properties of the frame to close
-
-**forceClosePinned**: `boolean`, Should we force close pinned tab
 
 
 
@@ -226,16 +211,6 @@ The new frame is expected to appear at the index it was last closed at
 ### clearClosedFrames() 
 
 Dispatches a message to the store to clear closed frames
-
-
-
-### setActiveFrame(frameProps) 
-
-Dispatches a message to the store to set a new frame as the active frame.
-
-**Parameters**
-
-**frameProps**: `Object`, the frame properties for the webview in question.
 
 
 

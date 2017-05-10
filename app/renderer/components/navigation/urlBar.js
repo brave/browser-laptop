@@ -54,15 +54,10 @@ class UrlBar extends React.Component {
     this.onContextMenu = this.onContextMenu.bind(this)
     this.keyPressed = false
     this.showAutocompleteResult = debounce(() => {
-      if (!this.urlInput || this.keyPressed || this.props.locationValue.length === 0) {
+      if (this.keyPressed || !this.urlInput || this.props.locationValueSuffix.length === 0) {
         return
       }
-      const suffixLen = this.props.locationValueSuffix.length
-      if (suffixLen > 0 && this.urlInput.value !== this.props.locationValue + this.props.locationValueSuffix) {
-        this.setValue(this.props.locationValue, this.props.locationValueSuffix)
-        const len = this.props.locationValue.length
-        this.urlInput.setSelectionRange(len, len + suffixLen)
-      }
+      this.updateAutocomplete(this.lastVal, this.props.locationValue + this.props.locationValueSuffix)
     }, 10)
   }
 
@@ -114,7 +109,7 @@ class UrlBar extends React.Component {
     switch (e.keyCode) {
       case KeyCodes.ENTER:
         e.preventDefault()
-        let location = this.urlInput ? this.urlInput.value : this.props.urlbarLocation
+        let location = this.urlInput ? this.getValue() : this.props.urlbarLocation
 
         if (location === null || location.length === 0) {
           windowActions.setUrlBarSelected(true)
@@ -231,32 +226,44 @@ class UrlBar extends React.Component {
     }
   }
 
-  onKeyPress (e) {
-    // If we're just continuing an autocomplete then prevent a change event
-    const last = this.lastVal + this.lastSuffix
-    const newValue = this.lastVal + String.fromCharCode(e.which)
-    if (last.startsWith(newValue)) {
-      const newSuffix = last.substring(newValue.length)
+  updateAutocomplete (newValue, suggestion = this.lastVal + this.lastSuffix) {
+    if (suggestion.startsWith(newValue)) {
+      const newSuffix = suggestion.substring(newValue.length)
       this.setValue(newValue, newSuffix)
-      windowActions.setNavBarUserInput(newValue)
       this.urlInput.setSelectionRange(newValue.length, newValue.length + newSuffix.length + 1)
-      if (this.suggestionLocation) {
-        windowActions.setUrlBarSuggestions(undefined, null)
+      return true
+    } else {
+      return false
+    }
+  }
+
+  onKeyPress (e) {
+    // handle urlInput.value = '' from tests
+    if (this.urlInput.value === '') {
+      this.lastVal = ''
+      this.lastSuffix = ''
+    }
+
+    const newValue = this.lastVal + String.fromCharCode(e.which)
+
+    if (!this.updateAutocomplete(newValue)) {
+      this.setValue(newValue)
+    }
+
+    e.preventDefault()
+  }
+
+  onChange (e) {
+    if (e.target.value !== this.lastVal + this.lastSuffix) {
+      if (!this.updateAutocomplete(e.target.value)) {
+        this.setValue(e.target.value)
       }
       e.preventDefault()
     }
   }
 
-  onChange (e) {
-    this.setValue(e.target.value)
-    if (this.suggestionLocation) {
-      windowActions.setUrlBarSuggestions(undefined, null)
-    }
-    // onChange is fired if text is cut from contextMenu
-    // for such cases we have to trigger render again to update urlIcon
-    if (e.target.value === '') {
-      windowActions.setNavBarUserInput('')
-    }
+  getValue () {
+    return this.lastVal + this.lastSuffix
   }
 
   // Keeps track of which part was set for the url suffix and which
@@ -269,6 +276,11 @@ class UrlBar extends React.Component {
     const newValue = val + suffix
     if (this.urlInput.value !== newValue) {
       this.urlInput.value = newValue
+      if (!this.keyPress) {
+        // if this is a key press don't sent the update until keyUp so
+        // showAutocompleteResult can handle the result
+        windowActions.setNavBarUserInput(val)
+      }
     }
   }
 
@@ -282,11 +294,8 @@ class UrlBar extends React.Component {
     if (this.props.isSelected) {
       windowActions.setUrlBarSelected(false)
     }
-    // We never want to set the full navbar user input to include the suffix
-    if (this.props.locationValue + this.props.locationValueSuffix !== e.target.value) {
-      windowActions.setNavBarUserInput(this.lastVal)
-    }
     this.keyPressed = false
+    windowActions.setNavBarUserInput(this.lastVal)
   }
 
   select () {
@@ -329,6 +338,7 @@ class UrlBar extends React.Component {
     // this.urlInput is not initialized in titleMode
     if (this.urlInput) {
       if (this.props.activeFrameKey !== prevProps.activeFrameKey) {
+        this.keyPressed = false
         // The user just changed tabs
         this.setValue(this.props.locationValue)
         // Each tab has a focused state stored separately
@@ -340,15 +350,12 @@ class UrlBar extends React.Component {
       } else if (this.props.location !== prevProps.location) {
         // This is a url nav change
         this.setValue(UrlUtil.getDisplayLocation(this.props.location, getSetting(settings.PDFJS_ENABLED)))
-      } else if (this.props.hasLocationValueSuffix && this.props.isActive &&
-        (this.props.hasLocationValueSuffix !== prevProps.hasLocationValueSuffix ||
-         this.props.urlbarLocation !== prevProps.urlbarLocation)) {
+      } else if (this.props.hasLocationValueSuffix &&
+                this.props.isActive &&
+                this.props.hasLocationValueSuffix !== this.lastSuffix) {
         this.showAutocompleteResult()
       } else if ((this.props.titleMode !== prevProps.titleMode) ||
           (!this.props.isActive && !this.props.isFocused)) {
-        this.setValue(this.props.locationValue)
-      } else if (this.props.urlbarLocation !== prevProps.urlbarLocation &&
-          this.urlInput.value !== this.props.urlbarLocation) {
         this.setValue(this.props.locationValue)
       }
     }
@@ -409,9 +416,9 @@ class UrlBar extends React.Component {
   }
 
   mergeProps (state, dispatchProps, ownProps) {
-    const windowState = state.get('currentWindow')
-    const activeFrame = frameStateUtil.getActiveFrame(windowState) || Immutable.Map()
-    const activeTabId = tabState.getActiveTabId(state, getCurrentWindowId())
+    const currentWindow = state.get('currentWindow')
+    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
+    const activeTabId = activeFrame.get('tabId') || tabState.TAB_ID_NONE
 
     const location = activeFrame.get('location') || ''
     const baseUrl = getBaseUrl(location)
@@ -421,7 +428,7 @@ class UrlBar extends React.Component {
     const urlbarLocation = urlbar.get('location')
     const locationValue = (isIntermediateAboutPage(urlbarLocation) && history.size > 0 && !canGoForward)
         ? history.last() : UrlUtil.getDisplayLocation(urlbarLocation, getSetting(settings.PDFJS_ENABLED))
-    const selectedIndex = activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])
+    const selectedIndex = urlbar.getIn(['suggestions', 'selectedIndex'])
     const allSiteSettings = siteSettingsState.getAllSiteSettings(state, activeFrame.get('isPrivate'))
     const braverySettings = siteSettings.getSiteSettingsForURL(allSiteSettings, location)
 
@@ -436,7 +443,7 @@ class UrlBar extends React.Component {
 
     const activateSearchEngine = urlbar.getIn(['searchDetail', 'activateSearchEngine'])
     const urlbarSearchDetail = urlbar.get('searchDetail')
-    let searchURL = windowState.getIn(['searchDetail', 'searchURL'])
+    let searchURL = currentWindow.getIn(['searchDetail', 'searchURL'])
     let searchShortcut = ''
     // remove shortcut from the search terms
     if (activateSearchEngine && urlbarSearchDetail !== null) {
@@ -459,22 +466,22 @@ class UrlBar extends React.Component {
     props.title = activeFrame.get('title') || ''
     props.scriptsBlocked = activeFrame.getIn(['noScript', 'blocked'])
     props.isSecure = activeFrame.getIn(['security', 'isSecure'])
-    props.hasLocationValueSuffix = activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix'])
+    props.hasLocationValueSuffix = urlbar.getIn(['suggestions', 'urlSuffix'])
     props.startLoadTime = activeFrame.get('startLoadTime')
     props.endLoadTime = activeFrame.get('endLoadTime')
     props.loading = activeFrame.get('loading')
     props.enableNoScript = siteSettingsState.isNoScriptEnabled(state, braverySettings)
-    props.noScriptIsVisible = windowState.getIn(['ui', 'noScriptInfo', 'isVisible']) || false
+    props.noScriptIsVisible = currentWindow.getIn(['ui', 'noScriptInfo', 'isVisible']) || false
     props.menubarVisible = ownProps.menubarVisible
     props.activeTabShowingMessageBox = tabState.isShowingMessageBox(state, activeTabId)
     props.noBorderRadius = isPublisherButtonEnabled
     props.onStop = ownProps.onStop
     props.titleMode = ownProps.titleMode
     props.locationValue = locationValue
-    props.locationValueSuffix = activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix'])
+    props.locationValueSuffix = urlbar.getIn(['suggestions', 'urlSuffix'])
     props.selectedIndex = selectedIndex
     props.suggestionList = urlbar.getIn(['suggestions', 'suggestionList'])
-    props.suggestion = activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'suggestionList', selectedIndex - 1])
+    props.suggestion = urlbar.getIn(['suggestions', 'suggestionList', selectedIndex - 1])
     props.shouldRender = urlbar.getIn(['suggestions', 'shouldRender'])
     props.urlbarLocation = urlbarLocation
     props.isActive = urlbar.get('active')

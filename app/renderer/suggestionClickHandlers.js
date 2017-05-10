@@ -27,7 +27,7 @@ const navigateSiteClickHandler = (formatUrl) => (site, isForSecondaryAction, shi
 }
 
 const frameClickHandler = (frameProps) =>
-  windowActions.setActiveFrame(frameProps)
+  appActions.tabActivateRequested(frameProps.get('tabId'))
 
 module.exports = {
   navigateSiteClickHandler,
