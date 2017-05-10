@@ -131,9 +131,9 @@ describe('findBar', function () {
     const url2 = Brave.server.url('find_in_page2.html')
     yield this.app.client
       .showFindbar()
+      .setValue(findBarInput, '')
       .waitForElementFocus(findBarInput)
       .newTab({ url: url2, active: false })
-      .setValue(findBarInput, '')
       .showFindbar()
       .waitForElementFocus(findBarInput)
       .keys('x')
