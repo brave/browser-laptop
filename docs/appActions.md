@@ -1023,6 +1023,18 @@ Notifies autoplay has been blocked
 
 
 
+### savePassword() 
+
+Handle 'save-password' event from muon
+
+
+
+### updatePassword() 
+
+Handle 'update-password' event from muon
+
+
+
 ### deletePassword(passwordDetail) 
 
 Deletes login credentials
@@ -1042,6 +1054,16 @@ Deletes all saved login credentials
 ### deletePasswordSite() 
 
 Delete legacy "never saved password" list
+
+
+
+### urlBarTextChanged(location) 
+
+Indicates that the urlbar text has changed, usually from user input
+
+**Parameters**
+
+**location**: `string`, The text to set as the new navbar URL input
 
 
 

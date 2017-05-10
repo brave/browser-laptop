@@ -116,19 +116,6 @@ const windowActions = {
   },
 
   /**
-   * Dispatches a message to the store to set the user entered text for the URL bar.
-   * Unlike setLocation and loadUrl, this does not modify the state of src and location.
-   *
-   * @param {string} location - The text to set as the new navbar URL input
-   */
-  setNavBarUserInput: function (location) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_NAVBAR_INPUT,
-      location
-    })
-  },
-
-  /**
    * Shows/hides the find-in-page bar.
    * @param {number} frameKey - Key of the frame that we want to modify
    * @param {boolean} shown - Whether to show the find bar

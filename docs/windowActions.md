@@ -98,17 +98,6 @@ Dispatches a message to set the frame error state
 
 
 
-### setNavBarUserInput(location) 
-
-Dispatches a message to the store to set the user entered text for the URL bar.
-Unlike setLocation and loadUrl, this does not modify the state of src and location.
-
-**Parameters**
-
-**location**: `string`, The text to set as the new navbar URL input
-
-
-
 ### setFindbarShown(frameKey, shown) 
 
 Shows/hides the find-in-page bar.

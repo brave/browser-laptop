@@ -5,6 +5,7 @@
 'use strict'
 
 const windowConstants = require('../../../js/constants/windowConstants')
+const appConstants = require('../../../js/constants/appConstants')
 const {aboutUrls, isNavigatableAboutPage, isSourceAboutUrl, isUrl, getSourceAboutUrl, getSourceMagnetUrl} = require('../../../js/lib/appUrlUtil')
 const {isURL, isPotentialPhishingUrl, getUrlFromInput} = require('../../../js/lib/urlutil')
 const {getFrameByKey, getFrameKeyByTabId, activeFrameStatePath, frameStatePath, getActiveFrame, getFrameByTabId} = require('../../../js/state/frameStateUtil')
@@ -388,8 +389,8 @@ const urlBarReducer = (state, action) => {
   const tabId = state.getIn(activeFrameStatePath(state).concat(['tabId']), tabState.TAB_ID_NONE)
 
   switch (action.actionType) {
-    case windowConstants.WINDOW_SET_NAVBAR_INPUT:
-      state = setNavBarUserInput(state, action.location)
+    case appConstants.APP_URL_BAR_TEXT_CHANGED:
+      state = setNavBarUserInput(state, action.input)
       break
     case windowConstants.WINDOW_SET_NAVIGATED:
       // For about: URLs, make sure we store the URL as about:something

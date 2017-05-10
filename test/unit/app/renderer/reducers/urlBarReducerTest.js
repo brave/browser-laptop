@@ -5,6 +5,7 @@ const assert = require('assert')
 const fakeElectron = require('../../../lib/fakeElectron')
 
 const windowConstants = require('../../../../../js/constants/windowConstants')
+const appConstants = require('../../../../../js/constants/appConstants')
 require('../../../braveUnit')
 
 const windowState = Immutable.fromJS({
@@ -111,10 +112,10 @@ describe('urlBarReducer', function () {
     mockery.disable()
   })
 
-  describe('WINDOW_SET_NAVBAR_INPUT', function () {
+  describe('APP_URL_BAR_TEXT_CHANGED', function () {
     before(function () {
       this.location = 'this test is brought to you by coffee.'
-      this.newState = urlBarReducer(windowState, {actionType: windowConstants.WINDOW_SET_NAVBAR_INPUT, location: this.location})
+      this.newState = urlBarReducer(windowState, {actionType: appConstants.APP_URL_BAR_TEXT_CHANGED, input: this.location})
     })
 
     it('Changes urlbar state for active frame key', function () {
@@ -288,7 +289,7 @@ describe('urlBarReducer', function () {
       })
     })
 
-    describe('WINDOW_SET_NAVBAR_INPUT', function () {
+    describe('APP_URL_BAR_TEXT_CHANGED', function () {
       // TODO
     })
 
