@@ -574,15 +574,18 @@ const handleAppAction = (action) => {
         break
       }
     case appConstants.APP_ADD_NOSCRIPT_EXCEPTIONS:
-      // Note that this is always cleared on restart or reload, so should not
-      // be synced or persisted.
-      let key = 'noScriptExceptions'
-      if (!action.origins || !action.origins.size) {
-        // Clear the exceptions
-        appState = appState.setIn(['siteSettings', action.hostPattern, key], new Immutable.Map())
-      } else {
-        const currentExceptions = appState.getIn(['siteSettings', action.hostPattern, key]) || new Immutable.Map()
-        appState = appState.setIn(['siteSettings', action.hostPattern, key], currentExceptions.merge(action.origins))
+      {
+        const propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
+        // Note that this is always cleared on restart or reload, so should not
+        // be synced or persisted.
+        const key = 'noScriptExceptions'
+        if (!action.origins || !action.origins.size) {
+          // Clear the exceptions
+          appState = appState.setIn([propertyName, action.hostPattern, key], new Immutable.Map())
+        } else {
+          const currentExceptions = appState.getIn([propertyName, action.hostPattern, key]) || new Immutable.Map()
+          appState = appState.setIn([propertyName, action.hostPattern, key], currentExceptions.merge(action.origins))
+        }
       }
       break
     case appConstants.APP_UPDATE_LEDGER_INFO:
