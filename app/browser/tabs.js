@@ -514,11 +514,18 @@ const api = {
     return true
   },
 
-  create: (createProperties, cb = null) => {
+  create: (createProperties, cb = null, isRestore = false) => {
     setImmediate(() => {
       createProperties = makeImmutable(createProperties).toJS()
+
+      // handle deprecated `location` property
+      if (createProperties.location) {
+        console.warn('Using `location` in createProperties is deprecated. Please use `url` instead')
+        createProperties.url = createProperties.location
+        delete createProperties.location
+      }
       const switchToNewTabsImmediately = getSetting(settings.SWITCH_TO_NEW_TABS) === true
-      if (createProperties.active == null && switchToNewTabsImmediately) {
+      if (!isRestore && switchToNewTabsImmediately) {
         createProperties.active = true
       }
       if (!createProperties.url) {
@@ -555,11 +562,6 @@ const api = {
       })
     })
     win.loadURL('about:blank')
-  },
-
-  createTab: (action) => {
-    action = makeImmutable(action)
-    api.create(action.get('createProperties'))
   },
 
   moveTo: (state, tabId, frameOpts, browserOpts, windowId) => {
@@ -602,9 +604,8 @@ const api = {
     }
   },
 
-  maybeCreateTab: (state, action) => {
-    action = makeImmutable(action)
-    let createProperties = makeImmutable(action.get('createProperties'))
+  maybeCreateTab: (state, createProperties) => {
+    createProperties = makeImmutable(createProperties)
     const url = normalizeUrl(createProperties.get('url'))
     createProperties = createProperties.set('url', url)
     const windowId = createProperties.get('windowId')
@@ -615,7 +616,7 @@ const api = {
     if (tabData) {
       api.setActive(tabData.get('id'))
     } else {
-      api.createTab(action)
+      api.create(createProperties)
     }
   },
 
