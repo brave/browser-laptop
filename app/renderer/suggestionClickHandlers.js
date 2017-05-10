@@ -7,16 +7,38 @@
 const appActions = require('../../js/actions/appActions')
 const windowActions = require('../../js/actions/windowActions')
 const windowStore = require('../../js/stores/windowStore')
+const suggestionTypes = require('../../js/constants/suggestionTypes')
+const {makeImmutable} = require('../common/state/immutableUtil')
 const {getActiveFrame} = require('../../js/state/frameStateUtil')
 
-const navigateSiteClickHandler = (formatUrl) => (site, isForSecondaryAction, shiftKey) => {
-  const url = formatUrl(site)
+const navigateSiteClickHandler = (suggestionData, isForSecondaryAction, shiftKey) => {
   // When clicked make sure to hide autocomplete
   windowActions.setRenderUrlBarSuggestions(false)
+
+  suggestionData = makeImmutable(suggestionData)
+  const type = suggestionData.get('type')
+  let partitionNumber
+  let url
+  if (type === suggestionTypes.SEARCH) {
+    const frameSearchDetail = suggestionData.getIn(['navbar', 'urlbar', 'searchDetail'])
+    const searchDetail = windowStore.state.get('searchDetail')
+    let searchURL = frameSearchDetail
+      ? frameSearchDetail.get('search') : searchDetail.get('searchURL')
+    url = searchURL.replace('{searchTerms}', encodeURIComponent(suggestionData.get('location')))
+  } else if (type === suggestionTypes.TAB) {
+    appActions.tabActivateRequested(suggestionData.get('tabId'))
+    return
+  } else if (type === suggestionTypes.TOP_SITE) {
+    url = suggestionData.get('location')
+  } else {
+    url = suggestionData.get('location')
+    partitionNumber = (suggestionData && suggestionData.get && suggestionData.get('partitionNumber')) || undefined
+  }
+
   if (isForSecondaryAction) {
     appActions.createTabRequested({
       url,
-      partitionNumber: (site && site.get && site.get('partitionNumber')) || undefined,
+      partitionNumber,
       active: !!shiftKey
     })
   } else {
@@ -26,10 +48,6 @@ const navigateSiteClickHandler = (formatUrl) => (site, isForSecondaryAction, shi
   }
 }
 
-const frameClickHandler = (frameProps) =>
-  appActions.tabActivateRequested(frameProps.get('tabId'))
-
 module.exports = {
-  navigateSiteClickHandler,
-  frameClickHandler
+  navigateSiteClickHandler
 }

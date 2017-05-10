@@ -19,7 +19,7 @@ const config = require('../../../js/constants/config')
 const top500 = require('../../../js/data/top500')
 const suggestion = require('../lib/suggestion')
 const suggestionTypes = require('../../../js/constants/suggestionTypes')
-const {navigateSiteClickHandler, frameClickHandler} = require('../suggestionClickHandlers')
+const {navigateSiteClickHandler} = require('../suggestionClickHandlers')
 const appStoreRenderer = require('../../../js/stores/appStoreRenderer')
 
 const navigationBarState = require('../../common/state/navigationBarState')
@@ -133,8 +133,6 @@ const generateNewSuggestionsList = (state) => {
   const activeFrameKey = state.get('activeFrameKey')
   const urlLocation = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'location']))
   const searchResults = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'searchResults']))
-  const frameSearchDetail = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'searchDetail']))
-  const searchDetail = state.get('searchDetail')
 
   if (!urlLocation) {
     return state
@@ -142,10 +140,11 @@ const generateNewSuggestionsList = (state) => {
 
   const urlLocationLower = urlLocation.toLowerCase()
   let suggestionsList = new Immutable.List()
-  const defaultme = (x) => x
-  const mapListToElements = ({data, maxResults, type, clickHandler = navigateSiteClickHandler.bind(this),
-      sortHandler = defaultme, formatTitle = defaultme, formatUrl = defaultme,
-      filterValue = (site) => {
+  const formatUrl = (x) => typeof x === 'object' && x !== null ? x.get('location') : x
+  const formatTitle = (x) => typeof x === 'object' && x !== null ? x.get('title') : x
+  const formatTabId = (x) => typeof x === 'object' && x !== null ? x.get('tabId') : x
+  const mapListToElements = ({data, maxResults, type,
+      sortHandler = (x) => x, filterValue = (site) => {
         return site.toLowerCase().indexOf(urlLocationLower) !== -1
       }
   }) => {
@@ -165,9 +164,9 @@ const generateNewSuggestionsList = (state) => {
       .take(maxResults)
       .map((site) => {
         return {
-          onClick: clickHandler.bind(null, site),
           title: formatTitle(site),
           location: formatUrl(site),
+          tabId: formatTabId(site),
           type
         }
       })
@@ -247,12 +246,7 @@ const generateNewSuggestionsList = (state) => {
         data: historySites,
         maxResults: config.urlBarSuggestions.maxHistorySites,
         type: suggestionTypes.HISTORY,
-        clickHandler: navigateSiteClickHandler((site) => {
-          return site.get('location')
-        }),
         sortHandler: sortBasedOnLocationPos,
-        formatTitle: (site) => site.get('title'),
-        formatUrl: (site) => site.get('location'),
         filterValue: null
       }))
     }
@@ -262,12 +256,7 @@ const generateNewSuggestionsList = (state) => {
         data: bookmarkSites,
         maxResults: config.urlBarSuggestions.maxBookmarkSites,
         type: suggestionTypes.BOOKMARK,
-        clickHandler: navigateSiteClickHandler((site) => {
-          return site.get('location')
-        }),
         sortHandler: sortBasedOnLocationPos,
-        formatTitle: (site) => site.get('title'),
-        formatUrl: (site) => site.get('location'),
         filterValue: null
       }))
     }
@@ -277,8 +266,8 @@ const generateNewSuggestionsList = (state) => {
   suggestionsList = suggestionsList.concat(mapListToElements({
     data: aboutUrls.keySeq().filter((x) => isNavigatableAboutPage(x)),
     maxResults: config.urlBarSuggestions.maxAboutPages,
-    type: suggestionTypes.ABOUT_PAGES,
-    clickHandler: navigateSiteClickHandler((x) => x)}))
+    type: suggestionTypes.ABOUT_PAGES
+  }))
 
   // opened frames
   if (getSetting(settings.OPENED_TAB_SUGGESTIONS)) {
@@ -286,10 +275,7 @@ const generateNewSuggestionsList = (state) => {
       data: state.get('frames'),
       maxResults: config.urlBarSuggestions.maxOpenedFrames,
       type: suggestionTypes.TAB,
-      clickHandler: frameClickHandler,
       sortHandler: sortBasedOnLocationPos,
-      formatTitle: (frame) => frame.get('title'),
-      formatUrl: (frame) => frame.get('location'),
       filterValue: (frame) => !isSourceAboutUrl(frame.get('location')) &&
         frame.get('key') !== activeFrameKey &&
         (
@@ -304,12 +290,7 @@ const generateNewSuggestionsList = (state) => {
     suggestionsList = suggestionsList.concat(mapListToElements({
       data: searchResults,
       maxResults: config.urlBarSuggestions.maxSearch,
-      type: suggestionTypes.SEARCH,
-      clickHandler: navigateSiteClickHandler((searchTerms) => {
-        let searchURL = frameSearchDetail
-        ? frameSearchDetail.get('search') : searchDetail.get('searchURL')
-        return searchURL.replace('{searchTerms}', encodeURIComponent(searchTerms))
-      })
+      type: suggestionTypes.SEARCH
     }))
   }
 
@@ -317,8 +298,8 @@ const generateNewSuggestionsList = (state) => {
   suggestionsList = suggestionsList.concat(mapListToElements({
     data: top500,
     maxResults: config.urlBarSuggestions.maxTopSites,
-    type: suggestionTypes.TOP_SITE,
-    clickHandler: navigateSiteClickHandler((x) => x)}))
+    type: suggestionTypes.TOP_SITE
+  }))
 
   return setUrlSuggestions(state, suggestionsList)
 }
@@ -519,8 +500,10 @@ const urlBarReducer = (state, action) => {
       const suggestionList = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']))
       if (suggestionList.size > 0) {
         // It's important this doesn't run sync or else the returned state below will overwrite anything done in the click handler
-        setImmediate(() =>
-          suggestionList.get(selectedIndex).onClick(action.isForSecondaryAction, action.shiftKey))
+        setImmediate(() => {
+          const suggestion = suggestionList.get(selectedIndex)
+          navigateSiteClickHandler(suggestion, action.isForSecondaryAction, action.shiftKey)
+        })
       }
       break
   }
