@@ -73,6 +73,8 @@ class DownloadItem extends ImmutableComponent {
   }
   render () {
     const origin = getOrigin(this.props.download.get('url'))
+    const localFileOrigins = ['file:', 'blob:', 'data:', 'chrome-extension:', 'chrome:']
+    const localFile = origin && localFileOrigins.some((localFileOrigin) => origin.startsWith(localFileOrigin))
     const progressStyle = {
       width: downloadUtil.getPercentageComplete(this.props.download)
     }
@@ -160,7 +162,7 @@ class DownloadItem extends ImmutableComponent {
                     ? <span className='fa fa-unlock isInsecure' />
                     : null
                 }
-                <span title={origin}>{origin}</span>
+                <span data-l10n-id={localFile ? 'downloadLocalFile' : null} title={origin}>{localFile ? null : origin}</span>
               </div>
               : null
           }
