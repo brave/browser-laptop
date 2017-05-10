@@ -49,6 +49,9 @@ const updateSearchEngineInfoFromInput = (state, frameProps) => {
 const searchXHR = (state, frameProps, searchOnline) => {
   const searchDetail = state.get('searchDetail')
   const frameSearchDetail = frameProps.getIn(['navbar', 'urlbar', 'searchDetail'])
+  if (!searchDetail && !frameSearchDetail) {
+    return state
+  }
   let autocompleteURL = frameSearchDetail
     ? frameSearchDetail.get('autocomplete')
     : searchDetail.get('autocompleteURL')
