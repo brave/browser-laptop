@@ -309,6 +309,55 @@ describe('Bravery Panel', function () {
         .keys(Brave.keys.ESCAPE)
         .waitForElementCount(noScriptNavButton, 0)
     })
+
+    // #8783
+    it('does not apply exceptions from private tabs to regular tabs', function * () {
+      const url = Brave.server.url('scriptBlock.html')
+      yield this.app.client
+        // 1. disable scripts on the url
+        .tabByIndex(0)
+        .loadUrl(url)
+        .waitForTextValue('body', 'test1 test2')
+        .openBraveMenu(braveMenu, braveryPanel)
+        .click(noScriptSwitch)
+        .waitForTextValue(noScriptStat, '2')
+        .keys(Brave.keys.ESCAPE)
+        .waitForVisible(noScriptNavButton)
+
+        // 2. open the url in a private tab. scripts should be disabled
+        .newTab({ url, isPrivate: true })
+        .waitForTabCount(2)
+        .waitForUrl(url)
+        .waitUntil(function () {
+          // getText returns empty in this case
+          return this.getElementSize('noscript')
+            .then((size) => size.height > 0)
+        })
+        .openBraveMenu(braveMenu, braveryPanel)
+        .waitForTextValue(noScriptStat, '2')
+        .keys(Brave.keys.ESCAPE)
+        .waitForVisible(noScriptNavButton)
+
+        // 3. click the noscript switch to allow scripts in the private tab
+        .openBraveMenu(braveMenu, braveryPanel)
+        .click(noScriptSwitch)
+        .waitForTextValue(noScriptStat, '0')
+        .keys(Brave.keys.ESCAPE)
+
+        // 4. load the url again in a regular tab. scripts should still be disabled.
+        .newTab({ url })
+        .waitForTabCount(3)
+        .waitForUrl(url)
+        .waitUntil(function () {
+          // getText returns empty in this case
+          return this.getElementSize('noscript')
+            .then((size) => size.height > 0)
+        })
+        .openBraveMenu(braveMenu, braveryPanel)
+        .waitForTextValue(noScriptStat, '2')
+        .keys(Brave.keys.ESCAPE)
+        .waitForVisible(noScriptNavButton)
+    })
     it('shows noscript tag content', function * () {
       const url = Brave.server.url('scriptBlock.html')
       yield this.app.client
