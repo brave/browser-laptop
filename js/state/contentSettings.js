@@ -64,7 +64,7 @@ const getDefaultUserPrefContentSettings = (braveryDefaults, appSettings, appConf
   braveryDefaults = makeImmutable(braveryDefaults)
   return Immutable.fromJS({
     autoplay: [{
-      setting: braveryDefaults.get('noAutoplay') ? 'block' : 'allow',
+      setting: 'block',
       primaryPattern: '*'
     }],
     cookies: getDefault3rdPartyStorageSettings(braveryDefaults, appSettings, appConfig),
@@ -281,8 +281,8 @@ const siteSettingsToContentSettings = (currentSiteSettings, defaultContentSettin
     if (typeof siteSetting.get('widevine') === 'number' && braveryDefaults.get('widevine')) {
       contentSettings = addContentSettings(contentSettings, 'plugins', primaryPattern, '*', 'allow', appConfig.widevine.resourceId)
     }
-    if (typeof siteSetting.get('noAutoplay') === 'boolean') {
-      contentSettings = addContentSettings(contentSettings, 'autoplay', primaryPattern, '*', siteSetting.get('noAutoplay') ? 'block' : 'allow')
+    if (typeof siteSetting.get('autoplay') === 'boolean') {
+      contentSettings = addContentSettings(contentSettings, 'autoplay', primaryPattern, '*', siteSetting.get('autoplay') ? 'allow' : 'block')
     }
   })
   // On the second pass we consider only shieldsUp === false settings since we want those to take precedence.
@@ -296,7 +296,6 @@ const siteSettingsToContentSettings = (currentSiteSettings, defaultContentSettin
       contentSettings = addContentSettings(contentSettings, 'javascript', primaryPattern, '*', 'allow')
       contentSettings = addContentSettings(contentSettings, 'referer', primaryPattern, '*', 'allow')
       contentSettings = addContentSettings(contentSettings, 'plugins', primaryPattern, '*', 'allow')
-      contentSettings = addContentSettings(contentSettings, 'autoplay', primaryPattern, '*', 'allow')
     }
   })
   return contentSettings

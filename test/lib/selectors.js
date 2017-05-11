@@ -58,7 +58,6 @@ module.exports = {
   noScriptAllowOnceButton: '[data-l10n-id="allowScriptsOnce"]',
   noScriptAllowButton: '[data-l10n-id="allowScripts"]',
   safeBrowsingSwitch: '.safeBrowsingSwitch .switchMiddle',
-  noAutoplaySwitch: '.noAutoplaySwitch .switchMiddle',
   backButton: '.backforward .backButton',
   forwardButton: '.backforward .forwardButton',
   reloadButton: '.reloadButton',

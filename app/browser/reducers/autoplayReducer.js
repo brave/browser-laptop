@@ -9,11 +9,13 @@ const {makeImmutable} = require('../../common/state/immutableUtil')
 const {ipcMain, webContents} = require('electron')
 const AppStore = require('../../../js/stores/appStore')
 const siteSettings = require('../../../js/state/siteSettings')
+const settings = require('../../../js/constants/settings')
 const appActions = require('../../../js/actions/appActions')
 const {getOrigin} = require('../../../js/state/siteUtil')
 const locale = require('../../locale')
 const messages = require('../../../js/constants/messages')
-const urlParse = require('../../common/urlParse')
+const getSetting = require('../../../js/settings').getSetting
+const {autoplayOption} = require('../../common/constants/settingsEnums')
 
 const showAutoplayMessageBox = (tabId) => {
   const tab = webContents.fromTabID(tabId)
@@ -22,8 +24,12 @@ const showAutoplayMessageBox = (tabId) => {
   }
   const location = tab.getURL()
   const origin = getOrigin(location)
+  if (getSetting(settings.AUTOPLAY_MEDIA) === autoplayOption.ALWAYS_ALLOW) {
+    appActions.changeSiteSetting(origin, 'autoplay', true)
+    return
+  }
   const originSettings = siteSettings.getSiteSettingsForURL(AppStore.getState().get('siteSettings'), origin)
-  if (originSettings && originSettings.get('noAutoplay') === true) {
+  if (originSettings && originSettings.get('autoplay') === false) {
     return
   }
   const message = locale.translation('allowAutoplay', {origin})
@@ -43,20 +49,20 @@ const showAutoplayMessageBox = (tabId) => {
   ipcMain.once(messages.NOTIFICATION_RESPONSE, (e, msg, buttonIndex, persist) => {
     if (msg === message) {
       appActions.hideNotification(message)
-      let ruleKey = origin
-      const parsedUrl = urlParse(location)
-      if ((parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:')) {
-        ruleKey = `https?://${parsedUrl.host}`
-      }
       if (buttonIndex === 0) {
-        appActions.changeSiteSetting(ruleKey, 'noAutoplay', false)
-
+        appActions.changeSiteSetting(origin, 'autoplay', true)
         if (tab && !tab.isDestroyed()) {
           tab.reload()
+          tab.on('destroyed', function temporaryAllow (e) {
+            if (!persist) {
+              appActions.removeSiteSetting(origin, 'autoplay')
+              // tab.removeListener('did-finish-load', temporaryAllow)
+            }
+          })
         }
       } else {
         if (persist) {
-          appActions.changeSiteSetting(ruleKey, 'noAutoplay', true)
+          appActions.changeSiteSetting(origin, 'autoplay', false)
         }
       }
     }

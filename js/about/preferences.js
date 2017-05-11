@@ -34,7 +34,7 @@ const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const {changeSetting} = require('../../app/renderer/lib/settingsUtil')
 const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
-const {startsWithOption, newTabMode, bookmarksToolbarMode, tabCloseAction, fullscreenOption} = require('../../app/common/constants/settingsEnums')
+const {startsWithOption, newTabMode, bookmarksToolbarMode, tabCloseAction, fullscreenOption, autoplayOption} = require('../../app/common/constants/settingsEnums')
 
 const aboutActions = require('./aboutActions')
 const appActions = require('../actions/appActions')
@@ -49,7 +49,6 @@ const adInsertion = appConfig.resourceNames.AD_INSERTION
 const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
 const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
 const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
-const noAutoplay = appConfig.resourceNames.NOAUTOPLAY
 const noScript = appConfig.resourceNames.NOSCRIPT
 const flash = appConfig.resourceNames.FLASH
 
@@ -77,7 +76,8 @@ const permissionNames = {
   'openExternalPermission': ['boolean'],
   'protocolRegistrationPermission': ['boolean'],
   'flash': ['boolean', 'number'],
-  'widevine': ['boolean', 'number']
+  'widevine': ['boolean', 'number'],
+  'autoplay': ['boolean']
 }
 
 const braveryPermissionNames = {
@@ -88,8 +88,7 @@ const braveryPermissionNames = {
   'safeBrowsing': ['boolean'],
   'httpsEverywhere': ['boolean'],
   'fingerprintingProtection': ['boolean'],
-  'noScript': ['boolean', 'number'],
-  'noAutoplay': ['boolean']
+  'noScript': ['boolean', 'number']
 }
 
 class GeneralTab extends ImmutableComponent {
@@ -498,7 +497,6 @@ class ShieldsTab extends ImmutableComponent {
     this.onChangeAdControl = this.onChangeAdControl.bind(this)
     this.onToggleHTTPSE = this.onToggleSetting.bind(this, httpsEverywhere)
     this.onToggleSafeBrowsing = this.onToggleSetting.bind(this, safeBrowsing)
-    this.onToggleNoAutoplay = this.onToggleSetting.bind(this, noAutoplay)
     this.onToggleNoScript = this.onToggleSetting.bind(this, noScript)
   }
   onChangeAdControl (e) {
@@ -549,7 +547,6 @@ class ShieldsTab extends ImmutableComponent {
         <SettingCheckbox checked={this.props.braveryDefaults.get('safeBrowsing')} dataL10nId='safeBrowsing' onChange={this.onToggleSafeBrowsing} />
         <SettingCheckbox checked={this.props.braveryDefaults.get('noScript')} dataL10nId='noScriptPref' onChange={this.onToggleNoScript} />
         <SettingCheckbox dataL10nId='blockCanvasFingerprinting' prefKey={settings.BLOCK_CANVAS_FINGERPRINTING} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox checked={this.props.braveryDefaults.get('noAutoplay')} dataL10nId='noAutoplay' onChange={this.onToggleNoAutoplay} />
         <Button l10nId='manageAdblockSettings' className='primaryButton manageAdblockSettings'
           onClick={aboutActions.createTabRequested.bind(null, {
             url: 'about:adblock'
@@ -655,6 +652,17 @@ class SecurityTab extends ImmutableComponent {
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.FULLSCREEN_CONTENT)}>
             <option data-l10n-id='alwaysAsk' value={fullscreenOption.ALWAYS_ASK} />
             <option data-l10n-id='alwaysAllow' value={fullscreenOption.ALWAYS_ALLOW} />
+          </SettingDropdown>
+        </SettingItem>
+      </SettingsList>
+      <DefaultSectionTitle data-l10n-id='autoplay' />
+      <SettingsList>
+        <SettingItem>
+          <SettingDropdown
+            value={getSetting(settings.AUTOPLAY_MEDIA, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.AUTOPLAY_MEDIA)}>
+            <option data-l10n-id='alwaysAsk' value={autoplayOption.ALWAYS_ASK} />
+            <option data-l10n-id='alwaysAllow' value={autoplayOption.ALWAYS_ALLOW} />
           </SettingDropdown>
         </SettingItem>
       </SettingsList>

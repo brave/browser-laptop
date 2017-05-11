@@ -11,7 +11,7 @@ const adHost = process.env.AD_HOST || 'https://oip.brave.com'
 
 const buildConfig = require('./buildConfig')
 const isProduction = buildConfig.nodeEnv === 'production'
-const {fullscreenOption} = require('../../app/common/constants/settingsEnums')
+const {fullscreenOption, autoplayOption} = require('../../app/common/constants/settingsEnums')
 
 module.exports = {
   name: 'Brave',
@@ -19,7 +19,6 @@ module.exports = {
   quitTimeout: 10 * 1000,
   resourceNames: {
     ADBLOCK: 'adblock',
-    NOAUTOPLAY: 'noAutoplay',
     SAFE_BROWSING: 'safeBrowsing',
     HTTPS_EVERYWHERE: 'httpsEverywhere',
     TRACKING_PROTECTION: 'trackingProtection',
@@ -34,9 +33,6 @@ module.exports = {
     // ... other optional resource files are identified by uuid such as for regional adblock
   },
   cookieblock: {
-    enabled: true
-  },
-  noAutoplay: {
     enabled: true
   },
   cookieblockAll: {
@@ -171,6 +167,7 @@ module.exports = {
     'security.passwords.enpass-enabled': false,
     'security.passwords.bitwarden-enabled': false,
     'security.fullscreen.content': fullscreenOption.ALWAYS_ASK,
+    'security.autoplay.media': autoplayOption.ALWAYS_ASK,
     'security.flash.installed': false,
     // sync
     'sync.enabled': false,

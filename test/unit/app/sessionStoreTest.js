@@ -526,6 +526,7 @@ describe('sessionStore unit tests', function () {
     let runPostMigrationsSpy
     let localeInitSpy
     let backupSessionStub
+    let runImportDefaultSettings
 
     before(function () {
       runPreMigrationsSpy = sinon.spy(sessionStore, 'runPreMigrations')
@@ -534,6 +535,7 @@ describe('sessionStore unit tests', function () {
       runPostMigrationsSpy = sinon.spy(sessionStore, 'runPostMigrations')
       localeInitSpy = sinon.spy(fakeLocale, 'init')
       backupSessionStub = sinon.stub(sessionStore, 'backupSession')
+      runImportDefaultSettings = sinon.spy(sessionStore, 'runImportDefaultSettings')
     })
 
     after(function () {
@@ -646,6 +648,16 @@ describe('sessionStore unit tests', function () {
           return sessionStore.loadAppState()
             .then(function (result) {
               assert.equal(backupSessionStub.calledOnce, true)
+            }, function (result) {
+              assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+            })
+        })
+
+        it('calls runImportDefaultSettings', function () {
+          runImportDefaultSettings.reset()
+          return sessionStore.loadAppState()
+            .then(function (result) {
+              assert.equal(runImportDefaultSettings.calledOnce, true)
             }, function (result) {
               assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
             })
@@ -775,6 +787,16 @@ describe('sessionStore unit tests', function () {
         })
     })
 
+    it('calls runImportDefaultSettings', function () {
+      runImportDefaultSettings.reset()
+      return sessionStore.loadAppState()
+        .then(function (result) {
+          assert.equal(runImportDefaultSettings.calledOnce, true)
+        }, function (result) {
+          assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+        })
+    })
+
     it('calls locale.init', function () {
       localeInitSpy.reset()
       return sessionStore.loadAppState()
@@ -835,5 +857,43 @@ describe('sessionStore unit tests', function () {
   })
 
   describe('isProtocolHandled', function () {
+  })
+
+  describe('runImportDefaultSettings', function () {
+    const { defaultSiteSettingsList } = require('../../../js/data/siteSettingsList')
+    const defaultAppState = {
+      siteSettings: {}
+    }
+    it('check defaultSiteSettingsListImported', function () {
+      assert.deepEqual(sessionStore.runImportDefaultSettings({defaultSiteSettingsListImported: true}), {defaultSiteSettingsListImported: true})
+    })
+    it('import to default app state', function () {
+      const result = sessionStore.runImportDefaultSettings(defaultAppState)
+      for (var i = 0; i < defaultSiteSettingsList.length; ++i) {
+        assert.equal(result.siteSettings.hasOwnProperty(defaultSiteSettingsList[i].pattern), true)
+        const setting = result.siteSettings[defaultSiteSettingsList[i].pattern]
+        assert.equal(setting[defaultSiteSettingsList[i].name], defaultSiteSettingsList[i].value)
+      }
+    })
+    it('import to existing app state', function () {
+      if (defaultSiteSettingsList.length >= 2) {
+        let conflictedAppstate = defaultAppState
+        conflictedAppstate.siteSettings[defaultSiteSettingsList[0].pattern] = {}
+        conflictedAppstate.siteSettings[defaultSiteSettingsList[1].pattern] = {}
+        let conflictedSetting = conflictedAppstate.siteSettings[defaultSiteSettingsList[0].pattern]
+        let sameSetting = conflictedAppstate.siteSettings[defaultSiteSettingsList[1].pattern]
+        conflictedSetting[defaultSiteSettingsList[0].name] = 'BRAVE'
+        sameSetting[defaultSiteSettingsList[1].name] = defaultSiteSettingsList[1].value
+        const result = sessionStore.runImportDefaultSettings(conflictedAppstate)
+        for (var i = 1; i < defaultSiteSettingsList.length; ++i) {
+          assert.equal(result.siteSettings.hasOwnProperty(defaultSiteSettingsList[i].pattern), true)
+          const setting = result.siteSettings[defaultSiteSettingsList[i].pattern]
+          assert.equal(setting[defaultSiteSettingsList[i].name], defaultSiteSettingsList[i].value)
+        }
+        assert.equal(result.siteSettings.hasOwnProperty(defaultSiteSettingsList[0].pattern), true)
+        const setting = result.siteSettings[defaultSiteSettingsList[0].pattern]
+        assert.equal(setting[defaultSiteSettingsList[0].name], 'BRAVE')
+      }
+    })
   })
 })

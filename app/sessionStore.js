@@ -23,6 +23,7 @@ const downloadStates = require('../js/constants/downloadStates')
 const {tabFromFrame} = require('../js/state/frameStateUtil')
 const siteUtil = require('../js/state/siteUtil')
 const { topSites, pinnedTopSites } = require('../js/data/newTabData')
+const { defaultSiteSettingsList } = require('../js/data/siteSettingsList')
 const sessionStorageVersion = 1
 const filtering = require('./filtering')
 const autofill = require('./autofill')
@@ -507,6 +508,25 @@ module.exports.runPostMigrations = (data) => {
   return data
 }
 
+module.exports.runImportDefaultSettings = (data) => {
+  // import default site settings list
+  if (!data.defaultSiteSettingsListImported) {
+    for (var i = 0; i < defaultSiteSettingsList.length; ++i) {
+      let setting = defaultSiteSettingsList[i]
+      if (!data.siteSettings[setting.pattern]) {
+        data.siteSettings[setting.pattern] = {}
+      }
+      let targetSetting = data.siteSettings[setting.pattern]
+      if (!targetSetting.hasOwnProperty[setting.name]) {
+        targetSetting[setting.name] = setting.value
+      }
+    }
+    data.defaultSiteSettingsListImported = true
+  }
+
+  return data
+}
+
 /**
  * Loads the browser state from storage.
  *
@@ -532,6 +552,7 @@ module.exports.loadAppState = () => {
         console.log('could not parse data: ', data, e)
       }
       data = exports.defaultAppState()
+      data = module.exports.runImportDefaultSettings(data)
     }
 
     if (loaded) {
@@ -561,6 +582,7 @@ module.exports.loadAppState = () => {
       }
 
       data = module.exports.runPostMigrations(data)
+      data = module.exports.runImportDefaultSettings(data)
     }
 
     data = setVersionInformation(data)
