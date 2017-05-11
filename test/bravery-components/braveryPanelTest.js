@@ -397,7 +397,6 @@ describe('Bravery Panel', function () {
         .waitForTabCount(3)
         .waitForUrl(url)
         .openBraveMenu(braveMenu, braveryPanel)
-        .click(fpSwitch)
         .waitUntil(function () {
           // TOOD: This should be 3, but see:
           // https://github.com/brave/browser-laptop/issues/3227
