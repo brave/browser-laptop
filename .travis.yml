@@ -9,7 +9,7 @@ before_install:
 before_script:
   - npm run download-sync-client
 script:
-  - BRAVE_TEST_COMMAND_LOGS=1 npm run testsuite
+  - npm run testsuite
 branches:
   only:
     - master
