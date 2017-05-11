@@ -311,13 +311,17 @@ class UrlBar extends React.Component {
 
   select () {
     if (this.urlInput) {
-      this.urlInput.select()
+      setImmediate(() => {
+        this.urlInput.select()
+      })
     }
   }
 
   focus () {
     if (this.urlInput) {
-      this.urlInput.focus()
+      setImmediate(() => {
+        this.urlInput.focus()
+      })
     }
   }
 
