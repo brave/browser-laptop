@@ -38,16 +38,18 @@ const {isIntermediateAboutPage} = require('../../../../js/lib/appUrlUtil')
 const contextMenus = require('../../../../js/contextMenus')
 const dnd = require('../../../../js/dnd')
 const throttle = require('../../../../js/lib/throttle')
-const {getTabBreakpoint, tabUpdateFrameRate} = require('../../lib/tabUtil')
+const {getTabBreakpoint, tabUpdateFrameRate, getMouseVelocity} = require('../../lib/tabUtil')
 const {isWindows} = require('../../../common/lib/platformUtil')
 const {getCurrentWindowId} = require('../../currentWindow')
 const UrlUtil = require('../../../../js/lib/urlutil')
+// const previewTimestamp = require('../../../../js/constants/config').tabs.maxAllowedTimesIdleMouseOverTab
 
 class Tab extends ImmutableComponent {
   constructor () {
     super()
     this.onMouseEnter = this.onMouseEnter.bind(this)
     this.onMouseLeave = this.onMouseLeave.bind(this)
+    this.onMouseMove = this.onMouseMove.bind(this)
     this.onUpdateTabSize = this.onUpdateTabSize.bind(this)
   }
   get frame () {
@@ -165,7 +167,6 @@ class Tab extends ImmutableComponent {
 
   onMouseLeave () {
     if (this.props.previewTabs) {
-      window.clearTimeout(this.hoverTimeout)
       windowActions.setPreviewFrame(null)
     }
     windowActions.setTabHoverState(this.frame, false)
@@ -175,15 +176,34 @@ class Tab extends ImmutableComponent {
     // relatedTarget inside mouseenter checks which element before this event was the pointer on
     // if this element has a tab-like class, then it's likely that the user was previewing
     // a sequency of tabs. Called here as previewMode.
-    const previewMode = /tab(?!pages)/i.test(e.relatedTarget.classList)
 
-    // If user isn't in previewMode, we add a bit of delay to avoid tab from flashing out
-    // as reported here: https://github.com/brave/browser-laptop/issues/1434
-    if (this.props.previewTabs) {
-      this.hoverTimeout =
-        window.setTimeout(windowActions.setPreviewFrame.bind(null, this.frame), previewMode ? 0 : 200)
+    // TODO this RegExp can be improved.
+    const previewMode = /tab(?!stoolbar)|tab(?=area|id|title)|closetab/i.test(e.relatedTarget.classList)
+    if (previewMode) {
+      windowActions.setPreviewFrame(this.frame)
     }
     windowActions.setTabHoverState(this.frame, true)
+  }
+
+  onMouseMove (e) {
+    getMouseVelocity(e, this.lastMouseMoveEvent, velocity => {
+      if (velocity < 1) {
+        // Brad: the number below is the number of times
+        // mouse is stopped over a tab. It is counted in milliseconds
+        // so it can be stopped even if you feel it doesn't.
+        // changing the number means that mouse should be stopped X times
+        // before preview happens.
+
+        // Note that this is only useful for vertical mouse positions i.e. from
+        // webview to urlbar and vice-versa. Horizontal tabs are always triggered
+        // when the latest item you hovered is another tab.
+        const magicBradNumber = 150
+        if (++this.timesMouseIsIdle >= magicBradNumber) {
+          windowActions.setPreviewFrame(this.frame)
+          this.timesMouseIsIdle = 0
+        }
+      }
+    })
   }
 
   onAuxClick (e) {
@@ -240,6 +260,14 @@ class Tab extends ImmutableComponent {
   }
 
   componentDidMount () {
+    // When tab is ready there's no mouse over it.
+    this.timesMouseIsIdle = 0
+    // Grab Mouse details to be used on tab previews
+    this.lastMouseMoveEvent = {
+      timestamp: null,
+      updatedX: null,
+      updatedY: null
+    }
     this.onUpdateTabSize()
     this.tabNode.addEventListener('auxclick', this.onAuxClick.bind(this))
     window.addEventListener('resize', throttle(this.onUpdateTabSize, tabUpdateFrameRate))
@@ -286,6 +314,7 @@ class Tab extends ImmutableComponent {
         partOfFullPageSet: this.props.partOfFullPageSet || !!this.props.tabWidth
       })}
       style={this.props.tabWidth ? { flex: `0 0 ${this.props.tabWidth}px` } : {}}
+      onMouseMove={this.onMouseMove}
       onMouseEnter={this.onMouseEnter}
       onMouseLeave={this.onMouseLeave}>
       {
