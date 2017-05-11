@@ -1590,7 +1590,12 @@ var updateLedgerInfo = () => {
       ledgerInfo.customerRequested = true
       retrieveCustomerInfo({ address: ledgerInfo.address }, (customer) => {
         ledgerInfo.customer = customer
-        updateLedgerInfo()
+        if (customer) {
+          retrieveCustomerTransactions({ address: ledgerInfo.address }, (transactions) => {
+            ledgerInfo.customer.transactions = transactions
+            updateLedgerInfo()
+          })
+        }
       })
     }
   }
@@ -1705,6 +1710,26 @@ var callback = (err, result, delayTime) => {
 
   muonWriter(pathName(statePath), result)
   run(delayTime)
+}
+
+var retrieveCustomerTransactions = (params, callback) => {
+  var options = {
+    url: process.env.ADDFUNDS_URL + '/v1/refunds/' + params.address,
+    method: params.method || 'GET',
+    responseType: 'text',
+    headers: underscore.defaults(params.headers || {}, { 'content-type': 'application/json; charset=utf-8' }),
+    verboseP: params.verboseP || false
+  }
+  request.request(options, (err, response, body) => {
+    if (err) {
+      return callback(null)
+    }
+    var transactions = response.statusCode === 200 && body ? JSON.parse(body) : null
+    if (transactions && clientOptions.debugP) {
+      console.log(transactions)
+    }
+    callback(transactions)
+  })
 }
 
 var retrieveCustomerInfo = (params, callback) => {
