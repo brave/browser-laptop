@@ -455,6 +455,7 @@ function registerPermissionHandler (session, partition) {
       appActions.hideNotification(message)
       const result = !!(buttonIndex)
       cb(result)
+      console.log(result)
       if (persist) {
         // remember site setting for this host
         appActions.changeSiteSetting(origin, permission + 'Permission', result, isPrivate)

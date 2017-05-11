@@ -253,7 +253,8 @@ var rendererIdentifiers = function () {
     'importSuccessOk',
     'connectionError',
     'unknownError',
-    'allowAutoplay'
+    'allowAutoplay',
+    'autoplayMedia'
   ]
 }
 

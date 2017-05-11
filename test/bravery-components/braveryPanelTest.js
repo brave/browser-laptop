@@ -1,7 +1,7 @@
 /* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
-const {cookieControl, allowAllCookiesOption, blockAllCookiesOption, urlInput, braveMenu, braveMenuDisabled, adsBlockedStat, adsBlockedControl, showAdsOption, blockAdsOption, braveryPanel, httpsEverywhereStat, noScriptStat, noScriptSwitch, fpSwitch, noAutoplaySwitch, fpStat, noScriptNavButton, customFiltersInput, notificationBar, reloadButton} = require('../lib/selectors')
+const {cookieControl, allowAllCookiesOption, blockAllCookiesOption, urlInput, braveMenu, braveMenuDisabled, adsBlockedStat, adsBlockedControl, showAdsOption, blockAdsOption, braveryPanel, httpsEverywhereStat, noScriptStat, noScriptSwitch, fpSwitch, fpStat, noScriptNavButton, customFiltersInput} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 
 describe('Bravery Panel', function () {
@@ -501,141 +501,67 @@ describe('Bravery Panel', function () {
     })
   })
 
-  describe('Autoplay test', function () {
+  // TODO: Fix iframe tests (See: #8760)
+  describe('Adblock stats iframe tests', function () {
     Brave.beforeEach(this)
     beforeEach(function * () {
       yield setup(this.app.client)
-    })
-
-    it('default block', function * () {
-      const url = Brave.server.url('autoplay.html')
       yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(url)
-        .waitUntil(function () {
-          return this.getText('div[id="status"]')
-            .then((status) => {
-              return status === ''
-            })
-        })
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist(notificationBar)
-        .waitUntil(function () {
-          return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
-        })
+        .waitForDataFile('adblock')
     })
-
-    it('allow autoplay in regular tab', function * () {
-      const url = Brave.server.url('autoplay.html')
-      yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(url)
-        .waitUntil(function () {
-          return this.getText('div[id="status"]')
-            .then((status) => {
-              return status === ''
-            })
-        })
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist(notificationBar)
-        .waitUntil(function () {
-          return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
-        })
-        .openBraveMenu(braveMenu, braveryPanel)
-        .click(noAutoplaySwitch)
-        .keys(Brave.keys.ESCAPE)
-        .tabByUrl(url)
-        .waitUntil(function () {
-          return this.getText('div[id="status"]')
-            .then((status) => {
-              return status === 'Autoplay playing'
-            })
-        })
-    })
-
-    it('allow autoplay in private tab', function * () {
-      const url = Brave.server.url('autoplay.html')
+    // TODO(bridiver) using slashdot won't provide reliable results so we should
+    // create our own iframe page with urls we expect to be blocked
+    it('detects blocked elements in iframe in private tab', function * () {
+      const url = Brave.server.url('slashdot.html')
       yield this.app.client
         .newTab({ url, isPrivate: true })
-        .waitForUrl(url)
-        .waitUntil(function () {
-          return this.getText('div[id="status"]')
-            .then((status) => {
-              return status === ''
-            })
-        })
+        .waitForTabCount(2)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist(notificationBar)
-        .waitUntil(function () {
-          return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
-        })
         .openBraveMenu(braveMenu, braveryPanel)
-        .click(noAutoplaySwitch)
+        .waitUntil(function () {
+          return this.getText(adsBlockedStat)
+            .then((blocked) => Number(blocked) > 1)
+        })
+        .click(adsBlockedControl)
+        .waitForVisible(showAdsOption)
+        .click(showAdsOption)
+        .waitForTextValue(adsBlockedStat, '0')
         .keys(Brave.keys.ESCAPE)
-        .tabByUrl(url)
+        .newTab({ url })
+        .waitForTabCount(3)
+        .openBraveMenu(braveMenu, braveryPanel)
         .waitUntil(function () {
-          return this.getText('div[id="status"]')
-            .then((status) => {
-              return status === 'Autoplay playing'
-            })
+          return this.getText(adsBlockedStat)
+            .then((blocked) => Number(blocked) > 1)
         })
     })
-
-    it('allow autoplay in notification bar', function * () {
-      const url = Brave.server.url('autoplay.html')
+    it('detects blocked elements in iframe', function * () {
+      const url = Brave.server.url('slashdot.html')
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(url)
+        .openBraveMenu(braveMenu, braveryPanel)
         .waitUntil(function () {
-          return this.getText('div[id="status"]')
-            .then((status) => {
-              return status === ''
-            })
+          return this.getText(adsBlockedStat)
+            .then((blocked) => Number(blocked) > 1)
         })
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist(notificationBar)
+        .click(adsBlockedControl)
+        .waitForVisible(showAdsOption)
+        .click(showAdsOption)
+        .waitForTextValue(adsBlockedStat, '0')
+        .keys(Brave.keys.ESCAPE)
+        .newTab({ url, isPrivate: true })
+        .waitForTabCount(1)
+        .waitForUrl(url)
+        .openBraveMenu(braveMenu, braveryPanel)
+        .waitForTextValue(adsBlockedStat, '0')
+        .click(adsBlockedControl)
+        .waitForVisible(blockAdsOption)
+        .click(blockAdsOption)
         .waitUntil(function () {
-          return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
+          return this.getText(adsBlockedStat)
+            .then((blocked) => Number(blocked) > 1)
         })
-        .click('button=Yes')
-        .tabByUrl(url)
-        .waitUntil(function () {
-          return this.getText('div[id="status"]')
-            .then((status) => {
-              return status === 'Autoplay playing'
-            })
-        })
-    })
-
-    it('Remember block autoplay in notification bar', function * () {
-      const url = Brave.server.url('autoplay.html')
-      yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(url)
-        .waitUntil(function () {
-          return this.getText('div[id="status"]')
-            .then((status) => {
-              return status === ''
-            })
-        })
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist(notificationBar)
-        .waitUntil(function () {
-          return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
-        })
-        .click('[data-l10n-id=rememberDecision]')
-        .click('button=No')
-        .windowByUrl(Brave.browserWindowUrl)
-        .click(reloadButton)
-        .tabByUrl(url)
-        .waitUntil(function () {
-          return this.getText('div[id="status"]')
-            .then((status) => {
-              return status === ''
-            })
-        })
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForElementCount('.notificationItem', 0)
     })
   })
 })
