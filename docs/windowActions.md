@@ -280,18 +280,6 @@ Dispatches a message to the store to indicate that the specified frame should mo
 
 
 
-### setUrlBarSuggestions(suggestionList, selectedIndex) 
-
-Sets the URL bar suggestions and selected index.
-
-**Parameters**
-
-**suggestionList**: `Array.&lt;Object&gt;`, The list of suggestions for the entered URL bar text. This can be generated from history, bookmarks, etc.
-
-**selectedIndex**: `number`, The index for the selected item (users can select items with down arrow on their keyboard)
-
-
-
 ### activeSuggestionClicked(isForSecondaryAction, shiftKey) 
 
 The active URL bar suggestion was clicked

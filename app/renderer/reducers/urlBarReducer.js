@@ -301,7 +301,8 @@ const generateNewSuggestionsList = (state) => {
     type: suggestionTypes.TOP_SITE
   }))
 
-  return setUrlSuggestions(state, suggestionsList)
+  const appActions = require('../../../js/actions/appActions')
+  appActions.urlBarSuggestionsChanged(suggestionsList)
 }
 
 const getLocation = (location) => {
@@ -346,8 +347,9 @@ const setNavBarUserInput = (state, location) => {
   const activeFrameProps = getActiveFrame(state)
   state = updateSearchEngineInfoFromInput(state, activeFrameProps)
   state = searchXHR(state, activeFrameProps, true)
-  state = generateNewSuggestionsList(state)
-  state = updateUrlSuffix(state, state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), Immutable.Map()))
+  setImmediate(() => {
+    generateNewSuggestionsList(state)
+  })
   if (!location) {
     state = setRenderUrlBarSuggestions(state, false)
   }
@@ -372,6 +374,12 @@ const urlBarReducer = (state, action) => {
   switch (action.actionType) {
     case appConstants.APP_URL_BAR_TEXT_CHANGED:
       state = setNavBarUserInput(state, action.input)
+      break
+    case appConstants.APP_URL_BAR_SUGGESTIONS_CHANGED:
+      if (action.selectedIndex !== undefined) {
+        state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), action.selectedIndex)
+      }
+      state = setUrlSuggestions(state, action.suggestionList)
       break
     case windowConstants.WINDOW_SET_NAVIGATED:
       // For about: URLs, make sure we store the URL as about:something
@@ -480,14 +488,12 @@ const urlBarReducer = (state, action) => {
     case windowConstants.WINDOW_SEARCH_SUGGESTION_RESULTS_AVAILABLE:
       const frameKey = getFrameKeyByTabId(state, action.tabId)
       state = state.setIn(frameStatePath(state, frameKey).concat(['navbar', 'urlbar', 'suggestions', 'searchResults']), action.searchResults)
-      state = generateNewSuggestionsList(state)
+      setImmediate(() => {
+        generateNewSuggestionsList(state)
+      })
       break
     case windowConstants.WINDOW_URL_BAR_AUTOCOMPLETE_ENABLED:
       state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']), action.enabled)
-      break
-    case windowConstants.WINDOW_SET_URL_BAR_SUGGESTIONS:
-      state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), action.selectedIndex)
-      state = setUrlSuggestions(state, action.suggestionList)
       break
     case windowConstants.WINDOW_SET_URL_BAR_ACTIVE:
       state = setActive(state, action.isActive)

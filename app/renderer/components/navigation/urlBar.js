@@ -94,7 +94,7 @@ class UrlBar extends React.Component {
     if (this.props.autocompleteEnabled) {
       windowActions.urlBarAutocompleteEnabled(false)
     }
-    windowActions.setUrlBarSuggestions(undefined, null)
+    appActions.urlBarSuggestionsChanged(undefined, null)
     windowActions.setRenderUrlBarSuggestions(false)
   }
 
@@ -270,7 +270,7 @@ class UrlBar extends React.Component {
     if (e.target.value !== this.lastVal + this.lastSuffix) {
       e.preventDefault()
       // clear any current arrow or mouse hover selection
-      windowActions.setUrlBarSuggestions(undefined, null)
+      appActions.urlBarSuggestionsChanged(undefined, null)
       this.setValue(e.target.value)
     }
   }
@@ -308,7 +308,7 @@ class UrlBar extends React.Component {
       windowActions.setUrlBarSelected(false)
     }
     // clear any current arrow or mouse hover selection
-    windowActions.setUrlBarSuggestions(undefined, null)
+    appActions.urlBarSuggestionsChanged(undefined, null)
     this.keyPressed = false
     appActions.urlBarTextChanged(getCurrentWindowId(), this.lastVal)
   }
@@ -365,7 +365,7 @@ class UrlBar extends React.Component {
         if (this.props.isFocused) {
           this.focus()
         }
-        windowActions.setUrlBarSuggestions(undefined, null)
+        appActions.urlBarSuggestionsChanged(undefined, null)
         windowActions.setRenderUrlBarSuggestions(false)
       } else if (this.props.location !== prevProps.location) {
         // This is a url nav change

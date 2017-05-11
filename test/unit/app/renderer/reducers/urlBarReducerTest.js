@@ -300,10 +300,10 @@ describe('urlBarReducer', function () {
       })
     })
 
-    describe('WINDOW_SET_URL_BAR_SUGGESTIONS', function () {
+    describe('APP_URL_BAR_SUGGESTIONS_CHANGED', function () {
       it('suggestion results can be updated', function () {
         const suggestionList = Immutable.fromJS(['0.207879576'])
-        const newState = urlBarReducer(windowState, {actionType: windowConstants.WINDOW_SET_URL_BAR_SUGGESTIONS, suggestionList, selectedIndex: null})
+        const newState = urlBarReducer(windowState, {actionType: appConstants.APP_URL_BAR_SUGGESTIONS_CHANGED, suggestionList, selectedIndex: null})
         assert.equal(newState.getIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'suggestionList']), suggestionList)
         assert.equal(newState.getIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'selectedIndex']), null)
       })

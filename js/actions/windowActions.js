@@ -340,20 +340,6 @@ const windowActions = {
   },
 
   /**
-   * Sets the URL bar suggestions and selected index.
-   *
-   * @param {Object[]} suggestionList - The list of suggestions for the entered URL bar text. This can be generated from history, bookmarks, etc.
-   * @param {number} selectedIndex - The index for the selected item (users can select items with down arrow on their keyboard)
-   */
-  setUrlBarSuggestions: function (suggestionList, selectedIndex) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_URL_BAR_SUGGESTIONS,
-      suggestionList,
-      selectedIndex
-    })
-  },
-
-  /**
    * The active URL bar suggestion was clicked
    * @param {boolean} isForSecondaryAction - Whether the secondary action is expected
    *  which happens when a modifier key is pressed.
