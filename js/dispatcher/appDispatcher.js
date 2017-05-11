@@ -65,7 +65,7 @@ class AppDispatcher {
       dispatchCargo.push(payload)
     } else {
       this.dispatching = true
-      this.dispatchInternal(payload, doneDispatching)
+      setImmediate(this.dispatchInternal.bind(this, payload, doneDispatching))
     }
   }
 
