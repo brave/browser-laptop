@@ -173,6 +173,35 @@ describe('ExtensionsTab component', function () {
           assert.equal(wrapper.find('[data-extension-enabled=false]').length, 1)
         })
       })
+      describe('bitwarden', function () {
+        it('shows on UI by default', function () {
+          const wrapper = mount(
+            <ExtensionsTab
+              extensions={extensions(passwordManagers.BITWARDEN, false, false)}
+              settings={Immutable.Map()}
+              onChangeSetting={null} />
+          )
+          assert.equal(wrapper.find(`[data-extension-id="${passwordManagers.BITWARDEN}"]`).length, 1)
+        })
+        it('can be enabled', function () {
+          const wrapper = mount(
+            <ExtensionsTab
+              extensions={extensions(passwordManagers.BITWARDEN, true, false)}
+              settings={Immutable.Map()}
+              onChangeSetting={null} />
+          )
+          assert.equal(wrapper.find('[data-extension-enabled=true]').length, 1)
+        })
+        it('can be disabled', function () {
+          const wrapper = mount(
+            <ExtensionsTab
+              extensions={extensions(passwordManagers.BITWARDEN, false, false)}
+              settings={Immutable.Map()}
+              onChangeSetting={null} />
+          )
+          assert.equal(wrapper.find('[data-extension-enabled=false]').length, 1)
+        })
+      })
     })
     describe('common extensions', function () {
       describe('brave', function () {
