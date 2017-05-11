@@ -181,6 +181,7 @@ const initiateSessionStateSave = () => {
     // quit triggered by window-all-closed should save last window state
     if (lastWindowClosed && lastWindowState) {
       perWindowState.push(lastWindowState)
+      saveAppState(true)
     } else if (BrowserWindow.getAllWindows().length > 0) {
       ++requestId
       BrowserWindow.getAllWindows().forEach((win) => win.webContents.send(messages.REQUEST_WINDOW_STATE, requestId))
