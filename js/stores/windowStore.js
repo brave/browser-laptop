@@ -242,6 +242,16 @@ const tabDataChanged = (state, action) => {
     if (frameProps) {
       state = state.mergeIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(state), frameProps)], newProps)
       state = state.mergeIn(['tabs', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(state), frameProps)], newProps)
+      if (tab.get('active') === true && tab.get('windowId') === getCurrentWindowId()) {
+        state = state.merge({
+          activeFrameKey: frameProps.get('key'),
+          previewFrameKey: null
+        })
+        state = state.mergeIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(state), action.frameProps)], {
+          lastAccessedTime: new Date().getTime() })
+        state = state.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
+        state = updateTabPageIndex(state, frameProps)
+      }
     }
   })
   return state
@@ -380,19 +390,6 @@ const doAction = (action) => {
       break
     case windowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
       windowState = windowState.set('closedFrames', new Immutable.List())
-      break
-    case windowConstants.WINDOW_ACTIVE_FRAME_CHANGED:
-      if (!action.frameProps) {
-        break
-      }
-      windowState = windowState.merge({
-        activeFrameKey: action.frameProps.get('key'),
-        previewFrameKey: null
-      })
-      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps)], {
-        lastAccessedTime: new Date().getTime() })
-      windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
-      windowState = updateTabPageIndex(windowState, action.frameProps)
       break
     case windowConstants.WINDOW_SET_PREVIEW_FRAME:
       windowState = windowState.merge({

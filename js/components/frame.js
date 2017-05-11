@@ -206,9 +206,6 @@ class Frame extends React.Component {
   }
 
   onPropsChanged (prevProps = {}) {
-    if (this.props.isTabActive && !prevProps.isTabActive) {
-      windowActions.activeFrameChanged(this.frame)
-    }
     if (this.props.tabIndex !== prevProps.tabIndex) {
       this.webview.setTabIndex(this.props.tabIndex)
     }
@@ -218,9 +215,6 @@ class Frame extends React.Component {
   }
 
   componentDidMount () {
-    if (this.props.isTabActive) {
-      windowActions.activeFrameChanged(this.frame)
-    }
     this.updateWebview(this.onPropsChanged)
     if (this.props.activeShortcut) {
       this.handleShortcut()
@@ -954,7 +948,6 @@ class Frame extends React.Component {
     props.isFullScreen = frame.get('isFullScreen')
     props.isPreview = frame.get('key') === currentWindow.get('previewFrameKey')
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frame.get('key'))
-    props.isTabActive = tab ? tabState.isActive(state, tabId) : false
     props.showFullScreenWarning = frame.get('showFullScreenWarning')
     props.location = frame.get('location')
     props.hrefPreview = frame.get('hrefPreview')
