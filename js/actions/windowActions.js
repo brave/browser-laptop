@@ -463,17 +463,6 @@ const windowActions = {
   },
 
   /**
-   * Dispatches a message to set the search engine details.
-   * @param {Object} searchDetail - the search details
-   */
-  setSearchDetail: function (searchDetail) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_SEARCH_DETAIL,
-      searchDetail
-    })
-  },
-
-  /**
    * Dispatches a message to set the find-in-page details.
    * @param {Object} frameKey - Frame key of the frame in question
    * @param {Object} findDetail - the find details

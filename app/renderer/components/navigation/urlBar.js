@@ -41,6 +41,9 @@ const {getCurrentWindowId} = require('../../currentWindow')
 // Icons
 const iconNoScript = require('../../../../img/url-bar-no-script.svg')
 
+// Stores
+const appStoreRenderer = require('../../../../js/stores/appStoreRenderer')
+
 class UrlBar extends React.Component {
   constructor (props) {
     super(props)
@@ -463,7 +466,7 @@ class UrlBar extends React.Component {
 
     const activateSearchEngine = urlbar.getIn(['searchDetail', 'activateSearchEngine'])
     const urlbarSearchDetail = urlbar.get('searchDetail')
-    let searchURL = currentWindow.getIn(['searchDetail', 'searchURL'])
+    let searchURL = appStoreRenderer.state.getIn(['searchDetail', 'searchURL'])
     let searchShortcut = ''
     // remove shortcut from the search terms
     if (activateSearchEngine && urlbarSearchDetail !== null) {

@@ -1092,6 +1092,16 @@ Indicates URL bar suggestions and selected index.
 
 
 
+### defaultSearchEngineLoaded(searchDetail) 
+
+Dispatches a message to set the search engine details.
+
+**Parameters**
+
+**searchDetail**: `Object`, the search details
+
+
+
 
 * * *
 

@@ -357,16 +357,6 @@ set from an IPC call.
 
 
 
-### setSearchDetail(searchDetail) 
-
-Dispatches a message to set the search engine details.
-
-**Parameters**
-
-**searchDetail**: `Object`, the search details
-
-
-
 ### setFindDetail(frameKey, findDetail) 
 
 Dispatches a message to set the find-in-page details.

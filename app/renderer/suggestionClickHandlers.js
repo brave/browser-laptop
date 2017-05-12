@@ -7,6 +7,7 @@
 const appActions = require('../../js/actions/appActions')
 const windowActions = require('../../js/actions/windowActions')
 const windowStore = require('../../js/stores/windowStore')
+const appStoreRenderer = require('../../js/stores/appStoreRenderer')
 const suggestionTypes = require('../../js/constants/suggestionTypes')
 const {makeImmutable} = require('../common/state/immutableUtil')
 const {getActiveFrame} = require('../../js/state/frameStateUtil')
@@ -21,7 +22,7 @@ const navigateSiteClickHandler = (suggestionData, isForSecondaryAction, shiftKey
   let url
   if (type === suggestionTypes.SEARCH) {
     const frameSearchDetail = suggestionData.getIn(['navbar', 'urlbar', 'searchDetail'])
-    const searchDetail = windowStore.state.get('searchDetail')
+    const searchDetail = appStoreRenderer.state.get('searchDetail')
     let searchURL = frameSearchDetail
       ? frameSearchDetail.get('search') : searchDetail.get('searchURL')
     url = searchURL.replace('{searchTerms}', encodeURIComponent(suggestionData.get('location')))

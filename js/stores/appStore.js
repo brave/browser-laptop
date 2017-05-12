@@ -891,6 +891,9 @@ const handleAppAction = (action) => {
         appState = appState.set('siteSettings', newSiteSettings)
       })
       break
+    case appConstants.APP_DEFAULT_SEARCH_ENGINE_LOADED:
+      appState = appState.set('searchDetail', action.searchDetail)
+      break
     default:
   }
 

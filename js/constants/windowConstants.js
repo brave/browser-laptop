@@ -41,7 +41,6 @@ const windowConstants = {
   WINDOW_URL_BAR_ON_FOCUS: _,
   WINDOW_TAB_ON_FOCUS: _,
   WINDOW_SET_URL_BAR_SELECTED: _,
-  WINDOW_SET_SEARCH_DETAIL: _,
   WINDOW_SET_FIND_DETAIL: _,
   WINDOW_SET_BOOKMARK_DETAIL: _, // If set, also indicates that add/edit is shown
   WINDOW_SET_CONTEXT_MENU_DETAIL: _, // If set, also indicates that the context menu is shown

@@ -1384,7 +1384,19 @@ const appActions = {
       suggestionList,
       selectedIndex
     })
+  },
+
+  /**
+   * Dispatches a message to set the search engine details.
+   * @param {Object} searchDetail - the search details
+   */
+  defaultSearchEngineLoaded: function (searchDetail) {
+    dispatch({
+      actionType: appConstants.APP_DEFAULT_SEARCH_ENGINE_LOADED,
+      searchDetail
+    })
   }
+
 }
 
 module.exports = appActions
