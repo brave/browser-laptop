@@ -62,6 +62,7 @@ module.exports = {
   backButton: '.backforward .backButton',
   forwardButton: '.backforward .forwardButton',
   reloadButton: '.reloadButton',
+  homeButton: '[data-test-id="homeButton"]',
   clearBrowsingDataButton: '[data-test-id="clearBrowsingDataButton"]',
   clearBrowsingDataPanel: '[data-test-id="clearBrowsingDataPanel"]',
   clearDataButton: '[data-test-id="clearDataButton"]',

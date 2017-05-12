@@ -5,7 +5,8 @@ const config = require('../../js/constants/config')
 const {urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime,
   titleBar, urlbarIcon, bookmarksToolbar, navigatorNotBookmarked, navigatorBookmarked,
   doneButton, allowRunInsecureContentButton, dismissAllowRunInsecureContentButton,
-  denyRunInsecureContentButton, dismissDenyRunInsecureContentButton, activeTabTitle} = require('../lib/selectors')
+  denyRunInsecureContentButton, dismissDenyRunInsecureContentButton, activeTabTitle,
+  homeButton} = require('../lib/selectors')
 const urlParse = require('url').parse
 const assert = require('assert')
 const settings = require('../../js/constants/settings')
@@ -17,7 +18,7 @@ describe('navigationBar tests', function () {
       .waitForUrl(Brave.newTabUrl)
       .windowByUrl(Brave.browserWindowUrl)
       .waitForEnabled(urlInput)
-      .changeSetting('general.disable-title-mode', false)
+      .changeSetting(settings.DISABLE_TITLE_MODE, false)
   }
 
   function * newFrame (client, frameKey = 2) {
@@ -1008,6 +1009,67 @@ describe('navigationBar tests', function () {
 
     describe('page with focused form input', function () {
       it('loads the url without submitting the form')
+    })
+  })
+
+  describe('home button', function () {
+    describe('when enabled', function () {
+      Brave.beforeAll(this)
+
+      before(function * () {
+        yield setup(this.app.client)
+        yield this.app.client
+          .changeSetting(settings.SHOW_HOME_BUTTON, true)
+      })
+
+      it('displays the button', function * () {
+        yield this.app.client
+          .waitForVisible(homeButton)
+      })
+
+      it('goes to the home page when clicked', function * () {
+        const page1Url = Brave.server.url('page1.html')
+
+        yield this.app.client
+          .changeSetting(settings.HOMEPAGE, page1Url)
+          .waitForVisible(homeButton)
+          .click(homeButton)
+          .waitForUrl(page1Url)
+      })
+
+      it('opens home page in a new tab when cmd/ctrl is pressed', function * () {
+        const page2Url = Brave.server.url('page2.html')
+
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .changeSetting(settings.HOMEPAGE, page2Url)
+          .waitForVisible(homeButton)
+          .isDarwin().then((val) => {
+            if (val === true) {
+              return this.app.client.keys(Brave.keys.COMMAND)
+            } else {
+              return this.app.client.keys(Brave.keys.CONTROL)
+            }
+          })
+          .click(homeButton)
+          .waitForTabCount(2)
+          .waitForUrl(page2Url)
+      })
+    })
+
+    describe('when disabled', function () {
+      Brave.beforeAll(this)
+
+      before(function * () {
+        yield setup(this.app.client)
+        yield this.app.client
+          .changeSetting(settings.SHOW_HOME_BUTTON, false)
+      })
+
+      it('does not display the button', function * () {
+        yield this.app.client
+          .waitForVisible(homeButton, 500, true)
+      })
     })
   })
 

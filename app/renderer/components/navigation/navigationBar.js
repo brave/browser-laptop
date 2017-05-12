@@ -158,6 +158,7 @@ class NavigationBar extends React.Component {
     props.activeTabShowingMessageBox = activeTabShowingMessageBox
     props.locationInfo = state.get('locationInfo')
     props.titleMode = titleMode
+    props.activeTabId = activeTabId
 
     return props
   }
@@ -205,7 +206,9 @@ class NavigationBar extends React.Component {
       {
         !this.props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
         ? <span className='navigationButtonContainer'>
-          <button data-l10n-id='homeButton'
+          <button
+            data-test-id='homeButton'
+            data-l10n-id='homeButton'
             className='normalizeButton navigationButton homeButton'
             onClick={this.onHome} />
         </span>
