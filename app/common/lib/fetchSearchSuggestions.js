@@ -3,8 +3,8 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Immutable = require('immutable')
-const appActions = require('../../js/actions/appActions')
-const debounce = require('../../js/lib/debounce')
+const appActions = require('../../../js/actions/appActions')
+const debounce = require('../../../js/lib/debounce')
 
 const fetchSearchSuggestions = debounce((windowId, tabId, autocompleteURL, searchTerms) => {
   const xhr = new window.XMLHttpRequest()

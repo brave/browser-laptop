@@ -14,7 +14,7 @@ const settings = require('../../../js/constants/settings')
 const {isBookmark, isDefaultEntry, isHistoryEntry} = require('../../../js/state/siteUtil')
 const config = require('../../../js/constants/config')
 const top500 = require('../../../js/data/top500')
-const fetchSearchSuggestions = require('../fetchSearchSuggestions')
+const fetchSearchSuggestions = require('./fetchSearchSuggestions')
 const {getFrameByTabId, getTabsByWindowId} = require('../../common/state/tabState')
 
 const sigmoid = (t) => {
@@ -466,7 +466,6 @@ const generateNewSearchXHRResults = (state, windowId, tabId, input) => {
       const replaceRE = new RegExp('^' + searchDetail.get('shortcut') + ' ', 'g')
       input = input.replace(replaceRE, '')
     }
-
     fetchSearchSuggestions(windowId, tabId, autocompleteURL, input)
   } else {
     const appActions = require('../../../js/actions/appActions')

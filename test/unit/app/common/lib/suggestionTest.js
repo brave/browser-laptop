@@ -32,7 +32,7 @@ describe('suggestion unit tests', function () {
 
     makeImmutableSpy = sinon.spy(fakeImmutableUtil, 'makeImmutable')
     mockery.registerMock('../../common/state/immutableUtil', fakeImmutableUtil)
-    suggestion = require('../../../../../app/renderer/lib/suggestion')
+    suggestion = require('../../../../../app/common/lib/suggestion')
   })
 
   after(function () {
