@@ -18,11 +18,11 @@ const globalStyles = require('../../styles/global')
 class TabTitle extends ImmutableComponent {
   get isActiveOrHasSecondaryIcon () {
     return this.props.isActive ||
-      (!!this.props.tab.get('isPrivate') || !!this.props.tab.get('partitionNumber'))
+      (!!this.props.frame.get('isPrivate') || !!this.props.frame.get('partitionNumber'))
   }
 
   get isPinned () {
-    return !!this.props.tab.get('pinnedLocation')
+    return !!this.props.frame.get('pinnedLocation')
   }
 
   get shouldHideTitle () {

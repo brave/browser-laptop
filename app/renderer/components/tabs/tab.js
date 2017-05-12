@@ -51,16 +51,16 @@ class Tab extends ImmutableComponent {
     this.onUpdateTabSize = this.onUpdateTabSize.bind(this)
   }
   get frame () {
-    return windowStore.getFrame(this.props.tab.get('frameKey'))
+    return windowStore.getFrame(this.props.frame.get('key'))
   }
   get isPinned () {
-    return !!this.props.tab.get('pinnedLocation')
+    return !!this.props.frame.get('pinnedLocation')
   }
 
   get draggingOverData () {
     const draggingOverData = this.props.dragData && this.props.dragData.get('dragOverData')
     if (!draggingOverData ||
-        draggingOverData.get('draggingOverKey') !== this.props.tab.get('frameKey') ||
+        draggingOverData.get('draggingOverKey') !== this.props.frame.get('key') ||
         draggingOverData.get('draggingOverWindowId') !== getCurrentWindowId()) {
       return
     }
@@ -83,7 +83,7 @@ class Tab extends ImmutableComponent {
   get isDragging () {
     const sourceDragData = dnd.getInterBraveDragData()
     return sourceDragData &&
-      sourceDragData.get('key') === this.props.tab.get('frameKey') &&
+      sourceDragData.get('key') === this.props.frame.get('key') &&
       sourceDragData.get('draggingOverWindowId') === getCurrentWindowId()
   }
 
@@ -115,17 +115,17 @@ class Tab extends ImmutableComponent {
     // until we know what we're loading.  We should probably do this for
     // all about: pages that we already know the title for so we don't have
     // to wait for the title to be parsed.
-    if (this.props.tab.get('location') === 'about:blank') {
+    if (this.props.frame.get('location') === 'about:blank') {
       return locale.translation('aboutBlankTitle')
-    } else if (this.props.tab.get('location') === 'about:newtab') {
+    } else if (this.props.frame.get('location') === 'about:newtab') {
       return locale.translation('newTab')
     }
 
     // YouTube tries to change the title to add a play icon when
     // there is audio. Since we have our own audio indicator we get
     // rid of it.
-    return (this.props.tab.get('title') ||
-      this.props.tab.get('location') ||
+    return (this.props.frame.get('title') ||
+      this.props.frame.get('location') ||
       '').replace('▶ ', '')
   }
 
@@ -138,7 +138,7 @@ class Tab extends ImmutableComponent {
   }
 
   onDragOver (e) {
-    dnd.onDragOver(dragTypes.TAB, this.tabNode.getBoundingClientRect(), this.props.tab.get('frameKey'), this.draggingOverData, e)
+    dnd.onDragOver(dragTypes.TAB, this.tabNode.getBoundingClientRect(), this.props.frame.get('key'), this.draggingOverData, e)
   }
 
   onTabClosedWithMouse (event) {
@@ -157,10 +157,10 @@ class Tab extends ImmutableComponent {
 
   get loading () {
     return this.frame &&
-    (this.props.tab.get('loading') ||
-     this.props.tab.get('location') === 'about:blank') &&
-    (!this.props.tab.get('provisionalLocation') ||
-    !this.props.tab.get('provisionalLocation').startsWith('chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/'))
+    (this.props.frame.get('loading') ||
+     this.props.frame.get('location') === 'about:blank') &&
+    (!this.props.frame.get('provisionalLocation') ||
+    !this.props.frame.get('provisionalLocation').startsWith('chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/'))
   }
 
   onMouseLeave () {
@@ -201,7 +201,7 @@ class Tab extends ImmutableComponent {
 
   get themeColor () {
     return this.props.paintTabs &&
-    (this.props.tab.get('themeColor') || this.props.tab.get('computedThemeColor'))
+    (this.props.frame.get('themeColor') || this.props.frame.get('computedThemeColor'))
   }
 
   get tabSize () {
@@ -212,21 +212,21 @@ class Tab extends ImmutableComponent {
 
   get mediumView () {
     const sizes = ['large', 'largeMedium']
-    return sizes.includes(this.props.tab.get('breakpoint'))
+    return sizes.includes(this.props.frame.get('breakpoint'))
   }
 
   get narrowView () {
     const sizes = ['medium', 'mediumSmall', 'small', 'extraSmall', 'smallest']
-    return sizes.includes(this.props.tab.get('breakpoint'))
+    return sizes.includes(this.props.frame.get('breakpoint'))
   }
 
   get narrowestView () {
     const sizes = ['extraSmall', 'smallest']
-    return sizes.includes(this.props.tab.get('breakpoint'))
+    return sizes.includes(this.props.frame.get('breakpoint'))
   }
 
   get canPlayAudio () {
-    return this.props.tab.get('audioPlaybackActive') || this.props.tab.get('audioMuted')
+    return this.props.frame.get('audioPlaybackActive') || this.props.frame.get('audioMuted')
   }
 
   onUpdateTabSize () {
@@ -263,10 +263,10 @@ class Tab extends ImmutableComponent {
 
   render () {
     const notificationBarActive = !!this.props.notificationBarActive &&
-      this.props.notificationBarActive.includes(UrlUtil.getUrlOrigin(this.props.tab.get('location')))
+      this.props.notificationBarActive.includes(UrlUtil.getUrlOrigin(this.props.frame.get('location')))
     const playIndicatorBreakpoint = this.mediumView || this.narrowView
     // we don't want themeColor if tab is private
-    const perPageStyles = !this.props.tab.get('isPrivate') && StyleSheet.create({
+    const perPageStyles = !this.props.frame.get('isPrivate') && StyleSheet.create({
       themeColor: {
         color: this.themeColor ? getTextColorForBackground(this.themeColor) : 'inherit',
         background: this.themeColor ? this.themeColor : 'inherit',
@@ -302,20 +302,20 @@ class Tab extends ImmutableComponent {
         playIndicatorBreakpoint && this.canPlayAudio && styles.narrowViewPlayIndicator,
         this.props.isActive && this.themeColor && perPageStyles.themeColor,
         // Private color should override themeColor
-        this.props.tab.get('isPrivate') && styles.private,
-        this.props.isActive && this.props.tab.get('isPrivate') && styles.activePrivateTab,
+        this.props.frame.get('isPrivate') && styles.private,
+        this.props.isActive && this.props.frame.get('isPrivate') && styles.activePrivateTab,
         !this.isPinned && this.narrowView && styles.tabNarrowView,
         !this.isPinned && this.narrowestView && styles.tabNarrowestView,
-        !this.isPinned && this.props.tab.get('breakpoint') === 'smallest' && styles.tabMinAllowedSize
+        !this.isPinned && this.props.frame.get('breakpoint') === 'smallest' && styles.tabMinAllowedSize
         )}
         data-test-active-tab={this.props.isActive}
         data-test-pinned-tab={this.isPinned}
-        data-test-private-tab={this.props.tab.get('isPrivate')}
+        data-test-private-tab={this.props.frame.get('isPrivate')}
         data-test-id='tab'
-        data-frame-key={this.props.tab.get('frameKey')}
+        data-frame-key={this.props.frame.get('key')}
         ref={(node) => { this.tabNode = node }}
         draggable
-        title={this.props.tab.get('title')}
+        title={this.props.frame.get('title')}
         onDragStart={this.onDragStart.bind(this)}
         onDragEnd={this.onDragEnd.bind(this)}
         onDragOver={this.onDragOver.bind(this)}
@@ -324,40 +324,40 @@ class Tab extends ImmutableComponent {
         <div className={css(
           styles.tabId,
           this.narrowView && styles.tabIdNarrowView,
-          this.props.tab.get('breakpoint') === 'smallest' && styles.tabIdMinAllowedSize
+          this.props.frame.get('breakpoint') === 'smallest' && styles.tabIdMinAllowedSize
           )}>
           <Favicon
             isActive={this.props.isActive}
             paintTabs={this.props.paintTabs}
-            tab={this.props.tab}
+            frame={this.props.frame}
             isLoading={this.loading}
             isPinned={this.isPinned}
           />
           <AudioTabIcon
-            tab={this.props.tab}
-            onClick={this.onMuteFrame.bind(this, !this.props.tab.get('audioMuted'))}
+            frame={this.props.frame}
+            onClick={this.onMuteFrame.bind(this, !this.props.frame.get('audioMuted'))}
           />
           <TabTitle
             isActive={this.props.isActive}
             paintTabs={this.props.paintTabs}
-            tab={this.props.tab}
+            frame={this.props.frame}
             pageTitle={this.displayValue}
           />
         </div>
         <PrivateIcon
-          tab={this.props.tab}
+          frame={this.props.frame}
           isActive={this.props.isActive}
          />
         <NewSessionIcon
           isActive={this.props.isActive}
           paintTabs={this.props.paintTabs}
-          tab={this.props.tab}
-          l10nArgs={this.props.tab.get('partitionNumber')}
+          frame={this.props.frame}
+          l10nArgs={this.props.frame.get('partitionNumber')}
           l10nId='sessionInfoTab'
         />
         <CloseTabIcon
           isActive={this.props.isActive}
-          tab={this.props.tab}
+          frame={this.props.frame}
           onClick={this.onTabClosedWithMouse.bind(this)}
           l10nId='closeTabButton'
         />
@@ -375,11 +375,11 @@ const paymentsEnabled = () => {
 windowStore.addChangeListener(() => {
   if (paymentsEnabled()) {
     const windowState = windowStore.getState()
-    const tabs = windowState && windowState.get('tabs')
-    if (tabs) {
+    const frames = windowState && windowState.get('frames')
+    if (frames) {
       try {
-        const presentP = tabs.some((tab) => {
-          return tab.get('location') === 'about:preferences#payments'
+        const presentP = frames.some((frame) => {
+          return frame.get('location') === 'about:preferences#payments'
         })
         ipc.send(messages.LEDGER_PAYMENTS_PRESENT, presentP)
       } catch (ex) { }

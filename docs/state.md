@@ -414,6 +414,7 @@ WindowStore
     audioMuted: boolean, // frame is muted
     audioPlaybackActive: boolean, // frame is playing audio
     basicAuthDetail: object,
+    breakpoint: string, // breakpoint name for current tab size, specified in app/renderer/components/styles/tab.js
     closedAtIndex: number, // index the frame was last closed at, cleared unless the frame is inside of closedFrames
     computedThemeColor: string, // CSS computed theme color from the favicon
     endtLoadTime: datetime,
@@ -433,6 +434,7 @@ WindowStore
     history: array, // navigation history
     hrefPreview: string, // show hovered link preview
     httpsEverywhere: Object<string, Array<string>>, // map of XML rulesets name to redirected resources
+    hoverState: boolean, // wheter or not tab is being hovered
     icon: string, // favicon url
     isFullScreen: boolean, // true if the frame should be shown as full screen
     isPrivate: boolean, // private browsing tab
@@ -614,23 +616,6 @@ WindowStore
     autocompleteURL: string, // ditto re: {searchTerms}
     searchURL: string // with replacement var in string: {searchTerms}
   },
-  tabs: [{
-    audioMuted: boolean, // frame is muted
-    audioPlaybackActive: boolean, // frame is playing audio
-    breakpoint: string, // breakpoint name for current tab size, specified in app/renderer/components/styles/tab.js
-    computedThemeColor: string, // CSS computed theme color from the favicon
-    frameKey: number,
-    hoverState: boolean, // wheter or not tab is being hovered
-    icon: string, // favicon url
-    isPrivate: boolean, // private browsing tab
-    loading: boolean,
-    location: string, // the currently navigated location
-    partitionNumber: number, // the session partition to use
-    pinnedLocation: string, // Indicates if a frame is pinned and its pin location
-    provisionalLocation: string,
-    themeColor: string, // CSS compatible color string
-    title: string // page title
-  }],
   ui: {
     bookmarksToolbar: {
       selectedFolderId: number // folderId from the siteDetail of the currently expanded folder
