@@ -37,12 +37,12 @@ class UrlBarSuggestions extends ImmutableComponent {
 
   render () {
     const suggestions = this.props.suggestionList
-    const bookmarkSuggestions = suggestions.filter((s) => s.type === suggestionTypes.BOOKMARK)
-    const historySuggestions = suggestions.filter((s) => s.type === suggestionTypes.HISTORY)
-    const aboutPagesSuggestions = suggestions.filter((s) => s.type === suggestionTypes.ABOUT_PAGES)
-    const tabSuggestions = suggestions.filter((s) => s.type === suggestionTypes.TAB)
-    const searchSuggestions = suggestions.filter((s) => s.type === suggestionTypes.SEARCH)
-    const topSiteSuggestions = suggestions.filter((s) => s.type === suggestionTypes.TOP_SITE)
+    const bookmarkSuggestions = suggestions.filter((s) => s.get('type') === suggestionTypes.BOOKMARK)
+    const historySuggestions = suggestions.filter((s) => s.get('type') === suggestionTypes.HISTORY)
+    const aboutPagesSuggestions = suggestions.filter((s) => s.get('type') === suggestionTypes.ABOUT_PAGES)
+    const tabSuggestions = suggestions.filter((s) => s.get('type') === suggestionTypes.TAB)
+    const searchSuggestions = suggestions.filter((s) => s.get('type') === suggestionTypes.SEARCH)
+    const topSiteSuggestions = suggestions.filter((s) => s.get('type') === suggestionTypes.TOP_SITE)
 
     let items = []
     let index = 0

@@ -6,21 +6,16 @@
 
 const windowConstants = require('../../../js/constants/windowConstants')
 const appConstants = require('../../../js/constants/appConstants')
-const {aboutUrls, isNavigatableAboutPage, isSourceAboutUrl, isUrl, getSourceAboutUrl, getSourceMagnetUrl} = require('../../../js/lib/appUrlUtil')
+const {isUrl, getSourceAboutUrl, getSourceMagnetUrl} = require('../../../js/lib/appUrlUtil')
 const {isURL, isPotentialPhishingUrl, getUrlFromInput} = require('../../../js/lib/urlutil')
 const {getFrameByKey, getFrameKeyByTabId, activeFrameStatePath, frameStatePath, getActiveFrame, getFrameByTabId} = require('../../../js/state/frameStateUtil')
 const getSetting = require('../../../js/settings').getSetting
-const {isBookmark, isDefaultEntry, isHistoryEntry} = require('../../../js/state/siteUtil')
 const fetchSearchSuggestions = require('../fetchSearchSuggestions')
 const searchProviders = require('../../../js/data/searchProviders')
 const settings = require('../../../js/constants/settings')
 const Immutable = require('immutable')
-const config = require('../../../js/constants/config')
-const top500 = require('../../../js/data/top500')
-const suggestion = require('../lib/suggestion')
-const suggestionTypes = require('../../../js/constants/suggestionTypes')
+const {generateNewSuggestionsList} = require('../lib/suggestion')
 const {navigateSiteClickHandler} = require('../suggestionClickHandlers')
-const appStoreRenderer = require('../../../js/stores/appStoreRenderer')
 
 const navigationBarState = require('../../common/state/navigationBarState')
 const tabState = require('../../common/state/tabState')
@@ -116,193 +111,17 @@ const updateUrlSuffix = (state, suggestionList) => {
 
     if (autocompleteEnabled) {
       const location = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'location'])) || ''
-      const index = suggestion.location.toLowerCase().indexOf(location.toLowerCase())
+      const index = suggestion.get('location').toLowerCase().indexOf(location.toLowerCase())
       if (index !== -1) {
-        const beforePrefix = suggestion.location.substring(0, index)
+        const beforePrefix = suggestion.get('location').substring(0, index)
         if (beforePrefix.endsWith('://') || beforePrefix.endsWith('://www.') || index === 0) {
-          suffix = suggestion.location.substring(index + location.length)
+          suffix = suggestion.get('location').substring(index + location.length)
         }
       }
     }
   }
   state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'urlSuffix']), suffix)
   return state
-}
-
-const generateNewSuggestionsList = (state) => {
-  const activeFrameKey = state.get('activeFrameKey')
-  const urlLocation = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'location']))
-  const searchResults = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'searchResults']))
-
-  if (!urlLocation) {
-    return state
-  }
-
-  const urlLocationLower = urlLocation.toLowerCase()
-  let suggestionsList = new Immutable.List()
-  const formatUrl = (x) => typeof x === 'object' && x !== null ? x.get('location') : x
-  const formatTitle = (x) => typeof x === 'object' && x !== null ? x.get('title') : x
-  const formatTabId = (x) => typeof x === 'object' && x !== null ? x.get('tabId') : x
-  const mapListToElements = ({data, maxResults, type,
-      sortHandler = (x) => x, filterValue = (site) => {
-        return site.toLowerCase().indexOf(urlLocationLower) !== -1
-      }
-  }) => {
-    // Filter out things which are already in our own list at a smaller index
-    // Filter out things which are already in the suggestions list
-    let filteredData = data.filter((site) =>
-      suggestionsList.findIndex((x) => (x.location || '').toLowerCase() === (formatUrl(site) || '').toLowerCase()) === -1 ||
-        // Tab autosuggestions should always be included since they will almost always be in history
-        type === suggestionTypes.TAB)
-    // Per suggestion provider filter
-    if (filterValue) {
-      filteredData = filteredData.filter(filterValue)
-    }
-
-    return filteredData
-      .sort(sortHandler)
-      .take(maxResults)
-      .map((site) => {
-        return {
-          title: formatTitle(site),
-          location: formatUrl(site),
-          tabId: formatTabId(site),
-          type
-        }
-      })
-  }
-
-  const shouldNormalize = suggestion.shouldNormalizeLocation(urlLocationLower)
-  const urlLocationLowerNormalized = suggestion.normalizeLocation(urlLocationLower)
-  const sortBasedOnLocationPos = (s1, s2) => {
-    const location1 = shouldNormalize ? suggestion.normalizeLocation(s1.get('location')) : s1.get('location')
-    const location2 = shouldNormalize ? suggestion.normalizeLocation(s2.get('location')) : s2.get('location')
-    const pos1 = location1.indexOf(urlLocationLowerNormalized)
-    const pos2 = location2.indexOf(urlLocationLowerNormalized)
-    if (pos1 === -1 && pos2 === -1) {
-      return 0
-    } else if (pos1 === -1) {
-      return 1
-    } else if (pos2 === -1) {
-      return -1
-    } else {
-      if (pos1 - pos2 !== 0) {
-        return pos1 - pos2
-      } else {
-        // sort site.com higher than site.com/somepath
-        const sdnv1 = suggestion.simpleDomainNameValue(s1)
-        const sdnv2 = suggestion.simpleDomainNameValue(s2)
-        if (sdnv1 !== sdnv2) {
-          return sdnv2 - sdnv1
-        } else {
-          // If there's a tie on the match location, use the age
-          // decay modified access count
-          return suggestion.sortByAccessCountWithAgeDecay(s1, s2)
-        }
-      }
-    }
-  }
-
-  // NOTE: Iterating sites can take a long time! Please be mindful when
-  // working with the history and bookmark suggestion code.
-  const historySuggestionsOn = getSetting(settings.HISTORY_SUGGESTIONS)
-  const bookmarkSuggestionsOn = getSetting(settings.BOOKMARK_SUGGESTIONS)
-  const shouldIterateSites = historySuggestionsOn || bookmarkSuggestionsOn
-  if (shouldIterateSites) {
-    // Note: Bookmark sites are now included in history. This will allow
-    // sites to appear in the auto-complete regardless of their bookmark
-    // status. If history is turned off, bookmarked sites will appear
-    // in the bookmark section.
-    const sitesFilter = (site) => {
-      const location = site.get('location')
-      if (!location) {
-        return false
-      }
-      const title = site.get('title')
-      return location.toLowerCase().indexOf(urlLocationLower) !== -1 ||
-        (title && title.toLowerCase().indexOf(urlLocationLower) !== -1)
-    }
-
-    let historySites = new Immutable.List()
-    let bookmarkSites = new Immutable.List()
-    const sites = appStoreRenderer.state.get('sites')
-    sites.forEach(site => {
-      if (!sitesFilter(site)) {
-        return
-      }
-      if (historySuggestionsOn && isHistoryEntry(site) && !isDefaultEntry(site)) {
-        historySites = historySites.push(site)
-        return
-      }
-      if (bookmarkSuggestionsOn && isBookmark(site) && !isDefaultEntry(site)) {
-        bookmarkSites = bookmarkSites.push(site)
-      }
-    })
-
-    if (historySites.size > 0) {
-      historySites = historySites.concat(suggestion.createVirtualHistoryItems(historySites))
-
-      suggestionsList = suggestionsList.concat(mapListToElements({
-        data: historySites,
-        maxResults: config.urlBarSuggestions.maxHistorySites,
-        type: suggestionTypes.HISTORY,
-        sortHandler: sortBasedOnLocationPos,
-        filterValue: null
-      }))
-    }
-
-    if (bookmarkSites.size > 0) {
-      suggestionsList = suggestionsList.concat(mapListToElements({
-        data: bookmarkSites,
-        maxResults: config.urlBarSuggestions.maxBookmarkSites,
-        type: suggestionTypes.BOOKMARK,
-        sortHandler: sortBasedOnLocationPos,
-        filterValue: null
-      }))
-    }
-  }
-
-  // about pages
-  suggestionsList = suggestionsList.concat(mapListToElements({
-    data: aboutUrls.keySeq().filter((x) => isNavigatableAboutPage(x)),
-    maxResults: config.urlBarSuggestions.maxAboutPages,
-    type: suggestionTypes.ABOUT_PAGES
-  }))
-
-  // opened frames
-  if (getSetting(settings.OPENED_TAB_SUGGESTIONS)) {
-    suggestionsList = suggestionsList.concat(mapListToElements({
-      data: state.get('frames'),
-      maxResults: config.urlBarSuggestions.maxOpenedFrames,
-      type: suggestionTypes.TAB,
-      sortHandler: sortBasedOnLocationPos,
-      filterValue: (frame) => !isSourceAboutUrl(frame.get('location')) &&
-        frame.get('key') !== activeFrameKey &&
-        (
-          (frame.get('title') && frame.get('title').toLowerCase().indexOf(urlLocationLower) !== -1) ||
-          (frame.get('location') && frame.get('location').toLowerCase().indexOf(urlLocationLower) !== -1)
-        )
-    }))
-  }
-
-  // Search suggestions
-  if (getSetting(settings.OFFER_SEARCH_SUGGESTIONS) && searchResults) {
-    suggestionsList = suggestionsList.concat(mapListToElements({
-      data: searchResults,
-      maxResults: config.urlBarSuggestions.maxSearch,
-      type: suggestionTypes.SEARCH
-    }))
-  }
-
-  // Alexa top 500
-  suggestionsList = suggestionsList.concat(mapListToElements({
-    data: top500,
-    maxResults: config.urlBarSuggestions.maxTopSites,
-    type: suggestionTypes.TOP_SITE
-  }))
-
-  const appActions = require('../../../js/actions/appActions')
-  appActions.urlBarSuggestionsChanged(suggestionsList)
 }
 
 const getLocation = (location) => {
@@ -347,8 +166,9 @@ const setNavBarUserInput = (state, location) => {
   const activeFrameProps = getActiveFrame(state)
   state = updateSearchEngineInfoFromInput(state, activeFrameProps)
   state = searchXHR(state, activeFrameProps, true)
+  const urlLocation = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'location']))
   setImmediate(() => {
-    generateNewSuggestionsList(state)
+    generateNewSuggestionsList(state, urlLocation)
   })
   if (!location) {
     state = setRenderUrlBarSuggestions(state, false)
@@ -488,8 +308,9 @@ const urlBarReducer = (state, action) => {
     case windowConstants.WINDOW_SEARCH_SUGGESTION_RESULTS_AVAILABLE:
       const frameKey = getFrameKeyByTabId(state, action.tabId)
       state = state.setIn(frameStatePath(state, frameKey).concat(['navbar', 'urlbar', 'suggestions', 'searchResults']), action.searchResults)
+      const urlLocation = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'location']))
       setImmediate(() => {
-        generateNewSuggestionsList(state)
+        generateNewSuggestionsList(state, urlLocation)
       })
       break
     case windowConstants.WINDOW_URL_BAR_AUTOCOMPLETE_ENABLED:

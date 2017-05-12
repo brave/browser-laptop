@@ -7,6 +7,15 @@ const appConfig = require('../../../js/constants/appConfig')
 const _ = require('underscore')
 const Immutable = require('immutable')
 const {makeImmutable} = require('../../common/state/immutableUtil')
+const {aboutUrls, isNavigatableAboutPage, isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
+const suggestionTypes = require('../../../js/constants/suggestionTypes')
+const getSetting = require('../../../js/settings').getSetting
+const settings = require('../../../js/constants/settings')
+const appStoreRenderer = require('../../../js/stores/appStoreRenderer')
+const {isBookmark, isDefaultEntry, isHistoryEntry} = require('../../../js/state/siteUtil')
+const config = require('../../../js/constants/config')
+const top500 = require('../../../js/data/top500')
+const {activeFrameStatePath} = require('../../../js/state/frameStateUtil')
 
 const sigmoid = (t) => {
   return 1 / (1 + Math.pow(Math.E, -t))
@@ -23,7 +32,7 @@ const ONE_DAY = 1000 * 60 * 60 * 24
  * @param {boolean} lastAccessedTime - Epoch milliseconds of last access
  *
  */
-module.exports.sortingPriority = (count, currentTime, lastAccessedTime, ageDecayConstant) => {
+const sortingPriority = (count, currentTime, lastAccessedTime, ageDecayConstant) => {
   // number of days since last access (with fractional component)
   const ageInDays = (currentTime - (lastAccessedTime || currentTime)) / ONE_DAY
   // decay factor based on age
@@ -71,15 +80,15 @@ module.exports.sortingPriority = (count, currentTime, lastAccessedTime, ageDecay
  *   priority  0.9982851225143763
  *
  */
-module.exports.sortByAccessCountWithAgeDecay = (s1, s2) => {
+const sortByAccessCountWithAgeDecay = (s1, s2) => {
   const now = new Date()
-  const s1Priority = module.exports.sortingPriority(
+  const s1Priority = sortingPriority(
     s1.get('count') || 0,
     now.getTime(),
     s1.get('lastAccessedTime') || now.getTime(),
     appConfig.urlSuggestions.ageDecayConstant
   )
-  const s2Priority = module.exports.sortingPriority(
+  const s2Priority = sortingPriority(
     s2.get('count') || 0,
     now.getTime(),
     s2.get('lastAccessedTime') || now.getTime(),
@@ -95,7 +104,7 @@ module.exports.sortByAccessCountWithAgeDecay = (s1, s2) => {
  * @param {ImmutableObject} site - object represent history entry
  *
  */
-module.exports.simpleDomainNameValue = (site) => {
+const simpleDomainNameValue = (site) => {
   const parsed = urlParse(site.get('location'))
   if (parsed.hash === null && parsed.search === null && parsed.query === null && parsed.pathname === '/') {
     return 1
@@ -110,7 +119,7 @@ module.exports.simpleDomainNameValue = (site) => {
  * @param {string} location - history item location
  *
  */
-module.exports.normalizeLocation = (location) => {
+const normalizeLocation = (location) => {
   if (typeof location === 'string') {
     location = location.replace(/www\./, '')
     location = location.replace(/^http:\/\//, '')
@@ -126,7 +135,7 @@ module.exports.normalizeLocation = (location) => {
  *
  * @return true if urls being compared should be normalized
  */
-module.exports.shouldNormalizeLocation = (input) => {
+const shouldNormalizeLocation = (input) => {
   const prefixes = ['http://', 'https://', 'www.']
   return prefixes.every((prefix) => {
     if (input.length > prefix.length) {
@@ -177,7 +186,7 @@ var virtualSite = (sites) => {
  *
  * @param {ImmutableList[ImmutableMap]} - history
  */
-module.exports.createVirtualHistoryItems = (historySites) => {
+const createVirtualHistoryItems = (historySites) => {
   historySites = makeImmutable(historySites || {})
 
   // parse each history item
@@ -207,4 +216,238 @@ module.exports.createVirtualHistoryItems = (historySites) => {
   return Immutable.fromJS(_.object(virtualHistorySites.map((site) => {
     return [site.location, site]
   })))
+}
+
+const sortBasedOnLocationPos = (urlLocationLower) => (s1, s2) => {
+  const shouldNormalize = shouldNormalizeLocation(urlLocationLower)
+  const urlLocationLowerNormalized = normalizeLocation(urlLocationLower)
+
+  const location1 = shouldNormalize ? normalizeLocation(s1.get('location')) : s1.get('location')
+  const location2 = shouldNormalize ? normalizeLocation(s2.get('location')) : s2.get('location')
+  const pos1 = location1.indexOf(urlLocationLowerNormalized)
+  const pos2 = location2.indexOf(urlLocationLowerNormalized)
+  if (pos1 === -1 && pos2 === -1) {
+    return 0
+  } else if (pos1 === -1) {
+    return 1
+  } else if (pos2 === -1) {
+    return -1
+  } else {
+    if (pos1 - pos2 !== 0) {
+      return pos1 - pos2
+    } else {
+      // sort site.com higher than site.com/somepath
+      const sdnv1 = simpleDomainNameValue(s1)
+      const sdnv2 = simpleDomainNameValue(s2)
+      if (sdnv1 !== sdnv2) {
+        return sdnv2 - sdnv1
+      } else {
+        // If there's a tie on the match location, use the age
+        // decay modified access count
+        return sortByAccessCountWithAgeDecay(s1, s2)
+      }
+    }
+  }
+}
+
+const getMapListToElements = (urlLocationLower) => ({data, maxResults, type,
+    sortHandler = (x) => x, filterValue = (site) => {
+      return site.toLowerCase().indexOf(urlLocationLower) !== -1
+    }
+}) => {
+  const suggestionsList = Immutable.List()
+  const formatUrl = (x) => typeof x === 'object' && x !== null ? x.get('location') : x
+  const formatTitle = (x) => typeof x === 'object' && x !== null ? x.get('title') : x
+  const formatTabId = (x) => typeof x === 'object' && x !== null ? x.get('tabId') : x
+  // Filter out things which are already in our own list at a smaller index
+  // Filter out things which are already in the suggestions list
+  let filteredData = data.filter((site) =>
+    suggestionsList.findIndex((x) => (x.location || '').toLowerCase() === (formatUrl(site) || '').toLowerCase()) === -1 ||
+      // Tab autosuggestions should always be included since they will almost always be in history
+      type === suggestionTypes.TAB)
+  // Per suggestion provider filter
+  if (filterValue) {
+    filteredData = filteredData.filter(filterValue)
+  }
+
+  return makeImmutable(filteredData
+    .sort(sortHandler)
+    .take(maxResults)
+    .map((site) => {
+      return Immutable.fromJS({
+        title: formatTitle(site),
+        location: formatUrl(site),
+        tabId: formatTabId(site),
+        type
+      })
+    }))
+}
+
+const getHistorySuggestions = (state, urlLocationLower) => {
+  return new Promise((resolve, reject) => {
+    const sortHandler = sortBasedOnLocationPos(urlLocationLower)
+    const mapListToElements = getMapListToElements(urlLocationLower)
+    let suggestionsList = Immutable.List()
+    // NOTE: Iterating sites can take a long time! Please be mindful when
+    // working with the history and bookmark suggestion code.
+    const historySuggestionsOn = getSetting(settings.HISTORY_SUGGESTIONS)
+    const bookmarkSuggestionsOn = getSetting(settings.BOOKMARK_SUGGESTIONS)
+    const shouldIterateSites = historySuggestionsOn || bookmarkSuggestionsOn
+    if (shouldIterateSites) {
+      // Note: Bookmark sites are now included in history. This will allow
+      // sites to appear in the auto-complete regardless of their bookmark
+      // status. If history is turned off, bookmarked sites will appear
+      // in the bookmark section.
+      const sitesFilter = (site) => {
+        const location = site.get('location')
+        if (!location) {
+          return false
+        }
+        const title = site.get('title')
+        return location.toLowerCase().indexOf(urlLocationLower) !== -1 ||
+          (title && title.toLowerCase().indexOf(urlLocationLower) !== -1)
+      }
+
+      let historySites = new Immutable.List()
+      let bookmarkSites = new Immutable.List()
+      const sites = appStoreRenderer.state.get('sites')
+      sites.forEach(site => {
+        if (!sitesFilter(site)) {
+          return
+        }
+        if (historySuggestionsOn && isHistoryEntry(site) && !isDefaultEntry(site)) {
+          historySites = historySites.push(site)
+          return
+        }
+        if (bookmarkSuggestionsOn && isBookmark(site) && !isDefaultEntry(site)) {
+          bookmarkSites = bookmarkSites.push(site)
+        }
+      })
+
+      if (historySites.size > 0) {
+        historySites = historySites.concat(createVirtualHistoryItems(historySites))
+
+        suggestionsList = suggestionsList.concat(mapListToElements({
+          data: historySites,
+          maxResults: config.urlBarSuggestions.maxHistorySites,
+          type: suggestionTypes.HISTORY,
+          sortHandler,
+          filterValue: null
+        }))
+      }
+
+      if (bookmarkSites.size > 0) {
+        suggestionsList = suggestionsList.concat(mapListToElements({
+          data: bookmarkSites,
+          maxResults: config.urlBarSuggestions.maxBookmarkSites,
+          type: suggestionTypes.BOOKMARK,
+          sortHandler,
+          filterValue: null
+        }))
+      }
+    }
+    resolve(suggestionsList)
+  })
+}
+
+const getAboutSuggestions = (state, urlLocationLower) => {
+  return new Promise((resolve, reject) => {
+    const mapListToElements = getMapListToElements(urlLocationLower)
+    const suggestionsList = mapListToElements({
+      data: aboutUrls.keySeq().filter((x) => isNavigatableAboutPage(x)),
+      maxResults: config.urlBarSuggestions.maxAboutPages,
+      type: suggestionTypes.ABOUT_PAGES
+    })
+    resolve(suggestionsList)
+  })
+}
+
+const getOpenedTabSuggestions = (state, urlLocationLower) => {
+  return new Promise((resolve, reject) => {
+    const sortHandler = sortBasedOnLocationPos(urlLocationLower)
+    const mapListToElements = getMapListToElements(urlLocationLower)
+    let suggestionsList = Immutable.List()
+    if (getSetting(settings.OPENED_TAB_SUGGESTIONS)) {
+      const activeFrameKey = state.get('activeFrameKey')
+      suggestionsList = mapListToElements({
+        data: state.get('frames'),
+        maxResults: config.urlBarSuggestions.maxOpenedFrames,
+        type: suggestionTypes.TAB,
+        sortHandler,
+        filterValue: (frame) => !isSourceAboutUrl(frame.get('location')) &&
+          frame.get('key') !== activeFrameKey &&
+          (
+            (frame.get('title') && frame.get('title').toLowerCase().indexOf(urlLocationLower) !== -1) ||
+            (frame.get('location') && frame.get('location').toLowerCase().indexOf(urlLocationLower) !== -1)
+          )
+      })
+    }
+    resolve(suggestionsList)
+  })
+}
+
+const getSearchSuggestions = (state, urlLocationLower) => {
+  return new Promise((resolve, reject) => {
+    const mapListToElements = getMapListToElements(urlLocationLower)
+    let suggestionsList = Immutable.List()
+    if (getSetting(settings.OFFER_SEARCH_SUGGESTIONS)) {
+      const searchResults = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'searchResults']))
+      if (searchResults) {
+        suggestionsList = mapListToElements({
+          data: searchResults,
+          maxResults: config.urlBarSuggestions.maxSearch,
+          type: suggestionTypes.SEARCH
+        })
+      }
+    }
+    resolve(suggestionsList)
+  })
+}
+
+const getAlexaSuggestions = (state, urlLocationLower) => {
+  return new Promise((resolve, reject) => {
+    const mapListToElements = getMapListToElements(urlLocationLower)
+    const suggestionsList = mapListToElements({
+      data: top500,
+      maxResults: config.urlBarSuggestions.maxTopSites,
+      type: suggestionTypes.TOP_SITE
+    })
+    resolve(suggestionsList)
+  })
+}
+
+const generateNewSuggestionsList = (state, urlLocation) => {
+  if (!urlLocation) {
+    return
+  }
+  const urlLocationLower = urlLocation.toLowerCase()
+  Promise.all([
+    getHistorySuggestions(state, urlLocationLower),
+    getAboutSuggestions(state, urlLocationLower),
+    getAboutSuggestions(state, urlLocationLower),
+    getOpenedTabSuggestions(state, urlLocationLower),
+    getSearchSuggestions(state, urlLocationLower),
+    getAlexaSuggestions(state, urlLocationLower)
+  ]).then(([...suggestionsLists]) => {
+    const appActions = require('../../../js/actions/appActions')
+    // Flatten only 1 level deep for perf only, nested will be objects within arrrays
+    appActions.urlBarSuggestionsChanged(makeImmutable(suggestionsLists).flatten(1))
+  })
+}
+
+module.exports = {
+  sortingPriority,
+  sortByAccessCountWithAgeDecay,
+  simpleDomainNameValue,
+  normalizeLocation,
+  shouldNormalizeLocation,
+  createVirtualHistoryItems,
+  sortBasedOnLocationPos,
+  getMapListToElements,
+  getHistorySuggestions,
+  getAboutSuggestions,
+  getOpenedTabSuggestions,
+  getSearchSuggestions,
+  getAlexaSuggestions,
+  generateNewSuggestionsList
 }
