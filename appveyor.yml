@@ -8,6 +8,9 @@ os: unstable
 environment:
   nodejs_version: "6.1"
 
+  matrix:
+    - PYTHON: "C:\\Python27"
+
 branches:
   only:
     - master
@@ -22,11 +25,17 @@ cache:
   - node_modules
 
 install:
+  - "%PYTHON%\\python.exe -m pip install wheel"
+  - set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
   - ps: Install-Product node $env:nodejs_version $env:PLATFORM
   - node --version
   - npm --version
   - set npm_config_arch=%PLATFORM:x86=ia32%
-  - npm install --progress false --depth 0
+  - npm config set python python2.7
+  - npm config set msvs_version 2015 --global
+  - npm install bloom-filter-cpp
+  - npm install hashset-cpp
+  #- npm install --progress false --depth 0
 
 build: off
 
