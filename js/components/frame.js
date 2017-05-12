@@ -91,7 +91,7 @@ class Frame extends React.Component {
   }
 
   onCloseFrame () {
-    windowActions.closeFrame(this.frame)
+    windowActions.closeFrame(this.props.frameKey)
   }
 
   getFrameBraverySettings (props) {

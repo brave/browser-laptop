@@ -188,11 +188,11 @@ const aboutActions = {
     ipc.sendToHost(messages.CONTEXT_MENU_OPENED, nodeProps, contextMenuType)
   },
 
-  moveSite: function (sourceDetail, destinationDetail, prepend, destinationIsParent) {
+  moveSite: function (sourceKey, destinationKey, prepend, destinationIsParent) {
     aboutActions.dispatchAction({
       actionType: appConstants.APP_MOVE_SITE,
-      sourceDetail,
-      destinationDetail,
+      sourceKey,
+      destinationKey,
       prepend,
       destinationIsParent
     })

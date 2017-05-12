@@ -377,8 +377,8 @@ const doAction = (action) => {
       break
     case windowConstants.WINDOW_SET_PREVIEW_FRAME:
       windowState = windowState.merge({
-        previewFrameKey: action.frameProps && action.frameProps.get('key') !== windowState.get('activeFrameKey')
-          ? action.frameProps.get('key') : null
+        previewFrameKey: action.frameKey != null && action.frameKey !== windowState.get('activeFrameKey')
+          ? action.frameKey : null
       })
       break
     case windowConstants.WINDOW_SET_PREVIEW_TAB_PAGE_INDEX:
@@ -397,23 +397,32 @@ const doAction = (action) => {
       }
       break
     case windowConstants.WINDOW_SET_TAB_BREAKPOINT:
-      windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps), 'breakpoint'], action.breakpoint)
-      break
-    case windowConstants.WINDOW_SET_TAB_HOVER_STATE:
-      windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps), 'hoverState'], action.hoverState)
-      break
-    case windowConstants.WINDOW_TAB_MOVE:
-      const sourceFramePropsIndex = frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.sourceFrameProps)
-      let newIndex = frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.destinationFrameProps) + (action.prepend ? 0 : 1)
-      let frames = frameStateUtil.getFrames(windowState).splice(sourceFramePropsIndex, 1)
-      if (newIndex > sourceFramePropsIndex) {
-        newIndex--
+      {
+        const frameIndex = frameStateUtil.findIndexForFrameKey(frameStateUtil.getFrames(windowState), action.frameKey)
+        windowState = windowState.setIn(['frames', frameIndex, 'breakpoint'], action.breakpoint)
+        break
       }
-      frames = frames.splice(newIndex, 0, action.sourceFrameProps)
-      windowState = windowState.set('frames', frames)
-      // Since the tab could have changed pages, update the tab page as well
-      windowState = updateTabPageIndex(windowState, frameStateUtil.getActiveFrame(windowState))
-      break
+    case windowConstants.WINDOW_SET_TAB_HOVER_STATE:
+      {
+        const frameIndex = frameStateUtil.findIndexForFrameKey(frameStateUtil.getFrames(windowState), action.frameKey)
+        windowState = windowState.setIn(['frames', frameIndex, 'hoverState'], action.hoverState)
+        break
+      }
+    case windowConstants.WINDOW_TAB_MOVE:
+      {
+        const sourceFrameProps = frameStateUtil.getFrameByKey(windowState, action.sourceFrameKey)
+        const sourceFrameIndex = frameStateUtil.findIndexForFrameKey(frameStateUtil.getFrames(windowState), action.sourceFrameKey)
+        let newIndex = frameStateUtil.findIndexForFrameKey(frameStateUtil.getFrames(windowState), action.destinationFrameKey) + (action.prepend ? 0 : 1)
+        let frames = frameStateUtil.getFrames(windowState).splice(sourceFrameIndex, 1)
+        if (newIndex > sourceFrameIndex) {
+          newIndex--
+        }
+        frames = frames.splice(newIndex, 0, sourceFrameProps)
+        windowState = windowState.set('frames', frames)
+        // Since the tab could have changed pages, update the tab page as well
+        windowState = updateTabPageIndex(windowState, frameStateUtil.getActiveFrame(windowState))
+        break
+      }
     case windowConstants.WINDOW_SET_LINK_HOVER_PREVIEW:
       windowState = windowState.mergeIn(activeFrameStatePath(windowState), {
         hrefPreview: action.href,

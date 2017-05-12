@@ -13,9 +13,6 @@ const Tab = require('./tab')
 const appActions = require('../../../../js/actions/appActions')
 const windowActions = require('../../../../js/actions/windowActions')
 
-// Store
-const windowStore = require('../../../../js/stores/windowStore')
-
 // Constants
 const siteTags = require('../../../../js/constants/siteTags')
 const dragTypes = require('../../../../js/constants/dragTypes')
@@ -48,13 +45,14 @@ class PinnedTabs extends ImmutableComponent {
       let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter((node) => node && node.props.frame.get('key') !== key), clientX).selectedRef
       if (droppedOnTab) {
         const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), clientX)
-        const droppedOnFrameProps = windowStore.getFrame(droppedOnTab.props.frame.get('key'))
-        windowActions.moveTab(sourceDragData, droppedOnFrameProps, isLeftSide)
+        windowActions.moveTab(key, droppedOnTab.props.frame.get('key'), isLeftSide)
         if (!sourceDragData.get('pinnedLocation')) {
           appActions.tabPinned(sourceDragData.get('tabId'), true)
         } else {
-          appActions.moveSite(siteUtil.getDetailFromFrame(sourceDragData, siteTags.PINNED),
-            siteUtil.getDetailFromFrame(droppedOnFrameProps, siteTags.PINNED),
+          const sourceDetails = siteUtil.getDetailFromFrame(sourceDragData, siteTags.PINNED)
+          const destinationDetails = siteUtil.getDetailFromFrame(droppedOnTab.props.frame, siteTags.PINNED)
+          appActions.moveSite(siteUtil.getSiteKey(sourceDetails),
+            siteUtil.getSiteKey(destinationDetails),
             isLeftSide)
         }
       }

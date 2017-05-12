@@ -24,7 +24,7 @@ const setFullScreen = (state, action) => {
 
 const closeFrame = (state, action) => {
   // Use the frameProps we passed in, or default to the active frame
-  const frameProps = action.frameProps
+  const frameProps = frameStateUtil.getFrameByKey(state, action.frameKey)
   const index = frameStateUtil.getFramePropsIndex(state.get('frames'), frameProps)
   if (index === -1) {
     return state
@@ -51,7 +51,7 @@ const closeFrame = (state, action) => {
   // Copy the hover state if tab closed with mouse as long as we have a next frame
   // This allow us to have closeTab button visible  for sequential frames closing, until onMouseLeave event happens.
   if (hoverState && nextFrame) {
-    windowActions.setTabHoverState(nextFrame, hoverState)
+    windowActions.setTabHoverState(nextFrame.get('key'), hoverState)
   }
 
   return state
@@ -75,7 +75,7 @@ const frameReducer = (state, action) => {
       })
       break
     case windowConstants.WINDOW_CLOSE_FRAME:
-      if (!action.frameProps) {
+      if (action.frameKey < 0) {
         break
       }
       // Unless a caller explicitly specifies to close a pinned frame, then

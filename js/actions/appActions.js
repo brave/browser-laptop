@@ -254,17 +254,17 @@ const appActions = {
   /**
    * Dispatches a message to move a site locations.
    *
-   * @param {string} sourceDetail - the location, partitionNumber, etc of the source moved site
-   * @param {string} destinationDetail - the location, partitionNumber, etc of the destination moved site
+   * @param {string} sourceKey - the source key of the source moved site
+   * @param {string} destinationKey - the destination key of the destination moved site
    * @param {boolean} prepend - Whether or not to prepend to the destinationLocation
    *   If false, the destinationDetail is considered a sibling.
    * @param {boolean} destinationIsParent - Whether or not the destinationDetail should be considered the new parent.
    */
-  moveSite: function (sourceDetail, destinationDetail, prepend, destinationIsParent) {
+  moveSite: function (sourceKey, destinationKey, prepend, destinationIsParent) {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_MOVE_SITE,
-      sourceDetail,
-      destinationDetail,
+      sourceKey,
+      destinationKey,
       prepend,
       destinationIsParent
     })

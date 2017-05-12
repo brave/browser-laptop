@@ -179,15 +179,13 @@ Dispatches a message to the store to indicate that the webview entered full scre
 
 
 
-### closeFrame(frames, frameProps) 
+### closeFrame(frameKey) 
 
 Dispatches a message to close a frame
 
 **Parameters**
 
-**frames**: `Array.&lt;Object&gt;`, Immutable list of of all the frames
-
-**frameProps**: `Object`, The properties of the frame to close
+**frameKey**: `Object`, Frame key of the frame to close
 
 
 
@@ -224,14 +222,14 @@ Dispatches a message to the store when the frame is active and the window is foc
 
 
 
-### setPreviewFrame(frameProps) 
+### setPreviewFrame(frameKey) 
 
 Dispatches a message to the store to set a preview frame.
 This is done when hovering over a tab.
 
 **Parameters**
 
-**frameProps**: `Object`, the frame properties for the webview in question.
+**frameKey**: `Object`, the frame key for the webview in question.
 
 
 
@@ -245,25 +243,25 @@ Dispatches a message to the store to set the tab page index.
 
 
 
-### setTabBreakpoint(frameProps, breakpoint) 
+### setTabBreakpoint(frameKey, breakpoint) 
 
 Dispatches a message to the store to set the tab breakpoint.
 
 **Parameters**
 
-**frameProps**: `Object`, the frame properties for the webview in question.
+**frameKey**: `Object`, the frame key for the webview in question.
 
 **breakpoint**: `string`, the tab breakpoint to change to
 
 
 
-### setTabHoverState(frameProps, hoverState) 
+### setTabHoverState(frameKey, hoverState) 
 
 Dispatches a message to the store to set the current tab hover state.
 
 **Parameters**
 
-**frameProps**: `Object`, the frame properties for the webview in question.
+**frameKey**: `Object`, the frame key for the webview in question.
 
 **hoverState**: `boolean`, whether or not mouse is over tab
 
@@ -289,15 +287,15 @@ Dispatches a message to the store to set the tab page index.
 
 
 
-### moveTab(sourceFrameProps, destinationFrameProps, prepend) 
+### moveTab(sourceFrameKey, destinationFrameKey, prepend) 
 
 Dispatches a message to the store to indicate that the specified frame should move locations.
 
 **Parameters**
 
-**sourceFrameProps**: `Object`, the frame properties for the webview to move.
+**sourceFrameKey**: `Object`, the frame key for the webview to move.
 
-**destinationFrameProps**: `Object`, the frame properties for the webview to move to.
+**destinationFrameKey**: `Object`, the frame key for the webview to move to.
 
 **prepend**: `boolean`, Whether or not to prepend to the destinationFrameProps
 

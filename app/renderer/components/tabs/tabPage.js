@@ -58,7 +58,7 @@ class TabPage extends ImmutableComponent {
     setTimeout(() => {
       // If we're moving to a right page, then we're already shifting everything to the left by one, so we want
       // to drop it on the right.
-      windowActions.moveTab(sourceDragData, moveToFrame,
+      windowActions.moveTab(sourceDragData.get('key'), moveToFrame.get('key'),
         // Has -1 value for pinned tabs
         sourceDragFromPageIndex === -1 ||
         sourceDragFromPageIndex >= this.props.index)

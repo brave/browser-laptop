@@ -168,7 +168,7 @@ class Tab extends ImmutableComponent {
       window.clearTimeout(this.hoverTimeout)
       windowActions.setPreviewFrame(null)
     }
-    windowActions.setTabHoverState(this.frame, false)
+    windowActions.setTabHoverState(this.props.frame.get('key'), false)
   }
 
   onMouseEnter (e) {
@@ -181,9 +181,9 @@ class Tab extends ImmutableComponent {
     // as reported here: https://github.com/brave/browser-laptop/issues/1434
     if (this.props.previewTabs) {
       this.hoverTimeout =
-        window.setTimeout(windowActions.setPreviewFrame.bind(null, this.frame), previewMode ? 0 : 200)
+        window.setTimeout(windowActions.setPreviewFrame.bind(null, this.props.frame.get('key')), previewMode ? 0 : 200)
     }
-    windowActions.setTabHoverState(this.frame, true)
+    windowActions.setTabHoverState(this.props.frame.get('key'), true)
   }
 
   onAuxClick (e) {
@@ -233,7 +233,7 @@ class Tab extends ImmutableComponent {
     setImmediate(() => {
       const currentSize = getTabBreakpoint(this.tabSize)
       // Avoid updating breakpoint when user enters fullscreen (see #7301)
-      !this.props.hasTabInFullScreen && windowActions.setTabBreakpoint(this.frame, currentSize)
+      !this.props.hasTabInFullScreen && windowActions.setTabBreakpoint(this.props.frame.get('key'), currentSize)
     })
   }
 

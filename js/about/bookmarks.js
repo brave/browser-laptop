@@ -59,8 +59,11 @@ class BookmarkFolderItem extends React.Component {
    */
   moveBookmark (e, bookmark) {
     if (siteUtil.isMoveAllowed(this.props.allBookmarkFolders, bookmark, this.props.bookmarkFolder)) {
-      aboutActions.moveSite(bookmark.toJS(),
-        this.props.bookmarkFolder.toJS(),
+      const bookmarkSiteKey = siteUtil.getSiteKey(bookmark.toJS())
+      const bookmarkFolderSiteKey = siteUtil.getSiteKey(this.props.bookmarkFolder.toJS())
+
+      aboutActions.moveSite(bookmarkSiteKey,
+        bookmarkFolderSiteKey,
         dndData.shouldPrependVerticalItem(e.target, e.clientY),
         true)
     }
@@ -296,8 +299,11 @@ class BookmarksList extends ImmutableComponent {
     }
 
     if (siteUtil.isMoveAllowed(this.props.allBookmarkFolders, bookmark, siteDetail)) {
-      aboutActions.moveSite(bookmark.toJS(),
-        siteDetail.toJS(),
+      const bookmarkSiteKey = siteUtil.getSiteKey(bookmark.toJS())
+      const siteKey = siteUtil.getSiteKey(siteDetail.toJS())
+
+      aboutActions.moveSite(bookmarkSiteKey,
+        siteKey,
         dndData.shouldPrependVerticalItem(e.target, e.clientY),
         destinationIsParent)
     }

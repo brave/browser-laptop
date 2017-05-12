@@ -112,8 +112,9 @@ describe('sitesReducerTest', function () {
   describe('APP_MOVE_SITE', function () {
     it('Moves the specified site', function () {
       const url = 'https://www.brave.com'
+      const url2 = 'https://www.brave.com/3'
       let state = initState
-      let action = {
+      let addAction = {
         actionType: appConstants.APP_ADD_SITE,
         siteDetail: Immutable.fromJS({
           location: url,
@@ -121,29 +122,33 @@ describe('sitesReducerTest', function () {
         }),
         skipSync: true
       }
-      let newState = sitesReducer(state, action)
-      action.siteDetail = action.siteDetail.set('location', 'https://www.brave.com/2')
-      newState = sitesReducer(newState, action)
-      action.siteDetail = action.siteDetail.set('location', 'https://www.brave.com/3')
-      newState = sitesReducer(newState, action)
+
+      let moveAction = {
+        actionType: appConstants.APP_MOVE_SITE,
+        sourceKey: `${url}|0|0`,
+        destinationKey: `${url2}|0|0`
+      }
+
+      // Add sites
+      let newState = sitesReducer(state, addAction)
+      addAction.siteDetail = addAction.siteDetail.set('location', 'https://www.brave.com/2')
+      newState = sitesReducer(newState, addAction)
+      addAction.siteDetail = addAction.siteDetail.set('location', 'https://www.brave.com/3')
+      newState = sitesReducer(newState, addAction)
       assert.equal(Object.keys(newState.get('sites').toJS()).length, 3)
 
       // Move the site to the 2nd position
-      action.actionType = appConstants.APP_MOVE_SITE
-      action.sourceDetail = action.siteDetail
-      action.destinationDetail = action.siteDetail.set('location', 'https://www.brave.com')
-      action.siteDetail = undefined
-      newState = sitesReducer(newState, action).toJS()
+      newState = sitesReducer(newState, moveAction).toJS()
       assert.equal(Object.keys(newState.sites).length, 3)
-      assert.equal(Object.values(newState.sites)[2].location, 'https://www.brave.com/3')
-      assert.equal(Object.values(newState.sites)[2].order, 1)
+      assert.equal(Object.values(newState.sites)[2].location, url)
+      assert.equal(Object.values(newState.sites)[2].order, 2)
 
       // Move the site to the 3rd position
-      action.prepend = true
-      newState = sitesReducer(Immutable.fromJS(newState), action).toJS()
+      moveAction.prepend = true
+      newState = sitesReducer(Immutable.fromJS(newState), moveAction).toJS()
       assert.equal(Object.keys(newState.sites).length, 3)
-      assert.equal(Object.values(newState.sites)[2].location, 'https://www.brave.com/3')
-      assert.equal(Object.values(newState.sites)[2].order, 0)
+      assert.equal(Object.values(newState.sites)[2].location, url)
+      assert.equal(Object.values(newState.sites)[2].order, 1)
     })
   })
 })
