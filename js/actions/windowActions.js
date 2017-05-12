@@ -4,15 +4,10 @@
 
 'use strict'
 
-const AppDispatcher = require('../dispatcher/appDispatcher')
+const {dispatch} = require('../dispatcher/appDispatcher')
 const windowConstants = require('../constants/windowConstants')
 
-function dispatch (action) {
-  AppDispatcher.dispatch(action)
-}
-
 const windowActions = {
-
   /**
    * Dispatches an event to the main process to replace the window state
    *
@@ -396,21 +391,6 @@ const windowActions = {
     dispatch({
       actionType: windowConstants.WINDOW_SET_RENDER_URL_BAR_SUGGESTIONS,
       enabled
-    })
-  },
-
-  /**
-   * New URL bar suggestion search results are available.
-   * This is typically from a service like Duck Duck Go auto complete for the portion of text that the user typed in.
-   *
-   * @param {number} tabId - the tab id for the action
-   * @param searchResults The search results for the currently entered URL bar text.
-   */
-  searchSuggestionResultsAvailable: function (tabId, searchResults) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SEARCH_SUGGESTION_RESULTS_AVAILABLE,
-      tabId,
-      searchResults
     })
   },
 

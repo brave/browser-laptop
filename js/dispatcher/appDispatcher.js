@@ -22,6 +22,7 @@ class AppDispatcher {
     this.callbacks = []
     this.promises = []
     this.dispatching = false
+    this.dispatch = this.dispatch.bind(this)
   }
 
   /**

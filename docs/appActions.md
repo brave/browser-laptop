@@ -1067,6 +1067,19 @@ Indicates that the urlbar text has changed, usually from user input
 
 
 
+### searchSuggestionResultsAvailable(tabId, searchResults) 
+
+New URL bar suggestion search results are available.
+This is typically from a service like Duck Duck Go auto complete for the portion of text that the user typed in.
+
+**Parameters**
+
+**tabId**: `number`, the tab id for the action
+
+**searchResults**: , The search results for the currently entered URL bar text.
+
+
+
 ### urlBarSuggestionsChanged(suggestionList, selectedIndex) 
 
 Indicates URL bar suggestions and selected index.

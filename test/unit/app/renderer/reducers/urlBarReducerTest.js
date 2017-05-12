@@ -281,10 +281,10 @@ describe('urlBarReducer', function () {
       })
     })
 
-    describe('WINDOW_SEARCH_SUGGESTION_RESULTS_AVAILABLE', function () {
+    describe('APP_SEARCH_SUGGESTION_RESULTS_AVAILABLE', function () {
       it('turns off suggestions', function () {
         const searchResults = Immutable.fromJS(['0110001001110010011010010110000101101110'])
-        const newState = urlBarReducer(windowState, {actionType: windowConstants.WINDOW_SEARCH_SUGGESTION_RESULTS_AVAILABLE, searchResults, tabId: 2})
+        const newState = urlBarReducer(windowState, {actionType: appConstants.APP_SEARCH_SUGGESTION_RESULTS_AVAILABLE, searchResults, tabId: 2})
         assert.deepEqual(newState.getIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'searchResults']).toJS(), searchResults.toJS())
       })
     })

@@ -3,10 +3,10 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Immutable = require('immutable')
-const windowActions = require('../../js/actions/windowActions')
+const appActions = require('../../js/actions/appActions')
 const debounce = require('../../js/lib/debounce')
 
-const fetchSearchSuggestions = debounce((tabId, autocompleteURL, searchTerms) => {
+const fetchSearchSuggestions = debounce((windowId, tabId, autocompleteURL, searchTerms) => {
   const xhr = new window.XMLHttpRequest()
   xhr.open('GET', autocompleteURL
     .replace('{searchTerms}', encodeURIComponent(searchTerms)), true)
@@ -14,7 +14,7 @@ const fetchSearchSuggestions = debounce((tabId, autocompleteURL, searchTerms) =>
   xhr.send()
   xhr.onload = () => {
     // Once we have the online suggestions, append them to the others
-    windowActions.searchSuggestionResultsAvailable(tabId, Immutable.fromJS(xhr.response[1]))
+    appActions.searchSuggestionResultsAvailable(windowId, tabId, Immutable.fromJS(xhr.response[1]))
   }
 }, 100)
 

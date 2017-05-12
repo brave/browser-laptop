@@ -319,19 +319,6 @@ This is sometimes only temporarily disabled, e.g. a user is pressing backspace.
 
 
 
-### searchSuggestionResultsAvailable(tabId, searchResults) 
-
-New URL bar suggestion search results are available.
-This is typically from a service like Duck Duck Go auto complete for the portion of text that the user typed in.
-
-**Parameters**
-
-**tabId**: `number`, the tab id for the action
-
-**searchResults**: , The search results for the currently entered URL bar text.
-
-
-
 ### setUrlBarSelected(isSelected) 
 
 Marks the URL bar text as selected or not

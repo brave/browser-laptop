@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 'use strict'
-const AppDispatcher = require('../dispatcher/appDispatcher')
+const {dispatch} = require('../dispatcher/appDispatcher')
 const appConstants = require('../constants/appConstants')
 
 const appActions = {
@@ -14,7 +14,7 @@ const appActions = {
    * @param {object} appState - Initial app state object (not yet converted to ImmutableJS)
    */
   setState: function (appState) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_SET_STATE,
       appState
     })
@@ -28,7 +28,7 @@ const appActions = {
    * @param {function} cb - Callback to call after the window is loaded, will only work if called from the main process.
    */
   newWindow: function (frameOpts, browserOpts, restoredState, cb) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_NEW_WINDOW,
       frameOpts,
       browserOpts,
@@ -38,35 +38,35 @@ const appActions = {
   },
 
   windowReady: function (windowId) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_WINDOW_READY,
       windowId
     })
   },
 
   closeWindow: function (windowId) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_CLOSE_WINDOW,
       windowId
     })
   },
 
   windowClosed: function (windowValue) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_WINDOW_CLOSED,
       windowValue
     })
   },
 
   windowCreated: function (windowValue) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_WINDOW_CREATED,
       windowValue
     })
   },
 
   windowUpdated: function (windowValue) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_WINDOW_UPDATED,
       windowValue
     })
@@ -77,7 +77,7 @@ const appActions = {
    * @param {Object} frame
    */
   frameChanged: function (frame) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_FRAME_CHANGED,
       frame
     })
@@ -88,7 +88,7 @@ const appActions = {
    * @param {Object} tabValue
    */
   tabCreated: function (tabValue) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_TAB_CREATED,
       tabValue
     })
@@ -102,7 +102,7 @@ const appActions = {
    * @param {Number} windowId
    */
   tabMoved: function (tabId, frameOpts, browserOpts, windowId) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_TAB_MOVED,
       tabId,
       frameOpts,
@@ -116,7 +116,7 @@ const appActions = {
    * @param {Object} createProperties
    */
   createTabRequested: function (createProperties, activateIfOpen = false, isRestore = false) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_CREATE_TAB_REQUESTED,
       createProperties,
       activateIfOpen,
@@ -130,7 +130,7 @@ const appActions = {
    * @param {string} url - The url to load
    */
   loadURLRequested: function (tabId, url) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_LOAD_URL_REQUESTED,
       tabId,
       url
@@ -143,7 +143,7 @@ const appActions = {
    * @param {string} url - The url to load
    */
   loadURLInActiveTabRequested: function (windowId, url) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_LOAD_URL_IN_ACTIVE_TAB_REQUESTED,
       windowId,
       url
@@ -156,7 +156,7 @@ const appActions = {
    * @param {string} shareType - The type of share to do, must be one of: "email", "facebook", "pinterest", "twitter", "googlePlus", "linkedIn", "buffer", "reddit", or "digg"
    */
   simpleShareActiveTabRequested: function (windowId, shareType) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_SIMPLE_SHARE_ACTIVE_TAB_REQUESTED,
       windowId,
       shareType
@@ -169,7 +169,7 @@ const appActions = {
    * @param {Object} changeInfo from chrome-tabs-updated
    */
   tabUpdated: function (tabValue, changeInfo) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_TAB_UPDATED,
       tabValue,
       changeInfo,
@@ -185,7 +185,7 @@ const appActions = {
    * @param {Number} tabId - the tabId to activate
    */
   tabActivateRequested: function (tabId) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_TAB_ACTIVATE_REQUESTED,
       tabId
     })
@@ -212,7 +212,7 @@ const appActions = {
    * @param {Boolean} forceClosePinned - force close if pinned
    */
   tabCloseRequested: function (tabId, forceClosePinned = false) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_TAB_CLOSE_REQUESTED,
       tabId,
       forceClosePinned
@@ -224,7 +224,7 @@ const appActions = {
    * @param {number} tabId
    */
   tabClosed: function (tabId, windowId) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_TAB_CLOSED,
       tabId,
       queryInfo: {
@@ -243,7 +243,7 @@ const appActions = {
    * @param {boolean} skipSync - Set true if a site isn't eligible for Sync (e.g. if addSite was triggered by Sync)
    */
   addSite: function (siteDetail, tag, originalSiteDetail, destinationDetail, skipSync) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_ADD_SITE,
       siteDetail,
       tag,
@@ -260,7 +260,7 @@ const appActions = {
    * @param {boolean} skipSync - Set true if a site isn't eligible for Sync (e.g. if this removal was triggered by Sync)
    */
   removeSite: function (siteDetail, tag, skipSync) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_REMOVE_SITE,
       siteDetail,
       tag,
@@ -278,7 +278,7 @@ const appActions = {
    * @param {boolean} destinationIsParent - Whether or not the destinationDetail should be considered the new parent.
    */
   moveSite: function (sourceKey, destinationKey, prepend, destinationIsParent) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_MOVE_SITE,
       sourceKey,
       destinationKey,
@@ -294,7 +294,7 @@ const appActions = {
    * @param {Object} downloadDetail - Properties for the download
    */
   mergeDownloadDetail: function (downloadId, downloadDetail) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_MERGE_DOWNLOAD_DETAIL,
       downloadId,
       downloadDetail
@@ -305,7 +305,7 @@ const appActions = {
    * Dispatches a message to clear all completed downloads
    */
   clearCompletedDownloads: function () {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_CLEAR_COMPLETED_DOWNLOADS
     })
   },
@@ -314,7 +314,7 @@ const appActions = {
    * Dispatches a message indicating ledger recovery succeeded
    */
   ledgerRecoverySucceeded: function () {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_LEDGER_RECOVERY_STATUS_CHANGED,
       recoverySucceeded: true
     })
@@ -324,7 +324,7 @@ const appActions = {
    * Dispatches a message indicating ledger recovery failed
    */
   ledgerRecoveryFailed: function () {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_LEDGER_RECOVERY_STATUS_CHANGED,
       recoverySucceeded: false
     })
@@ -336,7 +336,7 @@ const appActions = {
    * @param {Array} position - [x, y]
    */
   defaultWindowParamsChanged: function (size, position) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_DEFAULT_WINDOW_PARAMS_CHANGED,
       size,
       position
@@ -351,7 +351,7 @@ const appActions = {
    * @param {string} etag - The etag of the reosurce from the http response
    */
   setResourceETag: function (resourceName, etag) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_SET_DATA_FILE_ETAG,
       resourceName,
       etag
@@ -364,7 +364,7 @@ const appActions = {
    * @param {number} lastCheck - The last check date of the reosurce from the http response
    */
   setResourceLastCheck: function (resourceName, lastCheckVersion, lastCheckDate) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_SET_DATA_FILE_LAST_CHECK,
       resourceName,
       lastCheckVersion,
@@ -378,7 +378,7 @@ const appActions = {
    * @param {boolean} enabled - true if the resource is enabled.
    */
   setResourceEnabled: function (resourceName, enabled) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_SET_RESOURCE_ENABLED,
       resourceName,
       enabled
@@ -390,7 +390,7 @@ const appActions = {
    * @param {string} resourceName - 'widevine'
    */
   resourceReady: function (resourceName) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_RESOURCE_READY,
       resourceName
     })
@@ -402,7 +402,7 @@ const appActions = {
   * @param {number} count - number of blocked resources to add to the global count
   */
   addResourceCount: function (resourceName, count) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_ADD_RESOURCE_COUNT,
       resourceName,
       count
@@ -414,7 +414,7 @@ const appActions = {
    * epoch timestamp (milliseconds)
    */
   setUpdateLastCheck: function () {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_UPDATE_LAST_CHECK
     })
   },
@@ -426,7 +426,7 @@ const appActions = {
    * @param {object} metadata - Metadata from the pdate server, with info like release notes.
    */
   setUpdateStatus: function (status, verbose, metadata) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_SET_UPDATE_STATUS,
       status,
       verbose,
@@ -440,7 +440,7 @@ const appActions = {
    * @param {string} value - The value of the setting
    */
   changeSetting: function (key, value) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_CHANGE_SETTING,
       key,
       value
@@ -457,7 +457,7 @@ const appActions = {
    * @param {boolean} skipSync - Set true if a site isn't eligible for Sync (e.g. if addSite was triggered by Sync)
    */
   changeSiteSetting: function (hostPattern, key, value, temp, skipSync) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_CHANGE_SITE_SETTING,
       hostPattern,
       key,
@@ -476,7 +476,7 @@ const appActions = {
    * @param {boolean} skipSync - Set true if a site isn't eligible for Sync (e.g. if addSite was triggered by Sync)
    */
   removeSiteSetting: function (hostPattern, key, temp, skipSync) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_REMOVE_SITE_SETTING,
       hostPattern,
       key,
@@ -490,7 +490,7 @@ const appActions = {
    * @param {object} ledgerInfo - the current ledger state
    */
   updateLedgerInfo: function (ledgerInfo) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_UPDATE_LEDGER_INFO,
       ledgerInfo
     })
@@ -501,7 +501,7 @@ const appActions = {
    * @param {object} locationInfo - the current location synopsis
    */
   updateLocationInfo: function (locationInfo) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_UPDATE_LOCATION_INFO,
       locationInfo
     })
@@ -512,7 +512,7 @@ const appActions = {
    * @param {object} publisherInfo - the current publisher synopsis
    */
   updatePublisherInfo: function (publisherInfo) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_UPDATE_PUBLISHER_INFO,
       publisherInfo
     })
@@ -523,7 +523,7 @@ const appActions = {
    * @param {{message: string, buttons: Array.<string>, frameOrigin: string, options: Object}} detail
    */
   showNotification: function (detail) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_SHOW_NOTIFICATION,
       detail
     })
@@ -534,7 +534,7 @@ const appActions = {
    * @param {string} message
    */
   hideNotification: function (message) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_HIDE_NOTIFICATION,
       message
     })
@@ -546,7 +546,7 @@ const appActions = {
    * @param {boolean} learn - true if the word should be learned, false if ignored
    */
   addWord: function (word, learn) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_ADD_WORD,
       word,
       learn
@@ -558,7 +558,7 @@ const appActions = {
    * @param {string} locale - The locale to set for the dictionary
    */
   setDictionary: function (locale) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_SET_DICTIONARY,
       locale
     })
@@ -570,7 +570,7 @@ const appActions = {
    * @param {string} detail - login request info
    */
   setLoginRequiredDetail: function (tabId, detail) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_SET_LOGIN_REQUIRED_DETAIL,
       tabId,
       detail
@@ -578,7 +578,7 @@ const appActions = {
   },
 
   setLoginResponseDetail: function (tabId, detail) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_SET_LOGIN_RESPONSE_DETAIL,
       tabId,
       detail
@@ -590,7 +590,7 @@ const appActions = {
    * @param {object} clearDataDetail - the app data to clear as per doc/state.md's clearBrowsingDataDefaults
    */
   onClearBrowsingData: function (clearDataDetail) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_ON_CLEAR_BROWSING_DATA,
       clearDataDetail
     })
@@ -601,7 +601,7 @@ const appActions = {
    * @param {object} selected - the browser data to import as per doc/state.md's importBrowserDataSelected
    */
   importBrowserData: function (selected) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_IMPORT_BROWSER_DATA,
       selected
     })
@@ -613,7 +613,7 @@ const appActions = {
    * @param {object} originalDetail - the original address before editing
    */
   addAutofillAddress: function (detail, originalDetail) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_ADD_AUTOFILL_ADDRESS,
       detail,
       originalDetail
@@ -625,7 +625,7 @@ const appActions = {
    * @param {object} detail - the address to remove as per doc/state.md's autofillAddressDetail
    */
   removeAutofillAddress: function (detail) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_REMOVE_AUTOFILL_ADDRESS,
       detail
     })
@@ -637,7 +637,7 @@ const appActions = {
    * @param {object} originalDetail - the original credit card before editing
    */
   addAutofillCreditCard: function (detail, originalDetail) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_ADD_AUTOFILL_CREDIT_CARD,
       detail,
       originalDetail
@@ -649,7 +649,7 @@ const appActions = {
    * @param {object} detail - the credit card to remove as per doc/state.md's autofillCreditCardDetail
    */
   removeAutofillCreditCard: function (detail) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_REMOVE_AUTOFILL_CREDIT_CARD,
       detail
     })
@@ -661,7 +661,7 @@ const appActions = {
    * @param {Array} creditCardGuids - the guid array to access credit card entries in autofill DB
    */
   autofillDataChanged: function (addressGuids, creditCardGuids) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_AUTOFILL_DATA_CHANGED,
       addressGuids,
       creditCardGuids
@@ -674,7 +674,7 @@ const appActions = {
    * @param {Number} windowId - the unique id of the window
    */
   windowBlurred: function (windowId) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_WINDOW_BLURRED,
       windowId: windowId
     })
@@ -686,7 +686,7 @@ const appActions = {
    * @param {Number} windowId - the unique id of the window
    */
   windowFocused: function (windowId) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_WINDOW_FOCUSED,
       windowId: windowId
     })
@@ -697,7 +697,7 @@ const appActions = {
    * @param {Object} menubarTemplate - JSON used to build the menu
    */
   setMenubarTemplate: function (menubarTemplate) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_SET_MENUBAR_TEMPLATE,
       menubarTemplate
     })
@@ -708,7 +708,7 @@ const appActions = {
    * after being disconnected
    */
   networkConnected: function () {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_NETWORK_CONNECTED
     })
   },
@@ -717,7 +717,7 @@ const appActions = {
    * Dispatches a message when the network is disconnected
    */
   networkDisconnected: function () {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_NETWORK_DISCONNECTED
     })
   },
@@ -728,7 +728,7 @@ const appActions = {
    * @param {boolean} useBrave - whether set Brave as default browser
    */
   defaultBrowserUpdated: function (useBrave) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_DEFAULT_BROWSER_UPDATED,
       useBrave
     })
@@ -738,7 +738,7 @@ const appActions = {
    * Dispatch a message to indicate default browser check is complete
    */
   defaultBrowserCheckComplete: function () {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_DEFAULT_BROWSER_CHECK_COMPLETE
     })
   },
@@ -747,13 +747,13 @@ const appActions = {
    * Notify the AppStore to provide default history values.
    */
   populateHistory: function () {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_POPULATE_HISTORY
     })
   },
 
   allowFlashOnce: function (tabId, url, isPrivate) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_ALLOW_FLASH_ONCE,
       tabId,
       url,
@@ -762,7 +762,7 @@ const appActions = {
   },
 
   allowFlashAlways: function (tabId, url) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_ALLOW_FLASH_ALWAYS,
       tabId,
       url
@@ -773,7 +773,7 @@ const appActions = {
    * Dispatch a message to copy data URL to clipboard
    **/
   dataURLCopied: function (dataURL, html, text) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_DATA_URL_COPIED,
       dataURL,
       html,
@@ -785,7 +785,7 @@ const appActions = {
    * Dispatches a message when the app is shutting down.
    */
   shuttingDown: function () {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_SHUTTING_DOWN
     })
   },
@@ -796,7 +796,7 @@ const appActions = {
    * @param {string} downloadId - ID of the download being revealed
    */
   downloadRevealed: function (downloadId) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_DOWNLOAD_REVEALED,
       downloadId
     })
@@ -807,7 +807,7 @@ const appActions = {
    * @param {string} downloadId - ID of the download being opened
    */
   downloadOpened: function (downloadId) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_DOWNLOAD_OPENED,
       downloadId
     })
@@ -819,7 +819,7 @@ const appActions = {
    * @param {string} downloadAction - the action to perform from constants/electronDownloadItemActions.js
    */
   downloadActionPerformed: function (downloadId, downloadAction) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_DOWNLOAD_ACTION_PERFORMED,
       downloadId,
       downloadAction
@@ -831,7 +831,7 @@ const appActions = {
    * @param {string} downloadId - ID of the download item being copied to the clipboard
    */
   downloadCopiedToClipboard: function (downloadId) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_DOWNLOAD_COPIED_TO_CLIPBOARD,
       downloadId
     })
@@ -842,7 +842,7 @@ const appActions = {
    * @param {string} downloadId - ID of the download item being deleted
    */
   downloadDeleted: function (downloadId) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_DOWNLOAD_DELETED,
       downloadId
     })
@@ -853,7 +853,7 @@ const appActions = {
    * @param {string} downloadId - ID of the download item being cleared
    */
   downloadCleared: function (downloadId) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_DOWNLOAD_CLEARED,
       downloadId
     })
@@ -864,7 +864,7 @@ const appActions = {
    * @param {string} downloadId - ID of the download item being redownloaded
    */
   downloadRedownloaded: function (downloadId) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_DOWNLOAD_REDOWNLOADED,
       downloadId
     })
@@ -874,7 +874,7 @@ const appActions = {
    * Shows delete confirmation bar in download item panel
    */
   showDownloadDeleteConfirmation: function () {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_SHOW_DOWNLOAD_DELETE_CONFIRMATION
     })
   },
@@ -883,7 +883,7 @@ const appActions = {
    * Hides delete confirmation bar in download item panel
    */
   hideDownloadDeleteConfirmation: function () {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_HIDE_DOWNLOAD_DELETE_CONFIRMATION
     })
   },
@@ -893,7 +893,7 @@ const appActions = {
    * @param {string} text - clipboard text which is copied
    */
   clipboardTextCopied: function (text) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_CLIPBOARD_TEXT_UPDATED,
       text
     })
@@ -904,7 +904,7 @@ const appActions = {
    * @param {number} tabId - The tabId
    */
   toggleDevTools: function (tabId) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_TAB_TOGGLE_DEV_TOOLS,
       tabId
     })
@@ -916,7 +916,7 @@ const appActions = {
    * @param {object} options - object containing options such as acive, back, and forward booleans
    */
   tabCloned: function (tabId, options) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_TAB_CLONED,
       tabId,
       options
@@ -930,7 +930,7 @@ const appActions = {
    * @param {boolean} temporary
    */
   noScriptExceptionsAdded: function (hostPattern, origins, temporary) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_ADD_NOSCRIPT_EXCEPTIONS,
       hostPattern,
       origins,
@@ -944,7 +944,7 @@ const appActions = {
    * @param {Array.<string>} objectPath
    */
   setObjectId: function (objectId, objectPath) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_SET_OBJECT_ID,
       objectId,
       objectPath
@@ -958,7 +958,7 @@ const appActions = {
    * @param {Object} devices {[deviceId]: {lastRecordTimestamp=, name=}}
    */
   saveSyncDevices: function (devices) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_SAVE_SYNC_DEVICES,
       devices
     })
@@ -972,7 +972,7 @@ const appActions = {
    * @param {string=} seedQr
    */
   saveSyncInitData: function (seed, deviceId, lastFetchTimestamp, seedQr) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_SAVE_SYNC_INIT_DATA,
       seed,
       deviceId,
@@ -986,7 +986,7 @@ const appActions = {
    * @param {string|null} error
    */
   setSyncSetupError: function (error) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_SET_SYNC_SETUP_ERROR,
       error
     })
@@ -998,7 +998,7 @@ const appActions = {
    * @param {Array.<Object>} records
    */
   applySiteRecords: function (records) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_APPLY_SITE_RECORDS,
       records
     })
@@ -1008,7 +1008,7 @@ const appActions = {
    * Dispatch to populate the sync object id -> appState key path mapping cache
    */
   createSyncCache: function () {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_CREATE_SYNC_CACHE
     })
   },
@@ -1017,7 +1017,7 @@ const appActions = {
    * Dispatches a message to delete sync data.
    */
   resetSyncData: function () {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_RESET_SYNC_DATA
     })
   },
@@ -1028,7 +1028,7 @@ const appActions = {
    * @param {Object} detail - Object containing: title, message, buttons to show
    */
   tabMessageBoxShown: function (tabId, detail) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_TAB_MESSAGE_BOX_SHOWN,
       tabId,
       detail
@@ -1041,7 +1041,7 @@ const appActions = {
    * @param {Object} detail - Object containing: suppressCheckbox (boolean)
    */
   tabMessageBoxDismissed: function (tabId, detail) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_TAB_MESSAGE_BOX_DISMISSED,
       tabId,
       detail
@@ -1054,7 +1054,7 @@ const appActions = {
    * @param {Object} detail - Replacement object
    */
   tabMessageBoxUpdated: function (tabId, detail) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_TAB_MESSAGE_BOX_UPDATED,
       tabId,
       detail
@@ -1068,7 +1068,7 @@ const appActions = {
    * @param location {string} location where handler was triggered
    */
   navigatorHandlerRegistered: function (partition, protocol, location) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_NAVIGATOR_HANDLER_REGISTERED,
       partition,
       protocol,
@@ -1083,7 +1083,7 @@ const appActions = {
    * @param location {string} location where handler was triggered
    */
   navigatorHandlerUnregistered: function (partition, protocol, location) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_NAVIGATOR_HANDLER_UNREGISTERED,
       partition,
       protocol,
@@ -1095,7 +1095,7 @@ const appActions = {
    * Open dialog for default download path setting
    */
   defaultDownloadPath: function () {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_DOWNLOAD_DEFAULT_PATH
     })
   },
@@ -1107,7 +1107,7 @@ const appActions = {
    * @param publishers {Object} publishers from the synopsis
    */
   enableUndefinedPublishers: function (publishers) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_ENABLE_UNDEFINED_PUBLISHERS,
       publishers
     })
@@ -1118,7 +1118,7 @@ const appActions = {
    * @param publishers {Object} updated publishers
    */
   changeLedgerPinnedPercentages: function (publishers) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_CHANGE_LEDGER_PINNED_PERCENTAGES,
       publishers
     })
@@ -1131,7 +1131,7 @@ const appActions = {
    * @param {number} tabId - The tabId of the tab to pin
    */
   tabPinned: function (tabId, pinned) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_TAB_PINNED,
       tabId,
       pinned
@@ -1145,7 +1145,7 @@ const appActions = {
    * @param {object} tabValue - the created tab state
    */
   newWebContentsAdded: function (windowId, frameOpts, tabValue) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_NEW_WEB_CONTENTS_ADDED,
       queryInfo: {
         windowId
@@ -1162,7 +1162,7 @@ const appActions = {
    * @param {object} dragData - Data being transfered
    */
   dragStarted: function (windowId, dragType, dragData) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_DRAG_STARTED,
       windowId,
       dragType,
@@ -1176,7 +1176,7 @@ const appActions = {
    * @param {object} dragData - Data being transfered
    */
   dragEnded: function () {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_DRAG_ENDED
     })
   },
@@ -1185,7 +1185,7 @@ const appActions = {
    * Notifies the app that a drop operation occurred
    */
   dataDropped: function (dropWindowId) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_DATA_DROPPED,
       dropWindowId
     })
@@ -1195,7 +1195,7 @@ const appActions = {
    * Notifies the app that a drop operation occurred
    */
   draggedOver: function (draggedOverData) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_DRAGGED_OVER,
       draggedOverData
     })
@@ -1206,7 +1206,7 @@ const appActions = {
    * @param {number} tabId - Tab id used for an action
    */
   onGoBack: function (tabId) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_ON_GO_BACK,
       tabId
     })
@@ -1217,7 +1217,7 @@ const appActions = {
    * @param {number} tabId - Tab id used for an action
    */
   onGoForward: function (tabId) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_ON_GO_FORWARD,
       tabId
     })
@@ -1229,7 +1229,7 @@ const appActions = {
    * @param {number} index - Index in the history
    */
   onGoToIndex: function (tabId, index) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_ON_GO_TO_INDEX,
       tabId,
 
@@ -1243,7 +1243,7 @@ const appActions = {
    * @param {ClientRect} rect - Parent element position for this action
    */
   onGoBackLong: function (tabId, rect) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_ON_GO_BACK_LONG,
       tabId,
       rect
@@ -1256,7 +1256,7 @@ const appActions = {
    * @param {ClientRect} rect - Parent element position for this action
    */
   onGoForwardLong: function (tabId, rect) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_ON_GO_FORWARD_LONG,
       tabId,
       rect
@@ -1268,7 +1268,7 @@ const appActions = {
    * because ESC was pressed.
    */
   dragCancelled: function () {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_DRAG_CANCELLED
     })
   },
@@ -1278,7 +1278,7 @@ const appActions = {
    * @param {number} tabId - Tab id of current frame
    */
   autoplayBlocked: function (tabId) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_AUTOPLAY_BLOCKED,
       tabId
     })
@@ -1288,7 +1288,7 @@ const appActions = {
    * Handle 'save-password' event from muon
    */
   savePassword: function (username, origin, tabId) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_SAVE_PASSWORD,
       username,
       origin,
@@ -1300,7 +1300,7 @@ const appActions = {
    * Handle 'update-password' event from muon
    */
   updatePassword: function (username, origin, tabId) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_UPDATE_PASSWORD,
       username,
       origin,
@@ -1313,7 +1313,7 @@ const appActions = {
    * @param {Object} passwordDetail - login details
    */
   deletePassword: function (passwordDetail) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_REMOVE_PASSWORD,
       passwordDetail
     })
@@ -1323,7 +1323,7 @@ const appActions = {
    * Deletes all saved login credentials
    */
   clearPasswords: function () {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_CLEAR_PASSWORDS
     })
   },
@@ -1332,7 +1332,7 @@ const appActions = {
    * Delete legacy "never saved password" list
    */
   deletePasswordSite: function (origin) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_CHANGE_SITE_SETTING,
       hostPattern: origin,
       key: 'savePasswords'
@@ -1345,9 +1345,27 @@ const appActions = {
    * @param {string} location - The text to set as the new navbar URL input
    */
   urlBarTextChanged: function (windowId, input) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_URL_BAR_TEXT_CHANGED,
       input,
+      queryInfo: {
+        windowId
+      }
+    })
+  },
+
+  /**
+   * New URL bar suggestion search results are available.
+   * This is typically from a service like Duck Duck Go auto complete for the portion of text that the user typed in.
+   *
+   * @param {number} tabId - the tab id for the action
+   * @param searchResults The search results for the currently entered URL bar text.
+   */
+  searchSuggestionResultsAvailable: function (windowId, tabId, searchResults) {
+    dispatch({
+      actionType: appConstants.APP_SEARCH_SUGGESTION_RESULTS_AVAILABLE,
+      tabId,
+      searchResults,
       queryInfo: {
         windowId
       }
@@ -1361,13 +1379,12 @@ const appActions = {
    * @param {number} selectedIndex - The index for the selected item (users can select items with down arrow on their keyboard)
    */
   urlBarSuggestionsChanged: function (suggestionList, selectedIndex) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_URL_BAR_SUGGESTIONS_CHANGED,
       suggestionList,
       selectedIndex
     })
   }
-
 }
 
 module.exports = appActions

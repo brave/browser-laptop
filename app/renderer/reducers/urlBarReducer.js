@@ -9,13 +9,12 @@ const appConstants = require('../../../js/constants/appConstants')
 const {isUrl, getSourceAboutUrl, getSourceMagnetUrl} = require('../../../js/lib/appUrlUtil')
 const {isURL, isPotentialPhishingUrl, getUrlFromInput} = require('../../../js/lib/urlutil')
 const {getFrameByKey, getFrameKeyByTabId, activeFrameStatePath, frameStatePath, getActiveFrame, getFrameByTabId} = require('../../../js/state/frameStateUtil')
-const getSetting = require('../../../js/settings').getSetting
-const fetchSearchSuggestions = require('../fetchSearchSuggestions')
 const searchProviders = require('../../../js/data/searchProviders')
-const settings = require('../../../js/constants/settings')
 const Immutable = require('immutable')
-const {generateNewSuggestionsList} = require('../lib/suggestion')
+const {generateNewSuggestionsList, generateNewSearchXHRResults} = require('../lib/suggestion')
 const {navigateSiteClickHandler} = require('../suggestionClickHandlers')
+const {getCurrentWindowId} = require('../currentWindow')
+const appStoreRenderer = require('../../../js/stores/appStoreRenderer')
 
 const navigationBarState = require('../../common/state/navigationBarState')
 const tabState = require('../../common/state/tabState')
@@ -38,36 +37,6 @@ const updateSearchEngineInfoFromInput = (state, frameProps) => {
       }
     }
     state = state.deleteIn(searchDetailPath)
-  }
-  return state
-}
-
-const searchXHR = (state, frameProps, searchOnline) => {
-  const searchDetail = state.get('searchDetail')
-  const frameSearchDetail = frameProps.getIn(['navbar', 'urlbar', 'searchDetail'])
-  if (!searchDetail && !frameSearchDetail) {
-    return state
-  }
-  let autocompleteURL = frameSearchDetail
-    ? frameSearchDetail.get('autocomplete')
-    : searchDetail.get('autocompleteURL')
-  if (!getSetting(settings.OFFER_SEARCH_SUGGESTIONS) || !autocompleteURL) {
-    state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'searchResults']), Immutable.fromJS([]))
-    return state
-  }
-
-  let input = frameProps.getIn(['navbar', 'urlbar', 'location'])
-  if (!isUrl(input) && input.length > 0) {
-    if (searchDetail) {
-      const replaceRE = new RegExp('^' + searchDetail.get('shortcut') + ' ', 'g')
-      input = input.replace(replaceRE, '')
-    }
-
-    if (searchOnline) {
-      fetchSearchSuggestions(frameProps.get('tabId'), autocompleteURL, input)
-    }
-  } else {
-    state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'searchResults']), Immutable.fromJS([]))
   }
   return state
 }
@@ -165,11 +134,15 @@ const setNavBarUserInput = (state, location) => {
   state = updateNavBarInput(state, location)
   const activeFrameProps = getActiveFrame(state)
   state = updateSearchEngineInfoFromInput(state, activeFrameProps)
-  state = searchXHR(state, activeFrameProps, true)
   const urlLocation = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'location']))
-  setImmediate(() => {
-    generateNewSuggestionsList(state, urlLocation)
-  })
+  const windowId = getCurrentWindowId()
+  const tabId = activeFrameProps.get('tabId')
+  if (tabId) {
+    setImmediate(() => {
+      generateNewSearchXHRResults(appStoreRenderer.state, windowId, tabId, urlLocation)
+      generateNewSuggestionsList(appStoreRenderer.state, windowId, tabId, urlLocation)
+    })
+  }
   if (!location) {
     state = setRenderUrlBarSuggestions(state, false)
   }
@@ -190,7 +163,6 @@ const setActive = (state, isActive) => {
 
 const urlBarReducer = (state, action) => {
   const tabId = state.getIn(activeFrameStatePath(state).concat(['tabId']), tabState.TAB_ID_NONE)
-
   switch (action.actionType) {
     case appConstants.APP_URL_BAR_TEXT_CHANGED:
       state = setNavBarUserInput(state, action.input)
@@ -305,12 +277,12 @@ const urlBarReducer = (state, action) => {
       state = updateUrlSuffix(state, state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), suggestionList))
       break
     }
-    case windowConstants.WINDOW_SEARCH_SUGGESTION_RESULTS_AVAILABLE:
+    case appConstants.APP_SEARCH_SUGGESTION_RESULTS_AVAILABLE:
       const frameKey = getFrameKeyByTabId(state, action.tabId)
       state = state.setIn(frameStatePath(state, frameKey).concat(['navbar', 'urlbar', 'suggestions', 'searchResults']), action.searchResults)
       const urlLocation = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'location']))
       setImmediate(() => {
-        generateNewSuggestionsList(state, urlLocation)
+        generateNewSuggestionsList(appStoreRenderer.state, getCurrentWindowId(), action.tabId, urlLocation)
       })
       break
     case windowConstants.WINDOW_URL_BAR_AUTOCOMPLETE_ENABLED:
