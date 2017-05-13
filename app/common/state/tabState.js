@@ -82,12 +82,6 @@ const tabState = {
     return state.get('tabs').findIndex((tab) => tab.get('tabId') === tabId)
   },
 
-  getActiveTabValue: (state, windowId) => {
-    windowId = validateId('windowId', windowId)
-    state = validateState(state)
-    return state.get('tabs').find((tab) => tab.get('windowId') === windowId && tab.get('active'))
-  },
-
   removeTabByTabId: (state, tabId) => {
     tabId = validateId('tabId', tabId)
     state = validateState(state)

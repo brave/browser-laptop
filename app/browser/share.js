@@ -29,7 +29,7 @@ const validateShareType = (shareType) =>
  * @param {string} shareType - The template to use, see the property key names in templateUrls above.
  */
 const simpleShareActiveTab = (state, windowId, shareType) => {
-  const tabValue = tabState.getActiveTabValue(state, windowId)
+  const tabValue = tabState.getActiveTab(state, windowId)
   const encodedTitle = encodeURIComponent(tabValue.get('title') || '')
   const encodedUrl = encodeURIComponent(tabValue.get('url'))
 
