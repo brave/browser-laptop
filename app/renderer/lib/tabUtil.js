@@ -103,13 +103,7 @@ module.exports.getTabIconColor = (props) => {
  * @param frameProps Any frame belonging to the page
  */
 module.exports.updateTabPageIndex = (state, frameProps) => {
-  // No need to update tab page index if we are given a pinned frame
-  if (!frameProps || frameProps.get('pinnedLocation')) {
-    return state
-  }
-
-  const index = frameStateUtil.getFrameTabPageIndex(state.get('frames')
-      .filter((frame) => !frame.get('pinnedLocation')), frameProps, getSetting(settings.TABS_PER_PAGE))
+  const index = frameStateUtil.getFrameTabPageIndex(state, frameProps, getSetting(settings.TABS_PER_PAGE))
 
   if (index === -1) {
     return state

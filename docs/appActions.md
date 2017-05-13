@@ -137,6 +137,18 @@ Dispatches a message to the store to set a new frame as the active frame.
 
 
 
+### tabIndexChanged(tabId, index) 
+
+Dispatches a message to the store to change the tab index
+
+**Parameters**
+
+**tabId**: `Number`, the tabId
+
+**index**: `Number`, the new index
+
+
+
 ### tabCloseRequested(tabId, forceClosePinned) 
 
 Dispatches a message to close the tabId

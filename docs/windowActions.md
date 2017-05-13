@@ -85,16 +85,6 @@ Dispatches a message when the guestInstanceId changes for a frame
 
 
 
-### tabDataChanged(tabs) 
-
-Dispatches a message when tab data changes
-
-**Parameters**
-
-**tabs**: `Object`, the tab properties
-
-
-
 ### setFrameError(frameProps, errorDetails) 
 
 Dispatches a message to set the frame error state

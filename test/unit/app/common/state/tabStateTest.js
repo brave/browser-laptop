@@ -180,34 +180,6 @@ const shouldValidateAction = function (cb) {
 }
 
 describe('tabState unit tests', function () {
-  describe('getTabIndexByTabId', function () {
-    before(function () {
-      this.appState = defaultAppState.set('tabs', Immutable.fromJS([
-        { tabId: 2 },
-        { tabId: 3 },
-        { tabId: 1 }
-      ]))
-    })
-
-    it('returns the index of the tab for the tabId', function () {
-      assert.equal(tabState.getTabIndexByTabId(this.appState, 1), 2)
-      assert.equal(tabState.getTabIndexByTabId(this.appState, 2), 0)
-      assert.equal(tabState.getTabIndexByTabId(this.appState, 3), 1)
-    })
-
-    it('returns -1 if the tabId does not exist', function () {
-      assert.equal(tabState.getTabIndexByTabId(this.appState, 4), -1)
-    })
-
-    shouldValidateId((tabId) => {
-      tabState.getTabIndexByTabId(defaultAppState, tabId)
-    })
-
-    shouldValidateTabState((state) => {
-      tabState.getTabIndexByTabId(state, 1)
-    })
-  })
-
   describe('getByTabId', function () {
     before(function () {
       this.appState = defaultAppState.set('tabs', Immutable.fromJS([

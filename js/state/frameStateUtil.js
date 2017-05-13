@@ -10,6 +10,7 @@ const {isIntermediateAboutPage} = require('../lib/appUrlUtil')
 const urlParse = require('../../app/common/urlParse')
 const windowActions = require('../actions/windowActions.js')
 const webviewActions = require('../actions/webviewActions.js')
+const appActions = require('../actions/appActions')
 
 const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
@@ -19,106 +20,63 @@ const matchFrame = (queryInfo, frame) => {
   return !Object.keys(queryInfo).map((queryKey) => (frame.get(queryKey) === queryInfo[queryKey])).includes(false)
 }
 
-function query (windowState, queryInfo) {
-  return windowState.get('frames').filter(matchFrame.bind(null, queryInfo))
+function query (state, queryInfo) {
+  return state.get('frames').filter(matchFrame.bind(null, queryInfo))
 }
 
-function find (windowState, queryInfo) {
-  return windowState.get('frames').find(matchFrame.bind(null, queryInfo))
+function find (state, queryInfo) {
+  return state.get('frames').find(matchFrame.bind(null, queryInfo))
 }
 
-function isFrameKeyActive (windowState, frameKey) {
-  return windowState.get('activeFrameKey') === frameKey
+function isFrameKeyActive (state, frameKey) {
+  return getActiveFrameKey(state) === frameKey
 }
 
-function getFrameDisplayIndex (windowState, frame) {
-  return findDisplayIndexForFrameKey(windowState.get('frames'), frame)
+function getFrames (state) {
+  return state.get('frames')
 }
 
-function getFrames (windowState) {
-  return windowState.get('frames')
+function getSortedFrames (state) {
+  return state.get('frames').sort(comparatorByKeyAsc)
 }
 
-function getSortedFrames (windowState) {
-  return windowState.get('frames').sort(comparatorByKeyAsc)
+function getPinnedFrames (state) {
+  return state.get('frames').filter((frame) => frame.get('pinnedLocation'))
 }
 
-function getPinnedFrames (windowState) {
-  return windowState.get('frames').filter((frame) => frame.get('pinnedLocation'))
+function getNonPinnedFrames (state) {
+  return state.get('frames').filter((frame) => !frame.get('pinnedLocation'))
 }
 
-function getNonPinnedFrames (windowState) {
-  return windowState.get('frames').filter((frame) => !frame.get('pinnedLocation'))
+function getFrameIndex (state, key) {
+  return getFramesInternalIndex(state, key)
 }
 
-function getFrameIndex (windowState, frame) {
-  return findIndexForFrameKey(windowState.get('frames'), frame)
+function getActiveFrameIndex (state) {
+  return getFrameIndex(state, getActiveFrameKey(state))
 }
 
-function getActiveFrameDisplayIndex (windowState) {
-  return getFrameDisplayIndex(windowState, windowState.get('activeFrameKey'))
-}
-
-function getActiveFrameIndex (windowState) {
-  return getFrameIndex(windowState, windowState.get('activeFrameKey'))
-}
-
-// TODO(bridiver) - will be used for pinned tab transfer
-function restoreFramePropsFromTab (tab) {
-  let frame = (tab && tab.get('frame')) || new Immutable.Map()
-  return frame.delete('activeShortcut')
-      .delete('activeShortcutDetails')
-      .delete('guestInstanceId')
-      .delete('key')
-      .delete('tabId')
-      .delete('parentFrameKey')
-}
-
-function getFramePropsFromTab (tab) {
-  let frame = new Immutable.Map()
-  if (tab) {
-    const isTabPinned = tab.get('pinned')
-    const url = tab.get('url')
-    let pinnedLocation = 'about:blank'
-
-    if (isTabPinned && url !== 'about:blank' && url !== '') {
-      pinnedLocation = url
-    }
-
-    if (!isTabPinned) {
-      pinnedLocation = null
-    }
-
-    frame = frame.set('pinnedLocation', pinnedLocation)
-    frame = frame.set('title', tab.get('title'))
-  }
-  return frame
-}
-
-function getActiveFrameTabId (windowState) {
-  const activeFrame = getActiveFrame(windowState)
+function getActiveFrameTabId (state) {
+  const activeFrame = getActiveFrame(state)
   return activeFrame && activeFrame.get('tabId')
 }
 
-function getFrameByIndex (windowState, i) {
-  return windowState.getIn(['frames', i])
-}
-
-function findFrameInList (frames, key) {
-  return frames.find(matchFrame.bind(null, {key}))
+function getFrameByIndex (state, i) {
+  return state.getIn(['frames', i])
 }
 
 // This will eventually go away fully when we replace frameKey by tabId
-function getFrameKeyByTabId (windowState, tabId) {
+function getFrameKeyByTabId (state, tabId) {
   let parentFrameKey
-  const openerFrame = getFrameByTabId(windowState, tabId)
+  const openerFrame = getFrameByTabId(state, tabId)
   if (openerFrame) {
     parentFrameKey = openerFrame.get('key')
   }
   return parentFrameKey
 }
 
-function getFrameKeysByDisplayIndex (frames) {
+function getFrameKeysByDisplayIndex (state) {
+  const frames = state.get('frames')
   let framesByDisplayIndex = [[], []]
   frames.forEach((frame) => {
     let key = frame.get('key')
@@ -133,14 +91,15 @@ function getFrameKeysByDisplayIndex (frames) {
   }, [])
 }
 
-function getFrameByDisplayIndex (windowState, i) {
-  let frames = getFrameKeysByDisplayIndex(windowState.get('frames'))
+function getFrameByDisplayIndex (state, i) {
+  let frames = getFrameKeysByDisplayIndex(state)
   let key = frames[i]
-  return getFrameByKey(windowState, key)
+  return getFrameByKey(state, key)
 }
 
-function getFrameByKey (windowState, key) {
-  return find(windowState, {key})
+function getFrameByKey (state, key) {
+  const index = getFrameIndex(state, key)
+  return state.getIn(['frames', index])
 }
 
 function isFrameSecure (frame) {
@@ -172,25 +131,29 @@ function getHistory (frame) {
   return (frame && frame.get('history')) || Immutable.fromJS([])
 }
 
-function isFrameKeyPinned (frames, key) {
+function isFrameKeyPinned (state, key) {
   if (typeof key !== 'number') {
     return false
   }
-  const frame = frames.find(matchFrame.bind(null, {key}))
+  const frame = getFrameByKey(state, key)
   return frame ? frame.get('pinnedLocation') : false
 }
 
-function getNonPinnedFrameCount (windowState) {
-  return windowState.get('frames').filter((frame) => !frame.get('pinnedLocation')).size
+function getNonPinnedFrameCount (state) {
+  return state.get('frames').filter((frame) => !frame.get('pinnedLocation')).size
 }
 
-function getFrameByTabId (windowState, tabId) {
-  return find(windowState, {tabId})
+function getFrameByTabId (state, tabId) {
+  return getFrameByIndex(state, getFramesInternalIndexByTabId(state, tabId))
 }
 
-function getActiveFrame (windowState) {
-  const activeFrameIndex = getActiveFrameIndex(windowState)
-  return windowState.get('frames').get(activeFrameIndex)
+function getIndexByTabId (state, tabId) {
+  return getFramesInternalIndexByTabId(state, tabId)
+}
+
+function getActiveFrame (state) {
+  const activeFrameIndex = getActiveFrameIndex(state)
+  return state.get('frames').get(activeFrameIndex)
 }
 
 // Returns the same as the active frame's location, but returns the requested
@@ -214,103 +177,41 @@ function getLastCommittedURL (frame) {
   return location
 }
 
-function setActiveFrameDisplayIndex (windowState, i) {
-  const frame = getFrameByDisplayIndex(windowState, i)
-  if (!frame) {
-    return windowState
-  }
-
-  return setActiveFrameKey(windowState, frame.get('key'))
+function getActiveFrameKey (state) {
+  return state.get('activeFrameKey')
 }
 
-function setActiveFrameIndex (windowState, i) {
-  const frame = getFrameByIndex(windowState, i)
-  if (!frame) {
-    return windowState
-  }
-
-  return setActiveFrameKey(windowState, frame.get('key'))
-}
-
-function setActiveFrameKey (windowState, activeFrameKey) {
-  return windowState.merge({
+function setActiveFrameKey (state, activeFrameKey) {
+  return state.merge({
     activeFrameKey: activeFrameKey,
     previewFrameKey: null
   })
 }
 
-function getNextFrame (windowState) {
-  const activeFrameIndex = getActiveFrameDisplayIndex(windowState)
-  const index = (activeFrameIndex + 1) % windowState.get('frames').size
-  return getFrameByDisplayIndex(windowState, index)
+function getNextFrame (state) {
+  const activeFrameIndex = findDisplayIndexForFrameKey(state, getActiveFrameKey(state))
+  const index = (activeFrameIndex + 1) % state.get('frames').size
+  return getFrameByDisplayIndex(state, index)
 }
 
-function getPreviousFrame (windowState) {
-  const activeFrameIndex = getActiveFrameDisplayIndex(windowState)
-  const index = (windowState.get('frames').size + activeFrameIndex - 1) % windowState.get('frames').size
-  return getFrameByDisplayIndex(windowState, index)
-}
-
-/**
- * @param {Object} windowState
- * @param {Object} frameProps
- * @param {String} propName
- * @return {Object} the value of the propName associated with frameProps
- */
-function getFramePropValue (windowState, frameProps, propName) {
-  return windowState.getIn(getFramePropPath(windowState, frameProps, propName))
-}
-
-/**
- * @param {Object} windowState
- * @param {Object} frameProps
- * @param {String} propName
- * @return {Object} the path of the propName in windowState
- */
-function getFramePropPath (windowState, frameProps, propName) {
-  return ['frames', getFramePropsIndex(windowState.get('frames'), frameProps), propName]
-}
-
-/**
- * Obtains the index for the specified frame key
- */
-function findIndexForFrameKey (frames, key) {
-  return frames.findIndex(matchFrame.bind(null, {key}))
+function getPreviousFrame (state) {
+  const activeFrameIndex = findDisplayIndexForFrameKey(state, getActiveFrameKey(state))
+  const index = (state.get('frames').size + activeFrameIndex - 1) % state.get('frames').size
+  return getFrameByDisplayIndex(state, index)
 }
 
 /**
  * Obtains the display index for the specified frame key
  */
-function findDisplayIndexForFrameKey (frames, key) {
-  return getFrameKeysByDisplayIndex(frames).findIndex((displayKey) => displayKey === key)
-}
-
-/**
- * Obtains the frameProps index in the frames
- */
-function getFramePropsIndex (frames, frameProps) {
-  if (!frameProps) {
-    return -1
-  }
-  let queryInfo = frameProps.toJS ? frameProps.toJS() : frameProps
-  if (queryInfo.tabId) {
-    queryInfo = {
-      tabId: queryInfo.tabId
-    }
-  }
-  if (queryInfo.key) {
-    queryInfo = {
-      key: queryInfo.key
-    }
-  }
-  return frames.findIndex(matchFrame.bind(null, queryInfo))
+function findDisplayIndexForFrameKey (state, key) {
+  return getFrameKeysByDisplayIndex(state).findIndex((displayKey) => displayKey === key)
 }
 
 /**
  * Find frame that was accessed last
  */
-function getFrameByLastAccessedTime (frames) {
-  const frameProps = frames.toJS()
+function getFrameByLastAccessedTime (state) {
+  const frameProps = state.get('frames').toJS()
     .reduce((pre, cur) => {
       return ([undefined, null].includes(cur.pinnedLocation) &&
         cur.lastAccessedTime &&
@@ -320,7 +221,7 @@ function getFrameByLastAccessedTime (frames) {
       lastAccessedTime: 0
     })
 
-  return (frameProps.lastAccessedTime === 0) ? -1 : getFramePropsIndex(frames, frameProps)
+  return (frameProps.lastAccessedTime === 0) ? -1 : getFrameIndex(state, frameProps.get('key'))
 }
 
 /**
@@ -335,7 +236,7 @@ function getFrameByLastAccessedTime (frames) {
  * It should go like so:
  * G g1 g1.1 g2 g3 g4
  */
-function isAncestorFrameKey (frames, frame, parentFrameKey) {
+function isAncestorFrameKey (state, frame, parentFrameKey) {
   if (!frame || !frame.get('parentFrameKey')) {
     return false
   }
@@ -347,12 +248,12 @@ function isAncestorFrameKey (frames, frame, parentFrameKey) {
   // So there is a parentFrameKey but it isn't the specified one.
   // Check recursively for each of the parentFrame's ancestors to see
   // if we have a match.
-  const parentFrameIndex = findIndexForFrameKey(frames, frame.get('parentFrameKey'))
-  const parentFrame = frames.get(parentFrameIndex)
+  const parentFrameIndex = getFrameIndex(state, frame.get('parentFrameKey'))
+  const parentFrame = state.getIn(['frames', parentFrameIndex])
   if (parentFrameIndex === -1 || !parentFrame.get('parentFrameKey')) {
     return false
   }
-  return isAncestorFrameKey(frames, parentFrame, parentFrameKey)
+  return isAncestorFrameKey(state, parentFrame, parentFrameKey)
 }
 
 function getPartitionNumber (partition) {
@@ -395,8 +296,8 @@ const frameOptsFromFrame = (frame) => {
  * Adds a frame specified by frameOpts and newKey and sets the activeFrameKey
  * @return Immutable top level application state ready to merge back in
  */
-function addFrame (windowState, frameOpts, newKey, partitionNumber, activeFrameKey, insertionIndex) {
-  const frames = windowState.get('frames')
+function addFrame (state, frameOpts, newKey, partitionNumber, activeFrameKey, insertionIndex) {
+  const frames = state.get('frames')
   const url = frameOpts.location || config.defaultUrl
 
   // delayedLoadUrl is used as a placeholder when the new frame is created
@@ -414,7 +315,7 @@ function addFrame (windowState, frameOpts, newKey, partitionNumber, activeFrameK
   // calculating it here.
   let parentFrameKey = frameOpts.parentFrameKey
   if (frameOpts.openerTabId) {
-    parentFrameKey = getFrameKeyByTabId(windowState, frameOpts.openerTabId)
+    parentFrameKey = getFrameKeyByTabId(state, frameOpts.openerTabId)
   }
 
   const frame = Immutable.fromJS(Object.assign({
@@ -470,7 +371,7 @@ function addFrame (windowState, frameOpts, newKey, partitionNumber, activeFrameK
  * Removes a frame specified by frameProps
  * @return Immutable top level application state ready to merge back in
  */
-function removeFrame (frames, closedFrames, frameProps, activeFrameKey, framePropsIndex, closeAction) {
+function removeFrame (state, frameProps, activeFrameKey, framePropsIndex, closeAction) {
   function getNewActiveFrame (activeFrameIndex) {
     // Go to the next frame if it exists.
     let index = activeFrameIndex
@@ -491,13 +392,22 @@ function removeFrame (frames, closedFrames, frameProps, activeFrameKey, framePro
         return prevFrame.get('key')
       }
     }
+
     // Fall back on the original logic.
-    return Math.max(
-      newFrames.get(activeFrameIndex)
-      ? newFrames.get(activeFrameIndex).get('key')
-      : newFrames.get(activeFrameIndex - 1).get('key'),
-    0)
+    nextFrame = newFrames.get(activeFrameIndex)
+    if (!nextFrame) {
+      nextFrame = newFrames.get(activeFrameIndex - 1)
+    }
+    if (!nextFrame) {
+      nextFrame = newFrames.get(0)
+    }
+    return nextFrame.get('key')
   }
+
+  const frames = state.get('frames')
+  let closedFrames = state.get('closedFrames')
+  const newFrames = frames.splice(framePropsIndex, 1)
+  let newActiveFrameKey = activeFrameKey
 
   if (!frameProps.get('isPrivate') && frameProps.get('location') !== 'about:newtab') {
     frameProps = frameProps.set('isFullScreen', false)
@@ -510,9 +420,6 @@ function removeFrame (frames, closedFrames, frameProps, activeFrameKey, framePro
     }
   }
 
-  const newFrames = frames.splice(framePropsIndex, 1)
-  let newActiveFrameKey = activeFrameKey
-
   // If the frame being removed IS ACTIVE
   let isActiveFrameBeingRemoved = frameProps.get('key') === activeFrameKey
   if (isActiveFrameBeingRemoved && newFrames.size > 0) {
@@ -520,7 +427,7 @@ function removeFrame (frames, closedFrames, frameProps, activeFrameKey, framePro
 
     switch (closeAction) {
       case tabCloseAction.LAST_ACTIVE:
-        const lastActive = getFrameByLastAccessedTime(newFrames)
+        const lastActive = getFrameByLastAccessedTime(state)
         activeFrameIndex = (lastActive > -1) ? lastActive : frames.count() - 1
         break
       case tabCloseAction.NEXT:
@@ -528,8 +435,8 @@ function removeFrame (frames, closedFrames, frameProps, activeFrameKey, framePro
         break
       // Default is a parent tab
       default:
-        let parentFrameIndex = findIndexForFrameKey(frames, frameProps.get('parentFrameKey'))
-        activeFrameIndex = (parentFrameIndex === -1) ? findIndexForFrameKey(frames, activeFrameKey) : parentFrameIndex
+        let parentFrameIndex = getFrameIndex(state, frameProps.get('parentFrameKey'))
+        activeFrameIndex = (parentFrameIndex === -1) ? getFrameIndex(state, activeFrameKey) : parentFrameIndex
         break
     }
 
@@ -545,8 +452,8 @@ function removeFrame (frames, closedFrames, frameProps, activeFrameKey, framePro
   }
 }
 
-function getFrameTabPageIndex (frames, frameProps, tabsPerTabPage) {
-  const index = getFramePropsIndex(frames, frameProps)
+function getFrameTabPageIndex (state, frameProps, tabsPerTabPage) {
+  const index = getFrameIndex(state, frameProps.get('key'))
   if (index === -1) {
     return -1
   }
@@ -584,15 +491,43 @@ function getTotalBlocks (frame) {
     : ((blocked > 99) ? '99+' : blocked)
 }
 
-const frameStatePath = (windowState, key) =>
-  ['frames', findIndexForFrameKey(windowState.get('frames'), key)]
+const frameStatePath = (state, frameKey) =>
+  ['frames', getFrameIndex(state, frameKey)]
 
-const activeFrameStatePath = (windowState) => frameStatePath(windowState, windowState.get('activeFrameKey'))
+const activeFrameStatePath = (state) => frameStatePath(state, getActiveFrameKey(state))
 
-const frameStatePathForFrame = (windowState, frameProps) =>
-  ['frames', getFramePropsIndex(windowState.get('frames'), frameProps)]
+const frameStatePathForFrame = (state, frameProps) =>
+  ['frames', frameStatePath(state, frameProps.get('key'))]
+
+const getFramesInternalIndex = (state, frameKey) => {
+  const index = state.getIn(['framesInternal', 'index', frameKey])
+  return index == null ? -1 : index
+}
+
+const getFramesInternalIndexByTabId = (state, tabId) => {
+  const index = state.getIn(['framesInternal', 'tabIndex', tabId])
+  return index == null ? -1 : index
+}
+
+const updateFramesInternalIndex = (state, fromIndex) => {
+  let framesInternal = state.get('framesInternal') || Immutable.Map()
+  state.get('frames').slice(fromIndex).forEach((frame, idx) => {
+    const realIndex = idx + fromIndex
+    if (frame.get('key')) {
+      framesInternal = framesInternal.setIn(['index', frame.get('key')], realIndex)
+    }
+    if (frame.get('tabId') !== -1) {
+      framesInternal = framesInternal.setIn(['tabIndex', frame.get('tabId')], realIndex)
+    }
+
+    appActions.tabIndexChanged(frame.get('tabId'), realIndex)
+  })
+
+  return state.set('framesInternal', framesInternal)
+}
 
 module.exports = {
+  updateFramesInternalIndex,
   query,
   find,
   isAncestorFrameKey,
@@ -611,29 +546,19 @@ module.exports = {
   getPinnedFrames,
   getNonPinnedFrames,
   getFrameIndex,
-  getFrameDisplayIndex,
-  restoreFramePropsFromTab,
-  getFramePropsFromTab,
   getActiveFrameIndex,
-  getActiveFrameDisplayIndex,
   getActiveFrameTabId,
   getFrameByIndex,
   getFrameByDisplayIndex,
   getFrameByKey,
   getFrameByTabId,
+  getIndexByTabId,
   getPartitionNumber,
   getActiveFrame,
-  setActiveFrameDisplayIndex,
-  setActiveFrameIndex,
   setActiveFrameKey,
   getNextFrame,
   getPreviousFrame,
-  getFramePropValue,
-  getFramePropPath,
-  findIndexForFrameKey,
   findDisplayIndexForFrameKey,
-  findFrameInList,
-  getFramePropsIndex,
   getFrameKeysByDisplayIndex,
   getPartition,
   getPartitionFromNumber,
