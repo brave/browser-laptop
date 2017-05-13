@@ -7,7 +7,7 @@
 const windowConstants = require('../../../js/constants/windowConstants')
 const {aboutUrls, isNavigatableAboutPage, isSourceAboutUrl, isUrl, getSourceAboutUrl, getSourceMagnetUrl} = require('../../../js/lib/appUrlUtil')
 const {isURL, isPotentialPhishingUrl, getUrlFromInput} = require('../../../js/lib/urlutil')
-const {getFrameByKey, getFrameKeyByTabId, activeFrameStatePath, frameStatePath, frameStatePathForFrame, getActiveFrame, getFrameByTabId} = require('../../../js/state/frameStateUtil')
+const {getFrameByKey, getFrameKeyByTabId, activeFrameStatePath, frameStatePath, getActiveFrame, getFrameByTabId} = require('../../../js/state/frameStateUtil')
 const getSetting = require('../../../js/settings').getSetting
 const {isBookmark, isDefaultEntry, isHistoryEntry} = require('../../../js/state/siteUtil')
 const fetchSearchSuggestions = require('../fetchSearchSuggestions')
@@ -348,10 +348,10 @@ const navigationAborted = (state, action) => {
   if (frame) {
     let location = action.location || frame.get('provisionalLocation')
     if (location) {
-      const frameStatePath = frameStatePathForFrame(state, frame)
+      const framePath = frameStatePath(state, frame.get('key'))
       location = getLocation(location)
-      state = updateNavBarInput(state, location, frameStatePath)
-      state = state.mergeIn(frameStatePath, {
+      state = updateNavBarInput(state, location, framePath)
+      state = state.mergeIn(framePath, {
         location
       })
     }
