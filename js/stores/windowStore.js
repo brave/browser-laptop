@@ -11,7 +11,6 @@ const config = require('../constants/config')
 const settings = require('../constants/settings')
 const Immutable = require('immutable')
 const frameStateUtil = require('../state/frameStateUtil')
-const {activeFrameStatePath, frameStatePathForFrame} = frameStateUtil
 const ipc = require('electron').ipcRenderer
 const messages = require('../constants/messages')
 const debounce = require('../lib/debounce')
@@ -257,7 +256,7 @@ const doAction = (action) => {
       currentKey = frameStateUtil.getFrames(windowState).reduce((previousVal, frame) => Math.max(previousVal, frame.get('key')), 0)
       const activeFrame = frameStateUtil.getActiveFrame(windowState)
       if (activeFrame && activeFrame.get('location') !== 'about:newtab') {
-        focusWebview(activeFrameStatePath(windowState))
+        focusWebview(frameStateUtil.activeFrameStatePath(windowState))
       }
       // We should not emit here because the Window already know about the change on startup.
       return
@@ -315,7 +314,7 @@ const doAction = (action) => {
         // For about:newtab we want to have the urlbar focused, not the new frame.
         // Otherwise we want to focus the new tab when it is a new frame in the foreground.
         if (action.location !== getTargetAboutUrl('about:newtab')) {
-          focusWebview(activeFrameStatePath(windowState))
+          focusWebview(frameStateUtil.activeFrameStatePath(windowState))
         }
         break
       }
@@ -398,21 +397,24 @@ const doAction = (action) => {
         break
       }
     case windowConstants.WINDOW_SET_LINK_HOVER_PREVIEW:
-      windowState = windowState.mergeIn(activeFrameStatePath(windowState), {
+      windowState = windowState.mergeIn(frameStateUtil.activeFrameStatePath(windowState), {
         hrefPreview: action.href,
         showOnRight: action.showOnRight
       })
       break
     case windowConstants.WINDOW_SET_THEME_COLOR:
-      if (action.themeColor !== undefined) {
-        windowState = windowState.setIn(frameStatePathForFrame(windowState, action.frameProps).concat(['themeColor']), action.themeColor)
+      {
+        const frameKey = action.frameProps.get('key')
+        if (action.themeColor !== undefined) {
+          windowState = windowState.setIn(frameStateUtil.frameStatePath(windowState, frameKey).concat(['themeColor']), action.themeColor)
+        }
+        if (action.computedThemeColor !== undefined) {
+          windowState = windowState.setIn(frameStateUtil.frameStatePath(windowState, frameKey).concat(['computedThemeColor']), action.computedThemeColor)
+        }
+        break
       }
-      if (action.computedThemeColor !== undefined) {
-        windowState = windowState.setIn(frameStatePathForFrame(windowState, action.frameProps).concat(['computedThemeColor']), action.computedThemeColor)
-      }
-      break
     case windowConstants.WINDOW_FRAME_SHORTCUT_CHANGED:
-      const framePath = action.frameProps ? ['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key'))] : activeFrameStatePath(windowState)
+      const framePath = action.frameProps ? ['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key'))] : frameStateUtil.activeFrameStatePath(windowState)
       windowState = windowState.mergeIn(framePath, {
         activeShortcut: action.activeShortcut,
         activeShortcutDetails: action.activeShortcutDetails
@@ -536,7 +538,7 @@ const doAction = (action) => {
       }
       break
     case windowConstants.WINDOW_WIDEVINE_SITE_ACCESSED_WITHOUT_INSTALL:
-      const activeLocation = windowState.getIn(activeFrameStatePath(windowState).concat(['location']))
+      const activeLocation = windowState.getIn(frameStateUtil.activeFrameStatePath(windowState).concat(['location']))
       windowState = windowState.set('widevinePanelDetail', Immutable.Map({
         alsoAddRememberSiteSetting: true,
         location: activeLocation,
@@ -570,16 +572,18 @@ const doAction = (action) => {
       windowState = windowState.setIn(['ui', 'releaseNotes', 'isVisible'], action.isVisible)
       break
     case windowConstants.WINDOW_SET_SECURITY_STATE:
-      let path = frameStatePathForFrame(windowState, action.frameProps)
-      if (action.securityState.secure !== undefined) {
-        windowState = windowState.setIn(path.concat(['security', 'isSecure']),
-                                        action.securityState.secure)
+      {
+        const path = frameStateUtil.frameStatePath(windowState, action.frameProps.get('key'))
+        if (action.securityState.secure !== undefined) {
+          windowState = windowState.setIn(path.concat(['security', 'isSecure']),
+            action.securityState.secure)
+        }
+        if (action.securityState.runInsecureContent !== undefined) {
+          windowState = windowState.setIn(path.concat(['security', 'runInsecureContent']),
+            action.securityState.runInsecureContent)
+        }
+        break
       }
-      if (action.securityState.runInsecureContent !== undefined) {
-        windowState = windowState.setIn(path.concat(['security', 'runInsecureContent']),
-                                        action.securityState.runInsecureContent)
-      }
-      break
     case windowConstants.WINDOW_SET_BLOCKED_BY:
       const blockedByPath = ['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key')), action.blockType, 'blocked']
       let blockedBy = windowState.getIn(blockedByPath) || new Immutable.List()
@@ -766,7 +770,7 @@ frameShortcuts.forEach((shortcut) => {
     if (shortcut === 'toggle-dev-tools') {
       appActions.toggleDevTools(frameStateUtil.getActiveFrameTabId(windowState))
     } else {
-      windowState = windowState.mergeIn(activeFrameStatePath(windowState), {
+      windowState = windowState.mergeIn(frameStateUtil.activeFrameStatePath(windowState), {
         activeShortcut: shortcut,
         activeShortcutDetails: args
       })

@@ -221,7 +221,7 @@ function getFrameByLastAccessedTime (state) {
       lastAccessedTime: 0
     })
 
-  return (frameProps.lastAccessedTime === 0) ? -1 : getFrameIndex(state, frameProps.get('key'))
+  return (frameProps.lastAccessedTime === 0) ? -1 : getFrameIndex(state, frameProps.key)
 }
 
 /**
@@ -453,6 +453,7 @@ function removeFrame (state, frameProps, activeFrameKey, framePropsIndex, closeA
 }
 
 function getFrameTabPageIndex (state, frameProps, tabsPerTabPage) {
+  frameProps = makeImmutable(frameProps)
   const index = getFrameIndex(state, frameProps.get('key'))
   if (index === -1) {
     return -1
@@ -496,16 +497,19 @@ const frameStatePath = (state, frameKey) =>
 
 const activeFrameStatePath = (state) => frameStatePath(state, getActiveFrameKey(state))
 
-const frameStatePathForFrame = (state, frameProps) =>
-  ['frames', frameStatePath(state, frameProps.get('key'))]
-
 const getFramesInternalIndex = (state, frameKey) => {
-  const index = state.getIn(['framesInternal', 'index', frameKey])
+  if (frameKey == null) return -1
+
+  const index = state.getIn(['framesInternal', 'index', frameKey]) ||
+    state.getIn(['framesInternal', 'index', frameKey.toString()])
   return index == null ? -1 : index
 }
 
 const getFramesInternalIndexByTabId = (state, tabId) => {
-  const index = state.getIn(['framesInternal', 'tabIndex', tabId])
+  if (tabId == null) return -1
+
+  const index = state.getIn(['framesInternal', 'tabIndex', tabId]) ||
+    state.getIn(['framesInternal', 'tabIndex', tabId.toString()])
   return index == null ? -1 : index
 }
 
@@ -578,7 +582,6 @@ module.exports = {
   getFrameTabPageIndex,
   frameStatePath,
   activeFrameStatePath,
-  frameStatePathForFrame,
   getLastCommittedURL,
   getFrameByLastAccessedTime,
   onFindBarHide,

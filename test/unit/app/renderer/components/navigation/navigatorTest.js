@@ -39,6 +39,11 @@ const appStoreRenderer = Immutable.fromJS({
     canGoForward: true,
     windowId: 1
   }],
+  tabsInternal: {
+    index: {
+      1: 0
+    }
+  },
   windows: []
 })
 

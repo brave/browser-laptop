@@ -94,45 +94,68 @@ describe('frameStateUtil', function () {
   })
 
   describe('removeFrame', function () {
-    let frames, closedFrames, frameProps, activeFrameKey, framePropsIndex
+    let state, frameProps, activeFrameKey, framePropsIndex
 
     beforeEach(function () {
-      frames = Immutable.fromJS([
-        { key: 2 },
-        { key: 3, parentFrameKey: 2 },
-        { key: 4 },
-        { key: 4, pinnedLocation: 'https://www.facebook.com/' },
-        { key: 5, pinnedLocation: 'https://twitter.com/' }
-      ])
-      closedFrames = Immutable.fromJS([{ key: 1 }])
       frameProps = Immutable.fromJS({ key: 2 })
       activeFrameKey = 2
       framePropsIndex = 0
+
+      state = Immutable.fromJS({
+        activeFrameKey: activeFrameKey,
+        frames: [
+          { key: 2 },
+          { key: 3, parentFrameKey: 2 },
+          { key: 4, pinnedLocation: 'https://www.facebook.com/' },
+          { key: 5, pinnedLocation: 'https://twitter.com/' }
+        ],
+        closedFrames: [
+          { key: 1 }
+        ],
+        framesInternal: {
+          index: {
+            2: 0,
+            3: 1,
+            4: 2,
+            5: 3
+          }
+        }
+      })
     })
 
     it('removed frame is added to `closedFrames`', function () {
-      const result = frameStateUtil.removeFrame(frames, closedFrames, frameProps, activeFrameKey, framePropsIndex)
+      const result = frameStateUtil.removeFrame(state, frameProps, activeFrameKey, framePropsIndex)
       const inClosedFrames = result.closedFrames.find((frame) => frame.get('key') === frameProps.get('key'))
       assert.equal(false, inClosedFrames === undefined)
     })
 
     it('sets isFullScreen=false for the removed frame', function () {
       frameProps = Immutable.fromJS({ key: 2, isFullScreen: true })
-      const result = frameStateUtil.removeFrame(frames, closedFrames, frameProps, activeFrameKey, framePropsIndex)
+      const result = frameStateUtil.removeFrame(state, frameProps, activeFrameKey, framePropsIndex)
       const inClosedFrames = result.closedFrames.find((frame) => frame.get('key') === frameProps.get('key'))
       assert.equal(false, inClosedFrames.get('isFullScreen'))
     })
 
     it('removed frame is NOT added to `closedFrames` if private', function () {
-      frames = Immutable.fromJS([{ key: 2 }])
+      let data = Immutable.fromJS({
+        frames: [
+          { key: 2 }
+        ],
+        framesInternal: {
+          index: {
+            2: 0
+          }
+        }
+      })
+      const newState = state.merge(data)
       frameProps = Immutable.fromJS({ isPrivate: true, key: 2 })
-      const result = frameStateUtil.removeFrame(frames, closedFrames, frameProps, activeFrameKey, framePropsIndex)
+      const result = frameStateUtil.removeFrame(newState, frameProps, activeFrameKey, framePropsIndex)
       const inClosedFrames = result.closedFrames.find((frame) => frame.get('key') === frameProps.get('key'))
       assert.equal(true, inClosedFrames === undefined)
     })
 
     it('removes the frame from `frames`', function () {
-      const result = frameStateUtil.removeFrame(frames, closedFrames, frameProps, activeFrameKey, framePropsIndex)
+      const result = frameStateUtil.removeFrame(state, frameProps, activeFrameKey, framePropsIndex)
       const inFrames = result.frames.find((frame) => frame.get('key') === frameProps.get('key'))
       assert.equal(true, inFrames === undefined)
     })
@@ -140,19 +163,29 @@ describe('frameStateUtil', function () {
     describe('does not change `activeFrameKey`', function () {
       it('if frame removed is not active and has parentFrameKey set', function () {
         frameProps = Immutable.fromJS({ key: 3 })
-        const result = frameStateUtil.removeFrame(frames, closedFrames, frameProps, activeFrameKey, framePropsIndex)
+        const result = frameStateUtil.removeFrame(state, frameProps, activeFrameKey, framePropsIndex)
         assert.equal(activeFrameKey, result.activeFrameKey)
       })
 
       it('if frame removed is not active and does NOT have parentFrameKey set', function () {
         frameProps = Immutable.fromJS({ key: 4 })
-        const result = frameStateUtil.removeFrame(frames, closedFrames, frameProps, activeFrameKey, framePropsIndex)
+        const result = frameStateUtil.removeFrame(state, frameProps, activeFrameKey, framePropsIndex)
         assert.equal(activeFrameKey, result.activeFrameKey)
       })
 
       it('if there are no frames left', function () {
-        frames = Immutable.fromJS([{ key: 2 }])
-        const result = frameStateUtil.removeFrame(frames, closedFrames, frameProps, activeFrameKey, framePropsIndex)
+        let data = Immutable.fromJS({
+          frames: [
+            { key: 2 }
+          ],
+          framesInternal: {
+            index: {
+              2: 0
+            }
+          }
+        })
+        const newState = state.merge(data)
+        const result = frameStateUtil.removeFrame(newState, frameProps, activeFrameKey, framePropsIndex)
         assert.equal(activeFrameKey, result.activeFrameKey)
       })
     })
@@ -160,22 +193,34 @@ describe('frameStateUtil', function () {
     describe('when active frame is removed', function () {
       describe('returns the next *non-pinned* active frame key', function () {
         beforeEach(function () {
-          frames = Immutable.fromJS([
-            {key: 2, lastAccessedTime: 1484075990},
-            {key: 3, pinnedLocation: 'https://www.facebook.com/', lastAccessedTime: 1484075999},
-            {key: 4, parentFrameKey: 3, lastAccessedTime: 148407595},
-            {key: 5, lastAccessedTime: 1484075960},
-            {key: 6, lastAccessedTime: 1484075950}
-          ])
           activeFrameKey = 4
           frameProps = Immutable.fromJS({key: 4})
           framePropsIndex = 2
+
+          state = Immutable.fromJS({
+            activeFrameKey: activeFrameKey,
+            frames: [
+              {key: 2, lastAccessedTime: 1484075990},
+              {key: 3, pinnedLocation: 'https://www.facebook.com/', lastAccessedTime: 1484075999},
+              {key: 4, parentFrameKey: 3, lastAccessedTime: 148407595},
+              {key: 5, lastAccessedTime: 1484075960},
+              {key: 6, lastAccessedTime: 1484075950}
+            ],
+            closedFrames: [],
+            framesInternal: {
+              index: {
+                2: 0,
+                3: 1,
+                4: 2,
+                5: 3,
+                6: 4
+              }
+            }
+          })
         })
 
         it('parent tab action', function () {
-          const result = frameStateUtil.removeFrame(
-            frames,
-            closedFrames,
+          const result = frameStateUtil.removeFrame(state,
             frameProps,
             activeFrameKey,
             framePropsIndex
@@ -184,9 +229,7 @@ describe('frameStateUtil', function () {
         })
 
         it('next tab action', function () {
-          const result = frameStateUtil.removeFrame(
-            frames,
-            closedFrames,
+          const result = frameStateUtil.removeFrame(state,
             frameProps,
             activeFrameKey,
             framePropsIndex,
@@ -196,9 +239,7 @@ describe('frameStateUtil', function () {
         })
 
         it('last active tab action', function () {
-          const result = frameStateUtil.removeFrame(
-            frames,
-            closedFrames,
+          const result = frameStateUtil.removeFrame(state,
             frameProps,
             activeFrameKey,
             framePropsIndex,
@@ -209,12 +250,6 @@ describe('frameStateUtil', function () {
       })
 
       it('returns the previous *non-pinned* frame key (if none found for next and no parent association)', function () {
-        frames = Immutable.fromJS([
-          { key: 2 },
-          { key: 3 },
-          { key: 4, pinnedLocation: 'https://www.facebook.com/' },
-          { key: 5, pinnedLocation: 'https://twitter.com/' }
-        ])
         frameProps = Immutable.fromJS({
           isFullScreen: false,
           isPrivate: false,
@@ -222,28 +257,70 @@ describe('frameStateUtil', function () {
         })
         activeFrameKey = 3
         framePropsIndex = 1
-        const result = frameStateUtil.removeFrame(frames, closedFrames, frameProps, activeFrameKey, framePropsIndex)
+
+        state = Immutable.fromJS({
+          activeFrameKey: activeFrameKey,
+          frames: [
+            { key: 2 },
+            { key: 3 },
+            { key: 4, pinnedLocation: 'https://www.facebook.com/' },
+            { key: 5, pinnedLocation: 'https://twitter.com/' }
+          ],
+          closedFrames: [],
+          framesInternal: {
+            index: {
+              2: 0,
+              3: 1,
+              4: 2,
+              5: 3
+            }
+          }
+        })
+
+        const result = frameStateUtil.removeFrame(state, frameProps, activeFrameKey, framePropsIndex)
         assert.equal(2, result.activeFrameKey)
       })
 
       describe('when only pinned tabs remaining', function () {
         it('defaults to next index if there are tabs to right', function () {
-          frames = Immutable.fromJS([
-            { key: 2 },
-            { pinnedLocation: 'https://www.facebook.com/', key: 4 }
-          ])
           framePropsIndex = 0
-          const result = frameStateUtil.removeFrame(frames, closedFrames, frameProps, activeFrameKey, framePropsIndex)
+          state = Immutable.fromJS({
+            activeFrameKey: activeFrameKey,
+            frames: [
+              { key: 2 },
+              { key: 4, pinnedLocation: 'https://www.facebook.com/' }
+            ],
+            closedFrames: [],
+            framesInternal: {
+              index: {
+                2: 0,
+                4: 1
+              }
+            }
+          })
+
+          const result = frameStateUtil.removeFrame(state, frameProps, activeFrameKey, framePropsIndex)
           assert.equal(4, result.activeFrameKey)
         })
 
         it('defaults to previous if no tabs to right', function () {
-          frames = Immutable.fromJS([
-            { pinnedLocation: 'https://www.facebook.com/', key: 6 },
-            { key: 2 }
-          ])
           framePropsIndex = 1
-          const result = frameStateUtil.removeFrame(frames, closedFrames, frameProps, activeFrameKey, framePropsIndex)
+          state = Immutable.fromJS({
+            activeFrameKey: activeFrameKey,
+            frames: [
+              { key: 6, pinnedLocation: 'https://www.facebook.com/' },
+              { key: 2 }
+            ],
+            closedFrames: [],
+            framesInternal: {
+              index: {
+                6: 0,
+                2: 1
+              }
+            }
+          })
+
+          const result = frameStateUtil.removeFrame(state, frameProps, activeFrameKey, framePropsIndex)
           assert.equal(6, result.activeFrameKey)
         })
       })
@@ -266,39 +343,67 @@ describe('frameStateUtil', function () {
   })
 
   describe('getFrameByLastAccessedTime', function () {
-    let framesWithLastAccessedTime, framesWithoutLastAccessedTime, framesWithNullifiedLastAccessedTime
+    let stateWithLastAccessedTime, stateWithoutLastAccessedTime, stateWithNullifiedLastAccessedTime
 
     beforeEach(function () {
-      framesWithLastAccessedTime = Immutable.fromJS([
-        { key: 2, lastAccessedTime: null },
-        { key: 3, lastAccessedTime: 1488184050731 },
-        { key: 4, lastAccessedTime: 1488184050711 },
-        { key: 5 }
-      ])
-      framesWithoutLastAccessedTime = Immutable.fromJS([
-        { key: 2 },
-        { key: 3 },
-        { key: 4 }
-      ])
-      framesWithNullifiedLastAccessedTime = Immutable.fromJS([
-        { key: 2, lastAccessedTime: null },
-        { key: 3, lastAccessedTime: null },
-        { key: 4, lastAccessedTime: null }
-      ])
+      stateWithLastAccessedTime = Immutable.fromJS({
+        frames: [
+          { key: 2, lastAccessedTime: null },
+          { key: 3, lastAccessedTime: 1488184050731 },
+          { key: 4, lastAccessedTime: 1488184050711 },
+          { key: 5 }
+        ],
+        framesInternal: {
+          index: {
+            2: 0,
+            3: 1,
+            4: 2,
+            5: 3
+          }
+        }
+      })
+      stateWithoutLastAccessedTime = Immutable.fromJS({
+        frames: [
+          { key: 2 },
+          { key: 3 },
+          { key: 4 }
+        ],
+        framesInternal: {
+          index: {
+            2: 0,
+            3: 1,
+            4: 2
+          }
+        }
+      })
+      stateWithNullifiedLastAccessedTime = Immutable.fromJS({
+        frames: [
+          { key: 2, lastAccessedTime: null },
+          { key: 3, lastAccessedTime: null },
+          { key: 4, lastAccessedTime: null }
+        ],
+        framesInternal: {
+          index: {
+            2: 0,
+            3: 1,
+            4: 2
+          }
+        }
+      })
     })
 
     it('gets correct frame by last accessed time', function () {
-      const result = frameStateUtil.getFrameByLastAccessedTime(framesWithLastAccessedTime)
+      const result = frameStateUtil.getFrameByLastAccessedTime(stateWithLastAccessedTime)
       assert.equal(1, result)
     })
 
     it('returns -1 for frames without last accessed time', function () {
-      const result = frameStateUtil.getFrameByLastAccessedTime(framesWithoutLastAccessedTime)
+      const result = frameStateUtil.getFrameByLastAccessedTime(stateWithoutLastAccessedTime)
       assert.equal(-1, result)
     })
 
     it('returns -1 for frames with nullified last accessed time', function () {
-      const result = frameStateUtil.getFrameByLastAccessedTime(framesWithNullifiedLastAccessedTime)
+      const result = frameStateUtil.getFrameByLastAccessedTime(stateWithNullifiedLastAccessedTime)
       assert.equal(-1, result)
     })
   })

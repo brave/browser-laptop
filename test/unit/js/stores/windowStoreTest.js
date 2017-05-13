@@ -76,10 +76,10 @@ describe('Window store unit tests', function () {
         // call doAction for WINDOW_WEBVIEW_LOAD_START
         doAction({
           actionType: windowConstants.WINDOW_WEBVIEW_LOAD_START,
-          frameProps: {
+          frameProps: Immutable.fromJS({
             tabId: 0,
             key: 0
-          }
+          })
         })
 
         // get the updated windowState (AFTER doAction runs)
