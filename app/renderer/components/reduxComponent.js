@@ -32,6 +32,7 @@ class ReduxComponent extends ImmutableComponent {
   }
 
   componentDidMount () {
+    this.dontCheck = false
     appStore.addChangeListener(this.checkForUpdates)
     windowStore.addChangeListener(this.checkForUpdates)
   }
