@@ -72,7 +72,7 @@ class UrlBar extends React.Component {
     if (this.urlInput) {
       this.setValue(location)
     }
-    appActions.urlBarTextChanged(getCurrentWindowId(), location)
+    appActions.urlBarTextChanged(getCurrentWindowId(), this.props.activeTabId, location)
   }
 
   /**
@@ -97,7 +97,7 @@ class UrlBar extends React.Component {
     if (this.props.autocompleteEnabled) {
       windowActions.urlBarAutocompleteEnabled(false)
     }
-    appActions.urlBarSuggestionsChanged(undefined, null)
+    appActions.urlBarSuggestionsChanged(getCurrentWindowId(), undefined, null)
     windowActions.setRenderUrlBarSuggestions(false)
   }
 
@@ -273,7 +273,7 @@ class UrlBar extends React.Component {
     if (e.target.value !== this.lastVal + this.lastSuffix) {
       e.preventDefault()
       // clear any current arrow or mouse hover selection
-      appActions.urlBarSuggestionsChanged(undefined, null)
+      appActions.urlBarSuggestionsChanged(getCurrentWindowId(), undefined, null)
       this.setValue(e.target.value)
     }
   }
@@ -295,7 +295,7 @@ class UrlBar extends React.Component {
       if (!this.keyPress) {
         // if this is a key press don't sent the update until keyUp so
         // showAutocompleteResult can handle the result
-        appActions.urlBarTextChanged(getCurrentWindowId(), val)
+        appActions.urlBarTextChanged(getCurrentWindowId(), this.props.activeTabId, val)
       }
     }
   }
@@ -311,9 +311,9 @@ class UrlBar extends React.Component {
       windowActions.setUrlBarSelected(false)
     }
     // clear any current arrow or mouse hover selection
-    appActions.urlBarSuggestionsChanged(undefined, null)
+    appActions.urlBarSuggestionsChanged(getCurrentWindowId(), undefined, null)
     this.keyPressed = false
-    appActions.urlBarTextChanged(getCurrentWindowId(), this.lastVal)
+    appActions.urlBarTextChanged(getCurrentWindowId(), this.props.activeTabId, this.lastVal)
   }
 
   select () {
@@ -368,7 +368,7 @@ class UrlBar extends React.Component {
         if (this.props.isFocused) {
           this.focus()
         }
-        appActions.urlBarSuggestionsChanged(undefined, null)
+        appActions.urlBarSuggestionsChanged(getCurrentWindowId(), undefined, null)
         windowActions.setRenderUrlBarSuggestions(false)
       } else if (this.props.location !== prevProps.location) {
         // This is a url nav change

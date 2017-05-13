@@ -12,6 +12,7 @@ const suggestionTypes = require('../../../../js/constants/suggestionTypes')
 const cx = require('../../../../js/lib/classSet')
 const locale = require('../../../../js/l10n')
 const {isForSecondaryAction} = require('../../../../js/lib/eventUtil')
+const {getCurrentWindowId} = require('../../currentWindow')
 
 class UrlBarSuggestions extends ImmutableComponent {
   constructor () {
@@ -28,7 +29,7 @@ class UrlBarSuggestions extends ImmutableComponent {
   }
 
   blur () {
-    appActions.urlBarSuggestionsChanged(null, null)
+    appActions.urlBarSuggestionsChanged(getCurrentWindowId(), null, null)
   }
 
   onSuggestionClicked (e) {
@@ -106,7 +107,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     if (newIndex === 0 || newIndex > suggestions.size) {
       newIndex = null
     }
-    appActions.urlBarSuggestionsChanged(suggestions, newIndex)
+    appActions.urlBarSuggestionsChanged(getCurrentWindowId(), suggestions, newIndex)
   }
 }
 

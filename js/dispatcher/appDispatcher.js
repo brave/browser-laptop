@@ -98,11 +98,15 @@ class AppDispatcher {
         const {getCurrentWindowId} = require('../../app/renderer/currentWindow')
         if (!payload.queryInfo || !payload.queryInfo.windowId || payload.queryInfo.windowId === getCurrentWindowId()) {
           this.dispatchToOwnRegisteredCallbacks(payload)
+          // We still want to tell the browser prcoess about app actions for payloads with a windowId
+          // specified for the current window, but we don't want the browser process to forward it back
+          // to us.
+          if (payload.queryInfo) {
+            payload.queryInfo.alreadyHandledByRenderer = payload.queryInfo.windowId === getCurrentWindowId()
+          }
         }
         cb()
-        if (!payload.queryInfo || !payload.queryInfo.windowId || payload.queryInfo.windowId !== getCurrentWindowId()) {
-          ipcCargo.push(payload)
-        }
+        ipcCargo.push(payload)
         return
       }
     }
@@ -176,7 +180,7 @@ if (process.type === 'browser') {
     let queryInfo = payload.queryInfo || payload.frameProps || (payload.queryInfo = {})
     queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
     let sender = event.sender
-    if (!sender.isDestroyed()) {
+    if (!queryInfo.alreadyHandledByRenderer && !sender.isDestroyed()) {
       const hostWebContents = sender.hostWebContents
       sender = hostWebContents || sender
       const win = require('electron').BrowserWindow.fromWebContents(sender)

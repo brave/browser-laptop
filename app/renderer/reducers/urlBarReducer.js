@@ -11,11 +11,7 @@ const {isURL, isPotentialPhishingUrl, getUrlFromInput} = require('../../../js/li
 const {getFrameByKey, getFrameKeyByTabId, activeFrameStatePath, frameStatePath, getActiveFrame, getFrameByTabId} = require('../../../js/state/frameStateUtil')
 const searchProviders = require('../../../js/data/searchProviders')
 const Immutable = require('immutable')
-const {generateNewSuggestionsList, generateNewSearchXHRResults} = require('../../common/lib/suggestion')
 const {navigateSiteClickHandler} = require('../suggestionClickHandlers')
-const {getCurrentWindowId} = require('../currentWindow')
-const appStoreRenderer = require('../../../js/stores/appStoreRenderer')
-
 const navigationBarState = require('../../common/state/navigationBarState')
 const tabState = require('../../common/state/tabState')
 
@@ -134,15 +130,6 @@ const setNavBarUserInput = (state, location) => {
   state = updateNavBarInput(state, location)
   const activeFrameProps = getActiveFrame(state)
   state = updateSearchEngineInfoFromInput(state, activeFrameProps)
-  const urlLocation = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'location']))
-  const windowId = getCurrentWindowId()
-  const tabId = activeFrameProps.get('tabId')
-  if (tabId) {
-    setImmediate(() => {
-      generateNewSearchXHRResults(appStoreRenderer.state, windowId, tabId, urlLocation)
-      generateNewSuggestionsList(appStoreRenderer.state, windowId, tabId, urlLocation)
-    })
-  }
   if (!location) {
     state = setRenderUrlBarSuggestions(state, false)
   }
@@ -280,10 +267,6 @@ const urlBarReducer = (state, action) => {
     case appConstants.APP_SEARCH_SUGGESTION_RESULTS_AVAILABLE:
       const frameKey = getFrameKeyByTabId(state, action.tabId)
       state = state.setIn(frameStatePath(state, frameKey).concat(['navbar', 'urlbar', 'suggestions', 'searchResults']), action.searchResults)
-      const urlLocation = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'location']))
-      setImmediate(() => {
-        generateNewSuggestionsList(appStoreRenderer.state, getCurrentWindowId(), action.tabId, urlLocation)
-      })
       break
     case windowConstants.WINDOW_URL_BAR_AUTOCOMPLETE_ENABLED:
       state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']), action.enabled)

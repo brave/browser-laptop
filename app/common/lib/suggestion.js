@@ -436,7 +436,7 @@ const generateNewSuggestionsList = (state, windowId, tabId, urlLocation) => {
   ]).then(([...suggestionsLists]) => {
     const appActions = require('../../../js/actions/appActions')
     // Flatten only 1 level deep for perf only, nested will be objects within arrrays
-    appActions.urlBarSuggestionsChanged(makeImmutable(suggestionsLists).flatten(1))
+    appActions.urlBarSuggestionsChanged(windowId, makeImmutable(suggestionsLists).flatten(1))
   })
 }
 

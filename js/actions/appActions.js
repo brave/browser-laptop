@@ -1342,12 +1342,16 @@ const appActions = {
   /**
    * Indicates that the urlbar text has changed, usually from user input
    *
-   * @param {string} location - The text to set as the new navbar URL input
+   * @param {number} windowId - The window ID the text is being changed inside of
+   * @param {number} tabId - The tab ID the text is being changed inside of
+   * @param {string} input - The text that was entered into the URL bar
    */
-  urlBarTextChanged: function (windowId, input) {
+  urlBarTextChanged: function (windowId, tabId, input) {
     dispatch({
       actionType: appConstants.APP_URL_BAR_TEXT_CHANGED,
       input,
+      tabId,
+      windowId,
       queryInfo: {
         windowId
       }
@@ -1365,6 +1369,7 @@ const appActions = {
     dispatch({
       actionType: appConstants.APP_SEARCH_SUGGESTION_RESULTS_AVAILABLE,
       tabId,
+      windowId,
       searchResults,
       queryInfo: {
         windowId
@@ -1375,14 +1380,19 @@ const appActions = {
   /**
    * Indicates URL bar suggestions and selected index.
    *
+   * @param {number} windowId - the window ID
    * @param {Object[]} suggestionList - The list of suggestions for the entered URL bar text. This can be generated from history, bookmarks, etc.
    * @param {number} selectedIndex - The index for the selected item (users can select items with down arrow on their keyboard)
    */
-  urlBarSuggestionsChanged: function (suggestionList, selectedIndex) {
+  urlBarSuggestionsChanged: function (windowId, suggestionList, selectedIndex) {
     dispatch({
       actionType: appConstants.APP_URL_BAR_SUGGESTIONS_CHANGED,
       suggestionList,
-      selectedIndex
+      selectedIndex,
+      windowId,
+      queryInfo: {
+        windowId
+      }
     })
   },
 

@@ -1057,13 +1057,17 @@ Delete legacy "never saved password" list
 
 
 
-### urlBarTextChanged(location) 
+### urlBarTextChanged(windowId, tabId, input) 
 
 Indicates that the urlbar text has changed, usually from user input
 
 **Parameters**
 
-**location**: `string`, The text to set as the new navbar URL input
+**windowId**: `number`, The window ID the text is being changed inside of
+
+**tabId**: `number`, The tab ID the text is being changed inside of
+
+**input**: `string`, The text that was entered into the URL bar
 
 
 
@@ -1080,11 +1084,13 @@ This is typically from a service like Duck Duck Go auto complete for the portion
 
 
 
-### urlBarSuggestionsChanged(suggestionList, selectedIndex) 
+### urlBarSuggestionsChanged(windowId, suggestionList, selectedIndex) 
 
 Indicates URL bar suggestions and selected index.
 
 **Parameters**
+
+**windowId**: `number`, the window ID
 
 **suggestionList**: `Array.&lt;Object&gt;`, The list of suggestions for the entered URL bar text. This can be generated from history, bookmarks, etc.
 
