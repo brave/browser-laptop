@@ -67,7 +67,7 @@ const addPageView = (url, tabId) => {
     url,
     tabId
   })
-  eventState = eventState.set('page_view', eventState.get('page_view').push(pageViewEvent))
+  eventState = eventState.set('page_view', eventState.get('page_view').slice(-100).push(pageViewEvent))
   lastActivePageUrl = url
 }
 
@@ -117,19 +117,19 @@ const doAction = (action) => {
       break
     case 'event-set-page-info':
       // retains all past pages, not really sure that's needed... [MTR]
-      eventState = eventState.set('page_info', eventState.get('page_info').push(action.pageInfo))
+      eventState = eventState.set('page_info', eventState.get('page_info').slice(-100).push(action.pageInfo))
       break
     case windowConstants.WINDOW_GOT_RESPONSE_DETAILS:
       // Only capture response for the page (not subresources, like images, JavaScript, etc)
-      if (action.details && action.details.get('resourceType') === 'mainFrame') {
-        const pageUrl = action.details.get('newURL')
+      if (action.details && action.details.resourceType === 'mainFrame') {
+        const pageUrl = action.details.newURL
 
         // create a page view event if this is a page load on the active tabId
         if (!lastActiveTabId || action.tabId === lastActiveTabId) {
           addPageView(pageUrl, action.tabId)
         }
 
-        const responseCode = action.details.get('httpResponseCode')
+        const responseCode = action.details.httpResponseCode
         if (isSourceAboutUrl(pageUrl) || !responseHasContent(responseCode)) {
           break
         }
@@ -140,7 +140,7 @@ const doAction = (action) => {
           tabId: action.tabId,
           details: action.details
         })
-        eventState = eventState.set('page_load', eventState.get('page_load').push(pageLoadEvent))
+        eventState = eventState.set('page_load', eventState.get('page_load').slice(-100).push(pageLoadEvent))
       }
       break
     default:
