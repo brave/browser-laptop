@@ -261,7 +261,7 @@ const createViewSubmenu = () => {
       accelerator: isDarwin ? 'Cmd+Alt+I' : 'Ctrl+Shift+I',
       click: function (item) {
         const win = BrowserWindow.getActiveWindow()
-        const activeTab = tabState.getActiveTabValue(appStore.getState(), win.id)
+        const activeTab = tabState.getActiveTab(appStore.getState(), win.id)
         appActions.toggleDevTools(activeTab.get('tabId'))
       }
     },
