@@ -40,7 +40,7 @@ const closeFrame = (state, action) => {
     index,
     getSetting(settings.TAB_CLOSE_ACTION)
   ))
-
+  state = frameStateUtil.deleteFrameInternalIndex(state, frameProps)
   state = frameStateUtil.updateFramesInternalIndex(state, index)
 
   // If we reach the limit of opened tabs per page while closing tabs, switch to

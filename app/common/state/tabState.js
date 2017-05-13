@@ -56,6 +56,15 @@ const matchTab = function (queryInfo, tab) {
   return !Object.keys(queryInfo).map((queryKey) => (tab.get(queryKey) === queryInfo[queryKey])).includes(false)
 }
 
+const deleteTabsInternalIndex = (state, tabValue) => {
+  const tabId = validateId('tabId', tabValue.get('tabId'))
+  if (tabId === tabState.TAB_ID_NONE) {
+    return state
+  }
+  state = state.deleteIn(['tabsInternal', tabId])
+  return state.deleteIn(['tabsInternal', tabId.toString()])
+}
+
 const updateTabsInternalIndex = (state, fromIndex) => {
   let tabsInternal = state.get('tabsInternal') || Immutable.Map()
   state.get('tabs').slice(fromIndex).forEach((tab, idx) => {
@@ -102,6 +111,11 @@ const tabState = {
     index = parseInt(index)
     assert.ok(index >= 0, 'index must be positive')
     state = validateState(state)
+    const tabValue = state.getIn(['tabs', index])
+    if (!tabValue) {
+      return state
+    }
+    state = deleteTabsInternalIndex(state, tabValue)
     state = state.set('tabs', state.get('tabs').delete(index))
     return updateTabsInternalIndex(state, index)
   },
