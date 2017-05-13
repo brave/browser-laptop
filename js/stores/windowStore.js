@@ -6,7 +6,6 @@ const AppDispatcher = require('../dispatcher/appDispatcher')
 const EventEmitter = require('events').EventEmitter
 const appActions = require('../actions/appActions')
 const appConstants = require('../constants/appConstants')
-const windowActions = require('../actions/windowActions')
 const windowConstants = require('../constants/windowConstants')
 const config = require('../constants/config')
 const settings = require('../constants/settings')
@@ -26,10 +25,6 @@ const Serializer = require('../dispatcher/serializer')
 const {updateTabPageIndex} = require('../../app/renderer/lib/tabUtil')
 const assert = require('assert')
 const contextMenuState = require('../../app/common/state/contextMenuState')
-const tabState = require('../../app/common/state/tabState')
-const appStoreRenderer = require('./appStoreRenderer')
-
-let previousTabs = new Immutable.List()
 
 let windowState = Immutable.fromJS({
   activeFrameKey: null,
@@ -103,7 +98,7 @@ const addToHistory = (frameProps) => {
   return history.slice(-10)
 }
 
-const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
+const newFrame = (state, frameOpts, openInForeground, insertionIndex, nextKey) => {
   if (frameOpts === undefined) {
     frameOpts = {}
   }
@@ -150,14 +145,14 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
   // calculating it here.
   let parentFrameKey = frameOpts.parentFrameKey
   if (frameOpts.openerTabId) {
-    parentFrameKey = frameStateUtil.getFrameKeyByTabId(windowState, frameOpts.openerTabId)
+    parentFrameKey = frameStateUtil.getFrameKeyByTabId(state, frameOpts.openerTabId)
   }
 
   // Find the closest index to the current frame's index which has
   // a different ancestor frame key.
-  const frames = frameStateUtil.getFrames(windowState)
+  const frames = frameStateUtil.getFrames(state)
   if (insertionIndex === undefined) {
-    insertionIndex = frameStateUtil.findIndexForFrameKey(frames, frameOpts.indexByFrameKey || parentFrameKey)
+    insertionIndex = frameStateUtil.getFrameIndex(state, frameOpts.indexByFrameKey || parentFrameKey)
     if (frameOpts.prependIndexByFrameKey === false) {
       insertionIndex++
     }
@@ -167,13 +162,13 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
     } else if (!frameOpts.indexByFrameKey) {
       while (insertionIndex < frames.size) {
         ++insertionIndex
-        if (!frameStateUtil.isAncestorFrameKey(frames, frames.get(insertionIndex), parentFrameKey)) {
+        if (!frameStateUtil.isAncestorFrameKey(state, frames.get(insertionIndex), parentFrameKey)) {
           break
         }
       }
     }
   }
-  if (frameStateUtil.isFrameKeyPinned(frames, parentFrameKey)) {
+  if (frameStateUtil.isFrameKeyPinned(state, parentFrameKey)) {
     insertionIndex = 0
   }
 
@@ -181,15 +176,19 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
     nextKey = incrementNextKey()
   }
 
-  windowState = windowState.merge(
+  state = state.merge(
     frameStateUtil.addFrame(
-      windowState, frameOpts,
-      nextKey, frameOpts.partitionNumber, openInForeground || typeof windowState.get('activeFrameKey') !== 'number' ? nextKey : windowState.get('activeFrameKey'), insertionIndex))
+      state, frameOpts,
+      nextKey, frameOpts.partitionNumber, openInForeground || typeof state.get('activeFrameKey') !== 'number' ? nextKey : state.get('activeFrameKey'), insertionIndex))
+
+  state = frameStateUtil.updateFramesInternalIndex(state, insertionIndex)
 
   if (openInForeground) {
-    const activeFrame = frameStateUtil.getActiveFrame(windowState)
-    windowState = updateTabPageIndex(windowState, activeFrame)
+    const activeFrame = frameStateUtil.getActiveFrame(state)
+    state = updateTabPageIndex(state, activeFrame)
   }
+
+  return state
 }
 
 const frameTabIdChanged = (state, action) => {
@@ -201,15 +200,10 @@ const frameTabIdChanged = (state, action) => {
   }
 
   let newFrameProps = new Immutable.Map()
-  // TODO(bridiver) - use for pinned tab transfer
-  // if (oldTabId != null && oldTabId !== -1) {
-  //   let tab = appStoreRenderer.state.get('tabs').find((tab) => tab.get('tabId') === newTabId)
-  //   if (tab.get('pinned')) {
-  //     newFrameProps = frameStateUtil.restoreFramePropsFromTab(tab)
-  //   }
-  // }
   newFrameProps = newFrameProps.set('tabId', newTabId)
-  return state.mergeIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(state), action.get('frameProps'))], newFrameProps)
+  const index = frameStateUtil.getFrameIndex(state, action.getIn(['frameProps', 'key']))
+  state = state.mergeIn(['frames', index], newFrameProps)
+  return frameStateUtil.updateFramesInternalIndex(state, index)
 }
 
 const frameGuestInstanceIdChanged = (state, action) => {
@@ -221,45 +215,21 @@ const frameGuestInstanceIdChanged = (state, action) => {
     return state
   }
 
-  return state.mergeIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(state), action.get('frameProps'))], {
+  return state.mergeIn(['frames', frameStateUtil.getFrameIndex(state, action.getIn(['frameProps', 'key']))], {
     guestInstanceId: newGuestInstanceId
   })
-}
-
-const tabDataChanged = (state, action) => {
-  action = makeImmutable(action)
-  const tabs = action.get('tabs')
-
-  tabs.forEach((tab) => {
-    const newProps = frameStateUtil.getFramePropsFromTab(tab)
-    const frameProps = frameStateUtil.getFrameByTabId(state, tab.get('tabId'))
-    if (frameProps) {
-      state = state.mergeIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(state), frameProps)], newProps)
-      if (tab.get('active') === true && tab.get('windowId') === getCurrentWindowId()) {
-        state = state.merge({
-          activeFrameKey: frameProps.get('key'),
-          previewFrameKey: null
-        })
-        state = state.mergeIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(state), action.frameProps)], {
-          lastAccessedTime: new Date().getTime() })
-        state = state.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
-        state = updateTabPageIndex(state, frameProps)
-      }
-    }
-  })
-  return state
 }
 
 const windowStore = new WindowStore()
 const emitChanges = debounce(windowStore.emitChanges.bind(windowStore), 5)
 
-const applyReducers = (state, action) => [
+const applyReducers = (state, action, immutableAction) => [
   require('../../app/renderer/reducers/urlBarReducer'),
   require('../../app/renderer/reducers/frameReducer'),
   require('../../app/renderer/reducers/contextMenuReducer')
 ].reduce(
     (windowState, reducer) => {
-      const newState = reducer(windowState, action)
+      const newState = reducer(windowState, action, immutableAction)
       assert.ok(Immutable.Map.isMap(newState),
         `Oops! action ${action.actionType} didn't return valid state for reducer:\n\n${reducer}`)
       return newState
@@ -280,7 +250,7 @@ const immediatelyEmittedActions = [
 // Register callback to handle all updates
 const doAction = (action) => {
   // console.log(action.actionType, action, windowState.toJS())
-  windowState = applyReducers(windowState, action)
+  windowState = applyReducers(windowState, action, makeImmutable(action))
   switch (action.actionType) {
     case windowConstants.WINDOW_SET_STATE:
       windowState = action.windowState
@@ -302,7 +272,7 @@ const doAction = (action) => {
       // set the previous location to the most recent history item or the default url
       let previousLocation = action.frameProps.get('history').unshift(config.defaultUrl).findLast((url) => url !== action.errorDetails.url)
 
-      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps)], {
+      windowState = windowState.mergeIn(['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key'))], {
         aboutDetails: Object.assign({
           title: action.errorDetails.title || l10nErrorText(action.errorDetails.errorCode),
           message: action.errorDetails.message,
@@ -312,21 +282,21 @@ const doAction = (action) => {
       })
       break
     case windowConstants.WINDOW_SET_FINDBAR_SHOWN:
-      const frameIndex = frameStateUtil.findIndexForFrameKey(windowState.get('frames'), action.frameKey)
+      const frameIndex = frameStateUtil.getFrameIndex(windowState, action.frameKey)
       windowState = windowState.mergeIn(['frames', frameIndex], {
         findbarShown: action.shown,
         findbarSelected: action.shown
       })
       break
     case windowConstants.WINDOW_SET_FINDBAR_SELECTED:
-      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps)], {
+      windowState = windowState.mergeIn(['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key'))], {
         findbarSelected: action.selected
       })
       break
     case windowConstants.WINDOW_WEBVIEW_LOAD_START:
       {
         const statePath = path =>
-          [path, frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps)]
+          [path, frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key'))]
 
         // Reset security state
         windowState =
@@ -350,7 +320,7 @@ const doAction = (action) => {
         break
       }
     case windowConstants.WINDOW_WEBVIEW_LOAD_END:
-      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps)], {
+      windowState = windowState.mergeIn(['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key'))], {
         loading: false,
         endLoadTime: new Date().getTime(),
         history: addToHistory(action.frameProps)
@@ -398,21 +368,24 @@ const doAction = (action) => {
       break
     case windowConstants.WINDOW_SET_TAB_BREAKPOINT:
       {
-        const frameIndex = frameStateUtil.findIndexForFrameKey(frameStateUtil.getFrames(windowState), action.frameKey)
+        if (!action.frameKey) {
+          break
+        }
+        const frameIndex = frameStateUtil.getFrameIndex(frameStateUtil.getFrames(windowState), action.frameKey)
         windowState = windowState.setIn(['frames', frameIndex, 'breakpoint'], action.breakpoint)
         break
       }
     case windowConstants.WINDOW_SET_TAB_HOVER_STATE:
       {
-        const frameIndex = frameStateUtil.findIndexForFrameKey(frameStateUtil.getFrames(windowState), action.frameKey)
+        const frameIndex = frameStateUtil.getFrameIndex(frameStateUtil.getFrames(windowState), action.frameKey)
         windowState = windowState.setIn(['frames', frameIndex, 'hoverState'], action.hoverState)
         break
       }
     case windowConstants.WINDOW_TAB_MOVE:
       {
         const sourceFrameProps = frameStateUtil.getFrameByKey(windowState, action.sourceFrameKey)
-        const sourceFrameIndex = frameStateUtil.findIndexForFrameKey(frameStateUtil.getFrames(windowState), action.sourceFrameKey)
-        let newIndex = frameStateUtil.findIndexForFrameKey(frameStateUtil.getFrames(windowState), action.destinationFrameKey) + (action.prepend ? 0 : 1)
+        const sourceFrameIndex = frameStateUtil.getFrameIndex(frameStateUtil.getFrames(windowState), action.sourceFrameKey)
+        let newIndex = frameStateUtil.getFrameIndex(windowState, action.destinationFrameProps.get('key')) + (action.prepend ? 0 : 1)
         let frames = frameStateUtil.getFrames(windowState).splice(sourceFrameIndex, 1)
         if (newIndex > sourceFrameIndex) {
           newIndex--
@@ -420,6 +393,7 @@ const doAction = (action) => {
         frames = frames.splice(newIndex, 0, sourceFrameProps)
         windowState = windowState.set('frames', frames)
         // Since the tab could have changed pages, update the tab page as well
+        windowState = frameStateUtil.updateFramesInternalIndex(windowState, Math.min(sourceFrameIndex, newIndex))
         windowState = updateTabPageIndex(windowState, frameStateUtil.getActiveFrame(windowState))
         break
       }
@@ -438,7 +412,7 @@ const doAction = (action) => {
       }
       break
     case windowConstants.WINDOW_FRAME_SHORTCUT_CHANGED:
-      const framePath = action.frameProps ? ['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps)] : activeFrameStatePath(windowState)
+      const framePath = action.frameProps ? ['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key'))] : activeFrameStatePath(windowState)
       windowState = windowState.mergeIn(framePath, {
         activeShortcut: action.activeShortcut,
         activeShortcutDetails: action.activeShortcutDetails
@@ -451,7 +425,7 @@ const doAction = (action) => {
       break
     case windowConstants.WINDOW_SET_FIND_DETAIL:
       {
-        const frameIndex = frameStateUtil.findIndexForFrameKey(windowState.get('frames'), action.frameKey)
+        const frameIndex = frameStateUtil.getFrameIndex(windowState, action.frameKey)
         windowState = windowState.mergeIn(['frames', frameIndex, 'findDetail'], action.findDetail)
         break
       }
@@ -505,13 +479,13 @@ const doAction = (action) => {
       })
       break
     case windowConstants.WINDOW_SET_AUDIO_PLAYBACK_ACTIVE:
-      windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps), 'audioPlaybackActive'], action.audioPlaybackActive)
+      windowState = windowState.setIn(['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key')), 'audioPlaybackActive'], action.audioPlaybackActive)
       break
     case windowConstants.WINDOW_SET_FAVICON:
-      windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps), 'icon'], action.favicon)
+      windowState = windowState.setIn(['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key')), 'icon'], action.favicon)
       break
     case windowConstants.WINDOW_SET_LAST_ZOOM_PERCENTAGE:
-      windowState = windowState.setIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps), 'lastZoomPercentage'], action.percentage)
+      windowState = windowState.setIn(['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key')), 'lastZoomPercentage'], action.percentage)
       break
     case windowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR:
       windowState = windowState.setIn(['ui', 'mouseInTitlebar'], action.mouseInTitlebar)
@@ -607,24 +581,24 @@ const doAction = (action) => {
       }
       break
     case windowConstants.WINDOW_SET_BLOCKED_BY:
-      const blockedByPath = ['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps), action.blockType, 'blocked']
+      const blockedByPath = ['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key')), action.blockType, 'blocked']
       let blockedBy = windowState.getIn(blockedByPath) || new Immutable.List()
       blockedBy = blockedBy.toSet().add(action.location).toList()
       windowState = windowState.setIn(blockedByPath, blockedBy)
       break
     case windowConstants.WINDOW_SET_REDIRECTED_BY:
-      const redirectedByPath = ['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps), 'httpsEverywhere', action.ruleset]
+      const redirectedByPath = ['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key')), 'httpsEverywhere', action.ruleset]
       let redirectedBy = windowState.getIn(redirectedByPath) || new Immutable.List()
       windowState = windowState.setIn(redirectedByPath, redirectedBy.push(action.location))
       break
     case windowConstants.WINDOW_ADD_HISTORY:
-      windowState = windowState.mergeIn(['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps)], {
+      windowState = windowState.mergeIn(['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key'))], {
         history: addToHistory(action.frameProps)
       })
       break
     case windowConstants.WINDOW_SET_BLOCKED_RUN_INSECURE_CONTENT:
       const blockedRunInsecureContentPath =
-        ['frames', frameStateUtil.getFramePropsIndex(frameStateUtil.getFrames(windowState), action.frameProps)]
+        ['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key'))]
       if (action.source) {
         let blockedList = windowState.getIn(
           blockedRunInsecureContentPath.concat(['security', 'blockedRunInsecureContent'])) || new Immutable.List()
@@ -700,9 +674,6 @@ const doAction = (action) => {
     case windowConstants.WINDOW_TAB_MOUSE_LEAVE:
       windowState = windowState.deleteIn(['ui', 'tabs', 'fixTabWidth'])
       break
-    case windowConstants.WINDOW_TAB_DATA_CHANGED:
-      windowState = tabDataChanged(windowState, action)
-      break
     case appConstants.APP_NEW_WEB_CONTENTS_ADDED:
       if (!action.frameOpts) {
         break
@@ -715,8 +686,7 @@ const doAction = (action) => {
         action.frameOpts.tabId = tabValue.get('tabId')
         action.frameOpts.icon = action.frameOpts.icon || tabValue.get('favIconUrl')
       }
-      newFrame(action.frameOpts, action.frameOpts.openInForeground)
-      updateTabPageIndex(frameStateUtil.getActiveFrame(windowState))
+      windowState = newFrame(windowState, action.frameOpts, action.frameOpts.openInForeground)
       break
     case windowConstants.WINDOW_FRAME_MOUSE_ENTER:
       windowState = windowState.setIn(['ui', 'mouseInFrame'], true)
@@ -806,7 +776,7 @@ frameShortcuts.forEach((shortcut) => {
   // Listen for actions on frame N
   if (['reload', 'mute'].includes(shortcut)) {
     ipc.on(`shortcut-frame-${shortcut}`, (e, i, args) => {
-      const path = ['frames', frameStateUtil.findIndexForFrameKey(frameStateUtil.getFrames(windowState), i)]
+      const path = ['frames', frameStateUtil.getFrameIndex(windowState, i)]
       windowState = windowState.mergeIn(path, {
         activeShortcut: shortcut,
         activeShortcutDetails: args
@@ -835,20 +805,6 @@ ipc.on(messages.DISPATCH_ACTION, (e, serializedPayload) => {
     dispatchEventPayload(e, payload[i])
   }
 })
-
-const onAppStateChange = () => {
-  setImmediate(() => {
-    const tabs = tabState.getTabs(appStoreRenderer.state).map((tab) => {
-      return tab.delete('frame')
-    })
-    if (tabs.hashCode() !== previousTabs.hashCode()) {
-      previousTabs = tabs
-      windowActions.tabDataChanged(tabs)
-    }
-  })
-}
-
-appStoreRenderer.addChangeListener(onAppStateChange)
 
 AppDispatcher.register(doAction)
 

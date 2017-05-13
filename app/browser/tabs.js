@@ -413,12 +413,17 @@ const api = {
   },
 
   setActive: (tabId) => {
-    setImmediate(() => {
-      let tab = getWebContents(tabId)
-      if (tab && !tab.isDestroyed()) {
-        tab.setActive(true)
-      }
-    })
+    let tab = getWebContents(tabId)
+    if (tab && !tab.isDestroyed()) {
+      tab.setActive(true)
+    }
+  },
+
+  setTabIndex: (tabId, index) => {
+    let tab = getWebContents(tabId)
+    if (tab && !tab.isDestroyed()) {
+      tab.setTabIndex(index)
+    }
   },
 
   loadURL: (action) => {

@@ -206,9 +206,6 @@ class Frame extends React.Component {
   }
 
   onPropsChanged (prevProps = {}) {
-    if (this.props.tabIndex !== prevProps.tabIndex) {
-      this.webview.setTabIndex(this.props.tabIndex)
-    }
     if (this.props.isActive && isFocused()) {
       windowActions.setFocusedFrame(this.frame)
     }
