@@ -5,6 +5,7 @@
 'strict mode'
 
 const electron = require('electron')
+const app = electron.app
 const importer = electron.importer
 const dialog = electron.dialog
 const BrowserWindow = electron.BrowserWindow
@@ -235,7 +236,7 @@ const showImportSuccess = function () {
   }
 }
 
-importer.on('show-warning-dialog', (e) => {
+app.on('show-warning-dialog', (e) => {
   showImportWarning()
 })
 
