@@ -509,6 +509,14 @@ const getFramesInternalIndexByTabId = (state, tabId) => {
   return index == null ? -1 : index
 }
 
+const deleteFrameInternalIndex = (state, frame) => {
+  if (!frame) {
+    return state
+  }
+  state = state.deleteIn(['framesInternal', 'index', frame.get('key')])
+  return state.deleteIn(['framesInternal', 'tabIndex', frame.get('tabId')])
+}
+
 const updateFramesInternalIndex = (state, fromIndex) => {
   let framesInternal = state.get('framesInternal') || Immutable.Map()
   state.get('frames').slice(fromIndex).forEach((frame, idx) => {
@@ -527,6 +535,7 @@ const updateFramesInternalIndex = (state, fromIndex) => {
 }
 
 module.exports = {
+  deleteFrameInternalIndex,
   updateFramesInternalIndex,
   query,
   find,
