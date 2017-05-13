@@ -6,13 +6,21 @@ const sinon = require('sinon')
 const Immutable = require('immutable')
 const assert = require('assert')
 
-const defaultAppState = Immutable.fromJS({
+const defaultTabId = 1
+
+const sampleAppState = {
   windows: [{
     windowId: 1,
     windowUUID: 'uuid'
   }],
-  tabs: []
-})
+  tabs: [],
+  tabsInternal: {
+    index: {}
+  }
+}
+sampleAppState.tabsInternal.index[defaultTabId] = 0
+
+const defaultAppState = Immutable.fromJS(sampleAppState)
 
 const exampleMessageBox = Immutable.fromJS({
   message: 'example message',
@@ -21,8 +29,6 @@ const exampleMessageBox = Immutable.fromJS({
   suppress: true,
   showSuppress: true
 })
-
-const defaultTabId = 1
 
 const defaultTab = Immutable.fromJS({
   tabId: defaultTabId,
