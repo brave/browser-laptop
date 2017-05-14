@@ -500,16 +500,20 @@ const activeFrameStatePath = (state) => frameStatePath(state, getActiveFrameKey(
 const getFramesInternalIndex = (state, frameKey) => {
   if (frameKey == null) return -1
 
-  const index = state.getIn(['framesInternal', 'index', frameKey]) ||
-    state.getIn(['framesInternal', 'index', frameKey.toString()])
+  let index = state.getIn(['framesInternal', 'index', frameKey])
+  if (index == null) {
+    index = state.getIn(['framesInternal', 'index', frameKey.toString()])
+  }
   return index == null ? -1 : index
 }
 
 const getFramesInternalIndexByTabId = (state, tabId) => {
   if (tabId == null) return -1
 
-  const index = state.getIn(['framesInternal', 'tabIndex', tabId]) ||
-    state.getIn(['framesInternal', 'tabIndex', tabId.toString()])
+  let index = state.getIn(['framesInternal', 'tabIndex', tabId])
+  if (index == null) {
+    index = state.getIn(['framesInternal', 'tabIndex', tabId.toString()])
+  }
   return index == null ? -1 : index
 }
 
@@ -517,7 +521,9 @@ const deleteFrameInternalIndex = (state, frame) => {
   if (!frame) {
     return state
   }
+  state = state.deleteIn(['framesInternal', 'index', frame.get('key').toString()])
   state = state.deleteIn(['framesInternal', 'index', frame.get('key')])
+  state = state.deleteIn(['framesInternal', 'tabIndex', frame.get('tabId').toString()])
   return state.deleteIn(['framesInternal', 'tabIndex', frame.get('tabId')])
 }
 
