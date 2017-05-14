@@ -79,7 +79,10 @@ const getTabInternalIndexByTabId = (state, tabId) => {
   tabId = validateId('tabId', tabId)
   state = validateState(state)
 
-  const index = state.getIn(['tabsInternal', 'index', tabId]) || state.getIn(['tabsInternal', 'index', tabId.toString()])
+  let index = state.getIn(['tabsInternal', 'index', tabId])
+  if (index == null) {
+    index = state.getIn(['tabsInternal', 'index', tabId.toString()])
+  }
   return index == null ? -1 : index
 }
 
