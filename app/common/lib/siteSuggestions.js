@@ -3,16 +3,16 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Bloodhound = require('bloodhound-js')
+const siteTags = require('../../../js/constants/siteTags')
 
 let initialized = false
 let engine
-let internalSort
-let lastQueryInput
+let lastQueryOptions
 
 // Same as sortByAccessCountWithAgeDecay but if one is a prefix of the
 // other then it is considered always sorted first.
 const sortForSuggestions = (s1, s2) => {
-  return internalSort(s1, s2)
+  return lastQueryOptions.internalSort(s1, s2)
 }
 
 const getSiteIdentity = (data) => {
@@ -37,6 +37,7 @@ const init = (sites) => {
   return promise
 }
 
+const getTagToken = (tag) => '|' + tag + '|'
 const tokenizeInput = (data) => {
   let url = data || ''
   let parts = []
@@ -45,6 +46,13 @@ const tokenizeInput = (data) => {
     url = data.location
     if (data.title) {
       parts = data.title.toLowerCase().split(/\s/)
+    }
+    if (data.tags) {
+      parts = parts.concat(data.tags.map(getTagToken))
+    }
+  } else {
+    if (lastQueryOptions && !lastQueryOptions.historySuggestionsOn && lastQueryOptions.bookmarkSuggestionsOn) {
+      parts.push(getTagToken(siteTags.BOOKMARK))
     }
   }
 
@@ -56,19 +64,27 @@ const tokenizeInput = (data) => {
   return parts
 }
 
-const query = (input) => {
+const query = (input, options = {}) => {
   if (!initialized) {
     return Promise.resolve([])
   }
+
   return new Promise((resolve, reject) => {
-    lastQueryInput = input || ''
+    input = (input || '').toLowerCase()
     const {getSortForSuggestions} = require('./suggestion')
-    internalSort = getSortForSuggestions(lastQueryInput.toLowerCase())
-    engine.search(lastQueryInput, function (results) {
-      resolve(results)
-    }, function (err) {
-      reject(err)
+    lastQueryOptions = Object.assign({}, options, {
+      input,
+      internalSort: getSortForSuggestions(input)
     })
+    if (lastQueryOptions.historySuggestionsOn !== false || lastQueryOptions.bookmarkSuggestionsOn !== false) {
+      engine.search(input, function (results) {
+        resolve(results)
+      }, function (err) {
+        reject(err)
+      })
+    } else {
+      resolve([])
+    }
   })
 }
 

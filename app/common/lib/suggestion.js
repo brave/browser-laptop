@@ -287,16 +287,15 @@ const getMapListToElements = (urlLocationLower) => ({data, maxResults, type,
 }
 
 const getHistorySuggestions = (state, urlLocationLower) => {
-  /*
-   * todo:
-    const historySuggestionsOn = getSetting(settings.HISTORY_SUGGESTIONS)
-    const bookmarkSuggestionsOn = getSetting(settings.BOOKMARK_SUGGESTIONS)
-  */
-
   return new Promise((resolve, reject) => {
     const sortHandler = getSortForSuggestions(urlLocationLower)
     const mapListToElements = getMapListToElements(urlLocationLower)
-    query(urlLocationLower).then((results) => {
+    const options = {
+      historySuggestionsOn: getSetting(settings.HISTORY_SUGGESTIONS),
+      bookmarkSuggestionsOn: getSetting(settings.BOOKMARK_SUGGESTIONS)
+    }
+
+    query(urlLocationLower, options).then((results) => {
       results = makeImmutable(results)
       results = results.take(config.urlBarSuggestions.maxHistorySites)
       results = results.concat(createVirtualHistoryItems(results))
@@ -304,7 +303,7 @@ const getHistorySuggestions = (state, urlLocationLower) => {
       const suggestionsList = mapListToElements({
         data: results,
         maxResults: config.urlBarSuggestions.maxHistorySites,
-        type: suggestionTypes.HISTORY,
+        type: options.historySuggestionsOn ? suggestionTypes.HISTORY : suggestionTypes.BOOKMARK,
         sortHandler,
         filterValue: null
       })
