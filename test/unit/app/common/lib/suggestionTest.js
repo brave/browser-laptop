@@ -17,6 +17,9 @@ const AGE_DECAY = 50
 const fakeImmutableUtil = {
   makeImmutable: (obj) => {
     return makeImmutable(obj)
+  },
+  isList: (obj) => {
+    return Immutable.List.isList(obj)
   }
 }
 

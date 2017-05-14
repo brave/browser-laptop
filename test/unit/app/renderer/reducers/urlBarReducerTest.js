@@ -2,6 +2,7 @@
 const mockery = require('mockery')
 const Immutable = require('immutable')
 const assert = require('assert')
+const sinon = require('sinon')
 const fakeElectron = require('../../../lib/fakeElectron')
 
 const windowConstants = require('../../../../../js/constants/windowConstants')
@@ -212,7 +213,15 @@ describe('urlBarReducer', function () {
             suggestions: {
               shouldRender: true,
               selectedIndex: 2,
-              suggestionList: ['2.71828', '18284', '59045', '23536'],
+              suggestionList: [{
+                location: 'https://brave.com/2.71828'
+              }, {
+                location: 'https://brave.com/18284'
+              }, {
+                location: 'https://brave.com/59045'
+              }, {
+                location: 'https://brave.com/23536'
+              }],
               searchResults: [
                 '3.1415926535'
               ]
@@ -246,6 +255,10 @@ describe('urlBarReducer', function () {
           default: return true
         }
       }})
+      this.suggestionClickHandlers = {
+        navigateSiteClickHandler: sinon.mock()
+      }
+      mockery.registerMock('../suggestionClickHandlers', this.suggestionClickHandlers)
       urlBarReducer = require('../../../../../app/renderer/reducers/urlBarReducer')
     })
 
@@ -333,10 +346,10 @@ describe('urlBarReducer', function () {
     })
 
     describe('WINDOW_ACTIVE_URL_BAR_SUGGESTION_CLICKED', function () {
-      it('', function (cb) {
-        const inputState = windowState.setIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'suggestionList', 2], {onClick: cb})
-        // Thiis test will finish when the callback is called from the click event
+      it('callback is not called sync', function () {
+        const inputState = windowState.setIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'suggestionList', Immutable.fromJS([{location: 'https://www.brave.com'}])])
         urlBarReducer(inputState, {actionType: windowConstants.WINDOW_ACTIVE_URL_BAR_SUGGESTION_CLICKED})
+        assert.equal(this.suggestionClickHandlers.navigateSiteClickHandler.callCount, 0)
       })
     })
   })
