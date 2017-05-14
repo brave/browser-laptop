@@ -6,10 +6,20 @@
 
 const appConstants = require('../../../js/constants/appConstants')
 const {generateNewSuggestionsList, generateNewSearchXHRResults} = require('../../common/lib/suggestion')
-const {init} = require('../../common/lib/siteSuggestions')
+const {init, add} = require('../../common/lib/siteSuggestions')
+const Immutable = require('immutable')
 
 const urlBarSuggestionsReducer = (state, action) => {
   switch (action.actionType) {
+    case appConstants.APP_ADD_SITE:
+      if (Immutable.List.isList(action.siteDetail)) {
+        action.siteDetail.forEach((s) => {
+          add(s)
+        })
+      } else {
+        add(action.siteDetail)
+      }
+      break
     case appConstants.APP_SET_STATE:
       init(Object.values(action.appState.get('sites').toJS()))
       break

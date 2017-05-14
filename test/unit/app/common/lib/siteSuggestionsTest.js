@@ -1,5 +1,5 @@
 /* global describe, before, it */
-const {tokenizeInput, init, query} = require('../../../../../app/common/lib/siteSuggestions')
+const {tokenizeInput, init, query, add} = require('../../../../../app/common/lib/siteSuggestions')
 const assert = require('assert')
 const Immutable = require('immutable')
 
@@ -158,6 +158,37 @@ describe('siteSuggestions lib', function () {
         assert.deepEqual(results[0], { location: 'https://twitter.com/i/moments' })
         cb()
       })
+    })
+  })
+  describe('add sites after init', function () {
+    before(function (cb) {
+      const sites = [site1, site2, site3, site4]
+      init(sites).then(() => {
+        add({
+          location: 'https://slack.com'
+        })
+      }).then(cb.bind(null, null))
+    })
+    it('can be found', function (cb) {
+      checkResult('slack', [{ location: 'https://slack.com' }], cb)
+    })
+    it('adding twice results in 1 result only', function (cb) {
+      add({
+        location: 'https://slack.com'
+      })
+      checkResult('slack', [{ location: 'https://slack.com' }], cb)
+    })
+    it('can add simple strings', function (cb) {
+      add({
+        location: 'https://slashdot.org'
+      })
+      checkResult('slash', [{ location: 'https://slashdot.org' }], cb)
+    })
+    it('can add Immutable objects', function (cb) {
+      add(Immutable.fromJS({
+        location: 'https://microsoft.com'
+      }))
+      checkResult('micro', [{ location: 'https://microsoft.com' }], cb)
     })
   })
 })

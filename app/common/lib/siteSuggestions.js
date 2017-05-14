@@ -64,14 +64,25 @@ const tokenizeInput = (data) => {
   return parts
 }
 
+const add = (data) => {
+  if (!initialized) {
+    return
+  }
+  if (typeof data === 'string') {
+    engine.add(data)
+  } else {
+    engine.add(data.toJS ? data.toJS() : data)
+  }
+}
+
 const query = (input, options = {}) => {
   if (!initialized) {
     return Promise.resolve([])
   }
 
   return new Promise((resolve, reject) => {
-    input = (input || '').toLowerCase()
-    const {getSortForSuggestions} = require('./suggestion')
+    const {getSortForSuggestions, normalizeLocation} = require('./suggestion')
+    input = normalizeLocation((input || '').toLowerCase())
     lastQueryOptions = Object.assign({}, options, {
       input,
       internalSort: getSortForSuggestions(input)
@@ -90,6 +101,7 @@ const query = (input, options = {}) => {
 
 module.exports = {
   init,
+  add,
   tokenizeInput,
   query
 }
