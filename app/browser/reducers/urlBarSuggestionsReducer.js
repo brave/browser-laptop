@@ -6,9 +6,13 @@
 
 const appConstants = require('../../../js/constants/appConstants')
 const {generateNewSuggestionsList, generateNewSearchXHRResults} = require('../../common/lib/suggestion')
+const {init} = require('../../common/lib/siteSuggestions')
 
 const urlBarSuggestionsReducer = (state, action) => {
   switch (action.actionType) {
+    case appConstants.APP_SET_STATE:
+      init(Object.values(action.appState.get('sites').toJS()))
+      break
     case appConstants.APP_URL_BAR_TEXT_CHANGED:
       generateNewSuggestionsList(state, action.windowId, action.tabId, action.input)
       generateNewSearchXHRResults(state, action.windowId, action.tabId, action.input)

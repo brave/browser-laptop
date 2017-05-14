@@ -3,17 +3,32 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Bloodhound = require('bloodhound-js')
+
 let initialized = false
 let engine
+let internalSort
+let lastQueryInput
+
+// Same as sortByAccessCountWithAgeDecay but if one is a prefix of the
+// other then it is considered always sorted first.
+const sortForSuggestions = (s1, s2) => {
+  return internalSort(s1, s2)
+}
+
+const getSiteIdentity = (data) => {
+  if (typeof data === 'string') {
+    return data
+  }
+  return (data.location || '') + (data.partitionNumber ? '|' + data.partitionNumber : '')
+}
 
 const init = (sites) => {
-  if (initialized) {
-    return Promise.resolve()
-  }
   engine = new Bloodhound({
-    local: sites,
+    local: sites.toJS ? sites.toJS() : sites,
+    sorter: sortForSuggestions,
     queryTokenizer: tokenizeInput,
-    datumTokenizer: tokenizeInput
+    datumTokenizer: tokenizeInput,
+    identify: getSiteIdentity
   })
   const promise = engine.initialize()
   promise.then(() => {
@@ -46,7 +61,10 @@ const query = (input) => {
     return Promise.resolve([])
   }
   return new Promise((resolve, reject) => {
-    engine.search(input, function (results) {
+    lastQueryInput = input || ''
+    const {getSortForSuggestions} = require('./suggestion')
+    internalSort = getSortForSuggestions(lastQueryInput.toLowerCase())
+    engine.search(lastQueryInput, function (results) {
       resolve(results)
     }, function (err) {
       reject(err)

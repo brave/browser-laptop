@@ -11,11 +11,11 @@ const {isUrl, aboutUrls, isNavigatableAboutPage, isSourceAboutUrl} = require('..
 const suggestionTypes = require('../../../js/constants/suggestionTypes')
 const getSetting = require('../../../js/settings').getSetting
 const settings = require('../../../js/constants/settings')
-const {isBookmark, isDefaultEntry, isHistoryEntry} = require('../../../js/state/siteUtil')
 const config = require('../../../js/constants/config')
 const top500 = require('../../../js/data/top500')
 const fetchSearchSuggestions = require('./fetchSearchSuggestions')
 const {getFrameByTabId, getTabsByWindowId} = require('../../common/state/tabState')
+const {query} = require('./siteSuggestions')
 
 const sigmoid = (t) => {
   return 1 / (1 + Math.pow(Math.E, -t))
@@ -83,15 +83,15 @@ const sortingPriority = (count, currentTime, lastAccessedTime, ageDecayConstant)
 const sortByAccessCountWithAgeDecay = (s1, s2) => {
   const now = new Date()
   const s1Priority = sortingPriority(
-    s1.get('count') || 0,
+    s1.count || 0,
     now.getTime(),
-    s1.get('lastAccessedTime') || now.getTime(),
+    s1.lastAccessedTime || now.getTime(),
     appConfig.urlSuggestions.ageDecayConstant
   )
   const s2Priority = sortingPriority(
-    s2.get('count') || 0,
+    s2.count || 0,
     now.getTime(),
-    s2.get('lastAccessedTime') || now.getTime(),
+    s2.lastAccessedTime || now.getTime(),
     appConfig.urlSuggestions.ageDecayConstant
   )
   return s2Priority - s1Priority
@@ -214,43 +214,45 @@ const createVirtualHistoryItems = (historySites) => {
     return !!site
   })
   return Immutable.fromJS(_.object(virtualHistorySites.map((site) => {
-    return [site.location, site]
+    return [site.get('location'), site]
   })))
 }
 
-const sortBasedOnLocationPos = (urlLocationLower) => (s1, s2) => {
-  const shouldNormalize = shouldNormalizeLocation(urlLocationLower)
-  const urlLocationLowerNormalized = normalizeLocation(urlLocationLower)
-
-  const location1 = shouldNormalize ? normalizeLocation(getURL(s1)) : getURL(s1)
-  const location2 = shouldNormalize ? normalizeLocation(getURL(s2)) : getURL(s2)
-  const pos1 = location1.indexOf(urlLocationLowerNormalized)
-  const pos2 = location2.indexOf(urlLocationLowerNormalized)
-  if (pos1 === -1 && pos2 === -1) {
-    return 0
-  } else if (pos1 === -1) {
-    return 1
-  } else if (pos2 === -1) {
-    return -1
-  } else {
-    if (pos1 - pos2 !== 0) {
+// Same as sortByAccessCountWithAgeDecay but if one is a prefix of the
+// other then it is considered always sorted first.
+const getSortForSuggestions = (userInputLower) => (s1, s2) => {
+  const {sortByAccessCountWithAgeDecay, normalizeLocation} = require('./suggestion')
+  const url1 = normalizeLocation(getURL(s1))
+  const url2 = normalizeLocation(getURL(s2))
+  const pos1 = url1.indexOf(userInputLower)
+  const pos2 = url2.indexOf(userInputLower)
+  if (pos1 !== -1 && pos2 !== -1) {
+    if (pos1 !== pos2) {
       return pos1 - pos2
-    } else {
-      // sort site.com higher than site.com/somepath
-      const sdnv1 = simpleDomainNameValue(s1)
-      const sdnv2 = simpleDomainNameValue(s2)
-      if (sdnv1 !== sdnv2) {
-        return sdnv2 - sdnv1
-      } else {
-        // If there's a tie on the match location, use the age
-        // decay modified access count
-        return sortByAccessCountWithAgeDecay(s1, s2)
-      }
     }
+    return url1.length - url2.length
   }
+  if (pos1 !== -1 && pos2 === -1) {
+    return -1
+  }
+  if (pos1 === -1 && pos2 !== -1) {
+    return 1
+  }
+  return sortByAccessCountWithAgeDecay(s1, s2)
 }
 
-const getURL = (x) => typeof x === 'object' && x !== null ? x.get('location') || x.get('url') : x
+// Currently we sort only sites that are not immutableJS and
+const getURL = (x) => {
+  if (typeof x === 'string') {
+    return x
+  }
+
+  if (x.get) {
+    return x.get('location') || x.get('url')
+  }
+
+  return x.location || x.url
+}
 
 const getMapListToElements = (urlLocationLower) => ({data, maxResults, type,
     sortHandler = (x) => x, filterValue = (site) => {
@@ -285,69 +287,29 @@ const getMapListToElements = (urlLocationLower) => ({data, maxResults, type,
 }
 
 const getHistorySuggestions = (state, urlLocationLower) => {
-  return new Promise((resolve, reject) => {
-    const sortHandler = sortBasedOnLocationPos(urlLocationLower)
-    const mapListToElements = getMapListToElements(urlLocationLower)
-    let suggestionsList = Immutable.List()
-    // NOTE: Iterating sites can take a long time! Please be mindful when
-    // working with the history and bookmark suggestion code.
+  /*
+   * todo:
     const historySuggestionsOn = getSetting(settings.HISTORY_SUGGESTIONS)
     const bookmarkSuggestionsOn = getSetting(settings.BOOKMARK_SUGGESTIONS)
-    const shouldIterateSites = historySuggestionsOn || bookmarkSuggestionsOn
-    if (shouldIterateSites) {
-      // Note: Bookmark sites are now included in history. This will allow
-      // sites to appear in the auto-complete regardless of their bookmark
-      // status. If history is turned off, bookmarked sites will appear
-      // in the bookmark section.
-      const sitesFilter = (site) => {
-        const location = site.get('location')
-        if (!location) {
-          return false
-        }
-        const title = site.get('title')
-        return location.toLowerCase().indexOf(urlLocationLower) !== -1 ||
-          (title && title.toLowerCase().indexOf(urlLocationLower) !== -1)
-      }
+  */
 
-      let historySites = new Immutable.List()
-      let bookmarkSites = new Immutable.List()
-      const sites = state.get('sites')
-      sites.forEach(site => {
-        if (!sitesFilter(site)) {
-          return
-        }
-        if (historySuggestionsOn && isHistoryEntry(site) && !isDefaultEntry(site)) {
-          historySites = historySites.push(site)
-          return
-        }
-        if (bookmarkSuggestionsOn && isBookmark(site) && !isDefaultEntry(site)) {
-          bookmarkSites = bookmarkSites.push(site)
-        }
+  return new Promise((resolve, reject) => {
+    const sortHandler = getSortForSuggestions(urlLocationLower)
+    const mapListToElements = getMapListToElements(urlLocationLower)
+    query(urlLocationLower).then((results) => {
+      results = makeImmutable(results)
+      results = results.take(config.urlBarSuggestions.maxHistorySites)
+      results = results.concat(createVirtualHistoryItems(results))
+
+      const suggestionsList = mapListToElements({
+        data: results,
+        maxResults: config.urlBarSuggestions.maxHistorySites,
+        type: suggestionTypes.HISTORY,
+        sortHandler,
+        filterValue: null
       })
-
-      if (historySites.size > 0) {
-        historySites = historySites.concat(createVirtualHistoryItems(historySites))
-
-        suggestionsList = suggestionsList.concat(mapListToElements({
-          data: historySites,
-          maxResults: config.urlBarSuggestions.maxHistorySites,
-          type: suggestionTypes.HISTORY,
-          sortHandler,
-          filterValue: null
-        }))
-      }
-
-      if (bookmarkSites.size > 0) {
-        suggestionsList = suggestionsList.concat(mapListToElements({
-          data: bookmarkSites,
-          maxResults: config.urlBarSuggestions.maxBookmarkSites,
-          type: suggestionTypes.BOOKMARK,
-          sortHandler,
-          filterValue: null
-        }))
-      }
-    }
-    resolve(suggestionsList)
+      resolve(suggestionsList)
+    })
   })
 }
 
@@ -365,7 +327,7 @@ const getAboutSuggestions = (state, urlLocationLower) => {
 
 const getOpenedTabSuggestions = (state, windowId, urlLocationLower) => {
   return new Promise((resolve, reject) => {
-    const sortHandler = sortBasedOnLocationPos(urlLocationLower)
+    const sortHandler = getSortForSuggestions(urlLocationLower)
     const mapListToElements = getMapListToElements(urlLocationLower)
     const tabs = getTabsByWindowId(state, windowId)
     let suggestionsList = Immutable.List()
@@ -476,11 +438,11 @@ const generateNewSearchXHRResults = (state, windowId, tabId, input) => {
 module.exports = {
   sortingPriority,
   sortByAccessCountWithAgeDecay,
+  getSortForSuggestions,
   simpleDomainNameValue,
   normalizeLocation,
   shouldNormalizeLocation,
   createVirtualHistoryItems,
-  sortBasedOnLocationPos,
   getMapListToElements,
   getHistorySuggestions,
   getAboutSuggestions,

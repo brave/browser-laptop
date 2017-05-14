@@ -1,6 +1,7 @@
 /* global describe, before, it */
 const {tokenizeInput, init, query} = require('../../../../../app/common/lib/siteSuggestions')
 const assert = require('assert')
+const Immutable = require('immutable')
 
 const site1 = {
   location: 'https://www.bradrichter.co/bad_numbers/3',
@@ -111,6 +112,52 @@ describe('siteSuggestions lib', function () {
     })
     it('all tokens must match, not just some', function (cb) {
       checkResult('brave brad', [], cb)
+    })
+  })
+  describe('query sorts results', function () {
+    before(function (cb) {
+      const sites = Immutable.fromJS([{
+        location: 'https://brave.com/twi'
+      }, {
+        location: 'https://twitter.com/brave'
+      }, {
+        location: 'https://twitter.com/brianbondy'
+      }, {
+        location: 'https://twitter.com/_brianclif'
+      }, {
+        location: 'https://twitter.com/cezaraugusto'
+      }, {
+        location: 'https://bbondy.com/twitter'
+      }, {
+        location: 'https://twitter.com'
+      }, {
+        location: 'https://twitter.com/i/moments'
+      }])
+      init(sites).then(cb.bind(null, null))
+    })
+    it('orders shortest match first', function (cb) {
+      query('twitter.com').then((results) => {
+        assert.deepEqual(results[0], { location: 'https://twitter.com' })
+        cb()
+      })
+    })
+    it('matches prefixes first', function (cb) {
+      query('twi').then((results) => {
+        assert.deepEqual(results[0], { location: 'https://twitter.com' })
+        cb()
+      })
+    })
+    it('closest to the left match wins', function (cb) {
+      query('twitter.com brian').then((results) => {
+        assert.deepEqual(results[0], { location: 'https://twitter.com/brianbondy' })
+        cb()
+      })
+    })
+    it('matches based on tokens and not exactly', function (cb) {
+      query('twitter.com/moments').then((results) => {
+        assert.deepEqual(results[0], { location: 'https://twitter.com/i/moments' })
+        cb()
+      })
     })
   })
 })
