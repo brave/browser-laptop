@@ -14,6 +14,7 @@ Tests
 
 
 - [ ] Adequate test coverage exists to prevent regressions
-- [ ] Tests should be independent and work correctly when run indivually or as a suite [ref](https://github.com/brave/browser-laptop/wiki/Code-Guidelines#test-dependencies)
+- [ ] Tests should be independent and work correctly when run individually or as a suite [ref](https://github.com/brave/browser-laptop/wiki/Code-Guidelines#test-dependencies)
+- [ ] New files have MPL2 license header
 
 
