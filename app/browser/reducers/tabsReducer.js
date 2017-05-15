@@ -7,6 +7,7 @@
 const appConstants = require('../../../js/constants/appConstants')
 const tabs = require('../tabs')
 const {getWebContents} = require('../webContentsCache')
+const {BrowserWindow} = require('electron')
 const tabState = require('../../common/state/tabState')
 const windowConstants = require('../../../js/constants/windowConstants')
 const windowAction = require('../../../js/actions/windowActions.js')
@@ -57,7 +58,15 @@ const tabsReducer = (state, action, immutableAction) => {
       break
     case appConstants.APP_TAB_CLOSE_REQUESTED:
       {
-        const tabId = tabState.resolveTabId(state, action.get('tabId'))
+        let tabId = action.get('tabId')
+        // We can't use TAB_ID_ACTIVE directly in resolveTabId because
+        // it figures out the active window based on state with focused property,
+        // and the focused window might actually be a devtools window.
+        if (tabId === tabState.TAB_ID_ACTIVE) {
+          tabId = tabState.getActiveTabId(state, BrowserWindow.getActiveWindow().id)
+        } else {
+          tabId = tabState.resolveTabId(state, tabId)
+        }
         if (tabId === tabState.TAB_ID_NONE) {
           break
         }
