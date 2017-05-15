@@ -356,7 +356,7 @@ AppStore
     type: string,  // "normal", "popup", or "devtools"
     width: number,
     // session properties
-    id: number  // the electron id for the window
+    windowId: number  // the muon id for the window
   }]
 }
 ```
