@@ -62,12 +62,15 @@ function getActiveFrameTabId (state) {
 }
 
 function getFrameByIndex (state, i) {
+  if (i === -1) {
+    return null
+  }
   return state.getIn(['frames', i])
 }
 
 // This will eventually go away fully when we replace frameKey by tabId
 function getFrameKeyByTabId (state, tabId) {
-  let parentFrameKey
+  let parentFrameKey = null
   const openerFrame = getFrameByTabId(state, tabId)
   if (openerFrame) {
     parentFrameKey = openerFrame.get('key')
