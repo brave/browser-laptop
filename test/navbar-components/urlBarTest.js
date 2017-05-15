@@ -69,136 +69,122 @@ describe('urlBar tests', function () {
         .addSite({ location: 'http://uncrate.com' })
     })
 
-    it('un does not autocomplete to undefined', function * () {
-      yield this.app.client
-        .keys('un')
-        .waitForInputText(urlInput, 'uncrate.com')
-    })
-
-    it('autocompletes without protocol', function * () {
-      // now type something
-      yield this.app.client
-        .setInputText(urlInput, '')
-        .keys('br')
-        .waitForInputText(urlInput, 'brave.com')
-    })
-
-    it('autocompletes with protocol', function * () {
-      // now type something
-      yield this.app.client
-        .keys('https://br')
-        .waitForInputText(urlInput, 'https://brave.com')
-    })
-
-    it('autocompletes without www.', function * () {
-      // now type something
-      yield this.app.client
-        .keys('you')
-        .waitForInputText(urlInput, 'youtube.com')
-    })
-
-    it('autofills from selected suggestion', function * () {
-      // now type something
-      yield this.app.client
-        .keys('https://br')
-        .waitForInputText(urlInput, 'https://brave.com')
-        // hit down
-        .keys(Brave.keys.DOWN)
-        .waitForInputText(urlInput, 'https://brave.com/test')
-        // hit up
-        .keys(Brave.keys.UP)
-        .waitForInputText(urlInput, 'https://brave.com')
-    })
-
-    it('autocompletes without losing characters', function * () {
-      yield this.app.client
-        .keys('a\uE008\uE008b\uE008\uE008o\uE008\uE008u\uE008\uE008t\uE008\uE008x')
-        .waitForInputText(urlInput, 'aboutx')
-    })
-
-    it('does not show suggestions on focus', function * () {
-      yield this.app.client
-        .keys('brave')
-        .waitForVisible(urlBarSuggestions, 1)
-        .ipcSend('shortcut-focus-url')
-        .waitForElementFocus(urlInput)
-        .waitForElementCount(urlBarSuggestions, 0)
-    })
-
-    describe('with scrolling match', function () {
-      it('typing in the urlbar should override mouse hover for suggestions', function * () {
+    describe('press backspace key', function () {
+      beforeEach(function * () {
         yield this.app.client
-          .addSite({ location: 'https://brave.com/test2' })
-          .addSite({ location: 'https://brave.com/test3' })
-          .addSite({ location: 'https://brave.com/test4' })
-          .addSite({ location: 'https://brianbondy.com/test4' })
-          .resizeWindow(500, 300)
-          .setValue(urlInput, 'b')
-          .waitForVisible(urlBarSuggestions)
-          // highlight for autocomplete brianbondy.com
-          .moveToObject(urlBarSuggestions, 0, 100)
-        yield selectsText(this.app.client, 'rianbondy.com')
-          .keys('ra')
-          .execute(function (urlBarSuggestions) {
-            document.querySelector(urlBarSuggestions).scrollTop = 200
-          }, urlBarSuggestions)
-        yield selectsText(this.app.client, 've.com')
+          .setInputText(urlInput, '')
+          .keys('br')
+          .waitForInputText(urlInput, 'brave.com')
+          .waitForSelectedText('ave.com')
+          .keys(Brave.keys.BACKSPACE)
       })
-    })
-  })
 
-  describe('typing', function () {
-    Brave.beforeAll(this)
-
-    before(function * () {
-      yield setup(this.app.client)
-      yield this.app.client.waitForExist(urlInput)
-      yield this.app.client.waitForElementFocus(urlInput)
-        .waitForInputText(urlInput, '')
-
-      yield this.app.client
-        .addSite({ location: 'https://brave.com', title: 'Brave' })
-
-      // now type something
-      yield this.app.client
-        .setValue(urlInput, 'b')
-        .waitForExist(urlBarSuggestions + ' li')
-    })
-
-    it('sets the value to "b"', function * () {
-      yield this.app.client.waitForInputText(urlInput, 'brave.com')
-    })
-
-    it('clears the selected text', function * () {
-      // Since now the first letter will trigger the autocomplete
-      // expect the selected text to be part of the first suggestion
-      // in the list
-      yield selectsText(this.app.client, 'rave.com')
-    })
-
-    describe('shortcut-focus-url', function () {
-      before(function * () {
+      it('clears the selection', function * () {
         yield this.app.client
-          .ipcSend('shortcut-focus-url')
+          .waitForSelectedText('')
       })
 
-      it('has focus', function * () {
-        yield this.app.client.waitForElementFocus(urlInput)
+      it('removes the autocomplete value', function * () {
+        yield this.app.client
+          .waitForInputText(urlInput, 'br')
       })
 
-      it('selects the text', function * () {
-        // Since now the first letter will trigger the autocomplete
-        // expect the selected text to be the first suggestion in the list
-        yield selectsText(this.app.client, 'brave.com')
-      })
+      describe('with typing', function () {
+        beforeEach(function * () {
+          yield this.app.client
+            .keys('x')
+        })
 
-      it('has the search icon', function * () {
-        yield this.app.client.waitForExist('.urlbarIcon.fa-search')
+        it('has no selection', function * () {
+          yield this.app.client
+            .waitForSelectedText('')
+        })
+
+        it('inserts typing at the current cursor location', function * () {
+          yield this.app.client
+            .waitForInputText(urlInput, 'brx')
+        })
       })
     })
 
-    describe('type escape once with suggestions', function () {
-      before(function * () {
+    describe('press left arrow key', function () {
+      beforeEach(function * () {
+        yield this.app.client
+          .setInputText(urlInput, '')
+          .keys('br')
+          .waitForInputText(urlInput, 'brave.com')
+          .waitForSelectedText('ave.com')
+          .keys(Brave.keys.LEFT)
+      })
+
+      it('clears the selection', function * () {
+        yield this.app.client
+          .waitForSelectedText('')
+      })
+
+      it('keeps the autocomplete value', function * () {
+        yield this.app.client
+          .waitForInputText(urlInput, 'brave.com')
+      })
+
+      describe('with typing', function () {
+        beforeEach(function * () {
+          yield this.app.client
+            .keys('a')
+        })
+
+        it('has no selection', function * () {
+          yield this.app.client
+            .waitForSelectedText('')
+        })
+
+        it('inserts typing at the current cursor location', function * () {
+          yield this.app.client
+            .waitForInputText(urlInput, 'braave.com')
+        })
+      })
+    })
+
+    describe('press right arrow key', function () {
+      beforeEach(function * () {
+        yield this.app.client
+          .setInputText(urlInput, '')
+          .keys('br')
+          .waitForInputText(urlInput, 'brave.com')
+          .waitForSelectedText('ave.com')
+          .keys(Brave.keys.RIGHT)
+      })
+
+      it('clears the selection', function * () {
+        yield this.app.client
+          .waitForSelectedText('')
+      })
+
+      it('keeps the autocomplete value', function * () {
+        yield this.app.client
+          .waitForInputText(urlInput, 'brave.com')
+      })
+
+      describe('with typing', function () {
+        beforeEach(function * () {
+          yield this.app.client
+            .keys('a')
+        })
+
+        it('has no selection', function * () {
+          yield this.app.client
+            .waitForSelectedText('')
+        })
+
+        it('inserts typing at the current cursor location', function * () {
+          yield this.app.client
+            .waitForInputText(urlInput, 'brave.coma')
+        })
+      })
+    })
+
+    describe('press escape key', function () {
+      beforeEach(function * () {
         this.page = Brave.server.url('page1.html')
         return yield this.app.client
           .tabByIndex(0)
@@ -208,10 +194,10 @@ describe('urlBar tests', function () {
           .waitForElementFocus(urlInput)
           .setValue(urlInput, 'google')
           .waitForExist(urlBarSuggestions + ' li')
-
           .keys(Brave.keys.ESCAPE)
           .waitForElementFocus(urlInput)
       })
+
       it('does select the urlbar text', function * () {
         yield selectsText(this.app.client, this.page)
       })
@@ -221,8 +207,206 @@ describe('urlBar tests', function () {
       })
     })
 
-    describe('type escape once with no suggestions', function () {
-      before(function * () {
+    describe('type "un"', function () {
+      it('un does not autocomplete to undefined', function * () {
+        yield this.app.client
+          .keys('un')
+          .waitForInputText(urlInput, 'uncrate.com')
+      })
+    })
+
+    describe('start typing url without protocol', function () {
+      it('autocompletes without protocol', function * () {
+        // now type something
+        yield this.app.client
+          .setInputText(urlInput, '')
+          .keys('br')
+          .waitForInputText(urlInput, 'brave.com')
+      })
+    })
+
+    describe('start typing url with protocol', function () {
+      it('autocompletes with protocol', function * () {
+        // now type something
+        yield this.app.client
+          .keys('https://br')
+          .waitForInputText(urlInput, 'https://brave.com')
+      })
+    })
+
+    describe('start typing url without wwww', function () {
+      it('autocompletes without www.', function * () {
+        // now type something
+        yield this.app.client
+          .keys('you')
+          .waitForInputText(urlInput, 'youtube.com')
+      })
+    })
+
+    describe('highlight suggestions', function () {
+      it('autofills from selected suggestion', function * () {
+        // now type something
+        yield this.app.client
+          .keys('https://br')
+          .waitForInputText(urlInput, 'https://brave.com')
+          // hit down
+          .keys(Brave.keys.DOWN)
+          .waitForInputText(urlInput, 'https://brave.com/test')
+          // hit up
+          .keys(Brave.keys.UP)
+          .waitForInputText(urlInput, 'https://brave.com')
+      })
+    })
+
+    describe('type non-visible keys', function () {
+      it('autocompletes without losing characters', function * () {
+        // ue008 is left shift
+        yield this.app.client
+          .keys('a\uE008\uE008b\uE008\uE008o\uE008\uE008u\uE008\uE008t\uE008\uE008x')
+          .waitForInputText(urlInput, 'aboutx')
+      })
+    })
+
+    describe('focus urlbar', function () {
+      it('does not show suggestions', function * () {
+        yield this.app.client
+          .keys('brave')
+          .waitForVisible(urlBarSuggestions, 1)
+          .ipcSend('shortcut-focus-url')
+          .waitForElementFocus(urlInput)
+          .waitForElementCount(urlBarSuggestions, 0)
+      })
+    })
+  })
+
+  describe('with scrolling match', function () {
+    Brave.beforeEach(this)
+
+    it('typing in the urlbar should override mouse hover for suggestions', function * () {
+      yield this.app.client
+        .addSite({ location: 'https://brave.com', title: 'Brave' })
+        .addSite({ location: 'https://brave.com/test' })
+        .addSite({ location: 'https://brave.com/test2' })
+        .addSite({ location: 'https://brave.com/test3' })
+        .addSite({ location: 'https://brave.com/test4' })
+        .addSite({ location: 'https://brianbondy.com/test4' })
+        .resizeWindow(500, 300)
+        .setValue(urlInput, 'b')
+        .waitForVisible(urlBarSuggestions)
+        // highlight for autocomplete brianbondy.com
+        .moveToObject(urlBarSuggestions, 0, 100)
+      yield selectsText(this.app.client, 'rianbondy.com')
+        .keys('ra')
+        .execute(function (urlBarSuggestions) {
+          document.querySelector(urlBarSuggestions).scrollTop = 200
+        }, urlBarSuggestions)
+      yield selectsText(this.app.client, 've.com')
+    })
+  })
+
+  describe('typing', function () {
+    Brave.beforeEach(this)
+
+    beforeEach(function * () {
+      yield setup(this.app.client)
+      yield this.app.client.waitForExist(urlInput)
+      yield this.app.client.waitForElementFocus(urlInput)
+        .waitForInputText(urlInput, '')
+        .setValue(urlInput, 'br')
+    })
+
+    it('sets the value to "br"', function * () {
+      yield this.app.client.waitForInputText(urlInput, 'br')
+    })
+
+    it('clears the selected text', function * () {
+      yield selectsText(this.app.client, '')
+    })
+
+    describe('shortcut-focus-url', function () {
+      beforeEach(function * () {
+        yield this.app.client
+          .ipcSend('shortcut-focus-url')
+      })
+
+      it('has focus', function * () {
+        yield this.app.client.waitForElementFocus(urlInput)
+      })
+
+      it('selects the text', function * () {
+        yield selectsText(this.app.client, 'br')
+      })
+
+      it('has the search icon', function * () {
+        yield this.app.client.waitForExist('.urlbarIcon.fa-search')
+      })
+    })
+
+    describe('press left arrow key', function () {
+      beforeEach(function * () {
+        yield this.app.client
+          .keys(Brave.keys.LEFT)
+      })
+
+      it('clears the selection', function * () {
+        yield this.app.client
+          .waitForSelectedText('')
+      })
+
+      describe('with typing', function () {
+        beforeEach(function * () {
+          yield this.app.client
+            .keys('x')
+        })
+
+        it('has no selection', function * () {
+          yield this.app.client
+            .waitForSelectedText('')
+        })
+
+        it('inserts typing at the current cursor location', function * () {
+          yield this.app.client
+            .waitForInputText(urlInput, 'bxr')
+        })
+      })
+    })
+
+    describe('press backspace key', function () {
+      beforeEach(function * () {
+        yield this.app.client
+          .keys(Brave.keys.BACKSPACE)
+      })
+
+      it('clears the selection', function * () {
+        yield this.app.client
+          .waitForSelectedText('')
+      })
+
+      it('deletes the last character', function * () {
+        yield this.app.client
+          .waitForInputText(urlInput, 'b')
+      })
+
+      describe('with typing', function () {
+        beforeEach(function * () {
+          yield this.app.client
+            .keys('x')
+        })
+
+        it('has no selection', function * () {
+          yield this.app.client
+            .waitForSelectedText('')
+        })
+
+        it('inserts typing at the current cursor location', function * () {
+          yield this.app.client
+            .waitForInputText(urlInput, 'bx')
+        })
+      })
+    })
+
+    describe('press escape', function () {
+      beforeEach(function * () {
         this.page = Brave.server.url('page1.html')
         return yield this.app.client
           .tabByIndex(0)
@@ -243,33 +427,8 @@ describe('urlBar tests', function () {
       })
     })
 
-    describe('type escape twice', function () {
-      before(function * () {
-        this.page = Brave.server.url('page1.html')
-        return yield this.app.client
-          .tabByIndex(0)
-          .loadUrl(this.page)
-          .windowByUrl(Brave.browserWindowUrl)
-          .ipcSend('shortcut-focus-url')
-          .waitForElementFocus(urlInput)
-          .setValue(urlInput, 'blah')
-          // hit escape
-          .keys(Brave.keys.ESCAPE)
-          .waitForElementFocus(urlInput)
-          .keys(Brave.keys.ESCAPE)
-      })
-
-      it('selects the urlbar text', function * () {
-        yield selectsText(this.app.client, this.page)
-      })
-
-      it('sets the urlbar text to the webview src', function * () {
-        yield this.app.client.waitForInputText(urlInput, this.page)
-      })
-    })
-
     describe('submitting by typing a URL', function () {
-      before(function * () {
+      beforeEach(function * () {
         const url = Brave.server.url('page1.html')
         return yield this.app.client.ipcSend('shortcut-focus-url')
           .setValue(urlInput, url)

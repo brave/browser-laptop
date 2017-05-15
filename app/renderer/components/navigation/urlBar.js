@@ -247,6 +247,13 @@ class UrlBar extends React.Component {
       this.lastSuffix = ''
     }
 
+    // if there is no selection then we are not in autocomplete
+    // so make sure that this.lastValue is set to urlInput.value
+    if (this.urlInput.selectionStart === this.urlInput.selectionEnd) {
+      this.lastVal = this.urlInput.value
+      this.lastSuffix = ''
+    }
+
     const selectionStart = this.urlInput.selectionStart
     const newValue = [
       this.lastVal.slice(0, selectionStart),
