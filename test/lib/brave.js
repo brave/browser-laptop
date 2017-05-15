@@ -106,6 +106,8 @@ var exports = {
     SHIFT: '\ue008',
     BACKSPACE: '\ue003',
     DELETE: '\ue017',
+    LEFT: '\ue012',
+    RIGHT: '\ue014',
     DOWN: '\ue015',
     UP: '\ue013',
     PAGEDOWN: '\uE00F',
