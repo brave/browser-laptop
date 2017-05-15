@@ -288,7 +288,8 @@ const styles = StyleSheet.create({
   paymentsContainer: {
     position: 'relative',
     overflowX: 'hidden',
-    width: '805px'
+    width: '805px',
+    paddingBottom: '40px' // cf: padding of .prefTabContainer
   },
   paymentsSwitches: {
     display: 'flex',
