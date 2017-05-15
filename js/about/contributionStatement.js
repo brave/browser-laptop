@@ -142,7 +142,7 @@ class ContributionStatement extends React.Component {
   }
 
   renderPdf () {
-    aboutActions.renderUrlToPdf(this.htmlDataURL, this.receiptFileName())
+    aboutActions.renderUrlToPdf(this.htmlDataURL, this.receiptFileName(), true)
   }
 
   get transaction () {
