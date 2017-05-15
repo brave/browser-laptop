@@ -144,7 +144,7 @@ describe('bookmarksToolbar', function () {
         .click(navigatorNotBookmarked)
         .waitForVisible(doneButton)
         .waitForBookmarkDetail(this.page1Url, 'Page 1')
-        .setInputText(bookmarkNameInput, 'test1')
+        .typeText(bookmarkNameInput, 'test1')
         .waitForBookmarkDetail(this.page1Url, 'test1')
         .waitForEnabled(doneButton)
         .click(doneButton)

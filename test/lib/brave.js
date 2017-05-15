@@ -74,6 +74,8 @@ const executeType = (current, next) => {
     case exports.keys.BACKSPACE:
       current = current.slice(0, -1)
       break
+    case exports.keys.END:
+      break
     default:
       current += next
       break
@@ -937,8 +939,26 @@ var exports = {
 
         return this.keys(text[i])
           .waitUntil(function () {
-            return this.getValue(selector).then(function (val) {
-              return val === current
+            return this.elements(selector).then((res) => {
+              if (!res.value || res.value.length === 0) {
+                logVerbose(`Element not found for the selector ${selector}`)
+                return false
+              }
+
+              let elementIdAttributeCommands = []
+              for (let elem of res.value) {
+                elementIdAttributeCommands.push(this.elementIdAttribute(elem.ELEMENT, 'value'))
+              }
+
+              return Promise.all(elementIdAttributeCommands).then((result) => {
+                if (!Array.isArray(result)) {
+                  return result
+                }
+
+                return result.map(res => res.value)
+              })
+            }).then(function (val) {
+              return val.toString() === current
             })
           }).then(function (valid) {
             if (valid) {

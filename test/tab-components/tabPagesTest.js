@@ -55,12 +55,14 @@ describe('tab pages', function () {
 
       it('clicking tab page changes', function * () {
         yield this.app.client.click(tabPage1)
-          .waitForExist(tabPage1 + '.active')
+          .waitForElementCount(tabPage1 + '.active', 1)
       })
 
       it('clicking on webview resets tab page selection', function * () {
-        yield this.app.client.click(activeWebview)
-          .waitForExist(tabPage2 + '.active')
+        yield this.app.client
+          .waitForElementCount(tabPage2 + '.active', 1)
+          .click(activeWebview)
+          .waitForElementCount(tabPage2 + '.active', 1)
       })
     })
 

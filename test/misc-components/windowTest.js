@@ -287,7 +287,7 @@ describe('application window', function () {
       Brave.beforeAll(this)
 
       before(function * () {
-        var page1 = Brave.server.url('page1.html')
+        const page1 = Brave.server.url('page1.html')
 
         yield this.app.client
           .waitForBrowserWindow()
@@ -303,8 +303,8 @@ describe('application window', function () {
       })
 
       it('opens in a new tab', function * () {
-        var selector = '.frameWrapper:nth-child(2) webview'
-        var page1 = Brave.server.url('page1.html')
+        const selector = '.frameWrapper:nth-child(2) webview'
+        const page1 = Brave.server.url('page1.html')
 
         yield this.app.client
           .waitForVisible(selector)

@@ -97,7 +97,7 @@ function * bookmarkUrl (url, title, folderId) {
     .click(navigatorNotBookmarked)
     .waitForVisible(doneButton)
     .waitForVisible(bookmarkNameInput)
-    .setInputText(bookmarkNameInput, title)
+    .typeText(bookmarkNameInput, title)
     .waitForBookmarkDetail(url, title)
   if (folderId) {
     const folderOption = `[data-test-id="bookmarkParentFolder"] option[value="${folderId}"`
@@ -120,7 +120,7 @@ function * addBookmarkFolder (title) {
     .click('.addBookmarkFolder')
     .windowParentByUrl(aboutBookmarksUrl)
     .waitForExist(bookmarkNameInput)
-    .setInputText(bookmarkNameInput, title)
+    .typeText(bookmarkNameInput, title)
     .waitForEnabled(doneButton)
     .click(doneButton)
 }
@@ -350,7 +350,7 @@ describe('Syncing bookmarks', function () {
       .click(navigatorBookmarked)
       .waitForVisible(doneButton)
       .waitForExist(bookmarkNameInput)
-      .setInputText(bookmarkNameInput, this.page2TitleUpdated)
+      .typeText(bookmarkNameInput, this.page2TitleUpdated)
       .waitForBookmarkDetail(this.page2Url, this.page2TitleUpdated)
       .waitForEnabled(doneButton)
       .click(doneButton)
@@ -450,6 +450,7 @@ describe('Syncing bookmarks', function () {
     const folder = `[data-test-id="bookmarkToolbarButton"][title="${folderTitle}"]`
     yield Brave.app.client
       .waitForVisible(folder)
+      .doubleClick(folder)
       .click(folder)
       .waitForVisible('.contextMenu')
       .waitForTextValue(`.contextMenuItem:nth-child(${pageNthChild})`, pageTitle)
@@ -517,7 +518,7 @@ describe('Syncing bookmarks from an existing profile', function () {
       .click(navigatorBookmarked)
       .waitForVisible(doneButton)
       .waitForVisible(bookmarkNameInput)
-      .setInputText(bookmarkNameInput, this.page2TitleUpdated)
+      .typeText(bookmarkNameInput, this.page2TitleUpdated)
       .waitForBookmarkDetail(this.page2Url, this.page2TitleUpdated)
       .waitForEnabled(doneButton)
       .click(doneButton)
@@ -600,6 +601,7 @@ describe('Syncing bookmarks from an existing profile', function () {
     const folder = `[data-test-id="bookmarkToolbarButton"][title="${folderTitle}"]`
     yield Brave.app.client
       .waitForVisible(folder)
+      .click(folder)
       .click(folder)
       .waitForVisible('.contextMenu')
       .waitForTextValue(`.contextMenuItem:nth-child(${pageNthChild})`, pageTitle)
