@@ -56,7 +56,6 @@ const showAutoplayMessageBox = (tabId) => {
           tab.on('destroyed', function temporaryAllow (e) {
             if (!persist) {
               appActions.removeSiteSetting(origin, 'autoplay')
-              // tab.removeListener('did-finish-load', temporaryAllow)
             }
           })
         }
