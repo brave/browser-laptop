@@ -33,7 +33,7 @@ const {getCurrentWindowId, isMaximized, isFullScreen, isFocused} = require('../.
 const {isWindows} = require('../../../common/lib/platformUtil')
 const {braveShieldsEnabled} = require('../../../common/state/shieldState')
 const eventUtil = require('../../../../js/lib/eventUtil')
-const {isNavigatableAboutPage, getBaseUrl} = require('./../../../../js/lib/appUrlUtil')
+const {isNavigatableAboutPage, getBaseUrl, fileUrl} = require('./../../../../js/lib/appUrlUtil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const siteSettings = require('../../../../js/state/siteSettings')
 const cx = require('../../../../js/lib/classSet')
@@ -113,7 +113,7 @@ class Navigator extends React.Component {
   onDrop (e) {
     if (e.dataTransfer.files.length > 0) {
       Array.from(e.dataTransfer.files).forEach((file) => {
-        const path = encodeURI(file.path)
+        const path = fileUrl(file.path)
         appActions.createTabRequested({ url: path })
       })
     } else if (e.dataTransfer.getData('text/plain')) {
