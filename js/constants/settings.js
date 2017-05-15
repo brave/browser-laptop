@@ -48,6 +48,7 @@ const settings = {
   SHUTDOWN_CLEAR_SITE_SETTINGS: 'shutdown.clear-site-settings',
   FLASH_INSTALLED: 'security.flash.installed',
   FULLSCREEN_CONTENT: 'security.fullscreen.content',
+  AUTOPLAY_MEDIA: 'security.autoplay.media',
   // Autofill
   AUTOFILL_ENABLED: 'privacy.autofill-enabled',
   // Payments Tab

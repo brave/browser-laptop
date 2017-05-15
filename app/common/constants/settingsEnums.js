@@ -32,10 +32,16 @@ const fullscreenOption = {
   ALWAYS_ALLOW: 'alwaysAllow'
 }
 
+const autoplayOption = {
+  ALWAYS_ASK: 'alwaysAsk',
+  ALWAYS_ALLOW: 'alwaysAllow'
+}
+
 module.exports = {
   startsWithOption,
   newTabMode,
   bookmarksToolbarMode,
   tabCloseAction,
-  fullscreenOption
+  fullscreenOption,
+  autoplayOption
 }

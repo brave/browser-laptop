@@ -266,9 +266,11 @@ AppStore
       savePasswords: boolean, // only false or undefined/null
       shieldsUp: boolean,
       widevine: (number|boolean), // false = block widevine, 0 = allow once, 1 = allow always
-      zoomLevel: number
+      zoomLevel: number,
+      autoplay: boolean,
     }
   },
+  defaultSiteSettingsListImported: boolean,
   sync: {
     lastFetchTimestamp: integer // the last time new sync records were fetched in seconds
     deviceId: Array.<number>,

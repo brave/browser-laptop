@@ -1,7 +1,8 @@
 /* global describe, it, before, beforeEach */
 
 const Brave = require('../lib/brave')
-const {notificationBar, titleBar, urlInput} = require('../lib/selectors')
+const {notificationBar, titleBar, urlInput, reloadButton} = require('../lib/selectors')
+const {autoplayOption} = require('../../app/common/constants/settingsEnums')
 
 describe('notificationBar permissions', function () {
   function * setup (client) {
@@ -211,5 +212,222 @@ describe('permissions state', function () {
       .waitUntil(function () {
         return this.getText(titleBar).then((val) => val.includes('denied'))
       })
+  })
+})
+
+describe('Autoplay test', function () {
+  function * setup (client) {
+    yield client
+      .waitForBrowserWindow()
+      .waitForVisible(urlInput)
+  }
+
+  Brave.beforeEach(this)
+
+  beforeEach(function * () {
+    yield setup(this.app.client)
+  })
+
+  it('default always ask and block', function * () {
+    const url = Brave.server.url('autoplay.html')
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(url)
+      .waitUntil(function () {
+        return this.getText('div[id="status"]')
+          .then((status) => {
+            return status === ''
+          })
+      })
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForExist(notificationBar)
+      .waitUntil(function () {
+        return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
+      })
+  })
+
+  it('always allow', function * () {
+    const url = Brave.server.url('autoplay.html')
+    yield this.app.client
+      .changeSetting('security.autoplay.media', autoplayOption.ALWAYS_ALLOW)
+      .tabByIndex(0)
+      .loadUrl(url)
+      .waitUntil(function () {
+        return this.getText('div[id="status"]')
+          .then((status) => {
+            return status === 'Autoplay playing'
+          })
+      })
+  })
+
+  it('allow autoplay until tab closed', function * () {
+    const url = Brave.server.url('autoplay.html')
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(url)
+      .waitUntil(function () {
+        return this.getText('div[id="status"]')
+          .then((status) => {
+            return status === ''
+          })
+      })
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForExist(notificationBar)
+      .waitUntil(function () {
+        return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
+      })
+      .click('button=Yes')
+      .tabByUrl(url)
+      .waitUntil(function () {
+        return this.getText('div[id="status"]')
+          .then((status) => {
+            return status === 'Autoplay playing'
+          })
+      })
+      .windowByUrl(Brave.browserWindowUrl)
+      .click(reloadButton)
+      .tabByUrl(url)
+      .waitUntil(function () {
+        return this.getText('div[id="status"]')
+          .then((status) => {
+            return status === 'Autoplay playing'
+          })
+      })
+      .windowByUrl(Brave.browserWindowUrl)
+      .newTab({ url })
+      .waitForTabCount(2)
+      .waitForUrl(url)
+      .tabByUrl(url)
+      .waitUntil(function () {
+        return this.getText('div[id="status"]')
+          .then((status) => {
+            return status === 'Autoplay playing'
+          })
+      })
+      .windowByUrl(Brave.browserWindowUrl)
+      .closeTabByIndex(0)
+      .click(reloadButton)
+      .waitForExist(notificationBar)
+      .waitUntil(function () {
+        return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
+      })
+  })
+
+  it('allow autoplay and remember', function * () {
+    const url = Brave.server.url('autoplay.html')
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(url)
+      .waitUntil(function () {
+        return this.getText('div[id="status"]')
+          .then((status) => {
+            return status === ''
+          })
+      })
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForExist(notificationBar)
+      .waitUntil(function () {
+        return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
+      })
+      .click('[data-l10n-id=rememberDecision]')
+      .click('button=Yes')
+      .tabByUrl(url)
+      .waitUntil(function () {
+        return this.getText('div[id="status"]')
+          .then((status) => {
+            return status === 'Autoplay playing'
+          })
+      })
+      .windowByUrl(Brave.browserWindowUrl)
+      .click(reloadButton)
+      .tabByUrl(url)
+      .waitUntil(function () {
+        return this.getText('div[id="status"]')
+          .then((status) => {
+            return status === 'Autoplay playing'
+          })
+      })
+      .windowByUrl(Brave.browserWindowUrl)
+      .newTab({ url })
+      .waitForTabCount(2)
+      .waitForUrl(url)
+      .tabByUrl(url)
+      .waitUntil(function () {
+        return this.getText('div[id="status"]')
+          .then((status) => {
+            return status === 'Autoplay playing'
+          })
+      })
+      .windowByUrl(Brave.browserWindowUrl)
+      .closeTabByIndex(0)
+      .click(reloadButton)
+      .tabByUrl(url)
+      .waitUntil(function () {
+        return this.getText('div[id="status"]')
+          .then((status) => {
+            return status === 'Autoplay playing'
+          })
+      })
+  })
+
+  it('keep blocking autoplay', function * () {
+    const url = Brave.server.url('autoplay.html')
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(url)
+      .waitUntil(function () {
+        return this.getText('div[id="status"]')
+          .then((status) => {
+            return status === ''
+          })
+      })
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForExist(notificationBar)
+      .waitUntil(function () {
+        return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
+      })
+      .click('button=No')
+      .windowByUrl(Brave.browserWindowUrl)
+      .click(reloadButton)
+      .tabByUrl(url)
+      .waitUntil(function () {
+        return this.getText('div[id="status"]')
+          .then((status) => {
+            return status === ''
+          })
+      })
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForExist(notificationBar)
+  })
+
+  it('keep blocking autoplay and remember', function * () {
+    const url = Brave.server.url('autoplay.html')
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(url)
+      .waitUntil(function () {
+        return this.getText('div[id="status"]')
+          .then((status) => {
+            return status === ''
+          })
+      })
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForExist(notificationBar)
+      .waitUntil(function () {
+        return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
+      })
+      .click('[data-l10n-id=rememberDecision]')
+      .click('button=No')
+      .windowByUrl(Brave.browserWindowUrl)
+      .click(reloadButton)
+      .tabByUrl(url)
+      .waitUntil(function () {
+        return this.getText('div[id="status"]')
+          .then((status) => {
+            return status === ''
+          })
+      })
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForElementCount('.notificationItem', 0)
   })
 })
