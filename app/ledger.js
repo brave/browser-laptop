@@ -1533,6 +1533,7 @@ var ledgerInfo = {
   currency: undefined,
 
   paymentURL: undefined,
+  refundURL: undefined,
   buyURL: undefined,
   bravery: undefined,
 
@@ -1582,6 +1583,7 @@ var updateLedgerInfo = () => {
                             amount: getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT),
                             address: ledgerInfo.address })
       ledgerInfo.customerURL = process.env.ADDFUNDS_URL + '/customers/' + ledgerInfo.address
+      ledgerInfo.refundURL = process.env.ADDFUNDS_URL + '/refund?ledgerAddress=' + ledgerInfo.address
       ledgerInfo.buyMaximumUSD = false
     }
 

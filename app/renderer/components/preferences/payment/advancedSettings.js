@@ -18,6 +18,7 @@ const ImmutableComponent = require('../../immutableComponent')
 // style
 const commonStyles = require('../../styles/commonStyles')
 const globalStyles = require('../../styles/global')
+const cx = require('../../../../../js/lib/classSet')
 
 // other
 const settings = require('../../../../../js/constants/settings')
@@ -79,7 +80,17 @@ class AdvancedSettingsContent extends ImmutableComponent {
             className={css(styles.listItem, commonStyles.noMarginBottom)}
             switchClassName={css(styles.checkboxSwitch)}
             labelClassName={css(commonStyles.noMarginBottom)}
-          />
+      />
+
+          {
+            !this.props.ledgerData.getIn(['customer', 'transactions']) ? null
+              : <div className={cx({[css(styles.refundLinkContainer)]: true})}>
+                <a href={this.props.ledgerData.get('refundURL')}
+                  target='_blank'
+                  data-l10n-id='getARefund'
+                  className={cx({[css(styles.refundLink)]: true})} />
+              </div>
+          }
         </SettingsList>
       </div>
     </section>
@@ -139,6 +150,13 @@ const styles = StyleSheet.create({
     marginTop: '2px',
     paddingTop: 0,
     paddingBottom: 0
+  },
+  refundLinkContainer: {
+    marginTop: '8px'
+  },
+  refundLink: {
+    marginTop: '8px',
+    color: globalStyles.color.braveOrange
   }
 })
 
