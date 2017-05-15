@@ -369,18 +369,6 @@ class Frame extends React.Component {
       case 'show-findbar':
         windowActions.setFindbarShown(this.props.frameKey, true)
         break
-      case 'fill-password':
-        let currentUrl = urlParse(this.props.tabUrl)
-        if (currentUrl &&
-            [currentUrl.protocol, currentUrl.host].join('//') === this.props.shortcutDetailsOrigin) {
-          this.webview.send(messages.GOT_PASSWORD,
-                            this.props.shortcutDetailsUsername,
-                            this.props.shortcutDetailsPassword,
-                            this.props.shortcutDetailsOrigin,
-                            this.props.shortcutDetailsAction,
-                            true)
-        }
-        break
       case 'focus-webview':
         setImmediate(() => this.webview.focus())
         break

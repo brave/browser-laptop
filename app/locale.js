@@ -215,6 +215,7 @@ var rendererIdentifiers = function () {
     'updateLater',
     'updateHello',
     'notificationPasswordWithUserName',
+    'notificationUpdatePasswordWithUserName',
     'notificationPassword',
     'notificationPasswordSettings',
     'notificationPaymentDone',

@@ -448,26 +448,6 @@ function moreBookmarksTemplateInit (allBookmarkItems, bookmarks, activeFrame) {
   return menuUtil.sanitizeTemplateItems(template)
 }
 
-function usernameTemplateInit (usernames, origin, action) {
-  let template = []
-  for (let username in usernames) {
-    let password = usernames[username]
-    template.push({
-      label: username,
-      click: (item) => {
-        windowActions.frameShortcutChanged(null, messages.FILL_PASSWORD, {
-          username,
-          password,
-          origin,
-          action
-        })
-        windowActions.setContextMenuDetail()
-      }
-    })
-  }
-  return menuUtil.sanitizeTemplateItems(template)
-}
-
 function autofillTemplateInit (suggestions, frame) {
   const template = []
   for (let i = 0; i < suggestions.length; ++i) {
@@ -477,12 +457,22 @@ function autofillTemplateInit (suggestions, frame) {
       value = suggestions[i].value
     } else if (frontendId === -1) { // POPUP_ITEM_ID_WARNING_MESSAGE
       value = 'Disabled due to unsecure connection.'
+    } else if (frontendId === -2) { // POPUP_ITEM_ID_PASSWORD_ENTRY
+      value = suggestions[i].value
     } else if (frontendId === -4) { // POPUP_ITEM_ID_CLEAR_FORM
       value = 'Clear Form'
     } else if (frontendId === -5) { // POPUP_ITEM_ID_AUTOFILL_OPTIONS
       value = 'Autofill Settings'
     } else if (frontendId === -6) { // POPUP_ITEM_ID_DATALIST_ENTRY
       value = suggestions[i].value
+    } else if (frontendId === -11) { // POPUP_ITEM_ID_USERNAME_ENTRY
+      value = suggestions[i].value
+    }
+    if (frontendId === -2) {
+      template.push({
+        label: 'Use password for:',
+        enabled: false
+      })
     }
     if (frontendId === -3) { // POPUP_ITEM_ID_SEPARATOR
       template.push(CommonMenu.separatorMenuItem)
@@ -1463,24 +1453,6 @@ function onShowBookmarkFolderMenu (bookmarks, bookmark, activeFrame, e) {
   }))
 }
 
-/**
- * @param {Object} usernames - map of username to plaintext password
- * @param {string} origin - origin of the form
- * @param {string} action - action of the form
- * @param {Object} boundingRect - bounding rectangle of username input field
- * @param {number} topOffset - distance from webview to the top of window
- */
-function onShowUsernameMenu (usernames, origin, action, boundingRect,
-                                    topOffset) {
-  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) ? getDownloadsBarHeight() : 0
-  const menuTemplate = usernameTemplateInit(usernames, origin, action)
-  windowActions.setContextMenuDetail(Immutable.fromJS({
-    left: boundingRect.left,
-    top: boundingRect.bottom + topOffset - downloadsBarOffset,
-    template: menuTemplate
-  }))
-}
-
 function onShowAutofillMenu (suggestions, boundingRect, frame) {
   const menuTemplate = autofillTemplateInit(suggestions, frame)
   const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) &&
@@ -1536,7 +1508,6 @@ module.exports = {
   onFindBarContextMenu,
   onSiteDetailContextMenu,
   onShowBookmarkFolderMenu,
-  onShowUsernameMenu,
   onShowAutofillMenu,
   onMoreBookmarksMenu,
   onReloadContextMenu

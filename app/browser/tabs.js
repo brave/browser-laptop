@@ -193,9 +193,13 @@ const updateAboutDetails = (tab, tabValue) => {
       downloads: downloads.toJS()
     })
   } else if (location === 'about:passwords' && passwords) {
-    tab.send(messages.PASSWORD_DETAILS_UPDATED, passwords.toJS())
-    tab.send(messages.PASSWORD_SITE_DETAILS_UPDATED,
-        allSiteSettings.filter((setting) => setting.get('savePasswords') === false).toJS())
+    const defaultSession = session.defaultSession
+    defaultSession.autofill.getAutofillableLogins((result) => {
+      tab.send(messages.PASSWORD_DETAILS_UPDATED, result)
+    })
+    defaultSession.autofill.getBlackedlistLogins((result) => {
+      tab.send(messages.PASSWORD_SITE_DETAILS_UPDATED, result)
+    })
   } else if (location === 'about:flash') {
     tab.send(messages.BRAVERY_DEFAULTS_UPDATED, braveryDefaults.toJS())
   } else if (location === 'about:newtab') {
@@ -351,7 +355,16 @@ const api = {
         console.log('responsive')
       })
 
+      tab.on('save-password', (e, username, origin) => {
+        appActions.savePassword(username, origin, tabId)
+      })
+
+      tab.on('update-password', (e, username, origin) => {
+        appActions.updatePassword(username, origin, tabId)
+      })
+
       updateWebContents(tabId, tab)
+
       let tabValue = getTabValue(tabId)
       if (tabValue) {
         appActions.tabCreated(tabValue)
