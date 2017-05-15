@@ -120,3 +120,33 @@ module.exports.updateTabPageIndex = (state, frameProps) => {
 
   return state
 }
+
+/**
+ * Get the mouse velocity
+ * @param e The current mouse event
+ * @param lastE The last mouse event
+ * @param cb Callback function to execute
+ */
+module.exports.getMouseVelocity = (e, lastE, cb) => {
+  if (lastE.timestamp === null) {
+    lastE.timestamp = Date.now()
+    lastE.updatedX = e.clientX
+    lastE.updatedY = e.clientY
+    return
+  }
+
+  const now = Date.now()
+  const distanceX = e.clientX - lastE.updatedX
+  const distanceY = e.clientY - lastE.updatedY
+  const interval = now - lastE.timestamp
+  const velocity = Math.sqrt((distanceX * distanceX) + (distanceY * distanceY)) / interval
+
+  // velocity is defined as travelled dist / amount of time
+  // Which we get by using Pythagorean theorem
+  // => distance^2 = distanceX^2 + distanceY^2
+  cb(Math.round(velocity))
+
+  lastE.timestamp = now
+  lastE.updatedX = e.clientX
+  lastE.updatedY = e.clientY
+}

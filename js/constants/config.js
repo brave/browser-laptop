@@ -62,5 +62,8 @@ module.exports = {
   },
   tabs: {
     maxAllowedNewSessions: 9
+    // TODO: once Brad defines a number, add here
+    // because magic numbers are evil
+    // ,maxAllowedTimesIdleMouseOverTab: 10
   }
 }
