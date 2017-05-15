@@ -477,4 +477,18 @@ describe('windowState', function () {
       windowState.getWindows(state)
     })
   })
+
+  describe('getActiveWindowId', function () {
+    before(function () {
+      this.appState = defaultAppState
+        .set('windows', Immutable.fromJS([
+          { windowId: 1 },
+          { windowId: 2, focused: true }
+        ]))
+    })
+    it('obtains active windowId', function () {
+      const expectedWindowId = 2
+      assert.equal(windowState.getActiveWindowId(this.appState), expectedWindowId)
+    })
+  })
 })

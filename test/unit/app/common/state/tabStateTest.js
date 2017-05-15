@@ -700,4 +700,51 @@ describe('tabState unit tests', function () {
       )
     })
   })
+
+  describe('getActiveTabId', function () {
+    before(function () {
+      this.appState = defaultAppState
+        .set('tabs', Immutable.fromJS([
+          { tabId: 4, windowId: 1, active: true },
+          { tabId: 5, windowId: 2, active: true },
+          { tabId: 3, windowId: 2 }
+        ]))
+        .set('windows', Immutable.fromJS([
+          { windowId: 1 },
+          { windowId: 2, focused: true }
+        ]))
+    })
+    it('obtains active tabId when window is specified', function () {
+      const windowId = 1
+      const expectedTabId = 4
+      assert.equal(tabState.getActiveTabId(this.appState, windowId), expectedTabId)
+    })
+    it('obtains active tabId when no window is specified based on focused window', function () {
+      const expectedTabId = 5
+      assert.equal(tabState.getActiveTabId(this.appState), expectedTabId)
+    })
+  })
+
+  describe('resolveTabId', function () {
+    before(function () {
+      this.appState = defaultAppState
+        .set('tabs', Immutable.fromJS([
+          { tabId: 4, windowId: 1, active: true },
+          { tabId: 5, windowId: 2, active: true },
+          { tabId: 3, windowId: 2 }
+        ]))
+        .set('windows', Immutable.fromJS([
+          { windowId: 1 },
+          { windowId: 2, focused: true }
+        ]))
+    })
+    it('resolves numeric tabs', function () {
+      const tabId = 4
+      assert.equal(tabState.resolveTabId(this.appState, tabId), tabId)
+    })
+    it('resolves active tab', function () {
+      const expectedTabId = 5
+      assert.equal(tabState.resolveTabId(this.appState, tabState.TAB_ID_ACTIVE), expectedTabId)
+    })
+  })
 })
