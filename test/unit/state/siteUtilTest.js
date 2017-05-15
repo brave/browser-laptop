@@ -779,20 +779,15 @@ describe('siteUtil', function () {
   describe('moveSite', function () {
     describe('order test', function () {
       describe('back to front', function () {
-        const destinationDetail = {
-          location: testUrl1,
-          partitionNumber: 0,
-          parentFolderId: 0,
-          order: 0
-        }
-        const sourceDetail = {
-          location: testUrl2 + '4',
-          partitionNumber: 0,
-          parentFolderId: 0,
-          order: 3
-        }
+        const destinationKey = 'https://brave.com/|0|0'
+        const sourceKey = 'http://example.com/4|0|0'
         const sites = {
-          'https://brave.com/|0|0': destinationDetail,
+          'https://brave.com/|0|0': {
+            location: testUrl1,
+            partitionNumber: 0,
+            parentFolderId: 0,
+            order: 0
+          },
           'http://example.com/0|0': {
             location: testUrl2,
             partitionNumber: 0,
@@ -805,7 +800,12 @@ describe('siteUtil', function () {
             parentFolderId: 0,
             order: 2
           },
-          'http://example.com/4|0|0': sourceDetail
+          'http://example.com/4|0|0': {
+            location: testUrl2 + '4',
+            partitionNumber: 0,
+            parentFolderId: 0,
+            order: 3
+          }
         }
 
         it('prepend target', function () {
@@ -836,8 +836,8 @@ describe('siteUtil', function () {
             }
           }
           const processedSites = siteUtil.moveSite(Immutable.fromJS(sites),
-            Immutable.fromJS(sourceDetail),
-            Immutable.fromJS(destinationDetail), true, false, true)
+            sourceKey,
+            destinationKey, true, false, true)
           assert.deepEqual(processedSites.toJS(), expectedSites)
         })
         it('not prepend target', function () {
@@ -868,26 +868,21 @@ describe('siteUtil', function () {
             }
           }
           const processedSites = siteUtil.moveSite(Immutable.fromJS(sites),
-            Immutable.fromJS(sourceDetail),
-            Immutable.fromJS(destinationDetail), false, false, true)
+            sourceKey,
+            destinationKey, false, false, true)
           assert.deepEqual(processedSites.toJS(), expectedSites)
         })
       })
       describe('front to back', function () {
-        const sourceDetail = {
-          location: testUrl1,
-          partitionNumber: 0,
-          parentFolderId: 0,
-          order: 0
-        }
-        const destinationDetail = {
-          location: testUrl2 + '4',
-          partitionNumber: 0,
-          parentFolderId: 0,
-          order: 3
-        }
+        const sourceKey = 'https://brave.com/|0|0'
+        const destinationKey = 'http://example.com/4|0|0'
         const sites = {
-          'https://brave.com/|0|0': sourceDetail,
+          'https://brave.com/|0|0': {
+            location: testUrl1,
+            partitionNumber: 0,
+            parentFolderId: 0,
+            order: 0
+          },
           'http://example.com/0|0': {
             location: testUrl2,
             partitionNumber: 0,
@@ -900,7 +895,12 @@ describe('siteUtil', function () {
             parentFolderId: 0,
             order: 2
           },
-          'http://example.com/4|0|0': destinationDetail
+          'http://example.com/4|0|0': {
+            location: testUrl2 + '4',
+            partitionNumber: 0,
+            parentFolderId: 0,
+            order: 3
+          }
         }
 
         it('prepend target', function () {
@@ -931,8 +931,8 @@ describe('siteUtil', function () {
             }
           }
           const processedSites = siteUtil.moveSite(Immutable.fromJS(sites),
-            Immutable.fromJS(sourceDetail),
-            Immutable.fromJS(destinationDetail), true, false, true)
+            sourceKey,
+            destinationKey, true, false, true)
           assert.deepEqual(processedSites.toJS(), expectedSites)
         })
         it('not prepend target', function () {
@@ -963,13 +963,14 @@ describe('siteUtil', function () {
             }
           }
           const processedSites = siteUtil.moveSite(Immutable.fromJS(sites),
-            Immutable.fromJS(sourceDetail),
-            Immutable.fromJS(destinationDetail), false, false, true)
+            sourceKey,
+            destinationKey, false, false, true)
           assert.deepEqual(processedSites.toJS(), expectedSites)
         })
       })
     })
     it('destination is parent', function () {
+      const sourceKey = 'https://brave.com/|0|0'
       const sourceDetail = {
         location: testUrl1,
         partitionNumber: 0,
@@ -996,8 +997,8 @@ describe('siteUtil', function () {
         }
       }
       const processedSites = siteUtil.moveSite(Immutable.fromJS(sites),
-        Immutable.fromJS(sourceDetail),
-        Immutable.fromJS(destinationDetail), false, true, false)
+        sourceKey,
+        '1', false, true, false)
       assert.deepEqual(processedSites.toJS(), expectedSites)
     })
     it('reparent', function () {
@@ -1027,8 +1028,8 @@ describe('siteUtil', function () {
         }
       }
       const processedSites = siteUtil.moveSite(Immutable.fromJS(sites),
-        Immutable.fromJS(sourceDetail),
-        Immutable.fromJS(destinationDetail), false, false, false)
+        'https://brave.com/|0|1',
+        '1', false, false, false)
       assert.deepEqual(processedSites.toJS(), expectedSites)
     })
   })

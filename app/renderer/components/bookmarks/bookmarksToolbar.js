@@ -64,7 +64,10 @@ class BookmarksToolbar extends ImmutableComponent {
       if (droppedOn.selectedRef) {
         const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn.selectedRef), e.clientX)
         const droppedOnSiteDetail = droppedOn.selectedRef.props.bookmark || droppedOn.selectedRef.props.bookmarkFolder
-        appActions.moveSite(bookmark, droppedOnSiteDetail, isLeftSide, droppedOnSiteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER) && droppedOn && droppedOn.isDroppedOn)
+        const isDestinationParent = droppedOnSiteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER) && droppedOn && droppedOn.isDroppedOn
+        const bookmarkSiteKey = siteUtil.getSiteKey(bookmark)
+        const droppedOnSiteKey = siteUtil.getSiteKey(droppedOnSiteDetail)
+        appActions.moveSite(bookmarkSiteKey, droppedOnSiteKey, isLeftSide, isDestinationParent)
       }
       return
     }

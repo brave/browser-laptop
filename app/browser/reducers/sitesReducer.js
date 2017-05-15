@@ -40,8 +40,13 @@ const sitesReducer = (state, action, immutableAction) => {
         state = state.set('sites', siteUtil.addSite(sites, action.siteDetail, action.tag, action.originalSiteDetail, action.skipSync))
       }
       if (action.destinationDetail) {
-        state = state.set('sites', siteUtil.moveSite(state.get('sites'),
-          action.siteDetail, action.destinationDetail, false, false, true))
+        const sourceKey = siteUtil.getSiteKey(action.siteDetail)
+        const destinationKey = siteUtil.getSiteKey(action.destinationDetail)
+
+        if (sourceKey != null) {
+          state = state.set('sites', siteUtil.moveSite(state.get('sites'),
+            sourceKey, destinationKey, false, false, true))
+        }
       }
       if (syncEnabled()) {
         state = syncUtil.updateSiteCache(state, action.destinationDetail || action.siteDetail)
@@ -56,10 +61,11 @@ const sitesReducer = (state, action, immutableAction) => {
       break
     case appConstants.APP_MOVE_SITE:
       state = state.set('sites', siteUtil.moveSite(state.get('sites'),
-        action.sourceDetail, action.destinationDetail, action.prepend,
+        action.sourceKey, action.destinationKey, action.prepend,
         action.destinationIsParent, false))
       if (syncEnabled()) {
-        state = syncUtil.updateSiteCache(state, action.destinationDetail)
+        const destinationDetail = state.getIn(['sites', action.destinationKey])
+        state = syncUtil.updateSiteCache(state, destinationDetail)
       }
       break
     case appConstants.APP_APPLY_SITE_RECORDS:

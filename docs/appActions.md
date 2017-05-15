@@ -192,15 +192,15 @@ Removes a site from the site list
 
 
 
-### moveSite(sourceDetail, destinationDetail, prepend, destinationIsParent) 
+### moveSite(sourceKey, destinationKey, prepend, destinationIsParent) 
 
 Dispatches a message to move a site locations.
 
 **Parameters**
 
-**sourceDetail**: `string`, the location, partitionNumber, etc of the source moved site
+**sourceKey**: `string`, the source key of the source moved site
 
-**destinationDetail**: `string`, the location, partitionNumber, etc of the destination moved site
+**destinationKey**: `string`, the destination key of the destination moved site
 
 **prepend**: `boolean`, Whether or not to prepend to the destinationLocation
   If false, the destinationDetail is considered a sibling.

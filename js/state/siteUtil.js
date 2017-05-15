@@ -366,7 +366,7 @@ const getAncestorFolderIds = (parentFolderIds, bookmarkFolder, allBookmarks) => 
  * Determine if a proposed move is valid
  *
  * @param sites The application state's Immutable sites list
- * @param siteDetail The site detail to move
+ * @param sourceDetail The site detail to move
  * @param destinationDetail The site detail to move to
  */
 module.exports.isMoveAllowed = (sites, sourceDetail, destinationDetail) => {
@@ -389,41 +389,37 @@ module.exports.isMoveAllowed = (sites, sourceDetail, destinationDetail) => {
  * Moves the specified site from one location to another
  *
  * @param sites The application state's Immutable sites map
- * @param siteDetail The site detail to move
- * @param destinationDetail The site detail to move to
+ * @param sourceKey The site key to move
+ * @param destinationKey The site key to move to
  * @param prepend Whether the destination detail should be prepended or not, not used if destinationIsParent is true
  * @param destinationIsParent Whether the item should be moved inside of the destinationDetail.
  * @param disallowReparent If set to true, parent folder will not be set
  * @return The new sites Immutable object
  */
-module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prepend,
+module.exports.moveSite = function (sites, sourceKey, destinationKey, prepend,
   destinationIsParent, disallowReparent) {
-  if (!module.exports.isMoveAllowed(sites, sourceDetail, destinationDetail)) {
+  let sourceSite = sites.get(sourceKey) || Immutable.Map()
+  const destinationSite = sites.get(destinationKey) || Immutable.Map()
+
+  if (sourceSite.isEmpty() || !module.exports.isMoveAllowed(sites, sourceSite, destinationSite)) {
     return sites
   }
 
-  const sourceKey = module.exports.getSiteKey(sourceDetail)
-  const destinationKey = module.exports.getSiteKey(destinationDetail)
-
-  const sourceSiteIndex = sites.getIn([sourceKey, 'order'])
+  const sourceSiteIndex = sourceSite.get('order')
   let destinationSiteIndex
   if (destinationIsParent) {
     // When the destination is the parent we want to put it at the end
     destinationSiteIndex = sites.size - 1
     prepend = true
   } else {
-    destinationSiteIndex = sites.getIn([destinationKey, 'order'])
+    destinationSiteIndex = destinationSite.get('order')
   }
 
-  let sourceSite = sites.get(sourceKey)
-  if (!sourceSite) {
-    return sites
-  }
   let newIndex = destinationSiteIndex + (prepend ? 0 : 1)
   if (destinationSiteIndex > sourceSiteIndex) {
     --newIndex
   }
-  const destinationSite = sites.get(destinationKey)
+
   sites = sites.delete(sourceKey)
   sites = sites.map((site) => {
     const siteOrder = site.get('order')
@@ -437,9 +433,9 @@ module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prep
   sourceSite = sourceSite.set('order', newIndex)
 
   if (!disallowReparent) {
-    if (destinationIsParent && destinationDetail.get('folderId') !== sourceSite.get('folderId')) {
-      sourceSite = sourceSite.set('parentFolderId', destinationDetail.get('folderId'))
-    } else if (!destinationSite.get('parentFolderId')) {
+    if (destinationIsParent && destinationSite.get('folderId') !== sourceSite.get('folderId')) {
+      sourceSite = sourceSite.set('parentFolderId', destinationSite.get('folderId'))
+    } else if (destinationSite.get('parentFolderId') == null) {
       sourceSite = sourceSite.set('parentFolderId', 0)
     } else if (destinationSite.get('parentFolderId') !== sourceSite.get('parentFolderId')) {
       sourceSite = sourceSite.set('parentFolderId', destinationSite.get('parentFolderId'))

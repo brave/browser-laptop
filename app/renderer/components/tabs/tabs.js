@@ -14,9 +14,6 @@ const Tab = require('./tab')
 const appActions = require('../../../../js/actions/appActions')
 const windowActions = require('../../../../js/actions/windowActions')
 
-// Store
-const windowStore = require('../../../../js/stores/windowStore')
-
 // Constants
 const dragTypes = require('../../../../js/constants/dragTypes')
 
@@ -75,6 +72,12 @@ class Tabs extends ImmutableComponent {
     const clientX = e.clientX
     const sourceDragData = dndData.getDragData(e.dataTransfer, dragTypes.TAB)
     if (sourceDragData) {
+      // If this is a different window ID than where the drag started, then
+      // the tear off will be done by tab.js
+      if (this.props.dragData.get('windowId') !== getCurrentWindowId()) {
+        return
+      }
+
       // This must be executed async because the state change that this causes
       // will cause the onDragEnd to never run
       setTimeout(() => {
@@ -82,15 +85,8 @@ class Tabs extends ImmutableComponent {
         let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter((node) => node && node.props.frame.get('key') !== key), clientX).selectedRef
         if (droppedOnTab) {
           const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), clientX)
-          const droppedOnFrameProps = windowStore.getFrame(droppedOnTab.props.frame.get('key'))
 
-          // If this is a different window ID than where the drag started, then
-          // the tear off will be done by tab.js
-          if (this.props.dragData.get('windowId') !== getCurrentWindowId()) {
-            return
-          }
-
-          windowActions.moveTab(sourceDragData, droppedOnFrameProps, isLeftSide)
+          windowActions.moveTab(key, droppedOnTab.props.frame.get('key'), isLeftSide)
           if (sourceDragData.get('pinnedLocation')) {
             appActions.tabPinned(sourceDragData.get('tabId'), false)
           }
@@ -98,6 +94,7 @@ class Tabs extends ImmutableComponent {
       }, 0)
       return
     }
+
     if (e.dataTransfer.files) {
       Array.from(e.dataTransfer.files).forEach((file) => {
         const path = encodeURI(file.path)

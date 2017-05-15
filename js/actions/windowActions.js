@@ -210,13 +210,12 @@ const windowActions = {
   /**
    * Dispatches a message to close a frame
    *
-   * @param {Object[]} frames - Immutable list of of all the frames
-   * @param {Object} frameProps - The properties of the frame to close
+   * @param {Object} frameKey - Frame key of the frame to close
    */
-  closeFrame: function (frameProps) {
+  closeFrame: function (frameKey) {
     dispatch({
       actionType: windowConstants.WINDOW_CLOSE_FRAME,
-      frameProps
+      frameKey
     })
   },
 
@@ -275,12 +274,12 @@ const windowActions = {
    * Dispatches a message to the store to set a preview frame.
    * This is done when hovering over a tab.
    *
-   * @param {Object} frameProps - the frame properties for the webview in question.
+   * @param {Object} frameKey - the frame key for the webview in question.
    */
-  setPreviewFrame: function (frameProps) {
+  setPreviewFrame: function (frameKey) {
     dispatch({
       actionType: windowConstants.WINDOW_SET_PREVIEW_FRAME,
-      frameProps: frameProps
+      frameKey
     })
   },
 
@@ -299,13 +298,13 @@ const windowActions = {
   /**
    * Dispatches a message to the store to set the tab breakpoint.
    *
-   * @param {Object} frameProps - the frame properties for the webview in question.
+   * @param {Object} frameKey - the frame key for the webview in question.
    * @param {string} breakpoint - the tab breakpoint to change to
    */
-  setTabBreakpoint: function (frameProps, breakpoint) {
+  setTabBreakpoint: function (frameKey, breakpoint) {
     dispatch({
       actionType: windowConstants.WINDOW_SET_TAB_BREAKPOINT,
-      frameProps,
+      frameKey,
       breakpoint
     })
   },
@@ -313,13 +312,13 @@ const windowActions = {
   /**
    * Dispatches a message to the store to set the current tab hover state.
    *
-   * @param {Object} frameProps - the frame properties for the webview in question.
+   * @param {Object} frameKey - the frame key for the webview in question.
    * @param {boolean} hoverState - whether or not mouse is over tab
    */
-  setTabHoverState: function (frameProps, hoverState) {
+  setTabHoverState: function (frameKey, hoverState) {
     dispatch({
       actionType: windowConstants.WINDOW_SET_TAB_HOVER_STATE,
-      frameProps,
+      frameKey,
       hoverState
     })
   },
@@ -351,15 +350,15 @@ const windowActions = {
   /**
    * Dispatches a message to the store to indicate that the specified frame should move locations.
    *
-   * @param {Object} sourceFrameProps - the frame properties for the webview to move.
-   * @param {Object} destinationFrameProps - the frame properties for the webview to move to.
+   * @param {Object} sourceFrameKey - the frame key for the webview to move.
+   * @param {Object} destinationFrameKey - the frame key for the webview to move to.
    * @param {boolean} prepend - Whether or not to prepend to the destinationFrameProps
    */
-  moveTab: function (sourceFrameProps, destinationFrameProps, prepend) {
+  moveTab: function (sourceFrameKey, destinationFrameKey, prepend) {
     dispatch({
       actionType: windowConstants.WINDOW_TAB_MOVE,
-      sourceFrameProps,
-      destinationFrameProps,
+      sourceFrameKey,
+      destinationFrameKey,
       prepend
     })
   },

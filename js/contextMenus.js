@@ -373,7 +373,9 @@ function showBookmarkFolderInit (allBookmarkItems, parentBookmarkFolder, activeF
         e.preventDefault()
         const bookmark = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
         if (bookmark) {
-          appActions.moveSite(bookmark, parentBookmarkFolder, false, true)
+          const bookmarkSiteKey = siteUtil.getSiteKey(bookmark)
+          const parentBookmarkFolderKey = siteUtil.getSiteKey(parentBookmarkFolder)
+          appActions.moveSite(bookmarkSiteKey, parentBookmarkFolderKey, false, true)
         }
       }
     }]
@@ -414,7 +416,10 @@ function bookmarkItemsInit (allBookmarkItems, items, activeFrame) {
         e.preventDefault()
         const bookmarkItem = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
         if (bookmarkItem) {
-          appActions.moveSite(bookmarkItem, site, dndData.shouldPrependVerticalItem(e.target, e.clientY))
+          const bookmarkItemSiteKey = siteUtil.getSiteKey(bookmarkItem)
+          const siteKey = siteUtil.getSiteKey(site)
+
+          appActions.moveSite(bookmarkItemSiteKey, siteKey, dndData.shouldPrependVerticalItem(e.target, e.clientY))
         }
       },
       click: function (e) {
