@@ -7,15 +7,21 @@ const path = require('path')
 const UrlUtil = require('./urlutil')
 const config = require('../constants/config')
 
-module.exports.fileUrl = (str) => {
-  var pathName = path.resolve(str).replace(/\\/g, '/')
+module.exports.fileUrl = (filePath) => {
+  // It's preferrable to call path.resolve but it's not available
+  // because process.cwd doesn't exist in renderers like in file URL
+  // drops in the URL bar.
+  if (!path.isAbsolute(filePath) && process.cwd) {
+    filePath = path.resolve(filePath)
+  }
+  let fileUrlPath = filePath.replace(/\\/g, '/')
 
   // Windows drive letter must be prefixed with a slash
-  if (pathName[0] !== '/') {
-    pathName = '/' + pathName
+  if (fileUrlPath[0] !== '/') {
+    fileUrlPath = '/' + fileUrlPath
   }
 
-  return encodeURI('file://' + pathName)
+  return encodeURI('file://' + fileUrlPath)
 }
 
 /**
