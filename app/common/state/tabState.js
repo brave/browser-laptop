@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const { makeImmutable, isMap, isList } = require('./immutableUtil')
+const Immutable = require('immutable')
 const assert = require('assert')
 const frameState = require('./frameState')
 const windowState = require('./windowState')
@@ -55,6 +56,36 @@ const matchTab = function (queryInfo, tab) {
   return !Object.keys(queryInfo).map((queryKey) => (tab.get(queryKey) === queryInfo[queryKey])).includes(false)
 }
 
+const deleteTabsInternalIndex = (state, tabValue) => {
+  const tabId = validateId('tabId', tabValue.get('tabId'))
+  if (tabId === tabState.TAB_ID_NONE) {
+    return state
+  }
+  state = state.deleteIn(['tabsInternal', tabId])
+  return state.deleteIn(['tabsInternal', tabId.toString()])
+}
+
+const updateTabsInternalIndex = (state, fromIndex) => {
+  let tabsInternal = state.get('tabsInternal') || Immutable.Map()
+  state.get('tabs').slice(fromIndex).forEach((tab, idx) => {
+    if (tab.get('tabId') !== tabState.TAB_ID_NONE) {
+      tabsInternal = tabsInternal.setIn(['index', tab.get('tabId')], idx + fromIndex)
+    }
+  })
+  return state.set('tabsInternal', tabsInternal)
+}
+
+const getTabInternalIndexByTabId = (state, tabId) => {
+  tabId = validateId('tabId', tabId)
+  state = validateState(state)
+
+  let index = state.getIn(['tabsInternal', 'index', tabId])
+  if (index == null) {
+    index = state.getIn(['tabsInternal', 'index', tabId.toString()])
+  }
+  return index == null ? -1 : index
+}
+
 const tabState = {
   queryTab: (state, queryInfo) => {
     state = validateState(state)
@@ -68,32 +99,12 @@ const tabState = {
     validateId('tabId', tabId)
   },
 
-  getTabIndex: (state, tabValue) => {
-    state = validateState(state)
-    tabValue = validateTabValue(tabValue)
-    let tabId = validateId('tabId', tabValue.get('tabId'))
-    return tabState.getTabIndexByTabId(state, tabId)
-  },
-
-  getTabIndexByTabId: (state, tabId) => {
-    tabId = validateId('tabId', tabId)
-    state = validateState(state)
-
-    return state.get('tabs').findIndex((tab) => tab.get('tabId') === tabId)
-  },
-
-  getActiveTabValue: (state, windowId) => {
-    windowId = validateId('windowId', windowId)
-    state = validateState(state)
-    return state.get('tabs').find((tab) => tab.get('windowId') === windowId && tab.get('active'))
-  },
-
   removeTabByTabId: (state, tabId) => {
     tabId = validateId('tabId', tabId)
     state = validateState(state)
 
-    let index = tabState.getTabIndexByTabId(state, tabId)
-    if (index === -1) {
+    let index = getTabInternalIndexByTabId(state, tabId)
+    if (index === tabState.TAB_ID_NONE) {
       return state
     }
     return tabState.removeTabByIndex(state, index)
@@ -103,7 +114,13 @@ const tabState = {
     index = parseInt(index)
     assert.ok(index >= 0, 'index must be positive')
     state = validateState(state)
-    return state.set('tabs', state.get('tabs').delete(index))
+    const tabValue = state.getIn(['tabs', index])
+    if (!tabValue) {
+      return state
+    }
+    state = deleteTabsInternalIndex(state, tabValue)
+    state = state.set('tabs', state.get('tabs').delete(index))
+    return updateTabsInternalIndex(state, index)
   },
 
   removeTab: (state, tabValue) => {
@@ -119,7 +136,8 @@ const tabState = {
     state = validateState(state)
     let tabValue = validateTabValue(action.get('tabValue'))
     assert.ok(!tabState.getTab(state, tabValue), 'Tab already exists')
-    return state.set('tabs', state.get('tabs').push(tabValue))
+    state = state.set('tabs', state.get('tabs').push(tabValue))
+    return updateTabsInternalIndex(state, state.get('tabs').size - 1)
   },
 
   maybeCreateTab: (state, action) => {
@@ -171,7 +189,7 @@ const tabState = {
     tabId = tabState.resolveTabId(state, tabId)
     state = validateState(state)
 
-    const index = state.get('tabs').findIndex((tab) => tab.get('tabId') === tabId)
+    const index = getTabInternalIndexByTabId(state, tabId)
     if (index === tabState.TAB_ID_NONE) {
       return null
     }
@@ -217,8 +235,8 @@ const tabState = {
   updateTabValue: (state, tabValue, replace = false) => {
     tabValue = validateTabValue(tabValue)
     const tabs = state.get('tabs')
-    const index = tabState.getTabIndex(state, tabValue)
-    if (index === -1) {
+    const index = getTabInternalIndexByTabId(state, tabValue.get('tabId'))
+    if (index === tabState.TAB_ID_NONE) {
       return state
     }
 
@@ -269,43 +287,63 @@ const tabState = {
     return tabState.updateTabValue(state, tabValue)
   },
 
-  getTabPropertyByTabId: (state, tabId, property) => {
+  getTabPropertyByTabId: (state, tabId, property, defaultValue = null) => {
     state = validateState(state)
     tabId = validateId('tabId', tabId)
+    if (tabId === tabState.TAB_ID_NONE) {
+      return defaultValue
+    }
     const tab = tabState.getByTabId(state, tabId)
     assert.ok(tab, `Could not find tab for ${tabId}`)
-    return tab.get(property)
+    const val = tab.get(property)
+    return val == null ? defaultValue : val
   },
 
   windowId: (state, tabId) => {
-    return tabState.getTabPropertyByTabId(state, tabId, 'windowId') || windowState.WINDOW_ID_NONE
+    return tabState.getTabPropertyByTabId(state, tabId, 'windowId', windowState.WINDOW_ID_NONE)
   },
 
   canGoForward: (state, tabId) => {
-    return tabState.getTabPropertyByTabId(state, tabId, 'canGoForward') || false
+    try {
+      return tabState.getTabPropertyByTabId(state, tabId, 'canGoForward', false)
+    } catch (e) {
+      return false
+    }
   },
 
   canGoBack: (state, tabId) => {
-    return tabState.getTabPropertyByTabId(state, tabId, 'canGoBack') || false
+    try {
+      return tabState.getTabPropertyByTabId(state, tabId, 'canGoBack', false)
+    } catch (e) {
+      return false
+    }
   },
 
   isShowingMessageBox: (state, tabId) => {
-    if (tabId === tabState.TAB_ID_NONE) {
+    try {
+      return tabState.getTabPropertyByTabId(state, tabId, 'messageBoxDetail', false)
+    } catch (e) {
       return false
     }
-    return tabState.getTabPropertyByTabId(state, tabId, 'messageBoxDetail') || false
+  },
+
+  isPinned: (state, tabId) => {
+    return tabState.getTabPropertyByTabId(state, tabId, 'pinned', false)
   },
 
   getTitle: (state, tabId) => {
-    return tabState.getTabPropertyByTabId(state, tabId, 'title') || ''
+    return tabState.getTabPropertyByTabId(state, tabId, 'title', '')
   },
 
   isActive: (state, tabId) => {
-    return tabState.getTabPropertyByTabId(state, tabId, 'active') || false
+    return tabState.getTabPropertyByTabId(state, tabId, 'active', false)
   },
 
   // TOOD(bridiver) - make everything work with TAB_ID_ACTIVE
   resolveTabId: (state, tabId) => {
+    if (tabId == null) {
+      tabId = tabState.TAB_ID_NONE
+    }
     if (tabId === tabState.TAB_ID_ACTIVE) {
       tabId = tabState.getActiveTabId(state)
     }
@@ -385,6 +423,7 @@ const tabState = {
 
     state = tabState.removeTabField(state, 'messageBoxDetail')
     state = tabState.removeTabField(state, 'frame')
+    state = state.delete('tabsInternal')
     return state.delete('tabs')
   }
 }

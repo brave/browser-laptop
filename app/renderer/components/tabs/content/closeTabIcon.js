@@ -19,7 +19,7 @@ const closeTabSvg = require('../../../../extensions/brave/img/tabs/close_btn_nor
 
 class CloseTabIcon extends ImmutableComponent {
   get isPinned () {
-    return !!this.props.tab.get('pinnedLocation')
+    return !!this.props.frame.get('pinnedLocation')
   }
 
   render () {

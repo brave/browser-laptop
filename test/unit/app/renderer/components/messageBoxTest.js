@@ -33,7 +33,12 @@ let appState = Immutable.fromJS({
     windowUUID: 'uuid',
     url: 'https://brave.com',
     messageBoxDetail: detail1
-  }]
+  }],
+  tabsInternal: {
+    index: {
+      1: 0
+    }
+  }
 })
 
 describe('MessageBox component unit tests', function () {

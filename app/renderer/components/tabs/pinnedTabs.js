@@ -45,10 +45,10 @@ class PinnedTabs extends ImmutableComponent {
     // will cause the onDragEnd to never run
     setTimeout(() => {
       const key = sourceDragData.get('key')
-      let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter((node) => node && node.props.tab.get('frameKey') !== key), clientX).selectedRef
+      let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter((node) => node && node.props.frame.get('key') !== key), clientX).selectedRef
       if (droppedOnTab) {
         const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), clientX)
-        const droppedOnFrameProps = windowStore.getFrame(droppedOnTab.props.tab.get('frameKey'))
+        const droppedOnFrameProps = windowStore.getFrame(droppedOnTab.props.frame.get('key'))
         windowActions.moveTab(sourceDragData, droppedOnFrameProps, isLeftSide)
         if (!sourceDragData.get('pinnedLocation')) {
           appActions.tabPinned(sourceDragData.get('tabId'), true)
@@ -73,14 +73,14 @@ class PinnedTabs extends ImmutableComponent {
       onDrop={this.onDrop}>
       {
          this.props.pinnedTabs
-           .map((tab) =>
+           .map((frame) =>
              <Tab ref={(node) => this.tabRefs.push(node)}
                dragData={this.props.dragData}
-               tab={tab}
-               key={'tab-' + tab.get('frameKey')}
+               frame={frame}
+               key={'tab-' + frame.get('key')}
                paintTabs={this.props.paintTabs}
                previewTabs={this.props.previewTabs}
-               isActive={this.props.activeFrameKey === tab.get('frameKey')}
+               isActive={this.props.activeFrameKey === frame.get('key')}
                partOfFullPageSet={this.props.partOfFullPageSet} />)
       }
     </div>

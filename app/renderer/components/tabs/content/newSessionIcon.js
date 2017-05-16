@@ -21,7 +21,7 @@ const newSessionSvg = require('../../../../extensions/brave/img/tabs/new_session
 
 class NewSessionIcon extends ImmutableComponent {
   get partitionNumber () {
-    let partition = this.props.tab.get('partitionNumber')
+    let partition = this.props.frame.get('partitionNumber')
     // Persistent partitions opened by `target="_blank"` will have
     // *partition-* string first, which causes bad UI. We don't need it for tabs
     if (typeof partition === 'string') {

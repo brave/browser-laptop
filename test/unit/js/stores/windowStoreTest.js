@@ -76,10 +76,10 @@ describe('Window store unit tests', function () {
         // call doAction for WINDOW_WEBVIEW_LOAD_START
         doAction({
           actionType: windowConstants.WINDOW_WEBVIEW_LOAD_START,
-          frameProps: {
+          frameProps: Immutable.fromJS({
             tabId: 0,
             key: 0
-          }
+          })
         })
 
         // get the updated windowState (AFTER doAction runs)
@@ -117,12 +117,6 @@ describe('Window store unit tests', function () {
           })
           it('sets endLoadTime=null', function () {
             assert.equal(windowState.getIn(['frames', 0, 'endLoadTime']), null)
-          })
-        })
-
-        describe('for tabs', function () {
-          it('sets loading=true for tab', function () {
-            assert.equal(windowState.getIn(['tabs', 0, 'loading']), true)
           })
         })
       })

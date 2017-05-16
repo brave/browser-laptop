@@ -28,7 +28,7 @@ describe('Tabs content - PrivateIcon', function () {
   it('should show private icon if current tab is private', function () {
     const wrapper = shallow(
       <PrivateIcon
-        tab={
+        frame={
           Immutable.Map({
             isPrivate: true
           })}
@@ -39,7 +39,7 @@ describe('Tabs content - PrivateIcon', function () {
   it('should not show private icon if current tab is not private', function () {
     const wrapper = shallow(
       <PrivateIcon
-        tab={
+        frame={
           Immutable.Map({
             isPrivate: false
           })}
@@ -50,7 +50,7 @@ describe('Tabs content - PrivateIcon', function () {
   it('should not show private icon if mouse is over tab and breakpoint is default', function () {
     const wrapper = shallow(
       <PrivateIcon
-        tab={
+        frame={
           Immutable.Map({
             isPrivate: true,
             hoverState: true,
@@ -63,7 +63,7 @@ describe('Tabs content - PrivateIcon', function () {
   it('should show private icon if mouse is not over tab and breakpoint is default', function () {
     const wrapper = shallow(
       <PrivateIcon
-        tab={
+        frame={
           Immutable.Map({
             isPrivate: true,
             hoverState: false,
@@ -76,7 +76,7 @@ describe('Tabs content - PrivateIcon', function () {
   it('should not show private icon if mouse is over tab and breakpoint is large', function () {
     const wrapper = shallow(
       <PrivateIcon
-        tab={
+        frame={
           Immutable.Map({
             isPrivate: 1,
             hoverState: true,
@@ -89,7 +89,7 @@ describe('Tabs content - PrivateIcon', function () {
   it('should show private icon if mouse is not over tab and breakpoint is large', function () {
     const wrapper = shallow(
       <PrivateIcon
-        tab={
+        frame={
           Immutable.Map({
             isPrivate: 1,
             hoverState: false,
@@ -102,7 +102,7 @@ describe('Tabs content - PrivateIcon', function () {
   it('should not show private icon if tab is active and breakpoint is largeMedium', function () {
     const wrapper = shallow(
       <PrivateIcon isActive
-        tab={
+        frame={
           Immutable.Map({
             isPrivate: 1,
             hoverState: true,
@@ -115,7 +115,7 @@ describe('Tabs content - PrivateIcon', function () {
   it('should show private icon if tab is not active and breakpoint is largeMedium', function () {
     const wrapper = shallow(
       <PrivateIcon isActive={false}
-        tab={
+        frame={
           Immutable.Map({
             isPrivate: 1,
             hoverState: false,
@@ -128,7 +128,7 @@ describe('Tabs content - PrivateIcon', function () {
   it('should not show private icon if tab is active and breakpoint is medium', function () {
     const wrapper = shallow(
       <PrivateIcon isActive
-        tab={
+        frame={
           Immutable.Map({
             isPrivate: 1,
             hoverState: true,
@@ -141,7 +141,7 @@ describe('Tabs content - PrivateIcon', function () {
   it('should show private icon if tab is not active and breakpoint is medium', function () {
     const wrapper = shallow(
       <PrivateIcon isActive={false}
-        tab={
+        frame={
           Immutable.Map({
             isPrivate: 1,
             hoverState: false,
@@ -154,7 +154,7 @@ describe('Tabs content - PrivateIcon', function () {
   it('should not show private icon if breakpoint is mediumSmall', function () {
     const wrapper = shallow(
       <PrivateIcon isActive
-        tab={
+        frame={
           Immutable.Map({
             isPrivate: 1,
             hoverState: false,
@@ -167,7 +167,7 @@ describe('Tabs content - PrivateIcon', function () {
   it('should not show private icon if breakpoint is small', function () {
     const wrapper = shallow(
       <PrivateIcon isActive
-        tab={
+        frame={
           Immutable.Map({
             isPrivate: 1,
             hoverState: true,
@@ -180,7 +180,7 @@ describe('Tabs content - PrivateIcon', function () {
   it('should not show private icon if breakpoint is extraSmall', function () {
     const wrapper = shallow(
       <PrivateIcon isActive
-        tab={
+        frame={
           Immutable.Map({
             isPrivate: 1,
             hoverState: true,
@@ -193,7 +193,7 @@ describe('Tabs content - PrivateIcon', function () {
   it('should not show private icon if breakpoint is the smallest', function () {
     const wrapper = shallow(
       <PrivateIcon
-        tab={
+        frame={
           Immutable.Map({
             isPrivate: 1,
             hoverState: true,

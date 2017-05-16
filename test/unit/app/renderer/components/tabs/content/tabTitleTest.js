@@ -20,7 +20,7 @@ describe('Tabs content - Title', function () {
   it('should show text if page has a title', function () {
     const wrapper = shallow(
       <TabTitle
-        tab={
+        frame={
           Immutable.Map({
             location: url1,
             title: pageTitle1
@@ -33,7 +33,7 @@ describe('Tabs content - Title', function () {
   it('should not show text if tab is pinned', function () {
     const wrapper = shallow(
       <TabTitle
-        tab={
+        frame={
           Immutable.Map({
             location: url1,
             title: pageTitle1,
@@ -47,7 +47,7 @@ describe('Tabs content - Title', function () {
   it('should show text if breakpoint is default', function () {
     const wrapper = shallow(
       <TabTitle
-        tab={
+        frame={
           Immutable.Map({
             location: url1,
             title: pageTitle1,
@@ -61,7 +61,7 @@ describe('Tabs content - Title', function () {
   it('should show text if breakpoint is large', function () {
     const wrapper = shallow(
       <TabTitle
-        tab={
+        frame={
           Immutable.Map({
             location: url1,
             title: pageTitle1,
@@ -75,7 +75,7 @@ describe('Tabs content - Title', function () {
   it('should show text if breakpoint is medium', function () {
     const wrapper = shallow(
       <TabTitle
-        tab={
+        frame={
           Immutable.Map({
             location: url1,
             title: pageTitle1,
@@ -89,7 +89,7 @@ describe('Tabs content - Title', function () {
   it('should show text if breakpoint is mediumSmall', function () {
     const wrapper = shallow(
       <TabTitle
-        tab={
+        frame={
           Immutable.Map({
             location: url1,
             title: pageTitle1,
@@ -103,7 +103,7 @@ describe('Tabs content - Title', function () {
   it('should show text if breakpoint is small and tab is not active', function () {
     const wrapper = shallow(
       <TabTitle isActive={false}
-        tab={
+        frame={
           Immutable.Map({
             location: url1,
             title: pageTitle1,
@@ -117,7 +117,7 @@ describe('Tabs content - Title', function () {
   it('should not show text if breakpoint is small and tab is active', function () {
     const wrapper = shallow(
       <TabTitle isActive
-        tab={
+        frame={
           Immutable.Map({
             location: url1,
             title: pageTitle1,
@@ -131,7 +131,7 @@ describe('Tabs content - Title', function () {
   it('should not show text if breakpoint is extraSmall', function () {
     const wrapper = shallow(
       <TabTitle
-        tab={
+        frame={
           Immutable.Map({
             location: url1,
             title: pageTitle1,
@@ -145,7 +145,7 @@ describe('Tabs content - Title', function () {
   it('should not show text if breakpoint is the smallest', function () {
     const wrapper = shallow(
       <TabTitle
-        tab={
+        frame={
           Immutable.Map({
             location: url1,
             title: pageTitle1,

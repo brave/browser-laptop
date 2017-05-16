@@ -18,7 +18,7 @@ describe('Tabs content - AudioTabIcon', function () {
   it('should not show any audio icon if page has audio disabled', function () {
     const wrapper = shallow(
       <AudioTabIcon
-        tab={
+        frame={
           Immutable.Map({
             audioPlaybackActive: false,
             breakpoint: 'default'
@@ -31,7 +31,7 @@ describe('Tabs content - AudioTabIcon', function () {
   it('should show play icon if page has audio enabled', function () {
     const wrapper = shallow(
       <AudioTabIcon
-        tab={
+        frame={
           Immutable.Map({
             audioPlaybackActive: true,
             breakpoint: 'default'
@@ -43,7 +43,7 @@ describe('Tabs content - AudioTabIcon', function () {
   it('should not show play audio icon if tab size is different than default', function () {
     const wrapper = shallow(
       <AudioTabIcon
-        tab={
+        frame={
           Immutable.Map({
             audioPlaybackActive: true,
             audioMuted: false,
@@ -56,7 +56,7 @@ describe('Tabs content - AudioTabIcon', function () {
   it('should show mute icon if page has audio muted', function () {
     const wrapper = shallow(
       <AudioTabIcon
-        tab={
+        frame={
           Immutable.Map({
             audioPlaybackActive: true,
             audioMuted: true,
@@ -69,7 +69,7 @@ describe('Tabs content - AudioTabIcon', function () {
   it('should not show mute icon if tab size is different than default', function () {
     const wrapper = shallow(
       <AudioTabIcon
-        tab={
+        frame={
           Immutable.Map({
             audioPlaybackActive: true,
             audioMuted: true,

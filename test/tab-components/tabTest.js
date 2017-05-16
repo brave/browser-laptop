@@ -3,7 +3,7 @@
 const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
-const {urlInput, backButton, forwardButton, activeTab, activeTabTitle, activeTabFavicon, newFrameButton, notificationBar, contextMenu} = require('../lib/selectors')
+const {urlInput, backButton, forwardButton, activeTab, activeTabTitle, activeTabFavicon, newFrameButton, notificationBar, contextMenu, pinnedTabsTabs, tabsTabs} = require('../lib/selectors')
 
 describe('tab tests', function () {
   function * setup (client) {
@@ -14,8 +14,8 @@ describe('tab tests', function () {
   }
 
   describe('back forward actions', function () {
-    Brave.beforeAll(this)
-    before(function * () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
       yield setup(this.app.client)
       this.page1 = Brave.server.url('page1.html')
       this.page2 = Brave.server.url('page2.html')
@@ -117,6 +117,30 @@ describe('tab tests', function () {
   })
 
   describe('tab order', function () {
+    describe('with pinned tabs', function () {
+      Brave.beforeAll(this)
+      before(function * () {
+        this.page1 = Brave.server.url('page1.html')
+        this.page2 = Brave.server.url('page2.html')
+        yield setup(this.app.client)
+        yield this.app.client
+          .waitForExist('.tabArea:nth-of-type(1) [data-frame-key="1"]') // original newtab
+          .newTab({ url: this.page1, pinned: true })
+          .waitForExist(pinnedTabsTabs + '[data-frame-key="2"]')
+          .newTab({ url: this.page1 })
+          .waitForExist(tabsTabs + '[data-frame-key="3"]')
+          .newTab({ url: this.page2 })
+          .waitForExist(tabsTabs + '[data-frame-key="4"]')
+      })
+
+      it('sequentially by default', function * () {
+        yield this.app.client
+          .waitForExist('.tabArea:nth-of-type(2) [data-frame-key="3"]')
+          .waitForExist('webview[data-frame-key="3"][src="' + this.page1 + '"]')
+          .waitForExist('.tabArea:nth-of-type(3) [data-frame-key="4"]')
+          .waitForExist('.frameWrapper.isActive webview[data-frame-key="4"][src="' + this.page2 + '"]')
+      })
+    })
     describe('sequentially by default', function () {
       Brave.beforeAll(this)
       before(function * () {

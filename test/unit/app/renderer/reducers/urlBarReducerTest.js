@@ -40,7 +40,18 @@ const windowState = Immutable.fromJS({
   }, {
     key: 3,
     location: 'about:newtab'
-  }]
+  }],
+  framesInternal: {
+    index: {
+      1: 0,
+      2: 1,
+      3: 2
+    },
+    tabIndex: {
+      1: 0,
+      2: 1
+    }
+  }
 })
 
 const fakeAppStoreRenderer = {
@@ -210,7 +221,15 @@ describe('urlBarReducer', function () {
       }, {
         key: 3,
         location: 'about:newtab'
-      }]
+      }],
+      framesInternal: {
+        index: {
+          2: 1
+        },
+        tabIndex: {
+          2: 1
+        }
+      }
     })
 
     before(function () {

@@ -29,7 +29,7 @@ describe('Tabs content - CloseTabIcon', function () {
   it('should show closeTab icon if mouse is over tab and breakpoint is default', function () {
     const wrapper = shallow(
       <CloseTabIcon
-        tab={
+        frame={
           Immutable.Map({
             hoverState: true,
             breakpoint: 'default'
@@ -41,7 +41,7 @@ describe('Tabs content - CloseTabIcon', function () {
   it('should show closeTab icon if mouse is over tab and breakpoint is large', function () {
     const wrapper = shallow(
       <CloseTabIcon
-        tab={
+        frame={
           Immutable.Map({
             hoverState: true,
             breakpoint: 'large'
@@ -53,7 +53,7 @@ describe('Tabs content - CloseTabIcon', function () {
   it('should not show closeTab icon if tab is pinned', function () {
     const wrapper = shallow(
       <CloseTabIcon
-        tab={
+        frame={
           Immutable.Map({
             hoverState: true,
             pinnedLocation: true
@@ -65,7 +65,7 @@ describe('Tabs content - CloseTabIcon', function () {
   it('should show closeTab icon if tab size is largeMedium and tab is active', function () {
     const wrapper = shallow(
       <CloseTabIcon isActive
-        tab={
+        frame={
           Immutable.Map({
             hoverState: false,
             breakpoint: 'largeMedium'
@@ -77,7 +77,7 @@ describe('Tabs content - CloseTabIcon', function () {
   it('should not show closeTab icon if tab size is largeMedium and tab is not active', function () {
     const wrapper = shallow(
       <CloseTabIcon isActive={false}
-        tab={
+        frame={
           Immutable.Map({
             hoverState: true,
             breakpoint: 'largeMedium'
@@ -90,7 +90,7 @@ describe('Tabs content - CloseTabIcon', function () {
   it('should show closeTab icon if tab size is medium and tab is active', function () {
     const wrapper = shallow(
       <CloseTabIcon isActive
-        tab={
+        frame={
           Immutable.Map({
             hoverState: false,
             breakpoint: 'medium'
@@ -102,7 +102,7 @@ describe('Tabs content - CloseTabIcon', function () {
   it('should not show closeTab icon if tab size is medium and tab is not active', function () {
     const wrapper = shallow(
       <CloseTabIcon isActive={false}
-        tab={
+        frame={
           Immutable.Map({
             hoverState: true,
             breakpoint: 'medium'
@@ -115,7 +115,7 @@ describe('Tabs content - CloseTabIcon', function () {
   it('should show closeTab icon if tab size is mediumSmall and tab is active', function () {
     const wrapper = shallow(
       <CloseTabIcon isActive
-        tab={
+        frame={
           Immutable.Map({
             hoverState: false,
             breakpoint: 'mediumSmall'
@@ -127,7 +127,7 @@ describe('Tabs content - CloseTabIcon', function () {
   it('should not show closeTab icon if tab size is mediumSmall and tab is not active', function () {
     const wrapper = shallow(
       <CloseTabIcon isActive={false}
-        tab={
+        frame={
           Immutable.Map({
             hoverState: true,
             breakpoint: 'mediumSmall'
@@ -139,7 +139,7 @@ describe('Tabs content - CloseTabIcon', function () {
   it('should show closeTab icon if tab size is small and tab is active', function () {
     const wrapper = shallow(
       <CloseTabIcon isActive
-        tab={
+        frame={
           Immutable.Map({
             hoverState: false,
             breakpoint: 'small'
@@ -151,7 +151,7 @@ describe('Tabs content - CloseTabIcon', function () {
   it('should not show closeTab icon if tab size is small and tab is not active', function () {
     const wrapper = shallow(
       <CloseTabIcon isActive={false}
-        tab={
+        frame={
           Immutable.Map({
             hoverState: true,
             breakpoint: 'small'
@@ -163,7 +163,7 @@ describe('Tabs content - CloseTabIcon', function () {
   it('should show closeTab icon if tab size is extraSmall and tab is active', function () {
     const wrapper = shallow(
       <CloseTabIcon isActive
-        tab={
+        frame={
           Immutable.Map({
             hoverState: false,
             breakpoint: 'extraSmall'
@@ -175,7 +175,7 @@ describe('Tabs content - CloseTabIcon', function () {
   it('should not show closeTab icon if tab size is extraSmall and tab is not active', function () {
     const wrapper = shallow(
       <CloseTabIcon isActive={false}
-        tab={
+        frame={
           Immutable.Map({
             hoverState: true,
             breakpoint: 'extraSmall'
@@ -187,7 +187,7 @@ describe('Tabs content - CloseTabIcon', function () {
   it('should not show closeTab icon if tab size is the smallest size', function () {
     const wrapper = shallow(
       <CloseTabIcon
-        tab={
+        frame={
           Immutable.Map({
             hoverState: true,
             breakpoint: 'extraSmall'

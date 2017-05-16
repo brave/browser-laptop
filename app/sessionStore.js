@@ -20,7 +20,6 @@ const locale = require('./locale')
 const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
 const downloadStates = require('../js/constants/downloadStates')
-const {tabFromFrame} = require('../js/state/frameStateUtil')
 const siteUtil = require('../js/state/siteUtil')
 const { topSites, pinnedTopSites } = require('../js/data/newTabData')
 const { defaultSiteSettingsList } = require('../js/data/siteSettingsList')
@@ -79,11 +78,6 @@ module.exports.saveAppState = (payload, isShutdown) => {
       payload.perWindowState.forEach((wndPayload) => {
         wndPayload.frames = wndPayload.frames.filter((frame) => !frame.isPrivate)
       })
-      // tabs will be auto-reset to what the frame is in cleanAppData but just in
-      // case clean fails we don't want to save private tabs.
-      payload.perWindowState.forEach((wndPayload) => {
-        wndPayload.tabs = wndPayload.tabs.filter((tab) => !tab.isPrivate)
-      })
     } else {
       delete payload.perWindowState
     }
@@ -117,6 +111,8 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
   if (!perWindowData) {
     perWindowData = {}
   }
+  // delete the frame index because tabId is per-session
+  delete perWindowData.framesInternal
   // Hide the context menu when we restore.
   delete perWindowData.contextMenuDetail
   // Don't save preview frame since they are only related to hovering on a tab
@@ -239,8 +235,6 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
       .filter((frame) => !frame.pinnedLocation)
     perWindowData.frames.forEach(cleanFrame)
   }
-  // Always recalculate tab data from frame data
-  perWindowData.tabs = perWindowData.frames.map((frame) => tabFromFrame(frame))
 }
 
 /**
