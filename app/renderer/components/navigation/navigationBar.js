@@ -110,10 +110,7 @@ class NavigationBar extends React.Component {
 
   get bookmarked () {
     return this.props.activeFrameKey !== undefined &&
-      siteUtil.isSiteBookmarked(this.props.sites, Immutable.fromJS({
-        location: this.props.location,
-        partitionNumber: this.props.partitionNumber
-      }))
+      this.props.bookmarked
   }
 
   componentDidMount () {
@@ -126,6 +123,7 @@ class NavigationBar extends React.Component {
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const activeFrameKey = activeFrame.get('key')
     const activeTabId = activeFrame.get('tabId') || tabState.TAB_ID_NONE
+    const activeTab = tabState.getByTabId(state, activeTabId)
 
     const activeTabShowingMessageBox = tabState.isShowingMessageBox(state, activeTabId)
     const bookmarkDetail = currentWindow.get('bookmarkDetail')
@@ -155,6 +153,7 @@ class NavigationBar extends React.Component {
     props.activeFrameKey = activeFrameKey
     props.location = location
     props.title = title
+    props.bookmarked = activeTab && activeTab.get('bookmarked')
     props.partitionNumber = activeFrame.get('partitionNumber') || 0
     props.isSecure = activeFrame.getIn(['security', 'isSecure'])
     props.loading = loading

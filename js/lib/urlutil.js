@@ -306,10 +306,19 @@ const UrlUtil = {
    * @return {string}
    */
   getLocationIfPDF: function (url) {
-    if (url && url.startsWith(`chrome-extension://${pdfjsExtensionId}/`)) {
-      return url.replace(`chrome-extension://${pdfjsExtensionId}/`, '')
+    if (!url || url.indexOf(`chrome-extension://${pdfjsExtensionId}/`) === -1) {
+      return url
     }
-    return url
+
+    if (url.indexOf('content/web/viewer.html?file=') !== -1) {
+      const querystring = require('querystring')
+      const parsedUrl = urlParse(url)
+      const query = querystring.parse(parsedUrl.query)
+      if (query && query.file) {
+        return query.file
+      }
+    }
+    return url.replace(`chrome-extension://${pdfjsExtensionId}/`, '')
   },
 
   /**

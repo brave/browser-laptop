@@ -96,6 +96,7 @@ class NewTabPage extends React.Component {
     }).size > 0
   }
   isBookmarked (siteProps) {
+    // XXX: Fixme, not passing state in!
     return siteUtil.isSiteBookmarked(this.topSites, siteProps)
   }
   get gridLayout () {
