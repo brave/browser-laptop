@@ -45,6 +45,15 @@ module.exports.register = (win) => {
     simpleWebContentEvents.push(
       ['Cmd+Alt+U', messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE]
     )
+
+    if (process.env.NODE_ENV !== 'development') {
+      // We're in Darwin and release or test mode...
+      // We disable for development mode because Browser level dev tools copy doesn't work.
+      // Workaround for #1060
+      simpleWebContentEvents.push(
+        ['Cmd+C', messages.SHORTCUT_ACTIVE_FRAME_COPY]
+      )
+    }
   }
 
   // Tab ordering shortcuts
