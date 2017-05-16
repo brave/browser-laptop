@@ -5,6 +5,8 @@ const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
 const {urlInput, backButton, forwardButton, activeTab, activeTabTitle, activeTabFavicon, newFrameButton, notificationBar, contextMenu, pinnedTabsTabs, tabsTabs} = require('../lib/selectors')
 
+const newTabUrl = 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-newtab.html'
+
 describe('tab tests', function () {
   function * setup (client) {
     yield client
@@ -89,6 +91,18 @@ describe('tab tests', function () {
         .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
         .waitForTextValue('[data-test-id="tab"][data-frame-key="2"]', 'New Tab')
     })
+
+    it('shows empty urlbar', function * () {
+      yield this.app.client
+        .newTab()
+        .waitForExist('webview[data-frame-key="4"]')
+        .waitUntil(function () {
+          return this.getAttribute('webview[data-frame-key="4"]', 'src').then((value) => value === newTabUrl)
+        })
+        .waitUntil(function () {
+          return this.getAttribute(urlInput, 'value').then((value) => value === '')
+        })
+    })
   })
 
   describe('new tab button', function () {
@@ -101,6 +115,17 @@ describe('tab tests', function () {
       yield this.app.client
         .click(newFrameButton)
         .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
+    })
+    it('shows empty urlbar', function * () {
+      yield this.app.client
+        .click(newFrameButton)
+        .waitForExist('webview[data-frame-key="2"]')
+        .waitUntil(function () {
+          return this.getAttribute('webview[data-frame-key="2"]', 'src').then((value) => value === newTabUrl)
+        })
+        .waitUntil(function () {
+          return this.getAttribute(urlInput, 'value').then((value) => value === '')
+        })
     })
     it.skip('shows a context menu when long pressed (click and hold)', function * () {
       yield this.app.client
