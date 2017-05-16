@@ -16,6 +16,7 @@ const top500 = require('../../../js/data/top500')
 const fetchSearchSuggestions = require('./fetchSearchSuggestions')
 const {getFrameByTabId, getTabsByWindowId} = require('../../common/state/tabState')
 const {query} = require('./siteSuggestions')
+const debounce = require('../../../js/lib/debounce')
 
 const sigmoid = (t) => {
   return 1 / (1 + Math.pow(Math.E, -t))
@@ -378,7 +379,7 @@ const getAlexaSuggestions = (state, urlLocationLower) => {
   })
 }
 
-const generateNewSuggestionsList = (state, windowId, tabId, urlLocation) => {
+const generateNewSuggestionsList = debounce((state, windowId, tabId, urlLocation) => {
   if (!urlLocation) {
     return
   }
@@ -394,9 +395,9 @@ const generateNewSuggestionsList = (state, windowId, tabId, urlLocation) => {
     // Flatten only 1 level deep for perf only, nested will be objects within arrrays
     appActions.urlBarSuggestionsChanged(windowId, makeImmutable(suggestionsLists).flatten(1))
   })
-}
+}, 5)
 
-const generateNewSearchXHRResults = (state, windowId, tabId, input) => {
+const generateNewSearchXHRResults = debounce((state, windowId, tabId, input) => {
   const frame = getFrameByTabId(state, tabId)
   if (!frame) {
     // Frame info may not be available yet in app store
@@ -427,7 +428,7 @@ const generateNewSearchXHRResults = (state, windowId, tabId, input) => {
     const appActions = require('../../../js/actions/appActions')
     appActions.searchSuggestionResultsAvailable(tabId, Immutable.List())
   }
-}
+}, 100)
 
 module.exports = {
   sortingPriority,
