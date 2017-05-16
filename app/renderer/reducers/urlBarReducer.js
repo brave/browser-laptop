@@ -365,7 +365,7 @@ const setNavBarUserInput = (state, location) => {
   state = updateSearchEngineInfoFromInput(state, activeFrameProps)
   state = searchXHR(state, activeFrameProps, true)
   state = generateNewSuggestionsList(state)
-  state = updateUrlSuffix(state, state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), []))
+  state = updateUrlSuffix(state, state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), Immutable.Map()))
   if (!location) {
     state = setRenderUrlBarSuggestions(state, false)
   }
