@@ -91,9 +91,4 @@ describe('urlBarSuggestionsReducer', function () {
       assert.deepEqual(this.suggestionStub.generateNewSearchXHRResults.args[0][3], input)
     })
   })
-  describe('APP_SEARCH_SUGGESTION_RESULTS_AVAILABLE', function () {
-    it.skip('starts generating new suggestions', function () {
-      // TODO
-    })
-  })
 })

@@ -353,12 +353,7 @@ const getSearchSuggestions = (state, tabId, urlLocationLower) => {
     const mapListToElements = getMapListToElements(urlLocationLower)
     let suggestionsList = Immutable.List()
     if (getSetting(settings.OFFER_SEARCH_SUGGESTIONS)) {
-      const frame = getFrameByTabId(state, tabId)
-      if (!frame) {
-        resolve(suggestionsList)
-        return
-      }
-      const searchResults = frame.getIn(['navbar', 'urlbar', 'suggestions', 'searchResults'])
+      const searchResults = state.get('searchResults')
       if (searchResults) {
         suggestionsList = mapListToElements({
           data: searchResults,
@@ -430,7 +425,7 @@ const generateNewSearchXHRResults = (state, windowId, tabId, input) => {
     fetchSearchSuggestions(windowId, tabId, autocompleteURL, input)
   } else {
     const appActions = require('../../../js/actions/appActions')
-    appActions.searchSuggestionResultsAvailable(windowId, tabId, Immutable.List())
+    appActions.searchSuggestionResultsAvailable(tabId, Immutable.List())
   }
 }
 

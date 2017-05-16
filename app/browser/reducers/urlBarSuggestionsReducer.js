@@ -8,6 +8,7 @@ const appConstants = require('../../../js/constants/appConstants')
 const {generateNewSuggestionsList, generateNewSearchXHRResults} = require('../../common/lib/suggestion')
 const {init, add} = require('../../common/lib/siteSuggestions')
 const Immutable = require('immutable')
+const {makeImmutable} = require('../../common/state/immutableUtil')
 
 const urlBarSuggestionsReducer = (state, action) => {
   switch (action.actionType) {
@@ -28,8 +29,8 @@ const urlBarSuggestionsReducer = (state, action) => {
       generateNewSearchXHRResults(state, action.windowId, action.tabId, action.input)
       break
     case appConstants.APP_SEARCH_SUGGESTION_RESULTS_AVAILABLE:
-      // TODO: Find a way to get urlLocation and also convert search suggestions to fetch
-      // generateNewSuggestionsList(state, action.windowId, action.tabId, urlLocation, action.searchResults)
+      state = state.set('searchResults', makeImmutable(action.searchResults))
+      generateNewSuggestionsList(state, action.windowId, action.tabId)
       break
   }
   return state

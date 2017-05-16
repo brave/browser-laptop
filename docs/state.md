@@ -465,7 +465,6 @@ WindowStore
         selected: boolean, // is the urlbar text selected
         suggestions: {
           autocompleteEnabled: boolean, // used to enable or disable autocomplete
-          searchResults: array, // autocomplete server results if enabled
           selectedIndex: number, // index of the item in focus
           shouldRender: boolean, // if the suggestions should render
           suggestionList: {
@@ -628,6 +627,7 @@ WindowStore
     autocompleteURL: string, // ditto re: {searchTerms}
     searchURL: string // with replacement var in string: {searchTerms}
   },
+  searchResults: array, // autocomplete server results if enabled
   ui: {
     bookmarksToolbar: {
       selectedFolderId: number // folderId from the siteDetail of the currently expanded folder

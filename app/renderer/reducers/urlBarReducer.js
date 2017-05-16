@@ -8,7 +8,7 @@ const windowConstants = require('../../../js/constants/windowConstants')
 const appConstants = require('../../../js/constants/appConstants')
 const {isUrl, getSourceAboutUrl, getSourceMagnetUrl} = require('../../../js/lib/appUrlUtil')
 const {isURL, isPotentialPhishingUrl, getUrlFromInput} = require('../../../js/lib/urlutil')
-const {getFrameByKey, getFrameKeyByTabId, activeFrameStatePath, frameStatePath, getActiveFrame, getFrameByTabId} = require('../../../js/state/frameStateUtil')
+const {getFrameByKey, activeFrameStatePath, frameStatePath, getActiveFrame, getFrameByTabId} = require('../../../js/state/frameStateUtil')
 const searchProviders = require('../../../js/data/searchProviders')
 const Immutable = require('immutable')
 const {navigateSiteClickHandler} = require('../suggestionClickHandlers')
@@ -264,10 +264,6 @@ const urlBarReducer = (state, action) => {
       state = updateUrlSuffix(state, state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), suggestionList))
       break
     }
-    case appConstants.APP_SEARCH_SUGGESTION_RESULTS_AVAILABLE:
-      const frameKey = getFrameKeyByTabId(state, action.tabId)
-      state = state.setIn(frameStatePath(state, frameKey).concat(['navbar', 'urlbar', 'suggestions', 'searchResults']), action.searchResults)
-      break
     case windowConstants.WINDOW_URL_BAR_AUTOCOMPLETE_ENABLED:
       state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']), action.enabled)
       break

@@ -1,7 +1,9 @@
-/* global describe, before, it */
+/* global describe, before, after, it */
 const {tokenizeInput, init, query, add} = require('../../../../../app/common/lib/siteSuggestions')
 const assert = require('assert')
 const Immutable = require('immutable')
+const fakeElectron = require('../../../lib/fakeElectron')
+const mockery = require('mockery')
 
 const site1 = {
   location: 'https://www.bradrichter.co/bad_numbers/3',
@@ -24,6 +26,17 @@ const site4 = {
 require('../../../braveUnit')
 
 describe('siteSuggestions lib', function () {
+  before(function () {
+    mockery.enable({
+      warnOnReplace: false,
+      warnOnUnregistered: false,
+      useCleanCache: true
+    })
+    mockery.registerMock('electron', fakeElectron)
+  })
+  after(function () {
+    mockery.disable()
+  })
   describe('tokenizeInput', function () {
     it('empty string has no tokens', function () {
       assert.deepEqual(tokenizeInput(''), [])
