@@ -88,11 +88,11 @@ const styles = StyleSheet.create({
   title: {
     color: globalStyles.color.white100,
     fontSize: '30px',
-    marginBottom: globalStyles.spacing.paddingHorizontal
+    marginBottom: '20px'
   },
 
   text: {
-    paddingBottom: globalStyles.spacing.paddingHorizontal,
+    paddingBottom: '20px',
     lineHeight: '1.5',
     fontSize: '17px',
     color: globalStyles.color.alphaWhite
