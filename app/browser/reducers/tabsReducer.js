@@ -127,6 +127,11 @@ const tabsReducer = (state, action, immutableAction) => {
         tabs.setActive(action.get('tabId'))
       })
       break
+    case appConstants.APP_TAB_INDEX_CHANGED:
+      setImmediate(() => {
+        tabs.setTabIndex(action.get('tabId'), action.get('index'))
+      })
+      break
     case appConstants.APP_TAB_TOGGLE_DEV_TOOLS:
       setImmediate(() => {
         tabs.toggleDevTools(action.get('tabId'))

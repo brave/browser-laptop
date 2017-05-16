@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const appActions = require('../../js/actions/appActions')
+const windowActions = require('../../js/actions/windowActions')
 const config = require('../../js/constants/config')
 const Immutable = require('immutable')
 const tabState = require('../common/state/tabState')
@@ -363,6 +364,12 @@ const api = {
         appActions.updatePassword(username, origin, tabId)
       })
 
+      tab.on('did-get-response-details', (evt, status, newURL, originalURL, httpResponseCode, requestMethod, referrer, headers, resourceType) => {
+        if (resourceType === 'mainFrame') {
+          windowActions.gotResponseDetails(tabId, {status, newURL, originalURL, httpResponseCode, requestMethod, referrer, headers, resourceType})
+        }
+      })
+
       updateWebContents(tabId, tab)
 
       let tabValue = getTabValue(tabId)
@@ -413,12 +420,17 @@ const api = {
   },
 
   setActive: (tabId) => {
-    setImmediate(() => {
-      let tab = getWebContents(tabId)
-      if (tab && !tab.isDestroyed()) {
-        tab.setActive(true)
-      }
-    })
+    let tab = getWebContents(tabId)
+    if (tab && !tab.isDestroyed()) {
+      tab.setActive(true)
+    }
+  },
+
+  setTabIndex: (tabId, index) => {
+    let tab = getWebContents(tabId)
+    if (tab && !tab.isDestroyed()) {
+      tab.setTabIndex(index)
+    }
   },
 
   loadURL: (action) => {
@@ -443,7 +455,7 @@ const api = {
   },
 
   loadURLInActiveTab: (state, windowId, url) => {
-    const tabValue = tabState.getActiveTabValue(state, windowId)
+    const tabValue = tabState.getActiveTab(state, windowId)
     if (tabValue) {
       api.loadURLInTab(state, tabValue.get('tabId'), url)
     }
@@ -611,7 +623,7 @@ const api = {
         if (windowId == null || windowId === -1) {
           appActions.newWindow(makeImmutable(frameOpts), browserOpts)
         } else {
-          appActions.newWebContentsAdded(windowId, frameOpts)
+          appActions.newWebContentsAdded(windowId, frameOpts, tabValue)
         }
       })
     }

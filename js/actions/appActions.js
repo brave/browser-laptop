@@ -172,7 +172,10 @@ const appActions = {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_TAB_UPDATED,
       tabValue,
-      changeInfo
+      changeInfo,
+      queryInfo: {
+        windowId: tabValue.get('windowId')
+      }
     })
   },
 
@@ -185,6 +188,20 @@ const appActions = {
     AppDispatcher.dispatch({
       actionType: appConstants.APP_TAB_ACTIVATE_REQUESTED,
       tabId
+    })
+  },
+
+  /**
+   * Dispatches a message to the store to change the tab index
+   *
+   * @param {Number} tabId - the tabId
+   * @param {Number} index - the new index
+   */
+  tabIndexChanged: function (tabId, index) {
+    AppDispatcher.dispatch({
+      actionType: appConstants.APP_TAB_INDEX_CHANGED,
+      tabId,
+      index
     })
   },
 

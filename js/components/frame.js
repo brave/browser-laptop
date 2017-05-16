@@ -197,7 +197,7 @@ class Frame extends React.Component {
       if (!this.props.guestInstanceId || !this.webview.attachGuest(this.props.guestInstanceId)) {
         // The partition is guaranteed to be initialized by now by the browser process
         this.webview.setAttribute('partition', frameStateUtil.getPartition(this.frame))
-        this.webview.setAttribute('src', this.frame.get('location'))
+        this.webview.setAttribute('src', this.props.location)
       }
       domUtil.appendChild(this.webviewContainer, this.webview)
     } else {
@@ -206,9 +206,6 @@ class Frame extends React.Component {
   }
 
   onPropsChanged (prevProps = {}) {
-    if (this.props.tabIndex !== prevProps.tabIndex) {
-      this.webview.setTabIndex(this.props.tabIndex)
-    }
     if (this.props.isActive && isFocused()) {
       windowActions.setFocusedFrame(this.frame)
     }
@@ -348,9 +345,9 @@ class Frame extends React.Component {
         if (sourceLocation !== null) {
           appActions.createTabRequested({
             url: sourceLocation,
-            isPrivate: this.frame.get('isPrivate'),
-            partitionNumber: this.frame.get('partitionNumber'),
-            openerTabId: this.frame.get('tabId'),
+            isPrivate: this.props.isPrivate,
+            partitionNumber: this.props.partitionNumber,
+            openerTabId: this.props.tabId,
             active: true
           })
         }
@@ -486,7 +483,7 @@ class Frame extends React.Component {
         windowActions.setBlockedBy(this.frame, 'noScript', e.details[1])
       }
       if (e.details[0] === 'autoplay') {
-        appActions.autoplayBlocked(this.frame.get('tabId'))
+        appActions.autoplayBlocked(this.props.tabId)
       }
     })
     this.webview.addEventListener('did-block-run-insecure-content', (e) => {
@@ -650,7 +647,7 @@ class Frame extends React.Component {
       if (!this.allowRunningWidevinePlugin()) {
         this.showWidevineNotification(this.props.location, this.origin, () => {
         }, () => {
-          appActions.loadURLRequested(this.frame.get('tabId'), this.props.provisionalLocation)
+          appActions.loadURLRequested(this.props.tabId, this.props.provisionalLocation)
         })
       }
 
@@ -705,13 +702,13 @@ class Frame extends React.Component {
           errorCode: e.errorCode,
           url: e.validatedURL
         })
-        appActions.loadURLRequested(this.frame.get('tabId'), 'about:error')
+        appActions.loadURLRequested(this.props.tabId, 'about:error')
         appActions.removeSite(siteUtil.getDetailFromFrame(this.frame))
       } else if (isAborted(e.errorCode)) {
         // just stay put
-        windowActions.navigationAborted(this.frame.get('tabId'), url)
+        windowActions.navigationAborted(this.props.tabId, url)
       } else if (provisionLoadFailure) {
-        windowActions.setNavigated(url, this.props.frameKey, true, this.frame.get('tabId'))
+        windowActions.setNavigated(url, this.props.frameKey, true, this.props.tabId)
       }
     }
     this.webview.addEventListener('security-style-changed', (e) => {
@@ -759,7 +756,7 @@ class Frame extends React.Component {
         this.webview.focus()
       }
       if (!this.frame.isEmpty()) {
-        windowActions.setNavigated(e.url, this.props.frameKey, false, this.frame.get('tabId'))
+        windowActions.setNavigated(e.url, this.props.frameKey, false, this.props.tabId)
       }
       // force temporary url display for tabnapping protection
       windowActions.setMouseInTitlebar(true)
@@ -773,7 +770,7 @@ class Frame extends React.Component {
         title: 'unexpectedError',
         url: this.props.location
       })
-      appActions.loadURLRequested(this.frame.get('tabId'), 'about:error')
+      appActions.loadURLRequested(this.props.tabId, 'about:error')
       this.webview = false
     })
     this.webview.addEventListener('did-fail-provisional-load', (e) => {
@@ -799,7 +796,7 @@ class Frame extends React.Component {
         return
       }
       if (e.isMainFrame) {
-        windowActions.setNavigated(e.url, this.props.frameKey, true, this.frame.get('tabId'))
+        windowActions.setNavigated(e.url, this.props.frameKey, true, this.props.tabId)
         loadEnd(true, e.url)
       }
     })
@@ -857,12 +854,6 @@ class Frame extends React.Component {
         }))
       }
     })
-    this.webview.addEventListener('did-get-response-details', (details) => {
-      if (this.frame.isEmpty()) {
-        return
-      }
-      windowActions.gotResponseDetails(this.frame.get('tabId'), details)
-    })
     // Handle zoom using Ctrl/Cmd and the mouse wheel.
     this.webview.addEventListener('mousewheel', this.onMouseWheel.bind(this))
   }
@@ -874,7 +865,7 @@ class Frame extends React.Component {
   onFocus () {
     if (!this.frame.isEmpty()) {
       windowActions.setTabPageIndexByFrame(this.frame)
-      windowActions.tabOnFocus(this.frame.get('tabId'))
+      windowActions.tabOnFocus(this.props.tabId)
     }
 
     windowActions.setContextMenuDetail()
@@ -922,6 +913,7 @@ class Frame extends React.Component {
   mergeProps (state, dispatchProps, ownProps) {
     const currentWindow = state.get('currentWindow')
     const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey) || Immutable.Map()
+    const location = frame.get('location')
     const allSiteSettings = siteSettingsState.getAllSiteSettings(state, frame.get('isPrivate'))
     const frameSiteSettings = frame.get('location')
       ? siteSettings.getSiteSettingsForURL(allSiteSettings, frame.get('location'))
@@ -937,14 +929,13 @@ class Frame extends React.Component {
     props.isPreview = frame.get('key') === currentWindow.get('previewFrameKey')
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frame.get('key'))
     props.showFullScreenWarning = frame.get('showFullScreenWarning')
-    props.location = frame.get('location')
+    props.location = location
     props.hrefPreview = frame.get('hrefPreview')
     props.showOnRight = frame.get('showOnRight')
     props.tabId = tabId
     props.showMessageBox = tab && tab.get('messageBoxDetail')
 
     // used in other functions
-    props.tabIndex = frameStateUtil.getFrameIndex(currentWindow, frame.get('key'))
     props.urlBarFocused = frame && frame.getIn(['navbar', 'urlbar', 'focused'])
     props.isAutFillContextMenu = contextMenu && contextMenu.get('type') === 'autofill'
     props.isSecure = frame.getIn(['security', 'isSecure'])
@@ -961,7 +952,6 @@ class Frame extends React.Component {
     props.shortcutDetailsOrigin = frame.getIn(['activeShortcutDetails', 'origin'])
     props.shortcutDetailsAction = frame.getIn(['activeShortcutDetails', 'action'])
     props.provisionalLocation = frame.get('provisionalLocation')
-    props.pinnedLocation = frame.get('pinnedLocation')
     props.src = frame.get('src')
     props.guestInstanceId = frame.get('guestInstanceId')
     props.aboutDetailsUrl = frame.getIn(['aboutDetails', 'url'])
@@ -972,6 +962,7 @@ class Frame extends React.Component {
     props.siteZoomLevel = frameSiteSettings && frameSiteSettings.get('zoomLevel')
     props.allSiteSettings = allSiteSettings // TODO (nejc) can be improved even more
     props.tabUrl = tab && tab.get('url')
+    props.partitionNumber = frame.get('partitionNumber')
 
     return Object.assign({}, ownProps, props)
   }

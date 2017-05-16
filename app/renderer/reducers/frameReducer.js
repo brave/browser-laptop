@@ -5,6 +5,7 @@
 'use strict'
 
 const Immutable = require('immutable')
+const appConstants = require('../../../js/constants/appConstants')
 const windowConstants = require('../../../js/constants/windowConstants')
 const frameStateUtil = require('../../../js/state/frameStateUtil')
 const appActions = require('../../../js/actions/appActions')
@@ -16,29 +17,32 @@ const {updateTabPageIndex} = require('../lib/tabUtil')
 const {getCurrentWindowId} = require('../currentWindow')
 
 const setFullScreen = (state, action) => {
-  return state.mergeIn(['frames', frameStateUtil.getFramePropsIndex(state.get('frames'), action.frameProps)], {
-    isFullScreen: action.isFullScreen !== undefined ? action.isFullScreen : state.getIn(['frames', frameStateUtil.getFramePropsIndex(state.get('frames'), action.frameProps)].concat('isFullScreen')),
+  const index = frameStateUtil.getFrameIndex(state, action.frameProps.get('key'))
+  return state.mergeIn(['frames', index], {
+    isFullScreen: action.isFullScreen !== undefined ? action.isFullScreen : state.getIn(['frames', index].concat('isFullScreen')),
     showFullScreenWarning: action.showFullScreenWarning
   })
 }
 
 const closeFrame = (state, action) => {
   // Use the frameProps we passed in, or default to the active frame
-  const frameProps = frameStateUtil.getFrameByKey(state, action.frameKey)
-  const index = frameStateUtil.getFramePropsIndex(state.get('frames'), frameProps)
+  const frameProps = action.frameProps
+  const index = frameStateUtil.getFrameIndex(state, frameProps.get('key'))
   if (index === -1) {
     return state
   }
   const hoverState = state.getIn(['frames', index, 'hoverState'])
   const activeFrameKey = frameStateUtil.getActiveFrame(state).get('key')
   state = state.merge(frameStateUtil.removeFrame(
-    state.get('frames'),
-    state.get('closedFrames'),
+    state,
     frameProps.set('closedAtIndex', index),
     activeFrameKey,
     index,
     getSetting(settings.TAB_CLOSE_ACTION)
   ))
+  state = frameStateUtil.deleteFrameInternalIndex(state, frameProps)
+  state = frameStateUtil.updateFramesInternalIndex(state, index)
+
   // If we reach the limit of opened tabs per page while closing tabs, switch to
   // the active tab's page otherwise the user will hang on empty page
   if (frameStateUtil.getNonPinnedFrameCount(state) % getSetting(settings.TABS_PER_PAGE) === 0) {
@@ -57,8 +61,55 @@ const closeFrame = (state, action) => {
   return state
 }
 
-const frameReducer = (state, action) => {
+const frameReducer = (state, action, immutableAction) => {
   switch (action.actionType) {
+    case appConstants.APP_TAB_UPDATED:
+      const tab = immutableAction.get('tabValue')
+      if (!tab) {
+        break
+      }
+      const tabId = tab.get('tabId')
+      const frame = frameStateUtil.getFrameByTabId(state, tabId)
+      if (!frame) {
+        break
+      }
+
+      const index = frameStateUtil.getIndexByTabId(state, tabId)
+      const pinned = immutableAction.getIn(['changeInfo', 'pinned'])
+      if (pinned != null) {
+        if (pinned) {
+          state = state.setIn(['frames', index, 'pinnedLocation'], tab.get('url'))
+        } else {
+          state = state.deleteIn(['frames', index, 'pinnedLocation'])
+        }
+      }
+      // handle pinned tabs that are created as pinned
+      const url = immutableAction.getIn(['changeInfo', 'url'])
+      if (url != null && tab.get('pinned') === true) {
+        const pinnedLocation = state.getIn(['frames', index, 'pinnedLocation'])
+        if (!pinnedLocation || pinnedLocation === 'about:blank' || pinnedLocation === '') {
+          state = state.setIn(['frames', index, 'pinnedLocation'], tab.get('url'))
+        }
+      }
+
+      const title = immutableAction.getIn(['changeInfo', 'title'])
+      if (title != null) {
+        state = state.setIn(['frames', index, 'title'], title)
+      }
+
+      const active = immutableAction.getIn(['changeInfo', 'active'])
+      if (active != null) {
+        if (active) {
+          state = state.merge({
+            activeFrameKey: frame.get('key'),
+            previewFrameKey: null
+          })
+          state = state.setIn(['frames', index, 'lastAccessedTime'], new Date().getTime())
+          state = state.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
+          state = updateTabPageIndex(state, frame)
+        }
+      }
+      break
     case windowConstants.WINDOW_CLOSE_FRAMES:
       let closedFrames = new Immutable.List()
       action.framePropsList.forEach((frameProps) => {
@@ -80,9 +131,8 @@ const frameReducer = (state, action) => {
       }
       // Unless a caller explicitly specifies to close a pinned frame, then
       // ignore the call.
-      const frames = frameStateUtil.getFrames(state)
-      const nonPinnedFrames = frames.filter((frame) => !frame.get('pinnedLocation'))
-      const pinnedFrames = frames.filter((frame) => frame.get('pinnedLocation'))
+      const nonPinnedFrames = frameStateUtil.getNonPinnedFrames(state)
+      const pinnedFrames = frameStateUtil.getPinnedFrames(state)
       // If there is at least 1 pinned frame don't close the window until subsequent
       // close attempts
       if (nonPinnedFrames.size > 1 || pinnedFrames.size > 0) {
