@@ -357,10 +357,13 @@ class UrlBar extends React.Component {
   componentDidUpdate (prevProps) {
     // this.urlInput is not initialized in titleMode
     if (this.urlInput) {
+      const pdfjsEnabled = getSetting(settings.PDFJS_ENABLED)
       if (this.props.activeFrameKey !== prevProps.activeFrameKey) {
         this.keyPressed = false
         // The user just changed tabs
-        this.setValue(this.props.locationValue)
+        this.setValue(this.props.locationValue !== 'about:blank'
+          ? this.props.locationValue
+          : UrlUtil.getDisplayLocation(this.props.location, pdfjsEnabled))
         // Each tab has a focused state stored separately
         if (this.props.isFocused) {
           this.focus()
@@ -369,7 +372,7 @@ class UrlBar extends React.Component {
         windowActions.setRenderUrlBarSuggestions(false)
       } else if (this.props.location !== prevProps.location) {
         // This is a url nav change
-        this.setValue(UrlUtil.getDisplayLocation(this.props.location, getSetting(settings.PDFJS_ENABLED)))
+        this.setValue(UrlUtil.getDisplayLocation(this.props.location, pdfjsEnabled))
       } else if (this.props.hasLocationValueSuffix &&
                 this.props.isActive &&
                 this.props.locationValueSuffix !== this.lastSuffix) {
