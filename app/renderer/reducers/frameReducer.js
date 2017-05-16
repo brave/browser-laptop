@@ -126,7 +126,8 @@ const frameReducer = (state, action, immutableAction) => {
       })
       break
     case windowConstants.WINDOW_CLOSE_FRAME:
-      if (action.frameKey < 0) {
+      // TODO(bridiver) - why does `will-destroy` fire twice?
+      if (action.frameKey < 0 || !frameStateUtil.getFrameByKey(state, action.frameKey)) {
         break
       }
       // Unless a caller explicitly specifies to close a pinned frame, then

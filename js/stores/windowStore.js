@@ -185,6 +185,9 @@ const newFrame = (state, frameOpts, openInForeground, insertionIndex, nextKey) =
   if (openInForeground) {
     const activeFrame = frameStateUtil.getActiveFrame(state)
     state = updateTabPageIndex(state, activeFrame)
+    if (activeFrame.get('tabId')) {
+      appActions.tabActivateRequested(activeFrame.get('tabId'))
+    }
   }
 
   return state
@@ -202,6 +205,7 @@ const frameTabIdChanged = (state, action) => {
   newFrameProps = newFrameProps.set('tabId', newTabId)
   const index = frameStateUtil.getFrameIndex(state, action.getIn(['frameProps', 'key']))
   state = state.mergeIn(['frames', index], newFrameProps)
+  state = frameStateUtil.deleteTabInternalIndex(state, oldTabId)
   return frameStateUtil.updateFramesInternalIndex(state, index)
 }
 

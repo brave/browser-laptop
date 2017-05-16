@@ -526,10 +526,7 @@ class Frame extends React.Component {
       windowActions.onFrameMouseLeave(this.props.tabId)
     })
     this.webview.addEventListener('will-destroy', (e) => {
-      if (this.frame.isEmpty()) {
-        return
-      }
-      this.onCloseFrame(this.frame, true)
+      this.onCloseFrame()
     })
     this.webview.addEventListener('page-favicon-updated', (e) => {
       if (this.frame.isEmpty()) {

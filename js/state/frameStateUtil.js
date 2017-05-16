@@ -102,6 +102,9 @@ function getFrameByDisplayIndex (state, i) {
 
 function getFrameByKey (state, key) {
   const index = getFrameIndex(state, key)
+  if (index === -1) {
+    return null
+  }
   return state.getIn(['frames', index])
 }
 
@@ -520,14 +523,18 @@ const getFramesInternalIndexByTabId = (state, tabId) => {
   return index == null ? -1 : index
 }
 
+const deleteTabInternalIndex = (state, tabId) => {
+  state = state.deleteIn(['framesInternal', 'tabIndex', tabId.toString()])
+  return state.deleteIn(['framesInternal', 'tabIndex', tabId])
+}
+
 const deleteFrameInternalIndex = (state, frame) => {
   if (!frame) {
     return state
   }
   state = state.deleteIn(['framesInternal', 'index', frame.get('key').toString()])
   state = state.deleteIn(['framesInternal', 'index', frame.get('key')])
-  state = state.deleteIn(['framesInternal', 'tabIndex', frame.get('tabId').toString()])
-  return state.deleteIn(['framesInternal', 'tabIndex', frame.get('tabId')])
+  return deleteTabInternalIndex(state, frame.get('tabId'))
 }
 
 const updateFramesInternalIndex = (state, fromIndex) => {
@@ -548,6 +555,7 @@ const updateFramesInternalIndex = (state, fromIndex) => {
 }
 
 module.exports = {
+  deleteTabInternalIndex,
   deleteFrameInternalIndex,
   updateFramesInternalIndex,
   query,
