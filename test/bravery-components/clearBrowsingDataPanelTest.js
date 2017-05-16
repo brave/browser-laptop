@@ -6,6 +6,7 @@ const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 const aboutPreferencesUrl = getTargetAboutUrl('about:preferences')
 const {getHistory} = require('../../app/common/lib/historyUtil')
 const messages = require('../../js/constants/messages')
+const siteSettingsList = require('../../js/data/siteSettingsList')
 
 describe('Clear Browsing Panel', function () {
   function * setup (client) {
@@ -191,7 +192,7 @@ describe('Clear Browsing Panel', function () {
         .click(noScriptSwitch)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return Object.keys(val.value.siteSettings).length === 2
+            return Object.keys(val.value.siteSettings).length === (2 + siteSettingsList.defaultSiteSettingsList.length)
           })
         })
     })
