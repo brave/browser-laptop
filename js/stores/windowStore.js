@@ -24,6 +24,7 @@ const Serializer = require('../dispatcher/serializer')
 const {updateTabPageIndex} = require('../../app/renderer/lib/tabUtil')
 const assert = require('assert')
 const contextMenuState = require('../../app/common/state/contextMenuState')
+const appStoreRenderer = require('./appStoreRenderer')
 
 let windowState = Immutable.fromJS({
   activeFrameKey: null,

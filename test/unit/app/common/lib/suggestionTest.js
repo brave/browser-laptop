@@ -8,20 +8,21 @@ const assert = require('assert')
 const sinon = require('sinon')
 const Immutable = require('immutable')
 const {makeImmutable} = require('../../../../../app/common/state/immutableUtil')
+const fakeElectron = require('../../../lib/fakeElectron')
 const _ = require('underscore')
 let suggestion
 require('../../../braveUnit')
 
 const AGE_DECAY = 50
 
-const fakeImmutableUtil = {
+const fakeImmutableUtil = Object.assign({
   makeImmutable: (obj) => {
     return makeImmutable(obj)
   },
   isList: (obj) => {
     return Immutable.List.isList(obj)
   }
-}
+}, require('../../../../../app/common/state/immutableUtil'))
 
 describe('suggestion unit tests', function () {
   let makeImmutableSpy
@@ -35,6 +36,7 @@ describe('suggestion unit tests', function () {
 
     makeImmutableSpy = sinon.spy(fakeImmutableUtil, 'makeImmutable')
     mockery.registerMock('../../common/state/immutableUtil', fakeImmutableUtil)
+    mockery.registerMock('electron', fakeElectron)
     suggestion = require('../../../../../app/common/lib/suggestion')
   })
 

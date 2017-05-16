@@ -198,7 +198,7 @@ const appActions = {
    * @param {Number} index - the new index
    */
   tabIndexChanged: function (tabId, index) {
-    AppDispatcher.dispatch({
+    dispatch({
       actionType: appConstants.APP_TAB_INDEX_CHANGED,
       tabId,
       index

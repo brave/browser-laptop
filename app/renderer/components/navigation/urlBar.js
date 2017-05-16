@@ -37,6 +37,7 @@ const UrlUtil = require('../../../../js/lib/urlutil')
 const {eventElHasAncestorWithClasses, isForSecondaryAction} = require('../../../../js/lib/eventUtil')
 const {getBaseUrl, isUrl, isIntermediateAboutPage} = require('../../../../js/lib/appUrlUtil')
 const {getCurrentWindowId} = require('../../currentWindow')
+const {normalizeLocation} = require('../../../common/lib/suggestion')
 
 // Icons
 const iconNoScript = require('../../../../img/url-bar-no-script.svg')
@@ -62,7 +63,7 @@ class UrlBar extends React.Component {
       if (this.keyPressed || !this.urlInput || this.props.locationValueSuffix.length === 0) {
         return
       }
-      this.updateAutocomplete(this.lastVal, this.props.locationValue + this.props.locationValueSuffix)
+      this.updateAutocomplete(this.lastVal)
     }, 10)
   }
 
@@ -97,7 +98,6 @@ class UrlBar extends React.Component {
     if (this.props.autocompleteEnabled) {
       windowActions.urlBarAutocompleteEnabled(false)
     }
-    appActions.urlBarSuggestionsChanged(getCurrentWindowId(), undefined, null)
     windowActions.setRenderUrlBarSuggestions(false)
   }
 
@@ -229,7 +229,11 @@ class UrlBar extends React.Component {
     }
   }
 
-  updateAutocomplete (newValue, suggestion = this.lastVal + this.lastSuffix) {
+  updateAutocomplete (newValue) {
+    let suggestion = ''
+    if (this.props.suggestionList && this.props.suggestionList.size > 0) {
+      suggestion = normalizeLocation(this.props.suggestionList.getIn([this.activeIndex || 0, 'location'])) || ''
+    }
     if (suggestion.startsWith(newValue)) {
       const newSuffix = suggestion.substring(newValue.length)
       this.setValue(newValue, newSuffix)
@@ -272,8 +276,6 @@ class UrlBar extends React.Component {
   onChange (e) {
     if (e.target.value !== this.lastVal + this.lastSuffix) {
       e.preventDefault()
-      // clear any current arrow or mouse hover selection
-      appActions.urlBarSuggestionsChanged(getCurrentWindowId(), undefined, null)
       this.setValue(e.target.value)
     }
   }
@@ -310,8 +312,6 @@ class UrlBar extends React.Component {
     if (this.props.isSelected) {
       windowActions.setUrlBarSelected(false)
     }
-    // clear any current arrow or mouse hover selection
-    appActions.urlBarSuggestionsChanged(getCurrentWindowId(), undefined, null)
     this.keyPressed = false
     appActions.urlBarTextChanged(getCurrentWindowId(), this.props.activeTabId, this.lastVal)
   }
@@ -368,7 +368,6 @@ class UrlBar extends React.Component {
         if (this.props.isFocused) {
           this.focus()
         }
-        appActions.urlBarSuggestionsChanged(getCurrentWindowId(), undefined, null)
         windowActions.setRenderUrlBarSuggestions(false)
       } else if (this.props.location !== prevProps.location) {
         // This is a url nav change
