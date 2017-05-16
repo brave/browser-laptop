@@ -91,7 +91,7 @@ describe('notificationBar permissions', function () {
   })
 })
 
-describe('notificationBar passwords', function () {
+describe.skip('notificationBar passwords', function () {
   function * setup (client) {
     yield client
       .waitForBrowserWindow()
