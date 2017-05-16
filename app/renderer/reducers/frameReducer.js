@@ -25,12 +25,12 @@ const setFullScreen = (state, action) => {
 }
 
 const closeFrame = (state, action) => {
-  // Use the frameProps we passed in, or default to the active frame
-  const frameProps = action.frameProps
-  const index = frameStateUtil.getFrameIndex(state, frameProps.get('key'))
+  const index = frameStateUtil.getFrameIndex(state, action.frameKey)
   if (index === -1) {
     return state
   }
+  const frameProps = frameStateUtil.getFrameByKey(state, action.frameKey)
+
   const hoverState = state.getIn(['frames', index, 'hoverState'])
   const activeFrameKey = frameStateUtil.getActiveFrame(state).get('key')
   state = state.merge(frameStateUtil.removeFrame(
