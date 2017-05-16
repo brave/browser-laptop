@@ -150,7 +150,6 @@ class BraveryPanel extends ImmutableComponent {
     if (setting !== 'noScript' && (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:')) {
       ruleKey = `https?://${parsedUrl.host}`
     }
-    console.log(e.target.value)
     appActions.changeSiteSetting(ruleKey, setting, e.target.value, this.isPrivate)
     this.onReload()
   }
@@ -186,7 +185,15 @@ class BraveryPanel extends ImmutableComponent {
           </div>
           <div className='braveryPanelHeaderRight'>
             <div className='braveryShieldsUpDown'>
-              <SwitchControl onClick={this.onToggleShields} leftl10nId='shieldsDown' rightl10nId='shieldsUp' topl10nId='shields' checkedOn={shieldsUp} large />
+              <SwitchControl
+                onClick={this.onToggleShields}
+                leftl10nId='shieldsDown'
+                rightl10nId='shieldsUp'
+                topl10nId='shields'
+                testId='shields-toggle'
+                checkedOn={shieldsUp}
+                large
+              />
             </div>
           </div>
         </div>
