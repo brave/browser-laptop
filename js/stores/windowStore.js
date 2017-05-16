@@ -388,7 +388,7 @@ const doAction = (action) => {
       {
         const sourceFrameProps = frameStateUtil.getFrameByKey(windowState, action.sourceFrameKey)
         const sourceFrameIndex = frameStateUtil.getFrameIndex(windowState, action.sourceFrameKey)
-        let newIndex = frameStateUtil.getFrameIndex(windowState, action.destinationFrameProps.get('key')) + (action.prepend ? 0 : 1)
+        let newIndex = frameStateUtil.getFrameIndex(windowState, action.destinationFrameKey) + (action.prepend ? 0 : 1)
         let frames = frameStateUtil.getFrames(windowState).splice(sourceFrameIndex, 1)
         if (newIndex > sourceFrameIndex) {
           newIndex--
