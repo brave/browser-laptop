@@ -391,7 +391,7 @@ const doAction = (action) => {
       frames = frames.splice(newIndex, 0, action.sourceFrameProps)
       windowState = windowState.set('frames', frames)
       // Since the tab could have changed pages, update the tab page as well
-      windowState = frameStateUtil.updateFramesInternalIndex(windowState, Math.min(sourceFrameIndex, newIndex))
+      windowState = frameStateUtil.updateFramesInternalIndex(windowState, Math.min(sourceFramePropsIndex, newIndex))
       windowState = updateTabPageIndex(windowState, frameStateUtil.getActiveFrame(windowState))
       break
     case windowConstants.WINDOW_SET_LINK_HOVER_PREVIEW:
