@@ -79,7 +79,6 @@ class PinnedTabs extends ImmutableComponent {
                paintTabs={this.props.paintTabs}
                previewTabs={this.props.previewTabs}
                isActive={this.props.activeFrameKey === frame.get('key')}
-               notificationBarActive={this.props.notificationBarActive}
                partOfFullPageSet={this.props.partOfFullPageSet} />)
       }
     </div>

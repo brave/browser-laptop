@@ -301,7 +301,7 @@ class LedgerTable extends ImmutableComponent {
       />
       {
         (totalUnPinnedRows !== unPinnedRows.size && hideLower)
-        ? <div className={css(styles.ledgerTable__showAllWrap)}>
+        ? <div className={css(styles.showAllWrap)}>
           <BrowserButton secondaryColor
             l10nId={hideLower ? 'showAll' : 'hideLower'}
             onClick={this.showAll.bind(this, !hideLower)}
@@ -464,9 +464,10 @@ const styles = StyleSheet.create({
     right: '2px'
   },
 
-  ledgerTable__showAllWrap: {
+  showAllWrap: {
     textAlign: 'center',
-    marginTop: globalStyles.spacing.panelMargin
+    paddingBottom: '10px',
+    marginTop: '-20px'
   }
 })
 

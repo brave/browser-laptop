@@ -84,7 +84,7 @@ class NoScriptInfo extends ImmutableComponent {
       }
     })
     if (checkedOrigins.filter((value) => value !== false).size) {
-      appActions.noScriptExceptionsAdded(this.origin, checkedOrigins, this.isPrivate)
+      appActions.noScriptExceptionsAdded(this.origin, checkedOrigins)
       this.reload()
       this.props.onHide()
     }

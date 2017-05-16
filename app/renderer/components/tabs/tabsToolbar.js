@@ -49,7 +49,6 @@ class TabsToolbar extends ImmutableComponent {
           dragData={this.props.dragData}
           tabPageIndex={this.props.tabPageIndex}
           pinnedTabs={pinnedTabs}
-          notificationBarActive={this.props.notificationBarActive}
           />
         : null
       }
