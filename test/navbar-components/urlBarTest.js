@@ -293,7 +293,7 @@ describe('urlBar tests', function () {
       it('does not show suggestions', function * () {
         yield this.app.client
           .keys('brave')
-          .waitForVisible(urlBarSuggestions, 1)
+          .waitForVisible(urlBarSuggestions)
           .ipcSend('shortcut-focus-url')
           .waitForElementFocus(urlInput)
           .waitForElementCount(urlBarSuggestions, 0)
@@ -317,12 +317,12 @@ describe('urlBar tests', function () {
         .waitForVisible(urlBarSuggestions)
         // highlight for autocomplete brianbondy.com
         .moveToObject(urlBarSuggestions, 0, 100)
-      yield selectsText(this.app.client, 'rianbondy.com')
-        .keys('ra')
+      yield selectsText(this.app.client, 'rave.com/test3')
+        .keys('rian')
         .execute(function (urlBarSuggestions) {
           document.querySelector(urlBarSuggestions).scrollTop = 200
         }, urlBarSuggestions)
-      yield selectsText(this.app.client, 've.com')
+      yield selectsText(this.app.client, 'bondy.com/test4')
     })
   })
 

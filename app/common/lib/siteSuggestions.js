@@ -3,7 +3,9 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Bloodhound = require('bloodhound-js')
+const {isUrl} = require('../../../js/lib/appUrlUtil')
 const siteTags = require('../../../js/constants/siteTags')
+const urlParse = require('../urlParse')
 
 let initialized = false
 let engine
@@ -37,15 +39,24 @@ const init = (sites) => {
   return promise
 }
 
+const getPartsFromNonUrlInput = (input) =>
+  input.toLowerCase().split(/[,-.\s\\/?&]/)
+
 const getTagToken = (tag) => '|' + tag + '|'
+
 const tokenizeInput = (data) => {
   let url = data || ''
   let parts = []
 
   if (typeof data === 'object' && data !== null) {
+    // When lastAccessTime is 1 it is a default built-in entry which we don't want
+    // to appear in suggestions.
+    if (data.lastAccessedTime === 1) {
+      return []
+    }
     url = data.location
     if (data.title) {
-      parts = data.title.toLowerCase().split(/\s/)
+      parts = getPartsFromNonUrlInput(data.title)
     }
     if (data.tags) {
       parts = parts.concat(data.tags.map(getTagToken))
@@ -56,12 +67,27 @@ const tokenizeInput = (data) => {
     }
   }
 
-  if (url) {
-    url = url.toLowerCase().replace(/^https?:\/\//i, '')
-    parts = parts.concat(url.split(/[.\s\\/?&]/))
+  if (url && isUrl(url)) {
+    const parsedUrl = urlParse(url.toLowerCase())
+    if (parsedUrl.hash) {
+      parts.push(parsedUrl.hash.slice(1))
+    }
+    if (parsedUrl.host) {
+      parts = parts.concat(parsedUrl.host.split('.'))
+    }
+    if (parsedUrl.pathname) {
+      parts = parts.concat(parsedUrl.pathname.split(/[.\s\\/]/))
+    }
+    if (parsedUrl.query) {
+      parts = parts.concat(parsedUrl.query.split(/[&=]/))
+    }
+    if (parsedUrl.protocol) {
+      parts = parts.concat(parsedUrl.protocol)
+    }
+  } else if (url) {
+    parts = parts.concat(getPartsFromNonUrlInput(url))
   }
-
-  return parts
+  return parts.filter(x => !!x)
 }
 
 const add = (data) => {
@@ -81,8 +107,8 @@ const query = (input, options = {}) => {
   }
 
   return new Promise((resolve, reject) => {
-    const {getSortForSuggestions, normalizeLocation} = require('./suggestion')
-    input = normalizeLocation((input || '').toLowerCase())
+    const {getSortForSuggestions} = require('./suggestion')
+    input = (input || '').toLowerCase()
     lastQueryOptions = Object.assign({}, options, {
       input,
       internalSort: getSortForSuggestions(input)

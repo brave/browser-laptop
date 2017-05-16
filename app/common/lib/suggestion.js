@@ -99,18 +99,18 @@ const sortByAccessCountWithAgeDecay = (s1, s2) => {
 }
 
 /*
- * Return a 1 if the url is 'simple' as in without query, search or
- * hash components. Return 0 otherwise.
+ * Return true1 the url is 'simple' as in without query, search or
+ * hash components. Return false otherwise.
  *
- * @param {ImmutableObject} site - object represent history entry
+ * @param {object} An already normalized simple URL
  *
  */
-const simpleDomainNameValue = (site) => {
+const isSimpleDomainNameValue = (site) => {
   const parsed = urlParse(getURL(site))
   if (parsed.hash === null && parsed.search === null && parsed.query === null && parsed.pathname === '/') {
-    return 1
+    return true
   } else {
-    return 0
+    return false
   }
 }
 
@@ -231,7 +231,16 @@ const getSortForSuggestions = (userInputLower) => (s1, s2) => {
     if (pos1 !== pos2) {
       return pos1 - pos2
     }
-    return url1.length - url2.length
+    const url1IsSimple = isSimpleDomainNameValue(s1)
+    const url2IsSimple = isSimpleDomainNameValue(s2)
+    // If either both false or both true then rely on count w/ decay sort
+    if (url1IsSimple === url2IsSimple) {
+      return sortByAccessCountWithAgeDecay(s1, s2)
+    }
+    if (url1IsSimple) {
+      return -1
+    }
+    return 1
   }
   if (pos1 !== -1 && pos2 === -1) {
     return -1
@@ -404,7 +413,6 @@ const generateNewSearchXHRResults = debounce((state, windowId, tabId, input) => 
     return
   }
   const frameSearchDetail = frame.getIn(['navbar', 'urlbar', 'searchDetail'])
-  // TODO: Migrate searchDetail to app state
   const searchDetail = state.get('searchDetail')
   if (!searchDetail && !frameSearchDetail) {
     return
@@ -434,7 +442,7 @@ module.exports = {
   sortingPriority,
   sortByAccessCountWithAgeDecay,
   getSortForSuggestions,
-  simpleDomainNameValue,
+  isSimpleDomainNameValue,
   normalizeLocation,
   shouldNormalizeLocation,
   createVirtualHistoryItems,

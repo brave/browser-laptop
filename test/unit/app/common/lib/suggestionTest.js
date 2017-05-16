@@ -68,12 +68,12 @@ describe('suggestion unit tests', function () {
     })
   })
 
-  describe('simpleDomainNameValue', function () {
+  describe('isSimpleDomainNameValue', function () {
     it('sorts simple sites higher than complex sites', function () {
       const siteSimple = Immutable.Map({ location: 'http://www.site.com' })
       const siteComplex = Immutable.Map({ location: 'http://www.site.com/?foo=bar#a' })
-      assert.ok(suggestion.simpleDomainNameValue(siteSimple) === 1, 'simple site returns 1')
-      assert.ok(suggestion.simpleDomainNameValue(siteComplex) === 0, 'complex site returns 0')
+      assert.ok(suggestion.isSimpleDomainNameValue(siteSimple) === true, 'simple site returns 1')
+      assert.ok(suggestion.isSimpleDomainNameValue(siteComplex) === false, 'complex site returns 0')
     })
   })
 

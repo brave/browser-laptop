@@ -231,11 +231,14 @@ class UrlBar extends React.Component {
 
   updateAutocomplete (newValue) {
     let suggestion = ''
+    let suggestionNormalized = ''
     if (this.props.suggestionList && this.props.suggestionList.size > 0) {
-      suggestion = normalizeLocation(this.props.suggestionList.getIn([this.activeIndex || 0, 'location'])) || ''
+      suggestion = this.props.suggestionList.getIn([this.activeIndex || 0, 'location']) || ''
+      suggestionNormalized = normalizeLocation(suggestion)
     }
-    if (suggestion.startsWith(newValue)) {
-      const newSuffix = suggestion.substring(newValue.length)
+    const newValueNormalized = normalizeLocation(newValue)
+    if (suggestionNormalized.startsWith(newValueNormalized) && suggestionNormalized.length > 0) {
+      const newSuffix = suggestionNormalized.substring(newValueNormalized.length)
       this.setValue(newValue, newSuffix)
       this.urlInput.setSelectionRange(newValue.length, newValue.length + newSuffix.length + 1)
       return true

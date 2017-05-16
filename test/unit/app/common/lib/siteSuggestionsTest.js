@@ -50,11 +50,14 @@ describe('siteSuggestions lib', function () {
     it('lowercases tokens', function () {
       assert.deepEqual(tokenizeInput('BRaD HaTES PRIMES'), ['brad', 'hates', 'primes'])
     })
-    it('does not include http', function () {
-      assert.deepEqual(tokenizeInput('http://bradrichter.co/I/hate/primes.html'), ['bradrichter', 'co', 'i', 'hate', 'primes', 'html'])
+    it('includes protocol', function () {
+      assert.deepEqual(tokenizeInput('https://bradrichter.co/I/hate/primes.html'), ['bradrichter', 'co', 'i', 'hate', 'primes', 'html', 'https:'])
     })
-    it('does not include https as a token', function () {
-      assert.deepEqual(tokenizeInput('https://bradrichter.co/I/hate/primes.html'), ['bradrichter', 'co', 'i', 'hate', 'primes', 'html'])
+    it('includes query', function () {
+      assert.deepEqual(tokenizeInput('https://bradrichter.co/I/hate/primes.html?test=abc&test2=abcd'), ['bradrichter', 'co', 'i', 'hate', 'primes', 'html', 'test', 'abc', 'test2', 'abcd', 'https:'])
+    })
+    it('does not include hash', function () {
+      assert.deepEqual(tokenizeInput('https://bradrichter.co/I/hate/primes.html?test=abc#testing'), ['testing', 'bradrichter', 'co', 'i', 'hate', 'primes', 'html', 'test', 'abc', 'https:'])
     })
     it('spaces get tokenized', function () {
       assert.deepEqual(tokenizeInput('brad\thates primes'), ['brad', 'hates', 'primes'])
@@ -68,14 +71,11 @@ describe('siteSuggestions lib', function () {
     it('\\ gets tokenized', function () {
       assert.deepEqual(tokenizeInput('brad\\hates\\primes'), ['brad', 'hates', 'primes'])
     })
-    it('? gets tokenized', function () {
-      assert.deepEqual(tokenizeInput('brad?hates?primes'), ['brad', 'hates', 'primes'])
-    })
-    it('& gets tokenized', function () {
-      assert.deepEqual(tokenizeInput('brad&hates&primes'), ['brad', 'hates', 'primes'])
-    })
     it('can tokenize site objects', function () {
-      assert.deepEqual(tokenizeInput(site1), ['do', 'not', 'use', '3', 'for', 'items', 'because', 'it', 'is', 'prime', 'www', 'bradrichter', 'co', 'bad_numbers', '3'])
+      assert.deepEqual(tokenizeInput(site1), ['do', 'not', 'use', '3', 'for', 'items', 'because', 'it', 'is', 'prime', 'www', 'bradrichter', 'co', 'bad_numbers', '3', 'https:'])
+    })
+    it('non URLs get tokenized', function () {
+      assert.deepEqual(tokenizeInput('hello world Greatest...Boss...Ever'), ['hello', 'world', 'greatest', 'boss', 'ever'])
     })
   })
 
@@ -127,7 +127,7 @@ describe('siteSuggestions lib', function () {
       checkResult('brave brad', [], cb)
     })
   })
-  describe('query sorts results', function () {
+  describe('query sorts results by location', function () {
     before(function (cb) {
       const sites = Immutable.fromJS([{
         location: 'https://brave.com/twi'
@@ -169,6 +169,63 @@ describe('siteSuggestions lib', function () {
     it('matches based on tokens and not exactly', function (cb) {
       query('twitter.com/moments').then((results) => {
         assert.deepEqual(results[0], { location: 'https://twitter.com/i/moments' })
+        cb()
+      })
+    })
+  })
+  describe('query sorts results by count', function () {
+    before(function (cb) {
+      this.page2 = {
+        location: 'https://brave.com/page2',
+        count: 20
+      }
+      const sites = Immutable.fromJS([{
+        location: 'https://brave.com/page1',
+        count: 5
+      }, this.page2, {
+        location: 'https://brave.com/page3',
+        count: 2
+      }])
+      init(sites).then(cb.bind(null, null))
+    })
+    it('highest count first', function (cb) {
+      query('https://brave.com/page').then((results) => {
+        assert.deepEqual(results[0], this.page2)
+        cb()
+      })
+    })
+  })
+  describe('query respects lastAccessTime', function () {
+    before(function (cb) {
+      this.site = {
+        location: 'https://bravebrowser.com/page2',
+        lastAccessedTime: 1494958046427,  // most recent
+        count: 1
+      }
+      const sites = Immutable.fromJS([{
+        location: 'https://bravez.com/page1',
+        lastAccessedTime: 1,
+        count: 1
+      }, {
+        location: 'https://bravebrowser.com/page1',
+        lastAccessedTime: 1494957046426,
+        count: 1
+      }, this.site, {
+        location: 'https://bravebrowser.com/page3',
+        lastAccessedTime: 1494957046437,
+        count: 1
+      }])
+      init(sites).then(cb.bind(null, null))
+    })
+    it('items with lastAccessTime of 1 get ignored (signifies preloaded default)', function (cb) {
+      query('https://bravez.com/page').then((results) => {
+        assert.equal(results.length, 0)
+        cb()
+      })
+    })
+    it('most recently accessed get sorted first', function (cb) {
+      query('bravebrowser').then((results) => {
+        assert.deepEqual(results[0], this.site)
         cb()
       })
     })
