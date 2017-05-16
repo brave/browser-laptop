@@ -374,20 +374,20 @@ const doAction = (action) => {
         if (!action.frameKey) {
           break
         }
-        const frameIndex = frameStateUtil.getFrameIndex(frameStateUtil.getFrames(windowState), action.frameKey)
+        const frameIndex = frameStateUtil.getFrameIndex(windowState, action.frameKey)
         windowState = windowState.setIn(['frames', frameIndex, 'breakpoint'], action.breakpoint)
         break
       }
     case windowConstants.WINDOW_SET_TAB_HOVER_STATE:
       {
-        const frameIndex = frameStateUtil.getFrameIndex(frameStateUtil.getFrames(windowState), action.frameKey)
+        const frameIndex = frameStateUtil.getFrameIndex(windowState, action.frameKey)
         windowState = windowState.setIn(['frames', frameIndex, 'hoverState'], action.hoverState)
         break
       }
     case windowConstants.WINDOW_TAB_MOVE:
       {
         const sourceFrameProps = frameStateUtil.getFrameByKey(windowState, action.sourceFrameKey)
-        const sourceFrameIndex = frameStateUtil.getFrameIndex(frameStateUtil.getFrames(windowState), action.sourceFrameKey)
+        const sourceFrameIndex = frameStateUtil.getFrameIndex(windowState, action.sourceFrameKey)
         let newIndex = frameStateUtil.getFrameIndex(windowState, action.destinationFrameProps.get('key')) + (action.prepend ? 0 : 1)
         let frames = frameStateUtil.getFrames(windowState).splice(sourceFrameIndex, 1)
         if (newIndex > sourceFrameIndex) {
