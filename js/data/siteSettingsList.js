@@ -11,5 +11,20 @@ module.exports.defaultSiteSettingsList = [
       "name" : "autoplay",
       "pattern" : "https://www.twitch.tv",
       "value" : true,
+    },
+    {
+      "name" : "autoplay",
+      "pattern" : "https://www.netflix.com",
+      "value" : true,
+    },
+    {
+      "name" : "autoplay",
+      "pattern" : "https://www.amazon.com",
+      "value" : true,
+    },
+    {
+      "name" : "autoplay",
+      "pattern" : "https://calendar.google.com",
+      "value" : true,
     }
 ]
