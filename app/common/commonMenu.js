@@ -383,6 +383,39 @@ module.exports.aboutBraveMenuItem = () => {
   }
 }
 
+module.exports.braveHomeMenuItem = () => {
+  return {
+    label: locale.translation('home'),
+    accelerator: 'CmdOrCtrl+Shift+H',
+    click: function (item, focusedWindow) {
+      getSetting(settings.HOMEPAGE).split('|').forEach((homepage, i) => {
+        if (i === 0) {
+          appActions.loadURLInActiveTabRequested(getCurrentWindowId(), homepage)
+        } else {
+          appActions.createTabRequested({
+            url: homepage,
+            windowId: getCurrentWindowId()
+          })
+        }
+      })
+    }
+  }
+}
+
+module.exports.reopenLastClosedWindowMenuItem = () => {
+  return {
+    label: locale.translation('reopenLastClosedWindow'),
+    accelerator: 'Alt+Shift+CmdOrCtrl+T',
+    click: function (item, focusedWindow) {
+      if (process.type === 'browser') {
+        process.emit(messages.UNDO_CLOSED_WINDOW)
+      } else {
+        electron.ipcRenderer.send(messages.UNDO_CLOSED_WINDOW)
+      }
+    }
+  }
+}
+
 module.exports.braverySiteMenuItem = () => {
   return {
     label: locale.translation('braverySite'),
