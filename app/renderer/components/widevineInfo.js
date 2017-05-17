@@ -14,8 +14,7 @@ const appConfig = require('../../../js/constants/appConfig')
 const cx = require('../../../js/lib/classSet')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
-
-const {CommonFormSection} = require('./common/commonForm')
+const globalStyles = require('./styles/global')
 
 class WidevineInfo extends ImmutableComponent {
   constructor () {
@@ -34,8 +33,8 @@ class WidevineInfo extends ImmutableComponent {
     })
   }
   render () {
-    return <div data-test-id='widevineInfo'>
-      <CommonFormSection>
+    return <section data-test-id='widevineInfo'>
+      <div className={css(styles.widevineInfo__div)}>
         <span data-l10n-id='enableWidevineSubtext' />
         <span className={cx({
           fa: true,
@@ -46,8 +45,8 @@ class WidevineInfo extends ImmutableComponent {
           onClick={this.onMoreInfo}
           title={appConfig.widevine.moreInfoUrl}
         />
-      </CommonFormSection>
-      <CommonFormSection>
+      </div>
+      <div className={css(styles.widevineInfo__div)}>
         <span data-l10n-id='enableWidevineSubtext2' />
         <span className={cx({
           fa: true,
@@ -58,12 +57,15 @@ class WidevineInfo extends ImmutableComponent {
           onClick={this.onViewLicense}
           title={appConfig.widevine.licenseUrl}
         />
-      </CommonFormSection>
-    </div>
+      </div>
+    </section>
   }
 }
 
 const styles = StyleSheet.create({
+  widevineInfo__div: {
+    marginBottom: globalStyles.spacing.dialogInsideMargin
+  },
   cursor: {
     cursor: 'pointer'
   }
