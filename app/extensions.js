@@ -152,7 +152,6 @@ let generateBraveManifest = () => {
   let cspDirectives = {
     'default-src': '\'self\'',
     'form-action': '\'none\'',
-    'referrer': 'no-referrer',
     'style-src': '\'self\' \'unsafe-inline\'',
     'img-src': '* data: file://*',
     'frame-src': '\'self\' https://buy.coinbase.com'
@@ -184,7 +183,6 @@ let generateTorrentManifest = () => {
     'connect-src': '\'self\' https://example.com',
     'media-src': '\'self\' http://localhost:*',
     'form-action': '\'none\'',
-    'referrer': 'no-referrer',
     'style-src': '\'self\' \'unsafe-inline\'',
     'frame-src': '\'self\' http://localhost:*'
   }
