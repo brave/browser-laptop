@@ -153,7 +153,8 @@ class Navigator extends React.Component {
     const activeTab = tabState.getByTabId(state, activeTabId)
     const activeTabShowingMessageBox = !!(activeTab && tabState.isShowingMessageBox(state, activeTabId))
     const allSiteSettings = siteSettingsState.getAllSiteSettings(state, activeFrame)
-    const braverySettings = siteSettings.activeSettings(allSiteSettings, state, appConfig)
+    const activeSiteSettings = siteSettings.getSiteSettingsForURL(allSiteSettings, activeFrame.get('location'))
+    const braverySettings = siteSettings.activeSettings(activeSiteSettings, state, appConfig)
     const enabledExtensions = extensionState.getEnabledExtensions(state)
     const extensionBrowserActions = enabledExtensions
       .map((extension) => {
@@ -254,6 +255,7 @@ class Navigator extends React.Component {
               <Button iconClass='braveMenu'
                 l10nId='braveMenu'
                 testId='braveShieldButton'
+                test2Id={`shield-down-${this.props.shieldsDown}`}
                 className={cx({
                   braveShieldsDisabled: !this.props.shieldEnabled,
                   braveShieldsDown: this.props.shieldsDown,
