@@ -1,5 +1,6 @@
 /* global describe, it, before, beforeEach */
 
+const assert = require('assert')
 const Brave = require('../lib/brave')
 const {urlInput, urlBarSuggestions, urlbarIcon, reloadButton} = require('../lib/selectors')
 const searchProviders = require('../../js/data/searchProviders')
@@ -180,6 +181,27 @@ describe('urlBar tests', function () {
           yield this.app.client
             .waitForInputText(urlInput, 'brave.coma')
         })
+      })
+    })
+
+    describe('press keyboard shortcut', function () {
+      beforeEach(function * () {
+        this.page = Brave.server.url('page1.html')
+        return yield this.app.client
+          .tabByIndex(0)
+          .loadUrl(this.page)
+          .windowByUrl(Brave.browserWindowUrl)
+      })
+
+      it('does not show autosuggest', function * () {
+        return yield this.app.client
+          .ipcSend('shortcut-focus-url')
+          .waitForElementFocus(urlInput)
+          .keys(Brave.keys.CONTROL)
+          .keys('c')
+          .keys(Brave.keys.NULL) // needed to release the modifier key
+          .pause(100) // wait for the suggestions
+          .isExisting(urlBarSuggestions).then((isExisting) => assert(!isExisting))
       })
     })
 
