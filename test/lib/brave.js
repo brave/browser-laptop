@@ -7,7 +7,7 @@ require('./coMocha')
 const series = require('async/series')
 
 const path = require('path')
-const fs = require('fs')
+const fs = require('fs-extra')
 const os = require('os')
 const {getTargetAboutUrl, isSourceAboutUrl, getBraveExtIndexHTML} = require('../../js/lib/appUrlUtil')
 
@@ -51,7 +51,7 @@ const rmDir = (dirPath) => {
     }
   }
   try {
-    fs.rmdirSync(dirPath)
+    fs.removeSync(dirPath)
   } catch (e) {
     console.error(e)
   }
