@@ -180,7 +180,7 @@ if (process.type === 'browser') {
     let queryInfo = payload.queryInfo || payload.frameProps || (payload.queryInfo = {})
     queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
     let sender = event.sender
-    if (!queryInfo.alreadyHandledByRenderer && !sender.isDestroyed()) {
+    if (!sender.isDestroyed()) {
       const hostWebContents = sender.hostWebContents
       sender = hostWebContents || sender
       const win = require('electron').BrowserWindow.fromWebContents(sender)

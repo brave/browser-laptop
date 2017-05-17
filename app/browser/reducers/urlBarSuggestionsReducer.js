@@ -9,6 +9,7 @@ const {generateNewSuggestionsList, generateNewSearchXHRResults} = require('../..
 const {init, add} = require('../../common/lib/siteSuggestions')
 const Immutable = require('immutable')
 const {makeImmutable} = require('../../common/state/immutableUtil')
+const tabState = require('../../common/state/tabState')
 
 const urlBarSuggestionsReducer = (state, action) => {
   switch (action.actionType) {
@@ -30,7 +31,10 @@ const urlBarSuggestionsReducer = (state, action) => {
       break
     case appConstants.APP_SEARCH_SUGGESTION_RESULTS_AVAILABLE:
       state = state.set('searchResults', makeImmutable(action.searchResults))
-      generateNewSuggestionsList(state, action.windowId, action.tabId)
+      if (action.query) {
+        const windowId = tabState.windowId(state, action.tabId)
+        generateNewSuggestionsList(state, windowId, action.tabId, action.query)
+      }
       break
   }
   return state

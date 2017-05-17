@@ -32,6 +32,7 @@ let windowState = Immutable.fromJS({
   closedFrames: [],
   ui: {
     tabs: {
+      tabPageIndex: 0
     },
     mouseInTitlebar: false,
     menubar: {
@@ -796,7 +797,7 @@ const dispatchEventPayload = (e, payload) => {
     queryInfo.windowId = getCurrentWindowId()
   }
   // handle any ipc dispatches that are targeted to this window
-  if (queryInfo.windowId && queryInfo.windowId === getCurrentWindowId()) {
+  if (queryInfo.windowId && queryInfo.windowId === getCurrentWindowId() && !queryInfo.alreadyHandledByRenderer) {
     doAction(payload)
   }
 }

@@ -186,7 +186,22 @@ describe('search suggestions', function () {
   it('Finds search suggestions and performs a search when selected', function * () {
     yield this.app.client
       .changeSetting(settings.OFFER_SEARCH_SUGGESTIONS, true)
-      .setInputText(urlInput, 'what is')
+
+    // Until a refactor happens with search suggestions,
+    // they are a bit fragile if you aren't actually typing.
+    // So this for loop avoids an intermittent failure.
+    // I also couldn't use .typeText() because the autocomplete makes
+    // that hang when it checks for the value that was typed.
+    // The refactor needed is to allow urlbar suggestions to be built
+    // in parts and then rendered together, so that different suggestion
+    // types would be combined and rendered together as they are available.
+    const input = 'what is'
+    for (let i = 0; i < input.length; i++) {
+      yield this.app.client
+        .keys(input[i])
+        .pause(50)
+    }
+    yield this.app.client
       .waitForVisible(urlBarSuggestions)
       .keys(Brave.keys.DOWN)
       .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]:not(.selected)')

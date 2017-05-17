@@ -434,9 +434,9 @@ const generateNewSearchXHRResults = debounce((state, windowId, tabId, input) => 
     fetchSearchSuggestions(windowId, tabId, autocompleteURL, input)
   } else {
     const appActions = require('../../../js/actions/appActions')
-    appActions.searchSuggestionResultsAvailable(tabId, Immutable.List())
+    appActions.searchSuggestionResultsAvailable(tabId, undefined, Immutable.List())
   }
-}, 100)
+}, 10)
 
 module.exports = {
   sortingPriority,

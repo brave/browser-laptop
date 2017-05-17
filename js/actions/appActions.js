@@ -1365,11 +1365,12 @@ const appActions = {
    * @param {number} tabId - the tab id for the action
    * @param searchResults The search results for the currently entered URL bar text.
    */
-  searchSuggestionResultsAvailable: function (tabId, searchResults) {
+  searchSuggestionResultsAvailable: function (tabId, query, searchResults) {
     dispatch({
       actionType: appConstants.APP_SEARCH_SUGGESTION_RESULTS_AVAILABLE,
       tabId,
-      searchResults
+      searchResults,
+      query
     })
   },
 

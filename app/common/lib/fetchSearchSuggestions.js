@@ -4,8 +4,9 @@
 
 const appActions = require('../../../js/actions/appActions')
 const {request} = require('../../../js/lib/request')
+const debounce = require('../../../js/lib/debounce')
 
-const fetchSearchSuggestions = (windowId, tabId, autocompleteURL, searchTerms) => {
+const fetchSearchSuggestions = debounce((windowId, tabId, autocompleteURL, searchTerms) => {
   autocompleteURL.replace('{searchTerms}', encodeURIComponent(searchTerms))
   request(autocompleteURL.replace('{searchTerms}', encodeURIComponent(searchTerms)), (err, response, body) => {
     if (err) {
@@ -13,16 +14,19 @@ const fetchSearchSuggestions = (windowId, tabId, autocompleteURL, searchTerms) =
     }
 
     let searchResults
+    let query
     try {
-      searchResults = JSON.parse(body)[1]
+      const parsed = JSON.parse(body)
+      query = parsed[0]
+      searchResults = parsed[1]
     } catch (e) {
       console.warn(e)
       return
     }
 
     // Once we have the online suggestions, append them to the others
-    appActions.searchSuggestionResultsAvailable(tabId, searchResults)
+    appActions.searchSuggestionResultsAvailable(tabId, query, searchResults)
   })
-}
+}, 10)
 
 module.exports = fetchSearchSuggestions

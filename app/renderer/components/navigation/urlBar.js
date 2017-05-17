@@ -67,13 +67,19 @@ class UrlBar extends React.Component {
     }, 10)
   }
 
+  maybeUrlBarTextChanged (value) {
+    if (value !== this.props.locationValue) {
+      appActions.urlBarTextChanged(getCurrentWindowId(), this.props.activeTabId, value)
+    }
+  }
+
   // restores the url bar to the current location
   restore () {
     const location = UrlUtil.getDisplayLocation(this.props.location, getSetting(settings.PDFJS_ENABLED))
     if (this.urlInput) {
       this.setValue(location)
     }
-    appActions.urlBarTextChanged(getCurrentWindowId(), this.props.activeTabId, location)
+    this.maybeUrlBarTextChanged(location)
   }
 
   /**
@@ -300,7 +306,7 @@ class UrlBar extends React.Component {
       if (!this.keyPress) {
         // if this is a key press don't sent the update until keyUp so
         // showAutocompleteResult can handle the result
-        appActions.urlBarTextChanged(getCurrentWindowId(), this.props.activeTabId, val)
+        this.maybeUrlBarTextChanged(val)
       }
     }
   }
@@ -316,7 +322,7 @@ class UrlBar extends React.Component {
       windowActions.setUrlBarSelected(false)
     }
     this.keyPressed = false
-    appActions.urlBarTextChanged(getCurrentWindowId(), this.props.activeTabId, this.lastVal)
+    this.maybeUrlBarTextChanged(this.lastVal)
   }
 
   select () {
