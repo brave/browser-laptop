@@ -17,6 +17,14 @@ describe('navigator component tests', function () {
       yield setup(this.app.client)
     })
 
+    it('is orange by default (shield is up)', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl('https://clifton.io/')
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForElementCount('[data-test2-id="shield-down-false"]', 1)
+    })
+
     it('is grayed out if shield is disabled', function * () {
       yield this.app.client
         .tabByIndex(0)
