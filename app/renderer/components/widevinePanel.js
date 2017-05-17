@@ -16,6 +16,7 @@ const siteUtil = require('../../../js/state/siteUtil')
 const {
   CommonFormLarge,
   CommonFormTitle,
+  CommonFormSection,
   CommonFormButtonWrapper,
   CommonFormBottomWrapper
 } = require('./common/commonForm')
@@ -58,7 +59,9 @@ class ImportBrowserDataPanel extends ImmutableComponent {
     return <Dialog onHide={this.props.onHide} testId='widevinePanelDialog'>
       <CommonFormLarge onClick={(e) => e.stopPropagation()}>
         <CommonFormTitle data-l10n-id='widevinePanelTitle' />
-        <WidevineInfo createTabRequestedAction={appActions.createTabRequested} />
+        <CommonFormSection>
+          <WidevineInfo createTabRequestedAction={appActions.createTabRequested} />
+        </CommonFormSection>
         <CommonFormButtonWrapper>
           <Button className='whiteButton'
             l10nId='cancel'
