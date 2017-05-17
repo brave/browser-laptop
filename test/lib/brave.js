@@ -113,7 +113,8 @@ var exports = {
     DOWN: '\ue015',
     UP: '\ue013',
     PAGEDOWN: '\uE00F',
-    END: '\uE010'
+    END: '\uE010',
+    NULL: '\uE000'
   },
 
   defaultTimeout: 10000,

@@ -192,19 +192,16 @@ class UrlBar extends React.Component {
       case KeyCodes.TAB:
         this.hideAutoComplete()
         break
-      // Do not trigger rendering of suggestions if you are pressing alt or shift
-      case KeyCodes.ALT:
-      case KeyCodes.SHIFT:
-      case KeyCodes.CMD1:
-      case KeyCodes.CMD2:
-      case KeyCodes.CTRL:
-        break
       default:
         this.keyPressed = true
-        windowActions.setRenderUrlBarSuggestions(true)
-        // Any other keydown is fair game for autocomplete to be enabled.
-        if (!this.props.autocompleteEnabled) {
-          windowActions.urlBarAutocompleteEnabled(true)
+        // Only enable suggestions and autocomplete if we are typing in
+        // a printable character without cmd/ctrl
+        if (e.key && e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
+          windowActions.setRenderUrlBarSuggestions(true)
+          // Any other keydown is fair game for autocomplete to be enabled.
+          if (!this.props.autocompleteEnabled) {
+            windowActions.urlBarAutocompleteEnabled(true)
+          }
         }
     }
   }
