@@ -425,6 +425,25 @@ const tabState = {
     state = tabState.removeTabField(state, 'frame')
     state = state.delete('tabsInternal')
     return state.delete('tabs')
+  },
+
+  setNavigationState: (state, tabId, navigationState) => {
+    const tabValue = tabState.getByTabId(state, tabId)
+    if (!tabValue) {
+      return state
+    }
+    const path = tabState.getPathByTabId(state, tabId).push('navigationState')
+    return state.setIn(path, navigationState)
+  },
+
+  getVisibleURL: (state, tabId) => {
+    const path = tabState.getPathByTabId(state, tabId).push('navigationState', 'visibleEntry', 'url')
+    return path ? state.getIn(path, '') : ''
+  },
+
+  getVisibleVirtualURL: (state, tabId) => {
+    const path = tabState.getPathByTabId(state, tabId).push('navigationState', 'visibleEntry', 'virtualURL')
+    return path ? state.getIn(path, '') : ''
   }
 }
 

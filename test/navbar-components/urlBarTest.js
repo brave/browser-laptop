@@ -619,10 +619,12 @@ describe('urlBar tests', function () {
         .waitForInputText(urlInput, '')
         .windowByUrl(Brave.browserWindowUrl)
         .click(reloadButton)
+        .activateTitleMode()
     })
 
     it('reverts the URL', function * () {
       yield this.app.client
+        .activateURLMode()
         .waitForInputText(urlInput, this.page1Url)
     })
   })

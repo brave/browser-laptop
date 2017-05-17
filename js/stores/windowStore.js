@@ -15,7 +15,6 @@ const ipc = require('electron').ipcRenderer
 const messages = require('../constants/messages')
 const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
-const UrlUtil = require('../lib/urlutil')
 const {getCurrentWindowId, isFocused} = require('../../app/renderer/currentWindow')
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
 const { makeImmutable } = require('../../app/common/state/immutableUtil')
@@ -125,20 +124,7 @@ const newFrame = (state, frameOpts, openInForeground, insertionIndex, nextKey) =
   }
 
   // evaluate the location
-  frameOpts.location = frameOpts.location || newFrameUrl()
-  if (frameOpts.location && UrlUtil.isURL(frameOpts.location)) {
-    frameOpts.location = UrlUtil.getUrlFromInput(frameOpts.location)
-  } else {
-    // location is a search
-    const defaultURL = windowStore.getState().getIn(['searchDetail', 'searchURL'])
-    if (defaultURL) {
-      frameOpts.location = defaultURL
-        .replace('{searchTerms}', encodeURIComponent(frameOpts.location))
-    } else {
-      // Bad URLs passed here can actually crash the browser
-      frameOpts.location = ''
-    }
-  }
+  frameOpts.location = frameOpts.location === undefined ? newFrameUrl() : frameOpts.location
 
   // TODO: longer term get rid of parentFrameKey completely instead of
   // calculating it here.
@@ -298,18 +284,20 @@ const doAction = (action) => {
       break
     case windowConstants.WINDOW_WEBVIEW_LOAD_START:
       {
-        const statePath = path =>
-          [path, frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key'))]
+        const framePath = frameStateUtil.frameStatePath(windowState, action.frameProps.get('key'))
+        if (!framePath) {
+          break
+        }
 
         // Reset security state
         windowState =
-          windowState.deleteIn(statePath('frames').concat(['security', 'blockedRunInsecureContent']))
-        windowState = windowState.mergeIn(statePath('frames').concat(['security']), {
+          windowState.deleteIn(framePath.concat(['security', 'blockedRunInsecureContent']))
+        windowState = windowState.mergeIn(framePath.concat(['security']), {
           isSecure: null,
           runInsecureContent: false
         })
         // Update loading UI
-        windowState = windowState.mergeIn(statePath('frames'), {
+        windowState = windowState.mergeIn(framePath, {
           loading: true,
           provisionalLocation: action.location,
           startLoadTime: new Date().getTime(),
@@ -318,7 +306,7 @@ const doAction = (action) => {
         // For about:newtab we want to have the urlbar focused, not the new frame.
         // Otherwise we want to focus the new tab when it is a new frame in the foreground.
         if (action.location !== getTargetAboutUrl('about:newtab')) {
-          focusWebview(frameStateUtil.activeFrameStatePath(windowState))
+          focusWebview(framePath)
         }
         break
       }

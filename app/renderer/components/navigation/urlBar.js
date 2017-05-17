@@ -35,7 +35,7 @@ const {getSetting} = require('../../../../js/settings')
 const contextMenus = require('../../../../js/contextMenus')
 const UrlUtil = require('../../../../js/lib/urlutil')
 const {eventElHasAncestorWithClasses, isForSecondaryAction} = require('../../../../js/lib/eventUtil')
-const {getBaseUrl, isUrl, isIntermediateAboutPage} = require('../../../../js/lib/appUrlUtil')
+const {getBaseUrl, isUrl} = require('../../../../js/lib/appUrlUtil')
 const {getCurrentWindowId} = require('../../currentWindow')
 
 // Icons
@@ -56,20 +56,16 @@ class UrlBar extends React.Component {
     this.onContextMenu = this.onContextMenu.bind(this)
     this.keyPressed = false
     this.showAutocompleteResult = debounce(() => {
-      if (this.keyPressed || !this.urlInput || this.props.locationValueSuffix.length === 0) {
+      if (this.keyPressed || !this.urlInput || this.props.urlbarLocationSuffix.length === 0) {
         return
       }
-      this.updateAutocomplete(this.lastVal, this.props.locationValue + this.props.locationValueSuffix)
+      this.updateAutocomplete(this.lastVal, this.props.urlbarLocation + this.props.urlbarLocationSuffix)
     }, 10)
   }
 
   // restores the url bar to the current location
   restore () {
-    const location = UrlUtil.getDisplayLocation(this.props.location, getSetting(settings.PDFJS_ENABLED))
-    if (this.urlInput) {
-      this.setValue(location)
-    }
-    windowActions.setNavBarUserInput(location)
+    this.setValue(this.props.displayURL)
   }
 
   /**
@@ -124,7 +120,7 @@ class UrlBar extends React.Component {
             appActions.loadURLRequested(this.props.activeTabId, `www.${location}.com`)
           } else if (this.shouldRenderUrlBarSuggestions &&
               ((typeof this.activeIndex === 'number' && this.activeIndex >= 0) ||
-              (this.props.locationValueSuffix && this.props.autocompleteEnabled))) {
+              (this.props.urlbarLocationSuffix && this.props.autocompleteEnabled))) {
             // Hack to make alt enter open a new tab for url bar suggestions when hitting enter on them.
             const isDarwin = process.platform === 'darwin'
             if (e.altKey) {
@@ -177,7 +173,7 @@ class UrlBar extends React.Component {
         break
       case KeyCodes.DELETE:
         if (e.shiftKey) {
-          const selectedIndex = this.props.locationValueSuffix.length > 0 ? 1 : this.props.selectedIndex
+          const selectedIndex = this.props.urlbarLocationSuffix.length > 0 ? 1 : this.props.selectedIndex
           if (selectedIndex !== undefined) {
             const suggestionLocation = this.props.suggestion.location
             appActions.removeSite({ location: suggestionLocation })
@@ -213,7 +209,7 @@ class UrlBar extends React.Component {
   }
 
   onBlur (e) {
-    windowActions.urlBarOnBlur(getCurrentWindowId(), e.target.value, this.props.locationValue, eventElHasAncestorWithClasses(e, ['urlBarSuggestions', 'urlbarForm']))
+    windowActions.urlBarOnBlur(getCurrentWindowId(), e.target.value, this.props.displayURL, eventElHasAncestorWithClasses(e, ['urlBarSuggestions', 'urlbarForm']))
   }
 
   get suggestionLocation () {
@@ -226,7 +222,7 @@ class UrlBar extends React.Component {
     }
   }
 
-  updateAutocomplete (newValue, suggestion = this.lastVal + this.lastSuffix) {
+  updateAutocomplete (newValue, suggestion = this.getValue()) {
     if (suggestion.startsWith(newValue)) {
       const newSuffix = suggestion.substring(newValue.length)
       this.setValue(newValue, newSuffix)
@@ -267,7 +263,7 @@ class UrlBar extends React.Component {
   }
 
   onChange (e) {
-    if (e.target.value !== this.lastVal + this.lastSuffix) {
+    if (e.target.value !== this.getValue()) {
       e.preventDefault()
       // clear any current arrow or mouse hover selection
       windowActions.setUrlBarSuggestions(undefined, null)
@@ -287,7 +283,9 @@ class UrlBar extends React.Component {
     this.lastVal = val
     this.lastSuffix = suffix
     const newValue = val + suffix
-    if (this.urlInput.value !== newValue) {
+    if (!this.urlInput) {
+      windowActions.setNavBarUserInput(val)
+    } else if (this.urlInput.value !== newValue) {
       this.urlInput.value = newValue
       if (!this.keyPress) {
         // if this is a key press don't sent the update until keyUp so
@@ -345,38 +343,39 @@ class UrlBar extends React.Component {
   }
 
   componentDidMount () {
-    if (this.urlInput) {
-      this.setValue(UrlUtil.getDisplayLocation(this.props.location, getSetting(settings.PDFJS_ENABLED)))
-      this.focus()
-    }
+    this.setValue(this.props.urlbarLocation)
+    this.focus()
   }
 
   componentDidUpdate (prevProps) {
     // this.urlInput is not initialized in titleMode
     if (this.urlInput) {
-      const pdfjsEnabled = getSetting(settings.PDFJS_ENABLED)
       if (this.props.activeFrameKey !== prevProps.activeFrameKey) {
         this.keyPressed = false
         // The user just changed tabs
-        this.setValue(this.props.locationValue !== 'about:blank'
-          ? this.props.locationValue
-          : UrlUtil.getDisplayLocation(this.props.location, pdfjsEnabled))
+        this.setValue(this.props.urlbarLocation)
+
         // Each tab has a focused state stored separately
         if (this.props.isFocused) {
           this.focus()
+          this.select()
         }
         windowActions.setUrlBarSuggestions(undefined, null)
         windowActions.setRenderUrlBarSuggestions(false)
-      } else if (this.props.location !== prevProps.location) {
-        // This is a url nav change
-        this.setValue(UrlUtil.getDisplayLocation(this.props.location, pdfjsEnabled))
+      } else if (this.props.urlbarLocation !== prevProps.urlbarLocation &&
+        this.getValue() === prevProps.urlbarLocation) {
+        this.setValue(this.props.urlbarLocation)
       } else if (this.props.hasLocationValueSuffix &&
                 this.props.isActive &&
-                this.props.locationValueSuffix !== this.lastSuffix) {
+                this.props.urlbarLocationSuffix !== this.lastSuffix) {
         this.showAutocompleteResult()
-      } else if ((this.props.titleMode !== prevProps.titleMode) ||
-          (!this.props.isActive && !this.props.isFocused)) {
-        this.setValue(this.props.locationValue)
+      } else if (this.props.titleMode !== prevProps.titleMode) {
+        this.setValue(this.props.urlbarLocation)
+      }
+
+      // handle race condition with renderer initiated new tabs where navigation finishes before the frame is created
+      if (this.props.urlbarLocation === 'about:blank' && this.props.displayURL) {
+        this.setValue(this.props.displayURL)
       }
     }
 
@@ -401,7 +400,7 @@ class UrlBar extends React.Component {
   get titleValue () {
     // For about:newtab we don't want the top of the browser saying New Tab
     // Instead just show "Brave"
-    return ['about:blank', 'about:newtab'].includes(this.props.urlbarLocation)
+    return ['about:blank', 'about:newtab'].includes(this.props.displayURL)
       ? '' : this.props.title
   }
 
@@ -440,14 +439,12 @@ class UrlBar extends React.Component {
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const activeTabId = activeFrame.get('tabId') || tabState.TAB_ID_NONE
 
-    const location = activeFrame.get('location') || ''
+    const tab = tabState.getByTabId(state, activeTabId)
+    const location = tab ? tabState.getVisibleURL(state, activeTabId) : ''
+    const displayURL = tab ? tabState.getVisibleVirtualURL(state, activeTabId) : ''
     const baseUrl = getBaseUrl(location)
     const urlbar = activeFrame.getIn(['navbar', 'urlbar']) || Immutable.Map()
-    const history = (activeFrame.get('history') || new Immutable.List())
-    const canGoForward = activeTabId === tabState.TAB_ID_NONE ? false : tabState.canGoForward(state, activeTabId)
     const urlbarLocation = urlbar.get('location')
-    const locationValue = (isIntermediateAboutPage(urlbarLocation) && history.size > 0 && !canGoForward)
-        ? history.last() : UrlUtil.getDisplayLocation(urlbarLocation, getSetting(settings.PDFJS_ENABLED))
     const selectedIndex = urlbar.getIn(['suggestions', 'selectedIndex'])
     const allSiteSettings = siteSettingsState.getAllSiteSettings(state, activeFrame.get('isPrivate'))
     const braverySettings = siteSettings.getSiteSettingsForURL(allSiteSettings, location)
@@ -474,8 +471,7 @@ class UrlBar extends React.Component {
 
     // Whether this page is HTTP or HTTPS. We don't show security indicators
     // for other protocols like mailto: and about:.
-    const protocol = urlParse(
-      UrlUtil.getLocationIfPDF(location)).protocol
+    const protocol = urlParse(displayURL).protocol
     const isHTTPPage = protocol === 'http:' || protocol === 'https:'
 
     const props = {}
@@ -497,8 +493,8 @@ class UrlBar extends React.Component {
     props.noBorderRadius = isPublisherButtonEnabled
     props.onStop = ownProps.onStop
     props.titleMode = ownProps.titleMode
-    props.locationValue = locationValue
-    props.locationValueSuffix = urlbar.getIn(['suggestions', 'urlSuffix'])
+    props.displayURL = displayURL
+    props.urlbarLocationSuffix = urlbar.getIn(['suggestions', 'urlSuffix'])
     props.selectedIndex = selectedIndex
     props.suggestionList = urlbar.getIn(['suggestions', 'suggestionList'])
     props.suggestion = urlbar.getIn(['suggestions', 'suggestionList', selectedIndex - 1])
@@ -533,11 +529,11 @@ class UrlBar extends React.Component {
           isSecure={this.props.isSecure}
           isHTTPPage={this.props.isHTTPPage}
           loading={this.props.loading}
-          location={this.props.location}
+          location={this.props.displayURL}
           searchSelectEntry={this.props.searchSelectEntry}
           title={this.props.title}
           titleMode={this.props.titleMode}
-          isSearching={this.props.location !== this.props.urlbarLocation}
+          isSearching={this.props.displayURL !== this.props.urlbarLocation}
           activeTabShowingMessageBox={this.props.activeTabShowingMessageBox}
         />
       </div>
