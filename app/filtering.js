@@ -144,7 +144,9 @@ function registerForBeforeRequest (session, partition) {
           }))
 
         if (parentResourceName === appConfig.resourceNames.SAFE_BROWSING) {
-          cb({ redirectURL: appUrlUtil.getTargetAboutUrl('about:safebrowsing#' + details.url) })
+          cb({ cancel: true })
+          appActions.loadURLRequested(details.tabId,
+            appUrlUtil.getTargetAboutUrl('about:safebrowsing#' + details.url))
         } else if (details.resourceType === 'image') {
           cb({ redirectURL: transparent1pxGif })
         } else {

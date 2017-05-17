@@ -37,8 +37,12 @@ const ipc = window.chrome.ipcRenderer
 let element
 
 ipc.on('language', (e, detail) => {
-  document.l10n.requestLanguages([detail.langCode])
-  document.getElementsByName('availableLanguages')[0].content = detail.languageCodes.join(', ')
+  if (document.l10n) {
+    document.l10n.requestLanguages([detail.langCode])
+    document.getElementsByName('availableLanguages')[0].content = detail.languageCodes.join(', ')
+  } else {
+    console.error('Missing document.l10n object.')
+  }
 })
 ipc.send('request-language')
 
