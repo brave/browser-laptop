@@ -957,7 +957,7 @@ const searchSelectionMenuItem = (location) => {
       if (location) {
         let activeFrame = windowStore.getState().get('activeFrameKey')
         let frame = windowStore.getFrame(activeFrame)
-        let searchUrl = windowStore.getState().getIn(['searchDetail', 'searchURL']).replace('{searchTerms}', encodeURIComponent(location))
+        let searchUrl = appStoreRenderer.state.getIn(['searchDetail', 'searchURL']).replace('{searchTerms}', encodeURIComponent(location))
         appActions.createTabRequested({
           url: searchUrl,
           isPrivate: frame.get('isPrivate'),
@@ -1064,7 +1064,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
           click: () => {
             let activeFrame = windowStore.getState().get('activeFrameKey')
             let frame = windowStore.getFrame(activeFrame)
-            let searchUrl = windowStore.getState().getIn(['searchDetail', 'searchURL'])
+            let searchUrl = appStoreRenderer.state.getIn(['searchDetail', 'searchURL'])
               .replace('{searchTerms}', encodeURIComponent(nodeProps.srcURL))
               .replace('?q', 'byimage?image_url')
             appActions.createTabRequested({
@@ -1399,8 +1399,8 @@ function onTabPageContextMenu (framePropsList, e) {
 
 function onUrlBarContextMenu (e) {
   e.stopPropagation()
+  const searchDetail = appStoreRenderer.state.get('searchDetail')
   const windowState = windowStore.getState()
-  const searchDetail = windowStore.getState().get('searchDetail')
   const activeFrame = getActiveFrame(windowState)
   const inputMenu = Menu.buildFromTemplate(urlBarTemplateInit(searchDetail, activeFrame, e))
   inputMenu.popup(getCurrentWindow())

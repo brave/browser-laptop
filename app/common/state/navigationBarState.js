@@ -81,6 +81,11 @@ const api = {
     return api.getUrlBar(state, tabId).getIn(['suggestions', 'urlSuffix']) || ''
   },
 
+  hasSuggestionMatch: (state, tabId) => {
+    state = validateState(state)
+    return api.getUrlBar(state, tabId).getIn(['suggestions', 'hasSuggestionMatch']) || false
+  },
+
   hasLocationValueSuffix: (state, tabId) => {
     state = validateState(state)
     return api.locationValueSuffix(state, tabId).length > 0

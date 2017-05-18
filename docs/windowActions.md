@@ -98,17 +98,6 @@ Dispatches a message to set the frame error state
 
 
 
-### setNavBarUserInput(location) 
-
-Dispatches a message to the store to set the user entered text for the URL bar.
-Unlike setLocation and loadUrl, this does not modify the state of src and location.
-
-**Parameters**
-
-**location**: `string`, The text to set as the new navbar URL input
-
-
-
 ### setFindbarShown(frameKey, shown) 
 
 Shows/hides the find-in-page bar.
@@ -291,18 +280,6 @@ Dispatches a message to the store to indicate that the specified frame should mo
 
 
 
-### setUrlBarSuggestions(suggestionList, selectedIndex) 
-
-Sets the URL bar suggestions and selected index.
-
-**Parameters**
-
-**suggestionList**: `Array.&lt;Object&gt;`, The list of suggestions for the entered URL bar text. This can be generated from history, bookmarks, etc.
-
-**selectedIndex**: `number`, The index for the selected item (users can select items with down arrow on their keyboard)
-
-
-
 ### activeSuggestionClicked(isForSecondaryAction, shiftKey) 
 
 The active URL bar suggestion was clicked
@@ -342,19 +319,6 @@ This is sometimes only temporarily disabled, e.g. a user is pressing backspace.
 
 
 
-### searchSuggestionResultsAvailable(tabId, searchResults) 
-
-New URL bar suggestion search results are available.
-This is typically from a service like Duck Duck Go auto complete for the portion of text that the user typed in.
-
-**Parameters**
-
-**tabId**: `number`, the tab id for the action
-
-**searchResults**: , The search results for the currently entered URL bar text.
-
-
-
 ### setUrlBarSelected(isSelected) 
 
 Marks the URL bar text as selected or not
@@ -390,16 +354,6 @@ Dispatches a message to the store to indicate that the pending frame shortcut in
 set from an IPC call.
 
 **activeShortcutDetails**: `string`, Parameters for the shortcut action
-
-
-
-### setSearchDetail(searchDetail) 
-
-Dispatches a message to set the search engine details.
-
-**Parameters**
-
-**searchDetail**: `Object`, the search details
 
 
 

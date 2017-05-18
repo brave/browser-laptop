@@ -7,10 +7,12 @@ const ImmutableComponent = require('../immutableComponent')
 
 const UrlBarSuggestionItem = require('./urlBarSuggestionItem')
 const windowActions = require('../../../../js/actions/windowActions')
+const appActions = require('../../../../js/actions/appActions')
 const suggestionTypes = require('../../../../js/constants/suggestionTypes')
 const cx = require('../../../../js/lib/classSet')
 const locale = require('../../../../js/l10n')
 const {isForSecondaryAction} = require('../../../../js/lib/eventUtil')
+const {getCurrentWindowId} = require('../../currentWindow')
 
 class UrlBarSuggestions extends ImmutableComponent {
   constructor () {
@@ -27,7 +29,7 @@ class UrlBarSuggestions extends ImmutableComponent {
   }
 
   blur () {
-    windowActions.setUrlBarSuggestions(null, null)
+    appActions.urlBarSuggestionsChanged(getCurrentWindowId(), null, null)
   }
 
   onSuggestionClicked (e) {
@@ -36,12 +38,12 @@ class UrlBarSuggestions extends ImmutableComponent {
 
   render () {
     const suggestions = this.props.suggestionList
-    const bookmarkSuggestions = suggestions.filter((s) => s.type === suggestionTypes.BOOKMARK)
-    const historySuggestions = suggestions.filter((s) => s.type === suggestionTypes.HISTORY)
-    const aboutPagesSuggestions = suggestions.filter((s) => s.type === suggestionTypes.ABOUT_PAGES)
-    const tabSuggestions = suggestions.filter((s) => s.type === suggestionTypes.TAB)
-    const searchSuggestions = suggestions.filter((s) => s.type === suggestionTypes.SEARCH)
-    const topSiteSuggestions = suggestions.filter((s) => s.type === suggestionTypes.TOP_SITE)
+    const bookmarkSuggestions = suggestions.filter((s) => s.get('type') === suggestionTypes.BOOKMARK)
+    const historySuggestions = suggestions.filter((s) => s.get('type') === suggestionTypes.HISTORY)
+    const aboutPagesSuggestions = suggestions.filter((s) => s.get('type') === suggestionTypes.ABOUT_PAGES)
+    const tabSuggestions = suggestions.filter((s) => s.get('type') === suggestionTypes.TAB)
+    const searchSuggestions = suggestions.filter((s) => s.get('type') === suggestionTypes.SEARCH)
+    const topSiteSuggestions = suggestions.filter((s) => s.get('type') === suggestionTypes.TOP_SITE)
 
     let items = []
     let index = 0
@@ -63,7 +65,7 @@ class UrlBarSuggestions extends ImmutableComponent {
       }
       items = items.concat(suggestions.map((suggestion, i) => {
         const currentIndex = index + i
-        const selected = this.activeIndex === currentIndex || (!this.activeIndex && currentIndex === 0 && this.props.hasLocationValueSuffix)
+        const selected = this.activeIndex === currentIndex || (!this.activeIndex && currentIndex === 0 && this.props.hasSuggestionMatch)
         return <UrlBarSuggestionItem
           suggestion={suggestion}
           selected={selected}
@@ -105,7 +107,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     if (newIndex === 0 || newIndex > suggestions.size) {
       newIndex = null
     }
-    windowActions.setUrlBarSuggestions(suggestions, newIndex)
+    appActions.urlBarSuggestionsChanged(getCurrentWindowId(), suggestions, newIndex)
   }
 }
 

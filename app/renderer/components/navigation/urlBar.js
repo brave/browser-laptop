@@ -37,9 +37,13 @@ const UrlUtil = require('../../../../js/lib/urlutil')
 const {eventElHasAncestorWithClasses, isForSecondaryAction} = require('../../../../js/lib/eventUtil')
 const {getBaseUrl, isUrl, isIntermediateAboutPage} = require('../../../../js/lib/appUrlUtil')
 const {getCurrentWindowId} = require('../../currentWindow')
+const {normalizeLocation} = require('../../../common/lib/suggestion')
 
 // Icons
 const iconNoScript = require('../../../../img/url-bar-no-script.svg')
+
+// Stores
+const appStoreRenderer = require('../../../../js/stores/appStoreRenderer')
 
 class UrlBar extends React.Component {
   constructor (props) {
@@ -56,11 +60,17 @@ class UrlBar extends React.Component {
     this.onContextMenu = this.onContextMenu.bind(this)
     this.keyPressed = false
     this.showAutocompleteResult = debounce(() => {
-      if (this.keyPressed || !this.urlInput || this.props.locationValueSuffix.length === 0) {
+      if (this.keyPressed || !this.urlInput) {
         return
       }
-      this.updateAutocomplete(this.lastVal, this.props.locationValue + this.props.locationValueSuffix)
+      this.updateAutocomplete(this.lastVal)
     }, 10)
+  }
+
+  maybeUrlBarTextChanged (value) {
+    if (value !== this.props.locationValue) {
+      appActions.urlBarTextChanged(getCurrentWindowId(), this.props.activeTabId, value)
+    }
   }
 
   // restores the url bar to the current location
@@ -69,7 +79,7 @@ class UrlBar extends React.Component {
     if (this.urlInput) {
       this.setValue(location)
     }
-    windowActions.setNavBarUserInput(location)
+    this.maybeUrlBarTextChanged(location)
   }
 
   /**
@@ -94,7 +104,6 @@ class UrlBar extends React.Component {
     if (this.props.autocompleteEnabled) {
       windowActions.urlBarAutocompleteEnabled(false)
     }
-    windowActions.setUrlBarSuggestions(undefined, null)
     windowActions.setRenderUrlBarSuggestions(false)
   }
 
@@ -190,7 +199,14 @@ class UrlBar extends React.Component {
         this.hideAutoComplete()
         break
       case KeyCodes.TAB:
-        this.hideAutoComplete()
+        if (this.shouldRenderUrlBarSuggestions) {
+          if (e.shiftKey) {
+            windowActions.previousUrlBarSuggestionSelected()
+          } else {
+            windowActions.nextUrlBarSuggestionSelected()
+          }
+          e.preventDefault()
+        }
         break
       default:
         this.keyPressed = true
@@ -226,9 +242,16 @@ class UrlBar extends React.Component {
     }
   }
 
-  updateAutocomplete (newValue, suggestion = this.lastVal + this.lastSuffix) {
-    if (suggestion.startsWith(newValue)) {
-      const newSuffix = suggestion.substring(newValue.length)
+  updateAutocomplete (newValue) {
+    let suggestion = ''
+    let suggestionNormalized = ''
+    if (this.props.suggestionList && this.props.suggestionList.size > 0) {
+      suggestion = this.props.suggestionList.getIn([this.activeIndex || 0, 'location']) || ''
+      suggestionNormalized = normalizeLocation(suggestion)
+    }
+    const newValueNormalized = normalizeLocation(newValue)
+    if (suggestionNormalized.startsWith(newValueNormalized) && suggestionNormalized.length > 0) {
+      const newSuffix = suggestionNormalized.substring(newValueNormalized.length)
       this.setValue(newValue, newSuffix)
       this.urlInput.setSelectionRange(newValue.length, newValue.length + newSuffix.length + 1)
       return true
@@ -269,8 +292,6 @@ class UrlBar extends React.Component {
   onChange (e) {
     if (e.target.value !== this.lastVal + this.lastSuffix) {
       e.preventDefault()
-      // clear any current arrow or mouse hover selection
-      windowActions.setUrlBarSuggestions(undefined, null)
       this.setValue(e.target.value)
     }
   }
@@ -292,7 +313,7 @@ class UrlBar extends React.Component {
       if (!this.keyPress) {
         // if this is a key press don't sent the update until keyUp so
         // showAutocompleteResult can handle the result
-        windowActions.setNavBarUserInput(val)
+        this.maybeUrlBarTextChanged(val)
       }
     }
   }
@@ -301,16 +322,18 @@ class UrlBar extends React.Component {
     switch (e.keyCode) {
       case KeyCodes.UP:
       case KeyCodes.DOWN:
+      case KeyCodes.TAB:
       case KeyCodes.ESC:
+      case KeyCodes.LEFT:
+      case KeyCodes.SHIFT:
+      case KeyCodes.RIGHT:
         return
     }
     if (this.props.isSelected) {
       windowActions.setUrlBarSelected(false)
     }
-    // clear any current arrow or mouse hover selection
-    windowActions.setUrlBarSuggestions(undefined, null)
     this.keyPressed = false
-    windowActions.setNavBarUserInput(this.lastVal)
+    this.maybeUrlBarTextChanged(this.lastVal)
   }
 
   select () {
@@ -365,12 +388,11 @@ class UrlBar extends React.Component {
         if (this.props.isFocused) {
           this.focus()
         }
-        windowActions.setUrlBarSuggestions(undefined, null)
         windowActions.setRenderUrlBarSuggestions(false)
       } else if (this.props.location !== prevProps.location) {
         // This is a url nav change
         this.setValue(UrlUtil.getDisplayLocation(this.props.location, pdfjsEnabled))
-      } else if (this.props.hasLocationValueSuffix &&
+      } else if (this.props.hasSuggestionMatch &&
                 this.props.isActive &&
                 this.props.locationValueSuffix !== this.lastSuffix) {
         this.showAutocompleteResult()
@@ -463,7 +485,7 @@ class UrlBar extends React.Component {
 
     const activateSearchEngine = urlbar.getIn(['searchDetail', 'activateSearchEngine'])
     const urlbarSearchDetail = urlbar.get('searchDetail')
-    let searchURL = currentWindow.getIn(['searchDetail', 'searchURL'])
+    let searchURL = appStoreRenderer.state.getIn(['searchDetail', 'searchURL'])
     let searchShortcut = ''
     // remove shortcut from the search terms
     if (activateSearchEngine && urlbarSearchDetail !== null) {
@@ -486,7 +508,7 @@ class UrlBar extends React.Component {
     props.title = activeFrame.get('title') || ''
     props.scriptsBlocked = activeFrame.getIn(['noScript', 'blocked'])
     props.isSecure = activeFrame.getIn(['security', 'isSecure'])
-    props.hasLocationValueSuffix = urlbar.getIn(['suggestions', 'urlSuffix'])
+    props.hasSuggestionMatch = urlbar.getIn(['suggestions', 'hasSuggestionMatch'])
     props.startLoadTime = activeFrame.get('startLoadTime')
     props.endLoadTime = activeFrame.get('endLoadTime')
     props.loading = activeFrame.get('loading')
@@ -593,7 +615,7 @@ class UrlBar extends React.Component {
           ? <UrlBarSuggestions
             selectedIndex={this.props.selectedIndex}
             suggestionList={this.props.suggestionList}
-            hasLocationValueSuffix={this.props.hasLocationValueSuffix}
+            hasSuggestionMatch={this.props.hasSuggestionMatch}
             menubarVisible={this.props.menubarVisible} />
           : null
         }

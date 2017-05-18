@@ -20,21 +20,21 @@ class UrlBarSuggestionItem extends ImmutableComponent {
     return <li data-index={this.props.currentIndex}
       onMouseOver={this.props.onMouseOver.bind(this)}
       onClick={this.props.onClick}
-      key={`${this.props.suggestion.location}|${this.props.currentIndex + this.props.i}`}
+      key={`${this.props.suggestion.get('location')}|${this.props.currentIndex + this.props.i}`}
       ref={(node) => { this.node = node }}
       className={cx({
         selected: this.props.selected,
         suggestionItem: true,
-        [this.props.suggestion.type]: true
+        [this.props.suggestion.get('type')]: true
       })}>
       {
-        this.props.suggestion.type !== suggestionTypes.TOP_SITE && this.props.suggestion.title
-        ? <div className='suggestionTitle'>{this.props.suggestion.title}</div>
+        this.props.suggestion.get('type') !== suggestionTypes.TOP_SITE && this.props.suggestion.get('title')
+        ? <div className='suggestionTitle'>{this.props.suggestion.get('title')}</div>
         : null
       }
       {
-        this.props.suggestion.type !== suggestionTypes.SEARCH && this.props.suggestion.type !== suggestionTypes.ABOUT_PAGES
-        ? <div className='suggestionLocation'>{this.props.suggestion.location}</div>
+        this.props.suggestion.get('type') !== suggestionTypes.SEARCH && this.props.suggestion.get('type') !== suggestionTypes.ABOUT_PAGES
+        ? <div className='suggestionLocation'>{this.props.suggestion.get('location')}</div>
         : null
       }
     </li>

@@ -658,7 +658,8 @@ module.exports.defaultAppState = () => {
     httpsEverywhere: {
       count: 0
     },
-    defaultWindowParams: {}
+    defaultWindowParams: {},
+    searchDetail: null
   }
 }
 

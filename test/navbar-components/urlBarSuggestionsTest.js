@@ -46,7 +46,7 @@ describe('urlBarSuggestions', function () {
   it('show suggestion when single letter is typed in', function * () {
     yield this.app.client.ipcSend('shortcut-focus-url')
       .waitForElementFocus(urlInput)
-      .setInputText(urlInput, 'a')
+      .setInputText(urlInput, 'about:about')
       .waitForExist(urlBarSuggestions)
   })
 
@@ -63,6 +63,23 @@ describe('urlBarSuggestions', function () {
       .setInputText(urlInput, 'Page 1')
       .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]')
       .keys(Brave.keys.BACKSPACE)
+      .waitForElementCount(urlBarSuggestions, 0)
+  })
+
+  it('deactivated suggestions do not pop back up when left or shift is pressed', function * () {
+    yield this.app.client
+      .setInputText(urlInput, 'Page 1')
+      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]')
+      .keys(Brave.keys.BACKSPACE)
+      .waitForElementCount(urlBarSuggestions, 0)
+      .keys(Brave.keys.LEFT)
+      .pause(50)
+      .keys(Brave.keys.SHIFT + Brave.keys.LEFT)
+      .pause(50)
+      .keys(Brave.keys.LEFT)
+      .pause(50)
+      .keys(Brave.keys.SHIFT)
+      .pause(50)
       .waitForElementCount(urlBarSuggestions, 0)
   })
 
@@ -103,13 +120,13 @@ describe('urlBarSuggestions', function () {
       .keys(Brave.keys.DOWN)
       .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="1"].selected')
       .keys(Brave.keys.ENTER)
-      .tabByIndex(1).getUrl().should.become(this.page1Url)
+      .tabByIndex(1).getUrl().should.become(this.page2Url)
   })
 
   it('selects a location auto complete result but not for titles', function * () {
     yield this.app.client
       .setValue(urlInput, 'http://')
-      .waitForInputText(urlInput, Brave.server.urlOrigin())
+      .waitForInputText(urlInput, this.page1Url)
       .waitForExist(urlBarSuggestions + ' li.selected')
       .setValue(urlInput, 'Page')
       .waitForElementCount(urlBarSuggestions + ' li.selected', 0)
@@ -124,9 +141,8 @@ describe('urlBarSuggestions', function () {
     // so that finally, if the rest of the 1st option is entered via keyboard, it overwrites the suggestion from the mouse
     yield this.app.client
       .keys(pagePartialUrl)
-      .waitForInputText(urlInput, page2Url) // after entering partial URL matching two options, 1st is tentatively filled in (_without_ moving cursor to end)
+      .waitForInputText(urlInput, page1Url) // after entering partial URL matching two options, 1st is tentatively filled in (_without_ moving cursor to end)
       .waitForExist(urlBarSuggestions + ' li.suggestionItem')
-      .moveToObject(urlBarSuggestions + ' li.suggestionItem:not(.selected)')
       .waitForInputText(urlInput, page1Url) // mousing over 2nd option tentatively completes URL with 2nd option (_without_ moving cursor to end)
       .keys('2.html')
       .waitForInputText(urlInput, page2Url) // without moving mouse, typing rest of 1st option URL overwrites the autocomplete from mouseover
@@ -134,7 +150,7 @@ describe('urlBarSuggestions', function () {
 
   it('selection is not reset when pressing non-input key', function * () {
     const pagePartialUrl = Brave.server.url('page')
-    const page1Url = Brave.server.url('page1.html')
+    const page2Url = Brave.server.url('page2.html')
     aboutHistoryState.setHistory(Immutable.fromJS({
       about: {
         history: {
@@ -148,10 +164,10 @@ describe('urlBarSuggestions', function () {
       .setValue(urlInput, pagePartialUrl)
       .waitForVisible(urlBarSuggestions)
       .keys(Brave.keys.DOWN)
-      .waitForInputText(urlInput, page1Url)
+      .waitForInputText(urlInput, page2Url)
       .keys(Brave.keys.CONTROL)
       .keys(Brave.keys.CONTROL)
-      .waitForSelectedText('1.html')
+      .waitForSelectedText('2.html')
   })
 
   it('non-prefixed active suggestion loads the suggestion when enter is pressed', function * () {
@@ -187,7 +203,22 @@ describe('search suggestions', function () {
   it('Finds search suggestions and performs a search when selected', function * () {
     yield this.app.client
       .changeSetting(settings.OFFER_SEARCH_SUGGESTIONS, true)
-      .setInputText(urlInput, 'what is')
+
+    // Until a refactor happens with search suggestions,
+    // they are a bit fragile if you aren't actually typing.
+    // So this for loop avoids an intermittent failure.
+    // I also couldn't use .typeText() because the autocomplete makes
+    // that hang when it checks for the value that was typed.
+    // The refactor needed is to allow urlbar suggestions to be built
+    // in parts and then rendered together, so that different suggestion
+    // types would be combined and rendered together as they are available.
+    const input = 'what is'
+    for (let i = 0; i < input.length; i++) {
+      yield this.app.client
+        .keys(input[i])
+        .pause(50)
+    }
+    yield this.app.client
       .waitForVisible(urlBarSuggestions)
       .keys(Brave.keys.DOWN)
       .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]:not(.selected)')
