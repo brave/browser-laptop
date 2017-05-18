@@ -4,31 +4,40 @@
 
 const React = require('react')
 const Immutable = require('immutable')
-const ReduxComponent = require('../reduxComponent')
+const ipc = require('electron').ipcRenderer
 
-const cx = require('../../../../js/lib/classSet')
+// Components
+const ReduxComponent = require('../reduxComponent')
 const UrlBar = require('./urlBar')
+const AddEditBookmarkHanger = require('../bookmarks/addEditBookmarkHanger')
+const PublisherToggle = require('./publisherToggle')
+const LongPressButton = require('./../../../../js/components/longPressButton')
+
+// Actions
 const windowActions = require('../../../../js/actions/windowActions')
 const appActions = require('../../../../js/actions/appActions')
+
+// Constants
 const siteTags = require('../../../../js/constants/siteTags')
 const messages = require('../../../../js/constants/messages')
 const settings = require('../../../../js/constants/settings')
-const ipc = require('electron').ipcRenderer
-const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
-const AddEditBookmarkHanger = require('../bookmarks/addEditBookmarkHanger')
-const siteUtil = require('../../../../js/state/siteUtil')
-const eventUtil = require('../../../../js/lib/eventUtil')
-const UrlUtil = require('../../../../js/lib/urlutil')
-const getSetting = require('../../../../js/settings').getSetting
-const windowStore = require('../../../../js/stores/windowStore')
-const contextMenus = require('../../../../js/contextMenus')
-const LongPressButton = require('./../../../../js/components/longPressButton')
-const PublisherToggle = require('../publisherToggle')
 
 // State
 const tabState = require('../../../common/state/tabState')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const menuBarState = require('../../../common/state/menuBarState')
+
+// Store
+const windowStore = require('../../../../js/stores/windowStore')
+
+// Utils
+const cx = require('../../../../js/lib/classSet')
+const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
+const siteUtil = require('../../../../js/state/siteUtil')
+const eventUtil = require('../../../../js/lib/eventUtil')
+const UrlUtil = require('../../../../js/lib/urlutil')
+const {getSetting} = require('../../../../js/settings')
+const contextMenus = require('../../../../js/contextMenus')
 
 class NavigationBar extends React.Component {
   constructor (props) {

@@ -6,7 +6,7 @@ const React = require('react')
 const Immutable = require('immutable')
 const messages = require('../constants/messages')
 const SortableTable = require('../components/sortableTable')
-const ClipboardButton = require('../../app/renderer/components/clipboardButton')
+const ClipboardButton = require('../../app/renderer/components/common/clipboardButton')
 const aboutActions = require('./aboutActions')
 
 const ipc = window.chrome.ipcRenderer

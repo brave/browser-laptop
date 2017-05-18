@@ -43,11 +43,11 @@ describe('PublisherToggle component', function () {
       warnOnUnregistered: false,
       useCleanCache: true
     })
-    mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_no_verified.svg')
-    mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_yes_verified.svg')
-    mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_no.svg')
-    mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_yes.svg')
-    mockery.registerMock('../../../js/settings', { getSetting: (settingKey, settingsCollection, value) => {
+    mockery.registerMock('../../../extensions/brave/img/urlbar/browser_URL_fund_no_verified.svg')
+    mockery.registerMock('../../../extensions/brave/img/urlbar/browser_URL_fund_yes_verified.svg')
+    mockery.registerMock('../../../extensions/brave/img/urlbar/browser_URL_fund_no.svg')
+    mockery.registerMock('../../../extensions/brave/img/urlbar/browser_URL_fund_yes.svg')
+    mockery.registerMock('../../../../js/settings', { getSetting: (settingKey, settingsCollection, value) => {
       if (settingKey === paymentsEnabled || settingKey === autoSuggestSites) {
         return true
       }
@@ -55,7 +55,7 @@ describe('PublisherToggle component', function () {
     }})
     mockery.registerMock('electron', fakeElectron)
     window.chrome = fakeElectron
-    PublisherToggle = require('../../../../app/renderer/components/publisherToggle')
+    PublisherToggle = require('../../../../app/renderer/components/navigation/publisherToggle')
   })
   after(function () {
     mockery.disable()

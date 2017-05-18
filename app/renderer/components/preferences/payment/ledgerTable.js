@@ -24,7 +24,7 @@ const pinIcon = require('../../../../extensions/brave/img/ledger/icon_pin.svg')
 const settings = require('../../../../../js/constants/settings')
 const getSetting = require('../../../../../js/settings').getSetting
 const aboutActions = require('../../../../../js/about/aboutActions')
-const {SettingCheckbox, SiteSettingCheckbox} = require('../../settings')
+const {SettingCheckbox, SiteSettingCheckbox} = require('../../common/settings')
 
 class LedgerTable extends ImmutableComponent {
   get synopsis () {

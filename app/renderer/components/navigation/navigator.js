@@ -17,7 +17,7 @@ const ReduxComponent = require('../reduxComponent')
 const NavigationBar = require('./navigationBar')
 const LongPressButton = require('../../../../js/components/longPressButton')
 const MenuBar = require('./menuBar')
-const WindowCaptionButtons = require('../windowCaptionButtons')
+const WindowCaptionButtons = require('./windowCaptionButtons')
 const Button = require('../../../../js/components/button')
 const BrowserAction = require('./browserAction')
 

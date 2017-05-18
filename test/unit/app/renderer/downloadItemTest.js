@@ -48,7 +48,7 @@ describe('downloadItem component', function () {
       useCleanCache: true
     })
     mockery.registerMock('electron', fakeElectron)
-    DownloadItem = require('../../../../app/renderer/components/downloadItem')
+    DownloadItem = require('../../../../app/renderer/components/download/downloadItem')
     appActions = require('../../../../js/actions/appActions')
   })
 

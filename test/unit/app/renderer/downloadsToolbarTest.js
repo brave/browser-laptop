@@ -53,8 +53,8 @@ describe('downloadsBar component', function () {
       useCleanCache: true
     })
     mockery.registerMock('electron', fakeElectron)
-    DownloadItem = require('../../../../app/renderer/components/downloadItem')
-    DownloadsBar = require('../../../../app/renderer/components/downloadsBar')
+    DownloadItem = require('../../../../app/renderer/components/download/downloadItem')
+    DownloadsBar = require('../../../../app/renderer/components/download/downloadsBar')
   })
   after(function () {
     mockery.disable()
@@ -95,7 +95,7 @@ describe('downloadsBar component', function () {
   describe('very narrow downloads bar with items', function () {
     before(function () {
       // TODO: We can remove this once we're on Khan/aphrodite
-      mockery.registerMock('../getComputedStyle', () => 10)
+      mockery.registerMock('../../getComputedStyle', () => 10)
       this.result = mount(<DownloadsBar windowWidth={0} downloads={newDownloads()} />)
     })
     it('renders no downloads', function () {

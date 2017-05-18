@@ -3,20 +3,29 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('./immutableComponent')
-const appActions = require('../../../js/actions/appActions')
-const settings = require('../../../js/constants/settings')
-const getSetting = require('../../../js/settings').getSetting
 const {StyleSheet, css} = require('aphrodite')
-const globalStyles = require('./styles/global')
-const {getHostPattern, isHttpOrHttps} = require('../../../js/lib/urlutil')
-const {getBaseUrl} = require('../../../js/lib/appUrlUtil')
-const BrowserButton = require('./common/browserButton')
 
-const noFundVerifiedPublisherImage = require('../../extensions/brave/img/urlbar/browser_URL_fund_no_verified.svg')
-const fundVerifiedPublisherImage = require('../../extensions/brave/img/urlbar/browser_URL_fund_yes_verified.svg')
-const noFundUnverifiedPublisherImage = require('../../extensions/brave/img/urlbar/browser_URL_fund_no.svg')
-const fundUnverifiedPublisherImage = require('../../extensions/brave/img/urlbar/browser_URL_fund_yes.svg')
+// Components
+const ImmutableComponent = require('../immutableComponent')
+const BrowserButton = require('../common/browserButton')
+
+// Actions
+const appActions = require('../../../../js/actions/appActions')
+
+// Constants
+const settings = require('../../../../js/constants/settings')
+
+// Utils
+const {getSetting} = require('../../../../js/settings')
+const {getHostPattern, isHttpOrHttps} = require('../../../../js/lib/urlutil')
+const {getBaseUrl} = require('../../../../js/lib/appUrlUtil')
+
+// Style
+const globalStyles = require('../styles/global')
+const noFundVerifiedPublisherImage = require('../../../extensions/brave/img/urlbar/browser_URL_fund_no_verified.svg')
+const fundVerifiedPublisherImage = require('../../../extensions/brave/img/urlbar/browser_URL_fund_yes_verified.svg')
+const noFundUnverifiedPublisherImage = require('../../../extensions/brave/img/urlbar/browser_URL_fund_no.svg')
+const fundUnverifiedPublisherImage = require('../../../extensions/brave/img/urlbar/browser_URL_fund_yes.svg')
 
 class PublisherToggle extends ImmutableComponent {
   constructor () {

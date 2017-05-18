@@ -12,7 +12,7 @@ const {btcToCurrencyString} = require('../../../../common/lib/ledgerUtil')
 const ImmutableComponent = require('../../immutableComponent')
 const BrowserButton = require('../../common/browserButton')
 const {RecoveryKeyTextbox} = require('../../common/textbox')
-const {SettingsList, SettingItem} = require('../../settings')
+const {SettingsList, SettingItem} = require('../../common/settings')
 
 // style
 const globalStyles = require('../../styles/global')

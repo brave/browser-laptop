@@ -11,7 +11,7 @@ const commonStyles = require('../styles/commonStyles')
 const {getSetting} = require('../../../../js/settings')
 
 // Components
-const {SettingsList, SettingItem, SettingCheckbox} = require('../settings')
+const {SettingsList, SettingItem, SettingCheckbox} = require('../common/settings')
 const {SettingDropdown} = require('../common/dropdown')
 const {DefaultSectionTitle} = require('../common/sectionTitle')
 

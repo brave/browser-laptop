@@ -3,16 +3,14 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const {StyleSheet, css} = require('aphrodite/no-important')
+
+// Components
 const ImmutableComponent = require('./immutableComponent')
 const Dialog = require('../../../js/components/dialog')
 const Button = require('../../../js/components/button')
-const appConfig = require('../../../js/constants/appConfig')
 const WidevineInfo = require('./widevineInfo')
 const SwitchControl = require('../../../js/components/switchControl')
-const windowActions = require('../../../js/actions/windowActions')
-const appActions = require('../../../js/actions/appActions')
-const siteUtil = require('../../../js/state/siteUtil')
-
 const {
   CommonFormLarge,
   CommonFormTitle,
@@ -21,10 +19,20 @@ const {
   CommonFormBottomWrapper
 } = require('./common/commonForm')
 
-const {StyleSheet, css} = require('aphrodite/no-important')
+// Constants
+const appConfig = require('../../../js/constants/appConfig')
+
+// Actions
+const windowActions = require('../../../js/actions/windowActions')
+const appActions = require('../../../js/actions/appActions')
+
+// Utils
+const siteUtil = require('../../../js/state/siteUtil')
+
+// Styles
 const commonStyles = require('./styles/commonStyles')
 
-class ImportBrowserDataPanel extends ImmutableComponent {
+class WidevinePanel extends ImmutableComponent {
   constructor () {
     super()
     this.onInstallAndAllow = this.onInstallAndAllow.bind(this)
@@ -96,4 +104,4 @@ const styles = StyleSheet.create({
   }
 })
 
-module.exports = ImportBrowserDataPanel
+module.exports = WidevinePanel

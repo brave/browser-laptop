@@ -3,12 +3,18 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('./immutableComponent')
-const Button = require('../../../js/components/button')
-const contextMenus = require('../../../js/contextMenus')
-const windowActions = require('../../../js/actions/windowActions')
-const webviewActions = require('../../../js/actions/webviewActions')
+
+// Components
+const ImmutableComponent = require('../immutableComponent')
+const Button = require('../../../../js/components/button')
 const DownloadItem = require('./downloadItem')
+
+// Actions
+const windowActions = require('../../../../js/actions/windowActions')
+const webviewActions = require('../../../../js/actions/webviewActions')
+
+// Utils
+const contextMenus = require('../../../../js/contextMenus')
 
 class DownloadsBar extends ImmutableComponent {
   constructor () {
@@ -20,7 +26,7 @@ class DownloadsBar extends ImmutableComponent {
     webviewActions.setWebviewFocused()
   }
   render () {
-    const getComputedStyle = require('../getComputedStyle')
+    const getComputedStyle = require('../../getComputedStyle')
     const downloadItemWidth = Number.parseInt(getComputedStyle('--download-item-width'), 10)
     const downloadItemMargin = Number.parseInt(getComputedStyle('--download-item-margin'), 10)
     const downloadBarPadding = Number.parseInt(getComputedStyle('--download-bar-padding'), 10)
