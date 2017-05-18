@@ -167,7 +167,7 @@ module.exports = {
     'security.passwords.enpass-enabled': false,
     'security.passwords.bitwarden-enabled': false,
     'security.fullscreen.content': fullscreenOption.ALWAYS_ASK,
-    'security.autoplay.media': autoplayOption.ALWAYS_ASK,
+    'security.autoplay.media': autoplayOption.ALWAYS_ALLOW,
     'security.flash.installed': false,
     // sync
     'sync.enabled': false,
