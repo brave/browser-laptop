@@ -1,6 +1,6 @@
 const prettierBytes = require('prettier-bytes')
 const React = require('react')
-const SortableTable = require('../../components/sortableTable')
+const SortableTable = require('../../../app/renderer/components/common/sortableTable')
 
 const {css} = require('aphrodite/no-important')
 const commonStyles = require('../../../app/renderer/components/styles/commonStyles')

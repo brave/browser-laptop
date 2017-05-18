@@ -6,7 +6,7 @@ const React = require('react')
 
 // Components
 const ImmutableComponent = require('../immutableComponent')
-const Dialog = require('../../../../js/components/dialog')
+const Dialog = require('../common/dialog')
 const BrowserButton = require('../common/browserButton')
 
 // Actions

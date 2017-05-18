@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const Button = require('../components/button')
+const Button = require('../../app/renderer/components/common/button')
 const aboutActions = require('./aboutActions')
 const messages = require('../constants/messages')
 const ipc = window.chrome.ipcRenderer

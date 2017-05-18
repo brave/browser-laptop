@@ -9,7 +9,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 // Components
 const cx = require('../../../../js/lib/classSet')
 const ImmutableComponent = require('../immutableComponent')
-const ModalOverlay = require('../../../../js/components/modalOverlay')
+const ModalOverlay = require('../common/modalOverlay')
 
 const {SettingCheckbox} = require('../common/settings')
 const {

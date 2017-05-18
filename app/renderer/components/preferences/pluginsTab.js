@@ -10,7 +10,7 @@ const settings = require('../../../../js/constants/settings')
 const appConfig = require('../../../../js/constants/appConfig')
 const {isWindows, isDarwin, isLinux} = require('../../../common/lib/platformUtil')
 
-const WidevineInfo = require('../../components/widevineInfo')
+const WidevineInfo = require('../main/widevineInfo')
 const flash = appConfig.resourceNames.FLASH
 const widevine = appConfig.resourceNames.WIDEVINE
 

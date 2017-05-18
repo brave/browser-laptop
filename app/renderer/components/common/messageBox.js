@@ -7,9 +7,9 @@ const {StyleSheet, css} = require('aphrodite')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
-const Dialog = require('../../../../js/components/dialog')
+const Dialog = require('./dialog')
 const BrowserButton = require('../common/browserButton')
-const SwitchControl = require('../../../../js/components/switchControl')
+const SwitchControl = require('./switchControl')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')

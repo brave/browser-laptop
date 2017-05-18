@@ -10,7 +10,7 @@ const {ADBLOCK_CUSTOM_RULES} = require('../constants/settings')
 const getSetting = require('../settings').getSetting
 const aboutActions = require('./aboutActions')
 const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
-const SwitchControl = require('../components/switchControl')
+const SwitchControl = require('../../app/renderer/components/common/switchControl')
 const {DefaultTextArea} = require('../../app/renderer/components/common/textbox')
 
 const {StyleSheet, css} = require('aphrodite/no-important')

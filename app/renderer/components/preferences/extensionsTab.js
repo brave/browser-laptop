@@ -17,8 +17,8 @@ const {isPasswordManager, getExtensionKey, isBuiltInExtension, bravifyText} = re
 
 const {DefaultSectionTitle} = require('../common/sectionTitle')
 
-const HelpfulText = require('../helpfulText')
-const SortableTable = require('../../../../js/components/sortableTable')
+const HelpfulText = require('./helpfulText')
+const SortableTable = require('../common/sortableTable')
 
 class ExtensionsTab extends ImmutableComponent {
   getIcon (extension) {

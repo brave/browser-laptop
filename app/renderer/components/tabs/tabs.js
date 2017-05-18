@@ -7,7 +7,7 @@ const ReactDOM = require('react-dom')
 
 // Components
 const ImmutableComponent = require('../immutableComponent')
-const LongPressButton = require('../../../../js/components/longPressButton')
+const LongPressButton = require('../common/longPressButton')
 const Tab = require('./tab')
 
 // Actions

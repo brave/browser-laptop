@@ -5,7 +5,7 @@ const {css} = require('aphrodite/no-important')
 const commonStyles = require('../../../app/renderer/components/styles/commonStyles')
 
 // Components
-const Button = require('../../components/button')
+const Button = require('../../../app/renderer/components/common/button')
 const TorrentFileList = require('./torrentFileList')
 const TorrentStatus = require('./torrentStatus')
 
