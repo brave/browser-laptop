@@ -4,6 +4,11 @@
 module.exports.defaultSiteSettingsList = [
     {
       "name" : "autoplay",
+      "pattern" : "file:///",
+      "value" : true,
+    },
+    {
+      "name" : "autoplay",
       "pattern" : "https://www.youtube.com",
       "value" : true,
     },
