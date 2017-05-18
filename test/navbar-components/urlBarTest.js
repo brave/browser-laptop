@@ -265,6 +265,21 @@ describe('urlBar tests', function () {
       })
     })
 
+    describe('highlight suggestions with tab', function () {
+      it('autofills from selected suggestion', function * () {
+        // now type something
+        yield this.app.client
+          .keys('https://br')
+          .waitForInputText(urlInput, 'https://brave.com')
+          // hit down
+          .keys(Brave.keys.TAB)
+          .waitForInputText(urlInput, 'https://brave.com/test')
+          // hit up
+          .keys(Brave.keys.SHIFT + Brave.keys.TAB)
+          .waitForInputText(urlInput, 'https://brave.com')
+      })
+    })
+
     describe('highlight suggestions', function () {
       it('autofills from selected suggestion', function * () {
         // now type something

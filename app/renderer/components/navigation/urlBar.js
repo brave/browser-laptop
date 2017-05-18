@@ -199,7 +199,14 @@ class UrlBar extends React.Component {
         this.hideAutoComplete()
         break
       case KeyCodes.TAB:
-        this.hideAutoComplete()
+        if (this.shouldRenderUrlBarSuggestions) {
+          if (e.shiftKey) {
+            windowActions.previousUrlBarSuggestionSelected()
+          } else {
+            windowActions.nextUrlBarSuggestionSelected()
+          }
+          e.preventDefault()
+        }
         break
       default:
         this.keyPressed = true
@@ -315,6 +322,7 @@ class UrlBar extends React.Component {
     switch (e.keyCode) {
       case KeyCodes.UP:
       case KeyCodes.DOWN:
+      case KeyCodes.TAB:
       case KeyCodes.ESC:
         return
     }
