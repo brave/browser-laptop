@@ -31,7 +31,7 @@ const ImportBrowserDataPanel = require('./importBrowserDataPanel')
 const WidevinePanel = require('./widevinePanel')
 const AutofillAddressPanel = require('../autofill/autofillAddressPanel')
 const AutofillCreditCardPanel = require('../autofill/autofillCreditCardPanel')
-const AddEditBookmark = require('../bookmarks/addEditBookmark')
+const AddEditBookmarkHanger = require('../bookmarks/addEditBookmarkHanger')
 const LoginRequired = require('./loginRequired')
 const ReleaseNotes = require('./releaseNotes')
 const BookmarksToolbar = require('../bookmarks/bookmarksToolbar')
@@ -794,17 +794,13 @@ class Main extends ImmutableComponent {
         }
         {
           this.props.windowState.get('bookmarkDetail') && !this.props.windowState.getIn(['bookmarkDetail', 'isBookmarkHanger'])
-          ? <AddEditBookmark
-            sites={appStateSites}
-            currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])}
-            originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}
-            destinationDetail={this.props.windowState.getIn(['bookmarkDetail', 'destinationDetail'])}
-            shouldShowLocation={this.props.windowState.getIn(['bookmarkDetail', 'shouldShowLocation'])} />
+          ? <AddEditBookmarkHanger isModal />
           : null
         }
         {
           noScriptIsVisible
-            ? <NoScriptInfo frameProps={activeFrame}
+            ? <NoScriptInfo
+              frameProps={activeFrame}
               onHide={this.onHideNoScript} />
             : null
         }
