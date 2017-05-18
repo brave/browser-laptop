@@ -6,6 +6,7 @@
 
 const appConstants = require('../../../js/constants/appConstants')
 const flash = require('../../../js/flash')
+const siteSettings = require('../../../js/state/siteSettings')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 
 const flashReducer = (state, action, immutableAction) => {
@@ -15,8 +16,14 @@ const flashReducer = (state, action, immutableAction) => {
       flash.init()
       break
     case appConstants.APP_FLASH_PERMISSION_REQUESTED:
-      flash.showFlashMessageBox(action.get('location'), action.get('senderTabId'))
-      break
+      {
+        const location = action.get('location')
+        const settings = siteSettings.getSiteSettingsForURL(state.get('siteSettings'), location)
+        if (!(settings && ['boolean', 'number'].includes(typeof settings.get('flash')))) {
+          flash.showFlashMessageBox(location, action.get('senderTabId'))
+        }
+        break
+      }
   }
   return state
 }
