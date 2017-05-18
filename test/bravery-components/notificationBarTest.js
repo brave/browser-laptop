@@ -3,6 +3,7 @@
 const Brave = require('../lib/brave')
 const {notificationBar, titleBar, urlInput, reloadButton} = require('../lib/selectors')
 const {autoplayOption} = require('../../app/common/constants/settingsEnums')
+const {AUTOPLAY_MEDIA} = require('../../js/constants/settings')
 
 describe('notificationBar permissions', function () {
   function * setup (client) {
@@ -220,6 +221,7 @@ describe('Autoplay test', function () {
     yield client
       .waitForBrowserWindow()
       .waitForVisible(urlInput)
+      .changeSetting(AUTOPLAY_MEDIA, autoplayOption.ALWAYS_ASK)
   }
 
   Brave.beforeEach(this)
