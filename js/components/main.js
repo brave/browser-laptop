@@ -288,7 +288,7 @@ class Main extends ImmutableComponent {
     if (this.lastLoadedSearchProviders === undefined || engine !== this.lastLoadedSearchProviders) {
       entries.forEach((entry) => {
         if (entry.name === engine) {
-          windowActions.setSearchDetail(Immutable.fromJS({
+          appActions.defaultSearchEngineLoaded(Immutable.fromJS({
             searchURL: entry.search,
             autocompleteURL: entry.autocomplete,
             platformClientId: entry.platformClientId

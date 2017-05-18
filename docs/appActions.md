@@ -1023,6 +1023,18 @@ Notifies autoplay has been blocked
 
 
 
+### savePassword() 
+
+Handle 'save-password' event from muon
+
+
+
+### updatePassword() 
+
+Handle 'update-password' event from muon
+
+
+
 ### deletePassword(passwordDetail) 
 
 Deletes login credentials
@@ -1042,6 +1054,57 @@ Deletes all saved login credentials
 ### deletePasswordSite() 
 
 Delete legacy "never saved password" list
+
+
+
+### urlBarTextChanged(windowId, tabId, input) 
+
+Indicates that the urlbar text has changed, usually from user input
+
+**Parameters**
+
+**windowId**: `number`, The window ID the text is being changed inside of
+
+**tabId**: `number`, The tab ID the text is being changed inside of
+
+**input**: `string`, The text that was entered into the URL bar
+
+
+
+### searchSuggestionResultsAvailable(tabId, searchResults) 
+
+New URL bar suggestion search results are available.
+This is typically from a service like Duck Duck Go auto complete for the portion of text that the user typed in.
+
+**Parameters**
+
+**tabId**: `number`, the tab id for the action
+
+**searchResults**: , The search results for the currently entered URL bar text.
+
+
+
+### urlBarSuggestionsChanged(windowId, suggestionList, selectedIndex) 
+
+Indicates URL bar suggestions and selected index.
+
+**Parameters**
+
+**windowId**: `number`, the window ID
+
+**suggestionList**: `Array.&lt;Object&gt;`, The list of suggestions for the entered URL bar text. This can be generated from history, bookmarks, etc.
+
+**selectedIndex**: `number`, The index for the selected item (users can select items with down arrow on their keyboard)
+
+
+
+### defaultSearchEngineLoaded(searchDetail) 
+
+Dispatches a message to set the search engine details.
+
+**Parameters**
+
+**searchDetail**: `Object`, the search details
 
 
 

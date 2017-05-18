@@ -28,8 +28,7 @@ module.exports = {
   defaultUrl: 'about:newtab',
   urlBarSuggestions: {
     maxOpenedFrames: 2,
-    maxBookmarkSites: 2,
-    maxHistorySites: 3,
+    maxHistorySites: 5,
     maxAboutPages: 2,
     maxSearch: 3,
     maxTopSites: 3

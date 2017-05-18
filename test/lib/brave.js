@@ -114,6 +114,7 @@ var exports = {
     UP: '\ue013',
     PAGEDOWN: '\uE00F',
     END: '\uE010',
+    TAB: '\ue004',
     NULL: '\uE000'
   },
 

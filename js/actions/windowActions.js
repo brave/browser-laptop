@@ -4,15 +4,10 @@
 
 'use strict'
 
-const AppDispatcher = require('../dispatcher/appDispatcher')
+const {dispatch} = require('../dispatcher/appDispatcher')
 const windowConstants = require('../constants/windowConstants')
 
-function dispatch (action) {
-  AppDispatcher.dispatch(action)
-}
-
 const windowActions = {
-
   /**
    * Dispatches an event to the main process to replace the window state
    *
@@ -112,19 +107,6 @@ const windowActions = {
       actionType: windowConstants.WINDOW_SET_FRAME_ERROR,
       frameProps,
       errorDetails
-    })
-  },
-
-  /**
-   * Dispatches a message to the store to set the user entered text for the URL bar.
-   * Unlike setLocation and loadUrl, this does not modify the state of src and location.
-   *
-   * @param {string} location - The text to set as the new navbar URL input
-   */
-  setNavBarUserInput: function (location) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_NAVBAR_INPUT,
-      location
     })
   },
 
@@ -353,20 +335,6 @@ const windowActions = {
   },
 
   /**
-   * Sets the URL bar suggestions and selected index.
-   *
-   * @param {Object[]} suggestionList - The list of suggestions for the entered URL bar text. This can be generated from history, bookmarks, etc.
-   * @param {number} selectedIndex - The index for the selected item (users can select items with down arrow on their keyboard)
-   */
-  setUrlBarSuggestions: function (suggestionList, selectedIndex) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_URL_BAR_SUGGESTIONS,
-      suggestionList,
-      selectedIndex
-    })
-  },
-
-  /**
    * The active URL bar suggestion was clicked
    * @param {boolean} isForSecondaryAction - Whether the secondary action is expected
    *  which happens when a modifier key is pressed.
@@ -423,21 +391,6 @@ const windowActions = {
     dispatch({
       actionType: windowConstants.WINDOW_SET_RENDER_URL_BAR_SUGGESTIONS,
       enabled
-    })
-  },
-
-  /**
-   * New URL bar suggestion search results are available.
-   * This is typically from a service like Duck Duck Go auto complete for the portion of text that the user typed in.
-   *
-   * @param {number} tabId - the tab id for the action
-   * @param searchResults The search results for the currently entered URL bar text.
-   */
-  searchSuggestionResultsAvailable: function (tabId, searchResults) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SEARCH_SUGGESTION_RESULTS_AVAILABLE,
-      tabId,
-      searchResults
     })
   },
 
@@ -506,17 +459,6 @@ const windowActions = {
       frameProps,
       activeShortcut,
       activeShortcutDetails
-    })
-  },
-
-  /**
-   * Dispatches a message to set the search engine details.
-   * @param {Object} searchDetail - the search details
-   */
-  setSearchDetail: function (searchDetail) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_SEARCH_DETAIL,
-      searchDetail
     })
   },
 

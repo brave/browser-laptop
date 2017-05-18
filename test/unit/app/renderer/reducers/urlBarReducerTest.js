@@ -2,9 +2,11 @@
 const mockery = require('mockery')
 const Immutable = require('immutable')
 const assert = require('assert')
+const sinon = require('sinon')
 const fakeElectron = require('../../../lib/fakeElectron')
 
 const windowConstants = require('../../../../../js/constants/windowConstants')
+const appConstants = require('../../../../../js/constants/appConstants')
 require('../../../braveUnit')
 
 const windowState = Immutable.fromJS({
@@ -111,10 +113,10 @@ describe('urlBarReducer', function () {
     mockery.disable()
   })
 
-  describe('WINDOW_SET_NAVBAR_INPUT', function () {
+  describe('APP_URL_BAR_TEXT_CHANGED', function () {
     before(function () {
       this.location = 'this test is brought to you by coffee.'
-      this.newState = urlBarReducer(windowState, {actionType: windowConstants.WINDOW_SET_NAVBAR_INPUT, location: this.location})
+      this.newState = urlBarReducer(windowState, {actionType: appConstants.APP_URL_BAR_TEXT_CHANGED, input: this.location})
     })
 
     it('Changes urlbar state for active frame key', function () {
@@ -211,7 +213,15 @@ describe('urlBarReducer', function () {
             suggestions: {
               shouldRender: true,
               selectedIndex: 2,
-              suggestionList: ['2.71828', '18284', '59045', '23536'],
+              suggestionList: [{
+                location: 'https://brave.com/2.71828'
+              }, {
+                location: 'https://brave.com/18284'
+              }, {
+                location: 'https://brave.com/59045'
+              }, {
+                location: 'https://brave.com/23536'
+              }],
               searchResults: [
                 '3.1415926535'
               ]
@@ -245,6 +255,10 @@ describe('urlBarReducer', function () {
           default: return true
         }
       }})
+      this.suggestionClickHandlers = {
+        navigateSiteClickHandler: sinon.mock()
+      }
+      mockery.registerMock('../suggestionClickHandlers', this.suggestionClickHandlers)
       urlBarReducer = require('../../../../../app/renderer/reducers/urlBarReducer')
     })
 
@@ -280,15 +294,7 @@ describe('urlBarReducer', function () {
       })
     })
 
-    describe('WINDOW_SEARCH_SUGGESTION_RESULTS_AVAILABLE', function () {
-      it('turns off suggestions', function () {
-        const searchResults = Immutable.fromJS(['0110001001110010011010010110000101101110'])
-        const newState = urlBarReducer(windowState, {actionType: windowConstants.WINDOW_SEARCH_SUGGESTION_RESULTS_AVAILABLE, searchResults, tabId: 2})
-        assert.deepEqual(newState.getIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'searchResults']).toJS(), searchResults.toJS())
-      })
-    })
-
-    describe('WINDOW_SET_NAVBAR_INPUT', function () {
+    describe('APP_URL_BAR_TEXT_CHANGED', function () {
       // TODO
     })
 
@@ -299,10 +305,10 @@ describe('urlBarReducer', function () {
       })
     })
 
-    describe('WINDOW_SET_URL_BAR_SUGGESTIONS', function () {
+    describe('APP_URL_BAR_SUGGESTIONS_CHANGED', function () {
       it('suggestion results can be updated', function () {
         const suggestionList = Immutable.fromJS(['0.207879576'])
-        const newState = urlBarReducer(windowState, {actionType: windowConstants.WINDOW_SET_URL_BAR_SUGGESTIONS, suggestionList, selectedIndex: null})
+        const newState = urlBarReducer(windowState, {actionType: appConstants.APP_URL_BAR_SUGGESTIONS_CHANGED, suggestionList, selectedIndex: null})
         assert.equal(newState.getIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'suggestionList']), suggestionList)
         assert.equal(newState.getIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'selectedIndex']), null)
       })
@@ -332,10 +338,10 @@ describe('urlBarReducer', function () {
     })
 
     describe('WINDOW_ACTIVE_URL_BAR_SUGGESTION_CLICKED', function () {
-      it('', function (cb) {
-        const inputState = windowState.setIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'suggestionList', 2], {onClick: cb})
-        // Thiis test will finish when the callback is called from the click event
+      it('callback is not called sync', function () {
+        const inputState = windowState.setIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'suggestionList', Immutable.fromJS([{location: 'https://www.brave.com'}])])
         urlBarReducer(inputState, {actionType: windowConstants.WINDOW_ACTIVE_URL_BAR_SUGGESTION_CLICKED})
+        assert.equal(this.suggestionClickHandlers.navigateSiteClickHandler.callCount, 0)
       })
     })
   })

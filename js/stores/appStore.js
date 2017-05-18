@@ -395,6 +395,7 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/windowsReducer'),
       require('../../app/browser/reducers/spellCheckReducer'),
       require('../../app/browser/reducers/clipboardReducer'),
+      require('../../app/browser/reducers/urlBarSuggestionsReducer'),
       require('../../app/browser/reducers/passwordManagerReducer'),
       require('../../app/browser/reducers/tabMessageBoxReducer'),
       require('../../app/browser/reducers/dragDropReducer'),
@@ -890,6 +891,9 @@ const handleAppAction = (action) => {
         let newSiteSettings = siteSettings.mergeSiteSetting(appState.get('siteSettings'), pattern, 'ledgerPinPercentage', action.publishers[item].pinPercentage)
         appState = appState.set('siteSettings', newSiteSettings)
       })
+      break
+    case appConstants.APP_DEFAULT_SEARCH_ENGINE_LOADED:
+      appState = appState.set('searchDetail', action.searchDetail)
       break
     default:
   }
