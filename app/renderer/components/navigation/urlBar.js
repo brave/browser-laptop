@@ -498,6 +498,7 @@ class UrlBar extends React.Component {
     props.scriptsBlocked = activeFrame.getIn(['noScript', 'blocked'])
     props.isSecure = activeFrame.getIn(['security', 'isSecure'])
     props.hasLocationValueSuffix = urlbar.getIn(['suggestions', 'urlSuffix'])
+    props.hasSuggestionMatch = urlbar.getIn(['suggestions', 'hasSuggestionMatch'])
     props.startLoadTime = activeFrame.get('startLoadTime')
     props.endLoadTime = activeFrame.get('endLoadTime')
     props.loading = activeFrame.get('loading')
@@ -604,7 +605,7 @@ class UrlBar extends React.Component {
           ? <UrlBarSuggestions
             selectedIndex={this.props.selectedIndex}
             suggestionList={this.props.suggestionList}
-            hasLocationValueSuffix={this.props.hasLocationValueSuffix}
+            hasSuggestionMatch={this.props.hasSuggestionMatch}
             menubarVisible={this.props.menubarVisible} />
           : null
         }

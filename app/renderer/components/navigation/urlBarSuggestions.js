@@ -65,7 +65,7 @@ class UrlBarSuggestions extends ImmutableComponent {
       }
       items = items.concat(suggestions.map((suggestion, i) => {
         const currentIndex = index + i
-        const selected = this.activeIndex === currentIndex || (!this.activeIndex && currentIndex === 0 && this.props.hasLocationValueSuffix)
+        const selected = this.activeIndex === currentIndex || (!this.activeIndex && currentIndex === 0 && this.props.hasSuggestionMatch)
         return <UrlBarSuggestionItem
           suggestion={suggestion}
           selected={selected}

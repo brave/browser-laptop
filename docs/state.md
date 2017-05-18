@@ -357,7 +357,11 @@ AppStore
     width: number,
     // session properties
     windowId: number  // the muon id for the window
-  }]
+  }],
+  searchDetail: {
+    autocompleteURL: string, // ditto re: {searchTerms}
+    searchURL: string // with replacement var in string: {searchTerms}
+  },
 }
 ```
 
@@ -622,10 +626,6 @@ WindowStore
       minPublisherDuration: number, // e.g., 8000 for 8 seconds
       minPublisherVisits: number // e.g., 0
     }
-  },
-  searchDetail: {
-    autocompleteURL: string, // ditto re: {searchTerms}
-    searchURL: string // with replacement var in string: {searchTerms}
   },
   searchResults: array, // autocomplete server results if enabled
   ui: {

@@ -23,6 +23,27 @@ const site4 = {
   title: 'Brad Saves The World!'
 }
 
+// Compares 2 sites via deepEqual while first clearing out cached data
+const siteEqual = (actual, expected) => {
+  assert.equal(actual.constructor, expected.constructor)
+  if (expected.constructor === Array) {
+    assert.equal(actual.length, expected.length)
+    for (let i = 0; i < actual.length; i++) {
+      const a = Object.assign({}, actual[i])
+      delete a.parsedUrl
+      const e = Object.assign({}, expected[i])
+      delete e.parsedUrl
+      assert.deepEqual(a, e)
+    }
+  } else {
+    const a = Object.assign({}, actual)
+    delete a.parsedUrl
+    const e = Object.assign({}, expected)
+    delete e.parsedUrl
+    assert.deepEqual(a, e)
+  }
+}
+
 require('../../../braveUnit')
 
 describe('siteSuggestions lib', function () {
@@ -81,7 +102,7 @@ describe('siteSuggestions lib', function () {
 
   const checkResult = (inputQuery, expectedResults, cb) => {
     query(inputQuery).then((results) => {
-      assert.deepEqual(results, expectedResults)
+      siteEqual(results, expectedResults)
       cb()
     })
   }
@@ -127,109 +148,113 @@ describe('siteSuggestions lib', function () {
       checkResult('brave brad', [], cb)
     })
   })
-  describe('query sorts results by location', function () {
-    before(function (cb) {
-      const sites = Immutable.fromJS([{
-        location: 'https://brave.com/twi'
-      }, {
-        location: 'https://twitter.com/brave'
-      }, {
-        location: 'https://twitter.com/brianbondy'
-      }, {
-        location: 'https://twitter.com/_brianclif'
-      }, {
-        location: 'https://twitter.com/cezaraugusto'
-      }, {
-        location: 'https://bbondy.com/twitter'
-      }, {
-        location: 'https://twitter.com'
-      }, {
-        location: 'https://twitter.com/i/moments'
-      }])
-      init(sites).then(cb.bind(null, null))
-    })
-    it('orders shortest match first', function (cb) {
-      query('twitter.com').then((results) => {
-        assert.deepEqual(results[0], { location: 'https://twitter.com' })
-        cb()
+
+  describe('query', function () {
+    describe('sorts results by location', function () {
+      before(function (cb) {
+        const sites = Immutable.fromJS([{
+          location: 'https://brave.com/twi'
+        }, {
+          location: 'https://twitter.com/brave'
+        }, {
+          location: 'https://twitter.com/brianbondy'
+        }, {
+          location: 'https://twitter.com/_brianclif'
+        }, {
+          location: 'https://twitter.com/cezaraugusto'
+        }, {
+          location: 'https://bbondy.com/twitter'
+        }, {
+          location: 'https://twitter.com'
+        }, {
+          location: 'https://twitter.com/i/moments'
+        }])
+        init(sites).then(cb.bind(null, null))
+      })
+      it('orders shortest match first', function (cb) {
+        query('twitter.com').then((results) => {
+          siteEqual(results[0], { location: 'https://twitter.com' })
+          cb()
+        })
+      })
+      it('matches prefixes first', function (cb) {
+        query('twi').then((results) => {
+          siteEqual(results[0], { location: 'https://twitter.com' })
+          cb()
+        })
+      })
+      it('closest to the left match wins', function (cb) {
+        query('twitter.com brian').then((results) => {
+          siteEqual(results[0], { location: 'https://twitter.com/brianbondy' })
+          cb()
+        })
+      })
+      it('matches based on tokens and not exactly', function (cb) {
+        query('twitter.com/moments').then((results) => {
+          siteEqual(results[0], { location: 'https://twitter.com/i/moments' })
+          cb()
+        })
       })
     })
-    it('matches prefixes first', function (cb) {
-      query('twi').then((results) => {
-        assert.deepEqual(results[0], { location: 'https://twitter.com' })
-        cb()
+    describe('sorts results by count', function () {
+      before(function (cb) {
+        this.page2 = {
+          location: 'https://brave.com/page2',
+          count: 20
+        }
+        const sites = Immutable.fromJS([{
+          location: 'https://brave.com/page1',
+          count: 5
+        }, this.page2, {
+          location: 'https://brave.com/page3',
+          count: 2
+        }])
+        init(sites).then(cb.bind(null, null))
+      })
+      it('highest count first', function (cb) {
+        query('https://brave.com/page').then((results) => {
+          siteEqual(results[0], this.page2)
+          cb()
+        })
       })
     })
-    it('closest to the left match wins', function (cb) {
-      query('twitter.com brian').then((results) => {
-        assert.deepEqual(results[0], { location: 'https://twitter.com/brianbondy' })
-        cb()
+    describe('respects lastAccessTime', function () {
+      before(function (cb) {
+        this.site = {
+          location: 'https://bravebrowser.com/page2',
+          lastAccessedTime: 1494958046427,  // most recent
+          count: 1
+        }
+        const sites = Immutable.fromJS([{
+          location: 'https://bravez.com/page1',
+          lastAccessedTime: 1,
+          count: 1
+        }, {
+          location: 'https://bravebrowser.com/page1',
+          lastAccessedTime: 1494957046426,
+          count: 1
+        }, this.site, {
+          location: 'https://bravebrowser.com/page3',
+          lastAccessedTime: 1494957046437,
+          count: 1
+        }])
+        init(sites).then(cb.bind(null, null))
       })
-    })
-    it('matches based on tokens and not exactly', function (cb) {
-      query('twitter.com/moments').then((results) => {
-        assert.deepEqual(results[0], { location: 'https://twitter.com/i/moments' })
-        cb()
+      it('items with lastAccessTime of 1 get ignored (signifies preloaded default)', function (cb) {
+        query('https://bravez.com/page').then((results) => {
+          assert.equal(results.length, 0)
+          cb()
+        })
+      })
+      it('most recently accessed get sorted first', function (cb) {
+        query('bravebrowser').then((results) => {
+          siteEqual(results[0], this.site)
+          cb()
+        })
       })
     })
   })
-  describe('query sorts results by count', function () {
-    before(function (cb) {
-      this.page2 = {
-        location: 'https://brave.com/page2',
-        count: 20
-      }
-      const sites = Immutable.fromJS([{
-        location: 'https://brave.com/page1',
-        count: 5
-      }, this.page2, {
-        location: 'https://brave.com/page3',
-        count: 2
-      }])
-      init(sites).then(cb.bind(null, null))
-    })
-    it('highest count first', function (cb) {
-      query('https://brave.com/page').then((results) => {
-        assert.deepEqual(results[0], this.page2)
-        cb()
-      })
-    })
-  })
-  describe('query respects lastAccessTime', function () {
-    before(function (cb) {
-      this.site = {
-        location: 'https://bravebrowser.com/page2',
-        lastAccessedTime: 1494958046427,  // most recent
-        count: 1
-      }
-      const sites = Immutable.fromJS([{
-        location: 'https://bravez.com/page1',
-        lastAccessedTime: 1,
-        count: 1
-      }, {
-        location: 'https://bravebrowser.com/page1',
-        lastAccessedTime: 1494957046426,
-        count: 1
-      }, this.site, {
-        location: 'https://bravebrowser.com/page3',
-        lastAccessedTime: 1494957046437,
-        count: 1
-      }])
-      init(sites).then(cb.bind(null, null))
-    })
-    it('items with lastAccessTime of 1 get ignored (signifies preloaded default)', function (cb) {
-      query('https://bravez.com/page').then((results) => {
-        assert.equal(results.length, 0)
-        cb()
-      })
-    })
-    it('most recently accessed get sorted first', function (cb) {
-      query('bravebrowser').then((results) => {
-        assert.deepEqual(results[0], this.site)
-        cb()
-      })
-    })
-  })
+
   describe('add sites after init', function () {
     before(function (cb) {
       const sites = [site1, site2, site3, site4]

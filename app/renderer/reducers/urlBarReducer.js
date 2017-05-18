@@ -71,6 +71,7 @@ const updateUrlSuffix = (state, suggestionList) => {
   }
   const suggestion = suggestionList && suggestionList.get(selectedIndex)
   let suffix = ''
+  let hasSuggestionMatch = false
   if (suggestion) {
     const autocompleteEnabled = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']))
 
@@ -81,11 +82,13 @@ const updateUrlSuffix = (state, suggestionList) => {
         const beforePrefix = suggestion.get('location').substring(0, index)
         if (beforePrefix.endsWith('://') || beforePrefix.endsWith('://www.') || index === 0) {
           suffix = suggestion.get('location').substring(index + location.length)
+          hasSuggestionMatch = true
         }
       }
     }
   }
   state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'urlSuffix']), suffix)
+  state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'hasSuggestionMatch']), hasSuggestionMatch)
   return state
 }
 
@@ -238,8 +241,8 @@ const urlBarReducer = (state, action) => {
       const selectedIndexPath = activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])
       const suggestionList = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']))
       const selectedIndex = state.getIn(selectedIndexPath)
-      const lastSuffix = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'urlSuffix']))
-      if (!selectedIndex && selectedIndex !== 0 && !lastSuffix) {
+      const hasSuggestionMatch = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'hasSuggestionMatch']))
+      if (!selectedIndex && selectedIndex !== 0 && !hasSuggestionMatch) {
         state = state.setIn(selectedIndexPath, 0)
       } else if (selectedIndex > 0) {
         state = state.setIn(selectedIndexPath, selectedIndex - 1)
@@ -253,8 +256,8 @@ const urlBarReducer = (state, action) => {
       const selectedIndexPath = activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])
       const suggestionList = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']))
       const selectedIndex = state.getIn(selectedIndexPath)
-      const lastSuffix = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'urlSuffix']))
-      if (!selectedIndex && selectedIndex !== 0 && !lastSuffix) {
+      const hasSuggestionMatch = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'hasSuggestionMatch']))
+      if (!selectedIndex && selectedIndex !== 0 && !hasSuggestionMatch) {
         state = state.setIn(selectedIndexPath, 0)
       } else if (selectedIndex < suggestionList.size - 1) {
         state = state.setIn(selectedIndexPath, selectedIndex + 1)

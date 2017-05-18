@@ -48,7 +48,8 @@ const tokenizeInput = (data) => {
   let url = data || ''
   let parts = []
 
-  if (typeof data === 'object' && data !== null) {
+  const isSiteObject = typeof data === 'object' && data !== null
+  if (isSiteObject) {
     // When lastAccessTime is 1 it is a default built-in entry which we don't want
     // to appear in suggestions.
     if (data.lastAccessedTime === 1) {
@@ -69,6 +70,10 @@ const tokenizeInput = (data) => {
 
   if (url && isUrl(url)) {
     const parsedUrl = urlParse(url.toLowerCase())
+    // Cache parsed value for latter use when sorting
+    if (isSiteObject) {
+      data.parsedUrl = parsedUrl
+    }
     if (parsedUrl.hash) {
       parts.push(parsedUrl.hash.slice(1))
     }

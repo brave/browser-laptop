@@ -7,6 +7,7 @@ const mockery = require('mockery')
 const assert = require('assert')
 const sinon = require('sinon')
 const Immutable = require('immutable')
+const urlParse = require('url').parse
 const {makeImmutable} = require('../../../../../app/common/state/immutableUtil')
 const fakeElectron = require('../../../lib/fakeElectron')
 const _ = require('underscore')
@@ -157,6 +158,95 @@ describe('suggestion unit tests', function () {
       assert.ok(virtual[keys[0]].location === 'http://www.foo.com')
       assert.ok(virtual[keys[0]].title === 'www.foo.com')
       assert.ok(virtual[keys[0]].lastAccessedTime > 0)
+    })
+  })
+
+  describe('sorting functions', function () {
+    describe('getSortByPath', function () {
+      before(function () {
+        this.sort = suggestion.getSortByPath('twitter')
+      })
+      it('returns 0 when both paths contain the string', function () {
+        assert.equal(this.sort('https://brave.com/twitter', 'https://brianbondy.com/twitter'), 0)
+      })
+      it('returns 0 when neihter path contain the string', function () {
+        assert.equal(this.sort('https://brave.com/facebook', 'https://brianbondy.com/facebook'), 0)
+      })
+      it('returns -1 when the first site contains the string only', function () {
+        assert.equal(this.sort('https://brave.com/twitter', 'https://brianbondy.com/facebook'), -1)
+      })
+      it('returns 1 when the second site contains the string only', function () {
+        assert.equal(this.sort('https://brave.com/facebook', 'https://brianbondy.com/twitter'), 1)
+      })
+      it('matches even domain name for input string', function () {
+        assert.equal(this.sort('https://brave.com/facebook', 'https://twitter.com'), 1)
+      })
+    })
+    describe('sortBySimpleURL', function () {
+      before(function () {
+        this.sort = (url1, url2) => {
+          return suggestion.sortBySimpleURL(
+            { location: url1, parsedUrl: urlParse(url1) },
+            { location: url2, parsedUrl: urlParse(url2) }
+          )
+        }
+      })
+      it('returns 0 when both paths are simple', function () {
+        assert.equal(this.sort('https://brave.com', 'https://brianbondy.com'), 0)
+      })
+      it('returns 0 when neihter path is simple', function () {
+        assert.equal(this.sort('https://brave.com/facebook', 'https://brianbondy.com/facebook'), 0)
+      })
+      it('returns -1 when the first site is simple only', function () {
+        assert.equal(this.sort('https://brave.com', 'https://brianbondy.com/facebook'), -1)
+      })
+      it('returns 1 when the second site is simple only', function () {
+        assert.equal(this.sort('https://brave.com/facebook', 'https://brianbondy.com'), 1)
+      })
+      it('trailing slash is considered simple', function () {
+        assert.equal(this.sort('https://brave.com/', 'https://twitter.com'), 0)
+      })
+      it('trailing hash is considered simple', function () {
+        assert.equal(this.sort('https://brave.com/#', 'https://twitter.com'), 0)
+      })
+    })
+    describe('getSortByDomain', function () {
+      before(function () {
+        const userInputLower = 'google.c'
+        const userInputParts = userInputLower.split('/')
+        const userInputHost = userInputParts[0]
+        const internalSort = suggestion.getSortByDomain(userInputLower, userInputHost)
+        this.sort = (url1, url2) => {
+          return internalSort(
+            { location: url1, parsedUrl: urlParse(url1) },
+            { location: url2, parsedUrl: urlParse(url2) }
+          )
+        }
+      })
+      it('negative if only first has a matching domain', function () {
+        assert(this.sort('https://google.com', 'https://www.brianbondy.com') < 0)
+      })
+      it('positive if only second has a matching domain', function () {
+        assert(this.sort('https://www.brianbondy.com', 'https://google.com') > 0)
+      })
+      it('0 if both have a matching domain from index 0', function () {
+        assert.equal(this.sort('https://google.com', 'https://google.ca'), 0)
+      })
+      it('0 if neither has a matching domain', function () {
+        assert.equal(this.sort('https://brianbondy.com', 'https://clifton.io/'), 0)
+      })
+      it('negative if first site has a match from the start of domain', function () {
+        assert(this.sort('https://google.com', 'https://mygoogle.com') < 0)
+      })
+      it('positive if second site has a match but without www.', function () {
+        assert(this.sort('https://www.google.com', 'https://google.com') > 0)
+      })
+      it('negative if there is a pos 0 match not including www.', function () {
+        assert(this.sort('https://www.google.com', 'https://mygoogle.com') < 0)
+      })
+      it('simple domain gets matched higher', function () {
+        assert(this.sort('https://www.google.com', 'https://www.google.com/extra') < 0)
+      })
     })
   })
 })

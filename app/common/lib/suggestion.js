@@ -105,9 +105,10 @@ const sortByAccessCountWithAgeDecay = (s1, s2) => {
  * @param {object} An already normalized simple URL
  *
  */
-const isSimpleDomainNameValue = (site) => {
-  const parsed = urlParse(getURL(site))
-  if (parsed.hash === null && parsed.search === null && parsed.query === null && parsed.pathname === '/') {
+const isSimpleDomainNameValue = (site) => isParsedUrlSimpleDomainNameValue(urlParse(getURL(site)))
+const isParsedUrlSimpleDomainNameValue = (parsed) => {
+  if ((parsed.hash === null || parsed.hash === '#') &&
+    parsed.search === null && parsed.query === null && parsed.pathname === '/') {
     return true
   } else {
     return false
@@ -219,36 +220,128 @@ const createVirtualHistoryItems = (historySites) => {
   })))
 }
 
-// Same as sortByAccessCountWithAgeDecay but if one is a prefix of the
-// other then it is considered always sorted first.
-const getSortForSuggestions = (userInputLower) => (s1, s2) => {
-  const {sortByAccessCountWithAgeDecay, normalizeLocation} = require('./suggestion')
-  const url1 = normalizeLocation(getURL(s1))
-  const url2 = normalizeLocation(getURL(s2))
-  const pos1 = url1.indexOf(userInputLower)
-  const pos2 = url2.indexOf(userInputLower)
-  if (pos1 !== -1 && pos2 !== -1) {
-    if (pos1 !== pos2) {
-      return pos1 - pos2
+/**
+ * Returns a function that sorts 2 sites by their host.
+ * The result of that function is a postive, negative, or 0 result.
+ * 3 or -3 for a strong indicator of a superior result.
+ * 2 or -2 for a good indicator of a superior result.
+ * 1 or -1 for a weak indicator of a superior result.
+ * 0 if no determination can be made.
+ */
+const getSortByDomain = (userInputLower, userInputHost) => {
+  return (s1, s2) => {
+    // Check for matches on hostname which if found overrides
+    // any count or frequency calculation.
+    // Note that for parsed URLs that are not complete, the pathname contains
+    // what the user is entering as the host and the host is null.
+    const host1 = s1.parsedUrl.host || s1.parsedUrl.pathname
+    const host2 = s2.parsedUrl.host || s2.parsedUrl.pathname
+
+    let pos1 = host1.indexOf(userInputHost)
+    let pos2 = host2.indexOf(userInputHost)
+    if (pos1 !== -1 && pos2 === -1) {
+      return -3
     }
-    const url1IsSimple = isSimpleDomainNameValue(s1)
-    const url2IsSimple = isSimpleDomainNameValue(s2)
-    // If either both false or both true then rely on count w/ decay sort
-    if (url1IsSimple === url2IsSimple) {
-      return sortByAccessCountWithAgeDecay(s1, s2)
+    if (pos1 === -1 && pos2 !== -1) {
+      return 3
     }
-    if (url1IsSimple) {
-      return -1
+    if (pos1 !== -1 && pos2 !== -1) {
+      // Try to match on the first position without taking into account decay sort.
+      // This is because autocomplete is based on matching prefixes.
+      if (pos1 === 0 && pos2 !== 0) {
+        return -2
+      }
+      if (pos1 !== 0 && pos2 === 0) {
+        return 2
+      }
+
+      // Try the same to see if taking off www. helps.
+      if (!userInputLower.startsWith('www.')) {
+        pos1 = host1.indexOf('www.' + userInputLower)
+        pos2 = host2.indexOf('www.' + userInputLower)
+        if (pos1 === 0 && pos2 !== 0) {
+          return -1
+        }
+        if (pos1 !== 0 && pos2 === 0) {
+          return 1
+        }
+      }
+
+      const sortBySimpleURLResult = sortBySimpleURL(s1, s2)
+      if (sortBySimpleURLResult !== 0) {
+        return sortBySimpleURLResult
+      }
     }
-    return 1
+    // Can't determine what is the best match
+    return 0
   }
-  if (pos1 !== -1 && pos2 === -1) {
+}
+
+/**
+ * Sorts 2 URLS by if they are a simple URL or not.
+ * Returns the normal -1, 1, or 0 result for sort functions.
+ */
+const sortBySimpleURL = (s1, s2) => {
+  // If one of the URLs is a simpleURL and the other isn't then sort the simple one first
+  const url1IsSimple = isParsedUrlSimpleDomainNameValue(s1.parsedUrl)
+  const url2IsSimple = isParsedUrlSimpleDomainNameValue(s2.parsedUrl)
+  if (url1IsSimple && !url2IsSimple) {
     return -1
   }
-  if (pos1 === -1 && pos2 !== -1) {
+  if (!url1IsSimple && url2IsSimple) {
     return 1
   }
-  return sortByAccessCountWithAgeDecay(s1, s2)
+  return 0
+}
+
+/**
+ * Returns a function that sorts 2 sites by their host.
+ * The result of that function is a postive, negative, or 0 result.
+ */
+const getSortByPath = (userInputLower) => {
+  return (path1, path2) => {
+    const pos1 = path1.indexOf(userInputLower)
+    const pos2 = path2.indexOf(userInputLower)
+    if (pos1 !== -1 && pos2 === -1) {
+      return -1
+    }
+    if (pos1 === -1 && pos2 !== -1) {
+      return 1
+    }
+    // Can't determine what is the best match
+    return 0
+  }
+}
+
+// Same as sortByAccessCountWithAgeDecay but if one is a prefix of the
+// other then it is considered always sorted first.
+const getSortForSuggestions = (userInputLower) => {
+  userInputLower = userInputLower.replace(/^http:\/\//, '')
+  userInputLower = userInputLower.replace(/^https:\/\//, '')
+  const userInputParts = userInputLower.split('/')
+  const userInputHost = userInputParts[0]
+  const sortByDomain = getSortByDomain(userInputLower, userInputHost)
+  const sortByPath = getSortByPath(userInputLower)
+  const {sortByAccessCountWithAgeDecay} = require('./suggestion')
+
+  return (s1, s2) => {
+    s1.parsedUrl = s1.parsedUrl || urlParse(getURL(s1) || '')
+    s2.parsedUrl = s2.parsedUrl || urlParse(getURL(s2) || '')
+
+    const sortByDomainResult = sortByDomain(s1, s2)
+    if (sortByDomainResult !== 0) {
+      return sortByDomainResult
+    }
+
+    const path1 = s1.parsedUrl.path + (s1.parsedUrl.hash || '')
+    const path2 = s2.parsedUrl.path + (s2.parsedUrl.hash || '')
+    const sortByPathResult = sortByPath(path1, path2)
+    if (sortByPathResult !== 0) {
+      return sortByPathResult
+    }
+
+    return sortByAccessCountWithAgeDecay(s1, s2)
+  }
 }
 
 // Currently we sort only sites that are not immutableJS and
@@ -442,6 +535,9 @@ module.exports = {
   sortingPriority,
   sortByAccessCountWithAgeDecay,
   getSortForSuggestions,
+  getSortByPath,
+  sortBySimpleURL,
+  getSortByDomain,
   isSimpleDomainNameValue,
   normalizeLocation,
   shouldNormalizeLocation,
