@@ -135,6 +135,13 @@ describe('Bravery Panel', function () {
         .waitForDataFile('adblock')
     })
 
+    const verifyFingerprintingStat = function () {
+      // XXX: WebGL seems to be broken in Brave on Linux distros. #3227
+      return this.getText(fpStat).then((stat) => {
+        return process.platform === 'linux' ? stat === '2' : stat === '3'
+      })
+    }
+
     it('downloads and detects regional adblock resources in private tab', function * () {
       const url = Brave.server.url('adblock.html')
       const aboutAdblockURL = getTargetAboutUrl('about:adblock')
@@ -782,23 +789,13 @@ describe('Bravery Panel', function () {
         .loadUrl(url)
         .openBraveMenu(braveMenu, braveryPanel)
         .click(fpSwitch)
-        .waitUntil(function () {
-          // TOOD: This should be 3, but see:
-          // https://github.com/brave/browser-laptop/issues/3227
-          return this.getText(fpStat)
-            .then((stat) => stat === '2' || stat === '3')
-        })
+        .waitUntil(verifyFingerprintingStat)
         .keys(Brave.keys.ESCAPE)
         .newTab({ url, isPrivate: true })
         .waitForTabCount(2)
         .waitForUrl(url)
         .openBraveMenu(braveMenu, braveryPanel)
-        .waitUntil(function () {
-          // TOOD: This should be 3, but see:
-          // https://github.com/brave/browser-laptop/issues/3227
-          return this.getText(fpStat)
-            .then((stat) => stat === '2' || stat === '3')
-        })
+        .waitUntil(verifyFingerprintingStat)
         .click(fpSwitch)
         .waitForTextValue(fpStat, '0')
         .keys(Brave.keys.ESCAPE)
@@ -806,12 +803,7 @@ describe('Bravery Panel', function () {
         .waitForTabCount(3)
         .waitForUrl(url)
         .openBraveMenu(braveMenu, braveryPanel)
-        .waitUntil(function () {
-          // TOOD: This should be 3, but see:
-          // https://github.com/brave/browser-laptop/issues/3227
-          return this.getText(fpStat)
-            .then((stat) => stat === '2' || stat === '3')
-        })
+        .waitUntil(verifyFingerprintingStat)
     })
     it('blocks fingerprinting on compact panel', function * () {
       const url = Brave.server.url('fingerprinting.html')
@@ -827,23 +819,13 @@ describe('Bravery Panel', function () {
         .loadUrl(url)
         .openBraveMenu(braveMenu, braveryPanelCompact)
         .click(fpSwitch)
-        .waitUntil(function () {
-          // TOOD: This should be 3, but see:
-          // https://github.com/brave/browser-laptop/issues/3227
-          return this.getText(fpStat)
-            .then((stat) => stat === '2' || stat === '3')
-        })
+        .waitUntil(verifyFingerprintingStat)
         .keys(Brave.keys.ESCAPE)
         .newTab({ url, isPrivate: true })
         .waitForTabCount(2)
         .waitForUrl(url)
         .openBraveMenu(braveMenu, braveryPanelCompact)
-        .waitUntil(function () {
-          // TOOD: This should be 3, but see:
-          // https://github.com/brave/browser-laptop/issues/3227
-          return this.getText(fpStat)
-            .then((stat) => stat === '2' || stat === '3')
-        })
+        .waitUntil(verifyFingerprintingStat)
         .click(fpSwitch)
         .waitForTextValue(fpStat, '0')
         .keys(Brave.keys.ESCAPE)
@@ -851,12 +833,7 @@ describe('Bravery Panel', function () {
         .waitForTabCount(3)
         .waitForUrl(url)
         .openBraveMenu(braveMenu, braveryPanelCompact)
-        .waitUntil(function () {
-          // TOOD: This should be 3, but see:
-          // https://github.com/brave/browser-laptop/issues/3227
-          return this.getText(fpStat)
-            .then((stat) => stat === '2' || stat === '3')
-        })
+        .waitUntil(verifyFingerprintingStat)
     })
     it('block device enumeration', function * () {
       const url = Brave.server.url('enumerate_devices.html')
