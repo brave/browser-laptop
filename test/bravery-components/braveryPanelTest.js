@@ -374,10 +374,8 @@ describe('Bravery Panel', function () {
         .openBraveMenu(braveMenu, braveryPanel)
         .click(fpSwitch)
         .waitUntil(function () {
-          // TOOD: This should be 3, but see:
-          // https://github.com/brave/browser-laptop/issues/3227
           return this.getText(fpStat)
-            .then((stat) => stat === '2' || stat === '3')
+            .then((stat) => stat === '3')
         })
         .keys(Brave.keys.ESCAPE)
         .newTab({ url, isPrivate: true })
@@ -385,10 +383,8 @@ describe('Bravery Panel', function () {
         .waitForUrl(url)
         .openBraveMenu(braveMenu, braveryPanel)
         .waitUntil(function () {
-          // TOOD: This should be 3, but see:
-          // https://github.com/brave/browser-laptop/issues/3227
           return this.getText(fpStat)
-            .then((stat) => stat === '2' || stat === '3')
+            .then((stat) => stat === '3')
         })
         .click(fpSwitch)
         .waitForTextValue(fpStat, '0')
@@ -398,10 +394,8 @@ describe('Bravery Panel', function () {
         .waitForUrl(url)
         .openBraveMenu(braveMenu, braveryPanel)
         .waitUntil(function () {
-          // TOOD: This should be 3, but see:
-          // https://github.com/brave/browser-laptop/issues/3227
           return this.getText(fpStat)
-            .then((stat) => stat === '2' || stat === '3')
+            .then((stat) => stat === '3')
         })
     })
     it('block device enumeration', function * () {
