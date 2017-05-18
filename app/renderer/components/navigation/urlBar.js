@@ -324,6 +324,9 @@ class UrlBar extends React.Component {
       case KeyCodes.DOWN:
       case KeyCodes.TAB:
       case KeyCodes.ESC:
+      case KeyCodes.LEFT:
+      case KeyCodes.SHIFT:
+      case KeyCodes.RIGHT:
         return
     }
     if (this.props.isSelected) {

@@ -66,6 +66,23 @@ describe('urlBarSuggestions', function () {
       .waitForElementCount(urlBarSuggestions, 0)
   })
 
+  it('deactivated suggestions do not pop back up when left or shift is pressed', function * () {
+    yield this.app.client
+      .setInputText(urlInput, 'Page 1')
+      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]')
+      .keys(Brave.keys.BACKSPACE)
+      .waitForElementCount(urlBarSuggestions, 0)
+      .keys(Brave.keys.LEFT)
+      .pause(50)
+      .keys(Brave.keys.SHIFT + Brave.keys.LEFT)
+      .pause(50)
+      .keys(Brave.keys.LEFT)
+      .pause(50)
+      .keys(Brave.keys.SHIFT)
+      .pause(50)
+      .waitForElementCount(urlBarSuggestions, 0)
+  })
+
   it('deactivates suggestions on delete', function * () {
     yield this.app.client
       .setInputText(urlInput, 'Page 1')
