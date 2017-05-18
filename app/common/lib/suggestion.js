@@ -291,6 +291,16 @@ const sortBySimpleURL = (s1, s2) => {
   if (!url1IsSimple && url2IsSimple) {
     return 1
   }
+  const url1IsSecure = s1.parsedUrl.protocol === 'https:'
+  const url2IsSecure = s2.parsedUrl.protocol === 'https:'
+  if (url1IsSimple && url2IsSimple) {
+    if (url1IsSecure && !url2IsSecure) {
+      return -1
+    }
+    if (!url1IsSecure && url2IsSecure) {
+      return 1
+    }
+  }
   return 0
 }
 
@@ -320,6 +330,7 @@ const getSortForSuggestions = (userInputLower) => {
   userInputLower = userInputLower.replace(/^https:\/\//, '')
   const userInputParts = userInputLower.split('/')
   const userInputHost = userInputParts[0]
+  const userInputValue = userInputParts[1] || ''
   const sortByDomain = getSortByDomain(userInputLower, userInputHost)
   const sortByPath = getSortByPath(userInputLower)
   const {sortByAccessCountWithAgeDecay} = require('./suggestion')
@@ -328,13 +339,15 @@ const getSortForSuggestions = (userInputLower) => {
     s1.parsedUrl = s1.parsedUrl || urlParse(getURL(s1) || '')
     s2.parsedUrl = s2.parsedUrl || urlParse(getURL(s2) || '')
 
-    const sortByDomainResult = sortByDomain(s1, s2)
-    if (sortByDomainResult !== 0) {
-      return sortByDomainResult
+    if (!userInputValue) {
+      const sortByDomainResult = sortByDomain(s1, s2)
+      if (sortByDomainResult !== 0) {
+        return sortByDomainResult
+      }
     }
 
-    const path1 = s1.parsedUrl.path + (s1.parsedUrl.hash || '')
-    const path2 = s2.parsedUrl.path + (s2.parsedUrl.hash || '')
+    const path1 = s1.parsedUrl.host + s1.parsedUrl.path + (s1.parsedUrl.hash || '')
+    const path2 = s2.parsedUrl.host + s2.parsedUrl.path + (s2.parsedUrl.hash || '')
     const sortByPathResult = sortByPath(path1, path2)
     if (sortByPathResult !== 0) {
       return sortByPathResult

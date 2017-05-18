@@ -60,7 +60,7 @@ class UrlBar extends React.Component {
     this.onContextMenu = this.onContextMenu.bind(this)
     this.keyPressed = false
     this.showAutocompleteResult = debounce(() => {
-      if (this.keyPressed || !this.urlInput || this.props.locationValueSuffix.length === 0) {
+      if (this.keyPressed || !this.urlInput) {
         return
       }
       this.updateAutocomplete(this.lastVal)
@@ -392,7 +392,7 @@ class UrlBar extends React.Component {
       } else if (this.props.location !== prevProps.location) {
         // This is a url nav change
         this.setValue(UrlUtil.getDisplayLocation(this.props.location, pdfjsEnabled))
-      } else if (this.props.hasLocationValueSuffix &&
+      } else if (this.props.hasSuggestionMatch &&
                 this.props.isActive &&
                 this.props.locationValueSuffix !== this.lastSuffix) {
         this.showAutocompleteResult()
@@ -508,7 +508,6 @@ class UrlBar extends React.Component {
     props.title = activeFrame.get('title') || ''
     props.scriptsBlocked = activeFrame.getIn(['noScript', 'blocked'])
     props.isSecure = activeFrame.getIn(['security', 'isSecure'])
-    props.hasLocationValueSuffix = urlbar.getIn(['suggestions', 'urlSuffix'])
     props.hasSuggestionMatch = urlbar.getIn(['suggestions', 'hasSuggestionMatch'])
     props.startLoadTime = activeFrame.get('startLoadTime')
     props.endLoadTime = activeFrame.get('endLoadTime')

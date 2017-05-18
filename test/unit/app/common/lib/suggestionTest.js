@@ -209,6 +209,9 @@ describe('suggestion unit tests', function () {
       it('trailing hash is considered simple', function () {
         assert.equal(this.sort('https://brave.com/#', 'https://twitter.com'), 0)
       })
+      it('Prefers https sipmle URLs', function () {
+        assert(this.sort('https://brave.com', 'http://brave.com') < 0)
+      })
     })
     describe('getSortByDomain', function () {
       before(function () {
@@ -246,6 +249,52 @@ describe('suggestion unit tests', function () {
       })
       it('simple domain gets matched higher', function () {
         assert(this.sort('https://www.google.com', 'https://www.google.com/extra') < 0)
+      })
+    })
+    describe('getSortForSuggestions', function () {
+      describe('with url entered as path', function () {
+        before(function () {
+          const userInputLower = 'brianbondy.com/projects'
+          const userInputParts = userInputLower.split('/')
+          const userInputHost = userInputParts[0]
+          const internalSort = suggestion.getSortForSuggestions(userInputLower, userInputHost)
+          this.sort = (url1, url2) => {
+            return internalSort(
+              { location: url1, parsedUrl: urlParse(url1) },
+              { location: url2, parsedUrl: urlParse(url2) }
+            )
+          }
+        })
+        it('returns 0 when both urls are the same', function () {
+          assert.equal(this.sort('https://www.google.com', 'https://www.google.com'), 0)
+        })
+        it('matches exact path if more specific path is specified', function () {
+          assert(this.sort('https://brianbondy.com', 'https://www.brianbondy.com/projects/2') > 0)
+        })
+      })
+      describe('with single string entered', function () {
+        before(function () {
+          const userInputLower = 'brianbondy.c'
+          const userInputParts = userInputLower.split('/')
+          const userInputHost = userInputParts[0]
+          const internalSort = suggestion.getSortForSuggestions(userInputLower, userInputHost)
+          this.sort = (url1, url2) => {
+            return internalSort(
+              { location: url1, parsedUrl: urlParse(url1) },
+              { location: url2, parsedUrl: urlParse(url2) }
+            )
+          }
+        })
+        it('matches on domain name first', function () {
+          assert(this.sort('https://www.brianbondy.com', 'https://www.google.com/brianbondy.co') < 0)
+        })
+        it('matches with or without protocol', function () {
+          assert(this.sort('https://www.2brianbondy.com', 'http://www.brianbondy.com') > 0)
+          assert(this.sort('https://brianbondy.com', 'www.brianbondy.com') < 0)
+        })
+        it('non-wwww. matches before www.', function () {
+          assert(this.sort('https://brianbondy.com', 'www.brianbondy.com') < 0)
+        })
       })
     })
   })
