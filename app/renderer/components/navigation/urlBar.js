@@ -26,6 +26,7 @@ const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const siteSettings = require('../../../../js/state/siteSettings')
 const tabState = require('../../../common/state/tabState')
 const siteSettingsState = require('../../../common/state/siteSettingsState')
+const menuBarState = require('../../../common/state/menuBarState')
 
 // Utils
 const urlParse = require('../../../common/urlParse')
@@ -533,6 +534,7 @@ class UrlBar extends React.Component {
     props.autocompleteEnabled = urlbar.getIn(['suggestions', 'autocompleteEnabled'])
     props.searchURL = searchURL
     props.searchShortcut = searchShortcut
+    props.menubarVisible = menuBarState.isMenuBarVisible(currentWindow)
 
     return props
   }
