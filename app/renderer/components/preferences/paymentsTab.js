@@ -11,7 +11,7 @@ const cx = require('../../../../js/lib/classSet')
 const ImmutableComponent = require('../immutableComponent')
 const ModalOverlay = require('../../../../js/components/modalOverlay')
 
-const {SettingCheckbox} = require('../settings')
+const {SettingCheckbox} = require('../common/settings')
 const {
   sectionTitleStyles,
   SectionTitleWrapper,

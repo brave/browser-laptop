@@ -16,7 +16,7 @@ const ImmutableComponent = require('../../immutableComponent')
 const BrowserButton = require('../../common/browserButton')
 const {FormTextbox} = require('../../common/textbox')
 const {FormDropdown} = require('../../common/dropdown')
-const {SettingsList, SettingItem} = require('../../settings')
+const {SettingsList, SettingItem} = require('../../common/settings')
 const LedgerTable = require('./ledgerTable')
 
 // style

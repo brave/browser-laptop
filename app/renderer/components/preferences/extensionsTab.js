@@ -12,7 +12,7 @@ const aboutActions = require('../../../../js/about/aboutActions')
 const settings = require('../../../../js/constants/settings')
 const config = require('../../../../js/constants/config')
 const {getSetting} = require('../../../../js/settings')
-const {SettingCheckbox} = require('../settings')
+const {SettingCheckbox} = require('../common/settings')
 const {isPasswordManager, getExtensionKey, isBuiltInExtension, bravifyText} = require('../../lib/extensionsUtil')
 
 const {DefaultSectionTitle} = require('../common/sectionTitle')

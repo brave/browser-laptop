@@ -3,14 +3,14 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('./immutableComponent')
+const ImmutableComponent = require('../immutableComponent')
 const {StyleSheet, css} = require('aphrodite')
-const aboutActions = require('../../../js/about/aboutActions')
-const getSetting = require('../../../js/settings').getSetting
-const {changeSetting} = require('../lib/settingsUtil')
-const SwitchControl = require('../../../js/components/switchControl')
-const cx = require('../../../js/lib/classSet')
-const settings = require('../../../js/constants/settings')
+const aboutActions = require('../../../../js/about/aboutActions')
+const getSetting = require('../../../../js/settings').getSetting
+const {changeSetting} = require('../../lib/settingsUtil')
+const SwitchControl = require('../../../../js/components/switchControl')
+const cx = require('../../../../js/lib/classSet')
+const settings = require('../../../../js/constants/settings')
 
 class SettingsList extends ImmutableComponent {
   render () {

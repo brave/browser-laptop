@@ -3,12 +3,18 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('./immutableComponent')
-const appActions = require('../../../js/actions/appActions')
-const windowActions = require('../../../js/actions/windowActions')
-const locale = require('../../../js/l10n')
-const {getCurrentWindowId, isMaximized, isFullScreen} = require('../currentWindow')
-const cx = require('../../../js/lib/classSet')
+
+// Components
+const ImmutableComponent = require('../immutableComponent')
+
+// Actions
+const appActions = require('../../../../js/actions/appActions')
+const windowActions = require('../../../../js/actions/windowActions')
+
+// Utils
+const locale = require('../../../../js/l10n')
+const {getCurrentWindowId, isMaximized, isFullScreen} = require('../../currentWindow')
+const cx = require('../../../../js/lib/classSet')
 
 class WindowCaptionButtons extends ImmutableComponent {
   constructor () {

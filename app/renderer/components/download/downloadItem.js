@@ -3,15 +3,23 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('./immutableComponent')
-const Button = require('../../../js/components/button')
-const contextMenus = require('../../../js/contextMenus')
-const downloadStates = require('../../../js/constants/downloadStates')
-const {PAUSE, RESUME, CANCEL} = require('../../common/constants/electronDownloadItemActions')
-const appActions = require('../../../js/actions/appActions')
-const downloadUtil = require('../../../js/state/downloadUtil')
-const {getOrigin} = require('../../../js/state/siteUtil')
-const cx = require('../../../js/lib/classSet')
+
+// Components
+const ImmutableComponent = require('../immutableComponent')
+const Button = require('../../../../js/components/button')
+
+// Constants
+const downloadStates = require('../../../../js/constants/downloadStates')
+const {PAUSE, RESUME, CANCEL} = require('../../../common/constants/electronDownloadItemActions')
+
+// Actions
+const appActions = require('../../../../js/actions/appActions')
+
+// Utils
+const contextMenus = require('../../../../js/contextMenus')
+const downloadUtil = require('../../../../js/state/downloadUtil')
+const {getOrigin} = require('../../../../js/state/siteUtil')
+const cx = require('../../../../js/lib/classSet')
 
 class DownloadItem extends ImmutableComponent {
   constructor () {

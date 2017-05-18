@@ -56,7 +56,7 @@ describe('Preferences component', function () {
     window.CustomEvent = {}
 
     Preferences = require('../../../js/about/preferences').AboutPreferences
-    SettingItemIcon = require('../../../app/renderer/components/settings').SettingItemIcon
+    SettingItemIcon = require('../../../app/renderer/components/common/settings').SettingItemIcon
     appActions = require('../../../js/actions/appActions')
   })
   after(function () {
