@@ -143,6 +143,39 @@ describe('tabsReducer', function () {
     })
   })
 
+  describe('APP_TAB_CLOSE_REQUESTED', function () {
+    const action = {
+      actionType: appConstants.APP_TAB_CLOSE_REQUESTED,
+      tabId: 3
+    }
+    before(function () {
+      this.clock = sinon.useFakeTimers()
+    })
+    after(function () {
+      this.clock.restore()
+    })
+    afterEach(function () {
+      this.tabsAPI.toggleDevTools.reset()
+      this.tabsAPI.closeTab.reset()
+      this.tabsAPI.moveTo.reset()
+      this.tabsAPI.isDevToolsFocused.restore()
+    })
+    it('closes devtools when opened and focused', function () {
+      this.isDevToolsFocused = sinon.stub(this.tabsAPI, 'isDevToolsFocused', () => true)
+      tabsReducer(this.state, action)
+      this.clock.tick(1510)
+      assert(this.tabsAPI.toggleDevTools.withArgs(this.state, 1).calledOnce)
+      assert(this.tabsAPI.closeTab.notCalled)
+    })
+    it('closes tab when tab is focused with no devtools', function () {
+      this.isDevToolsFocused = sinon.stub(this.tabsAPI, 'isDevToolsFocused', () => false)
+      tabsReducer(this.state, action)
+      this.clock.tick(1510)
+      assert(this.tabsAPI.toggleDevTools.notCalled)
+      assert(this.tabsAPI.closeTab.withArgs(this.state, 1).calledOnce)
+    })
+  })
+
   describe.skip('APP_LOAD_URL_REQUESTED', function () {
     it('loads the specified URL', function () {
       // TODO
