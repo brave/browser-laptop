@@ -119,6 +119,8 @@ class UrlBar extends React.Component {
       windowActions.setUrlBarActive(true)
     }
     switch (e.keyCode) {
+      case KeyCodes.SHIFT:
+        break
       case KeyCodes.ENTER:
         e.preventDefault()
         let location = this.urlInput ? this.getValue() : this.props.urlbarLocation

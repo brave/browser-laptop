@@ -124,9 +124,10 @@ describe('urlBarSuggestions', function () {
   })
 
   it('selects a location auto complete result but not for titles', function * () {
+    const basePage1Url = Brave.server.url('')
     yield this.app.client
       .setValue(urlInput, 'http://')
-      .waitForInputText(urlInput, this.page1Url)
+      .waitForInputText(urlInput, basePage1Url.slice(0, -1))
       .waitForExist(urlBarSuggestions + ' li.selected')
       .setValue(urlInput, 'Page')
       .waitForElementCount(urlBarSuggestions + ' li.selected', 0)
