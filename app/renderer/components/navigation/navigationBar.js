@@ -11,7 +11,7 @@ const ReduxComponent = require('../reduxComponent')
 const UrlBar = require('./urlBar')
 const AddEditBookmarkHanger = require('../bookmarks/addEditBookmarkHanger')
 const PublisherToggle = require('./publisherToggle')
-const LongPressButton = require('./../../../../js/components/longPressButton')
+const LongPressButton = require('../common/longPressButton')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')

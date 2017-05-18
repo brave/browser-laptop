@@ -6,9 +6,9 @@ const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // components
-const Button = require('../../../../../js/components/button')
+const Button = require('../../common/button')
 const cx = require('../../../../../js/lib/classSet')
-const ModalOverlay = require('../../../../../js/components/modalOverlay')
+const ModalOverlay = require('../../common/modalOverlay')
 const ImmutableComponent = require('../../immutableComponent')
 
 // styles

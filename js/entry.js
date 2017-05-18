@@ -20,7 +20,7 @@ require('../node_modules/font-awesome/css/font-awesome.css')
 
 const React = require('react')
 const ReactDOM = require('react-dom')
-const Window = require('./components/window')
+const Window = require('../app/renderer/components/window')
 const electron = require('electron')
 const ipc = electron.ipcRenderer
 const webFrame = electron.webFrame

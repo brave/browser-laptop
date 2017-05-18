@@ -16,7 +16,7 @@ const {SettingsList, SettingItem, SettingCheckbox, SettingItemIcon} = require('.
 const {SettingTextbox} = require('../../app/renderer/components/common/textbox')
 const {SettingDropdown} = require('../../app/renderer/components/common/dropdown')
 const {DefaultSectionTitle} = require('../../app/renderer/components/common/sectionTitle')
-const Button = require('../components/button')
+const Button = require('../../app/renderer/components/common/button')
 
 // Tabs
 const PaymentsTab = require('../../app/renderer/components/preferences/paymentsTab')
@@ -39,7 +39,7 @@ const {startsWithOption, newTabMode, bookmarksToolbarMode, tabCloseAction, fulls
 const aboutActions = require('./aboutActions')
 const appActions = require('../actions/appActions')
 const getSetting = require('../settings').getSetting
-const SortableTable = require('../components/sortableTable')
+const SortableTable = require('../../app/renderer/components/common/sortableTable')
 const searchProviders = require('../data/searchProviders')
 
 const adblock = appConfig.resourceNames.ADBLOCK

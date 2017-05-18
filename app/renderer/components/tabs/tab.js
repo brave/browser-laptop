@@ -14,7 +14,7 @@ const NewSessionIcon = require('./content/newSessionIcon')
 const PrivateIcon = require('./content/privateIcon')
 const TabTitle = require('./content/tabTitle')
 const CloseTabIcon = require('./content/closeTabIcon')
-const {NotificationBarCaret} = require('../../../../js/components/notificationBar')
+const {NotificationBarCaret} = require('../main/notificationBar')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')

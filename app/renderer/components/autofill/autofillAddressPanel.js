@@ -4,8 +4,8 @@
 
 const React = require('react')
 const ImmutableComponent = require('../immutableComponent')
-const Dialog = require('../../../../js/components/dialog')
-const Button = require('../../../../js/components/button')
+const Dialog = require('../common/dialog')
+const Button = require('../common/button')
 const windowActions = require('../../../../js/actions/windowActions')
 const appActions = require('../../../../js/actions/appActions')
 const KeyCodes = require('../../../common/constants/keyCodes')

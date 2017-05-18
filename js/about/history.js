@@ -11,8 +11,8 @@ const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
-const SortableTable = require('../components/sortableTable')
-const Button = require('../components/button')
+const SortableTable = require('../../app/renderer/components/common/sortableTable')
+const Button = require('../../app/renderer/components/common/button')
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
 const historyUtil = require('../../app/common/lib/historyUtil')
 

@@ -6,7 +6,7 @@ const React = require('react')
 
 // Components
 const ImmutableComponent = require('../immutableComponent')
-const Button = require('../../../../js/components/button')
+const Button = require('../common/button')
 
 // Constants
 const downloadStates = require('../../../../js/constants/downloadStates')

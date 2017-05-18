@@ -8,7 +8,7 @@ const {StyleSheet, css} = require('aphrodite')
 const aboutActions = require('../../../../js/about/aboutActions')
 const getSetting = require('../../../../js/settings').getSetting
 const {changeSetting} = require('../../lib/settingsUtil')
-const SwitchControl = require('../../../../js/components/switchControl')
+const SwitchControl = require('./switchControl')
 const cx = require('../../../../js/lib/classSet')
 const settings = require('../../../../js/constants/settings')
 

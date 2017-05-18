@@ -8,7 +8,7 @@ const Immutable = require('immutable')
 const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
 const cx = require('../lib/classSet')
 const aboutActions = require('./aboutActions')
-const Button = require('../components/button')
+const Button = require('../../app/renderer/components/common/button')
 
 const ipc = window.chrome.ipcRenderer
 

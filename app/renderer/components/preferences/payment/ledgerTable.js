@@ -7,8 +7,8 @@ const {StyleSheet, css} = require('aphrodite')
 
 // components
 const ImmutableComponent = require('../../immutableComponent')
-const SortableTable = require('../../../../../js/components/sortableTable')
-const SwitchControl = require('../../../../../js/components/switchControl')
+const SortableTable = require('../../common/sortableTable')
+const SwitchControl = require('../../common/switchControl')
 const BrowserButton = require('../../common/browserButton')
 const PinnedInput = require('./pinnedInput')
 

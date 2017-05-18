@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const Button = require('../components/button')
+const Button = require('../../app/renderer/components/common/button')
 
 require('../../less/button.less')
 require('../../less/window.less')
