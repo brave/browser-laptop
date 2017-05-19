@@ -6,7 +6,7 @@
 
 const appConstants = require('../../../js/constants/appConstants')
 const filtering = require('../../filtering')
-const siteCache = require('../../../js/state/siteCache')
+const siteCache = require('../../common/state/siteCache')
 const siteTags = require('../../../js/constants/siteTags')
 const siteUtil = require('../../../js/state/siteUtil')
 const syncActions = require('../../../js/actions/syncActions')
