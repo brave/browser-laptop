@@ -194,7 +194,6 @@ class GeneralTab extends ImmutableComponent {
         {
           isDarwin ? null : <SettingCheckbox dataL10nId='autoHideMenuBar' prefKey={settings.AUTO_HIDE_MENU} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         }
-        <SettingCheckbox dataL10nId='disableTitleMode' prefKey={settings.DISABLE_TITLE_MODE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingItemIcon dataL10nId='downloadDefaultPath' position='right' icon={require('../../img/icon_pencil.svg')} clickAction={this.openDownloadDialog}>
           <SettingTextbox
             spellCheck='false'

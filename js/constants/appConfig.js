@@ -127,6 +127,7 @@ module.exports = {
     'general.show-home-button': false,
     'general.useragent.value': null, // Set at runtime
     'general.autohide-menu': true,
+    'general.wide-url-bar': false,
     'general.check-default-on-startup': true,
     'general.download-default-path': '',
     'general.download-always-ask': true,

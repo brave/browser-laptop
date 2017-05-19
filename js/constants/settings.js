@@ -11,6 +11,7 @@ const settings = {
   DEFAULT_DOWNLOAD_SAVE_PATH: 'general.downloads.default-save-path',
   AUTO_HIDE_MENU: 'general.autohide-menu',
   DISABLE_TITLE_MODE: 'general.disable-title-mode',
+  WIDE_URL_BAR: 'general.wide-url-bar',
   BOOKMARKS_TOOLBAR_MODE: 'general.bookmarks-toolbar-mode',
   SHOW_BOOKMARKS_TOOLBAR: 'bookmarks.toolbar.show',
   LANGUAGE: 'general.language',

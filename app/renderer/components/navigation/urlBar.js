@@ -532,6 +532,7 @@ class UrlBar extends React.Component {
     props.isSelected = urlbar.get('selected')
     props.isFocused = urlbar.get('focused')
     props.isHTTPPage = isHTTPPage
+    props.isWideURLbarEnabled = getSetting(settings.WIDE_URL_BAR)
     props.activateSearchEngine = activateSearchEngine
     props.searchSelectEntry = urlbarSearchDetail
     props.autocompleteEnabled = urlbar.getIn(['suggestions', 'autocompleteEnabled'])
@@ -545,6 +546,7 @@ class UrlBar extends React.Component {
     return <form
       className={cx({
         urlbarForm: true,
+        [css(styles.urlbarForm_wide)]: this.props.isWideURLbarEnabled,
         noBorderRadius: this.props.noBorderRadius
       })}
       action='#'
@@ -638,6 +640,11 @@ const styles = StyleSheet.create({
     width: '14px',
     height: '14px',
     border: '0px'
+  },
+
+  urlbarForm_wide: {
+    // cf: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L682-L684
+    maxWidth: '100%'
   }
 })
 

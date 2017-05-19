@@ -39,6 +39,8 @@ const UrlUtil = require('../../../../js/lib/urlutil')
 const {getSetting} = require('../../../../js/settings')
 const contextMenus = require('../../../../js/contextMenus')
 
+const {StyleSheet, css} = require('aphrodite/no-important')
+
 class NavigationBar extends React.Component {
   constructor (props) {
     super(props)
@@ -166,6 +168,7 @@ class NavigationBar extends React.Component {
     props.activeTabShowingMessageBox = activeTabShowingMessageBox
     props.locationInfo = state.get('locationInfo')
     props.titleMode = titleMode
+    props.isWideURLbarEnabled = getSetting(settings.WIDE_URL_BAR)
     props.activeTabId = activeTabId
 
     return props
@@ -181,7 +184,8 @@ class NavigationBar extends React.Component {
       ref='navigator'
       data-frame-key={this.props.activeFrameKey}
       className={cx({
-        titleMode: this.props.titleMode
+        titleMode: this.props.titleMode,
+        [css(styles.navigator_wide)]: this.props.isWideURLbarEnabled
       })}>
       {
         this.props.bookmarkDetail && this.props.bookmarkDetail.get('isBookmarkHanger')
@@ -261,5 +265,15 @@ class NavigationBar extends React.Component {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  navigator_wide: {
+
+    // TODO: Refactor navigationBar.js to remove !important
+    maxWidth: '100% !important',
+    marginRight: '0 !important',
+    justifyContent: 'initial !important'
+  }
+})
 
 module.exports = ReduxComponent.connect(NavigationBar)
