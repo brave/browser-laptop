@@ -121,8 +121,7 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
       propName: method
     }
     methods.push(item)
-    item.objName = 'WebGL2RenderingContext',
-    methods.push(item)
+    methods.push(Object.assign({}, item, {objName: 'WebGL2RenderingContext'}))
   })
 
   var audioBufferMethods = ['copyFromChannel', 'getChannelData']
