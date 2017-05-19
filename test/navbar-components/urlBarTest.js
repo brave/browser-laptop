@@ -623,10 +623,15 @@ describe('urlBar tests', function () {
 
     before(function * () {
       const input = 'brianbondy.com/projects'
+      const sites = []
+      for (var i = 0; i < 5000; i++) {
+        sites.push({ location: 'https://www.brave.com' + i })
+      }
       yield setup(this.app.client)
       yield this.app.client.waitForExist(urlInput)
       yield this.app.client.waitForElementFocus(urlInput)
       yield this.app.client
+        .addSiteList(sites)
         .waitForInputText(urlInput, '')
         .windowByUrl(Brave.browserWindowUrl)
         .newTab()
