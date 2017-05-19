@@ -9,6 +9,7 @@ const frameState = require('./frameState')
 const windowState = require('./windowState')
 // this file should eventually replace frameStateUtil
 const frameStateUtil = require('../../../js/state/frameStateUtil')
+const {isLocationBookmarked} = require('../../../js/state/siteUtil')
 
 const validateId = function (propName, id) {
   assert.ok(id, `${propName} cannot be null`)
@@ -283,7 +284,10 @@ const tabState = {
       return state
     }
 
-    tabValue = tabValue.set('frame', makeImmutable(action.get('frame')))
+    const frameLocation = action.getIn(['frame', 'location'])
+    const frameBookmarked = isLocationBookmarked(state, frameLocation)
+    const frameValue = action.get('frame').set('bookmarked', frameBookmarked)
+    tabValue = tabValue.set('frame', makeImmutable(frameValue))
     return tabState.updateTabValue(state, tabValue)
   },
 

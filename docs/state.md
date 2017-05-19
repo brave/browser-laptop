@@ -249,6 +249,9 @@ AppStore
       title: string
     } // folder: folderId; bookmark/history: location + partitionNumber + parentFolderId
   },
+  locationSiteKeyCache: {
+    [location]: Array.<string> // location -> site keys
+  },
   siteSettings: {
     [hostPattern]: {
       adControl: string, // (showBraveAds | blockAds | allowAdsAndTracking)

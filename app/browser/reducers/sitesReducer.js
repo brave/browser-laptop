@@ -6,6 +6,7 @@
 
 const appConstants = require('../../../js/constants/appConstants')
 const filtering = require('../../filtering')
+const siteCache = require('../../../js/state/siteCache')
 const siteTags = require('../../../js/constants/siteTags')
 const siteUtil = require('../../../js/state/siteUtil')
 const syncActions = require('../../../js/actions/syncActions')
@@ -14,13 +15,26 @@ const Immutable = require('immutable')
 const settings = require('../../../js/constants/settings')
 const {getSetting} = require('../../../js/settings')
 const writeActions = require('../../../js/constants/sync/proto').actions
+const tabState = require('../../common/state/tabState')
 
 const syncEnabled = () => {
   return getSetting(settings.SYNC_ENABLED) === true
 }
 
+const updateActiveTabBookmarked = (state) => {
+  const tab = tabState.getActiveTab(state)
+  if (!tab) {
+    return state
+  }
+  const bookmarked = siteUtil.isLocationBookmarked(state, tab.get('url'))
+  return tabState.updateTabValue(state, tab.set('bookmarked', bookmarked))
+}
+
 const sitesReducer = (state, action, immutableAction) => {
   switch (action.actionType) {
+    case appConstants.APP_SET_STATE:
+      state = siteCache.loadLocationSiteKeysCache(state)
+      break
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
       if (immutableAction.getIn(['clearDataDetail', 'browserHistory'])) {
         state = state.set('sites', siteUtil.clearHistory(state.get('sites')))
@@ -30,39 +44,41 @@ const sitesReducer = (state, action, immutableAction) => {
     case appConstants.APP_ADD_SITE:
       if (Immutable.List.isList(action.siteDetail)) {
         action.siteDetail.forEach((s) => {
-          state = state.set('sites', siteUtil.addSite(state.get('sites'), s, action.tag, undefined, action.skipSync))
+          state = siteUtil.addSite(state, s, action.tag, undefined, action.skipSync)
         })
       } else {
         let sites = state.get('sites')
         if (!action.siteDetail.get('folderId') && siteUtil.isFolder(action.siteDetail)) {
           action.siteDetail = action.siteDetail.set('folderId', siteUtil.getNextFolderId(sites))
         }
-        state = state.set('sites', siteUtil.addSite(sites, action.siteDetail, action.tag, action.originalSiteDetail, action.skipSync))
+        state = siteUtil.addSite(state, action.siteDetail, action.tag, action.originalSiteDetail, action.skipSync)
       }
       if (action.destinationDetail) {
         const sourceKey = siteUtil.getSiteKey(action.siteDetail)
         const destinationKey = siteUtil.getSiteKey(action.destinationDetail)
 
         if (sourceKey != null) {
-          state = state.set('sites', siteUtil.moveSite(state.get('sites'),
-            sourceKey, destinationKey, false, false, true))
+          state = siteUtil.moveSite(state,
+            sourceKey, destinationKey, false, false, true)
         }
       }
       if (syncEnabled()) {
         state = syncUtil.updateSiteCache(state, action.destinationDetail || action.siteDetail)
       }
+      state = updateActiveTabBookmarked(state)
       break
     case appConstants.APP_REMOVE_SITE:
       const removeSiteSyncCallback = action.skipSync ? undefined : syncActions.removeSite
-      state = state.set('sites', siteUtil.removeSite(state.get('sites'), action.siteDetail, action.tag, true, removeSiteSyncCallback))
+      state = siteUtil.removeSite(state, action.siteDetail, action.tag, true, removeSiteSyncCallback)
       if (syncEnabled()) {
         state = syncUtil.updateSiteCache(state, action.siteDetail)
       }
+      state = updateActiveTabBookmarked(state)
       break
     case appConstants.APP_MOVE_SITE:
-      state = state.set('sites', siteUtil.moveSite(state.get('sites'),
+      state = siteUtil.moveSite(state,
         action.sourceKey, action.destinationKey, action.prepend,
-        action.destinationIsParent, false))
+        action.destinationIsParent, false)
       if (syncEnabled()) {
         const destinationDetail = state.getIn(['sites', action.destinationKey])
         state = syncUtil.updateSiteCache(state, destinationDetail)
@@ -85,19 +101,15 @@ const sitesReducer = (state, action, immutableAction) => {
         const siteData = syncUtil.getSiteDataFromRecord(record, state, action.records)
         const tag = siteData.tag
         let siteDetail = siteData.siteDetail
-        const sites = state.get('sites')
         switch (record.action) {
           case writeActions.CREATE:
-            state = state.set('sites',
-              siteUtil.addSite(sites, siteDetail, tag, undefined, true))
+            state = siteUtil.addSite(state, siteDetail, tag, undefined, true)
             break
           case writeActions.UPDATE:
-            state = state.set('sites',
-              siteUtil.addSite(sites, siteDetail, tag, siteData.existingObjectData, true))
+            state = siteUtil.addSite(state, siteDetail, tag, siteData.existingObjectData, true)
             break
           case writeActions.DELETE:
-            state = state.set('sites',
-              siteUtil.removeSite(sites, siteDetail, tag))
+            state = siteUtil.removeSite(state, siteDetail, tag)
             break
         }
         state = syncUtil.updateSiteCache(state, siteDetail)
@@ -115,9 +127,9 @@ const sitesReducer = (state, action, immutableAction) => {
         const sites = state.get('sites')
         const siteDetail = siteUtil.getDetailFromTab(tab, siteTags.PINNED, sites)
         if (pinned) {
-          state = state.set('sites', siteUtil.addSite(sites, siteDetail, siteTags.PINNED))
+          state = siteUtil.addSite(state, siteDetail, siteTags.PINNED)
         } else {
-          state = state.set('sites', siteUtil.removeSite(sites, siteDetail, siteTags.PINNED))
+          state = siteUtil.removeSite(state, siteDetail, siteTags.PINNED)
         }
         if (syncEnabled()) {
           state = syncUtil.updateSiteCache(state, siteDetail)
@@ -127,8 +139,8 @@ const sitesReducer = (state, action, immutableAction) => {
     case appConstants.APP_CREATE_TAB_REQUESTED: {
       const createProperties = immutableAction.get('createProperties')
       if (createProperties.get('pinned')) {
-        state = state.set('sites', siteUtil.addSite(state.get('sites'),
-          siteUtil.getDetailFromCreateProperties(createProperties), siteTags.PINNED))
+        state = siteUtil.addSite(state,
+          siteUtil.getDetailFromCreateProperties(createProperties), siteTags.PINNED)
       }
       break
     }

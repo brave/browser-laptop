@@ -4,6 +4,7 @@
 'use strict'
 const Immutable = require('immutable')
 const normalizeUrl = require('normalize-url')
+const siteCache = require('./siteCache')
 const siteTags = require('../constants/siteTags')
 const settings = require('../constants/settings')
 const getSetting = require('../settings').getSetting
@@ -84,27 +85,57 @@ module.exports.getSiteKey = function (siteDetail) {
 }
 
 /**
- * Checks if a siteDetail has the specified tag
+ * Calculate location for siteKey
+ *
+ * @param siteKey The site key to to be calculated
+ * @return {string|null}
+ */
+module.exports.getLocationFromSiteKey = function (siteKey) {
+  if (!siteKey) {
+    return null
+  }
+
+  const splitKey = siteKey.split('|', 2)
+  if (typeof splitKey[0] === 'string' && typeof splitKey[1] === 'string') {
+    return splitKey[0]
+  }
+  return null
+}
+
+/**
+ * Checks if a siteDetail has the specified tag.
+ * Depends on siteDeatil siteKey being accurate.
  *
  * @param sites The application state's Immutable sites map
  * @param siteDetail The site to check if it's in the specified tag
  * @return true if the location is already bookmarked
  */
 module.exports.isSiteBookmarked = function (sites, siteDetail) {
-  if (!sites) {
+  const siteKey = module.exports.getSiteKey(siteDetail)
+  const siteTags = sites.getIn([siteKey, 'tags'])
+  return isBookmark(siteTags)
+}
+
+/**
+ * Checks if a location is bookmarked.
+ *
+ * @param state The application state Immutable map
+ * @param {string} location
+ * @return {boolean}
+ */
+module.exports.isLocationBookmarked = function (state, location) {
+  const sites = state.get('sites')
+  const siteKeys = siteCache.getLocationSiteKeys(state, location)
+  if (!siteKeys || siteKeys.length === 0) {
     return false
   }
-
-  const site = sites.find((site) =>
-    isBookmark(site.get('tags')) &&
-    site.get('location') === UrlUtil.getLocationIfPDF(siteDetail.get('location')) &&
-    (site.get('partitionNumber') || 0) === (siteDetail.get('partitionNumber') || 0)
-  )
-
-  if (site) {
-    return true
-  }
-  return false
+  return siteKeys.some(key => {
+    const site = sites.get(key)
+    if (!site) {
+      return false
+    }
+    return isBookmark(site.get('tags'))
+  })
 }
 
 const getNextFolderIdItem = (sites) =>
@@ -227,7 +258,7 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId, order) =>
 }
 
 /**
- * Adds or updates the specified siteDetail in sites.
+ * Adds or updates the specified siteDetail in appState.sites.
  *
  * Examples of updating:
  * - editing bookmark in add/edit modal
@@ -241,9 +272,10 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId, order) =>
  * @param originalSiteDetail If specified, use when searching site list
  * @param {boolean=} skipSync - True if this site was downloaded by sync and
  *   does not to be re-uploaded
- * @return The new sites Immutable object
+ * @return The new state Immutable object
  */
-module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail, skipSync) {
+module.exports.addSite = function (state, siteDetail, tag, originalSiteDetail, skipSync) {
+  let sites = state.get('sites')
   // Get tag from siteDetail object if not passed via tag param
   if (tag === undefined) {
     tag = siteDetail.getIn(['tags', 0])
@@ -278,35 +310,43 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail, s
     sites = sites.delete(oldKey)
   }
 
+  let location
   if (site.has('location')) {
-    site = site.set('location', UrlUtil.getLocationIfPDF(site.get('location')))
+    location = UrlUtil.getLocationIfPDF(site.get('location'))
+    site = site.set('location', location)
   }
+  const oldLocation = (oldSite && oldSite.get('location')) || site.get('location')
+  state = siteCache.removeLocationSiteKey(state, oldLocation, oldKey)
 
   if (skipSync) {
     site = site.set('skipSync', true)
   }
 
+  state = state.set('sites', sites)
   const key = module.exports.getSiteKey(site)
   if (key === null) {
-    return sites
+    return state
   }
-  return sites.set(key, site)
+  state = state.setIn(['sites', key], site)
+  state = siteCache.addLocationSiteKey(state, location, key)
+  return state
 }
 
 /**
  * Removes the specified tag from a siteDetail
  *
- * @param {Immutable.Map} sites The application state's Immutable sites map
+ * @param {Immutable.Map} state The application state Immutable map
  * @param {Immutable.Map} siteDetail The siteDetail to remove a tag from
  * @param {string} tag
  * @param {boolean} reorder whether to reorder sites (default with reorder)
  * @param {Function=} syncCallback
- * @return {Immutable.Map} The new sites Immutable object
+ * @return {Immutable.Map} The new state Immutable object
  */
-module.exports.removeSite = function (sites, siteDetail, tag, reorder = true, syncCallback) {
+module.exports.removeSite = function (state, siteDetail, tag, reorder = true, syncCallback) {
+  let sites = state.get('sites')
   const key = module.exports.getSiteKey(siteDetail)
   if (!key) {
-    return sites
+    return state
   }
   if (getSetting(settings.SYNC_ENABLED) === true && syncCallback) {
     syncCallback(sites.getIn([key]))
@@ -319,32 +359,37 @@ module.exports.removeSite = function (sites, siteDetail, tag, reorder = true, sy
     childSites.forEach((site) => {
       const tags = site.get('tags')
       tags.forEach((tag) => {
-        sites = module.exports.removeSite(sites, site, tag, false, syncCallback)
+        state = module.exports.removeSite(state, site, tag, false, syncCallback)
       })
     })
   }
-  let site = sites.get(key)
+
+  const location = siteDetail.get('location')
+  state = siteCache.removeLocationSiteKey(state, location, key)
+
+  const stateKey = ['sites', key]
+  let site = state.getIn(stateKey)
   if (!site) {
-    return sites
+    return state
   }
   if (isBookmark(tag)) {
     if (isPinnedTab(tags)) {
       const tags = site.get('tags').filterNot((tag) => tag === siteTags.BOOKMARK)
       site = site.set('tags', tags)
-      return sites.set(key, site)
+      return state.setIn(stateKey, site)
     }
-    if (sites.size && reorder) {
-      const order = sites.getIn([key, 'order'])
-      sites = reorderSite(sites, order)
+    if (state.get('sites').size && reorder) {
+      const order = state.getIn(stateKey.concat(['order']))
+      state = state.set('sites', reorderSite(state.get('sites'), order))
     }
-    return sites.delete(key)
+    return state.deleteIn(['sites', key])
   } else if (isPinnedTab(tag)) {
     const tags = site.get('tags').filterNot((tag) => tag === siteTags.PINNED)
     site = site.set('tags', tags)
-    return sites.set(key, site)
+    return state.setIn(stateKey, site)
   } else {
     site = site.set('lastAccessedTime', undefined)
-    return sites.set(key, site)
+    return state.setIn(stateKey, site)
   }
 }
 
@@ -388,21 +433,22 @@ module.exports.isMoveAllowed = (sites, sourceDetail, destinationDetail) => {
 /**
  * Moves the specified site from one location to another
  *
- * @param sites The application state's Immutable sites map
+ * @param state The application state Immutable map
  * @param sourceKey The site key to move
  * @param destinationKey The site key to move to
  * @param prepend Whether the destination detail should be prepended or not, not used if destinationIsParent is true
  * @param destinationIsParent Whether the item should be moved inside of the destinationDetail.
  * @param disallowReparent If set to true, parent folder will not be set
- * @return The new sites Immutable object
+ * @return The new state Immutable object
  */
-module.exports.moveSite = function (sites, sourceKey, destinationKey, prepend,
+module.exports.moveSite = function (state, sourceKey, destinationKey, prepend,
   destinationIsParent, disallowReparent) {
+  let sites = state.get('sites')
   let sourceSite = sites.get(sourceKey) || Immutable.Map()
   const destinationSite = sites.get(destinationKey) || Immutable.Map()
 
   if (sourceSite.isEmpty() || !module.exports.isMoveAllowed(sites, sourceSite, destinationSite)) {
-    return sites
+    return state
   }
 
   const sourceSiteIndex = sourceSite.get('order')
@@ -420,8 +466,10 @@ module.exports.moveSite = function (sites, sourceKey, destinationKey, prepend,
     --newIndex
   }
 
-  sites = sites.delete(sourceKey)
-  sites = sites.map((site) => {
+  const location = sourceSite.get('location')
+  state = siteCache.removeLocationSiteKey(state, location, sourceKey)
+  state = state.deleteIn(['sites', sourceKey])
+  state = state.set('sites', state.get('sites').map((site) => {
     const siteOrder = site.get('order')
     if (siteOrder >= newIndex && siteOrder < sourceSiteIndex) {
       return site.set('order', siteOrder + 1)
@@ -429,7 +477,7 @@ module.exports.moveSite = function (sites, sourceKey, destinationKey, prepend,
       return site.set('order', siteOrder - 1)
     }
     return site
-  })
+  }))
   sourceSite = sourceSite.set('order', newIndex)
 
   if (!disallowReparent) {
@@ -441,7 +489,9 @@ module.exports.moveSite = function (sites, sourceKey, destinationKey, prepend,
       sourceSite = sourceSite.set('parentFolderId', destinationSite.get('parentFolderId'))
     }
   }
-  return sites.set(module.exports.getSiteKey(sourceSite), sourceSite)
+  const destinationSiteKey = module.exports.getSiteKey(sourceSite)
+  state = siteCache.addLocationSiteKey(state, location, destinationSiteKey)
+  return state.setIn(['sites', destinationSiteKey], sourceSite)
 }
 
 module.exports.getDetailFromFrame = function (frame, tag) {

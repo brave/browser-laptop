@@ -10,7 +10,9 @@ const { makeImmutable } = require('../../../../../app/common/state/immutableUtil
 require('../../../braveUnit')
 
 const initState = Immutable.fromJS({
-  sites: {}
+  sites: {},
+  windows: [],
+  tabs: []
 })
 
 /**
