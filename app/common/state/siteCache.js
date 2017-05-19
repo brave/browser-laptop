@@ -3,8 +3,8 @@
 
 'use strict'
 const Immutable = require('immutable')
-const siteUtil = require('./siteUtil')
-const UrlUtil = require('../lib/urlutil')
+const siteUtil = require('../../../js/state/siteUtil')
+const UrlUtil = require('../../../js/lib/urlutil')
 
 const createLocationSiteKeysCache = (state) => {
   state = state.set('locationSiteKeysCache', new Immutable.Map())

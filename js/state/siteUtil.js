@@ -4,7 +4,7 @@
 'use strict'
 const Immutable = require('immutable')
 const normalizeUrl = require('normalize-url')
-const siteCache = require('./siteCache')
+const siteCache = require('../../app/common/state/siteCache')
 const siteTags = require('../constants/siteTags')
 const settings = require('../constants/settings')
 const getSetting = require('../settings').getSetting
