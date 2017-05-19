@@ -618,6 +618,28 @@ describe('urlBar tests', function () {
     })
   })
 
+  describe('Typing fast with newtab does not clear user input', function () {
+    Brave.beforeAll(this)
+
+    before(function * () {
+      const input = 'brianbondy.com/projects'
+      yield setup(this.app.client)
+      yield this.app.client.waitForExist(urlInput)
+      yield this.app.client.waitForElementFocus(urlInput)
+      yield this.app.client
+        .waitForInputText(urlInput, '')
+        .windowByUrl(Brave.browserWindowUrl)
+        .newTab()
+        .waitForElementFocus(urlInput)
+        .keys(input)
+        .waitForInputText(urlInput, input)
+    })
+
+    it('Retains user input on tab switches', function () {
+      tabLoadingTest('')
+    })
+  })
+
   describe('loading same URL as current page with changed input', function () {
     Brave.beforeAll(this)
 

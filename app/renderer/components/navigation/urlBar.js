@@ -389,11 +389,15 @@ class UrlBar extends React.Component {
         // Each tab has a focused state stored separately
         if (this.props.isFocused) {
           this.focus()
+          this.select()
         }
         windowActions.setRenderUrlBarSuggestions(false)
       } else if (this.props.location !== prevProps.location) {
         // This is a url nav change
-        this.setValue(UrlUtil.getDisplayLocation(this.props.location, pdfjsEnabled))
+        // This covers the case of user typing fast on newtab when they have lag from lots of bookmarks.
+        if (!(prevProps.location === 'about:blank' && this.props.location === 'about:newtab' && this.props.locationValue !== 'about:blank')) {
+          this.setValue(UrlUtil.getDisplayLocation(this.props.location, pdfjsEnabled))
+        }
       } else if (this.props.hasSuggestionMatch &&
                 this.props.isActive &&
                 this.props.locationValueSuffix !== this.lastSuffix) {
