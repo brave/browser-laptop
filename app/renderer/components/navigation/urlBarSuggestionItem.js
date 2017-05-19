@@ -17,7 +17,8 @@ class UrlBarSuggestionItem extends ImmutableComponent {
     }
   }
   render () {
-    return <li data-index={this.props.currentIndex}
+    return <li data-test-id='list-item'
+      data-index={this.props.currentIndex}
       onMouseOver={this.props.onMouseOver.bind(this)}
       onClick={this.props.onClick}
       key={`${this.props.suggestion.get('location')}|${this.props.currentIndex + this.props.i}`}
@@ -29,12 +30,12 @@ class UrlBarSuggestionItem extends ImmutableComponent {
       })}>
       {
         this.props.suggestion.get('type') !== suggestionTypes.TOP_SITE && this.props.suggestion.get('title')
-        ? <div className='suggestionTitle'>{this.props.suggestion.get('title')}</div>
+        ? <div data-test-id='suggestionTitle' className='suggestionTitle'>{this.props.suggestion.get('title')}</div>
         : null
       }
       {
         this.props.suggestion.get('type') !== suggestionTypes.SEARCH && this.props.suggestion.get('type') !== suggestionTypes.ABOUT_PAGES
-        ? <div className='suggestionLocation'>{this.props.suggestion.get('location')}</div>
+        ? <div data-test-id='suggestionLocation' className='suggestionLocation'>{this.props.suggestion.get('location')}</div>
         : null
       }
     </li>

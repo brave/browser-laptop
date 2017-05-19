@@ -52,7 +52,7 @@ describe('UrlBarIcon component unit tests', function () {
     const wrapper = mount(
       <UrlBarIcon {...props} />
     )
-    wrapper.find('span').simulate('click')
+    wrapper.find('[data-test-id="urlBarIcon"]').simulate('click')
     assert.equal(spy.calledOnce, true)
     windowActions.setSiteInfoVisible.restore()
   })
@@ -76,7 +76,7 @@ describe('UrlBarIcon component unit tests', function () {
       const wrapper = mount(
         <UrlBarIcon {...props2} />
       )
-      wrapper.find('span').simulate('click')
+      wrapper.find('[data-test-id="urlBarIcon"]').simulate('click')
       assert.equal(spy.notCalled, true)
       windowActions.setSiteInfoVisible.restore()
     })

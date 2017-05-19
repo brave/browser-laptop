@@ -104,59 +104,59 @@ class DownloadItem extends ImmutableComponent {
       })}>
       {
         this.props.deleteConfirmationVisible
-        ? <div className='deleteConfirmation'><span data-l10n-id='downloadDeleteConfirmation' /><Button l10nId='ok' className='primaryButton confirmDeleteButton' onClick={this.onDeleteDownload} /></div>
+        ? <div className='deleteConfirmation'><span data-l10n-id='downloadDeleteConfirmation' /><Button testId='confirmDeleteButton' l10nId='ok' className='primaryButton confirmDeleteButton' onClick={this.onDeleteDownload} /></div>
         : null
       }
       <div className='downloadActions'>
         {
           downloadUtil.shouldAllowPause(this.props.download)
-          ? <Button className='pauseButton' l10nId='downloadPause' iconClass='fa-pause' onClick={this.onPauseDownload} />
+          ? <Button testId='pauseButton' className='pauseButton' l10nId='downloadPause' iconClass='fa-pause' onClick={this.onPauseDownload} />
           : null
         }
         {
           downloadUtil.shouldAllowResume(this.props.download)
-          ? <Button className='resumeButton' l10nId='downloadResume' iconClass='fa-play' onClick={this.onResumeDownload} />
+          ? <Button testId='resumeButton' className='resumeButton' l10nId='downloadResume' iconClass='fa-play' onClick={this.onResumeDownload} />
           : null
         }
         {
           downloadUtil.shouldAllowCancel(this.props.download)
-          ? <Button className='cancelButton' l10nId='downloadCancel' iconClass='fa-times' onClick={this.onCancelDownload} />
+          ? <Button testId='cancelButton' className='cancelButton' l10nId='downloadCancel' iconClass='fa-times' onClick={this.onCancelDownload} />
           : null
         }
         {
           downloadUtil.shouldAllowRedownload(this.props.download)
-          ? <Button className='redownloadButton' l10nId='downloadRedownload' iconClass='fa-repeat' onClick={this.onRedownload} />
+          ? <Button testId='redownloadButton' className='redownloadButton' l10nId='downloadRedownload' iconClass='fa-repeat' onClick={this.onRedownload} />
           : null
         }
         {
           downloadUtil.shouldAllowCopyLink(this.props.download)
-          ? <Button className='copyLinkButton' l10nId='downloadCopyLinkLocation' iconClass='fa-link' onClick={this.onCopyLinkToClipboard} />
+          ? <Button testId='copyLinkButton' className='copyLinkButton' l10nId='downloadCopyLinkLocation' iconClass='fa-link' onClick={this.onCopyLinkToClipboard} />
           : null
         }
         {
           downloadUtil.shouldAllowOpenDownloadLocation(this.props.download)
-          ? <Button className='revealButton' l10nId='downloadOpenPath' iconClass='fa-folder-open-o' onClick={this.onRevealDownload} />
+          ? <Button testId='revealButton' className='revealButton' l10nId='downloadOpenPath' iconClass='fa-folder-open-o' onClick={this.onRevealDownload} />
           : null
         }
         {
           downloadUtil.shouldAllowDelete(this.props.download)
-          ? <Button className='deleteButton' l10nId='downloadDelete' iconClass='fa-trash-o' onClick={this.onShowDeleteConfirmation} />
+          ? <Button testId='deleteButton' className='deleteButton' l10nId='downloadDelete' iconClass='fa-trash-o' onClick={this.onShowDeleteConfirmation} />
           : null
         }
         {
           downloadUtil.shouldAllowRemoveFromList(this.props.download)
-          ? <Button l10nId='downloadRemoveFromList' iconClass='fa-times' className='removeDownloadFromList' onClick={this.onClearDownload} />
+          ? <Button testId='downloadRemoveFromList' l10nId='downloadRemoveFromList' iconClass='fa-times' className='removeDownloadFromList' onClick={this.onClearDownload} />
           : null
         }
       </div>
       {
         (this.isInProgress || this.isPaused) && this.props.download.get('totalBytes')
-        ? <div className='downloadProgress' style={progressStyle} />
+        ? <div data-test-id='downloadProgress' className='downloadProgress' style={progressStyle} />
         : null
       }
       <div className='downloadInfo'>
         <span>
-          <div className='downloadFilename'
+          <div data-test-id='downloadFilename' className='downloadFilename'
             title={this.props.download.get('filename')}>
             {
               this.props.download.get('filename')
@@ -164,7 +164,7 @@ class DownloadItem extends ImmutableComponent {
           </div>
           {
             origin
-              ? <div className='downloadOrigin'>
+              ? <div data-test-id='downloadOrigin' className='downloadOrigin'>
                 {
                   isInsecure
                     ? <span className='fa fa-unlock isInsecure' />

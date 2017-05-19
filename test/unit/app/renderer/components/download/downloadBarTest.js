@@ -74,7 +74,7 @@ describe('downloadsBar component', function () {
     })
 
     it('hide downloads button is shown', function () {
-      assert.equal(this.result.find('.hideDownloadsToolbar').length, 1)
+      assert.equal(this.result.find('[data-test-id="hideDownloadsToolbar"]').length, 1)
     })
   })
 
@@ -88,7 +88,7 @@ describe('downloadsBar component', function () {
     })
 
     it('hide downloads button is shown', function () {
-      assert.equal(this.result.find('.hideDownloadsToolbar').length, 1)
+      assert.equal(this.result.find('[data-test-id="hideDownloadsToolbar"]').length, 1)
     })
   })
 
@@ -103,7 +103,7 @@ describe('downloadsBar component', function () {
     })
 
     it('but still shows hide downloads button', function () {
-      assert.equal(this.result.find('.hideDownloadsToolbar').length, 1)
+      assert.equal(this.result.find('[data-test-id="hideDownloadsToolbar"]').length, 1)
     })
   })
 })

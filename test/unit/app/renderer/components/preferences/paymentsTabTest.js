@@ -101,7 +101,7 @@ describe('PaymentsTab component', function () {
           ledgerData={Immutable.Map()}
           showOverlay={function () {}} />
       )
-      assert.equal(wrapper.find('.dialog').length, 0)
+      assert.equal(wrapper.find(advancedSettingsDialog).length, 0)
     })
 
     it('renders the create wallet button by default', function () {
