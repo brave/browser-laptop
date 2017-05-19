@@ -78,23 +78,23 @@ describe('Preferences component', function () {
     })
 
     it('Changes pref pane on popstate event', function () {
-      assert.equal(this.result.find('[data-l10n-id="generalSettings"]').length, 1)
-      assert.equal(this.result.find('[data-l10n-id="searchSettings"]').length, 0)
+      assert.equal(this.result.find('[data-test-id="generalSettings"]').length, 1)
+      assert.equal(this.result.find('[data-test-id="searchSettings"]').length, 0)
       // emit a fake popstate event
       window.location.hash = 'search'
       this.eventMap.popstate()
-      assert.equal(this.result.find('[data-l10n-id="generalSettings"]').length, 0)
-      assert.equal(this.result.find('[data-l10n-id="searchSettings"]').length, 1)
+      assert.equal(this.result.find('[data-test-id="generalSettings"]').length, 0)
+      assert.equal(this.result.find('[data-test-id="searchSettings"]').length, 1)
     })
 
     it('Changes pref pane by hash on mount', function () {
       this.result = mount(Preferences)
-      assert.equal(this.result.find('[data-l10n-id="generalSettings"]').length, 1)
-      assert.equal(this.result.find('[data-l10n-id="searchSettings"]').length, 0)
+      assert.equal(this.result.find('[data-test-id="generalSettings"]').length, 1)
+      assert.equal(this.result.find('[data-test-id="searchSettings"]').length, 0)
       window.location.hash = 'search'
       this.result = mount(Preferences)
-      assert.equal(this.result.find('[data-l10n-id="generalSettings"]').length, 0)
-      assert.equal(this.result.find('[data-l10n-id="searchSettings"]').length, 1)
+      assert.equal(this.result.find('[data-test-id="generalSettings"]').length, 0)
+      assert.equal(this.result.find('[data-test-id="searchSettings"]').length, 1)
     })
   })
 

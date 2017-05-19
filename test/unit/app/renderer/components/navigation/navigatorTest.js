@@ -108,16 +108,17 @@ describe('Navigator component unit tests', function () {
     })
 
     it('both back/forward navigationButtonContainers are enabled', function () {
-      assert.equal(wrapper.find('div.backforward > div.navigationButtonContainer.disabled').length, 0)
+      assert.equal(wrapper.find('[data-test-id="navigationBackButtonDisabled"]').length, 0)
+      assert.equal(wrapper.find('[data-test-id="navigationForwardButtonDisabled"]').length, 0)
     })
 
     it('back navigation button is enabled', function () {
-      const node = wrapper.find('div.backforward > div.navigationButtonContainer .backButton').getDOMNode()
+      const node = wrapper.find('[data-test-id="backButton"]').getDOMNode()
       assert.equal(node.disabled, false)
     })
 
     it('forward navigation button is enabled', function () {
-      const node = wrapper.find('div.backforward > div.navigationButtonContainer .forwardButton').getDOMNode()
+      const node = wrapper.find('[data-test-id="forwardButton"]').getDOMNode()
       assert.equal(node.disabled, false)
     })
   })
@@ -139,16 +140,17 @@ describe('Navigator component unit tests', function () {
     })
 
     it('disables both back/forward navigationButtonContainers', function () {
-      assert.equal(wrapper.find('div.backforward > div.navigationButtonContainer.disabled').length, 2)
+      assert.equal(wrapper.find('[data-test-id="navigationBackButtonDisabled"]').length, 1)
+      assert.equal(wrapper.find('[data-test-id="navigationForwardButtonDisabled"]').length, 1)
     })
 
     it('disables the back navigation button', function () {
-      const node = wrapper.find('div.backforward > div.navigationButtonContainer .backButton').getDOMNode()
+      const node = wrapper.find('[data-test-id="backButtonDisabled"]').getDOMNode()
       assert.equal(node.disabled, true)
     })
 
     it('disables the forward navigation button', function () {
-      const node = wrapper.find('div.backforward > div.navigationButtonContainer .forwardButton').getDOMNode()
+      const node = wrapper.find('[data-test-id="forwardButtonDisabled"]').getDOMNode()
       assert.equal(node.disabled, true)
     })
 

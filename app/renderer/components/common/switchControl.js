@@ -46,7 +46,7 @@ class SwitchControl extends ImmutableComponent {
           ? <span className='switchControlTopText' data-l10n-id={this.props.topl10nId} />
           : null
         }
-        <div className={cx({
+        <div data-test-id='switchBackground' className={cx({
           switchBackground: true,
           switchedOn: this.props.checkedOn,
           [this.props.backgroundClassName]: !!this.props.backgroundClassName

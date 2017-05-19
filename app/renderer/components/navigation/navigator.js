@@ -213,12 +213,18 @@ class Navigator extends React.Component {
             backforward: true,
             fullscreen: isFullScreen()
           })}>
-            <div className={cx({
-              navigationButtonContainer: true,
-              nav: true,
-              disabled: !this.props.canGoBack
-            })}>
+            <div data-test-id={
+              !this.props.canGoBack
+                ? 'navigationBackButtonDisabled'
+                : 'navigationBackButton'
+              }
+              className={cx({
+                navigationButtonContainer: true,
+                nav: true,
+                disabled: !this.props.canGoBack
+              })}>
               <LongPressButton
+                testId={!this.props.canGoBack ? 'backButtonDisabled' : 'backButton'}
                 l10nId='backButton'
                 className='normalizeButton navigationButton backButton'
                 disabled={!this.props.canGoBack}
@@ -226,12 +232,18 @@ class Navigator extends React.Component {
                 onLongPress={this.onBackLongPress}
               />
             </div>
-            <div className={cx({
-              navigationButtonContainer: true,
-              nav: true,
-              disabled: !this.props.canGoForward
-            })}>
+            <div data-test-id={
+              !this.props.canGoForward
+                ? 'navigationForwardButtonDisabled'
+                : 'navigationForwardButton'
+              }
+              className={cx({
+                navigationButtonContainer: true,
+                nav: true,
+                disabled: !this.props.canGoForward
+              })}>
               <LongPressButton
+                testId={!this.props.canGoForward ? 'forwardButtonDisabled' : 'forwardButton'}
                 l10nId='forwardButton'
                 className='normalizeButton navigationButton forwardButton'
                 disabled={!this.props.canGoForward}

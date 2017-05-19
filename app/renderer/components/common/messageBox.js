@@ -121,7 +121,7 @@ class MessageBox extends React.Component {
   }
 
   render () {
-    return <Dialog className={css(styles.dialog)}>
+    return <Dialog testId='messageBoxDialog' className={css(styles.dialog)}>
       <div data-test-id={'msgBoxTab_' + this.props.tabId}
         onKeyDown={this.onKeyDown}
         className={css(
@@ -138,6 +138,7 @@ class MessageBox extends React.Component {
           {
             this.props.showSuppress
               ? <SwitchControl
+                testId='showSuppressSwitch'
                 // TODO: refactor SwitchControl
                 className={css(
                   commonStyles.noPaddingLeft,

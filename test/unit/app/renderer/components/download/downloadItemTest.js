@@ -91,16 +91,16 @@ describe('downloadItem component', function () {
       })
 
       it('filename exists and matches download filename', function () {
-        assert.equal(this.result.find('.downloadFilename').text(), this.download.get('filename'))
+        assert.equal(this.result.find('[data-test-id="downloadFilename"]').text(), this.download.get('filename'))
       })
 
       it('origin exists and matches download origin', function () {
-        assert.equal(this.result.find('.downloadOrigin').text(), 'http://www.bradrichter.com')
+        assert.equal(this.result.find('[data-test-id="downloadOrigin"]').text(), 'http://www.bradrichter.com')
       })
 
       const shouldProgressBarExist = [downloadStates.IN_PROGRESS, downloadStates.PAUSED].includes(state)
       it(shouldProgressBarExist ? 'progress bar should exist' : 'progress bar should not exist', function () {
-        assert.equal(this.result.find('.downloadProgress').length, shouldProgressBarExist ? 1 : 0)
+        assert.equal(this.result.find('[data-test-id="downloadProgress"]').length, shouldProgressBarExist ? 1 : 0)
       })
 
       const testButton = function (buttonSelector, allowedStates, allowedFn) {
@@ -115,53 +115,53 @@ describe('downloadItem component', function () {
         })
       }
 
-      testButton('.pauseButton', [downloadStates.IN_PROGRESS], function (button) {
+      testButton('[data-test-id="pauseButton"]', [downloadStates.IN_PROGRESS], function (button) {
         const spy = sinon.spy(appActions, 'downloadActionPerformed')
         button.simulate('click')
         assert(spy.withArgs(this.downloadId, PAUSE).calledOnce)
         appActions.downloadActionPerformed.restore()
       })
 
-      testButton('.resumeButton', [downloadStates.PAUSED], function (button) {
+      testButton('[data-test-id="resumeButton"]', [downloadStates.PAUSED], function (button) {
         const spy = sinon.spy(appActions, 'downloadActionPerformed')
         button.simulate('click')
         assert(spy.withArgs(this.downloadId, RESUME).calledOnce)
         appActions.downloadActionPerformed.restore()
       })
 
-      testButton('.cancelButton', [downloadStates.IN_PROGRESS, downloadStates.PAUSED], function (button) {
+      testButton('[data-test-id="cancelButton"]', [downloadStates.IN_PROGRESS, downloadStates.PAUSED], function (button) {
         const spy = sinon.spy(appActions, 'downloadActionPerformed')
         button.simulate('click')
         assert(spy.withArgs(this.downloadId, CANCEL).calledOnce)
         appActions.downloadActionPerformed.restore()
       })
 
-      testButton('.redownloadButton', [downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.COMPLETED], function (button) {
+      testButton('[data-test-id="redownloadButton"]', [downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.COMPLETED], function (button) {
         const spy = sinon.spy(appActions, 'downloadRedownloaded')
         button.simulate('click')
         assert(spy.withArgs(this.downloadId).calledOnce)
         appActions.downloadRedownloaded.restore()
       })
 
-      testButton('.copyLinkButton', Object.values(downloadStates), function (button) {
+      testButton('[data-test-id="copyLinkButton"]', Object.values(downloadStates), function (button) {
         const spy = sinon.spy(appActions, 'downloadCopiedToClipboard')
         button.simulate('click')
         assert(spy.withArgs(this.downloadId).calledOnce)
         appActions.downloadCopiedToClipboard.restore()
       })
 
-      testButton('.revealButton', [downloadStates.IN_PROGRESS, downloadStates.PAUSED, downloadStates.COMPLETED], function (button) {
+      testButton('[data-test-id="revealButton"]', [downloadStates.IN_PROGRESS, downloadStates.PAUSED, downloadStates.COMPLETED], function (button) {
         const spy = sinon.spy(appActions, 'downloadRevealed')
         button.simulate('click')
         assert(spy.withArgs(this.downloadId).calledOnce)
         appActions.downloadRevealed.restore()
       })
 
-      testButton('.deleteButton', [downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.COMPLETED], function (button) {
+      testButton('[data-test-id="deleteButton"]', [downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.COMPLETED], function (button) {
         const spy = sinon.spy(appActions, 'showDownloadDeleteConfirmation')
         try {
           // Confirmation should NOT be visible by default
-          assert.equal(this.result.find('.confirmDeleteButton').length, 0)
+          assert.equal(this.result.find('[data-test-id="confirmDeleteButton"]').length, 0)
 
           // Clicking delete should show confirmation
           button.simulate('click')
@@ -179,7 +179,7 @@ describe('downloadItem component', function () {
             })
           })
 
-          testButton('.confirmDeleteButton', [downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.COMPLETED], function (button) {
+          testButton('[data-test-id="confirmDeleteButton"]', [downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.COMPLETED], function (button) {
             const spy = sinon.spy(appActions, 'downloadDeleted')
             try {
               // Accepting confirmation should delete the item

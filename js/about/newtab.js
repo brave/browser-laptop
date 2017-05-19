@@ -256,13 +256,13 @@ class NewTabPage extends React.Component {
       backgroundProps.style = this.state.backgroundImage.style
       gradientClassName = 'bgGradient'
     }
-    return <div className='dynamicBackground' {...backgroundProps}>
+    return <div data-test-id='dynamicBackground' className='dynamicBackground' {...backgroundProps}>
       {
         this.showImages
           ? <img src={this.state.backgroundImage.source} onError={this.onImageLoadFailed.bind(this)} data-test-id='backgroundImage' />
           : null
       }
-      <div className={gradientClassName} />
+      <div data-test-id={this.showImages ? 'bgGradient' : 'gradient'} className={gradientClassName} />
       <div className='content'>
         <main>
           <div className='statsBar'>

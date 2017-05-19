@@ -103,6 +103,7 @@ class UrlBarIcon extends ImmutableComponent {
       props.onDragStart = this.onDragStart
     }
     return <span
+      data-test-id='urlBarIcon'
       {...props}
       className={this.iconClasses}
       style={this.iconStyles} />

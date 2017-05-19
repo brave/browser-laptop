@@ -193,13 +193,13 @@ describe('NewTab component unit tests', function () {
         })
 
         it('sets backgroundImage for root element to the URL of the image', function () {
-          const node = wrapper.find('.dynamicBackground').node
+          const node = wrapper.find('[data-test-id="dynamicBackground"]').node
           assert.notEqual(node, undefined)
           assert.deepEqual(node.props.style, backgroundImage.style)
         })
 
         it('includes div element with class bgGradient', function () {
-          assert.equal(wrapper.find('.bgGradient').length, 1)
+          assert.equal(wrapper.find('div[data-test-id="bgGradient"]').length, 1)
         })
 
         it('includes img element (used to detect onError)', function () {
@@ -218,7 +218,7 @@ describe('NewTab component unit tests', function () {
         })
 
         it('includes element with class gradient', function () {
-          assert.equal(wrapper.find('.gradient').length, 1)
+          assert.equal(wrapper.find('div[data-test-id="gradient"]').length, 1)
         })
 
         it('does NOT include img element (used to detect onError)', function () {

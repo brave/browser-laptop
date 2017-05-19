@@ -274,7 +274,7 @@ describe('LedgerTable component', function () {
     )
     assert.equal(wrapper.find('[data-tbody-index="0"] [data-test-id="siteName"]').length, 2, '2 pinned')
     assert.equal(wrapper.find('[data-tbody-index="1"] [data-test-id="siteName"]').length, 1, '1 unpinned')
-    assert.equal(wrapper.find('[data-l10n-id="showAll"]').length, 0, 'show all button hidden')
+    assert.equal(wrapper.find('[data-test-id="showAll"]').length, 0, 'show all button hidden')
   })
 
   it('two pinned tabs, no un pinned (there shouldn\'t be any show all button', function () {
@@ -338,7 +338,7 @@ describe('LedgerTable component', function () {
     )
     assert.equal(wrapper.find('[data-tbody-index="0"] [data-test-id="siteName"]').length, 2, '2 pinned')
     assert.equal(wrapper.find('[data-tbody-index="1"] [data-test-id="siteName"]').length, 0, '0 unpinned')
-    assert.equal(wrapper.find('[data-l10n-id="showAll"]').length, 0, 'show all button hidden')
+    assert.equal(wrapper.find('[data-test-id="showAll"]').length, 0, 'show all button hidden')
   })
 
   it('pinned tabs should have exclude disabled', function () {
@@ -378,7 +378,7 @@ describe('LedgerTable component', function () {
         siteSettings={siteSettings}
       />
     )
-    assert.equal(wrapper.find('[data-tbody-index="0"] [data-td-index="2"] .disabled').length, 1, 'exclude disabled')
+    assert.equal(wrapper.find('[data-tbody-index="0"] [data-td-index="2"] [data-test-id="pinnedDisabled"]').length, 1, 'exclude disabled')
   })
 
   it('two pinned tabs (1 banned), 3 unpinned (1 banned)', function () {
@@ -533,6 +533,6 @@ describe('LedgerTable component', function () {
     )
     assert.equal(wrapper.find('[data-tbody-index="0"] [data-test-id="siteName"]').length, 8, '8 pinned')
     assert.equal(wrapper.find('[data-tbody-index="1"] [data-test-id="siteName"]').length, 10, '10 unpinned, 2 hidden')
-    assert.equal(wrapper.find('[data-l10n-id="showAll"]').length, 1, 'show all button visible')
+    assert.equal(wrapper.find('[data-test-id="showAll"]').length, 1, 'show all button visible')
   })
 })

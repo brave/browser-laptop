@@ -68,7 +68,7 @@ describe('MessageBox component unit tests', function () {
           tabId={tabId}
         />
       )
-      assert.equal(wrapper.find('div.dialog').length, 1)
+      assert.equal(wrapper.find('[data-test-id="messageBoxDialog"]').length, 1)
     })
 
     it('renders the suppress checkbox if showSuppress is true', function () {
@@ -77,7 +77,7 @@ describe('MessageBox component unit tests', function () {
           tabId={tabId}
         />
       )
-      assert.equal(wrapper.find('div.switchControl').length, 1)
+      assert.equal(wrapper.find('[data-test-id="showSuppressSwitch"]').length, 1)
     })
 
     it('renders the button index 0 as primaryButton', function () {
@@ -106,7 +106,7 @@ describe('MessageBox component unit tests', function () {
           tabId={tabId}
         />
       )
-      assert.equal(wrapper.find('div.switchControl').length, 0)
+      assert.equal(wrapper.find('[data-test-id="showSuppressSwitch"]').length, 0)
     })
   })
 
@@ -122,7 +122,7 @@ describe('MessageBox component unit tests', function () {
           tabId={tabId}
         />
       )
-      wrapper.find('.switchBackground').simulate('click')
+      wrapper.find('[data-test-id="switchBackground"]').simulate('click')
       assert.equal(spy.calledOnce, true)
       appActions.tabMessageBoxUpdated.restore()
     })

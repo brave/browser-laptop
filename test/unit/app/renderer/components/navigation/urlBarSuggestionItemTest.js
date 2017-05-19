@@ -53,19 +53,19 @@ describe('UrlBarSuggestionItem component', function () {
 
       it('renders the suggestion title', function () {
         if (suggestionType !== suggestionTypes.TOP_SITE) {
-          assert.equal(this.result.find('.suggestionTitle').length, 1)
-          assert.equal(this.result.find('.suggestionTitle').text(), this.suggestion.get('title'))
+          assert.equal(this.result.find('[data-test-id="suggestionTitle"]').length, 1)
+          assert.equal(this.result.find('[data-test-id="suggestionTitle"]').text(), this.suggestion.get('title'))
         } else {
-          assert.equal(this.result.find('.suggestionTitle').length, 0)
+          assert.equal(this.result.find('[data-test-id="suggestionTitle"]').length, 0)
         }
       })
 
       it('renders a suggestion URL', function () {
         if (suggestionType !== suggestionTypes.SEARCH && suggestionType !== suggestionTypes.ABOUT_PAGES) {
-          assert.equal(this.result.find('.suggestionLocation').length, 1)
-          assert.equal(this.result.find('.suggestionLocation').text(), this.suggestion.get('location'))
+          assert.equal(this.result.find('[data-test-id="suggestionLocation"]').length, 1)
+          assert.equal(this.result.find('[data-test-id="suggestionLocation"]').text(), this.suggestion.get('location'))
         } else {
-          assert.equal(this.result.find('.suggestionLocation').length, 0)
+          assert.equal(this.result.find('[data-test-id="suggestionLocation"]').length, 0)
         }
       })
 

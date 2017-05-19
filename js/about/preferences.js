@@ -155,7 +155,7 @@ class GeneralTab extends ImmutableComponent {
 
     const defaultZoomSetting = getSetting(settings.DEFAULT_ZOOM_LEVEL, this.props.settings)
     return <SettingsList>
-      <DefaultSectionTitle data-l10n-id='generalSettings' />
+      <DefaultSectionTitle data-test-id='generalSettings' data-l10n-id='generalSettings' />
       <SettingsList>
         <SettingItem dataL10nId='startsWith'>
           <SettingDropdown value={getSetting(settings.STARTUP_MODE, this.props.settings)}
@@ -314,7 +314,7 @@ class SearchTab extends ImmutableComponent {
 
   render () {
     return <div>
-      <DefaultSectionTitle data-l10n-id='searchSettings' />
+      <DefaultSectionTitle data-test-id='searchSettings' data-l10n-id='searchSettings' />
       <SortableTable headings={['default', 'searchEngine', 'engineGoKey']} rows={this.searchProviders}
         defaultHeading='searchEngine'
         addHoverClass onClick={this.hoverCallback.bind(this)}

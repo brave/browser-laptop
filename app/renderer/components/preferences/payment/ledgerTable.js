@@ -182,6 +182,7 @@ class LedgerTable extends ImmutableComponent {
             disabled
             checkedOn
             indicatorClassName={css(styles.pinnedToggle)}
+            testId='pinnedDisabled'
             onClick={() => {}}
           />
           : <SiteSettingCheckbox small
@@ -303,6 +304,7 @@ class LedgerTable extends ImmutableComponent {
         (totalUnPinnedRows !== unPinnedRows.size && hideLower)
         ? <div className={css(styles.ledgerTable__showAllWrap)}>
           <BrowserButton secondaryColor
+            testId={hideLower ? 'showAll' : 'hideLower'}
             l10nId={hideLower ? 'showAll' : 'hideLower'}
             onClick={this.showAll.bind(this, !hideLower)}
           />
