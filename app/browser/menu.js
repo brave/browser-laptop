@@ -26,7 +26,7 @@ const menuUtil = require('../common/lib/menuUtil')
 const {getByTabId} = require('../common/state/tabState')
 const getSetting = require('../../js/settings').getSetting
 const locale = require('../locale')
-const {isSiteBookmarked, siteSort} = require('../../js/state/siteUtil')
+const {isLocationBookmarked, siteSort} = require('../../js/state/siteUtil')
 const tabState = require('../../app/common/state/tabState')
 const isDarwin = process.platform === 'darwin'
 const isLinux = process.platform === 'linux'
@@ -351,7 +351,7 @@ const createHistorySubmenu = () => {
 }
 
 const isCurrentLocationBookmarked = () => {
-  return isSiteBookmarked(appStore.getState().get('sites'), Immutable.fromJS({location: currentLocation}))
+  return isLocationBookmarked(appStore.getState(), currentLocation)
 }
 
 const createBookmarksSubmenu = () => {
