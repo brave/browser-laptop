@@ -238,7 +238,7 @@ class BraveryPanel extends ImmutableComponent {
         <div className='braveryPanelBody'>
           <ul>
             {
-              this.isBlockedAdsShown
+              this.isBlockedAdsShown && (this.isBlockingAds || this.isBlockingTrackedContent)
               ? <li><ul>
                 {
                   this.isBlockingAds
