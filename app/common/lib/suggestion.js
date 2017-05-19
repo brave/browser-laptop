@@ -234,8 +234,8 @@ const getSortByDomain = (userInputLower, userInputHost) => {
     // any count or frequency calculation.
     // Note that for parsed URLs that are not complete, the pathname contains
     // what the user is entering as the host and the host is null.
-    const host1 = s1.parsedUrl.host || s1.parsedUrl.pathname
-    const host2 = s2.parsedUrl.host || s2.parsedUrl.pathname
+    const host1 = s1.parsedUrl.host || s1.parsedUrl.pathname || s1.location || ''
+    const host2 = s2.parsedUrl.host || s2.parsedUrl.pathname || s2.location || ''
 
     let pos1 = host1.indexOf(userInputHost)
     let pos2 = host2.indexOf(userInputHost)
