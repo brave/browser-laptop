@@ -469,6 +469,7 @@ app.on('ready', () => {
 
       // This is fired by a menu entry
       process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
+      ipcMain.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
 
       // This is fired from a auto-update metadata call
       process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => {
