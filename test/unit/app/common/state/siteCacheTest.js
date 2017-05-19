@@ -1,12 +1,10 @@
 /* global describe, it */
 
-const siteTags = require('../../../js/constants/siteTags')
-const siteCache = require('../../../js/state/siteCache')
-const siteUtil = require('../../../js/state/siteUtil')
+const siteTags = require('../../../../../js/constants/siteTags')
+const siteCache = require('../../../../../app/common/state/siteCache')
+const siteUtil = require('../../../../../js/state/siteUtil')
 const assert = require('assert')
 const Immutable = require('immutable')
-// const mockery = require('mockery')
-// const settings = require('../../../js/constants/settings')
 
 describe('siteCache', function () {
   const testUrl1 = 'https://brave.com/'
