@@ -250,6 +250,9 @@ describe('suggestion unit tests', function () {
       it('simple domain gets matched higher', function () {
         assert(this.sort('https://www.google.com', 'https://www.google.com/extra') < 0)
       })
+      it('does not throw error for file:// URL', function () {
+        assert(this.sort('https://google.com', 'file://') < 0)
+      })
     })
     describe('getSortForSuggestions', function () {
       describe('with url entered as path', function () {
