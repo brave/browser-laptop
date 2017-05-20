@@ -297,7 +297,7 @@ module.exports.addSite = function (state, siteDetail, tag, originalSiteDetail, s
         site.get('parentFolderId') === siteDetail.get('parentFolderId') &&
         site.get('customTitle') === siteDetail.get('customTitle'))
       if (dupFolder) {
-        sites = module.exports.removeSite(sites, dupFolder, siteTags.BOOKMARK_FOLDER, true)
+        state = module.exports.removeSite(state, dupFolder, siteTags.BOOKMARK_FOLDER, true)
       }
     } else if (!folderId) {
       // Assign an id if this is a new folder

@@ -269,6 +269,15 @@ describe('siteUtil', function () {
           const folderId = state.getIn(['sites', processedKey, 'folderId'])
           assert.equal(folderId, 1)
         })
+        it('allows duplicate folders for site add', function () {
+          let state = emptyState
+          state = siteUtil.addSite(state, folderMinFields, siteTags.BOOKMARK_FOLDER)
+          const folderMinFieldsWithId = folderMinFields.set('folderId', 1)
+          state = siteUtil.addSite(state, folderMinFieldsWithId, siteTags.BOOKMARK_FOLDER, folderMinFieldsWithId.set('folderId', 9))
+          const processedKey = siteUtil.getSiteKey(folderMinFieldsWithId)
+          const folderId = state.getIn(['sites', processedKey, 'folderId'])
+          assert.equal(folderId, 1)
+        })
         it('allows for new folders to use the same customTitle as an existing folder', function () {
           // Add a new bookmark folder
           let state = siteUtil.addSite(emptyState, folderMinFields)
