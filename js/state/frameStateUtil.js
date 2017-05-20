@@ -94,6 +94,20 @@ function getFrameKeysByDisplayIndex (state) {
   }, [])
 }
 
+function getFrameKeysByNonPinnedDisplayIndex (state) {
+  return state.get('frames')
+    .filter((frame) => !frame.get('pinnedLocation'))
+    .map((frame) => frame.get('key'))
+}
+
+ /**
+ * Obtains the display index for the specified frame key excluding pins
+ */
+function findNonPinnedDisplayIndexForFrameKey (state, key) {
+  return getFrameKeysByNonPinnedDisplayIndex(state)
+    .findIndex((displayKey) => displayKey === key)
+}
+
 function getFrameByDisplayIndex (state, i) {
   let frames = getFrameKeysByDisplayIndex(state)
   let key = frames[i]
@@ -460,7 +474,7 @@ function removeFrame (state, frameProps, activeFrameKey, framePropsIndex, closeA
 
 function getFrameTabPageIndex (state, frameProps, tabsPerTabPage) {
   frameProps = makeImmutable(frameProps)
-  const index = getFrameIndex(state, frameProps.get('key'))
+  const index = findNonPinnedDisplayIndexForFrameKey(state, frameProps.get('key'))
   if (index === -1) {
     return -1
   }
