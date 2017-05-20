@@ -78,6 +78,26 @@ describe('noscript info', function () {
       .loadUrl(this.url)
       .waitForTextValue(result, '2')
   })
+
+  it('can allow scripts on a file:// URL without allowing all scripts', function * () {
+    const fileUrl = Brave.fixtureUrl('noscript2.html')
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(fileUrl)
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForVisible(noScriptNavButton)
+      .click(noScriptNavButton)
+      .waitForVisible(noScriptAllowTempButton)
+      .click(noScriptAllowTempButton)
+      .tabByIndex(0)
+      .loadUrl(fileUrl)
+      .waitForTextValue(result, 'scripts running')
+      .windowByUrl(Brave.browserWindowUrl)
+      .tabByIndex(0)
+      .loadUrl(this.url)
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForVisible(noScriptNavButton)
+  })
 })
 
 describe('noscript', function () {

@@ -22,12 +22,18 @@ const net = require('net')
 
 // backward compatibility with appState siteSettings
 const parseSiteSettingsPattern = (pattern) => {
+  if (pattern === 'file:///') {
+    return 'file:///*'
+  }
   let normalizedPattern = pattern.replace('https?', 'https')
   let parsed = urlParse(normalizedPattern)
   if (net.isIP(parsed.hostname)) {
     return parsed.host
-  } else {
+  } else if (parsed.host) {
     return '[*.]' + parsed.host
+  } else {
+    // Probably won't match anything. Fail closed.
+    return pattern
   }
 }
 
@@ -237,7 +243,7 @@ const siteSettingsToContentSettings = (currentSiteSettings, defaultContentSettin
       noScriptExceptions.forEach((value, origin) => {
         if (value === false) {
           contentSettings = addContentSettings(contentSettings, 'javascript',
-            primaryPattern, origin, 'block')
+            primaryPattern, origin === 'file:///' ? 'file:///*' : origin, 'block')
         }
       })
     } else if (noScriptExceptions && noScriptExceptions.size) {
