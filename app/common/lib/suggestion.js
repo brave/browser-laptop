@@ -234,8 +234,10 @@ const getSortByDomain = (userInputLower, userInputHost) => {
     // any count or frequency calculation.
     // Note that for parsed URLs that are not complete, the pathname contains
     // what the user is entering as the host and the host is null.
-    const host1 = s1.parsedUrl.host || s1.parsedUrl.pathname || s1.location || ''
-    const host2 = s2.parsedUrl.host || s2.parsedUrl.pathname || s2.location || ''
+    let host1 = s1.parsedUrl.host || s1.parsedUrl.pathname || s1.location || ''
+    let host2 = s2.parsedUrl.host || s2.parsedUrl.pathname || s2.location || ''
+    host1 = host1.replace('www.', '')
+    host2 = host2.replace('www.', '')
 
     let pos1 = host1.indexOf(userInputHost)
     let pos2 = host2.indexOf(userInputHost)
@@ -253,18 +255,6 @@ const getSortByDomain = (userInputLower, userInputHost) => {
       }
       if (pos1 !== 0 && pos2 === 0) {
         return 2
-      }
-
-      // Try the same to see if taking off www. helps.
-      if (!userInputLower.startsWith('www.')) {
-        pos1 = host1.indexOf('www.' + userInputLower)
-        pos2 = host2.indexOf('www.' + userInputLower)
-        if (pos1 === 0 && pos2 !== 0) {
-          return -1
-        }
-        if (pos1 !== 0 && pos2 === 0) {
-          return 1
-        }
       }
 
       const sortBySimpleURLResult = sortBySimpleURL(s1, s2)
@@ -300,6 +290,25 @@ const sortBySimpleURL = (s1, s2) => {
     if (!url1IsSecure && url2IsSecure) {
       return 1
     }
+
+    // Prefer smaller less complicated domains
+    const parts1 = s1.parsedUrl.hostname.split('.')
+    const parts2 = s2.parsedUrl.hostname.split('.')
+    let parts1Size = parts1.length
+    let parts2Size = parts2.length
+    if (parts1[0] === 'www') {
+      parts1Size--
+    }
+    if (parts2[0] === 'www') {
+      parts2Size--
+    }
+    if (parts1Size < parts2Size) {
+      return -1
+    }
+    if (parts1Size > parts2Size) {
+      return 1
+    }
+    return sortByAccessCountWithAgeDecay(s1, s2)
   }
   return 0
 }
@@ -333,7 +342,6 @@ const getSortForSuggestions = (userInputLower) => {
   const userInputValue = userInputParts[1] || ''
   const sortByDomain = getSortByDomain(userInputLower, userInputHost)
   const sortByPath = getSortByPath(userInputLower)
-  const {sortByAccessCountWithAgeDecay} = require('./suggestion')
 
   return (s1, s2) => {
     s1.parsedUrl = s1.parsedUrl || urlParse(getURL(s1) || '')
