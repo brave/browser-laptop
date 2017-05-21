@@ -28,7 +28,8 @@ class SwitchControl extends ImmutableComponent {
       disabled: this.props.disabled,
       large: this.props.large,
       small: this.props.small,
-      hasTopText: this.props.topl10nId
+      hasTopText: this.props.topl10nId,
+      [this.props.customWrapper]: !!this.props.customWrapper
     })}
       data-switch-status={this.props.checkedOn}
       data-test-id={this.props.testId}
@@ -43,7 +44,10 @@ class SwitchControl extends ImmutableComponent {
       <div className='switchMiddle'>
         {
           this.props.topl10nId
-          ? <span className='switchControlTopText' data-l10n-id={this.props.topl10nId} />
+          ? <span className={cx({
+            switchControlTopText: true,
+            [this.props.customTopText]: !!this.props.customTopText
+          })} data-l10n-id={this.props.topl10nId} />
           : null
         }
         <div data-test-id='switchBackground' className={cx({
@@ -64,9 +68,26 @@ class SwitchControl extends ImmutableComponent {
           {(this.props.rightl10nId || this.props.rightText) && !this.props.onInfoClick
           ? <span className='switchControlRightText' data-l10n-id={this.props.rightl10nId} data-l10n-args={this.props.rightl10nArgs}>{this.props.rightText || ''}</span>
           : null}
-          {(this.props.rightl10nId || this.props.rightText) && this.props.onInfoClick
-          ? <div className='switchControlRightText'><span data-l10n-id={this.props.rightl10nId} data-l10n-args={this.props.rightl10nArgs}>{this.props.rightText}</span><span className='fa fa-question-circle info clickable' onClick={this.props.onInfoClick} title={this.props.infoTitle} /></div>
-          : null}
+          {
+            (this.props.rightl10nId || this.props.rightText) && this.props.onInfoClick
+            ? <div className='switchControlRightText'>
+              <span data-l10n-id={this.props.rightl10nId}
+                data-l10n-args={this.props.rightl10nArgs}>
+                {this.props.rightText}
+              </span>
+              <span className={cx({
+                fa: true,
+                'fa-question-circle': true,
+                info: true,
+                clickable: true,
+                [this.props.customInfoButton]: !!this.props.customInfoButton
+              })}
+                onClick={this.props.onInfoClick}
+                title={this.props.infoTitle}
+              />
+            </div>
+            : null
+          }
         </div>
       }
     </div>

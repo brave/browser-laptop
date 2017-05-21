@@ -9,7 +9,7 @@ const Immutable = require('immutable')
 const ImmutableComponent = require('../immutableComponent')
 const Dialog = require('../common/dialog')
 const SwitchControl = require('../common/switchControl')
-const {FormDropdown} = require('../common/dropdown')
+const {BraveryPanelDropdown} = require('../common/dropdown')
 
 // Constants
 const config = require('../../../../js/constants/config')
@@ -25,8 +25,9 @@ const cx = require('../../../../js/lib/classSet')
 const siteUtil = require('../../../../js/state/siteUtil')
 const getSetting = require('../../../../js/settings').getSetting
 
-// TODO: Add no-important
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../styles/global')
+const commonStyles = require('../styles/commonStyles')
 
 class BraveryPanel extends ImmutableComponent {
   constructor () {
@@ -176,24 +177,22 @@ class BraveryPanel extends ImmutableComponent {
 
   get compactBraveryPanelHeader () {
     const shieldsUp = this.props.braverySettings.shieldsUp
-    return <section className={cx({
-      braveryPanelHeader: true,
-      [css(styles.braveryPanel_compact__header)]: true
-    })}>
-      <div data-l10n-id='braveryPanelTitle' className={cx({
-        braveryPanelHeaderLeft: true,
-        [css(styles.braveryPanel_compact__header_top)]: true
-      })} />
-      <div className={cx({
-        braveryPanelHeaderRight: true,
-        [css(styles.braveryPanel_compact__header_bottom)]: true
-      })}>
+    return <section className={css(
+      styles.braveryPanel__header,
+      styles.braveryPanel_compact__header
+    )}>
+      <div data-l10n-id='braveryPanelTitle' className={css(
+        styles.braveryPanel__header_left,
+        styles.braveryPanel_compact__header_top
+      )} />
+      <div className={css(
+        styles.braveryPanel__header_right,
+        styles.braveryPanel_compact__header_bottom
+      )}>
         <div title={this.displayHost} className={css(styles.braveryPanel_compact__header__displayHost)}>{this.displayHost}</div>
-        <div className={cx({
-          braveryShieldsUpDown: true,
-          [css(styles.braveryPanel_compact__header_bottom__shieldsSwitch)]: true
-        })}>
+        <div className={css(styles.braveryPanel_compact__header_bottom__shieldsSwitch)}>
           <SwitchControl large
+            customWrapper={css(styles.braveryPanel_compact__header_bottom__shieldsSwitch__switchControl)}
             onClick={this.onToggleShields}
             leftl10nId='shieldsDown'
             rightl10nId='shieldsUp'
@@ -206,21 +205,21 @@ class BraveryPanel extends ImmutableComponent {
 
   get defaultBraveryPanelHeader () {
     const shieldsUp = this.props.braverySettings.shieldsUp
-    return <section className='braveryPanelHeader'>
-      <div className='braveryPanelHeaderLeft'>
+    return <section className={css(styles.braveryPanel__header)}>
+      <div className={css(styles.braveryPanel__header_left)}>
         <div data-l10n-id='braveryPanelTitle' />
         <div title={this.displayHost} className={css(styles.braveryPanel__header__displayHost)}>{this.displayHost}</div>
       </div>
-      <div className='braveryPanelHeaderRight'>
-        <div className='braveryShieldsUpDown'>
-          <SwitchControl large
-            onClick={this.onToggleShields}
-            leftl10nId='shieldsDown'
-            rightl10nId='shieldsUp'
-            topl10nId='shields'
-            checkedOn={shieldsUp}
-          />
-        </div>
+      <div className={css(styles.braveryPanel__header_right)}>
+        <SwitchControl large
+          customWrapper={css(styles.braveryPanel__header_right__switchControl)}
+          customTopText={css(styles.braveryPanel__header_right__switchControl__topText)}
+          onClick={this.onToggleShields}
+          leftl10nId='shieldsDown'
+          rightl10nId='shieldsUp'
+          topl10nId='shields'
+          checkedOn={shieldsUp}
+        />
       </div>
     </section>
   }
@@ -243,11 +242,12 @@ class BraveryPanel extends ImmutableComponent {
     })
     const compactBraveryPanel = getSetting(settings.COMPACT_BRAVERY_PANEL)
 
-    return <Dialog onHide={this.props.onHide} className='braveryPanelContainer' testId='braveryPanelContainer' isClickDismiss>
-      <div className={cx({
-        braveryPanel: true,
-        [css(styles.braveryPanel_compact)]: compactBraveryPanel
-      })}
+    return <Dialog onHide={this.props.onHide} testId='braveryPanelContainer' isClickDismiss>
+      <div className={css(
+        commonStyles.flyoutDialog,
+        styles.braveryPanel,
+        compactBraveryPanel && styles.braveryPanel_compact
+      )}
         onClick={(e) => e.stopPropagation()}
         data-test-id={compactBraveryPanel ? 'braveryPanelCompact' : 'braveryPanel'}>
         {
@@ -255,66 +255,61 @@ class BraveryPanel extends ImmutableComponent {
           ? this.compactBraveryPanelHeader
           : this.defaultBraveryPanelHeader
         }
-        <section className={cx({
-          braveryPanelStats: true,
-          [css(styles.braveryPanel__stats)]: true,
-          [css(styles.braveryPanel_compact__stats)]: compactBraveryPanel
-        })}>
+        <section className={css(
+          styles.braveryPanel__stats,
+          compactBraveryPanel && styles.braveryPanel_compact__stats
+        )}>
           <div data-test-id='adsBlockedStat'
             onClick={this.onToggleAdsAndTracking}
             className={cx({
-              statClickable: !!adsBlockedStat,
-              statDisabled: !shieldsUp || adControl === 'allowAdsAndTracking',
-              braveryStat: true,
-              adsBlockedStat: true,
+              [css(styles.braveryPanel__stats__item_count_clickable)]: !!adsBlockedStat,
+              [css(styles.braveryPanel__stats__item_count_disabled)]: !shieldsUp || adControl === 'allowAdsAndTracking',
               [css(gridStyles.row1col1)]: !compactBraveryPanel,
               [css(gridStyles.row1col1)]: compactBraveryPanel,
-              [css(styles.braveryPanel__stats__item)]: !compactBraveryPanel,
+              [css(styles.braveryPanel__stats__item_count_adsBlockedStat)]: true,
+              [css(styles.braveryPanel__stats__item, styles.braveryPanel__stats__item_count)]: !compactBraveryPanel,
               [css(styles.braveryPanel_compact__stats__item_count)]: compactBraveryPanel
             })}>{adsBlockedStat}</div>
 
           <div data-test-id='redirectedResourcesStat'
             onClick={this.onToggleHttpseList}
             className={cx({
-              statClickable: !!this.redirectedResourcesSet.size,
-              statDisabled: !shieldsUp || !httpseEnabled,
-              braveryStat: true,
-              redirectedResourcesStat: true,
+              [css(styles.braveryPanel__stats__item_count_clickable)]: !!this.redirectedResourcesSet.size,
+              [css(styles.braveryPanel__stats__item_count_disabled)]: !shieldsUp || !httpseEnabled,
               [css(gridStyles.row1col2)]: !compactBraveryPanel,
               [css(gridStyles.row2col1)]: compactBraveryPanel,
-              [css(styles.braveryPanel__stats__item)]: !compactBraveryPanel,
+              [css(styles.braveryPanel__stats__item_count_redirectedResourcesStat)]: true,
+              [css(styles.braveryPanel__stats__item, styles.braveryPanel__stats__item_count)]: !compactBraveryPanel,
               [css(styles.braveryPanel_compact__stats__item_count)]: compactBraveryPanel
             })}>{httpsUpgradedResourceStat}</div>
 
           <div data-test-id='noScriptStat'
             onClick={this.onToggleNoScriptList}
             className={cx({
-              statClickable: !!scriptsBlockedStat,
-              statDisabled: !shieldsUp || !noScriptEnabled,
-              braveryStat: true,
-              noScriptStat: true,
+              [css(styles.braveryPanel__stats__item_count_clickable)]: !!scriptsBlockedStat,
+              [css(styles.braveryPanel__stats__item_count_disabled)]: !shieldsUp || !noScriptEnabled,
               [css(gridStyles.row1col3)]: !compactBraveryPanel,
               [css(gridStyles.row3col1)]: compactBraveryPanel,
-              [css(styles.braveryPanel__stats__item)]: !compactBraveryPanel,
+              [css(styles.braveryPanel__stats__item_count_noScriptStat)]: true,
+              [css(styles.braveryPanel__stats__item, styles.braveryPanel__stats__item_count)]: !compactBraveryPanel,
               [css(styles.braveryPanel_compact__stats__item_count)]: compactBraveryPanel
             })}>{scriptsBlockedStat}</div>
 
           <div data-test-id='fpStat'
             onClick={this.onToggleFpList}
             className={cx({
-              statClickable: !!fpBlockedStat,
-              statDisabled: !shieldsUp || !fpEnabled,
-              braveryStat: true,
-              fpStat: true,
+              [css(styles.braveryPanel__stats__item_count_clickable)]: !!fpBlockedStat,
+              [css(styles.braveryPanel__stats__item_count_disabled)]: !shieldsUp || !fpEnabled,
               [css(gridStyles.row1col4)]: !compactBraveryPanel,
               [css(gridStyles.row4col1)]: compactBraveryPanel,
-              [css(styles.braveryPanel__stats__item)]: !compactBraveryPanel,
+              [css(styles.braveryPanel__stats__item_count_fpStat)]: true,
+              [css(styles.braveryPanel__stats__item, styles.braveryPanel__stats__item_count)]: !compactBraveryPanel,
               [css(styles.braveryPanel_compact__stats__item_count)]: compactBraveryPanel
             })}>{fpBlockedStat}</div>
 
           <span className={cx({
-            statClickable: !!adsBlockedStat,
-            statDisabled: !shieldsUp || adControl === 'allowAdsAndTracking',
+            [css(styles.braveryPanel__stats__item_count_clickable)]: !!adsBlockedStat,
+            [css(styles.braveryPanel__stats__item_count_disabled)]: !shieldsUp || adControl === 'allowAdsAndTracking',
             [css(gridStyles.row2col1)]: !compactBraveryPanel,
             [css(gridStyles.row1col2)]: compactBraveryPanel,
             [css(styles.braveryPanel__stats__item)]: !compactBraveryPanel,
@@ -325,8 +320,8 @@ class BraveryPanel extends ImmutableComponent {
             data-l10n-args={l10nArgs}
           />
           <span className={cx({
-            statClickable: !!this.redirectedResourcesSet.size,
-            statDisabled: !shieldsUp || !httpseEnabled,
+            [css(styles.braveryPanel__stats__item_count_clickable)]: !!this.redirectedResourcesSet.size,
+            [css(styles.braveryPanel__stats__item_count_disabled)]: !shieldsUp || !httpseEnabled,
             [css(gridStyles.row2col2)]: !compactBraveryPanel,
             [css(gridStyles.row2col2)]: compactBraveryPanel,
             [css(styles.braveryPanel__stats__item)]: !compactBraveryPanel,
@@ -337,8 +332,8 @@ class BraveryPanel extends ImmutableComponent {
             data-l10n-args={l10nArgs}
           />
           <span className={cx({
-            statClickable: !!scriptsBlockedStat,
-            statDisabled: !shieldsUp || !noScriptEnabled,
+            [css(styles.braveryPanel__stats__item_count_clickable)]: !!scriptsBlockedStat,
+            [css(styles.braveryPanel__stats__item_count_disabled)]: !shieldsUp || !noScriptEnabled,
             [css(gridStyles.row2col3)]: !compactBraveryPanel,
             [css(gridStyles.row3col2)]: compactBraveryPanel,
             [css(styles.braveryPanel__stats__item)]: !compactBraveryPanel,
@@ -349,8 +344,8 @@ class BraveryPanel extends ImmutableComponent {
             data-l10n-args={l10nArgs}
           />
           <span className={cx({
-            statClickable: !!fpBlockedStat,
-            statDisabled: !shieldsUp || !fpEnabled,
+            [css(styles.braveryPanel__stats__item_count_clickable)]: !!fpBlockedStat,
+            [css(styles.braveryPanel__stats__item_count_disabled)]: !shieldsUp || !fpEnabled,
             [css(gridStyles.row2col4)]: !compactBraveryPanel,
             [css(gridStyles.row4col2)]: compactBraveryPanel,
             [css(styles.braveryPanel__stats__item)]: !compactBraveryPanel,
@@ -362,22 +357,25 @@ class BraveryPanel extends ImmutableComponent {
           />
         </section>
 
-        <section className={cx({
-          braveryPanelBody: true,
-          [css(styles.braveryPanel_compact__body)]: compactBraveryPanel
-        })}>
+        <section className={css(
+          styles.braveryPanel__body,
+          compactBraveryPanel && styles.braveryPanel_compact__body
+        )}>
           {
             (this.isBlockedAdsShown && (this.isBlockingAds || this.isBlockingTrackedContent))
             ? <ul data-test-id='braveryPanelBodyList'
-              className={cx({
-                [css(styles.braveryPanel__body__ul)]: true,
-                [css(styles.braveryPanel_compact__body__ul)]: compactBraveryPanel
-              })}>
+              className={css(
+                styles.braveryPanel__body__ul,
+                compactBraveryPanel && styles.braveryPanel_compact__body__ul
+              )}>
               {
                 this.isBlockingAds
                 ? this.blockedAds.map(site =>
                   <li data-test-id='braveryPanelBodyList'
-                    className={css(compactBraveryPanel && styles.braveryPanel_compact__body__ul__li)}
+                    className={css(
+                      styles.braveryPanel__body__ul__li,
+                      compactBraveryPanel && styles.braveryPanel_compact__body__ul__li
+                    )}
                     key={site}>{site}</li>)
                 : null
               }
@@ -385,7 +383,10 @@ class BraveryPanel extends ImmutableComponent {
                 this.isBlockingTrackedContent
                 ? this.blockedByTrackingList.map(site =>
                   <li data-test-id='braveryPanelBodyList'
-                    className={css(compactBraveryPanel && styles.braveryPanel_compact__body__ul__li)}
+                    className={css(
+                      styles.braveryPanel__body__ul__li,
+                      compactBraveryPanel && styles.braveryPanel_compact__body__ul__li
+                    )}
                     key={site}>{site}</li>)
                 : null
               }
@@ -395,14 +396,17 @@ class BraveryPanel extends ImmutableComponent {
           {
             this.isRedirectingResources && this.isHttpseShown
             ? <ul data-test-id='braveryPanelBodyList'
-              className={cx({
-                [css(styles.braveryPanel__body__ul)]: true,
-                [css(styles.braveryPanel_compact__body__ul)]: compactBraveryPanel
-              })}>
+              className={css(
+                styles.braveryPanel__body__ul,
+                compactBraveryPanel && styles.braveryPanel_compact__body__ul
+              )}>
               {
                 this.redirectedResourcesSet.map((site) =>
                   <li data-test-id='braveryPanelBodyList'
-                    className={css(compactBraveryPanel && styles.braveryPanel_compact__body__ul__li)}
+                    className={css(
+                      styles.braveryPanel__body__ul__li,
+                      compactBraveryPanel && styles.braveryPanel_compact__body__ul__li
+                    )}
                     key={site}>{site}</li>)
               }
             </ul>
@@ -411,14 +415,17 @@ class BraveryPanel extends ImmutableComponent {
           {
             this.isBlockingScripts && this.isBlockedScriptsShown
             ? <ul data-test-id='braveryPanelBodyList'
-              className={cx({
-                [css(styles.braveryPanel__body__ul)]: true,
-                [css(styles.braveryPanel_compact__body__ul)]: compactBraveryPanel
-              })}>
+              className={css(
+                styles.braveryPanel__body__ul,
+                compactBraveryPanel && styles.braveryPanel_compact__body__ul
+              )}>
               {
                 this.blockedScripts.map((site) =>
                   <li data-test-id='braveryPanelBodyList'
-                    className={css(compactBraveryPanel && styles.braveryPanel_compact__body__ul__li)}
+                    className={css(
+                      styles.braveryPanel__body__ul__li,
+                      compactBraveryPanel && styles.braveryPanel_compact__body__ul__li
+                    )}
                     key={site}>{site}</li>)
               }
             </ul>
@@ -427,30 +434,32 @@ class BraveryPanel extends ImmutableComponent {
           {
             this.isBlockingFingerprinting && this.isFpShown
             ? <ul data-test-id='braveryPanelBodyList'
-              className={cx({
-                [css(styles.braveryPanel__body__ul)]: true,
-                [css(styles.braveryPanel_compact__body__ul)]: compactBraveryPanel
-              })}>
+              className={css(
+                styles.braveryPanel__body__ul,
+                compactBraveryPanel && styles.braveryPanel_compact__body__ul
+              )}>
               {
                 this.blockedFingerprinting.map((site) =>
                   <li data-test-id='braveryPanelBodyList'
-                    className={css(compactBraveryPanel && styles.braveryPanel_compact__body__ul__li)}
+                    className={css(
+                      styles.braveryPanel__body__ul__li,
+                      compactBraveryPanel && styles.braveryPanel_compact__body__ul__li
+                    )}
                     key={site}>{site}</li>)
               }
             </ul>
             : null
           }
           <div onClick={this.onToggleAdvanced}
-            className={cx({
-              braveryAdvancedTitle: true,
-              disabled: !shieldsUp,
-              [css(styles.braveryPanel_compact__body__advancedTitle)]: compactBraveryPanel
-            })}>
+            className={css(
+              styles.braveryPanel__body__advancedTitle,
+              compactBraveryPanel && styles.braveryPanel_compact__body__advancedTitle
+            )}>
             <div className={cx({
               fa: true,
               'fa-caret-down': this.isAdvancedExpanded,
               'fa-caret-right': !this.isAdvancedExpanded,
-              braveryAdvancedIndicator: true,
+              [css(styles.braveryPanel__body__advancedTitle__indicator)]: true,
               [css(styles.braveryPanel_compact__body__advancedTitle__indicator)]: compactBraveryPanel
             })} />
             <div data-l10n-id='advancedControls' />
@@ -458,16 +467,18 @@ class BraveryPanel extends ImmutableComponent {
           {
             this.isAdvancedExpanded
             ? <section>
-              <hr className={css(compactBraveryPanel && styles.braveryPanel_compact__body__hr)} />
-              <div className={cx({
-                braveryControlGroup: true,
-                [css(styles.braveryPanel__body__advanced__control)]: true,
-                [css(styles.braveryPanel_compact__body__advanced__control)]: compactBraveryPanel
-              })}>
+              <hr className={css(
+                styles.braveryPanel__body__hr,
+                compactBraveryPanel && styles.braveryPanel_compact__body__hr
+              )} />
+              <div className={css(
+                styles.braveryPanel__body__advanced__control,
+                compactBraveryPanel && styles.braveryPanel_compact__body__advanced__control
+              )}>
                 <div data-l10n-id='adControl' className={cx({
-                  braverySelectTitle: true,
                   [css(gridStyles.row1col1)]: true,
                   [css(styles.braveryPanel__body__advanced__control__forms__title_disabled)]: !shieldsUp,
+                  [css(styles.braveryPanel__body__advanced__control__forms__title)]: !compactBraveryPanel,
                   [css(styles.braveryPanel_compact__body__advanced__control__forms__title)]: compactBraveryPanel
                 })} />
                 <div className={cx({
@@ -476,11 +487,11 @@ class BraveryPanel extends ImmutableComponent {
                   [css(styles.braveryPanel__body__advanced__control__forms__dropdown)]: !compactBraveryPanel,
                   [css(styles.braveryPanel_compact__body__advanced__control__forms__dropdown)]: compactBraveryPanel
                 })}>
-                  <FormDropdown data-test-id='adsBlockedControl' value={adControl} onChange={this.onToggleAdControl} disabled={!shieldsUp}>
+                  <BraveryPanelDropdown data-test-id='adsBlockedControl' value={adControl} onChange={this.onToggleAdControl} disabled={!shieldsUp}>
                     <option data-l10n-id='showBraveAds' data-test-id='showBraveAds' value='showBraveAds' />
                     <option data-l10n-id='blockAds' data-test-id='blockAdsOption' value='blockAds' />
                     <option data-l10n-id='allowAdsAndTracking' data-test-id='showAdsOption' value='allowAdsAndTracking' />
-                  </FormDropdown>
+                  </BraveryPanelDropdown>
                 </div>
                 <SwitchControl className={cx({
                   [css(gridStyles.row3col1)]: !compactBraveryPanel,
@@ -505,10 +516,10 @@ class BraveryPanel extends ImmutableComponent {
                   testId='noScriptSwitch'
                 />
                 <div data-l10n-id='cookieControl' className={cx({
-                  braverySelectTitle: true,
                   [css(gridStyles.row1col2)]: !compactBraveryPanel,
                   [css(gridStyles.row3col1)]: compactBraveryPanel,
                   [css(styles.braveryPanel__body__advanced__control__forms__title_disabled)]: !shieldsUp,
+                  [css(styles.braveryPanel__body__advanced__control__forms__title)]: !compactBraveryPanel,
                   [css(styles.braveryPanel_compact__body__advanced__control__forms__title)]: compactBraveryPanel
                 })} />
                 <div className={cx({
@@ -518,17 +529,18 @@ class BraveryPanel extends ImmutableComponent {
                   [css(styles.braveryPanel__body__advanced__control__forms__dropdown)]: !compactBraveryPanel,
                   [css(styles.braveryPanel_compact__body__advanced__control__forms__dropdown)]: compactBraveryPanel
                 })}>
-                  <FormDropdown data-test-id='cookieControl' value={this.props.braverySettings.cookieControl} onChange={this.onToggleCookieControl} disabled={!shieldsUp}>
+                  <BraveryPanelDropdown data-test-id='cookieControl' value={this.props.braverySettings.cookieControl} onChange={this.onToggleCookieControl} disabled={!shieldsUp}>
                     <option data-l10n-id='block3rdPartyCookie' value='block3rdPartyCookie' />
                     <option data-l10n-id='allowAllCookies' data-test-id='allowAllCookies' value='allowAllCookies' />
                     <option data-l10n-id='blockAllCookies' data-test-id='blockAllCookies' value='blockAllCookies' />
-                  </FormDropdown>
+                  </BraveryPanelDropdown>
                 </div>
                 <SwitchControl className={cx({
                   [css(gridStyles.row3col2)]: !compactBraveryPanel,
                   [css(gridStyles.row7col1)]: compactBraveryPanel,
                   [css(styles.braveryPanel_compact__body__advanced__control__switchControl)]: compactBraveryPanel
                 })}
+                  customInfoButton={css(styles.braveryPanel__body__advanced__control__switchControl__infoButton)}
                   onClick={this.onToggleFp}
                   rightl10nId='fingerprintingProtection'
                   checkedOn={fpEnabled}
@@ -552,22 +564,28 @@ class BraveryPanel extends ImmutableComponent {
             </section>
             : null
           }
-          <hr className={cx({
-            braveryBottomSplitter: true,
-            [css(styles.braveryPanel_compact__body__hr)]: compactBraveryPanel
-          })} />
-          <div className='braveryPanelFooter'>
-            <span className={cx({
-              clickable: true,
-              [css(styles.braveryPanel_compact__body__footer__editGlobal)]: compactBraveryPanel
-            })}
+          <hr className={css(
+            styles.braveryPanel__body__hr,
+            styles.braveryPanel__body__hr_splitter,
+            compactBraveryPanel && styles.braveryPanel_compact__body__hr
+          )} />
+          <div className={css(styles.braveryPanel__body__footer)}>
+            <span className={css(
+              styles.braveryPanel__body__footer__edit,
+              styles.braveryPanel__body__footer__edit_clickable,
+              compactBraveryPanel && styles.braveryPanel_compact__body__footer__edit
+            )}
               onClick={this.onEditGlobal}
               data-l10n-id='editBraveryGlobalSettings'
             />
-            <span className='reloadButton clickable' onClick={this.onReload}>
-              <div className='reloadText' data-l10n-id='reload' />
-              <div className='fa fa-repeat' />
-            </span>
+            <div className={css(
+              styles.braveryPanel__body__footer__reload,
+              styles.braveryPanel__body__footer__reload_clickable
+            )}
+              onClick={this.onReload}>
+              <span className={css(styles.braveryPanel__body__footer__reload__text)} data-l10n-id='reload' />
+              <span className='fa fa-repeat' />
+            </div>
           </div>
         </section>
       </div>
@@ -652,9 +670,35 @@ const gridStyles = StyleSheet.create({
 })
 
 const styles = StyleSheet.create({
+  braveryPanel: {
+    padding: 0,
+    width: '500px',
+    right: '20px',
+    userSelect: 'none',
+    cursor: 'default',
+    color: '#3B3B3B',
+    overflowY: 'auto',
+    maxHeight: `calc(100% - ${globalStyles.spacing.dialogTopOffset})`
+  },
   braveryPanel_compact: {
     width: 'auto',
     maxWidth: '50vw'
+  },
+
+  // braveryPanelHeader - Common
+  braveryPanel__header: {
+    color: '#fff',
+    display: 'flex',
+    backgroundColor: '#808080',
+    padding: '20px',
+    borderTopLeftRadius: globalStyles.radius.borderRadius,
+    borderTopRightRadius: globalStyles.radius.borderRadius
+  },
+  braveryPanel__header_left: {
+    minWidth: 0
+  },
+  braveryPanel__header_right: {
+    marginLeft: 'auto'
   },
 
   // braveryPanelHeader - Compact Panel
@@ -674,9 +718,19 @@ const styles = StyleSheet.create({
   braveryPanel_compact__header_bottom__shieldsSwitch: {
     marginLeft: '1rem'
   },
+  braveryPanel_compact__header_bottom__shieldsSwitch__switchControl: {
+    padding: 0
+  },
 
   // braveryPanelHeader - Normal Panel
   braveryPanel__header__displayHost: displayHost,
+
+  braveryPanel__header_right__switchControl: {
+    padding: 0
+  },
+  braveryPanel__header_right__switchControl__topText: {
+    color: '#d3d3d3'
+  },
 
   // braveryPanelStats - Common
   braveryPanel__stats: {
@@ -684,12 +738,36 @@ const styles = StyleSheet.create({
     display: 'grid',
     justifyContent: 'space-around',
     maxWidth: 'initial',
-    width: '100%'
+    width: '100%',
+    backgroundColor: '#f7f7f7',
+    padding: '20px'
+  },
+  braveryPanel__stats__item_count_adsBlockedStat: {
+    color: globalStyles.color.statsRed
+  },
+  braveryPanel__stats__item_count_redirectedResourcesStat: {
+    color: globalStyles.color.statsBlue
+  },
+  braveryPanel__stats__item_count_noScriptStat: {
+    color: globalStyles.color.statsGray
+  },
+  braveryPanel__stats__item_count_fpStat: {
+    color: globalStyles.color.statsYellow
+  },
+  braveryPanel__stats__item_count_clickable: {
+    cursor: 'pointer'
+  },
+  braveryPanel__stats__item_count_disabled: {
+    opacity: 0.3
   },
 
   // braveryPanelStats - Normal panel
   braveryPanel__stats__item: {
     maxWidth: '75px'
+
+  },
+  braveryPanel__stats__item_count: {
+    fontSize: '40px'
   },
 
   // braveryPanelStats - Compact panel
@@ -711,12 +789,60 @@ const styles = StyleSheet.create({
   },
 
   // braveryPanelBody - Common
+  braveryPanel__body: {
+    background: '#eee',
+    padding: '20px',
+    borderBottomLeftRadius: globalStyles.radius.borderRadius,
+    borderBottomRightRadius: globalStyles.radius.borderRadius
+  },
+  braveryPanel__body__advancedTitle: {
+    display: 'flex'
+  },
+  braveryPanel__body__advancedTitle__indicator: {
+    margin: '2px 5px 0 5px'
+  },
   braveryPanel__body__ul: {
     fontSize: 'smaller',
     maxHeight: '300px',
     overflowY: 'scroll',
     marginTop: '-20px',
-    padding: '10px'
+    padding: '10px',
+    userSelect: 'initial',
+    cursor: 'text'
+  },
+  braveryPanel__body__ul__li: {
+    listStyleType: 'none',
+    padding: '10px 0'
+  },
+  braveryPanel__body__hr: {
+    backgroundColor: '#ccc',
+    border: 0,
+    height: '1px',
+    margin: '10px 0'
+  },
+  braveryPanel__body__hr_splitter: {
+    marginTop: '30px'
+  },
+  braveryPanel__body__footer: {
+    display: 'flex',
+    flexFlow: 'row wrap',
+    justifyContent: 'space-between'
+  },
+  braveryPanel__body__footer__edit: {
+    marginRight: '1rem'
+  },
+  braveryPanel__body__footer__edit_clickable: {
+    cursor: 'pointer'
+  },
+  braveryPanel__body__footer__reload: {
+    display: 'flex',
+    alignItems: 'baseline'
+  },
+  braveryPanel__body__footer__reload__text: {
+    marginRight: '.3rem'
+  },
+  braveryPanel__body__footer__reload_clickable: {
+    cursor: 'pointer'
   },
 
   // braveryPanelBody - Compact Panel
@@ -731,7 +857,8 @@ const styles = StyleSheet.create({
     width: '5px'
   },
   braveryPanel_compact__body__hr: {
-    margin: '.75rem 0'
+    marginTop: '.75rem',
+    marginBottom: '.75rem'
   },
   braveryPanel_compact__body__ul: {
     padding: 0,
@@ -762,8 +889,8 @@ const styles = StyleSheet.create({
   braveryPanel_compact__body__advanced__control__switchControl: {
     padding: '5px 0 5px .25rem'
   },
-  braveryPanel_compact__body__footer__editGlobal: {
-    margin: `0 1rem ${editGlobalMarginBottom} 0`
+  braveryPanel_compact__body__footer__edit: {
+    marginBottom: editGlobalMarginBottom
   },
 
   // controlWrapper - Common
@@ -772,11 +899,21 @@ const styles = StyleSheet.create({
     gridColumnGap: '1rem',
     margin: '15px 10px'
   },
+  braveryPanel__body__advanced__control__forms__title: {
+    marginBottom: '4px',
+    marginLeft: '8px'
+  },
   braveryPanel__body__advanced__control__forms__title_disabled: {
     opacity: 0.3
   },
   braveryPanel__body__advanced__control__forms__dropdown_disabled: {
     opacity: 0.3
+  },
+  braveryPanel__body__advanced__control__switchControl__infoButton: {
+    display: 'inline',
+    cursor: 'pointer',
+    paddingLeft: '2px',
+    fontSize: '15px'
   },
 
   // controlWrapper - Normal Panel

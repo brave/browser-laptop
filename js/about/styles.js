@@ -13,7 +13,7 @@ require('../../less/forms.less')
 
 const {Textbox, FormTextbox, SettingTextbox, RecoveryKeyTextbox} = require('../../app/renderer/components/common/textbox')
 const {TextArea, DefaultTextArea} = require('../../app/renderer/components/common/textbox')
-const {Dropdown, FormDropdown, SettingDropdown} = require('../../app/renderer/components/common/dropdown')
+const {Dropdown, FormDropdown, SettingDropdown, BraveryPanelDropdown} = require('../../app/renderer/components/common/dropdown')
 const BrowserButton = require('../../app/renderer/components/common/browserButton')
 
 const {
@@ -224,6 +224,23 @@ class AboutStyle extends ImmutableComponent {
             &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
             &nbsp;&nbsp;&lt;option>Third Choice&lt;/option>{'\n'}
             &lt;/SettingDropdown>
+          </Code></Pre>
+        </Container>
+
+        <Container>
+          <h2>Dropdown used mostly on Bravery Panel; has 100% width and 13px font size</h2>
+          <BraveryPanelDropdown>
+            <option>Select Box</option>
+            <option>Second Choice</option>
+            <option>Third Choice</option>
+          </BraveryPanelDropdown>
+          <Pre><Code>
+            const { '{BraveryPanelDropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
+            &lt;BraveryPanelDropdown>{'\n'}
+            &nbsp;&nbsp;&lt;option>Select Box&lt;/option>{'\n'}
+            &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
+            &nbsp;&nbsp;&lt;option>Third Choice&lt;/option>{'\n'}
+            &lt;/BraveryPanelDropdown>
           </Code></Pre>
         </Container>
 

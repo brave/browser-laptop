@@ -16,7 +16,8 @@ class Dropdown extends ImmutableComponent {
       this.props['data-isFormControl'] && commonStyles.formControl,
       styles.dropdown,
       this.props['data-isCommonForm'] && styles.commonForm,
-      this.props['data-isSettings'] && styles.settings
+      this.props['data-isSettings'] && styles.settings,
+      this.props['data-isBraveryPanel'] && styles.braveryPanel
     )
 
     return <select className={className} {...this.props}>
@@ -34,6 +35,12 @@ class FormDropdown extends ImmutableComponent {
 class SettingDropdown extends ImmutableComponent {
   render () {
     return <FormDropdown data-isSettings='true' {...this.props} />
+  }
+}
+
+class BraveryPanelDropdown extends ImmutableComponent {
+  render () {
+    return <FormDropdown data-isBraveryPanel='true' {...this.props} />
   }
 }
 
@@ -66,11 +73,16 @@ const styles = StyleSheet.create({
   },
   settings: {
     width: '280px'
+  },
+  braveryPanel: {
+    fontSize: '13px',
+    width: '100%'
   }
 })
 
 module.exports = {
   Dropdown,
   FormDropdown,
-  SettingDropdown
+  SettingDropdown,
+  BraveryPanelDropdown
 }
