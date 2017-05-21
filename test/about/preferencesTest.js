@@ -1,11 +1,12 @@
 /* global describe, it, beforeEach, before, after */
 
 const Brave = require('../lib/brave')
-const {urlInput, homepageInput} = require('../lib/selectors')
+const {urlInput, homepageInput, compactBraveryPanelSwitch, braveMenu, braveryPanelCompact} = require('../lib/selectors')
 const settings = require('../../js/constants/settings')
 const {startsWithOption, newTabMode} = require('../../app/common/constants/settingsEnums')
 
 const prefsUrl = 'about:preferences'
+const prefsShieldsUrl = 'about:preferences#shields'
 
 function * setup (client) {
   yield client
@@ -92,6 +93,27 @@ describe('General Panel', function () {
 
     after(function * () {
       yield Brave.stopApp()
+    })
+  })
+})
+
+describe('Shields Panel', function () {
+  describe('Compact Panel', function () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
+      yield setup(this.app.client)
+    })
+
+    it('can be enabled', function * () {
+      const url = Brave.server.url('page1.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(prefsShieldsUrl)
+        .waitForVisible(compactBraveryPanelSwitch)
+        .click(compactBraveryPanelSwitch)
+        .loadUrl(url)
+        .openBraveMenu(braveMenu, braveryPanelCompact)
+        .waitForVisible(braveryPanelCompact)
     })
   })
 })

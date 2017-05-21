@@ -80,8 +80,6 @@ select {
 
     .braveryPanelStats {
       background-color: #f7f7f7;
-      display: flex;
-      justify-content: space-around;
       padding: 20px;
 
       .braveryStat {
@@ -107,9 +105,6 @@ select {
       .statClickable {
         cursor: pointer;
       }
-      &>div {
-        max-width: 75px;
-      }
     }
 
     .braveryPanelBody {
@@ -118,17 +113,9 @@ select {
       border-bottom-left-radius: @borderRadius;
       border-bottom-right-radius: @borderRadius;
 
-      .braveryAdvanced {
-        display: flex;
-        flex-direction: row;
-      }
-
       .braveryAdvancedTitle {
         display: flex;
 
-        &.disabled {
-          opacity: 0.3;
-        }
 
         .braveryAdvancedIndicator {
           margin-left: 5px;
@@ -138,22 +125,15 @@ select {
       }
 
       .braveryControlGroup {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
-        margin: 5px 10px auto 10px;
 
         .braverySelectTitle {
           margin-bottom: 4px;
           margin-left: 8px;
-          &.disabled {
-            opacity: 0.3;
-          }
         }
 
         select {
           font-size: 13px;
-          margin-bottom: 25px;
+          width: 100%;
         }
       }
 
@@ -175,13 +155,22 @@ select {
         }
       }
 
-      .reloadButton {
+      .braveryPanelFooter {
         display: flex;
-        float: right;
-        margin-right: 10px;
-        margin-bottom: 10px;
-        .reloadText {
-          margin-right: 10px;
+        flex-flow: row wrap;
+        justify-content: space-between;
+
+        .editGlobalSettings {
+          margin-right: 1rem;
+        }
+
+        .reloadButton {
+          display: flex;
+          align-items: baseline;
+
+          .reloadText {
+            margin-right: .3rem;
+          }
         }
       }
     }
@@ -200,14 +189,6 @@ select {
       }
       &.extendedValidation {
         color: green;
-      }
-
-      ul {
-        font-size: smaller;
-        max-height: 300px;
-        overflow-y: scroll;
-        margin-top: -20px;
-        padding: 0 10px;
       }
     }
   }

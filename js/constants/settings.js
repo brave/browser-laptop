@@ -19,8 +19,6 @@ const settings = {
   IS_DEFAULT_BROWSER: 'general.is-default-browser',
   DOWNLOAD_DEFAULT_PATH: 'general.download-default-path',
   DOWNLOAD_ALWAYS_ASK: 'general.download-always-ask',
-  // Shields Tab
-  BLOCKED_COUNT_BADGE: 'general.blocked-count-badge',
   // Search tab
   DEFAULT_SEARCH_ENGINE: 'search.default-search-engine',
   OFFER_SEARCH_SUGGESTIONS: 'search.offer-search-suggestions',
@@ -60,6 +58,9 @@ const settings = {
   PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED: 'payments.notificationTryPaymentsDismissed',
   PAYMENTS_CONTRIBUTION_AMOUNT: 'payments.contribution-amount',
   PAYMENTS_NON_VERIFIED: 'payments.allow-non-verified-publishers',
+  // Shields Tab
+  BLOCKED_COUNT_BADGE: 'shields.blocked-count-badge',
+  COMPACT_BRAVERY_PANEL: 'shields.compact-bravery-panel',
   // Advanced settings
   HARDWARE_ACCELERATION_ENABLED: 'advanced.hardware-acceleration-enabled',
   PDFJS_ENABLED: 'advanced.pdfjs-enabled',

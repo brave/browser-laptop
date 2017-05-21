@@ -554,6 +554,13 @@ class ShieldsTab extends ImmutableComponent {
       <DefaultSectionTitle data-l10n-id='shieldsPanelOptions' />
       <SettingsList>
         <SettingCheckbox dataL10nId='blockedCountBadge' prefKey={settings.BLOCKED_COUNT_BADGE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox
+          dataL10nId='compactBraveryPanel'
+          dataTestId='compactBraveryPanelSwitch'
+          prefKey={settings.COMPACT_BRAVERY_PANEL}
+          settings={this.props.settings}
+          onChangeSetting={this.props.onChangeSetting}
+        />
       </SettingsList>
       <SitePermissionsPage siteSettings={this.props.siteSettings}
         names={braveryPermissionNames}
