@@ -14,6 +14,9 @@ const KeyCodes = require('../../../common/constants/keyCodes')
 // Utils
 const cx = require('../../../../js/lib/classSet')
 
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../styles/global')
+
 /**
  * Represents a popup dialog
  */
@@ -39,7 +42,7 @@ class Dialog extends ImmutableComponent {
 
   render () {
     return <div className={cx({
-      dialog: true,
+      [css(styles.dialog)]: true,
       [this.props.className]: !!this.props.className
     })}
       data-test-id={this.props.testId}
@@ -63,5 +66,20 @@ Dialog.propTypes = {
   isClickDismiss: PropTypes.bool,
   onHide: PropTypes.func
 }
+
+const styles = StyleSheet.create({
+  dialog: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    height: '100%',
+    width: '100%',
+    zIndex: globalStyles.zindex.zindexDialogs,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    background: 'rgba(0, 0, 0, 0.15)'
+  }
+})
 
 module.exports = Dialog
