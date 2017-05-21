@@ -15,6 +15,8 @@ const getSetting = require('../../../js/settings').getSetting
 const config = require('../../../js/constants/config')
 const {updateTabPageIndex} = require('../lib/tabUtil')
 const {getCurrentWindowId} = require('../currentWindow')
+const {getSourceAboutUrl, getSourceMagnetUrl} = require('../../../js/lib/appUrlUtil')
+const {isURL, isPotentialPhishingUrl, getUrlFromInput} = require('../../../js/lib/urlutil')
 
 const setFullScreen = (state, action) => {
   const index = frameStateUtil.getFrameIndex(state, action.frameProps.get('key'))
@@ -59,6 +61,19 @@ const closeFrame = (state, action) => {
   }
 
   return state
+}
+
+const getLocation = (location) => {
+  location = location.trim()
+  location = getSourceAboutUrl(location) ||
+    getSourceMagnetUrl(location) ||
+    location
+
+  if (isURL(location)) {
+    location = getUrlFromInput(location)
+  }
+
+  return location
 }
 
 const frameReducer = (state, action, immutableAction) => {
@@ -109,6 +124,41 @@ const frameReducer = (state, action, immutableAction) => {
           state = updateTabPageIndex(state, frame)
         }
       }
+      break
+    case windowConstants.WINDOW_SET_NAVIGATED:
+      // For about: URLs, make sure we store the URL as about:something
+      // and not what we map to.
+      action.location = getLocation(action.location)
+
+      const key = action.key
+      const framePath = frameStateUtil.frameStatePath(state, key)
+      if (!framePath) {
+        break
+      }
+      state = state.mergeIn(framePath, {
+        location: action.location
+      })
+      if (!action.isNavigatedInPage) {
+        state = state.mergeIn(framePath, {
+          adblock: {},
+          audioPlaybackActive: false,
+          computedThemeColor: undefined,
+          httpsEverywhere: {},
+          icon: undefined,
+          location: action.location,
+          noScript: {},
+          themeColor: undefined,
+          title: '',
+          trackingProtection: {},
+          fingerprintingProtection: {}
+        })
+      }
+
+      // For potential phishing pages, show a warning
+      if (isPotentialPhishingUrl(action.location)) {
+        state = state.setIn(['ui', 'siteInfo', 'isVisible'], true)
+      }
+
       break
     case windowConstants.WINDOW_CLOSE_FRAMES:
       let closedFrames = new Immutable.List()

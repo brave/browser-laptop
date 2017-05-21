@@ -5,6 +5,7 @@ const assert = require('assert')
 const fakeElectron = require('../../../lib/fakeElectron')
 
 const windowConstants = require('../../../../../js/constants/windowConstants')
+const tabActions = require('../../../../../app/browser/actions/tabActions')
 require('../../../braveUnit')
 
 const windowState = Immutable.fromJS({
@@ -39,6 +40,7 @@ const windowState = Immutable.fromJS({
     fingerprintingProtection: {blocked: []}
   }, {
     key: 3,
+    tabId: 3,
     location: 'about:newtab'
   }],
   framesInternal: {
@@ -49,7 +51,8 @@ const windowState = Immutable.fromJS({
     },
     tabIndex: {
       1: 0,
-      2: 1
+      2: 1,
+      3: 2
     }
   }
 })
@@ -126,72 +129,25 @@ describe('urlBarReducer', function () {
     })
   })
 
-  describe('WINDOW_SET_NAVIGATED', function () {
-    describe('Basic', function () {
-      it('updates navbar navbar for URL navigation', function () {
-        this.location = 'https:/www.brave.com/3'
-        this.newState = urlBarReducer(windowState, {actionType: windowConstants.WINDOW_SET_NAVIGATED, location: this.location})
-        assert.equal(this.newState.getIn(['frames', 1, 'navbar', 'urlbar', 'location']), this.location)
-      })
-      it('does not update navbar for about:newtab nav', function () {
-        this.location = 'about:newtab'
-        this.newState = urlBarReducer(windowState, {actionType: windowConstants.WINDOW_SET_NAVIGATED, location: this.location, key: 3})
-        assert.equal(this.newState.getIn(['frames', 2, 'navbar', 'urlbar', 'location']), undefined)
-      })
-    })
-    describe('In page navigation', function () {
-      before(function () {
-        this.location = 'https://www.brave.com/'
-        this.newState = urlBarReducer(windowState, {actionType: windowConstants.WINDOW_SET_NAVIGATED, location: this.location, isNavigatedInPage: true})
-      })
-      it('does not reset values', function () {
-        assert.equal(this.newState.getIn(['frames', 1, 'title']), 'test')
-        assert.deepEqual(this.newState.getIn(['frames', 1, 'adblock']).toJS(), {blocked: []})
-        assert.equal(this.newState.getIn(['frames', 1, 'audioPlaybackActive']), true)
-        assert.equal(this.newState.getIn(['frames', 1, 'computedThemeColor']), '#ff0000')
-        assert.deepEqual(this.newState.getIn(['frames', 1, 'httpsEverywhere']).toJS(), {a: '1'})
-        assert.equal(this.newState.getIn(['frames', 1, 'icon']), 'https://www.brave.com/favicon.ico')
-        assert.equal(this.newState.getIn(['frames', 1, 'location']), this.location)
-        assert.deepEqual(this.newState.getIn(['frames', 1, 'noScript']).toJS(), {blocked: []})
-        assert.equal(this.newState.getIn(['frames', 1, 'themeColor']), '#ffffff')
-        assert.deepEqual(this.newState.getIn(['frames', 1, 'trackingProtection']).toJS(), {blocked: []})
-        assert.deepEqual(this.newState.getIn(['frames', 1, 'fingerprintingProtection']).toJS(), {blocked: []})
-      })
-    })
-    describe('Navigation', function () {
-      before(function () {
-        this.location = 'https://www.brave.com/'
-        this.newState = urlBarReducer(windowState, {actionType: windowConstants.WINDOW_SET_NAVIGATED, location: this.location})
-      })
-      it('resets values', function () {
-        assert.equal(this.newState.getIn(['frames', 1, 'title']), '')
-        assert.deepEqual(this.newState.getIn(['frames', 1, 'adblock']).toJS(), {})
-        assert.equal(this.newState.getIn(['frames', 1, 'audioPlaybackActive']), false)
-        assert.equal(this.newState.getIn(['frames', 1, 'computedThemeColor']), undefined)
-        assert.deepEqual(this.newState.getIn(['frames', 1, 'httpsEverywhere']).toJS(), {})
-        assert.equal(this.newState.getIn(['frames', 1, 'icon']), undefined)
-        assert.equal(this.newState.getIn(['frames', 1, 'location']), this.location)
-        assert.deepEqual(this.newState.getIn(['frames', 1, 'noScript']).toJS(), {})
-        assert.equal(this.newState.getIn(['frames', 1, 'themeColor']), undefined)
-        assert.deepEqual(this.newState.getIn(['frames', 1, 'trackingProtection']).toJS(), {})
-        assert.deepEqual(this.newState.getIn(['frames', 1, 'fingerprintingProtection']).toJS(), {})
-      })
-    })
-  })
-
-  describe('WINDOW_SET_NAVIGATION_ABORTED', function () {
+  describe('tabActions.didFinishNavigation', function () {
     before(function () {
-    })
-    it('sets the correct frame\'s text', function () {
-      // Active frame key is 2 but let's update tabId 1 (frameKey 1 too)
-      const action = {
-        actionType: windowConstants.WINDOW_SET_NAVIGATION_ABORTED,
+      this.newState = urlBarReducer(windowState, {
+        actionType: tabActions.didFinishNavigation.name,
         tabId: 1,
-        location: 'https://facebook.com/'
-      }
-      this.newState = urlBarReducer(windowState, action)
-      assert.equal(this.newState.getIn(['frames', 0, 'navbar', 'urlbar', 'location']), action.location)
-      assert.equal(this.newState.getIn(['frames', 0, 'location']), action.location)
+        navigationState: Immutable.fromJS({
+          visibleEntry: {
+            virtualURL: 'http://www.brave.com'
+          }
+        })
+      })
+    })
+
+    it('sets the urlbar location for `tabId` to the tab navigation state visibleEntry virtualURL', function () {
+      assert.equal(this.newState.getIn(['frames', 0, 'navbar', 'urlbar', 'location']), 'http://www.brave.com')
+    })
+
+    it('does not modify other frames', function () {
+      assert.equal(this.newState.getIn(['frames', 1, 'navbar', 'urlbar', 'location']), 'https://www.brave.com/2')
     })
   })
 
@@ -200,6 +156,7 @@ describe('urlBarReducer', function () {
     const windowState = Immutable.fromJS({
       activeFrameKey: 2,
       frames: [{
+        tabId: 1,
         key: 1
       }, {
         tabId: 2,
@@ -219,15 +176,20 @@ describe('urlBarReducer', function () {
           }
         }
       }, {
+        tabId: 3,
         key: 3,
         location: 'about:newtab'
       }],
       framesInternal: {
         index: {
-          2: 1
+          1: 0,
+          2: 1,
+          3: 2
         },
         tabIndex: {
-          2: 1
+          1: 0,
+          2: 1,
+          3: 2
         }
       }
     })
@@ -252,10 +214,20 @@ describe('urlBarReducer', function () {
       mockery.disable()
     })
 
-    describe('WINDOW_SET_NAVIGATED', function () {
-      it('turns off suggestions', function () {
-        const newState = urlBarReducer(windowState, {actionType: windowConstants.WINDOW_SET_NAVIGATED, location: 'http://brave.com'})
-        assert.equal(newState.getIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'shouldRender']), false)
+    describe('tabActions.didFinishNavigation', function () {
+      before(function () {
+        this.newState = urlBarReducer(windowState, {
+          actionType: tabActions.didFinishNavigation.name,
+          tabId: 1,
+          navigationState: Immutable.Map()})
+      })
+
+      it('turns off suggestions for `tabId`', function () {
+        assert.equal(this.newState.getIn(['frames', 0, 'navbar', 'urlbar', 'suggestions', 'shouldRender']), false)
+      })
+
+      it('does not turn off suggestions for other frames', function () {
+        assert.equal(this.newState.getIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'shouldRender']), true)
       })
     })
 

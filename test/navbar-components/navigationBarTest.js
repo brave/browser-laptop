@@ -112,8 +112,7 @@ describe('navigationBar tests', function () {
         yield setup(this.app.client)
         yield this.app.client
           .tabByUrl(Brave.newTabUrl)
-          .url(page1)
-          .waitForUrl(page1)
+          .loadUrl(page1)
           .waitForExist('#open_target')
           .leftClick('#open_target')
       })
@@ -122,7 +121,7 @@ describe('navigationBar tests', function () {
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
           .ipcSend('shortcut-focus-url')
-          .waitForInputText(urlInput, 'data:text/html;,%3Ctitle%3ETabnapping%20Target%3C/title%3E')
+          .waitForInputText(urlInput, 'data:text/html;,<title>Tabnapping Target</title>')
       })
     })
 
@@ -436,7 +435,7 @@ describe('navigationBar tests', function () {
         .keys(Brave.keys.ESCAPE)
     })
     it('Shows secure URL icon in title mode', function * () {
-      const page1Url = Brave.server.url('page1.html')
+      const page1Url = 'https://badssl.com/'
       yield this.app.client
         .tabByUrl(Brave.newTabUrl)
         .loadUrl(page1Url)
@@ -839,8 +838,7 @@ describe('navigationBar tests', function () {
         const page1 = this.page1
         yield this.app.client
           .tabByUrl(this.newTabUrl)
-          .url(page1)
-          .waitForUrl(page1)
+          .loadUrl(page1)
           .windowParentByUrl(page1)
           .activateTitleMode()
           .click(activeWebview)
