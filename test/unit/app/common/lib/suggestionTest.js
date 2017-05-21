@@ -212,6 +212,12 @@ describe('suggestion unit tests', function () {
       it('Prefers https sipmle URLs', function () {
         assert(this.sort('https://brave.com', 'http://brave.com') < 0)
       })
+      it('sorts better matched domains based on more simple domains', function () {
+        assert(this.sort('https://facebook.github.io/', 'https://facebook.com/') > 0)
+      })
+      it('sorts better matched domains based on more simple domains ignoring www.', function () {
+        assert(this.sort('https://facebook.github.io/', 'https://www.facebook.com/') > 0)
+      })
     })
     describe('getSortByDomain', function () {
       before(function () {
@@ -241,9 +247,6 @@ describe('suggestion unit tests', function () {
       it('negative if first site has a match from the start of domain', function () {
         assert(this.sort('https://google.com', 'https://mygoogle.com') < 0)
       })
-      it('positive if second site has a match but without www.', function () {
-        assert(this.sort('https://www.google.com', 'https://google.com') > 0)
-      })
       it('negative if there is a pos 0 match not including www.', function () {
         assert(this.sort('https://www.google.com', 'https://mygoogle.com') < 0)
       })
@@ -252,6 +255,34 @@ describe('suggestion unit tests', function () {
       })
       it('does not throw error for file:// URL', function () {
         assert(this.sort('https://google.com', 'file://') < 0)
+      })
+      it('sorts simple domains that match equally on subdomains as the same', function () {
+        const url1 = 'https://facebook.github.com'
+        const url2 = 'https://facebook.brave.com'
+        const sort = suggestion.getSortByDomain('facebook', 'facebook')
+        assert(sort({
+          location: url1,
+          parsedUrl: urlParse(url1)
+        }, {
+          location: url2,
+          parsedUrl: urlParse(url2)
+        }) === 0)
+      })
+      it('sorts simple domains that match equally but have different activity based on activity', function () {
+        const url1 = 'https://facebook.github.com'
+        const url2 = 'https://facebook.brave.com'
+        const sort = suggestion.getSortByDomain('facebook', 'facebook')
+        assert(sort({
+          location: url1,
+          parsedUrl: urlParse(url1),
+          lastAccessedTime: 1495335766455,
+          count: 30
+        }, {
+          location: url2,
+          parsedUrl: urlParse(url2),
+          lastAccessedTime: 1495334766432,
+          count: 10
+        }) < 0)
       })
     })
     describe('getSortForSuggestions', function () {
@@ -298,6 +329,17 @@ describe('suggestion unit tests', function () {
         it('non-wwww. matches before www.', function () {
           assert(this.sort('https://brianbondy.com', 'www.brianbondy.com') < 0)
         })
+      })
+      it('sorts better matched domains based on more simple domains ignoring www.', function () {
+        const userInputLower = 'facebook'
+        const internalSort = suggestion.getSortForSuggestions(userInputLower, userInputLower)
+        const sort = (url1, url2) => {
+          return internalSort(
+            { location: url1, parsedUrl: urlParse(url1) },
+            { location: url2, parsedUrl: urlParse(url2) }
+          )
+        }
+        assert(sort('https://facebook.github.io/', 'https://www.facebook.com/') > 0)
       })
     })
   })
