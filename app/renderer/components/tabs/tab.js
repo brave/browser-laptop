@@ -22,6 +22,9 @@ const windowActions = require('../../../../js/actions/windowActions')
 // Store
 const windowStore = require('../../../../js/stores/windowStore')
 
+// State
+const tabContentState = require('../../../common/state/tabContentState')
+
 // Constants
 const dragTypes = require('../../../../js/constants/dragTypes')
 const settings = require('../../../../js/constants/settings')
@@ -236,7 +239,7 @@ class Tab extends React.Component {
     const notificationOrigins = notifications ? notifications.map(bar => bar.get('frameOrigin')) : false
     const notificationBarActive = frame.get('location') && notificationOrigins &&
       notificationOrigins.includes(UrlUtil.getUrlOrigin(frame.get('location')))
-    const hasSeconardImage = frameStateUtil.hasVisibleSecondaryIcon(currentWindow, ownProps.frameKey)
+    const hasSeconardImage = tabContentState.hasVisibleSecondaryIcon(currentWindow, ownProps.frameKey)
     const breakpoint = frame.get('breakpoint')
     const partition = typeof frame.get('partitionNumber') === 'string'
       ? frame.get('partitionNumber').replace(/^partition-/i, '')
@@ -252,12 +255,12 @@ class Tab extends React.Component {
     props.paintTabs = getSetting(settings.PAINT_TABS)
     props.tabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
     props.isPinnedTab = frameStateUtil.isPinned(currentWindow, props.frameKey)
-    props.canPlayAudio = frameStateUtil.canPlayAudio(currentWindow, props.frameKey)
-    props.themeColor = frameStateUtil.getThemeColor(currentWindow, props.frameKey)
-    props.isTabLoading = frameStateUtil.isTabLoading(currentWindow, props.frameKey)
-    props.isNarrowView = frameStateUtil.isNarrowView(currentWindow, props.frameKey)
-    props.isNarrowestView = frameStateUtil.isNarrowestView(currentWindow, props.frameKey)
-    props.isPlayIndicatorBreakpoint = frameStateUtil.isMediumView(currentWindow, props.frameKey) || props.isNarrowView
+    props.canPlayAudio = tabContentState.canPlayAudio(currentWindow, props.frameKey)
+    props.themeColor = tabContentState.getThemeColor(currentWindow, props.frameKey)
+    props.isTabLoading = tabContentState.isTabLoading(currentWindow, props.frameKey)
+    props.isNarrowView = tabContentState.isNarrowView(currentWindow, props.frameKey)
+    props.isNarrowestView = tabContentState.isNarrowestView(currentWindow, props.frameKey)
+    props.isPlayIndicatorBreakpoint = tabContentState.isMediumView(currentWindow, props.frameKey) || props.isNarrowView
     props.title = frame.get('title')
     props.showSessionIcon = partition && hasSeconardImage
     props.showPrivateIcon = props.isPrivateTab && hasSeconardImage
@@ -274,7 +277,7 @@ class Tab extends React.Component {
     props.totalTabs = state.get('tabs').size
     props.previewTabs = getSetting(settings.SHOW_TAB_PREVIEWS)
     props.dragData = state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')
-    props.hasTabInFullScreen = frameStateUtil.hasTabInFullScreen(currentWindow)
+    props.hasTabInFullScreen = tabContentState.hasTabInFullScreen(currentWindow)
     props.tabId = frame.get('tabId')
 
     return props

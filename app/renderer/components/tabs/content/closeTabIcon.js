@@ -9,6 +9,9 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const ReduxComponent = require('../../reduxComponent')
 const TabIcon = require('./tabIcon')
 
+// State
+const tabContentState = require('../../../../common/state/tabContentState')
+
 // Store
 const windowStore = require('../../../../../js/stores/windowStore')
 
@@ -53,8 +56,8 @@ class CloseTabIcon extends React.Component {
     // used in renderer
     props.showCloseIcon = !isPinnedTab &&
       (
-        frameStateUtil.hasRelativeCloseIcon(currentWindow, ownProps.frameKey) ||
-        frameStateUtil.hasFixedCloseIcon(currentWindow, ownProps.frameKey)
+        tabContentState.hasRelativeCloseIcon(currentWindow, ownProps.frameKey) ||
+        tabContentState.hasFixedCloseIcon(currentWindow, ownProps.frameKey)
       )
 
     // used in functions

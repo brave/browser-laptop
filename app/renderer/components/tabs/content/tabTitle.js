@@ -8,18 +8,19 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 // Components
 const ReduxComponent = require('../../reduxComponent')
 
+// State
+const tabContentState = require('../../../../common/state/tabContentState')
+
 // Utils
 const {isWindows, isDarwin} = require('../../../../common/lib/platformUtil')
-const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 
 // Styles
 const globalStyles = require('../../styles/global')
-const tabContentState = require('../../../../common/state/tabContentState')
 
 class TabTitle extends React.Component {
   mergeProps (state, dispatchProps, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const tabIconColor = frameStateUtil.getTabIconColor(currentWindow, ownProps.frameKey)
+    const tabIconColor = tabContentState.getTabIconColor(currentWindow, ownProps.frameKey)
 
     const props = {}
     // used in renderer

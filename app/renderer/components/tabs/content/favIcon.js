@@ -10,6 +10,9 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const ReduxComponent = require('../../reduxComponent')
 const TabIcon = require('./tabIcon')
 
+// State
+const tabContentState = require('../../../../common/state/tabContentState')
+
 // Utils
 const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 
@@ -29,15 +32,15 @@ class Favicon extends React.Component {
   mergeProps (state, dispatchProps, ownProps) {
     const currentWindow = state.get('currentWindow')
     const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey) || Immutable.Map()
-    const isTabLoading = frameStateUtil.isTabLoading(currentWindow, ownProps.frameKey)
+    const isTabLoading = tabContentState.isTabLoading(currentWindow, ownProps.frameKey)
 
     const props = {}
     // used in renderer
     props.isTabLoading = isTabLoading
     props.favicon = !isTabLoading && frame.get('icon')
     props.isPinnedTab = frameStateUtil.isPinned(currentWindow, ownProps.frameKey)
-    props.tabIconColor = frameStateUtil.getTabIconColor(currentWindow, ownProps.frameKey)
-    props.isNarrowestView = frameStateUtil.isNarrowestView(currentWindow, ownProps.frameKey)
+    props.tabIconColor = tabContentState.getTabIconColor(currentWindow, ownProps.frameKey)
+    props.isNarrowestView = tabContentState.isNarrowestView(currentWindow, ownProps.frameKey)
 
     // used in functions
     props.frameKey = ownProps.frameKey

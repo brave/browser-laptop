@@ -64,8 +64,8 @@ describe('Tabs content - Favicon', function () {
       useCleanCache: true
     })
     mockery.registerMock('electron', fakeElectron)
-    mockery.registerMock('../../../../common/state/tabContentState', {
-      getDisplayTitle: () => {}
+    mockery.registerMock('../../../js/l10n', {
+      translation: () => 'translated'
     })
     mockery.registerMock('../../../js/stores/appStoreRenderer', fakeAppStoreRenderer)
     mockery.registerMock('../../../../extensions/brave/img/tabs/loading.svg')
@@ -79,6 +79,7 @@ describe('Tabs content - Favicon', function () {
 
   after(function () {
     mockery.deregisterAll()
+    mockery.disable()
   })
 
   describe('should show', function () {

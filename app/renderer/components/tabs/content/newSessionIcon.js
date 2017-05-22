@@ -9,6 +9,9 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const ReduxComponent = require('../../reduxComponent')
 const TabIcon = require('./tabIcon')
 
+// State
+const tabContentState = require('../../../../common/state/tabContentState')
+
 // Constants
 const {tabs} = require('../../../../../js/constants/config')
 
@@ -28,7 +31,7 @@ class NewSessionIcon extends React.Component {
     const props = {}
     // used in renderer
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, ownProps.frameKey)
-    props.iconColor = frameStateUtil.getTabIconColor(currentWindow, ownProps.frameKey)
+    props.iconColor = tabContentState.getTabIconColor(currentWindow, ownProps.frameKey)
     props.partitionNumber = typeof partition === 'string'
       ? partition.replace(/^partition-/i, '')
       : partition
