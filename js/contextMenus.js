@@ -1453,20 +1453,19 @@ function onShowBookmarkFolderMenu (bookmarks, bookmark, activeFrame, e) {
   }))
 }
 
-function onShowAutofillMenu (suggestions, boundingRect, frame) {
+function onShowAutofillMenu (suggestions, targetRect, frame, boundingClientRect) {
   const menuTemplate = autofillTemplateInit(suggestions, frame)
   const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) &&
     appStore.state.get('downloads') && appStore.state.get('downloads').size ? getDownloadsBarHeight() : 0
-  const offset = {
-    x: (window.innerWidth - boundingRect.clientWidth),
-    y: (window.innerHeight - boundingRect.clientHeight)
-  }
+  // toolbar UI scale ratio
+  const xRatio = window.innerWidth / window.outerWidth
+  const yRatio = window.innerHeight / window.outerHeight
   const tabId = frame.get('tabId')
   windowActions.setContextMenuDetail(Immutable.fromJS({
     type: 'autofill',
     tabId,
-    left: offset.x + boundingRect.x,
-    top: offset.y + (boundingRect.y + boundingRect.height) - downloadsBarOffset,
+    left: boundingClientRect.left + (targetRect.x * xRatio),
+    top: boundingClientRect.top + ((targetRect.y + targetRect.height) * yRatio) - downloadsBarOffset,
     template: menuTemplate
   }))
 }
