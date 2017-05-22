@@ -25,8 +25,13 @@ const getSiteIdentity = (data) => {
 }
 
 const init = (sites) => {
+  sites = sites.toJS ? sites.toJS() : sites
+  // Sort sites with smaller count first because later ones will overwrite with correct counts based on the site identity.
+  // This can happen when a user bookmarks the same site multiple times, but only one of the items are getting counts
+  // incremented by normal operations.
+  sites = sites.sort((s1, s2) => (s1.count || 0) - (s2.count || 0))
   engine = new Bloodhound({
-    local: sites.toJS ? sites.toJS() : sites,
+    local: sites,
     sorter: sortForSuggestions,
     queryTokenizer: tokenizeInput,
     datumTokenizer: tokenizeInput,
