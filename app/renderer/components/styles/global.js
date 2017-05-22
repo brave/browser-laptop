@@ -263,6 +263,27 @@ const globalStyles = {
       hoverColor: '#000',
       borderHoverColor: 'rgb(153, 153, 153)'
     }
+  },
+  braveryPanel: {
+    color: '#3b3b3b',
+
+    header: {
+      color: '#fff',
+      background: '#808080',
+      switchControlTopTextColor: '#d3d3d3'
+    },
+
+    stats: {
+      background: '#f7f7f7'
+    },
+
+    body: {
+      background: '#eee',
+
+      hr: {
+        background: '#ccc'
+      }
+    }
   }
 }
 
@@ -274,8 +295,12 @@ globalStyles.color.siteSecureColor = globalStyles.color.buttonColor
 globalStyles.color.loadTimeColor = globalStyles.color.highlightBlue
 globalStyles.color.activeTabDefaultColor = globalStyles.color.chromePrimary
 globalStyles.color.switchBG_on = globalStyles.color.braveOrange
-globalStyles.color.statsGray = globalStyles.color.chromeText
 
 globalStyles.spacing.tabHeight = globalStyles.spacing.tabsToolbarHeight
+
+globalStyles.braveryPanel.stats.colorAds = globalStyles.color.statsRed
+globalStyles.braveryPanel.stats.colorRedirected = globalStyles.color.statsBlue
+globalStyles.braveryPanel.stats.colorFp = globalStyles.color.statsYellow
+globalStyles.braveryPanel.stats.colorNoScript = globalStyles.color.chromeText
 
 module.exports = globalStyles

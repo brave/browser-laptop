@@ -40,7 +40,7 @@ class SettingDropdown extends ImmutableComponent {
 
 class BraveryPanelDropdown extends ImmutableComponent {
   render () {
-    return <FormDropdown data-isBraveryPanel='true' {...this.props} />
+    return <FormDropdown data-isBraveryPanel {...this.props} />
   }
 }
 
