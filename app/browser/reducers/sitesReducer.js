@@ -21,13 +21,20 @@ const syncEnabled = () => {
   return getSetting(settings.SYNC_ENABLED) === true
 }
 
+const updateTabBookmarked = (state, tabValue) => {
+  if (!tabValue || !tabValue.get('tabId')) {
+    return state
+  }
+  const bookmarked = siteUtil.isLocationBookmarked(state, tabValue.get('url'))
+  return tabState.updateTabValue(state, tabValue.set('bookmarked', bookmarked))
+}
+
 const updateActiveTabBookmarked = (state) => {
   const tab = tabState.getActiveTab(state)
   if (!tab) {
     return state
   }
-  const bookmarked = siteUtil.isLocationBookmarked(state, tab.get('url'))
-  return tabState.updateTabValue(state, tab.set('bookmarked', bookmarked))
+  return updateTabBookmarked(state, tab)
 }
 
 const sitesReducer = (state, action, immutableAction) => {
@@ -135,6 +142,7 @@ const sitesReducer = (state, action, immutableAction) => {
           state = syncUtil.updateSiteCache(state, siteDetail)
         }
       }
+      state = updateTabBookmarked(state, action.tabValue)
       break
     case appConstants.APP_CREATE_TAB_REQUESTED: {
       const createProperties = immutableAction.get('createProperties')

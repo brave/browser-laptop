@@ -1,4 +1,4 @@
-/* global describe, it, before */
+/* global describe, it, before, beforeEach */
 
 const Brave = require('../lib/brave')
 const Immutable = require('immutable')
@@ -246,6 +246,41 @@ describe('bookmark tests', function () {
           .waitForVisible(doneButton)
           .waitForInputText(bookmarkLocationInput, page1Url)
       })
+    })
+  })
+
+  describe('bookmark star button is preserved', function () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
+      this.page1Url = Brave.server.url('page1.html')
+      this.page2Url = Brave.server.url('page2.html')
+      yield setup(this.app.client)
+      yield this.app.client
+        .addSite({
+          location: this.page1Url,
+          folderId: 1,
+          parentFolderId: 0,
+          tags: [siteTags.BOOKMARK]
+        }, siteTags.BOOKMARK)
+    })
+
+    it('on new active tabs', function * () {
+      yield this.app.client
+        .waitForVisible(navigatorNotBookmarked)
+        .newTab({ url: this.page1Url })
+        .waitForVisible(navigatorBookmarked)
+    })
+    it('on new active tabs', function * () {
+      yield this.app.client
+        .waitForVisible(navigatorNotBookmarked)
+        .newTab({ url: this.page1Url, active: false })
+        .waitForUrl(this.page1Url)
+        .tabByIndex(0)
+        .loadUrl(this.page2Url)
+        .waitForUrl(this.page2Url)
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend('shortcut-next-tab')
+        .waitForVisible(navigatorBookmarked)
     })
   })
 
