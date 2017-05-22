@@ -5,16 +5,18 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
 const {StyleSheet, css} = require('aphrodite/no-important')
+const Immutable = require('immutable')
 
 // Components
-const ImmutableComponent = require('../immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 const BrowserButton = require('../common/browserButton')
 const BookmarkToolbarButton = require('./bookmarkToolbarButton')
 
 // Actions
-const windowActions = require('../../../../js/actions/windowActions')
-const bookmarkActions = require('../../../../js/actions/bookmarkActions')
 const appActions = require('../../../../js/actions/appActions')
+
+// State
+const windowState = require('../../../common/state/windowState')
 
 // Store
 const windowStore = require('../../../../js/stores/windowStore')
@@ -22,35 +24,35 @@ const windowStore = require('../../../../js/stores/windowStore')
 // Constants
 const siteTags = require('../../../../js/constants/siteTags')
 const dragTypes = require('../../../../js/constants/dragTypes')
-const {iconSize} = require('../../../../js/constants/config')
 
 // Utils
+const {isFocused} = require('../../currentWindow')
 const siteUtil = require('../../../../js/state/siteUtil')
 const contextMenus = require('../../../../js/contextMenus')
 const cx = require('../../../../js/lib/classSet')
 const dnd = require('../../../../js/dnd')
 const dndData = require('../../../../js/dndData')
-const {calculateTextWidth} = require('../../../../js/lib/textCalculator')
+const {isWindows} = require('../../../common/lib/platformUtil')
+const frameStateUtil = require('../../../../js/state/frameStateUtil')
+const bookmarkUtil = require('../../../common/lib/bookmarkUtil')
 
 // Styles
 const globalStyles = require('../styles/global')
-const domUtil = require('../../lib/domUtil')
 
-class BookmarksToolbar extends ImmutableComponent {
-  constructor () {
-    super()
+class BookmarksToolbar extends React.Component {
+  constructor (props) {
+    super(props)
     this.onDrop = this.onDrop.bind(this)
     this.onDragEnter = this.onDragEnter.bind(this)
     this.onDragOver = this.onDragOver.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
     this.onMoreBookmarksMenu = this.onMoreBookmarksMenu.bind(this)
-    this.openContextMenu = this.openContextMenu.bind(this)
-    this.clickBookmarkItem = this.clickBookmarkItem.bind(this)
-    this.showBookmarkFolderMenu = this.showBookmarkFolderMenu.bind(this)
   }
+
   get activeFrame () {
     return windowStore.getFrame(this.props.activeFrameKey)
   }
+
   onDrop (e) {
     e.preventDefault()
     const bookmark = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
@@ -74,9 +76,9 @@ class BookmarksToolbar extends ImmutableComponent {
     }
     const droppedHTML = e.dataTransfer.getData('text/html')
     if (droppedHTML) {
-      var parser = new window.DOMParser()
-      var doc = parser.parseFromString(droppedHTML, 'text/html')
-      var a = doc.querySelector('a')
+      const parser = new window.DOMParser()
+      const doc = parser.parseFromString(droppedHTML, 'text/html')
+      const a = doc.querySelector('a')
       if (a && a.href) {
         appActions.addSite({
           title: a.innerText,
@@ -85,6 +87,7 @@ class BookmarksToolbar extends ImmutableComponent {
         return
       }
     }
+
     if (e.dataTransfer.files.length > 0) {
       Array.from(e.dataTransfer.files).forEach((file) =>
         appActions.addSite({ location: file.path, title: file.name }, siteTags.BOOKMARK))
@@ -98,75 +101,7 @@ class BookmarksToolbar extends ImmutableComponent {
       .forEach((url) =>
         appActions.addSite({ location: url }, siteTags.BOOKMARK))
   }
-  openContextMenu (bookmark, e) {
-    contextMenus.onSiteDetailContextMenu(bookmark, this.activeFrame, e)
-  }
-  clickBookmarkItem (bookmark, e) {
-    return bookmarkActions.clickBookmarkItem(this.bookmarks, bookmark, this.activeFrame, e)
-  }
-  showBookmarkFolderMenu (bookmark, e) {
-    windowActions.setBookmarksToolbarSelectedFolderId(bookmark.get('folderId'))
-    contextMenus.onShowBookmarkFolderMenu(this.bookmarks, bookmark, this.activeFrame, e)
-  }
-  updateBookmarkData (props) {
-    // TODO(darkdh): Remove siteSort when we have #9030 landed
-    this.bookmarks = siteUtil.getBookmarks(props.sites).sort(siteUtil.siteSort)
 
-    const noParentItems = this.bookmarks
-      .filter((bookmark) => !bookmark.get('parentFolderId'))
-    let widthAccountedFor = 0
-    const overflowButtonWidth = 25
-
-    // Dynamically calculate how many bookmark items should appear on the toolbar
-    // before it is actually rendered.
-    this.maxWidth = domUtil.getStyleConstants('bookmark-item-max-width')
-    this.padding = domUtil.getStyleConstants('bookmark-item-padding') * 2
-    // Toolbar padding is only on the left
-    this.toolbarPadding = domUtil.getStyleConstants('bookmarks-toolbar-padding')
-    this.bookmarkItemMargin = domUtil.getStyleConstants('bookmark-item-margin') * 2
-    // No margin for show only favicons
-    this.chevronMargin = domUtil.getStyleConstants('bookmark-item-chevron-margin')
-    this.fontSize = domUtil.getStyleConstants('bookmark-item-font-size')
-    this.fontFamily = domUtil.getStyleConstants('default-font-family')
-    this.chevronWidth = this.chevronMargin + this.fontSize
-    const margin = props.showFavicon && props.showOnlyFavicon ? 0 : this.bookmarkItemMargin
-    widthAccountedFor += this.toolbarPadding
-
-    // Loop through until we fill up the entire bookmark toolbar width
-    let i
-    for (i = 0; i < noParentItems.size; i++) {
-      let iconWidth = props.showFavicon ? iconSize : 0
-      // font-awesome file icons are 3px smaller
-      if (props.showFavicon && !noParentItems.getIn([i, 'folderId']) && !noParentItems.getIn([i, 'favicon'])) {
-        iconWidth -= 3
-      }
-      const chevronWidth = props.showFavicon && noParentItems.getIn([i, 'folderId']) ? this.chevronWidth : 0
-      if (props.showFavicon && props.showOnlyFavicon) {
-        widthAccountedFor += this.padding + iconWidth + chevronWidth
-      } else {
-        const text = noParentItems.getIn([i, 'customTitle']) || noParentItems.getIn([i, 'title']) || noParentItems.getIn([i, 'location'])
-        widthAccountedFor += Math.min(calculateTextWidth(text, `${this.fontSize} ${this.fontFamily}`) + this.padding + iconWidth + chevronWidth, this.maxWidth)
-      }
-      widthAccountedFor += margin
-      if (widthAccountedFor >= props.windowWidth - overflowButtonWidth) {
-        break
-      }
-    }
-    this.bookmarksForToolbar = noParentItems.take(i)
-    // Show at most 100 items in the overflow menu
-    this.overflowBookmarkItems = noParentItems.skip(i).take(100)
-  }
-  componentWillMount () {
-    this.updateBookmarkData(this.props)
-  }
-  componentWillUpdate (nextProps) {
-    if (nextProps.sites !== this.props.sites ||
-        nextProps.windowWidth !== this.props.windowWidth ||
-        nextProps.showFavicon !== this.props.showFavicon ||
-        nextProps.showOnlyFavicon !== this.props.showOnlyFavicon) {
-      this.updateBookmarkData(nextProps)
-    }
-  }
   onDragEnter (e) {
     if (dndData.hasDragData(e.dataTransfer, dragTypes.BOOKMARK)) {
       if (Array.from(e.target.classList).includes('overflowIndicator')) {
@@ -174,6 +109,7 @@ class BookmarksToolbar extends ImmutableComponent {
       }
     }
   }
+
   onDragOver (e) {
     const sourceDragData = dndData.getDragData(e.dataTransfer, dragTypes.BOOKMARK)
     if (sourceDragData) {
@@ -181,7 +117,7 @@ class BookmarksToolbar extends ImmutableComponent {
       e.preventDefault()
       return
     }
-    // console.log(e.dataTransfer.types, e.dataTransfer.getData('text/plain'), e.dataTransfer.getData('text/uri-list'), e.dataTransfer.getData('text/html'))
+
     let intersection = e.dataTransfer.types.filter((x) =>
       ['text/plain', 'text/uri-list', 'text/html', 'Files'].includes(x))
     if (intersection.length > 0) {
@@ -189,23 +125,52 @@ class BookmarksToolbar extends ImmutableComponent {
       e.preventDefault()
     }
   }
+
   onMoreBookmarksMenu (e) {
-    contextMenus.onMoreBookmarksMenu(this.activeFrame, this.bookmarks, this.overflowBookmarkItems, e)
+    contextMenus.onMoreBookmarksMenu(this.activeFrame, this.props.bookmarks, this.props.hiddenBookmarks, e)
   }
+
   onContextMenu (e) {
     const closest = dnd.closestFromXOffset(this.bookmarkRefs.filter((x) => !!x), e.clientX).selectedRef
-    contextMenus.onTabsToolbarContextMenu(this.activeFrame.get('title'), this.activeFrame.get('location'), (closest && closest.props.bookmark) || undefined, closest && closest.isDroppedOn, e)
+    contextMenus.onTabsToolbarContextMenu(
+      this.props.title,
+      this.props.location,
+      (closest && closest.props.bookmark) || undefined,
+      closest && closest.isDroppedOn,
+      e
+    )
   }
-  render () {
-    let showFavicon = this.props.showFavicon
-    let showOnlyFavicon = this.props.showOnlyFavicon
 
+  mergeProps (state, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
+    const bookmarks = bookmarkUtil.getToolbarBookmarks(state)
+
+    const props = {}
+    // used in renderer
+    props.showOnlyFavicon = bookmarkUtil.showOnlyFavicon()
+    props.showFavicon = bookmarkUtil.showFavicon()
+    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused()) &&
+      !isWindows()
+    props.visibleBookmarks = bookmarks.visibleBookmarks // TODO (nejc) only primitives
+    props.hiddenBookmarks = bookmarks.hiddenBookmarks // TODO (nejc) only primitives
+
+    // used in other functions
+    props.activeFrameKey = activeFrame.get('key')
+    props.title = activeFrame.get('title')
+    props.location = activeFrame.get('location')
+    props.bookmarks = siteUtil.getBookmarks(state.get('sites', Immutable.List())) // TODO (nejc) only primitives
+
+    return props
+  }
+
+  render () {
     this.bookmarkRefs = []
     return <div
       className={cx({
         bookmarksToolbar: true,
-        showFavicon,
-        showOnlyFavicon,
+        showFavicon: this.props.showFavicon,
+        showOnlyFavicon: this.props.showOnlyFavicon,
         [css(styles.bookmarksToolbar)]: true,
         [css(this.props.shouldAllowWindowDrag && styles.bookmarksToolbar__allowDragging)]: true,
         [css(styles.bookmarksToolbar__showOnlyFavicon)]: true
@@ -216,23 +181,14 @@ class BookmarksToolbar extends ImmutableComponent {
       onDragOver={this.onDragOver}
       onContextMenu={this.onContextMenu}>
       {
-          this.bookmarksForToolbar.map((bookmark, i) =>
+          this.props.visibleBookmarks.map((bookmark, i) =>
             <BookmarkToolbarButton
               ref={(node) => this.bookmarkRefs.push(node)}
-              key={i}
-              contextMenuDetail={this.props.contextMenuDetail}
-              activeFrameKey={this.props.activeFrameKey}
-              draggingOverData={this.props.draggingOverData}
-              openContextMenu={this.openContextMenu}
-              clickBookmarkItem={this.clickBookmarkItem}
-              showBookmarkFolderMenu={this.showBookmarkFolderMenu}
-              bookmark={bookmark}
-              showFavicon={this.props.showFavicon}
-              showOnlyFavicon={this.props.showOnlyFavicon}
-              selectedFolderId={this.props.selectedFolderId} />)
+              key={`toolbar-button-${i}`}
+              bookmark={bookmark} />)
       }
       {
-        this.overflowBookmarkItems.size !== 0
+        this.props.hiddenBookmarks.size !== 0
         ? <BrowserButton
           iconClass={globalStyles.appIcons.angleDoubleRight}
           onClick={this.onMoreBookmarksMenu}
@@ -277,4 +233,4 @@ const styles = StyleSheet.create({
   }
 })
 
-module.exports = BookmarksToolbar
+module.exports = ReduxComponent.connect(BookmarksToolbar)

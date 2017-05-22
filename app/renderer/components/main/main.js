@@ -44,10 +44,8 @@ const CheckDefaultBrowserDialog = require('./checkDefaultBrowserDialog')
 const appConfig = require('../../../../js/constants/appConfig')
 const messages = require('../../../../js/constants/messages')
 const settings = require('../../../../js/constants/settings')
-const dragTypes = require('../../../../js/constants/dragTypes')
 const keyCodes = require('../../../common/constants/keyCodes')
 const keyLocations = require('../../../common/constants/keyLocations')
-const {bookmarksToolbarMode} = require('../../../common/constants/settingsEnums')
 
 // State handling
 const basicAuthState = require('../../../common/state/basicAuthState')
@@ -603,9 +601,6 @@ class Main extends ImmutableComponent {
     const nonPinnedFrames = frameStateUtil.getNonPinnedFrames(this.props.windowState)
     const tabsPerPage = Number(getSetting(settings.TABS_PER_PAGE))
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
-    const btbMode = getSetting(settings.BOOKMARKS_TOOLBAR_MODE)
-    const showFavicon = (btbMode === bookmarksToolbarMode.TEXT_AND_FAVICONS || btbMode === bookmarksToolbarMode.FAVICONS_ONLY)
-    const showOnlyFavicon = btbMode === bookmarksToolbarMode.FAVICONS_ONLY
     const siteInfoIsVisible = this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible']) && !isSourceAboutUrl(activeFrame.get('location'))
     const braveryPanelIsVisible = shieldState.braveShieldsEnabled(activeFrame) &&
       this.props.windowState.get('braveryPanelDetail')
@@ -627,8 +622,6 @@ class Main extends ImmutableComponent {
     const notificationBarIsVisible = activeOrigin && this.props.appState.get('notifications').filter((item) =>
       item.get('frameOrigin') ? activeOrigin === item.get('frameOrigin') : true).size > 0
     const updateIsVisible = updateState.isUpdateVisible(this.props.appState)
-
-    const appStateSites = this.props.appState.get('sites')
 
     return <div id='window'
       className={cx({
@@ -718,16 +711,7 @@ class Main extends ImmutableComponent {
         }
         {
           showBookmarksToolbar
-          ? <BookmarksToolbar
-            draggingOverData={this.props.appState.getIn(['dragData', 'dragOverData', 'draggingOverType']) === dragTypes.BOOKMARK && this.props.appState.getIn(['dragData', 'dragOverData'])}
-            showFavicon={showFavicon}
-            showOnlyFavicon={showOnlyFavicon}
-            shouldAllowWindowDrag={shouldAllowWindowDrag && !isWindows()}
-            activeFrameKey={(activeFrame && activeFrame.get('key')) || undefined}
-            windowWidth={window.innerWidth}
-            contextMenuDetail={contextMenuDetail}
-            sites={appStateSites}
-            selectedFolderId={this.props.windowState.getIn(['ui', 'bookmarksToolbar', 'selectedFolderId'])} />
+          ? <BookmarksToolbar />
           : null
         }
         <div className={cx({
