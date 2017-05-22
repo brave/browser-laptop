@@ -17,6 +17,7 @@ const fetchSearchSuggestions = require('./fetchSearchSuggestions')
 const {getFrameByTabId, getTabsByWindowId} = require('../../common/state/tabState')
 const {query} = require('./siteSuggestions')
 const debounce = require('../../../js/lib/debounce')
+const assert = require('assert')
 
 const sigmoid = (t) => {
   return 1 / (1 + Math.pow(Math.E, -t))
@@ -34,12 +35,12 @@ const ONE_DAY = 1000 * 60 * 60 * 24
  *
  */
 const sortingPriority = (count, currentTime, lastAccessedTime, ageDecayConstant) => {
+  count = Math.max(count, Number.EPSILON)
   // number of days since last access (with fractional component)
-  const ageInDays = (currentTime - (lastAccessedTime || currentTime)) / ONE_DAY
-  // decay factor based on age
-  const ageFactor = 1 - ((sigmoid(ageInDays / ageDecayConstant) - 0.5) * 2)
+  const ageInDays = (currentTime - (lastAccessedTime || 1)) / ONE_DAY
+  // Decay factor based on age, having a maximum of just less than 1 ensures the return will not be 0
+  const ageFactor = 1 - ((Math.min(sigmoid(ageInDays / ageDecayConstant), 1 - Number.EPSILON) - 0.5) * 2)
   // sorting priority
-  // console.log(count, ageInDays, ageFactor, count * ageFactor)
   return count * ageFactor
 }
 
@@ -86,13 +87,13 @@ const sortByAccessCountWithAgeDecay = (s1, s2) => {
   const s1Priority = sortingPriority(
     s1.count || 0,
     now.getTime(),
-    s1.lastAccessedTime || now.getTime(),
+    s1.lastAccessedTime || 0,
     appConfig.urlSuggestions.ageDecayConstant
   )
   const s2Priority = sortingPriority(
     s2.count || 0,
     now.getTime(),
-    s2.lastAccessedTime || now.getTime(),
+    s2.lastAccessedTime || 0,
     appConfig.urlSuggestions.ageDecayConstant
   )
   return s2Priority - s1Priority
@@ -172,12 +173,12 @@ var virtualSite = (sites) => {
   // if there are no simple locations then we will build and return one
   if (simple.length === 0) {
     // we need to create a virtual history item
-    return Immutable.Map({
+    return {
       location: sites[0].protocol + '//' + sites[0].host,
       count: 0,
       title: sites[0].host,
       lastAccessedTime: (new Date()).getTime()
-    })
+    }
   }
 }
 
@@ -186,17 +187,17 @@ var virtualSite = (sites) => {
  * The simple locations will be the root domain for a location
  * without parameters or path
  *
- * @param {ImmutableList[ImmutableMap]} - history
+ * @param {object} - history
  */
-const createVirtualHistoryItems = (historySites) => {
-  historySites = makeImmutable(historySites || {})
+const createVirtualHistoryItems = (historySites, urlLocationLower) => {
+  historySites = historySites || []
 
   // parse each history item
   const parsedHistorySites = []
   historySites.forEach((site) => {
-    if (site && site.get('location')) {
+    if (site && site.location) {
       parsedHistorySites.push(
-        urlParse(site.get('location'))
+        urlParse(site.location)
       )
     }
   })
@@ -215,9 +216,12 @@ const createVirtualHistoryItems = (historySites) => {
   virtualHistorySites = _.filter(virtualHistorySites, (site) => {
     return !!site
   })
-  return Immutable.fromJS(_.object(virtualHistorySites.map((site) => {
-    return [site.get('location'), site]
-  })))
+
+  if (urlLocationLower) {
+    virtualHistorySites = virtualHistorySites.filter((vs) => vs.location.indexOf(urlLocationLower) !== -1)
+  }
+
+  return virtualHistorySites
 }
 
 /**
@@ -290,8 +294,11 @@ const sortBySimpleURL = (s1, s2) => {
     if (!url1IsSecure && url2IsSecure) {
       return 1
     }
+  }
 
-    // Prefer smaller less complicated domains
+  // Prefer smaller less complicated domains
+  // hostname could be null in cases like javascript: bookmarklets
+  if (s1.parsedUrl.hostname && s2.parsedUrl.hostname) {
     const parts1 = s1.parsedUrl.hostname.split('.')
     const parts2 = s2.parsedUrl.hostname.split('.')
     let parts1Size = parts1.length
@@ -308,9 +315,8 @@ const sortBySimpleURL = (s1, s2) => {
     if (parts1Size > parts2Size) {
       return 1
     }
-    return sortByAccessCountWithAgeDecay(s1, s2)
   }
-  return 0
+  return sortByAccessCountWithAgeDecay(s1, s2)
 }
 
 /**
@@ -325,6 +331,14 @@ const getSortByPath = (userInputLower) => {
       return -1
     }
     if (pos1 === -1 && pos2 !== -1) {
+      return 1
+    }
+    const indexOf1 = path1.indexOf(path2)
+    const indexOf2 = path2.indexOf(path1)
+    if (indexOf1 === -1 && indexOf2 !== -1) {
+      return -1
+    }
+    if (indexOf1 !== -1 && indexOf2 === -1) {
       return 1
     }
     // Can't determine what is the best match
@@ -344,6 +358,9 @@ const getSortForSuggestions = (userInputLower) => {
   const sortByPath = getSortByPath(userInputLower)
 
   return (s1, s2) => {
+    if (s1.toJS || s2.toJS) {
+      assert('These sorting functions are not meant for Immutable data!')
+    }
     s1.parsedUrl = s1.parsedUrl || urlParse(getURL(s1) || '')
     s2.parsedUrl = s2.parsedUrl || urlParse(getURL(s2) || '')
 
@@ -379,7 +396,7 @@ const getURL = (x) => {
 }
 
 const getMapListToElements = (urlLocationLower) => ({data, maxResults, type,
-    sortHandler = (x) => x, filterValue = (site) => {
+    filterValue = (site) => {
       return site.toLowerCase().indexOf(urlLocationLower) !== -1
     }
 }) => {
@@ -398,7 +415,6 @@ const getMapListToElements = (urlLocationLower) => ({data, maxResults, type,
   }
 
   return makeImmutable(filteredData
-    .sort(sortHandler)
     .take(maxResults)
     .map((site) => {
       return Immutable.fromJS({
@@ -412,7 +428,6 @@ const getMapListToElements = (urlLocationLower) => ({data, maxResults, type,
 
 const getHistorySuggestions = (state, urlLocationLower) => {
   return new Promise((resolve, reject) => {
-    const sortHandler = getSortForSuggestions(urlLocationLower)
     const mapListToElements = getMapListToElements(urlLocationLower)
     const options = {
       historySuggestionsOn: getSetting(settings.HISTORY_SUGGESTIONS),
@@ -420,15 +435,15 @@ const getHistorySuggestions = (state, urlLocationLower) => {
     }
 
     query(urlLocationLower, options).then((results) => {
+      results = results.concat(createVirtualHistoryItems(results, urlLocationLower))
+      const sortHandler = getSortForSuggestions(urlLocationLower)
+      results = results.sort(sortHandler)
+      results = results.slice(0, config.urlBarSuggestions.maxHistorySites)
       results = makeImmutable(results)
-      results = results.take(config.urlBarSuggestions.maxHistorySites)
-      results = results.concat(createVirtualHistoryItems(results))
-
       const suggestionsList = mapListToElements({
         data: results,
         maxResults: config.urlBarSuggestions.maxHistorySites,
         type: options.historySuggestionsOn ? suggestionTypes.HISTORY : suggestionTypes.BOOKMARK,
-        sortHandler,
         filterValue: null
       })
       resolve(suggestionsList)
@@ -450,7 +465,6 @@ const getAboutSuggestions = (state, urlLocationLower) => {
 
 const getOpenedTabSuggestions = (state, windowId, urlLocationLower) => {
   return new Promise((resolve, reject) => {
-    const sortHandler = getSortForSuggestions(urlLocationLower)
     const mapListToElements = getMapListToElements(urlLocationLower)
     const tabs = getTabsByWindowId(state, windowId)
     let suggestionsList = Immutable.List()
@@ -459,7 +473,6 @@ const getOpenedTabSuggestions = (state, windowId, urlLocationLower) => {
         data: tabs,
         maxResults: config.urlBarSuggestions.maxOpenedFrames,
         type: suggestionTypes.TAB,
-        sortHandler,
         filterValue: (tab) => !isSourceAboutUrl(tab.get('url')) &&
           !tab.get('active') &&
           (

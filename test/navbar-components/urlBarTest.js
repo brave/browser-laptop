@@ -332,7 +332,7 @@ describe('urlBar tests', function () {
         .waitForVisible(urlBarSuggestions)
         // highlight for autocomplete brianbondy.com
         .moveToObject(urlBarSuggestions, 0, 100)
-      yield selectsText(this.app.client, 'rave.com/test3')
+      yield selectsText(this.app.client, 'rave.com/test2')
         .keys('rian')
         .execute(function (urlBarSuggestions) {
           document.querySelector(urlBarSuggestions).scrollTop = 200

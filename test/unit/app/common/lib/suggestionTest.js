@@ -10,7 +10,7 @@ const Immutable = require('immutable')
 const urlParse = require('url').parse
 const {makeImmutable} = require('../../../../../app/common/state/immutableUtil')
 const fakeElectron = require('../../../lib/fakeElectron')
-const _ = require('underscore')
+
 let suggestion
 require('../../../braveUnit')
 
@@ -98,66 +98,69 @@ describe('suggestion unit tests', function () {
   })
 
   describe('createVirtualHistoryItems', function () {
-    const site1 = Immutable.Map({
+    const site1 = {
       location: 'http://www.foo.com/1',
       count: 0,
       lastAccessedTime: 0,
       title: 'www.foo/com/1'
-    })
+    }
 
-    const site2 = Immutable.Map({
+    const site2 = {
       location: 'http://www.foo.com/2',
       count: 0,
       lastAccessedTime: 0,
       title: 'www.foo/com/2'
-    })
+    }
 
-    const site3 = Immutable.Map({
+    const site3 = {
       location: 'http://www.foo.com/3',
       count: 0,
       lastAccessedTime: 0,
       title: 'www.foo/com/3'
-    })
+    }
 
     it('handles input being null/undefined', function () {
-      const emptyResult = Immutable.Map()
+      const emptyResult = []
       assert.deepEqual(suggestion.createVirtualHistoryItems(), emptyResult)
       assert.deepEqual(suggestion.createVirtualHistoryItems(undefined), emptyResult)
       assert.deepEqual(suggestion.createVirtualHistoryItems(null), emptyResult)
     })
 
     it('handles entries with unparseable "location" field', function () {
-      const badInput = makeImmutable({
-        site1: {
+      const badInput = [
+        {
           location: undefined
-        },
-        site2: {
+        }, {
           location: null
-        },
-        site3: {
+        }, {
           location: ''
-        },
-        site4: {
+        }, {
           location: 'httphttp://lol.com'
         }
-      })
+      ]
+
       assert.ok(suggestion.createVirtualHistoryItems(badInput))
     })
 
-    it('calls immutableUtil.makeImmutable', function () {
-      const callCount = makeImmutableSpy.withArgs({}).callCount
-      suggestion.createVirtualHistoryItems()
-      assert.equal(makeImmutableSpy.withArgs({}).callCount, callCount + 1)
+    it('shows virtual history item', function () {
+      var history = [site1, site2, site3]
+      var virtual = suggestion.createVirtualHistoryItems(history)
+      assert.ok(virtual.length > 0, 'virtual location created')
+      assert.ok(virtual[0].location === 'http://www.foo.com')
+      assert.ok(virtual[0].title === 'www.foo.com')
+      assert.ok(virtual[0].lastAccessedTime > 0)
     })
 
-    it('shows virtual history item', function () {
-      var history = Immutable.List([site1, site2, site3])
-      var virtual = suggestion.createVirtualHistoryItems(history).toJS()
-      var keys = _.keys(virtual)
-      assert.ok(keys.length > 0, 'virtual location created')
-      assert.ok(virtual[keys[0]].location === 'http://www.foo.com')
-      assert.ok(virtual[keys[0]].title === 'www.foo.com')
-      assert.ok(virtual[keys[0]].lastAccessedTime > 0)
+    it('filters virtual sites to only matching input', function () {
+      var history = [{
+        location: 'https://www.google.com/test',
+        title: 'Google 1!'
+      }, {
+        location: 'https://www.google.com/blah',
+        title: 'Google 2!'
+      }]
+      var virtual = suggestion.createVirtualHistoryItems(history, 'google.ca')
+      assert.equal(virtual.length, 0)
     })
   })
 
@@ -180,6 +183,11 @@ describe('suggestion unit tests', function () {
       })
       it('matches even domain name for input string', function () {
         assert.equal(this.sort('https://brave.com/facebook', 'https://twitter.com'), 1)
+      })
+      it('sorts shortest path when one is a prefix of another and they have a match', function () {
+        assert(this.sort('https://www.twitter.com/brian', 'https://www.twitter.com/brian/test1') < 0)
+        assert(this.sort('https://www.twitter.com/brian/test1', 'https://www.twitter.com/brian') > 0)
+        assert.equal(this.sort('https://www.twitter.com/brian/test1', 'https://www.twitter.com/brian/test1'), 0)
       })
     })
     describe('sortBySimpleURL', function () {
@@ -256,17 +264,20 @@ describe('suggestion unit tests', function () {
       it('does not throw error for file:// URL', function () {
         assert(this.sort('https://google.com', 'file://') < 0)
       })
+      it('does not throw error for javascript: bookmarklets', function () {
+        assert.equal(this.sort('javascript:alert(document.links[0].href)', 'javascript:alert(document.links[1].href)'), 0)
+      })
       it('sorts simple domains that match equally on subdomains as the same', function () {
         const url1 = 'https://facebook.github.com'
         const url2 = 'https://facebook.brave.com'
         const sort = suggestion.getSortByDomain('facebook', 'facebook')
-        assert(sort({
+        assert.equal(sort({
           location: url1,
           parsedUrl: urlParse(url1)
         }, {
           location: url2,
           parsedUrl: urlParse(url2)
-        }) === 0)
+        }), 0)
       })
       it('sorts simple domains that match equally but have different activity based on activity', function () {
         const url1 = 'https://facebook.github.com'
@@ -340,6 +351,46 @@ describe('suggestion unit tests', function () {
           )
         }
         assert(sort('https://facebook.github.io/', 'https://www.facebook.com/') > 0)
+      })
+      it('sorts better matched domains based on more simple with paths ignoring www.', function () {
+        const userInputLower = 'facebook'
+        const internalSort = suggestion.getSortForSuggestions(userInputLower, userInputLower)
+        const sort = (url1, url2) => {
+          return internalSort(
+            { location: url1, parsedUrl: urlParse(url1) },
+            { location: url2, parsedUrl: urlParse(url2) }
+          )
+        }
+        assert(sort('https://facebook.github.io/brian', 'https://www.facebook.com/brian') > 0)
+      })
+      it('hierarchical input does not select shortest match domain', function () {
+        const userInputLower = 'facebook.com/brian'
+        const internalSort = suggestion.getSortForSuggestions(userInputLower, userInputLower)
+        const sort = (url1, url2) => {
+          return internalSort(
+            { location: url1, parsedUrl: urlParse(url1) },
+            { location: url2, parsedUrl: urlParse(url2) }
+          )
+        }
+        assert.equal(sort('https://www.facebook.com/brian2', 'https://www.facebook.com/brian/test1'), 0)
+      })
+      it('prefix matches1', function () {
+        const userInputLower = 'twi'
+        const url1 = 'https://twitter.com/'
+        const url2 = 'https://www.twilio.com/'
+        const sort = suggestion.getSortForSuggestions(userInputLower, userInputLower)
+        assert(sort({
+          location: url1,
+          title: 'Twitter. It\'s what\'s happening.',
+          parsedUrl: urlParse(url1),
+          count: 2,
+          lastAccessedTime: 1495376582112
+        }, {
+          location: url2,
+          title: 'Twilio - APIs for Text Messaging, VoIP & Voice in the Cloud',
+          parsedUrl: urlParse(url2),
+          lastAccessedTime: 0
+        }) < 0)
       })
     })
   })

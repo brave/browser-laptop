@@ -20,6 +20,13 @@ const site3 = {
 
 const site4 = {
   location: 'https://www.designers.com/brad',
+  title: 'Brad Saves The World!',
+  count: 50
+}
+
+// Same as site4 but added after in init, should be ignored.
+const site5 = {
+  location: 'https://www.designers.com/brad',
   title: 'Brad Saves The World!'
 }
 
@@ -112,9 +119,10 @@ describe('siteSuggestions lib', function () {
       checkResult('hello', [], cb)
     })
   })
+
   describe('query', function () {
     before(function (cb) {
-      const sites = [site1, site2, site3, site4]
+      const sites = [site1, site2, site3, site4, site5]
       init(sites).then(cb.bind(null, null))
     })
     it('can query with empty string', function (cb) {
@@ -197,59 +205,120 @@ describe('siteSuggestions lib', function () {
       })
     })
     describe('sorts results by count', function () {
-      before(function (cb) {
-        this.page2 = {
-          location: 'https://brave.com/page2',
-          count: 20
-        }
-        const sites = Immutable.fromJS([{
-          location: 'https://brave.com/page1',
-          count: 5
-        }, this.page2, {
-          location: 'https://brave.com/page3',
-          count: 2
-        }])
-        init(sites).then(cb.bind(null, null))
+      describe('with lastAccessedTime', function () {
+        before(function (cb) {
+          const lastAccessedTime = 1494958046427
+          this.page2 = {
+            location: 'https://brave.com/page2',
+            lastAccessedTime,
+            count: 20
+          }
+          const sites = Immutable.fromJS([{
+            location: 'https://brave.com/page1',
+            lastAccessedTime,
+            count: 5
+          }, this.page2, {
+            location: 'https://brave.com/page3',
+            lastAccessedTime,
+            count: 2
+          }])
+          init(sites).then(cb.bind(null, null))
+        })
+        it('highest count first', function (cb) {
+          query('https://brave.com/page').then((results) => {
+            siteEqual(results[0], this.page2)
+            cb()
+          })
+        })
       })
-      it('highest count first', function (cb) {
-        query('https://brave.com/page').then((results) => {
-          siteEqual(results[0], this.page2)
-          cb()
+      describe('without last access time', function () {
+        before(function (cb) {
+          this.page2 = {
+            location: 'https://brave.com/page2',
+            count: 20
+          }
+          const sites = Immutable.fromJS([{
+            location: 'https://brave.com/page1',
+            count: 5
+          }, this.page2, {
+            location: 'https://brave.com/page3',
+            count: 2
+          }])
+          init(sites).then(cb.bind(null, null))
+        })
+        it('highest count first', function (cb) {
+          query('https://brave.com/page').then((results) => {
+            siteEqual(results[0], this.page2)
+            cb()
+          })
         })
       })
     })
-    describe('respects lastAccessTime', function () {
-      before(function (cb) {
-        this.site = {
-          location: 'https://bravebrowser.com/page2',
-          lastAccessedTime: 1494958046427,  // most recent
-          count: 1
-        }
-        const sites = Immutable.fromJS([{
-          location: 'https://bravez.com/page1',
-          lastAccessedTime: 1,
-          count: 1
-        }, {
-          location: 'https://bravebrowser.com/page1',
-          lastAccessedTime: 1494957046426,
-          count: 1
-        }, this.site, {
-          location: 'https://bravebrowser.com/page3',
-          lastAccessedTime: 1494957046437,
-          count: 1
-        }])
-        init(sites).then(cb.bind(null, null))
-      })
-      it('items with lastAccessTime of 1 get ignored (signifies preloaded default)', function (cb) {
-        query('https://bravez.com/page').then((results) => {
-          assert.equal(results.length, 0)
-          cb()
+    describe('sorts results by lastAccessTime', function () {
+      describe('with counts', function () {
+        before(function (cb) {
+          this.site = {
+            location: 'https://bravebrowser.com/page2',
+            lastAccessedTime: 1494958046427,  // most recent
+            count: 1
+          }
+          const sites = Immutable.fromJS([{
+            location: 'https://bravez.com/page1',
+            lastAccessedTime: 1,
+            count: 1
+          }, {
+            location: 'https://bravebrowser.com/page1',
+            lastAccessedTime: 1494957046426,
+            count: 1
+          }, this.site, {
+            location: 'https://bravebrowser.com/page3',
+            lastAccessedTime: 1494957046437,
+            count: 1
+          }])
+          init(sites).then(cb.bind(null, null))
+        })
+        it('items with lastAccessTime of 1 get ignored (signifies preloaded default)', function (cb) {
+          query('https://bravez.com/page').then((results) => {
+            assert.equal(results.length, 0)
+            cb()
+          })
+        })
+        it('most recently accessed get sorted first', function (cb) {
+          query('bravebrowser').then((results) => {
+            siteEqual(results[0], this.site)
+            cb()
+          })
         })
       })
-      it('most recently accessed get sorted first', function (cb) {
-        query('bravebrowser').then((results) => {
-          siteEqual(results[0], this.site)
-          cb()
+      describe('without counts', function () {
+        before(function (cb) {
+          this.site = {
+            location: 'https://bravebrowser.com/page2',
+            lastAccessedTime: 1494958046427  // most recent
+          }
+          const sites = Immutable.fromJS([{
+            location: 'https://bravez.com/page1',
+            lastAccessedTime: 1
+          }, {
+            location: 'https://bravebrowser.com/page1',
+            lastAccessedTime: 1494957046426
+          }, this.site, {
+            location: 'https://bravebrowser.com/page3',
+            lastAccessedTime: 1494957046437
+          }])
+          init(sites).then(cb.bind(null, null))
+        })
+        it('items with lastAccessTime of 1 get ignored (signifies preloaded default)', function (cb) {
+          query('https://bravez.com/page').then((results) => {
+            assert.equal(results.length, 0)
+            cb()
+          })
+        })
+        it('most recently accessed get sorted first', function (cb) {
+          query('bravebrowser').then((results) => {
+            siteEqual(results[0], this.site)
+            cb()
+          })
         })
       })
     })
@@ -267,11 +336,12 @@ describe('siteSuggestions lib', function () {
     it('can be found', function (cb) {
       checkResult('slack', [{ location: 'https://slack.com' }], cb)
     })
-    it('adding twice results in 1 result only', function (cb) {
+    it('adding twice results in 1 result only with latest results', function (cb) {
       add({
-        location: 'https://slack.com'
+        location: 'https://slack.com',
+        count: 30
       })
-      checkResult('slack', [{ location: 'https://slack.com' }], cb)
+      checkResult('slack', [{ location: 'https://slack.com', count: 30 }], cb)
     })
     it('can add simple strings', function (cb) {
       add({
