@@ -9,10 +9,11 @@ const Immutable = require('immutable')
 const ImmutableComponent = require('../immutableComponent')
 const Dialog = require('../common/dialog')
 const SwitchControl = require('../common/switchControl')
-const {FormDropdown} = require('../common/dropdown')
+const {BraveryPanelDropdown} = require('../common/dropdown')
 
 // Constants
 const config = require('../../../../js/constants/config')
+const settings = require('../../../../js/constants/settings')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
@@ -22,6 +23,11 @@ const appActions = require('../../../../js/actions/appActions')
 const urlParse = require('../../../common/urlParse')
 const cx = require('../../../../js/lib/classSet')
 const siteUtil = require('../../../../js/state/siteUtil')
+const getSetting = require('../../../../js/settings').getSetting
+
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../styles/global')
+const commonStyles = require('../styles/commonStyles')
 
 class BraveryPanel extends ImmutableComponent {
   constructor () {
@@ -168,6 +174,56 @@ class BraveryPanel extends ImmutableComponent {
     }
     return this.props.lastCommittedURL
   }
+
+  get compactBraveryPanelHeader () {
+    const shieldsUp = this.props.braverySettings.shieldsUp
+    return <section className={css(
+      styles.braveryPanel__header,
+      styles.braveryPanel_compact__header
+    )}>
+      <div data-l10n-id='braveryPanelTitle' className={css(
+        styles.braveryPanel__header_left,
+        styles.braveryPanel_compact__header_top
+      )} />
+      <div className={css(
+        styles.braveryPanel__header_right,
+        styles.braveryPanel_compact__header_bottom
+      )}>
+        <div title={this.displayHost} className={css(styles.braveryPanel_compact__header__displayHost)}>{this.displayHost}</div>
+        <div className={css(styles.braveryPanel_compact__header_bottom__shieldsSwitch)}>
+          <SwitchControl large
+            customWrapper={css(styles.braveryPanel_compact__header_bottom__shieldsSwitch__switchControl)}
+            onClick={this.onToggleShields}
+            leftl10nId='shieldsDown'
+            rightl10nId='shieldsUp'
+            checkedOn={shieldsUp}
+          />
+        </div>
+      </div>
+    </section>
+  }
+
+  get defaultBraveryPanelHeader () {
+    const shieldsUp = this.props.braverySettings.shieldsUp
+    return <section className={css(styles.braveryPanel__header)}>
+      <div className={css(styles.braveryPanel__header_left)}>
+        <div data-l10n-id='braveryPanelTitle' />
+        <div title={this.displayHost} className={css(styles.braveryPanel__header__displayHost)}>{this.displayHost}</div>
+      </div>
+      <div className={css(styles.braveryPanel__header_right)}>
+        <SwitchControl large
+          customWrapper={css(styles.braveryPanel__header_right__switchControl)}
+          customTopText={css(styles.braveryPanel__header_right__switchControl__topText)}
+          onClick={this.onToggleShields}
+          leftl10nId='shieldsDown'
+          rightl10nId='shieldsUp'
+          topl10nId='shields'
+          checkedOn={shieldsUp}
+        />
+      </div>
+    </section>
+  }
+
   render () {
     const shieldsUp = this.props.braverySettings.shieldsUp
     const noScriptEnabled = this.props.braverySettings.noScript
@@ -184,164 +240,707 @@ class BraveryPanel extends ImmutableComponent {
       blockedScriptCount: scriptsBlockedStat,
       blockedFingerprintCount: fpBlockedStat
     })
-    return <Dialog onHide={this.props.onHide} className='braveryPanelContainer' isClickDismiss>
-      <div className='braveryPanel' onClick={(e) => e.stopPropagation()}>
-        <div className='braveryPanelHeader'>
-          <div className='braveryPanelHeaderLeft'>
-            <div data-l10n-id='braveryPanelTitle' />
-            <span title={this.displayHost} className='braverySettingsFor'>{this.displayHost}</span>
-          </div>
-          <div className='braveryPanelHeaderRight'>
-            <div className='braveryShieldsUpDown'>
-              <SwitchControl
-                onClick={this.onToggleShields}
-                leftl10nId='shieldsDown'
-                rightl10nId='shieldsUp'
-                topl10nId='shields'
-                testId='shields-toggle'
-                checkedOn={shieldsUp}
-                large
-              />
-            </div>
-          </div>
-        </div>
-        <div className='braveryPanelStats'>
-          <div onClick={this.onToggleAdsAndTracking} className={cx({
-            statClickable: !!adsBlockedStat,
-            statDisabled: !shieldsUp || adControl === 'allowAdsAndTracking'
-          })}>
-            <div className='braveryStat adsBlockedStat'>{adsBlockedStat}</div>
-            <div data-l10n-id='adsBlocked' data-l10n-args={l10nArgs} />
-          </div>
-          <div onClick={this.onToggleHttpseList} className={cx({
-            statClickable: !!this.redirectedResourcesSet.size,
-            statDisabled: !shieldsUp || !httpseEnabled
-          })}>
-            <div className='braveryStat redirectedResourcesStat'>{httpsUpgradedResourceStat}</div>
-            <div data-l10n-id='httpReroutes' data-l10n-args={l10nArgs} />
-          </div>
-          <div onClick={this.onToggleNoScriptList} className={cx({
-            statClickable: !!scriptsBlockedStat,
-            statDisabled: !shieldsUp || !noScriptEnabled
-          })}>
-            <div className='braveryStat noScriptStat'>{scriptsBlockedStat}</div>
-            <div data-l10n-id='scriptsBlockedNumber' data-l10n-args={l10nArgs} />
-          </div>
-          <div onClick={this.onToggleFpList} className={cx({
-            statClickable: !!fpBlockedStat,
-            statDisabled: !shieldsUp || !fpEnabled
-          })}>
-            <div className='braveryStat fpStat'>{fpBlockedStat}</div>
-            <div data-l10n-id='fingerprintingBlocked' data-l10n-args={l10nArgs} />
-          </div>
-        </div>
-        <div className='braveryPanelBody'>
-          <ul>
-            {
-              this.isBlockedAdsShown && (this.isBlockingAds || this.isBlockingTrackedContent)
-              ? <li><ul>
-                {
-                  this.isBlockingAds
-                  ? this.blockedAds.map((site) => <li key={site}>{site}</li>)
-                  : null
-                }
-                {
-                  this.isBlockingTrackedContent
-                  ? this.blockedByTrackingList.map((site) => <li key={site}>{site}</li>)
-                  : null
-                }
-              </ul></li>
-              : null
-            }
-            {
-              this.isRedirectingResources && this.isHttpseShown
-              ? <li><ul>
-                {
-                  this.redirectedResourcesSet.map((site) =>
-                    <li key={site}>{site}</li>)
-                }
-              </ul></li>
-              : null
-            }
-            {
-              this.isBlockingScripts && this.isBlockedScriptsShown
-              ? <li><ul>
-                {
-                  this.blockedScripts.map((site) =>
-                    <li key={site}>{site}</li>)
-                }
-              </ul></li>
-              : null
-            }
-            {
-              this.isBlockingFingerprinting && this.isFpShown
-              ? <li><ul>
-                {
-                  this.blockedFingerprinting.map((site) =>
-                    <li key={site}>{site}</li>)
-                }
-              </ul></li>
-              : null
-            }
-          </ul>
-          <div className={cx({
-            braveryAdvancedTitle: true,
-            disabled: !shieldsUp
-          })} onClick={this.onToggleAdvanced}>
+    const compactBraveryPanel = getSetting(settings.COMPACT_BRAVERY_PANEL)
+
+    return <Dialog onHide={this.props.onHide} testId='braveryPanelContainer' isClickDismiss>
+      <div className={css(
+        commonStyles.flyoutDialog,
+        styles.braveryPanel,
+        compactBraveryPanel && styles.braveryPanel_compact
+      )}
+        onClick={(e) => e.stopPropagation()}
+        data-test-id={compactBraveryPanel ? 'braveryPanelCompact' : 'braveryPanel'}>
+        {
+          compactBraveryPanel
+          ? this.compactBraveryPanelHeader
+          : this.defaultBraveryPanelHeader
+        }
+        <section className={css(
+          styles.braveryPanel__stats,
+          compactBraveryPanel && styles.braveryPanel_compact__stats
+        )}>
+          <div data-test-id='adsBlockedStat'
+            onClick={this.onToggleAdsAndTracking}
+            className={css(
+              styles.braveryPanel__stats__item_count_adsBlockedStat,
+              !!adsBlockedStat && styles.braveryPanel__stats__item_count_clickable,
+              (!shieldsUp || adControl === 'allowAdsAndTracking') && styles.braveryPanel__stats__item_count_disabled,
+              gridStyles.row1col1,
+              !compactBraveryPanel && styles.braveryPanel__stats__item,
+              !compactBraveryPanel && styles.braveryPanel__stats__item_count,
+              compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
+            )}>{adsBlockedStat}</div>
+
+          <div data-test-id='redirectedResourcesStat'
+            onClick={this.onToggleHttpseList}
+            className={css(
+              styles.braveryPanel__stats__item_count_redirectedResourcesStat,
+              !!this.redirectedResourcesSet.size && styles.braveryPanel__stats__item_count_clickable,
+              (!shieldsUp || !httpseEnabled) && styles.braveryPanel__stats__item_count_disabled,
+              !compactBraveryPanel && gridStyles.row1col2,
+              !compactBraveryPanel && styles.braveryPanel__stats__item,
+              !compactBraveryPanel && styles.braveryPanel__stats__item_count,
+              compactBraveryPanel && gridStyles.row2col1,
+              compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
+            )}>{httpsUpgradedResourceStat}</div>
+
+          <div data-test-id='noScriptStat'
+            onClick={this.onToggleNoScriptList}
+            className={css(
+              styles.braveryPanel__stats__item_count_noScriptStat,
+              !!scriptsBlockedStat && styles.braveryPanel__stats__item_count_clickable,
+              (!shieldsUp || !noScriptEnabled) && styles.braveryPanel__stats__item_count_disabled,
+              !compactBraveryPanel && gridStyles.row1col3,
+              !compactBraveryPanel && styles.braveryPanel__stats__item,
+              !compactBraveryPanel && styles.braveryPanel__stats__item_count,
+              compactBraveryPanel && gridStyles.row3col1,
+              compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
+            )}>{scriptsBlockedStat}</div>
+
+          <div data-test-id='fpStat'
+            onClick={this.onToggleFpList}
+            className={css(
+              styles.braveryPanel__stats__item_count_fpStat,
+              !!fpBlockedStat && styles.braveryPanel__stats__item_count_clickable,
+              (!shieldsUp || !fpEnabled) && styles.braveryPanel__stats__item_count_disabled,
+              !compactBraveryPanel && gridStyles.row1col4,
+              !compactBraveryPanel && styles.braveryPanel__stats__item,
+              !compactBraveryPanel && styles.braveryPanel__stats__item_count,
+              compactBraveryPanel && gridStyles.row4col1,
+              compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
+            )}>{fpBlockedStat}</div>
+
+          <span className={css(
+            !!adsBlockedStat && styles.braveryPanel__stats__item_label_clickable,
+            (!shieldsUp || adControl === 'allowAdsAndTracking') && styles.braveryPanel__stats__item_label_disabled,
+            !compactBraveryPanel && gridStyles.row2col1,
+            !compactBraveryPanel && styles.braveryPanel__stats__item,
+            compactBraveryPanel && gridStyles.row1col2,
+            compactBraveryPanel && styles.braveryPanel_compact__stats__item_label
+          )}
+            onClick={this.onToggleAdsAndTracking}
+            data-l10n-id='adsBlocked'
+            data-l10n-args={l10nArgs}
+          />
+          <span className={css(
+            !!this.redirectedResourcesSet.size && styles.braveryPanel__stats__item_label_clickable,
+            (!shieldsUp || !httpseEnabled) && styles.braveryPanel__stats__item_label_disabled,
+            gridStyles.row2col2,
+            !compactBraveryPanel && styles.braveryPanel__stats__item,
+            compactBraveryPanel && styles.braveryPanel_compact__stats__item_label
+          )}
+            onClick={this.onToggleHttpseList}
+            data-l10n-id='httpReroutes'
+            data-l10n-args={l10nArgs}
+          />
+          <span className={css(
+            !!scriptsBlockedStat && styles.braveryPanel__stats__item_label_clickable,
+            (!shieldsUp || !noScriptEnabled) && styles.braveryPanel__stats__item_label_disabled,
+            !compactBraveryPanel && gridStyles.row2col3,
+            !compactBraveryPanel && styles.braveryPanel__stats__item,
+            compactBraveryPanel && gridStyles.row3col2,
+            compactBraveryPanel && styles.braveryPanel_compact__stats__item_label
+          )}
+            onClick={this.onToggleNoScriptList}
+            data-l10n-id='scriptsBlockedNumber'
+            data-l10n-args={l10nArgs}
+          />
+          <span className={css(
+            !!fpBlockedStat && styles.braveryPanel__stats__item_label_clickable,
+            (!shieldsUp || !fpEnabled) && styles.braveryPanel__stats__item_label_disabled,
+            !compactBraveryPanel && gridStyles.row2col4,
+            !compactBraveryPanel && styles.braveryPanel__stats__item,
+            compactBraveryPanel && gridStyles.row4col2,
+            compactBraveryPanel && styles.braveryPanel_compact__stats__item_label
+          )}
+            onClick={this.onToggleFpList}
+            data-l10n-id='fingerprintingBlocked'
+            data-l10n-args={l10nArgs}
+          />
+        </section>
+
+        <section className={css(
+          styles.braveryPanel__body,
+          compactBraveryPanel && styles.braveryPanel_compact__body
+        )}>
+          {
+            (this.isBlockedAdsShown && (this.isBlockingAds || this.isBlockingTrackedContent))
+            ? <ul data-test-id='braveryPanelBodyList'
+              className={css(
+                styles.braveryPanel__body__ul,
+                compactBraveryPanel && styles.braveryPanel_compact__body__ul
+              )}>
+              {
+                this.isBlockingAds
+                ? this.blockedAds.map(site =>
+                  <li data-test-id='braveryPanelBodyList'
+                    className={css(
+                      styles.braveryPanel__body__ul__li,
+                      compactBraveryPanel && styles.braveryPanel_compact__body__ul__li
+                    )}
+                    key={site}>{site}</li>)
+                : null
+              }
+              {
+                this.isBlockingTrackedContent
+                ? this.blockedByTrackingList.map(site =>
+                  <li data-test-id='braveryPanelBodyList'
+                    className={css(
+                      styles.braveryPanel__body__ul__li,
+                      compactBraveryPanel && styles.braveryPanel_compact__body__ul__li
+                    )}
+                    key={site}>{site}</li>)
+                : null
+              }
+            </ul>
+            : null
+          }
+          {
+            this.isRedirectingResources && this.isHttpseShown
+            ? <ul data-test-id='braveryPanelBodyList'
+              className={css(
+                styles.braveryPanel__body__ul,
+                compactBraveryPanel && styles.braveryPanel_compact__body__ul
+              )}>
+              {
+                this.redirectedResourcesSet.map((site) =>
+                  <li data-test-id='braveryPanelBodyList'
+                    className={css(
+                      styles.braveryPanel__body__ul__li,
+                      compactBraveryPanel && styles.braveryPanel_compact__body__ul__li
+                    )}
+                    key={site}>{site}</li>)
+              }
+            </ul>
+            : null
+          }
+          {
+            this.isBlockingScripts && this.isBlockedScriptsShown
+            ? <ul data-test-id='braveryPanelBodyList'
+              className={css(
+                styles.braveryPanel__body__ul,
+                compactBraveryPanel && styles.braveryPanel_compact__body__ul
+              )}>
+              {
+                this.blockedScripts.map((site) =>
+                  <li data-test-id='braveryPanelBodyList'
+                    className={css(
+                      styles.braveryPanel__body__ul__li,
+                      compactBraveryPanel && styles.braveryPanel_compact__body__ul__li
+                    )}
+                    key={site}>{site}</li>)
+              }
+            </ul>
+            : null
+          }
+          {
+            this.isBlockingFingerprinting && this.isFpShown
+            ? <ul data-test-id='braveryPanelBodyList'
+              className={css(
+                styles.braveryPanel__body__ul,
+                compactBraveryPanel && styles.braveryPanel_compact__body__ul
+              )}>
+              {
+                this.blockedFingerprinting.map((site) =>
+                  <li data-test-id='braveryPanelBodyList'
+                    className={css(
+                      styles.braveryPanel__body__ul__li,
+                      compactBraveryPanel && styles.braveryPanel_compact__body__ul__li
+                    )}
+                    key={site}>{site}</li>)
+              }
+            </ul>
+            : null
+          }
+          <div onClick={this.onToggleAdvanced}
+            className={css(
+              styles.braveryPanel__body__advancedTitle,
+              compactBraveryPanel && styles.braveryPanel_compact__body__advancedTitle
+            )}>
             <div className={cx({
               fa: true,
               'fa-caret-down': this.isAdvancedExpanded,
               'fa-caret-right': !this.isAdvancedExpanded,
-              braveryAdvancedIndicator: true
+              [css(styles.braveryPanel__body__advancedTitle__indicator)]: true,
+              [css(styles.braveryPanel_compact__body__advancedTitle__indicator)]: compactBraveryPanel
             })} />
             <div data-l10n-id='advancedControls' />
           </div>
           {
             this.isAdvancedExpanded
-            ? <span>
-              <hr />
-              <div className='braveryAdvanced'>
-                <div className='braveryControlGroup'>
-                  <div className={cx({
-                    braverySelectTitle: true,
-                    disabled: !shieldsUp
-                  })} data-l10n-id='adControl' />
-                  <FormDropdown data-test-id='adsBlockedControl' value={adControl} onChange={this.onToggleAdControl} disabled={!shieldsUp}>
-                    <option data-l10n-id='showBraveAds' value='showBraveAds' />
-                    <option data-l10n-id='blockAds' value='blockAds' />
-                    <option data-l10n-id='allowAdsAndTracking' value='allowAdsAndTracking' />
-                  </FormDropdown>
-                  <SwitchControl onClick={this.onToggleHTTPSE} rightl10nId='httpsEverywhere' checkedOn={httpseEnabled} disabled={!shieldsUp} className='httpsEverywhereSwitch' />
-                  <SwitchControl onClick={this.onToggleNoScript} rightl10nId='noScript' checkedOn={noScriptEnabled} disabled={!shieldsUp} className='noScriptSwitch' />
+            ? <section>
+              <hr className={css(
+                styles.braveryPanel__body__hr,
+                compactBraveryPanel && styles.braveryPanel_compact__body__hr
+              )} />
+              <div className={css(
+                styles.braveryPanel__body__advanced__control,
+                compactBraveryPanel && styles.braveryPanel_compact__body__advanced__control
+              )}>
+                <div data-l10n-id='adControl' className={css(
+                  !shieldsUp && styles.braveryPanel__body__advanced__control__forms__title_disabled,
+                  gridStyles.row1col1,
+                  !compactBraveryPanel && styles.braveryPanel__body__advanced__control__forms__title,
+                  compactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__title
+                )} />
+
+                <div className={css(
+                  !shieldsUp && styles.braveryPanel__body__advanced__control__forms__dropdown_disabled,
+                  gridStyles.row2col1,
+                  !compactBraveryPanel && styles.braveryPanel__body__advanced__control__forms__dropdown,
+                  compactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__dropdown
+                )}>
+                  <BraveryPanelDropdown data-test-id='adsBlockedControl' value={adControl} onChange={this.onToggleAdControl} disabled={!shieldsUp}>
+                    <option data-l10n-id='showBraveAds' data-test-id='showBraveAds' value='showBraveAds' />
+                    <option data-l10n-id='blockAds' data-test-id='blockAdsOption' value='blockAds' />
+                    <option data-l10n-id='allowAdsAndTracking' data-test-id='showAdsOption' value='allowAdsAndTracking' />
+                  </BraveryPanelDropdown>
                 </div>
-                <div className='braveryControlGroup'>
-                  <div className={cx({
-                    braverySelectTitle: true,
-                    disabled: !shieldsUp
-                  })} data-l10n-id='cookieControl' />
-                  <FormDropdown data-test-id='cookieControl' value={this.props.braverySettings.cookieControl} onChange={this.onToggleCookieControl} disabled={!shieldsUp}>
+
+                <SwitchControl className={css(
+                  !compactBraveryPanel && gridStyles.row3col1,
+                  compactBraveryPanel && gridStyles.row5col1,
+                  compactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
+                )}
+                  onClick={this.onToggleHTTPSE}
+                  rightl10nId='httpsEverywhere'
+                  checkedOn={httpseEnabled}
+                  disabled={!shieldsUp}
+                  testId='httpsEverywhereSwitch'
+                />
+
+                <SwitchControl className={css(
+                  !compactBraveryPanel && gridStyles.row4col1,
+                  compactBraveryPanel && gridStyles.row6col1,
+                  compactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
+                )}
+                  onClick={this.onToggleNoScript}
+                  rightl10nId='noScript'
+                  checkedOn={noScriptEnabled}
+                  disabled={!shieldsUp}
+                  testId='noScriptSwitch'
+                />
+
+                <div data-l10n-id='cookieControl' className={css(
+                  !shieldsUp && styles.braveryPanel__body__advanced__control__forms__title_disabled,
+                  !compactBraveryPanel && gridStyles.row1col2,
+                  !compactBraveryPanel && styles.braveryPanel__body__advanced__control__forms__title,
+                  compactBraveryPanel && gridStyles.row3col1,
+                  compactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__title
+                )} />
+
+                <div className={css(
+                  !shieldsUp && styles.braveryPanel__body__advanced__control__forms__dropdown_disabled,
+                  !compactBraveryPanel && gridStyles.row2col2,
+                  !compactBraveryPanel && styles.braveryPanel__body__advanced__control__forms__dropdown,
+                  compactBraveryPanel && gridStyles.row4col1,
+                  compactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__dropdown
+                )}>
+                  <BraveryPanelDropdown data-test-id='cookieControl' value={this.props.braverySettings.cookieControl} onChange={this.onToggleCookieControl} disabled={!shieldsUp}>
                     <option data-l10n-id='block3rdPartyCookie' value='block3rdPartyCookie' />
-                    <option data-l10n-id='allowAllCookies' value='allowAllCookies' />
-                    <option data-l10n-id='blockAllCookies' value='blockAllCookies' />
-                  </FormDropdown>
-                  <SwitchControl onClick={this.onToggleFp} rightl10nId='fingerprintingProtection' checkedOn={fpEnabled} disabled={!shieldsUp} onInfoClick={this.onInfoClick} infoTitle={config.fingerprintingInfoUrl} className='fingerprintingProtectionSwitch' />
-                  <SwitchControl onClick={this.onToggleSafeBrowsing} rightl10nId='safeBrowsing' checkedOn={this.props.braverySettings.safeBrowsing} disabled={!shieldsUp} className='safeBrowsingSwitch' />
+                    <option data-l10n-id='allowAllCookies' data-test-id='allowAllCookies' value='allowAllCookies' />
+                    <option data-l10n-id='blockAllCookies' data-test-id='blockAllCookies' value='blockAllCookies' />
+                  </BraveryPanelDropdown>
                 </div>
-              </div></span>
+
+                <SwitchControl className={css(
+                  !compactBraveryPanel && gridStyles.row3col2,
+                  compactBraveryPanel && gridStyles.row7col1,
+                  compactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
+                )}
+                  customInfoButton={css(styles.braveryPanel__body__advanced__control__switchControl__infoButton)}
+                  onClick={this.onToggleFp}
+                  rightl10nId='fingerprintingProtection'
+                  checkedOn={fpEnabled}
+                  disabled={!shieldsUp}
+                  onInfoClick={this.onInfoClick}
+                  infoTitle={config.fingerprintingInfoUrl}
+                  testId='fingerprintingProtectionSwitch'
+                />
+
+                <SwitchControl className={css(
+                  !compactBraveryPanel && gridStyles.row4col2,
+                  compactBraveryPanel && gridStyles.row8col1,
+                  compactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
+                )}
+                  onClick={this.onToggleSafeBrowsing}
+                  rightl10nId='safeBrowsing'
+                  checkedOn={this.props.braverySettings.safeBrowsing}
+                  disabled={!shieldsUp}
+                  testId='safeBrowsingSwitch'
+                />
+              </div>
+            </section>
             : null
           }
-          <hr className='braveryBottomSplitter' />
-          <div className='braveryPanelFooter'>
-            <span className='clickable' onClick={this.onEditGlobal} data-l10n-id='editBraveryGlobalSettings' />
-            <span className='reloadButton clickable' onClick={this.onReload}>
-              <div className='reloadText' data-l10n-id='reload' />
-              <div className='fa fa-repeat' />
-            </span>
+          <hr className={css(
+            styles.braveryPanel__body__hr,
+            styles.braveryPanel__body__hr_splitter,
+            compactBraveryPanel && styles.braveryPanel_compact__body__hr
+          )} />
+          <div className={css(styles.braveryPanel__body__footer)}>
+            <span className={css(
+              styles.braveryPanel__body__footer__edit,
+              styles.braveryPanel__body__footer__edit_clickable,
+              compactBraveryPanel && styles.braveryPanel_compact__body__footer__edit
+            )}
+              onClick={this.onEditGlobal}
+              data-l10n-id='editBraveryGlobalSettings'
+            />
+            <div className={css(
+              styles.braveryPanel__body__footer__reload,
+              styles.braveryPanel__body__footer__reload_clickable
+            )}
+              onClick={this.onReload}>
+              <span className={css(styles.braveryPanel__body__footer__reload__text)} data-l10n-id='reload' />
+              <span className='fa fa-repeat' />
+            </div>
           </div>
-        </div>
+        </section>
       </div>
     </Dialog>
   }
 }
+
+const displayHost = {
+  fontSize: '20px',
+  fontWeight: 'normal',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden'
+}
+const editGlobalMarginBottom = '.25rem'
+
+const gridStyles = StyleSheet.create({
+  row1col1: {
+    gridRow: 1,
+    gridColumn: 1
+  },
+  row1col2: {
+    gridRow: 1,
+    gridColumn: 2
+  },
+  row1col3: {
+    gridRow: 1,
+    gridColumn: 3
+  },
+  row1col4: {
+    gridRow: 1,
+    gridColumn: 4
+  },
+  row2col1: {
+    gridRow: 2,
+    gridColumn: 1
+  },
+  row2col2: {
+    gridRow: 2,
+    gridColumn: 2
+  },
+  row2col3: {
+    gridRow: 2,
+    gridColumn: 3
+  },
+  row2col4: {
+    gridRow: 2,
+    gridColumn: 4
+  },
+  row3col1: {
+    gridRow: 3,
+    gridColumn: 1
+  },
+  row3col2: {
+    gridRow: 3,
+    gridColumn: 2
+  },
+  row4col1: {
+    gridRow: 4,
+    gridColumn: 1
+  },
+  row4col2: {
+    gridRow: 4,
+    gridColumn: 2
+  },
+  row5col1: {
+    gridRow: 5,
+    gridColumn: 1
+  },
+  row6col1: {
+    gridRow: 6,
+    gridColumn: 1
+  },
+  row7col1: {
+    gridRow: 7,
+    gridColumn: 1
+  },
+  row8col1: {
+    gridRow: 8,
+    gridColumn: 1
+  }
+})
+
+const styles = StyleSheet.create({
+  braveryPanel: {
+    padding: 0,
+    width: '500px',
+    right: '20px',
+    userSelect: 'none',
+    cursor: 'default',
+    color: globalStyles.braveryPanel.color,
+    overflowY: 'auto',
+    maxHeight: `calc(100% - ${globalStyles.spacing.dialogTopOffset})`
+  },
+  braveryPanel_compact: {
+    width: 'auto',
+    maxWidth: '50vw'
+  },
+
+  // braveryPanelHeader - Common
+  braveryPanel__header: {
+    color: globalStyles.braveryPanel.header.color,
+    background: globalStyles.braveryPanel.header.background,
+    display: 'flex',
+    padding: '20px',
+    borderTopLeftRadius: globalStyles.radius.borderRadius,
+    borderTopRightRadius: globalStyles.radius.borderRadius
+  },
+  braveryPanel__header_left: {
+    minWidth: 0
+  },
+  braveryPanel__header_right: {
+    marginLeft: 'auto'
+  },
+
+  // braveryPanelHeader - Compact Panel
+  braveryPanel_compact__header: {
+    flexFlow: 'column nowrap',
+    padding: '0.75rem 1rem'
+  },
+  braveryPanel_compact__header__displayHost: displayHost,
+  braveryPanel_compact__header_top: {
+    marginBottom: '5px'
+  },
+  braveryPanel_compact__header_bottom: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginLeft: 0
+  },
+  braveryPanel_compact__header_bottom__shieldsSwitch: {
+    marginLeft: '1rem'
+  },
+  braveryPanel_compact__header_bottom__shieldsSwitch__switchControl: {
+    padding: 0
+  },
+
+  // braveryPanelHeader - Normal Panel
+  braveryPanel__header__displayHost: displayHost,
+
+  braveryPanel__header_right__switchControl: {
+    padding: 0
+  },
+  braveryPanel__header_right__switchControl__topText: {
+    color: globalStyles.braveryPanel.header.switchControlTopTextColor
+  },
+
+  // braveryPanelStats - Common
+  braveryPanel__stats: {
+    boxSizing: 'border-box',
+    display: 'grid',
+    justifyContent: 'space-around',
+    maxWidth: 'initial',
+    width: '100%',
+    background: globalStyles.braveryPanel.stats.background,
+    padding: '20px'
+  },
+  braveryPanel__stats__item_count_adsBlockedStat: {
+    color: globalStyles.braveryPanel.stats.colorAds
+  },
+  braveryPanel__stats__item_count_redirectedResourcesStat: {
+    color: globalStyles.braveryPanel.stats.colorRedirected
+  },
+  braveryPanel__stats__item_count_noScriptStat: {
+    color: globalStyles.braveryPanel.stats.colorNoScript
+  },
+  braveryPanel__stats__item_count_fpStat: {
+    color: globalStyles.braveryPanel.stats.colorFp
+  },
+  braveryPanel__stats__item_count_clickable: {
+    cursor: 'pointer'
+  },
+  braveryPanel__stats__item_count_disabled: {
+    opacity: 0.3
+  },
+  braveryPanel__stats__item_label_clickable: {
+    cursor: 'pointer'
+  },
+  braveryPanel__stats__item_label_disabled: {
+    opacity: 0.3
+  },
+
+  // braveryPanelStats - Normal panel
+  braveryPanel__stats__item: {
+    maxWidth: '75px'
+
+  },
+  braveryPanel__stats__item_count: {
+    fontSize: '40px'
+  },
+
+  // braveryPanelStats - Compact panel
+  braveryPanel_compact__stats: {
+    padding: '.5rem 1rem',
+    alignItems: 'center',
+    justifyContent: 'flex-start'
+  },
+  braveryPanel_compact__stats__item_count: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    maxWidth: '100%',
+    marginRight: '.3rem',
+    fontSize: '1.7rem'
+  },
+  braveryPanel_compact__stats__item_label: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
+  },
+
+  // braveryPanelBody - Common
+  braveryPanel__body: {
+    background: globalStyles.braveryPanel.body.background,
+    padding: '20px',
+    borderBottomLeftRadius: globalStyles.radius.borderRadius,
+    borderBottomRightRadius: globalStyles.radius.borderRadius
+  },
+  braveryPanel__body__advancedTitle: {
+    display: 'flex'
+  },
+  braveryPanel__body__advancedTitle__indicator: {
+    margin: '2px 5px 0 5px'
+  },
+  braveryPanel__body__ul: {
+    fontSize: 'smaller',
+    maxHeight: '300px',
+    overflowY: 'scroll',
+    marginTop: '-20px',
+    padding: '10px',
+    userSelect: 'initial',
+    cursor: 'text'
+  },
+  braveryPanel__body__ul__li: {
+    listStyleType: 'none',
+    padding: '10px 0'
+  },
+  braveryPanel__body__hr: {
+    background: globalStyles.braveryPanel.body.hr.background,
+    border: 0,
+    height: '1px',
+    margin: '10px 0'
+  },
+  braveryPanel__body__hr_splitter: {
+    marginTop: '30px'
+  },
+  braveryPanel__body__footer: {
+    display: 'flex',
+    flexFlow: 'row wrap',
+    justifyContent: 'space-between'
+  },
+  braveryPanel__body__footer__edit: {
+    marginRight: '1rem'
+  },
+  braveryPanel__body__footer__edit_clickable: {
+    cursor: 'pointer'
+  },
+  braveryPanel__body__footer__reload: {
+    display: 'flex',
+    alignItems: 'baseline'
+  },
+  braveryPanel__body__footer__reload__text: {
+    marginRight: '.3rem'
+  },
+  braveryPanel__body__footer__reload_clickable: {
+    cursor: 'pointer'
+  },
+
+  // braveryPanelBody - Compact Panel
+  braveryPanel_compact__body: {
+    padding: `1rem 1rem calc(1rem - ${editGlobalMarginBottom})`
+  },
+  braveryPanel_compact__body__advancedTitle: {
+    alignItems: 'center'
+  },
+  braveryPanel_compact__body__advancedTitle__indicator: {
+    margin: '0 .4rem 0 0',
+    width: '5px'
+  },
+  braveryPanel_compact__body__hr: {
+    marginTop: '.75rem',
+    marginBottom: '.75rem'
+  },
+  braveryPanel_compact__body__ul: {
+    padding: 0,
+    margin: '0 0 .75rem 0',
+    wordBreak: 'break-all',
+    maxHeight: '10vh'
+  },
+  braveryPanel_compact__body__ul__li: {
+    padding: '5px 0',
+
+    ':first-of-type': {
+      paddingTop: 0
+    },
+    ':last-of-type': {
+      paddingBottom: 0
+    }
+  },
+  braveryPanel_compact__body__advanced: {
+    display: 'flex',
+    flexFlow: 'column nowrap'
+  },
+  braveryPanel_compact__body__advanced__control__forms__title: {
+    margin: '0 0 .25rem .25rem'
+  },
+  braveryPanel_compact__body__advanced__control__forms__dropdown: {
+    marginBottom: '.75rem'
+  },
+  braveryPanel_compact__body__advanced__control__switchControl: {
+    padding: '5px 0 5px .25rem'
+  },
+  braveryPanel_compact__body__footer__edit: {
+    marginBottom: editGlobalMarginBottom
+  },
+
+  // controlWrapper - Common
+  braveryPanel__body__advanced__control: {
+    display: 'grid',
+    gridColumnGap: '1rem',
+    margin: '15px 10px'
+  },
+  braveryPanel__body__advanced__control__forms__title: {
+    marginBottom: '4px',
+    marginLeft: '8px'
+  },
+  braveryPanel__body__advanced__control__forms__title_disabled: {
+    opacity: 0.3
+  },
+  braveryPanel__body__advanced__control__forms__dropdown_disabled: {
+    opacity: 0.3
+  },
+  braveryPanel__body__advanced__control__switchControl__infoButton: {
+    display: 'inline',
+    cursor: 'pointer',
+    paddingLeft: '2px',
+    fontSize: '15px'
+  },
+
+  // controlWrapper - Normal Panel
+  braveryPanel__body__advanced__control__forms__dropdown: {
+    marginBottom: '25px'
+  },
+
+  // controlWrapper - Compact Panel
+  braveryPanel_compact__body__advanced__control: {
+    gridColumnGap: 0,
+    margin: 0
+  }
+})
 
 module.exports = BraveryPanel

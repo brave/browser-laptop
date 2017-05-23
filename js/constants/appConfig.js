@@ -131,7 +131,6 @@ module.exports = {
     'general.check-default-on-startup': true,
     'general.download-default-path': '',
     'general.download-always-ask': true,
-    'general.blocked-count-badge': true,
     'search.default-search-engine': 'Google',
     'search.offer-search-suggestions': false, // false by default for privacy reasons
     'tabs.switch-to-new-tabs': false,
@@ -170,6 +169,8 @@ module.exports = {
     'security.fullscreen.content': fullscreenOption.ALWAYS_ASK,
     'security.autoplay.media': autoplayOption.ALWAYS_ALLOW,
     'security.flash.installed': false,
+    'shields.blocked-count-badge': true,
+    'shields.compact-bravery-panel': false,
     // sync
     'sync.enabled': false,
     'sync.device-name': 'browser-laptop',
