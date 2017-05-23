@@ -182,6 +182,7 @@ AppStore
     'bookmarks.toolbar.showOnlyFavicon': boolean, // true if only favicons should be shown on the bookmarks toolbar
     'extensions.pocket.enabled': boolean, // true if pocket is enabled
     'extensions.vimium.enabled': boolean, // true if vimium is enabled
+    'extensions.honey.enabled': boolean, // true if Honey is enabled
     'general.autohide-menu': boolean, // true if the Windows menu should be autohidden
     'general.wide-url-bar': boolean, // true to use wide URL bar
     'general.bookmarks-toolbar-mode': boolean, // true to show bookmarks toolbar

@@ -55,7 +55,14 @@ class BrowserAction extends React.Component {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const activeTabId = activeFrame.get('tabId') || tabState.TAB_ID_NONE
-    const browserActions = extensionState.getBrowserActionByTabId(state, ownProps.extensionId, activeTabId)
+    let browserActions = extensionState.getBrowserActionByTabId(state, ownProps.extensionId, activeTabId)
+    let tabAction = browserActions.getIn(['tabs', activeTabId.toString()])
+
+    if (tabAction) {
+      tabAction = tabAction.set('title', browserActions.get('title'))
+      tabAction = tabAction.set('base_path', browserActions.get('base_path'))
+      browserActions = tabAction
+    }
 
     const props = {}
     // used in renderer
