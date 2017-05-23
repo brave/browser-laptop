@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const {opacityIncreaseKeyframes} = require('./animations')
+
 /**
  * Historically this file includes styles with no defined criteria.
  * Imagine this file as a future reference for theming, in a way
@@ -239,6 +241,16 @@ const globalStyles = {
     trash: 'fa fa-trash',
     moreInfo: 'fa fa-info-circle',
     angleDoubleRight: 'fa fa-angle-double-right'
+  },
+  animations: {
+    subtleShowUp: {
+      opacity: 0,
+      animationName: opacityIncreaseKeyframes,
+      animationDelay: '120ms',
+      animationTimingFunction: 'linear',
+      animationDuration: '120ms',
+      animationFillMode: 'forwards'
+    }
   },
   button: {
     default: {

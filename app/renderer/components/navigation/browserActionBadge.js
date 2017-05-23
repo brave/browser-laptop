@@ -5,7 +5,7 @@
 const React = require('react')
 const {StyleSheet, css} = require('aphrodite')
 const ImmutableComponent = require('../immutableComponent')
-const commonStyles = require('../styles/global')
+const globalStyles = require('../styles/global')
 
 class BrowserActionBadge extends ImmutableComponent {
   constructor () {
@@ -30,9 +30,13 @@ class BrowserActionBadge extends ImmutableComponent {
       ref='badge'
       className={css(
         styles.browserActionBadge,
-        this.centered && styles.centered
+        this.centered && styles.centered,
+        // delay badge show-up.
+        // this is also set for braveryPanel badge
+        // in a way that both can appear at the same time.
+        styles.subtleShowUp
       )}
-      style={{backgroundColor: this.props.color || commonStyles.color.braveMediumOrange}}
+      style={{backgroundColor: this.props.color || globalStyles.color.braveMediumOrange}}
       >{this.props.text}</div>
   }
 }
@@ -58,7 +62,8 @@ const styles = StyleSheet.create({
     maxWidth: 'calc(100% - 5px)',
     overflow: 'hidden',
     textOverflow: 'ellipsis'
-  }
+  },
+  subtleShowUp: globalStyles.animations.subtleShowUp
 })
 
 module.exports = BrowserActionBadge

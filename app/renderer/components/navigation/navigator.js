@@ -3,7 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {StyleSheet, css} = require('aphrodite')
 const electron = require('electron')
 const ipc = electron.ipcRenderer
 const Immutable = require('immutable')
@@ -43,6 +42,10 @@ const {getSetting} = require('../../../../js/settings')
 const messages = require('../../../../js/constants/messages')
 const appConfig = require('../../../../js/constants/appConfig')
 const settings = require('../../../../js/constants/settings')
+
+// Styles
+const {StyleSheet, css} = require('aphrodite')
+const globalStyles = require('../styles/global')
 
 class Navigator extends React.Component {
   constructor () {
@@ -285,7 +288,11 @@ class Navigator extends React.Component {
                 this.props.isCounterEnabled
                   ? <div className={css(
                       styles.lionBadge,
-                      (this.props.menuBarVisible || !isWindows()) && styles.lionBadgeRight
+                      (this.props.menuBarVisible || !isWindows()) && styles.lionBadgeRight,
+                      // delay badge show-up.
+                      // this is also set for extension badge
+                      // in a way that both can appear at the same time.
+                      styles.subtleShowUp
                     )}
                     data-test-id='lionBadge'>
                     {this.props.totalBlocks}
@@ -335,6 +342,7 @@ const styles = StyleSheet.create({
   braveMenuContainer: {
     position: 'relative'
   },
+  subtleShowUp: globalStyles.animations.subtleShowUp,
 
   // TODO: Refactor navigator.js with Aphrodite to remove !important
   navigatorWrapper__topLevelEndButtons_isWideURLbarEnabled: {
