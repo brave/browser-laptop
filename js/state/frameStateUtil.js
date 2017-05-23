@@ -201,13 +201,6 @@ function getActiveFrameKey (state) {
   return state.get('activeFrameKey')
 }
 
-function setActiveFrameKey (state, activeFrameKey) {
-  return state.merge({
-    activeFrameKey: activeFrameKey,
-    previewFrameKey: null
-  })
-}
-
 function getNextFrame (state) {
   const activeFrameIndex = findDisplayIndexForFrameKey(state, getActiveFrameKey(state))
   const index = (activeFrameIndex + 1) % state.get('frames').size
@@ -599,7 +592,6 @@ module.exports = {
   getIndexByTabId,
   getPartitionNumber,
   getActiveFrame,
-  setActiveFrameKey,
   getNextFrame,
   getPreviousFrame,
   findDisplayIndexForFrameKey,
