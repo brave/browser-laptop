@@ -11,12 +11,12 @@ var env = process.env.NODE_ENV === 'production' ? 'production'
 
 function config () {
   return {
-    devtool: '#source-map',
+    devtool: '#cheap-module-source-map',
     cache: true,
     module: {
       loaders: [
         {
-          test: /\.js?$/,
+          test: /\.js$/,
           exclude: [
             /node_modules/,
             /\.min.js$/,
