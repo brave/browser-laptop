@@ -38,6 +38,9 @@ class AutofillCreditCardPanel extends ImmutableComponent {
   onNameChange (e) {
     let currentDetail = this.props.currentDetail
     currentDetail = currentDetail.set('name', e.target.value)
+    if (this.nameOnCard.value !== e.target.value) {
+      this.nameOnCard.value = e.target.value
+    }
     windowActions.setAutofillCreditCardDetail(currentDetail, this.props.originalDetail)
   }
   onCardChange (e) {
@@ -80,6 +83,7 @@ class AutofillCreditCardPanel extends ImmutableComponent {
   }
   componentDidMount () {
     this.nameOnCard.focus()
+    this.nameOnCard.value = this.props.currentDetail.get('name') || ''
   }
   render () {
     var ExpMonth = []
@@ -119,7 +123,6 @@ class AutofillCreditCardPanel extends ImmutableComponent {
                   spellCheck='false'
                   onKeyDown={this.onKeyDown}
                   onChange={this.onNameChange}
-                  value={this.props.currentDetail.get('name') || ''}
                   ref={(nameOnCard) => { this.nameOnCard = nameOnCard }}
                 />
               </div>
