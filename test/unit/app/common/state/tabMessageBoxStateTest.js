@@ -18,6 +18,7 @@ const sampleAppState = {
     index: {}
   }
 }
+
 sampleAppState.tabsInternal.index[defaultTabId] = 0
 
 const defaultAppState = Immutable.fromJS(sampleAppState)
@@ -32,6 +33,7 @@ const exampleMessageBox = Immutable.fromJS({
 
 const defaultTab = Immutable.fromJS({
   tabId: defaultTabId,
+  index: 0,
   windowId: 1,
   windowUUID: 'uuid',
   url: 'https://brave.com',
