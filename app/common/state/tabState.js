@@ -71,15 +71,15 @@ const updateLastActive = (state, oldTabValue, newTabValue) => {
   const windowId = validateId('windowId', newTabValue.get('windowId'))
 
   if (oldWindowId !== -1 && oldTabId !== tabState.TAB_ID_NONE) {
-    let oldActiveList = state.getIn(['tabsInternal', 'lastActive', oldWindowId], Immutable.OrderedSet())
+    let oldActiveList = state.getIn(['tabsInternal', 'lastActive', oldWindowId.toString()], Immutable.OrderedSet())
     oldActiveList = oldActiveList.remove(oldTabId)
-    state = state.setIn(['tabsInternal', 'lastActive', oldWindowId], oldActiveList)
+    state = state.setIn(['tabsInternal', 'lastActive', oldWindowId.toString()], oldActiveList)
   }
 
   if (windowId !== -1 && tabId !== tabState.TAB_ID_NONE) {
-    let activeList = state.getIn(['tabsInternal', 'lastActive', windowId], Immutable.OrderedSet())
+    let activeList = state.getIn(['tabsInternal', 'lastActive', windowId.toString()], Immutable.OrderedSet())
     activeList = activeList.add(tabId)
-    state = state.setIn(['tabsInternal', 'lastActive', windowId], activeList)
+    state = state.setIn(['tabsInternal', 'lastActive', windowId.toString()], activeList)
   }
 
   return state
@@ -90,7 +90,7 @@ const getTabIdByDisplayIndex = (state, windowId, index) => {
   index = validateIndex(index)
   windowId = validateId('windowId', windowId)
 
-  const tabId = state.getIn(['tabsInternal', 'displayIndex', windowId, index])
+  const tabId = state.getIn(['tabsInternal', 'displayIndex', windowId.toString(), index.toString()])
   return tabId == null ? tabState.TAB_ID_NONE : tabId
 }
 
@@ -99,14 +99,14 @@ const updateTabsDisplayIndex = (state, oldTabValue, newTabValue) => {
   const oldWindowId = validateId('windowId', oldTabValue.get('windowId'))
   const oldIndex = validateIndex(oldTabValue.get('index'))
   if (oldIndex !== -1 && oldTabId !== tabState.TAB_ID_NONE && oldWindowId !== windowState.WINDOW_ID_NONE) {
-    state = state.deleteIn(['tabsInternal', 'displayIndex', oldWindowId, oldIndex])
+    state = state.deleteIn(['tabsInternal', 'displayIndex', oldWindowId.toString(), oldIndex.toString()])
   }
 
   const tabId = validateId('tabId', newTabValue.get('tabId'))
   const windowId = validateId('windowId', newTabValue.get('windowId'))
   const index = validateIndex(newTabValue.get('index'))
   if (index !== -1 && tabId !== tabState.TAB_ID_NONE && windowId !== windowState.WINDOW_ID_NONE) {
-    return state.setIn(['tabsInternal', 'displayIndex', windowId, index], tabId)
+    return state.setIn(['tabsInternal', 'displayIndex', windowId.toString(), index.toString()], tabId)
   }
 
   return state
@@ -117,7 +117,7 @@ const getTabInternalIndexByTabId = (state, tabId) => {
   tabId = validateId('tabId', tabId)
   state = validateState(state)
 
-  const index = state.getIn(['tabsInternal', 'index', tabId])
+  const index = state.getIn(['tabsInternal', 'index', tabId.toString()])
   return index == null ? -1 : index
 }
 
@@ -129,23 +129,24 @@ const deleteTabsInternalIndex = (state, tabValue) => {
 
   const displayIndex = validateIndex(tabValue.get('index'))
   if (displayIndex !== -1) {
-    state = state.deleteIn(['tabsInternal', 'displayIndex', displayIndex])
+    state = state.deleteIn(['tabsInternal', 'displayIndex', displayIndex.toString()])
   }
   const windowId = validateId('windowId', tabValue.get('windowId'))
   if (windowId !== windowState.WINDOW_ID_NONE) {
-    let activeList = state.getIn(['tabsInternal', 'lastActive', windowId], Immutable.OrderedSet())
+    let activeList = state.getIn(['tabsInternal', 'lastActive', windowId.toString()], Immutable.OrderedSet())
     activeList = activeList.remove(tabId)
-    state = state.setIn(['tabsInternal', 'lastActive', windowId], activeList)
+    state = state.setIn(['tabsInternal', 'lastActive', windowId.toString()], activeList)
   }
-  return state.deleteIn(['tabsInternal', 'index', tabId])
+  return state.deleteIn(['tabsInternal', 'index', tabId.toString()])
 }
 
 const updateTabsInternalIndex = (state, fromIndex) => {
   fromIndex = validateIndex(fromIndex)
   let tabsInternal = state.get('tabsInternal') || Immutable.Map()
   state.get('tabs').slice(fromIndex).forEach((tab, idx) => {
-    if (tab.get('tabId') !== tabState.TAB_ID_NONE) {
-      tabsInternal = tabsInternal.setIn(['index', tab.get('tabId')], idx + fromIndex)
+    const tabId = validateId('tabId', tab.get('tabId')).toString()
+    if (tabId !== tabState.TAB_ID_NONE) {
+      tabsInternal = tabsInternal.setIn(['index', tabId], (idx + fromIndex).toString())
     }
   })
   return state.set('tabsInternal', tabsInternal)

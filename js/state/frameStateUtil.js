@@ -435,23 +435,20 @@ const activeFrameStatePath = (state) => frameStatePath(state, getActiveFrameKey(
 
 const getFramesInternalIndex = (state, frameKey) => {
   if (frameKey == null) return -1
-  frameKey = parseInt(frameKey)
 
-  const index = state.getIn(['framesInternal', 'index', frameKey])
+  const index = state.getIn(['framesInternal', 'index', frameKey.toString()])
   return index == null ? -1 : index
 }
 
 const getFramesInternalIndexByTabId = (state, tabId) => {
   if (tabId == null) return -1
-  tabId = parseInt(tabId)
 
-  const index = state.getIn(['framesInternal', 'tabIndex', tabId])
+  const index = state.getIn(['framesInternal', 'tabIndex', tabId.toString()])
   return index == null ? -1 : index
 }
 
 const deleteTabInternalIndex = (state, tabId) => {
-  tabId = parseInt(tabId)
-  return state.deleteIn(['framesInternal', 'tabIndex', tabId])
+  return state.deleteIn(['framesInternal', 'tabIndex', tabId.toString()])
 }
 
 const deleteFrameInternalIndex = (state, frame) => {
@@ -459,8 +456,7 @@ const deleteFrameInternalIndex = (state, frame) => {
     return state
   }
 
-  const key = parseInt(frame.get('key'))
-  state = state.deleteIn(['framesInternal', 'index', key])
+  state = state.deleteIn(['framesInternal', 'index', frame.get('key').toString()])
   return deleteTabInternalIndex(state, frame.get('tabId'))
 }
 
@@ -469,10 +465,10 @@ const updateFramesInternalIndex = (state, fromIndex) => {
   state.get('frames').slice(fromIndex).forEach((frame, idx) => {
     const realIndex = idx + fromIndex
     if (frame.get('key')) {
-      framesInternal = framesInternal.setIn(['index', frame.get('key')], realIndex)
+      framesInternal = framesInternal.setIn(['index', frame.get('key').toString()], realIndex)
     }
     if (frame.get('tabId') !== -1) {
-      framesInternal = framesInternal.setIn(['tabIndex', frame.get('tabId')], realIndex)
+      framesInternal = framesInternal.setIn(['tabIndex', frame.get('tabId').toString()], realIndex)
     }
 
     appActions.tabIndexChanged(frame.get('tabId'), realIndex)
