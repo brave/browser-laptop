@@ -41,6 +41,7 @@ const sitesReducer = (state, action, immutableAction) => {
   switch (action.actionType) {
     case appConstants.APP_SET_STATE:
       state = siteCache.loadLocationSiteKeysCache(state)
+      state = siteCache.createSiteKeysByFolderCache(state)
       break
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
       if (immutableAction.getIn(['clearDataDetail', 'browserHistory'])) {
