@@ -17,10 +17,17 @@ const {
   CommonFormLarge,
   CommonFormSection,
   CommonFormTitle,
-  CommonFormTextbox,
   CommonFormButtonWrapper,
   commonFormStyles
 } = require('../common/commonForm')
+
+const commonForm = css(
+  commonStyles.formControl,
+  commonStyles.textbox,
+  commonStyles.textbox__outlineable,
+  commonStyles.isCommonForm,
+  commonFormStyles.input__box
+)
 
 class AutofillAddressPanel extends ImmutableComponent {
   constructor () {
@@ -41,46 +48,73 @@ class AutofillAddressPanel extends ImmutableComponent {
   onNameChange (e) {
     let currentDetail = this.props.currentDetail
     currentDetail = currentDetail.set('name', e.target.value)
+    if (this.nameOnAddress.value !== e.target.value) {
+      this.nameOnAddress.value = e.target.value
+    }
     windowActions.setAutofillAddressDetail(currentDetail, this.props.originalDetail)
   }
   onOrganizationChange (e) {
     let currentDetail = this.props.currentDetail
     currentDetail = currentDetail.set('organization', e.target.value)
+    if (this.organization.value !== e.target.value) {
+      this.organization.value = e.target.value
+    }
     windowActions.setAutofillAddressDetail(currentDetail, this.props.originalDetail)
   }
   onStreetAddressChange (e) {
     let currentDetail = this.props.currentDetail
     currentDetail = currentDetail.set('streetAddress', e.target.value)
+    if (this.streetAddress.value !== e.target.value) {
+      this.streetAddress.value = e.target.value
+    }
     windowActions.setAutofillAddressDetail(currentDetail, this.props.originalDetail)
   }
   onCityChange (e) {
     let currentDetail = this.props.currentDetail
     currentDetail = currentDetail.set('city', e.target.value)
     windowActions.setAutofillAddressDetail(currentDetail, this.props.originalDetail)
+    if (this.city.value !== e.target.value) {
+      this.city.value = e.target.value
+    }
   }
   onStateChange (e) {
     let currentDetail = this.props.currentDetail
     currentDetail = currentDetail.set('state', e.target.value)
+    if (this.state.value !== e.target.value) {
+      this.state.value = e.target.value
+    }
     windowActions.setAutofillAddressDetail(currentDetail, this.props.originalDetail)
   }
   onPostalCodeChange (e) {
     let currentDetail = this.props.currentDetail
     currentDetail = currentDetail.set('postalCode', e.target.value)
+    if (this.postalCode.value !== e.target.value) {
+      this.postalCode.value = e.target.value
+    }
     windowActions.setAutofillAddressDetail(currentDetail, this.props.originalDetail)
   }
   onCountryChange (e) {
     let currentDetail = this.props.currentDetail
     currentDetail = currentDetail.set('country', e.target.value)
+    if (this.country.value !== e.target.value) {
+      this.country.value = e.target.value
+    }
     windowActions.setAutofillAddressDetail(currentDetail, this.props.originalDetail)
   }
   onPhoneChange (e) {
     let currentDetail = this.props.currentDetail
     currentDetail = currentDetail.set('phone', e.target.value)
+    if (this.phone.value !== e.target.value) {
+      this.phone.value = e.target.value
+    }
     windowActions.setAutofillAddressDetail(currentDetail, this.props.originalDetail)
   }
   onEmailChange (e) {
     let currentDetail = this.props.currentDetail
     currentDetail = currentDetail.set('email', e.target.value)
+    if (this.email.value !== e.target.value) {
+      this.email.value = e.target.value
+    }
     windowActions.setAutofillAddressDetail(currentDetail, this.props.originalDetail)
   }
   onKeyDown (e) {
@@ -111,6 +145,15 @@ class AutofillAddressPanel extends ImmutableComponent {
   }
   componentDidMount () {
     this.nameOnAddress.focus()
+    this.nameOnAddress.value = this.props.currentDetail.get('name') || ''
+    this.organization.value = this.props.currentDetail.get('organization') || ''
+    this.streetAddress.value = this.props.currentDetail.get('streetAddress') || ''
+    this.city.value = this.props.currentDetail.get('city') || ''
+    this.state.value = this.props.currentDetail.get('state') || ''
+    this.postalCode.value = this.props.currentDetail.get('postalCode') || ''
+    this.country.value = this.props.currentDetail.get('country') || ''
+    this.phone.value = this.props.currentDetail.get('phone') || ''
+    this.email.value = this.props.currentDetail.get('email') || ''
   }
   render () {
     return <Dialog onHide={this.props.onHide} testId='autofillAddressPanel' isClickDismiss>
@@ -138,55 +181,54 @@ class AutofillAddressPanel extends ImmutableComponent {
               )}
                 data-test-id='nameOnAddress'
                 spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onNameChange}
-                value={this.props.currentDetail.get('name') || ''}
                 ref={(nameOnAddress) => { this.nameOnAddress = nameOnAddress }} />
               <div className={css(commonFormStyles.input__marginRow)}>
-                <CommonFormTextbox
+                <input className={commonForm}
                   data-test-id='organization'
                   spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onOrganizationChange}
-                  value={this.props.currentDetail.get('organization')} />
+                  ref={(organization) => { this.organization = organization }} />
               </div>
               <div className={css(commonFormStyles.input__marginRow)}>
-                <CommonFormTextbox
+                <input className={commonForm}
                   data-test-id='streetAddress'
                   spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onStreetAddressChange}
-                  value={this.props.currentDetail.get('streetAddress')} />
+                  ref={(streetAddress) => { this.streetAddress = streetAddress }} />
               </div>
               <div className={css(commonFormStyles.input__marginRow)}>
-                <CommonFormTextbox
+                <input className={commonForm}
                   data-test-id='city'
                   spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onCityChange}
-                  value={this.props.currentDetail.get('city')} />
+                  ref={(city) => { this.city = city }} />
               </div>
               <div className={css(commonFormStyles.input__marginRow)}>
-                <CommonFormTextbox
+                <input className={commonForm}
                   data-test-id='state'
                   spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onStateChange}
-                  value={this.props.currentDetail.get('state')} />
+                  ref={(state) => { this.state = state }} />
               </div>
               <div className={css(commonFormStyles.input__marginRow)}>
-                <CommonFormTextbox
+                <input className={commonForm}
                   data-test-id='postalCode'
                   spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onPostalCodeChange}
-                  value={this.props.currentDetail.get('postalCode')} />
+                  ref={(postalCode) => { this.postalCode = postalCode }} />
               </div>
               <div className={css(commonFormStyles.input__marginRow)}>
-                <CommonFormTextbox
+                <input className={commonForm}
                   data-test-id='country'
                   spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onCountryChange}
-                  value={this.props.currentDetail.get('country')} />
+                  ref={(country) => { this.country = country }} />
               </div>
               <div className={css(commonFormStyles.input__marginRow)}>
-                <CommonFormTextbox
+                <input className={commonForm}
                   data-test-id='phone'
                   spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onPhoneChange}
-                  value={this.props.currentDetail.get('phone')} />
+                  ref={(phone) => { this.phone = phone }} />
               </div>
               <div className={css(commonFormStyles.input__marginRow)}>
-                <CommonFormTextbox
+                <input className={commonForm}
                   data-test-id='email'
                   spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onEmailChange}
-                  value={this.props.currentDetail.get('email')} />
+                  ref={(email) => { this.email = email }} />
               </div>
             </div>
           </div>

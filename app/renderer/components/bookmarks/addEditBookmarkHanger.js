@@ -97,12 +97,15 @@ class AddEditBookmarkHanger extends ImmutableComponent {
       this.updateFolders(nextProps)
     }
   }
+  componentDidUpdate () {
+  }
   componentDidMount () {
     // Automatically save if this is triggered by the url star
     if (!this.props.isModal && !this.props.shouldShowLocation) {
       this.onSave(false)
     }
     this.setDefaultFocus()
+    this.bookmarkName.value = this.displayBookmarkName
   }
   onKeyDown (e) {
     switch (e.keyCode) {
@@ -137,6 +140,9 @@ class AddEditBookmarkHanger extends ImmutableComponent {
       // Note that non-string bookmark titles fail bookmarkNameValid so they
       // are not saved.
       currentDetail = currentDetail.set('customTitle', name || 0)
+    }
+    if (this.bookmarkName.value !== name) {
+      this.bookmarkName.value = name
     }
     windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail, this.props.destinationDetail, this.props.shouldShowLocation, !this.props.isModal)
   }
@@ -226,7 +232,6 @@ class AddEditBookmarkHanger extends ImmutableComponent {
                   spellCheck='false'
                   onKeyDown={this.onKeyDown}
                   onChange={this.onNameChange}
-                  value={this.displayBookmarkName}
                   ref={(bookmarkName) => { this.bookmarkName = bookmarkName }}
                 />
               </div>
