@@ -812,7 +812,7 @@ class AboutPreferences extends React.Component {
         key === settings.DO_NOT_TRACK ||
         key === settings.LANGUAGE ||
         key === settings.PDFJS_ENABLED || key === settings.TORRENT_VIEWER_ENABLED ||
-        key === settings.SMOOTH_SCROLL_ENABLED || key === settings.SEND_CRASH_REPORTS) {
+        key === settings.SMOOTH_SCROLL_ENABLED || key === settings.SEND_CRASH_REPORTS || key === settings.UPDATE_TO_PREVIEW_RELEASES) {
       ipc.send(messages.PREFS_RESTART, key, value)
     }
     if (key === settings.PAYMENTS_ENABLED) {

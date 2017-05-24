@@ -69,6 +69,7 @@ const settings = {
   SMOOTH_SCROLL_ENABLED: 'advanced.smooth-scroll-enabled',
   SEND_CRASH_REPORTS: 'advanced.send-crash-reports',
   SEND_USAGE_STATISTICS: 'advanced.send-usage-statistics',
+  UPDATE_TO_PREVIEW_RELEASES: 'advanced.update-to-preview-releases',
   ADBLOCK_CUSTOM_RULES: 'adblock.customRules',
   HIDE_EXCLUDED_SITES: 'advanced.hide-excluded-sites',
   HIDE_LOWER_SITES: 'advanced.hide-lower-sites',
