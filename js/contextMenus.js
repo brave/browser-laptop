@@ -77,11 +77,6 @@ const addFolderMenuItem = (closestDestinationDetail, isParent) => {
   }
 }
 
-const getDownloadsBarHeight = () => {
-  const root = window.getComputedStyle(document.querySelector(':root'))
-  return Number.parseInt(root.getPropertyValue('--downloads-bar-height'), 10)
-}
-
 function tabPageTemplateInit (framePropsList) {
   return [{
     label: locale.translation('unmuteTabs'),
@@ -1455,8 +1450,6 @@ function onShowBookmarkFolderMenu (bookmarks, bookmark, activeFrame, e) {
 
 function onShowAutofillMenu (suggestions, targetRect, frame, boundingClientRect) {
   const menuTemplate = autofillTemplateInit(suggestions, frame)
-  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) &&
-    appStore.state.get('downloads') && appStore.state.get('downloads').size ? getDownloadsBarHeight() : 0
   // toolbar UI scale ratio
   const xRatio = window.innerWidth / window.outerWidth
   const yRatio = window.innerHeight / window.outerHeight
@@ -1465,7 +1458,7 @@ function onShowAutofillMenu (suggestions, targetRect, frame, boundingClientRect)
     type: 'autofill',
     tabId,
     left: boundingClientRect.left + (targetRect.x * xRatio),
-    top: boundingClientRect.top + ((targetRect.y + targetRect.height) * yRatio) - downloadsBarOffset,
+    top: boundingClientRect.top + ((targetRect.y + targetRect.height) * yRatio),
     template: menuTemplate
   }))
 }
