@@ -16,12 +16,14 @@ const sampleAppState = {
     index: {}
   }
 }
+
 sampleAppState.tabsInternal.index[defaultTabId] = 0
 
 const defaultAppState = Immutable.fromJS(sampleAppState)
 
 const defaultTab = Immutable.fromJS({
   tabId: defaultTabId,
+  index: 0,
   windowId: 1,
   windowUUID: 'uuid',
   loginRequiredDetail: {
@@ -51,7 +53,11 @@ describe('basicAuthState unit tests', function () {
 
     describe('`tabId` exists in appState with no loginRequiredDetail', function () {
       before(function () {
-        this.appState = defaultAppState.set('tabs', Immutable.fromJS([{ tabId: defaultTabId }]))
+        this.appState = defaultAppState.set('tabs', Immutable.fromJS([{
+          tabId: defaultTabId,
+          index: 0,
+          windowId: 1
+        }]))
         this.appState = basicAuthState.setLoginResponseDetail(this.appState, {tabId: defaultTabId,
           detail: {
             username: 'username',
@@ -113,11 +119,11 @@ describe('basicAuthState unit tests', function () {
 
     describe('`tabId` exists in appState', function () {
       before(function () {
-        this.appState = defaultAppState.set('tabs', Immutable.fromJS([
-          {
-            tabId: defaultTabId
-          }
-        ]))
+        this.appState = defaultAppState.set('tabs', Immutable.fromJS([{
+          tabId: defaultTabId,
+          index: 0,
+          windowId: 1
+        }]))
         this.appState = basicAuthState.setLoginRequiredDetail(this.appState, {tabId: defaultTabId,
           detail: {
             request: { url: 'someurl' },

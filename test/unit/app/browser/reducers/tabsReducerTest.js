@@ -32,6 +32,26 @@ describe('tabsReducer', function () {
         pinned: false,
         windowId: 2,
         active: true
+      }, {
+        tabId: 4,
+        pinned: false,
+        windowId: 2,
+        active: false
+      }],
+      tabsInternal: {
+        index: {
+          1: 0,
+          2: 1,
+          3: 2,
+          4: 3
+        }
+      },
+      windows: [{
+        windowId: 1,
+        windowUUID: 'uuid'
+      }, {
+        windowId: 2,
+        windowUUID: 'uuid2'
       }]
     })
     mockery.registerMock('electron', fakeElectron)
@@ -47,8 +67,13 @@ describe('tabsReducer', function () {
       moveTo: sinon.mock()
     }
 
+    this.windowsAPI = {
+      closeWindow: sinon.mock()
+    }
+
     mockery.registerMock('tabs', this.tabsAPI)
     mockery.registerMock('../tabs', this.tabsAPI)
+    mockery.registerMock('../windows', this.windowsAPI)
     tabsReducer = require('../../../../../app/browser/reducers/tabsReducer')
   })
 
