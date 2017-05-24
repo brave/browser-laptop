@@ -32,7 +32,7 @@ const urlBarSuggestionsReducer = (state, action) => {
     case appConstants.APP_SEARCH_SUGGESTION_RESULTS_AVAILABLE:
       state = state.set('searchResults', makeImmutable(action.searchResults))
       if (action.query) {
-        const windowId = tabState.windowId(state, action.tabId)
+        const windowId = tabState.getWindowId(state, action.tabId)
         generateNewSuggestionsList(state, windowId, action.tabId, action.query)
       }
       break

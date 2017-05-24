@@ -138,13 +138,17 @@ const tabsReducer = (state, action, immutableAction) => {
               tabs.toggleDevTools(tabId)
             })
           } else {
-            if (tabState.getNonPinnedTabs(state).size > 1 ||
-              (tabState.getNonPinnedTabs(state).size > 0 && tabState.getPinnedTabs(state).size > 0)) {
+            const windowId = tabState.getWindowId(state, tabId)
+            const nonPinnedTabs = tabState.getNonPinnedTabsByWindowId(state, windowId)
+            const pinnedTabs = tabState.getPinnedTabsByWindowId(state, windowId)
+
+            if (nonPinnedTabs.size > 1 ||
+              (nonPinnedTabs.size > 0 && pinnedTabs.size > 0)) {
               setImmediate(() => {
                 tabs.closeTab(tabId, action.get('forceClosePinned'))
               })
             } else {
-              state = windows.closeWindow(state, tabState.getWindowId(state, tabId))
+              state = windows.closeWindow(state, windowId)
             }
           }
         }

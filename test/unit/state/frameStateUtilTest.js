@@ -112,13 +112,14 @@ describe('frameStateUtil', function () {
           { key: 1 }
         ],
         framesInternal: {
-          index: {}
+          index: {
+            2: 0,
+            3: 1,
+            4: 2,
+            5: 3
+          }
         }
       })
-      .setIn(['framesInternal', 'index', 2], 0)
-      .setIn(['framesInternal', 'index', 3], 1)
-      .setIn(['framesInternal', 'index', 4], 2)
-      .setIn(['framesInternal', 'index', 5], 3)
     })
 
     it('removed frame is added to `closedFrames`', function () {
@@ -140,10 +141,9 @@ describe('frameStateUtil', function () {
           { key: 2 }
         ],
         framesInternal: {
-          index: {}
+          index: {2: 0}
         }
       })
-      .setIn(['framesInternal', 'index', 2], 0)
 
       const newState = state.merge(data)
       frameProps = Immutable.fromJS({ isPrivate: true, key: 2 })
@@ -154,9 +154,7 @@ describe('frameStateUtil', function () {
 
     it('removes the frame from `frames`', function () {
       const result = frameStateUtil.removeFrame(state, frameProps, framePropsIndex)
-      console.log('OK BSC]] ', {result})
       const inFrames = result.frames.find((frame) => frame.get('key') === frameProps.get('key'))
-      console.log('inFrames=', inFrames)
       assert.equal(true, inFrames === undefined)
     })
   })
