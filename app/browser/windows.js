@@ -324,9 +324,7 @@ const api = {
     })
   },
 
-  closeWindow: (state, action) => {
-    action = makeImmutable(action)
-    let windowId = action.get('windowId')
+  closeWindow: (state, windowId) => {
     let win = api.getWindow(windowId)
     try {
       setImmediate(() => {
