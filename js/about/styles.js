@@ -300,9 +300,9 @@ class AboutStyle extends ImmutableComponent {
         <BrowserButton secondaryColor groupedItem l10nId='wideButton' onClick={this.onRemoveBookmark} />
         <BrowserButton primaryColor groupedItem l10nId='primaryButton' onClick={this.onRemoveBookmark} />
         <Pre><Code>
-          &lt;BrowserButton primaryColor groupedItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
-          &lt;BrowserButton secondaryColor groupedItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
-          &lt;BrowserButton secondaryColor groupedItem wideItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
+          &lt;BrowserButton primaryColor groupedItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />{'\n'}
+          &lt;BrowserButton secondaryColor groupedItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />{'\n'}
+          &lt;BrowserButton secondaryColor groupedItem wideItem l10nId='cancel'{'\n'}  onClick={'{this.onRemoveBookmark}'} />{'\n'}
           &lt;BrowserButton primaryColor groupedItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
