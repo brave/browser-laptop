@@ -882,29 +882,6 @@ describe('Bravery Panel', function () {
               return body === ''
             })
         })
-
-        .keys(Brave.keys.ESCAPE)
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
-        .windowByUrl(Brave.browserWindowUrl)
-
-        .tabByIndex(0)
-        .loadUrl(url)
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitUntil(function () {
-          return this.getText(fpStat)
-            .then((stat) => stat === '1')
-        })
-        .click(fpSwitch)
-        .tabByUrl(url)
-        .waitUntil(function () {
-          return this.getText('body')
-            .then((body) => {
-              return body.includes('default')
-            })
-        })
     })
     it('allows fingerprinting when setting is off in private tab', function * () {
       const url = Brave.server.url('fingerprinting.html')
