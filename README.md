@@ -131,6 +131,8 @@ Now run tests in another terminal
 
     npm test
 
+See [docs/tests.md](docs/tests.md) for more information.
+
 ### Port
 
 Brave uses port 8080 to communicate between its client and server sides by default. If you are using port 8080 for something else (e.g. a web proxy) then you can set the node config to make it use a different one.
