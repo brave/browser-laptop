@@ -232,7 +232,7 @@ const createVirtualHistoryItems = (historySites, urlLocationLower) => {
  * 1 or -1 for a weak indicator of a superior result.
  * 0 if no determination can be made.
  */
-const getSortByDomain = (userInputLower, userInputHost) => {
+const getSortByDomainForSites = (userInputLower, userInputHost) => {
   return (s1, s2) => {
     // Check for matches on hostname which if found overrides
     // any count or frequency calculation.
@@ -264,6 +264,37 @@ const getSortByDomain = (userInputLower, userInputHost) => {
       const sortBySimpleURLResult = sortBySimpleURL(s1, s2)
       if (sortBySimpleURLResult !== 0) {
         return sortBySimpleURLResult
+      }
+    }
+    // Can't determine what is the best match
+    return 0
+  }
+}
+
+/**
+ * Returns a function that sorts 2 hosts
+ * The result of that function is a postive, negative, or 0 result.
+ */
+const getSortByDomainForHosts = (userInputHost) => {
+  return (host1, host2) => {
+    host1 = host1.replace('www.', '')
+    host2 = host2.replace('www.', '')
+    let pos1 = host1.indexOf(userInputHost)
+    let pos2 = host2.indexOf(userInputHost)
+    if (pos1 !== -1 && pos2 === -1) {
+      return -2
+    }
+    if (pos1 === -1 && pos2 !== -1) {
+      return 2
+    }
+    if (pos1 !== -1 && pos2 !== -1) {
+      // Try to match on the first position without taking into account decay sort.
+      // This is because autocomplete is based on matching prefixes.
+      if (pos1 === 0 && pos2 !== 0) {
+        return -1
+      }
+      if (pos1 !== 0 && pos2 === 0) {
+        return 1
       }
     }
     // Can't determine what is the best match
@@ -354,7 +385,7 @@ const getSortForSuggestions = (userInputLower) => {
   const userInputParts = userInputLower.split('/')
   const userInputHost = userInputParts[0]
   const userInputValue = userInputParts[1] || ''
-  const sortByDomain = getSortByDomain(userInputLower, userInputHost)
+  const sortByDomain = getSortByDomainForSites(userInputLower, userInputHost)
   const sortByPath = getSortByPath(userInputLower)
 
   return (s1, s2) => {
@@ -398,7 +429,8 @@ const getURL = (x) => {
 const getMapListToElements = (urlLocationLower) => ({data, maxResults, type,
     filterValue = (site) => {
       return site.toLowerCase().indexOf(urlLocationLower) !== -1
-    }
+    },
+    sortHandler
 }) => {
   const suggestionsList = Immutable.List()
   const formatTitle = (x) => typeof x === 'object' && x !== null ? x.get('title') : x
@@ -413,16 +445,17 @@ const getMapListToElements = (urlLocationLower) => ({data, maxResults, type,
   if (filterValue) {
     filteredData = filteredData.filter(filterValue)
   }
+  if (sortHandler) {
+    filteredData = filteredData.sort(sortHandler)
+  }
 
-  return makeImmutable(filteredData
+  return makeImmutable(filteredData)
     .take(maxResults)
-    .map((site) => {
-      return Immutable.fromJS({
-        title: formatTitle(site),
-        location: getURL(site),
-        tabId: formatTabId(site),
-        type
-      })
+    .map((site) => ({
+      title: formatTitle(site),
+      location: getURL(site),
+      tabId: formatTabId(site),
+      type
     }))
 }
 
@@ -465,6 +498,7 @@ const getAboutSuggestions = (state, urlLocationLower) => {
 
 const getOpenedTabSuggestions = (state, windowId, urlLocationLower) => {
   return new Promise((resolve, reject) => {
+    const sortHandler = getSortForSuggestions(urlLocationLower)
     const mapListToElements = getMapListToElements(urlLocationLower)
     const tabs = getTabsByWindowId(state, windowId)
     let suggestionsList = Immutable.List()
@@ -478,7 +512,8 @@ const getOpenedTabSuggestions = (state, windowId, urlLocationLower) => {
           (
             (tab.get('title') && tab.get('title').toLowerCase().indexOf(urlLocationLower) !== -1) ||
             (tab.get('url') && tab.get('url').toLowerCase().indexOf(urlLocationLower) !== -1)
-          )
+          ),
+        sortHandler
       })
     }
     resolve(suggestionsList)
@@ -506,10 +541,12 @@ const getSearchSuggestions = (state, tabId, urlLocationLower) => {
 const getAlexaSuggestions = (state, urlLocationLower) => {
   return new Promise((resolve, reject) => {
     const mapListToElements = getMapListToElements(urlLocationLower)
+    const sortHandler = getSortByDomainForHosts(urlLocationLower)
     const suggestionsList = mapListToElements({
       data: top500,
       maxResults: config.urlBarSuggestions.maxTopSites,
-      type: suggestionTypes.TOP_SITE
+      type: suggestionTypes.TOP_SITE,
+      sortHandler
     })
     resolve(suggestionsList)
   })
@@ -571,7 +608,8 @@ module.exports = {
   getSortForSuggestions,
   getSortByPath,
   sortBySimpleURL,
-  getSortByDomain,
+  getSortByDomainForSites,
+  getSortByDomainForHosts,
   isSimpleDomainNameValue,
   normalizeLocation,
   shouldNormalizeLocation,
