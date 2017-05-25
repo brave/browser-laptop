@@ -377,7 +377,7 @@ const tabState = {
   getTabsByLastActivated: (state, windowId) => {
     state = validateState(state)
     windowId = validateId('windowId', windowId)
-    return state.getIn(['tabsInternal', 'lastActive', windowId], Immutable.OrderedSet())
+    return state.getIn(['tabsInternal', 'lastActive', windowId.toString()], Immutable.OrderedSet())
   },
 
   setTabs: (state, tabs) => {
