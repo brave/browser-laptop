@@ -256,6 +256,7 @@ class UrlBar extends React.Component {
       this.urlInput.setSelectionRange(newValue.length, newValue.length + newSuffix.length + 1)
       return true
     } else {
+      this.setValue(newValue, '')
       return false
     }
   }
@@ -310,11 +311,9 @@ class UrlBar extends React.Component {
     const newValue = val + suffix
     if (this.urlInput.value !== newValue) {
       this.urlInput.value = newValue
-      if (!this.keyPress) {
-        // if this is a key press don't sent the update until keyUp so
-        // showAutocompleteResult can handle the result
-        this.maybeUrlBarTextChanged(val)
-      }
+      // if this is a key press don't sent the update until keyUp so
+      // showAutocompleteResult can handle the result
+      this.maybeUrlBarTextChanged(val)
     }
   }
 
@@ -394,8 +393,7 @@ class UrlBar extends React.Component {
         if (!(prevProps.location === 'about:blank' && this.props.location === 'about:newtab' && this.props.locationValue !== 'about:blank')) {
           this.setValue(UrlUtil.getDisplayLocation(this.props.location, pdfjsEnabled))
         }
-      } else if (this.props.hasSuggestionMatch &&
-                this.props.isActive &&
+      } else if (this.props.isActive &&
                 this.props.locationValueSuffix !== this.lastSuffix) {
         this.showAutocompleteResult()
       } else if ((this.props.titleMode !== prevProps.titleMode) ||

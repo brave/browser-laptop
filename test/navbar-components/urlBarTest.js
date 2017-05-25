@@ -172,15 +172,33 @@ describe('urlBar tests', function () {
       })
     })
 
-    describe('Brave about pages', function () {
+    describe('typing with characters that do not match prefix should not select first item', function () {
+      beforeEach(function * () {
+        yield this.app.client
+          .addSite({ location: 'https://slo-tech.com', title: 'title' })
+          .setInputText(urlInput, '')
+          .keys('o')
+      })
+      it('should not autocomplete to the domain', function * () {
+        yield this.app.client
+          .waitForInputText(urlInput, 'o')
+      })
+    })
+
+    describe('suffix', function () {
       beforeEach(function * () {
         yield this.app.client
           .setInputText(urlInput, '')
-          .keys('ab')
+          .keys('b')
+          .waitForInputText(urlInput, 'brave.com')
+          .keys(Brave.keys.DOWN)
+          .keys(Brave.keys.DOWN)
       })
-      it('should autocomplete for prefixes', function * () {
+      it('should clear when it is not a prefix match', function * () {
         yield this.app.client
-          .waitForInputText(urlInput, 'about:about')
+          .waitForInputText(urlInput, 'b')
+          .keys(Brave.keys.UP)
+          .waitForInputText(urlInput, 'brave.com/test')
       })
     })
 
