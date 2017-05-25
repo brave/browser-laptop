@@ -11,8 +11,8 @@ require('../../less/about/error.less')
 const {isSourceAboutUrl, getTargetAboutUrl} = require('../lib/appUrlUtil')
 
 class ErrorPage extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.state = {}
   }
 

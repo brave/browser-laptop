@@ -14,8 +14,8 @@ const windowActions = require('../../../../js/actions/windowActions')
 const {showContextMenu} = require('../../../common/lib/menuUtil')
 
 class MenuBarItem extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.onClick = this.onClick.bind(this)
     this.onMouseOver = this.onMouseOver.bind(this)
   }

@@ -16,13 +16,13 @@ const buildPropsImpl = (props, componentType) => {
 }
 
 class ReduxComponent extends ImmutableComponent {
-  constructor (props) {
+  constructor (componentType, props) {
     super(props)
-    this.componentType = props.componentType
     this.state = {}
-    this.internalState = props
+    this.componentType = componentType
+    this.internalState = this.buildProps(this.props)
     this.checkForUpdates = debounce(this.checkForUpdates.bind(this), 5)
-    this.dontCheck = false
+    this.dontCheck = true
   }
 
   checkForUpdates () {
@@ -72,8 +72,5 @@ class ReduxComponent extends ImmutableComponent {
 }
 
 module.exports.connect = (componentType) => {
-  return (props) => {
-    const component = React.createElement(ReduxComponent, Object.assign({componentType}, buildPropsImpl(props, componentType)))
-    return component
-  }
+  return ReduxComponent.bind(null, componentType)
 }

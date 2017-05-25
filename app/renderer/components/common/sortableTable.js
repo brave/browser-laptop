@@ -19,8 +19,8 @@ tableSort.extend('number', (item) => {
 })
 
 class SortableTable extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.onClick = this.onClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
     this.onTableDragStart = this.onTableDragStart.bind(this)

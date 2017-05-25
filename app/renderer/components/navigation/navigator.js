@@ -48,8 +48,8 @@ const {StyleSheet, css} = require('aphrodite')
 const globalStyles = require('../styles/global')
 
 class Navigator extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.onBack = this.onBack.bind(this)
     this.onForward = this.onForward.bind(this)
     this.onBackLongPress = this.onBackLongPress.bind(this)

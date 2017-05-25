@@ -30,8 +30,8 @@ const braveLogo = require('../../app/extensions/brave/img/braveAbout.png')
 const verifiedIcon = require('../../app/extensions/brave/img/ledger/verified_green_icon.svg')
 
 class ContributionStatement extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
 
     let hash = window.location.hash ? window.location.hash.slice(1) : ''
 
