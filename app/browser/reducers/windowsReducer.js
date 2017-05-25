@@ -27,7 +27,7 @@ const windowsReducer = (state, action, immutableAction) => {
       }
       break
     case appConstants.APP_CLOSE_WINDOW:
-      state = windows.closeWindow(state, action)
+      state = windows.closeWindow(state, action.get('windowId'))
       break
     case appConstants.APP_WINDOW_CLOSED:
       state = windowState.removeWindow(state, action)

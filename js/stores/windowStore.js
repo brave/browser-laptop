@@ -376,13 +376,17 @@ const doAction = (action) => {
           break
         }
         const frameIndex = frameStateUtil.getFrameIndex(windowState, action.frameKey)
-        windowState = windowState.setIn(['frames', frameIndex, 'breakpoint'], action.breakpoint)
+        if (frameIndex !== -1) {
+          windowState = windowState.setIn(['frames', frameIndex, 'breakpoint'], action.breakpoint)
+        }
         break
       }
     case windowConstants.WINDOW_SET_TAB_HOVER_STATE:
       {
         const frameIndex = frameStateUtil.getFrameIndex(windowState, action.frameKey)
-        windowState = windowState.setIn(['frames', frameIndex, 'hoverState'], action.hoverState)
+        if (frameIndex !== -1) {
+          windowState = windowState.setIn(['frames', frameIndex, 'hoverState'], action.hoverState)
+        }
         break
       }
     case windowConstants.WINDOW_TAB_MOVE:
@@ -428,7 +432,9 @@ const doAction = (action) => {
     case windowConstants.WINDOW_SET_FIND_DETAIL:
       {
         const frameIndex = frameStateUtil.getFrameIndex(windowState, action.frameKey)
-        windowState = windowState.mergeIn(['frames', frameIndex, 'findDetail'], action.findDetail)
+        if (frameIndex !== -1) {
+          windowState = windowState.mergeIn(['frames', frameIndex, 'findDetail'], action.findDetail)
+        }
         break
       }
     case windowConstants.WINDOW_SET_BOOKMARK_DETAIL:

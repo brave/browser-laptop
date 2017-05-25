@@ -8,20 +8,20 @@ const AssertionError = require('assert').AssertionError
 const defaultAppState = Immutable.fromJS({
   tabs: [],
   windows: [],
-  otherProp: true
-})
-
-const twoTabsAppState = defaultAppState
-  .set('tabs', Immutable.fromJS([
-    { tabId: 1, windowId: 1, frameKey: 2 },
-    { tabId: 2, windowId: 1, frameKey: 1 }
-  ]))
-  .set('tabsInternal', Immutable.fromJS({
+  otherProp: true,
+  tabsInternal: {
     index: {
       1: 0,
       2: 1
     }
-  }))
+  }
+})
+
+const twoTabsAppState = defaultAppState
+  .set('tabs', Immutable.fromJS([
+    { tabId: 1, index: 0, windowId: 1, frameKey: 2 },
+    { tabId: 2, index: 1, windowId: 1, frameKey: 1 }
+  ]))
 
 // NOTE: null check can be optional since resolveTabId sets a default if null
 const shouldValidateId = function (cb, skipNullCheck) {
@@ -124,7 +124,7 @@ const shouldValidateTabValue = function (cb) {
   it('throws an AssertionError if `tabValue` does not contain a valid `tabId`', function () {
     assert.doesNotThrow(
       () => {
-        cb({ tabId: 1 })
+        cb({ tabId: 1, index: 0, windowId: 1 })
       },
       AssertionError
     )
@@ -147,8 +147,8 @@ const shouldValidateAction = function (cb) {
   it('throws an AssertionError if action does not contain a `tabValue` that is convertable to an Immutable.Map', function () {
     assert.doesNotThrow(
       () => {
-        cb(Immutable.fromJS({ tabValue: { tabId: 1 } }))
-        cb({ tabValue: { tabId: 1 } })
+        cb(Immutable.fromJS({ tabValue: { tabId: 1, index: 0, windowId: 1 } }))
+        cb({ tabValue: { tabId: 1, index: 0, windowId: 1 } })
       },
       AssertionError
     )
@@ -169,7 +169,7 @@ const shouldValidateAction = function (cb) {
   it('throws an AssertionError if `action` is not convertable to an Immutable.Map', function () {
     assert.doesNotThrow(
       () => {
-        cb({ tabValue: { tabId: 1 } })
+        cb({ tabValue: { tabId: 1, index: 0, windowId: 1 } })
       },
       AssertionError
     )
@@ -295,20 +295,20 @@ describe('tabState unit tests', function () {
   describe('insertTab', function () {
     before(function () {
       this.appState = defaultAppState
-        .set('tabs', Immutable.fromJS([ { tabId: 1 } ]))
-        .set('tabsInternal', Immutable.fromJS({ index: { 1: 0 } }))
+        .set('tabs', Immutable.fromJS([ { tabId: 1, index: 0, windowId: 1 } ]))
+        .set('tabsInternal', Immutable.fromJS({index: { 1: 0 }}))
     })
 
     it('returns a new immutable state with the tabValue appended to the end of the list', function () {
       assert.deepEqual(
-        tabState.insertTab(this.appState, { tabValue: { tabId: 2 } }).get('tabs').toJS(),
-        [{ tabId: 1 }, { tabId: 2 }])
+        tabState.insertTab(this.appState, { tabValue: { tabId: 2, index: 1, windowId: 1 } }).get('tabs').toJS(),
+        [{ tabId: 1, index: 0, windowId: 1 }, { tabId: 2, index: 1, windowId: 1 }])
     })
 
     it('throws an AssertionError if there is already a tab with the tabId', function () {
       assert.throws(
         () => {
-          tabState.insertTab(this.appState, { tabValue: { tabId: 1 } })
+          tabState.insertTab(this.appState, { tabValue: { tabId: 1, index: 0, windowId: 1 } })
         },
         AssertionError
       )
@@ -323,7 +323,7 @@ describe('tabState unit tests', function () {
     })
 
     shouldValidateTabState((state) => {
-      tabState.insertTab(state, { tabValue: { tabId: 1 } })
+      tabState.insertTab(state, { tabValue: { tabId: 1, index: 0, windowId: 1 } })
     })
   })
 
@@ -335,6 +335,7 @@ describe('tabState unit tests', function () {
             windowId: 1,
             frameKey: 1,
             tabId: 1,
+            index: 0,
             myProp: 'test1',
             myProp2: 'blah'
           },
@@ -342,12 +343,16 @@ describe('tabState unit tests', function () {
             windowId: 1,
             frameKey: 1,
             tabId: 2,
+            index: 1,
             myProp: 'test2',
             myProp2: 'blah'
           }
         ]))
       .set('tabsInternal', Immutable.fromJS({
-        index: { 1: 0, 2: 1 }
+        index: {
+          1: 0,
+          2: 1
+        }
       }))
     })
 
@@ -356,6 +361,7 @@ describe('tabState unit tests', function () {
         tabState.updateTab(this.appState, { tabValue: { tabId: 1, test: 'blue', myProp: 'test2' } }).get('tabs').toJS(), [
           {
             tabId: 1,
+            index: 0,
             test: 'blue',
             windowId: 1,
             frameKey: 1,
@@ -366,6 +372,7 @@ describe('tabState unit tests', function () {
             windowId: 1,
             frameKey: 1,
             tabId: 2,
+            index: 1,
             myProp: 'test2',
             myProp2: 'blah'
           }
@@ -374,9 +381,11 @@ describe('tabState unit tests', function () {
 
     it('returns a new immutable state with the tabValue replaced if it already exists and `replace` is true', function () {
       assert.deepEqual(
-        tabState.updateTab(this.appState, { replace: true, tabValue: { tabId: 1, test: 'blue', myProp: 'test2' } }).get('tabs').toJS(), [
+        tabState.updateTab(this.appState, { replace: true, tabValue: { tabId: 1, index: 0, windowId: 1, test: 'blue', myProp: 'test2' } }).get('tabs').toJS(), [
           {
             tabId: 1,
+            index: 0,
+            windowId: 1,
             test: 'blue',
             myProp: 'test2'
           },
@@ -384,6 +393,7 @@ describe('tabState unit tests', function () {
             windowId: 1,
             frameKey: 1,
             tabId: 2,
+            index: 1,
             myProp: 'test2',
             myProp2: 'blah'
           }
@@ -471,23 +481,21 @@ describe('tabState unit tests', function () {
     before(function () {
       this.appState = defaultAppState
         .set('tabs', Immutable.fromJS([
-          { tabId: 1 }
+          { tabId: 1, index: 0, windowId: 1 }
         ]))
-        .set('tabsInternal', Immutable.fromJS({
-          index: { 1: 0 }
-        }))
+        .setIn(['tabsInternal', 'index', 1], 0)
     })
 
     it('returns a new immutable state with the tabValue appended to the end of the list if it does not already exist', function () {
       assert.deepEqual(
-        tabState.maybeCreateTab(this.appState, { tabValue: { tabId: 2 } }).get('tabs').toJS(),
-        [{ tabId: 1 }, { tabId: 2 }])
+        tabState.maybeCreateTab(this.appState, { tabValue: { tabId: 2, index: 1, windowId: 1 } }).get('tabs').toJS(),
+        [{ tabId: 1, index: 0, windowId: 1 }, { tabId: 2, index: 1, windowId: 1 }])
     })
 
     it('returns a new immutable state with the tabValue updated if it already exists', function () {
       assert.deepEqual(
-        tabState.maybeCreateTab(this.appState, { tabValue: { tabId: 1, test: 'blue' } }).get('tabs').toJS(),
-        [{ tabId: 1, test: 'blue' }])
+        tabState.maybeCreateTab(this.appState, { tabValue: { tabId: 1, index: 0, windowId: 1, test: 'blue' } }).get('tabs').toJS(),
+        [{ tabId: 1, index: 0, windowId: 1, test: 'blue' }])
     })
 
     shouldValidateAction((action) => {
@@ -499,7 +507,7 @@ describe('tabState unit tests', function () {
     })
 
     shouldValidateTabState((state) => {
-      tabState.maybeCreateTab(state, { tabValue: { tabId: 1 } })
+      tabState.maybeCreateTab(state, { tabValue: { tabId: 1, index: 0, windowId: 1 } })
     })
   })
 
@@ -658,7 +666,11 @@ describe('tabState unit tests', function () {
           { tabId: 3, prop2: 'test4' }
         ]))
         .set('tabsInternal', Immutable.fromJS({
-          index: { 1: 0, 2: 1, 3: 2 }
+          index: {
+            1: 0,
+            2: 1,
+            3: 2
+          }
         }))
     })
 

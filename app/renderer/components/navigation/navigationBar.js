@@ -124,7 +124,7 @@ class NavigationBar extends React.Component {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const activeFrameKey = activeFrame.get('key')
-    const activeTabId = activeFrame.get('tabId') || tabState.TAB_ID_NONE
+    const activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
     const activeTab = tabState.getByTabId(state, activeTabId)
 
     const activeTabShowingMessageBox = tabState.isShowingMessageBox(state, activeTabId)
