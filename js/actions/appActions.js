@@ -1394,6 +1394,23 @@ const appActions = {
   },
 
   /**
+   * Indicates URL bar selected index
+   *
+   * @param {number} windowId - the window ID
+   * @param {number} selectedIndex - The index for the selected item (users can select items with down arrow on their keyboard)
+   */
+  urlBarSelectedIndexChanged: function (windowId, selectedIndex) {
+    dispatch({
+      actionType: appConstants.APP_URL_BAR_SELECTED_INDEX_CHANGED,
+      selectedIndex,
+      windowId,
+      queryInfo: {
+        windowId
+      }
+    })
+  },
+
+  /**
    * Dispatches a message to set the search engine details.
    * @param {Object} searchDetail - the search details
    */

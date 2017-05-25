@@ -3,24 +3,57 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+
+// Components
 const ImmutableComponent = require('../immutableComponent')
+
+// Constants
 const suggestionTypes = require('../../../../js/constants/suggestionTypes')
+
+// Actions
+const appActions = require('../../../../js/actions/appActions')
+const windowActions = require('../../../../js/actions/windowActions')
+
+// utils
 const cx = require('../../../../js/lib/classSet')
+const {isForSecondaryAction} = require('../../../../js/lib/eventUtil')
+const {getCurrentWindowId} = require('../../currentWindow')
 
 class UrlBarSuggestionItem extends ImmutableComponent {
-  componentDidMount () {
-    this.node.addEventListener('auxclick', this.props.onClick)
+  constructor () {
+    super()
+    this.onMouseOver = this.onMouseOver.bind(this)
   }
+
+  onMouseOver (e) {
+    let newIndex = parseInt(e.target.getAttribute('data-index'), 10)
+
+    if (newIndex < 0) {
+      newIndex = null
+    }
+
+    appActions.urlBarSelectedIndexChanged(getCurrentWindowId(), newIndex)
+  }
+
+  onClick (e) {
+    windowActions.activeSuggestionClicked(isForSecondaryAction(e), e.shiftKey)
+  }
+
+  componentDidMount () {
+    this.node.addEventListener('auxclick', this.onClick)
+  }
+
   componentWillUpdate (nextProps) {
     if (!this.props.selected && nextProps.selected) {
       this.node.scrollIntoView()
     }
   }
+
   render () {
     return <li data-test-id='list-item'
       data-index={this.props.currentIndex}
-      onMouseOver={this.props.onMouseOver.bind(this)}
-      onClick={this.props.onClick}
+      onMouseOver={this.onMouseOver}
+      onClick={this.onClick}
       key={`${this.props.suggestion.get('location')}|${this.props.currentIndex + this.props.i}`}
       ref={(node) => { this.node = node }}
       className={cx({

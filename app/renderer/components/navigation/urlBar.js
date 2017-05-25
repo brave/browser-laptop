@@ -612,10 +612,8 @@ class UrlBar extends React.Component {
       {
           this.shouldRenderUrlBarSuggestions
           ? <UrlBarSuggestions
-            selectedIndex={this.props.selectedIndex}
-            suggestionList={this.props.suggestionList}
-            hasSuggestionMatch={this.props.hasSuggestionMatch}
-            menubarVisible={this.props.menubarVisible} />
+            menubarVisible={this.props.menubarVisible}
+          />
           : null
         }
     </form>
