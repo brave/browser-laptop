@@ -1098,6 +1098,18 @@ Indicates URL bar suggestions and selected index.
 
 
 
+### urlBarSelectedIndexChanged(windowId, selectedIndex) 
+
+Indicates URL bar selected index
+
+**Parameters**
+
+**windowId**: `number`, the window ID
+
+**selectedIndex**: `number`, The index for the selected item (users can select items with down arrow on their keyboard)
+
+
+
 ### defaultSearchEngineLoaded(searchDetail) 
 
 Dispatches a message to set the search engine details.
