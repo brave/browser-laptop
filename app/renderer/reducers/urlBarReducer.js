@@ -14,6 +14,7 @@ const Immutable = require('immutable')
 const {navigateSiteClickHandler} = require('../suggestionClickHandlers')
 const navigationBarState = require('../../common/state/navigationBarState')
 const tabState = require('../../common/state/tabState')
+const {normalizeLocation} = require('../../common/lib/suggestion')
 
 const updateSearchEngineInfoFromInput = (state, frameProps) => {
   const input = frameProps.getIn(['navbar', 'urlbar', 'location'])
@@ -76,14 +77,12 @@ const updateUrlSuffix = (state, suggestionList) => {
     const autocompleteEnabled = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']))
 
     if (autocompleteEnabled) {
-      const location = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'location'])) || ''
-      const index = suggestion.get('location').toLowerCase().indexOf(location.toLowerCase())
-      if (index !== -1) {
-        const beforePrefix = suggestion.get('location').substring(0, index)
-        if (beforePrefix.endsWith('://') || beforePrefix.endsWith('://www.') || index === 0) {
-          suffix = suggestion.get('location').substring(index + location.length)
-          hasSuggestionMatch = true
-        }
+      const location = normalizeLocation(state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'location']))) || ''
+      const normalizedSuggestion = normalizeLocation(suggestion.get('location').toLowerCase())
+      const index = normalizedSuggestion.indexOf(location.toLowerCase())
+      if (index === 0) {
+        suffix = normalizedSuggestion.substring(index + location.length)
+        hasSuggestionMatch = true
       }
     }
   }

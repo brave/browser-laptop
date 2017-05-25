@@ -58,9 +58,8 @@ class UrlBar extends React.Component {
     this.onKeyPress = this.onKeyPress.bind(this)
     this.onClick = this.onClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
-    this.keyPressed = false
     this.showAutocompleteResult = debounce(() => {
-      if (this.keyPressed || !this.urlInput) {
+      if (!this.urlInput) {
         return
       }
       this.updateAutocomplete(this.lastVal)
@@ -211,7 +210,6 @@ class UrlBar extends React.Component {
         }
         break
       default:
-        this.keyPressed = true
         // Only enable suggestions and autocomplete if we are typing in
         // a printable character without cmd/ctrl
         if (e.key && e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
@@ -334,7 +332,6 @@ class UrlBar extends React.Component {
     if (this.props.isSelected) {
       windowActions.setUrlBarSelected(false)
     }
-    this.keyPressed = false
     this.maybeUrlBarTextChanged(this.lastVal)
   }
 
@@ -381,7 +378,6 @@ class UrlBar extends React.Component {
     if (this.urlInput) {
       const pdfjsEnabled = getSetting(settings.PDFJS_ENABLED)
       if (this.props.activeFrameKey !== prevProps.activeFrameKey) {
-        this.keyPressed = false
         // The user just changed tabs
         this.setValue(this.props.locationValue !== 'about:blank'
           ? this.props.locationValue

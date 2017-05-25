@@ -146,6 +146,44 @@ describe('urlBar tests', function () {
       })
     })
 
+    describe('typing prefix with characters from "https" prefix', function () {
+      beforeEach(function * () {
+        yield this.app.client
+          .addSite({ location: 'https://slo-tech.com', title: 'title' })
+          .setInputText(urlInput, '')
+          .keys('s')
+      })
+      it('should autocomplete to the domain', function * () {
+        yield this.app.client
+          .waitForInputText(urlInput, 'slo-tech.com')
+      })
+    })
+
+    describe('typing with characters that do not match prefix should not select first item', function () {
+      beforeEach(function * () {
+        yield this.app.client
+          .addSite({ location: 'https://slo-tech.com', title: 'title' })
+          .setInputText(urlInput, '')
+          .keys('o')
+      })
+      it('should not autocomplete to the domain', function * () {
+        yield this.app.client
+          .waitForInputText(urlInput, 'o')
+      })
+    })
+
+    describe('Brave about pages', function () {
+      beforeEach(function * () {
+        yield this.app.client
+          .setInputText(urlInput, '')
+          .keys('ab')
+      })
+      it('should autocomplete for prefixes', function * () {
+        yield this.app.client
+          .waitForInputText(urlInput, 'about:about')
+      })
+    })
+
     describe('press right arrow key', function () {
       beforeEach(function * () {
         yield this.app.client

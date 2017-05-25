@@ -123,6 +123,19 @@ describe('urlBarSuggestions', function () {
       .tabByIndex(1).getUrl().should.become(this.page2Url)
   })
 
+  it('selected item works with mouse hover', function * () {
+    const firstItem = urlBarSuggestions + ' li.suggestionItem[data-index="0"]'
+    const secondItem = urlBarSuggestions + ' li.suggestionItem[data-index="1"]'
+    yield this.app.client
+      .setInputText(urlInput, 'o')
+      .waitForExist(firstItem)
+      .waitForExist(secondItem)
+      .moveToObject(firstItem)
+      .waitForExist(firstItem + '.selected')
+      .moveToObject(secondItem)
+      .waitForExist(secondItem + '.selected')
+  })
+
   it('selects a location auto complete result but not for titles', function * () {
     const basePage1Url = Brave.server.url('')
     yield this.app.client
