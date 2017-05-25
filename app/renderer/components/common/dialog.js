@@ -43,6 +43,7 @@ class Dialog extends ImmutableComponent {
   render () {
     return <div className={cx({
       [css(styles.dialog)]: true,
+      [css(styles.dialog_isNotClickDismiss)]: !this.props.isClickDismiss,
       [this.props.className]: !!this.props.className
     })}
       data-test-id={this.props.testId}
@@ -77,7 +78,9 @@ const styles = StyleSheet.create({
     zIndex: globalStyles.zindex.zindexDialogs,
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
+  },
+  dialog_isNotClickDismiss: {
     background: 'rgba(0, 0, 0, 0.15)'
   }
 })
