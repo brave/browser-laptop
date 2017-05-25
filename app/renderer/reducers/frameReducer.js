@@ -6,15 +6,12 @@
 
 const Immutable = require('immutable')
 const appConstants = require('../../../js/constants/appConstants')
+const windowActions = require('../../../js/actions/windowActions')
 const windowConstants = require('../../../js/constants/windowConstants')
 const frameStateUtil = require('../../../js/state/frameStateUtil')
 const appActions = require('../../../js/actions/appActions')
-const windowActions = require('../../../js/actions/windowActions')
-const settings = require('../../../js/constants/settings')
-const getSetting = require('../../../js/settings').getSetting
 const config = require('../../../js/constants/config')
 const {updateTabPageIndex} = require('../lib/tabUtil')
-const {getCurrentWindowId} = require('../currentWindow')
 
 const setFullScreen = (state, action) => {
   const index = frameStateUtil.getFrameIndex(state, action.frameProps.get('key'))
@@ -29,31 +26,21 @@ const closeFrame = (state, action) => {
   if (index === -1) {
     return state
   }
-  const frameProps = frameStateUtil.getFrameByKey(state, action.frameKey)
 
+  const frameProps = frameStateUtil.getFrameByKey(state, action.frameKey)
   const hoverState = state.getIn(['frames', index, 'hoverState'])
-  const activeFrameKey = frameStateUtil.getActiveFrame(state).get('key')
+
   state = state.merge(frameStateUtil.removeFrame(
     state,
     frameProps.set('closedAtIndex', index),
-    activeFrameKey,
-    index,
-    getSetting(settings.TAB_CLOSE_ACTION)
+    index
   ))
   state = frameStateUtil.deleteFrameInternalIndex(state, frameProps)
   state = frameStateUtil.updateFramesInternalIndex(state, index)
 
-  // If we reach the limit of opened tabs per page while closing tabs, switch to
-  // the active tab's page otherwise the user will hang on empty page
-  if (frameStateUtil.getNonPinnedFrameCount(state) % getSetting(settings.TABS_PER_PAGE) === 0) {
-    state = updateTabPageIndex(state, frameStateUtil.getActiveFrame(state))
-    state = state.deleteIn(['ui', 'tabs', 'fixTabWidth'])
-  }
-
-  const nextFrame = frameStateUtil.getFrameByIndex(state, index)
-
   // Copy the hover state if tab closed with mouse as long as we have a next frame
   // This allow us to have closeTab button visible  for sequential frames closing, until onMouseLeave event happens.
+  const nextFrame = frameStateUtil.getFrameByIndex(state, index)
   if (hoverState && nextFrame) {
     windowActions.setTabHoverState(nextFrame.get('key'), hoverState)
   }
@@ -127,26 +114,7 @@ const frameReducer = (state, action, immutableAction) => {
       })
       break
     case windowConstants.WINDOW_CLOSE_FRAME:
-      // TODO(bridiver) - why does `will-destroy` fire twice?
-      if (action.frameKey < 0 || !frameStateUtil.getFrameByKey(state, action.frameKey)) {
-        break
-      }
-      // Unless a caller explicitly specifies to close a pinned frame, then
-      // ignore the call.
-      const nonPinnedFrames = frameStateUtil.getNonPinnedFrames(state)
-      const pinnedFrames = frameStateUtil.getPinnedFrames(state)
-      // If there is at least 1 pinned frame don't close the window until subsequent
-      // close attempts
-      if (nonPinnedFrames.size > 1 || pinnedFrames.size > 0) {
-        state = closeFrame(state, action)
-
-        const frame = frameStateUtil.getActiveFrame(state)
-        if (frame) {
-          appActions.tabActivateRequested(frame.get('tabId'))
-        }
-      } else {
-        appActions.closeWindow(getCurrentWindowId())
-      }
+      state = closeFrame(state, action)
       break
 
     case windowConstants.WINDOW_SET_FULL_SCREEN:
