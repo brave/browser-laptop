@@ -104,7 +104,7 @@ class UrlBarSuggestions extends ImmutableComponent {
       return
     }
     // Update the urlbar preview content
-    if (newIndex === 0 || newIndex > suggestions.size) {
+    if (newIndex > suggestions.size) {
       newIndex = null
     }
     appActions.urlBarSuggestionsChanged(getCurrentWindowId(), suggestions, newIndex)

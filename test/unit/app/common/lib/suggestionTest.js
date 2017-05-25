@@ -227,12 +227,12 @@ describe('suggestion unit tests', function () {
         assert(this.sort('https://facebook.github.io/', 'https://www.facebook.com/') > 0)
       })
     })
-    describe('getSortByDomain', function () {
+    describe('getSortByDomainForSites', function () {
       before(function () {
         const userInputLower = 'google.c'
         const userInputParts = userInputLower.split('/')
         const userInputHost = userInputParts[0]
-        const internalSort = suggestion.getSortByDomain(userInputLower, userInputHost)
+        const internalSort = suggestion.getSortByDomainForSites(userInputLower, userInputHost)
         this.sort = (url1, url2) => {
           return internalSort(
             { location: url1, parsedUrl: urlParse(url1) },
@@ -270,7 +270,7 @@ describe('suggestion unit tests', function () {
       it('sorts simple domains that match equally on subdomains as the same', function () {
         const url1 = 'https://facebook.github.com'
         const url2 = 'https://facebook.brave.com'
-        const sort = suggestion.getSortByDomain('facebook', 'facebook')
+        const sort = suggestion.getSortByDomainForSites('facebook', 'facebook')
         assert.equal(sort({
           location: url1,
           parsedUrl: urlParse(url1)
@@ -282,7 +282,7 @@ describe('suggestion unit tests', function () {
       it('sorts simple domains that match equally but have different activity based on activity', function () {
         const url1 = 'https://facebook.github.com'
         const url2 = 'https://facebook.brave.com'
-        const sort = suggestion.getSortByDomain('facebook', 'facebook')
+        const sort = suggestion.getSortByDomainForSites('facebook', 'facebook')
         assert(sort({
           location: url1,
           parsedUrl: urlParse(url1),
@@ -294,6 +294,30 @@ describe('suggestion unit tests', function () {
           lastAccessedTime: 1495334766432,
           count: 10
         }) < 0)
+      })
+    })
+    describe('getSortByDomainForHosts', function () {
+      before(function () {
+        const userInputLower = 'google.c'
+        this.sort = suggestion.getSortByDomainForHosts(userInputLower)
+      })
+      it('negative if only first has a matching domain', function () {
+        assert(this.sort('google.com', 'www.brianbondy.com') < 0)
+      })
+      it('positive if only second has a matching domain', function () {
+        assert(this.sort('www.brianbondy.com', 'google.com') > 0)
+      })
+      it('0 if both have a matching domain from index 0', function () {
+        assert.equal(this.sort('google.com', 'google.ca'), 0)
+      })
+      it('0 if neither has a matching domain', function () {
+        assert.equal(this.sort('brianbondy.com', 'clifton.io/'), 0)
+      })
+      it('negative if first site has a match from the start of domain', function () {
+        assert(this.sort('google.com', 'mygoogle.com') < 0)
+      })
+      it('negative if there is a pos 0 match not including www.', function () {
+        assert(this.sort('www.google.com', 'mygoogle.com') < 0)
       })
     })
     describe('getSortForSuggestions', function () {
