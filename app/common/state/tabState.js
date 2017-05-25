@@ -64,6 +64,10 @@ const matchTab = function (queryInfo, tab) {
 }
 
 const updateLastActive = (state, oldTabValue, newTabValue) => {
+  if (!newTabValue.get('active')) {
+    return state
+  }
+
   const oldTabId = validateId('tabId', oldTabValue.get('tabId'))
   const oldWindowId = validateId('windowId', oldTabValue.get('windowId'))
 
@@ -367,7 +371,7 @@ const tabState = {
   },
 
   getLastActiveTabId: (state, windowId) => {
-    const tabId = tabState.getTabsByLastActivated(state, windowId).slice(1, 2).first()
+    const tabId = tabState.getTabsByLastActivated(state, windowId).slice(-2).first()
     if (tabId == null) {
       return tabState.TAB_ID_NONE
     }
