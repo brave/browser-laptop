@@ -2,10 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const Immutable = require('immutable')
-
 // Top 500 alexa sites sorted by popularity
-const top500 = Immutable.fromJS([
+const top500 = [
   'gmail.com',
   'google.com',
   'mail.google.com',
@@ -492,6 +490,6 @@ const top500 = Immutable.fromJS([
   'youm7.com',
   '123rf.com',
   'commentcamarche.net'
-])
+]
 
 module.exports = top500
