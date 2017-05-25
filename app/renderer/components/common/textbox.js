@@ -16,7 +16,7 @@ class Textbox extends ImmutableComponent {
       this.props['data-isFormControl'] && commonStyles.formControl,
       styles.textbox,
       (this.props.readonly || this.props.readOnly) ? styles.readOnly : styles.outlineable,
-      this.props['data-isCommonForm'] && styles.isCommonForm,
+      this.props['data-isCommonForm'] && commonStyles.isCommonForm,
       this.props['data-isSettings'] && styles.isSettings,
       this.props['data-isRecoveryKeyTextbox'] && styles.recoveryKeys
     )
@@ -74,10 +74,6 @@ const styles = StyleSheet.create({
       outlineStyle: 'solid',
       outlineWidth: '1px'
     }
-  },
-  isCommonForm: {
-    fontSize: globalStyles.fontSize.flyoutDialog,
-    width: '100%'
   },
   isSettings: {
     width: '280px'

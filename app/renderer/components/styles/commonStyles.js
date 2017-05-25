@@ -193,6 +193,11 @@ const styles = StyleSheet.create({
     /* TODO: refactor siteDetails.less */
     marginTop: '0 !important',
     marginLeft: globalStyles.spacing.aboutPageSectionPadding
+  },
+
+  isCommonForm: {
+    fontSize: globalStyles.fontSize.flyoutDialog,
+    width: '100%'
   }
 })
 
