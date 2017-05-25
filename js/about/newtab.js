@@ -28,8 +28,8 @@ require('../../less/about/newtab.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 class NewTabPage extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.state = {
       showSiteRemovalNotification: false,
       imageLoadFailed: false,

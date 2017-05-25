@@ -26,8 +26,8 @@ require('../../less/about/bookmarks.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 class BookmarkFolderItem extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.state = {
       isDragOver: false
     }
@@ -373,8 +373,8 @@ class BookmarksList extends ImmutableComponent {
 }
 
 class AboutBookmarks extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.onChangeSelectedFolder = this.onChangeSelectedFolder.bind(this)
     this.onChangeSearch = this.onChangeSearch.bind(this)
     this.onClearSearchText = this.onClearSearchText.bind(this)

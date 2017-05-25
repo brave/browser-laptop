@@ -39,8 +39,8 @@ function seperateHex (hexStr) {
 }
 
 class CertErrorPage extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.state = {
       advanced: false,
       certDetail: false,

@@ -67,8 +67,8 @@ function isTorrentViewerURL (url) {
 }
 
 class Frame extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.onCloseFrame = this.onCloseFrame.bind(this)
     this.onUpdateWheelZoom = debounce(this.onUpdateWheelZoom.bind(this), 20)
     this.onFocus = this.onFocus.bind(this)

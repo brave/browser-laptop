@@ -22,8 +22,8 @@ const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const windowActions = require('../../../../js/actions/windowActions')
 
 class BrowserAction extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.onClick = this.onClick.bind(this)
   }
 

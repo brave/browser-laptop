@@ -59,8 +59,8 @@ class DownloadsList extends ImmutableComponent {
 }
 
 class AboutDownloads extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.state = {
       downloads: Immutable.Map()
     }

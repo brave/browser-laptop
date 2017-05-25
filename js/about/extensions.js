@@ -87,8 +87,8 @@ class ExtensionList extends ImmutableComponent {
 }
 
 class AboutExtensions extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.state = {
       extensions: Immutable.List()
     }

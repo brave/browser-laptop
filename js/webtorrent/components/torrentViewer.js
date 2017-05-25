@@ -12,8 +12,8 @@ const TorrentStatus = require('./torrentStatus')
 const {AboutPageSectionTitle} = require('../../../app/renderer/components/common/sectionTitle')
 
 class TorrentViewer extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.state = {} // Needed for SortableTable.stateOwner
   }
 

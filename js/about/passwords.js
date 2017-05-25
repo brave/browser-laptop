@@ -57,8 +57,8 @@ class ActionsTd extends React.Component {
 }
 
 class SiteItem extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.onDelete = this.onDelete.bind(this)
   }
 
@@ -87,8 +87,8 @@ SiteItem.propTypes = {
 }
 
 class PasswordItem extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.onDelete = this.onDelete.bind(this)
     this.onCopy = this.onCopy.bind(this)
   }
@@ -137,8 +137,8 @@ PasswordItem.propTypes = {
 }
 
 class AboutPasswords extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.state = {
       passwordDetails: new Immutable.List(),
       disabledSiteDetails: new Immutable.List()

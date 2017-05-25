@@ -28,8 +28,8 @@ const tranformVersionInfoToString = (versionInformation) =>
     .reduce((coll, entry) => `${coll} \n${entry.get('name')}: ${entry.get('version')}`, '')
 
 class AboutBrave extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.state = { versionInformation: Immutable.fromJS([]) }
     ipc.on(messages.VERSION_INFORMATION_UPDATED, (e, versionInformation) => {
       if (this.state.versionInformation.size === 0) {

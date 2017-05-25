@@ -30,8 +30,8 @@ const commonStyles = require('../styles/commonStyles')
 const globalStyles = require('../styles/global')
 
 class MessageBox extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.onKeyDown = this.onKeyDown.bind(this)
     this.onSuppressChanged = this.onSuppressChanged.bind(this)
   }

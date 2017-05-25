@@ -677,8 +677,8 @@ class SecurityTab extends ImmutableComponent {
 }
 
 class AboutPreferences extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.state = {
       bitcoinOverlayVisible: false,
       qrcodeOverlayVisible: false,

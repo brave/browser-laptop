@@ -118,8 +118,8 @@ class CreditCardItem extends ImmutableComponent {
 }
 
 class AboutAutofill extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.state = {
       addressesDetails: new Immutable.List(),
       creditCardsDetails: new Immutable.List()
