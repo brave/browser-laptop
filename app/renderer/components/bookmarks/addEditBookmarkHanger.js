@@ -97,8 +97,6 @@ class AddEditBookmarkHanger extends ImmutableComponent {
       this.updateFolders(nextProps)
     }
   }
-  componentDidUpdate () {
-  }
   componentDidMount () {
     // Automatically save if this is triggered by the url star
     if (!this.props.isModal && !this.props.shouldShowLocation) {
