@@ -45,8 +45,6 @@
  - Fixed no progress indicator when reloading page. ([#8550](https://github.com/brave/browser-laptop/issues/8550))
  - Fixed Brave quits when New Tab command issued without window. ([#8575](https://github.com/brave/browser-laptop/issues/8575))
  - Fixed insecure connection info shown for about pages and new tab. ([#8299](https://github.com/brave/browser-laptop/issues/8299))
- - Update to v3.0.201 muon. ([#8445](https://github.com/brave/browser-laptop/issues/8445))
- - Update to Chromium 58.0.3029.110. ([#8962](https://github.com/brave/browser-laptop/issues/8962))
  - Upgraded to Chromium 58.0.3029.110. ([#8962](https://github.com/brave/browser-laptop/issues/8962))
  - Upgraded to muon 3.0.201. ([#8445](https://github.com/brave/browser-laptop/issues/8445))
 
