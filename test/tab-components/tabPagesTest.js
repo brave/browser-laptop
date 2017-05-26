@@ -3,7 +3,17 @@
 const Brave = require('../lib/brave')
 const appConfig = require('../../js/constants/appConfig')
 const settings = require('../../js/constants/settings')
-const {urlInput, newFrameButton, tabsTabs, tabPage, tabPage1, tabPage2, activeWebview} = require('../lib/selectors')
+const {
+  urlInput,
+  newFrameButton,
+  pinnedTabsTabs,
+  tabsTabs,
+  tabPage,
+  tabPage1,
+  tabPage2,
+  activeWebview,
+  activeTab
+} = require('../lib/selectors')
 
 describe('tab pages', function () {
   function * setup (client) {
@@ -73,6 +83,45 @@ describe('tab pages', function () {
           .changeSetting(settings.TABS_PER_PAGE, 1)
           .waitForElementCount(tabPage, defaultTabsPerPage)
       })
+    })
+  })
+
+  describe('basic tab page functionality with pinned tabs', function () {
+    Brave.beforeEach(this)
+
+    beforeEach(function * () {
+      yield setup(this.app.client)
+      this.page1 = Brave.server.url('page1.html')
+
+      yield this.app.client
+        .newTab({url: this.page1, pinned: true})
+        .waitForElementCount(pinnedTabsTabs, 1)
+        .newWindowAction()
+        .waitForWindowCount(2)
+        .windowByIndex(1)
+        .waitForElementCount(pinnedTabsTabs, 1)
+
+      yield this.app.client
+        .waitForElementCount(tabPage, 0)
+
+      for (let i = 0; i < appConfig.defaultSettings[settings.TABS_PER_PAGE] - 1; i++) {
+        yield this.app.client
+          .click(newFrameButton)
+          .waitForElementCount(tabsTabs, i + 2)
+      }
+    })
+
+    it('shows no tab pages when you have 1 pinned and 20 unpinned tabs', function * () {
+      yield this.app.client
+        .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
+        .middleClick(activeTab)
+        .waitForElementCount(tabPage, 0)
+    })
+
+    it('shows second tab page when you have 1 pinned and 21 unpinned tabs', function * () {
+      yield this.app.client
+        .click(newFrameButton)
+        .waitForElementCount(tabPage, 2)
     })
   })
 
