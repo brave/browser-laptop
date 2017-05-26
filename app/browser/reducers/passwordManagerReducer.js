@@ -176,6 +176,20 @@ const updatePassword = (username, origin, tabId) => {
   }
 }
 
+const removePassword = (form) => {
+  autofill.removeLogin(form)
+}
+
+const removePasswordSite = (form) => {
+  let newForm = form
+  delete newForm['blacklisted_by_user']
+  autofill.updateLogin(newForm)
+}
+
+const clearPasswords = () => {
+  autofill.clearLogins()
+}
+
 const migrate = (state) => {
   const passwords = state.get('passwords')
   if (passwords.size) {
@@ -229,6 +243,15 @@ const passwordManagerReducer = (state, action, immutableAction) => {
       break
     case appConstants.APP_UPDATE_PASSWORD:
       updatePassword(action.get('username'), action.get('origin'), action.get('tabId'))
+      break
+    case appConstants.APP_REMOVE_PASSWORD:
+      removePassword(action.get('passwordDetail').toJS())
+      break
+    case appConstants.APP_REMOVE_PASSWORD_SITE:
+      removePasswordSite(action.get('passwordDetail').toJS())
+      break
+    case appConstants.APP_CLEAR_PASSWORDS:
+      clearPasswords()
       break
   }
   return state

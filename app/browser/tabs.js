@@ -28,6 +28,7 @@ const {cleanupWebContents, currentWebContents, getWebContents, updateWebContents
 const {FilterOptions} = require('ad-block')
 const urlParse = require('../common/urlParse')
 const {isResourceEnabled} = require('../filtering')
+const autofill = require('../autofill')
 
 let currentPartitionNumber = 0
 const incrementPartitionNumber = () => ++currentPartitionNumber
@@ -171,7 +172,6 @@ const updateAboutDetails = (tab, tabValue) => {
   const history = aboutHistoryState.getHistory(appState)
   const adblock = appState.get('adblock')
   const downloads = appState.get('downloads')
-  const passwords = appState.get('passwords')
   const trackedBlockersCount = appState.getIn(['trackingProtection', 'count'])
   const adblockCount = appState.getIn(['adblock', 'count'])
   const httpsUpgradedCount = appState.getIn(['httpsEverywhere', 'count'])
@@ -211,14 +211,9 @@ const updateAboutDetails = (tab, tabValue) => {
     tab.send(messages.DOWNLOADS_UPDATED, {
       downloads: downloads.toJS()
     })
-  } else if (location === 'about:passwords' && passwords) {
-    const defaultSession = session.defaultSession
-    defaultSession.autofill.getAutofillableLogins((result) => {
-      tab.send(messages.PASSWORD_DETAILS_UPDATED, result)
-    })
-    defaultSession.autofill.getBlackedlistLogins((result) => {
-      tab.send(messages.PASSWORD_SITE_DETAILS_UPDATED, result)
-    })
+  } else if (location === 'about:passwords') {
+    autofill.getAutofillableLogins(tab)
+    autofill.getBlackedlistLogins(tab)
   } else if (location === 'about:flash') {
     tab.send(messages.BRAVERY_DEFAULTS_UPDATED, braveryDefaults.toJS())
   } else if (location === 'about:newtab') {
