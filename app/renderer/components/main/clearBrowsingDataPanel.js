@@ -26,7 +26,7 @@ const messages = require('../../../../js/constants/messages')
 
 class ClearBrowsingDataPanel extends React.Component {
   constructor (props) {
-    super()
+    super(props)
     this.onToggleBrowserHistory = this.onToggleSetting.bind(this, 'browserHistory')
     this.onToggleDownloadHistory = this.onToggleSetting.bind(this, 'downloadHistory')
     this.onToggleCachedImagesAndFiles = this.onToggleSetting.bind(this, 'cachedImagesAndFiles')

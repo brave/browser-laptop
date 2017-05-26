@@ -10,8 +10,8 @@ require('../../less/window.less')
 require('../../less/about/error.less')
 
 class SafebrowsingPage extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.state = {
       advanced: false
     }

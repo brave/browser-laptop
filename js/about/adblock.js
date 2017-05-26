@@ -22,8 +22,8 @@ require('../../less/switchControls.less')
 require('../../less/about/adblock.less')
 
 class AdBlockItem extends ImmutableComponent {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.onClick = this.onClick.bind(this)
   }
   onClick (e) {
@@ -45,8 +45,8 @@ class AdBlockItem extends ImmutableComponent {
 }
 
 class AboutAdBlock extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.onChangeCustomFilters = this.onChangeCustomFilters.bind(this)
     this.state = {
       adblock: Immutable.Map(),

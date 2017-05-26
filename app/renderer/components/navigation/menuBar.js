@@ -28,8 +28,8 @@ const {wrappingClamp} = require('../../../common/lib/formatUtil')
  * NOTE: the system menu is still created and used in order to keep the accelerators working.
  */
 class MenuBar extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.onKeyDown = this.onKeyDown.bind(this)
   }
 

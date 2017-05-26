@@ -128,8 +128,8 @@ class GroupedHistoryList extends React.Component {
 }
 
 class AboutHistory extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.onChangeSearch = this.onChangeSearch.bind(this)
     this.onClearSearchText = this.onClearSearchText.bind(this)
     this.clearBrowsingDataNow = this.clearBrowsingDataNow.bind(this)
