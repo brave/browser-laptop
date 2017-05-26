@@ -38,7 +38,6 @@ class NewSessionIcon extends React.Component {
     props.partitionIndicator = props.partitionNumber > tabs.maxAllowedNewSessions
       ? tabs.maxAllowedNewSessions
       : props.partitionNumber
-    props.partition = partition
 
     // used in funtions
     props.frameKey = ownProps.frameKey

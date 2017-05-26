@@ -28,10 +28,11 @@ const closeTabHoverSvg = require('../../../../extensions/brave/img/tabs/close_bt
 const closeTabSvg = require('../../../../extensions/brave/img/tabs/close_btn_normal.svg')
 
 class CloseTabIcon extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.onClick = this.onClick.bind(this)
   }
+
   get frame () {
     return windowStore.getFrame(this.props.frameKey)
   }
@@ -64,6 +65,7 @@ class CloseTabIcon extends React.Component {
     props.frameKey = ownProps.frameKey
     props.fixTabWidth = ownProps.fixTabWidth
     props.tabId = frame.get('tabId')
+
     return props
   }
 

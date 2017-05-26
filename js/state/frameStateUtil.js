@@ -7,7 +7,6 @@ const Immutable = require('immutable')
 // Constants
 const config = require('../constants/config')
 const settings = require('../constants/settings')
-const {tabCloseAction} = require('../../app/common/constants/settingsEnums')
 
 // Actions
 const windowActions = require('../actions/windowActions')

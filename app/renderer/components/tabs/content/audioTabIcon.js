@@ -23,15 +23,15 @@ const globalStyles = require('../../styles/global')
 const tabStyles = require('../../styles/tab')
 
 class AudioTabIcon extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.toggleMute = this.toggleMute.bind(this)
   }
 
   get audioIcon () {
-    const isMuted = this.props.pageCanPlayAudio && !this.props.audioMuted
+    const isNotMuted = this.props.pageCanPlayAudio && !this.props.audioMuted
 
-    return isMuted
+    return isNotMuted
       ? globalStyles.appIcons.volumeOn
       : globalStyles.appIcons.volumeOff
   }
@@ -46,8 +46,6 @@ class AudioTabIcon extends React.Component {
     const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey)
 
     const props = {}
-    // used in renderer
-
     // used in other functions
     props.frameKey = ownProps.frameKey
     props.pageCanPlayAudio = !!frame.get('audioPlaybackActive')

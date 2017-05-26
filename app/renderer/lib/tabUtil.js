@@ -28,7 +28,7 @@ module.exports.tabUpdateFrameRate = 66
 
 /**
  * Check whether or not current breakpoint match defined criteria
- * @param {Object} breakpoint - Brake point value
+ * @param {Object} breakpoint - Break point value
  * @param {Array} arr - Array of Strings including breakpoint names to check against
  * @returns {Boolean} Whether or not the sizing criteria was match
  */

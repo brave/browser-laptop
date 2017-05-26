@@ -9,15 +9,22 @@ const ReduxComponent = require('../reduxComponent')
 const Tabs = require('./tabs')
 const PinnedTabs = require('./pinnedTabs')
 
+// Store
+const windowStore = require('../../../../js/stores/windowStore')
+
 // Utils
 const contextMenus = require('../../../../js/contextMenus')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
 class TabsToolbar extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.onContextMenu = this.onContextMenu.bind(this)
     this.onHamburgerMenu = this.onHamburgerMenu.bind(this)
+  }
+
+  get activeFrame () {
+    return windowStore.getFrame(this.props.activeFrameKey)
   }
 
   onContextMenu (e) {
@@ -42,7 +49,7 @@ class TabsToolbar extends React.Component {
     props.hasPinnedTabs = pinnedTabs.size > 0
 
     // used in other functions
-    props.activeFrame = activeFrame
+    props.activeFrameKey = activeFrame && activeFrame.get('key')
     props.activeFrameLocation = (activeFrame && activeFrame.get('location')) || ''
 
     return props

@@ -24,7 +24,7 @@ class TabTitle extends React.Component {
 
     const props = {}
     // used in renderer
-    props.enforceFontVisibilty = isDarwin() && tabIconColor === 'white'
+    props.enforceFontVisibility = isDarwin() && tabIconColor === 'white'
     props.tabIconColor = tabIconColor
     props.displayTitle = tabContentState.getDisplayTitle(currentWindow, ownProps.frameKey)
 
@@ -46,7 +46,7 @@ class TabTitle extends React.Component {
       className={css(
         styles.tabTitle,
         titleStyles.gradientText,
-        this.props.enforceFontVisibilty && styles.enforceFontVisibilty,
+        this.props.enforceFontVisibility && styles.enforceFontVisibility,
         // Windows specific style
         isWindows() && styles.tabTitleForWindows
       )}>
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     WebkitBackgroundClip: 'text'
   },
 
-  enforceFontVisibilty: {
+  enforceFontVisibility: {
     fontWeight: '600'
   },
 

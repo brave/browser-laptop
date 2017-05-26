@@ -48,8 +48,8 @@ const UrlUtil = require('../../../../js/lib/urlutil')
 const {hasBreakpoint} = require('../../lib/tabUtil')
 
 class Tab extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.onMouseEnter = this.onMouseEnter.bind(this)
     this.onMouseLeave = this.onMouseLeave.bind(this)
     this.onUpdateTabSize = this.onUpdateTabSize.bind(this)
@@ -127,11 +127,6 @@ class Tab extends React.Component {
 
   onDragOver (e) {
     dnd.onDragOver(dragTypes.TAB, this.tabNode.getBoundingClientRect(), this.props.frameKey, this.draggingOverData, e)
-  }
-
-  setActiveFrame (event) {
-    event.stopPropagation()
-    windowActions.setActiveFrame(this.frame)
   }
 
   onMouseLeave () {
@@ -252,12 +247,10 @@ class Tab extends React.Component {
     props.breakpoint = frame.get('breakpoint')
     props.notificationBarActive = notificationBarActive
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, props.frameKey)
-    props.paintTabs = getSetting(settings.PAINT_TABS)
     props.tabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
     props.isPinnedTab = frameStateUtil.isPinned(currentWindow, props.frameKey)
     props.canPlayAudio = tabContentState.canPlayAudio(currentWindow, props.frameKey)
     props.themeColor = tabContentState.getThemeColor(currentWindow, props.frameKey)
-    props.isTabLoading = tabContentState.isTabLoading(currentWindow, props.frameKey)
     props.isNarrowView = tabContentState.isNarrowView(currentWindow, props.frameKey)
     props.isNarrowestView = tabContentState.isNarrowestView(currentWindow, props.frameKey)
     props.isPlayIndicatorBreakpoint = tabContentState.isMediumView(currentWindow, props.frameKey) || props.isNarrowView

@@ -1,9 +1,7 @@
 /* global describe, before, it, beforeEach, after */
-const frameStateUtil = require('../../../js/state/frameStateUtil')
 const Immutable = require('immutable')
 const mockery = require('mockery')
 const assert = require('assert')
-const {tabCloseAction} = require('../../../app/common/constants/settingsEnums')
 const fakeElectron = require('../lib/fakeElectron')
 
 require('../braveUnit')

@@ -4,6 +4,7 @@
 
 const React = require('react')
 const ReactDOM = require('react-dom')
+const Immutable = require('immutable')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
@@ -32,8 +33,8 @@ const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {getSetting} = require('../../../../js/settings')
 
 class Tabs extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.onDragOver = this.onDragOver.bind(this)
     this.onDrop = this.onDrop.bind(this)
     this.onPrevPage = this.onPrevPage.bind(this)
@@ -43,7 +44,7 @@ class Tabs extends React.Component {
   }
 
   onMouseLeave () {
-    if (this.props.fixTabWidth) {
+    if (this.props.fixTabWidth == null) {
       return
     }
 
@@ -75,7 +76,7 @@ class Tabs extends React.Component {
     if (sourceDragData) {
       // If this is a different window ID than where the drag started, then
       // the tear off will be done by tab.js
-      if (this.props.dragData.get('windowId') !== getCurrentWindowId()) {
+      if (this.props.dragWindowId !== getCurrentWindowId()) {
         return
       }
 
@@ -87,7 +88,7 @@ class Tabs extends React.Component {
         if (droppedOnTab) {
           const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), clientX)
 
-          windowActions.moveTab(key, droppedOnTab.props.frame.get('key'), isLeftSide)
+          windowActions.moveTab(key, droppedOnTab.props.frameKey, isLeftSide)
           if (sourceDragData.get('pinnedLocation')) {
             appActions.tabPinned(sourceDragData.get('tabId'), false)
           }
@@ -136,10 +137,10 @@ class Tabs extends React.Component {
       .map((tab) => tab.get('key'))
     const totalPages = Math.ceil(unpinnedTabs.size / tabsPerTabPage)
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow)
+    const dragData = (state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')) || Immutable.Map()
 
     const props = {}
     // used in renderer
-    props.fixTabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
     props.previewTabPageIndex = currentWindow.getIn(['ui', 'tabs', 'previewTabPageIndex'])
     props.currentTabs = currentTabs
     props.partOfFullPageSet = currentTabs.size === tabsPerTabPage
@@ -148,8 +149,9 @@ class Tabs extends React.Component {
     props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused())
 
     // used in other functions
+    props.fixTabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
     props.tabPageIndex = currentWindow.getIn(['ui', 'tabs', 'tabPageIndex'])
-    props.dragData = state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')
+    props.dragWindowId = dragData.get('windowId')
     props.totalPages = totalPages
 
     return props

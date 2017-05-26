@@ -13,6 +13,9 @@ const Tab = require('./tab')
 const appActions = require('../../../../js/actions/appActions')
 const windowActions = require('../../../../js/actions/windowActions')
 
+// Store
+const windowStore = require('../../../../js/stores/windowStore')
+
 // Constants
 const siteTags = require('../../../../js/constants/siteTags')
 const dragTypes = require('../../../../js/constants/dragTypes')
@@ -25,10 +28,14 @@ const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {isIntermediateAboutPage} = require('../../../../js/lib/appUrlUtil')
 
 class PinnedTabs extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.onDragOver = this.onDragOver.bind(this)
     this.onDrop = this.onDrop.bind(this)
+  }
+
+  dropFrame (frameKey) {
+    return windowStore.getFrame(frameKey)
   }
 
   onDrop (e) {
@@ -46,12 +53,13 @@ class PinnedTabs extends React.Component {
       let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter((node) => node && node.props.frameKey !== key), clientX).selectedRef
       if (droppedOnTab) {
         const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), clientX)
-        windowActions.moveTab(key, droppedOnTab.props.frame.get('key'), isLeftSide)
+        windowActions.moveTab(key, droppedOnTab.props.frameKey, isLeftSide)
         if (!sourceDragData.get('pinnedLocation')) {
           appActions.tabPinned(sourceDragData.get('tabId'), true)
         } else {
           const sourceDetails = siteUtil.getDetailFromFrame(sourceDragData, siteTags.PINNED)
-          const destinationDetails = siteUtil.getDetailFromFrame(droppedOnTab.props.frame, siteTags.PINNED)
+          const droppedOnFrame = this.dropFrame(droppedOnTab.props.frameKey)
+          const destinationDetails = siteUtil.getDetailFromFrame(droppedOnFrame, siteTags.PINNED)
           appActions.moveSite(siteUtil.getSiteKey(sourceDetails),
             siteUtil.getSiteKey(destinationDetails),
             isLeftSide)
