@@ -131,11 +131,11 @@ const deleteTabsInternalIndex = (state, tabValue) => {
     return state
   }
 
-  const displayIndex = validateIndex(tabValue.get('index'))
-  if (displayIndex !== -1) {
-    state = state.deleteIn(['tabsInternal', 'displayIndex', displayIndex.toString()])
-  }
   const windowId = validateId('windowId', tabValue.get('windowId'))
+  const displayIndex = validateIndex(tabValue.get('index'))
+  if (displayIndex !== -1 && windowId !== windowState.WINDOW_ID_NONE) {
+    state = state.deleteIn(['tabsInternal', 'displayIndex', windowId.toString(), displayIndex.toString()])
+  }
   if (windowId !== windowState.WINDOW_ID_NONE) {
     let activeList = state.getIn(['tabsInternal', 'lastActive', windowId.toString()], Immutable.OrderedSet())
     activeList = activeList.remove(tabId)
