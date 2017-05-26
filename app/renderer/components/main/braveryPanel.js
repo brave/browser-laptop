@@ -271,55 +271,63 @@ class BraveryPanel extends ImmutableComponent {
           compactBraveryPanel && styles.braveryPanel_compact__stats
         )}>
           <div data-test-id='adsBlockedStat'
-            onClick={this.onToggleAdsAndTracking}
             className={css(
               styles.braveryPanel__stats__item_count_adsBlockedStat,
-              !!adsBlockedStat && styles.braveryPanel__stats__item_count_clickable,
               (!shieldsUp || adControl === 'allowAdsAndTracking') && styles.braveryPanel__stats__item_count_disabled,
               gridStyles.row1col1,
               !compactBraveryPanel && styles.braveryPanel__stats__item,
               !compactBraveryPanel && styles.braveryPanel__stats__item_count,
               compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
-            )}>{adsBlockedStat}</div>
+            )}>
+            <span onClick={this.onToggleAdsAndTracking}
+              className={css(!!adsBlockedStat && styles.braveryPanel__stats__item_count_clickable)}
+            >{adsBlockedStat}</span>
+          </div>
 
           <div data-test-id='redirectedResourcesStat'
-            onClick={this.onToggleHttpseList}
             className={css(
               styles.braveryPanel__stats__item_count_redirectedResourcesStat,
-              !!this.redirectedResourcesSet.size && styles.braveryPanel__stats__item_count_clickable,
               (!shieldsUp || !httpseEnabled) && styles.braveryPanel__stats__item_count_disabled,
               !compactBraveryPanel && gridStyles.row1col2,
               !compactBraveryPanel && styles.braveryPanel__stats__item,
               !compactBraveryPanel && styles.braveryPanel__stats__item_count,
               compactBraveryPanel && gridStyles.row2col1,
               compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
-            )}>{httpsUpgradedResourceStat}</div>
+            )}>
+            <span onClick={this.onToggleHttpseList}
+              className={css(!!this.redirectedResourcesSet.size && styles.braveryPanel__stats__item_count_clickable)}
+            >{httpsUpgradedResourceStat}</span>
+          </div>
 
           <div data-test-id='noScriptStat'
-            onClick={this.onToggleNoScriptList}
             className={css(
               styles.braveryPanel__stats__item_count_noScriptStat,
-              !!scriptsBlockedStat && styles.braveryPanel__stats__item_count_clickable,
               (!shieldsUp || !noScriptEnabled) && styles.braveryPanel__stats__item_count_disabled,
               !compactBraveryPanel && gridStyles.row1col3,
               !compactBraveryPanel && styles.braveryPanel__stats__item,
               !compactBraveryPanel && styles.braveryPanel__stats__item_count,
               compactBraveryPanel && gridStyles.row3col1,
               compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
-            )}>{scriptsBlockedStat}</div>
+            )}>
+            <span onClick={this.onToggleNoScriptList}
+              className={css(!!scriptsBlockedStat && styles.braveryPanel__stats__item_count_clickable)}
+            >{scriptsBlockedStat}</span>
+          </div>
 
           <div data-test-id='fpStat'
-            onClick={this.onToggleFpList}
             className={css(
               styles.braveryPanel__stats__item_count_fpStat,
-              !!fpBlockedStat && styles.braveryPanel__stats__item_count_clickable,
               (!shieldsUp || !fpEnabled) && styles.braveryPanel__stats__item_count_disabled,
               !compactBraveryPanel && gridStyles.row1col4,
               !compactBraveryPanel && styles.braveryPanel__stats__item,
               !compactBraveryPanel && styles.braveryPanel__stats__item_count,
               compactBraveryPanel && gridStyles.row4col1,
               compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
-            )}>{fpBlockedStat}</div>
+            )}>
+            <span onClick={this.onToggleFpList}
+              className={css(!!fpBlockedStat && styles.braveryPanel__stats__item_count_clickable)}
+            >{fpBlockedStat}</span>
+          </div>
 
           <span className={css(
             !!adsBlockedStat && styles.braveryPanel__stats__item_label_clickable,
@@ -333,6 +341,7 @@ class BraveryPanel extends ImmutableComponent {
             data-l10n-id='adsBlocked'
             data-l10n-args={l10nArgs}
           />
+
           <span className={css(
             !!this.redirectedResourcesSet.size && styles.braveryPanel__stats__item_label_clickable,
             (!shieldsUp || !httpseEnabled) && styles.braveryPanel__stats__item_label_disabled,
@@ -344,6 +353,7 @@ class BraveryPanel extends ImmutableComponent {
             data-l10n-id='httpReroutes'
             data-l10n-args={l10nArgs}
           />
+
           <span className={css(
             !!scriptsBlockedStat && styles.braveryPanel__stats__item_label_clickable,
             (!shieldsUp || !noScriptEnabled) && styles.braveryPanel__stats__item_label_disabled,
@@ -356,6 +366,7 @@ class BraveryPanel extends ImmutableComponent {
             data-l10n-id='scriptsBlockedNumber'
             data-l10n-args={l10nArgs}
           />
+
           <span className={css(
             !!fpBlockedStat && styles.braveryPanel__stats__item_label_clickable,
             (!shieldsUp || !fpEnabled) && styles.braveryPanel__stats__item_label_disabled,
@@ -841,13 +852,13 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'flex-end',
     maxWidth: '100%',
-    marginRight: '.3rem',
     fontSize: '1.7rem',
     minWidth: '2ch'
   },
   braveryPanel_compact__stats__item_label: {
     overflow: 'hidden',
-    textOverflow: 'ellipsis'
+    textOverflow: 'ellipsis',
+    paddingLeft: '.3rem'
   },
 
   // braveryPanelBody - Common
@@ -923,7 +934,7 @@ const styles = StyleSheet.create({
     marginBottom: '.75rem'
   },
   braveryPanel_compact__body__ul: {
-    padding: 0,
+    padding: '0 .5rem',
     margin: '0 0 .75rem 0',
     wordBreak: 'break-all',
     maxHeight: '10vh'
