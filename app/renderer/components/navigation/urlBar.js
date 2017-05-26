@@ -436,7 +436,7 @@ class UrlBar extends React.Component {
   }
 
   get aboutPage () {
-    const protocol = urlParse(this.props.location).protocol
+    const protocol = this.props.location && urlParse(this.props.location).protocol
     return ['about:', 'file:', 'chrome:', 'view-source:'].includes(protocol)
   }
 
