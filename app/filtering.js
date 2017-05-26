@@ -144,9 +144,10 @@ function registerForBeforeRequest (session, partition) {
           }))
 
         if (parentResourceName === appConfig.resourceNames.SAFE_BROWSING) {
-          cb({ cancel: true })
-          appActions.loadURLRequested(details.tabId,
-            appUrlUtil.getTargetAboutUrl('about:safebrowsing#' + details.url))
+          let redirectURL = appUrlUtil.getTargetAboutUrl('about:safebrowsing#' + details.url)
+          cb({ redirectURL })
+          // Workaround #8905
+          appActions.loadURLRequested(details.tabId, redirectURL)
         } else if (details.resourceType === 'image') {
           cb({ redirectURL: transparent1pxGif })
         } else {
