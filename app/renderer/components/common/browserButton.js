@@ -13,17 +13,17 @@ class BrowserButton extends ImmutableComponent {
       styles.browserButton,
       this.props.primaryColor && [styles.browserButton_default, styles.browserButton_primaryColor],
       this.props.secondaryColor && [styles.browserButton_default, styles.browserButton_secondaryColor],
+      this.props.subtleItem && [styles.browserButton_default, styles.browserButton_subtleItem],
       this.props.extensionItem && styles.browserButton_extensionItem,
       this.props.groupedItem && styles.browserButton_groupedItem,
       this.props.notificationItem && styles.browserButton_notificationItem
       // TODO: These are other button styles app-wise
       // that needs to be refactored and included in this file
       // .............................................
-      // this.props.smallItem && styles.browserButton_actionItem,
+      // this.props.smallItem && styles.browserButton_smallItem,
       // this.props.actionItem && styles.browserButton_actionItem,
       // this.props.navItem && styles.browserButton_navItem,
       // this.props.panelItem && styles.browserButton_panelItem,
-      // this.props.subtleItem && styles.browserButton_subtleItem
     ]
   }
   render () {
@@ -46,6 +46,8 @@ class BrowserButton extends ImmutableComponent {
   }
 }
 
+const buttonSize = '25px'
+
 const styles = StyleSheet.create({
   browserButton: {
     margin: '0 3px',
@@ -53,11 +55,10 @@ const styles = StyleSheet.create({
     outline: 'none',
     cursor: 'default',
     display: 'inline-block',
-    lineHeight: '25px',
-    height: '25px',
-    width: '25px',
+    lineHeight: buttonSize,
+    height: buttonSize,
+    width: buttonSize,
     fontSize: '13px',
-    color: globalStyles.button.default.color,
     borderRadius: '2px',
     textAlign: 'center',
     transition: '.1s opacity, .1s background',
@@ -68,49 +69,71 @@ const styles = StyleSheet.create({
     backgroundImage: 'none',
     backgroundColor: globalStyles.button.default.backgroundColor,
     border: 'none',
+
+    // cf: https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L49
+    color: globalStyles.button.color,
+
     ':hover': {
       color: globalStyles.button.default.hoverColor
     }
   },
+
   // applies for primary and white buttons
   browserButton_default: {
+    // cf: https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L92
+    color: globalStyles.button.default.color,
+
     position: 'relative',
     boxShadow: globalStyles.button.default.boxShadow,
     cursor: 'pointer',
     lineHeight: 1.25,
     width: 'auto',
     height: 'auto',
-    minWidth: '78px',
-    fontSize: '13px',
-    padding: '7px 20px',
+    fontSize: globalStyles.spacing.defaultFontSize,
+
+    // cf: https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L94-L95
+    paddingTop: '5px',
+    paddingBottom: '5px',
+
+    // cf: https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L105-L106
+    paddingRight: '16px',
+    paddingLeft: '16px',
+
+    // cf: https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L98
+    minWidth: `calc(${globalStyles.spacing.defaultFontSize} * 6)`, // issue #6384
+
     ':active': {
       // push the button down when active
       bottom: '-1px'
     }
   },
+
   browserButton_primaryColor: {
     background: globalStyles.button.primary.background,
     borderLeft: '2px solid transparent',
     borderRight: '2px solid transparent',
     borderTop: `2px solid ${globalStyles.button.primary.gradientColor1}`,
     borderBottom: `2px solid ${globalStyles.button.primary.gradientColor2}`,
-    color: globalStyles.button.primary.color,
     cursor: 'pointer',
+
     ':hover': {
       border: `2px solid ${globalStyles.button.primary.borderHoverColor}`,
       color: globalStyles.button.primary.hoverColor
     }
   },
+
   browserButton_secondaryColor: {
     background: globalStyles.button.secondary.background,
     border: '1px solid white',
     color: globalStyles.button.secondary.color,
     cursor: 'pointer',
+
     ':hover': {
       border: `1px solid ${globalStyles.button.secondary.borderHoverColor}`,
       color: globalStyles.button.secondary.hoverColor
     }
   },
+
   browserButton_extensionItem: {
     WebkitAppRegion: 'no-drag',
     backgroundSize: 'contain',
@@ -119,20 +142,42 @@ const styles = StyleSheet.create({
     opacity: '0.85',
     backgroundRepeat: 'no-repeat'
   },
+
   browserButton_groupedItem: {
     // Legacy LESS inside ledger is too nested
     // and this style won't have effect without using !important
+    //
     // TODO: remove !important and check advancedSettings.js
     // once preferences is fully refactored
     marginRight: '4px !important',
     marginLeft: '4px !important'
   },
+
   browserButton_notificationItem: {
     fontSize: '13px',
     marginRight: '10px',
     padding: '2px 15px',
     textTransform: 'capitalize',
     width: 'auto'
+  },
+
+  browserButton_subtleItem: {
+    background: globalStyles.button.subtle.backgroundColor,
+
+    // cf: https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L152
+    fontSize: '14px',
+
+    // Adding box-shadow:none to cancel the box-shadow specified on browserButton_default
+    // On button.less, box-shadow is only speficied to .primaryButton and .whiteButton
+    // cf:
+    //  https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L114
+    //  https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L137
+    boxShadow: 'none',
+
+    // Cancel pushing down the button to make the button subtle
+    ':active': {
+      bottom: 0
+    }
   }
 })
 
