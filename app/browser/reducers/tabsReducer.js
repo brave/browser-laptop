@@ -124,7 +124,11 @@ const tabsReducer = (state, action, immutableAction) => {
         // it figures out the active window based on state with focused property,
         // and the focused window might actually be a devtools window.
         if (tabId === tabState.TAB_ID_ACTIVE) {
-          tabId = tabState.getActiveTabId(state, BrowserWindow.getActiveWindow().id)
+          if (BrowserWindow.getActiveWindow()) {
+            tabId = tabState.getActiveTabId(state, BrowserWindow.getActiveWindow().id)
+          } else {
+            break
+          }
         } else {
           tabId = tabState.resolveTabId(state, tabId)
         }
