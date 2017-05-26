@@ -648,6 +648,57 @@ describe('Bravery Panel', function () {
         .keys(Brave.keys.ESCAPE)
         .waitForVisible(noScriptNavButton)
     })
+    it('does not apply exceptions from private tabs to regular tabs on compact panel', function * () {
+      const url = Brave.server.url('scriptBlock.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(prefsShieldsUrl)
+        .waitForVisible(compactBraveryPanelSwitch)
+        .click(compactBraveryPanelSwitch)
+        .windowByUrl(Brave.browserWindowUrl)
+        .keys(Brave.keys.ESCAPE)
+
+        .tabByIndex(0)
+        .loadUrl(url)
+        .waitForTextValue('body', 'test1 test2')
+        .openBraveMenu(braveMenu, braveryPanelCompact)
+        .click(noScriptSwitch)
+        .waitForTextValue(noScriptStat, '2')
+        .keys(Brave.keys.ESCAPE)
+        .waitForVisible(noScriptNavButton)
+
+        .newTab({ url, isPrivate: true })
+        .waitForTabCount(2)
+        .waitForUrl(url)
+        .waitUntil(function () {
+          // getText returns empty in this case
+          return this.getElementSize('noscript')
+            .then((size) => size.height > 0)
+        })
+        .openBraveMenu(braveMenu, braveryPanelCompact)
+        .waitForTextValue(noScriptStat, '2')
+        .keys(Brave.keys.ESCAPE)
+        .waitForVisible(noScriptNavButton)
+
+        .openBraveMenu(braveMenu, braveryPanelCompact)
+        .click(noScriptSwitch)
+        .waitForTextValue(noScriptStat, '0')
+        .keys(Brave.keys.ESCAPE)
+
+        .newTab({ url })
+        .waitForTabCount(3)
+        .waitForUrl(url)
+        .waitUntil(function () {
+          // getText returns empty in this case
+          return this.getElementSize('noscript')
+            .then((size) => size.height > 0)
+        })
+        .openBraveMenu(braveMenu, braveryPanelCompact)
+        .waitForTextValue(noScriptStat, '2')
+        .keys(Brave.keys.ESCAPE)
+        .waitForVisible(noScriptNavButton)
+    })
+
     it('shows noscript tag content', function * () {
       const url = Brave.server.url('scriptBlock.html')
       yield this.app.client
