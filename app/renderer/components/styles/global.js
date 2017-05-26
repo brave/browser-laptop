@@ -252,21 +252,25 @@ const globalStyles = {
       animationFillMode: 'forwards'
     }
   },
+
   button: {
+    color: '#5a5a5a',
+
     default: {
-      color: '#5a5a5a',
+      color: '#fff',
       backgroundColor: 'transparent',
       hoverColor: '#000',
       boxShadow: '0px 1px 5px -1px rgba(0, 0, 0, 0.5)'
     },
+
     primary: {
       gradientColor1: '#FF7A1D',
       gradientColor2: '#ff5000',
       background: 'linear-gradient(#FF7A1D, #ff5000)',
-      color: '#fff',
       hoverColor: '#fff',
       borderHoverColor: '#fff'
     },
+
     secondary: {
       gradientColor1: '#fff',
       gradientColor2: '#ececec',
@@ -274,8 +278,14 @@ const globalStyles = {
       color: '#444',
       hoverColor: '#000',
       borderHoverColor: 'rgb(153, 153, 153)'
+    },
+
+    subtle: {
+      // cf: https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L151
+      backgroundColor: '#ccc'
     }
   },
+
   braveryPanel: {
     color: '#3b3b3b',
 

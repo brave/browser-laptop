@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const Button = require('../../app/renderer/components/common/button')
+const BrowserButton = require('../../app/renderer/components/common/browserButton')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 
@@ -35,7 +35,7 @@ class SafebrowsingPage extends React.Component {
         {this.state.advanced
           ? <section>
             <div className='buttons'>
-              <Button className='subtleButton'
+              <BrowserButton subtleItem
                 l10nId='safebrowsingErrorHideAdvanced'
                 testId='safebrowsingErrorHideAdvanced'
                 onClick={this.onAdvancedToggle.bind(this)}
@@ -47,7 +47,7 @@ class SafebrowsingPage extends React.Component {
             </div>
           </section>
           : <section className='buttons'>
-            <Button className='subtleButton'
+            <BrowserButton subtleItem
               l10nId='safebrowsingErrorAdvanced'
               testId='safebrowsingErrorAdvanced'
               onClick={this.onAdvancedToggle.bind(this)}
