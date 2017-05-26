@@ -436,17 +436,6 @@ const handleAppAction = (action) => {
     case appConstants.APP_NEW_WINDOW:
       createWindow(action)
       break
-    case appConstants.APP_REMOVE_PASSWORD:
-      autofill.removeLogin(action.passwordDetail.toJS())
-      break
-    case appConstants.APP_REMOVE_PASSWORD_SITE:
-      let newPasswordDetail = action.passwordDetail.toJS()
-      delete newPasswordDetail['blacklisted_by_user']
-      autofill.updateLogin(newPasswordDetail)
-      break
-    case appConstants.APP_CLEAR_PASSWORDS:
-      autofill.clearLogins()
-      break
     case appConstants.APP_CHANGE_NEW_TAB_DETAIL:
       appState = aboutNewTabState.mergeDetails(appState, action)
       if (action.refresh) {
