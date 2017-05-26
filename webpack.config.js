@@ -10,7 +10,7 @@ var env = process.env.NODE_ENV === 'production' ? 'production'
   : (process.env.NODE_ENV === 'test' ? 'test' : 'development')
 
 function config () {
-  return {
+  let c = {
     devtool: '#source-map',
     cache: true,
     module: {
@@ -55,7 +55,6 @@ function config () {
       'electron': 'chrome'
     },
     plugins: [
-      new WebpackNotifierPlugin({title: 'Brave-' + env}),
       new webpack.IgnorePlugin(/^\.\/stores\/appStore$/),
       new webpack.IgnorePlugin(/^spellchecker/),
       new webpack.DefinePlugin({
@@ -72,6 +71,10 @@ function config () {
       fs: 'empty'
     }
   }
+  if (!process.env.DISABLE_WEBPACK_NOTIFIER) {
+    c.plugins.push(new WebpackNotifierPlugin({title: 'Brave-' + env}))
+  }
+  return c
 }
 
 function watchOptions () {
