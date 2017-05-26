@@ -6,6 +6,9 @@
 const Brave = require('../lib/brave')
 const {urlInput} = require('../lib/selectors')
 
+const expectedText = 'For your safety, Brave has blocked this site'
+const link = '#clickme'
+
 describe('safebrowsing interception', function () {
   function * setup (client) {
     yield client
@@ -17,6 +20,8 @@ describe('safebrowsing interception', function () {
   before(function * () {
     this.badUrl = 'http://downloadme.org'
     this.safebrowsingUrl = `about:safebrowsing#${this.badUrl}`
+    this.url = Brave.server.url('safebrowsing.html')
+    this.expectedText = 'For your safety, Brave has blocked this site'
     yield setup(this.app.client)
   })
 
@@ -26,12 +31,43 @@ describe('safebrowsing interception', function () {
       .url(this.badUrl)
       .waitUntil(function () {
         return this.getText('body').then((val) => {
-          return val.includes('For your safety, Brave has blocked this site')
+          return val.includes(expectedText)
         })
       })
       .windowByUrl(Brave.browserWindowUrl)
       .getAttribute(urlInput, 'value').then((value) => {
         return value === this.safebrowsingUrl
+      })
+  })
+
+  it('can redirect to safebrowsing by clicking on a link', function * () {
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(this.url)
+      .waitForVisible(link)
+      .click(link)
+      .waitUntil(function () {
+        return this.getText('body').then((val) => {
+          return val.includes(expectedText)
+        })
+      })
+  })
+
+  it('can redirect to safebrowsing by opening in a new tab', function * () {
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(this.url)
+      .isDarwin().then((val) => {
+        return val ? this.app.client.keys(Brave.keys.COMMAND) : this.app.client.keys(Brave.keys.CONTROL)
+      })
+      .waitForVisible(link)
+      .click(link)
+      .windowByUrl(Brave.browserWindowUrl)
+      .tabByIndex(1)
+      .waitUntil(function () {
+        return this.getText('body').then((val) => {
+          return val.includes(expectedText)
+        })
       })
   })
 })

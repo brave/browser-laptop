@@ -25,6 +25,9 @@ const appConfig = require('../../js/constants/appConfig')
 const siteTags = require('../../js/constants/siteTags')
 const {newTabMode} = require('../common/constants/settingsEnums')
 const {cleanupWebContents, currentWebContents, getWebContents, updateWebContents} = require('./webContentsCache')
+const {FilterOptions} = require('ad-block')
+const urlParse = require('../common/urlParse')
+const {isResourceEnabled} = require('../filtering')
 
 let currentPartitionNumber = 0
 const incrementPartitionNumber = () => ++currentPartitionNumber
@@ -556,6 +559,7 @@ const api = {
 
   create: (createProperties, cb = null, isRestore = false) => {
     setImmediate(() => {
+      const {safeBrowsingInstance} = require('../adBlock')
       createProperties = makeImmutable(createProperties).toJS()
 
       // handle deprecated `location` property
@@ -572,6 +576,12 @@ const api = {
         createProperties.url = newFrameUrl()
       }
       createProperties.url = normalizeUrl(createProperties.url)
+      if (isResourceEnabled('safeBrowsing', createProperties.url, createProperties.isPrivate) &&
+        safeBrowsingInstance &&
+        safeBrowsingInstance.matches(createProperties.url, FilterOptions.document, urlParse(createProperties.url).host)) {
+        // Workaround #9056 by setting URL to the safebrowsing URL
+        createProperties.url = getTargetAboutUrl('about:safebrowsing#' + createProperties.url)
+      }
       if (needsPartitionAssigned(createProperties)) {
         createProperties.partition = getPartition(createProperties)
         if (isSessionPartition(createProperties.partition)) {
