@@ -863,6 +863,7 @@ describe('Bravery Panel', function () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(url)
+        .waitForUrl(url)
         .waitUntil(function () {
           return this.getText('body')
             .then((body) => {
@@ -870,6 +871,7 @@ describe('Bravery Panel', function () {
             })
         })
         .openBraveMenu(braveMenu, braveryPanel)
+        .waitForVisible(fpSwitch)
         .click(fpSwitch)
         .waitUntil(function () {
           return this.getText(fpStat)
