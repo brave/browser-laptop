@@ -1,11 +1,58 @@
 # Changelog
 
-## [0.15.300](https://github.com/brave/browser-laptop/releases/v0.15.300dev)
- - Update muon to 3.0.1. ([#8445](https://github.com/brave/browser-laptop/issues/8445))
+## [0.15.310](https://github.com/brave/browser-laptop/releases/v0.15.300dev)
+
+ - Optimized various UI features for when user has large amounts of data. ([#9079](https://github.com/brave/browser-laptop/issues/9079))
+ - Added new faster URL bar autocomplete and suggestions engine. ([#7453](https://github.com/brave/browser-laptop/issues/7453))
+ - Added Chromium password manager autofill with browser autofill. ([#3530](https://github.com/brave/browser-laptop/issues/3530))
+ - Added an option to block autoplay videos. ([#2227](https://github.com/brave/browser-laptop/issues/2227))
+ - Added ability to zoom UI. (including font size). ([#1937](https://github.com/brave/browser-laptop/issues/1937))
+ - Added a View Certificate option on mixed content sites. ([#8530](https://github.com/brave/browser-laptop/issues/8530))
+ - Added send URL by email. ([#3121](https://github.com/brave/browser-laptop/issues/3121))
+ - Added sharing to social media sites (Facebook, Twitter, etc.). ([#7555](https://github.com/brave/browser-laptop/issues/7555))
+ - Added the ability to close developer tools via keyboard shortcut on macOS. ([#45](https://github.com/brave/browser-laptop/issues/45))
+ - Added option to disable blocked count badge (on Lion). ([#8613](https://github.com/brave/browser-laptop/issues/8613))
+ - Added ledger switch to disable contributions to non-verified sites (in advanced settings). ([#8231](https://github.com/brave/browser-laptop/issues/8231))
+ - Added open link in new window option in the bookmarks toolbar. ([#8063](https://github.com/brave/browser-laptop/issues/8063))
+ - Changed header style on about:preferences pages. ([#8165](https://github.com/brave/browser-laptop/issues/8165))
+ - Changed font-size to be slightly bigger in the URL bar. ([#7848](https://github.com/brave/browser-laptop/issues/7848))
+ - Fixed typing fast in URL bar after new tab gets partially cleared. ([#8959](https://github.com/brave/browser-laptop/issues/8959))
+ - Fixed swipe back / forward on trackpads not working. ([#8627](https://github.com/brave/browser-laptop/issues/8627))
+ - Fixed PDF reading for file:/// URLs. ([#2714](https://github.com/brave/browser-laptop/issues/2714))
+ - Fixed "View page source" not working for file:/// URLs. ([#8049](https://github.com/brave/browser-laptop/issues/8049))
+ - Fixed when maximized, hitboxes seem off for buttons and address bar on Windows. ([#7641](https://github.com/brave/browser-laptop/issues/7641))
+ - Fixed pinned tabs lose order after re-launch. ([#8543](https://github.com/brave/browser-laptop/issues/8543))
+ - Fixed pinned tabs can reappear next load after unpinning. ([#8477](https://github.com/brave/browser-laptop/issues/8477))
+ - Fixed opening PDF via Wayback Machine archive.org loads different URL. ([#6726](https://github.com/brave/browser-laptop/issues/6726))
+ - Fixed Ad-blocker-blocker on The Atlantic. ([#6291](https://github.com/brave/browser-laptop/issues/6291))
+ - Fixed empty modal covers glennbeck.com. ([#8390](https://github.com/brave/browser-laptop/issues/8390))
+ - Fixed "Select the last viewed tab" option. ([#8357](https://github.com/brave/browser-laptop/issues/8357))
+ - Fixed fingerprinting Brave via extension resources. ([#8323](https://github.com/brave/browser-laptop/issues/8323))
+ - Fixed clicking Save Torrent File button does not save .torrent file. ([#8146](https://github.com/brave/browser-laptop/issues/8146))
+ - Fixed mouse cursor being visible while in full screen when viewing video. ([#7966](https://github.com/brave/browser-laptop/issues/7966))
+ - Fixed WebGL antifingerprint. ([#8448](https://github.com/brave/browser-laptop/issues/8448))
+ - Fixed maximizing browser extends into second monitor. ([#5159](https://github.com/brave/browser-laptop/issues/5159))
+-  Fixed Brave wallet QR code is now localizable. ([#8663](https://github.com/brave/browser-laptop/issues/8663))
+ - Fixed writing session to disk, ensure data is flushed. ([#7876](https://github.com/brave/browser-laptop/issues/7876))
+ - Fixed writing ledger files to disk, ensure data is flushed. ([#8602](https://github.com/brave/browser-laptop/issues/8602))
+ - Fixed custom filters block resource too strictly. ([#6883](https://github.com/brave/browser-laptop/issues/6883))
+ - Fixed pressing tab should cycle through the URL bar suggestion results. ([#8919](https://github.com/brave/browser-laptop/issues/8919))
+ - Fixed scrolling with alert boxes with lengthy content. ([#7930](https://github.com/brave/browser-laptop/issues/7930))
+ - Fixed browser crash with payment enabled when clearing browsing data. ([#8659](https://github.com/brave/browser-laptop/issues/8659))
+ - Fixed Faceblock: FB targeted tracking event assessment & protection. ([#7000](https://github.com/brave/browser-laptop/issues/7000))
+ - Fixed pad lock is retained when URL text is cut from context menu. ([#8468](https://github.com/brave/browser-laptop/issues/8468))
+ - Fixed new Session tab submenu goes off screen. ([#7748](https://github.com/brave/browser-laptop/issues/7748))
+ - Fixed no progress indicator when reloading page. ([#8550](https://github.com/brave/browser-laptop/issues/8550))
+ - Fixed Brave quits when New Tab command issued without window. ([#8575](https://github.com/brave/browser-laptop/issues/8575))
+ - Fixed insecure connection info shown for about pages and new tab. ([#8299](https://github.com/brave/browser-laptop/issues/8299))
+ - Update to v3.0.201 muon. ([#8445](https://github.com/brave/browser-laptop/issues/8445))
+ - Update to Chromium 58.0.3029.110. ([#8962](https://github.com/brave/browser-laptop/issues/8962))
+ - Upgraded to Chromium 58.0.3029.110. ([#8962](https://github.com/brave/browser-laptop/issues/8962))
+ - Upgraded to muon 3.0.201. ([#8445](https://github.com/brave/browser-laptop/issues/8445))
 
 ## [0.15.2](https://github.com/brave/browser-laptop/releases/v0.15.2dev)
  - Update libchromiumcontent to 58.0.3029.96. ([#8638](https://github.com/brave/browser-laptop/issues/8638))
- - Update muon to 2.58.9. ([#8660](https://github.com/brave/browser-laptop/issues/8660))
+ - Upgraded to to muon 2.58.9. ([#8660](https://github.com/brave/browser-laptop/issues/8660))
 
 ## [0.15.1](https://github.com/brave/browser-laptop/releases/v0.15.1dev)
  - Fixed navigating to a PDF may crash the tab. ([#8422](https://github.com/brave/browser-laptop/issues/8422))
@@ -13,7 +60,7 @@
  - Fixed when Brave Payment is enabled, accessing Shield Settings on a blank page will crash the browser. ([#8545](https://github.com/brave/browser-laptop/issues/8545))
  - Fixed Webview crash on http://www.jewsnews.co.il/. ([#8526](https://github.com/brave/browser-laptop/issues/8526))
  - Fixed windowscentral.com crashes renderer on Windows 7. ([#6989](https://github.com/brave/browser-laptop/issues/6989))
- - Upgrade to Muon 2.58.8. ([#8563](https://github.com/brave/browser-laptop/issues/8563))
+ - Upgrade to muon 2.58.8. ([#8563](https://github.com/brave/browser-laptop/issues/8563))
 
 ## [0.15.0](https://github.com/brave/browser-laptop/releases/v0.15.0dev)
  - Added tear off tabs - Ability to tear off tabs and to combine them back into other windows. ([#4402](https://github.com/brave/browser-laptop/issues/4402))
@@ -225,8 +272,8 @@
 - Fixed three-finger "Look up" tap. ([#1064](https://github.com/brave/browser-laptop/issues/1064))
 - Fixed tabs don't resize with window. ([#100](https://github.com/brave/browser-laptop/issues/100))
 - Upgraded to node 7.4.0. ([#7061](https://github.com/brave/browser-laptop/issues/7061))
-- Upgrade muon to 2.56.4. ([#7173](https://github.com/brave/browser-laptop/issues/7173))
-- Upgrade to Chromium v56.0.2924.87. ([#3681](https://github.com/brave/browser-laptop/issues/3681))
+- Upgraded muon to 2.56.4. ([#7173](https://github.com/brave/browser-laptop/issues/7173))
+- Upgraded to Chromium v56.0.2924.87. ([#3681](https://github.com/brave/browser-laptop/issues/3681))
 
 
 ## [0.13.2](https://github.com/brave/browser-laptop/releases/v0.13.2dev)
@@ -254,7 +301,7 @@
 - Fixed Widevine not working on Windows (Netflix). ([#6948](https://github.com/brave/browser-laptop/issues/6948))
 - Fixed DPI settings on Windows causing blurriness and causing missing pixels.  ([#6462](https://github.com/brave/browser-laptop/issues/6462))
 - Fixed high memory usage by temporarily disabling newtab background images.  ([#6945](https://github.com/brave/browser-laptop/issues/6945))
-- Upgrade to Muon 2.0.18. ([#6949](https://github.com/brave/browser-laptop/issues/6949))
+- Upgrade to muon 2.0.18. ([#6949](https://github.com/brave/browser-laptop/issues/6949))
 
 ## [0.13.0](https://github.com/brave/browser-laptop/releases/v0.13.0dev)
 - Added WebTorrent support for magnet links. ([#5818](https://github.com/brave/browser-laptop/issues/5818))([#5815](https://github.com/brave/browser-laptop/issues/5815))
@@ -288,7 +335,7 @@
 - Fixed borders and corners of each button on navbar not being clickable. ([#5679](https://github.com/brave/browser-laptop/issues/5679))
 - Fixed Geolocations not working on Windows ia32. ([#6331](https://github.com/brave/browser-laptop/issues/6331))
 - Upgrade to Chromium 54.0.2840.100. ([#3679](https://github.com/brave/browser-laptop/issues/3679))
-- Updated Muon to 2.0.17. ([#6340](https://github.com/brave/browser-laptop/issues/6340))
+- Upgraded to muon 2.0.17. ([#6340](https://github.com/brave/browser-laptop/issues/6340))
 
 ## [0.12.15](https://github.com/brave/browser-laptop/releases/v0.12.15dev)
 - Added Yandex as a new search engine. ([#2703](https://github.com/brave/browser-laptop/issues/2703))
@@ -301,17 +348,17 @@
 - Moved default zoom level from Advanced to General prefs. ([#5697](https://github.com/brave/browser-laptop/issues/5697))
 
 ## [0.12.14](https://github.com/brave/browser-laptop/releases/v0.12.14dev)
-- Muon updated to 1.4.31 to address Symantec issued cert problems
+- Upgraded to muon 1.4.31 to address Symantec issued cert problems
 
 ## [0.12.13](https://github.com/brave/browser-laptop/releases/v0.12.13dev)
 - Typing fast could lead to partial selection inside URL bar. ([#5943](https://github.com/brave/browser-laptop/issues/5943))
-- Muon updated to 1.4.29 (Brave's Electron fork)
+- Upgraded to muon 1.4.29
 
 ## [0.12.12](https://github.com/brave/browser-laptop/releases/v0.12.12dev)
-- Muon updated to 1.4.28 (Brave's Electron fork)
+- Upgraded to muon 1.4.28
 
 ## [0.12.11](https://github.com/brave/browser-laptop/releases/v0.12.11dev)
-- Muon updated to 1.4.27 (Brave's Electron fork)
+- Upgraded to muon 1.4.27
 
 ## [0.12.10](https://github.com/brave/browser-laptop/releases/v0.12.10dev)
 - Added dropdown menu with options for new tab. ([#4398](https://github.com/brave/browser-laptop/issues/4398))
@@ -328,7 +375,7 @@
 - Fixed Chromium not recognized as a browser for importing bookmarks. ([#5463](https://github.com/brave/browser-laptop/issues/5463))
 - Fixed about:brave doesn't show details. ([#5633](https://github.com/brave/browser-laptop/issues/5633))
 - Fixed [HackerOne] media permission requests in iframes show top-level origin. ([#5378](https://github.com/brave/browser-laptop/issues/5378))
-- Upgrade to muon v1.4.26 ([#5716](https://github.com/brave/browser-laptop/issues/5716))
+- Upgraded to muon v1.4.26 ([#5716](https://github.com/brave/browser-laptop/issues/5716))
 
 ## [0.12.9](https://github.com/brave/browser-laptop/releases/v0.12.9dev)
 - Added New Tab page. ([#3001](https://github.com/brave/browser-laptop/issues/3001))([#2106](https://github.com/brave/browser-laptop/issues/2106))([#5334](https://github.com/brave/browser-laptop/issues/5334))([#5310](https://github.com/brave/browser-laptop/issues/5310))([#5396](https://github.com/brave/browser-laptop/issues/5396))([#5336](https://github.com/brave/browser-laptop/issues/5336))([#5482](https://github.com/brave/browser-laptop/issues/5482))([#5332](https://github.com/brave/browser-laptop/issues/5332))([#5337](https://github.com/brave/browser-laptop/issues/5337))([#5380](https://github.com/brave/browser-laptop/issues/5380))([#5324](https://github.com/brave/browser-laptop/issues/5324))([#5321](https://github.com/brave/browser-laptop/issues/5321))([#5322](https://github.com/brave/browser-laptop/issues/5322))
