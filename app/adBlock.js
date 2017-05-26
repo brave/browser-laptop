@@ -32,6 +32,10 @@ module.exports.safeBrowsingResourceName = 'safeBrowsing'
  *   for example safe browsing checks main frame URLs but ad block checks do not.
  */
 const startAdBlocking = (adblock, resourceName, shouldCheckMainFrame) => {
+  if (resourceName === module.exports.safeBrowsingResourceName) {
+    // Needed for #9056
+    module.exports.safeBrowsingInstance = adblock
+  }
   Filtering.registerBeforeRequestFilteringCB((details) => {
     const mainFrameUrl = Filtering.getMainFrameUrl(details)
     // this can happen if the tab is closed and the webContents is no longer available
