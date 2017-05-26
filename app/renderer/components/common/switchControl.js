@@ -29,7 +29,7 @@ class SwitchControl extends ImmutableComponent {
       large: this.props.large,
       small: this.props.small,
       hasTopText: this.props.topl10nId,
-      [this.props.customWrapper]: !!this.props.customWrapper
+      [this.props.customWrapperClassName]: !!this.props.customWrapperClassName
     })}
       data-switch-status={this.props.checkedOn}
       data-test-id={this.props.testId}
@@ -46,7 +46,7 @@ class SwitchControl extends ImmutableComponent {
           this.props.topl10nId
           ? <span className={cx({
             switchControlTopText: true,
-            [this.props.customTopText]: !!this.props.customTopText
+            [this.props.customTopTextClassName]: !!this.props.customTopTextClassName
           })}
             data-l10n-id={this.props.topl10nId} />
           : null
@@ -69,7 +69,7 @@ class SwitchControl extends ImmutableComponent {
             <div className='switchSpacer'>&nbsp;</div>
             <span className={cx({
               switchControlRightText: true,
-              [this.props.customRightText]: !!this.props.customRightText
+              [this.props.customRightTextClassName]: !!this.props.customRightTextClassName
             })}
               data-l10n-id={this.props.rightl10nId}
               data-l10n-args={this.props.rightl10nArgs}
@@ -81,7 +81,7 @@ class SwitchControl extends ImmutableComponent {
             (this.props.rightl10nId || this.props.rightText) && !this.props.onInfoClick
             ? <span className={cx({
               switchControlRightText: true,
-              [this.props.customRightText]: !!this.props.customRightText
+              [this.props.customRightTextClassName]: !!this.props.customRightTextClassName
             })}
               data-l10n-id={this.props.rightl10nId}
               data-l10n-args={this.props.rightl10nArgs}
@@ -100,7 +100,7 @@ class SwitchControl extends ImmutableComponent {
                 'fa-question-circle': true,
                 info: true,
                 clickable: true,
-                [this.props.customInfoButton]: !!this.props.customInfoButton
+                [this.props.customInfoButtonClassName]: !!this.props.customInfoButtonClassName
               })}
                 onClick={this.props.onInfoClick}
                 title={this.props.infoTitle}
