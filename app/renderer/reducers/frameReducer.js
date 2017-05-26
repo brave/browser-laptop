@@ -12,6 +12,7 @@ const frameStateUtil = require('../../../js/state/frameStateUtil')
 const appActions = require('../../../js/actions/appActions')
 const config = require('../../../js/constants/config')
 const {updateTabPageIndex} = require('../lib/tabUtil')
+const {getCurrentWindowId} = require('../currentWindow')
 
 const setFullScreen = (state, action) => {
   const index = frameStateUtil.getFrameIndex(state, action.frameProps.get('key'))
@@ -38,6 +39,9 @@ const closeFrame = (state, action) => {
   state = frameStateUtil.deleteFrameInternalIndex(state, frameProps)
   state = frameStateUtil.updateFramesInternalIndex(state, index)
 
+  if (state.get('frames', Immutable.List()).size === 0) {
+    appActions.closeWindow(getCurrentWindowId())
+  }
   // Copy the hover state if tab closed with mouse as long as we have a next frame
   // This allow us to have closeTab button visible  for sequential frames closing, until onMouseLeave event happens.
   const nextFrame = frameStateUtil.getFrameByIndex(state, index)
