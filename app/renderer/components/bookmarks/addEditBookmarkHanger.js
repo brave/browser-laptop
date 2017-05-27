@@ -102,8 +102,8 @@ class AddEditBookmarkHanger extends ImmutableComponent {
     if (!this.props.isModal && !this.props.shouldShowLocation) {
       this.onSave(false)
     }
-    this.setDefaultFocus()
     this.bookmarkName.value = this.displayBookmarkName
+    this.setDefaultFocus()
   }
   onKeyDown (e) {
     switch (e.keyCode) {
