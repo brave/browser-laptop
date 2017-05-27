@@ -7,11 +7,15 @@ const React = require('react')
 // Components
 const ImmutableComponent = require('../immutableComponent')
 const Button = require('../common/button')
+const BrowserButton = require('../common/browserButton')
 const DownloadItem = require('./downloadItem')
+
+const {StyleSheet} = require('aphrodite/no-important')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
 const webviewActions = require('../../../../js/actions/webviewActions')
+const appActions = require('../../../../js/actions/appActions')
 
 // Utils
 const contextMenus = require('../../../../js/contextMenus')
@@ -20,8 +24,17 @@ class DownloadsBar extends ImmutableComponent {
   constructor () {
     super()
     this.onHideDownloadsToolbar = this.onHideDownloadsToolbar.bind(this)
+    this.onShowDownloads = this.onShowDownloads.bind(this)
   }
   onHideDownloadsToolbar () {
+    windowActions.setDownloadsToolbarVisible(false)
+    webviewActions.setWebviewFocused()
+  }
+  onShowDownloads () {
+    appActions.createTabRequested({
+      activateIfOpen: true,
+      url: 'about:downloads'
+    })
     windowActions.setDownloadsToolbarVisible(false)
     webviewActions.setWebviewFocused()
   }
@@ -49,6 +62,8 @@ class DownloadsBar extends ImmutableComponent {
         }
       </div>
       <div className='downloadBarButtons'>
+        <BrowserButton secondaryColor label='View all' custom={styles.viewAllButton}
+          onClick={this.onShowDownloads} />
         <Button testId='hideDownloadsToolbar' className='downloadButton hideDownloadsToolbar'
           onClick={this.onHideDownloadsToolbar} />
       </div>
@@ -57,3 +72,9 @@ class DownloadsBar extends ImmutableComponent {
 }
 
 module.exports = DownloadsBar
+
+const styles = StyleSheet.create({
+  viewAllButton: {
+    marginRight: '20px'
+  }
+})
