@@ -10,7 +10,7 @@ const Button = require('../common/button')
 const BrowserButton = require('../common/browserButton')
 const DownloadItem = require('./downloadItem')
 
-const {StyleSheet} = require('aphrodite/no-important')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
@@ -19,6 +19,8 @@ const appActions = require('../../../../js/actions/appActions')
 
 // Utils
 const contextMenus = require('../../../../js/contextMenus')
+
+const cx = require('../../../../js/lib/classSet')
 
 class DownloadsBar extends ImmutableComponent {
   constructor () {
@@ -61,11 +63,20 @@ class DownloadsBar extends ImmutableComponent {
                 downloadsSize={this.props.downloads.size} />)
         }
       </div>
-      <div className='downloadBarButtons'>
-        <BrowserButton secondaryColor label='View all' custom={styles.viewAllButton}
-          onClick={this.onShowDownloads} />
-        <Button testId='hideDownloadsToolbar' className='downloadButton hideDownloadsToolbar'
-          onClick={this.onHideDownloadsToolbar} />
+      <div className={cx({
+        downloadBarButtons: true,
+        [css(styles.downloadsBar__downloadBarButtons)]: true
+      })}>
+        <BrowserButton secondaryColor
+          l10nId='downloadViewAll'
+          testId='downloadViewAll'
+          custom={styles.downloadsBar__downloadBarButtons__viewAllButton}
+          onClick={this.onShowDownloads}
+        />
+        <Button className='downloadButton hideDownloadsToolbar'
+          testId='hideDownloadsToolbar'
+          onClick={this.onHideDownloadsToolbar}
+        />
       </div>
     </div>
   }
@@ -74,7 +85,13 @@ class DownloadsBar extends ImmutableComponent {
 module.exports = DownloadsBar
 
 const styles = StyleSheet.create({
-  viewAllButton: {
+  downloadsBar__downloadBarButtons: {
+    display: 'flex',
+    flexFlow: 'row nowrap',
+    alignItems: 'center'
+  },
+
+  downloadsBar__downloadBarButtons__viewAllButton: {
     marginRight: '20px'
   }
 })
