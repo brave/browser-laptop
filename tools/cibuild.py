@@ -5,7 +5,7 @@ import subprocess
 import sys
 import os.path
 MUON_VERSION = '3.2.101'
-CHROMEDRIVER_VERSION = '2.27'
+CHROMEDRIVER_VERSION = '2.29'
 SOURCE_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 TARGET_ARCH= os.environ['TARGET_ARCH'] if os.environ.has_key('TARGET_ARCH') else 'x64'
 os.environ['npm_config_arch'] = TARGET_ARCH
