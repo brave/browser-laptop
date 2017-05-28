@@ -9,6 +9,10 @@ const contextMenus = require('../../../js/contextMenus')
 const windowActions = require('../../../js/actions/windowActions')
 const webviewActions = require('../../../js/actions/webviewActions')
 const DownloadItem = require('./downloadItem')
+const appActions = require('../../../js/actions/appActions')
+const Immutable = require('immutable')
+const CommonMenu = require('../../common/commonMenu')
+const messages = require('../../../js/constants/messages')
 
 class DownloadsBar extends ImmutableComponent {
   constructor () {
@@ -18,6 +22,13 @@ class DownloadsBar extends ImmutableComponent {
   onHideDownloadsToolbar () {
     windowActions.setDownloadsToolbarVisible(false)
     webviewActions.setWebviewFocused()
+  }
+  showAllDownloadsPage() {
+    CommonMenu.sendToFocusedWindow(require('../currentWindow'), [messages.HIDE_DOWNLOADS_TOOLBAR])
+    appActions.maybeCreateTabRequested({
+      url: 'about:downloads',
+      windowId: CommonMenu.getCurrentWindowId()
+    })
   }
   render () {
     const getComputedStyle = require('../getComputedStyle')
@@ -42,7 +53,9 @@ class DownloadsBar extends ImmutableComponent {
                 downloadsSize={this.props.downloads.size} />)
         }
       </div>
+
       <div className='downloadBarButtons'>
+        <Button className='whiteButton' label="Show All" onClick={this.showAllDownloadsPage}/>
         <Button className='downloadButton hideDownloadsToolbar'
           onClick={this.onHideDownloadsToolbar} />
       </div>

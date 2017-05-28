@@ -28,7 +28,7 @@ const ensureAtLeastOneWindow = (frameOpts) => {
   }
 }
 
-const getCurrentWindowId = () => {
+module.exports.getCurrentWindowId = () => {
   if (process.type === 'browser') {
     return BrowserWindow.getActiveWindow().id
   } else {
