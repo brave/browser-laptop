@@ -183,7 +183,7 @@
     "react-test-renderer": "^15.5.4",
     "request": "^2.81.0",
     "sinon": "^1.17.6",
-    "spectron": "brave/spectron#chromium56",
+    "spectron": "brave/spectron#chromium59",
     "standard": "9.0.0",
     "style-loader": "^0.13.0",
     "uglify-js-harmony": "^2.7.5",
