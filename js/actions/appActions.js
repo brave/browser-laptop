@@ -1402,6 +1402,15 @@ const appActions = {
       actionType: appConstants.APP_DEFAULT_SEARCH_ENGINE_LOADED,
       searchDetail
     })
+  },
+
+  /**
+   * Dispatches a message to indicate that the update log is being opened
+   */
+  updateLogOpened: function (searchDetail) {
+    dispatch({
+      actionType: appConstants.APP_UPDATE_LOG_OPENED
+    })
   }
 
 }

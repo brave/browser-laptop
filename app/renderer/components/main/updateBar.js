@@ -79,7 +79,7 @@ class UpdateHide extends ImmutableComponent {
 
 class UpdateLog extends ImmutableComponent {
   onViewLog () {
-    remote.shell.openItem(path.join(remote.app.getPath('userData'), 'updateLog.log'))
+    appActions.updateLogOpened()
   }
   render () {
     return <BrowserButton notificationItem secondaryColor
