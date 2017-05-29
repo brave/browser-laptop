@@ -23,6 +23,7 @@ const {
 } = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 const prefsShieldsUrl = 'about:preferences#shields'
+const settings = require('../../js/constants/settings')
 
 describe('Bravery Panel', function () {
   function * setup (client) {
@@ -79,11 +80,9 @@ describe('Bravery Panel', function () {
         .click(showAdsOption)
         .waitForTextValue(adsBlockedStat, '0')
 
+        .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
         .keys(Brave.keys.ESCAPE)
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
+
         .windowByUrl(Brave.browserWindowUrl)
         .newTab({ url, isPrivate: true })
         .waitForTabCount(3)
@@ -108,11 +107,9 @@ describe('Bravery Panel', function () {
         .click(showAdsOption)
         .waitForTextValue(adsBlockedStat, '0')
 
+        .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
         .keys(Brave.keys.ESCAPE)
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
+
         .windowByUrl(Brave.browserWindowUrl)
         .tabByIndex(0)
         .loadUrl(url)
@@ -168,11 +165,9 @@ describe('Bravery Panel', function () {
         .click(blockAdsOption)
         .waitForTextValue(adsBlockedStat, '2')
 
+        .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
         .keys(Brave.keys.ESCAPE)
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
+
         .windowByUrl(Brave.browserWindowUrl)
         .newTab({ url, isPrivate: true })
         .waitForTabCount(3)
@@ -218,11 +213,9 @@ describe('Bravery Panel', function () {
         .click(blockAdsOption)
         .waitForTextValue(adsBlockedStat, '2')
 
+        .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
         .keys(Brave.keys.ESCAPE)
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
+
         .windowByUrl(Brave.browserWindowUrl)
         .newTab({ url })
         .waitForTabCount(2)
@@ -256,13 +249,10 @@ describe('Bravery Panel', function () {
         .click(blockAdsOption)
         .waitForTextValue(adsBlockedStat, '1')
 
+        .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
         .keys(Brave.keys.ESCAPE)
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
-        .windowByUrl(Brave.browserWindowUrl)
 
+        .windowByUrl(Brave.browserWindowUrl)
         .newTab({ url, isPrivate: true })
         .waitForTabCount(3)
         .waitForUrl(url)
@@ -296,13 +286,10 @@ describe('Bravery Panel', function () {
         .click(blockAdsOption)
         .waitForTextValue(adsBlockedStat, '1')
 
+        .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
         .keys(Brave.keys.ESCAPE)
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
-        .windowByUrl(Brave.browserWindowUrl)
 
+        .windowByUrl(Brave.browserWindowUrl)
         .newTab({ url })
         .waitForTabCount(3)
         .waitForUrl(url)
@@ -349,13 +336,10 @@ describe('Bravery Panel', function () {
         .click(blockAdsOption)
         .waitForTextValue(adsBlockedStat, '2')
 
+        .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
         .keys(Brave.keys.ESCAPE)
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
-        .windowByUrl(Brave.browserWindowUrl)
 
+        .windowByUrl(Brave.browserWindowUrl)
         .newTab({ url, isPrivate: true })
         .waitForTabCount(3)
         .waitForUrl(url)
@@ -403,13 +387,10 @@ describe('Bravery Panel', function () {
         .click(blockAdsOption)
         .waitForTextValue(adsBlockedStat, '2')
 
+        .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
         .keys(Brave.keys.ESCAPE)
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
-        .windowByUrl(Brave.browserWindowUrl)
 
+        .windowByUrl(Brave.browserWindowUrl)
         .newTab({ url })
         .waitForTabCount(3)
         .waitForUrl(url)
@@ -440,13 +421,10 @@ describe('Bravery Panel', function () {
             })
         })
 
+        .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
         .keys(Brave.keys.ESCAPE)
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
-        .windowByUrl(Brave.browserWindowUrl)
 
+        .windowByUrl(Brave.browserWindowUrl)
         .newTab({ url })
         .waitForTabCount(2)
         .waitForUrl(url)
@@ -477,13 +455,10 @@ describe('Bravery Panel', function () {
         .openBraveMenu(braveMenu, braveryPanel)
         .waitForTextValue(httpsEverywhereStat, '1')
 
+        .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
         .keys(Brave.keys.ESCAPE)
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
-        .windowByUrl(Brave.browserWindowUrl)
 
+        .windowByUrl(Brave.browserWindowUrl)
         .newTab({ url, isPrivate: true })
         .waitForTabCount(3)
         .waitForUrl(url)
@@ -500,13 +475,10 @@ describe('Bravery Panel', function () {
         .openBraveMenu(braveMenu, braveryPanel)
         .waitForTextValue(httpsEverywhereStat, '1')
 
+        .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
         .keys(Brave.keys.ESCAPE)
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
-        .windowByUrl(Brave.browserWindowUrl)
 
+        .windowByUrl(Brave.browserWindowUrl)
         .newTab({ url })
         .waitForTabCount(2)
         .waitForUrl(url)
@@ -541,13 +513,10 @@ describe('Bravery Panel', function () {
         .keys(Brave.keys.ESCAPE)
         .waitForElementCount(noScriptNavButton, 0)
 
+        .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
         .keys(Brave.keys.ESCAPE)
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
-        .windowByUrl(Brave.browserWindowUrl)
 
+        .windowByUrl(Brave.browserWindowUrl)
         .newTab({ url })
         .openBraveMenu(braveMenu, braveryPanelCompact)
         .click(noScriptSwitch)
@@ -583,13 +552,10 @@ describe('Bravery Panel', function () {
         .keys(Brave.keys.ESCAPE)
         .waitForElementCount(noScriptNavButton, 0)
 
+        .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
         .keys(Brave.keys.ESCAPE)
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
-        .windowByUrl(Brave.browserWindowUrl)
 
+        .windowByUrl(Brave.browserWindowUrl)
         .newTab({ url, isPrivate: true })
         .openBraveMenu(braveMenu, braveryPanelCompact)
         .click(noScriptSwitch)
@@ -651,11 +617,7 @@ describe('Bravery Panel', function () {
     it('does not apply exceptions from private tabs to regular tabs on compact panel', function * () {
       const url = Brave.server.url('scriptBlock.html')
       yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
-        .windowByUrl(Brave.browserWindowUrl)
+        .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
         .keys(Brave.keys.ESCAPE)
 
         .tabByIndex(0)
@@ -718,14 +680,10 @@ describe('Bravery Panel', function () {
             .then((size) => size.height > 0)
         })
 
-        .keys(Brave.keys.ESCAPE)
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
         .windowByUrl(Brave.browserWindowUrl)
-
         .keys(Brave.keys.ESCAPE)
+        .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
+
         .tabByIndex(0)
         .loadUrl(url)
         .waitUntil(function () {
@@ -765,14 +723,10 @@ describe('Bravery Panel', function () {
         .loadUrl(url)
         .waitForTextValue('body', expectedBlocked)
 
-        .keys(Brave.keys.ESCAPE)
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
         .windowByUrl(Brave.browserWindowUrl)
-
         .keys(Brave.keys.ESCAPE)
+        .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
+
         .tabByIndex(0)
         .loadUrl(url)
         .openBraveMenu(braveMenu, braveryPanelCompact)
@@ -804,20 +758,17 @@ describe('Bravery Panel', function () {
           })
         })
 
-        .keys(Brave.keys.ESCAPE)
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
         .windowByUrl(Brave.browserWindowUrl)
-
         .keys(Brave.keys.ESCAPE)
+        .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
+
         .tabByIndex(0)
         .loadUrl(url)
         .openBraveMenu(braveMenu, braveryPanelCompact)
         .click(cookieControl)
         .waitForVisible(blockAllCookiesOption)
         .click(allowAllCookiesOption)
+
         .tabByIndex(0)
         .loadUrl(url)
         .waitUntil(function () {
@@ -867,12 +818,7 @@ describe('Bravery Panel', function () {
     it('blocks fingerprinting on compact panel', function * () {
       const url = Brave.server.url('fingerprinting.html')
       yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
-        .windowByUrl(Brave.browserWindowUrl)
-        .keys(Brave.keys.ESCAPE)
+        .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
 
         .tabByIndex(0)
         .loadUrl(url)
@@ -967,12 +913,8 @@ describe('Bravery Panel', function () {
         .openBraveMenu(braveMenu, braveryPanel)
         .waitForTextValue(fpStat, '0')
 
+        .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
         .keys(Brave.keys.ESCAPE)
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
-        .windowByUrl(Brave.browserWindowUrl)
 
         .newTab({ url, isPrivate: true })
         .waitForTabCount(3)
@@ -990,12 +932,8 @@ describe('Bravery Panel', function () {
         .openBraveMenu(braveMenu, braveryPanel)
         .waitForTextValue(fpStat, '0')
 
+        .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
         .keys(Brave.keys.ESCAPE)
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
-        .windowByUrl(Brave.browserWindowUrl)
 
         .tabByIndex(0)
         .loadUrl(url)
