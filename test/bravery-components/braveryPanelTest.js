@@ -62,12 +62,11 @@ describe('Bravery Panel', function () {
     Brave.beforeEach(this)
     beforeEach(function * () {
       yield setup(this.app.client)
-      yield this.app.client
-        .waitForDataFile('trackingProtection')
     })
     it('detects blocked elements in private tab', function * () {
       const url = Brave.server.url('tracking.html')
       yield this.app.client
+        .waitForDataFile('trackingProtection')
         .newTab({ url, isPrivate: true })
         .waitForTabCount(2)
         .waitForUrl(url)
@@ -99,6 +98,7 @@ describe('Bravery Panel', function () {
     it('detects blocked elements', function * () {
       const url = Brave.server.url('tracking.html')
       yield this.app.client
+        .waitForDataFile('trackingProtection')
         .tabByIndex(0)
         .loadUrl(url)
         .openBraveMenu(braveMenu, braveryPanel)
@@ -131,8 +131,6 @@ describe('Bravery Panel', function () {
     Brave.beforeEach(this)
     beforeEach(function * () {
       yield setup(this.app.client)
-      yield this.app.client
-        .waitForDataFile('adblock')
     })
 
     it('downloads and detects regional adblock resources in private tab', function * () {
@@ -140,6 +138,7 @@ describe('Bravery Panel', function () {
       const aboutAdblockURL = getTargetAboutUrl('about:adblock')
       const adblockUUID = '48796273-E783-431E-B864-44D3DCEA66DC'
       yield this.app.client
+        .waitForDataFile('adblock')
         .tabByIndex(0)
         .loadUrl(aboutAdblockURL)
         .url(aboutAdblockURL)
@@ -191,6 +190,7 @@ describe('Bravery Panel', function () {
       const aboutAdblockURL = getTargetAboutUrl('about:adblock')
       const adblockUUID = '48796273-E783-431E-B864-44D3DCEA66DC'
       yield this.app.client
+        .waitForDataFile('adblock')
         .tabByIndex(0)
         .loadUrl(aboutAdblockURL)
         .url(aboutAdblockURL)
@@ -239,6 +239,7 @@ describe('Bravery Panel', function () {
     it('detects adblock resources in private tab', function * () {
       const url = Brave.server.url('adblock.html')
       yield this.app.client
+        .waitForDataFile('adblock')
         .newTab({ url, isPrivate: true })
         .waitForTabCount(2)
         .waitForUrl(url)
@@ -320,6 +321,7 @@ describe('Bravery Panel', function () {
       const url = Brave.server.url('adblock.html')
       const aboutAdblockURL = getTargetAboutUrl('about:adblock')
       yield this.app.client
+        .waitForDataFile('adblock')
         .tabByIndex(0)
         .loadUrl(aboutAdblockURL)
         .waitForVisible(customFiltersInput)
@@ -373,6 +375,7 @@ describe('Bravery Panel', function () {
       const url = Brave.server.url('adblock.html')
       const aboutAdblockURL = getTargetAboutUrl('about:adblock')
       yield this.app.client
+        .waitForDataFile('adblock')
         .tabByIndex(0)
         .loadUrl(aboutAdblockURL)
         .url(aboutAdblockURL)
@@ -464,8 +467,6 @@ describe('Bravery Panel', function () {
         })
     })
 
-    // TODO: Fix iframe tests (See: #8760)
-
     it('detects https upgrades in private tab', function * () {
       const url = Brave.server.url('httpsEverywhere.html')
       yield this.app.client
@@ -495,8 +496,10 @@ describe('Bravery Panel', function () {
       const url = Brave.server.url('httpsEverywhere.html')
       yield this.app.client
         .waitForDataFile('httpsEverywhere')
-        .tabByIndex(0)
-        .loadUrl(url)
+        .newTab({ url })
+        .waitForTabCount(2)
+        .waitForUrl(url)
+        .windowByUrl(Brave.browserWindowUrl)
         .openBraveMenu(braveMenu, braveryPanel)
         .waitForTextValue(httpsEverywhereStat, '1')
 
@@ -508,10 +511,9 @@ describe('Bravery Panel', function () {
         .windowByUrl(Brave.browserWindowUrl)
 
         .newTab({ url })
-        .waitForTabCount(2)
+        .waitForTabCount(3)
         .waitForUrl(url)
         .windowByUrl(Brave.browserWindowUrl)
-
         .openBraveMenu(braveMenu, braveryPanelCompact)
         .waitForTextValue(httpsEverywhereStat, '1')
     })
@@ -938,8 +940,6 @@ describe('Bravery Panel', function () {
     Brave.beforeEach(this)
     beforeEach(function * () {
       yield setup(this.app.client)
-      yield this.app.client
-        .waitForDataFile('adblock')
     })
     it('detects blocked elements in iframe in private tab', function * () {
       const url = Brave.server.url('iframe_with_tracker.html')
