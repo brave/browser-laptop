@@ -321,8 +321,9 @@ const styles = StyleSheet.create({
   },
 
   bookmarkHanger: {
-    justifyContent: 'flex-start',
-    background: 'none',
+    // See: #9040
+    justifyContent: 'flex-start !important',
+    background: 'none !important',
 
     // TODO: refactor navigationBar.less to remove !important
     animation: 'none !important',
