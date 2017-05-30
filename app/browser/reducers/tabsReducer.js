@@ -12,7 +12,7 @@ const {BrowserWindow} = require('electron')
 const tabState = require('../../common/state/tabState')
 const windowState = require('../../common/state/windowState')
 const windowConstants = require('../../../js/constants/windowConstants')
-const windowAction = require('../../../js/actions/windowActions.js')
+const windowActions = require('../../../js/actions/windowActions')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const {getFlashResourceId} = require('../../../js/flash')
 const {l10nErrorText} = require('../../common/lib/httpUtil')
@@ -246,7 +246,7 @@ const tabsReducer = (state, action, immutableAction) => {
         const windowId = tabValue.get('windowId')
 
         if (history !== null) {
-          windowAction.onLongBackHistory(
+          windowActions.onLongBackHistory(
             history,
             action.getIn(['rect', 'left']),
             action.getIn(['rect', 'bottom']),
@@ -264,7 +264,7 @@ const tabsReducer = (state, action, immutableAction) => {
         const windowId = tabValue.get('windowId')
 
         if (history !== null) {
-          windowAction.onLongForwardHistory(
+          windowActions.onLongForwardHistory(
             history,
             action.getIn(['rect', 'left']),
             action.getIn(['rect', 'bottom']),
