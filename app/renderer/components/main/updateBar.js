@@ -3,8 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const remote = require('electron').remote
-const path = require('path')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
