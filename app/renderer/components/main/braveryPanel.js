@@ -242,7 +242,7 @@ class BraveryPanel extends ImmutableComponent {
     })
     const compactBraveryPanel = getSetting(settings.COMPACT_BRAVERY_PANEL)
 
-    return <Dialog onHide={this.props.onHide} testId='braveryPanelContainer' isClickDismiss isBraveryPanel>
+    return <Dialog onHide={this.props.onHide} testId='braveryPanelContainer' isClickDismiss>
       <div className={css(
         commonStyles.flyoutDialog,
         styles.braveryPanel,

@@ -43,7 +43,7 @@ class Dialog extends ImmutableComponent {
   render () {
     return <div className={cx({
       [css(styles.dialog)]: true,
-      [css(styles.dialog_isNotClickDismiss)]: !this.props.isClickDismiss || this.props.isBraveryPanel,
+      [css(styles.dialog_isNotClickDismiss)]: !this.props.isClickDismiss,
       [this.props.className]: !!this.props.className
     })}
       data-test-id={this.props.testId}
@@ -65,7 +65,6 @@ Dialog.propTypes = {
   ]),
   className: PropTypes.string,
   isClickDismiss: PropTypes.bool,
-  isBraveryPanel: PropTypes.bool,
   onHide: PropTypes.func
 }
 
