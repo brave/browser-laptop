@@ -6,7 +6,7 @@
 
 const windowConstants = require('../../../js/constants/windowConstants')
 const appConstants = require('../../../js/constants/appConstants')
-const {isUrl, getSourceAboutUrl, getSourceMagnetUrl} = require('../../../js/lib/appUrlUtil')
+const {getSourceAboutUrl, getSourceMagnetUrl} = require('../../../js/lib/appUrlUtil')
 const {isURL, getUrlFromInput} = require('../../../js/lib/urlutil')
 const {getFrameByKey, activeFrameStatePath, frameStatePath, getActiveFrame, getFrameByTabId} = require('../../../js/state/frameStateUtil')
 const searchProviders = require('../../../js/data/searchProviders')
@@ -20,7 +20,7 @@ const updateSearchEngineInfoFromInput = (state, frameProps) => {
   const input = frameProps.getIn(['navbar', 'urlbar', 'location'])
   const frameSearchDetail = frameProps.getIn(['navbar', 'urlbar', 'searchDetail'])
   const searchDetailPath = frameStatePath(state, frameProps.get('key')).concat(['navbar', 'urlbar', 'searchDetail'])
-  if (!input || !input.length || isUrl(input) || !input.startsWith(':')) {
+  if (!input || !input.length || isURL(input) || !input.startsWith(':')) {
     state = state.deleteIn(searchDetailPath)
   } else if (!frameSearchDetail || !input.startsWith(frameSearchDetail.get('shortcut') + ' ')) {
     let entries = searchProviders.providers

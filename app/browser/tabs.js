@@ -4,13 +4,14 @@
 
 const appActions = require('../../js/actions/appActions')
 const windowActions = require('../../js/actions/windowActions')
+const tabActions = require('../browser/actions/tabActions')
 const config = require('../../js/constants/config')
 const Immutable = require('immutable')
 const tabState = require('../common/state/tabState')
 const {app, BrowserWindow, extensions, session, ipcMain} = require('electron')
 const {makeImmutable} = require('../common/state/immutableUtil')
-const {getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl, isTargetAboutUrl} = require('../../js/lib/appUrlUtil')
-const {isURL, getUrlFromInput, toPDFJSLocation, getDefaultFaviconUrl, isHttpOrHttps} = require('../../js/lib/urlutil')
+const {getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl, isTargetAboutUrl, isIntermediateAboutPage, isTargetMagnetUrl, getSourceMagnetUrl} = require('../../js/lib/appUrlUtil')
+const {isURL, getUrlFromInput, toPDFJSLocation, getDefaultFaviconUrl, isHttpOrHttps, getLocationIfPDF} = require('../../js/lib/urlutil')
 const {isSessionPartition} = require('../../js/state/frameStateUtil')
 const {getOrigin} = require('../../js/state/siteUtil')
 const {getSetting} = require('../../js/settings')
@@ -283,6 +284,57 @@ const updateAboutDetails = (tab, tabValue) => {
   }
 }
 
+// hack to deal with about:* pages
+const fixDisplayURL = (navigationEntry, controller) => {
+  if (navigationEntry == null) {
+    return null
+  }
+
+  navigationEntry = Object.assign({}, navigationEntry)
+
+  navigationEntry.virtualURL = getLocationIfPDF(navigationEntry.virtualURL)
+
+  if (isTargetAboutUrl(navigationEntry.virtualURL)) {
+    navigationEntry.virtualURL = getSourceAboutUrl(navigationEntry.virtualURL)
+  }
+
+  if (isIntermediateAboutPage(navigationEntry.virtualURL)) {
+    const previousEntry = controller.getEntryAtOffset(-1)
+    if (!controller.canGoForward() && previousEntry) {
+      navigationEntry.virtualURL = previousEntry.virtualURL
+    }
+  }
+
+  if (isTargetMagnetUrl(navigationEntry.virtualURL)) {
+    navigationEntry.virtualURL = getSourceMagnetUrl(navigationEntry.virtualURL)
+  }
+
+  if (navigationEntry.virtualURL === 'about:newtab') {
+    navigationEntry.virtualURL = ''
+  }
+
+  navigationEntry.virtualURL = muon.url.formatForDisplay(navigationEntry.virtualURL)
+
+  const parsedURL = muon.url.parse(navigationEntry.virtualURL)
+  navigationEntry = Object.assign(parsedURL, navigationEntry)
+
+  return navigationEntry
+}
+
+const createNavigationState = (navigationHandle, controller) => {
+  return Immutable.Map({
+    hasCommitted: navigationHandle.hasCommitted(),
+    isErrorPage: navigationHandle.isErrorPage(),
+    netErrorCode: navigationHandle.getNetErrorCode(),
+    activeEntry: fixDisplayURL(controller.getActiveEntry(), controller),
+    visibleEntry: fixDisplayURL(controller.getVisibleEntry(), controller),
+    lastCommittedEntry: fixDisplayURL(controller.getLastCommittedEntry(), controller),
+    pendingEntry: fixDisplayURL(controller.getPendingEntry(), controller),
+    canGoBack: controller.canGoBack(),
+    canGoForward: controller.canGoForward()
+  })
+}
+
 const api = {
   init: (state, action) => {
     process.on('open-url-from-tab', (e, source, targetUrl, disposition) => {
@@ -308,13 +360,16 @@ const api = {
         return
       }
 
-      let location = newTab.getURL()
-      if (!location || location === '') {
-        location = 'about:blank'
-      }
+      let displayURL = newTab.getURL()
+      let location = displayURL || 'about:blank'
 
       const openerTabId = !source.isDestroyed() ? source.getId() : -1
       let newTabValue = getTabValue(newTab.getId())
+
+      let rendererInitiated = false
+      if (source.isGuest()) {
+        rendererInitiated = true
+      }
 
       let index
       if (parseInt(newTabValue.get('index')) > -1) {
@@ -331,6 +386,8 @@ const api = {
 
       const frameOpts = {
         location,
+        displayURL,
+        rendererInitiated,
         partition: newTab.session.partition,
         active: !!newTabValue.get('active'),
         guestInstanceId: newTab.guestInstanceId,
@@ -368,6 +425,34 @@ const api = {
         return
       }
       let tabId = tab.getId()
+
+      tab.on('did-start-navigation', (e, navigationHandle) => {
+        if (navigationHandle.isValid() && navigationHandle.isInMainFrame()) {
+          const controller = tab.controller()
+          if (!controller.isValid()) {
+            return
+          }
+          let tabValue = getTabValue(tabId)
+          if (tabValue) {
+            const windowId = tabValue.get('windowId')
+            tabActions.didStartNavigation(tabId, createNavigationState(navigationHandle, controller), windowId)
+          }
+        }
+      })
+
+      tab.on('did-finish-navigation', (e, navigationHandle) => {
+        if (navigationHandle.isValid() && navigationHandle.isInMainFrame()) {
+          const controller = tab.controller()
+          if (!controller.isValid()) {
+            return
+          }
+          let tabValue = getTabValue(tabId)
+          if (tabValue) {
+            const windowId = tabValue.get('windowId')
+            tabActions.didFinishNavigation(tabId, createNavigationState(navigationHandle, controller), windowId)
+          }
+        }
+      })
 
       tab.on('unresponsive', () => {
         console.log('unresponsive')

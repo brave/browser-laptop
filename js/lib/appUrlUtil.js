@@ -209,7 +209,6 @@ module.exports.isTargetMagnetUrl = function (input) {
  * @param {string} input
  */
 module.exports.isUrl = function (input) {
-  input = input.trim()
   return UrlUtil.isURL(input)
 }
 

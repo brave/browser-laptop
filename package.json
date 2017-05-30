@@ -201,7 +201,8 @@
   "standard": {
     "global": [
       "chrome",
-      "muon"
+      "muon",
+      "postMessage"
     ],
     "ignore": [
       "app/extensions/**",

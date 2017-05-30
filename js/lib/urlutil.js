@@ -169,6 +169,7 @@ const UrlUtil = {
    * @returns {Boolean} Whether or not this is a valid URL.
    */
   isURL: function (input) {
+    input = input.trim()
     return !UrlUtil.isNotURL(input)
   },
 

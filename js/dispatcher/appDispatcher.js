@@ -155,6 +155,10 @@ const ipcCargo = async.cargo((tasks, callback) => {
 }, 200)
 
 if (processType === 'browser') {
+  process.on('dispatch-action', (action) => {
+    appDispatcher.dispatch(action)
+  })
+
   ipc.on('app-dispatcher-register', (event) => {
     const registrant = event.sender
     const hostWebContents = event.sender.hostWebContents || event.sender
