@@ -34,6 +34,7 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
+      - gtk+3.0
       - xvfb
       - g++-4.8
       - libgnome-keyring-dev
