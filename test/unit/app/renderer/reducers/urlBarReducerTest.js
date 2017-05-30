@@ -141,44 +141,6 @@ describe('urlBarReducer', function () {
         assert.equal(this.newState.getIn(['frames', 2, 'navbar', 'urlbar', 'location']), undefined)
       })
     })
-    describe('In page navigation', function () {
-      before(function () {
-        this.location = 'https://www.brave.com/'
-        this.newState = urlBarReducer(windowState, {actionType: windowConstants.WINDOW_SET_NAVIGATED, location: this.location, isNavigatedInPage: true})
-      })
-      it('does not reset values', function () {
-        assert.equal(this.newState.getIn(['frames', 1, 'title']), 'test')
-        assert.deepEqual(this.newState.getIn(['frames', 1, 'adblock']).toJS(), {blocked: []})
-        assert.equal(this.newState.getIn(['frames', 1, 'audioPlaybackActive']), true)
-        assert.equal(this.newState.getIn(['frames', 1, 'computedThemeColor']), '#ff0000')
-        assert.deepEqual(this.newState.getIn(['frames', 1, 'httpsEverywhere']).toJS(), {a: '1'})
-        assert.equal(this.newState.getIn(['frames', 1, 'icon']), 'https://www.brave.com/favicon.ico')
-        assert.equal(this.newState.getIn(['frames', 1, 'location']), this.location)
-        assert.deepEqual(this.newState.getIn(['frames', 1, 'noScript']).toJS(), {blocked: []})
-        assert.equal(this.newState.getIn(['frames', 1, 'themeColor']), '#ffffff')
-        assert.deepEqual(this.newState.getIn(['frames', 1, 'trackingProtection']).toJS(), {blocked: []})
-        assert.deepEqual(this.newState.getIn(['frames', 1, 'fingerprintingProtection']).toJS(), {blocked: []})
-      })
-    })
-    describe('Navigation', function () {
-      before(function () {
-        this.location = 'https://www.brave.com/'
-        this.newState = urlBarReducer(windowState, {actionType: windowConstants.WINDOW_SET_NAVIGATED, location: this.location})
-      })
-      it('resets values', function () {
-        assert.equal(this.newState.getIn(['frames', 1, 'title']), '')
-        assert.deepEqual(this.newState.getIn(['frames', 1, 'adblock']).toJS(), {})
-        assert.equal(this.newState.getIn(['frames', 1, 'audioPlaybackActive']), false)
-        assert.equal(this.newState.getIn(['frames', 1, 'computedThemeColor']), undefined)
-        assert.deepEqual(this.newState.getIn(['frames', 1, 'httpsEverywhere']).toJS(), {})
-        assert.equal(this.newState.getIn(['frames', 1, 'icon']), undefined)
-        assert.equal(this.newState.getIn(['frames', 1, 'location']), this.location)
-        assert.deepEqual(this.newState.getIn(['frames', 1, 'noScript']).toJS(), {})
-        assert.equal(this.newState.getIn(['frames', 1, 'themeColor']), undefined)
-        assert.deepEqual(this.newState.getIn(['frames', 1, 'trackingProtection']).toJS(), {})
-        assert.deepEqual(this.newState.getIn(['frames', 1, 'fingerprintingProtection']).toJS(), {})
-      })
-    })
   })
 
   describe('WINDOW_SET_NAVIGATION_ABORTED', function () {

@@ -7,7 +7,7 @@
 const windowConstants = require('../../../js/constants/windowConstants')
 const appConstants = require('../../../js/constants/appConstants')
 const {isUrl, getSourceAboutUrl, getSourceMagnetUrl} = require('../../../js/lib/appUrlUtil')
-const {isURL, isPotentialPhishingUrl, getUrlFromInput} = require('../../../js/lib/urlutil')
+const {isURL, getUrlFromInput} = require('../../../js/lib/urlutil')
 const {getFrameByKey, activeFrameStatePath, frameStatePath, getActiveFrame, getFrameByTabId} = require('../../../js/state/frameStateUtil')
 const searchProviders = require('../../../js/data/searchProviders')
 const Immutable = require('immutable')
@@ -130,6 +130,10 @@ const navigationAborted = (state, action) => {
         location
       })
     }
+  }
+  return state
+}
+
 const setNavBarUserInput = (state, location, framePath) => {
   if (framePath === undefined) {
     framePath = activeFrameStatePath(state)
@@ -173,35 +177,11 @@ const urlBarReducer = (state, action) => {
       action.location = getLocation(action.location)
 
       const key = action.key || state.get('activeFrameKey')
-      state = state.mergeIn(frameStatePath(state, key), {
-        location: action.location
-      })
-      if (!action.isNavigatedInPage) {
-        state = state.mergeIn(frameStatePath(state, key), {
-          adblock: {},
-          audioPlaybackActive: false,
-          computedThemeColor: undefined,
-          httpsEverywhere: {},
-          icon: undefined,
-          location: action.location,
-          noScript: {},
-          themeColor: undefined,
-          title: '',
-          trackingProtection: {},
-          fingerprintingProtection: {}
-        })
-      }
-
       // Update nav bar unless when spawning a new tab. The user might have
       // typed in the URL bar while we were navigating -- we should preserve it.
       if (!(action.location === 'about:newtab' && !getActiveFrame(state).get('canGoForward'))) {
         const key = action.key || state.get('activeFrameKey')
         state = updateNavBarInput(state, action.location, frameStatePath(state, key))
-      }
-
-      // For potential phishing pages, show a warning
-      if (isPotentialPhishingUrl(action.location)) {
-        state = state.setIn(['ui', 'siteInfo', 'isVisible'], true)
       }
 
       state = state.setIn(frameStatePath(state, key).concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), false)
