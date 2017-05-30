@@ -46,16 +46,19 @@ const setUrlSuggestions = (state, suggestionList) => {
   return state
 }
 
-const setRenderUrlBarSuggestions = (state, enabled) => {
-  state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), enabled)
+const setRenderUrlBarSuggestions = (state, enabled, framePath) => {
+  if (framePath === undefined) {
+    framePath = activeFrameStatePath(state)
+  }
+  state = state.setIn(framePath.concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), enabled)
   if (!enabled) {
-    state = state.mergeIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions']), {
+    state = state.mergeIn(framePath.concat(['navbar', 'urlbar', 'suggestions']), {
       selectedIndex: null,
       suggestionList: null
     })
     // Make sure to remove the suffix from the url bar
-    state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), null)
-    state = updateUrlSuffix(state, undefined)
+    state = state.setIn(framePath.concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), null)
+    state = updateUrlSuffix(state, undefined, framePath)
   }
   return state
 }
@@ -64,9 +67,12 @@ const setRenderUrlBarSuggestions = (state, enabled) => {
  * Updates the active frame state with what the URL bar suffix should be.
  * @param suggestionList - The suggestion list to use to figure out the suffix.
  */
-const updateUrlSuffix = (state, suggestionList) => {
-  let selectedIndex = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])) || 0
-  const lastSuffix = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'urlSuffix']))
+const updateUrlSuffix = (state, suggestionList, framePath) => {
+  if (framePath === undefined) {
+    framePath = activeFrameStatePath(state)
+  }
+  let selectedIndex = state.getIn(framePath.concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])) || 0
+  const lastSuffix = state.getIn(framePath.concat(['navbar', 'urlbar', 'suggestions', 'urlSuffix']))
   if (!selectedIndex && lastSuffix) {
     selectedIndex = 0
   }
@@ -74,10 +80,10 @@ const updateUrlSuffix = (state, suggestionList) => {
   let suffix = ''
   let hasSuggestionMatch = false
   if (suggestion) {
-    const autocompleteEnabled = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']))
+    const autocompleteEnabled = state.getIn(framePath.concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']))
 
     if (autocompleteEnabled) {
-      const location = normalizeLocation(state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'location']))) || ''
+      const location = normalizeLocation(state.getIn(framePath.concat(['navbar', 'urlbar', 'location']))) || ''
       const normalizedSuggestion = normalizeLocation(suggestion.get('location').toLowerCase())
       const index = normalizedSuggestion.indexOf(location.toLowerCase())
       if (index === 0) {
@@ -86,8 +92,8 @@ const updateUrlSuffix = (state, suggestionList) => {
       }
     }
   }
-  state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'urlSuffix']), suffix)
-  state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'hasSuggestionMatch']), hasSuggestionMatch)
+  state = state.setIn(framePath.concat(['navbar', 'urlbar', 'suggestions', 'urlSuffix']), suffix)
+  state = state.setIn(framePath.concat(['navbar', 'urlbar', 'suggestions', 'hasSuggestionMatch']), hasSuggestionMatch)
   return state
 }
 
@@ -124,16 +130,15 @@ const navigationAborted = (state, action) => {
         location
       })
     }
+const setNavBarUserInput = (state, location, framePath) => {
+  if (framePath === undefined) {
+    framePath = activeFrameStatePath(state)
   }
-  return state
-}
-
-const setNavBarUserInput = (state, location) => {
-  state = updateNavBarInput(state, location)
-  const activeFrameProps = getActiveFrame(state)
-  state = updateSearchEngineInfoFromInput(state, activeFrameProps)
+  state = updateNavBarInput(state, location, framePath)
+  const frameProps = state.getIn(framePath)
+  state = updateSearchEngineInfoFromInput(state, frameProps)
   if (!location) {
-    state = setRenderUrlBarSuggestions(state, false)
+    state = setRenderUrlBarSuggestions(state, false, framePath)
   }
   return state
 }
