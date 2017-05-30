@@ -55,7 +55,7 @@ const getWindowValue = (windowId) => {
 }
 
 const updateWindow = (windowId) => {
-  let windowValue = getWindowValue(windowId)
+  const windowValue = getWindowValue(windowId)
   if (windowValue) {
     appActions.windowUpdated(windowValue)
   }

@@ -1429,7 +1429,6 @@ const appActions = {
       actionType: appConstants.APP_UPDATE_LOG_OPENED
     })
   }
-
 }
 
 module.exports = appActions

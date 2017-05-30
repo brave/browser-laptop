@@ -505,11 +505,8 @@ class Frame extends React.Component {
       e.stopPropagation()
     })
     this.webview.addEventListener('update-target-url', (e) => {
-      if (!this.root) {
-        this.root = window.getComputedStyle(document.querySelector(':root'))
-        this.downloadsBarHeight = Number.parseInt(this.root.getPropertyValue('--downloads-bar-height'), 10)
-      }
-      let nearBottom = e.y > (window.innerHeight - 150 - this.downloadsBarHeight)
+      const downloadBarHeight = domUtil.getStyleConstants('download-bar-height')
+      let nearBottom = e.y > (window.innerHeight - 150 - downloadBarHeight)
       let mouseOnLeft = e.x < (window.innerWidth / 2)
       let showOnRight = nearBottom && mouseOnLeft
       windowActions.setLinkHoverPreview(e.url, showOnRight)

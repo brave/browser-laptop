@@ -44,7 +44,8 @@ const appStoreRenderer = Immutable.fromJS({
       receivedBytes: 1,
       state: downloadStates.IN_PROGRESS
     }
-  }
+  },
+  windows: []
 })
 
 describe('downloadsBar component', function () {
@@ -57,10 +58,12 @@ describe('downloadsBar component', function () {
       useCleanCache: true
     })
     mockery.registerMock('electron', fakeElectron)
+    mockery.registerMock('../../app/renderer/lib/domUtil', {
+      getStyleConstants: () => 100
+    })
     DownloadItem = require('../../../../../../app/renderer/components/download/downloadItem')
     DownloadsBar = require('../../../../../../app/renderer/components/download/downloadsBar')
     appStore = require('../../../../../../js/stores/appStoreRenderer')
-    appStore.state = appStoreRenderer
   })
 
   after(function () {
@@ -70,6 +73,7 @@ describe('downloadsBar component', function () {
 
   describe('multiple downloads with space', function () {
     before(function () {
+      appStore.state = appStoreRenderer
       this.result = mount(<DownloadsBar />)
     })
 
@@ -103,12 +107,13 @@ describe('downloadsBar component', function () {
     })
   })
 
-  // skipped until #9176 is merged
-  describe.skip('very narrow downloads bar with items', function () {
+  describe('very narrow downloads bar with items', function () {
     before(function () {
-      mockery.registerMock('../../getComputedStyle', () => 10)
+      window.innerWidth = 10
+      appStore.state = appStoreRenderer
       this.result = mount(<DownloadsBar />)
     })
+
     it('renders no downloads', function () {
       assert.equal(this.result.find(DownloadItem).length, 0)
     })

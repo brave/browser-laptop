@@ -34,6 +34,7 @@ const {calculateTextWidth} = require('../../../../js/lib/textCalculator')
 
 // Styles
 const globalStyles = require('../styles/global')
+const domUtil = require('../../lib/domUtil')
 
 class BookmarksToolbar extends ImmutableComponent {
   constructor () {
@@ -118,19 +119,16 @@ class BookmarksToolbar extends ImmutableComponent {
 
     // Dynamically calculate how many bookmark items should appear on the toolbar
     // before it is actually rendered.
-    if (!this.root) {
-      this.root = window.getComputedStyle(document.querySelector(':root'))
-      this.maxWidth = Number.parseInt(this.root.getPropertyValue('--bookmark-item-max-width'), 10)
-      this.padding = Number.parseInt(this.root.getPropertyValue('--bookmark-item-padding'), 10) * 2
-      // Toolbar padding is only on the left
-      this.toolbarPadding = Number.parseInt(this.root.getPropertyValue('--bookmarks-toolbar-padding'), 10)
-      this.bookmarkItemMargin = Number.parseInt(this.root.getPropertyValue('--bookmark-item-margin'), 10) * 2
-      // No margin for show only favicons
-      this.chevronMargin = Number.parseInt(this.root.getPropertyValue('--bookmark-item-chevron-margin'), 10)
-      this.fontSize = this.root.getPropertyValue('--bookmark-item-font-size')
-      this.fontFamily = this.root.getPropertyValue('--default-font-family')
-      this.chevronWidth = this.chevronMargin + Number.parseInt(this.fontSize)
-    }
+    this.maxWidth = domUtil.getStyleConstants('bookmark-item-max-width')
+    this.padding = domUtil.getStyleConstants('bookmark-item-padding') * 2
+    // Toolbar padding is only on the left
+    this.toolbarPadding = domUtil.getStyleConstants('bookmarks-toolbar-padding')
+    this.bookmarkItemMargin = domUtil.getStyleConstants('bookmark-item-margin') * 2
+    // No margin for show only favicons
+    this.chevronMargin = domUtil.getStyleConstants('bookmark-item-chevron-margin')
+    this.fontSize = domUtil.getStyleConstants('bookmark-item-font-size')
+    this.fontFamily = domUtil.getStyleConstants('default-font-family')
+    this.chevronWidth = this.chevronMargin + this.fontSize
     const margin = props.showFavicon && props.showOnlyFavicon ? 0 : this.bookmarkItemMargin
     widthAccountedFor += this.toolbarPadding
 
