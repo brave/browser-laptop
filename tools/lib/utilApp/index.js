@@ -57,7 +57,7 @@ app.on('ready', () => {
       addSimulatedLedgerTransactions(parseInt(process.argv[3]))
       break
     case 'addSimulatedSynopsisVisits':
-      addSimulatedSynopsisVisits(process.argv[3])
+      addSimulatedSynopsisVisits(parseInt(process.argv[3]))
       break
   }
 
