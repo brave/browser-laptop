@@ -89,7 +89,8 @@ const frameReducer = (state, action, immutableAction) => {
         state = state.setIn(['frames', index, 'title'], title)
       }
 
-      const active = immutableAction.getIn(['changeInfo', 'active'])
+      // TODO fix race condition in Muon more info in #9000
+      const active = immutableAction.getIn(['tabValue', 'active'])
       if (active != null) {
         if (active) {
           state = state.merge({
