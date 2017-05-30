@@ -258,6 +258,8 @@ class LedgerTable extends ImmutableComponent {
       })
     }
 
+    const showButton = (hideLower && totalUnPinnedRows !== unPinnedRows.size) || (!hideLower && totalUnPinnedRows > 10)
+
     return <section data-test-id='ledgerTable'>
       <div className={css(styles.hideExcludedSites)}>
         <div className={css(styles.columnOffset)} />
@@ -301,7 +303,7 @@ class LedgerTable extends ImmutableComponent {
         ]}
       />
       {
-        (totalUnPinnedRows !== unPinnedRows.size && hideLower)
+        showButton
         ? <div className={css(styles.ledgerTable__showAllWrap)}>
           <BrowserButton secondaryColor
             testId={hideLower ? 'showAll' : 'hideLower'}
