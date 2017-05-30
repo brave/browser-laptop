@@ -1,20 +1,20 @@
-/* global describe, it, before */
+/* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 const {errorContent, errorUrl, urlInput} = require('../lib/selectors')
 
 describe('errorPage', function () {
-  Brave.beforeAll(this)
+  Brave.beforeEach(this)
 
-  before(function * () {
+  beforeEach(function * () {
     yield this.app.client
       .waitForBrowserWindow()
       .waitForVisible(urlInput)
   })
 
   describe('DNS error', function () {
-    before(function * () {
+    beforeEach(function * () {
       this.url = 'http://fake.nosuchdomain/'
       yield this.app.client
         .tabByUrl(Brave.newTabUrl)

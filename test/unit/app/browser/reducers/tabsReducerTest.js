@@ -4,6 +4,7 @@ const assert = require('assert')
 const mockery = require('mockery')
 const sinon = require('sinon')
 const appConstants = require('../../../../../js/constants/appConstants')
+const tabActions = require('../../../../../app/common/actions/tabActions')
 const dragTypes = require('../../../../../js/constants/dragTypes')
 const fakeElectron = require('../../../lib/fakeElectron')
 const fakeAdBlock = require('../../../lib/fakeAdBlock')
@@ -95,8 +96,9 @@ describe('tabsReducer unit tests', function () {
       },
       toggleDevTools: sinon.mock(),
       closeTab: sinon.mock(),
+      setActive: sinon.spy(),
       moveTo: sinon.mock(),
-      setActive: sinon.spy()
+      reload: sinon.mock()
     }
 
     this.windowsAPI = require('../../../../../app/browser/windows')
@@ -119,6 +121,86 @@ describe('tabsReducer unit tests', function () {
 
   after(function () {
     mockery.disable()
+  })
+
+  describe('tabActions.reload', function () {
+    before(function () {
+      this.tabId = 1
+
+      this.action = {
+        actionType: tabActions.reload.name,
+        tabId: this.tabId
+      }
+      this.reload = sinon.spy()
+      this.tabsAPI.reload = this.reload
+      this.newState = tabsReducer(this.state, this.action)
+    })
+
+    after(function () {
+      this.tabsAPI.reload.reset()
+    })
+
+    it('calls `tabs.reload` for `action.tabId`', function () {
+      assert(this.tabsAPI.reload.withArgs(1).calledOnce)
+    })
+  })
+
+  describe('tabActions.didFinishNavigation', function () {
+    before(function () {
+      this.tabId = 1
+      this.navigationState = {
+        visibleEntry: {
+          virtualURL: 'about:newtab',
+          url: 'chrome-extension://blah/about-newtab.html'
+        }
+      }
+
+      const action = {
+        actionType: tabActions.didFinishNavigation.name,
+        tabId: this.tabId,
+        navigationState: this.navigationState
+      }
+
+      this.setNavigationStateSpy = sinon.stub(this.tabStateAPI, 'setNavigationState', (state) => state)
+      this.newState = tabsReducer(this.state, action)
+    })
+
+    after(function () {
+      this.setNavigationStateSpy.restore()
+    })
+
+    it('sets the navigation state to the value of `action.navigationState`', function () {
+      assert(this.setNavigationStateSpy.withArgs(this.state, 1, Immutable.fromJS(this.navigationState)).calledOnce)
+    })
+  })
+
+  describe('tabActions.didStartNavigation', function () {
+    before(function () {
+      this.tabId = 1
+      this.navigationState = {
+        visibleEntry: {
+          virtualURL: 'about:newtab',
+          url: 'chrome-extension://blah/about-newtab.html'
+        }
+      }
+
+      const action = {
+        actionType: tabActions.didStartNavigation.name,
+        tabId: this.tabId,
+        navigationState: this.navigationState
+      }
+
+      this.setNavigationStateSpy = sinon.stub(this.tabStateAPI, 'setNavigationState', (state) => state)
+      this.newState = tabsReducer(this.state, action)
+    })
+
+    after(function () {
+      this.setNavigationStateSpy.restore()
+    })
+
+    it('sets the navigation state to the value of `action.navigationState`', function () {
+      assert(this.setNavigationStateSpy.withArgs(this.state, 1, Immutable.fromJS(this.navigationState)).calledOnce)
+    })
   })
 
   describe.skip('APP_SET_STATE', function () {

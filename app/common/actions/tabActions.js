@@ -7,6 +7,15 @@
 const dispatchAction = require('../../common/dispatcher/dispatchAction')
 
 const tabActions = {
+  // TODO(bridiver) - this is an action anti-pattern and the code that uses it should be refactored
+  // to be declarative
+  reload: function tabActionsReload (tabId, ignoreCache) {
+    dispatchAction(tabActions.reload.name, {
+      tabId,
+      ignoreCache
+    })
+  },
+
   didFinishNavigation: function tabActionsDidFinishNavigation (tabId, navigationState, windowId) {
     dispatchAction(tabActions.didFinishNavigation.name, {
       tabId,

@@ -607,19 +607,19 @@ const tabState = {
     return state.setIn(path, navigationState)
   },
 
-  getVisibleEntry: (state, tabId) => {
+  getNavigationState: (state, tabId) => {
     const path = tabState.getPathByTabId(state, tabId)
-    return path ? state.getIn(path.push('navigationState', 'visibleEntry'), '') : null
+    return path ? state.getIn(path.push('navigationState'), Immutable.Map()) : null
+  },
+
+  getVisibleEntry: (state, tabId) => {
+    const navigationState = tabState.getNavigationState(state, tabId)
+    return navigationState ? navigationState.get('visibleEntry', '') : null
   },
 
   getVisibleURL: (state, tabId) => {
     const entry = tabState.getVisibleEntry(state, tabId)
     return entry ? entry.get('url') : ''
-  },
-
-  getVisibleVirtualEntry: (state, tabId) => {
-    const path = tabState.getPathByTabId(state, tabId)
-    return path ? state.getIn(path.push('navigationState', 'visibleEntry'), '') : null
   },
 
   getVisibleVirtualURL: (state, tabId) => {

@@ -4,7 +4,7 @@
 
 const appActions = require('../../js/actions/appActions')
 const windowActions = require('../../js/actions/windowActions')
-const tabActions = require('../browser/actions/tabActions')
+const tabActions = require('../common/actions/tabActions')
 const config = require('../../js/constants/config')
 const Immutable = require('immutable')
 const tabState = require('../common/state/tabState')
@@ -538,6 +538,18 @@ const api = {
     }
   },
 
+  reload: (tabId, ignoreCache = false) => {
+    const tab = getWebContents(tabId)
+    if (tab && !tab.isDestroyed()) {
+      // TODO(bridiver) - removeEntryAtIndex for intermediate about pages after loading
+      if (isIntermediateAboutPage(getSourceAboutUrl(tab.getURL()))) {
+        tab.goToOffset(-1)
+      } else {
+        tab.reload(ignoreCache)
+      }
+    }
+  },
+
   loadURL: (action) => {
     action = makeImmutable(action)
     const tabId = action.get('tabId')
@@ -760,20 +772,25 @@ const api = {
   goBack: (tabId) => {
     const tab = getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
-      tab.goBack()
+      // TODO(bridiver) - removeEntryAtIndex for intermediate about pages after loading
+      if (tab.controller().canGoToOffset(-2) && isIntermediateAboutPage(getSourceAboutUrl(tab.getURL()))) {
+        tab.goToOffset(-2)
+      } else if (tab.controller().canGoBack()) {
+        tab.goBack()
+      }
     }
   },
 
   goForward: (tabId) => {
     const tab = getWebContents(tabId)
-    if (tab && !tab.isDestroyed()) {
+    if (tab && !tab.isDestroyed() && tab.canGoForward()) {
       tab.goForward()
     }
   },
 
   goToIndex: (tabId, index) => {
     const tab = getWebContents(tabId)
-    if (tab && !tab.isDestroyed()) {
+    if (tab && !tab.isDestroyed() && tab.canGoToIndex(index)) {
       tab.goToIndex(index)
     }
   },

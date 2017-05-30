@@ -703,7 +703,6 @@ class Frame extends React.Component {
         appActions.removeSite(siteUtil.getDetailFromFrame(this.frame))
       } else if (isAborted(e.errorCode)) {
         // just stay put
-        windowActions.navigationAborted(this.props.tabId, url)
       } else if (provisionLoadFailure) {
         windowActions.setNavigated(url, this.props.frameKey, true, this.props.tabId)
       }

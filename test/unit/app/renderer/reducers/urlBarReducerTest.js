@@ -7,6 +7,8 @@ const fakeElectron = require('../../../lib/fakeElectron')
 
 const windowConstants = require('../../../../../js/constants/windowConstants')
 const appConstants = require('../../../../../js/constants/appConstants')
+const tabActions = require('../../../../../app/common/actions/tabActions')
+
 require('../../../braveUnit')
 
 const windowState = Immutable.fromJS({
@@ -128,34 +130,33 @@ describe('urlBarReducer', function () {
     })
   })
 
-  describe('WINDOW_SET_NAVIGATED', function () {
-    describe('Basic', function () {
-      it('updates navbar navbar for URL navigation', function () {
-        this.location = 'https:/www.brave.com/3'
-        this.newState = urlBarReducer(windowState, {actionType: windowConstants.WINDOW_SET_NAVIGATED, location: this.location})
-        assert.equal(this.newState.getIn(['frames', 1, 'navbar', 'urlbar', 'location']), this.location)
-      })
-      it('does not update navbar for about:newtab nav', function () {
-        this.location = 'about:newtab'
-        this.newState = urlBarReducer(windowState, {actionType: windowConstants.WINDOW_SET_NAVIGATED, location: this.location, key: 3})
-        assert.equal(this.newState.getIn(['frames', 2, 'navbar', 'urlbar', 'location']), undefined)
-      })
-    })
-  })
-
-  describe('WINDOW_SET_NAVIGATION_ABORTED', function () {
+  describe('tabActions.didFinishNavigation', function () {
     before(function () {
+      this.newState = urlBarReducer(windowState, {actionType: tabActions.didFinishNavigation.name,
+        tabId: 2,
+        navigationState: Immutable.fromJS({
+          visibleEntry: {
+            virtualURL: 'about:preferences',
+            url: 'chrome-extension://blah/about-preferences.html'
+          },
+          activeEntry: {
+            virtualURL: 'dont pick this one',
+            url: 'dont pick this one either'
+          },
+          lastCommittedEntry: {
+            virtualURL: 'nope',
+            url: 'nope nope'
+          }
+        })
+      })
     })
-    it('sets the correct frame\'s text', function () {
-      // Active frame key is 2 but let's update tabId 1 (frameKey 1 too)
-      const action = {
-        actionType: windowConstants.WINDOW_SET_NAVIGATION_ABORTED,
-        tabId: 1,
-        location: 'https://facebook.com/'
-      }
-      this.newState = urlBarReducer(windowState, action)
-      assert.equal(this.newState.getIn(['frames', 0, 'navbar', 'urlbar', 'location']), action.location)
-      assert.equal(this.newState.getIn(['frames', 0, 'location']), action.location)
+
+    it('sets the urlbar location to the navigationEntry visible entry virtualURL', function () {
+      assert.equal(this.newState.getIn(['frames', 1, 'navbar', 'urlbar', 'location']), 'about:preferences')
+    })
+
+    it('turns off suggestions', function () {
+      assert.equal(this.newState.getIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'shouldRender']), false)
     })
   })
 
@@ -226,13 +227,6 @@ describe('urlBarReducer', function () {
 
     after(function () {
       mockery.disable()
-    })
-
-    describe('WINDOW_SET_NAVIGATED', function () {
-      it('turns off suggestions', function () {
-        const newState = urlBarReducer(windowState, {actionType: windowConstants.WINDOW_SET_NAVIGATED, location: 'http://brave.com'})
-        assert.equal(newState.getIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'shouldRender']), false)
-      })
     })
 
     describe('WINDOW_SET_FINDBAR_SHOWN', function () {

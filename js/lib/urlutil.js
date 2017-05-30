@@ -336,26 +336,6 @@ const UrlUtil = {
   },
 
   /**
-   * Gets location to display in the urlbar
-   * @param {string} url
-   * @param {boolean} pdfjsEnabled
-   * @return {string}
-   */
-  getDisplayLocation: function (url, pdfjsEnabled) {
-    if (!url || url === 'about:newtab') {
-      return ''
-    }
-    url = pdfjsEnabled ? UrlUtil.getLocationIfPDF(url) : url
-    const parsed = urlParse(url)
-    if (parsed && parsed.auth) {
-      parsed.auth = null
-      return urlFormat(parsed)
-    } else {
-      return url
-    }
-  },
-
-  /**
    * Gets the default favicon URL for a URL.
    * @param {string} url The URL to find a favicon for
    * @return {string} url The base favicon URL

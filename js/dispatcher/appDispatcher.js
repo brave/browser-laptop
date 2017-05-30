@@ -155,10 +155,6 @@ const ipcCargo = async.cargo((tasks, callback) => {
 }, 200)
 
 if (processType === 'browser') {
-  process.on('dispatch-action', (action) => {
-    appDispatcher.dispatch(action)
-  })
-
   ipc.on('app-dispatcher-register', (event) => {
     const registrant = event.sender
     const hostWebContents = event.sender.hostWebContents || event.sender
@@ -233,7 +229,7 @@ if (processType === 'browser') {
         payload.senderWindowId = win.id
       }
       payload.queryInfo = queryInfo
-      payload.senderTabId = event.sender.getId()
+      payload.tabId = payload.tabId == null ? event.sender.getId() : payload.tabId
 
       if (queryInfo.windowId === -2) {
         const activeWindow = BrowserWindow.getActiveWindow()
@@ -242,6 +238,10 @@ if (processType === 'browser') {
     }
     appDispatcher.dispatch(payload)
   }
+
+  process.on(messages.DISPATCH_ACTION, (action) => {
+    appDispatcher.dispatch(action)
+  })
 
   ipc.on(messages.DISPATCH_ACTION, (event, payload) => {
     payload = Serializer.deserialize(payload)
