@@ -25,6 +25,8 @@ To download the latest release, [see our releases page](https://github.com/brave
 
 You can also [visit our website](https://brave.com/downloads.html) to get the latest stable release (along with a more user-friendly download page).
 
+Brave supports 3 [release channels](https://github.com/brave/browser-laptop/wiki/Release-channels): release, beta, and developer.
+
 ## Community
 
 [Join the community](https://community.brave.com/) if you'd like to get more involved with Brave. You can [ask for help](https://community.brave.com/c/help-me),
