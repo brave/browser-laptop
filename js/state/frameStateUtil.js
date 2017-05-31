@@ -284,6 +284,7 @@ const frameOptsFromFrame = (frame) => {
     .delete('parentFrameKey')
     .delete('activeShortcut')
     .delete('activeShortcutDetails')
+    .delete('index')
     .deleteIn(['navbar', 'urlbar', 'suggestions'])
 }
 
@@ -291,7 +292,7 @@ const frameOptsFromFrame = (frame) => {
  * Adds a frame specified by frameOpts and newKey and sets the activeFrameKey
  * @return Immutable top level application state ready to merge back in
  */
-function addFrame (state, frameOpts, newKey, partitionNumber, activeFrameKey, insertionIndex) {
+function addFrame (state, frameOpts, newKey, partitionNumber, openInForeground, insertionIndex) {
   const frames = state.get('frames')
   const url = frameOpts.location || config.defaultUrl
 
@@ -324,7 +325,7 @@ function addFrame (state, frameOpts, newKey, partitionNumber, activeFrameKey, in
     loading: !!delayedLoadUrl,
     startLoadTime: delayedLoadUrl ? new Date().getTime() : null,
     endLoadTime: null,
-    lastAccessedTime: (activeFrameKey === newKey) ? new Date().getTime() : null,
+    lastAccessedTime: openInForeground ? new Date().getTime() : null,
     isPrivate: false,
     partitionNumber,
     pinnedLocation: isPinned ? url : undefined,
@@ -356,9 +357,15 @@ function addFrame (state, frameOpts, newKey, partitionNumber, activeFrameKey, in
     history: []
   }, frameOpts))
 
-  return {
+  const result = {
     frames: frames.splice(insertionIndex, 0, frame)
   }
+
+  if (openInForeground) {
+    result.activeFrameKey = newKey
+  }
+
+  return result
 }
 
 /**
