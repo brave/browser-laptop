@@ -1,4 +1,4 @@
-/* global describe, it, before, after, afterEach */
+/* global describe, it, before, beforeEach, after, afterEach */
 const Immutable = require('immutable')
 const assert = require('assert')
 const mockery = require('mockery')
@@ -7,10 +7,14 @@ const appConstants = require('../../../../../js/constants/appConstants')
 const dragTypes = require('../../../../../js/constants/dragTypes')
 const fakeElectron = require('../../../lib/fakeElectron')
 const fakeAdBlock = require('../../../lib/fakeAdBlock')
+const {tabCloseAction} = require('../../../../../app/common/constants/settingsEnums')
+const settings = require('../../../../../js/constants/settings')
 require('../../../braveUnit')
 
-describe('tabsReducer', function () {
+describe('tabsReducer unit tests', function () {
   let tabsReducer
+  let tabCloseSetting
+
   before(function () {
     mockery.enable({
       warnOnReplace: false,
@@ -20,30 +24,57 @@ describe('tabsReducer', function () {
     this.state = Immutable.fromJS({
       tabs: [{
         tabId: 1,
+        index: 0,
         windowId: 1,
         pinned: false,
         active: true
       }, {
         tabId: 2,
+        index: 1,
         pinned: true,
         windowId: 1
       }, {
         tabId: 3,
-        pinned: false,
-        windowId: 2,
-        active: true
-      }, {
-        tabId: 4,
+        index: 2,
         pinned: false,
         windowId: 2,
         active: false
+      }, {
+        tabId: 4,
+        index: 3,
+        pinned: false,
+        windowId: 2,
+        active: false
+      }, {
+        tabId: 5,
+        index: 4,
+        pinned: false,
+        windowId: 2,
+        active: true,
+        openerTabId: 4
       }],
       tabsInternal: {
         index: {
           1: 0,
           2: 1,
           3: 2,
-          4: 3
+          4: 3,
+          5: 4
+        },
+        displayIndex: {
+          1: {
+            0: 1,
+            1: 2
+          },
+          2: {
+            2: 3,
+            3: 4,
+            4: 5
+          }
+        },
+        lastActive: {
+          1: [0, 1],
+          2: [4, 3, 2]
         }
       },
       windows: [{
@@ -64,16 +95,25 @@ describe('tabsReducer', function () {
       },
       toggleDevTools: sinon.mock(),
       closeTab: sinon.mock(),
-      moveTo: sinon.mock()
+      moveTo: sinon.mock(),
+      setActive: sinon.spy()
     }
 
-    this.windowsAPI = {
-      closeWindow: sinon.mock()
-    }
+    this.windowsAPI = require('../../../../../app/browser/windows')
+    this.tabStateAPI = require('../../../../../app/common/state/tabState')
+
+    tabCloseSetting = tabCloseAction.PARENT
 
     mockery.registerMock('tabs', this.tabsAPI)
     mockery.registerMock('../tabs', this.tabsAPI)
     mockery.registerMock('../windows', this.windowsAPI)
+    mockery.registerMock('../../common/state/tabState', this.tabStateAPI)
+    mockery.registerMock('../../../js/settings', { getSetting: (settingKey, settingsCollection, value) => {
+      if (settingKey === settings.TAB_CLOSE_ACTION) {
+        return tabCloseSetting
+      }
+      return false
+    }})
     tabsReducer = require('../../../../../app/browser/reducers/tabsReducer')
   })
 
@@ -92,6 +132,7 @@ describe('tabsReducer', function () {
       // TODO
     })
   })
+
   describe.skip('APP_TAB_MOVED', function () {
     it('moves a tab', function () {
       // TODO
@@ -120,9 +161,138 @@ describe('tabsReducer', function () {
     })
   })
 
-  describe.skip('APP_TAB_CLOSED', function () {
-    it('closes tab?', function () {
-      // TODO
+  describe('APP_TAB_CLOSED', function () {
+    const action = {
+      actionType: appConstants.APP_TAB_CLOSED,
+      tabId: 5
+    }
+
+    before(function () {
+      this.clock = sinon.useFakeTimers()
+    })
+
+    after(function () {
+      this.clock.restore()
+    })
+
+    beforeEach(function () {
+      this.removeTabByTabIdSpy = sinon.stub(this.tabStateAPI, 'removeTabByTabId', (state) => state)
+      this.tabsAPI.setActive.reset()
+    })
+
+    afterEach(function () {
+      this.removeTabByTabIdSpy.restore()
+    })
+
+    it('calls tabState.removeTabByTabId', function () {
+      tabsReducer(this.state, action)
+      assert(this.tabStateAPI.removeTabByTabId.withArgs(this.state, action.tabId).calledOnce)
+    })
+
+    it('does nothing if tabId is TAB_ID_NONE', function () {
+      const invalidAction = {
+        actionType: action.actionType,
+        tabId: this.tabStateAPI.TAB_ID_NONE
+      }
+      tabsReducer(this.state, invalidAction)
+      this.clock.tick(1510)
+      assert(this.tabStateAPI.removeTabByTabId.notCalled)
+    })
+
+    describe('when updating active tab', function () {
+      describe('when TAB_CLOSE_ACTION is set to LAST_ACTIVE', function () {
+        before(function () {
+          tabCloseSetting = tabCloseAction.LAST_ACTIVE
+        })
+        after(function () {
+          tabCloseSetting = tabCloseAction.PARENT
+        })
+        it('chooses the last active tab', function () {
+          tabsReducer(this.state, action)
+          this.clock.tick(1510)
+          assert(this.tabsAPI.setActive.withArgs(3).calledOnce)
+        })
+      })
+
+      describe('when TAB_CLOSE_ACTION is set to NEXT', function () {
+        before(function () {
+          tabCloseSetting = tabCloseAction.NEXT
+        })
+        after(function () {
+          tabCloseSetting = tabCloseAction.PARENT
+        })
+        it('chooses the next tab', function () {
+          const pickNextAction = {
+            actionType: action.actionType,
+            tabId: 3
+          }
+          const testState = this.state
+            .setIn(['tabs', 2, 'active'], true)
+            .setIn(['tabs', 2, 'openerTabId'], 5)
+            .setIn(['tabsInternal', 'lastActive', '2'], Immutable.fromJS([4, 5, 3]))
+          tabsReducer(testState, pickNextAction)
+          this.clock.tick(1510)
+          assert(this.tabsAPI.setActive.withArgs(4).calledOnce)
+        })
+      })
+
+      describe('when TAB_CLOSE_ACTION is set to PARENT', function () {
+        it('chooses parent tab id (if parent tab was last active)', function () {
+          tabsReducer(this.state, action)
+          this.clock.tick(1510)
+          assert(this.tabsAPI.setActive.withArgs(4).calledOnce)
+        })
+      })
+
+      describe('when last active tab is not set', function () {
+        beforeEach(function () {
+          this.getLastActiveTabIdStub = sinon.stub(this.tabStateAPI, 'getLastActiveTabId')
+        })
+        afterEach(function () {
+          this.getLastActiveTabIdStub.restore()
+        })
+
+        it('chooses next unpinned tab if nextTabId is TAB_ID_NONE', function () {
+          const pickNextAction = {
+            actionType: action.actionType,
+            tabId: 3
+          }
+          const testState = this.state
+            .setIn(['tabs', 2, 'active'], true)
+            .setIn(['tabs', 3, 'active'], false)
+            .setIn(['tabs', 3, 'pinned'], true)
+          tabsReducer(testState, pickNextAction)
+          this.clock.tick(1510)
+          assert(this.tabsAPI.setActive.withArgs(5).calledOnce)
+        })
+
+        it('chooses previous unpinned tab if nextTabId is TAB_ID_NONE', function () {
+          const testState = this.state
+            .setIn(['tabs', 2, 'active'], true)
+            .setIn(['tabs', 3, 'active'], false)
+            .setIn(['tabs', 3, 'pinned'], true)
+          tabsReducer(testState, action)
+          this.clock.tick(1510)
+          assert(this.tabsAPI.setActive.withArgs(3).calledOnce)
+        })
+
+        describe('if no unpinned tabs come after this', function () {
+          it('considers pinned tabs which come after this', function () {
+            const pickNextAction = {
+              actionType: action.actionType,
+              tabId: 3
+            }
+            const testState = this.state
+              .setIn(['tabs', 2, 'active'], true)
+              .setIn(['tabs', 3, 'pinned'], true)
+              .setIn(['tabs', 4, 'active'], false)
+              .setIn(['tabs', 4, 'pinned'], true)
+            tabsReducer(testState, pickNextAction)
+            this.clock.tick(1510)
+            assert(this.tabsAPI.setActive.withArgs(4).calledOnce)
+          })
+        })
+      })
     })
   })
 
@@ -171,33 +341,161 @@ describe('tabsReducer', function () {
   describe('APP_TAB_CLOSE_REQUESTED', function () {
     const action = {
       actionType: appConstants.APP_TAB_CLOSE_REQUESTED,
-      tabId: 3
+      tabId: 1
     }
+
     before(function () {
       this.clock = sinon.useFakeTimers()
     })
+
     after(function () {
       this.clock.restore()
     })
+
+    beforeEach(function () {
+      this.closeWindowSpy = sinon.spy(this.windowsAPI, 'closeWindow')
+    })
+
     afterEach(function () {
       this.tabsAPI.toggleDevTools.reset()
       this.tabsAPI.closeTab.reset()
       this.tabsAPI.moveTo.reset()
-      this.tabsAPI.isDevToolsFocused.restore()
+      this.closeWindowSpy.restore()
     })
-    it('closes devtools when opened and focused', function () {
-      this.isDevToolsFocused = sinon.stub(this.tabsAPI, 'isDevToolsFocused', () => true)
-      tabsReducer(this.state, action)
-      this.clock.tick(1510)
-      assert(this.tabsAPI.toggleDevTools.withArgs(this.state, 1).calledOnce)
-      assert(this.tabsAPI.closeTab.notCalled)
+
+    describe('when tabId == TAB_ID_ACTIVE', function () {
+      beforeEach(function () {
+        this.getActiveTabIdSpy = sinon.spy(this.tabStateAPI, 'getActiveTabId')
+      })
+      afterEach(function () {
+        this.getActiveTabIdSpy.restore()
+      })
+      it('calls getActiveTabId to get the actual tabId', function () {
+        const actionActiveTab = {
+          actionType: action.actionType,
+          tabId: this.tabStateAPI.TAB_ID_ACTIVE
+        }
+        tabsReducer(this.state, actionActiveTab)
+        this.clock.tick(1510)
+        assert(this.tabStateAPI.getActiveTabId.withArgs(this.state, 1).calledOnce)
+      })
     })
-    it('closes tab when tab is focused with no devtools', function () {
-      this.isDevToolsFocused = sinon.stub(this.tabsAPI, 'isDevToolsFocused', () => false)
-      tabsReducer(this.state, action)
-      this.clock.tick(1510)
-      assert(this.tabsAPI.toggleDevTools.notCalled)
-      assert(this.tabsAPI.closeTab.withArgs(this.state, 1).calledOnce)
+
+    describe('when tabId == TAB_ID_NONE', function () {
+      it('exits without taking action', function () {
+        const actionNoTab = {
+          actionType: action.actionType,
+          tabId: this.tabStateAPI.TAB_ID_NONE
+        }
+        tabsReducer(this.state, actionNoTab)
+        this.clock.tick(1510)
+        assert(this.tabsAPI.toggleDevTools.notCalled)
+        assert(this.tabsAPI.closeTab.notCalled)
+        assert(this.windowsAPI.closeWindow.notCalled)
+      })
+    })
+
+    describe('with isDevToolsFocused', function () {
+      afterEach(function () {
+        this.tabsAPI.isDevToolsFocused.restore()
+      })
+
+      describe('when true', function () {
+        beforeEach(function () {
+          this.isDevToolsFocused = sinon.stub(this.tabsAPI, 'isDevToolsFocused', () => true)
+          this.tabStateAPI.resolveTabId = sinon.stub(this.tabStateAPI, 'resolveTabId', () => {
+            return action.tabId
+          })
+        })
+        afterEach(function () {
+          this.tabStateAPI.resolveTabId.restore()
+        })
+
+        it('closes devtools when opened and focused', function () {
+          tabsReducer(this.state, action)
+          this.clock.tick(1510)
+          assert(this.tabsAPI.toggleDevTools.withArgs(this.state, 1).calledOnce)
+          assert(this.tabsAPI.closeTab.notCalled)
+        })
+      })
+
+      describe('when false', function () {
+        beforeEach(function () {
+          this.isDevToolsFocused = sinon.stub(this.tabsAPI, 'isDevToolsFocused', () => false)
+        })
+        afterEach(function () {
+          this.tabStateAPI.getNonPinnedTabsByWindowId.restore()
+          this.tabStateAPI.getPinnedTabsByWindowId.restore()
+        })
+
+        describe('when more than 1 tab exists', function () {
+          beforeEach(function () {
+            this.nonPinnedTabs = sinon.stub(this.tabStateAPI, 'getNonPinnedTabsByWindowId', (state, windowId) => {
+              return Immutable.fromJS([{
+                tabId: 1,
+                windowId: 1,
+                pinned: false,
+                active: true
+              }, {
+                tabId: 2,
+                pinned: false,
+                windowId: 1
+              }])
+            })
+            this.pinnedTabs = sinon.stub(this.tabStateAPI, 'getPinnedTabsByWindowId', (state, windowId) => Immutable.fromJS([]))
+          })
+
+          it('closes tab', function () {
+            tabsReducer(this.state, action)
+            this.clock.tick(1510)
+            assert(this.tabsAPI.toggleDevTools.notCalled)
+            assert(this.tabsAPI.closeTab.withArgs(action.tabId, undefined).calledOnce)
+          })
+        })
+
+        describe('when there are no tabs left', function () {
+          beforeEach(function () {
+            this.nonPinnedTabs = sinon.stub(this.tabStateAPI, 'getNonPinnedTabsByWindowId', (state, windowId) => {
+              return Immutable.fromJS([{
+                tabId: 1,
+                windowId: 1,
+                pinned: false,
+                active: true
+              }])
+            })
+          })
+
+          describe('when pinnedTabs.size > 0', function () {
+            beforeEach(function () {
+              this.pinnedTabs = sinon.stub(this.tabStateAPI, 'getPinnedTabsByWindowId', (state, windowId) => Immutable.fromJS([{
+                tabId: 2,
+                windowId: 1,
+                pinned: true
+              }]))
+            })
+
+            it('closes tab', function () {
+              tabsReducer(this.state, action)
+              this.clock.tick(1510)
+              assert(this.tabsAPI.toggleDevTools.notCalled)
+              assert(this.tabsAPI.closeTab.withArgs(action.tabId, undefined).calledOnce)
+            })
+          })
+
+          describe('when pinnedTabs.size == 0', function () {
+            beforeEach(function () {
+              this.pinnedTabs = sinon.stub(this.tabStateAPI, 'getPinnedTabsByWindowId', (state, windowId) => Immutable.fromJS([]))
+            })
+
+            it('closes window when there are no tabs left', function () {
+              tabsReducer(this.state, action)
+              this.clock.tick(1510)
+              assert(this.tabsAPI.toggleDevTools.notCalled)
+              assert(this.windowsAPI.closeWindow.withArgs(this.state, 1).calledOnce)
+            })
+          })
+        })
+      })
     })
   })
 

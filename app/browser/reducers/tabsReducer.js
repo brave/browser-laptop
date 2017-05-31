@@ -47,7 +47,7 @@ const updateActiveTab = (state, closeTabId) => {
     case tabCloseAction.LAST_ACTIVE:
       nextTabId = tabState.getLastActiveTabId(state, windowId)
       break
-    default:
+    case tabCloseAction.PARENT:
       {
         const openerTabId = tabState.getOpenerTabId(state, closeTabId)
         const lastActiveTabId = tabState.getLastActiveTabId(state, windowId)
@@ -65,11 +65,6 @@ const updateActiveTab = (state, closeTabId) => {
       // no unpinned tabs so find the next pinned tab
       nextTabId = tabState.getNextTabIdByIndex(state, windowId, index, true)
     }
-  }
-
-  // if we can't find anything else just pick the first tab
-  if (nextTabId === tabState.TAB_ID_NONE) {
-    nextTabId = tabState.getTabIdByIndex(state, windowId, 0, true)
   }
 
   if (nextTabId !== tabState.TAB_ID_NONE) {
