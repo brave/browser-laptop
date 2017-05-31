@@ -510,6 +510,7 @@ describe('tab tests', function () {
         .detachTabByIndex(1)
         .waitForWindowCount(2)
         .waitForTab({index: 0, url: this.page1, windowId: 2})
+        .waitForElementCount('.frameWrapper.isActive', 1)
     })
 
     it('can move into an existing window', function * () {
