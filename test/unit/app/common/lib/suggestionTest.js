@@ -320,6 +320,28 @@ describe('suggestion unit tests', function () {
         assert(this.sort('www.google.com', 'mygoogle.com') < 0)
       })
     })
+    describe('getSortForSearchSuggestions', function () {
+      it('0 if suggestions are not URLs', function () {
+        const sort = suggestion.getSortForSearchSuggestions('bug')
+        assert.equal(sort('foo', 'bar'), 0)
+      })
+      it('0 if suggestions are the same', function () {
+        const sort = suggestion.getSortForSearchSuggestions('bug')
+        assert.equal(sort('http://foo.com', 'http://foo.com'), 0)
+      })
+      it('0 if user input starts with HTTP', function () {
+        const sort = suggestion.getSortForSearchSuggestions('http://')
+        assert.equal(sort('http://foo.com', 'foo'), 0)
+      })
+      it('negative if second suggestion is HTTP', function () {
+        const sort = suggestion.getSortForSearchSuggestions('bug')
+        assert.equal(sort('bugs', 'http://bug'), -1)
+      })
+      it('positive if first suggestion is HTTP', function () {
+        const sort = suggestion.getSortForSearchSuggestions('bug')
+        assert.equal(sort('https://bug', 'bugs'), 1)
+      })
+    })
     describe('getSortForSuggestions', function () {
       describe('with url entered as path', function () {
         before(function () {

@@ -8,6 +8,7 @@ const _ = require('underscore')
 const Immutable = require('immutable')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const {isUrl, aboutUrls, isNavigatableAboutPage, isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
+const {isHttpOrHttps} = require('../../../js/lib/urlutil')
 const suggestionTypes = require('../../../js/constants/suggestionTypes')
 const getSetting = require('../../../js/settings').getSetting
 const settings = require('../../../js/constants/settings')
@@ -303,6 +304,25 @@ const getSortByDomainForHosts = (userInputHost) => {
 }
 
 /**
+ * Returns a function that sorts search suggestion results.
+ * Results starting with 'http://' or 'https://' are de-prioritized.
+ */
+const getSortForSearchSuggestions = (userInput) => {
+  return (s1, s2) => {
+    if (userInput.startsWith('http')) {
+      return 0
+    }
+    if (!isHttpOrHttps(s1) && isHttpOrHttps(s2)) {
+      return -1
+    }
+    if (isHttpOrHttps(s1) && !isHttpOrHttps(s2)) {
+      return 1
+    }
+    return 0
+  }
+}
+
+/**
  * Sorts 2 URLS by if they are a simple URL or not.
  * Returns the normal -1, 1, or 0 result for sort functions.
  */
@@ -526,11 +546,13 @@ const getSearchSuggestions = (state, tabId, urlLocationLower) => {
     let suggestionsList = Immutable.List()
     if (getSetting(settings.OFFER_SEARCH_SUGGESTIONS)) {
       const searchResults = state.get('searchResults')
+      const sortHandler = getSortForSearchSuggestions(urlLocationLower)
       if (searchResults) {
         suggestionsList = mapListToElements({
           data: searchResults,
           maxResults: config.urlBarSuggestions.maxSearch,
-          type: suggestionTypes.SEARCH
+          type: suggestionTypes.SEARCH,
+          sortHandler
         })
       }
     }
@@ -606,6 +628,7 @@ module.exports = {
   sortingPriority,
   sortByAccessCountWithAgeDecay,
   getSortForSuggestions,
+  getSortForSearchSuggestions,
   getSortByPath,
   sortBySimpleURL,
   getSortByDomainForSites,

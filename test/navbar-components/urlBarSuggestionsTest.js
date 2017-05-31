@@ -1,4 +1,4 @@
-/* global describe, it, before, beforeEach */
+/* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
 const settings = require('../../js/constants/settings')
@@ -205,19 +205,17 @@ describe('urlBarSuggestions', function () {
 })
 
 describe('search suggestions', function () {
-  Brave.beforeAll(this)
+  Brave.beforeEach(this)
 
-  before(function * () {
+  beforeEach(function * () {
     yield this.app.client
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
       .waitForVisible(urlInput)
+      .changeSetting(settings.OFFER_SEARCH_SUGGESTIONS, true)
   })
 
   it('Finds search suggestions and performs a search when selected', function * () {
-    yield this.app.client
-      .changeSetting(settings.OFFER_SEARCH_SUGGESTIONS, true)
-
     // Until a refactor happens with search suggestions,
     // they are a bit fragile if you aren't actually typing.
     // So this for loop avoids an intermittent failure.
@@ -238,5 +236,22 @@ describe('search suggestions', function () {
       .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]:not(.selected)')
       .keys(Brave.keys.ENTER)
       .waitForInputText(urlInput, /google.*\/.*q=what.+is/)
+  })
+
+  it('does not offer URL suggestions if user is not typing a URL', function * () {
+    const input = 'bug'
+    for (let i = 0; i < input.length; i++) {
+      yield this.app.client
+        .pause(50)
+        .keys(input[i])
+    }
+    yield this.app.client
+      .waitForVisible(urlBarSuggestions)
+      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="2"]')
+      .waitUntil(function () {
+        return this.getText(urlBarSuggestions).then((text) => {
+          return text.includes('bug') && !text.includes('http')
+        })
+      })
   })
 })
