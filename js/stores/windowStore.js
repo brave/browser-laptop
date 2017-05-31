@@ -174,20 +174,22 @@ const newFrame = (state, frameOpts, openInForeground, insertionIndex, nextKey) =
 
   if (nextKey === undefined) {
     nextKey = incrementNextKey()
+    openInForeground = true
   }
 
   state = state.merge(
     frameStateUtil.addFrame(
       state, frameOpts,
-      nextKey, frameOpts.partitionNumber, openInForeground || typeof state.get('activeFrameKey') !== 'number' ? nextKey : state.get('activeFrameKey'), insertionIndex))
+      nextKey, frameOpts.partitionNumber, openInForeground, insertionIndex))
 
   state = frameStateUtil.updateFramesInternalIndex(state, insertionIndex)
 
   if (openInForeground) {
     const activeFrame = frameStateUtil.getActiveFrame(state)
+    const tabId = activeFrame.get('tabId')
     state = updateTabPageIndex(state, activeFrame)
-    if (activeFrame.get('tabId')) {
-      appActions.tabActivateRequested(activeFrame.get('tabId'))
+    if (tabId) {
+      appActions.tabActivateRequested(tabId)
     }
   }
 
