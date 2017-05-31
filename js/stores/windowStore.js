@@ -353,8 +353,10 @@ const doAction = (action) => {
       break
     case windowConstants.WINDOW_SET_PREVIEW_FRAME:
       windowState = windowState.merge({
-        previewFrameKey: action.frameKey != null && action.frameKey !== windowState.get('activeFrameKey')
-          ? action.frameKey : null
+        previewFrameKey:
+          action.frameKey != null && !frameStateUtil.isFrameKeyActive(windowState, action.frameKey)
+          ? action.frameKey
+          : null
       })
       break
     case windowConstants.WINDOW_SET_PREVIEW_TAB_PAGE_INDEX:
