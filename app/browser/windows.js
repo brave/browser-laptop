@@ -328,7 +328,7 @@ const api = {
     let win = api.getWindow(windowId)
     try {
       setImmediate(() => {
-        if (!win.isDestroyed()) {
+        if (win && !win.isDestroyed()) {
           win.close()
         }
       })
