@@ -283,9 +283,9 @@ class AboutStyle extends ImmutableComponent {
           &lt;BrowserButton l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
-        <button data-l10n-id='actionButton' className='browserButton actionButton' onClick={this.onRemoveBookmark} />
+        <BrowserButton actionItem l10nId='actionButton' onClick={this.onRemoveBookmark} />
         <Pre><Code>
-          &lt;button data-l10n-id='done' className='browserButton actionButton'{'\n'}
+          &lt;BrowserButton actionItem l10nId='done'{'\n'}
           onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 

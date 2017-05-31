@@ -14,6 +14,9 @@ class BrowserButton extends ImmutableComponent {
       this.props.primaryColor && [styles.browserButton_default, styles.browserButton_primaryColor],
       this.props.secondaryColor && [styles.browserButton_default, styles.browserButton_secondaryColor],
       this.props.subtleItem && [styles.browserButton_default, styles.browserButton_subtleItem],
+      // actionItem is just subtleItem with a blue background
+      this.props.actionItem &&
+        [styles.browserButton_default, styles.browserButton_subtleItem, styles.browserButton_actionItem],
       this.props.extensionItem && styles.browserButton_extensionItem,
       this.props.groupedItem && styles.browserButton_groupedItem,
       this.props.notificationItem && styles.browserButton_notificationItem
@@ -21,7 +24,6 @@ class BrowserButton extends ImmutableComponent {
       // that needs to be refactored and included in this file
       // .............................................
       // this.props.smallItem && styles.browserButton_smallItem,
-      // this.props.actionItem && styles.browserButton_actionItem,
       // this.props.navItem && styles.browserButton_navItem,
       // this.props.panelItem && styles.browserButton_panelItem,
     ]
@@ -178,6 +180,10 @@ const styles = StyleSheet.create({
     ':active': {
       bottom: 0
     }
+  },
+
+  browserButton_actionItem: {
+    background: globalStyles.button.action.backgroundColor
   }
 })
 
