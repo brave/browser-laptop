@@ -107,17 +107,15 @@ class AppDispatcher {
         ipcCargo.push(payload)
         return
       } else {
-        if (!payload.queryInfo || !payload.queryInfo.windowId || payload.queryInfo.windowId === currentWindow.getCurrentWindowId()) {
+        // only handle actions that are for this window
+        if (!payload.queryInfo || payload.queryInfo.windowId == null || payload.queryInfo.windowId === currentWindow.getCurrentWindowId()) {
           this.dispatchToOwnRegisteredCallbacks(payload)
-          // We still want to tell the browser prcoess about app actions for payloads with a windowId
-          // specified for the current window, but we don't want the browser process to forward it back
-          // to us.
-          if (payload.queryInfo) {
-            payload.queryInfo.alreadyHandledByRenderer = payload.queryInfo.windowId === currentWindow.getCurrentWindowId()
-          }
         }
-        cb()
-        ipcCargo.push(payload)
+        // only forward actions that have not been relayed through the browser process
+        if (payload.senderWindowId == null) {
+          cb()
+          ipcCargo.push(payload)
+        }
         return
       }
     }
@@ -159,7 +157,11 @@ const ipcCargo = async.cargo((tasks, callback) => {
 
 if (processType === 'browser') {
   ipc.on('app-dispatcher-register', (event) => {
-    let registrant = event.sender
+    const registrant = event.sender
+    const hostWebContents = event.sender.hostWebContents || event.sender
+    const win = BrowserWindow.fromWebContents(hostWebContents)
+    const windowId = win.id
+
     const registrantCargo = async.cargo((tasks, callback) => {
       if (!registrant.isDestroyed()) {
         registrant.send(messages.DISPATCH_ACTION, Serializer.serialize(tasks))
@@ -172,6 +174,22 @@ if (processType === 'browser') {
         if (registrant.isDestroyed()) {
           appDispatcher.unregister(callback)
         } else {
+          // don't forward to windows unless queryInfo exists
+          if (!payload.queryInfo) {
+            return
+          }
+
+          // don't forward messages from other windows unless they have a windowId
+          if (payload.queryInfo.windowId == null && payload.senderWindowId != null) {
+            return
+          }
+
+          // only forward to the destination windowId and only if it wasn't the sender
+          if (payload.queryInfo.windowId != null) {
+            if (payload.queryInfo.windowId !== windowId || payload.senderWindowId === windowId) {
+              return
+            }
+          }
           registrantCargo.push(payload)
         }
       } catch (e) {
@@ -202,7 +220,7 @@ if (processType === 'browser') {
         // because other messages come from the main window
 
         // default to the windowId of the hostWebContents
-        if (!queryInfo.windowId && win) {
+        if (queryInfo.windowId == null && win) {
           queryInfo.windowId = win.id
         }
       }
@@ -211,6 +229,11 @@ if (processType === 'browser') {
         payload.senderWindowId = win.id
       }
       payload.senderTabId = event.sender.getId()
+
+      if (queryInfo.windowId === -2) {
+        const activeWindow = BrowserWindow.getActiveWindow()
+        queryInfo.windowId = activeWindow ? activeWindow.id : undefined
+      }
     }
     appDispatcher.dispatch(payload)
   }
@@ -220,6 +243,13 @@ if (processType === 'browser') {
 
     for (var i = 0; i < payload.length; i++) {
       dispatchEventPayload(event, payload[i])
+    }
+  })
+} else if (processType === 'renderer') {
+  ipc.on(messages.DISPATCH_ACTION, (e, serializedPayload) => {
+    let payload = Serializer.deserialize(serializedPayload)
+    for (var i = 0; i < payload.length; i++) {
+      appDispatcher.dispatch(payload[i])
     }
   })
 }

@@ -16,11 +16,9 @@ const messages = require('../constants/messages')
 const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
 const UrlUtil = require('../lib/urlutil')
-const {getCurrentWindowId, isFocused} = require('../../app/renderer/currentWindow')
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
 const { makeImmutable } = require('../../app/common/state/immutableUtil')
 const {aboutUrls, getTargetAboutUrl, newFrameUrl} = require('../lib/appUrlUtil')
-const Serializer = require('../dispatcher/serializer')
 const {updateTabPageIndex} = require('../../app/renderer/lib/tabUtil')
 const assert = require('assert')
 const contextMenuState = require('../../app/common/state/contextMenuState')
@@ -795,26 +793,6 @@ frameShortcuts.forEach((shortcut) => {
       })
       emitChanges()
     })
-  }
-})
-
-const dispatchEventPayload = (e, payload) => {
-  let queryInfo = payload.queryInfo || payload.frameProps || {}
-  queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
-  if (queryInfo.windowId === -2 && isFocused()) {
-    queryInfo.windowId = getCurrentWindowId()
-  }
-  // handle any ipc dispatches that are targeted to this window
-  if (queryInfo.windowId && queryInfo.windowId === getCurrentWindowId() && !queryInfo.alreadyHandledByRenderer) {
-    doAction(payload)
-  }
-}
-
-// Allows the parent process to dispatch window actions
-ipc.on(messages.DISPATCH_ACTION, (e, serializedPayload) => {
-  let payload = Serializer.deserialize(serializedPayload)
-  for (var i = 0; i < payload.length; i++) {
-    dispatchEventPayload(e, payload[i])
   }
 })
 
