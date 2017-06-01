@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.15.314](https://github.com/brave/browser-laptop/releases/v0.15.314dev)
+ - Fixed 'autocomplete search term' results are not filtering out 'http...' results. ([#9141](https://github.com/brave/browser-laptop/issues/9141))
+ - Fixed WebView Not Visible in Popup Window. ([#9095](https://github.com/brave/browser-laptop/issues/9095))
+ - Fixed password update new value is not saved in certain scenarios. ([#9028](https://github.com/brave/browser-laptop/issues/9028))
+ - Upgrade to muon 3.0.202. ([#9156](https://github.com/brave/browser-laptop/issues/9156))
+
 ## [0.15.310](https://github.com/brave/browser-laptop/releases/v0.15.300dev)
 
  - Optimized various UI features for when user has large amounts of data. ([#9079](https://github.com/brave/browser-laptop/issues/9079))
