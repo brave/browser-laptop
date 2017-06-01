@@ -22,6 +22,7 @@ const dialog = electron.dialog
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 const {fileUrl} = require('../../js/lib/appUrlUtil')
+const {isValidClosedFrame} = require('../../js/state/frameStateUtil')
 const menuUtil = require('../common/lib/menuUtil')
 const {getByTabId} = require('../common/state/tabState')
 const getSetting = require('../../js/settings').getSetting
@@ -33,7 +34,7 @@ const isLinux = process.platform === 'linux'
 
 let appMenu = null
 // TODO(bridiver) - these should be handled in the appStore
-let closedFrames = {}
+let closedFrames = new Immutable.OrderedMap()
 let lastClosedUrl = null
 let currentLocation = null
 
@@ -335,19 +336,30 @@ const createHistorySubmenu = () => {
       }
     }
   ]
-  submenu = submenu.concat(menuUtil.createRecentlyClosedTemplateItems(Immutable.fromJS(Object.keys(closedFrames).map(key => closedFrames[key]))))
+  const recentlyClosedItems = menuUtil.createRecentlyClosedTemplateItems(closedFrames)
+  submenu = submenu.concat(recentlyClosedItems)
 
   submenu.push(
-    // TODO: recently visited
-    // CommonMenu.separatorMenuItem,
-    // {
-    //   label: locale.translation('recentlyVisited'),
-    //   enabled: false
-    // },
     CommonMenu.separatorMenuItem,
-    CommonMenu.historyMenuItem())
+    CommonMenu.historyMenuItem()
+  )
 
   return submenu
+}
+
+const updateRecentlyClosedMenuItems = () => {
+  // Update electron menu (Mac / Linux)
+  menuUtil.updateRecentlyClosedMenuItems(appMenu, closedFrames)
+  Menu.setApplicationMenu(appMenu)
+
+  // Update in-memory menu template (Windows)
+  const oldTemplate = appStore.getState().getIn(['menu', 'template'])
+  const historySubmenuKey = oldTemplate.findKey(value =>
+    value.get('label') === locale.translation('history')
+  )
+  const newSubmenu = Immutable.fromJS(createHistorySubmenu())
+  const newTemplate = oldTemplate.set(historySubmenuKey, newSubmenu)
+  appActions.setMenubarTemplate(newTemplate)
 }
 
 const isCurrentLocationBookmarked = () => {
@@ -618,27 +630,31 @@ const doAction = (action) => {
       break
     case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
       appDispatcher.waitFor([appStore.dispatchToken], () => {
-        delete closedFrames[lastClosedUrl]
-        createMenu()
+        if (!lastClosedUrl) {
+          return
+        }
+        closedFrames = closedFrames.delete(lastClosedUrl)
+        const nextLastFrame = closedFrames.last()
+        lastClosedUrl = nextLastFrame ? nextLastFrame.get('location') : null
+        updateRecentlyClosedMenuItems()
       })
       break
     case windowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
       appDispatcher.waitFor([appStore.dispatchToken], () => {
-        closedFrames = {}
+        closedFrames = new Immutable.OrderedMap()
         lastClosedUrl = null
-        createMenu()
+        updateRecentlyClosedMenuItems()
       })
       break
     case appConstants.APP_TAB_CLOSE_REQUESTED:
       appDispatcher.waitFor([appStore.dispatchToken], () => {
         action = makeImmutable(action)
         const tab = getByTabId(appStore.getState(), action.get('tabId'))
-        if (tab && !tab.get('incognito') && tab.get('url') !== 'about:newtab') {
-          if (tab.get('frame')) {
-            lastClosedUrl = tab.get('url')
-            closedFrames[tab.get('url')] = tab.get('frame')
-            createMenu()
-          }
+        const frame = tab && tab.get('frame')
+        if (tab && !tab.get('incognito') && frame && isValidClosedFrame(frame)) {
+          lastClosedUrl = tab.get('url')
+          closedFrames = closedFrames.set(tab.get('url'), tab.get('frame'))
+          updateRecentlyClosedMenuItems()
         }
       })
       break
