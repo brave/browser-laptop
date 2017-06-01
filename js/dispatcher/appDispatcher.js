@@ -8,13 +8,25 @@ const async = require('async')
 const Serializer = require('./serializer')
 const messages = require('../constants/messages')
 let ipc
+let processType
+let currentWindow
+let BrowserWindow
 
-if (typeof chrome !== 'undefined') { // eslint-disable-line
+if (typeof process !== 'undefined') {
+  if (process.type === 'renderer') {
+    processType = 'renderer'
+    ipc = require('electron').ipcRenderer
+    currentWindow = require('../../app/renderer/currentWindow')
+  } else if (process.type === 'browser') {
+    processType = 'browser'
+    BrowserWindow = require('electron').BrowserWindow
+    ipc = require('electron').ipcMain
+  }
+} else if (typeof chrome !== 'undefined' && typeof chrome.ipcRenderer === 'function') {
+  processType = 'extension-page'
   ipc = chrome.ipcRenderer // eslint-disable-line
-} else if (process.type === 'renderer') {
-  ipc = require('electron').ipcRenderer
-} else if (process.type === 'browser') {
-  ipc = require('electron').ipcMain
+} else {
+  throw new Error('No ipc available in context')
 }
 
 class AppDispatcher {
@@ -89,20 +101,19 @@ class AppDispatcher {
   }
 
   dispatchInternal (payload, cb) {
-    if (process.type === 'renderer') {
+    if (processType === 'renderer') {
       if (window.location.protocol === 'chrome-extension:') {
         cb()
         ipcCargo.push(payload)
         return
       } else {
-        const {getCurrentWindowId} = require('../../app/renderer/currentWindow')
-        if (!payload.queryInfo || !payload.queryInfo.windowId || payload.queryInfo.windowId === getCurrentWindowId()) {
+        if (!payload.queryInfo || !payload.queryInfo.windowId || payload.queryInfo.windowId === currentWindow.getCurrentWindowId()) {
           this.dispatchToOwnRegisteredCallbacks(payload)
           // We still want to tell the browser prcoess about app actions for payloads with a windowId
           // specified for the current window, but we don't want the browser process to forward it back
           // to us.
           if (payload.queryInfo) {
-            payload.queryInfo.alreadyHandledByRenderer = payload.queryInfo.windowId === getCurrentWindowId()
+            payload.queryInfo.alreadyHandledByRenderer = payload.queryInfo.windowId === currentWindow.getCurrentWindowId()
           }
         }
         cb()
@@ -146,7 +157,7 @@ const ipcCargo = async.cargo((tasks, callback) => {
   callback()
 }, 200)
 
-if (process.type === 'browser') {
+if (processType === 'browser') {
   ipc.on('app-dispatcher-register', (event) => {
     let registrant = event.sender
     const registrantCargo = async.cargo((tasks, callback) => {
@@ -183,7 +194,7 @@ if (process.type === 'browser') {
     if (!sender.isDestroyed()) {
       const hostWebContents = sender.hostWebContents
       sender = hostWebContents || sender
-      const win = require('electron').BrowserWindow.fromWebContents(sender)
+      const win = BrowserWindow.fromWebContents(sender)
 
       if (hostWebContents) {
         // received from an extension

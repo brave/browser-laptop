@@ -4,8 +4,6 @@
 
 const { makeImmutable, isMap, isList } = require('./immutableUtil')
 const assert = require('assert')
-const defaultBrowserState = require('./defaultBrowserState')
-const shieldState = require('./shieldState')
 
 // TODO(bridiver) - make these generic validation functions
 const validateId = function (propName, id) {
@@ -162,6 +160,8 @@ const api = {
   // TODO (nejc) we should only pass in one state
   // refactor when window state is merged into app state
   shouldAllowWindowDrag: (state, windowState, frame, isFocused) => {
+    const shieldState = require('./shieldState')
+    const defaultBrowserState = require('./defaultBrowserState')
     const braveryPanelIsVisible = shieldState.braveShieldsEnabled(frame) &&
       windowState.get('braveryPanelDetail')
     const checkDefaultBrowserDialogIsVisible = isFocused &&
