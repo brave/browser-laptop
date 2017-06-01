@@ -98,16 +98,16 @@ const addToHistory = (frameProps) => {
   return history.slice(-10)
 }
 
-const newFrame = (state, frameOpts, openInForeground, insertionIndex, nextKey) => {
+const newFrame = (state, frameOpts, openInForeground) => {
   if (frameOpts === undefined) {
     frameOpts = {}
   }
   frameOpts = frameOpts.toJS ? frameOpts.toJS() : frameOpts
 
   // handle tabs.create properties
-  insertionIndex = frameOpts.index !== undefined
+  let insertionIndex = frameOpts.index !== undefined
     ? frameOpts.index
-    : insertionIndex
+    : undefined
 
   if (frameOpts.partition) {
     frameOpts.isPrivate = frameStateUtil.isPrivatePartition(frameOpts.partition)
@@ -121,7 +121,8 @@ const newFrame = (state, frameOpts, openInForeground, insertionIndex, nextKey) =
     openInForeground = frameOpts.disposition !== 'background-tab'
   }
 
-  if (openInForeground === undefined) {
+  const activeFrame = frameStateUtil.getActiveFrame(state)
+  if (openInForeground === undefined || !activeFrame) {
     openInForeground = true
   }
 
@@ -172,10 +173,7 @@ const newFrame = (state, frameOpts, openInForeground, insertionIndex, nextKey) =
     insertionIndex = 0
   }
 
-  if (nextKey === undefined) {
-    nextKey = incrementNextKey()
-    openInForeground = true
-  }
+  const nextKey = incrementNextKey()
 
   state = state.merge(
     frameStateUtil.addFrame(
