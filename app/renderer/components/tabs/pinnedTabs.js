@@ -6,12 +6,15 @@ const React = require('react')
 const ReactDOM = require('react-dom')
 
 // Components
-const ImmutableComponent = require('../immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 const Tab = require('./tab')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
 const windowActions = require('../../../../js/actions/windowActions')
+
+// Store
+const windowStore = require('../../../../js/stores/windowStore')
 
 // Constants
 const siteTags = require('../../../../js/constants/siteTags')
@@ -21,13 +24,18 @@ const dragTypes = require('../../../../js/constants/dragTypes')
 const siteUtil = require('../../../../js/state/siteUtil')
 const dnd = require('../../../../js/dnd')
 const dndData = require('../../../../js/dndData')
+const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {isIntermediateAboutPage} = require('../../../../js/lib/appUrlUtil')
 
-class PinnedTabs extends ImmutableComponent {
-  constructor () {
-    super()
+class PinnedTabs extends React.Component {
+  constructor (props) {
+    super(props)
     this.onDragOver = this.onDragOver.bind(this)
     this.onDrop = this.onDrop.bind(this)
+  }
+
+  dropFrame (frameKey) {
+    return windowStore.getFrame(frameKey)
   }
 
   onDrop (e) {
@@ -42,15 +50,16 @@ class PinnedTabs extends ImmutableComponent {
     // will cause the onDragEnd to never run
     setTimeout(() => {
       const key = sourceDragData.get('key')
-      let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter((node) => node && node.props.frame.get('key') !== key), clientX).selectedRef
+      let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter((node) => node && node.props.frameKey !== key), clientX).selectedRef
       if (droppedOnTab) {
         const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), clientX)
-        windowActions.moveTab(key, droppedOnTab.props.frame.get('key'), isLeftSide)
+        windowActions.moveTab(key, droppedOnTab.props.frameKey, isLeftSide)
         if (!sourceDragData.get('pinnedLocation')) {
           appActions.tabPinned(sourceDragData.get('tabId'), true)
         } else {
           const sourceDetails = siteUtil.getDetailFromFrame(sourceDragData, siteTags.PINNED)
-          const destinationDetails = siteUtil.getDetailFromFrame(droppedOnTab.props.frame, siteTags.PINNED)
+          const droppedOnFrame = this.dropFrame(droppedOnTab.props.frameKey)
+          const destinationDetails = siteUtil.getDetailFromFrame(droppedOnFrame, siteTags.PINNED)
           appActions.moveSite(siteUtil.getSiteKey(sourceDetails),
             siteUtil.getSiteKey(destinationDetails),
             isLeftSide)
@@ -64,26 +73,35 @@ class PinnedTabs extends ImmutableComponent {
     e.preventDefault()
   }
 
+  mergeProps (state, dispatchProps, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const pinnedFrames = frameStateUtil.getPinnedFrames(currentWindow)
+
+    const props = {}
+    // used in renderer
+    props.pinnedTabs = pinnedFrames.map((frame) => frame.get('key'))
+
+    return props
+  }
+
   render () {
     this.tabRefs = []
-    return <div className='pinnedTabs'
+    return <div
+      className='pinnedTabs'
       onDragOver={this.onDragOver}
       onDrop={this.onDrop}>
       {
          this.props.pinnedTabs
-           .map((frame) =>
-             <Tab ref={(node) => this.tabRefs.push(node)}
-               dragData={this.props.dragData}
-               frame={frame}
-               key={'tab-' + frame.get('key')}
-               paintTabs={this.props.paintTabs}
-               previewTabs={this.props.previewTabs}
-               isActive={this.props.activeFrameKey === frame.get('key')}
-               notificationBarActive={this.props.notificationBarActive}
-               partOfFullPageSet={this.props.partOfFullPageSet} />)
+           .map((frameKey) =>
+             <Tab
+               key={'tab-' + frameKey}
+               ref={(node) => this.tabRefs.push(node)}
+               frameKey={frameKey}
+             />
+           )
       }
     </div>
   }
 }
 
-module.exports = PinnedTabs
+module.exports = ReduxComponent.connect(PinnedTabs)

@@ -15,7 +15,7 @@ const cx = require('../lib/classSet')
 const SortableTable = require('../../app/renderer/components/common/sortableTable')
 const siteUtil = require('../state/siteUtil')
 const formatUtil = require('../../app/common/lib/formatUtil')
-const iconSize = require('../../app/common/lib/faviconUtil').iconSize
+const {iconSize} = require('../constants/config')
 
 const ipc = window.chrome.ipcRenderer
 

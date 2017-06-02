@@ -20,12 +20,12 @@ const windowStore = require('../../../../js/stores/windowStore')
 // Constants
 const siteTags = require('../../../../js/constants/siteTags')
 const dragTypes = require('../../../../js/constants/dragTypes')
+const {iconSize} = require('../../../../js/constants/config')
 
 // Utils
 const siteUtil = require('../../../../js/state/siteUtil')
 const {getCurrentWindowId} = require('../../currentWindow')
 const dnd = require('../../../../js/dnd')
-const iconSize = require('../../../common/lib/faviconUtil').iconSize
 const cx = require('../../../../js/lib/classSet')
 
 // Styles

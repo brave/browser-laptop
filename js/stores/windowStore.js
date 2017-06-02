@@ -19,7 +19,7 @@ const UrlUtil = require('../lib/urlutil')
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
 const { makeImmutable } = require('../../app/common/state/immutableUtil')
 const {aboutUrls, getTargetAboutUrl, newFrameUrl} = require('../lib/appUrlUtil')
-const {updateTabPageIndex} = require('../../app/renderer/lib/tabUtil')
+const Serializer = require('../dispatcher/serializer')
 const assert = require('assert')
 const contextMenuState = require('../../app/common/state/contextMenuState')
 const appStoreRenderer = require('./appStoreRenderer')
@@ -183,7 +183,7 @@ const newFrame = (state, frameOpts, openInForeground) => {
   if (openInForeground) {
     const activeFrame = frameStateUtil.getActiveFrame(state)
     const tabId = activeFrame.get('tabId')
-    state = updateTabPageIndex(state, activeFrame)
+    state = frameStateUtil.updateTabPageIndex(state, activeFrame)
     if (tabId) {
       appActions.tabActivateRequested(tabId)
     }
@@ -367,7 +367,7 @@ const doAction = (action) => {
         windowState = windowState.setIn(['ui', 'tabs', 'tabPageIndex'], action.index)
         windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
       } else {
-        windowState = updateTabPageIndex(windowState, action.frameProps)
+        windowState = frameStateUtil.updateTabPageIndex(windowState, action.frameProps)
       }
       break
     case windowConstants.WINDOW_SET_TAB_BREAKPOINT:
@@ -402,7 +402,7 @@ const doAction = (action) => {
         windowState = windowState.set('frames', frames)
         // Since the tab could have changed pages, update the tab page as well
         windowState = frameStateUtil.updateFramesInternalIndex(windowState, Math.min(sourceFrameIndex, newIndex))
-        windowState = updateTabPageIndex(windowState, frameStateUtil.getActiveFrame(windowState))
+        windowState = frameStateUtil.updateTabPageIndex(windowState, frameStateUtil.getActiveFrame(windowState))
         break
       }
     case windowConstants.WINDOW_SET_LINK_HOVER_PREVIEW:

@@ -3,16 +3,26 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Immutable = require('immutable')
+
+// Constants
 const config = require('../constants/config')
-const {makeImmutable} = require('../../app/common/state/immutableUtil')
-const {isIntermediateAboutPage} = require('../lib/appUrlUtil')
-const urlParse = require('../../app/common/urlParse')
-const windowActions = require('../actions/windowActions.js')
-const webviewActions = require('../actions/webviewActions.js')
+const settings = require('../constants/settings')
+
+// Actions
+const windowActions = require('../actions/windowActions')
+const webviewActions = require('../actions/webviewActions')
 const appActions = require('../actions/appActions')
 
+// State
+const {makeImmutable} = require('../../app/common/state/immutableUtil')
+
+// Utils
+const {getSetting} = require('../settings')
+const {isIntermediateAboutPage} = require('../lib/appUrlUtil')
+const urlParse = require('../../app/common/urlParse')
+
 const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
-      ? 1 : b.get('key') > a.get('key') ? -1 : 0
+  ? 1 : b.get('key') > a.get('key') ? -1 : 0
 
 const matchFrame = (queryInfo, frame) => {
   queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
@@ -435,6 +445,32 @@ function getTotalBlocks (frame) {
     : ((blocked > 99) ? '99+' : blocked)
 }
 
+/**
+ * Check if frame is pinned or not
+ */
+function isPinned (state, frameKey) {
+  const frame = getFrameByKey(state, frameKey)
+
+  return !!frame.get('pinnedLocation')
+}
+
+/**
+ * Updates the tab page index to the specified frameProps
+ * @param frameProps Any frame belonging to the page
+ */
+function updateTabPageIndex (state, frameProps) {
+  const index = getFrameTabPageIndex(state, frameProps, getSetting(settings.TABS_PER_PAGE))
+
+  if (index === -1) {
+    return state
+  }
+
+  state = state.setIn(['ui', 'tabs', 'tabPageIndex'], index)
+  state = state.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
+
+  return state
+}
+
 const frameStatePath = (state, frameKey) =>
   ['frames', getFrameIndex(state, frameKey)]
 
@@ -530,5 +566,7 @@ module.exports = {
   activeFrameStatePath,
   getLastCommittedURL,
   onFindBarHide,
-  getTotalBlocks
+  getTotalBlocks,
+  isPinned,
+  updateTabPageIndex
 }

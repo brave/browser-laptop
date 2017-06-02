@@ -42,6 +42,7 @@ class TabIcon extends ImmutableComponent {
               [css(styles.icon)]: true
             })}
             data-test-id={this.props['data-test-id']}
+            data-test2-id={this.props['data-test2-id']}
             data-l10n-id={this.props.l10nId}
             data-l10n-args={JSON.stringify(this.props.l10nArgs || {})}
           >{this.props.symbolContent}</span>

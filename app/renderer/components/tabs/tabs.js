@@ -4,9 +4,10 @@
 
 const React = require('react')
 const ReactDOM = require('react-dom')
+const Immutable = require('immutable')
 
 // Components
-const ImmutableComponent = require('../immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 const LongPressButton = require('../common/longPressButton')
 const Tab = require('./tab')
 
@@ -14,38 +15,41 @@ const Tab = require('./tab')
 const appActions = require('../../../../js/actions/appActions')
 const windowActions = require('../../../../js/actions/windowActions')
 
+// State
+const windowState = require('../../../common/state/windowState')
+const tabContentState = require('../../../common/state/tabContentState')
+
 // Constants
 const dragTypes = require('../../../../js/constants/dragTypes')
+const settings = require('../../../../js/constants/settings')
 
 // Utils
 const cx = require('../../../../js/lib/classSet')
 const contextMenus = require('../../../../js/contextMenus')
-const {getCurrentWindowId} = require('../../currentWindow')
+const {getCurrentWindowId, isFocused} = require('../../currentWindow')
 const dnd = require('../../../../js/dnd')
 const dndData = require('../../../../js/dndData')
+const frameStateUtil = require('../../../../js/state/frameStateUtil')
+const {getSetting} = require('../../../../js/settings')
 
-class Tabs extends ImmutableComponent {
-  constructor () {
-    super()
+class Tabs extends React.Component {
+  constructor (props) {
+    super(props)
     this.onDragOver = this.onDragOver.bind(this)
     this.onDrop = this.onDrop.bind(this)
     this.onPrevPage = this.onPrevPage.bind(this)
     this.onNextPage = this.onNextPage.bind(this)
     this.onNewTabLongPress = this.onNewTabLongPress.bind(this)
-    this.wasNewTabClicked = this.wasNewTabClicked.bind(this)
     this.onMouseLeave = this.onMouseLeave.bind(this)
-    this.onTabClosedWithMouse = this.onTabClosedWithMouse.bind(this)
   }
 
   onMouseLeave () {
+    if (this.props.fixTabWidth == null) {
+      return
+    }
+
     windowActions.onTabMouseLeave({
       fixTabWidth: null
-    })
-  }
-
-  onTabClosedWithMouse (rect) {
-    windowActions.onTabClosedWithMouse({
-      fixTabWidth: rect.width
     })
   }
 
@@ -53,18 +57,16 @@ class Tabs extends ImmutableComponent {
     if (this.props.tabPageIndex === 0) {
       return
     }
+
     windowActions.setTabPageIndex(this.props.tabPageIndex - 1)
   }
 
   onNextPage () {
-    if (this.props.tabPageIndex + 1 === this.totalPages) {
+    if (this.props.tabPageIndex + 1 === this.props.totalPages) {
       return
     }
-    windowActions.setTabPageIndex(this.props.tabPageIndex + 1)
-  }
 
-  get totalPages () {
-    return Math.ceil(this.props.tabs.size / this.props.tabsPerTabPage)
+    windowActions.setTabPageIndex(this.props.tabPageIndex + 1)
   }
 
   onDrop (e) {
@@ -74,7 +76,7 @@ class Tabs extends ImmutableComponent {
     if (sourceDragData) {
       // If this is a different window ID than where the drag started, then
       // the tear off will be done by tab.js
-      if (this.props.dragData.get('windowId') !== getCurrentWindowId()) {
+      if (this.props.dragWindowId !== getCurrentWindowId()) {
         return
       }
 
@@ -82,11 +84,11 @@ class Tabs extends ImmutableComponent {
       // will cause the onDragEnd to never run
       setTimeout(() => {
         const key = sourceDragData.get('key')
-        let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter((node) => node && node.props.frame.get('key') !== key), clientX).selectedRef
+        let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter((node) => node && node.props.frameKey !== key), clientX).selectedRef
         if (droppedOnTab) {
           const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), clientX)
 
-          windowActions.moveTab(key, droppedOnTab.props.frame.get('key'), isLeftSide)
+          windowActions.moveTab(key, droppedOnTab.props.frameKey, isLeftSide)
           if (sourceDragData.get('pinnedLocation')) {
             appActions.tabPinned(sourceDragData.get('tabId'), false)
           }
@@ -115,21 +117,50 @@ class Tabs extends ImmutableComponent {
       e.preventDefault()
     }
   }
-  wasNewTabClicked (target) {
-    return target.className === this.refs.newTabButton.props.className
-  }
+
   newTab () {
     appActions.createTabRequested({})
   }
+
   onNewTabLongPress (target) {
     contextMenus.onNewTabContextMenu(target)
   }
+
+  mergeProps (state, dispatchProps, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const pageIndex = tabContentState.getPageIndex(currentWindow)
+    const tabsPerTabPage = Number(getSetting(settings.TABS_PER_PAGE))
+    const startingFrameIndex = pageIndex * tabsPerTabPage
+    const unpinnedTabs = frameStateUtil.getNonPinnedFrames(currentWindow)
+    const currentTabs = unpinnedTabs
+      .slice(startingFrameIndex, startingFrameIndex + tabsPerTabPage)
+      .map((tab) => tab.get('key'))
+    const totalPages = Math.ceil(unpinnedTabs.size / tabsPerTabPage)
+    const activeFrame = frameStateUtil.getActiveFrame(currentWindow)
+    const dragData = (state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')) || Immutable.Map()
+
+    const props = {}
+    // used in renderer
+    props.previewTabPageIndex = currentWindow.getIn(['ui', 'tabs', 'previewTabPageIndex'])
+    props.currentTabs = currentTabs
+    props.partOfFullPageSet = currentTabs.size === tabsPerTabPage
+    props.onNextPage = currentTabs.size >= tabsPerTabPage && totalPages > pageIndex + 1
+    props.onPreviousPage = pageIndex > 0
+    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused())
+
+    // used in other functions
+    props.fixTabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
+    props.tabPageIndex = currentWindow.getIn(['ui', 'tabs', 'tabPageIndex'])
+    props.dragWindowId = dragData.get('windowId')
+    props.totalPages = totalPages
+
+    return props
+  }
+
   render () {
     this.tabRefs = []
-    const index = this.props.previewTabPageIndex !== undefined
-      ? this.props.previewTabPageIndex : this.props.tabPageIndex
     return <div className='tabs'
-      onMouseLeave={this.props.fixTabWidth ? this.onMouseLeave : null}>
+      onMouseLeave={this.onMouseLeave}>
       <span className={cx({
         tabStripContainer: true,
         isPreview: this.props.previewTabPageIndex !== undefined,
@@ -137,40 +168,31 @@ class Tabs extends ImmutableComponent {
       })}
         onDragOver={this.onDragOver}
         onDrop={this.onDrop}>
-        {(() => {
-          if (index > 0) {
-            return <span
+        {
+          this.props.onPreviousPage
+            ? <span
               className='prevTab fa fa-caret-left'
               onClick={this.onPrevPage} />
-          }
-        })()}
+            : null
+        }
         {
           this.props.currentTabs
-            .map((frame) =>
-              <Tab ref={(node) => this.tabRefs.push(node)}
-                dragData={this.props.dragData}
-                frame={frame}
-                key={'tab-' + frame.get('key')}
-                paintTabs={this.props.paintTabs}
-                previewTabs={this.props.previewTabs}
-                isActive={this.props.activeFrameKey === frame.get('key')}
-                onTabClosedWithMouse={this.onTabClosedWithMouse}
-                tabWidth={this.props.fixTabWidth}
-                hasTabInFullScreen={this.props.hasTabInFullScreen}
-                notificationBarActive={this.props.notificationBarActive}
-                totalTabs={this.props.tabs.size}
-                partOfFullPageSet={this.props.partOfFullPageSet} />)
+            .map((frameKey) =>
+              <Tab
+                key={'tab-' + frameKey}
+                ref={(node) => this.tabRefs.push(node)}
+                frameKey={frameKey}
+                partOfFullPageSet={this.props.partOfFullPageSet} />
+            )
         }
-        {(() => {
-          if (this.props.currentTabs.size >= this.props.tabsPerTabPage && this.totalPages > index + 1) {
-            return <span
+        {
+          this.props.onNextPage
+            ? <span
               className='nextTab fa fa-caret-right'
               onClick={this.onNextPage} />
-          }
-        })()}
-
+            : null
+        }
         <LongPressButton
-          ref='newTabButton'
           label='+'
           l10nId='newTabButton'
           className='browserButton navbutton newFrameButton'
@@ -183,4 +205,4 @@ class Tabs extends ImmutableComponent {
   }
 }
 
-module.exports = Tabs
+module.exports = ReduxComponent.connect(Tabs)

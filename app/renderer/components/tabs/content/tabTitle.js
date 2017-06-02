@@ -6,56 +6,56 @@ const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
-const ImmutableComponent = require('../../immutableComponent')
+const ReduxComponent = require('../../reduxComponent')
+
+// State
+const tabContentState = require('../../../../common/state/tabContentState')
 
 // Utils
-const {hasBreakpoint, getTabIconColor} = require('../../../lib/tabUtil')
 const {isWindows, isDarwin} = require('../../../../common/lib/platformUtil')
 
 // Styles
 const globalStyles = require('../../styles/global')
 
-class TabTitle extends ImmutableComponent {
-  get isActiveOrHasSecondaryIcon () {
-    return this.props.isActive ||
-      (!!this.props.frame.get('isPrivate') || !!this.props.frame.get('partitionNumber'))
-  }
+class TabTitle extends React.Component {
+  mergeProps (state, dispatchProps, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const tabIconColor = tabContentState.getTabIconColor(currentWindow, ownProps.frameKey)
 
-  get isPinned () {
-    return !!this.props.frame.get('pinnedLocation')
-  }
+    const props = {}
+    // used in renderer
+    props.enforceFontVisibility = isDarwin() && tabIconColor === 'white'
+    props.tabIconColor = tabIconColor
+    props.displayTitle = tabContentState.getDisplayTitle(currentWindow, ownProps.frameKey)
 
-  get shouldHideTitle () {
-    return (hasBreakpoint(this.props, 'small') && this.props.isActive) ||
-      hasBreakpoint(this.props, ['extraSmall', 'smallest'])
+    // used in functions
+    props.frameKey = ownProps.frameKey
+
+    return props
   }
 
   render () {
-    // Brad said that tabs with white title on macOS look too thin
-    const enforceFontVisibilty = isDarwin() && getTabIconColor(this.props) === 'white'
     const titleStyles = StyleSheet.create({
       gradientText: {
         backgroundImage: `-webkit-linear-gradient(left,
-        ${getTabIconColor(this.props)} 90%, ${globalStyles.color.almostInvisible} 100%)`
+        ${this.props.tabIconColor} 90%, ${globalStyles.color.almostInvisible} 100%)`
       }
     })
 
-    return !this.isPinned && !this.shouldHideTitle
-      ? <div data-test-id='tabTitle'
-        className={css(
-          styles.tabTitle,
-          titleStyles.gradientText,
-          enforceFontVisibilty && styles.enforceFontVisibilty,
-          // Windows specific style
-          isWindows() && styles.tabTitleForWindows
-        )}>
-        {this.props.pageTitle}
-      </div>
-      : null
+    return <div data-test-id='tabTitle'
+      className={css(
+        styles.tabTitle,
+        titleStyles.gradientText,
+        this.props.enforceFontVisibility && styles.enforceFontVisibility,
+        // Windows specific style
+        isWindows() && styles.tabTitleForWindows
+      )}>
+      {this.props.displayTitle}
+    </div>
   }
 }
 
-module.exports = TabTitle
+module.exports = ReduxComponent.connect(TabTitle)
 
 const styles = StyleSheet.create({
   tabTitle: {
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     WebkitBackgroundClip: 'text'
   },
 
-  enforceFontVisibilty: {
+  enforceFontVisibility: {
     fontWeight: '600'
   },
 
