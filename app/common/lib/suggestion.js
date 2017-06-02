@@ -562,14 +562,17 @@ const getSearchSuggestions = (state, tabId, urlLocationLower) => {
 
 const getAlexaSuggestions = (state, urlLocationLower) => {
   return new Promise((resolve, reject) => {
-    const mapListToElements = getMapListToElements(urlLocationLower)
     const sortHandler = getSortByDomainForHosts(urlLocationLower)
-    const suggestionsList = mapListToElements({
-      data: top500,
-      maxResults: config.urlBarSuggestions.maxTopSites,
-      type: suggestionTypes.TOP_SITE,
-      sortHandler
-    })
+    const mapListToElements = getMapListToElements(urlLocationLower)
+    let suggestionsList = Immutable.List()
+    if (getSetting(settings.TOPSITE_SUGGESTIONS)) {
+      suggestionsList = mapListToElements({
+        data: top500,
+        maxResults: config.urlBarSuggestions.maxTopSites,
+        type: suggestionTypes.TOP_SITE,
+        sortHandler
+      })
+    }
     resolve(suggestionsList)
   })
 }
