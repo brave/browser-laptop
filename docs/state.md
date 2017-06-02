@@ -209,6 +209,7 @@ AppStore
     'privacy.do-not-track': boolean, // whether DNT is 1
     'privacy.history-suggestions': boolean, // auto suggest for history enabled
     'privacy.opened-tab-suggestions': boolean, // auto suggest for opened tabs enabled
+    'privacy.topsite-suggestions': boolean, // auto suggest for top site enabled
     'search.default-search-engine': string, // name of search engine, from js/data/searchProviders.js
     'search.offer-search-suggestions': boolean, // true if suggestions should be offered from the default search engine when available.
     'security.flash.installed': boolean,

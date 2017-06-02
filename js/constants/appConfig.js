@@ -141,6 +141,7 @@ module.exports = {
     'tabs.show-dashboard-images': true,
     'privacy.history-suggestions': true,
     'privacy.bookmark-suggestions': true,
+    'privacy.topsite-suggestions': true,
     'privacy.opened-tab-suggestions': true,
     'privacy.autocomplete.history-size': 500,
     'privacy.block-canvas-fingerprinting': false,

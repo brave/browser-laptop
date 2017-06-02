@@ -32,6 +32,7 @@ const settings = {
   // Privacy Tab
   HISTORY_SUGGESTIONS: 'privacy.history-suggestions',
   BOOKMARK_SUGGESTIONS: 'privacy.bookmark-suggestions',
+  TOPSITE_SUGGESTIONS: 'privacy.topsite-suggestions',
   OPENED_TAB_SUGGESTIONS: 'privacy.opened-tab-suggestions',
   AUTOCOMPLETE_HISTORY_SIZE: 'privacy.autocomplete.history-size',
   DO_NOT_TRACK: 'privacy.do-not-track',
