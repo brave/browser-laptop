@@ -36,7 +36,9 @@ Brave welcomes contributions via [pull requests](https://github.com/brave/browse
 * steps to test the fix (if applicable)
 * for design-related changes, it is helpful to include screenshots
 
-Feel free to tag a Brave employee in the pull request to assign them to review your code.  Please note that your pull request will
+Once you submit a pull request, you should tag reviewers and add labels to the pull request according to [this guide](https://github.com/brave/browser-laptop/wiki/Pull-request-process). If you do not have the necessary Github permissions to do so, a Brave member will take care of this for you.
+
+Please note that your pull request will
 be subject to our [reviewer guidelines](https://github.com/brave/browser-laptop/wiki/Reviewer-guideline), which you'll want to make
 sure your PR meets.
 
@@ -47,6 +49,7 @@ sure your PR meets.
 * Ensure at least one other employee or contributor is tagged using the `Reviewers` field
 * Ensure the PR is approved before merging (see [`Reviewer guidelines`](https://github.com/brave/browser-laptop/wiki/Reviewer-guideline) for more information)
 * Flag issues with `qa-steps-specified` if there are special things to test at the issue level. In particular you should always specify this if there’s an upgrade of the session store file.  It’s a signal to QA to make sure they pay extra special attention to this task.
+* Follow the [pull request approval process](https://github.com/brave/browser-laptop/wiki/Pull-request-process).
 
 ### Considerations before submitting a pull request
 
