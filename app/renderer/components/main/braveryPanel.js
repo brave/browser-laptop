@@ -192,7 +192,7 @@ class BraveryPanel extends ImmutableComponent {
         <div title={this.displayHost} className={css(styles.braveryPanel_compact__header__displayHost)}>{this.displayHost}</div>
         <div className={css(styles.braveryPanel_compact__header_bottom__shieldsSwitch)}>
           <SwitchControl large
-            customWrapper={css(styles.braveryPanel_compact__header_bottom__shieldsSwitch__switchControl)}
+            customWrapperClassName={css(styles.braveryPanel_compact__header_bottom__shieldsSwitch__switchControl)}
             onClick={this.onToggleShields}
             leftl10nId='shieldsDown'
             rightl10nId='shieldsUp'
@@ -212,8 +212,8 @@ class BraveryPanel extends ImmutableComponent {
       </div>
       <div className={css(styles.braveryPanel__header_right)}>
         <SwitchControl large
-          customWrapper={css(styles.braveryPanel__header_right__switchControl)}
-          customTopText={css(styles.braveryPanel__header_right__switchControl__topText)}
+          customWrapperClassName={css(styles.braveryPanel__header_right__switchControl)}
+          customTopTextClassName={css(styles.braveryPanel__header_right__switchControl__topText)}
           onClick={this.onToggleShields}
           leftl10nId='shieldsDown'
           rightl10nId='shieldsUp'
@@ -548,7 +548,7 @@ class BraveryPanel extends ImmutableComponent {
                   compactBraveryPanel && gridStyles.row7col1,
                   compactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
                 )}
-                  customInfoButton={css(styles.braveryPanel__body__advanced__control__switchControl__infoButton)}
+                  customInfoButtonClassName={css(styles.braveryPanel__body__advanced__control__switchControl__infoButton)}
                   onClick={this.onToggleFp}
                   rightl10nId='fingerprintingProtection'
                   checkedOn={fpEnabled}
