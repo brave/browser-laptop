@@ -556,8 +556,9 @@ At some point you can deal with classes using with `cx()` that can't be changed 
   className={cx({
     mainClass: true, // mainClass will always be shown
     // Below will be applied only if condition match
-    conditionalClass: this.canBeApplied && this.isValid})} />
+    conditionalClass: this.canBeApplied && this.isValid,
     [css(styles.awesomeAphroditeStyleHere]: true
+})} />
 ```
 
 
