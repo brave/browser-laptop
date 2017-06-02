@@ -13,8 +13,7 @@ script:
 branches:
   only:
     - master
-    - dev-channel
-    - beta-channel
+    - /\d+\.\d+\.x/
 notifications:
   slack:
     secure: bDwO2uce5JAZvjrvWj4+/+yEXJAIK4O0RcgUWvZ2IMbi7Q9I89Mw40JmkLWL6x2gWZwxr8+FoLtErJA7RVrsfImjrX+NmMyAB7AydLdrBJtkLozNnuacnhcnBRyp1gGCa1ymxCEXGbgC6onAD3kiJJhggr70T+2lu3IuJYXENhc=
