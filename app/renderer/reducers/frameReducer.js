@@ -5,13 +5,18 @@
 'use strict'
 
 const Immutable = require('immutable')
+
+// Constants
 const appConstants = require('../../../js/constants/appConstants')
-const windowActions = require('../../../js/actions/windowActions')
 const windowConstants = require('../../../js/constants/windowConstants')
-const frameStateUtil = require('../../../js/state/frameStateUtil')
-const appActions = require('../../../js/actions/appActions')
 const config = require('../../../js/constants/config')
-const {updateTabPageIndex} = require('../lib/tabUtil')
+
+// Actions
+const appActions = require('../../../js/actions/appActions')
+const windowActions = require('../../../js/actions/windowActions')
+
+// Utils
+const frameStateUtil = require('../../../js/state/frameStateUtil')
 const {getCurrentWindowId} = require('../currentWindow')
 
 const setFullScreen = (state, action) => {
@@ -99,7 +104,7 @@ const frameReducer = (state, action, immutableAction) => {
           })
           state = state.setIn(['frames', index, 'lastAccessedTime'], new Date().getTime())
           state = state.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
-          state = updateTabPageIndex(state, frame)
+          state = frameStateUtil.updateTabPageIndex(state, frame)
         }
       }
       break

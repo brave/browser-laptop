@@ -2,11 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const { makeImmutable, isMap, isList } = require('./immutableUtil')
 const Immutable = require('immutable')
 const assert = require('assert')
+
+// State
 const frameState = require('./frameState')
 const windowState = require('./windowState')
+
+// utils
+const { makeImmutable, isMap, isList } = require('./immutableUtil')
 // this file should eventually replace frameStateUtil
 const frameStateUtil = require('../../../js/state/frameStateUtil')
 const {isLocationBookmarked} = require('../../../js/state/siteUtil')
@@ -488,10 +492,6 @@ const tabState = {
     } catch (e) {
       return false
     }
-  },
-
-  isPinned: (state, tabId) => {
-    return tabState.getTabPropertyByTabId(state, tabId, 'pinned', false)
   },
 
   getTitle: (state, tabId) => {

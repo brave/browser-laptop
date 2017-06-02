@@ -6,18 +6,31 @@ const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
-const ImmutableComponent = require('../../immutableComponent')
+const ReduxComponent = require('../../reduxComponent')
 const TabIcon = require('./tabIcon')
 
 // Utils
-const {hasVisibleSecondaryIcon} = require('../../../lib/tabUtil')
+const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 
 // Styles
 const globalStyles = require('../../styles/global')
 const tabStyles = require('../../styles/tab')
 const privateSvg = require('../../../../extensions/brave/img/tabs/private.svg')
 
-class PrivateIcon extends ImmutableComponent {
+class PrivateIcon extends React.Component {
+  mergeProps (state, dispatchProps, ownProps) {
+    const currentWindow = state.get('currentWindow')
+
+    const props = {}
+    // used in renderer
+    props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, ownProps.frameKey)
+
+    // used in functions
+    props.frameKey = ownProps.frameKey
+
+    return props
+  }
+
   render () {
     const privateStyles = StyleSheet.create({
       icon: {
@@ -25,15 +38,14 @@ class PrivateIcon extends ImmutableComponent {
       }
     })
 
-    return this.props.frame.get('isPrivate') && hasVisibleSecondaryIcon(this.props)
-      ? <TabIcon data-test-id='privateIcon'
-        className={css(tabStyles.icon, styles.secondaryIcon, privateStyles.icon)}
-      />
-      : null
+    return <TabIcon
+      data-test-id='privateIcon'
+      className={css(tabStyles.icon, styles.secondaryIcon, privateStyles.icon)}
+    />
   }
 }
 
-module.exports = PrivateIcon
+module.exports = ReduxComponent.connect(PrivateIcon)
 
 const styles = StyleSheet.create({
   secondaryIcon: {

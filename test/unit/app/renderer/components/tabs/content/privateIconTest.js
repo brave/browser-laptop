@@ -4,203 +4,221 @@
 /* global describe, before, after, it */
 
 const mockery = require('mockery')
-const {shallow} = require('enzyme')
+const {mount} = require('enzyme')
 const Immutable = require('immutable')
 const assert = require('assert')
-let PrivateIcon
+const fakeElectron = require('../../../../../lib/fakeElectron')
 require('../../../../../braveUnit')
 
+const tabId = 1
+const frameKey = 1
+
+const fakeAppStoreRenderer = {
+  state: Immutable.fromJS({
+    windows: [{
+      windowId: 1,
+      windowUUID: 'uuid'
+    }],
+    tabs: [{
+      tabId: tabId,
+      windowId: 1,
+      windowUUID: 'uuid',
+      url: 'https://brave.com'
+    }]
+  }),
+  addChangeListener: () => {},
+  removeChangeListener: () => {}
+}
+
+const defaultWindowStore = Immutable.fromJS({
+  activeFrameKey: frameKey,
+  frames: [{
+    key: frameKey,
+    tabId: tabId,
+    location: 'http://brave.com'
+  }],
+  tabs: [{
+    key: frameKey
+  }],
+  framesInternal: {
+    index: {
+      1: 0
+    },
+    tabIndex: {
+      1: 0
+    }
+  }
+})
+
 describe('Tabs content - PrivateIcon', function () {
+  let Tab, windowStore
+
   before(function () {
-    mockery.registerMock('../../../../extensions/brave/img/tabs/private.svg')
     mockery.enable({
       warnOnReplace: false,
       warnOnUnregistered: false,
       useCleanCache: true
     })
-    PrivateIcon = require('../../../../../../../app/renderer/components/tabs/content/privateIcon')
+    mockery.registerMock('electron', fakeElectron)
+    mockery.registerMock('../../../js/stores/appStoreRenderer', fakeAppStoreRenderer)
+    mockery.registerMock('../../../../extensions/brave/img/tabs/loading.svg')
+    mockery.registerMock('../../../../extensions/brave/img/tabs/new_session.svg')
+    mockery.registerMock('../../../../extensions/brave/img/tabs/private.svg')
+    mockery.registerMock('../../../../extensions/brave/img/tabs/close_btn_hover.svg')
+    mockery.registerMock('../../../../extensions/brave/img/tabs/close_btn_normal.svg')
+    windowStore = require('../../../../../../../js/stores/windowStore')
+    Tab = require('../../../../../../../app/renderer/components/tabs/tab')
   })
 
   after(function () {
+    mockery.deregisterAll()
     mockery.disable()
   })
 
-  it('should show private icon if current tab is private', function () {
-    const wrapper = shallow(
-      <PrivateIcon
-        frame={
-          Immutable.Map({
-            isPrivate: true
-          })}
-      />
-    )
-    assert.equal(wrapper.props()['data-test-id'], 'privateIcon')
+  describe('should show icon', function () {
+    it('if current tab is private', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        isPrivate: true,
+        breakpoint: 'default'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('PrivateIcon').length, 1)
+    })
+
+    it('if tab is not active and breakpoint is largeMedium', function () {
+      windowStore.state = defaultWindowStore.merge({
+        activeFrameKey: 0,
+        frames: [{
+          isPrivate: true,
+          hoverState: false,
+          breakpoint: 'largeMedium'
+        }]
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('PrivateIcon').length, 1)
+    })
+
+    it('if mouse is not over tab and breakpoint is large', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        isPrivate: true,
+        hoverState: false,
+        breakpoint: 'large'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('PrivateIcon').length, 1)
+    })
+
+    it('if tab is not active and breakpoint is medium', function () {
+      windowStore.state = defaultWindowStore.merge({
+        activeFrameKey: 0,
+        frames: [{
+          isPrivate: true,
+          hoverState: false,
+          breakpoint: 'medium'
+        }]
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('PrivateIcon').length, 1)
+    })
+
+    it('if mouse is not over tab and breakpoint is default', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        isPrivate: true,
+        hoverState: false,
+        breakpoint: 'default'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('PrivateIcon').length, 1)
+    })
   })
-  it('should not show private icon if current tab is not private', function () {
-    const wrapper = shallow(
-      <PrivateIcon
-        frame={
-          Immutable.Map({
-            isPrivate: false
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
-  })
-  it('should not show private icon if mouse is over tab and breakpoint is default', function () {
-    const wrapper = shallow(
-      <PrivateIcon
-        frame={
-          Immutable.Map({
-            isPrivate: true,
-            hoverState: true,
-            breakpoint: 'default'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
-  })
-  it('should show private icon if mouse is not over tab and breakpoint is default', function () {
-    const wrapper = shallow(
-      <PrivateIcon
-        frame={
-          Immutable.Map({
-            isPrivate: true,
-            hoverState: false,
-            breakpoint: 'default'
-          })}
-      />
-    )
-    assert.equal(wrapper.props()['data-test-id'], 'privateIcon')
-  })
-  it('should not show private icon if mouse is over tab and breakpoint is large', function () {
-    const wrapper = shallow(
-      <PrivateIcon
-        frame={
-          Immutable.Map({
-            isPrivate: 1,
-            hoverState: true,
-            breakpoint: 'large'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
-  })
-  it('should show private icon if mouse is not over tab and breakpoint is large', function () {
-    const wrapper = shallow(
-      <PrivateIcon
-        frame={
-          Immutable.Map({
-            isPrivate: 1,
-            hoverState: false,
-            breakpoint: 'large'
-          })}
-      />
-    )
-    assert.equal(wrapper.props()['data-test-id'], 'privateIcon')
-  })
-  it('should not show private icon if tab is active and breakpoint is largeMedium', function () {
-    const wrapper = shallow(
-      <PrivateIcon isActive
-        frame={
-          Immutable.Map({
-            isPrivate: 1,
-            hoverState: true,
-            breakpoint: 'largeMedium'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
-  })
-  it('should show private icon if tab is not active and breakpoint is largeMedium', function () {
-    const wrapper = shallow(
-      <PrivateIcon isActive={false}
-        frame={
-          Immutable.Map({
-            isPrivate: 1,
-            hoverState: false,
-            breakpoint: 'largeMedium'
-          })}
-      />
-    )
-    assert.equal(wrapper.props()['data-test-id'], 'privateIcon')
-  })
-  it('should not show private icon if tab is active and breakpoint is medium', function () {
-    const wrapper = shallow(
-      <PrivateIcon isActive
-        frame={
-          Immutable.Map({
-            isPrivate: 1,
-            hoverState: true,
-            breakpoint: 'medium'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
-  })
-  it('should show private icon if tab is not active and breakpoint is medium', function () {
-    const wrapper = shallow(
-      <PrivateIcon isActive={false}
-        frame={
-          Immutable.Map({
-            isPrivate: 1,
-            hoverState: false,
-            breakpoint: 'medium'
-          })}
-      />
-    )
-    assert.equal(wrapper.props()['data-test-id'], 'privateIcon')
-  })
-  it('should not show private icon if breakpoint is mediumSmall', function () {
-    const wrapper = shallow(
-      <PrivateIcon isActive
-        frame={
-          Immutable.Map({
-            isPrivate: 1,
-            hoverState: false,
-            breakpoint: 'mediumSmall'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
-  })
-  it('should not show private icon if breakpoint is small', function () {
-    const wrapper = shallow(
-      <PrivateIcon isActive
-        frame={
-          Immutable.Map({
-            isPrivate: 1,
-            hoverState: true,
-            breakpoint: 'small'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
-  })
-  it('should not show private icon if breakpoint is extraSmall', function () {
-    const wrapper = shallow(
-      <PrivateIcon isActive
-        frame={
-          Immutable.Map({
-            isPrivate: 1,
-            hoverState: true,
-            breakpoint: 'extraSmall'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
-  })
-  it('should not show private icon if breakpoint is the smallest', function () {
-    const wrapper = shallow(
-      <PrivateIcon
-        frame={
-          Immutable.Map({
-            isPrivate: 1,
-            hoverState: true,
-            breakpoint: 'smallest'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'privateIcon')
+
+  describe('should not show icon', function () {
+    it('if current tab is not private', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        isPrivate: false
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('PrivateIcon').length, 0)
+    })
+
+    it('if mouse is over tab and breakpoint is default', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        isPrivate: true,
+        hoverState: true,
+        breakpoint: 'default'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('PrivateIcon').length, 0)
+    })
+
+    it('if mouse is over tab and breakpoint is large', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        isPrivate: true,
+        hoverState: true,
+        breakpoint: 'large'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('PrivateIcon').length, 0)
+    })
+
+    it('if tab is active and breakpoint is largeMedium', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        isPrivate: true,
+        hoverState: true,
+        breakpoint: 'largeMedium'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('PrivateIcon').length, 0)
+    })
+
+    it('if tab is active and breakpoint is medium', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        isPrivate: true,
+        hoverState: true,
+        breakpoint: 'medium'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('PrivateIcon').length, 0)
+    })
+
+    it('if breakpoint is mediumSmall', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        isPrivate: true,
+        hoverState: false,
+        breakpoint: 'mediumSmall'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('PrivateIcon').length, 0)
+    })
+
+    it('if breakpoint is small', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        isPrivate: true,
+        hoverState: true,
+        breakpoint: 'small'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('PrivateIcon').length, 0)
+    })
+
+    it('if breakpoint is extraSmall', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        isPrivate: true,
+        hoverState: true,
+        breakpoint: 'extraSmall'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('PrivateIcon').length, 0)
+    })
+
+    it('if breakpoint is the smallest', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        isPrivate: true,
+        hoverState: true,
+        breakpoint: 'smallest'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('PrivateIcon').length, 0)
+    })
   })
 })

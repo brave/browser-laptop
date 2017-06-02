@@ -6,61 +6,64 @@ const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
-const ImmutableComponent = require('../../immutableComponent')
+const ReduxComponent = require('../../reduxComponent')
 const TabIcon = require('./tabIcon')
 
-// Utils
-const {hasVisibleSecondaryIcon, getTabIconColor} = require('../../../lib/tabUtil')
+// State
+const tabContentState = require('../../../../common/state/tabContentState')
 
 // Constants
 const {tabs} = require('../../../../../js/constants/config')
+
+// Utils
+const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 
 // Styles
 const tabStyles = require('../../styles/tab')
 const newSessionSvg = require('../../../../extensions/brave/img/tabs/new_session.svg')
 
-class NewSessionIcon extends ImmutableComponent {
-  get partitionNumber () {
-    let partition = this.props.frame.get('partitionNumber')
-    // Persistent partitions opened by `target="_blank"` will have
-    // *partition-* string first, which causes bad UI. We don't need it for tabs
-    if (typeof partition === 'string') {
-      partition = partition.replace(/^partition-/i, '')
-    }
-    return partition
-  }
+class NewSessionIcon extends React.Component {
+  mergeProps (state, dispatchProps, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey)
+    const partition = frame.get('partitionNumber')
 
-  get partitionIndicator () {
-    // For now due to UI limitations set session up to 9 visually
-    return this.partitionNumber > tabs.maxAllowedNewSessions
+    const props = {}
+    // used in renderer
+    props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, ownProps.frameKey)
+    props.iconColor = tabContentState.getTabIconColor(currentWindow, ownProps.frameKey)
+    props.partitionNumber = typeof partition === 'string'
+      ? partition.replace(/^partition-/i, '')
+      : partition
+    props.partitionIndicator = props.partitionNumber > tabs.maxAllowedNewSessions
       ? tabs.maxAllowedNewSessions
-      : this.partitionNumber
-  }
+      : props.partitionNumber
 
-  get iconColor () {
-    return getTabIconColor(this.props)
+    // used in funtions
+    props.frameKey = ownProps.frameKey
+
+    return props
   }
 
   render () {
     const newSession = StyleSheet.create({
       indicator: {
         // Based on getTextColorForBackground() icons can be only black or white.
-        filter: this.props.isActive && this.iconColor === 'white' ? 'invert(100%)' : 'none'
+        filter: this.props.isActive && this.props.iconColor === 'white' ? 'invert(100%)' : 'none'
       }
     })
 
-    return this.partitionNumber && hasVisibleSecondaryIcon(this.props)
-      ? <TabIcon symbol
-        data-test-id='newSessionIcon'
-        className={css(tabStyles.icon, styles.newSession, newSession.indicator)}
-        symbolContent={this.partitionIndicator}
-        {...this.props}
-      />
-      : null
+    return <TabIcon symbol
+      data-test-id='newSessionIcon'
+      className={css(tabStyles.icon, styles.newSession, newSession.indicator)}
+      symbolContent={this.props.partitionIndicator}
+      l10nArgs={this.props.partitionNumber}
+      l10nId='sessionInfoTab'
+    />
   }
 }
 
-module.exports = NewSessionIcon
+module.exports = ReduxComponent.connect(NewSessionIcon)
 
 const styles = StyleSheet.create({
   newSession: {

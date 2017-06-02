@@ -4,196 +4,217 @@
 /* global describe, before, after, it */
 
 const mockery = require('mockery')
-const {shallow} = require('enzyme')
+const {mount} = require('enzyme')
 const assert = require('assert')
 const Immutable = require('immutable')
-let CloseTabIcon
+const fakeElectron = require('../../../../../lib/fakeElectron')
 require('../../../../../braveUnit')
 
+const tabId = 1
+const frameKey = 1
+
+const fakeAppStoreRenderer = {
+  state: Immutable.fromJS({
+    windows: [{
+      windowId: 1,
+      windowUUID: 'uuid'
+    }],
+    tabs: [{
+      tabId: tabId,
+      windowId: 1,
+      windowUUID: 'uuid',
+      url: 'https://brave.com'
+    }]
+  }),
+  addChangeListener: () => {},
+  removeChangeListener: () => {}
+}
+
+const defaultWindowStore = Immutable.fromJS({
+  activeFrameKey: frameKey,
+  frames: [{
+    key: frameKey,
+    tabId: tabId,
+    location: 'http://brave.com'
+  }],
+  tabs: [{
+    key: frameKey
+  }],
+  framesInternal: {
+    index: {
+      1: 0
+    },
+    tabIndex: {
+      1: 0
+    }
+  }
+})
+
 describe('Tabs content - CloseTabIcon', function () {
+  let CloseTabIcon, windowStore
+
   before(function () {
-    mockery.registerMock('../../../../extensions/brave/img/tabs/close_btn_hover.svg')
-    mockery.registerMock('../../../../extensions/brave/img/tabs/close_btn_normal.svg')
     mockery.enable({
       warnOnReplace: false,
       warnOnUnregistered: false,
       useCleanCache: true
     })
+    mockery.registerMock('electron', fakeElectron)
+    mockery.registerMock('../../../js/stores/appStoreRenderer', fakeAppStoreRenderer)
+    mockery.registerMock('../../../../extensions/brave/img/tabs/close_btn_hover.svg')
+    mockery.registerMock('../../../../extensions/brave/img/tabs/close_btn_normal.svg')
+    windowStore = require('../../../../../../../js/stores/windowStore')
     CloseTabIcon = require('../../../../../../../app/renderer/components/tabs/content/closeTabIcon')
   })
 
   after(function () {
+    mockery.deregisterAll()
     mockery.disable()
   })
 
-  it('should show closeTab icon if mouse is over tab and breakpoint is default', function () {
-    const wrapper = shallow(
-      <CloseTabIcon
-        frame={
-          Immutable.Map({
-            hoverState: true,
-            breakpoint: 'default'
-          })}
-      />
-    )
-    assert.equal(wrapper.props()['data-test-id'], 'closeTabIcon')
-  })
-  it('should show closeTab icon if mouse is over tab and breakpoint is large', function () {
-    const wrapper = shallow(
-      <CloseTabIcon
-        frame={
-          Immutable.Map({
-            hoverState: true,
-            breakpoint: 'large'
-          })}
-      />
-    )
-    assert.equal(wrapper.props()['data-test-id'], 'closeTabIcon')
-  })
-  it('should not show closeTab icon if tab is pinned', function () {
-    const wrapper = shallow(
-      <CloseTabIcon
-        frame={
-          Immutable.Map({
-            hoverState: true,
-            pinnedLocation: true
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'closeTabIcon')
-  })
-  it('should show closeTab icon if tab size is largeMedium and tab is active', function () {
-    const wrapper = shallow(
-      <CloseTabIcon isActive
-        frame={
-          Immutable.Map({
-            hoverState: false,
-            breakpoint: 'largeMedium'
-          })}
-      />
-    )
-    assert.equal(wrapper.props()['data-test-id'], 'closeTabIcon')
-  })
-  it('should not show closeTab icon if tab size is largeMedium and tab is not active', function () {
-    const wrapper = shallow(
-      <CloseTabIcon isActive={false}
-        frame={
-          Immutable.Map({
-            hoverState: true,
-            breakpoint: 'largeMedium'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'closeTabIcon')
+  describe('should show icon', function () {
+    it('if mouse is over tab and breakpoint is default', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        hoverState: true,
+        breakpoint: 'default'
+      })
+      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
+      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-on')
+    })
+
+    it('if mouse is over tab and breakpoint is large', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        hoverState: true,
+        breakpoint: 'large'
+      })
+      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
+      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-on')
+    })
+
+    it('if tab size is largeMedium and tab is active', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        hoverState: false,
+        breakpoint: 'largeMedium'
+      })
+      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
+      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-on')
+    })
+
+    it('if tab size is medium and tab is active', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        hoverState: false,
+        breakpoint: 'medium'
+      })
+      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
+      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-on')
+    })
+
+    it('if tab size is mediumSmall and tab is active', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        hoverState: false,
+        breakpoint: 'mediumSmall'
+      })
+      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
+      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-on')
+    })
+
+    it('if tab size is small and tab is active', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        hoverState: false,
+        breakpoint: 'small'
+      })
+      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
+      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-on')
+    })
+
+    it('if tab size is extraSmall and tab is active', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        hoverState: false,
+        breakpoint: 'extraSmall'
+      })
+      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
+      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-on')
+    })
   })
 
-  it('should show closeTab icon if tab size is medium and tab is active', function () {
-    const wrapper = shallow(
-      <CloseTabIcon isActive
-        frame={
-          Immutable.Map({
-            hoverState: false,
-            breakpoint: 'medium'
-          })}
-      />
-    )
-    assert.equal(wrapper.props()['data-test-id'], 'closeTabIcon')
-  })
-  it('should not show closeTab icon if tab size is medium and tab is not active', function () {
-    const wrapper = shallow(
-      <CloseTabIcon isActive={false}
-        frame={
-          Immutable.Map({
-            hoverState: true,
-            breakpoint: 'medium'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'closeTabIcon')
-  })
+  describe('should not show icon', function () {
+    it('if tab is pinned', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        hoverState: true,
+        pinnedLocation: true
+      })
+      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
+      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-off')
+    })
 
-  it('should show closeTab icon if tab size is mediumSmall and tab is active', function () {
-    const wrapper = shallow(
-      <CloseTabIcon isActive
-        frame={
-          Immutable.Map({
-            hoverState: false,
-            breakpoint: 'mediumSmall'
-          })}
-      />
-    )
-    assert.equal(wrapper.props()['data-test-id'], 'closeTabIcon')
-  })
-  it('should not show closeTab icon if tab size is mediumSmall and tab is not active', function () {
-    const wrapper = shallow(
-      <CloseTabIcon isActive={false}
-        frame={
-          Immutable.Map({
-            hoverState: true,
-            breakpoint: 'mediumSmall'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'closeTabIcon')
-  })
-  it('should show closeTab icon if tab size is small and tab is active', function () {
-    const wrapper = shallow(
-      <CloseTabIcon isActive
-        frame={
-          Immutable.Map({
-            hoverState: false,
-            breakpoint: 'small'
-          })}
-      />
-    )
-    assert.equal(wrapper.props()['data-test-id'], 'closeTabIcon')
-  })
-  it('should not show closeTab icon if tab size is small and tab is not active', function () {
-    const wrapper = shallow(
-      <CloseTabIcon isActive={false}
-        frame={
-          Immutable.Map({
-            hoverState: true,
-            breakpoint: 'small'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'closeTabIcon')
-  })
-  it('should show closeTab icon if tab size is extraSmall and tab is active', function () {
-    const wrapper = shallow(
-      <CloseTabIcon isActive
-        frame={
-          Immutable.Map({
-            hoverState: false,
-            breakpoint: 'extraSmall'
-          })}
-      />
-    )
-    assert.equal(wrapper.props()['data-test-id'], 'closeTabIcon')
-  })
-  it('should not show closeTab icon if tab size is extraSmall and tab is not active', function () {
-    const wrapper = shallow(
-      <CloseTabIcon isActive={false}
-        frame={
-          Immutable.Map({
-            hoverState: true,
-            breakpoint: 'extraSmall'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'closeTabIcon')
-  })
-  it('should not show closeTab icon if tab size is the smallest size', function () {
-    const wrapper = shallow(
-      <CloseTabIcon
-        frame={
-          Immutable.Map({
-            hoverState: true,
-            breakpoint: 'extraSmall'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'closeTabIcon')
+    it('if tab size is largeMedium and tab is not active', function () {
+      windowStore.state = defaultWindowStore.merge({
+        activeFrameKey: 0,
+        frames: [{
+          hoverState: true,
+          breakpoint: 'largeMedium'
+        }]
+      })
+      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
+      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-off')
+    })
+
+    it('if tab size is medium and tab is not active', function () {
+      windowStore.state = defaultWindowStore.merge({
+        activeFrameKey: 0,
+        frames: [{
+          hoverState: true,
+          breakpoint: 'medium'
+        }]
+      })
+      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
+      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-off')
+    })
+
+    it('if tab size is mediumSmall and tab is not active', function () {
+      windowStore.state = defaultWindowStore.merge({
+        activeFrameKey: 0,
+        frames: [{
+          hoverState: true,
+          breakpoint: 'mediumSmall'
+        }]
+      })
+      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
+      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-off')
+    })
+
+    it('if tab size is small and tab is not active', function () {
+      windowStore.state = defaultWindowStore.merge({
+        activeFrameKey: 0,
+        frames: [{
+          hoverState: true,
+          breakpoint: 'small'
+        }]
+      })
+      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
+      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-off')
+    })
+
+    it('if tab size is extraSmall and tab is not active', function () {
+      windowStore.state = defaultWindowStore.merge({
+        activeFrameKey: 0,
+        frames: [{
+          hoverState: true,
+          breakpoint: 'extraSmall'
+        }]
+      })
+      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
+      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-off')
+    })
+
+    // TODO check what is going on
+    it.skip('if tab size is the smallest size', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        hoverState: true,
+        breakpoint: 'extraSmall'
+      })
+      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
+      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-off')
+    })
   })
 })

@@ -3,14 +3,18 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const Immutable = require('immutable')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
-const ImmutableComponent = require('../../immutableComponent')
+const ReduxComponent = require('../../reduxComponent')
 const TabIcon = require('./tabIcon')
 
+// State
+const tabContentState = require('../../../../common/state/tabContentState')
+
 // Utils
-const {hasBreakpoint, getTabIconColor} = require('../../../lib/tabUtil')
+const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 
 // Styles
 const globalStyles = require('../../styles/global')
@@ -18,63 +22,67 @@ const tabStyles = require('../../styles/tab')
 const {spinKeyframes} = require('../../styles/animations')
 const loadingIconSvg = require('../../../../extensions/brave/img/tabs/loading.svg')
 
-class Favicon extends ImmutableComponent {
-  get favicon () {
-    return !this.props.isLoading && this.props.frame.get('icon')
-  }
-
+class Favicon extends React.Component {
   get defaultIcon () {
-    return (!this.props.isLoading && !this.favicon)
+    return (!this.props.isTabLoading && !this.props.favicon)
       ? globalStyles.appIcons.defaultIcon
       : null
   }
 
-  get narrowView () {
-    return this.props.frame.get('breakpoint') === 'smallest'
-  }
+  mergeProps (state, dispatchProps, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey) || Immutable.Map()
+    const isTabLoading = tabContentState.isTabLoading(currentWindow, ownProps.frameKey)
 
-  get shouldHideFavicon () {
-    return (hasBreakpoint(this.props, 'extraSmall') && this.props.isActive) ||
-      this.props.frame.get('location') === 'about:newtab'
+    const props = {}
+    // used in renderer
+    props.isTabLoading = isTabLoading
+    props.favicon = !isTabLoading && frame.get('icon')
+    props.isPinnedTab = frameStateUtil.isPinned(currentWindow, ownProps.frameKey)
+    props.tabIconColor = tabContentState.getTabIconColor(currentWindow, ownProps.frameKey)
+    props.isNarrowestView = tabContentState.isNarrowestView(currentWindow, ownProps.frameKey)
+
+    // used in functions
+    props.frameKey = ownProps.frameKey
+
+    return props
   }
 
   render () {
     const iconStyles = StyleSheet.create({
       favicon: {
-        backgroundImage: `url(${this.favicon})`,
-        filter: getTabIconColor(this.props) === 'white' ? globalStyles.filter.whiteShadow : 'none'
+        backgroundImage: `url(${this.props.favicon})`,
+        filter: this.props.tabIconColor === 'white' ? globalStyles.filter.whiteShadow : 'none'
       },
       loadingIconColor: {
         // Don't change icon color unless when it should be white
-        filter: getTabIconColor(this.props) === 'white' ? globalStyles.filter.makeWhite : 'none'
+        filter: this.props.tabIconColor === 'white' ? globalStyles.filter.makeWhite : 'none'
       }
     })
 
-    return !this.shouldHideFavicon
-      ? <TabIcon
-        data-test-favicon={this.favicon}
-        data-test-id={this.props.isLoading ? 'loading' : 'defaultIcon'}
-        className={css(
-          tabStyles.icon,
-          this.favicon && iconStyles.favicon,
-          !this.props.frame.get('pinnedLocation') && this.narrowView && styles.faviconNarrowView
-        )}
-        symbol={
-          (this.props.isLoading && css(styles.loadingIcon, iconStyles.loadingIconColor)) ||
-          this.defaultIcon
-        } />
-      : null
+    return <TabIcon
+      data-test-favicon={this.props.favicon}
+      data-test-id={this.props.isTabLoading ? 'loading' : 'defaultIcon'}
+      className={css(
+        tabStyles.icon,
+        this.props.favicon && iconStyles.favicon,
+        !this.props.isPinnedTab && this.props.isNarrowestView && styles.faviconNarrowView
+      )}
+      symbol={
+        (this.props.isTabLoading && css(styles.loadingIcon, iconStyles.loadingIconColor)) ||
+        this.defaultIcon
+      } />
   }
 }
 
-module.exports = Favicon
+module.exports = ReduxComponent.connect(Favicon)
 
 const styles = StyleSheet.create({
   faviconNarrowView: {
     minWidth: 'auto',
     width: globalStyles.spacing.narrowIconSize,
     backgroundSize: 'contain',
-    padding: '0',
+    padding: 0,
     fontSize: '10px',
     backgroundPosition: 'center center'
   },

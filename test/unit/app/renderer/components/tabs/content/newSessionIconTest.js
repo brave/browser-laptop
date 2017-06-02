@@ -4,237 +4,249 @@
 /* global describe, before, after, it */
 
 const mockery = require('mockery')
-const {shallow} = require('enzyme')
+const {mount} = require('enzyme')
 const assert = require('assert')
 const Immutable = require('immutable')
 const {tabs} = require('../../../../../../../js/constants/config')
-let NewSessionIcon
+const fakeElectron = require('../../../../../lib/fakeElectron')
 require('../../../../../braveUnit')
 
+const tabId = 1
+const frameKey = 1
+
+const fakeAppStoreRenderer = {
+  state: Immutable.fromJS({
+    windows: [{
+      windowId: 1,
+      windowUUID: 'uuid'
+    }],
+    tabs: [{
+      tabId: tabId,
+      windowId: 1,
+      windowUUID: 'uuid',
+      url: 'https://brave.com'
+    }]
+  }),
+  addChangeListener: () => {},
+  removeChangeListener: () => {}
+}
+
+const defaultWindowStore = Immutable.fromJS({
+  activeFrameKey: frameKey,
+  frames: [{
+    key: frameKey,
+    tabId: tabId,
+    location: 'http://brave.com'
+  }],
+  tabs: [{
+    key: frameKey
+  }],
+  framesInternal: {
+    index: {
+      1: 0
+    },
+    tabIndex: {
+      1: 0
+    }
+  }
+})
+
 describe('Tabs content - NewSessionIcon', function () {
+  let Tab, windowStore, NewSessionIcon
+
   before(function () {
-    mockery.registerMock('../../../../extensions/brave/img/tabs/new_session.svg')
     mockery.enable({
       warnOnReplace: false,
       warnOnUnregistered: false,
       useCleanCache: true
     })
+    mockery.registerMock('electron', fakeElectron)
+    mockery.registerMock('../../../js/stores/appStoreRenderer', fakeAppStoreRenderer)
+    mockery.registerMock('../../../../extensions/brave/img/tabs/loading.svg')
+    mockery.registerMock('../../../../extensions/brave/img/tabs/new_session.svg')
+    mockery.registerMock('../../../../extensions/brave/img/tabs/private.svg')
+    mockery.registerMock('../../../../extensions/brave/img/tabs/close_btn_hover.svg')
+    mockery.registerMock('../../../../extensions/brave/img/tabs/close_btn_normal.svg')
+    windowStore = require('../../../../../../../js/stores/windowStore')
+    Tab = require('../../../../../../../app/renderer/components/tabs/tab')
     NewSessionIcon = require('../../../../../../../app/renderer/components/tabs/content/newSessionIcon')
   })
 
   after(function () {
-    mockery.disable()
+    mockery.deregisterAll()
   })
 
-  it('should show new session icon if current tab is a new session tab', function () {
-    const wrapper = shallow(
-      <NewSessionIcon
-        frame={
-          Immutable.Map({
-            partitionNumber: 1
-          })}
-      />
-    )
-    assert.equal(wrapper.props()['data-test-id'], 'newSessionIcon')
+  describe('should show', function () {
+    it('icon if current tab is a new session tab', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        partitionNumber: 1,
+        breakpoint: 'default'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('NewSessionIcon').length, 1)
+    })
+
+    it('icon if mouse is not over tab and breakpoint is default', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        partitionNumber: 1,
+        hoverState: false,
+        breakpoint: 'default'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('NewSessionIcon').length, 1)
+    })
+
+    it('icon if mouse is not over tab and breakpoint is large', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        partitionNumber: 1,
+        hoverState: false,
+        breakpoint: 'large'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('NewSessionIcon').length, 1)
+    })
+
+    it('icon if tab is not active and breakpoint is largeMedium', function () {
+      windowStore.state = defaultWindowStore.merge({
+        activeFrameKey: 0,
+        frames: [{
+          partitionNumber: 1,
+          hoverState: false,
+          breakpoint: 'largeMedium'
+        }]
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('NewSessionIcon').length, 1)
+    })
+
+    it('icon if tab is not active and breakpoint is medium', function () {
+      windowStore.state = defaultWindowStore.merge({
+        activeFrameKey: 0,
+        frames: [{
+          partitionNumber: 1,
+          hoverState: false,
+          breakpoint: 'medium'
+        }]
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('NewSessionIcon').length, 1)
+    })
+
+    it('partition number for new sessions', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        partitionNumber: 3,
+        breakpoint: 'default'
+      })
+      const wrapper = mount(<NewSessionIcon frameKey={frameKey} />)
+      assert.equal(wrapper.find('TabIcon').props().symbolContent, 3)
+    })
+
+    it('partition number for sessions with number set by opener (ex: clicking target=_blank)', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        partitionNumber: 'partition-3',
+        breakpoint: 'default'
+      })
+      const wrapper = mount(<NewSessionIcon frameKey={frameKey} />)
+      assert.equal(wrapper.find('TabIcon').props().symbolContent, 3)
+    })
+
+    it('max partition number even if session is bigger', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        partitionNumber: 1000,
+        breakpoint: 'default'
+      })
+      const wrapper = mount(<NewSessionIcon frameKey={frameKey} />)
+      assert.equal(wrapper.find('TabIcon').props().symbolContent, tabs.maxAllowedNewSessions)
+    })
   })
-  it('should not show new session icon if current tab is not private', function () {
-    const wrapper = shallow(
-      <NewSessionIcon
-        frame={
-          Immutable.Map({
-            partitionNumber: false
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
-  })
-  it('should not show new session icon if mouse is over tab and breakpoint is default', function () {
-    const wrapper = shallow(
-      <NewSessionIcon
-        frame={
-          Immutable.Map({
-            partitionNumber: 1,
-            hoverState: true,
-            breakpoint: 'default'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
-  })
-  it('should show new session icon if mouse is not over tab and breakpoint is default', function () {
-    const wrapper = shallow(
-      <NewSessionIcon
-        frame={
-          Immutable.Map({
-            partitionNumber: 1,
-            hoverState: false,
-            breakpoint: 'default'
-          })}
-      />
-    )
-    assert.equal(wrapper.props()['data-test-id'], 'newSessionIcon')
-  })
-  it('should not show new session icon if mouse is over tab and breakpoint is large', function () {
-    const wrapper = shallow(
-      <NewSessionIcon
-        frame={
-          Immutable.Map({
-            partitionNumber: 1,
-            hoverState: true,
-            breakpoint: 'large'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
-  })
-  it('should show new session icon if mouse is not over tab and breakpoint is large', function () {
-    const wrapper = shallow(
-      <NewSessionIcon
-        frame={
-          Immutable.Map({
-            partitionNumber: 1,
-            hoverState: false,
-            breakpoint: 'large'
-          })}
-      />
-    )
-    assert.equal(wrapper.props()['data-test-id'], 'newSessionIcon')
-  })
-  it('should not show new session icon if tab is active and breakpoint is largeMedium', function () {
-    const wrapper = shallow(
-      <NewSessionIcon isActive
-        frame={
-          Immutable.Map({
-            partitionNumber: 1,
-            hoverState: true,
-            breakpoint: 'largeMedium'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
-  })
-  it('should show new session icon if tab is not active and breakpoint is largeMedium', function () {
-    const wrapper = shallow(
-      <NewSessionIcon isActive={false}
-        frame={
-          Immutable.Map({
-            partitionNumber: 1,
-            hoverState: false,
-            breakpoint: 'largeMedium'
-          })}
-      />
-    )
-    assert.equal(wrapper.props()['data-test-id'], 'newSessionIcon')
-  })
-  it('should not show new session icon if tab is active and breakpoint is medium', function () {
-    const wrapper = shallow(
-      <NewSessionIcon isActive
-        frame={
-          Immutable.Map({
-            partitionNumber: 1,
-            hoverState: true,
-            breakpoint: 'medium'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
-  })
-  it('should show new session icon if tab is not active and breakpoint is medium', function () {
-    const wrapper = shallow(
-      <NewSessionIcon isActive={false}
-        frame={
-          Immutable.Map({
-            partitionNumber: 1,
-            hoverState: false,
-            breakpoint: 'medium'
-          })}
-      />
-    )
-    assert.equal(wrapper.props()['data-test-id'], 'newSessionIcon')
-  })
-  it('should not show new session icon if breakpoint is mediumSmall', function () {
-    const wrapper = shallow(
-      <NewSessionIcon isActive
-        frame={
-          Immutable.Map({
-            partitionNumber: 1,
-            hoverState: false,
-            breakpoint: 'mediumSmall'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
-  })
-  it('should not show new session icon if breakpoint is small', function () {
-    const wrapper = shallow(
-      <NewSessionIcon isActive
-        frame={
-          Immutable.Map({
-            partitionNumber: 1,
-            hoverState: true,
-            breakpoint: 'small'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
-  })
-  it('should not show new session icon if breakpoint is extraSmall', function () {
-    const wrapper = shallow(
-      <NewSessionIcon isActive
-        frame={
-          Immutable.Map({
-            partitionNumber: 1,
-            hoverState: true,
-            breakpoint: 'extraSmall'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
-  })
-  it('should not show new session icon if breakpoint is the smallest', function () {
-    const wrapper = shallow(
-      <NewSessionIcon
-        frame={
-          Immutable.Map({
-            partitionNumber: 1,
-            hoverState: true,
-            breakpoint: 'smallest'
-          })}
-      />
-    )
-    assert.notEqual(wrapper.props()['data-test-id'], 'newSessionIcon')
-  })
-  it('should show partition number for new sessions', function () {
-    const wrapper = shallow(
-      <NewSessionIcon
-        frame={
-          Immutable.Map({
-            partitionNumber: 3
-          })}
-      />
-    )
-    assert.equal(wrapper.props().symbolContent, 3)
-  })
-  it('should read and show partition number for sessions with number set by opener (ex: clicking target=_blank)', function () {
-    const wrapper = shallow(
-      <NewSessionIcon
-        frame={
-          Immutable.Map({
-            partitionNumber: 'partition-3'
-          })}
-      />
-    )
-    assert.equal(wrapper.props().symbolContent, 3)
-  })
-  it('should show max partition number even if session is bigger', function () {
-    const wrapper = shallow(
-      <NewSessionIcon
-        frame={
-          Immutable.Map({
-            partitionNumber: 1000
-          })}
-      />
-    )
-    assert.equal(wrapper.props().symbolContent, tabs.maxAllowedNewSessions)
+
+  describe('should not show icon', function () {
+    it('if current tab is not private', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        partitionNumber: false
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('NewSessionIcon').length, 0)
+    })
+
+    it('if mouse is over tab and breakpoint is default', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        partitionNumber: 1,
+        hoverState: true,
+        breakpoint: 'default'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('NewSessionIcon').length, 0)
+    })
+
+    it('if mouse is over tab and breakpoint is large', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        partitionNumber: 1,
+        hoverState: true,
+        breakpoint: 'large'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('NewSessionIcon').length, 0)
+    })
+
+    it('if tab is active and breakpoint is largeMedium', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        partitionNumber: 1,
+        hoverState: true,
+        breakpoint: 'largeMedium'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('NewSessionIcon').length, 0)
+    })
+
+    it('if tab is active and breakpoint is medium', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        partitionNumber: 1,
+        hoverState: true,
+        breakpoint: 'medium'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('NewSessionIcon').length, 0)
+    })
+
+    it('if breakpoint is mediumSmall', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        partitionNumber: 1,
+        hoverState: false,
+        breakpoint: 'mediumSmall'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('NewSessionIcon').length, 0)
+    })
+
+    it('if breakpoint is small', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        partitionNumber: 1,
+        hoverState: true,
+        breakpoint: 'small'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('NewSessionIcon').length, 0)
+    })
+
+    it('if breakpoint is extraSmall', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        partitionNumber: 1,
+        hoverState: true,
+        breakpoint: 'extraSmall'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('NewSessionIcon').length, 0)
+    })
+
+    it('if breakpoint is the smallest', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        partitionNumber: 1,
+        hoverState: true,
+        breakpoint: 'smallest'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('NewSessionIcon').length, 0)
+    })
   })
 })
