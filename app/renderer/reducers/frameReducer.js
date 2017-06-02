@@ -47,11 +47,18 @@ const closeFrame = (state, action) => {
   if (state.get('frames', Immutable.List()).size === 0) {
     appActions.closeWindow(getCurrentWindowId())
   }
-  // Copy the hover state if tab closed with mouse as long as we have a next frame
-  // This allow us to have closeTab button visible  for sequential frames closing, until onMouseLeave event happens.
+
   const nextFrame = frameStateUtil.getFrameByIndex(state, index)
-  if (hoverState && nextFrame) {
-    windowActions.setTabHoverState(nextFrame.get('key'), hoverState)
+
+  if (nextFrame) {
+    // After closing a tab, preview the next frame as long as there is one
+    windowActions.setPreviewFrame(nextFrame.get('key'))
+    // Copy the hover state if tab closed with mouse as long as we have a next frame
+    // This allow us to have closeTab button visible for sequential frames closing,
+    // until onMouseLeave event happens.
+    if (hoverState) {
+      windowActions.setTabHoverState(nextFrame.get('key'), hoverState)
+    }
   }
 
   return state
