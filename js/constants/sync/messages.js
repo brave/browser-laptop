@@ -51,7 +51,7 @@ const messages = {
    * with new records, do
    * GET_EXISTING_OBJECTS -> RESOLVE_SYNC_RECORDS -> RESOLVED_SYNC_RECORDS
    */
-  FETCH_SYNC_RECORDS: _, /* @param Array.<string> categoryNames, @param {number} startAt (in seconds or milliseconds), @param {boolean=} limitResponse true to limit response to 1000 records */
+  FETCH_SYNC_RECORDS: _, /* @param Array.<string> categoryNames, @param {number} startAt (in seconds or milliseconds), @param {number=} maxRecords limit response to a given max number of records. set to 0 or falsey to not limit the response. */
   /**
    * browser -> webview
    * sent to fetch all sync devices. webview responds with RESOLVED_SYNC_RECORDS.
@@ -61,8 +61,8 @@ const messages = {
    * webview -> browser
    * after sync gets records, it requests the browser's existing objects so sync
    * can perform conflict resolution.
-   * isTruncated is true if limitResponse was used and the total number of
-   * records exceeds the limit (1000).
+   * isTruncated is true if maxRecords was used and the total number of
+   * records exceeds the limit.
    */
   GET_EXISTING_OBJECTS: _, /* @param {string} categoryName, @param {Array.<Object>} records, @param {lastRecordTimeStamp} number, @param {boolean} isTruncated */
   /**

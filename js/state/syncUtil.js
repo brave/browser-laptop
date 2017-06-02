@@ -108,6 +108,8 @@ module.exports.getSiteDataFromRecord = (record, appState, records) => {
     if (parentFolderObjectId && parentFolderObjectId.length > 0) {
       siteProps.parentFolderId =
         getFolderIdByObjectId(new Immutable.List(parentFolderObjectId), appState, records)
+    } else if (siteProps.hideInToolbar === true) {
+      siteProps.parentFolderId = -1
     }
   }
   const siteDetail = new Immutable.Map(pickFields(siteProps, SITE_FIELDS))
@@ -422,7 +424,7 @@ module.exports.newObjectId = (objectPath) => {
  * @returns {Array.<number>}
  */
 const findOrCreateFolderObjectId = (folderId, appState) => {
-  if (typeof folderId !== 'number') { return undefined }
+  if (typeof folderId !== 'number' || folderId < 0) { return undefined }
   if (!appState) {
     const AppStore = require('../stores/appStore')
     appState = AppStore.getState()
@@ -472,6 +474,7 @@ module.exports.createSiteData = (site, appState) => {
       value: {
         site: siteData,
         isFolder: siteUtil.isFolder(immutableSite),
+        hideInToolbar: site.parentFolderId === -1,
         parentFolderObjectId
       }
     }
