@@ -62,5 +62,6 @@ module.exports = {
   },
   tabs: {
     maxAllowedNewSessions: 9
-  }
+  },
+  iconSize: 16
 }

@@ -4,6 +4,7 @@
 
 // Constants
 const settings = require('../../../js/constants/settings')
+const {braveExtensionId} = require('../../../js/constants/config')
 
 // Utils
 const locale = require('../../../js/l10n')
@@ -14,8 +15,6 @@ const {getSetting} = require('../../../js/settings')
 
 // Styles
 const styles = require('../../renderer/components/styles/global')
-
-module.exports.iconSize = 16
 
 const tabContentState = {
   getDisplayTitle: (state, frameKey) => {
@@ -66,7 +65,7 @@ const tabContentState = {
       ) &&
       (
         !frame.get('provisionalLocation') ||
-        !frame.get('provisionalLocation').startsWith('chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/')
+        !frame.get('provisionalLocation').startsWith(`chrome-extension://${braveExtensionId}/`)
       )
   },
 
@@ -79,23 +78,23 @@ const tabContentState = {
 
   isMediumView: (state, frameKey) => {
     const frame = frameStateUtil.getFrameByKey(state, frameKey)
-    const sizes = ['large', 'largeMedium']
-
-    return sizes.includes(frame.get('breakpoint'))
+    return frame
+      ? ['large', 'largeMedium'].includes(frame.get('breakpoint'))
+      : false
   },
 
   isNarrowView: (state, frameKey) => {
     const frame = frameStateUtil.getFrameByKey(state, frameKey)
-    const sizes = ['medium', 'mediumSmall', 'small', 'extraSmall', 'smallest']
-
-    return sizes.includes(frame.get('breakpoint'))
+    return frame
+      ? ['medium', 'mediumSmall', 'small', 'extraSmall', 'smallest'].includes(frame.get('breakpoint'))
+      : false
   },
 
   isNarrowestView: (state, frameKey) => {
     const frame = frameStateUtil.getFrameByKey(state, frameKey)
-    const sizes = ['extraSmall', 'smallest']
-
-    return sizes.includes(frame.get('breakpoint'))
+    return frame
+      ? ['extraSmall', 'smallest'].includes(frame.get('breakpoint'))
+      : false
   },
 
   getTabIconColor: (state, frameKey) => {

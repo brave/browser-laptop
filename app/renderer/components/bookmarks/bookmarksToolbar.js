@@ -22,6 +22,7 @@ const windowStore = require('../../../../js/stores/windowStore')
 // Constants
 const siteTags = require('../../../../js/constants/siteTags')
 const dragTypes = require('../../../../js/constants/dragTypes')
+const {iconSize} = require('../../../../js/constants/config')
 
 // Utils
 const siteUtil = require('../../../../js/state/siteUtil')
@@ -30,7 +31,6 @@ const cx = require('../../../../js/lib/classSet')
 const dnd = require('../../../../js/dnd')
 const dndData = require('../../../../js/dndData')
 const {calculateTextWidth} = require('../../../../js/lib/textCalculator')
-const {iconSize} = require('../../../common/state/tabContentState')
 
 // Styles
 const globalStyles = require('../styles/global')
