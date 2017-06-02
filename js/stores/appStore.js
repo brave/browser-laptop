@@ -370,6 +370,7 @@ function handleChangeSettingAction (settingKey, settingValue) {
 }
 
 let reducers = []
+let ledger = null
 
 const applyReducers = (state, action, immutableAction) => reducers.reduce(
     (appState, reducer) => {
@@ -380,9 +381,8 @@ const applyReducers = (state, action, immutableAction) => reducers.reduce(
     }, appState)
 
 const handleAppAction = (action) => {
-  const ledger = require('../../app/ledger')
-
   if (action.actionType === appConstants.APP_SET_STATE) {
+    ledger = require('../../app/ledger')
     reducers = [
       require('../../app/browser/reducers/downloadsReducer'),
       require('../../app/browser/reducers/flashReducer'),
