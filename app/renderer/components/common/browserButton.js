@@ -88,9 +88,9 @@ const styles = StyleSheet.create({
     boxShadow: globalStyles.button.default.boxShadow,
     cursor: 'pointer',
     width: 'auto',
-    height: 'auto',
 
     // TODO: #9223
+    height: '32px', // 32px == 1rem * 2
     fontSize: globalStyles.spacing.defaultFontSize,
     lineHeight: 1.25,
 
@@ -163,11 +163,10 @@ const styles = StyleSheet.create({
   },
 
   browserButton_notificationItem: {
-    fontSize: '13px',
     marginRight: '10px',
-    padding: '2px 15px',
     textTransform: 'capitalize',
-    width: 'auto'
+    width: 'auto',
+    height: '28px'
   },
 
   browserButton_subtleItem: {
