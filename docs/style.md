@@ -25,10 +25,13 @@ Also, note that this style guide was re-made after some code has being refactore
     * [Styles specific for a given component](#styles-specific-for-a-given-component)
   * [Naming styles](#naming-styles)
     * [Naming styles objects](#naming-styles-objects)
+    * [How we name styles](#how-we-name-styles)
+    * [Defining our blocks, elements, and modifiers](#defining-our-blocks-elements-and-modifiers)
     * [Naming styles themselves](#naming-styles-themselves)
   * [Styles are the last thing](#styles-are-the-last-thing)
   * [Important is evil](#important-is-evil)
 * [Best practices](#best-practices)
+  * [Always add space between styles](#always-add-space-between-styles)
   * [Dealing with pseudo-states](#dealing-with-pseudo-states)
   * [Dealing with media-queries](#dealing-with-media-queries)
   * [Dealing with keyframes](#dealing-with-keyframes)
@@ -120,22 +123,49 @@ module.exports = styles
 const styles = require('./something')
 ```
 
-#### Naming styles themselves
+#### How we name styles
 
-* Always camel-cased
+* BEM-like pattern
+* Always camelCased
 * Never quoted
 
+#### Defining our blocks, elements, and modifiers
+
+We make use of BEM for our styles, being the only difference is that we replace `--` (double dash) with `__` (double underline).
+
+Decision to make use of BEM took the following considerations:
+
+1. Following BEM should avoid visual regressions nicely;
+2. It follows a simple set of rules that once learned makes code easier to follow and make changes. Turns out that the naming convention adopted by BEM fits very well with parsed names set by Aphrodite, which makes the code easier to follow even after parsed by Aphrodite;
+3. Reduces style conflicts by keeping CSS specificity to a minimum level. Even with Aphrodite, there's a small (but worth considering) chance that some parsed style could conflict with other style with the same name. Naming convention set by BEM can reduce even more the risk.
+
+Below an overview of our practices, given `<BrowserButton>` component:
+
+```js
+browserButton: {}, // block -- this is our button
+browserButton__icon: {}, // element -- a child element of our button, in this case an icon
+browserButton_primary: {} // modifier -- we have a lot of button styles, this one customizes our primary button
+browserButton_primary__icon: {} // mixing it all -- our style for an icon inside a primary button
+```
+
+Notice that our styles resemble our code state, which means that if you strictly follow BEM practices, and your style name looks too big for you, you can consider that it is a strong indicator that either you have more elements than it is needed, or that some child elements should be split to a new file with its own styles (i.e. a new component).
 
 **Bad**
 
 ```js
 styles = StyleSheet.create({
   // Uppercased, quoted :(
-  'StyleName': {
+  'Component': {
     color: 'green'
+  },
+
+  // too big. Very likely that componentChild should be a separated component
+  component_someModifer__componentBody__componentChild__componentInnerDiv_componentInnerDivText: {
+    color: 'blue'
   }
 })
 ```
+
 
 **Good**
 ```js
@@ -143,6 +173,11 @@ styles = StyleSheet.create({
   // no quotes, camelCased :)
   styleName: {
     color: 'green'
+  },
+
+  // plain and simple ++
+  styleName_modifier__caret: {
+    color: 'blue'
   }
 })
 ```
@@ -196,6 +231,56 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 ```
 
 ## Best practices
+
+### Always add space between styles objects
+
+**Bad:**
+
+```js
+const styles = StyleSheet.create({
+  style1: {
+    background: 'purple'
+  },
+  style2:
+    background: 'orange'
+  }
+})
+```
+
+**Good:**
+
+```js
+const styles = StyleSheet.create({
+  style1: {
+    background: 'purple'
+  },
+
+  style2:
+    background: 'orange'
+  }
+})
+```
+
+** Note that this applies for nested styles as well:
+
+**Also good:**
+
+```js
+const styles = StyleSheet.create({
+  style1: {
+    background: 'purple',
+
+    // I'm nested
+    ':hover': {
+      bakground: 'green'
+    }
+  },
+
+  style2:
+    background: 'orange'
+  }
+})
+```
 
 ### Dealing with pseudo-states
 
@@ -471,8 +556,9 @@ At some point you can deal with classes using with `cx()` that can't be changed 
   className={cx({
     mainClass: true, // mainClass will always be shown
     // Below will be applied only if condition match
-    conditionalClass: this.canBeApplied && this.isValid})} />
+    conditionalClass: this.canBeApplied && this.isValid,
     [css(styles.awesomeAphroditeStyleHere]: true
+})} />
 ```
 
 
