@@ -27,6 +27,7 @@ class DownloadsBar extends ImmutableComponent {
     super()
     this.onHideDownloadsToolbar = this.onHideDownloadsToolbar.bind(this)
     this.onShowDownloads = this.onShowDownloads.bind(this)
+    this.downloadBarButtonsNode = null
   }
   onHideDownloadsToolbar () {
     windowActions.setDownloadsToolbarVisible(false)
@@ -38,14 +39,13 @@ class DownloadsBar extends ImmutableComponent {
       url: 'about:downloads'
     })
     windowActions.setDownloadsToolbarVisible(false)
-    webviewActions.setWebviewFocused()
   }
   render () {
     const getComputedStyle = require('../../getComputedStyle')
     const downloadItemWidth = Number.parseInt(getComputedStyle('--download-item-width'), 10)
     const downloadItemMargin = Number.parseInt(getComputedStyle('--download-item-margin'), 10)
     const downloadBarPadding = Number.parseInt(getComputedStyle('--download-bar-padding'), 10)
-    const downloadBarButtons = Number.parseInt(getComputedStyle('--download-bar-buttons'), 10)
+    const { width: downloadBarButtons } = this.downloadBarButtonsNode.getBoundingClientRect()
     const numItems = Math.floor((this.props.windowWidth - (downloadBarPadding * 2) - downloadBarButtons) / (downloadItemWidth + downloadItemMargin))
     return <div className='downloadsBar'
       onContextMenu={contextMenus.onDownloadsToolbarContextMenu.bind(null, undefined, undefined)}>
@@ -63,10 +63,13 @@ class DownloadsBar extends ImmutableComponent {
                 downloadsSize={this.props.downloads.size} />)
         }
       </div>
-      <div className={cx({
-        downloadBarButtons: true,
-        [css(styles.downloadsBar__downloadBarButtons)]: true
-      })}>
+      <div
+        className={cx({
+          downloadBarButtons: true,
+          [css(styles.downloadsBar__downloadBarButtons)]: true
+        })}
+        ref={refNode => { this.downloadBarButtonsNode = refNode }}
+        >
         <BrowserButton secondaryColor
           l10nId='downloadViewAll'
           testId='downloadViewAll'
