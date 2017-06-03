@@ -169,6 +169,10 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
     delete frame.adblock
     delete frame.noScript
 
+    // clean up any legacy frame opening props
+    delete frame.openInForeground
+    delete frame.disposition
+
     // Guest instance ID's are not valid after restarting.
     // Electron won't know about them.
     delete frame.guestInstanceId
