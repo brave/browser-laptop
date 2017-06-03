@@ -27,6 +27,13 @@ const tabCloseAction = {
   PARENT: 'parent'
 }
 
+// timing in milliseconds
+const tabPreviewTiming = {
+  LONG: 2000,
+  NORMAL: 1000,
+  SHORT: 500
+}
+
 const fullscreenOption = {
   ALWAYS_ASK: 'alwaysAsk',
   ALWAYS_ALLOW: 'alwaysAllow'
@@ -42,6 +49,7 @@ module.exports = {
   newTabMode,
   bookmarksToolbarMode,
   tabCloseAction,
+  tabPreviewTiming,
   fullscreenOption,
   autoplayOption
 }

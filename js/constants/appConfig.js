@@ -138,6 +138,7 @@ module.exports = {
     'tabs.tabs-per-page': 20,
     'tabs.close-action': 'parent',
     'tabs.show-tab-previews': true,
+    'tabs.preview-timing': 2000,
     'tabs.show-dashboard-images': true,
     'privacy.history-suggestions': true,
     'privacy.bookmark-suggestions': true,

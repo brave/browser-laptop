@@ -255,6 +255,19 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a message to the store to set preview mode.
+   * This will check whether setPreviewFrame should be fired or not.
+   *
+   * @param {Boolean} shouldEnablePreview - true if user enters in previewMode state
+   */
+  setPreviewMode: function (shouldEnablePreview) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SET_PREVIEW_MODE,
+      shouldEnablePreview
+    })
+  },
+
+  /**
    * Dispatches a message to the store to set the tab page index.
    *
    * @param {number} index - the tab page index to change to

@@ -28,6 +28,7 @@ const settings = {
   PAINT_TABS: 'tabs.paint-tabs',
   TABS_PER_PAGE: 'tabs.tabs-per-page',
   SHOW_TAB_PREVIEWS: 'tabs.show-tab-previews',
+  TAB_PREVIEW_TIMING: 'tabs.preview-timing',
   SHOW_DASHBOARD_IMAGES: 'tabs.show-dashboard-images',
   // Privacy Tab
   HISTORY_SUGGESTIONS: 'privacy.history-suggestions',

@@ -212,6 +212,17 @@ This is done when hovering over a tab.
 
 
 
+### setPreviewMode(shouldEnablePreview) 
+
+Dispatches a message to the store to set preview mode.
+This will check whether setPreviewFrame should be fired or not.
+
+**Parameters**
+
+**shouldEnablePreview**: `Boolean`, true if user enters in previewMode state
+
+
+
 ### setTabPageIndex(index) 
 
 Dispatches a message to the store to set the tab page index.
