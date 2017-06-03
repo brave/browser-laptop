@@ -30,13 +30,13 @@
     color: @mediumGray;
   }
 
-  span.findButton {
+  .closeButton {
+    border: 1px solid transparent;
     color: @gray;
     cursor: default;
-    border: 1px solid transparent;
-    font-size: 18px;
-    margin: 0 2px;
+    font-size: 22px;
     opacity: 0.5;
+    transform: rotate(45deg);
 
     &:not([disabled]):hover {
       opacity: 1;
@@ -45,14 +45,6 @@
     &.hideButton:not([disabled]):hover {
       background: @chromeControlsWarningBackground;
     }
-  }
-
-  .closeButton {
-    color: white;
-    font-size: 22px;
-    margin-right: 0;
-    opacity: 0.5;
-    transform: rotate(45deg);
   }
 
   .searchContainer {
