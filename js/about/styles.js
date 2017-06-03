@@ -261,16 +261,6 @@ class AboutStyle extends ImmutableComponent {
           &lt;BrowserButton secondaryColor l10nId='secondaryColor' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
-        {
-          /* TODO: I don't think we really need it. Once we confirm by removing
-            legacy button styles, remove this as well */
-        }
-        <button data-l10n-id='inlineButton' className='browserButton whiteButton inlineButton' onClick={this.onRemoveBookmark} />
-        <Pre><Code>
-          &lt;button data-l10n-id='inlineButton' className='browserButton whiteButton inlineButton'{'\n'}
-          onClick={'{this.onRemoveBookmark}'} />
-        </Code></Pre>
-
         {/* TODO: This button size doesn't match its name */}
         <button data-l10n-id='smallButton' className='browserButton whiteButton smallButton' onClick={this.onRemoveBookmark} />
         <Pre><Code>
