@@ -4,6 +4,7 @@ Submitter Checklist:
 - [ ] Used Github [auto-closing keywords](https://help.github.com/articles/closing-issues-via-commit-messages/) in the commit message.
 - [ ] Added/updated tests for this change (for new code or code which already has tests).
 - [ ] Ran `git rebase -i` to squash commits (if needed).
+- [ ] Tagged reviewers and labelled the pull request [as needed](https://github.com/brave/browser-laptop/wiki/Pull-request-process).
 
 Test Plan:
 
