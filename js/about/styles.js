@@ -270,13 +270,17 @@ class AboutStyle extends ImmutableComponent {
 
         <BrowserButton primaryColor l10nId='primaryColor' onClick={this.onRemoveBookmark} />
         <Pre><Code>
-          &lt;BrowserButton l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
+          &lt;BrowserButton primaryColor l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
+        </Code></Pre>
+
+        <BrowserButton secondaryColor l10nId='secondaryColor' onClick={this.onRemoveBookmark} />
+        <Pre><Code>
+          &lt;BrowserButton secondaryColor l10nId='secondaryColor' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
         <BrowserButton actionItem l10nId='actionButton' onClick={this.onRemoveBookmark} />
         <Pre><Code>
-          &lt;BrowserButton actionItem l10nId='done'{'\n'}
-          onClick={'{this.onRemoveBookmark}'} />
+          &lt;BrowserButton actionItem l10nId='done' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
         <BrowserButton subtleItem l10nId='subtleButton' onClick={this.onRemoveBookmark} />
@@ -284,9 +288,9 @@ class AboutStyle extends ImmutableComponent {
           &lt;BrowserButton subtleItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
-        <BrowserButton primaryColor groupedItem l10nId='primaryButton' onClick={this.onRemoveBookmark} />
-        <BrowserButton secondaryColor groupedItem l10nId='whiteButton' onClick={this.onRemoveBookmark} />
-        <BrowserButton primaryColor groupedItem l10nId='primaryButton' onClick={this.onRemoveBookmark} />
+        <BrowserButton primaryColor groupedItem l10nId='primaryColor' onClick={this.onRemoveBookmark} />
+        <BrowserButton secondaryColor groupedItem l10nId='secondaryColor' onClick={this.onRemoveBookmark} />
+        <BrowserButton primaryColor groupedItem l10nId='primaryColor' onClick={this.onRemoveBookmark} />
         <Pre><Code>
           &lt;BrowserButton primaryColor groupedItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />{'\n'}
           &lt;BrowserButton secondaryColor groupedItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />{'\n'}
@@ -298,9 +302,9 @@ class AboutStyle extends ImmutableComponent {
           &lt;BrowserButton extensionItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
-        <BrowserButton notificationItem l10nId='notificationItem' onClick={this.onRemoveBookmark} />
+        <BrowserButton notificationItem secondaryColor l10nId='notificationItem' onClick={this.onRemoveBookmark} />
         <Pre><Code>
-          &lt;BrowserButton notificationItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
+          &lt;BrowserButton notificationItem secondaryColor l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
         <GoTop />
@@ -694,15 +698,18 @@ const styles = StyleSheet.create({
 
   wrapper: common,
   container: common,
+
   pre: {
     background: '#1d1f21',
-    color: '#FFFFFF',
+    color: '#fff',
     fontSize: '14px',
-    padding: '5px',
+    padding: '1rem',
     borderRadius: globalStyles.radius.borderRadius,
     tabSize: '2',
-    wordBreak: 'normal'
+    wordBreak: 'normal',
+    overflowX: 'scroll'
   },
+
   code: {
     fontFamily: 'monospace',
     whiteSpace: 'pre'
