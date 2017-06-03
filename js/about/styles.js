@@ -302,9 +302,11 @@ class AboutStyle extends ImmutableComponent {
           &lt;BrowserButton extensionItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
-        <BrowserButton notificationItem secondaryColor l10nId='notificationItem' onClick={this.onRemoveBookmark} />
+        <BrowserButton secondaryColor notificationItem groupedItem l10nId='notificationItem' onClick={this.onRemoveBookmark} />
+        <BrowserButton secondaryColor notificationItem groupedItem l10nId='notificationItem' onClick={this.onRemoveBookmark} />
         <Pre><Code>
-          &lt;BrowserButton notificationItem secondaryColor l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
+          &lt;BrowserButton secondaryColor notificationItem groupedItem l10nId='Yes' onClick={'{this.onRemoveBookmark}'} />{'\n'}
+          &lt;BrowserButton secondaryColor notificationItem groupedItem l10nId='No' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
         <GoTop />

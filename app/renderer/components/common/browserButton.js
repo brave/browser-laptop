@@ -163,9 +163,7 @@ const styles = StyleSheet.create({
   },
 
   browserButton_notificationItem: {
-    marginRight: '10px',
     textTransform: 'capitalize',
-    width: 'auto',
     height: '28px'
   },
 
