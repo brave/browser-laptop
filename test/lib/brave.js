@@ -649,6 +649,15 @@ var exports = {
         }, createProperties)
     })
 
+    this.app.client.addCommand('activateTabByIndex', function (index) {
+      return this.waitForTab({index}).getAppState().then((val) => {
+        const tab = val.value.tabs.find((tab) => tab.index === index)
+        return this.execute(function (tabId) {
+          devTools('appActions').tabActivateRequested(tabId)
+        }, tab.tabId)
+      })
+    })
+
     /**
      * Adds a site to the sites list, such as a bookmarks.
      *

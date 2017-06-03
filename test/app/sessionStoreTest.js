@@ -2,7 +2,7 @@
 
 const Brave = require('../lib/brave')
 const Immutable = require('immutable')
-const {urlInput, navigatorBookmarked, navigatorNotBookmarked} = require('../lib/selectors')
+const {urlInput, navigatorBookmarked, navigatorNotBookmarked, pinnedTabsTabs, tabsTabs} = require('../lib/selectors')
 const siteTags = require('../../js/constants/siteTags')
 const siteUtil = require('../../js/state/siteUtil')
 
@@ -59,6 +59,91 @@ describe('sessionStore', function () {
       yield Brave.app.client
         .waitForBrowserWindow()
         .waitForExist(navigatorBookmarked)
+    })
+  })
+
+  describe('restore active tab', function () {
+    describe('regular tab', function () {
+      Brave.beforeAllServerSetup(this)
+      before(function * () {
+        this.page1Url = Brave.server.url('page1.html')
+        this.page2Url = Brave.server.url('page2.html')
+        this.activeTabSelector = '.frameWrapper.isActive webview[data-frame-key="1"][src="' + this.page1Url + '"]'
+        yield Brave.startApp()
+        yield setup(Brave.app.client)
+        yield Brave.app.client
+          .waitForBrowserWindow()
+          .waitForUrl(Brave.newTabUrl)
+          .loadUrl(this.page1Url)
+          .windowByUrl(Brave.browserWindowUrl)
+          .newTab({url: this.page2Url})
+          .waitForUrl(this.page2Url)
+          .windowByUrl(Brave.browserWindowUrl)
+          .newTab({url: this.page2Url})
+          .waitForUrl(this.page2Url)
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitForElementCount(tabsTabs, 3)
+          .pinTabByIndex(2, true)
+          .waitForExist(pinnedTabsTabs)
+          .waitForElementCount(pinnedTabsTabs, 1)
+          .waitForElementCount(tabsTabs, 2)
+          .activateTabByIndex(0)
+          .waitForExist(this.activeTabSelector)
+        yield Brave.stopApp(false)
+        yield Brave.startApp()
+        yield setup(Brave.app.client)
+      })
+
+      after(function * () {
+        yield Brave.stopApp()
+      })
+
+      it('restores the last active tab', function * () {
+        yield Brave.app.client
+          .waitForUrl(this.page1Url)
+          // page2Url is lazy loaded
+          .waitForBrowserWindow()
+          .waitForExist(this.activeTabSelector)
+      })
+    })
+
+    describe('pinned tab', function () {
+      Brave.beforeAllServerSetup(this)
+      before(function * () {
+        this.page1Url = Brave.server.url('page1.html')
+        this.page2Url = Brave.server.url('page2.html')
+        this.activeTabSelector = '.frameWrapper.isActive webview[data-frame-key="2"][src="' + this.page2Url + '"]'
+        yield Brave.startApp()
+        yield setup(Brave.app.client)
+        yield Brave.app.client
+          .waitForBrowserWindow()
+          .waitForUrl(Brave.newTabUrl)
+          .loadUrl(this.page1Url)
+          .windowByUrl(Brave.browserWindowUrl)
+          .newTab({url: this.page2Url})
+          .waitForUrl(this.page2Url)
+          .windowByUrl(Brave.browserWindowUrl)
+          .pinTabByIndex(1, true)
+          .waitForExist(pinnedTabsTabs)
+          .waitForElementCount(pinnedTabsTabs, 1)
+          .waitForElementCount(tabsTabs, 1)
+          .waitForExist(this.activeTabSelector)
+        yield Brave.stopApp(false)
+        yield Brave.startApp()
+        yield setup(Brave.app.client)
+      })
+
+      after(function * () {
+        yield Brave.stopApp()
+      })
+
+      it('restores the last active pinned tab', function * () {
+        yield Brave.app.client
+          // page1Url is lazy loaded
+          .waitForUrl(this.page2Url)
+          .waitForBrowserWindow()
+          .waitForExist(this.activeTabSelector)
+      })
     })
   })
 
