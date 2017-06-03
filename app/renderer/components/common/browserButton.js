@@ -23,7 +23,6 @@ class BrowserButton extends ImmutableComponent {
       // TODO: These are other button styles app-wise
       // that needs to be refactored and included in this file
       // .............................................
-      // this.props.smallItem && styles.browserButton_smallItem,
       // this.props.navItem && styles.browserButton_navItem,
       // this.props.panelItem && styles.browserButton_panelItem,
 

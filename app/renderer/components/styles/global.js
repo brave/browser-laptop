@@ -240,7 +240,9 @@ const globalStyles = {
     exclude: 'fa fa-ban',
     trash: 'fa fa-trash',
     moreInfo: 'fa fa-info-circle',
-    angleDoubleRight: 'fa fa-angle-double-right'
+    angleDoubleRight: 'fa fa-angle-double-right',
+    findPrev: 'fa fa-caret-up',
+    findNext: 'fa fa-caret-down'
   },
   animations: {
     subtleShowUp: {

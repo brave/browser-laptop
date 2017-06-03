@@ -20,8 +20,12 @@ const windowActions = require('../../../../js/actions/windowActions')
 const windowStore = require('../../../../js/stores/windowStore')
 
 // Utils
+const cx = require('../../../../js/lib/classSet')
 const contextMenus = require('../../../../js/contextMenus')
 const {getTextColorForBackground} = require('../../../../js/lib/color')
+
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../styles/global')
 
 class FindBar extends ImmutableComponent {
   constructor () {
@@ -236,16 +240,26 @@ class FindBar extends ImmutableComponent {
             onClick={this.onClear} />
         </div>
         <span className='findMatchText'>{findMatchText}</span>
-        <Button iconClass='findButton fa-caret-up'
+        <Button iconClass={globalStyles.appIcons.findPrev}
+          className={cx({
+            findButton: true,
+            [css(styles.findButton)]: true
+          })}
           inlineStyles={findBarStyle}
-          className='findButton smallButton findPrev'
+          testId='findBarPrevButton'
           disabled={this.numberOfMatches <= 0}
-          onClick={this.onFindPrev} />
-        <Button iconClass='findButton fa-caret-down'
+          onClick={this.onFindPrev}
+        />
+        <Button iconClass={globalStyles.appIcons.findNext}
+          className={cx({
+            findButton: true,
+            [css(styles.findButton)]: true
+          })}
           inlineStyles={findBarStyle}
-          className='findButton smallButton findNext'
+          testId='findBarNextButton'
           disabled={this.numberOfMatches <= 0}
-          onClick={this.onFindNext} />
+          onClick={this.onFindNext}
+        />
         <SwitchControl
           id='caseSensitivityCheckbox'
           checkedOn={this.isCaseSensitive}
@@ -258,5 +272,14 @@ class FindBar extends ImmutableComponent {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  findButton: {
+    lineHeight: '18px',
+    width: '18px',
+    height: '18px',
+    fontSize: '24px'
+  }
+})
 
 module.exports = FindBar
