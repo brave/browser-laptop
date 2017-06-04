@@ -40,12 +40,17 @@ class DownloadsBar extends ImmutableComponent {
     })
     windowActions.setDownloadsToolbarVisible(false)
   }
+
   render () {
     const getComputedStyle = require('../../getComputedStyle')
     const downloadItemWidth = Number.parseInt(getComputedStyle('--download-item-width'), 10)
     const downloadItemMargin = Number.parseInt(getComputedStyle('--download-item-margin'), 10)
     const downloadBarPadding = Number.parseInt(getComputedStyle('--download-bar-padding'), 10)
-    const { width: downloadBarButtons } = this.downloadBarButtonsNode.getBoundingClientRect()
+
+    const downloadBarButtons = this.downloadBarButtonsNode !== null
+                            ? this.downloadBarButtonsNode.getBoundingClientRect().width
+                            : 0
+
     const numItems = Math.floor((this.props.windowWidth - (downloadBarPadding * 2) - downloadBarButtons) / (downloadItemWidth + downloadItemMargin))
     return <div className='downloadsBar'
       onContextMenu={contextMenus.onDownloadsToolbarContextMenu.bind(null, undefined, undefined)}>
