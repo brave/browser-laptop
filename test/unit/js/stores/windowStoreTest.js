@@ -1,16 +1,18 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-/* global describe, before, after, it */
+/* global describe, before, beforeEach, after, afterEach, it */
 
 const mockery = require('mockery')
 const assert = require('assert')
-// const sinon = require('sinon')
+const sinon = require('sinon')
 const Immutable = require('immutable')
 const fakeElectron = require('../../lib/fakeElectron')
 const windowConstants = require('../../../../js/constants/windowConstants')
+const appConstants = require('../../../../js/constants/appConstants')
 let doAction
 let windowStore
+let appActions
 require('../../braveUnit')
 
 describe('Window store unit tests', function () {
@@ -28,6 +30,7 @@ describe('Window store unit tests', function () {
   ]
 
   before(function () {
+    appActions = require('../../../../js/actions/appActions.js')
     mockery.enable({
       warnOnReplace: false,
       warnOnUnregistered: false,
@@ -35,6 +38,7 @@ describe('Window store unit tests', function () {
     })
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('../dispatcher/appDispatcher', fakeDispatcher)
+    mockery.registerMock('../actions/appActions', appActions)
     windowStore = require('../../../../js/stores/windowStore.js')
   })
 
@@ -118,6 +122,159 @@ describe('Window store unit tests', function () {
           it('sets endLoadTime=null', function () {
             assert.equal(windowState.getIn(['frames', 0, 'endLoadTime']), null)
           })
+        })
+      })
+    })
+
+    describe('APP_NEW_WEB_CONTENTS_ADDED', function () {
+      let windowState
+      let tabIndexChangedStub
+      const demoWindowState = {
+        frames: [{
+          security: {
+            isSecure: null
+          },
+          src: 'https://brave.com',
+          lastAccessedTime: null,
+          guestInstanceId: 2,
+          partition: 'persist:default',
+          findDetail: {
+            searchString: '',
+            caseSensitivity: false
+          },
+          endLoadTime: null,
+          navbar: {
+            urlbar: {
+              location: 'https://brave.com',
+              suggestions: {
+                selectedIndex: 0,
+                searchResults: [],
+                suggestionList: null
+              },
+              selected: false,
+              focused: true,
+              active: false
+            }
+          },
+          tabId: 8,
+          zoomLevel: 0,
+          breakpoint: 'default',
+          index: 1,
+          partitionNumber: 0,
+          history: [],
+          audioMuted: false,
+          startLoadTime: null,
+          location: 'https://brave.com',
+          disposition: 'background-tab',
+          title: 'page title goes here',
+          searchDetail: null,
+          icon: 'https://brave.com/favicon.ico',
+          isPrivate: false,
+          openerTabId: 1,
+          parentFrameKey: null,
+          loading: false,
+          unloaded: true,
+          key: 2
+        }]
+      }
+      const demoAction = {
+        actionType: appConstants.APP_NEW_WEB_CONTENTS_ADDED,
+        queryInfo: {
+          windowId: 1
+        },
+        frameOpts: {
+          location: 'about:blank',
+          partition: 'persist:default',
+          active: true,
+          guestInstanceId: 8,
+          isPinned: false,
+          openerTabId: 8,
+          disposition: 'foreground-tab',
+          unloaded: false
+        },
+        tabValue: {
+          audible: false,
+          width: 300,
+          active: true,
+          height: 300,
+          guestInstanceId: 8,
+          autoDiscardable: true,
+          partition: 'persist:default',
+          windowId: -1,
+          incognito: false,
+          canGoForward: false,
+          url: '',
+          tabId: 33,
+          index: -1,
+          status: 'complete',
+          highlighted: false,
+          partitionNumber: 0,
+          title: '',
+          pinned: false,
+          mutedInfo: {
+            muted: false,
+            reason: 'user'
+          },
+          id: 33,
+          selected: true,
+          discarded: false,
+          canGoBack: false
+        }
+      }
+
+      beforeEach(function () {
+        tabIndexChangedStub = sinon.stub(appActions, 'tabIndexChanged')
+      })
+
+      afterEach(function () {
+        reducers.forEach((reducer) => {
+          mockery.deregisterMock(reducer)
+        })
+
+        tabIndexChangedStub.restore()
+      })
+
+      describe('when tab being opened is active', function () {
+        before(function () {
+          const fakeReducer = (state, action) => {
+            return Immutable.fromJS(demoWindowState)
+          }
+          reducers.forEach((reducer) => {
+            mockery.registerMock(reducer, fakeReducer)
+          })
+          doAction(demoAction)
+
+          // get the updated windowState (AFTER doAction runs)
+          windowStore = require('../../../../js/stores/windowStore.js')
+          windowState = windowStore.getState()
+        })
+
+        it('sets activeFrameKey', function () {
+          assert(windowState.get('activeFrameKey'))
+        })
+      })
+
+      describe('when tab being opened is not active', function () {
+        before(function () {
+          const newAction = Object.assign(demoAction, {})
+          newAction.frameOpts.active = false
+          newAction.tabValue.active = false
+
+          const fakeReducer = (state, action) => {
+            return Immutable.fromJS(demoWindowState)
+          }
+          reducers.forEach((reducer) => {
+            mockery.registerMock(reducer, fakeReducer)
+          })
+          doAction(newAction)
+
+          // get the updated windowState (AFTER doAction runs)
+          windowStore = require('../../../../js/stores/windowStore.js')
+          windowState = windowStore.getState()
+        })
+
+        it('does not set activeFrameKey', function () {
+          assert.equal(windowState.get('activeFrameKey'), undefined)
         })
       })
     })
