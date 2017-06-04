@@ -98,7 +98,7 @@ const addToHistory = (frameProps) => {
   return history.slice(-10)
 }
 
-const newFrame = (state, frameOpts, openInForeground) => {
+const newFrame = (state, frameOpts) => {
   if (frameOpts === undefined) {
     frameOpts = {}
   }
@@ -117,12 +117,17 @@ const newFrame = (state, frameOpts, openInForeground) => {
   }
   frameOpts.partitionNumber = frameOpts.partitionNumber || 0
 
-  if (frameOpts.disposition) {
+  const active = frameOpts.active
+  delete frameOpts.active
+  delete frameOpts.openInForeground // clean up any legacy openInForeground props
+  let openInForeground = active
+
+  if (openInForeground == null && frameOpts.disposition) {
     openInForeground = frameOpts.disposition !== 'background-tab'
+    delete frameOpts.disposition
   }
 
-  const activeFrame = frameStateUtil.getActiveFrame(state)
-  if (openInForeground === undefined || !activeFrame) {
+  if (openInForeground == null || state.get('activeFrameKey') == null) {
     openInForeground = true
   }
 
@@ -183,10 +188,13 @@ const newFrame = (state, frameOpts, openInForeground) => {
   state = frameStateUtil.updateFramesInternalIndex(state, insertionIndex)
 
   if (openInForeground) {
-    const activeFrame = frameStateUtil.getActiveFrame(state)
-    const tabId = activeFrame.get('tabId')
-    state = updateTabPageIndex(state, activeFrame)
-    if (tabId) {
+    const tabId = frameOpts.tabId
+    const frame = frameStateUtil.getFrameByTabId(state, tabId)
+    state = frameStateUtil.updateTabPageIndex(state, frame)
+    if (active) {
+      // only set the activeFrameKey if the tab is already active
+      state = state.set('activeFrameKey', frame.get('key'))
+    } else {
       appActions.tabActivateRequested(tabId)
     }
   }
@@ -698,7 +706,7 @@ const doAction = (action) => {
         action.frameOpts.tabId = tabValue.get('tabId')
         action.frameOpts.icon = action.frameOpts.icon || tabValue.get('favIconUrl')
       }
-      windowState = newFrame(windowState, action.frameOpts, action.frameOpts.openInForeground)
+      windowState = newFrame(windowState, action.frameOpts)
       break
     case windowConstants.WINDOW_FRAME_MOUSE_ENTER:
       windowState = windowState.setIn(['ui', 'mouseInFrame'], true)
