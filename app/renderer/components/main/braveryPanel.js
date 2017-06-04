@@ -194,6 +194,7 @@ class BraveryPanel extends ImmutableComponent {
           <SwitchControl large
             customWrapperClassName={css(styles.braveryPanel_compact__header_bottom__shieldsSwitch__switchControl)}
             onClick={this.onToggleShields}
+            testId='shields-toggle'
             leftl10nId='shieldsDown'
             rightl10nId='shieldsUp'
             checkedOn={shieldsUp}
@@ -215,6 +216,7 @@ class BraveryPanel extends ImmutableComponent {
           customWrapperClassName={css(styles.braveryPanel__header_right__switchControl)}
           customTopTextClassName={css(styles.braveryPanel__header_right__switchControl__topText)}
           onClick={this.onToggleShields}
+          testId='shields-toggle'
           leftl10nId='shieldsDown'
           rightl10nId='shieldsUp'
           topl10nId='shields'
