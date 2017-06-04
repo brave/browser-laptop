@@ -892,10 +892,7 @@ class Main extends ImmutableComponent {
       </div>
       {
         this.props.windowState.getIn(['ui', 'downloadsToolbar', 'isVisible']) && this.props.appState.get('downloads') && this.props.appState.get('downloads').size > 0
-        ? <DownloadsBar
-          windowWidth={window.innerWidth}
-          deleteConfirmationVisible={this.props.appState.get('deleteConfirmationVisible')}
-          downloads={this.props.appState.get('downloads')} />
+        ? <DownloadsBar />
         : null
       }
     </div>
