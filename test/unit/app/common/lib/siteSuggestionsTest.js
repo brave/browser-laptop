@@ -21,7 +21,8 @@ const site3 = {
 const site4 = {
   location: 'https://www.designers.com/brad',
   title: 'Brad Saves The World!',
-  count: 50
+  count: 50,
+  customTitle: 'brad-heart-composite'
 }
 
 // Same as site4 but added after in init, should be ignored.
@@ -148,6 +149,9 @@ describe('siteSuggestions lib', function () {
     })
     it('can query on title', function (cb) {
       checkResult('back', [site2], cb)
+    })
+    it('can query on customTitle', function (cb) {
+      checkResult('heart-comp', [site4], cb)
     })
     it('can query on multiple tokens in different order', function (cb) {
       checkResult('back really', [site2], cb)
@@ -337,11 +341,13 @@ describe('siteSuggestions lib', function () {
       checkResult('slack', [{ location: 'https://slack.com' }], cb)
     })
     it('adding twice results in 1 result only with latest results', function (cb) {
-      add({
+      const newSite = {
         location: 'https://slack.com',
-        count: 30
-      })
-      checkResult('slack', [{ location: 'https://slack.com', count: 30 }], cb)
+        count: 30,
+        customTitle: 'SlickSlack'
+      }
+      add(newSite)
+      checkResult('slack', [newSite], cb)
     })
     it('can add simple strings', function (cb) {
       add({
