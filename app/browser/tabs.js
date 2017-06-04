@@ -332,7 +332,7 @@ const api = {
       const frameOpts = {
         location,
         partition: newTab.session.partition,
-        openInForeground: !!newTabValue.get('active'),
+        active: !!newTabValue.get('active'),
         guestInstanceId: newTab.guestInstanceId,
         isPinned: !!newTabValue.get('pinned'),
         openerTabId,

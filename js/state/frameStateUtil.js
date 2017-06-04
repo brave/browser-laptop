@@ -367,15 +367,9 @@ function addFrame (state, frameOpts, newKey, partitionNumber, openInForeground, 
     history: []
   }, frameOpts))
 
-  const result = {
+  return {
     frames: frames.splice(insertionIndex, 0, frame)
   }
-
-  if (openInForeground) {
-    result.activeFrameKey = newKey
-  }
-
-  return result
 }
 
 /**
