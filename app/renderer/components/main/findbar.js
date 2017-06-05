@@ -252,7 +252,7 @@ class FindBar extends ImmutableComponent {
           onClick={this.onCaseSensitivityChange} />
         <label htmlFor='caseSensitivityCheckbox' data-l10n-id='caseSensitivity' style={findBarTextStyle} />
       </div>
-      <span className='findButton closeButton'
+      <span className='closeButton'
         style={findBarTextStyle}
         onClick={this.props.onFindHide}>+</span>
     </div>
