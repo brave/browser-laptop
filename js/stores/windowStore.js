@@ -190,7 +190,7 @@ const newFrame = (state, frameOpts) => {
   if (openInForeground) {
     const tabId = frameOpts.tabId
     const frame = frameStateUtil.getFrameByTabId(state, tabId)
-    state = frameStateUtil.updateTabPageIndex(state, frame)
+    state = updateTabPageIndex(state, frame)
     if (active) {
       // only set the activeFrameKey if the tab is already active
       state = state.set('activeFrameKey', frame.get('key'))
