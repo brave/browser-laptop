@@ -22,7 +22,7 @@ if (typeof process !== 'undefined') {
     BrowserWindow = require('electron').BrowserWindow
     ipc = require('electron').ipcMain
   }
-} else if (typeof chrome !== 'undefined' && typeof chrome.ipcRenderer === 'function') {
+} else if (typeof chrome !== 'undefined' && typeof chrome.ipcRenderer === 'object') {
   processType = 'extension-page'
   ipc = chrome.ipcRenderer // eslint-disable-line
 } else {
