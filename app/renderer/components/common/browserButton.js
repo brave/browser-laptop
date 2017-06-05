@@ -50,15 +50,13 @@ const buttonSize = '25px'
 
 const styles = StyleSheet.create({
   browserButton: {
+    height: buttonSize,
+    width: buttonSize,
     margin: '0 3px',
     whiteSpace: 'nowrap',
     outline: 'none',
     cursor: 'default',
     display: 'inline-block',
-    lineHeight: buttonSize,
-    height: buttonSize,
-    width: buttonSize,
-    fontSize: '13px',
     borderRadius: '2px',
     textAlign: 'center',
     transition: '.1s opacity, .1s background',
@@ -70,6 +68,10 @@ const styles = StyleSheet.create({
     backgroundColor: globalStyles.button.default.backgroundColor,
     border: 'none',
 
+    // TODO: #9223
+    fontSize: '13px',
+    lineHeight: buttonSize,
+
     // cf: https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L49
     color: globalStyles.button.color,
 
@@ -80,16 +82,18 @@ const styles = StyleSheet.create({
 
   // applies for primary and white buttons
   browserButton_default: {
-    // cf: https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L92
-    color: globalStyles.button.default.color,
-
     position: 'relative',
     boxShadow: globalStyles.button.default.boxShadow,
     cursor: 'pointer',
-    lineHeight: 1.25,
     width: 'auto',
     height: 'auto',
+
+    // TODO: #9223
     fontSize: globalStyles.spacing.defaultFontSize,
+    lineHeight: 1.25,
+
+    // cf: https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L92
+    color: globalStyles.button.default.color,
 
     // cf: https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L94-L95
     paddingTop: '5px',
@@ -115,6 +119,9 @@ const styles = StyleSheet.create({
     borderTop: `2px solid ${globalStyles.button.primary.gradientColor1}`,
     borderBottom: `2px solid ${globalStyles.button.primary.gradientColor2}`,
     cursor: 'pointer',
+
+    // https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L115
+    fontWeight: 500,
 
     ':hover': {
       border: `2px solid ${globalStyles.button.primary.borderHoverColor}`,
