@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const {urlInput} = require('../lib/selectors')
+const {urlInput, bookmarkNameInput} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 const siteTags = require('../../js/constants/siteTags')
 const aboutBookmarksUrl = getTargetAboutUrl('about:bookmarks')
@@ -163,6 +163,26 @@ describe('about:bookmarks', function () {
     it('shows bookmark folders', function * () {
       yield this.app.client
         .waitForVisible('.bookmarkFolderList .listItem[data-folder-id="' + folderId + '"]')
+    })
+
+    it('can add bookmark folder', function * () {
+      const addFolderButton = '.addBookmarkFolder'
+      yield this.app.client
+        .waitForVisible(addFolderButton)
+        .click(addFolderButton)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(bookmarkNameInput)
+        .tabByIndex(0)
+        .loadUrl(aboutBookmarksUrl)
+    })
+
+    it('can add bookmark', function * () {
+      const addButton = '.addBookmark'
+      yield this.app.client
+        .waitForVisible(addButton)
+        .click(addButton)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(bookmarkNameInput)
     })
   })
 
