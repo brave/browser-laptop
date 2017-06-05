@@ -1,0 +1,17 @@
+codecov:
+  notify:
+    require_ci_to_pass: no  # require CI to pass
+  ci:
+    - !appveyor
+flags:
+  unittest:
+    paths:
+      - app/
+      - js/
+comment:
+  layout: "diff, flags, files"
+  behavior: default
+  require_changes: true
+  require_base: no
+  require_head: yes
+  branches: null

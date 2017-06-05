@@ -8,6 +8,7 @@
 [![Misc Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=misc-components&label=misc-components-tests)](https://travis-ci.org/brave/browser-laptop)
 [![Navbar Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=navbar-components&label=navbar-components-tests)](https://travis-ci.org/brave/browser-laptop)
 [![Tab Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=tab-components&label=tab-components-tests)](https://travis-ci.org/brave/browser-laptop)
+[![codecov.io](https://codecov.io/github/brave/browser-laptop/coverage.svg?branch=master)](https://codecov.io/gh/brave/browser-laptop?branch=master)
 
 # Brave Browser
 
