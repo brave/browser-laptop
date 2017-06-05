@@ -8,7 +8,7 @@
   --download-item-width: 200px;
   --download-item-margin: 10px;
   --download-bar-padding: 20px;
-  --download-bar-buttons: 22px;
+  --download-bar-buttons: 140px;
 }
 
 @downloadItemHeight: 50px;
@@ -30,6 +30,7 @@
     display: flex;
     flex-grow: 1;
     position: relative;
+
     .downloadItem {
       background-color: white;
       border: 1px solid @chromeTertiary;
@@ -126,6 +127,7 @@
 
       .downloadActions {
         margin: 8px 0 0;
+
         .browserButton {
           font-size: 14px;
           height: auto;
