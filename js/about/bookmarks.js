@@ -59,9 +59,8 @@ class BookmarkFolderItem extends React.Component {
    */
   moveBookmark (e, bookmark) {
     if (siteUtil.isMoveAllowed(this.props.allBookmarkFolders, bookmark, this.props.bookmarkFolder)) {
-      const bookmarkSiteKey = siteUtil.getSiteKey(bookmark.toJS())
-      const bookmarkFolderSiteKey = siteUtil.getSiteKey(this.props.bookmarkFolder.toJS())
-
+      const bookmarkSiteKey = siteUtil.getSiteKey(bookmark)
+      const bookmarkFolderSiteKey = siteUtil.getSiteKey(this.props.bookmarkFolder)
       aboutActions.moveSite(bookmarkSiteKey,
         bookmarkFolderSiteKey,
         dndData.shouldPrependVerticalItem(e.target, e.clientY),
