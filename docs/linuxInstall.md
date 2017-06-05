@@ -6,10 +6,19 @@ want to try installing `git` using the package manager for your distro._
 **NOTE**: _If Brave does not start and shows an error about sandboxing, you may need
 to [enable userns in your kernel](https://superuser.com/questions/1094597/enable-user-namespaces-in-debian-kernel#1122977). Running with the `--no-sandbox` flag is NOT recommended!_
 
+## Snapcraft
+
+According to [snapcraft.io](https://snapcraft.io/)
+> Snaps are quick to install, easy to create, safe to run, and they update automatically and transactionally so your app is always fresh and never broken.
+
+Installation instructions for `snapd` [can be found here](https://snapcraft.io/docs/core/install). Once `snapd` is installed, installing Brave looks like this:
+
+    snap install brave --beta
+
 ## Debian (jessie) and Ubuntu (Zesty, Yakkety, Xenial, and Trusty) AMD64:
 To install brave using apt and lsb\_release :
 
-``` 
+```
 curl https://s3-us-west-2.amazonaws.com/brave-apt/keys.asc | sudo apt-key add -
 echo "deb [arch=amd64] https://s3-us-west-2.amazonaws.com/brave-apt `lsb_release -sc` main" | sudo tee -a /etc/apt/sources.list.d/brave-`lsb_release -sc`.list
 ```
@@ -69,7 +78,7 @@ To install brave using dnf:
 
 ```
 sudo dnf config-manager --add-repo https://s3-us-west-2.amazonaws.com/brave-rpm-release/x86_64/
-sudo rpm --import https://s3-us-west-2.amazonaws.com/brave-rpm-release/keys.asc 
+sudo rpm --import https://s3-us-west-2.amazonaws.com/brave-rpm-release/keys.asc
 sudo dnf install brave
 ```
 
