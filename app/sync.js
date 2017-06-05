@@ -9,10 +9,12 @@ const electron = require('electron')
 const qr = require('qr-image')
 const ipcMain = electron.ipcMain
 const locale = require('./locale')
-const messages = require('../js/constants/sync/messages')
+const messages = require('../js/constants/messages')
+const syncMessages = require('../js/constants/sync/messages')
 const categories = require('../js/constants/sync/proto').categories
 const writeActions = require('../js/constants/sync/proto').actions
 const config = require('../js/constants/appConfig').sync
+const syncExtensionId = require('../js/constants/config').syncExtensionId
 const appActions = require('../js/actions/appActions')
 const syncConstants = require('../js/constants/syncConstants')
 const appDispatcher = require('../js/dispatcher/appDispatcher')
@@ -21,6 +23,7 @@ const siteUtil = require('../js/state/siteUtil')
 const syncUtil = require('../js/state/syncUtil')
 const getSetting = require('../js/settings').getSetting
 const settings = require('../js/constants/settings')
+const extensions = require('./extensions')
 
 const CATEGORY_MAP = syncUtil.CATEGORY_MAP
 const CATEGORY_NAMES = Object.keys(categories)
@@ -121,7 +124,7 @@ const sendSyncRecords = (sender, action, data) => {
     (category.settingName && !getSetting(settings[category.settingName]))) {
     return
   }
-  sender.send(messages.SEND_SYNC_RECORDS, category.categoryName, data.map((item) => {
+  sender.send(syncMessages.SEND_SYNC_RECORDS, category.categoryName, data.map((item) => {
     if (!item || !item.name || !item.value) {
       return
     }
@@ -182,10 +185,10 @@ const dispatcherCallback = (action) => {
         [syncUtil.createSiteData(action.item.toJS())])
       break
     case syncConstants.SYNC_CLEAR_HISTORY:
-      backgroundSender.send(messages.DELETE_SYNC_CATEGORY, CATEGORY_MAP.historySite.categoryName)
+      backgroundSender.send(syncMessages.DELETE_SYNC_CATEGORY, CATEGORY_MAP.historySite.categoryName)
       break
     case syncConstants.SYNC_CLEAR_SITE_SETTINGS:
-      backgroundSender.send(messages.DELETE_SYNC_SITE_SETTINGS)
+      backgroundSender.send(syncMessages.DELETE_SYNC_SITE_SETTINGS)
       break
     default:
   }
@@ -281,7 +284,7 @@ module.exports.onSyncReady = (isFirstRun, e) => {
   }
 
   appActions.createSyncCache()
-  e.sender.send(messages.FETCH_SYNC_DEVICES)
+  e.sender.send(syncMessages.FETCH_SYNC_DEVICES)
 
   // Periodically poll for new records
   let startAt = appState.getIn(['sync', 'lastFetchTimestamp']) || 0
@@ -293,7 +296,7 @@ module.exports.onSyncReady = (isFirstRun, e) => {
         categoryNames.push(item.categoryName)
       }
     }
-    e.sender.send(messages.FETCH_SYNC_RECORDS, categoryNames, startAt)
+    e.sender.send(syncMessages.FETCH_SYNC_RECORDS, categoryNames, startAt)
     startAt = syncUtil.now()
     appActions.saveSyncInitData(null, null, startAt)
   }
@@ -307,8 +310,6 @@ module.exports.onSyncReady = (isFirstRun, e) => {
  */
 module.exports.init = function (appState) {
   const initialState = appState.get('sync') || new Immutable.Map()
-  const RELOAD_MESSAGE = 'reload-sync-extension'
-  const RESET_SYNC = 'reset-sync'
   const reset = () => {
     log('Resetting browser local sync state.')
     appActions.changeSetting(settings.SYNC_ENABLED, false)
@@ -316,23 +317,24 @@ module.exports.init = function (appState) {
     appActions.resetSyncData()
   }
   // sent by about:preferences when sync should be reloaded
-  ipcMain.on(RELOAD_MESSAGE, () => {
-    process.emit(RELOAD_MESSAGE)
+  ipcMain.on(messages.RELOAD_SYNC_EXTENSION, () => {
+    console.log('reloading sync')
+    extensions.reloadExtension(syncExtensionId)
   })
   // sent by about:preferences when resetting sync
-  ipcMain.on(RESET_SYNC, (e) => {
+  ipcMain.on(messages.RESET_SYNC, (e) => {
     if (backgroundSender) {
       // send DELETE_SYNC_USER to sync client. it replies with DELETED_SYNC_USER
-      backgroundSender.send(messages.DELETE_SYNC_USER)
+      backgroundSender.send(syncMessages.DELETE_SYNC_USER)
     } else {
       reset()
     }
   })
-  ipcMain.on(messages.DELETED_SYNC_USER, (e) => {
+  ipcMain.on(syncMessages.DELETED_SYNC_USER, (e) => {
     reset()
   })
   // GET_INIT_DATA is the first message sent by the sync-client when it starts
-  ipcMain.on(messages.GET_INIT_DATA, (e) => {
+  ipcMain.on(syncMessages.GET_INIT_DATA, (e) => {
     // Set the message sender
     backgroundSender = e.sender
     // Clear any old errors
@@ -355,12 +357,12 @@ module.exports.init = function (appState) {
           ? 'http://localhost' // set during tests to simulate network failure
           : config.serverUrl
       }
-      e.sender.send(messages.GOT_INIT_DATA, seed, deviceId, syncConfig)
+      e.sender.send(syncMessages.GOT_INIT_DATA, seed, deviceId, syncConfig)
     }
   })
   // SAVE_INIT_DATA is sent by about:preferences before sync is enabled
   // when restoring from an existing seed
-  ipcMain.on(messages.SAVE_INIT_DATA, (e, seed, newDeviceId) => {
+  ipcMain.on(syncMessages.SAVE_INIT_DATA, (e, seed, newDeviceId) => {
     const isRestoring = seed && !newDeviceId
     if (!deviceId && newDeviceId) {
       deviceId = Array.from(newDeviceId)
@@ -386,23 +388,23 @@ module.exports.init = function (appState) {
     if (isRestoring) {
       // we are restoring from a previous seed. wait for the seed to be saved
       // before reloading, or sync-client will override the seed.
-      process.emit(RELOAD_MESSAGE)
+      extensions.reloadExtension(syncExtensionId)
     }
   })
   const isFirstRun = !initialState.get('seed') && !initialState.get('deviceId')
-  ipcMain.on(messages.SYNC_READY, module.exports.onSyncReady.bind(null,
+  ipcMain.on(syncMessages.SYNC_READY, module.exports.onSyncReady.bind(null,
     isFirstRun))
-  ipcMain.on(messages.SYNC_DEBUG, (e, msg) => {
+  ipcMain.on(syncMessages.SYNC_DEBUG, (e, msg) => {
     log(msg)
   })
-  ipcMain.on(messages.SYNC_SETUP_ERROR, (e, error) => {
+  ipcMain.on(syncMessages.SYNC_SETUP_ERROR, (e, error) => {
     if (error === 'Failed to fetch') {
       // This is probably the most common error, so give it a more useful message.
       error = locale.translation('connectionError')
     }
     appActions.setSyncSetupError(error || locale.translation('unknownError'))
   })
-  ipcMain.on(messages.GET_EXISTING_OBJECTS, (event, categoryName, records) => {
+  ipcMain.on(syncMessages.GET_EXISTING_OBJECTS, (event, categoryName, records) => {
     if (!syncEnabled()) {
       return
     }
@@ -418,11 +420,11 @@ module.exports.init = function (appState) {
       const existingObject = syncUtil.getExistingObject(categoryName, record)
       return [safeRecord, existingObject]
     })
-    event.sender.send(messages.RESOLVE_SYNC_RECORDS, categoryName, recordsAndExistingObjects)
+    event.sender.send(syncMessages.RESOLVE_SYNC_RECORDS, categoryName, recordsAndExistingObjects)
     // For each device we saw, update its last record timestamp.
     appActions.saveSyncDevices(devices)
   })
-  ipcMain.on(messages.RESOLVED_SYNC_RECORDS, (event, categoryName, records) => {
+  ipcMain.on(syncMessages.RESOLVED_SYNC_RECORDS, (event, categoryName, records) => {
     if (!records || !records.length) {
       return
     }
