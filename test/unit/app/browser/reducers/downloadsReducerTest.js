@@ -10,7 +10,7 @@ const fakeElectron = require('../../../lib/fakeElectron')
 
 const appConstants = require('../../../../../js/constants/appConstants')
 const {PENDING, IN_PROGRESS, RESUMING, PAUSED, COMPLETED, CANCELLED, INTERRUPTED} = require('../../../../../js/constants/downloadStates')
-const {CANCEL, PAUSE, RESUME} = require('../../../../../app/common/constants/electronDownloadItemActions')
+const {CANCEL} = require('../../../../../app/common/constants/electronDownloadItemActions')
 require('../../../braveUnit')
 
 const downloadId = (state, i = 0) => Object.keys(state.get('downloads').toJS())[i]
@@ -101,16 +101,6 @@ describe('downloadsReducer', function () {
       const oldState = oneDownloadWithState(IN_PROGRESS)
       const newState = downloadsReducer(oldState, {actionType: appConstants.APP_DOWNLOAD_ACTION_PERFORMED, downloadId: downloadId(oldState), downloadAction: CANCEL})
       assert.equal(newState.getIn(['downloads', downloadId(oldState), 'state']), CANCELLED)
-    })
-    it('PAUSE causes PAUSED state', function () {
-      const oldState = oneDownloadWithState(IN_PROGRESS)
-      const newState = downloadsReducer(oldState, {actionType: appConstants.APP_DOWNLOAD_ACTION_PERFORMED, downloadId: downloadId(oldState), downloadAction: PAUSE})
-      assert.equal(newState.getIn(['downloads', downloadId(oldState), 'state']), PAUSED)
-    })
-    it('RESUME causes an IN_PROGRESS state', function () {
-      const oldState = oneDownloadWithState(PAUSED)
-      const newState = downloadsReducer(oldState, {actionType: appConstants.APP_DOWNLOAD_ACTION_PERFORMED, downloadId: downloadId(oldState), downloadAction: RESUME})
-      assert.equal(newState.getIn(['downloads', downloadId(oldState), 'state']), IN_PROGRESS)
     })
   })
 
