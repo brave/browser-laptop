@@ -283,6 +283,11 @@ const globalStyles = {
     subtle: {
       // cf: https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L151
       backgroundColor: '#ccc'
+    },
+
+    action: {
+      backgroundColor: '#4099FF',
+      hoverColor: '#000'
     }
   },
 

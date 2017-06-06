@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const Button = require('../../app/renderer/components/common/button')
+const BrowserButton = require('../../app/renderer/components/common/browserButton')
 
 require('../../less/button.less')
 require('../../less/window.less')
@@ -43,8 +43,8 @@ class ErrorPage extends React.Component {
         <span className='errorText' data-l10n-id={this.state.message} />
       </div>
       <div className='buttons'>
-        {this.showBackButton ? <Button l10nId='back' className='actionButton' onClick={this.reloadPrevious.bind(this)} /> : null}
-        {this.state.url ? <Button l10nId='errorReload' l10nArgs={{url: this.state.url}} className='actionButton' onClick={this.reload.bind(this)} /> : null}
+        {this.showBackButton ? <BrowserButton actionItem l10nId='back' onClick={this.reloadPrevious.bind(this)} /> : null}
+        {this.state.url ? <BrowserButton actionItem l10nId='errorReload' l10nArgs={{url: this.state.url}} onClick={this.reload.bind(this)} /> : null}
       </div>
     </div>
   }

@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const Button = require('../../app/renderer/components/common/button')
+const BrowserButton = require('../../app/renderer/components/common/browserButton')
 const aboutActions = require('./aboutActions')
 const messages = require('../constants/messages')
 const ipc = window.chrome.ipcRenderer
@@ -137,12 +137,12 @@ class CertErrorPage extends React.Component {
           </div>) : null}
       </div>
       <div className='buttons'>
-        <Button l10nId='certErrorSafety' className='actionButton' onClick={this.onSafety.bind(this)} />
+        <BrowserButton actionItem l10nId='certErrorSafety' onClick={this.onSafety.bind(this)} />
         {this.state.url ? (this.state.advanced
-          ? (<Button l10nId='certErrorButtonText' className='subtleButton' onClick={this.onAccept.bind(this)} />) : null) : null}
+          ? (<BrowserButton subtleItem l10nId='certErrorButtonText' onClick={this.onAccept.bind(this)} />) : null) : null}
         {this.state.url ? (this.state.advanced
-          ? (<Button l10nId='certErrorShowCertificate' className='subtleButton' onClick={this.onDetail.bind(this)} />)
-          : <Button l10nId='certErrorAdvanced' className='subtleButton' onClick={this.onAdvanced.bind(this)} />) : null}
+          ? (<BrowserButton subtleItem l10nId='certErrorShowCertificate' onClick={this.onDetail.bind(this)} />)
+          : <BrowserButton subtleItem l10nId='certErrorAdvanced' onClick={this.onAdvanced.bind(this)} />) : null}
       </div>
     </div>
   }
