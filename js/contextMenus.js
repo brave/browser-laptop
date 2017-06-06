@@ -1340,18 +1340,21 @@ function onMainContextMenu (nodeProps, frame, tab, contextMenuType) {
   } else {
     const mainMenu = Menu.buildFromTemplate(mainTemplateInit(nodeProps, frame, tab))
     mainMenu.popup(getCurrentWindow())
+    mainMenu.destroy()
   }
 }
 
 function onFlashContextMenu (nodeProps, frameProps) {
   const flashMenu = Menu.buildFromTemplate(flashTemplateInit(frameProps))
   flashMenu.popup(getCurrentWindow())
+  flashMenu.destroy()
 }
 
 function onTabContextMenu (frameProps, e) {
   e.stopPropagation()
   const tabMenu = Menu.buildFromTemplate(tabTemplateInit(frameProps))
   tabMenu.popup(getCurrentWindow())
+  tabMenu.destroy()
 }
 
 function onNewTabContextMenu (target) {
@@ -1363,12 +1366,14 @@ function onNewTabContextMenu (target) {
   ]
   const menu = Menu.buildFromTemplate(menuTemplate)
   menu.popup(getCurrentWindow())
+  menu.destroy()
 }
 
 function onTabsToolbarContextMenu (bookmarkTitle, bookmarkLink, closestDestinationDetail, isParent, e) {
   e.stopPropagation()
   const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(bookmarkTitle, bookmarkLink, closestDestinationDetail, isParent))
   tabsToolbarMenu.popup(getCurrentWindow())
+  tabsToolbarMenu.destroy()
 }
 
 function onDownloadsToolbarContextMenu (downloadId, downloadItem, e) {
@@ -1377,12 +1382,14 @@ function onDownloadsToolbarContextMenu (downloadId, downloadItem, e) {
   }
   const downloadsToolbarMenu = Menu.buildFromTemplate(downloadsToolbarTemplateInit(downloadId, downloadItem))
   downloadsToolbarMenu.popup(getCurrentWindow())
+  downloadsToolbarMenu.destroy()
 }
 
 function onTabPageContextMenu (framePropsList, e) {
   e.stopPropagation()
   const tabPageMenu = Menu.buildFromTemplate(tabPageTemplateInit(framePropsList))
   tabPageMenu.popup(getCurrentWindow())
+  tabPageMenu.destroy()
 }
 
 function onUrlBarContextMenu (e) {
@@ -1392,12 +1399,14 @@ function onUrlBarContextMenu (e) {
   const activeFrame = getActiveFrame(windowState)
   const inputMenu = Menu.buildFromTemplate(urlBarTemplateInit(searchDetail, activeFrame, e))
   inputMenu.popup(getCurrentWindow())
+  inputMenu.destroy()
 }
 
 function onFindBarContextMenu (e) {
   e.stopPropagation()
   const findBarMenu = Menu.buildFromTemplate(findBarTemplateInit(e))
   findBarMenu.popup(getCurrentWindow())
+  findBarMenu.destroy()
 }
 
 function onSiteDetailContextMenu (siteDetail, activeFrame, e) {
@@ -1406,6 +1415,7 @@ function onSiteDetailContextMenu (siteDetail, activeFrame, e) {
   }
   const menu = Menu.buildFromTemplate(siteDetailTemplateInit(siteDetail, activeFrame))
   menu.popup(getCurrentWindow())
+  menu.destroy()
 }
 
 function onLedgerContextMenu (location, hostPattern) {
@@ -1421,6 +1431,7 @@ function onLedgerContextMenu (location, hostPattern) {
   ]
   const menu = Menu.buildFromTemplate(template)
   menu.popup(getCurrentWindow())
+  menu.destroy()
 }
 
 function onShowBookmarkFolderMenu (bookmarks, bookmark, activeFrame, e) {
