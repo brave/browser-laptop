@@ -17,7 +17,7 @@ const fs = require('fs')
 const path = require('path')
 const l10n = require('../js/l10n')
 const {bravifyText} = require('./renderer/lib/extensionsUtil')
-const ipcMain = require('electron').ipcMain
+const {ipcMain, componentUpdater, session} = require('electron')
 
 // Takes Content Security Policy flags, for example { 'default-src': '*' }
 // Returns a CSP string, for example 'default-src: *;'
@@ -297,11 +297,31 @@ const isExtension = (componentId) =>
 const isWidevine = (componentId) =>
   componentId === config.widevineComponentId
 
+const enableExtension = (extensionId) => {
+  session.defaultSession.extensions.enable(extensionId)
+}
+
+const disableExtension = (extensionId) => {
+  session.defaultSession.extensions.disable(extensionId)
+}
+
+module.exports.reloadExtension = (extensionId) => {
+  const reload = (unloadedExtensionId) => {
+    if (extensionId === unloadedExtensionId) {
+      setImmediate(() => {
+        enableExtension(extensionId)
+      })
+      process.removeListener('extension-unloaded', reload)
+    }
+  }
+  process.on('extension-unloaded', reload)
+  disableExtension(extensionId)
+}
+
 module.exports.init = () => {
   browserActions.init()
   contextMenus.init()
 
-  const {componentUpdater, session} = require('electron')
   componentUpdater.on('component-checking-for-updates', () => {
     // console.log('checking for update')
   })
@@ -343,11 +363,6 @@ module.exports.init = () => {
     appActions.loadURLRequested(tabId, url)
   })
 
-  process.on('reload-sync-extension', () => {
-    console.log('reloading sync')
-    disableExtension(config.syncExtensionId)
-  })
-
   process.on('extension-load-error', (error) => {
     console.error(error)
   })
@@ -355,12 +370,6 @@ module.exports.init = () => {
   process.on('extension-unloaded', (extensionId) => {
     extensionInfo.setState(extensionId, extensionStates.DISABLED)
     extensionActions.extensionDisabled(extensionId)
-    if (extensionId === config.syncExtensionId) {
-      // Reload sync extension to restart the background script
-      setImmediate(() => {
-        enableExtension(config.syncExtensionId)
-      })
-    }
   })
 
   process.on('extension-ready', (installInfo) => {
@@ -429,14 +438,6 @@ module.exports.init = () => {
     } else {
       enableExtension(extensionId)
     }
-  }
-
-  let enableExtension = (extensionId) => {
-    session.defaultSession.extensions.enable(extensionId)
-  }
-
-  let disableExtension = (extensionId) => {
-    session.defaultSession.extensions.disable(extensionId)
   }
 
   let registerComponent = (extensionId) => {
