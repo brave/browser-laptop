@@ -330,7 +330,7 @@ function addFrame (state, frameOpts, newKey, partitionNumber, openInForeground, 
     location,
     aboutDetails: undefined,
     src: url, // what the iframe src should be
-    tabId: -1,
+    tabId: frameOpts.tabId == null ? -1 : frameOpts.tabId,
     // if this is a delayed load then go ahead and start the loading indicator
     loading: !!delayedLoadUrl,
     startLoadTime: delayedLoadUrl ? new Date().getTime() : null,

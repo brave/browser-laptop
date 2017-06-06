@@ -338,6 +338,7 @@ const api = {
         openerTabId,
         disposition,
         index,
+        tabId: newTabValue.get('id'),
         unloaded: !!newTabValue.get('discarded')
       }
 
