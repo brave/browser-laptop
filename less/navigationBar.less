@@ -642,7 +642,6 @@
   justify-content: center;
   height: @urlbarFormHeight;
   padding: 0 10px 0 3px;
-  background: @navigationBarBackgroundActive;
   display: flex;
   flex-grow: 1;
   min-width: 0%; // allow the navigator to shrink
@@ -654,7 +653,6 @@
   legend:before {
     content: ' ';
     position: absolute;
-    background: @navigationBarBackgroundActive;
     border-radius: 0 4px 4px 0;
     color: #333;
     box-shadow: inset 0 0 0 1px @urlBarOutline, inset 0 0 0 3px @focusUrlbarOutline;
@@ -672,13 +670,17 @@
   }
 
   #navigator:not(.titleMode) & {
-    background: @navigationBarBackgroundActive;
     border-radius: @borderRadiusURL;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     box-shadow: inset 0 0 0 1px rgba(187, 187, 187, 1.0);
     color: @chromeText;
+
+    // #4922
+    // TODO: replace this value with a CSS variable to add a dark UI.
+    background: #fff;
   }
+
   @media (max-width: @breakpointNarrowViewport) {
     max-width: 80%;
   }
@@ -718,7 +720,7 @@
     }
 
     .urlbarForm {
-        &.noBorderRadius {
+      &.noBorderRadius {
         border-radius: 0;
 
         legend:before {
@@ -825,13 +827,11 @@
   .urlbarForm {
     .loadTime {
       color: @loadTimeColor;
-      // background: @navigationBarBackground;
       font-size: 12px;
       text-align: right;
       cursor: default;
 
       &.onFocus {
-        background: @navigationBarBackgroundActive;
         display: none;
       }
     }
@@ -842,7 +842,6 @@
     }
 
     .inputbar-wrapper {
-      //background: white;
       display: flex;
       flex: 1 1 0;
       border-radius: 4px;
@@ -851,7 +850,6 @@
     }
 
     input {
-      background: @navigationBarBackgroundActive;
       border: none;
       box-sizing: border-box;
       color: #333;
@@ -864,9 +862,9 @@
       text-overflow: ellipsis;
       min-width: 0%; // allow the navigator to shrink
 
-      &:hover {
-        background: @navigationBarBackgroundActive;
-      }
+      // #4922: make the whole .urlbarForm clickable
+      height: @urlbarFormHeight;
+      background: transparent;
 
       &.private {
         background: @privateTabBackground;
@@ -874,7 +872,6 @@
       }
 
       &:focus {
-        background: @navigationBarBackgroundActive;
         margin-right: 3px;
       }
     }
