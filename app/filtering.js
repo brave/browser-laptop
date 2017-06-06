@@ -517,11 +517,7 @@ function registerForDownloadListener (session) {
       win.webContents.send(messages.SHOW_DOWNLOADS_TOOLBAR)
     }
     item.on('updated', function () {
-      let state = downloadStates.IN_PROGRESS
-      const downloadItem = appStore.getState().getIn(['downloads', downloadId])
-      if (downloadItem && downloadItem.get('state') === downloadStates.PAUSED) {
-        state = downloadStates.PAUSED
-      }
+      const state = item.isPaused() ? downloadStates.PAUSED : downloadStates.IN_PROGRESS
       updateDownloadState(downloadId, item, state)
     })
     item.on('done', function (e, state) {
