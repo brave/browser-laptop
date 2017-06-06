@@ -50,11 +50,9 @@ const downloadsReducer = (state, action) => {
           break
         case PAUSE:
           pauseDownload(action.downloadId)
-          state = state.setIn(['downloads', action.downloadId, 'state'], downloadStates.PAUSED)
           break
         case RESUME:
           resumeDownload(action.downloadId)
-          state = state.setIn(['downloads', action.downloadId, 'state'], downloadStates.IN_PROGRESS)
           break
       }
       break
