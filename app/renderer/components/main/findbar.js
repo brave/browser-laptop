@@ -7,7 +7,7 @@ const Immutable = require('immutable')
 
 // Components
 const ImmutableComponent = require('../immutableComponent')
-const Button = require('../common/button')
+const BrowserButton = require('../common/browserButton')
 const SwitchControl = require('../common/switchControl')
 
 // Constants
@@ -20,11 +20,9 @@ const windowActions = require('../../../../js/actions/windowActions')
 const windowStore = require('../../../../js/stores/windowStore')
 
 // Utils
-const cx = require('../../../../js/lib/classSet')
 const contextMenus = require('../../../../js/contextMenus')
 const {getTextColorForBackground} = require('../../../../js/lib/color')
 
-const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../styles/global')
 
 class FindBar extends ImmutableComponent {
@@ -240,21 +238,15 @@ class FindBar extends ImmutableComponent {
             onClick={this.onClear} />
         </div>
         <span className='findMatchText'>{findMatchText}</span>
-        <Button iconClass={globalStyles.appIcons.findPrev}
-          className={cx({
-            findButton: true,
-            [css(styles.findButton)]: true
-          })}
+        <BrowserButton iconOnly
+          iconClass={globalStyles.appIcons.findPrev}
           inlineStyles={findBarStyle}
           testId='findBarPrevButton'
           disabled={this.numberOfMatches <= 0}
           onClick={this.onFindPrev}
         />
-        <Button iconClass={globalStyles.appIcons.findNext}
-          className={cx({
-            findButton: true,
-            [css(styles.findButton)]: true
-          })}
+        <BrowserButton iconOnly
+          iconClass={globalStyles.appIcons.findNext}
           inlineStyles={findBarStyle}
           testId='findBarNextButton'
           disabled={this.numberOfMatches <= 0}
@@ -272,14 +264,5 @@ class FindBar extends ImmutableComponent {
     </div>
   }
 }
-
-const styles = StyleSheet.create({
-  findButton: {
-    lineHeight: '18px',
-    width: '18px',
-    height: '18px',
-    fontSize: '24px'
-  }
-})
 
 module.exports = FindBar

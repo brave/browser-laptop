@@ -10,6 +10,7 @@ const globalStyles = require('../../app/renderer/components/styles/global')
 // Stylesheets go here
 require('../../less/button.less')
 require('../../less/forms.less')
+require('../../node_modules/font-awesome/css/font-awesome.css')
 
 const {Textbox, FormTextbox, SettingTextbox, RecoveryKeyTextbox} = require('../../app/renderer/components/common/textbox')
 const {TextArea, DefaultTextArea} = require('../../app/renderer/components/common/textbox')
@@ -294,6 +295,15 @@ class AboutStyle extends ImmutableComponent {
         <BrowserButton notificationItem l10nId='notificationItem' onClick={this.onRemoveBookmark} />
         <Pre><Code>
           &lt;BrowserButton notificationItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
+        </Code></Pre>
+
+        <BrowserButton iconOnly iconClass={globalStyles.appIcons.moreInfo} size='30px' color='rebeccapurple' />
+        <BrowserButton iconOnly iconClass={globalStyles.appIcons.closeTab} size='45px' color='#c1c1c1' />
+        <BrowserButton iconOnly iconClass={globalStyles.appIcons.private} size='60px' color='red' />
+        <Pre><Code>
+          &lt;BrowserButton iconOnly icon={'{'}globalStyles.appIcons.private{'}'} size='30px' color='rebeccapurple' />{'\n'}
+          &lt;BrowserButton iconOnly icon={'{'}globalStyles.appIcons.private{'}'} size='45px' color='#c1c1c1' />{'\n'}
+          &lt;BrowserButton iconOnly icon={'{'}globalStyles.appIcons.private{'}'} size='60px' color='red' />
         </Code></Pre>
 
         <GoTop />
