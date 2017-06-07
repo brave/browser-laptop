@@ -4,11 +4,18 @@
 /* global describe, it, before, after */
 
 const mockery = require('mockery')
+const React = require('react')
 const {mount} = require('enzyme')
 const assert = require('assert')
 const Immutable = require('immutable')
 const fakeElectron = require('../../../../lib/fakeElectron')
 require('../../../../braveUnit')
+
+class urlBarFake extends React.Component {
+  render () {
+    return null
+  }
+}
 
 const fakeAppState = Immutable.fromJS({
   locationInfo: {
@@ -44,7 +51,20 @@ const fakeAppState = Immutable.fromJS({
       ledgerPayments: false,
       ledgerPaymentsShown: false
     }
-  }
+  },
+  tabs: [{
+    active: true,
+    tabId: 1,
+    canGoBack: true,
+    canGoForward: true,
+    windowId: 1
+  }],
+  tabsInternal: {
+    index: {
+      1: 0
+    }
+  },
+  windows: []
 })
 
 const defaultWindowStore = Immutable.fromJS({
@@ -59,8 +79,8 @@ const defaultWindowStore = Immutable.fromJS({
   }]
 })
 
-describe('PublisherToggle component', function () {
-  let PublisherToggle, windowStore, appStore
+describe('NavigationBar component', function () {
+  let NavigationBar, windowStore, appStore
 
   before(function () {
     mockery.enable({
@@ -69,57 +89,48 @@ describe('PublisherToggle component', function () {
       useCleanCache: true
     })
     mockery.registerMock('electron', fakeElectron)
+    mockery.registerMock('../../../js/settings', {
+      getSetting: () => true
+    })
+    mockery.registerMock('../../../../img/url-bar-no-script.svg')
     mockery.registerMock('../../../extensions/brave/img/urlbar/browser_URL_fund_no_verified.svg')
     mockery.registerMock('../../../extensions/brave/img/urlbar/browser_URL_fund_yes_verified.svg')
     mockery.registerMock('../../../extensions/brave/img/urlbar/browser_URL_fund_no.svg')
     mockery.registerMock('../../../extensions/brave/img/urlbar/browser_URL_fund_yes.svg')
-    mockery.registerMock('../../../../js/settings', {
-      getSetting: () => true
-    })
+    mockery.registerMock('../../../extensions/brave/img/caret_down_grey.svg')
+    mockery.registerMock('./urlBar', urlBarFake)
     windowStore = require('../../../../../../js/stores/windowStore')
     appStore = require('../../../../../../js/stores/appStoreRenderer')
-    PublisherToggle = require('../../../../../../app/renderer/components/navigation/publisherToggle')
+    NavigationBar = require('../../../../../../app/renderer/components/navigation/navigationBar')
   })
 
   after(function () {
     mockery.disable()
   })
 
-  describe('default behaviour (when autoSuggest is ON)', function () {
-    it('Show as disabled if publisher is on exclusion list', function () {
-      windowStore.state = defaultWindowStore
-      appStore.state = fakeAppState.setIn(['locationInfo', 'https://brave.com', 'exclude'], true)
-
-      const wrapper = mount(<PublisherToggle />)
-      assert.equal(wrapper.find('[data-test-id="publisherButton"]').length, 1)
-      assert.equal(wrapper.find('span').props()['data-test-authorized'], false)
-    })
-
-    it('Show as verified if publisher is shown as verified on locationInfo list', function () {
-      windowStore.state = defaultWindowStore
+  describe('publisherToggle', function () {
+    it('do not render if about page', function () {
+      windowStore.state = defaultWindowStore.setIn(['frames', 0, 'location'], 'about:preferences')
       appStore.state = fakeAppState
-      const wrapper = mount(<PublisherToggle />)
-      assert.equal(wrapper.find('[data-test-id="publisherButton"]').length, 1)
-      assert.equal(wrapper.find('span').props()['data-test-verified'], true)
-    })
-  })
 
-  describe('user interaction behaviour', function () {
-    it('show as enabled if ledgerPayments is true for that publisher', function () {
-      windowStore.state = defaultWindowStore
-      appStore.state = fakeAppState.setIn(['siteSettings', 'https?://brave.com', 'ledgerPayments'], true)
-
-      const wrapper = mount(<PublisherToggle />)
-      assert.equal(wrapper.find('[data-test-id="publisherButton"]').length, 1)
-      assert.equal(wrapper.find('span').props()['data-test-authorized'], true)
+      const wrapper = mount(<NavigationBar />)
+      assert.equal(wrapper.find('PublisherToggle').length, 0)
     })
 
-    it('Show as disabled if ledgerPayments is false for that publisher', function () {
+    it('do not render if publisher is permanently hidden', function () {
       windowStore.state = defaultWindowStore
       appStore.state = fakeAppState
 
-      const wrapper = mount(<PublisherToggle />)
-      assert.equal(wrapper.find('span').props()['data-test-authorized'], false)
+      const wrapper = mount(<NavigationBar />)
+      assert.equal(wrapper.find('PublisherToggle').length, 0)
+    })
+
+    it('render if ok', function () {
+      windowStore.state = defaultWindowStore
+      appStore.state = fakeAppState.setIn(['siteSettings', 'https?://brave.com', 'ledgerPaymentsShown'], true)
+
+      const wrapper = mount(<NavigationBar />)
+      assert.equal(wrapper.find('PublisherToggle').length, 1)
     })
   })
 })

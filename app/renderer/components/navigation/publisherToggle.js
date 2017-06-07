@@ -3,22 +3,23 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const Immutable = require('immutable')
 const {StyleSheet, css} = require('aphrodite')
 
 // Components
-const ImmutableComponent = require('../immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 const BrowserButton = require('../common/browserButton')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
 
-// Constants
-const settings = require('../../../../js/constants/settings')
+// State
+const publisherState = require('../../../common/lib/publisherUtil')
 
 // Utils
-const {getSetting} = require('../../../../js/settings')
-const {getHostPattern, isHttpOrHttps} = require('../../../../js/lib/urlutil')
+const {getHostPattern} = require('../../../../js/lib/urlutil')
 const {getBaseUrl} = require('../../../../js/lib/appUrlUtil')
+const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
 // Style
 const globalStyles = require('../styles/global')
@@ -27,104 +28,66 @@ const fundVerifiedPublisherImage = require('../../../extensions/brave/img/urlbar
 const noFundUnverifiedPublisherImage = require('../../../extensions/brave/img/urlbar/browser_URL_fund_no.svg')
 const fundUnverifiedPublisherImage = require('../../../extensions/brave/img/urlbar/browser_URL_fund_yes.svg')
 
-class PublisherToggle extends ImmutableComponent {
-  constructor () {
-    super()
+class PublisherToggle extends React.Component {
+  constructor (props) {
+    super(props)
     this.onAuthorizePublisher = this.onAuthorizePublisher.bind(this)
-  }
-
-  get locationId () {
-    return getBaseUrl(this.props.location)
-  }
-
-  get publisherId () {
-    return this.props.locationInfo && this.props.locationInfo.getIn([this.locationId, 'publisher'])
-  }
-
-  get hostSettings () {
-    const hostPattern = getHostPattern(this.publisherId)
-    return this.props.siteSettings.get(hostPattern)
-  }
-
-  get validPublisherSynopsis () {
-    // If session is clear then siteSettings is undefined and icon
-    // will never be shown, but synopsis may not be empty.
-    // In such cases let's check if synopsis matches current publisherId
-    return !!this.props.synopsis.map(entry => entry.get('site')).includes(this.publisherId)
-  }
-
-  get enabledForPaymentsPublisher () {
-    // All publishers will be enabled by default if AUTO_SUGGEST is ON,
-    // excluding publishers defined on ledger's exclusion list
-    const excluded = this.props.locationInfo && this.props.locationInfo.getIn([this.locationId, 'exclude'])
-    const autoSuggestSites = getSetting(settings.AUTO_SUGGEST_SITES)
-
-      // hostSettings is undefined until user hit addFunds button.
-      // For such cases check autoSuggestSites for eligibility.
-    return this.hostSettings
-      ? this.hostSettings.get('ledgerPayments') !== false
-      : this.validPublisherSynopsis || (autoSuggestSites && !excluded)
-  }
-
-  get verifiedPublisher () {
-    return this.props.locationInfo && this.props.locationInfo.getIn([this.locationId, 'verified'])
-  }
-
-  get visiblePublisher () {
-    // ledgerPaymentsShown is undefined by default until
-    // user decide to permanently hide the publisher,
-    // so for icon to be shown it can be everything but false
-    const ledgerPaymentsShown = this.hostSettings && this.hostSettings.get('ledgerPaymentsShown')
-    return typeof ledgerPaymentsShown === 'boolean'
-      ? ledgerPaymentsShown
-      : true
-  }
-
-  get shouldShowAddPublisherButton () {
-    return getSetting(settings.PAYMENTS_ENABLED) &&
-      isHttpOrHttps(this.props.location) &&
-      this.visiblePublisher
   }
 
   get l10nString () {
     let l10nData = 'disabledPublisher'
-    if (this.verifiedPublisher && !this.enabledForPaymentsPublisher) {
+    if (this.props.isVerifiedPublisher && !this.props.isEnabledForPaymentsPublisher) {
       l10nData = 'verifiedPublisher'
-    } else if (this.enabledForPaymentsPublisher) {
+    } else if (this.props.isEnabledForPaymentsPublisher) {
       l10nData = 'enabledPublisher'
     }
     return l10nData
   }
 
   onAuthorizePublisher () {
-    const hostPattern = getHostPattern(this.publisherId)
-    appActions.changeSiteSetting(hostPattern, 'ledgerPayments', !this.enabledForPaymentsPublisher)
+    appActions.changeSiteSetting(this.props.hostPattern, 'ledgerPayments', !this.props.isEnabledForPaymentsPublisher)
+  }
+
+  mergeProps (state, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
+    const location = activeFrame.get('location', '')
+    const locationId = getBaseUrl(location)
+    const locationInfo = state.get('locationInfo', Immutable.Map())
+
+    const props = {}
+    // used in renderer
+    props.isEnabledForPaymentsPublisher = publisherState.enabledForPaymentsPublisher(state, locationId)
+    props.isVerifiedPublisher = locationInfo.getIn([locationId, 'verified'])
+
+    // used in functions
+    props.publisherId = locationInfo.getIn([locationId, 'publisher'])
+    props.hostPattern = getHostPattern(props.publisherId)
+
+    return props
   }
 
   render () {
-    if (!this.props.locationInfo) {
-      return null
-    }
-    return this.shouldShowAddPublisherButton
-      ? <span
-        data-test-id='publisherButton'
-        data-test-authorized={this.enabledForPaymentsPublisher}
-        data-test-verified={this.verifiedPublisher}
-        className={css(styles.addPublisherButtonContainer)}>
-        <BrowserButton
-          custom={[
-            !this.enabledForPaymentsPublisher && this.verifiedPublisher && styles.noFundVerified,
-            this.enabledForPaymentsPublisher && this.verifiedPublisher && styles.fundVerified,
-            !this.enabledForPaymentsPublisher && !this.verifiedPublisher && styles.noFundUnverified,
-            this.enabledForPaymentsPublisher && !this.verifiedPublisher && styles.fundUnverified
-          ]}
-          data-l10n-id={this.l10nString}
-          onClick={this.onAuthorizePublisher}
-        />
-      </span>
-      : null
+    return <span
+      data-test-id='publisherButton'
+      data-test-authorized={this.props.isEnabledForPaymentsPublisher}
+      data-test-verified={this.props.isVerifiedPublisher}
+      className={css(styles.addPublisherButtonContainer)}>
+      <BrowserButton
+        custom={[
+          !this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher && styles.noFundVerified,
+          this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher && styles.fundVerified,
+          !this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher && styles.noFundUnverified,
+          this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher && styles.fundUnverified
+        ]}
+        data-l10n-id={this.l10nString}
+        onClick={this.onAuthorizePublisher}
+      />
+    </span>
   }
 }
+
+module.exports = ReduxComponent.connect(PublisherToggle)
 
 const styles = StyleSheet.create({
   addPublisherButtonContainer: {
@@ -166,5 +129,3 @@ const styles = StyleSheet.create({
     backgroundSize: '18px'
   }
 })
-
-module.exports = PublisherToggle

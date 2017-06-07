@@ -152,6 +152,7 @@ class Navigator extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
+    const activeFrameKey = activeFrame.get('key')
     const activeTabId = activeFrame.get('tabId') || tabState.TAB_ID_NONE
     const activeTab = tabState.getByTabId(state, activeTabId)
     const activeTabShowingMessageBox = !!(activeTab && tabState.isShowingMessageBox(state, activeTabId))
@@ -186,6 +187,8 @@ class Navigator extends React.Component {
       props.totalBlocks &&
       props.shieldEnabled
     props.isWideURLbarEnabled = getSetting(settings.WIDE_URL_BAR)
+    props.showNavigationBar = activeFrameKey !== undefined &&
+      state.get('siteSettings') !== undefined
 
     // used in other functions
     props.isNavigable = activeFrame && isNavigatableAboutPage(getBaseUrl(activeFrame.get('location')))
@@ -256,7 +259,11 @@ class Navigator extends React.Component {
               />
             </div>
           </div>
-          <NavigationBar />
+          {
+            this.props.showNavigationBar
+            ? <NavigationBar />
+            : null
+          }
           <div className={cx({
             topLevelEndButtons: true,
             [css(styles.navigatorWrapper__topLevelEndButtons_isWideURLbarEnabled)]: this.props.isWideURLbarEnabled

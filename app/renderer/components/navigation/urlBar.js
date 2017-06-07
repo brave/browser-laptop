@@ -33,11 +33,11 @@ const cx = require('../../../../js/lib/classSet')
 const debounce = require('../../../../js/lib/debounce')
 const {getSetting} = require('../../../../js/settings')
 const contextMenus = require('../../../../js/contextMenus')
-const UrlUtil = require('../../../../js/lib/urlutil')
 const {eventElHasAncestorWithClasses, isForSecondaryAction} = require('../../../../js/lib/eventUtil')
 const {getBaseUrl, isUrl} = require('../../../../js/lib/appUrlUtil')
 const {getCurrentWindowId} = require('../../currentWindow')
 const {normalizeLocation} = require('../../../common/lib/suggestion')
+const publisherUtil = require('../../../common/lib/publisherUtil')
 
 // Icons
 const iconNoScript = require('../../../../img/url-bar-no-script.svg')
@@ -431,7 +431,7 @@ class UrlBar extends React.Component {
     const activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
 
     const location = tabState.getVisibleURL(state, activeTabId)
-    const frameLocation = activeFrame.get('location') || ''
+    const frameLocation = activeFrame.get('location', '')
     const displayEntry = tabState.getVisibleEntry(state, activeTabId) || Immutable.Map()
     const displayURL = tabState.getVisibleVirtualURL(state, activeTabId) || ''
     const hostValue = displayEntry.get('host', '')
@@ -445,12 +445,6 @@ class UrlBar extends React.Component {
 
     // TODO(bridiver) - these definitely needs a helpers
     const publisherId = state.getIn(['locationInfo', baseUrl, 'publisher'])
-    const hostPattern = UrlUtil.getHostPattern(publisherId)
-    const hostSettings = siteSettings.getSiteSettingsForHostPattern(state.get('settings'), hostPattern)
-    const ledgerPaymentsShown = hostSettings && hostSettings.get('ledgerPaymentsShown')
-    const visiblePublisher = typeof ledgerPaymentsShown === 'boolean' ? ledgerPaymentsShown : true
-    const isPublisherButtonEnabled = getSetting(settings.PAYMENTS_ENABLED) &&
-        UrlUtil.isHttpOrHttps(location) && visiblePublisher
 
     const activateSearchEngine = urlbar.getIn(['searchDetail', 'activateSearchEngine'])
     const urlbarSearchDetail = urlbar.get('searchDetail')
@@ -480,7 +474,7 @@ class UrlBar extends React.Component {
     props.loading = activeFrame.get('loading')
     props.noScriptIsVisible = currentWindow.getIn(['ui', 'noScriptInfo', 'isVisible']) || false
     props.menubarVisible = ownProps.menubarVisible
-    props.noBorderRadius = isPublisherButtonEnabled
+    props.publisherButtonVisible = publisherUtil.shouldShowAddPublisherButton(state, location, publisherId)
     props.onStop = ownProps.onStop
     props.titleMode = ownProps.titleMode
     props.urlbarLocation = urlbarLocation
@@ -509,7 +503,7 @@ class UrlBar extends React.Component {
       className={cx({
         urlbarForm: true,
         [css(styles.urlbarForm_wide)]: this.props.isWideURLbarEnabled,
-        noBorderRadius: this.props.noBorderRadius
+        noBorderRadius: this.props.publisherButtonVisible
       })}
       action='#'
       id='urlbar'>
