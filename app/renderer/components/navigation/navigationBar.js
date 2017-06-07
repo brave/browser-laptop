@@ -25,7 +25,6 @@ const settings = require('../../../../js/constants/settings')
 // State
 const tabState = require('../../../common/state/tabState')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
-const menuBarState = require('../../../common/state/menuBarState')
 
 // Store
 const windowStore = require('../../../../js/stores/windowStore')
@@ -151,7 +150,7 @@ class NavigationBar extends React.Component {
     const props = {}
 
     props.navbar = navbar
-    props.sites = state.get('sites')
+    props.sites = state.get('sites') // TODO(nejc) remove, primitives only
     props.activeFrameKey = activeFrameKey
     props.location = location
     props.title = title
@@ -159,10 +158,9 @@ class NavigationBar extends React.Component {
     props.partitionNumber = activeFrame.get('partitionNumber') || 0
     props.isSecure = activeFrame.getIn(['security', 'isSecure'])
     props.loading = loading
-    props.bookmarkDetail = bookmarkDetail
+    props.showBookmarkHanger = bookmarkDetail && bookmarkDetail.get('isBookmarkHanger')
     props.mouseInTitlebar = mouseInTitlebar
     props.settings = state.get('settings')
-    props.menubarVisible = menuBarState.isMenuBarVisible(currentWindow)
     props.siteSettings = state.get('siteSettings')
     props.synopsis = state.getIn(['publisherInfo', 'synopsis']) || new Immutable.Map()
     props.activeTabShowingMessageBox = activeTabShowingMessageBox
@@ -188,14 +186,8 @@ class NavigationBar extends React.Component {
         [css(styles.navigator_wide)]: this.props.isWideURLbarEnabled
       })}>
       {
-        this.props.bookmarkDetail && this.props.bookmarkDetail.get('isBookmarkHanger')
-        ? <AddEditBookmarkHanger sites={this.props.sites}
-          currentDetail={this.props.bookmarkDetail.get('currentDetail')}
-          originalDetail={this.props.bookmarkDetail.get('originalDetail')}
-          destinationDetail={this.props.bookmarkDetail.get('destinationDetail')}
-          shouldShowLocation={this.props.bookmarkDetail.get('shouldShowLocation')}
-          withHomeButton={getSetting(settings.SHOW_HOME_BUTTON)}
-          />
+        this.props.showBookmarkHanger
+        ? <AddEditBookmarkHanger />
         : null
       }
       {
@@ -246,7 +238,6 @@ class NavigationBar extends React.Component {
       <UrlBar
         titleMode={this.props.titleMode}
         onStop={this.onStop}
-        menubarVisible={this.props.menubarVisible}
         />
       {
         isSourceAboutUrl(this.props.location)
