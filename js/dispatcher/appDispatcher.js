@@ -12,7 +12,10 @@ let processType
 let currentWindow
 let BrowserWindow
 
-if (typeof process !== 'undefined') {
+if (typeof window !== 'undefined' && window.location.protocol === 'chrome-extension:' && typeof chrome !== 'undefined' && typeof chrome.ipcRenderer === 'object') {
+  processType = 'extension-page'
+  ipc = chrome.ipcRenderer // eslint-disable-line
+} else if (typeof process !== 'undefined') {
   if (process.type === 'renderer') {
     processType = 'renderer'
     ipc = require('electron').ipcRenderer
@@ -23,9 +26,6 @@ if (typeof process !== 'undefined') {
     ipc = require('electron').ipcMain
   }
 } else if (typeof chrome !== 'undefined' && typeof chrome.ipcRenderer === 'object') {
-  processType = 'extension-page'
-  ipc = chrome.ipcRenderer // eslint-disable-line
-} else {
   throw new Error('No ipc available in context')
 }
 
@@ -101,23 +101,22 @@ class AppDispatcher {
   }
 
   dispatchInternal (payload, cb) {
+    if (processType === 'extension-page') {
+      cb()
+      ipcCargo.push(payload)
+      return
+    }
     if (processType === 'renderer') {
-      if (window.location.protocol === 'chrome-extension:') {
+      // only handle actions that are for this window
+      if (!payload.queryInfo || payload.queryInfo.windowId == null || payload.queryInfo.windowId === currentWindow.getCurrentWindowId()) {
+        this.dispatchToOwnRegisteredCallbacks(payload)
+      }
+      // only forward actions that have not been relayed through the browser process
+      if (payload.senderWindowId == null) {
         cb()
         ipcCargo.push(payload)
-        return
-      } else {
-        // only handle actions that are for this window
-        if (!payload.queryInfo || payload.queryInfo.windowId == null || payload.queryInfo.windowId === currentWindow.getCurrentWindowId()) {
-          this.dispatchToOwnRegisteredCallbacks(payload)
-        }
-        // only forward actions that have not been relayed through the browser process
-        if (payload.senderWindowId == null) {
-          cb()
-          ipcCargo.push(payload)
-        }
-        return
       }
+      return
     }
 
     this.dispatchToOwnRegisteredCallbacks(payload)
@@ -223,11 +222,12 @@ if (processType === 'browser') {
         if (queryInfo.windowId == null && win) {
           queryInfo.windowId = win.id
         }
-      }
-      payload.queryInfo = queryInfo
-      if (win) {
+      } else if (win) {
+        // don't set the senderWindowId for tabs because it will prevent them
+        // from being routed back to the window process
         payload.senderWindowId = win.id
       }
+      payload.queryInfo = queryInfo
       payload.senderTabId = event.sender.getId()
 
       if (queryInfo.windowId === -2) {
@@ -240,6 +240,10 @@ if (processType === 'browser') {
 
   ipc.on(messages.DISPATCH_ACTION, (event, payload) => {
     payload = Serializer.deserialize(payload)
+
+    if (payload.forEach === undefined) {
+      dispatchEventPayload(event, payload)
+    }
 
     for (var i = 0; i < payload.length; i++) {
       dispatchEventPayload(event, payload[i])
