@@ -311,6 +311,7 @@ app.on('ready', () => {
 
   process.on(messages.UNDO_CLOSED_WINDOW, () => {
     if (lastWindowState) {
+      SessionStore.cleanPerWindowData(lastWindowState)
       appActions.newWindow(undefined, undefined, lastWindowState)
       lastWindowState = undefined
     }
