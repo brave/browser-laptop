@@ -270,62 +270,62 @@ class BraveryPanel extends ImmutableComponent {
           styles.braveryPanel__stats,
           compactBraveryPanel && styles.braveryPanel_compact__stats
         )}>
-          <div data-test-id='adsBlockedStat'
-            className={css(
-              styles.braveryPanel__stats__item_count_adsBlockedStat,
-              (!shieldsUp || adControl === 'allowAdsAndTracking') && styles.braveryPanel__stats__item_count_disabled,
-              gridStyles.row1col1,
-              !compactBraveryPanel && styles.braveryPanel__stats__item,
-              !compactBraveryPanel && styles.braveryPanel__stats__item_count,
-              compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
-            )}>
-            <span onClick={this.onToggleAdsAndTracking}
-              className={css(!!adsBlockedStat && styles.braveryPanel__stats__item_count_clickable)}
+          <div className={css(
+            styles.braveryPanel__stats__item_count_adsBlockedStat,
+            (!shieldsUp || adControl === 'allowAdsAndTracking') && styles.braveryPanel__stats__item_count_disabled,
+            gridStyles.row1col1,
+            !compactBraveryPanel && styles.braveryPanel__stats__item,
+            !compactBraveryPanel && styles.braveryPanel__stats__item_count,
+            compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
+          )}>
+            <span className={css(!!adsBlockedStat && styles.braveryPanel__stats__item_count_clickable)}
+              onClick={this.onToggleAdsAndTracking}
+              data-test-id='adsBlockedStat'
             >{adsBlockedStat}</span>
           </div>
 
-          <div data-test-id='redirectedResourcesStat'
-            className={css(
-              styles.braveryPanel__stats__item_count_redirectedResourcesStat,
-              (!shieldsUp || !httpseEnabled) && styles.braveryPanel__stats__item_count_disabled,
-              !compactBraveryPanel && gridStyles.row1col2,
-              !compactBraveryPanel && styles.braveryPanel__stats__item,
-              !compactBraveryPanel && styles.braveryPanel__stats__item_count,
-              compactBraveryPanel && gridStyles.row2col1,
-              compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
-            )}>
-            <span onClick={this.onToggleHttpseList}
-              className={css(!!this.redirectedResourcesSet.size && styles.braveryPanel__stats__item_count_clickable)}
+          <div className={css(
+            styles.braveryPanel__stats__item_count_redirectedResourcesStat,
+            (!shieldsUp || !httpseEnabled) && styles.braveryPanel__stats__item_count_disabled,
+            !compactBraveryPanel && gridStyles.row1col2,
+            !compactBraveryPanel && styles.braveryPanel__stats__item,
+            !compactBraveryPanel && styles.braveryPanel__stats__item_count,
+            compactBraveryPanel && gridStyles.row2col1,
+            compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
+          )}>
+            <span className={css(!!this.redirectedResourcesSet.size && styles.braveryPanel__stats__item_count_clickable)}
+              onClick={this.onToggleHttpseList}
+              data-test-id='redirectedResourcesStat'
             >{httpsUpgradedResourceStat}</span>
           </div>
 
-          <div data-test-id='noScriptStat'
-            className={css(
-              styles.braveryPanel__stats__item_count_noScriptStat,
-              (!shieldsUp || !noScriptEnabled) && styles.braveryPanel__stats__item_count_disabled,
-              !compactBraveryPanel && gridStyles.row1col3,
-              !compactBraveryPanel && styles.braveryPanel__stats__item,
-              !compactBraveryPanel && styles.braveryPanel__stats__item_count,
-              compactBraveryPanel && gridStyles.row3col1,
-              compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
-            )}>
-            <span onClick={this.onToggleNoScriptList}
-              className={css(!!scriptsBlockedStat && styles.braveryPanel__stats__item_count_clickable)}
+          <div className={css(
+            styles.braveryPanel__stats__item_count_noScriptStat,
+            (!shieldsUp || !noScriptEnabled) && styles.braveryPanel__stats__item_count_disabled,
+            !compactBraveryPanel && gridStyles.row1col3,
+            !compactBraveryPanel && styles.braveryPanel__stats__item,
+            !compactBraveryPanel && styles.braveryPanel__stats__item_count,
+            compactBraveryPanel && gridStyles.row3col1,
+            compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
+          )}>
+            <span className={css(!!scriptsBlockedStat && styles.braveryPanel__stats__item_count_clickable)}
+              onClick={this.onToggleNoScriptList}
+              data-test-id='noScriptStat'
             >{scriptsBlockedStat}</span>
           </div>
 
-          <div data-test-id='fpStat'
-            className={css(
-              styles.braveryPanel__stats__item_count_fpStat,
-              (!shieldsUp || !fpEnabled) && styles.braveryPanel__stats__item_count_disabled,
-              !compactBraveryPanel && gridStyles.row1col4,
-              !compactBraveryPanel && styles.braveryPanel__stats__item,
-              !compactBraveryPanel && styles.braveryPanel__stats__item_count,
-              compactBraveryPanel && gridStyles.row4col1,
-              compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
-            )}>
-            <span onClick={this.onToggleFpList}
-              className={css(!!fpBlockedStat && styles.braveryPanel__stats__item_count_clickable)}
+          <div className={css(
+            styles.braveryPanel__stats__item_count_fpStat,
+            (!shieldsUp || !fpEnabled) && styles.braveryPanel__stats__item_count_disabled,
+            !compactBraveryPanel && gridStyles.row1col4,
+            !compactBraveryPanel && styles.braveryPanel__stats__item,
+            !compactBraveryPanel && styles.braveryPanel__stats__item_count,
+            compactBraveryPanel && gridStyles.row4col1,
+            compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
+          )}>
+            <span className={css(!!fpBlockedStat && styles.braveryPanel__stats__item_count_clickable)}
+              onClick={this.onToggleFpList}
+              data-test-id='fpStat'
             >{fpBlockedStat}</span>
           </div>
 
