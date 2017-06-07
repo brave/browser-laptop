@@ -59,7 +59,6 @@ const shieldState = require('../../../common/state/shieldState')
 const siteSettingsState = require('../../../common/state/siteSettingsState')
 const menuBarState = require('../../../common/state/menuBarState')
 const windowState = require('../../../common/state/windowState')
-const windowStore = require('../../../../js/stores/windowStore')
 
 // Util
 const _ = require('underscore')
@@ -506,22 +505,6 @@ class Main extends ImmutableComponent {
       self.resetAltMenuProcessing()
       windowActions.onBlur(getCurrentWindowId())
     }
-
-    windowStore.addChangeListener(function () {
-      const paymentsEnabled = getSetting(settings.PAYMENTS_ENABLED)
-      if (paymentsEnabled) {
-        const windowState = self.props.windowState
-        const tabs = windowState && windowState.get('tabs')
-        if (tabs) {
-          try {
-            const presentP = tabs.some((tab) => {
-              return tab.get('location') === 'about:preferences#payments'
-            })
-            ipc.send(messages.LEDGER_PAYMENTS_PRESENT, presentP)
-          } catch (ex) { }
-        }
-      }
-    })
   }
 
   checkForTitleMode () {

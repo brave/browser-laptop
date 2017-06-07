@@ -180,6 +180,15 @@ const updateAboutDetails = (tab, tabValue) => {
   const autofillAddresses = appState.getIn(['autofill', 'addresses'])
   const versionInformation = appState.getIn(['about', 'brave', 'versionInformation'])
   const aboutDetails = tabValue.get('aboutDetails')
+  // TODO(bridiver) - convert this to an action
+  if (url === 'about:preferences#payments') {
+    tab.on('destroyed', () => {
+      process.emit(messages.LEDGER_PAYMENTS_PRESENT, tabValue.get('tabId'), false)
+    })
+    process.emit(messages.LEDGER_PAYMENTS_PRESENT, tabValue.get('tabId'), true)
+  } else {
+    process.emit(messages.LEDGER_PAYMENTS_PRESENT, tabValue.get('tabId'), false)
+  }
   if (location === 'about:preferences' || location === 'about:contributions' || location === aboutUrls.get('about:contributions')) {
     const ledgerData = ledgerInfo.merge(publisherInfo).merge(preferencesData)
     tab.send(messages.LEDGER_UPDATED, ledgerData.toJS())
