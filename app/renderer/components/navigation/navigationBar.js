@@ -119,7 +119,7 @@ class NavigationBar extends React.Component {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark())
   }
 
-  mergeProps (state, dispatchProps, ownProps) {
+  mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const activeFrameKey = activeFrame.get('key')

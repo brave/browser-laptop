@@ -39,7 +39,7 @@ class TabsToolbar extends React.Component {
     contextMenus.onHamburgerMenu(this.props.activeFrameLocation, e)
   }
 
-  mergeProps (state, dispatchProps, ownProps) {
+  mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow)
     const pinnedTabs = frameStateUtil.getPinnedFrames(currentWindow)

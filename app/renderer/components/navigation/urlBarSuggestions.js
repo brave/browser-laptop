@@ -69,7 +69,7 @@ class UrlBarSuggestions extends React.Component {
     return items
   }
 
-  mergeProps (state, dispatchProps, ownProps) {
+  mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const urlBar = activeFrame.getIn(['navbar', 'urlbar'], Immutable.Map())

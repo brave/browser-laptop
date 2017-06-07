@@ -48,7 +48,7 @@ class CloseTabIcon extends React.Component {
     }
   }
 
-  mergeProps (state, dispatchProps, ownProps) {
+  mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const isPinnedTab = frameStateUtil.isPinned(currentWindow, ownProps.frameKey)
     const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey)

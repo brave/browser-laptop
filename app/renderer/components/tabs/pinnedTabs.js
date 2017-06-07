@@ -73,7 +73,7 @@ class PinnedTabs extends React.Component {
     e.preventDefault()
   }
 
-  mergeProps (state, dispatchProps, ownProps) {
+  mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const pinnedFrames = frameStateUtil.getPinnedFrames(currentWindow)
 

@@ -18,7 +18,7 @@ const {isWindows, isDarwin} = require('../../../../common/lib/platformUtil')
 const globalStyles = require('../../styles/global')
 
 class TabTitle extends React.Component {
-  mergeProps (state, dispatchProps, ownProps) {
+  mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const tabIconColor = tabContentState.getTabIconColor(currentWindow, ownProps.frameKey)
 
