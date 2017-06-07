@@ -86,7 +86,7 @@ const tabsReducer = (state, action, immutableAction) => {
     case appConstants.APP_TAB_MOVED: {
       setImmediate(() => {
         const tabId = action.get('tabId')
-        const frameOpts = action.get('frameOpts')
+        const frameOpts = frameOptsFromFrame(action.get('frameOpts'))
         const browserOpts = action.get('browserOpts') || new Immutable.Map()
         const windowId = action.get('windowId') || -1
         tabs.moveTo(state, tabId, frameOpts, browserOpts, windowId)

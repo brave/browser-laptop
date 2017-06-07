@@ -29,7 +29,7 @@ const locale = require('../js/l10n')
 const {getSetting} = require('./settings')
 const settings = require('./constants/settings')
 const textUtils = require('./lib/text')
-const {getPartitionFromNumber, frameOptsFromFrame, getActiveFrame} = require('./state/frameStateUtil')
+const {getPartitionFromNumber, getActiveFrame} = require('./state/frameStateUtil')
 const {isIntermediateAboutPage, isUrl, aboutUrls} = require('./lib/appUrlUtil')
 const {getBase64FromImageUrl} = require('./lib/imageUtil')
 const urlParse = require('../app/common/urlParse')
@@ -547,8 +547,7 @@ function tabTemplateInit (frameProps) {
       label: locale.translation('detach'),
       click: (item) => {
         const browserOpts = { positionByMouseCursor: true }
-        const frameOpts = frameOptsFromFrame(frameProps).toJS()
-        appActions.tabMoved(tabId, frameOpts, browserOpts, -1)
+        appActions.tabMoved(tabId, frameProps.toJS(), browserOpts, -1)
       }
     })
   }
