@@ -3,7 +3,6 @@
 
 'use strict'
 const Immutable = require('immutable')
-const normalizeUrl = require('normalize-url')
 const siteCache = require('../../app/common/state/siteCache')
 const siteTags = require('../constants/siteTags')
 const settings = require('../constants/settings')
@@ -587,64 +586,26 @@ module.exports.getDetailFromCreateProperties = function (createProperties, tag) 
 }
 
 /**
- * Update the favicon URL for all entries in the sites list
+ * Update the favicon URL for all entries in the state sites
  * which match a given location. Currently, there should only be
  * one match, but this will handle multiple.
  *
- * @param sites The application state's Immutable sites list
+ * @param state The application state
  * @param location URL for the entry needing an update
  * @param favicon favicon URL
  */
-module.exports.updateSiteFavicon = function (sites, location, favicon) {
-  sites = makeImmutable(sites)
-
+module.exports.updateSiteFavicon = function (state, location, favicon) {
   if (UrlUtil.isNotURL(location)) {
-    return sites
+    return state
   }
-  if (!Immutable.Map.isMap(sites)) {
-    return sites
+  const siteKeys = siteCache.getLocationSiteKeys(state, location)
+  if (!siteKeys || siteKeys.length === 0) {
+    return state
   }
-
-  const matchingIndices = []
-
-  sites.filter((site, index) => {
-    if (!site || typeof site.get !== 'function') {
-      return false
-    }
-    if (isBookmarkFolder(site.get('tags'))) {
-      return false
-    }
-    if (UrlUtil.isNotURL(site.get('location'))) {
-      return false
-    }
-    if (normURL(site.get('location')) === normURL(location)) {
-      matchingIndices.push(index)
-      return true
-    }
-    return false
+  siteKeys.forEach((siteKey) => {
+    state = state.setIn(['sites', siteKey, 'favicon'], favicon)
   })
-
-  if (!matchingIndices.length) return sites
-
-  let updatedSites = sites
-  matchingIndices.forEach((index) => {
-    updatedSites = updatedSites.setIn([index, 'favicon'], favicon)
-  })
-
-  return updatedSites
-}
-
-/**
- * Normalizes a URL for comparison, with special handling for magnet links
- */
-function normURL (url) {
-  const lowerURL = url.toLowerCase()
-  if (lowerURL.startsWith('magnet:?')) return lowerURL
-  try {
-    return normalizeUrl(url)
-  } catch (e) {
-    return url
-  }
+  return state
 }
 
 /**

@@ -805,7 +805,7 @@ const handleAppAction = (action) => {
       appState = appState.set('defaultBrowserCheckComplete', {})
       break
     case windowConstants.WINDOW_SET_FAVICON:
-      appState = appState.set('sites', siteUtil.updateSiteFavicon(appState.get('sites'), action.frameProps.get('location'), action.favicon))
+      appState = siteUtil.updateSiteFavicon(appState, action.frameProps.get('location'), action.favicon)
       appState = aboutNewTabState.setSites(appState, action)
       break
     case appConstants.APP_RENDER_URL_TO_PDF:

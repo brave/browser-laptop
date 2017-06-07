@@ -1051,37 +1051,44 @@ describe('siteUtil', function () {
 
   describe('updateSiteFavicon', function () {
     it('updates the favicon for all matching entries (normalizing the URL)', function () {
+      const folderDetail = Immutable.fromJS({
+        folderId: 1,
+        tags: [siteTags.BOOKMARK_FOLDER]
+      })
       const siteDetail1 = Immutable.fromJS({
         tags: [siteTags.BOOKMARK],
         location: testUrl1,
         title: 'bookmarked site',
-        lastAccessedTime: 123
+        lastAccessedTime: 123,
+        parentFolderId: 1
       })
       const siteDetail2 = Immutable.fromJS({
         tags: [],
-        location: 'https://www.brave.com',
+        location: testUrl1,
         title: 'history entry',
         lastAccessedTime: 456
       })
-      let state = siteUtil.addSite(emptyState, siteDetail1, siteTags.BOOKMARK)
+      let state = siteUtil.addSite(emptyState, folderDetail, siteTags.BOOKMARK_FOLDER)
+      state = siteUtil.addSite(state, siteDetail1, siteTags.BOOKMARK)
       state = siteUtil.addSite(state, siteDetail2)
-      const processedSites = siteUtil.updateSiteFavicon(state.get('sites'), testUrl1, testFavicon1)
+      const processedState = siteUtil.updateSiteFavicon(state, testUrl1, testFavicon1)
       const updatedSiteDetail1 = siteDetail1.set('favicon', testFavicon1)
       const updatedSiteDetail2 = siteDetail2.set('favicon', testFavicon1)
-      let expectedState = siteUtil.addSite(emptyState, updatedSiteDetail1, siteTags.BOOKMARK)
+      let expectedState = siteUtil.addSite(emptyState, folderDetail, siteTags.BOOKMARK_FOLDER)
+      expectedState = siteUtil.addSite(expectedState, updatedSiteDetail1, siteTags.BOOKMARK)
       expectedState = siteUtil.addSite(expectedState, updatedSiteDetail2)
 
-      assert.deepEqual(processedSites.toJS(), expectedState.get('sites').toJS())
+      assert.deepEqual(processedState.get('sites').toJS(), expectedState.get('sites').toJS())
     })
     it('returns the object unchanged if location is not a URL', function () {
-      const sites = siteUtil.addSite(emptyState, bookmarkMinFields, siteTags.BOOKMARK)
-      const processedSites = siteUtil.updateSiteFavicon(sites, 'not-a-url', 'https://brave.com/favicon.ico')
-      assert.deepEqual(processedSites, sites)
+      const state = siteUtil.addSite(emptyState, bookmarkMinFields, siteTags.BOOKMARK)
+      const processedState = siteUtil.updateSiteFavicon(state, 'not-a-url', 'https://brave.com/favicon.ico')
+      assert.deepEqual(processedState.get('sites'), state.get('sites'))
     })
     it('returns the object unchanged if it is not an Immutable.Map', function () {
       const emptyLegacySites = Immutable.fromJS([])
-      const processedSites = siteUtil.updateSiteFavicon(emptyLegacySites, testUrl1, 'https://brave.com/favicon.ico')
-      assert.deepEqual(processedSites, emptyLegacySites)
+      const processedState = siteUtil.updateSiteFavicon(emptyLegacySites, testUrl1, 'https://brave.com/favicon.ico')
+      assert.deepEqual(processedState.get('sites'), emptyLegacySites.get('sites'))
     })
     it('works even if null/undefined entries are present', function () {
       const stateWithInvalidEntries = Immutable.fromJS({
@@ -1091,10 +1098,10 @@ describe('siteUtil', function () {
         }
       })
       const state = siteUtil.addSite(stateWithInvalidEntries, bookmarkMinFields, siteTags.BOOKMARK)
-      const processedSites = siteUtil.updateSiteFavicon(state.get('sites'), testUrl1, 'https://brave.com/favicon.ico')
+      const processedState = siteUtil.updateSiteFavicon(state, testUrl1, 'https://brave.com/favicon.ico')
       const updatedSiteDetail = bookmarkMinFields.set('favicon', 'https://brave.com/favicon.ico')
       const expectedState = siteUtil.addSite(stateWithInvalidEntries, updatedSiteDetail, siteTags.BOOKMARK)
-      assert.deepEqual(processedSites.toJS(), expectedState.get('sites').toJS())
+      assert.deepEqual(processedState.get('sites').toJS(), expectedState.get('sites').toJS())
     })
   })
 
