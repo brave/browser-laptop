@@ -156,6 +156,13 @@ const urlBarReducer = (state, action) => {
     case appConstants.APP_URL_BAR_TEXT_CHANGED:
       state = setNavBarUserInput(state, action.input)
       break
+    case appConstants.APP_URL_BAR_SELECTED_INDEX_CHANGED:
+      {
+        const suggestionList = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']))
+        state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), action.selectedIndex)
+        state = updateUrlSuffix(state, suggestionList)
+        break
+      }
     case appConstants.APP_URL_BAR_SUGGESTIONS_CHANGED:
       if (action.selectedIndex !== undefined) {
         state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), action.selectedIndex)

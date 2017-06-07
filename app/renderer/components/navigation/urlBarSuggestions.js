@@ -3,112 +3,103 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('../immutableComponent')
+const Immutable = require('immutable')
 
+// Components
+const ReduxComponent = require('../reduxComponent')
 const UrlBarSuggestionItem = require('./urlBarSuggestionItem')
-const windowActions = require('../../../../js/actions/windowActions')
+
+// Actions
 const appActions = require('../../../../js/actions/appActions')
-const suggestionTypes = require('../../../../js/constants/suggestionTypes')
+
+// Utils
 const cx = require('../../../../js/lib/classSet')
 const locale = require('../../../../js/l10n')
-const {isForSecondaryAction} = require('../../../../js/lib/eventUtil')
+const suggestions = require('../../../common/lib/suggestion')
+const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {getCurrentWindowId} = require('../../currentWindow')
 
-class UrlBarSuggestions extends ImmutableComponent {
-  constructor () {
-    super()
-    this.onSuggestionClicked = this.onSuggestionClicked.bind(this)
-    this.onMouseOver = this.onMouseOver.bind(this)
-  }
-
-  get activeIndex () {
-    if (this.props.suggestionList === null) {
-      return -1
-    }
-    return this.props.selectedIndex
-  }
-
+class UrlBarSuggestions extends React.Component {
   blur () {
     appActions.urlBarSuggestionsChanged(getCurrentWindowId(), null, null)
   }
 
-  onSuggestionClicked (e) {
-    windowActions.activeSuggestionClicked(isForSecondaryAction(e), e.shiftKey)
-  }
-
-  render () {
-    const suggestions = this.props.suggestionList
-    const bookmarkSuggestions = suggestions.filter((s) => s.get('type') === suggestionTypes.BOOKMARK)
-    const historySuggestions = suggestions.filter((s) => s.get('type') === suggestionTypes.HISTORY)
-    const aboutPagesSuggestions = suggestions.filter((s) => s.get('type') === suggestionTypes.ABOUT_PAGES)
-    const tabSuggestions = suggestions.filter((s) => s.get('type') === suggestionTypes.TAB)
-    const searchSuggestions = suggestions.filter((s) => s.get('type') === suggestionTypes.SEARCH)
-    const topSiteSuggestions = suggestions.filter((s) => s.get('type') === suggestionTypes.TOP_SITE)
-
+  generateAllItems () {
     let items = []
     let index = 0
+
     const addToItems = (suggestions, sectionKey, title, icon) => {
-      if (suggestions.size > 0) {
+      if (suggestions.length > 0) {
         items.push(<li className='suggestionSection'>
           {
             icon
-            ? <span className={cx({
-              suggestionSectionIcon: true,
-              [sectionKey]: true,
-              fa: true,
-              [icon]: true
-            })} />
-            : null
+              ? <span className={cx({
+                suggestionSectionIcon: true,
+                [sectionKey]: true,
+                fa: true,
+                [icon]: true
+              })} />
+              : null
           }
           <span className='suggestionSectionTitle'>{title}</span>
         </li>)
       }
+
       items = items.concat(suggestions.map((suggestion, i) => {
         const currentIndex = index + i
-        const selected = this.activeIndex === currentIndex || (!this.activeIndex && currentIndex === 0 && this.props.hasSuggestionMatch)
+        const selected = this.props.activeIndex === currentIndex || (this.props.activeIndex == null && currentIndex === 0 && this.props.hasSuggestionMatch)
         return <UrlBarSuggestionItem
           suggestion={suggestion}
           selected={selected}
           currentIndex={currentIndex}
-          i={i}
-          onMouseOver={this.onMouseOver}
-          onClick={this.onSuggestionClicked} />
+          i={i} />
       }))
-      index += suggestions.size
+      index += suggestions.length
     }
-    addToItems(historySuggestions, 'historyTitle', locale.translation('historySuggestionTitle'), 'fa-clock-o')
-    addToItems(bookmarkSuggestions, 'bookmarksTitle', locale.translation('bookmarksSuggestionTitle'), 'fa-star-o')
-    addToItems(aboutPagesSuggestions, 'aboutPagesTitle', locale.translation('aboutPagesSuggestionTitle'), null)
-    addToItems(tabSuggestions, 'tabsTitle', locale.translation('tabsSuggestionTitle'), 'fa-external-link')
-    addToItems(searchSuggestions, 'searchTitle', locale.translation('searchSuggestionTitle'), 'fa-search')
-    addToItems(topSiteSuggestions, 'topSiteTitle', locale.translation('topSiteSuggestionTitle'), 'fa-link')
-    const documentHeight = Number.parseInt(window.getComputedStyle(document.querySelector(':root')).getPropertyValue('--navbar-height'), 10)
-    const menuHeight = this.props.menubarVisible ? 30 : 0
+
+    const list = suggestions.filterSuggestionListByType(this.props.suggestionList)
+
+    addToItems(list.historySuggestions, 'historyTitle', locale.translation('historySuggestionTitle'), 'fa-clock-o')
+    addToItems(list.bookmarkSuggestions, 'bookmarksTitle', locale.translation('bookmarksSuggestionTitle'), 'fa-star-o')
+    addToItems(list.aboutPagesSuggestions, 'aboutPagesTitle', locale.translation('aboutPagesSuggestionTitle'), null)
+    addToItems(list.tabSuggestions, 'tabsTitle', locale.translation('tabsSuggestionTitle'), 'fa-external-link')
+    addToItems(list.searchSuggestions, 'searchTitle', locale.translation('searchSuggestionTitle'), 'fa-search')
+    addToItems(list.topSiteSuggestions, 'topSiteTitle', locale.translation('topSiteSuggestionTitle'), 'fa-link')
+
+    return items
+  }
+
+  mergeProps (state, dispatchProps, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
+    const urlBar = activeFrame.getIn(['navbar', 'urlbar'], Immutable.Map())
+    const documentHeight = Number.parseInt(
+      window.getComputedStyle(document.querySelector(':root')).getPropertyValue('--navbar-height'), 10
+    )
+    const menuHeight = ownProps.menubarVisible ? 30 : 0
+
+    const props = {}
+    // used in renderer
+    props.maxHeight = document.documentElement.offsetHeight - documentHeight - 2 - menuHeight
+
+    // used in functions
+    props.menubarVisible = ownProps.menubarVisible
+    props.suggestionList = urlBar.getIn(['suggestions', 'suggestionList']) // TODO (nejc) improve, use primitives
+    props.hasSuggestionMatch = urlBar.getIn(['suggestions', 'hasSuggestionMatch'])
+    props.activeIndex = props.suggestionList === null
+      ? -1
+      : urlBar.getIn(['suggestions', 'selectedIndex'])
+
+    return props
+  }
+
+  render () {
     return <ul className='urlBarSuggestions' style={{
-      maxHeight: document.documentElement.offsetHeight - documentHeight - 2 - menuHeight
+      maxHeight: this.props.maxHeight
     }}>
-      {items}
+      {this.generateAllItems()}
     </ul>
-  }
-
-  onMouseOver (e) {
-    this.updateSuggestions(parseInt(e.target.dataset.index, 10))
-  }
-
-  componentDidMount () {
-  }
-
-  updateSuggestions (newIndex) {
-    const suggestions = this.suggestionList || this.props.suggestionList
-    if (!suggestions) {
-      return
-    }
-    // Update the urlbar preview content
-    if (newIndex > suggestions.size) {
-      newIndex = null
-    }
-    appActions.urlBarSuggestionsChanged(getCurrentWindowId(), suggestions, newIndex)
   }
 }
 
-module.exports = UrlBarSuggestions
+module.exports = ReduxComponent.connect(UrlBarSuggestions)

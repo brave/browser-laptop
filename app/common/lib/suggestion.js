@@ -627,6 +627,52 @@ const generateNewSearchXHRResults = debounce((state, windowId, tabId, input) => 
   }
 }, 10)
 
+const filterSuggestionListByType = (suggestionList) => {
+  const bookmarkSuggestions = []
+  const historySuggestions = []
+  const aboutPagesSuggestions = []
+  const tabSuggestions = []
+  const searchSuggestions = []
+  const topSiteSuggestions = []
+
+  suggestionList.forEach(item => {
+    switch (item.get('type')) {
+      case suggestionTypes.BOOKMARK:
+        bookmarkSuggestions.push(item)
+        break
+
+      case suggestionTypes.HISTORY:
+        historySuggestions.push(item)
+        break
+
+      case suggestionTypes.ABOUT_PAGES:
+        aboutPagesSuggestions.push(item)
+        break
+
+      case suggestionTypes.TAB:
+        tabSuggestions.push(item)
+        break
+
+      case suggestionTypes.SEARCH:
+        searchSuggestions.push(item)
+        break
+
+      case suggestionTypes.TOP_SITE:
+        topSiteSuggestions.push(item)
+        break
+    }
+  })
+
+  return {
+    bookmarkSuggestions,
+    historySuggestions,
+    aboutPagesSuggestions,
+    tabSuggestions,
+    searchSuggestions,
+    topSiteSuggestions
+  }
+}
+
 module.exports = {
   sortingPriority,
   sortByAccessCountWithAgeDecay,
@@ -647,5 +693,6 @@ module.exports = {
   getSearchSuggestions,
   getAlexaSuggestions,
   generateNewSuggestionsList,
-  generateNewSearchXHRResults
+  generateNewSearchXHRResults,
+  filterSuggestionListByType
 }
