@@ -63,12 +63,11 @@ describe('Bravery Panel', function () {
     Brave.beforeEach(this)
     beforeEach(function * () {
       yield setup(this.app.client)
-      yield this.app.client
-        .waitForDataFile('trackingProtection')
     })
     it('detects blocked elements in private tab', function * () {
       const url = Brave.server.url('tracking.html')
       yield this.app.client
+        .waitForDataFile('trackingProtection')
         .newTab({ url, isPrivate: true })
         .waitForTabCount(2)
         .waitForUrl(url)
@@ -98,6 +97,7 @@ describe('Bravery Panel', function () {
     it('detects blocked elements', function * () {
       const url = Brave.server.url('tracking.html')
       yield this.app.client
+        .waitForDataFile('trackingProtection')
         .tabByIndex(0)
         .loadUrl(url)
         .openBraveMenu(braveMenu, braveryPanel)
@@ -128,8 +128,6 @@ describe('Bravery Panel', function () {
     Brave.beforeEach(this)
     beforeEach(function * () {
       yield setup(this.app.client)
-      yield this.app.client
-        .waitForDataFile('adblock')
     })
 
     const verifyFingerprintingStat = function () {
@@ -144,6 +142,7 @@ describe('Bravery Panel', function () {
       const aboutAdblockURL = getTargetAboutUrl('about:adblock')
       const adblockUUID = '48796273-E783-431E-B864-44D3DCEA66DC'
       yield this.app.client
+        .waitForDataFile('adblock')
         .tabByIndex(0)
         .loadUrl(aboutAdblockURL)
         .url(aboutAdblockURL)
@@ -193,6 +192,7 @@ describe('Bravery Panel', function () {
       const aboutAdblockURL = getTargetAboutUrl('about:adblock')
       const adblockUUID = '48796273-E783-431E-B864-44D3DCEA66DC'
       yield this.app.client
+        .waitForDataFile('adblock')
         .tabByIndex(0)
         .loadUrl(aboutAdblockURL)
         .url(aboutAdblockURL)
@@ -239,6 +239,7 @@ describe('Bravery Panel', function () {
     it('detects adblock resources in private tab', function * () {
       const url = Brave.server.url('adblock.html')
       yield this.app.client
+        .waitForDataFile('adblock')
         .newTab({ url, isPrivate: true })
         .waitForTabCount(2)
         .waitForUrl(url)
@@ -314,6 +315,7 @@ describe('Bravery Panel', function () {
       const url = Brave.server.url('adblock.html')
       const aboutAdblockURL = getTargetAboutUrl('about:adblock')
       yield this.app.client
+        .waitForDataFile('adblock')
         .tabByIndex(0)
         .loadUrl(aboutAdblockURL)
         .waitForVisible(customFiltersInput)
@@ -364,6 +366,7 @@ describe('Bravery Panel', function () {
       const url = Brave.server.url('adblock.html')
       const aboutAdblockURL = getTargetAboutUrl('about:adblock')
       yield this.app.client
+        .waitForDataFile('adblock')
         .tabByIndex(0)
         .loadUrl(aboutAdblockURL)
         .url(aboutAdblockURL)
@@ -449,8 +452,6 @@ describe('Bravery Panel', function () {
         })
     })
 
-    // TODO: Fix iframe tests (See: #8760)
-
     it('detects https upgrades in private tab', function * () {
       const url = Brave.server.url('httpsEverywhere.html')
       yield this.app.client
@@ -477,8 +478,10 @@ describe('Bravery Panel', function () {
       const url = Brave.server.url('httpsEverywhere.html')
       yield this.app.client
         .waitForDataFile('httpsEverywhere')
-        .tabByIndex(0)
-        .loadUrl(url)
+        .newTab({ url })
+        .waitForTabCount(2)
+        .waitForUrl(url)
+        .windowByUrl(Brave.browserWindowUrl)
         .openBraveMenu(braveMenu, braveryPanel)
         .waitForTextValue(httpsEverywhereStat, '1')
 
@@ -487,10 +490,9 @@ describe('Bravery Panel', function () {
 
         .windowByUrl(Brave.browserWindowUrl)
         .newTab({ url })
-        .waitForTabCount(2)
+        .waitForTabCount(3)
         .waitForUrl(url)
         .windowByUrl(Brave.browserWindowUrl)
-
         .openBraveMenu(braveMenu, braveryPanelCompact)
         .waitForTextValue(httpsEverywhereStat, '1')
     })
@@ -837,6 +839,7 @@ describe('Bravery Panel', function () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(url)
+        .waitForUrl(url)
         .waitUntil(function () {
           return this.getText('body')
             .then((body) => {
@@ -844,6 +847,7 @@ describe('Bravery Panel', function () {
             })
         })
         .openBraveMenu(braveMenu, braveryPanel)
+        .waitForVisible(fpSwitch)
         .click(fpSwitch)
         .waitUntil(function () {
           return this.getText(fpStat)
@@ -854,29 +858,6 @@ describe('Bravery Panel', function () {
           return this.getText('body')
             .then((body) => {
               return body === ''
-            })
-        })
-
-        .keys(Brave.keys.ESCAPE)
-        .tabByIndex(0)
-        .loadUrl(prefsShieldsUrl)
-        .waitForVisible(compactBraveryPanelSwitch)
-        .click(compactBraveryPanelSwitch)
-        .windowByUrl(Brave.browserWindowUrl)
-
-        .tabByIndex(0)
-        .loadUrl(url)
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitUntil(function () {
-          return this.getText(fpStat)
-            .then((stat) => stat === '1')
-        })
-        .click(fpSwitch)
-        .tabByUrl(url)
-        .waitUntil(function () {
-          return this.getText('body')
-            .then((body) => {
-              return body.includes('default')
             })
         })
     })
@@ -925,21 +906,19 @@ describe('Bravery Panel', function () {
     Brave.beforeEach(this)
     beforeEach(function * () {
       yield setup(this.app.client)
-      yield this.app.client
-        .waitForDataFile('adblock')
     })
-    // TODO(bridiver) using slashdot won't provide reliable results so we should
-    // create our own iframe page with urls we expect to be blocked
     it('detects blocked elements in iframe in private tab', function * () {
-      const url = Brave.server.url('slashdot.html')
+      const url = Brave.server.url('iframe_with_tracker.html')
       yield this.app.client
         .newTab({ url, isPrivate: true })
         .waitForTabCount(2)
         .windowByUrl(Brave.browserWindowUrl)
         .openBraveMenu(braveMenu, braveryPanel)
+        .waitForVisible(adsBlockedStat)
+        .moveToObject(adsBlockedStat)
         .waitUntil(function () {
           return this.getText(adsBlockedStat)
-            .then((blocked) => Number(blocked) > 1)
+            .then((blocked) => Number(blocked) >= 1)
         })
         .click(adsBlockedControl)
         .waitForVisible(showAdsOption)
@@ -949,20 +928,25 @@ describe('Bravery Panel', function () {
         .newTab({ url })
         .waitForTabCount(3)
         .openBraveMenu(braveMenu, braveryPanel)
+        .waitForVisible(adsBlockedStat)
+        .moveToObject(adsBlockedStat)
         .waitUntil(function () {
           return this.getText(adsBlockedStat)
-            .then((blocked) => Number(blocked) > 1)
+            .then((blocked) => Number(blocked) >= 1)
         })
     })
     it('detects blocked elements in iframe', function * () {
-      const url = Brave.server.url('slashdot.html')
+      const url = Brave.server.url('iframe_with_tracker.html')
       yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(url)
+        .newTab({ url })
+        .waitForTabCount(2)
+        .windowByUrl(Brave.browserWindowUrl)
         .openBraveMenu(braveMenu, braveryPanel)
+        .waitForVisible(adsBlockedStat)
+        .moveToObject(adsBlockedStat)
         .waitUntil(function () {
           return this.getText(adsBlockedStat)
-            .then((blocked) => Number(blocked) > 1)
+            .then((blocked) => Number(blocked) >= 1)
         })
         .click(adsBlockedControl)
         .waitForVisible(showAdsOption)
@@ -970,16 +954,19 @@ describe('Bravery Panel', function () {
         .waitForTextValue(adsBlockedStat, '0')
         .keys(Brave.keys.ESCAPE)
         .newTab({ url, isPrivate: true })
-        .waitForTabCount(1)
         .waitForUrl(url)
+        .waitForTabCount(3)
         .openBraveMenu(braveMenu, braveryPanel)
+        .waitForVisible(adsBlockedStat)
+        .moveToObject(adsBlockedStat)
         .waitForTextValue(adsBlockedStat, '0')
         .click(adsBlockedControl)
         .waitForVisible(blockAdsOption)
         .click(blockAdsOption)
+        .moveToObject(adsBlockedStat)
         .waitUntil(function () {
           return this.getText(adsBlockedStat)
-            .then((blocked) => Number(blocked) > 1)
+            .then((blocked) => Number(blocked) >= 1)
         })
     })
   })
