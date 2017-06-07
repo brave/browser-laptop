@@ -9,6 +9,11 @@ const appConstants = require('../constants/appConstants')
 const ExtensionConstants = require('../../app/common/constants/extensionConstants')
 const ipc = window.chrome.ipcRenderer
 
+// aboutActions should only contain actions that are relevant to about pages,
+// it should not contain duplicates of actions from appActions, etc... because
+// you can just require and call those directly
+// using ipc.send for actions is also deprecated and dispatchAction should
+// be used along with an appropriate reducer for handling the action
 const aboutActions = {
   /**
    * Dispatches a window action

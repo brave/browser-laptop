@@ -5,6 +5,11 @@
 const mapValuesByKeys = require('../lib/functional').mapValuesByKeys
 
 const _ = null
+
+// DO NOT ADD TO THIS LIST
+// If you are adding an ipc message you should probably be using an action instead
+// If you think you have a really good reason for adding something please check
+// with @bbondy or @bridiver first to see if there is an alternative
 const messages = {
   // URL bar shortcuts
   SHORTCUT_FOCUS_URL: _,
@@ -143,6 +148,7 @@ const messages = {
   LOAD_URL_REQUESTED: _,
   // Torrent
   TORRENT_MESSAGE: _
+  // DO NOT ADD TO THIS LIST - see above
 }
 
 module.exports = mapValuesByKeys(messages)

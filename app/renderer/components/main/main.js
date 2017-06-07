@@ -337,6 +337,8 @@ class Main extends ImmutableComponent {
     this.registerWindowLevelShortcuts()
     this.registerCustomTitlebarHandlers()
 
+    // DO NOT ADD TO THIS LIST
+    // ipc.on is deprecated and should be replaced by actions/reducers
     ipc.on(messages.LEAVE_FULL_SCREEN, this.exitFullScreen.bind(this))
 
     ipc.on(messages.DEBUG_REACT_PROFILE, (e, args) => {
@@ -454,6 +456,7 @@ class Main extends ImmutableComponent {
       windowActions.setImportBrowserDataDetail(detail)
       windowActions.setImportBrowserDataSelected({})
     })
+    // DO NOT ADD TO THIS LIST - see above
 
     this.loadSearchProviders()
 
