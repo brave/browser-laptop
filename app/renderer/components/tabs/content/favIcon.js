@@ -29,7 +29,7 @@ class Favicon extends React.Component {
       : null
   }
 
-  mergeProps (state, dispatchProps, ownProps) {
+  mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey) || Immutable.Map()
     const isTabLoading = tabContentState.isTabLoading(currentWindow, ownProps.frameKey)

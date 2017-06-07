@@ -126,7 +126,7 @@ class Tabs extends React.Component {
     contextMenus.onNewTabContextMenu(target)
   }
 
-  mergeProps (state, dispatchProps, ownProps) {
+  mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const pageIndex = tabContentState.getPageIndex(currentWindow)
     const tabsPerTabPage = Number(getSetting(settings.TABS_PER_PAGE))

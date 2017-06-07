@@ -41,7 +41,7 @@ class AudioTabIcon extends React.Component {
     windowActions.setAudioMuted(this.props.frameKey, this.props.tabId, !this.props.audioMuted)
   }
 
-  mergeProps (state, dispatchProps, ownProps) {
+  mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey)
 

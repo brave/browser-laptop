@@ -42,7 +42,7 @@ class DownloadsBar extends React.Component {
     windowActions.setDownloadsToolbarVisible(false)
   }
 
-  mergeProps (state, dispatchProps, ownProps) {
+  mergeProps (state, ownProps) {
     const props = {}
     // used in renderer
     props.downloads = downloadUtil.getDownloadItems(state)

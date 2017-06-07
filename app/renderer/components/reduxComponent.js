@@ -5,14 +5,14 @@ const windowStore = require('../../../js/stores/windowStore')
 const debounce = require('../../../js/lib/debounce')
 const {isList, isSameHashCode} = require('../../common/state/immutableUtil')
 
-const mergePropsImpl = (stateProps, dispatchProps, ownProps) => {
-  return Object.assign({}, stateProps, dispatchProps, ownProps)
+const mergePropsImpl = (stateProps, ownProps) => {
+  return Object.assign({}, stateProps, ownProps)
 }
 
 const buildPropsImpl = (props, componentType) => {
   const fn = componentType.prototype.mergeProps || mergePropsImpl
   const state = appStore.state.set('currentWindow', windowStore.state)
-  return fn(state, {}, props)
+  return fn(state, props)
 }
 
 class ReduxComponent extends ImmutableComponent {
@@ -58,8 +58,8 @@ class ReduxComponent extends ImmutableComponent {
     return shouldUpdate
   }
 
-  mergeProps (stateProps, dispatchProps, ownProps) {
-    return mergePropsImpl(stateProps, dispatchProps, ownProps)
+  mergeProps (stateProps, ownProps) {
+    return mergePropsImpl(stateProps, ownProps)
   }
 
   buildProps (props = this.props) {

@@ -98,7 +98,7 @@ class MessageBox extends React.Component {
     return newButtons
   }
 
-  mergeProps (state, dispatchProps, ownProps) {
+  mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const tabId = ownProps.tabId
     const tab = tabState.getByTabId(state, tabId)

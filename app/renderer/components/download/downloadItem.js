@@ -96,7 +96,7 @@ class DownloadItem extends React.Component {
     return this.props.downloadState === downloadStates.PAUSED
   }
 
-  mergeProps (state, dispatchProps, ownProps) {
+  mergeProps (state, ownProps) {
     const download = state.getIn(['downloads', ownProps.downloadId]) || Immutable.Map()
     const origin = getOrigin(download.get('url'))
 

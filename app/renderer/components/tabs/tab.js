@@ -227,7 +227,7 @@ class Tab extends React.Component {
     return rect && rect.width
   }
 
-  mergeProps (state, dispatchProps, ownProps) {
+  mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey)
     const notifications = state.get('notifications')

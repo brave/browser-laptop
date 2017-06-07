@@ -45,7 +45,7 @@ class MenuBarItem extends React.Component {
     }
   }
 
-  mergeProps (state, dispatchProps, ownProps) {
+  mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const selectedIndex = currentWindow.getIn(['ui', 'menubar', 'selectedIndex'])
     const template = state.getIn(['menu', 'template', ownProps.index])

@@ -158,7 +158,7 @@ class AddEditBookmarkHanger extends React.Component {
     appActions.createTabRequested({url: 'about:bookmarks'})
   }
 
-  mergeProps (state, dispatchProps, ownProps) {
+  mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const bookmarkDetail = currentWindow.get('bookmarkDetail')
     const currentDetail = bookmarkDetail.get('currentDetail')

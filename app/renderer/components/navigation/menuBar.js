@@ -119,7 +119,7 @@ class MenuBar extends React.Component {
     }
   }
 
-  mergeProps (state, dispatchProps, ownProps) {
+  mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const contextMenuDetail = currentWindow.get('contextMenuDetail')
 
