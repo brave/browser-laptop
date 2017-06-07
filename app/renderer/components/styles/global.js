@@ -295,9 +295,10 @@ const globalStyles = {
     color: '#3b3b3b',
 
     header: {
-      color: '#fff',
+      color: '#fafafa',
       background: '#808080',
-      switchControlTopTextColor: '#d3d3d3'
+      switchControlTopTextColor: '#d3d3d3',
+      border: '1px solid #aaa'
     },
 
     stats: {

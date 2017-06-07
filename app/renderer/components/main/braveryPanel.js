@@ -8,6 +8,7 @@ const Immutable = require('immutable')
 // Components
 const ImmutableComponent = require('../immutableComponent')
 const Dialog = require('../common/dialog')
+const BrowserButton = require('../common/browserButton')
 const SwitchControl = require('../common/switchControl')
 const {BraveryPanelDropdown} = require('../common/dropdown')
 
@@ -28,6 +29,8 @@ const getSetting = require('../../../../js/settings').getSetting
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../styles/global')
 const commonStyles = require('../styles/commonStyles')
+
+const closeButton = require('../../../../img/toolbar/braveryPanel_btn.svg')
 
 class BraveryPanel extends ImmutableComponent {
   constructor () {
@@ -181,25 +184,31 @@ class BraveryPanel extends ImmutableComponent {
       styles.braveryPanel__header,
       styles.braveryPanel_compact__header
     )}>
-      <div data-l10n-id='braveryPanelTitle' className={css(
-        styles.braveryPanel__header_left,
-        styles.braveryPanel_compact__header_top
-      )} />
-      <div className={css(
-        styles.braveryPanel__header_right,
-        styles.braveryPanel_compact__header_bottom
-      )}>
-        <div title={this.displayHost} className={css(styles.braveryPanel_compact__header__displayHost)}>{this.displayHost}</div>
-        <div className={css(styles.braveryPanel_compact__header_bottom__shieldsSwitch)}>
-          <SwitchControl large
-            customWrapperClassName={css(styles.braveryPanel_compact__header_bottom__shieldsSwitch__switchControl)}
+      <div className={css(styles.braveryPanel_compact__header__top)}>
+        <span data-l10n-id='shields'
+          className={css(styles.braveryPanel_compact__header__top__left)}
+        />
+        <div className={css(styles.braveryPanel_compact__header__top__right)}>
+          <SwitchControl
+            customWrapperClassName={css(styles.braveryPanel_compact__header__top__right__switchControl)}
             onClick={this.onToggleShields}
             testId='shields-toggle'
             leftl10nId='shieldsDown'
             rightl10nId='shieldsUp'
             checkedOn={shieldsUp}
           />
+          <BrowserButton custom={styles.braveryPanel_compact__header__top__right__close}
+            testId='braveryCloseButton'
+            onClick={this.props.onHide}
+          />
         </div>
+      </div>
+      <div className={css(
+        styles.braveryPanel__header__right,
+        styles.braveryPanel_compact__header__bottom
+      )}>
+        <div data-l10n-id='braveryPanelTitle' className={css(styles.braveryPanel_compact__header__bottom__title)} />
+        <div title={this.displayHost} className={css(styles.braveryPanel_compact__header__bottom__displayHost)}>{this.displayHost}</div>
       </div>
     </section>
   }
@@ -207,14 +216,14 @@ class BraveryPanel extends ImmutableComponent {
   get defaultBraveryPanelHeader () {
     const shieldsUp = this.props.braverySettings.shieldsUp
     return <section className={css(styles.braveryPanel__header)}>
-      <div className={css(styles.braveryPanel__header_left)}>
+      <div className={css(styles.braveryPanel__header__left)}>
         <div data-l10n-id='braveryPanelTitle' />
-        <div title={this.displayHost} className={css(styles.braveryPanel__header__displayHost)}>{this.displayHost}</div>
+        <div title={this.displayHost} className={css(styles.braveryPanel__header__left__displayHost)}>{this.displayHost}</div>
       </div>
-      <div className={css(styles.braveryPanel__header_right)}>
+      <div className={css(styles.braveryPanel__header__right)}>
         <SwitchControl large
-          customWrapperClassName={css(styles.braveryPanel__header_right__switchControl)}
-          customTopTextClassName={css(styles.braveryPanel__header_right__switchControl__topText)}
+          customWrapperClassName={css(styles.braveryPanel__header__right__switchControl)}
+          customTopTextClassName={css(styles.braveryPanel__header__right__switchControl__topText)}
           onClick={this.onToggleShields}
           testId='shields-toggle'
           leftl10nId='shieldsDown'
@@ -261,56 +270,64 @@ class BraveryPanel extends ImmutableComponent {
           styles.braveryPanel__stats,
           compactBraveryPanel && styles.braveryPanel_compact__stats
         )}>
-          <div data-test-id='adsBlockedStat'
-            onClick={this.onToggleAdsAndTracking}
-            className={css(
-              styles.braveryPanel__stats__item_count_adsBlockedStat,
-              !!adsBlockedStat && styles.braveryPanel__stats__item_count_clickable,
-              (!shieldsUp || adControl === 'allowAdsAndTracking') && styles.braveryPanel__stats__item_count_disabled,
-              gridStyles.row1col1,
-              !compactBraveryPanel && styles.braveryPanel__stats__item,
-              !compactBraveryPanel && styles.braveryPanel__stats__item_count,
-              compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
-            )}>{adsBlockedStat}</div>
+          <div className={css(
+            styles.braveryPanel__stats__item_count_adsBlockedStat,
+            (!shieldsUp || adControl === 'allowAdsAndTracking') && styles.braveryPanel__stats__item_count_disabled,
+            gridStyles.row1col1,
+            !compactBraveryPanel && styles.braveryPanel__stats__item,
+            !compactBraveryPanel && styles.braveryPanel__stats__item_count,
+            compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
+          )}>
+            <span className={css(!!adsBlockedStat && styles.braveryPanel__stats__item_count_clickable)}
+              onClick={this.onToggleAdsAndTracking}
+              data-test-id='adsBlockedStat'
+            >{adsBlockedStat}</span>
+          </div>
 
-          <div data-test-id='redirectedResourcesStat'
-            onClick={this.onToggleHttpseList}
-            className={css(
-              styles.braveryPanel__stats__item_count_redirectedResourcesStat,
-              !!this.redirectedResourcesSet.size && styles.braveryPanel__stats__item_count_clickable,
-              (!shieldsUp || !httpseEnabled) && styles.braveryPanel__stats__item_count_disabled,
-              !compactBraveryPanel && gridStyles.row1col2,
-              !compactBraveryPanel && styles.braveryPanel__stats__item,
-              !compactBraveryPanel && styles.braveryPanel__stats__item_count,
-              compactBraveryPanel && gridStyles.row2col1,
-              compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
-            )}>{httpsUpgradedResourceStat}</div>
+          <div className={css(
+            styles.braveryPanel__stats__item_count_redirectedResourcesStat,
+            (!shieldsUp || !httpseEnabled) && styles.braveryPanel__stats__item_count_disabled,
+            !compactBraveryPanel && gridStyles.row1col2,
+            !compactBraveryPanel && styles.braveryPanel__stats__item,
+            !compactBraveryPanel && styles.braveryPanel__stats__item_count,
+            compactBraveryPanel && gridStyles.row2col1,
+            compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
+          )}>
+            <span className={css(!!this.redirectedResourcesSet.size && styles.braveryPanel__stats__item_count_clickable)}
+              onClick={this.onToggleHttpseList}
+              data-test-id='redirectedResourcesStat'
+            >{httpsUpgradedResourceStat}</span>
+          </div>
 
-          <div data-test-id='noScriptStat'
-            onClick={this.onToggleNoScriptList}
-            className={css(
-              styles.braveryPanel__stats__item_count_noScriptStat,
-              !!scriptsBlockedStat && styles.braveryPanel__stats__item_count_clickable,
-              (!shieldsUp || !noScriptEnabled) && styles.braveryPanel__stats__item_count_disabled,
-              !compactBraveryPanel && gridStyles.row1col3,
-              !compactBraveryPanel && styles.braveryPanel__stats__item,
-              !compactBraveryPanel && styles.braveryPanel__stats__item_count,
-              compactBraveryPanel && gridStyles.row3col1,
-              compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
-            )}>{scriptsBlockedStat}</div>
+          <div className={css(
+            styles.braveryPanel__stats__item_count_noScriptStat,
+            (!shieldsUp || !noScriptEnabled) && styles.braveryPanel__stats__item_count_disabled,
+            !compactBraveryPanel && gridStyles.row1col3,
+            !compactBraveryPanel && styles.braveryPanel__stats__item,
+            !compactBraveryPanel && styles.braveryPanel__stats__item_count,
+            compactBraveryPanel && gridStyles.row3col1,
+            compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
+          )}>
+            <span className={css(!!scriptsBlockedStat && styles.braveryPanel__stats__item_count_clickable)}
+              onClick={this.onToggleNoScriptList}
+              data-test-id='noScriptStat'
+            >{scriptsBlockedStat}</span>
+          </div>
 
-          <div data-test-id='fpStat'
-            onClick={this.onToggleFpList}
-            className={css(
-              styles.braveryPanel__stats__item_count_fpStat,
-              !!fpBlockedStat && styles.braveryPanel__stats__item_count_clickable,
-              (!shieldsUp || !fpEnabled) && styles.braveryPanel__stats__item_count_disabled,
-              !compactBraveryPanel && gridStyles.row1col4,
-              !compactBraveryPanel && styles.braveryPanel__stats__item,
-              !compactBraveryPanel && styles.braveryPanel__stats__item_count,
-              compactBraveryPanel && gridStyles.row4col1,
-              compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
-            )}>{fpBlockedStat}</div>
+          <div className={css(
+            styles.braveryPanel__stats__item_count_fpStat,
+            (!shieldsUp || !fpEnabled) && styles.braveryPanel__stats__item_count_disabled,
+            !compactBraveryPanel && gridStyles.row1col4,
+            !compactBraveryPanel && styles.braveryPanel__stats__item,
+            !compactBraveryPanel && styles.braveryPanel__stats__item_count,
+            compactBraveryPanel && gridStyles.row4col1,
+            compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
+          )}>
+            <span className={css(!!fpBlockedStat && styles.braveryPanel__stats__item_count_clickable)}
+              onClick={this.onToggleFpList}
+              data-test-id='fpStat'
+            >{fpBlockedStat}</span>
+          </div>
 
           <span className={css(
             !!adsBlockedStat && styles.braveryPanel__stats__item_label_clickable,
@@ -324,6 +341,7 @@ class BraveryPanel extends ImmutableComponent {
             data-l10n-id='adsBlocked'
             data-l10n-args={l10nArgs}
           />
+
           <span className={css(
             !!this.redirectedResourcesSet.size && styles.braveryPanel__stats__item_label_clickable,
             (!shieldsUp || !httpseEnabled) && styles.braveryPanel__stats__item_label_disabled,
@@ -335,6 +353,7 @@ class BraveryPanel extends ImmutableComponent {
             data-l10n-id='httpReroutes'
             data-l10n-args={l10nArgs}
           />
+
           <span className={css(
             !!scriptsBlockedStat && styles.braveryPanel__stats__item_label_clickable,
             (!shieldsUp || !noScriptEnabled) && styles.braveryPanel__stats__item_label_disabled,
@@ -347,6 +366,7 @@ class BraveryPanel extends ImmutableComponent {
             data-l10n-id='scriptsBlockedNumber'
             data-l10n-args={l10nArgs}
           />
+
           <span className={css(
             !!fpBlockedStat && styles.braveryPanel__stats__item_label_clickable,
             (!shieldsUp || !fpEnabled) && styles.braveryPanel__stats__item_label_disabled,
@@ -580,7 +600,10 @@ class BraveryPanel extends ImmutableComponent {
             styles.braveryPanel__body__hr_splitter,
             compactBraveryPanel && styles.braveryPanel_compact__body__hr
           )} />
-          <div className={css(styles.braveryPanel__body__footer)}>
+          <div className={css(
+            styles.braveryPanel__body__footer,
+            compactBraveryPanel && styles.braveryPanel_compact__body__footer
+          )}>
             <span className={css(
               styles.braveryPanel__body__footer__edit,
               styles.braveryPanel__body__footer__edit_clickable,
@@ -680,6 +703,8 @@ const gridStyles = StyleSheet.create({
   }
 })
 
+const buttonSize = '13px'
+
 const styles = StyleSheet.create({
   braveryPanel: {
     padding: 0,
@@ -705,41 +730,71 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: globalStyles.radius.borderRadius,
     borderTopRightRadius: globalStyles.radius.borderRadius
   },
-  braveryPanel__header_left: {
+  braveryPanel__header__left: {
     minWidth: 0
   },
-  braveryPanel__header_right: {
+  braveryPanel__header__right: {
     marginLeft: 'auto'
   },
 
   // braveryPanelHeader - Compact Panel
   braveryPanel_compact__header: {
     flexFlow: 'column nowrap',
-    padding: '0.75rem 1rem'
+    padding: '0.75rem'
   },
-  braveryPanel_compact__header__displayHost: displayHost,
-  braveryPanel_compact__header_top: {
-    marginBottom: '5px'
-  },
-  braveryPanel_compact__header_bottom: {
+  braveryPanel_compact__header__top: {
     display: 'flex',
     justifyContent: 'space-between',
-    marginLeft: 0
+    padding: '0 .25rem .5rem .25rem',
+    borderBottom: globalStyles.braveryPanel.header.border
   },
-  braveryPanel_compact__header_bottom__shieldsSwitch: {
-    marginLeft: '1rem'
+  braveryPanel_compact__header__top__left: {
+    fontSize: '1.1em'
   },
-  braveryPanel_compact__header_bottom__shieldsSwitch__switchControl: {
-    padding: 0
+  braveryPanel_compact__header__top__right: {
+    display: 'flex',
+    alignItems: 'center'
   },
+  braveryPanel_compact__header__top__right__switchControl: {
+    padding: '0 25px'
+  },
+  braveryPanel_compact__header__top__right__close: {
+    // ref: https://github.com/brave/browser-laptop/blob/master/app/renderer/components/common/modalOverlay.js#L160
+    display: 'inline-block',
+    color: globalStyles.braveryPanel.header.color,
+    height: buttonSize,
+    width: buttonSize,
+    cursor: 'pointer',
+    position: 'absolute',
+    top: '15px',
+    right: '10px',
+
+    // TODO: refactor button to remove !important
+    padding: '0 !important',
+    background: `url(${closeButton}) center no-repeat !important`,
+    backgroundSize: `${buttonSize} ${buttonSize} !important`,
+
+    ':focus': {
+      outline: 'none'
+    }
+  },
+  braveryPanel_compact__header__bottom: {
+    display: 'flex',
+    flexFlow: 'column nowrap',
+    marginLeft: 0,
+    padding: '.5rem .25rem 0'
+  },
+  braveryPanel_compact__header__bottom__title: {
+    fontWeight: 300
+  },
+  braveryPanel_compact__header__bottom__displayHost: displayHost,
 
   // braveryPanelHeader - Normal Panel
-  braveryPanel__header__displayHost: displayHost,
-
-  braveryPanel__header_right__switchControl: {
+  braveryPanel__header__left__displayHost: displayHost,
+  braveryPanel__header__right__switchControl: {
     padding: 0
   },
-  braveryPanel__header_right__switchControl__topText: {
+  braveryPanel__header__right__switchControl__topText: {
     color: globalStyles.braveryPanel.header.switchControlTopTextColor
   },
 
@@ -789,7 +844,7 @@ const styles = StyleSheet.create({
 
   // braveryPanelStats - Compact panel
   braveryPanel_compact__stats: {
-    padding: '.5rem 1rem',
+    padding: '.5rem .75rem',
     alignItems: 'center',
     justifyContent: 'flex-start'
   },
@@ -797,12 +852,13 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'flex-end',
     maxWidth: '100%',
-    marginRight: '.3rem',
-    fontSize: '1.7rem'
+    fontSize: '1.7rem',
+    minWidth: '2ch'
   },
   braveryPanel_compact__stats__item_label: {
     overflow: 'hidden',
-    textOverflow: 'ellipsis'
+    textOverflow: 'ellipsis',
+    paddingLeft: '.3rem'
   },
 
   // braveryPanelBody - Common
@@ -864,7 +920,7 @@ const styles = StyleSheet.create({
 
   // braveryPanelBody - Compact Panel
   braveryPanel_compact__body: {
-    padding: `1rem 1rem calc(1rem - ${editGlobalMarginBottom})`
+    padding: `1rem .75rem calc(1rem - ${editGlobalMarginBottom})`
   },
   braveryPanel_compact__body__advancedTitle: {
     alignItems: 'center'
@@ -878,7 +934,7 @@ const styles = StyleSheet.create({
     marginBottom: '.75rem'
   },
   braveryPanel_compact__body__ul: {
-    padding: 0,
+    padding: '0 .5rem',
     margin: '0 0 .75rem 0',
     wordBreak: 'break-all',
     maxHeight: '10vh'
@@ -905,6 +961,9 @@ const styles = StyleSheet.create({
   },
   braveryPanel_compact__body__advanced__control__switchControl: {
     padding: '5px 0 5px .25rem'
+  },
+  braveryPanel_compact__body__footer: {
+    padding: '0 .25rem'
   },
   braveryPanel_compact__body__footer__edit: {
     marginBottom: editGlobalMarginBottom
@@ -941,7 +1000,10 @@ const styles = StyleSheet.create({
   // controlWrapper - Compact Panel
   braveryPanel_compact__body__advanced__control: {
     gridColumnGap: 0,
-    margin: 0
+    margin: 0,
+
+    // Align the advanced control wrapper with the counters
+    padding: '0 4px'
   }
 })
 
