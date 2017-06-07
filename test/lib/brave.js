@@ -596,12 +596,12 @@ var exports = {
     })
 
     this.app.client.addCommand('detachTabByIndex', function (index, windowId = -1) {
-      return this.waitForTab({index}).getAppState().then((val) => {
-        const tab = val.value.tabs.find((tab) => tab.index === index)
-        return this.execute(function (tabId, windowId, location, guestInstanceId) {
+      return this.waitForTab({index}).getWindowState().then((val) => {
+        const frame = val.value.frames[index]
+        return this.execute(function (tabId, windowId, frame) {
           const browserOpts = { positionByMouseCursor: true }
-          devTools('appActions').tabMoved(tabId, {location, guestInstanceId}, browserOpts, windowId)
-        }, tab.tabId, windowId, tab.url, tab.guestInstanceId)
+          devTools('appActions').tabMoved(tabId, frame, browserOpts, windowId)
+        }, frame.tabId, windowId, frame)
       })
     })
 
