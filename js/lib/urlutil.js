@@ -411,6 +411,15 @@ const UrlUtil = {
    */
   getUrlOrigin: function (url) {
     return new window.URL(url).origin
+  },
+
+  isLocalFile: function (origin) {
+    if (!origin) {
+      return false
+    }
+
+    const localFileOrigins = ['file:', 'blob:', 'data:', 'chrome-extension:', 'chrome:']
+    return origin && localFileOrigins.some((localFileOrigin) => origin.startsWith(localFileOrigin))
   }
 }
 

@@ -11,41 +11,45 @@ const path = require('path')
 const uuid = require('uuid')
 const Immutable = require('immutable')
 const downloadStates = require('../../../../../../js/constants/downloadStates')
-let DownloadItem, DownloadsBar
 require('../../../../braveUnit')
 
 const mostRecentlyDownloadedId = uuid.v4()
-const newDownloads = () => Immutable.fromJS({
-  [uuid.v4()]: {
-    startTime: new Date().getTime(),
-    filename: 'mostHatedPrimes.txt',
-    savePath: path.join(require('os').tmpdir(), 'mostHatedPrimes.txt'),
-    url: 'http://www.bradrichter.com/mostHatedPrimes.txt',
-    totalBytes: 104729,
-    receivedBytes: 96931,
-    state: downloadStates.IN_PROGRESS
-  },
-  [mostRecentlyDownloadedId]: {
-    startTime: new Date().getTime() + 1000,
-    filename: 'compositeNumbersFTW.txt',
-    savePath: path.join(require('os').tmpdir(), 'compositeNumbersFTW.txt'),
-    url: 'http://www.bradrichter.com/compositeNumbersTW.txt',
-    totalBytes: 42,
-    receivedBytes: 1024,
-    state: downloadStates.COMPLETED
-  },
-  [uuid.v4()]: {
-    startTime: new Date().getTime() - 1000,
-    filename: 'guideToIntegers.txt',
-    savePath: path.join(require('os').tmpdir(), 'guideToInegers.txt'),
-    url: 'http://www.bradrichter.com/guideToInegers.txt',
-    totalBytes: 72,
-    receivedBytes: 1,
-    state: downloadStates.IN_PROGRESS
+
+const appStoreRenderer = Immutable.fromJS({
+  downloads: {
+    [uuid.v4()]: {
+      startTime: new Date().getTime(),
+      filename: 'mostHatedPrimes.txt',
+      savePath: path.join(require('os').tmpdir(), 'mostHatedPrimes.txt'),
+      url: 'http://www.bradrichter.com/mostHatedPrimes.txt',
+      totalBytes: 104729,
+      receivedBytes: 96931,
+      state: downloadStates.IN_PROGRESS
+    },
+    [mostRecentlyDownloadedId]: {
+      startTime: new Date().getTime() + 1000,
+      filename: 'compositeNumbersFTW.txt',
+      savePath: path.join(require('os').tmpdir(), 'compositeNumbersFTW.txt'),
+      url: 'http://www.bradrichter.com/compositeNumbersTW.txt',
+      totalBytes: 42,
+      receivedBytes: 1024,
+      state: downloadStates.COMPLETED
+    },
+    [uuid.v4()]: {
+      startTime: new Date().getTime() - 1000,
+      filename: 'guideToIntegers.txt',
+      savePath: path.join(require('os').tmpdir(), 'guideToInegers.txt'),
+      url: 'http://www.bradrichter.com/guideToInegers.txt',
+      totalBytes: 72,
+      receivedBytes: 1,
+      state: downloadStates.IN_PROGRESS
+    }
   }
 })
 
 describe('downloadsBar component', function () {
+  let DownloadItem, DownloadsBar, appStore
+
   before(function () {
     mockery.enable({
       warnOnReplace: false,
@@ -55,14 +59,18 @@ describe('downloadsBar component', function () {
     mockery.registerMock('electron', fakeElectron)
     DownloadItem = require('../../../../../../app/renderer/components/download/downloadItem')
     DownloadsBar = require('../../../../../../app/renderer/components/download/downloadsBar')
+    appStore = require('../../../../../../js/stores/appStoreRenderer')
+    appStore.state = appStoreRenderer
   })
+
   after(function () {
+    mockery.deregisterAll()
     mockery.disable()
   })
 
   describe('multiple downloads with space', function () {
     before(function () {
-      this.result = mount(<DownloadsBar windowWidth={1024} downloads={newDownloads()} />)
+      this.result = mount(<DownloadsBar />)
     })
 
     it('renders each download as a DownloadItem', function () {
@@ -80,7 +88,10 @@ describe('downloadsBar component', function () {
 
   describe('no downloads', function () {
     before(function () {
-      this.result = mount(<DownloadsBar windowWidth={1024} downloads={Immutable.Map()} />)
+      appStore.state = Immutable.fromJS({
+        downloads: {}
+      })
+      this.result = mount(<DownloadsBar />)
     })
 
     it('renders no DownloadItems when there are no downloads', function () {
@@ -92,11 +103,11 @@ describe('downloadsBar component', function () {
     })
   })
 
-  describe('very narrow downloads bar with items', function () {
+  // skipped until #9176 is merged
+  describe.skip('very narrow downloads bar with items', function () {
     before(function () {
-      // TODO: We can remove this once we're on Khan/aphrodite
       mockery.registerMock('../../getComputedStyle', () => 10)
-      this.result = mount(<DownloadsBar windowWidth={0} downloads={newDownloads()} />)
+      this.result = mount(<DownloadsBar />)
     })
     it('renders no downloads', function () {
       assert.equal(this.result.find(DownloadItem).length, 0)
