@@ -99,6 +99,7 @@ function development () {  // eslint-disable-line
 
 function production () {  // eslint-disable-line
   var prod = config()
+  delete prod.devtool
   prod.plugins.push(new webpack.optimize.DedupePlugin())
   prod.plugins.push(new webpack.optimize.OccurrenceOrderPlugin(true))
   if (env !== 'test') {
