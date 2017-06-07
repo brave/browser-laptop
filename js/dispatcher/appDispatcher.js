@@ -112,7 +112,7 @@ class AppDispatcher {
         this.dispatchToOwnRegisteredCallbacks(payload)
       }
       // only forward actions that have not been relayed through the browser process
-      if (payload.senderWindowId == null) {
+      if (!payload.sentFromBrowser) {
         cb()
         ipcCargo.push(payload)
       }
@@ -189,6 +189,7 @@ if (processType === 'browser') {
               return
             }
           }
+          payload.sentFromBrowser = true
           registrantCargo.push(payload)
         }
       } catch (e) {
