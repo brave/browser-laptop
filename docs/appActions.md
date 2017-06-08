@@ -1106,6 +1106,12 @@ Dispatches a message to set the search engine details.
 
 
 
+### updateLogOpened() 
+
+Dispatches a message to indicate that the update log is being opened
+
+
+
 
 * * *
 
