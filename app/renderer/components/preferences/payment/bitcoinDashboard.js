@@ -91,39 +91,64 @@ class BitcoinDashboard extends ImmutableComponent {
     })} />
   }
 
-  bitcoinPurchaseButton () {
-    if (!this.props.ledgerData.get('buyURLFrame')) {
-      /* TODO refactor button */
-      return <Button className={cx({
+  bitcoinPurchaseButton (options) {
+    const disabled = options && options.disabled
+    const buttonAttrs = {
+      l10nId: 'add',
+      testId: 'bitcoinPurchaseButton',
+      className: cx({
         primaryButton: true,
-        [css(styles.panelButton)]: true
-      })}
-        l10nId='add'
-        testId='bitcoinPurchaseButton'
-        onClick={this.props.showOverlay.bind(this)}
-      />
+        [css(styles.panelButton)]: true,
+        disabled: disabled
+      })
+    }
+    const hrefAttrs = {
+      href: this.props.ledgerData.get('buyURL'),
+      target: '_blank'
     }
 
-    return <a href={this.props.ledgerData.get('buyURL')} target='_blank' onClick={this.openBuyURLTab}>
-      {/* TODO: refactor button.js */}
-      <Button className={cx({
-        primaryButton: true,
-        [css(styles.panelButton)]: true
-      })}
-        l10nId='add'
-        testId='bitcoinPurchaseButton'
-      />
+    if (disabled) {
+      buttonAttrs.disabled = 'disabled'
+      hrefAttrs.disabled = 'disabled'
+    } else {
+      hrefAttrs.onClick = this.openBuyURLTab
+    }
+
+    if (!this.props.ledgerData.get('buyURLFrame')) {
+      if (!disabled) {
+        buttonAttrs.onClick = this.props.showOverlay.bind(this)
+      }
+      return <Button {...buttonAttrs} />
+    }
+
+    return <a {...hrefAttrs}>
+      <Button {...buttonAttrs} />
     </a>
   }
 
   coinbaseAvailability () {
+    const disabled = true
     if (this.canUseCoinbase) {
       return <section className={css(styles.panel__divider, styles.panel__divider_right)}>
-        {this.bitcoinPurchaseButton()}
-        <div className={css(
-          styles.panel__divider_right__title,
-          styles.panel__divider_right__subTitle
-        )} data-l10n-id='transferTime' />
+        {this.bitcoinPurchaseButton({disabled})}
+        {
+          disabled
+          ? <div className={css(
+            styles.panel__divider_right__title,
+            styles.panel__divider_right__subTitle,
+            styles.panel__divider_right__disabledSubTitle
+          )}>
+            <div data-l10n-id='fundingDisabled1' />
+            <div>
+              <span data-l10n-id='fundingDisabled2' />&nbsp;
+              <a href='https://community.brave.com/c/payments' target='_blank' data-l10n-id='fundingDisabled3' />
+            </div>
+          </div>
+          : <div className={css(
+             styles.panel__divider_right__title,
+             styles.panel__divider_right__subTitle
+          )} data-l10n-id='transferTime' />
+        }
       </section>
     } else {
       return <section className={css(styles.panel__divider, styles.panel__divider_right)}>
@@ -541,6 +566,10 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     lineHeight: '1.3em',
     marginTop: globalStyles.spacing.dialogInsideMargin
+  },
+  panel__divider_right__disabledSubTitle: {
+    textAlign: 'right',
+    fontSize: '12px'
   },
 
   panel__coinbase: {
