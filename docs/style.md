@@ -148,6 +148,10 @@ browserButton_primary: {} // modifier -- we have a lot of button styles, this on
 browserButton_primary__icon: {} // mixing it all -- our style for an icon inside a primary button
 ```
 
+See [browserButton.js](https://github.com/brave/browser-laptop/blob/master/app/renderer/components/common/browserButton.js) for a live example.
+
+#### Keep the style name simple
+
 Notice that our styles resemble our code state, which means that if you strictly follow BEM practices, and your style name looks too big for you, you can consider that it is a strong indicator that either you have more elements than it is needed, or that some child elements should be split to a new file with its own styles (i.e. a new component).
 
 **Bad**
@@ -261,7 +265,7 @@ const styles = StyleSheet.create({
 })
 ```
 
-** Note that this applies for nested styles as well:
+Note that this applies for nested styles as well.
 
 **Also good:**
 
