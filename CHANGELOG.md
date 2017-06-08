@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.16.5](https://github.com/brave/browser-laptop/releases/v0.16.5dev)
+ - Added various performance improvements. ([#9342](https://github.com/brave/browser-laptop/issues/9342))
+ - Disabled the “Fund with debit/credit card” button in preparation for new funding method. ([#9327](https://github.com/brave/browser-laptop/issues/9327))
+ - Fixed custom bookmark titles not being searched for suggestions. ([#9249](https://github.com/brave/browser-laptop/issues/9249))
+ - Fixed pause is not working correctly for downloads. ([#9244](https://github.com/brave/browser-laptop/issues/9244))
+ - Fixed pinned tab showing blank white page when relaunching the browser. ([#9134](https://github.com/brave/browser-laptop/issues/9134))
+ - Fixed view log shows console errors when checking for update. ([#9122](https://github.com/brave/browser-laptop/issues/9122))
+ - Fixed cannot move bookmarks/folders to other folders in Bookmark Manager. ([#9101](https://github.com/brave/browser-laptop/issues/9101))
+ - Fixed bookmarks manager scrolling on drag and drop into folders. ([#8946](https://github.com/brave/browser-laptop/issues/8946))
+ - Fixed sync not tracking & merging changes in some cases. ([#8454](https://github.com/brave/browser-laptop/issues/8454))
+ - Upgrade to Chromium 59.0.3071.86. ([#9012](https://github.com/brave/browser-laptop/issues/9012))
+ - Upgrade to Muon 4.0.1. ([#9256](https://github.com/brave/browser-laptop/issues/9256))
+
 ## [0.15.314](https://github.com/brave/browser-laptop/releases/v0.15.314dev)
  - Fixed 'autocomplete search term' results are not filtering out 'http...' results. ([#9141](https://github.com/brave/browser-laptop/issues/9141))
  - Fixed WebView Not Visible in Popup Window. ([#9095](https://github.com/brave/browser-laptop/issues/9095))
