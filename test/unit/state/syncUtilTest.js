@@ -47,6 +47,7 @@ describe('syncUtil', () => {
         value: {
           site: expectedSite.value,
           isFolder: false,
+          hideInToolbar: false,
           parentFolderObjectId: undefined
         }
       }
@@ -62,6 +63,7 @@ describe('syncUtil', () => {
         value: {
           site: newValue,
           isFolder: false,
+          hideInToolbar: false,
           parentFolderObjectId: undefined
         }
       }
@@ -77,6 +79,22 @@ describe('syncUtil', () => {
         value: {
           site: newValue,
           isFolder: false,
+          hideInToolbar: false,
+          parentFolderObjectId: undefined
+        }
+      }
+      assert.deepEqual(syncUtil.createSiteData(bookmark), expectedBookmark)
+    })
+
+    it('bookmark in Other Bookmarks folder', () => {
+      const bookmark = Object.assign({}, site, {tags: ['bookmark'], parentFolderId: -1})
+      const expectedBookmark = {
+        name: 'bookmark',
+        objectId,
+        value: {
+          site: expectedSite.value,
+          isFolder: false,
+          hideInToolbar: true,
           parentFolderObjectId: undefined
         }
       }
