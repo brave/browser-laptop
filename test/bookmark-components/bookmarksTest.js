@@ -2,7 +2,7 @@
 
 const Brave = require('../lib/brave')
 const Immutable = require('immutable')
-const {urlInput, navigator, navigatorBookmarked, navigatorNotBookmarked, doneButton, removeButton, bookmarkNameInput, bookmarkLocationInput} = require('../lib/selectors')
+const {homepageInput, urlInput, navigator, navigatorBookmarked, navigatorNotBookmarked, doneButton, removeButton, bookmarkNameInput, bookmarkLocationInput} = require('../lib/selectors')
 const siteTags = require('../../js/constants/siteTags')
 
 describe('bookmark tests', function () {
@@ -245,6 +245,43 @@ describe('bookmark tests', function () {
           .click(navigatorBookmarked)
           .waitForVisible(doneButton)
           .waitForInputText(bookmarkLocationInput, page1Url)
+      })
+    })
+
+    describe('about pages', function () {
+      Brave.beforeAll(this)
+
+      before(function * () {
+        yield setup(this.app.client)
+      })
+
+      it('about:preferences', function * () {
+        const historyUrl = 'about:history'
+        const prefsUrl = 'about:preferences'
+        yield this.app.client
+          .waitForUrl(Brave.newTabUrl)
+          .loadUrl(prefsUrl)
+          .waitForVisible(homepageInput)
+          .windowParentByUrl(prefsUrl)
+          .waitForVisible(navigatorNotBookmarked)
+          .click(navigatorNotBookmarked)
+          .waitForVisible(doneButton)
+          .waitForBookmarkDetail(prefsUrl, 'Preferences')
+          .waitForEnabled(doneButton)
+          .click(doneButton)
+          .activateURLMode()
+          .waitForVisible(navigatorBookmarked)
+          .tabByIndex(0)
+          .loadUrl(historyUrl)
+          .windowParentByUrl(historyUrl)
+          .activateURLMode()
+          .waitForVisible(navigatorNotBookmarked)
+          .tabByIndex(0)
+          .loadUrl(prefsUrl)
+          .waitForVisible(homepageInput)
+          .windowParentByUrl(prefsUrl)
+          .activateURLMode()
+          .waitForVisible(navigatorBookmarked)
       })
     })
   })

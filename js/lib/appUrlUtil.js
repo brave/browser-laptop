@@ -132,8 +132,11 @@ const aboutUrlsReverse = new Immutable.Map(module.exports.aboutUrls.reduce((obj,
  * about:blank -> http://localhost:8000/about-blank/index.html
  */
 module.exports.getTargetAboutUrl = function (input) {
-  const hash = getHash(input)
   const url = module.exports.aboutUrls.get(getBaseUrl(input))
+  if (!url) {
+    return url
+  }
+  const hash = getHash(input)
   return hash && url ? [url, hash].join('#') : url
 }
 
@@ -143,9 +146,12 @@ module.exports.getTargetAboutUrl = function (input) {
  * http://localhost:8000/about-blank.html -> about:blank
  */
 module.exports.getSourceAboutUrl = function (input) {
-  const hash = getHash(input)
   const url = aboutUrlsReverse.get(getBaseUrl(input))
-  return hash && url ? [url, hash].join('#') : url
+  if (!url) {
+    return url
+  }
+  const hash = getHash(input)
+  return hash ? [url, hash].join('#') : url
 }
 
 /**

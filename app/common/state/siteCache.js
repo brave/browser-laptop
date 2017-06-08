@@ -4,6 +4,7 @@
 'use strict'
 const Immutable = require('immutable')
 const siteUtil = require('../../../js/state/siteUtil')
+const appUrlUtil = require('../../../js/lib/appUrlUtil')
 const UrlUtil = require('../../../js/lib/urlutil')
 
 const createLocationSiteKeysCache = (state) => {
@@ -16,6 +17,14 @@ const createLocationSiteKeysCache = (state) => {
     state = addLocationSiteKey(state, location, siteKey)
   })
   return state
+}
+
+const normalizeLocation = (location) => {
+  const sourceAboutUrl = appUrlUtil.getSourceAboutUrl(location)
+  if (sourceAboutUrl) {
+    return sourceAboutUrl
+  }
+  return UrlUtil.getLocationIfPDF(location)
 }
 
 module.exports.loadLocationSiteKeysCache = (state) => {
@@ -34,7 +43,7 @@ module.exports.loadLocationSiteKeysCache = (state) => {
  * @return {Immutable.List<string>|null} siteKeys including this location.
  */
 module.exports.getLocationSiteKeys = (state, location) => {
-  const normalLocation = UrlUtil.getLocationIfPDF(location)
+  const normalLocation = normalizeLocation(location)
   return state.getIn(['locationSiteKeysCache', normalLocation])
 }
 
@@ -49,7 +58,7 @@ const addLocationSiteKey = (state, location, siteKey) => {
   if (!siteKey || !location) {
     return state
   }
-  const normalLocation = UrlUtil.getLocationIfPDF(location)
+  const normalLocation = normalizeLocation(location)
   const cacheKey = ['locationSiteKeysCache', normalLocation]
   const siteKeys = state.getIn(cacheKey)
   if (!siteKeys) {
@@ -74,7 +83,7 @@ const removeLocationSiteKey = (state, location, siteKey) => {
   if (!siteKey || !location) {
     return state
   }
-  const normalLocation = UrlUtil.getLocationIfPDF(location)
+  const normalLocation = normalizeLocation(location)
   const cacheKey = ['locationSiteKeysCache', normalLocation]
   let siteKeys = state.getIn(cacheKey)
   if (!siteKeys) {
