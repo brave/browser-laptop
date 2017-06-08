@@ -137,7 +137,7 @@ class SyncTab extends ImmutableComponent {
     return devices.map((device, id) => [
       {
         html: id,
-        value: parseInt(id)
+        value: device.get('lastRecordTimestamp')
       },
       {
         html: device.get('name'),
