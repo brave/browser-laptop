@@ -9,8 +9,6 @@ const BrowserButton = require('../../app/renderer/components/common/browserButto
 const appActions = require('../actions/appActions')
 const windowActions = require('../actions/windowActions')
 const UpdateStatus = require('../constants/updateStatus')
-const remote = require('electron').remote
-const path = require('path')
 const cx = require('../lib/classSet')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
