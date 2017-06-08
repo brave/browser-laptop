@@ -19,13 +19,16 @@ class BrowserButton extends ImmutableComponent {
         [styles.browserButton_default, styles.browserButton_subtleItem, styles.browserButton_actionItem],
       this.props.extensionItem && styles.browserButton_extensionItem,
       this.props.groupedItem && styles.browserButton_groupedItem,
-      this.props.notificationItem && styles.browserButton_notificationItem
+      this.props.notificationItem && styles.browserButton_notificationItem,
       // TODO: These are other button styles app-wise
       // that needs to be refactored and included in this file
       // .............................................
       // this.props.smallItem && styles.browserButton_smallItem,
       // this.props.navItem && styles.browserButton_navItem,
       // this.props.panelItem && styles.browserButton_panelItem,
+
+      // note: this should be the last item so it can override other styles
+      this.props.disabled && styles.browserButton_disabled
     ]
   }
   render () {
@@ -191,6 +194,12 @@ const styles = StyleSheet.create({
 
   browserButton_actionItem: {
     background: globalStyles.button.action.backgroundColor
+  },
+
+  browserButton_disabled: {
+    pointerEvents: 'none',
+    animation: 'none',
+    opacity: 0.25
   }
 })
 
