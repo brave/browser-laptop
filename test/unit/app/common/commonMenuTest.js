@@ -182,6 +182,24 @@ describe('Common menu module unit tests', function () {
     })
   })
 
+  describe('braveLaptopHelpMenuItem', function () {
+    it('has the expected defaults set', function () {
+      checkExpectedDefaults(commonMenu.braveLaptopHelpMenuItem, false)
+    })
+  })
+
+  describe('braveIOSHelpMenuItem', function () {
+    it('has the expected defaults set', function () {
+      checkExpectedDefaults(commonMenu.braveIOSHelpMenuItem, false)
+    })
+  })
+
+  describe('braveAndroidTabsHelpMenuItem', function () {
+    it('has the expected defaults set', function () {
+      checkExpectedDefaults(commonMenu.braveAndroidTabsHelpMenuItem, false)
+    })
+  })
+
   describe('bookmarksToolbarMenuItem', function () {
     it('has the expected defaults set', function () {
       checkExpectedDefaults(commonMenu.bookmarksToolbarMenuItem, false)
