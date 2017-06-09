@@ -1,5 +1,6 @@
 /* global describe, before, after, it */
 const siteTags = require('../../../../../js/constants/siteTags')
+const {loadLocationSiteKeysCache} = require('../../../../../app/common/state/siteCache')
 const mockery = require('mockery')
 const assert = require('assert')
 const Immutable = require('immutable')
@@ -121,64 +122,71 @@ describe('menuUtil tests', function () {
   })
 
   describe('createBookmarkTemplateItems', function () {
+    // TODO FIXME WIP
     it('returns an array of items w/ the bookmark tag', function () {
-      const appStateSites = Immutable.fromJS([
+      let appState = Immutable.fromJS({sites: [
         { tags: [siteTags.BOOKMARK], title: 'my website', location: 'https://brave.com' }
-      ])
+      ]})
+      appState = loadLocationSiteKeysCache(appState)
 
-      const menuItems = menuUtil.createBookmarkTemplateItems(appStateSites)
+      const menuItems = menuUtil.createBookmarkTemplateItems(appState)
 
       assert.equal(Array.isArray(menuItems), true)
       assert.equal(menuItems.length, 1)
       assert.equal(menuItems[0].label, 'my website')
     })
     it('prefers the customTitle field for the bookmark title (over the page title)', function () {
-      const appStateSites = Immutable.fromJS([
+      let appState = Immutable.fromJS({sites: [
         { tags: [siteTags.BOOKMARK], customTitle: 'use this', title: 'not this', location: 'https://brave.com' }
-      ])
+      ]})
+      appState = loadLocationSiteKeysCache(appState)
 
-      const menuItems = menuUtil.createBookmarkTemplateItems(appStateSites)
+      const menuItems = menuUtil.createBookmarkTemplateItems(appState)
 
       assert.equal(menuItems[0].label, 'use this')
     })
     it('only returns bookmarks that have a location set', function () {
-      const appStateSites = Immutable.fromJS({
+      let appState = Immutable.fromJS({
         sites: [
           { tags: [siteTags.BOOKMARK], title: 'not valid', location: '' }
         ]
       })
+      appState = loadLocationSiteKeysCache(appState)
 
-      const menuItems = menuUtil.createBookmarkTemplateItems(appStateSites)
+      const menuItems = menuUtil.createBookmarkTemplateItems(appState)
 
       assert.deepEqual(menuItems, [])
     })
     it('returns empty array if no bookmarks present', function () {
-      const appStateSites = Immutable.fromJS({
+      let appState = Immutable.fromJS({
         sites: [
           { tags: [], title: 'this is a history entry', location: 'https://brave.com' }
         ]
       })
+      appState = loadLocationSiteKeysCache(appState)
 
-      const menuItems = menuUtil.createBookmarkTemplateItems(appStateSites)
+      const menuItems = menuUtil.createBookmarkTemplateItems(appState)
 
       assert.deepEqual(menuItems, [])
     })
     it('does not count pinned tabs as bookmarks', function () {
-      const appStateSites = Immutable.fromJS([
+      let appState = Immutable.fromJS({sites: [
         { tags: [siteTags.PINNED], title: 'pinned site', location: 'https://pinned-website.com' },
         { tags: [siteTags.BOOKMARK], title: 'my website', location: 'https://brave.com' }
-      ])
-      const menuItems = menuUtil.createBookmarkTemplateItems(appStateSites)
+      ]})
+      appState = loadLocationSiteKeysCache(appState)
+      const menuItems = menuUtil.createBookmarkTemplateItems(appState)
 
       assert.equal(menuItems.length, 1)
       assert.equal(menuItems[0].label, 'my website')
     })
     it('processes folders', function () {
-      const appStateSites = Immutable.fromJS([
+      let appState = Immutable.fromJS({sites: [
         { tags: [siteTags.BOOKMARK_FOLDER], title: 'my folder', folderId: 123 },
         { tags: [siteTags.BOOKMARK], title: 'my website', location: 'https://brave.com', parentFolderId: 123 }
-      ])
-      const menuItems = menuUtil.createBookmarkTemplateItems(appStateSites)
+      ]})
+      appState = loadLocationSiteKeysCache(appState)
+      const menuItems = menuUtil.createBookmarkTemplateItems(appState)
 
       assert.equal(menuItems.length, 1)
       assert.equal(menuItems[0].label, 'my folder')
@@ -186,12 +194,13 @@ describe('menuUtil tests', function () {
       assert.equal(menuItems[0].submenu[0].label, 'my website')
     })
     it('considers customTitle when processing folders', function () {
-      const appStateSites = Immutable.fromJS([
+      let appState = Immutable.fromJS({sites: [
         { tags: [siteTags.BOOKMARK_FOLDER], customTitle: 'use this', title: 'not this', folderId: 123 },
         { tags: [siteTags.BOOKMARK], title: 'my website', location: 'https://brave.com', parentFolderId: 123 }
-      ])
+      ]})
+      appState = loadLocationSiteKeysCache(appState)
 
-      const menuItems = menuUtil.createBookmarkTemplateItems(appStateSites)
+      const menuItems = menuUtil.createBookmarkTemplateItems(appState)
 
       assert.equal(menuItems.length, 1)
       assert.equal(menuItems[0].label, 'use this')

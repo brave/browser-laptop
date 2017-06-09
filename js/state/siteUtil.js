@@ -324,10 +324,14 @@ module.exports.addSite = function (state, siteDetail, tag, originalSiteDetail, s
   state = state.set('sites', sites)
   const key = module.exports.getSiteKey(site)
   if (key === null) {
+    state = siteCache.createSiteKeysByFolderCache(state)
     return state
   }
   state = state.setIn(['sites', key], site)
   state = siteCache.addLocationSiteKey(state, location, key)
+  if ((location && location !== oldLocation) || (key && key !== oldKey)) {
+    state = siteCache.createSiteKeysByFolderCache(state)
+  }
   return state
 }
 
@@ -490,6 +494,7 @@ module.exports.moveSite = function (state, sourceKey, destinationKey, prepend,
   }
   const destinationSiteKey = module.exports.getSiteKey(sourceSite)
   state = siteCache.addLocationSiteKey(state, location, destinationSiteKey)
+  state = siteCache.createSiteKeysByFolderCache(state)
   return state.setIn(['sites', destinationSiteKey], sourceSite)
 }
 
@@ -737,6 +742,29 @@ module.exports.getFolders = function (sites, folderId, parentId, labelPrefix) {
     }
   })
   return folders
+}
+
+/**
+ * Group Immutable Map key paths by folder and sort by order.
+ * OrderedMap {
+ *   '1': OrderedMap {
+ *     '3': OrderedMap { },
+ *     'https://archive.org|0|1': null
+ *   },
+ *   '2': OrderedMap { 'https://example.com|0|2 },
+ *   'https://wikipedia.org|0|0': null
+ * }
+ *
+ * @param state Application state
+ * @return {Immutable.Map} Ordered site keys by folder
+ */
+module.exports.getSiteKeysByFolder = function (state) {
+  const cache = siteCache.getSiteKeysByFolder(state)
+  if (cache) {
+    return cache
+  } else {
+    return new Immutable.Map()
+  }
 }
 
 /**

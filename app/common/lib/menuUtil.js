@@ -3,9 +3,8 @@
 
 'use strict'
 
-const {makeImmutable} = require('../../common/state/immutableUtil')
+const {makeImmutable, isMap} = require('../../common/state/immutableUtil')
 const CommonMenu = require('../../common/commonMenu')
-const siteTags = require('../../../js/constants/siteTags')
 const eventUtil = require('../../../js/lib/eventUtil')
 const siteUtil = require('../../../js/state/siteUtil')
 const locale = require('../../locale')
@@ -71,45 +70,48 @@ module.exports.setTemplateItemChecked = (template, label, checked) => {
   return null
 }
 
-const createBookmarkTemplateItems = (bookmarks, parentFolderId) => {
-  const filteredBookmarks = parentFolderId
-    ? bookmarks.filter((bookmark) => bookmark.get('parentFolderId') === parentFolderId)
-    : bookmarks.filter((bookmark) => !bookmark.get('parentFolderId'))
-
-  const payload = []
-  filteredBookmarks.forEach((site) => {
-    if (site.get('tags').includes(siteTags.BOOKMARK) && site.get('location')) {
-      payload.push({
-        // TODO include label made from favicon. It needs to be of type NativeImage
-        // which can be made using a Buffer / DataURL / local image
-        // the image will likely need to be included in the site data
-        // there was potentially concern about the size of the app state
-        // and as such there may need to be another mechanism or cache
-        //
-        // see: https://github.com/brave/browser-laptop/issues/3050
-        label: site.get('customTitle') || site.get('title') || site.get('location'),
-        click: (item, focusedWindow, e) => {
-          if (eventUtil.isForSecondaryAction(e)) {
-            appActions.createTabRequested({
-              url: site.get('location'),
-              windowId: focusedWindow.id,
-              active: !!e.shiftKey
-            })
-          } else {
-            appActions.loadURLInActiveTabRequested(focusedWindow.id, site.get('location'))
+// TODO include label made from favicon. It needs to be of type NativeImage
+// which can be made using a Buffer / DataURL / local image
+// the image will likely need to be included in the site data
+// there was potentially concern about the size of the app state
+// and as such there may need to be another mechanism or cache
+//
+// see: https://github.com/brave/browser-laptop/issues/3050
+const createBookmarkTemplateItems = (state) => {
+  const sites = state.get('sites')
+  const createPayload = (groupedKeys) => {
+    const payload = []
+    groupedKeys.forEach((value, key) => {
+      const site = sites.get(key)
+      if (!site) {
+        return
+      }
+      const label = site.get('customTitle') || site.get('title') || site.get('location')
+      // Folder
+      if (isMap(value)) {
+        const submenu = createPayload(value)
+        payload.push({label, submenu})
+      } else {
+        payload.push({
+          label,
+          click: (item, focusedWindow, e) => {
+            if (eventUtil.isForSecondaryAction(e)) {
+              appActions.createTabRequested({
+                url: site.get('location'),
+                windowId: focusedWindow.id,
+                active: !!e.shiftKey
+              })
+            } else {
+              appActions.loadURLInActiveTabRequested(focusedWindow.id, site.get('location'))
+            }
           }
-        }
-      })
-    } else if (siteUtil.isFolder(site)) {
-      const folderId = site.get('folderId')
-      const submenuItems = bookmarks.filter((bookmark) => bookmark.get('parentFolderId') === folderId)
-      payload.push({
-        label: site.get('customTitle') || site.get('title'),
-        submenu: submenuItems.count() > 0 ? createBookmarkTemplateItems(bookmarks, folderId) : null
-      })
-    }
-  })
-  return payload
+        })
+      }
+    })
+    return payload
+  }
+  const groupedSiteKeys = siteUtil.getSiteKeysByFolder(state)
+  return createPayload(groupedSiteKeys)
 }
 
 /**
@@ -118,7 +120,7 @@ const createBookmarkTemplateItems = (bookmarks, parentFolderId) => {
  * @param sites The application state's Immutable sites list
  */
 module.exports.createBookmarkTemplateItems = (sites) => {
-  return createBookmarkTemplateItems(siteUtil.getBookmarks(sites))
+  return createBookmarkTemplateItems(sites)
 }
 
 /**
