@@ -198,6 +198,21 @@ const styles = StyleSheet.create({
   isCommonForm: {
     fontSize: globalStyles.fontSize.flyoutDialog,
     width: '100%'
+  },
+
+  // #9283
+  // Create 25x25 squares and place the buttons at the center of each container
+  navigator__buttonContainer: {
+    border: `1px solid ${globalStyles.color.urlBarOutline}`,
+    borderRadius: globalStyles.radius.borderRadiusURL,
+    boxSizing: 'border-box',
+    display: 'flex',
+    alignItems: 'center',
+    height: globalStyles.navigationBar.urlbarForm.height,
+    width: globalStyles.navigationBar.urlbarForm.height,
+    minHeight: globalStyles.navigationBar.urlbarForm.height,
+    minWidth: globalStyles.navigationBar.urlbarForm.height,
+    WebkitAppRegion: 'no-drag'
   }
 })
 

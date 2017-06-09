@@ -41,6 +41,13 @@ const {getSetting} = require('../../../../js/settings')
 const contextMenus = require('../../../../js/contextMenus')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../styles/global')
+const commonStyles = require('../styles/commonStyles')
+
+const stopLoadingButton = require('../../../../img/toolbar/stoploading_btn.svg')
+const reloadButton = require('../../../../img/toolbar/reload_btn.svg')
+const bookmarkButton = require('../../../../img/toolbar/bookmark_btn.svg')
+const bookmarkedButton = require('../../../../img/toolbar/bookmark_marked.svg')
 
 class NavigationBar extends React.Component {
   constructor (props) {
@@ -162,7 +169,7 @@ class NavigationBar extends React.Component {
       data-frame-key={this.props.activeFrameKey}
       className={cx({
         titleMode: this.props.titleMode,
-        [css(styles.navigator_wide)]: this.props.isWideUrlBarEnabled
+        [css(styles.navigator, this.props.isWideUrlBarEnabled && styles.navigator_wide)]: true
       })}>
       {
         this.props.showBookmarkHanger
@@ -174,14 +181,22 @@ class NavigationBar extends React.Component {
         ? null
         : this.props.isLoading
           ? <span className='navigationButtonContainer'>
-            <button data-l10n-id='stopButton'
-              className='normalizeButton navigationButton stopButton'
-              onClick={this.onStop} />
+            <button className={cx({
+              normalizeButton: true,
+              [css(styles.navigator__navigationButtonContainer__navigationButton, styles.navigator__navigationButtonContainer__navigationButton_stopButton)]: true
+            })}
+              data-l10n-id='stopButton'
+              onClick={this.onStop}
+            />
           </span>
           : <span className='navigationButtonContainer'>
             <LongPressButton
               l10nId='reloadButton'
-              className='normalizeButton navigationButton reloadButton'
+              testId='reloadButton'
+              className={cx({
+                normalizeButton: true,
+                [css(styles.navigator__navigationButtonContainer__navigationButton, styles.navigator__navigationButtonContainer__navigationButton_reloadButton)]: true
+              })}
               onClick={this.onReload}
               onLongPress={this.onReloadLongPress} />
           </span>
@@ -191,30 +206,34 @@ class NavigationBar extends React.Component {
         ? <HomeButton activeTabId={this.props.activeTabId} />
         : null
       }
-      <div className='startButtons'>
-        {
-          !this.props.titleMode
-          ? <span className='bookmarkButtonContainer'>
-            <button data-l10n-id={this.props.isBookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
-              className={cx({
-                navigationButton: true,
-                bookmarkButton: true,
-                removeBookmarkButton: this.props.isBookmarked,
-                withHomeButton: getSetting(settings.SHOW_HOME_BUTTON),
-                normalizeButton: true
-              })}
-              onClick={this.onToggleBookmark} />
-          </span>
-          : null
-        }
-      </div>
+      {
+        !this.props.titleMode
+        ? <span className={cx({
+          bookmarkButtonContainer: true,
+          [css(commonStyles.navigator__buttonContainer, styles.navigator__buttonContainer_bookmarkButtonContainer)]: true
+        })}>
+          <button className={cx({
+            normalizeButton: true,
+            withHomeButton: getSetting(settings.SHOW_HOME_BUTTON),
+            [css(styles.navigator__buttonContainer_bookmarkButtonContainer__bookmarkButton, this.bookmarked && styles.navigator__buttonContainer_bookmarkButtonContainer__bookmarkButton_removeBookmarkButton)]: true
+          })}
+            data-l10n-id={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
+            data-test-id={this.bookmarked ? 'bookmarked' : 'notBookmarked'}
+            onClick={this.onToggleBookmark}
+          />
+        </span>
+        : null
+      }
       <UrlBar
         titleMode={this.props.titleMode}
         onStop={this.onStop}
         />
       {
         this.props.showPublisherToggle
-        ? <div className='endButtons'>
+        ? <div className={css(
+          this.props.titleMode && styles.navigator__endButtons_titleMode,
+          !this.props.titleMode && styles.navigator__endButtons_notTitleMode
+        )}>
           <PublisherToggle />
         </div>
         : null
@@ -223,13 +242,78 @@ class NavigationBar extends React.Component {
   }
 }
 
-const styles = StyleSheet.create({
-  navigator_wide: {
+const rightMargin = `calc(${globalStyles.spacing.navbarLeftMarginDarwin} / 2)`
 
-    // TODO: Refactor navigationBar.js to remove !important
-    maxWidth: '100% !important',
-    marginRight: '0 !important',
-    justifyContent: 'initial !important'
+const styles = StyleSheet.create({
+
+  navigator: {
+    boxSizing: 'border-box',
+    display: 'flex',
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '20px',
+    minWidth: '0%', // allow the navigator to shrink
+    maxWidth: '900px',
+    marginRight: rightMargin,
+    padding: 0,
+    position: 'relative',
+    userSelect: 'none',
+    zIndex: globalStyles.zindex.zindexNavigationBar
+  },
+
+  navigator_wide: {
+    maxWidth: '100%',
+    marginRight: '0',
+    justifyContent: 'initial'
+  },
+
+  navigator__navigationButtonContainer__navigationButton: {
+    // cf: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L550-L553
+    backgroundColor: globalStyles.color.buttonColor,
+    display: 'inline-block',
+    width: '100%',
+    height: '100%',
+
+    // cf: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L584-L585
+    margin: 0,
+    padding: 0
+  },
+
+  navigator__navigationButtonContainer__navigationButton_stopButton: {
+    background: `url(${stopLoadingButton}) center no-repeat`,
+    backgroundSize: '11px 11px'
+  },
+
+  navigator__navigationButtonContainer__navigationButton_reloadButton: {
+    background: `url(${reloadButton}) center no-repeat`,
+    backgroundSize: '13px 13px'
+  },
+
+  // cf: navigator__buttonContainer_addPublisherButtonContainer on publisherToggle.js
+  navigator__buttonContainer_bookmarkButtonContainer: {
+    borderRight: 'none',
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0
+  },
+
+  navigator__buttonContainer_bookmarkButtonContainer__bookmarkButton: {
+    background: `url(${bookmarkButton}) center no-repeat`,
+    backgroundSize: '14px 14px',
+    width: globalStyles.navigationBar.urlbarForm.height, // #6704
+    height: globalStyles.navigationBar.urlbarForm.height // #6704
+  },
+
+  navigator__buttonContainer_bookmarkButtonContainer__bookmarkButton_removeBookmarkButton: {
+    background: `url(${bookmarkedButton}) center no-repeat`
+  },
+
+  navigator__endButtons_titleMode: {
+    display: 'none'
+  },
+
+  navigator__endButtons_notTitleMode: {
+    display: 'flex'
   }
 })
 

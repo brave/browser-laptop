@@ -4,7 +4,7 @@
 
 const React = require('react')
 const Immutable = require('immutable')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
@@ -22,7 +22,8 @@ const {getBaseUrl} = require('../../../../js/lib/appUrlUtil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
 // Style
-const globalStyles = require('../styles/global')
+const commonStyles = require('../styles/commonStyles')
+
 const noFundVerifiedPublisherImage = require('../../../extensions/brave/img/urlbar/browser_URL_fund_no_verified.svg')
 const fundVerifiedPublisherImage = require('../../../extensions/brave/img/urlbar/browser_URL_fund_yes_verified.svg')
 const noFundUnverifiedPublisherImage = require('../../../extensions/brave/img/urlbar/browser_URL_fund_no.svg')
@@ -72,11 +73,14 @@ class PublisherToggle extends React.Component {
       data-test-id='publisherButton'
       data-test-authorized={this.props.isEnabledForPaymentsPublisher}
       data-test-verified={this.props.isVerifiedPublisher}
-      className={css(styles.addPublisherButtonContainer)}>
+      className={css(
+        commonStyles.navigator__buttonContainer,
+        styles.navigator__buttonContainer_addPublisherButtonContainer,
+      )}>
       <BrowserButton
         custom={[
           !this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher && styles.noFundVerified,
-          this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher && styles.fundVerified,
+          this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher && styles.noFundVerified,
           !this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher && styles.noFundUnverified,
           this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher && styles.fundUnverified
         ]}
@@ -90,40 +94,29 @@ class PublisherToggle extends React.Component {
 module.exports = ReduxComponent.connect(PublisherToggle)
 
 const styles = StyleSheet.create({
-  addPublisherButtonContainer: {
-    boxSizing: 'border-box',
-    display: 'flex',
-    alignItems: 'center',
-    height: globalStyles.spacing.buttonHeight,
-    width: globalStyles.spacing.buttonWidth,
-    minHeight: globalStyles.spacing.buttonHeight,
-    minWidth: globalStyles.spacing.buttonWidth,
-    WebkitAppRegion: 'no-drag',
-    borderWidth: '1px 1px 1px 0px',
-    borderStyle: 'solid',
-    borderColor: globalStyles.color.urlBarOutline,
-    borderRadius: '0 4px 4px 0',
+  // ref: navigator__buttonContainer_bookmarkButtonContainer on nagivationBar.js
+  // ref: urlbarForm_isPublisherButtonEnabled on urlBar.js
+  navigator__buttonContainer_addPublisherButtonContainer: {
+    borderLeft: 'none',
     borderTopLeftRadius: '0',
     borderBottomLeftRadius: '0'
   },
 
+  // TODO: Refactor to BEM style
   noFundVerified: {
     backgroundImage: `url(${noFundVerifiedPublisherImage})`,
     backgroundSize: '18px',
     marginLeft: '2px'
   },
-
   fundVerified: {
     backgroundImage: `url(${fundVerifiedPublisherImage})`,
     backgroundSize: '18px',
     marginLeft: '2px'
   },
-
   noFundUnverified: {
     backgroundImage: `url(${noFundUnverifiedPublisherImage})`,
     backgroundSize: '18px'
   },
-
   fundUnverified: {
     backgroundImage: `url(${fundUnverifiedPublisherImage})`,
     backgroundSize: '18px'

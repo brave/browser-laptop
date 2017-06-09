@@ -14,8 +14,14 @@ const appActions = require('../../../../js/actions/appActions')
 const settings = require('../../../../js/constants/settings')
 
 // Utils
+const cx = require('../../../../js/lib/classSet')
 const {getSetting} = require('../../../../js/settings')
 const eventUtil = require('../../../../js/lib/eventUtil')
+
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../styles/global')
+
+const homeButton = require('../../../../img/toolbar/home_btn.svg')
 
 class HomeButton extends ImmutableComponent {
   constructor (props) {
@@ -51,15 +57,36 @@ class HomeButton extends ImmutableComponent {
 
   render () {
     return <span className='navigationButtonContainer'>
-      <button
+      <button className={cx({
+        normalizeButton: true,
+        [css(styles.navigator__navigationButtonContainer__navigationButton, styles.navigator__navigationButtonContainer__navigationButton_homeButton)]: true
+      })}
         data-test-id='homeButton'
         data-l10n-id='homeButton'
-        className='normalizeButton navigationButton homeButton'
         ref={(node) => { this.homeButton = node }}
         onClick={this.onHome}
       />
     </span>
   }
 }
+
+const styles = StyleSheet.create({
+  navigator__navigationButtonContainer__navigationButton: {
+    // cf: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L550-L553
+    backgroundColor: globalStyles.color.buttonColor,
+    display: 'inline-block',
+    width: '100%',
+    height: '100%',
+
+    // cf: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L584-L585
+    margin: 0,
+    padding: 0
+  },
+
+  navigator__navigationButtonContainer__navigationButton_homeButton: {
+    background: `url(${homeButton}) center no-repeat`,
+    backgroundSize: `16px 16px`
+  }
+})
 
 module.exports = HomeButton

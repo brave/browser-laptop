@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 const Immutable = require('immutable')
 const ipc = require('electron').ipcRenderer
 
@@ -41,6 +41,8 @@ const publisherUtil = require('../../../common/lib/publisherUtil')
 
 // Icons
 const iconNoScript = require('../../../../img/url-bar-no-script.svg')
+
+const globalStyles = require('../styles/global')
 
 class UrlBar extends React.Component {
   constructor (props) {
@@ -505,20 +507,22 @@ class UrlBar extends React.Component {
     return <form
       className={cx({
         urlbarForm: true,
-        [css(styles.urlbarForm_wide)]: this.props.isWideURLbarEnabled,
-        noBorderRadius: this.props.publisherButtonVisible
+        [css(styles.urlbarForm, this.props.isWideURLbarEnabled && styles.urlbarForm_wide, this.props.titleMode && styles.urlbarForm_titleMode, this.props.publisherButtonVisible && styles.urlbarForm_isPublisherButtonEnabled)]: true
       })}
       action='#'
       id='urlbar'>
-      <div className='urlbarIconContainer'>
+      <div className={cx({
+        urlbarIconContainer: true,
+        [css(styles.urlbarForm__urlbarIconContainer)]: true
+      })}>
         <UrlBarIcon
           titleMode={this.props.titleMode}
         />
       </div>
       {
         this.props.titleMode
-        ? <div id='titleBar'>
-          <span><strong>{this.props.hostValue}</strong></span>
+        ? <div id='titleBar' className={css(styles.urlbarForm__titleBar)}>
+          <span className={css(styles.urlbarForm__titleBar__host)}>{this.props.hostValue}</span>
           <span>{this.props.hostValue && this.titleValue ? ' | ' : ''}</span>
           <span>{this.titleValue}</span>
         </div>
@@ -574,23 +578,79 @@ class UrlBar extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  urlbarForm: {
+    display: 'flex',
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: globalStyles.navigationBar.urlbarForm.height,
+    padding: '0 10px 0 3px',
+    background: '#fff',
+
+    // PR #6485
+    position: 'relative',
+
+    // Fixes #4298
+    width: 0,
+
+    // allow the navigator to shrink
+    minWidth: 0
+  },
+
+  urlbarForm_wide: {
+    // cf: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L682-L684
+    maxWidth: '100%'
+  },
+
+  urlbarForm_titleMode: {
+    background: 'none'
+  },
+
+  // ref: navigator__buttonContainer_addPublisherButtonContainer on publisherToggle.js
+  // TODO: Convert 'urlbarForm' to remove !important
+  urlbarForm_isPublisherButtonEnabled: {
+    borderTopRightRadius: '0 !important',
+    borderBottomRightRadius: '0 !important'
+  },
+
+  // Create 25x25 square and place .urlbarIcon at the center of it
+  urlbarForm__urlbarIconContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: globalStyles.navigationBar.urlbarForm.height,
+    width: globalStyles.navigationBar.urlbarForm.height,
+    minHeight: globalStyles.navigationBar.urlbarForm.height,
+    minWidth: globalStyles.navigationBar.urlbarForm.height
+  },
+
+  urlbarForm__titleBar: {
+    display: 'inline-block',
+    color: globalStyles.color.chromeText,
+    fontSize: globalStyles.spacing.defaultFontSize,
+    maxWidth: '100%',
+    overflowX: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap'
+  },
+
+  urlbarForm__titleBar__host: {
+    fontWeight: 600
+  },
+
   noScriptContainer: {
     display: 'flex',
     padding: '5px',
     marginRight: '-8px',
     WebkitAppRegion: 'drag'
   },
+
   noScriptButton: {
     WebkitAppRegion: 'no-drag',
     backgroundImage: `url(${iconNoScript})`,
     width: '14px',
     height: '14px',
     border: '0px'
-  },
-
-  urlbarForm_wide: {
-    // cf: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L682-L684
-    maxWidth: '100%'
   }
 })
 

@@ -16,7 +16,7 @@
 
 // (macOS) We need to keep a padding left to avoid overlapping
 // with the window buttons to close/maximize/minimize the window.
-.platform--darwin .navigatorWrapper .backforward {
+.platform--darwin .navigatorWrapper .topLevelStartButtons {
   margin-left: @navbarLeftMarginDarwin;
 
   &.fullscreen {
@@ -36,7 +36,7 @@
     box-sizing: border-box;
   }
 
-  .backforward {
+  .topLevelStartButtons {
     padding-left: 5px;
   }
 
@@ -365,15 +365,6 @@
     -webkit-app-region: drag;
   }
 }
-.navbarMenubarFlexContainer {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  box-sizing: border-box;
-  position: relative;
-  overflow: visible;
-  white-space: nowrap;
-}
 
 // Window Caption Buttons (for use w/ slim titlebar)
 .windowCaptionButtons {
@@ -454,10 +445,8 @@
 
   @rightMargin: @navbarLeftMarginDarwin / 2;
 
-  display: flex;
-
   // Buttons on the left
-  .backforward {
+  .topLevelStartButtons {
     display: flex;
 
     .backButton,
@@ -480,14 +469,13 @@
 
   // Navigation bar at the center
   #navigator {
-    display: flex;
-    flex-grow: 1;
-    min-width: 0%; // allow the navigator to shrink
-    max-width: 900px;
-    margin-right: @rightMargin;
-
     &.titleMode {
       padding-right: @centerOffset;
+
+      @media (max-width: @breakpointNarrowViewport) {
+        transition: padding @transitionDuration ease-in-out;
+        padding-right: 0;
+      }
     }
 
     @media (max-width: @breakpointNarrowViewport) {
@@ -497,40 +485,10 @@
     @media (max-width: @breakpointNarrowViewport) {
       width: 100%;
     }
-
-    &.titleMode {
-      @media (max-width: @breakpointNarrowViewport) {
-        transition: padding @transitionDuration ease-in-out;
-        padding-right: 0;
-      }
-    }
   }
 
   // Buttons on the right
   .topLevelEndButtons {
-    display: flex;
-    flex-direction: row;
-    margin-left: 3px;
-    position: relative;
-
-    .braveMenu {
-      width: @navbarBraveButtonWidth;
-      margin-right: @navbarButtonSpacing;
-      -webkit-app-region: no-drag;
-      user-select: none;
-
-      &.braveShieldsDown {
-        -webkit-filter: grayscale(100%);
-      }
-
-      &.braveShieldsDisabled {
-        -webkit-filter: grayscale(100%);
-        opacity: 0.4;
-      }
-      &.leftOfCaptionButton {
-        margin-right: 3px;
-      }
-    }
 
     @media (max-width: @breakpointWideViewport) {
       .extraDragArea {
@@ -540,14 +498,6 @@
       }
     }
   }
-}
-
-.navigationButton {
-  background-color: @buttonColor;
-  display: inline-block;
-  width: 100%;
-  height: 100%;
-  margin: 0 7px 0 0;
 }
 
 .navigationButtonContainer {
@@ -573,42 +523,12 @@
   }
 }
 
-#navigator {
-  .stopButton,
-  .reloadButton,
-  .homeButton {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  .stopButton {
-    background: url('../img/toolbar/stoploading_btn.svg') center no-repeat;
-    background-size: 11px 11px;
-  }
-
-  .reloadButton {
-    background: url('../img/toolbar/reload_btn.svg') center no-repeat;
-    background-size: 13px 13px;
-  }
-
-  .homeButton {
-    background: url('../img/toolbar/home_btn.svg') center no-repeat;
-    background-size: 16px 16px;
-  }
-}
-
 .navigatorWrapper {
-  justify-content: space-between;
-  align-items: center;
-  margin-top: @navbarMenubarMargin;
-  box-sizing: border-box;
 
   /**
    * Left buttons
    */
-  .backforward {
+  .topLevelStartButtons {
     display: flex;
     z-index: @zindexNavigationBar;
     transition: margin @transitionDuration ease-in-out;
@@ -632,16 +552,6 @@
 @urlbarFormHeight: 25px;
 
 .urlbarForm {
-  position: relative; // PR #6485
-  width: 0; // Fixes #4298
-  align-items: center;
-  justify-content: center;
-  height: @urlbarFormHeight;
-  padding: 0 10px 0 3px;
-  display: flex;
-  flex-grow: 1;
-  min-width: 0%; // allow the navigator to shrink
-
   *:not(legend) {
     z-index: @zindexUrlbarNotLegend;
   }
@@ -683,14 +593,6 @@
 }
 
 #navigator {
-  font-size: 20px;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  padding: 0;
-  position: relative;
-  user-select: none;
-  z-index: @zindexNavigationBar;
 
   // #6253 #6680
   > * {
@@ -705,10 +607,6 @@
     }
   }
 
-  .endButtons {
-    display: flex;
-  }
-
   &:not(.titleMode) {
     > * {
       animation: fadeIn .6s;
@@ -716,47 +614,9 @@
     }
 
     .urlbarForm {
-      &.noBorderRadius {
-        border-radius: 0;
-
+      &.isPublisherButtonEnabled {
         legend:before {
           border-radius: 0;
-        }
-      }
-    }
-
-    // Create 25x25 squares and place the buttons at the center of each container
-    .bookmarkButtonContainer,
-    .addPublisherButtonContainer {
-      border: 1px solid @urlBarOutline;
-      border-radius: @borderRadiusURL;
-      box-sizing: border-box;
-      display: flex;
-      align-items: center;
-      height: @urlbarFormHeight;
-      width: @urlbarFormHeight;
-      min-height: @urlbarFormHeight;
-      min-width: @urlbarFormHeight;
-      -webkit-app-region: no-drag;
-    }
-
-    .bookmarkButtonContainer {
-      border-right: none;
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-
-      .bookmarkButton {
-        background: url('../img/toolbar/bookmark_btn.svg') center no-repeat;
-        -webkit-mask-repeat: no-repeat;
-        background-size: 14px 14px;
-        margin: 0;
-        height: 0;
-        width: @urlbarFormHeight; // #6704
-        height: @urlbarFormHeight; // #6704
-
-        &.removeBookmarkButton {
-          background: url('../img/toolbar/bookmark_marked.svg') center no-repeat;
-          background-size: 14px 14px;
         }
       }
     }
@@ -769,37 +629,9 @@
     // border-radius: @borderRadiusURL;
     // box-shadow: inset 0 0 0 1px rgba(187, 187, 187, 1.0);
 
-    .urlbarForm {
-      background: none;
-    }
-
-    input {
-      display: none;
-    }
-    #titleBar {
-      display: inline-block;
-      color: @chromeText;
-      font-size: 13px;
-      max-width: 100%;
-      overflow-x: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      margin-left: 2px;
-
-      strong {
-        font-weight: 600;
-      }
-    }
-
-    .endButtons {
-      display: none;
-    }
-
     .urlbarIcon {
       display: inline-block;
       opacity: 0.5;
-      position: relative;
-      left: 2px;
       min-width: 0;
 
       &.insecure-color {
@@ -813,11 +645,6 @@
         display: none;
       }
     }
-  }
-
-  #titleBar {
-    display: none;
-    text-overflow: ellipsis;
   }
 
   .urlbarForm {
@@ -864,16 +691,7 @@
       }
     }
 
-    // Create 25x25 square and place .urlbarIcon at the center of it
     .urlbarIconContainer {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: @urlbarFormHeight;
-      width: @urlbarFormHeight;
-      min-height: @urlbarFormHeight;
-      min-width: @urlbarFormHeight;
-
       .urlbarIcon {
         color: @siteSecureColor;
         font-size: 12px;

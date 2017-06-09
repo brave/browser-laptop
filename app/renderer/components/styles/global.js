@@ -134,8 +134,6 @@ const globalStyles = {
     switchNubTopMargin: '2px',
     switchNubLeftMargin: '2px',
     switchNubRightMargin: '2px',
-    buttonHeight: '25px',
-    buttonWidth: '25px',
     navbarHeight: '36px',
     downloadsBarHeight: '60px',
     tabsToolbarHeight: '26px',
@@ -313,6 +311,13 @@ const globalStyles = {
       hr: {
         background: '#ccc'
       }
+    }
+  },
+
+  navigationBar: {
+
+    urlbarForm: {
+      height: '25px'
     }
   }
 }
