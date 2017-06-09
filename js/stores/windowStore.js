@@ -324,7 +324,7 @@ const doAction = (action) => {
         // For about:newtab we want to have the urlbar focused, not the new frame.
         // Otherwise we want to focus the new tab when it is a new frame in the foreground.
         if (action.location !== getTargetAboutUrl('about:newtab')) {
-          focusWebview(frameStateUtil.activeFrameStatePath(windowState))
+          focusWebview(statePath)
         }
         break
       }

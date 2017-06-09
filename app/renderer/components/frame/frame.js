@@ -8,6 +8,7 @@ const ipc = require('electron').ipcRenderer
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
+const tabActions = require('../../../common/actions/tabActions')
 const windowActions = require('../../../../js/actions/windowActions')
 const webviewActions = require('../../../../js/actions/webviewActions')
 const getSetting = require('../../../../js/settings').getSetting
@@ -316,17 +317,12 @@ class Frame extends React.Component {
           !this.isAboutPage() &&
           !isTorrentViewerURL(this.props.location)) {
           this.webview.loadURL(this.props.location)
-        } else if (this.isIntermediateAboutPage() &&
-          this.props.tabUrl !== this.props.location &&
-          this.props.tabUrl !== this.props.aboutDetailsUrl) {
-          appActions.loadURLRequested(this.props.aboutDetailsUrl,
-            this.props.aboutDetailsFrameKey)
         } else {
-          this.webview.reload()
+          tabActions.reload(this.props.tabId)
         }
         break
       case 'clean-reload':
-        this.webview.reloadIgnoringCache()
+        tabActions.reload(this.props.tabId, true)
         break
       case 'explicitLoadURL':
         this.webview.loadURL(this.props.location)
@@ -595,7 +591,7 @@ class Frame extends React.Component {
           method = () => {
             this.reloadCounter[this.props.location] = this.reloadCounter[this.props.location] || 0
             if (this.reloadCounter[this.props.location] < 2) {
-              this.webview.reload()
+              tabActions.reload(this.props.tabId)
               this.reloadCounter[this.props.location] = this.reloadCounter[this.props.location] + 1
             }
           }
@@ -703,7 +699,6 @@ class Frame extends React.Component {
         appActions.removeSite(siteUtil.getDetailFromFrame(this.frame))
       } else if (isAborted(e.errorCode)) {
         // just stay put
-        windowActions.navigationAborted(this.props.tabId, url)
       } else if (provisionLoadFailure) {
         windowActions.setNavigated(url, this.props.frameKey, true, this.props.tabId)
       }

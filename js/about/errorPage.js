@@ -5,10 +5,12 @@
 const React = require('react')
 const BrowserButton = require('../../app/renderer/components/common/browserButton')
 
+const appActions = require('../../js/actions/appActions')
+const tabActions = require('../../app/common/actions/tabActions')
+
 require('../../less/button.less')
 require('../../less/window.less')
 require('../../less/about/error.less')
-const {isSourceAboutUrl, getTargetAboutUrl} = require('../lib/appUrlUtil')
 
 class ErrorPage extends React.Component {
   constructor (props) {
@@ -16,19 +18,12 @@ class ErrorPage extends React.Component {
     this.state = {}
   }
 
-  loadUrl (url) {
-    if (isSourceAboutUrl(url)) {
-      url = getTargetAboutUrl(url)
-    }
-    window.location = url
-  }
-
-  reloadPrevious () {
-    this.loadUrl(this.state.previousLocation)
+  goBack () {
+    appActions.onGoBack()
   }
 
   reload () {
-    this.loadUrl(this.state.url)
+    tabActions.reload(null, true)
   }
 
   get showBackButton () {
@@ -43,8 +38,8 @@ class ErrorPage extends React.Component {
         <span className='errorText' data-l10n-id={this.state.message} />
       </div>
       <div className='buttons'>
-        {this.showBackButton ? <BrowserButton actionItem l10nId='back' onClick={this.reloadPrevious.bind(this)} /> : null}
-        {this.state.url ? <BrowserButton actionItem l10nId='errorReload' l10nArgs={{url: this.state.url}} onClick={this.reload.bind(this)} /> : null}
+        {this.showBackButton ? <BrowserButton actionItem l10nId='back' onClick={this.goBack} /> : null}
+        {this.state.url ? <BrowserButton actionItem l10nId='errorReload' l10nArgs={{url: this.state.url}} onClick={this.reload} /> : null}
       </div>
     </div>
   }

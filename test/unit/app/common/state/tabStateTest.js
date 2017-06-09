@@ -8,13 +8,7 @@ const AssertionError = require('assert').AssertionError
 const defaultAppState = Immutable.fromJS({
   tabs: [],
   windows: [],
-  otherProp: true,
-  tabsInternal: {
-    index: {
-      1: 0,
-      2: 1
-    }
-  }
+  otherProp: true
 })
 
 const twoTabsAppState = defaultAppState
@@ -22,6 +16,12 @@ const twoTabsAppState = defaultAppState
     { tabId: 1, index: 0, windowId: 1, frameKey: 2 },
     { tabId: 2, index: 1, windowId: 1, frameKey: 1 }
   ]))
+  .set('tabsInternal', Immutable.fromJS({
+    index: {
+      1: 0,
+      2: 1
+    }
+  }))
 
 // NOTE: null check can be optional since resolveTabId sets a default if null
 const shouldValidateId = function (cb, skipNullCheck) {
@@ -483,7 +483,7 @@ describe('tabState unit tests', function () {
         .set('tabs', Immutable.fromJS([
           { tabId: 1, index: 0, windowId: 1 }
         ]))
-        .setIn(['tabsInternal', 'index', 1], 0)
+        .setIn(['tabsInternal', 'index', '1'], 0)
     })
 
     it('returns a new immutable state with the tabValue appended to the end of the list if it does not already exist', function () {
@@ -493,8 +493,7 @@ describe('tabState unit tests', function () {
     })
 
     it('returns a new immutable state with the tabValue updated if it already exists', function () {
-      assert.deepEqual(
-        tabState.maybeCreateTab(this.appState, { tabValue: { tabId: 1, index: 0, windowId: 1, test: 'blue' } }).get('tabs').toJS(),
+      assert.deepEqual(tabState.maybeCreateTab(this.appState, { tabValue: { tabId: 1, index: 0, windowId: 1, test: 'blue' } }).get('tabs').toJS(),
         [{ tabId: 1, index: 0, windowId: 1, test: 'blue' }])
     })
 
@@ -739,6 +738,72 @@ describe('tabState unit tests', function () {
     it('resolves active tab', function () {
       const expectedTabId = 5
       assert.equal(tabState.resolveTabId(this.appState, tabState.TAB_ID_ACTIVE), expectedTabId)
+    })
+  })
+
+  describe('navigationState', function () {
+    before(function () {
+      this.url = 'http://url'
+      this.virtualURL = 'http://virtualURL'
+      this.navigationState = Immutable.fromJS({
+        visibleEntry: {
+          url: this.url,
+          virtualURL: this.virtualURL
+        },
+        activeEntry: {
+          url: 'active entry',
+          virtualURL: 'active virtual entry'
+        },
+        lastCommittedEntry: {
+          url: 'last entry',
+          virtual: 'last virtual entry'
+        }
+      })
+      this.appState = twoTabsAppState.setIn(['tabs', 0, 'navigationState'], this.navigationState)
+      this.appState = this.appState.setIn(['tabs', 1, 'navigationState'], Immutable.fromJS({
+        visibleEntry: {
+          url: 'http://url2',
+          virtualURL: 'http://virtualURL2'
+        }
+      }))
+    })
+
+    describe('setNavigationState', function () {
+      before(function () {
+        this.appState = twoTabsAppState
+        this.navigationEntry = Immutable.fromJS({
+          visibleEntry: {
+            url: 'test'
+          }
+        })
+        this.appState = tabState.setNavigationState(this.appState, 1, this.navigationEntry)
+      })
+
+      it('sets appState.tabs.`tabId`.navigationState to the specified value', function () {
+        assert.deepEqual(this.appState.getIn(['tabs', 0, 'navigationState']), this.navigationEntry)
+      })
+
+      it('does not change other tabs ids', function () {
+        assert.equal(this.appState.getIn(['tabs', 1, 'navigationState']), undefined)
+      })
+    })
+
+    describe('getVisibleEntry', function () {
+      it('returns the value from appState.tabs.`tabId`.navigationState.visibleEntry', function () {
+        assert.deepEqual(tabState.getVisibleEntry(this.appState, 1).toJS(), this.navigationState.get('visibleEntry').toJS())
+      })
+    })
+
+    describe('getVisibleURL', function () {
+      it('returns the value from appState.tabs.`tabId`.navigationState.visibleEntry.url', function () {
+        assert.deepEqual(tabState.getVisibleURL(this.appState, 1), this.url)
+      })
+    })
+
+    describe('getVisibleVirtualURL', function () {
+      it('returns the value from appState.tabs.`tabId`.navigationState.visibleEntry.virtualURL', function () {
+        assert.deepEqual(tabState.getVisibleVirtualURL(this.appState, 1), this.virtualURL)
+      })
     })
   })
 })

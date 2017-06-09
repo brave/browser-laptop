@@ -20,7 +20,7 @@ const flashReducer = (state, action, immutableAction) => {
         const location = action.get('location')
         const settings = siteSettings.getSiteSettingsForURL(state.get('siteSettings'), location)
         if (!(settings && ['boolean', 'number'].includes(typeof settings.get('flash')))) {
-          flash.showFlashMessageBox(location, action.get('senderTabId'))
+          flash.showFlashMessageBox(location, action.get('tabId'))
         }
         break
       }

@@ -5,7 +5,6 @@
 const React = require('react')
 const PropTypes = require('prop-types')
 const Immutable = require('immutable')
-const ipc = require('electron').ipcRenderer
 const urlParse = require('../../../common/urlParse')
 
 // Components
@@ -15,9 +14,7 @@ const BrowserButton = require('../common/browserButton')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
-
-// Constants
-const messages = require('../../../../js/constants/messages')
+const tabActions = require('../../../common/actions/tabActions')
 
 // Utils
 const siteUtil = require('../../../../js/state/siteUtil')
@@ -77,7 +74,7 @@ class NoScriptInfo extends ImmutableComponent {
   }
 
   reload () {
-    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD)
+    tabActions.reload(this.props.frameProps.get('tabId'))
   }
 
   onAllow (setting, e) {

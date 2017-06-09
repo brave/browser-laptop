@@ -11,6 +11,7 @@ const {getWebContents} = require('../webContentsCache')
 const {BrowserWindow} = require('electron')
 const tabState = require('../../common/state/tabState')
 const windowState = require('../../common/state/windowState')
+const tabActions = require('../../common/actions/tabActions')
 const windowConstants = require('../../../js/constants/windowConstants')
 const windowActions = require('../../../js/actions/windowActions')
 const {makeImmutable} = require('../../common/state/immutableUtil')
@@ -77,6 +78,20 @@ const updateActiveTab = (state, closeTabId) => {
 const tabsReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
+    case tabActions.didStartNavigation.name:
+    case tabActions.didFinishNavigation.name:
+      {
+        state = tabState.setNavigationState(state, action.get('tabId'), action.get('navigationState'))
+        break
+      }
+    case tabActions.reload.name:
+      {
+        const tabId = tabState.resolveTabId(state, action.get('tabId'))
+        setImmediate(() => {
+          tabs.reload(tabId, action.get('ignoreCache'))
+        })
+        break
+      }
     case appConstants.APP_SET_STATE:
       state = tabs.init(state, action)
       break
