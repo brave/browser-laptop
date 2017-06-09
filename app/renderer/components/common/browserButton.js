@@ -20,16 +20,41 @@ class BrowserButton extends ImmutableComponent {
       this.props.extensionItem && styles.browserButton_extensionItem,
       this.props.groupedItem && styles.browserButton_groupedItem,
       this.props.notificationItem && styles.browserButton_notificationItem,
+      this.props.iconOnly && styles.browserButton_iconOnly,
       // TODO: These are other button styles app-wise
       // that needs to be refactored and included in this file
       // .............................................
-      // this.props.smallItem && styles.browserButton_smallItem,
       // this.props.navItem && styles.browserButton_navItem,
       // this.props.panelItem && styles.browserButton_panelItem,
 
       // note: this should be the last item so it can override other styles
       this.props.disabled && styles.browserButton_disabled
     ]
+  }
+
+  get buttonStyle () {
+    if (this.props.iconOnly && !this.props.inlineStyles) {
+      return {
+        height: this.props.size || '18px',
+        width: this.props.size || '18px'
+      }
+    }
+    return this.props.inlineStyles
+  }
+
+  get iconStyle () {
+    if (this.props.iconOnly) {
+      return {
+        display: 'inherit',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        height: this.props.size || '18px',
+        width: this.props.size || '18px',
+        fontSize: this.props.size || 'inherit',
+        color: this.props.color || 'inherit'
+      }
+    }
+    return this.props.iconStyle
   }
   render () {
     return <button
@@ -38,13 +63,15 @@ class BrowserButton extends ImmutableComponent {
       data-test-id={this.props.testId}
       data-test2-id={this.props.test2Id}
       data-l10n-args={JSON.stringify(this.props.l10nArgs || {})}
-      style={this.props.inlineStyles}
+      style={this.buttonStyle}
       data-button-value={this.props.dataButtonValue}
       onClick={this.props.onClick}
       className={css(this.classNames, this.props.custom)}>
       {
         this.props.iconClass || this.props.label
-        ? <span className={this.props.iconClass}>{this.props.label}</span>
+        ? <span
+          className={this.props.iconClass}
+          style={this.iconStyle}>{this.props.label}</span>
         : null
       }
     </button>
@@ -194,6 +221,15 @@ const styles = StyleSheet.create({
 
   browserButton_actionItem: {
     background: globalStyles.button.action.backgroundColor
+  },
+
+  browserButton_iconOnly: {
+    display: 'flex',
+    justifyContent: 'center',
+    lineHeight: '18px',
+    width: '18px',
+    height: '18px',
+    fontSize: '24px'
   },
 
   browserButton_disabled: {
