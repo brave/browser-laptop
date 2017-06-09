@@ -258,7 +258,6 @@ module.exports.getExistingObject = (categoryName, syncRecord) => {
       throw new Error(`Invalid category: ${categoryName}`)
   }
   if (!item) {
-    console.log(`Warning: Can't create JS from existingObject! ${JSON.stringify(existingObjectData)}`)
     return null
   }
   return {
@@ -305,8 +304,28 @@ module.exports.updateSiteCache = (appState, siteDetail) => {
   const cacheKey = ['sync', 'objectsById', objectId.toJS().join('|')]
   if (object) {
     return appState.setIn(cacheKey, ['sites', siteKey])
-  } else {
-    return appState.deleteIn(cacheKey)
+  }
+  return appState
+  // Keep obsolete object keys in the cache because they are used to get
+  // objectIds of deleted objects in appStoreChangeCallback
+}
+
+/**
+ * Gets the objectId of a site based on its siteKey.
+ * Does not assume the site hasn't been deleted.
+ * @param {Immutable.Map} appState - application state
+ * @param {string} siteKey - The state path, or undefined if none is found
+ * @returns {Array=}
+ */
+module.exports.siteKeyToObjectId = (appState, siteKey) => {
+  const objectsById = appState.getIn(['sync', 'objectsById'])
+  if (objectsById) {
+    const objectIdKey = objectsById.findKey((value, key) => {
+      return value[0] === 'sites' && value[1] === siteKey
+    })
+    if (objectIdKey) {
+      return objectIdKey.split('|')
+    }
   }
 }
 
@@ -485,7 +504,7 @@ module.exports.createSiteData = (site, appState) => {
       value: siteData
     }
   }
-  console.log(`Warning: Can't create site data: ${JSON.stringify(site)}`)
+  console.log(`Ignoring entry because we can't create site data: ${JSON.stringify(site)}`)
 }
 
 /**

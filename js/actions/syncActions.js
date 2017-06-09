@@ -7,13 +7,6 @@ const AppDispatcher = require('../dispatcher/appDispatcher')
 const syncConstants = require('../constants/syncConstants')
 
 const syncActions = {
-  removeSite: function (item) {
-    AppDispatcher.dispatch({
-      actionType: syncConstants.SYNC_REMOVE_SITE,
-      item
-    })
-  },
-
   clearHistory: function () {
     AppDispatcher.dispatch({
       actionType: syncConstants.SYNC_CLEAR_HISTORY
