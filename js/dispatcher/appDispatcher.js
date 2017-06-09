@@ -229,7 +229,7 @@ if (processType === 'browser') {
         payload.senderWindowId = win.id
       }
       payload.queryInfo = queryInfo
-      payload.senderTabId = event.sender.getId()
+      payload.tabId = payload.tabId == null ? event.sender.getId() : payload.tabId
 
       if (queryInfo.windowId === -2) {
         const activeWindow = BrowserWindow.getActiveWindow()
@@ -238,6 +238,10 @@ if (processType === 'browser') {
     }
     appDispatcher.dispatch(payload)
   }
+
+  process.on(messages.DISPATCH_ACTION, (action) => {
+    appDispatcher.dispatch(action)
+  })
 
   ipc.on(messages.DISPATCH_ACTION, (event, payload) => {
     payload = Serializer.deserialize(payload)

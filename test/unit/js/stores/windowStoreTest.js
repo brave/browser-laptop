@@ -55,8 +55,8 @@ describe('Window store unit tests', function () {
           // return the window state we want for our test :)
           return Immutable.fromJS({
             frames: [{
-              tabId: 0,
-              key: 0,
+              tabId: 1,
+              key: 1,
               loading: false,
               startLoadTime: new Date().getTime(),
               endLoadTime: 1337,
@@ -67,7 +67,15 @@ describe('Window store unit tests', function () {
                   nespresso: 'whatElse'
                 }
               }
-            }]
+            }],
+            framesInternal: {
+              index: {
+                1: 0
+              },
+              tabIndex: {
+                1: 0
+              }
+            }
           })
         }
 
@@ -81,8 +89,8 @@ describe('Window store unit tests', function () {
         doAction({
           actionType: windowConstants.WINDOW_WEBVIEW_LOAD_START,
           frameProps: Immutable.fromJS({
-            tabId: 0,
-            key: 0
+            tabId: 1,
+            key: 1
           })
         })
 

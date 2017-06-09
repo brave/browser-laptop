@@ -264,20 +264,6 @@ describe('urlutil', function () {
     })
   })
 
-  describe('getDisplayLocation', function () {
-    it('gets display location for PDF JS URL', function () {
-      assert.equal(UrlUtil.getDisplayLocation('chrome-extension://jdbefljfgobbmcidnmpjamcbhnbphjnb/https://www.blackhat.co…king-Kernel-Address-Space-Layout-Randomization-KASLR-With-Intel-TSX-wp.pdf', true),
-        'https://www.blackhat.co…king-Kernel-Address-Space-Layout-Randomization-KASLR-With-Intel-TSX-wp.pdf')
-    })
-    it('does not modify display location for non-pdf URL', function () {
-      assert.equal(UrlUtil.getDisplayLocation('http://example.com', true),
-        'http://example.com')
-    })
-    it('shows blank for about:newtab', function () {
-      assert.equal(UrlUtil.getDisplayLocation('about:newtab'), '')
-    })
-  })
-
   describe('getDefaultFaviconUrl', function () {
     it('returns empty string if input is not a URL', function () {
       assert.equal(UrlUtil.getDefaultFaviconUrl('invalid-url-goes-here'), '')

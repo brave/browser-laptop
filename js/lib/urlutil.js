@@ -169,6 +169,7 @@ const UrlUtil = {
    * @returns {Boolean} Whether or not this is a valid URL.
    */
   isURL: function (input) {
+    input = input.trim()
     return !UrlUtil.isNotURL(input)
   },
 
@@ -332,26 +333,6 @@ const UrlUtil = {
       return `chrome-extension://${pdfjsExtensionId}/${url}`
     }
     return url
-  },
-
-  /**
-   * Gets location to display in the urlbar
-   * @param {string} url
-   * @param {boolean} pdfjsEnabled
-   * @return {string}
-   */
-  getDisplayLocation: function (url, pdfjsEnabled) {
-    if (!url || url === 'about:newtab') {
-      return ''
-    }
-    url = pdfjsEnabled ? UrlUtil.getLocationIfPDF(url) : url
-    const parsed = urlParse(url)
-    if (parsed && parsed.auth) {
-      parsed.auth = null
-      return urlFormat(parsed)
-    } else {
-      return url
-    }
   },
 
   /**

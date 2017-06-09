@@ -122,7 +122,7 @@ describe('navigationBar tests', function () {
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
           .ipcSend('shortcut-focus-url')
-          .waitForInputText(urlInput, 'data:text/html;,%3Ctitle%3ETabnapping%20Target%3C/title%3E')
+          .waitForInputText(urlInput, 'data:text/html;,<title>Tabnapping Target</title>')
       })
     })
 
