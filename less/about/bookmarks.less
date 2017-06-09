@@ -90,7 +90,10 @@
       flex-grow: 5;
       border-left: 1px solid @braveOrange;
       overflow: auto;
-      max-height: 100vh;
+      // viewport - header size
+      // TODO: once table header is fixed,
+      // add table header (35px) size
+      max-height: calc(~"100vh - 84px");
 
       .sortableTable {
         user-select: none;
