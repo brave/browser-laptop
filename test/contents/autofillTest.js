@@ -200,6 +200,7 @@ describe('Autofill', function () {
       yield setup(this.app.client)
       this.autofillPreferences = 'about:autofill'
       this.formfill = Brave.server.url('formfill.html')
+      this.formfillHTTPS = 'https://brave.github.io/brave-tests/autofill/formfill.html'
 
       yield this.app.client
         .tabByIndex(0)
@@ -231,38 +232,38 @@ describe('Autofill', function () {
         .waitForTextValue('[data-test-id="creditCardPExpirationDate"]',
           (expMonth < 10 ? '0' + expMonth.toString() : expMonth.toString()) + '/' + expYear.toString())
     })
-    it.skip('autofills the credit card', function * () {
+    it('autofills the credit card in regular', function * () {
       yield this.app.client
         .tabByIndex(0)
-        .loadUrl(this.formfill)
+        .loadUrl(this.formfillHTTPS)
         .waitForVisible('<form>')
         .click(formCardNameInput)
         .click(formCardNameInput)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible('.contextMenuItemText')
         .click('.contextMenuItemText')
-        .tabByUrl(this.formfill)
+        .tabByUrl(this.formfillHTTPS)
         .waitForInputText(formCardNameInput, cardNumber)
         .waitForInputText(formCreditMonthInput, expMonth.toString())
         .waitForInputText(formCreditYearInput, expYear.toString())
     })
-    it.skip('autofills the credit card in a private tab', function * () {
+    it('autofills the credit card in a private tab', function * () {
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
-        .newTab({ url: this.formfill + '?2', isPrivate: true })
-        .waitForUrl(this.formfill + '?2')
+        .newTab({ url: this.formfillHTTPS + '?2', isPrivate: true })
+        .waitForUrl(this.formfillHTTPS + '?2')
         .waitForVisible('<form>')
         .click(formCardNameInput)
         .click(formCardNameInput)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible('.contextMenuItemText')
         .click('.contextMenuItemText')
-        .tabByUrl(this.formfill)
+        .tabByUrl(this.formfillHTTPS)
         .waitForInputText(formCardNameInput, cardNumber)
         .waitForInputText(formCreditMonthInput, expMonth.toString())
         .waitForInputText(formCreditYearInput, expYear.toString())
     })
-    it.skip('autofills the updated credit card when edited', function * () {
+    it('autofills the updated credit card when edited', function * () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(this.autofillPreferences)
@@ -292,14 +293,14 @@ describe('Autofill', function () {
         .waitForTextValue(cardNumberInput, '***' + (cardNumber + 123).slice(-4))
         .waitForTextValue('[data-test-id="creditCardPExpirationDate"]', (expMonth + 1).toString() + '/' + (expYear + 1).toString())
         .tabByIndex(0)
-        .loadUrl(this.formfill)
+        .loadUrl(this.formfillHTTPS)
         .waitForVisible('<form>')
         .click(formCardNameInput)
         .click(formCardNameInput)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible('.contextMenuItemText')
         .click('.contextMenuItemText')
-        .tabByUrl(this.formfill)
+        .tabByUrl(this.formfillHTTPS)
         .waitForInputText(formCardNameInput, cardNumber + '123')
         .waitForInputText(formCreditMonthInput, (expMonth + 1).toString())
         .waitForInputText(formCreditYearInput, (expYear + 1).toString())
@@ -322,6 +323,7 @@ describe('Autofill', function () {
       yield setup(this.app.client)
       this.autofillPreferences = 'about:autofill'
       this.formfill = Brave.server.url('formfill.html')
+      this.formfillHTTPS = 'https://brave.github.io/brave-tests/autofill/formfill.html'
 
       yield this.app.client
         .tabByIndex(0)
@@ -412,17 +414,17 @@ describe('Autofill', function () {
         .waitForInputText(formEmailInput, email)
         // TODO(bridiver) - this needs to check all fields
     })
-    it.skip('autofills the credit card', function * () {
+    it('autofills the credit card', function * () {
       yield this.app.client
         .tabByIndex(0)
-        .loadUrl(this.formfill)
+        .loadUrl(this.formfillHTTPS)
         .waitForVisible('<form>')
         .click(formCardNameInput)
         .click(formCardNameInput)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible('.contextMenuItemText')
         .click('.contextMenuItemText')
-        .tabByUrl(this.formfill)
+        .tabByUrl(this.formfillHTTPS)
         .waitForInputText(formCardNameInput, cardNumber)
         .waitForInputText(formCreditMonthInput, expMonth.toString())
         .waitForInputText(formCreditYearInput, expYear.toString())

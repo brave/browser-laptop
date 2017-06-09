@@ -92,7 +92,7 @@ describe('notificationBar permissions', function () {
   })
 })
 
-describe.skip('notificationBar passwords', function () {
+describe('notificationBar passwords', function () {
   function * setup (client) {
     yield client
       .waitForBrowserWindow()
@@ -107,12 +107,8 @@ describe.skip('notificationBar passwords', function () {
   })
 
   before(function * () {
-    this.loginUrl1 = Brave.server.url('login1.html')
-    this.loginUrl2 = Brave.server.url('login2.html')
-    this.loginUrl3 = Brave.server.url('login3.html')
-    this.loginUrl4 = Brave.server.url('login4.html')
-    this.loginUrl5 = Brave.server.url('login5.html')
-    this.loginUrl6 = Brave.server.url('login6.html')
+    this.loginUrl1 = 'https://brave.github.io/brave-tests/https_login/login1.html'
+    this.loginUrl2 = 'https://brave.github.io/brave-tests/https_login/login2.html'
     yield setup(this.app.client)
   })
 
@@ -120,11 +116,15 @@ describe.skip('notificationBar passwords', function () {
     yield this.app.client
       .tabByIndex(0)
       .url(this.loginUrl1)
+      .waitForExist('#acctmgr_loginform')
+      .setValue('#user', 'brave_user')
+      .setValue('#password', 'testing')
+      .click('#submit')
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(notificationBar)
       .waitUntil(function () {
         return this.getText(notificationBar).then((val) => {
-          return val.includes('localhost') && val.includes('brave_user')
+          return val.includes('brave') && val.includes('brave_user')
         })
       }).click('button=No')
   })
@@ -132,7 +132,12 @@ describe.skip('notificationBar passwords', function () {
   it('does not include a password in the notification bar', function * () {
     yield this.app.client
       .tabByIndex(0)
-      .url(this.loginUrl6)
+      .url(this.loginUrl2)
+      .waitForExist('#ChangePassForm')
+      .setValue('#password', 'secret')
+      .setValue('#old-password', 'secret')
+      .setValue('#new-password', 'secret2')
+      .click('#submit')
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(notificationBar)
       .waitUntil(function () {
@@ -146,45 +151,95 @@ describe.skip('notificationBar passwords', function () {
     yield this.app.client
       .tabByIndex(0)
       .url(this.loginUrl1)
+      .waitForExist('#acctmgr_loginform')
+      .setValue('#user', 'brave_user')
+      .setValue('#password', 'testing')
+      .click('#submit')
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(notificationBar)
       .waitUntil(function () {
-        return this.getText(notificationBar).then((val) => val.includes('localhost') && val.includes('brave_user'))
+        return this.getText(notificationBar).then((val) => val.includes('brave') && val.includes('brave_user'))
       }).click('button=Yes')
       .tabByIndex(0)
       .loadUrl('about:passwords')
       .waitForExist('[data-test-id="passwordItem"]')
       .windowByUrl(Brave.browserWindowUrl)
       .tabByIndex(0)
-      .url(this.loginUrl4)
+      .url(this.loginUrl1)
+      .waitForExist('#acctmgr_loginform')
+      .click('#acctmgr_loginform')
       .waitForInputText('#user', 'brave_user')
       .waitForInputText('#password', 'testing')
-      .waitForInputText('#user2', '')
-      .waitForInputText('#password2', '')
+      .tabByIndex(0)
+      .loadUrl('about:passwords')
+      .waitForExist('[data-test-id="passwordItem"]')
+      .click('[data-test-id="passwordAction"]')
+      .waitForExist('[data-l10n-id="noPasswordsSaved"]')
   })
 
-  it('autofills remembered password on login page with multiple forms', function * () {
+  it('autofills remembered password on login page after update password', function * () {
     yield this.app.client
       .tabByIndex(0)
-      .url(this.loginUrl5)
+      .url(this.loginUrl1)
+      .waitForExist('#acctmgr_loginform')
+      .setValue('#user', 'brave_user')
+      .setValue('#password', 'testing')
+      .click('#submit')
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForExist(notificationBar)
+      .waitUntil(function () {
+        return this.getText(notificationBar).then((val) => val.includes('brave') && val.includes('brave_user'))
+      }).click('button=Yes')
+      .tabByIndex(0)
+      .loadUrl('about:passwords')
+      .waitForExist('[data-test-id="passwordItem"]')
+      .windowByUrl(Brave.browserWindowUrl)
+      .tabByIndex(0)
+      .url(this.loginUrl1)
+      .waitForExist('#acctmgr_loginform')
+      .click('#acctmgr_loginform')
       .waitForInputText('#user', 'brave_user')
       .waitForInputText('#password', 'testing')
-      .waitForInputText('#user2', 'brave_user')
-      .waitForInputText('#password2', 'testing')
+      .setValue('#password', 'testing2')
+      .click('#submit')
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForExist(notificationBar)
+      .waitUntil(function () {
+        return this.getText(notificationBar).then((val) => val.includes('brave') && val.includes('brave_user') && val.includes('update'))
+      }).click('button=Yes')
+      .tabByIndex(0)
+      .url(this.loginUrl1)
+      .waitForExist('#acctmgr_loginform')
+      .click('#acctmgr_loginform')
+      .waitForInputText('#user', 'brave_user')
+      .waitForInputText('#password', 'testing2')
+      .tabByIndex(0)
+      .loadUrl('about:passwords')
+      .waitForExist('[data-test-id="passwordItem"]')
+      .click('[data-test-id="passwordAction"]')
+      .waitForExist('[data-l10n-id="noPasswordsSaved"]')
   })
 
   it('does not show login form notification if user turns it off for the site', function * () {
     yield this.app.client
       .tabByIndex(0)
-      .url(this.loginUrl3)
+      .url(this.loginUrl1)
+      .waitForExist('#acctmgr_loginform')
+      .setValue('#user', 'brave_user')
+      .setValue('#password', 'testing')
+      .click('#submit')
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(notificationBar)
       .waitUntil(function () {
-        return this.getText(notificationBar).then((val) => val.includes('localhost') && val.includes('brave_user'))
+        return this.getText(notificationBar).then((val) => val.includes('brave') && val.includes('brave_user'))
       })
       .click('button=Never for this site')
       .tabByIndex(0)
-      .url(this.loginUrl2)
+      .url(this.loginUrl1)
+      .waitForExist('#acctmgr_loginform')
+      .setValue('#user', 'brave_user')
+      .setValue('#password', 'testing')
+      .click('#submit')
       .windowByUrl(Brave.browserWindowUrl)
       .waitForElementCount(notificationBar, 0)
   })
