@@ -50,7 +50,7 @@ sudo apt-get install -y gdebi && sudo gdebi brave.deb
 or for ubuntu
 ```
 wget -O brave.deb https://laptop-updates.brave.com/latest/dev/ubuntu64
-sudo dpkg -i ./brave.deb
+sudo dpkg -i brave.deb
 ```
 
 If there are dependency errors during `dpkg -i`, the following command will
