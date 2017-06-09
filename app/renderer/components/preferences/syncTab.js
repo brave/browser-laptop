@@ -433,6 +433,15 @@ class SyncTab extends ImmutableComponent {
     window.alert('Invalid input code; please try again or create a new profile.')
   }
 
+  componentDidUpdate () {
+    if (!this.isSetup && this.props.syncStartOverlayVisible) {
+      this.deviceNameInput.focus()
+    }
+    if (!this.isSetup && this.props.syncAddOverlayVisible) {
+      this.passphraseInput.focus()
+    }
+  }
+
   render () {
     return <section className='syncContainer'>
       {
