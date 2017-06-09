@@ -5,6 +5,7 @@
 const electron = require('electron')
 const session = electron.session
 const appActions = require('../js/actions/appActions')
+const messages = require('../js/constants/messages')
 
 module.exports.init = () => {
   process.on('personal-data-changed', (profileGuids, creditCardGuids) => {
@@ -67,4 +68,20 @@ module.exports.removeLogin = (form) => {
 
 module.exports.clearLogins = (form) => {
   session.defaultSession.autofill.clearLogins(form)
+}
+
+module.exports.getAutofillableLogins = (tab) => {
+  session.defaultSession.autofill.getAutofillableLogins((result) => {
+    if (tab && !tab.isDestroyed()) {
+      tab.send(messages.PASSWORD_DETAILS_UPDATED, result)
+    }
+  })
+}
+
+module.exports.getBlackedlistLogins = (tab) => {
+  session.defaultSession.autofill.getBlackedlistLogins((result) => {
+    if (tab && !tab.isDestroyed()) {
+      tab.send(messages.PASSWORD_SITE_DETAILS_UPDATED, result)
+    }
+  })
 }
