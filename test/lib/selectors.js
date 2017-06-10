@@ -16,7 +16,7 @@ module.exports = {
   tabPage1: '[data-tab-page="0"]',
   tabPage2: '[data-tab-page="1"]',
   closeTab: '[data-test-id="closeTabIcon"]',
-  urlbarIcon: '.urlbarIcon',
+  urlbarIcon: '[data-test-id="urlBarIcon"]',
   urlBarSuggestions: '.urlBarSuggestions',
   titleBar: '#titleBar',
   navigatorBookmarked: '#navigator .removeBookmarkButton',
@@ -125,5 +125,7 @@ module.exports = {
   downloadReDownload: '[data-test-id="redownloadButton"]',
   downloadDelete: '[data-test-id="deleteButton"]',
   downloadDeleteConfirm: '[data-test-id="confirmDeleteButton"]',
-  downloadRemoveFromList: '[data-test-id="downloadRemoveFromList"]'
+  downloadRemoveFromList: '[data-test-id="downloadRemoveFromList"]',
+
+  siteInfoDialog: '[data-test-id="siteInfoDialog"]'
 }

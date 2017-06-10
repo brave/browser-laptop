@@ -231,7 +231,7 @@ class SiteInfo extends ImmutableComponent {
         </div>
     }
 
-    return <Dialog onHide={this.props.onHide} className='siteInfo' isClickDismiss>
+    return <Dialog testId='siteInfoDialog' onHide={this.props.onHide} className='siteInfo' isClickDismiss>
       <div onClick={(e) => e.stopPropagation()}
         className={cx({
           [css(commonStyles.flyoutDialog)]: true,
