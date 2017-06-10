@@ -195,6 +195,13 @@ const initiateSessionStateSave = () => {
   })
 }
 
+// exit cleanly on signals
+['SIGTERM', 'SIGHUP', 'SIGINT', 'SIGBREAK'].forEach((signal) => {
+  process.on(signal, () => {
+    app.quit()
+  })
+})
+
 let loadAppStatePromise = SessionStore.loadAppState()
 
 // Some settings must be set right away on startup, those settings should be handled here.
