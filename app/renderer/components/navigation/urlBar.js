@@ -428,17 +428,16 @@ class UrlBar extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
-    const activeTabId = activeFrame.get('tabId') || tabState.TAB_ID_NONE
+    const activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
 
     const location = tabState.getVisibleURL(state, activeTabId)
     const frameLocation = activeFrame.get('location') || ''
     const displayEntry = tabState.getVisibleEntry(state, activeTabId) || Immutable.Map()
     const displayURL = tabState.getVisibleVirtualURL(state, activeTabId) || ''
     const hostValue = displayEntry.get('host', '')
-    const protocol = displayEntry.get('protocol', '')
 
     const baseUrl = getBaseUrl(location)
-    const urlbar = activeFrame.getIn(['navbar', 'urlbar']) || Immutable.Map()
+    const urlbar = activeFrame.getIn(['navbar', 'urlbar'], Immutable.Map())
     const urlbarLocation = urlbar.get('location')
     const selectedIndex = urlbar.getIn(['suggestions', 'selectedIndex'])
     const allSiteSettings = siteSettingsState.getAllSiteSettings(state, activeFrame.get('isPrivate'))
@@ -464,8 +463,6 @@ class UrlBar extends React.Component {
       searchURL = provider.get('search')
     }
 
-    const isHTTPPage = protocol === 'http' || protocol === 'https'
-
     const props = {}
 
     props.activeTabId = activeTabId
@@ -473,18 +470,16 @@ class UrlBar extends React.Component {
     props.frameLocation = frameLocation
     props.displayURL = displayURL
     props.hostValue = hostValue
-    props.title = activeFrame.get('title') || ''
+    props.title = activeFrame.get('title', '')
     props.scriptsBlocked = activeFrame.getIn(['noScript', 'blocked'])
     props.enableNoScript = siteSettingsState.isNoScriptEnabled(state, braverySettings)
     props.showNoScriptInfo = props.enableNoScript && props.scriptsBlocked && props.scriptsBlocked.size
-    props.isSecure = activeFrame.getIn(['security', 'isSecure'])
     props.hasSuggestionMatch = urlbar.getIn(['suggestions', 'hasSuggestionMatch'])
     props.startLoadTime = activeFrame.get('startLoadTime')
     props.endLoadTime = activeFrame.get('endLoadTime')
     props.loading = activeFrame.get('loading')
     props.noScriptIsVisible = currentWindow.getIn(['ui', 'noScriptInfo', 'isVisible']) || false
     props.menubarVisible = ownProps.menubarVisible
-    props.activeTabShowingMessageBox = tabState.isShowingMessageBox(state, activeTabId)
     props.noBorderRadius = isPublisherButtonEnabled
     props.onStop = ownProps.onStop
     props.titleMode = ownProps.titleMode
@@ -498,9 +493,7 @@ class UrlBar extends React.Component {
     props.isActive = urlbar.get('active')
     props.isSelected = urlbar.get('selected')
     props.isFocused = urlbar.get('focused')
-    props.isHTTPPage = isHTTPPage
     props.isWideURLbarEnabled = getSetting(settings.WIDE_URL_BAR)
-    props.activateSearchEngine = activateSearchEngine
     props.searchSelectEntry = urlbarSearchDetail
     props.autocompleteEnabled = urlbar.getIn(['suggestions', 'autocompleteEnabled'])
     props.searchURL = searchURL
@@ -519,21 +512,10 @@ class UrlBar extends React.Component {
         noBorderRadius: this.props.noBorderRadius
       })}
       action='#'
-      id='urlbar'
-      ref='urlbar'>
+      id='urlbar'>
       <div className='urlbarIconContainer'>
         <UrlBarIcon
-          activateSearchEngine={this.props.activateSearchEngine}
-          active={this.props.isActive}
-          isSecure={this.props.isSecure}
-          isHTTPPage={this.props.isHTTPPage}
-          loading={this.props.loading}
-          location={this.props.displayURL}
-          searchSelectEntry={this.props.searchSelectEntry}
-          title={this.props.title}
           titleMode={this.props.titleMode}
-          isSearching={this.props.displayURL !== this.props.urlbarLocation}
-          activeTabShowingMessageBox={this.props.activeTabShowingMessageBox}
         />
       </div>
       {

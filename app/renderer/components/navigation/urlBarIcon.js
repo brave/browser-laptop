@@ -3,32 +3,45 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('../immutableComponent')
+const Immutable = require('immutable')
+
+// Components
+const ReduxComponent = require('../reduxComponent')
+
+// Actions
 const windowActions = require('../../../../js/actions/windowActions')
-const cx = require('../../../../js/lib/classSet')
+
+// Constants
 const dragTypes = require('../../../../js/constants/dragTypes')
+
+// State
+const tabState = require('../../../common/state/tabState')
+
+// Utils
+const cx = require('../../../../js/lib/classSet')
 const dndData = require('../../../../js/dndData')
+const UrlUtil = require('../../../../js/lib/urlutil')
+const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
 const {isPotentialPhishingUrl} = require('../../../../js/lib/urlutil')
-const windowStore = require('../../../../js/stores/windowStore')
-const {getActiveFrame} = require('../../../../js/state/frameStateUtil')
+
 const searchIconSize = 16
 
-class UrlBarIcon extends ImmutableComponent {
-  constructor () {
-    super()
+class UrlBarIcon extends React.Component {
+  constructor (props) {
+    super(props)
     this.onClick = this.onClick.bind(this)
     this.onDragStart = this.onDragStart.bind(this)
   }
+
   get iconCssClasses () {
-    if (isPotentialPhishingUrl(this.props.location)) {
+    if (this.props.isPotentialPhishingUrl) {
       return ['fa-exclamation-triangle', 'insecure-color']
     } else if (this.isSearch) {
       return ['fa-search']
-    } else if (this.isAboutPage && !this.props.titleMode) {
+    } else if (this.props.isAboutPage && !this.props.titleMode) {
       return ['fa-list']
     } else if (this.props.isHTTPPage && !this.props.active) {
-      // NOTE: EV style not approved yet; see discussion at https://github.com/brave/browser-laptop/issues/791
       if (this.props.isSecure === true) {
         return ['fa-lock']
       } else if (this.props.isSecure === false || this.props.isSecure === 2) {
@@ -37,8 +50,10 @@ class UrlBarIcon extends ImmutableComponent {
         return ['fa-unlock']
       }
     }
+
     return []
   }
+
   /**
    * search icon:
    * - does not show when in title mode
@@ -50,50 +65,84 @@ class UrlBarIcon extends ImmutableComponent {
 
     const defaultToSearch = (!this.props.isHTTPPage || this.props.active) &&
                             !this.props.titleMode &&
-                            !this.isAboutPage
+                            !this.props.isAboutPage
 
     return showSearch || defaultToSearch
   }
-  get isAboutPage () {
-    return isSourceAboutUrl(this.props.location) &&
-      this.props.location !== 'about:newtab'
-  }
+
   get iconClasses () {
     if (this.props.activateSearchEngine) {
-      return cx({urlbarIcon: true})
+      return cx({
+        urlbarIcon: true
+      })
     }
+
     const iconClasses = {
       urlbarIcon: true,
       fa: true
     }
+
     this.iconCssClasses.forEach((iconClass) => {
       iconClasses[iconClass] = true
     })
     return cx(iconClasses)
   }
+
   get iconStyles () {
     if (!this.props.activateSearchEngine) {
       return {}
     }
 
     return {
-      backgroundImage: `url(${this.props.searchSelectEntry.get('image')})`,
+      backgroundImage: `url(${this.props.searchSelectImage})`,
       backgroundSize: searchIconSize,
       width: searchIconSize,
       height: searchIconSize
     }
   }
+
   onClick () {
     if (isSourceAboutUrl(this.props.location) || this.isSearch) {
       return
     }
+
     windowActions.setSiteInfoVisible(true)
   }
+
   onDragStart (e) {
     dndData.setupDataTransferURL(e.dataTransfer, this.props.location, this.props.title)
-    const activeFrame = getActiveFrame(windowStore.state)
-    dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.TAB, activeFrame)
+    dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.TAB, this.props.activeFrame)
   }
+
+  mergeProps (state, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
+    const urlBar = activeFrame.getIn(['navbar', 'urlbar'], Immutable.Map())
+    const activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
+    const displayURL = tabState.getVisibleVirtualURL(state, activeTabId) || ''
+    const urlBarLocation = urlBar.get('location')
+
+    const props = {}
+    // used in renderer
+    props.activateSearchEngine = urlBar.getIn(['searchDetail', 'activateSearchEngine'])
+    props.active = urlBar.get('active')
+    props.isSecure = activeFrame.getIn(['security', 'isSecure'])
+    props.location = displayURL
+    props.isHTTPPage = UrlUtil.isHttpOrHttps(props.location)
+    props.searchSelectImage = urlBar.getIn(['searchDetail', 'image'], '')
+    props.titleMode = ownProps.titleMode
+    props.isSearching = displayURL !== urlBarLocation
+    props.activeTabShowingMessageBox = tabState.isShowingMessageBox(state, activeTabId)
+    props.isAboutPage = isSourceAboutUrl(props.location) && props.location !== 'about:newtab'
+    props.isPotentialPhishingUrl = isPotentialPhishingUrl(props.location)
+
+    // used in other functions
+    props.title = activeFrame.get('title', '')
+    props.activeFrame = activeFrame // TODO (nejc) only primitives
+
+    return props
+  }
+
   render () {
     // allow click and drag (unless tab is showing a message box)
     const props = {}
@@ -102,6 +151,7 @@ class UrlBarIcon extends ImmutableComponent {
       props.onClick = this.onClick
       props.onDragStart = this.onDragStart
     }
+
     return <span
       data-test-id='urlBarIcon'
       {...props}
@@ -110,4 +160,4 @@ class UrlBarIcon extends ImmutableComponent {
   }
 }
 
-module.exports = UrlBarIcon
+module.exports = ReduxComponent.connect(UrlBarIcon)
