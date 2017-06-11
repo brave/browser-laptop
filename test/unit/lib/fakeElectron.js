@@ -11,6 +11,11 @@ const fakeElectron = {
       }
     }
   },
+  MenuItem: class {
+    constructor (template) {
+      this.template = template
+    }
+  },
   ipcMain: {
     on: function () { },
     send: function () { }

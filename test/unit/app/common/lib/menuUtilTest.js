@@ -1,8 +1,11 @@
 /* global describe, before, after, it */
 const siteTags = require('../../../../../js/constants/siteTags')
 const mockery = require('mockery')
+const sinon = require('sinon')
 const assert = require('assert')
 const Immutable = require('immutable')
+// This is required; commonMenu is included by menuUtil (and references electron)
+const fakeElectron = require('../../../lib/fakeElectron')
 
 require('../../../braveUnit')
 
@@ -16,8 +19,7 @@ describe('menuUtil tests', function () {
       warnOnUnregistered: false,
       useCleanCache: true
     })
-    // This is required; commonMenu is included by menuUtil (and references electron)
-    mockery.registerMock('electron', require('../../../lib/fakeElectron'))
+    mockery.registerMock('electron', fakeElectron)
     menuUtil = require('../../../../../app/common/lib/menuUtil')
     separator = require('../../../../../app/common/commonMenu').separatorMenuItem
   })
@@ -236,20 +238,110 @@ describe('menuUtil tests', function () {
       assert.equal(menuItems[2].label, windowStateClosedFrames.get(10).get('title'))
     })
 
-    it('returns an empty array if lastClosedFrames is null, empty, or undefined', function () {
-      assert.deepEqual(menuUtil.createRecentlyClosedTemplateItems(), [])
-      assert.deepEqual(menuUtil.createRecentlyClosedTemplateItems(null), [])
-      assert.deepEqual(menuUtil.createRecentlyClosedTemplateItems(Immutable.fromJS([])), [])
+    it('returns hidden heading menu items if lastClosedFrames is null, empty, or undefined', function () {
+      const hiddenItems = menuUtil.recentlyClosedHeadingTemplates().map((item) => {
+        item.visible = false
+        return item
+      })
+      assert.deepEqual(menuUtil.createRecentlyClosedTemplateItems(), hiddenItems)
+      assert.deepEqual(menuUtil.createRecentlyClosedTemplateItems(null), hiddenItems)
+      assert.deepEqual(menuUtil.createRecentlyClosedTemplateItems(Immutable.fromJS({})), hiddenItems)
+    })
+  })
+
+  describe('updateRecentlyClosedMenuItems', function () {
+    const url1 = 'https://brave01.com'
+    const url2 = 'https://brave02.com'
+    const url3 = 'https://brave03.com'
+    const frame1 = new Immutable.Map({title: 'site1', location: url1})
+    const frame2 = new Immutable.Map({title: 'site2', location: url2})
+    const frame3 = new Immutable.Map({title: 'site3', location: url3})
+    const frameMatcher = (frame) => {
+      return (menuItem) => {
+        return menuItem.id === menuUtil.getRecentlyClosedMenuId(frame.get('location'))
+      }
+    }
+
+    before(function () {
+      this.historyMenu = {
+        submenu: {
+          insert: sinon.spy(),
+          items: []
+        }
+      }
+      sinon.stub(menuUtil, 'getMenuItem').returns(this.historyMenu)
     })
 
-    it('makes the input immutable if passed as mutable', function () {
-      const windowStateClosedFrames = [{
-        title: 'sample',
-        location: 'https://brave.com'
-      }]
-      const menuItems = menuUtil.createRecentlyClosedTemplateItems(windowStateClosedFrames)
-      assert.equal(Array.isArray(menuItems), true)
-      assert.equal(menuItems.length, 3)
+    after(function () {
+      menuUtil.getMenuItem.restore()
+    })
+
+    it('inserts new closed frames, with more recent frames appearing first', function () {
+      let closedFrames = new Immutable.OrderedMap()
+      closedFrames = closedFrames.set(frame1.get('location'), frame1)
+      closedFrames = closedFrames.set(frame2.get('location'), frame2)
+      closedFrames = closedFrames.set(frame3.get('location'), frame3)
+      menuUtil.updateRecentlyClosedMenuItems({}, closedFrames)
+      sinon.assert.calledWith(
+        this.historyMenu.submenu.insert.getCall(0),
+        0, sinon.match(frameMatcher(frame3))
+      )
+      sinon.assert.calledWith(
+        this.historyMenu.submenu.insert.getCall(1),
+        1, sinon.match(frameMatcher(frame2))
+      )
+      sinon.assert.calledWith(
+        this.historyMenu.submenu.insert.getCall(2),
+        2, sinon.match(frameMatcher(frame1))
+      )
+    })
+
+    it('does not insert duplicate frames', function () {
+      let closedFrames = new Immutable.OrderedMap()
+      closedFrames = closedFrames.set(frame1.get('location'), frame1)
+      this.historyMenu = {
+        submenu: {
+          insert: sinon.spy(),
+          items: [
+            {
+              id: menuUtil.getRecentlyClosedMenuId(frame1.get('location')),
+              label: 'site1',
+              visible: true
+            }
+          ]
+        }
+      }
+      menuUtil.updateRecentlyClosedMenuItems({}, closedFrames)
+      assert(this.historyMenu.submenu.insert.notCalled)
+    })
+
+    it('hides closed frames which have been reopened', function () {
+      let closedFrames = new Immutable.OrderedMap()
+      closedFrames = closedFrames.set(frame1.get('location'), frame1)
+      closedFrames = closedFrames.set(frame2.get('location'), frame2)
+      this.historyMenu = {
+        submenu: {
+          insert: sinon.spy(),
+          items: [
+            {
+              id: menuUtil.getRecentlyClosedMenuId(frame2.get('location')),
+              label: 'site2',
+              visible: true
+            },
+            {
+              id: menuUtil.getRecentlyClosedMenuId(frame1.get('location')),
+              label: 'site1',
+              visible: true
+            }
+          ]
+        }
+      }
+      menuUtil.updateRecentlyClosedMenuItems({}, closedFrames)
+      sinon.assert.notCalled(this.historyMenu.submenu.insert)
+      closedFrames.delete(frame2.get('location'))
+      menuUtil.updateRecentlyClosedMenuItems({}, closedFrames)
+      assert(this.historyMenu.submenu.items[0].visible, false)
+      assert(this.historyMenu.submenu.items[1].visible, true)
     })
   })
 

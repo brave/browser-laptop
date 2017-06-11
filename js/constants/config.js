@@ -20,6 +20,10 @@ module.exports = {
   },
   fingerprintingInfoUrl: 'https://github.com/brave/browser-laptop/wiki/Fingerprinting-Protection-Mode',
   maxClosedFrames: 100,
+  menu: {
+    // History -> Recently closed frame list
+    maxClosedFrames: 10
+  },
   thumbnail: {
     width: 160,
     height: 100
