@@ -3,6 +3,7 @@
 
 'use strict'
 
+const MenuItem = require('electron').MenuItem
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const CommonMenu = require('../../common/commonMenu')
 const siteTags = require('../../../js/constants/siteTags')
@@ -10,6 +11,7 @@ const eventUtil = require('../../../js/lib/eventUtil')
 const siteUtil = require('../../../js/state/siteUtil')
 const locale = require('../../locale')
 const appActions = require('../../../js/actions/appActions')
+const config = require('../../../js/constants/config')
 const {separatorMenuItem} = require('../../common/commonMenu')
 const windowActions = require('../../../js/actions/windowActions')
 
@@ -122,40 +124,152 @@ module.exports.createBookmarkTemplateItems = (sites) => {
 }
 
 /**
- * Create "recently closed" history entries for the "History" menu
+ * @param {string} key within closedFrames, i.e. a URL
+ * @return {string}
  */
-module.exports.createRecentlyClosedTemplateItems = (lastClosedFrames) => {
-  const payload = []
+const getRecentlyClosedMenuId = function (key) {
+  return `recentlyClosedFrame|${key}`
+}
+module.exports.getRecentlyClosedMenuId = getRecentlyClosedMenuId
 
-  lastClosedFrames = makeImmutable(lastClosedFrames)
+/**
+ * @param {string} menuId
+ * @return {string} key within closedFrames, i.e. a URL
+ */
+const getRecentlyClosedMenuKey = function (menuId) {
+  if (typeof menuId !== 'string' || menuId.indexOf('recentlyClosedFrame|') === -1) {
+    return undefined
+  }
+  return menuId.split('|')[1]
+}
 
-  if (lastClosedFrames && lastClosedFrames.size > 0) {
-    payload.push(
-      CommonMenu.separatorMenuItem,
-      {
-        label: locale.translation('recentlyClosed'),
-        enabled: false
+const recentlyClosedClickHandler = (frame) => {
+  return (item, focusedWindow, e) => {
+    const location = frame.get('location')
+    if (eventUtil.isForSecondaryAction(e)) {
+      appActions.createTabRequested({
+        url: location,
+        windowId: focusedWindow.id,
+        active: !!e.shiftKey
       })
+    } else {
+      appActions.loadURLInActiveTabRequested(focusedWindow.id, location)
+    }
+  }
+}
 
-    const lastTen = ((lastClosedFrames.size < 10) ? lastClosedFrames : lastClosedFrames.slice(-10)).reverse()
-    lastTen.forEach((closedFrame) => {
-      payload.push({
-        label: closedFrame.get('title') || closedFrame.get('location'),
-        click: (item, focusedWindow, e) => {
-          if (eventUtil.isForSecondaryAction(e)) {
-            appActions.createTabRequested({
-              url: closedFrame.get('location'),
-              windowId: focusedWindow.id,
-              active: !!e.shiftKey
-            })
-          } else {
-            appActions.loadURLInActiveTabRequested(focusedWindow.id, closedFrame.get('location'))
-          }
-        }
-      })
+const getFrameMenuLabel = (frame) => {
+  return frame.get('title') || frame.get('location')
+}
+
+const recentlyClosedTemplate = (key, frame) => {
+  return {
+    id: getRecentlyClosedMenuId(key),
+    click: recentlyClosedClickHandler(frame),
+    label: getFrameMenuLabel(frame)
+  }
+}
+
+module.exports.recentlyClosedHeadingTemplates = () => {
+  return [
+    {
+      id: 'recentlyClosedSeparator',
+      type: 'separator'
+    },
+    {
+      id: 'recentlyClosedHeading',
+      label: locale.translation('recentlyClosed'),
+      enabled: false
+    }
+  ]
+}
+
+/**
+ * Create "recently closed" history entries for the "History" menu.
+ * Labels and visibility change dynamically in updateRecentlyClosedMenuItems.
+ * @param {Immutable.OrderedMap} closedFrames
+ */
+module.exports.createRecentlyClosedTemplateItems = (closedFrames) => {
+  let payload = module.exports.recentlyClosedHeadingTemplates()
+  if (!closedFrames || !closedFrames.size) {
+    return payload.map((item) => {
+      item.visible = false
+      return item
     })
   }
+  let n = 0
+  closedFrames.reverse().forEach((frame) => {
+    payload.push(recentlyClosedTemplate(n, frame))
+    n = n + 1
+    if (n >= config.menu.maxClosedFrames) {
+      return false
+    }
+  })
   return payload
+}
+
+/**
+ * Update display of History menu "Recently closed" menu items by
+ * inserting MenuItems or hiding existing MenuItems.
+ * @param {electron.Menu} appMenu
+ * @param {Immutable.OrderedMap} closedFrames
+ */
+module.exports.updateRecentlyClosedMenuItems = (appMenu, closedFrames) => {
+  const headingVisible = closedFrames.size > 0
+  const maxMenuItems = config.menu.maxClosedFrames
+  const historyLabel = locale.translation('history')
+  const historyMenu = module.exports.getMenuItem(appMenu, historyLabel).submenu
+  let insertPosition = 0
+
+  const historyMenuIndicesByOrder = {}
+  for (let i = 0; i < historyMenu.items.length; i++) {
+    const item = historyMenu.items[i]
+    // New items go after "Recently closed"
+    if (!insertPosition && item.id === 'recentlyClosedHeading') {
+      insertPosition = i + 1
+      item.visible = headingVisible
+      continue
+    } else if (item.id === 'recentlyClosedSeparator') {
+      item.visible = headingVisible
+      continue
+    }
+
+    // Find existing items
+    const key = getRecentlyClosedMenuKey(item.id)
+    if (typeof key !== 'string') {
+      continue
+    }
+    // Undo close tab removes closed frames.
+    if (!closedFrames.get(key)) {
+      item.visible = false
+      continue
+    }
+    historyMenuIndicesByOrder[key] = i
+  }
+
+  let visibleItems = 0
+  closedFrames.reverse().forEach((frame, url) => {
+    const menuIndex = historyMenuIndicesByOrder[url]
+    if (visibleItems >= maxMenuItems) {
+      if (menuIndex) {
+        historyMenu.items[menuIndex].visible = false
+      }
+      return
+    }
+    if (menuIndex) {
+      historyMenu.items[menuIndex].visible = true
+      visibleItems += 1
+    } else {
+      const template = recentlyClosedTemplate(url, frame)
+      const item = new MenuItem(template)
+      // XXX: Can't set this with MenuItem constructor
+      item.id = template.id
+      historyMenu.insert(insertPosition, item)
+      visibleItems += 1
+      insertPosition = insertPosition + 1
+    }
+  })
+  return appMenu
 }
 
 const isItemValid = (currentItem, previousItem) => {

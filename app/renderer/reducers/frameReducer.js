@@ -168,7 +168,7 @@ const frameReducer = (state, action, immutableAction) => {
     case windowConstants.WINDOW_CLOSE_FRAMES:
       let closedFrames = new Immutable.List()
       action.framePropsList.forEach((frameProps) => {
-        if (!frameProps.get('isPrivate') && frameProps.get('location') !== 'about:newtab') {
+        if (frameStateUtil.isValidClosedFrame(frameProps)) {
           closedFrames = closedFrames.push(frameProps)
           if (closedFrames.size > config.maxClosedFrames) {
             closedFrames = closedFrames.shift()
