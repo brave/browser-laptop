@@ -849,10 +849,7 @@ class Main extends ImmutableComponent {
           onContextMenu={this.onTabContextMenu}>
           {
             nonPinnedFrames.size > tabsPerPage
-            ? <TabPages frames={nonPinnedFrames}
-              tabsPerTabPage={tabsPerPage}
-              previewTabPage={getSetting(settings.SHOW_TAB_PREVIEWS)}
-              tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])} />
+            ? <TabPages />
             : null
           }
         </div>

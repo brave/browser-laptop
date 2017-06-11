@@ -5,37 +5,34 @@
 const React = require('react')
 
 // Components
-const ImmutableComponent = require('../immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 const TabPage = require('./tabPage')
 
 // Utils
-const dnd = require('../../../../js/dnd')
+const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
-class TabPages extends ImmutableComponent {
+class TabPages extends React.Component {
+  mergeProps (state, ownProps) {
+    const currentWindow = state.get('currentWindow')
+
+    const props = {}
+    props.tabPageCount = frameStateUtil.getTabPageCount(currentWindow)
+
+    return props
+  }
+
   render () {
-    const tabPageCount = Math.ceil(this.props.frames.size / this.props.tabsPerTabPage)
-    let sourceDragFromPageIndex
-    const sourceDragData = dnd.getInterBraveDragData()
-    if (sourceDragData) {
-      sourceDragFromPageIndex = this.props.frames.findIndex((frame) => frame.get('key') === sourceDragData.get('key'))
-      if (sourceDragFromPageIndex !== -1) {
-        sourceDragFromPageIndex /= this.props.tabsPerTabPage
-      }
-    }
     return <div className='tabPageWrap'>
       {
-        tabPageCount > 1 &&
-        Array.from(new Array(tabPageCount)).map((x, i) =>
+        this.props.tabPageCount > 1 &&
+        Array.from(new Array(this.props.tabPageCount)).map((x, i) =>
           <TabPage
             key={`tabPage-${i}`}
-            tabPageFrames={this.props.frames.slice(i * this.props.tabsPerTabPage, (i * this.props.tabsPerTabPage) + this.props.tabsPerTabPage)}
-            previewTabPage={this.props.previewTabPage}
-            index={i}
-            sourceDragFromPageIndex={sourceDragFromPageIndex}
-            active={this.props.tabPageIndex === i} />)
+            index={i} />
+        )
       }
     </div>
   }
 }
 
-module.exports = TabPages
+module.exports = ReduxComponent.connect(TabPages)

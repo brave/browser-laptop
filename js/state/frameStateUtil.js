@@ -525,6 +525,13 @@ const isValidClosedFrame = (frame) => {
   return !frame.get('isPrivate')
 }
 
+const getTabPageCount = (state) => {
+  const frames = getNonPinnedFrames(state) || Immutable.List()
+  const tabsPerPage = Number(getSetting(settings.TABS_PER_PAGE))
+
+  return Math.ceil(frames.size / tabsPerPage)
+}
+
 module.exports = {
   deleteTabInternalIndex,
   deleteFrameInternalIndex,
@@ -574,5 +581,6 @@ module.exports = {
   getTotalBlocks,
   isPinned,
   updateTabPageIndex,
-  isValidClosedFrame
+  isValidClosedFrame,
+  getTabPageCount
 }
