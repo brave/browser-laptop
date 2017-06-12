@@ -95,7 +95,7 @@ class PublisherToggle extends React.Component {
 module.exports = ReduxComponent.connect(PublisherToggle)
 
 const styles = StyleSheet.create({
-  // ref: navigator__buttonContainer_bookmarkButtonContainer on nagivationBar.js
+  // ref: navigator__buttonContainer_bookmarkButtonContainer on navigationBar.js
   // ref: urlbarForm_isPublisherButtonEnabled on urlBar.js
   navigator__buttonContainer_addPublisherButtonContainer: {
     borderLeft: 'none',

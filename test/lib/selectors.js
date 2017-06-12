@@ -2,7 +2,7 @@ module.exports = {
   minimizeButton: '.min-btn',
   maximizeButton: '.max-btn',
   closeButton: '.close-btn',
-  urlInput: '#urlInput',
+  urlInput: '[data-test-id="urlInput"]',
   activeWebview: '.frameWrapper.isActive webview',
   activeTab: '[data-test-active-tab]',
   activeTabTitle: '[data-test-active-tab] [data-test-id="tabTitle"]',
@@ -10,7 +10,7 @@ module.exports = {
   pinnedTabsTabs: '.pinnedTabs [data-test-id="tab"]',
   tabsTabs: '.tabs [data-test-id="tab"]',
   navigator: '#navigator',
-  navigatorLoadTime: '#navigator .loadTime',
+  navigatorLoadTime: '[data-test-id="loadTime"]',
   newFrameButton: '.tabs .newFrameButton',
   tabPage: '.tabPage',
   tabPage1: '[data-tab-page="0"]',
@@ -35,8 +35,8 @@ module.exports = {
   findBarNextButton: '[data-test-id="findBarNextButton"]',
   findBarPrevButton: '[data-test-id="findBarPrevButton"]',
   findBarClearButton: '.findClear',
-  braveMenu: '.braveMenu:not(.braveShieldsDisabled)',
-  braveMenuDisabled: '.braveMenu.braveShieldsDisabled',
+  braveMenu: '[data-test-id="braveMenu"]',
+  braveMenuDisabled: '[data-test-id="braveMenuDisabled"]',
 
   // braveryPanelTest.js
   braveryPanel: '[data-test-id="braveryPanel"]',

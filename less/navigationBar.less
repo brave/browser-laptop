@@ -17,11 +17,6 @@
 // (macOS) We need to keep a padding left to avoid overlapping
 // with the window buttons to close/maximize/minimize the window.
 .platform--darwin .navigatorWrapper .topLevelStartButtons {
-  margin-left: @navbarLeftMarginDarwin;
-
-  &.fullscreen {
-    margin-left: 0;
-  }
 
   // Since we want to keep the navigator centered, we need to calculate the
   // difference between the width of the left box and the width of the right box.
@@ -35,23 +30,6 @@
     border: 1px solid #000;
     box-sizing: border-box;
   }
-
-  .topLevelStartButtons {
-    padding-left: 5px;
-  }
-
-  #navigator {
-    .urlbarForm {
-      input {
-        font-weight: 500;
-        line-height: 1.4;
-        margin: 0; // #5624
-        top: 0; // #5624
-      }
-    }
-  }
-
-  #urlInput { width: 100%; }
 
   // changes to ensure window can be as small as 480px wide
   // and still be useable and have the caption buttons intact
@@ -445,28 +423,6 @@
 
   @rightMargin: @navbarLeftMarginDarwin / 2;
 
-  // Buttons on the left
-  .topLevelStartButtons {
-    display: flex;
-
-    .backButton,
-    .forwardButton {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-    }
-
-    .backButton {
-      background: url('../img/toolbar/back_btn.svg') center no-repeat;
-      background-size: 14px 14px;
-    }
-
-    .forwardButton {
-      background: url('../img/toolbar/forward_btn.svg') center no-repeat;
-      background-size: 14px 14px;
-    }
-  }
-
   // Navigation bar at the center
   #navigator {
     &.titleMode {
@@ -500,91 +456,9 @@
   }
 }
 
-.navigationButtonContainer {
-  border-radius: @borderRadius;
-  height: 24px;
-  width: 26px;
-  margin-left: -3px;
-  margin-right: 6px;
-
-  &.nav {
-    margin-left: 4px;
-    margin-right: 1px;
-    width: 34px;
-  }
-
-  &:last-child {
-    margin-right: 8px;
-  }
-
-  &:not(.disabled):hover {
-    background: white;
-    box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.15);
-  }
-}
-
-.navigatorWrapper {
-
-  /**
-   * Left buttons
-   */
-  .topLevelStartButtons {
-    display: flex;
-    z-index: @zindexNavigationBar;
-    transition: margin @transitionDuration ease-in-out;
-
-    button {
-      user-select: none;
-      color: @buttonColor;
-      cursor: default;
-      border-radius: 4px;
-      font-weight: 300;
-      opacity: 0.2;
-
-      &:not([disabled]) {
-        opacity: 0.85;
-        -webkit-app-region: no-drag;
-      }
-    }
-  }
-}
-
-@urlbarFormHeight: 25px;
-
 .urlbarForm {
   *:not(legend) {
     z-index: @zindexUrlbarNotLegend;
-  }
-
-  legend:before {
-    content: ' ';
-    position: absolute;
-    border-radius: 0 4px 4px 0;
-    color: #333;
-    box-shadow: inset 0 0 0 1px @urlBarOutline, inset 0 0 0 3px @focusUrlbarOutline;
-    outline: none;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    z-index: @zindexNavigationBar;
-    display: none;
-  }
-
-  input:focus + legend:before {
-    display: block;
-  }
-
-  #navigator:not(.titleMode) & {
-    border-radius: @borderRadiusURL;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    box-shadow: inset 0 0 0 1px rgba(187, 187, 187, 1.0);
-    color: @chromeText;
-
-    // #4922
-    // TODO: replace this value with a CSS variable to add a dark UI.
-    background: #fff;
   }
 
   @media (max-width: @breakpointNarrowViewport) {
@@ -604,86 +478,5 @@
       animation: fadeIn .6s;
       z-index: @zindexNavigationBarElements;
     }
-
-    .urlbarForm {
-      &.isPublisherButtonEnabled {
-        legend:before {
-          border-radius: 0;
-        }
-      }
-    }
-  }
-
-  &.titleMode {
-    &:extend(#navigator:not(.titleMode).urlbarForm);
-    animation: fadeIn 1.2s;
-    background: none;
-    // border-radius: @borderRadiusURL;
-    // box-shadow: inset 0 0 0 1px rgba(187, 187, 187, 1.0);
-
-    .bookmarkButton {
-      &:not(.removeBookmarkButton) {
-        display: none;
-      }
-    }
-  }
-
-  .urlbarForm {
-    .loadTime {
-      color: @loadTimeColor;
-      font-size: 12px;
-      text-align: right;
-      cursor: default;
-
-      &.onFocus {
-        display: none;
-      }
-    }
-
-    /* Disable selection of button text */
-    > span {
-       user-select: none;
-    }
-
-    input {
-      border: none;
-      box-sizing: border-box;
-      color: #333;
-      letter-spacing: -0.125px;
-      cursor: text;
-      flex-grow: 1;
-      font-size: 13.5px;
-      font-weight: normal;
-      outline: none;
-      text-overflow: ellipsis;
-      min-width: 0%; // allow the navigator to shrink
-
-      // #4922: make the whole .urlbarForm clickable
-      height: @urlbarFormHeight;
-      background: transparent;
-
-      &.private {
-        background: @privateTabBackground;
-        color: @chromeText;
-      }
-
-      &:focus {
-        margin-right: 3px;
-      }
-    }
-  }
-}
-
-.topLevelEndButtons .braveMenu {
-  background-image: -webkit-image-set(url(../app/extensions/brave/img/braveBtn.png) 1x,
-                                      url(../app/extensions/brave/img/braveBtn2x.png) 2x,
-                                      url(../app/extensions/brave/img/braveBtn3x.png) 3x);
-  background-repeat: no-repeat;
-  height: 24px;
-
-  &:hover {
-    background-image: -webkit-image-set(url(../app/extensions/brave/img/braveBtn_hover.png) 1x,
-                                        url(../app/extensions/brave/img/braveBtn2x_hover.png) 2x,
-                                        url(../app/extensions/brave/img/braveBtn3x_hover.png) 3x);
   }
 }

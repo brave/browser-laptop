@@ -39,6 +39,8 @@ const eventUtil = require('../../../../js/lib/eventUtil')
 const UrlUtil = require('../../../../js/lib/urlutil')
 const {getSetting} = require('../../../../js/settings')
 const contextMenus = require('../../../../js/contextMenus')
+const {isDarwin} = require('../../../common/lib/platformUtil')
+const {isFullScreen} = require('../../currentWindow')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../styles/global')
@@ -101,6 +103,35 @@ class NavigationBar extends React.Component {
         windowActions.setUrlBarSelected(true)
       }
     }
+  }
+
+  get bookmarked () {
+    return this.props.activeFrameKey !== undefined &&
+      this.props.bookmarked
+  }
+
+  // BEM Level: navigator__navigationButtonContainer
+  get stopButton () {
+    return <button className={cx({
+      normalizeButton: true,
+      [css(styles.navigationButton, styles.navigationButton_stopButton)]: true
+    })}
+      data-l10n-id='stopButton'
+      onClick={this.onStop}
+    />
+  }
+
+  // BEM Level: navigator__navigationButtonContainer
+  get reloadButton () {
+    return <LongPressButton className={cx({
+      normalizeButton: true,
+      [css(styles.navigationButton, styles.navigationButton_reloadButton)]: true
+    })}
+      l10nId='reloadButton'
+      testId='reloadButton'
+      onClick={this.onReload}
+      onLongPress={this.onReloadLongPress}
+    />
   }
 
   componentDidMount () {
@@ -169,7 +200,7 @@ class NavigationBar extends React.Component {
       data-frame-key={this.props.activeFrameKey}
       className={cx({
         titleMode: this.props.titleMode,
-        [css(styles.navigator, this.props.isWideUrlBarEnabled && styles.navigator_wide)]: true
+        [css(styles.navigator, (this.props.isDarwin && this.props.isFullScreen) && styles.navigator_isDarwin_isFullScreen, this.props.titleMode && styles.navigator_titleMode, this.props.isWideUrlBarEnabled && styles.navigator_wide)]: true
       })}>
       {
         this.props.showBookmarkHanger
@@ -179,31 +210,25 @@ class NavigationBar extends React.Component {
       {
         this.props.titleMode
         ? null
-        : this.props.isLoading
-          ? <span className='navigationButtonContainer'>
-            <button className={cx({
-              normalizeButton: true,
-              [css(styles.navigator__navigationButtonContainer__navigationButton, styles.navigator__navigationButtonContainer__navigationButton_stopButton)]: true
-            })}
-              data-l10n-id='stopButton'
-              onClick={this.onStop}
-            />
-          </span>
-          : <span className='navigationButtonContainer'>
-            <LongPressButton
-              l10nId='reloadButton'
-              testId='reloadButton'
-              className={cx({
-                normalizeButton: true,
-                [css(styles.navigator__navigationButtonContainer__navigationButton, styles.navigator__navigationButtonContainer__navigationButton_reloadButton)]: true
-              })}
-              onClick={this.onReload}
-              onLongPress={this.onReloadLongPress} />
-          </span>
+        : <span className={css(
+            commonStyles.navigationButtonContainer,
+            styles.navigator__navigationButtonContainer,
+          )}>
+          {
+            this.props.isLoading
+            ? this.stopButton
+            : this.reloadButton
+          }
+        </span>
       }
       {
         this.props.showHomeButton
-        ? <HomeButton activeTabId={this.props.activeTabId} />
+        ? <span className={css(
+            commonStyles.navigationButtonContainer,
+            styles.navigator__navigationButtonContainer,
+          )}>
+          <HomeButton activeTabId={this.props.activeTabId} />
+        </span>
         : null
       }
       {
@@ -262,13 +287,27 @@ const styles = StyleSheet.create({
     zIndex: globalStyles.zindex.zindexNavigationBar
   },
 
+  navigator_isDarwin_isFullScreen: {
+    marginRight: 0
+  },
+
+  navigator_titleMode: {
+    animation: 'fadeIn 1.2s'
+  },
+
   navigator_wide: {
     maxWidth: '100%',
     marginRight: '0',
     justifyContent: 'initial'
   },
 
-  navigator__navigationButtonContainer__navigationButton: {
+  // cf: topLevelStartButtonContainer on navigator.js
+  navigator__navigationButtonContainer: {
+    // globalStyles.navigationBar.urlbarForm.height + 2px
+    width: '27px'
+  },
+
+  navigationButton: {
     // cf: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L550-L553
     backgroundColor: globalStyles.color.buttonColor,
     display: 'inline-block',
@@ -280,12 +319,12 @@ const styles = StyleSheet.create({
     padding: 0
   },
 
-  navigator__navigationButtonContainer__navigationButton_stopButton: {
+  navigationButton_stopButton: {
     background: `url(${stopLoadingButton}) center no-repeat`,
     backgroundSize: '11px 11px'
   },
 
-  navigator__navigationButtonContainer__navigationButton_reloadButton: {
+  navigationButton_reloadButton: {
     background: `url(${reloadButton}) center no-repeat`,
     backgroundSize: '13px 13px'
   },

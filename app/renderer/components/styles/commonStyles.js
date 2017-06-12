@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
 
-  // See urlBar.js and publisherToggle.js
+  // See urlBar.js
   // TODO: rename buttonContainer and urlbarIconContainer
   navigator__buttonContainer: buttonContainer,
   navigator__urlbarForm__buttonContainer_showNoScriptInfo: buttonContainer,
@@ -224,6 +224,18 @@ const styles = StyleSheet.create({
   navigator__buttonContainer_outsideOfURLbar: {
     border: `1px solid ${globalStyles.color.urlBarOutline}`,
     borderRadius: globalStyles.radius.borderRadiusURL
+  },
+
+  navigationButtonContainer: {
+    display: 'inline-block',
+    borderRadius: globalStyles.radius.borderRadiusNavigationButton,
+    height: globalStyles.navigationBar.urlbarForm.height,
+    marginRight: '6px',
+
+    ':hover': {
+      background: '#fff',
+      boxShadow: '0px 1px 5px 0px rgba(0, 0, 0, 0.15)'
+    }
   }
 })
 

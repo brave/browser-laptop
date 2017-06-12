@@ -38,6 +38,7 @@ const {getBaseUrl, isUrl} = require('../../../../js/lib/appUrlUtil')
 const {getCurrentWindowId} = require('../../currentWindow')
 const {normalizeLocation} = require('../../../common/lib/suggestion')
 const publisherUtil = require('../../../common/lib/publisherUtil')
+const {isWindows} = require('../../../common/lib/platformUtil')
 
 // Icons
 const iconNoScript = require('../../../../img/url-bar-no-script.svg')
@@ -494,6 +495,8 @@ class UrlBar extends React.Component {
     props.isSelected = urlbar.get('selected')
     props.isFocused = urlbar.get('focused')
     props.isWideURLbarEnabled = getSetting(settings.WIDE_URL_BAR)
+    props.isWindows = isWindows()
+    props.activateSearchEngine = activateSearchEngine
     props.searchSelectEntry = urlbarSearchDetail
     props.autocompleteEnabled = urlbar.getIn(['suggestions', 'autocompleteEnabled'])
     props.searchURL = searchURL
@@ -508,7 +511,7 @@ class UrlBar extends React.Component {
     return <form
       className={cx({
         urlbarForm: true,
-        [css(styles.urlbarForm, this.props.isWideURLbarEnabled && styles.urlbarForm_wide, this.props.titleMode && styles.urlbarForm_titleMode, this.props.publisherButtonVisible && styles.urlbarForm_isPublisherButtonEnabled)]: true
+        [css(styles.urlbarForm, this.props.isWideURLbarEnabled && styles.urlbarForm_wide, this.props.titleMode && styles.urlbarForm_titleMode, !this.props.titleMode && styles.urlbarForm_notTitleMode, !this.showNoScriptInfo && styles.urlbarForm_noScriptEnabled, this.props.publisherButtonVisible && styles.urlbarForm_isPublisherButtonEnabled)]: true
       })}
       action='#'
       id='urlbar'>
@@ -536,21 +539,27 @@ class UrlBar extends React.Component {
           onClick={this.onClick}
           onContextMenu={this.onContextMenu}
           data-l10n-id='urlbar'
+          data-test-id='urlInput'
           className={cx({
             private: this.private,
-            testHookLoadDone: !this.props.loading
+            testHookLoadDone: !this.props.loading,
+            [css(styles.urlbarForm__input, this.props.isWindows && styles.urlbarForm__input_windows)]: true
           })}
-          id='urlInput'
           readOnly={this.props.titleMode}
           ref={(node) => { this.urlInput = node }} />
       }
-      <legend />
+      <legend className={css(
+        styles.urlbarForm__legend,
+        !!this.props.isFocused && styles.urlbarForm__legend_isFocused,
+        this.props.isPublisherButtonEnabled && styles.urlbarForm__legend_isPublisherButtonEnabled
+      )} />
       {
         this.props.showDisplayTime
-        ? <span className={cx({
-          'loadTime': true,
-          'onFocus': this.props.isActive
-        })}>{this.loadTime}</span>
+        ? <span className={css(
+          styles.urlbarForm__titleBar__loadTime,
+          this.props.isActive && styles.urlbarForm__titleBar__loadTime_onFocus
+        )}
+          data-test-id='loadtime'>{this.loadTime}</span>
         : null
       }
       {
@@ -558,10 +567,9 @@ class UrlBar extends React.Component {
         ? null
         : <span className={css(commonStyles.navigator__urlbarForm__buttonContainer_showNoScriptInfo)}
           onClick={this.onNoScript}>
-          <span
+          <span className={css(styles.urlbarForm__buttonContainer_showNoScript__noScriptButton)}
             data-l10n-id='noScriptButton'
-            data-test-id='noScriptButton'
-            className={css(styles.noScriptButton)} />
+            data-test-id='noScriptButton' />
         </span>
       }
       {
@@ -582,8 +590,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     height: globalStyles.navigationBar.urlbarForm.height,
-    padding: '0 10px 0 3px',
+    padding: '0 3px',
     background: '#fff',
+
+    // Overwrite wildcard on https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L698-L700
+    WebkitAppRegion: 'drag !important',
 
     // PR #6485
     position: 'relative',
@@ -604,11 +615,23 @@ const styles = StyleSheet.create({
     background: 'none'
   },
 
+  urlbarForm_notTitleMode: {
+    background: globalStyles.color.navigationBarBackgroundActive,
+    borderRadius: globalStyles.radius.borderRadiusURL,
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
+    boxShadow: 'inset 0 0 0 1px rgba(187, 187, 187, 1.0)',
+    color: globalStyles.color.chromeText
+  },
+
+  urlbarForm_noScriptEnabled: {
+    paddingRight: '10px'
+  },
+
   // ref: navigator__buttonContainer_addPublisherButtonContainer on publisherToggle.js
-  // TODO: Convert 'urlbarForm' to remove !important
   urlbarForm_isPublisherButtonEnabled: {
-    borderTopRightRadius: '0 !important',
-    borderBottomRightRadius: '0 !important'
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0
   },
 
   urlbarForm__titleBar: {
@@ -625,12 +648,78 @@ const styles = StyleSheet.create({
     fontWeight: 600
   },
 
-  noScriptButton: {
-    WebkitAppRegion: 'no-drag',
-    backgroundImage: `url(${iconNoScript})`,
-    width: '14px',
-    height: '14px',
-    border: '0px'
+  urlbarForm__input: {
+    background: '#fff',
+    border: 'none',
+    boxSizing: 'border-box',
+    color: '#333',
+    letterSpacing: '-0.125px',
+    cursor: 'text',
+    display: 'flex',
+    flexGrow: 1,
+    fontSize: '13.5px',
+    fontWeight: 'normal',
+    outline: 'none',
+    textOverflow: 'ellipsis',
+
+    // allow the navigator to shrink
+    minWidth: 0,
+
+    // Disable window dragging so that selecting text is possible.
+    WebkitAppRegion: 'no-drag'
+  },
+
+  urlbarForm__input_windows: {
+    fontWeight: 500,
+    lineHeight: 1.4,
+    margin: 0, // #5624
+    top: 0, // #5624
+    width: '100%'
+  },
+
+  urlbarForm__legend: {
+    ':before': {
+      display: 'none',
+      content: '" "',
+      position: 'absolute',
+      borderRadius: '0 4px 4px 0',
+      color: '#333',
+      boxShadow: `inset 0 0 0 1px ${globalStyles.color.urlBarOutline}, inset 0 0 0 3px ${globalStyles.color.focusUrlbarOutline}`,
+      outline: 'none',
+      top: 0,
+      bottom: 0,
+      right: 0,
+      left: 0,
+      zIndex: globalStyles.zindex.zindexNavigationBar
+    }
+  },
+
+  urlbarForm__legend_isFocused: {
+    ':before': {
+      display: 'block'
+    }
+  },
+
+  urlbarForm__legend_isPublisherButtonEnabled: {
+    ':before': {
+      borderRadius: 0
+    }
+  },
+
+  urlbarForm__titleBar__loadTime: {
+    color: globalStyles.color.loadTimeColor,
+    fontSize: '12px'
+  },
+
+  urlbarForm__titleBar__loadTime_onFocus: {
+    display: 'none'
+  },
+
+  urlbarForm__buttonContainer_showNoScript__noScriptButton: {
+    background: `url(${iconNoScript}) center no-repeat`,
+    width: '15px',
+    height: '15px',
+    WebkitAppRegion: 'no-drag'
   }
 })
 

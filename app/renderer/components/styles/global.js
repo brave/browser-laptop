@@ -52,7 +52,8 @@ const globalStyles = {
     chromeSecondary: '#d3d3d3',
     chromeTertiary: '#c7c7c7',
     chromeText: '#555555',
-    navigationBarBackground: 'white',
+    navigationBarBackground: '#f7f7f7',
+    navigationBarBackgroundActive: '#fff',
     chromeControlsBackground: '#bbb',
     chromeControlsBackground2: 'white',
     tabsToolbarBorderColor: '#bbb',
@@ -105,6 +106,7 @@ const globalStyles = {
     notificationBottomBorderColor: '#ff5500',
     almostInvisible: 'rgba(255,255,255,0.01)',
     urlBarOutline: '#bbb',
+    focusUrlbarOutline: 'rgba(55, 169, 253, 0.4)',
     alphaWhite: 'rgba(255,255,255,0.8)'
   },
   filter: {
@@ -113,6 +115,7 @@ const globalStyles = {
   },
   radius: {
     borderRadius: '4px',
+    borderRadiusNavigationButton: '2px',
     borderRadiusTabs: '4px',
     borderRadiusURL: '4px',
     borderRadiusUIbox: '8px',
@@ -332,7 +335,6 @@ const globalStyles = {
 globalStyles.color.chromeBorderColor = globalStyles.color.chromePrimary
 globalStyles.color.chromeControlsWarningBackground = globalStyles.color.chromePrimary
 globalStyles.color.audioColor = globalStyles.color.highlightBlue
-globalStyles.color.focusUrlbarOutline = globalStyles.color.highlightBlue
 globalStyles.color.siteSecureColor = globalStyles.color.buttonColor
 globalStyles.color.loadTimeColor = globalStyles.color.highlightBlue
 globalStyles.color.activeTabDefaultColor = globalStyles.color.chromePrimary
