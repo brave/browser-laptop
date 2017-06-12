@@ -332,23 +332,50 @@ module.exports.addSite = function (state, siteDetail, tag, originalSiteDetail, s
 }
 
 /**
+ * Removes the appropriate tag from a site given the site's sync objectId.
+ * @param {Immutable.Map} state - Application state
+ * @param {Array} objectId - Object ID of object to be deleted
+ * @param {string} objectData - oneof 'historySite', 'bookmark'
+ * @returns {Immutable.Map}
+ */
+module.exports.removeSiteByObjectId = function (state, objectId, objectData) {
+  if (!objectId) {
+    return state
+  }
+  const cacheKey = ['sync', 'objectsById', objectId.join('|')]
+  const objectKey = state.getIn(cacheKey)
+  const site = objectKey && state.getIn(objectKey)
+  if (!site) {
+    return state
+  }
+  let tag = ''
+  if (objectData === 'bookmark') {
+    // determine whether this is a folder
+    tag = site.get('folderId') ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK
+  }
+  state = module.exports.removeSite(state, site, tag)
+  // If the object has been removed completely, purge it from the sync site
+  // cache
+  if (!state.getIn(objectKey)) {
+    state = state.deleteIn(cacheKey)
+  }
+  return state
+}
+
+/**
  * Removes the specified tag from a siteDetail
  *
  * @param {Immutable.Map} state The application state Immutable map
  * @param {Immutable.Map} siteDetail The siteDetail to remove a tag from
  * @param {string} tag
  * @param {boolean} reorder whether to reorder sites (default with reorder)
- * @param {Function=} syncCallback
  * @return {Immutable.Map} The new state Immutable object
  */
-module.exports.removeSite = function (state, siteDetail, tag, reorder = true, syncCallback) {
+module.exports.removeSite = function (state, siteDetail, tag, reorder = true) {
   let sites = state.get('sites')
   const key = module.exports.getSiteKey(siteDetail)
   if (!key) {
     return state
-  }
-  if (getSetting(settings.SYNC_ENABLED) === true && syncCallback) {
-    syncCallback(sites.getIn([key]))
   }
 
   const tags = sites.getIn([key, 'tags'])
@@ -358,7 +385,7 @@ module.exports.removeSite = function (state, siteDetail, tag, reorder = true, sy
     childSites.forEach((site) => {
       const tags = site.get('tags')
       tags.forEach((tag) => {
-        state = module.exports.removeSite(state, site, tag, false, syncCallback)
+        state = module.exports.removeSite(state, site, tag, false)
       })
     })
   }

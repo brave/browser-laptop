@@ -9,7 +9,6 @@ const filtering = require('../../filtering')
 const siteCache = require('../../common/state/siteCache')
 const siteTags = require('../../../js/constants/siteTags')
 const siteUtil = require('../../../js/state/siteUtil')
-const syncActions = require('../../../js/actions/syncActions')
 const syncUtil = require('../../../js/state/syncUtil')
 const Immutable = require('immutable')
 const settings = require('../../../js/constants/settings')
@@ -79,8 +78,7 @@ const sitesReducer = (state, action, immutableAction) => {
       state = updateActiveTabBookmarked(state)
       break
     case appConstants.APP_REMOVE_SITE:
-      const removeSiteSyncCallback = action.skipSync ? undefined : syncActions.removeSite
-      state = siteUtil.removeSite(state, action.siteDetail, action.tag, true, removeSiteSyncCallback)
+      state = siteUtil.removeSite(state, action.siteDetail, action.tag, true)
       if (syncEnabled()) {
         state = syncUtil.updateSiteCache(state, action.siteDetail)
       }
@@ -96,6 +94,7 @@ const sitesReducer = (state, action, immutableAction) => {
       }
       break
     case appConstants.APP_APPLY_SITE_RECORDS:
+      // Applies site records fetched by sync
       let nextFolderId = siteUtil.getNextFolderId(state.get('sites'))
       // Ensure that all folders are assigned folderIds
       action.records.forEach((record, i) => {
@@ -109,21 +108,22 @@ const sitesReducer = (state, action, immutableAction) => {
         }
       })
       action.records.forEach((record) => {
-        const siteData = syncUtil.getSiteDataFromRecord(record, state, action.records)
-        const tag = siteData.tag
-        let siteDetail = siteData.siteDetail
-        switch (record.action) {
-          case writeActions.CREATE:
-            state = siteUtil.addSite(state, siteDetail, tag, undefined, true)
-            break
-          case writeActions.UPDATE:
-            state = siteUtil.addSite(state, siteDetail, tag, siteData.existingObjectData, true)
-            break
-          case writeActions.DELETE:
-            state = siteUtil.removeSite(state, siteDetail, tag)
-            break
+        if (record.action === writeActions.DELETE) {
+          state = siteUtil.removeSiteByObjectId(state, record.objectId, record.objectData)
+        } else {
+          const siteData = syncUtil.getSiteDataFromRecord(record, state, action.records)
+          const tag = siteData.tag
+          let siteDetail = siteData.siteDetail
+          switch (record.action) {
+            case writeActions.CREATE:
+              state = siteUtil.addSite(state, siteDetail, tag, undefined, true)
+              break
+            case writeActions.UPDATE:
+              state = siteUtil.addSite(state, siteDetail, tag, siteData.existingObjectData, true)
+              break
+          }
+          state = syncUtil.updateSiteCache(state, siteDetail)
         }
-        state = syncUtil.updateSiteCache(state, siteDetail)
       })
       break
     case appConstants.APP_TAB_UPDATED:
