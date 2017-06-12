@@ -280,7 +280,7 @@ const tabState = {
     if (index === tabState.TAB_ID_NONE) {
       return null
     }
-    return makeImmutable(['tabs', index])
+    return ['tabs', index]
   },
 
   getByTabId: (state, tabId) => {
@@ -534,7 +534,7 @@ const tabState = {
       if (path == null) {
         return null
       }
-      return path.push('frame')
+      return path.concat(['frame'])
     } else {
       return frameState.getPathByTabId(state, tabId)
     }
@@ -603,13 +603,13 @@ const tabState = {
     if (!tabValue) {
       return state
     }
-    const path = tabState.getPathByTabId(state, tabId).push('navigationState')
-    return state.setIn(path, navigationState)
+    const path = tabState.getPathByTabId(state, tabId)
+    return path ? state.setIn(path.concat(['navigationState']), navigationState) : state
   },
 
   getNavigationState: (state, tabId) => {
     const path = tabState.getPathByTabId(state, tabId)
-    return path ? state.getIn(path.push('navigationState'), Immutable.Map()) : null
+    return path ? state.getIn(path.concat(['navigationState']), Immutable.Map()) : null
   },
 
   getVisibleEntry: (state, tabId) => {
