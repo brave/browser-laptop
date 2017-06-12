@@ -51,15 +51,14 @@ const updateActiveTab = (state, closeTabId) => {
     case tabCloseAction.PARENT:
       {
         const openerTabId = tabState.getOpenerTabId(state, closeTabId)
-        const lastActiveTabId = tabState.getLastActiveTabId(state, windowId)
-        if (openerTabId === lastActiveTabId) {
+        if (openerTabId && openerTabId !== tabState.TAB_ID_NONE) {
           nextTabId = openerTabId
         }
         break
       }
   }
 
-  // always fall back to NEXT
+  // DEFAULT: always fall back to NEXT
   if (nextTabId === tabState.TAB_ID_NONE) {
     nextTabId = tabState.getNextTabIdByIndex(state, windowId, index)
     if (nextTabId === tabState.TAB_ID_NONE) {

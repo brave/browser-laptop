@@ -13,8 +13,8 @@ const defaultAppState = Immutable.fromJS({
 
 const twoTabsAppState = defaultAppState
   .set('tabs', Immutable.fromJS([
-    { tabId: 1, index: 0, windowId: 1, frameKey: 2 },
-    { tabId: 2, index: 1, windowId: 1, frameKey: 1 }
+    { tabId: 1, index: 0, windowId: 1 },
+    { tabId: 2, index: 1, windowId: 1 }
   ]))
   .set('tabsInternal', Immutable.fromJS({
     index: {
@@ -204,7 +204,6 @@ describe('tabState unit tests', function () {
       let tab = tabState.getByTabId(this.appState, 2)
       assert(tab)
       assert.equal(1, tab.get('windowId'))
-      assert.equal(1, tab.get('frameKey'))
       assert.equal(2, tab.get('tabId'))
     })
 
@@ -333,7 +332,6 @@ describe('tabState unit tests', function () {
         .set('tabs', Immutable.fromJS([
           {
             windowId: 1,
-            frameKey: 1,
             tabId: 1,
             index: 0,
             myProp: 'test1',
@@ -341,7 +339,6 @@ describe('tabState unit tests', function () {
           },
           {
             windowId: 1,
-            frameKey: 1,
             tabId: 2,
             index: 1,
             myProp: 'test2',
@@ -364,13 +361,11 @@ describe('tabState unit tests', function () {
             index: 0,
             test: 'blue',
             windowId: 1,
-            frameKey: 1,
             myProp: 'test2',
             myProp2: 'blah'
           },
           {
             windowId: 1,
-            frameKey: 1,
             tabId: 2,
             index: 1,
             myProp: 'test2',
@@ -391,7 +386,6 @@ describe('tabState unit tests', function () {
           },
           {
             windowId: 1,
-            frameKey: 1,
             tabId: 2,
             index: 1,
             myProp: 'test2',
@@ -407,7 +401,6 @@ describe('tabState unit tests', function () {
       assert.equal('test1', tab.get('myProp'))
       assert.equal('blah', tab.get('myProp2'))
       assert.equal(1, tab.get('windowId'))
-      assert.equal(1, tab.get('frameKey'))
       assert.equal(1, tab.get('tabId'))
       assert.equal(true, state.get('otherProp'))
     })
@@ -429,7 +422,6 @@ describe('tabState unit tests', function () {
     it('removes the field specified', function () {
       const tab = Immutable.fromJS({
         windowId: 1,
-        frameKey: 1,
         tabId: 2,
         loginRequiredDetail: {
           request: { url: 'someurl' },
@@ -456,7 +448,6 @@ describe('tabState unit tests', function () {
     before(function () {
       const tabs = Immutable.fromJS([{
         windowId: 1,
-        frameKey: 1,
         tabId: 2,
         loginRequiredDetail: {
           request: { url: 'someurl' },
@@ -621,7 +612,7 @@ describe('tabState unit tests', function () {
       )
       assert.throws(
         () => {
-          tabState.setTabs(defaultAppState, [{ frameKey: 1 }])
+          tabState.setTabs(defaultAppState, [{ index: 0 }])
         },
         AssertionError
       )
@@ -691,6 +682,24 @@ describe('tabState unit tests', function () {
         },
         AssertionError
       )
+    })
+  })
+
+  describe('getOpenerTabId', function () {
+    it('returns tabId of the opener', function () {
+      const tempState = twoTabsAppState
+        .setIn(['tabs', 1, 'openerTabId'], 1)
+      assert.equal(tabState.getOpenerTabId(tempState, 2), 1)
+    })
+
+    it('defaults to TAB_ID_NONE if not found', function () {
+      assert.equal(tabState.getOpenerTabId(twoTabsAppState, 2), tabState.TAB_ID_NONE)
+    })
+
+    it('returns TAB_ID_NONE if tabId is invalid', function () {
+      const tempState = twoTabsAppState
+        .setIn(['tabs', 1, 'openerTabId'], 17)
+      assert.equal(tabState.getOpenerTabId(tempState, 2), tabState.TAB_ID_NONE)
     })
   })
 
