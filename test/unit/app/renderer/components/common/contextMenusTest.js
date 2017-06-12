@@ -70,12 +70,6 @@ describe('Context menu module unit tests', function () {
         contextMenus.onMainContextMenu()
         assert.equal(menuPopupSpy.calledOnce, true)
       })
-
-      it('calls menu.destroy', function () {
-        menuDestroySpy.reset()
-        contextMenus.onMainContextMenu()
-        assert.equal(menuDestroySpy.calledOnce, true)
-      })
     })
   })
 })
