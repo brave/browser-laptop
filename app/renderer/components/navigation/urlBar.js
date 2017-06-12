@@ -43,6 +43,7 @@ const publisherUtil = require('../../../common/lib/publisherUtil')
 const iconNoScript = require('../../../../img/url-bar-no-script.svg')
 
 const globalStyles = require('../styles/global')
+const commonStyles = require('../styles/commonStyles')
 
 class UrlBar extends React.Component {
   constructor (props) {
@@ -513,7 +514,7 @@ class UrlBar extends React.Component {
       id='urlbar'>
       <div className={cx({
         urlbarIconContainer: true,
-        [css(styles.urlbarForm__urlbarIconContainer)]: true
+        [css(commonStyles.navigator__urlbarForm__urlbarIconContainer)]: true
       })}>
         <UrlBarIcon
           titleMode={this.props.titleMode}
@@ -558,7 +559,7 @@ class UrlBar extends React.Component {
       {
         !this.props.showNoScriptInfo
         ? null
-        : <span className={css(styles.noScriptContainer)}
+        : <span className={css(commonStyles.navigator__urlbarForm__buttonContainer_showNoScriptInfo)}
           onClick={this.onNoScript}>
           <span
             data-l10n-id='noScriptButton'
@@ -613,17 +614,6 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: '0 !important'
   },
 
-  // Create 25x25 square and place .urlbarIcon at the center of it
-  urlbarForm__urlbarIconContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: globalStyles.navigationBar.urlbarForm.height,
-    width: globalStyles.navigationBar.urlbarForm.height,
-    minHeight: globalStyles.navigationBar.urlbarForm.height,
-    minWidth: globalStyles.navigationBar.urlbarForm.height
-  },
-
   urlbarForm__titleBar: {
     display: 'inline-block',
     color: globalStyles.color.chromeText,
@@ -636,13 +626,6 @@ const styles = StyleSheet.create({
 
   urlbarForm__titleBar__host: {
     fontWeight: 600
-  },
-
-  noScriptContainer: {
-    display: 'flex',
-    padding: '5px',
-    marginRight: '-8px',
-    WebkitAppRegion: 'drag'
   },
 
   noScriptButton: {

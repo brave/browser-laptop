@@ -210,7 +210,7 @@ class NavigationBar extends React.Component {
         !this.props.titleMode
         ? <span className={cx({
           bookmarkButtonContainer: true,
-          [css(commonStyles.navigator__buttonContainer, styles.navigator__buttonContainer_bookmarkButtonContainer)]: true
+          [css(commonStyles.navigator__buttonContainer, commonStyles.navigator__buttonContainer_outsideOfURLbar, styles.navigator__buttonContainer_bookmarkButtonContainer)]: true
         })}>
           <button className={cx({
             normalizeButton: true,

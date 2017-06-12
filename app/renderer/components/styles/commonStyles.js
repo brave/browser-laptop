@@ -5,6 +5,20 @@
 const {StyleSheet} = require('aphrodite')
 const globalStyles = require('./global')
 
+// #9283
+// Create 25x25 squares and place the buttons at the center of each container
+const buttonContainer = {
+  boxSizing: 'border-box',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: globalStyles.navigationBar.urlbarForm.height,
+  width: globalStyles.navigationBar.urlbarForm.height,
+  minHeight: globalStyles.navigationBar.urlbarForm.height,
+  minWidth: globalStyles.navigationBar.urlbarForm.height,
+  WebkitAppRegion: 'no-drag'
+}
+
 const styles = StyleSheet.create({
   formControl: {
     background: '#fff',
@@ -200,19 +214,16 @@ const styles = StyleSheet.create({
     width: '100%'
   },
 
-  // #9283
-  // Create 25x25 squares and place the buttons at the center of each container
-  navigator__buttonContainer: {
+  // See urlBar.js and publisherToggle.js
+  // TODO: rename buttonContainer and urlbarIconContainer
+  navigator__buttonContainer: buttonContainer,
+  navigator__urlbarForm__buttonContainer_showNoScriptInfo: buttonContainer,
+  navigator__urlbarForm__urlbarIconContainer: buttonContainer,
+
+  // Add border to the bookmark button and publisher button only
+  navigator__buttonContainer_outsideOfURLbar: {
     border: `1px solid ${globalStyles.color.urlBarOutline}`,
-    borderRadius: globalStyles.radius.borderRadiusURL,
-    boxSizing: 'border-box',
-    display: 'flex',
-    alignItems: 'center',
-    height: globalStyles.navigationBar.urlbarForm.height,
-    width: globalStyles.navigationBar.urlbarForm.height,
-    minHeight: globalStyles.navigationBar.urlbarForm.height,
-    minWidth: globalStyles.navigationBar.urlbarForm.height,
-    WebkitAppRegion: 'no-drag'
+    borderRadius: globalStyles.radius.borderRadiusURL
   }
 })
 

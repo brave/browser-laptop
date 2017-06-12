@@ -75,6 +75,7 @@ class PublisherToggle extends React.Component {
       data-test-verified={this.props.isVerifiedPublisher}
       className={css(
         commonStyles.navigator__buttonContainer,
+        commonStyles.navigator__buttonContainer_outsideOfURLbar,
         styles.navigator__buttonContainer_addPublisherButtonContainer,
       )}>
       <BrowserButton
