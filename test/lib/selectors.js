@@ -16,7 +16,7 @@ module.exports = {
   tabPage1: '[data-tab-page="0"]',
   tabPage2: '[data-tab-page="1"]',
   closeTab: '[data-test-id="closeTabIcon"]',
-  urlbarIcon: '[data-test-id="urlBarIcon"]',
+  urlbarIcon: '[data-test-id="urlbarIcon"]',
   urlBarSuggestions: '.urlBarSuggestions',
   titleBar: '#titleBar',
   navigatorBookmarked: '[data-test-id="bookmarked"]',

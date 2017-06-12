@@ -225,6 +225,7 @@ const globalStyles = {
     flyoutDialog: '13px',
     prefsPanelHeading: '23px'
   },
+
   appIcons: {
     clipboard: 'fa fa-clipboard',
     closeTab: 'fa fa-times-circle',
@@ -240,8 +241,14 @@ const globalStyles = {
     moreInfo: 'fa fa-info-circle',
     angleDoubleRight: 'fa fa-angle-double-right',
     findPrev: 'fa fa-caret-up',
-    findNext: 'fa fa-caret-down'
+    findNext: 'fa fa-caret-down',
+    exclamationTriangle: 'fa fa-exclamation-triangle',
+    search: 'fa fa-search',
+    list: 'fa fa-list',
+    lock: 'fa fa-lock',
+    unlock: 'fa fa-unlock'
   },
+
   animations: {
     subtleShowUp: {
       opacity: 0,

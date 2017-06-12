@@ -512,10 +512,7 @@ class UrlBar extends React.Component {
       })}
       action='#'
       id='urlbar'>
-      <div className={cx({
-        urlbarIconContainer: true,
-        [css(commonStyles.navigator__urlbarForm__urlbarIconContainer)]: true
-      })}>
+      <div className={css(commonStyles.navigator__urlbarForm__urlbarIconContainer)}>
         <UrlBarIcon
           titleMode={this.props.titleMode}
         />

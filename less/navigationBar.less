@@ -599,14 +599,6 @@
     -webkit-app-region: no-drag;
   }
 
-  form {
-    -webkit-app-region: drag;
-    // Disable window dragging so that selecting text and dragging the favicon is possible.
-    input, .urlbarIcon {
-      -webkit-app-region: no-drag;
-    }
-  }
-
   &:not(.titleMode) {
     > * {
       animation: fadeIn .6s;
@@ -628,17 +620,6 @@
     background: none;
     // border-radius: @borderRadiusURL;
     // box-shadow: inset 0 0 0 1px rgba(187, 187, 187, 1.0);
-
-    .urlbarIcon {
-      display: inline-block;
-      opacity: 0.5;
-      min-width: 0;
-
-      &.insecure-color {
-        color: @siteInsecureColor;
-        opacity: 1.0;
-      }
-    }
 
     .bookmarkButton {
       &:not(.removeBookmarkButton) {
@@ -688,40 +669,6 @@
 
       &:focus {
         margin-right: 3px;
-      }
-    }
-
-    .urlbarIconContainer {
-      .urlbarIcon {
-        color: @siteSecureColor;
-        font-size: 12px;
-        background-repeat: no-repeat;
-        background-position: center;
-        position: relative;
-        bottom: -1px;
-
-        // about:newtab
-        &.fa-search {
-          position: relative;
-          bottom: 0;
-          // 50% of #5a5a5a
-          color: rgba(90, 90, 90, 0.5);
-        }
-
-        &.fa-lock,
-        &.fa-unlock,
-        &.fa-exclamation-triangle {
-          font-size: 16px;
-          bottom: 0;
-        }
-
-        &.insecure-color {
-          color: @siteInsecureColor;
-        }
-
-        &.extendedValidation {
-          color: @siteEVColor;
-        }
       }
     }
   }
