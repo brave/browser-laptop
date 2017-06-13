@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.16.9](https://github.com/brave/browser-laptop/releases/tag/v0.16.9dev)
+- Fixed crash on login or other input. ([#9369](https://github.com/brave/browser-laptop/issues/9369))
+- Fixed ability to scroll down to latest bookmark. ([#9055](https://github.com/brave/browser-laptop/issues/9055))
+
 ## [0.16.5](https://github.com/brave/browser-laptop/releases/v0.16.5dev)
  - Added various performance improvements. ([#9342](https://github.com/brave/browser-laptop/issues/9342))
  - Disabled the “Fund with debit/credit card” button in preparation for new funding method. ([#9327](https://github.com/brave/browser-laptop/issues/9327))
