@@ -131,6 +131,9 @@ describe('sitesReducerTest', function () {
         destinationKey: `${url2}|0|0`
       }
 
+      // Sites will be sorted after each site operation. ex. sites[0] will be
+      // order 0, sites[1] will be order 1, ...etc.
+
       // Add sites
       let newState = sitesReducer(state, addAction)
       addAction.siteDetail = addAction.siteDetail.set('location', 'https://www.brave.com/2')
@@ -149,8 +152,8 @@ describe('sitesReducerTest', function () {
       moveAction.prepend = true
       newState = sitesReducer(Immutable.fromJS(newState), moveAction).toJS()
       assert.equal(Object.keys(newState.sites).length, 3)
-      assert.equal(Object.values(newState.sites)[2].location, url)
-      assert.equal(Object.values(newState.sites)[2].order, 1)
+      assert.equal(Object.values(newState.sites)[1].location, url)
+      assert.equal(Object.values(newState.sites)[1].order, 1)
     })
   })
 })
