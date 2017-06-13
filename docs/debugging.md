@@ -1,4 +1,4 @@
-#Debugging
+# Debugging
 
 ## Debugging the renderer processes
 
@@ -17,7 +17,7 @@ If you're running `npm run watch`, then webpack dev server will ensure that chan
 
 The browser process can be debugged and profiled with remote developer tools via Node Inspector.
 
-Simply pass the `--inspect` command line argument to the start script to enable node inspector.
+Pass the `--inspect` command line argument to the start script to enable node inspector.
 
 `npm run start -- --inspect`
 
@@ -30,9 +30,9 @@ On startup you'll see a message like this:
 > To start debugging, open the following URL in Chrome:
 >     chrome-devtools://devtools/bundled/inspector.html?experiments=true&v8only=true&ws=127.0.0.1:9229/1cfd06a0-c36a-4d98-85ad-d357ca6bebc6
 
-Simply start up Chrome and load that URL to see the developer tools that you're familiar with.
+Start up Chrome and load that URL to see the developer tools that you're familiar with.
 
-If your console or terminal has trouble copying text for the URL, you can also simply load `chrome://inspect` and click the link you see which brings you to the same place.
+If your console or terminal has trouble copying text for the URL, you can also load `chrome://inspect` and click the link you see which brings you to the same place.
 
 ## Debugging the browser process with VS Code
 
