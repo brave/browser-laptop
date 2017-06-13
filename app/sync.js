@@ -95,6 +95,11 @@ const appStoreChangeCallback = function (diffs) {
     const entry = state.getIn(statePath)
     const isSite = type === 'sites'
 
+    if (action === writeActions.CREATE && entry && entry.get('skipSync')) {
+      // Don't re-create objects that were fetched by sync
+      return
+    }
+
     if (isSite && action === writeActions.DELETE && !entry) {
       // If we deleted the site, it is no longer availble in appState.
       // Find the corresponding objectId using the sync cache
