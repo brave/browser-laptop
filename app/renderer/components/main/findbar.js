@@ -6,28 +6,30 @@ const React = require('react')
 const Immutable = require('immutable')
 
 // Components
-const ImmutableComponent = require('../immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 const BrowserButton = require('../common/browserButton')
 const SwitchControl = require('../common/switchControl')
 
 // Constants
 const keyCodes = require('../../../common/constants/keyCodes')
+const settings = require('../../../../js/constants/settings')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
-
-// Stores
-const windowStore = require('../../../../js/stores/windowStore')
+const webviewActions = require('../../../../js/actions/webviewActions')
 
 // Utils
 const contextMenus = require('../../../../js/contextMenus')
 const {getTextColorForBackground} = require('../../../../js/lib/color')
+const frameStateUtil = require('../../../../js/state/frameStateUtil')
+const {getSetting} = require('../../../../js/settings')
 
+// Styles
 const globalStyles = require('../styles/global')
 
-class FindBar extends ImmutableComponent {
-  constructor () {
-    super()
+class FindBar extends React.Component {
+  constructor (props) {
+    super(props)
     this.onBlur = this.onBlur.bind(this)
     this.onInputFocus = this.onInputFocus.bind(this)
     this.onClear = this.onClear.bind(this)
@@ -37,37 +39,34 @@ class FindBar extends ImmutableComponent {
     this.onFindPrev = this.onFindPrev.bind(this)
     this.onFindNext = this.onFindNext.bind(this)
     this.onCaseSensitivityChange = this.onCaseSensitivityChange.bind(this)
-    this.didFrameChange = true
-  }
-
-  get frame () {
-    return windowStore.getFrame(this.props.frameKey)
+    this.onFind = this.onFind.bind(this)
+    this.onFindHide = this.onFindHide.bind(this)
   }
 
   onInput (e) {
-    windowActions.setFindDetail(this.props.frameKey, Immutable.fromJS({
+    windowActions.setFindDetail(this.props.activeFrameKey, Immutable.fromJS({
       searchString: e.target.value,
-      caseSensitivity: this.isCaseSensitive
+      caseSensitivity: this.props.isCaseSensitive
     }))
   }
 
   onCaseSensitivityChange (e) {
-    windowActions.setFindDetail(this.props.frameKey, Immutable.fromJS({
-      searchString: this.searchString,
-      caseSensitivity: !this.isCaseSensitive
+    windowActions.setFindDetail(this.props.activeFrameKey, Immutable.fromJS({
+      searchString: this.props.searchString,
+      caseSensitivity: !this.props.isCaseSensitive
     }))
   }
 
   onFindFirst () {
-    this.props.onFind(this.searchString, this.isCaseSensitive, true, false)
+    this.onFind(this.props.searchString, this.props.isCaseSensitive, true, false)
   }
 
   onFindNext () {
-    this.props.onFind(this.searchString, this.isCaseSensitive, true, this.props.findDetail.get('internalFindStatePresent'))
+    this.onFind(this.props.searchString, this.props.isCaseSensitive, true, this.props.internalFindStatePresent)
   }
 
   onFindPrev () {
-    this.props.onFind(this.searchString, this.isCaseSensitive, false, this.props.findDetail.get('internalFindStatePresent'))
+    this.onFind(this.props.searchString, this.props.isCaseSensitive, false, this.props.internalFindStatePresent)
   }
 
   onContextMenu (e) {
@@ -75,8 +74,7 @@ class FindBar extends ImmutableComponent {
     // a word so the word replacement is kind of a surprise.  This is because
     // our context menus are modal at the moment.  If we fix that we can
     // remove this timeout.
-    setTimeout(() =>
-      contextMenus.onFindBarContextMenu(e), 10)
+    setTimeout(() => contextMenus.onFindBarContextMenu(e), 10)
   }
 
   /**
@@ -91,29 +89,37 @@ class FindBar extends ImmutableComponent {
   }
 
   componentDidMount () {
-    this.searchInput.value = this.searchString
+    this.searchInput.value = this.props.searchString
     this.focus()
     this.select()
-    windowActions.setFindbarSelected(this.frame, false)
+    windowActions.setFindbarSelected(this.props.activeFrameKey, false)
   }
 
   componentWillUpdate (nextProps) {
-    if (nextProps.frameKey !== this.props.frameKey) {
-      this.searchInput.value = (nextProps.findDetail && nextProps.findDetail.get('searchString')) || ''
+    if (nextProps.activeFrameKey !== this.props.activeFrameKey) {
+      this.searchInput.value = nextProps.searchString
+    }
+  }
+
+  componentWillUnmount () {
+    if (this.props.isPrivate) {
+      windowActions.setFindDetail(this.props.activeFrameKey, Immutable.fromJS({
+        searchString: '',
+        caseSensitivity: this.props.isCaseSensitive
+      }))
     }
   }
 
   componentDidUpdate (prevProps) {
-    if (this.props.selected && !prevProps.selected) {
+    if (this.props.isSelected && !prevProps.isSelected) {
       this.focus()
       // Findbar might already be focused, so make sure select happens even if no
       // onFocus event happens.
       this.select()
-      windowActions.setFindbarSelected(this.frame, false)
+      windowActions.setFindbarSelected(this.props.activeFrameKey, false)
     }
-    if (!this.props.findDetail || !prevProps.findDetail ||
-        this.props.findDetail.get('searchString') !== prevProps.findDetail.get('searchString') ||
-        this.props.findDetail.get('caseSensitivity') !== prevProps.findDetail.get('caseSensitivity')) {
+
+    if (this.props.searchString !== prevProps.searchString || this.props.isCaseSensitive !== prevProps.isCaseSensitive) {
       // Redo search if details have changed
       this.onFindFirst()
     }
@@ -123,7 +129,7 @@ class FindBar extends ImmutableComponent {
     switch (e.keyCode) {
       case keyCodes.ESC:
         e.preventDefault()
-        this.props.onFindHide()
+        this.onFindHide()
         break
       case keyCodes.ENTER:
         e.preventDefault()
@@ -141,81 +147,86 @@ class FindBar extends ImmutableComponent {
   }
 
   onBlur (e) {
-    windowActions.setFindbarSelected(this.frame, false)
+    windowActions.setFindbarSelected(this.props.activeFrameKey, false)
   }
 
   onClear () {
     this.searchInput.value = ''
-    windowActions.setFindDetail(this.props.frameKey, Immutable.fromJS({
+    windowActions.setFindDetail(this.props.activeFrameKey, Immutable.fromJS({
       searchString: '',
-      caseSensitivity: this.isCaseSensitive
+      caseSensitivity: this.props.isCaseSensitive
     }))
     this.focus()
   }
 
-  get numberOfMatches () {
-    if (!this.props.findDetail || this.props.findDetail.get('numberOfMatches') === undefined) {
-      return -1
+  onFindHide () {
+    frameStateUtil.onFindBarHide(this.props.activeFrameKey)
+  }
+
+  onFind (searchString, caseSensitivity, forward, findNext) {
+    webviewActions.findInPage(searchString, caseSensitivity, forward, findNext)
+    if (!findNext) {
+      windowActions.setFindDetail(this.props.activeFrameKey, Immutable.fromJS({
+        internalFindStatePresent: true
+      }))
     }
-    return this.props.findDetail.get('numberOfMatches')
   }
 
-  get activeMatchOrdinal () {
-    if (!this.props.findDetail || this.props.findDetail.get('activeMatchOrdinal') === undefined) {
-      return -1
-    }
-    return this.props.findDetail.get('activeMatchOrdinal') || -1
-  }
-
-  get isCaseSensitive () {
-    if (!this.props.findDetail) {
-      return false
-    }
-    return this.props.findDetail.get('caseSensitivity')
-  }
-
-  get searchString () {
-    if (!this.props.findDetail) {
-      return ''
-    }
-    return this.props.findDetail.get('searchString')
-  }
-
-  get backgroundColor () {
-    return this.props.paintTabs && (this.props.themeColor || this.props.computedThemeColor)
-  }
-
-  get textColor () {
-    return getTextColorForBackground(this.backgroundColor)
-  }
-
-  render () {
-    let findMatchText
-    if (this.numberOfMatches !== -1 && this.activeMatchOrdinal !== -1 && this.searchString) {
+  get findTextMatch () {
+    if (this.props.numberOfMatches > 0 && this.props.activeMatchOrdinal > 0 && this.props.searchString) {
       const l10nArgs = {
-        activeMatchOrdinal: this.activeMatchOrdinal,
-        numberOfMatches: this.numberOfMatches
+        activeMatchOrdinal: this.props.activeMatchOrdinal,
+        numberOfMatches: this.props.numberOfMatches
       }
-      findMatchText = <div className='foundResults'
+
+      return <div className='foundResults'
         data-l10n-args={JSON.stringify(l10nArgs)}
         data-l10n-id='findResults' />
-    } else if (this.numberOfMatches !== -1 && this.searchString) {
+    } else if (this.props.numberOfMatches === 0 && this.props.searchString) {
       const l10nArgs = {
-        activeMatchOrdinal: this.activeMatchOrdinal,
-        numberOfMatches: this.numberOfMatches
+        activeMatchOrdinal: this.props.activeMatchOrdinal,
+        numberOfMatches: this.props.numberOfMatches
       }
-      findMatchText = <div className='foundResults'
+
+      return <div className='foundResults'
         data-l10n-args={JSON.stringify(l10nArgs)}
         data-l10n-id='findResultMatches' />
     }
 
-    const backgroundColor = this.backgroundColor
+    return null
+  }
+
+  mergeProps (state, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
+    const activeFrameKey = activeFrame.get('key')
+
+    const props = {}
+    // used in renderer
+    props.backgroundColor = getSetting(settings.PAINT_TABS) &&
+      (activeFrame.get('themeColor') || activeFrame.get('computedThemeColor'))
+    props.textColor = props.backgroundColor && getTextColorForBackground(props.backgroundColor)
+    props.numberOfMatches = activeFrame.getIn(['findDetail', 'numberOfMatches'], -1)
+    props.activeMatchOrdinal = activeFrame.getIn(['findDetail', 'activeMatchOrdinal'], -1)
+    props.searchString = activeFrame.getIn(['findDetail', 'searchString'], '')
+    props.isCaseSensitive = activeFrame.getIn(['findDetail', 'caseSensitivity'], false)
+
+    // used in other functions
+    props.activeFrameKey = activeFrameKey
+    props.isSelected = activeFrame.get('findbarSelected', false)
+    props.internalFindStatePresent = activeFrame.getIn(['findDetail', 'internalFindStatePresent'])
+    props.isPrivate = activeFrame.get('isPrivate', false)
+
+    return props
+  }
+
+  render () {
     let findBarStyle = {}
     let findBarTextStyle = {}
 
-    if (backgroundColor) {
+    if (this.props.backgroundColor) {
       findBarStyle = {
-        background: backgroundColor,
+        background: this.props.backgroundColor,
         color: this.textColor
       }
       findBarTextStyle = {
@@ -227,42 +238,55 @@ class FindBar extends ImmutableComponent {
       <div className='searchContainer'>
         <div className='searchStringContainer'>
           <span className='searchStringContainerIcon fa fa-search' />
-          <input type='text'
+          <input
+            ref={(node) => { this.searchInput = node }}
+            type='text'
             spellCheck='false'
             onContextMenu={this.onContextMenu}
-            ref={(node) => { this.searchInput = node }}
             onFocus={this.onInputFocus}
             onKeyDown={this.onKeyDown}
-            onInput={this.onInput} />
-          <span className='searchStringContainerIcon fa fa-times findClear'
-            onClick={this.onClear} />
+            onInput={this.onInput}
+          />
+          <span
+            className='searchStringContainerIcon fa fa-times findClear'
+            onClick={this.onClear}
+          />
         </div>
-        <span className='findMatchText'>{findMatchText}</span>
-        <BrowserButton iconOnly
+        <span className='findMatchText'>{this.findTextMatch}</span>
+        <BrowserButton
+          iconOnly
           iconClass={globalStyles.appIcons.findPrev}
           inlineStyles={findBarStyle}
           testId='findBarPrevButton'
-          disabled={this.numberOfMatches <= 0}
+          disabled={this.props.numberOfMatches <= 0}
           onClick={this.onFindPrev}
         />
-        <BrowserButton iconOnly
+        <BrowserButton
+          iconOnly
           iconClass={globalStyles.appIcons.findNext}
           inlineStyles={findBarStyle}
           testId='findBarNextButton'
-          disabled={this.numberOfMatches <= 0}
+          disabled={this.props.numberOfMatches <= 0}
           onClick={this.onFindNext}
         />
         <SwitchControl
           id='caseSensitivityCheckbox'
-          checkedOn={this.isCaseSensitive}
-          onClick={this.onCaseSensitivityChange} />
-        <label htmlFor='caseSensitivityCheckbox' data-l10n-id='caseSensitivity' style={findBarTextStyle} />
+          checkedOn={this.props.isCaseSensitive}
+          onClick={this.onCaseSensitivityChange}
+        />
+        <label
+          htmlFor='caseSensitivityCheckbox'
+          data-l10n-id='caseSensitivity'
+          style={findBarTextStyle}
+        />
       </div>
-      <span className='closeButton'
+      <span
+        className='closeButton'
         style={findBarTextStyle}
-        onClick={this.props.onFindHide}>+</span>
+        onClick={this.onFindHide}
+      >+</span>
     </div>
   }
 }
 
-module.exports = FindBar
+module.exports = ReduxComponent.connect(FindBar)

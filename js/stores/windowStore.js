@@ -298,7 +298,7 @@ const doAction = (action) => {
       })
       break
     case windowConstants.WINDOW_SET_FINDBAR_SELECTED:
-      windowState = windowState.mergeIn(['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key'))], {
+      windowState = windowState.mergeIn(['frames', frameStateUtil.getFrameIndex(windowState, action.frameKey)], {
         findbarSelected: action.selected
       })
       break

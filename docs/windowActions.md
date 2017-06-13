@@ -98,15 +98,15 @@ Shows/hides the find-in-page bar.
 
 
 
-### setFindbarSelected(frameProps, selected) 
+### setFindbarSelected(frameKey, selected) 
 
-Highlight text in the findbar
+Highlight text in the find bar
 
 **Parameters**
 
-**frameProps**: `Object`, The frame properties to modify
+**frameKey**: `Object`, The frame key to modify
 
-**selected**: `boolean`, Whether to select the findbar search text
+**selected**: `boolean`, Whether to select the find bar search text
 
 
 
