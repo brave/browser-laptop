@@ -630,6 +630,13 @@ const tabState = {
     return entry ? entry.get('url') : ''
   },
 
+  getVisibleOrigin: (state, tabId) => {
+    const entry = tabState.getVisibleEntry(state, tabId)
+    const origin = entry ? entry.get('origin') : ''
+    // TODO(bridiver) - all origins in browser-laptop should be changed to have a trailing slash to match chromium
+    return (origin || '').replace(/\/$/, '')
+  },
+
   getVisibleVirtualURL: (state, tabId) => {
     const entry = tabState.getVisibleEntry(state, tabId)
     return entry ? entry.get('virtualURL') : ''
