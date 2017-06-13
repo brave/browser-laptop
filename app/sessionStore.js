@@ -296,6 +296,10 @@ module.exports.cleanAppData = (data, isShutdown) => {
   if (data.dragData) {
     delete data.dragData
   }
+  if (data.sync) {
+    // clear sync site cache
+    data.sync.objectsById = {}
+  }
   const clearSiteSettings = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_SITE_SETTINGS) === true
   if (clearSiteSettings) {
     data.siteSettings = {}
