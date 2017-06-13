@@ -57,6 +57,25 @@ describe('UrlBarIcon component unit tests', function () {
     windowActions.setSiteInfoVisible.restore()
   })
 
+  describe('when user is searching', function () {
+    const props2 = Object.assign({}, props)
+
+    before(function () {
+      props2.isSearching = true
+      props2.titleMode = false
+    })
+
+    it('does not show site information when clicked', function () {
+      const spy = sinon.spy(windowActions, 'setSiteInfoVisible')
+      const wrapper = mount(
+        <UrlBarIcon {...props2} />
+      )
+      wrapper.find('[data-test-id="urlBarIcon"]').simulate('click')
+      assert.equal(spy.notCalled, true)
+      windowActions.setSiteInfoVisible.restore()
+    })
+  })
+
   describe('when active tab is showing a message box', function () {
     const props2 = Object.assign({}, props)
 

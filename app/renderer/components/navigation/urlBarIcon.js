@@ -84,7 +84,7 @@ class UrlBarIcon extends ImmutableComponent {
     }
   }
   onClick () {
-    if (isSourceAboutUrl(this.props.location)) {
+    if (isSourceAboutUrl(this.props.location) || this.isSearch) {
       return
     }
     windowActions.setSiteInfoVisible(true)
