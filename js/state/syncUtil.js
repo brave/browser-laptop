@@ -481,7 +481,10 @@ module.exports.createSiteData = (site, appState) => {
   const immutableSite = Immutable.fromJS(site)
   const siteKey = siteUtil.getSiteKey(immutableSite) || siteUtil.getSiteKey(Immutable.fromJS(siteData))
   if (siteKey === null) {
-    throw new Error('Sync could not create siteKey')
+    // May happen if this is called before the appStore object has its location
+    // field populated
+    console.log(`Ignoring entry because we can't create site key: ${JSON.stringify(site)}`)
+    return
   }
   if (module.exports.isSyncable('bookmark', immutableSite)) {
     const objectId = site.objectId || module.exports.newObjectId(['sites', siteKey])
