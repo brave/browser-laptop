@@ -4,6 +4,7 @@
 
 'use strict'
 
+const appConfig = require('../../../js/constants/appConfig')
 const appConstants = require('../../../js/constants/appConstants')
 const tabs = require('../tabs')
 const windows = require('../windows')
@@ -12,6 +13,8 @@ const {BrowserWindow} = require('electron')
 const tabState = require('../../common/state/tabState')
 const windowState = require('../../common/state/windowState')
 const tabActions = require('../../common/actions/tabActions')
+const siteSettings = require('../../../js/state/siteSettings')
+const siteSettingsState = require('../../common/state/siteSettingsState')
 const windowConstants = require('../../../js/constants/windowConstants')
 const windowActions = require('../../../js/actions/windowActions')
 const {makeImmutable} = require('../../common/state/immutableUtil')
@@ -75,13 +78,37 @@ const updateActiveTab = (state, closeTabId) => {
   }
 }
 
+const WEBRTC_DEFAULT = 'default'
+const WEBRTC_DISABLE_NON_PROXY = 'disable_non_proxied_udp'
+
+const getWebRTCPolicy = (state, tabId) => {
+  const tabValue = tabState.getByTabId(state, tabId)
+  if (tabValue == null) {
+    return WEBRTC_DEFAULT
+  }
+  const allSiteSettings = siteSettingsState.getAllSiteSettings(state, tabValue.get('incognito') === true)
+  const tabSiteSettings =
+    siteSettings.getSiteSettingsForURL(allSiteSettings, tabValue.get('url'))
+  const activeSiteSettings = siteSettings.activeSettings(tabSiteSettings, state, appConfig)
+
+  if (!activeSiteSettings || activeSiteSettings.fingerprintingProtection !== true) {
+    return WEBRTC_DEFAULT
+  } else {
+    return WEBRTC_DISABLE_NON_PROXY
+  }
+}
+
 const tabsReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
     case tabActions.didStartNavigation.name:
     case tabActions.didFinishNavigation.name:
       {
-        state = tabState.setNavigationState(state, action.get('tabId'), action.get('navigationState'))
+        const tabId = action.get('tabId')
+        state = tabState.setNavigationState(state, tabId, action.get('navigationState'))
+        setImmediate(() => {
+          tabs.setWebRTCIPHandlingPolicy(tabId, getWebRTCPolicy(state, tabId))
+        })
         break
       }
     case tabActions.reload.name:

@@ -772,6 +772,13 @@ const api = {
     }
   },
 
+  setWebRTCIPHandlingPolicy: (tabId, policy) => {
+    const tab = getWebContents(tabId)
+    if (tab && !tab.isDestroyed()) {
+      tab.setWebRTCIPHandlingPolicy(policy)
+    }
+  },
+
   goBack: (tabId) => {
     const tab = getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
