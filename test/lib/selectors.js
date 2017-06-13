@@ -127,5 +127,6 @@ module.exports = {
   downloadDeleteConfirm: '[data-test-id="confirmDeleteButton"]',
   downloadRemoveFromList: '[data-test-id="downloadRemoveFromList"]',
 
-  siteInfoDialog: '[data-test-id="siteInfoDialog"]'
+  siteInfoDialog: '[data-test-id="siteInfoDialog"]',
+  viewCertificateButton: '[data-test-id="viewCertificate"]'
 }

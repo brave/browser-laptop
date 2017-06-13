@@ -67,6 +67,7 @@ const cx = require('../../../../js/lib/classSet')
 const eventUtil = require('../../../../js/lib/eventUtil')
 const siteSettings = require('../../../../js/state/siteSettings')
 const debounce = require('../../../../js/lib/debounce')
+const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
 const {getCurrentWindowId, isMaximized, isFocused, isFullScreen} = require('../../currentWindow')
 const {isDarwin, isWindows} = require('../../../common/lib/platformUtil')
 
@@ -687,7 +688,7 @@ class Main extends ImmutableComponent {
     const btbMode = getSetting(settings.BOOKMARKS_TOOLBAR_MODE)
     const showFavicon = (btbMode === bookmarksToolbarMode.TEXT_AND_FAVICONS || btbMode === bookmarksToolbarMode.FAVICONS_ONLY)
     const showOnlyFavicon = btbMode === bookmarksToolbarMode.FAVICONS_ONLY
-    const siteInfoIsVisible = this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
+    const siteInfoIsVisible = this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible']) && !isSourceAboutUrl(activeFrame.get('location'))
     const braveryPanelIsVisible = shieldState.braveShieldsEnabled(activeFrame) &&
       this.props.windowState.get('braveryPanelDetail')
     const clearBrowsingDataPanelIsVisible = this.props.windowState.getIn(['ui', 'isClearBrowsingDataPanelVisible'])
@@ -737,8 +738,7 @@ class Main extends ImmutableComponent {
         <Navigator />
         {
           siteInfoIsVisible
-          ? <SiteInfo frameProps={activeFrame}
-            onHide={this.onHideSiteInfo} />
+          ? <SiteInfo />
           : null
         }
         {
