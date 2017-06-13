@@ -170,11 +170,17 @@ class Tab extends React.Component {
   }
 
   onClickTab (e) {
-    if (e.button === 1) {
-      this.onTabClosedWithMouse(e)
-    } else {
-      e.stopPropagation()
-      appActions.tabActivateRequested(this.props.tabId)
+    switch (e.button) {
+      case 2:
+        // Ignore right click
+        return
+      case 1:
+        // Close tab with middle click
+        this.onTabClosedWithMouse(e)
+        break
+      default:
+        e.stopPropagation()
+        appActions.tabActivateRequested(this.props.tabId)
     }
   }
 
