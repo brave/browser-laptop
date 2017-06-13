@@ -76,6 +76,7 @@ const privacy = require('../js/state/privacy')
 const async = require('async')
 const settings = require('../js/constants/settings')
 const BookmarksExporter = require('./browser/bookmarksExporter')
+const siteUtil = require('../js/state/siteUtil')
 
 app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferHtmlOverPlugins')
 
@@ -329,7 +330,10 @@ app.on('ready', () => {
     // For tests we always want to load default app state
     const loadedPerWindowState = initialState.perWindowState
     delete initialState.perWindowState
-    appActions.setState(Immutable.fromJS(initialState))
+    // Retore map order after load
+    let state = Immutable.fromJS(initialState)
+    state = state.set('sites', state.get('sites').sort(siteUtil.siteSort))
+    appActions.setState(state)
     setImmediate(() => perWindowStateLoaded(loadedPerWindowState))
   })
 
