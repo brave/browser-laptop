@@ -19,7 +19,6 @@ const settings = require('../../js/constants/settings')
 const {getBaseUrl, aboutUrls} = require('../../js/lib/appUrlUtil')
 const siteSettings = require('../../js/state/siteSettings')
 const messages = require('../../js/constants/messages')
-const siteUtil = require('../../js/state/siteUtil')
 const aboutHistoryState = require('../common/state/aboutHistoryState')
 const appStore = require('../../js/stores/appStore')
 const appConfig = require('../../js/constants/appConfig')
@@ -137,8 +136,8 @@ ipcMain.on(messages.ABOUT_COMPONENT_INITIALIZED, (e) => {
 })
 
 const getBookmarksData = function (state) {
-  let bookmarkSites = new Immutable.Map()
-  let bookmarkFolderSites = new Immutable.Map()
+  let bookmarkSites = new Immutable.OrderedMap()
+  let bookmarkFolderSites = new Immutable.OrderedMap()
   state.get('sites').forEach((site, siteKey) => {
     const tags = site.get('tags')
     if (tags.includes(siteTags.BOOKMARK)) {
@@ -148,8 +147,8 @@ const getBookmarksData = function (state) {
       bookmarkFolderSites = bookmarkFolderSites.set(siteKey, site)
     }
   })
-  const bookmarks = bookmarkSites.toList().sort(siteUtil.siteSort).toJS()
-  const bookmarkFolders = bookmarkFolderSites.toList().sort(siteUtil.siteSort).toJS()
+  const bookmarks = bookmarkSites.toList().toJS()
+  const bookmarkFolders = bookmarkFolderSites.toList().toJS()
   return {bookmarks, bookmarkFolders}
 }
 
