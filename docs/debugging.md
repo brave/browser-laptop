@@ -13,9 +13,28 @@ Calls to `console.log` and related functions go into the dev tools console menti
 
 If you're running `npm run watch`, then webpack dev server will ensure that changes to source code will reload the app.
 
-## Debugging the browser process in JS
+## Debugging and profiling the browser process with the Chromium developer tools
 
-The browser process can be debugged with remote developer tools.
+The browser process can be debugged and profiled with remote developer tools via Node Inspector.
+
+Simply pass the `--inspect` command line argument to the start script to enable node inspector.
+
+`npm run start -- --inspect`
+
+You can also break on startup with:
+
+`npm run start -- --inspect --debug-brk`
+
+On startup you'll see a message like this:
+
+> To start debugging, open the following URL in Chrome:
+>     chrome-devtools://devtools/bundled/inspector.html?experiments=true&v8only=true&ws=127.0.0.1:9229/1cfd06a0-c36a-4d98-85ad-d357ca6bebc6
+
+Simply start up Chrome and load that URL to see the developer tools that you're familiar with.
+
+If your console or terminal has trouble copying text for the URL, you can also simply load `chrome://inspect` and click the link you see which brings you to the same place.
+
+## Debugging the browser process with VS Code
 
 One easy way to start debugging the browser process to `Attach` to, or `Launch` the process using [Visual Studio Code](https://code.visualstudio.com/) which works for macOS, Windows, and Linux.
 Project configurations are already inside the subdirectory `.vscode`, and have been tested with macOS.  It may need tweaking for other platforms.
