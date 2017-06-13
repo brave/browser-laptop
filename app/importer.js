@@ -69,9 +69,6 @@ importer.on('update-supported-browsers', (e, detail) => {
   }
 })
 
-importer.on('add-password-form', (e, detail) => {
-})
-
 importer.on('add-history-page', (e, history, visitSource) => {
   let sites = []
   for (let i = 0; i < history.length; ++i) {

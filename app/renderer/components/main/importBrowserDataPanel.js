@@ -33,6 +33,7 @@ class ImportBrowserDataPanel extends React.Component {
     this.onToggleHistory = this.onToggleSetting.bind(this, 'history')
     this.onToggleFavorites = this.onToggleSetting.bind(this, 'favorites')
     this.onToggleCookies = this.onToggleSetting.bind(this, 'cookies')
+    this.onTogglePasswords = this.onToggleSetting.bind(this, 'passwords')
     this.onImport = this.onImport.bind(this)
     this.onChange = this.onChange.bind(this)
   }
@@ -50,6 +51,7 @@ class ImportBrowserDataPanel extends React.Component {
     data.favorites = this.props.favorites
     data.history = this.props.history
     data.type = this.props.type
+    data.passwords = this.props.passwords
 
     appActions.importBrowserData(Immutable.fromJS(data))
     this.onHide()
@@ -83,11 +85,13 @@ class ImportBrowserDataPanel extends React.Component {
     props.isSupportingHistory = currentSelectedBrowser.get('history', false)
     props.isSupportingFavorites = currentSelectedBrowser.get('favorites', false)
     props.isSupportingCookies = currentSelectedBrowser.get('cookies', false)
+    props.isSupportingPasswords = currentSelectedBrowser.get('passwords', false)
     props.currentIndex = index
     props.cookies = importBrowserDataSelected.get('cookies')
     props.favorites = importBrowserDataSelected.get('favorites')
     props.history = importBrowserDataSelected.get('history')
     props.type = importBrowserDataSelected.get('type')
+    props.passwords = importBrowserDataSelected.get('passwords')
 
     // used in other functions
     props.selectedIndex = importBrowserDataSelected.get('index')
@@ -132,6 +136,13 @@ class ImportBrowserDataPanel extends React.Component {
             onClick={this.onToggleCookies}
             disabled={!this.props.isSupportingCookies}
           />
+          <SwitchControl
+            rightl10nId='savedPasswords'
+            checkedOn={this.props.passwords}
+            onClick={this.onTogglePasswords}
+            disabled={!this.props.isSupportingPasswords}
+          />
+
         </CommonFormSection>
         <CommonFormSection>
           <div data-l10n-id='importDataCloseBrowserWarning' />
