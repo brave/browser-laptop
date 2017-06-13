@@ -27,7 +27,7 @@ const menuUtil = require('../common/lib/menuUtil')
 const {getByTabId} = require('../common/state/tabState')
 const getSetting = require('../../js/settings').getSetting
 const locale = require('../locale')
-const {isLocationBookmarked, siteSort} = require('../../js/state/siteUtil')
+const {isLocationBookmarked} = require('../../js/state/siteUtil')
 const tabState = require('../../app/common/state/tabState')
 const isDarwin = process.platform === 'darwin'
 const isLinux = process.platform === 'linux'
@@ -393,7 +393,7 @@ const createBookmarksSubmenu = () => {
     CommonMenu.exportBookmarksMenuItem()
   ]
 
-  const bookmarks = menuUtil.createBookmarkTemplateItems(appStore.getState().get('sites').toList().sort(siteSort))
+  const bookmarks = menuUtil.createBookmarkTemplateItems(appStore.getState().get('sites'))
   if (bookmarks.length > 0) {
     submenu.push(CommonMenu.separatorMenuItem)
     submenu = submenu.concat(bookmarks)
