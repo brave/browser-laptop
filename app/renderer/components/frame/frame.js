@@ -402,7 +402,7 @@ class Frame extends React.Component {
       'https://www.primevideo.com',
       'https://www.spotify.com',
       'https://shaka-player-demo.appspot.com']
-    const isForWidevineTest = process.env.NODE_ENV === 'test' && location.endsWith('/drm.html')
+    const isForWidevineTest = config.env === 'test' && location.endsWith('/drm.html')
     if (!isForWidevineTest && (!origin || !widevineSites.includes(origin))) {
       noWidevineCallback()
       return

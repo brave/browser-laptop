@@ -27,6 +27,7 @@ const windowStore = require('./stores/windowStore')
 const appStoreRenderer = require('./stores/appStoreRenderer')
 const windowActions = require('./actions/windowActions')
 const messages = require('./constants/messages')
+const config = require('./constants/config')
 const Immutable = require('immutable')
 const patch = require('immutablepatch')
 const l10n = require('./l10n')
@@ -40,7 +41,7 @@ ipc.on(messages.REQUEST_WINDOW_STATE, (evt, requestId) => {
   ipc.send(messages.RESPONSE_WINDOW_STATE, windowStore.getState().toJS(), requestId)
 })
 
-if (process.env.NODE_ENV === 'test') {
+if (config.env === 'test') {
   electron.testData = {
     appStoreRenderer,
     windowActions,

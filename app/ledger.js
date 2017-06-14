@@ -57,6 +57,7 @@ const appActions = require('../js/actions/appActions')
 const appConfig = require('../js/constants/appConfig')
 const appConstants = require('../js/constants/appConstants')
 const appDispatcher = require('../js/dispatcher/appDispatcher')
+const config = require('../js/constants/config')
 const messages = require('../js/constants/messages')
 const settings = require('../js/constants/settings')
 const request = require('../js/lib/request')
@@ -797,7 +798,7 @@ var enable = (paymentsEnabled) => {
       }
       if (value > 0) synopsis.options.minPublisherVisits = value
 
-      if (process.env.NODE_ENV === 'test') {
+      if (config.env === 'test') {
         synopsis.options.minPublisherDuration = 0
         synopsis.options.minPublisherVisits = 0
       } else {
@@ -1034,7 +1035,7 @@ var stickyP = (publisher) => {
 }
 
 var eligibleP = (publisher) => {
-  if (!synopsis.options.minPublisherDuration && process.env.NODE_ENV !== 'test') {
+  if (!synopsis.options.minPublisherDuration && config.env !== 'test') {
     synopsis.options.minPublisherDuration = getSetting(settings.MINIMUM_VISIT_TIME)
   }
 
@@ -1408,7 +1409,7 @@ var excludeP = (publisher, callback) => {
 var verifiedP = (publisher, callback) => {
   inspectP(v2PublishersDB, v2PublishersPath, publisher, 'verified', null, callback)
 
-  if (process.env.NODE_ENV === 'test') {
+  if (config.env === 'test') {
     testVerifiedPublishers.forEach((publisher) => {
       if (synopsis.publishers[publisher]) {
         if (!synopsis.publishers[publisher].options) {

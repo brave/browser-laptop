@@ -5,6 +5,7 @@
 'use strict'
 
 const request = require('../js/lib/request')
+const config = require('../js/constants/config')
 const fs = require('fs')
 const path = require('path')
 const urlParse = require('./common/urlParse')
@@ -86,7 +87,7 @@ module.exports.init = (resourceName, version, startExtension, onInitDone, forceD
 
   let versionFolder = version
   const hasStagedDatFile = [appConfig.resourceNames.ADBLOCK, appConfig.resourceNames.SAFE_BROWSING].includes(resourceName)
-  if (process.env.NODE_ENV === 'development' && hasStagedDatFile) {
+  if (config.env === 'development' && hasStagedDatFile) {
     versionFolder = `test/${versionFolder}`
   }
   const url = appConfig[resourceName].url.replace('{version}', versionFolder)

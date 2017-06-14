@@ -14,6 +14,7 @@ const appActions = require('../../../../js/actions/appActions')
 const windowActions = require('../../../../js/actions/windowActions')
 
 // Constants
+const config = require('../../../../js/constants/config')
 const UpdateStatus = require('../../../../js/constants/updateStatus')
 
 // Utils
@@ -26,7 +27,7 @@ class UpdateHello extends ImmutableComponent {
   onSpinnerClick () {
     // To make testing of updates easier in dev mode,
     // clicking on the spinner toggles the UI
-    if (process.env.NODE_ENV === 'development') {
+    if (config.env === 'development') {
       let nextStatus = UpdateStatus.UPDATE_NONE
       switch (this.props.updateStatus) {
         case UpdateStatus.UPDATE_CHECKING:

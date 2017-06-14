@@ -29,6 +29,7 @@ const buildDir = 'Brave-' + process.platform + '-' + arch
 
 var env = {
   NODE_ENV: 'production',
+  BRAVE_ENV: 'production',
   CHANNEL: process.env.CHANNEL
 }
 

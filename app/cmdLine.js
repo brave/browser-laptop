@@ -7,6 +7,7 @@
 const Immutable = require('immutable')
 const electron = require('electron')
 const app = electron.app
+const config = require('../js/constants/config')
 const messages = require('../js/constants/messages')
 const BrowserWindow = electron.BrowserWindow
 const appActions = require('../js/actions/appActions')
@@ -79,7 +80,7 @@ const getUrlFromCommandLine = (argv) => {
 }
 
 app.on('ready', () => {
-  if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
+  if (config.env !== 'development' && config.env !== 'test') {
     const appAlreadyStartedShouldQuit = app.makeSingleInstance((argv, workingDirectory) => {
       // Someone tried to run a second instance, we should focus our window.
       if (isDarwin) {

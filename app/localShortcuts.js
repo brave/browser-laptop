@@ -7,6 +7,7 @@ const BrowserWindow = electron.BrowserWindow
 const electronLocalshortcut = require('electron-localshortcut')
 const messages = require('../js/constants/messages')
 const appActions = require('../js/actions/appActions')
+const config = require('../js/constants/config')
 const isDarwin = process.platform === 'darwin'
 
 module.exports.register = (win) => {
@@ -46,7 +47,7 @@ module.exports.register = (win) => {
       ['Cmd+Alt+U', messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE]
     )
 
-    if (process.env.NODE_ENV !== 'development') {
+    if (config.env !== 'development') {
       // We're in Darwin and release or test mode...
       // We disable for development mode because Browser level dev tools copy doesn't work.
       // Workaround for #1060

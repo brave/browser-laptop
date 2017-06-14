@@ -11,6 +11,7 @@ const appActions = require('../../js/actions/appActions')
 const appConstants = require('../../js/constants/appConstants')
 const appDispatcher = require('../../js/dispatcher/appDispatcher')
 const appStore = require('../../js/stores/appStore')
+const config = require('../../js/constants/config')
 const windowConstants = require('../../js/constants/windowConstants')
 const Menu = electron.Menu
 const CommonMenu = require('../common/commonMenu')
@@ -548,7 +549,7 @@ const createMenu = () => {
     { label: locale.translation('help'), submenu: createHelpSubmenu(), role: 'help' }
   ]
 
-  if (process.env.NODE_ENV === 'development') {
+  if (config.env === 'development') {
     template.push({ label: 'Debug', submenu: createDebugSubmenu() })
   }
 
