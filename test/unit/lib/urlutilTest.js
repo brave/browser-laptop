@@ -318,4 +318,21 @@ describe('urlutil', function () {
       })
     })
   })
+
+  describe('getDisplayHost', function () {
+    it('url is http', function () {
+      const result = UrlUtil.getDisplayHost('http://brave.com')
+      assert.equal(result, 'brave.com')
+    })
+
+    it('url is https', function () {
+      const result = UrlUtil.getDisplayHost('https://brave.com')
+      assert.equal(result, 'brave.com')
+    })
+
+    it('url is file', function () {
+      const result = UrlUtil.getDisplayHost('file://brave.text')
+      assert.equal(result, 'file://brave.text')
+    })
+  })
 })
