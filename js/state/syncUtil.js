@@ -429,6 +429,10 @@ module.exports.newObjectId = (objectPath) => {
  */
 const findOrCreateFolderObjectId = (folderId, appState) => {
   if (typeof folderId !== 'number') { return undefined }
+  if (!appState) {
+    const AppStore = require('../stores/appStore')
+    appState = AppStore.getState()
+  }
   const folder = appState.getIn(['sites', folderId.toString()])
   if (!folder) { return undefined }
   const objectId = folder.get('objectId')
