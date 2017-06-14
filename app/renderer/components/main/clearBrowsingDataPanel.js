@@ -7,6 +7,7 @@ const Immutable = require('immutable')
 const ipc = require('electron').ipcRenderer
 
 // Components
+const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../common/dialog')
 const Button = require('../common/button')
 const SwitchControl = require('../common/switchControl')
@@ -20,6 +21,7 @@ const {
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
+const windowActions = require('../../../../js/actions/windowActions')
 
 // Constants
 const messages = require('../../../../js/constants/messages')
@@ -36,71 +38,100 @@ class ClearBrowsingDataPanel extends React.Component {
     this.onToggleAutofillData = this.onToggleSetting.bind(this, 'autofillData')
     this.onToggleSavedSiteSettings = this.onToggleSetting.bind(this, 'savedSiteSettings')
     this.onClear = this.onClear.bind(this)
-    this.state = {
-      clearBrowsingDataDetail: props.clearBrowsingDataDefaults ? props.clearBrowsingDataDefaults : Immutable.Map()
-    }
+    this.onCancel = this.onCancel.bind(this)
   }
-  onToggleSetting (setting) {
-    this.setState(({clearBrowsingDataDetail}) => ({
-      clearBrowsingDataDetail: clearBrowsingDataDetail.update(setting, isChecked => !isChecked)
-    }))
+
+  onToggleSetting (setting, e) {
+    appActions.onToggleBrowsingData(setting, e.target.value)
   }
+
   onClear () {
-    appActions.onClearBrowsingData(this.state.clearBrowsingDataDetail)
-    this.props.onHide()
-    let detail = this.state.clearBrowsingDataDetail
-    if (detail.get('allSiteCookies') && detail.get('browserHistory') &&
-        detail.get('cachedImagesAndFiles')) {
+    appActions.onClearBrowsingData()
+    this.onHide()
+
+    if (
+      this.props.allSiteCookies &&
+      this.props.browserHistory &&
+      this.props.cachedImagesAndFiles
+    ) {
       ipc.send(messages.PREFS_RESTART)
     }
   }
+
+  onCancel () {
+    appActions.onCancelBrowsingData()
+    this.onHide()
+  }
+
+  onHide () {
+    windowActions.setClearBrowsingDataPanelVisible(false)
+  }
+
+  mergeProps (state, ownProps) {
+    const tempData = state.get('tempClearBrowsingData', Immutable.Map())
+    const data = state.get('clearBrowsingDataDefaults', Immutable.Map()).merge(tempData)
+
+    const props = {}
+    props.allSiteCookies = data.get('allSiteCookies')
+    props.browserHistory = data.get('browserHistory')
+    props.downloadHistory = data.get('downloadHistory')
+    props.cachedImagesAndFiles = data.get('cachedImagesAndFiles')
+    props.savedPasswords = data.get('savedPasswords')
+    props.allSiteCookies = data.get('allSiteCookies')
+    props.autocompleteData = data.get('autocompleteData')
+    props.autofillData = data.get('autofillData')
+    props.savedSiteSettings = data.get('savedSiteSettings')
+
+    return props
+  }
+
   render () {
-    return <Dialog onHide={this.props.onHide} testId='clearBrowsingDataPanel' isClickDismiss>
+    return <Dialog onHide={this.onHide} testId='clearBrowsingDataPanel' isClickDismiss>
       <CommonFormSmall onClick={(e) => e.stopPropagation()}>
         <CommonFormTitle data-l10n-id='clearBrowsingData' />
         <CommonFormSection>
           <SwitchControl
             rightl10nId='browserHistory'
             testId='browserHistorySwitch'
-            checkedOn={this.state.clearBrowsingDataDetail.get('browserHistory')}
+            checkedOn={this.props.browserHistory}
             onClick={this.onToggleBrowserHistory} />
           <SwitchControl
             rightl10nId='downloadHistory'
-            checkedOn={this.state.clearBrowsingDataDetail.get('downloadHistory')}
+            checkedOn={this.props.downloadHistory}
             onClick={this.onToggleDownloadHistory} />
           <SwitchControl
             rightl10nId='cachedImagesAndFiles'
-            checkedOn={this.state.clearBrowsingDataDetail.get('cachedImagesAndFiles')}
+            checkedOn={this.props.cachedImagesAndFiles}
             onClick={this.onToggleCachedImagesAndFiles} />
           <SwitchControl
             rightl10nId='savedPasswords'
-            checkedOn={this.state.clearBrowsingDataDetail.get('savedPasswords')}
+            checkedOn={this.props.savedPasswords}
             onClick={this.onToggleSavedPasswords} />
           <SwitchControl
             rightl10nId='allSiteCookies'
-            checkedOn={this.state.clearBrowsingDataDetail.get('allSiteCookies')}
+            checkedOn={this.props.allSiteCookies}
             onClick={this.onToggleAllSiteCookies} />
           <SwitchControl
             rightl10nId='autocompleteData'
             testId='autocompleteDataSwitch'
-            checkedOn={this.state.clearBrowsingDataDetail.get('autocompleteData')}
+            checkedOn={this.props.autocompleteData}
             onClick={this.onToggleAutocompleteData} />
           <SwitchControl
             rightl10nId='autofillData'
             testId='autofillDataSwitch'
-            checkedOn={this.state.clearBrowsingDataDetail.get('autofillData')}
+            checkedOn={this.props.autofillData}
             onClick={this.onToggleAutofillData} />
           <SwitchControl
             rightl10nId='savedSiteSettings'
             testId='siteSettingsSwitch'
-            checkedOn={this.state.clearBrowsingDataDetail.get('savedSiteSettings')}
+            checkedOn={this.props.savedSiteSettings}
             onClick={this.onToggleSavedSiteSettings} />
         </CommonFormSection>
         <CommonFormButtonWrapper>
           <Button className='whiteButton'
             l10nId='cancel'
             testId='cancelButton'
-            onClick={this.props.onHide}
+            onClick={this.onCancel}
           />
           <Button className='primaryButton'
             l10nId='clear'
@@ -116,4 +147,4 @@ class ClearBrowsingDataPanel extends React.Component {
   }
 }
 
-module.exports = ClearBrowsingDataPanel
+module.exports = ReduxComponent.connect(ClearBrowsingDataPanel)

@@ -587,12 +587,10 @@ const appActions = {
 
   /**
    * Clears the data specified in clearDataDetail
-   * @param {object} clearDataDetail - the app data to clear as per doc/state.md's clearBrowsingDataDefaults
    */
-  onClearBrowsingData: function (clearDataDetail) {
+  onClearBrowsingData: function () {
     dispatch({
-      actionType: appConstants.APP_ON_CLEAR_BROWSING_DATA,
-      clearDataDetail
+      actionType: appConstants.APP_ON_CLEAR_BROWSING_DATA
     })
   },
 
@@ -1425,6 +1423,26 @@ const appActions = {
   updateLogOpened: function (searchDetail) {
     dispatch({
       actionType: appConstants.APP_UPDATE_LOG_OPENED
+    })
+  },
+
+  /**
+   * Save temp setting for clear browsing data
+   */
+  onToggleBrowsingData: function (property, newValue) {
+    dispatch({
+      actionType: appConstants.APP_ON_TOGGLE_BROWSING_DATA,
+      property,
+      newValue
+    })
+  },
+
+  /**
+   * Clear temp setting for clear browsing data
+   */
+  onCancelBrowsingData: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_CANCEL_BROWSING_DATA
     })
   }
 }

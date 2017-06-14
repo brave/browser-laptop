@@ -42,7 +42,7 @@ const sitesReducer = (state, action, immutableAction) => {
       state = siteCache.loadLocationSiteKeysCache(state)
       break
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
-      if (immutableAction.getIn(['clearDataDetail', 'browserHistory'])) {
+      if (state.getIn(['clearBrowsingDataDefaults', 'browserHistory'])) {
         state = state.set('sites', siteUtil.clearHistory(state.get('sites')))
         filtering.clearHistory()
       }

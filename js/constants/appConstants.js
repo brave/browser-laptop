@@ -132,7 +132,9 @@ const appConstants = {
   APP_REMOVE_PASSWORD_SITE: _, /** @param {Object} passwordDetail */
   APP_CLEAR_PASSWORDS: _,
   APP_UPDATE_LOG_OPENED: _,
-  APP_URL_BAR_SELECTED_INDEX_CHANGED: _
+  APP_URL_BAR_SELECTED_INDEX_CHANGED: _,
+  APP_ON_TOGGLE_BROWSING_DATA: _,
+  APP_ON_CANCEL_BROWSING_DATA: _
 }
 
 module.exports = mapValuesByKeys(appConstants)
