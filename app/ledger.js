@@ -490,8 +490,16 @@ if (ipc) {
     boot()
   })
 
-  ipc.on(messages.LEDGER_PAYMENTS_PRESENT, (event, presentP) => {
+  let ledgerPaymentsPresent = {}
+  // TODO(bridiver) - convert this to an action
+  process.on(messages.LEDGER_PAYMENTS_PRESENT, (tabId, presentP) => {
     if (presentP) {
+      ledgerPaymentsPresent[tabId] = presentP
+    } else {
+      delete ledgerPaymentsPresent[tabId]
+    }
+
+    if (Object.keys(ledgerPaymentsPresent).length > 0 && getSetting(settings.PAYMENTS_ENABLED)) {
       if (!balanceTimeoutId) getBalance()
     } else if (balanceTimeoutId) {
       clearTimeout(balanceTimeoutId)
