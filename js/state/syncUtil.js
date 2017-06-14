@@ -65,7 +65,13 @@ const deviceIdString = (deviceId) => {
 module.exports.deviceIdString = deviceIdString
 
 // Cache of bookmark folder object IDs mapped to folder IDs
-let folderIdMap = new Immutable.Map()
+// Used when receiving folder records
+let objectToFolderMap = new Immutable.Map()
+// Cache of folder IDs mapped to object IDs to prevent double-assigning object IDs to
+// folders due to delay in appState propagation. See
+// https://github.com/brave/browser-laptop/issues/8892#issuecomment-307954974
+// Used when sending folder records
+const folderToObjectMap = {}
 
 /**
  * Converts sync records into a form that can be consumed by AppStore.
@@ -373,8 +379,8 @@ const getObjectById = (objectId, category, appState) => {
  * @returns {number|undefined}
  */
 const getFolderIdByObjectId = (objectId, appState, records) => {
-  if (folderIdMap.has(objectId)) {
-    return folderIdMap.get(objectId)
+  if (objectToFolderMap.has(objectId)) {
+    return objectToFolderMap.get(objectId)
   }
   let folderId
   const entry = getObjectById(objectId, 'BOOKMARKS', appState)
@@ -391,7 +397,7 @@ const getFolderIdByObjectId = (objectId, appState, records) => {
     }
   }
   if (folderId) {
-    folderIdMap = folderIdMap.set(objectId, folderId)
+    objectToFolderMap = objectToFolderMap.set(objectId, folderId)
   }
   return folderId
 }
@@ -444,10 +450,6 @@ module.exports.newObjectId = (objectPath) => {
  */
 const findOrCreateFolderObjectId = (folderId, appState) => {
   if (typeof folderId !== 'number' || folderId < 0) { return undefined }
-  if (!appState) {
-    const AppStore = require('../stores/appStore')
-    appState = AppStore.getState()
-  }
   const folder = appState.getIn(['sites', folderId.toString()])
   if (!folder) { return undefined }
   const objectId = folder.get('objectId')
@@ -483,25 +485,40 @@ module.exports.createSiteData = (site, appState) => {
   if (siteKey === null) {
     throw new Error('Sync could not create siteKey')
   }
+  let name
+  let objectId
+  let parentFolderObjectId
+  let value
   if (module.exports.isSyncable('bookmark', immutableSite)) {
-    const objectId = site.objectId || module.exports.newObjectId(['sites', siteKey])
-    const parentFolderObjectId = site.parentFolderObjectId ||
-      (site.parentFolderId && findOrCreateFolderObjectId(site.parentFolderId, appState))
-    return {
-      name: 'bookmark',
-      objectId,
-      value: {
-        site: siteData,
-        isFolder: siteUtil.isFolder(immutableSite),
-        hideInToolbar: site.parentFolderId === -1,
-        parentFolderObjectId
-      }
+    name = 'bookmark'
+    objectId = site.objectId ||
+      folderToObjectMap[site.folderId] ||
+      module.exports.newObjectId(['sites', siteKey])
+    parentFolderObjectId = site.parentFolderObjectId ||
+      folderToObjectMap[site.parentFolderId] ||
+      findOrCreateFolderObjectId(site.parentFolderId, appState)
+    value = {
+      site: siteData,
+      isFolder: siteUtil.isFolder(immutableSite),
+      hideInToolbar: site.parentFolderId === -1,
+      parentFolderObjectId
     }
   } else if (siteUtil.isHistoryEntry(immutableSite)) {
+    objectId = site.objectId || module.exports.newObjectId(['sites', siteKey])
+    name = 'historySite'
+    value = siteData
+  }
+  if (objectId) {
+    if (typeof site.folderId === 'number') {
+      folderToObjectMap[site.folderId] = objectId
+    }
+    if (typeof site.parentFolderId === 'number' && parentFolderObjectId) {
+      folderToObjectMap[site.parentFolderId] = parentFolderObjectId
+    }
     return {
-      name: 'historySite',
-      objectId: site.objectId || module.exports.newObjectId(['sites', siteKey]),
-      value: siteData
+      name,
+      objectId,
+      value
     }
   }
   console.log(`Ignoring entry because we can't create site data: ${JSON.stringify(site)}`)
