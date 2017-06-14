@@ -252,7 +252,7 @@ module.exports.onSyncReady = (isFirstRun, e) => {
       siteJS.parentFolderObjectId = folderToObjectId[parentFolderId]
     }
 
-    const record = syncUtil.createSiteData(siteJS)
+    const record = syncUtil.createSiteData(siteJS, appState)
     const folderId = site.get('folderId')
     if (typeof folderId === 'number') {
       folderToObjectId[folderId] = record.objectId
