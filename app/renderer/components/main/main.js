@@ -77,7 +77,6 @@ class Main extends ImmutableComponent {
     this.onHideSiteInfo = this.onHideSiteInfo.bind(this)
     this.onHideBraveryPanel = this.onHideBraveryPanel.bind(this)
     this.onHideClearBrowsingDataPanel = this.onHideClearBrowsingDataPanel.bind(this)
-    this.onHideImportBrowserDataPanel = this.onHideImportBrowserDataPanel.bind(this)
     this.onHideWidevinePanel = this.onHideWidevinePanel.bind(this)
     this.onHideAutofillAddressPanel = this.onHideAutofillAddressPanel.bind(this)
     this.onHideAutofillCreditCardPanel = this.onHideAutofillCreditCardPanel.bind(this)
@@ -453,7 +452,7 @@ class Main extends ImmutableComponent {
 
     ipc.on(messages.IMPORTER_LIST, (e, detail) => {
       windowActions.setImportBrowserDataDetail(detail)
-      windowActions.setImportBrowserDataSelected({})
+      windowActions.setImportBrowserDataSelected()
     })
     // DO NOT ADD TO THIS LIST - see above
 
@@ -539,10 +538,6 @@ class Main extends ImmutableComponent {
 
   onHideClearBrowsingDataPanel () {
     windowActions.setClearBrowsingDataPanelVisible(false)
-  }
-
-  onHideImportBrowserDataPanel () {
-    windowActions.setImportBrowserDataDetail()
   }
 
   onHideWidevinePanel () {
@@ -743,10 +738,7 @@ class Main extends ImmutableComponent {
         }
         {
           importBrowserDataPanelIsVisible
-          ? <ImportBrowserDataPanel
-            importBrowserDataDetail={this.props.windowState.get('importBrowserDataDetail')}
-            importBrowserDataSelected={this.props.windowState.get('importBrowserDataSelected')}
-            onHide={this.onHideImportBrowserDataPanel} />
+          ? <ImportBrowserDataPanel />
           : null
         }
         {

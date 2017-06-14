@@ -529,6 +529,7 @@ const doAction = (action) => {
     case windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_VISIBLE:
       windowState = windowState.setIn(['ui', 'isClearBrowsingDataPanelVisible'], action.isVisible)
       break
+
     case windowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_DETAIL:
       if (!action.importBrowserDataDetail) {
         windowState = windowState.delete('importBrowserDataDetail')
@@ -537,10 +538,19 @@ const doAction = (action) => {
       }
       break
     case windowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_SELECTED:
-      if (!action.selected) {
+      if (action.selected == null) {
         windowState = windowState.delete('importBrowserDataSelected')
       } else {
-        windowState = windowState.set('importBrowserDataSelected', Immutable.fromJS(action.selected))
+        if (typeof action.selected === 'number') {
+          const detail = windowState.getIn(['importBrowserDataDetail', action.selected])
+          windowState = windowState.set('importBrowserDataSelected', detail)
+        } else {
+          for (let prop in action.selected) {
+            if (!action.selected.hasOwnProperty(prop)) continue
+
+            windowState = windowState.setIn(['importBrowserDataSelected', prop], action.selected[prop])
+          }
+        }
       }
       break
     case windowConstants.WINDOW_WIDEVINE_PANEL_DETAIL_CHANGED:

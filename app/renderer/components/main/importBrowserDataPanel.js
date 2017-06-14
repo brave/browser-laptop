@@ -4,9 +4,10 @@
 
 const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
+const Immutable = require('immutable')
 
 // Components
-const ImmutableComponent = require('../immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../common/dialog')
 const Button = require('../common/button')
 const SwitchControl = require('../common/switchControl')
@@ -20,106 +21,82 @@ const {
 } = require('../common/commonForm')
 
 // Actions
-const windowActions = require('../../../../js/actions/windowActions')
 const appActions = require('../../../../js/actions/appActions')
+const windowActions = require('../../../../js/actions/windowActions')
 
 // Styles
 const globalStyles = require('../styles/global')
 
-class ImportBrowserDataPanel extends ImmutableComponent {
-  constructor () {
-    super()
+class ImportBrowserDataPanel extends React.Component {
+  constructor (props) {
+    super(props)
     this.onToggleHistory = this.onToggleSetting.bind(this, 'history')
     this.onToggleFavorites = this.onToggleSetting.bind(this, 'favorites')
     this.onToggleCookies = this.onToggleSetting.bind(this, 'cookies')
     this.onImport = this.onImport.bind(this)
     this.onChange = this.onChange.bind(this)
   }
+
   onToggleSetting (setting, e) {
-    windowActions.setImportBrowserDataSelected(this.props.importBrowserDataSelected.set(setting, e.target.value))
+    windowActions.setImportBrowserDataSelected({
+      [setting]: e.target.value
+    })
   }
-  get browserData () {
-    let index = this.props.importBrowserDataSelected.get('index')
-    if (index === undefined) {
-      index = '0'
-    }
-    return this.props.importBrowserDataDetail.get(index)
-  }
-  get supportHistory () {
-    let browserData = this.browserData
-    if (browserData === undefined) {
-      return false
-    }
-    return browserData.get('history')
-  }
-  get supportFavorites () {
-    let browserData = this.browserData
-    if (browserData === undefined) {
-      return false
-    }
-    return browserData.get('favorites')
-  }
-  get supportCookies () {
-    let browserData = this.browserData
-    if (browserData === undefined) {
-      return false
-    }
-    return browserData.get('cookies')
-  }
+
   onImport () {
-    let index = this.props.importBrowserDataSelected.get('index')
-    if (index === undefined) {
-      this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('index', '0')
-    }
-    let browserData = this.browserData
-    if (browserData !== undefined) {
-      let type = browserData.get('type')
-      this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('type', type)
-    }
-    appActions.importBrowserData(this.props.importBrowserDataSelected)
-    this.props.onHide()
+    let data = {}
+    data.index = this.props.selectedIndex.toString()
+    data.cookies = this.props.cookies
+    data.favorites = this.props.favorites
+    data.history = this.props.history
+    data.type = this.props.type
+
+    appActions.importBrowserData(Immutable.fromJS(data))
+    this.onHide()
   }
+
   onChange (e) {
-    this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('index', e.target.value)
-    this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('history', false)
-    this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('favorites', false)
-    this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('cookies', false)
-    let importBrowserDataSelected = this.props.importBrowserDataSelected
-    if (this.supportHistory) {
-      importBrowserDataSelected = importBrowserDataSelected.set('history', true)
-    }
-    if (this.supportFavorites) {
-      importBrowserDataSelected = importBrowserDataSelected.set('favorites', true)
-    }
-    if (this.supportCookies) {
-      importBrowserDataSelected = importBrowserDataSelected.set('cookies', true)
-    }
-    windowActions.setImportBrowserDataSelected(importBrowserDataSelected)
+    windowActions.setImportBrowserDataSelected(~~e.target.value)
   }
-  get selectedBrowser () {
-    let index = this.props.importBrowserDataSelected.get('index')
-    if (index === undefined) {
-      this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('index', '0')
-      if (this.supportHistory) {
-        this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('history', true)
-      }
-      if (this.supportFavorites) {
-        this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('favorites', true)
-      }
-      if (this.supportCookies) {
-        this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('cookies', true)
-      }
-    }
-    return index !== undefined ? index : '0'
+
+  onHide () {
+    windowActions.setImportBrowserDataDetail()
   }
+
+  componentWillMount () {
+    if (this.props.selectedIndex == null) {
+      windowActions.setImportBrowserDataSelected(0)
+    }
+  }
+
+  mergeProps (state, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const importBrowserDataSelected = currentWindow.get('importBrowserDataSelected', Immutable.Map())
+    const importBrowserDataDetail = currentWindow.get('importBrowserDataDetail', Immutable.Map())
+    const index = importBrowserDataSelected.get('index', '0')
+    const currentSelectedBrowser = importBrowserDataDetail.get(index, Immutable.Map())
+
+    const props = {}
+    // used in renderer
+    props.browserNames = importBrowserDataDetail.map((browser) => browser.get('name'))
+    props.browserIndexes = importBrowserDataDetail.map((browser) => browser.get('index'))
+    props.isSupportingHistory = currentSelectedBrowser.get('history', false)
+    props.isSupportingFavorites = currentSelectedBrowser.get('favorites', false)
+    props.isSupportingCookies = currentSelectedBrowser.get('cookies', false)
+    props.currentIndex = index
+    props.cookies = importBrowserDataSelected.get('cookies')
+    props.favorites = importBrowserDataSelected.get('favorites')
+    props.history = importBrowserDataSelected.get('history')
+    props.type = importBrowserDataSelected.get('type')
+
+    // used in other functions
+    props.selectedIndex = importBrowserDataSelected.get('index')
+
+    return props
+  }
+
   render () {
-    var browsers = []
-    if (this.props.importBrowserDataDetail !== undefined) {
-      this.props.importBrowserDataDetail.toJS().forEach((browser) => {
-        browsers.push(<option value={browser.index}>{browser.name}</option>)
-      })
-    }
-    return <Dialog onHide={this.props.onHide} testId='importBrowserDataPanel' isClickDismiss>
+    return <Dialog onHide={this.onHide} testId='importBrowserDataPanel' isClickDismiss>
       <CommonForm data-test-id='importBrowserData' onClick={(e) => e.stopPropagation()}>
         <CommonFormTitle
           data-test-id='importBrowserDataTitle'
@@ -128,35 +105,39 @@ class ImportBrowserDataPanel extends ImmutableComponent {
         <CommonFormSection data-test-id='importBrowserDataOptions'>
           <div className={css(styles.dropdownWrapper)}>
             <CommonFormDropdown
-              value={this.selectedBrowser}
+              value={this.props.currentIndex}
               onChange={this.onChange} >
-              {browsers}
+              {
+                this.props.browserNames.map((name, i) => {
+                  return <option value={this.props.browserIndexes.get(i)}>{name}</option>
+                })
+              }
             </CommonFormDropdown>
           </div>
           <SwitchControl
             rightl10nId='browserHistory'
-            checkedOn={this.props.importBrowserDataSelected.get('history')}
+            checkedOn={this.props.history}
             onClick={this.onToggleHistory}
-            disabled={!this.supportHistory}
+            disabled={!this.props.isSupportingHistory}
           />
           <SwitchControl
             rightl10nId='favoritesOrBookmarks'
-            checkedOn={this.props.importBrowserDataSelected.get('favorites')}
+            checkedOn={this.props.favorites}
             onClick={this.onToggleFavorites}
-            disabled={!this.supportFavorites}
+            disabled={!this.props.isSupportingFavorites}
           />
           <SwitchControl
             rightl10nId='cookies'
-            checkedOn={this.props.importBrowserDataSelected.get('cookies')}
+            checkedOn={this.props.cookies}
             onClick={this.onToggleCookies}
-            disabled={!this.supportCookies}
+            disabled={!this.props.isSupportingCookies}
           />
         </CommonFormSection>
         <CommonFormSection>
           <div data-l10n-id='importDataCloseBrowserWarning' />
         </CommonFormSection>
         <CommonFormButtonWrapper data-test-id='importBrowserDataButtons'>
-          <Button l10nId='cancel' className='whiteButton' onClick={this.props.onHide} />
+          <Button l10nId='cancel' className='whiteButton' onClick={this.onHide} />
           <Button l10nId='import' className='primaryButton' onClick={this.onImport} />
         </CommonFormButtonWrapper>
         <CommonFormBottomWrapper data-test-id='importBrowserDataWarning'>
@@ -167,10 +148,10 @@ class ImportBrowserDataPanel extends ImmutableComponent {
   }
 }
 
+module.exports = ReduxComponent.connect(ImportBrowserDataPanel)
+
 const styles = StyleSheet.create({
   dropdownWrapper: {
     marginBottom: `calc(${globalStyles.spacing.dialogInsideMargin} / 2)`
   }
 })
-
-module.exports = ImportBrowserDataPanel
