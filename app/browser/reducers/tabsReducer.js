@@ -51,7 +51,7 @@ const updateActiveTab = (state, closeTabId) => {
     case tabCloseAction.PARENT:
       {
         const openerTabId = tabState.getOpenerTabId(state, closeTabId)
-        if (openerTabId && openerTabId !== tabState.TAB_ID_NONE) {
+        if (openerTabId !== tabState.TAB_ID_NONE) {
           nextTabId = openerTabId
         }
         break

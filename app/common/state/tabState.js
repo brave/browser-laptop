@@ -501,9 +501,9 @@ const tabState = {
   getOpenerTabId: (state, tabId) => {
     const openerTabId = tabState.getTabPropertyByTabId(state, tabId, 'openerTabId', tabState.TAB_ID_NONE)
     if (openerTabId !== tabState.TAB_ID_NONE) {
-      // Validate that tabId exists
-      const index = getTabInternalIndexByTabId(state, openerTabId)
-      if (index !== tabState.TAB_ID_NONE) {
+      // Validate that tab exists
+      const tab = tabState.getByTabId(state, openerTabId)
+      if (tab) {
         return openerTabId
       }
     }
