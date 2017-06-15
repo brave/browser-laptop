@@ -1129,6 +1129,15 @@ describe('siteUtil', function () {
       const siteDetail = siteUtil.getDetailFromFrame(frame, siteTags.PINNED)
       assert.equal(siteDetail.get('location'), frame.get('pinnedLocation'))
     })
+    it('properly sets location for pinned sites when pinned location is blank page', function () {
+      const frame = Immutable.fromJS({
+        location: testUrl1,
+        pinnedLocation: 'about:blank',
+        tag: siteTags.PINNED
+      })
+      const siteDetail = siteUtil.getDetailFromFrame(frame, siteTags.PINNED)
+      assert.equal(siteDetail.get('location'), frame.get('location'))
+    })
   })
 
   describe('getDetailFromTab', function () {

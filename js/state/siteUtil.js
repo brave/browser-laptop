@@ -521,8 +521,9 @@ module.exports.moveSite = function (state, sourceKey, destinationKey, prepend,
 }
 
 module.exports.getDetailFromFrame = function (frame, tag) {
+  const pinnedLocation = frame.get('pinnedLocation')
   let location = frame.get('location')
-  if (frame.get('pinnedLocation') && tag === siteTags.PINNED) {
+  if (pinnedLocation && pinnedLocation !== 'about:blank' && tag === siteTags.PINNED) {
     location = frame.get('pinnedLocation')
   }
 
