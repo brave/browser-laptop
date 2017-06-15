@@ -12,7 +12,7 @@ const {formattedTimeFromNow, formattedDateFromTimestamp} = require('../../../../
 const appUrlUtil = require('../../../../../js/lib/appUrlUtil')
 
 // components
-const Button = require('../../common/button')
+const BrowserButton = require('../../common/browserButton')
 const ImmutableComponent = require('../../immutableComponent')
 
 // style
@@ -117,8 +117,7 @@ class HistoryFooter extends ImmutableComponent {
       <div className={css(styles.historyFooter__nextPayment)}>
         <span data-l10n-id={l10nDataId} data-l10n-args={JSON.stringify(l10nDataArgs)} />
       </div>
-      {/* TODO: refactor button.less */}
-      <Button className='primaryButton'
+      <BrowserButton primaryColor
         l10nId='paymentHistoryOKText'
         testId='paymentHistoryOKText'
         onClick={this.props.hideOverlay.bind(this, 'paymentHistory')}

@@ -277,8 +277,8 @@ const globalStyles = {
       gradientColor1: '#fff',
       gradientColor2: '#ececec',
       background: 'linear-gradient(#fff, #ececec)',
-      color: '#444',
-      hoverColor: '#000',
+      color: '#666',
+      hoverColor: '#444',
       borderHoverColor: 'rgb(153, 153, 153)'
     },
 

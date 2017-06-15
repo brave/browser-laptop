@@ -170,6 +170,7 @@ const styles = StyleSheet.create({
     border: '1px solid white',
     color: globalStyles.button.secondary.color,
     cursor: 'pointer',
+    fontWeight: 500,
 
     ':hover': {
       border: `1px solid ${globalStyles.button.secondary.borderHoverColor}`,

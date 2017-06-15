@@ -6,7 +6,7 @@ const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // components
-const Button = require('../../common/button')
+const BrowserButton = require('../../common/browserButton')
 const cx = require('../../../../../js/lib/classSet')
 const ModalOverlay = require('../../common/modalOverlay')
 const ImmutableComponent = require('../../immutableComponent')
@@ -96,11 +96,8 @@ class BitcoinDashboard extends ImmutableComponent {
     const buttonAttrs = {
       l10nId: 'add',
       testId: 'bitcoinPurchaseButton',
-      className: cx({
-        primaryButton: true,
-        [css(styles.panelButton)]: true,
-        disabled: disabled
-      })
+      primaryColor: true,
+      disabled: disabled
     }
     const hrefAttrs = {
       href: this.props.ledgerData.get('buyURL'),
@@ -118,11 +115,11 @@ class BitcoinDashboard extends ImmutableComponent {
       if (!disabled) {
         buttonAttrs.onClick = this.props.showOverlay.bind(this)
       }
-      return <Button {...buttonAttrs} />
+      return <BrowserButton {...buttonAttrs} />
     }
 
     return <a {...hrefAttrs}>
-      <Button {...buttonAttrs} />
+      <BrowserButton {...buttonAttrs} />
     </a>
   }
 
@@ -196,13 +193,10 @@ class BitcoinDashboard extends ImmutableComponent {
         </div>
         <div className={css(styles.panel__divider, styles.panel__divider_right)}>
           <a target='_blank' href={url}>
-            {/* TODO: refactor button.js */}
-            <Button className={cx({
-              primaryButton: true,
-              [css(styles.panelButton)]: true
-            })}
+            <BrowserButton
+              primaryColor
               testId='exchangePanelButton'
-              label={name}
+              l10nId={name}
             />
           </a>
         </div>
@@ -223,11 +217,8 @@ class BitcoinDashboard extends ImmutableComponent {
       </div>
       <div className={css(styles.panel__divider, styles.panel__divider_right)}>
         <a target='_blank' href='https://www.buybitcoinworldwide.com/'>
-          {/* TODO: refactor button.js */}
-          <Button className={cx({
-            primaryButton: true,
-            [css(styles.panelButton)]: true
-          })}
+          <BrowserButton
+            primaryColor
             testId='worldWidePanelButton'
             label='buybitcoinworldwide.com'
           />
@@ -261,11 +252,8 @@ class BitcoinDashboard extends ImmutableComponent {
               ledgerData.get('hasBitcoinHandler') && ledgerData.get('paymentURL')
                 ? <div className={css(styles.panel__divider_right__bitcoinPanel__paymentURL)}>
                   <a href={ledgerData.get('paymentURL')} target='_blank'>
-                    {/* TODO: refactor button.js */}
-                    <Button className={cx({
-                      primaryButton: true,
-                      [css(styles.panelButton)]: true
-                    })}
+                    <BrowserButton
+                      primaryColor
                       l10nId='bitcoinVisitAccount'
                       testId='bitcoinVisitAccountButton'
                     />
@@ -275,11 +263,8 @@ class BitcoinDashboard extends ImmutableComponent {
             }
             <div data-l10n-id='bitcoinPaymentURL' className={css(styles.panel__divider_right__bitcoinPanel__walletLabelText)} />
             <div className={css(styles.panel__divider_right__bitcoinPanel__walletAddressText)}>{ledgerData.get('address')}</div>
-            {/* TODO: refactor button.js */}
-            <Button className={cx({
-              primaryButton: true,
-              [css(styles.panelButton)]: true
-            })}
+            <BrowserButton
+              primaryColor
               l10nId='copyToClipboard'
               testId='copyToClipboardButton'
               onClick={this.copyToClipboard.bind(this, ledgerData.get('address'))}
@@ -308,11 +293,8 @@ class BitcoinDashboard extends ImmutableComponent {
         </div>
       </div>
       <div className={css(styles.panel__divider, styles.panel__divider_right)}>
-        {/* TODO: refactor button.js */}
-        <Button className={cx({
-          primaryButton: true,
-          [css(styles.panelButton)]: true
-        })}
+        <BrowserButton
+          primaryColor
           l10nId='displayQRCode'
           testId='displayQRCode'
           onClick={this.props.showQRcode.bind(this)}
@@ -449,10 +431,9 @@ class BitcoinDashboardFooter extends ImmutableComponent {
           ? this.coinbaseMessageWrapper
           : null
       }
-      <Button className={cx({
-        whiteButton: true,
-        [css(styles.dashboardFooter_coinbaseFooter__doneButton)]: this.coinbaseCountries
-      })}
+      <BrowserButton
+        secondaryColor
+        custom={this.coinbaseCountries && styles.dashboardFooter_coinbaseFooter__doneButton}
         l10nId='done'
         testId='panelDoneButton'
         onClick={this.props.hideParentOverlay}
@@ -582,7 +563,8 @@ const styles = StyleSheet.create({
     borderBottom: `3px solid ${globalStyles.color.modalLightGray}`
   },
   panel__smartphonePanel: {
-    padding: `${panelPadding} 0 ${panelPaddingBody}`
+    padding: `${panelPadding} 0 ${panelPaddingBody}`,
+    alignItems: 'center'
   },
 
   modalOverlay__qrcodeOverlay: {
