@@ -99,6 +99,16 @@ describe('tabMessageBoxState unit tests', function () {
     })
   })
 
+  describe('hasMessageBoxDetail', function () {
+    it('returns true if detail exists', function () {
+      this.appState = defaultAppState.set('tabs', Immutable.fromJS([defaultTab]))
+      assert.equal(tabMessageBoxState.hasMessageBoxDetail(this.appState, defaultTabId), true)
+    })
+    it('returns false if tabId is not found', function () {
+      assert.equal(tabMessageBoxState.hasMessageBoxDetail(defaultAppState, 1111), false)
+    })
+  })
+
   describe('getDetail', function () {
     it('returns null if tabId is falsey', function () {
       assert.equal(null, tabMessageBoxState.getDetail(defaultAppState))

@@ -44,6 +44,10 @@ const tabMessageBoxState = {
     return tabState.updateTab(state, {tabValue, replace: true})
   },
 
+  hasMessageBoxDetail: (state, tabId) => {
+    return tabMessageBoxState.getDetail(state, tabId) != null
+  },
+
   getDetail: (state, tabId) => {
     if (typeof tabId !== 'number') {
       return null

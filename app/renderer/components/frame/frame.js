@@ -26,6 +26,7 @@ const appStoreRenderer = require('../../../../js/stores/appStoreRenderer')
 const siteSettings = require('../../../../js/state/siteSettings')
 const siteSettingsState = require('../../../common/state/siteSettingsState')
 const tabState = require('../../../common/state/tabState')
+const tabMessageBoxState = require('../../../common/state/tabMessageBoxState')
 
 // Utils
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
@@ -925,7 +926,7 @@ class Frame extends React.Component {
     props.hrefPreview = frame.get('hrefPreview')
     props.showOnRight = frame.get('showOnRight')
     props.tabId = tabId
-    props.showMessageBox = tab && tab.get('messageBoxDetail')
+    props.showMessageBox = tabMessageBoxState.hasMessageBoxDetail(state, tabId)
 
     // used in other functions
     props.urlBarFocused = frame && frame.getIn(['navbar', 'urlbar', 'focused'])
