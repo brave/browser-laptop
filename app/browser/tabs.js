@@ -28,6 +28,7 @@ const {cleanupWebContents, currentWebContents, getWebContents, updateWebContents
 const {FilterOptions} = require('ad-block')
 const {isResourceEnabled} = require('../filtering')
 const autofill = require('../autofill')
+const l10n = require('../../js/l10n')
 
 let currentPartitionNumber = 0
 const incrementPartitionNumber = () => ++currentPartitionNumber
@@ -179,6 +180,7 @@ const updateAboutDetails = (tab, tabValue) => {
   const autofillAddresses = appState.getIn(['autofill', 'addresses'])
   const versionInformation = appState.getIn(['about', 'brave', 'versionInformation'])
   const aboutDetails = tabValue.get('aboutDetails')
+
   // TODO(bridiver) - convert this to an action
   if (url === 'about:preferences#payments') {
     tab.on('destroyed', () => {
@@ -657,6 +659,9 @@ const api = {
   },
 
   create: (createProperties, cb = null, isRestore = false) => {
+    const appState = appStore.getState()
+    let shouldShowWelcomeScreen = appState.getIn(['about', 'welcome', 'showOnLoad'])
+
     setImmediate(() => {
       const {safeBrowsingInstance} = require('../adBlock')
       createProperties = makeImmutable(createProperties).toJS()
@@ -673,6 +678,19 @@ const api = {
       }
       if (!createProperties.url) {
         createProperties.url = newFrameUrl()
+        // don't open welcome screen for general tests
+        if (process.env.NODE_ENV === 'test') {
+          shouldShowWelcomeScreen = false
+        }
+        if (shouldShowWelcomeScreen !== false) {
+          appActions.createTabRequested({
+            url: 'about:welcome',
+            // avoid chrome-extension title
+            // while page's title is not fetch
+            title: l10n.translation('aboutWelcome')
+          })
+          appActions.activateWelcomeScreen(false)
+        }
       }
       createProperties.url = normalizeUrl(createProperties.url)
       // TODO(bridiver) - this should be in filtering
