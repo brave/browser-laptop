@@ -13,15 +13,19 @@ const defaultWindowStore = Immutable.fromJS({
 })
 
 describe('frameStateUtil', function () {
-  let frameStateUtil
+  let frameStateUtil, getSettingsValue
 
   before(function () {
+    getSettingsValue = 20
     mockery.enable({
       warnOnReplace: false,
       warnOnUnregistered: false,
       useCleanCache: true
     })
     mockery.registerMock('electron', fakeElectron)
+    mockery.registerMock('../settings', {
+      getSetting: () => getSettingsValue
+    })
     frameStateUtil = require('../../../js/state/frameStateUtil')
     this.windowState = Immutable.fromJS(Object.assign({}, defaultWindowStore.toJS()))
   })
@@ -317,6 +321,94 @@ describe('frameStateUtil', function () {
 
       const result = frameStateUtil.getTotalBlocks(mutableFrames)
       assert.equal(result, '99+')
+    })
+  })
+
+  describe('getTabPageCount', function () {
+    before(function () {
+      getSettingsValue = 6
+    })
+
+    it('returns two pages when we have more tabs then the tab page limit', function () {
+      let state = Immutable.fromJS({
+        activeFrameKey: 1,
+        frames: [
+          { key: 1 },
+          { key: 2 },
+          { key: 3 },
+          { key: 4 },
+          { key: 5 },
+          { key: 6 },
+          { key: 7 },
+          { key: 8 }
+        ],
+        framesInternal: {
+          index: {
+            1: 0,
+            2: 1,
+            3: 2,
+            4: 3,
+            5: 4,
+            6: 5,
+            7: 6,
+            8: 7
+          }
+        }
+      })
+      const result = frameStateUtil.getTabPageCount(state)
+      assert.equal(result, 2)
+    })
+
+    it('returns one pages when we have exactly the same tabs as the tab page limit', function () {
+      let state = Immutable.fromJS({
+        activeFrameKey: 1,
+        frames: [
+          { key: 1 },
+          { key: 2 },
+          { key: 3 },
+          { key: 4 },
+          { key: 5 },
+          { key: 6 }
+        ],
+        framesInternal: {
+          index: {
+            1: 0,
+            2: 1,
+            3: 2,
+            4: 3,
+            5: 4,
+            6: 5
+          }
+        }
+      })
+      const result = frameStateUtil.getTabPageCount(state)
+      assert.equal(result, 1)
+    })
+
+    it('returns one pages when we have less tabs then the tab page limit', function () {
+      let state = Immutable.fromJS({
+        activeFrameKey: 1,
+        frames: [
+          { key: 1 },
+          { key: 2 },
+          { key: 3 },
+          { key: 4 },
+          { key: 5 },
+          { key: 6 }
+        ],
+        framesInternal: {
+          index: {
+            1: 0,
+            2: 1,
+            3: 2,
+            4: 3,
+            5: 4,
+            6: 5
+          }
+        }
+      })
+      const result = frameStateUtil.getTabPageCount(state)
+      assert.equal(result, 1)
     })
   })
 })
