@@ -78,7 +78,6 @@ class Main extends ImmutableComponent {
     this.onHideSiteInfo = this.onHideSiteInfo.bind(this)
     this.onHideBraveryPanel = this.onHideBraveryPanel.bind(this)
     this.onHideClearBrowsingDataPanel = this.onHideClearBrowsingDataPanel.bind(this)
-    this.onHideAutofillAddressPanel = this.onHideAutofillAddressPanel.bind(this)
     this.onHideAutofillCreditCardPanel = this.onHideAutofillCreditCardPanel.bind(this)
     this.onTabContextMenu = this.onTabContextMenu.bind(this)
     this.checkForTitleMode = debounce(this.checkForTitleMode.bind(this), 20)
@@ -535,10 +534,6 @@ class Main extends ImmutableComponent {
     windowActions.setClearBrowsingDataPanelVisible(false)
   }
 
-  onHideAutofillAddressPanel () {
-    windowActions.setAutofillAddressDetail()
-  }
-
   onHideAutofillCreditCardPanel () {
     windowActions.setAutofillCreditCardDetail()
   }
@@ -708,10 +703,7 @@ class Main extends ImmutableComponent {
         }
         {
          autofillAddressPanelIsVisible
-          ? <AutofillAddressPanel
-            currentDetail={this.props.windowState.getIn(['autofillAddressDetail', 'currentDetail'])}
-            originalDetail={this.props.windowState.getIn(['autofillAddressDetail', 'originalDetail'])}
-            onHide={this.onHideAutofillAddressPanel} />
+          ? <AutofillAddressPanel />
           : null
         }
         {

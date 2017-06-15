@@ -711,8 +711,7 @@ const handleAppAction = (action) => {
         break
       }
     case appConstants.APP_ADD_AUTOFILL_ADDRESS:
-      autofill.addAutofillAddress(action.detail.toJS(),
-        action.originalDetail.get('guid') === undefined ? '-1' : action.originalDetail.get('guid'))
+      autofill.addAutofillAddress(action.detail)
       break
     case appConstants.APP_REMOVE_AUTOFILL_ADDRESS:
       autofill.removeAutofillAddress(action.detail.get('guid'))

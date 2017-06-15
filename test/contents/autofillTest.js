@@ -82,6 +82,7 @@ describe('Autofill', function () {
         .click(emailInput)
         .typeText(emailInput, email)
         .click(saveAddressButton)
+        .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
             return val.value.autofill.addresses.guid.length === 1
@@ -152,6 +153,7 @@ describe('Autofill', function () {
         .keys(Brave.keys.END)
         .typeText(emailInput, 'mm', email)
         .click(saveAddressButton)
+        .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
             return val.value.autofill.addresses.guid.length === 1

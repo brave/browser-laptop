@@ -610,13 +610,11 @@ const appActions = {
   /**
    * Add address data
    * @param {object} detail - the address to add as per doc/state.md's autofillAddressDetail
-   * @param {object} originalDetail - the original address before editing
    */
-  addAutofillAddress: function (detail, originalDetail) {
+  addAutofillAddress: function (detail) {
     dispatch({
       actionType: appConstants.APP_ADD_AUTOFILL_ADDRESS,
-      detail,
-      originalDetail
+      detail
     })
   },
 

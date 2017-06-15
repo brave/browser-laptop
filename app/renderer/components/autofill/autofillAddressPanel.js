@@ -3,16 +3,13 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('../immutableComponent')
+const Immutable = require('immutable')
+const {css} = require('aphrodite/no-important')
+
+// Components
+const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../common/dialog')
 const Button = require('../common/button')
-const windowActions = require('../../../../js/actions/windowActions')
-const appActions = require('../../../../js/actions/appActions')
-const KeyCodes = require('../../../common/constants/keyCodes')
-
-const {css} = require('aphrodite/no-important')
-const commonStyles = require('../styles/commonStyles')
-
 const {
   CommonFormLarge,
   CommonFormSection,
@@ -21,6 +18,15 @@ const {
   commonFormStyles
 } = require('../common/commonForm')
 
+// Actions
+const windowActions = require('../../../../js/actions/windowActions')
+const appActions = require('../../../../js/actions/appActions')
+
+// Constants
+const KeyCodes = require('../../../common/constants/keyCodes')
+
+// Styles
+const commonStyles = require('../styles/commonStyles')
 const commonForm = css(
   commonStyles.formControl,
   commonStyles.textbox,
@@ -29,9 +35,9 @@ const commonForm = css(
   commonFormStyles.input__box
 )
 
-class AutofillAddressPanel extends ImmutableComponent {
-  constructor () {
-    super()
+class AutofillAddressPanel extends React.Component {
+  constructor (props) {
+    super(props)
     this.onNameChange = this.onNameChange.bind(this)
     this.onOrganizationChange = this.onOrganizationChange.bind(this)
     this.onStreetAddressChange = this.onStreetAddressChange.bind(this)
@@ -45,118 +51,100 @@ class AutofillAddressPanel extends ImmutableComponent {
     this.onSave = this.onSave.bind(this)
     this.onClick = this.onClick.bind(this)
   }
+
   onNameChange (e) {
-    let currentDetail = this.props.currentDetail
-    currentDetail = currentDetail.set('name', e.target.value)
-    if (this.nameOnAddress.value !== e.target.value) {
-      this.nameOnAddress.value = e.target.value
-    }
-    windowActions.setAutofillAddressDetail(currentDetail, this.props.originalDetail)
+    windowActions.setAutofillAddressDetail('name', e.target.value)
   }
   onOrganizationChange (e) {
-    let currentDetail = this.props.currentDetail
-    currentDetail = currentDetail.set('organization', e.target.value)
-    if (this.organization.value !== e.target.value) {
-      this.organization.value = e.target.value
-    }
-    windowActions.setAutofillAddressDetail(currentDetail, this.props.originalDetail)
+    windowActions.setAutofillAddressDetail('organization', e.target.value)
   }
   onStreetAddressChange (e) {
-    let currentDetail = this.props.currentDetail
-    currentDetail = currentDetail.set('streetAddress', e.target.value)
-    if (this.streetAddress.value !== e.target.value) {
-      this.streetAddress.value = e.target.value
-    }
-    windowActions.setAutofillAddressDetail(currentDetail, this.props.originalDetail)
+    windowActions.setAutofillAddressDetail('streetAddress', e.target.value)
   }
   onCityChange (e) {
-    let currentDetail = this.props.currentDetail
-    currentDetail = currentDetail.set('city', e.target.value)
-    windowActions.setAutofillAddressDetail(currentDetail, this.props.originalDetail)
-    if (this.city.value !== e.target.value) {
-      this.city.value = e.target.value
-    }
+    windowActions.setAutofillAddressDetail('city', e.target.value)
   }
   onStateChange (e) {
-    let currentDetail = this.props.currentDetail
-    currentDetail = currentDetail.set('state', e.target.value)
-    if (this.state.value !== e.target.value) {
-      this.state.value = e.target.value
-    }
-    windowActions.setAutofillAddressDetail(currentDetail, this.props.originalDetail)
+    windowActions.setAutofillAddressDetail('state', e.target.value)
   }
   onPostalCodeChange (e) {
-    let currentDetail = this.props.currentDetail
-    currentDetail = currentDetail.set('postalCode', e.target.value)
-    if (this.postalCode.value !== e.target.value) {
-      this.postalCode.value = e.target.value
-    }
-    windowActions.setAutofillAddressDetail(currentDetail, this.props.originalDetail)
+    windowActions.setAutofillAddressDetail('postalCode', e.target.value)
   }
   onCountryChange (e) {
-    let currentDetail = this.props.currentDetail
-    currentDetail = currentDetail.set('country', e.target.value)
-    if (this.country.value !== e.target.value) {
-      this.country.value = e.target.value
-    }
-    windowActions.setAutofillAddressDetail(currentDetail, this.props.originalDetail)
+    windowActions.setAutofillAddressDetail('country', e.target.value)
   }
   onPhoneChange (e) {
-    let currentDetail = this.props.currentDetail
-    currentDetail = currentDetail.set('phone', e.target.value)
-    if (this.phone.value !== e.target.value) {
-      this.phone.value = e.target.value
-    }
-    windowActions.setAutofillAddressDetail(currentDetail, this.props.originalDetail)
+    windowActions.setAutofillAddressDetail('phone', e.target.value)
   }
   onEmailChange (e) {
-    let currentDetail = this.props.currentDetail
-    currentDetail = currentDetail.set('email', e.target.value)
-    if (this.email.value !== e.target.value) {
-      this.email.value = e.target.value
-    }
-    windowActions.setAutofillAddressDetail(currentDetail, this.props.originalDetail)
+    windowActions.setAutofillAddressDetail('email', e.target.value)
   }
+
   onKeyDown (e) {
     switch (e.keyCode) {
       case KeyCodes.ENTER:
         this.onSave()
         break
       case KeyCodes.ESC:
-        this.props.onHide()
+        this.onHide()
         break
     }
   }
+
   onSave () {
-    appActions.addAutofillAddress(this.props.currentDetail, this.props.originalDetail)
-    this.props.onHide()
+    appActions.addAutofillAddress(Immutable.fromJS({
+      name: this.props.name,
+      organization: this.props.organization,
+      streetAddress: this.props.streetAddress,
+      city: this.props.city,
+      state: this.props.state,
+      postalCode: this.props.postalCode,
+      country: this.props.country,
+      phone: this.props.phone,
+      email: this.props.email,
+      guid: this.props.guid
+    }))
+    this.onHide()
   }
+
   onClick (e) {
     e.stopPropagation()
   }
-  get disableSaveButton () {
-    let currentDetail = this.props.currentDetail
-    if (!currentDetail.size) return true
-    if (!currentDetail.get('name') && !currentDetail.get('organization') &&
-      !currentDetail.get('streetAddress') && !currentDetail.get('city') &&
-      !currentDetail.get('state') && !currentDetail.get('country') &&
-      !currentDetail.get('phone') && !currentDetail.get('email')) return true
-    return false
-  }
+
   componentDidMount () {
     this.nameOnAddress.focus()
-    this.nameOnAddress.value = this.props.currentDetail.get('name') || ''
-    this.organization.value = this.props.currentDetail.get('organization') || ''
-    this.streetAddress.value = this.props.currentDetail.get('streetAddress') || ''
-    this.city.value = this.props.currentDetail.get('city') || ''
-    this.state.value = this.props.currentDetail.get('state') || ''
-    this.postalCode.value = this.props.currentDetail.get('postalCode') || ''
-    this.country.value = this.props.currentDetail.get('country') || ''
-    this.phone.value = this.props.currentDetail.get('phone') || ''
-    this.email.value = this.props.currentDetail.get('email') || ''
   }
+
+  onHide () {
+    windowActions.setAutofillAddressDetail()
+  }
+
+  mergeProps (state, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const detail = currentWindow.get('autofillAddressDetail', Immutable.Map())
+
+    const props = {}
+    // Used in renderer
+    props.name = detail.get('name', '')
+    props.organization = detail.get('organization', '')
+    props.streetAddress = detail.get('streetAddress', '')
+    props.city = detail.get('city', '')
+    props.state = detail.get('state', '')
+    props.postalCode = detail.get('postalCode', '')
+    props.country = detail.get('country', '')
+    props.phone = detail.get('phone', '')
+    props.email = detail.get('email', '')
+    props.guid = detail.get('guid', '-1')
+    props.disableSaveButton = !detail.get('name') && !detail.get('organization') &&
+      !detail.get('streetAddress') && !detail.get('city') &&
+      !detail.get('state') && !detail.get('country') &&
+      !detail.get('phone') && !detail.get('email')
+
+    return props
+  }
+
   render () {
-    return <Dialog onHide={this.props.onHide} testId='autofillAddressPanel' isClickDismiss>
+    return <Dialog onHide={this.onHide} testId='autofillAddressPanel' isClickDismiss>
       <CommonFormLarge onClick={this.onClick}>
         <CommonFormTitle data-l10n-id='editAddress' />
         <CommonFormSection>
@@ -173,62 +161,99 @@ class AutofillAddressPanel extends ImmutableComponent {
               <label className={css(commonFormStyles.input__marginRow)} data-l10n-id='email' htmlFor='email' />
             </div>
             <div className={css(commonFormStyles.inputWrapper, commonFormStyles.inputWrapper__input)}>
-              <input className={css(
-                commonStyles.formControl,
-                commonStyles.textbox,
-                commonStyles.textbox__outlineable,
-                commonFormStyles.input__box
-              )}
+              <input
+                className={css(
+                  commonStyles.formControl,
+                  commonStyles.textbox,
+                  commonStyles.textbox__outlineable,
+                  commonFormStyles.input__box
+                )}
                 data-test-id='nameOnAddress'
-                spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onNameChange}
-                ref={(nameOnAddress) => { this.nameOnAddress = nameOnAddress }} />
+                spellCheck='false'
+                ref={(ref) => { this.nameOnAddress = ref }}
+                onKeyDown={this.onKeyDown}
+                onChange={this.onNameChange}
+                defaultValue={this.props.name}
+              />
               <div className={css(commonFormStyles.input__marginRow)}>
-                <input className={commonForm}
+                <input
+                  className={commonForm}
                   data-test-id='organization'
-                  spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onOrganizationChange}
-                  ref={(organization) => { this.organization = organization }} />
+                  spellCheck='false'
+                  onKeyDown={this.onKeyDown}
+                  onChange={this.onOrganizationChange}
+                  defaultValue={this.props.organization}
+                />
               </div>
               <div className={css(commonFormStyles.input__marginRow)}>
-                <input className={commonForm}
+                <input
+                  className={commonForm}
                   data-test-id='streetAddress'
-                  spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onStreetAddressChange}
-                  ref={(streetAddress) => { this.streetAddress = streetAddress }} />
+                  spellCheck='false'
+                  onKeyDown={this.onKeyDown}
+                  onChange={this.onStreetAddressChange}
+                  defaultValue={this.props.streetAddress}
+                />
               </div>
               <div className={css(commonFormStyles.input__marginRow)}>
-                <input className={commonForm}
+                <input
+                  className={commonForm}
                   data-test-id='city'
-                  spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onCityChange}
-                  ref={(city) => { this.city = city }} />
+                  spellCheck='false'
+                  onKeyDown={this.onKeyDown}
+                  onChange={this.onCityChange}
+                  defaultValue={this.props.city}
+                />
               </div>
               <div className={css(commonFormStyles.input__marginRow)}>
-                <input className={commonForm}
+                <input
+                  className={commonForm}
                   data-test-id='state'
-                  spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onStateChange}
-                  ref={(state) => { this.state = state }} />
+                  spellCheck='false'
+                  onKeyDown={this.onKeyDown}
+                  onChange={this.onStateChange}
+                  defaultValue={this.props.state}
+                />
               </div>
               <div className={css(commonFormStyles.input__marginRow)}>
-                <input className={commonForm}
+                <input
+                  className={commonForm}
                   data-test-id='postalCode'
-                  spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onPostalCodeChange}
-                  ref={(postalCode) => { this.postalCode = postalCode }} />
+                  spellCheck='false'
+                  onKeyDown={this.onKeyDown}
+                  onChange={this.onPostalCodeChange}
+                  defaultValue={this.props.postalCode}
+                />
               </div>
               <div className={css(commonFormStyles.input__marginRow)}>
-                <input className={commonForm}
+                <input
+                  className={commonForm}
                   data-test-id='country'
-                  spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onCountryChange}
-                  ref={(country) => { this.country = country }} />
+                  spellCheck='false'
+                  onKeyDown={this.onKeyDown}
+                  onChange={this.onCountryChange}
+                  defaultValue={this.props.country}
+                />
               </div>
               <div className={css(commonFormStyles.input__marginRow)}>
-                <input className={commonForm}
+                <input
+                  className={commonForm}
                   data-test-id='phone'
-                  spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onPhoneChange}
-                  ref={(phone) => { this.phone = phone }} />
+                  spellCheck='false'
+                  onKeyDown={this.onKeyDown}
+                  onChange={this.onPhoneChange}
+                  defaultValue={this.props.phone}
+                />
               </div>
               <div className={css(commonFormStyles.input__marginRow)}>
-                <input className={commonForm}
+                <input
+                  className={commonForm}
                   data-test-id='email'
-                  spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onEmailChange}
-                  ref={(email) => { this.email = email }} />
+                  spellCheck='false'
+                  onKeyDown={this.onKeyDown}
+                  onChange={this.onEmailChange}
+                  defaultValue={this.props.email}
+                />
               </div>
             </div>
           </div>
@@ -237,10 +262,10 @@ class AutofillAddressPanel extends ImmutableComponent {
           <Button className='whiteButton'
             l10nId='cancel'
             testId='cancelAddressButton'
-            onClick={this.props.onHide}
+            onClick={this.onHide}
           />
           <Button className='primaryButton'
-            disabled={this.disableSaveButton}
+            disabled={this.props.disableSaveButton}
             l10nId='save'
             testId='saveAddressButton'
             onClick={this.onSave}
@@ -251,4 +276,4 @@ class AutofillAddressPanel extends ImmutableComponent {
   }
 }
 
-module.exports = AutofillAddressPanel
+module.exports = ReduxComponent.connect(AutofillAddressPanel)

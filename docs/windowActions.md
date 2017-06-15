@@ -636,15 +636,17 @@ Widevine popup detail changed
 
 
 
-### setAutofillAddressDetail(currentDetail, originalDetail) 
+### setAutofillAddressDetail(property, newValue, wholeObject) 
 
 Sets the manage autofill address popup detail
 
 **Parameters**
 
-**currentDetail**: `Object`, Properties of the address to change to
+**property**: `string`, Property that we want change
 
-**originalDetail**: `Object`, Properties of the address to edit
+**newValue**: `string`, New value for this property
+
+**wholeObject**: `Object`, Whole object of address detail
 
 
 
