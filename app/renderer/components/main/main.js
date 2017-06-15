@@ -80,7 +80,6 @@ class Main extends ImmutableComponent {
     this.onHideClearBrowsingDataPanel = this.onHideClearBrowsingDataPanel.bind(this)
     this.onHideAutofillAddressPanel = this.onHideAutofillAddressPanel.bind(this)
     this.onHideAutofillCreditCardPanel = this.onHideAutofillCreditCardPanel.bind(this)
-    this.onHideReleaseNotes = this.onHideReleaseNotes.bind(this)
     this.onTabContextMenu = this.onTabContextMenu.bind(this)
     this.checkForTitleMode = debounce(this.checkForTitleMode.bind(this), 20)
     this.resetAltMenuProcessing()
@@ -544,10 +543,6 @@ class Main extends ImmutableComponent {
     windowActions.setAutofillCreditCardDetail()
   }
 
-  onHideReleaseNotes () {
-    windowActions.setReleaseNotesVisible(false)
-  }
-
   onMouseDown (e) {
     // TODO(bsclifton): update this to use eventUtil.eventElHasAncestorWithClasses
     let node = e.target
@@ -744,9 +739,7 @@ class Main extends ImmutableComponent {
         }
         {
           releaseNotesIsVisible
-          ? <ReleaseNotes
-            metadata={this.props.appState.getIn(['updates', 'metadata'])}
-            onHide={this.onHideReleaseNotes} />
+          ? <ReleaseNotes />
           : null
         }
         {
