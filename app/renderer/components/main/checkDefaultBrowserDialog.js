@@ -6,10 +6,15 @@ const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
-const ImmutableComponent = require('../immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../common/dialog')
 const BrowserButton = require('../common/browserButton')
 const SwitchControl = require('../common/switchControl')
+const {
+  CommonFormMedium,
+  CommonFormSection,
+  CommonFormButtonWrapper
+} = require('../common/commonForm')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
@@ -18,51 +23,73 @@ const windowActions = require('../../../../js/actions/windowActions')
 // Constants
 const settings = require('../../../../js/constants/settings')
 
+// Utils
+const {getSetting} = require('../../../../js/settings')
+
 // Styles
 const globalStyles = require('../styles/global')
 const braveAbout = require('../../../extensions/brave/img/braveAbout.png')
 
-const {
-  CommonFormMedium,
-  CommonFormSection,
-  CommonFormButtonWrapper
-} = require('../common/commonForm')
-
-class CheckDefaultBrowserDialog extends ImmutableComponent {
+class CheckDefaultBrowserDialog extends React.Component {
   constructor () {
     super()
     this.onCheckDefaultOnStartup = this.onCheckDefaultOnStartup.bind(this)
     this.onNotNow = this.onNotNow.bind(this)
+    this.onClick = this.onClick.bind(this)
     this.onUseBrave = this.onUseBrave.bind(this)
   }
 
   onCheckDefaultOnStartup (e) {
-    windowActions.setModalDialogDetail('checkDefaultBrowserDialog', {checkDefaultOnStartup: e.target.value})
+    windowActions.setModalDialogDetail('checkDefaultBrowserDialog', {
+      checkDefaultOnStartup: e.target.value
+    })
   }
   onNotNow () {
     appActions.defaultBrowserUpdated(false)
     appActions.defaultBrowserCheckComplete()
     appActions.changeSetting(settings.CHECK_DEFAULT_ON_STARTUP, this.props.checkDefaultOnStartup)
-    this.props.onHide()
+    this.onHide()
   }
   onUseBrave () {
     appActions.defaultBrowserUpdated(true)
     appActions.defaultBrowserCheckComplete()
     appActions.changeSetting(settings.CHECK_DEFAULT_ON_STARTUP, this.props.checkDefaultOnStartup)
-    this.props.onHide()
+    this.onHide()
   }
+
+  onHide () {
+    windowActions.setModalDialogDetail('checkDefaultBrowserDialog')
+  }
+
+  onClick (e) {
+    e.stopPropagation()
+  }
+
+  mergeProps (state, ownProps) {
+    const currentWindow = state.get('currentWindow')
+
+    const props = {}
+    props.checkDefaultOnStartup = currentWindow.getIn(['modalDialogDetail', 'checkDefaultBrowserDialog']) === undefined
+      ? getSetting(settings.CHECK_DEFAULT_ON_STARTUP)
+      : currentWindow.getIn(['modalDialogDetail', 'checkDefaultBrowserDialog', 'checkDefaultOnStartup'])
+
+    return props
+  }
+
   render () {
     return <Dialog className='checkDefaultBrowserDialog'>
-      <CommonFormMedium onClick={(e) => e.stopPropagation()}>
+      <CommonFormMedium onClick={this.onClick}>
         <CommonFormSection>
           <div className={css(styles.flexAlignCenter)}>
             <div className={css(styles.section__braveIcon)} />
             <div>
               <div className={css(styles.section__title)} data-l10n-id='makeBraveDefault' />
-              <SwitchControl className={css(styles.section__switchControl)}
+              <SwitchControl
+                className={css(styles.section__switchControl)}
                 rightl10nId='checkDefaultOnStartup'
                 checkedOn={this.props.checkDefaultOnStartup}
-                onClick={this.onCheckDefaultOnStartup} />
+                onClick={this.onCheckDefaultOnStartup}
+              />
             </div>
           </div>
         </CommonFormSection>
@@ -82,6 +109,8 @@ class CheckDefaultBrowserDialog extends ImmutableComponent {
     </Dialog>
   }
 }
+
+module.exports = ReduxComponent.connect(CheckDefaultBrowserDialog)
 
 const styles = StyleSheet.create({
   flexAlignCenter: {
@@ -105,5 +134,3 @@ const styles = StyleSheet.create({
     marginTop: `calc(${globalStyles.spacing.dialogInsideMargin} / 2)`
   }
 })
-
-module.exports = CheckDefaultBrowserDialog
