@@ -270,8 +270,11 @@ class AppStore extends EventEmitter {
     if (lastEmittedState) {
       const d = diff(lastEmittedState, appState)
       if (!d.isEmpty()) {
-        BrowserWindow.getAllWindows().forEach((wnd) =>
-          wnd.webContents.send(messages.APP_STATE_CHANGE, { stateDiff: d.toJS() }))
+        BrowserWindow.getAllWindows().forEach((wnd) => {
+          if (wnd.webContents && !wnd.webContents.isDestroyed()) {
+            wnd.webContents.send(messages.APP_STATE_CHANGE, { stateDiff: d.toJS() })
+          }
+        })
         lastEmittedState = appState
         this.emit(CHANGE_EVENT, d.toJS())
       }
