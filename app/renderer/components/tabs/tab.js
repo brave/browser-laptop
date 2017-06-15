@@ -205,7 +205,7 @@ class Tab extends React.Component {
   componentDidMount () {
     this.onUpdateTabSize()
     this.tabNode.addEventListener('auxclick', this.onAuxClick.bind(this))
-    window.addEventListener('resize', throttle(this.onUpdateTabSize, tabUpdateFrameRate))
+    window.addEventListener('resize', throttle(this.onUpdateTabSize, tabUpdateFrameRate), { passive: true })
   }
 
   componentDidUpdate () {

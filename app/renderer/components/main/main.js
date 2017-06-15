@@ -115,7 +115,7 @@ class Main extends ImmutableComponent {
       }
       this.keydown[e.which] = true
       this.lastKeyPressed = e.which
-    })
+    }, { passive: true })
   }
 
   resetAltMenuProcessing () {
@@ -199,7 +199,7 @@ class Main extends ImmutableComponent {
         }
 
         windowActions.setLastFocusedSelector(selector)
-      }, true)
+      }, { capture: true, passive: true })
     }
   }
 
@@ -461,7 +461,7 @@ class Main extends ImmutableComponent {
         this.pageY = e.pageY
         this.checkForTitleMode()
       }
-    })
+    }, { passive: true })
     window.addEventListener('focus', () => {
       const activeFrame = frameStateUtil.getActiveFrame(self.props.windowState)
       windowActions.setFocusedFrame(activeFrame)
@@ -470,7 +470,7 @@ class Main extends ImmutableComponent {
       if (document.activeElement && document.activeElement.tagName === 'BODY') {
         webviewActions.setWebviewFocused()
       }
-    })
+    }, { passive: true })
     windowActions.onFocus(getCurrentWindowId())
 
     // disable dnd by default
