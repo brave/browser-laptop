@@ -68,7 +68,7 @@ const siteSettings = require('../../../../js/state/siteSettings')
 const debounce = require('../../../../js/lib/debounce')
 const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
 const {getCurrentWindowId, isMaximized, isFocused, isFullScreen} = require('../../currentWindow')
-const {isDarwin, isWindows} = require('../../../common/lib/platformUtil')
+const {isDarwin, isWindows, isLinux} = require('../../../common/lib/platformUtil')
 
 class Main extends ImmutableComponent {
   constructor () {
@@ -78,7 +78,6 @@ class Main extends ImmutableComponent {
     this.onHideSiteInfo = this.onHideSiteInfo.bind(this)
     this.onHideBraveryPanel = this.onHideBraveryPanel.bind(this)
     this.onHideClearBrowsingDataPanel = this.onHideClearBrowsingDataPanel.bind(this)
-    this.onHideWidevinePanel = this.onHideWidevinePanel.bind(this)
     this.onHideAutofillAddressPanel = this.onHideAutofillAddressPanel.bind(this)
     this.onHideAutofillCreditCardPanel = this.onHideAutofillCreditCardPanel.bind(this)
     this.onHideReleaseNotes = this.onHideReleaseNotes.bind(this)
@@ -540,12 +539,6 @@ class Main extends ImmutableComponent {
     windowActions.setClearBrowsingDataPanelVisible(false)
   }
 
-  onHideWidevinePanel () {
-    windowActions.widevinePanelDetailChanged({
-      shown: false
-    })
-  }
-
   onHideAutofillAddressPanel () {
     windowActions.setAutofillAddressDetail()
   }
@@ -666,7 +659,7 @@ class Main extends ImmutableComponent {
       this.props.windowState.get('braveryPanelDetail')
     const clearBrowsingDataPanelIsVisible = this.props.windowState.getIn(['ui', 'isClearBrowsingDataPanelVisible'])
     const importBrowserDataPanelIsVisible = this.props.windowState.get('importBrowserDataDetail')
-    const widevinePanelIsVisible = this.props.windowState.getIn(['widevinePanelDetail', 'shown'])
+    const widevinePanelIsVisible = this.props.windowState.getIn(['widevinePanelDetail', 'shown']) && !isLinux()
     const autofillAddressPanelIsVisible = this.props.windowState.get('autofillAddressDetail')
     const autofillCreditCardPanelIsVisible = this.props.windowState.get('autofillCreditCardDetail')
     const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible']) &&
@@ -740,8 +733,7 @@ class Main extends ImmutableComponent {
         {
           widevinePanelIsVisible
           ? <WidevinePanel
-            widevinePanelDetail={this.props.windowState.get('widevinePanelDetail')}
-            widevineReady={this.props.appState.getIn([appConfig.resourceNames.WIDEVINE, 'ready'])}
+
             onHide={this.onHideWidevinePanel} />
           : null
         }
