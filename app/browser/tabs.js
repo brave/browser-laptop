@@ -26,7 +26,6 @@ const siteTags = require('../../js/constants/siteTags')
 const {newTabMode} = require('../common/constants/settingsEnums')
 const {cleanupWebContents, currentWebContents, getWebContents, updateWebContents} = require('./webContentsCache')
 const {FilterOptions} = require('ad-block')
-const urlParse = require('../common/urlParse')
 const {isResourceEnabled} = require('../filtering')
 const autofill = require('../autofill')
 
@@ -678,9 +677,10 @@ const api = {
         createProperties.url = newFrameUrl()
       }
       createProperties.url = normalizeUrl(createProperties.url)
+      // TODO(bridiver) - this should be in filtering
       if (isResourceEnabled('safeBrowsing', createProperties.url, createProperties.isPrivate) &&
         safeBrowsingInstance &&
-        safeBrowsingInstance.matches(createProperties.url, FilterOptions.document, urlParse(createProperties.url).host)) {
+        safeBrowsingInstance.matches(createProperties.url, FilterOptions.document, muon.url.parse(createProperties.url).host)) {
         // Workaround #9056 by setting URL to the safebrowsing URL
         createProperties.url = getTargetAboutUrl('about:safebrowsing#' + createProperties.url)
       }
