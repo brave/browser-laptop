@@ -6,6 +6,7 @@ const React = require('react')
 const ImmutableComponent = require('../immutableComponent')
 const Immutable = require('immutable')
 const electron = require('electron')
+const urlResolve = require('url').resolve
 const ipc = electron.ipcRenderer
 
 // Actions
@@ -614,7 +615,12 @@ class Main extends ImmutableComponent {
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
     const checkDefaultBrowserDialogIsVisible =
       isFocused() && defaultBrowserState.shouldDisplayDialog(this.props.appState)
-    const loginRequiredDetail = activeFrame ? basicAuthState.getLoginRequiredDetail(this.props.appState, activeFrame.get('tabId')) : null
+    const loginRequiredDetails = activeFrame
+      ? basicAuthState.getLoginRequiredDetail(this.props.appState, activeFrame.get('tabId'))
+      : null
+    const loginRequiredUrl = loginRequiredDetails
+      ? urlResolve(loginRequiredDetails.getIn(['request', 'url']), '/')
+      : null
     const customTitlebar = this.customTitlebar
     const contextMenuDetail = this.props.windowState.get('contextMenuDetail')
     const shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(this.props.appState, this.props.windowState, activeFrame, isFocused())
@@ -680,8 +686,11 @@ class Main extends ImmutableComponent {
           : null
         }
         {
-          loginRequiredDetail
-            ? <LoginRequired loginRequiredDetail={loginRequiredDetail} tabId={activeFrame.get('tabId')} />
+          loginRequiredUrl
+            ? <LoginRequired
+              loginRequiredUrl={loginRequiredUrl}
+              tabId={activeFrame.get('tabId')}
+            />
             : null
         }
         {
