@@ -280,7 +280,7 @@ const tabState = {
     if (index === tabState.TAB_ID_NONE) {
       return null
     }
-    return makeImmutable(['tabs', index])
+    return ['tabs', index]
   },
 
   getByTabId: (state, tabId) => {
@@ -534,7 +534,7 @@ const tabState = {
       if (path == null) {
         return null
       }
-      return path.push('frame')
+      return path.concat(['frame'])
     } else {
       return frameState.getPathByTabId(state, tabId)
     }

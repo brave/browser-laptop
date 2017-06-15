@@ -195,6 +195,15 @@ const shouldValidateAction = function (cb) {
 }
 
 describe('tabState unit tests', function () {
+  describe('getPathByTabId', function () {
+    it('returns null if tab is not found', function () {
+      assert.equal(tabState.getPathByTabId(twoTabsAppState, 333), null)
+    })
+    it('returns path if index found (as mutable array)', function () {
+      assert.deepEqual(tabState.getPathByTabId(twoTabsAppState, 1), ['tabs', 0])
+    })
+  })
+
   describe('getByTabId', function () {
     before(function () {
       this.appState = twoTabsAppState
