@@ -66,6 +66,7 @@ class BrowserAction extends React.Component {
 
     const props = {}
     // used in renderer
+    props.extensionId = ownProps.extensionId
     props.title = browserActions.get('title')
     props.text = browserActions.get('text')
     props.color = browserActions.get('color')
@@ -75,7 +76,7 @@ class BrowserAction extends React.Component {
     props.popupWindowSrc = currentWindow.getIn(['popupWindowDetail', 'src'])
     props.activeTabId = activeTabId
 
-    return Object.assign({}, ownProps, props)
+    return props
   }
 
   render () {

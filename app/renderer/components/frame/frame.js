@@ -928,6 +928,7 @@ class Frame extends React.Component {
     props.showMessageBox = tab && tab.get('messageBoxDetail')
 
     // used in other functions
+    props.frameKey = ownProps.frameKey
     props.urlBarFocused = frame && frame.getIn(['navbar', 'urlbar', 'focused'])
     props.isAutFillContextMenu = contextMenu && contextMenu.get('type') === 'autofill'
     props.isSecure = frame.getIn(['security', 'isSecure'])
@@ -956,7 +957,7 @@ class Frame extends React.Component {
     props.tabUrl = tab && tab.get('url')
     props.partitionNumber = frame.get('partitionNumber')
 
-    return Object.assign({}, ownProps, props)
+    return props
   }
 
   render () {
