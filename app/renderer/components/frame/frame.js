@@ -192,7 +192,7 @@ class Frame extends React.Component {
           this.runOnDomReady()
           delete this.runOnDomReady
         }
-        this.webview.addEventListener('did-attach', eventCallback)
+        this.webview.addEventListener('did-attach', eventCallback, { passive: true })
       }
 
       if (!this.props.guestInstanceId || !this.webview.attachGuest(this.props.guestInstanceId)) {
@@ -463,14 +463,14 @@ class Frame extends React.Component {
       }
 
       windowActions.frameTabIdChanged(this.frame, this.props.tabId, e.tabID)
-    })
+    }, { passive: true })
     this.webview.addEventListener('guest-ready', (e) => {
       if (this.frame.isEmpty()) {
         return
       }
 
       windowActions.frameGuestInstanceIdChanged(this.frame, this.props.guestInstanceId, e.guestInstanceId)
-    })
+    }, { passive: true })
     this.webview.addEventListener('content-blocked', (e) => {
       if (this.frame.isEmpty()) {
         return
@@ -481,13 +481,13 @@ class Frame extends React.Component {
       if (e.details[0] === 'autoplay') {
         appActions.autoplayBlocked(this.props.tabId)
       }
-    })
+    }, { passive: true })
     this.webview.addEventListener('did-block-run-insecure-content', (e) => {
       if (this.frame.isEmpty()) {
         return
       }
       windowActions.setBlockedRunInsecureContent(this.frame, e.details[0])
-    })
+    }, { passive: true })
     this.webview.addEventListener('enable-pepper-menu', (e) => {
       if (this.frame.isEmpty()) {
         return
@@ -513,17 +513,17 @@ class Frame extends React.Component {
       let mouseOnLeft = e.x < (window.innerWidth / 2)
       let showOnRight = nearBottom && mouseOnLeft
       windowActions.setLinkHoverPreview(e.url, showOnRight)
-    })
-    this.webview.addEventListener('focus', this.onFocus)
+    }, { passive: true })
+    this.webview.addEventListener('focus', this.onFocus, { passive: true })
     this.webview.addEventListener('mouseenter', (e) => {
       windowActions.onFrameMouseEnter(this.props.tabId)
-    })
+    }, { passive: true })
     this.webview.addEventListener('mouseleave', (e) => {
       windowActions.onFrameMouseLeave(this.props.tabId)
-    })
+    }, { passive: true })
     this.webview.addEventListener('will-destroy', (e) => {
       this.onCloseFrame()
-    })
+    }, { passive: true })
     this.webview.addEventListener('page-favicon-updated', (e) => {
       if (this.frame.isEmpty()) {
         return
@@ -533,24 +533,24 @@ class Frame extends React.Component {
           windowActions.setFavicon(this.frame, imageFound ? e.favicons[0] : null)
         })
       }
-    })
+    }, { passive: true })
     this.webview.addEventListener('show-autofill-settings', (e) => {
       appActions.createTabRequested({
         url: 'about:autofill',
         active: true
       })
-    })
+    }, { passive: true })
     this.webview.addEventListener('show-autofill-popup', (e) => {
       if (this.frame.isEmpty()) {
         return
       }
       contextMenus.onShowAutofillMenu(e.suggestions, e.rect, this.frame, e.target.getBoundingClientRect())
-    })
+    }, { passive: true })
     this.webview.addEventListener('hide-autofill-popup', (e) => {
       if (this.props.isAutFillContextMenu) {
         windowActions.autofillPopupHidden(this.props.tabId)
       }
-    })
+    }, { passive: true })
     this.webview.addEventListener('ipc-message', (e) => {
       let method = () => {}
       switch (e.channel) {
@@ -613,7 +613,7 @@ class Frame extends React.Component {
           break
       }
       method.apply(this, e.args)
-    })
+    }, { passive: true })
 
     const loadStart = (e) => {
       if (this.frame.isEmpty()) {
@@ -728,10 +728,10 @@ class Frame extends React.Component {
         secure: runInsecureContent ? false : isSecure,
         runInsecureContent
       })
-    })
+    }, { passive: true })
     this.webview.addEventListener('load-start', (e) => {
       loadStart(e)
-    })
+    }, { passive: true })
     this.webview.addEventListener('did-navigate', (e) => {
       if (this.props.findbarShown) {
         frameStateUtil.onFindBarHide(this.props.frameKey)
@@ -752,7 +752,7 @@ class Frame extends React.Component {
       }
       // force temporary url display for tabnapping protection
       windowActions.setMouseInTitlebar(true)
-    })
+    }, { passive: true })
     this.webview.addEventListener('crashed', (e) => {
       if (this.frame.isEmpty()) {
         return
@@ -764,7 +764,7 @@ class Frame extends React.Component {
       })
       appActions.loadURLRequested(this.props.tabId, 'about:error')
       this.webview = false
-    })
+    }, { passive: true })
     this.webview.addEventListener('did-fail-provisional-load', (e) => {
       if (e.isMainFrame) {
         loadEnd(false, e.validatedURL)
