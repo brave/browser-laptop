@@ -354,11 +354,11 @@ const updateRecentlyClosedMenuItems = () => {
 
   // Update in-memory menu template (Windows)
   const oldTemplate = appStore.getState().getIn(['menu', 'template'])
-  const historySubmenuKey = oldTemplate.findKey(value =>
+  const historyMenuKey = oldTemplate.findKey(value =>
     value.get('label') === locale.translation('history')
   )
-  const newSubmenu = Immutable.fromJS(createHistorySubmenu())
-  const newTemplate = oldTemplate.set(historySubmenuKey, newSubmenu)
+  const newSubmenu = createHistorySubmenu()
+  const newTemplate = oldTemplate.setIn([historyMenuKey, 'submenu'], newSubmenu)
   appActions.setMenubarTemplate(newTemplate)
 }
 
