@@ -3,11 +3,12 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const Immutable = require('immutable')
 const ipc = require('electron').ipcRenderer
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
-const ImmutableComponent = require('../immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 const BrowserButton = require('../common/browserButton')
 
 // Constants
@@ -22,22 +23,35 @@ const cx = require('../../../../js/lib/classSet')
 // Styles
 const commonStyles = require('../styles/commonStyles')
 
-class NotificationItem extends ImmutableComponent {
-  clickHandler (buttonIndex, e) {
-    const nonce = this.props.detail.get('options').get('nonce')
-    if (nonce) {
-      ipc.emit(messages.NOTIFICATION_RESPONSE + nonce, {},
-               this.props.detail.get('message'),
-               buttonIndex, this.checkbox ? this.checkbox.checked : false)
+class NotificationItem extends React.Component {
+  constructor (props) {
+    super(props)
+    this.openAdvanced = this.openAdvanced.bind(this)
+    this.toggleCheckbox = this.toggleCheckbox.bind(this)
+  }
+
+  clickHandler (buttonIndex) {
+    if (this.props.nonce) {
+      ipc.emit(
+        messages.NOTIFICATION_RESPONSE + this.props.nonce,
+        {},
+        this.props.message,
+        buttonIndex,
+        this.checkbox ? this.checkbox.checked : false
+      )
     } else {
-      ipc.send(messages.NOTIFICATION_RESPONSE, this.props.detail.get('message'),
-               buttonIndex, this.checkbox ? this.checkbox.checked : false)
+      ipc.send(
+        messages.NOTIFICATION_RESPONSE,
+        this.props.message,
+        buttonIndex,
+        this.checkbox ? this.checkbox.checked : false
+      )
     }
   }
 
   openAdvanced () {
     appActions.createTabRequested({
-      url: this.props.detail.get('options').get('advancedLink')
+      url: this.props.advancedLink
     })
   }
 
@@ -45,47 +59,63 @@ class NotificationItem extends ImmutableComponent {
     this.checkbox.checked = !this.checkbox.checked
   }
 
+  mergeProps (state, ownProps) {
+    const notification = state.get('notifications')
+        .find((notification) => {
+          return notification.get('message') === ownProps.message
+        }) || Immutable.Map()
+
+    const props = {}
+    props.message = ownProps.message
+    props.greeting = notification.get('greeting')
+    props.buttons = notification.get('buttons') // TODO (nejc) only primitives
+    props.style = notification.getIn(['options', 'style'])
+    props.advancedText = notification.getIn(['options', 'advancedText'])
+    props.advancedLink = notification.getIn(['options', 'advancedLink'])
+    props.persist = notification.getIn(['options', 'persist'])
+    props.nonce = notification.getIn(['options', 'nonce'])
+
+    return props
+  }
+
   render () {
-    let i = 0
-    const options = this.props.detail.get('options')
-    const greeting = this.props.detail.get('greeting')
     return <div className={cx({
       notificationItem: true,
       [css(commonStyles.notificationBar__notificationItem)]: true,
-      [options.get('style')]: options.get('style')
+      [this.props.style]: this.props.style
     })}>
       <div className={css(styles.flexJustifyBetween, styles.flexAlignCenter)}>
         <div className={css(styles.marginRight)}>
           {
-            greeting
-              ? <span className={css(commonStyles.notificationItem__greeting)} data-test-id='greeting'>{greeting}</span>
+            this.props.greeting
+              ? <span className={css(commonStyles.notificationItem__greeting)} data-test-id='greeting'>{this.props.greeting}</span>
               : null
           }
-          <span className={css(commonStyles.notificationItem__message)}>{this.props.detail.get('message')}</span>
+          <span className={css(commonStyles.notificationItem__message)}>{this.props.message}</span>
           <span className={css(styles.advanced)}>
             {
-              options.get('advancedText') && options.get('advancedLink')
-                ? <span onClick={this.openAdvanced.bind(this)}>{options.get('advancedText')}</span>
+              this.props.advancedText && this.props.advancedLink
+                ? <span onClick={this.openAdvanced}>{this.props.advancedText}</span>
                 : null
             }
           </span>
         </div>
         <span className={css(styles.flexAlignCenter)} data-test-id='notificationOptions'>
           {
-            options.get('persist')
+            this.props.persist
               ? <span id='rememberOption'>
                 <input className={css(styles.checkbox)} type='checkbox' ref={(node) => { this.checkbox = node }} />
-                <label className={css(styles.label)} htmlFor='rememberOption' data-l10n-id='rememberDecision' onClick={this.toggleCheckbox.bind(this)} />
+                <label className={css(styles.label)} htmlFor='rememberOption' data-l10n-id='rememberDecision' onClick={this.toggleCheckbox} />
               </span>
               : null
           }
           {
-            this.props.detail.get('buttons').map((button) =>
+            this.props.buttons.map((button, i) =>
               <BrowserButton groupedItem secondaryColor notificationItem
                 iconClass={button.get('className')}
                 testId='notificationButton'
                 label={button.get('text')}
-                onClick={this.clickHandler.bind(this, i++)}
+                onClick={this.clickHandler.bind(this, i)}
               />
             )
           }
@@ -94,6 +124,8 @@ class NotificationItem extends ImmutableComponent {
     </div>
   }
 }
+
+module.exports = ReduxComponent.connect(NotificationItem)
 
 const styles = StyleSheet.create({
   flexJustifyBetween: {
@@ -124,5 +156,3 @@ const styles = StyleSheet.create({
     margin: '5px'
   }
 })
-
-module.exports = NotificationItem
