@@ -376,7 +376,6 @@ function handleChangeSettingAction (settingKey, settingValue) {
 }
 
 let reducers = []
-let ledger = null
 
 const applyReducers = (state, action, immutableAction) => reducers.reduce(
     (appState, reducer) => {
@@ -388,7 +387,6 @@ const applyReducers = (state, action, immutableAction) => reducers.reduce(
 
 const handleAppAction = (action) => {
   if (action.actionType === appConstants.APP_SET_STATE) {
-    ledger = require('../../app/ledger')
     reducers = [
       require('../../app/browser/reducers/downloadsReducer'),
       require('../../app/browser/reducers/flashReducer'),
@@ -409,7 +407,7 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/extensionsReducer'),
       require('../../app/browser/reducers/shareReducer'),
       require('../../app/browser/reducers/updatesReducer'),
-      require('../../app/browser/reducers/topSitesReducer')
+      require('../../app/ledger').doAction
     ]
     initialized = true
     appState = action.appState
@@ -435,7 +433,6 @@ const handleAppAction = (action) => {
       appState = profiles.init(appState, action, appStore)
       appState = require('../../app/browser/menu').init(appState, action, appStore)
       appState = require('../../app/sync').init(appState, action, appStore)
-      ledger.init()
       break
     case appConstants.APP_SHUTTING_DOWN:
       AppDispatcher.shutdown()
