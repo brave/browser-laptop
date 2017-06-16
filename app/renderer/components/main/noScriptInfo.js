@@ -3,11 +3,11 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const PropTypes = require('prop-types')
 const Immutable = require('immutable')
 const urlParse = require('../../../common/urlParse')
 
 // Components
+const ReduxComponent = require('../reduxComponent')
 const ImmutableComponent = require('../immutableComponent')
 const Dialog = require('../common/dialog')
 const BrowserButton = require('../common/browserButton')
@@ -15,14 +15,19 @@ const BrowserButton = require('../common/browserButton')
 // Actions
 const appActions = require('../../../../js/actions/appActions')
 const tabActions = require('../../../common/actions/tabActions')
+const windowActions = require('../../../../js/actions/windowActions')
+
+// State
+const tabState = require('../../../common/state/tabState')
 
 // Utils
 const siteUtil = require('../../../../js/state/siteUtil')
+const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
 class NoScriptCheckbox extends ImmutableComponent {
   toggleCheckbox (e) {
-    this.checkbox.checked = !this.checkbox.checked
     e.stopPropagation()
+    this.checkbox.checked = !this.checkbox.checked
   }
 
   get id () {
@@ -30,32 +35,27 @@ class NoScriptCheckbox extends ImmutableComponent {
   }
 
   render () {
-    return <div className='noScriptCheckbox' id={this.id}
-      onClick={this.toggleCheckbox.bind(this)}>
-      <input type='checkbox' onClick={(e) => { e.stopPropagation() }}
-        ref={(node) => { this.checkbox = node }} defaultChecked
-        origin={this.props.origin} />
+    return <div
+      className='noScriptCheckbox'
+      id={this.id}
+      onClick={this.toggleCheckbox.bind(this)}
+    >
+      <input
+        type='checkbox'
+        onClick={(e) => { e.stopPropagation() }}
+        ref={(node) => { this.checkbox = node }}
+        defaultChecked
+        origin={this.props.origin}
+      />
       <label htmlFor={this.id}>{this.props.origin}</label>
     </div>
   }
 }
 
-class NoScriptInfo extends ImmutableComponent {
-  get blockedOrigins () {
-    const blocked = this.props.frameProps.getIn(['noScript', 'blocked'])
-    if (blocked && blocked.size) {
-      return new Immutable.Set(blocked.map(siteUtil.getOrigin))
-    } else {
-      return new Immutable.Set()
-    }
-  }
-
-  get origin () {
-    return siteUtil.getOrigin(this.props.frameProps.get('location'))
-  }
-
-  get isPrivate () {
-    return this.props.frameProps.get('isPrivate')
+class NoScriptInfo extends React.Component {
+  constructor (props) {
+    super(props)
+    this.unselectAll = this.unselectAll.bind(this)
   }
 
   onClickInner (e) {
@@ -65,22 +65,23 @@ class NoScriptInfo extends ImmutableComponent {
   unselectAll (e) {
     e.stopPropagation()
     let checkboxes = this.checkboxes.querySelectorAll('input')
-    if (!checkboxes) {
-      return
+
+    if (checkboxes) {
+      checkboxes.forEach((box) => {
+        box.checked = false
+      })
     }
-    checkboxes.forEach((box) => {
-      box.checked = false
-    })
   }
 
   reload () {
-    tabActions.reload(this.props.frameProps.get('tabId'))
+    tabActions.reload(this.props.activeTabId)
   }
 
-  onAllow (setting, e) {
-    if (!this.origin) {
+  onAllow (setting) {
+    if (!this.props.origin) {
       return
     }
+
     let checkedOrigins = new Immutable.Map()
     this.checkboxes.querySelectorAll('input').forEach((box) => {
       const origin = box.getAttribute('origin')
@@ -88,53 +89,90 @@ class NoScriptInfo extends ImmutableComponent {
         checkedOrigins = checkedOrigins.set(origin, box.checked ? setting : false)
       }
     })
+
     if (checkedOrigins.filter((value) => value !== false).size) {
-      appActions.noScriptExceptionsAdded(this.origin, checkedOrigins, this.isPrivate)
+      appActions.noScriptExceptionsAdded(this.props.origin, checkedOrigins, this.props.isPrivate)
       this.reload()
-      this.props.onHide()
+      this.onHide()
     }
   }
 
-  get buttons () {
-    return <div>
-      <BrowserButton actionItem l10nId='allowScriptsOnce' onClick={this.onAllow.bind(this, 0)} />
-      {this.isPrivate
-        ? null
-        : <BrowserButton subtleItem l10nId='allowScriptsTemp' onClick={this.onAllow.bind(this, 1)} />
-      }
-    </div>
+  onHide () {
+    windowActions.setNoScriptVisible(false)
+  }
+
+  mergeProps (state, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
+    const blocked = activeFrame.getIn(['noScript', 'blocked'])
+    let blockedOrigins = Immutable.List()
+
+    if (blocked && blocked.size) {
+      const originsSet = Immutable.Set(blocked.map(siteUtil.getOrigin))
+      blockedOrigins = Immutable.List(originsSet.toJS())
+    }
+
+    const props = {}
+    // used in renderer
+    props.siteHost = urlParse(activeFrame.get('location')).host
+    props.showBlocks = blocked && blockedOrigins.size
+    props.blockedOrigins = blockedOrigins
+    props.isPrivate = activeFrame.get('isPrivate')
+
+    // Used in other function
+    props.activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
+    props.origin = siteUtil.getOrigin(activeFrame.get('location'))
+
+    return props
   }
 
   render () {
-    if (!this.origin) {
-      return null
-    }
     const l10nArgs = {
-      site: urlParse(this.props.frameProps.get('location')).host
+      site: this.props.siteHost
     }
-    return <Dialog onHide={this.props.onHide} className='noScriptInfo' isClickDismiss>
+
+    return <Dialog onHide={this.onHide} className='noScriptInfo' isClickDismiss>
       <div className='dialogInner' onClick={this.onClickInner}>
-        <div className='truncate' data-l10n-args={JSON.stringify(l10nArgs)}
-          data-l10n-id={'scriptsBlocked'} />
-        {this.blockedOrigins.size
+        <div
+          className='truncate'
+          data-l10n-args={JSON.stringify(l10nArgs)}
+          data-l10n-id='scriptsBlocked'
+        />
+        {
+          this.props.showBlocks
           ? <div>
             <div ref={(node) => { this.checkboxes = node }} className='blockedOriginsList'>
-              {this.blockedOrigins.map((origin) => <NoScriptCheckbox origin={origin} />)}
+              {
+                this.props.blockedOrigins.map((origin) => <NoScriptCheckbox origin={origin} />)
+              }
             </div>
-            <div data-l10n-id={'unselectAll'}
+            <div
+              data-l10n-id='unselectAll'
               className='clickable'
-              onClick={this.unselectAll.bind(this)} />
-            {this.buttons}
+              onClick={this.unselectAll}
+            />
+            <div>
+              <BrowserButton
+                actionItem
+                l10nId='allowScriptsOnce'
+                onClick={this.onAllow.bind(this, 0)}
+              />
+              {
+                !this.props.isPrivate
+                ? <BrowserButton
+                  subtleItem
+                  l10nId='allowScriptsTemp'
+                  onClick={this.onAllow.bind(this, 1)}
+                />
+                : null
+              }
+            </div>
           </div>
-          : null}
+          : null
+        }
       </div>
     </Dialog>
   }
 }
 
-NoScriptInfo.propTypes = {
-  frameProps: PropTypes.object,
-  onHide: PropTypes.func
-}
-
-module.exports = NoScriptInfo
+module.exports = ReduxComponent.connect(NoScriptInfo)

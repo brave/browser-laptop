@@ -82,7 +82,6 @@ class Main extends ImmutableComponent {
     this.onHideWidevinePanel = this.onHideWidevinePanel.bind(this)
     this.onHideAutofillAddressPanel = this.onHideAutofillAddressPanel.bind(this)
     this.onHideAutofillCreditCardPanel = this.onHideAutofillCreditCardPanel.bind(this)
-    this.onHideNoScript = this.onHideNoScript.bind(this)
     this.onHideReleaseNotes = this.onHideReleaseNotes.bind(this)
     this.onHideCheckDefaultBrowserDialog = this.onHideCheckDefaultBrowserDialog.bind(this)
     this.onTabContextMenu = this.onTabContextMenu.bind(this)
@@ -560,10 +559,6 @@ class Main extends ImmutableComponent {
     windowActions.setAutofillCreditCardDetail()
   }
 
-  onHideNoScript () {
-    windowActions.setNoScriptVisible(false)
-  }
-
   onHideReleaseNotes () {
     windowActions.setReleaseNotesVisible(false)
   }
@@ -679,7 +674,8 @@ class Main extends ImmutableComponent {
     const widevinePanelIsVisible = this.props.windowState.getIn(['widevinePanelDetail', 'shown'])
     const autofillAddressPanelIsVisible = this.props.windowState.get('autofillAddressDetail')
     const autofillCreditCardPanelIsVisible = this.props.windowState.get('autofillCreditCardDetail')
-    const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
+    const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible']) &&
+      siteUtil.getOrigin(activeFrame.get('location'))
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
     const checkDefaultBrowserDialogIsVisible =
       isFocused() && defaultBrowserState.shouldDisplayDialog(this.props.appState)
@@ -785,9 +781,7 @@ class Main extends ImmutableComponent {
         }
         {
           noScriptIsVisible
-            ? <NoScriptInfo
-              frameProps={activeFrame}
-              onHide={this.onHideNoScript} />
+            ? <NoScriptInfo />
             : null
         }
         {
