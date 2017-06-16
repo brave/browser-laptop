@@ -303,6 +303,7 @@ describe('tabsReducer unit tests', function () {
         after(function () {
           tabCloseSetting = tabCloseAction.PARENT
         })
+
         it('chooses the next tab', function () {
           const pickNextAction = {
             actionType: action.actionType,
@@ -316,25 +317,8 @@ describe('tabsReducer unit tests', function () {
           this.clock.tick(1510)
           assert(this.tabsAPI.setActive.withArgs(4).calledOnce)
         })
-      })
 
-      describe('when TAB_CLOSE_ACTION is set to PARENT', function () {
-        it('chooses parent tab id (if parent tab was last active)', function () {
-          tabsReducer(this.state, action)
-          this.clock.tick(1510)
-          assert(this.tabsAPI.setActive.withArgs(4).calledOnce)
-        })
-      })
-
-      describe('when last active tab is not set', function () {
-        beforeEach(function () {
-          this.getLastActiveTabIdStub = sinon.stub(this.tabStateAPI, 'getLastActiveTabId')
-        })
-        afterEach(function () {
-          this.getLastActiveTabIdStub.restore()
-        })
-
-        it('chooses next unpinned tab if nextTabId is TAB_ID_NONE', function () {
+        it('chooses next unpinned tab', function () {
           const pickNextAction = {
             actionType: action.actionType,
             tabId: 3
@@ -348,7 +332,7 @@ describe('tabsReducer unit tests', function () {
           assert(this.tabsAPI.setActive.withArgs(5).calledOnce)
         })
 
-        it('chooses previous unpinned tab if nextTabId is TAB_ID_NONE', function () {
+        it('chooses previous unpinned tab', function () {
           const testState = this.state
             .setIn(['tabs', 2, 'active'], true)
             .setIn(['tabs', 3, 'active'], false)
@@ -373,6 +357,23 @@ describe('tabsReducer unit tests', function () {
             this.clock.tick(1510)
             assert(this.tabsAPI.setActive.withArgs(4).calledOnce)
           })
+        })
+      })
+
+      describe('when TAB_CLOSE_ACTION is set to PARENT', function () {
+        it('chooses parent tab id (if parent tab was last active)', function () {
+          tabsReducer(this.state, action)
+          this.clock.tick(1510)
+          assert(this.tabsAPI.setActive.withArgs(4).calledOnce)
+        })
+
+        it('chooses parent tab id (even if parent tab was NOT last active)', function () {
+          const testState = this.state
+            .setIn(['tabs', 4, 'openerTabId'], 3)
+            .setIn(['tabsInternal', 'lastActive', '2'], Immutable.fromJS([]))
+          tabsReducer(testState, action)
+          this.clock.tick(1510)
+          assert(this.tabsAPI.setActive.withArgs(3).calledOnce)
         })
       })
     })
