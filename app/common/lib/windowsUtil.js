@@ -4,10 +4,14 @@
 
 const Immutable = require('immutable')
 
-module.exports.getPinnedSiteProps = site => {
+const getPinnedSiteProps = site => {
   return Immutable.fromJS({
     location: site.get('location'),
     order: site.get('order'),
     partitionNumber: site.get('partitionNumber') || 0
   })
+}
+
+module.exports = {
+  getPinnedSiteProps
 }

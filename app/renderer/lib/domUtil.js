@@ -1,7 +1,23 @@
-module.exports.createWebView = () => {
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+const styleValues = require('../../common/constants/styleValues')
+
+const createWebView = () => {
   return document.createElement('webview')
 }
 
-module.exports.appendChild = (element, child) => {
+const appendChild = (element, child) => {
   element.appendChild(child)
+}
+
+const getStyleConstants = (prop) => {
+  return styleValues[prop]
+}
+
+module.exports = {
+  createWebView,
+  appendChild,
+  getStyleConstants
 }

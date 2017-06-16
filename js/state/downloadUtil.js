@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 const Immutable = require('immutable')
 const downloadStates = require('../constants/downloadStates')
+const domUtil = require('../../app/renderer/lib/domUtil')
 
 const pendingStates = [downloadStates.IN_PROGRESS, downloadStates.PAUSED]
 const stopStates = [downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.COMPLETED]
@@ -66,11 +67,10 @@ const getDownloadItems = (state) => {
   }
 
   const downloadsSize = state.get('downloads').size
-  const root = window.getComputedStyle(document.querySelector(':root'))
-  const downloadItemWidth = Number.parseInt(root.getPropertyValue('--download-item-width'), 10)
-  const downloadItemMargin = Number.parseInt(root.getPropertyValue('--download-item-margin'), 10)
-  const downloadBarPadding = Number.parseInt(root.getPropertyValue('--download-bar-padding'), 10)
-  const downloadBarButtons = Number.parseInt(root.getPropertyValue('--download-bar-buttons'), 10)
+  const downloadItemWidth = domUtil.getStyleConstants('download-item-width')
+  const downloadItemMargin = domUtil.getStyleConstants('download-item-margin')
+  const downloadBarPadding = domUtil.getStyleConstants('download-bar-padding')
+  const downloadBarButtons = domUtil.getStyleConstants('download-bar-buttons')
   const numItems = Math.floor(
     (window.innerWidth - (downloadBarPadding * 2) - downloadBarButtons) /
     (downloadItemWidth + downloadItemMargin)
