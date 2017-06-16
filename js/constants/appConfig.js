@@ -205,6 +205,7 @@ module.exports = {
     'extensions.pocket.enabled': false,
     'extensions.vimium.enabled': false,
     'extensions.honey.enabled': false,
+    'extensions.pinterest.enabled': false,
     'general.bookmarks-toolbar-mode': null,
     'general.is-default-browser': null,
     'notification-add-funds-timestamp': null,
