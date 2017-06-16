@@ -59,6 +59,7 @@ const shieldState = require('../../../common/state/shieldState')
 const siteSettingsState = require('../../../common/state/siteSettingsState')
 const menuBarState = require('../../../common/state/menuBarState')
 const windowState = require('../../../common/state/windowState')
+const updateState = require('../../../common/state/updateState')
 
 // Util
 const _ = require('underscore')
@@ -643,6 +644,7 @@ class Main extends ImmutableComponent {
     const activeOrigin = activeFrame ? siteUtil.getOrigin(activeFrame.get('location')) : null
     const notificationBarIsVisible = activeOrigin && this.props.appState.get('notifications').filter((item) =>
       item.get('frameOrigin') ? activeOrigin === item.get('frameOrigin') : true).size > 0
+    const updateIsVisible = updateState.isUpdateVisible(this.props.appState)
 
     const appStateSites = this.props.appState.get('sites')
 
@@ -737,8 +739,11 @@ class Main extends ImmutableComponent {
             ? <CheckDefaultBrowserDialog />
             : null
         }
-
-        <UpdateBar updates={this.props.appState.get('updates')} />
+        {
+          updateIsVisible
+          ? <UpdateBar />
+          : null
+        }
         {
           showBookmarksToolbar
           ? <BookmarksToolbar
