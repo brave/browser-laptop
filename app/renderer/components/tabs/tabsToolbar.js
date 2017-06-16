@@ -3,14 +3,12 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const Immutable = require('immutable')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
 const Tabs = require('./tabs')
 const PinnedTabs = require('./pinnedTabs')
-
-// Store
-const windowStore = require('../../../../js/stores/windowStore')
 
 // Utils
 const contextMenus = require('../../../../js/contextMenus')
@@ -23,16 +21,18 @@ class TabsToolbar extends React.Component {
     this.onHamburgerMenu = this.onHamburgerMenu.bind(this)
   }
 
-  get activeFrame () {
-    return windowStore.getFrame(this.props.activeFrameKey)
-  }
-
   onContextMenu (e) {
     if (e.target.tagName === 'BUTTON') {
       return
     }
 
-    contextMenus.onTabsToolbarContextMenu(this.props.activeFrame, undefined, undefined, e)
+    contextMenus.onTabsToolbarContextMenu(
+      this.props.activeFrameTitle,
+      this.props.activeFrameLocation,
+      undefined,
+      undefined,
+      e
+    )
   }
 
   onHamburgerMenu (e) {
@@ -41,7 +41,7 @@ class TabsToolbar extends React.Component {
 
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const activeFrame = frameStateUtil.getActiveFrame(currentWindow)
+    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const pinnedTabs = frameStateUtil.getPinnedFrames(currentWindow)
 
     const props = {}
@@ -49,8 +49,9 @@ class TabsToolbar extends React.Component {
     props.hasPinnedTabs = pinnedTabs.size > 0
 
     // used in other functions
-    props.activeFrameKey = activeFrame && activeFrame.get('key')
-    props.activeFrameLocation = (activeFrame && activeFrame.get('location')) || ''
+    props.activeFrameKey = activeFrame.get('key')
+    props.activeFrameLocation = activeFrame.get('location', '')
+    props.activeFrameTitle = activeFrame.get('title', '')
 
     return props
   }
