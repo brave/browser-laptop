@@ -8,7 +8,6 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
-const BrowserButton = require('../common/browserButton')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
@@ -23,6 +22,7 @@ const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
 // Style
 const commonStyles = require('../styles/commonStyles')
+const cx = require('../../../../js/lib/classSet')
 
 const noFundVerifiedPublisherImage = require('../../../extensions/brave/img/urlbar/browser_URL_fund_no_verified.svg')
 const fundVerifiedPublisherImage = require('../../../extensions/brave/img/urlbar/browser_URL_fund_yes_verified.svg')
@@ -76,15 +76,12 @@ class PublisherToggle extends React.Component {
       className={css(
         commonStyles.navigator__buttonContainer,
         commonStyles.navigator__buttonContainer_outsideOfURLbar,
-        styles.navigator__buttonContainer_addPublisherButtonContainer,
+        styles.navigator__buttonContainer_publisherToggleContainer
       )}>
-      <BrowserButton
-        custom={[
-          !this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher && styles.noFundVerified,
-          this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher && styles.noFundVerified,
-          !this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher && styles.noFundUnverified,
-          this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher && styles.fundUnverified
-        ]}
+      <button className={cx({
+        normalizeButton: true,
+        [css((!this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher) && styles.publisherButton_noFundVerified, (this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher) && styles.publisherButton_fundVerified, (!this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher) && styles.publisherButton_noFundUnverified, (this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher) && styles.publisherButton_fundUnverified, styles.publisherButton)]: true
+      })}
         data-l10n-id={this.l10nString}
         onClick={this.onAuthorizePublisher}
       />
@@ -92,34 +89,35 @@ class PublisherToggle extends React.Component {
   }
 }
 
-module.exports = ReduxComponent.connect(PublisherToggle)
-
 const styles = StyleSheet.create({
-  // ref: navigator__buttonContainer_bookmarkButtonContainer on navigationBar.js
-  // ref: urlbarForm_isPublisherButtonEnabled on urlBar.js
-  navigator__buttonContainer_addPublisherButtonContainer: {
+  navigator__buttonContainer_publisherToggleContainer: {
     borderLeft: 'none',
-    borderTopLeftRadius: '0',
-    borderBottomLeftRadius: '0'
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0
   },
 
-  // TODO: Refactor to BEM style
-  noFundVerified: {
-    backgroundImage: `url(${noFundVerifiedPublisherImage})`,
-    backgroundSize: '18px',
-    marginLeft: '2px'
+  publisherButton_noFundVerified: {
+    // 1px added due to the check mark
+    background: `url(${noFundVerifiedPublisherImage}) calc(50% + 1px) no-repeat`
   },
-  fundVerified: {
-    backgroundImage: `url(${fundVerifiedPublisherImage})`,
-    backgroundSize: '18px',
-    marginLeft: '2px'
+
+  publisherButton_fundVerified: {
+    background: `url(${fundVerifiedPublisherImage}) calc(50% + 1px) no-repeat`
   },
-  noFundUnverified: {
-    backgroundImage: `url(${noFundUnverifiedPublisherImage})`,
-    backgroundSize: '18px'
+
+  publisherButton_noFundUnverified: {
+    background: `url(${noFundUnverifiedPublisherImage}) 50% no-repeat`
   },
-  fundUnverified: {
-    backgroundImage: `url(${fundUnverifiedPublisherImage})`,
-    backgroundSize: '18px'
+
+  publisherButton_fundUnverified: {
+    background: `url(${fundUnverifiedPublisherImage}) 50% no-repeat`
+  },
+
+  publisherButton: {
+    backgroundSize: '18px 18px',
+    width: '100%',
+    height: '100%'
   }
 })
+
+module.exports = ReduxComponent.connect(PublisherToggle)

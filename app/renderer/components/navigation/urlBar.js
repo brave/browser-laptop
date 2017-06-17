@@ -424,6 +424,88 @@ class UrlBar extends React.Component {
       this.props.suggestionList && this.props.suggestionList.size > 0
   }
 
+  get showNoScriptInfo () {
+    return this.props.enableNoScript && this.props.scriptsBlocked && this.props.scriptsBlocked.size
+  }
+
+  get UrlBarIcon () {
+    return <UrlBarIcon
+      activateSearchEngine={this.props.activateSearchEngine}
+      active={this.props.isActive}
+      isSecure={this.props.isSecure}
+      isHTTPPage={this.props.isHTTPPage}
+      loading={this.props.loading}
+      location={this.props.location}
+      searchSelectEntry={this.props.searchSelectEntry}
+      title={this.props.title}
+      titleMode={this.props.titleMode}
+      isSearching={this.props.location !== this.props.urlbarLocation}
+      activeTabShowingMessageBox={this.props.activeTabShowingMessageBox}
+    />
+  }
+
+  // BEM Level: urlbarForm__titleBar
+  get titleBar () {
+    return <div id='titleBar' className={css(styles.titleBar)}>
+      <span className={css(styles.titleBar__host)}>{this.props.hostValue}</span>
+      <span>{this.props.hostValue && this.titleValue ? ' | ' : ''}</span>
+      <span>{this.titleValue}</span>
+    </div>
+  }
+
+  // BEM Level: urlbarForm__titleBar__loadTime
+  get loadTimer () {
+    return <span className={css(
+      styles.loadTime,
+      this.props.isActive && styles.loadTime_onFocus
+    )}
+      data-test-id='loadTime'>{this.loadTime}</span>
+  }
+
+  // BEM Level: urlbarForm__input
+  get input () {
+    return <input type='text'
+      spellCheck='false'
+      disabled={this.props.displayURL === undefined && this.loadTime === ''}
+      onFocus={this.onFocus}
+      onBlur={this.onBlur}
+      onKeyDown={this.onKeyDown}
+      onKeyUp={this.onKeyUp}
+      onChange={this.onChange}
+      onKeyPress={this.onKeyPress}
+      onClick={this.onClick}
+      onContextMenu={this.onContextMenu}
+      data-l10n-id='urlbar'
+      data-test-id='urlInput'
+      className={cx({
+        private: this.private,
+        testHookLoadDone: !this.props.loading,
+        [css(styles.input, this.props.isWindows && styles.input_windows)]: true
+      })}
+      readOnly={this.props.titleMode}
+      ref={(node) => { this.urlInput = node }}
+    />
+  }
+
+  // BEM Level: urlbarForm__legend
+  get legend () {
+    return <legend className={css(
+      styles.legend,
+      !!this.props.isFocused && styles.legend_isFocused,
+      this.props.isPublisherButtonEnabled && styles.legend_isPublisherButtonEnabled
+    )} />
+  }
+
+  // BEM Level: urlbarForm__buttonContainer_showNoScript
+  get noScriptInfo () {
+    return <span className={css(commonStyles.navigator__urlbarForm__buttonContainer_showNoScriptInfo)}
+      onClick={this.onNoScript}>
+      <span className={css(styles.showNoScript__noScriptButton)}
+        data-l10n-id='noScriptButton'
+        data-test-id='noScriptButton' />
+    </span>
+  }
+
   onNoScript () {
     windowActions.setNoScriptVisible()
   }
@@ -522,55 +604,23 @@ class UrlBar extends React.Component {
       </div>
       {
         this.props.titleMode
-        ? <div id='titleBar' className={css(styles.urlbarForm__titleBar)}>
-          <span className={css(styles.urlbarForm__titleBar__host)}>{this.props.hostValue}</span>
-          <span>{this.props.hostValue && this.titleValue ? ' | ' : ''}</span>
-          <span>{this.titleValue}</span>
-        </div>
-        : <input type='text'
-          spellCheck='false'
-          disabled={this.props.displayURL === undefined && this.loadTime === ''}
-          onFocus={this.onFocus}
-          onBlur={this.onBlur}
-          onKeyDown={this.onKeyDown}
-          onKeyUp={this.onKeyUp}
-          onChange={this.onChange}
-          onKeyPress={this.onKeyPress}
-          onClick={this.onClick}
-          onContextMenu={this.onContextMenu}
-          data-l10n-id='urlbar'
-          data-test-id='urlInput'
-          className={cx({
-            private: this.private,
-            testHookLoadDone: !this.props.loading,
-            [css(styles.urlbarForm__input, this.props.isWindows && styles.urlbarForm__input_windows)]: true
-          })}
-          readOnly={this.props.titleMode}
-          ref={(node) => { this.urlInput = node }} />
+        ? this.titleBar
+        : this.input
       }
-      <legend className={css(
-        styles.urlbarForm__legend,
-        !!this.props.isFocused && styles.urlbarForm__legend_isFocused,
-        this.props.isPublisherButtonEnabled && styles.urlbarForm__legend_isPublisherButtonEnabled
-      )} />
+      {
+        this.props.titleMode
+        ? null
+        : this.legend
+      }
       {
         this.props.showDisplayTime
-        ? <span className={css(
-          styles.urlbarForm__titleBar__loadTime,
-          this.props.isActive && styles.urlbarForm__titleBar__loadTime_onFocus
-        )}
-          data-test-id='loadtime'>{this.loadTime}</span>
+        ? this.loadTimer
         : null
       }
       {
-        !this.props.showNoScriptInfo
-        ? null
-        : <span className={css(commonStyles.navigator__urlbarForm__buttonContainer_showNoScriptInfo)}
-          onClick={this.onNoScript}>
-          <span className={css(styles.urlbarForm__buttonContainer_showNoScript__noScriptButton)}
-            data-l10n-id='noScriptButton'
-            data-test-id='noScriptButton' />
-        </span>
+        this.props.showNoScriptInfo
+        ? this.noScriptInfo
+        : null
       }
       {
           this.shouldRenderUrlBarSuggestions
@@ -634,7 +684,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 0
   },
 
-  urlbarForm__titleBar: {
+  titleBar: {
     display: 'inline-block',
     color: globalStyles.color.chromeText,
     fontSize: globalStyles.spacing.defaultFontSize,
@@ -644,11 +694,11 @@ const styles = StyleSheet.create({
     whiteSpace: 'nowrap'
   },
 
-  urlbarForm__titleBar__host: {
+  titleBar__host: {
     fontWeight: 600
   },
 
-  urlbarForm__input: {
+  input: {
     background: '#fff',
     border: 'none',
     boxSizing: 'border-box',
@@ -669,7 +719,7 @@ const styles = StyleSheet.create({
     WebkitAppRegion: 'no-drag'
   },
 
-  urlbarForm__input_windows: {
+  input_windows: {
     fontWeight: 500,
     lineHeight: 1.4,
     margin: 0, // #5624
@@ -677,7 +727,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
 
-  urlbarForm__legend: {
+  legend: {
     ':before': {
       display: 'none',
       content: '" "',
@@ -694,28 +744,28 @@ const styles = StyleSheet.create({
     }
   },
 
-  urlbarForm__legend_isFocused: {
+  legend_isFocused: {
     ':before': {
       display: 'block'
     }
   },
 
-  urlbarForm__legend_isPublisherButtonEnabled: {
+  legend_isPublisherButtonEnabled: {
     ':before': {
       borderRadius: 0
     }
   },
 
-  urlbarForm__titleBar__loadTime: {
+  loadTime: {
     color: globalStyles.color.loadTimeColor,
     fontSize: '12px'
   },
 
-  urlbarForm__titleBar__loadTime_onFocus: {
+  loadTime_onFocus: {
     display: 'none'
   },
 
-  urlbarForm__buttonContainer_showNoScript__noScriptButton: {
+  showNoScript__noScriptButton: {
     background: `url(${iconNoScript}) center no-repeat`,
     width: '15px',
     height: '15px',

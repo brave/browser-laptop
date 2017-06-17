@@ -134,6 +134,25 @@ class NavigationBar extends React.Component {
     />
   }
 
+  // BEM Level: navigator
+  get bookmarkButtonContainer () {
+    return <span className={css(
+      commonStyles.navigator__buttonContainer,
+      commonStyles.navigator__buttonContainer_outsideOfURLbar,
+      styles.navigator__buttonContainer_bookmarkButtonContainer
+    )}>
+      <button className={cx({
+        normalizeButton: true,
+        withHomeButton: getSetting(settings.SHOW_HOME_BUTTON),
+        [css(styles.navigator__buttonContainer_bookmarkButtonContainer__bookmarkButton, this.bookmarked && styles.navigator__buttonContainer_bookmarkButtonContainer__bookmarkButton_removeBookmarkButton)]: true
+      })}
+        data-l10n-id={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
+        data-test-id={this.bookmarked ? 'bookmarked' : 'notBookmarked'}
+        onClick={this.onToggleBookmark}
+      />
+    </span>
+  }
+
   componentDidMount () {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, () => this.onToggleBookmark())
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark())
@@ -233,20 +252,7 @@ class NavigationBar extends React.Component {
       }
       {
         !this.props.titleMode
-        ? <span className={cx({
-          bookmarkButtonContainer: true,
-          [css(commonStyles.navigator__buttonContainer, commonStyles.navigator__buttonContainer_outsideOfURLbar, styles.navigator__buttonContainer_bookmarkButtonContainer)]: true
-        })}>
-          <button className={cx({
-            normalizeButton: true,
-            withHomeButton: getSetting(settings.SHOW_HOME_BUTTON),
-            [css(styles.navigator__buttonContainer_bookmarkButtonContainer__bookmarkButton, this.bookmarked && styles.navigator__buttonContainer_bookmarkButtonContainer__bookmarkButton_removeBookmarkButton)]: true
-          })}
-            data-l10n-id={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
-            data-test-id={this.bookmarked ? 'bookmarked' : 'notBookmarked'}
-            onClick={this.onToggleBookmark}
-          />
-        </span>
+        ? this.bookmarkButtonContainer
         : null
       }
       <UrlBar
@@ -339,20 +345,12 @@ const styles = StyleSheet.create({
   navigator__buttonContainer_bookmarkButtonContainer__bookmarkButton: {
     background: `url(${bookmarkButton}) center no-repeat`,
     backgroundSize: '14px 14px',
-    width: globalStyles.navigationBar.urlbarForm.height, // #6704
-    height: globalStyles.navigationBar.urlbarForm.height // #6704
+    width: '100%',
+    height: '100%'
   },
 
   navigator__buttonContainer_bookmarkButtonContainer__bookmarkButton_removeBookmarkButton: {
     background: `url(${bookmarkedButton}) center no-repeat`
-  },
-
-  navigator__endButtons_titleMode: {
-    display: 'none'
-  },
-
-  navigator__endButtons_notTitleMode: {
-    display: 'flex'
   }
 })
 

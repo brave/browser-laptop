@@ -56,10 +56,11 @@ class HomeButton extends ImmutableComponent {
   }
 
   render () {
+    // BEM Level: navigator__navigationButtonContainer
     return <span className='navigationButtonContainer'>
       <button className={cx({
         normalizeButton: true,
-        [css(styles.navigator__navigationButtonContainer__navigationButton, styles.navigator__navigationButtonContainer__navigationButton_homeButton)]: true
+        [css(styles.navigationButton, styles.navigationButton_homeButton)]: true
       })}
         data-test-id='homeButton'
         data-l10n-id='homeButton'
@@ -71,7 +72,7 @@ class HomeButton extends ImmutableComponent {
 }
 
 const styles = StyleSheet.create({
-  navigator__navigationButtonContainer__navigationButton: {
+  navigationButton: {
     // cf: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L550-L553
     backgroundColor: globalStyles.color.buttonColor,
     display: 'inline-block',
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
     padding: 0
   },
 
-  navigator__navigationButtonContainer__navigationButton_homeButton: {
+  navigationButton_homeButton: {
     background: `url(${homeButton}) center no-repeat`,
     backgroundSize: `16px 16px`
   }
