@@ -176,7 +176,12 @@ class Tab extends React.Component {
         return
       case 1:
         // Close tab with middle click
-        this.onTabClosedWithMouse(e)
+        // This is ignored for pinned tabs
+        // TODO: @cezaraugusto remove conditional
+        // when #4063 is resolved
+        if (!this.props.isPinnedTab) {
+          this.onTabClosedWithMouse(e)
+        }
         break
       default:
         e.stopPropagation()
