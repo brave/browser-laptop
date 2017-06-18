@@ -42,7 +42,7 @@ class NotificationBar extends ImmutableComponent {
 class NotificationBarCaret extends ImmutableComponent {
   render () {
     return <div className={css(styles.caretWrapper)}>
-      <div className={css(styles.caret)} />
+      <div className={css(styles.caretWrapper__caret)} />
     </div>
   }
 }
@@ -56,10 +56,12 @@ const styles = StyleSheet.create({
     zIndex: globalStyles.zindex.zindexTabs,
     filter: 'drop-shadow(rgba(0,0,0,0.25) 0px 0px 1px)'
   },
-  caret: {
+
+  caretWrapper__caret: {
     position: 'relative',
     margin: 'auto',
     width: '16px',
+
     ':before': {
       content: '""',
       position: 'absolute',

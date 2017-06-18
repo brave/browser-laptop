@@ -126,17 +126,17 @@ class LedgerRecoveryFooter extends ImmutableComponent {
 
   render () {
     return <div>
-      <BrowserButton primaryColor groupedItem
+      <BrowserButton groupedItem primaryColor
         l10nId='recover'
         testId='recoverButton'
         onClick={this.recoverWallet}
       />
-      <BrowserButton primaryColor groupedItem
+      <BrowserButton groupedItem primaryColor
         l10nId='recoverFromFile'
         testId='recoverFromFileButton'
         onClick={this.recoverWalletFromFile}
       />
-      <BrowserButton secondaryColor groupedItem
+      <BrowserButton groupedItem secondaryColor
         l10nId='cancel'
         testId='cancelButton'
         onClick={this.props.hideOverlay.bind(this, 'ledgerRecovery')}

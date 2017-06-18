@@ -68,7 +68,7 @@ class UpdateHello extends ImmutableComponent {
 
 class UpdateHide extends ImmutableComponent {
   render () {
-    return <BrowserButton notificationItem secondaryColor
+    return <BrowserButton groupedItem notificationItem secondaryColor
       testId='updateHide'
       l10nId='updateHide'
       onClick={appActions.setUpdateStatus.bind(null, this.props.reset ? UpdateStatus.UPDATE_NONE : undefined, false, undefined)} />
@@ -80,7 +80,7 @@ class UpdateLog extends ImmutableComponent {
     appActions.updateLogOpened()
   }
   render () {
-    return <BrowserButton notificationItem secondaryColor
+    return <BrowserButton groupedItem notificationItem secondaryColor
       testId='updateViewLogButton'
       l10nId='updateViewLog'
       onClick={this.onViewLog.bind(this)} />
@@ -98,17 +98,17 @@ class UpdateAvailable extends ImmutableComponent {
       <span className={css(styles.flexAlignCenter)} data-test-id='notificationOptions'>
         {
           this.props.metadata && this.props.metadata.get('notes')
-          ? <BrowserButton notificationItem secondaryColor
+          ? <BrowserButton groupedItem notificationItem secondaryColor
             testId='updateDetails'
             l10nId='updateDetails'
             onClick={windowActions.setReleaseNotesVisible.bind(null, true)} />
           : null
         }
-        <BrowserButton notificationItem secondaryColor
+        <BrowserButton groupedItem notificationItem secondaryColor
           testId='updateLater'
           l10nId='updateLater'
           onClick={appActions.setUpdateStatus.bind(null, UpdateStatus.UPDATE_AVAILABLE_DEFERRED, false, undefined)} />
-        <BrowserButton notificationItem primaryColor
+        <BrowserButton groupedItem notificationItem primaryColor
           testId='updateNow'
           l10nId='updateNow'
           onClick={appActions.setUpdateStatus.bind(null, UpdateStatus.UPDATE_APPLYING_RESTART, false, undefined)} />

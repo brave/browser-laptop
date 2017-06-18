@@ -81,7 +81,7 @@ class NotificationItem extends ImmutableComponent {
           }
           {
             this.props.detail.get('buttons').map((button) =>
-              <BrowserButton secondaryColor notificationItem groupedItem
+              <BrowserButton groupedItem secondaryColor notificationItem
                 iconClass={button.get('className')}
                 testId='notificationButton'
                 label={button.get('text')}

@@ -93,12 +93,12 @@ class SyncTab extends ImmutableComponent {
     }
     // displayed before a sync userId has been created
     return <section className={css(styles.setupContent)}>
-      <BrowserButton primaryColor
+      <BrowserButton groupedItem primaryColor
         l10nId='syncStart'
         testId='syncStartButton'
         onClick={this.props.showOverlay.bind(this, 'syncStart')}
       />
-      <BrowserButton secondaryColor
+      <BrowserButton groupedItem secondaryColor
         l10nId='syncAdd'
         testId='syncAddButton'
         onClick={this.props.showOverlay.bind(this, 'syncAdd')}
@@ -365,12 +365,12 @@ class SyncTab extends ImmutableComponent {
 
   get resetOverlayFooter () {
     return <section>
-      <BrowserButton secondaryColor groupedItem
+      <BrowserButton groupedItem secondaryColor
         l10nId='cancel'
         testId='cancelButton'
         onClick={this.props.hideOverlay.bind(this, 'syncReset')}
       />
-      <BrowserButton primaryColor groupedItem
+      <BrowserButton groupedItem primaryColor
         l10nId='syncReset'
         testId='syncResetButton'
         onClick={this.onReset}
