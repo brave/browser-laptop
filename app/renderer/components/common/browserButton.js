@@ -84,7 +84,6 @@ const styles = StyleSheet.create({
   browserButton: {
     height: buttonSize,
     width: buttonSize,
-    margin: '0 3px',
     whiteSpace: 'nowrap',
     outline: 'none',
     cursor: 'default',
@@ -103,6 +102,11 @@ const styles = StyleSheet.create({
     // TODO: #9223
     fontSize: '13px',
     lineHeight: buttonSize,
+
+    // The buttons as such do not require margin.
+    // They are expected to have margin only if they are grouped.
+    // Also see note on browserButton_groupedItem below.
+    margin: 0,
 
     // cf: https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L49
     color: globalStyles.button.color,
@@ -188,8 +192,19 @@ const styles = StyleSheet.create({
     //
     // TODO: remove !important and check advancedSettings.js
     // once preferences is fully refactored
-    marginRight: '4px !important',
-    marginLeft: '4px !important'
+
+    // 'mm' assures theoretically the equal width of margin
+    // on every platform with any display monitor resolution.
+    // 7.5px = 1/12 inch
+    marginLeft: '7.5px !important',
+
+    // Issue #9252
+    // Because the grouped buttons are *by design* aligned to the right
+    // with flex/grid, margin-right of each one should be null.
+    // If you set margin-right to those buttons, it is expected to lead
+    // to the alignment inconsistency.
+    // Before making a change, please consult with Brad on your proposal.
+    marginRight: 0
   },
 
   browserButton_notificationItem: {

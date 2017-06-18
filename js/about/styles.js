@@ -282,13 +282,13 @@ class AboutStyle extends ImmutableComponent {
           &lt;BrowserButton subtleItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
-        <BrowserButton primaryColor groupedItem l10nId='primaryColor' onClick={this.onRemoveBookmark} />
-        <BrowserButton secondaryColor groupedItem l10nId='secondaryColor' onClick={this.onRemoveBookmark} />
-        <BrowserButton primaryColor groupedItem l10nId='primaryColor' onClick={this.onRemoveBookmark} />
+        <BrowserButton groupedItem primaryColor l10nId='primaryColor' onClick={this.onRemoveBookmark} />
+        <BrowserButton groupedItem secondaryColor l10nId='secondaryColor' onClick={this.onRemoveBookmark} />
+        <BrowserButton groupedItem primaryColor l10nId='primaryColor' onClick={this.onRemoveBookmark} />
         <Pre><Code>
-          &lt;BrowserButton primaryColor groupedItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />{'\n'}
-          &lt;BrowserButton secondaryColor groupedItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />{'\n'}
-          &lt;BrowserButton primaryColor groupedItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
+          &lt;BrowserButton groupedItem primaryColor l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />{'\n'}
+          &lt;BrowserButton groupedItem secondaryColor l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />{'\n'}
+          &lt;BrowserButton groupedItem primaryColor l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
         <BrowserButton extensionItem l10nId='extensionItem' onClick={this.onRemoveBookmark} />
@@ -296,11 +296,11 @@ class AboutStyle extends ImmutableComponent {
           &lt;BrowserButton extensionItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
-        <BrowserButton secondaryColor notificationItem groupedItem l10nId='notificationItem' onClick={this.onRemoveBookmark} />
-        <BrowserButton secondaryColor notificationItem groupedItem l10nId='notificationItem' onClick={this.onRemoveBookmark} />
+        <BrowserButton groupedItem secondaryColor notificationItem l10nId='notificationItem' onClick={this.onEnableAutoplay} />
+        <BrowserButton groupedItem secondaryColor notificationItem l10nId='notificationItem' onClick={this.onEnableAutoplay} />
         <Pre><Code>
-          &lt;BrowserButton secondaryColor notificationItem groupedItem l10nId='Yes' onClick={'{this.onRemoveBookmark}'} />{'\n'}
-          &lt;BrowserButton secondaryColor notificationItem groupedItem l10nId='No' onClick={'{this.onRemoveBookmark}'} />
+          &lt;BrowserButton groupedItem secondaryColor notificationItem l10nId='Yes' onClick={'{this.onEnableAutoplay}'} />{'\n'}
+          &lt;BrowserButton groupedItem secondaryColor notificationItem l10nId='No' onClick={'{this.onEnableAutoplay}'} />
         </Code></Pre>
 
         <BrowserButton iconOnly iconClass={globalStyles.appIcons.moreInfo} size='30px' color='rebeccapurple' />
@@ -350,8 +350,8 @@ class AboutStyle extends ImmutableComponent {
                 labore et dolore magna aliqua.
               </CommonFormSection>
               <CommonFormButtonWrapper>
-                <BrowserButton secondaryColor l10nId='Cancel' />
-                <BrowserButton primaryColor l10nId='Done' />
+                <BrowserButton groupedItem secondaryColor l10nId='Cancel' />
+                <BrowserButton groupedItem primaryColor l10nId='Done' />
               </CommonFormButtonWrapper>
               <CommonFormBottomWrapper>
                 <CommonFormClickable>CommonFormClickable</CommonFormClickable>
@@ -395,8 +395,8 @@ class AboutStyle extends ImmutableComponent {
             <Tab2>sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.{'\n'}</Tab2>
             <Tab>&lt;/CommonFormSection&gt;{'\n'}</Tab>
             <Tab>&lt;CommonFormButtonWrapper&gt;{'\n'}</Tab>
-            <Tab2>&lt;button data-l10n-id='Cancel' className='browserButton whiteButton' /&gt;{'\n'}</Tab2>
-            <Tab2>&lt;button data-l10n-id='Done' className='browserButton primaryButton' /&gt;{'\n'}</Tab2>
+            <Tab2>&lt;BrowserButton groupedItem secondaryColor l10nId='Cancel' /&gt;{'\n'}</Tab2>
+            <Tab2>&lt;BrowserButton groupedItem primaryColor l10nId='Done' /&gt;{'\n'}</Tab2>
             <Tab>&lt;/CommonFormButtonWrapper&gt;{'\n'}</Tab>
             <Tab>&lt;CommonFormBottomWrapper&gt;{'\n'}</Tab>
             <Tab2>&lt;CommonFormClickable&gt;CommonFormClickable&lt;/CommonFormClickable&gt;{'\n'}</Tab2>
@@ -541,8 +541,8 @@ class AboutStyle extends ImmutableComponent {
           }}>
             <CommonForm>
               <CommonFormButtonWrapper>
-                <BrowserButton secondaryColor l10nId='Cancel' />
-                <BrowserButton primaryColor l10nId='Done' />
+                <BrowserButton groupedItem secondaryColor l10nId='Cancel' />
+                <BrowserButton groupedItem primaryColor l10nId='Done' />
               </CommonFormButtonWrapper>
             </CommonForm>
           </div>
@@ -555,8 +555,8 @@ class AboutStyle extends ImmutableComponent {
             {'\n'}
             &lt;CommonForm&gt;{'\n'}
             <Tab>&lt;CommonFormButtonWrapper&gt;{'\n'}</Tab>
-            <Tab2>&lt;button data-l10n-id='Cancel' className='browserButton whiteButton' /&gt;{'\n'}</Tab2>
-            <Tab2>&lt;button data-l10n-id='Done' className='browserButton primaryButton' /&gt;{'\n'}</Tab2>
+            <Tab2>&lt;BrowserButton groupedItem secondaryColor l10nId='Cancel' /&gt;{'\n'}</Tab2>
+            <Tab2>&lt;BrowserButton groupedItem primaryColor l10nId='Done' /&gt;{'\n'}</Tab2>
             <Tab>&lt;/CommonFormButtonWrapper&gt;{'\n'}</Tab>
             &lt;/CommonForm&gt;{'\n'}
           </Code></Pre>
