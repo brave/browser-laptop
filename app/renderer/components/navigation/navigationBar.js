@@ -110,7 +110,7 @@ class NavigationBar extends React.Component {
       this.props.bookmarked
   }
 
-  // BEM Level: navigator__navigationButtonContainer
+  // BEM Level: navigationBar__navigationButtonContainer
   get stopButton () {
     return <button className={cx({
       normalizeButton: true,
@@ -121,7 +121,7 @@ class NavigationBar extends React.Component {
     />
   }
 
-  // BEM Level: navigator__navigationButtonContainer
+  // BEM Level: navigationBar__navigationButtonContainer
   get reloadButton () {
     return <LongPressButton className={cx({
       normalizeButton: true,
@@ -134,17 +134,17 @@ class NavigationBar extends React.Component {
     />
   }
 
-  // BEM Level: navigator
+  // BEM Level: navigationBar
   get bookmarkButtonContainer () {
     return <span className={css(
-      commonStyles.navigator__buttonContainer,
-      commonStyles.navigator__buttonContainer_outsideOfURLbar,
-      styles.navigator__buttonContainer_bookmarkButtonContainer
+      commonStyles.navigationBar__buttonContainer,
+      commonStyles.navigationBar__buttonContainer_outsideOfURLbar,
+      styles.navigationBar__buttonContainer_bookmarkButtonContainer
     )}>
       <button className={cx({
         normalizeButton: true,
         withHomeButton: getSetting(settings.SHOW_HOME_BUTTON),
-        [css(styles.navigator__buttonContainer_bookmarkButtonContainer__bookmarkButton, this.bookmarked && styles.navigator__buttonContainer_bookmarkButtonContainer__bookmarkButton_removeBookmarkButton)]: true
+        [css(styles.navigationBar__buttonContainer_bookmarkButtonContainer__bookmarkButton, this.bookmarked && styles.navigationBar__buttonContainer_bookmarkButtonContainer__bookmarkButton_removeBookmarkButton)]: true
       })}
         data-l10n-id={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
         data-test-id={this.bookmarked ? 'bookmarked' : 'notBookmarked'}
@@ -214,12 +214,12 @@ class NavigationBar extends React.Component {
       return null
     }
 
-    return <div
-      id='navigator'
+    return <div id='navigationBar'
+      data-test-id='navigationBar'
       data-frame-key={this.props.activeFrameKey}
       className={cx({
         titleMode: this.props.titleMode,
-        [css(styles.navigator, (this.props.isDarwin && this.props.isFullScreen) && styles.navigator_isDarwin_isFullScreen, this.props.titleMode && styles.navigator_titleMode, this.props.isWideUrlBarEnabled && styles.navigator_wide)]: true
+        [css(styles.navigationBar, (this.props.isDarwin && this.props.isFullScreen) && styles.navigationBar_isDarwin_isFullScreen, this.props.titleMode && styles.navigationBar_titleMode, this.props.isWideUrlBarEnabled && styles.navigationBar_wide)]: true
       })}>
       {
         this.props.showBookmarkHanger
@@ -231,7 +231,7 @@ class NavigationBar extends React.Component {
         ? null
         : <span className={css(
             commonStyles.navigationButtonContainer,
-            styles.navigator__navigationButtonContainer,
+            styles.navigationBar__navigationButtonContainer,
           )}>
           {
             this.props.isLoading
@@ -244,7 +244,7 @@ class NavigationBar extends React.Component {
         this.props.showHomeButton
         ? <span className={css(
             commonStyles.navigationButtonContainer,
-            styles.navigator__navigationButtonContainer,
+            styles.navigationBar__navigationButtonContainer,
           )}>
           <HomeButton activeTabId={this.props.activeTabId} />
         </span>
@@ -261,12 +261,7 @@ class NavigationBar extends React.Component {
         />
       {
         this.props.showPublisherToggle
-        ? <div className={css(
-          this.props.titleMode && styles.navigator__endButtons_titleMode,
-          !this.props.titleMode && styles.navigator__endButtons_notTitleMode
-        )}>
-          <PublisherToggle />
-        </div>
+        ? <PublisherToggle />
         : null
       }
     </div>
@@ -277,14 +272,14 @@ const rightMargin = `calc(${globalStyles.spacing.navbarLeftMarginDarwin} / 2)`
 
 const styles = StyleSheet.create({
 
-  navigator: {
+  navigationBar: {
     boxSizing: 'border-box',
     display: 'flex',
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
     fontSize: '20px',
-    minWidth: '0%', // allow the navigator to shrink
+    minWidth: '0%', // allow the navigationBar to shrink
     maxWidth: '900px',
     marginRight: rightMargin,
     padding: 0,
@@ -293,24 +288,22 @@ const styles = StyleSheet.create({
     zIndex: globalStyles.zindex.zindexNavigationBar
   },
 
-  navigator_isDarwin_isFullScreen: {
+  navigationBar_isDarwin_isFullScreen: {
     marginRight: 0
   },
 
-  navigator_titleMode: {
+  navigationBar_titleMode: {
     animation: 'fadeIn 1.2s'
   },
 
-  navigator_wide: {
+  navigationBar_wide: {
     maxWidth: '100%',
     marginRight: '0',
     justifyContent: 'initial'
   },
 
-  // cf: topLevelStartButtonContainer on navigator.js
-  navigator__navigationButtonContainer: {
-    // globalStyles.navigationBar.urlbarForm.height + 2px
-    width: '27px'
+  navigationBar__navigationButtonContainer: {
+    width: globalStyles.navigationBar.navigationButtonContainer.width
   },
 
   navigationButton: {
@@ -336,20 +329,20 @@ const styles = StyleSheet.create({
   },
 
   // cf: navigator__buttonContainer_addPublisherButtonContainer on publisherToggle.js
-  navigator__buttonContainer_bookmarkButtonContainer: {
+  navigationBar__buttonContainer_bookmarkButtonContainer: {
     borderRight: 'none',
     borderTopRightRadius: 0,
     borderBottomRightRadius: 0
   },
 
-  navigator__buttonContainer_bookmarkButtonContainer__bookmarkButton: {
+  navigationBar__buttonContainer_bookmarkButtonContainer__bookmarkButton: {
     background: `url(${bookmarkButton}) center no-repeat`,
     backgroundSize: '14px 14px',
     width: '100%',
     height: '100%'
   },
 
-  navigator__buttonContainer_bookmarkButtonContainer__bookmarkButton_removeBookmarkButton: {
+  navigationBar__buttonContainer_bookmarkButtonContainer__bookmarkButton_removeBookmarkButton: {
     background: `url(${bookmarkedButton}) center no-repeat`
   }
 })

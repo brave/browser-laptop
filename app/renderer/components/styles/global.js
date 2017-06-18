@@ -125,7 +125,6 @@ const globalStyles = {
     carotRadius: '8px'
   },
   spacing: {
-    navigatorHeight: '48px',
     defaultSpacing: '12px',
     defaultFontSize: '13px',
     contextMenuFontSize: '14px',
@@ -328,6 +327,14 @@ const globalStyles = {
 
     urlbarForm: {
       height: '25px'
+    },
+
+    navigationButtonContainer: {
+      marginRight: '6px',
+
+      // cf: topLevelStartButtonContainer on navigator.js
+      // globalStyles.navigationBar.urlbarForm.height + 2px
+      width: 'calc(25px + 2px)'
     }
   }
 }

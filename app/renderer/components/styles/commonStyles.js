@@ -214,14 +214,14 @@ const styles = StyleSheet.create({
     width: '100%'
   },
 
-  // See urlBar.js
+  // See navigationBar.js and urlBar.js
   // TODO: rename buttonContainer and urlbarIconContainer
-  navigator__buttonContainer: buttonContainer,
-  navigator__urlbarForm__buttonContainer_showNoScriptInfo: buttonContainer,
-  navigator__urlbarForm__urlbarIconContainer: buttonContainer,
+  navigationBar__buttonContainer: buttonContainer,
+  urlbarForm__buttonContainer_noScript: buttonContainer,
+  urlbarForm__urlbarIconContainer: buttonContainer,
 
   // Add border to the bookmark button and publisher button only
-  navigator__buttonContainer_outsideOfURLbar: {
+  navigationBar__buttonContainer_outsideOfURLbar: {
     border: `1px solid ${globalStyles.color.urlBarOutline}`,
     borderRadius: globalStyles.radius.borderRadiusURL
   },
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     display: 'inline-block',
     borderRadius: globalStyles.radius.borderRadiusNavigationButton,
     height: globalStyles.navigationBar.urlbarForm.height,
-    marginRight: '6px',
+    marginRight: globalStyles.navigationBar.navigationButtonContainer.marginRight,
 
     ':hover': {
       background: '#fff',

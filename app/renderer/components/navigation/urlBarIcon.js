@@ -68,9 +68,9 @@ class UrlBarIcon extends React.Component {
       if (this.props.isSecure === true) {
         return [globalStyles.appIcons.lock, css(styles.urlbarIcon_large)]
       } else if (this.props.isSecure === false || this.props.isSecure === 2) {
-        return [globalStyles.appIcons.unlock, css(styles.urlbarIcon_large, styles.urlbarIcon_siteInsecureColor)]
+        return [globalStyles.appIcons.unlock, css(styles.urlbarIcon_large, styles.urlbarIcon_siteInsecureColor, styles.urlbarIcon_insecure)]
       } else if (this.props.isSecure === 1) {
-        return [globalStyles.appIcons.unlock, css(styles.urlbarIcon_large)]
+        return [globalStyles.appIcons.unlock, css(styles.urlbarIcon_large, styles.urlbarIcon_insecure)]
       }
     }
     return []
@@ -189,6 +189,12 @@ const styles = StyleSheet.create({
     display: 'inline-block',
     opacity: 0.5,
     minWidth: 0
+  },
+
+  // ref: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L809
+  // Unlock icon has this value if the title mode is enabled or not.
+  urlbarIcon_insecure: {
+    opacity: 1
   },
 
   // ref: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L900-L906

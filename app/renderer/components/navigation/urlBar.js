@@ -229,16 +229,6 @@ class UrlBar extends React.Component {
     windowActions.urlBarOnBlur(getCurrentWindowId(), e.target.value, this.props.urlbarLocation, eventElHasAncestorWithClasses(e, ['urlBarSuggestions', 'urlbarForm']))
   }
 
-  get suggestionLocation () {
-    const selectedIndex = this.props.selectedIndex
-    if (typeof selectedIndex === 'number') {
-      const suggestion = this.props.suggestion
-      if (suggestion) {
-        return suggestion.location
-      }
-    }
-  }
-
   updateAutocomplete (newValue) {
     let suggestion = ''
     let suggestionNormalized = ''
@@ -315,6 +305,22 @@ class UrlBar extends React.Component {
     this.maybeUrlBarTextChanged(val)
   }
 
+  select () {
+    setImmediate(() => {
+      if (this.urlInput) {
+        this.urlInput.select()
+      }
+    })
+  }
+
+  focus () {
+    setImmediate(() => {
+      if (this.urlInput) {
+        this.urlInput.focus()
+      }
+    })
+  }
+
   onKeyUp (e) {
     switch (e.keyCode) {
       case KeyCodes.UP:
@@ -332,25 +338,17 @@ class UrlBar extends React.Component {
     this.maybeUrlBarTextChanged(this.lastVal)
   }
 
-  select () {
-    setImmediate(() => {
-      if (this.urlInput) {
-        this.urlInput.select()
-      }
-    })
-  }
-
-  focus () {
-    setImmediate(() => {
-      if (this.urlInput) {
-        this.urlInput.focus()
-      }
-    })
-  }
-
   onFocus (e) {
     this.select()
     windowActions.urlBarOnFocus(getCurrentWindowId())
+  }
+
+  onNoScript () {
+    windowActions.setNoScriptVisible()
+  }
+
+  onContextMenu (e) {
+    contextMenus.onUrlBarContextMenu(e)
   }
 
   componentWillMount () {
@@ -404,6 +402,13 @@ class UrlBar extends React.Component {
     }
   }
 
+  get hostValue () {
+    const parsed = urlParse(this.props.location)
+    return parsed.host &&
+      parsed.protocol !== 'about:' &&
+      parsed.protocol !== 'chrome-extension:' ? parsed.host : ''
+  }
+
   get titleValue () {
     // For about:newtab we don't want the top of the browser saying New Tab
     // Instead just show "Brave"
@@ -428,20 +433,14 @@ class UrlBar extends React.Component {
     return this.props.enableNoScript && this.props.scriptsBlocked && this.props.scriptsBlocked.size
   }
 
-  get UrlBarIcon () {
-    return <UrlBarIcon
-      activateSearchEngine={this.props.activateSearchEngine}
-      active={this.props.isActive}
-      isSecure={this.props.isSecure}
-      isHTTPPage={this.props.isHTTPPage}
-      loading={this.props.loading}
-      location={this.props.location}
-      searchSelectEntry={this.props.searchSelectEntry}
-      title={this.props.title}
-      titleMode={this.props.titleMode}
-      isSearching={this.props.location !== this.props.urlbarLocation}
-      activeTabShowingMessageBox={this.props.activeTabShowingMessageBox}
-    />
+  get suggestionLocation () {
+    const selectedIndex = this.props.selectedIndex
+    if (typeof selectedIndex === 'number') {
+      const suggestion = this.props.suggestion
+      if (suggestion) {
+        return suggestion.location
+      }
+    }
   }
 
   // BEM Level: urlbarForm__titleBar
@@ -479,7 +478,6 @@ class UrlBar extends React.Component {
       data-test-id='urlInput'
       className={cx({
         private: this.private,
-        testHookLoadDone: !this.props.loading,
         [css(styles.input, this.props.isWindows && styles.input_windows)]: true
       })}
       readOnly={this.props.titleMode}
@@ -498,20 +496,12 @@ class UrlBar extends React.Component {
 
   // BEM Level: urlbarForm__buttonContainer_showNoScript
   get noScriptInfo () {
-    return <span className={css(commonStyles.navigator__urlbarForm__buttonContainer_showNoScriptInfo)}
+    return <span className={css(commonStyles.urlbarForm__buttonContainer_noScript)}
       onClick={this.onNoScript}>
-      <span className={css(styles.showNoScript__noScriptButton)}
+      <span className={css(styles.noScript__button)}
         data-l10n-id='noScriptButton'
         data-test-id='noScriptButton' />
     </span>
-  }
-
-  onNoScript () {
-    windowActions.setNoScriptVisible()
-  }
-
-  onContextMenu (e) {
-    contextMenus.onUrlBarContextMenu(e)
   }
 
   mergeProps (state, ownProps) {
@@ -597,7 +587,7 @@ class UrlBar extends React.Component {
       })}
       action='#'
       id='urlbar'>
-      <div className={css(commonStyles.navigator__urlbarForm__urlbarIconContainer)}>
+      <div className={css(commonStyles.urlbarForm__urlbarIconContainer)}>
         <UrlBarIcon
           titleMode={this.props.titleMode}
         />
@@ -623,7 +613,7 @@ class UrlBar extends React.Component {
         : null
       }
       {
-          this.shouldRenderUrlBarSuggestions
+        this.shouldRenderUrlBarSuggestions
           ? <UrlBarSuggestions
             menubarVisible={this.props.menubarVisible}
           />
@@ -678,7 +668,7 @@ const styles = StyleSheet.create({
     paddingRight: '10px'
   },
 
-  // ref: navigator__buttonContainer_addPublisherButtonContainer on publisherToggle.js
+  // ref: navigationBar__buttonContainer_addPublisherButtonContainer on publisherToggle.js
   urlbarForm_isPublisherButtonEnabled: {
     borderTopRightRadius: 0,
     borderBottomRightRadius: 0
@@ -765,7 +755,7 @@ const styles = StyleSheet.create({
     display: 'none'
   },
 
-  showNoScript__noScriptButton: {
+  noScript__button: {
     background: `url(${iconNoScript}) center no-repeat`,
     width: '15px',
     height: '15px',

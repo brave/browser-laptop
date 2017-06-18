@@ -9,7 +9,7 @@ module.exports = {
   activeTabFavicon: '[data-test-active-tab] [data-test-favicon]',
   pinnedTabsTabs: '.pinnedTabs [data-test-id="tab"]',
   tabsTabs: '.tabs [data-test-id="tab"]',
-  navigator: '#navigator',
+  navigator: '[data-test-id="navigationBar"]',
   navigatorLoadTime: '[data-test-id="loadTime"]',
   newFrameButton: '.tabs .newFrameButton',
   tabPage: '.tabPage',

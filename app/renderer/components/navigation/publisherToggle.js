@@ -68,15 +68,17 @@ class PublisherToggle extends React.Component {
     return props
   }
 
+  // TODO (Suguru): NormalizeButton
+  // ref: navigationBar__buttonContainer_bookmarkButtonContainer on navigationBar.js
   render () {
     return <span
       data-test-id='publisherButton'
       data-test-authorized={this.props.isEnabledForPaymentsPublisher}
       data-test-verified={this.props.isVerifiedPublisher}
       className={css(
-        commonStyles.navigator__buttonContainer,
-        commonStyles.navigator__buttonContainer_outsideOfURLbar,
-        styles.navigator__buttonContainer_publisherToggleContainer
+        commonStyles.navigationBar__buttonContainer,
+        commonStyles.navigationBar__buttonContainer_outsideOfURLbar,
+        styles.navigationBar__buttonContainer_publisherToggleContainer
       )}>
       <button className={cx({
         normalizeButton: true,
@@ -90,10 +92,13 @@ class PublisherToggle extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  navigator__buttonContainer_publisherToggleContainer: {
+  navigationBar__buttonContainer_publisherToggleContainer: {
     borderLeft: 'none',
     borderTopLeftRadius: 0,
-    borderBottomLeftRadius: 0
+    borderBottomLeftRadius: 0,
+
+    // TODO (Suguru): Refactor navigationBar.less to remove !important. See the wildcard style under '#navigationBar'.
+    animation: 'none !important'
   },
 
   publisherButton_noFundVerified: {

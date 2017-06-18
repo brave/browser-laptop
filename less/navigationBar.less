@@ -18,7 +18,7 @@
 // with the window buttons to close/maximize/minimize the window.
 .platform--darwin .navigatorWrapper .topLevelStartButtons {
 
-  // Since we want to keep the navigator centered, we need to calculate the
+  // Since we want to keep the navigationBar centered, we need to calculate the
   // difference between the width of the left box and the width of the right box.
   @centerOffset: @navbarLeftMarginDarwin + 2 * (@navbarButtonWidth + @navbarButtonSpacing) // width area on the left
                  - (@navbarBraveButtonWidth + 2 * @navbarButtonSpacing);
@@ -335,7 +335,7 @@
 }
 
 // Styles had to be reworked to properly position the new caption buttons for Windows
-.navbarCaptionButtonContainer {
+.navigator {
   display: flex;
   //border-bottom: 1px solid #bbb;
 
@@ -412,11 +412,11 @@
 }
 
 // Here I grouped the rules to keep the layout of the top bar consistent.
-// The tricky part is to keep the title in `#navigator` centered when the
+// The tricky part is to keep the title in `#navigationBar` centered when the
 // box on its left has different size than the one on the right.
 // This is achieved by the local variable `@centerOffset`.
 .navigatorWrapper {
-  // Since we want to keep the navigator centered, we need to calculate the
+  // Since we want to keep the navigationBar centered, we need to calculate the
   // difference between the width of the left box and the width of the right box.
   @centerOffset: 2 * (@navbarButtonWidth + @navbarButtonSpacing) // width area on the left
                  - (@navbarBraveButtonWidth + 2 * @navbarButtonSpacing);
@@ -424,7 +424,7 @@
   @rightMargin: @navbarLeftMarginDarwin / 2;
 
   // Navigation bar at the center
-  #navigator {
+  #navigationBar {
     &.titleMode {
       padding-right: @centerOffset;
 
@@ -466,7 +466,7 @@
   }
 }
 
-#navigator {
+#navigationBar {
 
   // #6253 #6680
   > * {
