@@ -87,7 +87,7 @@ const tabContentState = {
     const tabPageIndex = state.getIn(['ui', 'tabs', 'tabPageIndex'], 0)
     const previewTabPageIndex = state.getIn(['ui', 'tabs', 'previewTabPageIndex'])
 
-    return previewTabPageIndex !== undefined ? previewTabPageIndex : tabPageIndex
+    return previewTabPageIndex != null ? previewTabPageIndex : tabPageIndex
   },
 
   isMediumView: (state, frameKey) => {

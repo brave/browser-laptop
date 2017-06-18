@@ -355,22 +355,13 @@ const doAction = (action) => {
       windowState = windowState.set('closedFrames', new Immutable.List())
       break
     case windowConstants.WINDOW_SET_PREVIEW_FRAME:
-      windowState = windowState.merge({
-        previewFrameKey:
-          action.frameKey != null && !frameStateUtil.isFrameKeyActive(windowState, action.frameKey)
-          ? action.frameKey
-          : null
-      })
+      windowState = frameStateUtil.setPreviewFrameKey(windowState, action.frameKey, true)
       break
     case windowConstants.WINDOW_SET_PREVIEW_TAB_PAGE_INDEX:
-      if (action.previewTabPageIndex !== windowState.getIn(['ui', 'tabs', 'tabPageIndex'])) {
-        windowState = windowState.setIn(['ui', 'tabs', 'previewTabPageIndex'], action.previewTabPageIndex)
-      } else {
-        windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
-      }
+      windowState = frameStateUtil.setPreviewTabPageIndex(windowState, action.previewTabPageIndex, true)
       break
     case windowConstants.WINDOW_SET_TAB_PAGE_INDEX:
-      if (action.index !== undefined) {
+      if (action.index != null) {
         windowState = windowState.setIn(['ui', 'tabs', 'tabPageIndex'], action.index)
         windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
       } else {
@@ -390,10 +381,12 @@ const doAction = (action) => {
       }
     case windowConstants.WINDOW_SET_TAB_HOVER_STATE:
       {
-        const frameIndex = frameStateUtil.getFrameIndex(windowState, action.frameKey)
-        if (frameIndex !== -1) {
-          windowState = windowState.setIn(['frames', frameIndex, 'hoverState'], action.hoverState)
-        }
+        windowState = frameStateUtil.setTabHoverState(windowState, action.frameKey, action.hoverState)
+        break
+      }
+    case windowConstants.WINDOW_SET_TAB_PAGE_HOVER_STATE:
+      {
+        windowState = frameStateUtil.setTabPageHoverState(windowState, action.tabPageIndex, action.hoverState)
         break
       }
     case windowConstants.WINDOW_TAB_MOVE:
