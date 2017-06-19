@@ -48,6 +48,7 @@ class NavigationBar extends React.Component {
     this.onReload = this.onReload.bind(this)
     this.onHome = this.onHome.bind(this)
     this.onReloadLongPress = this.onReloadLongPress.bind(this)
+    this.auxHomeButtonAdded = false
   }
 
   get activeFrame () {
@@ -117,6 +118,25 @@ class NavigationBar extends React.Component {
   componentDidMount () {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, () => this.onToggleBookmark())
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark())
+
+    if (this.homeButton != null) {
+      this.homeButton.addEventListener('auxclick', this.onHome)
+      this.auxHomeButtonAdded = true
+    }
+  }
+
+  componentWillUpdate () {
+    if (this.homeButton != null) {
+      if (this.props.showHomeButton && !this.auxHomeButtonAdded) {
+        this.homeButton.addEventListener('auxclick', this.onHome)
+        this.auxHomeButtonAdded = true
+      }
+
+      if (!this.props.showHomeButton && this.auxHomeButtonAdded) {
+        this.homeButton.removeEventListener('auxclick', this.onHome)
+        this.auxHomeButtonAdded = false
+      }
+    }
   }
 
   mergeProps (state, ownProps) {
@@ -168,6 +188,7 @@ class NavigationBar extends React.Component {
     props.titleMode = titleMode
     props.isWideURLbarEnabled = getSetting(settings.WIDE_URL_BAR)
     props.activeTabId = activeTabId
+    props.showHomeButton = !props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
 
     return props
   }
@@ -208,12 +229,13 @@ class NavigationBar extends React.Component {
           </span>
       }
       {
-        !this.props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
+        this.props.showHomeButton
         ? <span className='navigationButtonContainer'>
           <button
             data-test-id='homeButton'
             data-l10n-id='homeButton'
             className='normalizeButton navigationButton homeButton'
+            ref={(node) => { this.homeButton = node }}
             onClick={this.onHome} />
         </span>
         : null
