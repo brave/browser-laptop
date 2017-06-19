@@ -19,6 +19,7 @@ const sync = config.syncExtensionId
 const webtorrent = config.torrentExtensionId
 const vimium = config.vimiumExtensionId
 const honey = config.honeyExtensionId
+const pinterest = config.pinterestExtensionId
 
 /**
  * Stores dummy data for all known extensions based on vault-updater extension manifest.
@@ -60,6 +61,12 @@ const dummyData = [
     name: 'honey',
     description: 'honeyDesc',
     icon: 'img/extensions/honey-128.png'
+  },
+  {
+    id: pinterest,
+    name: 'Pinterest Save',
+    description: 'pinterestDesc',
+    icon: 'img/extensions/pinterest-128.png'
   }
   // { id: 'vimium' // TBD }
 ]
@@ -145,6 +152,9 @@ module.exports.getExtensionKey = (extensionId) => {
       break
     case honey:
       extensionSetting = settings.HONEY_ENABLED
+      break
+    case pinterest:
+      extensionSetting = settings.PINTEREST_ENABLED
       break
     default:
       break
