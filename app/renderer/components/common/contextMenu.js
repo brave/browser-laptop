@@ -7,6 +7,7 @@ const Immutable = require('immutable')
 
 // Components
 const ImmutableComponent = require('../immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
@@ -16,6 +17,7 @@ const keyCodes = require('../../../common/constants/keyCodes')
 
 // Utils
 const cx = require('../../../../js/lib/classSet')
+const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {formatAccelerator, wrappingClamp} = require('../../../common/lib/formatUtil')
 const {separatorMenuItem} = require('../../../common/commonMenu')
 
@@ -267,10 +269,12 @@ class ContextMenuSingle extends ImmutableComponent {
 /**
  * Represents a context menu including all submenus
  */
-class ContextMenu extends ImmutableComponent {
-  constructor () {
-    super()
+class ContextMenu extends React.Component {
+  constructor (props) {
+    super(props)
     this.onKeyDown = this.onKeyDown.bind(this)
+    this.onClick = this.onClick.bind(this)
+    this.onAuxClick = this.onAuxClick.bind(this)
   }
 
   componentDidMount () {
@@ -278,7 +282,7 @@ class ContextMenu extends ImmutableComponent {
     window.addEventListener('keyup', this.onKeyUp)
 
     if (this.node) {
-      this.node.addEventListener('auxclick', this.onAuxClick.bind(this))
+      this.node.addEventListener('auxclick', this.onAuxClick)
     }
   }
 
@@ -452,41 +456,72 @@ class ContextMenu extends ImmutableComponent {
     return (this.props.selectedIndex === null) ? false : this.props.selectedIndex.length > 1
   }
 
+  mergeProps (state, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
+    const selectedIndex = currentWindow.getIn(['ui', 'contextMenu', 'selectedIndex'], null)
+    const contextMenuDetail = currentWindow.get('contextMenuDetail', Immutable.Map())
+
+    const props = {}
+    props.lastZoomPercentage = activeFrame.get('lastZoomPercentage')
+    props.contextMenuDetail = contextMenuDetail  // TODO (nejc) only primitives
+    props.selectedIndex = typeof selectedIndex === 'object' &&
+      Array.isArray(selectedIndex) &&
+      selectedIndex.length > 0
+        ? selectedIndex
+        : null
+    props.selectedIndexNorm = selectedIndex === null
+      ? [0]
+      : props.selectedIndex
+    props.selectedIndexChild = props.selectedIndex
+      ? this.props.selectedIndex[0]
+      : null
+    props.left = contextMenuDetail.get('left')
+    props.right = contextMenuDetail.get('right')
+    props.top = contextMenuDetail.get('top')
+    props.bottom = contextMenuDetail.get('bottom')
+    props.width = contextMenuDetail.get('width')
+    props.maxHeight = contextMenuDetail.get('maxHeight')
+    props.template = contextMenuDetail.get('template')
+
+    return props
+  }
+
   render () {
-    const selectedIndex = (this.props.selectedIndex === null) ? [0] : this.props.selectedIndex
     const styles = {}
-    if (this.props.contextMenuDetail.get('left') !== undefined) {
-      styles.left = this.props.contextMenuDetail.get('left')
+    if (this.props.left !== undefined) {
+      styles.left = this.props.left
     }
-    if (this.props.contextMenuDetail.get('right') !== undefined) {
-      styles.right = this.props.contextMenuDetail.get('right')
+    if (this.props.right !== undefined) {
+      styles.right = this.props.right
     }
-    if (this.props.contextMenuDetail.get('top') !== undefined) {
-      styles.marginTop = this.props.contextMenuDetail.get('top')
+    if (this.props.top !== undefined) {
+      styles.marginTop = this.props.top
     }
-    if (this.props.contextMenuDetail.get('bottom') !== undefined) {
-      styles.bottom = this.props.contextMenuDetail.get('bottom')
+    if (this.props.bottom !== undefined) {
+      styles.bottom = this.props.bottom
     }
-    if (this.props.contextMenuDetail.get('width') !== undefined) {
-      styles.width = this.props.contextMenuDetail.get('width')
+    if (this.props.width !== undefined) {
+      styles.width = this.props.width
     }
-    if (this.props.contextMenuDetail.get('maxHeight')) {
-      styles.maxHeight = this.props.contextMenuDetail.get('maxHeight')
+    if (this.props.maxHeight) {
+      styles.maxHeight = this.props.maxHeight
     }
+
     return <div
       ref={(node) => { this.node = node }}
       className={cx({
         contextMenu: true,
-        reverseExpand: this.props.contextMenuDetail.get('right') !== undefined,
-        contextMenuScrollable: this.props.contextMenuDetail.get('maxHeight') !== undefined
+        reverseExpand: this.props.right !== undefined,
+        contextMenuScrollable: this.props.maxHeight !== undefined
       })}
-      onClick={this.onClick.bind(this)}
+      onClick={this.onClick}
       style={styles}>
       <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}
         submenuIndex={0}
         lastZoomPercentage={this.props.lastZoomPercentage}
-        template={this.props.contextMenuDetail.get('template')}
-        selectedIndex={this.props.selectedIndex ? this.props.selectedIndex[0] : null} />
+        template={this.props.template}
+        selectedIndex={this.props.selectedIndexChild} />
       {
         this.openedSubmenuDetails.map((openedSubmenuDetail, i) =>
           <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}
@@ -495,12 +530,12 @@ class ContextMenu extends ImmutableComponent {
             template={openedSubmenuDetail.get('template')}
             y={openedSubmenuDetail.get('y')}
             selectedIndex={
-              selectedIndex && (i + 1) < selectedIndex.length
-                ? selectedIndex[i + 1]
+              this.props.selectedIndexNorm && (i + 1) < this.props.selectedIndexNorm.length
+                ? this.props.selectedIndexNorm[i + 1]
                 : null} />)
       }
     </div>
   }
 }
 
-module.exports = ContextMenu
+module.exports = ReduxComponent.connect(ContextMenu)

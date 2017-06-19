@@ -696,10 +696,7 @@ class Main extends ImmutableComponent {
       onClick={this.onClickWindow}>
       {
         contextMenuDetail
-        ? <ContextMenu
-          lastZoomPercentage={activeFrame && activeFrame.get('lastZoomPercentage')}
-          contextMenuDetail={contextMenuDetail}
-          selectedIndex={customTitlebar.contextMenuSelectedIndex} />
+        ? <ContextMenu />
         : null
       }
       {
