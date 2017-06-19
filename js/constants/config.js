@@ -47,6 +47,8 @@ module.exports = {
     authUrl: (userId) => `${vaultHost}/v1/users/${userId}`,
     replacementUrl: adHost
   },
+  widevineComponentId: 'oimompecagnajdejgnnjijobebaeigek',
+  widevineComponentPublicKey: 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCmhe+02cLPPAViaevk/fzODKUnb/ysaAeD8lpE9pwirV6GYOm+naTo7xPOCh8ujcR6Ryi1nPTq2GTG0CyqdDyOsZ1aRLuMZ5QqX3dJ9jXklS0LqGfosoIpGexfwggbiLvQOo9Q+IWTrAO620KAzYU0U6MV272TJLSmZPUEFY6IGQIDAQAB',
   braveExtensionId: 'mnojpmjdmbbfmejpflffifhffcmidifd',
   torrentExtensionId: 'fmdpfempfmekjkcfdehndghogpnpjeno',
   syncExtensionId: 'cjnmeadmgmiihncdidmfiabhenbggfjm',
@@ -57,7 +59,6 @@ module.exports = {
   honeyExtensionPublicKey: 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC79mayLyuCYY/dyT7Ycr1sVBp9yHrY4mnogVEgu+sDT6+/A121Na+aTw6mFLD6LHgbgHt4fnQ2V/QwcfBSXRTSkGpgNsZAjnYs4/XzZQYKGltWT93EP9zXN1kGbtzfkPGzTakquCfOjbKtbAQKWh8ppzqLhWcRUn9g/PhU99F29QIDAQAB',
   pinterestExtensionId: 'gpdjojdkbbmdfjfahjcgigfpmkopogic',
   pinterestExtensionPublicKey: 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDB95q2hyt49ZDuVnYI91XaZhqQkbXu0X3fzoNxPxhFbfqGKwtts90LJ7lD5DCIfnBg8WGFhp3eW4GxOglAKrnksmJoyAD5PnSAufx8fD3trZvo/ZAqFx1x5Xm3Rm34EgvVXdralgHSYiqcEU/FX3kYnLLhr2TS4lcrsn1KZd/lcQIDAQAB',
-  widevineComponentId: 'oimompecagnajdejgnnjijobebaeigek',
   coinbaseOrigin: 'https://buy.coinbase.com',
   newtab: {
     fallbackImage: {
