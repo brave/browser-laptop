@@ -672,8 +672,7 @@ class Main extends ImmutableComponent {
       }
       {
         this.props.windowState.get('popupWindowDetail')
-        ? <PopupWindow
-          detail={this.props.windowState.get('popupWindowDetail')} />
+        ? <PopupWindow />
         : null
       }
       <div className='top'>

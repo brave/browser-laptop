@@ -3,11 +3,12 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const Immutable = require('immutable')
 const ReactDOM = require('react-dom')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
-const ImmutableComponent = require('../immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 
 // Constants
 const KeyCodes = require('../../../common/constants/keyCodes')
@@ -18,33 +19,22 @@ const windowActions = require('../../../../js/actions/windowActions')
 // Styles
 const globalStyles = require('../styles/global')
 
-/**
- * Represents a popup window
- */
-class PopupWindow extends ImmutableComponent {
-  componentWillMount () {
-    this.width = this.props.detail.get('width')
-    this.height = this.props.detail.get('height')
-    this.top = this.props.detail.get('top')
-    this.left = this.props.detail.get('left')
-  }
-
-  onKeyDown (e) {
-    if (e.keyCode === KeyCodes.ESC) {
-      windowActions.setPopupWindowDetail()
-    }
+class PopupWindow extends React.Component {
+  constructor (props) {
+    super(props)
+    this.onKeyDown = this.onKeyDown.bind(this)
   }
 
   componentWillUnmount () {
-    window.removeEventListener('keydown', this.onKeyDown.bind(this))
+    window.removeEventListener('keydown', this.onKeyDown)
   }
 
   componentDidMount () {
-    window.addEventListener('keydown', this.onKeyDown.bind(this))
-    let src = this.props.detail.get('src')
-    if (src) {
+    window.addEventListener('keydown', this.onKeyDown)
+
+    if (this.props.src) {
       let webview = document.createElement('webview')
-      webview.setAttribute('src', src)
+      webview.setAttribute('src', this.props.src)
       webview.addEventListener('crashed', () => {
         windowActions.setPopupWindowDetail()
       })
@@ -54,52 +44,74 @@ class PopupWindow extends ImmutableComponent {
       webview.addEventListener('close', () => {
         windowActions.setPopupWindowDetail()
       })
-      let updateSize = () => {
-        webview.getPreferredSize((preferredSize) => {
-          let width = preferredSize.width
-          let height = preferredSize.height
-          if (width !== this.width || height !== this.height) {
-            this.width = width
-            this.height = height
-            webview.style.height = height + 'px'
-            webview.style.width = width + 'px'
-            this.forceUpdate()
-          }
-        })
-      }
       webview.addEventListener('did-attach', () => {
         webview.enablePreferredSizeMode(true)
       })
-      webview.addEventListener('preferred-size-changed', (e) => {
-        updateSize()
+      webview.addEventListener('preferred-size-changed', () => {
+        webview.getPreferredSize((preferredSize) => {
+          const width = preferredSize.width
+          const height = preferredSize.height
+          webview.style.height = height + 'px'
+          webview.style.width = width + 'px'
+
+          windowActions.setPopupWindowDetail(Immutable.fromJS({
+            left: this.props.left,
+            top: this.props.top,
+            height: height,
+            width: width,
+            src: this.props.src
+          }))
+        })
       })
       ReactDOM.findDOMNode(this).appendChild(webview)
     }
   }
 
+  onKeyDown (e) {
+    if (e.keyCode === KeyCodes.ESC) {
+      windowActions.setPopupWindowDetail()
+    }
+  }
+
+  mergeProps (state, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const detail = currentWindow.get('popupWindowDetail', Immutable.Map())
+
+    const props = {}
+    // used in renderer
+    props.width = parseInt(detail.get('width'))
+    props.height = parseInt(detail.get('height'))
+    props.top = parseInt(detail.get('top'))
+    props.left = parseInt(detail.get('left'))
+
+    // used in other functions
+    props.src = detail.get('src')
+
+    return props
+  }
+
   render () {
     let style = {}
-    let width = parseInt(this.width)
-    let height = parseInt(this.height)
-    let top = parseInt(this.top)
-    let left = parseInt(this.left)
 
-    if (width) {
-      style.width = width + 2
+    if (this.props.width) {
+      style.width = this.props.width + 2
     }
-    if (height) {
-      style.height = height + 2
+
+    if (this.props.height) {
+      style.height = this.props.height + 2
     }
-    if (top) {
-      if (top + height < window.innerHeight) {
-        style.top = top
+
+    if (this.props.top) {
+      if (this.props.top + this.props.height < window.innerHeight) {
+        style.top = this.props.top
       } else {
         style.bottom = 0
       }
     }
-    if (left) {
-      if (left + width < window.innerWidth) {
-        style.left = left
+
+    if (this.props.left) {
+      if (this.props.left + this.props.width < window.innerWidth) {
+        style.left = this.props.left
       } else {
         style.right = '1em'
       }
@@ -113,6 +125,8 @@ class PopupWindow extends ImmutableComponent {
       style={style} />
   }
 }
+
+module.exports = ReduxComponent.connect(PopupWindow)
 
 const styles = StyleSheet.create({
   popupWindow: {
@@ -132,5 +146,3 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse'
   }
 })
-
-module.exports = PopupWindow
