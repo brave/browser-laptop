@@ -67,12 +67,12 @@ class CheckDefaultBrowserDialog extends ImmutableComponent {
           </div>
         </CommonFormSection>
         <CommonFormButtonWrapper>
-          <BrowserButton secondaryColor
+          <BrowserButton groupedItem secondaryColor
             l10nId='notNow'
             testId='notNowButton'
             onClick={this.onNotNow}
           />
-          <BrowserButton primaryColor
+          <BrowserButton groupedItem primaryColor
             l10nId='useBrave'
             testId='useBraveButton'
             onClick={this.onUseBrave}

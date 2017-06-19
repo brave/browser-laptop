@@ -275,18 +275,18 @@ class AddEditBookmarkHanger extends React.Component {
         <CommonFormButtonWrapper>
           {
             this.props.hasOriginalDetail
-            ? <BrowserButton secondaryColor
+            ? <BrowserButton groupedItem secondaryColor
               l10nId='remove'
               testId='bookmarkHangerRemoveButton'
               onClick={this.onRemoveBookmark}
             />
-            : <BrowserButton secondaryColor
+            : <BrowserButton groupedItem secondaryColor
               l10nId='cancel'
               testId='bookmarkHangerCancelButton'
               onClick={this.onClose}
             />
           }
-          <BrowserButton primaryColor
+          <BrowserButton groupedItem primaryColor
             l10nId='done'
             testId='bookmarkHangerDoneButton'
             disabled={!this.props.isBookmarkNameValid}
