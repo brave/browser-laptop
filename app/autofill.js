@@ -32,13 +32,13 @@ module.exports.removeAutofillAddress = (guid) => {
   session.defaultSession.autofill.removeProfile(guid)
 }
 
-module.exports.addAutofillCreditCard = (detail, guid) => {
+module.exports.addAutofillCreditCard = (detail) => {
   session.defaultSession.autofill.addCreditCard({
-    name: detail.name,
-    card_number: detail.card,
-    expiration_month: detail.month,
-    expiration_year: detail.year,
-    guid: guid
+    name: detail.get('name'),
+    card_number: detail.get('card'),
+    expiration_month: detail.get('month'),
+    expiration_year: detail.get('year'),
+    guid: detail.get('guid')
   })
 }
 

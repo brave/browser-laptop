@@ -630,13 +630,11 @@ const appActions = {
   /**
    * Add credit card data
    * @param {object} detail - the credit card to add as per doc/state.md's autofillCreditCardDetail
-   * @param {object} originalDetail - the original credit card before editing
    */
-  addAutofillCreditCard: function (detail, originalDetail) {
+  addAutofillCreditCard: function (detail) {
     dispatch({
       actionType: appConstants.APP_ADD_AUTOFILL_CREDIT_CARD,
-      detail,
-      originalDetail
+      detail
     })
   },
 

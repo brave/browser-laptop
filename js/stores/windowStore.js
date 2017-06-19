@@ -583,13 +583,12 @@ const doAction = (action) => {
       }
       break
     case windowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL:
-      if (!action.currentDetail && !action.originalDetail) {
+      if (!action.property && !action.wholeObject) {
         windowState = windowState.delete('autofillCreditCardDetail')
+      } else if (action.wholeObject) {
+        windowState = windowState.set('autofillCreditCardDetail', Immutable.fromJS(action.wholeObject))
       } else {
-        windowState = windowState.mergeIn(['autofillCreditCardDetail'], {
-          currentDetail: action.currentDetail,
-          originalDetail: action.originalDetail
-        })
+        windowState = windowState.setIn(['autofillCreditCardDetail', action.property], action.newValue)
       }
       break
     case windowConstants.WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE:

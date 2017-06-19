@@ -77,7 +77,6 @@ class Main extends ImmutableComponent {
     this.onClickWindow = this.onClickWindow.bind(this)
     this.onHideSiteInfo = this.onHideSiteInfo.bind(this)
     this.onHideBraveryPanel = this.onHideBraveryPanel.bind(this)
-    this.onHideAutofillCreditCardPanel = this.onHideAutofillCreditCardPanel.bind(this)
     this.onTabContextMenu = this.onTabContextMenu.bind(this)
     this.checkForTitleMode = debounce(this.checkForTitleMode.bind(this), 20)
     this.resetAltMenuProcessing()
@@ -529,10 +528,6 @@ class Main extends ImmutableComponent {
     windowActions.setBraveryPanelDetail()
   }
 
-  onHideAutofillCreditCardPanel () {
-    windowActions.setAutofillCreditCardDetail()
-  }
-
   onMouseDown (e) {
     // TODO(bsclifton): update this to use eventUtil.eventElHasAncestorWithClasses
     let node = e.target
@@ -699,10 +694,7 @@ class Main extends ImmutableComponent {
         }
         {
          autofillCreditCardPanelIsVisible
-          ? <AutofillCreditCardPanel
-            currentDetail={this.props.windowState.getIn(['autofillCreditCardDetail', 'currentDetail'])}
-            originalDetail={this.props.windowState.getIn(['autofillCreditCardDetail', 'originalDetail'])}
-            onHide={this.onHideAutofillCreditCardPanel} />
+          ? <AutofillCreditCardPanel />
           : null
         }
         {
