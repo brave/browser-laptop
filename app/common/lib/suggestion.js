@@ -298,6 +298,21 @@ const getSortByDomainForHosts = (userInputHost) => {
         return 1
       }
     }
+
+    // The list here is sufficiently small to not be a perf concern
+    const topPos1 = top500.indexOf(host1)
+    const topPos2 = top500.indexOf(host2)
+
+    if (topPos1 !== -1 && topPos2 === -1) {
+      return -1
+    }
+    if (topPos2 !== -1 && topPos1 === -1) {
+      return 1
+    }
+    if (topPos1 !== -1 && topPos2 !== -1) {
+      return topPos1 - topPos2
+    }
+
     // Can't determine what is the best match
     return 0
   }

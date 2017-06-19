@@ -308,7 +308,7 @@ describe('suggestion unit tests', function () {
         assert(this.sort('www.brianbondy.com', 'google.com') > 0)
       })
       it('0 if both have a matching domain from index 0', function () {
-        assert.equal(this.sort('google.com', 'google.ca'), 0)
+        assert.equal(this.sort('brianbondy.com', 'brianbondy.ca'), 0)
       })
       it('0 if neither has a matching domain', function () {
         assert.equal(this.sort('brianbondy.com', 'clifton.io/'), 0)
@@ -318,6 +318,14 @@ describe('suggestion unit tests', function () {
       })
       it('negative if there is a pos 0 match not including www.', function () {
         assert(this.sort('www.google.com', 'mygoogle.com') < 0)
+      })
+      it('sorts based on top sites data file order first', function () {
+        const sort = suggestion.getSortByDomainForHosts('g')
+        assert(sort('gmail.com', 'google.com') > 0)
+      })
+      it('user input does not change order', function () {
+        const sort = suggestion.getSortByDomainForHosts('google.c')
+        assert(sort('google.com.cr', 'google.com') > 0)
       })
     })
     describe('getSortForSearchSuggestions', function () {
