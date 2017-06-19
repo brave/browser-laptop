@@ -191,7 +191,7 @@ class Navigator extends React.Component {
     props.isNavigable = activeFrame && isNavigatableAboutPage(getBaseUrl(activeFrame.get('location')))
     props.activeTabId = activeTabId
 
-    return Object.assign({}, ownProps, props)
+    return props
   }
 
   render () {

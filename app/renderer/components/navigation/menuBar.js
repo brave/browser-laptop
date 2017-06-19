@@ -133,7 +133,7 @@ class MenuBar extends React.Component {
     props.contextMenuDetail = !!contextMenuDetail
     props.lastFocusedSelector = currentWindow.getIn(['ui', 'menubar', 'lastFocusedSelector'])
 
-    return Object.assign({}, ownProps, props)
+    return props
   }
 
   render () {

@@ -52,6 +52,7 @@ class MenuBarItem extends React.Component {
 
     const props = {}
     // used in renderer
+    props.index = ownProps.index
     props.selected = ownProps.index === selectedIndex
     props.label = template.get('label')
 
@@ -60,7 +61,7 @@ class MenuBarItem extends React.Component {
     props.lastFocusedSelector = currentWindow.getIn(['ui', 'menubar', 'lastFocusedSelector'])
     props.selectedIndex = selectedIndex
 
-    return Object.assign({}, ownProps, props)
+    return props
   }
 
   render () {

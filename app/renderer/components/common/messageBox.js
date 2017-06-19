@@ -117,7 +117,7 @@ class MessageBox extends React.Component {
     props.cancelId = messageBoxDetail.get('cancelId')
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, tab.getIn(['frame', 'key']))
 
-    return Object.assign({}, ownProps, props)
+    return props
   }
 
   render () {
