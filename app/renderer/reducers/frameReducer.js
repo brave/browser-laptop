@@ -18,6 +18,8 @@ const windowActions = require('../../../js/actions/windowActions')
 // Utils
 const frameStateUtil = require('../../../js/state/frameStateUtil')
 const {getCurrentWindowId} = require('../currentWindow')
+const {getSetting} = require('../../../js/settings')
+const settings = require('../../../js/constants/settings')
 
 const setFullScreen = (state, action) => {
   const index = frameStateUtil.getFrameIndex(state, action.frameProps.get('key'))
@@ -28,6 +30,7 @@ const setFullScreen = (state, action) => {
 }
 
 const closeFrame = (state, action) => {
+  const activeFrameIndex = frameStateUtil.getActiveFrameIndex(state)
   const index = frameStateUtil.getFrameIndex(state, action.frameKey)
   if (index === -1) {
     return state
@@ -35,6 +38,7 @@ const closeFrame = (state, action) => {
 
   const frameProps = frameStateUtil.getFrameByKey(state, action.frameKey)
   const hoverState = state.getIn(['frames', index, 'hoverState'])
+  const framePreviewEnabled = getSetting(settings.SHOW_TAB_PREVIEWS)
 
   state = state.merge(frameStateUtil.removeFrame(
     state,
@@ -50,14 +54,14 @@ const closeFrame = (state, action) => {
 
   const nextFrame = frameStateUtil.getFrameByIndex(state, index)
 
-  if (nextFrame) {
-    // After closing a tab, preview the next frame as long as there is one
-    windowActions.setPreviewFrame(nextFrame.get('key'))
+  if (nextFrame && hoverState) {
     // Copy the hover state if tab closed with mouse as long as we have a next frame
     // This allow us to have closeTab button visible for sequential frames closing,
     // until onMouseLeave event happens.
-    if (hoverState) {
-      windowActions.setTabHoverState(nextFrame.get('key'), hoverState)
+    windowActions.setTabHoverState(nextFrame.get('key'), hoverState)
+    if (framePreviewEnabled && index !== activeFrameIndex) {
+      // After closing a tab, preview the next frame as long as there is one
+      windowActions.setPreviewFrame(nextFrame.get('key'))
     }
   }
 
