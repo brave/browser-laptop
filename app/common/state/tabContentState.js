@@ -152,7 +152,8 @@ const tabContentState = {
       // If closeIcon is fixed then there's no room for another icon
       !tabContentState.hasFixedCloseIcon(state, frameKey) &&
       // completely hide it for small sizes
-      !hasBreakpoint(frame.get('breakpoint'), ['mediumSmall', 'small', 'extraSmall', 'smallest'])
+      !hasBreakpoint(frame.get('breakpoint'),
+        ['medium', 'mediumSmall', 'small', 'extraSmall', 'smallest'])
     )
   }
 }

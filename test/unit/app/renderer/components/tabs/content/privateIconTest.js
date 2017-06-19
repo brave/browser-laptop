@@ -108,19 +108,6 @@ describe('Tabs content - PrivateIcon', function () {
       assert.equal(wrapper.find('PrivateIcon').length, 1)
     })
 
-    it('if tab is not active and breakpoint is medium', function () {
-      windowStore.state = defaultWindowStore.merge({
-        activeFrameKey: 0,
-        frames: [{
-          isPrivate: true,
-          hoverState: false,
-          breakpoint: 'medium'
-        }]
-      })
-      const wrapper = mount(<Tab frameKey={frameKey} />)
-      assert.equal(wrapper.find('PrivateIcon').length, 1)
-    })
-
     it('if mouse is not over tab and breakpoint is default', function () {
       windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
         isPrivate: true,
@@ -171,10 +158,10 @@ describe('Tabs content - PrivateIcon', function () {
       assert.equal(wrapper.find('PrivateIcon').length, 0)
     })
 
-    it('if tab is active and breakpoint is medium', function () {
+    it('if breakpoint is medium', function () {
       windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
         isPrivate: true,
-        hoverState: true,
+        hoverState: false,
         breakpoint: 'medium'
       })
       const wrapper = mount(<Tab frameKey={frameKey} />)
