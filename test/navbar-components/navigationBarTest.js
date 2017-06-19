@@ -1055,6 +1055,18 @@ describe('navigationBar tests', function () {
           .waitForTabCount(2)
           .waitForUrl(page2Url)
       })
+
+      it('opens home page in a new tab when middle mouse button is clicked', function * () {
+        const page3Url = Brave.server.url('page3.html')
+
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .changeSetting(settings.HOMEPAGE, page3Url)
+          .waitForVisible(homeButton)
+          .middleClick(homeButton)
+          .waitForTabCount(3)
+          .waitForUrl(page3Url)
+      })
     })
 
     describe('when disabled', function () {
