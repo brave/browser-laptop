@@ -97,6 +97,7 @@ class BitcoinDashboard extends ImmutableComponent {
       l10nId: 'add',
       testId: 'bitcoinPurchaseButton',
       primaryColor: true,
+      panelItem: true,
       disabled: disabled
     }
     const hrefAttrs = {
@@ -195,6 +196,7 @@ class BitcoinDashboard extends ImmutableComponent {
           <a target='_blank' href={url}>
             <BrowserButton
               primaryColor
+              panelItem
               testId='exchangePanelButton'
               l10nId={name}
             />
@@ -219,6 +221,7 @@ class BitcoinDashboard extends ImmutableComponent {
         <a target='_blank' href='https://www.buybitcoinworldwide.com/'>
           <BrowserButton
             primaryColor
+            panelItem
             testId='worldWidePanelButton'
             label='buybitcoinworldwide.com'
           />
@@ -254,6 +257,7 @@ class BitcoinDashboard extends ImmutableComponent {
                   <a href={ledgerData.get('paymentURL')} target='_blank'>
                     <BrowserButton
                       primaryColor
+                      panelItem
                       l10nId='bitcoinVisitAccount'
                       testId='bitcoinVisitAccountButton'
                     />
@@ -265,6 +269,7 @@ class BitcoinDashboard extends ImmutableComponent {
             <div className={css(styles.panel__divider_right__bitcoinPanel__walletAddressText)}>{ledgerData.get('address')}</div>
             <BrowserButton
               primaryColor
+              panelItem
               l10nId='copyToClipboard'
               testId='copyToClipboardButton'
               onClick={this.copyToClipboard.bind(this, ledgerData.get('address'))}
@@ -295,6 +300,7 @@ class BitcoinDashboard extends ImmutableComponent {
       <div className={css(styles.panel__divider, styles.panel__divider_right)}>
         <BrowserButton
           primaryColor
+          panelItem
           l10nId='displayQRCode'
           testId='displayQRCode'
           onClick={this.props.showQRcode.bind(this)}
