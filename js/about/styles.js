@@ -257,11 +257,6 @@ class AboutStyle extends ImmutableComponent {
           &lt;BrowserButton l10nId='browserButton' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
-        <BrowserButton secondaryColor l10nId='secondaryColor' onClick={this.onRemoveBookmark} />
-        <Pre><Code>
-          &lt;BrowserButton secondaryColor l10nId='secondaryColor' onClick={'{this.onRemoveBookmark}'} />
-        </Code></Pre>
-
         <BrowserButton primaryColor l10nId='primaryColor' onClick={this.onRemoveBookmark} />
         <Pre><Code>
           &lt;BrowserButton primaryColor l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
