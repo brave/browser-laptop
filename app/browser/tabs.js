@@ -364,19 +364,16 @@ const api = {
 
       let displayURL = newTab.getURL()
       let location = displayURL || 'about:blank'
-
       const openerTabId = !source.isDestroyed() ? source.getId() : -1
-      let newTabValue = getTabValue(newTab.getId())
 
       let rendererInitiated = false
       if (source.isGuest()) {
         rendererInitiated = true
       }
 
-      let index
-      if (parseInt(newTabValue.get('index')) > -1) {
-        index = newTabValue.get('index')
-      }
+      const tabId = newTab.getId()
+      updateWebContents(tabId, newTab)
+      let newTabValue = getTabValue(newTab.getId())
 
       let windowId
       if (newTabValue && parseInt(newTabValue.get('windowId')) > -1) {
@@ -384,6 +381,11 @@ const api = {
       } else {
         const hostWebContents = source.hostWebContents || source
         windowId = hostWebContents.getOwnerBrowserWindow().id
+      }
+
+      let index
+      if (parseInt(newTabValue.get('index')) > -1) {
+        index = newTabValue.get('index')
       }
 
       const frameOpts = {
@@ -397,14 +399,17 @@ const api = {
         openerTabId,
         disposition,
         index,
-        tabId: newTabValue.get('id'),
+        tabId,
         unloaded: !!newTabValue.get('discarded')
       }
+
+      appActions.tabCreated(newTabValue)
 
       if (disposition === 'new-window' || disposition === 'new-popup') {
         const windowOpts = makeImmutable(size)
         appActions.newWindow(makeImmutable(frameOpts), windowOpts)
       } else {
+        // TODO(bridiver) - use tabCreated in place of newWebContentsAdded
         appActions.newWebContentsAdded(windowId, frameOpts, newTabValue)
       }
     })
@@ -476,13 +481,6 @@ const api = {
           windowActions.gotResponseDetails(tabId, {status, newURL, originalURL, httpResponseCode, requestMethod, referrer, headers, resourceType})
         }
       })
-
-      updateWebContents(tabId, tab)
-
-      let tabValue = getTabValue(tabId)
-      if (tabValue) {
-        appActions.tabCreated(tabValue)
-      }
     })
 
     process.on('on-tab-created', (tab, options) => {
