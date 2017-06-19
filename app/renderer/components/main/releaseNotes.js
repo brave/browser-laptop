@@ -4,32 +4,58 @@
 
 const React = require('react')
 const {StyleSheet, css} = require('aphrodite')
+const Immutable = require('immutable')
 
 // Components
-const ImmutableComponent = require('../immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../common/dialog')
+
+// Actions
+const windowActions = require('../../../../js/actions/windowActions')
 
 // Styles
 const commonStyles = require('../styles/commonStyles')
 
-class ReleaseNotes extends ImmutableComponent {
+class ReleaseNotes extends React.Component {
+  constructor (props) {
+    super(props)
+    this.onClick = this.onClick.bind(this)
+  }
+
   onClick (e) {
     e.stopPropagation()
   }
+
+  onHide () {
+    windowActions.setReleaseNotesVisible(false)
+  }
+
+  mergeProps (state, ownProps) {
+    const metadata = state.getIn(['updates', 'metadata'], Immutable.Map())
+
+    const props = {}
+    props.name = metadata.get('name')
+    props.notes = metadata.get('notes')
+
+    return props
+  }
+
   render () {
     const className = css(
       commonStyles.flyoutDialog,
       styles.releaseNotes
     )
 
-    return <Dialog onHide={this.props.onHide} isClickDismiss>
-      <div className={className} onClick={this.onClick.bind(this)}>
-        <h1 className={css(styles.header)}>{this.props.metadata.get('name')}</h1>
-        <div>{this.props.metadata.get('notes')}</div>
+    return <Dialog onHide={this.onHide} isClickDismiss>
+      <div className={className} onClick={this.onClick}>
+        <h1 className={css(styles.header)}>{this.props.name}</h1>
+        <div>{this.props.notes}</div>
       </div>
     </Dialog>
   }
 }
+
+module.exports = ReduxComponent.connect(ReleaseNotes)
 
 const styles = StyleSheet.create({
   releaseNotes: {
@@ -42,5 +68,3 @@ const styles = StyleSheet.create({
     marginBottom: '10px'
   }
 })
-
-module.exports = ReleaseNotes
