@@ -208,7 +208,7 @@ class BraveryPanel extends ImmutableComponent {
         styles.braveryPanel_compact__header__bottom
       )}>
         <div data-l10n-id='braveryPanelTitle' className={css(styles.braveryPanel_compact__header__bottom__title)} />
-        <div title={this.displayHost} className={css(styles.braveryPanel_compact__header__bottom__displayHost)}>{this.displayHost}</div>
+        <div title={this.props.lastCommittedURL} className={css(styles.braveryPanel_compact__header__bottom__displayHost)}>{this.displayHost}</div>
       </div>
     </section>
   }
@@ -218,7 +218,7 @@ class BraveryPanel extends ImmutableComponent {
     return <section className={css(styles.braveryPanel__header)}>
       <div className={css(styles.braveryPanel__header__left)}>
         <div data-l10n-id='braveryPanelTitle' />
-        <div title={this.displayHost} className={css(styles.braveryPanel__header__left__displayHost)}>{this.displayHost}</div>
+        <div title={this.props.lastCommittedURL} className={css(styles.braveryPanel__header__left__displayHost)}>{this.displayHost}</div>
       </div>
       <div className={css(styles.braveryPanel__header__right)}>
         <SwitchControl large
@@ -731,7 +731,11 @@ const styles = StyleSheet.create({
     borderTopRightRadius: globalStyles.radius.borderRadius
   },
   braveryPanel__header__left: {
-    minWidth: 0
+    minWidth: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    marginRight: '10px'
   },
   braveryPanel__header__right: {
     marginLeft: 'auto'
