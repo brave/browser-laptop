@@ -82,8 +82,6 @@ class Main extends ImmutableComponent {
     this.onHideAutofillCreditCardPanel = this.onHideAutofillCreditCardPanel.bind(this)
     this.onHideReleaseNotes = this.onHideReleaseNotes.bind(this)
     this.onTabContextMenu = this.onTabContextMenu.bind(this)
-    this.onFind = this.onFind.bind(this)
-    this.onFindHide = this.onFindHide.bind(this)
     this.checkForTitleMode = debounce(this.checkForTitleMode.bind(this), 20)
     this.resetAltMenuProcessing()
   }
@@ -587,21 +585,6 @@ class Main extends ImmutableComponent {
     windowActions.setUrlBarActive(false)
   }
 
-  onFindHide () {
-    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
-    frameStateUtil.onFindBarHide(activeFrame.get('key'))
-  }
-
-  onFind (searchString, caseSensitivity, forward, findNext) {
-    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
-    webviewActions.findInPage(searchString, caseSensitivity, forward, findNext)
-    if (!findNext) {
-      windowActions.setFindDetail(activeFrame.get('key'), Immutable.fromJS({
-        internalFindStatePresent: true
-      }))
-    }
-  }
-
   onTabContextMenu (e) {
     const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
     contextMenus.onTabsToolbarContextMenu(activeFrame.get('title'), activeFrame.get('location'), undefined, undefined, e)
@@ -808,15 +791,7 @@ class Main extends ImmutableComponent {
         }
         {
           activeFrame && activeFrame.get('findbarShown') && !activeFrame.get('isFullScreen')
-          ? <FindBar
-            paintTabs={getSetting(settings.PAINT_TABS)}
-            themeColor={activeFrame.get('themeColor')}
-            computedThemeColor={activeFrame.get('computedThemeColor')}
-            frameKey={activeFrame.get('key')}
-            selected={activeFrame.get('findbarSelected')}
-            findDetail={activeFrame.get('findDetail')}
-            onFind={this.onFind}
-            onFindHide={this.onFindHide} />
+          ? <FindBar />
           : null
         }
       </div>

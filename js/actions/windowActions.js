@@ -110,14 +110,14 @@ const windowActions = {
   },
 
   /**
-   * Highlight text in the findbar
-   * @param {Object} frameProps - The frame properties to modify
-   * @param {boolean} selected - Whether to select the findbar search text
+   * Highlight text in the find bar
+   * @param {Object} frameKey - The frame key to modify
+   * @param {boolean} selected - Whether to select the find bar search text
    */
-  setFindbarSelected: function (frameProps, selected) {
+  setFindbarSelected: function (frameKey, selected) {
     dispatch({
       actionType: windowConstants.WINDOW_SET_FINDBAR_SELECTED,
-      frameProps,
+      frameKey,
       selected
     })
   },

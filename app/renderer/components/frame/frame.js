@@ -830,6 +830,7 @@ class Frame extends React.Component {
       if (this.frame.isEmpty()) {
         return
       }
+
       if (e.result !== undefined && (e.result.matches !== undefined || e.result.activeMatchOrdinal !== undefined)) {
         if (e.result.matches === 0) {
           windowActions.setFindDetail(this.props.frameKey, Immutable.fromJS({
@@ -838,9 +839,10 @@ class Frame extends React.Component {
           }))
           return
         }
+
         windowActions.setFindDetail(this.props.frameKey, Immutable.fromJS({
-          numberOfMatches: e.result.matches || this.props.findDetailNumberOfMatches,
-          activeMatchOrdinal: e.result.activeMatchOrdinal || this.props.findDetailActiveMatchOrdinal
+          numberOfMatches: e.result.matches || -1,
+          activeMatchOrdinal: e.result.activeMatchOrdinal || -1
         }))
       }
     })
@@ -932,10 +934,8 @@ class Frame extends React.Component {
     props.isSecure = frame.getIn(['security', 'isSecure'])
     props.findbarShown = frame.get('findbarShown')
     props.findDetailCaseSensitivity = frame.getIn(['findDetail', 'caseSensitivity']) || undefined
-    props.findDetailNumberOfMatches = frame.getIn(['findDetail', 'numberOfMatches']) || 0
     props.findDetailSearchString = frame.getIn(['findDetail', 'searchString'])
     props.findDetailInternalFindStatePresent = frame.getIn(['findDetail', 'internalFindStatePresent'])
-    props.findDetailActiveMatchOrdinal = frame.getIn(['findDetail', 'activeMatchOrdinal'])
     props.isPrivate = frame.get('isPrivate')
     props.activeShortcut = frame.get('activeShortcut')
     props.shortcutDetailsUsername = frame.getIn(['activeShortcutDetails', 'username'])
