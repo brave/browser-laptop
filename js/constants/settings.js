@@ -102,7 +102,8 @@ const settings = {
   SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON: 'bookmarks.toolbar.showOnlyFavicon',
   POCKET_ENABLED: 'extensions.pocket.enabled',
   VIMIUM_ENABLED: 'extensions.vimium.enabled',
-  HONEY_ENABLED: 'extensions.honey.enabled'
+  HONEY_ENABLED: 'extensions.honey.enabled',
+  PINTEREST_ENABLED: 'extensions.pinterest.enabled'
 }
 
 module.exports = settings

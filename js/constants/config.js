@@ -54,6 +54,9 @@ module.exports = {
   PocketExtensionId: 'niloccemoadcdkdjlinkgdfekeahmflj',
   vimiumExtensionId: 'dbepggeogbaibhgnhhndojpepiihcmeb',
   honeyExtensionId: 'bmnlcjabgnpnenekpadlanbbkooimhnj',
+  honeyExtensionPublicKey: 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC79mayLyuCYY/dyT7Ycr1sVBp9yHrY4mnogVEgu+sDT6+/A121Na+aTw6mFLD6LHgbgHt4fnQ2V/QwcfBSXRTSkGpgNsZAjnYs4/XzZQYKGltWT93EP9zXN1kGbtzfkPGzTakquCfOjbKtbAQKWh8ppzqLhWcRUn9g/PhU99F29QIDAQAB',
+  pinterestExtensionId: 'gpdjojdkbbmdfjfahjcgigfpmkopogic',
+  pinterestExtensionPublicKey: 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDB95q2hyt49ZDuVnYI91XaZhqQkbXu0X3fzoNxPxhFbfqGKwtts90LJ7lD5DCIfnBg8WGFhp3eW4GxOglAKrnksmJoyAD5PnSAufx8fD3trZvo/ZAqFx1x5Xm3Rm34EgvVXdralgHSYiqcEU/FX3kYnLLhr2TS4lcrsn1KZd/lcQIDAQAB',
   widevineComponentId: 'oimompecagnajdejgnnjijobebaeigek',
   coinbaseOrigin: 'https://buy.coinbase.com',
   newtab: {

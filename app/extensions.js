@@ -440,10 +440,14 @@ module.exports.init = () => {
     }
   }
 
-  let registerComponent = (extensionId) => {
+  let registerComponent = (extensionId, publicKeyString) => {
     if (!extensionInfo.isRegistered(extensionId) && !extensionInfo.isRegistering(extensionId)) {
       extensionInfo.setState(extensionId, extensionStates.REGISTERING)
-      componentUpdater.registerComponent(extensionId)
+      if (typeof publicKeyString !== 'undefined') {
+        componentUpdater.registerComponent(extensionId, publicKeyString)
+      } else {
+        componentUpdater.registerComponent(extensionId)
+      }
     } else {
       const extensions = extensionState.getExtensions(appStore.getState())
       const extensionPath = extensions.getIn([extensionId, 'filePath'])
@@ -518,9 +522,15 @@ module.exports.init = () => {
     }
 
     if (getSetting(settings.HONEY_ENABLED)) {
-      registerComponent(config.honeyExtensionId)
+      registerComponent(config.honeyExtensionId, config.honeyExtensionPublicKey)
     } else {
       disableExtension(config.honeyExtensionId)
+    }
+
+    if (getSetting(settings.PINTEREST_ENABLED)) {
+      registerComponent(config.pinterestExtensionId, config.pinterestExtensionPublicKey)
+    } else {
+      disableExtension(config.pinterestExtensionId)
     }
 
     if (appStore.getState().getIn(['widevine', 'enabled'])) {
