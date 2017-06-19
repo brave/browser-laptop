@@ -114,11 +114,14 @@ describe('Tabs content - Title', function () {
       const wrapper = mount(<Tab frameKey={frameKey} />)
       assert.equal(wrapper.find('TabTitle div').text(), pageTitle1)
     })
-    it('if breakpoint is mediumSmall', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        location: url1,
-        title: pageTitle1,
-        breakpoint: 'mediumSmall'
+    it('if breakpoint is mediumSmall and tab is not active', function () {
+      windowStore.state = defaultWindowStore.merge({
+        activeFrameKey: 0,
+        frames: [{
+          location: url1,
+          title: pageTitle1,
+          breakpoint: 'mediumSmall'
+        }]
       })
       const wrapper = mount(<Tab frameKey={frameKey} />)
       assert.equal(wrapper.find('TabTitle div').text(), pageTitle1)
@@ -147,7 +150,15 @@ describe('Tabs content - Title', function () {
       const wrapper = mount(<Tab frameKey={frameKey} />)
       assert.equal(wrapper.find('TabTitle').length, 0)
     })
-
+    it('if breakpoint is mediumSmall and tab is active', function () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        location: url1,
+        title: pageTitle1,
+        breakpoint: 'mediumSmall'
+      })
+      const wrapper = mount(<Tab frameKey={frameKey} />)
+      assert.equal(wrapper.find('TabTitle').length, 0)
+    })
     it('if breakpoint is small and tab is active', function () {
       windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
         location: url1,
