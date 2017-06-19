@@ -312,6 +312,13 @@ class AboutStyle extends ImmutableComponent {
           &lt;BrowserButton iconOnly icon={'{'}globalStyles.appIcons.private{'}'} size='60px' color='red' />
         </Code></Pre>
 
+        <BrowserButton groupedItem primaryColor panelItem l10nId='panelItem' onClick={this.copyToClipboard} />
+        <BrowserButton groupedItem primaryColor panelItem l10nId='panelItem' onClick={this.props.showQRcode} />
+        <Pre><Code>
+          &lt;BrowserButton groupedItem primaryColor panelItem l10nId='panelItem' onClick={'{this.copyToClipboard}'} />{'\n'}
+          &lt;BrowserButton groupedItem primaryColor panelItem l10nId='panelItem' onClick={'{this.props.showQRcode}'} />
+        </Code></Pre>
+
         <GoTop />
       </div>
 
