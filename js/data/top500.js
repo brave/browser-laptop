@@ -4,8 +4,8 @@
 
 // Top 500 alexa sites sorted by popularity
 const top500 = [
-  'gmail.com',
   'google.com',
+  'gmail.com',
   'mail.google.com',
   'calendar.google.com',
   'facebook.com',
@@ -20,6 +20,7 @@ const top500 = [
   'linkedin.com',
   'sina.com.cn',
   'amazon.com',
+  'amazon.ca',
   'hao123.com',
   'google.co.in',
   'blogspot.com',
@@ -65,7 +66,18 @@ const top500 = [
   'google.com.hk',
   'adcash.com',
   'blogger.com',
+  'news.ycombinator.com',
   'reddit.com',
+  'slashdot.org',
+  'digg.com',
+  'duckduckgo.com',
+  'startpage.com',
+  'wolframalpha.com',
+  'infogalactic.com',
+  'qwant.com',
+  'searx.me',
+  'ecosia.org',
+  'semanticscholar.org',
   'fc2.com',
   'cnn.com',
   'google.ca',
@@ -94,6 +106,7 @@ const top500 = [
   'blogspot.in',
   'ebay.de',
   'netflix.com',
+  'khanacademy.org',
   'kickass.to',
   'google.pl',
   'ku6.com',
@@ -333,6 +346,7 @@ const top500 = [
   'mobile01.com',
   'clickbank.com',
   'microsoftonline.com',
+  'yandex.com',
   'yandex.ua',
   'gsmarena.com',
   'bluehost.com',
@@ -489,7 +503,8 @@ const top500 = [
   'babytree.com',
   'youm7.com',
   '123rf.com',
-  'commentcamarche.net'
+  'commentcamarche.net',
+  'brave.com'
 ]
 
 module.exports = top500
