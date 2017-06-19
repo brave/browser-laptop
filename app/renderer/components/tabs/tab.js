@@ -273,7 +273,7 @@ class Tab extends React.Component {
     props.partOfFullPageSet = ownProps.partOfFullPageSet
     props.showTitle = !props.isPinnedTab &&
       !(
-        (hasBreakpoint(breakpoint, 'small') && props.isActive) ||
+        (hasBreakpoint(breakpoint, ['mediumSmall', 'small']) && props.isActive) ||
         hasBreakpoint(breakpoint, ['extraSmall', 'smallest'])
       )
 

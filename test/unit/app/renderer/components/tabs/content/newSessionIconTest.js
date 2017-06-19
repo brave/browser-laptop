@@ -119,19 +119,6 @@ describe('Tabs content - NewSessionIcon', function () {
       assert.equal(wrapper.find('NewSessionIcon').length, 1)
     })
 
-    it('icon if tab is not active and breakpoint is medium', function () {
-      windowStore.state = defaultWindowStore.merge({
-        activeFrameKey: 0,
-        frames: [{
-          partitionNumber: 1,
-          hoverState: false,
-          breakpoint: 'medium'
-        }]
-      })
-      const wrapper = mount(<Tab frameKey={frameKey} />)
-      assert.equal(wrapper.find('NewSessionIcon').length, 1)
-    })
-
     it('partition number for new sessions', function () {
       windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
         partitionNumber: 3,
@@ -199,10 +186,10 @@ describe('Tabs content - NewSessionIcon', function () {
       assert.equal(wrapper.find('NewSessionIcon').length, 0)
     })
 
-    it('if tab is active and breakpoint is medium', function () {
+    it('if breakpoint is medium', function () {
       windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
         partitionNumber: 1,
-        hoverState: true,
+        hoverState: false,
         breakpoint: 'medium'
       })
       const wrapper = mount(<Tab frameKey={frameKey} />)
