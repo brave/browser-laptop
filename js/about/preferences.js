@@ -16,7 +16,7 @@ const {SettingsList, SettingItem, SettingCheckbox, SettingItemIcon} = require('.
 const {SettingTextbox} = require('../../app/renderer/components/common/textbox')
 const {SettingDropdown} = require('../../app/renderer/components/common/dropdown')
 const {DefaultSectionTitle} = require('../../app/renderer/components/common/sectionTitle')
-const Button = require('../../app/renderer/components/common/button')
+const BrowserButton = require('../../app/renderer/components/common/browserButton')
 
 // Tabs
 const PaymentsTab = require('../../app/renderer/components/preferences/paymentsTab')
@@ -149,8 +149,11 @@ class GeneralTab extends ImmutableComponent {
     const defaultBrowser = getSetting(settings.IS_DEFAULT_BROWSER, this.props.settings)
       ? <SettingItem dataL10nId='defaultBrowser' />
       : <SettingItem dataL10nId='notDefaultBrowser' >
-        <Button l10nId='setAsDefault' className='primaryButton setAsDefaultButton'
-          onClick={this.setAsDefaultBrowser} />
+        <BrowserButton
+          primaryColor
+          l10nId='setAsDefault'
+          onClick={this.setAsDefaultBrowser}
+        />
       </SettingItem>
 
     const defaultZoomSetting = getSetting(settings.DEFAULT_ZOOM_LEVEL, this.props.settings)
@@ -234,8 +237,11 @@ class GeneralTab extends ImmutableComponent {
           </SettingDropdown>
         </SettingItem>
         <SettingItem dataL10nId='importBrowserData'>
-          <Button l10nId='importNow' className='primaryButton importNowButton'
-            onClick={this.importBrowserDataNow} />
+          <BrowserButton
+            primaryColor
+            l10nId='importNow'
+            onClick={this.importBrowserDataNow}
+          />
         </SettingItem>
         {defaultBrowser}
         <SettingItem>
@@ -547,10 +553,15 @@ class ShieldsTab extends ImmutableComponent {
         <SettingCheckbox checked={this.props.braveryDefaults.get('safeBrowsing')} dataL10nId='safeBrowsing' onChange={this.onToggleSafeBrowsing} />
         <SettingCheckbox checked={this.props.braveryDefaults.get('noScript')} dataL10nId='noScriptPref' onChange={this.onToggleNoScript} />
         <SettingCheckbox dataL10nId='blockCanvasFingerprinting' prefKey={settings.BLOCK_CANVAS_FINGERPRINTING} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <Button l10nId='manageAdblockSettings' className='primaryButton manageAdblockSettings'
-          onClick={aboutActions.createTabRequested.bind(null, {
-            url: 'about:adblock'
-          })} />
+        {/* TODO: move this inline style to Aphrodite once refactored */}
+        <div style={{marginTop: '15px'}}>
+          <BrowserButton
+            primaryColor
+            l10nId='manageAdblockSettings'
+            onClick={aboutActions.createTabRequested.bind(null, {
+              url: 'about:adblock'
+            })} />
+        </div>
       </SettingsList>
       <DefaultSectionTitle data-l10n-id='shieldsPanelOptions' />
       <SettingsList>
@@ -605,11 +616,15 @@ class SecurityTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='autocompleteData' prefKey={settings.SHUTDOWN_CLEAR_AUTOCOMPLETE_DATA} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='autofillData' prefKey={settings.SHUTDOWN_CLEAR_AUTOFILL_DATA} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='savedSiteSettings' prefKey={settings.SHUTDOWN_CLEAR_SITE_SETTINGS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <Button className='primaryButton'
-          l10nId='clearBrowsingDataNow'
-          testId='clearBrowsingDataButton'
-          onClick={this.clearBrowsingDataNow}
-        />
+        {/* TODO: move this inline style to Aphrodite once refactored */}
+        <div style={{marginTop: '15px'}}>
+          <BrowserButton
+            primaryColor
+            l10nId='clearBrowsingDataNow'
+            testId='clearBrowsingDataButton'
+            onClick={this.clearBrowsingDataNow}
+          />
+        </div>
       </SettingsList>
       <DefaultSectionTitle data-l10n-id='passwordsAndForms' />
       <SettingsList>
@@ -646,10 +661,17 @@ class SecurityTab extends ImmutableComponent {
       <DefaultSectionTitle data-l10n-id='autofillSettings' />
       <SettingsList>
         <SettingCheckbox dataL10nId='enableAutofill' prefKey={settings.AUTOFILL_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <Button l10nId='manageAutofillData' className='primaryButton manageAutofillDataButton'
-          onClick={aboutActions.createTabRequested.bind(null, {
-            url: 'about:autofill'
-          })} disabled={!getSetting(settings.AUTOFILL_ENABLED, this.props.settings)} />
+        {/* TODO: move this inline style to Aphrodite once refactored */}
+        <div style={{marginTop: '15px'}}>
+          <BrowserButton
+            primaryColor
+            l10nId='manageAutofillData'
+            disabled={!getSetting(settings.AUTOFILL_ENABLED, this.props.settings)}
+            onClick={aboutActions.createTabRequested.bind(null, {
+              url: 'about:autofill'
+            })}
+          />
+        </div>
       </SettingsList>
       <DefaultSectionTitle data-l10n-id='fullscreenContent' />
       <SettingsList>

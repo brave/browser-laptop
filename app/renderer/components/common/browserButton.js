@@ -21,11 +21,11 @@ class BrowserButton extends ImmutableComponent {
       this.props.groupedItem && styles.browserButton_groupedItem,
       this.props.notificationItem && styles.browserButton_notificationItem,
       this.props.iconOnly && styles.browserButton_iconOnly,
+      this.props.panelItem && styles.browserButton_panelItem,
       // TODO: These are other button styles app-wise
       // that needs to be refactored and included in this file
       // .............................................
       // this.props.navItem && styles.browserButton_navItem,
-      // this.props.panelItem && styles.browserButton_panelItem,
 
       // note: this should be the last item so it can override other styles
       this.props.disabled && styles.browserButton_disabled
@@ -170,6 +170,7 @@ const styles = StyleSheet.create({
     border: '1px solid white',
     color: globalStyles.button.secondary.color,
     cursor: 'pointer',
+    fontWeight: 500,
 
     ':hover': {
       border: `1px solid ${globalStyles.button.secondary.borderHoverColor}`,
@@ -233,6 +234,10 @@ const styles = StyleSheet.create({
 
   browserButton_actionItem: {
     background: globalStyles.button.action.backgroundColor
+  },
+
+  browserButton_panelItem: {
+    minWidth: '180px'
   },
 
   browserButton_iconOnly: {
