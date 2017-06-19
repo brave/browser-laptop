@@ -4,42 +4,52 @@
 
 const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
+const Immutable = require('immutable')
 
 // Components
-const ImmutableComponent = require('../immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 const NotificationItem = require('./notificationItem')
 
 // Utils
 const {getOrigin} = require('../../../../js/state/siteUtil')
+const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
 // Styles
 const commonStyles = require('../styles/commonStyles')
 const globalStyles = require('../styles/global')
 
-class NotificationBar extends ImmutableComponent {
+class NotificationBar extends React.Component {
+  mergeProps (state, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
+    const activeOrigin = getOrigin(activeFrame.get('location'))
+    const notifications = state.get('notifications')
+
+    const props = {}
+    props.activeNotifications = notifications
+      .filter((item) => {
+        return item.get('frameOrigin')
+          ? activeOrigin === item.get('frameOrigin')
+          : true
+      })
+      .takeLast(3)
+      .map((notification) => notification.get('message'))
+
+    return props
+  }
+
   render () {
-    const activeOrigin = getOrigin(this.props.activeFrame.get('location'))
-    if (!activeOrigin) {
-      return null
-    }
-    const activeNotifications = this.props.notifications.filter((item) =>
-      item.get('frameOrigin') ? activeOrigin === item.get('frameOrigin') : true)
-
-    if (!activeNotifications.size) {
-      return null
-    }
-
     return <div className={css(commonStyles.notificationBar)} data-test-id='notificationBar'>
       {
-        activeNotifications.takeLast(3).map((notificationDetail) =>
-          <NotificationItem detail={notificationDetail} />
+        this.props.activeNotifications.map((message) =>
+          <NotificationItem message={message} />
         )
       }
     </div>
   }
 }
 
-class NotificationBarCaret extends ImmutableComponent {
+class NotificationBarCaret extends React.Component {
   render () {
     return <div className={css(styles.caretWrapper)}>
       <div className={css(styles.caretWrapper__caret)} />
@@ -75,6 +85,6 @@ const styles = StyleSheet.create({
 })
 
 module.exports = {
-  NotificationBar,
+  NotificationBar: ReduxComponent.connect(NotificationBar),
   NotificationBarCaret
 }

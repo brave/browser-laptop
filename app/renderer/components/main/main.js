@@ -679,11 +679,11 @@ class Main extends ImmutableComponent {
     const customTitlebar = this.customTitlebar
     const contextMenuDetail = this.props.windowState.get('contextMenuDetail')
     const shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(this.props.appState, this.props.windowState, activeFrame, isFocused())
+    const activeOrigin = activeFrame ? siteUtil.getOrigin(activeFrame.get('location')) : null
+    const notificationBarIsVisible = activeOrigin && this.props.appState.get('notifications').filter((item) =>
+      item.get('frameOrigin') ? activeOrigin === item.get('frameOrigin') : true).size > 0
 
     const appStateSites = this.props.appState.get('sites')
-
-    const notifications = this.props.appState.get('notifications')
-    const hasNotifications = notifications && notifications.size
 
     return <div id='window'
       className={cx({
@@ -821,11 +821,10 @@ class Main extends ImmutableComponent {
         </div>
         <TabsToolbar key='tab-bar' />
         {
-          hasNotifications && activeFrame
-          ? <NotificationBar notifications={notifications} activeFrame={activeFrame} />
+          notificationBarIsVisible
+          ? <NotificationBar />
           : null
         }
-
         {
           activeFrame && activeFrame.get('findbarShown') && !activeFrame.get('isFullScreen')
           ? <FindBar
