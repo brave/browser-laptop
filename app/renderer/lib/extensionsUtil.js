@@ -39,7 +39,11 @@ const dummyData = [
     name: 'dashlane',
     description: 'dashlaneDesc',
     icon: 'img/extensions/dashlane-128.png'
-  // { id: enpass // TBD },
+  }, {
+    id: enpass,
+    name: 'enpass',
+    description: 'enpassDesc',
+    icon: 'img/extensions/enpass-128.png'
   }, {
     id: lastpass,
     name: 'lastpass',
