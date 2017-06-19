@@ -82,7 +82,6 @@ class Main extends ImmutableComponent {
     this.onHideAutofillAddressPanel = this.onHideAutofillAddressPanel.bind(this)
     this.onHideAutofillCreditCardPanel = this.onHideAutofillCreditCardPanel.bind(this)
     this.onHideReleaseNotes = this.onHideReleaseNotes.bind(this)
-    this.onHideCheckDefaultBrowserDialog = this.onHideCheckDefaultBrowserDialog.bind(this)
     this.onTabContextMenu = this.onTabContextMenu.bind(this)
     this.onFind = this.onFind.bind(this)
     this.onFindHide = this.onFindHide.bind(this)
@@ -558,10 +557,6 @@ class Main extends ImmutableComponent {
     windowActions.setReleaseNotesVisible(false)
   }
 
-  onHideCheckDefaultBrowserDialog () {
-    windowActions.setModalDialogDetail('checkDefaultBrowserDialog')
-  }
-
   onMouseDown (e) {
     // TODO(bsclifton): update this to use eventUtil.eventElHasAncestorWithClasses
     let node = e.target
@@ -782,13 +777,7 @@ class Main extends ImmutableComponent {
         }
         {
           checkDefaultBrowserDialogIsVisible
-            ? <CheckDefaultBrowserDialog
-              checkDefaultOnStartup={
-                this.props.windowState.getIn(['modalDialogDetail', 'checkDefaultBrowserDialog']) === undefined
-                ? getSetting(settings.CHECK_DEFAULT_ON_STARTUP)
-                : this.props.windowState.getIn(['modalDialogDetail', 'checkDefaultBrowserDialog', 'checkDefaultOnStartup'])
-              }
-              onHide={this.onHideCheckDefaultBrowserDialog} />
+            ? <CheckDefaultBrowserDialog />
             : null
         }
 
