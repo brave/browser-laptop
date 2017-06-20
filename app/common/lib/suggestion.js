@@ -13,7 +13,7 @@ const suggestionTypes = require('../../../js/constants/suggestionTypes')
 const getSetting = require('../../../js/settings').getSetting
 const settings = require('../../../js/constants/settings')
 const config = require('../../../js/constants/config')
-const top500 = require('../../../js/data/top500')
+const {topSites, getSiteOrder} = require('../data/topSites')
 const fetchSearchSuggestions = require('./fetchSearchSuggestions')
 const {getFrameByTabId, getTabsByWindowId} = require('../../common/state/tabState')
 const {query} = require('./siteSuggestions')
@@ -299,9 +299,8 @@ const getSortByDomainForHosts = (userInputHost) => {
       }
     }
 
-    // The list here is sufficiently small to not be a perf concern
-    const topPos1 = top500.indexOf(host1)
-    const topPos2 = top500.indexOf(host2)
+    const topPos1 = getSiteOrder(host1)
+    const topPos2 = getSiteOrder(host2)
 
     if (topPos1 !== -1 && topPos2 === -1) {
       return -1
@@ -580,7 +579,7 @@ const getAlexaSuggestions = (state, urlLocationLower) => {
     const mapListToElements = getMapListToElements(urlLocationLower)
     const sortHandler = getSortByDomainForHosts(urlLocationLower)
     const suggestionsList = mapListToElements({
-      data: top500,
+      data: topSites,
       maxResults: config.urlBarSuggestions.maxTopSites,
       type: suggestionTypes.TOP_SITE,
       sortHandler

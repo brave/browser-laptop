@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// Top 500 alexa sites sorted by popularity
-const top500 = [
+// Top sites
+const topSites = [
   'google.com',
   'gmail.com',
   'mail.google.com',
@@ -507,4 +507,16 @@ const top500 = [
   'brave.com'
 ]
 
-module.exports = top500
+const siteOrderMap = topSites.reduce(
+  (result, site, i) => {
+    result[site] = i + 1
+    return result
+  }, {}
+)
+
+const getSiteOrder = (site) => (siteOrderMap[site] || Number.MAX_SAFE_INTEGER)
+
+module.exports = {
+  topSites,
+  getSiteOrder
+}
