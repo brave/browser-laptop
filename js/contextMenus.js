@@ -1462,17 +1462,12 @@ function onMoreBookmarksMenu (activeFrame, allBookmarkItems, overflowItems, e) {
 }
 
 function onReloadContextMenu (target) {
-  const rect = target.getBoundingClientRect()
   const menuTemplate = [
     CommonMenu.reloadPageMenuItem(),
     CommonMenu.cleanReloadMenuItem()
   ]
-
-  windowActions.setContextMenuDetail(Immutable.fromJS({
-    left: rect.left,
-    top: rect.bottom + 2,
-    template: menuTemplate
-  }))
+  const menu = Menu.buildFromTemplate(menuTemplate)
+  menu.popup(getCurrentWindow())
 }
 
 module.exports = {
