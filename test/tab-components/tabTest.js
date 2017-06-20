@@ -333,6 +333,40 @@ describe('tab tests', function () {
     })
   })
 
+  describe('sequentially closing tabs', function () {
+    Brave.beforeAll(this)
+    before(function * () {
+      const page1 = Brave.server.url('adblock2.html')
+      const page2 = Brave.server.url('red_bg.html')
+      const page3 = Brave.server.url('yellow_header.html')
+
+      yield setup(this.app.client)
+      yield this.app.client
+        .newTab({ url: page1 })
+        .waitForUrl(page1)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
+        .newTab({ url: page2 })
+        .waitForUrl(page2)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist('[data-test-id="tab"][data-frame-key="3"]')
+        .newTab({ url: page3 })
+        .waitForUrl(page3)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist('[data-test-id="tab"][data-frame-key="4"]')
+    })
+
+    it('fallsback to last active tab if next tab does not exist', function * () {
+      yield this.app.client.changeSetting(settings.SHOW_TAB_PREVIEWS, false)
+      yield this.app.client
+        .moveToObject('[data-test-id="tab"][data-frame-key="3"]')
+        .middleClick('[data-test-id="tab"][data-frame-key="3"]')
+        .moveToObject('[data-test-id="tab"][data-frame-key="4"]')
+        .middleClick('[data-test-id="tab"][data-frame-key="4"]')
+        .waitForVisible('[data-test-active-tab="true"][data-frame-key="2"]')
+    })
+  })
+
   describe('webview previews when tab is hovered', function () {
     Brave.beforeAll(this)
     before(function * () {
@@ -432,7 +466,6 @@ describe('tab tests', function () {
         .click('[data-test-id="tab"][data-frame-key="2"]')
         .moveToObject('[data-test-id="tab"][data-frame-key="5"]')
         .middleClick('[data-test-id="tab"][data-frame-key="5"]')
-        .waitForExist('.frameWrapper.isPreview webview')
         // no preview should be shown
         .waitForVisible('.frameWrapper.isPreview webview', 500, true)
     })
