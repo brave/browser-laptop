@@ -37,12 +37,13 @@ const updateActiveTab = (state, closeTabId) => {
     return
   }
 
-  if (!tabState.isActive(state, closeTabId)) {
+  const windowId = tabState.getWindowId(state, closeTabId)
+  if (windowId === windowState.WINDOW_ID_NONE) {
     return
   }
 
-  const windowId = tabState.getWindowId(state, closeTabId)
-  if (windowId === windowState.WINDOW_ID_NONE) {
+  const lastActiveTabId = tabState.getTabsByLastActivated(state, windowId).last()
+  if (lastActiveTabId !== closeTabId && !tabState.isActive(state, closeTabId)) {
     return
   }
 
