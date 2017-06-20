@@ -443,7 +443,7 @@ function getTotalBlocks (frame) {
 function isPinned (state, frameKey) {
   const frame = getFrameByKey(state, frameKey)
 
-  return !!frame.get('pinnedLocation')
+  return frame && !!frame.get('pinnedLocation')
 }
 
 /**

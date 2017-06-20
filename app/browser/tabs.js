@@ -434,7 +434,7 @@ const api = {
       let tabId = tab.getId()
 
       tab.on('did-start-navigation', (e, navigationHandle) => {
-        if (navigationHandle.isValid() && navigationHandle.isInMainFrame()) {
+        if (!tab.isDestroyed() && navigationHandle.isValid() && navigationHandle.isInMainFrame()) {
           const controller = tab.controller()
           if (!controller.isValid()) {
             return
@@ -448,7 +448,7 @@ const api = {
       })
 
       tab.on('did-finish-navigation', (e, navigationHandle) => {
-        if (navigationHandle.isValid() && navigationHandle.isInMainFrame()) {
+        if (!tab.isDestroyed() && navigationHandle.isValid() && navigationHandle.isInMainFrame()) {
           const controller = tab.controller()
           if (!controller.isValid()) {
             return
