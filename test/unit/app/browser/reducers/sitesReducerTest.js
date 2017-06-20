@@ -40,10 +40,9 @@ describe('sitesReducerTest', function () {
   describe('APP_ON_CLEAR_BROWSING_DATA', function () {
     before(function () {
       this.action = {
-        actionType: appConstants.APP_ON_CLEAR_BROWSING_DATA,
-        clearDataDetail: {browserHistory: true}
+        actionType: appConstants.APP_ON_CLEAR_BROWSING_DATA
       }
-      const newState = initState.setIn(['tempClearBrowsingData', 'browserHistory'], true)
+      const newState = initState.setIn(['clearBrowsingDataDefaults', 'browserHistory'], true)
       this.clearHistory = sinon.stub(this.fakeFiltering, 'clearHistory')
       this.state = sitesReducer(newState, this.action, makeImmutable(this.action))
     })
