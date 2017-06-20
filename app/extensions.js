@@ -9,7 +9,7 @@ const {getExtensionsPath, getBraveExtUrl, getBraveExtIndexHTML} = require('../js
 const {getSetting} = require('../js/settings')
 const settings = require('../js/constants/settings')
 const extensionStates = require('../js/constants/extensionStates')
-const {passwordManagers, extensionIds} = require('../js/constants/passwordManagers')
+const {passwordManagers, extensionIds, publicKeys} = require('../js/constants/passwordManagers')
 const appStore = require('../js/stores/appStore')
 const extensionState = require('./common/state/extensionState')
 const appActions = require('../js/actions/appActions')
@@ -473,50 +473,50 @@ module.exports.init = () => {
 
   let registerComponents = (diff) => {
     if (getSetting(settings.PDFJS_ENABLED)) {
-      registerComponent(config.PDFJSExtensionId)
+      registerComponent(config.PDFJSExtensionId, config.PDFJSExtensionPublicKey)
     } else {
       disableExtension(config.PDFJSExtensionId)
     }
 
     const activePasswordManager = getSetting(settings.ACTIVE_PASSWORD_MANAGER)
     if (activePasswordManager === passwordManagers.ONE_PASSWORD) {
-      registerComponent(extensionIds[passwordManagers.ONE_PASSWORD])
+      registerComponent(extensionIds[passwordManagers.ONE_PASSWORD], publicKeys[passwordManagers.ONE_PASSWORD])
     } else {
       disableExtension(extensionIds[passwordManagers.ONE_PASSWORD])
     }
 
     if (activePasswordManager === passwordManagers.DASHLANE) {
-      registerComponent(extensionIds[passwordManagers.DASHLANE])
+      registerComponent(extensionIds[passwordManagers.DASHLANE], publicKeys[passwordManagers.DASHLANE])
     } else {
       disableExtension(extensionIds[passwordManagers.DASHLANE])
     }
 
     if (activePasswordManager === passwordManagers.LAST_PASS) {
-      registerComponent(extensionIds[passwordManagers.LAST_PASS])
+      registerComponent(extensionIds[passwordManagers.LAST_PASS], publicKeys[passwordManagers.LAST_PASS])
     } else {
       disableExtension(extensionIds[passwordManagers.LAST_PASS])
     }
 
     if (activePasswordManager === passwordManagers.ENPASS) {
-      registerComponent(extensionIds[passwordManagers.ENPASS])
+      registerComponent(extensionIds[passwordManagers.ENPASS], publicKeys[passwordManagers.ENPASS])
     } else {
       disableExtension(extensionIds[passwordManagers.ENPASS])
     }
 
     if (activePasswordManager === passwordManagers.BITWARDEN) {
-      registerComponent(extensionIds[passwordManagers.BITWARDEN])
+      registerComponent(extensionIds[passwordManagers.BITWARDEN], publicKeys[passwordManagers.BITWARDEN])
     } else {
       disableExtension(extensionIds[passwordManagers.BITWARDEN])
     }
 
     if (getSetting(settings.POCKET_ENABLED)) {
-      registerComponent(config.PocketExtensionId)
+      registerComponent(config.PocketExtensionId, config.PocketExtensionPublicKey)
     } else {
       disableExtension(config.PocketExtensionId)
     }
 
     if (getSetting(settings.VIMIUM_ENABLED)) {
-      registerComponent(config.vimiumExtensionId)
+      registerComponent(config.vimiumExtensionId, config.vimiumExtensionPublicKey)
     } else {
       disableExtension(config.vimiumExtensionId)
     }
@@ -534,7 +534,7 @@ module.exports.init = () => {
     }
 
     if (appStore.getState().getIn(['widevine', 'enabled'])) {
-      registerComponent(config.widevineComponentId)
+      registerComponent(config.widevineComponentId, config.widevineComponentPublicKey)
     }
   }
 
