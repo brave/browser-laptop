@@ -23,6 +23,7 @@ describe('tabsReducer unit tests', function () {
       useCleanCache: true
     })
     this.state = Immutable.fromJS({
+      settings: [],
       tabs: [{
         tabId: 1,
         index: 0,
@@ -94,6 +95,7 @@ describe('tabsReducer unit tests', function () {
       isDevToolsFocused: (tabId) => {
         return tabId === 1
       },
+      setWebRTCIPHandlingPolicy: sinon.mock(),
       toggleDevTools: sinon.mock(),
       closeTab: sinon.mock(),
       setActive: sinon.spy(),
@@ -167,10 +169,15 @@ describe('tabsReducer unit tests', function () {
 
     after(function () {
       this.setNavigationStateSpy.restore()
+      this.tabsAPI.setWebRTCIPHandlingPolicy.reset()
     })
 
     it('sets the navigation state to the value of `action.navigationState`', function () {
       assert(this.setNavigationStateSpy.withArgs(this.state, 1, Immutable.fromJS(this.navigationState)).calledOnce)
+    })
+
+    it('updates the setWebRTCIPHandlingPolicy', function () {
+      assert(this.tabsAPI.setWebRTCIPHandlingPolicy.calledOnce)
     })
   })
 
@@ -196,6 +203,7 @@ describe('tabsReducer unit tests', function () {
 
     after(function () {
       this.setNavigationStateSpy.restore()
+      this.tabsAPI.setWebRTCIPHandlingPolicy.reset()
     })
 
     it('sets the navigation state to the value of `action.navigationState`', function () {
