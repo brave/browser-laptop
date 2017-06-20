@@ -719,8 +719,7 @@ const handleAppAction = (action) => {
       autofill.removeAutofillAddress(action.detail.get('guid'))
       break
     case appConstants.APP_ADD_AUTOFILL_CREDIT_CARD:
-      autofill.addAutofillCreditCard(action.detail.toJS(),
-        action.originalDetail.get('guid') === undefined ? '-1' : action.originalDetail.get('guid'))
+      autofill.addAutofillCreditCard(action.detail)
       break
     case appConstants.APP_REMOVE_AUTOFILL_CREDIT_CARD:
       autofill.removeAutofillCreditCard(action.detail.get('guid'))

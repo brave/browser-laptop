@@ -594,8 +594,8 @@ class Frame extends React.Component {
             windowActions.setAutofillAddressDetail(null, null, currentDetail)
           break
         case messages.AUTOFILL_SET_CREDIT_CARD:
-          method = (currentDetail, originalDetail) =>
-            windowActions.setAutofillCreditCardDetail(currentDetail, originalDetail)
+          method = (currentDetail) =>
+            windowActions.setAutofillCreditCardDetail(null, null, currentDetail)
           break
         case messages.HIDE_CONTEXT_MENU:
           method = () => windowActions.setContextMenuDetail()

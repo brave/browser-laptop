@@ -799,14 +799,16 @@ const windowActions = {
 
   /**
    * Sets the manage autofill credit card popup detail
-   * @param {Object} currentDetail - Properties of the credit card to change to
-   * @param {Object} originalDetail - Properties of the credit card to edit
+   * @param {string} property - Property that we want change
+   * @param {string} newValue - New value for this property
+   * @param {Object} wholeObject -  Whole object of credit card detail
    */
-  setAutofillCreditCardDetail: function (currentDetail, originalDetail) {
+  setAutofillCreditCardDetail: function (property, newValue, wholeObject) {
     dispatch({
       actionType: windowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL,
-      currentDetail,
-      originalDetail
+      property,
+      newValue,
+      wholeObject
     })
   },
 

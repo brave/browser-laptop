@@ -513,15 +513,13 @@ Remove address data
 
 
 
-### addAutofillCreditCard(detail, originalDetail) 
+### addAutofillCreditCard(detail) 
 
 Add credit card data
 
 **Parameters**
 
 **detail**: `object`, the credit card to add as per doc/state.md's autofillCreditCardDetail
-
-**originalDetail**: `object`, the original credit card before editing
 
 
 
