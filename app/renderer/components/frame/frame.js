@@ -57,11 +57,6 @@ const messages = require('../../../../js/constants/messages')
 const config = require('../../../../js/constants/config')
 
 const pdfjsOrigin = `chrome-extension://${config.PDFJSExtensionId}/`
-const WEBRTC_DEFAULT = 'default'
-const WEBRTC_DISABLE_NON_PROXY = 'disable_non_proxied_udp'
-// Looks like Brave leaks true public IP from behind system proxy when this option
-// is on.
-// const WEBRTC_PUBLIC_ONLY = 'default_public_interface_only'
 
 function isTorrentViewerURL (url) {
   const isEnabled = getSetting(settings.TORRENT_VIEWER_ENABLED)
@@ -275,10 +270,6 @@ class Frame extends React.Component {
 
     const cb = (prevProps = {}) => {
       this.onPropsChanged(prevProps)
-      if (this.getWebRTCPolicy(prevProps) !== this.getWebRTCPolicy(this.props)) {
-        this.webview.setWebRTCIPHandlingPolicy(this.getWebRTCPolicy(this.props))
-      }
-
       if (this.props.isActive && !prevProps.isActive && !this.props.urlBarFocused) {
         this.webview.focus()
       }
@@ -890,15 +881,6 @@ class Frame extends React.Component {
       this.onUpdateWheelZoom()
     } else {
       this.wheelDeltaY = 0
-    }
-  }
-
-  getWebRTCPolicy (props) {
-    const braverySettings = this.getFrameBraverySettings(props)
-    if (!braverySettings || braverySettings.get('fingerprintingProtection') !== true) {
-      return WEBRTC_DEFAULT
-    } else {
-      return WEBRTC_DISABLE_NON_PROXY
     }
   }
 
