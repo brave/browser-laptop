@@ -57,7 +57,7 @@ For other platforms (macOS, Linux) You'll need certain packages installed before
 
         sudo npm install -g node-gyp@3.3.1
 
-#### On Debian/Ubuntu
+#### On Debian / Ubuntu /Mint
 
 ````
 apt-get install libgnome-keyring-dev build-essential rpm ninja-build

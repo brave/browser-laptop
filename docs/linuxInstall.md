@@ -47,19 +47,13 @@ Alternatively you can install the deb directly but then you won't get automatic 
 wget -O brave.deb https://laptop-updates.brave.com/latest/dev/debian64
 sudo apt-get install -y gdebi && sudo gdebi brave.deb
 ```
-or for ubuntu
+or for Ubuntu
 ```
 wget -O brave.deb https://laptop-updates.brave.com/latest/dev/ubuntu64
 sudo dpkg -i brave.deb
 ```
 
-If there are dependency errors during `dpkg -i`, the following command will
-install the dependency for you:
-```
-sudo apt-get -f install
-```
-
-## Mint AMD64:
+or for Mint
 
 ```
 wget -O brave.deb https://laptop-updates.brave.com/latest/mint64
