@@ -497,15 +497,13 @@ Import browser data specified in selected
 
 
 
-### addAutofillAddress(detail, originalDetail) 
+### addAutofillAddress(detail) 
 
 Add address data
 
 **Parameters**
 
 **detail**: `object`, the address to add as per doc/state.md's autofillAddressDetail
-
-**originalDetail**: `object`, the original address before editing
 
 
 

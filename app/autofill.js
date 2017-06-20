@@ -13,18 +13,18 @@ module.exports.init = () => {
   })
 }
 
-module.exports.addAutofillAddress = (detail, guid) => {
+module.exports.addAutofillAddress = (detail) => {
   session.defaultSession.autofill.addProfile({
-    full_name: detail.name,
-    company_name: detail.organization,
-    street_address: detail.streetAddress,
-    city: detail.city,
-    state: detail.state,
-    postal_code: detail.postalCode,
-    country_code: detail.country,
-    phone: detail.phone,
-    email: detail.email,
-    guid: guid
+    full_name: detail.get('name'),
+    company_name: detail.get('organization'),
+    street_address: detail.get('streetAddress'),
+    city: detail.get('city'),
+    state: detail.get('state'),
+    postal_code: detail.get('postalCode'),
+    country_code: detail.get('country'),
+    phone: detail.get('phone'),
+    email: detail.get('email'),
+    guid: detail.get('guid')
   })
 }
 

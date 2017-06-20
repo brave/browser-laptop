@@ -590,8 +590,8 @@ class Frame extends React.Component {
             windowActions.setClearBrowsingDataPanelVisible(true)
           break
         case messages.AUTOFILL_SET_ADDRESS:
-          method = (currentDetail, originalDetail) =>
-            windowActions.setAutofillAddressDetail(currentDetail, originalDetail)
+          method = (currentDetail) =>
+            windowActions.setAutofillAddressDetail(null, null, currentDetail)
           break
         case messages.AUTOFILL_SET_CREDIT_CARD:
           method = (currentDetail, originalDetail) =>

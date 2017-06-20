@@ -784,14 +784,16 @@ const windowActions = {
 
   /**
    * Sets the manage autofill address popup detail
-   * @param {Object} currentDetail - Properties of the address to change to
-   * @param {Object} originalDetail - Properties of the address to edit
+   * @param {string} property - Property that we want change
+   * @param {string} newValue - New value for this property
+   * @param {Object} wholeObject - Whole object of address detail
    */
-  setAutofillAddressDetail: function (currentDetail, originalDetail) {
+  setAutofillAddressDetail: function (property, newValue, wholeObject) {
     dispatch({
       actionType: windowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL,
-      currentDetail,
-      originalDetail
+      property,
+      newValue,
+      wholeObject
     })
   },
 

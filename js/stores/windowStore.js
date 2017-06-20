@@ -574,13 +574,12 @@ const doAction = (action) => {
       }))
       break
     case windowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL:
-      if (!action.currentDetail && !action.originalDetail) {
+      if (!action.property && !action.wholeObject) {
         windowState = windowState.delete('autofillAddressDetail')
+      } else if (action.wholeObject) {
+        windowState = windowState.set('autofillAddressDetail', Immutable.fromJS(action.wholeObject))
       } else {
-        windowState = windowState.mergeIn(['autofillAddressDetail'], {
-          currentDetail: action.currentDetail,
-          originalDetail: action.originalDetail
-        })
+        windowState = windowState.setIn(['autofillAddressDetail', action.property], action.newValue)
       }
       break
     case windowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL:
