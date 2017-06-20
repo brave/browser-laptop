@@ -29,6 +29,12 @@ const extensions = require('./extensions')
 const CATEGORY_MAP = syncUtil.CATEGORY_MAP
 const CATEGORY_NAMES = Object.keys(categories)
 
+// Fields that should trigger a sync SEND when changed
+const SYNC_FIELDS = {
+  sites: ['location', 'customTitle', 'folderId', 'parentFolderId'],
+  siteSettings: Object.keys(syncUtil.siteSettingDefaults)
+}
+
 // The sync background script message sender
 let backgroundSender = null
 
@@ -49,15 +55,13 @@ let bookmarksToolbarShown = false
 
 // Syncs state diffs to the sync server if needed
 const appStoreChangeCallback = function (diffs) {
-  if (!backgroundSender) {
+  if (!backgroundSender || !diffs) {
     return
   }
 
-  // Fields that should trigger a sync SEND when changed
-  const syncFields = {
-    sites: ['location', 'tags', 'customTitle', 'folderId', 'parentFolderId'],
-    siteSettings: Object.keys(syncUtil.siteSettingDefaults)
-  }
+  // Site locations created by the diffs
+  let createdSiteLocations = []
+
   diffs.forEach((diff) => {
     if (!diff || !diff.path) {
       return
@@ -67,20 +71,43 @@ const appStoreChangeCallback = function (diffs) {
       // We are looking for paths like ['', 'sites', 'https://brave.com/', 'title']
       return
     }
+
     const type = path[1]
-    const fieldsToPick = syncFields[type]
+    const isSite = type === 'sites'
+    const siteLocation = isSite ? path[2].split('|')[0] : null
+
+    const fieldsToPick = SYNC_FIELDS[type]
     if (!fieldsToPick) {
       return
     }
 
     let action = null
+    let maybeSkipSync = false
+    if (siteLocation && diff.op !== 'remove') {
+      createdSiteLocations.push(siteLocation)
+    }
 
+    // XXX: adding/removing a tag (e.g. 'bookmark') corresponds to adding/deleting a site record in sync
     if (path.length === 3 || path[3] === 'tags') {
-      // XXX: adding/removing a tag (e.g. 'bookmark') corresponds to adding/deleting a site record in sync
       if (diff.op === 'add') {
-        action = writeActions.CREATE
+        maybeSkipSync = true
+        if (isSite) {
+          // Send UPDATE instead of CREATE for sites to work around sync#111
+          action = writeActions.UPDATE
+        } else {
+          action = writeActions.CREATE
+        }
       } else if (diff.op === 'remove') {
+        if (path.length === 3 && createdSiteLocations.includes(siteLocation)) {
+          // We are removing a site that is created in the same diff set.
+          // This probably means we are moving a site, not actually deleting
+          // it, so ignore this update.
+          console.log('Skipping site deletion', siteLocation)
+          return
+        }
         action = writeActions.DELETE
+      } else {
+        action = writeActions.UPDATE
       }
     } else if (fieldsToPick.includes(path[3])) {
       action = writeActions.UPDATE
@@ -93,9 +120,8 @@ const appStoreChangeCallback = function (diffs) {
     const statePath = path.slice(1, 3).map((item) => item.replace(/~1/g, '/'))
     const state = AppStore.getState()
     const entry = state.getIn(statePath)
-    const isSite = type === 'sites'
 
-    if (action === writeActions.CREATE && entry && entry.get('skipSync')) {
+    if (maybeSkipSync && entry && entry.get('skipSync')) {
       // Don't re-create objects that were fetched by sync
       return
     }
