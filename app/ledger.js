@@ -56,7 +56,6 @@ const uuid = require('uuid')
 const appActions = require('../js/actions/appActions')
 const appConfig = require('../js/constants/appConfig')
 const appConstants = require('../js/constants/appConstants')
-const appDispatcher = require('../js/dispatcher/appDispatcher')
 const messages = require('../js/constants/messages')
 const settings = require('../js/constants/settings')
 const request = require('../js/lib/request')
@@ -145,7 +144,7 @@ let notificationTryPaymentsMessage
 let notificationTimeout = null
 
 // TODO(bridiver) - create a better way to get setting changes
-const doAction = (action) => {
+const doAction = (state, action) => {
   var i, publisher
 
 /* TBD: handle
@@ -163,12 +162,26 @@ const doAction = (action) => {
   }
 
   switch (action.actionType) {
+    case appConstants.APP_SET_STATE:
+      init()
+      break
+
+    case appConstants.APP_BACKUP_KEYS:
+      state = backupKeys(state, action)
+      break
+
+    case appConstants.APP_RECOVER_WALLET:
+      state = recoverKeys(state, action)
+      break
+
     case appConstants.APP_SHUTTING_DOWN:
       quit()
       break
 
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
-      if (action.clearDataDetail.get('browserHistory') && !getSetting(settings.PAYMENTS_ENABLED)) reset(true)
+      if (state.getIn(['clearBrowsingDataDefaults', 'browserHistory']) && !getSetting(settings.PAYMENTS_ENABLED)) {
+        reset(true)
+      }
       break
 
     case appConstants.APP_IDLE_STATE_CHANGED:
@@ -264,6 +277,8 @@ const doAction = (action) => {
     default:
       break
   }
+
+  return state
 }
 
 /*
@@ -272,7 +287,6 @@ const doAction = (action) => {
 
 var init = () => {
   try {
-    appDispatcher.register(doAction)
     initialize(getSetting(settings.PAYMENTS_ENABLED))
   } catch (ex) { console.log('ledger.js initialization failed: ' + ex.toString() + '\n' + ex.stack) }
 }
@@ -2250,5 +2264,6 @@ module.exports = {
   backupKeys: backupKeys,
   quit: quit,
   boot: boot,
-  reset: reset
+  reset: reset,
+  doAction
 }

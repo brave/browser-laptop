@@ -77,7 +77,6 @@ class Main extends ImmutableComponent {
     this.onClickWindow = this.onClickWindow.bind(this)
     this.onHideSiteInfo = this.onHideSiteInfo.bind(this)
     this.onHideBraveryPanel = this.onHideBraveryPanel.bind(this)
-    this.onHideClearBrowsingDataPanel = this.onHideClearBrowsingDataPanel.bind(this)
     this.onHideAutofillCreditCardPanel = this.onHideAutofillCreditCardPanel.bind(this)
     this.onTabContextMenu = this.onTabContextMenu.bind(this)
     this.checkForTitleMode = debounce(this.checkForTitleMode.bind(this), 20)
@@ -530,10 +529,6 @@ class Main extends ImmutableComponent {
     windowActions.setBraveryPanelDetail()
   }
 
-  onHideClearBrowsingDataPanel () {
-    windowActions.setClearBrowsingDataPanelVisible(false)
-  }
-
   onHideAutofillCreditCardPanel () {
     windowActions.setAutofillCreditCardDetail()
   }
@@ -684,9 +679,7 @@ class Main extends ImmutableComponent {
         }
         {
          clearBrowsingDataPanelIsVisible
-          ? <ClearBrowsingDataPanel
-            clearBrowsingDataDefaults={this.props.appState.get('clearBrowsingDataDefaults')}
-            onHide={this.onHideClearBrowsingDataPanel} />
+          ? <ClearBrowsingDataPanel />
           : null
         }
         {

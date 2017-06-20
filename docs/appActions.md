@@ -477,13 +477,9 @@ Adds information about pending basic auth login requests
 
 
 
-### onClearBrowsingData(clearDataDetail) 
+### onClearBrowsingData() 
 
 Clears the data specified in clearDataDetail
-
-**Parameters**
-
-**clearDataDetail**: `object`, the app data to clear as per doc/state.md's clearBrowsingDataDefaults
 
 
 
@@ -1121,6 +1117,18 @@ Dispatches a message to set the search engine details.
 ### updateLogOpened() 
 
 Dispatches a message to indicate that the update log is being opened
+
+
+
+### onToggleBrowsingData() 
+
+Save temp setting for clear browsing data
+
+
+
+### onCancelBrowsingData() 
+
+Clear temp setting for clear browsing data
 
 
 

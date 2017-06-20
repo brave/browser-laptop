@@ -373,7 +373,6 @@ function handleChangeSettingAction (settingKey, settingValue) {
 }
 
 let reducers = []
-let ledger = null
 
 const applyReducers = (state, action, immutableAction) => reducers.reduce(
     (appState, reducer) => {
@@ -385,7 +384,6 @@ const applyReducers = (state, action, immutableAction) => reducers.reduce(
 
 const handleAppAction = (action) => {
   if (action.actionType === appConstants.APP_SET_STATE) {
-    ledger = require('../../app/ledger')
     reducers = [
       require('../../app/browser/reducers/downloadsReducer'),
       require('../../app/browser/reducers/flashReducer'),
@@ -404,7 +402,8 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/dragDropReducer'),
       require('../../app/browser/reducers/extensionsReducer'),
       require('../../app/browser/reducers/shareReducer'),
-      require('../../app/browser/reducers/updatesReducer')
+      require('../../app/browser/reducers/updatesReducer'),
+      require('../../app/ledger').doAction
     ]
     initialized = true
     appState = action.appState
@@ -430,7 +429,6 @@ const handleAppAction = (action) => {
       appState = profiles.init(appState, action, appStore)
       appState = require('../../app/browser/menu').init(appState, action, appStore)
       appState = require('../../app/sync').init(appState, action, appStore)
-      ledger.init()
       break
     case appConstants.APP_SHUTTING_DOWN:
       AppDispatcher.shutdown()
@@ -651,12 +649,6 @@ const handleAppAction = (action) => {
     case appConstants.APP_SET_DICTIONARY:
       appState = appState.setIn(['dictionary', 'locale'], action.locale)
       break
-    case appConstants.APP_BACKUP_KEYS:
-      appState = ledger.backupKeys(appState, action)
-      break
-    case appConstants.APP_RECOVER_WALLET:
-      appState = ledger.recoverKeys(appState, action)
-      break
     case appConstants.APP_LEDGER_RECOVERY_STATUS_CHANGED:
       {
         const date = new Date().getTime()
@@ -665,38 +657,48 @@ const handleAppAction = (action) => {
       }
       break
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
-      // TODO: Maybe make storing this state optional?
-      appState = appState.set('clearBrowsingDataDefaults', action.clearDataDetail)
-      if (action.clearDataDetail.get('browserHistory')) {
-        appState = aboutNewTabState.setSites(appState, action)
-        appState = aboutHistoryState.setHistory(appState, action)
+      const defaults = appState.get('clearBrowsingDataDefaults')
+      const temp = appState.get('tempClearBrowsingData')
+      const clearData = defaults ? defaults.merge(temp) : temp
+
+      if (clearData.get('browserHistory')) {
+        appState = aboutNewTabState.setSites(appState)
+        appState = aboutHistoryState.setHistory(appState)
         syncActions.clearHistory()
         BrowserWindow.getAllWindows().forEach((wnd) => wnd.webContents.send(messages.CLEAR_CLOSED_FRAMES))
       }
-      if (action.clearDataDetail.get('downloadHistory')) {
+      if (clearData.get('downloadHistory')) {
         handleAppAction({actionType: appConstants.APP_CLEAR_COMPLETED_DOWNLOADS})
       }
-      // Site cookies clearing should also clear cache so that evercookies will be properly removed
-      if (action.clearDataDetail.get('cachedImagesAndFiles') || action.clearDataDetail.get('allSiteCookies')) {
+      // Site cookies clearing should also clear cache so that every cookies will be properly removed
+      if (clearData.get('cachedImagesAndFiles') || clearData.get('allSiteCookies')) {
         filtering.clearCache()
       }
-      if (action.clearDataDetail.get('savedPasswords')) {
+      if (clearData.get('savedPasswords')) {
         handleAppAction({actionType: appConstants.APP_CLEAR_PASSWORDS})
       }
-      if (action.clearDataDetail.get('allSiteCookies')) {
+      if (clearData.get('allSiteCookies')) {
         filtering.clearStorageData()
       }
-      if (action.clearDataDetail.get('autocompleteData')) {
+      if (clearData.get('autocompleteData')) {
         autofill.clearAutocompleteData()
       }
-      if (action.clearDataDetail.get('autofillData')) {
+      if (clearData.get('autofillData')) {
         autofill.clearAutofillData()
       }
-      if (action.clearDataDetail.get('savedSiteSettings')) {
+      if (clearData.get('savedSiteSettings')) {
         appState = appState.set('siteSettings', Immutable.Map())
         appState = appState.set('temporarySiteSettings', Immutable.Map())
         syncActions.clearSiteSettings()
       }
+      appState = appState.set('tempClearBrowsingData', Immutable.Map())
+      appState = appState.set('clearBrowsingDataDefaults', clearData)
+      break
+    case appConstants.APP_ON_TOGGLE_BROWSING_DATA:
+      appState = appState.setIn(['tempClearBrowsingData', action.property], action.newValue)
+      break
+    case appConstants.APP_ON_CANCEL_BROWSING_DATA:
+      appState = appState.set('tempClearBrowsingData', Immutable.Map())
       break
     case appConstants.APP_IMPORT_BROWSER_DATA:
       {

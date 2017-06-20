@@ -693,11 +693,11 @@ const doAction = (action) => {
       }
       break
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
-      if (action.clearDataDetail.get('browserHistory')) {
-        appDispatcher.waitFor([appStore.dispatchToken], () => {
+      appDispatcher.waitFor([appStore.dispatchToken], () => {
+        if (appStore.getState().getIn(['clearBrowsingDataDefaults', 'browserHistory'])) {
           createMenu()
-        })
-      }
+        }
+      })
       break
     case windowConstants.WINDOW_CLICK_MENUBAR_SUBMENU:
       appDispatcher.waitFor([appStore.dispatchToken], () => {
