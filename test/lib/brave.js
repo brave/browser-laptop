@@ -993,6 +993,7 @@ var exports = {
       console.log('BRAVE_USER_DATA_DIR=' + userDataDir)
     }
     let env = {
+      BRAVE_ENV: 'test',
       NODE_ENV: 'test',
       BRAVE_USER_DATA_DIR: userDataDir,
       SPECTRON: true

@@ -83,10 +83,10 @@ module.exports.registerHeadersReceivedFilteringCB = (filteringFn) => {
 function registerForBeforeRequest (session, partition) {
   const isPrivate = module.exports.isPrivate(partition)
   session.webRequest.onBeforeRequest((details, cb) => {
-    if (process.env.NODE_ENV === 'development') {
+    if (config.env === 'development') {
       let page = appUrlUtil.getGenDir(details.url)
       if (page) {
-        let redirectURL = 'http://localhost:' + (process.env.BRAVE_PORT || process.env.npm_package_config_port) + '/' + page
+        let redirectURL = 'http://localhost:' + config.bravePort + '/' + page
         cb({
           redirectURL
         })

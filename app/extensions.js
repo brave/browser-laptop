@@ -157,7 +157,7 @@ let generateBraveManifest = () => {
     'frame-src': '\'self\' https://buy.coinbase.com https://brave.com'
   }
 
-  if (process.env.NODE_ENV === 'development') {
+  if (config.env === 'development') {
     // allow access to webpack dev server resources
     let devServer = 'localhost:' + process.env.npm_package_config_port
     cspDirectives['default-src'] = '\'self\' http://' + devServer
@@ -187,7 +187,7 @@ let generateTorrentManifest = () => {
     'frame-src': '\'self\' http://localhost:*'
   }
 
-  if (process.env.NODE_ENV === 'development') {
+  if (config.env === 'development') {
     // allow access to webpack dev server resources
     let devServer = 'localhost:' + process.env.npm_package_config_port
     cspDirectives['default-src'] += ' http://' + devServer
@@ -228,13 +228,13 @@ let generateSyncManifest = () => {
     'form-action': '\'none\''
   }
   const connectSources = ['\'self\'', appConfig.sync.serverUrl, appConfig.sync.s3Url]
-  if (process.env.NODE_ENV === 'development') {
+  if (config.env === 'development') {
     connectSources.push(appConfig.sync.testS3Url)
   }
 
   cspDirectives['connect-src'] = connectSources.join(' ')
 
-  if (process.env.NODE_ENV === 'development') {
+  if (config.env === 'development') {
     // allow access to webpack dev server resources
     let devServer = 'localhost:' + process.env.npm_package_config_port
     cspDirectives['default-src'] += ' http://' + devServer

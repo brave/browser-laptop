@@ -8,6 +8,7 @@ const electron = require('electron')
 const session = electron.session
 const underscore = require('underscore')
 const util = require('util')
+const config = require('../constants/config')
 const urlParse = require('../../app/common/urlParse')
 
 /**
@@ -33,7 +34,7 @@ module.exports.request = (options, callback) => {
     })
   }
 
-  if (process.env.NODE_ENV === 'development' &&
+  if (config.env === 'development' &&
       urlParse(options.url).protocol === 'http:') {
     console.log('WARNING: requesting non-HTTPS URL', options.url)
   }

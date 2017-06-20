@@ -4,12 +4,15 @@
 
 var webpack = require('webpack')
 var WebpackNotifierPlugin = require('webpack-notifier')
-var port = process.env.npm_package_config_port
 var path = require('path')
-var env = process.env.NODE_ENV === 'production' ? 'production'
-  : (process.env.NODE_ENV === 'test' ? 'test' : 'development')
+const config = require('./js/constants/config')
 
-function config () {
+console.log('env=' + config.env)
+console.log('BRAVE_ENV=' + process.env.BRAVE_ENV)
+console.log('NODE_ENV=' + process.env.NODE_ENV)
+console.log('port=' + config.bravePort)
+
+function baseConfig () {
   let c = {
     devtool: '#source-map',
     cache: true,
@@ -59,8 +62,9 @@ function config () {
       new webpack.IgnorePlugin(/^spellchecker/),
       new webpack.DefinePlugin({
         'process.env': {
-          NODE_ENV: JSON.stringify(env),
-          BRAVE_PORT: port
+          BRAVE_ENV: JSON.stringify(config.env),
+          NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+          BRAVE_PORT: config.bravePort
         }
       })
     ],
@@ -72,7 +76,7 @@ function config () {
     }
   }
   if (!process.env.DISABLE_WEBPACK_NOTIFIER) {
-    c.plugins.push(new WebpackNotifierPlugin({title: 'Brave-' + env}))
+    c.plugins.push(new WebpackNotifierPlugin({title: 'Brave-' + config.env}))
   }
   return c
 }
@@ -89,19 +93,20 @@ function watchOptions () {
 }
 
 function development () {  // eslint-disable-line
-  var dev = config()
+  var dev = baseConfig()
   dev.devServer = {
-    publicPath: 'http://localhost:' + port + '/gen/',
-    headers: { 'Access-Control-Allow-Origin': '*' }
+    publicPath: 'http://localhost:' + config.bravePort + '/gen/',
+    headers: { 'Access-Control-Allow-Origin': '*' },
+    historyApiFallback: true
   }
   return Object.assign(dev, watchOptions())
 }
 
 function production () {  // eslint-disable-line
-  var prod = config()
+  var prod = baseConfig()
   prod.plugins.push(new webpack.optimize.DedupePlugin())
   prod.plugins.push(new webpack.optimize.OccurrenceOrderPlugin(true))
-  if (env !== 'test') {
+  if (config.env !== 'test') {
     prod.plugins.push(new webpack.optimize.UglifyJsPlugin({
       compress: {
         warnings: false
@@ -118,9 +123,9 @@ function test () {  // eslint-disable-line
   return Object.assign(production(), watchOptions())
 }
 
-function merge (config, env) {
-  var merged = Object.assign({}, env, config)
-  merged.plugins = (config.plugins || []).concat(env.plugins || [])
+function merge (conf1, conf2) {
+  var merged = Object.assign({}, conf2, conf1)
+  merged.plugins = (conf1.plugins || []).concat(conf2.plugins || [])
   return merged
 }
 
@@ -161,7 +166,7 @@ var webtorrentPage = {
   }
 }
 
-const envConfig = eval(env)  // eslint-disable-line
+const envConfig = eval(config.env)  // eslint-disable-line
 module.exports = [
   merge(app, envConfig()),
   merge(devTools, envConfig()),

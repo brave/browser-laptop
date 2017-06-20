@@ -44,6 +44,7 @@
     "vagrant-ssh-linux": "VAGRANT_CWD=./test/vms/vagrant/ubuntu-14.04 vagrant ssh",
     "vagrant-up-linux": "VAGRANT_CWD=./test/vms/vagrant/ubuntu-14.04 vagrant up",
     "watch": "webpack-dev-server --inline --hot --colors --content-base=./app/extensions/brave",
+    "watch-nodebug": "cross-env NODE_ENV=production BRAVE_ENV=development webpack-dev-server --inline --colors --content-base=./app/extensions/brave",
     "watch-all": "npm run watch & npm run watch-test",
     "watch-test": "cross-env NODE_ENV=test webpack --watch",
     "webpack": "webpack",

@@ -8,6 +8,12 @@
 // http://localhost:3000 for production
 const vaultHost = process.env.VAULT_HOST || 'https://vault-staging.brave.com'
 const adHost = process.env.AD_HOST || 'https://oip.brave.com'
+const bravePort = process.env.BRAVE_PORT || process.env.npm_config_port || process.env.npm_package_config_port
+const env = process.env.BRAVE_ENV || process.env.NODE_ENV || 'development'
+
+// make sure BRAVE_ENV and NODE_ENV are always set
+process.env.BRAVE_ENV = process.env.BRAVE_ENV || env
+process.env.NODE_ENV = process.env.NODE_ENV || env
 
 module.exports = {
   cache: {
@@ -85,5 +91,7 @@ module.exports = {
   tabs: {
     maxAllowedNewSessions: 9
   },
-  iconSize: 16
+  iconSize: 16,
+  env,
+  bravePort
 }

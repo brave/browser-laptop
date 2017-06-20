@@ -19,6 +19,7 @@ const app = electron.app
 const locale = require('./locale')
 const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
+const config = require('../js/constants/config')
 const downloadStates = require('../js/constants/downloadStates')
 const siteUtil = require('../js/state/siteUtil')
 const { topSites, pinnedTopSites } = require('../js/data/newTabData')
@@ -52,7 +53,7 @@ const getTopSiteMap = () => {
 const getTempStoragePath = (filename) => {
   const epochTimestamp = (new Date()).getTime().toString()
   filename = filename || 'tmp'
-  return process.env.NODE_ENV !== 'test'
+  return config.env !== 'test'
     ? path.join(app.getPath('userData'), 'session-store-' + filename + '-' + epochTimestamp)
     : path.join(process.env.HOME, '.brave-test-session-store-' + filename + '-' + epochTimestamp)
 }

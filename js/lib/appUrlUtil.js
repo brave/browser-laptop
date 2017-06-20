@@ -49,7 +49,7 @@ module.exports.getTorrentExtUrl = function (relativeUrl) {
 }
 
 module.exports.getExtensionsPath = function (extensionDir) {
-  return (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test')
+  return (config.env !== 'development' && config.env !== 'test')
     // the path is different for release builds because extensions are not in the asar file
     ? path.join(__dirname, '..', '..', '..', 'extensions', extensionDir)
     : path.join(__dirname, '..', '..', 'app', 'extensions', extensionDir)
@@ -76,7 +76,7 @@ module.exports.getBraveIndexPath = function (relateivePath = '') {
 }
 
 module.exports.getBraveExtIndexHTML = function () {
-  return process.env.NODE_ENV === 'development'
+  return config.env === 'development'
     ? module.exports.getBraveIndexPath('index-dev.html')
     : module.exports.getBraveIndexPath('index.html')
 }

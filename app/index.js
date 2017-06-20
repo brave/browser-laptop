@@ -53,6 +53,7 @@ const ipcMain = electron.ipcMain
 const Immutable = require('immutable')
 const Updater = require('./updater')
 const Importer = require('./importer')
+const config = require('../js/constants/config')
 const messages = require('../js/constants/messages')
 const appConfig = require('../js/constants/appConfig')
 const appActions = require('../js/actions/appActions')
@@ -372,7 +373,7 @@ app.on('ready', () => {
       }
     } else {
       // Default browser checking
-      let isDefaultBrowser = ['development', 'test'].includes(process.env.NODE_ENV)
+      let isDefaultBrowser = ['development', 'test'].includes(config.env)
         ? true : defaultProtocols.every(p => app.isDefaultProtocolClient(p))
       appActions.changeSetting(settings.IS_DEFAULT_BROWSER, isDefaultBrowser)
     }

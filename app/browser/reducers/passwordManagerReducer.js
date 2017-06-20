@@ -7,6 +7,7 @@
 const keytar = require('keytar')
 const appConstants = require('../../../js/constants/appConstants')
 const appActions = require('../../../js/actions/appActions')
+const config = require('../../../js/constants/config')
 const CryptoUtil = require('../../../js/lib/cryptoUtil')
 const locale = require('../../locale')
 const messages = require('../../../js/constants/messages')
@@ -34,7 +35,7 @@ const getMasterKey = () => {
     return null
   }
 
-  if (process.env.NODE_ENV === 'test') {
+  if (config.env === 'test') {
     // workaround for https://travis-ci.org/brave/browser-laptop/builds/132700770
     return (new Buffer(unsafeTestMasterKey, 'hex')).toString('binary')
   }
