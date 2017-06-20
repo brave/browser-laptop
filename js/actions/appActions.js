@@ -1455,6 +1455,20 @@ const appActions = {
     dispatch({
       actionType: appConstants.APP_ON_CANCEL_BROWSING_DATA
     })
+  },
+
+  swipedLeft: function (percent) {
+    dispatch({
+      actionType: appConstants.APP_SWIPE_LEFT,
+      percent
+    })
+  },
+
+  swipedRight: function (percent) {
+    dispatch({
+      actionType: appConstants.APP_SWIPE_RIGHT,
+      percent
+    })
   }
 }
 

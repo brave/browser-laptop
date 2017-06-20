@@ -35,6 +35,30 @@ class AdvancedTab extends ImmutableComponent {
         onChangeSetting={this.props.onChangeSetting} />
   }
 
+  get swipeNavigationDistanceSetting () {
+    if (platformUtil.isDarwin()) {
+      return <div>
+        <DefaultSectionTitle data-l10n-id='swipeNavigationDistance' />
+        <SettingsList listClassName={css(styles.swipeNavigation)}>
+          <span data-l10n-id='short' className={css(styles.swipeNavigation__shortLabel)} />
+          <input type='range' min='1' max='201' step='50' list='swipeDistance'
+            value={getSetting(settings.SWIPE_NAV_DISTANCE, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.SWIPE_NAV_DISTANCE)} />
+          <datalist id='swipeDistance'>
+            <option value='1' />
+            <option value='51' />
+            <option value='101' />
+            <option value='151' />
+            <option value='201' />
+          </datalist>
+          <span data-l10n-id='long' className={css(styles.swipeNavigation__longLabel)} />
+        </SettingsList>
+      </div>
+    }
+
+    return null
+  }
+
   render () {
     return <section>
       <main className={css(styles.advancedTabMain)}>
@@ -62,6 +86,8 @@ class AdvancedTab extends ImmutableComponent {
           </SettingItem>
         </SettingsList>
 
+        {this.swipeNavigationDistanceSetting}
+
         <DefaultSectionTitle data-l10n-id='urlBarOptions' />
         <SettingsList>
           <SettingCheckbox dataL10nId='disableTitleMode' prefKey={settings.DISABLE_TITLE_MODE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
@@ -78,6 +104,19 @@ class AdvancedTab extends ImmutableComponent {
 const styles = StyleSheet.create({
   advancedTabMain: {
     paddingBottom: '40px'
+  },
+
+  swipeNavigation: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+
+  swipeNavigation__shortLabel: {
+    marginRight: '5px'
+  },
+
+  swipeNavigation__longLabel: {
+    marginLeft: '5px'
   },
 
   moreInfo: {
