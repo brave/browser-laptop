@@ -413,11 +413,16 @@ const doAction = (action) => {
         break
       }
     case windowConstants.WINDOW_SET_LINK_HOVER_PREVIEW:
-      windowState = windowState.mergeIn(frameStateUtil.activeFrameStatePath(windowState), {
-        hrefPreview: action.href,
-        showOnRight: action.showOnRight
-      })
-      break
+      {
+        const framePath = frameStateUtil.activeFrameStatePath(windowState)
+        if (framePath) {
+          windowState = windowState.mergeIn(framePath, {
+            hrefPreview: action.href,
+            showOnRight: action.showOnRight
+          })
+        }
+        break
+      }
     case windowConstants.WINDOW_SET_THEME_COLOR:
       {
         const frameKey = action.frameProps.get('key')
