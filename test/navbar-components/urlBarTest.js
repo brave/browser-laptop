@@ -752,4 +752,37 @@ describe('urlBar tests', function () {
         .waitForInputText(urlInput, this.page2Url)
     })
   })
+
+  describe('keeps url text separate from suffix text', function () {
+    Brave.beforeAll(this)
+    before(function * () {
+      yield setup(this.app.client)
+      yield this.app.client.waitForExist(urlInput)
+      yield this.app.client.waitForElementFocus(urlInput)
+      yield this.app.client
+        .onClearBrowsingData({browserHistory: true})
+        .addSite({ location: 'https://github.com/brave/browser-laptop', title: 'browser-laptop' })
+        .addSite({ location: 'https://github.com/brave/ad-block', title: 'Muon' })
+    })
+
+    it('changes only the selection', function * () {
+      yield this.app.client
+        .setInputText(urlInput, 'git')
+        .waitForSelectedText('hub.com')
+        // Select next suggestion
+        .keys(Brave.keys.DOWN)
+        .waitForSelectedText('hub.com/brave/browser-laptop')
+        // Remove selection of suffix
+        .keys(Brave.keys.RIGHT)
+        // Move to the left and create a new selection
+        .keys(Brave.keys.LEFT)
+        .keys(Brave.keys.LEFT)
+        .keys(Brave.keys.LEFT)
+        .keys(Brave.keys.SHIFT)
+        .keys(Brave.keys.LEFT)
+        .keys(Brave.keys.SHIFT)
+        .keys('s')
+        .waitForInputText(urlInput, 'github.com/brave/browser-lastop')
+    })
+  })
 })
