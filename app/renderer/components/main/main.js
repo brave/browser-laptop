@@ -701,9 +701,7 @@ class Main extends ImmutableComponent {
         }
         {
           widevinePanelIsVisible
-          ? <WidevinePanel
-
-            onHide={this.onHideWidevinePanel} />
+          ? <WidevinePanel />
           : null
         }
         {
