@@ -556,6 +556,12 @@ module.exports.init = () => {
       disableExtension(config.metamaskExtensionId)
     }
 
+    if (getSetting(settings.METAMASK_ENABLED)) {
+      registerComponent(config.metamaskExtensionId, config.metamaskPublicKey)
+    } else {
+      disableExtension(config.metamaskExtensionId)
+    }
+
     if (appStore.getState().getIn(['widevine', 'enabled'])) {
       registerComponent(config.widevineComponentId, config.widevineComponentPublicKey)
     }
