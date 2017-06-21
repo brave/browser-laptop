@@ -26,6 +26,12 @@ const CATEGORY_MAP = syncUtil.CATEGORY_MAP
 const CATEGORY_NAMES = Object.keys(categories)
 const SYNC_ACTIONS = Object.values(syncConstants)
 
+// Fields that should trigger a sync SEND when changed
+const SYNC_FIELDS = {
+  sites: ['location', 'customTitle', 'folderId', 'parentFolderId'],
+  siteSettings: Object.keys(syncUtil.siteSettingDefaults)
+}
+
 // The sync background script message sender
 let backgroundSender = null
 
@@ -46,15 +52,10 @@ let bookmarksToolbarShown = false
 
 // Determines what to sync
 const appStoreChangeCallback = function (diffs) {
-  if (!backgroundSender) {
+  if (!backgroundSender || !diffs) {
     return
   }
 
-  // Fields that should trigger a sync SEND when changed
-  const syncFields = {
-    sites: ['location', 'tags', 'customTitle', 'folderId', 'parentFolderId'],
-    siteSettings: Object.keys(syncUtil.siteSettingDefaults)
-  }
   diffs.forEach((diff) => {
     if (!diff || !diff.path) {
       return
@@ -64,8 +65,11 @@ const appStoreChangeCallback = function (diffs) {
       // We are looking for paths like ['', 'sites', 'https://brave.com/', 'title']
       return
     }
+
     const type = path[1]
-    const fieldsToPick = syncFields[type]
+    const isSite = type === 'sites'
+
+    const fieldsToPick = SYNC_FIELDS[type]
     if (!fieldsToPick) {
       return
     }
@@ -86,7 +90,8 @@ const appStoreChangeCallback = function (diffs) {
       let action = null
 
       if (isInsert && !entry.get('skipSync')) {
-        action = writeActions.CREATE
+        // Send UPDATE instead of CREATE for sites to work around sync#111
+        action = isSite ? writeActions.UPDATE : writeActions.CREATE
       } else if (isUpdate) {
         action = writeActions.UPDATE
       }
