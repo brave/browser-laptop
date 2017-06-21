@@ -535,6 +535,13 @@ var exports = {
       })
     })
 
+    this.app.client.addCommand('closeTabWithMouse', function () {
+      logVerbose('closeTabWithMouse()')
+      return this.execute(function () {
+        return devTools('electron').testData.windowActions.onTabClosedWithMouse()
+      })
+    })
+
     this.app.client.addCommand('waitForInputText', function (selector, input) {
       logVerbose('waitForInputText("' + selector + '", "' + input + '")')
       return this
