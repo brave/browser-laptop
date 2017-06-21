@@ -695,7 +695,8 @@ const doAction = (action) => {
       }
       break
     case windowConstants.WINDOW_TAB_CLOSED_WITH_MOUSE:
-      if (frameStateUtil.getNonPinnedFrameCount(windowState) % getSetting(settings.TABS_PER_PAGE) === 0) {
+      const frameCountAfterClose = frameStateUtil.getNonPinnedFrameCount(windowState) - 1
+      if (frameCountAfterClose % getSetting(settings.TABS_PER_PAGE) === 0) {
         windowState = windowState.deleteIn(['ui', 'tabs', 'fixTabWidth'])
       } else {
         windowState = windowState.setIn(['ui', 'tabs', 'fixTabWidth'], action.data.fixTabWidth)
