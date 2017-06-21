@@ -34,6 +34,21 @@ You can run a subset of tests which match a `description` or `it` with:
 
 Where `expression` could be for example `^tabs` to match all tests which start with the word tabs. This works for all testing modes (test, unittest).
 
+## Things you should know
+
+### Background image for new tab page is disabled by default
+
+To speed-up tests, background image for new tab page is disabled by default. If your new webdriver test needs the background to be visible you'll need to enable this setting again, for example:
+
+```js
+it('shows new tab page background', function * () {
+  yield this.app.client
+    // enable setting again:
+    .changeSetting('tabs.show-dashboard-images', true)
+    // keep testing...
+})
+```
+
 ## Best practices for writing tests
 
 - If you do anything that opens a new tab, you have to validate that the tab has opened before trying to switch to

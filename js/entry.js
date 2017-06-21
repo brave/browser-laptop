@@ -26,6 +26,7 @@ const webFrame = electron.webFrame
 const windowStore = require('./stores/windowStore')
 const appStoreRenderer = require('./stores/appStoreRenderer')
 const windowActions = require('./actions/windowActions')
+const appActions = require('./actions/appActions')
 const messages = require('./constants/messages')
 const Immutable = require('immutable')
 const patch = require('immutablepatch')
@@ -46,6 +47,7 @@ if (process.env.NODE_ENV === 'test') {
     windowActions,
     windowStore
   }
+  appActions.changeSetting('tabs.show-dashboard-images', false)
 }
 
 ipc.on(messages.APP_STATE_CHANGE, (e, action) => {
