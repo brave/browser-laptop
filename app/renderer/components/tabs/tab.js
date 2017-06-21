@@ -196,15 +196,13 @@ class Tab extends React.Component {
   }
 
   onUpdateTabSize () {
-    setImmediate(() => {
-      const currentSize = getTabBreakpoint(this.tabSize)
-      // Avoid updating breakpoint when user enters fullscreen (see #7301)
-      !this.props.hasTabInFullScreen && windowActions.setTabBreakpoint(this.props.frameKey, currentSize)
-    })
-  }
-
-  componentWillMount () {
-    this.onUpdateTabSize()
+    const currentSize = getTabBreakpoint(this.tabSize)
+    // Avoid updating breakpoint when user enters fullscreen (see #7301)
+    // Also there can be a race condition for pinned tabs if we update when not needed
+    // since a new tab component with the same key gets created which is not pinned.
+    if (this.props.breakpoint !== currentSize && !this.props.hasTabInFullScreen) {
+      windowActions.setTabBreakpoint(this.props.frameKey, currentSize)
+    }
   }
 
   componentDidMount () {
@@ -218,15 +216,7 @@ class Tab extends React.Component {
   }
 
   componentWillUnmount () {
-    this.onUpdateTabSize()
     window.removeEventListener('resize', this.onUpdateTabSize)
-  }
-
-  componentWillReceiveProps (nextProps) {
-    // Update breakpoint each time a new tab is open
-    if (this.props.totalTabs !== nextProps.totalTabs) {
-      this.onUpdateTabSize()
-    }
   }
 
   get fixTabWidth () {
