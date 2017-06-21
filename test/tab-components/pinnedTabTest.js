@@ -38,6 +38,7 @@ describe('pinnedTabs', function () {
         .waitForExist('[data-test-pinned-tab="false"][data-frame-key="2"]')
         .waitForElementCount(pinnedTabsTabs, 0)
         .waitForElementCount(tabsTabs, 2)
+        .waitForTextValue('[data-test-pinned-tab="false"][data-frame-key="2"]', 'Page 1')
     })
     it('pinning the same site again combines it', function * () {
       yield this.app.client
@@ -205,6 +206,32 @@ describe('pinnedTabs', function () {
         .waitForExist('[data-test-active-tab][data-frame-key="2"]')
         .ipcSend(messages.SHORTCUT_CLOSE_FRAME)
         .waitForExist('[data-test-active-tab][data-frame-key="1"]')
+    })
+  })
+
+  describe('Going back to original state after unpinning', function () {
+    Brave.beforeAll(this)
+    before(function * () {
+      yield setup(this.app.client)
+      const page1 = Brave.server.url('page1.html')
+      const page2 = Brave.server.url('page2.html')
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+        .newTab({ url: page1, pinned: true })
+        .waitForUrl(page1)
+        .windowByUrl(Brave.browserWindowUrl)
+        .newTab({ url: page2, pinned: true })
+        .waitForUrl(page2)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForElementCount(pinnedTabsTabs, 2)
+        .waitForElementCount(tabsTabs, 1)
+    })
+    it('shows the tab title', function * () {
+      yield this.app.client
+        .pinTabByIndex(2, false)
+        .waitForExist('[data-test-id="tab"][data-frame-key="3"]')
+        .waitForVisible('[data-test-id="tab"][data-frame-key="3"]')
+        .waitForTextValue('[data-test-id="tab"][data-frame-key="3"]', 'Page 2')
     })
   })
 })
