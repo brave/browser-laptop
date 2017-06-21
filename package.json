@@ -149,6 +149,7 @@
     "cross-env": "^3.1.4",
     "css-loader": "^0.23.0",
     "electron-builder": "^17.1.1",
+    "electron-chromedriver": "^1.7.1",
     "electron-packager": "brave/electron-packager",
     "electron-prebuilt": "brave/electron-prebuilt",
     "empty-port": "0.0.2",
