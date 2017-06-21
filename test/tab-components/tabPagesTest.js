@@ -55,6 +55,18 @@ describe('tab pages', function () {
       yield this.app.client.waitForVisible('[data-test-active-tab]')
     })
 
+    it('shows the right number of tabs after closing with mouse', function * () {
+      const numTabsPerPage = appConfig.defaultSettings[settings.TABS_PER_PAGE]
+      const firstTabOfNewPageIndex = numTabsPerPage
+      yield this.app.client.click(newFrameButton)
+        .waitForElementCount(tabPage, 2)
+        .closeTabWithMouse()
+        .closeTabByIndex(firstTabOfNewPageIndex)
+        // No tab page indicator elements when 1 page
+        .waitForElementCount(tabPage, 0)
+        .waitForElementCount(tabsTabs, numTabsPerPage)
+    })
+
     describe('allows changing to tab pages', function () {
       beforeEach(function * () {
         // Make sure there are 2 tab pages
