@@ -28,12 +28,8 @@ const honey = config.honeyExtensionId
  * Properties such as name and description are referenced like keys for proper l10n
  */
 const dummyData = [
+  // { id: bitwarden, // TBD },
   {
-    id: bitwarden,
-    name: 'bitwarden',
-    description: 'bitwardenDesc',
-    icon: 'img/extensions/bitwarden-128.png'
-  }, {
     id: dashlane,
     name: 'dashlane',
     description: 'dashlaneDesc',
