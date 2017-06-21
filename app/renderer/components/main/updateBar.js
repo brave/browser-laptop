@@ -7,6 +7,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ImmutableComponent = require('../immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 const BrowserButton = require('../common/browserButton')
 
 // Actions
@@ -15,6 +16,9 @@ const windowActions = require('../../../../js/actions/windowActions')
 
 // Constants
 const UpdateStatus = require('../../../../js/constants/updateStatus')
+
+// State
+const updateState = require('../../../common/state/updateState')
 
 // Utils
 const cx = require('../../../../js/lib/classSet')
@@ -79,6 +83,7 @@ class UpdateLog extends ImmutableComponent {
   onViewLog () {
     appActions.updateLogOpened()
   }
+
   render () {
     return <BrowserButton groupedItem notificationItem secondaryColor
       testId='updateViewLogButton'
@@ -97,7 +102,7 @@ class UpdateAvailable extends ImmutableComponent {
       </div>
       <span className={css(styles.flexAlignCenter)} data-test-id='notificationOptions'>
         {
-          this.props.metadata && this.props.metadata.get('notes')
+          this.props.notes
           ? <BrowserButton groupedItem notificationItem secondaryColor
             testId='updateDetails'
             l10nId='updateDetails'
@@ -176,54 +181,57 @@ class UpdateNotAvailable extends ImmutableComponent {
   }
 }
 
-class UpdateBar extends ImmutableComponent {
+class UpdateBar extends React.Component {
+  mergeProps (state, ownProps) {
+    const props = {}
+    props.updateStatus = updateState.getUpdateStatus(state)
+    props.notes = state.getIn(['updates', 'metadata', 'notes'])
+    props.isAvailable = props.updateStatus === UpdateStatus.UPDATE_AVAILABLE
+    props.isChecking = props.updateStatus === UpdateStatus.UPDATE_CHECKING
+    props.isDownloading = props.updateStatus === UpdateStatus.UPDATE_DOWNLOADING
+    props.isNotAvailable = props.updateStatus === UpdateStatus.UPDATE_NOT_AVAILABLE
+    props.isError = props.updateStatus === UpdateStatus.UPDATE_ERROR
+
+    return props
+  }
+
   render () {
-    if (!this.props.updates) {
-      return null
-    }
-
-    // When verbose is not set we only want to show update available
-    // prompts, because otherwise the check is a background check and
-    // the user shouldn't be bothered.
-    const verbose = this.props.updates.get('verbose')
-    let updateStatus = this.props.updates.get('status')
-    if (!updateStatus ||
-        (!verbose && updateStatus !== UpdateStatus.UPDATE_AVAILABLE) ||
-        updateStatus === UpdateStatus.UPDATE_NONE ||
-        updateStatus === UpdateStatus.UPDATE_APPLYING_RESTART ||
-        updateStatus === UpdateStatus.UPDATE_APPLYING_NO_RESTART) {
-      return null
-    }
-
-    // The only difference between the deferred and non deferred variant is that
-    // the deferred allows hiding.  Otherwise you couldn't hide available prompts.
-    if (updateStatus === UpdateStatus.UPDATE_AVAILABLE_DEFERRED) {
-      updateStatus = UpdateStatus.UPDATE_AVAILABLE
-    }
-
     // 'notificationItem' for styling with notificationBar.less
     return <div className={cx({
       [updateBarStyle]: true,
       notificationItem: true
     })} data-test-id='updateBar'>
       {
-        updateStatus === UpdateStatus.UPDATE_AVAILABLE ? <UpdateAvailable metadata={this.props.updates.get('metadata')} updateStatus={updateStatus} /> : null
+        this.props.isAvailable
+          ? <UpdateAvailable notes={this.props.notes} updateStatus={this.props.updateStatus} />
+          : null
       }
       {
-        updateStatus === UpdateStatus.UPDATE_CHECKING ? <UpdateChecking updateStatus={updateStatus} /> : null
+        this.props.isChecking
+          ? <UpdateChecking updateStatus={this.props.updateStatus} />
+          : null
       }
       {
-        updateStatus === UpdateStatus.UPDATE_DOWNLOADING ? <UpdateDownloading updateStatus={updateStatus} /> : null
+        this.props.isDownloading
+          ? <UpdateDownloading updateStatus={this.props.updateStatus} />
+          : null
       }
       {
-        updateStatus === UpdateStatus.UPDATE_NOT_AVAILABLE ? <UpdateNotAvailable updateStatus={updateStatus} /> : null
+
+        this.props.isNotAvailable
+          ? <UpdateNotAvailable updateStatus={this.props.updateStatus} />
+          : null
       }
       {
-        updateStatus === UpdateStatus.UPDATE_ERROR ? <UpdateError updateStatus={updateStatus} /> : null
+        this.props.isError
+          ? <UpdateError updateStatus={this.props.updateStatus} />
+          : null
       }
     </div>
   }
 }
+
+module.exports = ReduxComponent.connect(UpdateBar)
 
 const styles = StyleSheet.create({
   flexJustifyBetween: {
@@ -242,5 +250,3 @@ const updateBarStyle = css(
   commonStyles.notificationBar__notificationItem,
   commonStyles.notificationBar__greetingStyle
 )
-
-module.exports = UpdateBar
