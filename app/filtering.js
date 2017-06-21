@@ -488,7 +488,19 @@ function updateDownloadState (downloadId, item, state) {
 
 function registerForDownloadListener (session) {
   session.on('will-download', function (event, item, webContents) {
-    const win = BrowserWindow.getFocusedWindow()
+    if (webContents.isDestroyed()) {
+      event.preventDefault()
+      return
+    }
+
+    const hostWebContents = webContents.hostWebContents || webContents
+    const win = BrowserWindow.fromWebContents(hostWebContents) || BrowserWindow.getFocusedWindow()
+
+    // TODO(bridiver) - move this fix to muon
+    const controller = webContents.controller()
+    if (controller && controller.isValid() && controller.isInitialNavigation()) {
+      webContents.forceClose()
+    }
 
     // special handling for data URLs where another 'will-download' event handler is trying to suggest a filename via item.setSavePath
     // see the IPC handler for RENDER_URL_TO_PDF in app/index.js for example
