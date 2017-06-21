@@ -658,7 +658,7 @@ const handleAppAction = (action) => {
       break
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
       const defaults = appState.get('clearBrowsingDataDefaults')
-      const temp = appState.get('tempClearBrowsingData')
+      const temp = appState.get('tempClearBrowsingData', Immutable.Map())
       const clearData = defaults ? defaults.merge(temp) : temp
 
       if (clearData.get('browserHistory')) {

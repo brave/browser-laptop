@@ -27,7 +27,7 @@ describe('urlBar tests', function () {
       yield this.app.client.waitForExist(urlInput)
       yield this.app.client.waitForElementFocus(urlInput)
       yield this.app.client
-        .onClearBrowsingData({browserHistory: true})
+        .onClearBrowsingData('browserHistory', true)
         .addSite({ location: 'https://brave.com', title: 'Brave' })
     })
 
@@ -63,7 +63,7 @@ describe('urlBar tests', function () {
         .waitForInputText(urlInput, '')
 
       yield this.app.client
-        .onClearBrowsingData({browserHistory: true})
+        .onClearBrowsingData('browserHistory', true)
         .addSite({ location: 'https://brave.com', title: 'Brave' })
         .addSite({ location: 'https://brave.com/test' })
         .addSite({ location: 'https://www.youtube.com' })
@@ -760,7 +760,7 @@ describe('urlBar tests', function () {
       yield this.app.client.waitForExist(urlInput)
       yield this.app.client.waitForElementFocus(urlInput)
       yield this.app.client
-        .onClearBrowsingData({browserHistory: true})
+        .onClearBrowsingData('browserHistory', true)
         .addSite({ location: 'https://github.com/brave/browser-laptop', title: 'browser-laptop' })
         .addSite({ location: 'https://github.com/brave/ad-block', title: 'Muon' })
     })

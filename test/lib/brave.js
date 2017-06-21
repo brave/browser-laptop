@@ -781,11 +781,12 @@ var exports = {
      *
      * @param {object} clearDataDetail - the options to use for clearing
      */
-    this.app.client.addCommand('onClearBrowsingData', function (clearDataDetail) {
-      logVerbose('onClearBrowsingData("' + clearDataDetail + '")')
-      return this.execute(function (clearDataDetail) {
-        return devTools('appActions').onClearBrowsingData(clearDataDetail)
-      }, clearDataDetail).then((response) => response.value)
+    this.app.client.addCommand('onClearBrowsingData', function (key, value) {
+      logVerbose('onClearBrowsingData("' + key + ': ' + value + '")')
+      return this.execute(function (key, value) {
+        devTools('appActions').onToggleBrowsingData(key, value)
+        return devTools('appActions').onClearBrowsingData()
+      }, key, value).then((response) => response.value)
     })
 
     this.app.client.addCommand('getDefaultWindowHeight', function () {

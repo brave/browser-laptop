@@ -694,7 +694,11 @@ const doAction = (action) => {
       break
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
       appDispatcher.waitFor([appStore.dispatchToken], () => {
-        if (appStore.getState().getIn(['clearBrowsingDataDefaults', 'browserHistory'])) {
+        const state = appStore.getState()
+        const defaults = state.get('clearBrowsingDataDefaults')
+        const temp = state.get('tempClearBrowsingData', Immutable.Map())
+        const clearData = defaults ? defaults.merge(temp) : temp
+        if (clearData.get('browserHistory')) {
           createMenu()
         }
       })

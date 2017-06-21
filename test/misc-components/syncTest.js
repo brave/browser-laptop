@@ -636,7 +636,7 @@ describe('Syncing history', function () {
     yield setupBrave(Brave.app.client)
     // New tab sites appear in history; so clear them out.
     yield Brave.app.client
-      .onClearBrowsingData({browserHistory: true})
+      .onClearBrowsingData('browserHistory', true)
       .changeSetting(settings.NEWTAB_MODE, newTabMode.EMPTY_NEW_TAB)
       .changeSetting(settings.SYNC_TYPE_HISTORY, true)
     yield setupSync(Brave.app.client, seed)
@@ -780,7 +780,7 @@ describe('Syncing and clearing data prevents it from syncing', function () {
     yield setupBrave(Brave.app.client)
     // New tab sites appear in history; so first clear them out.
     yield Brave.app.client
-      .onClearBrowsingData({browserHistory: true})
+      .onClearBrowsingData('browserHistory', true)
       .changeSetting(settings.NEWTAB_MODE, newTabMode.EMPTY_NEW_TAB)
       .changeSetting(settings.SYNC_TYPE_HISTORY, true)
     yield setupSync(Brave.app.client, seed)
@@ -801,7 +801,8 @@ describe('Syncing and clearing data prevents it from syncing', function () {
       .click(noScriptSwitch)
       .waitUntil(checkSiteSetting(hostPattern, 'noScript', true))
       .pause(1000) // XXX: Wait for sync to upload records to S3
-      .onClearBrowsingData({browserHistory: true, savedSiteSettings: true})
+      .onClearBrowsingData('browserHistory', true)
+      .onClearBrowsingData('savedSiteSettings', true)
       .pause(500) // XXX: Wait for sync to delete records from S3
 
     // Finally start a fresh profile and setup sync
@@ -842,7 +843,7 @@ describe('Syncing then turning it off stops syncing', function () {
     yield setupBrave(Brave.app.client)
     // New tab sites appear in history; so first clear them out.
     yield Brave.app.client
-      .onClearBrowsingData({browserHistory: true})
+      .onClearBrowsingData('browserHistory', true)
       .changeSetting(settings.NEWTAB_MODE, newTabMode.EMPTY_NEW_TAB)
       .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
       .changeSetting(settings.SYNC_TYPE_HISTORY, true)

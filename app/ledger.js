@@ -37,6 +37,7 @@ const path = require('path')
 const urlParse = require('./common/urlParse')
 const urlFormat = require('url').format
 const util = require('util')
+const Immutable = require('immutable')
 
 const electron = require('electron')
 const app = electron.app
@@ -179,10 +180,15 @@ const doAction = (state, action) => {
       break
 
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
-      if (state.getIn(['clearBrowsingDataDefaults', 'browserHistory']) && !getSetting(settings.PAYMENTS_ENABLED)) {
-        reset(true)
+      {
+        const defaults = state.get('clearBrowsingDataDefaults')
+        const temp = state.get('tempClearBrowsingData', Immutable.Map())
+        const clearData = defaults ? defaults.merge(temp) : temp
+        if (clearData.get('browserHistory') && !getSetting(settings.PAYMENTS_ENABLED)) {
+          reset(true)
+        }
+        break
       }
-      break
 
     case appConstants.APP_IDLE_STATE_CHANGED:
       visit('NOOP', underscore.now(), null)
