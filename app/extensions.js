@@ -463,6 +463,7 @@ module.exports.init = () => {
   loadExtension(config.braveExtensionId, getExtensionsPath('brave'), generateBraveManifest(), 'component')
   extensionInfo.setState(config.syncExtensionId, extensionStates.REGISTERED)
   loadExtension(config.syncExtensionId, getExtensionsPath('brave'), generateSyncManifest(), 'unpacked')
+
   if (getSetting(settings.TORRENT_VIEWER_ENABLED)) {
     extensionInfo.setState(config.torrentExtensionId, extensionStates.REGISTERED)
     loadExtension(config.torrentExtensionId, getExtensionsPath('torrent'), generateTorrentManifest(), 'component')
@@ -531,6 +532,12 @@ module.exports.init = () => {
       registerComponent(config.pinterestExtensionId, config.pinterestExtensionPublicKey)
     } else {
       disableExtension(config.pinterestExtensionId)
+    }
+
+    if (getSetting(settings.METAMASK_ENABLED)) {
+      registerComponent(config.metamaskExtensionId, config.metamaskPublicKey)
+    } else {
+      disableExtension(config.metamaskExtensionId)
     }
 
     if (appStore.getState().getIn(['widevine', 'enabled'])) {

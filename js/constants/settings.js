@@ -103,7 +103,8 @@ const settings = {
   POCKET_ENABLED: 'extensions.pocket.enabled',
   VIMIUM_ENABLED: 'extensions.vimium.enabled',
   HONEY_ENABLED: 'extensions.honey.enabled',
-  PINTEREST_ENABLED: 'extensions.pinterest.enabled'
+  PINTEREST_ENABLED: 'extensions.pinterest.enabled',
+  METAMASK_ENABLED: 'extensions.metamask.enabled'
 }
 
 module.exports = settings
