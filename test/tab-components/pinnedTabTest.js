@@ -38,6 +38,7 @@ describe('pinnedTabs', function () {
         .waitForExist('[data-test-pinned-tab="false"][data-frame-key="2"]')
         .waitForElementCount(pinnedTabsTabs, 0)
         .waitForElementCount(tabsTabs, 2)
+        .waitForTextValue('[data-test-pinned-tab="false"][data-frame-key="2"]', 'Page 1')
     })
     it('pinning the same site again combines it', function * () {
       yield this.app.client
