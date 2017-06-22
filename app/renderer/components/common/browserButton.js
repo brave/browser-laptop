@@ -194,8 +194,6 @@ const styles = StyleSheet.create({
     // TODO: remove !important and check advancedSettings.js
     // once preferences is fully refactored
 
-    // 'mm' assures theoretically the equal width of margin
-    // on every platform with any display monitor resolution.
     // 7.5px = 1/12 inch
     marginLeft: '7.5px !important',
 
