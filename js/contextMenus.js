@@ -768,6 +768,37 @@ function hamburgerTemplateInit (location, e) {
     },
     CommonMenu.separatorMenuItem,
     {
+      label: locale.translation('history'),
+      submenu: [
+        CommonMenu.braveHomeMenuItem(),
+        {
+          label: locale.translation('back'),
+          accelerator: 'CmdOrCtrl+[',
+          click: function (item, focusedWindow) {
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_BACK])
+          }
+        }, {
+          label: locale.translation('forward'),
+          accelerator: 'CmdOrCtrl+]',
+          click: function (item, focusedWindow) {
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_FORWARD])
+          }
+        },
+        CommonMenu.separatorMenuItem,
+        CommonMenu.reopenLastClosedTabItem(),
+        CommonMenu.reopenLastClosedWindowMenuItem(),
+        CommonMenu.separatorMenuItem,
+        {
+          label: locale.translation('clearBrowsingData'),
+          accelerator: 'Shift+CmdOrCtrl+Delete',
+          click: function (item, focusedWindow) {
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL])
+          }
+        },
+        CommonMenu.separatorMenuItem,
+        CommonMenu.historyMenuItem()
+      ]
+    }, {
       label: locale.translation('bookmarks'),
       submenu: [
         CommonMenu.bookmarksManagerMenuItem(),
