@@ -155,9 +155,9 @@ class NavigationBar extends React.Component {
     const navbar = activeFrame.get('navbar') || Immutable.Map()
 
     const hasTitle = title && location && title !== location.replace(/^https?:\/\//, '')
-    const titleMode = activeTabShowingMessageBox ||
-      (
-        mouseInTitlebar === false &&
+    const titleMode = activeTabShowingMessageBox
+      ? !getSetting(settings.DISABLE_TITLE_MODE)
+      : mouseInTitlebar === false &&
         !bookmarkDetail &&
         hasTitle &&
         !['about:blank', 'about:newtab'].includes(location) &&
@@ -165,7 +165,6 @@ class NavigationBar extends React.Component {
         !navbar.getIn(['urlbar', 'focused']) &&
         !navbar.getIn(['urlbar', 'active']) &&
         getSetting(settings.DISABLE_TITLE_MODE) === false
-      )
 
     const props = {}
 
