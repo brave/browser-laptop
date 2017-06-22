@@ -157,7 +157,8 @@ class Frame extends React.Component {
     }
     const noScriptExceptions = activeSiteSettings.get('noScriptExceptions')
     if (noScriptExceptions) {
-      appActions.noScriptExceptionsAdded(origin, noScriptExceptions.filter((value, host) => value !== 0))
+      appActions.noScriptExceptionsAdded(origin,
+        noScriptExceptions.map(value => value === 0 ? false : value))
     }
   }
 
