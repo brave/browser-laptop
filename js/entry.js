@@ -19,17 +19,27 @@ require('../node_modules/font-awesome/css/font-awesome.css')
 
 const React = require('react')
 const ReactDOM = require('react-dom')
-const Window = require('../app/renderer/components/window')
+const Immutable = require('immutable')
+const patch = require('immutablepatch')
 const electron = require('electron')
 const ipc = electron.ipcRenderer
 const webFrame = electron.webFrame
+
+// Components
+const Window = require('../app/renderer/components/window')
+
+// Store
 const windowStore = require('./stores/windowStore')
 const appStoreRenderer = require('./stores/appStoreRenderer')
+
+// Actions
 const windowActions = require('./actions/windowActions')
 const appActions = require('./actions/appActions')
+
+// Constants
 const messages = require('./constants/messages')
-const Immutable = require('immutable')
-const patch = require('immutablepatch')
+
+// Utils
 const l10n = require('./l10n')
 const currentWindow = require('../app/renderer/currentWindow')
 
@@ -64,10 +74,34 @@ window.addEventListener('beforeunload', function (e) {
   ipc.send(messages.LAST_WINDOW_STATE, windowStore.getState().toJS())
 })
 
-ipc.on(messages.INITIALIZE_WINDOW, (e, windowValue, appState, frames, initWindowState) => {
+ipc.on(messages.INITIALIZE_WINDOW, (e, windowValue, appState, frames, windowState) => {
   currentWindow.setWindowId(windowValue.id)
+  const newState = Immutable.fromJS(windowState) || windowStore.getState()
+
   appStoreRenderer.state = Immutable.fromJS(appState)
-  ReactDOM.render(
-    <Window frames={frames} initWindowState={initWindowState} />,
-    document.getElementById('appContainer'))
+  windowStore.state = newState
+  generateTabs(newState, frames, windowValue.id)
+  appActions.windowReady(windowValue.id)
+  ReactDOM.render(<Window />, document.getElementById('appContainer'))
 })
+
+const generateTabs = (windowState, frames, windowId) => {
+  const activeFrameKey = windowState.get('activeFrameKey')
+
+  frames.forEach((frame, i) => {
+    if (frame.guestInstanceId) {
+      appActions.newWebContentsAdded(windowId, frame)
+    } else {
+      appActions.createTabRequested({
+        url: frame.location || frame.src || frame.provisionalLocation,
+        partitionNumber: frame.partitionNumber,
+        isPrivate: frame.isPrivate,
+        active: activeFrameKey ? frame.key === activeFrameKey : true,
+        discarded: frame.unloaded,
+        title: frame.title,
+        faviconUrl: frame.icon,
+        index: i
+      }, false, true /* isRestore */)
+    }
+  })
+}
