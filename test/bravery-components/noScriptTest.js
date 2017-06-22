@@ -98,6 +98,52 @@ describe('noscript info', function () {
       .windowByUrl(Brave.browserWindowUrl)
       .waitForVisible(noScriptNavButton)
   })
+
+  it('can selectively allow scripts once', function * () {
+    yield this.app.client
+      .tabByIndex(0)
+      .url(this.url)
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForVisible(noScriptNavButton)
+      .click(noScriptNavButton)
+      .waitForVisible(noScriptInfo)
+      .waitUntil(function () {
+        return this.getText('.blockedOriginsList')
+          .then((text) => {
+            return text.includes('https://cdnjs.cloudflare.com') && text.includes('http://localhost:')
+          })
+      })
+      .click('[for="checkbox-for-https://cdnjs.cloudflare.com"]') // keep blocking cloudflare
+      .waitForVisible(noScriptAllowOnceButton)
+      .click(noScriptAllowOnceButton)
+      .tabByIndex(0)
+      .url(this.url)
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForVisible(noScriptNavButton)
+      .click(noScriptNavButton)
+      .waitForVisible(noScriptInfo)
+      .waitUntil(function () {
+        return this.getText('.blockedOriginsList')
+          .then((text) => {
+            return text.includes('https://cdnjs.cloudflare.com') && !text.includes('http://localhost:')
+          })
+      })
+      .newTab()
+      .closeTabByIndex(0)
+      .pause(10) // wait for appstate changes
+      .tabByUrl(Brave.newTabUrl)
+      .url(this.url)
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForVisible(noScriptNavButton)
+      .click(noScriptNavButton)
+      .waitForVisible(noScriptInfo)
+      .waitUntil(function () {
+        return this.getText('.blockedOriginsList')
+          .then((text) => {
+            return text.includes('https://cdnjs.cloudflare.com') && text.includes('http://localhost:')
+          })
+      })
+  })
 })
 
 describe('noscript', function () {
