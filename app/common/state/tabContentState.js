@@ -20,7 +20,7 @@ const tabContentState = {
   getDisplayTitle: (state, frameKey) => {
     const frame = frameStateUtil.getFrameByKey(state, frameKey)
 
-    if (!frame) {
+    if (frame == null) {
       return ''
     }
 
@@ -48,29 +48,43 @@ const tabContentState = {
 
   getThemeColor: (state, frameKey) => {
     const frame = frameStateUtil.getFrameByKey(state, frameKey)
+
+    if (frame == null) {
+      return false
+    }
+
     return getSetting(settings.PAINT_TABS) && (frame.get('themeColor') || frame.get('computedThemeColor'))
   },
 
   canPlayAudio (state, frameKey) {
     const frame = frameStateUtil.getFrameByKey(state, frameKey)
+
+    if (frame == null) {
+      return false
+    }
+
     return frame.get('audioPlaybackActive') || frame.get('audioMuted')
   },
 
   isTabLoading: (state, frameKey) => {
     const frame = frameStateUtil.getFrameByKey(state, frameKey)
-    return frame &&
-      (
-        frame.get('loading') ||
-        frame.get('location') === 'about:blank'
-      ) &&
-      (
-        !frame.get('provisionalLocation') ||
-        !frame.get('provisionalLocation').startsWith(`chrome-extension://${braveExtensionId}/`)
-      )
+
+    if (frame == null) {
+      return false
+    }
+
+    return (
+      frame.get('loading') ||
+      frame.get('location') === 'about:blank'
+    ) &&
+    (
+      !frame.get('provisionalLocation') ||
+      !frame.get('provisionalLocation').startsWith(`chrome-extension://${braveExtensionId}/`)
+    )
   },
 
   getPageIndex: (state) => {
-    const tabPageIndex = state.getIn(['ui', 'tabs', 'tabPageIndex'])
+    const tabPageIndex = state.getIn(['ui', 'tabs', 'tabPageIndex'], 0)
     const previewTabPageIndex = state.getIn(['ui', 'tabs', 'previewTabPageIndex'])
 
     return previewTabPageIndex !== undefined ? previewTabPageIndex : tabPageIndex
@@ -101,7 +115,7 @@ const tabContentState = {
     const frame = frameStateUtil.getFrameByKey(state, frameKey)
     const isActive = frameStateUtil.isFrameKeyActive(state, frameKey)
 
-    if (!frame) {
+    if (frame == null) {
       return ''
     }
 
@@ -123,6 +137,10 @@ const tabContentState = {
     const frame = frameStateUtil.getFrameByKey(state, frameKey)
     const isActive = frameStateUtil.isFrameKeyActive(state, frameKey)
 
+    if (frame == null) {
+      return false
+    }
+
     return (
       isActive &&
       // Larger sizes still have a relative closeIcon
@@ -137,6 +155,10 @@ const tabContentState = {
   hasRelativeCloseIcon: (state, frameKey) => {
     const frame = frameStateUtil.getFrameByKey(state, frameKey)
 
+    if (frame == null) {
+      return false
+    }
+
     return frame.get('hoverState') && hasBreakpoint(frame.get('breakpoint'), ['default', 'large'])
   },
 
@@ -145,6 +167,10 @@ const tabContentState = {
    */
   hasVisibleSecondaryIcon: (state, frameKey) => {
     const frame = frameStateUtil.getFrameByKey(state, frameKey)
+
+    if (frame == null) {
+      return false
+    }
 
     return (
       // Hide icon on hover
