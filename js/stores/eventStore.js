@@ -97,8 +97,9 @@ const windowClosed = (windowId) => {
 const doAction = (action) => {
   switch (action.actionType) {
     case windowConstants.WINDOW_SET_FOCUSED_FRAME:
-      lastActiveTabId = action.frameProps.get('tabId')
-      addPageView(action.frameProps.get('location'), lastActiveTabId)
+      if (action.location) {
+        addPageView(action.location, action.tabId)
+      }
       break
     case appConstants.APP_WINDOW_BLURRED:
       windowBlurred(action.windowId)

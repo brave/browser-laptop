@@ -52,6 +52,12 @@ function getSortedFrames (state) {
   return state.get('frames').sort(comparatorByKeyAsc)
 }
 
+function getSortedFrameKeys (state) {
+  return state.get('frames')
+    .sort(comparatorByKeyAsc)
+    .map(frame => frame.get('key'))
+}
+
 function getPinnedFrames (state) {
   return state.get('frames').filter((frame) => frame.get('pinnedLocation'))
 }
@@ -470,7 +476,15 @@ const frameStatePath = (state, frameKey) => {
   if (index === -1) {
     return null
   }
-  return ['frames', getFrameIndex(state, frameKey)]
+  return ['frames', index]
+}
+
+const frameStatePathByTabId = (state, tabId) => {
+  const index = getIndexByTabId(state, tabId)
+  if (index === -1) {
+    return null
+  }
+  return ['frames', index]
 }
 
 const activeFrameStatePath = (state) => frameStatePath(state, getActiveFrameKey(state))
@@ -688,5 +702,7 @@ module.exports = {
   isPinned,
   updateTabPageIndex,
   isValidClosedFrame,
-  getTabPageCount
+  getTabPageCount,
+  getSortedFrameKeys,
+  frameStatePathByTabId
 }
