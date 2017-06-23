@@ -12,6 +12,7 @@ const UrlBar = require('./urlBar')
 const AddEditBookmarkHanger = require('../bookmarks/addEditBookmarkHanger')
 const PublisherToggle = require('./publisherToggle')
 const LongPressButton = require('../common/longPressButton')
+const HomeButton = require('./homeButton')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
@@ -46,9 +47,7 @@ class NavigationBar extends React.Component {
     this.onToggleBookmark = this.onToggleBookmark.bind(this)
     this.onStop = this.onStop.bind(this)
     this.onReload = this.onReload.bind(this)
-    this.onHome = this.onHome.bind(this)
     this.onReloadLongPress = this.onReloadLongPress.bind(this)
-    this.auxHomeButtonAdded = false
   }
 
   get activeFrame () {
@@ -81,20 +80,6 @@ class NavigationBar extends React.Component {
     contextMenus.onReloadContextMenu(target)
   }
 
-  onHome (e) {
-    getSetting(settings.HOMEPAGE).split('|')
-      .forEach((homepage, i) => {
-        if (i === 0 && !eventUtil.isForSecondaryAction(e)) {
-          appActions.loadURLRequested(this.props.activeTabId, homepage)
-        } else {
-          appActions.createTabRequested({
-            url: homepage,
-            active: false
-          })
-        }
-      })
-  }
-
   onStop () {
     ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_STOP)
     if (this.props.navbar.getIn(['urlbar', 'focused'])) {
@@ -118,25 +103,6 @@ class NavigationBar extends React.Component {
   componentDidMount () {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, () => this.onToggleBookmark())
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark())
-
-    if (this.homeButton != null) {
-      this.homeButton.addEventListener('auxclick', this.onHome)
-      this.auxHomeButtonAdded = true
-    }
-  }
-
-  componentWillUpdate () {
-    if (this.homeButton != null) {
-      if (this.props.showHomeButton && !this.auxHomeButtonAdded) {
-        this.homeButton.addEventListener('auxclick', this.onHome)
-        this.auxHomeButtonAdded = true
-      }
-
-      if (!this.props.showHomeButton && this.auxHomeButtonAdded) {
-        this.homeButton.removeEventListener('auxclick', this.onHome)
-        this.auxHomeButtonAdded = false
-      }
-    }
   }
 
   mergeProps (state, ownProps) {
@@ -230,14 +196,7 @@ class NavigationBar extends React.Component {
       }
       {
         this.props.showHomeButton
-        ? <span className='navigationButtonContainer'>
-          <button
-            data-test-id='homeButton'
-            data-l10n-id='homeButton'
-            className='normalizeButton navigationButton homeButton'
-            ref={(node) => { this.homeButton = node }}
-            onClick={this.onHome} />
-        </span>
+        ? <HomeButton activeTabId={this.props.activeTabId} />
         : null
       }
       <div className='startButtons'>
