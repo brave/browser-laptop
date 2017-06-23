@@ -483,7 +483,6 @@ module.exports.createSiteData = (site, appState) => {
     value = {
       site: siteData,
       isFolder: siteUtil.isFolder(immutableSite),
-      hideInToolbar: site.parentFolderId === -1,
       parentFolderObjectId
     }
   } else if (siteUtil.isHistoryEntry(immutableSite)) {
