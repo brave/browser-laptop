@@ -3,13 +3,19 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const PropTypes = require('prop-types')
 const {StyleSheet, css} = require('aphrodite/no-important')
-const urlResolve = require('url').resolve
 
 // Components
 const Dialog = require('../common/dialog')
 const Button = require('../common/button')
+const {
+  CommonForm,
+  CommonFormSection,
+  CommonFormTitle,
+  CommonFormTextbox,
+  CommonFormButtonWrapper,
+  commonFormStyles
+} = require('../common/commonForm')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
@@ -19,15 +25,6 @@ const KeyCodes = require('../../../common/constants/keyCodes')
 
 // Styles
 const commonStyles = require('../styles/commonStyles')
-
-const {
-  CommonForm,
-  CommonFormSection,
-  CommonFormTitle,
-  CommonFormTextbox,
-  CommonFormButtonWrapper,
-  commonFormStyles
-} = require('../common/commonForm')
 
 class LoginRequired extends React.Component {
   constructor (props) {
@@ -40,20 +37,18 @@ class LoginRequired extends React.Component {
     this.onPasswordChange = this.onPasswordChange.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
     this.onClose = this.onClose.bind(this)
+    this.onSave = this.onSave.bind(this)
   }
+
   focus () {
     this.loginUsername.select()
     this.loginUsername.focus()
   }
+
   componentDidMount () {
     this.focus()
   }
-  get detail () {
-    return this.props.loginRequiredDetail
-  }
-  get tabId () {
-    return this.props.tabId
-  }
+
   onKeyDown (e) {
     switch (e.keyCode) {
       case KeyCodes.ENTER:
@@ -64,33 +59,39 @@ class LoginRequired extends React.Component {
         break
     }
   }
+
   onClose () {
-    appActions.setLoginResponseDetail(this.tabId)
+    appActions.setLoginResponseDetail(this.props.tabId)
   }
+
   onClick (e) {
     e.stopPropagation()
   }
+
   onUsernameChange (e) {
     this.setState({
       username: e.target.value
     })
   }
+
   onPasswordChange (e) {
     this.setState({
       password: e.target.value
     })
   }
+
   onSave () {
     this.focus()
     this.setState({
       username: '',
       password: ''
     })
-    appActions.setLoginResponseDetail(this.tabId, this.state)
+    appActions.setLoginResponseDetail(this.props.tabId, this.state)
   }
+
   render () {
     const l10nArgs = {
-      host: urlResolve(this.detail.getIn(['request', 'url']), '/')
+      host: this.props.loginRequiredUrl
     }
     return <Dialog onHide={this.onClose} isClickDismiss>
       <CommonForm onClick={this.onClick.bind(this)}>
@@ -106,8 +107,7 @@ class LoginRequired extends React.Component {
               <label className={css(commonFormStyles.input__bottomRow)} data-l10n-id='basicAuthPasswordLabel' htmlFor='loginPassword' />
             </div>
             {
-              !this.isFolder
-              ? <div id='loginInput' className={css(
+              <div id='loginInput' className={css(
                   commonFormStyles.inputWrapper,
                   commonFormStyles.inputWrapper__input
                 )}>
@@ -133,20 +133,19 @@ class LoginRequired extends React.Component {
                   />
                 </div>
               </div>
-              : null
             }
           </div>
         </CommonFormSection>
         <CommonFormButtonWrapper>
           <Button l10nId='cancel' className='whiteButton' onClick={this.onClose} />
-          <Button l10nId='ok' className='primaryButton' onClick={this.onSave.bind(this)} />
+          <Button l10nId='ok' className='primaryButton' onClick={this.onSave} />
         </CommonFormButtonWrapper>
       </CommonForm>
     </Dialog>
   }
 }
 
-LoginRequired.propTypes = { frameProps: PropTypes.object }
+module.exports = LoginRequired
 
 const styles = StyleSheet.create({
   sectionWrapper: {
@@ -154,5 +153,3 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   }
 })
-
-module.exports = LoginRequired
