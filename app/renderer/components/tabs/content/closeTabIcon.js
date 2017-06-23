@@ -31,6 +31,7 @@ class CloseTabIcon extends React.Component {
   constructor (props) {
     super(props)
     this.onClick = this.onClick.bind(this)
+    this.onDragStart = this.onDragStart.bind(this)
   }
 
   get frame () {
@@ -46,6 +47,10 @@ class CloseTabIcon extends React.Component {
       })
       appActions.tabCloseRequested(this.props.tabId)
     }
+  }
+
+  onDragStart (event) {
+    event.preventDefault()
   }
 
   mergeProps (state, ownProps) {
@@ -76,6 +81,8 @@ class CloseTabIcon extends React.Component {
       className={css(this.props.showCloseIcon && styles.closeTab)}
       l10nId='closeTabButton'
       onClick={this.onClick}
+      onDragStart={this.onDragStart}
+      draggable='true'
     />
   }
 }
