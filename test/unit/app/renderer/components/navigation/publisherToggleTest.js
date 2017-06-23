@@ -10,57 +10,57 @@ const Immutable = require('immutable')
 const fakeElectron = require('../../../../lib/fakeElectron')
 require('../../../../braveUnit')
 
-const fakeAppState = Immutable.fromJS({
-  locationInfo: {
-    'https://brave.com': {
-      exclude: false,
-      publisher: 'brave.com',
-      stickyP: false,
-      timestamp: 1496942403068,
-      verified: true
-    }
-  },
-  publisherInfo: {
-    synopsis: {
-      0: {
-        daysSpent: 0,
-        duration: 623405,
-        faviconURL: '',
-        hoursSpent: 0,
-        minutesSpent: 10,
-        percentage: 100,
-        publisherURL: 'https://brave.com',
-        score: 9.365888800773842,
-        secondsSpent: 23,
-        site: 'brave.com',
-        verified: false,
-        views: 1,
-        weight: 100
-      }
-    }
-  },
-  siteSettings: {
-    'https?://brave.com': {
-      ledgerPayments: false,
-      ledgerPaymentsShown: false
-    }
-  }
-})
-
-const defaultWindowStore = Immutable.fromJS({
-  activeFrameKey: 0,
-  frames: [{
-    key: 0,
-    tabId: 1,
-    location: 'https://brave.com'
-  }],
-  tabs: [{
-    key: 0
-  }]
-})
-
 describe('PublisherToggle component', function () {
   let PublisherToggle, windowStore, appStore
+
+  const fakeAppState = Immutable.fromJS({
+    locationInfo: {
+      'https://brave.com': {
+        exclude: false,
+        publisher: 'brave.com',
+        stickyP: false,
+        timestamp: 1496942403068,
+        verified: true
+      }
+    },
+    publisherInfo: {
+      synopsis: {
+        0: {
+          daysSpent: 0,
+          duration: 623405,
+          faviconURL: '',
+          hoursSpent: 0,
+          minutesSpent: 10,
+          percentage: 100,
+          publisherURL: 'https://brave.com',
+          score: 9.365888800773842,
+          secondsSpent: 23,
+          site: 'brave.com',
+          verified: false,
+          views: 1,
+          weight: 100
+        }
+      }
+    },
+    siteSettings: {
+      'https?://brave.com': {
+        ledgerPayments: false,
+        ledgerPaymentsShown: false
+      }
+    }
+  })
+
+  const defaultWindowStore = Immutable.fromJS({
+    activeFrameKey: 0,
+    frames: [{
+      key: 0,
+      tabId: 1,
+      location: 'https://brave.com'
+    }],
+    tabs: [{
+      key: 0
+    }]
+  })
 
   before(function () {
     mockery.enable({
@@ -82,6 +82,7 @@ describe('PublisherToggle component', function () {
   })
 
   after(function () {
+    mockery.deregisterAll()
     mockery.disable()
   })
 
