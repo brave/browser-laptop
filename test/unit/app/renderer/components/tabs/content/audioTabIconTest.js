@@ -13,6 +13,7 @@ require('../../../../../braveUnit')
 
 const tabId = 1
 const frameKey = 1
+const invalidFrameKey = 71
 
 const fakeAppStoreRenderer = {
   state: Immutable.fromJS({
@@ -94,6 +95,12 @@ describe('Tabs content - AudioTabIcon', function () {
       })
       const wrapper = mount(<Tab frameKey={frameKey} />)
       assert.equal(wrapper.find('AudioTabIcon TabIcon').props().symbol, globalStyles.appIcons.volumeOff)
+    })
+    it('passing in a frame key which does not exist does not fail', function () {
+      windowStore.state = defaultWindowStore
+      const wrapper = mount(<Tab frameKey={invalidFrameKey} />)
+      // No audio icon is rendered in this case so just check for Tab
+      assert(wrapper.find('Tab'))
     })
   })
 
