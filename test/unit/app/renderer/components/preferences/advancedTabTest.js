@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-/* global describe, before, after, it */
+/* global describe, before, afterEach, it */
 
 const mockery = require('mockery')
 const {mount} = require('enzyme')
@@ -11,7 +11,7 @@ let AdvancedTab
 require('../../../../braveUnit')
 
 describe('AdvancedTab component', function () {
-  before(function () {
+  const testSetup = (customLogic) => {
     mockery.enable({
       warnOnReplace: false,
       warnOnUnregistered: false,
@@ -24,22 +24,31 @@ describe('AdvancedTab component', function () {
     mockery.registerMock('../../node_modules/font-awesome/css/font-awesome.css', {})
     mockery.registerMock('../../../extensions/brave/img/caret_down_grey.svg')
 
-    // default platformUtil to non-Linux
-    mockery.registerMock('../../../common/lib/platformUtil', {isLinux: () => false})
+    if (typeof customLogic === 'function') {
+      customLogic()
+    }
 
     mockery.registerMock('electron', fakeElectron)
     window.chrome = fakeElectron
 
     AdvancedTab = require('../../../../../../app/renderer/components/preferences/advancedTab')
-  })
-  after(function () {
-    mockery.deregisterAll()
+  }
+
+  afterEach(function () {
     mockery.disable()
   })
+
+  const platformUtilMac = {isLinux: () => false, isWindows: () => false, isDarwin: () => true}
+  const platformUtilLinux = {isLinux: () => true, isWindows: () => false, isDarwin: () => false}
 
   describe('AdvancedTab', function () {
     describe('previewReleases', function () {
       describe('on macOS', function () {
+        before(function () {
+          testSetup(function () {
+            mockery.registerMock('../../../common/lib/platformUtil', platformUtilMac)
+          })
+        })
         it('is shown', function () {
           const wrapper = mount(
             <AdvancedTab onChangeSetting={null} />
@@ -51,17 +60,9 @@ describe('AdvancedTab component', function () {
 
       describe('on Linux', function () {
         before(function () {
-          mockery.deregisterMock('../../../common/lib/platformUtil')
-          mockery.registerMock('../../../common/lib/platformUtil', {isLinux: () => true})
-          mockery.resetCache()
-          AdvancedTab = require('../../../../../../app/renderer/components/preferences/advancedTab')
-        })
-
-        after(function () {
-          mockery.deregisterMock('../../../common/lib/platformUtil')
-          mockery.registerMock('../../../common/lib/platformUtil', {isLinux: () => false})
-          mockery.resetCache()
-          AdvancedTab = require('../../../../../../app/renderer/components/preferences/advancedTab')
+          testSetup(function () {
+            mockery.registerMock('../../../common/lib/platformUtil', platformUtilLinux)
+          })
         })
 
         it('is hidden', function () {
