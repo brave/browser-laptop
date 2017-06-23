@@ -20,6 +20,7 @@ const BrowserButton = require('../../app/renderer/components/common/browserButto
 
 // Tabs
 const PaymentsTab = require('../../app/renderer/components/preferences/paymentsTab')
+const TabsTab = require('../../app/renderer/components/preferences/tabsTab')
 const SyncTab = require('../../app/renderer/components/preferences/syncTab')
 const PluginsTab = require('../../app/renderer/components/preferences/pluginsTab')
 const ExtensionsTab = require('../../app/renderer/components/preferences/extensionsTab')
@@ -34,7 +35,7 @@ const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const {changeSetting} = require('../../app/renderer/lib/settingsUtil')
 const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
-const {startsWithOption, newTabMode, bookmarksToolbarMode, tabCloseAction, fullscreenOption, autoplayOption} = require('../../app/common/constants/settingsEnums')
+const {startsWithOption, newTabMode, bookmarksToolbarMode, fullscreenOption, autoplayOption} = require('../../app/common/constants/settingsEnums')
 
 const aboutActions = require('./aboutActions')
 const appActions = require('../actions/appActions')
@@ -331,43 +332,6 @@ class SearchTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='showBookmarkMatches' prefKey={settings.BOOKMARK_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='showTopsiteSuggestions' prefKey={settings.TOPSITE_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='offerSearchSuggestions' prefKey={settings.OFFER_SEARCH_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-      </SettingsList>
-    </div>
-  }
-}
-
-class TabsTab extends ImmutableComponent {
-  render () {
-    return <div>
-      <DefaultSectionTitle data-l10n-id='tabSettings' />
-      <SettingsList>
-        <SettingItem dataL10nId='tabsPerTabPage'>
-          <SettingDropdown
-            value={getSetting(settings.TABS_PER_PAGE, this.props.settings)}
-            data-type='number'
-            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TABS_PER_PAGE)}>
-            {
-              // Sorry, Brad says he hates primes :'(
-              [6, 8, 10, 20, 100].map((x) =>
-                <option value={x} key={x}>{x}</option>)
-            }
-          </SettingDropdown>
-        </SettingItem>
-        <SettingItem dataL10nId='tabCloseAction'>
-          <SettingDropdown
-            value={getSetting(settings.TAB_CLOSE_ACTION, this.props.settings)}
-            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TAB_CLOSE_ACTION)}>
-            <option data-l10n-id='tabCloseActionLastActive' value={tabCloseAction.LAST_ACTIVE} />
-            <option data-l10n-id='tabCloseActionNext' value={tabCloseAction.NEXT} />
-            <option data-l10n-id='tabCloseActionParent' value={tabCloseAction.PARENT} />
-          </SettingDropdown>
-        </SettingItem>
-        <SettingCheckbox dataL10nId='switchToNewTabs' prefKey={settings.SWITCH_TO_NEW_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='paintTabs' prefKey={settings.PAINT_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='showTabPreviews' prefKey={settings.SHOW_TAB_PREVIEWS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingItem dataL10nId='dashboardSettingsTitle'>
-          <SettingCheckbox dataL10nId='dashboardShowImages' prefKey={settings.SHOW_DASHBOARD_IMAGES} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        </SettingItem>
       </SettingsList>
     </div>
   }
