@@ -474,7 +474,7 @@ class ContextMenu extends React.Component {
       ? [0]
       : props.selectedIndex
     props.selectedIndexChild = props.selectedIndex
-      ? this.props.selectedIndex[0]
+      ? props.selectedIndex[0]
       : null
     props.left = contextMenuDetail.get('left')
     props.right = contextMenuDetail.get('right')

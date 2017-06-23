@@ -24,7 +24,7 @@ describe('sessionStore', function () {
       yield setup(Brave.app.client)
       yield Brave.app.client
         .waitForBrowserWindow()
-        .onClearBrowsingData({browserHistory: true})
+        .onClearBrowsingData('browserHistory', true)
         .waitForUrl(Brave.newTabUrl)
         .loadUrl(page1Url)
         .windowParentByUrl(page1Url)

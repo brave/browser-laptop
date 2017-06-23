@@ -42,11 +42,16 @@ const sitesReducer = (state, action, immutableAction) => {
       state = siteCache.loadLocationSiteKeysCache(state)
       break
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
-      if (state.getIn(['clearBrowsingDataDefaults', 'browserHistory'])) {
-        state = state.set('sites', siteUtil.clearHistory(state.get('sites')))
-        filtering.clearHistory()
+      {
+        const defaults = state.get('clearBrowsingDataDefaults')
+        const temp = state.get('tempClearBrowsingData', Immutable.Map())
+        const clearData = defaults ? defaults.merge(temp) : temp
+        if (clearData.get('browserHistory')) {
+          state = state.set('sites', siteUtil.clearHistory(state.get('sites')))
+          filtering.clearHistory()
+        }
+        break
       }
-      break
     case appConstants.APP_ADD_SITE:
       const isSyncEnabled = syncEnabled()
       if (Immutable.List.isList(action.siteDetail)) {

@@ -87,7 +87,7 @@ describe('Clear Browsing Panel', function () {
       const page1Url = Brave.server.url('page1.html')
       yield setup(this.app.client)
       yield this.app.client
-        .onClearBrowsingData({browserHistory: true})
+        .onClearBrowsingData('browserHistory', true)
         .tabByIndex(0)
         .loadUrl(page1Url)
         .waitForBrowserWindow()
@@ -117,7 +117,7 @@ describe('Clear Browsing Panel', function () {
         .waitForVisible(clearBrowsingDataButton)
         .click(clearBrowsingDataButton)
         .waitForBrowserWindow()
-        .waitForVisible('[data-test-id="browserHistorySwitch"]')
+        .waitForVisible('[data-test-id="browserHistorySwitch"] .switchedOn')
         .waitForVisible(clearDataButton)
         .click(clearDataButton)
         .waitUntil(function () {
@@ -134,7 +134,7 @@ describe('Clear Browsing Panel', function () {
       const page1Url = Brave.server.url('page1.html')
       yield setup(this.app.client)
       yield this.app.client
-        .onClearBrowsingData({browserHistory: true})
+        .onClearBrowsingData('browserHistory', true)
         .tabByIndex(0)
         .loadUrl(page1Url)
         .waitForBrowserWindow()
@@ -161,7 +161,7 @@ describe('Clear Browsing Panel', function () {
             return val.value.closedFrames.length === 1
           })
         })
-        .onClearBrowsingData({browserHistory: true})
+        .onClearBrowsingData('browserHistory', true)
         .waitUntil(function () {
           return this.getWindowState().then((val) => {
             return val.value.closedFrames.length === 0

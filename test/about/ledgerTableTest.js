@@ -140,8 +140,8 @@ describe('Ledger table', function () {
       yield this.app.client
         .tabByIndex(0)
         .click(`${secondTableFirstRow} .switchBackground`)
-        .waitForVisible(`${secondTableSecondRow} [data-switch-status="false"]`)
-        .click(`${secondTableSecondRow} [data-test-pinned="false"]`)
+        .waitForVisible(`${secondTableFirstRow} [data-switch-status="false"]`)
+        .click(`${secondTableFirstRow} [data-test-pinned="false"]`)
         .waitForVisible(`${firstTableFirstRow} [data-test-pinned="true"]`)
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntilSynopsis(function (synopsis) {
