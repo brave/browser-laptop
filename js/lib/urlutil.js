@@ -401,6 +401,15 @@ const UrlUtil = {
 
     const localFileOrigins = ['file:', 'blob:', 'data:', 'chrome-extension:', 'chrome:']
     return origin && localFileOrigins.some((localFileOrigin) => origin.startsWith(localFileOrigin))
+  },
+
+  getDisplayHost: (url) => {
+    const parsedUrl = urlParse(url)
+    if (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:') {
+      return parsedUrl.host
+    }
+
+    return url
   }
 }
 

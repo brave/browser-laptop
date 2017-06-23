@@ -77,7 +77,6 @@ class Main extends ImmutableComponent {
     this.onMouseDown = this.onMouseDown.bind(this)
     this.onClickWindow = this.onClickWindow.bind(this)
     this.onHideSiteInfo = this.onHideSiteInfo.bind(this)
-    this.onHideBraveryPanel = this.onHideBraveryPanel.bind(this)
     this.onTabContextMenu = this.onTabContextMenu.bind(this)
     this.checkForTitleMode = debounce(this.checkForTitleMode.bind(this), 20)
     this.resetAltMenuProcessing()
@@ -525,10 +524,6 @@ class Main extends ImmutableComponent {
     windowActions.setSiteInfoVisible(false)
   }
 
-  onHideBraveryPanel () {
-    windowActions.setBraveryPanelDetail()
-  }
-
   onMouseDown (e) {
     // TODO(bsclifton): update this to use eventUtil.eventElHasAncestorWithClasses
     let node = e.target
@@ -605,8 +600,6 @@ class Main extends ImmutableComponent {
     // can be passed everywhere other than the Frame elements.
     const sortedFrames = frameStateUtil.getSortedFrames(this.props.windowState)
     const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
-    const lastCommittedURL = frameStateUtil.getLastCommittedURL(activeFrame)
-    const activeSiteSettings = this.frameSiteSettings(lastCommittedURL)
     const nonPinnedFrames = frameStateUtil.getNonPinnedFrames(this.props.windowState)
     const tabsPerPage = Number(getSetting(settings.TABS_PER_PAGE))
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
@@ -626,7 +619,6 @@ class Main extends ImmutableComponent {
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
     const checkDefaultBrowserDialogIsVisible =
       isFocused() && defaultBrowserState.shouldDisplayDialog(this.props.appState)
-    const braverySettings = siteSettings.activeSettings(activeSiteSettings, this.props.appState, appConfig)
     const loginRequiredDetail = activeFrame ? basicAuthState.getLoginRequiredDetail(this.props.appState, activeFrame.get('tabId')) : null
     const customTitlebar = this.customTitlebar
     const contextMenuDetail = this.props.windowState.get('contextMenuDetail')
@@ -666,12 +658,7 @@ class Main extends ImmutableComponent {
         }
         {
           braveryPanelIsVisible
-          ? <BraveryPanel frameProps={activeFrame}
-            lastCommittedURL={lastCommittedURL}
-            braveryPanelDetail={this.props.windowState.get('braveryPanelDetail')}
-            braverySettings={braverySettings}
-            activeSiteSettings={activeSiteSettings}
-            onHide={this.onHideBraveryPanel} />
+          ? <BraveryPanel />
           : null
         }
         {

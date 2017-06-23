@@ -4,9 +4,10 @@
 
 const React = require('react')
 const Immutable = require('immutable')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
-const ImmutableComponent = require('../immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../common/dialog')
 const BrowserButton = require('../common/browserButton')
 const SwitchControl = require('../common/switchControl')
@@ -15,29 +16,37 @@ const {BraveryPanelDropdown} = require('../common/dropdown')
 // Constants
 const config = require('../../../../js/constants/config')
 const settings = require('../../../../js/constants/settings')
+const appConfig = require('../../../../js/constants/appConfig')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
 const appActions = require('../../../../js/actions/appActions')
 
+// State
+const siteSettingsState = require('../../../common/state/siteSettingsState')
+const siteSettings = require('../../../../js/state/siteSettings')
+const tabState = require('../../../common/state/tabState')
+
 // Utils
 const urlParse = require('../../../common/urlParse')
 const cx = require('../../../../js/lib/classSet')
 const siteUtil = require('../../../../js/state/siteUtil')
-const getSetting = require('../../../../js/settings').getSetting
+const {getSetting} = require('../../../../js/settings')
+const frameStateUtil = require('../../../../js/state/frameStateUtil')
+const braveryUtil = require('../../../common/lib/braveryPanelUtil')
+const urlUtil = require('../../../../js/lib/urlutil')
 
-const {StyleSheet, css} = require('aphrodite/no-important')
+// Styles
 const globalStyles = require('../styles/global')
 const commonStyles = require('../styles/commonStyles')
-
 const closeButton = require('../../../../img/toolbar/braveryPanel_btn.svg')
 
-class BraveryPanel extends ImmutableComponent {
+class BraveryPanel extends React.Component {
   constructor () {
     super()
     this.onToggleSiteSetting = this.onToggleSiteSetting.bind(this)
     this.onToggleAdsAndTracking = this.onToggleAdsAndTracking.bind(this)
-    this.onToggleHttpseList = this.onToggleHttpseList.bind(this)
+    this.onToggleHttpsList = this.onToggleHttpsList.bind(this)
     this.onToggleNoScriptList = this.onToggleNoScriptList.bind(this)
     this.onToggleFpList = this.onToggleFpList.bind(this)
     this.onToggleAdvanced = this.onToggleAdvanced.bind(this)
@@ -52,134 +61,82 @@ class BraveryPanel extends ImmutableComponent {
     this.onEditGlobal = this.onEditGlobal.bind(this)
     this.onInfoClick = this.onInfoClick.bind(this)
   }
-  get isBlockingTrackedContent () {
-    return this.blockedByTrackingList && this.blockedByTrackingList.size > 0
-  }
-  get blockedByTrackingList () {
-    return this.props.frameProps.getIn(['trackingProtection', 'blocked'])
-  }
-  get isAdvancedExpanded () {
-    return this.props.braveryPanelDetail.get('advancedControls') !== false
-  }
-  get blockedAds () {
-    return this.props.frameProps.getIn(['adblock', 'blocked'])
-  }
-  get isBlockingAds () {
-    return this.blockedAds && this.blockedAds.size > 0
-  }
-  get isBlockedAdsShown () {
-    return this.props.braveryPanelDetail.get('expandAdblock')
-  }
-  get blockedScripts () {
-    return this.props.frameProps.getIn(['noScript', 'blocked'])
-  }
-  get isBlockingScripts () {
-    return this.blockedScripts && this.blockedScripts.size > 0
-  }
-  get isBlockedScriptsShown () {
-    return this.props.braveryPanelDetail.get('expandNoScript')
-  }
-  get isBlockingFingerprinting () {
-    return this.blockedFingerprinting && this.blockedFingerprinting.size > 0
-  }
-  get blockedFingerprinting () {
-    return this.props.frameProps.getIn(['fingerprintingProtection', 'blocked'])
-  }
-  get isHttpseShown () {
-    return this.props.braveryPanelDetail.get('expandHttpse')
-  }
-  get isFpShown () {
-    return this.props.braveryPanelDetail.get('expandFp')
-  }
-  get isPrivate () {
-    return this.props.frameProps.getIn(['isPrivate'])
-  }
-  get redirectedResources () {
-    return this.props.frameProps.get('httpsEverywhere')
-  }
-  get redirectedResourcesSet () {
-    let result = new Immutable.Set([])
-    if (this.redirectedResources) {
-      this.redirectedResources.forEach((urls) => {
-        if (urls) {
-          result = result.union(urls)
-        }
-      })
-    }
-    return result
-  }
-  get isRedirectingResources () {
-    return this.redirectedResources && this.redirectedResources.size > 0
-  }
+
   onToggleAdsAndTracking (e) {
     windowActions.setBraveryPanelDetail({
-      expandAdblock: !this.isBlockedAdsShown
+      expandAdblock: !this.props.isBlockedAdsShown
     })
     e.stopPropagation()
   }
-  onToggleHttpseList (e) {
-    if (!this.isHttpseShown && this.redirectedResources &&
-        this.redirectedResources.size) {
-      // Display full list of rulesets in console for debugging
-      console.log('httpse rulesets', JSON.stringify(this.redirectedResources.toJS()))
+
+  onToggleHttpsList (e) {
+    if (!this.props.isHttpsShown && this.props.redirectedResources &&
+        this.props.redirectedResources.size) {
+      // Display full list of rule sets in console for debugging
+      console.log('https rule sets', JSON.stringify(this.props.redirectedResources.toJS()))
     }
     windowActions.setBraveryPanelDetail({
-      expandHttpse: !this.isHttpseShown
+      expandHttpse: !this.props.isHttpsShown
     })
     e.stopPropagation()
   }
+
   onToggleFpList (e) {
     windowActions.setBraveryPanelDetail({
-      expandFp: !this.isFpShown
+      expandFp: !this.props.isFpShown
     })
     e.stopPropagation()
   }
+
   onToggleNoScriptList (e) {
     windowActions.setBraveryPanelDetail({
-      expandNoScript: !this.isBlockedScriptsShown
+      expandNoScript: !this.props.isBlockedScriptsShown
     })
     e.stopPropagation()
   }
+
   onToggleAdvanced () {
     windowActions.setBraveryPanelDetail({
-      advancedControls: !this.isAdvancedExpanded
+      advancedControls: !this.props.isAdvancedExpanded
     })
   }
+
   onReload () {
-    appActions.loadURLRequested(this.props.frameProps.get('tabId'), this.props.lastCommittedURL)
+    appActions.loadURLRequested(this.props.tabId, this.props.lastCommittedURL)
   }
+
   onEditGlobal () {
     appActions.createTabRequested({
       url: 'about:preferences#shields'
     })
   }
+
   onInfoClick () {
+    this.onHide()
     appActions.createTabRequested({
       url: config.fingerprintingInfoUrl
     })
   }
+
+  onHide () {
+    windowActions.setBraveryPanelDetail()
+  }
+
   onToggleSiteSetting (setting, e) {
-    if (setting !== 'shieldsUp' && !this.props.braverySettings.shieldsUp) {
+    if (setting !== 'shieldsUp' && !this.props.shieldsUp) {
       return
     }
+
     let ruleKey = siteUtil.getOrigin(this.props.lastCommittedURL)
     const parsedUrl = urlParse(this.props.lastCommittedURL)
     if (setting !== 'noScript' && (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:')) {
       ruleKey = `https?://${parsedUrl.host}`
     }
-    appActions.changeSiteSetting(ruleKey, setting, e.target.value, this.isPrivate)
+    appActions.changeSiteSetting(ruleKey, setting, e.target.value, this.props.isPrivate)
     this.onReload()
-  }
-  get displayHost () {
-    const parsedUrl = urlParse(this.props.lastCommittedURL)
-    if (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:') {
-      return parsedUrl.host
-    }
-    return this.props.lastCommittedURL
   }
 
   get compactBraveryPanelHeader () {
-    const shieldsUp = this.props.braverySettings.shieldsUp
     return <section className={css(
       styles.braveryPanel__header,
       styles.braveryPanel_compact__header
@@ -195,11 +152,11 @@ class BraveryPanel extends ImmutableComponent {
             testId='shields-toggle'
             leftl10nId='shieldsDown'
             rightl10nId='shieldsUp'
-            checkedOn={shieldsUp}
+            checkedOn={this.props.shieldsUp}
           />
           <BrowserButton custom={styles.braveryPanel_compact__header__top__right__close}
             testId='braveryCloseButton'
-            onClick={this.props.onHide}
+            onClick={this.onHide}
           />
         </div>
       </div>
@@ -208,17 +165,16 @@ class BraveryPanel extends ImmutableComponent {
         styles.braveryPanel_compact__header__bottom
       )}>
         <div data-l10n-id='braveryPanelTitle' className={css(styles.braveryPanel_compact__header__bottom__title)} />
-        <div title={this.props.lastCommittedURL} className={css(styles.braveryPanel_compact__header__bottom__displayHost)}>{this.displayHost}</div>
+        <div title={this.props.lastCommittedURL} className={css(styles.braveryPanel_compact__header__bottom__displayHost)}>{this.props.displayHost}</div>
       </div>
     </section>
   }
 
   get defaultBraveryPanelHeader () {
-    const shieldsUp = this.props.braverySettings.shieldsUp
     return <section className={css(styles.braveryPanel__header)}>
       <div className={css(styles.braveryPanel__header__left)}>
         <div data-l10n-id='braveryPanelTitle' />
-        <div title={this.props.lastCommittedURL} className={css(styles.braveryPanel__header__left__displayHost)}>{this.displayHost}</div>
+        <div title={this.props.lastCommittedURL} className={css(styles.braveryPanel__header__left__displayHost)}>{this.props.displayHost}</div>
       </div>
       <div className={css(styles.braveryPanel__header__right)}>
         <SwitchControl large
@@ -229,113 +185,152 @@ class BraveryPanel extends ImmutableComponent {
           leftl10nId='shieldsDown'
           rightl10nId='shieldsUp'
           topl10nId='shields'
-          checkedOn={shieldsUp}
+          checkedOn={this.props.shieldsUp}
         />
       </div>
     </section>
   }
 
-  render () {
-    const shieldsUp = this.props.braverySettings.shieldsUp
-    const noScriptEnabled = this.props.braverySettings.noScript
-    const httpseEnabled = this.props.braverySettings.httpsEverywhere
-    const adControl = this.props.braverySettings.adControl
-    const fpEnabled = this.props.braverySettings.fingerprintingProtection
-    const adsBlockedStat = (this.blockedAds ? this.blockedAds.size : 0) + (this.blockedByTrackingList ? this.blockedByTrackingList.size : 0)
-    const scriptsBlockedStat = this.blockedScripts ? this.blockedScripts.size : 0
-    const fpBlockedStat = this.blockedFingerprinting ? this.blockedFingerprinting.size : 0
-    const httpsUpgradedResourceStat = this.redirectedResourcesSet.size || 0
-    const l10nArgs = JSON.stringify({
-      blockedAdCount: adsBlockedStat,
-      httpsUpgradeCount: httpsUpgradedResourceStat,
-      blockedScriptCount: scriptsBlockedStat,
-      blockedFingerprintCount: fpBlockedStat
-    })
-    const compactBraveryPanel = getSetting(settings.COMPACT_BRAVERY_PANEL)
+  mergeProps (state, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
+    const lastCommittedURL = frameStateUtil.getLastCommittedURL(activeFrame)
+    const allSiteSettings = siteSettingsState.getAllSiteSettings(state, activeFrame.get('isPrivate'))
+    const activeSiteSettings = siteSettings.getSiteSettingsForURL(allSiteSettings, lastCommittedURL)
+    const braverySettings = siteSettings.activeSettings(activeSiteSettings, state, appConfig)
+    const braveryPanelDetail = currentWindow.get('braveryPanelDetail', Immutable.Map())
+    const redirectedResources = activeFrame.get('httpsEverywhere', Immutable.List())
 
-    return <Dialog onHide={this.props.onHide} testId='braveryPanelContainer' isClickDismiss>
+    const props = {}
+    // used in renderer
+    props.tabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
+    props.blockedAds = activeFrame.getIn(['adblock', 'blocked'], Immutable.List())
+    props.blockedByTrackingList = activeFrame.getIn(['trackingProtection', 'blocked'], Immutable.List())
+    props.blockedScripts = activeFrame.getIn(['noScript', 'blocked'], Immutable.List())
+    props.blockedFingerprinting = activeFrame.getIn(['fingerprintingProtection', 'blocked'], Immutable.List())
+    props.redirectedResources = braveryUtil.getRedirectedResources(redirectedResources)
+    props.shieldsUp = braverySettings.shieldsUp
+    props.noScriptEnabled = braverySettings.noScript
+    props.httpsEnabled = braverySettings.httpsEverywhere
+    props.adControl = braverySettings.adControl
+    props.isFpEnabled = braverySettings.fingerprintingProtection
+    props.cookieControl = braverySettings.cookieControl
+    props.safeBrowsing = braverySettings.safeBrowsing
+    props.isCompactBraveryPanel = getSetting(settings.COMPACT_BRAVERY_PANEL)
+    props.adsBlockedStat = props.blockedAds.size + props.blockedByTrackingList.size
+    props.scriptsBlockedStat = props.blockedScripts.size
+    props.fpBlockedStat = props.blockedFingerprinting.size
+    props.httpsUpgradedResourceStat = props.redirectedResources.size
+    props.displayHost = urlUtil.getDisplayHost(lastCommittedURL)
+    props.isAdvancedExpanded = braveryPanelDetail.get('advancedControls') !== false
+    props.isBlockedAdsShown = braveryPanelDetail.get('expandAdblock')
+    props.isBlockingAds = props.blockedAds.size > 0
+    props.isBlockingTrackedContent = props.blockedByTrackingList.size > 0
+    props.showRedirectingResources = props.redirectedResources.size > 0
+    props.isHttpsShown = braveryPanelDetail.get('expandHttpse')
+    props.isBlockingScripts = props.blockedScripts.size > 0
+    props.isBlockedScriptsShown = braveryPanelDetail.get('expandNoScript')
+    props.isBlockingFingerprinting = props.blockedFingerprinting.size > 0
+    props.isFpShown = braveryPanelDetail.get('expandFp')
+
+    // used in other functions
+    props.lastCommittedURL = lastCommittedURL
+    props.isPrivate = activeFrame.get('isPrivate')
+
+    return props
+  }
+
+  render () {
+    const l10nArgs = JSON.stringify({
+      blockedAdCount: this.props.adsBlockedStat,
+      httpsUpgradeCount: this.props.httpsUpgradedResourceStat,
+      blockedScriptCount: this.props.scriptsBlockedStat,
+      blockedFingerprintCount: this.props.fpBlockedStat
+    })
+
+    return <Dialog onHide={this.onHide} testId='braveryPanelContainer' isClickDismiss>
       <div className={css(
         commonStyles.flyoutDialog,
         styles.braveryPanel,
-        compactBraveryPanel && styles.braveryPanel_compact
+        this.props.isCompactBraveryPanel && styles.braveryPanel_compact
       )}
         onClick={(e) => e.stopPropagation()}
-        data-test-id={compactBraveryPanel ? 'braveryPanelCompact' : 'braveryPanel'}>
+        data-test-id={this.props.isCompactBraveryPanel ? 'braveryPanelCompact' : 'braveryPanel'}>
         {
-          compactBraveryPanel
+          this.props.isCompactBraveryPanel
           ? this.compactBraveryPanelHeader
           : this.defaultBraveryPanelHeader
         }
         <section className={css(
           styles.braveryPanel__stats,
-          compactBraveryPanel && styles.braveryPanel_compact__stats
+          this.props.isCompactBraveryPanel && styles.braveryPanel_compact__stats
         )}>
           <div className={css(
             styles.braveryPanel__stats__item_count_adsBlockedStat,
-            (!shieldsUp || adControl === 'allowAdsAndTracking') && styles.braveryPanel__stats__item_count_disabled,
+            (!this.props.shieldsUp || this.props.adControl === 'allowAdsAndTracking') && styles.braveryPanel__stats__item_count_disabled,
             gridStyles.row1col1,
-            !compactBraveryPanel && styles.braveryPanel__stats__item,
-            !compactBraveryPanel && styles.braveryPanel__stats__item_count,
-            compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
+            !this.props.isCompactBraveryPanel && styles.braveryPanel__stats__item,
+            !this.props.isCompactBraveryPanel && styles.braveryPanel__stats__item_count,
+            this.props.isCompactBraveryPanel && styles.braveryPanel_compact__stats__item_count
           )}>
-            <span className={css(!!adsBlockedStat && styles.braveryPanel__stats__item_count_clickable)}
+            <span className={css(!!this.props.adsBlockedStat && styles.braveryPanel__stats__item_count_clickable)}
               onClick={this.onToggleAdsAndTracking}
               data-test-id='adsBlockedStat'
-            >{adsBlockedStat}</span>
+            >{this.props.adsBlockedStat}</span>
           </div>
 
           <div className={css(
             styles.braveryPanel__stats__item_count_redirectedResourcesStat,
-            (!shieldsUp || !httpseEnabled) && styles.braveryPanel__stats__item_count_disabled,
-            !compactBraveryPanel && gridStyles.row1col2,
-            !compactBraveryPanel && styles.braveryPanel__stats__item,
-            !compactBraveryPanel && styles.braveryPanel__stats__item_count,
-            compactBraveryPanel && gridStyles.row2col1,
-            compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
+            (!this.props.shieldsUp || !this.props.httpsEnabled) && styles.braveryPanel__stats__item_count_disabled,
+            !this.props.isCompactBraveryPanel && gridStyles.row1col2,
+            !this.props.isCompactBraveryPanel && styles.braveryPanel__stats__item,
+            !this.props.isCompactBraveryPanel && styles.braveryPanel__stats__item_count,
+            this.props.isCompactBraveryPanel && gridStyles.row2col1,
+            this.props.isCompactBraveryPanel && styles.braveryPanel_compact__stats__item_count
           )}>
-            <span className={css(!!this.redirectedResourcesSet.size && styles.braveryPanel__stats__item_count_clickable)}
-              onClick={this.onToggleHttpseList}
+            <span className={css(!!this.props.httpsUpgradedResourceStat && styles.braveryPanel__stats__item_count_clickable)}
+              onClick={this.onToggleHttpsList}
               data-test-id='redirectedResourcesStat'
-            >{httpsUpgradedResourceStat}</span>
+            >{this.props.httpsUpgradedResourceStat}</span>
           </div>
 
           <div className={css(
             styles.braveryPanel__stats__item_count_noScriptStat,
-            (!shieldsUp || !noScriptEnabled) && styles.braveryPanel__stats__item_count_disabled,
-            !compactBraveryPanel && gridStyles.row1col3,
-            !compactBraveryPanel && styles.braveryPanel__stats__item,
-            !compactBraveryPanel && styles.braveryPanel__stats__item_count,
-            compactBraveryPanel && gridStyles.row3col1,
-            compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
+            (!this.props.shieldsUp || !this.props.noScriptEnabled) && styles.braveryPanel__stats__item_count_disabled,
+            !this.props.isCompactBraveryPanel && gridStyles.row1col3,
+            !this.props.isCompactBraveryPanel && styles.braveryPanel__stats__item,
+            !this.props.isCompactBraveryPanel && styles.braveryPanel__stats__item_count,
+            this.props.isCompactBraveryPanel && gridStyles.row3col1,
+            this.props.isCompactBraveryPanel && styles.braveryPanel_compact__stats__item_count
           )}>
-            <span className={css(!!scriptsBlockedStat && styles.braveryPanel__stats__item_count_clickable)}
+            <span className={css(!!this.props.scriptsBlockedStat && styles.braveryPanel__stats__item_count_clickable)}
               onClick={this.onToggleNoScriptList}
               data-test-id='noScriptStat'
-            >{scriptsBlockedStat}</span>
+            >{this.props.scriptsBlockedStat}</span>
           </div>
 
           <div className={css(
             styles.braveryPanel__stats__item_count_fpStat,
-            (!shieldsUp || !fpEnabled) && styles.braveryPanel__stats__item_count_disabled,
-            !compactBraveryPanel && gridStyles.row1col4,
-            !compactBraveryPanel && styles.braveryPanel__stats__item,
-            !compactBraveryPanel && styles.braveryPanel__stats__item_count,
-            compactBraveryPanel && gridStyles.row4col1,
-            compactBraveryPanel && styles.braveryPanel_compact__stats__item_count
+            (!this.props.shieldsUp || !this.props.isFpEnabled) && styles.braveryPanel__stats__item_count_disabled,
+            !this.props.isCompactBraveryPanel && gridStyles.row1col4,
+            !this.props.isCompactBraveryPanel && styles.braveryPanel__stats__item,
+            !this.props.isCompactBraveryPanel && styles.braveryPanel__stats__item_count,
+            this.props.isCompactBraveryPanel && gridStyles.row4col1,
+            this.props.isCompactBraveryPanel && styles.braveryPanel_compact__stats__item_count
           )}>
-            <span className={css(!!fpBlockedStat && styles.braveryPanel__stats__item_count_clickable)}
+            <span className={css(!!this.props.fpBlockedStat && styles.braveryPanel__stats__item_count_clickable)}
               onClick={this.onToggleFpList}
               data-test-id='fpStat'
-            >{fpBlockedStat}</span>
+            >{this.props.fpBlockedStat}</span>
           </div>
 
           <span className={css(
-            !!adsBlockedStat && styles.braveryPanel__stats__item_label_clickable,
-            (!shieldsUp || adControl === 'allowAdsAndTracking') && styles.braveryPanel__stats__item_label_disabled,
-            !compactBraveryPanel && gridStyles.row2col1,
-            !compactBraveryPanel && styles.braveryPanel__stats__item,
-            compactBraveryPanel && gridStyles.row1col2,
-            compactBraveryPanel && styles.braveryPanel_compact__stats__item_label
+            !!this.props.adsBlockedStat && styles.braveryPanel__stats__item_label_clickable,
+            (!this.props.shieldsUp || this.props.adControl === 'allowAdsAndTracking') && styles.braveryPanel__stats__item_label_disabled,
+            !this.props.isCompactBraveryPanel && gridStyles.row2col1,
+            !this.props.isCompactBraveryPanel && styles.braveryPanel__stats__item,
+            this.props.isCompactBraveryPanel && gridStyles.row1col2,
+            this.props.isCompactBraveryPanel && styles.braveryPanel_compact__stats__item_label
           )}
             onClick={this.onToggleAdsAndTracking}
             data-l10n-id='adsBlocked'
@@ -343,24 +338,24 @@ class BraveryPanel extends ImmutableComponent {
           />
 
           <span className={css(
-            !!this.redirectedResourcesSet.size && styles.braveryPanel__stats__item_label_clickable,
-            (!shieldsUp || !httpseEnabled) && styles.braveryPanel__stats__item_label_disabled,
+            !!this.props.redirectedResources.size && styles.braveryPanel__stats__item_label_clickable,
+            (!this.props.shieldsUp || !this.props.httpsEnabled) && styles.braveryPanel__stats__item_label_disabled,
             gridStyles.row2col2,
-            !compactBraveryPanel && styles.braveryPanel__stats__item,
-            compactBraveryPanel && styles.braveryPanel_compact__stats__item_label
+            !this.props.isCompactBraveryPanel && styles.braveryPanel__stats__item,
+            this.props.isCompactBraveryPanel && styles.braveryPanel_compact__stats__item_label
           )}
-            onClick={this.onToggleHttpseList}
+            onClick={this.onToggleHttpsList}
             data-l10n-id='httpReroutes'
             data-l10n-args={l10nArgs}
           />
 
           <span className={css(
-            !!scriptsBlockedStat && styles.braveryPanel__stats__item_label_clickable,
-            (!shieldsUp || !noScriptEnabled) && styles.braveryPanel__stats__item_label_disabled,
-            !compactBraveryPanel && gridStyles.row2col3,
-            !compactBraveryPanel && styles.braveryPanel__stats__item,
-            compactBraveryPanel && gridStyles.row3col2,
-            compactBraveryPanel && styles.braveryPanel_compact__stats__item_label
+            !!this.props.scriptsBlockedStat && styles.braveryPanel__stats__item_label_clickable,
+            (!this.props.shieldsUp || !this.props.noScriptEnabled) && styles.braveryPanel__stats__item_label_disabled,
+            !this.props.isCompactBraveryPanel && gridStyles.row2col3,
+            !this.props.isCompactBraveryPanel && styles.braveryPanel__stats__item,
+            this.props.isCompactBraveryPanel && gridStyles.row3col2,
+            this.props.isCompactBraveryPanel && styles.braveryPanel_compact__stats__item_label
           )}
             onClick={this.onToggleNoScriptList}
             data-l10n-id='scriptsBlockedNumber'
@@ -368,12 +363,12 @@ class BraveryPanel extends ImmutableComponent {
           />
 
           <span className={css(
-            !!fpBlockedStat && styles.braveryPanel__stats__item_label_clickable,
-            (!shieldsUp || !fpEnabled) && styles.braveryPanel__stats__item_label_disabled,
-            !compactBraveryPanel && gridStyles.row2col4,
-            !compactBraveryPanel && styles.braveryPanel__stats__item,
-            compactBraveryPanel && gridStyles.row4col2,
-            compactBraveryPanel && styles.braveryPanel_compact__stats__item_label
+            !!this.props.fpBlockedStat && styles.braveryPanel__stats__item_label_clickable,
+            (!this.props.shieldsUp || !this.props.isFpEnabled) && styles.braveryPanel__stats__item_label_disabled,
+            !this.props.isCompactBraveryPanel && gridStyles.row2col4,
+            !this.props.isCompactBraveryPanel && styles.braveryPanel__stats__item,
+            this.props.isCompactBraveryPanel && gridStyles.row4col2,
+            this.props.isCompactBraveryPanel && styles.braveryPanel_compact__stats__item_label
           )}
             onClick={this.onToggleFpList}
             data-l10n-id='fingerprintingBlocked'
@@ -383,33 +378,33 @@ class BraveryPanel extends ImmutableComponent {
 
         <section className={css(
           styles.braveryPanel__body,
-          compactBraveryPanel && styles.braveryPanel_compact__body
+          this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body
         )}>
           {
-            (this.isBlockedAdsShown && (this.isBlockingAds || this.isBlockingTrackedContent))
+            (this.props.isBlockedAdsShown && (this.props.isBlockingAds || this.props.isBlockingTrackedContent))
             ? <ul data-test-id='braveryPanelBodyList'
               className={css(
                 styles.braveryPanel__body__ul,
-                compactBraveryPanel && styles.braveryPanel_compact__body__ul
+                this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__ul
               )}>
               {
-                this.isBlockingAds
-                ? this.blockedAds.map(site =>
+                this.props.isBlockingAds
+                ? this.props.blockedAds.map(site =>
                   <li data-test-id='braveryPanelBodyList'
                     className={css(
                       styles.braveryPanel__body__ul__li,
-                      compactBraveryPanel && styles.braveryPanel_compact__body__ul__li
+                      this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__ul__li
                     )}
                     key={site}>{site}</li>)
                 : null
               }
               {
-                this.isBlockingTrackedContent
-                ? this.blockedByTrackingList.map(site =>
+                this.props.isBlockingTrackedContent
+                ? this.props.blockedByTrackingList.map(site =>
                   <li data-test-id='braveryPanelBodyList'
                     className={css(
                       styles.braveryPanel__body__ul__li,
-                      compactBraveryPanel && styles.braveryPanel_compact__body__ul__li
+                      this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__ul__li
                     )}
                     key={site}>{site}</li>)
                 : null
@@ -418,18 +413,18 @@ class BraveryPanel extends ImmutableComponent {
             : null
           }
           {
-            this.isRedirectingResources && this.isHttpseShown
+            this.props.showRedirectingResources && this.props.isHttpsShown
             ? <ul data-test-id='braveryPanelBodyList'
               className={css(
                 styles.braveryPanel__body__ul,
-                compactBraveryPanel && styles.braveryPanel_compact__body__ul
+                this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__ul
               )}>
               {
-                this.redirectedResourcesSet.map((site) =>
+                this.props.redirectedResources.map((site) =>
                   <li data-test-id='braveryPanelBodyList'
                     className={css(
                       styles.braveryPanel__body__ul__li,
-                      compactBraveryPanel && styles.braveryPanel_compact__body__ul__li
+                      this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__ul__li
                     )}
                     key={site}>{site}</li>)
               }
@@ -437,18 +432,18 @@ class BraveryPanel extends ImmutableComponent {
             : null
           }
           {
-            this.isBlockingScripts && this.isBlockedScriptsShown
+            this.props.isBlockingScripts && this.props.isBlockedScriptsShown
             ? <ul data-test-id='braveryPanelBodyList'
               className={css(
                 styles.braveryPanel__body__ul,
-                compactBraveryPanel && styles.braveryPanel_compact__body__ul
+                this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__ul
               )}>
               {
-                this.blockedScripts.map((site) =>
+                this.props.blockedScripts.map((site) =>
                   <li data-test-id='braveryPanelBodyList'
                     className={css(
                       styles.braveryPanel__body__ul__li,
-                      compactBraveryPanel && styles.braveryPanel_compact__body__ul__li
+                      this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__ul__li
                     )}
                     key={site}>{site}</li>)
               }
@@ -456,18 +451,18 @@ class BraveryPanel extends ImmutableComponent {
             : null
           }
           {
-            this.isBlockingFingerprinting && this.isFpShown
+            this.props.isBlockingFingerprinting && this.props.isFpShown
             ? <ul data-test-id='braveryPanelBodyList'
               className={css(
                 styles.braveryPanel__body__ul,
-                compactBraveryPanel && styles.braveryPanel_compact__body__ul
+                this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__ul
               )}>
               {
-                this.blockedFingerprinting.map((site) =>
+                this.props.blockedFingerprinting.map((site) =>
                   <li data-test-id='braveryPanelBodyList'
                     className={css(
                       styles.braveryPanel__body__ul__li,
-                      compactBraveryPanel && styles.braveryPanel_compact__body__ul__li
+                      this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__ul__li
                     )}
                     key={site}>{site}</li>)
               }
@@ -477,42 +472,42 @@ class BraveryPanel extends ImmutableComponent {
           <div onClick={this.onToggleAdvanced}
             className={css(
               styles.braveryPanel__body__advancedTitle,
-              compactBraveryPanel && styles.braveryPanel_compact__body__advancedTitle
+              this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advancedTitle
             )}>
             <div className={cx({
               fa: true,
-              'fa-caret-down': this.isAdvancedExpanded,
-              'fa-caret-right': !this.isAdvancedExpanded,
+              'fa-caret-down': this.props.isAdvancedExpanded,
+              'fa-caret-right': !this.props.isAdvancedExpanded,
               [css(styles.braveryPanel__body__advancedTitle__indicator)]: true,
-              [css(styles.braveryPanel_compact__body__advancedTitle__indicator)]: compactBraveryPanel
+              [css(styles.braveryPanel_compact__body__advancedTitle__indicator)]: this.props.isCompactBraveryPanel
             })} />
             <div data-l10n-id='advancedControls' />
           </div>
           {
-            this.isAdvancedExpanded
+            this.props.isAdvancedExpanded
             ? <section>
               <hr className={css(
                 styles.braveryPanel__body__hr,
-                compactBraveryPanel && styles.braveryPanel_compact__body__hr
+                this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__hr
               )} />
               <div className={css(
                 styles.braveryPanel__body__advanced__control,
-                compactBraveryPanel && styles.braveryPanel_compact__body__advanced__control
+                this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control
               )}>
                 <div data-l10n-id='adControl' className={css(
-                  !shieldsUp && styles.braveryPanel__body__advanced__control__forms__title_disabled,
+                  !this.props.shieldsUp && styles.braveryPanel__body__advanced__control__forms__title_disabled,
                   gridStyles.row1col1,
-                  !compactBraveryPanel && styles.braveryPanel__body__advanced__control__forms__title,
-                  compactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__title
+                  !this.props.isCompactBraveryPanel && styles.braveryPanel__body__advanced__control__forms__title,
+                  this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__title
                 )} />
 
                 <div className={css(
-                  !shieldsUp && styles.braveryPanel__body__advanced__control__forms__dropdown_disabled,
+                  !this.props.shieldsUp && styles.braveryPanel__body__advanced__control__forms__dropdown_disabled,
                   gridStyles.row2col1,
-                  !compactBraveryPanel && styles.braveryPanel__body__advanced__control__forms__dropdown,
-                  compactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__dropdown
+                  !this.props.isCompactBraveryPanel && styles.braveryPanel__body__advanced__control__forms__dropdown,
+                  this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__dropdown
                 )}>
-                  <BraveryPanelDropdown data-test-id='adsBlockedControl' value={adControl} onChange={this.onToggleAdControl} disabled={!shieldsUp}>
+                  <BraveryPanelDropdown data-test-id='adsBlockedControl' value={this.props.adControl} onChange={this.onToggleAdControl} disabled={!this.props.shieldsUp}>
                     <option data-l10n-id='showBraveAds' data-test-id='showBraveAds' value='showBraveAds' />
                     <option data-l10n-id='blockAds' data-test-id='blockAdsOption' value='blockAds' />
                     <option data-l10n-id='allowAdsAndTracking' data-test-id='showAdsOption' value='allowAdsAndTracking' />
@@ -520,45 +515,45 @@ class BraveryPanel extends ImmutableComponent {
                 </div>
 
                 <SwitchControl className={css(
-                  !compactBraveryPanel && gridStyles.row3col1,
-                  compactBraveryPanel && gridStyles.row5col1,
-                  compactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
+                  !this.props.isCompactBraveryPanel && gridStyles.row3col1,
+                  this.props.isCompactBraveryPanel && gridStyles.row5col1,
+                  this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
                 )}
                   onClick={this.onToggleHTTPSE}
                   rightl10nId='httpsEverywhere'
-                  checkedOn={httpseEnabled}
-                  disabled={!shieldsUp}
+                  checkedOn={this.props.httpsEnabled}
+                  disabled={!this.props.shieldsUp}
                   testId='httpsEverywhereSwitch'
                 />
 
                 <SwitchControl className={css(
-                  !compactBraveryPanel && gridStyles.row4col1,
-                  compactBraveryPanel && gridStyles.row6col1,
-                  compactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
+                  !this.props.isCompactBraveryPanel && gridStyles.row4col1,
+                  this.props.isCompactBraveryPanel && gridStyles.row6col1,
+                  this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
                 )}
                   onClick={this.onToggleNoScript}
                   rightl10nId='noScript'
-                  checkedOn={noScriptEnabled}
-                  disabled={!shieldsUp}
+                  checkedOn={this.props.noScriptEnabled}
+                  disabled={!this.props.shieldsUp}
                   testId='noScriptSwitch'
                 />
 
                 <div data-l10n-id='cookieControl' className={css(
-                  !shieldsUp && styles.braveryPanel__body__advanced__control__forms__title_disabled,
-                  !compactBraveryPanel && gridStyles.row1col2,
-                  !compactBraveryPanel && styles.braveryPanel__body__advanced__control__forms__title,
-                  compactBraveryPanel && gridStyles.row3col1,
-                  compactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__title
+                  !this.props.shieldsUp && styles.braveryPanel__body__advanced__control__forms__title_disabled,
+                  !this.props.isCompactBraveryPanel && gridStyles.row1col2,
+                  !this.props.isCompactBraveryPanel && styles.braveryPanel__body__advanced__control__forms__title,
+                  this.props.isCompactBraveryPanel && gridStyles.row3col1,
+                  this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__title
                 )} />
 
                 <div className={css(
-                  !shieldsUp && styles.braveryPanel__body__advanced__control__forms__dropdown_disabled,
-                  !compactBraveryPanel && gridStyles.row2col2,
-                  !compactBraveryPanel && styles.braveryPanel__body__advanced__control__forms__dropdown,
-                  compactBraveryPanel && gridStyles.row4col1,
-                  compactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__dropdown
+                  !this.props.shieldsUp && styles.braveryPanel__body__advanced__control__forms__dropdown_disabled,
+                  !this.props.isCompactBraveryPanel && gridStyles.row2col2,
+                  !this.props.isCompactBraveryPanel && styles.braveryPanel__body__advanced__control__forms__dropdown,
+                  this.props.isCompactBraveryPanel && gridStyles.row4col1,
+                  this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__dropdown
                 )}>
-                  <BraveryPanelDropdown data-test-id='cookieControl' value={this.props.braverySettings.cookieControl} onChange={this.onToggleCookieControl} disabled={!shieldsUp}>
+                  <BraveryPanelDropdown data-test-id='cookieControl' value={this.props.cookieControl} onChange={this.onToggleCookieControl} disabled={!this.props.shieldsUp}>
                     <option data-l10n-id='block3rdPartyCookie' value='block3rdPartyCookie' />
                     <option data-l10n-id='allowAllCookies' data-test-id='allowAllCookies' value='allowAllCookies' />
                     <option data-l10n-id='blockAllCookies' data-test-id='blockAllCookies' value='blockAllCookies' />
@@ -566,29 +561,29 @@ class BraveryPanel extends ImmutableComponent {
                 </div>
 
                 <SwitchControl className={css(
-                  !compactBraveryPanel && gridStyles.row3col2,
-                  compactBraveryPanel && gridStyles.row7col1,
-                  compactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
+                  !this.props.isCompactBraveryPanel && gridStyles.row3col2,
+                  this.props.isCompactBraveryPanel && gridStyles.row7col1,
+                  this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
                 )}
                   customInfoButtonClassName={css(styles.braveryPanel__body__advanced__control__switchControl__infoButton)}
                   onClick={this.onToggleFp}
                   rightl10nId='fingerprintingProtection'
-                  checkedOn={fpEnabled}
-                  disabled={!shieldsUp}
+                  checkedOn={this.props.isFpEnabled}
+                  disabled={!this.props.shieldsUp}
                   onInfoClick={this.onInfoClick}
                   infoTitle={config.fingerprintingInfoUrl}
                   testId='fingerprintingProtectionSwitch'
                 />
 
                 <SwitchControl className={css(
-                  !compactBraveryPanel && gridStyles.row4col2,
-                  compactBraveryPanel && gridStyles.row8col1,
-                  compactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
+                  !this.props.isCompactBraveryPanel && gridStyles.row4col2,
+                  this.props.isCompactBraveryPanel && gridStyles.row8col1,
+                  this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
                 )}
                   onClick={this.onToggleSafeBrowsing}
                   rightl10nId='safeBrowsing'
-                  checkedOn={this.props.braverySettings.safeBrowsing}
-                  disabled={!shieldsUp}
+                  checkedOn={this.props.safeBrowsing}
+                  disabled={!this.props.shieldsUp}
                   testId='safeBrowsingSwitch'
                 />
               </div>
@@ -598,16 +593,16 @@ class BraveryPanel extends ImmutableComponent {
           <hr className={css(
             styles.braveryPanel__body__hr,
             styles.braveryPanel__body__hr_splitter,
-            compactBraveryPanel && styles.braveryPanel_compact__body__hr
+            this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__hr
           )} />
           <div className={css(
             styles.braveryPanel__body__footer,
-            compactBraveryPanel && styles.braveryPanel_compact__body__footer
+            this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__footer
           )}>
             <span className={css(
               styles.braveryPanel__body__footer__edit,
               styles.braveryPanel__body__footer__edit_clickable,
-              compactBraveryPanel && styles.braveryPanel_compact__body__footer__edit
+              this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__footer__edit
             )}
               onClick={this.onEditGlobal}
               data-l10n-id='editBraveryGlobalSettings'
@@ -626,6 +621,8 @@ class BraveryPanel extends ImmutableComponent {
     </Dialog>
   }
 }
+
+module.exports = ReduxComponent.connect(BraveryPanel)
 
 const displayHost = {
   fontSize: '20px',
@@ -1010,5 +1007,3 @@ const styles = StyleSheet.create({
     padding: '0 4px'
   }
 })
-
-module.exports = BraveryPanel
