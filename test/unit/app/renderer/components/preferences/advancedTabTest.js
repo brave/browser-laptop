@@ -33,6 +33,7 @@ describe('AdvancedTab component', function () {
     AdvancedTab = require('../../../../../../app/renderer/components/preferences/advancedTab')
   })
   after(function () {
+    mockery.deregisterAll()
     mockery.disable()
   })
 
