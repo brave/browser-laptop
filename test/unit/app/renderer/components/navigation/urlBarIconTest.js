@@ -12,55 +12,55 @@ const assert = require('assert')
 const fakeElectron = require('../../../../lib/fakeElectron')
 require('../../../../braveUnit')
 
-const tabId = 1
-const frameKey = 0
-
-const fakeAppStoreRenderer = Immutable.fromJS({
-  windows: [{
-    windowId: 1,
-    windowUUID: 'uuid'
-  }],
-  tabs: [{
-    tabId: tabId,
-    windowId: 1,
-    windowUUID: 'uuid',
-    url: 'https://brave.com',
-    messageBoxDetail: false
-  }],
-  tabsInternal: {
-    index: {
-      1: 0
-    }
-  }
-})
-
-const defaultWindowStore = Immutable.fromJS({
-  activeFrameKey: frameKey,
-  frames: [{
-    key: frameKey,
-    tabId: tabId,
-    location: 'https://brave.com',
-    security: {
-      isSecure: true
-    },
-    navbar: {
-      urlbar: {
-        location: 'https://brave.com',
-        active: false,
-        searchDetail: {
-          activateSearchEngine: true
-        }
-      }
-    },
-    title: 'Brave Software'
-  }],
-  tabs: [{
-    key: frameKey
-  }]
-})
-
 describe('UrlBarIcon component unit tests', function () {
   let UrlBarIcon, windowActions, windowStore, appStore
+
+  const tabId = 1
+  const frameKey = 0
+
+  const fakeAppStoreRenderer = Immutable.fromJS({
+    windows: [{
+      windowId: 1,
+      windowUUID: 'uuid'
+    }],
+    tabs: [{
+      tabId: tabId,
+      windowId: 1,
+      windowUUID: 'uuid',
+      url: 'https://brave.com',
+      messageBoxDetail: false
+    }],
+    tabsInternal: {
+      index: {
+        1: 0
+      }
+    }
+  })
+
+  const defaultWindowStore = Immutable.fromJS({
+    activeFrameKey: frameKey,
+    frames: [{
+      key: frameKey,
+      tabId: tabId,
+      location: 'https://brave.com',
+      security: {
+        isSecure: true
+      },
+      navbar: {
+        urlbar: {
+          location: 'https://brave.com',
+          active: false,
+          searchDetail: {
+            activateSearchEngine: true
+          }
+        }
+      },
+      title: 'Brave Software'
+    }],
+    tabs: [{
+      key: frameKey
+    }]
+  })
 
   before(function () {
     mockery.enable({
@@ -69,29 +69,34 @@ describe('UrlBarIcon component unit tests', function () {
       useCleanCache: true
     })
     mockery.registerMock('electron', fakeElectron)
-    UrlBarIcon = require('../../../../../../app/renderer/components/navigation/urlBarIcon')
     windowActions = require('../../../../../../js/actions/windowActions')
     windowStore = require('../../../../../../js/stores/windowStore')
     appStore = require('../../../../../../js/stores/appStoreRenderer')
+    UrlBarIcon = require('../../../../../../app/renderer/components/navigation/urlBarIcon')
   })
 
   after(function () {
     mockery.disable()
   })
 
-  it('sets element as draggable', function () {
-    appStore.state = fakeAppStoreRenderer
-    windowStore.state = defaultWindowStore
-    const wrapper = mount(<UrlBarIcon titleMode />)
-    assert.equal(wrapper.find('span[draggable]').length, 1)
-  })
+  describe('general things', function () {
+    before(function () {
+      appStore.state = fakeAppStoreRenderer
+      windowStore.state = defaultWindowStore
+    })
 
-  it('shows site information when clicked', function () {
-    const spy = sinon.spy(windowActions, 'setSiteInfoVisible')
-    const wrapper = mount(<UrlBarIcon titleMode />)
-    wrapper.find('[data-test-id="urlBarIcon"]').simulate('click')
-    assert.equal(spy.calledOnce, true)
-    windowActions.setSiteInfoVisible.restore()
+    it('sets element as draggable', function () {
+      const wrapper = mount(<UrlBarIcon titleMode />)
+      assert.equal(wrapper.find('span[draggable]').length, 1)
+    })
+
+    it('shows site information when clicked', function () {
+      const spy = sinon.spy(windowActions, 'setSiteInfoVisible')
+      const wrapper = mount(<UrlBarIcon titleMode />)
+      wrapper.find('[data-test-id="urlBarIcon"]').simulate('click')
+      assert.equal(spy.calledOnce, true)
+      windowActions.setSiteInfoVisible.restore()
+    })
   })
 
   describe('when user is searching', function () {

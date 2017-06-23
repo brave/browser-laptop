@@ -25,6 +25,7 @@ const settings = require('../../../../js/constants/settings')
 
 // State
 const tabState = require('../../../common/state/tabState')
+const publisherState = require('../../../common/lib/publisherUtil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
 // Store
@@ -32,7 +33,7 @@ const windowStore = require('../../../../js/stores/windowStore')
 
 // Utils
 const cx = require('../../../../js/lib/classSet')
-const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
+const {getBaseUrl} = require('../../../../js/lib/appUrlUtil')
 const siteUtil = require('../../../../js/state/siteUtil')
 const eventUtil = require('../../../../js/lib/eventUtil')
 const UrlUtil = require('../../../../js/lib/urlutil')
@@ -55,7 +56,7 @@ class NavigationBar extends React.Component {
   }
 
   onToggleBookmark () {
-    const editing = this.bookmarked
+    const editing = this.props.isBookmarked
     // show the AddEditBookmarkHanger control; saving/deleting takes place there
     let siteDetail = siteUtil.getDetailFromFrame(this.activeFrame, siteTags.BOOKMARK)
     const key = siteUtil.getSiteKey(siteDetail)
@@ -95,11 +96,6 @@ class NavigationBar extends React.Component {
     }
   }
 
-  get bookmarked () {
-    return this.props.activeFrameKey !== undefined &&
-      this.props.bookmarked
-  }
-
   componentDidMount () {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, () => this.onToggleBookmark())
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark())
@@ -115,10 +111,12 @@ class NavigationBar extends React.Component {
     const activeTabShowingMessageBox = tabState.isShowingMessageBox(state, activeTabId)
     const bookmarkDetail = currentWindow.get('bookmarkDetail')
     const mouseInTitlebar = currentWindow.getIn(['ui', 'mouseInTitlebar'])
-    const title = activeFrame.get('title') || ''
+    const title = activeFrame.get('title', '')
     const loading = activeFrame.get('loading')
-    const location = activeFrame.get('location') || ''
-    const navbar = activeFrame.get('navbar') || Immutable.Map()
+    const location = activeFrame.get('location', '')
+    const locationId = getBaseUrl(location)
+    const publisherId = state.getIn(['locationInfo', locationId, 'publisher'])
+    const navbar = activeFrame.get('navbar', Immutable.Map())
 
     const hasTitle = title && location && title !== location.replace(/^https?:\/\//, '')
     const titleMode = activeTabShowingMessageBox ||
@@ -134,25 +132,20 @@ class NavigationBar extends React.Component {
       )
 
     const props = {}
-
-    props.navbar = navbar
-    props.sites = state.get('sites') // TODO(nejc) remove, primitives only
+    // used in renderer
     props.activeFrameKey = activeFrameKey
-    props.location = location
-    props.title = title
-    props.bookmarked = activeTab && activeTab.get('bookmarked')
-    props.partitionNumber = activeFrame.get('partitionNumber') || 0
-    props.isSecure = activeFrame.getIn(['security', 'isSecure'])
-    props.loading = loading
-    props.showBookmarkHanger = bookmarkDetail && bookmarkDetail.get('isBookmarkHanger')
-    props.mouseInTitlebar = mouseInTitlebar
-    props.settings = state.get('settings')
-    props.siteSettings = state.get('siteSettings')
-    props.synopsis = state.getIn(['publisherInfo', 'synopsis']) || new Immutable.Map()
-    props.activeTabShowingMessageBox = activeTabShowingMessageBox
-    props.locationInfo = state.get('locationInfo')
     props.titleMode = titleMode
-    props.isWideURLbarEnabled = getSetting(settings.WIDE_URL_BAR)
+    props.isBookmarked = props.activeFrameKey !== undefined &&
+      activeTab && activeTab.get('bookmarked')
+    props.isWideUrlBarEnabled = getSetting(settings.WIDE_URL_BAR)
+    props.showBookmarkHanger = bookmarkDetail && bookmarkDetail.get('isBookmarkHanger')
+    props.isLoading = loading
+    props.showPublisherToggle = publisherState.shouldShowAddPublisherButton(state, location, publisherId)
+    props.showHomeButton = !props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
+
+    // used in other functions
+    props.navbar = navbar // TODO(nejc) remove, primitives only
+    props.sites = state.get('sites') // TODO(nejc) remove, primitives only
     props.activeTabId = activeTabId
     props.showHomeButton = !props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
 
@@ -160,17 +153,16 @@ class NavigationBar extends React.Component {
   }
 
   render () {
-    if (this.props.activeFrameKey === undefined ||
-        this.props.siteSettings === undefined) {
+    if (this.props.dontRender) {
       return null
     }
 
-    return <div id='navigator'
-      ref='navigator'
+    return <div
+      id='navigator'
       data-frame-key={this.props.activeFrameKey}
       className={cx({
         titleMode: this.props.titleMode,
-        [css(styles.navigator_wide)]: this.props.isWideURLbarEnabled
+        [css(styles.navigator_wide)]: this.props.isWideUrlBarEnabled
       })}>
       {
         this.props.showBookmarkHanger
@@ -180,7 +172,7 @@ class NavigationBar extends React.Component {
       {
         this.props.titleMode
         ? null
-        : this.props.loading
+        : this.props.isLoading
           ? <span className='navigationButtonContainer'>
             <button data-l10n-id='stopButton'
               className='normalizeButton navigationButton stopButton'
@@ -203,11 +195,11 @@ class NavigationBar extends React.Component {
         {
           !this.props.titleMode
           ? <span className='bookmarkButtonContainer'>
-            <button data-l10n-id={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
+            <button data-l10n-id={this.props.isBookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
               className={cx({
                 navigationButton: true,
                 bookmarkButton: true,
-                removeBookmarkButton: this.bookmarked,
+                removeBookmarkButton: this.props.isBookmarked,
                 withHomeButton: getSetting(settings.SHOW_HOME_BUTTON),
                 normalizeButton: true
               })}
@@ -221,18 +213,11 @@ class NavigationBar extends React.Component {
         onStop={this.onStop}
         />
       {
-        isSourceAboutUrl(this.props.location)
-        ? null
-        : <div className='endButtons'>
-          {
-            <PublisherToggle
-              location={this.props.location}
-              locationInfo={this.props.locationInfo}
-              siteSettings={this.props.siteSettings}
-              synopsis={this.props.synopsis}
-            />
-          }
+        this.props.showPublisherToggle
+        ? <div className='endButtons'>
+          <PublisherToggle />
         </div>
+        : null
       }
     </div>
   }
