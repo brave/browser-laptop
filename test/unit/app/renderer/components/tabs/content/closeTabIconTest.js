@@ -12,6 +12,7 @@ require('../../../../../braveUnit')
 
 const tabId = 1
 const frameKey = 1
+const invalidFrameKey = 71
 
 const fakeAppStoreRenderer = {
   state: Immutable.fromJS({
@@ -134,6 +135,12 @@ describe('Tabs content - CloseTabIcon', function () {
       })
       const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
       assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-on')
+    })
+
+    it('passing in a frame key which does not exist does not fail', function () {
+      windowStore.state = defaultWindowStore
+      const wrapper = mount(<CloseTabIcon frameKey={invalidFrameKey} />)
+      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-off')
     })
   })
 

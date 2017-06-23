@@ -15,6 +15,7 @@ const url1 = 'https://brave.com'
 const pageTitle1 = 'Brave Software'
 const tabId = 1
 const frameKey = 1
+const invalidFrameKey = 71
 
 const fakeAppStoreRenderer = {
   state: Immutable.fromJS({
@@ -137,6 +138,11 @@ describe('Tabs content - Title', function () {
       })
       const wrapper = mount(<Tab frameKey={frameKey} />)
       assert.equal(wrapper.find('TabTitle div').text(), pageTitle1)
+    })
+    it('passing in a frame key which does not exist does not fail', function () {
+      windowStore.state = defaultWindowStore
+      const wrapper = mount(<Tab frameKey={invalidFrameKey} />)
+      assert.equal(wrapper.find('TabTitle div').text(), '')
     })
   })
 

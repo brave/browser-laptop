@@ -4,6 +4,7 @@
 
 const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
+const Immutable = require('immutable')
 
 // Components
 const ReduxComponent = require('../../reduxComponent')
@@ -43,7 +44,10 @@ class AudioTabIcon extends React.Component {
 
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey)
+
+    // AudioIcon will never be created if there is no frameKey, but for consistency
+    // across other components I added teh || Immutable.Map()
+    const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey) || Immutable.Map()
 
     const props = {}
     // used in other functions

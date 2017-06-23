@@ -13,6 +13,7 @@ require('../../../../../braveUnit')
 
 const tabId = 1
 const frameKey = 1
+const invalidFrameKey = 71
 
 const fakeAppStoreRenderer = {
   state: Immutable.fromJS({
@@ -144,6 +145,11 @@ describe('Tabs content - NewSessionIcon', function () {
       })
       const wrapper = mount(<NewSessionIcon frameKey={frameKey} />)
       assert.equal(wrapper.find('TabIcon').props().symbolContent, tabs.maxAllowedNewSessions)
+    })
+    it('passing in a frame key which does not exist does not fail', function () {
+      windowStore.state = defaultWindowStore
+      const wrapper = mount(<NewSessionIcon frameKey={invalidFrameKey} />)
+      assert(wrapper.find('TabIcon'))
     })
   })
 
