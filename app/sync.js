@@ -28,7 +28,7 @@ const SYNC_ACTIONS = Object.values(syncConstants)
 
 // Fields that should trigger a sync SEND when changed
 const SYNC_FIELDS = {
-  sites: ['location', 'customTitle', 'folderId', 'parentFolderId'],
+  sites: ['location', 'customTitle', 'folderId', 'parentFolderId', 'tags'],
   siteSettings: Object.keys(syncUtil.siteSettingDefaults)
 }
 
@@ -67,6 +67,7 @@ const appStoreChangeCallback = function (diffs) {
     }
 
     const type = path[1]
+    const field = path[3]
     const isSite = type === 'sites'
 
     const fieldsToPick = SYNC_FIELDS[type]
@@ -74,22 +75,33 @@ const appStoreChangeCallback = function (diffs) {
       return
     }
 
+    const statePath = path.slice(1, 3).map((item) => item.replace(/~1/g, '/'))
+    if (field === 'skipSync' && diff.value === true) {
+      // Remove the flag so that this gets synced next time it is updated
+      appActions.setSkipSync(statePath, false)
+      return
+    }
+
     const isInsert = diff.op === 'add' && path.length === 3
-    const isUpdate = fieldsToPick.includes(path[3]) // Ignore insignicant updates
+    const isUpdate = fieldsToPick.includes(field) // Ignore insignicant updates
 
     // DELETES are handled in appState because the old object is no longer
     // available by the time emitChanges is received
     if (isInsert || isUpdate) {
       // Get the item's path and entry in appStore
-      const statePath = path.slice(1, 3).map((item) => item.replace(/~1/g, '/'))
       const entry = AppStore.getState().getIn(statePath)
       if (!entry || !entry.toJS) {
+        return
+      }
+      if (entry.get('skipSync')) {
+        // Remove the flag so that this gets synced next time it is updated
+        appActions.setSkipSync(statePath, false)
         return
       }
 
       let action = null
 
-      if (isInsert && !entry.get('skipSync')) {
+      if (isInsert) {
         // Send UPDATE instead of CREATE for sites to work around sync#111
         action = isSite ? writeActions.UPDATE : writeActions.CREATE
       } else if (isUpdate) {
