@@ -178,6 +178,7 @@
     "node-static": "^0.7.7",
     "nsp": "^2.2.0",
     "pre-commit": "brave/pre-commit",
+    "pre-push": "^0.1.1",
     "react-addons-perf": "^15.2.1",
     "react-addons-test-utils": "^15.4.1",
     "react-test-renderer": "^15.5.4",
@@ -223,10 +224,15 @@
   },
   "pre-commit": {
     "run": [
-      "lint",
       "docs"
     ],
     "template": "COMMIT_TEMPLATE"
+  },
+  "pre-push": {
+    "run": [
+      "lint",
+      "unittest"
+    ]
   },
   "engineStrict": true,
   "engines": {
