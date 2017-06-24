@@ -354,6 +354,9 @@ const doAction = (action) => {
     case windowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
       windowState = windowState.set('closedFrames', new Immutable.List())
       break
+    case windowConstants.WINDOW_SET_PREVIEW_MODE:
+      windowState = windowState.setIn(['ui', 'tabs', 'previewMode'], action.shouldEnablePreview)
+      break
     case windowConstants.WINDOW_SET_PREVIEW_FRAME:
       windowState = windowState.merge({
         previewFrameKey:

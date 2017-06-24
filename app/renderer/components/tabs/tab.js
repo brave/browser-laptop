@@ -51,6 +51,7 @@ const {hasBreakpoint} = require('../../lib/tabUtil')
 class Tab extends React.Component {
   constructor (props) {
     super(props)
+    this.onMouseMove = this.onMouseMove.bind(this)
     this.onMouseEnter = this.onMouseEnter.bind(this)
     this.onMouseLeave = this.onMouseLeave.bind(this)
     this.onUpdateTabSize = this.onUpdateTabSize.bind(this)
@@ -130,27 +131,47 @@ class Tab extends React.Component {
     dnd.onDragOver(dragTypes.TAB, this.tabNode.getBoundingClientRect(), this.props.frameKey, this.draggingOverData, e)
   }
 
-  onMouseLeave () {
+  onMouseLeave (e) {
+    windowActions.setTabHoverState(this.props.frameKey, false)
+
     if (this.props.previewTabs) {
-      window.clearTimeout(this.hoverTimeout)
-      windowActions.setPreviewFrame(null)
+      clearTimeout(this.mouseTimeout)
+      // Matches tab_, tabArea, tabTitle, tabId, closeTab and
+      // all tab icons such as favicon, private and new session
+      const tabComponents = /tab(?=_|area|title|id)|closetab|icon/i
+      const tabAsRelatedTarget = tabComponents.test(e.relatedTarget.classList)
+
+      // We are taking for granted that user hovering over another tab
+      // means that he wants to sequentially preview a set of tabs,
+      // so if previewMode was set by defined mouse idle time,
+      // only cancel previewMode if the next event doesn't happen in another tab.
+      if (!tabAsRelatedTarget) {
+        windowActions.setPreviewFrame(null)
+        windowActions.setPreviewMode(false)
+      }
     }
     windowActions.setTabHoverState(this.props.frameKey, false)
   }
 
   onMouseEnter (e) {
-    // relatedTarget inside mouseenter checks which element before this event was the pointer on
-    // if this element has a tab-like class, then it's likely that the user was previewing
-    // a sequency of tabs. Called here as previewMode.
-    const previewMode = /tab(?!pages)/i.test(e.relatedTarget.classList)
-
-    // If user isn't in previewMode, we add a bit of delay to avoid tab from flashing out
-    // as reported here: https://github.com/brave/browser-laptop/issues/1434
-    if (this.props.previewTabs) {
-      this.hoverTimeout =
-        window.setTimeout(windowActions.setPreviewFrame.bind(null, this.props.frameKey), previewMode ? 0 : 200)
-    }
     windowActions.setTabHoverState(this.props.frameKey, true)
+
+    this.mouseTimeout = null
+    if (this.props.previewTabs && this.props.previewMode) {
+      windowActions.setPreviewFrame(this.props.frameKey)
+    }
+  }
+
+  onMouseMove (e) {
+    // previewMode is only triggered if mouse is idle over a tab
+    // for a given amount of time based on timing defined in prefs->tabs
+    if (this.props.previewTabs) {
+      clearTimeout(this.mouseTimeout)
+      this.mouseTimeout = setTimeout(() => {
+        windowActions.setPreviewFrame(this.props.frameKey)
+        windowActions.setPreviewMode(true)
+      }, getSetting(settings.TAB_PREVIEW_TIMING))
+    }
   }
 
   onAuxClick (e) {
@@ -274,6 +295,7 @@ class Tab extends React.Component {
     props.dragData = state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')
     props.hasTabInFullScreen = tabContentState.hasTabInFullScreen(currentWindow)
     props.tabId = frame.get('tabId')
+    props.previewMode = currentWindow.getIn(['ui', 'tabs', 'previewMode'])
 
     return props
   }
@@ -300,6 +322,7 @@ class Tab extends React.Component {
         partOfFullPageSet: this.props.partOfFullPageSet || !!this.props.tabWidth
       })}
       style={this.props.tabWidth ? { flex: `0 0 ${this.props.tabWidth}px` } : {}}
+      onMouseMove={this.onMouseMove}
       onMouseEnter={this.onMouseEnter}
       onMouseLeave={this.onMouseLeave}>
       {

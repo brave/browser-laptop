@@ -233,6 +233,7 @@ AppStore
     'tabs.close-action': string, // one of: parent, lastActive, next
     'tabs.paint-tabs': boolean, // true if the page theme color and favicon color should be used for tabs
     'tabs.show-tab-previews': boolean, // true to show tab previews
+    'tabs.preview-timing': boolean, // how much in milliseconds user should wait before tab preview is fired
     'tabs.switch-to-new-tabs': boolean, // true if newly opened tabs should be focused immediately
     'tabs.tabs-per-page': number // number of tabs per tab page
   },
@@ -665,8 +666,9 @@ WindowStore
     },
     size: array, // last known window size [x, y]
     tabs: {
-      tabPageIndex: number, // index of the current tab page
+      previewMode: boolean, // whether or not tab preview should be fired based on mouse idle time
       previewTabPageIndex: number // index of the tab being previewed
+      tabPageIndex: number, // index of the current tab page
     },
   },
   widevinePanelDetail: {

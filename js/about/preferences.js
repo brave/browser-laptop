@@ -34,7 +34,15 @@ const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const {changeSetting} = require('../../app/renderer/lib/settingsUtil')
 const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
-const {startsWithOption, newTabMode, bookmarksToolbarMode, tabCloseAction, fullscreenOption, autoplayOption} = require('../../app/common/constants/settingsEnums')
+const {
+  startsWithOption,
+  newTabMode,
+  bookmarksToolbarMode,
+  tabCloseAction,
+  fullscreenOption,
+  autoplayOption,
+  tabPreviewTiming
+} = require('../../app/common/constants/settingsEnums')
 
 const aboutActions = require('./aboutActions')
 const appActions = require('../actions/appActions')
@@ -365,6 +373,19 @@ class TabsTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='switchToNewTabs' prefKey={settings.SWITCH_TO_NEW_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='paintTabs' prefKey={settings.PAINT_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='showTabPreviews' prefKey={settings.SHOW_TAB_PREVIEWS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        {
+          getSetting(settings.SHOW_TAB_PREVIEWS, this.props.settings)
+            ? <SettingItem dataL10nId='tabPreviewTiming'>
+              <SettingDropdown
+                value={getSetting(settings.TAB_PREVIEW_TIMING, this.props.settings)}
+                onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TAB_PREVIEW_TIMING)}>
+                <option data-l10n-id='long' value={tabPreviewTiming.LONG} />
+                <option data-l10n-id='normal' value={tabPreviewTiming.NORMAL} />
+                <option data-l10n-id='short' value={tabPreviewTiming.SHORT} />
+              </SettingDropdown>
+            </SettingItem>
+            : null
+        }
         <SettingItem dataL10nId='dashboardSettingsTitle'>
           <SettingCheckbox dataL10nId='dashboardShowImages' prefKey={settings.SHOW_DASHBOARD_IMAGES} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         </SettingItem>
