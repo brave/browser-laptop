@@ -658,7 +658,7 @@ const api = {
     return true
   },
 
-  create: (createProperties, cb = null, isRestore = false) => {
+  create: (createProperties, cb = null, isRestore = false, skipIfTest = true) => {
     const appState = appStore.getState()
     let shouldShowWelcomeScreen = appState.getIn(['about', 'welcome', 'showOnLoad'])
 
@@ -679,7 +679,7 @@ const api = {
       if (!createProperties.url) {
         createProperties.url = newFrameUrl()
         // don't open welcome screen for general tests
-        if (process.env.NODE_ENV === 'test') {
+        if (skipIfTest && process.env.NODE_ENV === 'test') {
           shouldShowWelcomeScreen = false
         }
         if (shouldShowWelcomeScreen !== false) {

@@ -90,29 +90,6 @@ describe('about:newtab tests', function () {
     })
   })
 
-  describe('first time run', function () {
-    Brave.beforeAll(this)
-
-    before(function * () {
-      yield setup(this.app.client)
-    })
-
-    it('shows welcome screen instead of new tab page for first time run', function * () {
-      // TODO: Find a better way to run this test with
-      // an specific NODE_ENV to avoid calling welcome screen on every test
-      if (process.env.NODE_ENV !== 'welcomeScreenTest') {
-        return
-      }
-      yield this.app.client.onClearBrowsingData({browserHistory: true})
-
-      yield this.app.client
-        .waitForBrowserWindow()
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist('[data-test-active-tab][data-frame-key="2"]')
-        .waitForVisible('[data-test-id="welcomeIframe"]')
-    })
-  })
-
   describe.skip('with NEWTAB_MODE === NEW_TAB_PAGE', function () {
     describe('when displaying stats', function () {
       Brave.beforeEach(this)
