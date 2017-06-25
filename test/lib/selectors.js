@@ -128,5 +128,9 @@ module.exports = {
   downloadRemoveFromList: '[data-test-id="downloadRemoveFromList"]',
 
   siteInfoDialog: '[data-test-id="siteInfoDialog"]',
-  viewCertificateButton: '[data-test-id="viewCertificate"]'
+  viewCertificateButton: '[data-test-id="viewCertificate"]',
+
+  // about:preferences#tabs
+  tabsPerTabPageActiveOption: '[data-test-id="tabsPerTabPageOption"][data-test-active="true"]',
+  tabCloseActionActiveOption: '[data-test-id="tabCloseActionActiveOption"][data-test-active="true"]'
 }
