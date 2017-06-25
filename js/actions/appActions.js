@@ -1428,8 +1428,20 @@ const appActions = {
     dispatch({
       actionType: appConstants.APP_UPDATE_LOG_OPENED
     })
-  }
+  },
 
+  /**
+  * Dispatches a message to the store to show the welcome screen.
+  *
+  * @param {Boolean} shouldShowWelcomeScreen - true if a new tab
+  * with the welcome screen should be show
+  */
+  activateWelcomeScreen: function (activateWelcomeScreen) {
+    dispatch({
+      actionType: appConstants.APP_ACTIVATE_WELCOME_SCREEN,
+      activateWelcomeScreen
+    })
+  }
 }
 
 module.exports = appActions

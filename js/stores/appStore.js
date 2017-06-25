@@ -404,7 +404,8 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/dragDropReducer'),
       require('../../app/browser/reducers/extensionsReducer'),
       require('../../app/browser/reducers/shareReducer'),
-      require('../../app/browser/reducers/updatesReducer')
+      require('../../app/browser/reducers/updatesReducer'),
+      require('../../app/browser/reducers/aboutWelcomeReducer')
     ]
     initialized = true
     appState = action.appState

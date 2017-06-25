@@ -9,7 +9,7 @@ const fakeAdBlock = require('../../lib/fakeAdBlock')
 
 require('../../braveUnit')
 
-describe('tabs API', function () {
+describe('tabs API unit tests', function () {
   let tabs, appActions
   before(function () {
     mockery.enable({
@@ -59,9 +59,28 @@ describe('tabs API', function () {
       }]
     })
 
+    this.appState = {
+      about: {
+        welcome: {
+          showOnLoad: true
+        }
+      }
+    }
+
+    this.appStore = {
+      getState: () => Immutable.fromJS(this.appState)
+    }
+
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('ad-block', fakeAdBlock)
     mockery.registerMock('leveldown', {})
+    mockery.registerMock('../../js/stores/appStore', this.appStore)
+    mockery.registerMock('../../js/l10n', {
+      translation: (word) => word
+    })
+    mockery.registerMock('../filtering', {
+      isResourceEnabled: (resourceName, url, isPrivate) => false
+    })
 
     mockery.registerMock('./webContentsCache', {
       getWebContents: (tabId) => {
@@ -90,25 +109,17 @@ describe('tabs API', function () {
     appActions = require('../../../../js/actions/appActions')
   })
 
-  beforeEach(function () {
-    this.newWindowSpy = sinon.spy(appActions, 'newWindow')
-    this.newWebContentsAddedSpy = sinon.spy(appActions, 'newWebContentsAdded')
-  })
-
   after(function () {
     mockery.disable()
   })
 
-  afterEach(function () {
-    this.tabWithDevToolsClosed.openDevTools.reset()
-    this.tabWithDevToolsClosed.closeDevTools.reset()
-    this.tabWithDevToolsOpened.openDevTools.reset()
-    this.tabWithDevToolsOpened.closeDevTools.reset()
-    this.newWindowSpy.restore()
-    this.newWebContentsAddedSpy.restore()
-  })
-
   describe('toggleDevTools', function () {
+    afterEach(function () {
+      this.tabWithDevToolsClosed.openDevTools.reset()
+      this.tabWithDevToolsClosed.closeDevTools.reset()
+      this.tabWithDevToolsOpened.openDevTools.reset()
+      this.tabWithDevToolsOpened.closeDevTools.reset()
+    })
     it('opens dev tools if closed', function () {
       tabs.toggleDevTools(1)
       assert(this.tabWithDevToolsClosed.openDevTools.calledOnce)
@@ -130,6 +141,7 @@ describe('tabs API', function () {
       assert(this.tabWithDevToolsOpenedAndFocused.closeDevTools.notCalled)
     })
   })
+
   describe('isDevToolsFocused', function () {
     it('returns false if devtools are opened but not focused', function () {
       assert.equal(tabs.isDevToolsFocused(1), false)
@@ -141,11 +153,20 @@ describe('tabs API', function () {
       assert.equal(tabs.isDevToolsFocused(3), true)
     })
   })
+
   describe('moveTo', function () {
     before(function () {
       this.browserOpts = {
         positionByMouseCursor: true
       }
+    })
+    beforeEach(function () {
+      this.newWindowSpy = sinon.spy(appActions, 'newWindow')
+      this.newWebContentsAddedSpy = sinon.spy(appActions, 'newWebContentsAdded')
+    })
+    afterEach(function () {
+      this.newWindowSpy.restore()
+      this.newWebContentsAddedSpy.restore()
     })
     it('moves tab to a new window', function () {
       const state = this.state.set('dragData', Immutable.fromJS({
@@ -318,8 +339,49 @@ describe('tabs API', function () {
     })
   })
 
-  describe.skip('create', function () {
-    it('todo', function () {
+  describe('create', function () {
+    before(function () {
+      this.clock = sinon.useFakeTimers()
+      this.createTabRequestedSpy = sinon.spy(appActions, 'createTabRequested')
+      this.activateWelcomeScreenSpy = sinon.spy(appActions, 'activateWelcomeScreen')
+      this.extensionsCreateTabSpy = sinon.spy(fakeElectron.extensions, 'createTab')
+    })
+
+    after(function () {
+      this.clock.restore()
+      this.createTabRequestedSpy.restore()
+      this.activateWelcomeScreenSpy.restore()
+      this.extensionsCreateTabSpy.restore()
+    })
+
+    const createProperties = Immutable.fromJS({})
+    const cb = null
+    const isRestore = false
+    const skipIfTest = false
+
+    describe('when createProperties.url is not set', function () {
+      it('calls appActions.createTabRequested', function () {
+        this.createTabRequestedSpy.reset()
+        tabs.create(createProperties, cb, isRestore, skipIfTest)
+        this.clock.tick(1510)
+        assert.equal(this.createTabRequestedSpy.calledOnce, true)
+      })
+
+      describe('when welcome screen has not shown yet', function () {
+        it('calls appActions.activateWelcomeScreen if state is true', function () {
+          this.activateWelcomeScreenSpy.reset()
+          tabs.create(createProperties, cb, isRestore, skipIfTest)
+          this.clock.tick(1510)
+          assert.equal(this.activateWelcomeScreenSpy.calledOnce, true)
+        })
+      })
+    })
+
+    it('calls electron.extensions.createTab', function () {
+      this.extensionsCreateTabSpy.reset()
+      tabs.create(createProperties, cb, isRestore, skipIfTest)
+      this.clock.tick(1510)
+      assert.equal(this.extensionsCreateTabSpy.calledOnce, true)
     })
   })
 
