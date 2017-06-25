@@ -854,6 +854,10 @@ describe('sessionStore unit tests', function () {
   })
 
   describe('defaultAppState', function () {
+    it('sets showOnLoad to true (which triggers about:welcome)', function () {
+      const defaultAppState = sessionStore.defaultAppState()
+      assert.equal(defaultAppState.about.welcome.showOnLoad, true)
+    })
   })
 
   describe('isProtocolHandled', function () {
