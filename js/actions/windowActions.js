@@ -1164,6 +1164,30 @@ const windowActions = {
       isFocused,
       shouldRender
     })
+  },
+
+  onMoreBookmarksMenu: function (bookmarks, top) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_MORE_BOOKMARKS_MENU,
+      bookmarks,
+      top
+    })
+  },
+
+  onShowBookmarkFolderMenu: function (bookmarkKey, left, top) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_SHOW_BOOKMARK_FOLDER_MENU,
+      bookmarkKey,
+      left,
+      top
+    })
+  },
+
+  onSiteDetailMenu: function (bookmarkKey) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_SITE_DETAIL_MENU,
+      bookmarkKey
+    })
   }
 }
 

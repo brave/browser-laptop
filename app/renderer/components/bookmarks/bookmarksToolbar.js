@@ -14,12 +14,10 @@ const BookmarkToolbarButton = require('./bookmarkToolbarButton')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
+const windowActions = require('../../../../js/actions/windowActions')
 
 // State
 const windowState = require('../../../common/state/windowState')
-
-// Store
-const windowStore = require('../../../../js/stores/windowStore')
 
 // Constants
 const siteTags = require('../../../../js/constants/siteTags')
@@ -27,7 +25,6 @@ const dragTypes = require('../../../../js/constants/dragTypes')
 
 // Utils
 const {isFocused} = require('../../currentWindow')
-const siteUtil = require('../../../../js/state/siteUtil')
 const contextMenus = require('../../../../js/contextMenus')
 const cx = require('../../../../js/lib/classSet')
 const dnd = require('../../../../js/dnd')
@@ -49,10 +46,6 @@ class BookmarksToolbar extends React.Component {
     this.onMoreBookmarksMenu = this.onMoreBookmarksMenu.bind(this)
   }
 
-  get activeFrame () {
-    return windowStore.getFrame(this.props.activeFrameKey)
-  }
-
   onDrop (e) {
     e.preventDefault()
     const bookmark = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
@@ -62,15 +55,14 @@ class BookmarksToolbar extends React.Component {
         if (!bookmarkRef) {
           return false
         }
-        return !siteUtil.isEquivalent(bookmarkRef.props.bookmark, bookmark)
+        return bookmarkRef.props.bookmarkKey !== bookmark.get('bookmarkKey')
       }), e.clientX)
       if (droppedOn.selectedRef) {
         const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn.selectedRef), e.clientX)
-        const droppedOnSiteDetail = droppedOn.selectedRef.props.bookmark || droppedOn.selectedRef.props.bookmarkFolder
-        const isDestinationParent = droppedOnSiteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER) && droppedOn && droppedOn.isDroppedOn
-        const bookmarkSiteKey = siteUtil.getSiteKey(bookmark)
-        const droppedOnSiteKey = siteUtil.getSiteKey(droppedOnSiteDetail)
-        appActions.moveSite(bookmarkSiteKey, droppedOnSiteKey, isLeftSide, isDestinationParent)
+        const droppedOnKey = droppedOn.selectedRef.props.bookmarkKey
+        const isDestinationParent = droppedOn.selectedRef.props.isFolder && droppedOn && droppedOn.isDroppedOn
+        appActions.moveSite(bookmark.get('bookmarkKey'), droppedOnKey, isLeftSide, isDestinationParent)
+        dnd.onDragEnd()
       }
       return
     }
@@ -128,7 +120,8 @@ class BookmarksToolbar extends React.Component {
   }
 
   onMoreBookmarksMenu (e) {
-    contextMenus.onMoreBookmarksMenu(this.activeFrame, this.props.bookmarks, this.props.hiddenBookmarks, e)
+    const rect = e.target.getBoundingClientRect()
+    windowActions.onMoreBookmarksMenu(this.props.hiddenBookmarks, rect.bottom)
   }
 
   onContextMenu (e) {
@@ -153,14 +146,13 @@ class BookmarksToolbar extends React.Component {
     props.showFavicon = bookmarkUtil.showFavicon()
     props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused()) &&
       !isWindows()
-    props.visibleBookmarks = bookmarks.visibleBookmarks // TODO (nejc) only primitives
-    props.hiddenBookmarks = bookmarks.hiddenBookmarks // TODO (nejc) only primitives
+    props.visibleBookmarks = bookmarks.visibleBookmarks
+    props.hiddenBookmarks = bookmarks.hiddenBookmarks
 
     // used in other functions
     props.activeFrameKey = activeFrame.get('key')
     props.title = activeFrame.get('title')
     props.location = activeFrame.get('location')
-    props.bookmarks = siteUtil.getBookmarks(state.get('sites', Immutable.List())) // TODO (nejc) only primitives
 
     return props
   }
@@ -182,11 +174,11 @@ class BookmarksToolbar extends React.Component {
       onDragOver={this.onDragOver}
       onContextMenu={this.onContextMenu}>
       {
-          this.props.visibleBookmarks.map((bookmark, i) =>
+          this.props.visibleBookmarks.map((bookmarkKey, i) =>
             <BookmarkToolbarButton
               ref={(node) => this.bookmarkRefs.push(node)}
               key={`toolbar-button-${i}`}
-              bookmark={bookmark} />)
+              bookmarkKey={bookmarkKey} />)
       }
       {
         this.props.hiddenBookmarks.size !== 0
