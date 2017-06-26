@@ -109,7 +109,7 @@ const UrlUtil = {
     // - starts with "?" or "."
     // - contains "? "
     // - ends with "." (and was not preceded by a domain or /)
-    const case2Reg = /(^\?)|(\?.+\s)|(^\.)|(^[^.+..+]*[^/]*\.$)/
+    const case2Reg = /(^\?)|(\?.+\s)|(^\.)|(^[^.+]*[^/]*\.$)/
     // for cases, pure string
     const case3Reg = /[?./\s:]/
     // for cases, data:uri, view-source:uri and about
