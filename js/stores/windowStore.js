@@ -260,7 +260,8 @@ const applyReducers = (state, action, immutableAction) => [
 const immediatelyEmittedActions = [
   windowConstants.WINDOW_SET_NAVBAR_INPUT,
   windowConstants.WINDOW_SET_FIND_DETAIL,
-  windowConstants.WINDOW_SET_BOOKMARK_DETAIL,
+  windowConstants.WINDOW_ON_ADD_BOOKMARK,
+  windowConstants.WINDOW_ON_EDIT_BOOKMARK,
   windowConstants.WINDOW_AUTOFILL_POPUP_HIDDEN,
   windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL,
   windowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL,
@@ -456,17 +457,47 @@ const doAction = (action) => {
         }
         break
       }
-    case windowConstants.WINDOW_SET_BOOKMARK_DETAIL:
-      if (!action.currentDetail && !action.originalDetail) {
-        windowState = windowState.delete('bookmarkDetail')
-      } else {
-        windowState = windowState.mergeIn(['bookmarkDetail'], {
-          currentDetail: action.currentDetail,
-          originalDetail: action.originalDetail,
-          destinationDetail: action.destinationDetail,
-          shouldShowLocation: action.shouldShowLocation,
-          isBookmarkHanger: action.isBookmarkHanger
-        })
+    case windowConstants.WINDOW_ON_ADD_BOOKMARK:
+      windowState = windowState.setIn(['bookmarkDetail'], Immutable.fromJS({
+        siteDetail: action.siteDetail,
+        isBookmarkHanger: false,
+        closestKey: action.closestKey
+      }))
+      break
+    case windowConstants.WINDOW_ON_BOOKMARK_CLOSE:
+      windowState = windowState.delete('bookmarkDetail')
+      break
+    case windowConstants.WINDOW_ON_EDIT_BOOKMARK:
+      const siteDetail = appStoreRenderer.state.getIn(['sites', action.editKey])
+
+      windowState = windowState.setIn(['bookmarkDetail'], Immutable.fromJS({
+        siteDetail: siteDetail,
+        editKey: action.editKey,
+        isBookmarkHanger: action.isHanger
+      }))
+      break
+    case windowConstants.WINDOW_ON_BOOKMARK_ADDED:
+      {
+        let editKey = action.editKey
+        const site = appStoreRenderer.state.getIn(['sites', editKey])
+        let siteDetail = action.siteDetail
+
+        if (site) {
+          siteDetail = site
+        }
+
+        if (siteDetail == null) {
+          siteDetail = frameStateUtil.getActiveFrame(windowState)
+        }
+
+        siteDetail = siteDetail.set('location', UrlUtil.getLocationIfPDF(siteDetail.get('location')))
+
+        windowState = windowState.setIn(['bookmarkDetail'], Immutable.fromJS({
+          siteDetail: siteDetail,
+          editKey: editKey,
+          isBookmarkHanger: action.isHanger,
+          isAdded: true
+        }))
       }
       break
     case windowConstants.WINDOW_AUTOFILL_SELECTION_CLICKED:

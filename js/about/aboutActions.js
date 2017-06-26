@@ -4,7 +4,6 @@
 
 const messages = require('../constants/messages')
 const appDispatcher = require('../dispatcher/appDispatcher')
-const windowConstants = require('../constants/windowConstants')
 const appConstants = require('../constants/appConstants')
 const ExtensionConstants = require('../../app/common/constants/extensionConstants')
 const ipc = window.chrome.ipcRenderer
@@ -353,51 +352,6 @@ const aboutActions = {
     aboutActions.dispatchAction({
       actionType: appConstants.APP_UPDATE_ADBLOCK_CUSTOM_RULES,
       rules
-    })
-  },
-
-  /**
-   * Show the "Add Bookmark" control
-   * @param {Object} siteDetail - object bound to add/edit control
-   */
-  showAddBookmark: function (siteDetail) {
-    aboutActions.dispatchAction({
-      actionType: windowConstants.WINDOW_SET_BOOKMARK_DETAIL,
-      currentDetail: siteDetail,
-      originalDetail: null,
-      destinationDetail: null,
-      shouldShowLocation: true
-    })
-  },
-
-  /**
-   * Show the "Add Bookmark" control for a folder
-   * @param {Object} siteDetail - object bound to add/edit control
-   */
-  showAddBookmarkFolder: function (siteDetail) {
-    aboutActions.dispatchAction({
-      actionType: windowConstants.WINDOW_SET_BOOKMARK_DETAIL,
-      currentDetail: siteDetail
-    })
-  },
-
-  /**
-   * Dispatches a message to set add/edit bookmark details
-   * If set, also indicates that add/edit is shown
-   * @param {Object} currentDetail - Properties of the bookmark to change to
-   * @param {Object} originalDetail - Properties of the bookmark to edit
-   * @param {Object} destinationDetail - Will move the added bookmark to the specified position
-   * @param {boolean} shouldShowLocation - Whether or not to show the URL input
-   * @param {boolean} isBookmarkHanger - true if triggered from star icon in nav bar
-   */
-  setBookmarkDetail: function (currentDetail, originalDetail, destinationDetail, shouldShowLocation, isBookmarkHanger) {
-    aboutActions.dispatchAction({
-      actionType: windowConstants.WINDOW_SET_BOOKMARK_DETAIL,
-      currentDetail,
-      originalDetail,
-      destinationDetail,
-      shouldShowLocation,
-      isBookmarkHanger
     })
   },
 

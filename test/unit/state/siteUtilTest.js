@@ -273,7 +273,8 @@ describe('siteUtil', function () {
           let state = emptyState
           state = siteUtil.addSite(state, folderMinFields, siteTags.BOOKMARK_FOLDER)
           const folderMinFieldsWithId = folderMinFields.set('folderId', 1)
-          state = siteUtil.addSite(state, folderMinFieldsWithId, siteTags.BOOKMARK_FOLDER, folderMinFieldsWithId.set('folderId', 9))
+          const oldKey = siteUtil.getSiteKey(folderMinFieldsWithId.set('folderId', 9))
+          state = siteUtil.addSite(state, folderMinFieldsWithId, siteTags.BOOKMARK_FOLDER, false, oldKey)
           const processedKey = siteUtil.getSiteKey(folderMinFieldsWithId)
           const folderId = state.getIn(['sites', processedKey, 'folderId'])
           assert.equal(folderId, 1)
@@ -418,7 +419,7 @@ describe('siteUtil', function () {
         })
         let sites = {}
         sites[oldSiteKey] = oldSiteDetail.toJS()
-        const state = siteUtil.addSite(Immutable.fromJS({sites}), newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
+        const state = siteUtil.addSite(Immutable.fromJS({sites}), newSiteDetail, siteTags.BOOKMARK, oldSiteKey)
         const expectedSiteKey = siteUtil.getSiteKey(expectedSiteDetail)
         let expectedSites = {}
         expectedSites[expectedSiteKey] = expectedSiteDetail.toJS()
@@ -443,7 +444,7 @@ describe('siteUtil', function () {
         })
         let sites = {}
         sites[oldSiteKey] = oldSiteDetail.toJS()
-        const state = siteUtil.addSite(Immutable.fromJS({sites}), newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
+        const state = siteUtil.addSite(Immutable.fromJS({sites}), newSiteDetail, siteTags.BOOKMARK, oldSiteKey)
         const expectedSites = {}
         const expectedSiteKey = siteUtil.getSiteKey(newSiteDetail)
         expectedSites[expectedSiteKey] = newSiteDetail.set('order', 0).set('objectId', undefined).toJS()
@@ -455,6 +456,7 @@ describe('siteUtil', function () {
           location: testUrl1,
           title: 'a brave title'
         })
+        const oldSiteKey = siteUtil.getSiteKey(oldSiteDetail)
         const newSiteDetail = Immutable.fromJS({
           tags: [siteTags.BOOKMARK],
           location: testUrl1,
@@ -462,7 +464,7 @@ describe('siteUtil', function () {
         })
 
         const sites = Immutable.fromJS([oldSiteDetail])
-        const state = siteUtil.addSite(Immutable.fromJS({sites}), newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
+        const state = siteUtil.addSite(Immutable.fromJS({sites}), newSiteDetail, siteTags.BOOKMARK, oldSiteKey)
         const expectedSites = sites
         assert.deepEqual(
           state.getIn(['sites', 0, 'lastAccessedTime']),
@@ -501,7 +503,7 @@ describe('siteUtil', function () {
         })
         let sites = {}
         sites[oldSiteKey] = oldSiteDetail.toJS()
-        const state = siteUtil.addSite(Immutable.fromJS({sites}), newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
+        const state = siteUtil.addSite(Immutable.fromJS({sites}), newSiteDetail, siteTags.BOOKMARK, oldSiteKey)
         const expectedSiteKey = siteUtil.getSiteKey(expectedSiteDetail)
         let expectedSites = {}
         expectedSites[expectedSiteKey] = expectedSiteDetail.set('objectId', undefined).toJS()
@@ -536,14 +538,14 @@ describe('siteUtil', function () {
           title: 'new title',
           customTitle: 'new customTitle'
         })
-        const siteKey = siteUtil.getSiteKey(oldSiteDetail)
+        const oldSiteKey = siteUtil.getSiteKey(oldSiteDetail)
         const sites = {
-          [siteKey]: oldSiteDetail
+          [oldSiteKey]: oldSiteDetail
         }
-        const state = siteUtil.addSite(Immutable.fromJS({sites}), newSiteDetail, siteTags.BOOKMARK, oldSiteDetail, true)
+        const state = siteUtil.addSite(Immutable.fromJS({sites}), newSiteDetail, siteTags.BOOKMARK, oldSiteKey, true)
         mockery.deregisterMock('./stores/appStoreRenderer')
         mockery.disable()
-        assert.equal(state.getIn(['sites', siteKey, 'skipSync']), true)
+        assert.equal(state.getIn(['sites', oldSiteKey, 'skipSync']), true)
       })
     })
   })

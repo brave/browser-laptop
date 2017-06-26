@@ -14,6 +14,8 @@ const tabState = require('../../common/state/tabState')
 const urlBarSuggestionsReducer = (state, action) => {
   switch (action.actionType) {
     case appConstants.APP_ADD_SITE:
+    case appConstants.APP_ADD_BOOKMARK:
+    case appConstants.APP_EDIT_BOOKMARK:
       if (Immutable.List.isList(action.siteDetail)) {
         action.siteDetail.forEach((s) => {
           add(s)

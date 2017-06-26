@@ -137,7 +137,9 @@ const appConstants = {
   APP_URL_BAR_SELECTED_INDEX_CHANGED: _,
   APP_ON_TOGGLE_BROWSING_DATA: _,
   APP_ON_CANCEL_BROWSING_DATA: _,
-  APP_SET_SKIP_SYNC: _
+  APP_SET_SKIP_SYNC: _,
+  APP_ADD_BOOKMARK: _,
+  APP_EDIT_BOOKMARK: _
 }
 
 module.exports = mapValuesByKeys(appConstants)
