@@ -270,7 +270,7 @@ class Navigator extends React.Component {
       }
       {
         this.props.isCaptionButton
-          ? <span className='buttonSeparator' />
+          ? <span className={css(styles.topLevelEndButtons__buttonSeparator)} />
           : null
       }
     </div>
@@ -279,7 +279,7 @@ class Navigator extends React.Component {
   get extensionButtons () {
     let buttons = this.props.extensionBrowserActions.map((id) => <BrowserAction extensionId={id} />).values()
     buttons = Array.from(buttons)
-    buttons.push(<span className='buttonSeparator' />)
+    buttons.push(<span className={css(styles.topLevelEndButtons__buttonSeparator)} />)
 
     return buttons
   }
@@ -497,6 +497,12 @@ const styles = StyleSheet.create({
   // TODO (Suguru): Refactor navigationBar.less to remove !important
   topLevelEndButtons__extraDragArea_disabled: {
     display: 'none !important'
+  },
+
+  topLevelEndButtons__buttonSeparator: {
+    width: '1px',
+    borderLeft: '1px solid #e2e2e2',
+    margin: '4px 3px 4px 3px'
   },
 
   braveMenuButton: {
