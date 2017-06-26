@@ -113,7 +113,7 @@ class ExtensionsTab extends ImmutableComponent {
           headings={['icon', 'name', 'description', 'version', 'enabled'] /* 'exclude' */}
           columnClassNames={this.columnClassNames}
           rowClassNames={
-            this.props.extensions.map(entry => (entry = css(styles.extensionsRow))).toJS()
+            this.props.extensions.map(entry => css(styles.extensionsRow)).toJS()
           }
           rows={this.props.extensions.map(entry => this.getRow(entry))} />
       </main>
