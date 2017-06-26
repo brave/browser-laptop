@@ -1288,7 +1288,7 @@ function onUrlBarContextMenu (e) {
 
 function onFindBarContextMenu (e) {
   e.stopPropagation()
-  const findBarMenu = Menu.buildFromTemplate(findBarTemplateInit(e))
+  const findBarMenu = Menu.buildFromTemplate(findBarTemplateInit())
   findBarMenu.popup(getCurrentWindow())
 }
 
