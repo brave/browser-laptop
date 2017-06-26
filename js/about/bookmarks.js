@@ -16,6 +16,7 @@ const SortableTable = require('../../app/renderer/components/common/sortableTabl
 const siteUtil = require('../state/siteUtil')
 const formatUtil = require('../../app/common/lib/formatUtil')
 const {iconSize} = require('../constants/config')
+const windowActions = require('../actions/windowActions')
 
 const ipc = window.chrome.ipcRenderer
 
@@ -201,7 +202,7 @@ class BookmarkTitleHeader extends ImmutableComponent {
       parentFolderId: this.props.selectedFolderId,
       tags: [siteTags.BOOKMARK]
     })
-    aboutActions.showAddBookmark(newBookmark)
+    windowActions.addBookmark(newBookmark)
   }
   render () {
     return <div className='th-inner'>
@@ -444,7 +445,7 @@ class AboutBookmarks extends React.Component {
       parentFolderId: this.state.selectedFolderId,
       tags: [siteTags.BOOKMARK_FOLDER]
     })
-    aboutActions.showAddBookmarkFolder(newFolder)
+    windowActions.addBookmark(newFolder)
   }
   clearSelection () {
     this.refs.bookmarkList.clearSelection()

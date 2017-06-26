@@ -8,150 +8,64 @@ const Immutable = require('immutable')
 // Components
 const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../common/dialog')
-const BrowserButton = require('../common/browserButton')
+const AddEditBookmarkForm = require('./addEditBookmarkForm')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
 const windowActions = require('../../../../js/actions/windowActions')
 
 // Constants
-const KeyCodes = require('../../../common/constants/keyCodes')
 const siteTags = require('../../../../js/constants/siteTags')
 const settings = require('../../../../js/constants/settings')
 
 // Utils
 const cx = require('../../../../js/lib/classSet')
 const siteUtil = require('../../../../js/state/siteUtil')
-const UrlUtil = require('../../../../js/lib/urlutil')
 const {getSetting} = require('../../../../js/settings')
 const {bookmarkHangerHeading, displayBookmarkName, isBookmarkNameValid} = require('../../../common/lib/bookmarkUtil')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../styles/global')
-const commonStyles = require('../styles/commonStyles')
 
 const {
   CommonFormBookmarkHanger,
-  CommonFormSection,
-  CommonFormDropdown,
-  CommonFormTextbox,
-  CommonFormButtonWrapper,
-  CommonFormBottomWrapper,
-  commonFormStyles
+  CommonFormBottomWrapper
 } = require('../common/commonForm')
 
 class AddEditBookmarkHanger extends React.Component {
   constructor (props) {
     super(props)
-    this.onNameChange = this.onNameChange.bind(this)
-    this.onLocationChange = this.onLocationChange.bind(this)
-    this.onParentFolderChange = this.onParentFolderChange.bind(this)
-    this.onKeyDown = this.onKeyDown.bind(this)
     this.onClose = this.onClose.bind(this)
     this.onClick = this.onClick.bind(this)
-    this.onSave = this.onSave.bind(this)
     this.onViewBookmarks = this.onViewBookmarks.bind(this)
-    this.onRemoveBookmark = this.onRemoveBookmark.bind(this)
-  }
-
-  setDefaultFocus () {
-    this.bookmarkName.select()
-    this.bookmarkName.focus()
   }
 
   componentDidMount () {
-    // Automatically save if this is triggered by the url star
-    if (!this.props.isModal && !this.props.shouldShowLocation) {
-      this.onSave(false)
-    }
-    this.bookmarkName.value = displayBookmarkName(this.props.currentDetail)
-    this.setDefaultFocus()
-  }
-
-  onKeyDown (e) {
-    switch (e.keyCode) {
-      case KeyCodes.ENTER:
-        this.onSave()
-        break
-      case KeyCodes.ESC:
-        this.onClose()
-        break
-    }
+    this.addBookmark()
   }
 
   onClose () {
-    windowActions.setBookmarkDetail()
+    windowActions.onBookmarkClose()
   }
 
   onClick (e) {
     e.stopPropagation()
   }
 
-  onNameChange (e) {
-    let currentDetail = this.props.currentDetail
-    let name = e.target.value
-    if (typeof name === 'string' && UrlUtil.isURL(name)) {
-      const punycodeUrl = UrlUtil.getPunycodeUrl(name)
-      if (punycodeUrl.replace(/\/$/, '') !== name) {
-        name = punycodeUrl
-      }
+  addBookmark () {
+    if (!this.props.isAdded || this.props.isFolder) {
+      return false
     }
-    if (currentDetail.get('title') === name && name) {
-      currentDetail = currentDetail.delete('customTitle')
-    } else {
-      // '' is reserved for the default customTitle value of synced bookmarks,
-      // so replace '' with 0 if the user is deleting the customTitle.
-      // Note that non-string bookmark titles fail isBookmarkNameValid so they
-      // are not saved.
-      currentDetail = currentDetail.set('customTitle', name || 0)
-    }
-    if (this.bookmarkName.value !== name) {
-      this.bookmarkName.value = name
-    }
-    windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail, this.props.destinationDetail, this.props.shouldShowLocation, !this.props.isModal)
-  }
 
-  onLocationChange (e) {
-    let location = e.target.value
-    if (typeof location === 'string') {
-      const punycodeUrl = UrlUtil.getPunycodeUrl(location)
-      if (punycodeUrl.replace(/\/$/, '') !== location) {
-        location = punycodeUrl
-      }
-    }
-    const currentDetail = this.props.currentDetail.set('location', location)
-    windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail, this.props.destinationDetail, this.props.shouldShowLocation, !this.props.isModal)
-  }
-
-  onParentFolderChange (e) {
-    const currentDetail = this.props.currentDetail.set('parentFolderId', Number(e.target.value))
-    windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail, this.props.destinationDetail, undefined, !this.props.isModal)
-  }
-
-  showToolbarOnFirstBookmark () {
     if (!this.props.hasBookmarks && !getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)) {
       appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
     }
-  }
 
-  onSave (closeDialog = true) {
-    // First check if the title of the currentDetail is set
-    if (!this.props.isBookmarkNameValid) {
-      return false
-    }
-    this.showToolbarOnFirstBookmark()
-    const tag = this.props.isFolder ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK
-    appActions.addSite(this.props.currentDetail, tag, this.props.originalDetail, this.props.destinationDetail)
-
-    if (closeDialog) {
-      this.onClose()
-    }
-  }
-
-  onRemoveBookmark () {
-    const tag = this.props.isFolder ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK
-    appActions.removeSite(this.props.currentDetail, tag)
-    this.onClose()
+    appActions.addBookmark(Immutable.fromJS({
+      title: this.props.bookmarkName,
+      location: this.props.location,
+      folderId: this.props.parentId
+    }), siteTags.BOOKMARK)
   }
 
   onViewBookmarks () {
@@ -161,9 +75,10 @@ class AddEditBookmarkHanger extends React.Component {
 
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const bookmarkDetail = currentWindow.get('bookmarkDetail', new Immutable.Map())
-    const currentDetail = bookmarkDetail.get('currentDetail', new Immutable.Map())
-    const originalDetail = bookmarkDetail.get('originalDetail')
+    const bookmarkDetail = currentWindow.get('bookmarkDetail', Immutable.Map())
+    const siteDetail = bookmarkDetail.get('siteDetail') || Immutable.Map()
+    const editMode = bookmarkDetail.has('editKey')
+    const isAdded = bookmarkDetail.get('isAdded', false)
 
     const props = {}
     // used in renderer
@@ -171,21 +86,26 @@ class AddEditBookmarkHanger extends React.Component {
     props.withHomeButton = getSetting(settings.SHOW_HOME_BUTTON)
     // Fake a folderId property so that the bookmark is considered a bookmark folder.
     // This is ImmutableJS so it doesn't actually set a value, it just returns a new one.
-    props.isFolder = siteUtil.isFolder(currentDetail.set('folderId', 0))
-    props.shouldShowLocation = bookmarkDetail.get('shouldShowLocation')
-    props.heading = bookmarkHangerHeading(originalDetail, props.isFolder, props.shouldShowLocation)
-    props.location = currentDetail.get('location')
-    props.parentFolderId = currentDetail.get('parentFolderId')
-    props.hasOriginalDetail = !!originalDetail
-    props.displayBookmarkName = displayBookmarkName(currentDetail)
-    props.isBookmarkNameValid = isBookmarkNameValid(currentDetail, props.isFolder)
-    props.folders = siteUtil.getFolders(state.get('sites'), currentDetail.get('folderId')) // TODO (nejc) improve, primitives only
+    props.isFolder = siteUtil.isFolder(siteDetail.set('folderId', 0))
+    props.heading = bookmarkHangerHeading(editMode, props.isFolder, isAdded)
+    props.location = siteDetail.get('location')
+    props.parentFolderId = siteDetail.get('parentFolderId')
+    props.partitionNumber = siteDetail.get('partitionNumber')
+    props.bookmarkName = displayBookmarkName(siteDetail)
+    props.currentTitle = siteDetail.get('title')
+    props.isBookmarkNameValid = isBookmarkNameValid(
+      siteDetail.get('title'),
+      siteDetail.get('location'),
+      props.isFolder,
+      siteDetail.get('customTitle')
+    )
+    props.folders = siteUtil.getFolders(state.get('sites'), siteDetail.get('folderId')) // TODO (nejc) improve, primitives only
+    props.editKey = bookmarkDetail.get('editKey', null)
+    props.closestKey = bookmarkDetail.get('closestKey', null)
 
     // used in functions
-    props.currentDetail = currentDetail // TODO (nejc) improve, primitives only
-    props.originalDetail = originalDetail // TODO (nejc) improve, primitives only
-    props.destinationDetail = bookmarkDetail.get('destinationDetail') // TODO (nejc) improve, primitives only
-    props.hasBookmarks = state.get('sites').find(
+    props.isAdded = isAdded
+    props.hasBookmarks = state.get('sites').some(
       (site) => siteUtil.isBookmark(site) || siteUtil.isFolder(site)
     )
 
@@ -211,89 +131,19 @@ class AddEditBookmarkHanger extends React.Component {
           [css(styles.commonFormSection)]: true,
           [css(styles.commonFormTitle)]: true
         })} data-l10n-id={this.props.heading} />
-        <CommonFormSection>
-          <div className={css(styles.bookmark__sectionWrapper)}>
-            <section>
-              <label className={css(styles.bookmarkHanger__label)}
-                data-l10n-id='nameField' htmlFor='bookmarkName' />
-              <div className={css(
-                commonFormStyles.inputWrapper,
-                commonFormStyles.inputWrapper__input
-              )}>
-                <input className={css(
-                  commonStyles.formControl,
-                  commonStyles.textbox,
-                  commonStyles.textbox__outlineable,
-                  commonFormStyles.input__box,
-                )}
-                  data-test-id='bookmarkNameInput'
-                  spellCheck='false'
-                  onKeyDown={this.onKeyDown}
-                  onChange={this.onNameChange}
-                  ref={(bookmarkName) => { this.bookmarkName = bookmarkName }}
-                />
-              </div>
-            </section>
-            {
-              !this.props.isFolder && this.props.shouldShowLocation
-              ? <section className={css(styles.bookmarkHanger__marginRow)}>
-                <div className={css(
-                  commonFormStyles.inputWrapper,
-                  commonFormStyles.inputWrapper__input
-                )}>
-                  <label className={css(styles.bookmarkHanger__label)}
-                    data-l10n-id='locationField' htmlFor='bookmarkLocation' />
-                  <CommonFormTextbox
-                    data-test-id='bookmarkLocationInput'
-                    spellCheck='false'
-                    onKeyDown={this.onKeyDown}
-                    onChange={this.onLocationChange}
-                    value={this.props.location}
-                  />
-                </div>
-              </section>
-              : null
-            }
-            <div className={css(
-              commonFormStyles.inputWrapper,
-              commonFormStyles.inputWrapper__input,
-              styles.bookmarkHanger__marginRow,
-            )}>
-              <label className={css(styles.bookmarkHanger__label)}
-                data-l10n-id='parentFolderField' htmlFor='bookmarkParentFolder' />
-              <CommonFormDropdown
-                data-test-id='bookmarkParentFolder'
-                value={this.props.parentFolderId}
-                onChange={this.onParentFolderChange} >
-                <option value='0' data-l10n-id='bookmarksToolbar' />
-                {
-                  this.props.folders.map((folder) => <option value={folder.folderId}>{folder.label}</option>)
-                }
-              </CommonFormDropdown>
-            </div>
-          </div>
-        </CommonFormSection>
-        <CommonFormButtonWrapper>
-          {
-            this.props.hasOriginalDetail
-            ? <BrowserButton groupedItem secondaryColor
-              l10nId='remove'
-              testId='bookmarkHangerRemoveButton'
-              onClick={this.onRemoveBookmark}
-            />
-            : <BrowserButton groupedItem secondaryColor
-              l10nId='cancel'
-              testId='bookmarkHangerCancelButton'
-              onClick={this.onClose}
-            />
-          }
-          <BrowserButton groupedItem primaryColor
-            l10nId='done'
-            testId='bookmarkHangerDoneButton'
-            disabled={!this.props.isBookmarkNameValid}
-            onClick={this.onSave}
-          />
-        </CommonFormButtonWrapper>
+        <AddEditBookmarkForm
+          bookmarkName={this.props.bookmarkName}
+          currentTitle={this.props.currentTitle}
+          editKey={this.props.editKey}
+          closestKey={this.props.closestKey}
+          location={this.props.location}
+          parentFolderId={this.props.parentFolderId}
+          partitionNumber={this.props.partitionNumber}
+          isFolder={this.props.isFolder}
+          folders={this.props.folders}
+          isAdded={this.props.isAdded}
+          isDisabled={!this.props.isBookmarkNameValid}
+        />
         {
           !this.props.isModal
             ? <CommonFormBottomWrapper>
@@ -350,18 +200,6 @@ const styles = StyleSheet.create({
   },
   bookmarkHanger__withHomeButton: {
     left: '83px'
-  },
-  bookmarkHanger__label: {
-    display: 'block',
-    marginBottom: `calc(${globalStyles.spacing.dialogInsideMargin} / 3)`
-  },
-  bookmarkHanger__marginRow: {
-    marginTop: `calc(${globalStyles.spacing.dialogInsideMargin} / 2)`
-  },
-
-  bookmark__sectionWrapper: {
-    display: 'flex',
-    flexFlow: 'column nowrap'
   },
   bookmark__bottomWrapper: {
     display: 'flex',

@@ -78,17 +78,26 @@ describe('bookmark tests', function () {
           .typeText(bookmarkNameInput, 'https://www.brave.com')
           .keys(Brave.keys.END)
           .keys('а')
-          .waitForInputText(bookmarkNameInput, 'https://www.brave.xn--com-8cd/')
           .setValue(bookmarkLocationInput, '')
           .waitForInputText(bookmarkLocationInput, '')
           .typeText(bookmarkLocationInput, 'https://www.brave.com')
           .keys(Brave.keys.END)
           .keys('а')
-          .waitForInputText(bookmarkLocationInput, 'https://www.brave.xn--com-8cd/')
-          .click(removeButton)
+          .click(doneButton)
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitUntil(function () {
+            return this.getAppState().then((val) => {
+              return val.value.sites['https://www.brave.xn--com-8cd/|0|0'].customTitle === 'https://www.brave.xn--com-8cd/'
+            })
+          })
       })
       it('custom title and location can be backspaced', function * () {
         yield this.app.client
+          .activateURLMode()
+          .waitForVisible(navigatorNotBookmarked)
+          .click(navigatorNotBookmarked)
+          .waitForVisible(doneButton)
+          .click(doneButton)
           .activateURLMode()
           .waitForVisible(navigatorBookmarked)
           .click(navigatorBookmarked)
@@ -259,7 +268,7 @@ describe('bookmark tests', function () {
         const historyUrl = 'about:history'
         const prefsUrl = 'about:preferences'
         yield this.app.client
-          .waitForUrl(Brave.newTabUrl)
+          .tabByIndex(0)
           .loadUrl(prefsUrl)
           .waitForVisible(homepageInput)
           .windowParentByUrl(prefsUrl)

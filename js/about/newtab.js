@@ -21,6 +21,7 @@ const config = require('../constants/config')
 const backgrounds = require('../data/backgrounds')
 const {random} = require('../../app/common/lib/randomUtil')
 const NewPrivateTab = require('./newprivatetab')
+const windowActions = require('../actions/windowActions')
 
 const ipc = window.chrome.ipcRenderer
 
@@ -96,7 +97,7 @@ class NewTabPage extends React.Component {
     }).size > 0
   }
   isBookmarked (siteProps) {
-    return siteUtil.isSiteBookmarked(this.topSites, siteProps)
+    return siteUtil.isBookmark(siteProps)
   }
   get gridLayout () {
     const sizeToCount = {large: 18, medium: 12, small: 6}
@@ -171,8 +172,13 @@ class NewTabPage extends React.Component {
   onToggleBookmark (siteProps) {
     const siteDetail = siteUtil.getDetailFromFrame(siteProps, siteTags.BOOKMARK)
     const editing = this.isBookmarked(siteProps)
-    // PDFJS will not show up in new tab
-    aboutActions.setBookmarkDetail(siteDetail, siteDetail, null, editing)
+    const key = siteUtil.getSiteKey(siteDetail)
+
+    if (editing) {
+      windowActions.editBookmark(false, key)
+    } else {
+      windowActions.onBookmarkAdded(false, key)
+    }
   }
 
   onPinnedTopSite (siteProps) {

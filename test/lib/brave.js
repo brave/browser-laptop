@@ -484,9 +484,9 @@ var exports = {
       return this.waitUntil(function () {
         return this.getWindowState().then((val) => {
           const bookmarkDetailLocation = val.value && val.value.bookmarkDetail &&
-            val.value.bookmarkDetail.currentDetail && val.value.bookmarkDetail.currentDetail.location
-          const bookmarkDetailTitle = (val.value && val.value.bookmarkDetail && val.value.bookmarkDetail.currentDetail &&
-            val.value.bookmarkDetail.currentDetail.customTitle) || val.value.bookmarkDetail.currentDetail.title
+            val.value.bookmarkDetail.siteDetail && val.value.bookmarkDetail.siteDetail.location
+          const bookmarkDetailTitle = (val.value && val.value.bookmarkDetail && val.value.bookmarkDetail.siteDetail &&
+            val.value.bookmarkDetail.siteDetail.customTitle) || val.value.bookmarkDetail.siteDetail.title
           const ret = bookmarkDetailLocation === location && bookmarkDetailTitle === title
           logVerbose('waitForBookmarkDetail("' + location + '", "' + title + '") => ' + ret +
             ' (bookmarkDetailLocation = ' + bookmarkDetailLocation + ', bookmarkDetailTitle = ' + bookmarkDetailTitle + ')')

@@ -19,7 +19,6 @@ const windowActions = require('../../../../js/actions/windowActions')
 const appActions = require('../../../../js/actions/appActions')
 
 // Constants
-const siteTags = require('../../../../js/constants/siteTags')
 const messages = require('../../../../js/constants/messages')
 const settings = require('../../../../js/constants/settings')
 
@@ -28,15 +27,11 @@ const tabState = require('../../../common/state/tabState')
 const publisherState = require('../../../common/lib/publisherUtil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
-// Store
-const windowStore = require('../../../../js/stores/windowStore')
-
 // Utils
 const cx = require('../../../../js/lib/classSet')
 const {getBaseUrl} = require('../../../../js/lib/appUrlUtil')
 const siteUtil = require('../../../../js/state/siteUtil')
 const eventUtil = require('../../../../js/lib/eventUtil')
-const UrlUtil = require('../../../../js/lib/urlutil')
 const {getSetting} = require('../../../../js/settings')
 const contextMenus = require('../../../../js/contextMenus')
 
@@ -51,22 +46,14 @@ class NavigationBar extends React.Component {
     this.onReloadLongPress = this.onReloadLongPress.bind(this)
   }
 
-  get activeFrame () {
-    return windowStore.getFrame(this.props.activeFrameKey)
-  }
-
   onToggleBookmark () {
     const editing = this.props.isBookmarked
-    // show the AddEditBookmarkHanger control; saving/deleting takes place there
-    let siteDetail = siteUtil.getDetailFromFrame(this.activeFrame, siteTags.BOOKMARK)
-    const key = siteUtil.getSiteKey(siteDetail)
 
-    if (key !== null) {
-      siteDetail = siteDetail.set('parentFolderId', this.props.sites.getIn([key, 'parentFolderId']))
-      siteDetail = siteDetail.set('customTitle', this.props.sites.getIn([key, 'customTitle']))
+    if (editing) {
+      windowActions.editBookmark(true, this.props.bookmarkKey)
+    } else {
+      windowActions.onBookmarkAdded(true, this.props.bookmarkKey)
     }
-    siteDetail = siteDetail.set('location', UrlUtil.getLocationIfPDF(siteDetail.get('location')))
-    windowActions.setBookmarkDetail(siteDetail, siteDetail, null, editing, true)
   }
 
   onReload (e) {
@@ -137,8 +124,8 @@ class NavigationBar extends React.Component {
     // used in other functions
     props.isFocused = navbar.getIn(['urlbar', 'focused'], false)
     props.shouldRenderSuggestions = navbar.getIn(['urlbar', 'suggestions', 'shouldRender']) === true
-    props.sites = state.get('sites') // TODO(nejc) remove, primitives only
     props.activeTabId = activeTabId
+    props.bookmarkKey = siteUtil.getSiteKey(activeFrame)
     props.showHomeButton = !props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
 
     return props

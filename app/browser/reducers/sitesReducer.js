@@ -54,35 +54,57 @@ const sitesReducer = (state, action, immutableAction) => {
         break
       }
     case appConstants.APP_ADD_SITE:
-      const isSyncEnabled = syncEnabled()
-      if (Immutable.List.isList(action.siteDetail)) {
-        action.siteDetail.forEach((s) => {
-          state = siteUtil.addSite(state, s, action.tag, undefined, action.skipSync)
+      {
+        const isSyncEnabled = syncEnabled()
+        if (Immutable.List.isList(action.siteDetail)) {
+          action.siteDetail.forEach((s) => {
+            state = siteUtil.addSite(state, s, action.tag, action.skipSync)
+            if (isSyncEnabled) {
+              state = syncUtil.updateSiteCache(state, s)
+            }
+          })
+        } else {
+          let sites = state.get('sites')
+          if (!action.siteDetail.get('folderId') && siteUtil.isFolder(action.siteDetail)) {
+            action.siteDetail = action.siteDetail.set('folderId', siteUtil.getNextFolderId(sites))
+          }
+          state = siteUtil.addSite(state, action.siteDetail, action.tag, action.skipSync)
           if (isSyncEnabled) {
-            state = syncUtil.updateSiteCache(state, s)
-          }
-        })
-      } else {
-        let sites = state.get('sites')
-        if (!action.siteDetail.get('folderId') && siteUtil.isFolder(action.siteDetail)) {
-          action.siteDetail = action.siteDetail.set('folderId', siteUtil.getNextFolderId(sites))
-        }
-        state = siteUtil.addSite(state, action.siteDetail, action.tag, action.originalSiteDetail, action.skipSync)
-        if (action.destinationDetail) {
-          const sourceKey = siteUtil.getSiteKey(action.siteDetail)
-          const destinationKey = siteUtil.getSiteKey(action.destinationDetail)
-
-          if (sourceKey != null) {
-            state = siteUtil.moveSite(state,
-              sourceKey, destinationKey, false, false, true)
+            state = syncUtil.updateSiteCache(state, action.siteDetail)
           }
         }
-        if (isSyncEnabled) {
-          state = syncUtil.updateSiteCache(state, action.destinationDetail || action.siteDetail)
-        }
+        break
       }
-      state = updateActiveTabBookmarked(state)
-      break
+    case appConstants.APP_ADD_BOOKMARK:
+    case appConstants.APP_EDIT_BOOKMARK:
+      {
+        const isSyncEnabled = syncEnabled()
+        const sites = state.get('sites')
+        const closestKey = action.closestKey
+        let site = action.siteDetail
+
+        if (site == null || action.tag == null) {
+          break
+        }
+
+        if (!site.get('folderId') && action.tag === siteTags.BOOKMARK_FOLDER) {
+          site = site.set('folderId', siteUtil.getNextFolderId(sites))
+        }
+
+        state = siteUtil.addSite(state, site, action.tag, action.editKey)
+
+        if (closestKey != null) {
+          const sourceKey = siteUtil.getSiteKey(site)
+          state = siteUtil.moveSite(state, sourceKey, closestKey, false, false, true)
+        }
+
+        if (isSyncEnabled) {
+          state = syncUtil.updateSiteCache(state, site)
+        }
+
+        state = updateActiveTabBookmarked(state)
+        break
+      }
     case appConstants.APP_REMOVE_SITE:
       const removeSiteSyncCallback = action.skipSync ? undefined : syncActions.removeSite
       state = siteUtil.removeSite(state, action.siteDetail, action.tag, true, removeSiteSyncCallback)

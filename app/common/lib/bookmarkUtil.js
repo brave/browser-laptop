@@ -16,17 +16,20 @@ const {calculateTextWidth} = require('../../../js/lib/textCalculator')
 const {iconSize} = require('../../../js/constants/config')
 const {getSetting} = require('../../../js/settings')
 
-const bookmarkHangerHeading = (detail, isFolder, shouldShowLocation) => {
+function bookmarkHangerHeading (editMode, isFolder, isAdded) {
   if (isFolder) {
-    return shouldShowLocation
+    return editMode
       ? 'bookmarkFolderEditing'
       : 'bookmarkFolderAdding'
   }
-  return shouldShowLocation
-    ? (!detail || !detail.has('location'))
-      ? 'bookmarkCreateNew'
-      : 'bookmarkEdit'
-    : 'bookmarkAdded'
+
+  if (isAdded) {
+    return 'bookmarkAdded'
+  }
+
+  return editMode
+    ? 'bookmarkEdit'
+    : 'bookmarkCreateNew'
 }
 
 const displayBookmarkName = (detail) => {
@@ -37,11 +40,10 @@ const displayBookmarkName = (detail) => {
   return detail.get('title') || ''
 }
 
-const isBookmarkNameValid = (detail, isFolder) => {
-  const title = detail.get('title') || detail.get('customTitle')
-  const location = detail.get('location')
+const isBookmarkNameValid = (title, location, isFolder, customTitle) => {
+  const newTitle = title || customTitle
   return isFolder
-    ? (title != null && title !== 0) && title.trim().length > 0
+    ? (newTitle != null && newTitle !== 0) && newTitle.trim().length > 0
     : location != null && location.trim().length > 0
 }
 

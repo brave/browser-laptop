@@ -237,18 +237,13 @@ const appActions = {
    * Adds a site to the site list
    * @param {Object} siteDetail - Properties of the site in question, can also be an array of siteDetail
    * @param {string} tag - A tag to associate with the site. e.g. bookmarks.
-   * @param {string} originalSiteDetail - If specified, the original site detail to edit / overwrite.
-   * @param {boolean} destinationIsParent - Whether or not the destinationDetail should be considered the new parent.
-   *   The details of the old entries will be modified if this is set, otherwise only the tag will be added.
    * @param {boolean} skipSync - Set true if a site isn't eligible for Sync (e.g. if addSite was triggered by Sync)
    */
-  addSite: function (siteDetail, tag, originalSiteDetail, destinationDetail, skipSync) {
+  addSite: function (siteDetail, tag, skipSync) {
     dispatch({
       actionType: appConstants.APP_ADD_SITE,
       siteDetail,
       tag,
-      originalSiteDetail,
-      destinationDetail,
       skipSync
     })
   },
@@ -1492,6 +1487,24 @@ const appActions = {
     dispatch({
       actionType: appConstants.APP_SWIPE_RIGHT,
       percent
+    })
+  },
+
+  addBookmark: function (siteDetail, tag, closestKey) {
+    dispatch({
+      actionType: appConstants.APP_ADD_BOOKMARK,
+      siteDetail,
+      tag,
+      closestKey
+    })
+  },
+
+  editBookmark: function (siteDetail, editKey, tag) {
+    dispatch({
+      actionType: appConstants.APP_EDIT_BOOKMARK,
+      siteDetail,
+      tag,
+      editKey
     })
   }
 }

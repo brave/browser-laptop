@@ -40,21 +40,28 @@ const isLinux = process.platform === 'linux'
 
 /**
  * Obtains an add bookmark menu item
- * @param {object} Detail of the bookmark to initialize with
  */
 const addBookmarkMenuItem = (label, siteDetail, closestDestinationDetail, isParent) => {
   return {
     label: locale.translation(label),
     accelerator: 'CmdOrCtrl+D',
     click: () => {
-      if (isParent) {
-        siteDetail = siteDetail.set('parentFolderId', closestDestinationDetail && (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
+      let closestKey = null
+
+      if (closestDestinationDetail) {
+        closestKey = siteUtil.getSiteKey(closestDestinationDetail)
+
+        if (isParent) {
+          siteDetail = siteDetail.set('parentFolderId', (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
+        }
       }
+
       if (siteDetail.constructor !== Immutable.Map) {
         siteDetail = Immutable.fromJS(siteDetail)
       }
+
       siteDetail = siteDetail.set('location', urlUtil.getLocationIfPDF(siteDetail.get('location')))
-      windowActions.setBookmarkDetail(siteDetail, siteDetail, closestDestinationDetail, true)
+      windowActions.addBookmark(siteDetail, closestKey)
     }
   }
 }
@@ -63,11 +70,18 @@ const addFolderMenuItem = (closestDestinationDetail, isParent) => {
   return {
     label: locale.translation('addFolder'),
     click: () => {
-      let emptyFolder = Immutable.fromJS({ tags: [siteTags.BOOKMARK_FOLDER] })
-      if (isParent) {
-        emptyFolder = emptyFolder.set('parentFolderId', closestDestinationDetail && (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
+      let siteDetail = Immutable.fromJS({ tags: [siteTags.BOOKMARK_FOLDER] })
+      let closestKey = null
+
+      if (closestDestinationDetail) {
+        closestKey = siteUtil.getSiteKey(closestDestinationDetail)
+
+        if (isParent) {
+          siteDetail = siteDetail.set('parentFolderId', (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
+        }
       }
-      windowActions.setBookmarkDetail(emptyFolder, undefined, closestDestinationDetail, false)
+
+      windowActions.addBookmark(siteDetail, closestKey)
     }
   }
 }
@@ -290,7 +304,10 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
       template.push(
         {
           label: locale.translation(isFolder ? 'editFolder' : 'editBookmark'),
-          click: () => windowActions.setBookmarkDetail(siteDetail, siteDetail, null, true)
+          click: () => {
+            const editKey = siteUtil.getSiteKey(siteDetail)
+            windowActions.editBookmark(false, editKey)
+          }
         },
         CommonMenu.separatorMenuItem)
     }
