@@ -100,7 +100,8 @@ describe('tabsReducer unit tests', function () {
       closeTab: sinon.mock(),
       setActive: sinon.spy(),
       moveTo: sinon.mock(),
-      reload: sinon.mock()
+      reload: sinon.mock(),
+      create: sinon.mock()
     }
 
     this.windowsAPI = require('../../../../../app/browser/windows')
@@ -605,6 +606,80 @@ describe('tabsReducer unit tests', function () {
   describe.skip('APP_FRAME_CHANGED', function () {
     it('updates frame data', function () {
       // TODO
+    })
+  })
+
+  describe('APP_WINDOW_READY', function () {
+    before(function () {
+      this.clock = sinon.useFakeTimers()
+      this.action = Immutable.fromJS({
+        actionType: appConstants.APP_WINDOW_READY,
+        senderWindowId: 1337,
+        createProperties: {
+          windowId: null
+        }
+      })
+      this.create = sinon.spy()
+      this.tabsAPI.create = this.create
+      tabsReducer = require('../../../../../app/browser/reducers/tabsReducer')
+    })
+
+    beforeEach(function () {
+      this.tabsAPI.create.reset()
+    })
+
+    after(function () {
+      this.clock.restore()
+    })
+
+    describe('when showOnLoad is true', function () {
+      before(function () {
+        this.newState = this.state.set('about', Immutable.fromJS({
+          welcome: {
+            showOnLoad: true
+          }
+        }))
+      })
+
+      it('calls tabs.create', function () {
+        tabsReducer(this.newState, this.action)
+        this.clock.tick(1510)
+        assert(this.tabsAPI.create.calledOnce)
+      })
+
+      it('sets tabs.create url argument to welcome screen', function () {
+        tabsReducer(this.newState, this.action)
+        this.clock.tick(1510)
+        assert.equal(
+          this.tabsAPI.create.args[0][0].url,
+          'about:welcome'
+        )
+      })
+
+      it('sets senderWindowId as the windowId when none is found', function () {
+        tabsReducer(this.newState, this.action)
+        this.clock.tick(1510)
+        assert.equal(
+          this.tabsAPI.create.args[0][0].windowId,
+          this.action.get('senderWindowId')
+        )
+      })
+    })
+
+    describe('when showOnLoad is false', function () {
+      before(function () {
+        this.newState = this.state.set('about', Immutable.fromJS({
+          welcome: {
+            showOnLoad: false
+          }
+        }))
+      })
+
+      it('does not call tabs.create', function () {
+        tabsReducer(this.newState, this.action)
+        this.clock.tick(1510)
+        assert.equal(this.tabsAPI.create.notCalled, true)
+      })
     })
   })
 

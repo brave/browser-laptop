@@ -59,14 +59,6 @@ describe('tabs API unit tests', function () {
       }]
     })
 
-    this.appState = {
-      about: {
-        welcome: {
-          showOnLoad: true
-        }
-      }
-    }
-
     this.appStore = {
       getState: () => Immutable.fromJS(this.appState)
     }
@@ -75,9 +67,6 @@ describe('tabs API unit tests', function () {
     mockery.registerMock('ad-block', fakeAdBlock)
     mockery.registerMock('leveldown', {})
     mockery.registerMock('../../js/stores/appStore', this.appStore)
-    mockery.registerMock('../../js/l10n', {
-      translation: (word) => word
-    })
     mockery.registerMock('../filtering', {
       isResourceEnabled: (resourceName, url, isPrivate) => false
     })
@@ -343,43 +332,22 @@ describe('tabs API unit tests', function () {
     before(function () {
       this.clock = sinon.useFakeTimers()
       this.createTabRequestedSpy = sinon.spy(appActions, 'createTabRequested')
-      this.activateWelcomeScreenSpy = sinon.spy(appActions, 'activateWelcomeScreen')
       this.extensionsCreateTabSpy = sinon.spy(fakeElectron.extensions, 'createTab')
     })
 
     after(function () {
       this.clock.restore()
       this.createTabRequestedSpy.restore()
-      this.activateWelcomeScreenSpy.restore()
       this.extensionsCreateTabSpy.restore()
     })
 
     const createProperties = Immutable.fromJS({})
     const cb = null
     const isRestore = false
-    const skipIfTest = false
-
-    describe('when createProperties.url is not set', function () {
-      it('calls appActions.createTabRequested', function () {
-        this.createTabRequestedSpy.reset()
-        tabs.create(createProperties, cb, isRestore, skipIfTest)
-        this.clock.tick(1510)
-        assert.equal(this.createTabRequestedSpy.calledOnce, true)
-      })
-
-      describe('when welcome screen has not shown yet', function () {
-        it('calls appActions.activateWelcomeScreen if state is true', function () {
-          this.activateWelcomeScreenSpy.reset()
-          tabs.create(createProperties, cb, isRestore, skipIfTest)
-          this.clock.tick(1510)
-          assert.equal(this.activateWelcomeScreenSpy.calledOnce, true)
-        })
-      })
-    })
 
     it('calls electron.extensions.createTab', function () {
       this.extensionsCreateTabSpy.reset()
-      tabs.create(createProperties, cb, isRestore, skipIfTest)
+      tabs.create(createProperties, cb, isRestore)
       this.clock.tick(1510)
       assert.equal(this.extensionsCreateTabSpy.calledOnce, true)
     })

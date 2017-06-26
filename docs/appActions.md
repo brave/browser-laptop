@@ -1142,17 +1142,6 @@ Clear temp setting for clear browsing data
 
 
 
-### activateWelcomeScreen(shouldShowWelcomeScreen) 
-
-Dispatches a message to the store to show the welcome screen.
-
-**Parameters**
-
-**shouldShowWelcomeScreen**: `Boolean`, true if a new tab
-with the welcome screen should be show
-
-
-
 
 * * *
 
