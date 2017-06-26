@@ -559,6 +559,13 @@ const handleAppAction = (action) => {
         appState = appState.set(propertyName, newSiteSettings)
         break
       }
+    case appConstants.APP_SET_SKIP_SYNC:
+      {
+        if (appState.getIn(action.path)) {
+          appState = appState.setIn(action.path.concat(['skipSync']), action.skipSync)
+        }
+        break
+      }
     case appConstants.APP_ADD_NOSCRIPT_EXCEPTIONS:
       {
         const propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'

@@ -369,13 +369,17 @@ module.exports.removeSiteByObjectId = function (state, objectId, objectData) {
  * @param {Immutable.Map} siteDetail The siteDetail to remove a tag from
  * @param {string} tag
  * @param {boolean} reorder whether to reorder sites (default with reorder)
+ * @param {Function=} syncCallback
  * @return {Immutable.Map} The new state Immutable object
  */
-module.exports.removeSite = function (state, siteDetail, tag, reorder = true) {
+module.exports.removeSite = function (state, siteDetail, tag, reorder = true, syncCallback) {
   let sites = state.get('sites')
   const key = module.exports.getSiteKey(siteDetail)
   if (!key) {
     return state
+  }
+  if (getSetting(settings.SYNC_ENABLED) === true && syncCallback) {
+    syncCallback(sites.getIn([key]))
   }
 
   const tags = sites.getIn([key, 'tags'])
@@ -385,7 +389,7 @@ module.exports.removeSite = function (state, siteDetail, tag, reorder = true) {
     childSites.forEach((site) => {
       const tags = site.get('tags')
       tags.forEach((tag) => {
-        state = module.exports.removeSite(state, site, tag, false)
+        state = module.exports.removeSite(state, site, tag, false, syncCallback)
       })
     })
   }

@@ -486,6 +486,19 @@ const appActions = {
   },
 
   /**
+   * Changes the skipSync flag on an appState path.
+   * @param {Array.<string>} path
+   * @param {boolean} skipSync
+   */
+  setSkipSync: function (path, skipSync) {
+    dispatch({
+      actionType: appConstants.APP_SET_SKIP_SYNC,
+      path,
+      skipSync
+    })
+  },
+
+  /**
    * Updates ledger information for the payments pane
    * @param {object} ledgerInfo - the current ledger state
    */
