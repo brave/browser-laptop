@@ -92,6 +92,14 @@ const tokenizeInput = (data) => {
       parts = parts.concat(parsedUrl.pathname.split(/[.\s\\/]/))
     }
     if (parsedUrl.query) {
+      // I think fast-url-parser has a bug in it where it returns an object for query
+      // instead of a string.  Object is supported but only when you pass in true
+      // for the second value of parse which we don't do.
+      // We can remove this when we change away from using fast-url-parser in favour of the
+      // Chrome URL parser.
+      if (parsedUrl.query.constructor !== String) {
+        parsedUrl.query = Object.entries(parsedUrl.query).map((x) => x.join('=')).join('&')
+      }
       parts = parts.concat(parsedUrl.query.split(/[&=]/))
     }
     if (parsedUrl.protocol) {
