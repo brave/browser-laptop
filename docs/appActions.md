@@ -393,6 +393,18 @@ Removes a site setting
 
 
 
+### setSkipSync(path, skipSync) 
+
+Changes the skipSync flag on an appState path.
+
+**Parameters**
+
+**path**: `Array.&lt;string&gt;`, Changes the skipSync flag on an appState path.
+
+**skipSync**: `boolean`, Changes the skipSync flag on an appState path.
+
+
+
 ### updateLedgerInfo(ledgerInfo) 
 
 Updates ledger information for the payments pane

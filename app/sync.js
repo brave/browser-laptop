@@ -10,7 +10,6 @@ const qr = require('qr-image')
 const ipcMain = electron.ipcMain
 const locale = require('./locale')
 const messages = require('../js/constants/messages')
-const siteTags = require('../js/constants/siteTags')
 const syncMessages = require('../js/constants/sync/messages')
 const categories = require('../js/constants/sync/proto').categories
 const writeActions = require('../js/constants/sync/proto').actions
@@ -28,10 +27,11 @@ const extensions = require('./extensions')
 
 const CATEGORY_MAP = syncUtil.CATEGORY_MAP
 const CATEGORY_NAMES = Object.keys(categories)
+const SYNC_ACTIONS = Object.values(syncConstants)
 
 // Fields that should trigger a sync SEND when changed
 const SYNC_FIELDS = {
-  sites: ['location', 'customTitle', 'folderId', 'parentFolderId'],
+  sites: ['location', 'customTitle', 'folderId', 'parentFolderId', 'tags'],
   siteSettings: Object.keys(syncUtil.siteSettingDefaults)
 }
 
@@ -53,14 +53,11 @@ let pollIntervalId = null
 let deviceIdSent = false
 let bookmarksToolbarShown = false
 
-// Syncs state diffs to the sync server if needed
+// Determines what to sync
 const appStoreChangeCallback = function (diffs) {
   if (!backgroundSender || !diffs) {
     return
   }
-
-  // Site locations created by the diffs
-  let createdSiteLocations = []
 
   diffs.forEach((diff) => {
     if (!diff || !diff.path) {
@@ -73,92 +70,54 @@ const appStoreChangeCallback = function (diffs) {
     }
 
     const type = path[1]
+    const field = path[3]
     const isSite = type === 'sites'
-    const siteLocation = isSite ? path[2].split('|')[0] : null
 
     const fieldsToPick = SYNC_FIELDS[type]
     if (!fieldsToPick) {
       return
     }
 
-    let action = null
-    let maybeSkipSync = false
-    if (siteLocation && diff.op !== 'remove') {
-      createdSiteLocations.push(siteLocation)
+    const statePath = path.slice(1, 3).map((item) => item.replace(/~1/g, '/'))
+    if (field === 'skipSync' && diff.value === true) {
+      // Remove the flag so that this gets synced next time it is updated
+      appActions.setSkipSync(statePath, false)
+      return
     }
 
-    // XXX: adding/removing a tag (e.g. 'bookmark') corresponds to adding/deleting a site record in sync
-    if (path.length === 3 || path[3] === 'tags') {
-      if (diff.op === 'add') {
-        maybeSkipSync = true
-        if (isSite) {
-          // Send UPDATE instead of CREATE for sites to work around sync#111
-          action = writeActions.UPDATE
-        } else {
-          action = writeActions.CREATE
-        }
-      } else if (diff.op === 'remove') {
-        if (path.length === 3 && createdSiteLocations.includes(siteLocation)) {
-          // We are removing a site that is created in the same diff set.
-          // This probably means we are moving a site, not actually deleting
-          // it, so ignore this update.
-          console.log('Skipping site deletion', siteLocation)
-          return
-        }
-        action = writeActions.DELETE
-      } else {
+    const isInsert = diff.op === 'add' && path.length === 3
+    const isUpdate = fieldsToPick.includes(field) // Ignore insignicant updates
+
+    // DELETES are handled in appState because the old object is no longer
+    // available by the time emitChanges is received
+    if (isInsert || isUpdate) {
+      // Get the item's path and entry in appStore
+      const entry = AppStore.getState().getIn(statePath)
+      if (!entry || !entry.toJS) {
+        return
+      }
+      if (entry.get('skipSync')) {
+        // Remove the flag so that this gets synced next time it is updated
+        appActions.setSkipSync(statePath, false)
+        return
+      }
+
+      let action = null
+
+      if (isInsert) {
+        // Send UPDATE instead of CREATE for sites to work around sync#111
+        action = isSite ? writeActions.UPDATE : writeActions.CREATE
+      } else if (isUpdate) {
         action = writeActions.UPDATE
       }
-    } else if (fieldsToPick.includes(path[3])) {
-      action = writeActions.UPDATE
-    }
 
-    if (action === null) {
-      return
-    }
+      if (action !== null) {
+        // Set the object ID if there is not already one
+        const entryJS = entry.toJS()
+        entryJS.objectId = entryJS.objectId || syncUtil.newObjectId(statePath)
 
-    const statePath = path.slice(1, 3).map((item) => item.replace(/~1/g, '/'))
-    const state = AppStore.getState()
-    const entry = state.getIn(statePath)
-
-    if (maybeSkipSync && entry && entry.get('skipSync')) {
-      // Don't re-create objects that were fetched by sync
-      return
-    }
-
-    if (isSite && action === writeActions.DELETE && !entry) {
-      // If we deleted the site, it is no longer availble in appState.
-      // Find the corresponding objectId using the sync cache
-      // and send this in the sync record
-      const objectId = syncUtil.siteKeyToObjectId(state, statePath[1])
-      if (objectId) {
-        // Delete the site from both history and bookmarks
-        sendSyncRecords(backgroundSender, action, [{
-          name: 'bookmark',
-          objectId,
-          value: {}
-        }])
-        sendSyncRecords(backgroundSender, action, [{
-          name: 'historySite',
-          objectId,
-          value: {}
-        }])
-      }
-    } else if (entry && entry.toJS) {
-      const entryJS = entry.toJS()
-      if (action === writeActions.DELETE && isSite) {
-        const tags = entryJS.tags || []
-        sendSyncRecords(backgroundSender, action, [{
-          objectId: entryJS.objectId,
-          value: {},
-          name: tags.includes(siteTags.BOOKMARK) || siteTags.includes(siteTags.BOOKMARK_FOLDER)
-            ? 'historySite' // if the site is still a bookmark, it must have been deleted from history
-            : 'bookmark'
-        }])
-      } else {
-        sendSyncRecords(backgroundSender, action, [
-          isSite ? syncUtil.createSiteData(entryJS, state) : syncUtil.createSiteSettingsData(statePath[1], entryJS)
-        ])
+        sendSyncRecords(backgroundSender, action,
+          [type === 'sites' ? syncUtil.createSiteData(entryJS) : syncUtil.createSiteSettingsData(statePath[1], entryJS)])
       }
     }
   })
@@ -168,7 +127,7 @@ const appStoreChangeCallback = function (diffs) {
  * Sends sync records of the same category to the sync server.
  * @param {event.sender} sender
  * @param {number} action
- * @param {Array.<{objectId: Array, name: string, value: Object}>} data
+ * @param {Array.<{name: string, value: Object}>} data
  */
 const sendSyncRecords = (sender, action, data) => {
   if (!deviceId) {
@@ -183,7 +142,7 @@ const sendSyncRecords = (sender, action, data) => {
     return
   }
   sender.send(syncMessages.SEND_SYNC_RECORDS, category.categoryName, data.map((item) => {
-    if (!item || !item.name || !item.value || !item.objectId) {
+    if (!item || !item.name || !item.value) {
       return
     }
     return {
@@ -193,6 +152,34 @@ const sendSyncRecords = (sender, action, data) => {
       [item.name]: item.value
     }
   }))
+}
+
+/**
+ * @param {Object} action
+ * @returns {boolean}
+ */
+const validateAction = (action) => {
+  const SYNC_ACTIONS_WITHOUT_ITEMS = [
+    syncConstants.SYNC_CLEAR_HISTORY,
+    syncConstants.SYNC_CLEAR_SITE_SETTINGS
+  ]
+  if (SYNC_ACTIONS.includes(action.actionType) !== true) {
+    return false
+  }
+
+  // If the action requires an item, validate the item.
+  if (SYNC_ACTIONS_WITHOUT_ITEMS.includes(action.actionType) !== true) {
+    if (!action.item || !action.item.toJS) {
+      log('Missing item!')
+      return false
+    }
+    // Only accept items who have an objectId set already
+    if (!action.item.get('objectId')) {
+      log(`Missing object ID! ${action.item.toJS()}`)
+      return false
+    }
+  }
+  return true
 }
 
 const dispatcherCallback = (action) => {
@@ -206,10 +193,14 @@ const dispatcherCallback = (action) => {
     }
   }
   // If sync is not enabled, the following actions should be ignored.
-  if (!syncEnabled() || backgroundSender.isDestroyed()) {
+  if (!syncEnabled() || validateAction(action) !== true || backgroundSender.isDestroyed()) {
     return
   }
   switch (action.actionType) {
+    case syncConstants.SYNC_REMOVE_SITE:
+      sendSyncRecords(backgroundSender, writeActions.DELETE,
+        [syncUtil.createSiteData(action.item.toJS())])
+      break
     case syncConstants.SYNC_CLEAR_HISTORY:
       backgroundSender.send(syncMessages.DELETE_SYNC_CATEGORY, CATEGORY_MAP.historySite.categoryName)
       break
@@ -343,6 +334,7 @@ module.exports.init = function (appState) {
   }
   // sent by about:preferences when sync should be reloaded
   ipcMain.on(messages.RELOAD_SYNC_EXTENSION, () => {
+    console.log('reloading sync')
     extensions.reloadExtension(syncExtensionId)
   })
   // sent by about:preferences when resetting sync
