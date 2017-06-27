@@ -342,6 +342,7 @@ describe('Autoplay test', function () {
           })
       })
       .windowByUrl(Brave.browserWindowUrl)
+      .activateURLMode()
       .click(reloadButton)
       .tabByUrl(url)
       .waitUntil(function () {
@@ -363,6 +364,7 @@ describe('Autoplay test', function () {
       })
       .windowByUrl(Brave.browserWindowUrl)
       .closeTabByIndex(0)
+      .activateURLMode()
       .click(reloadButton)
       .waitForExist(notificationBar)
       .waitUntil(function () {
@@ -396,6 +398,7 @@ describe('Autoplay test', function () {
           })
       })
       .windowByUrl(Brave.browserWindowUrl)
+      .activateURLMode()
       .click(reloadButton)
       .tabByUrl(url)
       .waitUntil(function () {
@@ -417,6 +420,7 @@ describe('Autoplay test', function () {
       })
       .windowByUrl(Brave.browserWindowUrl)
       .closeTabByIndex(0)
+      .activateURLMode()
       .click(reloadButton)
       .tabByUrl(url)
       .waitUntil(function () {
@@ -445,6 +449,7 @@ describe('Autoplay test', function () {
       })
       .click('button=No')
       .windowByUrl(Brave.browserWindowUrl)
+      .activateURLMode()
       .click(reloadButton)
       .tabByUrl(url)
       .waitUntil(function () {
