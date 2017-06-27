@@ -707,12 +707,11 @@ class Frame extends React.Component {
         isSecure = false
         const parsedUrl = urlParse(this.props.location)
         ipc.send(messages.CHECK_CERT_ERROR_ACCEPTED, parsedUrl.host, this.props.frameKey)
-      } else if (this.props.isSecure !== false &&
-        ['warning', 'passive-mixed-content'].includes(e.securityState)) {
+      } else if (['warning', 'passive-mixed-content'].includes(e.securityState)) {
         // Passive mixed content should not upgrade an insecure connection to a
         // partially-secure connection. It can only downgrade a secure
         // connection.
-        isSecure = 1
+        isSecure = this.props.isSecure !== false ? 1 : false
       }
       windowActions.setSecurityState(this.frame, {
         secure: runInsecureContent ? false : isSecure,
