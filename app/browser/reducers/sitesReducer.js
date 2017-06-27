@@ -9,6 +9,7 @@ const filtering = require('../../filtering')
 const siteCache = require('../../common/state/siteCache')
 const siteTags = require('../../../js/constants/siteTags')
 const siteUtil = require('../../../js/state/siteUtil')
+const syncActions = require('../../../js/actions/syncActions')
 const syncUtil = require('../../../js/state/syncUtil')
 const Immutable = require('immutable')
 const settings = require('../../../js/constants/settings')
@@ -83,7 +84,8 @@ const sitesReducer = (state, action, immutableAction) => {
       state = updateActiveTabBookmarked(state)
       break
     case appConstants.APP_REMOVE_SITE:
-      state = siteUtil.removeSite(state, action.siteDetail, action.tag, true)
+      const removeSiteSyncCallback = action.skipSync ? undefined : syncActions.removeSite
+      state = siteUtil.removeSite(state, action.siteDetail, action.tag, true, removeSiteSyncCallback)
       if (syncEnabled()) {
         state = syncUtil.updateSiteCache(state, action.siteDetail)
       }
@@ -100,7 +102,6 @@ const sitesReducer = (state, action, immutableAction) => {
       }
       break
     case appConstants.APP_APPLY_SITE_RECORDS:
-      // Applies site records fetched by sync
       let nextFolderId = siteUtil.getNextFolderId(state.get('sites'))
       // Ensure that all folders are assigned folderIds
       action.records.forEach((record, i) => {
