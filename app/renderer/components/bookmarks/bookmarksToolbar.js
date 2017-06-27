@@ -89,8 +89,9 @@ class BookmarksToolbar extends React.Component {
     }
 
     if (e.dataTransfer.files.length > 0) {
-      Array.from(e.dataTransfer.files).forEach((file) =>
-        appActions.addSite({ location: file.path, title: file.name }, siteTags.BOOKMARK))
+      Array.from(e.dataTransfer.items).forEach((item) => {
+        item.getAsString((name) => appActions.addSite({ location: item.type, title: name }, siteTags.BOOKMARK))
+      })
       return
     }
 
