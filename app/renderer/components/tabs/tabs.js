@@ -98,9 +98,10 @@ class Tabs extends React.Component {
     }
 
     if (e.dataTransfer.files) {
-      Array.from(e.dataTransfer.files).forEach((file) => {
-        const path = encodeURI(file.path)
-        return appActions.createTabRequested({url: path, title: file.name})
+      Array.from(e.dataTransfer.items).forEach((item) => {
+        if (item.kind === 'string') {
+          return appActions.createTabRequested({url: item.type})
+        }
       })
     }
   }
