@@ -2,7 +2,6 @@ const appStore = require('../../../js/stores/appStoreRenderer')
 const ImmutableComponent = require('./immutableComponent')
 const React = require('react')
 const windowStore = require('../../../js/stores/windowStore')
-const debounce = require('../../../js/lib/debounce')
 const {isList, isSameHashCode} = require('../../common/state/immutableUtil')
 
 const mergePropsImpl = (stateProps, ownProps) => {
@@ -15,19 +14,46 @@ const buildPropsImpl = (props, componentType) => {
   return fn(state, props)
 }
 
+const checkParam = function (old, next, prop) {
+  return isList(next[prop])
+    ? !isSameHashCode(next[prop], old[prop])
+    : next[prop] !== old[prop]
+}
+
+const didPropsChange = function (oldProps, newProps) {
+  let checked = {}
+  const oldKeys = Object.keys(oldProps)
+  for (let prop of oldKeys) {
+    if (checkParam(oldProps, newProps, prop)) {
+      return true
+    } else {
+      checked[prop] = true
+    }
+  }
+  const newKeys = Object.keys(newProps)
+  for (let prop of newKeys) {
+    if (!checked[prop] && checkParam(oldProps, newProps, prop)) {
+      return true
+    }
+  }
+  return false
+}
+
 class ReduxComponent extends ImmutableComponent {
   constructor (componentType, props) {
     super(props)
-    this.state = {}
     this.componentType = componentType
-    this.internalState = this.buildProps(this.props)
-    this.checkForUpdates = debounce(this.checkForUpdates.bind(this), 5)
+    this.state = this.buildProps(this.props)
+    this.checkForUpdates = this.checkForUpdates.bind(this)
     this.dontCheck = true
   }
 
   checkForUpdates () {
-    if (!this.dontCheck && this.shouldComponentUpdate(this.props)) {
-      this.forceUpdate()
+    if (!this.dontCheck) {
+      const newState = this.buildProps(this.props)
+      if (didPropsChange(this.state, newState)) {
+        this.setState(newState)
+      }
     }
   }
 
@@ -43,19 +69,15 @@ class ReduxComponent extends ImmutableComponent {
     windowStore.removeChangeListener(this.checkForUpdates)
   }
 
-  checkParam (old, next, prop) {
-    return isList(next[prop])
-      ? !isSameHashCode(next[prop], old[prop])
-      : next[prop] !== old[prop]
+  componentWillReceiveProps (nextProps) {
+    if (didPropsChange(this.props, nextProps)) {
+      this.setState(this.buildProps(nextProps))
+    }
   }
 
   shouldComponentUpdate (nextProps, nextState) {
-    nextState = this.buildProps(nextProps)
-    const shouldUpdate = Object.keys(nextState).some((prop) => this.checkParam(this.internalState, nextState, prop))
-    if (shouldUpdate) {
-      this.internalState = nextState
-    }
-    return shouldUpdate
+    // we only update the state when it actually changes so this can be a simple equality check
+    return this.state !== nextState
   }
 
   mergeProps (stateProps, ownProps) {
@@ -67,7 +89,7 @@ class ReduxComponent extends ImmutableComponent {
   }
 
   render () {
-    return React.createElement(this.componentType, this.internalState)
+    return React.createElement(this.componentType, this.state)
   }
 }
 
