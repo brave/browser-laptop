@@ -959,6 +959,32 @@ const appActions = {
   },
 
   /**
+   * Add records sent with sync lib's SEND_SYNC_RECORDS to the appState
+   * records pending upload. After we download records via the sync lib
+   * we run pendingSyncRecordsRemoved.
+   * @param {Object} records Array.<object>
+   */
+  pendingSyncRecordsAdded: function (records) {
+    dispatch({
+      actionType: appConstants.APP_PENDING_SYNC_RECORDS_ADDED,
+      records
+    })
+  },
+
+  /**
+   * Remove records from the appState's records pending upload.
+   * This function is called after we download the records from the sync
+   * library.
+   * @param {Object} records Array.<object>
+   */
+  pendingSyncRecordsRemoved: function (records) {
+    dispatch({
+      actionType: appConstants.APP_PENDING_SYNC_RECORDS_REMOVED,
+      records
+    })
+  },
+
+  /**
    * Dispatch to update sync devices cache.
    * NOTE: deviceId is a string! Normally it's Array.<number> but that can't
    * be an object key. Use syncUtil.deviceIdToString()

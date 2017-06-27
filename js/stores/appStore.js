@@ -394,6 +394,7 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/tabsReducer'),
       require('../../app/browser/reducers/sitesReducer'),
       require('../../app/browser/reducers/windowsReducer'),
+      require('../../app/browser/reducers/syncReducer'),
       require('../../app/browser/reducers/spellCheckReducer'),
       require('../../app/browser/reducers/clipboardReducer'),
       require('../../app/browser/reducers/urlBarSuggestionsReducer'),
