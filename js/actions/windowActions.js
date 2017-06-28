@@ -1149,6 +1149,13 @@ const windowActions = {
       actionType: windowConstants.WINDOW_ON_TAB_PAGE_CONTEXT_MENU,
       index
     })
+  },
+
+  onFrameBookmark: function (tabId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_FRAME_BOOKMARK,
+      tabId
+    })
   }
 }
 

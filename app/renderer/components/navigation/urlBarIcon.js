@@ -111,7 +111,9 @@ class UrlBarIcon extends React.Component {
 
   onDragStart (e) {
     dndData.setupDataTransferURL(e.dataTransfer, this.props.location, this.props.title)
-    dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.TAB, this.props.activeFrame)
+    dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.TAB, {
+      tabId: this.props.tabId
+    })
   }
 
   mergeProps (state, ownProps) {
@@ -138,7 +140,7 @@ class UrlBarIcon extends React.Component {
 
     // used in other functions
     props.title = activeFrame.get('title', '')
-    props.activeFrame = activeFrame // TODO (nejc) only primitives
+    props.tabId = activeFrame.get('tabId')
 
     return props
   }
