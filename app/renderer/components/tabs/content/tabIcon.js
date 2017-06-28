@@ -33,6 +33,8 @@ class TabIcon extends ImmutableComponent {
     return <div
       className={this.props.className}
       data-test-favicon={this.props['data-test-favicon']}
+      onDragStart={this.props.onDragStart}
+      draggable={this.props.draggable}
       onClick={this.props.onClick}>
       {
         this.props.symbol
