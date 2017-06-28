@@ -9,11 +9,11 @@ const {tabCloseAction} = require('../../../../../../app/common/constants/setting
 const {tabsPerTabPageActiveOption, tabCloseActionActiveOption} = require('../../../../../lib/selectors')
 const assert = require('assert')
 const fakeElectron = require('../../../../lib/fakeElectron')
-let settingDefaultValue
-let TabsTab
 require('../../../../braveUnit')
 
 describe('TabsTab component', function () {
+  let settingDefaultValue, TabsTab
+
   before(function () {
     mockery.enable({
       warnOnReplace: false,
@@ -21,13 +21,11 @@ describe('TabsTab component', function () {
       useCleanCache: true
     })
     mockery.registerMock('../../../extensions/brave/img/caret_down_grey.svg', 'caret_down_grey.svg')
-
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('../../../../js/settings', {
       getSetting: () => settingDefaultValue
     })
-    window.chrome = fakeElectron
-    TabsTab = require('../../../../../../app/renderer/components/preferences/TabsTab')
+    TabsTab = require('../../../../../../app/renderer/components/preferences/tabsTab')
   })
   after(function () {
     mockery.disable()
