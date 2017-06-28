@@ -337,6 +337,27 @@ const tabsReducer = (state, action, immutableAction) => {
         }
       }
       break
+    case appConstants.APP_WINDOW_READY: {
+      if (!action.getIn(['createProperties', 'windowId'])) {
+        const senderWindowId = action.getIn(['senderWindowId'])
+        if (senderWindowId) {
+          action = action.setIn(['createProperties', 'windowId'], senderWindowId)
+        }
+      }
+
+      const welcomeScreenProperties = {
+        'url': 'about:welcome',
+        'windowId': action.getIn(['createProperties', 'windowId'])
+      }
+
+      const shouldShowWelcomeScreen = state.getIn(['about', 'welcome', 'showOnLoad'])
+      if (shouldShowWelcomeScreen) {
+        setImmediate(() => tabs.create(welcomeScreenProperties))
+        // We only need to run welcome screen once
+        state = state.setIn(['about', 'welcome', 'showOnLoad'], false)
+      }
+      break
+    }
     case appConstants.APP_DRAG_ENDED: {
       const dragData = state.get('dragData')
       if (dragData && dragData.get('type') === dragTypes.TAB) {

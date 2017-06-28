@@ -403,7 +403,6 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/extensionsReducer'),
       require('../../app/browser/reducers/shareReducer'),
       require('../../app/browser/reducers/updatesReducer'),
-      require('../../app/browser/reducers/aboutWelcomeReducer'),
       require('../../app/ledger').doAction
     ]
     initialized = true

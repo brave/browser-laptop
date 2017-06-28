@@ -658,7 +658,7 @@ module.exports.defaultAppState = () => {
         pinnedTopSites: pinnedTopSites
       },
       welcome: {
-        showOnLoad: true
+        showOnLoad: !['test', 'development'].includes(process.env.NODE_ENV)
       }
     },
     trackingProtection: {
