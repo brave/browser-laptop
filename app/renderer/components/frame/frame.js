@@ -91,15 +91,6 @@ class Frame extends React.Component {
     windowActions.closeFrame(this.props.frameKey)
   }
 
-  getFrameBraverySettings (props) {
-    props = props || this.props
-    const frameSiteSettings =
-      siteSettings.getSiteSettingsForURL(props.allSiteSettings, props.location)
-    return Immutable.fromJS(siteSettings.activeSettings(frameSiteSettings,
-                                                        appStoreRenderer.state,
-                                                        appConfig))
-  }
-
   isAboutPage () {
     return aboutUrls.get(getBaseUrl(this.props.location))
   }
@@ -611,7 +602,7 @@ class Frame extends React.Component {
       }
       if (e.isMainFrame && !e.isErrorPage && !e.isFrameSrcDoc) {
         if (e.url && e.url.startsWith(appConfig.noScript.twitterRedirectUrl) &&
-          this.getFrameBraverySettings(this.props).get('noScript') === true) {
+          this.props.frameBraveryNoScript === true) {
           // This result will be canceled immediately by sitehacks, so don't
           // update the load state; otherwise it will not show the security
           // icon.
@@ -895,6 +886,7 @@ class Frame extends React.Component {
     const contextMenu = currentWindow.get('contextMenuDetail')
     const tabId = frame.get('tabId')
     const tab = tabId && tabId > -1 && tabState.getByTabId(state, tabId)
+    const frameBraverySettings = siteSettings.activeSettings(frameSiteSettings, state, appConfig)
 
     const props = {}
     // used in renderer
@@ -936,6 +928,7 @@ class Frame extends React.Component {
     props.allSiteSettings = allSiteSettings // TODO (nejc) can be improved even more
     props.tabUrl = tab && tab.get('url')
     props.partitionNumber = frame.get('partitionNumber')
+    props.frameBraveryNoScript = frameBraverySettings.noScript
 
     return props
   }
