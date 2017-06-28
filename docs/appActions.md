@@ -1138,17 +1138,6 @@ Dispatches a message to indicate that the update log is being opened
 
 
 
-### activateWelcomeScreen(shouldShowWelcomeScreen) 
-
-Dispatches a message to the store to show the welcome screen.
-
-**Parameters**
-
-**shouldShowWelcomeScreen**: `Boolean`, true if a new tab
-with the welcome screen should be show
-
-
-
 
 * * *
 
