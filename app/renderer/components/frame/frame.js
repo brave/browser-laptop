@@ -739,8 +739,6 @@ class Frame extends React.Component {
       if (!this.frame.isEmpty()) {
         windowActions.setNavigated(e.url, this.props.frameKey, false, this.props.tabId)
       }
-      // force temporary url display for tabnapping protection
-      windowActions.setMouseInTitlebar(true)
     }, { passive: true })
     this.webview.addEventListener('crashed', (e) => {
       if (this.frame.isEmpty()) {

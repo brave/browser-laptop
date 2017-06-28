@@ -65,7 +65,6 @@ const _ = require('underscore')
 const cx = require('../../../../js/lib/classSet')
 const eventUtil = require('../../../../js/lib/eventUtil')
 const siteSettings = require('../../../../js/state/siteSettings')
-const debounce = require('../../../../js/lib/debounce')
 const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
 const {getCurrentWindowId, isMaximized, isFocused, isFullScreen} = require('../../currentWindow')
 const {isDarwin, isWindows, isLinux} = require('../../../common/lib/platformUtil')
@@ -77,7 +76,6 @@ class Main extends ImmutableComponent {
     this.onClickWindow = this.onClickWindow.bind(this)
     this.onHideSiteInfo = this.onHideSiteInfo.bind(this)
     this.onTabContextMenu = this.onTabContextMenu.bind(this)
-    this.checkForTitleMode = debounce(this.checkForTitleMode.bind(this), 20)
     this.resetAltMenuProcessing()
   }
   registerWindowLevelShortcuts () {
@@ -449,12 +447,6 @@ class Main extends ImmutableComponent {
 
     this.loadSearchProviders()
 
-    window.addEventListener('mousemove', (e) => {
-      if (e.pageY !== this.pageY) {
-        this.pageY = e.pageY
-        this.checkForTitleMode()
-      }
-    }, { passive: true })
     window.addEventListener('focus', () => {
       const activeFrame = frameStateUtil.getActiveFrame(self.props.windowState)
       windowActions.setFocusedFrame(activeFrame)
@@ -494,21 +486,6 @@ class Main extends ImmutableComponent {
     window.onblur = () => {
       self.resetAltMenuProcessing()
       windowActions.onBlur(getCurrentWindowId())
-    }
-  }
-
-  checkForTitleMode () {
-    const navigator = document.querySelector('.top')
-    // Uncaught TypeError: Cannot read property 'getBoundingClientRect' of null
-    if (!navigator) {
-      return
-    }
-
-    const height = navigator.getBoundingClientRect().bottom
-    if (this.pageY < height && this.props.windowState.getIn(['ui', 'mouseInTitlebar']) !== true) {
-      windowActions.setMouseInTitlebar(true)
-    } else if (this.pageY === undefined || (this.pageY >= height && this.props.windowState.getIn(['ui', 'mouseInTitlebar']) !== false)) {
-      windowActions.setMouseInTitlebar(false)
     }
   }
 
@@ -648,7 +625,10 @@ class Main extends ImmutableComponent {
         ? <PopupWindow />
         : null
       }
-      <div className='top'>
+      <div className='top'
+        onMouseEnter={windowActions.setMouseInTitlebar.bind(null, true)}
+        onMouseLeave={windowActions.setMouseInTitlebar.bind(null, false)}
+        >
         <Navigator />
         {
           siteInfoIsVisible
