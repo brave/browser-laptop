@@ -130,6 +130,19 @@ const setActive = (state, isActive) => {
   return state
 }
 
+const setUrlBarSelected = (state, selected) => {
+  const urlBarPath = activeFrameStatePath(state).concat(['navbar', 'urlbar'])
+  state = state.mergeIn(urlBarPath, {
+    selected: selected
+  })
+  // selection implies focus
+  if (selected) {
+    state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'focused']), true)
+  }
+
+  return state
+}
+
 const urlBarReducer = (state, action) => {
   // TODO(bridiver) - this is a workaround until we can migrate frames to tabs
   if (action.actionType === tabActions.didFinishNavigation.name) {
@@ -189,14 +202,7 @@ const urlBarReducer = (state, action) => {
       state = setActive(state, false)
       break
     case windowConstants.WINDOW_SET_URL_BAR_SELECTED:
-      const urlBarPath = activeFrameStatePath(state).concat(['navbar', 'urlbar'])
-      state = state.mergeIn(urlBarPath, {
-        selected: action.selected
-      })
-      // selection implies focus
-      if (action.selected) {
-        state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'focused']), true)
-      }
+      state = setUrlBarSelected(state, action.selected)
       break
     case windowConstants.WINDOW_SET_FINDBAR_SHOWN:
       if (action.shown) {
@@ -251,6 +257,14 @@ const urlBarReducer = (state, action) => {
           const suggestion = suggestionList.get(selectedIndex)
           navigateSiteClickHandler(suggestion, action.isForSecondaryAction, action.shiftKey)
         })
+      }
+      break
+    case windowConstants.WINDOW_ON_STOP:
+      if (action.isFocused) {
+        state = setActive(state, false)
+        if (!action.shouldRender) {
+          state = setUrlBarSelected(state, true)
+        }
       }
       break
   }

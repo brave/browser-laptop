@@ -689,6 +689,17 @@ const filterSuggestionListByType = (suggestionList) => {
   }
 }
 
+const getNormalizedSuggestion = (suggestionList, activeIndex) => {
+  let suggestion = ''
+  let normalizedSuggestion = ''
+  if (suggestionList && suggestionList.size > 0) {
+    suggestion = suggestionList.getIn([activeIndex || 0, 'location'], '')
+    normalizedSuggestion = normalizeLocation(suggestion)
+  }
+
+  return normalizedSuggestion
+}
+
 module.exports = {
   sortingPriority,
   sortByAccessCountWithAgeDecay,
@@ -710,5 +721,6 @@ module.exports = {
   getAlexaSuggestions,
   generateNewSuggestionsList,
   generateNewSearchXHRResults,
-  filterSuggestionListByType
+  filterSuggestionListByType,
+  getNormalizedSuggestion
 }
