@@ -227,10 +227,10 @@ class FindBar extends React.Component {
     if (this.props.backgroundColor) {
       findBarStyle = {
         background: this.props.backgroundColor,
-        color: this.textColor
+        color: this.props.textColor
       }
       findBarTextStyle = {
-        color: this.textColor
+        color: this.props.textColor
       }
     }
 
