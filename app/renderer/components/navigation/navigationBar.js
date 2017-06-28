@@ -82,18 +82,9 @@ class NavigationBar extends React.Component {
   }
 
   onStop () {
+    // TODO (bridiver) - remove shortcut
     ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_STOP)
-    if (this.props.navbar.getIn(['urlbar', 'focused'])) {
-      windowActions.setUrlBarActive(false)
-      const shouldRenderSuggestions = this.props.navbar.getIn(['urlbar', 'suggestions', 'shouldRender']) === true
-      const suggestionList = this.props.navbar.getIn(['urlbar', 'suggestions', 'suggestionList'])
-      if (!shouldRenderSuggestions ||
-          // TODO: Once we take out suggestion generation from within URLBarSuggestions we can remove this check
-          // and put it in shouldRenderUrlBarSuggestions where it belongs.  See https://github.com/brave/browser-laptop/issues/3151
-          !suggestionList || suggestionList.size === 0) {
-        windowActions.setUrlBarSelected(true)
-      }
-    }
+    windowActions.onStop(this.props.isFocused, this.props.shouldRenderSuggestions)
   }
 
   componentDidMount () {
@@ -144,7 +135,8 @@ class NavigationBar extends React.Component {
     props.showHomeButton = !props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
 
     // used in other functions
-    props.navbar = navbar // TODO(nejc) remove, primitives only
+    props.isFocused = navbar.getIn(['urlbar', 'focused'], false)
+    props.shouldRenderSuggestions = navbar.getIn(['urlbar', 'suggestions', 'shouldRender']) === true
     props.sites = state.get('sites') // TODO(nejc) remove, primitives only
     props.activeTabId = activeTabId
     props.showHomeButton = !props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
@@ -208,10 +200,7 @@ class NavigationBar extends React.Component {
           : null
         }
       </div>
-      <UrlBar
-        titleMode={this.props.titleMode}
-        onStop={this.onStop}
-        />
+      <UrlBar titleMode={this.props.titleMode} />
       {
         this.props.showPublisherToggle
         ? <div className='endButtons'>
