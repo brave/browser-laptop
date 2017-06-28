@@ -75,6 +75,7 @@ describe('Tabs content - NewSessionIcon', function () {
 
   after(function () {
     mockery.deregisterAll()
+    mockery.disable()
   })
 
   describe('should show', function () {

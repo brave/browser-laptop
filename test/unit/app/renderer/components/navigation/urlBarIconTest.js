@@ -12,7 +12,7 @@ const assert = require('assert')
 const fakeElectron = require('../../../../lib/fakeElectron')
 require('../../../../braveUnit')
 
-describe.skip('UrlBarIcon component unit tests', function () {
+describe('UrlBarIcon component unit tests', function () {
   let UrlBarIcon, windowActions, windowStore, appStore
 
   const tabId = 1

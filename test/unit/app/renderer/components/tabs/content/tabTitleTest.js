@@ -77,6 +77,7 @@ describe('Tabs content - Title', function () {
 
   after(function () {
     mockery.deregisterAll()
+    mockery.disable()
   })
 
   describe('should show text', function () {
