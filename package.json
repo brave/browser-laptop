@@ -102,7 +102,7 @@
     "immutablepatch": "brave/immutable-js-patch",
     "keytar": "^3.0.0",
     "l20n": "^3.5.1",
-    "ledger-balance": "^0.9.0",
+    "ledger-balance": "^0.9.1",
     "ledger-client": "^0.9.18",
     "ledger-geoip": "^0.9.0",
     "ledger-publisher": "^0.9.4",
