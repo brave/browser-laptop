@@ -10,7 +10,7 @@ const Immutable = require('immutable')
 const fakeElectron = require('../../../../lib/fakeElectron')
 require('../../../../braveUnit')
 
-describe('PublisherToggle component', function () {
+describe.skip('PublisherToggle component', function () {
   let PublisherToggle, windowStore, appStore
 
   const fakeAppState = Immutable.fromJS({
