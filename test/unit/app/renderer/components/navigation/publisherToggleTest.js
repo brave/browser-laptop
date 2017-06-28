@@ -9,7 +9,7 @@ const {getHostPattern} = require('../../../../../../js/lib/urlutil')
 let PublisherToggle
 require('../../../../braveUnit')
 
-describe.skip('PublisherToggle component', function () {
+describe('PublisherToggle component', function () {
   const getUrlOrigin = url => url.split('/').slice(0, 3).join('/')
   const getHostName = url => getUrlOrigin(url).split('/').slice(2).join('/')
   const getPattern = pattern => getHostPattern(getHostName(pattern))

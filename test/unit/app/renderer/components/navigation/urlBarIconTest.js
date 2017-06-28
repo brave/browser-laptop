@@ -11,7 +11,7 @@ const assert = require('assert')
 let UrlBarIcon, windowActions
 require('../../../../braveUnit')
 
-describe.skip('UrlBarIcon component unit tests', function () {
+describe('UrlBarIcon component unit tests', function () {
   before(function () {
     mockery.enable({
       warnOnReplace: false,
