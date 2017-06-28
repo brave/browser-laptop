@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const Immutable = require('immutable')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
@@ -160,8 +161,8 @@ class AddEditBookmarkHanger extends React.Component {
 
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const bookmarkDetail = currentWindow.get('bookmarkDetail')
-    const currentDetail = bookmarkDetail.get('currentDetail')
+    const bookmarkDetail = currentWindow.get('bookmarkDetail', new Immutable.Map())
+    const currentDetail = bookmarkDetail.get('currentDetail', new Immutable.Map())
     const originalDetail = bookmarkDetail.get('originalDetail')
 
     const props = {}
