@@ -233,11 +233,11 @@ class ContextMenuSingle extends ImmutableComponent {
     if (this.props.y) {
       styles.marginTop = this.props.y
     }
-    const visibleMenuItems = this.props.template.filter((element) => {
+    const visibleMenuItems = this.props.template ? this.props.template.filter((element) => {
       return element.has('visible')
         ? element.get('visible')
         : true
-    })
+    }) : new Immutable.List()
 
     let index = 0
     return <div role='list' className={cx({
