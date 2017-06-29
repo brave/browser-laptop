@@ -130,7 +130,8 @@ const frameReducer = (state, action, immutableAction) => {
             state = state.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
           }
           state = state.setIn(['frames', index, 'lastAccessedTime'], new Date().getTime())
-          state = frameStateUtil.updateTabPageIndex(state, frame)
+
+          state = frameStateUtil.updateTabPageIndex(state, tabId)
         }
       }
       break

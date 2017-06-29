@@ -188,7 +188,7 @@ const newFrame = (state, frameOpts) => {
   if (openInForeground) {
     const tabId = frameOpts.tabId
     const frame = frameStateUtil.getFrameByTabId(state, tabId)
-    state = frameStateUtil.updateTabPageIndex(state, frame)
+    state = frameStateUtil.updateTabPageIndex(state, tabId)
     if (active) {
       // only set the activeFrameKey if the tab is already active
       state = state.set('activeFrameKey', frame.get('key'))
@@ -228,6 +228,18 @@ const frameGuestInstanceIdChanged = (state, action) => {
   return state.mergeIn(['frames', frameStateUtil.getFrameIndex(state, action.getIn(['frameProps', 'key']))], {
     guestInstanceId: newGuestInstanceId
   })
+}
+
+function handleChangeSettingAction (state, settingKey, settingValue) {
+  switch (settingKey) {
+    case settings.TABS_PER_PAGE:
+      const activeFrame = frameStateUtil.getActiveFrame(state)
+      state = frameStateUtil.updateTabPageIndex(state, activeFrame.get('tabId'), settingValue)
+      break
+    default:
+  }
+
+  return state
 }
 
 const windowStore = new WindowStore()
@@ -366,7 +378,7 @@ const doAction = (action) => {
         windowState = windowState.setIn(['ui', 'tabs', 'tabPageIndex'], action.index)
         windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
       } else {
-        windowState = frameStateUtil.updateTabPageIndex(windowState, action.frameProps)
+        windowState = frameStateUtil.updateTabPageIndex(windowState, action.frameProps.get('tabId'))
       }
       break
     case windowConstants.WINDOW_SET_TAB_BREAKPOINT:
@@ -394,6 +406,7 @@ const doAction = (action) => {
       {
         const sourceFrameProps = frameStateUtil.getFrameByKey(windowState, action.sourceFrameKey)
         const sourceFrameIndex = frameStateUtil.getFrameIndex(windowState, action.sourceFrameKey)
+        const activeFrame = frameStateUtil.getActiveFrame(windowState)
         let newIndex = frameStateUtil.getFrameIndex(windowState, action.destinationFrameKey) + (action.prepend ? 0 : 1)
         let frames = frameStateUtil.getFrames(windowState).splice(sourceFrameIndex, 1)
         if (newIndex > sourceFrameIndex) {
@@ -403,7 +416,7 @@ const doAction = (action) => {
         windowState = windowState.set('frames', frames)
         // Since the tab could have changed pages, update the tab page as well
         windowState = frameStateUtil.updateFramesInternalIndex(windowState, Math.min(sourceFrameIndex, newIndex))
-        windowState = frameStateUtil.updateTabPageIndex(windowState, frameStateUtil.getActiveFrame(windowState))
+        windowState = frameStateUtil.updateTabPageIndex(windowState, activeFrame.get('tabId'))
         break
       }
     case windowConstants.WINDOW_SET_LINK_HOVER_PREVIEW:
@@ -712,6 +725,9 @@ const doAction = (action) => {
         action.frameOpts.icon = action.frameOpts.icon || tabValue.get('favIconUrl')
       }
       windowState = newFrame(windowState, action.frameOpts)
+      break
+    case appConstants.APP_CHANGE_SETTING:
+      windowState = handleChangeSettingAction(windowState, action.key, action.value)
       break
     case windowConstants.WINDOW_FRAME_MOUSE_ENTER:
       windowState = windowState.setIn(['ui', 'mouseInFrame'], true)
