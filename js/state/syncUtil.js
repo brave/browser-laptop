@@ -91,7 +91,7 @@ module.exports.getSiteDataFromRecord = (record, appState, records) => {
   }
 
   let tag
-  let siteProps = Object.assign(
+  const siteProps = Object.assign(
     {},
     existingObjectData && existingObjectData.toJS(),
     record.historySite,
@@ -99,6 +99,10 @@ module.exports.getSiteDataFromRecord = (record, appState, records) => {
     record.bookmark && record.bookmark.site,
     {objectId}
   )
+  if (siteProps.customTitle === '') {
+    // browser-laptop UI expects the customTitle field to not exist if it is empty
+    delete siteProps.customTitle
+  }
   if (record.objectData === 'bookmark') {
     const existingFolderId = existingObjectData && existingObjectData.get('folderId')
     if (existingFolderId) {

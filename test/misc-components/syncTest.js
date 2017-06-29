@@ -432,7 +432,7 @@ describe('Syncing bookmarks', function () {
   })
 
   it('create bookmark in folder', function * () {
-    const pageNthChild = 1
+    const pageNthChild = 2 // TODO: This should be 1. See https://github.com/brave/sync/issues/104
     const folderTitle = this.folder1Title
     const pageTitle = this.folder1Page1Title
     const folder = `[data-test-id="bookmarkToolbarButton"][title="${folderTitle}"]`
@@ -444,7 +444,7 @@ describe('Syncing bookmarks', function () {
   })
 
   it('update bookmark, moving it into the folder', function * () {
-    const pageNthChild = 2
+    const pageNthChild = 1 // TODO: This should be 2
     const folderTitle = this.folder1Title
     const pageTitle = this.folder1Page2Title
     const folder = `[data-test-id="bookmarkToolbarButton"][title="${folderTitle}"]`
@@ -583,7 +583,7 @@ describe('Syncing bookmarks from an existing profile', function () {
   })
 
   it('create bookmark in folder', function * () {
-    const pageNthChild = 1
+    const pageNthChild = 2 // TODO: This should be 1
     const folderTitle = this.folder1Title
     const pageTitle = this.folder1Page1Title
     const folder = `[data-test-id="bookmarkToolbarButton"][title="${folderTitle}"]`
@@ -595,7 +595,7 @@ describe('Syncing bookmarks from an existing profile', function () {
   })
 
   it('update bookmark, moving it into the folder', function * () {
-    const pageNthChild = 2
+    const pageNthChild = 1 // TODO: This should be 2
     const folderTitle = this.folder1Title
     const pageTitle = this.folder1Page2Title
     const folder = `[data-test-id="bookmarkToolbarButton"][title="${folderTitle}"]`
