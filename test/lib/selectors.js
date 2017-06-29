@@ -72,6 +72,7 @@ module.exports = {
   securityTab: '[data-l10n-id="security"]',
   paymentsTab: '[data-l10n-id="payments"]',
   syncTab: '[data-l10n-id="sync"]',
+  tabsTab: '[data-l10n-id="tabs"]',
   doneButton: '[data-l10n-id="done"]',
   homepageInput: '[data-l10n-id="homepageInput"]',
   compactBraveryPanelSwitch: '[data-test-id="compactBraveryPanelSwitch"] .switchBackground',

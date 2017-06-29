@@ -12,7 +12,8 @@ const {
   tabPage1,
   tabPage2,
   activeWebview,
-  activeTab
+  activeTab,
+  tabsTab
 } = require('../lib/selectors')
 
 describe('tab pages', function () {
@@ -90,10 +91,21 @@ describe('tab pages', function () {
 
     describe('tabs per page setting', function () {
       it('takes effect immediately', function * () {
-        const defaultTabsPerPage = appConfig.defaultSettings[settings.TABS_PER_PAGE]
+        const newValue = 6
+        const tabs = appConfig.defaultSettings[settings.TABS_PER_PAGE]
+        const numberOfPages = Math.ceil(tabs / newValue)
+        const numberOfTabs = tabs - (Math.floor(tabs / newValue) * newValue)
         yield this.app.client
-          .changeSetting(settings.TABS_PER_PAGE, 1)
-          .waitForElementCount(tabPage, defaultTabsPerPage)
+          .tabByIndex(1)
+          .loadUrl('about:preferences')
+          .waitForVisible(tabsTab)
+          .click(tabsTab)
+          .waitForElementCount('[data-test-id="tabsPerTabPage"]', 1)
+          .click('[data-test-id="tabsPerTabPage"]')
+          .click(`option[value="${newValue}"]`)
+          .waitForBrowserWindow()
+          .waitForElementCount(tabPage, numberOfPages)
+          .waitForElementCount('.tabArea', numberOfTabs)
       })
     })
   })
