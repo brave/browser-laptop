@@ -164,7 +164,7 @@ class Tabs extends React.Component {
       onMouseLeave={this.onMouseLeave}>
       <span className={cx({
         tabStripContainer: true,
-        isPreview: this.props.previewTabPageIndex !== undefined,
+        isPreview: this.props.previewTabPageIndex != null,
         allowDragging: this.props.shouldAllowWindowDrag
       })}
         onDragOver={this.onDragOver}

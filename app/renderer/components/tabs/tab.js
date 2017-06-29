@@ -28,7 +28,6 @@ const tabContentState = require('../../../common/state/tabContentState')
 
 // Constants
 const dragTypes = require('../../../../js/constants/dragTypes')
-const settings = require('../../../../js/constants/settings')
 
 // Styles
 const styles = require('../styles/tab')
@@ -44,7 +43,6 @@ const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {getTabBreakpoint, tabUpdateFrameRate} = require('../../lib/tabUtil')
 const {isWindows} = require('../../../common/lib/platformUtil')
 const {getCurrentWindowId} = require('../../currentWindow')
-const {getSetting} = require('../../../../js/settings')
 const UrlUtil = require('../../../../js/lib/urlutil')
 const {hasBreakpoint} = require('../../lib/tabUtil')
 
@@ -131,25 +129,10 @@ class Tab extends React.Component {
   }
 
   onMouseLeave () {
-    if (this.props.previewTabs) {
-      window.clearTimeout(this.hoverTimeout)
-      windowActions.setPreviewFrame(null)
-    }
     windowActions.setTabHoverState(this.props.frameKey, false)
   }
 
   onMouseEnter (e) {
-    // relatedTarget inside mouseenter checks which element before this event was the pointer on
-    // if this element has a tab-like class, then it's likely that the user was previewing
-    // a sequency of tabs. Called here as previewMode.
-    const previewMode = /tab(?!pages)/i.test(e.relatedTarget.classList)
-
-    // If user isn't in previewMode, we add a bit of delay to avoid tab from flashing out
-    // as reported here: https://github.com/brave/browser-laptop/issues/1434
-    if (this.props.previewTabs) {
-      this.hoverTimeout =
-        window.setTimeout(windowActions.setPreviewFrame.bind(null, this.props.frameKey), previewMode ? 0 : 200)
-    }
     windowActions.setTabHoverState(this.props.frameKey, true)
   }
 
@@ -270,7 +253,6 @@ class Tab extends React.Component {
 
     // used in other functions
     props.totalTabs = state.get('tabs').size
-    props.previewTabs = getSetting(settings.SHOW_TAB_PREVIEWS)
     props.dragData = state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')
     props.hasTabInFullScreen = tabContentState.hasTabInFullScreen(currentWindow)
     props.tabId = frame.get('tabId')
