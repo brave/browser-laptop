@@ -21,7 +21,6 @@ module.exports = [
   'Release/obj',
   'obj.target',
   'ad-block/(node_modules|test|perf|sample|scripts|test|vendor|ABPFilterParserData.dat)',
-  'leveldown/(node_modules|src|iojs)',
   'tracking-protection/(node_modules|test|data|scripts|vendor)',
   'tracking-protection/build/node_modules',
   'tracking-protection/build/Release/(sample.exe|test.exe)',

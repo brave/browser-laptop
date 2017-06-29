@@ -65,7 +65,6 @@ describe('tabs API unit tests', function () {
 
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('ad-block', fakeAdBlock)
-    mockery.registerMock('leveldown', {})
     mockery.registerMock('../../js/stores/appStore', this.appStore)
     mockery.registerMock('../filtering', {
       isResourceEnabled: (resourceName, url, isPrivate) => false
