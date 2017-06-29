@@ -13,15 +13,12 @@ const config = require('../../../js/constants/config')
 
 // Actions
 const appActions = require('../../../js/actions/appActions')
-const windowActions = require('../../../js/actions/windowActions')
 
 // Utils
 const frameStateUtil = require('../../../js/state/frameStateUtil')
 const {getCurrentWindowId} = require('../currentWindow')
 const {getSourceAboutUrl, getSourceMagnetUrl} = require('../../../js/lib/appUrlUtil')
 const {isURL, isPotentialPhishingUrl, getUrlFromInput} = require('../../../js/lib/urlutil')
-const settings = require('../../../js/constants/settings')
-const {getSetting} = require('../../../js/settings')
 
 const setFullScreen = (state, action) => {
   const index = frameStateUtil.getFrameIndex(state, action.frameProps.get('key'))
@@ -32,7 +29,6 @@ const setFullScreen = (state, action) => {
 }
 
 const closeFrame = (state, action) => {
-  const activeFrameIndex = frameStateUtil.getActiveFrameIndex(state)
   const index = frameStateUtil.getFrameIndex(state, action.frameKey)
   if (index === -1) {
     return state
@@ -40,7 +36,6 @@ const closeFrame = (state, action) => {
 
   const frameProps = frameStateUtil.getFrameByKey(state, action.frameKey)
   const hoverState = state.getIn(['frames', index, 'hoverState'])
-  const framePreviewEnabled = getSetting(settings.SHOW_TAB_PREVIEWS)
 
   state = state.merge(frameStateUtil.removeFrame(
     state,
@@ -56,15 +51,15 @@ const closeFrame = (state, action) => {
 
   const nextFrame = frameStateUtil.getFrameByIndex(state, index)
 
-  if (nextFrame && hoverState) {
+  if (nextFrame) {
     // Copy the hover state if tab closed with mouse as long as we have a next frame
     // This allow us to have closeTab button visible for sequential frames closing,
     // until onMouseLeave event happens.
-    windowActions.setTabHoverState(nextFrame.get('key'), hoverState)
-    if (framePreviewEnabled && index !== activeFrameIndex) {
-      // After closing a tab, preview the next frame as long as there is one
-      windowActions.setPreviewFrame(nextFrame.get('key'))
+    if (hoverState) {
+      state = frameStateUtil.setTabHoverState(state, nextFrame.get('key'), hoverState)
     }
+  } else if (hoverState && frameStateUtil.getPreviewFrameKey(state) === action.frameKey) {
+    state = frameStateUtil.setPreviewFrameKey(state, null)
   }
 
   return state
@@ -124,12 +119,15 @@ const frameReducer = (state, action, immutableAction) => {
       const active = immutableAction.getIn(['tabValue', 'active'])
       if (active != null) {
         if (active) {
-          state = state.merge({
-            activeFrameKey: frame.get('key'),
-            previewFrameKey: null
-          })
+          state = state.set('activeFrameKey', frame.get('key'))
+          if (frame.get('hoverState')) {
+            state = state.set('previewFrameKey', null)
+          }
+          if (frame.getIn(['ui', 'tabs', 'hoverTabPageIndex']) == null) {
+            state = state.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
+          }
           state = state.setIn(['frames', index, 'lastAccessedTime'], new Date().getTime())
-          state = state.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
+
           state = frameStateUtil.updateTabPageIndex(state, frame)
         }
       }
