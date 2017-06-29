@@ -140,56 +140,62 @@
   if (!node) node = document.head.querySelector("link[rel='shortcut icon']")
   if (node) results.faviconURL = node.getAttribute('href')
 
-  var pubinfo = chrome.ipcRenderer.sendSync('ledger-publisher', document.location.href)
-  if ((!pubinfo) || (!pubinfo.context) || (!pubinfo.rules)) return console.log('no pubinfo available')
-
-  var context = pubinfo.context
-  var rules = pubinfo.rules
-
-  var i, publisher, rule
-  for (i = 0; i < rules.length; i++) {
-    rule = rules[i]
-
-    try {
-      if (!resolve(rule.condition, context)) continue
-    } catch (ex) {
-      console.log('error resolving rule at position #' + i + '\n' + ex.stack)
-      continue
+  var location = document.location.href
+  chrome.ipcRenderer.once('ledger-publisher-response-' + location, (e, pubinfo) => {
+    if (!pubinfo || !pubinfo.context || !pubinfo.rules) {
+      return console.log('no pubinfo available')
     }
 
-    if (rule.publisher) {
-      context.node = document.body.querySelector(rule.publisher.selector)
-      publisher = resolve(rule.publisher.consequent, context)
-    } else {
-      delete context.node
-      publisher = rule.consequent ? resolve(rule.consequent, context) : rule.consequent
+    var context = pubinfo.context
+    var rules = pubinfo.rules
+
+    var i, publisher, rule
+    for (i = 0; i < rules.length; i++) {
+      rule = rules[i]
+
+      try {
+        if (!resolve(rule.condition, context)) continue
+      } catch (ex) {
+        console.log('error resolving rule at position #' + i + '\n' + ex.stack)
+        continue
+      }
+
+      if (rule.publisher) {
+        context.node = document.body.querySelector(rule.publisher.selector)
+        publisher = resolve(rule.publisher.consequent, context)
+      } else {
+        delete context.node
+        publisher = rule.consequent ? resolve(rule.consequent, context) : rule.consequent
+      }
+      if (publisher === '') continue
+
+      if (typeof publisher !== 'string') return console.log('NOT a string')
+
+      publisher.replace(new RegExp('^./+|./+$', 'g'), '')
+
+      results.publisher = publisher
+      if (rule.faviconURL) {
+        context.node = document.body.querySelector(rule.faviconURL.selector)
+        results.faviconURL = resolve(rule.faviconURL.consequent, context)
+      }
+      break
     }
-    if (publisher === '') continue
 
-    if (typeof publisher !== 'string') return console.log('NOT a string')
-
-    publisher.replace(new RegExp('^./+|./+$', 'g'), '')
-
-    results.publisher = publisher
-    if (rule.faviconURL) {
-      context.node = document.body.querySelector(rule.faviconURL.selector)
-      results.faviconURL = resolve(rule.faviconURL.consequent, context)
+    if (results.faviconURL) {
+      var prefix = (results.faviconURL.indexOf('//') === 0) ? document.location.protocol
+                   : (results.faviconURL.indexOf('/') === 0) ? document.location.protocol + '//' + document.location.host
+                   : (results.faviconURL.indexOf(':') === -1) ? document.location.protocol + '//' + document.location.host + '/'
+                   : null
+      if (prefix) results.faviconURL = prefix + results.faviconURL
     }
-    break
-  }
 
-  if (results.faviconURL) {
-    var prefix = (results.faviconURL.indexOf('//') === 0) ? document.location.protocol
-                 : (results.faviconURL.indexOf('/') === 0) ? document.location.protocol + '//' + document.location.host
-                 : (results.faviconURL.indexOf(':') === -1) ? document.location.protocol + '//' + document.location.host + '/'
-                 : null
-    if (prefix) results.faviconURL = prefix + results.faviconURL
-  }
+    results.url = window.location.href
+    chrome.ipcRenderer.send('dispatch-action', JSON.stringify([{
+      location: window.location.href,
+      actionType: 'event-set-page-info',
+      pageInfo: results
+    }]))
+  })
+  var pubinfo = chrome.ipcRenderer.send('ledger-publisher', location)
 
-  results.url = window.location.href
-  chrome.ipcRenderer.send('dispatch-action', JSON.stringify([{
-    location: window.location.href,
-    actionType: 'event-set-page-info',
-    pageInfo: results
-  }]))
 } catch (ex) { console.log(ex.toString() + '\n' + ex.stack) } })()
