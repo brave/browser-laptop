@@ -167,6 +167,7 @@ class Navigator extends React.Component {
         return browserAction ? extension.get('id') : false
       })
       .filter((browserAction) => browserAction)
+      .toList()
 
     const props = {}
     // used in renderer
