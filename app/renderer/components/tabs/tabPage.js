@@ -27,20 +27,11 @@ class TabPage extends ImmutableComponent {
     this.onMouseLeave = this.onMouseLeave.bind(this)
   }
   onMouseLeave () {
-    window.clearTimeout(this.hoverTimeout)
-    windowActions.setPreviewTabPageIndex()
+    windowActions.setTabPageHoverState(this.props.index, false)
   }
 
   onMouseEnter (e) {
-    // relatedTarget inside mouseenter checks which element before this event was the pointer on
-    // if this element has a tab-like class, then it's likely that the user was previewing
-    // a sequency of tabs. Called here as previewMode.
-    const previewMode = /tab(?!pages)/i.test(e.relatedTarget.classList)
-
-    // If user isn't in previewMode, we add a bit of delay to avoid tab from flashing out
-    // as reported here: https://github.com/brave/browser-laptop/issues/1434
-    this.hoverTimeout =
-      window.setTimeout(windowActions.setPreviewTabPageIndex.bind(null, this.props.index), previewMode ? 0 : 200)
+    windowActions.setTabPageHoverState(this.props.index, true)
   }
 
   onDrop (e) {
