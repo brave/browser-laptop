@@ -1,3 +1,12 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/**
+ * Derived from Privacy Badger Chrome <https://github.com/EFForg/privacybadger>,
+ * Copyright (C) 2015 Electronic Frontier Foundation and other contributors
+ */
+
 module.exports = {
     "0.bg": 1,
     "0emm.com": 2,

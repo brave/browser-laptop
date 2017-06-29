@@ -1,6 +1,13 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/**
+ * Some parts of this file are derived from:
+ * HTTPS Everywhere <https://github.com/EFForg/https-everywhere>
+ * Copyright (C) 2010-2017 Electronic Frontier Foundation and others
+ */
+
 'use strict'
 
 const urlParse = require('./common/urlParse')

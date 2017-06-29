@@ -23,6 +23,8 @@ const checkASCII = function (str) {
 
 /**
  * Returns base domain for specified host based on Public Suffix List.
+ * Derived from Privacy Badger Chrome <https://github.com/EFForg/privacybadger>,
+ * Copyright (C) 2015 Electronic Frontier Foundation and other contributors
  * @param {string} hostname The name of the host to get the base domain for
  */
 
