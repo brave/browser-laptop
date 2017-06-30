@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.17.7](https://github.com/brave/browser-laptop/releases/tag/v0.17.7dev)
+## [0.17.13](https://github.com/brave/browser-laptop/releases/tag/v0.17.13dev)
 - Added Honey extension. ([#8118](https://github.com/brave/browser-laptop/issues/8118))
 - Added compact bravery panel option. ([#8954](https://github.com/brave/browser-laptop/issues/8954))
 - Added wide URL bar option. ([#8421](https://github.com/brave/browser-laptop/issues/8421))
