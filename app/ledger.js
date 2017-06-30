@@ -2204,7 +2204,7 @@ const sendAutorenewalRequest = (callback) => {
     verboseP: params.verboseP || false
   }
   request.request(options, (err, response, body) => {
-    // TODO - messaging in browser?
+    // TODO - this left in for messaging in browser?
     callback(err, body)
   })
 }
@@ -2223,13 +2223,14 @@ const attemptAutorenewalCharge = () => {
 }
 
 const closeToReconciliation = () => {
+  if (process.env.LEDGER_CLOSE) return true
   return ledgerInfo.reconcileStamp && (ledgerInfo.reconcileStamp - underscore.now() < 3 * msecs.day)
 }
 
 const waitedADay = () => {
   return ledgerInfo.customer &&
     ledgerInfo.customer.lastChargeTimestamp &&
-    (ledgerInfo.customer.lastChargeTimestamp - underscore.now() > 1 * msecs.day)
+    (underscore.now() - ledgerInfo.customer.lastChargeTimestamp > 1 * msecs.day)
 }
 
 const isAutorenewalEnabled = () => {
@@ -2322,8 +2323,8 @@ const showEnabledNotifications = () => {
 }
 
 const sufficientBalanceToReconcile = () => {
-  const balance = Number(ledgerInfo.balance || 0)
-  const unconfirmed = Number(ledgerInfo.unconfirmed || 0)
+  const balance = process.env.LEDGER_BALANCE || Number(ledgerInfo.balance || 0)
+  const unconfirmed = process.env.LEDGER_BALANCE || Number(ledgerInfo.unconfirmed || 0)
   return ledgerInfo.btc &&
     (balance + unconfirmed > 0.9 * Number(ledgerInfo.btc))
 }
