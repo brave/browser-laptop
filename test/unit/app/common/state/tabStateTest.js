@@ -763,18 +763,22 @@ describe('tabState unit tests', function () {
     before(function () {
       this.url = 'http://url'
       this.virtualURL = 'http://virtualURL'
+      this.origin = 'http://url/'
       this.navigationState = Immutable.fromJS({
         visibleEntry: {
           url: this.url,
-          virtualURL: this.virtualURL
+          virtualURL: this.virtualURL,
+          origin: this.origin
         },
         activeEntry: {
           url: 'active entry',
-          virtualURL: 'active virtual entry'
+          virtualURL: 'active virtual entry',
+          origin: 'active origin/'
         },
         lastCommittedEntry: {
           url: 'last entry',
-          virtual: 'last virtual entry'
+          virtual: 'last virtual entry',
+          origin: 'last origin/'
         }
       })
       this.appState = twoTabsAppState.setIn(['tabs', 0, 'navigationState'], this.navigationState)
@@ -803,6 +807,12 @@ describe('tabState unit tests', function () {
 
       it('does not change other tabs ids', function () {
         assert.equal(this.appState.getIn(['tabs', 1, 'navigationState']), undefined)
+      })
+    })
+
+    describe('getVisibleOrigin', function () {
+      it('returns the value from appState.tabs.`tabId`.navigationState.visibleEntry.origin with trailing slash removed', function () {
+        assert.deepEqual(tabState.getVisibleOrigin(this.appState, 1), 'http://url')
       })
     })
 
