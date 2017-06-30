@@ -37,7 +37,7 @@
 - Fixed clicking on disabled Ad/Tracker count enables the `<li>` element under braveryPanelBody. ([#7026](https://github.com/brave/browser-laptop/issues/7026))
 - Fixed autofill form option blinks and cannot be clicked. ([#5438](https://github.com/brave/browser-laptop/issues/5438))
 - Fixed build hangs in tmux on macOS. ([#8916](https://github.com/brave/browser-laptop/issues/8916))
-- Upgrade Muon to 4.1.6. ([#9645](https://github.com/brave/browser-laptop/issues/9645))
+- Upgrade Muon to 4.1.7. ([#9645](https://github.com/brave/browser-laptop/issues/9645))
 - Upgrade Chromium to 59.0.3071.109. ([#9626](https://github.com/brave/browser-laptop/issues/9626))
 
 ## [0.16.9](https://github.com/brave/browser-laptop/releases/tag/v0.16.9dev)
