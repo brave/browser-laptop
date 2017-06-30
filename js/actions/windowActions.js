@@ -1142,6 +1142,13 @@ const windowActions = {
       url,
       error
     })
+  },
+
+  onTabPageContextMenu: function (index) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_TAB_PAGE_CONTEXT_MENU,
+      index
+    })
   }
 }
 
