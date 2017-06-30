@@ -29,8 +29,10 @@ Brave supports 3 [release channels](https://github.com/brave/browser-laptop/wiki
 
 ## Community
 
-[Join the community](https://community.brave.com/) if you'd like to get more involved with Brave. You can [ask for help](https://community.brave.com/c/help-me),
+[Join the Q&A community](https://community.brave.com/) if you'd like to get more involved with Brave. You can [ask for help](https://community.brave.com/c/help-me),
 [discuss features you'd like to see](https://community.brave.com/c/feature-requests), and a lot more. We'd love to have your help so that we can continue improving Brave.
+
+Join our [Discord community chat](https://discordapp.com/invite/k57tYrS) for higher bandidth discussions.
 
 ## Useful documentation
 
