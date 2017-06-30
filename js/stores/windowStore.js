@@ -14,7 +14,7 @@ const frameStateUtil = require('../state/frameStateUtil')
 const ipc = require('electron').ipcRenderer
 const messages = require('../constants/messages')
 const debounce = require('../lib/debounce')
-const getSetting = require('../settings').getSetting
+const {getSetting} = require('../settings')
 const UrlUtil = require('../lib/urlutil')
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
 const { makeImmutable } = require('../../app/common/state/immutableUtil')
@@ -23,6 +23,8 @@ const assert = require('assert')
 const contextMenuState = require('../../app/common/state/contextMenuState')
 const appStoreRenderer = require('./appStoreRenderer')
 const windowActions = require('../actions/windowActions')
+const siteUtil = require('../state/siteUtil')
+const siteTags = require('../constants/siteTags')
 
 let windowState = Immutable.fromJS({
   activeFrameKey: null,
@@ -748,6 +750,22 @@ const doAction = (action) => {
           })
           appActions.loadURLRequested(action.tabId, 'about:certerror')
         }
+        break
+      }
+    case windowConstants.WINDOW_ON_TOGGLE_BOOKMARK:
+      {
+        // show the AddEditBookmarkHanger control; saving/deleting takes place there
+        const activeFrame = frameStateUtil.getActiveFrame(windowState)
+        let siteDetail = siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK)
+        const key = siteUtil.getSiteKey(siteDetail)
+
+        if (key !== null) {
+          const site = appStoreRenderer.state.getIn(['sites', key], Immutable.Map())
+          siteDetail = siteDetail.set('parentFolderId', site.get('parentFolderId'))
+          siteDetail = siteDetail.set('customTitle', site.get('customTitle'))
+        }
+        siteDetail = siteDetail.set('location', UrlUtil.getLocationIfPDF(siteDetail.get('location')))
+        windowActions.setBookmarkDetail(siteDetail, siteDetail, null, action.isBookmarked, true)
         break
       }
     default:

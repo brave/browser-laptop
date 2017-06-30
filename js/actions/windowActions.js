@@ -1142,6 +1142,13 @@ const windowActions = {
       url,
       error
     })
+  },
+
+  onToggleBookmark: function (isBookmarked) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_TOGGLE_BOOKMARK,
+      isBookmarked
+    })
   }
 }
 
