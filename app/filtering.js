@@ -117,8 +117,6 @@ function registerForBeforeRequest (session, partition) {
         continue
       }
       if (results.cancel) {
-        // We have no good way of knowing which BrowserWindow the blocking is for
-        // yet so send it everywhere and let listeners decide how to respond.
         let message = details.resourceType === 'mainFrame'
           ? messages.BLOCKED_PAGE
           : messages.BLOCKED_RESOURCE
@@ -137,11 +135,16 @@ function registerForBeforeRequest (session, partition) {
           appActions.addResourceCount(parentResourceName, 1)
         }
 
-        BrowserWindow.getAllWindows().forEach((wnd) =>
-          wnd.webContents.send(message, parentResourceName, {
-            tabId: details.tabId,
-            url: details.url
-          }))
+        // TODO(bridiver) - convert to appActions/appState
+        setImmediate(() => {
+          const tab = webContents.fromTabID(details.tabId)
+          if (tab && tab.hostWebContents) {
+            tab.hostWebContents.send(message, parentResourceName, {
+              tabId: details.tabId,
+              url: details.url
+            })
+          }
+        })
 
         if (parentResourceName === appConfig.resourceNames.SAFE_BROWSING) {
           let redirectURL = appUrlUtil.getTargetAboutUrl('about:safebrowsing#' + details.url)
@@ -167,11 +170,16 @@ function registerForBeforeRequest (session, partition) {
           if (isHttpsEverywhere) {
             appActions.addResourceCount(results.resourceName, 1)
           }
-          BrowserWindow.getAllWindows().forEach((wnd) =>
-            wnd.webContents.send(messages.HTTPSE_RULE_APPLIED, results.ruleset, {
-              tabId: details.tabId,
-              url: details.url
-            }))
+          // TODO(bridiver) - convert to appActions/appState
+          setImmediate(() => {
+            const tab = webContents.fromTabID(details.tabId)
+            if (tab && tab.hostWebContents) {
+              tab.hostWebContents.send(messages.HTTPSE_RULE_APPLIED, results.ruleset, {
+                tabId: details.tabId,
+                url: details.url
+              })
+            }
+          })
         }
         cb({redirectURL: results.redirectURL})
         return
