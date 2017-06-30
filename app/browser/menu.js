@@ -6,34 +6,38 @@
 
 const Immutable = require('immutable')
 const electron = require('electron')
-const appConfig = require('../../js/constants/appConfig')
-const appActions = require('../../js/actions/appActions')
-const appConstants = require('../../js/constants/appConstants')
-const appDispatcher = require('../../js/dispatcher/appDispatcher')
-const appStore = require('../../js/stores/appStore')
-const windowConstants = require('../../js/constants/windowConstants')
 const Menu = electron.Menu
-const CommonMenu = require('../common/commonMenu')
-const { makeImmutable } = require('../common/state/immutableUtil')
-const messages = require('../../js/constants/messages')
-const settings = require('../../js/constants/settings')
-const siteTags = require('../../js/constants/siteTags')
 const dialog = electron.dialog
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
-const {fileUrl} = require('../../js/lib/appUrlUtil')
-const {isValidClosedFrame} = require('../../js/state/frameStateUtil')
-const menuUtil = require('../common/lib/menuUtil')
+
+// Constants
+const appConfig = require('../../js/constants/appConfig')
+const appConstants = require('../../js/constants/appConstants')
+const windowConstants = require('../../js/constants/windowConstants')
+const messages = require('../../js/constants/messages')
+const settings = require('../../js/constants/settings')
+const siteTags = require('../../js/constants/siteTags')
+
+// State
 const {getByTabId} = require('../common/state/tabState')
-const getSetting = require('../../js/settings').getSetting
+const tabState = require('../../app/common/state/tabState')
+
+// Actions
+const appActions = require('../../js/actions/appActions')
+
+// Util
+const CommonMenu = require('../common/commonMenu')
+const {makeImmutable} = require('../common/state/immutableUtil')
+const {fileUrl} = require('../../js/lib/appUrlUtil')
+const frameStateUtil = require('../../js/state/frameStateUtil')
+const menuUtil = require('../common/lib/menuUtil')
+const {getSetting} = require('../../js/settings')
 const locale = require('../locale')
 const {isLocationBookmarked} = require('../../js/state/siteUtil')
-const tabState = require('../../app/common/state/tabState')
-const isDarwin = process.platform === 'darwin'
-const isLinux = process.platform === 'linux'
+const {isDarwin, isLinux} = require('../common/lib/platformUtil')
 
 let appMenu = null
-// TODO(bridiver) - these should be handled in the appStore
 let closedFrames = new Immutable.OrderedMap()
 let lastClosedUrl = null
 let currentLocation = null
@@ -75,7 +79,7 @@ const createFileSubmenu = () => {
       // This should be disabled when no windows are active.
       label: locale.translation('closeTab'),
       accelerator: 'CmdOrCtrl+W',
-      click: function (item, focusedWindow) {
+      click: function () {
         appActions.tabCloseRequested(tabState.TAB_ID_ACTIVE)
       }
     }, {
@@ -187,7 +191,7 @@ const createEditSubmenu = () => {
   return submenu
 }
 
-const createViewSubmenu = () => {
+const createViewSubmenu = (state) => {
   return [
     {
       label: locale.translation('actualSize'),
@@ -260,9 +264,9 @@ const createViewSubmenu = () => {
     {
       label: locale.translation('toggleDeveloperTools'),
       accelerator: isDarwin ? 'Cmd+Alt+I' : 'Ctrl+Shift+I',
-      click: function (item) {
+      click: function () {
         const win = BrowserWindow.getActiveWindow()
-        const activeTab = tabState.getActiveTab(appStore.getState(), win.id)
+        const activeTab = tabState.getActiveTab(state, win.id)
         appActions.toggleDevTools(activeTab.get('tabId'))
       }
     },
@@ -347,13 +351,13 @@ const createHistorySubmenu = () => {
   return submenu
 }
 
-const updateRecentlyClosedMenuItems = () => {
+const updateRecentlyClosedMenuItems = (state) => {
   // Update electron menu (Mac / Linux)
   menuUtil.updateRecentlyClosedMenuItems(appMenu, closedFrames)
   Menu.setApplicationMenu(appMenu)
 
   // Update in-memory menu template (Windows)
-  const oldTemplate = appStore.getState().getIn(['menu', 'template'])
+  const oldTemplate = state.getIn(['menu', 'template'])
   const historyMenuKey = oldTemplate.findKey(value =>
     value.get('label') === locale.translation('history')
   )
@@ -362,19 +366,19 @@ const updateRecentlyClosedMenuItems = () => {
   appActions.setMenubarTemplate(newTemplate)
 }
 
-const isCurrentLocationBookmarked = () => {
-  return isLocationBookmarked(appStore.getState(), currentLocation)
+const isCurrentLocationBookmarked = (state) => {
+  return isLocationBookmarked(state, currentLocation)
 }
 
-const createBookmarksSubmenu = () => {
+const createBookmarksSubmenu = (state) => {
   let submenu = [
     {
       label: locale.translation('bookmarkPage'),
       type: 'checkbox',
       accelerator: 'CmdOrCtrl+D',
-      checked: isCurrentLocationBookmarked(),
+      checked: isCurrentLocationBookmarked(state),
       click: function (item, focusedWindow) {
-        var msg = item.checked
+        const msg = item.checked
           ? messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK
           : messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK
         CommonMenu.sendToFocusedWindow(focusedWindow, [msg])
@@ -393,7 +397,7 @@ const createBookmarksSubmenu = () => {
     CommonMenu.exportBookmarksMenuItem()
   ]
 
-  const bookmarks = menuUtil.createBookmarkTemplateItems(appStore.getState().get('sites'))
+  const bookmarks = menuUtil.createBookmarkTemplateItems(state.get('sites'))
   if (bookmarks.length > 0) {
     submenu.push(CommonMenu.separatorMenuItem)
     submenu = submenu.concat(bookmarks)
@@ -529,13 +533,13 @@ const createDockSubmenu = () => {
  * Will only build the initial menu, which is mostly static items
  * Dynamic items (Bookmarks, History) get updated w/ updateMenu
  */
-const createMenu = () => {
+const createMenu = (state) => {
   const template = [
     { label: locale.translation('file'), submenu: createFileSubmenu() },
     { label: locale.translation('edit'), submenu: createEditSubmenu() },
-    { label: locale.translation('view'), submenu: createViewSubmenu() },
+    { label: locale.translation('view'), submenu: createViewSubmenu(state) },
     { label: locale.translation('history'), submenu: createHistorySubmenu() },
-    { label: locale.translation('bookmarks'), submenu: createBookmarksSubmenu() },
+    { label: locale.translation('bookmarks'), submenu: createBookmarksSubmenu(state) },
     {
       label: locale.translation('bravery'),
       submenu: [
@@ -602,126 +606,128 @@ const createMenu = () => {
   }
 }
 
-const setMenuItemChecked = (label, checked) => {
+const setMenuItemChecked = (state, label, checked) => {
   // Update electron menu (Mac / Linux)
   const systemMenuItem = menuUtil.getMenuItem(appMenu, label)
   systemMenuItem.checked = checked
 
   // Update in-memory menu template (Windows)
-  const oldTemplate = appStore.getState().getIn(['menu', 'template'])
+  const oldTemplate = state.getIn(['menu', 'template'])
   const newTemplate = menuUtil.setTemplateItemChecked(oldTemplate, label, checked)
   if (newTemplate) {
     appActions.setMenubarTemplate(newTemplate)
   }
 }
 
-const doAction = (action) => {
+const doAction = (state, action) => {
   switch (action.actionType) {
-    case windowConstants.WINDOW_SET_FOCUSED_FRAME:
-      // Update the checkbox next to "Bookmark Page" (Bookmarks menu)
-      currentLocation = action.frameProps.get('location')
-      setMenuItemChecked(locale.translation('bookmarkPage'), isCurrentLocationBookmarked())
+    case appConstants.APP_SET_STATE:
+      createMenu(state)
       break
+    case windowConstants.WINDOW_SET_FOCUSED_FRAME:
+      {
+        // Update the checkbox next to "Bookmark Page" (Bookmarks menu)
+        const frame = frameStateUtil.getFrameByTabId(state, action.tabId)
+        if (frame) {
+          currentLocation = frame.location
+          setMenuItemChecked(state, locale.translation('bookmarkPage'), isCurrentLocationBookmarked(state))
+        }
+        break
+      }
     case appConstants.APP_CHANGE_SETTING:
       if (action.key === settings.SHOW_BOOKMARKS_TOOLBAR) {
         // Update the checkbox next to "Bookmarks Toolbar" (Bookmarks menu)
-        setMenuItemChecked(locale.translation('bookmarksToolbar'), action.value)
+        setMenuItemChecked(state, locale.translation('bookmarksToolbar'), action.value)
       }
       break
     case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
-      appDispatcher.waitFor([appStore.dispatchToken], () => {
+      {
         if (!lastClosedUrl) {
           return
         }
         closedFrames = closedFrames.delete(lastClosedUrl)
         const nextLastFrame = closedFrames.last()
         lastClosedUrl = nextLastFrame ? nextLastFrame.get('location') : null
-        updateRecentlyClosedMenuItems()
-      })
-      break
+        updateRecentlyClosedMenuItems(state)
+        break
+      }
     case windowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
-      appDispatcher.waitFor([appStore.dispatchToken], () => {
+      {
         closedFrames = new Immutable.OrderedMap()
         lastClosedUrl = null
-        updateRecentlyClosedMenuItems()
-      })
-      break
+        updateRecentlyClosedMenuItems(state)
+        break
+      }
     case appConstants.APP_TAB_CLOSE_REQUESTED:
-      appDispatcher.waitFor([appStore.dispatchToken], () => {
+      {
         action = makeImmutable(action)
-        const tab = getByTabId(appStore.getState(), action.get('tabId'))
+        const tab = getByTabId(state, action.get('tabId'))
         const frame = tab && tab.get('frame')
-        if (tab && !tab.get('incognito') && frame && isValidClosedFrame(frame)) {
+        if (tab && !tab.get('incognito') && frame && frameStateUtil.isValidClosedFrame(frame)) {
           lastClosedUrl = tab.get('url')
           closedFrames = closedFrames.set(tab.get('url'), tab.get('frame'))
-          updateRecentlyClosedMenuItems()
+          updateRecentlyClosedMenuItems(state)
         }
-      })
-      break
+        break
+      }
     case appConstants.APP_APPLY_SITE_RECORDS:
       if (action.records.find((record) => record.objectData === 'bookmark')) {
-        appDispatcher.waitFor([appStore.dispatchToken], () => {
-          createMenu()
-        })
+        createMenu(state)
       }
       break
     case appConstants.APP_ADD_SITE:
-      if (action.tag === siteTags.BOOKMARK || action.tag === siteTags.BOOKMARK_FOLDER) {
-        appDispatcher.waitFor([appStore.dispatchToken], () => {
-          createMenu()
-        })
-      } else if (action.siteDetail.constructor === Immutable.List && action.tag === undefined) {
-        let shouldRebuild = false
-        action.siteDetail.forEach((site) => {
-          const tag = site.getIn(['tags', 0])
-          if (tag === siteTags.BOOKMARK || tag === siteTags.BOOKMARK_FOLDER) {
-            shouldRebuild = true
-          }
-        })
-        if (shouldRebuild) {
-          appDispatcher.waitFor([appStore.dispatchToken], () => {
-            createMenu()
+      {
+        if (action.tag === siteTags.BOOKMARK || action.tag === siteTags.BOOKMARK_FOLDER) {
+          createMenu(state)
+        } else if (action.siteDetail.constructor === Immutable.List && action.tag === undefined) {
+          let shouldRebuild = false
+          action.siteDetail.forEach((site) => {
+            const tag = site.getIn(['tags', 0])
+            if (tag === siteTags.BOOKMARK || tag === siteTags.BOOKMARK_FOLDER) {
+              shouldRebuild = true
+            }
           })
+          if (shouldRebuild) {
+            createMenu(state)
+          }
         }
+        break
       }
-      break
     case appConstants.APP_REMOVE_SITE:
-      if (action.tag === siteTags.BOOKMARK || action.tag === siteTags.BOOKMARK_FOLDER) {
-        appDispatcher.waitFor([appStore.dispatchToken], () => {
-          createMenu()
-        })
+      {
+        if (action.tag === siteTags.BOOKMARK || action.tag === siteTags.BOOKMARK_FOLDER) {
+          createMenu(state)
+        }
+        break
       }
-      break
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
-      appDispatcher.waitFor([appStore.dispatchToken], () => {
-        const state = appStore.getState()
+      {
         const defaults = state.get('clearBrowsingDataDefaults')
         const temp = state.get('tempClearBrowsingData', Immutable.Map())
         const clearData = defaults ? defaults.merge(temp) : temp
         if (clearData.get('browserHistory')) {
-          createMenu()
+          createMenu(state)
         }
-      })
-      break
+        break
+      }
     case windowConstants.WINDOW_CLICK_MENUBAR_SUBMENU:
-      appDispatcher.waitFor([appStore.dispatchToken], () => {
+      {
         const clickedMenuItem = menuUtil.getMenuItem(appMenu, action.label)
         if (clickedMenuItem) {
           const focusedWindow = BrowserWindow.getFocusedWindow()
           clickedMenuItem.click(clickedMenuItem, focusedWindow, focusedWindow.webContents)
         }
-      })
-      break
+        break
+      }
     default:
   }
+
+  return state
 }
 
 /**
  * Sets up the menu.
  * @param {Object} appState - Application state. Used to fetch bookmarks and settings (like homepage)
  */
-module.exports.init = (appState) => {
-  createMenu()
-  appDispatcher.register(doAction)
-  return appState
-}
+
+module.exports = doAction

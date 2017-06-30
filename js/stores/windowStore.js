@@ -22,6 +22,7 @@ const {aboutUrls, getTargetAboutUrl, newFrameUrl} = require('../lib/appUrlUtil')
 const assert = require('assert')
 const contextMenuState = require('../../app/common/state/contextMenuState')
 const appStoreRenderer = require('./appStoreRenderer')
+const windowActions = require('../actions/windowActions')
 
 let windowState = Immutable.fromJS({
   activeFrameKey: null,
@@ -592,7 +593,7 @@ const doAction = (action) => {
       break
     case windowConstants.WINDOW_SET_SECURITY_STATE:
       {
-        const path = frameStateUtil.frameStatePath(windowState, action.frameProps.get('key'))
+        const path = frameStateUtil.frameStatePathByTabId(windowState, action.tabId)
         if (action.securityState.secure !== undefined) {
           windowState = windowState.setIn(path.concat(['security', 'isSecure']),
             action.securityState.secure)
@@ -604,13 +605,13 @@ const doAction = (action) => {
         break
       }
     case windowConstants.WINDOW_SET_BLOCKED_BY:
-      const blockedByPath = ['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key')), action.blockType, 'blocked']
+      const blockedByPath = ['frames', frameStateUtil.getIndexByTabId(windowState, action.tabId), action.blockType, 'blocked']
       let blockedBy = windowState.getIn(blockedByPath) || new Immutable.List()
       blockedBy = blockedBy.toSet().add(action.location).toList()
       windowState = windowState.setIn(blockedByPath, blockedBy)
       break
     case windowConstants.WINDOW_SET_REDIRECTED_BY:
-      const redirectedByPath = ['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key')), 'httpsEverywhere', action.ruleset]
+      const redirectedByPath = ['frames', frameStateUtil.getIndexByTabId(windowState, action.tabId), 'httpsEverywhere', action.ruleset]
       let redirectedBy = windowState.getIn(redirectedByPath) || new Immutable.List()
       windowState = windowState.setIn(redirectedByPath, redirectedBy.push(action.location))
       break
@@ -736,6 +737,19 @@ const doAction = (action) => {
     case windowConstants.WINDOW_ON_EXIT_FULL_SCREEN:
       windowState = windowState.setIn(['ui', 'isFullScreen'], false)
       break
+    case windowConstants.WINDOW_ON_CERT_ERROR:
+      {
+        const frame = frameStateUtil.getFrameByTabId(windowState, action.tabId) || Immutable.Map()
+        if (frame.get('location') === action.url ||
+          frame.get('provisionalLocation') === action.url) {
+          windowActions.setFrameError(frame, {
+            url: action.url,
+            error: action.error
+          })
+          appActions.loadURLRequested(action.tabId, 'about:certerror')
+        }
+        break
+      }
     default:
       break
   }

@@ -610,7 +610,7 @@ function tabTemplateInit (frameProps) {
       click: (item, focusedWindow) => {
         if (focusedWindow) {
           // TODO: Don't switch active tabs when this is called
-          focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_FRAME, frameKey)
+          focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_FRAME, tabId)
         }
       }
     })
@@ -620,21 +620,21 @@ function tabTemplateInit (frameProps) {
     label: locale.translation('closeOtherTabs'),
     click: (item, focusedWindow) => {
       if (focusedWindow) {
-        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, frameKey, true, true)
+        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, tabId, true, true)
       }
     }
   }, {
     label: locale.translation('closeTabsToRight'),
     click: (item, focusedWindow) => {
       if (focusedWindow) {
-        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, frameKey, true, false)
+        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, tabId, true, false)
       }
     }
   }, {
     label: locale.translation('closeTabsToLeft'),
     click: (item, focusedWindow) => {
       if (focusedWindow) {
-        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, frameKey, false, true)
+        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, tabId, false, true)
       }
     }
   }, CommonMenu.separatorMenuItem)

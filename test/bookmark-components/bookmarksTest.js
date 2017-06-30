@@ -263,6 +263,7 @@ describe('bookmark tests', function () {
           .loadUrl(prefsUrl)
           .waitForVisible(homepageInput)
           .windowParentByUrl(prefsUrl)
+          .activateURLMode()
           .waitForVisible(navigatorNotBookmarked)
           .click(navigatorNotBookmarked)
           .waitForVisible(doneButton)

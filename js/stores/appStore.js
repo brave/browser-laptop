@@ -403,7 +403,8 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/extensionsReducer'),
       require('../../app/browser/reducers/shareReducer'),
       require('../../app/browser/reducers/updatesReducer'),
-      require('../../app/ledger').doAction
+      require('../../app/ledger').doAction,
+      require('../../app/browser/menu')
     ]
     initialized = true
     appState = action.appState
@@ -427,7 +428,6 @@ const handleAppAction = (action) => {
       appState = basicAuth.init(appState, action, appStore)
       appState = webtorrent.init(appState, action, appStore)
       appState = profiles.init(appState, action, appStore)
-      appState = require('../../app/browser/menu').init(appState, action, appStore)
       appState = require('../../app/sync').init(appState, action, appStore)
       break
     case appConstants.APP_SHUTTING_DOWN:

@@ -86,8 +86,7 @@ class Window extends React.Component {
     }
 
     return <div id='windowContainer' className={cx(classes)} >
-      <Main windowState={this.state.immutableData.windowState}
-        appState={this.state.immutableData.appState} />
+      <Main />
     </div>
   }
 

@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ImmutableComponent = require('../immutableComponent')
+const ReduxComponent = require('../reduxComponent')
 const Immutable = require('immutable')
 const electron = require('electron')
 const urlResolve = require('url').resolve
@@ -55,7 +55,6 @@ const siteUtil = require('../../../../js/state/siteUtil')
 const searchProviders = require('../../../../js/data/searchProviders')
 const defaultBrowserState = require('../../../common/state/defaultBrowserState')
 const shieldState = require('../../../common/state/shieldState')
-const siteSettingsState = require('../../../common/state/siteSettingsState')
 const menuBarState = require('../../../common/state/menuBarState')
 const windowState = require('../../../common/state/windowState')
 const updateState = require('../../../common/state/updateState')
@@ -64,14 +63,13 @@ const updateState = require('../../../common/state/updateState')
 const _ = require('underscore')
 const cx = require('../../../../js/lib/classSet')
 const eventUtil = require('../../../../js/lib/eventUtil')
-const siteSettings = require('../../../../js/state/siteSettings')
 const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
 const {getCurrentWindowId, isMaximized, isFocused, isFullScreen} = require('../../currentWindow')
 const {isDarwin, isWindows, isLinux} = require('../../../common/lib/platformUtil')
 
-class Main extends ImmutableComponent {
-  constructor () {
-    super()
+class Main extends React.Component {
+  constructor (props) {
+    super(props)
     this.onMouseDown = this.onMouseDown.bind(this)
     this.onClickWindow = this.onClickWindow.bind(this)
     this.onHideSiteInfo = this.onHideSiteInfo.bind(this)
@@ -112,10 +110,9 @@ class Main extends ImmutableComponent {
     this.keydownHistory = []
   }
 
-  registerCustomTitlebarHandlers () {
-    if (this.customTitlebar.enabled) {
+  registerCustomTitleBarHandlers () {
+    if (this.props.showCustomTitleBar) {
       document.addEventListener('keyup', (e) => {
-        const customTitlebar = this.customTitlebar
         switch (e.which) {
           case keyCodes.LEFT:
           case keyCodes.RIGHT:
@@ -143,7 +140,7 @@ class Main extends ImmutableComponent {
             if (getSetting(settings.AUTO_HIDE_MENU)) {
               windowActions.toggleMenubarVisible(null)
             } else {
-              if (customTitlebar.menubarSelectedIndex) {
+              if (this.props.menubarSelectedIndex) {
                 windowActions.setMenuBarSelectedIndex()
                 windowActions.setContextMenuDetail()
               } else {
@@ -152,12 +149,12 @@ class Main extends ImmutableComponent {
             }
             break
           case keyCodes.ESC:
-            if (getSetting(settings.AUTO_HIDE_MENU) && customTitlebar.menubarVisible && !customTitlebar.menubarSelectedIndex) {
+            if (getSetting(settings.AUTO_HIDE_MENU) && this.props.menubarVisible && !this.props.menubarSelectedIndex) {
               e.preventDefault()
               windowActions.toggleMenubarVisible(false)
               break
             }
-            if (customTitlebar.menubarSelectedIndex) {
+            if (this.props.menubarSelectedIndex) {
               e.preventDefault()
               windowActions.setMenuBarSelectedIndex()
               windowActions.setContextMenuDetail()
@@ -174,7 +171,7 @@ class Main extends ImmutableComponent {
         delete this.keydown[e.which]
       })
 
-      document.addEventListener('focus', (e) => {
+      document.addEventListener('focus', () => {
         let selector = document.activeElement.id
           ? '#' + document.activeElement.id
           : null
@@ -192,15 +189,13 @@ class Main extends ImmutableComponent {
   }
 
   exitFullScreen () {
-    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
-    if (activeFrame && activeFrame.get('isFullScreen')) {
-      windowActions.setFullScreen(activeFrame, false)
+    if (this.props.isFullScreen) {
+      windowActions.setFullScreen(this.props.tabId, false)
     }
   }
 
   registerSwipeListener () {
     // Navigates back/forward on macOS two- and or three-finger swipe
-    let mouseInFrame = false
     let trackingFingers = false
     let startTime = 0
     let isSwipeOnLeftEdge = false
@@ -211,8 +206,7 @@ class Main extends ImmutableComponent {
 
     // isSwipeTrackingFromScrollEventsEnabled is only true if "two finger scroll to swipe" is enabled
     ipc.on('scroll-touch-begin', () => {
-      mouseInFrame = this.props.windowState.getIn(['ui', 'mouseInFrame'])
-      if (mouseInFrame) {
+      if (this.props.mouseInTitlebar) {
         trackingFingers = true
         startTime = (new Date()).getTime()
       }
@@ -257,7 +251,7 @@ class Main extends ImmutableComponent {
     })
 
     const throttledSwipe = _.throttle(direction => {
-      if (mouseInFrame) {
+      if (this.props.mouseInTitlebar) {
         if (direction === 'left') {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_BACK)
         } else if (direction === 'right') {
@@ -288,41 +282,38 @@ class Main extends ImmutableComponent {
   }
 
   componentWillUpdate (nextProps) {
-    if (!this.props.appState.getIn([appConfig.resourceNames.WIDEVINE, 'ready']) &&
-        nextProps.appState.getIn([appConfig.resourceNames.WIDEVINE, 'ready'])) {
-      const widevinePanelDetail = this.props.windowState.get('widevinePanelDetail')
+    if (!this.props.isWidevineReady && nextProps.isWidevineReady) {
       // User may have enabled from preferences and no details are present
-      if (!widevinePanelDetail) {
+      if (this.props.widevineLocation) {
         return
       }
-      const origin = siteUtil.getOrigin(widevinePanelDetail.get('location'))
+
       // This automatically handles reloading the frame as well
-      appActions.changeSiteSetting(origin, appConfig.resourceNames.WIDEVINE, widevinePanelDetail.get('alsoAddRememberSiteSetting') ? 1 : 0)
+      appActions.changeSiteSetting(
+        this.props.widevineLocation,
+        appConfig.resourceNames.WIDEVINE,
+        this.props.widevineRememberSettings
+      )
     }
   }
 
   componentDidUpdate (prevProps) {
     this.loadSearchProviders()
-    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
-    const activeFramePrev = frameStateUtil.getActiveFrame(prevProps.windowState)
-    const activeFrameTitle = (activeFrame && (activeFrame.get('title') || activeFrame.get('location'))) || ''
-    const activeFramePrevTitle = (activeFramePrev && (activeFramePrev.get('title') || activeFramePrev.get('location'))) || ''
-    if (activeFrameTitle !== activeFramePrevTitle) {
-      windowActions.shouldSetTitle(getCurrentWindowId(), activeFrameTitle)
+    if (prevProps.title !== this.props.title) {
+      windowActions.shouldSetTitle(getCurrentWindowId(), this.props.title)
     }
 
     // If the tab changes or was closed, exit out of full screen to give a better
     // picture of what's happening.
-    if (activeFramePrev && activeFrame &&
-        activeFrame.get('key') !== activeFramePrev.get('key') && activeFramePrev.get('isFullScreen')) {
-      windowActions.setFullScreen(activeFramePrev, false)
+    if (prevProps.tabId !== this.props.tabId && this.props.isFullScreen) {
+      windowActions.setFullScreen(this.props.tabId, false)
     }
   }
 
   componentDidMount () {
     this.registerSwipeListener()
     this.registerWindowLevelShortcuts()
-    this.registerCustomTitlebarHandlers()
+    this.registerCustomTitleBarHandlers()
 
     // DO NOT ADD TO THIS LIST
     // ipc.on is deprecated and should be replaced by actions/reducers
@@ -346,9 +337,8 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.OPEN_BRAVERY_PANEL, () => {
-      const activeFrame = frameStateUtil.getActiveFrame(self.props.windowState)
-      if (shieldState.braveShieldsEnabled(activeFrame)) {
-        this.onBraveMenu()
+      if (this.props.braveShieldEnabled) {
+        windowActions.setBraveryPanelDetail({})
       } else {
         appActions.maybeCreateTabRequested({
           url: 'about:preferences#shields'
@@ -366,30 +356,20 @@ class Main extends ImmutableComponent {
       }))
     })
 
-    ipc.on(messages.SHORTCUT_CLOSE_FRAME, (e, i) => {
-      const frame = i == null
-        ? frameStateUtil.getActiveFrame(this.props.windowState)
-        : frameStateUtil.getFrameByKey(self.props.windowState, i)
-      if (frame) {
-        appActions.tabCloseRequested(frame.get('tabId'))
+    ipc.on(messages.SHORTCUT_CLOSE_FRAME, (e, tabId) => {
+      if (tabId == null) {
+        tabId = this.props.tabId
+      }
+
+      if (tabId) {
+        appActions.tabCloseRequested(tabId)
       }
     })
+
     ipc.on(messages.SHORTCUT_UNDO_CLOSED_FRAME, () => windowActions.undoClosedFrame())
 
-    ipc.on(messages.SHORTCUT_CLOSE_OTHER_FRAMES, (e, key, isCloseRight, isCloseLeft) => {
-      const currentIndex = frameStateUtil.getFrameIndex(self.props.windowState, key)
-      if (currentIndex === -1) {
-        return
-      }
-
-      frameStateUtil.getFrames(self.props.windowState).forEach((frame, i) => {
-        if (!frame.get('pinnedLocation') &&
-            ((i < currentIndex && isCloseLeft) || (i > currentIndex && isCloseRight))) {
-          if (frame) {
-            appActions.tabCloseRequested(frame.get('tabId'))
-          }
-        }
-      })
+    ipc.on(messages.SHORTCUT_CLOSE_OTHER_FRAMES, (e, tabId, isCloseRight, isCloseLeft) => {
+      windowActions.closeOtherFrames(tabId, isCloseRight, isCloseLeft)
     })
 
     ipc.on(messages.SHOW_DOWNLOADS_TOOLBAR, () => {
@@ -400,39 +380,20 @@ class Main extends ImmutableComponent {
       windowActions.setDownloadsToolbarVisible(false)
     })
 
-    const self = this
     ipc.on(messages.BLOCKED_RESOURCE, (e, blockType, details) => {
-      const frameProps = frameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
-      frameProps && windowActions.setBlockedBy(frameProps, blockType, details.url)
-    })
-
-    ipc.on(messages.BLOCKED_PAGE, (e, blockType, details) => {
-      // const frameProps = frameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
-      // if (!frameProps) {
-      //   return
-      // }
+      windowActions.setBlockedBy(this.props.tabId, blockType, details.url)
     })
 
     ipc.on(messages.HTTPSE_RULE_APPLIED, (e, ruleset, details) => {
-      const frameProps = frameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
-      frameProps && windowActions.setRedirectedBy(frameProps, ruleset, details.url)
+      windowActions.setRedirectedBy(details.tabId, ruleset, details.url)
     })
 
     ipc.on(messages.CERT_ERROR, (e, details) => {
-      const frame = frameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
-      if (frame && (frame.get('location') === details.url ||
-                    frame.get('provisionalLocation') === details.url)) {
-        windowActions.setFrameError(frame, {
-          url: details.url,
-          error: details.error
-        })
-        appActions.loadURLRequested(frame.get('tabId'), 'about:certerror')
-      }
+      windowActions.onCertError(details.tabId, details.url, details.error)
     })
 
-    ipc.on(messages.SET_SECURITY_STATE, (e, frameKey, securityState) => {
-      windowActions.setSecurityState(frameStateUtil.getFrameByKey(self.props.windowState, frameKey),
-                                     securityState)
+    ipc.on(messages.SET_SECURITY_STATE, (e, tabId, securityState) => {
+      windowActions.setSecurityState(tabId, securityState)
     })
 
     ipc.on(messages.HIDE_CONTEXT_MENU, () => {
@@ -448,14 +409,14 @@ class Main extends ImmutableComponent {
     this.loadSearchProviders()
 
     window.addEventListener('focus', () => {
-      const activeFrame = frameStateUtil.getActiveFrame(self.props.windowState)
-      windowActions.setFocusedFrame(activeFrame)
+      windowActions.setFocusedFrame(this.props.location, this.props.tabId)
       windowActions.onFocus(getCurrentWindowId())
       // For whatever reason other elements are preserved but webviews are not.
       if (document.activeElement && document.activeElement.tagName === 'BODY') {
         webviewActions.setWebviewFocused()
       }
     }, { passive: true })
+
     windowActions.onFocus(getCurrentWindowId())
 
     // disable dnd by default
@@ -478,21 +439,14 @@ class Main extends ImmutableComponent {
       return false
     }, true)
 
-    const activeFrame = frameStateUtil.getActiveFrame(self.props.windowState)
-    if (activeFrame && activeFrame.get('title')) {
-      windowActions.shouldSetTitle(getCurrentWindowId(), activeFrame.get('title'))
+    if (this.props.title) {
+      windowActions.shouldSetTitle(getCurrentWindowId(), this.props.title)
     }
 
+    const self = this
     window.onblur = () => {
       self.resetAltMenuProcessing()
       windowActions.onBlur(getCurrentWindowId())
-    }
-  }
-
-  onBraveMenu () {
-    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
-    if (shieldState.braveShieldsEnabled(activeFrame)) {
-      windowActions.setBraveryPanelDetail({})
     }
   }
 
@@ -520,6 +474,7 @@ class Main extends ImmutableComponent {
       }
       node = node.parentNode
     }
+
     // Hide context menus, popup menus, and menu selections
     windowActions.resetMenuState()
   }
@@ -538,90 +493,90 @@ class Main extends ImmutableComponent {
   }
 
   onTabContextMenu (e) {
-    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
-    contextMenus.onTabsToolbarContextMenu(activeFrame.get('title'), activeFrame.get('location'), undefined, undefined, e)
+    contextMenus.onTabsToolbarContextMenu(this.props.title, this.props.location, undefined, undefined, e)
   }
 
-  get allSiteSettings () {
-    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState) || Immutable.Map()
-    return siteSettingsState.getAllSiteSettings(this.props.appState, activeFrame.get('isPrivate'))
-  }
+  mergeProps (state, ownProps) {
+    const currentWindow = state.get('currentWindow')
+    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
+    const nonPinnedFrames = frameStateUtil.getNonPinnedFrames(currentWindow)
+    const tabsPerPage = Number(getSetting(settings.TABS_PER_PAGE))
+    const activeOrigin = !activeFrame.isEmpty() ? siteUtil.getOrigin(activeFrame.get('location')) : null
+    const widevinePanelDetail = currentWindow.get('widevinePanelDetail', Immutable.Map())
+    const loginRequiredDetails = basicAuthState.getLoginRequiredDetail(state, activeFrame.get('tabId'))
 
-  frameSiteSettings (location) {
-    if (!location) {
-      return undefined
-    }
-    return siteSettings.getSiteSettingsForURL(this.allSiteSettings, location)
-  }
+    const props = {}
+    // used in renderer
+    props.isFullScreen = activeFrame.get('isFullScreen', false)
+    props.isMaximized = isMaximized() || isFullScreen()
+    props.captionButtonsVisible = isWindows()
+    props.showContextMenu = !!currentWindow.get('contextMenuDetail')
+    props.showPopupWindow = !!currentWindow.get('popupWindowDetail')
+    props.showSiteInfo = currentWindow.getIn(['ui', 'siteInfo', 'isVisible']) &&
+      !isSourceAboutUrl(activeFrame.get('location'))
+    props.showBravery = shieldState.braveShieldsEnabled(activeFrame) &&
+      !!currentWindow.get('braveryPanelDetail')
+    props.showClearData = !!currentWindow.getIn(['ui', 'isClearBrowsingDataPanelVisible'])
+    props.showImportData = !!currentWindow.get('importBrowserDataDetail')
+    props.showWidevine = currentWindow.getIn(['widevinePanelDetail', 'shown']) && !isLinux()
+    props.showAutoFillAddress = !!currentWindow.get('autofillAddressDetail')
+    props.showAutoFillCC = !!currentWindow.get('autofillCreditCardDetail')
+    props.showLogin = !!loginRequiredDetails
+    props.showBookmarkHanger = currentWindow.get('bookmarkDetail') &&
+      !currentWindow.getIn(['bookmarkDetail', 'isBookmarkHanger'])
+    props.showNoScript = currentWindow.getIn(['ui', 'noScriptInfo', 'isVisible']) &&
+      siteUtil.getOrigin(activeFrame.get('location'))
+    props.showReleaseNotes = currentWindow.getIn(['ui', 'releaseNotes', 'isVisible'])
+    props.showCheckDefault = isFocused() && defaultBrowserState.shouldDisplayDialog(state)
+    props.showUpdate = updateState.isUpdateVisible(state)
+    props.showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
+    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused())
+    props.isSinglePage = nonPinnedFrames.size <= tabsPerPage
+    props.showTabPages = nonPinnedFrames.size > tabsPerPage
+    props.showNotificationBar = activeOrigin && state.get('notifications').filter((item) =>
+        item.get('frameOrigin') ? activeOrigin === item.get('frameOrigin') : true).size > 0
+    props.showFindBar = activeFrame.get('findbarShown') && !activeFrame.get('isFullScreen')
+    props.sortedFrames = frameStateUtil.getSortedFrameKeys(currentWindow)
+    props.showDownloadBar = currentWindow.getIn(['ui', 'downloadsToolbar', 'isVisible']) &&
+      state.get('downloads') && state.get('downloads').size > 0
+    props.title = activeFrame.get('title')
+    props.location = activeFrame.get('location')
+    props.loginRequiredUrl = loginRequiredDetails
+      ? urlResolve(loginRequiredDetails.getIn(['request', 'url']), '/')
+      : null
 
-  get customTitlebar () {
-    const menubarVisible = menuBarState.isMenuBarVisible(this.props.windowState)
-    const selectedIndex = this.props.windowState.getIn(['ui', 'contextMenu', 'selectedIndex'])
-    return {
-      enabled: isWindows(),
-      captionButtonsVisible: isWindows(),
-      menubarVisible: menubarVisible,
-      menubarSelectedIndex: this.props.windowState.getIn(['ui', 'menubar', 'selectedIndex']),
-      contextMenuSelectedIndex: typeof selectedIndex === 'object' && Array.isArray(selectedIndex) && selectedIndex.length > 0
-        ? selectedIndex
-        : null,
-      isMaximized: isMaximized() || isFullScreen()
-    }
+    // used in other functions
+    props.menubarSelectedIndex = currentWindow.getIn(['ui', 'menubar', 'selectedIndex'])
+    props.showCustomTitleBar = isWindows()
+    props.menubarVisible = menuBarState.isMenuBarVisible(currentWindow)
+    props.mouseInTitlebar = currentWindow.getIn(['ui', 'mouseInTitlebar'])
+    props.braveShieldEnabled = shieldState.braveShieldsEnabled(activeFrame)
+    props.tabId = activeFrame.get('tabId')
+    props.location = activeFrame.get('location')
+    props.isWidevineReady = state.getIn([appConfig.resourceNames.WIDEVINE, 'ready'])
+    props.widevineLocation = siteUtil.getOrigin(widevinePanelDetail.get('location'))
+    props.widevineRememberSettings = widevinePanelDetail.get('alsoAddRememberSiteSetting') ? 1 : 0
+
+    return props
   }
 
   render () {
-    // Sort frames by key so that the order of the frames do not change which could
-    // cause unexpected reloading when a user moves tabs.
-    // All frame operations work off of frame keys and not index though so unsorted frames
-    // can be passed everywhere other than the Frame elements.
-    const sortedFrames = frameStateUtil.getSortedFrames(this.props.windowState)
-    const activeFrame = frameStateUtil.getActiveFrame(this.props.windowState)
-    const nonPinnedFrames = frameStateUtil.getNonPinnedFrames(this.props.windowState)
-    const tabsPerPage = Number(getSetting(settings.TABS_PER_PAGE))
-    const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
-    const siteInfoIsVisible = this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible']) && !isSourceAboutUrl(activeFrame.get('location'))
-    const braveryPanelIsVisible = shieldState.braveShieldsEnabled(activeFrame) &&
-      this.props.windowState.get('braveryPanelDetail')
-    const clearBrowsingDataPanelIsVisible = this.props.windowState.getIn(['ui', 'isClearBrowsingDataPanelVisible'])
-    const importBrowserDataPanelIsVisible = this.props.windowState.get('importBrowserDataDetail')
-    const widevinePanelIsVisible = this.props.windowState.getIn(['widevinePanelDetail', 'shown']) && !isLinux()
-    const autofillAddressPanelIsVisible = this.props.windowState.get('autofillAddressDetail')
-    const autofillCreditCardPanelIsVisible = this.props.windowState.get('autofillCreditCardDetail')
-    const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible']) &&
-      siteUtil.getOrigin(activeFrame.get('location'))
-    const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
-    const checkDefaultBrowserDialogIsVisible =
-      isFocused() && defaultBrowserState.shouldDisplayDialog(this.props.appState)
-    const loginRequiredDetails = activeFrame
-      ? basicAuthState.getLoginRequiredDetail(this.props.appState, activeFrame.get('tabId'))
-      : null
-    const loginRequiredUrl = loginRequiredDetails
-      ? urlResolve(loginRequiredDetails.getIn(['request', 'url']), '/')
-      : null
-    const customTitlebar = this.customTitlebar
-    const contextMenuDetail = this.props.windowState.get('contextMenuDetail')
-    const shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(this.props.appState, this.props.windowState, activeFrame, isFocused())
-    const activeOrigin = activeFrame ? siteUtil.getOrigin(activeFrame.get('location')) : null
-    const notificationBarIsVisible = activeOrigin && this.props.appState.get('notifications').filter((item) =>
-      item.get('frameOrigin') ? activeOrigin === item.get('frameOrigin') : true).size > 0
-    const updateIsVisible = updateState.isUpdateVisible(this.props.appState)
-
     return <div id='window'
       className={cx({
-        isFullScreen: activeFrame && activeFrame.get('isFullScreen'),
-        isMaximized: customTitlebar.isMaximized,
-        frameless: customTitlebar.captionButtonsVisible
+        isFullScreen: this.props.isFullScreen,
+        isMaximized: this.props.isMaximized,
+        frameless: this.props.captionButtonsVisible
       })}
       ref={(node) => { this.mainWindow = node }}
       onMouseDown={this.onMouseDown}
       onClick={this.onClickWindow}>
       {
-        contextMenuDetail
+        this.props.showContextMenu
         ? <ContextMenu />
         : null
       }
       {
-        this.props.windowState.get('popupWindowDetail')
+        this.props.showPopupWindow
         ? <PopupWindow />
         : null
       }
@@ -631,116 +586,115 @@ class Main extends ImmutableComponent {
         >
         <Navigator />
         {
-          siteInfoIsVisible
+          this.props.showSiteInfo
           ? <SiteInfo />
           : null
         }
         {
-          braveryPanelIsVisible
+          this.props.showBravery
           ? <BraveryPanel />
           : null
         }
         {
-         clearBrowsingDataPanelIsVisible
+         this.props.showClearData
           ? <ClearBrowsingDataPanel />
           : null
         }
         {
-          importBrowserDataPanelIsVisible
+          this.props.showImportData
           ? <ImportBrowserDataPanel />
           : null
         }
         {
-          widevinePanelIsVisible
+          this.props.showWidevine
           ? <WidevinePanel />
           : null
         }
         {
-         autofillAddressPanelIsVisible
+         this.props.showAutoFillAddress
           ? <AutofillAddressPanel />
           : null
         }
         {
-         autofillCreditCardPanelIsVisible
+         this.props.showAutoFillCC
           ? <AutofillCreditCardPanel />
           : null
         }
         {
-          loginRequiredUrl
+          this.props.showLogin
             ? <LoginRequired
-              loginRequiredUrl={loginRequiredUrl}
-              tabId={activeFrame.get('tabId')}
+              loginRequiredUrl={this.props.loginRequiredUrl}
+              tabId={this.props.tabId}
             />
             : null
         }
         {
-          this.props.windowState.get('bookmarkDetail') && !this.props.windowState.getIn(['bookmarkDetail', 'isBookmarkHanger'])
+          this.props.showBookmarkHanger
           ? <AddEditBookmarkHanger isModal />
           : null
         }
         {
-          noScriptIsVisible
+          this.props.showNoScript
             ? <NoScriptInfo />
             : null
         }
         {
-          releaseNotesIsVisible
+          this.props.showReleaseNotes
           ? <ReleaseNotes />
           : null
         }
         {
-          checkDefaultBrowserDialogIsVisible
+          this.props.showCheckDefault
             ? <CheckDefaultBrowserDialog />
             : null
         }
         {
-          updateIsVisible
+          this.props.showUpdate
           ? <UpdateBar />
           : null
         }
         {
-          showBookmarksToolbar
+          this.props.showBookmarksToolbar
           ? <BookmarksToolbar />
           : null
         }
         <div className={cx({
           tabPages: true,
-          allowDragging: shouldAllowWindowDrag,
-          singlePage: nonPinnedFrames.size <= tabsPerPage
+          allowDragging: this.props.shouldAllowWindowDrag,
+          singlePage: this.props.isSinglePage
         })}
           onContextMenu={this.onTabContextMenu}>
           {
-            nonPinnedFrames.size > tabsPerPage
+            this.props.showTabPages
             ? <TabPages />
             : null
           }
         </div>
         <TabsToolbar key='tab-bar' />
         {
-          notificationBarIsVisible
+          this.props.showNotificationBar
           ? <NotificationBar />
           : null
         }
         {
-          activeFrame && activeFrame.get('findbarShown') && !activeFrame.get('isFullScreen')
+          this.props.showFindBar
           ? <FindBar />
           : null
         }
       </div>
       <div className='mainContainer'>
-        <div className='tabContainer'
-          ref={(node) => { this.tabContainer = node }}>
+        <div className='tabContainer'>
           {
-            sortedFrames.map((frame) =>
+            this.props.sortedFrames.map((frameKey) =>
               <Frame
-                frameKey={frame.get('key')}
-                key={frame.get('key')}
+                frameKey={frameKey}
+                key={frameKey}
               />)
           }
         </div>
       </div>
       {
-        this.props.windowState.getIn(['ui', 'downloadsToolbar', 'isVisible']) && this.props.appState.get('downloads') && this.props.appState.get('downloads').size > 0
+        this.props.showDownloadBar
         ? <DownloadsBar />
         : null
       }
@@ -748,4 +702,4 @@ class Main extends ImmutableComponent {
   }
 }
 
-module.exports = Main
+module.exports = ReduxComponent.connect(Main)

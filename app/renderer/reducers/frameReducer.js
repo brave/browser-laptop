@@ -21,7 +21,7 @@ const {getSourceAboutUrl, getSourceMagnetUrl} = require('../../../js/lib/appUrlU
 const {isURL, isPotentialPhishingUrl, getUrlFromInput} = require('../../../js/lib/urlutil')
 
 const setFullScreen = (state, action) => {
-  const index = frameStateUtil.getFrameIndex(state, action.frameProps.get('key'))
+  const index = frameStateUtil.getIndexByTabId(state, action.tabId)
   return state.mergeIn(['frames', index], {
     isFullScreen: action.isFullScreen !== undefined ? action.isFullScreen : state.getIn(['frames', index].concat('isFullScreen')),
     showFullScreenWarning: action.showFullScreenWarning
@@ -181,6 +181,22 @@ const frameReducer = (state, action, immutableAction) => {
       closedFrames.forEach((frame) => {
         appActions.tabCloseRequested(frame.get('tabId'))
       })
+      break
+    case windowConstants.WINDOW_CLOSE_OTHER_FRAMES:
+      const currentIndex = frameStateUtil.getIndexByTabId(state, action.tabId)
+      if (currentIndex === -1) {
+        return
+      }
+
+      state.get('frames').forEach((frame, i) => {
+        if (!frame.get('pinnedLocation') &&
+          ((i < currentIndex && action.isCloseLeft) || (i > currentIndex && action.isCloseRight))) {
+          if (frame) {
+            appActions.tabCloseRequested(frame.get('tabId'))
+          }
+        }
+      })
+
       break
     case windowConstants.WINDOW_CLOSE_FRAME:
       state = closeFrame(state, action)

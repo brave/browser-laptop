@@ -40,15 +40,15 @@ const windowActions = {
 
   /**
    * Dispatches a message to set the security state.
-   * @param {Object} frameProps - The frame properties to modify.
+   * @param {Object} tabId - Tab id of the frame properties to modify.
    * @param {Object} securityState - The security state properties that have
    *   changed.
    */
-  setSecurityState: function (frameProps, securityState) {
+  setSecurityState: function (tabId, securityState) {
     dispatch({
       actionType: windowConstants.WINDOW_SET_SECURITY_STATE,
-      securityState,
-      frameProps
+      tabId,
+      securityState
     })
   },
 
@@ -151,14 +151,14 @@ const windowActions = {
   /**
    * Dispatches a message to the store to indicate that the webview entered full screen mode.
    *
-   * @param {Object} frameProps - The frame properties to put in full screen
+   * @param {Object} tabId - Tab id of the frame to put in full screen
    * @param {boolean} isFullScreen - true if the webview is entering full screen mode.
    * @param {boolean} showFullScreenWarning - true if a warning about entering full screen should be shown.
    */
-  setFullScreen: function (frameProps, isFullScreen, showFullScreenWarning) {
+  setFullScreen: function (tabId, isFullScreen, showFullScreenWarning) {
     dispatch({
       actionType: windowConstants.WINDOW_SET_FULL_SCREEN,
-      frameProps,
+      tabId,
       isFullScreen,
       showFullScreenWarning
     })
@@ -184,6 +184,21 @@ const windowActions = {
     dispatch({
       actionType: windowConstants.WINDOW_CLOSE_FRAMES,
       framePropsList
+    })
+  },
+
+  /**
+   * Dispatches a message to close multiple frames
+   * @param {string} tabId - Frame that we want to ignore when closing all tabs
+   * @param {boolean} isCloseRight - Close frames to the right of the frame provided
+   * @param {boolean} isCloseLeft - Close frames to the left of the frame provided
+   */
+  closeOtherFrames: function (tabId, isCloseRight, isCloseLeft) {
+    dispatch({
+      actionType: windowConstants.WINDOW_CLOSE_OTHER_FRAMES,
+      tabId,
+      isCloseRight,
+      isCloseLeft
     })
   },
 
@@ -216,15 +231,15 @@ const windowActions = {
   /**
    * Dispatches a message to the store when the frame is active and the window is focused
    *
-   * @param {Object} frameProps - the frame properties for the webview in question.
+   * @param {Object} location - location for the webview in question.
+   * @param {Object} tabId - tabId for the webview in question.
    */
-  setFocusedFrame: function (frameProps) {
-    if (frameProps) {
-      dispatch({
-        actionType: windowConstants.WINDOW_SET_FOCUSED_FRAME,
-        frameProps: frameProps
-      })
-    }
+  setFocusedFrame: function (location, tabId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SET_FOCUSED_FRAME,
+      location,
+      tabId
+    })
   },
 
   /**
@@ -697,14 +712,14 @@ const windowActions = {
   /**
    * Dispatches a message to indicate the site info, such as # of blocked ads, should be shown
    *
-   * @param {object} frameProps - The frame to set blocked info on
+   * @param {object} tabId - Tab id for the frame to set blocked info on
    * @param {string} blockType - type of the block
    * @param {string} location - URL that was blocked
    */
-  setBlockedBy: function (frameProps, blockType, location) {
+  setBlockedBy: function (tabId, blockType, location) {
     dispatch({
       actionType: windowConstants.WINDOW_SET_BLOCKED_BY,
-      frameProps,
+      tabId,
       blockType,
       location
     })
@@ -712,14 +727,14 @@ const windowActions = {
 
   /**
    * Similar to setBlockedBy but for httpse redirects
-   * @param {Object} frameProps - The frame to set blocked info on
+   * @param {Object} tabId - Tab id of the frame to set blocked info on
    * @param {string} ruleset - Name of the HTTPS Everywhere ruleset XML file
    * @param {string} location - URL that was redirected
    */
-  setRedirectedBy: function (frameProps, ruleset, location) {
+  setRedirectedBy: function (tabId, ruleset, location) {
     dispatch({
       actionType: windowConstants.WINDOW_SET_REDIRECTED_BY,
-      frameProps,
+      tabId,
       ruleset,
       location
     })
@@ -1117,6 +1132,15 @@ const windowActions = {
       top,
       partition,
       tabId
+    })
+  },
+
+  onCertError: function (tabId, url, error) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_CERT_ERROR,
+      tabId,
+      url,
+      error
     })
   }
 }

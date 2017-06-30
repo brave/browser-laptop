@@ -203,9 +203,9 @@ class Frame extends React.Component {
     }
   }
 
-  onPropsChanged (prevProps = {}) {
+  onPropsChanged () {
     if (this.props.isActive && isFocused()) {
-      windowActions.setFocusedFrame(this.frame)
+      windowActions.setFocusedFrame(this.props.location, this.props.tabId)
     }
   }
 
@@ -270,7 +270,7 @@ class Frame extends React.Component {
     this.lastFrame = this.frame.delete('lastAccessedTime')
 
     const cb = (prevProps = {}) => {
-      this.onPropsChanged(prevProps)
+      this.onPropsChanged()
       if (this.props.isActive && !prevProps.isActive && !this.props.urlBarFocused) {
         this.webview.focus()
       }
@@ -469,7 +469,7 @@ class Frame extends React.Component {
         return
       }
       if (e.details[0] === 'javascript' && e.details[1]) {
-        windowActions.setBlockedBy(this.frame, 'noScript', e.details[1])
+        windowActions.setBlockedBy(this.props.tabId, 'noScript', e.details[1])
       }
       if (e.details[0] === 'autoplay') {
         appActions.autoplayBlocked(this.props.tabId)
@@ -550,7 +550,7 @@ class Frame extends React.Component {
           }
           method = (detail) => {
             const description = [detail.type, detail.scriptUrl || this.props.provisionalLocation].join(': ')
-            windowActions.setBlockedBy(this.frame, 'fingerprintingProtection', description)
+            windowActions.setBlockedBy(this.props.tabId, 'fingerprintingProtection', description)
           }
           break
         case messages.THEME_COLOR_COMPUTED:
@@ -648,7 +648,7 @@ class Frame extends React.Component {
 
       if (url.startsWith(pdfjsOrigin)) {
         let displayLocation = UrlUtil.getLocationIfPDF(url)
-        windowActions.setSecurityState(this.frame, {
+        windowActions.setSecurityState(this.props.tabId, {
           secure: urlParse(displayLocation).protocol === 'https:',
           runInsecureContent: false
         })
@@ -706,14 +706,14 @@ class Frame extends React.Component {
       } else if (e.securityState === 'broken') {
         isSecure = false
         const parsedUrl = urlParse(this.props.location)
-        ipc.send(messages.CHECK_CERT_ERROR_ACCEPTED, parsedUrl.host, this.props.frameKey)
+        ipc.send(messages.CHECK_CERT_ERROR_ACCEPTED, parsedUrl.host, this.props.tabId)
       } else if (['warning', 'passive-mixed-content'].includes(e.securityState)) {
         // Passive mixed content should not upgrade an insecure connection to a
         // partially-secure connection. It can only downgrade a secure
         // connection.
         isSecure = this.props.isSecure !== false ? 1 : false
       }
-      windowActions.setSecurityState(this.frame, {
+      windowActions.setSecurityState(this.props.tabId, {
         secure: runInsecureContent ? false : isSecure,
         runInsecureContent
       })
@@ -783,15 +783,15 @@ class Frame extends React.Component {
       if (this.frame.isEmpty()) {
         return
       }
-      windowActions.setFullScreen(this.frame, true, true)
+      windowActions.setFullScreen(this.props.tabId, true, true)
       // disable the fullscreen warning after 5 seconds
-      setTimeout(windowActions.setFullScreen.bind(this, this.frame, undefined, false), 5000)
+      setTimeout(windowActions.setFullScreen.bind(this, this.props.tabId, undefined, false), 5000)
     })
     this.webview.addEventListener('leave-html-full-screen', () => {
       if (this.frame.isEmpty()) {
         return
       }
-      windowActions.setFullScreen(this.frame, false)
+      windowActions.setFullScreen(this.props.tabId, false)
     })
     this.webview.addEventListener('media-started-playing', ({title}) => {
       if (this.frame.isEmpty()) {

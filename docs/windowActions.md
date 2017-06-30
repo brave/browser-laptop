@@ -32,13 +32,13 @@ Dispatches a message to the store to let it know a page has been navigated.
 
 
 
-### setSecurityState(frameProps, securityState) 
+### setSecurityState(tabId, securityState) 
 
 Dispatches a message to set the security state.
 
 **Parameters**
 
-**frameProps**: `Object`, The frame properties to modify.
+**tabId**: `Object`, Tab id of the frame properties to modify.
 
 **securityState**: `Object`, The security state properties that have
   changed.
@@ -132,13 +132,13 @@ Dispatches a message to the store to indicate that the webview is done loading.
 
 
 
-### setFullScreen(frameProps, isFullScreen, showFullScreenWarning) 
+### setFullScreen(tabId, isFullScreen, showFullScreenWarning) 
 
 Dispatches a message to the store to indicate that the webview entered full screen mode.
 
 **Parameters**
 
-**frameProps**: `Object`, The frame properties to put in full screen
+**tabId**: `Object`, Tab id of the frame to put in full screen
 
 **isFullScreen**: `boolean`, true if the webview is entering full screen mode.
 
@@ -166,6 +166,20 @@ Dispatches a message to close multiple frames
 
 
 
+### closeOtherFrames(tabId, isCloseRight, isCloseLeft) 
+
+Dispatches a message to close multiple frames
+
+**Parameters**
+
+**tabId**: `string`, Frame that we want to ignore when closing all tabs
+
+**isCloseRight**: `boolean`, Close frames to the right of the frame provided
+
+**isCloseLeft**: `boolean`, Close frames to the left of the frame provided
+
+
+
 ### undoClosedFrame() 
 
 Dispatches a message to the store to undo a closed frame
@@ -179,13 +193,15 @@ Dispatches a message to the store to clear closed frames
 
 
 
-### setFocusedFrame(frameProps) 
+### setFocusedFrame(location, tabId) 
 
 Dispatches a message to the store when the frame is active and the window is focused
 
 **Parameters**
 
-**frameProps**: `Object`, the frame properties for the webview in question.
+**location**: `Object`, location for the webview in question.
+
+**tabId**: `Object`, tabId for the webview in question.
 
 
 
@@ -561,13 +577,13 @@ for a hovered link
 
 
 
-### setBlockedBy(frameProps, blockType, location) 
+### setBlockedBy(tabId, blockType, location) 
 
 Dispatches a message to indicate the site info, such as # of blocked ads, should be shown
 
 **Parameters**
 
-**frameProps**: `object`, The frame to set blocked info on
+**tabId**: `object`, Tab id for the frame to set blocked info on
 
 **blockType**: `string`, type of the block
 
@@ -575,13 +591,13 @@ Dispatches a message to indicate the site info, such as # of blocked ads, should
 
 
 
-### setRedirectedBy(frameProps, ruleset, location) 
+### setRedirectedBy(tabId, ruleset, location) 
 
 Similar to setBlockedBy but for httpse redirects
 
 **Parameters**
 
-**frameProps**: `Object`, The frame to set blocked info on
+**tabId**: `Object`, Tab id of the frame to set blocked info on
 
 **ruleset**: `string`, Name of the HTTPS Everywhere ruleset XML file
 

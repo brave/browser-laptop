@@ -99,7 +99,9 @@ const windowConstants = {
   WINDOW_SHOULD_OPEN_DEV_TOOLS: _,
   WINDOW_SET_ALL_AUDIO_MUTED: _,
   WINDOW_ON_GO_BACK_LONG: _,
-  WINDOW_ON_GO_FORWARD_LONG: _
+  WINDOW_ON_GO_FORWARD_LONG: _,
+  WINDOW_CLOSE_OTHER_FRAMES: _,
+  WINDOW_ON_CERT_ERROR: _
 }
 
 module.exports = mapValuesByKeys(windowConstants)
