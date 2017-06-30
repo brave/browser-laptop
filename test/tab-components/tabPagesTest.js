@@ -3,6 +3,7 @@
 const Brave = require('../lib/brave')
 const appConfig = require('../../js/constants/appConfig')
 const settings = require('../../js/constants/settings')
+const messages = require('../../js/constants/messages')
 const {
   urlInput,
   newFrameButton,
@@ -66,6 +67,25 @@ describe('tab pages', function () {
         // No tab page indicator elements when 1 page
         .waitForElementCount(tabPage, 0)
         .waitForElementCount(tabsTabs, numTabsPerPage)
+    })
+
+    it('closing tabs with close-to-left option', function * () {
+      let tabId = 0
+      yield this.app.client
+        .click(newFrameButton)
+        .waitForElementCount(tabPage, 2)
+        .waitUntil(function () {
+          return this.getAppState().then((state) => {
+            const length = state.value.tabs.length
+            tabId = state.value.tabs[length - 1].id
+            return true
+          })
+        })
+        .waitUntil(function () {
+          return this.ipcSend(messages.SHORTCUT_CLOSE_OTHER_FRAMES, tabId, false, true)
+        })
+        .waitForElementCount(tabPage, 0)
+        .waitForElementCount(tabsTabs, 1)
     })
 
     describe('allows changing to tab pages', function () {

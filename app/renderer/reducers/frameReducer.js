@@ -186,21 +186,33 @@ const frameReducer = (state, action, immutableAction) => {
       })
       break
     case windowConstants.WINDOW_CLOSE_OTHER_FRAMES:
-      const currentIndex = frameStateUtil.getIndexByTabId(state, action.tabId)
-      if (currentIndex === -1) {
-        return
-      }
-
-      state.get('frames').forEach((frame, i) => {
-        if (!frame.get('pinnedLocation') &&
-          ((i < currentIndex && action.isCloseLeft) || (i > currentIndex && action.isCloseRight))) {
-          if (frame) {
-            appActions.tabCloseRequested(frame.get('tabId'))
-          }
+      {
+        const currentIndex = frameStateUtil.getIndexByTabId(state, action.tabId)
+        if (currentIndex === -1) {
+          break
         }
-      })
 
+        let tabs = []
+
+        state.get('frames').forEach((frame, i) => {
+          if (!frame.get('pinnedLocation') &&
+            ((i < currentIndex && action.isCloseLeft) || (i > currentIndex && action.isCloseRight))) {
+            if (frame) {
+              tabs.push(frame.get('tabId'))
+              appActions.tabCloseRequested(frame.get('tabId'))
+            }
+          }
+        })
+
+        // TODO(nejc) this can be simplified when states are merged
+        const newFrames = state.get('frames').filter(frame => !tabs.includes(frame.get('tabId')))
+        let newState = state.set('frames', newFrames)
+        newState = frameStateUtil.updateTabPageIndex(newState, action.tabId)
+        const index = newState.getIn(['ui', 'tabs', 'tabPageIndex'], 0)
+        state = state.setIn(['ui', 'tabs', 'tabPageIndex'], index)
+      }
       break
+
     case windowConstants.WINDOW_CLOSE_FRAME:
       state = closeFrame(state, action)
       break

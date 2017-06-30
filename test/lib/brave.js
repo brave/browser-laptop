@@ -202,7 +202,7 @@ var exports = {
     const initialized = []
 
     this.app.client.addCommand('ipcSend', function (message, ...param) {
-      logVerbose('ipcSend(' + message + ')')
+      logVerbose('ipcSend(' + message + ', "' + param + '")')
       return this.execute(function (message, ...param) {
         return devTools('electron').remote.getCurrentWindow().webContents.send(message, ...param)
       }, message, ...param).then((response) => response.value)
