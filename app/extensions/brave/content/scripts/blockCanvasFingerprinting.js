@@ -2,6 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/**
+ * Some parts of this file are derived from:
+ * Chameleon <https://github.com/ghostwords/chameleon>, Copyright (C) 2015 ghostwords
+ * Privacy Badger Chrome <https://github.com/EFForg/privacybadger>, Copyright (C) 2015 Electronic Frontier Foundation and other contributors
+ */
+
 if (chrome.contentSettings.canvasFingerprinting == 'block') {
   Error.stackTraceLimit = Infinity // collect all frames
 
