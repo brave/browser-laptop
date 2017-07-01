@@ -51,13 +51,9 @@ For other platforms (macOS, Linux) You'll need certain packages installed before
 
 ### Prerequisites
 
-1. `nodejs` **`>= 6.1`**
+1. `nodejs` **`>= 7.9.0`**
 
     Install from your package manager or download from https://nodejs.org
-
-2. `node-gyp` **`3.3.1`**
-
-        sudo npm install -g node-gyp@3.3.1
 
 #### On Debian / Ubuntu /Mint
 
@@ -91,11 +87,9 @@ After installing the prerequisites:
 
         cd browser-laptop
 
-3. Install the Node (v5+) dependencies:
+3. Install the Node dependencies:
 
         npm install
-
-If this fails on Linux with an error related to `ad-block`, try updating to Node 6.1 and `node-gyp` 3.3.1 (see discussion at https://github.com/brave/browser-laptop/issues/214)
 
 Instead of `npm install` you may also install with [yarn](https://github.com/yarnpkg/yarn).
 
