@@ -89,7 +89,6 @@ describe('tabsReducer unit tests', function () {
     })
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('ad-block', fakeAdBlock)
-    mockery.registerMock('leveldown', {})
 
     this.tabsAPI = {
       isDevToolsFocused: (tabId) => {
