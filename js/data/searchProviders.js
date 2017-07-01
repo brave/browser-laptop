@@ -135,7 +135,7 @@ module.exports = { "providers" :
     {
       "name" : "Ecosia",
       "base" : "https://www.ecosia.org/",
-      "image" : "https://www.ecosia.org/favicon.ico",
+      "image" : "https://cdn.ecosia.org/assets/images/ico/favicon.ico",
       "search" : "https://www.ecosia.org/search?q={searchTerms}",
       "autocomplete": "https://ac.ecosia.org/autocomplete?q={searchTerms}&type=list",
       "shortcut" : ":e"
