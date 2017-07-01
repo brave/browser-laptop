@@ -168,7 +168,7 @@
     "level": "^1.7.0",
     "mkdirp": "^0.5.1",
     "mocha": "^2.3.4",
-    "mockery": "^1.7.0",
+    "mockery": "^2.1.0",
     "muon-winstaller": "^2.5.4",
     "ncp": "^2.0.0",
     "node-gyp": "^3.2.1",
