@@ -1864,35 +1864,6 @@ var run = (delayTime) => {
   console.log('what? wait, how can this happen?')
 }
 
-/*
- * ledger client utilities
- */
-
-/* code that may never be needed...
-
-var rulesV2Reset = (callback) => {
-  if (clientOptions.verboseP) console.log('\n\nreset rulesets')
-  if (!v2RulesetDB) return
-
-  if (client) {
-    delete client.state.rulesV2Stamp
-    client.state.updatesStamp = underscore.now()
-  }
-  v2RulesetDB.close((err) => {
-    if (err) console.log(v2RulesetPath + ' close error: ' + err.toString())
-
-    v2RulesetDB = null
-    require('leveldown').destroy(pathName(v2RulesetPath), (err) => {
-      if (err) console.log(v2RulesetPath + ' destroy error: ' + err.toString())
-
-      v2RulesetDB = levelup(pathName(v2RulesetPath))
-      callback()
-    })
-  })
-}
-
-*/
-
 var getStateInfo = (state) => {
   var ballots, i, transaction
   var info = state.paymentInfo
