@@ -114,7 +114,7 @@ class NavigationBar extends React.Component {
   get stopButton () {
     return <button className={cx({
       normalizeButton: true,
-      [css(styles.navigationButton, styles.navigationButton_stopButton)]: true
+      [css(styles.navigationButton, styles.navigationButton_stop)]: true
     })}
       data-l10n-id='stopButton'
       onClick={this.onStop}
@@ -125,7 +125,7 @@ class NavigationBar extends React.Component {
   get reloadButton () {
     return <LongPressButton className={cx({
       normalizeButton: true,
-      [css(styles.navigationButton, styles.navigationButton_reloadButton)]: true
+      [css(styles.navigationButton, styles.navigationButton_reload)]: true
     })}
       l10nId='reloadButton'
       testId='reloadButton'
@@ -318,12 +318,12 @@ const styles = StyleSheet.create({
     padding: 0
   },
 
-  navigationButton_stopButton: {
+  navigationButton_stop: {
     background: `url(${stopLoadingButton}) center no-repeat`,
     backgroundSize: '11px 11px'
   },
 
-  navigationButton_reloadButton: {
+  navigationButton_reload: {
     background: `url(${reloadButton}) center no-repeat`,
     backgroundSize: '13px 13px'
   },
