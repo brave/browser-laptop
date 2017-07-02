@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const {urlInput, backButton, forwardButton, pinnedTabsTabs} = require('../lib/selectors')
+const {urlInput, backButton, backButtonDisabled, forwardButton, forwardButtonDisabled, pinnedTabsTabs} = require('../lib/selectors')
 const messages = require('../../js/constants/messages')
 
 describe('frame tests', function () {
@@ -106,8 +106,8 @@ describe('frame tests', function () {
           .tabByIndex(1)
           .waitForUrl(this.url2)
           .windowByUrl(Brave.browserWindowUrl)
-          .waitForExist(backButton + ':not([disabled])')
-          .waitForExist(forwardButton + '[disabled]')
+          .waitForExist(backButton)
+          .waitForExist(forwardButtonDisabled)
           .click(backButton)
           .tabByIndex(1)
           .waitForUrl(this.url1)
@@ -121,7 +121,7 @@ describe('frame tests', function () {
         this.url1 = Brave.server.url('page1.html')
         yield setup(this.app.client)
         yield this.app.client
-          .waitForExist('.navigationButtonContainer.disabled .backButton')
+          .waitForExist(backButtonDisabled)
           .tabByIndex(0)
           // add some history
           .loadUrl(this.url1)
@@ -130,13 +130,13 @@ describe('frame tests', function () {
 
       it('enables back button on first nav', function * () {
         yield this.app.client
-          .waitForExist('.navigationButtonContainer:not(.disabled) .backButton')
+          .waitForExist(backButton)
       })
 
       it('enables forward button after pressing back', function * () {
         yield this.app.client
           .click(backButton)
-          .waitForExist('.navigationButtonContainer:not(.disabled) .forwardButton')
+          .waitForExist(forwardButton)
       })
     })
 
@@ -165,14 +165,14 @@ describe('frame tests', function () {
           .tabByIndex(1)
           .waitForUrl(this.url1)
           .windowByUrl(Brave.browserWindowUrl)
-          .waitForExist(backButton + ':not([disabled])')
-          .waitForExist(forwardButton + ':not([disabled])')
+          .waitForExist(backButton)
+          .waitForExist(forwardButton)
           .click(forwardButton)
           .tabByIndex(1)
           .waitForUrl(this.url2)
           .windowByUrl(Brave.browserWindowUrl)
-          .waitForExist(backButton + ':not([disabled])')
-          .waitForExist(forwardButton + '[disabled]')
+          .waitForExist(backButton)
+          .waitForExist(forwardButtonDisabled)
       })
     })
   })

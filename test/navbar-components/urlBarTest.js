@@ -2,7 +2,7 @@
 
 const assert = require('assert')
 const Brave = require('../lib/brave')
-const {urlInput, urlBarSuggestions, urlbarIcon, reloadButton} = require('../lib/selectors')
+const {urlInput, urlBarSuggestions, urlBarIcon, reloadButton} = require('../lib/selectors')
 const searchProviders = require('../../js/data/searchProviders')
 const config = require('../../js/constants/config')
 
@@ -431,7 +431,7 @@ describe('urlBar tests', function () {
       })
 
       it('has the search icon', function * () {
-        yield this.app.client.waitForExist('.urlbarIcon.fa-search')
+        yield this.app.client.waitForExist('[data-test-id="urlBarIcon"].fa-search')
       })
     })
 
@@ -560,13 +560,13 @@ describe('urlBar tests', function () {
         it('has the icon', function * () {
           yield this.app.client
             .keys(entry.shortcut + ' ')
-            .waitForExist(urlbarIcon)
+            .waitForExist(urlBarIcon)
             .waitUntil(function () {
               return this
-                .getCssProperty(urlbarIcon, 'background-image')
+                .getCssProperty(urlBarIcon, 'background-image')
                 .then((backgroundImage) => backgroundImage.value === `url("${entry.image}")`)
             })
-            .waitForElementCount('.urlbarIcon.fa-search', 0)
+            .waitForElementCount('[data-test-id="urlBarIcon"].fa-search', 0)
         })
       })
     })
@@ -591,7 +591,7 @@ describe('urlBar tests', function () {
         .keys(`${entry.shortcut} hi`)
         .waitUntil(function () {
           return this
-            .getCssProperty(urlbarIcon, 'background-image')
+            .getCssProperty(urlBarIcon, 'background-image')
             .then((backgroundImage) => backgroundImage.value === `url("${entry.image}")`)
         })
     })
@@ -599,19 +599,19 @@ describe('urlBar tests', function () {
     it('clears last search engine when removed', function * () {
       yield this.app.client
         .setInputText(urlInput, '.')
-        .waitForElementCount(urlbarIcon + '.fa-search', 1)
+        .waitForElementCount(urlBarIcon + '.fa-search', 1)
     })
     it('clears last search engine when searching', function * () {
       yield this.app.client
         .keys(Brave.keys.ENTER)
-        .waitForElementCount(urlbarIcon + '.fa-lock', 1)
+        .waitForElementCount(urlBarIcon + '.fa-lock', 1)
     })
     it('clears last search engine when loading arbitrary page', function * () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(Brave.server.url('page1.html'))
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForElementCount(urlbarIcon + '.fa-unlock', 1)
+        .waitForElementCount(urlBarIcon + '.fa-unlock', 1)
     })
   })
 
