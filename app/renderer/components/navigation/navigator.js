@@ -188,7 +188,7 @@ class Navigator extends React.Component {
         : 'navigationBackButton'
       }
       className={css(
-        commonStyles.navigationButtonContainer,
+        commonStyles.navbarButtonContainer,
         styles.topLevelStartButtonContainer,
         !this.props.canGoBack && styles.topLevelStartButtonContainer_disabled
       )}
@@ -221,7 +221,7 @@ class Navigator extends React.Component {
         : 'navigationForwardButton'
       }
       className={css(
-        commonStyles.navigationButtonContainer,
+        commonStyles.navbarButtonContainer,
         styles.topLevelStartButtonContainer,
         !this.props.canGoForward && styles.topLevelStartButtonContainer_disabled
       )}

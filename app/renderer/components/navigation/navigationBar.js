@@ -110,7 +110,7 @@ class NavigationBar extends React.Component {
       this.props.bookmarked
   }
 
-  // BEM Level: navigationBar__navigationButtonContainer
+  // BEM Level: navigationBar__buttonContainer
   get stopButton () {
     return <button className={cx({
       normalizeButton: true,
@@ -121,7 +121,7 @@ class NavigationBar extends React.Component {
     />
   }
 
-  // BEM Level: navigationBar__navigationButtonContainer
+  // BEM Level: navigationBar__buttonContainer
   get reloadButton () {
     return <LongPressButton className={cx({
       normalizeButton: true,
@@ -139,12 +139,12 @@ class NavigationBar extends React.Component {
     return <span className={css(
       commonStyles.navigationBar__buttonContainer,
       commonStyles.navigationBar__buttonContainer_outsideOfURLbar,
-      styles.navigationBar__buttonContainer_bookmarkButtonContainer
+      styles.navigationBar__buttonContainer_bookmark
     )}>
       <button className={cx({
         normalizeButton: true,
         withHomeButton: getSetting(settings.SHOW_HOME_BUTTON),
-        [css(styles.navigationBar__buttonContainer_bookmarkButtonContainer__bookmarkButton, this.bookmarked && styles.navigationBar__buttonContainer_bookmarkButtonContainer__bookmarkButton_removeBookmarkButton)]: true
+        [css(styles.navigationBar__buttonContainer_bookmark__button, this.bookmarked && styles.navigationBar__buttonContainer_bookmark__button_remove)]: true
       })}
         data-l10n-id={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
         data-test-id={this.bookmarked ? 'bookmarked' : 'notBookmarked'}
@@ -230,8 +230,8 @@ class NavigationBar extends React.Component {
         this.props.titleMode
         ? null
         : <span className={css(
-            commonStyles.navigationButtonContainer,
-            styles.navigationBar__navigationButtonContainer,
+            commonStyles.navbarButtonContainer,
+            styles.navigationBar__buttonContainer,
           )}>
           {
             this.props.isLoading
@@ -243,8 +243,8 @@ class NavigationBar extends React.Component {
       {
         this.props.showHomeButton
         ? <span className={css(
-            commonStyles.navigationButtonContainer,
-            styles.navigationBar__navigationButtonContainer,
+            commonStyles.navbarButtonContainer,
+            styles.navigationBar__buttonContainer,
           )}>
           <HomeButton activeTabId={this.props.activeTabId} />
         </span>
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     justifyContent: 'initial'
   },
 
-  navigationBar__navigationButtonContainer: {
+  navigationBar__buttonContainer: {
     width: globalStyles.navigationBar.navigationButtonContainer.width
   },
 
@@ -328,21 +328,20 @@ const styles = StyleSheet.create({
     backgroundSize: '13px 13px'
   },
 
-  // cf: navigator__buttonContainer_addPublisherButtonContainer on publisherToggle.js
-  navigationBar__buttonContainer_bookmarkButtonContainer: {
+  navigationBar__buttonContainer_bookmark: {
     borderRight: 'none',
     borderTopRightRadius: 0,
     borderBottomRightRadius: 0
   },
 
-  navigationBar__buttonContainer_bookmarkButtonContainer__bookmarkButton: {
+  navigationBar__buttonContainer_bookmark__button: {
     background: `url(${bookmarkButton}) center no-repeat`,
     backgroundSize: '14px 14px',
     width: '100%',
     height: '100%'
   },
 
-  navigationBar__buttonContainer_bookmarkButtonContainer__bookmarkButton_removeBookmarkButton: {
+  navigationBar__buttonContainer_bookmark__button_remove: {
     background: `url(${bookmarkedButton}) center no-repeat`
   }
 })

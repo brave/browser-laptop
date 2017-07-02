@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     borderRadius: globalStyles.radius.borderRadiusURL
   },
 
-  navigationButtonContainer: {
+  navbarButtonContainer: {
     display: 'inline-block',
     borderRadius: globalStyles.radius.borderRadiusNavigationButton,
     height: globalStyles.navigationBar.urlbarForm.height,
