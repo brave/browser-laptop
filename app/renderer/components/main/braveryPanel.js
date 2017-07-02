@@ -878,15 +878,15 @@ const styles = StyleSheet.create({
   braveryPanel__body__ul: {
     fontSize: 'smaller',
     maxHeight: '300px',
-    overflowY: 'scroll',
+    overflowY: 'auto',
     marginTop: '-20px',
     padding: '10px',
-    userSelect: 'initial',
-    cursor: 'text'
+    userSelect: 'initial'
   },
   braveryPanel__body__ul__li: {
     listStyleType: 'none',
-    padding: '10px 0'
+    padding: '10px 0',
+    cursor: 'text'
   },
   braveryPanel__body__hr: {
     background: globalStyles.braveryPanel.body.hr.background,
