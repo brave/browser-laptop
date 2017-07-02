@@ -202,6 +202,7 @@ const styles = StyleSheet.create({
 
   // #9283
   // Create 25x25 squares and place the buttons at the center of each container
+  // Used for bookmarkButtonContainer, PublisherToggle, noScriptInfo, and UrlBarIcon.
   rectangleContainer: {
     boxSizing: 'border-box',
     display: 'flex',
@@ -221,6 +222,8 @@ const styles = StyleSheet.create({
   },
 
   navbarButtonContainer: {
+  // Used for stopButton, reloadButton, and homeButton on navigationBar.js
+  // and backButton and forwardButton on navigator.js
     display: 'inline-block',
     borderRadius: globalStyles.radius.borderRadiusNavigationButton,
     height: globalStyles.navigationBar.urlbarForm.height,
