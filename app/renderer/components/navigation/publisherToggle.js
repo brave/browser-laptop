@@ -16,13 +16,13 @@ const appActions = require('../../../../js/actions/appActions')
 const publisherState = require('../../../common/lib/publisherUtil')
 
 // Utils
+const cx = require('../../../../js/lib/classSet')
 const {getHostPattern} = require('../../../../js/lib/urlutil')
 const {getBaseUrl} = require('../../../../js/lib/appUrlUtil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
 // Style
 const commonStyles = require('../styles/commonStyles')
-const cx = require('../../../../js/lib/classSet')
 
 const noFundVerifiedPublisherImage = require('../../../extensions/brave/img/urlbar/browser_URL_fund_no_verified.svg')
 const fundVerifiedPublisherImage = require('../../../extensions/brave/img/urlbar/browser_URL_fund_yes_verified.svg')
@@ -78,11 +78,11 @@ class PublisherToggle extends React.Component {
       className={css(
         commonStyles.navigationBar__buttonContainer,
         commonStyles.navigationBar__buttonContainer_outsideOfURLbar,
-        styles.navigationBar__buttonContainer_publisherToggleContainer
+        styles.publisherButtonContainer
       )}>
       <button className={cx({
         normalizeButton: true,
-        [css((!this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher) && styles.publisherButton_noFundVerified, (this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher) && styles.publisherButton_fundVerified, (!this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher) && styles.publisherButton_noFundUnverified, (this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher) && styles.publisherButton_fundUnverified, styles.publisherButton)]: true
+        [css((!this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher) && styles.publisherButtonContainer__button_noFundVerified, (this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher) && styles.publisherButtonContainer__button_fundVerified, (!this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher) && styles.publisherButtonContainer__button_noFundUnverified, (this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher) && styles.publisherButtonContainer__button_fundUnverified, styles.publisherButtonContainer__button)]: true
       })}
         data-l10n-id={this.l10nString}
         onClick={this.onAuthorizePublisher}
@@ -92,36 +92,39 @@ class PublisherToggle extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  navigationBar__buttonContainer_publisherToggleContainer: {
+
+  // cf: navigationBar__buttonContainer_bookmarkButtonContainer on navigationBar.js
+  publisherButtonContainer: {
     borderLeft: 'none',
     borderTopLeftRadius: 0,
     borderBottomLeftRadius: 0,
 
-    // TODO (Suguru): Refactor navigationBar.less to remove !important. See the wildcard style under '#navigationBar'.
+    // TODO (Suguru): Refactor navigationBar.less to remove !important.
+    // See the wildcard style under '#navigationBar'.
     animation: 'none !important'
   },
 
-  publisherButton_noFundVerified: {
+  publisherButtonContainer__button: {
+    backgroundSize: '18px 18px',
+    width: '100%',
+    height: '100%'
+  },
+
+  publisherButtonContainer__button_noFundVerified: {
     // 1px added due to the check mark
     background: `url(${noFundVerifiedPublisherImage}) calc(50% + 1px) no-repeat`
   },
 
-  publisherButton_fundVerified: {
+  publisherButtonContainer__button_fundVerified: {
     background: `url(${fundVerifiedPublisherImage}) calc(50% + 1px) no-repeat`
   },
 
-  publisherButton_noFundUnverified: {
+  publisherButtonContainer__button_noFundUnverified: {
     background: `url(${noFundUnverifiedPublisherImage}) 50% no-repeat`
   },
 
-  publisherButton_fundUnverified: {
+  publisherButtonContainer__button_fundUnverified: {
     background: `url(${fundUnverifiedPublisherImage}) 50% no-repeat`
-  },
-
-  publisherButton: {
-    backgroundSize: '18px 18px',
-    width: '100%',
-    height: '100%'
   }
 })
 
