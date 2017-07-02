@@ -935,13 +935,16 @@ const styles = StyleSheet.create({
     marginBottom: '.75rem'
   },
   braveryPanel_compact__body__ul: {
-    padding: '0 .5rem',
-    margin: '0 0 .75rem 0',
-    wordBreak: 'break-all',
+    padding: '0 .5rem 1rem',
+    margin: '0 0 .25rem 0',
     maxHeight: '10vh'
   },
   braveryPanel_compact__body__ul__li: {
     padding: '5px 0',
+
+    // #9839: Avoid the panel width from increasing
+    width: 0,
+    whiteSpace: 'nowrap',
 
     ':first-of-type': {
       paddingTop: 0
