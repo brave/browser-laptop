@@ -6,6 +6,7 @@ const React = require('react')
 
 // Components
 const ImmutableComponent = require('../immutableComponent')
+const {NormalizedButton} = require('../common/browserButton')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
@@ -57,10 +58,10 @@ class HomeButton extends ImmutableComponent {
 
   // BEM Level: navigationBar__buttonContainer
   render () {
-    return <button className={cx({
-      normalizeButton: true,
-      [css(styles.navigationButton, styles.navigationButton_home)]: true
-    })}
+    return <NormalizedButton custom={[
+      styles.navigationButton,
+      styles.navigationButton_home
+    ]}
       data-test-id='homeButton'
       data-l10n-id='homeButton'
       ref={(node) => { this.homeButton = node }}
@@ -71,8 +72,6 @@ class HomeButton extends ImmutableComponent {
 
 const styles = StyleSheet.create({
   navigationButton: {
-    // cf: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L550-L553
-    backgroundColor: globalStyles.color.buttonColor,
     display: 'inline-block',
     width: '100%',
     height: '100%',

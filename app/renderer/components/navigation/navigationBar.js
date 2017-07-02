@@ -13,6 +13,7 @@ const AddEditBookmarkHanger = require('../bookmarks/addEditBookmarkHanger')
 const PublisherToggle = require('./publisherToggle')
 const LongPressButton = require('../common/longPressButton')
 const HomeButton = require('./homeButton')
+const {NormalizedButton} = require('../common/browserButton')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
@@ -111,17 +112,6 @@ class NavigationBar extends React.Component {
   }
 
   // BEM Level: navigationBar__buttonContainer
-  get stopButton () {
-    return <button className={cx({
-      normalizeButton: true,
-      [css(styles.navigationButton, styles.navigationButton_stop)]: true
-    })}
-      data-l10n-id='stopButton'
-      onClick={this.onStop}
-    />
-  }
-
-  // BEM Level: navigationBar__buttonContainer
   get reloadButton () {
     return <LongPressButton className={cx({
       normalizeButton: true,
@@ -131,6 +121,17 @@ class NavigationBar extends React.Component {
       testId='reloadButton'
       onClick={this.onReload}
       onLongPress={this.onReloadLongPress}
+    />
+  }
+
+  // BEM Level: navigationBar__buttonContainer
+  get stopButton () {
+    return <NormalizedButton custom={[
+      styles.navigationButton,
+      styles.navigationButton_stop
+    ]}
+      l10nid='stopButton'
+      onClick={this.onStop}
     />
   }
 
@@ -307,8 +308,6 @@ const styles = StyleSheet.create({
   },
 
   navigationButton: {
-    // cf: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L550-L553
-    backgroundColor: globalStyles.color.buttonColor,
     display: 'inline-block',
     width: '100%',
     height: '100%',
