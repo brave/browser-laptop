@@ -30,14 +30,6 @@ class HomeButton extends ImmutableComponent {
     this.onHome = this.onHome.bind(this)
   }
 
-  componentDidMount () {
-    this.homeButton.addEventListener('auxclick', this.onHome)
-  }
-
-  componentWillUnmount () {
-    this.homeButton.removeEventListener('auxclick', this.onHome)
-  }
-
   onHome (e) {
     if (e.button === 2) {
       return

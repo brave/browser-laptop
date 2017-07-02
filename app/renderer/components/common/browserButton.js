@@ -88,7 +88,11 @@ class NormalizedButton extends ImmutableComponent {
       data-l10n-args={JSON.stringify(this.props.l10nArgs || {})}
       data-button-value={this.props.dataButtonValue}
       onClick={this.props.onClick}
-      className={css(styles.normalizedButton, this.props.custom)}>
+      className={css(styles.normalizedButton, this.props.custom)}
+
+      // for publisherToggle.js
+      data-test-authorized={this.props.testAuthorized}
+      data-test-verified={this.props.testVerified}>
       {
         this.props.iconClass || this.props.label
         ? <span className={this.props.iconClass}>{this.props.label}</span>

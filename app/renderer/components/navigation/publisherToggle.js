@@ -8,6 +8,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
+const {NormalizedButton} = require('../common/browserButton')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
@@ -16,7 +17,6 @@ const appActions = require('../../../../js/actions/appActions')
 const publisherState = require('../../../common/lib/publisherUtil')
 
 // Utils
-const cx = require('../../../../js/lib/classSet')
 const {getHostPattern} = require('../../../../js/lib/urlutil')
 const {getBaseUrl} = require('../../../../js/lib/appUrlUtil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
@@ -68,23 +68,23 @@ class PublisherToggle extends React.Component {
     return props
   }
 
-  // TODO (Suguru): NormalizeButton
-      // ref: navigationBar__buttonContainer_bookmarkButtonContainer on navigationBar.js
   render () {
-    return <span
-      data-test-id='publisherButton'
-      data-test-authorized={this.props.isEnabledForPaymentsPublisher}
-      data-test-verified={this.props.isVerifiedPublisher}
-      className={css(
-        commonStyles.rectangleContainer,
-        commonStyles.rectangleContainer_outsideOfurlbarForm,
-        styles.publisherButtonContainer
-      )}>
-      <button className={cx({
-        normalizeButton: true,
-        [css((!this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher) && styles.publisherButtonContainer__button_noFundVerified, (this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher) && styles.publisherButtonContainer__button_fundVerified, (!this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher) && styles.publisherButtonContainer__button_noFundUnverified, (this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher) && styles.publisherButtonContainer__button_fundUnverified, styles.publisherButtonContainer__button)]: true
-      })}
-        data-l10n-id={this.l10nString}
+    return <span className={css(
+      commonStyles.rectangleContainer,
+      commonStyles.rectangleContainer_outsideOfurlbarForm,
+      styles.publisherButtonContainer
+    )}>
+      <NormalizedButton custom={[
+        (!this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher) && styles.publisherButtonContainer__button_noFundVerified,
+        (this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher) && styles.publisherButtonContainer__button_fundVerified,
+        (!this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher) && styles.publisherButtonContainer__button_noFundUnverified,
+        (this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher) && styles.publisherButtonContainer__button_fundUnverified,
+        styles.publisherButtonContainer__button
+      ]}
+        l10nId={this.l10nString}
+        testId='publisherButton'
+        testAuthorized={this.props.isEnabledForPaymentsPublisher}
+        testVerified={this.props.isVerifiedPublisher}
         onClick={this.onAuthorizePublisher}
       />
     </span>
