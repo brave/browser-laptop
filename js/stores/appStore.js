@@ -899,6 +899,12 @@ const handleAppAction = (action) => {
     case appConstants.APP_DEFAULT_SEARCH_ENGINE_LOADED:
       appState = appState.set('searchDetail', action.searchDetail)
       break
+    case appConstants.APP_SWIPE_LEFT:
+      appState = appState.set('swipeLeftPercent', action.percent)
+      break
+    case appConstants.APP_SWIPE_RIGHT:
+      appState = appState.set('swipeRightPercent', action.percent)
+      break
     default:
   }
 
