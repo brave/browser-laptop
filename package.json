@@ -171,7 +171,7 @@
     "mockery": "^2.1.0",
     "muon-winstaller": "^2.5.4",
     "ncp": "^2.0.0",
-    "node-gyp": "^3.2.1",
+    "node-gyp": "^3.3.1",
     "node-libs-browser": "^1.0.0",
     "node-static": "^0.7.7",
     "nsp": "^2.2.0",
@@ -234,6 +234,6 @@
   },
   "engineStrict": true,
   "engines": {
-    "node": ">= 7.0.0"
+    "node": ">= 7.9.0"
   }
 }
