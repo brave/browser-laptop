@@ -496,7 +496,7 @@ class UrlBar extends React.Component {
 
   // BEM Level: urlbarForm__buttonContainer_showNoScript
   get noScriptInfo () {
-    return <span className={css(commonStyles.urlbarForm__buttonContainer_noScript)}
+    return <span className={css(commonStyles.rectangleContainer)}
       onClick={this.onNoScript}>
       <span className={css(styles.noScript__button)}
         data-l10n-id='noScriptButton'
@@ -587,7 +587,7 @@ class UrlBar extends React.Component {
       })}
       action='#'
       id='urlbar'>
-      <div className={css(commonStyles.urlbarForm__urlbarIconContainer)}>
+      <div className={css(commonStyles.rectangleContainer)}>
         <UrlBarIcon
           titleMode={this.props.titleMode}
         />

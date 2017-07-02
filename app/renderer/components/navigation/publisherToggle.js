@@ -69,15 +69,15 @@ class PublisherToggle extends React.Component {
   }
 
   // TODO (Suguru): NormalizeButton
-  // ref: navigationBar__buttonContainer_bookmarkButtonContainer on navigationBar.js
+      // ref: navigationBar__buttonContainer_bookmarkButtonContainer on navigationBar.js
   render () {
     return <span
       data-test-id='publisherButton'
       data-test-authorized={this.props.isEnabledForPaymentsPublisher}
       data-test-verified={this.props.isVerifiedPublisher}
       className={css(
-        commonStyles.navigationBar__buttonContainer,
-        commonStyles.navigationBar__buttonContainer_outsideOfURLbar,
+        commonStyles.rectangleContainer,
+        commonStyles.rectangleContainer_outsideOfurlbarForm,
         styles.publisherButtonContainer
       )}>
       <button className={cx({

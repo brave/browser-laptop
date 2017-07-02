@@ -137,8 +137,8 @@ class NavigationBar extends React.Component {
   // BEM Level: navigationBar
   get bookmarkButtonContainer () {
     return <span className={css(
-      commonStyles.navigationBar__buttonContainer,
-      commonStyles.navigationBar__buttonContainer_outsideOfURLbar,
+      commonStyles.rectangleContainer,
+      commonStyles.rectangleContainer_outsideOfurlbarForm,
       styles.navigationBar__buttonContainer_bookmark
     )}>
       <button className={cx({
