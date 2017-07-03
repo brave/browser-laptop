@@ -22,6 +22,7 @@ class NavigationBarButtonContainer extends React.Component {
         // isNested and isStandalone should not be called at the same time
         this.props.isNested && styles.container_nested,
         this.props.isStandalone && styles.container_standalone,
+        this.props.onNavigationBarChrome && styles.chromeButtonContainer,
 
         // BEM style class name unique for each component
         this.props.containerFor
@@ -52,6 +53,11 @@ const styles = StyleSheet.create({
   container_nested: {
     border: `1px solid ${globalStyles.color.urlBarOutline}`,
     borderRadius: globalStyles.radius.borderRadiusURL
+  },
+
+  // Used for stopButton, reloadButton, and homeButton on navigationBar.js
+  chromeButtonContainer: {
+    width: globalStyles.navigationBar.navigationButtonContainer.width
   },
 
   // Used for stopButton, reloadButton, and homeButton on navigationBar.js

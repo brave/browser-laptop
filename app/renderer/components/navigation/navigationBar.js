@@ -10,12 +10,14 @@ const ipc = require('electron').ipcRenderer
 const ReduxComponent = require('../reduxComponent')
 const UrlBar = require('./urlBar')
 const AddEditBookmarkHanger = require('../bookmarks/addEditBookmarkHanger')
-const PublisherToggle = require('./publisherToggle')
-const LongPressButton = require('../common/longPressButton')
-const HomeButton = require('./homeButton')
 const {NormalizedButton} = require('../common/browserButton')
 const NavigationBarButtonContainer = require('./buttons/navigationBarButtonContainer')
+
+// Components -> buttons
+const LongPressButton = require('../common/longPressButton')
+const HomeButton = require('./buttons/homeButton')
 const BookmarkButton = require('./buttons/bookmarkButton')
+const PublisherToggle = require('./publisherToggle')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
@@ -46,7 +48,6 @@ const commonStyles = require('../styles/commonStyles')
 
 const stopLoadingButton = require('../../../../img/toolbar/stoploading_btn.svg')
 const reloadButton = require('../../../../img/toolbar/reload_btn.svg')
-const homeButton = require('../../../../img/toolbar/home_btn.svg')
 
 class NavigationBar extends React.Component {
   constructor (props) {
@@ -196,12 +197,14 @@ class NavigationBar extends React.Component {
       }
       {
         this.props.showHomeButton
-        ? <span className={css(
-            commonStyles.navbarButtonContainer,
-            styles.navigationBar__buttonContainer,
-          )}>
-          <HomeButton activeTabId={this.props.activeTabId} />
-        </span>
+        ? (
+          <NavigationBarButtonContainer
+            isStandalone
+            onNavigationBarChrome
+          >
+            <HomeButton />
+          </NavigationBarButtonContainer>
+        )
         : null
       }
       {
@@ -210,7 +213,8 @@ class NavigationBar extends React.Component {
           <NavigationBarButtonContainer
             isSquare
             isNested
-            containerFor={styles.navigationBar__urlBarStart}>
+            containerFor={styles.navigationBar__urlBarStart}
+          >
             <BookmarkButton />
           </NavigationBarButtonContainer>
           )
@@ -232,7 +236,6 @@ class NavigationBar extends React.Component {
 const rightMargin = `calc(${globalStyles.spacing.navbarLeftMarginDarwin} / 2)`
 
 const styles = StyleSheet.create({
-
   navigationBar: {
     boxSizing: 'border-box',
     display: 'flex',
@@ -287,7 +290,7 @@ const styles = StyleSheet.create({
     backgroundSize: '13px 13px'
   },
 
-  // Applies for urlBar beggining buttons
+  // Applies for the first urlBar nested button
   navigationBar__urlBarStart: {
     borderRight: 'none',
     borderTopRightRadius: 0,
