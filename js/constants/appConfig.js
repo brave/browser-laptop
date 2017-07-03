@@ -195,7 +195,7 @@ module.exports = {
     'advanced.auto-suggest-sites': true,
     'advanced.hide-lower-sites': true,
     'advanced.toolbar-ui-scale': 'normal',
-    'advanced.swipe-swipe-nav-distance': 101,
+    'advanced.swipe-nav-distance': 101,
     'shutdown.clear-history': false,
     'shutdown.clear-downloads': false,
     'shutdown.clear-cache': false,
