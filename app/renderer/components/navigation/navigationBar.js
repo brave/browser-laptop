@@ -14,13 +14,14 @@ const PublisherToggle = require('./publisherToggle')
 const LongPressButton = require('../common/longPressButton')
 const HomeButton = require('./homeButton')
 const {NormalizedButton} = require('../common/browserButton')
+const NavigationBarButtonContainer = require('./buttons/navigationBarButtonContainer')
+const BookmarkButton = require('./buttons/bookmarkButton')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
 const appActions = require('../../../../js/actions/appActions')
 
 // Constants
-const siteTags = require('../../../../js/constants/siteTags')
 const messages = require('../../../../js/constants/messages')
 const settings = require('../../../../js/constants/settings')
 
@@ -29,15 +30,11 @@ const tabState = require('../../../common/state/tabState')
 const publisherState = require('../../../common/lib/publisherUtil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
-// Store
-const windowStore = require('../../../../js/stores/windowStore')
-
 // Utils
 const cx = require('../../../../js/lib/classSet')
 const {getBaseUrl} = require('../../../../js/lib/appUrlUtil')
-const siteUtil = require('../../../../js/state/siteUtil')
+const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
 const eventUtil = require('../../../../js/lib/eventUtil')
-const UrlUtil = require('../../../../js/lib/urlutil')
 const {getSetting} = require('../../../../js/settings')
 const contextMenus = require('../../../../js/contextMenus')
 const {isDarwin} = require('../../../common/lib/platformUtil')
@@ -49,34 +46,14 @@ const commonStyles = require('../styles/commonStyles')
 
 const stopLoadingButton = require('../../../../img/toolbar/stoploading_btn.svg')
 const reloadButton = require('../../../../img/toolbar/reload_btn.svg')
-const bookmarkButton = require('../../../../img/toolbar/bookmark_btn.svg')
-const bookmarkedButton = require('../../../../img/toolbar/bookmark_marked.svg')
+const homeButton = require('../../../../img/toolbar/home_btn.svg')
 
 class NavigationBar extends React.Component {
   constructor (props) {
     super(props)
-    this.onToggleBookmark = this.onToggleBookmark.bind(this)
     this.onStop = this.onStop.bind(this)
     this.onReload = this.onReload.bind(this)
     this.onReloadLongPress = this.onReloadLongPress.bind(this)
-  }
-
-  get activeFrame () {
-    return windowStore.getFrame(this.props.activeFrameKey)
-  }
-
-  onToggleBookmark () {
-    const editing = this.props.isBookmarked
-    // show the AddEditBookmarkHanger control; saving/deleting takes place there
-    let siteDetail = siteUtil.getDetailFromFrame(this.activeFrame, siteTags.BOOKMARK)
-    const key = siteUtil.getSiteKey(siteDetail)
-
-    if (key !== null) {
-      siteDetail = siteDetail.set('parentFolderId', this.props.sites.getIn([key, 'parentFolderId']))
-      siteDetail = siteDetail.set('customTitle', this.props.sites.getIn([key, 'customTitle']))
-    }
-    siteDetail = siteDetail.set('location', UrlUtil.getLocationIfPDF(siteDetail.get('location')))
-    windowActions.setBookmarkDetail(siteDetail, siteDetail, null, editing, true)
   }
 
   onReload (e) {
@@ -106,11 +83,6 @@ class NavigationBar extends React.Component {
     }
   }
 
-  get bookmarked () {
-    return this.props.activeFrameKey !== undefined &&
-      this.props.bookmarked
-  }
-
   // BEM Level: navigationBar__buttonContainer
   get reloadButton () {
     return <LongPressButton className={cx({
@@ -133,25 +105,6 @@ class NavigationBar extends React.Component {
       l10nid='stopButton'
       onClick={this.onStop}
     />
-  }
-
-  // BEM Level: navigationBar
-  get bookmarkButtonContainer () {
-    return <span className={css(
-      commonStyles.rectangleContainer,
-      commonStyles.rectangleContainer_outsideOfurlbarForm,
-      styles.navigationBar__buttonContainer_bookmark
-    )}>
-      <button className={cx({
-        normalizeButton: true,
-        withHomeButton: getSetting(settings.SHOW_HOME_BUTTON),
-        [css(styles.navigationBar__buttonContainer_bookmark__button, this.bookmarked && styles.navigationBar__buttonContainer_bookmark__button_remove)]: true
-      })}
-        data-l10n-id={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
-        data-test-id={this.bookmarked ? 'bookmarked' : 'notBookmarked'}
-        onClick={this.onToggleBookmark}
-      />
-    </span>
   }
 
   componentDidMount () {
@@ -253,7 +206,14 @@ class NavigationBar extends React.Component {
       }
       {
         !this.props.titleMode
-        ? this.bookmarkButtonContainer
+        ? (
+          <NavigationBarButtonContainer
+            isBoxed
+            isNested
+            containerFor={styles.navigationBar__urlBarStart}>
+            <BookmarkButton />
+          </NavigationBarButtonContainer>
+          )
         : null
       }
       <UrlBar
@@ -327,21 +287,11 @@ const styles = StyleSheet.create({
     backgroundSize: '13px 13px'
   },
 
-  navigationBar__buttonContainer_bookmark: {
+  // Applies for urlBar beggining buttons
+  navigationBar__urlBarStart: {
     borderRight: 'none',
     borderTopRightRadius: 0,
     borderBottomRightRadius: 0
-  },
-
-  navigationBar__buttonContainer_bookmark__button: {
-    background: `url(${bookmarkButton}) center no-repeat`,
-    backgroundSize: '14px 14px',
-    width: '100%',
-    height: '100%'
-  },
-
-  navigationBar__buttonContainer_bookmark__button_remove: {
-    background: `url(${bookmarkedButton}) center no-repeat`
   }
 })
 
