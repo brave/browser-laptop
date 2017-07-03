@@ -8,6 +8,7 @@ const ipc = require('electron').ipcRenderer
 
 // Components
 const ReduxComponent = require('../../reduxComponent')
+const {NormalizedButton} = require('../../common/browserButton')
 
 // Actions
 const windowActions = require('../../../../../js/actions/windowActions')
@@ -15,7 +16,6 @@ const windowActions = require('../../../../../js/actions/windowActions')
 // Constants
 const siteTags = require('../../../../../js/constants/siteTags')
 const messages = require('../../../../../js/constants/messages')
-const settings = require('../../../../../js/constants/settings')
 
 // State
 const tabState = require('../../../../common/state/tabState')
@@ -25,12 +25,10 @@ const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 const windowStore = require('../../../../../js/stores/windowStore')
 
 // Utils
-const cx = require('../../../../../js/lib/classSet')
 const siteUtil = require('../../../../../js/state/siteUtil')
 const UrlUtil = require('../../../../../js/lib/urlutil')
-const {getSetting} = require('../../../../../js/settings')
 
-const {StyleSheet, css} = require('aphrodite/no-important')
+const {StyleSheet} = require('aphrodite/no-important')
 
 const bookmarkButtonIcon = require('../../../../../img/toolbar/bookmark_btn.svg')
 const bookmarkedButtonIcon = require('../../../../../img/toolbar/bookmark_marked.svg')
@@ -97,18 +95,13 @@ class BookmarkButton extends React.Component {
 
   render () {
     return (
-      <button
-        className={cx({
-          // TODO: check if iconOnly solves this and if not
-          // find a way to remove cx cos cx is evooool :P
-          normalizeButton: true,
-          withHomeButton: getSetting(settings.SHOW_HOME_BUTTON),
-          [css(styles.bookmark__button, this.bookmarked && styles.bookmark__button_remove)]: true
-        })}
-        data-l10n-id={
-          this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'
-        }
-        data-test-id={this.bookmarked ? 'bookmarked' : 'notBookmarked'}
+      <NormalizedButton navigationButton
+        custom={[
+          styles.bookmarkButton,
+          this.bookmarked && styles.bookmarkButton_bookmarked
+        ]}
+        l10nId={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
+        testId={this.bookmarked ? 'bookmarked' : 'notBookmarked'}
         onClick={this.onToggleBookmark}
       />
     )
@@ -116,14 +109,12 @@ class BookmarkButton extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  bookmark__button: {
+  bookmarkButton: {
     background: `url(${bookmarkButtonIcon}) center no-repeat`,
-    backgroundSize: '14px 14px',
-    width: '100%',
-    height: '100%'
+    backgroundSize: '14px 14px'
   },
 
-  bookmark__button_remove: {
+  bookmarkButton_bookmarked: {
     background: `url(${bookmarkedButtonIcon}) center no-repeat`
   }
 })

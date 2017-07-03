@@ -91,7 +91,7 @@ class NormalizedButton extends ImmutableComponent {
       className={css(
         styles.normalizedButton,
 
-        // For homeButton and stopButton
+        // For homeButton, stopButton, and bookmarkButton
         this.props.navigationButton && styles.normalizedButton_navigationButton,
 
         this.props.custom
