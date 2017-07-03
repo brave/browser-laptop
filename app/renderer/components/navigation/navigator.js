@@ -198,12 +198,13 @@ class Navigator extends React.Component {
         ? 'navigationBackButtonDisabled'
         : 'navigationBackButton'
       }>
-      <LongPressButton className={cx({
-        normalizeButton: true,
-        [css(styles.topLevelStartButtonContainer__topLevelStartButton_backButton)]: true,
-        [css(styles.topLevelStartButtonContainer__topLevelStartButton_disabled)]: !this.props.canGoBack,
-        [css(styles.topLevelStartButtonContainer__topLevelStartButton_enabled)]: this.props.canGoBack
-      })}
+      <LongPressButton
+        navigationButton
+        custom={[
+          styles.topLevelStartButtonContainer__topLevelStartButton_backButton,
+          !this.props.canGoBack && styles.topLevelStartButtonContainer__topLevelStartButton_disabled,
+          this.props.canGoBack && styles.topLevelStartButtonContainer__topLevelStartButton_enabled
+        ]}
         l10nId='backButton'
         testId={!this.props.canGoBack ? 'backButtonDisabled' : 'backButton'}
         disabled={!this.props.canGoBack}
@@ -231,12 +232,13 @@ class Navigator extends React.Component {
         ? 'navigationForwardButtonDisabled'
         : 'navigationForwardButton'
       }>
-      <LongPressButton className={cx({
-        normalizeButton: true,
-        [css(styles.topLevelStartButtonContainer__topLevelStartButton_forwardButton)]: true,
-        [css(styles.topLevelStartButtonContainer__topLevelStartButton_disabled)]: !this.props.canGoForward,
-        [css(styles.topLevelStartButtonContainer__topLevelStartButton_enabled)]: this.props.canGoForward
-      })}
+      <LongPressButton
+        navigationButton
+        custom={[
+          styles.topLevelStartButtonContainer__topLevelStartButton_forwardButton,
+          !this.props.canGoForward && styles.topLevelStartButtonContainer__topLevelStartButton_disabled,
+          this.props.canGoForward && styles.topLevelStartButtonContainer__topLevelStartButton_enabled
+        ]}
         l10nId='forwardButton'
         testId={!this.props.canGoForward ? 'forwardButtonDisabled' : 'forwardButton'}
         disabled={!this.props.canGoForward}
