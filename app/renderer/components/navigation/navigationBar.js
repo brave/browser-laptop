@@ -10,7 +10,6 @@ const ipc = require('electron').ipcRenderer
 const ReduxComponent = require('../reduxComponent')
 const UrlBar = require('./urlBar')
 const AddEditBookmarkHanger = require('../bookmarks/addEditBookmarkHanger')
-const {NormalizedButton} = require('../common/browserButton')
 const NavigationBarButtonContainer = require('./buttons/navigationBarButtonContainer')
 
 // Components -> buttons
@@ -92,17 +91,6 @@ class NavigationBar extends React.Component {
       testId='reloadButton'
       onClick={this.onReload}
       onLongPress={this.onReloadLongPress}
-    />
-  }
-
-  // BEM Level: navigationBar__buttonContainer
-  get stopButton () {
-    return <NormalizedButton custom={[
-      styles.navigationButton,
-      styles.navigationButton_stop
-    ]}
-      l10nid='stopButton'
-      onClick={this.onStop}
     />
   }
 
