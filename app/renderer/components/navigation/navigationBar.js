@@ -208,7 +208,7 @@ class NavigationBar extends React.Component {
         !this.props.titleMode
         ? (
           <NavigationBarButtonContainer
-            isBoxed
+            isSquare
             isNested
             containerFor={styles.navigationBar__urlBarStart}>
             <BookmarkButton />
