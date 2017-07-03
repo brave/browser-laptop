@@ -14,6 +14,7 @@ const windowActions = require('../../../../js/actions/windowActions')
 // Components
 const ReduxComponent = require('../reduxComponent')
 const NavigationBar = require('./navigationBar')
+const NavigationBarButtonContainer = require('./buttons/navigationBarButtonContainer')
 const LongPressButton = require('../common/longPressButton')
 const MenuBar = require('./menuBar')
 const WindowCaptionButtons = require('./windowCaptionButtons')
@@ -46,7 +47,6 @@ const settings = require('../../../../js/constants/settings')
 // Styles
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../styles/global')
-const commonStyles = require('../styles/commonStyles')
 
 const backButton = require('../../../../img/toolbar/back_btn.svg')
 const forwardButton = require('../../../../img/toolbar/forward_btn.svg')
@@ -182,22 +182,22 @@ class Navigator extends React.Component {
 
   // BEM Level: navigator__menuBarAndNavigationBar__navigationBarWrapper__topLevelStartButtons__topLevelStartButtonContainer
   get backButton () {
-    return <span data-test-id={
-      !this.props.canGoBack
-        ? 'navigationBackButtonDisabled'
-        : 'navigationBackButton'
-      }
-      className={css(
-        commonStyles.navbarButtonContainer,
+    return <NavigationBarButtonContainer isStandalone
+      containerFor={[
         styles.topLevelStartButtonContainer,
         !this.props.canGoBack && styles.topLevelStartButtonContainer_disabled
-      )}
+      ]}
 
       // TODO (Suguru): Convert with Aphrodite
       style={{
         transform: this.props.canGoBack ? `scale(${this.props.swipeLeftPercent})` : `scale(1)`,
         opacity: `${this.props.swipeLeftOpacity}`
-      }}>
+      }}
+
+      testId={!this.props.canGoBack
+        ? 'navigationBackButtonDisabled'
+        : 'navigationBackButton'
+      }>
       <LongPressButton className={cx({
         normalizeButton: true,
         [css(styles.topLevelStartButtonContainer__topLevelStartButton_backButton)]: true,
@@ -210,27 +210,27 @@ class Navigator extends React.Component {
         onClick={this.onBack}
         onLongPress={this.onBackLongPress}
       />
-    </span>
+    </NavigationBarButtonContainer>
   }
 
   // BEM Level: navigator__menuBarAndNavigationBar__navigationBarWrapper__topLevelStartButtons__topLevelStartButtonContainer
   get forwardButton () {
-    return <span data-test-id={
-      !this.props.canGoForward
-        ? 'navigationForwardButtonDisabled'
-        : 'navigationForwardButton'
-      }
-      className={css(
-        commonStyles.navbarButtonContainer,
+    return <NavigationBarButtonContainer isStandalone
+      containerFor={[
         styles.topLevelStartButtonContainer,
         !this.props.canGoForward && styles.topLevelStartButtonContainer_disabled
-      )}
+      ]}
 
       // TODO (Suguru): Convert with Aphrodite
       style={{
         transform: this.props.canGoForward ? `scale(${this.props.swipeRightPercent})` : `scale(1)`,
         opacity: `${this.props.swipeRightOpacity}`
-      }}>
+      }}
+
+      testId={!this.props.canGoForward
+        ? 'navigationForwardButtonDisabled'
+        : 'navigationForwardButton'
+      }>
       <LongPressButton className={cx({
         normalizeButton: true,
         [css(styles.topLevelStartButtonContainer__topLevelStartButton_forwardButton)]: true,
@@ -243,7 +243,7 @@ class Navigator extends React.Component {
         onClick={this.onForward}
         onLongPress={this.onForwardLongPress}
       />
-    </span>
+    </NavigationBarButtonContainer>
   }
 
   // BEM Level: navigator__menuBarAndNavigationBar__navigationBarWrapper__topLevelEndButtons

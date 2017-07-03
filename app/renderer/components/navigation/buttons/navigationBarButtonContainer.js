@@ -34,7 +34,8 @@ class NavigationBarButtonContainer extends React.Component {
 
         // BEM style class name unique for each component
         this.props.containerFor
-      )}>
+      )}
+        data-test-id={this.props.testId}>
         {this.props.children}
       </div>
     )

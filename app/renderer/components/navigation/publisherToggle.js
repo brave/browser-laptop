@@ -4,10 +4,11 @@
 
 const React = require('react')
 const Immutable = require('immutable')
-const {StyleSheet, css} = require('aphrodite/no-important')
+const {StyleSheet} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
+const NavigationBarButtonContainer = require('./buttons/navigationBarButtonContainer')
 const {NormalizedButton} = require('../common/browserButton')
 
 // Actions
@@ -20,9 +21,6 @@ const publisherState = require('../../../common/lib/publisherUtil')
 const {getHostPattern} = require('../../../../js/lib/urlutil')
 const {getBaseUrl} = require('../../../../js/lib/appUrlUtil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
-
-// Style
-const commonStyles = require('../styles/commonStyles')
 
 const noFundVerifiedPublisherImage = require('../../../extensions/brave/img/urlbar/browser_URL_fund_no_verified.svg')
 const fundVerifiedPublisherImage = require('../../../extensions/brave/img/urlbar/browser_URL_fund_yes_verified.svg')
@@ -69,11 +67,8 @@ class PublisherToggle extends React.Component {
   }
 
   render () {
-    return <span className={css(
-      commonStyles.rectangleContainer,
-      commonStyles.rectangleContainer_outsideOfurlbarForm,
-      styles.publisherButtonContainer
-    )}>
+    return <NavigationBarButtonContainer isSquare isNested
+      containerFor={styles.publisherButtonContainer}>
       <NormalizedButton custom={[
         (!this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher) && styles.publisherButtonContainer__button_noFundVerified,
         (this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher) && styles.publisherButtonContainer__button_fundVerified,
@@ -87,12 +82,11 @@ class PublisherToggle extends React.Component {
         testVerified={this.props.isVerifiedPublisher}
         onClick={this.onAuthorizePublisher}
       />
-    </span>
+    </NavigationBarButtonContainer>
   }
 }
 
 const styles = StyleSheet.create({
-
   // cf: navigationBar__buttonContainer_bookmarkButtonContainer on navigationBar.js
   publisherButtonContainer: {
     borderLeft: 'none',
