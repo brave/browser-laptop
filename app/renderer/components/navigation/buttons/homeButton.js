@@ -60,10 +60,9 @@ class HomeButton extends React.Component {
 
   // BEM Level: navigationBar__buttonContainer
   render () {
-    return <NormalizedButton custom={[
-      styles.navigationButton,
-      styles.navigationButton_home
-    ]}
+    return <NormalizedButton
+      navigationButton
+      custom={styles.homeButton}
       testId='homeButton'
       l10nId='homeButton'
       onClick={this.onHome}
@@ -72,17 +71,7 @@ class HomeButton extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  navigationButton: {
-    display: 'inline-block',
-    width: '100%',
-    height: '100%',
-
-    // cf: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L584-L585
-    margin: 0,
-    padding: 0
-  },
-
-  navigationButton_home: {
+  homeButton: {
     background: `url(${homeButtonIcon}) center no-repeat`,
     backgroundSize: '16px 16px'
   }

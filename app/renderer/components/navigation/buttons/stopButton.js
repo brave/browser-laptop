@@ -11,10 +11,9 @@ const stopLoadingButtonIcon = require('../../../../../img/toolbar/stoploading_bt
 class StopButton extends React.Component {
   // BEM Level: navigationBar__buttonContainer
   render () {
-    return <NormalizedButton custom={[
-      styles.navigationButton,
-      styles.navigationButton_stop
-    ]}
+    return <NormalizedButton
+      navigationButton
+      custom={styles.stopButton}
       l10nid='stopButton'
       onClick={
         /*
@@ -31,17 +30,7 @@ class StopButton extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  navigationButton: {
-    display: 'inline-block',
-    width: '100%',
-    height: '100%',
-
-    // cf: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L584-L585
-    margin: 0,
-    padding: 0
-  },
-
-  navigationButton_stop: {
+  stopButton: {
     background: `url(${stopLoadingButtonIcon}) center no-repeat`,
     backgroundSize: '11px 11px'
   }
