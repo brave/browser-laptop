@@ -13,15 +13,14 @@ const AddEditBookmarkHanger = require('../bookmarks/addEditBookmarkHanger')
 const NavigationBarButtonContainer = require('./buttons/navigationBarButtonContainer')
 
 // Components -> buttons
-const LongPressButton = require('../common/longPressButton')
 const StopButton = require('./buttons/stopButton')
+const ReloadButton = require('./buttons/ReloadButton')
 const HomeButton = require('./buttons/homeButton')
 const BookmarkButton = require('./buttons/bookmarkButton')
 const PublisherToggle = require('./publisherToggle')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
-const appActions = require('../../../../js/actions/appActions')
 
 // Constants
 const messages = require('../../../../js/constants/messages')
@@ -36,34 +35,17 @@ const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const cx = require('../../../../js/lib/classSet')
 const {getBaseUrl} = require('../../../../js/lib/appUrlUtil')
 const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
-const eventUtil = require('../../../../js/lib/eventUtil')
 const {getSetting} = require('../../../../js/settings')
-const contextMenus = require('../../../../js/contextMenus')
 const {isDarwin} = require('../../../common/lib/platformUtil')
 const {isFullScreen} = require('../../currentWindow')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../styles/global')
-const reloadButton = require('../../../../img/toolbar/reload_btn.svg')
 
 class NavigationBar extends React.Component {
   constructor (props) {
     super(props)
     this.onStop = this.onStop.bind(this)
-    this.onReload = this.onReload.bind(this)
-    this.onReloadLongPress = this.onReloadLongPress.bind(this)
-  }
-
-  onReload (e) {
-    if (eventUtil.isForSecondaryAction(e)) {
-      appActions.tabCloned(this.props.activeTabId, {active: !!e.shiftKey})
-    } else {
-      ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
-    }
-  }
-
-  onReloadLongPress (target) {
-    contextMenus.onReloadContextMenu(target)
   }
 
   onStop () {
@@ -79,19 +61,6 @@ class NavigationBar extends React.Component {
         windowActions.setUrlBarSelected(true)
       }
     }
-  }
-
-  // BEM Level: navigationBar__buttonContainer
-  get reloadButton () {
-    return <LongPressButton className={cx({
-      normalizeButton: true,
-      [css(styles.navigationButton, styles.navigationButton_reload)]: true
-    })}
-      l10nId='reloadButton'
-      testId='reloadButton'
-      onClick={this.onReload}
-      onLongPress={this.onReloadLongPress}
-    />
   }
 
   componentDidMount () {
@@ -170,14 +139,11 @@ class NavigationBar extends React.Component {
       {
         !this.props.titleMode
         ? (
-          <NavigationBarButtonContainer
-            isStandalone
-            onNavigationBarChrome
-          >
+          <NavigationBarButtonContainer isStandalone onNavigationBarChrome>
             {
               this.props.isLoading
               ? <StopButton onStop={this.onStop} />
-              : this.reloadButton
+              : <ReloadButton />
             }
           </NavigationBarButtonContainer>
         )
@@ -186,10 +152,7 @@ class NavigationBar extends React.Component {
       {
         this.props.showHomeButton
         ? (
-          <NavigationBarButtonContainer
-            isStandalone
-            onNavigationBarChrome
-          >
+          <NavigationBarButtonContainer isStandalone onNavigationBarChrome>
             <HomeButton />
           </NavigationBarButtonContainer>
         )
@@ -198,9 +161,7 @@ class NavigationBar extends React.Component {
       {
         !this.props.titleMode
         ? (
-          <NavigationBarButtonContainer
-            isSquare
-            isNested
+          <NavigationBarButtonContainer isSquare isNested
             containerFor={styles.navigationBar__urlBarStart}
           >
             <BookmarkButton />
@@ -221,8 +182,6 @@ class NavigationBar extends React.Component {
   }
 }
 
-const rightMargin = `calc(${globalStyles.spacing.navbarLeftMarginDarwin} / 2)`
-
 const styles = StyleSheet.create({
   navigationBar: {
     boxSizing: 'border-box',
@@ -233,7 +192,7 @@ const styles = StyleSheet.create({
     fontSize: '20px',
     minWidth: '0%', // allow the navigationBar to shrink
     maxWidth: '900px',
-    marginRight: rightMargin,
+    marginRight: `calc(${globalStyles.spacing.navbarLeftMarginDarwin} / 2)`,
     padding: 0,
     position: 'relative',
     userSelect: 'none',
@@ -252,25 +211,6 @@ const styles = StyleSheet.create({
     maxWidth: '100%',
     marginRight: '0',
     justifyContent: 'initial'
-  },
-
-  navigationBar__buttonContainer: {
-    width: globalStyles.navigationBar.navigationButtonContainer.width
-  },
-
-  navigationButton: {
-    display: 'inline-block',
-    width: '100%',
-    height: '100%',
-
-    // cf: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L584-L585
-    margin: 0,
-    padding: 0
-  },
-
-  navigationButton_reload: {
-    background: `url(${reloadButton}) center no-repeat`,
-    backgroundSize: '13px 13px'
   },
 
   // Applies for the first urlBar nested button
