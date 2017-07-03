@@ -17,12 +17,20 @@ class NavigationBarButtonContainer extends React.Component {
   render () {
     return (
       <div className={css(
+        // Used for bookmarkButtonContainer, PublisherToggle, noScriptInfo, and UrlBarIcon.
         this.props.isSquare && styles.container_square,
 
         // isNested and isStandalone should not be called at the same time
+        // Add border to the bookmark button and publisher button only
         this.props.isNested && styles.container_nested,
+
+        // Used for stopButton, reloadButton, and homeButton on navigationBar.js
+        // and backButton and forwardButton on navigator.js
         this.props.isStandalone && styles.container_standalone,
-        this.props.onNavigationBarChrome && styles.chromeButtonContainer,
+
+        // Used for stopButton, reloadButton, and homeButton on navigationBar.js
+        // NOT used for the backButton and forwardButton
+        this.props.onNavigationBarChrome && styles.container_chromeButton,
 
         // BEM style class name unique for each component
         this.props.containerFor
@@ -36,7 +44,6 @@ class NavigationBarButtonContainer extends React.Component {
 const styles = StyleSheet.create({
   // #9283
   // Create 25x25 square and place the button at the center of each container
-  // Used for bookmarkButtonContainer, PublisherToggle, noScriptInfo, and UrlBarIcon.
   container_square: {
     boxSizing: 'border-box',
     display: 'flex',
@@ -49,19 +56,11 @@ const styles = StyleSheet.create({
     WebkitAppRegion: 'no-drag'
   },
 
-  // Add border to the bookmark button and publisher button only
   container_nested: {
     border: `1px solid ${globalStyles.color.urlBarOutline}`,
     borderRadius: globalStyles.radius.borderRadiusURL
   },
 
-  // Used for stopButton, reloadButton, and homeButton on navigationBar.js
-  chromeButtonContainer: {
-    width: globalStyles.navigationBar.navigationButtonContainer.width
-  },
-
-  // Used for stopButton, reloadButton, and homeButton on navigationBar.js
-  // and backButton and forwardButton on navigator.js
   container_standalone: {
     display: 'inline-block',
     borderRadius: globalStyles.radius.borderRadiusNavigationButton,
@@ -72,6 +71,10 @@ const styles = StyleSheet.create({
       background: '#fff',
       boxShadow: '0px 1px 5px 0px rgba(0, 0, 0, 0.15)'
     }
+  },
+
+  container_chromeButton: {
+    width: globalStyles.navigationBar.navigationButtonContainer.width
   }
 })
 

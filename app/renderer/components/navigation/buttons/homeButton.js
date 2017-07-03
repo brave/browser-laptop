@@ -4,9 +4,11 @@
 
 const React = require('react')
 const Immutable = require('immutable')
+const {StyleSheet} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../../reduxComponent')
+const {NormalizedButton} = require('../../common/browserButton')
 
 // Actions
 const appActions = require('../../../../../js/actions/appActions')
@@ -19,12 +21,8 @@ const tabState = require('../../../../common/state/tabState')
 const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 
 // Utils
-const cx = require('../../../../../js/lib/classSet')
 const eventUtil = require('../../../../../js/lib/eventUtil')
 const {getSetting} = require('../../../../../js/settings')
-
-const {StyleSheet, css} = require('aphrodite/no-important')
-const globalStyles = require('../../styles/global')
 
 const homeButtonIcon = require('../../../../../img/toolbar/home_btn.svg')
 
@@ -60,28 +58,26 @@ class HomeButton extends React.Component {
     return props
   }
 
+  // BEM Level: navigationBar__buttonContainer
   render () {
-    return (
-      <button className={cx({
-        // TODO: check if iconOnly solves this and if not
-        // find a way to remove cx cos cx is evooool :P
-        normalizeButton: true,
-        [css(styles.navigationButton, styles.navigationButton_home)]: true
-      })}
-        data-test-id='homeButton'
-        data-l10n-id='homeButton'
-        onClick={this.onHome}
-      />
-    )
+    return <NormalizedButton custom={[
+      styles.navigationButton,
+      styles.navigationButton_home
+    ]}
+      testId='homeButton'
+      l10nId='homeButton'
+      onClick={this.onHome}
+    />
   }
 }
 
 const styles = StyleSheet.create({
   navigationButton: {
-    backgroundColor: globalStyles.color.buttonColor,
     display: 'inline-block',
     width: '100%',
     height: '100%',
+
+    // cf: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L584-L585
     margin: 0,
     padding: 0
   },
