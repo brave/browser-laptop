@@ -28,6 +28,7 @@ const settings = require('../../../../js/constants/settings')
 
 // State
 const tabState = require('../../../common/state/tabState')
+const menuBarState = require('../../../common/state/menuBarState')
 const publisherState = require('../../../common/lib/publisherUtil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
@@ -101,10 +102,8 @@ class NavigationBar extends React.Component {
     const props = {}
     // used in renderer
     props.activeFrameKey = activeFrameKey
-    props.titleMode = titleMode
     props.isBookmarked = props.activeFrameKey !== undefined &&
       activeTab && activeTab.get('bookmarked')
-    props.isWideUrlBarEnabled = getSetting(settings.WIDE_URL_BAR)
     props.showBookmarkHanger = bookmarkDetail && bookmarkDetail.get('isBookmarkHanger')
     props.isLoading = loading
     props.showPublisherToggle = publisherState.shouldShowAddPublisherButton(state, location, publisherId)
@@ -113,8 +112,19 @@ class NavigationBar extends React.Component {
     // used in other functions
     props.navbar = navbar // TODO(nejc) remove, primitives only
     props.sites = state.get('sites') // TODO(nejc) remove, primitives only
-    props.activeTabId = activeTabId
     props.showHomeButton = !props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
+
+    props.location = location
+    props.isDarwin = isDarwin()
+    props.isFullScreen = isFullScreen()
+    props.loading = loading
+    props.bookmarkDetail = bookmarkDetail
+    props.menubarVisible = menuBarState.isMenuBarVisible(currentWindow)
+    props.siteSettings = state.get('siteSettings')
+    props.synopsis = state.getIn(['publisherInfo', 'synopsis']) || new Immutable.Map()
+    props.locationInfo = state.get('locationInfo')
+    props.titleMode = titleMode
+    props.isWideUrlBarEnabled = getSetting(settings.WIDE_URL_BAR)
 
     return props
   }
