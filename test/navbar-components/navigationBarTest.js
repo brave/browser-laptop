@@ -214,6 +214,7 @@ describe('navigationBar tests', function () {
       it('remains cleared when onChange is fired but not onKeyUp', function * () {
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
+          .activateURLMode()
           .waitForVisible(urlInput)
           .setValue(urlInput, '')
           .moveToObject(activeWebview)
