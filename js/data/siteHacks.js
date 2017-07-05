@@ -27,8 +27,12 @@ const emptyDataURI = {
  */
 module.exports.cookieExceptions = [
   ['https://inbox.google.com', 'https://hangouts.google.com'],
-  ['https://mail.google.com', 'https://hangouts.google.com']
+  ['https://mail.google.com', 'https://hangouts.google.com'],
+  ['https://drive.google.com', 'https://doc-0g-3g-docs.googleusercontent.com']
 ]
+
+// Third party domains that require a valid referer to work
+module.exports.refererExceptions = ['use.typekit.net', 'cloud.typography.com', 'www.moremorewin.net']
 
 /**
  * Holds an array of [Primary URL, subresource URL] to allow 3rd party localstorage.

@@ -33,6 +33,7 @@ const {updateElectronDownloadItem} = require('./browser/electronDownloadItem')
 const {fullscreenOption} = require('./common/constants/settingsEnums')
 const isThirdPartyHost = require('./browser/isThirdPartyHost')
 var extensionState = require('./common/state/extensionState.js')
+const {cookieExceptions, refererExceptions} = require('../js/data/siteHacks')
 
 let appStore = null
 
@@ -45,9 +46,6 @@ let initializedPartitions = {}
 
 const transparent1pxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
 const pdfjsOrigin = `chrome-extension://${config.PDFJSExtensionId}`
-
-// Third party domains that require a valid referer to work
-const refererExceptions = ['use.typekit.net', 'cloud.typography.com', 'www.moremorewin.net']
 
 /**
  * Maps partition name to the session object
@@ -273,9 +271,15 @@ function registerForBeforeSendHeaders (session, partition) {
 
       if (cookieSetting === 'blockAllCookies' ||
         isThirdPartyHost(parsedFirstPartyUrl.hostname, parsedTargetUrl.hostname)) {
+        let hasCookieException = false
+        cookieExceptions.forEach((exceptionPair) => {
+          if (getOrigin(firstPartyUrl) === exceptionPair[0] && getOrigin(details.url) === exceptionPair[1] && cookieSetting !== 'blockAllCookies') {
+            hasCookieException = true
+          }
+        })
         // Clear cookie and referer on third-party requests
         if (requestHeaders['Cookie'] &&
-            getOrigin(firstPartyUrl) !== pdfjsOrigin) {
+            getOrigin(firstPartyUrl) !== pdfjsOrigin && !hasCookieException) {
           requestHeaders['Cookie'] = undefined
         }
         if (cookieSetting !== 'blockAllCookies' &&
