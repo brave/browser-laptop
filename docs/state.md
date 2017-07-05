@@ -238,6 +238,7 @@ AppStore
   },
   sites: {
     [siteKey]: {
+      bookmarkWidth: number, // width of a bookmark on bookmarks toolbar
       creationTime: number, //creation time of bookmark
       customTitle: string, // User provided title for bookmark; overrides title
       favicon: string, // URL of the favicon

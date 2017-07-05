@@ -3,13 +3,20 @@
 
 'use strict'
 const Immutable = require('immutable')
+
+// State
 const siteCache = require('../../app/common/state/siteCache')
+const {makeImmutable} = require('../../app/common/state/immutableUtil')
+
+// Constants
 const siteTags = require('../constants/siteTags')
 const settings = require('../constants/settings')
-const getSetting = require('../settings').getSetting
+
+// Utils
+const {getSetting} = require('../settings')
 const UrlUtil = require('../lib/urlutil')
 const urlParse = require('../../app/common/urlParse')
-const {makeImmutable} = require('../../app/common/state/immutableUtil')
+const bookmarkUtil = require('../../app/common/lib/bookmarkUtil')
 
 const defaultTags = new Immutable.List([siteTags.DEFAULT])
 
@@ -216,6 +223,7 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId, order) =>
     tags,
     objectId: newSiteDetail.get('objectId') || (oldSiteDetail ? oldSiteDetail.get('objectId') : undefined),
     title: newSiteDetail.get('title'),
+    bookmarkWidth: newSiteDetail.get('bookmarkWidth'),
     order
   })
 
@@ -289,18 +297,25 @@ module.exports.addSite = function (state, siteDetail, tag, originalSiteDetail, s
   const oldSite = oldKey !== null ? sites.get(oldKey) : null
   let folderId = siteDetail.get('folderId')
 
-  if (tag === siteTags.BOOKMARK_FOLDER) {
-    if (!oldSite && folderId) {
-      // Remove duplicate folder (needed for import)
-      const dupFolder = sites.find((site) => isBookmarkFolder(site.get('tags')) &&
+  switch (tag) {
+    case siteTags.BOOKMARK_FOLDER: {
+      if (!oldSite && folderId) {
+        // Remove duplicate folder (needed for import)
+        const dupFolder = sites.find((site) => isBookmarkFolder(site.get('tags')) &&
         site.get('parentFolderId') === siteDetail.get('parentFolderId') &&
         site.get('customTitle') === siteDetail.get('customTitle'))
-      if (dupFolder) {
-        state = module.exports.removeSite(state, dupFolder, siteTags.BOOKMARK_FOLDER, true)
+        if (dupFolder) {
+          state = module.exports.removeSite(state, dupFolder, siteTags.BOOKMARK_FOLDER, true)
+        }
+      } else if (!folderId) {
+        // Assign an id if this is a new folder
+        folderId = module.exports.getNextFolderId(sites)
       }
-    } else if (!folderId) {
-      // Assign an id if this is a new folder
-      folderId = module.exports.getNextFolderId(sites)
+      siteDetail = siteDetail.set('bookmarkWidth', bookmarkUtil.calcBookmarkWidth(siteDetail))
+      break
+    }
+    case siteTags.BOOKMARK: {
+      siteDetail = siteDetail.set('bookmarkWidth', bookmarkUtil.calcBookmarkWidth(siteDetail))
     }
   }
 

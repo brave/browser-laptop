@@ -8,13 +8,13 @@ const Immutable = require('immutable')
 const dragTypes = require('../../../js/constants/dragTypes')
 const {bookmarksToolbarMode} = require('../constants/settingsEnums')
 const settings = require('../../../js/constants/settings')
+const {iconSize} = require('../../../js/constants/config')
 
 // Utils
 const domUtil = require('../../renderer/lib/domUtil')
 const siteUtil = require('../../../js/state/siteUtil')
-const {calculateTextWidth} = require('../../../js/lib/textCalculator')
-const {iconSize} = require('../../../js/constants/config')
 const {getSetting} = require('../../../js/settings')
+const {calculateTextWidth} = require('../../../js/lib/textCalculator')
 
 const bookmarkHangerHeading = (detail, isFolder, shouldShowLocation) => {
   if (isFolder) {
@@ -72,49 +72,30 @@ const getToolbarBookmarks = (state) => {
   const sites = state.get('sites', Immutable.List())
 
   const noParentItems = siteUtil.getBookmarks(sites)
-    .sort(siteUtil.siteSort)
     .filter((bookmark) => !bookmark.get('parentFolderId'))
-  let widthAccountedFor = 0
+    .sort(siteUtil.siteSort)
+
+  let widthAccountedFor = domUtil.getStyleConstants('bookmarks-toolbar-padding')
   const overflowButtonWidth = 25
   const onlyFavicon = showOnlyFavicon()
   const favicon = showFavicon()
 
   // Dynamically calculate how many bookmark items should appear on the toolbar
   // before it is actually rendered.
-  const maxWidth = domUtil.getStyleConstants('bookmark-item-max-width')
-  const padding = domUtil.getStyleConstants('bookmark-item-padding') * 2
-  // Toolbar padding is only on the left
-  const toolbarPadding = domUtil.getStyleConstants('bookmarks-toolbar-padding')
   const bookmarkItemMargin = domUtil.getStyleConstants('bookmark-item-margin') * 2
-  // No margin for show only favicons
-  const chevronMargin = domUtil.getStyleConstants('bookmark-item-chevron-margin')
-  const fontSize = domUtil.getStyleConstants('bookmark-item-font-size')
-  const fontFamily = domUtil.getStyleConstants('default-font-family')
-  const chevronWidth = chevronMargin + fontSize
   const margin = favicon && onlyFavicon ? 0 : bookmarkItemMargin
   const windowWidth = window.innerWidth
-  widthAccountedFor += toolbarPadding
 
   // Loop through until we fill up the entire bookmark toolbar width
   let i = 0
   for (let bookmark of noParentItems) {
-    const current = bookmark[1]
-    let iconWidth = favicon ? iconSize : 0
-    // font-awesome file icons are 3px smaller
-    if (favicon && !current.get('folderId') && !current.get('favicon')) {
-      iconWidth -= 3
-    }
-    const currentChevronWidth = favicon && current.get('folderId') ? chevronWidth : 0
-    if (favicon && onlyFavicon) {
-      widthAccountedFor += padding + iconWidth + currentChevronWidth
-    } else {
-      const text = current.get('customTitle') || current.get('title') || current.get('location')
-      widthAccountedFor += Math.min(calculateTextWidth(text, `${fontSize} ${fontFamily}`) + padding + iconWidth + currentChevronWidth, maxWidth)
-    }
+    widthAccountedFor += noParentItems.getIn([bookmark[1], 'bookmarkWidth'])
     widthAccountedFor += margin
+
     if (widthAccountedFor >= windowWidth - overflowButtonWidth) {
       break
     }
+
     i++
   }
 
@@ -125,6 +106,36 @@ const getToolbarBookmarks = (state) => {
   }
 }
 
+const calcBookmarkWidth = (bookmark) => {
+  let bookmarkWidth = 0
+  // Dynamically calculate how many bookmark items should appear on the toolbar
+  // before it is actually rendered.
+  const maxWidth = domUtil.getStyleConstants('bookmark-item-max-width')
+  const padding = domUtil.getStyleConstants('bookmark-item-padding') * 2
+  // No margin for show only favicons
+  const chevronMargin = domUtil.getStyleConstants('bookmark-item-chevron-margin')
+  const fontSize = domUtil.getStyleConstants('bookmark-item-font-size')
+  const fontFamily = domUtil.getStyleConstants('default-font-family')
+  const onlyFavicon = showOnlyFavicon()
+  const favicon = showFavicon()
+  const chevronWidth = chevronMargin + fontSize
+
+  let iconWidth = favicon ? iconSize : 0
+  // font-awesome file icons are 3px smaller
+  if (favicon && !bookmark.get('folderId') && !bookmark.get('favicon')) {
+    iconWidth -= 3
+  }
+  const currentChevronWidth = favicon && bookmark.get('folderId') ? chevronWidth : 0
+  if (favicon && onlyFavicon) {
+    bookmarkWidth += padding + iconWidth + currentChevronWidth
+  } else {
+    const text = bookmark.get('customTitle') || bookmark.get('title') || bookmark.get('location')
+    bookmarkWidth += Math.min(calculateTextWidth(text, `${fontSize} ${fontFamily}`) + padding + iconWidth + currentChevronWidth, maxWidth)
+  }
+
+  return bookmarkWidth
+}
+
 module.exports = {
   bookmarkHangerHeading,
   displayBookmarkName,
@@ -132,5 +143,6 @@ module.exports = {
   showOnlyFavicon,
   showFavicon,
   getDNDBookmarkData,
-  getToolbarBookmarks
+  getToolbarBookmarks,
+  calcBookmarkWidth
 }
