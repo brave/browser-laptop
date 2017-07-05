@@ -101,7 +101,8 @@ const windowConstants = {
   WINDOW_ON_GO_BACK_LONG: _,
   WINDOW_ON_GO_FORWARD_LONG: _,
   WINDOW_CLOSE_OTHER_FRAMES: _,
-  WINDOW_ON_CERT_ERROR: _
+  WINDOW_ON_CERT_ERROR: _,
+  WINDOW_ON_TAB_PAGE_CONTEXT_MENU: _
 }
 
 module.exports = mapValuesByKeys(windowConstants)

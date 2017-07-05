@@ -3,23 +3,31 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const assert = require('assert')
+const Immutable = require('immutable')
+const electron = require('electron')
+const remote = electron.remote
+const Menu = remote.Menu
 
 // Constants
 const config = require('../../../js/constants/config.js')
 const windowConstants = require('../../../js/constants/windowConstants')
+const settings = require('../../../js/constants/settings')
 
 // State
-const contextMenuState = require('../../common/state/contextMenuState.js')
+const contextMenuState = require('../../common/state/contextMenuState')
 
 // Actions
-const appActions = require('../../../js/actions/appActions.js')
-const windowAction = require('../../../js/actions/windowActions.js')
+const appActions = require('../../../js/actions/appActions')
+const windowActions = require('../../../js/actions/windowActions')
 
 // Utils
-const eventUtil = require('../../../js/lib/eventUtil.js')
-const CommonMenu = require('../../common/commonMenu.js')
+const eventUtil = require('../../../js/lib/eventUtil')
+const CommonMenu = require('../../common/commonMenu')
 const locale = require('../../../js/l10n.js')
-const { makeImmutable, isMap } = require('../../common/state/immutableUtil')
+const {makeImmutable, isMap} = require('../../common/state/immutableUtil')
+const {getSetting} = require('../../../js/settings')
+const frameStateUtil = require('../../../js/state/frameStateUtil')
+const {getCurrentWindow} = require('../../renderer/currentWindow')
 
 const validateAction = function (action) {
   action = makeImmutable(action)
@@ -31,6 +39,54 @@ const validateState = function (state) {
   state = makeImmutable(state)
   assert.ok(isMap(state), 'state must be an Immutable.Map')
   return state
+}
+
+function generateMuteFrameList (framePropsList, muted) {
+  return framePropsList.map((frameProp) => {
+    return {
+      frameKey: frameProp.get('key'),
+      tabId: frameProp.get('tabId'),
+      muted: muted && frameProp.get('audioPlaybackActive') && !frameProp.get('audioMuted')
+    }
+  })
+}
+
+const onTabPageMenu = function (state, action) {
+  action = validateAction(action)
+  state = validateState(state)
+
+  const index = action.get('index')
+  if (index == null || index < 0) {
+    return
+  }
+
+  const frames = frameStateUtil.getNonPinnedFrames(state) || Immutable.List()
+  const tabsPerPage = Number(getSetting(settings.TABS_PER_PAGE))
+  const tabPageFrames = frames.slice(index * tabsPerPage, (index * tabsPerPage) + tabsPerPage)
+
+  if (tabPageFrames.isEmpty()) {
+    return
+  }
+
+  const template = [{
+    label: locale.translation('unmuteTabs'),
+    click: () => {
+      windowActions.muteAllAudio(generateMuteFrameList(tabPageFrames, false))
+    }
+  }, {
+    label: locale.translation('muteTabs'),
+    click: () => {
+      windowActions.muteAllAudio(generateMuteFrameList(tabPageFrames, true))
+    }
+  }, {
+    label: locale.translation('closeTabPage'),
+    click: () => {
+      windowActions.closeFrames(tabPageFrames)
+    }
+  }]
+
+  const tabPageMenu = Menu.buildFromTemplate(template)
+  tabPageMenu.popup(getCurrentWindow())
 }
 
 const onLongBackHistory = (state, action) => {
@@ -72,7 +128,7 @@ const onLongBackHistory = (state, action) => {
           appActions.createTabRequested({
             url: 'about:history'
           })
-          windowAction.setContextMenuDetail()
+          windowActions.setContextMenuDetail()
         }
       })
 
@@ -125,7 +181,7 @@ const onLongForwardHistory = (state, action) => {
           appActions.createTabRequested({
             url: 'about:history'
           })
-          windowAction.setContextMenuDetail()
+          windowActions.setContextMenuDetail()
         }
       })
 
@@ -146,6 +202,9 @@ const contextMenuReducer = (windowState, action) => {
       break
     case windowConstants.WINDOW_ON_GO_FORWARD_LONG:
       windowState = onLongForwardHistory(windowState, action)
+      break
+    case windowConstants.WINDOW_ON_TAB_PAGE_CONTEXT_MENU:
+      onTabPageMenu(windowState, action)
       break
   }
 

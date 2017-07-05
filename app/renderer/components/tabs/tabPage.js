@@ -19,7 +19,6 @@ const settings = require('../../../../js/constants/settings')
 // Utils
 const {getSetting} = require('../../../../js/settings')
 const cx = require('../../../../js/lib/classSet')
-const {onTabPageContextMenu} = require('../../../../js/contextMenus')
 const {getCurrentWindowId} = require('../../currentWindow')
 const dndData = require('../../../../js/dndData')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
@@ -30,6 +29,8 @@ class TabPage extends React.Component {
     super(props)
     this.onMouseEnter = this.onMouseEnter.bind(this)
     this.onMouseLeave = this.onMouseLeave.bind(this)
+    this.onContextMenu = this.onContextMenu.bind(this)
+    this.onClick = this.onClick.bind(this)
   }
 
   onMouseLeave () {
@@ -69,6 +70,15 @@ class TabPage extends React.Component {
     e.preventDefault()
   }
 
+  onContextMenu (e) {
+    e.stopPropagation()
+    windowActions.onTabPageContextMenu(this.props.index)
+  }
+
+  onClick () {
+    windowActions.setTabPageIndex(this.props.index)
+  }
+
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const frames = frameStateUtil.getNonPinnedFrames(currentWindow) || Immutable.List()
@@ -90,7 +100,6 @@ class TabPage extends React.Component {
     const props = {}
     // used in renderer
     props.index = ownProps.index
-    props.tabPageFrames = tabPageFrames // TODO (nejc) only primitives
     props.isAudioPlaybackActive = isAudioPlaybackActive
     props.previewTabPage = getSetting(settings.SHOW_TAB_PREVIEWS)
     props.active = currentWindow.getIn(['ui', 'tabs', 'tabPageIndex']) === props.index
@@ -113,10 +122,11 @@ class TabPage extends React.Component {
       className={cx({
         tabPage: true,
         audioPlaybackActive: this.props.isAudioPlaybackActive,
-        active: this.props.active})}
-      onContextMenu={onTabPageContextMenu.bind(this, this.props.tabPageFrames)}
-      onClick={windowActions.setTabPageIndex.bind(this, this.props.index)
-      } />
+        active: this.props.active
+      })}
+      onContextMenu={this.onContextMenu}
+      onClick={this.onClick}
+    />
   }
 }
 

@@ -77,35 +77,6 @@ const addFolderMenuItem = (closestDestinationDetail, isParent) => {
   }
 }
 
-function tabPageTemplateInit (framePropsList) {
-  return [{
-    label: locale.translation('unmuteTabs'),
-    click: () => {
-      windowActions.muteAllAudio(generateMuteFrameList(framePropsList, false))
-    }
-  }, {
-    label: locale.translation('muteTabs'),
-    click: () => {
-      windowActions.muteAllAudio(generateMuteFrameList(framePropsList, true))
-    }
-  }, {
-    label: locale.translation('closeTabPage'),
-    click: () => {
-      windowActions.closeFrames(framePropsList)
-    }
-  }]
-}
-
-function generateMuteFrameList (framePropsList, muted) {
-  return framePropsList.map((frameProp) => {
-    return {
-      frameKey: frameProp.get('key'),
-      tabId: frameProp.get('tabId'),
-      muted: muted && frameProp.get('audioPlaybackActive') && !frameProp.get('audioMuted')
-    }
-  })
-}
-
 function urlBarTemplateInit (searchDetail, activeFrame, e) {
   const items = getEditableItems(window.getSelection().toString())
   const clipboardText = clipboard.readText()
@@ -1378,12 +1349,6 @@ function onDownloadsToolbarContextMenu (downloadId, downloadItem, e) {
   downloadsToolbarMenu.popup(getCurrentWindow())
 }
 
-function onTabPageContextMenu (framePropsList, e) {
-  e.stopPropagation()
-  const tabPageMenu = Menu.buildFromTemplate(tabPageTemplateInit(framePropsList))
-  tabPageMenu.popup(getCurrentWindow())
-}
-
 function onUrlBarContextMenu (e) {
   e.stopPropagation()
   const searchDetail = appStoreRenderer.state.get('searchDetail')
@@ -1478,7 +1443,6 @@ module.exports = {
   onNewTabContextMenu,
   onTabsToolbarContextMenu,
   onDownloadsToolbarContextMenu,
-  onTabPageContextMenu,
   onUrlBarContextMenu,
   onFindBarContextMenu,
   onSiteDetailContextMenu,
