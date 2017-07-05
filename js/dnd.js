@@ -7,8 +7,6 @@ const appActions = require('./actions/appActions')
 const ReactDOM = require('react-dom')
 const dndData = require('./dndData')
 const dragTypes = require('./constants/dragTypes')
-const siteTags = require('./constants/siteTags')
-const siteUtil = require('./state/siteUtil')
 const appStoreRenderer = require('./stores/appStoreRenderer')
 const {getCurrentWindowId} = require('../app/renderer/currentWindow')
 const {ESC} = require('../app/common/constants/keyCodes.js')
@@ -137,11 +135,8 @@ module.exports.isMiddle = (domNode, clientX) => {
 module.exports.prepareBookmarkDataFromCompatible = (dataTransfer) => {
   let bookmark = dndData.getDragData(dataTransfer, dragTypes.BOOKMARK)
   if (!bookmark) {
-    const frameProps = dndData.getDragData(dataTransfer, dragTypes.TAB)
-    if (frameProps) {
-      bookmark = siteUtil.getDetailFromFrame(frameProps, siteTags.BOOKMARK)
-      appActions.addSite(bookmark, siteTags.BOOKMARK)
-    }
+    const dragData = dndData.getDragData(dataTransfer, dragTypes.TAB)
+    windowActions.onFrameBookmark(dragData.get('tabId'))
   }
   return bookmark
 }

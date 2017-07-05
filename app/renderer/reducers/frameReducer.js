@@ -10,6 +10,7 @@ const Immutable = require('immutable')
 const appConstants = require('../../../js/constants/appConstants')
 const windowConstants = require('../../../js/constants/windowConstants')
 const config = require('../../../js/constants/config')
+const siteTags = require('../../../js/constants/siteTags')
 
 // Actions
 const appActions = require('../../../js/actions/appActions')
@@ -19,6 +20,7 @@ const frameStateUtil = require('../../../js/state/frameStateUtil')
 const {getCurrentWindowId} = require('../currentWindow')
 const {getSourceAboutUrl, getSourceMagnetUrl} = require('../../../js/lib/appUrlUtil')
 const {isURL, isPotentialPhishingUrl, getUrlFromInput} = require('../../../js/lib/urlutil')
+const siteUtil = require('../../../js/state/siteUtil')
 
 const setFullScreen = (state, action) => {
   const index = frameStateUtil.getIndexByTabId(state, action.tabId)
@@ -205,6 +207,17 @@ const frameReducer = (state, action, immutableAction) => {
     case windowConstants.WINDOW_SET_FULL_SCREEN:
       state = setFullScreen(state, action)
       break
+
+    case windowConstants.WINDOW_ON_FRAME_BOOKMARK:
+      {
+        // TODO make this an appAction that gets the bookmark data from tabState
+        const frameProps = frameStateUtil.getFrameByTabId(state, action.tabId)
+        if (frameProps) {
+          const bookmark = siteUtil.getDetailFromFrame(frameProps, siteTags.BOOKMARK)
+          appActions.addSite(bookmark, siteTags.BOOKMARK)
+        }
+        break
+      }
   }
 
   return state
