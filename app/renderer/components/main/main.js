@@ -206,7 +206,7 @@ class Main extends React.Component {
 
     // isSwipeTrackingFromScrollEventsEnabled is only true if "two finger scroll to swipe" is enabled
     ipc.on('scroll-touch-begin', () => {
-      if (this.props.mouseInTitlebar) {
+      if (this.props.mouseInFrame) {
         trackingFingers = true
         startTime = (new Date()).getTime()
       }
@@ -270,7 +270,7 @@ class Main extends React.Component {
     })
 
     const throttledSwipe = _.throttle(direction => {
-      if (this.props.mouseInTitlebar) {
+      if (this.props.mouseInFrame) {
         if (direction === 'left') {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_BACK)
         } else if (direction === 'right') {
@@ -568,7 +568,7 @@ class Main extends React.Component {
     props.menubarSelectedIndex = currentWindow.getIn(['ui', 'menubar', 'selectedIndex'])
     props.showCustomTitleBar = isWindows()
     props.menubarVisible = menuBarState.isMenuBarVisible(currentWindow)
-    props.mouseInTitlebar = currentWindow.getIn(['ui', 'mouseInTitlebar'])
+    props.mouseInFrame = currentWindow.getIn(['ui', 'mouseInFrame'])
     props.braveShieldEnabled = shieldState.braveShieldsEnabled(activeFrame)
     props.tabId = activeFrame.get('tabId')
     props.location = activeFrame.get('location')
