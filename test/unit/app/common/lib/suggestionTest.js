@@ -448,4 +448,30 @@ describe('suggestion unit tests', function () {
       })
     })
   })
+
+  describe('getNormalizedSuggestion', function () {
+    const suggestionList = Immutable.fromJS([
+      {
+        location: 'https://www.brave.com/'
+      },
+      {
+        location: 'https://clifton.io/'
+      }
+    ])
+
+    it('suggestion list is empty', function () {
+      const result = suggestion.getNormalizedSuggestion(Immutable.List())
+      assert.equal(result, '')
+    })
+
+    it('active index is not provided', function () {
+      const result = suggestion.getNormalizedSuggestion(suggestionList)
+      assert.equal(result, 'brave.com/')
+    })
+
+    it('everything is provided', function () {
+      const result = suggestion.getNormalizedSuggestion(suggestionList, 1)
+      assert.equal(result, 'clifton.io/')
+    })
+  })
 })

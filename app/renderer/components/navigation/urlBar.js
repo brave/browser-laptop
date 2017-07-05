@@ -26,7 +26,6 @@ const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const siteSettings = require('../../../../js/state/siteSettings')
 const tabState = require('../../../common/state/tabState')
 const siteSettingsState = require('../../../common/state/siteSettingsState')
-const menuBarState = require('../../../common/state/menuBarState')
 
 // Utils
 const cx = require('../../../../js/lib/classSet')
@@ -36,7 +35,8 @@ const contextMenus = require('../../../../js/contextMenus')
 const {eventElHasAncestorWithClasses, isForSecondaryAction} = require('../../../../js/lib/eventUtil')
 const {getBaseUrl, isUrl} = require('../../../../js/lib/appUrlUtil')
 const {getCurrentWindowId} = require('../../currentWindow')
-const {normalizeLocation} = require('../../../common/lib/suggestion')
+const {normalizeLocation, getNormalizedSuggestion} = require('../../../common/lib/suggestion')
+const {isDarwin} = require('../../../common/lib/platformUtil')
 const publisherUtil = require('../../../common/lib/publisherUtil')
 
 // Icons
@@ -99,13 +99,6 @@ class UrlBar extends React.Component {
     windowActions.setRenderUrlBarSuggestions(false)
   }
 
-  get activeIndex () {
-    if (this.props.suggestionList === null) {
-      return -1
-    }
-    return this.props.selectedIndex
-  }
-
   onKeyDown (e) {
     if (!this.props.isActive) {
       windowActions.setUrlBarActive(true)
@@ -125,13 +118,12 @@ class UrlBar extends React.Component {
           const isLocationUrl = isUrl(location)
           if (!isLocationUrl && e.ctrlKey) {
             appActions.loadURLRequested(this.props.activeTabId, `www.${location}.com`)
-          } else if (this.shouldRenderUrlBarSuggestions &&
-              ((typeof this.activeIndex === 'number' && this.activeIndex >= 0) ||
+          } else if (this.props.showUrlBarSuggestions &&
+              ((typeof this.props.activeIndex === 'number' && this.props.activeIndex >= 0) ||
               (this.props.urlbarLocationSuffix && this.props.autocompleteEnabled))) {
             // Hack to make alt enter open a new tab for url bar suggestions when hitting enter on them.
-            const isDarwin = process.platform === 'darwin'
             if (e.altKey) {
-              if (isDarwin) {
+              if (isDarwin()) {
                 e.metaKey = true
               } else {
                 e.ctrlKey = true
@@ -161,20 +153,20 @@ class UrlBar extends React.Component {
         windowActions.setRenderUrlBarSuggestions(false)
         break
       case KeyCodes.UP:
-        if (this.shouldRenderUrlBarSuggestions) {
+        if (this.props.showUrlBarSuggestions) {
           windowActions.previousUrlBarSuggestionSelected()
           e.preventDefault()
         }
         break
       case KeyCodes.DOWN:
-        if (this.shouldRenderUrlBarSuggestions) {
+        if (this.props.showUrlBarSuggestions) {
           windowActions.nextUrlBarSuggestionSelected()
           e.preventDefault()
         }
         break
       case KeyCodes.ESC:
         e.preventDefault()
-        this.props.onStop()
+        this.onStop()
         this.restore()
         this.select()
         break
@@ -182,8 +174,7 @@ class UrlBar extends React.Component {
         if (e.shiftKey) {
           const selectedIndex = this.props.urlbarLocationSuffix.length > 0 ? 1 : this.props.selectedIndex
           if (selectedIndex !== undefined) {
-            const suggestionLocation = this.props.suggestion.location
-            appActions.removeSite({ location: suggestionLocation })
+            appActions.removeSite({ location: this.props.suggestionLocation })
           }
         } else {
           this.hideAutoComplete()
@@ -193,7 +184,7 @@ class UrlBar extends React.Component {
         this.hideAutoComplete()
         break
       case KeyCodes.TAB:
-        if (this.shouldRenderUrlBarSuggestions) {
+        if (this.props.showUrlBarSuggestions) {
           if (e.shiftKey) {
             windowActions.previousUrlBarSuggestionSelected()
           } else {
@@ -215,7 +206,7 @@ class UrlBar extends React.Component {
     }
   }
 
-  onClick (e) {
+  onClick () {
     if (this.props.isSelected) {
       windowActions.setUrlBarActive(true)
     }
@@ -225,26 +216,10 @@ class UrlBar extends React.Component {
     windowActions.urlBarOnBlur(getCurrentWindowId(), e.target.value, this.props.urlbarLocation, eventElHasAncestorWithClasses(e, ['urlBarSuggestions', 'urlbarForm']))
   }
 
-  get suggestionLocation () {
-    const selectedIndex = this.props.selectedIndex
-    if (typeof selectedIndex === 'number') {
-      const suggestion = this.props.suggestion
-      if (suggestion) {
-        return suggestion.location
-      }
-    }
-  }
-
   updateAutocomplete (newValue) {
-    let suggestion = ''
-    let suggestionNormalized = ''
-    if (this.props.suggestionList && this.props.suggestionList.size > 0) {
-      suggestion = this.props.suggestionList.getIn([this.activeIndex || 0, 'location']) || ''
-      suggestionNormalized = normalizeLocation(suggestion)
-    }
     const newValueNormalized = normalizeLocation(newValue)
-    if (suggestionNormalized.startsWith(newValueNormalized) && suggestionNormalized.length > 0) {
-      const newSuffix = suggestionNormalized.substring(newValueNormalized.length)
+    if (this.props.normalizedSuggestion.startsWith(newValueNormalized) && this.props.normalizedSuggestion.length > 0) {
+      const newSuffix = this.props.normalizedSuggestion.substring(newValueNormalized.length)
       this.setValue(newValue, newSuffix)
       this.urlInput.setSelectionRange(newValue.length, newValue.length + newSuffix.length + 1)
       return true
@@ -344,7 +319,7 @@ class UrlBar extends React.Component {
     })
   }
 
-  onFocus (e) {
+  onFocus () {
     this.select()
     windowActions.urlBarOnFocus(getCurrentWindowId())
   }
@@ -415,17 +390,18 @@ class UrlBar extends React.Component {
     return ''
   }
 
-  get shouldRenderUrlBarSuggestions () {
-    return this.props.shouldRender === true &&
-      this.props.suggestionList && this.props.suggestionList.size > 0
-  }
-
   onNoScript () {
     windowActions.setNoScriptVisible()
   }
 
   onContextMenu (e) {
     contextMenus.onUrlBarContextMenu(e)
+  }
+
+  onStop () {
+    // TODO (bridiver) - remove shortcut
+    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_STOP)
+    windowActions.onStop(this.props.isFocused, this.props.shouldRenderSuggestion)
   }
 
   mergeProps (state, ownProps) {
@@ -459,44 +435,46 @@ class UrlBar extends React.Component {
       searchShortcut = new RegExp('^' + provider.get('shortcut') + ' ', 'g')
       searchURL = provider.get('search')
     }
+    const suggestionList = urlbar.getIn(['suggestions', 'suggestionList'])
+    const scriptsBlocked = activeFrame.getIn(['noScript', 'blocked'])
+    const enableNoScript = siteSettingsState.isNoScriptEnabled(state, braverySettings)
+    const activeIndex = suggestionList === null ? -1 : selectedIndex
 
     const props = {}
-
-    props.activeTabId = activeTabId
-    props.activeFrameKey = activeFrame.get('key')
-    props.frameLocation = frameLocation
-    props.displayURL = displayURL
+    // used in renderer
+    props.isWideURLbarEnabled = getSetting(settings.WIDE_URL_BAR)
+    props.publisherButtonVisible = publisherUtil.shouldShowAddPublisherButton(state, location, publisherId)
+    props.titleMode = ownProps.titleMode
     props.hostValue = hostValue
+    props.urlbarLocation = urlbarLocation
     props.title = activeFrame.get('title', '')
-    props.scriptsBlocked = activeFrame.getIn(['noScript', 'blocked'])
-    props.enableNoScript = siteSettingsState.isNoScriptEnabled(state, braverySettings)
-    props.showNoScriptInfo = props.enableNoScript && props.scriptsBlocked && props.scriptsBlocked.size
-    props.hasSuggestionMatch = urlbar.getIn(['suggestions', 'hasSuggestionMatch'])
+    props.displayURL = displayURL
     props.startLoadTime = activeFrame.get('startLoadTime')
     props.endLoadTime = activeFrame.get('endLoadTime')
     props.loading = activeFrame.get('loading')
-    props.noScriptIsVisible = currentWindow.getIn(['ui', 'noScriptInfo', 'isVisible']) || false
-    props.menubarVisible = ownProps.menubarVisible
-    props.publisherButtonVisible = publisherUtil.shouldShowAddPublisherButton(state, location, publisherId)
-    props.onStop = ownProps.onStop
-    props.titleMode = ownProps.titleMode
-    props.urlbarLocation = urlbarLocation
-    props.urlbarLocationSuffix = urlbar.getIn(['suggestions', 'urlSuffix'])
-    props.selectedIndex = selectedIndex
-    props.suggestionList = urlbar.getIn(['suggestions', 'suggestionList'])
-    props.suggestion = urlbar.getIn(['suggestions', 'suggestionList', selectedIndex - 1])
-    props.shouldRender = urlbar.getIn(['suggestions', 'shouldRender'])
-    props.urlbarLocation = urlbarLocation
+    props.showDisplayTime = !props.titleMode && props.displayURL === location
+    props.showNoScriptInfo = enableNoScript && scriptsBlocked && scriptsBlocked.size
     props.isActive = urlbar.get('active')
-    props.isSelected = urlbar.get('selected')
+    props.showUrlBarSuggestions = urlbar.getIn(['suggestions', 'shouldRender']) === true &&
+      suggestionList && suggestionList.size > 0
+
+    // used in other functions
+    props.activeFrameKey = activeFrame.get('key')
+    props.urlbarLocation = urlbarLocation
     props.isFocused = urlbar.get('focused')
-    props.isWideURLbarEnabled = getSetting(settings.WIDE_URL_BAR)
-    props.searchSelectEntry = urlbarSearchDetail
+    props.frameLocation = frameLocation
+    props.isSelected = urlbar.get('selected')
+    props.noScriptIsVisible = currentWindow.getIn(['ui', 'noScriptInfo', 'isVisible'], false)
+    props.selectedIndex = selectedIndex
+    props.suggestionLocation = urlbar.getIn(['suggestions', 'suggestionList', selectedIndex - 1, 'location'])
+    props.normalizedSuggestion = getNormalizedSuggestion(suggestionList, activeIndex)
+    props.activeTabId = activeTabId
+    props.urlbarLocationSuffix = urlbar.getIn(['suggestions', 'urlSuffix'])
     props.autocompleteEnabled = urlbar.getIn(['suggestions', 'autocompleteEnabled'])
     props.searchURL = searchURL
     props.searchShortcut = searchShortcut
-    props.showDisplayTime = !props.titleMode && props.displayURL === location
-    props.menubarVisible = menuBarState.isMenuBarVisible(currentWindow)
+    props.shouldRenderSuggestion = urlbar.getIn(['suggestions', 'shouldRender']) === true
+    props.activeIndex = activeIndex
 
     return props
   }
@@ -535,7 +513,6 @@ class UrlBar extends React.Component {
           onContextMenu={this.onContextMenu}
           data-l10n-id='urlbar'
           className={cx({
-            private: this.private,
             testHookLoadDone: !this.props.loading
           })}
           id='urlInput'
@@ -563,10 +540,8 @@ class UrlBar extends React.Component {
         </span>
       }
       {
-          this.shouldRenderUrlBarSuggestions
-          ? <UrlBarSuggestions
-            menubarVisible={this.props.menubarVisible}
-          />
+          this.props.showUrlBarSuggestions
+          ? <UrlBarSuggestions />
           : null
         }
     </form>

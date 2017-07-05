@@ -18,6 +18,7 @@ const locale = require('../../../../js/l10n')
 const suggestions = require('../../../common/lib/suggestion')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const domUtil = require('../../lib/domUtil')
+const menuBarState = require('../../../common/state/menuBarState')
 const {getCurrentWindowId} = require('../../currentWindow')
 
 class UrlBarSuggestions extends React.Component {
@@ -75,14 +76,14 @@ class UrlBarSuggestions extends React.Component {
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const urlBar = activeFrame.getIn(['navbar', 'urlbar'], Immutable.Map())
     const documentHeight = domUtil.getStyleConstants('navbar-height')
-    const menuHeight = ownProps.menubarVisible ? 30 : 0
+    const menubarVisible = menuBarState.isMenuBarVisible(currentWindow)
+    const menuHeight = menubarVisible ? 30 : 0
 
     const props = {}
     // used in renderer
     props.maxHeight = document.documentElement.offsetHeight - documentHeight - 2 - menuHeight
 
     // used in functions
-    props.menubarVisible = ownProps.menubarVisible
     props.suggestionList = urlBar.getIn(['suggestions', 'suggestionList']) // TODO (nejc) improve, use primitives
     props.hasSuggestionMatch = urlBar.getIn(['suggestions', 'hasSuggestionMatch'])
     props.activeIndex = props.suggestionList === null
