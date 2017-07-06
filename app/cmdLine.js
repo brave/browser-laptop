@@ -52,30 +52,18 @@ const focusOrOpenWindow = function (url) {
 
 // Checks an array of arguments if it can find a url
 const getUrlFromCommandLine = (argv) => {
-  if (argv) {
-    if (argv.length === 2 && !argv[1].startsWith('-')) {
-      const parsedUrl = urlParse(argv[1])
-      if (sessionStore.isProtocolHandled(parsedUrl.protocol)) {
-        return argv[1]
-      }
-      const filePath = path.resolve(argv[1])
-      if (fs.existsSync(filePath)) {
-        return fileUrl(filePath)
-      }
-    }
-    const index = argv.indexOf('--')
-    if (index !== -1 && index + 1 < argv.length && !argv[index + 1].startsWith('-')) {
-      const parsedUrl = urlParse(argv[index + 1])
-      if (sessionStore.isProtocolHandled(parsedUrl.protocol)) {
-        return argv[index + 1]
-      }
-      const filePath = path.resolve(argv[index + 1])
-      if (fs.existsSync(filePath)) {
-        return fileUrl(filePath)
-      }
+  var url
+  if (argv && argv.length >= 2) {
+    const lastArg = argv[argv.length - 1]
+    const parsedUrl = urlParse(lastArg)
+    const filePath = path.resolve(lastArg)
+    if (sessionStore.isProtocolHandled(parsedUrl.protocol)) {
+      url = lastArg
+    } else if (fs.existsSync(filePath)) {
+      url = fileUrl(filePath)
     }
   }
-  return undefined
+  return url
 }
 
 app.on('ready', () => {
