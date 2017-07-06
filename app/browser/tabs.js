@@ -798,7 +798,8 @@ const api = {
 
   goToIndex: (tabId, index) => {
     const tab = getWebContents(tabId)
-    if (tab && !tab.isDestroyed() && tab.canGoToIndex(index)) {
+    const validIndex = index >= 0 && index < tab.getEntryCount()
+    if (tab && !tab.isDestroyed() && validIndex) {
       tab.goToIndex(index)
     }
   },
