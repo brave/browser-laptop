@@ -3,6 +3,7 @@
 
 'use strict'
 const Immutable = require('immutable')
+const historyCache = require('../../app/common/state/historyCache')
 const siteCache = require('../../app/common/state/siteCache')
 const siteTags = require('../constants/siteTags')
 const settings = require('../constants/settings')
@@ -256,6 +257,20 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId, order) =>
   return site
 }
 
+const cacheSite = (state, site, siteKey) => {
+  const location = site.has('location') && UrlUtil.getLocationIfPDF(site.get('location'))
+  state = siteCache.addLocationSiteKey(state, location, siteKey)
+  historyCache.addSiteKey(siteKey, site)
+  return state
+}
+
+const uncacheSite = (state, site, siteKey, newSite) => {
+  const oldLocation = (site && site.get('location')) || (newSite && newSite.get('location'))
+  state = siteCache.removeLocationSiteKey(state, oldLocation, siteKey)
+  historyCache.removeSiteKey(siteKey)
+  return state
+}
+
 /**
  * Adds the specified siteDetail in appState.sites.
  *
@@ -312,9 +327,7 @@ module.exports.addSite = function (state, siteDetail, tag, oldKey, skipSync) {
     location = UrlUtil.getLocationIfPDF(site.get('location'))
     site = site.set('location', location)
   }
-
-  const oldLocation = (oldSite && oldSite.get('location')) || site.get('location')
-  state = siteCache.removeLocationSiteKey(state, oldLocation, oldKey)
+  state = uncacheSite(state, oldSite, oldKey, site)
 
   if (skipSync) {
     site = site.set('skipSync', true)
@@ -326,7 +339,7 @@ module.exports.addSite = function (state, siteDetail, tag, oldKey, skipSync) {
     return state
   }
   state = state.setIn(['sites', key], site)
-  state = siteCache.addLocationSiteKey(state, location, key)
+  state = cacheSite(state, site, key)
   return state
 }
 
@@ -393,8 +406,7 @@ module.exports.removeSite = function (state, siteDetail, tag, reorder = true, sy
     })
   }
 
-  const location = siteDetail.get('location')
-  state = siteCache.removeLocationSiteKey(state, location, key)
+  state = uncacheSite(state, siteDetail, key)
 
   const stateKey = ['sites', key]
   let site = state.getIn(stateKey)
@@ -495,8 +507,7 @@ module.exports.moveSite = function (state, sourceKey, destinationKey, prepend,
     --newIndex
   }
 
-  const location = sourceSite.get('location')
-  state = siteCache.removeLocationSiteKey(state, location, sourceKey)
+  state = uncacheSite(state, sourceSite, sourceKey)
   state = state.deleteIn(['sites', sourceKey])
   state = state.set('sites', state.get('sites').map((site) => {
     const siteOrder = site.get('order')
@@ -519,7 +530,7 @@ module.exports.moveSite = function (state, sourceKey, destinationKey, prepend,
     }
   }
   const destinationSiteKey = module.exports.getSiteKey(sourceSite)
-  state = siteCache.addLocationSiteKey(state, location, destinationSiteKey)
+  state = cacheSite(state, sourceSite, destinationSiteKey)
   return state.setIn(['sites', destinationSiteKey], sourceSite)
 }
 

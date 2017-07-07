@@ -5,19 +5,8 @@
 const Immutable = require('immutable')
 const siteUtil = require('../../../js/state/siteUtil')
 const appUrlUtil = require('../../../js/lib/appUrlUtil')
+const historyCache = require('./historyCache')
 const UrlUtil = require('../../../js/lib/urlutil')
-
-const createLocationSiteKeysCache = (state) => {
-  state = state.set('locationSiteKeysCache', new Immutable.Map())
-  state.get('sites').forEach((site, siteKey) => {
-    const location = siteUtil.getLocationFromSiteKey(siteKey)
-    if (!location) {
-      return
-    }
-    state = addLocationSiteKey(state, location, siteKey)
-  })
-  return state
-}
 
 const normalizeLocation = (location) => {
   const sourceAboutUrl = appUrlUtil.getSourceAboutUrl(location)
@@ -27,17 +16,29 @@ const normalizeLocation = (location) => {
   return UrlUtil.getLocationIfPDF(location)
 }
 
-module.exports.loadLocationSiteKeysCache = (state) => {
-  const cache = state.get('locationSiteKeysCache')
-  if (cache) {
-    return state
+module.exports.loadSiteKeyCaches = (state) => {
+  const shouldCacheLocation = !state.get('locationSiteKeysCache')
+  if (shouldCacheLocation) {
+    state = state.set('locationSiteKeysCache', new Immutable.Map())
   }
-  return createLocationSiteKeysCache(state)
+  const cacheLocation = (site, siteKey) => {
+    const location = siteUtil.getLocationFromSiteKey(siteKey)
+    if (!location) {
+      return
+    }
+    state = addLocationSiteKey(state, location, siteKey)
+  }
+  state.get('sites').forEach((site, siteKey) => {
+    if (shouldCacheLocation) {
+      cacheLocation(site, siteKey)
+    }
+    historyCache.addSiteKey(siteKey, site)
+  })
+  return state
 }
 
 /**
  * Given a location, get matching appState siteKeys based on cache.
- * Loads cache from appState if it hasn't been loaded yet.
  * @param state Application state
  * @param location {string}
  * @return {Immutable.List<string>|null} siteKeys including this location.
