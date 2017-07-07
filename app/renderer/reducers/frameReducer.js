@@ -37,7 +37,7 @@ const closeFrame = (state, action) => {
   }
 
   const frameProps = frameStateUtil.getFrameByKey(state, action.frameKey)
-  const hoverState = state.getIn(['frames', index, 'hoverState'])
+  const hoverState = frameStateUtil.getTabHoverState(state, action.frameKey)
 
   state = state.merge(frameStateUtil.removeFrame(
     state,
@@ -117,12 +117,13 @@ const frameReducer = (state, action, immutableAction) => {
         state = state.setIn(['frames', index, 'title'], title)
       }
 
+      const hoverState = frameStateUtil.getTabHoverState(state, frame.get('key'))
       // TODO fix race condition in Muon more info in #9000
       const active = immutableAction.getIn(['tabValue', 'active'])
       if (active != null) {
         if (active) {
           state = state.set('activeFrameKey', frame.get('key'))
-          if (frame.get('hoverState')) {
+          if (hoverState) {
             state = state.set('previewFrameKey', null)
           }
           if (frame.getIn(['ui', 'tabs', 'hoverTabPageIndex']) == null) {

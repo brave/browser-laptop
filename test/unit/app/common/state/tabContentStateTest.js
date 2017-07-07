@@ -13,6 +13,7 @@ const {braveExtensionId} = require('../../../../../js/constants/config')
 const styles = require('../../../../../app/renderer/components/styles/global')
 
 const frameKey = 1
+const index = 0
 const defaultWindowStore = Immutable.fromJS({
   activeFrameKey: frameKey,
   frames: [{
@@ -21,7 +22,8 @@ const defaultWindowStore = Immutable.fromJS({
     location: 'http://brave.com'
   }],
   tabs: [{
-    key: frameKey
+    key: frameKey,
+    index: index
   }],
   framesInternal: {
     index: {
@@ -29,6 +31,11 @@ const defaultWindowStore = Immutable.fromJS({
     },
     tabIndex: {
       1: 0
+    }
+  },
+  ui: {
+    tabs: {
+      hoverTabIndex: index
     }
   }
 })
@@ -340,6 +347,7 @@ describe('tabContentState unit tests', function () {
     })
 
     it('tab is private and active', function () {
+      const state = defaultWindowStore
       getFrameByKeyMock = sinon.stub(frameStateUtil, 'getFrameByKey', () => {
         return Immutable.fromJS({
           isPrivate: true
@@ -348,10 +356,11 @@ describe('tabContentState unit tests', function () {
       isFrameKeyActive = sinon.stub(frameStateUtil, 'isFrameKeyActive', () => {
         return true
       })
-      assert.equal(tabContentState.getTabIconColor(), styles.color.white100)
+      assert.equal(tabContentState.getTabIconColor(state), styles.color.white100)
     })
 
     it('tab is not private and active, but paint is disabled', function () {
+      const state = defaultWindowStore
       getFrameByKeyMock = sinon.stub(frameStateUtil, 'getFrameByKey', () => {
         return Immutable.fromJS({
           isPrivate: false
@@ -361,10 +370,11 @@ describe('tabContentState unit tests', function () {
         return true
       })
       defaultValue = false
-      assert.equal(tabContentState.getTabIconColor(), styles.color.black100)
+      assert.equal(tabContentState.getTabIconColor(state), styles.color.black100)
     })
 
     it('all valid', function () {
+      const state = defaultWindowStore
       getFrameByKeyMock = sinon.stub(frameStateUtil, 'getFrameByKey', () => {
         return Immutable.fromJS({
           isPrivate: false,
@@ -374,7 +384,7 @@ describe('tabContentState unit tests', function () {
       isFrameKeyActive = sinon.stub(frameStateUtil, 'isFrameKeyActive', () => {
         return true
       })
-      assert.equal(tabContentState.getTabIconColor(), 'white')
+      assert.equal(tabContentState.getTabIconColor(state), 'white')
     })
   })
 
@@ -427,33 +437,29 @@ describe('tabContentState unit tests', function () {
       assert.equal(tabContentState.hasRelativeCloseIcon(state), false)
     })
 
-    it('if not hovering', function () {
-      getFrameByKeyMock = sinon.stub(frameStateUtil, 'getFrameByKey', () => {
-        return Immutable.fromJS({
-          hoverState: false
-        })
-      })
-      assert.equal(tabContentState.hasRelativeCloseIcon(), false)
+    it('if not hovering (tabIndex !== hoverTabIndex)', function () {
+      const state = defaultWindowStore.setIn(['ui', 'tabs', 'hoverTabIndex'], null)
+      assert.equal(tabContentState.hasRelativeCloseIcon(state, frameKey), false)
     })
 
-    it('if hovering and break point is small', function () {
+    it('if hovering (tabIndex === hoverTabIndex) and break point is small', function () {
+      const state = defaultWindowStore
       getFrameByKeyMock = sinon.stub(frameStateUtil, 'getFrameByKey', () => {
         return Immutable.fromJS({
-          hoverState: true,
           breakpoint: 'small'
         })
       })
-      assert.equal(tabContentState.hasRelativeCloseIcon(), false)
+      assert.equal(tabContentState.hasRelativeCloseIcon(state, frameKey), false)
     })
 
-    it('if hovering and break point is default', function () {
+    it('if hovering (tabIndex === hoverTabIndex) and break point is default', function () {
+      const state = defaultWindowStore
       getFrameByKeyMock = sinon.stub(frameStateUtil, 'getFrameByKey', () => {
         return Immutable.fromJS({
-          hoverState: true,
           breakpoint: 'default'
         })
       })
-      assert.equal(tabContentState.hasRelativeCloseIcon(), true)
+      assert.equal(tabContentState.hasRelativeCloseIcon(state, frameKey), true)
     })
   })
 

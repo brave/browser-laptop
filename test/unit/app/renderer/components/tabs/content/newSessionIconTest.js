@@ -11,6 +11,7 @@ const {tabs} = require('../../../../../../../js/constants/config')
 const fakeElectron = require('../../../../../lib/fakeElectron')
 require('../../../../../braveUnit')
 
+const index = 0
 const tabId = 1
 const frameKey = 1
 const invalidFrameKey = 71
@@ -40,7 +41,8 @@ const defaultWindowStore = Immutable.fromJS({
     location: 'http://brave.com'
   }],
   tabs: [{
-    key: frameKey
+    key: frameKey,
+    index: index
   }],
   framesInternal: {
     index: {
@@ -48,6 +50,11 @@ const defaultWindowStore = Immutable.fromJS({
     },
     tabIndex: {
       1: 0
+    }
+  },
+  ui: {
+    tabs: {
+      hoverTabIndex: index
     }
   }
 })
@@ -80,29 +87,51 @@ describe('Tabs content - NewSessionIcon', function () {
 
   describe('should show', function () {
     it('icon if current tab is a new session tab', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        partitionNumber: 1,
-        breakpoint: 'default'
+      windowStore.state = defaultWindowStore.merge({
+        activeFrameKey: 0,
+        frames: [{
+          partitionNumber: 1,
+          breakpoint: 'default'
+        }],
+        ui: {
+          tabs: {
+            hoverTabIndex: null
+          }
+        }
       })
       const wrapper = mount(<Tab frameKey={frameKey} />)
       assert.equal(wrapper.find('NewSessionIcon').length, 1)
     })
 
     it('icon if mouse is not over tab and breakpoint is default', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        partitionNumber: 1,
-        hoverState: false,
-        breakpoint: 'default'
+      windowStore.state = defaultWindowStore.merge({
+        activeFrameKey: 0,
+        frames: [{
+          partitionNumber: 1,
+          breakpoint: 'default'
+        }],
+        ui: {
+          tabs: {
+            hoverTabIndex: null
+          }
+        }
       })
       const wrapper = mount(<Tab frameKey={frameKey} />)
       assert.equal(wrapper.find('NewSessionIcon').length, 1)
     })
 
     it('icon if mouse is not over tab and breakpoint is large', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        partitionNumber: 1,
-        hoverState: false,
-        breakpoint: 'large'
+      windowStore.state = defaultWindowStore.merge({
+        activeFrameKey: 0,
+        frames: [{
+          partitionNumber: 1,
+          breakpoint: 'large'
+        }],
+        ui: {
+          tabs: {
+            hoverTabIndex: null
+          }
+        }
       })
       const wrapper = mount(<Tab frameKey={frameKey} />)
       assert.equal(wrapper.find('NewSessionIcon').length, 1)
@@ -113,9 +142,13 @@ describe('Tabs content - NewSessionIcon', function () {
         activeFrameKey: 0,
         frames: [{
           partitionNumber: 1,
-          hoverState: false,
           breakpoint: 'largeMedium'
-        }]
+        }],
+        ui: {
+          tabs: {
+            hoverTabIndex: null
+          }
+        }
       })
       const wrapper = mount(<Tab frameKey={frameKey} />)
       assert.equal(wrapper.find('NewSessionIcon').length, 1)
