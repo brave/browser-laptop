@@ -218,6 +218,38 @@ function registerForBeforeRedirect (session, partition) {
   })
 }
 
+module.exports.considerRequestExceptions = (requestHeaders, url, firstPartyUrl, isPrivate) => {
+  const cookieSetting = module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, firstPartyUrl, isPrivate)
+  if (cookieSetting) {
+    const parsedTargetUrl = urlParse(url || '')
+    const parsedFirstPartyUrl = urlParse(firstPartyUrl)
+
+    if (cookieSetting === 'blockAllCookies' ||
+      isThirdPartyHost(parsedFirstPartyUrl.hostname, parsedTargetUrl.hostname)) {
+      let hasCookieException = false
+      cookieExceptions.forEach((exceptionPair) => {
+        if (getOrigin(firstPartyUrl) === exceptionPair[0] &&
+            getOrigin(url) === exceptionPair[1] &&
+            cookieSetting !== 'blockAllCookies') {
+          hasCookieException = true
+        }
+      })
+      // Clear cookie and referer on third-party requests
+      if (requestHeaders['Cookie'] &&
+          getOrigin(firstPartyUrl) !== pdfjsOrigin && !hasCookieException) {
+        requestHeaders['Cookie'] = undefined
+      }
+      if (cookieSetting !== 'blockAllCookies' &&
+          requestHeaders['Referer'] &&
+          !refererExceptions.includes(parsedTargetUrl.hostname)) {
+        requestHeaders['Referer'] = getOrigin(url)
+      }
+    }
+  }
+
+  return requestHeaders
+}
+
 /**
  * Register for notifications for webRequest.onBeforeSendHeaders for
  * a particular session.
@@ -264,31 +296,8 @@ function registerForBeforeSendHeaders (session, partition) {
       }
     }
 
-    const cookieSetting = module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, firstPartyUrl, isPrivate)
-    if (cookieSetting) {
-      const parsedTargetUrl = urlParse(details.url || '')
-      const parsedFirstPartyUrl = urlParse(firstPartyUrl)
+    requestHeaders = module.exports.considerRequestExceptions(requestHeaders, details.url, firstPartyUrl, isPrivate)
 
-      if (cookieSetting === 'blockAllCookies' ||
-        isThirdPartyHost(parsedFirstPartyUrl.hostname, parsedTargetUrl.hostname)) {
-        let hasCookieException = false
-        cookieExceptions.forEach((exceptionPair) => {
-          if (getOrigin(firstPartyUrl) === exceptionPair[0] && getOrigin(details.url) === exceptionPair[1] && cookieSetting !== 'blockAllCookies') {
-            hasCookieException = true
-          }
-        })
-        // Clear cookie and referer on third-party requests
-        if (requestHeaders['Cookie'] &&
-            getOrigin(firstPartyUrl) !== pdfjsOrigin && !hasCookieException) {
-          requestHeaders['Cookie'] = undefined
-        }
-        if (cookieSetting !== 'blockAllCookies' &&
-            requestHeaders['Referer'] &&
-            !refererExceptions.includes(parsedTargetUrl.hostname)) {
-          requestHeaders['Referer'] = getOrigin(details.url)
-        }
-      }
-    }
     if (sendDNT) {
       requestHeaders['DNT'] = '1'
     }
