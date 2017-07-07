@@ -140,7 +140,7 @@ class UrlBarIcon extends React.Component {
 
     // used in other functions
     props.title = activeFrame.get('title', '')
-    props.tabId = activeFrame.get('tabId')
+    props.tabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
 
     return props
   }

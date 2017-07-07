@@ -12,9 +12,7 @@ const TabIcon = require('./tabIcon')
 
 // State
 const tabContentState = require('../../../../common/state/tabContentState')
-
-// Store
-const windowStore = require('../../../../../js/stores/windowStore')
+const tabState = require('../../../../common/state/tabState')
 
 // Actions
 const windowActions = require('../../../../../js/actions/windowActions')
@@ -35,14 +33,9 @@ class CloseTabIcon extends React.Component {
     this.onDragStart = this.onDragStart.bind(this)
   }
 
-  get frame () {
-    return windowStore.getFrame(this.props.frameKey)
-  }
-
   onClick (event) {
     event.stopPropagation()
-    const frame = this.frame
-    if (frame && !frame.isEmpty()) {
+    if (this.props.hasFrame) {
       windowActions.onTabClosedWithMouse({
         fixTabWidth: this.props.fixTabWidth
       })
@@ -56,21 +49,23 @@ class CloseTabIcon extends React.Component {
 
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const isPinnedTab = frameStateUtil.isPinned(currentWindow, ownProps.frameKey)
-    const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey) || Immutable.Map()
+    const frameKey = ownProps.frameKey
+    const isPinnedTab = frameStateUtil.isPinned(currentWindow, frameKey)
+    const frame = frameStateUtil.getFrameByKey(currentWindow, frameKey) || Immutable.Map()
 
     const props = {}
     // used in renderer
     props.showCloseIcon = !isPinnedTab &&
       (
-        tabContentState.hasRelativeCloseIcon(currentWindow, ownProps.frameKey) ||
-        tabContentState.hasFixedCloseIcon(currentWindow, ownProps.frameKey)
+        tabContentState.hasRelativeCloseIcon(currentWindow, frameKey) ||
+        tabContentState.hasFixedCloseIcon(currentWindow, frameKey)
       )
 
     // used in functions
-    props.frameKey = ownProps.frameKey
+    props.frameKey = frameKey
     props.fixTabWidth = ownProps.fixTabWidth
-    props.tabId = frame.get('tabId')
+    props.tabId = frame.get('tabId', tabState.TAB_ID_NONE)
+    props.hasFrame = !frame.isEmpty()
 
     return props
   }

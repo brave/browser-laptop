@@ -121,7 +121,6 @@ class MenuBar extends React.Component {
 
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const contextMenuDetail = currentWindow.get('contextMenuDetail')
 
     const props = {}
     // used in renderer
@@ -130,7 +129,7 @@ class MenuBar extends React.Component {
     // used in other functions
     props.selectedIndex = currentWindow.getIn(['ui', 'menubar', 'selectedIndex'])
     props.contextMenuSelectedIndex = contextMenuState.selectedIndex(currentWindow)
-    props.contextMenuDetail = !!contextMenuDetail
+    props.contextMenuDetail = currentWindow.has('contextMenuDetail')
     props.lastFocusedSelector = currentWindow.getIn(['ui', 'menubar', 'lastFocusedSelector'])
 
     return props

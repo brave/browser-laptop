@@ -83,7 +83,8 @@ class TabPage extends React.Component {
     const currentWindow = state.get('currentWindow')
     const frames = frameStateUtil.getNonPinnedFrames(currentWindow) || Immutable.List()
     const tabsPerPage = Number(getSetting(settings.TABS_PER_PAGE))
-    const tabPageFrames = frames.slice(ownProps.index * tabsPerPage, (ownProps.index * tabsPerPage) + tabsPerPage)
+    const index = ownProps.index
+    const tabPageFrames = frames.slice(index * tabsPerPage, (index * tabsPerPage) + tabsPerPage) || Immutable.List()
     const isAudioPlaybackActive = tabPageFrames.find((frame) =>
     frame.get('audioPlaybackActive') && !frame.get('audioMuted'))
 
@@ -99,7 +100,7 @@ class TabPage extends React.Component {
 
     const props = {}
     // used in renderer
-    props.index = ownProps.index
+    props.index = index
     props.isAudioPlaybackActive = isAudioPlaybackActive
     props.previewTabPage = getSetting(settings.SHOW_TAB_PREVIEWS)
     props.active = currentWindow.getIn(['ui', 'tabs', 'tabPageIndex']) === props.index

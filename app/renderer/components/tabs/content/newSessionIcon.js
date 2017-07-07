@@ -26,13 +26,14 @@ const newSessionSvg = require('../../../../extensions/brave/img/tabs/new_session
 class NewSessionIcon extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey) || Immutable.Map()
+    const frameKey = ownProps.frameKey
+    const frame = frameStateUtil.getFrameByKey(currentWindow, frameKey) || Immutable.Map()
     const partition = frame.get('partitionNumber')
 
     const props = {}
     // used in renderer
-    props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, ownProps.frameKey)
-    props.iconColor = tabContentState.getTabIconColor(currentWindow, ownProps.frameKey)
+    props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frameKey)
+    props.iconColor = tabContentState.getTabIconColor(currentWindow, frameKey)
     props.partitionNumber = typeof partition === 'string'
       ? partition.replace(/^partition-/i, '')
       : partition
@@ -40,8 +41,8 @@ class NewSessionIcon extends React.Component {
       ? tabs.maxAllowedNewSessions
       : props.partitionNumber
 
-    // used in funtions
-    props.frameKey = ownProps.frameKey
+    // used in functions
+    props.frameKey = frameKey
 
     return props
   }

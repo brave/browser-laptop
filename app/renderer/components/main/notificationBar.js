@@ -23,7 +23,7 @@ class NotificationBar extends React.Component {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const activeOrigin = getOrigin(activeFrame.get('location'))
-    const notifications = state.get('notifications')
+    const notifications = state.get('notifications', Immutable.List())
 
     const props = {}
     props.activeNotifications = notifications
