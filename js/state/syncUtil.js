@@ -4,6 +4,8 @@
 'use strict'
 
 const Immutable = require('immutable')
+const appActions = require('../actions/appActions')
+const crypto = require('crypto')
 const writeActions = require('../constants/sync/proto').actions
 const siteTags = require('../constants/siteTags')
 const siteUtil = require('./siteUtil')
@@ -416,8 +418,6 @@ module.exports.isSyncable = (type, item) => {
  * @returns {Array.<number>}
  */
 module.exports.newObjectId = (objectPath) => {
-  const crypto = require('crypto')
-  const appActions = require('../actions/appActions')
   const objectId = new Immutable.List(crypto.randomBytes(16))
   appActions.setObjectId(objectId, objectPath)
   return objectId.toJS()
@@ -564,6 +564,7 @@ const deepArrayify = (sourceObject) => {
   }
   return object
 }
+module.exports.deepArrayify = deepArrayify
 
 /**
  * @param {Object}
