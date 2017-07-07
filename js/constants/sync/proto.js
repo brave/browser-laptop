@@ -11,3 +11,10 @@ module.exports.actions = {
   UPDATE: 1,
   DELETE: 2
 }
+
+module.exports.categoryMap = {
+  bookmark: 'BOOKMARKS',
+  historySite: 'HISTORY_SITES',
+  siteSetting: 'PREFERENCES',
+  device: 'PREFERENCES'
+}

@@ -618,7 +618,8 @@ module.exports.defaultAppState = () => {
     sync: {
       devices: {},
       lastFetchTimestamp: 0,
-      objectsById: {}
+      objectsById: {},
+      pendingRecords: {}
     },
     locationSiteKeysCache: undefined,
     sites: getTopSiteMap(),

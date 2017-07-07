@@ -82,7 +82,7 @@ const messages = {
    * browser sends this to the webview with the data that needs to be synced
    * to the sync server.
    */
-  SEND_SYNC_RECORDS: _, /* @param {string} categoryName, @param {Array.<Object>} records */
+  SEND_SYNC_RECORDS: _, /* @param {string=} categoryName, @param {Array.<Object>} records */
   /**
    * browser -> webview
    * browser sends this to delete the current user.
