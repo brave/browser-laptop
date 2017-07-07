@@ -180,7 +180,11 @@ module.exports = {
     'sync.type.history': false,
     'sync.type.siteSetting': true,
     'general.downloads.default-save-path': null,
-    'general.disable-title-mode': process.platform === 'linux',
+    // Windows has issues with titlebar mode because it doesn't fire onMouseEnter events if you enter
+    // your mouse from the top of the window.  Also users with Surface tablets or Surface books that
+    // have immersive mode w/ touch makes it too hard to enter a URL.
+    // Tracking issue for that and to re-enable title mode on Windows is at #9900.
+    'general.disable-title-mode': process.platform === 'linux' || process.platform === 'win32',
     'advanced.hardware-acceleration-enabled': true,
     'advanced.default-zoom-level': null,
     'advanced.pdfjs-enabled': true,
