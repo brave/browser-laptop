@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.17.14](https://github.com/brave/browser-laptop/releases/tag/v0.17.14dev)
+- Urlbar error happening since redux. ([#9891](https://github.com/brave/browser-laptop/issues/9891))
+- Ecosia favicon not shown. ([#9823](https://github.com/brave/browser-laptop/issues/9823))
+- Disable title mode on windows by default. ([#9903](https://github.com/brave/browser-laptop/issues/9903))
+- Allow pause and resume of pending sync uploads. ([#125](https://github.com/brave/sync/issues/125))
+- Add support for Debian stretch. ([#7508](https://github.com/brave/browser-laptop/issues/7508))
+- Upgrade Muon to 4.1.8. ([#9906](https://github.com/brave/browser-laptop/issues/9906))
+- Upgrade Chromium to 59.0.3071.115. ([#9905](https://github.com/brave/browser-laptop/issues/9905))
+
 ## [0.17.13](https://github.com/brave/browser-laptop/releases/tag/v0.17.13dev)
 - Added Honey extension. ([#8118](https://github.com/brave/browser-laptop/issues/8118))
 - Added compact bravery panel option. ([#8954](https://github.com/brave/browser-laptop/issues/8954))
