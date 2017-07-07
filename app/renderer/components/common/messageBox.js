@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const Immutable = require('immutable')
 const {StyleSheet, css} = require('aphrodite')
 
 // Components
@@ -101,8 +102,8 @@ class MessageBox extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const tabId = ownProps.tabId
-    const tab = tabState.getByTabId(state, tabId)
-    const messageBoxDetail = tab.get('messageBoxDetail')
+    const tab = tabState.getByTabId(state, tabId) || Immutable.Map()
+    const messageBoxDetail = tab.get('messageBoxDetail', Immutable.Map())
 
     const props = {}
     // used in renderer

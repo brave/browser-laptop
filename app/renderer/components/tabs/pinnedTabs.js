@@ -4,6 +4,7 @@
 
 const React = require('react')
 const ReactDOM = require('react-dom')
+const Immutable = require('immutable')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
@@ -75,7 +76,7 @@ class PinnedTabs extends React.Component {
 
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const pinnedFrames = frameStateUtil.getPinnedFrames(currentWindow)
+    const pinnedFrames = frameStateUtil.getPinnedFrames(currentWindow) || Immutable.List()
 
     const props = {}
     // used in renderer

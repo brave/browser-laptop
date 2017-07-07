@@ -3,14 +3,14 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const {StyleSheet, css} = require('aphrodite/no-important')
+const Immutable = require('immutable')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
 const Button = require('../common/button')
 const BrowserButton = require('../common/browserButton')
 const DownloadItem = require('./downloadItem')
-
-const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
@@ -45,7 +45,7 @@ class DownloadsBar extends React.Component {
   mergeProps (state, ownProps) {
     const props = {}
     // used in renderer
-    props.downloads = downloadUtil.getDownloadItems(state)
+    props.downloads = downloadUtil.getDownloadItems(state) || Immutable.List()
 
     return props
   }

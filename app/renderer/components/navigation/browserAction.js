@@ -54,8 +54,8 @@ class BrowserAction extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
-    const activeTabId = activeFrame.get('tabId') || tabState.TAB_ID_NONE
-    let browserActions = extensionState.getBrowserActionByTabId(state, ownProps.extensionId, activeTabId)
+    const activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
+    let browserActions = extensionState.getBrowserActionByTabId(state, ownProps.extensionId, activeTabId) || Immutable.Map()
     let tabAction = browserActions.getIn(['tabs', activeTabId.toString()])
 
     if (tabAction) {

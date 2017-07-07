@@ -20,13 +20,14 @@ const privateSvg = require('../../../../extensions/brave/img/tabs/private.svg')
 class PrivateIcon extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
+    const frameKey = ownProps.frameKey
 
     const props = {}
     // used in renderer
-    props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, ownProps.frameKey)
+    props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frameKey)
 
     // used in functions
-    props.frameKey = ownProps.frameKey
+    props.frameKey = frameKey
 
     return props
   }

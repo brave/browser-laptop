@@ -103,7 +103,7 @@ class Frame extends React.Component {
     return !this.webview
   }
 
-  allowRunningWidevinePlugin (url) {
+  allowRunningWidevinePlugin () {
     if (!this.props.isWidevineEnabled) {
       return false
     }
@@ -111,7 +111,7 @@ class Frame extends React.Component {
       return false
     }
     // Check for at least one CtP allowed on this origin
-    if (!this.props.allSiteSettings) {
+    if (!this.props.hasAllSiteSettings) {
       return false
     }
     if (typeof this.props.widevine === 'number') {
@@ -859,7 +859,7 @@ class Frame extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey) || Immutable.Map()
-    const tabId = frame.get('tabId')
+    const tabId = frame.get('tabId', tabState.TAB_ID_NONE)
 
     const location = frame.get('location')
     const origin = tabState.getVisibleOrigin(state, tabId)
@@ -896,7 +896,7 @@ class Frame extends React.Component {
     props.isAutFillContextMenu = contextMenu && contextMenu.get('type') === 'autofill'
     props.isSecure = frame.getIn(['security', 'isSecure'])
     props.findbarShown = frame.get('findbarShown')
-    props.findDetailCaseSensitivity = frame.getIn(['findDetail', 'caseSensitivity']) || undefined
+    props.findDetailCaseSensitivity = frame.getIn(['findDetail', 'caseSensitivity'], undefined)
     props.findDetailSearchString = frame.getIn(['findDetail', 'searchString'])
     props.findDetailInternalFindStatePresent = frame.getIn(['findDetail', 'internalFindStatePresent'])
     props.isPrivate = frame.get('isPrivate')
@@ -914,7 +914,7 @@ class Frame extends React.Component {
     props.unloaded = frame.get('unloaded')
     props.isWidevineEnabled = state.get('widevine') && state.getIn(['widevine', 'enabled'])
     props.siteZoomLevel = frameSiteSettings.get('zoomLevel')
-    props.allSiteSettings = allSiteSettings // TODO (nejc) can be improved even more
+    props.hasAllSiteSettings = !!allSiteSettings
     props.tabUrl = tab && tab.get('url')
     props.partitionNumber = frame.get('partitionNumber')
 

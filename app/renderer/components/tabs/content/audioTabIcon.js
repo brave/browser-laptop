@@ -53,7 +53,7 @@ class AudioTabIcon extends React.Component {
     // used in other functions
     props.frameKey = ownProps.frameKey
     props.pageCanPlayAudio = !!frame.get('audioPlaybackActive')
-    props.tabId = frame ? frame.get('tabId') : tabState.TAB_ID_NONE
+    props.tabId = frame.get('tabId', tabState.TAB_ID_NONE)
     props.audioMuted = frame.get('audioMuted')
 
     return props

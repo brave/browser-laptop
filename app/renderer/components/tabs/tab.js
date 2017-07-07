@@ -25,6 +25,7 @@ const windowStore = require('../../../../js/stores/windowStore')
 
 // State
 const tabContentState = require('../../../common/state/tabContentState')
+const tabState = require('../../../common/state/tabState')
 
 // Constants
 const dragTypes = require('../../../../js/constants/dragTypes')
@@ -255,7 +256,7 @@ class Tab extends React.Component {
     props.totalTabs = state.get('tabs').size
     props.dragData = state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')
     props.hasTabInFullScreen = tabContentState.hasTabInFullScreen(currentWindow)
-    props.tabId = frame.get('tabId')
+    props.tabId = frame.get('tabId', tabState.TAB_ID_NONE)
 
     return props
   }

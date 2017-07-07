@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const Immutable = require('immutable')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
@@ -48,7 +49,7 @@ class MenuBarItem extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const selectedIndex = currentWindow.getIn(['ui', 'menubar', 'selectedIndex'])
-    const template = state.getIn(['menu', 'template', ownProps.index])
+    const template = state.getIn(['menu', 'template', ownProps.index], Immutable.Map())
 
     const props = {}
     // used in renderer

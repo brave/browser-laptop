@@ -132,12 +132,12 @@ class Tabs extends React.Component {
     const pageIndex = tabContentState.getPageIndex(currentWindow)
     const tabsPerTabPage = Number(getSetting(settings.TABS_PER_PAGE))
     const startingFrameIndex = pageIndex * tabsPerTabPage
-    const unpinnedTabs = frameStateUtil.getNonPinnedFrames(currentWindow)
+    const unpinnedTabs = frameStateUtil.getNonPinnedFrames(currentWindow) || Immutable.List()
     const currentTabs = unpinnedTabs
       .slice(startingFrameIndex, startingFrameIndex + tabsPerTabPage)
       .map((tab) => tab.get('key'))
     const totalPages = Math.ceil(unpinnedTabs.size / tabsPerTabPage)
-    const activeFrame = frameStateUtil.getActiveFrame(currentWindow)
+    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const dragData = (state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')) || Immutable.Map()
 
     const props = {}

@@ -31,19 +31,20 @@ class Favicon extends React.Component {
 
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey) || Immutable.Map()
-    const isTabLoading = tabContentState.isTabLoading(currentWindow, ownProps.frameKey)
+    const frameKey = ownProps.frameKey
+    const frame = frameStateUtil.getFrameByKey(currentWindow, frameKey) || Immutable.Map()
+    const isTabLoading = tabContentState.isTabLoading(currentWindow, frameKey)
 
     const props = {}
     // used in renderer
     props.isTabLoading = isTabLoading
     props.favicon = !isTabLoading && frame.get('icon')
-    props.isPinnedTab = frameStateUtil.isPinned(currentWindow, ownProps.frameKey)
-    props.tabIconColor = tabContentState.getTabIconColor(currentWindow, ownProps.frameKey)
-    props.isNarrowestView = tabContentState.isNarrowestView(currentWindow, ownProps.frameKey)
+    props.isPinnedTab = frameStateUtil.isPinned(currentWindow, frameKey)
+    props.tabIconColor = tabContentState.getTabIconColor(currentWindow, frameKey)
+    props.isNarrowestView = tabContentState.isNarrowestView(currentWindow, frameKey)
 
     // used in functions
-    props.frameKey = ownProps.frameKey
+    props.frameKey = frameKey
 
     return props
   }
