@@ -48,12 +48,18 @@ describe('filtering unit tests', function () {
 
       describe('when there is a cookie exception', function () {
         it('keeps the cookie field', function () {
-          const cookieException = cookieExceptions && cookieExceptions[0]
+          let cookieException = false
+          let firstPartyUrl = ''
+          let url = ''
+          for (let key in cookieExceptions) {
+            firstPartyUrl = key
+            url = cookieException[key]
+            cookieException = true
+            break
+          }
 
           assert(cookieException)
 
-          const url = cookieException[0]
-          const firstPartyUrl = cookieException[1]
           const requestHeaders = {
             Cookie: 'optimizelyEndUserId=oeu1491721215718r0.024789086462633003; __ssid=97b17d31-8f1b-4193-8914-df36e7b740f6; optimizelySegments=%7B%22300150879%22%3A%22false%22%2C%22300333436%22%3A%22gc%22%2C%22300387578%22%3A%22campaign%22%7D; optimizelyBuckets=%7B%7D; _pk_id.40.2105=8fca10ea565f58bf.1485982886.187.1499406000.1499405260.; _pk_ses.40.2105=*'
           }

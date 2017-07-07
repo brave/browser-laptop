@@ -227,22 +227,22 @@ module.exports.considerRequestExceptions = (requestHeaders, url, firstPartyUrl, 
     if (cookieSetting === 'blockAllCookies' ||
       isThirdPartyHost(parsedFirstPartyUrl.hostname, parsedTargetUrl.hostname)) {
       let hasCookieException = false
-      cookieExceptions.forEach((exceptionPair) => {
-        if (getOrigin(firstPartyUrl) === exceptionPair[0] &&
-            getOrigin(url) === exceptionPair[1] &&
-            cookieSetting !== 'blockAllCookies') {
-          hasCookieException = true
-        }
-      })
+      const firstPartyOrigin = getOrigin(firstPartyUrl)
+      const targetOrigin = getOrigin(url)
+      if (cookieExceptions.hasOwnProperty(firstPartyOrigin) &&
+          cookieExceptions[firstPartyOrigin] === targetOrigin &&
+          cookieSetting !== 'blockAllCookies') {
+        hasCookieException = true
+      }
       // Clear cookie and referer on third-party requests
       if (requestHeaders['Cookie'] &&
-          getOrigin(firstPartyUrl) !== pdfjsOrigin && !hasCookieException) {
+          firstPartyOrigin !== pdfjsOrigin && !hasCookieException) {
         requestHeaders['Cookie'] = undefined
       }
       if (cookieSetting !== 'blockAllCookies' &&
           requestHeaders['Referer'] &&
           !refererExceptions.includes(parsedTargetUrl.hostname)) {
-        requestHeaders['Referer'] = getOrigin(url)
+        requestHeaders['Referer'] = targetOrigin
       }
     }
   }
