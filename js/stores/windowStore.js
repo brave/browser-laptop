@@ -248,7 +248,10 @@ const emitChanges = debounce(windowStore.emitChanges.bind(windowStore), 5)
 const applyReducers = (state, action, immutableAction) => [
   require('../../app/renderer/reducers/urlBarReducer'),
   require('../../app/renderer/reducers/frameReducer'),
-  require('../../app/renderer/reducers/contextMenuReducer')
+  require('../../app/renderer/reducers/contextMenuReducer'),
+  // This should be included even in production builds since you can use
+  // an environment variable to show the Debug menu
+  require('../../app/renderer/reducers/debugReducer')
 ].reduce(
     (windowState, reducer) => {
       const newState = reducer(windowState, action, immutableAction)

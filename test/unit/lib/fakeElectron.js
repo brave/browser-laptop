@@ -1,3 +1,6 @@
+const {EventEmitter} = require('events')
+const ipcMain = new EventEmitter()
+ipcMain.send = ipcMain.emit
 const fakeElectron = {
   BrowserWindow: {
     getFocusedWindow: function () {
@@ -9,6 +12,9 @@ const fakeElectron = {
       return {
         id: 1
       }
+    },
+    getAllWindows: function () {
+      return [{id: 1}]
     }
   },
   MenuItem: class {
@@ -16,20 +22,14 @@ const fakeElectron = {
       this.template = template
     }
   },
-  ipcMain: {
-    on: function () { },
-    send: function () { }
-  },
+  ipcMain,
   ipcRenderer: {
     on: function () { },
     send: function () { },
     sendSync: function () { }
   },
   remote: {
-    app: {
-      on: function () {
-      }
-    },
+    app: new EventEmitter(),
     clipboard: {
       readText: function () { return '' }
     },
@@ -48,14 +48,13 @@ const fakeElectron = {
       }
     }
   },
-  app: {
-    on: function () {
-    },
+  app: Object.assign(new EventEmitter(), {
     getPath: (param) => `${process.cwd()}/${param}`,
     getVersion: () => '0.14.0',
     setLocale: (locale) => {},
+    quit: () => {},
     exit: () => {}
-  },
+  }),
   clipboard: {
     writeText: function () {
     }
@@ -82,7 +81,8 @@ const fakeElectron = {
   },
   extensions: {
     createTab: function () {}
-  }
+  },
+  autoUpdater: new EventEmitter()
 }
 
 module.exports = fakeElectron
