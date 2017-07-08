@@ -10,6 +10,7 @@ const Immutable = require('immutable')
 const fakeElectron = require('../../../../../lib/fakeElectron')
 require('../../../../../braveUnit')
 
+const index = 0
 const tabId = 1
 const frameKey = 1
 const invalidFrameKey = 71
@@ -39,7 +40,8 @@ const defaultWindowStore = Immutable.fromJS({
     location: 'http://brave.com'
   }],
   tabs: [{
-    key: frameKey
+    key: frameKey,
+    index: index
   }],
   framesInternal: {
     index: {
@@ -47,6 +49,11 @@ const defaultWindowStore = Immutable.fromJS({
     },
     tabIndex: {
       1: 0
+    }
+  },
+  ui: {
+    tabs: {
+      hoverTabIndex: index
     }
   }
 })
