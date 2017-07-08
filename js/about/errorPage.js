@@ -39,7 +39,7 @@ class ErrorPage extends React.Component {
       </div>
       <div className='buttons'>
         {this.showBackButton ? <BrowserButton actionItem l10nId='back' onClick={this.goBack} /> : null}
-        {this.state.url ? <BrowserButton actionItem l10nId='errorReload' l10nArgs={{url: this.state.url}} onClick={this.reload} /> : null}
+        {this.state.url ? <BrowserButton actionItem groupedItem l10nId='errorReload' l10nArgs={{url: this.state.url}} onClick={this.reload} /> : null}
       </div>
     </div>
   }
