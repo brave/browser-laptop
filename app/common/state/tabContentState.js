@@ -114,6 +114,7 @@ const tabContentState = {
   getTabIconColor: (state, frameKey) => {
     const frame = frameStateUtil.getFrameByKey(state, frameKey)
     const isActive = frameStateUtil.isFrameKeyActive(state, frameKey)
+    const hoverState = frameStateUtil.getTabHoverState(state, frameKey)
 
     if (frame == null) {
       return ''
@@ -121,7 +122,7 @@ const tabContentState = {
 
     const themeColor = frame.get('themeColor') || frame.get('computedThemeColor')
     const activeNonPrivateTab = !frame.get('isPrivate') && isActive
-    const isPrivateTab = frame.get('isPrivate') && (isActive || frame.get('hoverState'))
+    const isPrivateTab = frame.get('isPrivate') && (isActive || hoverState)
     const defaultColor = isPrivateTab ? styles.color.white100 : styles.color.black100
     const isPaintTabs = getSetting(settings.PAINT_TABS)
 
@@ -159,7 +160,8 @@ const tabContentState = {
       return false
     }
 
-    return frame.get('hoverState') && hasBreakpoint(frame.get('breakpoint'), ['default', 'large'])
+    return frameStateUtil.getTabHoverState(state, frameKey) &&
+      hasBreakpoint(frame.get('breakpoint'), ['default', 'large'])
   },
 
   /**
