@@ -37,7 +37,7 @@ const closeFrame = (state, action) => {
   }
 
   const frameProps = frameStateUtil.getFrameByKey(state, action.frameKey)
-  const hoverState = state.getIn(['frames', index, 'hoverState'])
+  const hoverState = frameStateUtil.getTabHoverState(state, action.frameKey)
 
   state = state.merge(frameStateUtil.removeFrame(
     state,
@@ -122,14 +122,10 @@ const frameReducer = (state, action, immutableAction) => {
       if (active != null) {
         if (active) {
           state = state.set('activeFrameKey', frame.get('key'))
-          if (frame.get('hoverState')) {
-            state = state.set('previewFrameKey', null)
-          }
           if (frame.getIn(['ui', 'tabs', 'hoverTabPageIndex']) == null) {
             state = state.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
           }
           state = state.setIn(['frames', index, 'lastAccessedTime'], new Date().getTime())
-
           state = frameStateUtil.updateTabPageIndex(state, frame)
         }
       }

@@ -464,7 +464,6 @@ WindowStore
     history: array, // navigation history
     hrefPreview: string, // show hovered link preview
     httpsEverywhere: Object<string, Array<string>>, // map of XML rulesets name to redirected resources
-    hoverState: boolean, // wheter or not tab is being hovered
     icon: string, // favicon url
     isFullScreen: boolean, // true if the frame should be shown as full screen
     isPrivate: boolean, // private browsing tab
@@ -671,6 +670,7 @@ WindowStore
     },
     size: array, // last known window size [x, y]
     tabs: {
+      hoverTabIndex: number, // index of the current hovered tab
       tabPageIndex: number, // index of the current tab page
       previewTabPageIndex: number // index of the tab being previewed
     },
