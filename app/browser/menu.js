@@ -22,6 +22,7 @@ const siteTags = require('../../js/constants/siteTags')
 // State
 const {getByTabId} = require('../common/state/tabState')
 const tabState = require('../../app/common/state/tabState')
+const appStore = require('../../js/stores/appStore')
 
 // Actions
 const appActions = require('../../js/actions/appActions')
@@ -191,7 +192,7 @@ const createEditSubmenu = () => {
   return submenu
 }
 
-const createViewSubmenu = (state) => {
+const createViewSubmenu = () => {
   return [
     {
       label: locale.translation('actualSize'),
@@ -266,7 +267,7 @@ const createViewSubmenu = (state) => {
       accelerator: isDarwin ? 'Cmd+Alt+I' : 'Ctrl+Shift+I',
       click: function () {
         const win = BrowserWindow.getActiveWindow()
-        const activeTab = tabState.getActiveTab(state, win.id)
+        const activeTab = tabState.getActiveTab(appStore.getState(), win.id)
         appActions.toggleDevTools(activeTab.get('tabId'))
       }
     },
@@ -537,7 +538,7 @@ const createMenu = (state) => {
   const template = [
     { label: locale.translation('file'), submenu: createFileSubmenu() },
     { label: locale.translation('edit'), submenu: createEditSubmenu() },
-    { label: locale.translation('view'), submenu: createViewSubmenu(state) },
+    { label: locale.translation('view'), submenu: createViewSubmenu() },
     { label: locale.translation('history'), submenu: createHistorySubmenu() },
     { label: locale.translation('bookmarks'), submenu: createBookmarksSubmenu(state) },
     {
