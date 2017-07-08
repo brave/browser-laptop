@@ -10,6 +10,7 @@ const assert = require('assert')
 const fakeElectron = require('../../../../../lib/fakeElectron')
 require('../../../../../braveUnit')
 
+const index = 0
 const tabId = 1
 const frameKey = 1
 
@@ -38,6 +39,7 @@ const defaultWindowStore = Immutable.fromJS({
     location: 'http://brave.com'
   }],
   tabs: [{
+    index: index,
     key: frameKey
   }],
   framesInternal: {
@@ -46,6 +48,11 @@ const defaultWindowStore = Immutable.fromJS({
     },
     tabIndex: {
       1: 0
+    }
+  },
+  ui: {
+    tabs: {
+      hoverTabIndex: index
     }
   }
 })
@@ -77,9 +84,17 @@ describe('Tabs content - PrivateIcon', function () {
 
   describe('should show icon', function () {
     it('if current tab is private', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        isPrivate: true,
-        breakpoint: 'default'
+      windowStore.state = defaultWindowStore.merge({
+        activeFrameKey: 0,
+        frames: [{
+          isPrivate: true,
+          breakpoint: 'default'
+        }],
+        ui: {
+          tabs: {
+            hoverTabIndex: null
+          }
+        }
       })
       const wrapper = mount(<Tab frameKey={frameKey} />)
       assert.equal(wrapper.find('PrivateIcon').length, 1)
@@ -99,20 +114,34 @@ describe('Tabs content - PrivateIcon', function () {
     })
 
     it('if mouse is not over tab and breakpoint is large', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        isPrivate: true,
-        hoverState: false,
-        breakpoint: 'large'
+      windowStore.state = defaultWindowStore.merge({
+        activeFrameKey: 0,
+        frames: [{
+          isPrivate: true,
+          breakpoint: 'large'
+        }],
+        ui: {
+          tabs: {
+            hoverTabIndex: null
+          }
+        }
       })
       const wrapper = mount(<Tab frameKey={frameKey} />)
       assert.equal(wrapper.find('PrivateIcon').length, 1)
     })
 
     it('if mouse is not over tab and breakpoint is default', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        isPrivate: true,
-        hoverState: false,
-        breakpoint: 'default'
+      windowStore.state = defaultWindowStore.merge({
+        activeFrameKey: 0,
+        frames: [{
+          isPrivate: true,
+          breakpoint: 'default'
+        }],
+        ui: {
+          tabs: {
+            hoverTabIndex: null
+          }
+        }
       })
       const wrapper = mount(<Tab frameKey={frameKey} />)
       assert.equal(wrapper.find('PrivateIcon').length, 1)
