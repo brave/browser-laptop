@@ -97,6 +97,22 @@ const updateUrlSuffix = (state, suggestionList, framePath) => {
   return state
 }
 
+/**
+ * Accepts whatever suffix is present as part of the user input
+ */
+const acceptUrlSuffix = (state, framePath) => {
+  const lastSuffix = state.getIn(framePath.concat(['navbar', 'urlbar', 'suggestions', 'urlSuffix']))
+  if (lastSuffix) {
+    const input = state.getIn(framePath.concat(['navbar', 'urlbar', 'location']))
+    state = setNavBarUserInput(state, input + lastSuffix, framePath)
+  }
+  state = state.mergeIn(framePath.concat(['navbar', 'urlbar', 'suggestions']), {
+    selectedIndex: null,
+    suggestionList: null
+  })
+  return state
+}
+
 const updateNavBarInput = (state, loc, framePath) => {
   if (framePath === undefined) {
     framePath = activeFrameStatePath(state)
@@ -131,7 +147,9 @@ const setActive = (state, isActive) => {
 }
 
 const setUrlBarSelected = (state, selected) => {
-  const urlBarPath = activeFrameStatePath(state).concat(['navbar', 'urlbar'])
+  const framePath = activeFrameStatePath(state)
+  const urlBarPath = framePath.concat(['navbar', 'urlbar'])
+  state = acceptUrlSuffix(state, framePath)
   state = state.mergeIn(urlBarPath, {
     selected: selected
   })
@@ -139,7 +157,8 @@ const setUrlBarSelected = (state, selected) => {
   if (selected) {
     state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'focused']), true)
   }
-
+  state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']), false)
+  state = setRenderUrlBarSuggestions(state, false, framePath)
   return state
 }
 
@@ -152,9 +171,8 @@ const urlBarReducer = (state, action) => {
     const displayURL = navigationState.getIn(['visibleEntry', 'virtualURL'])
     const frame = getFrameByTabId(state, tabId)
     if (frame) {
-      state = updateNavBarInput(state, displayURL, frameStatePath(state, frame.get('key')))
+      state = setNavBarUserInput(state, displayURL, frameStatePath(state, frame.get('key')))
       state = state.setIn(frameStatePath(state, frame.get('key')).concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), false)
-      state = updateSearchEngineInfoFromInput(state, frame)
     }
     return state
   }
@@ -185,6 +203,7 @@ const urlBarReducer = (state, action) => {
         state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), action.selectedIndex)
       }
       state = setUrlSuggestions(state, action.suggestionList)
+      state = updateUrlSuffix(state, action.suggestionList)
       break
     case windowConstants.WINDOW_URL_BAR_ON_FOCUS:
       state = navigationBarState.setFocused(state, tabId, true)
@@ -201,7 +220,7 @@ const urlBarReducer = (state, action) => {
       state = navigationBarState.setFocused(state, tabId, false)
       state = setActive(state, false)
       break
-    case windowConstants.WINDOW_SET_URL_BAR_SELECTED:
+    case windowConstants.WINDOW_URL_BAR_SELECTED:
       state = setUrlBarSelected(state, action.selected)
       break
     case windowConstants.WINDOW_SET_FINDBAR_SHOWN:

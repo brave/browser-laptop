@@ -336,13 +336,9 @@ This is sometimes only temporarily disabled, e.g. a user is pressing backspace.
 
 
 
-### setUrlBarSelected(isSelected) 
+### urlBarSelected() 
 
-Marks the URL bar text as selected or not
-
-**Parameters**
-
-**isSelected**: `boolean`, Whether or not the URL bar text input should be selected
+Indicates the URLbar has been selected
 
 
 

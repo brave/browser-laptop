@@ -98,7 +98,7 @@ describe('navigationBar tests', function () {
           .newTab({ url: page1Url })
           .waitUntil(function () {
             return this.getWindowState().then((val) => {
-              return val.value.frames.length === 2
+              return val.value.frames.length === 3
             })
           })
           .waitForElementFocus(activeWebview)
@@ -214,6 +214,7 @@ describe('navigationBar tests', function () {
       it('remains cleared when onChange is fired but not onKeyUp', function * () {
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
+          .activateURLMode()
           .waitForVisible(urlInput)
           .setValue(urlInput, '')
           .moveToObject(activeWebview)
@@ -610,7 +611,7 @@ describe('navigationBar tests', function () {
         })
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist(urlbarIcon + '.fa-lock')
-        .click(urlbarIcon)
+        .click(urlbarIcon + '.fa-lock')
         .waitForVisible('[data-test-id="secureConnection"]')
         .waitForVisible('[data-test-id="runInsecureContentWarning"]')
         .waitForVisible(dismissAllowRunInsecureContentButton)
@@ -913,10 +914,9 @@ describe('navigationBar tests', function () {
         yield setup(this.app.client)
         yield this.app.client
           .waitForExist(urlInput)
-        yield this.app.client
           .keys(this.page1)
-        yield this.app.client
           .keys(Brave.keys.ENTER)
+          .activateURLMode()
       })
 
       it('shows search icon when input is empty', function * () {
@@ -1002,6 +1002,7 @@ describe('navigationBar tests', function () {
           .keys(Brave.keys.ENTER)
           .tabByUrl('about:about')
           .windowByUrl(Brave.browserWindowUrl)
+          .activateURLMode()
           .waitForInputText(urlInput, 'about:about')
           .waitForExist('.urlbarIcon.fa-list')
       })
@@ -1223,20 +1224,25 @@ describe('navigationBar tests', function () {
   })
 
   describe('shortcut-focus-url', function () {
-    Brave.beforeAll(this)
+    Brave.beforeEach(this)
 
-    before(function * () {
+    beforeEach(function * () {
       yield setup(this.app.client)
       yield blur(this.app.client)
       yield this.app.client.ipcSend('shortcut-focus-url')
+      yield this.app.client.waitForElementFocus(urlInput)
     })
 
     it('has an empty url with placeholder', function * () {
       yield defaultUrlInputValue(this.app.client)
     })
 
-    it('has focus', function * () {
-      yield this.app.client.waitForElementFocus(urlInput)
+    it('selects full url when autocompleting with partial selection', function * () {
+      yield this.app.client
+        .keys('about:bra')
+      yield selectsText(this.app.client, 've')
+      yield this.app.client.ipcSend('shortcut-focus-url')
+      yield selectsText(this.app.client, 'about:brave')
     })
   })
 
