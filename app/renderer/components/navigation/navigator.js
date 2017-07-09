@@ -197,8 +197,8 @@ class Navigator extends React.Component {
     props.swipeRightPercent = swipeRightPercent ? (swipeRightPercent + 1) * 1.2 : 1
     // 0.85 is the default button opacity in less/navigationBar.less
     // Remove this magic number once we migrate to Aphrodite
-    props.swipeLeftOpacity = 0.85 - (swipeLeftPercent > 0.65 ? 0.65 : swipeLeftPercent)
-    props.swipeRightOpacity = 0.85 - (swipeRightPercent > 0.65 ? 0.65 : swipeRightPercent)
+    props.swipeLeftOpacity = swipeLeftPercent ? 0.85 - (swipeLeftPercent > 0.65 ? 0.65 : swipeLeftPercent) : 0.85
+    props.swipeRightOpacity = swipeRightPercent ? 0.85 - (swipeRightPercent > 0.65 ? 0.65 : swipeRightPercent) : 0.85
     if (swipeLeftPercent === 1) {
       props.swipeLeftOpacity = 0.85
     }
