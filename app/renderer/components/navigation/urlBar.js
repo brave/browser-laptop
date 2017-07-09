@@ -29,7 +29,6 @@ const siteSettingsState = require('../../../common/state/siteSettingsState')
 
 // Utils
 const cx = require('../../../../js/lib/classSet')
-const debounce = require('../../../../js/lib/debounce')
 const {getSetting} = require('../../../../js/settings')
 const contextMenus = require('../../../../js/contextMenus')
 const {eventElHasAncestorWithClasses, isForSecondaryAction} = require('../../../../js/lib/eventUtil')
@@ -55,12 +54,6 @@ class UrlBar extends React.Component {
     this.onKeyPress = this.onKeyPress.bind(this)
     this.onClick = this.onClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
-    this.showAutocompleteResult = debounce(() => {
-      if (!this.urlInput) {
-        return
-      }
-      this.updateAutocomplete(this.lastVal)
-    }, 10)
   }
 
   maybeUrlBarTextChanged (value) {
@@ -111,7 +104,7 @@ class UrlBar extends React.Component {
         let location = this.urlInput ? this.getValue() : this.props.urlbarLocation
 
         if (location === null || location.length === 0) {
-          windowActions.setUrlBarSelected(true)
+          windowActions.urlBarSelected(true)
         } else {
           // Filter javascript URLs to prevent self-XSS
           location = location.replace(/^(\s*javascript:)+/i, '')
@@ -298,12 +291,13 @@ class UrlBar extends React.Component {
         return
     }
     if (this.props.isSelected) {
-      windowActions.setUrlBarSelected(false)
+      windowActions.urlBarSelected(false)
     }
     this.maybeUrlBarTextChanged(this.lastVal)
   }
 
   select () {
+    windowActions.urlBarSelected(true)
     setImmediate(() => {
       if (this.urlInput) {
         this.urlInput.select()
@@ -356,17 +350,18 @@ class UrlBar extends React.Component {
       if (!(prevProps.frameLocation === 'about:blank' && this.props.frameLocation === 'about:newtab' && this.props.urlbarLocation !== 'about:blank')) {
         this.setValue(this.props.displayURL)
       }
-    } else if (this.props.isActive &&
-              this.props.urlbarLocationSuffix !== this.lastSuffix) {
-      this.showAutocompleteResult()
+    } else if (this.props.autocompleteEnabled &&
+        this.props.normalizedSuggestion !== prevProps.normalizedSuggestion) {
+      this.updateAutocomplete(this.lastVal)
+    // This case handles when entering urlmode from tilemode
     } else if ((this.props.titleMode !== prevProps.titleMode) ||
-        (!this.props.isActive && !this.props.isFocused)) {
+         (!this.props.isActive && !this.props.isFocused)) {
       this.setValue(this.props.urlbarLocation)
     }
 
     if (this.props.isSelected && !prevProps.isSelected) {
       this.select()
-      windowActions.setUrlBarSelected(false)
+      windowActions.urlBarSelected(false)
     }
 
     if (this.props.noScriptIsVisible && !this.props.showNoScriptInfo) {
