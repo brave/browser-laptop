@@ -15,23 +15,16 @@ const windowActions = require('../../../../js/actions/windowActions')
 const appActions = require('../../../../js/actions/appActions')
 const bookmarkActions = require('../../../../js/actions/bookmarkActions')
 
-// Store
-const windowStore = require('../../../../js/stores/windowStore')
-
 // Constants
 const dragTypes = require('../../../../js/constants/dragTypes')
 const {iconSize} = require('../../../../js/constants/config')
-const {bookmarksToolbarMode} = require('../../../common/constants/settingsEnums')
-const settings = require('../../../../js/constants/settings')
 
 // Utils
 const siteUtil = require('../../../../js/state/siteUtil')
 const {getCurrentWindowId} = require('../../currentWindow')
 const dnd = require('../../../../js/dnd')
 const cx = require('../../../../js/lib/classSet')
-const {getSetting} = require('../../../../js/settings')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
-const contextMenus = require('../../../../js/contextMenus')
 const bookmarkUtil = require('../../../common/lib/bookmarkUtil')
 
 // Styles
@@ -56,10 +49,6 @@ class BookmarkToolbarButton extends React.Component {
 
   componentDidMount () {
     this.bookmarkNode.addEventListener('auxclick', this.onAuxClick)
-  }
-
-  get activeFrame () {
-    return windowStore.getFrame(this.props.activeFrameKey)
   }
 
   onAuxClick (e) {
@@ -96,11 +85,15 @@ class BookmarkToolbarButton extends React.Component {
   }
 
   onDragStart (e) {
-    dnd.onDragStart(dragTypes.BOOKMARK, this.props.bookmark, e)
+    dnd.onDragStart(dragTypes.BOOKMARK, Immutable.fromJS({
+      location: this.props.location,
+      title: this.props.title,
+      bookmarkKey: this.props.bookmarkKey
+    }), e)
   }
 
-  onDragEnd (e) {
-    dnd.onDragEnd(dragTypes.BOOKMARK, this.props.bookmark, e)
+  onDragEnd () {
+    dnd.onDragEnd()
   }
 
   onDragEnter (e) {
@@ -110,7 +103,7 @@ class BookmarkToolbarButton extends React.Component {
       if (dnd.isMiddle(e.target, e.clientX)) {
         this.showBookmarkFolderMenu(e)
         appActions.draggedOver({
-          draggingOverKey: this.props.bookmark,
+          draggingOverKey: this.props.bookmarkKey,
           draggingOverType: dragTypes.BOOKMARK,
           draggingOverWindowId: getCurrentWindowId(),
           expanded: true
@@ -123,7 +116,7 @@ class BookmarkToolbarButton extends React.Component {
     // Bookmark specific DND code to expand hover when on a folder item
     if (this.props.isFolder) {
       appActions.draggedOver({
-        draggingOverKey: this.props.bookmark,
+        draggingOverKey: this.props.bookmarkKey,
         draggingOverType: dragTypes.BOOKMARK,
         draggingOverWindowId: getCurrentWindowId(),
         expanded: false
@@ -135,8 +128,11 @@ class BookmarkToolbarButton extends React.Component {
     dnd.onDragOver(
       dragTypes.BOOKMARK,
       this.bookmarkNode.getBoundingClientRect(),
-      this.props.bookmark,
-      this.props.draggingOverData,
+      this.props.bookmarkKey,
+      Immutable.fromJS({
+        draggingOverLeftHalf: this.props.isDraggingOverLeft,
+        draggingOverRightHalf: this.props.isDraggingOverRight
+      }),
       e
     )
   }
@@ -146,30 +142,42 @@ class BookmarkToolbarButton extends React.Component {
   }
 
   openContextMenu (e) {
-    contextMenus.onSiteDetailContextMenu(this.props.bookmark, this.activeFrame, e)
+    if (e) {
+      e.stopPropagation()
+    }
+    windowActions.onSiteDetailMenu(this.props.bookmarkKey)
   }
 
   clickBookmarkItem (e) {
-    return bookmarkActions.clickBookmarkItem(this.props.bookmarks, this.props.bookmark, this.activeFrame, e)
+    return bookmarkActions.clickBookmarkItem(this.props.bookmarkKey, this.props.tabId, e)
   }
 
   showBookmarkFolderMenu (e) {
+    const rectLeft = e.target.getBoundingClientRect()
+    const rectBottom = e.target.parentNode.getBoundingClientRect()
+    const left = (rectLeft.left | 0) - 2
+    const top = (rectBottom.bottom | 0) - 1
+
+    if (e && e.stopPropagation) {
+      e.stopPropagation()
+    }
+
+    // TODO merge this two actions into one
+    windowActions.onShowBookmarkFolderMenu(this.props.bookmarkKey, left, top)
     windowActions.setBookmarksToolbarSelectedFolderId(this.props.folderId)
-    contextMenus.onShowBookmarkFolderMenu(this.props.bookmarks, this.props.bookmark, this.activeFrame, e)
   }
 
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
-    const btbMode = getSetting(settings.BOOKMARKS_TOOLBAR_MODE)
-    const bookmark = ownProps.bookmark
-    const draggingOverData = bookmarkUtil.getDNDBookmarkData(state, bookmark)
+    const bookmarkKey = ownProps.bookmarkKey
+    const bookmark = state.getIn(['sites', bookmarkKey], Immutable.Map())
+    const draggingOverData = bookmarkUtil.getDNDBookmarkData(state, bookmarkKey)
 
     const props = {}
     // used in renderer
-    props.showFavicon = btbMode === bookmarksToolbarMode.TEXT_AND_FAVICONS ||
-      btbMode === bookmarksToolbarMode.FAVICONS_ONLY
-    props.showOnlyFavicon = btbMode === bookmarksToolbarMode.FAVICONS_ONLY
+    props.showFavicon = bookmarkUtil.showFavicon()
+    props.showOnlyFavicon = bookmarkUtil.showOnlyFavicon()
     props.favIcon = bookmark.get('favicon')
     props.title = bookmark.get('customTitle', bookmark.get('title'))
     props.location = bookmark.get('location')
@@ -177,14 +185,13 @@ class BookmarkToolbarButton extends React.Component {
     props.isDraggingOverLeft = draggingOverData.get('draggingOverLeftHalf', false)
     props.isDraggingOverRight = draggingOverData.get('draggingOverRightHalf', false)
     props.isExpanded = draggingOverData.get('expanded', false)
-    props.isDragging = Immutable.is(dnd.getInterBraveDragData(), bookmark)
+    props.isDragging = state.getIn(['dragData', 'data', 'bookmarkKey']) === bookmarkKey
 
     // used in other function
-    props.bookmark = bookmark // TODO (nejc) only primitives
-    props.bookmarks = siteUtil.getBookmarks(state.get('sites')) // TODO (nejc) only primitives
-    props.contextMenuDetail = currentWindow.get('contextMenuDetail') // TODO (nejc) only primitives
-    props.draggingOverData = draggingOverData // TODO (nejc) only primitives
+    props.bookmarkKey = bookmarkKey
     props.activeFrameKey = activeFrame.get('key')
+    props.tabId = activeFrame.get('tabId')
+    props.contextMenuDetail = !!currentWindow.get('contextMenuDetail')
     props.selectedFolderId = currentWindow.getIn(['ui', 'bookmarksToolbar', 'selectedFolderId'])
     props.folderId = bookmark.get('folderId')
 

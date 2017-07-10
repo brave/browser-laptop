@@ -265,15 +265,11 @@ describe('bookmarkUtil test', function () {
         dragData: {
           dragOverData: {
             draggingOverType: dragTypes.BOOKMARK,
-            draggingOverKey: {
-              location: 'https://brave.com'
-            }
+            draggingOverKey: 'https://brave.com|0|0'
           }
         }
       })
-      const bookmark = makeImmutable({
-        location: 'https://brave.com'
-      })
+      const bookmark = 'https://brave.com|0|0'
       const result = bookmarkUtil.getDNDBookmarkData(state, bookmark)
       assert.deepEqual(result, state.getIn(['dragData', 'dragOverData']))
     })
@@ -283,15 +279,11 @@ describe('bookmarkUtil test', function () {
         dragData: {
           dragOverData: {
             draggingOverType: dragTypes.BOOKMARK,
-            draggingOverKey: {
-              location: 'https://brave.com'
-            }
+            draggingOverKey: 'https://brave.com|0|0'
           }
         }
       })
-      const bookmark = makeImmutable({
-        location: 'https://clifton.io'
-      })
+      const bookmark = 'https://clifton.io|0|0'
       const result = bookmarkUtil.getDNDBookmarkData(state, bookmark)
       assert.deepEqual(result, Immutable.Map())
     })

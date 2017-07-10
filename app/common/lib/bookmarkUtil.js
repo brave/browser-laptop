@@ -41,8 +41,8 @@ const isBookmarkNameValid = (detail, isFolder) => {
   const title = detail.get('title') || detail.get('customTitle')
   const location = detail.get('location')
   return isFolder
-    ? (title != null && title.trim().length > 0)
-    : (location != null && location.trim().length > 0)
+    ? (title != null && title !== 0) && title.trim().length > 0
+    : location != null && location.trim().length > 0
 }
 
 const showOnlyFavicon = () => {
@@ -56,24 +56,19 @@ const showFavicon = () => {
     btbMode === bookmarksToolbarMode.FAVICONS_ONLY
 }
 
-const getDNDBookmarkData = (state, bookmark) => {
+const getDNDBookmarkData = (state, bookmarkKey) => {
   const data = (state.getIn(['dragData', 'dragOverData', 'draggingOverType']) === dragTypes.BOOKMARK &&
     state.getIn(['dragData', 'dragOverData'], Immutable.Map())) || Immutable.Map()
 
-  if (data.get('draggingOverKey') == null) {
-    return Immutable.Map()
-  }
-
-  // TODO (nejc) this is slow, replace with simple ID check - we need to add id into bookmark object
-  return (Immutable.is(data.get('draggingOverKey'), bookmark)) ? data : Immutable.Map()
+  return data.get('draggingOverKey') === bookmarkKey ? data : Immutable.Map()
 }
 
 const getToolbarBookmarks = (state) => {
   const sites = state.get('sites', Immutable.List())
 
   const noParentItems = siteUtil.getBookmarks(sites)
-    .sort(siteUtil.siteSort)
     .filter((bookmark) => !bookmark.get('parentFolderId'))
+    .sort(siteUtil.siteSort)
   let widthAccountedFor = 0
   const overflowButtonWidth = 25
   const onlyFavicon = showOnlyFavicon()
@@ -119,9 +114,9 @@ const getToolbarBookmarks = (state) => {
   }
 
   return {
-    visibleBookmarks: noParentItems.take(i),
+    visibleBookmarks: noParentItems.take(i).map((item, index) => index).toList(),
     // Show at most 100 items in the overflow menu
-    hiddenBookmarks: noParentItems.skip(i).take(100)
+    hiddenBookmarks: noParentItems.skip(i).take(100).map((item, index) => index).toList()
   }
 }
 

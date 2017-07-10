@@ -24,7 +24,7 @@ describe('contextMenuReducer', function () {
       useCleanCache: true
     })
     mockery.registerMock('electron', fakeElectron)
-    mockery.registerMock('../../../js/l10n.js', fakeLocale)
+    mockery.registerMock('../../../js/l10n', fakeLocale)
     fakeElectronMenu = require('../../../lib/fakeElectronMenu')
     contextMenuReducer = require('../../../../../app/renderer/reducers/contextMenuReducer')
   })
