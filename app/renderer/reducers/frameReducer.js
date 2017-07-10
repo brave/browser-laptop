@@ -119,9 +119,13 @@ const frameReducer = (state, action, immutableAction) => {
 
       // TODO fix race condition in Muon more info in #9000
       const active = immutableAction.getIn(['tabValue', 'active'])
+      const hasTabInHoverState = state.getIn(['ui', 'tabs', 'hoverTabIndex'])
       if (active != null) {
         if (active) {
           state = state.set('activeFrameKey', frame.get('key'))
+          if (hasTabInHoverState != null) {
+            state = state.set('previewFrameKey', null)
+          }
           if (frame.getIn(['ui', 'tabs', 'hoverTabPageIndex']) == null) {
             state = state.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
           }
