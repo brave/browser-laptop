@@ -61,7 +61,7 @@ def release_channel():
   return channel
 
 def publish_release(github, release_id):
-  data = dict(draft=False)
+  data = dict(draft=False, prerelease=True)
   github.repos(BROWSER_LAPTOP_REPO).releases(release_id).patch(data=data)
 
 if __name__ == '__main__':
