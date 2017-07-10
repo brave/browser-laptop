@@ -26,9 +26,9 @@ const emptyDataURI = {
  * Subresource URL can be '*' or undefined to indicate all.
  */
 module.exports.cookieExceptions = {
-  'https://inbox.google.com': 'https://hangouts.google.com',
-  'https://mail.google.com': 'https://hangouts.google.com',
-  'https://drive.google.com': 'https://doc-0g-3g-docs.googleusercontent.com'
+  'https://inbox.google.com': ['https://hangouts.google.com'],
+  'https://mail.google.com': ['https://hangouts.google.com'],
+  'https://drive.google.com': ['https://doc-*-docs.googleusercontent.com']
 }
 
 // Third party domains that require a valid referer to work

@@ -218,7 +218,7 @@ function registerForBeforeRedirect (session, partition) {
   })
 }
 
-module.exports.considerRequestExceptions = (requestHeaders, url, firstPartyUrl, isPrivate) => {
+module.exports.applyCookieSetting = (requestHeaders, url, firstPartyUrl, isPrivate) => {
   const cookieSetting = module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, firstPartyUrl, isPrivate)
   if (cookieSetting) {
     const parsedTargetUrl = urlParse(url || '')
@@ -229,18 +229,27 @@ module.exports.considerRequestExceptions = (requestHeaders, url, firstPartyUrl, 
       let hasCookieException = false
       const firstPartyOrigin = getOrigin(firstPartyUrl)
       const targetOrigin = getOrigin(url)
-      if (cookieExceptions.hasOwnProperty(firstPartyOrigin) &&
-          cookieExceptions[firstPartyOrigin] === targetOrigin &&
-          cookieSetting !== 'blockAllCookies') {
-        hasCookieException = true
+      if (cookieExceptions.hasOwnProperty(firstPartyOrigin)) {
+          const subResources = cookieExceptions[firstPartyOrigin]
+          for (let i = 0; i < subResources.length; ++i) {
+            if (subResources[i] === targetOrigin) {
+              hasCookieException = true
+              break
+            } else if (subResources[i].includes('*')) {
+              const regSubResource = new RegExp(subResources[i].replace('//', '\\/\\/').replace('*', '.*'), 'g')
+              if (targetOrigin.match(regSubResource)) {
+                hasCookieException = true
+                break
+              }
+            }
+          }
       }
       // Clear cookie and referer on third-party requests
       if (requestHeaders['Cookie'] &&
           firstPartyOrigin !== pdfjsOrigin && !hasCookieException) {
         requestHeaders['Cookie'] = undefined
       }
-      if (cookieSetting !== 'blockAllCookies' &&
-          requestHeaders['Referer'] &&
+      if (requestHeaders['Referer'] &&
           !refererExceptions.includes(parsedTargetUrl.hostname)) {
         requestHeaders['Referer'] = targetOrigin
       }
@@ -296,7 +305,7 @@ function registerForBeforeSendHeaders (session, partition) {
       }
     }
 
-    requestHeaders = module.exports.considerRequestExceptions(requestHeaders, details.url, firstPartyUrl, isPrivate)
+    requestHeaders = module.exports.applyCookieSetting(requestHeaders, details.url, firstPartyUrl, isPrivate)
 
     if (sendDNT) {
       requestHeaders['DNT'] = '1'

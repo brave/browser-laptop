@@ -25,7 +25,7 @@ describe('filtering unit tests', function () {
     mockery.disable()
   })
 
-  describe('considerRequestExceptions', function () {
+  describe('applyCookieSetting', function () {
     describe('when cookieSetting === "blockAllCookies"', function () {
       let isResourceEnabledStub
       before(function () {
@@ -41,7 +41,7 @@ describe('filtering unit tests', function () {
         const requestHeaders = {
           Cookie: 'optimizelyEndUserId=oeu1491721215718r0.024789086462633003; __ssid=97b17d31-8f1b-4193-8914-df36e7b740f6; optimizelySegments=%7B%22300150879%22%3A%22false%22%2C%22300333436%22%3A%22gc%22%2C%22300387578%22%3A%22campaign%22%7D; optimizelyBuckets=%7B%7D; _pk_id.40.2105=8fca10ea565f58bf.1485982886.187.1499406000.1499405260.; _pk_ses.40.2105=*'
         }
-        const result = filtering.considerRequestExceptions(requestHeaders, url, firstPartyUrl, false)
+        const result = filtering.applyCookieSetting(requestHeaders, url, firstPartyUrl, false)
 
         assert.equal(result.Cookie, undefined)
       })
@@ -53,7 +53,8 @@ describe('filtering unit tests', function () {
           let url = ''
           for (let key in cookieExceptions) {
             firstPartyUrl = key
-            url = cookieException[key]
+            const urls = cookieExceptions[key]
+            url = urls[0]
             cookieException = true
             break
           }
@@ -63,7 +64,19 @@ describe('filtering unit tests', function () {
           const requestHeaders = {
             Cookie: 'optimizelyEndUserId=oeu1491721215718r0.024789086462633003; __ssid=97b17d31-8f1b-4193-8914-df36e7b740f6; optimizelySegments=%7B%22300150879%22%3A%22false%22%2C%22300333436%22%3A%22gc%22%2C%22300387578%22%3A%22campaign%22%7D; optimizelyBuckets=%7B%7D; _pk_id.40.2105=8fca10ea565f58bf.1485982886.187.1499406000.1499405260.; _pk_ses.40.2105=*'
           }
-          const result = filtering.considerRequestExceptions(requestHeaders, url, firstPartyUrl, false)
+          const result = filtering.applyCookieSetting(requestHeaders, url, firstPartyUrl, false)
+
+          assert.equal(result.Cookie, requestHeaders.Cookie)
+        })
+        it('wildcard cookie exception', function () {
+          // Specifically testing drive.google.com
+          const firstPartyUrl = 'https://drive.google.com'
+          const url = 'https://doc-0g-3g-docs.googleusercontent.com'
+
+          const requestHeaders = {
+            Cookie: 'optimizelyEndUserId=oeu1491721215718r0.024789086462633003; __ssid=97b17d31-8f1b-4193-8914-df36e7b740f6; optimizelySegments=%7B%22300150879%22%3A%22false%22%2C%22300333436%22%3A%22gc%22%2C%22300387578%22%3A%22campaign%22%7D; optimizelyBuckets=%7B%7D; _pk_id.40.2105=8fca10ea565f58bf.1485982886.187.1499406000.1499405260.; _pk_ses.40.2105=*'
+          }
+          const result = filtering.applyCookieSetting(requestHeaders, url, firstPartyUrl, false)
 
           assert.equal(result.Cookie, requestHeaders.Cookie)
         })
@@ -85,7 +98,7 @@ describe('filtering unit tests', function () {
         const requestHeaders = {
           Referer: 'https://brave.com'
         }
-        const result = filtering.considerRequestExceptions(requestHeaders, url, firstPartyUrl, false)
+        const result = filtering.applyCookieSetting(requestHeaders, url, firstPartyUrl, false)
 
         assert.equal(result.Referer, 'https://cdnp3.stackassets.com')
       })
@@ -97,7 +110,7 @@ describe('filtering unit tests', function () {
           const requestHeaders = {
             Referer: 'https://brave.com'
           }
-          const result = filtering.considerRequestExceptions(requestHeaders, url, firstPartyUrl, false)
+          const result = filtering.applyCookieSetting(requestHeaders, url, firstPartyUrl, false)
 
           assert.equal(result.Referer, requestHeaders.Referer)
         })
