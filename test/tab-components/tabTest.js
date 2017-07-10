@@ -390,6 +390,16 @@ describe('tab tests', function () {
         .waitForExist('.frameWrapper.isPreview webview[data-frame-key="2"]')
         .moveToObject(urlInput)
     })
+    it('does not show preview in the active tab', function * () {
+      yield this.app.client
+        .moveToObject('[data-test-id="tab"][data-frame-key="2"]')
+        .waitForTextValue('[data-test-id="tab"][data-frame-key="2"]', 'Page 1')
+        .waitForExist('.frameWrapper.isPreview webview[data-frame-key="2"]')
+        .moveToObject('[data-test-id="tab"][data-frame-key="1"]')
+        .click('[data-test-id="tab"][data-frame-key="1"]')
+        .waitForExist('[data-test-active-tab][data-frame-key="1"]')
+        .waitForElementCount('.frameWrapper.isPreview webview[data-frame-key="1"]', 0)
+    })
     it('does not show tab previews when setting is off', function * () {
       yield this.app.client.changeSetting(settings.SHOW_TAB_PREVIEWS, false)
       yield this.app.client
