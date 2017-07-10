@@ -1205,8 +1205,6 @@ const appActions = {
 
   /**
    * Notifies the app that a drag operation stopped from within the app
-   * @param {string} dragType - The type of data
-   * @param {object} dragData - Data being transfered
    */
   dragEnded: function () {
     dispatch({

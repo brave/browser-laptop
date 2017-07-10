@@ -23,7 +23,7 @@ module.exports.onDragStart = (dragType, data, e) => {
   e.dataTransfer.effectAllowed = 'all'
   dndData.setupDataTransferBraveData(e.dataTransfer, dragType, data)
   if (dragType === dragTypes.BOOKMARK) {
-    dndData.setupDataTransferURL(e.dataTransfer, data.get('location'), data.get('customTitle') || data.get('title'))
+    dndData.setupDataTransferURL(e.dataTransfer, data.get('location'), data.get('title'))
   }
   appActions.dragStarted(getCurrentWindowId(), dragType, data)
 }
@@ -34,7 +34,7 @@ document.addEventListener('keyup', (e) => {
   }
 }, true)
 
-module.exports.onDragEnd = (dragType, key) => {
+module.exports.onDragEnd = () => {
   windowActions.setContextMenuDetail()
   // TODO: This timeout is a hack to give time for the keyup event to fire.
   // The keydown event is not fired currently for dragend events that

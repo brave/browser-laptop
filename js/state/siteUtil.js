@@ -474,8 +474,8 @@ module.exports.isMoveAllowed = (sites, sourceDetail, destinationDetail) => {
 module.exports.moveSite = function (state, sourceKey, destinationKey, prepend,
   destinationIsParent, disallowReparent) {
   let sites = state.get('sites')
-  let sourceSite = sites.get(sourceKey) || Immutable.Map()
-  const destinationSite = sites.get(destinationKey) || Immutable.Map()
+  let sourceSite = sites.get(sourceKey, Immutable.Map())
+  const destinationSite = sites.get(destinationKey, Immutable.Map())
 
   if (sourceSite.isEmpty() || !module.exports.isMoveAllowed(sites, sourceSite, destinationSite)) {
     return state

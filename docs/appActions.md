@@ -954,15 +954,9 @@ Dispatches a message when a tab is being pinned
 
 
 
-### dragEnded(dragType, dragData) 
+### dragEnded() 
 
 Notifies the app that a drag operation stopped from within the app
-
-**Parameters**
-
-**dragType**: `string`, The type of data
-
-**dragData**: `object`, Data being transfered
 
 
 

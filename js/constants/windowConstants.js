@@ -104,7 +104,10 @@ const windowConstants = {
   WINDOW_ON_CERT_ERROR: _,
   WINDOW_ON_TAB_PAGE_CONTEXT_MENU: _,
   WINDOW_ON_FRAME_BOOKMARK: _,
-  WINDOW_ON_STOP: _
+  WINDOW_ON_STOP: _,
+  WINDOW_ON_MORE_BOOKMARKS_MENU: _,
+  WINDOW_ON_SHOW_BOOKMARK_FOLDER_MENU: _,
+  WINDOW_ON_SITE_DETAIL_MENU: _
 }
 
 module.exports = mapValuesByKeys(windowConstants)
