@@ -27,7 +27,7 @@ def main():
   parts = version.split('.', 3)
   if (len(parts) == 3):
     parts[2] = 'x'
-    commit_tag = version
+    commit_tag = '.'.join(parts)
 
   # Press the publish button.
   if not tag_exists and commit_tag:
