@@ -264,7 +264,12 @@ module.exports.onSyncReady = (isFirstRun, e) => {
   const folderToObjectId = {}
   const bookmarksToSync = []
   const shouldSyncBookmark = (site) => {
-    if (!site) { return false }
+    if (!site) {
+      return false
+    }
+    if (siteUtil.isSiteBookmarked(sites, site) !== true && siteUtil.isFolder(site) !== true) {
+      return false
+    }
     // originalSeed is set on reset to prevent synced bookmarks on a device
     // from being  re-synced.
     const originalSeed = site.get('originalSeed')
@@ -299,7 +304,7 @@ module.exports.onSyncReady = (isFirstRun, e) => {
 
   // Sync bookmarks that have not been synced yet.
   sites.forEach((site) => {
-    if (siteUtil.isSiteBookmarked(sites, site) !== true || shouldSyncBookmark(site) !== true) {
+    if (shouldSyncBookmark(site) !== true) {
       return
     }
     syncBookmark(site)
