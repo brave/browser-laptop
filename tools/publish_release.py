@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# for more info see https://developer.github.com/v3/repos/releases/
 
 import json
 import os
@@ -12,8 +13,8 @@ RELEASE_NAME = 'Dev Channel Beta'
 def main():
   github = GitHub(auth_token())
   releases = github.repos(BROWSER_LAPTOP_REPO).releases.get()
-  tag = ('v' + json.load(open('package.json'))['version'] +
-    release_channel())
+  version = json.load(open('package.json'))['version']
+  tag = ('v' + version + release_channel())
   tag_exists = False
   for release in releases:
     if not release['draft'] and release['tag_name'] == tag:
@@ -21,10 +22,16 @@ def main():
       break
   release = create_or_get_release_draft(github, releases, tag,
                                         tag_exists)
+  # match version to GitHub milestone
+  commit_tag = None
+  parts = version.split('.', 3)
+  if (len(parts) == 3):
+    parts[2] = 'x'
+    commit_tag = version
 
   # Press the publish button.
-  if not tag_exists:
-    publish_release(github, release['id'], tag)
+  if not tag_exists and commit_tag:
+    publish_release(github, release['id'], tag, commit_tag)
 
 def create_release_draft(github, tag):
   name = '{0} {1}'.format(RELEASE_NAME, tag)
@@ -61,8 +68,8 @@ def release_channel():
   assert channel, message
   return channel
 
-def publish_release(github, release_id, tag):
-  data = dict(draft=False, prerelease=True, tag_name=tag)
+def publish_release(github, release_id, tag, commit_tag):
+  data = dict(draft=False, prerelease=True, tag_name=tag, target_commitish=commit_tag)
   github.repos(BROWSER_LAPTOP_REPO).releases(release_id).patch(data=data)
 
 if __name__ == '__main__':
