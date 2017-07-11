@@ -1080,7 +1080,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
             enabled: tab.get('canGoBack'),
             click: (item, focusedWindow) => {
               if (focusedWindow) {
-                focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
+                CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_BACK])
               }
             }
           }, {
@@ -1088,7 +1088,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
             enabled: tab.get('canGoForward'),
             click: (item, focusedWindow) => {
               if (focusedWindow) {
-                focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
+                CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_FORWARD])
               }
             }
           }, {
@@ -1096,7 +1096,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
             accelerator: 'CmdOrCtrl+R',
             click: (item, focusedWindow) => {
               if (focusedWindow) {
-                focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
+                CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_RELOAD])
               }
             }
           },
@@ -1117,7 +1117,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
           label: locale.translation('find'),
           accelerator: 'CmdOrCtrl+F',
           click: function (item, focusedWindow) {
-            focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_SHOW_FINDBAR)
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_SHOW_FINDBAR])
           }
         })
 
@@ -1126,7 +1126,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
             label: locale.translation('print'),
             accelerator: 'CmdOrCtrl+P',
             click: function (item, focusedWindow) {
-              focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_PRINT)
+              CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_PRINT])
             }
           })
         }
@@ -1144,7 +1144,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
         accelerator: 'CmdOrCtrl+Alt+U',
         click: (item, focusedWindow) => {
           if (focusedWindow) {
-            focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE])
           }
         }
       })
