@@ -257,35 +257,33 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId, order) =>
 }
 
 /**
- * Adds or updates the specified siteDetail in appState.sites.
+ * Adds the specified siteDetail in appState.sites.
  *
  * Examples of updating:
  * - editing bookmark in add/edit modal
  * - when timestamp is added (history entry)
  * - moving bookmark to/from a folder
  *
- * @param sites The application state's Immutable site list
- * @param siteDetails The site details object to add or update
- * @param tag The tag to add for this site
+ * @param state - The application state
+ * @param siteDetail - The site details object to add or update
+ * @param tag - The tag to add for this site
  *   See siteTags.js for supported types. No tag means just a history item
- * @param originalSiteDetail If specified, use when searching site list
- * @param {boolean=} skipSync - True if this site was downloaded by sync and
+ * @param oldKey - key of a changed site
+ * @param {boolean} skipSync - True if this site was downloaded by sync and
  *   does not to be re-uploaded
  * @return The new state Immutable object
  */
-module.exports.addSite = function (state, siteDetail, tag, originalSiteDetail, skipSync) {
+module.exports.addSite = function (state, siteDetail, tag, oldKey, skipSync) {
   let sites = state.get('sites')
   // Get tag from siteDetail object if not passed via tag param
   if (tag === undefined) {
     tag = siteDetail.getIn(['tags', 0])
   }
 
-  let originalSiteKey
-  if (originalSiteDetail) {
-    originalSiteKey = module.exports.getSiteKey(originalSiteDetail)
+  if (!oldKey) {
+    oldKey = module.exports.getSiteKey(siteDetail)
   }
 
-  const oldKey = originalSiteKey || module.exports.getSiteKey(siteDetail)
   const oldSite = oldKey !== null ? sites.get(oldKey) : null
   let folderId = siteDetail.get('folderId')
 
@@ -314,6 +312,7 @@ module.exports.addSite = function (state, siteDetail, tag, originalSiteDetail, s
     location = UrlUtil.getLocationIfPDF(site.get('location'))
     site = site.set('location', location)
   }
+
   const oldLocation = (oldSite && oldSite.get('location')) || site.get('location')
   state = siteCache.removeLocationSiteKey(state, oldLocation, oldKey)
 
@@ -753,21 +752,30 @@ module.exports.getFolder = function (sites, folderId) {
 module.exports.getFolders = function (sites, folderId, parentId, labelPrefix) {
   parentId = parentId || 0
   let folders = []
-  sites.toList().sort(module.exports.siteSort).forEach((site) => {
-    if ((site.get('parentFolderId') || 0) === parentId && module.exports.isFolder(site)) {
-      if (site.get('folderId') === folderId) {
-        return
-      }
-      const label = (labelPrefix || '') + (site.get('customTitle') || site.get('title'))
-      folders.push({
-        folderId: site.get('folderId'),
-        parentFolderId: site.get('parentFolderId'),
-        label
-      })
-      const subsites = module.exports.getFolders(sites, folderId, site.get('folderId'), (label || '') + ' / ')
-      folders = folders.concat(subsites)
+  const results = sites
+    .filter(site => {
+      return (site.get('parentFolderId', 0) === parentId && module.exports.isFolder(site))
+    })
+    .toList()
+    .sort(module.exports.siteSort)
+
+  const resultSize = results.size
+  for (let i = 0; i < resultSize; i++) {
+    const site = results.get(i)
+    if (site.get('folderId') === folderId) {
+      continue
     }
-  })
+
+    const label = (labelPrefix || '') + (site.get('customTitle') || site.get('title'))
+    folders.push({
+      folderId: site.get('folderId'),
+      parentFolderId: site.get('parentFolderId'),
+      label
+    })
+    const subsites = module.exports.getFolders(sites, folderId, site.get('folderId'), (label || '') + ' / ')
+    folders = folders.concat(subsites)
+  }
+
   return folders
 }
 

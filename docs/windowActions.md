@@ -386,22 +386,23 @@ Dispatches a message to set the find-in-page details.
 
 
 
-### setBookmarkDetail(currentDetail, originalDetail, destinationDetail, shouldShowLocation, isBookmarkHanger) 
+### addBookmark() 
 
-Dispatches a message to set add/edit bookmark details
-If set, also indicates that add/edit is shown
+Used for displaying bookmark hanger
+when adding bookmark site or folder
 
-**Parameters**
 
-**currentDetail**: `Object`, Properties of the bookmark to change to
 
-**originalDetail**: `Object`, Properties of the bookmark to edit
+### editBookmark() 
 
-**destinationDetail**: `Object`, Will move the added bookmark to the specified position
+Used for displaying bookmark hanger
+when editing bookmark site or folder
 
-**shouldShowLocation**: `boolean`, Whether or not to show the URL input
 
-**isBookmarkHanger**: `boolean`, true if triggered from star icon in nav bar
+
+### onBookmarkClose() 
+
+Used for closing a bookmark dialog
 
 
 

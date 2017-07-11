@@ -677,6 +677,8 @@ const doAction = (state, action) => {
       }
       break
     case appConstants.APP_ADD_SITE:
+    case appConstants.APP_ADD_BOOKMARK:
+    case appConstants.APP_EDIT_BOOKMARK:
       {
         if (action.tag === siteTags.BOOKMARK || action.tag === siteTags.BOOKMARK_FOLDER) {
           createMenu(state)

@@ -156,4 +156,400 @@ describe('sitesReducerTest', function () {
       assert.equal(Object.values(newState.sites)[1].order, 1)
     })
   })
+
+  describe('APP_ADD_BOOKMARK', function () {
+    it('site details is null', function () {
+      const state = initState
+      const action = {
+        actionType: appConstants.APP_ADD_BOOKMARK
+      }
+
+      const result = sitesReducer(state, action)
+      assert.deepEqual(result, state)
+    })
+
+    it('add a bookmark, but tag is missing', function () {
+      const state = initState
+      const action = {
+        actionType: appConstants.APP_ADD_BOOKMARK,
+        siteDetail: makeImmutable({
+          parentFolderId: 0,
+          title: 'Brave',
+          location: 'https://www.brave.com'
+        })
+      }
+
+      const result = sitesReducer(state, action)
+      assert.deepEqual(result, state)
+    })
+
+    it('add a bookmark', function () {
+      const state = initState
+      const action = {
+        actionType: appConstants.APP_ADD_BOOKMARK,
+        siteDetail: makeImmutable({
+          parentFolderId: 0,
+          title: 'Brave',
+          location: 'https://www.brave.com'
+        }),
+        tag: siteTags.BOOKMARK
+      }
+
+      const newSites = {
+        'https://www.brave.com|0|0': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave',
+          order: 0,
+          location: 'https://www.brave.com',
+          parentFolderId: 0
+        }
+      }
+
+      const result = sitesReducer(state, action)
+      assert.deepEqual(result.get('sites').toJS(), newSites)
+    })
+
+    it('add a bookmark folder', function () {
+      const state = initState
+
+      const action = {
+        actionType: appConstants.APP_ADD_BOOKMARK,
+        siteDetail: makeImmutable({
+          parentFolderId: 0,
+          title: 'Brave folder'
+        }),
+        tag: siteTags.BOOKMARK_FOLDER
+      }
+
+      const newSites = {
+        '1': {
+          folderId: 1,
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK_FOLDER],
+          objectId: undefined,
+          title: 'Brave folder',
+          order: 0,
+          parentFolderId: 0
+        }
+      }
+
+      const result = sitesReducer(state, action)
+      assert.deepEqual(result.get('sites').toJS(), newSites)
+    })
+
+    it('add a bookmark with a close bookmark', function () {
+      const state = initState.set('sites', makeImmutable({
+        'https://www.clifton.io|0|0': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave',
+          order: 0,
+          location: 'https://www.brave.com',
+          parentFolderId: 0
+        },
+        'https://www.bbondy.io|0|0': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave',
+          order: 1,
+          location: 'https://www.bbondy.io',
+          parentFolderId: 0
+        },
+        'https://www.bridiver.io|0|0': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave',
+          order: 2,
+          location: 'https://www.bridiver.io',
+          parentFolderId: 0
+        }
+      }))
+
+      const action = {
+        actionType: appConstants.APP_ADD_BOOKMARK,
+        siteDetail: makeImmutable({
+          parentFolderId: 0,
+          title: 'Brave',
+          location: 'https://www.brave.com'
+        }),
+        tag: siteTags.BOOKMARK,
+        closestKey: 'https://www.bbondy.io|0|0'
+      }
+
+      const newSites = {
+        'https://www.clifton.io|0|0': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave',
+          order: 0,
+          location: 'https://www.brave.com',
+          parentFolderId: 0
+        },
+        'https://www.bbondy.io|0|0': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave',
+          order: 1,
+          location: 'https://www.bbondy.io',
+          parentFolderId: 0
+        },
+        'https://www.brave.com|0|0': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave',
+          order: 2,
+          location: 'https://www.brave.com',
+          parentFolderId: 0
+        },
+        'https://www.bridiver.io|0|0': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave',
+          order: 3,
+          location: 'https://www.bridiver.io',
+          parentFolderId: 0
+        }
+      }
+
+      const result = sitesReducer(state, action)
+      assert.deepEqual(result.get('sites').toJS(), newSites)
+    })
+  })
+
+  describe('APP_EDIT_BOOKMARK', function () {
+    it('site details is null', function () {
+      const state = initState
+      const action = {
+        actionType: appConstants.APP_EDIT_BOOKMARK
+      }
+
+      const newState = sitesReducer(state, action)
+      assert.deepEqual(state, newState)
+    })
+
+    it('edit a bookmark, but tag is missing', function () {
+      const state = initState
+      const action = {
+        actionType: appConstants.APP_EDIT_BOOKMARK,
+        siteDetail: makeImmutable({
+          parentFolderId: 0,
+          title: 'Brave',
+          location: 'https://www.brave.com'
+        })
+      }
+
+      const result = sitesReducer(state, action)
+      assert.deepEqual(result, state)
+    })
+
+    it('edit a bookmark, but editKey is missing (title changes)', function () {
+      const state = initState.set('sites', makeImmutable({
+        'https://www.brave.com|0|0': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave',
+          order: 0,
+          location: 'https://www.brave.com',
+          parentFolderId: 0
+        }
+      }))
+      const action = {
+        actionType: appConstants.APP_EDIT_BOOKMARK,
+        siteDetail: makeImmutable({
+          parentFolderId: 0,
+          title: 'Brave 12',
+          location: 'https://www.brave.com'
+        }),
+        tag: siteTags.BOOKMARK
+      }
+
+      const newState = {
+        'https://www.brave.com|0|0': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave 12',
+          order: 0,
+          location: 'https://www.brave.com',
+          parentFolderId: 0
+        }
+      }
+
+      const result = sitesReducer(state, action)
+      assert.deepEqual(result.get('sites').toJS(), newState)
+    })
+
+    it('edit a bookmark, but editKey is missing (location changes)', function () {
+      const state = initState.set('sites', makeImmutable({
+        'https://www.brave.com|0|0': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave',
+          order: 0,
+          location: 'https://www.brave.com',
+          parentFolderId: 0
+        }
+      }))
+      const action = {
+        actionType: appConstants.APP_EDIT_BOOKMARK,
+        siteDetail: makeImmutable({
+          parentFolderId: 0,
+          title: 'Brave',
+          location: 'https://www.brave.si'
+        }),
+        tag: siteTags.BOOKMARK
+      }
+
+      const newState = {
+        'https://www.brave.com|0|0': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave',
+          order: 0,
+          location: 'https://www.brave.com',
+          parentFolderId: 0
+        },
+        'https://www.brave.si|0|0': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave',
+          order: 1,
+          location: 'https://www.brave.si',
+          parentFolderId: 0
+        }
+      }
+
+      const result = sitesReducer(state, action)
+      assert.deepEqual(result.get('sites').toJS(), newState)
+    })
+
+    it('edit a bookmark', function () {
+      const state = initState.set('sites', makeImmutable({
+        'https://www.brave.com|0|0': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave',
+          order: 0,
+          location: 'https://www.brave.com',
+          parentFolderId: 0
+        }
+      }))
+      const action = {
+        actionType: appConstants.APP_EDIT_BOOKMARK,
+        siteDetail: makeImmutable({
+          parentFolderId: 1,
+          title: 'Brave yes',
+          location: 'https://www.brave.si'
+        }),
+        editKey: 'https://www.brave.com|0|0',
+        tag: siteTags.BOOKMARK
+      }
+
+      const newState = {
+        'https://www.brave.si|0|1': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave yes',
+          order: 0,
+          location: 'https://www.brave.si',
+          parentFolderId: 1
+        }
+      }
+
+      const result = sitesReducer(state, action)
+      assert.deepEqual(result.get('sites').toJS(), newState)
+    })
+
+    it('edit a bookmark folder, but folderId is missing', function () {
+      const state = initState.set('sites', makeImmutable({
+        '1': {
+          lastAccessedTime: 0,
+          folderId: 1,
+          tags: [siteTags.BOOKMARK_FOLDER],
+          objectId: undefined,
+          title: 'Brave',
+          order: 0,
+          parentFolderId: 0
+        }
+      }))
+      const action = {
+        actionType: appConstants.APP_EDIT_BOOKMARK,
+        siteDetail: makeImmutable({
+          parentFolderId: 1,
+          title: 'Brave yes'
+        }),
+        editKey: '1',
+        tag: siteTags.BOOKMARK_FOLDER
+      }
+
+      const newState = {
+        '2': {
+          lastAccessedTime: 0,
+          folderId: 2,
+          tags: [siteTags.BOOKMARK_FOLDER],
+          objectId: undefined,
+          title: 'Brave yes',
+          order: 0,
+          parentFolderId: 1
+        }
+      }
+
+      const result = sitesReducer(state, action)
+      assert.deepEqual(result.get('sites').toJS(), newState)
+    })
+
+    it('edit a bookmark folder', function () {
+      const state = initState.set('sites', makeImmutable({
+        '1': {
+          lastAccessedTime: 0,
+          folderId: 1,
+          tags: [siteTags.BOOKMARK_FOLDER],
+          objectId: undefined,
+          title: 'Brave',
+          order: 0,
+          parentFolderId: 0
+        }
+      }))
+      const action = {
+        actionType: appConstants.APP_EDIT_BOOKMARK,
+        siteDetail: makeImmutable({
+          folderId: 1,
+          parentFolderId: 1,
+          title: 'Brave yes'
+        }),
+        editKey: '1',
+        tag: siteTags.BOOKMARK_FOLDER
+      }
+
+      const newState = {
+        '1': {
+          lastAccessedTime: 0,
+          folderId: 1,
+          tags: [siteTags.BOOKMARK_FOLDER],
+          objectId: undefined,
+          title: 'Brave yes',
+          order: 0,
+          parentFolderId: 1
+        }
+      }
+
+      const result = sitesReducer(state, action)
+      assert.deepEqual(result.get('sites').toJS(), newState)
+    })
+  })
 })

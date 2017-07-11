@@ -492,22 +492,44 @@ const windowActions = {
   },
 
   /**
-   * Dispatches a message to set add/edit bookmark details
-   * If set, also indicates that add/edit is shown
-   * @param {Object} currentDetail - Properties of the bookmark to change to
-   * @param {Object} originalDetail - Properties of the bookmark to edit
-   * @param {Object} destinationDetail - Will move the added bookmark to the specified position
-   * @param {boolean} shouldShowLocation - Whether or not to show the URL input
-   * @param {boolean} isBookmarkHanger - true if triggered from star icon in nav bar
+   * Used for displaying bookmark hanger
+   * when adding bookmark site or folder
    */
-  setBookmarkDetail: function (currentDetail, originalDetail, destinationDetail, shouldShowLocation, isBookmarkHanger) {
+  addBookmark: function (siteDetail, closestKey) {
     dispatch({
-      actionType: windowConstants.WINDOW_SET_BOOKMARK_DETAIL,
-      currentDetail,
-      originalDetail,
-      destinationDetail,
-      shouldShowLocation,
-      isBookmarkHanger
+      actionType: windowConstants.WINDOW_ON_ADD_BOOKMARK,
+      siteDetail,
+      closestKey
+    })
+  },
+
+  /**
+   * Used for displaying bookmark hanger
+   * when editing bookmark site or folder
+   */
+  editBookmark: function (isHanger, editKey) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_EDIT_BOOKMARK,
+      editKey,
+      isHanger
+    })
+  },
+
+  onBookmarkAdded: function (isHanger, editKey, siteDetail) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_BOOKMARK_ADDED,
+      siteDetail,
+      editKey,
+      isHanger
+    })
+  },
+
+  /**
+   * Used for closing a bookmark dialog
+   */
+  onBookmarkClose: function () {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_BOOKMARK_CLOSE
     })
   },
 

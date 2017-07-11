@@ -139,7 +139,9 @@ const appConstants = {
   APP_ON_CANCEL_BROWSING_DATA: _,
   APP_SET_SKIP_SYNC: _,
   APP_SWIPE_LEFT: _,
-  APP_SWIPE_RIGHT: _
+  APP_SWIPE_RIGHT: _,
+  APP_ADD_BOOKMARK: _,
+  APP_EDIT_BOOKMARK: _
 }
 
 module.exports = mapValuesByKeys(appConstants)
