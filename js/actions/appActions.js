@@ -155,10 +155,9 @@ const appActions = {
    * @param {number} windowId - the window ID to use for the active tab
    * @param {string} shareType - The type of share to do, must be one of: "email", "facebook", "pinterest", "twitter", "googlePlus", "linkedIn", "buffer", "reddit", or "digg"
    */
-  simpleShareActiveTabRequested: function (windowId, shareType) {
+  simpleShareActiveTabRequested: function (shareType) {
     dispatch({
       actionType: appConstants.APP_SIMPLE_SHARE_ACTIVE_TAB_REQUESTED,
-      windowId,
       shareType
     })
   },

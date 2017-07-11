@@ -33,7 +33,7 @@ describe('shareReducer', function () {
       this.state = Immutable.Map()
       this.windowId = 2
       this.shareType = 'email'
-      this.newState = shareReducer(this.state, {actionType: appConstants.APP_SIMPLE_SHARE_ACTIVE_TAB_REQUESTED, windowId: this.windowId, shareType: this.shareType})
+      this.newState = shareReducer(this.state, {actionType: appConstants.APP_SIMPLE_SHARE_ACTIVE_TAB_REQUESTED, senderWindowId: this.windowId, shareType: this.shareType})
     })
     it('calls simpleShareActiveTab once with the correct args', function () {
       const callCount = this.shareStub.simpleShareActiveTab.withArgs(this.state, this.windowId, this.shareType).callCount
