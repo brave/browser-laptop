@@ -1070,20 +1070,37 @@ var visibleP = (publisher) => {
     synopsis.options.showOnlyVerified = getSetting(settings.PAYMENTS_NON_VERIFIED)
   }
 
+  const publisherOptions = synopsis.publishers[publisher].options
   const onlyVerified = !synopsis.options.showOnlyVerified
 
-  return (
-      eligibleP(publisher) &&
-      (
-        synopsis.publishers[publisher].options.exclude !== true ||
-        stickyP(publisher)
-      ) &&
-      (
-        (onlyVerified && synopsis.publishers[publisher].options && synopsis.publishers[publisher].options.verified) ||
-        !onlyVerified
-      )
-    ) &&
-    !blockedP(publisher)
+  // Publisher Options
+  const excludedByUser = blockedP(publisher)
+  const eligibleByPublisherToggle = stickyP(publisher) != null
+  const eligibleByNumberOfVisits = eligibleP(publisher)
+  const isInExclusionList = publisherOptions && publisherOptions.exclude
+  const verifiedPublisher = publisherOptions && publisherOptions.verified
+
+  // websites not included in exclusion list are eligible by number of visits
+  // but can be enabled by user action in the publisher toggle
+  const isEligible = (eligibleByNumberOfVisits && !isInExclusionList) || eligibleByPublisherToggle
+
+  // If user decide to remove the website, don't show it.
+  if (excludedByUser) {
+    return false
+  }
+
+  // Unless user decided to enable publisher with publisherToggle,
+  // do not show exclusion list.
+  if (!eligibleByPublisherToggle && isInExclusionList) {
+    return false
+  }
+
+  // If verified option is set, only show verified publishers
+  if (isEligible && onlyVerified) {
+    return verifiedPublisher
+  }
+
+  return isEligible
 }
 
 var contributeP = (publisher) => {
