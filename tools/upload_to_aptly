@@ -33,6 +33,11 @@ cat <<EOF > $HOME/.aptly.conf
 "region": "us-west-2",
 "bucket": "brave-apt-staging",
 "acl": "public-read"
+},
+"brave-apt-testing": {
+"region": "us-west-2",
+"bucket": "brave-apt-testing",
+"acl": "public-read"
 }
 },
 "SwiftPublishEndpoints": {} }
