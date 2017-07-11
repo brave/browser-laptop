@@ -931,3 +931,88 @@ describe('Syncing then turning it off stops syncing', function () {
       })
   })
 })
+
+describe('Syncing then turning it off, then turning it on sends new records', function () {
+  Brave.beforeAllServerSetup(this)
+
+  function * setup (seed) {
+    yield Brave.startApp()
+    yield setupBrave(Brave.app.client)
+    // New tab sites appear in history; so first clear them out.
+    yield Brave.app.client
+      .onClearBrowsingData('browserHistory', true)
+      .changeSetting(settings.NEWTAB_MODE, newTabMode.EMPTY_NEW_TAB)
+      .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
+      .changeSetting(settings.SYNC_TYPE_HISTORY, true)
+    yield setupSync(Brave.app.client, seed)
+  }
+
+  before(function * () {
+    this.folder1Title = 'Folder 1'
+    this.page1Url = Brave.server.url('page1.html')
+    this.page1Title = 'Page 1'
+    this.page3Url = 'https://www.brave.com/'
+    this.page3HostPattern = 'https?://www.brave.com'
+    this.hostPattern1 = this.page3HostPattern
+    this.siteSettingName = 'fingerprintingProtection'
+    this.seed = new Immutable.List(crypto.randomBytes(32))
+    yield setup(this.seed)
+
+    // Sync Off - Do some browsing
+    yield toggleSync(Brave.app.client, false)
+    yield addBookmarkFolder(this.folder1Title)
+    yield bookmarkUrl(this.page1Url, this.page1Title)
+    yield Brave.app.client
+      .tabByIndex(0)
+      .loadUrl(this.page3Url)
+      .openBraveMenu(braveMenu, braveryPanel)
+      .waitForVisible(fpSwitch)
+      .click(fpSwitch)
+      .waitUntil(checkSiteSetting(this.hostPattern1, this.siteSettingName, true))
+      .moveToObject(navigatorNotBookmarked)
+      .leftClick()
+      .waitForVisible(braveryPanelContainer, 1000, true)
+
+    // Sync On - Records are sent
+    yield toggleSync(Brave.app.client, true)
+    yield Brave.app.client.pause(1000) // XXX: Wait for Sync to upload records to S3
+
+    // Finally start a fresh profile and setup sync
+    yield Brave.stopApp()
+    yield setup(this.seed)
+    yield Brave.app.client
+      .tabByIndex(0)
+      .loadUrl(aboutHistoryUrl)
+      .pause(500) // XXX: Wait for history to load
+  })
+
+  after(function * () {
+    yield Brave.stopApp()
+  })
+
+  it('bookmark', function * () {
+    yield Brave.app.client
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitUntil(checkBookmark(this.page1Title))
+  })
+
+  it('bookmark folder', function * () {
+    yield Brave.app.client
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitUntil(checkBookmark(this.folder1Title))
+  })
+
+  it('history', function * () {
+    yield Brave.app.client
+      .tabByIndex(0)
+      .waitForElementCount('table.sortableTable tbody tr', 1)
+      .waitForVisible(`table.sortableTable td.title[data-sort="${this.page1Title}"]`)
+  })
+
+  it('site setting', function * () {
+    const hostPattern1 = this.hostPattern1
+    yield Brave.app.client
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitUntil(checkSiteSetting(hostPattern1, this.siteSettingName, true))
+  })
+})
