@@ -23,7 +23,8 @@ def main():
                                         tag_exists)
 
   # Press the publish button.
-  publish_release(github, release['id'])
+  if not tag_exists:
+    publish_release(github, release['id'], tag)
 
 def create_release_draft(github, tag):
   name = '{0} {1}'.format(RELEASE_NAME, tag)
@@ -60,8 +61,8 @@ def release_channel():
   assert channel, message
   return channel
 
-def publish_release(github, release_id):
-  data = dict(draft=False, prerelease=True)
+def publish_release(github, release_id, tag):
+  data = dict(draft=False, prerelease=True, tag_name=tag)
   github.repos(BROWSER_LAPTOP_REPO).releases(release_id).patch(data=data)
 
 if __name__ == '__main__':
