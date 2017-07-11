@@ -549,30 +549,6 @@ const appActions = {
   },
 
   /**
-   * Adds a word to the dictionary
-   * @param {string} word - The word to add
-   * @param {boolean} learn - true if the word should be learned, false if ignored
-   */
-  addWord: function (word, learn) {
-    dispatch({
-      actionType: appConstants.APP_ADD_WORD,
-      word,
-      learn
-    })
-  },
-
-  /**
-   * Adds a word to the dictionary
-   * @param {string} locale - The locale to set for the dictionary
-   */
-  setDictionary: function (locale) {
-    dispatch({
-      actionType: appConstants.APP_SET_DICTIONARY,
-      locale
-    })
-  },
-
-  /**
    * Adds information about pending basic auth login requests
    * @param {number} tabId - The tabId that generated the request
    * @param {string} detail - login request info
@@ -1514,6 +1490,30 @@ const appActions = {
       queryInfo: {
         windowId
       }
+    })
+  },
+
+  spellingSuggested: function (suggestion, tabId) {
+    dispatch({
+      actionType: appConstants.APP_SPELLING_SUGGESTED,
+      suggestion,
+      tabId
+    })
+  },
+
+  learnSpelling: function (word, tabId) {
+    dispatch({
+      actionType: appConstants.APP_LEARN_SPELLING,
+      word,
+      tabId
+    })
+  },
+
+  forgetLearnedSpelling: function (word, tabId) {
+    dispatch({
+      actionType: appConstants.APP_FORGET_LEARNED_SPELLING,
+      word,
+      tabId
     })
   }
 }
