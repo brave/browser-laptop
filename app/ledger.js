@@ -693,15 +693,18 @@ eventStore.addChangeListener(() => {
  */
 
 var initialize = (paymentsEnabled) => {
-  var ruleset
+  var ruleset, timeout
 
   if (!v2RulesetDB) v2RulesetDB = levelup(pathName(v2RulesetPath))
   if (!v2PublishersDB) v2PublishersDB = levelup(pathName(v2PublishersPath))
   enable(paymentsEnabled)
 
-  // Check if relevant browser notifications should be shown every 15 minutes
+  // Check if relevant browser notifications should be shown every 15 (default) minutes
+  timeout = 15 // minutes
+  if (process.env.LEDGER_NOTIFICATIONS_TIMEOUT) timeout = parseInt(process.env.LEDGER_NOTIFICATIONS_TIMEOUT)
+
   if (notificationTimeout) clearInterval(notificationTimeout)
-  notificationTimeout = setInterval(showNotifications, 15 * msecs.minute)
+  notificationTimeout = setInterval(showNotifications, timeout * msecs.minute)
 
   if (!paymentsEnabled) {
     client = null
@@ -1530,6 +1533,7 @@ var ledgerInfo = {
   currency: undefined,
 
   paymentURL: undefined,
+  refundURL: undefined,
   buyURL: undefined,
   bravery: undefined,
 
@@ -1547,6 +1551,10 @@ var ledgerInfo = {
   // geoIP/exchange information
   countryCode: undefined,
   exchangeInfo: undefined,
+
+  // customer auto-renewal info
+  customer: undefined,
+  customerRequested: false,
 
   _internal: {
     exchangeExpiry: 0,
@@ -1574,10 +1582,24 @@ var updateLedgerInfo = () => {
                           querystring.stringify({ currency: ledgerInfo.currency,
                             amount: getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT),
                             address: ledgerInfo.address })
+      ledgerInfo.customerURL = process.env.ADDFUNDS_URL + '/customers/' + ledgerInfo.address
+      ledgerInfo.refundURL = process.env.ADDFUNDS_URL + '/refund?ledgerAddress=' + ledgerInfo.address
       ledgerInfo.buyMaximumUSD = false
     }
 
     underscore.extend(ledgerInfo, ledgerInfo._internal.cache || {})
+    if (process.env.ADDFUNDS_URL && !ledgerInfo.customer && !ledgerInfo.customerRequested) {
+      ledgerInfo.customerRequested = true
+      retrieveCustomerInfo({ address: ledgerInfo.address }, (customer) => {
+        ledgerInfo.customer = customer
+        if (customer) {
+          retrieveCustomerTransactions({ address: ledgerInfo.address }, (transactions) => {
+            ledgerInfo.customer.transactions = transactions
+            updateLedgerInfo()
+          })
+        }
+      })
+    }
   }
 
   if ((client) && (now > ledgerInfo._internal.geoipExpiry)) {
@@ -1690,6 +1712,50 @@ var callback = (err, result, delayTime) => {
 
   muonWriter(pathName(statePath), result)
   run(delayTime)
+}
+
+var retrieveCustomerTransactions = (params, callback) => {
+  var options = {
+    url: process.env.ADDFUNDS_URL + '/v1/refunds/' + params.address,
+    method: params.method || 'GET',
+    responseType: 'text',
+    headers: underscore.defaults(params.headers || {}, { 'content-type': 'application/json; charset=utf-8' }),
+    verboseP: params.verboseP || false
+  }
+  request.request(options, (err, response, body) => {
+    if (err) {
+      return callback(null)
+    }
+    var transactions = response.statusCode === 200 && body ? JSON.parse(body) : null
+    if (transactions && clientOptions.debugP) {
+      console.log(transactions)
+    }
+    callback(transactions)
+  })
+}
+
+var retrieveCustomerInfo = (params, callback) => {
+  var options = {
+    url: process.env.ADDFUNDS_URL + '/v1/customers/' + params.address,
+    method: params.method || 'GET',
+    responseType: 'text',
+    headers: underscore.defaults(params.headers || {}, { 'content-type': 'application/json; charset=utf-8' }),
+    verboseP: params.verboseP || false
+  }
+  request.request(options, (err, response, body) => {
+    if (err) {
+      return callback(null)
+    }
+    var customer = response.statusCode === 200 ? JSON.parse(body) : null
+    if (customer && process.env.LEDGER_LAST_PURCHASE_DAYS_AGO) {
+      customer.lastChargeTimestamp = parseInt(moment().subtract(parseInt(process.env.LEDGER_LAST_PURCHASE_DAYS_AGO), 'days').format('x'))
+    }
+    if (customer && clientOptions.debugP) {
+      customer.lastCharged = moment(customer.lastChargeTimestamp).format('YYYY-MM-DD HH:mm:ss')
+      console.log(customer)
+    }
+    callback(customer)
+  })
 }
 
 var roundtrip = (params, options, callback) => {
@@ -2099,7 +2165,57 @@ var pathName = (name) => {
   return path.join(app.getPath('userData'), parts.name + parts.ext)
 }
 
-/*
+const sendAutorenewalRequest = (callback) => {
+  var params = { address: ledgerInfo.address }
+  var options = {
+    method: 'POST',
+    url: process.env.ADDFUNDS_URL + '/v1/purchases/autorenew/' + params.address,
+    responseType: 'text',
+    headers: underscore.defaults(params.headers || {}, { 'content-type': 'application/json; charset=utf-8' }),
+    verboseP: params.verboseP || false
+  }
+  request.request(options, (err, response, body) => {
+    // TODO - this left in for messaging in browser?
+    callback(err, body)
+  })
+}
+
+const attemptAutorenewalCharge = () => {
+  sendAutorenewalRequest((err, results) => {
+    if (!err) {
+      retrieveCustomerInfo({ address: ledgerInfo.address }, (customer) => {
+        ledgerInfo.customer = customer
+        updateLedgerInfo()
+      })
+    } else {
+      if (clientOptions.debugP) console.log(err.toString())
+    }
+  })
+}
+
+const closeToReconciliation = () => {
+  if (process.env.LEDGER_CLOSE) return true
+  return ledgerInfo.reconcileStamp && (ledgerInfo.reconcileStamp - underscore.now() < 3 * msecs.day)
+}
+
+const waitedADay = () => {
+  return ledgerInfo.customer &&
+    ledgerInfo.customer.lastChargeTimestamp &&
+    (underscore.now() - ledgerInfo.customer.lastChargeTimestamp > 1 * msecs.day)
+}
+
+const isAutorenewalEnabled = () => {
+  return process.env.ADDFUNDS_URL &&
+    ledgerInfo.customer &&
+    ledgerInfo.customer.autoRenew &&
+    ledgerInfo.customer.emailVerified
+}
+
+const isPaymentsEnabled = () => {
+  return !!client
+}
+
+/**
  * UI controller functionality
  */
 
@@ -2108,6 +2224,23 @@ const showNotifications = () => {
     if (getSetting(settings.PAYMENTS_NOTIFICATIONS)) showEnabledNotifications()
   } else {
     showDisabledNotifications()
+  }
+
+  if (clientOptions.debugP) {
+    console.log('payments enabled = ' + isPaymentsEnabled())
+    console.log('autorenewal enabled = ' + isAutorenewalEnabled())
+    console.log('close to reconciliation time = ' + closeToReconciliation())
+    console.log('insufficient balance = ' + !sufficientBalanceToReconcile())
+    console.log('waited a day since last attempt = ' + waitedADay())
+  }
+
+  if (isPaymentsEnabled() &&
+      isAutorenewalEnabled() &&
+      closeToReconciliation() &&
+      !sufficientBalanceToReconcile() &&
+      waitedADay()
+     ) {
+    attemptAutorenewalCharge()
   }
 }
 
@@ -2161,8 +2294,8 @@ const showEnabledNotifications = () => {
 }
 
 const sufficientBalanceToReconcile = () => {
-  const balance = Number(ledgerInfo.balance || 0)
-  const unconfirmed = Number(ledgerInfo.unconfirmed || 0)
+  const balance = process.env.LEDGER_BALANCE || Number(ledgerInfo.balance || 0)
+  const unconfirmed = process.env.LEDGER_BALANCE || Number(ledgerInfo.unconfirmed || 0)
   return ledgerInfo.btc &&
     (balance + unconfirmed > 0.9 * Number(ledgerInfo.btc))
 }
