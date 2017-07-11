@@ -46,6 +46,18 @@ const checkSiteSetting = function (hostPattern, setting, value) {
   }
 }
 
+const checkSyncUploadsStarted = function () {
+  return this.getAppState().then((val) => {
+    return Object.keys(val.value.sync.pendingRecords).length > 0
+  })
+}
+
+const checkSyncUploadsFinished = function () {
+  return this.getAppState().then((val) => {
+    return Object.keys(val.value.sync.pendingRecords).length === 0
+  })
+}
+
 function * setupBrave (client) {
   Brave.addCommands()
   yield client
@@ -98,7 +110,15 @@ function * bookmarkUrl (url, title, folderId) {
     .waitForVisible(doneButton)
     .waitForVisible(bookmarkNameInput)
     .typeText(bookmarkNameInput, title)
-    .waitForBookmarkDetail(url, title)
+    .waitForEnabled(doneButton)
+    .click(doneButton)
+    .waitUntil(function () {
+      return this.getText('[data-test-id="bookmarkToolbarButton"] [data-test-id="bookmarkText"]')
+        .then(allTitles => allTitles.indexOf(title) !== -1)
+    })
+    .activateURLMode()
+    .waitForVisible(navigatorBookmarked)
+    .click(navigatorBookmarked)
   if (folderId) {
     const folderOption = `[data-test-id="bookmarkParentFolder"] option[value="${folderId}"`
     yield Brave.app.client
@@ -116,6 +136,7 @@ function * addBookmarkFolder (title) {
   yield Brave.app.client
     .tabByIndex(0)
     .url(aboutBookmarksUrl)
+    .waitForUrl(aboutBookmarksUrl)
     .waitForVisible('.addBookmarkFolder')
     .click('.addBookmarkFolder')
     .windowParentByUrl(aboutBookmarksUrl)
@@ -351,9 +372,13 @@ describe('Syncing bookmarks', function () {
       .waitForVisible(doneButton)
       .waitForExist(bookmarkNameInput)
       .typeText(bookmarkNameInput, this.page2TitleUpdated)
-      .waitForBookmarkDetail(this.page2Url, this.page2TitleUpdated)
       .waitForEnabled(doneButton)
       .click(doneButton)
+      .activateURLMode()
+      .waitForVisible(navigatorBookmarked)
+      .click(navigatorBookmarked)
+      .waitForVisible(doneButton)
+      .waitForInputText(bookmarkNameInput, this.page2TitleUpdated)
 
     // For Delete: Bookmark page 3 and delete it
     yield Brave.app.client
@@ -395,9 +420,8 @@ describe('Syncing bookmarks', function () {
     yield bookmarkUrl(this.folder2Page1Url, this.folder2Page1Title, folder2Id)
     yield Brave.app.client
       .removeSite({ folderId: folder2Id }, siteTags.BOOKMARK_FOLDER)
-
-    // XXX: Wait for sync to upload records to S3
-    yield Brave.app.client.pause(1000)
+      .waitUntil(checkSyncUploadsStarted)
+      .waitUntil(checkSyncUploadsFinished, 2000)
 
     // Finally start a fresh profile and setup sync
     yield Brave.stopApp()
@@ -519,9 +543,13 @@ describe('Syncing bookmarks from an existing profile', function () {
       .waitForVisible(doneButton)
       .waitForVisible(bookmarkNameInput)
       .typeText(bookmarkNameInput, this.page2TitleUpdated)
-      .waitForBookmarkDetail(this.page2Url, this.page2TitleUpdated)
       .waitForEnabled(doneButton)
       .click(doneButton)
+      .activateURLMode()
+      .waitForVisible(navigatorBookmarked)
+      .click(navigatorBookmarked)
+      .waitForVisible(doneButton)
+      .waitForInputText(bookmarkNameInput, this.page2TitleUpdated)
 
     // Create folder then add a bookmark
     yield addBookmarkFolder(this.folder1Title)
@@ -550,8 +578,10 @@ describe('Syncing bookmarks from an existing profile', function () {
     // Enable Sync
     this.seed = new Immutable.List(crypto.randomBytes(32))
     yield setupSync(Brave.app.client, this.seed)
-    // XXX: Wait for sync to upload records to S3
-    yield Brave.app.client.pause(1000)
+
+    yield Brave.app.client
+      .waitUntil(checkSyncUploadsStarted)
+      .waitUntil(checkSyncUploadsFinished, 2000)
 
     // Finally start a fresh profile and setup sync
     yield Brave.stopApp()
@@ -663,16 +693,18 @@ describe('Syncing history', function () {
     yield Brave.app.client
       .waitForUrl(this.page1Url)
       .loadUrl(this.page2Url)
+      .waitForUrl(this.page2Url)
+      .windowParentByUrl(this.page2Url)
+      .waitUntil(checkSyncUploadsStarted)
 
     // Private tab should not sync
     yield Brave.app.client
-      .waitForUrl(this.page2Url)
-      .windowParentByUrl(this.page2Url)
       .newTab({ url: this.page3Url, isPrivate: true })
       .waitForUrl(this.page3Url)
 
-    // XXX: Wait for sync to upload records to S3
-    yield Brave.app.client.pause(1000)
+    yield Brave.app.client
+      .windowParentByUrl(this.page1Url)
+      .waitUntil(checkSyncUploadsFinished, 2000)
 
     // Finally start a fresh profile and setup sync
     yield Brave.stopApp()
@@ -721,10 +753,11 @@ describe('Syncing site settings', function () {
     this.page1Url = 'https://www.brave.com/'
     this.page1HostPattern = 'https?://www.brave.com'
     this.page1HostPatternNoScript = 'https://www.brave.com'
+    const hostPattern = this.page1HostPattern
     this.seed = new Immutable.List(crypto.randomBytes(32))
     yield setup(this.seed)
 
-    // Visit page 1 and poke everything
+    // Visit page 1 and change every site setting
     yield Brave.app.client
       .waitForTabCount(1)
       .tabByIndex(0)
@@ -732,18 +765,23 @@ describe('Syncing site settings', function () {
       .openBraveMenu(braveMenu, braveryPanel)
       .waitForVisible(httpsEverywhereSwitch)
       .click(httpsEverywhereSwitch)
+      .waitUntil(checkSyncUploadsStarted)
+      .waitUntil(checkSiteSetting(hostPattern, 'httpsEverywhere', false))
       .click(noScriptSwitch)
+      .waitUntil(checkSiteSetting(this.page1HostPatternNoScript, 'noScript', true))
       .click(fpSwitch)
+      .waitUntil(checkSiteSetting(hostPattern, 'fingerprintingProtection', true))
       .click(safeBrowsingSwitch)
+      .waitUntil(checkSiteSetting(hostPattern, 'safeBrowsing', false))
       .click(adsBlockedControl)
       .waitForVisible(showAdsOption)
       .click(showAdsOption)
+      .waitUntil(checkSiteSetting(hostPattern, 'adControl', 'allowAdsAndTracking'))
       .click(cookieControl)
       .waitForVisible(allowAllCookiesOption)
       .click(allowAllCookiesOption)
-
-    // XXX: Wait for sync to upload records to S3
-    yield Brave.app.client.pause(1000)
+      .waitUntil(checkSiteSetting(hostPattern, 'cookieControl', 'allowAllCookies'))
+    // XXX: Is a .waitUntil(checkSyncUploadsFinished) necessary here?
 
     // Finally start a fresh profile and setup sync
     yield Brave.stopApp()
@@ -799,11 +837,15 @@ describe('Syncing and clearing data prevents it from syncing', function () {
       .openBraveMenu(braveMenu, braveryPanel)
       .waitForVisible(noScriptSwitch)
       .click(noScriptSwitch)
+      .waitUntil(checkSyncUploadsStarted)
       .waitUntil(checkSiteSetting(hostPattern, 'noScript', true))
-      .pause(1000) // XXX: Wait for sync to upload records to S3
+      .moveToObject(navigatorNotBookmarked)
+      .leftClick()
+      .waitForVisible(braveryPanelContainer, 1000, true)
+      .waitUntil(checkSyncUploadsFinished, 2000)
       .onClearBrowsingData('browserHistory', true)
       .onClearBrowsingData('savedSiteSettings', true)
-      .pause(500) // XXX: Wait for sync to delete records from S3
+      .pause(500) // XXX: Wait for SYNC_CLEAR_HISTORY and SYNC_CLEAR_SITE_SETTINGS to upload
 
     // Finally start a fresh profile and setup sync
     yield Brave.stopApp()
@@ -811,7 +853,6 @@ describe('Syncing and clearing data prevents it from syncing', function () {
     yield Brave.app.client
       .tabByIndex(0)
       .loadUrl(aboutHistoryUrl)
-      .pause(500) // XXX: Wait for history to load
   })
 
   after(function * () {
@@ -873,11 +914,12 @@ describe('Syncing then turning it off stops syncing', function () {
       .openBraveMenu(braveMenu, braveryPanel)
       .waitForVisible(fpSwitch)
       .click(fpSwitch)
+      .waitUntil(checkSyncUploadsStarted)
       .waitUntil(checkSiteSetting(this.hostPattern1, this.siteSettingName, true))
       .moveToObject(navigatorNotBookmarked)
       .leftClick()
       .waitForVisible(braveryPanelContainer, 1000, true)
-      .pause(1000) // XXX: Wait for Sync to upload records to S3
+      .waitUntil(checkSyncUploadsFinished, 2000)
 
     // Sync Off - browsing activity NOT synced
     yield toggleSync(Brave.app.client, false)
@@ -896,7 +938,6 @@ describe('Syncing then turning it off stops syncing', function () {
     yield Brave.app.client
       .tabByIndex(0)
       .loadUrl(aboutHistoryUrl)
-      .pause(500) // XXX: Wait for history to load
   })
 
   after(function * () {
