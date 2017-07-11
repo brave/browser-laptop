@@ -112,18 +112,18 @@ function getFrameKeysByDisplayIndex (state) {
   }, [])
 }
 
-function getFrameKeysByNonPinnedDisplayIndex (state) {
+function getTabIdsByNonPinnedDisplayIndex (state) {
   return state.get('frames')
     .filter((frame) => !frame.get('pinnedLocation'))
-    .map((frame) => frame.get('key'))
+    .map((frame) => frame.get('tabId'))
 }
 
  /**
- * Obtains the display index for the specified frame key excluding pins
+ * Obtains the display index for the specified tab ID excluding pins
  */
-function findNonPinnedDisplayIndexForFrameKey (state, key) {
-  return getFrameKeysByNonPinnedDisplayIndex(state)
-    .findIndex((displayKey) => displayKey === key)
+function findNonPinnedDisplayIndexForTabId (state, tabId) {
+  return getTabIdsByNonPinnedDisplayIndex(state)
+    .findIndex((displayKey) => displayKey === tabId)
 }
 
 function getFrameByDisplayIndex (state, i) {
@@ -405,8 +405,8 @@ function removeFrame (state, frameProps, framePropsIndex) {
   }
 }
 
-function getFrameTabPageIndex (state, frameKey, tabsPerTabPage = getSetting(settings.TABS_PER_PAGE)) {
-  const index = findNonPinnedDisplayIndexForFrameKey(state, frameKey)
+function getFrameTabPageIndex (state, tabId, tabsPerTabPage = getSetting(settings.TABS_PER_PAGE)) {
+  const index = findNonPinnedDisplayIndexForTabId(state, tabId)
   if (index === -1) {
     return -1
   }
@@ -455,11 +455,12 @@ function isPinned (state, frameKey) {
 
 /**
  * Updates the tab page index to the specified frameProps
- * @param frameProps Any frame belonging to the page
+ * @param state{Object} - Window state
+ * @param tabId{number} - Tab id for the frame
+ * @param tabsPerPage{string} - Current setting for tabs per page, with a default value
  */
-function updateTabPageIndex (state, frameProps) {
-  frameProps = makeImmutable(frameProps)
-  const index = getFrameTabPageIndex(state, frameProps.get('key'))
+function updateTabPageIndex (state, tabId, tabsPerPage = getSetting(settings.TABS_PER_PAGE)) {
+  const index = getFrameTabPageIndex(state, tabId, tabsPerPage)
   const isTabInHoverState = !!getHoverTabIndex(state)
 
   if (index === -1) {
@@ -472,7 +473,6 @@ function updateTabPageIndex (state, frameProps) {
   }
   return state.setIn(['ui', 'tabs', 'tabPageIndex'], index)
 }
-
 const frameStatePath = (state, frameKey) => {
   const index = getFrameIndex(state, frameKey)
   if (index === -1) {
@@ -619,7 +619,7 @@ const setPreviewFrameKey = (state, frameKey, immediate = false) => {
     }
   }
 
-  const index = getFrameTabPageIndex(state, frame)
+  const index = frame ? getFrameTabPageIndex(state, frame.get('tabId')) : -1
   if (index !== -1) {
     if (index !== state.getIn(['ui', 'tabs', 'tabPageIndex'])) {
       state = state.setIn(['ui', 'tabs', 'previewTabPageIndex'], index)
