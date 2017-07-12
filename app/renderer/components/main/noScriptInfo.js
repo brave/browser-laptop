@@ -153,6 +153,7 @@ class NoScriptInfo extends React.Component {
             />
             <div>
               <BrowserButton
+                groupedItem
                 actionItem
                 l10nId='allowScriptsOnce'
                 onClick={this.onAllow.bind(this, 0)}
@@ -160,6 +161,7 @@ class NoScriptInfo extends React.Component {
               {
                 !this.props.isPrivate
                 ? <BrowserButton
+                  groupedItem
                   subtleItem
                   l10nId='allowScriptsTemp'
                   onClick={this.onAllow.bind(this, 1)}
