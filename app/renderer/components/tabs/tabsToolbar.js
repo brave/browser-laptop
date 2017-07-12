@@ -42,7 +42,7 @@ class TabsToolbar extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
-    const pinnedTabs = frameStateUtil.getPinnedFrames(currentWindow)
+    const pinnedTabs = frameStateUtil.getPinnedFrames(currentWindow) || Immutable.List()
 
     const props = {}
     // used in renderer

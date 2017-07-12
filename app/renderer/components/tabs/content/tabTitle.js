@@ -20,16 +20,17 @@ const globalStyles = require('../../styles/global')
 class TabTitle extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const tabIconColor = tabContentState.getTabIconColor(currentWindow, ownProps.frameKey)
+    const frameKey = ownProps.frameKey
+    const tabIconColor = tabContentState.getTabIconColor(currentWindow, frameKey)
 
     const props = {}
     // used in renderer
     props.enforceFontVisibility = isDarwin() && tabIconColor === 'white'
     props.tabIconColor = tabIconColor
-    props.displayTitle = tabContentState.getDisplayTitle(currentWindow, ownProps.frameKey)
+    props.displayTitle = tabContentState.getDisplayTitle(currentWindow, frameKey)
 
     // used in functions
-    props.frameKey = ownProps.frameKey
+    props.frameKey = frameKey
 
     return props
   }

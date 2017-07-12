@@ -58,6 +58,7 @@ const shieldState = require('../../../common/state/shieldState')
 const menuBarState = require('../../../common/state/menuBarState')
 const windowState = require('../../../common/state/windowState')
 const updateState = require('../../../common/state/updateState')
+const tabState = require('../../../common/state/tabState')
 
 // Util
 const _ = require('underscore')
@@ -518,11 +519,12 @@ class Main extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
+    const activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
     const nonPinnedFrames = frameStateUtil.getNonPinnedFrames(currentWindow)
     const tabsPerPage = Number(getSetting(settings.TABS_PER_PAGE))
     const activeOrigin = !activeFrame.isEmpty() ? siteUtil.getOrigin(activeFrame.get('location')) : null
     const widevinePanelDetail = currentWindow.get('widevinePanelDetail', Immutable.Map())
-    const loginRequiredDetails = basicAuthState.getLoginRequiredDetail(state, activeFrame.get('tabId'))
+    const loginRequiredDetails = basicAuthState.getLoginRequiredDetail(state, activeTabId)
 
     const props = {}
     // used in renderer
@@ -570,7 +572,7 @@ class Main extends React.Component {
     props.menubarVisible = menuBarState.isMenuBarVisible(currentWindow)
     props.mouseInFrame = currentWindow.getIn(['ui', 'mouseInFrame'])
     props.braveShieldEnabled = shieldState.braveShieldsEnabled(activeFrame)
-    props.tabId = activeFrame.get('tabId')
+    props.tabId = activeTabId
     props.location = activeFrame.get('location')
     props.isWidevineReady = state.getIn([appConfig.resourceNames.WIDEVINE, 'ready'])
     props.widevineLocation = siteUtil.getOrigin(widevinePanelDetail.get('location'))

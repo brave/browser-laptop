@@ -87,7 +87,7 @@ class NavigationBar extends React.Component {
     const activeTab = tabState.getByTabId(state, activeTabId)
 
     const activeTabShowingMessageBox = tabState.isShowingMessageBox(state, activeTabId)
-    const bookmarkDetail = currentWindow.get('bookmarkDetail')
+    const bookmarkDetail = currentWindow.get('bookmarkDetail', Immutable.Map())
     const mouseInTitlebar = currentWindow.getIn(['ui', 'mouseInTitlebar'])
     const title = activeFrame.get('title', '')
     const loading = activeFrame.get('loading')
@@ -113,10 +113,10 @@ class NavigationBar extends React.Component {
     // used in renderer
     props.activeFrameKey = activeFrameKey
     props.titleMode = titleMode
-    props.isBookmarked = props.activeFrameKey !== undefined &&
+    props.isBookmarked = activeFrameKey !== undefined &&
       activeTab && activeTab.get('bookmarked')
     props.isWideUrlBarEnabled = getSetting(settings.WIDE_URL_BAR)
-    props.showBookmarkHanger = bookmarkDetail && bookmarkDetail.get('isBookmarkHanger')
+    props.showBookmarkHanger = bookmarkDetail.get('isBookmarkHanger')
     props.isLoading = loading
     props.showPublisherToggle = publisherState.shouldShowAddPublisherButton(state, location, publisherId)
     props.showHomeButton = !props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)

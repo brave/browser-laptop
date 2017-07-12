@@ -156,8 +156,8 @@ class Navigator extends React.Component {
     const swipeRightPercent = state.get('swipeRightPercent')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const activeFrameKey = activeFrame.get('key')
-    const activeTabId = activeFrame.get('tabId') || tabState.TAB_ID_NONE
-    const activeTab = tabState.getByTabId(state, activeTabId)
+    const activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
+    const activeTab = tabState.getByTabId(state, activeTabId) || Immutable.Map()
     const activeTabShowingMessageBox = !!(activeTab && tabState.isShowingMessageBox(state, activeTabId))
     const allSiteSettings = siteSettingsState.getAllSiteSettings(state, activeFrame)
     const activeSiteSettings = siteSettings.getSiteSettingsForURL(allSiteSettings, activeFrame.get('location'))
@@ -173,8 +173,8 @@ class Navigator extends React.Component {
 
     const props = {}
     // used in renderer
-    props.canGoBack = activeTab && activeTab.get('canGoBack') && !activeTabShowingMessageBox
-    props.canGoForward = activeTab && activeTab.get('canGoForward') && !activeTabShowingMessageBox
+    props.canGoBack = activeTab.get('canGoBack') && !activeTabShowingMessageBox
+    props.canGoForward = activeTab.get('canGoForward') && !activeTabShowingMessageBox
     props.totalBlocks = activeFrame ? frameStateUtil.getTotalBlocks(activeFrame) : false
     props.shieldsDown = !braverySettings.shieldsUp
     props.shieldEnabled = braveShieldsEnabled(activeFrame)

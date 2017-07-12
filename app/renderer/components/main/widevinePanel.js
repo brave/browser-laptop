@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const Immutable = require('immutable')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
@@ -60,7 +61,7 @@ class WidevinePanel extends React.Component {
 
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const widevinePanelDetail = currentWindow.get('widevinePanelDetail')
+    const widevinePanelDetail = currentWindow.get('widevinePanelDetail', Immutable.Map())
 
     const props = {}
     props.origin = siteUtil.getOrigin(widevinePanelDetail.get('location'))
