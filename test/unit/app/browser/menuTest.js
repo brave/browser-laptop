@@ -49,7 +49,7 @@ describe('menu reducer unit tests', function () {
   })
 
   const assertNoStateChange = (actionType) => {
-    const input = Immutable.fromJS({keyGoesHere: 'valueGoesHere'})
+    const input = Immutable.fromJS({bookmarks: {}, keyGoesHere: 'valueGoesHere'})
     const output = menuReducer(input, {actionType})
     assert.deepEqual(input, output)
   }

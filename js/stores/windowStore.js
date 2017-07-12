@@ -23,6 +23,9 @@ const assert = require('assert')
 const contextMenuState = require('../../app/common/state/contextMenuState')
 const appStoreRenderer = require('./appStoreRenderer')
 const windowActions = require('../actions/windowActions')
+const siteUtil = require('../state/siteUtil')
+const bookmarkFoldersState = require('../../app/common/state/bookmarkFoldersState')
+const bookmarksState = require('../../app/common/state/bookmarksState')
 
 let windowState = Immutable.fromJS({
   activeFrameKey: null,
@@ -62,10 +65,6 @@ class WindowStore extends EventEmitter {
 
   set state (newWindowState) {
     windowState = newWindowState
-  }
-
-  getFrames () {
-    return frameStateUtil.getFrames(this.state)
   }
 
   getFrame (key) {
@@ -471,37 +470,54 @@ const doAction = (action) => {
       windowState = windowState.delete('bookmarkDetail')
       break
     case windowConstants.WINDOW_ON_EDIT_BOOKMARK:
-      const siteDetail = appStoreRenderer.state.getIn(['sites', action.editKey])
-
-      windowState = windowState.setIn(['bookmarkDetail'], Immutable.fromJS({
-        siteDetail: siteDetail,
-        editKey: action.editKey,
-        isBookmarkHanger: action.isHanger
-      }))
-      break
-    case windowConstants.WINDOW_ON_BOOKMARK_ADDED:
       {
-        let editKey = action.editKey
-        const site = appStoreRenderer.state.getIn(['sites', editKey])
-        let siteDetail = action.siteDetail
-
-        if (site) {
-          siteDetail = site
-        }
-
-        if (siteDetail == null) {
-          siteDetail = frameStateUtil.getActiveFrame(windowState)
-        }
-
-        siteDetail = siteDetail.set('location', UrlUtil.getLocationIfPDF(siteDetail.get('location')))
+        const siteDetail = bookmarksState.getBookmark(appStoreRenderer.state, action.editKey)
 
         windowState = windowState.setIn(['bookmarkDetail'], Immutable.fromJS({
           siteDetail: siteDetail,
+          editKey: action.editKey,
+          isBookmarkHanger: action.isHanger
+        }))
+        break
+      }
+    case windowConstants.WINDOW_ON_BOOKMARK_ADDED:
+      {
+        let bookmarkDetail = action.bookmarkDetail
+
+        if (bookmarkDetail == null) {
+          bookmarkDetail = frameStateUtil.getActiveFrame(windowState)
+        }
+
+        bookmarkDetail = bookmarkDetail.set('location', UrlUtil.getLocationIfPDF(bookmarkDetail.get('location')))
+
+        const editKey = siteUtil.getSiteKey(bookmarkDetail)
+
+        windowState = windowState.setIn(['bookmarkDetail'], Immutable.fromJS({
+          siteDetail: bookmarkDetail,
           editKey: editKey,
           isBookmarkHanger: action.isHanger,
           isAdded: true
         }))
       }
+      break
+    case windowConstants.WINDOW_ON_ADD_BOOKMARK_FOLDER:
+      windowState = windowState.setIn(['bookmarkFolderDetail'], Immutable.fromJS({
+        folderDetails: action.folderDetails,
+        closestKey: action.closestKey
+      }))
+      break
+    case windowConstants.WINDOW_ON_EDIT_BOOKMARK_FOLDER:
+      {
+        const folderDetails = bookmarkFoldersState.getFolder(appStoreRenderer.state, action.editKey)
+
+        windowState = windowState.setIn(['bookmarkFolderDetail'], Immutable.fromJS({
+          folderDetails: folderDetails,
+          editKey: action.editKey
+        }))
+        break
+      }
+    case windowConstants.WINDOW_ON_BOOKMARK_FOLDER_CLOSE:
+      windowState = windowState.delete('bookmarkFolderDetail')
       break
     case windowConstants.WINDOW_AUTOFILL_SELECTION_CLICKED:
       ipc.send('autofill-selection-clicked', action.tabId, action.value, action.frontEndId, action.index)

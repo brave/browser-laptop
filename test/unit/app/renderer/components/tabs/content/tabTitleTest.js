@@ -17,22 +17,23 @@ const tabId = 1
 const frameKey = 1
 const invalidFrameKey = 71
 
-const fakeAppStoreRenderer = {
-  state: Immutable.fromJS({
-    windows: [{
-      windowId: 1,
-      windowUUID: 'uuid'
-    }],
-    tabs: [{
-      tabId: tabId,
-      windowId: 1,
-      windowUUID: 'uuid',
-      url: url1
-    }]
-  }),
-  addChangeListener: () => {},
-  removeChangeListener: () => {}
-}
+const fakeAppStoreRenderer = Immutable.fromJS({
+  windows: [{
+    windowId: 1,
+    windowUUID: 'uuid'
+  }],
+  tabs: [{
+    tabId: tabId,
+    windowId: 1,
+    windowUUID: 'uuid',
+    url: url1
+  }],
+  tabsInternal: {
+    index: {
+      1: 0
+    }
+  }
+})
 
 const defaultWindowStore = Immutable.fromJS({
   activeFrameKey: frameKey,
@@ -56,7 +57,7 @@ const defaultWindowStore = Immutable.fromJS({
 })
 
 describe('Tabs content - Title', function () {
-  let Tab, windowStore
+  let Tab, windowStore, appStore
 
   before(function () {
     mockery.enable({
@@ -65,14 +66,15 @@ describe('Tabs content - Title', function () {
       useCleanCache: true
     })
     mockery.registerMock('electron', fakeElectron)
-    mockery.registerMock('../../../js/stores/appStoreRenderer', fakeAppStoreRenderer)
     mockery.registerMock('../../../../extensions/brave/img/tabs/loading.svg')
     mockery.registerMock('../../../../extensions/brave/img/tabs/new_session.svg')
     mockery.registerMock('../../../../extensions/brave/img/tabs/private.svg')
     mockery.registerMock('../../../../extensions/brave/img/tabs/close_btn_hover.svg')
     mockery.registerMock('../../../../extensions/brave/img/tabs/close_btn_normal.svg')
     windowStore = require('../../../../../../../js/stores/windowStore')
+    appStore = require('../../../../../../../js/stores/appStoreRenderer')
     Tab = require('../../../../../../../app/renderer/components/tabs/tab')
+    appStore.state = fakeAppStoreRenderer
   })
 
   after(function () {
@@ -154,6 +156,7 @@ describe('Tabs content - Title', function () {
         title: pageTitle1,
         pinnedLocation: true
       })
+      appStore.state = fakeAppStoreRenderer.setIn(['tabs', 0, 'pinned'], true)
       const wrapper = mount(<Tab frameKey={frameKey} />)
       assert.equal(wrapper.find('TabTitle').length, 0)
     })
