@@ -13,7 +13,6 @@ const windowState = require('./windowState')
 const { makeImmutable, isMap, isList } = require('./immutableUtil')
 // this file should eventually replace frameStateUtil
 const frameStateUtil = require('../../../js/state/frameStateUtil')
-const {isLocationBookmarked} = require('../../../js/state/siteUtil')
 
 const validateId = function (propName, id) {
   assert.ok(id, `${propName} cannot be null`)
@@ -239,6 +238,13 @@ const tabState = {
     return state.get('tabs').filter((tab) => !!tab.get('pinned'))
   },
 
+  isTabPinned: (state, tabId) => {
+    state = validateState(state)
+    tabId = validateId('tabId', tabId)
+    const tab = tabState.getByTabId(state, tabId)
+    return tab != null ? !!tab.get('pinned') : false
+  },
+
   getNonPinnedTabs: (state) => {
     state = validateState(state)
     return state.get('tabs').filter((tab) => !tab.get('pinned'))
@@ -447,8 +453,9 @@ const tabState = {
       return state
     }
 
+    const bookmarkUtil = require('../lib/bookmarkUtil')
     const frameLocation = action.getIn(['frame', 'location'])
-    const frameBookmarked = isLocationBookmarked(state, frameLocation)
+    const frameBookmarked = bookmarkUtil.isLocationBookmarked(state, frameLocation)
     const frameValue = action.get('frame').set('bookmarked', frameBookmarked)
     tabValue = tabValue.set('frame', makeImmutable(frameValue))
     return tabState.updateTabValue(state, tabValue)

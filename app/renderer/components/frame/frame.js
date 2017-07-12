@@ -30,7 +30,6 @@ const tabMessageBoxState = require('../../../common/state/tabMessageBoxState')
 
 // Utils
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
-const siteUtil = require('../../../../js/state/siteUtil')
 const UrlUtil = require('../../../../js/lib/urlutil')
 const cx = require('../../../../js/lib/classSet')
 const urlParse = require('../../../common/urlParse')
@@ -49,6 +48,8 @@ const {isFocused} = require('../../currentWindow')
 const debounce = require('../../../../js/lib/debounce')
 const locale = require('../../../../js/l10n')
 const imageUtil = require('../../../../js/lib/imageUtil')
+const historyUtil = require('../../../common/lib/historyUtil')
+const siteUtil = require('../../../../js/state/siteUtil')
 
 // Constants
 const settings = require('../../../../js/constants/settings')
@@ -624,7 +625,7 @@ class Frame extends React.Component {
         // with setTitle. We either need to delay this call until the title is
         // or add a way to update it
         setTimeout(() => {
-          appActions.addSite(siteUtil.getDetailFromFrame(this.frame))
+          appActions.addHistorySite(historyUtil.getDetailFromFrame(this.frame))
         }, 250)
       }
 
@@ -667,8 +668,9 @@ class Frame extends React.Component {
           errorCode: e.errorCode,
           url: e.validatedURL
         })
+        const key = siteUtil.getSiteKey(this.frame)
         appActions.loadURLRequested(this.props.tabId, 'about:error')
-        appActions.removeSite(siteUtil.getDetailFromFrame(this.frame))
+        appActions.removeHistorySite(key)
       } else if (isAborted(e.errorCode)) {
         // just stay put
       } else if (provisionLoadFailure) {

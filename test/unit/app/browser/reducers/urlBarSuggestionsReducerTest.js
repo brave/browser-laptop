@@ -6,6 +6,7 @@ const assert = require('assert')
 
 const appConstants = require('../../../../../js/constants/appConstants')
 require('../../../braveUnit')
+const siteTags = require('../../../../../js/constants/siteTags')
 
 describe('urlBarSuggestionsReducer', function () {
   let urlBarSuggestionsReducer
@@ -43,13 +44,15 @@ describe('urlBarSuggestionsReducer', function () {
   })
 
   const site1 = {
-    location: 'https://brave.com'
+    location: 'https://brave.com',
+    type: siteTags.BOOKMARK
   }
 
   const initState = Immutable.fromJS({
-    sites: {
+    bookmarks: {
       'key': site1
-    }
+    },
+    historySites: {}
   })
 
   describe('APP_SET_STATE', function () {
@@ -60,9 +63,27 @@ describe('urlBarSuggestionsReducer', function () {
       assert.deepEqual(this.siteSuggestionsStub.init.args[0][0], [site1])
     })
   })
-  describe('APP_ADD_SITE', function () {
+  describe('APP_ADD_BOOKMARK', function () {
     it('adds a site in the suggestions lib', function () {
-      const newState = urlBarSuggestionsReducer(initState, {actionType: appConstants.APP_ADD_SITE, siteDetail: site1})
+      const newState = urlBarSuggestionsReducer(initState, {actionType: appConstants.APP_ADD_BOOKMARK, siteDetail: site1})
+      const callCount = this.siteSuggestionsStub.add.calledOnce
+      assert.equal(callCount, 1)
+      assert.deepEqual(this.siteSuggestionsStub.add.args[0][0], site1)
+      assert.deepEqual(newState, initState)
+    })
+  })
+  describe('APP_ADD_HISTORY_SITE', function () {
+    it('adds a site in the suggestions lib', function () {
+      const newState = urlBarSuggestionsReducer(initState, {actionType: appConstants.APP_ADD_HISTORY_SITE, siteDetail: site1})
+      const callCount = this.siteSuggestionsStub.add.calledOnce
+      assert.equal(callCount, 1)
+      assert.deepEqual(this.siteSuggestionsStub.add.args[0][0], site1)
+      assert.deepEqual(newState, initState)
+    })
+  })
+  describe('APP_EDIT_BOOKMARK', function () {
+    it('adds a site in the suggestions lib', function () {
+      const newState = urlBarSuggestionsReducer(initState, {actionType: appConstants.APP_EDIT_BOOKMARK, siteDetail: site1})
       const callCount = this.siteSuggestionsStub.add.calledOnce
       assert.equal(callCount, 1)
       assert.deepEqual(this.siteSuggestionsStub.add.args[0][0], site1)
