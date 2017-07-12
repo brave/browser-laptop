@@ -93,7 +93,7 @@ module.exports.getSiteDataFromRecord = (record, appState, records) => {
   }
 
   let tag
-  let siteProps = Object.assign(
+  const siteProps = Object.assign(
     {},
     existingObjectData && existingObjectData.toJS(),
     record.historySite,
@@ -101,6 +101,10 @@ module.exports.getSiteDataFromRecord = (record, appState, records) => {
     record.bookmark && record.bookmark.site,
     {objectId}
   )
+  if (siteProps.customTitle === '') {
+    // browser-laptop UI expects the customTitle field to not exist if it is empty
+    delete siteProps.customTitle
+  }
   if (record.objectData === 'bookmark') {
     const existingFolderId = existingObjectData && existingObjectData.get('folderId')
     if (existingFolderId) {
@@ -116,8 +120,10 @@ module.exports.getSiteDataFromRecord = (record, appState, records) => {
     if (parentFolderObjectId && parentFolderObjectId.length > 0) {
       siteProps.parentFolderId =
         getFolderIdByObjectId(new Immutable.List(parentFolderObjectId), appState, records)
-    } else if (siteProps.hideInToolbar === true) {
-      siteProps.parentFolderId = -1
+    } else {
+      // Null or empty parentFolderObjectId on a record corresponds to
+      // a top-level bookmark. -1 indicates a hidden bookmark.
+      siteProps.parentFolderId = siteProps.hideInToolbar ? -1 : 0
     }
   }
   const siteDetail = new Immutable.Map(pickFields(siteProps, SITE_FIELDS))
