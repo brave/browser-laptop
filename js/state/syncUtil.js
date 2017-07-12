@@ -120,8 +120,10 @@ module.exports.getSiteDataFromRecord = (record, appState, records) => {
     if (parentFolderObjectId && parentFolderObjectId.length > 0) {
       siteProps.parentFolderId =
         getFolderIdByObjectId(new Immutable.List(parentFolderObjectId), appState, records)
-    } else if (siteProps.hideInToolbar === true) {
-      siteProps.parentFolderId = -1
+    } else {
+      // Null or empty parentFolderObjectId on a record corresponds to
+      // a top-level bookmark. -1 indicates a hidden bookmark.
+      siteProps.parentFolderId = siteProps.hideInToolbar ? -1 : 0
     }
   }
   const siteDetail = new Immutable.Map(pickFields(siteProps, SITE_FIELDS))
