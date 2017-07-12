@@ -88,7 +88,9 @@ class MessageBox extends React.Component {
     const newButtons = []
 
     for (let index = (buttons.size - 1); index > -1; index--) {
-      newButtons.push(<BrowserButton l10nId={buttons.get(index)}
+      newButtons.push(<BrowserButton
+        groupedItem
+        l10nId={buttons.get(index)}
         testId={index === 0 ? 'primaryColor' : 'secondaryColor'}
         primaryColor={index === 0}
         secondaryColor={index !== 0}
