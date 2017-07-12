@@ -4,13 +4,18 @@
 
 const Immutable = require('immutable')
 
+// State
+const bookmarksState = require('../state/bookmarksState')
+const tabState = require('../state/tabState')
+
 // Constants
 const dragTypes = require('../../../js/constants/dragTypes')
 const {bookmarksToolbarMode} = require('../constants/settingsEnums')
 const settings = require('../../../js/constants/settings')
+const siteTags = require('../../../js/constants/siteTags')
 
 // Utils
-const siteUtil = require('../../../js/state/siteUtil')
+const bookmarkLocationCache = require('../cache/bookmarkLocationCache')
 const {calculateTextWidth} = require('../../../js/lib/textCalculator')
 const {iconSize} = require('../../../js/constants/config')
 const {getSetting} = require('../../../js/settings')
@@ -18,13 +23,7 @@ const {getSetting} = require('../../../js/settings')
 // Styles
 const globalStyles = require('../../renderer/components/styles/global')
 
-function bookmarkHangerHeading (editMode, isFolder, isAdded) {
-  if (isFolder) {
-    return editMode
-      ? 'bookmarkFolderEditing'
-      : 'bookmarkFolderAdding'
-  }
-
+const bookmarkHangerHeading = (editMode, isAdded) => {
   if (isAdded) {
     return 'bookmarkAdded'
   }
@@ -34,19 +33,8 @@ function bookmarkHangerHeading (editMode, isFolder, isAdded) {
     : 'bookmarkCreateNew'
 }
 
-const displayBookmarkName = (detail) => {
-  const customTitle = detail.get('customTitle')
-  if (customTitle !== undefined && customTitle !== '') {
-    return customTitle || ''
-  }
-  return detail.get('title') || ''
-}
-
-const isBookmarkNameValid = (title, location, isFolder, customTitle) => {
-  const newTitle = title || customTitle
-  return isFolder
-    ? (newTitle != null && newTitle !== 0) && newTitle.trim().length > 0
-    : location != null && location.trim().length > 0
+const isBookmarkNameValid = (location) => {
+  return location != null && location.trim().length > 0
 }
 
 const showOnlyText = () => {
@@ -77,23 +65,17 @@ const getDNDBookmarkData = (state, bookmarkKey) => {
   return data.get('draggingOverKey') === bookmarkKey ? data : Immutable.Map()
 }
 
-let oldSites
+let oldBookmarks
 let lastValue
 let lastWidth
 const getToolbarBookmarks = (state) => {
-  const sites = state.get('sites', Immutable.List())
+  const bookmarks = bookmarksState.getBookmarksWithFolders(state)
   const windowWidth = window.innerWidth
-
-  if (sites === oldSites && lastWidth === windowWidth && lastValue) {
+  if (bookmarks === oldBookmarks && lastWidth === windowWidth && lastValue) {
     return lastValue
   }
-
-  oldSites = sites
+  oldBookmarks = bookmarks
   lastWidth = windowWidth
-
-  const noParentItems = siteUtil.getBookmarks(sites)
-    .filter((bookmark) => !bookmark.get('parentFolderId'))
-    .sort(siteUtil.siteSort)
 
   let widthAccountedFor = 0
 
@@ -123,40 +105,33 @@ const getToolbarBookmarks = (state) => {
 
   // Loop through until we fill up the entire bookmark toolbar width
   let i = 0
-  for (let bookmark of noParentItems) {
-    const current = bookmark[1]
-
+  for (let bookmark of bookmarks) {
     let iconWidth
 
     if (onlyText) {
       iconWidth = 0
-    } else if (textAndFavicon || current.get('folderId')) {
+    } else if (textAndFavicon || bookmark.get('folderId')) {
       iconWidth = iconSize + parseInt(globalStyles.spacing.bookmarksItemMargin, 10)
     } else if (onlyFavicon) {
       iconWidth = iconSize
     }
 
-    const currentChevronWidth = current.get('folderId') ? chevronWidth : 0
-
+    const currentChevronWidth = bookmark.get('folderId') ? chevronWidth : 0
+    const text = bookmark.get('title') || bookmark.get('location')
     let extraWidth
 
     if (onlyText) {
-      const text = current.get('customTitle') || current.get('title') || current.get('location')
-
       extraWidth = padding + calculateTextWidth(text, `${fontSize} ${fontFamily}`)
 
-      if (current.get('folderId')) {
+      if (bookmark.get('folderId')) {
         extraWidth += currentChevronWidth
       }
     } else if (textAndFavicon) {
-      const text = current.get('customTitle') || current.get('title') || current.get('location')
-
       extraWidth = padding + iconWidth + calculateTextWidth(text, `${fontSize} ${fontFamily}`) + currentChevronWidth
     } else if (onlyFavicon) {
       extraWidth = padding + iconWidth + currentChevronWidth
 
-      if (current.get('folderId')) {
-        const text = current.get('customTitle') || current.get('title') || current.get('location')
+      if (bookmark.get('folderId')) {
         extraWidth += calculateTextWidth(text, `${fontSize} ${fontFamily}`)
       }
     }
@@ -175,19 +150,100 @@ const getToolbarBookmarks = (state) => {
   }
 
   lastValue = {
-    visibleBookmarks: noParentItems.take(i).map((item, index) => index).toList(),
+    visibleBookmarks: bookmarks.take(i).map((item) => item.get('key')).toList(),
     // Show at most 100 items in the overflow menu
-    hiddenBookmarks: noParentItems.skip(i).take(100).map((item, index) => index).toList()
+    hiddenBookmarks: bookmarks.skip(i).take(100).map((item) => item.get('key')).toList()
   }
+
   return lastValue
+}
+
+const getDetailFromFrame = (frame) => {
+  return Immutable.fromJS({
+    location: frame.get('location'),
+    title: frame.get('title'),
+    partitionNumber: frame.get('partitionNumber'),
+    favicon: frame.get('icon'),
+    themeColor: frame.get('themeColor') || frame.get('computedThemeColor')
+  })
+}
+
+/**
+ * Checks if a location is bookmarked.
+ *
+ * @param state The application state Immutable map
+ * @param {string} location
+ * @return {boolean}
+ */
+const isLocationBookmarked = (state, location) => {
+  const bookmarks = bookmarksState.getBookmarks(state)
+  const siteKeys = bookmarkLocationCache.getCacheKey(state, location)
+
+  if (siteKeys.isEmpty()) {
+    return false
+  }
+
+  return siteKeys.some(key => bookmarks.has(key))
+}
+
+/**
+ * Converts a siteDetail to createProperties format
+ * @param {Object} bookmark - A bookmark detail as per app state
+ * @return {Object} A createProperties plain JS object, not ImmutableJS
+ */
+const toCreateProperties = (bookmark) => {
+  return {
+    url: bookmark.get('location'),
+    partitionNumber: bookmark.get('partitionNumber')
+  }
+}
+
+/**
+ * Filters bookmarks relative to a parent folder
+ * @param state - The application state
+ * @param folderKey The folder key to filter to
+ */
+const getBookmarksByParentId = (state, folderKey) => {
+  const bookmarks = bookmarksState.getBookmarks(state)
+  if (!folderKey) {
+    return bookmarks
+  }
+
+  return bookmarks.filter((bookmark) => bookmark.get('parentFolderId') === folderKey)
+}
+
+const isBookmark = (bookmark) => {
+  return bookmark.get('type') === siteTags.BOOKMARK
+}
+
+const updateTabBookmarked = (state, tabValue) => {
+  if (!tabValue || !tabValue.get('tabId')) {
+    return state
+  }
+  const bookmarked = isLocationBookmarked(state, tabValue.get('url'))
+  return tabState.updateTabValue(state, tabValue.set('bookmarked', bookmarked))
+}
+
+const updateActiveTabBookmarked = (state) => {
+  const tab = tabState.getActiveTab(state)
+  if (!tab) {
+    return state
+  }
+  return updateTabBookmarked(state, tab)
 }
 
 module.exports = {
   bookmarkHangerHeading,
-  displayBookmarkName,
   isBookmarkNameValid,
   showOnlyFavicon,
   showFavicon,
   getDNDBookmarkData,
-  getToolbarBookmarks
+  getToolbarBookmarks,
+  getDetailFromFrame,
+  isLocationBookmarked,
+  toCreateProperties,
+  getBookmarksByParentId,
+  isBookmark,
+  updateTabBookmarked,
+  updateActiveTabBookmarked
 }

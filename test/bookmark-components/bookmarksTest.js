@@ -1,7 +1,6 @@
 /* global describe, it, before, beforeEach */
 
 const Brave = require('../lib/brave')
-const Immutable = require('immutable')
 const {homepageInput, urlInput, navigator, navigatorBookmarked, navigatorNotBookmarked, doneButton, removeButton, bookmarkNameInput, bookmarkLocationInput} = require('../lib/selectors')
 const siteTags = require('../../js/constants/siteTags')
 
@@ -87,7 +86,7 @@ describe('bookmark tests', function () {
           .windowByUrl(Brave.browserWindowUrl)
           .waitUntil(function () {
             return this.getAppState().then((val) => {
-              return val.value.sites['https://www.brave.xn--com-8cd/|0|0'].customTitle === 'https://www.brave.xn--com-8cd/'
+              return val.value.sites['https://www.brave.xn--com-8cd/|0|0'].title === 'https://www.brave.xn--com-8cd/'
             })
           })
       })
@@ -303,12 +302,12 @@ describe('bookmark tests', function () {
       this.page2Url = Brave.server.url('page2.html')
       yield setup(this.app.client)
       yield this.app.client
-        .addSite({
+        .addBookmark({
           location: this.page1Url,
           folderId: 1,
           parentFolderId: 0,
-          tags: [siteTags.BOOKMARK]
-        }, siteTags.BOOKMARK)
+          type: siteTags.BOOKMARK
+        })
     })
 
     it('on new active tabs', function * () {
@@ -332,9 +331,18 @@ describe('bookmark tests', function () {
   })
 
   describe('menu behavior', function () {
+    // Skip this test if we are not on Windows,
+    // we only generate menu on windows
+    const isWindows = process.platform === 'win32'
+
     Brave.beforeAll(this)
 
     before(function * () {
+      if (!isWindows) {
+        this.skip()
+        return
+      }
+
       yield setup(this.app.client)
     })
 
@@ -342,12 +350,12 @@ describe('bookmark tests', function () {
       const folderName = 'bookmark-folder-rebuild-menu-demo'
 
       yield this.app.client
-        .addSite({
+        .addBookmarkFolder({
           customTitle: folderName,
           folderId: 1,
           parentFolderId: 0,
-          tags: [siteTags.BOOKMARK_FOLDER]
-        }, siteTags.BOOKMARK_FOLDER)
+          type: siteTags.BOOKMARK_FOLDER
+        })
         .waitUntil(function () {
           return this.getAppState().then((val) => {
             const bookmarksMenu = val.value.menu.template.find((item) => {
@@ -368,12 +376,12 @@ describe('bookmark tests', function () {
       const bookmarkTitle = 'bookmark-rebuild-menu-demo'
 
       yield this.app.client
-        .addSite({
+        .addBookmark({
           lastAccessedTime: 456,
-          tags: [siteTags.BOOKMARK],
+          type: siteTags.BOOKMARK,
           location: 'https://brave.com',
           title: bookmarkTitle
-        }, siteTags.BOOKMARK)
+        })
         .waitUntil(function () {
           return this.getAppState().then((val) => {
             const bookmarksMenu = val.value.menu.template.find((item) => {
@@ -393,22 +401,19 @@ describe('bookmark tests', function () {
     it('rebuilds the menu when add a list of items', function * () {
       const bookmarkTitle = 'bookmark-rebuild-menu-demo'
       const folderName = 'bookmark-folder-rebuild-menu-demo'
-      const sites = Immutable.fromJS([
-        {
+      yield this.app.client
+        .addBookmarkFolder({
           customTitle: folderName,
           folderId: 1,
           parentFolderId: 0,
-          tags: [siteTags.BOOKMARK_FOLDER]
-        },
-        {
+          type: siteTags.BOOKMARK_FOLDER
+        })
+        .addBookmark({
           lastAccessedTime: 123,
           title: bookmarkTitle,
           location: 'https://brave.com',
-          tags: [siteTags.BOOKMARK]
-        }
-      ])
-      yield this.app.client
-        .addSiteList(sites)
+          type: siteTags.BOOKMARK
+        })
         .waitForBrowserWindow()
         .waitUntil(function () {
           return this.getAppState().then((val) => {

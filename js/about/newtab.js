@@ -5,26 +5,34 @@
 const path = require('path')
 const React = require('react')
 const Immutable = require('immutable')
-const messages = require('../constants/messages')
-const HTML5Backend = require('react-dnd-html5-backend')
 const {DragDropContext} = require('react-dnd')
+const HTML5Backend = require('react-dnd-html5-backend')
+
+// Components
 const Stats = require('./newTabComponents/stats')
 const Clock = require('./newTabComponents/clock')
 const Block = require('./newTabComponents/block')
 const SiteRemovalNotification = require('./newTabComponents/siteRemovalNotification')
 const FooterInfo = require('./newTabComponents/footerInfo')
-const aboutActions = require('./aboutActions')
-const siteUtil = require('../state/siteUtil')
-const urlutils = require('../lib/urlutil')
-const siteTags = require('../constants/siteTags')
-const config = require('../constants/config')
-const backgrounds = require('../data/backgrounds')
-const {random} = require('../../app/common/lib/randomUtil')
 const NewPrivateTab = require('./newprivatetab')
+
+// Constants
+const messages = require('../constants/messages')
+const config = require('../constants/config')
+
+// Actions
+const aboutActions = require('./aboutActions')
 const windowActions = require('../actions/windowActions')
 
+// Data
+const backgrounds = require('../data/backgrounds')
+
+// Utils
+const urlutils = require('../lib/urlutil')
+const {random} = require('../../app/common/lib/randomUtil')
 const ipc = window.chrome.ipcRenderer
 
+// Styles
 require('../../less/about/newtab.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
@@ -32,15 +40,16 @@ class NewTabPage extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      showSiteRemovalNotification: false,
+      showNotification: false,
       imageLoadFailed: false,
       updatedStamp: undefined,
       showEmptyPage: true,
       showImages: false,
       backgroundImage: undefined
     }
-    ipc.on(messages.NEWTAB_DATA_UPDATED, (e, newTabData) => {
-      const data = Immutable.fromJS(newTabData || {})
+
+    ipc.on(messages.NEWTAB_DATA_UPDATED, (e, newData) => {
+      let data = Immutable.fromJS(newData || {})
       const updatedStamp = data.getIn(['newTabDetail', 'updatedStamp'])
 
       // Only update if the data has changed.
@@ -63,83 +72,73 @@ class NewTabPage extends React.Component {
       })
     })
   }
+
   get showImages () {
     return this.state.showImages && !!this.state.backgroundImage
   }
+
   get randomBackgroundImage () {
     const image = Object.assign({}, backgrounds[Math.floor(random() * backgrounds.length)])
     image.style = {backgroundImage: 'url(' + image.source + ')'}
     return image
   }
+
   get fallbackImage () {
     const image = Object.assign({}, config.newtab.fallbackImage)
     const pathToImage = path.join(__dirname, '..', '..', image.source)
     image.style = {backgroundImage: 'url(' + `${pathToImage}` + ')'}
     return image
   }
+
   get topSites () {
-    return this.state.newTabData.getIn(['newTabDetail', 'sites']) || Immutable.List()
+    return this.state.newTabData.getIn(['newTabDetail', 'sites'])
   }
+
   get pinnedTopSites () {
-    return (this.state.newTabData.getIn(['newTabDetail', 'pinnedTopSites']) || Immutable.List()).setSize(18)
+    return this.state.newTabData.getIn(['newTabDetail', 'pinnedTopSites'], Immutable.List())
   }
+
   get ignoredTopSites () {
-    return this.state.newTabData.getIn(['newTabDetail', 'ignoredTopSites']) || Immutable.List()
+    return this.state.newTabData.getIn(['newTabDetail', 'ignoredTopSites'], Immutable.List())
   }
+
   get gridLayoutSize () {
-    return this.state.newTabData.getIn(['newTabDetail', 'gridLayoutSize']) || 'small'
+    return this.state.newTabData.getIn(['newTabDetail', 'gridLayoutSize'], 'small')
   }
-  isPinned (siteProps) {
-    return this.pinnedTopSites.filter((site) => {
-      if (!site || !site.get) return false
-      return site.get('location') === siteProps.get('location') &&
-        site.get('partitionNumber') === siteProps.get('partitionNumber')
-    }).size > 0
+
+  isPinned (siteKey) {
+    return this.pinnedTopSites.find(site => site.get('key') === siteKey)
   }
-  isBookmarked (siteProps) {
-    return siteUtil.isBookmark(siteProps)
-  }
+
   get gridLayout () {
     const sizeToCount = {large: 18, medium: 12, small: 6}
     const count = sizeToCount[this.gridLayoutSize]
-    return this.topSites.take(count)
-  }
-  showSiteRemovalNotification () {
-    this.setState({
-      showSiteRemovalNotification: true
-    })
-  }
-  hideSiteRemovalNotification () {
-    this.setState({
-      showSiteRemovalNotification: false
-    })
-  }
 
-  /**
-   * save number of rows on store. gridsLayout starts with 3 rows (large).
-   * Rows are reduced at each click and then reset to three again
-   */
-  onChangeGridLayout () {
-    const gridLayoutSize = this.gridLayoutSize
-    const changeGridSizeTo = (size) => aboutActions.setNewTabDetail({gridLayoutSize: size})
+    let sites = this.pinnedTopSites.take(count)
 
-    if (gridLayoutSize === 'large') {
-      changeGridSizeTo('medium')
-    } else if (gridLayoutSize === 'medium') {
-      changeGridSizeTo('small')
-    } else if (gridLayoutSize === 'small') {
-      changeGridSizeTo('large')
-    } else {
-      changeGridSizeTo('large')
+    if (sites.size < count) {
+      sites = sites.concat(this.topSites.take(count - sites.size))
     }
 
-    return gridLayoutSize
+    return sites
   }
 
-  onDraggedSite (currentId, finalId) {
+  showNotification () {
+    this.setState({
+      showNotification: true
+    })
+  }
+
+  hideSiteRemovalNotification () {
+    this.setState({
+      showNotification: false
+    })
+  }
+
+  onDraggedSite (siteKey, destinationKey) {
     let gridSites = this.topSites
-    const currentPosition = gridSites.filter((site) => site.get('location') === currentId).get(0)
-    const finalPosition = gridSites.filter((site) => site.get('location') === finalId).get(0)
+    const currentPosition = gridSites.find(site => site.get('key') === siteKey)
+    const finalPosition = gridSites.find(site => site.get('key') === destinationKey)
 
     const currentPositionIndex = gridSites.indexOf(currentPosition)
     const finalPositionIndex = gridSites.indexOf(finalPosition)
@@ -154,63 +153,57 @@ class NewTabPage extends React.Component {
     pinnedTopSites = pinnedTopSites.splice(finalPositionIndex, 0, currentPosition)
 
     // If site is pinned, update pinnedTopSites list
-    const newTabState = {}
+    let newTabState = Immutable.Map()
     if (this.isPinned(currentPosition)) {
-      newTabState.pinnedTopSites = pinnedTopSites
+      newTabState = newTabState.set('pinnedTopSites', pinnedTopSites)
     }
-    newTabState.sites = gridSites
+    newTabState = newTabState.set('sites', gridSites)
 
     // Only update if there was an actual change
-    const stateDiff = Immutable.fromJS(newTabState)
     const existingState = this.state.newTabData || Immutable.fromJS({})
-    const proposedState = existingState.mergeIn(['newTabDetail'], stateDiff)
+    const proposedState = existingState.mergeIn(['newTabDetail'], newTabState)
     if (!proposedState.isSubset(existingState)) {
-      aboutActions.setNewTabDetail(stateDiff)
+      aboutActions.setNewTabDetail(newTabState)
     }
   }
 
-  onToggleBookmark (siteProps) {
-    const siteDetail = siteUtil.getDetailFromFrame(siteProps, siteTags.BOOKMARK)
-    const editing = this.isBookmarked(siteProps)
-    const key = siteUtil.getSiteKey(siteDetail)
-
-    if (editing) {
-      windowActions.editBookmark(false, key)
+  onToggleBookmark (site) {
+    if (site.get('bookmarked')) {
+      windowActions.editBookmark(false, site.get('key'))
     } else {
-      windowActions.onBookmarkAdded(false, key)
+      windowActions.onBookmarkAdded(false, site)
     }
   }
 
-  onPinnedTopSite (siteProps) {
-    const currentPosition = this.topSites.filter((site) => siteProps.get('location') === site.get('location')).get(0)
-    const currentPositionIndex = this.topSites.indexOf(currentPosition)
+  onPinnedTopSite (siteKey) {
+    let pinnedTopSites = this.pinnedTopSites
+    const siteProps = this.topSites.find(site => site.get('key') === siteKey)
 
-    // If pinned, leave it null. Otherwise stores site on ignoredTopSites list, retaining the same position
-    let pinnedTopSites = this.pinnedTopSites.splice(currentPositionIndex, 1, this.isPinned(siteProps) ? null : siteProps)
+    if (this.isPinned(siteKey)) {
+      pinnedTopSites = pinnedTopSites.filter(site => site.get('key') !== siteKey)
+    } else {
+      pinnedTopSites = pinnedTopSites.push(siteProps)
+    }
 
-    aboutActions.setNewTabDetail({pinnedTopSites: pinnedTopSites})
+    aboutActions.setNewTabDetail({pinnedTopSites: pinnedTopSites}, true)
   }
 
-  onIgnoredTopSite (siteProps) {
-    this.showSiteRemovalNotification()
+  onIgnoredTopSite (siteKey) {
+    this.showNotification(siteKey)
 
     // If a pinnedTopSite is ignored, remove it from the pinned list as well
     const newTabState = {}
-    if (this.isPinned(siteProps)) {
-      const gridSites = this.topSites
-      const currentPosition = gridSites.filter((site) => siteProps.get('location') === site.get('location')).get(0)
-      const currentPositionIndex = gridSites.indexOf(currentPosition)
-      const pinnedTopSites = this.pinnedTopSites.splice(currentPositionIndex, 1, null)
-      newTabState.pinnedTopSites = pinnedTopSites
+    if (this.isPinned(siteKey)) {
+      newTabState.pinnedTopSites = this.pinnedTopSites.filter(site => site.get('key') !== siteKey)
     }
 
-    newTabState.ignoredTopSites = this.ignoredTopSites.push(siteProps)
+    newTabState.ignoredTopSites = this.ignoredTopSites.push(siteKey)
     aboutActions.setNewTabDetail(newTabState, true)
   }
 
   onUndoIgnoredTopSite () {
     // Remove last List's entry
-    const ignoredTopSites = this.ignoredTopSites.splice(-1, 1)
+    const ignoredTopSites = this.ignoredTopSites.pop()
     aboutActions.setNewTabDetail({ignoredTopSites: ignoredTopSites}, true)
     this.hideSiteRemovalNotification()
   }
@@ -236,6 +229,12 @@ class NewTabPage extends React.Component {
     })
   }
 
+  getLetterFromUrl (url) {
+    const hostname = urlutils.getHostname(url.get('location'), true)
+    const name = url.get('title') || hostname || '?'
+    return name.charAt(0).toUpperCase()
+  }
+
   render () {
     // don't render if user prefers an empty page
     if (this.state.showEmptyPage && !this.props.isIncognito) {
@@ -249,11 +248,6 @@ class NewTabPage extends React.Component {
     // don't render until object is found
     if (!this.state.newTabData) {
       return null
-    }
-    const getLetterFromUrl = (url) => {
-      const hostname = urlutils.getHostname(url.get('location'), true)
-      const name = url.get('title') || hostname || '?'
-      return name.charAt(0).toUpperCase()
     }
     const gridLayout = this.gridLayout
     const backgroundProps = {}
@@ -278,24 +272,24 @@ class NewTabPage extends React.Component {
           <div className='topSitesContainer'>
             <nav className='topSitesGrid'>
               {
-                gridLayout.map((site) =>
+                gridLayout.map(site =>
                   <Block
                     key={site.get('location')}
-                    id={site.get('location')}
+                    id={site.get('key')}
                     title={site.get('title')}
                     href={site.get('location')}
                     favicon={
                       site.get('favicon') == null
-                      ? getLetterFromUrl(site)
+                      ? this.getLetterFromUrl(site)
                       : <img src={site.get('favicon')} />
                     }
                     style={{backgroundColor: site.get('themeColor')}}
                     onToggleBookmark={this.onToggleBookmark.bind(this, site)}
-                    onPinnedTopSite={this.onPinnedTopSite.bind(this, site)}
-                    onIgnoredTopSite={this.onIgnoredTopSite.bind(this, site)}
+                    onPinnedTopSite={this.onPinnedTopSite.bind(this, site.get('key'))}
+                    onIgnoredTopSite={this.onIgnoredTopSite.bind(this, site.get('key'))}
                     onDraggedSite={this.onDraggedSite.bind(this)}
-                    isPinned={this.isPinned(site)}
-                    isBookmarked={this.isBookmarked(site)}
+                    isPinned={this.isPinned(site.get('key'))}
+                    isBookmarked={site.get('bookmarked')}
                   />
                 )
               }
@@ -303,7 +297,7 @@ class NewTabPage extends React.Component {
           </div>
         </main>
         {
-          this.state.showSiteRemovalNotification
+          this.state.showNotification
             ? <SiteRemovalNotification
               onUndoIgnoredTopSite={this.onUndoIgnoredTopSite.bind(this)}
               onRestoreAll={this.onRestoreAll.bind(this)}

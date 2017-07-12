@@ -4,33 +4,35 @@
 
 const React = require('react')
 const Immutable = require('immutable')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../common/dialog')
 const AddEditBookmarkForm = require('./addEditBookmarkForm')
+const {
+  CommonFormBookmarkHanger,
+  CommonFormBottomWrapper
+} = require('../common/commonForm')
+
+// States
+const bookmarksState = require('../../../common/state/bookmarksState')
+const bookmarkFoldersState = require('../../../common/state/bookmarkFoldersState')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
 const windowActions = require('../../../../js/actions/windowActions')
 
 // Constants
-const siteTags = require('../../../../js/constants/siteTags')
 const settings = require('../../../../js/constants/settings')
 
 // Utils
 const cx = require('../../../../js/lib/classSet')
-const siteUtil = require('../../../../js/state/siteUtil')
 const {getSetting} = require('../../../../js/settings')
-const {bookmarkHangerHeading, displayBookmarkName, isBookmarkNameValid} = require('../../../common/lib/bookmarkUtil')
+const {bookmarkHangerHeading, isBookmarkNameValid} = require('../../../common/lib/bookmarkUtil')
 
-const {StyleSheet, css} = require('aphrodite/no-important')
+// Styles
 const globalStyles = require('../styles/global')
-
-const {
-  CommonFormBookmarkHanger,
-  CommonFormBottomWrapper
-} = require('../common/commonForm')
 
 class AddEditBookmarkHanger extends React.Component {
   constructor (props) {
@@ -53,7 +55,7 @@ class AddEditBookmarkHanger extends React.Component {
   }
 
   addBookmark () {
-    if (!this.props.isAdded || this.props.isFolder) {
+    if (!this.props.isAdded) {
       return false
     }
 
@@ -62,10 +64,10 @@ class AddEditBookmarkHanger extends React.Component {
     }
 
     appActions.addBookmark(Immutable.fromJS({
-      title: this.props.bookmarkName,
+      title: this.props.title,
       location: this.props.location,
       folderId: this.props.parentId
-    }), siteTags.BOOKMARK)
+    }))
   }
 
   onViewBookmarks () {
@@ -84,30 +86,19 @@ class AddEditBookmarkHanger extends React.Component {
     // used in renderer
     props.isModal = ownProps.isModal
     props.withHomeButton = getSetting(settings.SHOW_HOME_BUTTON)
-    // Fake a folderId property so that the bookmark is considered a bookmark folder.
-    // This is ImmutableJS so it doesn't actually set a value, it just returns a new one.
-    props.isFolder = siteUtil.isFolder(siteDetail.set('folderId', 0))
-    props.heading = bookmarkHangerHeading(editMode, props.isFolder, isAdded)
+    props.heading = bookmarkHangerHeading(editMode, isAdded)
     props.location = siteDetail.get('location')
     props.parentFolderId = siteDetail.get('parentFolderId')
     props.partitionNumber = siteDetail.get('partitionNumber')
-    props.bookmarkName = displayBookmarkName(siteDetail)
-    props.currentTitle = siteDetail.get('title')
-    props.isBookmarkNameValid = isBookmarkNameValid(
-      siteDetail.get('title'),
-      siteDetail.get('location'),
-      props.isFolder,
-      siteDetail.get('customTitle')
-    )
-    props.folders = siteUtil.getFolders(state.get('sites'), siteDetail.get('folderId')) // TODO (nejc) improve, primitives only
+    props.title = siteDetail.get('title')
+    props.isBookmarkNameValid = isBookmarkNameValid(siteDetail.get('location'))
+    props.folders = bookmarkFoldersState.getFoldersWithoutKey(state, siteDetail.get('folderId')) // TODO (nejc) improve, primitives only
     props.editKey = bookmarkDetail.get('editKey', null)
     props.closestKey = bookmarkDetail.get('closestKey', null)
 
     // used in functions
     props.isAdded = isAdded
-    props.hasBookmarks = state.get('sites').some(
-      (site) => siteUtil.isBookmark(site) || siteUtil.isFolder(site)
-    )
+    props.hasBookmarks = bookmarksState.getBookmarks(state).size > 0 || bookmarkFoldersState.getFolders(state).size > 0
 
     return props
   }
@@ -132,14 +123,12 @@ class AddEditBookmarkHanger extends React.Component {
           [css(styles.commonFormTitle)]: true
         })} data-l10n-id={this.props.heading} />
         <AddEditBookmarkForm
-          bookmarkName={this.props.bookmarkName}
-          currentTitle={this.props.currentTitle}
+          title={this.props.title}
           editKey={this.props.editKey}
           closestKey={this.props.closestKey}
           location={this.props.location}
           parentFolderId={this.props.parentFolderId}
           partitionNumber={this.props.partitionNumber}
-          isFolder={this.props.isFolder}
           folders={this.props.folders}
           isAdded={this.props.isAdded}
           isDisabled={!this.props.isBookmarkNameValid}

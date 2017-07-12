@@ -61,11 +61,8 @@ const tokenizeInput = (data) => {
       return []
     }
     url = data.location
-    if (data.customTitle) {
-      parts = getPartsFromNonUrlInput(data.customTitle)
-    }
     if (data.title) {
-      parts = parts.concat(getPartsFromNonUrlInput(data.title))
+      parts = getPartsFromNonUrlInput(data.title)
     }
     if (data.tags) {
       parts = parts.concat(data.tags.map(getTagToken))

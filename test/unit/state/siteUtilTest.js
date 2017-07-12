@@ -1335,67 +1335,6 @@ describe('siteUtil', function () {
     })
   })
 
-  describe('isEquivalent', function () {
-    it('returns true if both siteDetail objects are identical', function () {
-      const siteDetail1 = Immutable.fromJS({
-        location: testUrl1,
-        partitionNumber: 0,
-        tags: [siteTags.BOOKMARK]
-      })
-      const siteDetail2 = Immutable.fromJS({
-        location: testUrl1,
-        partitionNumber: 0,
-        tags: [siteTags.BOOKMARK]
-      })
-      assert.equal(siteUtil.isEquivalent(siteDetail1, siteDetail2), true)
-    })
-    it('returns false if one object is a folder and the other is not', function () {
-      const siteDetail1 = Immutable.fromJS({
-        tags: [siteTags.BOOKMARK]
-      })
-      const siteDetail2 = Immutable.fromJS({
-        tags: [siteTags.BOOKMARK_FOLDER],
-        folderId: 1
-      })
-      assert.equal(siteUtil.isEquivalent(siteDetail1, siteDetail2), false)
-    })
-    it('returns false if both are folders and have a different folderId', function () {
-      const siteDetail1 = Immutable.fromJS({
-        tags: [siteTags.BOOKMARK_FOLDER],
-        folderId: 0
-      })
-      const siteDetail2 = Immutable.fromJS({
-        tags: [siteTags.BOOKMARK_FOLDER],
-        folderId: 1
-      })
-      assert.equal(siteUtil.isEquivalent(siteDetail1, siteDetail2), false)
-    })
-    it('returns false if both are bookmarks and have a different location', function () {
-      const siteDetail1 = Immutable.fromJS({
-        tags: [siteTags.BOOKMARK],
-        location: testUrl1
-      })
-      const siteDetail2 = Immutable.fromJS({
-        tags: [siteTags.BOOKMARK],
-        location: 'http://example.com/'
-      })
-      assert.equal(siteUtil.isEquivalent(siteDetail1, siteDetail2), false)
-    })
-    it('returns false if both are bookmarks and have a different partitionNumber', function () {
-      const siteDetail1 = Immutable.fromJS({
-        tags: [siteTags.BOOKMARK],
-        location: testUrl1,
-        partitionNumber: 0
-      })
-      const siteDetail2 = Immutable.fromJS({
-        tags: [siteTags.BOOKMARK],
-        location: testUrl2,
-        partitionNumber: 1
-      })
-      assert.equal(siteUtil.isEquivalent(siteDetail1, siteDetail2), false)
-    })
-  })
-
   describe('isFolder', function () {
     it('returns true if the input is a siteDetail and has a `BOOKMARK_FOLDER` tag and a folder ID', function () {
       const siteDetail = Immutable.fromJS({
@@ -1681,22 +1620,6 @@ describe('siteUtil', function () {
     })
     it('returns correct result for URL with hostname that is a scheme', function () {
       assert.strictEqual(siteUtil.getOrigin('http://http/test'), 'http://http')
-    })
-  })
-  describe('isPinnedTab', function () {
-    it('detects pinned tab site', function () {
-      assert.strictEqual(siteUtil.isPinnedTab(siteTags.PINNED), true)
-      assert.strictEqual(siteUtil.isPinnedTab([siteTags.PINNED]), true)
-    })
-    it('detects not pinned for no site tags', function () {
-      assert.strictEqual(siteUtil.isPinnedTab([]), false)
-    })
-    it('detects not pinned for site tags which are not PINNED', function () {
-      assert.strictEqual(siteUtil.isPinnedTab(siteTags.BOOKMARK), false)
-      assert.strictEqual(siteUtil.isPinnedTab([siteTags.BOOKMARK]), false)
-    })
-    it('detects pinned when bookmarked and pinned', function () {
-      assert.strictEqual(siteUtil.isPinnedTab([siteTags.PINNED, siteTags.BOOKMARK]), true)
     })
   })
 })

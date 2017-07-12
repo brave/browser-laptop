@@ -26,17 +26,21 @@ const locale = require('../js/l10n')
 const {getSetting} = require('./settings')
 const settings = require('./constants/settings')
 const textUtils = require('./lib/text')
-const {getPartitionFromNumber, getActiveFrame} = require('./state/frameStateUtil')
 const {isIntermediateAboutPage, isUrl, aboutUrls} = require('./lib/appUrlUtil')
 const {getBase64FromImageUrl} = require('./lib/imageUtil')
 const urlParse = require('../app/common/urlParse')
 const {getCurrentWindow} = require('../app/renderer/currentWindow')
 const extensionState = require('../app/common/state/extensionState')
 const extensionActions = require('../app/common/actions/extensionActions')
+const bookmarkUtil = require('../app/common/lib/bookmarkUtil')
+const bookmarksState = require('../app/common/state/bookmarksState')
+const historyState = require('../app/common/state/historyState')
+const frameStateUtil = require('./state/frameStateUtil')
+const platformUtil = require('../app/common/lib/platformUtil')
 const {makeImmutable} = require('../app/common/state/immutableUtil')
 
-const isDarwin = process.platform === 'darwin'
-const isLinux = process.platform === 'linux'
+const isDarwin = platformUtil.isDarwin()
+const isLinux = platformUtil.isLinux()
 
 /**
  * Obtains an add bookmark menu item
@@ -70,18 +74,18 @@ const addFolderMenuItem = (closestDestinationDetail, isParent) => {
   return {
     label: locale.translation('addFolder'),
     click: () => {
-      let siteDetail = Immutable.fromJS({ tags: [siteTags.BOOKMARK_FOLDER] })
       let closestKey = null
+      let folderDetails = Immutable.Map()
 
       if (closestDestinationDetail) {
         closestKey = siteUtil.getSiteKey(closestDestinationDetail)
 
         if (isParent) {
-          siteDetail = siteDetail.set('parentFolderId', (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
+          folderDetails = folderDetails.set('parentFolderId', (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
         }
       }
 
-      windowActions.addBookmark(siteDetail, closestKey)
+      windowActions.addBookmarkFolder(folderDetails, closestKey)
     }
   }
 }
@@ -133,8 +137,7 @@ function tabsToolbarTemplateInit (bookmarkTitle, bookmarkLink, closestDestinatio
 
   template.push(addBookmarkMenuItem('addBookmark', {
     title: bookmarkTitle,
-    location: bookmarkLink,
-    tags: [siteTags.BOOKMARK]
+    location: bookmarkLink
   }, closestDestinationDetail, isParent))
   template.push(addFolderMenuItem(closestDestinationDetail, isParent))
 
@@ -225,113 +228,158 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
   return menuUtil.sanitizeTemplateItems(template)
 }
 
-function siteDetailTemplateInit (siteDetail, activeFrame) {
-  let isHistoryEntry = false
-  let multipleHistoryEntries = false
-  let multipleBookmarks = false
-  let isFolder = false
-  let isSystemFolder = false
-  let deleteLabel
-  let deleteTag
+const getLabel = (siteDetail, type, activeFrame) => {
+  let label = ''
 
-  // TODO(bsclifton): pull this out to a method
-  if (siteUtil.isBookmark(siteDetail) && activeFrame) {
-    deleteLabel = 'deleteBookmark'
-    deleteTag = siteTags.BOOKMARK
-  } else if (siteUtil.isFolder(siteDetail)) {
-    isFolder = true
-    isSystemFolder = siteDetail.get('folderId') === 0 ||
-      siteDetail.get('folderId') === -1
-    deleteLabel = 'deleteFolder'
-    deleteTag = siteTags.BOOKMARK_FOLDER
-  } else if (siteUtil.isHistoryEntry(siteDetail)) {
-    isHistoryEntry = true
-    deleteLabel = 'deleteHistoryEntry'
-  } else if (Immutable.List.isList(siteDetail)) {
-    // Multiple bookmarks OR history entries selected
-    multipleHistoryEntries = true
-    multipleBookmarks = true
-    siteDetail.forEach((site) => {
-      if (!siteUtil.isBookmark(site)) multipleBookmarks = false
-      if (!siteUtil.isHistoryEntry(site)) multipleHistoryEntries = false
-    })
-    if (multipleBookmarks) {
-      deleteLabel = 'deleteBookmarks'
-      deleteTag = siteTags.BOOKMARK
-    } else if (multipleHistoryEntries) {
-      deleteLabel = 'deleteHistoryEntries'
+  if (Immutable.List.isList(siteDetail)) {
+    if (type === siteTags.BOOKMARK) {
+      label = 'deleteBookmarks'
+    } else if (type === siteTags.HISTORY) {
+      label = 'deleteHistoryEntries'
     }
-  } else {
-    deleteLabel = ''
+  } else if (type === siteTags.BOOKMARK && activeFrame) {
+    label = 'deleteBookmark'
+  } else if (type === siteTags.BOOKMARK_FOLDER) {
+    label = 'deleteFolder'
+  } else if (type === siteTags.HISTORY) {
+    label = 'deleteHistoryEntry'
   }
 
+  return label
+}
+
+const siteMultipleDetailTemplate = (data, type, activeFrame) => {
   const template = []
+  const label = getLabel(data, type)
 
-  if (!isFolder) {
-    if (!Immutable.List.isList(siteDetail)) {
-      const location = siteDetail.get('location')
+  let locations = []
+  let partitionNumbers = []
+  let keys = []
+  data.forEach((site) => {
+    locations.push(site.get('location'))
+    partitionNumbers.push(site.get('partitionNumber'))
+    keys.push(siteUtil.getSiteKey(site))
+  })
 
-      template.push(openInNewTabMenuItem(location, undefined, siteDetail.get('partitionNumber')),
-        openInNewPrivateTabMenuItem(location),
-        openInNewWindowMenuItem(location, undefined, siteDetail.get('partitionNumber')),
-        openInNewSessionTabMenuItem(location),
-        copyAddressMenuItem('copyLinkAddress', location),
-        CommonMenu.separatorMenuItem)
-    } else {
-      let locations = []
-      let partitionNumbers = []
-      siteDetail.forEach((site) => {
-        locations.push(site.get('location'))
-        partitionNumbers.push(site.get('partitionNumber'))
-      })
+  template.push(
+    openInNewTabMenuItem(locations, undefined, partitionNumbers),
+    openInNewPrivateTabMenuItem(locations),
+    openInNewSessionTabMenuItem(locations),
+    CommonMenu.separatorMenuItem
+  )
 
-      template.push(openInNewTabMenuItem(locations, undefined, partitionNumbers),
-        openInNewPrivateTabMenuItem(locations),
-        openInNewSessionTabMenuItem(locations),
-        CommonMenu.separatorMenuItem)
+  template.push({
+    label: locale.translation(label),
+    click: () => {
+      if (type === siteTags.BOOKMARK) {
+        appActions.removeBookmark(keys)
+      } else if (type === siteTags.HISTORY) {
+        appActions.removeHistorySite(keys)
+      }
     }
-  } else {
-    template.push(openAllInNewTabsMenuItem(appStoreRenderer.state.get('sites'), siteDetail),
-      CommonMenu.separatorMenuItem)
+  })
+
+  if (type !== siteTags.HISTORY) {
+    if (template[template.length - 1] !== CommonMenu.separatorMenuItem) {
+      template.push(CommonMenu.separatorMenuItem)
+    }
+
+    template.push(
+      addBookmarkMenuItem('addBookmark', bookmarkUtil.getDetailFromFrame(activeFrame), null, true),
+      addFolderMenuItem(null, true)
+    )
   }
 
-  if (!isSystemFolder) {
+  return template
+}
+
+const siteSingleDetailTemplate = (siteKey, type, activeFrame) => {
+  const template = []
+  const state = appStoreRenderer.state
+  let isFolder = type === siteTags.BOOKMARK_FOLDER
+  let siteDetail
+
+  if (type === siteTags.HISTORY) {
+    siteDetail = historyState.getSite(state, siteKey)
+  } else {
+    siteDetail = bookmarksState.findBookmark(state, siteKey)
+  }
+
+  const label = getLabel(siteDetail, type, activeFrame)
+
+  if (type !== siteTags.BOOKMARK_FOLDER) {
+    const location = siteDetail.get('location')
+
+    template.push(
+      openInNewTabMenuItem(location, undefined, siteDetail.get('partitionNumber')),
+      openInNewPrivateTabMenuItem(location),
+      openInNewWindowMenuItem(location, undefined, siteDetail.get('partitionNumber')),
+      openInNewSessionTabMenuItem(location),
+      copyAddressMenuItem('copyLinkAddress', location),
+      CommonMenu.separatorMenuItem
+    )
+  } else {
+    template.push(openAllInNewTabsMenuItem(siteDetail), CommonMenu.separatorMenuItem)
+  }
+
+  if (siteDetail.get('folderId') !== 0 && siteDetail.get('folderId') !== -1) {
     // Picking this menu item pops up the AddEditBookmark modal
     // - History can be deleted but not edited
     // - Multiple bookmarks cannot be edited at once
     // - "Bookmarks Toolbar" and "Other Bookmarks" folders cannot be deleted
-    if (!isHistoryEntry && !multipleHistoryEntries && !multipleBookmarks) {
+    if (type !== siteTags.HISTORY) {
       template.push(
         {
           label: locale.translation(isFolder ? 'editFolder' : 'editBookmark'),
           click: () => {
             const editKey = siteUtil.getSiteKey(siteDetail)
-            windowActions.editBookmark(false, editKey)
+            if (isFolder) {
+              windowActions.editBookmarkFolder(editKey)
+            } else {
+              windowActions.editBookmark(false, editKey)
+            }
           }
         },
-        CommonMenu.separatorMenuItem)
+        CommonMenu.separatorMenuItem
+      )
     }
 
-    template.push(
-      {
-        label: locale.translation(deleteLabel),
-        click: () => {
-          if (Immutable.List.isList(siteDetail)) {
-            siteDetail.forEach((site) => appActions.removeSite(site, deleteTag))
-          } else {
-            appActions.removeSite(siteDetail, deleteTag)
-          }
+    template.push({
+      label: locale.translation(label),
+      click: () => {
+        if (type === siteTags.HISTORY) {
+          appActions.removeHistorySite(siteKey)
+        } else if (type === siteTags.BOOKMARK) {
+          appActions.removeBookmark(siteKey)
+        } else if (type === siteTags.BOOKMARK_FOLDER) {
+          appActions.removeBookmarkFolder(siteKey)
         }
-      })
+      }
+    })
   }
 
-  if (!isHistoryEntry && !multipleHistoryEntries) {
+  if (type !== siteTags.HISTORY) {
     if (template[template.length - 1] !== CommonMenu.separatorMenuItem) {
       template.push(CommonMenu.separatorMenuItem)
     }
+
     template.push(
-      addBookmarkMenuItem('addBookmark', siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail, true),
-      addFolderMenuItem(siteDetail, true))
+      addBookmarkMenuItem('addBookmark', bookmarkUtil.getDetailFromFrame(activeFrame), siteDetail, true),
+      addFolderMenuItem(siteDetail, true)
+    )
+  }
+
+  return template
+}
+
+const siteDetailTemplateInit = (data, type, activeFrame) => {
+  let multiple = Immutable.List.isList(data)
+  let template
+
+  if (multiple) {
+    template = siteMultipleDetailTemplate(data, type, activeFrame)
+  } else {
+    template = siteSingleDetailTemplate(data, type, activeFrame)
   }
 
   return menuUtil.sanitizeTemplateItems(template)
@@ -724,11 +772,11 @@ const openInNewTabMenuItem = (url, isPrivate, partitionNumber, openerTabId) => {
   }
 }
 
-const openAllInNewTabsMenuItem = (allSites, folderDetail) => {
+const openAllInNewTabsMenuItem = (folderDetail) => {
   return {
     label: locale.translation('openAllInTabs'),
     click: () => {
-      bookmarkActions.openBookmarksInFolder(allSites, folderDetail)
+      bookmarkActions.openBookmarksInFolder(folderDetail)
     }
   }
 }
@@ -920,7 +968,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
             appActions.createTabRequested({
               url: nodeProps.srcURL,
               openerTabId: frame.get('tabId'),
-              partition: getPartitionFromNumber(frame.get('partitionNumber'), isPrivate),
+              partition: frameStateUtil.getPartitionFromNumber(frame.get('partitionNumber'), isPrivate),
               active: active
             })
           }
@@ -1009,8 +1057,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
       )
       if (isLink) {
         template.push(addBookmarkMenuItem('bookmarkLink', {
-          location: nodeProps.linkURL,
-          tags: [siteTags.BOOKMARK]
+          location: nodeProps.linkURL
         }, false))
       }
     }
@@ -1024,8 +1071,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
     if (!isImage) {
       if (isLink) {
         template.push(addBookmarkMenuItem('bookmarkLink', {
-          location: nodeProps.linkURL,
-          tags: [siteTags.BOOKMARK]
+          location: nodeProps.linkURL
         }, false))
       } else {
         template.push(
@@ -1055,7 +1101,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
             }
           },
           CommonMenu.separatorMenuItem,
-          addBookmarkMenuItem('bookmarkPage', siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false))
+          addBookmarkMenuItem('bookmarkPage', bookmarkUtil.getDetailFromFrame(frame), false))
 
         if (!isAboutPage) {
           template.push({
@@ -1204,8 +1250,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
     template.push(
       CommonMenu.separatorMenuItem,
       addBookmarkMenuItem('addBookmark', {
-        location: nodeProps.linkURL,
-        tags: [siteTags.BOOKMARK]
+        location: nodeProps.linkURL
       }),
       addFolderMenuItem()
     )
@@ -1226,11 +1271,16 @@ function onHamburgerMenu (location, e) {
 }
 
 function onMainContextMenu (nodeProps, frame, tab, contextMenuType) {
-  if (contextMenuType === 'bookmark' || contextMenuType === 'bookmark-folder') {
+  let data = Immutable.fromJS(nodeProps)
+  if (!Array.isArray(nodeProps)) {
+    data = siteUtil.getSiteKey(data)
+  }
+
+  if (contextMenuType === siteTags.BOOKMARK || contextMenuType === siteTags.BOOKMARK_FOLDER) {
     const activeFrame = Immutable.fromJS({ location: '', title: '', partitionNumber: frame.get('partitionNumber') })
-    onSiteDetailContextMenu(Immutable.fromJS(nodeProps), activeFrame)
-  } else if (contextMenuType === 'history') {
-    onSiteDetailContextMenu(Immutable.fromJS(nodeProps))
+    onSiteDetailContextMenu(data, contextMenuType, activeFrame)
+  } else if (contextMenuType === siteTags.HISTORY) {
+    onSiteDetailContextMenu(data, contextMenuType)
   } else if (contextMenuType === 'synopsis') {
     onLedgerContextMenu(nodeProps.location, nodeProps.hostPattern)
   } else if (contextMenuType === 'download') {
@@ -1281,7 +1331,7 @@ function onUrlBarContextMenu (e) {
   e.stopPropagation()
   const searchDetail = appStoreRenderer.state.get('searchDetail')
   const windowState = windowStore.getState()
-  const activeFrame = getActiveFrame(windowState)
+  const activeFrame = frameStateUtil.getActiveFrame(windowState)
   const inputMenu = Menu.buildFromTemplate(urlBarTemplateInit(searchDetail, activeFrame, e))
   inputMenu.popup(getCurrentWindow())
 }
@@ -1292,11 +1342,11 @@ function onFindBarContextMenu (e) {
   findBarMenu.popup(getCurrentWindow())
 }
 
-function onSiteDetailContextMenu (siteDetail, activeFrame, e) {
+function onSiteDetailContextMenu (data, type, activeFrame, e) {
   if (e) {
     e.stopPropagation()
   }
-  const menu = Menu.buildFromTemplate(siteDetailTemplateInit(siteDetail, activeFrame))
+  const menu = Menu.buildFromTemplate(siteDetailTemplateInit(data, type, activeFrame))
   menu.popup(getCurrentWindow())
 }
 

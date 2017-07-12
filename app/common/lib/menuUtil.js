@@ -4,16 +4,25 @@
 'use strict'
 
 const MenuItem = require('electron').MenuItem
+
+// Constants
+const config = require('../../../js/constants/config')
+
+// State
+const bookmarksState = require('../state/bookmarksState')
+
+// Actions
+const appActions = require('../../../js/actions/appActions')
+const windowActions = require('../../../js/actions/windowActions')
+
+// Utils
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const CommonMenu = require('../../common/commonMenu')
-const siteTags = require('../../../js/constants/siteTags')
 const eventUtil = require('../../../js/lib/eventUtil')
-const siteUtil = require('../../../js/state/siteUtil')
 const locale = require('../../locale')
-const appActions = require('../../../js/actions/appActions')
-const config = require('../../../js/constants/config')
 const {separatorMenuItem} = require('../../common/commonMenu')
-const windowActions = require('../../../js/actions/windowActions')
+const bookmarkUtil = require('./bookmarkUtil')
+const bookmarkFoldersUtil = require('./bookmarkFoldersUtil')
 
 /**
  * Get the an electron MenuItem object from a Menu based on its label
@@ -73,14 +82,12 @@ module.exports.setTemplateItemChecked = (template, label, checked) => {
   return null
 }
 
-const createBookmarkTemplateItems = (bookmarks, parentFolderId) => {
-  const filteredBookmarks = parentFolderId
-    ? bookmarks.filter((bookmark) => bookmark.get('parentFolderId') === parentFolderId)
-    : bookmarks.filter((bookmark) => !bookmark.get('parentFolderId'))
+const createBookmarkTemplateItems = (state, parentFolderId) => {
+  const bookmarks = bookmarksState.getBookmarksWithFolders(state, parentFolderId)
 
   const payload = []
-  filteredBookmarks.forEach((site) => {
-    if (site.get('tags').includes(siteTags.BOOKMARK) && site.get('location')) {
+  for (let bookmark of bookmarks) {
+    if (bookmarkUtil.isBookmark(bookmark)) {
       payload.push({
         // TODO include label made from favicon. It needs to be of type NativeImage
         // which can be made using a Buffer / DataURL / local image
@@ -89,38 +96,37 @@ const createBookmarkTemplateItems = (bookmarks, parentFolderId) => {
         // and as such there may need to be another mechanism or cache
         //
         // see: https://github.com/brave/browser-laptop/issues/3050
-        label: site.get('customTitle') || site.get('title') || site.get('location'),
+        label: bookmark.get('title', bookmark.get('location')),
         click: (item, focusedWindow, e) => {
           if (eventUtil.isForSecondaryAction(e)) {
             appActions.createTabRequested({
-              url: site.get('location'),
+              url: bookmark.get('location'),
               windowId: focusedWindow.id,
               active: !!e.shiftKey
             })
           } else {
-            appActions.loadURLInActiveTabRequested(focusedWindow.id, site.get('location'))
+            appActions.loadURLInActiveTabRequested(focusedWindow.id, bookmark.get('location'))
           }
         }
       })
-    } else if (siteUtil.isFolder(site)) {
-      const folderId = site.get('folderId')
-      const submenuItems = bookmarks.filter((bookmark) => bookmark.get('parentFolderId') === folderId)
+    } else if (bookmarkFoldersUtil.isFolder(bookmark)) {
       payload.push({
-        label: site.get('customTitle') || site.get('title'),
-        submenu: submenuItems.count() > 0 ? createBookmarkTemplateItems(bookmarks, folderId) : null
+        label: bookmark.get('title'),
+        submenu: createBookmarkTemplateItems(state, bookmark.get('folderId'))
       })
     }
-  })
+  }
+
   return payload
 }
 
 /**
  * Used to create bookmarks and bookmark folder entries for the "Bookmarks" menu
  *
- * @param sites The application state's Immutable sites list
+ * @param state The application state
  */
-module.exports.createBookmarkTemplateItems = (sites) => {
-  return createBookmarkTemplateItems(siteUtil.getBookmarks(sites))
+module.exports.createBookmarkTemplateItems = (state) => {
+  return createBookmarkTemplateItems(state)
 }
 
 /**

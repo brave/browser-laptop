@@ -242,49 +242,22 @@ const appActions = {
   /**
    * Adds a site to the site list
    * @param {Object} siteDetail - Properties of the site in question, can also be an array of siteDetail
-   * @param {string} tag - A tag to associate with the site. e.g. bookmarks.
-   * @param {boolean} skipSync - Set true if a site isn't eligible for Sync (e.g. if addSite was triggered by Sync)
    */
-  addSite: function (siteDetail, tag, skipSync) {
+  addHistorySite: function (siteDetail) {
     dispatch({
-      actionType: appConstants.APP_ADD_SITE,
-      siteDetail,
-      tag,
-      skipSync
+      actionType: appConstants.APP_ADD_HISTORY_SITE,
+      siteDetail
     })
   },
 
   /**
    * Removes a site from the site list
-   * @param {Object} siteDetail - Properties of the site in question
-   * @param {string} tag - A tag to associate with the site. e.g. bookmarks.
-   * @param {boolean} skipSync - Set true if a site isn't eligible for Sync (e.g. if this removal was triggered by Sync)
+   * @param {string|Immutable.List} historyKey - Hisotry item key that we want to remove, can be list of keys as well
    */
-  removeSite: function (siteDetail, tag, skipSync) {
+  removeHistorySite: function (historyKey) {
     dispatch({
-      actionType: appConstants.APP_REMOVE_SITE,
-      siteDetail,
-      tag,
-      skipSync
-    })
-  },
-
-  /**
-   * Dispatches a message to move a site locations.
-   *
-   * @param {string} sourceKey - the source key of the source moved site
-   * @param {string} destinationKey - the destination key of the destination moved site
-   * @param {boolean} prepend - Whether or not to prepend to the destinationLocation
-   *   If false, the destinationDetail is considered a sibling.
-   * @param {boolean} destinationIsParent - Whether or not the destinationDetail should be considered the new parent.
-   */
-  moveSite: function (sourceKey, destinationKey, prepend, destinationIsParent) {
-    dispatch({
-      actionType: appConstants.APP_MOVE_SITE,
-      sourceKey,
-      destinationKey,
-      prepend,
-      destinationIsParent
+      actionType: appConstants.APP_REMOVE_HISTORY_SITE,
+      historyKey
     })
   },
 
@@ -1003,18 +976,6 @@ const appActions = {
   },
 
   /**
-   * Dispatches a message to apply a batch of site records from Brave Sync
-   * TODO: Refactor this to merge it into addSite/removeSite
-   * @param {Array.<Object>} records
-   */
-  applySiteRecords: function (records) {
-    dispatch({
-      actionType: appConstants.APP_APPLY_SITE_RECORDS,
-      records
-    })
-  },
-
-  /**
    * Dispatch to populate the sync object id -> appState key path mapping cache
    */
   createSyncCache: function () {
@@ -1472,21 +1433,73 @@ const appActions = {
     })
   },
 
-  addBookmark: function (siteDetail, tag, closestKey) {
+  addBookmark: function (siteDetail, closestKey) {
     dispatch({
       actionType: appConstants.APP_ADD_BOOKMARK,
       siteDetail,
-      tag,
       closestKey
     })
   },
 
-  editBookmark: function (siteDetail, editKey, tag) {
+  editBookmark: function (siteDetail, editKey) {
     dispatch({
       actionType: appConstants.APP_EDIT_BOOKMARK,
       siteDetail,
-      tag,
       editKey
+    })
+  },
+
+  moveBookmark: function (bookmarkKey, destinationKey, append, moveIntoParent) {
+    dispatch({
+      actionType: appConstants.APP_MOVE_BOOKMARK,
+      bookmarkKey,
+      destinationKey,
+      append,
+      moveIntoParent
+    })
+  },
+
+  /**
+   * Removes bookmark
+   * @param bookmarkKey {string|Immutable.List} - Bookmark key that we want to remove. This could also be list of keys
+   */
+  removeBookmark: function (bookmarkKey) {
+    dispatch({
+      actionType: appConstants.APP_REMOVE_BOOKMARK,
+      bookmarkKey
+    })
+  },
+
+  addBookmarkFolder: function (folderDetails, closestKey) {
+    dispatch({
+      actionType: appConstants.APP_ADD_BOOKMARK_FOLDER,
+      folderDetails,
+      closestKey
+    })
+  },
+
+  editBookmarkFolder: function (folderDetails, editKey) {
+    dispatch({
+      actionType: appConstants.APP_EDIT_BOOKMARK_FOLDER,
+      folderDetails,
+      editKey
+    })
+  },
+
+  moveBookmarkFolder: function (folderKey, destinationKey, append, moveIntoParent) {
+    dispatch({
+      actionType: appConstants.APP_MOVE_BOOKMARK_FOLDER,
+      folderKey,
+      destinationKey,
+      append,
+      moveIntoParent
+    })
+  },
+
+  removeBookmarkFolder: function (folderKey) {
+    dispatch({
+      actionType: appConstants.APP_REMOVE_BOOKMARK_FOLDER,
+      folderKey
     })
   },
 
@@ -1528,6 +1541,15 @@ const appActions = {
       actionType: appConstants.APP_SET_VERSION_INFO,
       name,
       version
+    })
+  },
+
+  onPinnedTabReorder: function (siteKey, destinationKey, prepend) {
+    dispatch({
+      actionType: appConstants.APP_ON_PINNED_TAB_REORDER,
+      siteKey,
+      destinationKey,
+      prepend
     })
   }
 }

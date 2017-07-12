@@ -1,12 +1,12 @@
 /* global describe, it */
 
 const siteTags = require('../../../../../js/constants/siteTags')
-const siteCache = require('../../../../../app/common/state/siteCache')
+const siteCache = require('../../../../../app/common/cache/bookmarkLocationCache')
 const siteUtil = require('../../../../../js/state/siteUtil')
 const assert = require('assert')
 const Immutable = require('immutable')
 
-describe('siteCache', function () {
+describe('bookmarkLocationCache unit test', function () {
   const testUrl1 = 'https://brave.com/'
   const testUrl2 = 'http://example.com/'
   const bookmark = Immutable.fromJS({

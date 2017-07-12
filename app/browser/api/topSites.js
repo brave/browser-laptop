@@ -7,39 +7,36 @@
 const Immutable = require('immutable')
 const appActions = require('../../../js/actions/appActions')
 const debounce = require('../../../js/lib/debounce')
-const siteUtil = require('../../../js/state/siteUtil')
+const historyState = require('../../common/state/historyState')
+const bookmarkLocationCache = require('../../common/cache/bookmarkLocationCache')
+const newTabData = require('../../../js/data/newTabData')
 const {isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
-const aboutNewTabMaxEntries = 100
+const aboutNewTabMaxEntries = 18
 let appStore
 
 let minCountOfTopSites
 let minAccessOfTopSites
-
-const compareSites = (site1, site2) => {
-  if (!site1 || !site2) return false
-  return site1.get('location') === site2.get('location') &&
-    site1.get('partitionNumber') === site2.get('partitionNumber')
-}
+const staticData = Immutable.fromJS(newTabData.topSites)
 
 const pinnedTopSites = (state) => {
-  return (state.getIn(['about', 'newtab', 'pinnedTopSites']) || Immutable.List()).setSize(18)
+  return state.getIn(['about', 'newtab', 'pinnedTopSites'], Immutable.List())
 }
 
 const ignoredTopSites = (state) => {
-  return state.getIn(['about', 'newtab', 'ignoredTopSites']) || Immutable.List()
+  return state.getIn(['about', 'newtab', 'ignoredTopSites'], Immutable.List())
 }
 
-const isPinned = (state, siteProps) => {
-  return pinnedTopSites(state).filter((site) => compareSites(site, siteProps)).size > 0
+const isPinned = (state, siteKey) => {
+  return pinnedTopSites(state).find(site => site.get('key') === siteKey)
 }
 
-const isIgnored = (state, siteProps) => {
-  return ignoredTopSites(state).filter((site) => compareSites(site, siteProps)).size > 0
+const isIgnored = (state, siteKey) => {
+  return ignoredTopSites(state).includes(siteKey)
 }
 
 const sortCountDescending = (left, right) => {
-  const leftCount = left.get('count') || 0
-  const rightCount = right.get('count') || 0
+  const leftCount = left.get('count', 0)
+  const rightCount = right.get('count', 0)
   if (leftCount < rightCount) {
     return 1
   }
@@ -55,54 +52,44 @@ const sortCountDescending = (left, right) => {
   return 0
 }
 
-const removeDuplicateDomains = (list) => {
-  const siteDomains = new Set()
-  return list.filter((site) => {
-    if (!site.get('location')) {
-      return false
-    }
-    try {
-      const hostname = require('../../common/urlParse')(site.get('location')).hostname
-      if (!siteDomains.has(hostname)) {
-        siteDomains.add(hostname)
-        return true
-      }
-    } catch (e) {
-      console.log('Error parsing hostname: ', e)
-    }
-    return false
-  })
-}
-
-const calculateTopSites = (clearCache) => {
+const calculateTopSites = (clearCache, withoutDebounce = false) => {
   if (clearCache) {
     clearTopSiteCacheData()
   }
-  startCalculatingTopSiteData()
+  if (withoutDebounce) {
+    getTopSiteData()
+  } else {
+    debouncedGetTopSiteData()
+  }
 }
 
-/**
- * TopSites are defined by users for the new tab page. Pinned sites are attached to their positions
- * in the grid, and the non pinned indexes are populated with newly accessed sites
- */
-const startCalculatingTopSiteData = debounce(() => {
+const getTopSiteData = () => {
   if (!appStore) {
     appStore = require('../../../js/stores/appStore')
   }
   const state = appStore.getState()
   // remove folders; sort by visit count; enforce a max limit
-  const sites = (state.get('sites') ? state.get('sites').toList() : new Immutable.List())
-    .filter((site) => !siteUtil.isFolder(site) &&
-      !siteUtil.isImportedBookmark(site) &&
-      !isSourceAboutUrl(site.get('location')) &&
+  let sites = historyState.getSites(state)
+    .filter((site, key) => !isSourceAboutUrl(site.get('location')) &&
+      !isPinned(state, key) &&
+      !isIgnored(state, key) &&
       (minCountOfTopSites === undefined || (site.get('count') || 0) >= minCountOfTopSites) &&
-      (minAccessOfTopSites === undefined || (site.get('lastAccessedTime') || 0) >= minAccessOfTopSites))
+      (minAccessOfTopSites === undefined || (site.get('lastAccessedTime') || 0) >= minAccessOfTopSites)
+    )
     .sort(sortCountDescending)
     .slice(0, aboutNewTabMaxEntries)
+    .map((site, key) => {
+      const bookmarkKey = bookmarkLocationCache.getCacheKey(state, site.get('location'))
+
+      site = site.set('bookmarked', !bookmarkKey.isEmpty())
+      site = site.set('key', key)
+      return site
+    })
+    .toList()
 
   for (let i = 0; i < sites.size; i++) {
-    const count = sites.getIn([i, 'count']) || 0
-    const access = sites.getIn([i, 'lastAccessedTime']) || 0
+    const count = sites.getIn([i, 'count'], 0)
+    const access = sites.getIn([i, 'lastAccessedTime'], 0)
     if (minCountOfTopSites === undefined || count < minCountOfTopSites) {
       minCountOfTopSites = count
     }
@@ -111,33 +98,26 @@ const startCalculatingTopSiteData = debounce(() => {
     }
   }
 
-  // Filter out pinned and ignored sites
-  let unpinnedSites = sites.filter((site) => !(isPinned(state, site) || isIgnored(state, site)))
-  unpinnedSites = removeDuplicateDomains(unpinnedSites)
-
-  // Merge the pinned and unpinned lists together
-  // Pinned items have priority because the position is important
-  let gridSites = pinnedTopSites(state).map((pinnedSite) => {
-    // Fetch latest siteDetail objects from appState.sites using location/partition
-    if (pinnedSite) {
-      const matches = sites.filter((site) => compareSites(site, pinnedSite))
-      if (matches.size > 0) return matches.first()
-    }
-    // Default to unpinned items
-    const firstSite = unpinnedSites.first()
-    unpinnedSites = unpinnedSites.shift()
-    return firstSite
-  })
-
-  // Include up to [aboutNewTabMaxEntries] entries so that folks
-  // can ignore sites and have new items fill those empty spaces
-  if (unpinnedSites.size > 0) {
-    gridSites = gridSites.concat(unpinnedSites)
+  if (sites.size < 18) {
+    const preDefined = staticData
+      .filter((site) => {
+        return !isPinned(state, site.get('key')) && !isIgnored(state, site.get('key'))
+      })
+      .map(site => {
+        const bookmarkKey = bookmarkLocationCache.getCacheKey(state, site.get('location'))
+        return site.set('bookmarked', !bookmarkKey.isEmpty())
+      })
+    sites = sites.concat(preDefined)
   }
 
-  const finalData = gridSites.filter((site) => site != null)
-  appActions.topSiteDataAvailable(finalData)
-}, 5 * 1000)
+  appActions.topSiteDataAvailable(sites)
+}
+
+/**
+ * TopSites are defined by users for the new tab page. Pinned sites are attached to their positions
+ * in the grid, and the non pinned indexes are populated with newly accessed sites
+ */
+const debouncedGetTopSiteData = debounce(() => getTopSiteData(), 5 * 1000)
 
 const clearTopSiteCacheData = () => {
   minCountOfTopSites = undefined

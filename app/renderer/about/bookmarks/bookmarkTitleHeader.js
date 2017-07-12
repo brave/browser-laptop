@@ -11,9 +11,6 @@ const ImmutableComponent = require('../../components/immutableComponent')
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
 
-// Constants
-const siteTags = require('../../../../js/constants/siteTags')
-
 class BookmarkTitleHeader extends ImmutableComponent {
   constructor () {
     super()
@@ -21,8 +18,7 @@ class BookmarkTitleHeader extends ImmutableComponent {
   }
   addBookmark () {
     const newBookmark = Immutable.fromJS({
-      parentFolderId: this.props.selectedFolderId,
-      tags: [siteTags.BOOKMARK]
+      parentFolderId: this.props.selectedFolderId
     })
     windowActions.addBookmark(newBookmark)
   }

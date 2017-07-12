@@ -452,19 +452,6 @@ var exports = {
       }, 5000, null, 100)
     })
 
-    this.app.client.addCommand('waitForSiteEntry', function (location, waitForTitle = true) {
-      logVerbose('waitForSiteEntry("' + location + '", "' + waitForTitle + '")')
-      return this.waitUntil(function () {
-        return this.getAppState().then((val) => {
-          const ret = val.value && val.value.sites && Array.from(Object.values(val.value.sites)).find(
-            (site) => site.location === location &&
-              (!waitForTitle || (waitForTitle && site.title)))
-          logVerbose('waitForSiteEntry("' + location + ', ' + waitForTitle + '") => ' + ret)
-          return ret
-        })
-      }, 5000, null, 100)
-    })
-
     this.app.client.addCommand('waitForAddressEntry', function (location, waitForTitle = true) {
       logVerbose('waitForAddressEntry("' + location + '", "' + waitForTitle + '")')
       return this.waitUntil(function () {
@@ -473,7 +460,7 @@ var exports = {
             (site) => site.location === location &&
               (!waitForTitle || (waitForTitle && site.title)))
           logVerbose('sites:' + JSON.stringify(val.value.sites))
-          logVerbose('waitForSiteEntry("' + location + '", ' + waitForTitle + ') => ' + ret)
+          logVerbose('waitForAddressEntry("' + location + '", ' + waitForTitle + ') => ' + ret)
           return ret
         })
       }, 5000, null, 100)
@@ -672,51 +659,114 @@ var exports = {
     })
 
     /**
-     * Adds a site to the sites list, such as a bookmarks.
+     * Adds a bookmark
      *
      * @param {object} siteDetail - Properties for the siteDetail to add
-     * @param {string} tag - A site tag from js/constants/siteTags.js
      */
-    this.app.client.addCommand('addSite', function (siteDetail, tag) {
-      logVerbose('addSite("' + siteDetail + '", "' + tag + '")')
+    this.app.client.addCommand('addBookmark', function (siteDetail) {
+      logVerbose('addBookmark("' + siteDetail + '")')
       let waitUrl = siteDetail.location
       if (isSourceAboutUrl(waitUrl)) {
         waitUrl = getTargetAboutUrl(waitUrl)
       }
-      return this.execute(function (siteDetail, tag) {
-        return devTools('appActions').addSite(siteDetail, tag)
-      }, siteDetail, tag).then((response) => response.value)
-      .waitForSiteEntry(waitUrl, false)
-    })
-
-    /**
-     * Adds a bookmark to the bookmarks list.
-     *
-     * @param {object} siteDetail - Properties for the siteDetail to add
-     * @param {string} tag - A site tag from js/constants/siteTags.js
-     */
-    this.app.client.addCommand('addBookmark', function (siteDetail, tag) {
-      logVerbose('addBookmark("' + siteDetail + '", "' + tag + '")')
-      let waitUrl = siteDetail.location
-      if (isSourceAboutUrl(waitUrl)) {
-        waitUrl = getTargetAboutUrl(waitUrl)
-      }
-      return this.execute(function (siteDetail, tag) {
-        return devTools('appActions').addBookmark(siteDetail, tag)
-      }, siteDetail, tag).then((response) => response.value)
-      .waitForSiteEntry(waitUrl, false)
-    })
-
-    /**
-     * Adds a list sites to the sites list, including bookmark and foler.
-     *
-     * @param {object} siteDetail - Properties for the siteDetail to add
-     */
-    this.app.client.addCommand('addSiteList', function (siteDetail) {
-      logVerbose('addSiteList("' + siteDetail + '")')
       return this.execute(function (siteDetail) {
-        return devTools('appActions').addSite(siteDetail)
+        return devTools('appActions').addBookmark(siteDetail)
       }, siteDetail).then((response) => response.value)
+      .waitForBookmarkEntry(waitUrl, false)
+    })
+
+    this.app.client.addCommand('waitForBookmarkEntry', function (location, waitForTitle = true) {
+      logVerbose('waitForBookmarkEntry("' + location + '", "' + waitForTitle + '")')
+      return this.waitUntil(function () {
+        return this.getAppState().then((val) => {
+          const ret = val.value && val.value.bookmarks && Array.from(Object.values(val.value.bookmarks)).find(
+              (bookmark) => bookmark.location === location &&
+              (!waitForTitle || (waitForTitle && bookmark.title)))
+          logVerbose('waitForBookmarkEntry("' + location + ', ' + waitForTitle + '") => ' + ret)
+          return ret
+        })
+      }, 5000, null, 100)
+    })
+
+    /**
+     * Adds a history site
+     *
+     * @param {object} siteDetail - Properties for the siteDetail to add
+     */
+    this.app.client.addCommand('addHistorySite', function (siteDetail) {
+      logVerbose('addHistorySite("' + siteDetail + '")')
+      let waitUrl = siteDetail.location
+      if (isSourceAboutUrl(waitUrl)) {
+        waitUrl = getTargetAboutUrl(waitUrl)
+      }
+      return this.execute(function (siteDetail) {
+        return devTools('appActions').addHistorySite(siteDetail)
+      }, siteDetail).then((response) => response.value)
+        .waitForHistoryEntry(waitUrl, false)
+    })
+
+    this.app.client.addCommand('waitForHistoryEntry', function (location, waitForTitle = true) {
+      logVerbose('waitForHistoryEntry("' + location + '", "' + waitForTitle + '")')
+      return this.waitUntil(function () {
+        return this.getAppState().then((val) => {
+          const ret = val.value && val.value.historySites && Array.from(Object.values(val.value.historySites)).find(
+              (site) => site.location === location &&
+              (!waitForTitle || (waitForTitle && site.title)))
+          logVerbose('waitForHistoryEntry("' + location + ', ' + waitForTitle + '") => ' + ret)
+          return ret
+        })
+      }, 5000, null, 100)
+    })
+
+    /**
+     * Adds a bookmark folder
+     *
+     * @param {object} siteDetail - Properties for the siteDetail to add
+     */
+    this.app.client.addCommand('addBookmarkFolder', function (siteDetail) {
+      logVerbose('addBookmarkFolder("' + siteDetail + '")')
+      return this.execute(function (siteDetail) {
+        return devTools('appActions').addBookmarkFolder(siteDetail)
+      }, siteDetail).then((response) => response.value)
+      .waitForBookmarkFolderEntry(siteDetail.folderId, false)
+    })
+
+    this.app.client.addCommand('waitForBookmarkFolderEntry', function (folderId, waitForTitle = true) {
+      logVerbose('waitForBookmarkFolderEntry("' + folderId + '", "' + waitForTitle + '")')
+      return this.waitUntil(function () {
+        return this.getAppState().then((val) => {
+          const ret = val.value && val.value.bookmarkFolders && Array.from(Object.values(val.value.bookmarkFolders)).find(
+              (folder) => folder.folderId === folderId &&
+              (!waitForTitle || (waitForTitle && folder.title)))
+          logVerbose('waitForBookmarkFolderEntry("' + folderId + ', ' + waitForTitle + '") => ' + ret)
+          return ret
+        })
+      }, 5000, null, 100)
+    })
+
+    /**
+     * Adds a list of bookmarks
+     *
+     * @param {object} bookmarkList - List of bookmarks to add
+     */
+    // TODO fix
+    this.app.client.addCommand('addBookmarks', function (bookmarkList) {
+      logVerbose('addBookmarks("' + bookmarkList + '")')
+      return this.execute(function (bookmarkList) {
+        return devTools('appActions').addBookmark(bookmarkList)
+      }, bookmarkList).then((response) => response.value)
+    })
+
+    /**
+     * Adds a list of history sites
+     *
+     * @param {object} historyList - List of history sites to add
+     */
+    this.app.client.addCommand('addHistorySites', function (historyList) {
+      logVerbose('addHistorySites("' + historyList + '")')
+      return this.execute(function (historyList) {
+        return devTools('appActions').addHistorySites(historyList)
+      }, historyList).then((response) => response.value)
     })
 
     /**

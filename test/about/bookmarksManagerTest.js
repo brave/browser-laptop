@@ -10,7 +10,6 @@ const Immutable = require('immutable')
 describe('about:bookmarks', function () {
   const folderId = Math.random()
   const lastVisit = 1476140184441
-  const bookmarkTag = [siteTags.BOOKMARK]
   const browseableSiteUrl = 'page1.html'
   const browseableSiteTitle = 'Page 1'
 
@@ -30,20 +29,20 @@ describe('about:bookmarks', function () {
         location: siteWithFavicon,
         title: 'Page with Favicon',
         favicon: favicon,
-        tags: bookmarkTag,
+        type: siteTags.BOOKMARK,
         parentFolderId: 0,
         lastAccessedTime: lastVisit
       },
       {
         location: siteWithoutFavicon,
         title: 'Page without Favicon',
-        tags: bookmarkTag,
+        type: siteTags.BOOKMARK,
         parentFolderId: 0,
         lastAccessedTime: lastVisit
       }
     ])
     yield client
-      .addSiteList(sites)
+      .addBookmarks(sites)
       .tabByIndex(0)
       .loadUrl(aboutBookmarksUrl)
   }
@@ -51,15 +50,9 @@ describe('about:bookmarks', function () {
   function * addDemoSites (client) {
     const sites = Immutable.fromJS([
       {
-        customTitle: 'demo1',
-        folderId: folderId,
-        parentFolderId: 0,
-        tags: [siteTags.BOOKMARK_FOLDER]
-      },
-      {
         location: 'https://brave.com',
         title: 'Brave',
-        tags: bookmarkTag,
+        type: siteTags.BOOKMARK,
         parentFolderId: 0,
         lastAccessedTime: lastVisit
       },
@@ -67,7 +60,7 @@ describe('about:bookmarks', function () {
         location: 'https://brave.com/test',
         title: 'Test',
         customTitle: 'customTest',
-        tags: bookmarkTag,
+        type: siteTags.BOOKMARK,
         parentFolderId: 0,
         lastAccessedTime: lastVisit
       },
@@ -75,41 +68,41 @@ describe('about:bookmarks', function () {
         location: 'https://brave.com/test',
         title: 'Test',
         customTitle: 'customTest',
-        tags: bookmarkTag,
+        type: siteTags.BOOKMARK,
         parentFolderId: 0,
         lastAccessedTime: lastVisit
       },
       {
         location: 'https://www.youtube.com',
-        tags: bookmarkTag,
+        type: siteTags.BOOKMARK,
         parentFolderId: 0,
         lastAccessedTime: lastVisit
       },
       {
         location: 'https://www.facebook.com',
         title: 'facebook',
-        tags: bookmarkTag,
+        type: siteTags.BOOKMARK,
         parentFolderId: 0,
         lastAccessedTime: lastVisit
       },
       {
         location: 'https://duckduckgo.com',
         title: 'duckduckgo',
-        tags: bookmarkTag,
+        type: siteTags.BOOKMARK,
         parentFolderId: folderId,
         lastAccessedTime: lastVisit
       },
       {
         location: 'https://google.com',
         title: 'Google',
-        tags: bookmarkTag,
+        type: siteTags.BOOKMARK,
         parentFolderId: folderId,
         lastAccessedTime: lastVisit
       },
       {
         location: 'https://bing.com',
         title: 'Bing',
-        tags: bookmarkTag,
+        type: siteTags.BOOKMARK,
         parentFolderId: folderId,
         lastAccessedTime: lastVisit
       }
@@ -117,7 +110,13 @@ describe('about:bookmarks', function () {
 
     yield client
       .waitForBrowserWindow()
-      .addSiteList(sites)
+      .addBookmarkFolder({
+        customTitle: 'demo1',
+        folderId: folderId,
+        parentFolderId: 0,
+        type: siteTags.BOOKMARK_FOLDER
+      })
+      .addBookmarks(sites)
       .tabByIndex(0)
       .loadUrl(aboutBookmarksUrl)
   }
@@ -126,13 +125,13 @@ describe('about:bookmarks', function () {
     const site = Brave.server.url(browseableSiteUrl)
     yield client
       .waitForBrowserWindow()
-      .addSite({
+      .addBookmark({
         location: site,
         title: browseableSiteTitle,
-        tags: bookmarkTag,
+        type: siteTags.BOOKMARK,
         parentFolderId: 0,
         lastAccessedTime: lastVisit
-      }, siteTags.BOOKMARK)
+      })
       .tabByIndex(0)
       .loadUrl(aboutBookmarksUrl)
   }

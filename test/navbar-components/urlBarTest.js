@@ -29,7 +29,7 @@ describe('urlBar tests', function () {
       yield this.app.client.waitForElementFocus(urlInput)
       yield this.app.client
         .onClearBrowsingData('browserHistory', true)
-        .addSite({ location: 'https://brave.com', title: 'Brave' })
+        .addHistorySite({ location: 'https://brave.com', title: 'Brave' })
     })
 
     // OMG, Brad would hate this test!
@@ -65,10 +65,10 @@ describe('urlBar tests', function () {
 
       yield this.app.client
         .onClearBrowsingData('browserHistory', true)
-        .addSite({ location: 'https://brave.com', title: 'Brave' })
-        .addSite({ location: 'https://brave.com/test' })
-        .addSite({ location: 'https://www.youtube.com' })
-        .addSite({ location: 'http://uncrate.com' })
+        .addHistorySite({ location: 'https://brave.com', title: 'Brave' })
+        .addHistorySite({ location: 'https://brave.com/test' })
+        .addHistorySite({ location: 'https://www.youtube.com' })
+        .addHistorySite({ location: 'http://uncrate.com' })
     })
 
     describe('press backspace key', function () {
@@ -150,7 +150,7 @@ describe('urlBar tests', function () {
     describe('typing prefix with characters from "https" prefix', function () {
       beforeEach(function * () {
         yield this.app.client
-          .addSite({ location: 'https://slo-tech.com', title: 'title' })
+          .addHistorySite({ location: 'https://slo-tech.com', title: 'title' })
           .setInputText(urlInput, '')
           .keys('s')
       })
@@ -163,7 +163,7 @@ describe('urlBar tests', function () {
     describe('typing with characters that do not match prefix should not select first item', function () {
       beforeEach(function * () {
         yield this.app.client
-          .addSite({ location: 'https://slo-tech.com', title: 'title' })
+          .addHistorySite({ location: 'https://slo-tech.com', title: 'title' })
           .setInputText(urlInput, '')
           .keys('o')
       })
@@ -176,7 +176,7 @@ describe('urlBar tests', function () {
     describe('typing with characters that do not match prefix should not select first item', function () {
       beforeEach(function * () {
         yield this.app.client
-          .addSite({ location: 'https://slo-tech.com', title: 'title' })
+          .addHistorySite({ location: 'https://slo-tech.com', title: 'title' })
           .setInputText(urlInput, '')
           .keys('o')
       })
@@ -378,12 +378,12 @@ describe('urlBar tests', function () {
 
     it('typing in the urlbar should override mouse hover for suggestions', function * () {
       yield this.app.client
-        .addSite({ location: 'https://brave.com', title: 'Brave' })
-        .addSite({ location: 'https://brave.com/test' })
-        .addSite({ location: 'https://brave.com/test2' })
-        .addSite({ location: 'https://brave.com/test3' })
-        .addSite({ location: 'https://brave.com/test4' })
-        .addSite({ location: 'https://brianbondy.com/test4' })
+        .addHistorySite({ location: 'https://brave.com', title: 'Brave' })
+        .addHistorySite({ location: 'https://brave.com/test' })
+        .addHistorySite({ location: 'https://brave.com/test2' })
+        .addHistorySite({ location: 'https://brave.com/test3' })
+        .addHistorySite({ location: 'https://brave.com/test4' })
+        .addHistorySite({ location: 'https://brianbondy.com/test4' })
         .resizeWindow(500, 300)
         .setValue(urlInput, 'b')
         .waitForVisible(urlBarSuggestions)
@@ -688,7 +688,7 @@ describe('urlBar tests', function () {
       yield this.app.client.waitForExist(urlInput)
       yield this.app.client.waitForElementFocus(urlInput)
       yield this.app.client
-        .addSiteList(sites)
+        .addHistorySites(sites)
         .waitForInputText(urlInput, '')
         .windowByUrl(Brave.browserWindowUrl)
         .newTab()
@@ -763,8 +763,8 @@ describe('urlBar tests', function () {
       yield this.app.client.waitForElementFocus(urlInput)
       yield this.app.client
         .onClearBrowsingData('browserHistory', true)
-        .addSite({ location: 'https://github.com/brave/browser-laptop', title: 'browser-laptop' })
-        .addSite({ location: 'https://github.com/brave/ad-block', title: 'Muon' })
+        .addHistorySite({ location: 'https://github.com/brave/browser-laptop', title: 'browser-laptop' })
+        .addHistorySite({ location: 'https://github.com/brave/ad-block', title: 'Muon' })
     })
 
     it('changes only the selection', function * () {

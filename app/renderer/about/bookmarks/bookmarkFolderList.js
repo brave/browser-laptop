@@ -35,6 +35,7 @@ class BookmarkFolderList extends ImmutableComponent {
             allBookmarkFolders={this.props.allBookmarkFolders}
             selectedFolderId={this.props.selectedFolderId}
             bookmarkFolder={Immutable.fromJS({folderId: 0, tags: [siteTags.BOOKMARK_FOLDER]})}
+            bookmarkOrder={this.props.bookmarkOrder}
           />
           : null
       }
@@ -50,6 +51,7 @@ class BookmarkFolderList extends ImmutableComponent {
               selected={!this.props.search && this.props.selectedFolderId === bookmarkFolder.get('folderId')}
               selectedFolderId={this.props.selectedFolderId}
               onChangeSelectedFolder={this.props.onChangeSelectedFolder}
+              bookmarkOrder={this.props.bookmarkOrder}
             />
         )
       }
@@ -65,6 +67,7 @@ class BookmarkFolderList extends ImmutableComponent {
             allBookmarkFolders={this.props.allBookmarkFolders}
             selectedFolderId={this.props.selectedFolderId}
             bookmarkFolder={Immutable.fromJS({folderId: -1, tags: [siteTags.BOOKMARK_FOLDER]})}
+            bookmarkOrder={this.props.bookmarkOrder}
           />
           : null
       }

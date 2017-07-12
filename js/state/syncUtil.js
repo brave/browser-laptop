@@ -9,7 +9,9 @@ const crypto = require('crypto')
 const writeActions = require('../constants/sync/proto').actions
 const siteTags = require('../constants/siteTags')
 const siteUtil = require('./siteUtil')
+const {getSetting} = require('../settings')
 const {isDataUrl} = require('../lib/urlutil')
+const settings = require('../constants/settings')
 
 const CATEGORY_MAP = {
   bookmark: {
@@ -47,7 +49,19 @@ module.exports.siteSettingDefaults = {
 
 // Whitelist of valid browser-laptop site fields. In browser-laptop, site
 // is used for both bookmarks and history sites.
-const SITE_FIELDS = ['objectId', 'location', 'title', 'customTitle', 'tags', 'favicon', 'themeColor', 'lastAccessedTime', 'creationTime', 'partitionNumber', 'folderId', 'parentFolderId']
+const SITE_FIELDS = [
+  'objectId',
+  'location',
+  'title',
+  'tags',
+  'favicon',
+  'themeColor',
+  'lastAccessedTime',
+  'creationTime',
+  'partitionNumber',
+  'folderId',
+  'parentFolderId'
+]
 
 const pickFields = (object, fields) => {
   return fields.reduce((a, x) => {
@@ -101,10 +115,7 @@ module.exports.getSiteDataFromRecord = (record, appState, records) => {
     record.bookmark && record.bookmark.site,
     {objectId}
   )
-  if (siteProps.customTitle === '') {
-    // browser-laptop UI expects the customTitle field to not exist if it is empty
-    delete siteProps.customTitle
-  }
+  delete siteProps.customTitle
   if (record.objectData === 'bookmark') {
     const existingFolderId = existingObjectData && existingObjectData.get('folderId')
     if (existingFolderId) {
@@ -151,7 +162,6 @@ const applySiteSettingRecord = (record) => {
       return value
     }
   }
-  const appActions = require('../actions/appActions')
   const hostPattern = record.siteSetting.hostPattern
   if (!hostPattern) {
     throw new Error('siteSetting.hostPattern is required.')
@@ -210,7 +220,7 @@ const applySyncRecord = (record) => {
       break
     case 'device':
       const device = Object.assign({}, record.device, {lastRecordTimestamp: record.syncTimestamp})
-      require('../actions/appActions').saveSyncDevices({
+      appActions.saveSyncDevices({
         [deviceIdString(record.deviceId)]: device
       })
       break
@@ -225,19 +235,39 @@ const applySyncRecord = (record) => {
  */
 module.exports.applySyncRecords = (records) => {
   if (!records || records.length === 0) { return }
-  const siteRecords = []
+  const bookmarkRecords = []
+  const bookmarkFoldersRecords = []
+  const historyRecords = []
   const otherRecords = []
   records.forEach((record) => {
-    if (record && ['bookmark', 'historySite'].includes(record.objectData)) {
-      siteRecords.push(record)
+    if (record && ['bookmark'].includes(record.objectData)) {
+      bookmarkRecords.push(record)
+    } else if (record && ['historySite'].includes(record.objectData)) {
+      historyRecords.push(record)
+    } else if (record && ['bookmark-folder'].includes(record.objectData)) {
+      bookmarkFoldersRecords.push(record)
     } else {
       otherRecords.push(record)
     }
   })
   applyNonBatchedRecords(otherRecords)
-  if (siteRecords.length) {
+
+  // TODO we now always add (need to check record.action for what to do)
+  if (bookmarkRecords.length) {
     setImmediate(() => {
-      require('../actions/appActions').applySiteRecords(new Immutable.List(siteRecords))
+      appActions.addBookmarks(new Immutable.List(bookmarkRecords))
+    })
+  }
+
+  if (bookmarkFoldersRecords.length) {
+    setImmediate(() => {
+      appActions.addBookmarkFolder(new Immutable.List(bookmarkFoldersRecords))
+    })
+  }
+
+  if (historyRecords.length) {
+    setImmediate(() => {
+      appActions.addHistorySite(new Immutable.List(historyRecords))
     })
   }
 }
@@ -293,6 +323,7 @@ module.exports.getExistingObject = (categoryName, syncRecord) => {
  */
 module.exports.createSiteCache = (appState) => {
   const objectsById = new Immutable.Map().withMutations(objectsById => {
+    // TODO what to do here?
     appState.get('sites').forEach((site, siteKey) => {
       const objectId = site.get('objectId')
       if (!objectId) { return true }
@@ -461,7 +492,6 @@ module.exports.createSiteData = (site, appState) => {
   const siteData = {
     location: '',
     title: '',
-    customTitle: '',
     favicon: '',
     lastAccessedTime: 0,
     creationTime: 0
@@ -581,4 +611,8 @@ module.exports.deepArrayify = deepArrayify
  */
 module.exports.ipcSafeObject = (object) => {
   return deepArrayify(object)
+}
+
+module.exports.syncEnabled = () => {
+  return getSetting(settings.SYNC_ENABLED) === true
 }

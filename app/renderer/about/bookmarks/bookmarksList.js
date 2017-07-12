@@ -13,10 +13,10 @@ const BookmarkTitleHeader = require('./bookmarkTitleHeader')
 
 // Constants
 const dragTypes = require('../../../../js/constants/dragTypes')
-const siteTags = require('../../../../js/constants/siteTags')
 
 // Actions
 const aboutActions = require('../../../../js/about/aboutActions')
+const appActions = require('../../../../js/actions/appActions')
 
 // Utils
 const dndData = require('../../../../js/dndData')
@@ -46,7 +46,7 @@ class BookmarksList extends ImmutableComponent {
     // TODO: Pass the location here when content scripts are fixed
     dndData.setupDataTransferURL(e.dataTransfer, '', isList
       ? 'Multi-selection (' + siteDetail.size + ' bookmarks)'
-      : siteDetail.get('customTitle') || siteDetail.get('title'))
+      : siteDetail.get('title'))
   }
   /**
    * Bookmark entry is being dragged.
@@ -59,26 +59,19 @@ class BookmarksList extends ImmutableComponent {
    * Move a folder, a bookmark, or multiple bookmarks IF move is allowed.
    * ex: won't allow child folder to become parent of an ancestor, etc.
    */
+
   moveBookmark (e, bookmark, siteDetail) {
     let destinationIsParent = false
 
-    // If source is folder, destination needs to be a folder too
-    if (siteUtil.isFolder(bookmark)) {
-      siteDetail = siteDetail.get('parentFolderId')
-        ? this.props.allBookmarkFolders.find((folder) => folder.get('folderId') === siteDetail.get('parentFolderId'))
-        : Immutable.fromJS({folderId: 0, tags: [siteTags.BOOKMARK_FOLDER]})
-      destinationIsParent = true
-    }
+    const bookmarkSiteKey = siteUtil.getSiteKey(bookmark)
+    const siteKey = siteUtil.getSiteKey(siteDetail)
 
-    if (siteUtil.isMoveAllowed(this.props.allBookmarkFolders, bookmark, siteDetail)) {
-      const bookmarkSiteKey = siteUtil.getSiteKey(bookmark.toJS())
-      const siteKey = siteUtil.getSiteKey(siteDetail.toJS())
-
-      aboutActions.moveSite(bookmarkSiteKey,
-        siteKey,
-        dndData.shouldPrependVerticalItem(e.target, e.clientY),
-        destinationIsParent)
-    }
+    appActions.moveBookmark(
+      bookmarkSiteKey,
+      siteKey,
+      dndData.shouldPrependVerticalItem(e.target, e.clientY),
+      destinationIsParent
+    )
   }
   /**
    * Bookmark (one or multiple) or BookmarkFolderItem object was dropped
@@ -124,7 +117,7 @@ class BookmarksList extends ImmutableComponent {
         rows={this.props.bookmarks.map((entry) => [
           {
             cell: <BookmarkTitleCell siteDetail={entry} />,
-            value: entry.get('customTitle') || entry.get('title') || entry.get('location')
+            value: entry.get('title', entry.get('location'))
           },
           {
             html: formatUtil.toLocaleString(entry.get('lastAccessedTime'), ''),
