@@ -33,6 +33,7 @@ const WidevinePanel = require('./widevinePanel')
 const AutofillAddressPanel = require('../autofill/autofillAddressPanel')
 const AutofillCreditCardPanel = require('../autofill/autofillCreditCardPanel')
 const AddEditBookmarkHanger = require('../bookmarks/addEditBookmarkHanger')
+const AddEditBookmarkFolder = require('../bookmarks/addEditBookmarkFolder')
 const LoginRequired = require('./loginRequired')
 const ReleaseNotes = require('./releaseNotes')
 const BookmarksToolbar = require('../bookmarks/bookmarksToolbar')
@@ -534,21 +535,22 @@ class Main extends React.Component {
     props.isFullScreen = activeFrame.get('isFullScreen', false)
     props.isMaximized = isMaximized() || isFullScreen()
     props.captionButtonsVisible = isWindows
-    props.showContextMenu = !!currentWindow.get('contextMenuDetail')
-    props.showPopupWindow = !!currentWindow.get('popupWindowDetail')
+    props.showContextMenu = currentWindow.has('contextMenuDetail')
+    props.showPopupWindow = currentWindow.has('popupWindowDetail')
     props.showSiteInfo = currentWindow.getIn(['ui', 'siteInfo', 'isVisible']) &&
       !isSourceAboutUrl(activeFrame.get('location'))
     props.showBravery = shieldState.braveShieldsEnabled(activeFrame) &&
       !!currentWindow.get('braveryPanelDetail')
-    props.showClearData = !!currentWindow.getIn(['ui', 'isClearBrowsingDataPanelVisible'])
-    props.showImportData = !!currentWindow.get('importBrowserDataDetail')
+    props.showClearData = currentWindow.hasIn(['ui', 'isClearBrowsingDataPanelVisible'])
+    props.showImportData = currentWindow.has('importBrowserDataDetail')
     props.showWidevine = currentWindow.getIn(['widevinePanelDetail', 'shown']) && !isLinux
-    props.showAutoFillAddress = !!currentWindow.get('autofillAddressDetail')
-    props.showAutoFillCC = !!currentWindow.get('autofillCreditCardDetail')
+    props.showAutoFillAddress = currentWindow.has('autofillAddressDetail')
+    props.showAutoFillCC = currentWindow.has('autofillCreditCardDetail')
     props.showLogin = !!loginRequiredDetails
-    props.showBookmarkHanger = currentWindow.get('bookmarkDetail') &&
+    props.showBookmarkHanger = currentWindow.has('bookmarkDetail') &&
       !currentWindow.getIn(['bookmarkDetail', 'isBookmarkHanger'])
-    props.showNoScript = currentWindow.getIn(['ui', 'noScriptInfo', 'isVisible']) &&
+    props.showBookmarkFolderDialog = currentWindow.has('bookmarkFolderDetail')
+    props.showNoScript = currentWindow.hasIn(['ui', 'noScriptInfo', 'isVisible']) &&
       siteUtil.getOrigin(activeFrame.get('location'))
     props.showReleaseNotes = currentWindow.getIn(['ui', 'releaseNotes', 'isVisible'])
     props.showCheckDefault = isFocused() && defaultBrowserState.shouldDisplayDialog(state)
@@ -656,6 +658,11 @@ class Main extends React.Component {
           this.props.showBookmarkHanger
           ? <AddEditBookmarkHanger isModal />
           : null
+        }
+        {
+          this.props.showBookmarkFolderDialog
+            ? <AddEditBookmarkFolder />
+            : null
         }
         {
           this.props.showNoScript

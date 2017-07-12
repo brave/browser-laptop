@@ -192,16 +192,6 @@ const aboutActions = {
     ipc.sendToHost(messages.CONTEXT_MENU_OPENED, nodeProps, contextMenuType)
   },
 
-  moveSite: function (sourceKey, destinationKey, prepend, destinationIsParent) {
-    aboutActions.dispatchAction({
-      actionType: appConstants.APP_MOVE_SITE,
-      sourceKey,
-      destinationKey,
-      prepend,
-      destinationIsParent
-    })
-  },
-
   downloadRevealed: function (downloadId) {
     aboutActions.dispatchAction({
       actionType: appConstants.APP_DOWNLOAD_REVEALED,

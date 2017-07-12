@@ -9,14 +9,14 @@ const debounce = require('../../js/lib/debounce')
 const {getSetting} = require('../../js/settings')
 const locale = require('../locale')
 const LocalShortcuts = require('../localShortcuts')
-const {getPinnedSiteProps} = require('../common/lib/windowsUtil')
 const {makeImmutable} = require('../common/state/immutableUtil')
 const {getPinnedTabsByWindowId} = require('../common/state/tabState')
 const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
-const siteTags = require('../../js/constants/siteTags')
 const windowState = require('../common/state/windowState')
 const Immutable = require('immutable')
+const pinnedSitesState = require('../common/state/pinnedSitesState')
+const pinnedSitesUtil = require('../common/lib/pinnedSitesUtil')
 
 // TODO(bridiver) - set window uuid
 let currentWindows = {}
@@ -69,8 +69,7 @@ const updatePinnedTabs = (win) => {
   const appStore = require('../../js/stores/appStore')
   const state = appStore.getState()
   const windowId = win.id
-  const pinnedSites = state.get('sites').toList().filter((site) =>
-    site.get('tags').includes(siteTags.PINNED)).map(site => getPinnedSiteProps(site))
+  const pinnedSites = pinnedSitesState.getSites(state).map(site => pinnedSitesUtil.getPinnedSiteProps(site))
   const pinnedTabs = getPinnedTabsByWindowId(state, windowId)
 
   pinnedSites.filter((site) =>

@@ -72,7 +72,7 @@ describe('topSites api', function () {
       location: 'https://example6.com', title: 'sample 6', parentFolderId: 0, count: 23, lastAccessedTime: 0
     })
     const folder1 = Immutable.fromJS({
-      customTitle: 'folder1', parentFolderId: 0, tags: [siteTags.BOOKMARK_FOLDER]
+      title: 'folder1', parentFolderId: 0, type: siteTags.BOOKMARK_FOLDER
     })
 
     describe('when fetching unpinned results', function () {

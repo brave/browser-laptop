@@ -512,11 +512,16 @@ const windowActions = {
     })
   },
 
-  onBookmarkAdded: function (isHanger, editKey, siteDetail) {
+  /**
+   * Used for adding bookmark site directly and then allowing to
+   * edit it right afterwords
+   * @param isHanger
+   * @param bookmarkDetail - bookmark data, if empty active frame will be used
+   */
+  onBookmarkAdded: function (isHanger, bookmarkDetail) {
     dispatch({
       actionType: windowConstants.WINDOW_ON_BOOKMARK_ADDED,
-      siteDetail,
-      editKey,
+      bookmarkDetail,
       isHanger
     })
   },
@@ -527,6 +532,38 @@ const windowActions = {
   onBookmarkClose: function () {
     dispatch({
       actionType: windowConstants.WINDOW_ON_BOOKMARK_CLOSE
+    })
+  },
+
+  /**
+   * Used for displaying bookmark folder dialog
+   * when adding bookmark site or folder
+   */
+  addBookmarkFolder: function (folderDetails, closestKey) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_ADD_BOOKMARK_FOLDER,
+      folderDetails,
+      closestKey
+    })
+  },
+
+  /**
+   * Used for displaying bookmark folder dialog
+   * when editing bookmark site or folder
+   */
+  editBookmarkFolder: function (editKey) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_EDIT_BOOKMARK_FOLDER,
+      editKey
+    })
+  },
+
+  /**
+   * Used for closing a bookmark dialog
+   */
+  onBookmarkFolderClose: function () {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_BOOKMARK_FOLDER_CLOSE
     })
   },
 
@@ -1202,10 +1239,11 @@ const windowActions = {
     })
   },
 
-  onSiteDetailMenu: function (bookmarkKey) {
+  onSiteDetailMenu: function (bookmarkKey, type) {
     dispatch({
       actionType: windowConstants.WINDOW_ON_SITE_DETAIL_MENU,
-      bookmarkKey
+      bookmarkKey,
+      type
     })
   }
 }

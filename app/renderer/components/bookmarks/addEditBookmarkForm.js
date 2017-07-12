@@ -22,7 +22,6 @@ const windowActions = require('../../../../js/actions/windowActions')
 
 // Constants
 const KeyCodes = require('../../../common/constants/keyCodes')
-const siteTags = require('../../../../js/constants/siteTags')
 const settings = require('../../../../js/constants/settings')
 
 // Utils
@@ -45,7 +44,7 @@ class AddEditBookmarkForm extends React.Component {
     this.onSave = this.onSave.bind(this)
     this.onRemoveBookmark = this.onRemoveBookmark.bind(this)
     this.state = {
-      title: props.bookmarkName,
+      title: props.title,
       location: props.location,
       parentFolderId: props.parentFolderId,
       isDisabled: props.isDisabled
@@ -87,8 +86,6 @@ class AddEditBookmarkForm extends React.Component {
     this.setState({
       title: title
     })
-
-    this.updateButtonStatus(!isBookmarkNameValid(title, this.state.location, this.props.isFolder))
   }
 
   onLocationChange (e) {
@@ -98,7 +95,7 @@ class AddEditBookmarkForm extends React.Component {
       location: location
     })
 
-    this.updateButtonStatus(!isBookmarkNameValid(this.state.title, location, this.props.isFolder))
+    this.updateButtonStatus(!isBookmarkNameValid(location))
   }
 
   onParentFolderChange (e) {
@@ -118,15 +115,9 @@ class AddEditBookmarkForm extends React.Component {
       appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
     }
 
-    const tag = this.props.isFolder ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK
     let data = Immutable.fromJS({
-      parentFolderId: this.state.parentFolderId,
-      title: this.props.currentTitle
+      parentFolderId: this.state.parentFolderId
     })
-
-    if (this.props.isFolder && this.props.editKey != null) {
-      data = data.set('folderId', this.props.editKey)
-    }
 
     // handle title input
     let title = this.state.title
@@ -136,10 +127,7 @@ class AddEditBookmarkForm extends React.Component {
         title = punycodeUrl
       }
     }
-
-    if (this.props.currentTitle !== title || !title) {
-      data = data.set('customTitle', title || 0)
-    }
+    data = data.set('title', title)
 
     // handle location input
     let location = this.state.location
@@ -152,23 +140,16 @@ class AddEditBookmarkForm extends React.Component {
     data = data.set('location', location)
 
     if (this.props.editKey != null) {
-      appActions.editBookmark(data, this.props.editKey, tag)
+      appActions.editBookmark(data, this.props.editKey)
     } else {
-      appActions.addBookmark(data, tag, this.props.closestKey)
+      appActions.addBookmark(data, this.props.closestKey)
     }
 
     this.onClose()
   }
 
   onRemoveBookmark () {
-    const tag = this.props.isFolder ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK
-    // TODO check if you need to add folderId as prop or you can use editKey
-    appActions.removeSite(Immutable.fromJS({
-      parentFolderId: this.props.parentFolderId,
-      location: this.props.location,
-      partitionNumber: this.props.partitionNumber,
-      folderId: this.props.isFolder ? this.props.editKey : null
-    }), tag)
+    appActions.removeBookmark(this.props.editKey)
     this.onClose()
   }
 
@@ -203,7 +184,7 @@ class AddEditBookmarkForm extends React.Component {
             </div>
           </section>
           {
-            !this.props.isFolder && !this.props.isAdded
+            !this.props.isAdded
               ? <section className={css(styles.bookmarkHanger__marginRow)}>
                 <div className={css(
                   commonFormStyles.inputWrapper,

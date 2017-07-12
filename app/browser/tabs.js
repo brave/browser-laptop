@@ -22,12 +22,15 @@ const messages = require('../../js/constants/messages')
 const aboutHistoryState = require('../common/state/aboutHistoryState')
 const appStore = require('../../js/stores/appStore')
 const appConfig = require('../../js/constants/appConfig')
-const siteTags = require('../../js/constants/siteTags')
 const {newTabMode} = require('../common/constants/settingsEnums')
 const {cleanupWebContents, currentWebContents, getWebContents, updateWebContents} = require('./webContentsCache')
 const {FilterOptions} = require('ad-block')
 const {isResourceEnabled} = require('../filtering')
 const autofill = require('../autofill')
+const bookmarksState = require('../common/state/bookmarksState')
+const bookmarkFoldersState = require('../common/state/bookmarkFoldersState')
+const historyState = require('../common/state/historyState')
+const bookmarkOrderCache = require('../common/cache/bookmarkOrderCache')
 
 let currentPartitionNumber = 0
 const incrementPartitionNumber = () => ++currentPartitionNumber
@@ -134,21 +137,12 @@ ipcMain.on(messages.ABOUT_COMPONENT_INITIALIZED, (e) => {
   })
 })
 
-const getBookmarksData = function (state) {
-  let bookmarkSites = new Immutable.OrderedMap()
-  let bookmarkFolderSites = new Immutable.OrderedMap()
-  state.get('sites').forEach((site, siteKey) => {
-    const tags = site.get('tags')
-    if (tags.includes(siteTags.BOOKMARK)) {
-      bookmarkSites = bookmarkSites.set(siteKey, site)
-    }
-    if (tags.includes(siteTags.BOOKMARK_FOLDER)) {
-      bookmarkFolderSites = bookmarkFolderSites.set(siteKey, site)
-    }
-  })
-  const bookmarks = bookmarkSites.toList().toJS()
-  const bookmarkFolders = bookmarkFolderSites.toList().toJS()
-  return {bookmarks, bookmarkFolders}
+const getBookmarksData = (state) => {
+  return {
+    bookmarks: bookmarksState.getBookmarks(state).toJS(),
+    bookmarkFolders: bookmarkFoldersState.getFolders(state).toJS(),
+    bookmarkOrder: bookmarkOrderCache.getOrderCache(state).toJS()
+  }
 }
 
 const updateAboutDetails = (tab, tabValue) => {
@@ -812,7 +806,7 @@ const api = {
 
   getHistoryEntries: (state, action) => {
     const tab = getWebContents(action.get('tabId'))
-    const sites = state ? state.get('sites') : null
+    const sites = state ? historyState.getSites(state) : null
 
     if (tab && !tab.isDestroyed()) {
       let history = {
@@ -836,7 +830,7 @@ const api = {
           // TODO: return brave lion (or better: get icon from extension if possible as data URI)
         } else {
           if (sites) {
-            const site = sites.find(function (element) { return element.get('location') === url })
+            const site = sites.find((element) => element.get('location') === url)
             if (site) {
               entry.icon = site.get('favicon')
             }

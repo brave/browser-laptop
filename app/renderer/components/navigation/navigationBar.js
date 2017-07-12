@@ -30,10 +30,10 @@ const frameStateUtil = require('../../../../js/state/frameStateUtil')
 // Utils
 const cx = require('../../../../js/lib/classSet')
 const {getBaseUrl} = require('../../../../js/lib/appUrlUtil')
-const siteUtil = require('../../../../js/state/siteUtil')
 const eventUtil = require('../../../../js/lib/eventUtil')
 const {getSetting} = require('../../../../js/settings')
 const contextMenus = require('../../../../js/contextMenus')
+const bookmarkLocationCache = require('../../../common/cache/bookmarkLocationCache')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 
@@ -47,12 +47,10 @@ class NavigationBar extends React.Component {
   }
 
   onToggleBookmark () {
-    const editing = this.props.isBookmarked
-
-    if (editing) {
+    if (this.props.isBookmarked) {
       windowActions.editBookmark(true, this.props.bookmarkKey)
     } else {
-      windowActions.onBookmarkAdded(true, this.props.bookmarkKey)
+      windowActions.onBookmarkAdded(true)
     }
   }
 
@@ -84,7 +82,6 @@ class NavigationBar extends React.Component {
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const activeFrameKey = activeFrame.get('key')
     const activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
-    const activeTab = tabState.getByTabId(state, activeTabId)
 
     const activeTabShowingMessageBox = tabState.isShowingMessageBox(state, activeTabId)
     const bookmarkDetail = currentWindow.get('bookmarkDetail', Immutable.Map())
@@ -95,6 +92,8 @@ class NavigationBar extends React.Component {
     const locationId = getBaseUrl(location)
     const publisherId = state.getIn(['locationInfo', locationId, 'publisher'])
     const navbar = activeFrame.get('navbar', Immutable.Map())
+    const locationCache = bookmarkLocationCache.getCacheKey(state, location)
+    const bookmarkKey = locationCache.get(0, false)
 
     const hasTitle = title && location && title !== location.replace(/^https?:\/\//, '')
     const titleMode = activeTabShowingMessageBox ||
@@ -113,8 +112,7 @@ class NavigationBar extends React.Component {
     // used in renderer
     props.activeFrameKey = activeFrameKey
     props.titleMode = titleMode
-    props.isBookmarked = activeFrameKey !== undefined &&
-      activeTab && activeTab.get('bookmarked')
+    props.isBookmarked = !!bookmarkKey
     props.isWideUrlBarEnabled = getSetting(settings.WIDE_URL_BAR)
     props.showBookmarkHanger = bookmarkDetail.get('isBookmarkHanger', false)
     props.isLoading = loading
@@ -125,7 +123,7 @@ class NavigationBar extends React.Component {
     props.isFocused = navbar.getIn(['urlbar', 'focused'], false)
     props.shouldRenderSuggestions = navbar.getIn(['urlbar', 'suggestions', 'shouldRender']) === true
     props.activeTabId = activeTabId
-    props.bookmarkKey = siteUtil.getSiteKey(activeFrame)
+    props.bookmarkKey = bookmarkKey
     props.showHomeButton = !props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
 
     return props

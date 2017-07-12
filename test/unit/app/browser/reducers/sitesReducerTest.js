@@ -9,6 +9,8 @@ const siteTags = require('../../../../../js/constants/siteTags')
 const { makeImmutable } = require('../../../../../app/common/state/immutableUtil')
 require('../../../braveUnit')
 
+// TODO reuse what you can
+
 const initState = Immutable.fromJS({
   sites: {},
   windows: [],
