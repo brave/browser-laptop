@@ -52,9 +52,23 @@ module.exports = {
   braveExtensionId: 'mnojpmjdmbbfmejpflffifhffcmidifd',
   torrentExtensionId: 'fmdpfempfmekjkcfdehndghogpnpjeno',
   syncExtensionId: 'cjnmeadmgmiihncdidmfiabhenbggfjm',
+  // PDFJS
+  // Parent repo: https://github.com/diracdeltas/pdf.js
+  // Run: gulp run chromium
+  // Use Chromium to package build/chormium with the brave private key for pdfjs.
+  // We maintain our own private keyask bcrypt or bbondy.
   PDFJSExtensionId: 'jdbefljfgobbmcidnmpjamcbhnbphjnb',
+  PDFJSExtensionPublicKey: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqmqh6Kxmj00IjKvjPsCtw6g2BHvKipjS3fBD0IInXZZ57u5oZfw6q42L7tgWDLrNDPvu3XDH0vpECr+IcgBjkM+w6+2VdTyPj5ubngTwvBqCIPItetpsZNJOJfrFw0OIgmyekZYsI+BsK7wiMtHczwfKSTi0JKgrwIRhHbEhpUnCxFhi+zI61p9jwMb2EBFwxru7MtpP21jG7pVznFeLV9W9BkNL1Th9QBvVs7GvZwtIIIniQkKtqT1wp4IY9/mDeM5SgggKakumCnT9D37ZxDnM2K13BKAXOkeH6JLGrZCl3aXmqDO9OhLwoch+LGb5IaXwOZyGnhdhm9MNA3hgEwIDAQAB',
+  // Pocket
+  // Download: https://clients2.google.com/service/update2/crx?response=redirect&prodversion=52.0.2743.116&x=id%3Dniloccemoadcdkdjlinkgdfekeahmflj%26uc // NOLINT
   PocketExtensionId: 'niloccemoadcdkdjlinkgdfekeahmflj',
+  PocketExtensionPublicKey: 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDKCQwBisK1UcxYMn6MAfDbc8yXWzvbnCzqJwjwbeMaAHji91jdCy3bEzMprTZxW/1Anfk9B4P+hcoTwqUaMUB4WemQMRKRsr9vC45V1iv912nqyGkoGT+cRKZc+niBriAnn4J2GBACHJqkkCiSChphDFt/UNoQEKz4VoqWZDVj/QIDAQAB',
+  // Vimium
+  // Download: https://clients2.google.com/service/update2/crx?response=redirect&prodversion=52.0.2743.116&x=id%3Ddbepggeogbaibhgnhhndojpepiihcmeb%26uc // NOLINT
   vimiumExtensionId: 'dbepggeogbaibhgnhhndojpepiihcmeb',
+  vimiumExtensionPublicKey: 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCavizCZ9EnBGbtcRmMErcaxD2WUHJ9ME8IYGQhUBlFgIvchJjAO8koyak3AM95dqu3sOLdtIYD+75T82V1Wl5fLnHAeij2/IWL2VViTHeZhXZl1+rD9sRDaEYd7aZetpJ29+XXfhVphKArCCfwbYCtoJhTIr6S6DYsXuRevoV0EwIDAQAB',
+  // Honey
+  // Download: https://clients2.google.com/service/update2/crx?response=redirect&prodversion=52.0.2743.116&x=id%3Dbmnlcjabgnpnenekpadlanbbkooimhnj%26uc // NOLINT
   honeyExtensionId: 'bmnlcjabgnpnenekpadlanbbkooimhnj',
   honeyExtensionPublicKey: 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC79mayLyuCYY/dyT7Ycr1sVBp9yHrY4mnogVEgu+sDT6+/A121Na+aTw6mFLD6LHgbgHt4fnQ2V/QwcfBSXRTSkGpgNsZAjnYs4/XzZQYKGltWT93EP9zXN1kGbtzfkPGzTakquCfOjbKtbAQKWh8ppzqLhWcRUn9g/PhU99F29QIDAQAB',
   pinterestExtensionId: 'gpdjojdkbbmdfjfahjcgigfpmkopogic',
