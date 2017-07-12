@@ -2,6 +2,7 @@
 
 const syncUtil = require('../../../js/state/syncUtil')
 const assert = require('assert')
+const Immutable = require('immutable')
 
 describe('syncUtil', () => {
   describe('createSiteData()', () => {
@@ -148,6 +149,67 @@ describe('syncUtil', () => {
       const deepObject = {chill: true, deep: {arr: new Uint8Array([1, 2, 3])}}
       const deepExpected = {chill: true, deep: {arr: [1, 2, 3]}}
       assert.deepEqual(syncUtil.ipcSafeObject(deepObject), deepExpected)
+    })
+  })
+
+  describe('getSiteDataFromRecord()', () => {
+    it('update bookmark parent folder to null -> overrides existing parent folder', () => {
+      const objectId = [96, 46, 213, 0, 13, 111, 180, 184, 65, 66, 173, 27, 207, 29, 32, 108]
+      const records = [{
+        action: 1,
+        bookmark: {
+          isFolder: true,
+          parentFolderObjectId: null,
+          site: {
+            creationTime: 0,
+            customTitle: '',
+            favicon: '',
+            lastAccessedTime: 0,
+            location: '',
+            title: 'Folder1'
+          }
+        },
+        deviceId: [1],
+        objectData: 'bookmark',
+        objectId,
+        syncTimestamp: 1499736988267
+      }]
+      const existingObject = {
+        lastAccessedTime: 0,
+        tags: ['bookmark-folder'],
+        objectId,
+        order: 9,
+        folderId: 2,
+        customTitle: 'Folder1', // XXX: Android uses title whereas laptop uses customTitle
+        parentFolderId: 1
+      }
+      const appState = {
+        sites: {
+          '2': existingObject
+        },
+        sync: {
+          objectsById: {
+            [objectId.join('|')]: ['sites', '2']
+          }
+        }
+      }
+      const result = syncUtil.getSiteDataFromRecord(records[0],
+        Immutable.fromJS(appState), Immutable.fromJS(records))
+      assert.equal(result.tag, 'bookmark-folder')
+      assert.deepEqual(result.siteDetail.toJS(),
+        {
+          objectId,
+          title: 'Folder1',
+          favicon: '',
+          location: '',
+          parentFolderId: 0,
+          folderId: 2,
+          tags: ['bookmark-folder'],
+          lastAccessedTime: 0,
+          creationTime: 0
+        }
+      )
+      assert.deepEqual(result.existingObjectData.toJS(), existingObject)
     })
   })
 })
