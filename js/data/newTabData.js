@@ -5,75 +5,64 @@
 const {getBraveExtUrl} = require('../lib/appUrlUtil')
 const iconPath = getBraveExtUrl('img/newtab/defaultTopSitesIcon')
 
-const now = 1
-
 module.exports.pinnedTopSites = [
-    {
-      "count": 1,
-      "favicon": `${iconPath}/twitter.png`,
-      "lastAccessedTime": now,
-      "location": "https://twitter.com/brave",
-      "partitionNumber": 0,
-      "tags": ['default'],
-      "themeColor": "rgb(255, 255, 255)",
-      "title": "Brave Software (@brave) | Twitter"
+  {
+    'key': 'https://twitter.com/brave/|0|0',
+    'count': 0,
+    'favicon': `${iconPath}/twitter.png`,
+    'location': 'https://twitter.com/brave/',
+    'themeColor': 'rgb(255, 255, 255)',
+    'title': 'Brave Software (@brave) | Twitter'
   }
 ]
 
 module.exports.topSites = [
   {
-      "count": 1,
-      "favicon": `${iconPath}/twitter.png`,
-      "lastAccessedTime": now,
-      "location": "https://twitter.com/brave",
-      "partitionNumber": 0,
-      "tags": ['default'],
-      "themeColor": "rgb(255, 255, 255)",
-      "title": "Brave Software (@brave) | Twitter"
-  }, {
-      "count": 1,
-      "favicon": `${iconPath}/facebook.png`,
-      "lastAccessedTime": now,
-      "location": "https://www.facebook.com/BraveSoftware/",
-      "partitionNumber": 0,
-      "tags": ['default'],
-      "themeColor": "rgb(59, 89, 152)",
-      "title": "Brave Software | Facebook"
-  }, {
-      "count": 1,
-      "favicon": `${iconPath}/youtube.png`,
-      "lastAccessedTime": now,
-      "location": "https://www.youtube.com/bravesoftware",
-      "partitionNumber": 0,
-      "tags": ['default'],
-      "themeColor": "#E62117",
-      "title": "Brave Browser - YouTube"
-  }, {
-      "count": 1,
-      "favicon": `${iconPath}/brave.ico`,
-      "lastAccessedTime": now,
-      "location": "https://brave.com/",
-      "partitionNumber": 0,
-      "tags": ['default'],
-      "themeColor": "rgb(255, 255, 255)",
-      "title": "Brave Software | Building a Better Web"
-  }, {
-      "count": 1,
-      "favicon": `${iconPath}/appstore.png`,
-      "lastAccessedTime": now,
-      "location": "https://itunes.apple.com/app/brave-web-browser/id1052879175?mt=8",
-      "partitionNumber": 0,
-      "tags": ['default'],
-      "themeColor": "rgba(255, 255, 255, 1)",
-      "title": "Brave Web Browser: Fast with built-in adblock on the App Store"
-  }, {
-      "count": 1,
-      "favicon": `${iconPath}/playstore.png`,
-      "lastAccessedTime": now,
-      "location": "https://play.google.com/store/apps/details?id=com.brave.browser",
-      "partitionNumber": 0,
-      "tags": ['default'],
-      "themeColor": "rgb(241, 241, 241)",
-      "title": "Brave Browser: Fast AdBlock – Apps para Android no Google Play"
+    'key': 'https://twitter.com/brave/|0|0',
+    'count': 0,
+    'favicon': `${iconPath}/twitter.png`,
+    'location': 'https://twitter.com/brave',
+    'themeColor': 'rgb(255, 255, 255)',
+    'title': 'Brave Software (@brave) | Twitter'
+  },
+  {
+    'key': 'https://www.facebook.com/BraveSoftware/|0|0',
+    'count': 0,
+    'favicon': `${iconPath}/facebook.png`,
+    'location': 'https://www.facebook.com/BraveSoftware/',
+    'themeColor': 'rgb(59, 89, 152)',
+    'title': 'Brave Software | Facebook'
+  },
+  {
+    'key': 'https://www.youtube.com/bravesoftware/|0|0',
+    'count': 0,
+    'favicon': `${iconPath}/youtube.png`,
+    'location': 'https://www.youtube.com/bravesoftware/',
+    'themeColor': '#E62117',
+    'title': 'Brave Browser - YouTube'
+  },
+  {
+    'key': 'https://brave.com/|0|0',
+    'count': 0,
+    'favicon': `${iconPath}/brave.ico`,
+    'location': 'https://brave.com/',
+    'themeColor': 'rgb(255, 255, 255)',
+    'title': 'Brave Software | Building a Better Web'
+  },
+  {
+    'key': 'https://itunes.apple.com/app/brave-web-browser/id1052879175?mt=8|0|0',
+    'count': 0,
+    'favicon': `${iconPath}/appstore.png`,
+    'location': 'https://itunes.apple.com/app/brave-web-browser/id1052879175?mt=8',
+    'themeColor': 'rgba(255, 255, 255, 1)',
+    'title': 'Brave Web Browser: Fast with built-in adblock on the App Store'
+  },
+  {
+    'key': 'https://play.google.com/store/apps/details?id=com.brave.browser|0|0',
+    'count': 0,
+    'favicon': `${iconPath}/playstore.png`,
+    'location': 'https://play.google.com/store/apps/details?id=com.brave.browser',
+    'themeColor': 'rgb(241, 241, 241)',
+    'title': 'Brave Browser: Fast AdBlock – Apps para Android no Google Play'
   }
 ]

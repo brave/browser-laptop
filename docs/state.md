@@ -53,6 +53,30 @@ AppStore
       timestamp: number
     }
   },
+  bookmarks: {
+    [bookmarkKey]: {
+      favicon: string, // URL of the favicon
+      key: string, // key is duplication of bookmarkKey
+      location: string,
+      objectId: Array.<number>,
+      originalSeed: Array.<number>, // bookmarks that have been synced before a sync profile reset
+      parentFolderId: number,
+      partitionNumber: number, // optionally specifies a specific session
+      skipSync: boolean,
+      title: string
+    }
+  },
+  bookmarkFolders: {
+    [folderKey]: {
+      folderId: number,
+      key: string, // key is duplication of folderKey
+      objectId: Array.<number>,
+      originalSeed: Array.<number>, // only set for bookmarks that have been synced before a sync profile reset
+      parentFolderId: number, // set for bookmarks and bookmark folders only
+      skipSync: boolean, // Set for objects FETCHed by sync
+      title: string
+    }
+  },
   clearBrowsingDataDefaults: {
     allSiteCookies: boolean,
     autocompleteData: boolean,
@@ -118,6 +142,18 @@ AppStore
   flash: {
     enabled: boolean // enable flash
   },
+  historySites: {
+    [siteKey]: {
+      favicon: string, // URL of the favicon
+      lastAccessedTime: number, // datetime.getTime()
+      location: string,
+      objectId: Array.<number>,
+      partitionNumber: number, // optionally specifies a specific session
+      skipSync: boolean, // Set for objects FETCHed by sync
+      title: string,
+      themeColor: string
+    }
+  },
   menu: {
     template: object // used on Windows and by our tests: template object with Menubar control
   },
@@ -156,6 +192,13 @@ AppStore
     origin: string, // origin of the form
     username: string
   }],
+  pinnedSites: {
+    [siteKey]: {
+      location: string,
+      title: string,
+      order: number
+    }
+  },
   settings: {
     // See defaults in js/constants/appConfig.js
     'adblock.customRules': string, // custom rules in ABP filter syntax
@@ -229,24 +272,6 @@ AppStore
     'tabs.show-tab-previews': boolean, // true to show tab previews
     'tabs.switch-to-new-tabs': boolean, // true if newly opened tabs should be focused immediately
     'tabs.tabs-per-page': number // number of tabs per tab page
-  },
-  sites: {
-    [siteKey]: {
-      creationTime: number, //creation time of bookmark
-      customTitle: string, // User provided title for bookmark; overrides title
-      favicon: string, // URL of the favicon
-      folderId: number, // set for bookmark folders only
-      lastAccessedTime: number, // datetime.getTime()
-      location: string,
-      objectId: Array.<number>,
-      originalSeed: Array.<number>, // only set for bookmarks that have been synced before a sync profile reset
-      parentFolderId: number, // set for bookmarks and bookmark folders only
-      partitionNumber: number, // optionally specifies a specific session
-      skipSync: boolean, // Set for objects FETCHed by sync
-      tags: [string], // empty, 'bookmark', 'bookmark-folder', 'default', or 'reader'
-      themeColor: string, // CSS compatible color string
-      title: string
-    } // folder: folderId; bookmark/history: location + partitionNumber + parentFolderId
   },
   locationSiteKeyCache: {
     [location]: Array.<string> // location -> site keys

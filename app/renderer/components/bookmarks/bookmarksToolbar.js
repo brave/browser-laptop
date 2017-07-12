@@ -20,8 +20,8 @@ const windowActions = require('../../../../js/actions/windowActions')
 const windowState = require('../../../common/state/windowState')
 
 // Constants
-const siteTags = require('../../../../js/constants/siteTags')
 const dragTypes = require('../../../../js/constants/dragTypes')
+const siteTags = require('../../../../js/constants/siteTags')
 
 // Utils
 const {isFocused} = require('../../currentWindow')
@@ -55,34 +55,43 @@ class BookmarksToolbar extends React.Component {
         if (!bookmarkRef) {
           return false
         }
-        return bookmarkRef.props.bookmarkKey !== bookmark.get('bookmarkKey')
+        return bookmarkRef.props.bookmarkKey !== bookmark.get('key')
       }), e.clientX)
       if (droppedOn.selectedRef) {
-        const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn.selectedRef), e.clientX)
+        const isRightSide = !dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn.selectedRef), e.clientX)
         const droppedOnKey = droppedOn.selectedRef.props.bookmarkKey
         const isDestinationParent = droppedOn.selectedRef.props.isFolder && droppedOn && droppedOn.isDroppedOn
-        appActions.moveSite(bookmark.get('bookmarkKey'), droppedOnKey, isLeftSide, isDestinationParent)
+
+        if (bookmark.get('type') === siteTags.BOOKMARK_FOLDER) {
+          appActions.moveBookmarkFolder(bookmark.get('key'), droppedOnKey, isRightSide, isDestinationParent)
+        } else {
+          appActions.moveBookmark(bookmark.get('key'), droppedOnKey, isRightSide, isDestinationParent)
+        }
         dnd.onDragEnd()
       }
       return
     }
+
     const droppedHTML = e.dataTransfer.getData('text/html')
     if (droppedHTML) {
       const parser = new window.DOMParser()
       const doc = parser.parseFromString(droppedHTML, 'text/html')
       const a = doc.querySelector('a')
       if (a && a.href) {
-        appActions.addSite({
+        appActions.addBookmark(Immutable.fromJS({
           title: a.innerText,
           location: e.dataTransfer.getData('text/plain')
-        }, siteTags.BOOKMARK)
+        }))
         return
       }
     }
 
     if (e.dataTransfer.files.length > 0) {
       Array.from(e.dataTransfer.items).forEach((item) => {
-        item.getAsString((name) => appActions.addSite({ location: item.type, title: name }, siteTags.BOOKMARK))
+        item.getAsString((name) => appActions.addBookmark(Immutable.fromJS({
+          location: item.type,
+          title: name
+        })))
       })
       return
     }
@@ -92,7 +101,7 @@ class BookmarksToolbar extends React.Component {
       .map((x) => x.trim())
       .filter((x) => !x.startsWith('#') && x.length > 0)
       .forEach((url) =>
-        appActions.addSite({ location: url }, siteTags.BOOKMARK))
+        appActions.addBookmark(Immutable.fromJS({ location: url })))
   }
 
   onDragEnter (e) {

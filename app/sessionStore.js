@@ -17,39 +17,32 @@ const path = require('path')
 const electron = require('electron')
 const os = require('os')
 const app = electron.app
-const locale = require('./locale')
+
+// Constants
 const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
+const siteTags = require('../js/constants/siteTags')
 const downloadStates = require('../js/constants/downloadStates')
+
+// State
+const tabState = require('./common/state/tabState')
+const windowState = require('./common/state/windowState')
+
+// Utils
+const locale = require('./locale')
 const siteUtil = require('../js/state/siteUtil')
-const { topSites, pinnedTopSites } = require('../js/data/newTabData')
-const { defaultSiteSettingsList } = require('../js/data/siteSettingsList')
-const sessionStorageVersion = 1
+const {pinnedTopSites} = require('../js/data/newTabData')
+const {defaultSiteSettingsList} = require('../js/data/siteSettingsList')
 const filtering = require('./filtering')
 const autofill = require('./autofill')
 const {navigatableTypes} = require('../js/lib/appUrlUtil')
 const Channel = require('./channel')
-const { makeImmutable } = require('./common/state/immutableUtil')
-const tabState = require('./common/state/tabState')
-const windowState = require('./common/state/windowState')
-
+const {makeImmutable} = require('./common/state/immutableUtil')
+const {getSetting} = require('../js/settings')
 const platformUtil = require('./common/lib/platformUtil')
-const getSetting = require('../js/settings').getSetting
-const sessionStorageName = `session-store-${sessionStorageVersion}`
 
-const getTopSiteMap = () => {
-  if (Array.isArray(topSites) && topSites.length) {
-    let siteMap = {}
-    let order = 0
-    topSites.forEach((site) => {
-      let key = siteUtil.getSiteKey(Immutable.fromJS(site))
-      site.order = order++
-      siteMap[key] = site
-    })
-    return siteMap
-  }
-  return {}
-}
+const sessionStorageVersion = 1
+const sessionStorageName = `session-store-${sessionStorageVersion}`
 
 const getTempStoragePath = (filename) => {
   const epochTimestamp = (new Date()).getTime().toString()
@@ -329,7 +322,7 @@ module.exports.cleanAppData = (data, isShutdown) => {
   if (data.sites) {
     const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY) === true
     if (clearHistory) {
-      data.sites = siteUtil.clearHistory(Immutable.fromJS(data.sites)).toJS()
+      data.historySites = {}
       if (data.about) {
         delete data.about.history
         delete data.about.newtab
@@ -446,6 +439,30 @@ const setVersionInformation = (data) => {
   return data
 }
 
+const sortBookmarkOrder = (bookmarkOrder) => {
+  const newOrder = {}
+  for (let key of Object.keys(bookmarkOrder)) {
+    let i = 0
+    const order = bookmarkOrder[key].sort((x, y) => {
+      if (x.order < y.order) {
+        return -1
+      } else if (x.order > y.order) {
+        return 1
+      } else {
+        return 0
+      }
+    }).map(item => {
+      item.order = i
+      i++
+      return item
+    })
+
+    newOrder[key] = order
+  }
+
+  return newOrder
+}
+
 module.exports.runPreMigrations = (data) => {
   // autofill data migration
   if (data.autofill) {
@@ -496,6 +513,162 @@ module.exports.runPreMigrations = (data) => {
     if (data.settings[settings.DEFAULT_SEARCH_ENGINE] === 'content/search/duckduckgo.xml') {
       data.settings[settings.DEFAULT_SEARCH_ENGINE] = 'DuckDuckGo'
     }
+  }
+
+  if (data.sites) {
+    // pinned sites
+    if (!data.pinnedSites) {
+      data.pinnedSites = {}
+      for (let key of Object.keys(data.sites)) {
+        const site = data.sites[key]
+        if (site.tags && site.tags.includes('pinned')) {
+          delete site.tags
+          data.pinnedSites[key] = site
+        }
+      }
+    }
+
+    // default sites
+    let newTab = data.about.newtab
+
+    if (newTab) {
+      const ignoredSites = []
+      const pinnedSites = []
+
+      if (newTab.ignoredTopSites) {
+        for (let site of newTab.ignoredTopSites) {
+          if (site) {
+            ignoredSites.push(`${site.location}|0|0`)
+          }
+        }
+        data.about.newtab.ignoredTopSites = ignoredSites
+      }
+
+      if (newTab.pinnedTopSites) {
+        for (let site of newTab.pinnedTopSites) {
+          if (site) {
+            site.key = `${site.location}|0|0`
+            pinnedSites.push(site)
+          }
+        }
+        data.about.newtab.pinnedTopSites = pinnedSites
+      }
+
+      data.about.newtab.sites = []
+    }
+
+    // bookmark order
+    let bookmarkOrder = {}
+
+    // bookmark folders
+    if (!data.bookmarkFolders) {
+      data.bookmarkFolders = {}
+
+      for (let key of Object.keys(data.sites)) {
+        const oldFolder = data.sites[key]
+        if (oldFolder.tags && oldFolder.tags.includes(siteTags.BOOKMARK_FOLDER)) {
+          let folder = {}
+          key = key.toString()
+
+          if (oldFolder.customTitle) {
+            folder.title = oldFolder.customTitle
+          } else {
+            folder.title = oldFolder.title
+          }
+
+          if (oldFolder.parentFolderId == null) {
+            folder.parentFolderId = 0
+          } else {
+            folder.parentFolderId = oldFolder.parentFolderId
+          }
+
+          folder.folderId = oldFolder.folderId
+          folder.partitionNumber = oldFolder.partitionNumber
+          folder.objectId = oldFolder.objectId
+          folder.type = siteTags.BOOKMARK_FOLDER
+          folder.key = key
+          data.bookmarkFolders[key] = folder
+
+          // bookmark order
+          const id = folder.parentFolderId.toString()
+          if (!bookmarkOrder[id]) {
+            bookmarkOrder[id] = []
+          }
+
+          bookmarkOrder[id].push({
+            key: key,
+            order: oldFolder.order,
+            type: siteTags.BOOKMARK_FOLDER
+          })
+        }
+      }
+    }
+
+    // bookmarks
+    if (!data.bookmarks) {
+      data.bookmarks = {}
+
+      for (let key of Object.keys(data.sites)) {
+        const oldBookmark = data.sites[key]
+        if (oldBookmark.tags && oldBookmark.tags.includes(siteTags.BOOKMARK)) {
+          let bookmark = {}
+
+          if (oldBookmark.customTitle && oldBookmark.customTitle.length > 0) {
+            bookmark.title = oldBookmark.customTitle
+          } else {
+            bookmark.title = oldBookmark.title
+          }
+
+          if (oldBookmark.parentFolderId == null) {
+            bookmark.parentFolderId = 0
+          } else {
+            bookmark.parentFolderId = oldBookmark.parentFolderId
+          }
+
+          bookmark.location = oldBookmark.location
+          bookmark.partitionNumber = oldBookmark.partitionNumber
+          bookmark.objectId = oldBookmark.objectId
+          bookmark.favicon = oldBookmark.favicon
+          bookmark.themeColor = oldBookmark.themeColor
+          bookmark.type = siteTags.BOOKMARK
+          bookmark.key = key
+          data.bookmarks[key] = bookmark
+
+          // bookmark order
+          const id = bookmark.parentFolderId.toString()
+          if (!bookmarkOrder[id]) {
+            bookmarkOrder[id] = []
+          }
+
+          bookmarkOrder[id].push({
+            key: key,
+            order: oldBookmark.order,
+            type: siteTags.BOOKMARK
+          })
+        }
+      }
+    }
+
+    // Add cache to the state
+    if (!data.cache) {
+      data.cache = {}
+      data.cache.bookmarkLocation = data.locationSiteKeysCache
+      data.cache.bookmarkOrder = sortBookmarkOrder(bookmarkOrder)
+    }
+
+    // history
+    if (!data.historySites) {
+      data.historySites = {}
+
+      for (let key of Object.keys(data.sites)) {
+        const site = data.sites[key]
+        if (site.lastAccessedTime || !site.tags || site.tags.length === 0) {
+          data.historySites[key] = site
+        }
+      }
+    }
+
+    delete data.sites
   }
 
   return data
@@ -633,8 +806,14 @@ module.exports.defaultAppState = () => {
       pendingRecords: {},
       lastConfirmedRecordTimestamp: 0
     },
-    locationSiteKeysCache: undefined,
-    sites: getTopSiteMap(),
+    cache: {
+      bookmarkLocation: undefined,
+      bookmarkOrder: {}
+    },
+    pinnedSites: {},
+    bookmarks: {},
+    bookmarkFolders: {},
+    historySites: {},
     tabs: [],
     windows: [],
     extensions: {},
@@ -658,7 +837,7 @@ module.exports.defaultAppState = () => {
     about: {
       newtab: {
         gridLayoutSize: 'small',
-        sites: topSites,
+        sites: [],
         ignoredTopSites: [],
         pinnedTopSites: pinnedTopSites
       },

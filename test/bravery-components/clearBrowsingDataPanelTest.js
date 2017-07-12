@@ -56,7 +56,7 @@ describe('Clear Browsing Panel', function () {
         .click(clearDataButton)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return getHistory(val.value.sites).size === 0
+            return getHistory(val.value.historySites).size === 0
           })
         })
       yield this.app.client
@@ -65,7 +65,7 @@ describe('Clear Browsing Panel', function () {
         .waitForBrowserWindow()
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return getHistory(val.value.sites).size === 1
+            return getHistory(val.value.historySites).size === 1
           })
         })
       yield openClearBrowsingDataPanel(this.app.client)
@@ -75,7 +75,7 @@ describe('Clear Browsing Panel', function () {
         .click(clearDataButton)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return getHistory(val.value.sites).size === 0
+            return getHistory(val.value.historySites).size === 0
           })
         })
     })
@@ -91,11 +91,18 @@ describe('Clear Browsing Panel', function () {
         .tabByIndex(0)
         .loadUrl(page1Url)
         .waitForBrowserWindow()
+        .pause(5500) // top sites are debounced for 5 seconds
         .waitUntil(function () {
-          return this.getAppState().then((val) =>
-            getHistory(val.value.sites).size === 1 &&
-            val.value.about.history.entries.length === 1 &&
-            getHistory(val.value.about.newtab.sites).size === 1)
+          return this.getAppState().then((val) => {
+            console.log(getHistory(val.value.historySites).size)
+            console.log(val.value.about.history.entries.length)
+            console.log(getHistory(val.value.about.newtab.sites))
+
+            return getHistory(val.value.historySites).size === 1 &&
+              val.value.about.history.entries.length === 1 &&
+              getHistory(val.value.about.newtab.sites).size === 6 &&
+              val.value.about.newtab.sites[0].title === 'Page 1'
+          })
         })
     })
 
@@ -122,7 +129,7 @@ describe('Clear Browsing Panel', function () {
         .click(clearDataButton)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return getHistory(val.value.sites).size === 0
+            return getHistory(val.value.historySites).size === 0
           })
         })
     })
@@ -140,7 +147,7 @@ describe('Clear Browsing Panel', function () {
         .waitForBrowserWindow()
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return getHistory(val.value.sites).size === 1
+            return getHistory(val.value.historySites).size === 1
           })
         })
     })

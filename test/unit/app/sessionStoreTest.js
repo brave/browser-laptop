@@ -377,15 +377,6 @@ describe('sessionStore unit tests', function () {
     })
 
     describe('when sites and clearHistory are truthy', function () {
-      it('calls siteUtil.clearHistory', function () {
-        const clearHistorySpy = sinon.spy(siteUtil, 'clearHistory')
-        const data = {
-          sites: {entry1: {}}
-        }
-        sessionStore.cleanAppData(data, true)
-        assert.equal(clearHistorySpy.calledOnce, true)
-        clearHistorySpy.restore()
-      })
       it('deletes temporary entries used in about:history', function () {
         const data = {
           about: {history: true},

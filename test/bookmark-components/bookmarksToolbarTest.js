@@ -3,7 +3,6 @@
 const Brave = require('../lib/brave')
 const {urlInput, bookmarksToolbar, navigator, navigatorNotBookmarked, doneButton, bookmarkNameInput} = require('../lib/selectors')
 const settings = require('../../js/constants/settings')
-const siteTags = require('../../js/constants/siteTags')
 
 function * setup (client) {
   yield client
@@ -12,17 +11,8 @@ function * setup (client) {
     .waitForEnabled(urlInput)
 }
 
-const findBookmarkFolder = (folderName, val) => {
-  const bookmarksMenu = val.value.menu.template.find((item) => {
-    return item.label === 'Bookmarks'
-  })
-  if (bookmarksMenu && bookmarksMenu.submenu) {
-    const bookmarkFolder = bookmarksMenu.submenu.find((item) => {
-      return item.label === folderName
-    })
-    if (bookmarkFolder) return true
-  }
-  return false
+const findBookmarkFolder = (val, id, folderName) => {
+  return val.value.bookmarkFolders[id] && val.value.bookmarkFolders[id].title === folderName
 }
 
 describe('bookmarksToolbar', function () {
@@ -57,12 +47,11 @@ describe('bookmarksToolbar', function () {
       yield this.app.client
         .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
         .waitForVisible(bookmarksToolbar)
-        .addSite({
-          customTitle: 'demo1',
-          folderId: Math.random(),
-          parentFolderId: 0,
-          tags: [siteTags.BOOKMARK_FOLDER]
-        }, siteTags.BOOKMARK_FOLDER)
+        .addBookmarkFolder({
+          title: 'demo1',
+          folderId: 105,
+          parentFolderId: 0
+        })
         .waitForVisible('[data-test-id="bookmarkToolbarButton"][title=demo1]')
         .click(bookmarksToolbar)
         .click('[data-test-id="bookmarkToolbarButton"][title=demo1]')
@@ -72,38 +61,36 @@ describe('bookmarksToolbar', function () {
     it('automatically opens context menu if you move mouse over a different folder', function * () {
       this.page1Url = Brave.server.url('page1.html')
 
-      const folderId1 = Math.random()
-      const folderId2 = Math.random()
+      const folderId1 = 50
+      const folderId2 = 60
 
       yield this.app.client
         .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
         .waitForVisible(bookmarksToolbar)
-        .addSite({
-          customTitle: 'demo1',
+        .addBookmarkFolder({
+          title: 'demo1',
           folderId: folderId1,
-          parentFolderId: 0,
-          tags: [siteTags.BOOKMARK_FOLDER]
-        }, siteTags.BOOKMARK_FOLDER)
+          parentFolderId: 0
+        })
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return findBookmarkFolder('demo1', val)
+            return findBookmarkFolder(val, folderId1, 'demo1')
           })
         })
-        .addSite({
-          customTitle: 'demo2',
+        .addBookmarkFolder({
+          title: 'demo2',
           folderId: folderId2,
-          parentFolderId: 0,
-          tags: [siteTags.BOOKMARK_FOLDER]
-        }, siteTags.BOOKMARK_FOLDER)
+          parentFolderId: 0
+        })
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return findBookmarkFolder('demo2', val)
+            return findBookmarkFolder(val, folderId2, 'demo2')
           })
         })
         .waitForUrl(Brave.newTabUrl)
         .loadUrl(this.page1Url)
         .windowParentByUrl(this.page1Url)
-        .waitForSiteEntry(this.page1Url)
+        .waitForHistoryEntry(this.page1Url)
         .waitForVisible(navigator)
         .activateURLMode()
         .waitForVisible(navigatorNotBookmarked)
@@ -120,24 +107,24 @@ describe('bookmarksToolbar', function () {
 
     it('hides context menu when mousing over regular bookmark', function * () {
       this.page1Url = Brave.server.url('page1.html')
+      const folderId1 = 40
       yield this.app.client
         .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
         .waitForVisible(bookmarksToolbar)
-        .addSite({
-          customTitle: 'demo1',
-          folderId: Math.random(),
-          parentFolderId: 0,
-          tags: [siteTags.BOOKMARK_FOLDER]
-        }, siteTags.BOOKMARK_FOLDER)
+        .addBookmarkFolder({
+          title: 'demo1',
+          folderId: folderId1,
+          parentFolderId: 0
+        })
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return findBookmarkFolder('demo1', val)
+            return findBookmarkFolder(val, folderId1, 'demo1')
           })
         })
         .waitForUrl(Brave.newTabUrl)
         .loadUrl(this.page1Url)
         .windowParentByUrl(this.page1Url)
-        .waitForSiteEntry(this.page1Url)
+        .waitForHistoryEntry(this.page1Url)
         .waitForVisible(navigator)
         .activateURLMode()
         .waitForVisible(navigatorNotBookmarked)
@@ -145,7 +132,6 @@ describe('bookmarksToolbar', function () {
         .waitForVisible(doneButton)
         .waitForBookmarkDetail(this.page1Url, 'Page 1')
         .typeText(bookmarkNameInput, 'test1')
-        .waitForBookmarkDetail(this.page1Url, 'test1')
         .waitForEnabled(doneButton)
         .click(doneButton)
         .waitForVisible('[data-test-id="bookmarkToolbarButton"][title^=test1]')
@@ -172,7 +158,7 @@ describe('bookmarksToolbar', function () {
         .waitForUrl(Brave.newTabUrl)
         .loadUrl(pageWithFavicon)
         .windowParentByUrl(pageWithFavicon)
-        .waitForSiteEntry(pageWithFavicon, false)
+        .waitForHistoryEntry(pageWithFavicon, false)
         .activateURLMode()
         .waitForVisible(navigatorNotBookmarked)
         .click(navigatorNotBookmarked)
@@ -197,7 +183,7 @@ describe('bookmarksToolbar', function () {
         .waitForUrl(Brave.newTabUrl)
         .loadUrl(pageWithoutFavicon)
         .windowParentByUrl(pageWithoutFavicon)
-        .waitForSiteEntry(pageWithoutFavicon, false)
+        .waitForHistoryEntry(pageWithoutFavicon, false)
         .activateURLMode()
         .waitForVisible(navigatorNotBookmarked)
         .click(navigatorNotBookmarked)

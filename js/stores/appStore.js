@@ -45,6 +45,9 @@ const extensionState = require('../../app/common/state/extensionState')
 const aboutNewTabState = require('../../app/common/state/aboutNewTabState')
 const aboutHistoryState = require('../../app/common/state/aboutHistoryState')
 const tabState = require('../../app/common/state/tabState')
+const bookmarksState = require('../../app/common/state/bookmarksState')
+const bookmarkFoldersState = require('../../app/common/state/bookmarkFoldersState')
+const historyState = require('../../app/common/state/historyState')
 
 const isDarwin = process.platform === 'darwin'
 const isWindows = process.platform === 'win32'
@@ -344,16 +347,6 @@ const appStore = new AppStore()
 const emitChanges = debounce(appStore.emitChanges.bind(appStore), 5)
 
 /**
- * Clears out the top X non tagged sites.
- * This is debounced to every 1 minute, the cleanup is not particularly intensive
- * but there's no point to cleanup frequently.
- */
-const filterOutNonRecents = debounce(() => {
-  appState = appState.set('sites', siteUtil.filterOutNonRecents(appState.get('sites')))
-  emitChanges()
-}, 60 * 1000)
-
-/**
  * Useful for updating non-react preferences (electron properties, etc).
  * Called when any settings are modified (ex: via preferences).
  */
@@ -398,7 +391,10 @@ const handleAppAction = (action) => {
       // until we have a better way to manage dependencies.
       // tabsReducer must be above dragDropReducer.
       require('../../app/browser/reducers/tabsReducer'),
-      require('../../app/browser/reducers/sitesReducer'),
+      require('../../app/browser/reducers/bookmarksReducer'),
+      require('../../app/browser/reducers/bookmarkFoldersReducer'),
+      require('../../app/browser/reducers/historyReducer'),
+      require('../../app/browser/reducers/pinnedSitesReducer'),
       require('../../app/browser/reducers/windowsReducer'),
       require('../../app/browser/reducers/syncReducer'),
       require('../../app/browser/reducers/clipboardReducer'),
@@ -437,6 +433,7 @@ const handleAppAction = (action) => {
       appState = webtorrent.init(appState, action, appStore)
       appState = profiles.init(appState, action, appStore)
       appState = require('../../app/sync').init(appState, action, appStore)
+      calculateTopSites(true, true)
       break
     case appConstants.APP_SHUTTING_DOWN:
       AppDispatcher.shutdown()
@@ -448,30 +445,11 @@ const handleAppAction = (action) => {
     case appConstants.APP_CHANGE_NEW_TAB_DETAIL:
       appState = aboutNewTabState.mergeDetails(appState, action)
       if (action.refresh) {
-        calculateTopSites(true)
+        calculateTopSites(true, true)
       }
-      break
-    case appConstants.APP_POPULATE_HISTORY:
-      appState = aboutHistoryState.setHistory(appState, action)
       break
     case appConstants.APP_DATA_URL_COPIED:
       nativeImage.copyDataURL(action.dataURL, action.html, action.text)
-      break
-    case appConstants.APP_ADD_SITE:
-    case appConstants.APP_ADD_BOOKMARK:
-    case appConstants.APP_EDIT_BOOKMARK:
-      const oldSiteSize = appState.get('sites').size
-      calculateTopSites(false)
-      appState = aboutHistoryState.setHistory(appState, action)
-      // If there was an item added then clear out the old history entries
-      if (oldSiteSize !== appState.get('sites').size) {
-        filterOutNonRecents()
-      }
-      break
-    case appConstants.APP_APPLY_SITE_RECORDS:
-    case appConstants.APP_REMOVE_SITE:
-      calculateTopSites(true)
-      appState = aboutHistoryState.setHistory(appState, action)
       break
     case appConstants.APP_SET_DATA_FILE_ETAG:
       appState = appState.setIn([action.resourceName, 'etag'], action.etag)
@@ -665,8 +643,8 @@ const handleAppAction = (action) => {
       const clearData = defaults ? defaults.merge(temp) : temp
 
       if (clearData.get('browserHistory')) {
-        calculateTopSites(true)
-        appState = aboutHistoryState.setHistory(appState)
+        appState = aboutNewTabState.clearTopSites(appState)
+        appState = aboutHistoryState.clearHistory(appState)
         syncActions.clearHistory()
         BrowserWindow.getAllWindows().forEach((wnd) => wnd.webContents.send(messages.CLEAR_CLOSED_FRAMES))
       }
@@ -800,8 +778,9 @@ const handleAppAction = (action) => {
       appState = appState.set('defaultBrowserCheckComplete', {})
       break
     case windowConstants.WINDOW_SET_FAVICON:
-      appState = siteUtil.updateSiteFavicon(appState, action.frameProps.get('location'), action.favicon)
       if (action.frameProps.get('favicon') !== action.favicon) {
+        appState = bookmarksState.updateFavicon(appState, action.frameProps.get('location'), action.favicon)
+        appState = historyState.updateFavicon(appState, action.frameProps, action.favicon)
         calculateTopSites(false)
       }
       break
@@ -856,13 +835,22 @@ const handleAppAction = (action) => {
       const syncDefault = Immutable.fromJS(sessionStore.defaultAppState().sync)
       const originalSeed = appState.getIn(['sync', 'seed'])
       appState = appState.set('sync', syncDefault)
-      appState.get('sites').forEach((site, key) => {
-        if (site.has('objectId') && syncUtil.isSyncable('bookmark', site)) {
+      bookmarksState.getBookmarks(appState).forEach((site, key) => {
+        if (site.has('objectId')) {
           // Remember which profile this bookmark was originally synced to.
           // Since old bookmarks should be synced when a new profile is created,
           // we have to keep track of which profile already has these bookmarks
           // or else the old profile may have these bookmarks duplicated. #7405
-          appState = appState.setIn(['sites', key, 'originalSeed'], originalSeed)
+          appState = appState.setIn(['bookmarks', key, 'originalSeed'], originalSeed)
+        }
+      })
+      bookmarkFoldersState.getFolders(appState).forEach((site, key) => {
+        if (site.has('objectId')) {
+          // Remember which profile this bookmark was originally synced to.
+          // Since old bookmarks should be synced when a new profile is created,
+          // we have to keep track of which profile already has these bookmarks
+          // or else the old profile may have these bookmarks duplicated. #7405
+          appState = appState.setIn(['bookmarks', key, 'originalSeed'], originalSeed)
         }
       })
       appState.setIn(['sync', 'devices'], {})

@@ -18,7 +18,6 @@ const windowActions = require('../../../../js/actions/windowActions')
 const windowStore = require('../../../../js/stores/windowStore')
 
 // Constants
-const siteTags = require('../../../../js/constants/siteTags')
 const dragTypes = require('../../../../js/constants/dragTypes')
 
 // Utils
@@ -26,6 +25,7 @@ const siteUtil = require('../../../../js/state/siteUtil')
 const dnd = require('../../../../js/dnd')
 const dndData = require('../../../../js/dndData')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
+const pinnedSitesUtil = require('../../../common/lib/pinnedSitesUtil')
 const {isIntermediateAboutPage} = require('../../../../js/lib/appUrlUtil')
 
 class PinnedTabs extends React.Component {
@@ -58,12 +58,14 @@ class PinnedTabs extends React.Component {
         if (!sourceDragData.get('pinnedLocation')) {
           appActions.tabPinned(sourceDragData.get('tabId'), true)
         } else {
-          const sourceDetails = siteUtil.getDetailFromFrame(sourceDragData, siteTags.PINNED)
+          const sourceDetails = pinnedSitesUtil.getDetailFromFrame(sourceDragData)
           const droppedOnFrame = this.dropFrame(droppedOnTab.props.frameKey)
-          const destinationDetails = siteUtil.getDetailFromFrame(droppedOnFrame, siteTags.PINNED)
-          appActions.moveSite(siteUtil.getSiteKey(sourceDetails),
+          const destinationDetails = pinnedSitesUtil.getDetailFromFrame(droppedOnFrame)
+          appActions.onPinnedTabReorder(
+            siteUtil.getSiteKey(sourceDetails),
             siteUtil.getSiteKey(destinationDetails),
-            isLeftSide)
+            isLeftSide
+          )
         }
       }
     }, 0)

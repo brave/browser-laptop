@@ -10,21 +10,32 @@ const importer = electron.importer
 const dialog = electron.dialog
 const BrowserWindow = electron.BrowserWindow
 const session = electron.session
-const siteUtil = require('../js/state/siteUtil')
-const AppStore = require('../js/stores/appStore')
-const siteTags = require('../js/constants/siteTags')
-const appActions = require('../js/actions/appActions')
+
+// Store
+const appStore = require('../js/stores/appStore')
+
+// State
+const tabState = require('./common/state/tabState')
+const bookmarksState = require('./common/state/bookmarksState')
+const bookmarkFoldersState = require('./common/state/bookmarkFoldersState')
+
+// Constants
 const messages = require('../js/constants/messages')
 const settings = require('../js/constants/settings')
-const getSetting = require('../js/settings').getSetting
+
+// Actions
+const appActions = require('../js/actions/appActions')
+
+// Utils
+const {getSetting} = require('../js/settings')
 const locale = require('./locale')
 const tabMessageBox = require('./browser/tabMessageBox')
 const {makeImmutable} = require('./common/state/immutableUtil')
-const tabState = require('./common/state/tabState')
+const bookmarkFoldersUtil = require('./common/lib/bookmarkFoldersUtil')
 
-var isImportingBookmarks = false
-var hasBookmarks
-var importedSites
+let isImportingBookmarks = false
+let hasBookmarks
+let bookmarkList
 
 exports.init = () => {
   importer.initialize()
@@ -33,10 +44,8 @@ exports.init = () => {
 exports.importData = (selected) => {
   if (selected.get('favorites')) {
     isImportingBookmarks = true
-    const sites = AppStore.getState().get('sites')
-    hasBookmarks = sites.find(
-      (site) => siteUtil.isBookmark(site) || siteUtil.isFolder(site)
-    )
+    const state = appStore.getState()
+    hasBookmarks = bookmarksState.getBookmarks(state).size > 0 || bookmarkFoldersState.getFolders(state).size > 0
   }
   if (selected !== undefined) {
     importer.importData(selected.toJS())
@@ -45,10 +54,8 @@ exports.importData = (selected) => {
 
 exports.importHTML = (selected) => {
   isImportingBookmarks = true
-  const sites = AppStore.getState().get('sites')
-  hasBookmarks = sites.find(
-    (site) => siteUtil.isBookmark(site) || siteUtil.isFolder(site)
-  )
+  const state = appStore.getState()
+  hasBookmarks = bookmarksState.getBookmarks(state).size > 0 || bookmarkFoldersState.getFolders(state).size > 0
   const files = dialog.showOpenDialog({
     properties: ['openFile'],
     filters: [{
@@ -69,7 +76,7 @@ importer.on('update-supported-browsers', (e, detail) => {
   }
 })
 
-importer.on('add-history-page', (e, history, visitSource) => {
+importer.on('add-history-page', (e, history) => {
   let sites = []
   for (let i = 0; i < history.length; ++i) {
     const site = {
@@ -79,80 +86,71 @@ importer.on('add-history-page', (e, history, visitSource) => {
     }
     sites.push(site)
   }
-  appActions.addSite(makeImmutable(sites))
+  appActions.addHistorySite(makeImmutable(sites))
 })
 
 importer.on('add-homepage', (e, detail) => {
 })
 
-const getParentFolderId = (path, pathMap, sites, topLevelFolderId, nextFolderIdObject) => {
+const getParentFolderId = (path, pathMap, folders, topLevelFolderId, nextFolderIdObject) => {
   const pathLen = path.length
   if (!pathLen) {
     return topLevelFolderId
   }
+
   const parentFolder = path.pop()
   let parentFolderId = pathMap[parentFolder]
   if (parentFolderId === undefined) {
     parentFolderId = nextFolderIdObject.id++
     pathMap[parentFolder] = parentFolderId
-    const folder = {
-      customTitle: parentFolder,
+    folders.push({
+      title: parentFolder,
       folderId: parentFolderId,
-      parentFolderId: getParentFolderId(path, pathMap, sites, topLevelFolderId, nextFolderIdObject),
-      lastAccessedTime: 0,
-      creationTime: (new Date()).getTime(),
-      tags: [siteTags.BOOKMARK_FOLDER]
-    }
-    sites.push(folder)
+      parentFolderId: getParentFolderId(path, pathMap, folders, topLevelFolderId, nextFolderIdObject)
+    })
   }
   return parentFolderId
 }
 
-importer.on('add-bookmarks', (e, bookmarks, topLevelFolder) => {
-  let nextFolderId = siteUtil.getNextFolderId(AppStore.getState().get('sites'))
+importer.on('add-bookmarks', (e, importedBookmarks, topLevelFolder) => {
+  const state = appStore.getState()
+  const bookmarkFolders = bookmarkFoldersState.getFolders(state)
+  let nextFolderId = bookmarkFoldersUtil.getNextFolderId(bookmarkFolders)
   let nextFolderIdObject = { id: nextFolderId }
   let pathMap = {}
-  let sites = []
-  let topLevelFolderId = 0
-  topLevelFolderId = nextFolderIdObject.id++
-  sites.push({
-    customTitle: siteUtil.getNextFolderName(AppStore.getState().get('sites'), topLevelFolder),
+  let folders = []
+  let bookmarks = []
+  let topLevelFolderId = nextFolderIdObject.id++
+
+  folders.push({
+    title: bookmarkFoldersUtil.getNextFolderName(bookmarkFolders, topLevelFolder),
     folderId: topLevelFolderId,
-    parentFolderId: 0,
-    lastAccessedTime: 0,
-    creationTime: (new Date()).getTime(),
-    tags: [siteTags.BOOKMARK_FOLDER]
+    parentFolderId: 0
   })
-  for (let i = 0; i < bookmarks.length; ++i) {
-    let path = bookmarks[i].path
-    let parentFolderId = getParentFolderId(path, pathMap, sites, topLevelFolderId, nextFolderIdObject)
-    if (bookmarks[i].is_folder) {
+
+  for (let i = 0; i < importedBookmarks.length; ++i) {
+    let path = importedBookmarks[i].path
+    let parentFolderId = getParentFolderId(path, pathMap, folders, topLevelFolderId, nextFolderIdObject)
+    if (importedBookmarks[i].is_folder) {
       const folderId = nextFolderIdObject.id++
-      pathMap[bookmarks[i].title] = folderId
-      const folder = {
-        customTitle: bookmarks[i].title,
+      pathMap[importedBookmarks[i].title] = folderId
+      folders.push({
+        title: importedBookmarks[i].title,
         folderId: folderId,
-        parentFolderId: parentFolderId,
-        lastAccessedTime: 0,
-        creationTime: bookmarks[i].creation_time * 1000,
-        tags: [siteTags.BOOKMARK_FOLDER]
-      }
-      sites.push(folder)
+        parentFolderId: parentFolderId
+      })
     } else {
-      const site = {
-        title: bookmarks[i].title,
-        customTitle: bookmarks[i].title,
-        location: bookmarks[i].url,
-        parentFolderId: parentFolderId,
-        lastAccessedTime: 0,
-        creationTime: bookmarks[i].creation_time * 1000,
-        tags: [siteTags.BOOKMARK]
-      }
-      sites.push(site)
+      bookmarks.push({
+        title: importedBookmarks[i].title,
+        location: importedBookmarks[i].url,
+        parentFolderId: parentFolderId
+      })
     }
   }
-  importedSites = makeImmutable(sites)
-  appActions.addSite(makeImmutable(sites))
+
+  bookmarkList = bookmarks
+  appActions.addBookmarkFolder(makeImmutable(folders))
+  appActions.addBookmark(makeImmutable(bookmarks))
 })
 
 importer.on('add-favicons', (e, detail) => {
@@ -168,17 +166,24 @@ importer.on('add-favicons', (e, detail) => {
       }
     }
   })
-  let sites = importedSites
-  sites = sites.map((site) => {
-    if ((site.get('favicon') === undefined && site.get('location') !== undefined &&
-      faviconMap[site.get('location')] !== undefined) ||
-      (site.get('favicon') !== undefined && site.get('favicon').includes('made-up-favicon'))) {
+  let updatedSites = bookmarkList.map((site) => {
+    if (
+      (
+        site.get('favicon') === undefined &&
+        site.get('location') !== undefined &&
+        faviconMap[site.get('location')] !== undefined
+      ) ||
+      (
+        site.get('favicon') !== undefined &&
+        site.get('favicon').includes('made-up-favicon'))
+    ) {
       return site.set('favicon', faviconMap[site.get('location')])
     } else {
       return site
     }
   })
-  appActions.addSite(sites)
+  // TODO can we call addBookmark only once? we need to create a new functions addFavicons
+  appActions.addBookmark(updatedSites)
 })
 
 importer.on('add-keywords', (e, templateUrls, uniqueOnHostAndPath) => {
@@ -208,7 +213,7 @@ importer.on('add-cookies', (e, cookies) => {
 })
 
 const getActiveTabId = () => {
-  return tabState.getActiveTabId(AppStore.getState())
+  return tabState.getActiveTabId(appStore.getState())
 }
 
 const showImportWarning = function () {

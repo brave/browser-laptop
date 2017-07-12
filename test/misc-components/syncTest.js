@@ -673,7 +673,7 @@ describe('Syncing history', function () {
       .tabByIndex(0)
       .loadUrl(this.page1Url)
       .windowParentByUrl(this.page1Url)
-      .waitForSiteEntry(this.page1Url)
+      .waitForHistoryEntry(this.page1Url)
 
     // For order: Visit page 2
     yield Brave.app.client

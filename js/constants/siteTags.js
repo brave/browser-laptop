@@ -6,11 +6,9 @@ const mapValuesByKeys = require('../lib/functional').mapValuesByKeys
 
 const _ = null
 const siteTags = {
-  DEFAULT: _,
   BOOKMARK: _,
   BOOKMARK_FOLDER: _,
-  PINNED: _,
-  READING_LIST: _
+  HISTORY: _
 }
 
 module.exports = mapValuesByKeys(siteTags)
