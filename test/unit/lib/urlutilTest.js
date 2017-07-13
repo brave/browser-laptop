@@ -69,6 +69,9 @@ describe('urlutil', function () {
           assert.equal(UrlUtil.isNotURL('chrome-extension://fmfcbgogabcbclcofgocippekhfcmgfj/cast_sender.js'), false)
         })
         it('is a magnet URL', function () {
+          assert.equal(UrlUtil.isNotURL('chrome://gpu'), false)
+        })
+        it('is a chrome page', function () {
           assert.equal(UrlUtil.isNotURL('magnet:?xt=urn:sha1:YNCKHTQCWBTRNJIV4WNAE52SJUQCZO5C'), false)
         })
       })
