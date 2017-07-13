@@ -359,12 +359,14 @@ const updateRecentlyClosedMenuItems = (state) => {
 
   // Update in-memory menu template (Windows)
   const oldTemplate = state.getIn(['menu', 'template'])
-  const historyMenuKey = oldTemplate.findKey(value =>
-    value.get('label') === locale.translation('history')
-  )
-  const newSubmenu = createHistorySubmenu()
-  const newTemplate = oldTemplate.setIn([historyMenuKey, 'submenu'], newSubmenu)
-  appActions.setMenubarTemplate(newTemplate)
+  if (oldTemplate) {
+    const historyMenuKey = oldTemplate.findKey(value =>
+      value.get('label') === locale.translation('history')
+    )
+    const newSubmenu = createHistorySubmenu()
+    const newTemplate = oldTemplate.setIn([historyMenuKey, 'submenu'], newSubmenu)
+    appActions.setMenubarTemplate(newTemplate)
+  }
 }
 
 const isCurrentLocationBookmarked = (state) => {
@@ -662,17 +664,20 @@ const doAction = (state, action) => {
     case appConstants.APP_TAB_CLOSE_REQUESTED:
       {
         action = makeImmutable(action)
-        const tab = getByTabId(state, action.get('tabId'))
-        const frame = tab && tab.get('frame')
-        if (tab && !tab.get('incognito') && frame && frameStateUtil.isValidClosedFrame(frame)) {
-          lastClosedUrl = tab.get('url')
-          closedFrames = closedFrames.set(tab.get('url'), tab.get('frame'))
-          updateRecentlyClosedMenuItems(state)
+        const tabId = action.get('tabId')
+        if (tabId) {
+          const tab = getByTabId(state, tabId)
+          const frame = tab && tab.get('frame')
+          if (tab && !tab.get('incognito') && frame && frameStateUtil.isValidClosedFrame(frame)) {
+            lastClosedUrl = tab.get('url')
+            closedFrames = closedFrames.set(tab.get('url'), tab.get('frame'))
+            updateRecentlyClosedMenuItems(state)
+          }
         }
         break
       }
     case appConstants.APP_APPLY_SITE_RECORDS:
-      if (action.records.find((record) => record.objectData === 'bookmark')) {
+      if (action.records && action.records.find((record) => record.objectData === 'bookmark')) {
         createMenu(state)
       }
       break
@@ -680,7 +685,7 @@ const doAction = (state, action) => {
       {
         if (action.tag === siteTags.BOOKMARK || action.tag === siteTags.BOOKMARK_FOLDER) {
           createMenu(state)
-        } else if (action.siteDetail.constructor === Immutable.List && action.tag === undefined) {
+        } else if (action.siteDetail && action.siteDetail.constructor === Immutable.List && action.tag === undefined) {
           let shouldRebuild = false
           action.siteDetail.forEach((site) => {
             const tag = site.getIn(['tags', 0])
