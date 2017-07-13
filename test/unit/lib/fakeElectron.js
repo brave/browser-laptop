@@ -63,6 +63,12 @@ const fakeElectron = {
   dialog: {
     showOpenDialog: function () { }
   },
+  Menu: {
+    setApplicationMenu: (template) => {},
+    buildFromTemplate: (template) => {
+      return require('./fakeElectronMenu')
+    }
+  },
   shell: {
     openExternal: function () {
     },
