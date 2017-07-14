@@ -8,6 +8,7 @@ const updateHost = process.env.BRAVE_UPDATE_HOST || 'https://brave-laptop-update
 const winUpdateHost = process.env.BRAVE_WIN_UPDATE_HOST || 'https://brave-download.global.ssl.fastly.net'
 const crashURL = process.env.BRAVE_CRASH_URL || 'https://brave-laptop-updates.herokuapp.com/1/crashes'
 const adHost = process.env.AD_HOST || 'https://oip.brave.com'
+const isTest = process.env.NODE_ENV === 'test'
 
 const buildConfig = require('./buildConfig')
 const isProduction = buildConfig.nodeEnv === 'production'
@@ -16,7 +17,8 @@ const {fullscreenOption, autoplayOption} = require('../../app/common/constants/s
 module.exports = {
   name: 'Brave',
   contactUrl: 'mailto:support+laptop@brave.com',
-  quitTimeout: 10 * 1000,
+  quitTimeout: isTest ? 3 * 1000 : 10 * 1000,
+  sessionSaveInterval: 1000 * 60 * 5,
   resourceNames: {
     ADBLOCK: 'adblock',
     SAFE_BROWSING: 'safeBrowsing',

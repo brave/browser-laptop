@@ -602,6 +602,12 @@ var exports = {
       })
     })
 
+    this.app.client.addCommand('stopReportingStateUpdates', function () {
+      return this.execute(function () {
+        devTools('electron').ipcRenderer.removeAllListeners('request-window-state')
+      })
+    })
+
     this.app.client.addCommand('detachTabByIndex', function (index, windowId = -1) {
       return this.waitForTab({index}).getWindowState().then((val) => {
         const frame = val.value.frames[index]
@@ -679,6 +685,24 @@ var exports = {
       }
       return this.execute(function (siteDetail, tag) {
         return devTools('appActions').addSite(siteDetail, tag)
+      }, siteDetail, tag).then((response) => response.value)
+      .waitForSiteEntry(waitUrl, false)
+    })
+
+    /**
+     * Adds a bookmark to the bookmarks list.
+     *
+     * @param {object} siteDetail - Properties for the siteDetail to add
+     * @param {string} tag - A site tag from js/constants/siteTags.js
+     */
+    this.app.client.addCommand('addBookmark', function (siteDetail, tag) {
+      logVerbose('addBookmark("' + siteDetail + '", "' + tag + '")')
+      let waitUrl = siteDetail.location
+      if (isSourceAboutUrl(waitUrl)) {
+        waitUrl = getTargetAboutUrl(waitUrl)
+      }
+      return this.execute(function (siteDetail, tag) {
+        return devTools('appActions').addBookmark(siteDetail, tag)
       }, siteDetail, tag).then((response) => response.value)
       .waitForSiteEntry(waitUrl, false)
     })
@@ -1020,7 +1044,7 @@ var exports = {
     return this.app.start()
   },
 
-  stopApp: function (cleanSessionStore = true) {
+  stopApp: function (cleanSessionStore = true, timeout = 100) {
     const promises = []
 
     if (process.env.BRAVE_TEST_ALL_LOGS || process.env.BRAVE_TEST_BROWSER_LOGS) {
@@ -1056,7 +1080,7 @@ var exports = {
     }
 
     promises.push((callback) => {
-      callback = setTimeout(cleanup.bind(this, callback), 100)
+      callback = setTimeout(cleanup.bind(this, callback), timeout)
       this.app.client.waitForBrowserWindow().quit()
         .then(callback)
         .catch((err) => {

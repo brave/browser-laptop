@@ -48,16 +48,15 @@ if (process.platform === 'win32') {
 
 const electron = require('electron')
 const app = electron.app
-const BrowserWindow = electron.BrowserWindow
 const ipcMain = electron.ipcMain
 const Immutable = require('immutable')
-const Updater = require('./updater')
+const updater = require('./updater')
 const Importer = require('./importer')
 const messages = require('../js/constants/messages')
-const appConfig = require('../js/constants/appConfig')
 const appActions = require('../js/actions/appActions')
 const SessionStore = require('./sessionStore')
-const AppStore = require('../js/stores/appStore')
+const {startSessionSaveInterval} = require('./sessionStoreShutdown')
+const appStore = require('../js/stores/appStore')
 const Autofill = require('./autofill')
 const Extensions = require('./extensions')
 const TrackingProtection = require('./trackingProtection')
@@ -67,28 +66,16 @@ const HttpsEverywhere = require('./httpsEverywhere')
 const PDFJS = require('./pdfJS')
 const SiteHacks = require('./siteHacks')
 const CmdLine = require('./cmdLine')
-const UpdateStatus = require('../js/constants/updateStatus')
 const urlParse = require('./common/urlParse')
 const spellCheck = require('./spellCheck')
 const locale = require('./locale')
 const contentSettings = require('../js/state/contentSettings')
 const privacy = require('../js/state/privacy')
-const async = require('async')
 const settings = require('../js/constants/settings')
 const BookmarksExporter = require('./browser/bookmarksExporter')
 const siteUtil = require('../js/state/siteUtil')
 
 app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferHtmlOverPlugins')
-
-// Used to collect the per window state when shutting down the application
-let perWindowState = []
-let sessionStateStoreComplete = false
-let sessionStateStoreCompleteCallback = null
-let saveAppStateTimeout = null
-let requestId = 0
-let shuttingDown = false
-let lastWindowState
-let lastWindowClosed = false
 
 // Domains to accept bad certs for. TODO: Save the accepted cert fingerprints.
 let acceptCertDomains = {}
@@ -99,105 +86,8 @@ const prefsRestartLastValue = {}
 
 const defaultProtocols = ['http', 'https']
 
-const sessionStoreQueue = async.queue((task, callback) => {
-  task(callback)
-}, 1)
-
-const logSaveAppStateError = (e) => {
-  console.error('Error saving app state: ', e)
-}
-
-const saveAppState = (forceSave = false) => {
-  if (!sessionStateStoreCompleteCallback) {
-    return
-  }
-
-  // If we're shutting down early and can't access the state, it's better
-  // to not try to save anything at all and just quit.
-  if (shuttingDown && !AppStore.getState()) {
-    app.exit(0)
-  }
-
-  const appState = AppStore.getState().toJS()
-  appState.perWindowState = perWindowState
-
-  const receivedAllWindows = perWindowState.length === BrowserWindow.getAllWindows().length
-  if (receivedAllWindows) {
-    clearTimeout(saveAppStateTimeout)
-  }
-
-  if (!forceSave && !receivedAllWindows) {
-    return
-  }
-
-  return SessionStore.saveAppState(appState, shuttingDown).catch((e) => {
-    logSaveAppStateError(e)
-  }).then(() => {
-    if (receivedAllWindows || forceSave) {
-      sessionStateStoreComplete = true
-    }
-
-    if (sessionStateStoreComplete) {
-      if (shuttingDown) {
-        // If the status is still UPDATE_AVAILABLE then the user wants to quit
-        // and not restart
-        if (appState.updates && (appState.updates.status === UpdateStatus.UPDATE_AVAILABLE ||
-            appState.updates.status === UpdateStatus.UPDATE_AVAILABLE_DEFERRED)) {
-          // In this case on win32, the process doesn't try to auto restart, so avoid the user
-          // having to open the app twice.  Maybe squirrel detects the app is already shutting down.
-          if (process.platform === 'win32') {
-            appState.updates.status = UpdateStatus.UPDATE_APPLYING_RESTART
-          } else {
-            appState.updates.status = UpdateStatus.UPDATE_APPLYING_NO_RESTART
-          }
-        }
-
-        // If there's an update to apply, then do it here.
-        // Otherwise just quit.
-        if (appState.updates && (appState.updates.status === UpdateStatus.UPDATE_APPLYING_NO_RESTART ||
-            appState.updates.status === UpdateStatus.UPDATE_APPLYING_RESTART)) {
-          Updater.quitAndInstall()
-        } else {
-          app.quit()
-        }
-      } else {
-        const cb = sessionStateStoreCompleteCallback
-        sessionStateStoreCompleteCallback = null
-        cb()
-      }
-    }
-  })
-}
-
-/**
- * Saves the session storage for all windows
- */
-const initiateSessionStateSave = () => {
-  sessionStoreQueue.push((cb) => {
-    sessionStateStoreComplete = false
-    sessionStateStoreCompleteCallback = cb
-
-    perWindowState.length = 0
-    // quit triggered by window-all-closed should save last window state
-    if (lastWindowClosed && lastWindowState) {
-      perWindowState.push(lastWindowState)
-      saveAppState(true)
-    } else if (BrowserWindow.getAllWindows().length > 0) {
-      ++requestId
-      BrowserWindow.getAllWindows().forEach((win) => win.webContents.send(messages.REQUEST_WINDOW_STATE, requestId))
-      // Just in case a window is not responsive, we don't want to wait forever.
-      // In this case just save session store for the windows that we have already.
-      saveAppStateTimeout = setTimeout(() => {
-        saveAppState(true)
-      }, appConfig.quitTimeout)
-    } else {
-      saveAppState()
-    }
-  })
-}
-
 // exit cleanly on signals
-['SIGTERM', 'SIGHUP', 'SIGINT', 'SIGBREAK'].forEach((signal) => {
+;['SIGTERM', 'SIGHUP', 'SIGINT', 'SIGBREAK'].forEach((signal) => {
   process.on(signal, () => {
     app.quit()
   })
@@ -245,7 +135,6 @@ const notifyCertError = (webContents, url, error, cert) => {
 }
 
 app.on('ready', () => {
-  let sessionStateSaveInterval = null
   app.on('certificate-error', (e, webContents, url, error, cert, resourceType, overridable, strictEnforcement, expiredPreviousDecision, cb) => {
     let host = urlParse(url).host
     if (host && acceptCertDomains[host] === true) {
@@ -263,66 +152,12 @@ app.on('ready', () => {
     notifyCertError(webContents, url, error, cert)
   })
 
-  app.on('window-all-closed', () => {
-    // On macOS it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform !== 'darwin') {
-      lastWindowClosed = true
-      app.quit()
-    }
-  })
-
-  app.on('before-quit', (e) => {
-    if (shuttingDown && sessionStateStoreComplete) {
-      return
-    }
-
-    e.preventDefault()
-
-    // before-quit can be triggered multiple times because of the preventDefault call
-    if (shuttingDown) {
-      return
-    } else {
-      shuttingDown = true
-    }
-
-    appActions.shuttingDown()
-    clearInterval(sessionStateSaveInterval)
-    initiateSessionStateSave()
-  })
-
   app.on('network-connected', () => {
     appActions.networkConnected()
   })
 
   app.on('network-disconnected', () => {
     appActions.networkDisconnected()
-  })
-
-  // User initiated exit using File->Quit
-  ipcMain.on(messages.RESPONSE_WINDOW_STATE, (evt, data, id) => {
-    if (id !== requestId) {
-      return
-    }
-
-    if (data) {
-      perWindowState.push(data)
-    }
-    saveAppState()
-  })
-
-  ipcMain.on(messages.LAST_WINDOW_STATE, (evt, data) => {
-    if (data) {
-      lastWindowState = data
-    }
-  })
-
-  process.on(messages.UNDO_CLOSED_WINDOW, () => {
-    if (lastWindowState) {
-      SessionStore.cleanPerWindowData(lastWindowState)
-      appActions.newWindow(undefined, undefined, lastWindowState)
-      lastWindowState = undefined
-    }
   })
 
   loadAppStatePromise.then((initialState) => {
@@ -455,8 +290,7 @@ app.on('ready', () => {
       }
     })
 
-    // save app state every 5 minutes regardless of update frequency
-    sessionStateSaveInterval = setInterval(initiateSessionStateSave, 1000 * 60 * 5)
+    startSessionSaveInterval()
 
     ipcMain.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex, persist) => {
       if (prefsRestartCallbacks[message]) {
@@ -469,13 +303,13 @@ app.on('ready', () => {
     })
 
     ipcMain.on(messages.EXPORT_BOOKMARKS, () => {
-      BookmarksExporter.showDialog(AppStore.getState().get('sites'))
+      BookmarksExporter.showDialog(appStore.getState().get('sites'))
     })
     // DO NOT TO THIS LIST - see above
 
     // We need the initial state to read the UPDATE_TO_PREVIEW_RELEASES preference
     loadAppStatePromise.then((initialState) => {
-      Updater.init(
+      updater.init(
         process.platform,
         process.arch,
         process.env.BRAVE_UPDATE_VERSION || app.getVersion(),
@@ -483,8 +317,8 @@ app.on('ready', () => {
       )
 
       // This is fired by a menu entry
-      process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
-      ipcMain.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
+      process.on(messages.CHECK_FOR_UPDATE, () => updater.checkForUpdate(true))
+      ipcMain.on(messages.CHECK_FOR_UPDATE, () => updater.checkForUpdate(true))
 
       // This is fired from a auto-update metadata call
       process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => {
@@ -498,7 +332,7 @@ app.on('ready', () => {
     })
 
     process.on(messages.EXPORT_BOOKMARKS, () => {
-      BookmarksExporter.showDialog(AppStore.getState().get('sites'))
+      BookmarksExporter.showDialog(appStore.getState().get('sites'))
     })
 
     ready = true

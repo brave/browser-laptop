@@ -1,17 +1,16 @@
 /* global describe, it, before, after */
 
 const Brave = require('../lib/brave')
-const Immutable = require('immutable')
 const {urlInput, navigatorBookmarked, navigatorNotBookmarked, pinnedTabsTabs, tabsTabs} = require('../lib/selectors')
 const siteTags = require('../../js/constants/siteTags')
-const siteUtil = require('../../js/state/siteUtil')
+const settings = require('../../js/constants/settings')
 
-describe('sessionStore', function () {
+describe('sessionStore test', function () {
   function * setup (client) {
     Brave.addCommands()
   }
 
-  describe('state is preserved', function () {
+  describe('state is preserved with a normal shutdown', function () {
     Brave.beforeAllServerSetup(this)
     before(function * () {
       const page1Url = Brave.server.url('page1.html')
@@ -19,24 +18,18 @@ describe('sessionStore', function () {
         location: page1Url,
         title: 'some page'
       }
-      const key = siteUtil.getSiteKey(Immutable.fromJS(site))
       yield Brave.startApp()
       yield setup(Brave.app.client)
       yield Brave.app.client
         .waitForBrowserWindow()
-        .onClearBrowsingData('browserHistory', true)
+        .changeSetting(settings.DISABLE_TITLE_MODE, false)
         .waitForUrl(Brave.newTabUrl)
         .loadUrl(page1Url)
         .windowParentByUrl(page1Url)
         .activateURLMode()
         .waitForExist(navigatorNotBookmarked)
-      yield Brave.app.client.addSite(site, siteTags.BOOKMARK)
-        .waitUntil(function () {
-          return this.getAppState().then((val) => {
-            let state = val.value
-            return siteUtil.getBookmarks(Immutable.fromJS(state.sites)).size === 1 && state.sites[key].location === page1Url
-          })
-        })
+        .addBookmark(site, siteTags.BOOKMARK)
+        .waitForExist(navigatorBookmarked)
       yield Brave.stopApp(false)
       yield Brave.startApp()
       yield setup(Brave.app.client)
@@ -51,14 +44,81 @@ describe('sessionStore', function () {
       yield Brave.app.client
         .waitForUrl(page1Url)
         .waitForBrowserWindow()
-        .moveToObject(urlInput)
+        .activateURLMode()
         .waitForInputText(urlInput, page1Url)
     })
 
     it('appstate by preserving a bookmark', function * () {
       yield Brave.app.client
         .waitForBrowserWindow()
+        .activateURLMode()
         .waitForExist(navigatorBookmarked)
+    })
+  })
+
+  describe('state is preserved with a hung window', function () {
+    Brave.beforeAllServerSetup(this)
+    before(function * () {
+      const page1Url = Brave.server.url('page1.html')
+      const site = {
+        location: page1Url,
+        title: 'some page'
+      }
+      yield Brave.startApp()
+      yield setup(Brave.app.client)
+      yield Brave.app.client
+        .waitForBrowserWindow()
+        .changeSetting(settings.DISABLE_TITLE_MODE, false)
+        .waitForUrl(Brave.newTabUrl)
+        .loadUrl(page1Url)
+        .windowParentByUrl(page1Url)
+        .activateURLMode()
+        .waitForExist(navigatorNotBookmarked)
+        .addBookmark(site, siteTags.BOOKMARK)
+        .waitForExist(navigatorBookmarked)
+
+      yield Brave.stopApp(false)
+      yield Brave.startApp()
+      yield setup(Brave.app.client)
+
+      yield Brave.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForBrowserWindow()
+        .activateURLMode()
+        .waitForInputText(urlInput, page1Url)
+        .stopReportingStateUpdates()
+        .newTab({active: false})
+        .waitForTabCount(2)
+        .waitForBrowserWindow()
+
+      yield Brave.stopApp(false, 10000)
+      yield Brave.startApp()
+      yield setup(Brave.app.client)
+    })
+
+    after(function * () {
+      yield Brave.stopApp()
+    })
+
+    it('windowState by preserving open page', function * () {
+      const page1Url = Brave.server.url('page1.html')
+      yield Brave.app.client
+        .waitForUrl(page1Url)
+        .waitForBrowserWindow()
+        .activateURLMode()
+        .waitForInputText(urlInput, page1Url)
+    })
+
+    it('appstate by preserving a bookmark', function * () {
+      yield Brave.app.client
+        .waitForBrowserWindow()
+        .activateURLMode()
+        .waitForExist(navigatorBookmarked)
+    })
+
+    it('has only 1 tab on restore', function * () {
+      yield Brave.app.client
+        .waitForTabCount(1)
     })
   })
 

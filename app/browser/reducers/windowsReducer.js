@@ -8,6 +8,7 @@ const appConstants = require('../../../js/constants/appConstants')
 const windowConstants = require('../../../js/constants/windowConstants')
 const windowState = require('../../common/state/windowState')
 const windows = require('../windows')
+const sessionStoreShutdown = require('../../sessionStoreShutdown')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 
 const windowsReducer = (state, action, immutableAction) => {
@@ -31,6 +32,7 @@ const windowsReducer = (state, action, immutableAction) => {
       break
     case appConstants.APP_WINDOW_CLOSED:
       state = windowState.removeWindow(state, action)
+      sessionStoreShutdown.removeWindowFromCache(action.getIn(['windowValue', 'windowId']))
       break
     case appConstants.APP_WINDOW_CREATED:
       state = windowState.maybeCreateWindow(state, action)
