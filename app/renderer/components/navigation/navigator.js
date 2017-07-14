@@ -29,7 +29,7 @@ const windowState = require('../../../common/state/windowState')
 
 // Util
 const {getCurrentWindowId, isMaximized, isFullScreen, isFocused} = require('../../currentWindow')
-const {isWindows} = require('../../../common/lib/platformUtil')
+const isWindows = require('../../../common/lib/platformUtil').isWindows()
 const {braveShieldsEnabled} = require('../../../common/state/shieldState')
 const eventUtil = require('../../../../js/lib/eventUtil')
 const {isNavigatableAboutPage, getBaseUrl} = require('./../../../../js/lib/appUrlUtil')
@@ -180,7 +180,7 @@ class Navigator extends React.Component {
     props.shieldEnabled = braveShieldsEnabled(activeFrame)
     props.menuBarVisible = menuBarState.isMenuBarVisible(currentWindow)
     props.isMaximized = isMaximized() || isFullScreen()
-    props.isCaptionButton = isWindows() && !props.menuBarVisible
+    props.isCaptionButton = isWindows && !props.menuBarVisible
     props.activeTabShowingMessageBox = activeTabShowingMessageBox
     props.extensionBrowserActions = extensionBrowserActions
     props.showBrowserActions = !activeTabShowingMessageBox &&
@@ -319,7 +319,7 @@ class Navigator extends React.Component {
                 this.props.isCounterEnabled
                   ? <div className={css(
                       styles.lionBadge,
-                      (this.props.menuBarVisible || !isWindows()) && styles.lionBadgeRight,
+                      (this.props.menuBarVisible || !isWindows) && styles.lionBadgeRight,
                       // delay badge show-up.
                       // this is also set for extension badge
                       // in a way that both can appear at the same time.

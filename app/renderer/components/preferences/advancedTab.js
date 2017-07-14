@@ -22,10 +22,12 @@ const {scaleSize} = require('../../../common/constants/toolbarUserInterfaceScale
 // Utils
 const {changeSetting} = require('../../lib/settingsUtil')
 const platformUtil = require('../../../common/lib/platformUtil')
+const isDarwin = platformUtil.isDarwin()
+const isLinux = platformUtil.isLinux()
 
 class AdvancedTab extends ImmutableComponent {
   previewReleases () {
-    return platformUtil.isLinux()
+    return isLinux
       ? null
       : <SettingCheckbox
         dataL10nId='updateToPreviewReleases'
@@ -36,7 +38,7 @@ class AdvancedTab extends ImmutableComponent {
   }
 
   get swipeNavigationDistanceSetting () {
-    if (platformUtil.isDarwin()) {
+    if (isDarwin) {
       return <div>
         <DefaultSectionTitle data-l10n-id='swipeNavigationDistance' />
         <SettingsList listClassName={css(styles.swipeNavigation)}>
