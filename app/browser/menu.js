@@ -486,7 +486,7 @@ const createDebugSubmenu = () => {
       // The console will print a message like: [84790:0710/201431:ERROR:child_process.cc(136)] Renderer (84790) paused waiting for debugger to attach. Send SIGUSR1 to unpause.
       // And this means you should attach Xcode or whatever your debugger is to PID 84790 to unpause.
       // To debug all renderer processes then add the appendSwitch call to app/index.js
-      label: 'append wait renderer switch',
+      label: 'Append wait renderer switch',
       click: function () {
         app.commandLine.appendSwitch('renderer-startup-dialog')
       }
@@ -516,10 +516,16 @@ const createDebugSubmenu = () => {
         }
       }
     }, {
-      label: 'Toggle React Profiling',
+      label: 'Toggle React profiling',
       accelerator: 'Alt+P',
       click: function (item, focusedWindow) {
         CommonMenu.sendToFocusedWindow(focusedWindow, [messages.DEBUG_REACT_PROFILE])
+      }
+    }, {
+      label: 'Stop reporting window state',
+      click: function () {
+        const win = BrowserWindow.getActiveWindow()
+        appActions.noReportStateModeClicked(win.id)
       }
     }
   ]
@@ -557,7 +563,7 @@ const createMenu = (state) => {
     { label: locale.translation('help'), submenu: createHelpSubmenu(), role: 'help' }
   ]
 
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development' || process.env.BRAVE_ENABLE_DEBUG_MENU !== undefined) {
     template.push({ label: 'Debug', submenu: createDebugSubmenu() })
   }
 

@@ -35,6 +35,7 @@ const webtorrent = require('../../app/browser/webtorrent')
 const assert = require('assert')
 const profiles = require('../../app/browser/profiles')
 const {zoomLevel} = require('../../app/common/constants/toolbarUserInterfaceScale')
+const {initWindowCacheState} = require('../../app/sessionStoreShutdown')
 
 // state helpers
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
@@ -197,6 +198,7 @@ const createWindow = (action) => {
 
   setImmediate(() => {
     let mainWindow = new BrowserWindow(Object.assign(windowProps, browserOpts, {disposition: frameOpts.disposition}))
+    initWindowCacheState(mainWindow.id, action.restoredState)
 
     // initialize frames state
     let frames = []

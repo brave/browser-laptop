@@ -1506,6 +1506,15 @@ const appActions = {
       tag,
       editKey
     })
+  },
+
+  noReportStateModeClicked: function (windowId) {
+    dispatch({
+      actionType: appConstants.APP_DEBUG_NO_REPORT_STATE_MODE_CLICKED,
+      queryInfo: {
+        windowId
+      }
+    })
   }
 }
 
