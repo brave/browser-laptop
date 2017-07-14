@@ -972,7 +972,8 @@ function mainTemplateInit (nodeProps, frame, tab) {
         getMisspelledSuggestions(nodeProps.selectionText,
                                  true, nodeProps.dictionarySuggestions,
                                  frame.get('tabId'))
-    } else if (nodeProps.properties.hasOwnProperty('customDictionaryWord') &&
+    } else if (nodeProps.properties &&
+               nodeProps.properties.hasOwnProperty('customDictionaryWord') &&
                nodeProps.properties['customDictionaryWord'] === nodeProps.selectionText) {
       misspelledSuggestions =
         getMisspelledSuggestions(nodeProps.selectionText,
