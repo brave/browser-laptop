@@ -5,6 +5,9 @@ const sinon = require('sinon')
 const Immutable = require('immutable')
 const messages = require('../../../js/constants/messages')
 
+let isWindows = false
+let isDarwin = false
+
 require('../braveUnit')
 
 const makeSender = (fakeWindow) => ({
@@ -43,6 +46,10 @@ describe('sessionStoreShutdown unit tests', function () {
         }
       }
     }
+
+    const platformUtil = require('../../../app/common/lib/platformUtil')
+    this.isWindowsStub = sinon.stub(platformUtil, 'isWindows', () => isWindows)
+    this.isDarwinStub = sinon.stub(platformUtil, 'isDarwin', () => isDarwin)
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('ad-block', fakeAdBlock)
     mockery.registerMock('leveldown', {})
@@ -55,6 +62,8 @@ describe('sessionStoreShutdown unit tests', function () {
 
   after(function () {
     this.clock.restore()
+    this.isWindowsStub.restore()
+    this.isDarwinStub.restore()
     mockery.disable()
   })
 
@@ -65,36 +74,27 @@ describe('sessionStoreShutdown unit tests', function () {
   describe('windows all closed', function () {
     before(function () {
       this.appQuitSpy = sinon.spy(fakeElectron.app, 'quit')
-      this.oldPlatform = process.platform
       sessionStoreShutdown.reset()
     })
     afterEach(function () {
       this.appQuitSpy.reset()
     })
     after(function () {
-      Object.defineProperty(process, 'platform', {
-        value: this.oldPlatform
-      })
       this.appQuitSpy.restore()
     })
     it('does not quit on macOS', function () {
-      Object.defineProperty(process, 'platform', {
-        value: 'darwin'
-      })
+      isDarwin = true
       fakeElectron.app.emit('window-all-closed')
       assert.equal(this.appQuitSpy.notCalled, true)
+      isDarwin = false
     })
     it('quits on windows', function () {
-      Object.defineProperty(process, 'platform', {
-        value: 'win32'
-      })
+      isWindows = true
       fakeElectron.app.emit('window-all-closed')
       assert.equal(this.appQuitSpy.calledOnce, true)
+      isWindows = false
     })
     it('quits on linux', function () {
-      Object.defineProperty(process, 'platform', {
-        value: 'linux'
-      })
       fakeElectron.app.emit('window-all-closed')
       assert.equal(this.appQuitSpy.calledOnce, true)
     })
@@ -173,17 +173,12 @@ describe('sessionStoreShutdown unit tests', function () {
         this.clock.tick(1)
       })
       it('remembers last closed window with no windows (Win32)', function (cb) {
-        const oldPlatform = process.platform
-        Object.defineProperty(process, 'platform', {
-          value: 'win32'
-        })
+        isWindows = true
         const windowState = { a: 1 }
         fakeElectron.ipcMain.send(messages.LAST_WINDOW_STATE, {}, windowState)
         fakeElectron.app.emit('window-all-closed')
         const saveAppStateStub = sinon.stub(sessionStore, 'saveAppState', (state) => {
-          Object.defineProperty(process, 'platform', {
-            value: oldPlatform
-          })
+          isWindows = false
           assert.equal(saveAppStateStub.calledOnce, true)
           saveAppStateStub.restore()
           assert.equal(state.perWindowState.length, 1)
@@ -195,17 +190,10 @@ describe('sessionStoreShutdown unit tests', function () {
         this.clock.tick(1)
       })
       it('remembers last closed window with no windows (Linux)', function (cb) {
-        const oldPlatform = process.platform
-        Object.defineProperty(process, 'platform', {
-          value: 'linux'
-        })
         const windowState = { a: 1 }
         fakeElectron.ipcMain.send(messages.LAST_WINDOW_STATE, {}, windowState)
         fakeElectron.app.emit('window-all-closed')
         const saveAppStateStub = sinon.stub(sessionStore, 'saveAppState', (state) => {
-          Object.defineProperty(process, 'platform', {
-            value: oldPlatform
-          })
           assert.equal(saveAppStateStub.calledOnce, true)
           saveAppStateStub.restore()
           assert.equal(state.perWindowState.length, 1)
@@ -217,17 +205,12 @@ describe('sessionStoreShutdown unit tests', function () {
         this.clock.tick(1)
       })
       it('remembers last closed window with no windows (macOS)', function (cb) {
-        const oldPlatform = process.platform
-        Object.defineProperty(process, 'platform', {
-          value: 'darwin'
-        })
+        isDarwin = true
         const windowState = { a: 1 }
         fakeElectron.ipcMain.send(messages.LAST_WINDOW_STATE, {}, windowState)
         fakeElectron.app.emit('window-all-closed')
         const saveAppStateStub = sinon.stub(sessionStore, 'saveAppState', (state) => {
-          Object.defineProperty(process, 'platform', {
-            value: oldPlatform
-          })
+          isDarwin = false
           assert.equal(saveAppStateStub.calledOnce, true)
           saveAppStateStub.restore()
           assert.equal(state.perWindowState.length, 0)

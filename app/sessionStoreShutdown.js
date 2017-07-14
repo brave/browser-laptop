@@ -12,6 +12,7 @@ const appConfig = require('../js/constants/appConfig')
 const async = require('async')
 const messages = require('../js/constants/messages')
 const appActions = require('../js/actions/appActions')
+const platformUtil = require('./common/lib/platformUtil')
 
 // Used to collect the per window state when shutting down the application
 let perWindowState
@@ -99,7 +100,7 @@ const saveAppState = (forceSave = false) => {
             appState.updates.status === updateStatus.UPDATE_AVAILABLE_DEFERRED)) {
           // In this case on win32, the process doesn't try to auto restart, so avoid the user
           // having to open the app twice.  Maybe squirrel detects the app is already shutting down.
-          if (process.platform === 'win32') {
+          if (platformUtil.isWindows()) {
             appState.updates.status = updateStatus.UPDATE_APPLYING_RESTART
           } else {
             appState.updates.status = updateStatus.UPDATE_APPLYING_NO_RESTART
@@ -227,7 +228,7 @@ process.on(messages.UNDO_CLOSED_WINDOW, () => {
 app.on('window-all-closed', () => {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
+  if (!platformUtil.isDarwin()) {
     isAllWindowsClosed = true
     app.quit()
   }
