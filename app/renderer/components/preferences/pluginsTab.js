@@ -8,7 +8,10 @@ const aboutActions = require('../../../../js/about/aboutActions')
 const getSetting = require('../../../../js/settings').getSetting
 const settings = require('../../../../js/constants/settings')
 const appConfig = require('../../../../js/constants/appConfig')
-const {isWindows, isDarwin, isLinux} = require('../../../common/lib/platformUtil')
+const platformUtil = require('../../../common/lib/platformUtil')
+const isDarwin = platformUtil.isDarwin()
+const isLinux = platformUtil.isLinux()
+const isWindows = platformUtil.isLinux()
 
 const WidevineInfo = require('../main/widevineInfo')
 const flash = appConfig.resourceNames.FLASH
@@ -55,7 +58,7 @@ class PluginsTab extends ImmutableComponent {
         <SettingCheckbox checked={this.flashInstalled ? this.props.braveryDefaults.get('flash') : false} dataL10nId='enableFlash' onChange={this.onToggleFlash} disabled={!this.flashInstalled} />
         <div className='subtext flashText'>
           {
-            isDarwin() || isWindows()
+            isDarwin || isWindows
             ? <div>
               {this.infoCircle(appConfig.flash.installUrl)}
               <span data-l10n-id='enableFlashSubtext' />&nbsp;
@@ -81,7 +84,7 @@ class PluginsTab extends ImmutableComponent {
         </div>
       </SettingsList>
       {
-        !isLinux()
+        !isLinux
           ? <div>
             <DefaultSectionTitle data-l10n-id='widevineSection' />
             <SettingsList>

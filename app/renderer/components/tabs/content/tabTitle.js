@@ -12,7 +12,9 @@ const ReduxComponent = require('../../reduxComponent')
 const tabContentState = require('../../../../common/state/tabContentState')
 
 // Utils
-const {isWindows, isDarwin} = require('../../../../common/lib/platformUtil')
+const platformUtil = require('../../../../common/lib/platformUtil')
+const isWindows = platformUtil.isWindows()
+const isDarwin = platformUtil.isDarwin()
 
 // Styles
 const globalStyles = require('../../styles/global')
@@ -25,7 +27,7 @@ class TabTitle extends React.Component {
 
     const props = {}
     // used in renderer
-    props.enforceFontVisibility = isDarwin() && tabIconColor === 'white'
+    props.enforceFontVisibility = isDarwin && tabIconColor === 'white'
     props.tabIconColor = tabIconColor
     props.displayTitle = tabContentState.getDisplayTitle(currentWindow, frameKey)
 
@@ -49,7 +51,7 @@ class TabTitle extends React.Component {
         titleStyles.gradientText,
         this.props.enforceFontVisibility && styles.enforceFontVisibility,
         // Windows specific style
-        isWindows() && styles.tabTitleForWindows
+        isWindows && styles.tabTitleForWindows
       )}>
       {this.props.displayTitle}
     </div>

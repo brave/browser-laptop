@@ -22,10 +22,11 @@ const {scaleSize} = require('../../../common/constants/toolbarUserInterfaceScale
 // Utils
 const {changeSetting} = require('../../lib/settingsUtil')
 const platformUtil = require('../../../common/lib/platformUtil')
+const isLinux = platformUtil.isLinux()
 
 class AdvancedTab extends ImmutableComponent {
   previewReleases () {
-    return platformUtil.isLinux()
+    return isLinux
       ? null
       : <SettingCheckbox
         dataL10nId='updateToPreviewReleases'

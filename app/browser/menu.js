@@ -36,7 +36,9 @@ const menuUtil = require('../common/lib/menuUtil')
 const {getSetting} = require('../../js/settings')
 const locale = require('../locale')
 const {isLocationBookmarked} = require('../../js/state/siteUtil')
-const {isDarwin, isLinux} = require('../common/lib/platformUtil')
+const platformUtil = require('../common/lib/platformUtil')
+const isDarwin = platformUtil.isDarwin()
+const isLinux = platformUtil.isLinux()
 
 let appMenu = null
 let closedFrames = new Immutable.OrderedMap()

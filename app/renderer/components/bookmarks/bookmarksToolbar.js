@@ -29,7 +29,7 @@ const contextMenus = require('../../../../js/contextMenus')
 const cx = require('../../../../js/lib/classSet')
 const dnd = require('../../../../js/dnd')
 const dndData = require('../../../../js/dndData')
-const {isWindows} = require('../../../common/lib/platformUtil')
+const isWindows = require('../../../common/lib/platformUtil').isWindows()
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const bookmarkUtil = require('../../../common/lib/bookmarkUtil')
 
@@ -145,7 +145,7 @@ class BookmarksToolbar extends React.Component {
     props.showOnlyFavicon = bookmarkUtil.showOnlyFavicon()
     props.showFavicon = bookmarkUtil.showFavicon()
     props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused()) &&
-      !isWindows()
+      !isWindows
     props.visibleBookmarks = bookmarks.visibleBookmarks
     props.hiddenBookmarks = bookmarks.hiddenBookmarks
 
