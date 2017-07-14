@@ -33,17 +33,6 @@ const webviewActions = {
   },
 
   /**
-   * Replaces the selected text in an editable
-   * @param {string} text - The text to replace with
-   */
-  replace: function (text) {
-    const webview = getWebview()
-    if (webview) {
-      webview.replaceMisspelling(text)
-    }
-  },
-
-  /**
    * Shows the certificate infomation
    */
   showCertificate: function () {

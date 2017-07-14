@@ -400,10 +400,10 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/sitesReducer'),
       require('../../app/browser/reducers/windowsReducer'),
       require('../../app/browser/reducers/syncReducer'),
-      require('../../app/browser/reducers/spellCheckReducer'),
       require('../../app/browser/reducers/clipboardReducer'),
       require('../../app/browser/reducers/urlBarSuggestionsReducer'),
       require('../../app/browser/reducers/passwordManagerReducer'),
+      require('../../app/browser/reducers/spellCheckerReducer'),
       require('../../app/browser/reducers/tabMessageBoxReducer'),
       require('../../app/browser/reducers/dragDropReducer'),
       require('../../app/browser/reducers/extensionsReducer'),
@@ -648,26 +648,6 @@ const handleAppAction = (action) => {
           }))
         }
       }
-      break
-    case appConstants.APP_ADD_WORD:
-      let listType = 'ignoredWords'
-      if (action.learn) {
-        listType = 'addedWords'
-      }
-      const path = ['dictionary', listType]
-      let wordList = appState.getIn(path)
-      if (!wordList.includes(action.word)) {
-        appState = appState.setIn(path, wordList.push(action.word))
-      }
-      break
-    case appConstants.APP_SET_DICTIONARY:
-      appState = appState.setIn(['dictionary', 'locale'], action.locale)
-      break
-    case appConstants.APP_BACKUP_KEYS:
-      appState = ledger.backupKeys(appState, action)
-      break
-    case appConstants.APP_RECOVER_WALLET:
-      appState = ledger.recoverKeys(appState, action)
       break
     case appConstants.APP_LEDGER_RECOVERY_STATUS_CHANGED:
       {

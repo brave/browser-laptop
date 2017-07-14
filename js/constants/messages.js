@@ -76,8 +76,6 @@ const messages = {
   GO_FORWARD: _,
   RELOAD: _,
   DETACH: _,
-  IS_MISSPELLED: _, /** @arg {string} word, the word to check */
-  GET_MISSPELLING_INFO: _, /** @arg {string} word, the word to lookup */
   PASSWORD_DETAILS_UPDATED: _, /** @arg {Object} passwords app state */
   PASSWORD_SITE_DETAILS_UPDATED: _, /** @arg {Object} passwords app state */
   // Init

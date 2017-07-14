@@ -178,7 +178,7 @@ var rendererIdentifiers = function () {
     'braveryStartUsingPayments',
     'blockPopups',
     'learnSpelling',
-    'ignoreSpelling',
+    'forgetLearnedSpelling',
     'lookupSelection',
     // Other identifiers
     'aboutBlankTitle',
