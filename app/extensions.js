@@ -113,7 +113,6 @@ let generateBraveManifest = () => {
           getBraveExtUrl('about-blank.html') + '#*'
         ],
         js: [
-          'content/scripts/spellCheck.js',
           'content/scripts/themeColor.js'
         ]
       },

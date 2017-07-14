@@ -636,10 +636,6 @@ module.exports.defaultAppState = () => {
     passwords: [],
     notifications: [],
     temporarySiteSettings: {},
-    dictionary: {
-      addedWords: [],
-      ignoredWords: []
-    },
     autofill: {
       addresses: {
         guid: [],

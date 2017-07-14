@@ -119,7 +119,6 @@
     "react-dnd": "^2.1.4",
     "react-dnd-html5-backend": "^2.1.2",
     "react-dom": "^15.5.4",
-    "spellchecker": "brave/node-spellchecker",
     "string.prototype.endswith": "^0.2.0",
     "string.prototype.startswith": "^0.2.0",
     "tablesort": "5.0.0",
