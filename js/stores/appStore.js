@@ -11,7 +11,6 @@ const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
 const siteUtil = require('../state/siteUtil')
 const syncUtil = require('../state/syncUtil')
-const siteSettings = require('../state/siteSettings')
 const appUrlUtil = require('../lib/appUrlUtil')
 const electron = require('electron')
 const app = electron.app
@@ -406,6 +405,7 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/extensionsReducer'),
       require('../../app/browser/reducers/shareReducer'),
       require('../../app/browser/reducers/updatesReducer'),
+      require('../../app/browser/reducers/siteSettingsReducer'),
       require('../../app/ledger').doAction,
       require('../../app/browser/menu')
     ]
@@ -513,56 +513,6 @@ const handleAppAction = (action) => {
       appState = appState.setIn(['settings', action.key], action.value)
       handleChangeSettingAction(action.key, action.value)
       break
-    case appConstants.APP_ALLOW_FLASH_ONCE:
-      {
-        const propertyName = action.isPrivate ? 'temporarySiteSettings' : 'siteSettings'
-        appState = appState.set(propertyName,
-          siteSettings.mergeSiteSetting(appState.get(propertyName), siteUtil.getOrigin(action.url), 'flash', 1))
-        break
-      }
-    case appConstants.APP_ALLOW_FLASH_ALWAYS:
-      {
-        const propertyName = action.isPrivate ? 'temporarySiteSettings' : 'siteSettings'
-        const expirationTime = Date.now() + (7 * 24 * 3600 * 1000)
-        appState = appState.set(propertyName,
-          siteSettings.mergeSiteSetting(appState.get(propertyName), siteUtil.getOrigin(action.url), 'flash', expirationTime))
-        break
-      }
-    case appConstants.APP_CHANGE_SITE_SETTING:
-      {
-        let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
-        let newSiteSettings = siteSettings.mergeSiteSetting(appState.get(propertyName), action.hostPattern, action.key, action.value)
-        if (action.skipSync) {
-          newSiteSettings = newSiteSettings.setIn([action.hostPattern, 'skipSync'], true)
-        }
-        appState = appState.set(propertyName, newSiteSettings)
-        break
-      }
-    case appConstants.APP_REMOVE_SITE_SETTING:
-      {
-        let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
-        let newSiteSettings = siteSettings.removeSiteSetting(appState.get(propertyName),
-          action.hostPattern, action.key)
-        if (action.skipSync) {
-          newSiteSettings = newSiteSettings.setIn([action.hostPattern, 'skipSync'], true)
-        }
-        appState = appState.set(propertyName, newSiteSettings)
-        break
-      }
-    case appConstants.APP_CLEAR_SITE_SETTINGS:
-      {
-        let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
-        let newSiteSettings = new Immutable.Map()
-        appState.get(propertyName).map((entry, hostPattern) => {
-          let newEntry = entry.delete(action.key)
-          if (action.skipSync) {
-            newEntry = newEntry.set('skipSync', true)
-          }
-          newSiteSettings = newSiteSettings.set(hostPattern, newEntry)
-        })
-        appState = appState.set(propertyName, newSiteSettings)
-        break
-      }
     case appConstants.APP_SET_SKIP_SYNC:
       {
         if (appState.getIn(action.path)) {
@@ -570,21 +520,6 @@ const handleAppAction = (action) => {
         }
         break
       }
-    case appConstants.APP_ADD_NOSCRIPT_EXCEPTIONS:
-      {
-        const propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
-        // Note that this is always cleared on restart or reload, so should not
-        // be synced or persisted.
-        const key = 'noScriptExceptions'
-        if (!action.origins || !action.origins.size) {
-          // Clear the exceptions
-          appState = appState.setIn([propertyName, action.hostPattern, key], new Immutable.Map())
-        } else {
-          const currentExceptions = appState.getIn([propertyName, action.hostPattern, key]) || new Immutable.Map()
-          appState = appState.setIn([propertyName, action.hostPattern, key], currentExceptions.merge(action.origins))
-        }
-      }
-      break
     case appConstants.APP_UPDATE_LEDGER_INFO:
       appState = appState.set('ledgerInfo', Immutable.fromJS(action.ledgerInfo))
       break
@@ -871,26 +806,6 @@ const handleAppAction = (action) => {
       break
     case appConstants.APP_HIDE_DOWNLOAD_DELETE_CONFIRMATION:
       appState = appState.set('deleteConfirmationVisible', false)
-      break
-    case appConstants.APP_ENABLE_UNDEFINED_PUBLISHERS:
-      const sitesObject = appState.get('siteSettings')
-      Object.keys(action.publishers).map((item) => {
-        const pattern = `https?://${item}`
-        const siteSetting = sitesObject.get(pattern)
-        const result = (siteSetting) && (siteSetting.get('ledgerPayments'))
-
-        if (result === undefined) {
-          let newSiteSettings = siteSettings.mergeSiteSetting(appState.get('siteSettings'), pattern, 'ledgerPayments', true)
-          appState = appState.set('siteSettings', newSiteSettings)
-        }
-      })
-      break
-    case appConstants.APP_CHANGE_LEDGER_PINNED_PERCENTAGES:
-      Object.keys(action.publishers).map((item) => {
-        const pattern = `https?://${item}`
-        let newSiteSettings = siteSettings.mergeSiteSetting(appState.get('siteSettings'), pattern, 'ledgerPinPercentage', action.publishers[item].pinPercentage)
-        appState = appState.set('siteSettings', newSiteSettings)
-      })
       break
     case appConstants.APP_DEFAULT_SEARCH_ENGINE_LOADED:
       appState = appState.set('searchDetail', action.searchDetail)
