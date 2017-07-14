@@ -35,12 +35,12 @@ module.exports.getPathFromFileURI = (fileURI) => {
 
 module.exports.isDarwin = () => {
   return process.platform === 'darwin' ||
-    (navigator && navigator.platform === 'MacIntel')
+    (typeof navigator !== 'undefined' && navigator.platform === 'MacIntel')
 }
 
 module.exports.isWindows = () => {
   return process.platform === 'win32' ||
-    (navigator && navigator.platform === 'Win32')
+    (typeof navigator !== 'undefined' && navigator.platform === 'Win32')
 }
 
 module.exports.isLinux = () => {
