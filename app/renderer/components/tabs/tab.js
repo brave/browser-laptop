@@ -42,7 +42,7 @@ const dnd = require('../../../../js/dnd')
 const throttle = require('../../../../js/lib/throttle')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {getTabBreakpoint, tabUpdateFrameRate} = require('../../lib/tabUtil')
-const {isWindows} = require('../../../common/lib/platformUtil')
+const isWindows = require('../../../common/lib/platformUtil').isWindows()
 const {getCurrentWindowId} = require('../../currentWindow')
 const UrlUtil = require('../../../../js/lib/urlutil')
 const {hasBreakpoint} = require('../../lib/tabUtil')
@@ -295,7 +295,7 @@ class Tab extends React.Component {
         className={css(
           styles.tab,
           // Windows specific style
-          isWindows() && styles.tabForWindows,
+          isWindows && styles.tabForWindows,
           this.props.isPinnedTab && styles.isPinned,
           this.props.isActive && styles.active,
           this.props.isPlayIndicatorBreakpoint && this.props.canPlayAudio && styles.narrowViewPlayIndicator,

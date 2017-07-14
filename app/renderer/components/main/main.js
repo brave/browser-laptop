@@ -66,7 +66,10 @@ const cx = require('../../../../js/lib/classSet')
 const eventUtil = require('../../../../js/lib/eventUtil')
 const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
 const {getCurrentWindowId, isMaximized, isFocused, isFullScreen} = require('../../currentWindow')
-const {isDarwin, isWindows, isLinux} = require('../../../common/lib/platformUtil')
+const platformUtil = require('../../../common/lib/platformUtil')
+const isDarwin = platformUtil.isDarwin()
+const isWindows = platformUtil.isWindows()
+const isLinux = platformUtil.isLinux()
 
 class Main extends React.Component {
   constructor (props) {
@@ -85,7 +88,7 @@ class Main extends React.Component {
           this.exitFullScreen()
           break
         case keyCodes.F12:
-          if (!isDarwin()) {
+          if (!isDarwin) {
             ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS)
           }
           break
@@ -530,7 +533,7 @@ class Main extends React.Component {
     // used in renderer
     props.isFullScreen = activeFrame.get('isFullScreen', false)
     props.isMaximized = isMaximized() || isFullScreen()
-    props.captionButtonsVisible = isWindows()
+    props.captionButtonsVisible = isWindows
     props.showContextMenu = !!currentWindow.get('contextMenuDetail')
     props.showPopupWindow = !!currentWindow.get('popupWindowDetail')
     props.showSiteInfo = currentWindow.getIn(['ui', 'siteInfo', 'isVisible']) &&
@@ -539,7 +542,7 @@ class Main extends React.Component {
       !!currentWindow.get('braveryPanelDetail')
     props.showClearData = !!currentWindow.getIn(['ui', 'isClearBrowsingDataPanelVisible'])
     props.showImportData = !!currentWindow.get('importBrowserDataDetail')
-    props.showWidevine = currentWindow.getIn(['widevinePanelDetail', 'shown']) && !isLinux()
+    props.showWidevine = currentWindow.getIn(['widevinePanelDetail', 'shown']) && !isLinux
     props.showAutoFillAddress = !!currentWindow.get('autofillAddressDetail')
     props.showAutoFillCC = !!currentWindow.get('autofillCreditCardDetail')
     props.showLogin = !!loginRequiredDetails
@@ -568,7 +571,7 @@ class Main extends React.Component {
 
     // used in other functions
     props.menubarSelectedIndex = currentWindow.getIn(['ui', 'menubar', 'selectedIndex'])
-    props.showCustomTitleBar = isWindows()
+    props.showCustomTitleBar = isWindows
     props.menubarVisible = menuBarState.isMenuBarVisible(currentWindow)
     props.mouseInFrame = currentWindow.getIn(['ui', 'mouseInFrame'])
     props.braveShieldEnabled = shieldState.braveShieldsEnabled(activeFrame)

@@ -23,7 +23,7 @@ const tabState = require('../../../common/state/tabState')
 const cx = require('../../../../js/lib/classSet')
 const {isPotentialPhishingUrl} = require('../../../../js/lib/urlutil')
 const siteUtil = require('../../../../js/state/siteUtil')
-const platformUtil = require('../../../common/lib/platformUtil')
+const isLinux = require('../../../common/lib/platformUtil').isLinux()
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
 // Styles
@@ -135,7 +135,7 @@ class SiteInfo extends React.Component {
 
   get viewCertificateButton () {
     // TODO(Anthony): Hide it until muon support linux
-    if (!platformUtil.isLinux()) {
+    if (!isLinux) {
       return <div className={css(styles.flexJustifyEnd, styles.viewCertificateButton__wrapper)}>
         <Button
           l10nId='viewCertificate'

@@ -36,7 +36,7 @@ const {eventElHasAncestorWithClasses, isForSecondaryAction} = require('../../../
 const {getBaseUrl, isUrl} = require('../../../../js/lib/appUrlUtil')
 const {getCurrentWindowId} = require('../../currentWindow')
 const {normalizeLocation, getNormalizedSuggestion} = require('../../../common/lib/suggestion')
-const {isDarwin} = require('../../../common/lib/platformUtil')
+const isDarwin = require('../../../common/lib/platformUtil').isDarwin()
 const publisherUtil = require('../../../common/lib/publisherUtil')
 
 // Icons
@@ -123,7 +123,7 @@ class UrlBar extends React.Component {
               (this.props.urlbarLocationSuffix && this.props.autocompleteEnabled))) {
             // Hack to make alt enter open a new tab for url bar suggestions when hitting enter on them.
             if (e.altKey) {
-              if (isDarwin()) {
+              if (isDarwin) {
                 e.metaKey = true
               } else {
                 e.ctrlKey = true
