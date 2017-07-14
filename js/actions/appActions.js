@@ -1467,6 +1467,67 @@ const appActions = {
     dispatch({
       actionType: appConstants.APP_UPDATE_LOG_OPENED
     })
+  },
+
+  /**
+   * Save temp setting for clear browsing data
+   */
+  onToggleBrowsingData: function (property, newValue) {
+    dispatch({
+      actionType: appConstants.APP_ON_TOGGLE_BROWSING_DATA,
+      property,
+      newValue
+    })
+  },
+
+  /**
+   * Clear temp setting for clear browsing data
+   */
+  onCancelBrowsingData: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_CANCEL_BROWSING_DATA
+    })
+  },
+
+  swipedLeft: function (percent) {
+    dispatch({
+      actionType: appConstants.APP_SWIPE_LEFT,
+      percent
+    })
+  },
+
+  swipedRight: function (percent) {
+    dispatch({
+      actionType: appConstants.APP_SWIPE_RIGHT,
+      percent
+    })
+  },
+
+  addBookmark: function (siteDetail, tag, closestKey) {
+    dispatch({
+      actionType: appConstants.APP_ADD_BOOKMARK,
+      siteDetail,
+      tag,
+      closestKey
+    })
+  },
+
+  editBookmark: function (siteDetail, editKey, tag) {
+    dispatch({
+      actionType: appConstants.APP_EDIT_BOOKMARK,
+      siteDetail,
+      tag,
+      editKey
+    })
+  },
+
+  noReportStateModeClicked: function (windowId) {
+    dispatch({
+      actionType: appConstants.APP_DEBUG_NO_REPORT_STATE_MODE_CLICKED,
+      queryInfo: {
+        windowId
+      }
+    })
   }
 }
 
