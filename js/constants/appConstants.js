@@ -41,8 +41,6 @@ const appConstants = {
   APP_UPDATE_PUBLISHER_INFO: _,
   APP_SHOW_NOTIFICATION: _, /** @param {Object} detail */
   APP_HIDE_NOTIFICATION: _, /** @param {string} message */
-  APP_ADD_WORD: _, /** @param {string} word, @param {boolean} learn */
-  APP_SET_DICTIONARY: _, /** @param {string} locale */
   APP_BACKUP_KEYS: _,
   APP_RECOVER_WALLET: _,
   APP_ADD_AUTOFILL_ADDRESS: _,
@@ -140,7 +138,10 @@ const appConstants = {
   APP_SET_SKIP_SYNC: _,
   APP_ADD_BOOKMARK: _,
   APP_EDIT_BOOKMARK: _,
-  APP_DEBUG_NO_REPORT_STATE_MODE_CLICKED: _
+  APP_DEBUG_NO_REPORT_STATE_MODE_CLICKED: _,
+  APP_SPELLING_SUGGESTED: _,
+  APP_LEARN_SPELLING: _,
+  APP_FORGET_LEARNED_SPELLING: _
 }
 
 module.exports = mapValuesByKeys(appConstants)
