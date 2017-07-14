@@ -304,10 +304,6 @@ class BookmarkToolbarButton extends React.Component {
 
 module.exports = ReduxComponent.connect(BookmarkToolbarButton)
 
-const bookmarkItemMaxWidth = '100px'
-const bookmarkItemPadding = '4px'
-const bookmarkItemMargin = '3px'
-const bookmarkItemChevronMargin = '4px'
 const bookmarkToolbarButtonDraggingMargin = '25px'
 
 const styles = StyleSheet.create({
@@ -318,11 +314,11 @@ const styles = StyleSheet.create({
     borderRadius: '3px',
     color: globalStyles.color.mediumGray,
     cursor: 'default',
-    fontSize: '11px',
+    fontSize: globalStyles.spacing.bookmarksItemFontSize,
     lineHeight: '1.3',
-    margin: `auto ${bookmarkItemMargin}`,
-    maxWidth: bookmarkItemMaxWidth,
-    padding: `2px ${bookmarkItemPadding}`,
+    margin: `auto ${globalStyles.spacing.bookmarksItemMargin}`,
+    maxWidth: globalStyles.spacing.bookmarksItemMaxWidth,
+    padding: `2px ${globalStyles.spacing.bookmarksItemPadding}`,
     textOverflow: 'ellipsis',
     userSelect: 'none',
     whiteSpace: 'nowrap',
@@ -343,7 +339,7 @@ const styles = StyleSheet.create({
     opacity: '0.2'
   },
   bookmarkToolbarButton__showOnlyFavicon: {
-    padding: '2px 4px',
+    padding: `2px ${globalStyles.spacing.bookmarksItemPadding}`,
     margin: 'auto 0'
   },
   bookmarkToolbarButton__marginRightZero: {
@@ -353,7 +349,7 @@ const styles = StyleSheet.create({
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
     display: 'inline-block',
-    marginRight: '4px'
+    marginRight: globalStyles.spacing.bookmarksItemMargin
   },
   bookmarkToolbarButton__bookmarkFolder: {
     fontSize: globalStyles.spacing.bookmarksFolderIconSize,
@@ -371,7 +367,7 @@ const styles = StyleSheet.create({
   },
   bookmarkToolbarButton__bookmarkFolderChevron: {
     color: '#676767',
-    fontSize: '8px',
-    marginLeft: bookmarkItemChevronMargin
+    fontSize: globalStyles.spacing.bookmarksItemChevronFontSize,
+    marginLeft: globalStyles.spacing.bookmarksItemChevronMargin
   }
 })

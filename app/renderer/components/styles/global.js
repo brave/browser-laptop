@@ -23,6 +23,10 @@ const {opacityIncreaseKeyframes} = require('./animations')
  */
 
 const globalStyles = {
+  defaultFontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI"` +
+    `, "Helvetica Neue", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans"` +
+    `, "Droid Sans", sans-serif`,
+
   breakpoint: {
     breakpointWideViewport: '1000px',
     breakpointNarrowViewport: '600px',
@@ -145,6 +149,13 @@ const globalStyles = {
     bookmarksToolbarWithFaviconsHeight: '24px',
     bookmarksFileIconSize: '13px',
     bookmarksFolderIconSize: '15px',
+    bookmarksItemMaxWidth: '100px',
+    bookmarksItemPadding: '4px',
+    bookmarksItemMargin: '4px',
+    bookmarksItemChevronMargin: '4px',
+    bookmarksItemChevronFontSize: '8px',
+    bookmarksToolbarPadding: '10px',
+    bookmarksItemFontSize: '11px',
     navbarMenubarMargin: '7px',
     navbarButtonSpacing: '4px',
     navbarButtonWidth: '20px',

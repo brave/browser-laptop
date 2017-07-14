@@ -4,13 +4,6 @@
 
 // Don't forget to update .less files as well and vice-versa
 const styleValues = {
-  'bookmark-item-max-width': 100,
-  'bookmark-item-padding': 4,
-  'bookmark-item-margin': 3,
-  'bookmark-item-font-size': 4,
-  'bookmark-item-chevron-margin': 4,
-  'bookmarks-toolbar-padding': 10,
-  'default-font-family': '-apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", sans-serif',
   'download-bar-buttons': 140,
   'download-bar-height': 60,
   'download-bar-padding': 20,

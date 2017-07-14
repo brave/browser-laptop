@@ -200,13 +200,13 @@ const styles = StyleSheet.create({
     boxSizing: 'border-box',
     display: 'flex',
     flex: 1,
-    padding: `${globalStyles.spacing.navbarMenubarMargin} 10px`
+    padding: `${globalStyles.spacing.navbarMenubarMargin} ${globalStyles.spacing.bookmarksToolbarPadding}`
   },
   bookmarksToolbar__allowDragging: {
     WebkitAppRegion: 'drag'
   },
   bookmarksToolbar__showOnlyFavicon: {
-    padding: `${globalStyles.spacing.navbarMenubarMargin} 0 ${globalStyles.spacing.tabPagesHeight} 10px`
+    padding: `${globalStyles.spacing.navbarMenubarMargin} 0 ${globalStyles.spacing.tabPagesHeight} ${globalStyles.spacing.bookmarksToolbarPadding}`
   },
   bookmarksToolbar__bookmarkButton: {
     boxSizing: 'border-box',
