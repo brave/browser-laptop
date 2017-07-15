@@ -50,6 +50,7 @@ describe('sessionStoreShutdown unit tests', function () {
     const platformUtil = require('../../../app/common/lib/platformUtil')
     this.isWindowsStub = sinon.stub(platformUtil, 'isWindows', () => isWindows)
     this.isDarwinStub = sinon.stub(platformUtil, 'isDarwin', () => isDarwin)
+    fakeElectron.reset()
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('ad-block', fakeAdBlock)
     mockery.registerMock('leveldown', {})
@@ -88,7 +89,7 @@ describe('sessionStoreShutdown unit tests', function () {
       assert.equal(this.appQuitSpy.notCalled, true)
       isDarwin = false
     })
-    it('quits on windows', function () {
+    it('quits on Windows', function () {
       isWindows = true
       fakeElectron.app.emit('window-all-closed')
       assert.equal(this.appQuitSpy.calledOnce, true)
