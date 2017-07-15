@@ -143,7 +143,8 @@ const appConstants = {
   APP_DEBUG_NO_REPORT_STATE_MODE_CLICKED: _,
   APP_SPELLING_SUGGESTED: _,
   APP_LEARN_SPELLING: _,
-  APP_FORGET_LEARNED_SPELLING: _
+  APP_FORGET_LEARNED_SPELLING: _,
+  APP_SET_VERSION_INFO: _
 }
 
 module.exports = mapValuesByKeys(appConstants)

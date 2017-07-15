@@ -426,10 +426,11 @@ const setVersionInformation = (data) => {
     ['os.release', require('os').release],
     ['os.arch', require('os').arch]
   ]
-  const versionInformation = []
+  const versionInformation = {}
 
   versionFields.forEach((field) => {
-    versionInformation.push(safeGetVersion(field[0], field[1]))
+    const versionField = safeGetVersion(field[0], field[1])
+    versionInformation[versionField.name] = versionField.version
   })
 
   data.about = data.about || {}

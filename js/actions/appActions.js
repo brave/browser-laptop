@@ -1515,6 +1515,14 @@ const appActions = {
       word,
       tabId
     })
+  },
+
+  setVersionInfo: function (name, version) {
+    dispatch({
+      actionType: appConstants.APP_SET_VERSION_INFO,
+      name,
+      version
+    })
   }
 }
 

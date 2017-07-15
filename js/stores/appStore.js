@@ -861,6 +861,11 @@ const handleAppAction = (action) => {
       appState.setIn(['sync', 'devices'], {})
       appState.setIn(['sync', 'objectsById'], {})
       break
+    case appConstants.APP_SET_VERSION_INFO:
+      if (action.name && action.version) {
+        appState = appState.setIn(['about', 'brave', 'versionInformation', action.name], action.version)
+      }
+      break
     case appConstants.APP_SHOW_DOWNLOAD_DELETE_CONFIRMATION:
       appState = appState.set('deleteConfirmationVisible', true)
       break

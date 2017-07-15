@@ -25,12 +25,12 @@ require('../../node_modules/font-awesome/css/font-awesome.css')
 
 const tranformVersionInfoToString = (versionInformation) =>
   versionInformation
-    .reduce((coll, entry) => `${coll} \n${entry.get('name')}: ${entry.get('version')}`, '')
+    .reduce((coll, version, name) => `${coll} \n${name}: ${version}`, '')
 
 class AboutBrave extends React.Component {
   constructor (props) {
     super(props)
-    this.state = { versionInformation: Immutable.fromJS([]) }
+    this.state = { versionInformation: new Immutable.Map() }
     ipc.on(messages.VERSION_INFORMATION_UPDATED, (e, versionInformation) => {
       if (this.state.versionInformation.size === 0) {
         this.setState({versionInformation: Immutable.fromJS(versionInformation)})
@@ -60,7 +60,7 @@ class AboutBrave extends React.Component {
         <div>
           <span data-l10n-id='relNotesInfo1' />
           &nbsp;
-          <a className='linkText' href={`https://github.com/brave/browser-laptop/releases/tag/v${this.state.versionInformation.getIn([0, 'version'])}dev`} target='_blank' data-l10n-id='relNotesInfo2' />
+          <a className='linkText' href={`https://github.com/brave/browser-laptop/releases/tag/v${this.state.versionInformation.get('Brave')}dev`} target='_blank' data-l10n-id='relNotesInfo2' />
           &nbsp;
           <span data-l10n-id='relNotesInfo3' />
         </div>
@@ -76,16 +76,16 @@ class AboutBrave extends React.Component {
 
         <SortableTable
           headings={['Name', 'Version']}
-          rows={this.state.versionInformation.map((entry) => [
+          rows={this.state.versionInformation.map((version, name) => [
             {
-              html: entry.get('name'),
-              value: entry.get('name')
+              html: name,
+              value: name
             },
             {
-              html: entry.get('name') === 'rev'
-                ? <a target='_blank' href={`https://github.com/brave/browser-laptop/commit/${entry.get('version')}`}>{(entry.get('version') && entry.get('version').substring(0, 7)) || ''}</a>
-                : entry.get('version'),
-              value: entry.get('version')
+              html: name === 'rev'
+                ? <a target='_blank' href={`https://github.com/brave/browser-laptop/commit/${version}`}>{(version && version.substring(0, 7)) || ''}</a>
+                : version,
+              value: version
             }
           ])}
         />

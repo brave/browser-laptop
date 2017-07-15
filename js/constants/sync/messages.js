@@ -24,9 +24,10 @@ const messages = {
   SYNC_SETUP_ERROR: _, /* @param {string} error */
   /**
    * webview -> browser
+   * emits the version of sync that is currently running
    * browser sends GOT_INIT_DATA with the saved values
    */
-  GET_INIT_DATA: _,
+  GET_INIT_DATA: _, /* @param {string} syncVersion */
   /**
    * browser -> webview
    * browser must send null for seed or deviceId if a value has not yet been

@@ -376,7 +376,10 @@ module.exports.init = function (appState) {
     reset()
   })
   // GET_INIT_DATA is the first message sent by the sync-client when it starts
-  ipcMain.on(syncMessages.GET_INIT_DATA, (e) => {
+  ipcMain.on(syncMessages.GET_INIT_DATA, (e, syncVersion) => {
+    if (syncVersion) {
+      appActions.setVersionInfo('Brave Sync', syncVersion)
+    }
     // Set the message sender
     backgroundSender = e.sender
     // Clear any old errors
