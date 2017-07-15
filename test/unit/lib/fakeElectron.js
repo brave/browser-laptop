@@ -2,6 +2,11 @@ const {EventEmitter} = require('events')
 const ipcMain = new EventEmitter()
 ipcMain.send = ipcMain.emit
 const fakeElectron = {
+  reset: function () {
+    fakeElectron.app.removeAllListeners()
+    fakeElectron.remote.app.removeAllListeners()
+    fakeElectron.autoUpdater.removeAllListeners()
+  },
   BrowserWindow: {
     getFocusedWindow: function () {
       return {
