@@ -411,14 +411,11 @@ const windowActions = {
   },
 
   /**
-   * Marks the URL bar text as selected or not
-   *
-   * @param {boolean} isSelected - Whether or not the URL bar text input should be selected
+   * Indicates the URLbar has been selected
    */
-  setUrlBarSelected: function (selected) {
+  urlBarSelected: function (selected) {
     dispatch({
-      actionType: windowConstants.WINDOW_SET_URL_BAR_SELECTED,
-      selected
+      actionType: windowConstants.WINDOW_URL_BAR_SELECTED
     })
   },
 

@@ -5,6 +5,7 @@ const Brave = require('../lib/brave')
 const {urlInput, urlBarSuggestions, urlbarIcon, reloadButton} = require('../lib/selectors')
 const searchProviders = require('../../js/data/searchProviders')
 const config = require('../../js/constants/config')
+const settings = require('../../js/constants/settings')
 
 describe('urlBar tests', function () {
   function * setup (client) {
@@ -708,6 +709,7 @@ describe('urlBar tests', function () {
       this.page1Url = Brave.server.url('page1.html')
       yield setup(this.app.client)
       yield this.app.client
+        .changeSetting(settings.DISABLE_TITLE_MODE, false)
         .waitForExist(urlInput)
         .waitForElementFocus(urlInput)
         .tabByIndex(0)
@@ -767,7 +769,7 @@ describe('urlBar tests', function () {
 
     it('changes only the selection', function * () {
       yield this.app.client
-        .setInputText(urlInput, 'git')
+        .keys('git')
         .waitForSelectedText('hub.com')
         // Select next suggestion
         .keys(Brave.keys.DOWN)
