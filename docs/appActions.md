@@ -1162,6 +1162,18 @@ Dispatches a message to indicate that the update log is being opened
 
 
 
+### onToggleBrowsingData() 
+
+Save temp setting for clear browsing data
+
+
+
+### onCancelBrowsingData() 
+
+Clear temp setting for clear browsing data
+
+
+
 
 * * *
 
