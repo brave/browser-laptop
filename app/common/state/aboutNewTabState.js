@@ -60,6 +60,9 @@ const removeDuplicateDomains = (list) => {
     return false
   })
 }
+
+let minCountOfTopSites
+let minAccessOfTopSites
 /**
  * topSites are defined by users. Pinned sites are attached to their positions
  * in the grid, and the non pinned indexes are populated with newly accessed sites
@@ -67,11 +70,24 @@ const removeDuplicateDomains = (list) => {
 const getTopSites = (state) => {
   // remove folders; sort by visit count; enforce a max limit
   const sites = (state.get('sites') ? state.get('sites').toList() : new Immutable.List())
-    .filter((site) => !siteUtil.isFolder(site))
-    .filter((site) => !siteUtil.isImportedBookmark(site))
-    .filter((site) => !isSourceAboutUrl(site.get('location')))
+    .filter((site) => !siteUtil.isFolder(site) &&
+      !siteUtil.isImportedBookmark(site) &&
+      !isSourceAboutUrl(site.get('location')) &&
+      (minCountOfTopSites === undefined || (site.get('count') || 0) >= minCountOfTopSites) &&
+      (minAccessOfTopSites === undefined || (site.get('lastAccessedTime') || 0) >= minAccessOfTopSites))
     .sort(sortCountDescending)
     .slice(0, aboutNewTabMaxEntries)
+
+  for (let i = 0; i < sites.size; i++) {
+    const count = sites.getIn([i, 'count']) || 0
+    const access = sites.getIn([i, 'lastAccessedTime']) || 0
+    if (minCountOfTopSites === undefined || count < minCountOfTopSites) {
+      minCountOfTopSites = count
+    }
+    if (minAccessOfTopSites === undefined || access < minAccessOfTopSites) {
+      minAccessOfTopSites = access
+    }
+  }
 
   // Filter out pinned and ignored sites
   let unpinnedSites = sites.filter((site) => !(isPinned(state, site) || isIgnored(state, site)))
@@ -117,8 +133,13 @@ const aboutNewTabState = {
     return state.setIn(['about', 'newtab', 'updatedStamp'], new Date().getTime())
   },
 
-  setSites: (state) => {
+  setSites: (state, clearCache) => {
     state = makeImmutable(state)
+
+    if (clearCache) {
+      minCountOfTopSites = undefined
+      minAccessOfTopSites = undefined
+    }
 
     // return a filtered version of the sites array
     state = state.setIn(['about', 'newtab', 'sites'], getTopSites(state))
