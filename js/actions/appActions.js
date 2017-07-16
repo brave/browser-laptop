@@ -124,6 +124,13 @@ const appActions = {
     })
   },
 
+  topSiteDataAvailable: function (topSites) {
+    dispatch({
+      actionType: appConstants.APP_TOP_SITE_DATA_AVAILABLE,
+      topSites
+    })
+  },
+
   /**
    * A request for a URL load
    * @param {number} tabId - the tab ID to load the URL inside of
