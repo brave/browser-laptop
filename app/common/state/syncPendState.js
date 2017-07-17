@@ -54,6 +54,7 @@ module.exports.getPendingRecords = (state) => {
  * @returns {Immutable.Map} new app state
  */
 module.exports.confirmRecords = (state, downloadedRecords) => {
+  let recordsConfirmed = 0
   downloadedRecords.forEach(record => {
     // browser-laptop stores byte arrays like objectId as Arrays.
     // downloaded records use Uint8Arrays which we should convert back.
@@ -64,6 +65,11 @@ module.exports.confirmRecords = (state, downloadedRecords) => {
       return
     }
     state = state.deleteIn(['sync', 'pendingRecords', key])
+    recordsConfirmed += 1
   })
+  if (recordsConfirmed > 0) {
+    const t = new Date().getTime()
+    state = state.setIn(['sync', 'lastConfirmedRecordTimestamp'], t)
+  }
   return state
 }
