@@ -131,17 +131,16 @@ var requestVersionInfo = (done, pingOnly) => {
   if (!platformBaseUrl) throw new Error('platformBaseUrl not set')
 
   // Get the daily, week of year and month update checks
-  var lastCheckYMD = AppStore.getState().toJS().updates['lastCheckYMD'] || null
+  const state = AppStore.getState()
+  var lastCheckYMD = state.getIn(['updates', 'lastCheckYMD']) || null
   debug(`lastCheckYMD = ${lastCheckYMD}`)
-
-  var lastCheckWOY = AppStore.getState().toJS().updates['lastCheckWOY'] || null
+  var lastCheckWOY = state.getIn(['updates', 'lastCheckWOY']) || null
   debug(`lastCheckWOY = ${lastCheckWOY}`)
-
-  var lastCheckMonth = AppStore.getState().toJS().updates['lastCheckMonth'] || null
+  var lastCheckMonth = state.getIn(['updates', 'lastCheckMonth']) || null
   debug(`lastCheckMonth = ${lastCheckMonth}`)
 
   // Has the browser ever asked for an update
-  var firstCheckMade = AppStore.getState().toJS().updates['firstCheckMade'] || false
+  var firstCheckMade = state.getIn(['updates', 'firstCheckMade']) || false
   debug(`firstCheckMade = ${firstCheckMade}`)
 
   // Build query string based on the last date an update request was made
