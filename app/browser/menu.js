@@ -29,8 +29,10 @@ const getSetting = require('../../js/settings').getSetting
 const locale = require('../locale')
 const {isLocationBookmarked} = require('../../js/state/siteUtil')
 const tabState = require('../../app/common/state/tabState')
-const isDarwin = process.platform === 'darwin'
-const isLinux = process.platform === 'linux'
+const platformUtil = require('../common/lib/platformUtil')
+const isDarwin = platformUtil.isDarwin()
+const isLinux = platformUtil.isLinux()
+const isWindows = platformUtil.isWindows()
 
 let appMenu = null
 // TODO(bridiver) - these should be handled in the appStore
@@ -353,13 +355,18 @@ const updateRecentlyClosedMenuItems = () => {
   Menu.setApplicationMenu(appMenu)
 
   // Update in-memory menu template (Windows)
-  const oldTemplate = appStore.getState().getIn(['menu', 'template'])
-  const historyMenuKey = oldTemplate.findKey(value =>
-    value.get('label') === locale.translation('history')
-  )
-  const newSubmenu = createHistorySubmenu()
-  const newTemplate = oldTemplate.setIn([historyMenuKey, 'submenu'], newSubmenu)
-  appActions.setMenubarTemplate(newTemplate)
+  if (isWindows) {
+    const oldTemplate = appStore.getState().getIn(['menu', 'template'])
+    if (oldTemplate) {
+      const historyMenuKey = oldTemplate.findKey(value =>
+        value.get('label') === locale.translation('history')
+      )
+      const newSubmenuTemplate = createHistorySubmenu()
+      const newSubmenu = JSON.parse(JSON.stringify(newSubmenuTemplate))
+      const newTemplate = oldTemplate.setIn([historyMenuKey, 'submenu'], newSubmenu)
+      appActions.setMenubarTemplate(newTemplate)
+    }
+  }
 }
 
 const isCurrentLocationBookmarked = () => {
@@ -587,7 +594,10 @@ const createMenu = () => {
     })
   }
 
-  appActions.setMenubarTemplate(Immutable.fromJS(template))
+  if (isWindows) {
+    const menuTemplate = JSON.parse(JSON.stringify(template))
+    appActions.setMenubarTemplate(Immutable.fromJS(menuTemplate))
+  }
 
   let oldMenu = appMenu
   appMenu = Menu.buildFromTemplate(template)
@@ -608,10 +618,12 @@ const setMenuItemChecked = (label, checked) => {
   systemMenuItem.checked = checked
 
   // Update in-memory menu template (Windows)
-  const oldTemplate = appStore.getState().getIn(['menu', 'template'])
-  const newTemplate = menuUtil.setTemplateItemChecked(oldTemplate, label, checked)
-  if (newTemplate) {
-    appActions.setMenubarTemplate(newTemplate)
+  if (isWindows) {
+    const oldTemplate = appStore.getState().getIn(['menu', 'template'])
+    const newTemplate = menuUtil.setTemplateItemChecked(oldTemplate, label, checked)
+    if (newTemplate) {
+      appActions.setMenubarTemplate(newTemplate)
+    }
   }
 }
 
