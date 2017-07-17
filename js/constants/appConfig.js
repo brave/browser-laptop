@@ -12,6 +12,7 @@ const isTest = process.env.NODE_ENV === 'test'
 
 const buildConfig = require('./buildConfig')
 const isProduction = buildConfig.nodeEnv === 'production'
+const isTest = process.env.NODE_ENV === 'test'
 const {fullscreenOption, autoplayOption} = require('../../app/common/constants/settingsEnums')
 
 module.exports = {
@@ -115,7 +116,11 @@ module.exports = {
     debug: !isProduction,
     testS3Url: 'https://brave-sync-test.s3.dualstack.us-west-2.amazonaws.com/',
     s3Url: isProduction ? 'https://brave-sync.s3.dualstack.us-west-2.amazonaws.com' : 'https://brave-sync-staging.s3.dualstack.us-west-2.amazonaws.com',
-    fetchInterval: isProduction ? 1000 * 60 * 3 : 1000 * 60
+    fetchInterval: isProduction
+      ? 1000 * 60 * 3
+      : isTest
+        ? 500
+        : 1000 * 60
   },
   urlSuggestions: {
     ageDecayConstant: 50
