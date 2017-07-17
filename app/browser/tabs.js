@@ -199,13 +199,15 @@ const updateAboutDetails = (tab, tabValue) => {
   } else if (location === 'about:bookmarks') {
     const bookmarksData = getBookmarksData(appState)
     if (bookmarksData.bookmarks) {
-      tab.send(messages.BOOKMARKS_UPDATED, bookmarksData)
+      const handle = muon.shared_memory.create(bookmarksData)
+      tab.sendShared(messages.BOOKMARKS_UPDATED, handle)
     }
   } else if (location === 'about:history') {
     if (!history) {
       appActions.populateHistory()
     } else {
-      tab.send(messages.HISTORY_UPDATED, history.toJS())
+      const handle = muon.shared_memory.create(history.toJS())
+      tab.sendShared(messages.HISTORY_UPDATED, handle)
     }
     tab.send(messages.SETTINGS_UPDATED, appSettings.toJS())
   } else if (location === 'about:extensions' && extensions) {
