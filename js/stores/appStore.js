@@ -32,6 +32,7 @@ const nativeImage = require('../../app/nativeImage')
 const filtering = require('../../app/filtering')
 const basicAuth = require('../../app/browser/basicAuth')
 const webtorrent = require('../../app/browser/webtorrent')
+const {calculateTopSites} = require('../../app/browser/api/topSites')
 const assert = require('assert')
 const profiles = require('../../app/browser/profiles')
 const {zoomLevel} = require('../../app/common/constants/toolbarUserInterfaceScale')
@@ -407,7 +408,8 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/dragDropReducer'),
       require('../../app/browser/reducers/extensionsReducer'),
       require('../../app/browser/reducers/shareReducer'),
-      require('../../app/browser/reducers/updatesReducer')
+      require('../../app/browser/reducers/updatesReducer'),
+      require('../../app/browser/reducers/topSitesReducer')
     ]
     initialized = true
     appState = action.appState
@@ -445,7 +447,7 @@ const handleAppAction = (action) => {
     case appConstants.APP_CHANGE_NEW_TAB_DETAIL:
       appState = aboutNewTabState.mergeDetails(appState, action)
       if (action.refresh) {
-        appState = aboutNewTabState.setSites(appState, action)
+        calculateTopSites(true)
       }
       break
     case appConstants.APP_POPULATE_HISTORY:
@@ -456,7 +458,7 @@ const handleAppAction = (action) => {
       break
     case appConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size
-      appState = aboutNewTabState.setSites(appState, action)
+      calculateTopSites(false)
       appState = aboutHistoryState.setHistory(appState, action)
       // If there was an item added then clear out the old history entries
       if (oldSiteSize !== appState.get('sites').size) {
@@ -465,7 +467,7 @@ const handleAppAction = (action) => {
       break
     case appConstants.APP_APPLY_SITE_RECORDS:
     case appConstants.APP_REMOVE_SITE:
-      appState = aboutNewTabState.setSites(appState, action)
+      calculateTopSites(true)
       appState = aboutHistoryState.setHistory(appState, action)
       break
     case appConstants.APP_SET_DATA_FILE_ETAG:
@@ -678,7 +680,7 @@ const handleAppAction = (action) => {
       // TODO: Maybe make storing this state optional?
       appState = appState.set('clearBrowsingDataDefaults', action.clearDataDetail)
       if (action.clearDataDetail.get('browserHistory')) {
-        appState = aboutNewTabState.setSites(appState, action)
+        calculateTopSites(true)
         appState = aboutHistoryState.setHistory(appState, action)
         syncActions.clearHistory()
         BrowserWindow.getAllWindows().forEach((wnd) => wnd.webContents.send(messages.CLEAR_CLOSED_FRAMES))
@@ -808,7 +810,9 @@ const handleAppAction = (action) => {
       break
     case windowConstants.WINDOW_SET_FAVICON:
       appState = siteUtil.updateSiteFavicon(appState, action.frameProps.get('location'), action.favicon)
-      appState = aboutNewTabState.setSites(appState, action)
+      if (action.frameProps.get('favicon') !== action.favicon) {
+        calculateTopSites(false)
+      }
       break
     case appConstants.APP_RENDER_URL_TO_PDF:
       const pdf = require('../../app/pdf')
