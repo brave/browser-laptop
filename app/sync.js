@@ -22,6 +22,7 @@ const syncUtil = require('../js/state/syncUtil')
 const syncPendState = require('./common/state/syncPendState')
 const getSetting = require('../js/settings').getSetting
 const settings = require('../js/constants/settings')
+const {unescapeJSONPointer} = require('./common/lib/jsonUtil')
 
 const CATEGORY_MAP = syncUtil.CATEGORY_MAP
 const CATEGORY_NAMES = Object.keys(categories)
@@ -76,7 +77,7 @@ const appStoreChangeCallback = function (diffs) {
       return
     }
 
-    const statePath = path.slice(1, 3).map((item) => item.replace(/~1/g, '/'))
+    const statePath = path.slice(1, 3).map(unescapeJSONPointer)
     if (field === 'skipSync' && diff.value === true) {
       // Remove the flag so that this gets synced next time it is updated
       appActions.setSkipSync(statePath, false)
@@ -228,11 +229,20 @@ module.exports.onSyncReady = (isFirstRun, e) => {
   AppStore.addChangeListener(appStoreChangeCallback)
   const appState = AppStore.getState()
 
-  // Sync records which haven't been confirmed yet.
-  const oldPendingRecords = syncPendState.getPendingRecords(appState)
-  if (oldPendingRecords.length > 0) {
-    log(`Sending ${oldPendingRecords.length} pending records`)
-    e.sender.send(messages.SEND_SYNC_RECORDS, undefined, oldPendingRecords)
+  // poll() calls this periodically.
+  const resendPendingRecords = () => {
+    const state = AppStore.getState()
+    const timeSinceLastConfirm = new Date().getTime() - state.getIn(['sync', 'lastConfirmedRecordTimestamp'])
+    if (timeSinceLastConfirm < config.resendPendingRecordInterval) {
+      return
+    }
+    // Sync records which haven't been confirmed yet.
+    const pendingRecords = syncPendState.getPendingRecords(state)
+    if (pendingRecords.length === 0) {
+      return
+    }
+    log(`Resending ${pendingRecords.length} pending records`)
+    e.sender.send(messages.SEND_SYNC_RECORDS, undefined, pendingRecords)
   }
 
   if (!deviceIdSent && isFirstRun) {
@@ -338,6 +348,7 @@ module.exports.onSyncReady = (isFirstRun, e) => {
     e.sender.send(messages.FETCH_SYNC_RECORDS, categoryNames, startAt)
     startAt = syncUtil.now()
     appActions.saveSyncInitData(null, null, startAt)
+    resendPendingRecords()
   }
   poll()
   pollIntervalId = setInterval(poll, config.fetchInterval)
