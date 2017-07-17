@@ -39,6 +39,7 @@ const {isLocationBookmarked} = require('../../js/state/siteUtil')
 const platformUtil = require('../common/lib/platformUtil')
 const isDarwin = platformUtil.isDarwin()
 const isLinux = platformUtil.isLinux()
+const isWindows = platformUtil.isWindows()
 
 let appMenu = null
 let closedFrames = new Immutable.OrderedMap()
@@ -360,14 +361,17 @@ const updateRecentlyClosedMenuItems = (state) => {
   Menu.setApplicationMenu(appMenu)
 
   // Update in-memory menu template (Windows)
-  const oldTemplate = state.getIn(['menu', 'template'])
-  if (oldTemplate) {
-    const historyMenuKey = oldTemplate.findKey(value =>
-      value.get('label') === locale.translation('history')
-    )
-    const newSubmenu = createHistorySubmenu()
-    const newTemplate = oldTemplate.setIn([historyMenuKey, 'submenu'], newSubmenu)
-    appActions.setMenubarTemplate(newTemplate)
+  if (isWindows) {
+    const oldTemplate = state.getIn(['menu', 'template'])
+    if (oldTemplate) {
+      const historyMenuKey = oldTemplate.findKey(value =>
+        value.get('label') === locale.translation('history')
+      )
+      const newSubmenuTemplate = createHistorySubmenu()
+      const newSubmenu = JSON.parse(JSON.stringify(newSubmenuTemplate))
+      const newTemplate = oldTemplate.setIn([historyMenuKey, 'submenu'], newSubmenu)
+      appActions.setMenubarTemplate(newTemplate)
+    }
   }
 }
 
@@ -602,7 +606,10 @@ const createMenu = (state) => {
     })
   }
 
-  appActions.setMenubarTemplate(Immutable.fromJS(template))
+  if (isWindows) {
+    const menuTemplate = JSON.parse(JSON.stringify(template))
+    appActions.setMenubarTemplate(Immutable.fromJS(menuTemplate))
+  }
 
   let oldMenu = appMenu
   appMenu = Menu.buildFromTemplate(template)
@@ -623,10 +630,12 @@ const setMenuItemChecked = (state, label, checked) => {
   systemMenuItem.checked = checked
 
   // Update in-memory menu template (Windows)
-  const oldTemplate = state.getIn(['menu', 'template'])
-  const newTemplate = menuUtil.setTemplateItemChecked(oldTemplate, label, checked)
-  if (newTemplate) {
-    appActions.setMenubarTemplate(newTemplate)
+  if (isWindows) {
+    const oldTemplate = state.getIn(['menu', 'template'])
+    const newTemplate = menuUtil.setTemplateItemChecked(oldTemplate, label, checked)
+    if (newTemplate) {
+      appActions.setMenubarTemplate(newTemplate)
+    }
   }
 }
 
