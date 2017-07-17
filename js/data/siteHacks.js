@@ -39,6 +39,8 @@ module.exports.localStorageExceptions = [
   ['https://mail.google.com', 'https://hangouts.google.com']
 ]
 
+const braveUAWhitelist = ['adobe.com', 'duckduckgo.com']
+
 module.exports.siteHacks = {
   'sp1.nypost.com': emptyDataURI,
   'sp.nasdaq.com': emptyDataURI,
@@ -55,16 +57,6 @@ module.exports.siteHacks = {
     onBeforeSendHeaders: function (details) {
       return {
         customCookie: details.requestHeaders.Cookie + `; forbes_ab=true; welcomeAd=true; adblock_session=Off; dailyWelcomeCookie=true`
-      }
-    }
-  },
-  'adobe.com': {
-    onBeforeSendHeaders: function (details) {
-      let userAgent = details.requestHeaders['User-Agent']
-      userAgent = [userAgent.split('Chrome')[0], 'Brave Chrome', userAgent.split('Chrome')[1]].join('')
-      details.requestHeaders['User-Agent'] = userAgent
-      return {
-        requestHeaders: details.requestHeaders
       }
     }
   },
@@ -142,6 +134,19 @@ module.exports.siteHacks = {
   },
    'www.theatlantic.com': {
     allowFirstPartyAdblockChecks: true
-  } 
+  }
 }
+
+braveUAWhitelist.forEach((domain) => {
+  module.exports.siteHacks[domain] = {
+    onBeforeSendHeaders: function (details) {
+      let userAgent = details.requestHeaders['User-Agent']
+      userAgent = [userAgent.split('Chrome')[0], 'Brave Chrome', userAgent.split('Chrome')[1]].join('')
+      details.requestHeaders['User-Agent'] = userAgent
+      return {
+        requestHeaders: details.requestHeaders
+      }
+    }
+  }
+})
 
