@@ -132,7 +132,11 @@ function initTorrent (torrent) {
   torrent.on('warning', onWarning)
   torrent.on('error', onError)
 
-  server = torrent.createServer()
+  server = torrent.createServer({
+    // Only allow requests from this origin ('chrome-extension://...) so websites
+    // cannot violate same-origin policy by reading contents of active torrents.
+    origin: window.location.origin
+  })
   server.listen(onServerListening)
 
   // These event listeners aren't strictly required, but it's better to update the
