@@ -533,7 +533,11 @@ class Frame extends React.Component {
       if (this.frame.isEmpty()) {
         return
       }
-      if (e.favicons && e.favicons.length > 0) {
+      if (e.favicons &&
+          e.favicons.length > 0 &&
+          // Favicon changes lead to recalculation of top site data so only fire
+          // this when needed.  Some sites update favicons very frequently.
+          e.favicons[0] !== this.frame.get('icon')) {
         imageUtil.getWorkingImageUrl(e.favicons[0], (imageFound) => {
           windowActions.setFavicon(this.frame, imageFound ? e.favicons[0] : null)
         })
@@ -636,7 +640,7 @@ class Frame extends React.Component {
       }
     }
 
-    const loadEnd = (savePage, url) => {
+    const loadEnd = (savePage, url, inPageNav) => {
       if (this.frame.isEmpty()) {
         return
       }
@@ -651,7 +655,7 @@ class Frame extends React.Component {
 
       const protocol = parsedUrl.protocol
       const isError = this.props.aboutDetailsErrorCode
-      if (!this.props.isPrivate && (protocol === 'http:' || protocol === 'https:') && !isError && savePage) {
+      if (!this.props.isPrivate && (protocol === 'http:' || protocol === 'https:') && !isError && savePage && !inPageNav) {
         // Register the site for recent history for navigation bar
         // calling with setTimeout is an ugly hack for a race condition
         // with setTitle. We either need to delay this call until the title is
@@ -773,18 +777,18 @@ class Frame extends React.Component {
     }, { passive: true })
     this.webview.addEventListener('did-fail-provisional-load', (e) => {
       if (e.isMainFrame) {
-        loadEnd(false, e.validatedURL)
+        loadEnd(false, e.validatedURL, false)
         loadFail(e, true, e.currentURL)
       }
     })
     this.webview.addEventListener('did-fail-load', (e) => {
       if (e.isMainFrame) {
-        loadEnd(false, e.validatedURL)
+        loadEnd(false, e.validatedURL, false)
         loadFail(e, false, e.validatedURL)
       }
     })
     this.webview.addEventListener('did-finish-load', (e) => {
-      loadEnd(true, e.validatedURL)
+      loadEnd(true, e.validatedURL, false)
       if (this.runInsecureContent()) {
         appActions.removeSiteSetting(this.origin, 'runInsecureContent', this.props.isPrivate)
       }
@@ -795,7 +799,7 @@ class Frame extends React.Component {
       }
       if (e.isMainFrame) {
         windowActions.setNavigated(e.url, this.props.frameKey, true, this.props.tabId)
-        loadEnd(true, e.url)
+        loadEnd(true, e.url, true)
       }
     })
     this.webview.addEventListener('enter-html-full-screen', () => {
