@@ -388,7 +388,8 @@ class AboutBookmarks extends React.Component {
       selectedFolderId: 0,
       search: ''
     }
-    ipc.on(messages.BOOKMARKS_UPDATED, (e, detail) => {
+    ipc.on(messages.BOOKMARKS_UPDATED, (e, handle) => {
+      const detail = handle.memory()
       this.setState({
         bookmarks: Immutable.fromJS((detail && detail.bookmarks) || {}),
         bookmarkFolders: Immutable.fromJS((detail && detail.bookmarkFolders) || {})
