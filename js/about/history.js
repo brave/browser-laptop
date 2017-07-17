@@ -143,7 +143,8 @@ class AboutHistory extends React.Component {
       selection: Immutable.Set(),
       updatedStamp: undefined
     }
-    ipc.on(messages.HISTORY_UPDATED, (e, detail) => {
+    ipc.on(messages.HISTORY_UPDATED, (e, handle) => {
+      const detail = handle.memory()
       const aboutHistory = Immutable.fromJS(detail || {})
       const updatedStamp = aboutHistory.get('updatedStamp')
       // Only update if the data has changed.
