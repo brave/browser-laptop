@@ -237,14 +237,17 @@ const createWindow = (action) => {
     mainWindow.webContents.on('did-finish-load', (e) => {
       lastEmittedState = appState
       mainWindow.webContents.setZoomLevel(zoomLevel[toolbarUserInterfaceScale] || 0.0)
-      e.sender.send(messages.INITIALIZE_WINDOW,
-        {
+
+      const mem = muon.shared_memory.create({
+        windowValue: {
           disposition: frameOpts.disposition,
           id: mainWindow.id
         },
-        appState.toJS(),
+        appState: appState.toJS(),
         frames,
-        action.restoredState)
+        windowState: action.restoredState})
+
+      e.sender.sendShared(messages.INITIALIZE_WINDOW, mem)
       if (action.cb) {
         action.cb()
       }
