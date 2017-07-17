@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.17.14](https://github.com/brave/browser-laptop/releases/tag/v0.17.14dev)
+## [0.17.16](https://github.com/brave/browser-laptop/releases/tag/v0.17.16dev)
 - Added pause and resume of pending sync uploads. ([#125](https://github.com/brave/sync/issues/125))
 - Added support for Debian stretch. ([#7508](https://github.com/brave/browser-laptop/issues/7508))
 - Fixed URL bar error causing the need for a browser restart. ([#9891](https://github.com/brave/browser-laptop/issues/9891))
