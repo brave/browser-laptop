@@ -355,6 +355,10 @@ module.exports.cleanAppData = (data, isShutdown) => {
     }
   }
 
+  if (data.menu) {
+    delete data.menu
+  }
+
   try {
     data = tabState.getPersistentState(data).toJS()
   } catch (e) {
