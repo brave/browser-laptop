@@ -98,7 +98,15 @@ function * bookmarkUrl (url, title, folderId) {
     .waitForVisible(doneButton)
     .waitForVisible(bookmarkNameInput)
     .typeText(bookmarkNameInput, title)
-    .waitForBookmarkDetail(url, title)
+    .waitForEnabled(doneButton)
+    .click(doneButton)
+    .waitUntil(function () {
+      return this.getText('[data-test-id="bookmarkToolbarButton"] [data-test-id="bookmarkText"]')
+     .then(allTitles => allTitles.indexOf(title) !== -1)
+    })
+    .activateURLMode()
+    .waitForVisible(navigatorBookmarked)
+    .click(navigatorBookmarked)
   if (folderId) {
     const folderOption = `[data-test-id="bookmarkParentFolder"] option[value="${folderId}"`
     yield Brave.app.client
@@ -351,9 +359,13 @@ describe('Syncing bookmarks', function () {
       .waitForVisible(doneButton)
       .waitForExist(bookmarkNameInput)
       .typeText(bookmarkNameInput, this.page2TitleUpdated)
-      .waitForBookmarkDetail(this.page2Url, this.page2TitleUpdated)
       .waitForEnabled(doneButton)
       .click(doneButton)
+      .activateURLMode()
+      .waitForVisible(navigatorBookmarked)
+      .click(navigatorBookmarked)
+      .waitForVisible(doneButton)
+      .waitForInputText(bookmarkNameInput, this.page2TitleUpdated)
 
     // For Delete: Bookmark page 3 and delete it
     yield Brave.app.client
@@ -519,9 +531,13 @@ describe('Syncing bookmarks from an existing profile', function () {
       .waitForVisible(doneButton)
       .waitForVisible(bookmarkNameInput)
       .typeText(bookmarkNameInput, this.page2TitleUpdated)
-      .waitForBookmarkDetail(this.page2Url, this.page2TitleUpdated)
       .waitForEnabled(doneButton)
       .click(doneButton)
+      .activateURLMode()
+      .waitForVisible(navigatorBookmarked)
+      .click(navigatorBookmarked)
+      .waitForVisible(doneButton)
+      .waitForInputText(bookmarkNameInput, this.page2TitleUpdated)
 
     // Create folder then add a bookmark
     yield addBookmarkFolder(this.folder1Title)
