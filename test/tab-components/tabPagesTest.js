@@ -13,7 +13,8 @@ const {
   tabPage2,
   activeWebview,
   activeTab,
-  tabsTab
+  tabsTab,
+  closeTab
 } = require('../lib/selectors')
 
 describe('tab pages', function () {
@@ -58,11 +59,10 @@ describe('tab pages', function () {
 
     it('shows the right number of tabs after closing with mouse', function * () {
       const numTabsPerPage = appConfig.defaultSettings[settings.TABS_PER_PAGE]
-      const firstTabOfNewPageIndex = numTabsPerPage
       yield this.app.client.click(newFrameButton)
         .waitForElementCount(tabPage, 2)
-        .closeTabWithMouse()
-        .closeTabByIndex(firstTabOfNewPageIndex)
+        .moveToObject(activeTab)
+        .click(closeTab)
         // No tab page indicator elements when 1 page
         .waitForElementCount(tabPage, 0)
         .waitForElementCount(tabsTabs, numTabsPerPage)

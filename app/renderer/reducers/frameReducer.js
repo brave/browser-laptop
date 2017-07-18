@@ -81,7 +81,10 @@ const getLocation = (location) => {
 const frameReducer = (state, action, immutableAction) => {
   switch (action.actionType) {
     case appConstants.APP_TAB_UPDATED:
+      // This case will be fired for both tab creation and tab update.
+      // being `tabValue` set for tab creation and `changeInfo` set for tab update
       const tab = immutableAction.get('tabValue')
+      const changeInfo = immutableAction.get('changeInfo')
       if (!tab) {
         break
       }
@@ -110,26 +113,28 @@ const frameReducer = (state, action, immutableAction) => {
       }
 
       // TODO fix race condition in Muon more info in #9000
-      const title = immutableAction.getIn(['tabValue', 'title'])
+      const title = tab.get('title')
       if (title != null) {
         state = state.setIn(['frames', index, 'title'], title)
       }
 
       // TODO fix race condition in Muon more info in #9000
-      const active = immutableAction.getIn(['tabValue', 'active'])
-      const hasTabInHoverState = state.getIn(['ui', 'tabs', 'hoverTabIndex'])
+      const active = tab.get('active')
       if (active != null) {
         if (active) {
-          state = state.set('activeFrameKey', frame.get('key'))
-          if (hasTabInHoverState != null) {
+          state = frameStateUtil.setActiveFrameKey(state, frame.get('key'))
+          state = frameStateUtil.setFrameLastAccessedTime(state, index)
+
+          // Handle tabPage updates and preview cancelation based on tab updated
+          // otherwise tabValue will fire those events each time a tab finish loading
+          // see bug #8429
+          const isNewTab = changeInfo.isEmpty()
+          const activeTabHasUpdated = changeInfo.get('active') != null
+
+          if (!isNewTab && activeTabHasUpdated) {
+            state = frameStateUtil.updateTabPageIndex(state, tabId)
             state = state.set('previewFrameKey', null)
           }
-          if (frame.getIn(['ui', 'tabs', 'hoverTabPageIndex']) == null) {
-            state = state.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
-          }
-          state = state.setIn(['frames', index, 'lastAccessedTime'], new Date().getTime())
-
-          state = frameStateUtil.updateTabPageIndex(state, tabId)
         }
       }
       break
