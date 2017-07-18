@@ -463,6 +463,10 @@ const api = {
         }
       })
 
+      tab.on('close', () => {
+        tab.forceClose()
+      })
+
       tab.on('unresponsive', () => {
         console.log('unresponsive')
       })
