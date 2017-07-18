@@ -132,26 +132,26 @@ var requestVersionInfo = (done, pingOnly) => {
 
   // Get the daily, week of year and month update checks
   const state = AppStore.getState()
-  var lastCheckYMD = state.getIn(['updates', 'lastCheckYMD']) || null
+  const lastCheckYMD = state.getIn(['updates', 'lastCheckYMD'], null)
   debug(`lastCheckYMD = ${lastCheckYMD}`)
-  var lastCheckWOY = state.getIn(['updates', 'lastCheckWOY']) || null
+  const lastCheckWOY = state.getIn(['updates', 'lastCheckWOY'], null)
   debug(`lastCheckWOY = ${lastCheckWOY}`)
-  var lastCheckMonth = state.getIn(['updates', 'lastCheckMonth']) || null
+  const lastCheckMonth = state.getIn(['updates', 'lastCheckMonth'], null)
   debug(`lastCheckMonth = ${lastCheckMonth}`)
 
   // Has the browser ever asked for an update
-  var firstCheckMade = state.getIn(['updates', 'firstCheckMade']) || false
+  const firstCheckMade = state.getIn(['updates', 'firstCheckMade'], false)
   debug(`firstCheckMade = ${firstCheckMade}`)
 
   // Build query string based on the last date an update request was made
-  var query = paramsFromLastCheckDelta(
+  const query = paramsFromLastCheckDelta(
     lastCheckYMD,
     lastCheckWOY,
     lastCheckMonth,
     firstCheckMade
   )
   query.accept_preview = updateToPreviewReleases ? 'true' : 'false'
-  var queryString = `${platformBaseUrl}?${querystring.stringify(query)}`
+  const queryString = `${platformBaseUrl}?${querystring.stringify(query)}`
   debug(queryString)
 
   request(queryString, (err, response, body) => {
