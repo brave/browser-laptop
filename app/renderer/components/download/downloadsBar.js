@@ -36,7 +36,6 @@ class DownloadsBar extends React.Component {
 
   onShowDownloads () {
     appActions.createTabRequested({
-      activateIfOpen: true,
       url: 'about:downloads'
     })
     windowActions.setDownloadsToolbarVisible(false)

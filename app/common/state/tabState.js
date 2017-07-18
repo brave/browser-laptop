@@ -262,7 +262,7 @@ const tabState = {
     return state.get('tabs').find(
       (tab) => tab.get('windowId') === windowId &&
         tab.get('url') === createProperties.get('url') &&
-        (tab.get('partition') || 'default') === (createProperties.get('partition') || 'default'))
+        (tab.get('partition') || 'persist:default') === (createProperties.get('partition') || 'persist:default'))
   },
 
   getTabsByWindow: (state, windowValue) => {

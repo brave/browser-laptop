@@ -566,7 +566,6 @@ if (ipc) {
       } else if (buttonIndex === 2 && win) {
         // Add funds: Open payments panel
         appActions.createTabRequested({
-          activateIfOpen: true,
           url: 'about:preferences#payments',
           windowId: win.id
         })
@@ -578,7 +577,6 @@ if (ipc) {
         appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
       } else if (buttonIndex === 2 && win) {
         appActions.createTabRequested({
-          activateIfOpen: true,
           url: 'about:preferences#payments',
           windowId: win.id
         })
@@ -592,7 +590,6 @@ if (ipc) {
       appActions.hideNotification(message)
       if (buttonIndex === 1 && win) {
         appActions.createTabRequested({
-          activateIfOpen: true,
           url: 'about:preferences#payments',
           windowId: win.id
         })
