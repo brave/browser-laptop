@@ -30,10 +30,22 @@ class TabIcon extends ImmutableComponent {
       }
     })
 
+    let altProps
+    if (!this.props.symbol) {
+      altProps = {
+        'data-test-id': this.props['data-test-id'],
+        'data-test2-id': this.props['data-test2-id']
+      }
+    }
+
     return <div
       className={this.props.className}
       data-test-favicon={this.props['data-test-favicon']}
-      onClick={this.props.onClick}>
+      onDragStart={this.props.onDragStart}
+      draggable={this.props.draggable}
+      onClick={this.props.onClick}
+      {...altProps}
+    >
       {
         this.props.symbol
           ? <span

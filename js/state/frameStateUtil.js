@@ -213,6 +213,14 @@ function getActiveFrameKey (state) {
   return state.get('activeFrameKey')
 }
 
+const setActiveFrameKey = (state, frameKey) => {
+  return state.set('activeFrameKey', frameKey)
+}
+
+const setFrameLastAccessedTime = (state, index) => {
+  return state.setIn(['frames', index, 'lastAccessedTime'], new Date().getTime())
+}
+
 function getNextFrame (state) {
   const activeFrameIndex = findDisplayIndexForFrameKey(state, getActiveFrameKey(state))
   const index = (activeFrameIndex + 1) % state.get('frames').size
@@ -456,16 +464,11 @@ function isPinned (state, frameKey) {
 function updateTabPageIndex (state, frameProps) {
   frameProps = makeImmutable(frameProps)
   const index = getFrameTabPageIndex(state, frameProps.get('key'))
-  const isTabInHoverState = !!getHoverTabIndex(state)
 
   if (index === -1) {
     return state
   }
 
-  // Do not update tabPageIndex if user is in hover mode
-  if (isTabInHoverState) {
-    return state
-  }
   return state.setIn(['ui', 'tabs', 'tabPageIndex'], index)
 }
 
@@ -711,6 +714,8 @@ module.exports = {
   getFrameByTabId,
   getIndexByTabId,
   getPartitionNumber,
+  setFrameLastAccessedTime,
+  setActiveFrameKey,
   getActiveFrame,
   getNextFrame,
   getPreviousFrame,
