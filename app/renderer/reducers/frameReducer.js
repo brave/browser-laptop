@@ -163,12 +163,8 @@ const frameReducer = (state, action, immutableAction) => {
           fingerprintingProtection: {}
         })
       }
-
       // For potential phishing pages, show a warning
-      if (isPotentialPhishingUrl(action.location)) {
-        state = state.setIn(['ui', 'siteInfo', 'isVisible'], true)
-      }
-
+      state = state.setIn(['ui', 'siteInfo', 'isVisible'], isPotentialPhishingUrl(action.location))
       break
     case windowConstants.WINDOW_CLOSE_FRAMES:
       let closedFrames = new Immutable.List()

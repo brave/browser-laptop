@@ -53,4 +53,21 @@ describe('siteInfo component tests', function () {
         .waitForElementCount(viewCertificateButton, 1)
     })
   })
+
+  describe('siteInfo warning on phishing URLs', function () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
+      yield setup(this.app.client)
+    })
+
+    it('siteInfo popup closes when navigating from data: to https:', function * () {
+      const page1 = 'data:text/html,<meta http-equiv="refresh" content="1; url=https://example.com/">'
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(page1)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForElementCount(siteInfoDialog, 1)
+        .waitForElementCount(siteInfoDialog, 0)
+    })
+  })
 })
