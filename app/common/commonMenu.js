@@ -22,22 +22,14 @@ if (process.type === 'browser') {
   BrowserWindow = electron.remote.BrowserWindow
 }
 
-const ensureAtLeastOneWindow = (frameOpts) => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    appActions.newWindow(frameOpts)
-    return false
-  }
-  return true
-}
-
-const getCurrentWindowId = () => {
+const ensureAtLeastOneWindow = (frameOpts = {}) => {
   if (process.type === 'browser') {
-    const activeWindow = BrowserWindow.getActiveWindow()
-    return activeWindow && activeWindow.id
+    if (BrowserWindow.getAllWindows().length === 0) {
+      appActions.newWindow(Immutable.fromJS({location: frameOpts.url}))
+      return
+    }
   }
-
-  const currentWindow = require('../renderer/currentWindow')
-  return currentWindow.getCurrentWindowId()
+  appActions.createTabRequested(frameOpts)
 }
 
 /**
@@ -76,12 +68,7 @@ module.exports.newTabMenuItem = (openerTabId) => {
     label: locale.translation('newTab'),
     accelerator: 'CmdOrCtrl+T',
     click: function (item, focusedWindow) {
-      if (ensureAtLeastOneWindow(Immutable.fromJS({}))) {
-        appActions.createTabRequested({
-          windowId: getCurrentWindowId(),
-          openerTabId
-        })
-      }
+      ensureAtLeastOneWindow({ openerTabId })
     }
   }
 }
@@ -91,13 +78,10 @@ module.exports.newPrivateTabMenuItem = () => {
     label: locale.translation('newPrivateTab'),
     accelerator: 'Shift+CmdOrCtrl+P',
     click: function (item, focusedWindow) {
-      if (ensureAtLeastOneWindow(Immutable.fromJS({ isPrivate: true }))) {
-        appActions.createTabRequested({
-          url: 'about:newtab',
-          windowId: getCurrentWindowId(),
-          isPrivate: true
-        })
-      }
+      ensureAtLeastOneWindow({
+        url: 'about:newtab',
+        isPrivate: true
+      })
     }
   }
 }
@@ -106,11 +90,9 @@ module.exports.newPartitionedTabMenuItem = () => {
   const newPartitionedMenuItem = (partitionNumber) => ({
     label: `${locale.translation('newSessionTab')} ${partitionNumber}`,
     click: (item, focusedWindow) => {
-      if (ensureAtLeastOneWindow(Immutable.fromJS({ partitionNumber }))) {
-        appActions.createTabRequested({
-          partitionNumber
-        })
-      }
+      ensureAtLeastOneWindow({
+        partitionNumber
+      })
     }
   })
 
@@ -160,7 +142,7 @@ module.exports.simpleShareActiveTabMenuItem = (l10nId, type, accelerator) => {
     label: locale.translation(l10nId),
     accelerator,
     click: function (item, focusedWindow) {
-      appActions.simpleShareActiveTabRequested(getCurrentWindowId(), type)
+      appActions.simpleShareActiveTabRequested(type)
     }
   }
 }
@@ -194,17 +176,9 @@ module.exports.preferencesMenuItem = () => {
     label: locale.translation(isDarwin ? 'preferences' : 'settings'),
     accelerator: 'CmdOrCtrl+,',
     click: (item, focusedWindow) => {
-      if (BrowserWindow.getAllWindows().length === 0) {
-        appActions.newWindow(Immutable.fromJS({
-          location: 'about:preferences'
-        }))
-      } else {
-        appActions.createTabRequested({
-          activateIfOpen: true,
-          url: 'about:preferences',
-          windowId: getCurrentWindowId()
-        })
-      }
+      ensureAtLeastOneWindow({
+        url: 'about:preferences'
+      })
     }
   }
 }
@@ -214,17 +188,9 @@ module.exports.bookmarksManagerMenuItem = () => {
     label: locale.translation('bookmarksManager'),
     accelerator: isDarwin ? 'CmdOrCtrl+Alt+B' : 'Ctrl+Shift+O',
     click: (item, focusedWindow) => {
-      if (BrowserWindow.getAllWindows().length === 0) {
-        appActions.newWindow(Immutable.fromJS({
-          location: 'about:bookmarks'
-        }))
-      } else {
-        appActions.createTabRequested({
-          activateIfOpen: true,
-          url: 'about:bookmarks',
-          windowId: getCurrentWindowId()
-        })
-      }
+      ensureAtLeastOneWindow({
+        url: 'about:bookmarks'
+      })
     }
   }
 }
@@ -234,17 +200,9 @@ module.exports.historyMenuItem = () => {
     label: locale.translation('showAllHistory'),
     accelerator: 'CmdOrCtrl+Y',
     click: function (item, focusedWindow) {
-      if (BrowserWindow.getAllWindows().length === 0) {
-        appActions.newWindow(Immutable.fromJS({
-          location: 'about:history'
-        }))
-      } else {
-        appActions.createTabRequested({
-          activateIfOpen: true,
-          url: 'about:history',
-          windowId: getCurrentWindowId()
-        })
-      }
+      ensureAtLeastOneWindow({
+        url: 'about:history'
+      })
     }
   }
 }
@@ -254,18 +212,10 @@ module.exports.downloadsMenuItem = () => {
     label: locale.translation('downloadsManager'),
     accelerator: isDarwin ? 'CmdOrCtrl+Shift+J' : 'Ctrl+J',
     click: (item, focusedWindow) => {
-      if (BrowserWindow.getAllWindows().length === 0) {
-        appActions.newWindow(Immutable.fromJS({
-          location: 'about:downloads'
-        }))
-      } else {
-        module.exports.sendToFocusedWindow(focusedWindow, [messages.HIDE_DOWNLOADS_TOOLBAR])
-        appActions.createTabRequested({
-          activateIfOpen: true,
-          url: 'about:downloads',
-          windowId: getCurrentWindowId()
-        })
-      }
+      module.exports.sendToFocusedWindow(focusedWindow, [messages.HIDE_DOWNLOADS_TOOLBAR])
+      ensureAtLeastOneWindow({
+        url: 'about:downloads'
+      })
     }
   }
 }
@@ -274,17 +224,9 @@ module.exports.extensionsMenuItem = () => {
   return {
     label: locale.translation('extensionsManager'),
     click: (item, focusedWindow) => {
-      if (BrowserWindow.getAllWindows().length === 0) {
-        appActions.newWindow(Immutable.fromJS({
-          location: 'about:preferences#extensions'
-        }))
-      } else {
-        appActions.createTabRequested({
-          activateIfOpen: true,
-          url: 'about:preferences#extensions',
-          windowId: getCurrentWindowId()
-        })
-      }
+      ensureAtLeastOneWindow({
+        url: 'about:preferences#extensions'
+      })
     }
   }
 }
@@ -293,17 +235,9 @@ module.exports.passwordsMenuItem = () => {
   return {
     label: locale.translation('passwordsManager'),
     click: (item, focusedWindow) => {
-      if (BrowserWindow.getAllWindows().length === 0) {
-        appActions.newWindow(Immutable.fromJS({
-          location: 'about:passwords'
-        }))
-      } else {
-        appActions.createTabRequested({
-          activateIfOpen: true,
-          url: 'about:passwords',
-          windowId: getCurrentWindowId()
-        })
-      }
+      ensureAtLeastOneWindow({
+        url: 'about:passwords'
+      })
     }
   }
 }
@@ -338,11 +272,9 @@ module.exports.submitFeedbackMenuItem = () => {
   return {
     label: locale.translation('submitFeedback'),
     click: function (item, focusedWindow) {
-      appActions.createTabRequested({
-        activateIfOpen: true,
-        url: communityURL,
-        windowId: getCurrentWindowId()
-      })
+      ensureAtLeastOneWindow({
+        url: communityURL
+      }, true)
     }
   }
 }
@@ -374,10 +306,8 @@ module.exports.aboutBraveMenuItem = () => {
   return {
     label: locale.translation('aboutApp'),
     click: (item, focusedWindow) => {
-      appActions.createTabRequested({
-        activateIfOpen: true,
-        url: 'about:brave',
-        windowId: getCurrentWindowId()
+      ensureAtLeastOneWindow({
+        url: 'about:brave'
       })
     }
   }
@@ -396,17 +326,9 @@ module.exports.braveryGlobalMenuItem = () => {
   return {
     label: locale.translation('braveryGlobal'),
     click: (item, focusedWindow) => {
-      if (BrowserWindow.getAllWindows().length === 0) {
-        appActions.newWindow(Immutable.fromJS({
-          location: 'about:preferences#shields'
-        }))
-      } else {
-        appActions.createTabRequested({
-          activateIfOpen: true,
-          url: 'about:preferences#shields',
-          windowId: getCurrentWindowId()
-        })
-      }
+      ensureAtLeastOneWindow({
+        url: 'about:preferences#shields'
+      })
     }
   }
 }
@@ -419,17 +341,9 @@ module.exports.braveryPaymentsMenuItem = () => {
   return {
     label: label,
     click: (item, focusedWindow) => {
-      if (BrowserWindow.getAllWindows().length === 0) {
-        appActions.newWindow(Immutable.fromJS({
-          location: 'about:preferences#payments'
-        }))
-      } else {
-        appActions.createTabRequested({
-          activateIfOpen: true,
-          url: 'about:preferences#payments',
-          windowId: getCurrentWindowId()
-        })
-      }
+      ensureAtLeastOneWindow({
+        url: 'about:preferences#payments'
+      })
     }
   }
 }

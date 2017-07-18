@@ -7,12 +7,20 @@
 const appConstants = require('../../../js/constants/appConstants')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const {simpleShareActiveTab} = require('../share')
+const BrowserWindow = require('electron').BrowserWindow
 
 const shareReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
     case appConstants.APP_SIMPLE_SHARE_ACTIVE_TAB_REQUESTED:
-      state = simpleShareActiveTab(state, action.get('windowId'), action.get('shareType'))
+      let windowId = action.get('senderWindowId')
+      if (windowId == null) {
+        if (BrowserWindow.getActiveWindow()) {
+          windowId = BrowserWindow.getActiveWindow().id
+        }
+      }
+
+      state = simpleShareActiveTab(state, windowId, action.get('shareType'))
       break
   }
   return state
