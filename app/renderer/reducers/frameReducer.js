@@ -97,13 +97,11 @@ const frameReducer = (state, action, immutableAction) => {
         }
       }
 
-      // TODO fix race condition in Muon more info in #9000
       const title = tab.get('title')
       if (title != null) {
         state = state.setIn(['frames', index, 'title'], title)
       }
 
-      // TODO fix race condition in Muon more info in #9000
       const active = tab.get('active')
       if (active != null) {
         if (active) {
