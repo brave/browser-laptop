@@ -673,8 +673,15 @@ const doAction = (state, action) => {
       }
     case windowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
       {
-        closedFrames = new Immutable.OrderedMap()
-        lastClosedUrl = null
+        if (!action.location) {
+          closedFrames = new Immutable.OrderedMap()
+          lastClosedUrl = null
+        } else {
+          closedFrames = closedFrames.delete(action.location)
+          if (lastClosedUrl === action.location) {
+            lastClosedUrl = null
+          }
+        }
         updateRecentlyClosedMenuItems(state)
         break
       }
@@ -720,7 +727,7 @@ const doAction = (state, action) => {
       }
     case appConstants.APP_REMOVE_SITE:
       {
-        if (action.tag === siteTags.BOOKMARK || action.tag === siteTags.BOOKMARK_FOLDER) {
+        if (!action.tag || action.tag === siteTags.BOOKMARK || action.tag === siteTags.BOOKMARK_FOLDER) {
           createMenu(state)
         }
         break

@@ -369,7 +369,12 @@ const doAction = (action) => {
       }
       break
     case windowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
-      windowState = windowState.set('closedFrames', new Immutable.List())
+      if (!action.location) {
+        windowState = windowState.set('closedFrames', new Immutable.List())
+      } else {
+        windowState = windowState.set('closedFrames',
+          windowState.get('closedFrames').filterNot((frame) => frame.get('location') === action.location))
+      }
       break
     case windowConstants.WINDOW_SET_PREVIEW_FRAME:
       windowState = frameStateUtil.setPreviewFrameKey(windowState, action.frameKey, true)

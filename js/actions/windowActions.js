@@ -214,10 +214,13 @@ const windowActions = {
 
   /**
    * Dispatches a message to the store to clear closed frames
+   * @param {string=} location - If specified, only clear frames with this
+   *   location.
    */
-  clearClosedFrames: function () {
+  clearClosedFrames: function (location) {
     dispatch({
-      actionType: windowConstants.WINDOW_CLEAR_CLOSED_FRAMES
+      actionType: windowConstants.WINDOW_CLEAR_CLOSED_FRAMES,
+      location
     })
   },
 
