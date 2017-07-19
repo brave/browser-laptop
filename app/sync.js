@@ -349,7 +349,8 @@ module.exports.onSyncReady = (isFirstRun, e) => {
       }
     }
     e.sender.send(syncMessages.FETCH_SYNC_RECORDS, categoryNames, startAt)
-    startAt = syncUtil.now()
+    // Reduce syncUtil.now() by this amount to compensate for records pending S3 consistency. See brave/sync #139
+    startAt = syncUtil.now() - config.fetchOffset
     appActions.saveSyncInitData(null, null, startAt)
     resendPendingRecords()
   }
