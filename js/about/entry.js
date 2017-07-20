@@ -60,7 +60,7 @@ switch (getBaseUrl(getSourceAboutUrl(window.location.href))) {
     element = require('./brave')
     break
   case 'about:bookmarks':
-    element = require('./bookmarks')
+    element = require('../../app/renderer/about/bookmarks/bookmarks')
     break
   case 'about:certerror':
     element = require('./certerror')
