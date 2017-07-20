@@ -107,7 +107,7 @@ class TabPage extends React.Component {
 
     // used in other functions
     props.sourceDragFromPageIndex = sourceDragFromPageIndex
-    props.isPageEmpty = tabPageFrames.size === 0
+    props.isPageEmpty = tabPageFrames.isEmpty()
     props.moveToFrameKey = tabPageFrames.getIn([0, 'key'])
 
     return props

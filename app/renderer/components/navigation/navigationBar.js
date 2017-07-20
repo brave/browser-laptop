@@ -100,7 +100,7 @@ class NavigationBar extends React.Component {
     const titleMode = activeTabShowingMessageBox ||
       (
         mouseInTitlebar === false &&
-        !bookmarkDetail &&
+        bookmarkDetail.isEmpty() &&
         hasTitle &&
         !['about:blank', 'about:newtab'].includes(location) &&
         !loading &&
@@ -116,7 +116,7 @@ class NavigationBar extends React.Component {
     props.isBookmarked = activeFrameKey !== undefined &&
       activeTab && activeTab.get('bookmarked')
     props.isWideUrlBarEnabled = getSetting(settings.WIDE_URL_BAR)
-    props.showBookmarkHanger = bookmarkDetail.get('isBookmarkHanger')
+    props.showBookmarkHanger = bookmarkDetail.get('isBookmarkHanger', false)
     props.isLoading = loading
     props.showPublisherToggle = publisherState.shouldShowAddPublisherButton(state, location, publisherId)
     props.showHomeButton = !props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)

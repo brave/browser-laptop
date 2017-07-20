@@ -58,7 +58,7 @@ class MenuBarItem extends React.Component {
     props.label = template.get('label')
 
     // used in other functions
-    props.submenu = template.get('submenu') && template.get('submenu').toJS()
+    props.submenu = template.get('submenu') && template.get('submenu').toJS() // TODO (nejc) only primitives
     props.lastFocusedSelector = currentWindow.getIn(['ui', 'menubar', 'lastFocusedSelector'])
     props.selectedIndex = selectedIndex
 
