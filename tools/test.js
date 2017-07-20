@@ -2,16 +2,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-var execute = require('./lib/execute')
+const execute = require('./lib/execute')
 
 const TEST_DIR = process.env.TEST_DIR
 
-var cmd = []
+let cmd = []
 
-if (TEST_DIR === 'lint') {
-  cmd.push('standard')
-} else {
-  cmd.push(`mocha "test/${TEST_DIR}/**/*Test.js"`)
+switch (TEST_DIR) {
+  case 'lint':
+    cmd.push('standard')
+    break
+  case 'codecov':
+    cmd.push('bash tools/codecov.sh')
+    break
+  default:
+    cmd.push(`mocha "test/${TEST_DIR}/**/*Test.js"`)
 }
 
 execute(cmd, process.env, (err) => {

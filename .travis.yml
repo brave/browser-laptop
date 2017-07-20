@@ -21,6 +21,7 @@ notifications:
 env:
   - CXX=g++-4.8 NODE_ENV=test TEST_DIR=lint
   - CXX=g++-4.8 NODE_ENV=test TEST_DIR=unit
+  - CXX=g++-4.8 NODE_ENV=test TEST_DIR=codecov
   - CXX=g++-4.8 NODE_ENV=test TEST_DIR=about
   - CXX=g++-4.8 NODE_ENV=test TEST_DIR=app
   - CXX=g++-4.8 NODE_ENV=test TEST_DIR=bookmark-components
