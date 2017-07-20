@@ -46,7 +46,7 @@ class TabsToolbar extends React.Component {
 
     const props = {}
     // used in renderer
-    props.hasPinnedTabs = pinnedTabs.size > 0
+    props.hasPinnedTabs = !pinnedTabs.isEmpty()
 
     // used in other functions
     props.activeFrameKey = activeFrame.get('key')
