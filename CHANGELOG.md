@@ -3,7 +3,7 @@
 ## [0.17.19](https://github.com/brave/browser-laptop/releases/tag/v0.17.19dev)
  - Optimized getTopsites to speed up URL bar suggestions. ([#10004](https://github.com/brave/browser-laptop/issues/10004))
  - Optimized check for updates. ([#9996](https://github.com/brave/browser-laptop/issues/9996))
- - Optimized calculating top sites. ([#10018](https://github.com/brave/browser-laptop/issues/10018))
+ - Optimized window initialization data to use shared memory. ([#10018](https://github.com/brave/browser-laptop/issues/10018))
  - Optimized shared memory IPC to transfer history & bookmarks. ([#10024](https://github.com/brave/browser-laptop/issues/10024))
  - Added Whitelist DuckDuckGo for Brave UA. ([#10020](https://github.com/brave/browser-laptop/issues/10020))
  - Fixed tab display after a tabpage closes. ([#9922](https://github.com/brave/browser-laptop/issues/9922))
