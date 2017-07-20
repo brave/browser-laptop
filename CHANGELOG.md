@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.17.19](https://github.com/brave/browser-laptop/releases/tag/v0.17.19dev)
+ - Added Whitelist DuckDuckGo for Brave UA. ([#10020](https://github.com/brave/browser-laptop/issues/10020))
+ - Fixed tab display after a tabpage closes. ([#9922](https://github.com/brave/browser-laptop/issues/9922))
+ - Fixed history list shows unnecessary duplicates for same-page actions (like google maps). ([#3848](https://github.com/brave/browser-laptop/issues/3848))
+ - Fixed : Security : WebTorrent: Torrent server should be restricted to same origin. ([#10012](https://github.com/brave/browser-laptop/issues/10012))
+ - Performance improvements. ([#10004](https://github.com/brave/browser-laptop/issues/10004))([#9996](https://github.com/brave/browser-laptop/issues/9996))
+ - Update to Muon 4.1.9. ([#10064](https://github.com/brave/browser-laptop/issues/10064))
+
 ## [0.17.16](https://github.com/brave/browser-laptop/releases/tag/v0.17.16dev)
 - Added pause and resume of pending sync uploads. ([#125](https://github.com/brave/sync/issues/125))
 - Added support for Debian stretch. ([#7508](https://github.com/brave/browser-laptop/issues/7508))
