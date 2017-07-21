@@ -4,11 +4,12 @@
 
 'use strict'
 
-const electron = require('electron')
-const app = electron.app
+// const electron = require('electron')
+// const app = electron.app
 
-const path = require('path')
-const rimraf = require('rimraf')
+// const path = require('path')
+// TODO @cezaraugusto enable again once we have a GUI to exclude an extension
+// const rimraf = require('rimraf')
 
 const extensionState = require('../../common/state/extensionState')
 const ExtensionConstants = require('../../common/constants/extensionConstants')
@@ -18,17 +19,18 @@ const extensionsReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
     case ExtensionConstants.EXTENSION_UNINSTALLED:
-      let extensionId = action.get('extensionId').toString()
-      let extensionPath = path.join(app.getPath('userData'), 'Extensions', extensionId)
+      // let extensionId = action.get('extensionId').toString()
+      // let extensionPath = path.join(app.getPath('userData'), 'Extensions', extensionId)
 
       state = extensionState.extensionUninstalled(state, action)
+      // TODO @cezaraugusto enable again once we have a GUI to exclude an extension
       // Remove extension folder
-      rimraf(extensionPath, err => {
-        if (err) {
-          console.log('unable to remove extension', err)
-        }
-        console.log(`extension id ${extensionId} removed at: \n ${extensionPath}`)
-      })
+      // rimraf(extensionPath, err => {
+      //   if (err) {
+      //     console.log('unable to remove extension', err)
+      //   }
+      //   console.log(`extension id ${extensionId} removed at: \n ${extensionPath}`)
+      // })
       break
   }
   return state

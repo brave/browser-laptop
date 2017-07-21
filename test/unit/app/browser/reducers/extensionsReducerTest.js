@@ -28,7 +28,7 @@ const extensionState = (extensionId) => Immutable.fromJS({
   }
 })
 
-describe('extensionsReducer', function () {
+describe.skip('extensionsReducer', function () {
   let extensionsReducer
   const fakeRimraf = sinon.stub()
 
