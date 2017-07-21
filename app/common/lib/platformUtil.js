@@ -47,3 +47,16 @@ module.exports.isLinux = () => {
   return !module.exports.isDarwin() &&
     !module.exports.isWindows()
 }
+
+module.exports.formatOsPlatform = (os) => {
+  let platformMapping = {
+    'aix': 'AIX',
+    'darwin': 'macOS',
+    'freebsd': 'FreeBSD',
+    'linux': 'Linux',
+    'openbsd': 'OpenBSD',
+    'sunos': 'sunOS',
+    'win32': 'Microsoft Windows'
+  }
+  return Object.keys(platformMapping).includes(os) ? platformMapping[os] : os
+}
