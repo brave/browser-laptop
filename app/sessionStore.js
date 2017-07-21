@@ -15,6 +15,7 @@ const Immutable = require('immutable')
 const fs = require('fs-extra')
 const path = require('path')
 const electron = require('electron')
+const os = require('os')
 const app = electron.app
 const locale = require('./locale')
 const UpdateStatus = require('../js/constants/updateStatus')
@@ -32,6 +33,7 @@ const { makeImmutable } = require('./common/state/immutableUtil')
 const tabState = require('./common/state/tabState')
 const windowState = require('./common/state/windowState')
 
+const platformUtil = require('./common/lib/platformUtil')
 const getSetting = require('../js/settings').getSetting
 const sessionStorageName = `session-store-${sessionStorageVersion}`
 
@@ -426,9 +428,9 @@ const setVersionInformation = (data) => {
     ['V8', () => { return process.versions.v8 }],
     ['Node.js', () => { return process.versions.node }],
     ['Update Channel', Channel.channel],
-    ['os.platform', require('os').platform],
-    ['os.release', require('os').release],
-    ['os.arch', require('os').arch]
+    ['OS Platform', () => platformUtil.formatOsPlatform(os.platform())],
+    ['OS Release', os.release],
+    ['OS Architecture', os.arch]
   ]
   const versionInformation = {}
 
