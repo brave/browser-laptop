@@ -304,8 +304,6 @@ class BookmarkToolbarButton extends React.Component {
 
 module.exports = ReduxComponent.connect(BookmarkToolbarButton)
 
-const bookmarkToolbarButtonDraggingMargin = '25px'
-
 const styles = StyleSheet.create({
   bookmarkToolbarButton: {
     display: 'flex',
@@ -330,10 +328,10 @@ const styles = StyleSheet.create({
     }
   },
   bookmarkToolbarButton__draggingOverLeft: {
-    paddingLeft: bookmarkToolbarButtonDraggingMargin
+    paddingLeft: globalStyles.spacing.bookmarksToolbarButtonDraggingMargin
   },
   bookmarkToolbarButton__draggingOverRight: {
-    paddingRight: bookmarkToolbarButtonDraggingMargin
+    paddingRight: globalStyles.spacing.bookmarksToolbarButtonDraggingMargin
   },
   bookmarkToolbarButton__isDragging: {
     opacity: '0.2'

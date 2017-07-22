@@ -156,6 +156,8 @@ const globalStyles = {
     bookmarksItemChevronFontSize: '8px',
     bookmarksToolbarPadding: '10px',
     bookmarksItemFontSize: '11px',
+    bookmarksToolbarButtonDraggingMargin: '25px',
+    bookmarksToolbarOverflowButtonWidth: '25px',
     navbarMenubarMargin: '7px',
     navbarButtonSpacing: '4px',
     navbarButtonWidth: '20px',

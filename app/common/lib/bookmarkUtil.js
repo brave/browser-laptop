@@ -116,7 +116,7 @@ const getToolbarBookmarks = (state) => {
   // Toolbar padding is only on the left
   const toolbarPadding = parseInt(globalStyles.spacing.bookmarksToolbarPadding)
 
-  const overflowButtonWidth = 25
+  const overflowButtonWidth = parseInt(globalStyles.spacing.bookmarksToolbarOverflowButtonWidth, 10)
   const maximumBookmarksToolbarWidth = windowWidth - overflowButtonWidth
 
   widthAccountedFor += toolbarPadding
