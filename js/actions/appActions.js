@@ -198,20 +198,6 @@ const appActions = {
   },
 
   /**
-   * Dispatches a message to the store to change the tab index
-   *
-   * @param {Number} tabId - the tabId
-   * @param {Number} index - the new index
-   */
-  tabIndexChanged: function (tabId, index) {
-    dispatch({
-      actionType: appConstants.APP_TAB_INDEX_CHANGED,
-      tabId,
-      index
-    })
-  },
-
-  /**
    * Dispatches a message to close the tabId
    *
    * @param {Number} tabId - the tabId to close

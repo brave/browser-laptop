@@ -78,7 +78,7 @@ module.exports.saveAppState = (payload, isShutdown) => {
       startupModeSettingValue === 'lastTime'
     if (payload.perWindowState && savePerWindowState) {
       payload.perWindowState.forEach((wndPayload) => {
-        wndPayload.frames = wndPayload.frames.filter((frame) => !frame.isPrivate)
+        wndPayload.frames = wndPayload.frames ? wndPayload.frames.filter((frame) => !frame.isPrivate) : []
       })
     } else {
       delete payload.perWindowState

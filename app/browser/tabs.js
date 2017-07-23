@@ -8,6 +8,7 @@ const tabActions = require('../common/actions/tabActions')
 const config = require('../../js/constants/config')
 const Immutable = require('immutable')
 const tabState = require('../common/state/tabState')
+const windowState = require('../common/state/windowState')
 const {app, BrowserWindow, extensions, session, ipcMain} = require('electron')
 const {makeImmutable} = require('../common/state/immutableUtil')
 const {getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl, isTargetAboutUrl, isIntermediateAboutPage, isTargetMagnetUrl, getSourceMagnetUrl} = require('../../js/lib/appUrlUtil')
@@ -24,6 +25,7 @@ const appStore = require('../../js/stores/appStore')
 const appConfig = require('../../js/constants/appConfig')
 const siteTags = require('../../js/constants/siteTags')
 const {newTabMode} = require('../common/constants/settingsEnums')
+const {tabCloseAction} = require('../common/constants/settingsEnums')
 const {cleanupWebContents, currentWebContents, getWebContents, updateWebContents} = require('./webContentsCache')
 const {FilterOptions} = require('ad-block')
 const {isResourceEnabled} = require('../filtering')
@@ -434,8 +436,7 @@ const api = {
       if (tab.isBackgroundPage() || !tab.isGuest()) {
         return
       }
-      let tabId = tab.getId()
-
+      const tabId = tab.getId()
       tab.on('did-start-navigation', (e, navigationHandle) => {
         if (!tab.isDestroyed() && navigationHandle.isValid() && navigationHandle.isInMainFrame()) {
           const controller = tab.controller()
@@ -471,8 +472,13 @@ const api = {
       tab.on('unresponsive', () => {
         console.log('unresponsive')
       })
+
       tab.on('responsive', () => {
         console.log('responsive')
+      })
+
+      tab.on('tab-changed-at', () => {
+        console.log('tab changed at:', tabId)
       })
 
       tab.on('save-password', (e, username, origin) => {
@@ -535,13 +541,6 @@ const api = {
     let tab = getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
       tab.setActive(true)
-    }
-  },
-
-  setTabIndex: (tabId, index) => {
-    let tab = getWebContents(tabId)
-    if (tab && !tab.isDestroyed()) {
-      tab.setTabIndex(index)
     }
   },
 
@@ -609,8 +608,11 @@ const api = {
     const tabId = action.get('tabId')
     let options = action.get('options') || Immutable.Map()
     const tabValue = getTabValue(tabId)
-    if (tabValue && tabValue.get('index') !== undefined) {
-      options = options.set('index', tabValue.get('index') + 1)
+    if (tabValue) {
+      const index = tabValue.get('index')
+      if (index !== undefined) {
+        options = options.set('index', index)
+      }
     }
     const tab = getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
@@ -721,7 +723,7 @@ const api = {
     win.loadURL('about:blank')
   },
 
-  moveTo: (state, tabId, frameOpts, browserOpts, windowId) => {
+  moveTo: (state, tabId, frameOpts, browserOpts, toWindowId) => {
     frameOpts = makeImmutable(frameOpts)
     browserOpts = makeImmutable(browserOpts)
     const tab = getWebContents(tabId)
@@ -733,11 +735,11 @@ const api = {
       }
 
       const currentWindowId = tabValue && tabValue.get('windowId')
-      if (windowId != null && currentWindowId === windowId) {
+      if (toWindowId != null && currentWindowId === toWindowId) {
         return
       }
 
-      if (windowId == null || windowId === -1) {
+      if (toWindowId == null || toWindowId === -1) {
         // If there's only one tab and we're dragging outside the window, then disallow
         // a new window to be created.
         const windowTabCount = tabState.getTabsByWindowId(state, currentWindowId).size
@@ -750,12 +752,12 @@ const api = {
         // If the current tab is pinned, then don't allow to drag out
         return
       }
-
+      api.updateActiveTab(state, tabId)
       tab.detach(() => {
-        if (windowId == null || windowId === -1) {
+        if (toWindowId == null || toWindowId === -1) {
           appActions.newWindow(makeImmutable(frameOpts), browserOpts)
         } else {
-          appActions.newWebContentsAdded(windowId, frameOpts, tabValue)
+          appActions.newWebContentsAdded(toWindowId, frameOpts, tabValue)
         }
       })
     }
@@ -855,6 +857,76 @@ const api = {
     }
 
     return null
+  },
+
+  updateActiveTab: (state, closeTabId) => {
+    if (!tabState.getByTabId(state, closeTabId)) {
+      return
+    }
+
+    const index = tabState.getIndex(state, closeTabId)
+    if (index === -1) {
+      return
+    }
+
+    const windowId = tabState.getWindowId(state, closeTabId)
+    if (windowId === windowState.WINDOW_ID_NONE) {
+      return
+    }
+
+    const lastActiveTabId = tabState.getTabsByLastActivated(state, windowId).last()
+    if (lastActiveTabId !== closeTabId && !tabState.isActive(state, closeTabId)) {
+      return
+    }
+
+    let nextTabId = tabState.TAB_ID_NONE
+    switch (getSetting(settings.TAB_CLOSE_ACTION)) {
+      case tabCloseAction.LAST_ACTIVE:
+        nextTabId = tabState.getLastActiveTabId(state, windowId)
+        break
+      case tabCloseAction.PARENT:
+        {
+          const openerTabId = tabState.getOpenerTabId(state, closeTabId)
+          if (openerTabId !== tabState.TAB_ID_NONE) {
+            nextTabId = openerTabId
+          }
+          break
+        }
+    }
+
+    // DEFAULT: always fall back to NEXT
+    if (nextTabId === tabState.TAB_ID_NONE) {
+      nextTabId = tabState.getNextTabIdByIndex(state, windowId, index)
+      if (nextTabId === tabState.TAB_ID_NONE) {
+        // no unpinned tabs so find the next pinned tab
+        nextTabId = tabState.getNextTabIdByIndex(state, windowId, index, true)
+      }
+    }
+
+    if (nextTabId !== tabState.TAB_ID_NONE) {
+      setImmediate(() => {
+        api.setActive(nextTabId)
+      })
+    }
+  },
+  debugTabs: (state) => {
+    console.log(tabState.getTabs(state)
+      .toJS()
+      .map((tab) => {
+        return {
+          tabId: tab.tabId,
+          index: tab.index,
+          windowId: tab.windowId,
+          active: tab.active
+        }
+      })
+      .sort((tab1, tab2) => {
+        if (tab1.windowId !== tab2.windowId)
+          return tab1.windowId - tab2.windowId
+        if (tab1.index !== tab2.index)
+          return tab1.index - tab2.index
+        return 0
+      }))
   }
 }
 

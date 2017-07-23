@@ -288,7 +288,7 @@ const api = {
   setTitle: (windowId, title) => {
     setImmediate(() => {
       const win = currentWindows[windowId]
-      if (win && !win.isDestroyed()) {
+      if (win && !win.isDestroyed() && title != null) {
         win.setTitle(title)
       }
     })
@@ -334,7 +334,7 @@ const api = {
     } catch (e) {
       // ignore
     }
-    return windowState.removeWindowByWindowId(state, windowId)
+    return state
   },
 
   getWindow: (windowId) => {
