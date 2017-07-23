@@ -124,9 +124,6 @@ if (isLinux) {
   cmds.push('"node_modules/rcedit/bin/rcedit.exe" ./Brave-win32-' + arch + '/Brave.exe --set-version-string "SquirrelAwareVersion" "1"')
 }
 
-cmds.push('mkdirp ' + path.join(buildDir, 'resources', 'app.asar.unpacked', 'node_modules', 'spellchecker', 'vendor', 'hunspell_dictionaries'))
-cmds.push('ncp ' + path.join('node_modules', 'spellchecker', 'vendor', 'hunspell_dictionaries') + ' ' + path.join(buildDir, 'resources', 'app.asar.unpacked', 'node_modules', 'spellchecker', 'vendor', 'hunspell_dictionaries'))
-
 if (isDarwin) {
   cmds.push('mkdirp ' + path.join(buildDir, 'Brave.app', 'Contents', 'Resources', 'app.asar.unpacked', 'node_modules', 'node-anonize2-relic-emscripten'))
   cmds.push('ncp ' + path.join('node_modules', 'node-anonize2-relic-emscripten', 'anonize2.js.mem') + ' ' + path.join(buildDir, 'Brave.app', 'Contents', 'Resources', 'app.asar.unpacked', 'node_modules', 'node-anonize2-relic-emscripten', 'anonize2.js.mem'))

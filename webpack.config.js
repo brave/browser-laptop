@@ -56,7 +56,6 @@ function config () {
     },
     plugins: [
       new webpack.IgnorePlugin(/^\.\/stores\/appStore$/),
-      new webpack.IgnorePlugin(/^spellchecker/),
       new webpack.DefinePlugin({
         'process.env': {
           NODE_ENV: JSON.stringify(env),
