@@ -223,7 +223,6 @@ const frameReducer = (state, action, immutableAction) => {
     case windowConstants.WINDOW_SET_FULL_SCREEN:
       state = setFullScreen(state, action)
       break
-
     case windowConstants.WINDOW_ON_FRAME_BOOKMARK:
       {
         // TODO make this an appAction that gets the bookmark data from tabState

@@ -81,7 +81,10 @@ describe('tabs API unit tests', function () {
           tabValue: () =>
             this.state.get('tabs').find((tab) => tab.get('tabId') === tabId),
           isDestroyed: () => false,
-          detach: (cb) => cb()
+          detach: (cb) => cb(),
+          once: (event, cb) => {
+            setImmediate(cb)
+          }
         }
         if (tabId === 1) {
           Object.assign(webContents, this.tabWithDevToolsClosed)

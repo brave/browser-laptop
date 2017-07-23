@@ -11,7 +11,6 @@ const windows = require('../windows')
 const {getWebContents} = require('../webContentsCache')
 const {BrowserWindow} = require('electron')
 const tabState = require('../../common/state/tabState')
-const windowState = require('../../common/state/windowState')
 const tabActions = require('../../common/actions/tabActions')
 const siteSettings = require('../../../js/state/siteSettings')
 const siteSettingsState = require('../../common/state/siteSettingsState')
@@ -22,62 +21,8 @@ const {getFlashResourceId} = require('../../../js/flash')
 const {l10nErrorText} = require('../../common/lib/httpUtil')
 const Immutable = require('immutable')
 const dragTypes = require('../../../js/constants/dragTypes')
-const getSetting = require('../../../js/settings').getSetting
-const settings = require('../../../js/constants/settings')
-const {tabCloseAction} = require('../../common/constants/settingsEnums')
 const {frameOptsFromFrame} = require('../../../js/state/frameStateUtil')
 const {isSourceAboutUrl, isTargetAboutUrl, isIntermediateAboutPage} = require('../../../js/lib/appUrlUtil')
-
-const updateActiveTab = (state, closeTabId) => {
-  if (!tabState.getByTabId(state, closeTabId)) {
-    return
-  }
-
-  const index = tabState.getIndex(state, closeTabId)
-  if (index === -1) {
-    return
-  }
-
-  const windowId = tabState.getWindowId(state, closeTabId)
-  if (windowId === windowState.WINDOW_ID_NONE) {
-    return
-  }
-
-  const lastActiveTabId = tabState.getTabsByLastActivated(state, windowId).last()
-  if (lastActiveTabId !== closeTabId && !tabState.isActive(state, closeTabId)) {
-    return
-  }
-
-  let nextTabId = tabState.TAB_ID_NONE
-  switch (getSetting(settings.TAB_CLOSE_ACTION)) {
-    case tabCloseAction.LAST_ACTIVE:
-      nextTabId = tabState.getLastActiveTabId(state, windowId)
-      break
-    case tabCloseAction.PARENT:
-      {
-        const openerTabId = tabState.getOpenerTabId(state, closeTabId)
-        if (openerTabId !== tabState.TAB_ID_NONE) {
-          nextTabId = openerTabId
-        }
-        break
-      }
-  }
-
-  // DEFAULT: always fall back to NEXT
-  if (nextTabId === tabState.TAB_ID_NONE) {
-    nextTabId = tabState.getNextTabIdByIndex(state, windowId, index)
-    if (nextTabId === tabState.TAB_ID_NONE) {
-      // no unpinned tabs so find the next pinned tab
-      nextTabId = tabState.getNextTabIdByIndex(state, windowId, index, true)
-    }
-  }
-
-  if (nextTabId !== tabState.TAB_ID_NONE) {
-    setImmediate(() => {
-      tabs.setActive(nextTabId)
-    })
-  }
-}
 
 const WEBRTC_DEFAULT = 'default'
 const WEBRTC_DISABLE_NON_PROXY = 'disable_non_proxied_udp'
@@ -126,7 +71,23 @@ const tabsReducer = (state, action, immutableAction) => {
     case appConstants.APP_TAB_CREATED:
       state = tabState.maybeCreateTab(state, action)
       break
-    case appConstants.APP_TAB_MOVED: {
+    case appConstants.APP_TAB_ATTACHED:
+      tabs.updateTabsStateForAttachedTab(state, action.get('tabId'))
+      break
+    case appConstants.APP_TAB_WILL_ATTACH: {
+      const tabId = action.get('tabId')
+      const tabValue = tabState.getByTabId(state, tabId)
+      if (!tabValue) {
+        break
+      }
+      const oldWindowId = tabState.getWindowId(state, tabId)
+      tabs.updateTabsStateForWindow(state, oldWindowId)
+      break
+    }
+    case appConstants.APP_TAB_MOVED:
+      tabs.updateTabsStateForAttachedTab(state, action.get('tabId'))
+      break
+    case appConstants.APP_TAB_DETACH_MENU_ITEM_CLICKED: {
       setImmediate(() => {
         const tabId = action.get('tabId')
         const frameOpts = frameOptsFromFrame(action.get('frameOpts'))
@@ -158,6 +119,7 @@ const tabsReducer = (state, action, immutableAction) => {
       break
     case appConstants.APP_TAB_UPDATED:
       state = tabState.maybeCreateTab(state, action)
+      // tabs.debugTabs(state)
       break
     case appConstants.APP_TAB_CLOSE_REQUESTED:
       {
@@ -206,8 +168,21 @@ const tabsReducer = (state, action, immutableAction) => {
         if (tabId === tabState.TAB_ID_NONE) {
           break
         }
-        updateActiveTab(state, tabId)
+        const nextActiveTabId = tabs.getNextActiveTab(state, tabId)
+
+        // Must be called before tab is removed
+        // But still check for no tabId because on tab detach there's a dummy tabId
+        const tabValue = tabState.getByTabId(state, tabId)
+        if (tabValue) {
+          const windowIdOfTabBeingRemoved = tabState.getWindowId(state, tabId)
+          tabs.updateTabsStateForWindow(state, windowIdOfTabBeingRemoved)
+        }
         state = tabState.removeTabByTabId(state, tabId)
+        setImmediate(() => {
+          if (nextActiveTabId !== tabState.TAB_ID_NONE) {
+            tabs.setActive(nextActiveTabId)
+          }
+        })
       }
       break
     case appConstants.APP_ALLOW_FLASH_ONCE:
