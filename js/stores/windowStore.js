@@ -71,6 +71,10 @@ class WindowStore extends EventEmitter {
     return frameStateUtil.getFrameByKey(windowState, key)
   }
 
+  getFrameByTabId (tabId) {
+    return frameStateUtil.getFrameByTabId(windowState, tabId)
+  }
+
   emitChanges () {
     if (lastEmittedState !== windowState) {
       lastEmittedState = windowState
@@ -104,7 +108,7 @@ const newFrame = (state, frameOpts) => {
   // handle tabs.create properties
   let insertionIndex = frameOpts.index !== undefined
     ? frameOpts.index
-    : undefined
+    : 0
 
   if (frameOpts.partition) {
     frameOpts.isPrivate = frameStateUtil.isPrivatePartition(frameOpts.partition)
@@ -116,7 +120,6 @@ const newFrame = (state, frameOpts) => {
 
   const active = frameOpts.active
   delete frameOpts.active
-  delete frameOpts.openInForeground // clean up any legacy openInForeground props
   let openInForeground = active
 
   if (openInForeground == null && frameOpts.disposition) {
@@ -143,45 +146,11 @@ const newFrame = (state, frameOpts) => {
       frameOpts.location = ''
     }
   }
-
-  // TODO: longer term get rid of parentFrameKey completely instead of
-  // calculating it here.
-  let parentFrameKey = frameOpts.parentFrameKey
-  if (frameOpts.openerTabId) {
-    parentFrameKey = frameStateUtil.getFrameKeyByTabId(state, frameOpts.openerTabId)
-  }
-
-  // Find the closest index to the current frame's index which has
-  // a different ancestor frame key.
-  const frames = frameStateUtil.getFrames(state)
-  if (insertionIndex === undefined) {
-    insertionIndex = frameStateUtil.getFrameIndex(state, frameOpts.indexByFrameKey || parentFrameKey)
-    if (frameOpts.prependIndexByFrameKey === false) {
-      insertionIndex++
-    }
-    if (insertionIndex === -1) {
-      insertionIndex = frames.size
-    // frameOpts.indexByFrameKey is used when the insertionIndex should be used exactly
-    } else if (!frameOpts.indexByFrameKey) {
-      while (insertionIndex < frames.size) {
-        ++insertionIndex
-        if (!frameStateUtil.isAncestorFrameKey(state, frames.get(insertionIndex), parentFrameKey)) {
-          break
-        }
-      }
-    }
-  }
-  if (frameStateUtil.isFrameKeyPinned(state, parentFrameKey)) {
-    insertionIndex = 0
-  }
-
   const nextKey = incrementNextKey()
-
   state = state.merge(
     frameStateUtil.addFrame(
       state, frameOpts,
       nextKey, frameOpts.partitionNumber, openInForeground, insertionIndex))
-
   state = frameStateUtil.updateFramesInternalIndex(state, insertionIndex)
 
   if (openInForeground) {
@@ -212,7 +181,8 @@ const frameTabIdChanged = (state, action) => {
   const index = frameStateUtil.getFrameIndex(state, action.getIn(['frameProps', 'key']))
   state = state.mergeIn(['frames', index], newFrameProps)
   state = frameStateUtil.deleteTabInternalIndex(state, oldTabId)
-  return frameStateUtil.updateFramesInternalIndex(state, index)
+  state = frameStateUtil.updateFramesInternalIndex(state, index)
+  return state
 }
 
 const frameGuestInstanceIdChanged = (state, action) => {
@@ -418,7 +388,9 @@ const doAction = (action) => {
         windowState = windowState.set('frames', frames)
         // Since the tab could have changed pages, update the tab page as well
         windowState = frameStateUtil.updateFramesInternalIndex(windowState, Math.min(sourceFrameIndex, newIndex))
+        windowState = frameStateUtil.moveFrame(windowState, sourceFrameProps.get('tabId'), newIndex)
         windowState = frameStateUtil.updateTabPageIndex(windowState, activeFrame.get('tabId'))
+        appActions.tabIndexChanged(activeFrame.get('tabId'), newIndex)
         break
       }
     case windowConstants.WINDOW_SET_LINK_HOVER_PREVIEW:

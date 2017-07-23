@@ -11,7 +11,6 @@ const settings = require('../constants/settings')
 // Actions
 const windowActions = require('../actions/windowActions')
 const webviewActions = require('../actions/webviewActions')
-const appActions = require('../actions/appActions')
 
 // State
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
@@ -313,7 +312,7 @@ const frameOptsFromFrame = (frame) => {
  * Adds a frame specified by frameOpts and newKey and sets the activeFrameKey
  * @return Immutable top level application state ready to merge back in
  */
-function addFrame (state, frameOpts, newKey, partitionNumber, openInForeground, insertionIndex) {
+function addFrame (state, frameOpts, newKey, partitionNumber, openInForeground, insertionIndex, active) {
   const frames = state.get('frames')
 
   const location = frameOpts.location // page url
@@ -509,18 +508,30 @@ const deleteFrameInternalIndex = (state, frame) => {
 
 const updateFramesInternalIndex = (state, fromIndex) => {
   let framesInternal = state.get('framesInternal') || Immutable.Map()
-  state.get('frames').slice(fromIndex).forEach((frame, idx) => {
+  state.get('frames').slice(fromIndex).reduceRight((result, frame, idx) => {
+    const tabId = frame.get('tabId')
+    const frameKey = frame.get('key')
     const realIndex = idx + fromIndex
-    if (frame.get('key')) {
-      framesInternal = framesInternal.setIn(['index', frame.get('key').toString()], realIndex)
+    if (frameKey) {
+      framesInternal = framesInternal.setIn(['index', frameKey.toString()], realIndex)
     }
-    if (frame.get('tabId') !== -1) {
-      framesInternal = framesInternal.setIn(['tabIndex', frame.get('tabId').toString()], realIndex)
+    if (tabId !== -1) {
+      framesInternal = framesInternal.setIn(['tabIndex', tabId.toString()], realIndex)
     }
+  }, 0)
+  return state.set('framesInternal', framesInternal)
+}
 
-    appActions.tabIndexChanged(frame.get('tabId'), realIndex)
-  })
-
+const moveFrame = (state, tabId, index) => {
+  let framesInternal = state.get('framesInternal') || Immutable.Map()
+  const frame = getFrameByTabId(state, tabId)
+  const frameKey = frame.get('key')
+  if (frameKey) {
+    framesInternal = framesInternal.setIn(['index', frameKey.toString()], index)
+  }
+  if (tabId !== -1) {
+    framesInternal = framesInternal.setIn(['tabIndex', tabId.toString()], index)
+  }
   return state.set('framesInternal', framesInternal)
 }
 
@@ -691,6 +702,7 @@ module.exports = {
   deleteTabInternalIndex,
   deleteFrameInternalIndex,
   updateFramesInternalIndex,
+  moveFrame,
   query,
   find,
   isAncestorFrameKey,
