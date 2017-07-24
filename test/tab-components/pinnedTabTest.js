@@ -51,6 +51,17 @@ describe('pinnedTabs', function () {
         .waitForElementCount(pinnedTabsTabs, 1)
         .waitForElementCount(tabsTabs, 1)
     })
+    it('can pin a PDF', function * () {
+      const pdfUrl = 'http://orimi.com/pdf-test.pdf'
+      yield this.app.client
+        .tabByIndex(0)
+        .url(pdfUrl)
+        .pause(1000) // wait for PDF load
+        .windowByUrl(Brave.browserWindowUrl)
+        .pinTabByIndex(0, true)
+        .waitForElementCount(pinnedTabsTabs, 2)
+        .waitForElementCount(tabsTabs, 0)
+    })
   })
 
   describe('Pinning with partitions', function () {

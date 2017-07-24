@@ -5,6 +5,7 @@
 const {app, BrowserWindow, ipcMain} = require('electron')
 const appActions = require('../../js/actions/appActions')
 const appUrlUtil = require('../../js/lib/appUrlUtil')
+const {getLocationIfPDF} = require('../../js/lib/urlutil')
 const debounce = require('../../js/lib/debounce')
 const {getSetting} = require('../../js/settings')
 const locale = require('../locale')
@@ -75,7 +76,7 @@ const updatePinnedTabs = (win) => {
 
   pinnedSites.filter((site) =>
     pinnedTabs.find((tab) =>
-      tab.get('url') === site.get('location') &&
+      getLocationIfPDF(tab.get('url')) === site.get('location') &&
       (tab.get('partitionNumber') || 0) === (site.get('partitionNumber') || 0))).forEach((site) => {
         win.__alreadyPinnedSites = win.__alreadyPinnedSites.add(site)
       })
