@@ -18,8 +18,8 @@
     "x-scheme-handler/ftp"
   ],
   "requires": [
-    "GConf2",
-    "libXScrnSaver",
+    "(GConf2 or gconf2)",
+    "(libXScrnSaver or libXss1)",
     "lsb"
   ],
   "depends": [
