@@ -5,8 +5,12 @@
 
 const mockery = require('mockery')
 const {mount, shallow} = require('enzyme')
-const {tabCloseAction} = require('../../../../../../app/common/constants/settingsEnums')
-const {tabsPerTabPageActiveOption, tabCloseActionActiveOption} = require('../../../../../lib/selectors')
+const {tabCloseAction, tabPreviewTiming} = require('../../../../../../app/common/constants/settingsEnums')
+const {
+  tabsPerTabPageActiveOption,
+  tabCloseActionActiveOption,
+  tabPreviewTimingActiveOption
+} = require('../../../../../lib/selectors')
 const assert = require('assert')
 const fakeElectron = require('../../../../lib/fakeElectron')
 require('../../../../braveUnit')
@@ -164,6 +168,79 @@ describe('TabsTab component', function () {
     })
   })
 
+  describe('tab preview functionality', function () {
+    it('can show tab previews on hover', function () {
+      settingDefaultValue = true
+      const wrapper = shallow(<TabsTab settings={settingDefaultValue} />)
+
+      assert.notEqual(
+        wrapper
+          .find('[dataTestId="showTabPreviews"]')
+          .map(option => option.props().value)
+          .includes(settingDefaultValue),
+        true
+      )
+    })
+    it('show all 3 tab preview timing options if tab preview is on', function () {
+      settingDefaultValue = true
+      const wrapper = shallow(<TabsTab settings={settingDefaultValue} />)
+      assert.equal(wrapper.find(tabPreviewTimingActiveOption).length, 3)
+    })
+    it('does not show tab preview timing options if tab preview is off', function () {
+      settingDefaultValue = false
+      const wrapper = shallow(<TabsTab settings={settingDefaultValue} />)
+      assert.equal(wrapper.find(tabPreviewTimingActiveOption).length, 0)
+    })
+    it('can switch tab previews time to activate previews to LONG', function () {
+      settingDefaultValue = tabPreviewTiming.LONG
+      const wrapper = shallow(<TabsTab settings={settingDefaultValue} />)
+
+      assert.equal(
+        wrapper
+          .find(tabPreviewTimingActiveOption)
+          .map(option => option.props().value)
+          .includes(settingDefaultValue),
+        true
+      )
+    })
+    it('can switch tab previews time to activate previews to NORMAL', function () {
+      settingDefaultValue = tabPreviewTiming.NORMAL
+      const wrapper = shallow(<TabsTab settings={settingDefaultValue} />)
+
+      assert.equal(
+        wrapper
+          .find(tabPreviewTimingActiveOption)
+          .map(option => option.props().value)
+          .includes(settingDefaultValue),
+        true
+      )
+    })
+    it('can switch tab previews time to activate previews to SHORT', function () {
+      settingDefaultValue = tabPreviewTiming.SHORT
+      const wrapper = shallow(<TabsTab settings={settingDefaultValue} />)
+
+      assert.equal(
+        wrapper
+          .find(tabPreviewTimingActiveOption)
+          .map(option => option.props().value)
+          .includes(settingDefaultValue),
+        true
+      )
+    })
+    it('can not switch to other values', function () {
+      settingDefaultValue = tabPreviewTiming.ONLY_ONCE_IN_A_LIFETIME
+      const wrapper = shallow(<TabsTab settings={settingDefaultValue} />)
+
+      assert.notEqual(
+        wrapper
+          .find(tabPreviewTimingActiveOption)
+          .map(option => option.props().value)
+          .includes(settingDefaultValue),
+        true
+      )
+    })
+  })
+
   describe('basic functionality', function () {
     it('can switch to new tabs immediately', function () {
       settingDefaultValue = true
@@ -177,25 +254,13 @@ describe('TabsTab component', function () {
         true
       )
     })
-    it('can show tab previews on hover', function () {
-      settingDefaultValue = true
-      const wrapper = shallow(<TabsTab settings={settingDefaultValue} />)
-
-      assert.notEqual(
-        wrapper
-          .find('[dataTestId="paintTabs"]')
-          .map(option => option.props().value)
-          .includes(settingDefaultValue),
-        true
-      )
-    })
     it('can show tabs in page theme color', function () {
       settingDefaultValue = true
       const wrapper = shallow(<TabsTab settings={settingDefaultValue} />)
 
       assert.notEqual(
         wrapper
-          .find('[dataTestId="showTabPreviews"]')
+          .find('[dataTestId="paintTabs"]')
           .map(option => option.props().value)
           .includes(settingDefaultValue),
         true
