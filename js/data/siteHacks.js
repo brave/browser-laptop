@@ -22,13 +22,17 @@ const emptyDataURI = {
 }
 
 /**
- * Holds an array of [Primary URL, subresource URL] to allow 3rd party cookies.
+ * Holds an map of {Primary URL: subresource URL} to allow 3rd party cookies.
  * Subresource URL can be '*' or undefined to indicate all.
  */
-module.exports.cookieExceptions = [
-  ['https://inbox.google.com', 'https://hangouts.google.com'],
-  ['https://mail.google.com', 'https://hangouts.google.com']
-]
+module.exports.cookieExceptions = {
+  'https://inbox.google.com': ['https://hangouts.google.com'],
+  'https://mail.google.com': ['https://hangouts.google.com'],
+  'https://drive.google.com': ['https://doc-*-docs.googleusercontent.com']
+}
+
+// Third party domains that require a valid referer to work
+module.exports.refererExceptions = ['use.typekit.net', 'cloud.typography.com', 'www.moremorewin.net']
 
 /**
  * Holds an array of [Primary URL, subresource URL] to allow 3rd party localstorage.

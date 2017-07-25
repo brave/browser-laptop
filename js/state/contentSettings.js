@@ -263,9 +263,12 @@ const siteSettingsToContentSettings = (currentSiteSettings, defaultContentSettin
         contentSettings = addContentSettings(contentSettings, 'cookies', primaryPattern, '*', 'block')
         contentSettings = addContentSettings(contentSettings, 'cookies', primaryPattern, primaryPattern, 'allow')
         contentSettings = addContentSettings(contentSettings, 'referer', primaryPattern, '*', 'block')
-        cookieExceptions.forEach((exceptionPair) => {
-          contentSettings = addContentSettings(contentSettings, 'cookies', exceptionPair[0], exceptionPair[1], 'allow')
-        })
+        for (let key in cookieExceptions) {
+          const subResources = cookieExceptions[key]
+          for (let i = 0; i < subResources.length; ++i) {
+            contentSettings = addContentSettings(contentSettings, 'cookies', key, subResources[i], 'allow')
+          }
+        }
       } else if (siteSetting.get('cookieControl') === 'blockAllCookies') {
         contentSettings = addContentSettings(contentSettings, 'cookies', primaryPattern, '*', 'block')
         contentSettings = addContentSettings(contentSettings, 'referer', primaryPattern, '*', 'block')
