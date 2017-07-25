@@ -10,11 +10,13 @@ const {bookmarksToolbarMode} = require('../constants/settingsEnums')
 const settings = require('../../../js/constants/settings')
 
 // Utils
-const domUtil = require('../../renderer/lib/domUtil')
 const siteUtil = require('../../../js/state/siteUtil')
 const {calculateTextWidth} = require('../../../js/lib/textCalculator')
 const {iconSize} = require('../../../js/constants/config')
 const {getSetting} = require('../../../js/settings')
+
+// Styles
+const globalStyles = require('../../renderer/components/styles/global')
 
 function bookmarkHangerHeading (editMode, isFolder, isAdded) {
   if (isFolder) {
@@ -47,6 +49,16 @@ const isBookmarkNameValid = (title, location, isFolder, customTitle) => {
     : location != null && location.trim().length > 0
 }
 
+const showOnlyText = () => {
+  const btbMode = getSetting(settings.BOOKMARKS_TOOLBAR_MODE)
+  return btbMode === bookmarksToolbarMode.TEXT_ONLY
+}
+
+const showTextAndFavicon = () => {
+  const btbMode = getSetting(settings.BOOKMARKS_TOOLBAR_MODE)
+  return btbMode === bookmarksToolbarMode.TEXT_AND_FAVICONS
+}
+
 const showOnlyFavicon = () => {
   const btbMode = getSetting(settings.BOOKMARKS_TOOLBAR_MODE)
   return btbMode === bookmarksToolbarMode.FAVICONS_ONLY
@@ -71,57 +83,94 @@ let lastWidth
 const getToolbarBookmarks = (state) => {
   const sites = state.get('sites', Immutable.List())
   const windowWidth = window.innerWidth
-  if (sites === oldSites &&
-      lastWidth === windowWidth &&
-      lastValue) {
+
+  if (sites === oldSites && lastWidth === windowWidth && lastValue) {
     return lastValue
   }
+
   oldSites = sites
   lastWidth = windowWidth
 
   const noParentItems = siteUtil.getBookmarks(sites)
     .filter((bookmark) => !bookmark.get('parentFolderId'))
     .sort(siteUtil.siteSort)
-  let widthAccountedFor = 0
-  const overflowButtonWidth = 25
-  const onlyFavicon = showOnlyFavicon()
-  const favicon = showFavicon()
 
-  // Dynamically calculate how many bookmark items should appear on the toolbar
-  // before it is actually rendered.
-  const maxWidth = domUtil.getStyleConstants('bookmark-item-max-width')
-  const padding = domUtil.getStyleConstants('bookmark-item-padding') * 2
-  // Toolbar padding is only on the left
-  const toolbarPadding = domUtil.getStyleConstants('bookmarks-toolbar-padding')
-  const bookmarkItemMargin = domUtil.getStyleConstants('bookmark-item-margin') * 2
+  let widthAccountedFor = 0
+
+  const onlyText = showOnlyText()
+  const textAndFavicon = showTextAndFavicon()
+  const onlyFavicon = showOnlyFavicon()
+
+  const maxWidth = parseInt(globalStyles.spacing.bookmarksItemMaxWidth, 10)
+  const padding = parseInt(globalStyles.spacing.bookmarksItemPadding, 10) * 2
+  const bookmarkItemMargin = parseInt(globalStyles.spacing.bookmarksItemMargin, 10) * 2
+  const fontSize = parseInt(globalStyles.spacing.bookmarksItemFontSize)
+  const fontFamily = globalStyles.defaultFontFamily
+  const chevronMargin = parseInt(globalStyles.spacing.bookmarksItemChevronMargin)
+  const chevronFontSize = parseInt(globalStyles.spacing.bookmarksItemChevronFontSize)
+  const chevronWidth = chevronMargin + chevronFontSize
+
   // No margin for show only favicons
-  const chevronMargin = domUtil.getStyleConstants('bookmark-item-chevron-margin')
-  const fontSize = domUtil.getStyleConstants('bookmark-item-font-size')
-  const fontFamily = domUtil.getStyleConstants('default-font-family')
-  const chevronWidth = chevronMargin + fontSize
-  const margin = favicon && onlyFavicon ? 0 : bookmarkItemMargin
+  const margin = onlyFavicon ? 0 : bookmarkItemMargin
+
+  // Toolbar padding is only on the left
+  const toolbarPadding = parseInt(globalStyles.spacing.bookmarksToolbarPadding)
+
+  const overflowButtonWidth = parseInt(globalStyles.spacing.bookmarksToolbarOverflowButtonWidth, 10)
+  const maximumBookmarksToolbarWidth = windowWidth - overflowButtonWidth
+
   widthAccountedFor += toolbarPadding
 
   // Loop through until we fill up the entire bookmark toolbar width
   let i = 0
   for (let bookmark of noParentItems) {
     const current = bookmark[1]
-    let iconWidth = favicon ? iconSize : 0
-    // font-awesome file icons are 3px smaller
-    if (favicon && !current.get('folderId') && !current.get('favicon')) {
-      iconWidth -= 3
+
+    let iconWidth
+
+    if (onlyText) {
+      iconWidth = 0
+    } else if (textAndFavicon || current.get('folderId')) {
+      iconWidth = iconSize + parseInt(globalStyles.spacing.bookmarksItemMargin, 10)
+    } else if (onlyFavicon) {
+      iconWidth = iconSize
     }
-    const currentChevronWidth = favicon && current.get('folderId') ? chevronWidth : 0
-    if (favicon && onlyFavicon) {
-      widthAccountedFor += padding + iconWidth + currentChevronWidth
-    } else {
+
+    const currentChevronWidth = current.get('folderId') ? chevronWidth : 0
+
+    let extraWidth
+
+    if (onlyText) {
       const text = current.get('customTitle') || current.get('title') || current.get('location')
-      widthAccountedFor += Math.min(calculateTextWidth(text, `${fontSize} ${fontFamily}`) + padding + iconWidth + currentChevronWidth, maxWidth)
+
+      extraWidth = padding + calculateTextWidth(text, `${fontSize} ${fontFamily}`)
+
+      if (current.get('folderId')) {
+        extraWidth += currentChevronWidth
+      }
+    } else if (textAndFavicon) {
+      const text = current.get('customTitle') || current.get('title') || current.get('location')
+
+      extraWidth = padding + iconWidth + calculateTextWidth(text, `${fontSize} ${fontFamily}`) + currentChevronWidth
+    } else if (onlyFavicon) {
+      extraWidth = padding + iconWidth + currentChevronWidth
+
+      if (current.get('folderId')) {
+        const text = current.get('customTitle') || current.get('title') || current.get('location')
+        extraWidth += calculateTextWidth(text, `${fontSize} ${fontFamily}`)
+      }
     }
-    widthAccountedFor += margin
-    if (widthAccountedFor >= windowWidth - overflowButtonWidth) {
+
+    extraWidth = Math.min(extraWidth, maxWidth)
+    widthAccountedFor += extraWidth + margin
+
+    if (widthAccountedFor >= maximumBookmarksToolbarWidth) {
+      widthAccountedFor -= extraWidth + margin
+      i--
+
       break
     }
+
     i++
   }
 
