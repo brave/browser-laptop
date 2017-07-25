@@ -32,7 +32,6 @@ const eventUtil = require('../../../js/lib/eventUtil')
 const CommonMenu = require('../../common/commonMenu')
 const locale = require('../../../js/l10n')
 const bookmarkUtil = require('../../common/lib/bookmarkUtil')
-const siteUtil = require('../../../js/state/siteUtil')
 const dnd = require('../../../js/dnd')
 const menuUtil = require('../../common/lib/menuUtil')
 const urlUtil = require('../../../js/lib/urlutil')
@@ -219,7 +218,7 @@ const addBookmarkMenuItem = (label, siteDetail, closestDestinationDetail, isPare
       let closestKey = null
 
       if (closestDestinationDetail) {
-        closestKey = siteUtil.getSiteKey(closestDestinationDetail)
+        closestKey = closestDestinationDetail.get('key')
 
         if (isParent) {
           siteDetail = siteDetail.set('parentFolderId', (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
@@ -244,7 +243,7 @@ const addFolderMenuItem = (closestDestinationDetail, isParent) => {
       let folderDetails = Immutable.Map()
 
       if (closestDestinationDetail) {
-        closestKey = siteUtil.getSiteKey(closestDestinationDetail)
+        closestKey = closestDestinationDetail.get('key')
 
         if (isParent) {
           folderDetails = folderDetails.set('parentFolderId', (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
@@ -330,11 +329,10 @@ const siteDetailTemplateInit = (state, siteKey, type) => {
         {
           label: locale.translation(isFolder ? 'editFolder' : 'editBookmark'),
           click: () => {
-            const editKey = siteUtil.getSiteKey(siteDetail)
             if (isFolder) {
-              windowActions.editBookmarkFolder(editKey)
+              windowActions.editBookmarkFolder(siteKey)
             } else {
-              windowActions.editBookmark(false, editKey)
+              windowActions.editBookmark(false, siteKey)
             }
           }
         },

@@ -48,7 +48,7 @@ module.exports.getSiteKey = function (siteDetail) {
   }
   const folderId = siteDetail.get('folderId')
   let location = siteDetail.get('location')
-  if (folderId) {
+  if (folderId != null) {
     return folderId.toString()
   } else if (location) {
     location = UrlUtil.getLocationIfPDF(location)

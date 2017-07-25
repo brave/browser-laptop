@@ -62,10 +62,7 @@ const tokenizeInput = (data) => {
     }
     url = data.location
     if (data.title) {
-      parts = getPartsFromNonUrlInput(data.title)
-    }
-    if (data.tags) {
-      parts = parts.concat(data.tags.map(getTagToken))
+      parts = parts.concat(getPartsFromNonUrlInput(data.title))
     }
   } else {
     if (lastQueryOptions && !lastQueryOptions.historySuggestionsOn && lastQueryOptions.bookmarkSuggestionsOn) {

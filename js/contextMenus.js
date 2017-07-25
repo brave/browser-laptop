@@ -53,7 +53,7 @@ const addBookmarkMenuItem = (label, siteDetail, closestDestinationDetail, isPare
       let closestKey = null
 
       if (closestDestinationDetail) {
-        closestKey = siteUtil.getSiteKey(closestDestinationDetail)
+        closestKey = closestDestinationDetail.get('key')
 
         if (isParent) {
           siteDetail = siteDetail.set('parentFolderId', (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
@@ -78,7 +78,7 @@ const addFolderMenuItem = (closestDestinationDetail, isParent) => {
       let folderDetails = Immutable.Map()
 
       if (closestDestinationDetail) {
-        closestKey = siteUtil.getSiteKey(closestDestinationDetail)
+        closestKey = closestDestinationDetail.get('key')
 
         if (isParent) {
           folderDetails = folderDetails.set('parentFolderId', (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
@@ -258,7 +258,7 @@ const siteMultipleDetailTemplate = (data, type, activeFrame) => {
   data.forEach((site) => {
     locations.push(site.get('location'))
     partitionNumbers.push(site.get('partitionNumber'))
-    keys.push(siteUtil.getSiteKey(site))
+    keys.push(site.get('key'))
   })
 
   template.push(
@@ -322,7 +322,7 @@ const siteSingleDetailTemplate = (siteKey, type, activeFrame) => {
     template.push(openAllInNewTabsMenuItem(siteDetail), CommonMenu.separatorMenuItem)
   }
 
-  if (siteDetail.get('folderId') !== 0 && siteDetail.get('folderId') !== -1) {
+  if (!siteDetail.isEmpty() && siteDetail.get('folderId') !== 0 && siteDetail.get('folderId') !== -1) {
     // Picking this menu item pops up the AddEditBookmark modal
     // - History can be deleted but not edited
     // - Multiple bookmarks cannot be edited at once
@@ -332,11 +332,10 @@ const siteSingleDetailTemplate = (siteKey, type, activeFrame) => {
         {
           label: locale.translation(isFolder ? 'editFolder' : 'editBookmark'),
           click: () => {
-            const editKey = siteUtil.getSiteKey(siteDetail)
             if (isFolder) {
-              windowActions.editBookmarkFolder(editKey)
+              windowActions.editBookmarkFolder(siteKey)
             } else {
-              windowActions.editBookmark(false, editKey)
+              windowActions.editBookmark(false, siteKey)
             }
           }
         },

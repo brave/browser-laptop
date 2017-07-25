@@ -55,18 +55,16 @@ class BookmarkFolderItem extends ImmutableComponent {
    */
   moveBookmark (e, bookmark) {
     if (siteUtil.isMoveAllowed(this.props.allBookmarkFolders, bookmark, this.props.bookmarkFolder)) {
-      const bookmarkSiteKey = siteUtil.getSiteKey(bookmark)
-
       if (bookmark.get('type') === siteTags.BOOKMARK_FOLDER) {
         appActions.moveBookmarkFolder(
-          bookmarkSiteKey,
+          bookmark.get('key'),
           this.props.bookmarkFolder.get('folderId'),
           dndData.shouldPrependVerticalItem(e.target, e.clientY),
           true
         )
       } else {
         appActions.moveBookmark(
-          bookmarkSiteKey,
+          bookmark.get('key'),
           this.props.bookmarkFolder.get('folderId'),
           dndData.shouldPrependVerticalItem(e.target, e.clientY),
           true
@@ -101,14 +99,14 @@ class BookmarkFolderItem extends ImmutableComponent {
   }
 
   get childBookmarkFolders () {
-    const cached = this.props.bookmarkOrder.get(this.props.bookmarkFolder.get('folderId').toString())
+    const cached = this.props.bookmarkOrder.get(this.props.bookmarkFolder.get('key'))
 
     if (cached == null) {
       return Immutable.Map()
     }
     return cached
       .filter(item => item.get('type') === siteTags.BOOKMARK_FOLDER)
-      .map(folder => this.props.allBookmarkFolders.get(folder.get('key').toString()))
+      .map(folder => this.props.allBookmarkFolders.get(folder.get('key')))
   }
 
   render () {

@@ -93,7 +93,7 @@ const bookmarksState = {
       // check if we have data in tabs
       const tab = tabState.getActiveTab(state) || Immutable.Map()
 
-      if (!tab.isEmpty()) {
+      if (!tab.isEmpty() && bookmarkDetail.get('location') === tab.get('url')) {
         dataItem = makeImmutable({
           partitionNumber: tab.getIn(['frame', 'partitionNumber'], 0),
           favicon: tab.getIn(['frame', 'icon']),

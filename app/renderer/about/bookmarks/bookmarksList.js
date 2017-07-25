@@ -20,7 +20,6 @@ const appActions = require('../../../../js/actions/appActions')
 
 // Utils
 const dndData = require('../../../../js/dndData')
-const siteUtil = require('../../../../js/state/siteUtil')
 const formatUtil = require('../../../common/lib/formatUtil')
 
 class BookmarksList extends ImmutableComponent {
@@ -63,12 +62,9 @@ class BookmarksList extends ImmutableComponent {
   moveBookmark (e, bookmark, siteDetail) {
     let destinationIsParent = false
 
-    const bookmarkSiteKey = siteUtil.getSiteKey(bookmark)
-    const siteKey = siteUtil.getSiteKey(siteDetail)
-
     appActions.moveBookmark(
-      bookmarkSiteKey,
-      siteKey,
+      bookmark.get('key'),
+      siteDetail.get('key'),
       dndData.shouldPrependVerticalItem(e.target, e.clientY),
       destinationIsParent
     )
