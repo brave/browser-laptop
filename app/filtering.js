@@ -33,6 +33,7 @@ const {updateElectronDownloadItem} = require('./browser/electronDownloadItem')
 const {fullscreenOption} = require('./common/constants/settingsEnums')
 const isThirdPartyHost = require('./browser/isThirdPartyHost')
 var extensionState = require('./common/state/extensionState.js')
+const {cookieExceptions, refererExceptions} = require('../js/data/siteHacks')
 
 let appStore = null
 
@@ -45,9 +46,6 @@ let initializedPartitions = {}
 
 const transparent1pxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
 const pdfjsOrigin = `chrome-extension://${config.PDFJSExtensionId}`
-
-// Third party domains that require a valid referer to work
-const refererExceptions = ['use.typekit.net', 'cloud.typography.com', 'www.moremorewin.net']
 
 /**
  * Maps partition name to the session object
@@ -220,6 +218,47 @@ function registerForBeforeRedirect (session, partition) {
   })
 }
 
+module.exports.applyCookieSetting = (requestHeaders, url, firstPartyUrl, isPrivate) => {
+  const cookieSetting = module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, firstPartyUrl, isPrivate)
+  if (cookieSetting) {
+    const parsedTargetUrl = urlParse(url || '')
+    const parsedFirstPartyUrl = urlParse(firstPartyUrl)
+
+    if (cookieSetting === 'blockAllCookies' ||
+      isThirdPartyHost(parsedFirstPartyUrl.hostname, parsedTargetUrl.hostname)) {
+      let hasCookieException = false
+      const firstPartyOrigin = getOrigin(firstPartyUrl)
+      const targetOrigin = getOrigin(url)
+      if (cookieExceptions.hasOwnProperty(firstPartyOrigin)) {
+          const subResources = cookieExceptions[firstPartyOrigin]
+          for (let i = 0; i < subResources.length; ++i) {
+            if (subResources[i] === targetOrigin) {
+              hasCookieException = true
+              break
+            } else if (subResources[i].includes('*')) {
+              const regSubResource = new RegExp(subResources[i].replace('//', '\\/\\/').replace('*', '.*'), 'g')
+              if (targetOrigin.match(regSubResource)) {
+                hasCookieException = true
+                break
+              }
+            }
+          }
+      }
+      // Clear cookie and referer on third-party requests
+      if (requestHeaders['Cookie'] &&
+          firstPartyOrigin !== pdfjsOrigin && !hasCookieException) {
+        requestHeaders['Cookie'] = undefined
+      }
+      if (requestHeaders['Referer'] &&
+          !refererExceptions.includes(parsedTargetUrl.hostname)) {
+        requestHeaders['Referer'] = targetOrigin
+      }
+    }
+  }
+
+  return requestHeaders
+}
+
 /**
  * Register for notifications for webRequest.onBeforeSendHeaders for
  * a particular session.
@@ -266,25 +305,8 @@ function registerForBeforeSendHeaders (session, partition) {
       }
     }
 
-    const cookieSetting = module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, firstPartyUrl, isPrivate)
-    if (cookieSetting) {
-      const parsedTargetUrl = urlParse(details.url || '')
-      const parsedFirstPartyUrl = urlParse(firstPartyUrl)
+    requestHeaders = module.exports.applyCookieSetting(requestHeaders, details.url, firstPartyUrl, isPrivate)
 
-      if (cookieSetting === 'blockAllCookies' ||
-        isThirdPartyHost(parsedFirstPartyUrl.hostname, parsedTargetUrl.hostname)) {
-        // Clear cookie and referer on third-party requests
-        if (requestHeaders['Cookie'] &&
-            getOrigin(firstPartyUrl) !== pdfjsOrigin) {
-          requestHeaders['Cookie'] = undefined
-        }
-        if (cookieSetting !== 'blockAllCookies' &&
-            requestHeaders['Referer'] &&
-            !refererExceptions.includes(parsedTargetUrl.hostname)) {
-          requestHeaders['Referer'] = getOrigin(details.url)
-        }
-      }
-    }
     if (sendDNT) {
       requestHeaders['DNT'] = '1'
     }
