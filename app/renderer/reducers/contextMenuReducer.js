@@ -479,10 +479,10 @@ const onMoreBookmarksMenu = (state, action) => {
   state = validateState(state)
 
   const appState = appStoreRenderer.state
-  let newSites = Immutable.OrderedMap()
+  let newSites = Immutable.List()
 
   for (let key of action.get('bookmarks')) {
-    newSites.set(key, bookmarksState.findBookmark(appState, key))
+    newSites = newSites.push(bookmarksState.findBookmark(appState, key))
   }
 
   const menuTemplate = bookmarkItemsInit(state, newSites)

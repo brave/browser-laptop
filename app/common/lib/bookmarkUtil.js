@@ -6,6 +6,7 @@ const Immutable = require('immutable')
 
 // State
 const bookmarksState = require('../state/bookmarksState')
+const bookmarkFoldersState = require('../state/bookmarkFoldersState')
 const tabState = require('../state/tabState')
 
 // Constants
@@ -66,17 +67,27 @@ const getDNDBookmarkData = (state, bookmarkKey) => {
 }
 
 let oldBookmarks
+let oldFolders
 let lastValue
 let lastWidth
 const getToolbarBookmarks = (state) => {
-  const bookmarks = bookmarksState.getBookmarksWithFolders(state)
   const windowWidth = window.innerWidth
-  if (bookmarks === oldBookmarks && lastWidth === windowWidth && lastValue) {
+  const allBookmarks = bookmarksState.getBookmarks(state)
+  const allFolders = bookmarkFoldersState.getFolders(state)
+  if (
+    allBookmarks === oldBookmarks &&
+    allFolders === oldFolders &&
+    lastWidth === windowWidth &&
+    lastValue
+  ) {
     return lastValue
   }
-  oldBookmarks = bookmarks
+
+  oldBookmarks = allBookmarks
+  oldFolders = allFolders
   lastWidth = windowWidth
 
+  const bookmarks = bookmarksState.getBookmarksWithFolders(state)
   let widthAccountedFor = 0
 
   const onlyText = showOnlyText()
