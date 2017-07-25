@@ -1398,7 +1398,7 @@ var excludeP = (publisher, callback) => {
 
       if (underscore.intersection(data.key.split(''),
                                    [ '^', '$', '*', '+', '?', '[', '(', '{', '|' ]).length === 0) {
-        if ((data.key !== ('TLD:' + props.TLD)) && (data.key !== ('SLD:' + props.SLD.split('.')[0]))) return
+        if ((data.key !== ('TLD:' + props.TLD)) && (props.SLD && data.key !== ('SLD:' + props.SLD.split('.')[0]))) return
       } else {
         try {
           regexp = new RegExp(data.key.substr(4))
