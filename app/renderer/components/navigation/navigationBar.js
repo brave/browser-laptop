@@ -82,7 +82,6 @@ class NavigationBar extends React.Component {
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const activeFrameKey = activeFrame.get('key')
     const activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
-    const activeTab = tabState.getByTabId(state, activeTabId)
 
     const activeTabShowingMessageBox = tabState.isShowingMessageBox(state, activeTabId)
     const bookmarkDetail = currentWindow.get('bookmarkDetail', Immutable.Map())
@@ -113,7 +112,7 @@ class NavigationBar extends React.Component {
     // used in renderer
     props.activeFrameKey = activeFrameKey
     props.titleMode = titleMode
-    props.isBookmarked = (bookmarkKey && activeTab) ? activeTab.get('bookmarked') : false
+    props.isBookmarked = !!bookmarkKey
     props.isWideUrlBarEnabled = getSetting(settings.WIDE_URL_BAR)
     props.showBookmarkHanger = bookmarkDetail.get('isBookmarkHanger', false)
     props.isLoading = loading

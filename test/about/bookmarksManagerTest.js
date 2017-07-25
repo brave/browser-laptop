@@ -8,7 +8,7 @@ const aboutBookmarksUrl = getTargetAboutUrl('about:bookmarks')
 const Immutable = require('immutable')
 
 describe('about:bookmarks', function () {
-  const folderId = Math.random()
+  const folderId = Math.floor(Math.random() * (100 - 1 + 1)) + 1
   const lastVisit = 1476140184441
   const browseableSiteUrl = 'page1.html'
   const browseableSiteTitle = 'Page 1'
@@ -52,57 +52,41 @@ describe('about:bookmarks', function () {
       {
         location: 'https://brave.com',
         title: 'Brave',
-        type: siteTags.BOOKMARK,
         parentFolderId: 0,
         lastAccessedTime: lastVisit
       },
       {
         location: 'https://brave.com/test',
-        title: 'Test',
-        customTitle: 'customTest',
-        type: siteTags.BOOKMARK,
-        parentFolderId: 0,
-        lastAccessedTime: lastVisit
-      },
-      {
-        location: 'https://brave.com/test',
-        title: 'Test',
-        customTitle: 'customTest',
-        type: siteTags.BOOKMARK,
+        title: 'customTest',
         parentFolderId: 0,
         lastAccessedTime: lastVisit
       },
       {
         location: 'https://www.youtube.com',
-        type: siteTags.BOOKMARK,
         parentFolderId: 0,
         lastAccessedTime: lastVisit
       },
       {
         location: 'https://www.facebook.com',
         title: 'facebook',
-        type: siteTags.BOOKMARK,
         parentFolderId: 0,
         lastAccessedTime: lastVisit
       },
       {
         location: 'https://duckduckgo.com',
         title: 'duckduckgo',
-        type: siteTags.BOOKMARK,
         parentFolderId: folderId,
         lastAccessedTime: lastVisit
       },
       {
         location: 'https://google.com',
         title: 'Google',
-        type: siteTags.BOOKMARK,
         parentFolderId: folderId,
         lastAccessedTime: lastVisit
       },
       {
         location: 'https://bing.com',
         title: 'Bing',
-        type: siteTags.BOOKMARK,
         parentFolderId: folderId,
         lastAccessedTime: lastVisit
       }
@@ -111,10 +95,9 @@ describe('about:bookmarks', function () {
     yield client
       .waitForBrowserWindow()
       .addBookmarkFolder({
-        customTitle: 'demo1',
+        title: 'demo1',
         folderId: folderId,
-        parentFolderId: 0,
-        type: siteTags.BOOKMARK_FOLDER
+        parentFolderId: 0
       })
       .addBookmarks(sites)
       .tabByIndex(0)
@@ -152,11 +135,6 @@ describe('about:bookmarks', function () {
     it('displays entries without a title using their URL', function * () {
       yield this.app.client
         .waitForVisible('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
-    })
-
-    it('displays entries using customTitle (if available)', function * () {
-      yield this.app.client
-        .waitForVisible('table.sortableTable td.title[data-sort="customTest"]')
     })
 
     it('shows bookmark folders', function * () {

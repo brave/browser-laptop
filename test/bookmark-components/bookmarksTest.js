@@ -86,7 +86,7 @@ describe('bookmark tests', function () {
           .windowByUrl(Brave.browserWindowUrl)
           .waitUntil(function () {
             return this.getAppState().then((val) => {
-              return val.value.sites['https://www.brave.xn--com-8cd/|0|0'].title === 'https://www.brave.xn--com-8cd/'
+              return val.value.bookmarks['https://www.brave.xn--com-8cd/|0|0'].title === 'https://www.brave.xn--com-8cd/'
             })
           })
       })
@@ -314,6 +314,7 @@ describe('bookmark tests', function () {
       yield this.app.client
         .waitForVisible(navigatorNotBookmarked)
         .newTab({ url: this.page1Url })
+        .activateURLMode()
         .waitForVisible(navigatorBookmarked)
     })
     it('on new active tabs', function * () {
@@ -351,10 +352,9 @@ describe('bookmark tests', function () {
 
       yield this.app.client
         .addBookmarkFolder({
-          customTitle: folderName,
+          title: folderName,
           folderId: 1,
-          parentFolderId: 0,
-          type: siteTags.BOOKMARK_FOLDER
+          parentFolderId: 0
         })
         .waitUntil(function () {
           return this.getAppState().then((val) => {
@@ -403,10 +403,9 @@ describe('bookmark tests', function () {
       const folderName = 'bookmark-folder-rebuild-menu-demo'
       yield this.app.client
         .addBookmarkFolder({
-          customTitle: folderName,
+          title: folderName,
           folderId: 1,
-          parentFolderId: 0,
-          type: siteTags.BOOKMARK_FOLDER
+          parentFolderId: 0
         })
         .addBookmark({
           lastAccessedTime: 123,

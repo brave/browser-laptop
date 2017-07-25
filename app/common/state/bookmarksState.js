@@ -111,7 +111,7 @@ const bookmarksState = {
     }
 
     let bookmark = makeImmutable({
-      title: bookmarkDetail.get('title', ' '),
+      title: bookmarkDetail.get('title', ''),
       location: bookmarkDetail.get('location'),
       parentFolderId: ~~bookmarkDetail.get('parentFolderId', 0),
       partitionNumber: ~~dataItem.get('partitionNumber', 0),
@@ -126,9 +126,12 @@ const bookmarksState = {
       return state
     }
 
+    if (!state.hasIn(['bookmarks', key])) {
+      state = bookmarkLocationCache.addCacheKey(state, location, key)
+      state = bookmarkOrderCache.addBookmarkToCache(state, bookmark.get('parentFolderId'), key, destinationKey)
+    }
+
     state = state.setIn(['bookmarks', key], bookmark)
-    state = bookmarkLocationCache.addCacheKey(state, location, key)
-    state = bookmarkOrderCache.addBookmarkToCache(state, bookmark.get('parentFolderId'), key, destinationKey)
     return state
   },
 

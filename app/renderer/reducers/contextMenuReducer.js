@@ -419,7 +419,7 @@ const bookmarkItemsInit = (state, items) => {
     const templateItem = {
       bookmark: site,
       draggable: true,
-      label: site.get('title', site.get('location')),
+      label: site.get('title') || site.get('location'),
       icon: showFavicon ? site.get('favicon') : undefined,
       faIcon,
       contextMenu: function () {

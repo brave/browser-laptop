@@ -113,7 +113,7 @@ class BookmarksList extends ImmutableComponent {
         rows={this.props.bookmarks.map((entry) => [
           {
             cell: <BookmarkTitleCell siteDetail={entry} />,
-            value: entry.get('title', entry.get('location'))
+            value: entry.get('title') || entry.get('location')
           },
           {
             html: formatUtil.toLocaleString(entry.get('lastAccessedTime'), ''),

@@ -53,13 +53,13 @@ describe('bookmarkUtil test', function () {
 
       it('is null', function () {
         assert.equal(bookmarkUtil.displayBookmarkName(makeImmutable({
-          customTitle: null
+          title: null
         })), '')
       })
 
       it('is provided', function () {
         assert.equal(bookmarkUtil.displayBookmarkName(makeImmutable({
-          customTitle: 'custom brave'
+          title: 'custom brave'
         })), 'custom brave')
       })
     })
@@ -95,14 +95,6 @@ describe('bookmarkUtil test', function () {
 
       it('title is empty string', function () {
         assert.equal(bookmarkUtil.isBookmarkNameValid('', null, true), false)
-      })
-
-      it('title is null, but customTitle is ok', function () {
-        assert.equal(bookmarkUtil.isBookmarkNameValid(null, null, true, 'custom brave'), true)
-      })
-
-      it('title and customTitle are ok', function () {
-        assert.equal(bookmarkUtil.isBookmarkNameValid('brave', null, true, 'custom brave'), true)
       })
     })
 

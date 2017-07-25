@@ -472,8 +472,8 @@ var exports = {
         return this.getWindowState().then((val) => {
           const bookmarkDetailLocation = val.value && val.value.bookmarkDetail &&
             val.value.bookmarkDetail.siteDetail && val.value.bookmarkDetail.siteDetail.location
-          const bookmarkDetailTitle = (val.value && val.value.bookmarkDetail && val.value.bookmarkDetail.siteDetail &&
-            val.value.bookmarkDetail.siteDetail.customTitle) || val.value.bookmarkDetail.siteDetail.title
+          const bookmarkDetailTitle = val.value && val.value.bookmarkDetail && val.value.bookmarkDetail.siteDetail &&
+            val.value.bookmarkDetail.siteDetail.title
           const ret = bookmarkDetailLocation === location && bookmarkDetailTitle === title
           logVerbose('waitForBookmarkDetail("' + location + '", "' + title + '") => ' + ret +
             ' (bookmarkDetailLocation = ' + bookmarkDetailLocation + ', bookmarkDetailTitle = ' + bookmarkDetailTitle + ')')
@@ -724,7 +724,7 @@ var exports = {
      * @param {object} siteDetail - Properties for the siteDetail to add
      */
     this.app.client.addCommand('addBookmarkFolder', function (siteDetail) {
-      logVerbose('addBookmarkFolder("' + siteDetail + '")')
+      logVerbose('addBookmarkFolder("' + JSON.stringify(siteDetail) + '")')
       return this.execute(function (siteDetail) {
         return devTools('appActions').addBookmarkFolder(siteDetail)
       }, siteDetail).then((response) => response.value)
@@ -749,7 +749,6 @@ var exports = {
      *
      * @param {object} bookmarkList - List of bookmarks to add
      */
-    // TODO fix
     this.app.client.addCommand('addBookmarks', function (bookmarkList) {
       logVerbose('addBookmarks("' + bookmarkList + '")')
       return this.execute(function (bookmarkList) {
@@ -765,7 +764,7 @@ var exports = {
     this.app.client.addCommand('addHistorySites', function (historyList) {
       logVerbose('addHistorySites("' + historyList + '")')
       return this.execute(function (historyList) {
-        return devTools('appActions').addHistorySites(historyList)
+        return devTools('appActions').addHistorySite(historyList)
       }, historyList).then((response) => response.value)
     })
 

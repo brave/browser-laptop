@@ -96,7 +96,7 @@ const createBookmarkTemplateItems = (state, parentFolderId) => {
         // and as such there may need to be another mechanism or cache
         //
         // see: https://github.com/brave/browser-laptop/issues/3050
-        label: bookmark.get('title', bookmark.get('location')),
+        label: bookmark.get('title') || bookmark.get('location'),
         click: (item, focusedWindow, e) => {
           if (eventUtil.isForSecondaryAction(e)) {
             appActions.createTabRequested({

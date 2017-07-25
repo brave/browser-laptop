@@ -21,7 +21,7 @@ describe('bookmarkLocationCache unit test', function () {
   const bookmarkLocation = bookmark.get('location')
   const bookmarkKey = siteUtil.getSiteKey(bookmark)
   const folder = Immutable.fromJS({
-    customTitle: 'folder1',
+    title: 'folder1',
     folderId: 1,
     parentFolderId: 0,
     tags: [siteTags.BOOKMARK_FOLDER]
