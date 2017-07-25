@@ -14,6 +14,7 @@ const newTabData = require('../../../js/data/newTabData')
 const historyState = require('./historyState')
 const bookmarkOrderCache = require('../cache/bookmarkOrderCache')
 const bookmarkFoldersState = require('./bookmarkFoldersState')
+const tabState = require('./tabState')
 
 // Actions
 const syncActions = require('../../../js/actions/syncActions')
@@ -89,11 +90,23 @@ const bookmarksState = {
     let dataItem = historyState.getSite(state, key)
 
     if (dataItem.isEmpty()) {
-      const topSites = Immutable.fromJS(newTabData.topSites.concat(newTabData.pinnedTopSites))
-      const topSite = topSites.find(site => site.get('location') === bookmarkDetail.get('location')) || Immutable.Map()
+      // check if we have data in tabs
+      const tab = tabState.getActiveTab(state) || Immutable.Map()
 
-      if (!topSite.isEmpty()) {
-        dataItem = topSite
+      if (!tab.isEmpty()) {
+        dataItem = makeImmutable({
+          partitionNumber: tab.getIn(['frame', 'partitionNumber'], 0),
+          favicon: tab.getIn(['frame', 'icon']),
+          themeColor: tab.getIn(['frame', 'themeColor'])
+        })
+      } else {
+        // check if bookmark is in top sites
+        const topSites = Immutable.fromJS(newTabData.topSites.concat(newTabData.pinnedTopSites))
+        const topSite = topSites.find(site => site.get('location') === bookmarkDetail.get('location')) || Immutable.Map()
+
+        if (!topSite.isEmpty()) {
+          dataItem = topSite
+        }
       }
     }
 
