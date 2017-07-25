@@ -795,11 +795,18 @@ class AboutPreferences extends React.Component {
       settings: this.state.settings.set(key, value)
     })
     aboutActions.changeSetting(key, value)
-    if (key === settings.HARDWARE_ACCELERATION_ENABLED ||
-        key === settings.DO_NOT_TRACK ||
-        key === settings.LANGUAGE ||
-        key === settings.PDFJS_ENABLED || key === settings.TORRENT_VIEWER_ENABLED ||
-        key === settings.SMOOTH_SCROLL_ENABLED || key === settings.SEND_CRASH_REPORTS || key === settings.UPDATE_TO_PREVIEW_RELEASES) {
+    const settingsRequiringRestart = [
+      settings.HARDWARE_ACCELERATION_ENABLED,
+      settings.DO_NOT_TRACK,
+      settings.LANGUAGE,
+      settings.PDFJS_ENABLED,
+      settings.TORRENT_VIEWER_ENABLED,
+      settings.SMOOTH_SCROLL_ENABLED,
+      settings.SEND_CRASH_REPORTS,
+      settings.UPDATE_TO_PREVIEW_RELEASES,
+      settings.TOOLBAR_UI_SCALE
+    ]
+    if (settingsRequiringRestart.includes(key)) {
       ipc.send(messages.PREFS_RESTART, key, value)
     }
     if (key === settings.PAYMENTS_ENABLED) {
