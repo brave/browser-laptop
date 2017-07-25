@@ -230,19 +230,19 @@ module.exports.applyCookieSetting = (requestHeaders, url, firstPartyUrl, isPriva
       const firstPartyOrigin = getOrigin(firstPartyUrl)
       const targetOrigin = getOrigin(url)
       if (cookieExceptions.hasOwnProperty(firstPartyOrigin)) {
-          const subResources = cookieExceptions[firstPartyOrigin]
-          for (let i = 0; i < subResources.length; ++i) {
-            if (subResources[i] === targetOrigin) {
+        const subResources = cookieExceptions[firstPartyOrigin]
+        for (let i = 0; i < subResources.length; ++i) {
+          if (subResources[i] === targetOrigin) {
+            hasCookieException = true
+            break
+          } else if (subResources[i].includes('*')) {
+            const regSubResource = new RegExp(subResources[i].replace('//', '\\/\\/').replace('*', '.*'), 'g')
+            if (targetOrigin.match(regSubResource)) {
               hasCookieException = true
               break
-            } else if (subResources[i].includes('*')) {
-              const regSubResource = new RegExp(subResources[i].replace('//', '\\/\\/').replace('*', '.*'), 'g')
-              if (targetOrigin.match(regSubResource)) {
-                hasCookieException = true
-                break
-              }
             }
           }
+        }
       }
       // Clear cookie and referer on third-party requests
       if (requestHeaders['Cookie'] &&
