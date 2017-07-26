@@ -41,11 +41,12 @@ class EnabledContent extends ImmutableComponent {
       ? this.props.showOverlay.bind(this, 'addFunds')
       : (ledgerData.get('creating') ? () => {} : this.createWallet())
 
-    return <BrowserButton primaryColor
+    return <BrowserButton
+      primaryColor
+      panelItem
       testId={buttonText}
       test2Id={'addFunds'}
       l10nId={buttonText}
-      custom={styles.addFunds}
       onClick={onButtonClick.bind(this)}
       disabled={ledgerData.get('creating')}
     />
@@ -272,14 +273,6 @@ const styles = StyleSheet.create({
 
   settingsListContainer: {
     marginBottom: 0
-  },
-
-  addFunds: {
-    minWidth: '180px',
-    width: 'auto',
-    marginTop: 0,
-    paddingTop: '6px',
-    paddingBottom: '6px'
   },
 
   balance: {
