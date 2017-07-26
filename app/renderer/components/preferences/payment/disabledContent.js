@@ -10,6 +10,7 @@ const ImmutableComponent = require('../../immutableComponent')
 
 // style
 const globalStyles = require('../../styles/global')
+const commonStyles = require('../../styles/commonStyles')
 const {paymentStyles} = require('../../styles/payment')
 const PIA = require('../../../../extensions/brave/img/private_internet_access.png')
 const PIA2 = require('../../../../extensions/brave/img/private_internet_access_2x.png')
@@ -30,7 +31,7 @@ class DisabledContent extends ImmutableComponent {
         <div className={css(styles.text)}data-l10n-id='paymentsWelcomeText5' />
         <div className={css(styles.text)}>
           <span data-l10n-id='paymentsWelcomeText6' />&nbsp;
-          <a className='linkText' href='https://brave.com/Payments_FAQ.html' rel='noopener' target='_blank' data-l10n-id='paymentsWelcomeLink' />&nbsp;
+          <a className={css(commonStyles.linkText)} href='https://brave.com/Payments_FAQ.html' rel='noopener' target='_blank' data-l10n-id='paymentsWelcomeLink' />&nbsp;
           <span data-l10n-id='paymentsWelcomeText7' />
         </div>
       </div>

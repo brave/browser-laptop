@@ -607,7 +607,7 @@ class SecurityTab extends ImmutableComponent {
         </SettingItem>
         {
           getSetting(settings.ACTIVE_PASSWORD_MANAGER, this.props.settings) === passwordManagers.BUILT_IN
-          ? <label className='linkTextSmall' data-l10n-id='managePasswords'
+          ? <label className={css(commonStyles.linkText, commonStyles.linkText_small)} data-l10n-id='managePasswords'
             onClick={aboutActions.createTabRequested.bind(null, {
               url: 'about:passwords'
             })} />
@@ -615,7 +615,7 @@ class SecurityTab extends ImmutableComponent {
         }
         {
           getSetting(settings.ACTIVE_PASSWORD_MANAGER, this.props.settings) === passwordManagers.LAST_PASS
-          ? <label className='linkTextSmall' data-l10n-id='preferences'
+          ? <label className={css(commonStyles.linkText, commonStyles.linkText_small)} data-l10n-id='preferences'
             onClick={aboutActions.createTabRequested.bind(null, {
               url: lastPassPreferencesUrl
             })} />
