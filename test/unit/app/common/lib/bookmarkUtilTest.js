@@ -20,100 +20,35 @@ describe('bookmarkUtil test', function () {
     })
 
     it('if bookmark was newly added', function () {
-      assert.equal(bookmarkUtil.bookmarkHangerHeading(false, false, true), 'bookmarkAdded')
-    })
-
-    describe('is folder', function () {
-      it('returns editing mode when in edit mode', function () {
-        assert.equal(bookmarkUtil.bookmarkHangerHeading(true, true), 'bookmarkFolderEditing')
-      })
-      it('returns edit mode when in edit mode', function () {
-        assert.equal(bookmarkUtil.bookmarkHangerHeading(false, true), 'bookmarkFolderAdding')
-      })
+      assert.equal(bookmarkUtil.bookmarkHangerHeading(false, true), 'bookmarkAdded')
     })
 
     describe('is bookmark', function () {
       it('returns create mode when not in edit mode', function () {
-        assert.equal(bookmarkUtil.bookmarkHangerHeading(false, false), 'bookmarkCreateNew')
+        assert.equal(bookmarkUtil.bookmarkHangerHeading(false), 'bookmarkCreateNew')
       })
 
       it('returns edit mode when in edit mode', function () {
-        assert.equal(bookmarkUtil.bookmarkHangerHeading(true, false), 'bookmarkEdit')
-      })
-    })
-  })
-
-  describe('displayBookmarkName', function () {
-    it('custom title', function () {
-      it('is not provided', function () {
-        assert.equal(bookmarkUtil.displayBookmarkName(makeImmutable({
-          title: 'brave'
-        })), 'brave')
-      })
-
-      it('is null', function () {
-        assert.equal(bookmarkUtil.displayBookmarkName(makeImmutable({
-          title: null
-        })), '')
-      })
-
-      it('is provided', function () {
-        assert.equal(bookmarkUtil.displayBookmarkName(makeImmutable({
-          title: 'custom brave'
-        })), 'custom brave')
-      })
-    })
-
-    it('regular title', function () {
-      it('is not provided', function () {
-        assert.equal(bookmarkUtil.displayBookmarkName(makeImmutable({})), '')
-      })
-
-      it('is null', function () {
-        assert.equal(bookmarkUtil.displayBookmarkName(makeImmutable({
-          title: null
-        })), '')
-      })
-
-      it('is provided', function () {
-        assert.equal(bookmarkUtil.displayBookmarkName(makeImmutable({
-          title: 'brave'
-        })), 'brave')
+        assert.equal(bookmarkUtil.bookmarkHangerHeading(true), 'bookmarkEdit')
       })
     })
   })
 
   describe('isBookmarkNameValid', function () {
-    describe('for folder', function () {
-      it('title and custom title is not provided', function () {
-        assert.equal(bookmarkUtil.isBookmarkNameValid(), false)
-      })
-
-      it('title and custom title are null', function () {
-        assert.equal(bookmarkUtil.isBookmarkNameValid(null, null, true), false)
-      })
-
-      it('title is empty string', function () {
-        assert.equal(bookmarkUtil.isBookmarkNameValid('', null, true), false)
-      })
+    it('location is not provided', function () {
+      assert.equal(bookmarkUtil.isBookmarkNameValid(), false)
     })
 
-    describe('for bookmark', function () {
-      it('location is not provided', function () {
-        assert.equal(bookmarkUtil.isBookmarkNameValid(null, null, false), false)
-      })
+    it('location is null', function () {
+      assert.equal(bookmarkUtil.isBookmarkNameValid(null), false)
+    })
 
-      it('location is null', function () {
-        assert.equal(bookmarkUtil.isBookmarkNameValid(null, null, false), false)
-      })
+    it('location is empty string', function () {
+      assert.equal(bookmarkUtil.isBookmarkNameValid(''), false)
+    })
 
-      it('location is empty string', function () {
-        assert.equal(bookmarkUtil.isBookmarkNameValid(null, '', false), false)
-      })
-
-      it('location is provided', function () {
-        assert.equal(bookmarkUtil.isBookmarkNameValid(null, 'https://www.brave.com', false), true)
-      })
+    it('location is provided', function () {
+      assert.equal(bookmarkUtil.isBookmarkNameValid('https://www.brave.com'), true)
     })
   })
 

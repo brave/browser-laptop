@@ -4,11 +4,24 @@ const siteTags = require('../../../js/constants/siteTags')
 const siteUtil = require('../../../js/state/siteUtil')
 const assert = require('assert')
 const Immutable = require('immutable')
+const bookmarkFoldersState = require('../../../app/common/state/bookmarkFoldersState')
+const bookmarksStaate = require('../../../app/common/state/bookmarksState')
 
 describe('siteUtil', function () {
   const testUrl1 = 'https://brave.com/'
-  const testUrl2 = 'http://example.com/'
-  const emptyState = Immutable.fromJS({sites: {}})
+  const emptyState = Immutable.fromJS({
+    bookmarks: {},
+    bookmarkFolders: {},
+    historySites: {
+      'https://brave.com/|0|1': {
+        lastAccessedTime: 123,
+        location: testUrl1,
+        title: 'sample',
+        parentFolderId: 0,
+        partitionNumber: 0
+      }
+    }
+  })
   const bookmarkAllFields = Immutable.fromJS({
     lastAccessedTime: 123,
     objectId: [210, 115, 31, 176, 57, 212, 167, 120, 104, 88, 88, 27, 141, 36, 235, 226],
@@ -97,205 +110,39 @@ describe('siteUtil', function () {
     })
   })
 
-  describe('isSiteBookmarked', function () {
-    it('returns true if site is bookmarked', function () {
-      const site = {
-        location: testUrl1,
-        tags: [siteTags.BOOKMARK]
-      }
-      const siteDetail = Immutable.fromJS(site)
-      const key = siteUtil.getSiteKey(siteDetail)
-      const sites = {}
-      sites[key] = site
-      const result = siteUtil.isSiteBookmarked(Immutable.fromJS(sites), siteDetail)
-      assert.equal(result, true)
-    })
-    it('returns false if site is not bookmarked', function () {
-      const site = {
-        location: testUrl2,
-        tags: [siteTags.BOOKMARK]
-      }
-      const key = siteUtil.getSiteKey(Immutable.fromJS(site))
-      const sites = {}
-      sites[key] = site
-      const result = siteUtil.isSiteBookmarked(Immutable.fromJS({sites}), Immutable.fromJS({
-        location: testUrl1,
-        tags: [siteTags.BOOKMARK]
-      }))
-      assert.equal(result, false)
-    })
-    it('returns false if site is a bookmark folder', function () {
-      const site = {
-        folderId: 0,
-        tags: [siteTags.BOOKMARK_FOLDER]
-      }
-      const siteDetail = Immutable.fromJS(site)
-      const key = siteUtil.getSiteKey(siteDetail)
-      const sites = {}
-      sites[key] = site
-      const result = siteUtil.isSiteBookmarked(Immutable.fromJS({sites}), siteDetail)
-      assert.equal(result, false)
-    })
-  })
-
   describe('isMoveAllowed', function () {
     // NOTE: usage taken from Bookmark Manager, which calls aboutActions.moveSite
     it('does not allow you to move a bookmark folder into itself', function () {
       // Add a new bookmark folder
-      let state = siteUtil.addSite(emptyState, folderMinFields)
+      let state = bookmarkFoldersState.addFolder(emptyState, folderMinFields)
       const folderMinFieldsWithId = folderMinFields.set('folderId', 1)
       const processedKey = siteUtil.getSiteKey(folderMinFieldsWithId)
-      const folderId = state.getIn(['sites', processedKey, 'folderId'])
+      const folderId = state.getIn(['bookmarkFolders', processedKey, 'folderId'])
       // Add a bookmark into that folder
-      state = siteUtil.addSite(state, bookmarkAllFields.set('parentFolderId', folderId))
-      const bookmarkFolder = state.getIn(['sites', processedKey])
+      state = bookmarksStaate.addBookmark(state, bookmarkAllFields.set('parentFolderId', folderId))
+      const bookmarkFolder = state.getIn(['bookmarkFolders', processedKey])
       // Should NOT be able to move bookmark folder into itself
-      assert.equal(false, siteUtil.isMoveAllowed(state.get('sites'), bookmarkFolder, bookmarkFolder))
+      assert.equal(false, siteUtil.isMoveAllowed(state.get('bookmarkFolders'), bookmarkFolder, bookmarkFolder))
     })
     it('does not allow you to move an ancestor folder into a descendant folder', function () {
       // Add a new bookmark folder
-      let state = siteUtil.addSite(emptyState, folderMinFields)
+      let state = bookmarkFoldersState.addFolder(emptyState, folderMinFields)
       const folderMinFieldsWithId1 = folderMinFields.set('folderId', 1)
       const processedKey1 = siteUtil.getSiteKey(folderMinFieldsWithId1)
-      const folderId1 = state.getIn(['sites', processedKey1, 'folderId'])
+      const folderId1 = state.getIn(['bookmarkFolders', processedKey1, 'folderId'])
       // Add a child below that folder
-      state = siteUtil.addSite(state, folderMinFields.set('parentFolderId', folderId1))
+      state = bookmarkFoldersState.addFolder(state, folderMinFields.set('parentFolderId', folderId1))
       const folderMinFieldsWithId2 = folderMinFields.set('folderId', 2)
       const processedKey2 = siteUtil.getSiteKey(folderMinFieldsWithId2)
-      const folderId2 = state.getIn(['sites', processedKey2, 'folderId'])
+      const folderId2 = state.getIn(['bookmarkFolders', processedKey2, 'folderId'])
       // Add a folder below the previous child
-      state = siteUtil.addSite(state, folderMinFields.set('parentFolderId', folderId2))
+      state = bookmarkFoldersState.addFolder(state, folderMinFields.set('parentFolderId', folderId2))
       const folderMinFieldsWithId3 = folderMinFields.set('folderId', 3)
       const processedKey3 = siteUtil.getSiteKey(folderMinFieldsWithId3)
-      const bookmarkFolder1 = state.getIn(['sites', processedKey1])
-      const bookmarkFolder3 = state.getIn(['sites', processedKey3])
+      const bookmarkFolder1 = state.getIn(['bookmarkFolders', processedKey1])
+      const bookmarkFolder3 = state.getIn(['bookmarkFolders', processedKey3])
       // Should NOT be able to move grandparent folder into its grandchild
-      assert.equal(false, siteUtil.isMoveAllowed(state.get('sites'), bookmarkFolder1, bookmarkFolder3))
-    })
-  })
-
-  describe('isFolder', function () {
-    it('returns true if the input is a siteDetail and has a `BOOKMARK_FOLDER` tag and a folder ID', function () {
-      const siteDetail = Immutable.fromJS({
-        tags: [siteTags.BOOKMARK_FOLDER],
-        folderId: 1
-      })
-      assert.equal(siteUtil.isFolder(siteDetail), true)
-    })
-    it('returns false if the input does not have a folderId', function () {
-      const siteDetail = Immutable.fromJS({
-        tags: [siteTags.BOOKMARK_FOLDER]
-      })
-      assert.equal(siteUtil.isFolder(siteDetail), false)
-    })
-    it('returns false if the input does not have a `BOOKMARK_FOLDER` tag', function () {
-      const siteDetail = Immutable.fromJS({
-        tags: [siteTags.BOOKMARK]
-      })
-      assert.equal(siteUtil.isFolder(siteDetail), false)
-    })
-    it('returns false if there is not a `tags` property', function () {
-      const siteDetail = Immutable.fromJS({
-        notTags: null
-      })
-      assert.equal(siteUtil.isFolder(siteDetail), false)
-    })
-    it('returns false if the input is null', function () {
-      assert.equal(siteUtil.isFolder(null), false)
-    })
-    it('returns false if the input is undefined', function () {
-      assert.equal(siteUtil.isFolder(), false)
-    })
-  })
-
-  describe('isBookmark', function () {
-    it('returns true if the input is a siteDetail and has a `BOOKMARK` tag', function () {
-      const siteDetail = Immutable.fromJS({
-        tags: [siteTags.BOOKMARK]
-      })
-      assert.equal(siteUtil.isBookmark(siteDetail), true)
-    })
-    it('returns false if the input does not have a `BOOKMARK` tag', function () {
-      const siteDetail = Immutable.fromJS({
-        tags: [siteTags.BOOKMARK_FOLDER]
-      })
-      assert.equal(siteUtil.isBookmark(siteDetail), false)
-    })
-    it('returns false if there is not a `tags` property', function () {
-      const siteDetail = Immutable.fromJS({
-        notTags: null
-      })
-      assert.equal(siteUtil.isBookmark(siteDetail), false)
-    })
-    it('returns false if the input is falsey', function () {
-      assert.equal(siteUtil.isBookmark(null), false)
-    })
-  })
-
-  describe('isHistoryEntry', function () {
-    it('returns true for a typical history entry', function () {
-      const siteDetail = Immutable.fromJS({
-        location: testUrl1,
-        lastAccessedTime: 123
-      })
-      assert.equal(siteUtil.isHistoryEntry(siteDetail), true)
-    })
-    it('returns true for a bookmark history entry which has lastAccessedTime', function () {
-      const siteDetail = Immutable.fromJS({
-        location: testUrl1,
-        tags: [siteTags.BOOKMARK],
-        lastAccessedTime: 123
-      })
-      assert.equal(siteUtil.isHistoryEntry(siteDetail), true)
-    })
-    it('returns false for a default site', function () {
-      const siteDetail = Immutable.fromJS({
-        location: testUrl1,
-        tags: [siteTags.DEFAULT],
-        lastAccessedTime: 1
-      })
-      assert.equal(siteUtil.isHistoryEntry(siteDetail), false)
-    })
-    it('returns false for a bookmark entry with falsey lastAccessedTime', function () {
-      const siteDetail = Immutable.fromJS({
-        location: testUrl1,
-        tags: [siteTags.BOOKMARK]
-      })
-      assert.equal(siteUtil.isHistoryEntry(siteDetail), false)
-    })
-    it('returns true for a history entry with falsey lastAccessedTime', function () {
-      const siteDetail = Immutable.fromJS({
-        location: testUrl1,
-        tags: []
-      })
-      assert.equal(siteUtil.isHistoryEntry(siteDetail), true)
-    })
-    it('returns false for a bookmarks folder', function () {
-      const siteDetail = Immutable.fromJS({
-        location: testUrl1,
-        tags: [siteTags.BOOKMARK_FOLDER],
-        lastAccessedTime: 123
-      })
-      assert.equal(siteUtil.isHistoryEntry(siteDetail), false)
-    })
-    it('returns false for a brave default site', function () {
-      const siteDetail = Immutable.fromJS({
-        location: testUrl1,
-        tags: [siteTags.DEFAULT],
-        lastAccessedTime: 1
-      })
-      assert.equal(siteUtil.isHistoryEntry(siteDetail), false)
-    })
-    it('returns false if input is falsey', function () {
-      assert.equal(siteUtil.isHistoryEntry(null), false)
-      assert.equal(siteUtil.isHistoryEntry(undefined), false)
-    })
-    it('returns false for about: pages', function () {
-      const siteDetail = Immutable.fromJS({
-        location: 'about:fake-page-here',
-        lastAccessedTime: 123
-      })
-      assert.equal(siteUtil.isHistoryEntry(siteDetail), false)
+      assert.equal(false, siteUtil.isMoveAllowed(state.get('bookmarkFolders'), bookmarkFolder1, bookmarkFolder3))
     })
   })
 

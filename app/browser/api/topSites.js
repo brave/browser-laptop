@@ -11,7 +11,7 @@ const historyState = require('../../common/state/historyState')
 const bookmarkLocationCache = require('../../common/cache/bookmarkLocationCache')
 const newTabData = require('../../../js/data/newTabData')
 const {isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
-const aboutNewTabMaxEntries = 18
+const aboutNewTabMaxEntries = 100
 let appStore
 
 let minCountOfTopSites
@@ -50,6 +50,25 @@ const sortCountDescending = (left, right) => {
     return -1
   }
   return 0
+}
+
+const removeDuplicateDomains = (list) => {
+  const siteDomains = new Set()
+  return list.filter((site) => {
+    if (!site.get('location')) {
+      return false
+    }
+    try {
+      const hostname = require('../../common/urlParse')(site.get('location')).hostname
+      if (!siteDomains.has(hostname)) {
+        siteDomains.add(hostname)
+        return true
+      }
+    } catch (e) {
+      console.log('Error parsing hostname: ', e)
+    }
+    return false
+  })
 }
 
 const calculateTopSites = (clearCache, withoutDebounce = false) => {
@@ -97,6 +116,10 @@ const getTopSiteData = () => {
       minAccessOfTopSites = access
     }
   }
+
+  // remove duplicate domains
+  // we only keep uniques host names
+  sites = removeDuplicateDomains(sites)
 
   if (sites.size < 18) {
     const preDefined = staticData

@@ -124,6 +124,7 @@ const getDetailFromFrame = (frame) => {
 }
 
 module.exports = {
+  maxEntries: aboutHistoryMaxEntries,
   getHistory,
   groupEntriesByDay,
   totalEntries,

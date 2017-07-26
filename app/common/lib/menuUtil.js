@@ -87,7 +87,7 @@ const createBookmarkTemplateItems = (state, parentFolderId) => {
 
   const payload = []
   for (let bookmark of bookmarks) {
-    if (bookmarkUtil.isBookmark(bookmark)) {
+    if (bookmarkUtil.isBookmark(bookmark) && bookmark.get('location')) {
       payload.push({
         // TODO include label made from favicon. It needs to be of type NativeImage
         // which can be made using a Buffer / DataURL / local image

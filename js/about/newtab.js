@@ -91,7 +91,7 @@ class NewTabPage extends React.Component {
   }
 
   get topSites () {
-    return this.state.newTabData.getIn(['newTabDetail', 'sites'])
+    return this.state.newTabData.getIn(['newTabDetail', 'sites'], Immutable.List())
   }
 
   get pinnedTopSites () {

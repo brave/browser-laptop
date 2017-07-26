@@ -5,9 +5,9 @@
 /* global describe, it, after, afterEach, before */
 const Immutable = require('immutable')
 const assert = require('assert')
-const siteTags = require('../../../../../js/constants/siteTags')
 const sinon = require('sinon')
 const mockery = require('mockery')
+const siteUtil = require('../../../../../js/state/siteUtil')
 
 let getStateValue
 
@@ -24,6 +24,16 @@ const defaultAppState = Immutable.fromJS({
 })
 
 const calculateTopSitesClockTime = 1000000
+
+const generateMap = (...sites) => {
+  let history = Immutable.Map()
+
+  for (let item of sites) {
+    history = history.set(siteUtil.getSiteKey(item), item)
+  }
+
+  return history
+}
 
 describe('topSites api', function () {
   before(function () {
@@ -54,86 +64,247 @@ describe('topSites api', function () {
   })
   describe('calculateTopSites', function () {
     const site1 = Immutable.fromJS({
-      location: 'https://example1.com/', title: 'sample 1', parentFolderId: 0, count: 10
+      location: 'https://example1.com/',
+      title: 'sample 1',
+      parentFolderId: 0,
+      count: 10,
+      key: 'https://example1.com/|0|0'
     })
     const site2 = Immutable.fromJS({
-      location: 'https://example2.com', title: 'sample 2', parentFolderId: 0, count: 5
+      location: 'https://example2.com/',
+      title: 'sample 2',
+      parentFolderId: 0,
+      count: 5,
+      key: 'https://example2.com/|0|0'
     })
     const site3 = Immutable.fromJS({
-      location: 'https://example3.com', title: 'sample 3', parentFolderId: 0, count: 23, lastAccessedTime: 123
+      location: 'https://example3.com/',
+      title: 'sample 3',
+      parentFolderId: 0,
+      count: 23,
+      lastAccessedTime: 123,
+      key: 'https://example3.com/|0|0'
     })
     const site4 = Immutable.fromJS({
-      location: 'https://example4.com', title: 'sample 4', parentFolderId: 0, count: 0
+      location: 'https://example4.com/',
+      title: 'sample 4',
+      parentFolderId: 0,
+      count: 0,
+      key: 'https://example4.com/|0|0'
     })
     const site5 = Immutable.fromJS({
-      location: 'https://example4.com', title: 'sample 5', parentFolderId: 0, count: 23, lastAccessedTime: 456
+      location: 'https://example5.com/',
+      title: 'sample 5',
+      parentFolderId: 0,
+      count: 23,
+      lastAccessedTime: 456,
+      key: 'https://example5.com/|0|0'
     })
-    const importedBookmark1 = Immutable.fromJS({
-      location: 'https://example6.com', title: 'sample 6', parentFolderId: 0, count: 23, lastAccessedTime: 0
+
+    const staticNewData = Immutable.fromJS([
+      { key: 'https://twitter.com/brave/|0|0',
+        count: 0,
+        favicon: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/img/newtab/defaultTopSitesIcon/twitter.png',
+        location: 'https://twitter.com/brave',
+        themeColor: 'rgb(255, 255, 255)',
+        title: 'Brave Software (@brave) | Twitter',
+        bookmarked: false
+      },
+      { key: 'https://www.facebook.com/BraveSoftware/|0|0',
+        count: 0,
+        favicon: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/img/newtab/defaultTopSitesIcon/facebook.png',
+        location: 'https://www.facebook.com/BraveSoftware/',
+        themeColor: 'rgb(59, 89, 152)',
+        title: 'Brave Software | Facebook',
+        bookmarked: false
+      },
+      { key: 'https://www.youtube.com/bravesoftware/|0|0',
+        count: 0,
+        favicon: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/img/newtab/defaultTopSitesIcon/youtube.png',
+        location: 'https://www.youtube.com/bravesoftware/',
+        themeColor: '#E62117',
+        title: 'Brave Browser - YouTube',
+        bookmarked: false
+      },
+      { key: 'https://brave.com/|0|0',
+        count: 0,
+        favicon: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/img/newtab/defaultTopSitesIcon/brave.ico',
+        location: 'https://brave.com/',
+        themeColor: 'rgb(255, 255, 255)',
+        title: 'Brave Software | Building a Better Web',
+        bookmarked: false
+      },
+      { key: 'https://itunes.apple.com/app/brave-web-browser/id1052879175?mt=8|0|0',
+        count: 0,
+        favicon: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/img/newtab/defaultTopSitesIcon/appstore.png',
+        location: 'https://itunes.apple.com/app/brave-web-browser/id1052879175?mt=8',
+        themeColor: 'rgba(255, 255, 255, 1)',
+        title: 'Brave Web Browser: Fast with built-in adblock on the App Store',
+        bookmarked: false
+      },
+      { key: 'https://play.google.com/store/apps/details?id=com.brave.browser|0|0',
+        count: 0,
+        favicon: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/img/newtab/defaultTopSitesIcon/playstore.png',
+        location: 'https://play.google.com/store/apps/details?id=com.brave.browser',
+        themeColor: 'rgb(241, 241, 241)',
+        title: 'Brave Browser: Fast AdBlock – Apps para Android no Google Play',
+        bookmarked: false
+      }
+    ])
+
+    it('respects position of pinned items when populating results', function () {
+      const allPinned = Immutable.fromJS([site1, site4])
+      const stateWithPinnedSites = defaultAppState
+        .set('historySites', generateMap(site1, site2, site3, site4))
+        .setIn(['about', 'newtab', 'pinnedTopSites'], allPinned)
+      this.topSites.calculateTopSites(stateWithPinnedSites)
+      // checks:
+      // - pinned item are in their expected order
+      // - unpinned items fill the rest of the spots (starting w/ highest # visits first)
+      getStateValue = stateWithPinnedSites
+      this.clock.tick(calculateTopSitesClockTime)
+      assert.equal(this.appActions.topSiteDataAvailable.callCount, 1)
+      const newSitesData = this.appActions.topSiteDataAvailable.getCall(0).args[0]
+      const expectedSites = Immutable.fromJS([
+        {
+          location: 'https://example3.com/',
+          title: 'sample 3',
+          parentFolderId: 0,
+          count: 23,
+          lastAccessedTime: 123,
+          bookmarked: false,
+          key: 'https://example3.com/|0|0'
+        },
+        {
+          location: 'https://example2.com/',
+          title: 'sample 2',
+          parentFolderId: 0,
+          count: 5,
+          bookmarked: false,
+          key: 'https://example2.com/|0|0'
+        }
+      ])
+      assert.deepEqual(newSitesData.toJS(), expectedSites.concat(staticNewData).toJS())
     })
-    const folder1 = Immutable.fromJS({
-      title: 'folder1', parentFolderId: 0, type: siteTags.BOOKMARK_FOLDER
+
+    it('only includes one result for a domain (the one with the highest count)', function () {
+      const stateWithDuplicateDomains = defaultAppState.set('historySites', generateMap(
+        site1.set('location', 'https://example1.com/test').set('count', 12),
+        site1.set('location', 'https://example1.com/about').set('count', 7)))
+      this.topSites.calculateTopSites(stateWithDuplicateDomains)
+      getStateValue = stateWithDuplicateDomains
+      this.clock.tick(calculateTopSitesClockTime)
+      assert.equal(this.appActions.topSiteDataAvailable.callCount, 1)
+      const newSitesData = this.appActions.topSiteDataAvailable.getCall(0).args[0]
+      const expectedSites = Immutable.fromJS([
+        {
+          location: 'https://example1.com/test',
+          title: 'sample 1',
+          parentFolderId: 0,
+          count: 12,
+          bookmarked: false,
+          key: 'https://example1.com/test|0|0'
+        }
+      ])
+      assert.deepEqual(newSitesData.toJS(), expectedSites.concat(staticNewData).toJS())
     })
 
     describe('when fetching unpinned results', function () {
-      it('does not include bookmark folders', function () {
-        const stateWithSites = defaultAppState.set('sites',
-          Immutable.List().push(site1).push(folder1))
-        const expectedSites = Immutable.List().push(site1)
-        getStateValue = stateWithSites
-        this.topSites.calculateTopSites(true)
-        this.clock.tick(calculateTopSitesClockTime)
-        assert.equal(this.appActions.topSiteDataAvailable.callCount, 1)
-        const newSitesData = this.appActions.topSiteDataAvailable.getCall(0).args[0]
-        assert.deepEqual(newSitesData.toJS(), expectedSites.toJS())
-      })
-
-      it('does not include imported bookmarks (lastAccessedTime === 0)', function () {
-        const stateWithSites = defaultAppState.set('sites',
-          Immutable.List().push(site1).push(importedBookmark1))
-        const expectedSites = Immutable.List().push(site1)
-        this.topSites.calculateTopSites(stateWithSites)
-        getStateValue = stateWithSites
-        this.clock.tick(calculateTopSitesClockTime)
-        assert.equal(this.appActions.topSiteDataAvailable.callCount, 1)
-        const newSitesData = this.appActions.topSiteDataAvailable.getCall(0).args[0]
-        assert.deepEqual(newSitesData.toJS(), expectedSites.toJS())
-      })
-
       it('sorts results by `count` DESC', function () {
-        const stateWithSites = defaultAppState.set('sites',
-          Immutable.List().push(site1).push(site2).push(site3).push(site4))
-        const expectedSites = Immutable.List().push(site3).push(site1).push(site2).push(site4)
+        const stateWithSites = defaultAppState.set('historySites', generateMap(site1, site2, site3, site4))
         this.topSites.calculateTopSites(stateWithSites)
         getStateValue = stateWithSites
         this.clock.tick(calculateTopSitesClockTime)
         assert.equal(this.appActions.topSiteDataAvailable.callCount, 1)
         const newSitesData = this.appActions.topSiteDataAvailable.getCall(0).args[0]
-        assert.deepEqual(newSitesData.toJS(), expectedSites.toJS())
+        const expectedSites = Immutable.fromJS([
+          {
+            location: 'https://example3.com/',
+            title: 'sample 3',
+            parentFolderId: 0,
+            count: 23,
+            lastAccessedTime: 123,
+            bookmarked: false,
+            key: 'https://example3.com/|0|0'
+          },
+          {
+            location: 'https://example1.com/',
+            title: 'sample 1',
+            parentFolderId: 0,
+            count: 10,
+            bookmarked: false,
+            key: 'https://example1.com/|0|0'
+          },
+          {
+            location: 'https://example2.com/',
+            title: 'sample 2',
+            parentFolderId: 0,
+            count: 5,
+            bookmarked: false,
+            key: 'https://example2.com/|0|0'
+          },
+          {
+            location: 'https://example4.com/',
+            title: 'sample 4',
+            parentFolderId: 0,
+            count: 0,
+            bookmarked: false,
+            key: 'https://example4.com/|0|0'
+          }
+        ])
+        assert.deepEqual(newSitesData.toJS(), expectedSites.concat(staticNewData).toJS())
       })
 
       it('sorts results by `lastAccessedTime` DESC if `count` is the same', function () {
-        const stateWithSites = defaultAppState.set('sites',
-          Immutable.List().push(site1).push(site3).push(site5))
-        const expectedSites = Immutable.List().push(site5).push(site3).push(site1)
+        const stateWithSites = defaultAppState.set('historySites', generateMap(site1, site3, site5))
         this.topSites.calculateTopSites(stateWithSites)
         getStateValue = stateWithSites
         this.clock.tick(calculateTopSitesClockTime)
         assert.equal(this.appActions.topSiteDataAvailable.callCount, 1)
         const newSitesData = this.appActions.topSiteDataAvailable.getCall(0).args[0]
-        assert.deepEqual(newSitesData.toJS(), expectedSites.toJS())
+        const expectedSites = Immutable.fromJS([
+          {
+            location: 'https://example5.com/',
+            title: 'sample 5',
+            parentFolderId: 0,
+            count: 23,
+            lastAccessedTime: 456,
+            bookmarked: false,
+            key: 'https://example5.com/|0|0'
+          },
+          {
+            location: 'https://example3.com/',
+            title: 'sample 3',
+            parentFolderId: 0,
+            count: 23,
+            bookmarked: false,
+            key: 'https://example3.com/|0|0',
+            lastAccessedTime: 123
+          },
+          {
+            location: 'https://example1.com/',
+            title: 'sample 1',
+            parentFolderId: 0,
+            count: 10,
+            bookmarked: false,
+            key: 'https://example1.com/|0|0'
+          }
+        ])
+        assert.deepEqual(newSitesData.toJS(), expectedSites.concat(staticNewData).toJS())
       })
 
       it('only returns the last `maxSites` results', function () {
         const maxSites = this.topSites.aboutNewTabMaxEntries
-        let tooManySites = Immutable.List()
+        let tooManySites = Immutable.Map()
         for (let i = 0; i < maxSites + 1; i++) {
-          tooManySites = tooManySites.push(
+          tooManySites = tooManySites.set('https://example' + i + '.com|0|0',
             site1.set('location', 'https://example' + i + '.com')
               .set('title', 'sample ' + i)
-              .set('count', i))
+              .set('count', i)
+              .set('bookmarked', false)
+          )
         }
-        const stateWithTooManySites = defaultAppState.set('sites', tooManySites)
+        const stateWithTooManySites = defaultAppState.set('historySites', tooManySites)
         this.topSites.calculateTopSites(stateWithTooManySites)
 
         getStateValue = stateWithTooManySites
@@ -145,48 +316,35 @@ describe('topSites api', function () {
       })
 
       it('does not include items marked as ignored', function () {
-        const ignoredSites = Immutable.List().push(site1).push(site3)
+        const ignoredSites = Immutable.List().push('https://example1.com/|0|0').push('https://example3.com/|0|0')
         const stateWithIgnoredSites = defaultAppState
-          .set('sites', Immutable.List().push(site1).push(site2).push(site3).push(site4))
+          .set('historySites', generateMap(site1, site2, site3, site4))
           .setIn(['about', 'newtab', 'ignoredTopSites'], ignoredSites)
-        const expectedSites = Immutable.List().push(site2).push(site4)
         this.topSites.calculateTopSites(stateWithIgnoredSites)
         getStateValue = stateWithIgnoredSites
         this.clock.tick(calculateTopSitesClockTime)
         assert.equal(this.appActions.topSiteDataAvailable.callCount, 1)
         const newSitesData = this.appActions.topSiteDataAvailable.getCall(0).args[0]
-        assert.deepEqual(newSitesData.toJS(), expectedSites.toJS())
+        const expectedSites = Immutable.fromJS([
+          {
+            location: 'https://example2.com/',
+            title: 'sample 2',
+            parentFolderId: 0,
+            count: 5,
+            bookmarked: false,
+            key: 'https://example2.com/|0|0'
+          },
+          {
+            location: 'https://example4.com/',
+            title: 'sample 4',
+            parentFolderId: 0,
+            count: 0,
+            bookmarked: false,
+            key: 'https://example4.com/|0|0'
+          }
+        ])
+        assert.deepEqual(newSitesData.toJS(), expectedSites.concat(staticNewData).toJS())
       })
-    })
-
-    it('respects position of pinned items when populating results', function () {
-      const allPinned = Immutable.fromJS([null, null, site1, null, null, null, null, null, site4])
-      const stateWithPinnedSites = defaultAppState
-        .set('sites', Immutable.List().push(site1).push(site2).push(site3).push(folder1).push(site4))
-        .setIn(['about', 'newtab', 'pinnedTopSites'], allPinned)
-      const expectedSites = Immutable.List().push(site3).push(site2).push(site1).push(site4)
-      this.topSites.calculateTopSites(stateWithPinnedSites)
-      // checks:
-      // - pinned item are in their expected order
-      // - unpinned items fill the rest of the spots (starting w/ highest # visits first)
-      getStateValue = stateWithPinnedSites
-      this.clock.tick(calculateTopSitesClockTime)
-      assert.equal(this.appActions.topSiteDataAvailable.callCount, 1)
-      const newSitesData = this.appActions.topSiteDataAvailable.getCall(0).args[0]
-      assert.deepEqual(newSitesData.toJS(), expectedSites.toJS())
-    })
-
-    it('only includes one result for a domain (the one with the highest count)', function () {
-      const stateWithDuplicateDomains = defaultAppState.set('sites', Immutable.List()
-        .push(site1.set('location', 'https://example1.com/test').set('count', 12))
-        .push(site1.set('location', 'https://example1.com/about').set('count', 7)))
-      const expectedSites = Immutable.List().push(site1.set('location', 'https://example1.com/test').set('count', 12))
-      this.topSites.calculateTopSites(stateWithDuplicateDomains)
-      getStateValue = stateWithDuplicateDomains
-      this.clock.tick(calculateTopSitesClockTime)
-      assert.equal(this.appActions.topSiteDataAvailable.callCount, 1)
-      const newSitesData = this.appActions.topSiteDataAvailable.getCall(0).args[0]
-      assert.deepEqual(newSitesData.toJS(), expectedSites.toJS())
     })
   })
 })
