@@ -11,7 +11,7 @@ const appConfig = require('../../../../js/constants/appConfig')
 const platformUtil = require('../../../common/lib/platformUtil')
 const isDarwin = platformUtil.isDarwin()
 const isLinux = platformUtil.isLinux()
-const isWindows = platformUtil.isLinux()
+const isWindows = platformUtil.isWindows()
 
 const WidevineInfo = require('../main/widevineInfo')
 const flash = appConfig.resourceNames.FLASH
