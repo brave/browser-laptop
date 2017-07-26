@@ -145,6 +145,11 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
 
   function reportBlock (type) {
     var script_url = getOriginatingScriptUrl()
+    if (script_url) {
+      script_url = stripLineAndColumnNumbers(script_url)
+    } else {
+      script_url = window.location.href
+    }
     var msg = {
       type,
       scriptUrl: stripLineAndColumnNumbers(script_url)

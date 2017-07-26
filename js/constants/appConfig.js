@@ -24,6 +24,8 @@ module.exports = {
     SAFE_BROWSING: 'safeBrowsing',
     HTTPS_EVERYWHERE: 'httpsEverywhere',
     TRACKING_PROTECTION: 'trackingProtection',
+    FINGERPRINTING_PROTECTION: 'fingerprintingProtection', // block 3p fingerprinting
+    FINGERPRINTING_PROTECTION_ALL: 'fingerprintingProtectionAll', // block all fingerprinting
     AD_INSERTION: 'adInsertion',
     NOSCRIPT: 'noScript',
     FLASH: 'flash',
@@ -38,6 +40,12 @@ module.exports = {
     enabled: true
   },
   cookieblockAll: {
+    enabled: false
+  },
+  fingerprintingProtection: {
+    enabled: true
+  },
+  fingerprintingProtectionAll: {
     enabled: false
   },
   noScript: {
@@ -147,7 +155,6 @@ module.exports = {
     'privacy.topsite-suggestions': true,
     'privacy.opened-tab-suggestions': true,
     'privacy.autocomplete.history-size': 500,
-    'privacy.block-canvas-fingerprinting': false,
     'bookmarks.toolbar.show': false,
     'bookmarks.toolbar.showFavicon': false,
     'bookmarks.toolbar.showOnlyFavicon': false,

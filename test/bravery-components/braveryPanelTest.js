@@ -15,7 +15,10 @@ const {
   httpsEverywhereStat,
   noScriptSwitch,
   noScriptStat,
-  fpSwitch,
+  fpControl,
+  blockFpOption,
+  allowFpOption,
+  defaultFpOption,
   fpStat,
   cookieControl,
   allowAllCookiesOption,
@@ -31,6 +34,14 @@ describe('Bravery Panel', function () {
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
       .waitForVisible(urlInput)
+  }
+
+  function * changeFpSetting (client, fpSetting) {
+    yield client
+      .waitForVisible(fpControl)
+      .click(fpControl)
+      .waitForVisible(fpSetting)
+      .click(fpSetting)
   }
 
   describe('General', function () {
@@ -136,6 +147,12 @@ describe('Bravery Panel', function () {
       // XXX: WebGL seems to be broken in Brave on Linux distros. #3227
       return this.getText(fpStat).then((stat) => {
         return process.platform === 'linux' ? stat === '2' : stat === '3'
+      })
+    }
+    const verifyDoubleFingerprintingStat = function () {
+      // XXX: WebGL seems to be broken in Brave on Linux distros. #3227
+      return this.getText(fpStat).then((stat) => {
+        return process.platform === 'linux' ? stat === '4' : stat === '6'
       })
     }
 
@@ -785,51 +802,61 @@ describe('Bravery Panel', function () {
         })
     })
     it('blocks fingerprinting', function * () {
-      const url = Brave.server.url('fingerprinting.html')
+      const url = Brave.server.url('fingerprinting_iframe.html')
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(url)
         .openBraveMenu(braveMenu, braveryPanel)
-        .click(fpSwitch)
-        .waitUntil(verifyFingerprintingStat)
+      yield changeFpSetting(this.app.client, blockFpOption)
+      yield this.app.client
+        .waitUntil(verifyDoubleFingerprintingStat)
         .keys(Brave.keys.ESCAPE)
         .newTab({ url, isPrivate: true })
         .waitForTabCount(2)
         .waitForUrl(url)
         .openBraveMenu(braveMenu, braveryPanel)
         .waitUntil(verifyFingerprintingStat)
-        .click(fpSwitch)
+      yield changeFpSetting(this.app.client, allowFpOption)
+      yield this.app.client
         .waitForTextValue(fpStat, '0')
         .keys(Brave.keys.ESCAPE)
         .newTab({ url })
         .waitForTabCount(3)
         .waitForUrl(url)
         .openBraveMenu(braveMenu, braveryPanel)
+        .waitUntil(verifyDoubleFingerprintingStat)
+      yield changeFpSetting(this.app.client, defaultFpOption)
+      yield this.app.client
         .waitUntil(verifyFingerprintingStat)
     })
     it('blocks fingerprinting on compact panel', function * () {
-      const url = Brave.server.url('fingerprinting.html')
+      const url = Brave.server.url('fingerprinting_iframe.html')
       yield this.app.client
         .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
 
         .tabByIndex(0)
         .loadUrl(url)
         .openBraveMenu(braveMenu, braveryPanelCompact)
-        .click(fpSwitch)
-        .waitUntil(verifyFingerprintingStat)
+      yield changeFpSetting(this.app.client, blockFpOption)
+      yield this.app.client
+        .waitUntil(verifyDoubleFingerprintingStat)
         .keys(Brave.keys.ESCAPE)
         .newTab({ url, isPrivate: true })
         .waitForTabCount(2)
         .waitForUrl(url)
         .openBraveMenu(braveMenu, braveryPanelCompact)
         .waitUntil(verifyFingerprintingStat)
-        .click(fpSwitch)
+      yield changeFpSetting(this.app.client, allowFpOption)
+      yield this.app.client
         .waitForTextValue(fpStat, '0')
         .keys(Brave.keys.ESCAPE)
         .newTab({ url })
         .waitForTabCount(3)
         .waitForUrl(url)
         .openBraveMenu(braveMenu, braveryPanelCompact)
+        .waitUntil(verifyDoubleFingerprintingStat)
+      yield changeFpSetting(this.app.client, defaultFpOption)
+      yield this.app.client
         .waitUntil(verifyFingerprintingStat)
     })
     it('proxy fingerprinting method', function * () {
@@ -839,8 +866,8 @@ describe('Bravery Panel', function () {
         .loadUrl(url)
         .waitForUrl(url)
         .openBraveMenu(braveMenu, braveryPanel)
-        .waitForVisible(fpSwitch)
-        .click(fpSwitch)
+      yield changeFpSetting(this.app.client, blockFpOption)
+      yield this.app.client
         .keys(Brave.keys.ESCAPE)
         .tabByIndex(0)
         .waitForTextValue('#target', 'proxy blocking works')
@@ -857,7 +884,8 @@ describe('Bravery Panel', function () {
             })
         })
         .openBraveMenu(braveMenu, braveryPanel)
-        .click(fpSwitch)
+      yield changeFpSetting(this.app.client, blockFpOption)
+      yield this.app.client
         .waitUntil(function () {
           return this.getText(fpStat)
             .then((stat) => stat === '1')
@@ -884,7 +912,8 @@ describe('Bravery Panel', function () {
           return this.getText(fpStat)
             .then((stat) => stat === '1')
         })
-        .click(fpSwitch)
+      yield changeFpSetting(this.app.client, defaultFpOption)
+      yield this.app.client
         .tabByUrl(url)
         .waitUntil(function () {
           return this.getText('body')

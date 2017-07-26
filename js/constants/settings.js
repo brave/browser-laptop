@@ -36,7 +36,6 @@ const settings = {
   OPENED_TAB_SUGGESTIONS: 'privacy.opened-tab-suggestions',
   AUTOCOMPLETE_HISTORY_SIZE: 'privacy.autocomplete.history-size',
   DO_NOT_TRACK: 'privacy.do-not-track',
-  BLOCK_CANVAS_FINGERPRINTING: 'privacy.block-canvas-fingerprinting',
   // Security Tab
   ACTIVE_PASSWORD_MANAGER: 'security.passwords.active-password-manager',
   SHUTDOWN_CLEAR_HISTORY: 'shutdown.clear-history',

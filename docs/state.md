@@ -150,6 +150,12 @@ AppStore
       }
     } // the unique id of the extension
   },
+  fingerprintingProtection: {
+    enabled: boolean // enable 3p fingerprinting blocking. default true.
+  },
+  fingerprintingProtectionAll: {
+    enabled: boolean // enable all fingerprinting blocking. default false.
+  },
   firstRunTimestamp: integer,
   flash: {
     enabled: boolean // enable flash
@@ -255,7 +261,6 @@ AppStore
     'payments.sites-show-less': boolean, // whether to show less sites in the payments list
     'privacy.autocomplete.history-size': number, // number of autocomplete entries to keep
     'privacy.autofill-enabled': boolean, // true to enable autofill
-    'privacy.block-canvas-fingerprinting': boolean, // canvas fingerprinting defense
     'privacy.bookmark-suggestions': boolean, // auto suggest for bookmarks enabled
     'privacy.do-not-track': boolean, // whether DNT is 1
     'privacy.history-suggestions': boolean, // auto suggest for history enabled
@@ -294,7 +299,7 @@ AppStore
     [hostPattern]: {
       adControl: string, // (showBraveAds | blockAds | allowAdsAndTracking)
       cookieControl: string, // (block3rdPartyCookie | allowAllCookies | blockAllCookies)
-      fingerprintingProtection: boolean,
+      fingerprintingProtection: string, // (block3rdPartyFingerprinting | allowAllFingerprinting | blockAllFingerprinting)
       flash: (number|boolean), // approval expiration time if allowed, false if never allow
       fullscreenPermission: boolean,
       geolocationPermission: boolean,
