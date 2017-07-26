@@ -302,7 +302,8 @@ const fixDisplayURL = (navigationEntry, controller) => {
     navigationEntry.virtualURL = getSourceAboutUrl(navigationEntry.virtualURL)
   }
 
-  if (isIntermediateAboutPage(navigationEntry.virtualURL)) {
+  if (isIntermediateAboutPage(navigationEntry.virtualURL) &&
+    !navigationEntry.virtualURL.startsWith('about:safebrowsing#')) {
     const previousEntry = controller.getEntryAtOffset(-1)
     if (!controller.canGoForward() && previousEntry) {
       navigationEntry.virtualURL = previousEntry.virtualURL
