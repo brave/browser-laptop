@@ -8,6 +8,7 @@ const Immutable = require('immutable')
 const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
 const messages = require('../constants/messages')
 const aboutActions = require('./aboutActions')
+const appActions = require('../actions/appActions')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../../app/renderer/components/styles/global')
@@ -24,6 +25,7 @@ class ExtensionItem extends ImmutableComponent {
   constructor () {
     super()
     this.onContextMenu = this.onContextMenu.bind(this)
+    this.onInspect = this.onInspect.bind(this)
   }
   onContextMenu (e) {
     aboutActions.contextMenu(this.props.extension.toJS(), 'extensions', e)
@@ -35,6 +37,19 @@ class ExtensionItem extends ImmutableComponent {
       this.props.extension.getIn(['manifest', 'icons', '16']) ||
       null
   }
+  get backgroundPage () {
+    return this.props.extension.getIn(['manifest', 'background', 'page']) || '_generated_background_page.html'
+  }
+  onInspect () {
+    const url = this.props.extension.get('url')
+    const backgroundPage = this.backgroundPage
+    chrome.tabs.query(
+      {currentWindow: true, active: true},
+      function (tabArray) {
+        appActions.loadURLRequested(tabArray[0].id, url + backgroundPage)
+      }
+    )
+  }
 
   render () {
     const className = css(
@@ -44,6 +59,7 @@ class ExtensionItem extends ImmutableComponent {
     )
     const icon = this.icon
     const permissions = this.props.extension.getIn(['manifest', 'permissions'])
+    const hasBackground = this.props.extension.getIn(['manifest', 'background'])
 
     return <div role='listitem'
       disabled={!this.props.extension.get('enabled')}
@@ -68,6 +84,11 @@ class ExtensionItem extends ImmutableComponent {
         {
           permissions
           ? <div className='extensionPermissions'><span data-l10n-id='extensionPermissionsLabel' /> <span>{permissions.join(', ')}</span></div>
+          : null
+        }
+        {
+          hasBackground && this.props.extension.get('enabled')
+          ? <div className='extensionInspectViews'><span data-l10n-id='extensionInspectViewsLabel' /> <label className={css(commonStyles.linkText, commonStyles.linkText_small)} onClick={this.onInspect}>{this.backgroundPage}</label></div>
           : null
         }
       </div>

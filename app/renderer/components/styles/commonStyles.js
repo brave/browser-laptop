@@ -198,6 +198,22 @@ const styles = StyleSheet.create({
   isCommonForm: {
     fontSize: globalStyles.fontSize.flyoutDialog,
     width: '100%'
+  },
+
+  linkText: {
+    display: 'inline-block',
+    textDecoration: 'underline',
+    color: globalStyles.color.braveOrange,
+    cursor: 'pointer',
+    margin: '0',
+
+    ':hover': {
+      color: '#000'
+    }
+  },
+
+  linkText_small: {
+    fontSize: '14px'
   }
 })
 
