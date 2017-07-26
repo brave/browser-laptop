@@ -35,6 +35,7 @@ const globalStyles = {
     breakpointTinyWin32: '500px',
     breakpointNewPrivateTab: '890px',
     tab: {
+      dynamic: '99999px', // add a large number as new spec will set tab width based on window size
       default: '184px', // match tabArea max-width
       large: '120px',
       largeMedium: '83px',
