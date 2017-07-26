@@ -6,7 +6,7 @@ const siteTags = require('../../js/constants/siteTags')
 const settings = require('../../js/constants/settings')
 
 describe('sessionStore test', function () {
-  function * setup (client) {
+  function * setup () {
     Brave.addCommands()
   }
 
@@ -16,7 +16,8 @@ describe('sessionStore test', function () {
       const page1Url = Brave.server.url('page1.html')
       const site = {
         location: page1Url,
-        title: 'some page'
+        title: 'some page',
+        type: siteTags.BOOKMARK
       }
       yield Brave.startApp()
       yield setup(Brave.app.client)
@@ -28,7 +29,7 @@ describe('sessionStore test', function () {
         .windowParentByUrl(page1Url)
         .activateURLMode()
         .waitForExist(navigatorNotBookmarked)
-        .addBookmark(site, siteTags.BOOKMARK)
+        .addBookmark(site)
         .waitForExist(navigatorBookmarked)
       yield Brave.stopApp(false)
       yield Brave.startApp()
@@ -62,7 +63,8 @@ describe('sessionStore test', function () {
       const page1Url = Brave.server.url('page1.html')
       const site = {
         location: page1Url,
-        title: 'some page'
+        title: 'some page',
+        type: siteTags.BOOKMARK
       }
       yield Brave.startApp()
       yield setup(Brave.app.client)
@@ -74,7 +76,7 @@ describe('sessionStore test', function () {
         .windowParentByUrl(page1Url)
         .activateURLMode()
         .waitForExist(navigatorNotBookmarked)
-        .addBookmark(site, siteTags.BOOKMARK)
+        .addBookmark(site)
         .waitForExist(navigatorBookmarked)
 
       yield Brave.stopApp(false)

@@ -4,15 +4,15 @@
 
 const fs = require('fs')
 const appActions = require('../actions/appActions')
-const siteTags = require('../constants/siteTags')
-const siteUtil = require('../state/siteUtil')
 const Immutable = require('immutable')
 const appStoreRenderer = require('../stores/appStoreRenderer')
+const bookmarFoldersUtil = require('../../app/common/lib/bookmarkFoldersUtil')
+const bookmarkFoldersState = require('../../app/common/state/bookmarkFoldersState')
 
 /**
  * Processes a single node from an exported HTML file from Firefox or Chrome
  * @param {Object} parserState - the current parser state
- * @param {Object} node - The current DOM node which is being processed
+ * @param {Object} domNode - The current DOM node which is being processed
  */
 function processBookmarkNode (parserState, domNode) {
   switch (domNode.tagName) {
@@ -38,12 +38,11 @@ function processBookmarkNode (parserState, domNode) {
           title: domNode.innerText,
           folderId: parserState.nextFolderId,
           parentFolderId: parserState.parentFolderId,
-          lastAccessedTime: (domNode.getAttribute('LAST_MODIFIED') || domNode.getAttribute('ADD_DATE') || 0) * 1000,
-          tags: [siteTags.BOOKMARK_FOLDER]
+          lastAccessedTime: (domNode.getAttribute('LAST_MODIFIED') || domNode.getAttribute('ADD_DATE') || 0) * 1000
         }
         parserState.lastFolderId = parserState.nextFolderId
         parserState.nextFolderId++
-        parserState.sites.push(folder)
+        parserState.bookmarkFolders.push(folder)
       } else {
         parserState.lastFolderId = 0
         parserState.foundBookmarksToolbar = true
@@ -54,15 +53,13 @@ function processBookmarkNode (parserState, domNode) {
       if (domNode.href.startsWith('place:')) {
         break
       }
-      const site = {
+      const bookmarks = {
         title: domNode.innerText,
         location: domNode.href,
         favicon: domNode.getAttribute('ICON'),
-        parentFolderId: parserState.parentFolderId,
-        lastAccessedTime: (domNode.getAttribute('LAST_MODIFIED') || domNode.getAttribute('ADD_DATE') || 0) * 1000,
-        tags: [siteTags.BOOKMARK]
+        parentFolderId: parserState.parentFolderId
       }
-      parserState.sites.push(site)
+      parserState.bookmarks.push(bookmarks)
       break
   }
 }
@@ -91,17 +88,19 @@ module.exports.importFromHTML = (path) => {
       // Each window's appStoreRenderer holds a copy of the app state, but it's not
       // mutable, so this is only used for getting the current list of sites.
       const parserState = {
-        nextFolderId: siteUtil.getNextFolderId(appStoreRenderer.state.get('sites')),
+        nextFolderId: bookmarFoldersUtil.getNextFolderId(bookmarkFoldersState.getFolders(appStoreRenderer.state)),
         lastFolderId: -1,
         parentFolderId: -1,
-        sites: []
+        bookmarks: [],
+        bookmarkFolders: []
       }
 
       // Process each of the nodes starting with the first node which is either DL or DT
       processBookmarkNode(parserState, doc.querySelector('dl, dt'))
 
       // Add the sites to the app store in the main process
-      appActions.addSite(Immutable.fromJS(parserState.sites))
+      appActions.addBookmark(Immutable.fromJS(parserState.bookmarks))
+      appActions.addBookmarkFolder(Immutable.fromJS(parserState.bookmarkFolders))
       resolve({importCount: parserState.sites.length})
     })
   })

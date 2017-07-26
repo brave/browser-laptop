@@ -8,15 +8,13 @@ const {makeImmutable} = require('../state/immutableUtil')
 const siteUtil = require('../../../js/state/siteUtil')
 const aboutHistoryMaxEntries = 500
 
-module.exports.maxEntries = aboutHistoryMaxEntries
-
 const sortTimeDescending = (left, right) => {
   if (left.get('lastAccessedTime') < right.get('lastAccessedTime')) return 1
   if (left.get('lastAccessedTime') > right.get('lastAccessedTime')) return -1
   return 0
 }
 
-module.exports.getHistory = (sites) => {
+const getHistory = (sites) => {
   sites = makeImmutable(sites) ? makeImmutable(sites).toList() : new Immutable.List()
   return sites.filter((site) => siteUtil.isHistoryEntry(site))
       .sort(sortTimeDescending)
@@ -30,7 +28,7 @@ const getDayString = (entry, locale) => {
     : ''
 }
 
-module.exports.groupEntriesByDay = (history, locale) => {
+const groupEntriesByDay = (history, locale) => {
   const reduced = history.reduce((previousValue, currentValue, currentIndex, array) => {
     const result = currentIndex === 1 ? [] : previousValue
     if (currentIndex === 1) {
@@ -60,7 +58,7 @@ module.exports.groupEntriesByDay = (history, locale) => {
  * Return an array with ALL entries.
  * Format is expected to be array containing one array per day.
  */
-module.exports.totalEntries = (entriesByDay) => {
+const totalEntries = (entriesByDay) => {
   entriesByDay = makeImmutable(entriesByDay) || new Immutable.List()
 
   let result = new Immutable.List()
@@ -68,4 +66,69 @@ module.exports.totalEntries = (entriesByDay) => {
     result = result.push(entry.get('entries'))
   })
   return result
+}
+
+const prepareHistoryEntry = (siteDetail) => {
+  const time = siteDetail.has('lastAccessedTime')
+    ? siteDetail.get('lastAccessedTime')
+    : new Date().getTime()
+
+  return makeImmutable({
+    lastAccessedTime: time,
+    objectId: undefined,
+    title: siteDetail.get('title'),
+    location: siteDetail.get('location'),
+    themeColor: siteDetail.get('themeColor'),
+    favicon: siteDetail.get('favicon', siteDetail.get('icon')),
+    count: 1
+  })
+}
+
+const mergeSiteDetails = (oldDetail, newDetail) => {
+  const objectId = newDetail.has('objectId') ? newDetail.get('objectId') : oldDetail.get('objectId', undefined)
+  const time = newDetail.has('lastAccessedTime')
+    ? newDetail.get('lastAccessedTime')
+    : new Date().getTime()
+
+  let site = makeImmutable({
+    title: newDetail.get('title'),
+    location: newDetail.get('location'),
+    count: ~~oldDetail.get('count', 0) + 1,
+    lastAccessedTime: time,
+    objectId
+  })
+
+  const themeColor = newDetail.has('themeColor') ? newDetail.get('themeColor') : oldDetail.get('themeColor')
+  if (themeColor) {
+    site = site.set('themeColor', themeColor)
+  }
+
+  // we need to have a fallback to icon, because frame has icon for it
+  const favicon = (newDetail.has('favicon') || newDetail.has('icon'))
+    ? newDetail.get('favicon', newDetail.get('icon'))
+    : oldDetail.get('favicon')
+  if (favicon) {
+    site = site.set('favicon', favicon)
+  }
+
+  return site
+}
+
+const getDetailFromFrame = (frame) => {
+  return makeImmutable({
+    location: frame.get('location'),
+    title: frame.get('title'),
+    partitionNumber: frame.get('partitionNumber'),
+    favicon: frame.get('icon'),
+    themeColor: frame.get('themeColor') || frame.get('computedThemeColor')
+  })
+}
+
+module.exports = {
+  getHistory,
+  groupEntriesByDay,
+  totalEntries,
+  prepareHistoryEntry,
+  mergeSiteDetails,
+  getDetailFromFrame
 }

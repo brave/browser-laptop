@@ -3,21 +3,8 @@
 
 'use strict'
 const Immutable = require('immutable')
-const siteUtil = require('../../../js/state/siteUtil')
 const appUrlUtil = require('../../../js/lib/appUrlUtil')
 const UrlUtil = require('../../../js/lib/urlutil')
-
-const createLocationSiteKeysCache = (state) => {
-  state = state.set('locationSiteKeysCache', new Immutable.Map())
-  state.get('sites').forEach((site, siteKey) => {
-    const location = siteUtil.getLocationFromSiteKey(siteKey)
-    if (!location) {
-      return
-    }
-    state = addLocationSiteKey(state, location, siteKey)
-  })
-  return state
-}
 
 const normalizeLocation = (location) => {
   const sourceAboutUrl = appUrlUtil.getSourceAboutUrl(location)
@@ -27,12 +14,40 @@ const normalizeLocation = (location) => {
   return UrlUtil.getLocationIfPDF(location)
 }
 
-module.exports.loadLocationSiteKeysCache = (state) => {
-  const cache = state.get('locationSiteKeysCache')
+/**
+ * Calculate location for siteKey
+ *
+ * @param siteKey The site key to to be calculated
+ * @return {string|null}
+ */
+const getLocationFromCacheKey = function (siteKey) {
+  if (!siteKey) {
+    return null
+  }
+
+  const splitKey = siteKey.split('|', 2)
+  if (typeof splitKey[0] === 'string' && typeof splitKey[1] === 'string') {
+    return splitKey[0]
+  }
+  return null
+}
+
+const generateCache = (state) => {
+  const cache = state.getIn(['cache', 'bookmarkLocation'])
   if (cache) {
     return state
   }
-  return createLocationSiteKeysCache(state)
+
+  state = state.setIn(['cache', 'bookmarkLocation'], new Immutable.Map())
+  const bookmarksState = require('../state/bookmarksState')
+  bookmarksState.getBookmarks(state).forEach((site, siteKey) => {
+    const location = getLocationFromCacheKey(siteKey)
+    if (!location) {
+      return
+    }
+    state = addCacheKey(state, location, siteKey)
+  })
+  return state
 }
 
 /**
@@ -42,9 +57,9 @@ module.exports.loadLocationSiteKeysCache = (state) => {
  * @param location {string}
  * @return {Immutable.List<string>|null} siteKeys including this location.
  */
-module.exports.getLocationSiteKeys = (state, location) => {
+const getCacheKey = (state, location) => {
   const normalLocation = normalizeLocation(location)
-  return state.getIn(['locationSiteKeysCache', normalLocation])
+  return state.getIn(['cache', 'bookmarkLocation', normalLocation], Immutable.List())
 }
 
 /**
@@ -54,13 +69,15 @@ module.exports.getLocationSiteKeys = (state, location) => {
  * @param location {string}
  * @param siteKey {string}
  */
-const addLocationSiteKey = (state, location, siteKey) => {
+const addCacheKey = (state, location, siteKey) => {
   if (!siteKey || !location) {
     return state
   }
+
   const normalLocation = normalizeLocation(location)
-  const cacheKey = ['locationSiteKeysCache', normalLocation]
+  const cacheKey = ['cache', 'bookmarkLocation', normalLocation]
   const siteKeys = state.getIn(cacheKey)
+
   if (!siteKeys) {
     return state.setIn(cacheKey, new Immutable.List([siteKey]))
   } else {
@@ -70,7 +87,6 @@ const addLocationSiteKey = (state, location, siteKey) => {
     return state.setIn(cacheKey, siteKeys.push(siteKey))
   }
 }
-module.exports.addLocationSiteKey = addLocationSiteKey
 
 /**
  * Given a location, remove matching appState siteKeys in cache.
@@ -79,16 +95,17 @@ module.exports.addLocationSiteKey = addLocationSiteKey
  * @param location {string}
  * @param siteKey {string}
  */
-const removeLocationSiteKey = (state, location, siteKey) => {
+const removeCacheKey = (state, location, siteKey) => {
   if (!siteKey || !location) {
     return state
   }
   const normalLocation = normalizeLocation(location)
-  const cacheKey = ['locationSiteKeysCache', normalLocation]
+  const cacheKey = ['cache', 'bookmarkLocation', normalLocation]
   let siteKeys = state.getIn(cacheKey)
   if (!siteKeys) {
     return state
   }
+
   siteKeys = siteKeys.filter(key => key !== siteKey)
   if (siteKeys.size > 0) {
     return state.setIn(cacheKey, siteKeys)
@@ -96,4 +113,10 @@ const removeLocationSiteKey = (state, location, siteKey) => {
     return state.deleteIn(cacheKey)
   }
 }
-module.exports.removeLocationSiteKey = removeLocationSiteKey
+
+module.exports = {
+  generateCache,
+  getCacheKey,
+  addCacheKey,
+  removeCacheKey
+}

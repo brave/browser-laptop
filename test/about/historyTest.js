@@ -19,10 +19,10 @@ describe('about:history', function () {
 
   function * addDemoSites (client) {
     yield client
-      .addSite({ location: 'https://brave.com', title: 'Brave' })
-      .addSite({ location: 'https://brave.com/test', customTitle: 'customTest' })
-      .addSite({ location: 'https://www.youtube.com' })
-      .addSite({ location: 'https://www.facebook.com' })
+      .addHistorySite({ location: 'https://brave.com', title: 'Brave' })
+      .addHistorySite({ location: 'https://brave.com/test', title: 'customTest' })
+      .addHistorySite({ location: 'https://www.youtube.com' })
+      .addHistorySite({ location: 'https://www.facebook.com' })
       .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
       .tabByIndex(0)
       .url(aboutHistoryUrl)
@@ -31,7 +31,7 @@ describe('about:history', function () {
   function * addBrowseableSite (client) {
     const site = Brave.server.url(browseableSiteUrl)
     yield client
-      .addSite({
+      .addHistorySite({
         location: site,
         title: 'Page 1'
       })
@@ -57,11 +57,6 @@ describe('about:history', function () {
       yield this.app.client
         .waitForVisible('table.sortableTable td.title[data-sort="Brave"]')
         .waitForVisible('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
-    })
-
-    it('does NOT use customTitle when displaying entries', function * () {
-      yield this.app.client
-        .waitForElementCount('table.sortableTable td.title[data-sort="customTest"]', 0)
     })
 
     it('defaults to sorting table by time DESC', function * () {

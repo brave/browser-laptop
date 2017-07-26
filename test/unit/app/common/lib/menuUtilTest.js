@@ -134,15 +134,6 @@ describe('menuUtil tests', function () {
       assert.equal(menuItems.length, 1)
       assert.equal(menuItems[0].label, 'my website')
     })
-    it('prefers the customTitle field for the bookmark title (over the page title)', function () {
-      const appStateSites = Immutable.fromJS([
-        { tags: [siteTags.BOOKMARK], customTitle: 'use this', title: 'not this', location: 'https://brave.com' }
-      ])
-
-      const menuItems = menuUtil.createBookmarkTemplateItems(appStateSites)
-
-      assert.equal(menuItems[0].label, 'use this')
-    })
     it('only returns bookmarks that have a location set', function () {
       const appStateSites = Immutable.fromJS({
         sites: [
@@ -186,17 +177,6 @@ describe('menuUtil tests', function () {
       assert.equal(menuItems[0].label, 'my folder')
       assert.equal(menuItems[0].submenu.length, 1)
       assert.equal(menuItems[0].submenu[0].label, 'my website')
-    })
-    it('considers customTitle when processing folders', function () {
-      const appStateSites = Immutable.fromJS([
-        { tags: [siteTags.BOOKMARK_FOLDER], customTitle: 'use this', title: 'not this', folderId: 123 },
-        { tags: [siteTags.BOOKMARK], title: 'my website', location: 'https://brave.com', parentFolderId: 123 }
-      ])
-
-      const menuItems = menuUtil.createBookmarkTemplateItems(appStateSites)
-
-      assert.equal(menuItems.length, 1)
-      assert.equal(menuItems[0].label, 'use this')
     })
   })
 
