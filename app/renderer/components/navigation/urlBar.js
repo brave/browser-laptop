@@ -438,7 +438,7 @@ class UrlBar extends React.Component {
     const displayEntry = tabState.getVisibleEntry(state, activeTabId) || Immutable.Map()
     const displayURL = tabState.getVisibleVirtualURL(state, activeTabId) || ''
     const hostValue = displayEntry.get('host', '')
-    const protocol = displayEntry.get('protocol', '')
+    const protocol = (displayEntry.get('protocol', '')).split(':')[0]
 
     const baseUrl = getBaseUrl(location)
     const urlbar = activeFrame.getIn(['navbar', 'urlbar']) || Immutable.Map()
