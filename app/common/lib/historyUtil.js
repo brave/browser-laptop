@@ -5,7 +5,6 @@
 
 const Immutable = require('immutable')
 const {makeImmutable} = require('../state/immutableUtil')
-const siteUtil = require('../../../js/state/siteUtil')
 const aboutHistoryMaxEntries = 500
 
 const sortTimeDescending = (left, right) => {
@@ -16,7 +15,7 @@ const sortTimeDescending = (left, right) => {
 
 const getHistory = (sites) => {
   sites = makeImmutable(sites) ? makeImmutable(sites).toList() : new Immutable.List()
-  return sites.filter((site) => siteUtil.isHistoryEntry(site))
+  return sites
       .sort(sortTimeDescending)
       .slice(0, aboutHistoryMaxEntries)
 }
@@ -29,7 +28,7 @@ const getDayString = (entry, locale) => {
 }
 
 const groupEntriesByDay = (history, locale) => {
-  const reduced = history.reduce((previousValue, currentValue, currentIndex, array) => {
+  const reduced = history.reduce((previousValue, currentValue, currentIndex) => {
     const result = currentIndex === 1 ? [] : previousValue
     if (currentIndex === 1) {
       const firstDate = getDayString(previousValue, locale)
@@ -78,9 +77,9 @@ const prepareHistoryEntry = (siteDetail) => {
     objectId: undefined,
     title: siteDetail.get('title'),
     location: siteDetail.get('location'),
+    count: 1,
     themeColor: siteDetail.get('themeColor'),
-    favicon: siteDetail.get('favicon', siteDetail.get('icon')),
-    count: 1
+    favicon: siteDetail.get('favicon', siteDetail.get('icon'))
   })
 }
 
@@ -91,11 +90,11 @@ const mergeSiteDetails = (oldDetail, newDetail) => {
     : new Date().getTime()
 
   let site = makeImmutable({
+    lastAccessedTime: time,
+    objectId,
     title: newDetail.get('title'),
     location: newDetail.get('location'),
-    count: ~~oldDetail.get('count', 0) + 1,
-    lastAccessedTime: time,
-    objectId
+    count: ~~oldDetail.get('count', 0) + 1
   })
 
   const themeColor = newDetail.has('themeColor') ? newDetail.get('themeColor') : oldDetail.get('themeColor')

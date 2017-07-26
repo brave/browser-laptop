@@ -452,20 +452,6 @@ var exports = {
       }, 5000, null, 100)
     })
 
-    this.app.client.addCommand('waitForAddressEntry', function (location, waitForTitle = true) {
-      logVerbose('waitForAddressEntry("' + location + '", "' + waitForTitle + '")')
-      return this.waitUntil(function () {
-        return this.getAppState().then((val) => {
-          const ret = val.value && val.value.sites && Array.from(Object.values(val.value.sites)).find(
-            (site) => site.location === location &&
-              (!waitForTitle || (waitForTitle && site.title)))
-          logVerbose('sites:' + JSON.stringify(val.value.sites))
-          logVerbose('waitForAddressEntry("' + location + '", ' + waitForTitle + ') => ' + ret)
-          return ret
-        })
-      }, 5000, null, 100)
-    })
-
     this.app.client.addCommand('waitForBookmarkDetail', function (location, title) {
       logVerbose('waitForBookmarkDetail("' + location + '", "' + title + '")')
       return this.waitUntil(function () {

@@ -26,7 +26,7 @@ const historyReducer = (state, action, immutableAction) => {
         const temp = state.get('tempClearBrowsingData', Immutable.Map())
         const clearData = defaults ? defaults.merge(temp) : temp
         if (clearData.get('browserHistory')) {
-          state = historyState.clearSites()
+          state = historyState.clearSites(state)
           filtering.clearHistory()
         }
         break

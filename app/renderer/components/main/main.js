@@ -541,7 +541,7 @@ class Main extends React.Component {
       !isSourceAboutUrl(activeFrame.get('location'))
     props.showBravery = shieldState.braveShieldsEnabled(activeFrame) &&
       !!currentWindow.get('braveryPanelDetail')
-    props.showClearData = currentWindow.hasIn(['ui', 'isClearBrowsingDataPanelVisible'])
+    props.showClearData = currentWindow.getIn(['ui', 'isClearBrowsingDataPanelVisible'], false)
     props.showImportData = currentWindow.has('importBrowserDataDetail')
     props.showWidevine = currentWindow.getIn(['widevinePanelDetail', 'shown']) && !isLinux
     props.showAutoFillAddress = currentWindow.has('autofillAddressDetail')
@@ -550,7 +550,7 @@ class Main extends React.Component {
     props.showBookmarkHanger = currentWindow.has('bookmarkDetail') &&
       !currentWindow.getIn(['bookmarkDetail', 'isBookmarkHanger'])
     props.showBookmarkFolderDialog = currentWindow.has('bookmarkFolderDetail')
-    props.showNoScript = currentWindow.hasIn(['ui', 'noScriptInfo', 'isVisible']) &&
+    props.showNoScript = currentWindow.getIn(['ui', 'noScriptInfo', 'isVisible']) &&
       siteUtil.getOrigin(activeFrame.get('location'))
     props.showReleaseNotes = currentWindow.getIn(['ui', 'releaseNotes', 'isVisible'])
     props.showCheckDefault = isFocused() && defaultBrowserState.shouldDisplayDialog(state)

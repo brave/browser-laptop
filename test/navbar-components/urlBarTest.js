@@ -374,7 +374,11 @@ describe('urlBar tests', function () {
   })
 
   describe('with scrolling match', function () {
-    Brave.beforeEach(this)
+    Brave.beforeAll(this)
+
+    before(function * () {
+      yield setup(this.app.client)
+    })
 
     it('typing in the urlbar should override mouse hover for suggestions', function * () {
       yield this.app.client

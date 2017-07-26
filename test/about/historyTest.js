@@ -20,7 +20,7 @@ describe('about:history', function () {
   function * addDemoSites (client) {
     yield client
       .addHistorySite({ location: 'https://brave.com', title: 'Brave' })
-      .addHistorySite({ location: 'https://brave.com/test', title: 'customTest' })
+      .addHistorySite({ location: 'https://brave.com/test' })
       .addHistorySite({ location: 'https://www.youtube.com' })
       .addHistorySite({ location: 'https://www.facebook.com' })
       .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
@@ -57,6 +57,11 @@ describe('about:history', function () {
       yield this.app.client
         .waitForVisible('table.sortableTable td.title[data-sort="Brave"]')
         .waitForVisible('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
+    })
+
+    it('does NOT use customTitle when displaying entries', function * () {
+      yield this.app.client
+        .waitForElementCount('table.sortableTable td.title[data-sort="customTest"]', 0)
     })
 
     it('defaults to sorting table by time DESC', function * () {
