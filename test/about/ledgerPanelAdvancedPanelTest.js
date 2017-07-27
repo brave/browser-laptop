@@ -130,7 +130,8 @@ let generateAndSaveRecoveryFile = function (recoveryFilePath, paymentId, passphr
   fs.writeFileSync(recoveryFilePath, recoveryFileContents)
 }
 
-describe('Advanced payment panel tests', function () {
+// TODO re-enable when #9677 is fixed
+describe.skip('Advanced payment panel tests', function () {
   let context = this
   Brave.beforeEach(this)
 
