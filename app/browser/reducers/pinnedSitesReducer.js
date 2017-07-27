@@ -52,9 +52,9 @@ const pinnedSitesReducer = (state, action, immutableAction) => {
       {
         state = pinnedSitesState.reOrderSite(
           state,
-          action.siteKey,
-          action.destinationKey,
-          action.prepend
+          action.get('siteKey'),
+          action.get('destinationKey'),
+          action.get('prepend')
         )
 
         // TODO do we need this for pinned sites?

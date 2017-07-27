@@ -169,7 +169,7 @@ class NewTabPage extends React.Component {
 
   onToggleBookmark (site) {
     if (site.get('bookmarked')) {
-      windowActions.editBookmark(false, site.get('key'))
+      windowActions.editBookmark(site.get('key'))
     } else {
       windowActions.onBookmarkAdded(false, site)
     }

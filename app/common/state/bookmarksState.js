@@ -135,10 +135,15 @@ const bookmarksState = {
     return state
   },
 
-  editBookmark: (state, bookmarkDetail, editKey) => {
+  editBookmark: (state, editKey, bookmarkDetail) => {
     state = validateState(state)
 
     const oldBookmark = bookmarksState.getBookmark(state, editKey)
+
+    if (oldBookmark.isEmpty()) {
+      return state
+    }
+
     let newBookmark = oldBookmark.merge(bookmarkDetail)
 
     let location
@@ -192,6 +197,10 @@ const bookmarksState = {
    */
   removeBookmarksByParentId: (state, parentFolderId) => {
     state = validateState(state)
+
+    if (parentFolderId == null) {
+      return state
+    }
 
     const bookmarks = bookmarksState.getBookmarks(state)
       .filter(bookmark => bookmark.get('parentFolderId') !== ~~parentFolderId)

@@ -33,12 +33,12 @@ const getLocationFromCacheKey = function (siteKey) {
 }
 
 const generateCache = (state) => {
-  const cache = state.getIn(['cache', 'bookmarkLocation'])
-  if (cache) {
+  const cache = state.getIn(['cache', 'bookmarkLocation']) || Immutable.Map()
+  if (!cache.isEmpty()) {
     return state
   }
 
-  state = state.setIn(['cache', 'bookmarkLocation'], new Immutable.Map())
+  state = state.setIn(['cache', 'bookmarkLocation'], Immutable.Map())
   const bookmarksState = require('../state/bookmarksState')
   bookmarksState.getBookmarks(state).forEach((site, siteKey) => {
     const location = getLocationFromCacheKey(siteKey)

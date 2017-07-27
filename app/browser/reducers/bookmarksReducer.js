@@ -25,7 +25,7 @@ const bookmarksReducer = (state, action, immutableAction) => {
     case appConstants.APP_ADD_BOOKMARK:
       {
         const closestKey = action.get('closestKey')
-        let bookmark = action.get('siteDetail')
+        const bookmark = action.get('siteDetail')
 
         if (bookmark == null) {
           break
@@ -52,13 +52,14 @@ const bookmarksReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_EDIT_BOOKMARK:
       {
-        let bookmark = action.get('siteDetail')
+        const bookmark = action.get('siteDetail', Immutable.Map())
+        const key = action.get('editKey')
 
-        if (bookmark == null) {
+        if (key == null || bookmark.isEmpty()) {
           break
         }
 
-        state = bookmarksState.editBookmark(state, bookmark, action.get('editKey'))
+        state = bookmarksState.editBookmark(state, key, bookmark)
 
         if (syncUtil.syncEnabled()) {
           state = syncUtil.updateSiteCache(state, bookmark)
@@ -69,9 +70,15 @@ const bookmarksReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_MOVE_BOOKMARK:
       {
+        const key = action.get('bookmarkKey')
+
+        if (key == null) {
+          break
+        }
+
         state = bookmarksState.moveBookmark(
           state,
-          action.get('bookmarkKey'),
+          key,
           action.get('destinationKey'),
           action.get('append'),
           action.get('moveIntoParent')
@@ -85,12 +92,17 @@ const bookmarksReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_REMOVE_BOOKMARK:
       {
-        if (Immutable.List.isList(action.get('bookmarkKey'))) {
+        const bookmarkKey = action.get('bookmarkKey')
+        if (bookmarkKey == null) {
+          break
+        }
+
+        if (Immutable.List.isList(bookmarkKey)) {
           action.get('bookmarkKey', Immutable.List()).forEach((key) => {
             state = bookmarksState.removeBookmark(state, key)
           })
         } else {
-          state = bookmarksState.removeBookmark(state, action.get('bookmarkKey'))
+          state = bookmarksState.removeBookmark(state, bookmarkKey)
         }
         state = bookmarkUtil.updateActiveTabBookmarked(state)
         break

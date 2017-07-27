@@ -21,6 +21,11 @@ const pinnedSiteState = {
     return state.get('pinnedSites')
   },
 
+  getSite: (state, key) => {
+    state = validateState(state)
+    return state.getIn(['pinnedSites', key], Immutable.Map())
+  },
+
   /**
    * Adds the specified siteDetail in appState.pinnedSites.
    * @param {Immutable.Map} state The application state Immutable map

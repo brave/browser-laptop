@@ -20,7 +20,7 @@ const bookmarkFoldersReducer = (state, action, immutableAction) => {
     case appConstants.APP_ADD_BOOKMARK_FOLDER:
       {
         const closestKey = action.get('closestKey')
-        let folder = action.get('folderDetails')
+        const folder = action.get('folderDetails')
 
         if (folder == null) {
           break
@@ -45,13 +45,14 @@ const bookmarkFoldersReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_EDIT_BOOKMARK_FOLDER:
       {
-        let folder = action.get('folderDetails')
+        const folder = action.get('folderDetails', Immutable.Map())
+        const key = action.get('editKey')
 
-        if (folder == null) {
+        if (key == null || folder.isEmpty()) {
           break
         }
 
-        state = bookmarkFoldersState.editFolder(state, folder, action.get('editKey'))
+        state = bookmarkFoldersState.editFolder(state, key, folder)
 
         if (syncUtil.syncEnabled()) {
           state = syncUtil.updateSiteCache(state, folder)
@@ -61,9 +62,15 @@ const bookmarkFoldersReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_MOVE_BOOKMARK_FOLDER:
       {
+        const key = action.get('folderKey')
+
+        if (key == null) {
+          break
+        }
+
         state = bookmarkFoldersState.moveFolder(
           state,
-          action.get('folderKey'),
+          key,
           action.get('destinationKey'),
           action.get('append'),
           action.get('moveIntoParent')
@@ -77,7 +84,13 @@ const bookmarkFoldersReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_REMOVE_BOOKMARK_FOLDER:
       {
-        state = bookmarkFoldersState.removeFolder(state, action.get('folderKey'))
+        const key = action.get('folderKey')
+
+        if (key == null) {
+          break
+        }
+
+        state = bookmarkFoldersState.removeFolder(state, key)
         break
       }
   }

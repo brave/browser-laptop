@@ -72,9 +72,13 @@ const bookmarkFoldersState = {
     return state
   },
 
-  editFolder: (state, folderDetails, editKey) => {
+  editFolder: (state, editKey, folderDetails) => {
     state = validateState(state)
     const oldFolder = bookmarkFoldersState.getFolder(state, editKey)
+
+    if (oldFolder.isEmpty()) {
+      return state
+    }
 
     const newFolder = oldFolder.merge(makeImmutable({
       title: folderDetails.get('title'),
@@ -117,6 +121,14 @@ const bookmarkFoldersState = {
     return state.deleteIn(['bookmarkFolders', folderKey.toString()])
   },
 
+  /**
+   * Get all folders except provided folder
+   * @param state
+   * @param folderKey
+   * @param parentFolderId
+   * @param labelPrefix
+   * @returns {Array}
+   */
   getFoldersWithoutKey: (state, folderKey, parentFolderId = 0, labelPrefix = '') => {
     let folders = []
     const results = bookmarkFoldersState.getFoldersByParentId(state, parentFolderId)

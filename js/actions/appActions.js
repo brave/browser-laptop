@@ -1433,6 +1433,11 @@ const appActions = {
     })
   },
 
+  /**
+   * Dispatches a message that adds a bookmark
+   * @param siteDetail{Immutable.Map|Immutable.List} - Bookmark details that we want to add, this can be a List as well
+   * @param closestKey{string} - Key of the sibling where we would like to place this new bookmark
+   */
   addBookmark: function (siteDetail, closestKey) {
     dispatch({
       actionType: appConstants.APP_ADD_BOOKMARK,
@@ -1441,14 +1446,26 @@ const appActions = {
     })
   },
 
-  editBookmark: function (siteDetail, editKey) {
+  /**
+   * Dispatches a message that edits a bookmark
+   * @param editKey{string} - Key of the bookmark that we want to edit
+   * @param siteDetail{Immutable.Map} - Data that we want to change
+   */
+  editBookmark: function (editKey, siteDetail) {
     dispatch({
       actionType: appConstants.APP_EDIT_BOOKMARK,
-      siteDetail,
-      editKey
+      editKey,
+      siteDetail
     })
   },
 
+  /**
+   * Dispatches a message that moves a bookmark to another destination
+   * @param bookmarkKey{string} - Key of the bookmark that we want to move
+   * @param destinationKey{string} - Key of the bookmark/folder where we would like to move
+   * @param append{boolean} - Defines if we will append(true) or prepend(false) moved bookmark
+   * @param moveIntoParent{boolean} - Should we move folder into destination folder or not
+   */
   moveBookmark: function (bookmarkKey, destinationKey, append, moveIntoParent) {
     dispatch({
       actionType: appConstants.APP_MOVE_BOOKMARK,
@@ -1460,7 +1477,7 @@ const appActions = {
   },
 
   /**
-   * Removes bookmark
+   * Dispatches a message that removes a bookmark
    * @param bookmarkKey {string|Immutable.List} - Bookmark key that we want to remove. This could also be list of keys
    */
   removeBookmark: function (bookmarkKey) {
@@ -1470,6 +1487,11 @@ const appActions = {
     })
   },
 
+  /**
+   * Dispatches a message that adds a bookmark folder
+   * @param folderDetails{Immutable.Map|Immutable.List} - Folder details that we want to add, this can be List as well
+   * @param closestKey{string} - Key of the sibling where we would like to place this new folder
+   */
   addBookmarkFolder: function (folderDetails, closestKey) {
     dispatch({
       actionType: appConstants.APP_ADD_BOOKMARK_FOLDER,
@@ -1478,14 +1500,26 @@ const appActions = {
     })
   },
 
-  editBookmarkFolder: function (folderDetails, editKey) {
+  /**
+   * Dispatches a message that edits a bookmark folder
+   * @param editKey{string} - Key of the folder that we want to edit
+   * @param folderDetails{Immutable.Map} - Data that we want to change
+   */
+  editBookmarkFolder: function (editKey, folderDetails) {
     dispatch({
       actionType: appConstants.APP_EDIT_BOOKMARK_FOLDER,
-      folderDetails,
-      editKey
+      editKey,
+      folderDetails
     })
   },
 
+  /**
+   * Dispatches a message that moves a bookmark folder to another destination
+   * @param folderKey{string} - Key of the folder that we want to move
+   * @param destinationKey{string} - Key of the bookmark/folder where we would like to move
+   * @param append{boolean} - Defines if we will append(true) or prepend(false) moved folder
+   * @param moveIntoParent{boolean} - Should we move folder into destination folder or not
+   */
   moveBookmarkFolder: function (folderKey, destinationKey, append, moveIntoParent) {
     dispatch({
       actionType: appConstants.APP_MOVE_BOOKMARK_FOLDER,
@@ -1496,6 +1530,10 @@ const appActions = {
     })
   },
 
+  /**
+   * Dispatches a message that removes a bookmark folder
+   * @param folderKey{string} - Key of the folder that we want to remove
+   */
   removeBookmarkFolder: function (folderKey) {
     dispatch({
       actionType: appConstants.APP_REMOVE_BOOKMARK_FOLDER,

@@ -140,7 +140,7 @@ class AddEditBookmarkForm extends React.Component {
     data = data.set('location', location)
 
     if (this.props.editKey != null) {
-      appActions.editBookmark(data, this.props.editKey)
+      appActions.editBookmark(this.props.editKey, data)
     } else {
       appActions.addBookmark(data, this.props.closestKey)
     }

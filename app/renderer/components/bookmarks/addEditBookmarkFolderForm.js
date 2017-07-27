@@ -123,7 +123,7 @@ class AddEditBookmarkFolderForm extends React.Component {
     data = data.set('title', title)
 
     if (this.props.editKey != null) {
-      appActions.editBookmarkFolder(data, this.props.editKey)
+      appActions.editBookmarkFolder(this.props.editKey, data)
     } else {
       appActions.addBookmarkFolder(data, this.props.closestKey)
     }

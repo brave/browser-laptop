@@ -335,7 +335,7 @@ const siteSingleDetailTemplate = (siteKey, type, activeFrame) => {
             if (isFolder) {
               windowActions.editBookmarkFolder(siteKey)
             } else {
-              windowActions.editBookmark(false, siteKey)
+              windowActions.editBookmark(siteKey)
             }
           }
         },

@@ -48,7 +48,7 @@ class NavigationBar extends React.Component {
 
   onToggleBookmark () {
     if (this.props.isBookmarked) {
-      windowActions.editBookmark(true, this.props.bookmarkKey)
+      windowActions.editBookmark(this.props.bookmarkKey, true)
     } else {
       windowActions.onBookmarkAdded(true)
     }

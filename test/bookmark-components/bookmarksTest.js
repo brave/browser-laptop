@@ -339,15 +339,15 @@ describe('bookmark tests', function () {
     Brave.beforeAll(this)
 
     before(function * () {
+      yield setup(this.app.client)
+    })
+
+    it('rebuilds the menu when a folder is added', function * () {
       if (!isWindows) {
         this.skip()
         return
       }
 
-      yield setup(this.app.client)
-    })
-
-    it('rebuilds the menu when a folder is added', function * () {
       const folderName = 'bookmark-folder-rebuild-menu-demo'
 
       yield this.app.client
@@ -373,6 +373,11 @@ describe('bookmark tests', function () {
     })
 
     it('rebuilds the menu when a bookmark is added', function * () {
+      if (!isWindows) {
+        this.skip()
+        return
+      }
+
       const bookmarkTitle = 'bookmark-rebuild-menu-demo'
 
       yield this.app.client
@@ -399,6 +404,11 @@ describe('bookmark tests', function () {
     })
 
     it('rebuilds the menu when add a list of items', function * () {
+      if (!isWindows) {
+        this.skip()
+        return
+      }
+
       const bookmarkTitle = 'bookmark-rebuild-menu-demo'
       const folderName = 'bookmark-folder-rebuild-menu-demo'
       yield this.app.client

@@ -504,7 +504,7 @@ const windowActions = {
    * Used for displaying bookmark hanger
    * when editing bookmark site or folder
    */
-  editBookmark: function (isHanger, editKey) {
+  editBookmark: function (editKey, isHanger) {
     dispatch({
       actionType: windowConstants.WINDOW_ON_EDIT_BOOKMARK,
       editKey,
