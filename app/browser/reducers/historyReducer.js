@@ -10,6 +10,7 @@ const aboutHistoryState = require('../../common/state/aboutHistoryState')
 
 // Constants
 const appConstants = require('../../../js/constants/appConstants')
+const {STATE_SITES} = require('../../../js/constants/stateConstants')
 
 // Utils
 const {makeImmutable} = require('../../common/state/immutableUtil')
@@ -33,21 +34,16 @@ const historyReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ADD_HISTORY_SITE:
       {
-        const isSyncEnabled = syncUtil.syncEnabled()
         const detail = action.get('siteDetail')
 
         if (Immutable.List.isList(detail)) {
           detail.forEach((item) => {
             state = historyState.addSite(state, item)
-            if (isSyncEnabled) {
-              state = syncUtil.updateSiteCache(state, item)
-            }
+            state = syncUtil.updateObjectCache(state, item, STATE_SITES.HISTORY_SITES)
           })
         } else {
           state = historyState.addSite(state, detail)
-          if (isSyncEnabled) {
-            state = syncUtil.updateSiteCache(state, detail)
-          }
+          state = syncUtil.updateObjectCache(state, detail, STATE_SITES.HISTORY_SITES)
         }
 
         calculateTopSites(true)
@@ -60,18 +56,14 @@ const historyReducer = (state, action, immutableAction) => {
         if (Immutable.List.isList(action.get('historyKey'))) {
           action.get('historyKey', Immutable.List()).forEach((key) => {
             state = historyState.removeSite(state, key)
+            // TODO: Implement Sync history site removal
+            // state = syncUtil.updateObjectCache(state, action.get('siteDetail'), STATE_SITES.HISTORY_SITES)
           })
         } else {
           state = historyState.removeSite(state, action.get('historyKey'))
+          // TODO: Implement Sync history site removal
+          // state = syncUtil.updateObjectCache(state, action.get('siteDetail'), STATE_SITES.HISTORY_SITES)
         }
-
-        // TODO fix sync
-        /*
-        if (syncUtil.syncEnabled()) {
-          //syncActions.removeSite(historyState.getSite(state, action.get('historyKey')))
-          //state = syncUtil.updateSiteCache(state, action.get('siteDetail'))
-        }
-        */
 
         calculateTopSites(true)
         state = aboutHistoryState.setHistory(state, historyState.getSites(state))
