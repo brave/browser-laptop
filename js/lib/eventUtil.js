@@ -11,8 +11,9 @@ module.exports.isForSecondaryAction = (e) =>
 
 module.exports.eventElHasAncestorWithClasses = (e, classesToCheck) => {
   // DO NOT ADD NEW CHECKS USING THIS METHOD
-  // classNames are changed from dev to prod by Aphrodite
+  // classNames are changed from dev to prod by Aphrodite est. v1.2.3
   // and new code will not work. Consider using dataset attribute instead.
+  // See issue #10029 for a breaking example.
   // ....
   // TODO deprecate this method.
   let node = e.target
