@@ -1293,6 +1293,17 @@ const appActions = {
   },
 
   /**
+   * Notifies autoplay notification can be dismissed
+   * @param {number} tabId - Tab id of current frame
+   */
+  autoplayDismissed: function (tabId) {
+    dispatch({
+      actionType: appConstants.APP_AUTOPLAY_DISMISSED,
+      tabId
+    })
+  },
+
+  /**
    * Handle 'save-password' event from muon
    */
   savePassword: function (username, origin, tabId) {
