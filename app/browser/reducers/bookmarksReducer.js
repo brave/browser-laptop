@@ -9,6 +9,7 @@ const bookmarksState = require('../../common/state/bookmarksState')
 
 // Constants
 const appConstants = require('../../../js/constants/appConstants')
+const {STATE_SITES} = require('../../../js/constants/stateConstants')
 
 // Utils
 const {makeImmutable} = require('../../common/state/immutableUtil')
@@ -34,17 +35,11 @@ const bookmarksReducer = (state, action, immutableAction) => {
         if (Immutable.List.isList(bookmark)) {
           action.get('siteDetail', Immutable.List()).forEach((bookmark) => {
             state = bookmarksState.addBookmark(state, bookmark, closestKey)
-
-            if (syncUtil.syncEnabled()) {
-              state = syncUtil.updateSiteCache(state, bookmark)
-            }
+            state = syncUtil.updateObjectCache(state, bookmark, STATE_SITES.BOOKMARKS)
           })
         } else {
           state = bookmarksState.addBookmark(state, bookmark, closestKey)
-
-          if (syncUtil.syncEnabled()) {
-            state = syncUtil.updateSiteCache(state, bookmark)
-          }
+          state = syncUtil.updateObjectCache(state, bookmark, STATE_SITES.BOOKMARKS)
         }
 
         state = bookmarkUtil.updateActiveTabBookmarked(state)
@@ -60,10 +55,7 @@ const bookmarksReducer = (state, action, immutableAction) => {
         }
 
         state = bookmarksState.editBookmark(state, key, bookmark)
-
-        if (syncUtil.syncEnabled()) {
-          state = syncUtil.updateSiteCache(state, bookmark)
-        }
+        state = syncUtil.updateObjectCache(state, bookmark, STATE_SITES.BOOKMARKS)
 
         state = bookmarkUtil.updateActiveTabBookmarked(state)
         break
@@ -84,10 +76,8 @@ const bookmarksReducer = (state, action, immutableAction) => {
           action.get('moveIntoParent')
         )
 
-        if (syncUtil.syncEnabled()) {
-          const destinationDetail = state.getIn(['sites', action.get('destinationKey')])
-          state = syncUtil.updateSiteCache(state, destinationDetail)
-        }
+        const destinationDetail = bookmarksState.getBookmark(state, action.get('destinationKey'))
+        state = syncUtil.updateObjectCache(state, destinationDetail, STATE_SITES.BOOKMARKS)
         break
       }
     case appConstants.APP_REMOVE_BOOKMARK:

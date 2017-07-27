@@ -10,6 +10,7 @@ const sinon = require('sinon')
 
 const appConstants = require('../../../../../js/constants/appConstants')
 const siteTags = require('../../../../../js/constants/siteTags')
+const {STATE_SITES} = require('../../../../../js/constants/stateConstants')
 require('../../../braveUnit')
 
 describe('bookmarkFoldersReducer unit test', function () {
@@ -249,7 +250,7 @@ describe('bookmarkFoldersReducer unit test', function () {
         },
         editKey: '1'
       })
-      const expectedState = stateWithData.setIn(['bookmarkFolders', '1', 'title'], 'folder1 new')
+      const expectedState = stateWithData.setIn([STATE_SITES.BOOKMARK_FOLDERS, '1', 'title'], 'folder1 new')
       assert.equal(spy.calledOnce, true)
       assert.deepEqual(newState.toJS(), expectedState.toJS())
     })
@@ -326,7 +327,7 @@ describe('bookmarkFoldersReducer unit test', function () {
             type: siteTags.BOOKMARK_FOLDER
           }
         ]))
-        .deleteIn(['bookmarkFolders', '1'])
+        .deleteIn([STATE_SITES.BOOKMARK_FOLDERS, '1'])
       assert.equal(spy.calledOnce, true)
       assert.deepEqual(newState.toJS(), expectedState.toJS())
     })

@@ -7,11 +7,15 @@ const Immutable = require('immutable')
 const appActions = require('../actions/appActions')
 const crypto = require('crypto')
 const writeActions = require('../constants/sync/proto').actions
-const siteTags = require('../constants/siteTags')
 const siteUtil = require('./siteUtil')
 const {getSetting} = require('../settings')
 const {isDataUrl} = require('../lib/urlutil')
+const bookmarkUtil = require('../../app/common/lib/bookmarkUtil')
+const bookmarkFoldersState = require('../../app/common/state/bookmarkFoldersState')
+const bookmarkFoldersUtil = require('../../app/common/lib/bookmarkFoldersUtil')
 const settings = require('../constants/settings')
+
+const {STATE_SITES} = require('../constants/stateConstants')
 
 const CATEGORY_MAP = {
   bookmark: {
@@ -63,6 +67,11 @@ const SITE_FIELDS = [
   'parentFolderId'
 ]
 
+// The Sync cache maps {sync objectId} -> {app state object path}
+// See createObjectCache() and updateObjectCache().
+const STATE_SITES_VALUES = Object.values(STATE_SITES)
+const CACHED_STATE_COLLECTIONS = STATE_SITES_VALUES
+
 const pickFields = (object, fields) => {
   return fields.reduce((a, x) => {
     if (object.hasOwnProperty(x)) { a[x] = object[x] }
@@ -90,10 +99,12 @@ let objectToFolderMap = new Immutable.Map()
 const folderToObjectMap = {}
 
 /**
- * Converts sync records into a form that can be consumed by AppStore.
+ * Converts sync bookmark and history records into an object that can be
+ * consumed by AppStore actions.
  * @param {Object} record
  * @param {Immutable.Map} appState
  * @param {Immutable.List=} records - batch of records possibly not yet applied
+ * @returns {Object}
  */
 module.exports.getSiteDataFromRecord = (record, appState, records) => {
   const objectId = new Immutable.List(record.objectId)
@@ -106,7 +117,6 @@ module.exports.getSiteDataFromRecord = (record, appState, records) => {
     existingObjectData = existingObject && existingObject[1]
   }
 
-  let tag
   const siteProps = Object.assign(
     {},
     existingObjectData && existingObjectData.toJS(),
@@ -121,24 +131,17 @@ module.exports.getSiteDataFromRecord = (record, appState, records) => {
     if (existingFolderId) {
       siteProps.folderId = existingFolderId
     }
-    const isFolder = (typeof siteProps.isFolder === 'boolean')
-      ? siteProps.isFolder
-      : !!existingFolderId
-    tag = isFolder
-      ? siteTags.BOOKMARK_FOLDER
-      : siteTags.BOOKMARK
     const parentFolderObjectId = siteProps.parentFolderObjectId
     if (parentFolderObjectId && parentFolderObjectId.length > 0) {
       siteProps.parentFolderId =
         getFolderIdByObjectId(new Immutable.List(parentFolderObjectId), appState, records)
     } else {
       // Null or empty parentFolderObjectId on a record corresponds to
-      // a top-level bookmark. -1 indicates a hidden bookmark.
+      // a top-level bookmark. -1 indicates a hidden bookmark (Other bookmarks).
       siteProps.parentFolderId = siteProps.hideInToolbar ? -1 : 0
     }
   }
-  const siteDetail = new Immutable.Map(pickFields(siteProps, SITE_FIELDS))
-  return {siteDetail, tag, existingObjectData}
+  return new Immutable.Map(pickFields(siteProps, SITE_FIELDS))
 }
 
 const applySiteSettingRecord = (record) => {
@@ -229,47 +232,95 @@ const applySyncRecord = (record) => {
   }
 }
 
+const assignFolderIdsToRecords = (records, state) => {
+  const folders = bookmarkFoldersState.getFolders(state)
+  let nextFolderId = bookmarkFoldersUtil.getNextFolderId(folders)
+  return records.map(record => {
+    if (record.action !== writeActions.DELETE &&
+      record.bookmark && record.bookmark.isFolder &&
+      record.bookmark.site &&
+      typeof record.bookmark.site.folderId !== 'number') {
+      record.bookmark.site.folderId = nextFolderId
+      nextFolderId = nextFolderId + 1
+    }
+    return record
+  })
+}
+
 /**
  * Apply several SyncRecords in a less blocking manner.
  * @param {Array<Object>} records
  */
 module.exports.applySyncRecords = (records) => {
   if (!records || records.length === 0) { return }
-  const bookmarkRecords = []
-  const bookmarkFoldersRecords = []
-  const historyRecords = []
+  const AppStore = require('../stores/appStore')
+  const appState = AppStore.getState()
   const otherRecords = []
+  const shouldAddRecord = (record) =>
+    [writeActions.CREATE, writeActions.UPDATE].includes(record.action)
+  const shouldRemoveRecord = (record) => writeActions.DELETE === record.action
+
+  // Ensure that all folders are assigned folderIds
+  records = assignFolderIdsToRecords(records, appState)
+
+  /*
+   * Apply records in the same order they're received.
+   * For example assume these Create bookmark records:
+   * [Site 1, Site 2, Folder A, Site X (in Folder A)]
+   * If we accumulated all bookmark sites and applied together, then Folder A
+   * would be out of order.
+   * So instead we buffer all records applied with a particular action (e.g.
+   * bookmark sites), then when the apply action changes (e.g. to folders) we
+   * first flush the buffer (e.g. apply the first sequence of sites).
+   */
+  let buffer = []
+  let previousAppAction = () => {}
+  const flushBufferedAppActions = () => {
+    if (!buffer.length) { return }
+    previousAppAction(new Immutable.List(buffer))
+    buffer = []
+  }
+  const bufferAppAction = (appAction, item) => {
+    if (previousAppAction !== appAction) {
+      flushBufferedAppActions()
+      previousAppAction = appAction
+    }
+    buffer.push(item)
+  }
+
   records.forEach((record) => {
-    if (record && ['bookmark'].includes(record.objectData)) {
-      bookmarkRecords.push(record)
-    } else if (record && ['historySite'].includes(record.objectData)) {
-      historyRecords.push(record)
-    } else if (record && ['bookmark-folder'].includes(record.objectData)) {
-      bookmarkFoldersRecords.push(record)
+    if (!record) {
+      return true
+    }
+    if (record.objectData === 'bookmark') {
+      const siteData = module.exports.getSiteDataFromRecord(record, appState, records)
+      if (shouldAddRecord(record)) {
+        if (record.bookmark.isFolder) {
+          bufferAppAction(appActions.addBookmarkFolder, siteData)
+        } else {
+          bufferAppAction(appActions.addBookmark, siteData)
+        }
+      } else if (shouldRemoveRecord(record)) {
+        const siteKey = siteUtil.getSiteKey(siteData)
+        // TODO: removeBookmarkFolder doesn't support List removal
+        setImmediate(() => {
+          appActions.removeBookmarkFolder(siteKey)
+        })
+      }
+    } else if (record.objectData === 'historySite') {
+      const siteData = module.exports.getSiteDataFromRecord(record, appState, records)
+      if (shouldAddRecord(record)) {
+        bufferAppAction(appActions.addHistorySite, siteData)
+      } else if (shouldRemoveRecord(record)) {
+        const siteKey = siteUtil.getSiteKey(siteData)
+        bufferAppAction(appActions.removeHistorySite, siteKey)
+      }
     } else {
       otherRecords.push(record)
     }
   })
+  flushBufferedAppActions()
   applyNonBatchedRecords(otherRecords)
-
-  // TODO we now always add (need to check record.action for what to do)
-  if (bookmarkRecords.length) {
-    setImmediate(() => {
-      appActions.addBookmarks(new Immutable.List(bookmarkRecords))
-    })
-  }
-
-  if (bookmarkFoldersRecords.length) {
-    setImmediate(() => {
-      appActions.addBookmarkFolder(new Immutable.List(bookmarkFoldersRecords))
-    })
-  }
-
-  if (historyRecords.length) {
-    setImmediate(() => {
-      appActions.addHistorySite(new Immutable.List(historyRecords))
-    })
-  }
 }
 
 /**
@@ -321,15 +372,16 @@ module.exports.getExistingObject = (categoryName, syncRecord) => {
  * @param {Immutable.Map} appState application state
  * @returns {Immutable.Map} new app state
  */
-module.exports.createSiteCache = (appState) => {
+module.exports.createObjectCache = (appState) => {
   const objectsById = new Immutable.Map().withMutations(objectsById => {
-    // TODO what to do here?
-    appState.get('sites').forEach((site, siteKey) => {
-      const objectId = site.get('objectId')
-      if (!objectId) { return true }
-      const cacheKey = objectId.toJS().join('|')
-      objectsById = objectsById.set(cacheKey, ['sites', siteKey])
-    })
+    for (let collectionKey of CACHED_STATE_COLLECTIONS) {
+      appState.get(collectionKey).forEach((object, objectKey) => {
+        const objectId = object.get('objectId')
+        if (!objectId) { return true }
+        const cacheKey = objectId.toJS().join('|')
+        objectsById = objectsById.set(cacheKey, [collectionKey, objectKey])
+      })
+    }
   })
   return appState.setIn(['sync', 'objectsById'], objectsById)
 }
@@ -338,29 +390,33 @@ module.exports.createSiteCache = (appState) => {
  * Cache a sync object's key path by objectId.
  * XXX: Currently only caches sites (history and bookmarks).
  * @param {Immutable.Map} appState application state
- * @param {Immutable.Map} siteDetail
+ * @param {Immutable.Map} object object detail (e.g. siteDetail)
+ * @param {string} collectionKey one of CACHED_STATE_COLLECTIONS ('bookmarks', 'bookmarkFolders', 'historySites', 'pinnedSites')
  * @returns {Immutable.Map} new app state
  */
-module.exports.updateSiteCache = (appState, siteDetail) => {
-  if (!siteDetail) { return appState }
-  const siteKey = siteUtil.getSiteKey(siteDetail)
-  const object = appState.getIn(['sites', siteKey])
-  const objectId = (object && object.get('objectId')) || siteDetail.get('objectId')
+module.exports.updateObjectCache = (appState, object, collectionKey) => {
+  if (!module.exports.syncEnabled() || !object || (typeof object.isEmpty === 'function' && object.isEmpty()) || !collectionKey || !CACHED_STATE_COLLECTIONS.includes(collectionKey)) {
+    return appState
+  }
+  // XXX: Currently only caches sites (history and bookmarks).
+  const stateKeyPath = [collectionKey, siteUtil.getSiteKey(object)]
+  const stateObject = appState.getIn(stateKeyPath)
+  const objectId = (stateObject && stateObject.get('objectId')) || object.get('objectId')
   if (!objectId) { return appState }
   const cacheKey = ['sync', 'objectsById', objectId.toJS().join('|')]
-  if (object) {
-    return appState.setIn(cacheKey, ['sites', siteKey])
+  if (stateObject) {
+    return appState.setIn(cacheKey, stateKeyPath)
   } else {
     return appState.deleteIn(cacheKey)
   }
 }
 
 /**
- * Given an objectId and category, return the matching browser object.
+ * Given an objectId, return the matching browser object.
  * @param {Immutable.List} objectId
  * @param {string} category
  * @param {Immutable.Map=} appState
- * @returns {Array} [<Array>, <Immutable.Map>] array is AppStore searchKeyPath e.g. ['sites', 10] for use with updateIn
+ * @returns {Array} [<Array>, <Immutable.Map>] array is AppStore searchKeyPath e.g. ['bookmarkSites', 10] for use with updateIn
  */
 const getObjectById = (objectId, category, appState) => {
   if (!(objectId instanceof Immutable.List)) {
@@ -437,7 +493,7 @@ module.exports.now = () => {
  */
 module.exports.isSyncable = (type, item) => {
   if (type === 'bookmark') {
-    return siteUtil.isBookmark(item) || siteUtil.isFolder(item)
+    return bookmarkUtil.isBookmark(item) || bookmarkFoldersUtil.isFolder(item)
   } else if (type === 'siteSetting') {
     for (let field in module.exports.siteSettingDefaults) {
       if (item.has(field)) {
@@ -472,13 +528,13 @@ const findOrCreateFolderObjectId = (folderId, appState) => {
     const AppStore = require('../stores/appStore')
     appState = AppStore.getState()
   }
-  const folder = appState.getIn(['sites', folderId.toString()])
-  if (!folder) { return undefined }
+  const folder = bookmarkFoldersState.getFolder(appState, folderId)
+  if (folder.isEmpty()) { return undefined }
   const objectId = folder.get('objectId')
   if (objectId) {
     return objectId.toJS()
   } else {
-    return module.exports.newObjectId(['sites', folderId.toString()])
+    return module.exports.newObjectId([STATE_SITES.BOOKMARK_FOLDERS, folder.get('key')])
   }
 }
 
@@ -515,20 +571,22 @@ module.exports.createSiteData = (site, appState) => {
   let value
   if (module.exports.isSyncable('bookmark', immutableSite)) {
     name = 'bookmark'
+    const isFolder = bookmarkFoldersUtil.isFolder(immutableSite)
+    const sitesCollection = isFolder ? STATE_SITES.BOOKMARK_FOLDERS : STATE_SITES.BOOKMARKS
     objectId = site.objectId ||
       folderToObjectMap[site.folderId] ||
-      module.exports.newObjectId(['sites', siteKey])
+      module.exports.newObjectId([sitesCollection, siteKey])
     parentFolderObjectId = site.parentFolderObjectId ||
       folderToObjectMap[site.parentFolderId] ||
       findOrCreateFolderObjectId(site.parentFolderId, appState)
     value = {
       site: siteData,
-      isFolder: siteUtil.isFolder(immutableSite),
+      isFolder,
       hideInToolbar: site.parentFolderId === -1,
       parentFolderObjectId
     }
   } else if (siteUtil.isHistoryEntry(immutableSite)) {
-    objectId = site.objectId || module.exports.newObjectId(['sites', siteKey])
+    objectId = site.objectId || module.exports.newObjectId([STATE_SITES.HISTORY_SITES, siteKey])
     name = 'historySite'
     value = siteData
   }

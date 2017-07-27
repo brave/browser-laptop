@@ -5,25 +5,26 @@
 const assert = require('assert')
 const Immutable = require('immutable')
 const siteUtil = require('../../../js/state/siteUtil')
+const {STATE_SITES} = require('../../../js/constants/stateConstants')
 const urlUtil = require('../../../js/lib/urlutil')
 const {makeImmutable, isMap} = require('./immutableUtil')
 
 const validateState = function (state) {
   state = makeImmutable(state)
   assert.ok(isMap(state), 'state must be an Immutable.Map')
-  assert.ok(isMap(state.get('pinnedSites')), 'state must contain an Immutable.Map of pinnedSites')
+  assert.ok(isMap(state.get(STATE_SITES.PINNED_SITES)), 'state must contain an Immutable.Map of pinnedSites')
   return state
 }
 
 const pinnedSiteState = {
   getSites: (state) => {
     state = validateState(state)
-    return state.get('pinnedSites')
+    return state.get(STATE_SITES.PINNED_SITES)
   },
 
   getSite: (state, key) => {
     state = validateState(state)
-    return state.getIn(['pinnedSites', key], Immutable.Map())
+    return state.getIn([STATE_SITES.PINNED_SITES, key], Immutable.Map())
   },
 
   /**
@@ -47,7 +48,7 @@ const pinnedSiteState = {
       return state
     }
 
-    state = state.setIn(['pinnedSites', key], site)
+    state = state.setIn([STATE_SITES.PINNED_SITES, key], site)
     return state
   },
 
@@ -65,7 +66,7 @@ const pinnedSiteState = {
       return state
     }
 
-    const stateKey = ['pinnedSites', key]
+    const stateKey = [STATE_SITES.PINNED_SITES, key]
     let site = state.getIn(stateKey)
     if (!site) {
       return state
@@ -87,7 +88,7 @@ const pinnedSiteState = {
    */
   reOrderSite: (state, sourceKey, destinationKey, prepend) => {
     state = validateState(state)
-    let sites = state.get('pinnedSites')
+    let sites = state.get(STATE_SITES.PINNED_SITES)
     let sourceSite = sites.get(sourceKey, Immutable.Map())
     const destinationSite = sites.get(destinationKey, Immutable.Map())
 
@@ -102,7 +103,7 @@ const pinnedSiteState = {
       --newIndex
     }
 
-    state = state.set('pinnedSites', state.get('pinnedSites').map((site, index) => {
+    state = state.set(STATE_SITES.PINNED_SITES, state.get(STATE_SITES.PINNED_SITES).map((site, index) => {
       const siteOrder = site.get('order')
       if (index === sourceKey) {
         return site
@@ -118,7 +119,7 @@ const pinnedSiteState = {
     }))
 
     sourceSite = sourceSite.set('order', newIndex)
-    return state.setIn(['pinnedSites', sourceKey], sourceSite)
+    return state.setIn([STATE_SITES.PINNED_SITES, sourceKey], sourceSite)
   }
 }
 

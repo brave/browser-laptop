@@ -784,16 +784,27 @@ var exports = {
     })
 
     /**
-     * Removes a site from the sites list, or removes a bookmark.
+     * Removes a bookmark.
      *
-     * @param {object} siteDetail - Properties for the frame to add
-     * @param {string} tag - A site tag from js/constants/siteTags.js
+     * @param bookmarkKey {string|Immutable.List} - Bookmark key that we want to remove. This could also be list of keys
      */
-    this.app.client.addCommand('removeSite', function (siteDetail, tag) {
-      logVerbose('removeSite("' + siteDetail + '", "' + tag + '")')
-      return this.execute(function (siteDetail, tag) {
-        return devTools('appActions').removeSite(siteDetail, tag)
-      }, siteDetail, tag).then((response) => response.value)
+    this.app.client.addCommand('removeBookmark', function (bookmarkKey) {
+      logVerbose('removeBookmark("' + bookmarkKey + '")')
+      return this.execute(function (bookmarkKey) {
+        return devTools('appActions').removeBookmark(bookmarkKey)
+      }, bookmarkKey).then((response) => response.value)
+    })
+
+    /**
+     * Removes a bookmark folder.
+     *
+     * @param {object} folderKey folder key to remove
+     */
+    this.app.client.addCommand('removeBookmarkFolder', function (folderKey) {
+      logVerbose('removeBookmarkFolder("' + folderKey + '")')
+      return this.execute(function (folderKey) {
+        return devTools('appActions').removeBookmarkFolder(folderKey)
+      }, folderKey).then((response) => response.value)
     })
 
     /**

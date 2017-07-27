@@ -11,6 +11,7 @@ const syncActions = require('../../../js/actions/syncActions')
 // Constants
 const settings = require('../../../js/constants/settings')
 const siteTags = require('../../../js/constants/siteTags')
+const {STATE_SITES} = require('../../../js/constants/stateConstants')
 
 // State
 const bookmarkOrderCache = require('../cache/bookmarkOrderCache')
@@ -24,20 +25,20 @@ const {getSetting} = require('../../../js/settings')
 const validateState = function (state) {
   state = makeImmutable(state)
   assert.ok(isMap(state), 'state must be an Immutable.Map')
-  assert.ok(isMap(state.get('bookmarkFolders')), 'state must contain an Immutable.Map of bookmarkFolders')
+  assert.ok(isMap(state.get(STATE_SITES.BOOKMARK_FOLDERS)), 'state must contain an Immutable.Map of bookmarkFolders')
   return state
 }
 
 const bookmarkFoldersState = {
   getFolders: (state) => {
     state = validateState(state)
-    return state.get('bookmarkFolders', Immutable.Map())
+    return state.get(STATE_SITES.BOOKMARK_FOLDERS, Immutable.Map())
   },
 
   getFolder: (state, folderKey) => {
     state = validateState(state)
     folderKey = folderKey.toString()
-    return state.getIn(['bookmarkFolders', folderKey], Immutable.Map())
+    return state.getIn([STATE_SITES.BOOKMARK_FOLDERS, folderKey], Immutable.Map())
   },
 
   getFoldersByParentId: (state, parentFolderId) => {
@@ -67,7 +68,7 @@ const bookmarkFoldersState = {
       type: siteTags.BOOKMARK_FOLDER
     })
 
-    state = state.setIn(['bookmarkFolders', key.toString()], newFolder)
+    state = state.setIn([STATE_SITES.BOOKMARK_FOLDERS, key.toString()], newFolder)
     state = bookmarkOrderCache.addFolderToCache(state, newFolder.get('parentFolderId'), key, destinationKey)
     return state
   },
@@ -90,7 +91,7 @@ const bookmarkFoldersState = {
       state = bookmarkOrderCache.addFolderToCache(state, newFolder.get('parentFolderId'), editKey)
     }
 
-    state = state.setIn(['bookmarkFolders', editKey.toString()], newFolder)
+    state = state.setIn([STATE_SITES.BOOKMARK_FOLDERS, editKey.toString()], newFolder)
     return state
   },
 
@@ -118,7 +119,7 @@ const bookmarkFoldersState = {
     state = bookmarksState.removeBookmarksByParentId(state, folderKey)
     state = bookmarkOrderCache.removeCacheParent(state, folderKey)
     state = bookmarkOrderCache.removeCacheKey(state, folder.get('parentFolderId'), folderKey)
-    return state.deleteIn(['bookmarkFolders', folderKey.toString()])
+    return state.deleteIn([STATE_SITES.BOOKMARK_FOLDERS, folderKey.toString()])
   },
 
   /**
@@ -169,9 +170,9 @@ const bookmarkFoldersState = {
       state = bookmarkOrderCache.removeCacheKey(state, folder.get('parentFolderId'), folderKey)
       folder = folder.set('parentFolderId', ~~parentFolderId)
       const newKey = siteUtil.getSiteKey(folder)
-      state = state.deleteIn(['bookmarkFolders', folderKey])
+      state = state.deleteIn([STATE_SITES.BOOKMARK_FOLDERS, folderKey])
       state = bookmarkOrderCache.addFolderToCache(state, folder.get('parentFolderId'), newKey)
-      return state.setIn(['bookmarkFolders', newKey.toString()], folder)
+      return state.setIn([STATE_SITES.BOOKMARK_FOLDERS, newKey.toString()], folder)
     }
 
     state = bookmarkOrderCache.removeCacheKey(state, folder.get('parentFolderId'), folderKey)

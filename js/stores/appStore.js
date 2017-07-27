@@ -9,6 +9,7 @@ const ExtensionConstants = require('../../app/common/constants/extensionConstant
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
+const {STATE_SITES} = require('../constants/stateConstants')
 const siteUtil = require('../state/siteUtil')
 const syncUtil = require('../state/syncUtil')
 const siteSettings = require('../state/siteSettings')
@@ -793,10 +794,8 @@ const handleAppAction = (action) => {
       if (obj && obj.constructor === Immutable.Map) {
         appState = appState.setIn(action.objectPath.concat(['objectId']),
           action.objectId)
-        // Update the site cache if this is a site
-        if (action.objectPath[0] === 'sites') {
-          appState = syncUtil.updateSiteCache(appState, obj)
-        }
+        appState = syncUtil.updateObjectCache(appState, obj,
+          action.objectPath[0])
       }
       break
     case appConstants.APP_SAVE_SYNC_DEVICES:
@@ -828,33 +827,31 @@ const handleAppAction = (action) => {
       appState = appState.setIn(['sync', 'setupError'], action.error)
       break
     case appConstants.APP_CREATE_SYNC_CACHE:
-      appState = syncUtil.createSiteCache(appState)
+      appState = syncUtil.createObjectCache(appState)
       break
     case appConstants.APP_RESET_SYNC_DATA:
       const sessionStore = require('../../app/sessionStore')
       const syncDefault = Immutable.fromJS(sessionStore.defaultAppState().sync)
-      const originalSeed = appState.getIn(['sync', 'seed'])
       appState = appState.set('sync', syncDefault)
-      bookmarksState.getBookmarks(appState).forEach((site, key) => {
-        if (site.has('objectId')) {
-          // Remember which profile this bookmark was originally synced to.
-          // Since old bookmarks should be synced when a new profile is created,
-          // we have to keep track of which profile already has these bookmarks
-          // or else the old profile may have these bookmarks duplicated. #7405
-          appState = appState.setIn(['bookmarks', key, 'originalSeed'], originalSeed)
-        }
-      })
-      bookmarkFoldersState.getFolders(appState).forEach((site, key) => {
-        if (site.has('objectId')) {
-          // Remember which profile this bookmark was originally synced to.
-          // Since old bookmarks should be synced when a new profile is created,
-          // we have to keep track of which profile already has these bookmarks
-          // or else the old profile may have these bookmarks duplicated. #7405
-          appState = appState.setIn(['bookmarks', key, 'originalSeed'], originalSeed)
-        }
-      })
-      appState.setIn(['sync', 'devices'], {})
-      appState.setIn(['sync', 'objectsById'], {})
+
+      // Remember which profile this bookmark was originally synced to.
+      // Since old bookmarks should be synced when a new profile is created,
+      // we have to keep track of which profile already has these bookmarks
+      // or else the old profile may have these bookmarks duplicated. #7405
+      const originalSeed = appState.getIn(['sync', 'seed'])
+      const setOriginalSeed = (state, objects) => {
+        objects.forEach((site, key) => {
+          if (!site.has('objectId')) {
+            return true
+          }
+          state = state.setIn([STATE_SITES.BOOKMARKS, key, 'originalSeed'], originalSeed)
+        })
+        return state
+      }
+      appState = setOriginalSeed(appState, bookmarksState.getBookmarks(appState))
+      appState = setOriginalSeed(appState, bookmarkFoldersState.getFolders(appState))
+      appState = appState.setIn(['sync', 'devices'], {})
+      appState = appState.setIn(['sync', 'objectsById'], {})
       break
     case appConstants.APP_SET_VERSION_INFO:
       if (action.name && action.version) {

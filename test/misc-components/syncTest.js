@@ -3,7 +3,6 @@
 const crypto = require('crypto')
 const settings = require('../../js/constants/settings')
 const {newTabMode} = require('../../app/common/constants/settingsEnums')
-const siteTags = require('../../js/constants/siteTags')
 const Brave = require('../lib/brave')
 const Immutable = require('immutable')
 const {adsBlockedControl, allowAllCookiesOption, bookmarksToolbar, braveMenu, braveryPanel, braveryPanelContainer, cookieControl, doneButton, fpSwitch, httpsEverywhereSwitch, navigatorBookmarked, navigatorNotBookmarked, noScriptSwitch, urlInput, removeButton, safeBrowsingSwitch, showAdsOption, syncTab, syncSwitch, bookmarkNameInput} = require('../lib/selectors')
@@ -405,8 +404,7 @@ describe('Syncing bookmarks', function () {
     const folder2Id = 2 // XXX: Hardcoded
     yield Brave.app.client
     yield bookmarkUrl(this.folder2Page1Url, this.folder2Page1Title, folder2Id)
-    yield Brave.app.client
-      .removeSite({ folderId: folder2Id }, siteTags.BOOKMARK_FOLDER)
+    yield Brave.app.client.removeBookmarkFolder(folder2Id)
 
     // XXX: Wait for sync to upload records to S3
     yield Brave.app.client.pause(1000)
@@ -538,6 +536,7 @@ describe('Syncing bookmarks from an existing profile', function () {
       .click(navigatorBookmarked)
       .waitForVisible(doneButton)
       .waitForInputText(bookmarkNameInput, this.page2TitleUpdated)
+      .click(doneButton)
 
     // Create folder then add a bookmark
     yield addBookmarkFolder(this.folder1Title)

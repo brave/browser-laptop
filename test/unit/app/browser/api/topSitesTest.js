@@ -8,6 +8,7 @@ const assert = require('assert')
 const sinon = require('sinon')
 const mockery = require('mockery')
 const siteUtil = require('../../../../../js/state/siteUtil')
+const {STATE_SITES} = require('../../../../../js/constants/stateConstants')
 
 let getStateValue
 
@@ -155,7 +156,7 @@ describe('topSites api', function () {
     it('respects position of pinned items when populating results', function () {
       const allPinned = Immutable.fromJS([site1, site4])
       const stateWithPinnedSites = defaultAppState
-        .set('historySites', generateMap(site1, site2, site3, site4))
+        .set(STATE_SITES.HISTORY_SITES, generateMap(site1, site2, site3, site4))
         .setIn(['about', 'newtab', 'pinnedTopSites'], allPinned)
       this.topSites.calculateTopSites(stateWithPinnedSites)
       // checks:
@@ -188,7 +189,7 @@ describe('topSites api', function () {
     })
 
     it('only includes one result for a domain (the one with the highest count)', function () {
-      const stateWithDuplicateDomains = defaultAppState.set('historySites', generateMap(
+      const stateWithDuplicateDomains = defaultAppState.set(STATE_SITES.HISTORY_SITES, generateMap(
         site1.set('location', 'https://example1.com/test').set('count', 12),
         site1.set('location', 'https://example1.com/about').set('count', 7)))
       this.topSites.calculateTopSites(stateWithDuplicateDomains)
@@ -211,7 +212,7 @@ describe('topSites api', function () {
 
     describe('when fetching unpinned results', function () {
       it('sorts results by `count` DESC', function () {
-        const stateWithSites = defaultAppState.set('historySites', generateMap(site1, site2, site3, site4))
+        const stateWithSites = defaultAppState.set(STATE_SITES.HISTORY_SITES, generateMap(site1, site2, site3, site4))
         this.topSites.calculateTopSites(stateWithSites)
         getStateValue = stateWithSites
         this.clock.tick(calculateTopSitesClockTime)
@@ -256,7 +257,7 @@ describe('topSites api', function () {
       })
 
       it('sorts results by `lastAccessedTime` DESC if `count` is the same', function () {
-        const stateWithSites = defaultAppState.set('historySites', generateMap(site1, site3, site5))
+        const stateWithSites = defaultAppState.set(STATE_SITES.HISTORY_SITES, generateMap(site1, site3, site5))
         this.topSites.calculateTopSites(stateWithSites)
         getStateValue = stateWithSites
         this.clock.tick(calculateTopSitesClockTime)
@@ -304,7 +305,7 @@ describe('topSites api', function () {
               .set('bookmarked', false)
           )
         }
-        const stateWithTooManySites = defaultAppState.set('historySites', tooManySites)
+        const stateWithTooManySites = defaultAppState.set(STATE_SITES.HISTORY_SITES, tooManySites)
         this.topSites.calculateTopSites(stateWithTooManySites)
 
         getStateValue = stateWithTooManySites
@@ -318,7 +319,7 @@ describe('topSites api', function () {
       it('does not include items marked as ignored', function () {
         const ignoredSites = Immutable.List().push('https://example1.com/|0|0').push('https://example3.com/|0|0')
         const stateWithIgnoredSites = defaultAppState
-          .set('historySites', generateMap(site1, site2, site3, site4))
+          .set(STATE_SITES.HISTORY_SITES, generateMap(site1, site2, site3, site4))
           .setIn(['about', 'newtab', 'ignoredTopSites'], ignoredSites)
         this.topSites.calculateTopSites(stateWithIgnoredSites)
         getStateValue = stateWithIgnoredSites

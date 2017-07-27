@@ -9,6 +9,7 @@ const bookmarkFoldersState = require('../../common/state/bookmarkFoldersState')
 
 // Constants
 const appConstants = require('../../../js/constants/appConstants')
+const {STATE_SITES} = require('../../../js/constants/stateConstants')
 
 // Utils
 const {makeImmutable} = require('../../common/state/immutableUtil')
@@ -29,17 +30,11 @@ const bookmarkFoldersReducer = (state, action, immutableAction) => {
         if (Immutable.List.isList(folder)) {
           action.get('folderDetails', Immutable.List()).forEach((folder) => {
             state = bookmarkFoldersState.addFolder(state, folder, closestKey)
-
-            if (syncUtil.syncEnabled()) {
-              state = syncUtil.updateSiteCache(state, folder)
-            }
+            state = syncUtil.updateObjectCache(state, folder, STATE_SITES.BOOKMARK_FOLDERS)
           })
         } else {
           state = bookmarkFoldersState.addFolder(state, folder, closestKey)
-
-          if (syncUtil.syncEnabled()) {
-            state = syncUtil.updateSiteCache(state, folder)
-          }
+          state = syncUtil.updateObjectCache(state, folder, STATE_SITES.BOOKMARK_FOLDERS)
         }
         break
       }
@@ -53,10 +48,7 @@ const bookmarkFoldersReducer = (state, action, immutableAction) => {
         }
 
         state = bookmarkFoldersState.editFolder(state, key, folder)
-
-        if (syncUtil.syncEnabled()) {
-          state = syncUtil.updateSiteCache(state, folder)
-        }
+        state = syncUtil.updateObjectCache(state, folder, STATE_SITES.BOOKMARK_FOLDERS)
 
         break
       }
@@ -76,10 +68,8 @@ const bookmarkFoldersReducer = (state, action, immutableAction) => {
           action.get('moveIntoParent')
         )
 
-        if (syncUtil.syncEnabled()) {
-          const destinationDetail = state.getIn(['sites', action.get('destinationKey')])
-          state = syncUtil.updateSiteCache(state, destinationDetail)
-        }
+        const destinationDetail = bookmarkFoldersState.getFolder(state, action.get('destinationKey'))
+        state = syncUtil.updateObjectCache(state, destinationDetail, STATE_SITES.BOOKMARK_FOLDERS)
         break
       }
     case appConstants.APP_REMOVE_BOOKMARK_FOLDER:
@@ -90,7 +80,9 @@ const bookmarkFoldersReducer = (state, action, immutableAction) => {
           break
         }
 
+        const folder = state.getIn([STATE_SITES.BOOKMARK_FOLDERS, key])
         state = bookmarkFoldersState.removeFolder(state, key)
+        state = syncUtil.updateObjectCache(state, folder, STATE_SITES.BOOKMARK_FOLDERS)
         break
       }
   }

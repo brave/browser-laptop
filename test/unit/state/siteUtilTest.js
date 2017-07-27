@@ -2,6 +2,7 @@
 
 const siteTags = require('../../../js/constants/siteTags')
 const siteUtil = require('../../../js/state/siteUtil')
+const {STATE_SITES} = require('../../../js/constants/stateConstants')
 const assert = require('assert')
 const Immutable = require('immutable')
 const bookmarkFoldersState = require('../../../app/common/state/bookmarkFoldersState')
@@ -117,32 +118,32 @@ describe('siteUtil', function () {
       let state = bookmarkFoldersState.addFolder(emptyState, folderMinFields)
       const folderMinFieldsWithId = folderMinFields.set('folderId', 1)
       const processedKey = siteUtil.getSiteKey(folderMinFieldsWithId)
-      const folderId = state.getIn(['bookmarkFolders', processedKey, 'folderId'])
+      const folderId = state.getIn([STATE_SITES.BOOKMARK_FOLDERS, processedKey, 'folderId'])
       // Add a bookmark into that folder
       state = bookmarksStaate.addBookmark(state, bookmarkAllFields.set('parentFolderId', folderId))
-      const bookmarkFolder = state.getIn(['bookmarkFolders', processedKey])
+      const bookmarkFolder = state.getIn([STATE_SITES.BOOKMARK_FOLDERS, processedKey])
       // Should NOT be able to move bookmark folder into itself
-      assert.equal(false, siteUtil.isMoveAllowed(state.get('bookmarkFolders'), bookmarkFolder, bookmarkFolder))
+      assert.equal(false, siteUtil.isMoveAllowed(state.get(STATE_SITES.BOOKMARK_FOLDERS), bookmarkFolder, bookmarkFolder))
     })
     it('does not allow you to move an ancestor folder into a descendant folder', function () {
       // Add a new bookmark folder
       let state = bookmarkFoldersState.addFolder(emptyState, folderMinFields)
       const folderMinFieldsWithId1 = folderMinFields.set('folderId', 1)
       const processedKey1 = siteUtil.getSiteKey(folderMinFieldsWithId1)
-      const folderId1 = state.getIn(['bookmarkFolders', processedKey1, 'folderId'])
+      const folderId1 = state.getIn([STATE_SITES.BOOKMARK_FOLDERS, processedKey1, 'folderId'])
       // Add a child below that folder
       state = bookmarkFoldersState.addFolder(state, folderMinFields.set('parentFolderId', folderId1))
       const folderMinFieldsWithId2 = folderMinFields.set('folderId', 2)
       const processedKey2 = siteUtil.getSiteKey(folderMinFieldsWithId2)
-      const folderId2 = state.getIn(['bookmarkFolders', processedKey2, 'folderId'])
+      const folderId2 = state.getIn([STATE_SITES.BOOKMARK_FOLDERS, processedKey2, 'folderId'])
       // Add a folder below the previous child
       state = bookmarkFoldersState.addFolder(state, folderMinFields.set('parentFolderId', folderId2))
       const folderMinFieldsWithId3 = folderMinFields.set('folderId', 3)
       const processedKey3 = siteUtil.getSiteKey(folderMinFieldsWithId3)
-      const bookmarkFolder1 = state.getIn(['bookmarkFolders', processedKey1])
-      const bookmarkFolder3 = state.getIn(['bookmarkFolders', processedKey3])
+      const bookmarkFolder1 = state.getIn([STATE_SITES.BOOKMARK_FOLDERS, processedKey1])
+      const bookmarkFolder3 = state.getIn([STATE_SITES.BOOKMARK_FOLDERS, processedKey3])
       // Should NOT be able to move grandparent folder into its grandchild
-      assert.equal(false, siteUtil.isMoveAllowed(state.get('bookmarkFolders'), bookmarkFolder1, bookmarkFolder3))
+      assert.equal(false, siteUtil.isMoveAllowed(state.get(STATE_SITES.BOOKMARK_FOLDERS), bookmarkFolder1, bookmarkFolder3))
     })
   })
 

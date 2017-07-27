@@ -2,6 +2,7 @@
 
 const siteTags = require('../../../../../js/constants/siteTags')
 const siteCache = require('../../../../../app/common/cache/bookmarkLocationCache')
+const {STATE_SITES} = require('../../../../../js/constants/stateConstants')
 const siteUtil = require('../../../../../js/state/siteUtil')
 const assert = require('assert')
 const Immutable = require('immutable')
@@ -103,7 +104,7 @@ describe('bookmarkLocationCache unit test', function () {
         type: siteTags.BOOKMARK
       })
       const siteKey = siteUtil.getSiteKey(site)
-      let state = baseState.setIn(['bookmarks', siteKey], site)
+      let state = baseState.setIn([STATE_SITES.BOOKMARKS, siteKey], site)
       state = siteCache.generateCache(state)
 
       // Sanity
