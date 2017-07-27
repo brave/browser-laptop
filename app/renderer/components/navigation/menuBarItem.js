@@ -67,6 +67,7 @@ class MenuBarItem extends React.Component {
 
   render () {
     return <span
+      data-menubar-item
       className={'menubarItem' + (this.props.selected ? ' selected' : '')}
       onClick={this.onClick}
       onMouseOver={this.onMouseOver}

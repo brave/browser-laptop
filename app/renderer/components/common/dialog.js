@@ -41,11 +41,13 @@ class Dialog extends ImmutableComponent {
   }
 
   render () {
-    return <div className={cx({
-      [css(styles.dialog)]: true,
-      [css(styles.dialog_isNotClickDismiss)]: !this.props.isClickDismiss,
-      [this.props.className]: !!this.props.className
-    })}
+    return <div
+      data-bookmark-hanger={this.props.bookmarkHanger}
+      className={cx({
+        [css(styles.dialog)]: true,
+        [css(styles.dialog_isNotClickDismiss)]: !this.props.isClickDismiss,
+        [this.props.className]: !!this.props.className
+      })}
       data-test-id={this.props.testId}
       data-test2-id={this.props.test2Id}
       tabIndex='-1'

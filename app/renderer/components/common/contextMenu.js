@@ -509,6 +509,7 @@ class ContextMenu extends React.Component {
     }
 
     return <div
+      data-context-menu
       ref={(node) => { this.node = node }}
       className={cx({
         contextMenu: true,
