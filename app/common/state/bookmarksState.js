@@ -8,6 +8,7 @@ const Immutable = require('immutable')
 // Constants
 const settings = require('../../../js/constants/settings')
 const siteTags = require('../../../js/constants/siteTags')
+const {STATE_SITES} = require('../../../js/constants/stateConstants')
 const newTabData = require('../../../js/data/newTabData')
 
 // State
@@ -29,19 +30,19 @@ const {makeImmutable, isMap} = require('./immutableUtil')
 const validateState = function (state) {
   state = makeImmutable(state)
   assert.ok(isMap(state), 'state must be an Immutable.Map')
-  assert.ok(isMap(state.get('bookmarks')), 'state must contain an Immutable.Map of bookmarks')
+  assert.ok(isMap(state.get(STATE_SITES.BOOKMARKS)), 'state must contain an Immutable.Map of bookmarks')
   return state
 }
 
 const bookmarksState = {
   getBookmarks: (state) => {
     state = validateState(state)
-    return state.get('bookmarks')
+    return state.get(STATE_SITES.BOOKMARKS)
   },
 
   getBookmark: (state, key) => {
     state = validateState(state)
-    return state.getIn(['bookmarks', key], Immutable.Map())
+    return state.getIn([STATE_SITES.BOOKMARKS, key], Immutable.Map())
   },
 
   /**
@@ -126,12 +127,12 @@ const bookmarksState = {
       return state
     }
 
-    if (!state.hasIn(['bookmarks', key])) {
+    if (!state.hasIn([STATE_SITES.BOOKMARKS, key])) {
       state = bookmarkLocationCache.addCacheKey(state, location, key)
       state = bookmarkOrderCache.addBookmarkToCache(state, bookmark.get('parentFolderId'), key, destinationKey)
     }
 
-    state = state.setIn(['bookmarks', key], bookmark)
+    state = state.setIn([STATE_SITES.BOOKMARKS, key], bookmark)
     return state
   },
 
@@ -158,13 +159,13 @@ const bookmarksState = {
     }
 
     if (editKey !== newKey) {
-      state = state.deleteIn(['bookmarks', editKey])
+      state = state.deleteIn([STATE_SITES.BOOKMARKS, editKey])
       state = bookmarkOrderCache.removeCacheKey(state, oldBookmark.get('parentFolderId'), editKey)
       state = bookmarkOrderCache.addBookmarkToCache(state, newBookmark.get('parentFolderId'), newKey)
       newBookmark = newBookmark.set('key', newKey)
     }
 
-    state = state.setIn(['bookmarks', newKey], newBookmark)
+    state = state.setIn([STATE_SITES.BOOKMARKS, newKey], newBookmark)
     state = bookmarkLocationCache.removeCacheKey(state, oldBookmark.get('location'), editKey)
     state = bookmarkLocationCache.addCacheKey(state, location, newKey)
     return state
@@ -186,7 +187,7 @@ const bookmarksState = {
     state = bookmarkLocationCache.removeCacheKey(state, bookmark.get('location'), bookmarkKey)
     state = bookmarkOrderCache.removeCacheKey(state, bookmark.get('parentFolderId'), bookmarkKey)
 
-    return state.deleteIn(['bookmarks', bookmarkKey])
+    return state.deleteIn([STATE_SITES.BOOKMARKS, bookmarkKey])
   },
 
   /**
@@ -205,7 +206,7 @@ const bookmarksState = {
     const bookmarks = bookmarksState.getBookmarks(state)
       .filter(bookmark => bookmark.get('parentFolderId') !== ~~parentFolderId)
 
-    return state.set('bookmarks', bookmarks)
+    return state.set(STATE_SITES.BOOKMARKS, bookmarks)
   },
 
   /**
@@ -230,7 +231,7 @@ const bookmarksState = {
     }
 
     siteKeys.forEach((siteKey) => {
-      state = state.setIn(['bookmarks', siteKey, 'favicon'], favicon)
+      state = state.setIn([STATE_SITES.BOOKMARKS, siteKey, 'favicon'], favicon)
     })
     return state
   },
@@ -252,10 +253,10 @@ const bookmarksState = {
       state = bookmarkOrderCache.removeCacheKey(state, bookmark.get('parentFolderId'), bookmarkKey)
       bookmark = bookmark.set('parentFolderId', ~~parentFolderId)
       const newKey = siteUtil.getSiteKey(bookmark)
-      state = state.deleteIn(['bookmarks', bookmarkKey])
+      state = state.deleteIn([STATE_SITES.BOOKMARKS, bookmarkKey])
       state = bookmarkOrderCache.addBookmarkToCache(state, bookmark.get('parentFolderId'), newKey)
       bookmark = bookmark.set('key', newKey)
-      return state.setIn(['bookmarks', newKey], bookmark)
+      return state.setIn([STATE_SITES.BOOKMARKS, newKey], bookmark)
     }
 
     // move bookmark to another place
