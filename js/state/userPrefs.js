@@ -10,13 +10,14 @@ let registeredPrivateSessions = {}
 const setUserPrefType = (ses, path, value) => {
   switch (typeof value) {
     case 'object':
-      ses.userPrefs.setDictionaryPref(path, value)
+      if (Array.isArray(value)) {
+        ses.userPrefs.setListPref(path, value)
+      } else {
+        ses.userPrefs.setDictionaryPref(path, value)
+      }
       break
     case 'string':
       ses.userPrefs.setStringPref(path, value)
-      break
-    case 'array':
-      ses.userPrefs.setListPref(path, value)
       break
     case 'number':
       if ((/^(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/i).test(value.to_s())) {

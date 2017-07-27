@@ -47,7 +47,7 @@ const defaultOrderLookup = (value) => {
  * Accelerator reference: https://github.com/electron/electron/blob/master/docs/api/accelerator.md
  */
 module.exports.formatAccelerator = (accelerator) => {
-  let result = accelerator
+  let result
   let splitResult = accelerator.split('+')
   // sort in proper order, based on OS
   // also, replace w/ name or symbol

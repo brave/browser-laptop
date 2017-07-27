@@ -253,7 +253,7 @@ const api = {
     }
     if (selected) {
       // selection implies focus
-      state = state = api.setFocused(state, tabId, true)
+      state = api.setFocused(state, tabId, true)
     }
     return state.setIn(path.push('selected'), selected)
   },
