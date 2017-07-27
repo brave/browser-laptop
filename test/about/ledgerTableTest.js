@@ -157,7 +157,8 @@ describe('Ledger table', function () {
         .waitForVisible(`${firstTableFirstRow} [data-switch-status="true"]`)
     })
 
-    it('check pinned sites amount, when you have 0 eligible unpinned sites', function * () {
+    // TODO re-enable when #9641 is fixed
+    it.skip('check pinned sites amount, when you have 0 eligible unpinned sites', function * () {
       yield this.app.client
         .tabByIndex(0)
         .click(`${secondTableFirstRow} [data-test-pinned="false"]`)
