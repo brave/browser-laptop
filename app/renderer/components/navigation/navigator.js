@@ -18,7 +18,7 @@ const NavigationBar = require('./navigationBar')
 const LongPressButton = require('../common/longPressButton')
 const MenuBar = require('./menuBar')
 const WindowCaptionButtons = require('./windowCaptionButtons')
-const BrowserButton = require('../common/button')
+const {NormalizedButton} = require('../common/browserButton')
 const BrowserAction = require('./browserAction')
 
 // State
@@ -289,12 +289,12 @@ class Navigator extends React.Component {
 
   // BEM Level: navigator__menuBarAndNavigationBar__navigationBarWrapper__topLevelEndButtons__braveMenuButton
   get braveMenuButton () {
-    return <BrowserButton className={css(
+    return <NormalizedButton custom={[
       styles.braveMenuButton,
       !this.props.shieldsEnabled && styles.braveMenuButton_shieldsDisabled,
       this.props.shieldsDown && styles.braveMenuButton_shieldsDown,
       this.props.isCaptionButton && styles.braveMenuButton_leftOfCaptionButton
-    )}
+    ]}
       l10nId='braveMenu'
       testId={!this.props.shieldsEnabled ? 'braveMenuDisabled' : 'braveMenu'}
       test2Id={`shield-down-${this.props.shieldsDown}`}
@@ -507,17 +507,14 @@ const styles = StyleSheet.create({
   },
 
   braveMenuButton: {
-    backgroundImage: `-webkit-image-set(url(${braveButton1x}) 1x, url(${braveButton2x}) 2x, url(${braveButton3x}) 3x)`,
-    backgroundRepeat: 'no-repeat',
+    background: `-webkit-image-set(url(${braveButton1x}) 1x, url(${braveButton2x}) 2x, url(${braveButton3x}) 3x) no-repeat`,
     height: globalStyles.navigationBar.urlbarForm.height,
     width: globalStyles.spacing.navbarBraveButtonWidth,
     marginRight: globalStyles.spacing.navbarButtonSpacing,
-    userSelect: 'none',
-    position: 'relative',
     WebkitAppRegion: 'no-drag',
 
     ':hover': {
-      backgroundImage: `-webkit-image-set(url(${braveButtonHover1x}) 1x, url(${braveButtonHover2x}) 2x, url(${braveButtonHover3x}) 3x)`
+      background: `-webkit-image-set(url(${braveButtonHover1x}) 1x, url(${braveButtonHover2x}) 2x, url(${braveButtonHover3x}) 3x) no-repeat`
     }
   },
 

@@ -10,7 +10,7 @@ const urlParse = require('../../../common/urlParse')
 const ReduxComponent = require('../reduxComponent')
 const ImmutableComponent = require('../immutableComponent')
 const Dialog = require('../common/dialog')
-const BrowserButton = require('../common/browserButton')
+const {BrowserButton} = require('../common/browserButton')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')

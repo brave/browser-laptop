@@ -10,7 +10,7 @@ const Immutable = require('immutable')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
-const BrowserButton = require('../common/browserButton')
+const {BrowserButton} = require('../common/browserButton')
 const BrowserActionBadge = require('./browserActionBadge')
 
 // State

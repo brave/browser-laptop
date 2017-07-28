@@ -7,7 +7,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 
 // components
 const ImmutableComponent = require('../../immutableComponent')
-const BrowserButton = require('../../common/browserButton')
+const {BrowserButton} = require('../../common/browserButton')
 
 // style
 const globalStyles = require('../../styles/global')

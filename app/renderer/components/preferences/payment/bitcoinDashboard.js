@@ -6,7 +6,7 @@ const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // components
-const BrowserButton = require('../../common/browserButton')
+const {BrowserButton} = require('../../common/browserButton')
 const cx = require('../../../../../js/lib/classSet')
 const ModalOverlay = require('../../common/modalOverlay')
 const ImmutableComponent = require('../../immutableComponent')

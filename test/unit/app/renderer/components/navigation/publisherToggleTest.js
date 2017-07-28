@@ -93,7 +93,7 @@ describe('PublisherToggle component', function () {
 
       const wrapper = mount(<PublisherToggle />)
       assert.equal(wrapper.find('[data-test-id="publisherButton"]').length, 1)
-      assert.equal(wrapper.find('span').props()['data-test-authorized'], false)
+      assert.equal(wrapper.find('button').props()['data-test-authorized'], false)
     })
 
     it('Show as verified if publisher is shown as verified on locationInfo list', function () {
@@ -101,7 +101,7 @@ describe('PublisherToggle component', function () {
       appStore.state = fakeAppState
       const wrapper = mount(<PublisherToggle />)
       assert.equal(wrapper.find('[data-test-id="publisherButton"]').length, 1)
-      assert.equal(wrapper.find('span').props()['data-test-verified'], true)
+      assert.equal(wrapper.find('button').props()['data-test-verified'], true)
     })
   })
 
@@ -112,7 +112,7 @@ describe('PublisherToggle component', function () {
 
       const wrapper = mount(<PublisherToggle />)
       assert.equal(wrapper.find('[data-test-id="publisherButton"]').length, 1)
-      assert.equal(wrapper.find('span').props()['data-test-authorized'], true)
+      assert.equal(wrapper.find('button').props()['data-test-authorized'], true)
     })
 
     it('Show as disabled if ledgerPayments is false for that publisher', function () {
@@ -120,7 +120,7 @@ describe('PublisherToggle component', function () {
       appStore.state = fakeAppState
 
       const wrapper = mount(<PublisherToggle />)
-      assert.equal(wrapper.find('span').props()['data-test-authorized'], false)
+      assert.equal(wrapper.find('button').props()['data-test-authorized'], false)
     })
   })
 })

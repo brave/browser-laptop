@@ -13,7 +13,7 @@ const {changeSetting} = require('../../../lib/settingsUtil')
 
 // components
 const ImmutableComponent = require('../../immutableComponent')
-const BrowserButton = require('../../common/browserButton')
+const {BrowserButton} = require('../../common/browserButton')
 const {FormTextbox} = require('../../common/textbox')
 const {FormDropdown} = require('../../common/dropdown')
 const {SettingsList, SettingItem} = require('../../common/settings')

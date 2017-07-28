@@ -12,7 +12,7 @@ const {formattedTimeFromNow, formattedDateFromTimestamp} = require('../../../../
 const appUrlUtil = require('../../../../../js/lib/appUrlUtil')
 
 // components
-const BrowserButton = require('../../common/browserButton')
+const {BrowserButton} = require('../../common/browserButton')
 const ImmutableComponent = require('../../immutableComponent')
 
 // style

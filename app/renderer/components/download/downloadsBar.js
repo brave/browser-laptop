@@ -9,7 +9,7 @@ const Immutable = require('immutable')
 // Components
 const ReduxComponent = require('../reduxComponent')
 const Button = require('../common/button')
-const BrowserButton = require('../common/browserButton')
+const {BrowserButton} = require('../common/browserButton')
 const DownloadItem = require('./downloadItem')
 
 // Actions
