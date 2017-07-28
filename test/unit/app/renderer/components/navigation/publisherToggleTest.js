@@ -92,7 +92,7 @@ describe('PublisherToggle component', function () {
       appStore.state = fakeAppState.setIn(['locationInfo', 'https://brave.com', 'exclude'], true)
 
       const wrapper = mount(<PublisherToggle />)
-      assert.equal(wrapper.find('[data-test-id="publisherButton"]').length, 1)
+      assert.equal(wrapper.find('[data-test-id="publisherToggle"]').length, 1)
       assert.equal(wrapper.find('button').props()['data-test-authorized'], false)
     })
 
@@ -100,7 +100,7 @@ describe('PublisherToggle component', function () {
       windowStore.state = defaultWindowStore
       appStore.state = fakeAppState
       const wrapper = mount(<PublisherToggle />)
-      assert.equal(wrapper.find('[data-test-id="publisherButton"]').length, 1)
+      assert.equal(wrapper.find('[data-test-id="publisherToggle"]').length, 1)
       assert.equal(wrapper.find('button').props()['data-test-verified'], true)
     })
   })
@@ -111,7 +111,7 @@ describe('PublisherToggle component', function () {
       appStore.state = fakeAppState.setIn(['siteSettings', 'https?://brave.com', 'ledgerPayments'], true)
 
       const wrapper = mount(<PublisherToggle />)
-      assert.equal(wrapper.find('[data-test-id="publisherButton"]').length, 1)
+      assert.equal(wrapper.find('[data-test-id="publisherToggle"]').length, 1)
       assert.equal(wrapper.find('button').props()['data-test-authorized'], true)
     })
 

@@ -11,6 +11,7 @@ const ipc = require('electron').ipcRenderer
 const ReduxComponent = require('../reduxComponent')
 const UrlBarSuggestions = require('./urlBarSuggestions')
 const UrlBarIcon = require('./urlBarIcon')
+const NavigationBarButtonContainer = require('./buttons/navigationBarButtonContainer')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
@@ -43,7 +44,6 @@ const {isWindows} = require('../../../common/lib/platformUtil')
 const iconNoScript = require('../../../../img/url-bar-no-script.svg')
 
 const globalStyles = require('../styles/global')
-const commonStyles = require('../styles/commonStyles')
 
 class UrlBar extends React.Component {
   constructor (props) {
@@ -389,38 +389,31 @@ class UrlBar extends React.Component {
     return ''
   }
 
-  get UrlBarIcon () {
-    return <UrlBarIcon
-      activateSearchEngine={this.props.activateSearchEngine}
-      active={this.props.isActive}
-      isSecure={this.props.isSecure}
-      isHTTPPage={this.props.isHTTPPage}
-      loading={this.props.loading}
-      location={this.props.location}
-      searchSelectEntry={this.props.searchSelectEntry}
-      title={this.props.title}
-      titleMode={this.props.titleMode}
-      isSearching={this.props.location !== this.props.urlbarLocation}
-      activeTabShowingMessageBox={this.props.activeTabShowingMessageBox}
-    />
+  get URLBarIcon () {
+    return <NavigationBarButtonContainer isSquare>
+      <UrlBarIcon
+        activateSearchEngine={this.props.activateSearchEngine}
+        active={this.props.isActive}
+        isSecure={this.props.isSecure}
+        isHTTPPage={this.props.isHTTPPage}
+        loading={this.props.loading}
+        location={this.props.location}
+        searchSelectEntry={this.props.searchSelectEntry}
+        title={this.props.title}
+        titleMode={this.props.titleMode}
+        isSearching={this.props.location !== this.props.urlbarLocation}
+        activeTabShowingMessageBox={this.props.activeTabShowingMessageBox}
+      />
+    </NavigationBarButtonContainer>
   }
 
   // BEM Level: urlbarForm__titleBar
   get titleBar () {
-    return <div id='titleBar' className={css(styles.titleBar)}>
+    return <div id='titleBar' data-test-id='titleBar' className={css(styles.titleBar)}>
       <span className={css(styles.titleBar__host)}>{this.props.hostValue}</span>
       <span>{this.props.hostValue && this.titleValue ? ' | ' : ''}</span>
       <span>{this.titleValue}</span>
     </div>
-  }
-
-  // BEM Level: urlbarForm__titleBar__loadTime
-  get loadTimer () {
-    return <span className={css(
-      styles.loadTime,
-      this.props.isActive && styles.loadTime_onFocus
-    )}
-      data-test-id='loadTime'>{this.loadTime}</span>
   }
 
   // BEM Level: urlbarForm__input
@@ -447,23 +440,15 @@ class UrlBar extends React.Component {
     />
   }
 
-  // BEM Level: urlbarForm__legend
-  get legend () {
-    return <legend className={css(
-      styles.legend,
-      !!this.props.isFocused && styles.legend_isFocused,
-      this.props.isPublisherButtonEnabled && styles.legend_isPublisherButtonEnabled
-    )} />
-  }
-
   // BEM Level: urlbarForm__buttonContainer_showNoScript
   get noScriptInfo () {
-    return <span className={css(commonStyles.rectangleContainer)}
-      onClick={this.onNoScript}>
+    return <NavigationBarButtonContainer isSquare>
       <span className={css(styles.noScript__button)}
+        onClick={this.onNoScript}
         data-l10n-id='noScriptButton'
-        data-test-id='noScriptButton' />
-    </span>
+        data-test-id='noScriptButton'
+      />
+    </NavigationBarButtonContainer>
   }
 
   onNoScript () {
@@ -560,26 +545,33 @@ class UrlBar extends React.Component {
     return <form
       className={cx({
         urlbarForm: true,
-        [css(styles.urlbarForm, this.props.isWideURLbarEnabled && styles.urlbarForm_wide, this.props.titleMode && styles.urlbarForm_titleMode, !this.props.titleMode && styles.urlbarForm_notTitleMode, !this.props.showNoScriptInfo && styles.urlbarForm_noScriptDisabled, this.props.publisherButtonVisible && styles.urlbarForm_isPublisherButtonEnabled)]: true
+        // currently publisherButtonVisible is the only element under urlbarForm_urlBarEnd
+        [css(styles.urlbarForm, this.props.isWideURLbarEnabled && styles.urlbarForm_wide, this.props.titleMode && styles.urlbarForm_titleMode, !this.props.titleMode && styles.urlbarForm_notTitleMode, !this.props.showNoScriptInfo && styles.urlbarForm_noScriptDisabled, this.props.publisherButtonVisible && styles.urlbarForm_urlBarEnd)]: true
       })}
       action='#'
       id='urlbar'>
-      <div className={css(commonStyles.rectangleContainer)}>
-        <UrlBarIcon titleMode={this.props.titleMode} />
-      </div>
+      {this.URLBarIcon}
       {
-        this.props.titleMode
-        ? this.titleBar
-        : this.input
+        !this.props.titleMode
+        ? this.input
+        : this.titleBar
       }
       {
-        this.props.titleMode
-        ? null
-        : this.legend
+        !this.props.titleMode
+        ? <legend className={css(
+          styles.urlbarForm__legend,
+          !!this.props.isFocused && styles.urlbarForm__legend_isFocused,
+          this.props.publisherButtonVisible && styles.urlbarForm__legend_urlBarEnd
+        )} />
+        : null
       }
       {
         this.props.showDisplayTime
-        ? this.loadTimer
+        ? <span className={css(
+          styles.urlbarForm__loadTime,
+          this.props.isActive && styles.urlbarForm__loadTime_onFocus
+        )}
+          data-test-id='loadTime'>{this.loadTime}</span>
         : null
       }
       {
@@ -641,10 +633,48 @@ const styles = StyleSheet.create({
     paddingRight: '10px'
   },
 
-  // ref: navigationBar__buttonContainer_addPublisherButtonContainer on publisherToggle.js
-  urlbarForm_isPublisherButtonEnabled: {
+  // ref: navigationBar__urlBarEnd on navigationBarButtonContainer.js
+  urlbarForm_urlBarEnd: {
     borderTopRightRadius: 0,
     borderBottomRightRadius: 0
+  },
+
+  urlbarForm__legend: {
+    ':before': {
+      display: 'none',
+      content: '" "',
+      position: 'absolute',
+      borderRadius: '0 4px 4px 0',
+      color: '#333',
+      boxShadow: `inset 0 0 0 1px ${globalStyles.color.urlBarOutline}, inset 0 0 0 3px ${globalStyles.color.focusUrlbarOutline}`,
+      outline: 'none',
+      top: 0,
+      bottom: 0,
+      right: 0,
+      left: 0,
+      zIndex: globalStyles.zindex.zindexNavigationBar
+    }
+  },
+
+  urlbarForm__legend_isFocused: {
+    ':before': {
+      display: 'block'
+    }
+  },
+
+  urlbarForm__legend_urlBarEnd: {
+    ':before': {
+      borderRadius: 0
+    }
+  },
+
+  urlbarForm__loadTime: {
+    color: globalStyles.color.loadTimeColor,
+    fontSize: '12px'
+  },
+
+  urlbarForm__loadTime_onFocus: {
+    display: 'none'
   },
 
   titleBar: {
@@ -688,44 +718,6 @@ const styles = StyleSheet.create({
     margin: 0, // #5624
     top: 0, // #5624
     width: '100%'
-  },
-
-  legend: {
-    ':before': {
-      display: 'none',
-      content: '" "',
-      position: 'absolute',
-      borderRadius: '0 4px 4px 0',
-      color: '#333',
-      boxShadow: `inset 0 0 0 1px ${globalStyles.color.urlBarOutline}, inset 0 0 0 3px ${globalStyles.color.focusUrlbarOutline}`,
-      outline: 'none',
-      top: 0,
-      bottom: 0,
-      right: 0,
-      left: 0,
-      zIndex: globalStyles.zindex.zindexNavigationBar
-    }
-  },
-
-  legend_isFocused: {
-    ':before': {
-      display: 'block'
-    }
-  },
-
-  legend_isPublisherButtonEnabled: {
-    ':before': {
-      borderRadius: 0
-    }
-  },
-
-  loadTime: {
-    color: globalStyles.color.loadTimeColor,
-    fontSize: '12px'
-  },
-
-  loadTime_onFocus: {
-    display: 'none'
   },
 
   noScript__button: {

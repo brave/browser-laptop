@@ -72,6 +72,8 @@ describe('Navigator component unit tests', function () {
     mockery.registerMock('../../extensions/brave/img/tabs/new_session.svg')
     mockery.registerMock('../../../extensions/brave/img/caret_down_grey.svg')
     mockery.registerMock('../../../../img/url-bar-no-script.svg', {})
+    mockery.registerMock('../../../../img/toolbar/back_btn.svg', {})
+    mockery.registerMock('../../../../img/toolbar/forward_btn.svg', {})
     mockery.registerMock('electron', require('../../../../lib/fakeElectron'))
     mockery.registerMock('../../../common/state/windowState', fakeWindowState)
     mockery.registerMock('../../currentWindow', fakeCurrentWindow)
@@ -156,7 +158,7 @@ describe('Navigator component unit tests', function () {
     })
 
     it('disables the lion icon', function () {
-      const node = wrapper.find('[data-test-id="braveShieldButton"]').getDOMNode()
+      const node = wrapper.find('[data-test-id="braveMenu"]').getDOMNode()
       assert.equal(node.disabled, true)
     })
   })
@@ -169,7 +171,7 @@ describe('Navigator component unit tests', function () {
 
     it('lion icon is shown by default', function () {
       const wrapper = mount(<Navigator />)
-      const node = wrapper.find('[data-test-id="braveShieldButton"]').getDOMNode()
+      const node = wrapper.find('[data-test-id="braveMenu"]').getDOMNode()
       assert.equal(node.disabled, false)
     })
 

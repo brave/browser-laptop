@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 const ImmutableComponent = require('../immutableComponent')
 const globalStyles = require('../styles/global')
 
@@ -30,11 +30,11 @@ class BrowserActionBadge extends ImmutableComponent {
       ref='badge'
       className={css(
         styles.browserActionBadge,
-        this.centered && styles.centered,
+        this.centered && styles.browserActionBadge_centered,
         // delay badge show-up.
         // this is also set for braveryPanel badge
         // in a way that both can appear at the same time.
-        styles.subtleShowUp
+        styles.browserActionBadge_subtleShowUp
       )}
       style={{backgroundColor: this.props.color || globalStyles.color.braveMediumOrange}}
       >{this.props.text}</div>
@@ -56,14 +56,16 @@ const styles = StyleSheet.create({
     minWidth: '10px',
     userSelect: 'none'
   },
-  centered: {
+
+  browserActionBadge_centered: {
     left: '50%',
     transform: 'translateX(-50%)',
     maxWidth: 'calc(100% - 5px)',
     overflow: 'hidden',
     textOverflow: 'ellipsis'
   },
-  subtleShowUp: globalStyles.animations.subtleShowUp
+
+  browserActionBadge_subtleShowUp: globalStyles.animations.subtleShowUp
 })
 
 module.exports = BrowserActionBadge

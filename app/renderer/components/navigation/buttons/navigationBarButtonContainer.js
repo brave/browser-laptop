@@ -6,20 +6,37 @@ const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../../styles/global')
 
-// TODO: Check if stateless components can benefit from reduxComponent
-// by setting ownProps to stateless props.
+// This component normalizes the wrapper for buttons called on files
+// under app/renderer/components/navigation/buttons/ ro reduce the risk of
+// visual regressions and style inconsistency.
+// Ref https://github.com/brave/browser-laptop/pull/9299#discussion_r124714562
+
+// TODO (Cezar): Check if stateless components can benefit
+// from reduxComponent by setting ownProps to stateless props.
 class NavigationBarButtonContainer extends React.Component {
   render () {
     return (
       <div className={css(
-        this.props.isBoxed && styles.boxed,
-        this.props.isNested && styles.nestedContainer,
-        this.props.isStandalone && styles.standaloneContainer,
-        this.props.onNavigationBarChrome && styles.chromeContainer,
+        // Used for bookmarkButtonContainer, PublisherToggle, noScriptInfo, UrlBarIcon, and BrowserAction
+        this.props.isSquare && styles.container_square,
+
+        // isNested and isStandalone should not be called at the same time
+        // Add border to the bookmark button and publisher button only
+        this.props.isNested && styles.container_nested,
+
+        // Used for stopButton, reloadButton, and homeButton on navigationBar.js
+        // and backButton and forwardButton on navigator.js
+        this.props.isStandalone && styles.container_standalone,
+
+        // Used for stopButton, reloadButton, and homeButton on navigationBar.js
+        // NOT used for the backButton and forwardButton
+        this.props.onNavigationBarChrome && styles.container_chromeButton,
 
         // BEM style class name unique for each component
         this.props.containerFor
-      )}>
+      )}
+        data-test-id={this.props.testId}
+        style={this.props.containerStyle}>
         {this.props.children}
       </div>
     )
@@ -28,9 +45,8 @@ class NavigationBarButtonContainer extends React.Component {
 
 const styles = StyleSheet.create({
   // #9283
-  // Create 25x25 squares and place the buttons at the center of each container
-  // Used for bookmarkButtonContainer, PublisherToggle, noScriptInfo, and UrlBarIcon.
-  boxed: {
+  // Create 25x25 square and place the button at the center of each container
+  container_square: {
     boxSizing: 'border-box',
     display: 'flex',
     alignItems: 'center',
@@ -42,15 +58,12 @@ const styles = StyleSheet.create({
     WebkitAppRegion: 'no-drag'
   },
 
-  // Add border to the bookmark button and publisher button only
-  nestedContainer: {
+  container_nested: {
     border: `1px solid ${globalStyles.color.urlBarOutline}`,
     borderRadius: globalStyles.radius.borderRadiusURL
   },
 
-  // Used for stopButton, reloadButton, and homeButton on navigationBar.js
-  // and backButton and forwardButton on navigator.js
-  standaloneContainer: {
+  container_standalone: {
     display: 'inline-block',
     borderRadius: globalStyles.radius.borderRadiusNavigationButton,
     height: globalStyles.navigationBar.urlbarForm.height,
@@ -62,7 +75,7 @@ const styles = StyleSheet.create({
     }
   },
 
-  chromeContainer: {
+  container_chromeButton: {
     width: globalStyles.navigationBar.navigationButtonContainer.width
   }
 })

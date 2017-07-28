@@ -58,7 +58,7 @@ class UrlBarIcon extends React.Component {
 
   get iconCssClasses () {
     if (isPotentialPhishingUrl(this.props.location)) {
-      return [globalStyles.appIcons.exclamationTriangle, css(styles.urlbarIcon_large, styles.urlbarIcon_siteInsecureColor)]
+      return [globalStyles.appIcons.exclamationTriangle, css(styles.urlBarIcon_large, styles.urlBarIcon_siteInsecureColor)]
     } else if (this.isSearch) {
       return [globalStyles.appIcons.search]
     } else if (this.isAboutPage && !this.props.titleMode) {
@@ -66,11 +66,11 @@ class UrlBarIcon extends React.Component {
     } else if (this.props.isHTTPPage && !this.props.active) {
       // NOTE: EV style not approved yet; see discussion at https://github.com/brave/browser-laptop/issues/791
       if (this.props.isSecure === true) {
-        return [globalStyles.appIcons.lock, css(styles.urlbarIcon_large)]
+        return [globalStyles.appIcons.lock, css(styles.urlBarIcon_large)]
       } else if (this.props.isSecure === false || this.props.isSecure === 2) {
-        return [globalStyles.appIcons.unlock, css(styles.urlbarIcon_large, styles.urlbarIcon_siteInsecureColor, styles.urlbarIcon_insecure)]
+        return [globalStyles.appIcons.unlock, css(styles.urlBarIcon_large, styles.urlBarIcon_siteInsecureColor, styles.urlBarIcon_insecure)]
       } else if (this.props.isSecure === 1) {
-        return [globalStyles.appIcons.unlock, css(styles.urlbarIcon_large, styles.urlbarIcon_insecure)]
+        return [globalStyles.appIcons.unlock, css(styles.urlBarIcon_large, styles.urlBarIcon_insecure)]
       }
     }
     return []
@@ -82,11 +82,11 @@ class UrlBarIcon extends React.Component {
     }
 
     // Move fa-list (not fa-search) icon on about pages 1px down
-    // ref: urlbarIcon_relative
+    // ref: urlBarIcon_relative
     const relativeIcon = this.isAboutPage && !this.isSearch
 
     const iconClasses = {
-      [css(styles.urlbarIcon, this.props.titleMode && styles.urlbarIcon_titleMode, this.isSearch && styles.urlbarIcon_isSearch, relativeIcon && styles.urlbarIcon_relative)]: true
+      [css(styles.urlBarIcon, this.props.titleMode && styles.urlBarIcon_titleMode, this.isSearch && styles.urlBarIcon_isSearch, relativeIcon && styles.urlBarIcon_relative)]: true
     }
 
     this.iconCssClasses.forEach((iconClass) => {
@@ -165,7 +165,7 @@ class UrlBarIcon extends React.Component {
     }
 
     return <span
-      data-test-id='urlbarIcon'
+      data-test-id='urlBarIcon'
       {...props}
       className={this.iconClasses}
       style={this.iconStyles} />
@@ -175,7 +175,7 @@ class UrlBarIcon extends React.Component {
 const styles = StyleSheet.create({
 
   // ref: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L893-L896
-  urlbarIcon: {
+  urlBarIcon: {
     color: globalStyles.color.siteSecureColor,
     fontSize: '12px',
     backgroundRepeat: 'no-repeat',
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   },
 
   // ref: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L801-L805
-  urlbarIcon_titleMode: {
+  urlBarIcon_titleMode: {
     display: 'inline-block',
     opacity: 0.5,
     minWidth: 0
@@ -195,33 +195,33 @@ const styles = StyleSheet.create({
 
   // ref: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L809
   // Unlock icon has this value if the title mode is enabled or not.
-  urlbarIcon_insecure: {
+  urlBarIcon_insecure: {
     opacity: 1
   },
 
   // ref: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L900-L906
   // about:newtab
-  urlbarIcon_isSearch: {
+  urlBarIcon_isSearch: {
 
     // 50% of #5a5a5a
     color: 'rgba(90, 90, 90, .5)'
   },
 
   // ref: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L908-L913
-  urlbarIcon_large: {
+  urlBarIcon_large: {
 
     // Refactor iconClasses to remove !important
     fontSize: '16px !important'
   },
 
   // ref: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L897-L898
-  urlbarIcon_relative: {
+  urlBarIcon_relative: {
     position: 'relative',
     bottom: '-1px'
   },
 
   // ref: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L915-L917
-  urlbarIcon_siteInsecureColor: {
+  urlBarIcon_siteInsecureColor: {
     color: globalStyles.color.siteInsecureColor
   }
 })
