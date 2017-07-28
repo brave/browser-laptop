@@ -136,6 +136,9 @@ let generateBraveManifest = () => {
         ]
       }
     ],
+    web_accessible_resources: [
+      'img/favicon.ico'
+    ],
     permissions: [
       'externally_connectable.all_urls', 'tabs', '<all_urls>', 'contentSettings', 'idle'
     ],
