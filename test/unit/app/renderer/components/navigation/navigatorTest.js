@@ -175,13 +175,13 @@ describe('Navigator component unit tests', function () {
 
     it('counter is shown by default', function () {
       const wrapper = mount(<Navigator />)
-      assert.equal(wrapper.find('[data-test-id="lionBadge"]').length, 1)
+      assert.equal(wrapper.find('[data-test-id="counterBraveMenu"]').length, 1)
     })
 
     it('counter is not shown when disabled via settings', function () {
       settingDefaultValue = false
       const wrapper = mount(<Navigator />)
-      assert.equal(wrapper.find('[data-test-id="lionBadge"]').length, 0)
+      assert.equal(wrapper.find('[data-test-id="counterBraveMenu"]').length, 0)
     })
   })
 })

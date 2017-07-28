@@ -6,6 +6,7 @@ const React = require('react')
 const electron = require('electron')
 const ipc = electron.ipcRenderer
 const Immutable = require('immutable')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
@@ -17,7 +18,7 @@ const NavigationBar = require('./navigationBar')
 const LongPressButton = require('../common/longPressButton')
 const MenuBar = require('./menuBar')
 const WindowCaptionButtons = require('./windowCaptionButtons')
-const Button = require('../common/button')
+const BrowserButton = require('../common/button')
 const BrowserAction = require('./browserAction')
 
 // State
@@ -29,7 +30,7 @@ const windowState = require('../../../common/state/windowState')
 
 // Util
 const {getCurrentWindowId, isMaximized, isFullScreen, isFocused} = require('../../currentWindow')
-const isWindows = require('../../../common/lib/platformUtil').isWindows()
+const platformUtil = require('../../../common/lib/platformUtil')
 const {braveShieldsEnabled} = require('../../../common/state/shieldState')
 const eventUtil = require('../../../../js/lib/eventUtil')
 const {isNavigatableAboutPage, getBaseUrl} = require('./../../../../js/lib/appUrlUtil')
@@ -44,8 +45,20 @@ const appConfig = require('../../../../js/constants/appConfig')
 const settings = require('../../../../js/constants/settings')
 
 // Styles
-const {StyleSheet, css} = require('aphrodite')
 const globalStyles = require('../styles/global')
+const commonStyles = require('../styles/commonStyles')
+
+const backButton = require('../../../../img/toolbar/back_btn.svg')
+const forwardButton = require('../../../../img/toolbar/forward_btn.svg')
+const braveButton1x = require('../../../../app/extensions/brave/img/braveBtn.png')
+const braveButton2x = require('../../../../app/extensions/brave/img/braveBtn2x.png')
+const braveButton3x = require('../../../../app/extensions/brave/img/braveBtn3x.png')
+const braveButtonHover1x = require('../../../../app/extensions/brave/img/braveBtn_hover.png')
+const braveButtonHover2x = require('../../../../app/extensions/brave/img/braveBtn2x_hover.png')
+const braveButtonHover3x = require('../../../../app/extensions/brave/img/braveBtn3x_hover.png')
+
+const isWindows = platformUtil.isWindows()
+const isDarwin = platformUtil.isDarwin()
 
 class Navigator extends React.Component {
   constructor (props) {
@@ -71,14 +84,6 @@ class Navigator extends React.Component {
     } else {
       navAction.call(this, this.props.activeTabId)
     }
-  }
-
-  get extensionButtons () {
-    let buttons = this.props.extensionBrowserActions.map((id) => <BrowserAction extensionId={id} />).values()
-    buttons = Array.from(buttons)
-    buttons.push(<span className='buttonSeparator' />)
-
-    return buttons
   }
 
   onBack (e) {
@@ -128,13 +133,13 @@ class Navigator extends React.Component {
   }
 
   onBraveMenu () {
-    if (this.props.shieldEnabled) {
+    if (this.props.shieldsEnabled) {
       windowActions.setBraveryPanelDetail({})
     }
   }
 
   onDoubleClick (e) {
-    if (!e.target.className.includes('navigatorWrapper')) {
+    if (!e.target.className.includes('navigationBarWrapper')) {
       return
     }
     return !isMaximized() ? windowActions.shouldMaximize(getCurrentWindowId()) : windowActions.shouldMinimize(getCurrentWindowId())
@@ -148,6 +153,170 @@ class Navigator extends React.Component {
   componentWillUnmount () {
     ipc.off(messages.SHORTCUT_ACTIVE_FRAME_BACK, this.onBack)
     ipc.off(messages.SHORTCUT_ACTIVE_FRAME_FORWARD, this.onForward)
+  }
+
+  // BEM Level: navigator__menuBarAndNavigationBar__navigationBarWrapper
+  get navigationBarWrapper () {
+    return <div className={cx({
+      navigationBarWrapper: true,
+      [css(styles.navigationBarWrapper)]: true
+    })}
+      onDoubleClick={this.onDoubleClick}
+      onDragOver={this.onDragOver}
+      onDrop={this.onDrop}
+    >
+      {this.topLevelStartButtons}
+      <NavigationBar />
+      {this.topLevelEndButtons}
+    </div>
+  }
+
+  // BEM Level: navigator__menuBarAndNavigationBar__navigationBarWrapper__topLevelStartButtons
+  get topLevelStartButtons () {
+    return <div className={cx({
+      topLevelStartButtons: true,
+      [css(styles.topLevelStartButtons, isWindows && styles.topLevelStartButtons_isWindows, isDarwin && styles.topLevelStartButtons_isDarwin, (isDarwin && this.props.isFullScreen) && styles.topLevelStartButtons_isDarwin_isFullScreen)]: true,
+      fullscreen: isFullScreen()
+    })}>
+      {this.backButton}
+      {this.forwardButton}
+    </div>
+  }
+
+  // BEM Level: navigator__menuBarAndNavigationBar__navigationBarWrapper__topLevelStartButtons__topLevelStartButtonContainer
+  get backButton () {
+    return <span data-test-id={
+      !this.props.canGoBack
+        ? 'navigationBackButtonDisabled'
+        : 'navigationBackButton'
+      }
+      className={css(
+        commonStyles.navbarButtonContainer,
+        styles.topLevelStartButtonContainer,
+        !this.props.canGoBack && styles.topLevelStartButtonContainer_disabled
+      )}
+
+      // TODO (Suguru): Convert with Aphrodite
+      style={{
+        transform: this.props.canGoBack ? `scale(${this.props.swipeLeftPercent})` : `scale(1)`,
+        opacity: `${this.props.swipeLeftOpacity}`
+      }}>
+      <LongPressButton className={cx({
+        normalizeButton: true,
+        [css(styles.topLevelStartButtonContainer__topLevelStartButton_backButton)]: true,
+        [css(styles.topLevelStartButtonContainer__topLevelStartButton_disabled)]: !this.props.canGoBack,
+        [css(styles.topLevelStartButtonContainer__topLevelStartButton_enabled)]: this.props.canGoBack
+      })}
+        l10nId='backButton'
+        testId={!this.props.canGoBack ? 'backButtonDisabled' : 'backButton'}
+        disabled={!this.props.canGoBack}
+        onClick={this.onBack}
+        onLongPress={this.onBackLongPress}
+      />
+    </span>
+  }
+
+  // BEM Level: navigator__menuBarAndNavigationBar__navigationBarWrapper__topLevelStartButtons__topLevelStartButtonContainer
+  get forwardButton () {
+    return <span data-test-id={
+      !this.props.canGoForward
+        ? 'navigationForwardButtonDisabled'
+        : 'navigationForwardButton'
+      }
+      className={css(
+        commonStyles.navbarButtonContainer,
+        styles.topLevelStartButtonContainer,
+        !this.props.canGoForward && styles.topLevelStartButtonContainer_disabled
+      )}
+
+      // TODO (Suguru): Convert with Aphrodite
+      style={{
+        transform: this.props.canGoForward ? `scale(${this.props.swipeRightPercent})` : `scale(1)`,
+        opacity: `${this.props.swipeRightOpacity}`
+      }}>
+      <LongPressButton className={cx({
+        normalizeButton: true,
+        [css(styles.topLevelStartButtonContainer__topLevelStartButton_forwardButton)]: true,
+        [css(styles.topLevelStartButtonContainer__topLevelStartButton_disabled)]: !this.props.canGoForward,
+        [css(styles.topLevelStartButtonContainer__topLevelStartButton_enabled)]: this.props.canGoForward
+      })}
+        l10nId='forwardButton'
+        testId={!this.props.canGoForward ? 'forwardButtonDisabled' : 'forwardButton'}
+        disabled={!this.props.canGoForward}
+        onClick={this.onForward}
+        onLongPress={this.onForwardLongPress}
+      />
+    </span>
+  }
+
+  // BEM Level: navigator__menuBarAndNavigationBar__navigationBarWrapper__topLevelEndButtons
+  get topLevelEndButtons () {
+    return <div className={cx({
+      topLevelEndButtons: true,
+      [css(styles.topLevelEndButtons, this.props.isWideURLbarEnabled && styles.topLevelEndButtons_isWideURLbarEnabled)]: true
+    })}>
+      <div className={cx({
+        extraDragArea: !this.props.menuBarVisible,
+        allowDragging: this.props.shouldAllowWindowDrag,
+        [css(styles.topLevelEndButtons__extraDragArea_disabled)]: this.props.isWideURLbarEnabled
+      })} />
+      {
+        this.props.showBrowserActions
+          ? this.extensionButtons
+          : null
+      }
+      {this.braveMenuButton}
+      {
+        this.props.isCounterEnabled
+          ? this.counterBraveMenu
+          : null
+      }
+      {
+        this.props.isCaptionButton
+          ? <span className={css(styles.topLevelEndButtons__buttonSeparator)} />
+          : null
+      }
+    </div>
+  }
+
+  get extensionButtons () {
+    let buttons = this.props.extensionBrowserActions.map((id) => <BrowserAction extensionId={id} />).values()
+    buttons = Array.from(buttons)
+    buttons.push(<span className={css(styles.topLevelEndButtons__buttonSeparator)} />)
+
+    return buttons
+  }
+
+  // BEM Level: navigator__menuBarAndNavigationBar__navigationBarWrapper__topLevelEndButtons__braveMenuButton
+  get braveMenuButton () {
+    return <BrowserButton className={css(
+      styles.braveMenuButton,
+      !this.props.shieldsEnabled && styles.braveMenuButton_shieldsDisabled,
+      this.props.shieldsDown && styles.braveMenuButton_shieldsDown,
+      this.props.isCaptionButton && styles.braveMenuButton_leftOfCaptionButton
+    )}
+      l10nId='braveMenu'
+      testId={!this.props.shieldsEnabled ? 'braveMenuDisabled' : 'braveMenu'}
+      test2Id={`shield-down-${this.props.shieldsDown}`}
+      disabled={this.props.activeTabShowingMessageBox}
+      onClick={this.onBraveMenu}
+    />
+  }
+
+  // BEM Level: navigator__menuBarAndNavigationBar__navigationBarWrapper__topLevelEndButtons__counter_braveMenu
+  get counterBraveMenu () {
+    return <div data-test-id='counterBraveMenu'
+      className={css(
+        styles.counterBraveMenu,
+        (this.props.menuBarVisible || !isWindows) && styles.counterBraveMenu_right,
+
+        // delay badge show-up.
+        // this is also set for extension badge
+        // in a way that both can appear at the same time.
+        styles.counterBraveMenu_subtleShowUp
+      )}>
+      {this.props.totalBlocks}
+    </div>
   }
 
   mergeProps (state, ownProps) {
@@ -177,9 +346,10 @@ class Navigator extends React.Component {
     props.canGoForward = activeTab.get('canGoForward') && !activeTabShowingMessageBox
     props.totalBlocks = activeFrame ? frameStateUtil.getTotalBlocks(activeFrame) : false
     props.shieldsDown = !braverySettings.shieldsUp
-    props.shieldEnabled = braveShieldsEnabled(activeFrame)
+    props.shieldsEnabled = braveShieldsEnabled(activeFrame)
     props.menuBarVisible = menuBarState.isMenuBarVisible(currentWindow)
     props.isMaximized = isMaximized() || isFullScreen()
+    props.isFullScreen = isFullScreen()
     props.isCaptionButton = isWindows && !props.menuBarVisible
     props.activeTabShowingMessageBox = activeTabShowingMessageBox
     props.extensionBrowserActions = extensionBrowserActions
@@ -189,7 +359,7 @@ class Navigator extends React.Component {
     props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused())
     props.isCounterEnabled = getSetting(settings.BLOCKED_COUNT_BADGE) &&
       props.totalBlocks &&
-      props.shieldEnabled
+      props.shieldsEnabled
     props.isWideURLbarEnabled = getSetting(settings.WIDE_URL_BAR)
     props.showNavigationBar = activeFrameKey !== undefined &&
       state.get('siteSettings') !== undefined
@@ -215,10 +385,10 @@ class Navigator extends React.Component {
 
   render () {
     return <div className={cx({
-      navbarCaptionButtonContainer: true,
+      navigator: true,
       allowDragging: this.props.shouldAllowWindowDrag
     })}>
-      <div className='navbarMenubarFlexContainer'>
+      <div className={css(styles.navigator__menuBarAndNavigationBar)}>
         {
           this.props.menuBarVisible
             ? <div className='menubarContainer'>
@@ -227,117 +397,7 @@ class Navigator extends React.Component {
             </div>
             : null
         }
-        <div className='navigatorWrapper'
-          onDoubleClick={this.onDoubleClick}
-          onDragOver={this.onDragOver}
-          onDrop={this.onDrop}
-        >
-          <div className={cx({
-            backforward: true,
-            fullscreen: isFullScreen()
-          })}>
-            <div data-test-id={
-              !this.props.canGoBack
-                ? 'navigationBackButtonDisabled'
-                : 'navigationBackButton'
-              }
-              className={cx({
-                navigationButtonContainer: true,
-                nav: true,
-                disabled: !this.props.canGoBack
-              })}
-              style={{
-                transform: this.props.canGoBack ? `scale(${this.props.swipeLeftPercent})` : `scale(1)`,
-                opacity: `${this.props.swipeLeftOpacity}`
-              }}>
-              <LongPressButton
-                testId={!this.props.canGoBack ? 'backButtonDisabled' : 'backButton'}
-                l10nId='backButton'
-                className='normalizeButton navigationButton backButton'
-                disabled={!this.props.canGoBack}
-                onClick={this.onBack}
-                onLongPress={this.onBackLongPress}
-              />
-            </div>
-            <div data-test-id={
-              !this.props.canGoForward
-                ? 'navigationForwardButtonDisabled'
-                : 'navigationForwardButton'
-              }
-              className={cx({
-                navigationButtonContainer: true,
-                nav: true,
-                disabled: !this.props.canGoForward
-              })}
-              style={{
-                transform: this.props.canGoForward ? `scale(${this.props.swipeRightPercent})` : `scale(1)`,
-                opacity: `${this.props.swipeRightOpacity}`
-              }}>
-              <LongPressButton
-                testId={!this.props.canGoForward ? 'forwardButtonDisabled' : 'forwardButton'}
-                l10nId='forwardButton'
-                className='normalizeButton navigationButton forwardButton'
-                disabled={!this.props.canGoForward}
-                onClick={this.onForward}
-                onLongPress={this.onForwardLongPress}
-              />
-            </div>
-          </div>
-          {
-            this.props.showNavigationBar
-            ? <NavigationBar />
-            : null
-          }
-          <div className={cx({
-            topLevelEndButtons: true,
-            [css(styles.navigatorWrapper__topLevelEndButtons_isWideURLbarEnabled)]: this.props.isWideURLbarEnabled
-          })}>
-            <div className={cx({
-              extraDragArea: !this.props.menuBarVisible,
-              allowDragging: this.props.shouldAllowWindowDrag,
-              [css(styles.navigatorWrapper__topLevelEndButtons__extraDragArea_disabled)]: this.props.isWideURLbarEnabled
-            })} />
-            {
-              this.props.showBrowserActions
-                ? this.extensionButtons
-                : null
-            }
-            <div className={css(styles.braveMenuContainer)}>
-              <Button iconClass='braveMenu'
-                l10nId='braveMenu'
-                testId='braveShieldButton'
-                test2Id={`shield-down-${this.props.shieldsDown}`}
-                className={cx({
-                  braveShieldsDisabled: !this.props.shieldEnabled,
-                  braveShieldsDown: this.props.shieldsDown,
-                  leftOfCaptionButton: this.props.isCaptionButton
-                })}
-                disabled={this.props.activeTabShowingMessageBox}
-                onClick={this.onBraveMenu}
-              />
-              {
-                this.props.isCounterEnabled
-                  ? <div className={css(
-                      styles.lionBadge,
-                      (this.props.menuBarVisible || !isWindows) && styles.lionBadgeRight,
-                      // delay badge show-up.
-                      // this is also set for extension badge
-                      // in a way that both can appear at the same time.
-                      styles.subtleShowUp
-                    )}
-                    data-test-id='lionBadge'>
-                    {this.props.totalBlocks}
-                  </div>
-                  : null
-              }
-            </div>
-            {
-              this.props.isCaptionButton
-                ? <span className='buttonSeparator' />
-                : null
-            }
-          </div>
-        </div>
+        {this.navigationBarWrapper}
       </div>
       {
         this.props.isCaptionButton
@@ -348,38 +408,154 @@ class Navigator extends React.Component {
   }
 }
 
-module.exports = ReduxComponent.connect(Navigator)
-
 const styles = StyleSheet.create({
-  lionBadge: {
+  navigator__menuBarAndNavigationBar: {
+    display: 'flex',
+    flex: 1,
+    flexDirection: 'column',
+    boxSizing: 'border-box',
+    position: 'relative',
+    overflow: 'visible',
+    whiteSpace: 'nowrap'
+  },
+
+  navigationBarWrapper: {
+    boxSizing: 'border-box',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: globalStyles.spacing.navbarMenubarMargin
+  },
+
+  topLevelStartButtons: {
+    display: 'flex',
+    zIndex: globalStyles.zindex.zindexNavigationBar
+  },
+
+  topLevelStartButtons_isWindows: {
+    paddingLeft: '5px'
+  },
+
+  topLevelStartButtons_isDarwin: {
+    paddingLeft: globalStyles.spacing.navbarLeftMarginDarwin
+  },
+
+  topLevelStartButtons_isDarwin_isFullScreen: {
+    paddingLeft: '4px'
+  },
+
+  // cf: navigationBar__navigationButtonContainer on navitionBar.js
+  topLevelStartButtonContainer: {
+    width: '34px'
+  },
+
+  topLevelStartButtonContainer_disabled: {
+    ':hover': {
+      background: 'transparent',
+      boxShadow: 'none'
+    }
+  },
+
+  topLevelStartButtonContainer__topLevelStartButton_backButton: {
+    background: `url(${backButton}) center no-repeat`,
+    backgroundSize: '14px 14px',
+
+    // ref: https://github.com/brave/browser-laptop/blob/48e9b4e792612b5fc17d7202bc7f2b5e8fbcfc2b/less/navigationBar.less#L467-L472
+    width: '100%',
+    height: '100%',
+    margin: 0
+  },
+
+  topLevelStartButtonContainer__topLevelStartButton_forwardButton: {
+    background: `url(${forwardButton}) center no-repeat`,
+    backgroundSize: '14px 14px',
+
+    // ref: https://github.com/brave/browser-laptop/blob/48e9b4e792612b5fc17d7202bc7f2b5e8fbcfc2b/less/navigationBar.less#L467-L472
+    width: '100%',
+    height: '100%',
+    margin: 0
+  },
+
+  topLevelStartButtonContainer__topLevelStartButton_disabled: {
+    opacity: 0.2
+  },
+
+  topLevelStartButtonContainer__topLevelStartButton_enabled: {
+    opacity: 0.85,
+    WebkitAppRegion: 'no-drag'
+  },
+
+  topLevelEndButtons: {
+    display: 'flex',
+    flexDirection: 'row',
+    position: 'relative'
+  },
+
+  topLevelEndButtons_isWideURLbarEnabled: {
+    marginLeft: '6px'
+  },
+
+  // TODO (Suguru): Refactor navigationBar.less to remove !important
+  topLevelEndButtons__extraDragArea_disabled: {
+    display: 'none !important'
+  },
+
+  topLevelEndButtons__buttonSeparator: {
+    width: '1px',
+    borderLeft: '1px solid #e2e2e2',
+    margin: '4px 3px 4px 3px'
+  },
+
+  braveMenuButton: {
+    backgroundImage: `-webkit-image-set(url(${braveButton1x}) 1x, url(${braveButton2x}) 2x, url(${braveButton3x}) 3x)`,
+    backgroundRepeat: 'no-repeat',
+    height: globalStyles.navigationBar.urlbarForm.height,
+    width: globalStyles.spacing.navbarBraveButtonWidth,
+    marginRight: globalStyles.spacing.navbarButtonSpacing,
+    userSelect: 'none',
+    position: 'relative',
+    WebkitAppRegion: 'no-drag',
+
+    ':hover': {
+      backgroundImage: `-webkit-image-set(url(${braveButtonHover1x}) 1x, url(${braveButtonHover2x}) 2x, url(${braveButtonHover3x}) 3x)`
+    }
+  },
+
+  braveMenuButton_shieldsDisabled: {
+    filter: 'grayscale(100%)',
+    opacity: 0.4
+  },
+
+  braveMenuButton_shieldsDown: {
+    filter: 'grayscale(100%)'
+  },
+
+  braveMenuButton_leftOfCaptionButton: {
+    marginRight: '3px'
+  },
+
+  counterBraveMenu: {
+    position: 'absolute',
     left: 'calc(50% - 1px)',
     top: '14px',
-    position: 'absolute',
-    color: '#FFF',
-    borderRadius: '2.5px',
-    padding: '1px 2px',
-    pointerEvents: 'none',
+    color: '#fff',
     font: '6pt "Arial Narrow"',
     textAlign: 'center',
-    border: '0px solid #FFF',
-    background: '#555555',
+    padding: '1px 2px',
+    border: '0px solid #fff',
+    borderRadius: '2.5px',
+    background: '#555',
     minWidth: '10px',
+    pointerEvents: 'none',
     WebkitUserSelect: 'none'
   },
-  lionBadgeRight: {
+
+  counterBraveMenu_right: {
     left: 'auto',
     right: '2px'
   },
-  braveMenuContainer: {
-    position: 'relative'
-  },
-  subtleShowUp: globalStyles.animations.subtleShowUp,
 
-  // TODO: Refactor navigator.js with Aphrodite to remove !important
-  navigatorWrapper__topLevelEndButtons_isWideURLbarEnabled: {
-    marginLeft: '6px !important'
-  },
-  navigatorWrapper__topLevelEndButtons__extraDragArea_disabled: {
-    display: 'none'
-  }
+  counterBraveMenu_subtleShowUp: globalStyles.animations.subtleShowUp
 })
+
+module.exports = ReduxComponent.connect(Navigator)

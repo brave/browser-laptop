@@ -34,8 +34,17 @@ const siteUtil = require('../../../../js/state/siteUtil')
 const eventUtil = require('../../../../js/lib/eventUtil')
 const {getSetting} = require('../../../../js/settings')
 const contextMenus = require('../../../../js/contextMenus')
+const {isDarwin} = require('../../../common/lib/platformUtil')
+const {isFullScreen} = require('../../currentWindow')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../styles/global')
+const commonStyles = require('../styles/commonStyles')
+
+const stopLoadingButton = require('../../../../img/toolbar/stoploading_btn.svg')
+const reloadButton = require('../../../../img/toolbar/reload_btn.svg')
+const bookmarkButton = require('../../../../img/toolbar/bookmark_btn.svg')
+const bookmarkedButton = require('../../../../img/toolbar/bookmark_marked.svg')
 
 class NavigationBar extends React.Component {
   constructor (props) {
@@ -72,6 +81,54 @@ class NavigationBar extends React.Component {
     // TODO (bridiver) - remove shortcut
     ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_STOP)
     windowActions.onStop(this.props.isFocused, this.props.shouldRenderSuggestions)
+  }
+
+  get bookmarked () {
+    return this.props.activeFrameKey !== undefined &&
+      this.props.bookmarked
+  }
+
+  // BEM Level: navigationBar__buttonContainer
+  get stopButton () {
+    return <button className={cx({
+      normalizeButton: true,
+      [css(styles.navigationButton, styles.navigationButton_stop)]: true
+    })}
+      data-l10n-id='stopButton'
+      onClick={this.onStop}
+    />
+  }
+
+  // BEM Level: navigationBar__buttonContainer
+  get reloadButton () {
+    return <LongPressButton className={cx({
+      normalizeButton: true,
+      [css(styles.navigationButton, styles.navigationButton_reload)]: true
+    })}
+      l10nId='reloadButton'
+      testId='reloadButton'
+      onClick={this.onReload}
+      onLongPress={this.onReloadLongPress}
+    />
+  }
+
+  // BEM Level: navigationBar
+  get bookmarkButtonContainer () {
+    return <span className={css(
+      commonStyles.rectangleContainer,
+      commonStyles.rectangleContainer_outsideOfurlbarForm,
+      styles.navigationBar__buttonContainer_bookmark
+    )}>
+      <button className={cx({
+        normalizeButton: true,
+        withHomeButton: getSetting(settings.SHOW_HOME_BUTTON),
+        [css(styles.navigationBar__buttonContainer_bookmark__button, this.bookmarked && styles.navigationBar__buttonContainer_bookmark__button_remove)]: true
+      })}
+        data-l10n-id={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
+        data-test-id={this.bookmarked ? 'bookmarked' : 'notBookmarked'}
+        onClick={this.onToggleBookmark}
+      />
+    </span>
   }
 
   componentDidMount () {
@@ -136,12 +193,12 @@ class NavigationBar extends React.Component {
       return null
     }
 
-    return <div
-      id='navigator'
+    return <div id='navigationBar'
+      data-test-id='navigationBar'
       data-frame-key={this.props.activeFrameKey}
       className={cx({
         titleMode: this.props.titleMode,
-        [css(styles.navigator_wide)]: this.props.isWideUrlBarEnabled
+        [css(styles.navigationBar, (this.props.isDarwin && this.props.isFullScreen) && styles.navigationBar_isDarwin_isFullScreen, this.props.titleMode && styles.navigationBar_titleMode, this.props.isWideUrlBarEnabled && styles.navigationBar_wide)]: true
       })}>
       {
         this.props.showBookmarkHanger
@@ -151,61 +208,117 @@ class NavigationBar extends React.Component {
       {
         this.props.titleMode
         ? null
-        : this.props.isLoading
-          ? <span className='navigationButtonContainer'>
-            <button data-l10n-id='stopButton'
-              className='normalizeButton navigationButton stopButton'
-              onClick={this.onStop} />
-          </span>
-          : <span className='navigationButtonContainer'>
-            <LongPressButton
-              l10nId='reloadButton'
-              className='normalizeButton navigationButton reloadButton'
-              onClick={this.onReload}
-              onLongPress={this.onReloadLongPress} />
-          </span>
+        : <span className={css(
+            commonStyles.navbarButtonContainer,
+            styles.navigationBar__buttonContainer,
+          )}>
+          {
+            this.props.isLoading
+            ? this.stopButton
+            : this.reloadButton
+          }
+        </span>
       }
       {
         this.props.showHomeButton
-        ? <HomeButton activeTabId={this.props.activeTabId} />
+        ? <span className={css(
+            commonStyles.navbarButtonContainer,
+            styles.navigationBar__buttonContainer,
+          )}>
+          <HomeButton activeTabId={this.props.activeTabId} />
+        </span>
         : null
       }
-      <div className='startButtons'>
-        {
-          !this.props.titleMode
-          ? <span className='bookmarkButtonContainer'>
-            <button data-l10n-id={this.props.isBookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
-              className={cx({
-                navigationButton: true,
-                bookmarkButton: true,
-                removeBookmarkButton: this.props.isBookmarked,
-                withHomeButton: getSetting(settings.SHOW_HOME_BUTTON),
-                normalizeButton: true
-              })}
-              onClick={this.onToggleBookmark} />
-          </span>
-          : null
-        }
-      </div>
+      {
+        !this.props.titleMode
+        ? this.bookmarkButtonContainer
+        : null
+      }
       <UrlBar titleMode={this.props.titleMode} />
       {
         this.props.showPublisherToggle
-        ? <div className='endButtons'>
-          <PublisherToggle />
-        </div>
+        ? <PublisherToggle />
         : null
       }
     </div>
   }
 }
 
-const styles = StyleSheet.create({
-  navigator_wide: {
+const rightMargin = `calc(${globalStyles.spacing.navbarLeftMarginDarwin} / 2)`
 
-    // TODO: Refactor navigationBar.js to remove !important
-    maxWidth: '100% !important',
-    marginRight: '0 !important',
-    justifyContent: 'initial !important'
+const styles = StyleSheet.create({
+
+  navigationBar: {
+    boxSizing: 'border-box',
+    display: 'flex',
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '20px',
+    minWidth: '0%', // allow the navigationBar to shrink
+    maxWidth: '900px',
+    marginRight: rightMargin,
+    padding: 0,
+    position: 'relative',
+    userSelect: 'none',
+    zIndex: globalStyles.zindex.zindexNavigationBar
+  },
+
+  navigationBar_isDarwin_isFullScreen: {
+    marginRight: 0
+  },
+
+  navigationBar_titleMode: {
+    animation: 'fadeIn 1.2s'
+  },
+
+  navigationBar_wide: {
+    maxWidth: '100%',
+    marginRight: '0',
+    justifyContent: 'initial'
+  },
+
+  navigationBar__buttonContainer: {
+    width: globalStyles.navigationBar.navigationButtonContainer.width
+  },
+
+  navigationButton: {
+    // cf: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L550-L553
+    backgroundColor: globalStyles.color.buttonColor,
+    display: 'inline-block',
+    width: '100%',
+    height: '100%',
+
+    // cf: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L584-L585
+    margin: 0,
+    padding: 0
+  },
+
+  navigationButton_stop: {
+    background: `url(${stopLoadingButton}) center no-repeat`,
+    backgroundSize: '11px 11px'
+  },
+
+  navigationButton_reload: {
+    background: `url(${reloadButton}) center no-repeat`,
+    backgroundSize: '13px 13px'
+  },
+
+  navigationBar__buttonContainer_bookmark: {
+    borderRight: 'none',
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0
+  },
+
+  navigationBar__buttonContainer_bookmark__button: {
+    background: `url(${bookmarkButton}) center no-repeat`,
+    backgroundSize: '14px 14px',
+    width: '100%',
+    height: '100%'
+  },
+
+  navigationBar__buttonContainer_bookmark__button_remove: {
+    background: `url(${bookmarkedButton}) center no-repeat`
   }
 })
 

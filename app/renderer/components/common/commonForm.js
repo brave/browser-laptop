@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     maxWidth: globalStyles.spacing.bookmarkHangerMaxWidth,
     height: 'initial', // #8634
 
-    // Cancel the inherited value from .navbarMenubarFlexContainer, which is 'nowrap'.
+    // Cancel the inherited value from navigator__menuBarAndNavigationBar on navigator.js, which is 'nowrap'.
     whiteSpace: 'normal'
   },
 

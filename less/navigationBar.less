@@ -16,14 +16,9 @@
 
 // (macOS) We need to keep a padding left to avoid overlapping
 // with the window buttons to close/maximize/minimize the window.
-.platform--darwin .navigatorWrapper .backforward {
-  margin-left: @navbarLeftMarginDarwin;
+.platform--darwin .navigatorWrapper .topLevelStartButtons {
 
-  &.fullscreen {
-    margin-left: 0;
-  }
-
-  // Since we want to keep the navigator centered, we need to calculate the
+  // Since we want to keep the navigationBar centered, we need to calculate the
   // difference between the width of the left box and the width of the right box.
   @centerOffset: @navbarLeftMarginDarwin + 2 * (@navbarButtonWidth + @navbarButtonSpacing) // width area on the left
                  - (@navbarBraveButtonWidth + 2 * @navbarButtonSpacing);
@@ -35,23 +30,6 @@
     border: 1px solid #000;
     box-sizing: border-box;
   }
-
-  .backforward {
-    padding-left: 5px;
-  }
-
-  #navigator {
-    .urlbarForm {
-      input {
-        font-weight: 500;
-        line-height: 1.4;
-        margin: 0; // #5624
-        top: 0; // #5624
-      }
-    }
-  }
-
-  #urlInput { width: 100%; }
 
   // changes to ensure window can be as small as 480px wide
   // and still be useable and have the caption buttons intact
@@ -357,22 +335,13 @@
 }
 
 // Styles had to be reworked to properly position the new caption buttons for Windows
-.navbarCaptionButtonContainer {
+.navigator {
   display: flex;
   //border-bottom: 1px solid #bbb;
 
   &.allowDragging {
     -webkit-app-region: drag;
   }
-}
-.navbarMenubarFlexContainer {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  box-sizing: border-box;
-  position: relative;
-  overflow: visible;
-  white-space: nowrap;
 }
 
 // Window Caption Buttons (for use w/ slim titlebar)
@@ -443,51 +412,26 @@
 }
 
 // Here I grouped the rules to keep the layout of the top bar consistent.
-// The tricky part is to keep the title in `#navigator` centered when the
+// The tricky part is to keep the title in `#navigationBar` centered when the
 // box on its left has different size than the one on the right.
 // This is achieved by the local variable `@centerOffset`.
 .navigatorWrapper {
-  // Since we want to keep the navigator centered, we need to calculate the
+  // Since we want to keep the navigationBar centered, we need to calculate the
   // difference between the width of the left box and the width of the right box.
   @centerOffset: 2 * (@navbarButtonWidth + @navbarButtonSpacing) // width area on the left
                  - (@navbarBraveButtonWidth + 2 * @navbarButtonSpacing);
 
   @rightMargin: @navbarLeftMarginDarwin / 2;
 
-  display: flex;
-
-  // Buttons on the left
-  .backforward {
-    display: flex;
-
-    .backButton,
-    .forwardButton {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-    }
-
-    .backButton {
-      background: url('../img/toolbar/back_btn.svg') center no-repeat;
-      background-size: 14px 14px;
-    }
-
-    .forwardButton {
-      background: url('../img/toolbar/forward_btn.svg') center no-repeat;
-      background-size: 14px 14px;
-    }
-  }
-
   // Navigation bar at the center
-  #navigator {
-    display: flex;
-    flex-grow: 1;
-    min-width: 0%; // allow the navigator to shrink
-    max-width: 900px;
-    margin-right: @rightMargin;
-
+  #navigationBar {
     &.titleMode {
       padding-right: @centerOffset;
+
+      @media (max-width: @breakpointNarrowViewport) {
+        transition: padding @transitionDuration ease-in-out;
+        padding-right: 0;
+      }
     }
 
     @media (max-width: @breakpointNarrowViewport) {
@@ -497,40 +441,10 @@
     @media (max-width: @breakpointNarrowViewport) {
       width: 100%;
     }
-
-    &.titleMode {
-      @media (max-width: @breakpointNarrowViewport) {
-        transition: padding @transitionDuration ease-in-out;
-        padding-right: 0;
-      }
-    }
   }
 
   // Buttons on the right
   .topLevelEndButtons {
-    display: flex;
-    flex-direction: row;
-    margin-left: 3px;
-    position: relative;
-
-    .braveMenu {
-      width: @navbarBraveButtonWidth;
-      margin-right: @navbarButtonSpacing;
-      -webkit-app-region: no-drag;
-      user-select: none;
-
-      &.braveShieldsDown {
-        -webkit-filter: grayscale(100%);
-      }
-
-      &.braveShieldsDisabled {
-        -webkit-filter: grayscale(100%);
-        opacity: 0.4;
-      }
-      &.leftOfCaptionButton {
-        margin-right: 3px;
-      }
-    }
 
     @media (max-width: @breakpointWideViewport) {
       .extraDragArea {
@@ -542,139 +456,9 @@
   }
 }
 
-.navigationButton {
-  background-color: @buttonColor;
-  display: inline-block;
-  width: 100%;
-  height: 100%;
-  margin: 0 7px 0 0;
-}
-
-.navigationButtonContainer {
-  border-radius: @borderRadius;
-  height: 24px;
-  width: 26px;
-  margin-left: -3px;
-  margin-right: 6px;
-
-  &.nav {
-    margin-left: 4px;
-    margin-right: 1px;
-    width: 34px;
-  }
-
-  &:last-child {
-    margin-right: 8px;
-  }
-
-  &:not(.disabled):hover {
-    background: white;
-    box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.15);
-  }
-}
-
-#navigator {
-  .stopButton,
-  .reloadButton,
-  .homeButton {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  .stopButton {
-    background: url('../img/toolbar/stoploading_btn.svg') center no-repeat;
-    background-size: 11px 11px;
-  }
-
-  .reloadButton {
-    background: url('../img/toolbar/reload_btn.svg') center no-repeat;
-    background-size: 13px 13px;
-  }
-
-  .homeButton {
-    background: url('../img/toolbar/home_btn.svg') center no-repeat;
-    background-size: 16px 16px;
-  }
-}
-
-.navigatorWrapper {
-  justify-content: space-between;
-  align-items: center;
-  margin-top: @navbarMenubarMargin;
-  box-sizing: border-box;
-
-  /**
-   * Left buttons
-   */
-  .backforward {
-    display: flex;
-    z-index: @zindexNavigationBar;
-    transition: margin @transitionDuration ease-in-out;
-
-    button {
-      user-select: none;
-      color: @buttonColor;
-      cursor: default;
-      border-radius: 4px;
-      font-weight: 300;
-      opacity: 0.2;
-
-      &:not([disabled]) {
-        opacity: 0.85;
-        -webkit-app-region: no-drag;
-      }
-    }
-  }
-}
-
-@urlbarFormHeight: 25px;
-
 .urlbarForm {
-  position: relative; // PR #6485
-  width: 0; // Fixes #4298
-  align-items: center;
-  justify-content: center;
-  height: @urlbarFormHeight;
-  padding: 0 10px 0 3px;
-  display: flex;
-  flex-grow: 1;
-  min-width: 0%; // allow the navigator to shrink
-
   *:not(legend) {
     z-index: @zindexUrlbarNotLegend;
-  }
-
-  legend:before {
-    content: ' ';
-    position: absolute;
-    border-radius: 0 4px 4px 0;
-    color: #333;
-    box-shadow: inset 0 0 0 1px @urlBarOutline, inset 0 0 0 3px @focusUrlbarOutline;
-    outline: none;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    z-index: @zindexNavigationBar;
-    display: none;
-  }
-
-  input:focus + legend:before {
-    display: block;
-  }
-
-  #navigator:not(.titleMode) & {
-    border-radius: @borderRadiusURL;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    box-shadow: inset 0 0 0 1px rgba(187, 187, 187, 1.0);
-    color: @chromeText;
-
-    // #4922
-    // TODO: replace this value with a CSS variable to add a dark UI.
-    background: #fff;
   }
 
   @media (max-width: @breakpointNarrowViewport) {
@@ -682,31 +466,11 @@
   }
 }
 
-#navigator {
-  font-size: 20px;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  padding: 0;
-  position: relative;
-  user-select: none;
-  z-index: @zindexNavigationBar;
+#navigationBar {
 
   // #6253 #6680
   > * {
     -webkit-app-region: no-drag;
-  }
-
-  form {
-    -webkit-app-region: drag;
-    // Disable window dragging so that selecting text and dragging the favicon is possible.
-    input, .urlbarIcon {
-      -webkit-app-region: no-drag;
-    }
-  }
-
-  .endButtons {
-    display: flex;
   }
 
   &:not(.titleMode) {
@@ -714,211 +478,5 @@
       animation: fadeIn .6s;
       z-index: @zindexNavigationBarElements;
     }
-
-    .urlbarForm {
-      &.noBorderRadius {
-        border-radius: 0;
-
-        legend:before {
-          border-radius: 0;
-        }
-      }
-    }
-
-    // Create 25x25 squares and place the buttons at the center of each container
-    .bookmarkButtonContainer,
-    .addPublisherButtonContainer {
-      border: 1px solid @urlBarOutline;
-      border-radius: @borderRadiusURL;
-      box-sizing: border-box;
-      display: flex;
-      align-items: center;
-      height: @urlbarFormHeight;
-      width: @urlbarFormHeight;
-      min-height: @urlbarFormHeight;
-      min-width: @urlbarFormHeight;
-      -webkit-app-region: no-drag;
-    }
-
-    .bookmarkButtonContainer {
-      border-right: none;
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-
-      .bookmarkButton {
-        background: url('../img/toolbar/bookmark_btn.svg') center no-repeat;
-        -webkit-mask-repeat: no-repeat;
-        background-size: 14px 14px;
-        margin: 0;
-        height: 0;
-        width: @urlbarFormHeight; // #6704
-        height: @urlbarFormHeight; // #6704
-
-        &.removeBookmarkButton {
-          background: url('../img/toolbar/bookmark_marked.svg') center no-repeat;
-          background-size: 14px 14px;
-        }
-      }
-    }
-  }
-
-  &.titleMode {
-    &:extend(#navigator:not(.titleMode).urlbarForm);
-    animation: fadeIn 1.2s;
-    background: none;
-    // border-radius: @borderRadiusURL;
-    // box-shadow: inset 0 0 0 1px rgba(187, 187, 187, 1.0);
-
-    .urlbarForm {
-      background: none;
-    }
-
-    input {
-      display: none;
-    }
-    #titleBar {
-      display: inline-block;
-      color: @chromeText;
-      font-size: 13px;
-      max-width: 100%;
-      overflow-x: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      margin-left: 2px;
-
-      strong {
-        font-weight: 600;
-      }
-    }
-
-    .endButtons {
-      display: none;
-    }
-
-    .urlbarIcon {
-      display: inline-block;
-      opacity: 0.5;
-      position: relative;
-      left: 2px;
-      min-width: 0;
-
-      &.insecure-color {
-        color: @siteInsecureColor;
-        opacity: 1.0;
-      }
-    }
-
-    .bookmarkButton {
-      &:not(.removeBookmarkButton) {
-        display: none;
-      }
-    }
-  }
-
-  #titleBar {
-    display: none;
-    text-overflow: ellipsis;
-  }
-
-  .urlbarForm {
-    .loadTime {
-      color: @loadTimeColor;
-      font-size: 12px;
-      text-align: right;
-      cursor: default;
-
-      &.onFocus {
-        display: none;
-      }
-    }
-
-    /* Disable selection of button text */
-    > span {
-       user-select: none;
-    }
-
-    input {
-      border: none;
-      box-sizing: border-box;
-      color: #333;
-      letter-spacing: -0.125px;
-      cursor: text;
-      flex-grow: 1;
-      font-size: 13.5px;
-      font-weight: normal;
-      outline: none;
-      text-overflow: ellipsis;
-      min-width: 0%; // allow the navigator to shrink
-
-      // #4922: make the whole .urlbarForm clickable
-      height: @urlbarFormHeight;
-      background: transparent;
-
-      &.private {
-        background: @privateTabBackground;
-        color: @chromeText;
-      }
-
-      &:focus {
-        margin-right: 3px;
-      }
-    }
-
-    // Create 25x25 square and place .urlbarIcon at the center of it
-    .urlbarIconContainer {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: @urlbarFormHeight;
-      width: @urlbarFormHeight;
-      min-height: @urlbarFormHeight;
-      min-width: @urlbarFormHeight;
-
-      .urlbarIcon {
-        color: @siteSecureColor;
-        font-size: 12px;
-        background-repeat: no-repeat;
-        background-position: center;
-        position: relative;
-        bottom: -1px;
-
-        // about:newtab
-        &.fa-search {
-          position: relative;
-          bottom: 0;
-          // 50% of #5a5a5a
-          color: rgba(90, 90, 90, 0.5);
-        }
-
-        &.fa-lock,
-        &.fa-unlock,
-        &.fa-exclamation-triangle {
-          font-size: 16px;
-          bottom: 0;
-        }
-
-        &.insecure-color {
-          color: @siteInsecureColor;
-        }
-
-        &.extendedValidation {
-          color: @siteEVColor;
-        }
-      }
-    }
-  }
-}
-
-.topLevelEndButtons .braveMenu {
-  background-image: -webkit-image-set(url(../app/extensions/brave/img/braveBtn.png) 1x,
-                                      url(../app/extensions/brave/img/braveBtn2x.png) 2x,
-                                      url(../app/extensions/brave/img/braveBtn3x.png) 3x);
-  background-repeat: no-repeat;
-  height: 24px;
-
-  &:hover {
-    background-image: -webkit-image-set(url(../app/extensions/brave/img/braveBtn_hover.png) 1x,
-                                        url(../app/extensions/brave/img/braveBtn2x_hover.png) 2x,
-                                        url(../app/extensions/brave/img/braveBtn3x_hover.png) 3x);
   }
 }

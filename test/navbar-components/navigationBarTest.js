@@ -27,7 +27,7 @@ describe('navigationBar tests', function () {
       // wait for correct urlInput based on frameKey
       .waitForTabCount(frameKey)
       .windowByUrl(Brave.browserWindowUrl)
-      .waitForVisible('div[id="navigator"][data-frame-key="' + frameKey + '"] ' + urlInput)
+      .waitForVisible('div[data-test-id="navigationBar"][data-frame-key="' + frameKey + '"] ' + urlInput)
       .waitForElementFocus(urlInput)
   }
 
@@ -1114,7 +1114,7 @@ describe('navigationBar tests', function () {
       before(function * () {
         yield this.app.client
           .ipcSend('shortcut-set-active-frame-by-index', 0)
-          .waitForVisible('div[id="navigator"][data-frame-key="1"] ' + urlInput)
+          .waitForVisible('div[data-test-id="navigationBar"][data-frame-key="1"] ' + urlInput)
       })
 
       it('shows the default location', function * () {
@@ -1132,7 +1132,7 @@ describe('navigationBar tests', function () {
       before(function * () {
         yield this.app.client
           .ipcSend('shortcut-set-active-frame-by-index', 1)
-          .waitForVisible('div[id="navigator"][data-frame-key="2"] ' + urlInput)
+          .waitForVisible('div[data-test-id="navigationBar"][data-frame-key="2"] ' + urlInput)
       })
 
       it('preserves typing state', function * () {

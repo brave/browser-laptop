@@ -159,6 +159,20 @@ class AddEditBookmarkHanger extends React.Component {
   }
 }
 
+const navigationButtonContainerWidth = globalStyles.navigationBar.navigationButtonContainer.width
+const navigationButtonContainerMarginRight = globalStyles.navigationBar.navigationButtonContainer.marginRight
+const bookmarkButtonContainerWidth = globalStyles.navigationBar.urlbarForm.height
+
+// Add navigationButtonContainerMarginRight (6px)
+const navigationButtonWidth = `calc(${navigationButtonContainerWidth} + ${navigationButtonContainerMarginRight})`
+
+// Count the reload and stop button, adding the half width of the bookmark button container
+// 12px == arrowUp width
+const bookmarkHangerPosition = `calc(12px + ${navigationButtonWidth} + (${bookmarkButtonContainerWidth} / 2))`
+
+// Add another container width
+const bookmarkHangerPositionWithHomeButton = `calc(${bookmarkHangerPosition} + ${navigationButtonWidth})`
+
 const styles = StyleSheet.create({
   // Copied from commonForm.js
   commonFormSection: {
@@ -185,7 +199,7 @@ const styles = StyleSheet.create({
   },
   bookmarkHanger__arrowUp: {
     position: 'relative',
-    left: '54px',
+    left: bookmarkHangerPosition,
 
     '::after': {
       content: '""',
@@ -199,7 +213,7 @@ const styles = StyleSheet.create({
     }
   },
   bookmarkHanger__withHomeButton: {
-    left: '83px'
+    left: bookmarkHangerPositionWithHomeButton
   },
   bookmark__bottomWrapper: {
     display: 'flex',

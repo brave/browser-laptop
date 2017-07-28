@@ -56,7 +56,8 @@ const globalStyles = {
     chromeSecondary: '#d3d3d3',
     chromeTertiary: '#c7c7c7',
     chromeText: '#555555',
-    navigationBarBackground: 'white',
+    navigationBarBackground: '#f7f7f7',
+    navigationBarBackgroundActive: '#fff',
     chromeControlsBackground: '#bbb',
     chromeControlsBackground2: 'white',
     tabsToolbarBorderColor: '#bbb',
@@ -109,6 +110,7 @@ const globalStyles = {
     notificationBottomBorderColor: '#ff5500',
     almostInvisible: 'rgba(255,255,255,0.01)',
     urlBarOutline: '#bbb',
+    focusUrlbarOutline: 'rgba(55, 169, 253, 0.4)',
     alphaWhite: 'rgba(255,255,255,0.8)'
   },
   filter: {
@@ -117,6 +119,7 @@ const globalStyles = {
   },
   radius: {
     borderRadius: '4px',
+    borderRadiusNavigationButton: '2px',
     borderRadiusTabs: '4px',
     borderRadiusURL: '4px',
     borderRadiusUIbox: '8px',
@@ -126,7 +129,6 @@ const globalStyles = {
     carotRadius: '8px'
   },
   spacing: {
-    navigatorHeight: '48px',
     defaultSpacing: '12px',
     defaultFontSize: '13px',
     contextMenuFontSize: '14px',
@@ -138,8 +140,6 @@ const globalStyles = {
     switchNubTopMargin: '2px',
     switchNubLeftMargin: '2px',
     switchNubRightMargin: '2px',
-    buttonHeight: '25px',
-    buttonWidth: '25px',
     navbarHeight: '36px',
     downloadsBarHeight: '60px',
     tabsToolbarHeight: '26px',
@@ -240,6 +240,7 @@ const globalStyles = {
     flyoutDialog: '13px',
     prefsPanelHeading: '23px'
   },
+
   appIcons: {
     clipboard: 'fa fa-clipboard',
     closeTab: 'fa fa-times-circle',
@@ -255,8 +256,14 @@ const globalStyles = {
     moreInfo: 'fa fa-info-circle',
     angleDoubleRight: 'fa fa-angle-double-right',
     findPrev: 'fa fa-caret-up',
-    findNext: 'fa fa-caret-down'
+    findNext: 'fa fa-caret-down',
+    exclamationTriangle: 'fa fa-exclamation-triangle',
+    search: 'fa fa-search',
+    list: 'fa fa-list',
+    lock: 'fa fa-lock',
+    unlock: 'fa fa-unlock'
   },
+
   animations: {
     subtleShowUp: {
       opacity: 0,
@@ -327,13 +334,27 @@ const globalStyles = {
         background: '#ccc'
       }
     }
+  },
+
+  navigationBar: {
+
+    urlbarForm: {
+      height: '25px'
+    },
+
+    navigationButtonContainer: {
+      marginRight: '6px',
+
+      // cf: topLevelStartButtonContainer on navigator.js
+      // globalStyles.navigationBar.urlbarForm.height + 2px
+      width: 'calc(25px + 2px)'
+    }
   }
 }
 
 globalStyles.color.chromeBorderColor = globalStyles.color.chromePrimary
 globalStyles.color.chromeControlsWarningBackground = globalStyles.color.chromePrimary
 globalStyles.color.audioColor = globalStyles.color.highlightBlue
-globalStyles.color.focusUrlbarOutline = globalStyles.color.highlightBlue
 globalStyles.color.siteSecureColor = globalStyles.color.buttonColor
 globalStyles.color.loadTimeColor = globalStyles.color.highlightBlue
 globalStyles.color.activeTabDefaultColor = globalStyles.color.chromePrimary

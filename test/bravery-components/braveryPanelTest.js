@@ -56,7 +56,7 @@ describe('Bravery Panel', function () {
         .tabByIndex(0)
         .loadUrl(url)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForTextValue('[data-test-id="lionBadge"]', '2')
+        .waitForTextValue('[data-test-id="counterBraveMenu"]', '2')
     })
   })
   describe('Tracking Protection stats', function () {
