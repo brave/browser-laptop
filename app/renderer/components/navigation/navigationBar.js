@@ -10,14 +10,17 @@ const ipc = require('electron').ipcRenderer
 const ReduxComponent = require('../reduxComponent')
 const UrlBar = require('./urlBar')
 const AddEditBookmarkHanger = require('../bookmarks/addEditBookmarkHanger')
+const NavigationBarButtonContainer = require('./buttons/navigationBarButtonContainer')
+
+// Components -> buttons
+const StopButton = require('./buttons/stopButton')
+const ReloadButton = require('./buttons/reloadButton')
+const HomeButton = require('./buttons/homeButton')
+const BookmarkButton = require('./buttons/bookmarkButton')
 const PublisherToggle = require('./publisherToggle')
-const LongPressButton = require('../common/longPressButton')
-const HomeButton = require('./homeButton')
-const {NormalizedButton} = require('../common/browserButton')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
-const appActions = require('../../../../js/actions/appActions')
 
 // Constants
 const messages = require('../../../../js/constants/messages')
@@ -25,6 +28,7 @@ const settings = require('../../../../js/constants/settings')
 
 // State
 const tabState = require('../../../common/state/tabState')
+const menuBarState = require('../../../common/state/menuBarState')
 const publisherState = require('../../../common/lib/publisherUtil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
@@ -32,104 +36,23 @@ const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const cx = require('../../../../js/lib/classSet')
 const {getBaseUrl} = require('../../../../js/lib/appUrlUtil')
 const siteUtil = require('../../../../js/state/siteUtil')
-const eventUtil = require('../../../../js/lib/eventUtil')
 const {getSetting} = require('../../../../js/settings')
-const contextMenus = require('../../../../js/contextMenus')
 const {isDarwin} = require('../../../common/lib/platformUtil')
 const {isFullScreen} = require('../../currentWindow')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../styles/global')
-const commonStyles = require('../styles/commonStyles')
-
-const stopLoadingButton = require('../../../../img/toolbar/stoploading_btn.svg')
-const reloadButton = require('../../../../img/toolbar/reload_btn.svg')
-const bookmarkButton = require('../../../../img/toolbar/bookmark_btn.svg')
-const bookmarkedButton = require('../../../../img/toolbar/bookmark_marked.svg')
 
 class NavigationBar extends React.Component {
   constructor (props) {
     super(props)
-    this.onToggleBookmark = this.onToggleBookmark.bind(this)
     this.onStop = this.onStop.bind(this)
-    this.onReload = this.onReload.bind(this)
-    this.onReloadLongPress = this.onReloadLongPress.bind(this)
-  }
-
-  onToggleBookmark () {
-    const editing = this.props.isBookmarked
-
-    if (editing) {
-      windowActions.editBookmark(true, this.props.bookmarkKey)
-    } else {
-      windowActions.onBookmarkAdded(true, this.props.bookmarkKey)
-    }
-  }
-
-  onReload (e) {
-    if (eventUtil.isForSecondaryAction(e)) {
-      appActions.tabCloned(this.props.activeTabId, {active: !!e.shiftKey})
-    } else {
-      ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
-    }
-  }
-
-  onReloadLongPress (target) {
-    contextMenus.onReloadContextMenu(target)
   }
 
   onStop () {
     // TODO (bridiver) - remove shortcut
     ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_STOP)
     windowActions.onStop(this.props.isFocused, this.props.shouldRenderSuggestions)
-  }
-
-  get bookmarked () {
-    return this.props.activeFrameKey !== undefined &&
-      this.props.bookmarked
-  }
-
-  // BEM Level: navigationBar__buttonContainer
-  get reloadButton () {
-    return <LongPressButton className={cx({
-      normalizeButton: true,
-      [css(styles.navigationButton, styles.navigationButton_reload)]: true
-    })}
-      l10nId='reloadButton'
-      testId='reloadButton'
-      onClick={this.onReload}
-      onLongPress={this.onReloadLongPress}
-    />
-  }
-
-  // BEM Level: navigationBar__buttonContainer
-  get stopButton () {
-    return <NormalizedButton custom={[
-      styles.navigationButton,
-      styles.navigationButton_stop
-    ]}
-      l10nid='stopButton'
-      onClick={this.onStop}
-    />
-  }
-
-  // BEM Level: navigationBar
-  get bookmarkButtonContainer () {
-    return <span className={css(
-      commonStyles.rectangleContainer,
-      commonStyles.rectangleContainer_outsideOfurlbarForm,
-      styles.navigationBar__buttonContainer_bookmark
-    )}>
-      <button className={cx({
-        normalizeButton: true,
-        withHomeButton: getSetting(settings.SHOW_HOME_BUTTON),
-        [css(styles.navigationBar__buttonContainer_bookmark__button, this.bookmarked && styles.navigationBar__buttonContainer_bookmark__button_remove)]: true
-      })}
-        data-l10n-id={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
-        data-test-id={this.bookmarked ? 'bookmarked' : 'notBookmarked'}
-        onClick={this.onToggleBookmark}
-      />
-    </span>
   }
 
   componentDidMount () {
@@ -173,7 +96,7 @@ class NavigationBar extends React.Component {
     props.titleMode = titleMode
     props.isBookmarked = activeFrameKey !== undefined &&
       activeTab && activeTab.get('bookmarked')
-    props.isWideUrlBarEnabled = getSetting(settings.WIDE_URL_BAR)
+    props.isWideURLbarEnabled = getSetting(settings.WIDE_URL_BAR)
     props.showBookmarkHanger = bookmarkDetail.get('isBookmarkHanger', false)
     props.isLoading = loading
     props.showPublisherToggle = publisherState.shouldShowAddPublisherButton(state, location, publisherId)
@@ -185,6 +108,15 @@ class NavigationBar extends React.Component {
     props.activeTabId = activeTabId
     props.bookmarkKey = siteUtil.getSiteKey(activeFrame)
     props.showHomeButton = !props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
+
+    props.location = location
+    props.isDarwin = isDarwin()
+    props.isFullScreen = isFullScreen()
+    props.bookmarkDetail = bookmarkDetail
+    props.menubarVisible = menuBarState.isMenuBarVisible(currentWindow)
+    props.siteSettings = state.get('siteSettings')
+    props.synopsis = state.getIn(['publisherInfo', 'synopsis']) || new Immutable.Map()
+    props.locationInfo = state.get('locationInfo')
 
     return props
   }
@@ -199,7 +131,7 @@ class NavigationBar extends React.Component {
       data-frame-key={this.props.activeFrameKey}
       className={cx({
         titleMode: this.props.titleMode,
-        [css(styles.navigationBar, (this.props.isDarwin && this.props.isFullScreen) && styles.navigationBar_isDarwin_isFullScreen, this.props.titleMode && styles.navigationBar_titleMode, this.props.isWideUrlBarEnabled && styles.navigationBar_wide)]: true
+        [css(styles.navigationBar, (this.props.isDarwin && this.props.isFullScreen) && styles.navigationBar_isDarwin_isFullScreen, this.props.titleMode && styles.navigationBar_titleMode, this.props.isWideURLbarEnabled && styles.navigationBar_wide)]: true
       })}>
       {
         this.props.showBookmarkHanger
@@ -207,32 +139,36 @@ class NavigationBar extends React.Component {
         : null
       }
       {
-        this.props.titleMode
-        ? null
-        : <span className={css(
-            commonStyles.navbarButtonContainer,
-            styles.navigationBar__buttonContainer,
-          )}>
-          {
-            this.props.isLoading
-            ? this.stopButton
-            : this.reloadButton
-          }
-        </span>
+        !this.props.titleMode
+        ? (
+          <NavigationBarButtonContainer isStandalone onNavigationBarChrome>
+            {
+              this.props.isLoading
+              ? <StopButton onStop={this.onStop} />
+              : <ReloadButton />
+            }
+          </NavigationBarButtonContainer>
+        )
+        : null
       }
       {
         this.props.showHomeButton
-        ? <span className={css(
-            commonStyles.navbarButtonContainer,
-            styles.navigationBar__buttonContainer,
-          )}>
-          <HomeButton activeTabId={this.props.activeTabId} />
-        </span>
+        ? (
+          <NavigationBarButtonContainer isStandalone onNavigationBarChrome>
+            <HomeButton />
+          </NavigationBarButtonContainer>
+        )
         : null
       }
       {
         !this.props.titleMode
-        ? this.bookmarkButtonContainer
+        ? (
+          <NavigationBarButtonContainer isSquare isNested
+            containerFor={styles.navigationBar__urlBarStart}
+          >
+            <BookmarkButton />
+          </NavigationBarButtonContainer>
+          )
         : null
       }
       <UrlBar titleMode={this.props.titleMode} />
@@ -245,10 +181,7 @@ class NavigationBar extends React.Component {
   }
 }
 
-const rightMargin = `calc(${globalStyles.spacing.navbarLeftMarginDarwin} / 2)`
-
 const styles = StyleSheet.create({
-
   navigationBar: {
     boxSizing: 'border-box',
     display: 'flex',
@@ -258,7 +191,7 @@ const styles = StyleSheet.create({
     fontSize: '20px',
     minWidth: '0%', // allow the navigationBar to shrink
     maxWidth: '900px',
-    marginRight: rightMargin,
+    marginRight: `calc(${globalStyles.spacing.navbarLeftMarginDarwin} / 2)`,
     padding: 0,
     position: 'relative',
     userSelect: 'none',
@@ -279,45 +212,11 @@ const styles = StyleSheet.create({
     justifyContent: 'initial'
   },
 
-  navigationBar__buttonContainer: {
-    width: globalStyles.navigationBar.navigationButtonContainer.width
-  },
-
-  navigationButton: {
-    display: 'inline-block',
-    width: '100%',
-    height: '100%',
-
-    // cf: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L584-L585
-    margin: 0,
-    padding: 0
-  },
-
-  navigationButton_stop: {
-    background: `url(${stopLoadingButton}) center no-repeat`,
-    backgroundSize: '11px 11px'
-  },
-
-  navigationButton_reload: {
-    background: `url(${reloadButton}) center no-repeat`,
-    backgroundSize: '13px 13px'
-  },
-
-  navigationBar__buttonContainer_bookmark: {
+  // Applies for the first urlBar nested button
+  navigationBar__urlBarStart: {
     borderRight: 'none',
     borderTopRightRadius: 0,
     borderBottomRightRadius: 0
-  },
-
-  navigationBar__buttonContainer_bookmark__button: {
-    background: `url(${bookmarkButton}) center no-repeat`,
-    backgroundSize: '14px 14px',
-    width: '100%',
-    height: '100%'
-  },
-
-  navigationBar__buttonContainer_bookmark__button_remove: {
-    background: `url(${bookmarkedButton}) center no-repeat`
   }
 })
 

@@ -198,41 +198,6 @@ const styles = StyleSheet.create({
   isCommonForm: {
     fontSize: globalStyles.fontSize.flyoutDialog,
     width: '100%'
-  },
-
-  // #9283
-  // Create 25x25 squares and place the buttons at the center of each container
-  // Used for bookmarkButtonContainer, PublisherToggle, noScriptInfo, and UrlBarIcon.
-  rectangleContainer: {
-    boxSizing: 'border-box',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: globalStyles.navigationBar.urlbarForm.height,
-    width: globalStyles.navigationBar.urlbarForm.height,
-    minHeight: globalStyles.navigationBar.urlbarForm.height,
-    minWidth: globalStyles.navigationBar.urlbarForm.height,
-    WebkitAppRegion: 'no-drag'
-  },
-
-  // Add border to the bookmark button and publisher button only
-  rectangleContainer_outsideOfurlbarForm: {
-    border: `1px solid ${globalStyles.color.urlBarOutline}`,
-    borderRadius: globalStyles.radius.borderRadiusURL
-  },
-
-  navbarButtonContainer: {
-  // Used for stopButton, reloadButton, and homeButton on navigationBar.js
-  // and backButton and forwardButton on navigator.js
-    display: 'inline-block',
-    borderRadius: globalStyles.radius.borderRadiusNavigationButton,
-    height: globalStyles.navigationBar.urlbarForm.height,
-    marginRight: globalStyles.navigationBar.navigationButtonContainer.marginRight,
-
-    ':hover': {
-      background: '#fff',
-      boxShadow: '0px 1px 5px 0px rgba(0, 0, 0, 0.15)'
-    }
   }
 })
 
