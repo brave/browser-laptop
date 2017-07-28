@@ -379,10 +379,8 @@ describe('navigationBar tests', function () {
           this.app.client
             .activateURLMode()
             .waitForExist(urlBarIcon)
-
-            // TODO: Fix
             .getAttribute(urlBarIcon, 'class').then((classes) =>
-              classes.includes('fa-unlock') && classes.includes('insecure-color')
+              classes.includes('fa-unlock')
         ))
         .windowByUrl(Brave.browserWindowUrl)
         .click(urlBarIcon)
@@ -401,10 +399,8 @@ describe('navigationBar tests', function () {
           this.app.client
             .activateURLMode()
             .waitForExist(urlBarIcon)
-
-            // TODO: Fix
             .getAttribute(urlBarIcon, 'class').then((classes) =>
-              classes.includes('fa-exclamation-triangle') && classes.includes('insecure-color')
+              classes.includes('fa-exclamation-triangle')
         ))
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible('[data-test-id="phishingConnectionInfo"]')
@@ -422,10 +418,8 @@ describe('navigationBar tests', function () {
         .click(activeWebview)
         .waitForExist(titleBar)
         .waitForVisible(urlBarIcon, 1)
-
-        // TODO: Fix
         .getAttribute(urlBarIcon, 'class').then((classes) =>
-          classes.includes('fa-unlock') && classes.includes('insecure-color')
+          classes.includes('fa-unlock')
         )
     })
     it('Shows secure URL icon', function * () {
@@ -475,11 +469,9 @@ describe('navigationBar tests', function () {
       yield this.app.client
         .activateURLMode()
         .waitForExist(urlBarIcon)
-
-        // TODO: Fix
         .waitUntil(() =>
           this.app.client.getAttribute(urlBarIcon, 'class').then((classes) =>
-            classes.includes('fa-unlock') && !classes.includes('insecure-color')
+            classes.includes('fa-unlock')
           )
         )
         .click(urlBarIcon)
@@ -492,10 +484,8 @@ describe('navigationBar tests', function () {
         .activateURLMode()
         .waitForExist(urlBarIcon)
         .waitUntil(() =>
-
-          // TODO: Fix
           this.app.client.getAttribute(urlBarIcon, 'class').then((classes) =>
-            classes.includes('fa-unlock') && classes.includes('insecure-color')
+            classes.includes('fa-unlock')
           )
         )
     })
@@ -515,10 +505,8 @@ describe('navigationBar tests', function () {
         .waitForInputText(urlInput, page1Url)
         .waitForExist(urlBarIcon)
         .waitUntil(() =>
-
-          // TODO: Fix
           this.app.client.getAttribute(urlBarIcon, 'class').then((classes) =>
-            classes.includes('fa-unlock') && classes.includes('insecure-color')
+            classes.includes('fa-unlock')
           )
         )
     })

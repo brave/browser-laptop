@@ -3,11 +3,10 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const Immutable = require('immutable')
 const {StyleSheet} = require('aphrodite/no-important')
 
 // Components
-const ReduxComponent = require('../../reduxComponent')
+const ImmutableComponent = require('../../immutableComponent')
 const {NormalizedButton} = require('../../common/browserButton')
 
 // Actions
@@ -16,23 +15,32 @@ const appActions = require('../../../../../js/actions/appActions')
 // Constants
 const settings = require('../../../../../js/constants/settings')
 
-// State
-const tabState = require('../../../../common/state/tabState')
-const frameStateUtil = require('../../../../../js/state/frameStateUtil')
-
 // Utils
-const eventUtil = require('../../../../../js/lib/eventUtil')
 const {getSetting} = require('../../../../../js/settings')
+const eventUtil = require('../../../../../js/lib/eventUtil')
 
+// Styles
 const homeButtonIcon = require('../../../../../img/toolbar/home_btn.svg')
 
-class HomeButton extends React.Component {
+class HomeButton extends ImmutableComponent {
   constructor (props) {
     super(props)
     this.onHome = this.onHome.bind(this)
   }
 
+  componentDidMount () {
+    this.homeButton.addEventListener('auxclick', this.onHome)
+  }
+
+  componentWillUnmount () {
+    this.homeButton.removeEventListener('auxclick', this.onHome)
+  }
+
   onHome (e) {
+    if (e.button === 2) {
+      return
+    }
+
     getSetting(settings.HOMEPAGE).split('|')
       .forEach((homepage, i) => {
         if (i === 0 && !eventUtil.isForSecondaryAction(e)) {
@@ -46,18 +54,6 @@ class HomeButton extends React.Component {
       })
   }
 
-  mergeProps (state, dispatchProps, ownProps) {
-    const currentWindow = state.get('currentWindow')
-    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
-    const activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
-
-    const props = {}
-
-    props.activeTabId = activeTabId
-
-    return props
-  }
-
   // BEM Level: navigationBar__buttonContainer
   render () {
     return <NormalizedButton
@@ -65,6 +61,7 @@ class HomeButton extends React.Component {
       custom={styles.homeButton}
       testId='homeButton'
       l10nId='homeButton'
+      ref={(node) => { this.homeButton = node }}
       onClick={this.onHome}
     />
   }
@@ -77,4 +74,4 @@ const styles = StyleSheet.create({
   }
 })
 
-module.exports = ReduxComponent.connect(HomeButton)
+module.exports = HomeButton

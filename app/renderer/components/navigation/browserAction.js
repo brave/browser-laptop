@@ -84,7 +84,8 @@ class BrowserAction extends React.Component {
     // TODO(bridiver) should have some visual notification of hover/press
     return <NavigationBarButtonContainer
       isSquare
-      containerFor={styles.browserActionButton}>
+      containerFor={styles.browserActionButton}
+    >
       <BrowserButton
         extensionItem
         l10nId='browserActionButton'

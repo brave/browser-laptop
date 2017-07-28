@@ -3,11 +3,11 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const Immutable = require('immutable')
 const ipc = require('electron').ipcRenderer
+const {StyleSheet} = require('aphrodite/no-important')
 
 // Components
-const ReduxComponent = require('../../reduxComponent')
+const ImmutableComponent = require('../../immutableComponent')
 const LongPressButton = require('../../common/longPressButton')
 
 // Actions
@@ -16,19 +16,14 @@ const appActions = require('../../../../../js/actions/appActions')
 // Constants
 const messages = require('../../../../../js/constants/messages')
 
-// State
-const tabState = require('../../../../common/state/tabState')
-const frameStateUtil = require('../../../../../js/state/frameStateUtil')
-
 // Utils
 const eventUtil = require('../../../../../js/lib/eventUtil')
 const contextMenus = require('../../../../../js/contextMenus')
 
-const {StyleSheet} = require('aphrodite/no-important')
-
+// Styles
 const reloadButtonIcon = require('../../../../../img/toolbar/reload_btn.svg')
 
-class ReloadButton extends React.Component {
+class ReloadButton extends ImmutableComponent {
   constructor (props) {
     super(props)
     this.onReload = this.onReload.bind(this)
@@ -45,18 +40,6 @@ class ReloadButton extends React.Component {
 
   onReloadLongPress (target) {
     contextMenus.onReloadContextMenu(target)
-  }
-
-  mergeProps (state, dispatchProps, ownProps) {
-    const currentWindow = state.get('currentWindow')
-    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
-    const activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
-
-    const props = {}
-
-    props.activeTabId = activeTabId
-
-    return props
   }
 
   render () {
@@ -79,4 +62,4 @@ const styles = StyleSheet.create({
   }
 })
 
-module.exports = ReduxComponent.connect(ReloadButton)
+module.exports = ReloadButton

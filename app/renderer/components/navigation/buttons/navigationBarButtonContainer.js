@@ -4,6 +4,8 @@
 
 const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
+
+const ImmutableComponent = require('../../immutableComponent')
 const globalStyles = require('../../styles/global')
 
 // This component normalizes the wrapper for buttons called on files
@@ -11,9 +13,7 @@ const globalStyles = require('../../styles/global')
 // visual regressions and style inconsistency.
 // Ref https://github.com/brave/browser-laptop/pull/9299#discussion_r124714562
 
-// TODO (Cezar): Check if stateless components can benefit
-// from reduxComponent by setting ownProps to stateless props.
-class NavigationBarButtonContainer extends React.Component {
+class NavigationBarButtonContainer extends ImmutableComponent {
   render () {
     return (
       <div className={css(

@@ -3,75 +3,27 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const Immutable = require('immutable')
 const ipc = require('electron').ipcRenderer
+const {StyleSheet} = require('aphrodite/no-important')
 
 // Components
-const ReduxComponent = require('../../reduxComponent')
+const ImmutableComponent = require('../../immutableComponent')
 const {NormalizedButton} = require('../../common/browserButton')
 
 // Actions
 const windowActions = require('../../../../../js/actions/windowActions')
 
 // Constants
-const siteTags = require('../../../../../js/constants/siteTags')
 const messages = require('../../../../../js/constants/messages')
 
-// State
-const tabState = require('../../../../common/state/tabState')
-const frameStateUtil = require('../../../../../js/state/frameStateUtil')
-
-// Utils
-const siteUtil = require('../../../../../js/state/siteUtil')
-const UrlUtil = require('../../../../../js/lib/urlutil')
-
-const {StyleSheet} = require('aphrodite/no-important')
-
+// Style
 const bookmarkButtonIcon = require('../../../../../img/toolbar/bookmark_btn.svg')
 const bookmarkedButtonIcon = require('../../../../../img/toolbar/bookmark_marked.svg')
 
-class BookmarkButton extends React.Component {
+class BookmarkButton extends ImmutableComponent {
   constructor (props) {
     super(props)
     this.onToggleBookmark = this.onToggleBookmark.bind(this)
-  }
-
-  onToggleBookmark () {
-    const editing = this.bookmarked
-    // show the AddEditBookmarkHanger control; saving/deleting takes place there
-    let siteDetail = siteUtil.getDetailFromFrame(
-      this.activeFrame,
-      siteTags.BOOKMARK
-    )
-    const key = siteUtil.getSiteKey(siteDetail)
-
-    if (key !== null) {
-      siteDetail = siteDetail.set(
-        'parentFolderId',
-        this.props.sites.getIn([key, 'parentFolderId'])
-      )
-      siteDetail = siteDetail.set(
-        'customTitle',
-        this.props.sites.getIn([key, 'customTitle'])
-      )
-    }
-    siteDetail = siteDetail.set(
-      'location',
-      UrlUtil.getLocationIfPDF(siteDetail.get('location'))
-    )
-    windowActions.setBookmarkDetail(siteDetail, siteDetail, null, editing, true)
-  }
-
-  mergeProps (state, dispatchProps, ownProps) {
-    const currentWindow = state.get('currentWindow')
-    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
-    const activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
-    const activeTab = tabState.getByTabId(state, activeTabId)
-
-    const props = {}
-    props.bookmarked = activeTab && activeTab.get('bookmarked')
-
-    return props
   }
 
   componentDidMount () {
@@ -79,15 +31,23 @@ class BookmarkButton extends React.Component {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark())
   }
 
+  onToggleBookmark () {
+    if (this.props.isBookmarked) {
+      windowActions.editBookmark(true, this.props.bookmarkKey)
+    } else {
+      windowActions.onBookmarkAdded(true, this.props.bookmarkKey)
+    }
+  }
+
   render () {
     return (
       <NormalizedButton navigationButton
         custom={[
           styles.bookmarkButton,
-          this.bookmarked && styles.bookmarkButton_bookmarked
+          this.props.isBookmarked && styles.bookmarkButton_bookmarked
         ]}
-        l10nId={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
-        testId={this.bookmarked ? 'bookmarked' : 'notBookmarked'}
+        l10nId={this.props.isBookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
+        testId={this.props.isBookmarked ? 'bookmarked' : 'notBookmarked'}
         onClick={this.onToggleBookmark}
       />
     )
@@ -105,4 +65,4 @@ const styles = StyleSheet.create({
   }
 })
 
-module.exports = ReduxComponent.connect(BookmarkButton)
+module.exports = BookmarkButton

@@ -51,17 +51,12 @@ class UrlBarIcon extends React.Component {
     return showSearch || defaultToSearch
   }
 
-  get isAboutPage () {
-    return isSourceAboutUrl(this.props.location) &&
-      this.props.location !== 'about:newtab'
-  }
-
   get iconCssClasses () {
     if (isPotentialPhishingUrl(this.props.location)) {
       return [globalStyles.appIcons.exclamationTriangle, css(styles.urlBarIcon_large, styles.urlBarIcon_siteInsecureColor)]
     } else if (this.isSearch) {
       return [globalStyles.appIcons.search]
-    } else if (this.isAboutPage && !this.props.titleMode) {
+    } else if (this.props.isAboutPage && !this.props.titleMode) {
       return [globalStyles.appIcons.list]
     } else if (this.props.isHTTPPage && !this.props.active) {
       // NOTE: EV style not approved yet; see discussion at https://github.com/brave/browser-laptop/issues/791
@@ -83,7 +78,7 @@ class UrlBarIcon extends React.Component {
 
     // Move fa-list (not fa-search) icon on about pages 1px down
     // ref: urlBarIcon_relative
-    const relativeIcon = this.isAboutPage && !this.isSearch
+    const relativeIcon = this.props.isAboutPage && !this.isSearch
 
     const iconClasses = {
       [css(styles.urlBarIcon, this.props.titleMode && styles.urlBarIcon_titleMode, this.isSearch && styles.urlBarIcon_isSearch, relativeIcon && styles.urlBarIcon_relative)]: true
