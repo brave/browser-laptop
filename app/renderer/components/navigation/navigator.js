@@ -155,26 +155,6 @@ class Navigator extends React.Component {
     ipc.off(messages.SHORTCUT_ACTIVE_FRAME_FORWARD, this.onForward)
   }
 
-  // BEM Level: navigator__menuBarAndNavigationBar__navigationBarWrapper
-  get navigationBarWrapper () {
-    return <div className={cx({
-      navigationBarWrapper: true,
-      [css(styles.navigationBarWrapper)]: true
-    })}
-      onDoubleClick={this.onDoubleClick}
-      onDragOver={this.onDragOver}
-      onDrop={this.onDrop}
-    >
-      {this.topLevelStartButtons}
-      {
-        this.props.showNavigationBar
-        ? <NavigationBar />
-        : null
-      }
-      {this.topLevelEndButtons}
-    </div>
-  }
-
   // BEM Level: navigator__menuBarAndNavigationBar__navigationBarWrapper__topLevelStartButtons
   get topLevelStartButtons () {
     return <div className={cx({
@@ -403,7 +383,22 @@ class Navigator extends React.Component {
             </div>
             : null
         }
-        {this.navigationBarWrapper}
+        <div className={cx({
+          navigationBarWrapper: true,
+          [css(styles.navigator__menuBarAndNavigationBar__navigationBarWrapper)]: true
+        })}
+          onDoubleClick={this.onDoubleClick}
+          onDragOver={this.onDragOver}
+          onDrop={this.onDrop}
+        >
+          {this.topLevelStartButtons}
+          {
+            this.props.showNavigationBar
+            ? <NavigationBar />
+            : null
+          }
+          {this.topLevelEndButtons}
+        </div>
       </div>
       {
         this.props.isCaptionButton
@@ -425,7 +420,7 @@ const styles = StyleSheet.create({
     whiteSpace: 'nowrap'
   },
 
-  navigationBarWrapper: {
+  navigator__menuBarAndNavigationBar__navigationBarWrapper: {
     boxSizing: 'border-box',
     display: 'flex',
     justifyContent: 'space-between',
