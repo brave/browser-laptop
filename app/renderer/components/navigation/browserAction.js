@@ -59,9 +59,7 @@ class BrowserAction extends React.Component {
     let tabAction = browserActions.getIn(['tabs', activeTabId.toString()])
 
     if (tabAction) {
-      tabAction = tabAction.set('title', browserActions.get('title'))
-      tabAction = tabAction.set('base_path', browserActions.get('base_path'))
-      browserActions = tabAction
+      browserActions = browserActions.merge(tabAction)
     }
 
     const props = {}
