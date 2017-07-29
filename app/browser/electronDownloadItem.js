@@ -10,15 +10,43 @@ const app = electron.app
  * Maps downloadId to an electron download-item
  */
 const downloadMap = {}
+/**
+ * Monitor progress of active downloads
+ */
+let completedBytes = 0
+const activeDownloadItems = () => Object.keys(downloadMap).length
+const progressDownloadItems = () => {
+  const receivedBytes = Object.keys(downloadMap).reduce((receivedBytes, downloadId) => {
+    receivedBytes += downloadMap[downloadId].getReceivedBytes()
+    return receivedBytes
+  }, completedBytes)
+  const totalBytes = Object.keys(downloadMap).reduce((totalBytes, downloadId) => {
+    totalBytes += downloadMap[downloadId].getTotalBytes()
+    return totalBytes
+  }, completedBytes)
+  return receivedBytes / totalBytes
+}
 
-module.exports.updateElectronDownloadItem = (downloadId, item, state) => {
+module.exports.updateElectronDownloadItem = (win, downloadId, item, state) => {
   if (state === downloadStates.INTERRUPTED || state === downloadStates.CANCELLED || state === downloadStates.COMPLETED) {
     if (app.dock && state === downloadStates.COMPLETED) {
       app.dock.downloadFinished(item.getSavePath())
     }
+    completedBytes += downloadMap[downloadId].getTotalBytes()
     delete downloadMap[downloadId]
   } else {
     downloadMap[downloadId] = item
+  }
+  if (['darwin', 'linux'].includes(process.platform)) {
+    app.setBadgeCount(activeDownloadItems())
+  }
+  if (win && !win.isDestroyed()) {
+    if (activeDownloadItems()) {
+      win.setProgressBar(progressDownloadItems())
+    } else {
+      win.setProgressBar(-1)
+      completedBytes = 0
+    }
   }
 }
 
