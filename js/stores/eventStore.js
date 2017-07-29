@@ -145,6 +145,7 @@ const doAction = (action) => {
       }
       break
     default:
+      return
   }
 
   emitChanges()
