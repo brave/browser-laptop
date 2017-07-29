@@ -496,8 +496,8 @@ function registerPermissionHandler (session, partition) {
   })
 }
 
-function updateDownloadState (downloadId, item, state) {
-  updateElectronDownloadItem(downloadId, item, state)
+function updateDownloadState (win, downloadId, item, state) {
+  updateElectronDownloadItem(win, downloadId, item, state)
 
   if (!item) {
     appActions.mergeDownloadDetail(downloadId, { state: downloadStates.INTERRUPTED })
@@ -554,16 +554,16 @@ function registerForDownloadListener (session) {
     appActions.changeSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH, path.dirname(savePath))
 
     const downloadId = uuid.v4()
-    updateDownloadState(downloadId, item, downloadStates.PENDING)
+    updateDownloadState(win, downloadId, item, downloadStates.PENDING)
     if (win) {
       win.webContents.send(messages.SHOW_DOWNLOADS_TOOLBAR)
     }
     item.on('updated', function () {
       const state = item.isPaused() ? downloadStates.PAUSED : downloadStates.IN_PROGRESS
-      updateDownloadState(downloadId, item, state)
+      updateDownloadState(win, downloadId, item, state)
     })
     item.on('done', function (e, state) {
-      updateDownloadState(downloadId, item, state)
+      updateDownloadState(win, downloadId, item, state)
     })
   })
 }
