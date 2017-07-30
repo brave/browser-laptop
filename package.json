@@ -120,7 +120,7 @@
     "react-dom": "^15.5.4",
     "string.prototype.endswith": "^0.2.0",
     "string.prototype.startswith": "^0.2.0",
-    "tablesort": "5.0.0",
+    "tablesort": "5.0.1",
     "tldjs": "1.6.2",
     "tracking-protection": "1.1.x",
     "underscore": "1.8.3",
