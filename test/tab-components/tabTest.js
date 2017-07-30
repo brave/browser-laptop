@@ -678,4 +678,67 @@ describe('tab tests', function () {
         .waitForTab({index: 1, url: this.page1, windowId: 2})
     })
   })
+  describe('bad tabByIndex behavior', function () {
+    Brave.beforeAll(this)
+    before(function * () {
+      yield setup(this.app.client)
+      this.page1 = Brave.server.url('page1.html')
+    })
+    it('instead of getting index 19, we get index 2', function * () {
+      // loading tabs the boring way
+      // just to ensure that this is not related to any loop
+      yield this.app.client
+      .newTab()
+      .waitForElementCount(tabsTabs, 2)
+      .newTab()
+      .waitForElementCount(tabsTabs, 3)
+      .newTab()
+      .waitForElementCount(tabsTabs, 4)
+      .newTab()
+      .waitForElementCount(tabsTabs, 5)
+      .newTab()
+      .waitForElementCount(tabsTabs, 6)
+      .newTab()
+      .waitForElementCount(tabsTabs, 7)
+      .newTab()
+      .waitForElementCount(tabsTabs, 8)
+      .newTab()
+      .waitForElementCount(tabsTabs, 9)
+      .newTab()
+      .waitForElementCount(tabsTabs, 10)
+      .newTab()
+      .waitForElementCount(tabsTabs, 11)
+      .newTab()
+      .waitForElementCount(tabsTabs, 12)
+      .newTab()
+      .waitForElementCount(tabsTabs, 13)
+      .newTab()
+      .waitForElementCount(tabsTabs, 14)
+      .newTab()
+      .waitForElementCount(tabsTabs, 15)
+      .newTab()
+      .waitForElementCount(tabsTabs, 16)
+      .newTab()
+      .waitForElementCount(tabsTabs, 17)
+      .newTab()
+      .waitForElementCount(tabsTabs, 18)
+      .newTab()
+      .waitForElementCount(tabsTabs, 19)
+      .newTab()
+      .waitForElementCount(tabsTabs, 20)
+      // This should point me to 19th index not 2nd.
+      .tabByIndex(18)
+      .loadUrl(this.page1)
+      // This is just for visual check.
+      // see that url was set for frame-key=2
+      // even after defining index 19.
+      // if you change it to index 18 it will point you to to index 3
+      // which indicates that method is checking indexes going backwards
+      .windowByUrl(Brave.browserWindowUrl)
+      .moveToObject('[data-test-id="tab"][data-frame-key="2"]')
+      .click('[data-test-id="tab"][data-frame-key="2"]')
+      // this passes but shouldn't
+      .waitForTextValue('[data-test-id="tab"][data-frame-key="2"]', 'Page 1')
+    })
+  })
 })
