@@ -5,7 +5,7 @@
 const React = require('react')
 const ImmutableComponent = require('../immutableComponent')
 
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../styles/global')
 const {thirdPartyPasswordManagers} = require('../../../../js/constants/passwordManagers')
 const aboutActions = require('../../../../js/about/aboutActions')
@@ -56,7 +56,7 @@ class ExtensionsTab extends ImmutableComponent {
 
     return [
       { // Icon
-        html: <img className={css(styles.icon)} src={this.getIcon(extension)} />
+        html: <img className={css(styles.table__row__column__icon)} src={this.getIcon(extension)} />
       },
       { // Name
         html: <span data-extension-id={extension.get('id')}
@@ -91,12 +91,12 @@ class ExtensionsTab extends ImmutableComponent {
 
   get columnClassNames () {
     return [
-      css(styles.extensionsColumn, styles.center),
-      css(styles.extensionsColumn),
-      css(styles.extensionsColumn),
-      css(styles.extensionsColumn),
-      css(styles.extensionsColumn, styles.center)
-      // css(styles.extensionsColumn, styles.center)
+      css(styles.table__row__column, styles.table__row__column_center),
+      css(styles.table__row__column),
+      css(styles.table__row__column),
+      css(styles.table__row__column),
+      css(styles.table__row__column, styles.table__row__column_center)
+      // css(styles.table__row__column, styles.table__row__column_center)
     ]
   }
 
@@ -104,99 +104,75 @@ class ExtensionsTab extends ImmutableComponent {
     if (!this.props.extensions) {
       return null
     }
-    return <div className={css(styles.extensionsContainer)}>
-      <main className={css(styles.extensionsMain)}>
-        <DefaultSectionTitle data-l10n-id='extensions' />
-        <SortableTable
-          sortingDisabled
-          tableClassNames={css(styles.extensionsTable)}
-          headings={['icon', 'name', 'description', 'version', 'enabled'] /* 'exclude' */}
-          columnClassNames={this.columnClassNames}
-          rowClassNames={
-            this.props.extensions.map(entry => css(styles.extensionsRow)).toJS()
-          }
-          rows={this.props.extensions.map(entry => this.getRow(entry))} />
-      </main>
+    return <section>
+      <DefaultSectionTitle data-l10n-id='extensions' />
+      <SortableTable
+        sortingDisabled
+        tableClassNames={css(styles.table)}
+        headings={['icon', 'name', 'description', 'version', 'enabled'] /* 'exclude' */}
+        columnClassNames={this.columnClassNames}
+        rowClassNames={
+          this.props.extensions.map(entry => css(styles.table__row)).toJS()
+        }
+        rows={this.props.extensions.map(entry => this.getRow(entry))} />
       <footer className={css(styles.moreInfo)}>
         <HelpfulText l10nId='extensionsTabFooterInfo'>&nbsp;
           <span data-l10n-id='community'
-            className={css(styles.moreInfoLink)}
+            className={css(styles.moreInfo__link)}
             onClick={aboutActions.createTabRequested.bind(null, {
               url: 'https://community.brave.com/c/feature-requests/extension-requests'
             }, true)} />.
         </HelpfulText>
       </footer>
-    </div>
+    </section>
   }
 }
 
 const styles = StyleSheet.create({
-  extensionsContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    height: '100%'
+  table: {
+    // TODO (Suguru): refactor sortableTable.js to remove !important
+    width: '100% !important',
+    marginBottom: '0 !important'
   },
 
-  extensionsMain: {
-    paddingBottom: '40px'
+  table__row: {
+    fontSize: '15px',
+    background: '#fff',
+
+    // TODO (Suguru): refactor sortableTable.js to remove !important
+    height: '56px !important',
+
+    ':nth-child(even)': {
+      background: globalStyles.color.veryLightGray
+    },
+
+    ':hover': {
+      background: globalStyles.color.lightGray
+    }
   },
 
-  icon: {
+  table__row__column: {
+    padding: '0 8px'
+  },
+
+  table__row__column_center: {
+    textAlign: 'center'
+  },
+
+  table__row__column__icon: {
     display: 'flex',
     margin: 'auto',
     width: '32px',
     height: '32px'
   },
 
-  extensionsOption: {
-    display: 'flex',
-    flex: '1',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: '15px'
-  },
-
-  extensionsHeading: {
-    color: '#444444',
-    cursor: 'default',
-    fontSize: '1.2em',
-    marginBottom: '0.7em',
-    userSelect: 'none'
-  },
-
-  extensionsTable: {
-    width: '100%'
-  },
-
-  extensionsRow: {
-    fontSize: '15px',
-    background: '#fff',
-    height: '56px',
-
-    ':nth-child(even)': {
-      background: globalStyles.color.veryLightGray
-    },
-    ':hover': {
-      background: globalStyles.color.lightGray
-    }
-  },
-
-  extensionsColumn: {
-    padding: '0 8px'
-  },
-
-  center: {
-    textAlign: 'center'
-  },
-
   moreInfo: {
-    display: 'flex',
-    flex: '1',
-    alignItems: 'flex-end'
+    // ref: https://github.com/brave/browser-laptop/blob/64c48d5039b5ab66c45b5fdd5be68206ffd6aa89/app/renderer/components/preferences/paymentsTab.js#L292
+    // and https://github.com/brave/browser-laptop/blob/0d0261a2d107d6173e917bb98b56de386601295b/less/about/preferences.less#L18
+    margin: '40px 0'
   },
 
-  moreInfoLink: {
+  moreInfo__link: {
     cursor: 'pointer',
     color: globalStyles.color.braveOrange,
     textDecoration: 'none',
