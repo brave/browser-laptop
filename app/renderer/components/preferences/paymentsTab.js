@@ -226,7 +226,7 @@ class PaymentsTab extends ImmutableComponent {
               <div className={css(styles.switchWrap__autoSuggestSwitch)}>
                 <div className={css(styles.flexAlignCenter, styles.autoSuggestSwitch__subtext)}>
                   <SettingCheckbox dataL10nId='autoSuggestSites'
-                    prefKey={settings.AUTO_SUGGEST_SITES}
+                    prefKey={settings.PAYMENTS_SITES_AUTO_SUGGEST}
                     settings={this.props.settings}
                     disabled={!enabled}
                     onChangeSetting={this.props.onChangeSetting}

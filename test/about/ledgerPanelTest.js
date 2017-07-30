@@ -281,7 +281,7 @@ describe('Regular payment panel tests', function () {
     beforeEach(function * () {
       yield setup(this.app.client)
       yield this.app.client
-        .changeSetting(settings.AUTO_SUGGEST_SITES, true)
+        .changeSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST, true)
         .tabByIndex(0)
         .loadUrl(prefsUrl)
         .waitForVisible(paymentsTab)
@@ -322,7 +322,7 @@ describe('Regular payment panel tests', function () {
     it('site is not added automatically', function * () {
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
-        .changeSetting(settings.AUTO_SUGGEST_SITES, false)
+        .changeSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST, false)
         .tabByIndex(0)
         .loadUrl(site1)
         .windowByUrl(Brave.browserWindowUrl)
@@ -357,7 +357,7 @@ describe('Regular payment panel tests', function () {
         .waitForSiteEntry(site1)
         .tabByUrl(site1)
         .windowByUrl(Brave.browserWindowUrl)
-        .changeSetting(settings.AUTO_SUGGEST_SITES, false)
+        .changeSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST, false)
         .tabByIndex(0)
         .loadUrl(site2)
         .windowByUrl(Brave.browserWindowUrl)

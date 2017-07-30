@@ -40,7 +40,7 @@ const publisherState = {
     // All publishers will be enabled by default if AUTO_SUGGEST is ON,
     // excluding publishers defined on ledger's exclusion list
     const excluded = locationInfo.getIn([locationId, 'exclude'])
-    const autoSuggestSites = getSetting(settings.AUTO_SUGGEST_SITES)
+    const autoSuggestSites = getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)
 
     // If session is clear then siteSettings is undefined and icon
     // will never be shown, but synopsis may not be empty.

@@ -159,13 +159,8 @@ AppStore
   settings: {
     // See defaults in js/constants/appConfig.js
     'adblock.customRules': string, // custom rules in ABP filter syntax
-    'advanced.auto-suggest-sites': boolean, // show auto suggestion
     'advanced.default-zoom-level': number, // the default zoom level for sites that have no specific setting
     'advanced.hardware-acceleration-enabled': boolean, // false if hardware acceleration should be explicitly disabled
-    'advanced.hide-excluded-sites': boolean, // whether to hide excluded sites in the payments list
-    'advanced.minimum-visit-time': number,
-    'advanced.minimum-visits': number,
-    'advanced.minimum-percentage': boolean,
     'advanced.pdfjs-enabled': boolean, // whether or not to render PDF documents in the browser
     'advanced.send-crash-reports': boolean, // true or undefined if crash reports should be sent
     'advanced.send-usage-statistics': boolean, // true or undefined if usage reports should be sent
@@ -192,10 +187,18 @@ AppStore
     'general.useragent.value': (undefined|string), // custom user agent value
     'notification-add-funds-timestamp': number, // timestamp on which we decide if we will show notification Add founds
     'notification-reconcile-soon-timestamp': number, // timestamp
+    'payments.allow-non-verified-publishers': boolean,
     'payments.contribution-amount': number, // in USD
     'payments.enabled': boolean, // true if the Payments pane is active
+    'payments.minimum-visit-time': number,
+    'payments.minimum-visits': number,
+    'payments.notification-add-funds-timestamp': number,
+    'payments.notification-reconcile-soon-timestamp': number,
+    'payments.notification-try-payments-dismissed': boolean, // true if you dismiss the message or enable Payments
     'payments.notifications': boolean, // true to show payment notifications
-    'payments.notificationTryPaymentsDismissed': boolean, // true if you dismiss the message or enable Payments
+    'payments.sites-auto-suggest': boolean, // show auto suggestion
+    'payments.sites-hide-excluded': boolean, // whether to hide excluded sites in the payments list
+    'payments.sites-show-less': boolean, // whether to show less sites in the payments list
     'privacy.autocomplete.history-size': number, // number of autocomplete entries to keep
     'privacy.autofill-enabled': boolean, // true to enable autofill
     'privacy.block-canvas-fingerprinting': boolean, // canvas fingerprinting defense
