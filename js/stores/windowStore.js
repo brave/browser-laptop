@@ -23,9 +23,9 @@ const assert = require('assert')
 const contextMenuState = require('../../app/common/state/contextMenuState')
 const appStoreRenderer = require('./appStoreRenderer')
 const windowActions = require('../actions/windowActions')
-const siteUtil = require('../state/siteUtil')
 const bookmarkFoldersState = require('../../app/common/state/bookmarkFoldersState')
 const bookmarksState = require('../../app/common/state/bookmarksState')
+const bookmarkUtil = require('../../app/common/lib/bookmarkUtil')
 
 let windowState = Immutable.fromJS({
   activeFrameKey: null,
@@ -490,7 +490,7 @@ const doAction = (action) => {
 
         bookmarkDetail = bookmarkDetail.set('location', UrlUtil.getLocationIfPDF(bookmarkDetail.get('location')))
 
-        const editKey = siteUtil.getSiteKey(bookmarkDetail)
+        const editKey = bookmarkUtil.getKey(bookmarkDetail)
 
         windowState = windowState.setIn(['bookmarkDetail'], Immutable.fromJS({
           siteDetail: bookmarkDetail,

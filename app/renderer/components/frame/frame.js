@@ -49,7 +49,6 @@ const debounce = require('../../../../js/lib/debounce')
 const locale = require('../../../../js/l10n')
 const imageUtil = require('../../../../js/lib/imageUtil')
 const historyUtil = require('../../../common/lib/historyUtil')
-const siteUtil = require('../../../../js/state/siteUtil')
 
 // Constants
 const settings = require('../../../../js/constants/settings')
@@ -668,7 +667,7 @@ class Frame extends React.Component {
           errorCode: e.errorCode,
           url: e.validatedURL
         })
-        const key = siteUtil.getSiteKey(this.frame)
+        const key = historyUtil.getKey(this.frame)
         appActions.loadURLRequested(this.props.tabId, 'about:error')
         appActions.removeHistorySite(key)
       } else if (isAborted(e.errorCode)) {

@@ -52,7 +52,6 @@ const keyLocations = require('../../../common/constants/keyLocations')
 // State handling
 const basicAuthState = require('../../../common/state/basicAuthState')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
-const siteUtil = require('../../../../js/state/siteUtil')
 const searchProviders = require('../../../../js/data/searchProviders')
 const defaultBrowserState = require('../../../common/state/defaultBrowserState')
 const shieldState = require('../../../common/state/shieldState')
@@ -68,6 +67,7 @@ const eventUtil = require('../../../../js/lib/eventUtil')
 const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
 const {getCurrentWindowId, isMaximized, isFocused, isFullScreen} = require('../../currentWindow')
 const platformUtil = require('../../../common/lib/platformUtil')
+const urlUtil = require('../../../../js/lib/urlutil')
 const isDarwin = platformUtil.isDarwin()
 const isWindows = platformUtil.isWindows()
 const isLinux = platformUtil.isLinux()
@@ -527,7 +527,7 @@ class Main extends React.Component {
     const activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
     const nonPinnedFrames = frameStateUtil.getNonPinnedFrames(currentWindow)
     const tabsPerPage = Number(getSetting(settings.TABS_PER_PAGE))
-    const activeOrigin = !activeFrame.isEmpty() ? siteUtil.getOrigin(activeFrame.get('location')) : null
+    const activeOrigin = !activeFrame.isEmpty() ? urlUtil.getOrigin(activeFrame.get('location')) : null
     const widevinePanelDetail = currentWindow.get('widevinePanelDetail', Immutable.Map())
     const loginRequiredDetails = basicAuthState.getLoginRequiredDetail(state, activeTabId)
 
@@ -552,7 +552,7 @@ class Main extends React.Component {
       !currentWindow.getIn(['bookmarkDetail', 'isBookmarkHanger'])
     props.showBookmarkFolderDialog = currentWindow.has('bookmarkFolderDetail')
     props.showNoScript = currentWindow.getIn(['ui', 'noScriptInfo', 'isVisible']) &&
-      siteUtil.getOrigin(activeFrame.get('location'))
+      urlUtil.getOrigin(activeFrame.get('location'))
     props.showReleaseNotes = currentWindow.getIn(['ui', 'releaseNotes', 'isVisible'])
     props.showCheckDefault = isFocused() && defaultBrowserState.shouldDisplayDialog(state)
     props.showUpdate = updateState.isUpdateVisible(state)
@@ -581,7 +581,7 @@ class Main extends React.Component {
     props.tabId = activeTabId
     props.location = activeFrame.get('location')
     props.isWidevineReady = state.getIn([appConfig.resourceNames.WIDEVINE, 'ready'])
-    props.widevineLocation = siteUtil.getOrigin(widevinePanelDetail.get('location'))
+    props.widevineLocation = urlUtil.getOrigin(widevinePanelDetail.get('location'))
     props.widevineRememberSettings = widevinePanelDetail.get('alsoAddRememberSiteSetting') ? 1 : 0
 
     return props

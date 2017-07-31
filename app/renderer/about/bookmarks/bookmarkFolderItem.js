@@ -18,8 +18,8 @@ const siteTags = require('../../../../js/constants/siteTags')
 
 // Utils
 const dndData = require('../../../../js/dndData')
-const siteUtil = require('../../../../js/state/siteUtil')
 const cx = require('../../../../js/lib/classSet')
+const bookmarkFoldersUtil = require('../../../common/lib/bookmarkFoldersUtil')
 
 class BookmarkFolderItem extends ImmutableComponent {
   constructor (props) {
@@ -54,7 +54,7 @@ class BookmarkFolderItem extends ImmutableComponent {
    * ex: won't allow child folder to become parent of an ancestor, etc.
    */
   moveBookmark (e, bookmark) {
-    if (siteUtil.isMoveAllowed(this.props.allBookmarkFolders, bookmark, this.props.bookmarkFolder)) {
+    if (bookmarkFoldersUtil.isMoveAllowed(this.props.allBookmarkFolders, bookmark, this.props.bookmarkFolder)) {
       if (bookmark.get('type') === siteTags.BOOKMARK_FOLDER) {
         appActions.moveBookmarkFolder(
           bookmark.get('key'),

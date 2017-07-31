@@ -5,7 +5,6 @@ const sinon = require('sinon')
 const settings = require('../../../js/constants/settings')
 const {makeImmutable} = require('../../../app/common/state/immutableUtil')
 const downloadStates = require('../../../js/constants/downloadStates')
-const siteUtil = require('../../../js/state/siteUtil')
 
 require('../braveUnit')
 
@@ -64,14 +63,6 @@ describe('sessionStore unit tests', function () {
       return true
     }
   }
-  const mockSiteUtil = {
-    clearHistory: (sites) => {
-      return siteUtil.clearHistory(sites)
-    },
-    getSiteKey: (siteDetail) => {
-      return siteUtil.getSiteKey(siteDetail)
-    }
-  }
   const fakeLocale = {
     init: (language) => {
       return new Promise((resolve, reject) => {
@@ -89,7 +80,6 @@ describe('sessionStore unit tests', function () {
     mockery.registerMock('fs-extra', fakeFileSystem)
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('./locale', fakeLocale)
-    mockery.registerMock('../js/state/siteUtil', mockSiteUtil)
     mockery.registerMock('./autofill', fakeAutofill)
     mockery.registerMock('./common/state/tabState', fakeTabState)
     mockery.registerMock('./common/state/windowState', fakeWindowState)

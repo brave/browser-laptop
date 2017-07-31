@@ -21,7 +21,6 @@ const windowStore = require('../../../../js/stores/windowStore')
 const dragTypes = require('../../../../js/constants/dragTypes')
 
 // Utils
-const siteUtil = require('../../../../js/state/siteUtil')
 const dnd = require('../../../../js/dnd')
 const dndData = require('../../../../js/dndData')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
@@ -62,8 +61,8 @@ class PinnedTabs extends React.Component {
           const droppedOnFrame = this.dropFrame(droppedOnTab.props.frameKey)
           const destinationDetails = pinnedSitesUtil.getDetailFromFrame(droppedOnFrame)
           appActions.onPinnedTabReorder(
-            siteUtil.getSiteKey(sourceDetails),
-            siteUtil.getSiteKey(destinationDetails),
+            pinnedSitesUtil.getKey(sourceDetails),
+            pinnedSitesUtil.getKey(destinationDetails),
             isLeftSide
           )
         }

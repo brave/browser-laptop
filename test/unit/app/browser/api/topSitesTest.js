@@ -7,7 +7,7 @@ const Immutable = require('immutable')
 const assert = require('assert')
 const sinon = require('sinon')
 const mockery = require('mockery')
-const siteUtil = require('../../../../../js/state/siteUtil')
+const historyUtil = require('../../../../../app/common/lib/historyUtil')
 const {STATE_SITES} = require('../../../../../js/constants/stateConstants')
 
 let getStateValue
@@ -30,7 +30,7 @@ const generateMap = (...sites) => {
   let history = Immutable.Map()
 
   for (let item of sites) {
-    history = history.set(siteUtil.getSiteKey(item), item)
+    history = history.set(historyUtil.getKey(item), item)
   }
 
   return history
@@ -69,14 +69,14 @@ describe('topSites api', function () {
       title: 'sample 1',
       parentFolderId: 0,
       count: 10,
-      key: 'https://example1.com/|0|0'
+      key: 'https://example1.com/|0'
     })
     const site2 = Immutable.fromJS({
       location: 'https://example2.com/',
       title: 'sample 2',
       parentFolderId: 0,
       count: 5,
-      key: 'https://example2.com/|0|0'
+      key: 'https://example2.com/|0'
     })
     const site3 = Immutable.fromJS({
       location: 'https://example3.com/',
@@ -84,14 +84,14 @@ describe('topSites api', function () {
       parentFolderId: 0,
       count: 23,
       lastAccessedTime: 123,
-      key: 'https://example3.com/|0|0'
+      key: 'https://example3.com/|0'
     })
     const site4 = Immutable.fromJS({
       location: 'https://example4.com/',
       title: 'sample 4',
       parentFolderId: 0,
       count: 0,
-      key: 'https://example4.com/|0|0'
+      key: 'https://example4.com/|0'
     })
     const site5 = Immutable.fromJS({
       location: 'https://example5.com/',
@@ -99,11 +99,11 @@ describe('topSites api', function () {
       parentFolderId: 0,
       count: 23,
       lastAccessedTime: 456,
-      key: 'https://example5.com/|0|0'
+      key: 'https://example5.com/|0'
     })
 
     const staticNewData = Immutable.fromJS([
-      { key: 'https://twitter.com/brave/|0|0',
+      { key: 'https://twitter.com/brave/|0',
         count: 0,
         favicon: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/img/newtab/defaultTopSitesIcon/twitter.png',
         location: 'https://twitter.com/brave',
@@ -111,7 +111,7 @@ describe('topSites api', function () {
         title: 'Brave Software (@brave) | Twitter',
         bookmarked: false
       },
-      { key: 'https://www.facebook.com/BraveSoftware/|0|0',
+      { key: 'https://www.facebook.com/BraveSoftware/|0',
         count: 0,
         favicon: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/img/newtab/defaultTopSitesIcon/facebook.png',
         location: 'https://www.facebook.com/BraveSoftware/',
@@ -119,7 +119,7 @@ describe('topSites api', function () {
         title: 'Brave Software | Facebook',
         bookmarked: false
       },
-      { key: 'https://www.youtube.com/bravesoftware/|0|0',
+      { key: 'https://www.youtube.com/bravesoftware/|0',
         count: 0,
         favicon: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/img/newtab/defaultTopSitesIcon/youtube.png',
         location: 'https://www.youtube.com/bravesoftware/',
@@ -127,7 +127,7 @@ describe('topSites api', function () {
         title: 'Brave Browser - YouTube',
         bookmarked: false
       },
-      { key: 'https://brave.com/|0|0',
+      { key: 'https://brave.com/|0',
         count: 0,
         favicon: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/img/newtab/defaultTopSitesIcon/brave.ico',
         location: 'https://brave.com/',
@@ -135,7 +135,7 @@ describe('topSites api', function () {
         title: 'Brave Software | Building a Better Web',
         bookmarked: false
       },
-      { key: 'https://itunes.apple.com/app/brave-web-browser/id1052879175?mt=8|0|0',
+      { key: 'https://itunes.apple.com/app/brave-web-browser/id1052879175?mt=8|0',
         count: 0,
         favicon: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/img/newtab/defaultTopSitesIcon/appstore.png',
         location: 'https://itunes.apple.com/app/brave-web-browser/id1052879175?mt=8',
@@ -143,7 +143,7 @@ describe('topSites api', function () {
         title: 'Brave Web Browser: Fast with built-in adblock on the App Store',
         bookmarked: false
       },
-      { key: 'https://play.google.com/store/apps/details?id=com.brave.browser|0|0',
+      { key: 'https://play.google.com/store/apps/details?id=com.brave.browser|0',
         count: 0,
         favicon: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/img/newtab/defaultTopSitesIcon/playstore.png',
         location: 'https://play.google.com/store/apps/details?id=com.brave.browser',
@@ -174,7 +174,7 @@ describe('topSites api', function () {
           count: 23,
           lastAccessedTime: 123,
           bookmarked: false,
-          key: 'https://example3.com/|0|0'
+          key: 'https://example3.com/|0'
         },
         {
           location: 'https://example2.com/',
@@ -182,7 +182,7 @@ describe('topSites api', function () {
           parentFolderId: 0,
           count: 5,
           bookmarked: false,
-          key: 'https://example2.com/|0|0'
+          key: 'https://example2.com/|0'
         }
       ])
       assert.deepEqual(newSitesData.toJS(), expectedSites.concat(staticNewData).toJS())
@@ -204,7 +204,7 @@ describe('topSites api', function () {
           parentFolderId: 0,
           count: 12,
           bookmarked: false,
-          key: 'https://example1.com/test|0|0'
+          key: 'https://example1.com/test|0'
         }
       ])
       assert.deepEqual(newSitesData.toJS(), expectedSites.concat(staticNewData).toJS())
@@ -226,7 +226,7 @@ describe('topSites api', function () {
             count: 23,
             lastAccessedTime: 123,
             bookmarked: false,
-            key: 'https://example3.com/|0|0'
+            key: 'https://example3.com/|0'
           },
           {
             location: 'https://example1.com/',
@@ -234,7 +234,7 @@ describe('topSites api', function () {
             parentFolderId: 0,
             count: 10,
             bookmarked: false,
-            key: 'https://example1.com/|0|0'
+            key: 'https://example1.com/|0'
           },
           {
             location: 'https://example2.com/',
@@ -242,7 +242,7 @@ describe('topSites api', function () {
             parentFolderId: 0,
             count: 5,
             bookmarked: false,
-            key: 'https://example2.com/|0|0'
+            key: 'https://example2.com/|0'
           },
           {
             location: 'https://example4.com/',
@@ -250,7 +250,7 @@ describe('topSites api', function () {
             parentFolderId: 0,
             count: 0,
             bookmarked: false,
-            key: 'https://example4.com/|0|0'
+            key: 'https://example4.com/|0'
           }
         ])
         assert.deepEqual(newSitesData.toJS(), expectedSites.concat(staticNewData).toJS())
@@ -271,7 +271,7 @@ describe('topSites api', function () {
             count: 23,
             lastAccessedTime: 456,
             bookmarked: false,
-            key: 'https://example5.com/|0|0'
+            key: 'https://example5.com/|0'
           },
           {
             location: 'https://example3.com/',
@@ -279,7 +279,7 @@ describe('topSites api', function () {
             parentFolderId: 0,
             count: 23,
             bookmarked: false,
-            key: 'https://example3.com/|0|0',
+            key: 'https://example3.com/|0',
             lastAccessedTime: 123
           },
           {
@@ -288,7 +288,7 @@ describe('topSites api', function () {
             parentFolderId: 0,
             count: 10,
             bookmarked: false,
-            key: 'https://example1.com/|0|0'
+            key: 'https://example1.com/|0'
           }
         ])
         assert.deepEqual(newSitesData.toJS(), expectedSites.concat(staticNewData).toJS())
@@ -298,7 +298,7 @@ describe('topSites api', function () {
         const maxSites = this.topSites.aboutNewTabMaxEntries
         let tooManySites = Immutable.Map()
         for (let i = 0; i < maxSites + 1; i++) {
-          tooManySites = tooManySites.set('https://example' + i + '.com|0|0',
+          tooManySites = tooManySites.set('https://example' + i + '.com|0',
             site1.set('location', 'https://example' + i + '.com')
               .set('title', 'sample ' + i)
               .set('count', i)
@@ -317,7 +317,7 @@ describe('topSites api', function () {
       })
 
       it('does not include items marked as ignored', function () {
-        const ignoredSites = Immutable.List().push('https://example1.com/|0|0').push('https://example3.com/|0|0')
+        const ignoredSites = Immutable.List().push('https://example1.com/|0').push('https://example3.com/|0')
         const stateWithIgnoredSites = defaultAppState
           .set(STATE_SITES.HISTORY_SITES, generateMap(site1, site2, site3, site4))
           .setIn(['about', 'newtab', 'ignoredTopSites'], ignoredSites)
@@ -333,7 +333,7 @@ describe('topSites api', function () {
             parentFolderId: 0,
             count: 5,
             bookmarked: false,
-            key: 'https://example2.com/|0|0'
+            key: 'https://example2.com/|0'
           },
           {
             location: 'https://example4.com/',
@@ -341,7 +341,7 @@ describe('topSites api', function () {
             parentFolderId: 0,
             count: 0,
             bookmarked: false,
-            key: 'https://example4.com/|0|0'
+            key: 'https://example4.com/|0'
           }
         ])
         assert.deepEqual(newSitesData.toJS(), expectedSites.concat(staticNewData).toJS())

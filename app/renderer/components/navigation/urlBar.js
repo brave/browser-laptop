@@ -37,7 +37,7 @@ const {getCurrentWindowId} = require('../../currentWindow')
 const {normalizeLocation, getNormalizedSuggestion} = require('../../../common/lib/suggestion')
 const isDarwin = require('../../../common/lib/platformUtil').isDarwin()
 const publisherUtil = require('../../../common/lib/publisherUtil')
-const siteUtil = require('../../../../js/state/siteUtil')
+const historyUtil = require('../../../common/lib/historyUtil')
 
 // Icons
 const iconNoScript = require('../../../../img/url-bar-no-script.svg')
@@ -168,7 +168,7 @@ class UrlBar extends React.Component {
         if (e.shiftKey) {
           const selectedIndex = this.props.urlbarLocationSuffix.length > 0 ? 1 : this.props.selectedIndex
           if (selectedIndex !== undefined) {
-            const key = siteUtil.getSiteKey(Immutable.fromJS({ location: this.props.suggestionLocation }))
+            const key = historyUtil.getKey(Immutable.fromJS({ location: this.props.suggestionLocation }))
             appActions.removeHistorySite(key)
           }
         } else {

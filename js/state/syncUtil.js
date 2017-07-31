@@ -14,6 +14,7 @@ const bookmarkUtil = require('../../app/common/lib/bookmarkUtil')
 const bookmarkFoldersState = require('../../app/common/state/bookmarkFoldersState')
 const bookmarkFoldersUtil = require('../../app/common/lib/bookmarkFoldersUtil')
 const settings = require('../constants/settings')
+const historyUtil = require('../../app/common/lib/historyUtil')
 
 const {STATE_SITES} = require('../constants/stateConstants')
 
@@ -301,10 +302,10 @@ module.exports.applySyncRecords = (records) => {
           bufferAppAction(appActions.addBookmark, siteData)
         }
       } else if (shouldRemoveRecord(record)) {
-        const siteKey = siteUtil.getSiteKey(siteData)
+        const folderKey = bookmarkFoldersUtil.getKey(siteData)
         // TODO: removeBookmarkFolder doesn't support List removal
         setImmediate(() => {
-          appActions.removeBookmarkFolder(siteKey)
+          appActions.removeBookmarkFolder(folderKey)
         })
       }
     } else if (record.objectData === 'historySite') {
@@ -312,7 +313,7 @@ module.exports.applySyncRecords = (records) => {
       if (shouldAddRecord(record)) {
         bufferAppAction(appActions.addHistorySite, siteData)
       } else if (shouldRemoveRecord(record)) {
-        const siteKey = siteUtil.getSiteKey(siteData)
+        const siteKey = historyUtil.getKey(siteData)
         bufferAppAction(appActions.removeHistorySite, siteKey)
       }
     } else {
@@ -399,7 +400,20 @@ module.exports.updateObjectCache = (appState, object, collectionKey) => {
     return appState
   }
   // XXX: Currently only caches sites (history and bookmarks).
-  const stateKeyPath = [collectionKey, siteUtil.getSiteKey(object)]
+  let objectKey = null
+  switch (collectionKey) {
+    case STATE_SITES.BOOKMARKS:
+      objectKey = bookmarkUtil.getKey(object)
+      break
+    case STATE_SITES.BOOKMARK_FOLDERS:
+      objectKey = bookmarkFoldersUtil.getKey(object)
+      break
+    case STATE_SITES.HISTORY_SITES:
+      objectKey = historyUtil.getKey(object)
+      break
+  }
+
+  const stateKeyPath = [collectionKey, objectKey]
   const stateObject = appState.getIn(stateKeyPath)
   const objectId = (stateObject && stateObject.get('objectId')) || object.get('objectId')
   if (!objectId) { return appState }
@@ -558,13 +572,6 @@ module.exports.createSiteData = (site, appState) => {
     }
   }
   const immutableSite = Immutable.fromJS(site)
-  const siteKey = siteUtil.getSiteKey(immutableSite) || siteUtil.getSiteKey(Immutable.fromJS(siteData))
-  if (siteKey === null) {
-    // May happen if this is called before the appStore object has its location
-    // field populated
-    console.log(`Ignoring entry because we can't create site key: ${JSON.stringify(site)}`)
-    return
-  }
   let name
   let objectId
   let parentFolderObjectId
@@ -572,6 +579,19 @@ module.exports.createSiteData = (site, appState) => {
   if (module.exports.isSyncable('bookmark', immutableSite)) {
     name = 'bookmark'
     const isFolder = bookmarkFoldersUtil.isFolder(immutableSite)
+    let siteKey
+    if (isFolder) {
+      siteKey = bookmarkFoldersUtil.getKey(immutableSite) || bookmarkFoldersUtil.getKey(Immutable.fromJS(siteData))
+    } else {
+      siteKey = bookmarkUtil.getKey(immutableSite) || bookmarkUtil.getKey(Immutable.fromJS(siteData))
+    }
+    if (siteKey === null) {
+      // May happen if this is called before the appStore object has its location
+      // field populated
+      console.log(`Ignoring entry because we can't create site key: ${JSON.stringify(site)}`)
+      return
+    }
+
     const sitesCollection = isFolder ? STATE_SITES.BOOKMARK_FOLDERS : STATE_SITES.BOOKMARKS
     objectId = site.objectId ||
       folderToObjectMap[site.folderId] ||
@@ -586,10 +606,20 @@ module.exports.createSiteData = (site, appState) => {
       parentFolderObjectId
     }
   } else if (siteUtil.isHistoryEntry(immutableSite)) {
+    // TODO create new function in historyUtil, because siteUtil.isHistoryEntry is deprecated
+    const siteKey = historyUtil.getKey(immutableSite) || historyUtil.getKey(Immutable.fromJS(siteData))
+    if (siteKey === null) {
+      // May happen if this is called before the appStore object has its location
+      // field populated
+      console.log(`Ignoring entry because we can't create site key: ${JSON.stringify(site)}`)
+      return
+    }
+
     objectId = site.objectId || module.exports.newObjectId([STATE_SITES.HISTORY_SITES, siteKey])
     name = 'historySite'
     value = siteData
   }
+
   if (objectId) {
     if (typeof site.folderId === 'number') {
       folderToObjectMap[site.folderId] = objectId

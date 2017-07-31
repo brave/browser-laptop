@@ -30,7 +30,6 @@ const tabState = require('../../../common/state/tabState')
 // Utils
 const urlParse = require('../../../common/urlParse')
 const cx = require('../../../../js/lib/classSet')
-const siteUtil = require('../../../../js/state/siteUtil')
 const {getSetting} = require('../../../../js/settings')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const braveryUtil = require('../../../common/lib/braveryPanelUtil')
@@ -127,7 +126,7 @@ class BraveryPanel extends React.Component {
       return
     }
 
-    let ruleKey = siteUtil.getOrigin(this.props.lastCommittedURL)
+    let ruleKey = urlUtil.getOrigin(this.props.lastCommittedURL)
     const parsedUrl = urlParse(this.props.lastCommittedURL)
     if (setting !== 'noScript' && (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:')) {
       ruleKey = `https?://${parsedUrl.host}`

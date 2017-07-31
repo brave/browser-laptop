@@ -20,6 +20,7 @@ const bookmarkLocationCache = require('../cache/bookmarkLocationCache')
 const {calculateTextWidth} = require('../../../js/lib/textCalculator')
 const {iconSize} = require('../../../js/constants/config')
 const {getSetting} = require('../../../js/settings')
+const UrlUtil = require('../../../js/lib/urlutil')
 
 // Styles
 const globalStyles = require('../../renderer/components/styles/global')
@@ -243,6 +244,22 @@ const updateActiveTabBookmarked = (state) => {
   return updateTabBookmarked(state, tab)
 }
 
+const getKey = (siteDetail) => {
+  if (!siteDetail) {
+    return null
+  }
+
+  let location = siteDetail.get('location')
+
+  if (location) {
+    location = UrlUtil.getLocationIfPDF(location)
+    return location + '|' +
+      (siteDetail.get('partitionNumber') || 0) + '|' +
+      (siteDetail.get('parentFolderId') || 0)
+  }
+  return null
+}
+
 module.exports = {
   bookmarkHangerHeading,
   isBookmarkNameValid,
@@ -256,5 +273,6 @@ module.exports = {
   getBookmarksByParentId,
   isBookmark,
   updateTabBookmarked,
-  updateActiveTabBookmarked
+  updateActiveTabBookmarked,
+  getKey
 }
