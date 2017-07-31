@@ -762,6 +762,7 @@ class Frame extends React.Component {
       if (this.frame.isEmpty()) {
         return
       }
+      appActions.autoplayDismissed(this.props.tabId)
       windowActions.setAudioPlaybackActive(this.frame, true)
     })
     this.webview.addEventListener('media-paused', ({title}) => {

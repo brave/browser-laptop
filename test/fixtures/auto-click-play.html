@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Autoplay</title>
+  </head>
+  <body onload="autoplay()">
+
+    <video id="autoplay" width="320" height="240" controls onplay="playing()">
+      <source src="video/autoplay.mp4" type="video/mp4">
+    </video>
+
+    <div id='status'></div>
+
+    <script>
+      function playing () {
+        let status = document.getElementById('status')
+        status.textContent = 'Autoplay playing'
+      }
+    </script>
+
+  </body>
+  <script>
+    function autoplay () {
+      var video = document.getElementById("autoplay");
+      video.play()
+    }
+  </script>
+</html>
