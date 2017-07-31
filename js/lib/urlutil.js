@@ -410,6 +410,30 @@ const UrlUtil = {
     }
 
     return url
+  },
+
+  /**
+   * Gets a site origin (scheme + hostname + port) from a URL or null if not
+   * available.
+   * @param {string} location
+   * @return {string|null}
+   */
+  getOrigin: (location) => {
+    // Returns scheme + hostname + port
+    if (typeof location !== 'string') {
+      return null
+    }
+
+    if (location.startsWith('file://')) {
+      return 'file:///'
+    }
+
+    let parsed = urlParse(location)
+    if (parsed.host && parsed.protocol) {
+      return parsed.slashes ? [parsed.protocol, parsed.host].join('//') : [parsed.protocol, parsed.host].join('')
+    } else {
+      return null
+    }
   }
 }
 

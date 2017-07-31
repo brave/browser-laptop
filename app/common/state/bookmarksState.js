@@ -21,7 +21,6 @@ const tabState = require('./tabState')
 const syncActions = require('../../../js/actions/syncActions')
 
 // Utils
-const siteUtil = require('../../../js/state/siteUtil')
 const UrlUtil = require('../../../js/lib/urlutil')
 const bookmarkLocationCache = require('../cache/bookmarkLocationCache')
 const {getSetting} = require('../../../js/settings')
@@ -79,6 +78,7 @@ const bookmarksState = {
 
   addBookmark: (state, bookmarkDetail, destinationKey) => {
     state = validateState(state)
+    const bookmarkUtil = require('../lib/bookmarkUtil')
 
     bookmarkDetail = makeImmutable(bookmarkDetail)
     let location
@@ -87,7 +87,7 @@ const bookmarksState = {
       bookmarkDetail = bookmarkDetail.set('location', location)
     }
 
-    const key = siteUtil.getSiteKey(bookmarkDetail)
+    const key = bookmarkUtil.getKey(bookmarkDetail)
     let dataItem = historyState.getSite(state, key)
 
     if (dataItem.isEmpty()) {
@@ -138,6 +138,7 @@ const bookmarksState = {
 
   editBookmark: (state, editKey, bookmarkDetail) => {
     state = validateState(state)
+    const bookmarkUtil = require('../lib/bookmarkUtil')
 
     const oldBookmark = bookmarksState.getBookmark(state, editKey)
 
@@ -152,8 +153,7 @@ const bookmarksState = {
       location = UrlUtil.getLocationIfPDF(newBookmark.get('location'))
       newBookmark = newBookmark.set('location', location)
     }
-
-    const newKey = siteUtil.getSiteKey(newBookmark)
+    const newKey = bookmarkUtil.getKey(newBookmark)
     if (newKey === null) {
       return state
     }
@@ -237,6 +237,9 @@ const bookmarksState = {
   },
 
   moveBookmark: (state, bookmarkKey, destinationKey, append, moveIntoParent) => {
+    state = validateState(state)
+
+    const bookmarkUtil = require('../lib/bookmarkUtil')
     let bookmark = bookmarksState.getBookmark(state, bookmarkKey)
     let destinationItem = bookmarksState.findBookmark(state, destinationKey)
 
@@ -252,7 +255,7 @@ const bookmarksState = {
 
       state = bookmarkOrderCache.removeCacheKey(state, bookmark.get('parentFolderId'), bookmarkKey)
       bookmark = bookmark.set('parentFolderId', ~~parentFolderId)
-      const newKey = siteUtil.getSiteKey(bookmark)
+      const newKey = bookmarkUtil.getKey(bookmark)
       state = state.deleteIn([STATE_SITES.BOOKMARKS, bookmarkKey])
       state = bookmarkOrderCache.addBookmarkToCache(state, bookmark.get('parentFolderId'), newKey)
       bookmark = bookmark.set('key', newKey)

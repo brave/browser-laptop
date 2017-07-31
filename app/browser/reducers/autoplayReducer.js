@@ -9,7 +9,7 @@ const {makeImmutable} = require('../../common/state/immutableUtil')
 const {ipcMain, webContents} = require('electron')
 const siteSettings = require('../../../js/state/siteSettings')
 const appActions = require('../../../js/actions/appActions')
-const {getOrigin} = require('../../../js/state/siteUtil')
+const {getOrigin} = require('../../../js/lib/urlutil')
 const locale = require('../../locale')
 const messages = require('../../../js/constants/messages')
 

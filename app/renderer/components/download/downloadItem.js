@@ -20,7 +20,7 @@ const appActions = require('../../../../js/actions/appActions')
 const contextMenus = require('../../../../js/contextMenus')
 const downloadUtil = require('../../../../js/state/downloadUtil')
 const urlUtil = require('../../../../js/lib/urlutil')
-const {getOrigin} = require('../../../../js/state/siteUtil')
+const {getOrigin} = require('../../../../js/lib/urlutil')
 const cx = require('../../../../js/lib/classSet')
 
 class DownloadItem extends React.Component {
