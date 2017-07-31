@@ -313,7 +313,20 @@ describe('bookmarkFoldersReducer unit test', function () {
       assert.deepEqual(state, newState)
     })
 
-    it('check if delete is working', function () {
+    it('folder key is list (multiple folders)', function () {
+      spy = sinon.spy(bookmarkFoldersState, 'removeFolder')
+      const newState = bookmarkFoldersReducer(stateWithData, {
+        actionType: appConstants.APP_REMOVE_BOOKMARK_FOLDER,
+        folderKey: [
+          '1',
+          '69'
+        ]
+      })
+      assert.equal(spy.callCount, 2)
+      assert.deepEqual(newState.toJS(), state.toJS())
+    })
+
+    it('folder key is map (single folder)', function () {
       spy = sinon.spy(bookmarkFoldersState, 'removeFolder')
       const newState = bookmarkFoldersReducer(stateWithData, {
         actionType: appConstants.APP_REMOVE_BOOKMARK_FOLDER,

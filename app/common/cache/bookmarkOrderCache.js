@@ -37,8 +37,13 @@ const setOrder = (cache, key, tag, destinationKey, append = true) => {
 }
 
 const addCacheItem = (state, parentId = 0, key, destinationKey, tag, append) => {
+  if (key == null) {
+    return state
+  }
+
   parentId = parentId.toString()
   key = key.toString()
+
   // cache with this parentId doesn't exist yet
   if (!state.hasIn(['cache', 'bookmarkOrder', parentId])) {
     return state.setIn(['cache', 'bookmarkOrder', parentId], Immutable.fromJS([
@@ -53,6 +58,11 @@ const addCacheItem = (state, parentId = 0, key, destinationKey, tag, append) => 
   const cache = state.getIn(['cache', 'bookmarkOrder', parentId])
   // destination key is not provided
   if (destinationKey == null) {
+    const keyExist = cache.some(item => item.get('key') === key)
+    if (keyExist) {
+      return state
+    }
+
     return state.setIn(['cache', 'bookmarkOrder', parentId], cache.push(Immutable.fromJS(
       {
         key: key,
@@ -75,21 +85,26 @@ const addFolderToCache = (state, parentId, key, destinationKey, append) => {
   return addCacheItem(state, parentId, key, destinationKey, siteTags.BOOKMARK_FOLDER, append)
 }
 
-const getFoldersByParentId = (state, parentId) => {
+const getFoldersByParentId = (state, parentId = 0) => {
   return state.getIn(['cache', 'bookmarkOrder', parentId.toString()], Immutable.List())
     .filter(item => bookmarkFoldersUtil.isFolder(item))
 }
 
 const getBookmarksByParentId = (state, parentId = 0) => {
+  const bookmarkUtil = require('../lib/bookmarkUtil')
   return state.getIn(['cache', 'bookmarkOrder', parentId.toString()], Immutable.List())
-    .filter(item => bookmarkFoldersUtil.isFolder(item))
+    .filter(item => bookmarkUtil.isBookmark(item))
 }
 
-const getBookmarksWithFolders = (state, parentId) => {
+const getBookmarksWithFolders = (state, parentId = 0) => {
   return state.getIn(['cache', 'bookmarkOrder', parentId.toString()], Immutable.List())
 }
 
 const removeCacheKey = (state, parentId, key) => {
+  if (parentId == null || key == null) {
+    return state
+  }
+
   parentId = parentId.toString()
   key = key.toString()
   const cache = state.getIn(['cache', 'bookmarkOrder', parentId])
@@ -108,10 +123,20 @@ const removeCacheKey = (state, parentId, key) => {
     }
   }
 
-  return state.setIn(['cache', 'bookmarkOrder', parentId], newCache)
+  if (newCache.size > 0) {
+    state = state.setIn(['cache', 'bookmarkOrder', parentId], newCache)
+  } else {
+    state = state.deleteIn(['cache', 'bookmarkOrder', parentId])
+  }
+
+  return state
 }
 
 const removeCacheParent = (state, parentId) => {
+  if (parentId == null) {
+    return state
+  }
+
   return state.deleteIn(['cache', 'bookmarkOrder', parentId.toString()])
 }
 

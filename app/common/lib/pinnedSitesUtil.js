@@ -20,7 +20,7 @@ const getSitesBySubkey = (sites, siteKey) => {
 
 const getDetailsFromTab = (sites, tab) => {
   let location = tab.get('url')
-  const partitionNumber = tab.get('partitionNumber')
+  const partitionNumber = tab.get('partitionNumber', 0)
   let parentFolderId
 
   // TODO check if needed https://github.com/brave/browser-laptop/pull/8588
@@ -60,8 +60,7 @@ const getDetailsFromTab = (sites, tab) => {
     title: tab.get('title')
   }
 
-  // TODO I think that we don't need this one
-  if (partitionNumber) {
+  if (partitionNumber != null) {
     siteDetail.partitionNumber = partitionNumber
   }
 

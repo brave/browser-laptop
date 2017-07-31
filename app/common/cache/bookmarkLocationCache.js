@@ -59,6 +59,11 @@ const generateCache = (state) => {
  */
 const getCacheKey = (state, location) => {
   const normalLocation = normalizeLocation(location)
+
+  if (normalLocation == null) {
+    return Immutable.List()
+  }
+
   return state.getIn(['cache', 'bookmarkLocation', normalLocation], Immutable.List())
 }
 

@@ -166,6 +166,7 @@ describe('bookmarksToolbar', function () {
         .waitForBookmarkDetail(pageWithFavicon, pageWithFavicon.replace(/http:\/\//, ''))
         .waitForEnabled(doneButton)
         .click(doneButton)
+        .click('[data-test-id="bookmarkToolbarButton"]')
 
       yield this.app.client.waitUntil(() =>
         this.app.client.getCssProperty('[data-test-id="bookmarkFavicon"]', 'background-image').then((backgroundImage) =>
