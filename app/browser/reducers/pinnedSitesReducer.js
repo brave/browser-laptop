@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const Immutable = require('immutable')
+
 // State
 const pinnedSitesState = require('../../common/state/pinnedSitesState')
 const tabState = require('../../common/state/tabState')
@@ -41,7 +43,7 @@ const pinnedSitesReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_CREATE_TAB_REQUESTED:
       {
-        const createProperties = action.get('createProperties')
+        const createProperties = action.get('createProperties', Immutable.Map())
         if (createProperties.get('pinned')) {
           state = pinnedSitesState.addPinnedSite(state, pinnedSitesUtil.getDetailFromProperties(createProperties))
         }
@@ -50,6 +52,11 @@ const pinnedSitesReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_PINNED_TAB_REORDER:
       {
         const siteKey = action.get('siteKey')
+
+        if (siteKey == null) {
+          break
+        }
+
         state = pinnedSitesState.reOrderSite(
           state,
           siteKey,

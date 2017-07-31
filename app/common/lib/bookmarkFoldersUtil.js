@@ -7,8 +7,8 @@ const isFolderNameValid = (title) => {
   return title != null && title.trim().length > 0
 }
 
-const getNextFolderIdItem = (folders) =>
-  folders.max((folderA, folderB) => {
+const getNextFolderIdItem = (folders) => {
+  return folders.max((folderA, folderB) => {
     const folderIdA = folderA.get('folderId')
     const folderIdB = folderB.get('folderId')
 
@@ -23,12 +23,14 @@ const getNextFolderIdItem = (folders) =>
     }
     return folderIdA > folderIdB
   })
+}
 
 const getNextFolderId = (folders) => {
   const defaultFolderId = 0
   if (!folders) {
     return defaultFolderId
   }
+
   const maxIdItem = getNextFolderIdItem(folders)
   return (maxIdItem ? (maxIdItem.get('folderId') || 0) : 0) + 1
 }
@@ -37,8 +39,8 @@ const getNextFolderName = (folders, name) => {
   if (!folders) {
     return name
   }
-  const site = folders.find((site) => site.get('title') === name)
-  if (!site) {
+  const exist = folders.some((site) => site.get('title') === name)
+  if (!exist) {
     return name
   }
   const filenameFormat = /(.*) \((\d+)\)/
@@ -52,6 +54,10 @@ const getNextFolderName = (folders, name) => {
 }
 
 const isFolder = (folder) => {
+  if (folder == null) {
+    return false
+  }
+
   return folder.get('type') === siteTags.BOOKMARK_FOLDER
 }
 
@@ -85,11 +91,15 @@ const getAncestorFolderIds = (parentFolderIds, bookmarkFolder, allBookmarks) => 
 /**
  * Determine if a proposed move is valid
  *
- * @param sites The application state's Immutable sites list
+ * @param folderList The application state's Immutable folderList list
  * @param sourceDetail The site detail to move
  * @param destinationDetail The site detail to move to
  */
-const isMoveAllowed = (sites, sourceDetail, destinationDetail) => {
+const isMoveAllowed = (folderList, sourceDetail, destinationDetail) => {
+  if (destinationDetail == null || sourceDetail == null) {
+    return false
+  }
+
   if (typeof destinationDetail.get('parentFolderId') === 'number' && typeof sourceDetail.get('folderId') === 'number') {
     // Folder can't be its own parent
     if (sourceDetail.get('folderId') === destinationDetail.get('folderId')) {
@@ -97,11 +107,12 @@ const isMoveAllowed = (sites, sourceDetail, destinationDetail) => {
     }
     // Ancestor folder can't be moved into a descendant
     let ancestorFolderIds = []
-    getAncestorFolderIds(ancestorFolderIds, destinationDetail, sites)
+    getAncestorFolderIds(ancestorFolderIds, destinationDetail, folderList)
     if (ancestorFolderIds.includes(sourceDetail.get('folderId'))) {
       return false
     }
   }
+
   return true
 }
 

@@ -171,6 +171,10 @@ const getToolbarBookmarks = (state) => {
 }
 
 const getDetailFromFrame = (frame) => {
+  if (frame == null) {
+    return null
+  }
+
   return Immutable.fromJS({
     location: frame.get('location'),
     title: frame.get('title'),
@@ -204,6 +208,10 @@ const isLocationBookmarked = (state, location) => {
  * @return {Object} A createProperties plain JS object, not ImmutableJS
  */
 const toCreateProperties = (bookmark) => {
+  if (bookmark == null) {
+    return null
+  }
+
   return {
     url: bookmark.get('location'),
     partitionNumber: bookmark.get('partitionNumber')
@@ -225,6 +233,10 @@ const getBookmarksByParentId = (state, folderKey) => {
 }
 
 const isBookmark = (bookmark) => {
+  if (bookmark == null) {
+    return false
+  }
+
   return bookmark.get('type') === siteTags.BOOKMARK
 }
 
