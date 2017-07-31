@@ -11,7 +11,7 @@ const ReduxComponent = require('../reduxComponent')
 const NotificationItem = require('./notificationItem')
 
 // Utils
-const {getOrigin} = require('../../../../js/state/siteUtil')
+const {getOrigin} = require('../../../../js/lib/urlutil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
 // Styles

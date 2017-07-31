@@ -11,7 +11,6 @@
 // - When all state is collected save it to a JSON file and close the app
 // - NODE_ENV of ‘test’ bypassing session state or else they all fail.
 
-const Immutable = require('immutable')
 const fs = require('fs-extra')
 const path = require('path')
 const electron = require('electron')
@@ -30,7 +29,6 @@ const windowState = require('./common/state/windowState')
 
 // Utils
 const locale = require('./locale')
-const siteUtil = require('../js/state/siteUtil')
 const {pinnedTopSites} = require('../js/data/newTabData')
 const {defaultSiteSettingsList} = require('../js/data/siteSettingsList')
 const filtering = require('./filtering')
@@ -40,6 +38,7 @@ const Channel = require('./channel')
 const {makeImmutable} = require('./common/state/immutableUtil')
 const {getSetting} = require('../js/settings')
 const platformUtil = require('./common/lib/platformUtil')
+const historyUtil = require('./common/lib/historyUtil')
 
 const sessionStorageVersion = 1
 const sessionStorageName = `session-store-${sessionStorageVersion}`
@@ -662,8 +661,9 @@ module.exports.runPreMigrations = (data) => {
 
       for (let key of Object.keys(data.sites)) {
         const site = data.sites[key]
+        const newKey = historyUtil.getKey(makeImmutable(site))
         if (site.lastAccessedTime || !site.tags || site.tags.length === 0) {
-          data.historySites[key] = site
+          data.historySites[newKey] = site
         }
       }
     }
@@ -675,18 +675,6 @@ module.exports.runPreMigrations = (data) => {
 }
 
 module.exports.runPostMigrations = (data) => {
-  // sites refactoring migration
-  if (Array.isArray(data.sites) && data.sites.length) {
-    let sites = {}
-    let order = 0
-    data.sites.forEach((site) => {
-      let key = siteUtil.getSiteKey(Immutable.fromJS(site))
-      site.order = order++
-      sites[key] = site
-    })
-    data.sites = sites
-  }
-
   return data
 }
 

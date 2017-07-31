@@ -28,7 +28,7 @@ const windowActions = require('../../../../js/actions/windowActions')
 const appActions = require('../../../../js/actions/appActions')
 
 // Utils
-const siteUtil = require('../../../../js/state/siteUtil')
+const urlUtil = require('../../../../js/lib/urlutil')
 
 // Styles
 const commonStyles = require('../styles/commonStyles')
@@ -64,7 +64,7 @@ class WidevinePanel extends React.Component {
     const widevinePanelDetail = currentWindow.get('widevinePanelDetail', Immutable.Map())
 
     const props = {}
-    props.origin = siteUtil.getOrigin(widevinePanelDetail.get('location'))
+    props.origin = urlUtil.getOrigin(widevinePanelDetail.get('location'))
     props.alsoAddRememberSiteSetting = widevinePanelDetail.get('alsoAddRememberSiteSetting')
 
     return props

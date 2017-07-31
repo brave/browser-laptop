@@ -7,7 +7,7 @@ const iconPath = getBraveExtUrl('img/newtab/defaultTopSitesIcon')
 
 module.exports.pinnedTopSites = [
   {
-    'key': 'https://twitter.com/brave/|0|0',
+    'key': 'https://twitter.com/brave/|0',
     'count': 0,
     'favicon': `${iconPath}/twitter.png`,
     'location': 'https://twitter.com/brave/',
@@ -18,7 +18,7 @@ module.exports.pinnedTopSites = [
 
 module.exports.topSites = [
   {
-    'key': 'https://twitter.com/brave/|0|0',
+    'key': 'https://twitter.com/brave/|0',
     'count': 0,
     'favicon': `${iconPath}/twitter.png`,
     'location': 'https://twitter.com/brave',
@@ -26,7 +26,7 @@ module.exports.topSites = [
     'title': 'Brave Software (@brave) | Twitter'
   },
   {
-    'key': 'https://www.facebook.com/BraveSoftware/|0|0',
+    'key': 'https://www.facebook.com/BraveSoftware/|0',
     'count': 0,
     'favicon': `${iconPath}/facebook.png`,
     'location': 'https://www.facebook.com/BraveSoftware/',
@@ -34,7 +34,7 @@ module.exports.topSites = [
     'title': 'Brave Software | Facebook'
   },
   {
-    'key': 'https://www.youtube.com/bravesoftware/|0|0',
+    'key': 'https://www.youtube.com/bravesoftware/|0',
     'count': 0,
     'favicon': `${iconPath}/youtube.png`,
     'location': 'https://www.youtube.com/bravesoftware/',
@@ -42,7 +42,7 @@ module.exports.topSites = [
     'title': 'Brave Browser - YouTube'
   },
   {
-    'key': 'https://brave.com/|0|0',
+    'key': 'https://brave.com/|0',
     'count': 0,
     'favicon': `${iconPath}/brave.ico`,
     'location': 'https://brave.com/',
@@ -50,7 +50,7 @@ module.exports.topSites = [
     'title': 'Brave Software | Building a Better Web'
   },
   {
-    'key': 'https://itunes.apple.com/app/brave-web-browser/id1052879175?mt=8|0|0',
+    'key': 'https://itunes.apple.com/app/brave-web-browser/id1052879175?mt=8|0',
     'count': 0,
     'favicon': `${iconPath}/appstore.png`,
     'location': 'https://itunes.apple.com/app/brave-web-browser/id1052879175?mt=8',
@@ -58,7 +58,7 @@ module.exports.topSites = [
     'title': 'Brave Web Browser: Fast with built-in adblock on the App Store'
   },
   {
-    'key': 'https://play.google.com/store/apps/details?id=com.brave.browser|0|0',
+    'key': 'https://play.google.com/store/apps/details?id=com.brave.browser|0',
     'count': 0,
     'favicon': `${iconPath}/playstore.png`,
     'location': 'https://play.google.com/store/apps/details?id=com.brave.browser',

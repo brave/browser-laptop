@@ -21,8 +21,8 @@ const windowActions = require('../../../../js/actions/windowActions')
 const tabState = require('../../../common/state/tabState')
 
 // Utils
-const siteUtil = require('../../../../js/state/siteUtil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
+const urlUtil = require('../../../../js/lib/urlutil')
 
 class NoScriptCheckbox extends ImmutableComponent {
   toggleCheckbox (e) {
@@ -108,7 +108,7 @@ class NoScriptInfo extends React.Component {
     let blockedOrigins = Immutable.List()
 
     if (blocked && blocked.size) {
-      const originsSet = Immutable.Set(blocked.map(siteUtil.getOrigin))
+      const originsSet = Immutable.Set(blocked.map(urlUtil.getOrigin))
       blockedOrigins = Immutable.List(originsSet.toJS())
     }
 
@@ -121,7 +121,7 @@ class NoScriptInfo extends React.Component {
 
     // Used in other function
     props.activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
-    props.origin = siteUtil.getOrigin(activeFrame.get('location'))
+    props.origin = urlUtil.getOrigin(activeFrame.get('location'))
 
     return props
   }

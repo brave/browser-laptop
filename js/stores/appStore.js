@@ -10,7 +10,6 @@ const AppDispatcher = require('../dispatcher/appDispatcher')
 const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
 const {STATE_SITES} = require('../constants/stateConstants')
-const siteUtil = require('../state/siteUtil')
 const syncUtil = require('../state/syncUtil')
 const siteSettings = require('../state/siteSettings')
 const appUrlUtil = require('../lib/appUrlUtil')
@@ -49,6 +48,7 @@ const tabState = require('../../app/common/state/tabState')
 const bookmarksState = require('../../app/common/state/bookmarksState')
 const bookmarkFoldersState = require('../../app/common/state/bookmarkFoldersState')
 const historyState = require('../../app/common/state/historyState')
+const urlUtil = require('../lib/urlutil')
 
 const isDarwin = process.platform === 'darwin'
 const isWindows = process.platform === 'win32'
@@ -501,7 +501,7 @@ const handleAppAction = (action) => {
       {
         const propertyName = action.isPrivate ? 'temporarySiteSettings' : 'siteSettings'
         appState = appState.set(propertyName,
-          siteSettings.mergeSiteSetting(appState.get(propertyName), siteUtil.getOrigin(action.url), 'flash', 1))
+          siteSettings.mergeSiteSetting(appState.get(propertyName), urlUtil.getOrigin(action.url), 'flash', 1))
         break
       }
     case appConstants.APP_ALLOW_FLASH_ALWAYS:
@@ -509,7 +509,7 @@ const handleAppAction = (action) => {
         const propertyName = action.isPrivate ? 'temporarySiteSettings' : 'siteSettings'
         const expirationTime = Date.now() + (7 * 24 * 3600 * 1000)
         appState = appState.set(propertyName,
-          siteSettings.mergeSiteSetting(appState.get(propertyName), siteUtil.getOrigin(action.url), 'flash', expirationTime))
+          siteSettings.mergeSiteSetting(appState.get(propertyName), urlUtil.getOrigin(action.url), 'flash', expirationTime))
         break
       }
     case appConstants.APP_CHANGE_SITE_SETTING:
@@ -619,11 +619,11 @@ const handleAppAction = (action) => {
       if (!tabValue) {
         break
       }
-      const origin = siteUtil.getOrigin(tabValue.get('url'))
+      const origin = urlUtil.getOrigin(tabValue.get('url'))
 
       if (origin) {
         const tabsInOrigin = tabState.getTabs(appState).find((tabValue) =>
-          siteUtil.getOrigin(tabValue.get('url')) === origin && tabValue.get('tabId') !== immutableAction.get('tabId'))
+          urlUtil.getOrigin(tabValue.get('url')) === origin && tabValue.get('tabId') !== immutableAction.get('tabId'))
         if (!tabsInOrigin) {
           appState = appState.set('notifications', appState.get('notifications').filterNot((notification) => {
             return notification.get('frameOrigin') === origin

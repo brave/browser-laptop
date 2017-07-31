@@ -4,7 +4,6 @@
 
 const assert = require('assert')
 const Immutable = require('immutable')
-const siteUtil = require('../../../js/state/siteUtil')
 const {STATE_SITES} = require('../../../js/constants/stateConstants')
 const urlUtil = require('../../../js/lib/urlutil')
 const {makeImmutable, isMap} = require('./immutableUtil')
@@ -34,6 +33,7 @@ const pinnedSiteState = {
    */
   addPinnedSite: (state, site) => {
     state = validateState(state)
+    const pinnedSitesUtil = require('../lib/pinnedSitesUtil')
     const sites = pinnedSiteState.getSites(state) || Immutable.Map()
     let location
     if (site.has('location')) {
@@ -43,7 +43,7 @@ const pinnedSiteState = {
 
     site = site.set('order', sites.size)
 
-    const key = siteUtil.getSiteKey(site)
+    const key = pinnedSitesUtil.getKey(site)
     if (key === null) {
       return state
     }
@@ -61,7 +61,8 @@ const pinnedSiteState = {
    */
   removePinnedSite: (state, siteDetail) => {
     state = validateState(state)
-    const key = siteUtil.getSiteKey(siteDetail)
+    const pinnedSitesUtil = require('../lib/pinnedSitesUtil')
+    const key = pinnedSitesUtil.getKey(siteDetail)
     if (!key) {
       return state
     }

@@ -3,9 +3,9 @@
 const siteTags = require('../../../../../js/constants/siteTags')
 const siteCache = require('../../../../../app/common/cache/bookmarkLocationCache')
 const {STATE_SITES} = require('../../../../../js/constants/stateConstants')
-const siteUtil = require('../../../../../js/state/siteUtil')
 const assert = require('assert')
 const Immutable = require('immutable')
+const bookmarkUtil = require('../../../../../app/common/lib/bookmarkUtil')
 
 describe('bookmarkLocationCache unit test', function () {
   const testUrl1 = 'https://brave.com/'
@@ -19,7 +19,7 @@ describe('bookmarkLocationCache unit test', function () {
     partitionNumber: 0
   })
   const bookmarkLocation = bookmark.get('location')
-  const bookmarkKey = siteUtil.getSiteKey(bookmark)
+  const bookmarkKey = bookmarkUtil.getKey(bookmark)
   const baseState = Immutable.fromJS({
     bookmarks: {
       [bookmarkKey]: bookmark
@@ -63,7 +63,7 @@ describe('bookmarkLocationCache unit test', function () {
         parentFolderId: 1,
         type: siteTags.BOOKMARK
       })
-      const siteKey = siteUtil.getSiteKey(site)
+      const siteKey = bookmarkUtil.getKey(site)
       let state = siteCache.generateCache(baseState)
       state = siteCache.addCacheKey(state, bookmarkLocation, siteKey)
       const cachedKeys = siteCache.getCacheKey(state, bookmarkLocation)
@@ -77,7 +77,7 @@ describe('bookmarkLocationCache unit test', function () {
         title: 'different',
         type: siteTags.BOOKMARK
       })
-      const siteKey = siteUtil.getSiteKey(site)
+      const siteKey = bookmarkUtil.getKey(site)
       let state = siteCache.generateCache(baseState)
       state = siteCache.addCacheKey(state, location, siteKey)
       const cachedKeys = siteCache.getCacheKey(state, location)
@@ -103,7 +103,7 @@ describe('bookmarkLocationCache unit test', function () {
         parentFolderId: 1,
         type: siteTags.BOOKMARK
       })
-      const siteKey = siteUtil.getSiteKey(site)
+      const siteKey = bookmarkUtil.getKey(site)
       let state = baseState.setIn([STATE_SITES.BOOKMARKS, siteKey], site)
       state = siteCache.generateCache(state)
 

@@ -4,6 +4,7 @@
 'use strict'
 
 const Immutable = require('immutable')
+const UrlUtil = require('../../../js/lib/urlutil')
 const {makeImmutable} = require('../state/immutableUtil')
 const aboutHistoryMaxEntries = 500
 
@@ -123,6 +124,21 @@ const getDetailFromFrame = (frame) => {
   })
 }
 
+const getKey = (siteDetail) => {
+  if (!siteDetail) {
+    return null
+  }
+
+  let location = siteDetail.get('location')
+
+  if (location) {
+    location = UrlUtil.getLocationIfPDF(location)
+    return location + '|' +
+      (siteDetail.get('partitionNumber') || 0)
+  }
+  return null
+}
+
 module.exports = {
   maxEntries: aboutHistoryMaxEntries,
   getHistory,
@@ -130,5 +146,6 @@ module.exports = {
   totalEntries,
   prepareHistoryEntry,
   mergeSiteDetails,
-  getDetailFromFrame
+  getDetailFromFrame,
+  getKey
 }

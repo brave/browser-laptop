@@ -18,7 +18,6 @@ const bookmarkOrderCache = require('../cache/bookmarkOrderCache')
 
 // Utils
 const bookmarkFoldersUtil = require('../lib/bookmarkFoldersUtil')
-const siteUtil = require('../../../js/state/siteUtil')
 const {makeImmutable, isMap} = require('./immutableUtil')
 const {getSetting} = require('../../../js/settings')
 
@@ -169,7 +168,7 @@ const bookmarkFoldersState = {
 
       state = bookmarkOrderCache.removeCacheKey(state, folder.get('parentFolderId'), folderKey)
       folder = folder.set('parentFolderId', ~~parentFolderId)
-      const newKey = siteUtil.getSiteKey(folder)
+      const newKey = bookmarkFoldersUtil.getKey(folder)
       state = state.deleteIn([STATE_SITES.BOOKMARK_FOLDERS, folderKey])
       state = bookmarkOrderCache.addFolderToCache(state, folder.get('parentFolderId'), newKey)
       return state.setIn([STATE_SITES.BOOKMARK_FOLDERS, newKey.toString()], folder)

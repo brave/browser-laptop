@@ -4,7 +4,6 @@
 
 const assert = require('assert')
 const Immutable = require('immutable')
-const siteUtil = require('../../../js/state/siteUtil')
 const {STATE_SITES} = require('../../../js/constants/stateConstants')
 const historyUtil = require('../lib/historyUtil')
 const urlUtil = require('../../../js/lib/urlutil')
@@ -30,7 +29,7 @@ const historyState = {
 
   addSite: (state, siteDetail) => {
     let sites = historyState.getSites(state)
-    let siteKey = siteUtil.getSiteKey(siteDetail)
+    let siteKey = historyUtil.getKey(siteDetail)
     siteDetail = makeImmutable(siteDetail)
 
     const oldSite = sites.get(siteKey)
@@ -44,7 +43,7 @@ const historyState = {
         siteDetail = siteDetail.set('location', location)
       }
 
-      siteKey = siteUtil.getSiteKey(siteDetail)
+      siteKey = historyUtil.getKey(siteDetail)
       site = historyUtil.prepareHistoryEntry(siteDetail)
     }
 
@@ -63,7 +62,7 @@ const historyState = {
   },
 
   updateFavicon: (state, siteDetails, favIcon) => {
-    const historyKey = siteUtil.getSiteKey(siteDetails)
+    const historyKey = historyUtil.getKey(siteDetails)
     if (historyKey == null) {
       return state
     }

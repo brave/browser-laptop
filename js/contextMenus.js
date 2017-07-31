@@ -15,7 +15,6 @@ const bookmarkActions = require('./actions/bookmarkActions')
 const appActions = require('./actions/appActions')
 const siteTags = require('./constants/siteTags')
 const electronDownloadItemActions = require('../app/common/constants/electronDownloadItemActions')
-const siteUtil = require('./state/siteUtil')
 const downloadUtil = require('./state/downloadUtil')
 const menuUtil = require('../app/common/lib/menuUtil')
 const urlUtil = require('./lib/urlutil')
@@ -37,6 +36,8 @@ const bookmarksState = require('../app/common/state/bookmarksState')
 const historyState = require('../app/common/state/historyState')
 const frameStateUtil = require('./state/frameStateUtil')
 const platformUtil = require('../app/common/lib/platformUtil')
+const bookmarkFoldersUtil = require('../app/common/lib/bookmarkFoldersUtil')
+const historyUtil = require('../app/common/lib/historyUtil')
 const {makeImmutable} = require('../app/common/state/immutableUtil')
 
 const isDarwin = platformUtil.isDarwin()
@@ -1271,8 +1272,21 @@ function onHamburgerMenu (location, e) {
 
 function onMainContextMenu (nodeProps, frame, tab, contextMenuType) {
   let data = Immutable.fromJS(nodeProps)
+
   if (!Array.isArray(nodeProps)) {
-    data = siteUtil.getSiteKey(data)
+    switch (contextMenuType) {
+      case siteTags.BOOKMARK:
+        data = bookmarkUtil.getKey(data)
+        break
+
+      case siteTags.BOOKMARK_FOLDER:
+        data = bookmarkFoldersUtil.getKey(data)
+        break
+
+      case siteTags.HISTORY:
+        data = historyUtil.getKey(data)
+        break
+    }
   }
 
   if (contextMenuType === siteTags.BOOKMARK || contextMenuType === siteTags.BOOKMARK_FOLDER) {

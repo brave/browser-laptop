@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Immutable = require('immutable')
-const siteUtil = require('../../../js/state/siteUtil')
+const UrlUtil = require('../../../js/lib/urlutil')
 const {makeImmutable} = require('../state/immutableUtil')
 
 const getSitesBySubkey = (sites, siteKey) => {
@@ -31,7 +31,7 @@ const getDetailsFromTab = (sites, tab) => {
   // - parent folder id
   if (sites) {
     // get all sites matching URL and partition (disregarding parentFolderId)
-    let siteKey = siteUtil.getSiteKey(makeImmutable({location, partitionNumber}))
+    let siteKey = getKey(makeImmutable({location, partitionNumber}))
     let results = getSitesBySubkey(sites, siteKey)
 
     // only check for provisional location if entry is not found
@@ -40,7 +40,7 @@ const getDetailsFromTab = (sites, tab) => {
       // this may be different if the site was redirected
       const provisionalLocation = tab.getIn(['frame', 'provisionalLocation'])
       if (provisionalLocation && provisionalLocation !== location) {
-        siteKey = siteUtil.getSiteKey(makeImmutable({
+        siteKey = getKey(makeImmutable({
           location: provisionalLocation,
           partitionNumber
         }))
@@ -107,9 +107,25 @@ const getPinnedSiteProps = site => {
   })
 }
 
+const getKey = (siteDetail) => {
+  if (!siteDetail) {
+    return null
+  }
+
+  let location = siteDetail.get('location')
+
+  if (location) {
+    location = UrlUtil.getLocationIfPDF(location)
+    return location + '|' +
+      (siteDetail.get('partitionNumber') || 0)
+  }
+  return null
+}
+
 module.exports = {
   getDetailsFromTab,
   getDetailFromProperties,
   getDetailFromFrame,
-  getPinnedSiteProps
+  getPinnedSiteProps,
+  getKey
 }
