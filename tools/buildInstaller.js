@@ -86,15 +86,21 @@ if (isDarwin) {
     // .deb file
     'electron-installer-debian' +
       ' --src Brave-linux-x64/' +
-      ' --dest dist/' +
+      ' --dest dist/deb' +
       ' --arch amd64' +
       ' --config res/linuxPackaging.json',
     // .rpm file
     'electron-installer-redhat' +
       ' --src Brave-linux-x64/' +
-      ' --dest dist/' +
+      ' --dest dist/redhat/' +
       ' --arch x86_64' +
       ' --config res/linuxPackaging.json',
+    // OpenSuse .rpm file
+    'electron-installer-redhat' +
+      ' --src Brave-linux-x64/' +
+      ' --dest dist/suse/' +
+      ' --arch x86_64' +
+      ' --config res/suse.json',
     // .tar.bz2 file
     'tar -jcvf dist/Brave.tar.bz2 ./Brave-linux-x64'
   ]
