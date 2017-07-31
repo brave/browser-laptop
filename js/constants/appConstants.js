@@ -125,6 +125,7 @@ const appConstants = {
   APP_ON_GO_BACK_LONG: _,
   APP_ON_GO_FORWARD_LONG: _,
   APP_AUTOPLAY_BLOCKED: _,
+  APP_AUTOPLAY_DISMISSED: _,
   APP_SAVE_PASSWORD: _,
   APP_UPDATE_PASSWORD: _,
   APP_ADD_PASSWORD: _, /** @param {Object} passwordDetail */

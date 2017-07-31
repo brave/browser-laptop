@@ -17,6 +17,7 @@ const urlParse = require('../../app/common/urlParse')
 const siteSettings = require('./siteSettings')
 const {registerUserPrefs} = require('./userPrefs')
 const {getSetting} = require('../settings')
+const {autoplayOption} = require('../../app/common/constants/settingsEnums')
 const {getFlashResourceId} = require('../flash')
 const net = require('net')
 
@@ -70,7 +71,7 @@ const getDefaultUserPrefContentSettings = (braveryDefaults, appSettings, appConf
   braveryDefaults = makeImmutable(braveryDefaults)
   return Immutable.fromJS({
     autoplay: [{
-      setting: 'block',
+      setting: getSetting(settings.AUTOPLAY_MEDIA) === autoplayOption.ALWAYS_ALLOW ? 'allow' : 'block',
       primaryPattern: '*'
     }],
     cookies: getDefault3rdPartyStorageSettings(braveryDefaults, appSettings, appConfig),
