@@ -15,6 +15,17 @@ const validateState = function (state) {
   return state
 }
 
+const reorderSite = (sites, order) => {
+  sites = sites.map((site) => {
+    const siteOrder = site.get('order')
+    if (siteOrder > order) {
+      return site.set('order', siteOrder - 1)
+    }
+    return site
+  })
+  return sites
+}
+
 const pinnedSiteState = {
   getSites: (state) => {
     state = validateState(state)
@@ -73,7 +84,9 @@ const pinnedSiteState = {
       return state
     }
 
-    // TODO update order, so that is up to date
+    if (siteDetail.get('order') != null) {
+      state = state.set(STATE_SITES.PINNED_SITES, reorderSite(pinnedSiteState.getSites(state), siteDetail.get('order')))
+    }
 
     return state.deleteIn(stateKey, site)
   },

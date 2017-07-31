@@ -52,8 +52,6 @@ const historyState = {
   },
 
   removeSite: (state, siteKey) => {
-    // TODO should we remove this only when a tab with this siteKey is not opened
-    // if not, we are deleting data that is use for bookmarking
     return state.deleteIn([STATE_SITES.HISTORY_SITES, siteKey])
   },
 

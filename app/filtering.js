@@ -32,7 +32,7 @@ const {adBlockResourceName} = require('./adBlock')
 const {updateElectronDownloadItem} = require('./browser/electronDownloadItem')
 const {fullscreenOption} = require('./common/constants/settingsEnums')
 const isThirdPartyHost = require('./browser/isThirdPartyHost')
-var extensionState = require('./common/state/extensionState.js')
+const extensionState = require('./common/state/extensionState')
 const {cookieExceptions, refererExceptions} = require('../js/data/siteHacks')
 
 let appStore = null

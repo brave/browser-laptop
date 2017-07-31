@@ -78,9 +78,11 @@ const prepareHistoryEntry = (siteDetail) => {
     objectId: undefined,
     title: siteDetail.get('title'),
     location: siteDetail.get('location'),
+    partitionNumber: ~~siteDetail.get('partitionNumber', 0),
     count: 1,
     themeColor: siteDetail.get('themeColor'),
-    favicon: siteDetail.get('favicon', siteDetail.get('icon'))
+    favicon: siteDetail.get('favicon', siteDetail.get('icon')),
+    key: getKey(siteDetail)
   })
 }
 
@@ -95,6 +97,7 @@ const mergeSiteDetails = (oldDetail, newDetail) => {
     objectId,
     title: newDetail.get('title'),
     location: newDetail.get('location'),
+    partitionNumber: ~~newDetail.get('partitionNumber', 0),
     count: ~~oldDetail.get('count', 0) + 1
   })
 
@@ -110,6 +113,8 @@ const mergeSiteDetails = (oldDetail, newDetail) => {
   if (favicon) {
     site = site.set('favicon', favicon)
   }
+
+  site = site.set('key', getKey(site))
 
   return site
 }

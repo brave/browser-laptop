@@ -74,15 +74,24 @@ const bookmarkFoldersReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_REMOVE_BOOKMARK_FOLDER:
       {
-        const key = action.get('folderKey')
+        const folderKey = action.get('folderKey')
 
-        if (key == null) {
+        if (folderKey == null) {
           break
         }
 
-        const folder = state.getIn([STATE_SITES.BOOKMARK_FOLDERS, key])
-        state = bookmarkFoldersState.removeFolder(state, key)
-        state = syncUtil.updateObjectCache(state, folder, STATE_SITES.BOOKMARK_FOLDERS)
+        if (Immutable.List.isList(folderKey)) {
+          action.get('folderKey', Immutable.List()).forEach((key) => {
+            const folder = state.getIn([STATE_SITES.BOOKMARK_FOLDERS, key])
+            state = bookmarkFoldersState.removeFolder(state, key)
+            state = syncUtil.updateObjectCache(state, folder, STATE_SITES.BOOKMARK_FOLDERS)
+          })
+        } else {
+          const folder = state.getIn([STATE_SITES.BOOKMARK_FOLDERS, folderKey])
+          state = bookmarkFoldersState.removeFolder(state, folderKey)
+          state = syncUtil.updateObjectCache(state, folder, STATE_SITES.BOOKMARK_FOLDERS)
+        }
+
         break
       }
   }

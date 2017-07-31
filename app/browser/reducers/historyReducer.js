@@ -28,13 +28,18 @@ const historyReducer = (state, action, immutableAction) => {
         const clearData = defaults ? defaults.merge(temp) : temp
         if (clearData.get('browserHistory')) {
           state = historyState.clearSites(state)
+          state = aboutHistoryState.clearHistory(state)
           filtering.clearHistory()
         }
         break
       }
     case appConstants.APP_ADD_HISTORY_SITE:
       {
-        const detail = action.get('siteDetail')
+        const detail = action.get('siteDetail', Immutable.Map())
+
+        if (detail.isEmpty()) {
+          break
+        }
 
         if (Immutable.List.isList(detail)) {
           detail.forEach((item) => {
@@ -53,14 +58,19 @@ const historyReducer = (state, action, immutableAction) => {
 
     case appConstants.APP_REMOVE_HISTORY_SITE:
       {
-        if (Immutable.List.isList(action.get('historyKey'))) {
+        const historyKey = action.get('historyKey')
+        if (historyKey == null) {
+          break
+        }
+
+        if (Immutable.List.isList(historyKey)) {
           action.get('historyKey', Immutable.List()).forEach((key) => {
             state = historyState.removeSite(state, key)
             // TODO: Implement Sync history site removal
             // state = syncUtil.updateObjectCache(state, action.get('siteDetail'), STATE_SITES.HISTORY_SITES)
           })
         } else {
-          state = historyState.removeSite(state, action.get('historyKey'))
+          state = historyState.removeSite(state, historyKey)
           // TODO: Implement Sync history site removal
           // state = syncUtil.updateObjectCache(state, action.get('siteDetail'), STATE_SITES.HISTORY_SITES)
         }
