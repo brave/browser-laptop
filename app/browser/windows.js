@@ -69,8 +69,14 @@ const updatePinnedTabs = (win) => {
   const appStore = require('../../js/stores/appStore')
   const state = appStore.getState()
   const windowId = win.id
-  const pinnedSites = state.get('sites').toList().filter((site) =>
-    site.get('tags').includes(siteTags.PINNED)).map(site => getPinnedSiteProps(site))
+  const pinnedSites = state.get('sites').toList().filter((site) => {
+    const tags = site.get('tags')
+    if (!tags) {
+      return false
+    }
+    return tags.includes(siteTags.PINNED)
+  })
+      .map(site => getPinnedSiteProps(site))
   const pinnedTabs = getPinnedTabsByWindowId(state, windowId)
 
   pinnedSites.filter((site) =>
