@@ -7,31 +7,26 @@
 const appConstants = require('../../../js/constants/appConstants')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const {ipcMain, webContents} = require('electron')
-const AppStore = require('../../../js/stores/appStore')
 const siteSettings = require('../../../js/state/siteSettings')
-const settings = require('../../../js/constants/settings')
 const appActions = require('../../../js/actions/appActions')
 const {getOrigin} = require('../../../js/state/siteUtil')
 const locale = require('../../locale')
 const messages = require('../../../js/constants/messages')
-const getSetting = require('../../../js/settings').getSetting
-const {autoplayOption} = require('../../common/constants/settingsEnums')
 
-const showAutoplayMessageBox = (tabId) => {
+let notificationCallbacks = []
+
+const showAutoplayMessageBox = (state, tabId) => {
   const tab = webContents.fromTabID(tabId)
   if (!tab || tab.isDestroyed()) {
     return
   }
   const location = tab.getURL()
   const origin = getOrigin(location)
-  if (getSetting(settings.AUTOPLAY_MEDIA) === autoplayOption.ALWAYS_ALLOW) {
-    appActions.changeSiteSetting(origin, 'autoplay', true)
-    return
-  }
-  const originSettings = siteSettings.getSiteSettingsForURL(AppStore.getState().get('siteSettings'), origin)
+  const originSettings = siteSettings.getSiteSettingsForURL(state.get('siteSettings'), origin)
   if (originSettings && originSettings.get('autoplay') === false) {
     return
   }
+
   const message = locale.translation('allowAutoplay', {origin})
 
   appActions.showNotification({
@@ -46,33 +41,60 @@ const showAutoplayMessageBox = (tabId) => {
     }
   })
 
-  ipcMain.once(messages.NOTIFICATION_RESPONSE, (e, msg, buttonIndex, persist) => {
-    if (msg === message) {
-      appActions.hideNotification(message)
-      if (buttonIndex === 0) {
-        appActions.changeSiteSetting(origin, 'autoplay', true)
-        if (tab && !tab.isDestroyed()) {
-          tab.reload()
-          tab.on('destroyed', function temporaryAllow (e) {
-            if (!persist) {
-              appActions.removeSiteSetting(origin, 'autoplay')
+  if (!notificationCallbacks[tabId]) {
+    notificationCallbacks[tabId] = (e, msg, buttonIndex, persist) => {
+      if (msg === message) {
+        appActions.hideNotification(message)
+        if (buttonIndex === 0) {
+          appActions.changeSiteSetting(origin, 'autoplay', true)
+          if (tab && !tab.isDestroyed()) {
+            tab.reload()
+            const temporaryAllow = (e) => {
+              tab.removeListener('media-started-playing', temporaryAllow)
+              if (!persist) {
+                appActions.removeSiteSetting(origin, 'autoplay')
+              }
             }
-          })
+            tab.on('media-started-playing', temporaryAllow)
+          }
+        } else {
+          if (persist) {
+            appActions.changeSiteSetting(origin, 'autoplay', false)
+          }
         }
-      } else {
-        if (persist) {
-          appActions.changeSiteSetting(origin, 'autoplay', false)
+        if (notificationCallbacks[tabId]) {
+          ipcMain.removeListener(messages.NOTIFICATION_RESPONSE, notificationCallbacks[tabId])
+          delete notificationCallbacks[tabId]
         }
       }
     }
-  })
+    ipcMain.on(messages.NOTIFICATION_RESPONSE, notificationCallbacks[tabId])
+  }
+}
+
+const hideAutoplayMessageBox = (tabId) => {
+  const tab = webContents.fromTabID(tabId)
+  if (!tab || tab.isDestroyed()) {
+    return
+  }
+  const location = tab.getURL()
+  const origin = getOrigin(location)
+  const message = locale.translation('allowAutoplay', {origin})
+  appActions.hideNotification(message)
+  if (notificationCallbacks[tabId]) {
+    ipcMain.removeListener(messages.NOTIFICATION_RESPONSE, notificationCallbacks[tabId])
+    delete notificationCallbacks[tabId]
+  }
 }
 
 const autoplayReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
     case appConstants.APP_AUTOPLAY_BLOCKED:
-      showAutoplayMessageBox(action.get('tabId'))
+      showAutoplayMessageBox(state, action.get('tabId'))
+      break
+    case appConstants.APP_AUTOPLAY_DISMISSED:
+      hideAutoplayMessageBox(action.get('tabId'))
       break
   }
   return state
