@@ -74,7 +74,7 @@ class WindowCaptionButtons extends ImmutableComponent {
             minimize: true
           })}
           onClick={this.onMinimizeClick}
-          title={locale.translation('windowCaptionButtonMinimize')}>
+          aria-label={locale.translation('windowCaptionButtonMinimize')}>
           <div className='widget' />
         </button>
         <button
@@ -86,7 +86,7 @@ class WindowCaptionButtons extends ImmutableComponent {
             maximize: true
           })}
           onClick={this.onMaximizeClick}
-          title={locale.translation(this.maximizeTitle)}>
+          aria-label={locale.translation(this.maximizeTitle)}>
           <div className='widget'>
             <div className='widget1' />
             <div className='widget2' />
@@ -102,7 +102,7 @@ class WindowCaptionButtons extends ImmutableComponent {
             close: true
           })}
           onClick={this.onCloseClick}
-          title={locale.translation('windowCaptionButtonClose')}>
+          aria-label={locale.translation('windowCaptionButtonClose')}>
           <div className='widget' />
         </button>
       </div>
