@@ -459,18 +459,19 @@ class Main extends React.Component {
   }
 
   onMouseDown (e) {
-    // TODO(bsclifton): update this to use eventUtil.eventElHasAncestorWithClasses
     let node = e.target
+    const datasets = [
+      'popupWindow',
+      'contextMenu',
+      'extensionButton',
+      'menubarItem',
+      'bookmarkHanger'
+    ]
     while (node) {
-      if (node.classList &&
-          (node.matches('[class^="popupWindow"]') ||
-            node.classList.contains('contextMenu') ||
-            node.matches('[class*="extensionButton_"]') ||
-            node.classList.contains('menubarItem') ||
-            node.classList.contains('bookmarkHanger'))) {
+      if (eventUtil.elementHasDataset(node, datasets)) {
         // Middle click (on context menu) needs to fire the click event.
         // We need to prevent the default "Auto-Scrolling" behavior.
-        if (node.classList.contains('contextMenu') && e.button === 1) {
+        if (eventUtil.elementHasDataset(node, 'contextMenu') && e.button === 1) {
           e.preventDefault()
         }
         // Click event is handled downstream
