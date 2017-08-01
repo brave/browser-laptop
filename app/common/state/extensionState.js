@@ -134,7 +134,7 @@ const extensionState = {
     let extensionId = action.get('extensionId').toString()
     let extension = extensionState.getExtensionById(state, extensionId)
     if (extension) {
-      return state.setIn(['extensions', action.get('extensionId')], extension.set('enabled', false))
+      return state.setIn(['extensions', extensionId], extension.set('enabled', false))
     } else {
       return state
     }
@@ -154,28 +154,28 @@ const extensionState = {
     let extensionId = action.get('extensionId').toString()
     let extension = extensionState.getExtensionById(state, extensionId)
     if (extension) {
-      if (state.getIn(['extensions', action.get('extensionId'), 'contextMenus']) === undefined) {
-        state = state.setIn(['extensions', action.get('extensionId'), 'contextMenus'], new Immutable.List())
+      if (state.getIn(['extensions', extensionId, 'contextMenus']) === undefined) {
+        state = state.setIn(['extensions', extensionId, 'contextMenus'], new Immutable.List())
       }
-      let contextMenus = state.getIn(['extensions', action.get('extensionId'), 'contextMenus'])
+      let contextMenus = state.getIn(['extensions', extensionId, 'contextMenus'])
       const basePath =
-        platformUtil.getPathFromFileURI(state.getIn(['extensions', action.get('extensionId'), 'base_path']))
+        platformUtil.getPathFromFileURI(state.getIn(['extensions', extensionId, 'base_path']))
       const iconPath = action.get('icon')
       if (!iconPath) {
         contextMenus = contextMenus.push({
-          extensionId: action.get('extensionId'),
+          extensionId: extensionId,
           menuItemId: action.get('menuItemId'),
           properties: action.get('properties').toJS()
         })
       } else {
         contextMenus = contextMenus.push({
-          extensionId: action.get('extensionId'),
+          extensionId: extensionId,
           menuItemId: action.get('menuItemId'),
           properties: action.get('properties').toJS(),
           icon: basePath + '/' + iconPath
         })
       }
-      return state.setIn(['extensions', action.get('extensionId'), 'contextMenus'],
+      return state.setIn(['extensions', extensionId, 'contextMenus'],
         contextMenus)
     } else {
       return state
@@ -188,7 +188,7 @@ const extensionState = {
     let extensionId = action.get('extensionId').toString()
     let extension = extensionState.getExtensionById(state, extensionId)
     if (extension) {
-      return state.deleteIn(['extensions', action.get('extensionId'), 'contextMenus'])
+      return state.deleteIn(['extensions', extensionId, 'contextMenus'])
     } else {
       return state
     }
