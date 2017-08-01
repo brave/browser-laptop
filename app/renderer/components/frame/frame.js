@@ -180,8 +180,8 @@ class Frame extends React.Component {
     }
   }
 
-  onPropsChanged () {
-    if (this.props.isActive && isFocused()) {
+  onPropsChanged (prevProps = {}) {
+    if (this.props.isActive && !prevProps.isActive && isFocused()) {
       windowActions.setFocusedFrame(this.props.location, this.props.tabId)
     }
   }
@@ -247,7 +247,7 @@ class Frame extends React.Component {
     this.lastFrame = this.frame.delete('lastAccessedTime')
 
     const cb = (prevProps = {}) => {
-      this.onPropsChanged()
+      this.onPropsChanged(prevProps)
       if (this.props.isActive && !prevProps.isActive && !this.props.urlBarFocused) {
         this.webview.focus()
       }
