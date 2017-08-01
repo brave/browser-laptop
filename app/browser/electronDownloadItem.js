@@ -32,7 +32,10 @@ module.exports.updateElectronDownloadItem = (win, downloadId, item, state) => {
     if (app.dock && state === downloadStates.COMPLETED) {
       app.dock.downloadFinished(item.getSavePath())
     }
-    completedBytes += downloadMap[downloadId].getTotalBytes()
+
+    if (downloadMap[downloadId] != null) {
+      completedBytes += downloadMap[downloadId].getTotalBytes()
+    }
     delete downloadMap[downloadId]
   } else {
     downloadMap[downloadId] = item
