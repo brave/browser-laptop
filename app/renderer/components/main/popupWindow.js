@@ -106,6 +106,7 @@ class PopupWindow extends ImmutableComponent {
     }
 
     return <div
+      data-popup-window
       className={css(
         styles.popupWindow,
         style.right !== undefined && styles.reverseExpand

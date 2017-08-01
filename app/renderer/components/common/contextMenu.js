@@ -474,6 +474,7 @@ class ContextMenu extends ImmutableComponent {
       styles.maxHeight = this.props.contextMenuDetail.get('maxHeight')
     }
     return <div
+      data-context-menu
       ref={(node) => { this.node = node }}
       className={cx({
         contextMenu: true,

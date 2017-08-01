@@ -80,6 +80,7 @@ class BrowserAction extends React.Component {
     // TODO(bridiver) should have some visual notification of hover/press
     return <div className={css(styles.browserActionButton)}>
       <BrowserButton
+        extensionButton
         extensionItem
         l10nId='browserActionButton'
         testId='extensionBrowserAction'

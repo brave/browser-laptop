@@ -193,7 +193,7 @@ class AddEditBookmarkHanger extends React.Component {
   }
 
   render () {
-    return <Dialog className={cx({
+    return <Dialog bookmarkHanger className={cx({
       bookmarkDialog: this.props.isModal,
       bookmarkHanger: !this.props.isModal,
       [css(styles.bookmarkHanger)]: !this.props.isModal
