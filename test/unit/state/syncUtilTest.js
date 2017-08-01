@@ -7,7 +7,7 @@ const Immutable = require('immutable')
 const writeActions = require('../../../js/constants/sync/proto').actions
 
 // TODO re-enable when fixes @ayumi
-describe.skip('syncUtil', () => {
+describe('syncUtil', () => {
   let syncUtil
   let appAction
   let crypto
@@ -54,42 +54,22 @@ describe.skip('syncUtil', () => {
       objectId,
       order: 9,
       folderId: 2,
-      customTitle: 'Folder1', // XXX: Android uses title whereas laptop uses customTitle
       parentFolderId: 1
     }
     const appState = {
-      sites: {
+      bookmarkFolders: {
         '2': existingObject
       },
       sync: {
         objectsById: {
-          [objectId.join('|')]: ['sites', '2']
+          [objectId.join('|')]: ['bookmarkFolders', '2']
         }
       }
     }
 
-    describe('with action', function () {
-      describe('when NOT writeActions.CREATE', function () {
-        it('looks up / returns existing object', function () {
-          const result = syncUtil.getSiteDataFromRecord(records[0],
-            Immutable.fromJS(appState), Immutable.fromJS(records))
-          assert.deepEqual(result.existingObjectData.toJS(), existingObject)
-        })
-      })
-
-      describe('when writeActions.CREATE', function () {
-        it('does not set existingObjectData', function () {
-          const recordsCopy = Object.assign({}, records[0])
-          recordsCopy.action = writeActions.CREATE
-          const result = syncUtil.getSiteDataFromRecord(recordsCopy,
-            Immutable.fromJS(appState), Immutable.fromJS([recordsCopy]))
-          assert.equal(result.existingObjectData, undefined)
-        })
-      })
-    })
-
-    describe('with customTitle', function () {
-      it('keeps field if assigned value', function () {
+    // customTitle deprecated in browser-laptop, however we should support old records with it.
+    describe.skip('with customTitle', function () {
+      it('if assigned value, it copies field to title', function () {
         // deep copy and assign a different custom title
         const recordsCopy = Object.assign({}, records[0])
         recordsCopy.bookmark = Object.assign({}, records[0].bookmark)
@@ -97,14 +77,15 @@ describe.skip('syncUtil', () => {
         recordsCopy.bookmark.site.customTitle = 'demo value'
         const result = syncUtil.getSiteDataFromRecord(recordsCopy,
           Immutable.fromJS(appState), Immutable.fromJS([recordsCopy]))
-        assert.equal(result.siteDetail.has('customTitle'), true)
-        assert.equal(result.siteDetail.get('customTitle'), 'demo value')
+        assert.equal(result.has('customTitle'), false)
+        assert.equal(result.has('title'), true)
+        assert.equal(result.get('title'), 'demo value')
       })
 
       it('deletes field if empty', function () {
         const result = syncUtil.getSiteDataFromRecord(records[0],
           Immutable.fromJS(appState), Immutable.fromJS(records))
-        assert.equal(result.siteDetail.has('customTitle'), false)
+        assert.equal(result.has('customTitle'), false)
       })
     })
 
@@ -113,8 +94,7 @@ describe.skip('syncUtil', () => {
         it('update bookmark parent folder to null -> overrides existing parent folder', () => {
           const result = syncUtil.getSiteDataFromRecord(records[0],
             Immutable.fromJS(appState), Immutable.fromJS(records))
-          assert.equal(result.tag, 'bookmark-folder')
-          assert.deepEqual(result.siteDetail.toJS(),
+          assert.deepEqual(result.toJS(),
             {
               objectId,
               title: 'Folder1',
@@ -122,12 +102,10 @@ describe.skip('syncUtil', () => {
               location: '',
               parentFolderId: 0,
               folderId: 2,
-              tags: ['bookmark-folder'],
               lastAccessedTime: 0,
               creationTime: 0
             }
           )
-          assert.deepEqual(result.existingObjectData.toJS(), existingObject)
         })
       })
 
@@ -163,7 +141,13 @@ describe.skip('syncUtil', () => {
     })
   })
 
-  describe('isSyncable', function () {
+  describe('isSyncableBookmark', function () {
+  })
+
+  describe('isSyncableHistorySite', function () {
+  })
+
+  describe('isSyncableSiteSetting', function () {
   })
 
   describe('newObjectId', function () {
@@ -191,7 +175,7 @@ describe.skip('syncUtil', () => {
     })
   })
 
-  describe('createSiteData', function () {
+  describe('create{collection}SiteData', function () {
     const objectId = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
     const site = {
       favicon: 'https://calendar.google.com/googlecalendar/images/favicon_v2014_18.ico',
@@ -199,7 +183,6 @@ describe.skip('syncUtil', () => {
       location: 'https://calendar.google.com/calendar/render#main_7',
       objectId,
       partitionNumber: 0,
-      tags: [],
       themeColor: 'rgb(255, 255, 255)',
       title: 'Google Calendar'
     }
@@ -210,112 +193,104 @@ describe.skip('syncUtil', () => {
         favicon: 'https://calendar.google.com/googlecalendar/images/favicon_v2014_18.ico',
         location: 'https://calendar.google.com/calendar/render#main_7',
         title: 'Google Calendar',
-        customTitle: '',
         lastAccessedTime: 1484792353816,
         creationTime: 0
       }
     }
 
-    it('history sites', () => {
-      assert.deepEqual(syncUtil.createSiteData(site), expectedSite)
-    })
-
-    // TODO: Not explicitly supported; falls back to history item
-    it('pinned sites', () => {
-      const pinnedSite = Object.assign({}, site, {tags: ['pinned']})
-      assert.deepEqual(syncUtil.createSiteData(pinnedSite), expectedSite)
-    })
-
-    it('bookmarks', () => {
-      const bookmark = Object.assign({}, site, {tags: ['bookmark']})
-      const expectedBookmark = {
-        name: 'bookmark',
-        objectId,
-        value: {
-          site: expectedSite.value,
-          isFolder: false,
-          hideInToolbar: false,
-          parentFolderObjectId: undefined
+    describe('createBookmarkData', function () {
+      it('bookmarks', () => {
+        const expectedBookmark = {
+          name: 'bookmark',
+          objectId,
+          value: {
+            site: expectedSite.value,
+            isFolder: false,
+            hideInToolbar: false,
+            parentFolderObjectId: undefined
+          }
         }
-      }
-      assert.deepEqual(syncUtil.createSiteData(bookmark), expectedBookmark)
-    })
+        assert.deepEqual(syncUtil.createBookmarkData(site), expectedBookmark)
+      })
 
-    it('bookmark with undefined custom title', () => {
-      const bookmark = Object.assign({}, site, {tags: ['bookmark'], customTitle: undefined})
-      const newValue = Object.assign({}, expectedSite.value, {customTitle: undefined})
-      const expectedBookmark = {
-        name: 'bookmark',
-        objectId,
-        value: {
-          site: newValue,
-          isFolder: false,
-          hideInToolbar: false,
-          parentFolderObjectId: undefined
+      it('bookmark with undefined custom title', () => {
+        const expectedBookmark = {
+          name: 'bookmark',
+          objectId,
+          value: {
+            site: expectedSite.value,
+            isFolder: false,
+            hideInToolbar: false,
+            parentFolderObjectId: undefined
+          }
         }
-      }
-      assert.deepEqual(syncUtil.createSiteData(bookmark), expectedBookmark)
-    })
+        assert.deepEqual(syncUtil.createBookmarkData(site), expectedBookmark)
+      })
 
-    it('bookmark containing data url', () => {
-      const bookmark = Object.assign({}, site, {tags: ['bookmark'], favicon: 'data:foo'})
-      const newValue = Object.assign({}, expectedSite.value, {favicon: ''})
-      const expectedBookmark = {
-        name: 'bookmark',
-        objectId,
-        value: {
-          site: newValue,
-          isFolder: false,
-          hideInToolbar: false,
-          parentFolderObjectId: undefined
+      it('bookmark containing data url', () => {
+        const bookmark = Object.assign({}, site, {favicon: 'data:foo'})
+        const newValue = Object.assign({}, expectedSite.value, {favicon: ''})
+        const expectedBookmark = {
+          name: 'bookmark',
+          objectId,
+          value: {
+            site: newValue,
+            isFolder: false,
+            hideInToolbar: false,
+            parentFolderObjectId: undefined
+          }
         }
-      }
-      assert.deepEqual(syncUtil.createSiteData(bookmark), expectedBookmark)
-    })
+        assert.deepEqual(syncUtil.createBookmarkData(bookmark), expectedBookmark)
+      })
 
-    it('bookmark in Other Bookmarks folder', () => {
-      const bookmark = Object.assign({}, site, {tags: ['bookmark'], parentFolderId: -1})
-      const expectedBookmark = {
-        name: 'bookmark',
-        objectId,
-        value: {
-          site: expectedSite.value,
-          isFolder: false,
-          hideInToolbar: true,
-          parentFolderObjectId: undefined
+      it('bookmark in Other Bookmarks folder', () => {
+        const bookmark = Object.assign({}, site, {parentFolderId: -1})
+        const expectedBookmark = {
+          name: 'bookmark',
+          objectId,
+          value: {
+            site: expectedSite.value,
+            isFolder: false,
+            hideInToolbar: true,
+            parentFolderObjectId: undefined
+          }
         }
-      }
-      assert.deepEqual(syncUtil.createSiteData(bookmark), expectedBookmark)
+        assert.deepEqual(syncUtil.createBookmarkData(bookmark), expectedBookmark)
+      })
     })
 
-    it('site without lastAccessedTime', () => {
-      const site = {
-        order: 1207,
-        count: 15,
-        partitionNumber: 0,
-        location: 'https://parsecpizzadelivery.com/',
-        title: "Parsec Pizza Delivery trailer - A pixelated deliver 'em up",
-        tags: [],
-        objectId: [0, 63, 197, 156, 48, 17, 112, 109, 247, 175, 79, 57, 151, 123, 29, 198],
-        themeColor: 'rgb(5, 5, 5)'
-      }
-      const expectedSite = {
-        name: 'historySite',
-        objectId: [0, 63, 197, 156, 48, 17, 112, 109, 247, 175, 79, 57, 151, 123, 29, 198],
-        value: {
-          creationTime: 0,
-          customTitle: '',
-          favicon: '',
-          lastAccessedTime: 0,
+    describe('createHistorySiteData', function () {
+      it('history sites', () => {
+        assert.deepEqual(syncUtil.createHistorySiteData(site), expectedSite)
+      })
+
+      it('site without lastAccessedTime', () => {
+        const site = {
+          order: 1207,
+          count: 15,
+          partitionNumber: 0,
           location: 'https://parsecpizzadelivery.com/',
-          title: "Parsec Pizza Delivery trailer - A pixelated deliver 'em up"
+          title: "Parsec Pizza Delivery trailer - A pixelated deliver 'em up",
+          objectId: [0, 63, 197, 156, 48, 17, 112, 109, 247, 175, 79, 57, 151, 123, 29, 198],
+          themeColor: 'rgb(5, 5, 5)'
         }
-      }
-      assert.deepEqual(syncUtil.createSiteData(site), expectedSite)
+        const expectedSite = {
+          name: 'historySite',
+          objectId: [0, 63, 197, 156, 48, 17, 112, 109, 247, 175, 79, 57, 151, 123, 29, 198],
+          value: {
+            creationTime: 0,
+            favicon: '',
+            lastAccessedTime: 0,
+            location: 'https://parsecpizzadelivery.com/',
+            title: "Parsec Pizza Delivery trailer - A pixelated deliver 'em up"
+          }
+        }
+        assert.deepEqual(syncUtil.createHistorySiteData(site), expectedSite)
+      })
     })
-  })
 
-  describe('createSiteSettingsData', function () {
+    describe('createSiteSettingsData', function () {
+    })
   })
 
   describe('deepArrayify', function () {

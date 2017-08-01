@@ -7,7 +7,6 @@ const Immutable = require('immutable')
 const appActions = require('../actions/appActions')
 const crypto = require('crypto')
 const writeActions = require('../constants/sync/proto').actions
-const siteUtil = require('./siteUtil')
 const {getSetting} = require('../settings')
 const {isDataUrl} = require('../lib/urlutil')
 const bookmarkUtil = require('../../app/common/lib/bookmarkUtil')
@@ -58,7 +57,6 @@ const SITE_FIELDS = [
   'objectId',
   'location',
   'title',
-  'tags',
   'favicon',
   'themeColor',
   'lastAccessedTime',
@@ -99,6 +97,24 @@ let objectToFolderMap = new Immutable.Map()
 // Used when sending folder records
 const folderToObjectMap = {}
 
+const getBookmarkSiteDataFromRecord = (siteProps, appState, records, existingObjectData) => {
+  const newSiteProps = Object.assign({}, siteProps)
+  const existingFolderId = existingObjectData && existingObjectData.get('folderId')
+  if (existingFolderId) {
+    newSiteProps.folderId = existingFolderId
+  }
+  const parentFolderObjectId = newSiteProps.parentFolderObjectId
+  if (parentFolderObjectId && parentFolderObjectId.length > 0) {
+    newSiteProps.parentFolderId =
+      getFolderIdByObjectId(new Immutable.List(parentFolderObjectId), appState, records)
+  } else {
+    // Null or empty parentFolderObjectId on a record corresponds to
+    // a top-level bookmark. -1 indicates a hidden bookmark (Other bookmarks).
+    newSiteProps.parentFolderId = siteProps.hideInToolbar ? -1 : 0
+  }
+  return newSiteProps
+}
+
 /**
  * Converts sync bookmark and history records into an object that can be
  * consumed by AppStore actions.
@@ -118,7 +134,7 @@ module.exports.getSiteDataFromRecord = (record, appState, records) => {
     existingObjectData = existingObject && existingObject[1]
   }
 
-  const siteProps = Object.assign(
+  let siteProps = Object.assign(
     {},
     existingObjectData && existingObjectData.toJS(),
     record.historySite,
@@ -126,21 +142,13 @@ module.exports.getSiteDataFromRecord = (record, appState, records) => {
     record.bookmark && record.bookmark.site,
     {objectId}
   )
+  // customTitle was previously used in browser-laptop
+  if (siteProps.customTitle) {
+    siteProps.title = siteProps.customTitle
+  }
   delete siteProps.customTitle
   if (record.objectData === 'bookmark') {
-    const existingFolderId = existingObjectData && existingObjectData.get('folderId')
-    if (existingFolderId) {
-      siteProps.folderId = existingFolderId
-    }
-    const parentFolderObjectId = siteProps.parentFolderObjectId
-    if (parentFolderObjectId && parentFolderObjectId.length > 0) {
-      siteProps.parentFolderId =
-        getFolderIdByObjectId(new Immutable.List(parentFolderObjectId), appState, records)
-    } else {
-      // Null or empty parentFolderObjectId on a record corresponds to
-      // a top-level bookmark. -1 indicates a hidden bookmark (Other bookmarks).
-      siteProps.parentFolderId = siteProps.hideInToolbar ? -1 : 0
-    }
+    siteProps = getBookmarkSiteDataFromRecord(siteProps, appState, records, existingObjectData)
   }
   return new Immutable.Map(pickFields(siteProps, SITE_FIELDS))
 }
@@ -294,7 +302,7 @@ module.exports.applySyncRecords = (records) => {
       return true
     }
     if (record.objectData === 'bookmark') {
-      const siteData = module.exports.getSiteDataFromRecord(record, appState, records)
+      const siteData = module.exports.getSiteDataFromRecord(record, appState, records).set('skipSync', true)
       if (shouldAddRecord(record)) {
         if (record.bookmark.isFolder) {
           bufferAppAction(appActions.addBookmarkFolder, siteData)
@@ -302,11 +310,13 @@ module.exports.applySyncRecords = (records) => {
           bufferAppAction(appActions.addBookmark, siteData)
         }
       } else if (shouldRemoveRecord(record)) {
-        const folderKey = bookmarkFoldersUtil.getKey(siteData)
-        // TODO: removeBookmarkFolder doesn't support List removal
-        setImmediate(() => {
-          appActions.removeBookmarkFolder(folderKey)
-        })
+        if (record.bookmark.isFolder) {
+          const folderKey = bookmarkFoldersUtil.getKey(siteData)
+          bufferAppAction(appActions.removeBookmarkFolder, folderKey)
+        } else {
+          const siteKey = bookmarkUtil.getKey(siteData)
+          bufferAppAction(appActions.removeBookmark, siteKey)
+        }
       }
     } else if (record.objectData === 'historySite') {
       const siteData = module.exports.getSiteDataFromRecord(record, appState, records)
@@ -343,8 +353,10 @@ module.exports.getExistingObject = (categoryName, syncRecord) => {
   let item
   switch (categoryName) {
     case 'BOOKMARKS':
+      item = module.exports.createBookmarkData(existingObjectData, appState)
+      break
     case 'HISTORY_SITES':
-      item = module.exports.createSiteData(existingObjectData, appState)
+      item = module.exports.createHistorySiteData(existingObjectData)
       break
     case 'PREFERENCES':
       const hostPattern = existingObjectKeyPath[existingObjectKeyPath.length - 1]
@@ -500,19 +512,39 @@ module.exports.now = () => {
 }
 
 /**
- * Checks whether an object is syncable as a record of the given type
- * @param {string} type
+ * Checks whether an object is syncable as a bookmark.
  * @param {Immutable.Map} item
  * @returns {boolean}
  */
-module.exports.isSyncable = (type, item) => {
-  if (type === 'bookmark') {
-    return bookmarkUtil.isBookmark(item) || bookmarkFoldersUtil.isFolder(item)
-  } else if (type === 'siteSetting') {
-    for (let field in module.exports.siteSettingDefaults) {
-      if (item.has(field)) {
-        return true
-      }
+module.exports.isSyncableBookmark = (site) => {
+  return bookmarkUtil.isBookmark(site) || bookmarkFoldersUtil.isFolder(site)
+}
+
+/**
+ * Checks whether an object is syncable as a history site.
+ * @param {Immutable.Map} item
+ * @returns {boolean}
+ */
+module.exports.isSyncableHistorySite = (site) => {
+  if (!site) {
+    return false
+  }
+  const order = site.get('order')
+  const location = site.get('location')
+  return !order &&
+    typeof location === 'string' &&
+    !location.startsWith('about:')
+}
+
+/**
+ * Checks whether an object is syncable as a site setting.
+ * @param {Immutable.Map} item
+ * @returns {boolean}
+ */
+module.exports.isSyncableSiteSetting = (item) => {
+  for (let field in module.exports.siteSettingDefaults) {
+    if (item.has(field)) {
+      return true
     }
   }
   return false
@@ -552,13 +584,7 @@ const findOrCreateFolderObjectId = (folderId, appState) => {
   }
 }
 
-/**
- * Converts a site object into input for sendSyncRecords
- * @param {Object} site
- * @param {Immutable.Map} appState
- * @returns {{name: string, value: object, objectId: Array.<number>}}
- */
-module.exports.createSiteData = (site, appState) => {
+const pickSiteData = (site) => {
   const siteData = {
     location: '',
     title: '',
@@ -571,69 +597,79 @@ module.exports.createSiteData = (site, appState) => {
       siteData[field] = site[field]
     }
   }
+  return siteData
+}
+
+/**
+ * Converts a bookmark site object into input for sendSyncRecords.
+ * @param {Object} site
+ * @param {Immutable.Map} appState
+ * @returns {{name: string, value: object, objectId: Array.<number>}}
+ */
+module.exports.createBookmarkData = (site, appState) => {
+  const siteData = pickSiteData(site)
   const immutableSite = Immutable.fromJS(site)
-  let name
-  let objectId
-  let parentFolderObjectId
-  let value
-  if (module.exports.isSyncable('bookmark', immutableSite)) {
-    name = 'bookmark'
-    const isFolder = bookmarkFoldersUtil.isFolder(immutableSite)
-    let siteKey
-    if (isFolder) {
-      siteKey = bookmarkFoldersUtil.getKey(immutableSite) || bookmarkFoldersUtil.getKey(Immutable.fromJS(siteData))
-    } else {
-      siteKey = bookmarkUtil.getKey(immutableSite) || bookmarkUtil.getKey(Immutable.fromJS(siteData))
-    }
-    if (siteKey === null) {
-      // May happen if this is called before the appStore object has its location
-      // field populated
-      console.log(`Ignoring entry because we can't create site key: ${JSON.stringify(site)}`)
-      return
-    }
-
-    const sitesCollection = isFolder ? STATE_SITES.BOOKMARK_FOLDERS : STATE_SITES.BOOKMARKS
-    objectId = site.objectId ||
-      folderToObjectMap[site.folderId] ||
-      module.exports.newObjectId([sitesCollection, siteKey])
-    parentFolderObjectId = site.parentFolderObjectId ||
-      folderToObjectMap[site.parentFolderId] ||
-      findOrCreateFolderObjectId(site.parentFolderId, appState)
-    value = {
-      site: siteData,
-      isFolder,
-      hideInToolbar: site.parentFolderId === -1,
-      parentFolderObjectId
-    }
-  } else if (siteUtil.isHistoryEntry(immutableSite)) {
-    // TODO create new function in historyUtil, because siteUtil.isHistoryEntry is deprecated
-    const siteKey = historyUtil.getKey(immutableSite) || historyUtil.getKey(Immutable.fromJS(siteData))
-    if (siteKey === null) {
-      // May happen if this is called before the appStore object has its location
-      // field populated
-      console.log(`Ignoring entry because we can't create site key: ${JSON.stringify(site)}`)
-      return
-    }
-
-    objectId = site.objectId || module.exports.newObjectId([STATE_SITES.HISTORY_SITES, siteKey])
-    name = 'historySite'
-    value = siteData
+  const isFolder = bookmarkFoldersUtil.isFolder(immutableSite)
+  const collectionUtil = isFolder ? bookmarkFoldersUtil : bookmarkUtil
+  const siteKey = collectionUtil.getKey(immutableSite) ||
+    collectionUtil.getKey(Immutable.fromJS(siteData))
+  if (siteKey === null) {
+    // May happen if this is called before the appStore object has its location
+    // field populated
+    console.log(`createBookmarkData ignoring entry because we can't create site key: ${JSON.stringify(site)}`)
+    return
   }
 
-  if (objectId) {
-    if (typeof site.folderId === 'number') {
-      folderToObjectMap[site.folderId] = objectId
-    }
-    if (typeof site.parentFolderId === 'number' && parentFolderObjectId) {
-      folderToObjectMap[site.parentFolderId] = parentFolderObjectId
-    }
-    return {
-      name,
-      objectId,
-      value
-    }
+  const sitesCollection = isFolder ? STATE_SITES.BOOKMARK_FOLDERS : STATE_SITES.BOOKMARKS
+  const objectId = site.objectId ||
+    folderToObjectMap[site.folderId] ||
+    module.exports.newObjectId([sitesCollection, siteKey])
+  if (!objectId) {
+    console.log(`Warning: createBookmarkData can't create site data: ${JSON.stringify(site)}`)
   }
-  console.log(`Warning: Can't create site data: ${JSON.stringify(site)}`)
+
+  const parentFolderObjectId = site.parentFolderObjectId ||
+    folderToObjectMap[site.parentFolderId] ||
+    findOrCreateFolderObjectId(site.parentFolderId, appState)
+  const value = {
+    site: siteData,
+    isFolder,
+    hideInToolbar: site.parentFolderId === -1,
+    parentFolderObjectId
+  }
+  return {
+    name: 'bookmark',
+    objectId,
+    value
+  }
+}
+
+/**
+ * Converts a bookmark site object into input for sendSyncRecords.
+ * @param {Object} site
+ * @returns {{name: string, value: object, objectId: Array.<number>}}
+ */
+module.exports.createHistorySiteData = (site) => {
+  const siteData = pickSiteData(site)
+  const siteKey = historyUtil.getKey(Immutable.fromJS(site)) ||
+    historyUtil.getKey(Immutable.fromJS(siteData))
+  if (siteKey === null) {
+    // May happen if this is called before the appStore object has its location
+    // field populated
+    console.log(`createHistorySiteData ignoring site because we can't create site key: ${JSON.stringify(site)}`)
+    return
+  }
+
+  const objectId = site.objectId || module.exports.newObjectId([STATE_SITES.HISTORY_SITES, siteKey])
+  if (!objectId) {
+    console.log(`Warning: createHistorySiteData can't create site data: ${JSON.stringify(site)}`)
+  }
+
+  return {
+    name: 'historySite',
+    objectId,
+    value: siteData
+  }
 }
 
 /**
