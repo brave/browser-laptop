@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 const moment = require('moment')
 
 // util
@@ -84,11 +84,11 @@ class EnabledContent extends ImmutableComponent {
 
     return <section className={css(styles.balance)}>
       <FormTextbox data-test-id='fundsAmount' readOnly value={btcToCurrencyString(value, ledgerData)} />
-      <a className={css(styles.iconLink)} href='https://brave.com/Payments_FAQ.html' target='_blank'>
+      <a className={css(styles.balance__iconLink)} href='https://brave.com/Payments_FAQ.html' target='_blank'>
         <span className={cx({
           fa: true,
           'fa-question-circle': true,
-          [css(styles.iconText)]: true
+          [css(styles.balance__iconLink__iconText)]: true
         })} />
       </a>
     </section>
@@ -116,7 +116,7 @@ class EnabledContent extends ImmutableComponent {
       date: prevReconcileDateValue
     }
 
-    return <section className={css(styles.contribution, styles.lastContribution)}>
+    return <section className={css(styles.contribution, styles.contribution_last)}>
       <div data-l10n-id='lastContribution' />
       <div data-l10n-id={text} data-l10n-args={JSON.stringify(l10nDataArgs)} />
     </section>
@@ -157,7 +157,7 @@ class EnabledContent extends ImmutableComponent {
       reconcileDate: nextReconcileDateRelative
     }
 
-    return <section className={css(styles.contribution, styles.nextContribution)}>
+    return <section className={css(styles.contribution, styles.contribution_next)}>
       <div data-l10n-id='nextContribution' />
       <div data-l10n-args={JSON.stringify(l10nDataArgs)} data-l10n-id={l10nDataId} />
     </section>
@@ -171,16 +171,16 @@ class EnabledContent extends ImmutableComponent {
       <div className={css(styles.walletBar)} data-test-id='walletBar'>
         <table>
           <thead>
-            <tr className={css(styles.tableTr)}>
+            <tr className={css(styles.walletBar__tableTr)}>
               <th className={css(styles.walletBar__tableTr__tableTh)} data-l10n-id='monthlyBudget' />
               <th className={css(styles.walletBar__tableTr__tableTh)} data-l10n-id='accountBalance' />
               <th className={css(styles.walletBar__tableTr__tableTh)} />
             </tr>
           </thead>
           <tbody>
-            <tr className={css(styles.tableTr)}>
-              <td className={css(styles.tableTd)}>
-                <SettingsList className={css(styles.listContainer)}>
+            <tr className={css(styles.walletBar__tableTr)}>
+              <td className={css(styles.walletBar__tableTr__tableTd)}>
+                <SettingsList className={css(styles.walletBar__tableTr__tableTd__listContainer)}>
                   <SettingItem>
                     <FormDropdown
                       data-test-id='fundsSelectBox'
@@ -198,15 +198,15 @@ class EnabledContent extends ImmutableComponent {
                   </SettingItem>
                 </SettingsList>
               </td>
-              <td className={css(styles.tableTd)}>
+              <td className={css(styles.walletBar__tableTr__tableTd)}>
                 {
                   ledgerData.get('error') && ledgerData.get('error').get('caller') === 'getWalletProperties'
                     ? <div>
                       <div data-l10n-id='accountBalanceConnectionError' />
-                      <div className={css(styles.accountBalanceError)} data-l10n-id={this.ledgerDataErrorText()} />
+                      <div className={css(styles.walletBar__tableTr__tableTd__accountBalanceError)} data-l10n-id={this.ledgerDataErrorText()} />
                     </div>
                     : <div>
-                      <SettingsList className={css(styles.listContainer)}>
+                      <SettingsList className={css(styles.walletBar__tableTr__tableTd__listContainer)}>
                         <SettingItem>
                           {this.fundsAmount()}
                         </SettingItem>
@@ -217,9 +217,9 @@ class EnabledContent extends ImmutableComponent {
                     </div>
                 }
               </td>
-              <td className={css(styles.tableTd)}>
+              <td className={css(styles.walletBar__tableTr__tableTd)}>
                 {this.walletButton()}
-                <div className={css(styles.walletStatus)}
+                <div className={css(styles.walletBar__tableTr__tableTd__walletStatus)}
                   data-test-id='walletStatus'
                   data-l10n-id={walletStatusText.id}
                   data-l10n-args={walletStatusText.args ? JSON.stringify(walletStatusText.args) : null}
@@ -245,8 +245,8 @@ const styles = StyleSheet.create({
     margin: `${globalStyles.spacing.panelMargin} 0`
   },
 
-  listContainer: {
-    marginBottom: 0
+  walletBar__tableTr: {
+    height: '1em'
   },
 
   walletBar__tableTr__tableTh: {
@@ -255,11 +255,7 @@ const styles = StyleSheet.create({
     textAlign: 'left'
   },
 
-  tableTr: {
-    height: '1em'
-  },
-
-  tableTd: {
+  walletBar__tableTr__tableTd: {
     fontSize: paymentStyles.font.regular,
     padding: '10px 30px 0 0',
     width: 'auto',
@@ -267,12 +263,17 @@ const styles = StyleSheet.create({
     verticalAlign: 'top'
   },
 
-  accountBalanceError: {
+  walletBar__tableTr__tableTd__listContainer: {
+    marginBottom: 0
+  },
+
+  walletBar__tableTr__tableTd__accountBalanceError: {
     marginTop: globalStyles.spacing.panelItemMargin
   },
 
-  settingsListContainer: {
-    marginBottom: 0
+  walletBar__tableTr__tableTd__walletStatus: {
+    marginTop: '15px',
+    lineHeight: 1.5
   },
 
   balance: {
@@ -283,39 +284,36 @@ const styles = StyleSheet.create({
     marginBottom: 0
   },
 
-  iconLink: {
+  balance__iconLink: {
     textDecoration: 'none',
 
     ':hover': {
-      textDecoration: 'none'
+      // TODO: refactor preferences.less to remove !important
+      // See .prefBody a:hover
+      textDecoration: 'none !important'
     }
   },
 
-  iconText: {
-    color: globalStyles.color.mediumGray,
-    margin: '0 0 0 5px',
-
+  balance__iconLink__iconText: {
     // TODO: refactor preferences.less to remove !important
-    fontSize: `${globalStyles.fontSize.settingItemSubtext} !important`
+    fontSize: `${globalStyles.fontSize.settingItemSubtext} !important`,
+    color: `${globalStyles.color.mediumGray} !important`,
+    margin: '0 0 0 5px !important',
+    paddingRight: '0 !important'
   },
 
   contribution: {
     lineHeight: 1.5
   },
 
-  lastContribution: {
+  contribution_last: {
     marginTop: '16px',
     marginBottom: 0
   },
 
-  nextContribution: {
+  contribution_next: {
     marginTop: '15px',
     marginBottom: 0
-  },
-
-  walletStatus: {
-    marginTop: '15px',
-    lineHeight: 1.5
   }
 })
 
