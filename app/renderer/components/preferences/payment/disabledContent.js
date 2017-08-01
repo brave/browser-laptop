@@ -20,8 +20,8 @@ const CoinBase2 = require('../../../../extensions/brave/img/coinbase_2x.png')
 
 class DisabledContent extends ImmutableComponent {
   render () {
-    return <section data-test-id='disabledContent'>
-      <div className={css(styles.paymentsMessage, styles.walletBarMargin)} data-test-id='paymentsMessage'>
+    return <section className={css(styles.disabledContent)} data-test-id='disabledContent'>
+      <div className={css(styles.paymentsMessage)} data-test-id='paymentsMessage'>
         <h3 className={css(styles.h3)} data-l10n-id='paymentsWelcomeTitle' />
         <div className={css(styles.text)} data-l10n-id='paymentsWelcomeText1' />
         <div className={css(styles.boldText, styles.text)} data-l10n-id='paymentsWelcomeText2' />
@@ -48,6 +48,13 @@ class DisabledContent extends ImmutableComponent {
 }
 
 const styles = StyleSheet.create({
+  disabledContent: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    marginTop: globalStyles.spacing.panelMargin
+  },
+
   paymentsMessage: {
     backgroundColor: globalStyles.color.lightGray,
     borderRadius: globalStyles.radius.borderRadiusUIbox,
@@ -55,8 +62,7 @@ const styles = StyleSheet.create({
     fontSize: paymentStyles.font.regular,
     lineHeight: '1.8em',
     color: globalStyles.color.mediumGray,
-    width: '500px',
-    float: 'left'
+    width: '500px'
   },
 
   text: {
@@ -66,10 +72,6 @@ const styles = StyleSheet.create({
   textSide: {
     fontSize: paymentStyles.font.regular,
     margin: '50px 0 20px 12px'
-  },
-
-  walletBarMargin: {
-    marginTop: globalStyles.spacing.panelMargin
   },
 
   h3: {
@@ -89,7 +91,6 @@ const styles = StyleSheet.create({
   paymentsSidebar: {
     opacity: 0.8,
     width: '200px',
-    float: 'left',
     marginLeft: '23px'
   },
 
