@@ -181,7 +181,7 @@ class Frame extends React.Component {
   }
 
   onPropsChanged (prevProps = {}) {
-    if (this.props.isActive && isFocused()) {
+    if (this.props.isActive && !prevProps.isActive && isFocused()) {
       windowActions.setFocusedFrame(this.frame)
     }
   }
