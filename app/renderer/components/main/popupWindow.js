@@ -118,6 +118,7 @@ class PopupWindow extends React.Component {
     }
 
     return <div
+      data-popup-window
       className={css(
         styles.popupWindow,
         style.right !== undefined && styles.reverseExpand
