@@ -40,11 +40,11 @@ const dummyData = [
     name: 'dashlane',
     description: 'dashlaneDesc',
     icon: 'img/extensions/dashlane-128.png'
-  }, {
-    id: enpass,
-    name: 'enpass',
-    description: 'enpassDesc',
-    icon: 'img/extensions/enpass-128.png'
+  // }, {
+  //   id: enpass,
+  //   name: 'enpass',
+  //   description: 'enpassDesc',
+  //   icon: 'img/extensions/enpass-128.png'
   }, {
     id: lastpass,
     name: 'lastpass',
@@ -72,13 +72,13 @@ const dummyData = [
     name: 'Pinterest Save',
     description: 'pinterestDesc',
     icon: 'img/extensions/pinterest-128.png'
-  },
-  {
-    id: metamask,
-    name: 'MetaMask',
-    description: 'metamaskDesc',
-    icon: 'img/extensions/metamask-128.png'
   }
+  // {
+  //   id: metamask,
+  //   name: 'MetaMask',
+  //   description: 'metamaskDesc',
+  //   icon: 'img/extensions/metamask-128.png'
+  // }
   // { id: 'vimium' // TBD }
 ]
 
