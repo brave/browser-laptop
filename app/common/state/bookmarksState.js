@@ -117,11 +117,12 @@ const bookmarksState = {
       location: bookmarkDetail.get('location'),
       parentFolderId: ~~bookmarkDetail.get('parentFolderId', 0),
       partitionNumber: ~~dataItem.get('partitionNumber', 0),
-      objectId: null,
+      objectId: bookmarkDetail.get('objectId', null),
       favicon: dataItem.get('favicon'),
       themeColor: dataItem.get('themeColor'),
       type: siteTags.BOOKMARK,
-      key: key
+      key: key,
+      skipSync: bookmarkDetail.get('skipSync', null)
     })
 
     if (key === null) {
@@ -204,8 +205,17 @@ const bookmarksState = {
       return state
     }
 
+    const syncEnabled = getSetting(settings.SYNC_ENABLED) === true
     const bookmarks = bookmarksState.getBookmarks(state)
-      .filter(bookmark => bookmark.get('parentFolderId') !== ~~parentFolderId)
+      .filter(bookmark => {
+        if (bookmark.get('parentFolderId') !== ~~parentFolderId) {
+          return true
+        }
+        if (syncEnabled) {
+          syncActions.removeSite(bookmark)
+        }
+        return false
+      })
 
     return state.set(STATE_SITES.BOOKMARKS, bookmarks)
   },

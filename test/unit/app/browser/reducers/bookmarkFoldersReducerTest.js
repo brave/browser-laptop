@@ -111,6 +111,7 @@ describe('bookmarkFoldersReducer unit test', function () {
             key: '1',
             parentFolderId: 0,
             partitionNumber: 0,
+            skipSync: null,
             objectId: null,
             type: siteTags.BOOKMARK_FOLDER
           }
@@ -155,6 +156,7 @@ describe('bookmarkFoldersReducer unit test', function () {
             key: '1',
             parentFolderId: 0,
             partitionNumber: 0,
+            skipSync: null,
             objectId: null,
             type: siteTags.BOOKMARK_FOLDER
           },
@@ -164,6 +166,7 @@ describe('bookmarkFoldersReducer unit test', function () {
             key: '2',
             parentFolderId: 0,
             partitionNumber: 0,
+            skipSync: null,
             objectId: null,
             type: siteTags.BOOKMARK_FOLDER
           },
@@ -173,6 +176,7 @@ describe('bookmarkFoldersReducer unit test', function () {
             key: '3',
             parentFolderId: 0,
             partitionNumber: 0,
+            skipSync: null,
             objectId: null,
             type: siteTags.BOOKMARK_FOLDER
           }

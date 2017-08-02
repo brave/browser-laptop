@@ -63,8 +63,9 @@ const bookmarkFoldersState = {
       key: key.toString(),
       parentFolderId: ~~folderDetails.get('parentFolderId', 0),
       partitionNumber: ~~folderDetails.get('partitionNumber', 0),
-      objectId: null,
-      type: siteTags.BOOKMARK_FOLDER
+      objectId: folderDetails.get('objectId', null),
+      type: siteTags.BOOKMARK_FOLDER,
+      skipSync: folderDetails.get('skipSync', null)
     })
 
     state = state.setIn([STATE_SITES.BOOKMARK_FOLDERS, key.toString()], newFolder)

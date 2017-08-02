@@ -41,7 +41,7 @@ describe('historyReducer unit test', function () {
         key: 'https://clifton.io/|0',
         lastAccessedTime: 0,
         location: 'https://clifton.io/',
-        objectId: undefined,
+        objectId: null,
         partitionNumber: 0,
         themeColor: undefined,
         title: 'Clifton'
@@ -52,7 +52,7 @@ describe('historyReducer unit test', function () {
         key: 'https://brave.com/|0',
         lastAccessedTime: 0,
         location: 'https://brave.com/',
-        objectId: undefined,
+        objectId: null,
         partitionNumber: 0,
         themeColor: undefined,
         title: 'Brave'
@@ -68,7 +68,7 @@ describe('historyReducer unit test', function () {
             key: 'https://clifton.io/|0',
             lastAccessedTime: 0,
             location: 'https://clifton.io/',
-            objectId: undefined,
+            objectId: null,
             partitionNumber: 0,
             themeColor: undefined,
             title: 'Clifton'
@@ -79,7 +79,7 @@ describe('historyReducer unit test', function () {
             key: 'https://brave.com/|0',
             lastAccessedTime: 0,
             location: 'https://brave.com/',
-            objectId: undefined,
+            objectId: null,
             partitionNumber: 0,
             themeColor: undefined,
             title: 'Brave'
@@ -224,8 +224,9 @@ describe('historyReducer unit test', function () {
             key: 'https://clifton.io/|0',
             lastAccessedTime: 0,
             location: 'https://clifton.io/',
-            objectId: undefined,
+            objectId: null,
             partitionNumber: 0,
+            skipSync: null,
             themeColor: undefined,
             title: 'Clifton'
           },
@@ -235,8 +236,9 @@ describe('historyReducer unit test', function () {
             key: 'https://brave.com/|0',
             lastAccessedTime: 0,
             location: 'https://brave.com/',
-            objectId: undefined,
+            objectId: null,
             partitionNumber: 0,
+            skipSync: null,
             themeColor: undefined,
             title: 'Brave'
           }
@@ -249,8 +251,9 @@ describe('historyReducer unit test', function () {
               key: 'https://clifton.io/|0',
               lastAccessedTime: 0,
               location: 'https://clifton.io/',
-              objectId: undefined,
+              objectId: null,
               partitionNumber: 0,
+              skipSync: null,
               themeColor: undefined,
               title: 'Clifton'
             },
@@ -260,8 +263,9 @@ describe('historyReducer unit test', function () {
               key: 'https://brave.com/|0',
               lastAccessedTime: 0,
               location: 'https://brave.com/',
-              objectId: undefined,
+              objectId: null,
               partitionNumber: 0,
+              skipSync: null,
               themeColor: undefined,
               title: 'Brave'
             }
@@ -291,7 +295,8 @@ describe('historyReducer unit test', function () {
             key: 'https://clifton.io/|0',
             lastAccessedTime: 0,
             location: 'https://clifton.io/',
-            objectId: undefined,
+            objectId: null,
+            skipSync: null,
             partitionNumber: 0,
             themeColor: undefined,
             title: 'Clifton'
@@ -305,8 +310,9 @@ describe('historyReducer unit test', function () {
               key: 'https://clifton.io/|0',
               lastAccessedTime: 0,
               location: 'https://clifton.io/',
-              objectId: undefined,
+              objectId: null,
               partitionNumber: 0,
+              skipSync: null,
               themeColor: undefined,
               title: 'Clifton'
             }
@@ -368,7 +374,7 @@ describe('historyReducer unit test', function () {
             key: 'https://clifton.io/|0',
             lastAccessedTime: 0,
             location: 'https://clifton.io/',
-            objectId: undefined,
+            objectId: null,
             partitionNumber: 0,
             themeColor: undefined,
             title: 'Clifton'
@@ -382,7 +388,7 @@ describe('historyReducer unit test', function () {
               key: 'https://clifton.io/|0',
               lastAccessedTime: 0,
               location: 'https://clifton.io/',
-              objectId: undefined,
+              objectId: null,
               partitionNumber: 0,
               themeColor: undefined,
               title: 'Clifton'
@@ -413,7 +419,7 @@ describe('historyReducer unit test', function () {
         .setIn(['about', 'history', 'entries'], Immutable.fromJS([
           {
             lastAccessedTime: 0,
-            objectId: undefined,
+            objectId: null,
             count: 1,
             favicon: undefined,
             key: 'https://clifton.io/|0',
@@ -424,7 +430,7 @@ describe('historyReducer unit test', function () {
           },
           {
             lastAccessedTime: 0,
-            objectId: undefined,
+            objectId: null,
             count: 1,
             favicon: undefined,
             key: 'https://brave.com/|0',
