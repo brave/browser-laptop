@@ -442,7 +442,7 @@ describe('Syncing bookmarks', function () {
   })
 
   it('create bookmark in folder', function * () {
-    const pageNthChild = 2 // TODO: This should be 1. See https://github.com/brave/sync/issues/104
+    const pageNthChild = 1
     const folderTitle = this.folder1Title
     const pageTitle = this.folder1Page1Title
     const folder = `[data-test-id="bookmarkToolbarButton"][title="${folderTitle}"]`
@@ -454,7 +454,7 @@ describe('Syncing bookmarks', function () {
   })
 
   it('update bookmark, moving it into the folder', function * () {
-    const pageNthChild = 1 // TODO: This should be 2
+    const pageNthChild = 2
     const folderTitle = this.folder1Title
     const pageTitle = this.folder1Page2Title
     const folder = `[data-test-id="bookmarkToolbarButton"][title="${folderTitle}"]`
@@ -598,7 +598,7 @@ describe('Syncing bookmarks from an existing profile', function () {
   })
 
   it('create bookmark in folder', function * () {
-    const pageNthChild = 2 // TODO: This should be 1
+    const pageNthChild = 1
     const folderTitle = this.folder1Title
     const pageTitle = this.folder1Page1Title
     const folder = `[data-test-id="bookmarkToolbarButton"][title="${folderTitle}"]`
@@ -610,7 +610,7 @@ describe('Syncing bookmarks from an existing profile', function () {
   })
 
   it('update bookmark, moving it into the folder', function * () {
-    const pageNthChild = 1 // TODO: This should be 2
+    const pageNthChild = 2
     const folderTitle = this.folder1Title
     const pageTitle = this.folder1Page2Title
     const folder = `[data-test-id="bookmarkToolbarButton"][title="${folderTitle}"]`
@@ -1017,12 +1017,14 @@ describe('Syncing then turning it off, then turning it on sends new records', fu
       .waitUntil(checkBookmark(this.folder1Title))
   })
 
-  it('history', function * () {
-    yield Brave.app.client
-      .tabByIndex(0)
-      .waitForElementCount('table.sortableTable tbody tr', 1)
-      .waitForVisible(`table.sortableTable td.title[data-sort="${this.page1Title}"]`)
-  })
+  // TODO: Decide whether history generated while browsing w/o sync should
+  // be synced when re-enabling. We don't do this currently.
+  // it('history', function * () {
+  //   yield Brave.app.client
+  //     .tabByIndex(0)
+  //     .waitForElementCount('table.sortableTable tbody tr', 1)
+  //     .waitForVisible(`table.sortableTable td.title[data-sort="${this.page1Title}"]`)
+  // })
 
   it('site setting', function * () {
     const hostPattern1 = this.hostPattern1

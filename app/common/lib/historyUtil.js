@@ -75,14 +75,15 @@ const prepareHistoryEntry = (siteDetail) => {
 
   return makeImmutable({
     lastAccessedTime: time,
-    objectId: undefined,
+    objectId: siteDetail.get('objectId', null),
     title: siteDetail.get('title'),
     location: siteDetail.get('location'),
     partitionNumber: ~~siteDetail.get('partitionNumber', 0),
     count: 1,
     themeColor: siteDetail.get('themeColor'),
     favicon: siteDetail.get('favicon', siteDetail.get('icon')),
-    key: getKey(siteDetail)
+    key: getKey(siteDetail),
+    skipSync: siteDetail.get('skipSync', null)
   })
 }
 
