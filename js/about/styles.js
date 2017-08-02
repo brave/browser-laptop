@@ -11,7 +11,15 @@ require('../../node_modules/font-awesome/css/font-awesome.css')
 
 const {Textbox, FormTextbox, SettingTextbox, RecoveryKeyTextbox} = require('../../app/renderer/components/common/textbox')
 const {TextArea, DefaultTextArea} = require('../../app/renderer/components/common/textbox')
-const {Dropdown, FormDropdown, SettingDropdown, BraveryPanelDropdown} = require('../../app/renderer/components/common/dropdown')
+
+const {
+  Dropdown,
+  FormDropdown,
+  SettingDropdown,
+  PanelDropdown,
+  BraveryPanelDropdown
+} = require('../../app/renderer/components/common/dropdown')
+
 const BrowserButton = require('../../app/renderer/components/common/browserButton')
 
 const {
@@ -222,6 +230,23 @@ class AboutStyle extends ImmutableComponent {
             &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
             &nbsp;&nbsp;&lt;option>Third Choice&lt;/option>{'\n'}
             &lt;/SettingDropdown>
+          </Code></Pre>
+        </Container>
+
+        <Container>
+          <h2>Dropdown used on Brave Payments; has 180px width (same as Panel Item button below)</h2>
+          <PanelDropdown>
+            <option>5 USD</option>
+            <option>10 USD</option>
+            <option>15 USD</option>
+          </PanelDropdown>
+          <Pre><Code>
+            const { '{PanelDropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
+            &lt;PanelDropdown>{'\n'}
+            &nbsp;&nbsp;&lt;option>5 USD&lt;/option>{'\n'}
+            &nbsp;&nbsp;&lt;option>10 USD&lt;/option>{'\n'}
+            &nbsp;&nbsp;&lt;option>15 USD&lt;/option>{'\n'}
+            &lt;/PanelDropdown>
           </Code></Pre>
         </Container>
 

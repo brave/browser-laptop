@@ -16,8 +16,9 @@ class Dropdown extends ImmutableComponent {
       this.props['data-isFormControl'] && commonStyles.formControl,
       styles.dropdown,
       this.props['data-isCommonForm'] && styles.commonForm,
-      this.props['data-isSettings'] && styles.settings,
       this.props['data-isFullWidth'] && styles.fullWidth,
+      this.props['data-isSettings'] && styles.settings,
+      this.props['data-isPanel'] && styles.settings_panel,
       this.props['data-isBraveryPanel'] && styles.braveryPanel
     )
 
@@ -36,6 +37,12 @@ class FormDropdown extends ImmutableComponent {
 class SettingDropdown extends ImmutableComponent {
   render () {
     return <FormDropdown data-isSettings='true' {...this.props} />
+  }
+}
+
+class PanelDropdown extends ImmutableComponent {
+  render () {
+    return <FormDropdown data-isPanel {...this.props} />
   }
 }
 
@@ -75,12 +82,16 @@ const styles = StyleSheet.create({
     fontSize: globalStyles.fontSize.flyoutDialog
   },
 
+  fullWidth: {
+    width: '100%'
+  },
+
   settings: {
     width: '280px'
   },
 
-  fullWidth: {
-    width: '100%'
+  settings_panel: {
+    width: globalStyles.button.panel.width
   },
 
   braveryPanel: {
@@ -93,5 +104,6 @@ module.exports = {
   Dropdown,
   FormDropdown,
   SettingDropdown,
+  PanelDropdown,
   BraveryPanelDropdown
 }

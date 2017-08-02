@@ -305,6 +305,10 @@ const globalStyles = {
     action: {
       backgroundColor: '#4099FF',
       hoverColor: '#000'
+    },
+
+    panel: {
+      width: '180px'
     }
   },
 
@@ -328,6 +332,13 @@ const globalStyles = {
       hr: {
         background: '#ccc'
       }
+    }
+  },
+
+  // TODO (Suguru): move them to payment.js after style refactoring is done
+  payments: {
+    fontSize: {
+      regular: '14.5px'
     }
   }
 }

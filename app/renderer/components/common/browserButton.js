@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
   },
 
   browserButton_panelItem: {
-    minWidth: '180px'
+    minWidth: globalStyles.button.panel.width
   },
 
   browserButton_iconOnly: {

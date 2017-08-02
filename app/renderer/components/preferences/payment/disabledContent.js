@@ -11,7 +11,6 @@ const ImmutableComponent = require('../../immutableComponent')
 // style
 const globalStyles = require('../../styles/global')
 const commonStyles = require('../../styles/commonStyles')
-const {paymentStyles} = require('../../styles/payment')
 const PIA = require('../../../../extensions/brave/img/private_internet_access.png')
 const PIA2 = require('../../../../extensions/brave/img/private_internet_access_2x.png')
 const BitGo = require('../../../../extensions/brave/img/bitgo.png')
@@ -61,7 +60,7 @@ const styles = StyleSheet.create({
     borderRadius: globalStyles.radius.borderRadiusUIbox,
     boxSizing: 'border-box',
     padding: '40px',
-    fontSize: paymentStyles.font.regular,
+    fontSize: globalStyles.payments.fontSize.regular,
     lineHeight: '1.8em',
     color: globalStyles.color.mediumGray
   },
@@ -92,7 +91,7 @@ const styles = StyleSheet.create({
 
   disabledContent__sidebar__text: {
     opacity: 0.8,
-    fontSize: paymentStyles.font.regular
+    fontSize: globalStyles.payments.fontSize.regular
   },
 
   disabledContent__sidebar__logo: {

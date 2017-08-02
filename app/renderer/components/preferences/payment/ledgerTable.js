@@ -262,13 +262,16 @@ class LedgerTable extends ImmutableComponent {
 
     return <section data-test-id='ledgerTable'>
       <div className={css(styles.hideExcludedSites)}>
-        <div className={css(styles.columnOffset)} />
-        <div className={css(styles.rightColumn)}>
-          <SettingCheckbox small compact
+        <div className={css(gridStyles.row1col1)} />
+        <div className={css(gridStyles.row1col2)}>
+          <SettingCheckbox
+            small
+            compact
             dataL10nId='hideExcluded'
             prefKey={settings.PAYMENTS_SITES_HIDE_EXCLUDED}
             settings={this.props.settings}
             onChangeSetting={this.props.onChangeSetting}
+            switchClassName={css(styles.hideExcludedSites__switchWrap__switchControl)}
           />
         </div>
       </div>
@@ -324,6 +327,18 @@ const verifiedBadge = (icon) => ({
   marginRight: '-10px',
   display: 'block',
   background: `url(${icon}) center no-repeat`
+})
+
+const gridStyles = StyleSheet.create({
+  row1col1: {
+    gridRow: 1,
+    gridColumn: 1
+  },
+
+  row1col2: {
+    gridRow: 1,
+    gridColumn: 2
+  }
 })
 
 const styles = StyleSheet.create({
@@ -388,22 +403,15 @@ const styles = StyleSheet.create({
   },
 
   hideExcludedSites: {
-    display: 'flex',
-    flex: 1,
+    display: 'grid',
     alignItems: 'center',
-    height: '35px'
+    gridTemplateColumns: '2fr 1fr',
+    width: `calc(100% - calc(${globalStyles.spacing.panelPadding} / 2))`,
+    marginBottom: globalStyles.spacing.panelMargin
   },
 
-  columnOffset: {
-    display: 'flex',
-    flexGrow: 8,
-    flexShrink: 8
-  },
-
-  rightColumn: {
-    display: 'flex',
-    flexGrow: 1,
-    flexShrink: 1
+  hideExcludedSites__switchWrap__switchControl: {
+    padding: '0 5px 0 0'
   },
 
   alignRight: {
