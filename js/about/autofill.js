@@ -9,6 +9,7 @@ const ImmutableComponent = require('../../app/renderer/components/immutableCompo
 const cx = require('../lib/classSet')
 const aboutActions = require('./aboutActions')
 const Button = require('../../app/renderer/components/common/button')
+const locale = require('../../js/l10n')
 
 const ipc = window.chrome.ipcRenderer
 
@@ -49,7 +50,7 @@ class AddressItem extends ImmutableComponent {
       <td data-test-id='city'>{address.get('city')}</td>
       <td data-test-id='state'>{address.get('state')}</td>
       <td data-test-id='postalCode'>{address.get('postalCode')}</td>
-      <td data-test-id='country'>{address.get('country')}</td>
+      <td data-test-id='country'>{locale.translation(address.get('country'))}</td>
       <td data-test-id='phone'>{address.get('phone')}</td>
       <td data-test-id='email'>{address.get('email')}</td>
       <td className='autofillActions' data-test-id='autofillActions'>
