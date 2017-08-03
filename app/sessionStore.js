@@ -513,6 +513,18 @@ module.exports.runPostMigrations = (data) => {
     data.sites = sites
   }
 
+  // sites trailing slash migration
+  if (typeof data.sites === 'object') {
+    for (let key in data.sites) {
+      if (/.+|\d+|\d+/.test(key)) {
+        const site = data.sites[key]
+        const newKey = siteUtil.getSiteKey(Immutable.fromJS(site))
+        data.sites[newKey] = site
+        delete data.sites[key]
+      }
+    }
+  }
+
   return data
 }
 
