@@ -283,6 +283,20 @@ const bookmarksState = {
       append
     )
     return state
+  },
+
+  /**
+   * Get bookmarks relative to a parent folder
+   * @param state - The application state
+   * @param folderKey The folder key to filter to
+   */
+  getBookmarksByParentId: (state, folderKey) => {
+    if (folderKey == null) {
+      return Immutable.List()
+    }
+
+    const cache = bookmarkOrderCache.getBookmarksByParentId(state, folderKey)
+    return cache.map((item) => bookmarksState.getBookmark(state, item.get('key')))
   }
 }
 

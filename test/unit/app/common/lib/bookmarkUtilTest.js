@@ -2,19 +2,132 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* global describe, it, before, after */
+/* global describe, it, before, beforeEach, after, afterEach */
 const assert = require('assert')
 const mockery = require('mockery')
 const Immutable = require('immutable')
-const bookmarkUtil = require('../../../../../app/common/lib/bookmarkUtil')
 const {makeImmutable} = require('../../../../../app/common/state/immutableUtil')
 const {bookmarksToolbarMode} = require('../../../../../app/common/constants/settingsEnums')
 const dragTypes = require('../../../../../js/constants/dragTypes')
 const siteTags = require('../../../../../js/constants/siteTags')
+const tabState = require('../../../../../app/common/state/tabState')
+const sinon = require('sinon')
 
 require('../../../braveUnit')
 
 describe('bookmarkUtil unit test', function () {
+  let bookmarkUtil, settingDefaultValue
+
+  const state = Immutable.fromJS({
+    windows: [],
+    bookmarks: {},
+    bookmarkFolders: {},
+    cache: {
+      bookmarkOrder: {},
+      bookmarkLocation: {}
+    },
+    historySites: {},
+    tabs: [],
+    tabsInternal: {}
+  })
+
+  const stateWithData = Immutable.fromJS({
+    windows: [{
+      windowId: 1,
+      windowUUID: 'uuid',
+      focused: true
+    }],
+    bookmarks: {
+      'https://brave.com/|0|0': {
+        favicon: undefined,
+        title: 'Brave',
+        location: 'https://brave.com/',
+        key: 'https://brave.com/|0|0',
+        parentFolderId: 0,
+        partitionNumber: 0,
+        objectId: null,
+        themeColor: undefined,
+        type: siteTags.BOOKMARK
+      },
+      'https://clifton.io/|0|0': {
+        favicon: undefined,
+        title: 'Clifton',
+        location: 'https://clifton.io/',
+        key: 'https://clifton.io/|0|0',
+        parentFolderId: 0,
+        partitionNumber: 0,
+        objectId: null,
+        themeColor: undefined,
+        type: siteTags.BOOKMARK
+      }
+    },
+    bookmarkFolders: {},
+    cache: {
+      bookmarkOrder: {
+        '0': [
+          {
+            key: 'https://brave.com/|0|0',
+            order: 0,
+            type: siteTags.BOOKMARK
+          },
+          {
+            key: 'https://clifton.io/|0|0',
+            order: 1,
+            type: siteTags.BOOKMARK
+          }
+        ]
+      },
+      bookmarkLocation: {
+        'https://brave.com/': [
+          'https://brave.com/|0|0'
+        ],
+        'https://clifton.io/': [
+          'https://clifton.io/|0|0'
+        ]
+      }
+    },
+    historySites: {},
+    tabs: [{
+      index: 0,
+      tabId: 1,
+      windowId: 1,
+      windowUUID: 'uuid',
+      url: 'https://brave.com/',
+      title: 'Brave',
+      active: true,
+      bookmarked: false
+    }],
+    tabsInternal: {
+      index: {
+        1: 0
+      },
+      displayIndex: {
+        1: {
+          0: 1
+        }
+      }
+    }
+  })
+
+  before(function () {
+    mockery.enable({
+      warnOnReplace: false,
+      warnOnUnregistered: false,
+      useCleanCache: true
+    })
+    mockery.registerMock('../state/tabState', tabState)
+    mockery.registerMock('../../../js/settings', {
+      getSetting: () => {
+        return settingDefaultValue
+      }
+    })
+    bookmarkUtil = require('../../../../../app/common/lib/bookmarkUtil')
+  })
+
+  after(function () {
+    mockery.disable()
+  })
+
   describe('bookmarkHangerHeading', function () {
     it('returns default if isFolder and editKey are not provided', function () {
       assert.equal(bookmarkUtil.bookmarkHangerHeading(), 'bookmarkCreateNew')
@@ -54,75 +167,35 @@ describe('bookmarkUtil unit test', function () {
   })
 
   describe('showOnlyFavicon', function () {
-    let bookmarkUtilMock, settingDefaultValue
-
-    before(function () {
-      mockery.enable({
-        warnOnReplace: false,
-        warnOnUnregistered: false,
-        useCleanCache: true
-      })
-      mockery.registerMock('../../../js/settings', {
-        getSetting: () => {
-          return settingDefaultValue
-        }
-      })
-      bookmarkUtilMock = require('../../../../../app/common/lib/bookmarkUtil')
-    })
-
-    after(function () {
-      mockery.disable()
-    })
-
     it('BOOKMARKS_TOOLBAR_MODE is FAVICONS_ONLY', function () {
       settingDefaultValue = bookmarksToolbarMode.FAVICONS_ONLY
-      const result = bookmarkUtilMock.showOnlyFavicon()
+      const result = bookmarkUtil.showOnlyFavicon()
       assert.equal(result, true)
     })
 
     it('BOOKMARKS_TOOLBAR_MODE is not FAVICONS_ONLY', function () {
       settingDefaultValue = bookmarksToolbarMode.TEXT_ONLY
-      const result = bookmarkUtilMock.showOnlyFavicon()
+      const result = bookmarkUtil.showOnlyFavicon()
       assert.equal(result, false)
     })
   })
 
   describe('showFavicon', function () {
-    let bookmarkUtilMock, settingDefaultValue
-
-    before(function () {
-      mockery.enable({
-        warnOnReplace: false,
-        warnOnUnregistered: false,
-        useCleanCache: true
-      })
-      mockery.registerMock('../../../js/settings', {
-        getSetting: () => {
-          return settingDefaultValue
-        }
-      })
-      bookmarkUtilMock = require('../../../../../app/common/lib/bookmarkUtil')
-    })
-
-    after(function () {
-      mockery.disable()
-    })
-
     it('BOOKMARKS_TOOLBAR_MODE is FAVICONS_ONLY', function () {
       settingDefaultValue = bookmarksToolbarMode.FAVICONS_ONLY
-      const result = bookmarkUtilMock.showFavicon()
+      const result = bookmarkUtil.showFavicon()
       assert.equal(result, true)
     })
 
     it('BOOKMARKS_TOOLBAR_MODE is TEXT_AND_FAVICONS', function () {
       settingDefaultValue = bookmarksToolbarMode.TEXT_AND_FAVICONS
-      const result = bookmarkUtilMock.showFavicon()
+      const result = bookmarkUtil.showFavicon()
       assert.equal(result, true)
     })
 
     it('BOOKMARKS_TOOLBAR_MODE is not TEXT_AND_FAVICONS nor FAVICONS_ONLY', function () {
       settingDefaultValue = bookmarksToolbarMode.TEXT_ONLY
-      const result = bookmarkUtilMock.showFavicon()
+      const result = bookmarkUtil.showFavicon()
       assert.equal(result, false)
     })
   })
@@ -133,7 +206,7 @@ describe('bookmarkUtil unit test', function () {
         dragData: {}
       })
       const result = bookmarkUtil.getDNDBookmarkData(state, null)
-      assert.equal(result, Immutable.Map())
+      assert.deepEqual(result, Immutable.Map())
     })
 
     it('draggingOverType is BOOKMARK, but draggingOverKey is missing', function () {
@@ -212,7 +285,20 @@ describe('bookmarkUtil unit test', function () {
   })
 
   describe('isLocationBookmarked', function () {
+    it('null case', function () {
+      const result = bookmarkUtil.isLocationBookmarked(stateWithData)
+      assert.equal(result, false)
+    })
 
+    it('cache key is not found', function () {
+      const result = bookmarkUtil.isLocationBookmarked(stateWithData, 'https://brianbondy.com')
+      assert.equal(result, false)
+    })
+
+    it('cache key is found', function () {
+      const result = bookmarkUtil.isLocationBookmarked(stateWithData, 'https://clifton.io/')
+      assert.equal(result, true)
+    })
   })
 
   describe('toCreateProperties', function () {
@@ -230,10 +316,6 @@ describe('bookmarkUtil unit test', function () {
       assert.equal(result.url, siteDetail.get('location'))
       assert.equal(result.partitionNumber, siteDetail.get('partitionNumber'))
     })
-  })
-
-  describe('getBookmarksByParentId', function () {
-
   })
 
   describe('isBookmark', function () {
@@ -254,11 +336,56 @@ describe('bookmarkUtil unit test', function () {
   })
 
   describe('updateTabBookmarked', function () {
+    let spy
 
+    beforeEach(function () {
+      spy = sinon.spy(tabState, 'updateTabValue')
+    })
+
+    afterEach(function () {
+      spy.restore()
+    })
+
+    it('null check', function () {
+      const newState = bookmarkUtil.updateTabBookmarked(state)
+      assert.deepEqual(state.toJS(), newState.toJS())
+    })
+
+    it('tab is updated', function () {
+      bookmarkUtil.updateTabBookmarked(stateWithData, Immutable.fromJS({
+        index: 0,
+        tabId: 1,
+        windowId: 1,
+        windowUUID: 'uuid',
+        url: 'https://brave.com/',
+        title: 'Brave',
+        active: true,
+        bookmarked: false
+      }))
+      assert.equal(spy.calledOnce, true)
+    })
   })
 
   describe('updateActiveTabBookmarked', function () {
+    let spy
 
+    beforeEach(function () {
+      spy = sinon.spy(bookmarkUtil, 'updateTabBookmarked')
+    })
+
+    afterEach(function () {
+      spy.restore()
+    })
+
+    it('null check', function () {
+      const newState = bookmarkUtil.updateActiveTabBookmarked(state)
+      assert.deepEqual(state.toJS(), newState.toJS())
+    })
+
+    it('check if updateTabBookmarked is called', function () {
+      bookmarkUtil.updateActiveTabBookmarked(stateWithData)
+      assert.equal(spy.calledOnce, true)
+    })
   })
 
   describe('getKey', function () {

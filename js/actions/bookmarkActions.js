@@ -16,7 +16,7 @@ const {getSetting} = require('../settings')
 
 const bookmarkActions = {
   openBookmarksInFolder: function (folderDetail) {
-    const bookmarks = bookmarksUtil.getBookmarksByParentId(appStoreRenderer.state, folderDetail.get('folderId'))
+    const bookmarks = bookmarksState.getBookmarksByParentId(appStoreRenderer.state, folderDetail.get('folderId'))
 
     // Only load the first 25 tabs as loaded
     bookmarks
