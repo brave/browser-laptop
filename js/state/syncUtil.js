@@ -80,6 +80,23 @@ const pickFields = (object, fields) => {
 }
 
 /**
+ * Useful for checking if two objectIDs are equal
+ * @param {Array} arr1
+ * @param {Array} arr2
+ */
+const shallowArrayEquals = (arr1, arr2) => {
+  if (!arr1 || !arr2 || arr1.length !== arr2.length) {
+    return false
+  }
+  for (let i = arr1.length; i--;) {
+    if (arr1[i] !== arr2[i]) {
+      return false
+    }
+  }
+  return true
+}
+
+/**
  * Convert deviceId to a type better suited for object keys.
  * @param {Array.<number>} deviceId
  * @returns {string}
@@ -107,7 +124,7 @@ const getBookmarkSiteDataFromRecord = (siteProps, appState, records, existingObj
   const parentFolderObjectId = newSiteProps.parentFolderObjectId
   if (parentFolderObjectId && parentFolderObjectId.length > 0) {
     newSiteProps.parentFolderId =
-      getFolderIdByObjectId(new Immutable.List(parentFolderObjectId), appState, records)
+      getFolderIdByObjectId(parentFolderObjectId, appState, records)
   } else {
     // Null or empty parentFolderObjectId on a record corresponds to
     // a top-level bookmark. -1 indicates a hidden bookmark (Other bookmarks).
@@ -125,7 +142,7 @@ const getBookmarkSiteDataFromRecord = (siteProps, appState, records, existingObj
  * @returns {Object}
  */
 module.exports.getSiteDataFromRecord = (record, appState, records) => {
-  const objectId = new Immutable.List(record.objectId)
+  const objectId = record.objectId
   const category = CATEGORY_MAP[record.objectData].categoryName
   let existingObjectData
 
@@ -141,7 +158,7 @@ module.exports.getSiteDataFromRecord = (record, appState, records) => {
     record.historySite,
     record.bookmark,
     record.bookmark && record.bookmark.site,
-    {objectId}
+    {objectId: new Immutable.List(objectId)}
   )
   // customTitle was previously used in browser-laptop
   if (siteProps.customTitle) {
@@ -331,7 +348,7 @@ module.exports.applySyncRecords = (records) => {
 module.exports.getExistingObject = (categoryName, syncRecord) => {
   const AppStore = require('../stores/appStore')
   const appState = AppStore.getState()
-  const objectId = new Immutable.List(syncRecord.objectId)
+  const objectId = syncRecord.objectId
   const existingObject = getObjectById(objectId, categoryName, appState)
   if (!existingObject) { return null }
 
@@ -425,17 +442,16 @@ module.exports.updateObjectCache = (appState, object, collectionKey) => {
 }
 
 /**
- * Given an objectId, return the matching browser object.
- * @param {Immutable.List} objectId
+ * Given an objectId and category, return the matching browser object.
+ * @param {Array} objectId
  * @param {string} category
  * @param {Immutable.Map=} appState
  * @returns {Array} [<Array>, <Immutable.Map>] array is AppStore searchKeyPath e.g. ['bookmarkSites', 10] for use with updateIn
  */
 const getObjectById = (objectId, category, appState) => {
-  if (!(objectId instanceof Immutable.List)) {
-    throw new Error('objectId must be an Immutable.List')
+  if (!objectId || !objectId.length) {
+    throw new Error('objectId must be an Array')
   }
-
   if (!appState) {
     const AppStore = require('../stores/appStore')
     appState = AppStore.getState()
@@ -443,7 +459,7 @@ const getObjectById = (objectId, category, appState) => {
   switch (category) {
     case 'BOOKMARKS':
     case 'HISTORY_SITES':
-      const objectKey = appState.getIn(['sync', 'objectsById', objectId.toJS().join('|')])
+      const objectKey = appState.getIn(['sync', 'objectsById', objectId.join('|')])
       const object = objectKey && appState.getIn(objectKey)
       if (!object) {
         return null
@@ -453,7 +469,7 @@ const getObjectById = (objectId, category, appState) => {
     case 'PREFERENCES':
       return appState.get('siteSettings').findEntry((siteSetting, hostPattern) => {
         const itemObjectId = siteSetting.get('objectId')
-        return (itemObjectId && itemObjectId.equals(objectId))
+        return (itemObjectId && itemObjectId.equals(new Immutable.List(objectId)))
       })
     default:
       throw new Error(`Invalid object category: ${category}`)
@@ -462,7 +478,7 @@ const getObjectById = (objectId, category, appState) => {
 
 /**
  * Given an bookmark folder objectId, find the folder and return its folderId.
- * @param {Immutable.List} objectId
+ * @param {Array} objectId
  * @param {Immutable.Map=} appState
  * @param {Immutable.List=} records
  * @returns {number|undefined}
@@ -478,8 +494,7 @@ const getFolderIdByObjectId = (objectId, appState, records) => {
   } else if (records) {
     // Look for a folder record with a matching object ID in this record batch
     const matchingFolder = records.find((record) => {
-      record = Immutable.fromJS(record)
-      return record && objectId.equals(record.get('objectId')) && typeof record.getIn(['bookmark', 'site', 'folderId']) === 'number'
+      return record && record.bookmark && record.bookmark.site && typeof record.bookmark.site.folderId === 'number' && shallowArrayEquals(objectId, record.objectId)
     })
     if (matchingFolder) {
       folderId = matchingFolder.bookmark.site.folderId
@@ -544,9 +559,9 @@ module.exports.isSyncableSiteSetting = (item) => {
  * @returns {Array.<number>}
  */
 module.exports.newObjectId = (objectPath) => {
-  const objectId = new Immutable.List(crypto.randomBytes(16))
-  appActions.setObjectId(objectId, objectPath)
-  return objectId.toJS()
+  const objectId = crypto.randomBytes(16)
+  appActions.setObjectId(new Immutable.List(objectId), objectPath)
+  return Array.from(objectId)
 }
 
 /**
