@@ -148,9 +148,9 @@ importer.on('add-bookmarks', (e, importedBookmarks, topLevelFolder) => {
     }
   }
 
-  bookmarkList = bookmarks
+  bookmarkList = makeImmutable(bookmarks)
   appActions.addBookmarkFolder(makeImmutable(folders))
-  appActions.addBookmark(makeImmutable(bookmarks))
+  appActions.addBookmark(bookmarkList)
 })
 
 importer.on('add-favicons', (e, detail) => {
