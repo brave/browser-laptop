@@ -20,7 +20,6 @@
     "clean-sb-data": "node ./tools/clean.js userData SafeBrowsingData.dat",
     "clean-session-store": "node ./tools/clean.js userData session-store-1",
     "clean-tp-data": "node ./tools/clean.js userData TrackingProtection.dat",
-    "docs": "jsdox js/actions/appActions.js js/actions/windowActions.js --output docs",
     "download-languages": "node ./tools/downloadLanguages",
     "download-sync-client": "node ./tools/downloadSyncClient",
     "electron-rebuild": "electron-rebuild",
@@ -159,7 +158,6 @@
     "joi": "^10.2.2",
     "jsdom": "9.4.1",
     "jsdom-global": "2.0.0",
-    "jsdox": "^0.4.9",
     "json-loader": "^0.5.4",
     "jsonfile": "^2.2.3",
     "less": "^2.5.3",
@@ -220,9 +218,7 @@
     ]
   },
   "pre-commit": {
-    "run": [
-      "docs"
-    ],
+    "run": [],
     "template": "COMMIT_TEMPLATE"
   },
   "pre-push": {
