@@ -129,7 +129,6 @@ module.exports = {
     'general.homepage': 'https://www.brave.com',
     'general.newtab-mode': 'newTabPage',
     'general.show-home-button': false,
-    'general.useragent.value': null, // Set at runtime
     'general.autohide-menu': true,
     'general.wide-url-bar': false,
     'general.check-default-on-startup': true,

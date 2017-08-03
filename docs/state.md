@@ -189,7 +189,6 @@ AppStore
     'general.newtab-mode': string,  // one of: newTabPage, homePage, defaultSearchEngine
     'general.show-home-button': boolean, // true if the home button should be shown
     'general.startup-mode': string, // one of: lastTime, homePage, newTabPage
-    'general.useragent.value': (undefined|string), // custom user agent value
     'notification-add-funds-timestamp': number, // timestamp on which we decide if we will show notification Add founds
     'notification-reconcile-soon-timestamp': number, // timestamp
     'payments.contribution-amount': number, // in USD
