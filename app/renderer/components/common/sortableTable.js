@@ -6,6 +6,8 @@ const React = require('react')
 const Immutable = require('immutable')
 const tableSort = require('tablesort')
 
+const {StyleSheet, css} = require('aphrodite/no-important')
+
 // Utils
 const cx = require('../../../../js/lib/classSet')
 const eventUtil = require('../../../../js/lib/eventUtil')
@@ -418,16 +420,19 @@ class SortableTable extends React.Component {
       return <tbody>{this.generateTableRows(this.props.rows)}</tbody>
     }
   }
+
   render () {
     if (!this.props.headings || !this.props.rows) {
       return false
     }
+
     return <table
       {...this.getTableAttributes()}
       className={cx({
         sort: !this.sortingDisabled,
-        sortableTable: !this.props.overrideDefaultStyle,
-        [this.props.tableClassNames]: !!this.props.tableClassNames
+        sortableTable: true,
+        [this.props.tableClassNames]: !!this.props.tableClassNames,
+        [css(styles.table, this.props.fillAvailable && styles.table_fillAvailable)]: true
       })}
       ref={(node) => { this.table = node }}>
       <thead>
@@ -468,5 +473,21 @@ class SortableTable extends React.Component {
     </table>
   }
 }
+
+const styles = StyleSheet.create({
+  // By default the width and margin are not specified.
+  // It can be specified by setting css to tableClassNames.
+  // See 'styles.devices__devicesList' on syncTab.js for example.
+  table: {
+    boxSizing: 'border-box',
+    cursor: 'default',
+    borderSpacing: 0
+  },
+
+  // Setting 'fillAvailable' maximizes the width of the table.
+  table_fillAvailable: {
+    width: '-webkit-fill-available'
+  }
+})
 
 module.exports = SortableTable
