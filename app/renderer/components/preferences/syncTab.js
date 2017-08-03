@@ -160,7 +160,6 @@ class SyncTab extends ImmutableComponent {
         defaultHeadingSortOrder='desc'
         rows={this.devicesTableRows}
         tableClassNames={css(styles.devices__devicesList)}
-        customCellClasses={css(styles.devices__devicesListCell)}
       />
     </section>
   }
@@ -592,9 +591,6 @@ const styles = StyleSheet.create({
   devices__devicesList: {
     marginBottom: globalStyles.spacing.dialogInsideMargin,
     width: '600px'
-  },
-  devices__devicesListCell: {
-    padding: '4px 8px'
   },
 
   textArea__passphrase: {
