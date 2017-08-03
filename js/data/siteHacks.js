@@ -64,14 +64,6 @@ module.exports.siteHacks = {
       }
     }
   },
-  'cityam.com': {
-    onBeforeSendHeaders: function (details) {
-      details.requestHeaders['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36 Googlebot'
-      return {
-        requestHeaders: details.requestHeaders
-      }
-    }
-  },
   // For links like: https://player.twitch.tv/?channel=iwilldominate
   'player.twitch.tv': {
     enableForAll: true
