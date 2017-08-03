@@ -100,7 +100,12 @@ const frameReducer = (state, action, immutableAction) => {
       const pinned = immutableAction.getIn(['changeInfo', 'pinned'])
       if (pinned != null) {
         if (pinned) {
-          state = state.setIn(['frames', index, 'pinnedLocation'], tab.get('url'))
+          const history = state.getIn(['frames', index, 'history'])
+          if (history && history.size !== 0) {
+            state = state.setIn(['frames', index, 'pinnedLocation'], history.first())
+          } else {
+            state = state.setIn(['frames', index, 'pinnedLocation'], tab.get('url'))
+          }
         } else {
           state = state.deleteIn(['frames', index, 'pinnedLocation'])
         }
@@ -110,7 +115,12 @@ const frameReducer = (state, action, immutableAction) => {
       if (url != null && tab.get('pinned') === true) {
         const pinnedLocation = state.getIn(['frames', index, 'pinnedLocation'])
         if (!pinnedLocation || pinnedLocation === 'about:blank' || pinnedLocation === '') {
-          state = state.setIn(['frames', index, 'pinnedLocation'], tab.get('url'))
+          const history = state.getIn(['frames', index, 'history'])
+          if (history && history.size !== 0) {
+            state = state.setIn(['frames', index, 'pinnedLocation'], history.first())
+          } else {
+            state = state.setIn(['frames', index, 'pinnedLocation'], tab.get('url'))
+          }
         }
       }
 
