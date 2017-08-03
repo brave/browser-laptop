@@ -77,6 +77,18 @@ AppStore
       title: string
     }
   },
+  cache: {
+    bookmarLocation: {
+      [location]: Array<string> // array of bookmark keys
+    },
+    bookmarkOrder: {
+      [parentId]: [{
+        key: string, // bookmark or folder key
+        order: number,
+        type: string // siteTags.BOOKMARK or siteTags.BOOKMARK_FOLDER
+      }]
+    }
+  }
   clearBrowsingDataDefaults: {
     allSiteCookies: boolean,
     autocompleteData: boolean,

@@ -138,11 +138,11 @@ ipcMain.on(messages.ABOUT_COMPONENT_INITIALIZED, (e) => {
 })
 
 const getBookmarksData = (state) => {
-  return {
-    bookmarks: bookmarksState.getBookmarks(state).toJS(),
-    bookmarkFolders: bookmarkFoldersState.getFolders(state).toJS(),
-    bookmarkOrder: bookmarkOrderCache.getOrderCache(state).toJS()
-  }
+  return Immutable.Map()
+    .set('bookmarks', bookmarksState.getBookmarks(state))
+    .set('bookmarkFolders', bookmarkFoldersState.getFolders(state))
+    .set('bookmarkOrder', bookmarkOrderCache.getOrderCache(state))
+    .toJS()
 }
 
 const updateAboutDetails = (tab, tabValue) => {

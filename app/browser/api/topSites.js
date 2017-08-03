@@ -100,7 +100,7 @@ const getTopSiteData = () => {
     .map((site, key) => {
       const bookmarkKey = bookmarkLocationCache.getCacheKey(state, site.get('location'))
 
-      site = site.set('bookmarked', !bookmarkKey.isEmpty())
+      site = site.set('bookmarked', bookmarkKey.get(0, false))
       site = site.set('key', key)
       return site
     })
@@ -128,7 +128,7 @@ const getTopSiteData = () => {
       })
       .map(site => {
         const bookmarkKey = bookmarkLocationCache.getCacheKey(state, site.get('location'))
-        return site.set('bookmarked', !bookmarkKey.isEmpty())
+        return site.set('bookmarked', bookmarkKey.get(0, false))
       })
     sites = sites.concat(preDefined)
   }
