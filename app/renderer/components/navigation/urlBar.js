@@ -41,6 +41,7 @@ const historyUtil = require('../../../common/lib/historyUtil')
 
 // Icons
 const iconNoScript = require('../../../../img/url-bar-no-script.svg')
+const emojiRegex = require('emoji-regex')
 
 class UrlBar extends React.Component {
   constructor (props) {
@@ -376,7 +377,7 @@ class UrlBar extends React.Component {
     // For about:newtab we don't want the top of the browser saying New Tab
     // Instead just show "Brave"
     return ['about:blank', 'about:newtab'].includes(this.props.urlbarLocation)
-      ? '' : this.props.title
+      ? '' : this.props.title.replace(emojiRegex(), '')
   }
 
   get loadTime () {
