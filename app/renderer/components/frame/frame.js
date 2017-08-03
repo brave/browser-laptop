@@ -16,6 +16,7 @@ const getSetting = require('../../../../js/settings').getSetting
 // Components
 const ReduxComponent = require('../reduxComponent')
 const FullScreenWarning = require('./fullScreenWarning')
+const HrefPreview = require('./hrefPreview')
 const MessageBox = require('../common/messageBox')
 
 // Store
@@ -884,8 +885,6 @@ class Frame extends React.Component {
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frame.get('key'))
     props.showFullScreenWarning = frame.get('showFullScreenWarning')
     props.location = location
-    props.hrefPreview = frame.get('hrefPreview')
-    props.showOnRight = frame.get('showOnRight')
     props.tabId = tabId
     props.showMessageBox = tabMessageBoxState.hasMessageBoxDetail(state, tabId)
 
@@ -944,16 +943,7 @@ class Frame extends React.Component {
           webviewContainer: true,
           isPreview: this.props.isPreview
         })} />
-      {
-        this.props.hrefPreview
-        ? <div className={cx({
-          hrefPreview: true,
-          right: this.props.showOnRight
-        })}>
-          {this.props.hrefPreview}
-        </div>
-        : null
-      }
+      <HrefPreview frameKey={this.props.frameKey} />
       {
         this.props.showMessageBox
         ? <MessageBox
