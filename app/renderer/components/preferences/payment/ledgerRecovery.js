@@ -10,7 +10,7 @@ const {btcToCurrencyString} = require('../../../../common/lib/ledgerUtil')
 
 // components
 const ImmutableComponent = require('../../immutableComponent')
-const BrowserButton = require('../../common/browserButton')
+const {BrowserButton} = require('../../common/browserButton')
 const {RecoveryKeyTextbox} = require('../../common/textbox')
 const {SettingsList, SettingItem} = require('../../common/settings')
 

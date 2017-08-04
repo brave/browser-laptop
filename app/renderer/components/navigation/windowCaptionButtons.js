@@ -50,7 +50,7 @@ class WindowCaptionButtons extends ImmutableComponent {
   }
 
   onDoubleClick (e) {
-    if (!e.target.className.includes('navigatorWrapper')) {
+    if (!e.target.className.includes('navigationBarWrapper')) {
       return
     }
     this.onMaximizeClick(e)

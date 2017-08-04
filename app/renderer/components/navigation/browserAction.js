@@ -5,12 +5,13 @@
 const React = require('react')
 const electron = require('electron')
 const ipc = electron.ipcRenderer
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet} = require('aphrodite/no-important')
 const Immutable = require('immutable')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
-const BrowserButton = require('../common/browserButton')
+const NavigationBarButtonContainer = require('./buttons/navigationBarButtonContainer')
+const {BrowserButton} = require('../common/browserButton')
 const BrowserActionBadge = require('./browserActionBadge')
 
 // State
@@ -79,7 +80,10 @@ class BrowserAction extends React.Component {
 
   render () {
     // TODO(bridiver) should have some visual notification of hover/press
-    return <div className={css(styles.browserActionButton)}>
+    return <NavigationBarButtonContainer
+      isSquare
+      containerFor={styles.browserActionButton}
+    >
       <BrowserButton
         extensionButton
         extensionItem
@@ -100,7 +104,7 @@ class BrowserAction extends React.Component {
         ? <BrowserActionBadge text={this.props.text} color={this.props.color} />
         : null
       }
-    </div>
+    </NavigationBarButtonContainer>
   }
 }
 

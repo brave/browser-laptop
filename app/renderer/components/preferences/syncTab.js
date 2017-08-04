@@ -10,7 +10,7 @@ const niceware = require('niceware')
 
 // Components
 const ModalOverlay = require('../common/modalOverlay')
-const BrowserButton = require('../common/browserButton')
+const {BrowserButton} = require('../common/browserButton')
 const {SettingsList, SettingItem, SettingCheckbox} = require('../common/settings')
 const SortableTable = require('../common/sortableTable')
 

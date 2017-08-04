@@ -3,19 +3,24 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const {StyleSheet} = require('aphrodite/no-important')
 
 // Components
-const ImmutableComponent = require('../immutableComponent')
+const ImmutableComponent = require('../../immutableComponent')
+const {NormalizedButton} = require('../../common/browserButton')
 
 // Actions
-const appActions = require('../../../../js/actions/appActions')
+const appActions = require('../../../../../js/actions/appActions')
 
 // Constants
-const settings = require('../../../../js/constants/settings')
+const settings = require('../../../../../js/constants/settings')
 
 // Utils
-const {getSetting} = require('../../../../js/settings')
-const eventUtil = require('../../../../js/lib/eventUtil')
+const {getSetting} = require('../../../../../js/settings')
+const eventUtil = require('../../../../../js/lib/eventUtil')
+
+// Styles
+const homeButtonIcon = require('../../../../../img/toolbar/home_btn.svg')
 
 class HomeButton extends ImmutableComponent {
   constructor (props) {
@@ -49,17 +54,24 @@ class HomeButton extends ImmutableComponent {
       })
   }
 
+  // BEM Level: navigationBar__buttonContainer
   render () {
-    return <span className='navigationButtonContainer'>
-      <button
-        data-test-id='homeButton'
-        data-l10n-id='homeButton'
-        className='normalizeButton navigationButton homeButton'
-        ref={(node) => { this.homeButton = node }}
-        onClick={this.onHome}
-      />
-    </span>
+    return <NormalizedButton
+      navigationButton
+      custom={styles.homeButton}
+      testId='homeButton'
+      l10nId='homeButton'
+      ref={(node) => { this.homeButton = node }}
+      onClick={this.onHome}
+    />
   }
 }
+
+const styles = StyleSheet.create({
+  homeButton: {
+    background: `url(${homeButtonIcon}) center no-repeat`,
+    backgroundSize: '16px 16px'
+  }
+})
 
 module.exports = HomeButton

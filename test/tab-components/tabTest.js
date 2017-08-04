@@ -60,7 +60,7 @@ describe('tab tests', function () {
         .waitForUrl(this.page1)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForTextValue(activeTabTitle, 'Page 1')
-        .waitForExist('.forwardButton')
+        .waitForExist(forwardButton)
         .rightClick(forwardButton)
         .waitForExist(contextMenu)
         .middleClick(`${contextMenu} [data-index="0"]`)

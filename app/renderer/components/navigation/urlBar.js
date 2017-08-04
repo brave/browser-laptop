@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 const Immutable = require('immutable')
 const ipc = require('electron').ipcRenderer
 
@@ -11,6 +11,7 @@ const ipc = require('electron').ipcRenderer
 const ReduxComponent = require('../reduxComponent')
 const UrlBarSuggestions = require('./urlBarSuggestions')
 const UrlBarIcon = require('./urlBarIcon')
+const NavigationBarButtonContainer = require('./buttons/navigationBarButtonContainer')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
@@ -37,9 +38,11 @@ const {getCurrentWindowId} = require('../../currentWindow')
 const {normalizeLocation, getNormalizedSuggestion} = require('../../../common/lib/suggestion')
 const isDarwin = require('../../../common/lib/platformUtil').isDarwin()
 const publisherUtil = require('../../../common/lib/publisherUtil')
+const isWindows = require('../../../common/lib/platformUtil').isWindows()
 
-// Icons
+// Styles
 const iconNoScript = require('../../../../img/url-bar-no-script.svg')
+const globalStyles = require('../styles/global')
 
 class UrlBar extends React.Component {
   constructor (props) {
@@ -385,6 +388,50 @@ class UrlBar extends React.Component {
     return ''
   }
 
+  // BEM Level: urlbarForm__titleBar
+  get titleBar () {
+    return <div id='titleBar' data-test-id='titleBar' className={css(styles.titleBar)}>
+      <span className={css(styles.titleBar__host)}>{this.props.hostValue}</span>
+      <span>{this.props.hostValue && this.titleValue ? ' | ' : ''}</span>
+      <span>{this.titleValue}</span>
+    </div>
+  }
+
+  // BEM Level: urlbarForm__input
+  get input () {
+    return <input type='text'
+      spellCheck='false'
+      disabled={this.props.displayURL === undefined && this.loadTime === ''}
+      onFocus={this.onFocus}
+      onBlur={this.onBlur}
+      onKeyDown={this.onKeyDown}
+      onKeyUp={this.onKeyUp}
+      onChange={this.onChange}
+      onKeyPress={this.onKeyPress}
+      onClick={this.onClick}
+      onContextMenu={this.onContextMenu}
+      data-l10n-id='urlbar'
+      data-test-id='urlInput'
+      className={cx({
+        private: this.private,
+        [css(styles.input, isWindows && styles.input_windows)]: true
+      })}
+      readOnly={this.props.titleMode}
+      ref={(node) => { this.urlInput = node }}
+    />
+  }
+
+  // BEM Level: urlbarForm__buttonContainer_showNoScript
+  get noScriptInfo () {
+    return <NavigationBarButtonContainer isSquare>
+      <span className={css(styles.noScript__button)}
+        onClick={this.onNoScript}
+        data-l10n-id='noScriptButton'
+        data-test-id='noScriptButton'
+      />
+    </NavigationBarButtonContainer>
+  }
+
   onNoScript () {
     windowActions.setNoScriptVisible()
   }
@@ -478,89 +525,188 @@ class UrlBar extends React.Component {
     return <form
       className={cx({
         urlbarForm: true,
-        [css(styles.urlbarForm_wide)]: this.props.isWideURLbarEnabled,
-        noBorderRadius: this.props.publisherButtonVisible
+        // currently publisherButtonVisible is the only element under urlbarForm_urlBarEnd
+        [css(styles.urlbarForm, this.props.isWideURLbarEnabled && styles.urlbarForm_wide, this.props.titleMode && styles.urlbarForm_titleMode, !this.props.titleMode && styles.urlbarForm_notTitleMode, !this.props.showNoScriptInfo && styles.urlbarForm_noScriptDisabled, this.props.publisherButtonVisible && styles.urlbarForm_urlBarEnd)]: true
       })}
       action='#'
       id='urlbar'>
-      <div className='urlbarIconContainer'>
-        <UrlBarIcon
-          titleMode={this.props.titleMode}
-        />
-      </div>
+      <NavigationBarButtonContainer isSquare>
+        <UrlBarIcon titleMode={this.props.titleMode} />
+      </NavigationBarButtonContainer>
       {
-        this.props.titleMode
-        ? <div id='titleBar'>
-          <span><strong>{this.props.hostValue}</strong></span>
-          <span>{this.props.hostValue && this.titleValue ? ' | ' : ''}</span>
-          <span>{this.titleValue}</span>
-        </div>
-        : <input type='text'
-          spellCheck='false'
-          disabled={this.props.displayURL === undefined && this.loadTime === ''}
-          onFocus={this.onFocus}
-          onBlur={this.onBlur}
-          onKeyDown={this.onKeyDown}
-          onKeyUp={this.onKeyUp}
-          onChange={this.onChange}
-          onKeyPress={this.onKeyPress}
-          onClick={this.onClick}
-          onContextMenu={this.onContextMenu}
-          data-l10n-id='urlbar'
-          className={cx({
-            testHookLoadDone: !this.props.loading
-          })}
-          id='urlInput'
-          readOnly={this.props.titleMode}
-          ref={(node) => { this.urlInput = node }} />
+        !this.props.titleMode
+        ? this.input
+        : this.titleBar
       }
-      <legend />
       {
-        this.props.showDisplayTime
-        ? <span className={cx({
-          'loadTime': true,
-          'onFocus': this.props.isActive
-        })}>{this.loadTime}</span>
+        !this.props.titleMode
+        ? <legend className={css(
+          styles.urlbarForm__legend,
+          !!this.props.isFocused && styles.urlbarForm__legend_isFocused,
+          this.props.publisherButtonVisible && styles.urlbarForm__legend_urlBarEnd
+        )} />
         : null
       }
       {
-        !this.props.showNoScriptInfo
-        ? null
-        : <span className={css(styles.noScriptContainer)}
-          onClick={this.onNoScript}>
-          <span
-            data-l10n-id='noScriptButton'
-            data-test-id='noScriptButton'
-            className={css(styles.noScriptButton)} />
-        </span>
+        this.props.showDisplayTime
+        ? <span className={css(
+          styles.urlbarForm__loadTime,
+          this.props.isActive && styles.urlbarForm__loadTime_onFocus
+        )}
+          data-test-id='loadTime'>{this.loadTime}</span>
+        : null
       }
       {
-          this.props.showUrlBarSuggestions
-          ? <UrlBarSuggestions />
-          : null
-        }
+        this.props.showNoScriptInfo
+        ? this.noScriptInfo
+        : null
+      }
+      {
+        this.props.showUrlBarSuggestions
+        ? <UrlBarSuggestions />
+        : null
+      }
     </form>
   }
 }
 
 const styles = StyleSheet.create({
-  noScriptContainer: {
+  urlbarForm: {
     display: 'flex',
-    padding: '5px',
-    marginRight: '-8px',
-    WebkitAppRegion: 'drag'
-  },
-  noScriptButton: {
-    WebkitAppRegion: 'no-drag',
-    backgroundImage: `url(${iconNoScript})`,
-    width: '14px',
-    height: '14px',
-    border: '0px'
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: globalStyles.navigationBar.urlbarForm.height,
+    padding: '0 3px',
+    background: '#fff',
+
+    // Overwrite wildcard on https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L698-L700
+    WebkitAppRegion: 'drag !important',
+
+    // PR #6485
+    position: 'relative',
+
+    // Fixes #4298
+    width: 0,
+
+    // allow the navigator to shrink
+    minWidth: 0
   },
 
   urlbarForm_wide: {
     // cf: https://github.com/brave/browser-laptop/blob/b161b37cf5e9f59be64855ebbc5d04816bfc537b/less/navigationBar.less#L682-L684
     maxWidth: '100%'
+  },
+
+  urlbarForm_titleMode: {
+    background: 'none'
+  },
+
+  urlbarForm_notTitleMode: {
+    background: globalStyles.color.navigationBarBackgroundActive,
+    borderRadius: globalStyles.radius.borderRadiusURL,
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
+    boxShadow: 'inset 0 0 0 1px rgba(187, 187, 187, 1.0)',
+    color: globalStyles.color.chromeText
+  },
+
+  urlbarForm_noScriptDisabled: {
+    paddingRight: '10px'
+  },
+
+  // ref: navigationBar__urlBarEnd on navigationBarButtonContainer.js
+  urlbarForm_urlBarEnd: {
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0
+  },
+
+  urlbarForm__legend: {
+    ':before': {
+      display: 'none',
+      content: '" "',
+      position: 'absolute',
+      borderRadius: '0 4px 4px 0',
+      color: '#333',
+      boxShadow: `inset 0 0 0 1px ${globalStyles.color.urlBarOutline}, inset 0 0 0 3px ${globalStyles.color.focusUrlbarOutline}`,
+      outline: 'none',
+      top: 0,
+      bottom: 0,
+      right: 0,
+      left: 0,
+      zIndex: globalStyles.zindex.zindexNavigationBar
+    }
+  },
+
+  urlbarForm__legend_isFocused: {
+    ':before': {
+      display: 'block'
+    }
+  },
+
+  urlbarForm__legend_urlBarEnd: {
+    ':before': {
+      borderRadius: 0
+    }
+  },
+
+  urlbarForm__loadTime: {
+    color: globalStyles.color.loadTimeColor,
+    fontSize: '12px'
+  },
+
+  urlbarForm__loadTime_onFocus: {
+    display: 'none'
+  },
+
+  titleBar: {
+    display: 'inline-block',
+    color: globalStyles.color.chromeText,
+    fontSize: globalStyles.spacing.defaultFontSize,
+    maxWidth: '100%',
+    overflowX: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap'
+  },
+
+  titleBar__host: {
+    fontWeight: 600
+  },
+
+  input: {
+    background: '#fff',
+    border: 'none',
+    boxSizing: 'border-box',
+    color: '#333',
+    letterSpacing: '-0.125px',
+    cursor: 'text',
+    display: 'flex',
+    flexGrow: 1,
+    fontSize: '13.5px',
+    fontWeight: 'normal',
+    outline: 'none',
+    textOverflow: 'ellipsis',
+
+    // allow the navigator to shrink
+    minWidth: 0,
+
+    // Disable window dragging so that selecting text is possible.
+    WebkitAppRegion: 'no-drag'
+  },
+
+  input_windows: {
+    fontWeight: 500,
+    lineHeight: 1.4,
+    margin: 0, // #5624
+    top: 0, // #5624
+    width: '100%'
+  },
+
+  noScript__button: {
+    background: `url(${iconNoScript}) center no-repeat`,
+    width: '15px',
+    height: '15px',
+    WebkitAppRegion: 'no-drag'
   }
 })
 

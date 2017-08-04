@@ -16,7 +16,7 @@ const {SettingsList, SettingItem, SettingCheckbox, SettingItemIcon} = require('.
 const {SettingTextbox} = require('../../app/renderer/components/common/textbox')
 const {SettingDropdown} = require('../../app/renderer/components/common/dropdown')
 const {DefaultSectionTitle} = require('../../app/renderer/components/common/sectionTitle')
-const BrowserButton = require('../../app/renderer/components/common/browserButton')
+const {BrowserButton} = require('../../app/renderer/components/common/browserButton')
 
 // Tabs
 const PaymentsTab = require('../../app/renderer/components/preferences/paymentsTab')

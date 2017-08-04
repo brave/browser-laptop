@@ -4,6 +4,8 @@
 
 const React = require('react')
 const ImmutableComponent = require('../immutableComponent')
+const cx = require('../../../../js/lib/classSet')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 class LongPressButton extends ImmutableComponent {
   constructor () {
@@ -78,16 +80,42 @@ class LongPressButton extends ImmutableComponent {
   }
 
   render () {
-    return <button data-l10n-id={this.props.l10nId}
+    return <button
+      // Add 'navigationButton' for the buttons on navigationBarWrapper
+      // eg. reloadButton, backButton and forwardButton
+      // TODO (Suguru): Refactor newFrameButton on tabs.js
+      className={cx({
+        [this.props.className]: this.props.className,
+        [css(styles.normalizedButton, this.props.navigationButton && styles.normalizedButton_navigationButton, this.props.custom)]: true
+      })}
+      data-l10n-id={this.props.l10nId}
       data-test-id={this.props.testId}
-      className={this.props.className}
       disabled={this.props.disabled}
       onClick={this.onClick}
       ref={(node) => { this.buttonNode = node }}
       onMouseDown={this.onMouseDown}
       onMouseUp={this.onMouseUp}
-      onMouseLeave={this.onMouseLeave} />
+      onMouseLeave={this.onMouseLeave}
+    />
   }
 }
+
+const styles = StyleSheet.create({
+  // See browserButton.js for the same properties
+  normalizedButton: {
+    background: 'none',
+    outline: 'none',
+    border: 'none',
+    margin: 0,
+    whiteSpace: 'nowrap'
+  },
+
+  normalizedButton_navigationButton: {
+    display: 'inline-block',
+    width: '100%',
+    height: '100%',
+    padding: 0
+  }
+})
 
 module.exports = LongPressButton

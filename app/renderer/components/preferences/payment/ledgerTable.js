@@ -9,7 +9,7 @@ const {StyleSheet, css} = require('aphrodite')
 const ImmutableComponent = require('../../immutableComponent')
 const SortableTable = require('../../common/sortableTable')
 const SwitchControl = require('../../common/switchControl')
-const BrowserButton = require('../../common/browserButton')
+const {BrowserButton} = require('../../common/browserButton')
 const PinnedInput = require('./pinnedInput')
 
 // style

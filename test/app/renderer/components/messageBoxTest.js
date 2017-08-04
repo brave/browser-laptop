@@ -2,7 +2,7 @@
 
 const Brave = require('../../../lib/brave')
 const {
-  urlInput, backButton, forwardButton,
+  urlInput, backButton, forwardButton, forwardButtonDisabled,
   msgBoxSuppress, msgBoxSuppressTrue, msgBoxMessage, msgBoxTitle
 } = require('../../../lib/selectors')
 const assert = require('assert')
@@ -220,7 +220,7 @@ describe('MessageBox component tests', function () {
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
           .leftClick(backButton)
-          .waitForElementCount(forwardButton + '[disabled]', 0)
+          .waitForElementCount(forwardButtonDisabled, 0)
 
         // click forward button
         yield this.app.client

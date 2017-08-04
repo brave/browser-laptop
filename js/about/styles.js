@@ -15,7 +15,7 @@ require('../../node_modules/font-awesome/css/font-awesome.css')
 const {Textbox, FormTextbox, SettingTextbox, RecoveryKeyTextbox} = require('../../app/renderer/components/common/textbox')
 const {TextArea, DefaultTextArea} = require('../../app/renderer/components/common/textbox')
 const {Dropdown, FormDropdown, SettingDropdown, BraveryPanelDropdown} = require('../../app/renderer/components/common/dropdown')
-const BrowserButton = require('../../app/renderer/components/common/browserButton')
+const {BrowserButton} = require('../../app/renderer/components/common/browserButton')
 
 const {
   SectionTitleWrapper,

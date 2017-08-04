@@ -4,22 +4,22 @@
 
 const React = require('react')
 const Immutable = require('immutable')
-const ipc = require('electron').ipcRenderer
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
 const UrlBar = require('./urlBar')
 const AddEditBookmarkHanger = require('../bookmarks/addEditBookmarkHanger')
-const PublisherToggle = require('./publisherToggle')
-const LongPressButton = require('../common/longPressButton')
-const HomeButton = require('./homeButton')
+const NavigationBarButtonContainer = require('./buttons/navigationBarButtonContainer')
 
-// Actions
-const windowActions = require('../../../../js/actions/windowActions')
-const appActions = require('../../../../js/actions/appActions')
+// Components -> buttons
+const StopButton = require('./buttons/stopButton')
+const ReloadButton = require('./buttons/reloadButton')
+const HomeButton = require('./buttons/homeButton')
+const BookmarkButton = require('./buttons/bookmarkButton')
+const PublisherToggle = require('./publisherToggle')
 
 // Constants
-const messages = require('../../../../js/constants/messages')
 const settings = require('../../../../js/constants/settings')
 
 // State
@@ -31,54 +31,15 @@ const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const cx = require('../../../../js/lib/classSet')
 const {getBaseUrl} = require('../../../../js/lib/appUrlUtil')
 const siteUtil = require('../../../../js/state/siteUtil')
-const eventUtil = require('../../../../js/lib/eventUtil')
 const {getSetting} = require('../../../../js/settings')
-const contextMenus = require('../../../../js/contextMenus')
+const platformUtil = require('../../../common/lib/platformUtil')
 
-const {StyleSheet, css} = require('aphrodite/no-important')
+// Styles
+const globalStyles = require('../styles/global')
+
+const isDarwin = platformUtil.isDarwin()
 
 class NavigationBar extends React.Component {
-  constructor (props) {
-    super(props)
-    this.onToggleBookmark = this.onToggleBookmark.bind(this)
-    this.onStop = this.onStop.bind(this)
-    this.onReload = this.onReload.bind(this)
-    this.onReloadLongPress = this.onReloadLongPress.bind(this)
-  }
-
-  onToggleBookmark () {
-    const editing = this.props.isBookmarked
-
-    if (editing) {
-      windowActions.editBookmark(true, this.props.bookmarkKey)
-    } else {
-      windowActions.onBookmarkAdded(true, this.props.bookmarkKey)
-    }
-  }
-
-  onReload (e) {
-    if (eventUtil.isForSecondaryAction(e)) {
-      appActions.tabCloned(this.props.activeTabId, {active: !!e.shiftKey})
-    } else {
-      ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
-    }
-  }
-
-  onReloadLongPress (target) {
-    contextMenus.onReloadContextMenu(target)
-  }
-
-  onStop () {
-    // TODO (bridiver) - remove shortcut
-    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_STOP)
-    windowActions.onStop(this.props.isFocused, this.props.shouldRenderSuggestions)
-  }
-
-  componentDidMount () {
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, () => this.onToggleBookmark())
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark())
-  }
-
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
@@ -126,22 +87,17 @@ class NavigationBar extends React.Component {
     props.shouldRenderSuggestions = navbar.getIn(['urlbar', 'suggestions', 'shouldRender']) === true
     props.activeTabId = activeTabId
     props.bookmarkKey = siteUtil.getSiteKey(activeFrame)
-    props.showHomeButton = !props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
 
     return props
   }
 
   render () {
-    if (this.props.dontRender) {
-      return null
-    }
-
-    return <div
-      id='navigator'
+    return <div id='navigationBar'
+      data-test-id='navigationBar'
       data-frame-key={this.props.activeFrameKey}
       className={cx({
         titleMode: this.props.titleMode,
-        [css(styles.navigator_wide)]: this.props.isWideUrlBarEnabled
+        [css(styles.navigationBar, (isDarwin && this.props.isFullScreen) && styles.navigationBar_isDarwin_isFullScreen, this.props.titleMode && styles.navigationBar_titleMode, this.props.isWideUrlBarEnabled && styles.navigationBar_wide)]: true
       })}>
       {
         this.props.showBookmarkHanger
@@ -149,50 +105,59 @@ class NavigationBar extends React.Component {
         : null
       }
       {
-        this.props.titleMode
-        ? null
-        : this.props.isLoading
-          ? <span className='navigationButtonContainer'>
-            <button data-l10n-id='stopButton'
-              className='normalizeButton navigationButton stopButton'
-              onClick={this.onStop} />
-          </span>
-          : <span className='navigationButtonContainer'>
-            <LongPressButton
-              l10nId='reloadButton'
-              className='normalizeButton navigationButton reloadButton'
-              onClick={this.onReload}
-              onLongPress={this.onReloadLongPress} />
-          </span>
-      }
-      {
-        this.props.showHomeButton
-        ? <HomeButton activeTabId={this.props.activeTabId} />
+        !this.props.titleMode
+        ? (
+          <NavigationBarButtonContainer isStandalone onNavigationBarChrome>
+            {
+              this.props.isLoading
+              ? <StopButton
+                activeTabId={this.props.activeTabId}
+                isFocused={this.props.isFocused}
+                shouldRenderSuggestions={this.props.shouldRenderSuggestions}
+              />
+              : <ReloadButton activeTabId={this.props.activeTabId} />
+            }
+          </NavigationBarButtonContainer>
+        )
         : null
       }
-      <div className='startButtons'>
-        {
-          !this.props.titleMode
-          ? <span className='bookmarkButtonContainer'>
-            <button data-l10n-id={this.props.isBookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
-              className={cx({
-                navigationButton: true,
-                bookmarkButton: true,
-                removeBookmarkButton: this.props.isBookmarked,
-                withHomeButton: getSetting(settings.SHOW_HOME_BUTTON),
-                normalizeButton: true
-              })}
-              onClick={this.onToggleBookmark} />
-          </span>
-          : null
-        }
-      </div>
+      {
+        !this.props.titleMode && this.props.showHomeButton
+        ? (
+          <NavigationBarButtonContainer isStandalone onNavigationBarChrome>
+            <HomeButton />
+          </NavigationBarButtonContainer>
+        )
+        : null
+      }
+      {
+        !this.props.titleMode
+        ? (
+          <NavigationBarButtonContainer
+            isSquare
+            isNested
+            containerFor={styles.navigationBar__urlBarStart}
+          >
+            <BookmarkButton
+              isBookmarked={this.props.isBookmarked}
+              bookmarkKey={this.props.bookmarkKey}
+            />
+          </NavigationBarButtonContainer>
+          )
+        : null
+      }
       <UrlBar titleMode={this.props.titleMode} />
       {
-        this.props.showPublisherToggle
-        ? <div className='endButtons'>
-          <PublisherToggle />
-        </div>
+        !this.props.titleMode && this.props.showPublisherToggle
+        ? (
+          <NavigationBarButtonContainer
+            isSquare
+            isNested
+            containerFor={styles.navigationBar__urlBarEnd}
+          >
+            <PublisherToggle />
+          </NavigationBarButtonContainer>
+          )
         : null
       }
     </div>
@@ -200,12 +165,50 @@ class NavigationBar extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  navigator_wide: {
+  navigationBar: {
+    boxSizing: 'border-box',
+    display: 'flex',
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '20px',
+    minWidth: '0%', // allow the navigationBar to shrink
+    maxWidth: '900px',
+    marginRight: `calc(${globalStyles.spacing.navbarLeftMarginDarwin} / 2)`,
+    padding: 0,
+    position: 'relative',
+    userSelect: 'none',
+    zIndex: globalStyles.zindex.zindexNavigationBar
+  },
 
-    // TODO: Refactor navigationBar.js to remove !important
-    maxWidth: '100% !important',
-    marginRight: '0 !important',
-    justifyContent: 'initial !important'
+  navigationBar_isDarwin_isFullScreen: {
+    marginRight: 0
+  },
+
+  navigationBar_titleMode: {
+    animation: 'fadeIn 1.2s'
+  },
+
+  navigationBar_wide: {
+    maxWidth: '100%',
+    marginRight: '0',
+    justifyContent: 'initial'
+  },
+
+  // Applies for the first urlBar nested button
+  // currently for BookmarkButton
+  navigationBar__urlBarStart: {
+    borderRight: 'none',
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0
+  },
+
+ // Applies for the end urlBar nested button
+ // currently for PublisherToggle
+  navigationBar__urlBarEnd: {
+    borderLeft: 'none',
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0
   }
 })
 

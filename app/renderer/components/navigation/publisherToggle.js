@@ -4,11 +4,11 @@
 
 const React = require('react')
 const Immutable = require('immutable')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
-const BrowserButton = require('../common/browserButton')
+const {NormalizedButton} = require('../common/browserButton')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
@@ -21,8 +21,6 @@ const {getHostPattern} = require('../../../../js/lib/urlutil')
 const {getBaseUrl} = require('../../../../js/lib/appUrlUtil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
-// Style
-const globalStyles = require('../styles/global')
 const noFundVerifiedPublisherImage = require('../../../extensions/brave/img/urlbar/browser_URL_fund_no_verified.svg')
 const fundVerifiedPublisherImage = require('../../../extensions/brave/img/urlbar/browser_URL_fund_yes_verified.svg')
 const noFundUnverifiedPublisherImage = require('../../../extensions/brave/img/urlbar/browser_URL_fund_no.svg')
@@ -68,64 +66,45 @@ class PublisherToggle extends React.Component {
   }
 
   render () {
-    return <span
-      data-test-id='publisherButton'
-      data-test-authorized={this.props.isEnabledForPaymentsPublisher}
-      data-test-verified={this.props.isVerifiedPublisher}
-      className={css(styles.addPublisherButtonContainer)}>
-      <BrowserButton
-        custom={[
-          !this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher && styles.noFundVerified,
-          this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher && styles.fundVerified,
-          !this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher && styles.noFundUnverified,
-          this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher && styles.fundUnverified
-        ]}
-        data-l10n-id={this.l10nString}
-        onClick={this.onAuthorizePublisher}
-      />
-    </span>
+    return <NormalizedButton custom={[
+      (!this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher) && styles.publisherToggle_noFundVerified,
+      (this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher) && styles.publisherToggle_fundVerified,
+      (!this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher) && styles.publisherToggle_noFundUnverified,
+      (this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher) && styles.publisherToggle_fundUnverified,
+      styles.publisherToggle
+    ]}
+      l10nId={this.l10nString}
+      testId='publisherToggle'
+      testAuthorized={this.props.isEnabledForPaymentsPublisher}
+      testVerified={this.props.isVerifiedPublisher}
+      onClick={this.onAuthorizePublisher}
+    />
   }
 }
 
-module.exports = ReduxComponent.connect(PublisherToggle)
-
 const styles = StyleSheet.create({
-  addPublisherButtonContainer: {
-    boxSizing: 'border-box',
-    display: 'flex',
-    alignItems: 'center',
-    height: globalStyles.spacing.buttonHeight,
-    width: globalStyles.spacing.buttonWidth,
-    minHeight: globalStyles.spacing.buttonHeight,
-    minWidth: globalStyles.spacing.buttonWidth,
-    WebkitAppRegion: 'no-drag',
-    borderWidth: '1px 1px 1px 0px',
-    borderStyle: 'solid',
-    borderColor: globalStyles.color.urlBarOutline,
-    borderRadius: '0 4px 4px 0',
-    borderTopLeftRadius: '0',
-    borderBottomLeftRadius: '0'
+  publisherToggle: {
+    backgroundSize: '18px 18px',
+    width: '100%',
+    height: '100%'
   },
 
-  noFundVerified: {
-    backgroundImage: `url(${noFundVerifiedPublisherImage})`,
-    backgroundSize: '18px',
-    marginLeft: '2px'
+  publisherToggle_noFundVerified: {
+    // 1px added due to the check mark
+    background: `url(${noFundVerifiedPublisherImage}) calc(50% + 1px) no-repeat`
   },
 
-  fundVerified: {
-    backgroundImage: `url(${fundVerifiedPublisherImage})`,
-    backgroundSize: '18px',
-    marginLeft: '2px'
+  publisherToggle_fundVerified: {
+    background: `url(${fundVerifiedPublisherImage}) calc(50% + 1px) no-repeat`
   },
 
-  noFundUnverified: {
-    backgroundImage: `url(${noFundUnverifiedPublisherImage})`,
-    backgroundSize: '18px'
+  publisherToggle_noFundUnverified: {
+    background: `url(${noFundUnverifiedPublisherImage}) 50% no-repeat`
   },
 
-  fundUnverified: {
-    backgroundImage: `url(${fundUnverifiedPublisherImage})`,
-    backgroundSize: '18px'
+  publisherToggle_fundUnverified: {
+    background: `url(${fundUnverifiedPublisherImage}) 50% no-repeat`
   }
 })
+
+module.exports = ReduxComponent.connect(PublisherToggle)

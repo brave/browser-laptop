@@ -8,7 +8,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 // Components
 const ImmutableComponent = require('../immutableComponent')
 const ReduxComponent = require('../reduxComponent')
-const BrowserButton = require('../common/browserButton')
+const {BrowserButton} = require('../common/browserButton')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')

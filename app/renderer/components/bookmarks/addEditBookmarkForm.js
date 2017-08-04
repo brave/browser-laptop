@@ -7,7 +7,7 @@ const Immutable = require('immutable')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
-const BrowserButton = require('../common/browserButton')
+const {BrowserButton} = require('../common/browserButton')
 const {
   CommonFormSection,
   CommonFormDropdown,
