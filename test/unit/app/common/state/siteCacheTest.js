@@ -48,24 +48,24 @@ describe('siteCache', function () {
         [bookmark.get('location')]: [bookmarkKey],
         [historySite.get('location')]: [historySiteKey]
       }
-      const state = siteCache.loadLocationSiteKeysCache(baseState)
+      const state = siteCache.loadSiteKeyCaches(baseState)
       assert.deepEqual(state.get('locationSiteKeysCache').toJS(), expectedCache)
     })
   })
 
   describe('getLocationSiteKeys', function () {
     it('returns cached siteKeys', function () {
-      const state = siteCache.loadLocationSiteKeysCache(baseState)
+      const state = siteCache.loadSiteKeyCaches(baseState)
       const cachedKeys = siteCache.getLocationSiteKeys(state, bookmark.get('location'))
       assert.deepEqual(cachedKeys.toJS(), [bookmarkKey])
     })
     it('returns null when location is not cached', function () {
-      const state = siteCache.loadLocationSiteKeysCache(baseState)
+      const state = siteCache.loadSiteKeyCaches(baseState)
       const cachedKeys = siteCache.getLocationSiteKeys(state, 'https://archive.org')
       assert.equal(cachedKeys, null)
     })
     it('returns null when location is undefined', function () {
-      const state = siteCache.loadLocationSiteKeysCache(baseState)
+      const state = siteCache.loadSiteKeyCaches(baseState)
       const cachedKeys = siteCache.getLocationSiteKeys(state, undefined)
       assert.equal(cachedKeys, null)
     })
@@ -81,7 +81,7 @@ describe('siteCache', function () {
         tags: [siteTags.BOOKMARK]
       })
       const siteKey = siteUtil.getSiteKey(site)
-      let state = siteCache.loadLocationSiteKeysCache(baseState)
+      let state = siteCache.loadSiteKeyCaches(baseState)
       state = siteCache.addLocationSiteKey(state, bookmarkLocation, siteKey)
       const cachedKeys = siteCache.getLocationSiteKeys(state, bookmarkLocation)
       assert.deepEqual(cachedKeys.toJS(), [bookmarkKey, siteKey])
@@ -95,7 +95,7 @@ describe('siteCache', function () {
         tags: [siteTags.BOOKMARK]
       })
       const siteKey = siteUtil.getSiteKey(site)
-      let state = siteCache.loadLocationSiteKeysCache(baseState)
+      let state = siteCache.loadSiteKeyCaches(baseState)
       state = siteCache.addLocationSiteKey(state, location, siteKey)
       const cachedKeys = siteCache.getLocationSiteKeys(state, location)
       assert.deepEqual(cachedKeys.toJS(), [siteKey])
@@ -122,7 +122,7 @@ describe('siteCache', function () {
       })
       const siteKey = siteUtil.getSiteKey(site)
       let state = baseState.setIn(['sites', siteKey], site)
-      state = siteCache.loadLocationSiteKeysCache(state)
+      state = siteCache.loadSiteKeyCaches(state)
 
       // Sanity
       let cachedKeys = siteCache.getLocationSiteKeys(state, bookmarkLocation)
@@ -134,7 +134,7 @@ describe('siteCache', function () {
     })
 
     it('when removing the last siteKey, removes location', function () {
-      let state = siteCache.loadLocationSiteKeysCache(baseState)
+      let state = siteCache.loadSiteKeyCaches(baseState)
       state = siteCache.removeLocationSiteKey(state, bookmarkLocation, bookmarkKey)
       const cachedKeys = siteCache.getLocationSiteKeys(state, bookmarkLocation)
       assert.deepEqual(cachedKeys, undefined)
