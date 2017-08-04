@@ -23,6 +23,7 @@ const contextMenus = require('../../../../js/contextMenus')
 const {getTextColorForBackground} = require('../../../../js/lib/color')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {getSetting} = require('../../../../js/settings')
+const debounce = require('../../../../js/lib/debounce')
 
 // Styles
 const globalStyles = require('../styles/global')
@@ -41,10 +42,11 @@ class FindBar extends React.Component {
     this.onCaseSensitivityChange = this.onCaseSensitivityChange.bind(this)
     this.onFind = this.onFind.bind(this)
     this.onFindHide = this.onFindHide.bind(this)
+    this.onSetFindDetail = debounce(windowActions.setFindDetail, 100)
   }
 
   onInput (e) {
-    windowActions.setFindDetail(this.props.activeFrameKey, Immutable.fromJS({
+    this.onSetFindDetail(this.props.activeFrameKey, Immutable.fromJS({
       searchString: e.target.value,
       caseSensitivity: this.props.isCaseSensitive
     }))
