@@ -30,18 +30,18 @@ class DisabledContent extends ImmutableComponent {
         <div className={css(styles.text)}data-l10n-id='paymentsWelcomeText5' />
         <div className={css(styles.text)}>
           <span data-l10n-id='paymentsWelcomeText6' />&nbsp;
-          <a className='linkText' href='https://brave.com/Payments_FAQ.html' target='_blank' data-l10n-id='paymentsWelcomeLink' />&nbsp;
+          <a className='linkText' href='https://brave.com/Payments_FAQ.html' rel='noopener' target='_blank' data-l10n-id='paymentsWelcomeLink' />&nbsp;
           <span data-l10n-id='paymentsWelcomeText7' />
         </div>
       </div>
       <div className={css(styles.paymentsSidebar)}>
         <h2 className={css(styles.sideH2)} data-l10n-id='paymentsSidebarText1' />
         <div className={css(styles.textSide)} data-l10n-id='paymentsSidebarText2' />
-        <a href='https://www.privateinternetaccess.com/' target='_blank'><span className={css(styles.paymentsSidebarPIA)} /></a>
+        <a href='https://www.privateinternetaccess.com/' rel='noopener' target='_blank'><span className={css(styles.paymentsSidebarPIA)} /></a>
         <div className={css(styles.textSide)} data-l10n-id='paymentsSidebarText3' />
-        <a href='https://www.bitgo.com/' target='_blank'><span className={css(styles.paymentsSidebarBitgo)} /></a>
+        <a href='https://www.bitgo.com/' rel='noopener' target='_blank'><span className={css(styles.paymentsSidebarBitgo)} /></a>
         <div className={css(styles.textSide)} data-l10n-id='paymentsSidebarText4' />
-        <a href='https://www.coinbase.com/' target='_blank'><span className={css(styles.paymentsSidebarCoinbase)} /></a>
+        <a href='https://www.coinbase.com/' rel='noopener' target='_blank'><span className={css(styles.paymentsSidebarCoinbase)} /></a>
       </div>
     </section>
   }

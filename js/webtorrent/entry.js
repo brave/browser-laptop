@@ -188,6 +188,7 @@ function saveTorrentFile () {
   const href = url.format(parsedUrl)
 
   const a = document.createElement('a')
+  a.rel = 'noopener'
   a.target = '_blank'
   a.download = name
   a.href = href

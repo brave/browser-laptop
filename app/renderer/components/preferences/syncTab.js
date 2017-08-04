@@ -488,7 +488,7 @@ class SyncTab extends ImmutableComponent {
 
         <div className={css(styles.settingsListContainerMargin__bottom)}>
           <span className='settingsListTitle' data-l10n-id='syncTitleMessage' />
-          <a href='https://github.com/brave/sync/wiki/Design' target='_blank'>
+          <a href='https://github.com/brave/sync/wiki/Design' rel='noopener' target='_blank'>
             <span className={cx({
               fa: true,
               'fa-question-circle': true
