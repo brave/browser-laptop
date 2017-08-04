@@ -29,6 +29,15 @@ const api = {
 
   makeImmutable: (obj) => {
     return api.isImmutable(obj) ? obj : Immutable.fromJS(obj)
+  },
+
+  deleteImmutablePaths: (obj, paths) => {
+    return paths.reduce((result, path) => {
+      if (path.constructor === Array) {
+        return result.deleteIn(path)
+      }
+      return result.delete(path)
+    }, obj)
   }
 }
 
