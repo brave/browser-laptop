@@ -106,8 +106,7 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     return undefined
   }
 
-  var allPurposeProxy
-  allPurposeProxy = new Proxy(defaultFunc, {
+  var allPurposeProxy = new Proxy(defaultFunc, {
     get: function (target, property, receiver) {
       if (property === 'valueOf') {
         return target[property]

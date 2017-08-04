@@ -832,6 +832,19 @@ describe('Bravery Panel', function () {
         .openBraveMenu(braveMenu, braveryPanelCompact)
         .waitUntil(verifyFingerprintingStat)
     })
+    it('proxy fingerprinting method', function * () {
+      const url = Brave.server.url('fingerprinting-proxy-method.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(url)
+        .waitForUrl(url)
+        .openBraveMenu(braveMenu, braveryPanel)
+        .waitForVisible(fpSwitch)
+        .click(fpSwitch)
+        .keys(Brave.keys.ESCAPE)
+        .tabByIndex(0)
+        .waitForTextValue('#target', 'proxy blocking works')
+    })
     it('block device enumeration', function * () {
       const url = Brave.server.url('enumerate_devices.html')
       yield this.app.client

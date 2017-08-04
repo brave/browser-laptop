@@ -1,0 +1,29 @@
+<html>
+<head>
+</head>
+<body>
+<div id="target">
+proxy blocking being tested
+</div>
+<script>
+(function () {
+
+    var canvas = document.createElement("canvas");
+    canvas.width = 2000;
+    canvas.height = 200;
+    canvas.style.display = "inline";
+    var gl = canvas.getContext("webgl")
+    var format = gl.getShaderPrecisionFormat(gl.VERTEX_SHADER, gl.MEDIUM_FLOAT);
+
+    // If blocking is working correctly, format will not be a
+    // WebGLShaderPrecisionFormat instance, but a proxy instance, that allows
+    // us to look up any indexes and attributes on the object we want.
+    // If the proxy based method of blocking is working, then the below
+    // *will not* throw.
+    format.comeAlongBort['are you talking to me'].no.mySonIsAlsoNamedBort();
+
+    document.getElementsByTagName('div')[0].innerHTML = 'proxy blocking works';
+}())
+</script>
+</body>
+</html>
