@@ -91,6 +91,7 @@ const styles = StyleSheet.create({
   },
 
   loadingIcon: {
+    willChange: 'transform',
     backgroundImage: `url(${loadingIconSvg})`,
     animationName: spinKeyframes,
     animationTimingFunction: 'linear',
