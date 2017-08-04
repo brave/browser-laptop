@@ -6,12 +6,12 @@
 const mockery = require('mockery')
 const assert = require('assert')
 const sinon = require('sinon')
-const fakeElectron = require('../../../../lib/fakeElectron')
-let fakeElectronMenu
-let contextMenus
-require('../../../../braveUnit')
+const fakeElectron = require('../lib/fakeElectron')
+require('../braveUnit')
 
-describe('Context menu module unit tests', function () {
+describe('ContextMenus unit tests', function () {
+  let fakeElectronMenu, contextMenus
+
   const fakeLocale = {
     translation: (token) => { return token }
   }
@@ -24,8 +24,8 @@ describe('Context menu module unit tests', function () {
     })
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('../js/l10n', fakeLocale)
-    contextMenus = require('../../../../../../js/contextMenus')
-    fakeElectronMenu = require('../../../../lib/fakeElectronMenu')
+    contextMenus = require('../../../js/contextMenus')
+    fakeElectronMenu = require('../lib/fakeElectronMenu')
   })
 
   after(function () {

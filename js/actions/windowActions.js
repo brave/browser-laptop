@@ -1179,12 +1179,13 @@ const windowActions = {
     })
   },
 
-  onShowBookmarkFolderMenu: function (bookmarkKey, left, top) {
+  onShowBookmarkFolderMenu: function (bookmarkKey, left, top, submenuIndex) {
     dispatch({
       actionType: windowConstants.WINDOW_ON_SHOW_BOOKMARK_FOLDER_MENU,
       bookmarkKey,
       left,
-      top
+      top,
+      submenuIndex
     })
   },
 
