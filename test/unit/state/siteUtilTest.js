@@ -8,8 +8,10 @@ const mockery = require('mockery')
 const settings = require('../../../js/constants/settings')
 
 describe('siteUtil', function () {
-  const testUrl1 = 'https://brave.com/'
-  const testUrl2 = 'http://example.com/'
+  const testUrl1Slash = 'https://brave.com/'
+  const testUrl1 = 'https://brave.com'
+  const testUrl2Slash = 'http://example.com/'
+  const testUrl2 = 'http://example.com'
   const testFavicon1 = 'https://brave.com/favicon.ico'
   const emptyState = Immutable.fromJS({sites: {}})
   const bookmarkAllFields = Immutable.fromJS({
@@ -40,6 +42,14 @@ describe('siteUtil', function () {
     it('returns null if siteDetail is falsey', function () {
       const key = siteUtil.getSiteKey(null)
       assert.equal(key, null)
+    })
+    it('remove trailing slash as key', function () {
+      const siteDetail = Immutable.fromJS({
+        location: testUrl1Slash,
+        partitionNumber: 0
+      })
+      const key = siteUtil.getSiteKey(siteDetail)
+      assert.equal(key, testUrl1 + '|0|0')
     })
     describe('matching `BOOKMARK_FOLDER`', function () {
       it('returns key if folderId matches', function () {
@@ -570,7 +580,7 @@ describe('siteUtil', function () {
           location: testUrl1
         }
         const expectedSites = {
-          'https://brave.com/|0|0': {
+          'https://brave.com|0|0': {
             tags: [siteTags.PINNED],
             location: testUrl1
           }
@@ -587,7 +597,7 @@ describe('siteUtil', function () {
           location: testUrl1
         }
         const expectedSites = {
-          'https://brave.com/|0|0': {
+          'https://brave.com|0|0': {
             tags: [siteTags.BOOKMARK],
             location: testUrl1
           }
@@ -703,7 +713,7 @@ describe('siteUtil', function () {
           lastAccessedTime: 123
         }
         const expectedSites = {
-          'https://brave.com/|0|0': {
+          'https://brave.com|0|0': {
             tags: [],
             location: testUrl1,
             lastAccessedTime: undefined
@@ -722,7 +732,7 @@ describe('siteUtil', function () {
           lastAccessedTime: 123
         }
         const expectedSites = {
-          'https://brave.com/|0|0': {
+          'https://brave.com|0|0': {
             tags: [],
             location: testUrl1,
             lastAccessedTime: 123
@@ -746,7 +756,7 @@ describe('siteUtil', function () {
           lastAccessedTime: 456
         }
         const expectedSites = {
-          'http://example.com/|0|0': addedSite
+          'http://example.com|0|0': addedSite
         }
         const siteKey = siteUtil.getSiteKey(Immutable.fromJS(addedSite))
         let sites = {}
@@ -796,10 +806,10 @@ describe('siteUtil', function () {
   describe('moveSite', function () {
     describe('order test', function () {
       describe('back to front', function () {
-        const destinationKey = 'https://brave.com/|0|0'
+        const destinationKey = 'https://brave.com|0|0'
         const sourceKey = 'http://example.com/4|0|0'
         const sites = {
-          'https://brave.com/|0|0': {
+          'https://brave.com|0|0': {
             location: testUrl1,
             partitionNumber: 0,
             parentFolderId: 0,
@@ -812,13 +822,13 @@ describe('siteUtil', function () {
             order: 1
           },
           'https://brave.com/3|0|0': {
-            location: testUrl1 + '3',
+            location: testUrl1Slash + '3',
             partitionNumber: 0,
             parentFolderId: 0,
             order: 2
           },
           'http://example.com/4|0|0': {
-            location: testUrl2 + '4',
+            location: testUrl2Slash + '4',
             partitionNumber: 0,
             parentFolderId: 0,
             order: 3
@@ -828,12 +838,12 @@ describe('siteUtil', function () {
         it('prepend target', function () {
           const expectedSites = {
             'http://example.com/4|0|0': {
-              location: testUrl2 + '4',
+              location: testUrl2Slash + '4',
               partitionNumber: 0,
               parentFolderId: 0,
               order: 0
             },
-            'https://brave.com/|0|0': {
+            'https://brave.com|0|0': {
               location: testUrl1,
               partitionNumber: 0,
               parentFolderId: 0,
@@ -846,7 +856,7 @@ describe('siteUtil', function () {
               order: 2
             },
             'https://brave.com/3|0|0': {
-              location: testUrl1 + '3',
+              location: testUrl1Slash + '3',
               partitionNumber: 0,
               parentFolderId: 0,
               order: 3
@@ -860,12 +870,12 @@ describe('siteUtil', function () {
         it('not prepend target', function () {
           const expectedSites = {
             'http://example.com/4|0|0': {
-              location: testUrl2 + '4',
+              location: testUrl2Slash + '4',
               partitionNumber: 0,
               parentFolderId: 0,
               order: 1
             },
-            'https://brave.com/|0|0': {
+            'https://brave.com|0|0': {
               location: testUrl1,
               partitionNumber: 0,
               parentFolderId: 0,
@@ -878,7 +888,7 @@ describe('siteUtil', function () {
               order: 2
             },
             'https://brave.com/3|0|0': {
-              location: testUrl1 + '3',
+              location: testUrl1Slash + '3',
               partitionNumber: 0,
               parentFolderId: 0,
               order: 3
@@ -891,10 +901,10 @@ describe('siteUtil', function () {
         })
       })
       describe('front to back', function () {
-        const sourceKey = 'https://brave.com/|0|0'
+        const sourceKey = 'https://brave.com|0|0'
         const destinationKey = 'http://example.com/4|0|0'
         const sites = {
-          'https://brave.com/|0|0': {
+          'https://brave.com|0|0': {
             location: testUrl1,
             partitionNumber: 0,
             parentFolderId: 0,
@@ -907,13 +917,13 @@ describe('siteUtil', function () {
             order: 1
           },
           'https://brave.com/3|0|0': {
-            location: testUrl1 + '3',
+            location: testUrl1Slash + '3',
             partitionNumber: 0,
             parentFolderId: 0,
             order: 2
           },
           'http://example.com/4|0|0': {
-            location: testUrl2 + '4',
+            location: testUrl2Slash + '4',
             partitionNumber: 0,
             parentFolderId: 0,
             order: 3
@@ -929,19 +939,19 @@ describe('siteUtil', function () {
               order: 0
             },
             'https://brave.com/3|0|0': {
-              location: testUrl1 + '3',
+              location: testUrl1Slash + '3',
               partitionNumber: 0,
               parentFolderId: 0,
               order: 1
             },
-            'https://brave.com/|0|0': {
+            'https://brave.com|0|0': {
               location: testUrl1,
               partitionNumber: 0,
               parentFolderId: 0,
               order: 2
             },
             'http://example.com/4|0|0': {
-              location: testUrl2 + '4',
+              location: testUrl2Slash + '4',
               partitionNumber: 0,
               parentFolderId: 0,
               order: 3
@@ -961,18 +971,18 @@ describe('siteUtil', function () {
               order: 0
             },
             'https://brave.com/3|0|0': {
-              location: testUrl1 + '3',
+              location: testUrl1Slash + '3',
               partitionNumber: 0,
               parentFolderId: 0,
               order: 1
             },
             'http://example.com/4|0|0': {
-              location: testUrl2 + '4',
+              location: testUrl2Slash + '4',
               partitionNumber: 0,
               parentFolderId: 0,
               order: 2
             },
-            'https://brave.com/|0|0': {
+            'https://brave.com|0|0': {
               location: testUrl1,
               partitionNumber: 0,
               parentFolderId: 0,
@@ -987,7 +997,7 @@ describe('siteUtil', function () {
       })
     })
     it('destination is parent', function () {
-      const sourceKey = 'https://brave.com/|0|0'
+      const sourceKey = 'https://brave.com|0|0'
       const sourceDetail = {
         location: testUrl1,
         partitionNumber: 0,
@@ -1002,11 +1012,11 @@ describe('siteUtil', function () {
       }
       const sites = {
         1: destinationDetail,
-        'https://brave.com/|0|0': sourceDetail
+        'https://brave.com|0|0': sourceDetail
       }
       const expectedSites = {
         1: destinationDetail,
-        'https://brave.com/|0|1': {
+        'https://brave.com|0|1': {
           location: testUrl1,
           partitionNumber: 0,
           parentFolderId: 1,
@@ -1033,11 +1043,11 @@ describe('siteUtil', function () {
       }
       const sites = {
         1: destinationDetail,
-        'https://brave.com/|0|1': sourceDetail
+        'https://brave.com|0|1': sourceDetail
       }
       const expectedSites = {
         1: destinationDetail,
-        'https://brave.com/|0|0': {
+        'https://brave.com|0|0': {
           location: testUrl1,
           partitionNumber: 0,
           parentFolderId: 0,
@@ -1045,7 +1055,7 @@ describe('siteUtil', function () {
         }
       }
       const state = siteUtil.moveSite(Immutable.fromJS({sites}),
-        'https://brave.com/|0|1',
+        'https://brave.com|0|1',
         '1', false, false, false)
       assert.deepEqual(state.get('sites').toJS(), expectedSites)
     })
@@ -1289,6 +1299,70 @@ describe('siteUtil', function () {
             partitionNumber: tab.get('partitionNumber'),
             parentFolderId: siteWithFolder.get('parentFolderId')
           }
+        )
+      })
+    })
+
+    describe('when considering pinned tab', function () {
+      const siteUrl = 'https://brave.com'
+      const siteRedirectUrl = 'https://brave.com/welcome'
+      const title = 'brave'
+      const sites = {
+        'https://brave.com|0|0': {
+          location: siteUrl,
+          title: title,
+          partitionNumber: 0,
+          lastAccessedTime: 123,
+          tags: [siteTags.PINNED, siteTags.BOOKMARK],
+          parentFolderId: 0
+        }
+      }
+      const expectedResult = {
+        location: siteUrl,
+        title: title,
+        tags: [siteTags.PINNED]
+      }
+      it('location same as pinnedLocation', function () {
+        const tab = Immutable.fromJS({
+          url: siteUrl,
+          title: title,
+          frame: {
+            pinnedLocation: siteUrl,
+            history: [siteUrl, siteRedirectUrl]
+          }
+        })
+        assert.deepEqual(
+          siteUtil.getDetailFromTab(tab, siteTags.PINNED, Immutable.fromJS(sites)).toJS(),
+          expectedResult
+        )
+      })
+
+      it('location different than pinnedLocation', function () {
+        const tab = Immutable.fromJS({
+          url: siteRedirectUrl,
+          title: title,
+          frame: {
+            pinnedLocation: siteUrl,
+            history: [siteUrl, siteRedirectUrl]
+          }
+        })
+        assert.deepEqual(
+          siteUtil.getDetailFromTab(tab, siteTags.PINNED, Immutable.fromJS(sites)).toJS(),
+          expectedResult
+        )
+      })
+
+      it('location different than pinnedLocation which is unavailable', function () {
+        const tab = Immutable.fromJS({
+          url: siteRedirectUrl,
+          title: title,
+          frame: {
+            history: [siteUrl, siteRedirectUrl]
+          }
+        })
+        assert.deepEqual(
+          siteUtil.getDetailFromTab(tab, siteTags.PINNED, Immutable.fromJS(sites)).toJS(),
+          expectedResult
         )
       })
     })

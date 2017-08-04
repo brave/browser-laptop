@@ -7,8 +7,8 @@ const assert = require('assert')
 const Immutable = require('immutable')
 
 describe('siteCache', function () {
-  const testUrl1 = 'https://brave.com/'
-  const testUrl2 = 'http://example.com/'
+  const testUrl1 = 'https://brave.com'
+  const testUrl2 = 'http://example.com'
   const bookmark = Immutable.fromJS({
     lastAccessedTime: 123,
     objectId: [210, 115, 31, 176, 57, 212, 167, 120, 104, 88, 88, 27, 141, 36, 235, 226],

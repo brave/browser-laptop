@@ -910,4 +910,27 @@ describe('sessionStore unit tests', function () {
       }
     })
   })
+
+  describe('runPostMigrations', function () {
+    it('sites trailing slash migration', function () {
+      const data = {
+        sites: {
+          'https://brave.com/|0|0': {
+            location: 'https://brave.com/',
+            partitionNumber: 0
+          }
+        }
+      }
+      const expectedResult = {
+        sites: {
+          'https://brave.com|0|0': {
+            location: 'https://brave.com/',
+            partitionNumber: 0
+          }
+        }
+      }
+      const result = sessionStore.runPostMigrations(data)
+      assert.deepEqual(result, expectedResult)
+    })
+  })
 })
