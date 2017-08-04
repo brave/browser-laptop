@@ -62,10 +62,12 @@ window.addEventListener('beforeunload', function (e) {
   ipc.send(messages.LAST_WINDOW_STATE, windowStore.getState().toJS())
 })
 
-ipc.on(messages.INITIALIZE_WINDOW, (e, windowValue, appState, frames, initWindowState) => {
+ipc.on(messages.INITIALIZE_WINDOW, (e, mem) => {
+  const message = mem.memory()
+  const windowValue = message.windowValue
   currentWindow.setWindowId(windowValue.id)
-  appStoreRenderer.state = Immutable.fromJS(appState)
+  appStoreRenderer.state = Immutable.fromJS(message.appState)
   ReactDOM.render(
-    <Window frames={frames} initWindowState={initWindowState} />,
+    <Window frames={message.frames} initWindowState={message.windowState} />,
     document.getElementById('appContainer'))
 })
