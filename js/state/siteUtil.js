@@ -417,11 +417,6 @@ module.exports.removeSite = function (state, siteDetail, tag, reorder = true, sy
     site = site.set('tags', tags)
     return state.setIn(stateKey, site)
   } else {
-    const siteDetailTags = siteDetail.get('tags')
-    if (!tag && (!siteDetailTags || siteDetailTags.size === 0)) {
-      // Delete the site from history
-      return state.deleteIn(stateKey)
-    }
     site = site.set('lastAccessedTime', undefined)
     return state.setIn(stateKey, site)
   }

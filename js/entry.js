@@ -66,8 +66,8 @@ ipc.on(messages.APP_STATE_CHANGE, (e, action) => {
     : appStoreRenderer.state = Immutable.fromJS(action.state)
 })
 
-ipc.on(messages.CLEAR_CLOSED_FRAMES, (e, location) => {
-  windowActions.clearClosedFrames(location)
+ipc.on(messages.CLEAR_CLOSED_FRAMES, () => {
+  windowActions.clearClosedFrames()
 })
 
 window.addEventListener('beforeunload', function (e) {
