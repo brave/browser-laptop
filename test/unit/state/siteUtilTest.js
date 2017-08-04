@@ -702,13 +702,7 @@ describe('siteUtil', function () {
           location: testUrl1,
           lastAccessedTime: 123
         }
-        const expectedSites = {
-          'https://brave.com/|0|0': {
-            tags: [],
-            location: testUrl1,
-            lastAccessedTime: undefined
-          }
-        }
+        const expectedSites = {}
         const siteKey = siteUtil.getSiteKey(Immutable.fromJS(siteDetail))
         let sites = {}
         sites[siteKey] = siteDetail
