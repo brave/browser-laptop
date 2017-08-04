@@ -107,8 +107,7 @@ describe('sitesReducerTest', function () {
       let newState = sitesReducer(state, action)
       action.actionType = appConstants.APP_REMOVE_SITE
       newState = sitesReducer(newState, action).toJS()
-      assert.equal(Object.keys(newState.sites).length, 1)
-      assert.equal(Object.keys(newState.sites)[0].lastAccessedTime, undefined)
+      assert.equal(Object.keys(newState.sites).length, 0)
     })
   })
   describe('APP_MOVE_SITE', function () {

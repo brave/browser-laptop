@@ -472,6 +472,9 @@ const handleAppAction = (action) => {
     case appConstants.APP_REMOVE_SITE:
       calculateTopSites(true)
       appState = aboutHistoryState.setHistory(appState, action)
+      if (!action.tag && siteUtil.isHistoryEntry(action.siteDetail)) {
+        BrowserWindow.getAllWindows().forEach((wnd) => wnd.webContents.send(messages.CLEAR_CLOSED_FRAMES, action.siteDetail.get('location')))
+      }
       break
     case appConstants.APP_SET_DATA_FILE_ETAG:
       appState = appState.setIn([action.resourceName, 'etag'], action.etag)
