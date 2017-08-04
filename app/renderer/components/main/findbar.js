@@ -22,6 +22,7 @@ const windowStore = require('../../../../js/stores/windowStore')
 // Utils
 const contextMenus = require('../../../../js/contextMenus')
 const {getTextColorForBackground} = require('../../../../js/lib/color')
+const debounce = require('../../../../js/lib/debounce')
 
 const globalStyles = require('../styles/global')
 
@@ -38,6 +39,7 @@ class FindBar extends ImmutableComponent {
     this.onFindNext = this.onFindNext.bind(this)
     this.onCaseSensitivityChange = this.onCaseSensitivityChange.bind(this)
     this.didFrameChange = true
+    this.onSetFindDetail = debounce(windowActions.setFindDetail, 100)
   }
 
   get frame () {
@@ -45,7 +47,7 @@ class FindBar extends ImmutableComponent {
   }
 
   onInput (e) {
-    windowActions.setFindDetail(this.props.frameKey, Immutable.fromJS({
+    this.onSetFindDetail(this.props.frameKey, Immutable.fromJS({
       searchString: e.target.value,
       caseSensitivity: this.isCaseSensitive
     }))
