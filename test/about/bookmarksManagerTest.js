@@ -9,7 +9,6 @@ const Immutable = require('immutable')
 
 describe('about:bookmarks', function () {
   const folderId = Math.floor(Math.random() * (100 - 1 + 1)) + 1
-  const lastVisit = 1476140184441
   const browseableSiteUrl = 'page1.html'
   const browseableSiteTitle = 'Page 1'
 
@@ -30,15 +29,13 @@ describe('about:bookmarks', function () {
         title: 'Page with Favicon',
         favicon: favicon,
         type: siteTags.BOOKMARK,
-        parentFolderId: 0,
-        lastAccessedTime: lastVisit
+        parentFolderId: 0
       },
       {
         location: siteWithoutFavicon,
         title: 'Page without Favicon',
         type: siteTags.BOOKMARK,
-        parentFolderId: 0,
-        lastAccessedTime: lastVisit
+        parentFolderId: 0
       }
     ])
     yield client
@@ -52,43 +49,36 @@ describe('about:bookmarks', function () {
       {
         location: 'https://brave.com',
         title: 'Brave',
-        parentFolderId: 0,
-        lastAccessedTime: lastVisit
+        parentFolderId: 0
       },
       {
         location: 'https://brave.com/test',
         title: 'customTest',
-        parentFolderId: 0,
-        lastAccessedTime: lastVisit
+        parentFolderId: 0
       },
       {
         location: 'https://www.youtube.com',
-        parentFolderId: 0,
-        lastAccessedTime: lastVisit
+        parentFolderId: 0
       },
       {
         location: 'https://www.facebook.com',
         title: 'facebook',
-        parentFolderId: 0,
-        lastAccessedTime: lastVisit
+        parentFolderId: 0
       },
       {
         location: 'https://duckduckgo.com',
         title: 'duckduckgo',
-        parentFolderId: folderId,
-        lastAccessedTime: lastVisit
+        parentFolderId: folderId
       },
       {
         location: 'https://google.com',
         title: 'Google',
-        parentFolderId: folderId,
-        lastAccessedTime: lastVisit
+        parentFolderId: folderId
       },
       {
         location: 'https://bing.com',
         title: 'Bing',
-        parentFolderId: folderId,
-        lastAccessedTime: lastVisit
+        parentFolderId: folderId
       }
     ])
 
@@ -112,8 +102,7 @@ describe('about:bookmarks', function () {
         location: site,
         title: browseableSiteTitle,
         type: siteTags.BOOKMARK,
-        parentFolderId: 0,
-        lastAccessedTime: lastVisit
+        parentFolderId: 0
       })
       .tabByIndex(0)
       .loadUrl(aboutBookmarksUrl)

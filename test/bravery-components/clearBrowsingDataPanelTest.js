@@ -94,10 +94,6 @@ describe('Clear Browsing Panel', function () {
         .pause(5500) // top sites are debounced for 5 seconds
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            console.log(getHistory(val.value.historySites).size)
-            console.log(val.value.about.history.entries.length)
-            console.log(getHistory(val.value.about.newtab.sites))
-
             return getHistory(val.value.historySites).size === 1 &&
               val.value.about.history.entries.length === 1 &&
               getHistory(val.value.about.newtab.sites).size === 6 &&

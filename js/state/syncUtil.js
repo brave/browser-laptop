@@ -9,6 +9,7 @@ const crypto = require('crypto')
 const writeActions = require('../constants/sync/proto').actions
 const {getSetting} = require('../settings')
 const {isDataUrl} = require('../lib/urlutil')
+const FunctionBuffer = require('../lib/functionBuffer')
 const bookmarkUtil = require('../../app/common/lib/bookmarkUtil')
 const bookmarkFoldersState = require('../../app/common/state/bookmarkFoldersState')
 const bookmarkFoldersUtil = require('../../app/common/lib/bookmarkFoldersUtil')
@@ -282,21 +283,7 @@ module.exports.applySyncRecords = (records) => {
    * bookmark sites), then when the apply action changes (e.g. to folders) we
    * first flush the buffer (e.g. apply the first sequence of sites).
    */
-  let buffer = []
-  let previousAppAction = () => {}
-  const flushBufferedAppActions = () => {
-    if (!buffer.length) { return }
-    previousAppAction(new Immutable.List(buffer))
-    buffer = []
-  }
-  const bufferAppAction = (appAction, item) => {
-    if (previousAppAction !== appAction) {
-      flushBufferedAppActions()
-      previousAppAction = appAction
-    }
-    buffer.push(item)
-  }
-
+  const functionBuffer = new FunctionBuffer((args) => new Immutable.List(args))
   records.forEach((record) => {
     if (!record) {
       return true
@@ -305,32 +292,32 @@ module.exports.applySyncRecords = (records) => {
       const siteData = module.exports.getSiteDataFromRecord(record, appState, records).set('skipSync', true)
       if (shouldAddRecord(record)) {
         if (record.bookmark.isFolder) {
-          bufferAppAction(appActions.addBookmarkFolder, siteData)
+          functionBuffer.buffer(appActions.addBookmarkFolder, siteData)
         } else {
-          bufferAppAction(appActions.addBookmark, siteData)
+          functionBuffer.buffer(appActions.addBookmark, siteData)
         }
       } else if (shouldRemoveRecord(record)) {
         if (record.bookmark.isFolder) {
           const folderKey = bookmarkFoldersUtil.getKey(siteData)
-          bufferAppAction(appActions.removeBookmarkFolder, folderKey)
+          functionBuffer.buffer(appActions.removeBookmarkFolder, folderKey)
         } else {
           const siteKey = bookmarkUtil.getKey(siteData)
-          bufferAppAction(appActions.removeBookmark, siteKey)
+          functionBuffer.buffer(appActions.removeBookmark, siteKey)
         }
       }
     } else if (record.objectData === 'historySite') {
       const siteData = module.exports.getSiteDataFromRecord(record, appState, records)
       if (shouldAddRecord(record)) {
-        bufferAppAction(appActions.addHistorySite, siteData)
+        functionBuffer.buffer(appActions.addHistorySite, siteData)
       } else if (shouldRemoveRecord(record)) {
         const siteKey = historyUtil.getKey(siteData)
-        bufferAppAction(appActions.removeHistorySite, siteKey)
+        functionBuffer.buffer(appActions.removeHistorySite, siteKey)
       }
     } else {
       otherRecords.push(record)
     }
   })
-  flushBufferedAppActions()
+  functionBuffer.flush()
   applyNonBatchedRecords(otherRecords)
 }
 

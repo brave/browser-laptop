@@ -32,6 +32,7 @@ const locale = require('./locale')
 const tabMessageBox = require('./browser/tabMessageBox')
 const {makeImmutable} = require('./common/state/immutableUtil')
 const bookmarkFoldersUtil = require('./common/lib/bookmarkFoldersUtil')
+const FunctionBuffer = require('../js/lib/functionBuffer')
 
 let isImportingBookmarks = false
 let hasBookmarks
@@ -92,7 +93,7 @@ importer.on('add-history-page', (e, history) => {
 importer.on('add-homepage', (e, detail) => {
 })
 
-const getParentFolderId = (path, pathMap, folders, topLevelFolderId, nextFolderIdObject) => {
+const getParentFolderId = (path, pathMap, addFolderFunction, topLevelFolderId, nextFolderIdObject) => {
   const pathLen = path.length
   if (!pathLen) {
     return topLevelFolderId
@@ -103,10 +104,10 @@ const getParentFolderId = (path, pathMap, folders, topLevelFolderId, nextFolderI
   if (parentFolderId === undefined) {
     parentFolderId = nextFolderIdObject.id++
     pathMap[parentFolder] = parentFolderId
-    folders.push({
+    addFolderFunction({
       title: parentFolder,
       folderId: parentFolderId,
-      parentFolderId: getParentFolderId(path, pathMap, folders, topLevelFolderId, nextFolderIdObject)
+      parentFolderId: getParentFolderId(path, pathMap, addFolderFunction, topLevelFolderId, nextFolderIdObject)
     })
   }
   return parentFolderId
@@ -121,36 +122,47 @@ importer.on('add-bookmarks', (e, importedBookmarks, topLevelFolder) => {
   let folders = []
   let bookmarks = []
   let topLevelFolderId = nextFolderIdObject.id++
+  const functionBuffer = new FunctionBuffer((args) => makeImmutable(args), this)
+  const bufferedAddFolder = (folder) => {
+    functionBuffer.buffer(appActions.addBookmarkFolder, folder)
+    folders.push(folder)
+  }
 
-  folders.push({
+  const importTopLevelFolder = {
     title: bookmarkFoldersUtil.getNextFolderName(bookmarkFolders, topLevelFolder),
     folderId: topLevelFolderId,
     parentFolderId: 0
-  })
+  }
+  bufferedAddFolder(importTopLevelFolder)
 
   for (let i = 0; i < importedBookmarks.length; ++i) {
-    let path = importedBookmarks[i].path
-    let parentFolderId = getParentFolderId(path, pathMap, folders, topLevelFolderId, nextFolderIdObject)
-    if (importedBookmarks[i].is_folder) {
+    const importedBookmark = importedBookmarks[i]
+    const path = importedBookmark.path
+    const title = importedBookmark.title
+    const parentFolderId = getParentFolderId(path, pathMap, bufferedAddFolder, topLevelFolderId, nextFolderIdObject)
+    if (importedBookmark.is_folder) {
       const folderId = nextFolderIdObject.id++
-      pathMap[importedBookmarks[i].title] = folderId
-      folders.push({
-        title: importedBookmarks[i].title,
-        folderId: folderId,
-        parentFolderId: parentFolderId
-      })
+      pathMap[title] = folderId
+      const folder = {
+        title,
+        folderId,
+        parentFolderId
+      }
+      functionBuffer.buffer(appActions.addBookmarkFolder, folder)
+      folders.push(folder)
     } else {
-      bookmarks.push({
-        title: importedBookmarks[i].title,
-        location: importedBookmarks[i].url,
-        parentFolderId: parentFolderId
-      })
+      const location = importedBookmark.url
+      const bookmark = {
+        title,
+        location,
+        parentFolderId
+      }
+      functionBuffer.buffer(appActions.addBookmark, bookmark)
+      bookmarks.push(bookmark)
     }
   }
-
-  bookmarkList = bookmarks
-  appActions.addBookmarkFolder(makeImmutable(folders))
-  appActions.addBookmark(makeImmutable(bookmarks))
+  functionBuffer.flush()
+  bookmarkList = makeImmutable(bookmarks)
 })
 
 importer.on('add-favicons', (e, detail) => {

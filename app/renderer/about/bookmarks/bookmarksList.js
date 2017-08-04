@@ -20,7 +20,6 @@ const appActions = require('../../../../js/actions/appActions')
 
 // Utils
 const dndData = require('../../../../js/dndData')
-const formatUtil = require('../../../common/lib/formatUtil')
 
 class BookmarksList extends ImmutableComponent {
   onDoubleClick (entry, e) {
@@ -106,22 +105,17 @@ class BookmarksList extends ImmutableComponent {
       <SortableTable
         ref='bookmarkTable'
         headings={[
-          <BookmarkTitleHeader heading='title' selectedFolderId={this.props.selectedFolderId} />,
-          <span data-l10n-id='lastVisited' />
+          <BookmarkTitleHeader heading='title' selectedFolderId={this.props.selectedFolderId} />
         ]}
         defaultHeading='Title'
         rows={this.props.bookmarks.map((entry) => [
           {
             cell: <BookmarkTitleCell siteDetail={entry} />,
             value: entry.get('title') || entry.get('location')
-          },
-          {
-            html: formatUtil.toLocaleString(entry.get('lastAccessedTime'), ''),
-            value: entry.get('lastAccessedTime') || 0
           }
         ])}
         rowObjects={this.props.bookmarks}
-        columnClassNames={['title', 'date']}
+        columnClassNames={['title']}
         addHoverClass
         multiSelect
         onDoubleClick={this.onDoubleClick}

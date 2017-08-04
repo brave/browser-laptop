@@ -88,7 +88,8 @@ const bookmarksState = {
     }
 
     const key = bookmarkUtil.getKey(bookmarkDetail)
-    let dataItem = historyState.getSite(state, key)
+    const historyKey = key.slice(0, -2)
+    let dataItem = historyState.getSite(state, historyKey)
 
     if (dataItem.isEmpty()) {
       // check if we have data in tabs
