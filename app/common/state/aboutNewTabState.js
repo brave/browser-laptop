@@ -31,6 +31,13 @@ const aboutNewTabState = {
     topSites = makeImmutable(topSites)
     state = state.setIn(['about', 'newtab', 'sites'], topSites)
     return state.setIn(['about', 'newtab', 'updatedStamp'], new Date().getTime())
+  },
+
+  clearTopSites: (state) => {
+    state = makeImmutable(state)
+
+    state = state.setIn(['about', 'newtab', 'sites'], makeImmutable([]))
+    return state.setIn(['about', 'newtab', 'updatedStamp'], new Date().getTime())
   }
 }
 

@@ -50,8 +50,9 @@ class CloseTabIcon extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const frameKey = ownProps.frameKey
-    const isPinnedTab = frameStateUtil.isPinned(currentWindow, frameKey)
     const frame = frameStateUtil.getFrameByKey(currentWindow, frameKey) || Immutable.Map()
+    const tabId = frame.get('tabId', tabState.TAB_ID_NONE)
+    const isPinnedTab = tabState.isTabPinned(state, tabId)
 
     const props = {}
     // used in renderer
@@ -64,7 +65,7 @@ class CloseTabIcon extends React.Component {
     // used in functions
     props.frameKey = frameKey
     props.fixTabWidth = ownProps.fixTabWidth
-    props.tabId = frame.get('tabId', tabState.TAB_ID_NONE)
+    props.tabId = tabId
     props.hasFrame = !frame.isEmpty()
 
     return props

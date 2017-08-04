@@ -11,14 +11,14 @@ const ImmutableComponent = require('../../components/immutableComponent')
 const {iconSize} = require('../../../../js/constants/config')
 
 // Utils
-const siteUtil = require('../../../../js/state/siteUtil')
 const cx = require('../../../../js/lib/classSet')
+const bookmarkFoldersUtil = require('../../../common/lib/bookmarkFoldersUtil')
 
 class BookmarkTitleCell extends ImmutableComponent {
   render () {
     let iconStyle
     const icon = this.props.siteDetail.get('favicon')
-    if (!siteUtil.isFolder(this.props.siteDetail)) {
+    if (!bookmarkFoldersUtil.isFolder(this.props.siteDetail)) {
       if (icon) {
         iconStyle = {
           minWidth: iconSize,
@@ -30,7 +30,7 @@ class BookmarkTitleCell extends ImmutableComponent {
       }
     }
 
-    const bookmarkTitle = this.props.siteDetail.get('customTitle') || this.props.siteDetail.get('title')
+    const bookmarkTitle = this.props.siteDetail.get('title')
     const bookmarkLocation = this.props.siteDetail.get('location')
     const defaultIcon = 'fa fa-file-o'
 

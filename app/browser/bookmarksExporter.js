@@ -11,15 +11,23 @@ const electron = require('electron')
 const dialog = electron.dialog
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
-const getSetting = require('../../js/settings').getSetting
+
+// State
+const bookmarksState = require('../common/state/bookmarksState')
+
+// Constants
 const settings = require('../../js/constants/settings')
-const siteTags = require('../../js/constants/siteTags')
-const siteUtil = require('../../js/state/siteUtil')
-const isWindows = process.platform === 'win32'
+
+// Utils
+const {getSetting} = require('../../js/settings')
+const platformUtil = require('../common/lib/platformUtil')
+const bookmarkFoldersUtil = require('../common/lib/bookmarkFoldersUtil')
+const bookmarkUtil = require('../common/lib/bookmarkUtil')
+
 const indentLength = 2
 const indentType = ' '
 
-function showDialog (sites) {
+const showDialog = (state) => {
   const focusedWindow = BrowserWindow.getFocusedWindow()
   const fileName = moment().format('DD_MM_YYYY') + '.html'
   const defaultPath = path.join(getSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH) || app.getPath('downloads'), fileName)
@@ -34,17 +42,15 @@ function showDialog (sites) {
     }]
   }, (fileName) => {
     if (fileName) {
-      personal = createBookmarkArray(sites)
-      other = createBookmarkArray(sites, -1, false)
+      personal = createBookmarkArray(state)
+      other = createBookmarkArray(state, -1, false)
       fs.writeFileSync(fileName, createBookmarkHTML(personal, other))
     }
   })
 }
 
-function createBookmarkArray (sites, parentFolderId, first = true, depth = 1) {
-  const filteredBookmarks = parentFolderId
-    ? sites.filter((site) => site.get('parentFolderId') === parentFolderId)
-    : sites.filter((site) => !site.get('parentFolderId'))
+const createBookmarkArray = (state, parentFolderId = 0, first = true, depth = 1) => {
+  const bookmarks = bookmarksState.getBookmarksWithFolders(state, parentFolderId)
   let payload = []
   let title
   let indentFirst = indentType.repeat(depth * indentLength)
@@ -52,26 +58,23 @@ function createBookmarkArray (sites, parentFolderId, first = true, depth = 1) {
 
   if (first) payload.push(`${indentFirst}<DL><p>`)
 
-  filteredBookmarks.forEach((site) => {
-    if (site.get('tags').includes(siteTags.BOOKMARK) && site.get('location')) {
-      title = site.get('customTitle') || site.get('title') || site.get('location')
+  for (let site of bookmarks) {
+    if (bookmarkUtil.isBookmark(site) && site.get('location')) {
+      title = site.get('title', site.get('location'))
       payload.push(`${indentNext}<DT><A HREF="${site.get('location')}">${title}</A>`)
-    } else if (siteUtil.isFolder(site)) {
-      const folderId = site.get('folderId')
-
-      title = site.get('customTitle') || site.get('title')
-      payload.push(`${indentNext}<DT><H3>${title}</H3>`)
-      payload = payload.concat(createBookmarkArray(sites, folderId, true, (depth + 1)))
+    } else if (bookmarkFoldersUtil.isFolder(site)) {
+      payload.push(`${indentNext}<DT><H3>${site.get('title')}</H3>`)
+      payload = payload.concat(createBookmarkArray(state, site.get('folderId'), true, (depth + 1)))
     }
-  })
+  }
 
   if (first) payload.push(`${indentFirst}</DL><p>`)
 
   return payload
 }
 
-function createBookmarkHTML (personal, other) {
-  const breakTag = (isWindows) ? '\r\n' : '\n'
+const createBookmarkHTML = (personal, other) => {
+  const breakTag = (platformUtil.isWindows()) ? '\r\n' : '\n'
   const title = 'Bookmarks'
 
   return `<!DOCTYPE NETSCAPE-Bookmark-file-1>

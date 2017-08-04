@@ -19,21 +19,28 @@ const appActions = require('../js/actions/appActions')
 const syncConstants = require('../js/constants/syncConstants')
 const appDispatcher = require('../js/dispatcher/appDispatcher')
 const AppStore = require('../js/stores/appStore')
-const siteUtil = require('../js/state/siteUtil')
 const syncUtil = require('../js/state/syncUtil')
 const syncPendState = require('./common/state/syncPendState')
 const getSetting = require('../js/settings').getSetting
 const settings = require('../js/constants/settings')
 const extensions = require('./extensions')
 const {unescapeJSONPointer} = require('./common/lib/jsonUtil')
+const bookmarkFoldersUtil = require('./common/lib/bookmarkFoldersUtil')
+const bookmarkFoldersState = require('./common/state/bookmarkFoldersState')
+const bookmarksState = require('./common/state/bookmarksState')
+const {STATE_SITES} = require('../js/constants/stateConstants')
 
 const CATEGORY_MAP = syncUtil.CATEGORY_MAP
 const CATEGORY_NAMES = Object.keys(categories)
 const SYNC_ACTIONS = Object.values(syncConstants)
+const STATE_SITES_VALUES = Object.values(STATE_SITES)
 
 // Fields that should trigger a sync SEND when changed
+const SYNC_FIELDS_SITES = ['location', 'title', 'folderId', 'parentFolderId', 'tags']
 const SYNC_FIELDS = {
-  sites: ['location', 'customTitle', 'folderId', 'parentFolderId', 'tags'],
+  [STATE_SITES.BOOKMARKS]: SYNC_FIELDS_SITES,
+  [STATE_SITES.BOOKMARK_FOLDERS]: SYNC_FIELDS_SITES,
+  [STATE_SITES.HISTORY_SITES]: SYNC_FIELDS_SITES,
   siteSettings: Object.keys(syncUtil.siteSettingDefaults)
 }
 
@@ -67,13 +74,13 @@ const appStoreChangeCallback = function (diffs) {
     }
     const path = diff.path.split('/')
     if (path.length < 3) {
-      // We are looking for paths like ['', 'sites', 'https://brave.com/', 'title']
+      // We are looking for paths like ['', 'bookmarks', 'https://brave.com/', 'title']
       return
     }
 
     const type = path[1]
     const field = path[3]
-    const isSite = type === 'sites'
+    const isSite = STATE_SITES_VALUES.includes(type)
 
     const fieldsToPick = SYNC_FIELDS[type]
     if (!fieldsToPick) {
@@ -118,8 +125,15 @@ const appStoreChangeCallback = function (diffs) {
         const entryJS = entry.toJS()
         entryJS.objectId = entryJS.objectId || syncUtil.newObjectId(statePath)
 
-        sendSyncRecords(backgroundSender, action,
-          [type === 'sites' ? syncUtil.createSiteData(entryJS) : syncUtil.createSiteSettingsData(statePath[1], entryJS)])
+        let record = null
+        if (type === STATE_SITES.BOOKMARKS || type === STATE_SITES.BOOKMARK_FOLDERS) {
+          record = syncUtil.createBookmarkData(entryJS)
+        } else if (type === STATE_SITES.HISTORY_SITES) {
+          record = syncUtil.createHistorySiteData(entryJS)
+        } else {
+          record = syncUtil.createSiteSettingsData(statePath[1], entryJS)
+        }
+        sendSyncRecords(backgroundSender, action, [record])
       }
     }
   })
@@ -205,9 +219,10 @@ const dispatcherCallback = (action) => {
     return
   }
   switch (action.actionType) {
+    // Currently triggered only by bookmarksState and bookmarkFoldersState.
     case syncConstants.SYNC_REMOVE_SITE:
       sendSyncRecords(backgroundSender, writeActions.DELETE,
-        [syncUtil.createSiteData(action.item.toJS())])
+        [syncUtil.createBookmarkData(action.item.toJS())])
       break
     case syncConstants.SYNC_CLEAR_HISTORY:
       backgroundSender.send(syncMessages.DELETE_SYNC_CATEGORY, CATEGORY_MAP.historySite.categoryName)
@@ -260,51 +275,47 @@ module.exports.onSyncReady = (isFirstRun, e) => {
     sendSyncRecords(e.sender, writeActions.CREATE, [deviceRecord])
     deviceIdSent = true
   }
-  const sites = appState.get('sites') || new Immutable.List()
   const seed = appState.get('seed') || new Immutable.List()
 
   /**
    * Sync a bookmark that has not been synced yet, first syncing the parent
    * folder if needed. For folders, set and memoize folderId to ensure
    * consistent parentFolderObjectIds.
-   * Otherwise siteUtil.createSiteData() will generate new objectIds every
+   * Otherwise syncUtil.createBookmarkData() will generate new objectIds every
    * call; there's not enough time to dispatch id updates to appStore.sites.
    * @param {Immutable.Map} site
    */
   const folderToObjectId = {}
   const bookmarksToSync = []
-  const shouldSyncBookmark = (site) => {
-    if (!site) {
-      return false
-    }
-    if (siteUtil.isSiteBookmarked(sites, site) !== true && siteUtil.isFolder(site) !== true) {
-      return false
-    }
+
+  const shouldSyncBookmark = (bookmark) => {
     // originalSeed is set on reset to prevent synced bookmarks on a device
     // from being  re-synced.
-    const originalSeed = site.get('originalSeed')
-    if (site.get('objectId') && (!originalSeed || seed.equals(originalSeed))) {
+    const originalSeed = bookmark.get('originalSeed')
+    if (bookmark.get('objectId') && (!originalSeed || seed.equals(originalSeed))) {
       return false
     }
-    if (folderToObjectId[site.get('folderId')]) { return false }
-    return syncUtil.isSyncable('bookmark', site)
-  }
-  const syncBookmark = (site) => {
-    const siteJS = site.toJS()
 
-    const parentFolderId = site.get('parentFolderId')
+    // If this this exists, then we must have synced it; see below:
+    return !folderToObjectId[bookmark.get('folderId')]
+  }
+
+  const syncBookmark = (bookmark, appState) => {
+    const bookmarkJS = bookmark.toJS()
+
+    const parentFolderId = bookmark.get('parentFolderId')
     if (typeof parentFolderId === 'number') {
       if (!folderToObjectId[parentFolderId]) {
-        const folderResult = siteUtil.getFolder(sites, parentFolderId)
-        if (folderResult) {
-          syncBookmark(folderResult[1])
+        const folderResult = bookmarkFoldersState.getFolder(appState, parentFolderId)
+        if (!folderResult.isEmpty()) {
+          syncBookmark(folderResult, appState)
         }
       }
-      siteJS.parentFolderObjectId = folderToObjectId[parentFolderId]
+      bookmarkJS.parentFolderObjectId = folderToObjectId[parentFolderId]
     }
 
-    const record = syncUtil.createSiteData(siteJS, appState)
-    const folderId = site.get('folderId')
+    const record = syncUtil.createBookmarkData(bookmarkJS, appState)
+    const folderId = bookmark.get('folderId')
     if (typeof folderId === 'number') {
       folderToObjectId[folderId] = record.objectId
     }
@@ -313,12 +324,21 @@ module.exports.onSyncReady = (isFirstRun, e) => {
   }
 
   // Sync bookmarks that have not been synced yet.
-  sites.forEach((site) => {
-    if (shouldSyncBookmark(site) !== true) {
-      return
-    }
-    syncBookmark(site)
-  })
+  const syncBookmarkFolder = (parentFolderId, appState) => {
+    const bookmarks = bookmarksState.getBookmarksWithFolders(appState, parentFolderId)
+    bookmarks.forEach((bookmark) => {
+      if (shouldSyncBookmark(bookmark) === true) {
+        syncBookmark(bookmark, appState)
+      }
+      if (bookmarkFoldersUtil.isFolder(bookmark)) {
+        syncBookmarkFolder(bookmark.get('folderId'), appState)
+      }
+    })
+  }
+  // Sync bookmarks starting from the top level.
+  syncBookmarkFolder(0, appState)
+  // Other bookmarks
+  syncBookmarkFolder(-1, appState)
   sendSyncRecords(e.sender, writeActions.CREATE, bookmarksToSync)
 
   // Sync site settings that have not been synced yet
@@ -326,7 +346,7 @@ module.exports.onSyncReady = (isFirstRun, e) => {
   // might not be synced.
   const siteSettings =
     appState.get('siteSettings').filter((value, key) => {
-      return !value.get('objectId') && syncUtil.isSyncable('siteSetting', value)
+      return !value.get('objectId') && syncUtil.isSyncableSiteSetting(value)
     }).toJS()
   if (siteSettings) {
     const siteSettingsData = Object.keys(siteSettings).map((item) => {
@@ -489,8 +509,8 @@ module.exports.init = function (appState) {
       return
     }
     if (!bookmarksToolbarShown && isFirstRun) {
-      // syncing for the first time
-      const bookmarks = siteUtil.getBookmarks(AppStore.getState().get('sites'))
+      // syncing for the first time -- show toolbar if we were fresh and just added some bookmarks via Sync
+      const bookmarks = bookmarksState.getBookmarksWithFolders(AppStore.getState())
       if (!bookmarks.size) {
         for (const record of records) {
           if (record && record.objectData === 'bookmark') {

@@ -22,9 +22,9 @@ const tabState = require('../../../common/state/tabState')
 // Utils
 const cx = require('../../../../js/lib/classSet')
 const {isPotentialPhishingUrl} = require('../../../../js/lib/urlutil')
-const siteUtil = require('../../../../js/state/siteUtil')
 const isLinux = require('../../../common/lib/platformUtil').isLinux()
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
+const urlUtil = require('../../../../js/lib/urlutil')
 
 // Styles
 const globalStyles = require('../styles/global')
@@ -39,14 +39,14 @@ class SiteInfo extends React.Component {
   }
 
   onAllowRunInsecureContent () {
-    appActions.changeSiteSetting(siteUtil.getOrigin(this.props.location),
+    appActions.changeSiteSetting(urlUtil.getOrigin(this.props.location),
       'runInsecureContent', true, this.props.isPrivate)
     appActions.loadURLRequested(this.props.activeTabId, this.props.location)
     this.onHide()
   }
 
   onDenyRunInsecureContent () {
-    appActions.removeSiteSetting(siteUtil.getOrigin(this.props.location),
+    appActions.removeSiteSetting(urlUtil.getOrigin(this.props.location),
       'runInsecureContent', this.props.isPrivate)
     appActions.loadURLRequested(this.props.activeTabId, this.props.location)
     this.onHide()

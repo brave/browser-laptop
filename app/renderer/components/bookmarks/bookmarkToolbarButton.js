@@ -15,17 +15,21 @@ const windowActions = require('../../../../js/actions/windowActions')
 const appActions = require('../../../../js/actions/appActions')
 const bookmarkActions = require('../../../../js/actions/bookmarkActions')
 
+// State
+const bookmarksState = require('../../../common/state/bookmarksState')
+
 // Constants
 const dragTypes = require('../../../../js/constants/dragTypes')
 const {iconSize} = require('../../../../js/constants/config')
+const siteTags = require('../../../../js/constants/siteTags')
 
 // Utils
-const siteUtil = require('../../../../js/state/siteUtil')
 const {getCurrentWindowId} = require('../../currentWindow')
 const dnd = require('../../../../js/dnd')
 const cx = require('../../../../js/lib/classSet')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const bookmarkUtil = require('../../../common/lib/bookmarkUtil')
+const bookmarkFoldersUtil = require('../../../common/lib/bookmarkFoldersUtil')
 
 // Styles
 const globalStyles = require('../styles/global')
@@ -88,7 +92,8 @@ class BookmarkToolbarButton extends React.Component {
     dnd.onDragStart(dragTypes.BOOKMARK, Immutable.fromJS({
       location: this.props.location,
       title: this.props.title,
-      bookmarkKey: this.props.bookmarkKey
+      key: this.props.bookmarkKey,
+      type: this.props.isFolder ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK
     }), e)
   }
 
@@ -145,11 +150,11 @@ class BookmarkToolbarButton extends React.Component {
     if (e) {
       e.stopPropagation()
     }
-    windowActions.onSiteDetailMenu(this.props.bookmarkKey)
+    windowActions.onSiteDetailMenu(this.props.bookmarkKey, this.props.isFolder ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK)
   }
 
   clickBookmarkItem (e) {
-    return bookmarkActions.clickBookmarkItem(this.props.bookmarkKey, this.props.tabId, e)
+    return bookmarkActions.clickBookmarkItem(this.props.bookmarkKey, this.props.tabId, this.props.isFolder, e)
   }
 
   showBookmarkFolderMenu (e) {
@@ -171,7 +176,8 @@ class BookmarkToolbarButton extends React.Component {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const bookmarkKey = ownProps.bookmarkKey
-    const bookmark = state.getIn(['sites', bookmarkKey], Immutable.Map())
+    let bookmark = bookmarksState.findBookmark(state, bookmarkKey)
+
     const draggingOverData = bookmarkUtil.getDNDBookmarkData(state, bookmarkKey)
 
     const props = {}
@@ -179,19 +185,19 @@ class BookmarkToolbarButton extends React.Component {
     props.showFavicon = bookmarkUtil.showFavicon()
     props.showOnlyFavicon = bookmarkUtil.showOnlyFavicon()
     props.favIcon = bookmark.get('favicon')
-    props.title = bookmark.get('customTitle', bookmark.get('title'))
+    props.title = bookmark.get('title')
     props.location = bookmark.get('location')
-    props.isFolder = siteUtil.isFolder(bookmark)
+    props.isFolder = bookmarkFoldersUtil.isFolder(bookmark)
     props.isDraggingOverLeft = draggingOverData.get('draggingOverLeftHalf', false)
     props.isDraggingOverRight = draggingOverData.get('draggingOverRightHalf', false)
     props.isExpanded = draggingOverData.get('expanded', false)
-    props.isDragging = state.getIn(['dragData', 'data', 'bookmarkKey']) === bookmarkKey
+    props.isDragging = state.getIn(['dragData', 'data', 'key']) === bookmarkKey
 
     // used in other function
     props.bookmarkKey = bookmarkKey
     props.activeFrameKey = activeFrame.get('key')
     props.tabId = activeFrame.get('tabId')
-    props.contextMenuDetail = !!currentWindow.get('contextMenuDetail')
+    props.contextMenuDetail = currentWindow.has('contextMenuDetail')
     props.selectedFolderId = currentWindow.getIn(['ui', 'bookmarksToolbar', 'selectedFolderId'])
     props.folderId = bookmark.get('folderId')
 

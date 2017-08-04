@@ -225,6 +225,7 @@ class Tab extends React.Component {
     const partition = typeof frame.get('partitionNumber') === 'string'
       ? frame.get('partitionNumber').replace(/^partition-/i, '')
       : frame.get('partitionNumber')
+    const tabId = frame.get('tabId', tabState.TAB_ID_NONE)
 
     const props = {}
     // used in renderer
@@ -234,7 +235,7 @@ class Tab extends React.Component {
     props.notificationBarActive = notificationBarActive
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, props.frameKey)
     props.tabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
-    props.isPinnedTab = frameStateUtil.isPinned(currentWindow, props.frameKey)
+    props.isPinnedTab = tabState.isTabPinned(state, tabId)
     props.canPlayAudio = tabContentState.canPlayAudio(currentWindow, props.frameKey)
     props.themeColor = tabContentState.getThemeColor(currentWindow, props.frameKey)
     props.isNarrowView = tabContentState.isNarrowView(currentWindow, props.frameKey)
@@ -256,7 +257,7 @@ class Tab extends React.Component {
     props.totalTabs = state.get('tabs').size
     props.dragData = state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')
     props.hasTabInFullScreen = tabContentState.hasTabInFullScreen(currentWindow)
-    props.tabId = frame.get('tabId', tabState.TAB_ID_NONE)
+    props.tabId = tabId
 
     return props
   }

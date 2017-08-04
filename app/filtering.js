@@ -27,12 +27,12 @@ const dialog = electron.dialog
 const app = electron.app
 const uuid = require('uuid')
 const path = require('path')
-const getOrigin = require('../js/state/siteUtil').getOrigin
+const getOrigin = require('../js/lib/urlutil').getOrigin
 const {adBlockResourceName} = require('./adBlock')
 const {updateElectronDownloadItem} = require('./browser/electronDownloadItem')
 const {fullscreenOption} = require('./common/constants/settingsEnums')
 const isThirdPartyHost = require('./browser/isThirdPartyHost')
-var extensionState = require('./common/state/extensionState.js')
+const extensionState = require('./common/state/extensionState')
 const {cookieExceptions, refererExceptions} = require('../js/data/siteHacks')
 
 let appStore = null

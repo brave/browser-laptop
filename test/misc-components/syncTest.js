@@ -3,7 +3,6 @@
 const crypto = require('crypto')
 const settings = require('../../js/constants/settings')
 const {newTabMode} = require('../../app/common/constants/settingsEnums')
-const siteTags = require('../../js/constants/siteTags')
 const Brave = require('../lib/brave')
 const Immutable = require('immutable')
 const {adsBlockedControl, allowAllCookiesOption, bookmarksToolbar, braveMenu, braveryPanel, braveryPanelContainer, cookieControl, doneButton, fpSwitch, httpsEverywhereSwitch, navigatorBookmarked, navigatorNotBookmarked, noScriptSwitch, urlInput, removeButton, safeBrowsingSwitch, showAdsOption, syncTab, syncSwitch, bookmarkNameInput} = require('../lib/selectors')
@@ -405,8 +404,7 @@ describe('Syncing bookmarks', function () {
     const folder2Id = 2 // XXX: Hardcoded
     yield Brave.app.client
     yield bookmarkUrl(this.folder2Page1Url, this.folder2Page1Title, folder2Id)
-    yield Brave.app.client
-      .removeSite({ folderId: folder2Id }, siteTags.BOOKMARK_FOLDER)
+    yield Brave.app.client.removeBookmarkFolder(folder2Id)
 
     // XXX: Wait for sync to upload records to S3
     yield Brave.app.client.pause(1000)
@@ -444,7 +442,7 @@ describe('Syncing bookmarks', function () {
   })
 
   it('create bookmark in folder', function * () {
-    const pageNthChild = 2 // TODO: This should be 1. See https://github.com/brave/sync/issues/104
+    const pageNthChild = 1
     const folderTitle = this.folder1Title
     const pageTitle = this.folder1Page1Title
     const folder = `[data-test-id="bookmarkToolbarButton"][title="${folderTitle}"]`
@@ -456,7 +454,7 @@ describe('Syncing bookmarks', function () {
   })
 
   it('update bookmark, moving it into the folder', function * () {
-    const pageNthChild = 1 // TODO: This should be 2
+    const pageNthChild = 2
     const folderTitle = this.folder1Title
     const pageTitle = this.folder1Page2Title
     const folder = `[data-test-id="bookmarkToolbarButton"][title="${folderTitle}"]`
@@ -538,6 +536,7 @@ describe('Syncing bookmarks from an existing profile', function () {
       .click(navigatorBookmarked)
       .waitForVisible(doneButton)
       .waitForInputText(bookmarkNameInput, this.page2TitleUpdated)
+      .click(doneButton)
 
     // Create folder then add a bookmark
     yield addBookmarkFolder(this.folder1Title)
@@ -599,7 +598,7 @@ describe('Syncing bookmarks from an existing profile', function () {
   })
 
   it('create bookmark in folder', function * () {
-    const pageNthChild = 2 // TODO: This should be 1
+    const pageNthChild = 1
     const folderTitle = this.folder1Title
     const pageTitle = this.folder1Page1Title
     const folder = `[data-test-id="bookmarkToolbarButton"][title="${folderTitle}"]`
@@ -611,7 +610,7 @@ describe('Syncing bookmarks from an existing profile', function () {
   })
 
   it('update bookmark, moving it into the folder', function * () {
-    const pageNthChild = 1 // TODO: This should be 2
+    const pageNthChild = 2
     const folderTitle = this.folder1Title
     const pageTitle = this.folder1Page2Title
     const folder = `[data-test-id="bookmarkToolbarButton"][title="${folderTitle}"]`
@@ -673,7 +672,7 @@ describe('Syncing history', function () {
       .tabByIndex(0)
       .loadUrl(this.page1Url)
       .windowParentByUrl(this.page1Url)
-      .waitForSiteEntry(this.page1Url)
+      .waitForHistoryEntry(this.page1Url)
 
     // For order: Visit page 2
     yield Brave.app.client
@@ -1018,12 +1017,14 @@ describe('Syncing then turning it off, then turning it on sends new records', fu
       .waitUntil(checkBookmark(this.folder1Title))
   })
 
-  it('history', function * () {
-    yield Brave.app.client
-      .tabByIndex(0)
-      .waitForElementCount('table.sortableTable tbody tr', 1)
-      .waitForVisible(`table.sortableTable td.title[data-sort="${this.page1Title}"]`)
-  })
+  // TODO: Decide whether history generated while browsing w/o sync should
+  // be synced when re-enabling. We don't do this currently.
+  // it('history', function * () {
+  //   yield Brave.app.client
+  //     .tabByIndex(0)
+  //     .waitForElementCount('table.sortableTable tbody tr', 1)
+  //     .waitForVisible(`table.sortableTable td.title[data-sort="${this.page1Title}"]`)
+  // })
 
   it('site setting', function * () {
     const hostPattern1 = this.hostPattern1
