@@ -241,21 +241,22 @@ const globalStyles = {
     prefsPanelHeading: '23px'
   },
   appIcons: {
+    angleDoubleRight: 'fa fa-angle-double-right',
     clipboard: 'fa fa-clipboard',
     closeTab: 'fa fa-times-circle',
     defaultIcon: 'fa fa-file-o',
+    exclude: 'fa fa-ban',
+    findNext: 'fa fa-caret-down',
+    findPrev: 'fa fa-caret-up',
     loading: 'fa fa-spinner fa-spin',
+    moreInfo: 'fa fa-info-circle',
     private: 'fa fa-eye',
+    question: 'fa fa-question-circle',
     refresh: 'fa fa-refresh',
     remove: 'fa fa-times',
-    volumeOff: 'fa fa-volume-off',
-    volumeOn: 'fa fa-volume-up',
-    exclude: 'fa fa-ban',
     trash: 'fa fa-trash',
-    moreInfo: 'fa fa-info-circle',
-    angleDoubleRight: 'fa fa-angle-double-right',
-    findPrev: 'fa fa-caret-up',
-    findNext: 'fa fa-caret-down'
+    volumeOff: 'fa fa-volume-off',
+    volumeOn: 'fa fa-volume-up'
   },
   animations: {
     subtleShowUp: {

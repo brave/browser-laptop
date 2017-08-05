@@ -497,8 +497,7 @@ class BraveryPanel extends React.Component {
                 <div data-l10n-id='adControl' className={css(
                   !this.props.shieldsUp && styles.braveryPanel__body__advanced__control__forms__title_disabled,
                   gridStyles.row1col1,
-                  !this.props.isCompactBraveryPanel && styles.braveryPanel__body__advanced__control__forms__title,
-                  this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__title
+                  styles.braveryPanel__body__advanced__control__forms__title
                 )} />
 
                 <div className={css(
@@ -541,9 +540,8 @@ class BraveryPanel extends React.Component {
                 <div data-l10n-id='cookieControl' className={css(
                   !this.props.shieldsUp && styles.braveryPanel__body__advanced__control__forms__title_disabled,
                   !this.props.isCompactBraveryPanel && gridStyles.row1col2,
-                  !this.props.isCompactBraveryPanel && styles.braveryPanel__body__advanced__control__forms__title,
                   this.props.isCompactBraveryPanel && gridStyles.row3col1,
-                  this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__title
+                  styles.braveryPanel__body__advanced__control__forms__title
                 )} />
 
                 <div className={css(
@@ -560,26 +558,19 @@ class BraveryPanel extends React.Component {
                   </BraveryPanelDropdown>
                 </div>
 
-                <div data-l10n-id='fingerprintingProtection' className={css(
+                <div className={css(
                   !this.props.shieldsUp && styles.braveryPanel__body__advanced__control__forms__title_disabled,
                   !this.props.isCompactBraveryPanel && gridStyles.row3col2,
-                  !this.props.isCompactBraveryPanel && styles.braveryPanel__body__advanced__control__forms__title,
                   this.props.isCompactBraveryPanel && gridStyles.row5col1,
-                  this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__title
-                )} />
-                <span className={cx({
-                  [css(gridStyles.row3col2)]: !this.props.isCompactBraveryPanel,
-                  [css(gridStyles.row5col1)]: this.props.isCompactBraveryPanel,
-                  [css(styles.braveryPanel__body__advanced__control__forms__title_disabled)]: !this.props.shieldsUp,
-                  [css(styles.braveryPanel_compact__body__advanced__control__forms__title)]: this.props.isCompactBraveryPanel,
-                  [css(styles.braveryPanel__body__advanced__control__forms__title)]: !this.props.isCompactBraveryPanel,
-                  fa: true,
-                  pullRight: true,
-                  'fa-question-circle': true
-                })}
-                  title={config.fingerprintingInfoUrl}
-                  onClick={this.onInfoClick}
-                />
+                  styles.braveryPanel__body__advanced__control__fpWrapper,
+                  styles.braveryPanel__body__advanced__control__forms__title
+                )}>
+                  <span data-l10n-id='fingerprintingProtection' />
+                  <span className={globalStyles.appIcons.question}
+                    title={config.fingerprintingInfoUrl}
+                    onClick={this.onInfoClick}
+                  />
+                </div>
 
                 <div className={css(
                   !this.props.shieldsUp && styles.braveryPanel__body__advanced__control__forms__dropdown_disabled,
@@ -616,7 +607,6 @@ class BraveryPanel extends React.Component {
           }
           <hr className={css(
             styles.braveryPanel__body__hr,
-            styles.braveryPanel__body__hr_splitter,
             this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__hr
           )} />
           <div className={css(
@@ -720,6 +710,10 @@ const gridStyles = StyleSheet.create({
   },
   row8col1: {
     gridRow: 8,
+    gridColumn: 1
+  },
+  row9col1: {
+    gridRow: 9,
     gridColumn: 1
   }
 })
@@ -916,10 +910,7 @@ const styles = StyleSheet.create({
     background: globalStyles.braveryPanel.body.hr.background,
     border: 0,
     height: '1px',
-    margin: '10px 0'
-  },
-  braveryPanel__body__hr_splitter: {
-    marginTop: '30px'
+    margin: '1rem 0'
   },
   braveryPanel__body__footer: {
     display: 'flex',
@@ -981,14 +972,11 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexFlow: 'column nowrap'
   },
-  braveryPanel_compact__body__advanced__control__forms__title: {
-    margin: '0 0 .25rem .25rem'
-  },
   braveryPanel_compact__body__advanced__control__forms__dropdown: {
     marginBottom: '.75rem'
   },
   braveryPanel_compact__body__advanced__control__switchControl: {
-    padding: '5px 0 5px .25rem'
+    padding: '5px .25rem'
   },
   braveryPanel_compact__body__footer: {
     padding: '0 .25rem'
@@ -1004,14 +992,18 @@ const styles = StyleSheet.create({
     margin: '15px 10px'
   },
   braveryPanel__body__advanced__control__forms__title: {
-    marginBottom: '4px',
-    marginLeft: '8px'
+    margin: '0 .25rem .25rem .25rem'
   },
   braveryPanel__body__advanced__control__forms__title_disabled: {
     opacity: 0.3
   },
   braveryPanel__body__advanced__control__forms__dropdown_disabled: {
     opacity: 0.3
+  },
+  braveryPanel__body__advanced__control__fpWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between'
   },
   braveryPanel__body__advanced__control__switchControl__infoButton: {
     display: 'inline',
