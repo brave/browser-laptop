@@ -532,13 +532,42 @@ module.exports.runPreMigrations = (data) => {
       data.autofill.creditCards.guid = guids
     }
   }
-  // xml migration
   if (data.settings) {
+    // xml migration
     if (data.settings[settings.DEFAULT_SEARCH_ENGINE] === 'content/search/google.xml') {
       data.settings[settings.DEFAULT_SEARCH_ENGINE] = 'Google'
     }
     if (data.settings[settings.DEFAULT_SEARCH_ENGINE] === 'content/search/duckduckgo.xml') {
       data.settings[settings.DEFAULT_SEARCH_ENGINE] = 'DuckDuckGo'
+    }
+    // ledger payments migration. see PR #10164
+    // changes was introduced in 0.21.x.
+    // if legacy setting exist, make sure the new setting inherits the legacy value
+    if (data.settings[settings.AUTO_SUGGEST_SITES] != null) {
+      data.settings[settings.PAYMENTS_SITES_AUTO_SUGGEST] = data.settings[settings.AUTO_SUGGEST_SITES]
+      delete data.settings[settings.AUTO_SUGGEST_SITES]
+    }
+    if (data.settings[settings.MINIMUM_VISIT_TIME] != null) {
+      data.settings[settings.PAYMENTS_MINIMUM_VISIT_TIME] = data.settings[settings.MINIMUM_VISIT_TIME]
+      delete data.settings[settings.MINIMUM_VISIT_TIME]
+    }
+    if (data.settings[settings.MINIMUM_VISITS] != null) {
+      data.settings[settings.PAYMENTS_MINIMUM_VISITS] = data.settings[settings.MINIMUM_VISITS]
+      delete data.settings[settings.MINIMUM_VISITS]
+    }
+    if (data.settings[settings.HIDE_LOWER_SITES] != null) {
+      data.settings[settings.PAYMENTS_SITES_SHOW_LESS] = data.settings[settings.HIDE_LOWER_SITES]
+      delete data.settings[settings.HIDE_LOWER_SITES]
+    }
+    if (data.settings[settings.HIDE_EXCLUDED_SITES] != null) {
+      data.settings[settings.PAYMENTS_SITES_HIDE_EXCLUDED] = data.settings[settings.HIDE_EXCLUDED_SITES]
+      delete data.settings[settings.HIDE_EXCLUDED_SITES]
+    }
+    // PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED kept the same
+    // constant but has its value changed.
+    if (data.settings['payments.notificationTryPaymentsDismissed'] != null) {
+      data.settings[settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED] = data.settings['payments.notificationTryPaymentsDismissed']
+      delete data.settings['payments.notificationTryPaymentsDismissed']
     }
   }
 
