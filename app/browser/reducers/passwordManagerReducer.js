@@ -102,8 +102,8 @@ const savePassword = (username, origin, tabId) => {
     // Notification not shown already
     appActions.showNotification({
       buttons: [
-        {text: locale.translation('yes')},
-        {text: locale.translation('no')},
+        {text: locale.translation('allow')},
+        {text: locale.translation('deny')},
         {text: locale.translation('neverForThisSite')}
       ],
       options: {
@@ -149,8 +149,8 @@ const updatePassword = (username, origin, tabId) => {
     // Notification not shown already
     appActions.showNotification({
       buttons: [
-        {text: locale.translation('yes')},
-        {text: locale.translation('no')}
+        {text: locale.translation('allow')},
+        {text: locale.translation('deny')}
       ],
       options: {
         persist: false,

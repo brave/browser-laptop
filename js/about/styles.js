@@ -294,8 +294,8 @@ class AboutStyle extends ImmutableComponent {
         <BrowserButton groupedItem secondaryColor notificationItem l10nId='notificationItem' onClick={this.onEnableAutoplay} />
         <BrowserButton groupedItem secondaryColor notificationItem l10nId='notificationItem' onClick={this.onEnableAutoplay} />
         <Pre><Code>
-          &lt;BrowserButton groupedItem secondaryColor notificationItem l10nId='Yes' onClick={'{this.onEnableAutoplay}'} />{'\n'}
-          &lt;BrowserButton groupedItem secondaryColor notificationItem l10nId='No' onClick={'{this.onEnableAutoplay}'} />
+          &lt;BrowserButton groupedItem secondaryColor notificationItem l10nId='Allow' onClick={'{this.onEnableAutoplay}'} />{'\n'}
+          &lt;BrowserButton groupedItem secondaryColor notificationItem l10nId='Deny' onClick={'{this.onEnableAutoplay}'} />
         </Code></Pre>
 
         <BrowserButton iconOnly iconClass={globalStyles.appIcons.moreInfo} size='30px' color='rebeccapurple' />
