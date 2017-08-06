@@ -7,13 +7,38 @@ const Immutable = require('immutable')
 module.exports.hasDragData = (dataTransfer, dragType) => {
   return dataTransfer.types.includes(`application/x-brave-${dragType}`)
 }
+// Construct a pipe-delimited bookmark key from the bookmark's main identifiers.
+module.exports.setBookmarkKey = ({
+  location, parentFolderId, partitionNumber
+}) => {
+  return [location, partitionNumber, parentFolderId].join('|')
+}
 
-module.exports.getDragData = (dataTransfer, dragType) => {
+// Return the last item, the parentFolderId, from the pipe-delimited key.
+module.exports.getBookmarkKeyFolderId = (key) => {
+  const keySplit = key.split('|')
+  return keySplit[keySplit.length - 1]
+}
+// Get data from a drag event, e.g. drag of a bookmark between folders.
+module.exports.getDragData = function(dataTransfer, dragType) {
+  // Get the bookmark's data from the event.
   const data = dataTransfer.getData(`application/x-brave-${dragType}`)
+  // Validate.
   if (!data) {
+    // If invalid, exit w/ undefined (or falsey value?).
     return undefined
   }
-  return Immutable.fromJS(JSON.parse(data))
+  // If valid, parse data to get bookmark and its identifiers.
+  const bookmark = JSON.parse(data)
+  const { key, parentFolderId } = bookmark
+  const keyFolderId = this.getBookmarkKeyFolderId(key)
+  // Reset to correct key if key's parentFolderId set to top-level folder,
+  // not actual parent folder ID.
+  if (parentFolderId !== keyFolderId) {
+    bookmark.key = this.setBookmarkKey(bookmark)
+  }
+  // Return the bookmark as an immutable object.
+  return Immutable.fromJS(bookmark)
 }
 
 module.exports.setupDataTransferURL = (dataTransfer, location, title) => {
