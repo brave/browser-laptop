@@ -32,7 +32,7 @@ class LedgerTable extends ImmutableComponent {
   }
 
   showAll (value) {
-    this.props.onChangeSetting(settings.HIDE_LOWER_SITES, value)
+    this.props.onChangeSetting(settings.PAYMENTS_SITES_SHOW_LESS, value)
   }
 
   getFormattedTime (synopsis) {
@@ -69,7 +69,7 @@ class LedgerTable extends ImmutableComponent {
         return result
       }
     }
-    return getSetting(settings.AUTO_SUGGEST_SITES, this.props.settings)
+    return getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST, this.props.settings)
   }
 
   shouldShow (synopsis) {
@@ -233,7 +233,7 @@ class LedgerTable extends ImmutableComponent {
     }
 
     const allRows = this.synopsis.filter(synopsis => {
-      return (!getSetting(settings.HIDE_EXCLUDED_SITES, this.props.settings) || this.enabledForSite(synopsis)) &&
+      return (!getSetting(settings.PAYMENTS_SITES_HIDE_EXCLUDED, this.props.settings) || this.enabledForSite(synopsis)) &&
         this.shouldShow(synopsis)
     })
     const pinnedRows = allRows.filter(synopsis => {
@@ -244,9 +244,9 @@ class LedgerTable extends ImmutableComponent {
     })
 
     const totalUnPinnedRows = unPinnedRows.size
-    const hideLower = getSetting(settings.HIDE_LOWER_SITES, this.props.settings)
+    const showLess = getSetting(settings.PAYMENTS_SITES_SHOW_LESS, this.props.settings)
 
-    if (hideLower && totalUnPinnedRows > 10) {
+    if (showLess && totalUnPinnedRows > 10) {
       let sumUnPinned = 0
       let threshold = 90
       const limit = 0.9 // show only 90th of publishers
@@ -258,7 +258,7 @@ class LedgerTable extends ImmutableComponent {
       })
     }
 
-    const showButton = (hideLower && totalUnPinnedRows !== unPinnedRows.size) || (!hideLower && totalUnPinnedRows > 10)
+    const showButton = (showLess && totalUnPinnedRows !== unPinnedRows.size) || (!showLess && totalUnPinnedRows > 10)
 
     return <section data-test-id='ledgerTable'>
       <div className={css(styles.hideExcludedSites)}>
@@ -266,7 +266,7 @@ class LedgerTable extends ImmutableComponent {
         <div className={css(styles.rightColumn)}>
           <SettingCheckbox small
             dataL10nId='hideExcluded'
-            prefKey={settings.HIDE_EXCLUDED_SITES}
+            prefKey={settings.PAYMENTS_SITES_HIDE_EXCLUDED}
             settings={this.props.settings}
             onChangeSetting={this.props.onChangeSetting}
           />
@@ -306,9 +306,9 @@ class LedgerTable extends ImmutableComponent {
         showButton
         ? <div className={css(styles.ledgerTable__showAllWrap)}>
           <BrowserButton secondaryColor
-            testId={hideLower ? 'showAll' : 'hideLower'}
-            l10nId={hideLower ? 'showAll' : 'hideLower'}
-            onClick={this.showAll.bind(this, !hideLower)}
+            testId={showLess ? 'showAll' : 'showLess'}
+            l10nId={showLess ? 'showAll' : 'showLess'}
+            onClick={this.showAll.bind(this, !showLess)}
           />
         </div>
         : null

@@ -204,21 +204,21 @@ const doAction = (state, action) => {
           setPaymentInfo(action.value)
           break
 
-        case settings.MINIMUM_VISIT_TIME:
+        case settings.PAYMENTS_MINIMUM_VISIT_TIME:
           if (action.value <= 0) break
 
           synopsis.options.minPublisherDuration = action.value
           updatePublisherInfo()
           break
 
-        case settings.MINIMUM_VISITS:
+        case settings.PAYMENTS_MINIMUM_VISITS:
           if (action.value <= 0) break
 
           synopsis.options.minPublisherVisits = action.value
           updatePublisherInfo()
           break
 
-        case settings.PAYMENTS_NON_VERIFIED:
+        case settings.PAYMENTS_ALLOW_NON_VERIFIED:
           synopsis.options.showOnlyVerified = action.value
           updatePublisherInfo()
           break
@@ -666,7 +666,7 @@ eventStore.addChangeListener(() => {
     synopsis.initPublisher(publisher)
     if (initP) {
       excludeP(publisher, (unused, exclude) => {
-        if (!getSetting(settings.AUTO_SUGGEST_SITES)) {
+        if (!getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)) {
           exclude = false
         } else {
           exclude = !exclude
@@ -800,19 +800,19 @@ var enable = (paymentsEnabled) => {
       var value
 
       // cf., the `Synopsis` constructor, https://github.com/brave/ledger-publisher/blob/master/index.js#L167
-      value = getSetting(settings.MINIMUM_VISIT_TIME)
+      value = getSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME)
       if (!value) {
         value = 8 * 1000
-        appActions.changeSetting(settings.MINIMUM_VISIT_TIME, value)
+        appActions.changeSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME, value)
       }
 
       // for earlier versions of the code...
       if ((value > 0) && (value < 1000)) synopsis.options.minPublisherDuration = value * 1000
 
-      value = getSetting(settings.MINIMUM_VISITS)
+      value = getSetting(settings.PAYMENTS_MINIMUM_VISITS)
       if (!value) {
         value = 1
-        appActions.changeSetting(settings.MINIMUM_VISITS, value)
+        appActions.changeSetting(settings.PAYMENTS_MINIMUM_VISITS, value)
       }
       if (value > 0) synopsis.options.minPublisherVisits = value
 
@@ -1054,7 +1054,7 @@ var stickyP = (publisher) => {
 
 var eligibleP = (publisher) => {
   if (!synopsis.options.minPublisherDuration && process.env.NODE_ENV !== 'test') {
-    synopsis.options.minPublisherDuration = getSetting(settings.MINIMUM_VISIT_TIME)
+    synopsis.options.minPublisherDuration = getSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME)
   }
 
   return ((synopsis.publishers[publisher].scores[synopsis.options.scorekeeper] > 0) &&
@@ -1064,7 +1064,7 @@ var eligibleP = (publisher) => {
 
 var visibleP = (publisher) => {
   if (synopsis.options.showOnlyVerified === undefined) {
-    synopsis.options.showOnlyVerified = getSetting(settings.PAYMENTS_NON_VERIFIED)
+    synopsis.options.showOnlyVerified = getSetting(settings.PAYMENTS_ALLOW_NON_VERIFIED)
   }
 
   const publisherOptions = synopsis.publishers[publisher].options
