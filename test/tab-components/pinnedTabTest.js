@@ -168,6 +168,7 @@ describe('pinnedTabs', function () {
       yield setup(this.app.client)
       this.page1 = Brave.server.url('page1.html')
       yield this.app.client
+        .activateURLMode()
         .newTab({ url: this.page1 })
         .waitForUrl(this.page1)
         .windowByUrl(Brave.browserWindowUrl)
