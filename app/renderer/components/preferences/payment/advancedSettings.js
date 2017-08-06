@@ -34,8 +34,8 @@ class AdvancedSettingsContent extends ImmutableComponent {
           <SettingItem>
             <SettingDropdown
               data-test-id='durationSelector'
-              defaultValue={minPublisherDuration || appConfig.defaultSettings[settings.MINIMUM_VISIT_TIME]}
-              onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.MINIMUM_VISIT_TIME)}>
+              defaultValue={minPublisherDuration || appConfig.defaultSettings[settings.PAYMENTS_MINIMUM_VISIT_TIME]}
+              onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_MINIMUM_VISIT_TIME)}>
               <option data-l10n-id='minimumPageTimeLow' value='5000' />
               <option data-l10n-id='minimumPageTimeMedium' value='8000' />
               <option data-l10n-id='minimumPageTimeHigh' value='60000' />
@@ -73,7 +73,7 @@ class AdvancedSettingsContent extends ImmutableComponent {
           <SettingCheckbox
             dataTestId='payment-advance-nonverified'
             dataL10nId='nonVerifiedPublishers'
-            prefKey={settings.PAYMENTS_NON_VERIFIED}
+            prefKey={settings.PAYMENTS_ALLOW_NON_VERIFIED}
             settings={this.props.settings}
             onChangeSetting={this.props.onChangeSetting}
             className={css(styles.listItem, commonStyles.noMarginBottom)}

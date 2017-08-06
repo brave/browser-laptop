@@ -964,7 +964,13 @@ describe('sessionStore unit tests', function () {
           creditCards: ['guid1', 'guid2']
         },
         settings: {
-          [settings.DEFAULT_SEARCH_ENGINE]: 'content/search/google.xml'
+          [settings.DEFAULT_SEARCH_ENGINE]: 'content/search/google.xml',
+          [settings.AUTO_SUGGEST_SITES]: 'sure thing',
+          [settings.MINIMUM_VISIT_TIME]: 'almost instantly',
+          [settings.MINIMUM_VISITS]: 'a million',
+          [settings.HIDE_LOWER_SITES]: 'pls do it',
+          [settings.HIDE_EXCLUDED_SITES]: 'no thanks',
+          'payments.notificationTryPaymentsDismissed': 'why would I?'
         }
       }))
       runPreMigrations = sessionStore.runPreMigrations(data.toJS())
@@ -1014,6 +1020,47 @@ describe('sessionStore unit tests', function () {
           const output = sessionStore.runPreMigrations(dataCopy.toJS())
           const newValue = output.settings[settings.DEFAULT_SEARCH_ENGINE]
           assert.equal(newValue, 'DuckDuckGo')
+        })
+      })
+
+      describe('payments migration', function () {
+        it('sets PAYMENTS_SITES_AUTO_SUGGEST based on AUTO_SUGGEST_SITES', function () {
+          const oldValue = data.getIn(['settings', settings.AUTO_SUGGEST_SITES])
+          const newValue = runPreMigrations.settings[settings.PAYMENTS_SITES_AUTO_SUGGEST]
+          assert.equal(newValue, oldValue)
+        })
+        it('sets PAYMENTS_MINIMUM_VISIT_TIME based on MINIMUM_VISIT_TIME', function () {
+          const oldValue = data.getIn(['settings', settings.MINIMUM_VISIT_TIME])
+          const newValue = runPreMigrations.settings[settings.PAYMENTS_MINIMUM_VISIT_TIME]
+          assert.equal(newValue, oldValue)
+        })
+        it('sets PAYMENTS_MINIMUM_VISITS based on MINIMUM_VISITS', function () {
+          const oldValue = data.getIn(['settings', settings.MINIMUM_VISITS])
+          const newValue = runPreMigrations.settings[settings.PAYMENTS_MINIMUM_VISITS]
+          assert.equal(newValue, oldValue)
+        })
+        it('sets PAYMENTS_SITES_SHOW_LESS based on HIDE_LOWER_SITES', function () {
+          const oldValue = data.getIn(['settings', settings.HIDE_LOWER_SITES])
+          const newValue = runPreMigrations.settings[settings.PAYMENTS_SITES_SHOW_LESS]
+          assert.equal(newValue, oldValue)
+        })
+        it('sets PAYMENTS_SITES_HIDE_EXCLUDED based on HIDE_EXCLUDED_SITES', function () {
+          const oldValue = data.getIn(['settings', settings.HIDE_EXCLUDED_SITES])
+          const newValue = runPreMigrations.settings[settings.PAYMENTS_SITES_HIDE_EXCLUDED]
+          assert.equal(newValue, oldValue)
+        })
+        it('sets PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED based on payments.notificationTryPaymentsDismissed', function () {
+          const oldValue = data.getIn(['settings', 'payments.notificationTryPaymentsDismissed'])
+          const newValue = runPreMigrations.settings[settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED]
+          assert.equal(newValue, oldValue)
+        })
+        it('removes the old values', function () {
+          assert.equal(runPreMigrations.settings[settings.AUTO_SUGGEST_SITES], undefined)
+          assert.equal(runPreMigrations.settings[settings.MINIMUM_VISIT_TIME], undefined)
+          assert.equal(runPreMigrations.settings[settings.MINIMUM_VISITS], undefined)
+          assert.equal(runPreMigrations.settings[settings.HIDE_LOWER_SITES], undefined)
+          assert.equal(runPreMigrations.settings[settings.HIDE_EXCLUDED_SITES], undefined)
+          assert.equal(runPreMigrations.settings['payments.notificationTryPaymentsDismissed'], undefined)
         })
       })
     })

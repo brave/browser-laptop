@@ -8,6 +8,8 @@ const settings = require('./constants/settings')
 const {passwordManagers, defaultPasswordManager, extensionIds, displayNames} = require('./constants/passwordManagers')
 const {bookmarksToolbarMode} = require('../app/common/constants/settingsEnums')
 
+// individual settings were deprecated with 0.11.4
+// DO NOT ADD TO THIS LIST
 const passwordManagerDefault = (settingKey, settingsCollection) => {
   const onePasswordEnabled = resolveValue(settings.ONE_PASSWORD_ENABLED, settingsCollection) === true
   if (onePasswordEnabled) return passwordManagers.ONE_PASSWORD
@@ -18,18 +20,14 @@ const passwordManagerDefault = (settingKey, settingsCollection) => {
   const lastPassEnabled = resolveValue(settings.LAST_PASS_ENABLED, settingsCollection) === true
   if (lastPassEnabled) return passwordManagers.LAST_PASS
 
-  const enpassEnabled = resolveValue(settings.ENPASS_ENABLED, settingsCollection) === true
-  if (enpassEnabled) return passwordManagers.ENPASS
-
-  const bitwardenEnabled = resolveValue(settings.BITWARDEN_ENABLED, settingsCollection) === true
-  if (bitwardenEnabled) return passwordManagers.BITWARDEN
-
   const disabled = resolveValue(settings.PASSWORD_MANAGER_ENABLED, settingsCollection) === false
   if (disabled) return passwordManagers.UNMANAGED
 
   return defaultPasswordManager
 }
 
+// individual settings were deprecated with 0.12.6
+// DO NOT ADD TO THIS LIST
 const bookmarksBarDefault = (settingKey, settingsCollection) => {
   const faviconsOnly = resolveValue(settings.SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON, settingsCollection) === true
   if (faviconsOnly) return bookmarksToolbarMode.FAVICONS_ONLY

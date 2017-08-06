@@ -150,25 +150,9 @@ module.exports = {
     'privacy.autocomplete.history-size': 500,
     'privacy.block-canvas-fingerprinting': false,
     'bookmarks.toolbar.show': false,
-    'bookmarks.toolbar.showFavicon': false,
-    'bookmarks.toolbar.showOnlyFavicon': false,
-    'payments.enabled': false,
-    'payments.notifications': false,
-    'payments.allow-non-verified-publishers': true,
-    // "Add funds to your wallet" -- Limit to once every n days to reduce nagging.
-    'payments.notification-add-funds-timestamp': null,
-    // "Out of money, pls add" / "In 24h we'll pay publishers [Review]"
-    // After shown, set timestamp to next reconcile time - 1 day.
-    'payments.notification-reconcile-soon-timestamp': null,
-    'payments.notificationTryPaymentsDismissed': false, // True if you dismiss the message or enable Payments
-    'payments.contribution-amount': 5, // USD
     'privacy.autofill-enabled': true,
     'privacy.do-not-track': false,
     'security.passwords.active-password-manager': null, // Set in settings.js by passwordManagerDefault (defaults to built in)
-    'security.passwords.manager-enabled': true,
-    'security.passwords.one-password-enabled': false,
-    'security.passwords.dashlane-enabled': false,
-    'security.passwords.last-pass-enabled': false,
     'security.passwords.enpass-enabled': false,
     'security.passwords.bitwarden-enabled': false,
     'security.fullscreen.content': fullscreenOption.ALWAYS_ASK,
@@ -189,6 +173,23 @@ module.exports = {
     // have immersive mode w/ touch makes it too hard to enter a URL.
     // Tracking issue for that and to re-enable title mode on Windows is at #9900.
     'general.disable-title-mode': process.platform === 'linux' || process.platform === 'win32',
+    // payments
+    'payments.allow-non-verified-publishers': true,
+    'payments.contribution-amount': 5, // USD
+    'payments.enabled': false,
+    'payments.minimum-visit-time': 8000,
+    'payments.minimum-visits': 1,
+    // "Add funds to your wallet" -- Limit to once every n days to reduce nagging.
+    'payments.notification-add-funds-timestamp': null,
+    // "Out of money, pls add" / "In 24h we'll pay publishers [Review]"
+    // After shown, set timestamp to next reconcile time - 1 day.
+    'payments.notification-reconcile-soon-timestamp': null,
+    'payments.notification-try-payments-dismissed': false, // True if you dismiss the message or enable Payments
+    'payments.notifications': false,
+    'payments.sites-auto-suggest': true,
+    'payments.sites-hide-excluded': false,
+    'payments.sites-show-less': true,
+    // advanced
     'advanced.hardware-acceleration-enabled': true,
     'advanced.default-zoom-level': null,
     'advanced.pdfjs-enabled': true,
@@ -197,11 +198,6 @@ module.exports = {
     'advanced.send-crash-reports': true,
     'advanced.send-usage-statistics': false,
     'advanced.update-to-preview-releases': false,
-    'advanced.hide-excluded-sites': false,
-    'advanced.minimum-visit-time': 8000,
-    'advanced.minimum-visits': 1,
-    'advanced.auto-suggest-sites': true,
-    'advanced.hide-lower-sites': true,
     'advanced.toolbar-ui-scale': 'normal',
     'shutdown.clear-history': false,
     'shutdown.clear-downloads': false,
@@ -218,7 +214,34 @@ module.exports = {
     'general.bookmarks-toolbar-mode': null,
     'general.is-default-browser': null,
     'notification-add-funds-timestamp': null,
-    'notification-reconcile-soon-timestamp': null
+    'notification-reconcile-soon-timestamp': null,
+
+    // DEPRECATED settings
+    // DO NOT REMOVE OR CHANGE THESE VALUES
+    // ########################
+    // These values should only ever be references from ./settings.js
+    // Any place using those should have a migration to convert the value
+    // ########################
+
+    // START - DEPRECATED WITH 0.11.4
+    'security.passwords.manager-enabled': true,
+    'security.passwords.one-password-enabled': false,
+    'security.passwords.dashlane-enabled': false,
+    'security.passwords.last-pass-enabled': false,
+    // END - DEPRECATED WITH 0.11.4
+
+    // START - DEPRECATED WITH 0.12.6
+    'bookmarks.toolbar.showFavicon': false,
+    'bookmarks.toolbar.showOnlyFavicon': false,
+    // END - DEPRECATED WITH 0.12.6
+
+    // START - DEPRECATED WITH 0.21.0
+    'advanced.hide-excluded-sites': false,
+    'advanced.minimum-visit-time': 8000,
+    'advanced.minimum-visits': 1,
+    'advanced.auto-suggest-sites': true,
+    'advanced.hide-lower-sites': true
+    // END - DEPRECATED WITH 0.21.0
   },
   defaultFavicon: 'img/empty_favicon.png'
 }
