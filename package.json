@@ -91,6 +91,7 @@
     "clipboard-copy": "^1.0.0",
     "electron-localshortcut": "^0.6.0",
     "electron-squirrel-startup": "brave/electron-squirrel-startup",
+    "emoji-regex": "^6.5.1",
     "file-loader": "^0.8.5",
     "font-awesome": "^4.5.0",
     "font-awesome-webpack": "0.0.4",
