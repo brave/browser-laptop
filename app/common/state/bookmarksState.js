@@ -263,10 +263,6 @@ const bookmarksState = {
 
     // Move bookmark to destination folder.
     if (moveIntoParent || destinationItem.get('parentFolderId') !== bookmark.get('parentFolderId')) {
-      // Get the destination folder's ID.
-      const parentFolderId = destinationItem.get('type') === siteTags.BOOKMARK
-        ? destinationItem.get('parentFolderId')
-        : destinationItem.get('folderId')
       // Remove bookmark from cache.
       state = bookmarkOrderCache.removeCacheKey(state, bookmark.get('parentFolderId'), bookmarkKey)
       // Update parent folder ID to new folder.
