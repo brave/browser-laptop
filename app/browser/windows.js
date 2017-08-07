@@ -16,7 +16,6 @@ const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
 const windowState = require('../common/state/windowState')
 const pinnedSitesState = require('../common/state/pinnedSitesState')
-const windowActions = require('../../js/actions/windowActions')
 
 // TODO(bridiver) - set window uuid
 let currentWindows = {}
@@ -56,8 +55,14 @@ const getWindowValue = (windowId) => {
 const updateWindow = (windowId, updateDefault = false) => {
   const windowValue = getWindowValue(windowId)
   if (windowValue) {
-    appActions.windowUpdated(windowValue, updateDefault)
-    windowActions.onWindowUpdate(windowId, windowValue)
+    appActions.windowUpdated(windowValue, updateDefault, windowId)
+  }
+}
+
+const onWindowResize = (windowId) => {
+  const windowValue = getWindowValue(windowId)
+  if (windowValue) {
+    appActions.onWindowResize(windowValue, windowId)
   }
 }
 
@@ -107,6 +112,7 @@ const api = {
       let windowId = -1
       const updateWindowMove = debounce(updateWindow, 100)
       const updateWindowDebounce = debounce(updateWindow, 5)
+      const onWindowResizeDebounce = debounce(onWindowResize, 5)
 
       win.once('initialized', () => {
         windowId = win.id
@@ -181,7 +187,7 @@ const api = {
 
         LocalShortcuts.register(win)
 
-        appActions.windowCreated(windowValue)
+        appActions.windowCreated(windowValue, windowId)
       })
       win.once('closed', () => {
       })
@@ -211,7 +217,7 @@ const api = {
         updateWindowDebounce(windowId)
       })
       win.on('resize', () => {
-        updateWindowDebounce(windowId, true)
+        onWindowResizeDebounce(windowId)
       })
       win.on('move', () => {
         updateWindowMove(windowId, true)

@@ -49,27 +49,9 @@ const bookmarkFoldersState = {
 
   addFolder: (state, folderDetails, destinationKey) => {
     state = validateState(state)
-    folderDetails = makeImmutable(folderDetails)
-    let folders = bookmarkFoldersState.getFolders(state)
-    let key = folderDetails.get('folderId')
 
-    if (!folderDetails.has('folderId')) {
-      key = bookmarkFoldersUtil.getNextFolderId(folders)
-    }
-
-    const newFolder = makeImmutable({
-      title: folderDetails.get('title'),
-      folderId: ~~key,
-      key: key.toString(),
-      parentFolderId: ~~folderDetails.get('parentFolderId', 0),
-      partitionNumber: ~~folderDetails.get('partitionNumber', 0),
-      objectId: folderDetails.get('objectId', null),
-      type: siteTags.BOOKMARK_FOLDER,
-      skipSync: folderDetails.get('skipSync', null)
-    })
-
-    state = state.setIn([STATE_SITES.BOOKMARK_FOLDERS, key.toString()], newFolder)
-    state = bookmarkOrderCache.addFolderToCache(state, newFolder.get('parentFolderId'), key, destinationKey)
+    state = state.setIn([STATE_SITES.BOOKMARK_FOLDERS, folderDetails.get('key')], folderDetails)
+    state = bookmarkOrderCache.addFolderToCache(state, folderDetails.get('parentFolderId'), folderDetails.get('key'), destinationKey)
     return state
   },
 
@@ -184,6 +166,10 @@ const bookmarkFoldersState = {
       append
     )
     return state
+  },
+
+  setWidth: (state, key, width) => {
+    return state.setIn([STATE_SITES.BOOKMARK_FOLDERS, key, 'width'], parseFloat(width))
   }
 }
 

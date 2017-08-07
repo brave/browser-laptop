@@ -95,7 +95,12 @@ describe('bookmarkUtil unit test', function () {
       url: 'https://brave.com/',
       title: 'Brave',
       active: true,
-      bookmarked: false
+      bookmarked: false,
+      frame: {
+        partitionNumber: 2,
+        icon: 'ico',
+        themeColor: '#FFF'
+      }
     }],
     tabsInternal: {
       index: {
@@ -196,6 +201,34 @@ describe('bookmarkUtil unit test', function () {
     it('BOOKMARKS_TOOLBAR_MODE is not TEXT_AND_FAVICONS nor FAVICONS_ONLY', function () {
       settingDefaultValue = bookmarksToolbarMode.TEXT_ONLY
       const result = bookmarkUtil.showFavicon()
+      assert.equal(result, false)
+    })
+  })
+
+  describe('showOnlyText', function () {
+    it('BOOKMARKS_TOOLBAR_MODE is TEXT_ONLY', function () {
+      settingDefaultValue = bookmarksToolbarMode.TEXT_ONLY
+      const result = bookmarkUtil.showOnlyText()
+      assert.equal(result, true)
+    })
+
+    it('BOOKMARKS_TOOLBAR_MODE is not TEXT_ONLY', function () {
+      settingDefaultValue = bookmarksToolbarMode.FAVICONS_ONLY
+      const result = bookmarkUtil.showOnlyText()
+      assert.equal(result, false)
+    })
+  })
+
+  describe('showTextAndFavicon', function () {
+    it('BOOKMARKS_TOOLBAR_MODE is TEXT_AND_FAVICONS', function () {
+      settingDefaultValue = bookmarksToolbarMode.TEXT_AND_FAVICONS
+      const result = bookmarkUtil.showTextAndFavicon()
+      assert.equal(result, true)
+    })
+
+    it('BOOKMARKS_TOOLBAR_MODE is not TEXT_AND_FAVICONS', function () {
+      settingDefaultValue = bookmarksToolbarMode.TEXT_ONLY
+      const result = bookmarkUtil.showTextAndFavicon()
       assert.equal(result, false)
     })
   })
@@ -444,6 +477,156 @@ describe('bookmarkUtil unit test', function () {
         const keyB = bookmarkUtil.getKey(siteB)
         assert.notEqual(keyA, keyB)
       })
+    })
+  })
+
+  describe('buildBookmark', function () {
+    it('use only defaults', function () {
+      const bookmark = Immutable.fromJS({
+        title: 'Brave',
+        location: 'https://brave.com'
+      })
+
+      const expectedResult = {
+        title: 'Brave',
+        location: 'https://brave.com',
+        parentFolderId: 0,
+        partitionNumber: 0,
+        objectId: null,
+        favicon: undefined,
+        themeColor: undefined,
+        type: siteTags.BOOKMARK,
+        key: 'https://brave.com|0|0',
+        skipSync: null,
+        width: 0
+      }
+
+      assert.deepEqual(bookmarkUtil.buildBookmark(state, bookmark).toJS(), expectedResult)
+    })
+
+    it('bookmark data is in history', function () {
+      const newState = state
+        .setIn(['historySites', 'https://brave.com|0'], Immutable.fromJS({
+          partitionNumber: 1,
+          favicon: 'icon',
+          themeColor: '#000'
+        }))
+
+      const bookmark = Immutable.fromJS({
+        title: 'Brave',
+        location: 'https://brave.com'
+      })
+
+      const expectedResult = {
+        title: 'Brave',
+        location: 'https://brave.com',
+        parentFolderId: 0,
+        partitionNumber: 1,
+        objectId: null,
+        favicon: 'icon',
+        themeColor: '#000',
+        type: siteTags.BOOKMARK,
+        key: 'https://brave.com|0|0',
+        skipSync: null,
+        width: 0
+      }
+
+      assert.deepEqual(bookmarkUtil.buildBookmark(newState, bookmark).toJS(), expectedResult)
+    })
+
+    it('bookmark data is in active tab', function () {
+      const bookmark = Immutable.fromJS({
+        title: 'Brave',
+        location: 'https://brave.com/'
+      })
+
+      const expectedResult = {
+        title: 'Brave',
+        location: 'https://brave.com/',
+        parentFolderId: 0,
+        partitionNumber: 2,
+        objectId: null,
+        favicon: 'ico',
+        themeColor: '#FFF',
+        type: siteTags.BOOKMARK,
+        key: 'https://brave.com/|0|0',
+        skipSync: null,
+        width: 0
+      }
+
+      assert.deepEqual(bookmarkUtil.buildBookmark(stateWithData, bookmark).toJS(), expectedResult)
+    })
+
+    it('bookmark data is in topSites', function () {
+      const bookmark = Immutable.fromJS({
+        title: 'Brave',
+        location: 'https://www.facebook.com/BraveSoftware/'
+      })
+
+      const expectedResult = {
+        title: 'Brave',
+        location: 'https://www.facebook.com/BraveSoftware/',
+        parentFolderId: 0,
+        partitionNumber: 0,
+        objectId: null,
+        favicon: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/img/newtab/defaultTopSitesIcon/facebook.png',
+        themeColor: 'rgb(59, 89, 152)',
+        type: siteTags.BOOKMARK,
+        key: 'https://www.facebook.com/BraveSoftware/|0|0',
+        skipSync: null,
+        width: 0
+      }
+
+      assert.deepEqual(bookmarkUtil.buildBookmark(stateWithData, bookmark).toJS(), expectedResult)
+    })
+  })
+
+  describe('buildEditBookmark', function () {
+    it('bookmarkDetail is null', function () {
+      const bookmark = Immutable.fromJS({
+        title: 'Brave',
+        type: siteTags.BOOKMARK
+      })
+      assert.deepEqual(bookmarkUtil.buildEditBookmark(bookmark).toJS(), bookmark.toJS())
+    })
+
+    it('old and new are merged, but key is the same', function () {
+      const oldBookmark = Immutable.fromJS({
+        title: 'Brave',
+        location: 'http://brave.com',
+        type: siteTags.BOOKMARK,
+        parentFolderId: 0,
+        key: 'http://brave.com|0|0'
+      })
+
+      const newBookmark = Immutable.fromJS({
+        title: 'Brave 1',
+        location: 'http://brave.com',
+        type: siteTags.BOOKMARK,
+        parentFolderId: 0
+      })
+
+      const expectedBookmark = newBookmark.set('key', oldBookmark.get('key'))
+      assert.deepEqual(bookmarkUtil.buildEditBookmark(oldBookmark, newBookmark).toJS(), expectedBookmark.toJS())
+    })
+
+    it('old and new data is merged and new key is generated', function () {
+      const oldBookmark = Immutable.fromJS({
+        title: 'Brave',
+        location: 'http://brave.com',
+        type: siteTags.BOOKMARK,
+        parentFolderId: 0
+      })
+
+      const newBookmark = Immutable.fromJS({
+        title: 'Brave 1',
+        location: 'http://new.brave.com',
+        type: siteTags.BOOKMARK,
+        parentFolderId: 1
+      })
+
+      const expectedBookmark = newBookmark.set('key', 'http://new.brave.com|0|1')
+      assert.deepEqual(bookmarkUtil.buildEditBookmark(oldBookmark, newBookmark).toJS(), expectedBookmark.toJS())
     })
   })
 })

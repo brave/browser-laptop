@@ -18,6 +18,7 @@ const windowActions = require('../../../../js/actions/windowActions')
 
 // State
 const windowState = require('../../../common/state/windowState')
+const bookmarkToolbarState = require('../../../common/state/bookmarkToolbarState')
 
 // Constants
 const dragTypes = require('../../../../js/constants/dragTypes')
@@ -33,6 +34,7 @@ const isWindows = require('../../../common/lib/platformUtil').isWindows()
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const bookmarkUtil = require('../../../common/lib/bookmarkUtil')
 const {elementHasDataset} = require('../../../../js/lib/eventUtil')
+const {getCurrentWindowId} = require('../../currentWindow')
 
 // Styles
 const globalStyles = require('../styles/global')
@@ -147,7 +149,7 @@ class BookmarksToolbar extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
-    const bookmarks = bookmarkUtil.getToolbarBookmarks(state)
+    const currentWindowId = getCurrentWindowId()
 
     const props = {}
     // used in renderer
@@ -155,8 +157,8 @@ class BookmarksToolbar extends React.Component {
     props.showFavicon = bookmarkUtil.showFavicon()
     props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused(state)) &&
       !isWindows
-    props.visibleBookmarks = bookmarks.visibleBookmarks
-    props.hiddenBookmarks = bookmarks.hiddenBookmarks
+    props.visibleBookmarks = bookmarkToolbarState.getToolbar(state, currentWindowId)
+    props.hiddenBookmarks = bookmarkToolbarState.getOther(state, currentWindowId)
 
     // used in other functions
     props.activeFrameKey = activeFrame.get('key')

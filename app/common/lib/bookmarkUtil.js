@@ -6,24 +6,21 @@ const Immutable = require('immutable')
 
 // State
 const bookmarksState = require('../state/bookmarksState')
-const bookmarkFoldersState = require('../state/bookmarkFoldersState')
 const tabState = require('../state/tabState')
+const historyState = require('../state/historyState')
 
 // Constants
 const dragTypes = require('../../../js/constants/dragTypes')
 const {bookmarksToolbarMode} = require('../constants/settingsEnums')
 const settings = require('../../../js/constants/settings')
 const siteTags = require('../../../js/constants/siteTags')
+const newTabData = require('../../../js/data/newTabData')
 
 // Utils
 const bookmarkLocationCache = require('../cache/bookmarkLocationCache')
-const {calculateTextWidth} = require('../../../js/lib/textCalculator')
-const {iconSize} = require('../../../js/constants/config')
 const {getSetting} = require('../../../js/settings')
 const UrlUtil = require('../../../js/lib/urlutil')
-
-// Styles
-const globalStyles = require('../../renderer/components/styles/global')
+const {makeImmutable} = require('../state/immutableUtil')
 
 const bookmarkHangerHeading = (editMode, isAdded) => {
   if (isAdded) {
@@ -65,113 +62,6 @@ const getDNDBookmarkData = (state, bookmarkKey) => {
     state.getIn(['dragData', 'dragOverData'], Immutable.Map())) || Immutable.Map()
 
   return data.get('draggingOverKey') === bookmarkKey ? data : Immutable.Map()
-}
-
-let oldBookmarks
-let oldBookmarkOrderCache
-let oldFolders
-let lastValue
-let lastWidth
-const getToolbarBookmarks = (state) => {
-  const windowWidth = window.innerWidth
-  const allBookmarks = bookmarksState.getBookmarks(state)
-  const bookmarkOrderCache = bookmarksState.getBookmarkOrder(state)
-  const allFolders = bookmarkFoldersState.getFolders(state)
-  if (
-    allBookmarks === oldBookmarks &&
-    bookmarkOrderCache === oldBookmarkOrderCache &&
-    allFolders === oldFolders &&
-    lastWidth === windowWidth &&
-    lastValue
-  ) {
-    return lastValue
-  }
-
-  oldBookmarks = allBookmarks
-  oldBookmarkOrderCache = bookmarkOrderCache
-  oldFolders = allFolders
-  lastWidth = windowWidth
-
-  const bookmarks = bookmarksState.getBookmarksWithFolders(state)
-  let widthAccountedFor = 0
-
-  const onlyText = showOnlyText()
-  const textAndFavicon = showTextAndFavicon()
-  const onlyFavicon = showOnlyFavicon()
-
-  const maxWidth = parseInt(globalStyles.spacing.bookmarksItemMaxWidth, 10)
-  const padding = parseInt(globalStyles.spacing.bookmarksItemPadding, 10) * 2
-  const bookmarkItemMargin = parseInt(globalStyles.spacing.bookmarksItemMargin, 10) * 2
-  const fontSize = parseInt(globalStyles.spacing.bookmarksItemFontSize)
-  const fontFamily = globalStyles.defaultFontFamily
-  const chevronMargin = parseInt(globalStyles.spacing.bookmarksItemChevronMargin)
-  const chevronFontSize = parseInt(globalStyles.spacing.bookmarksItemChevronFontSize)
-  const chevronWidth = chevronMargin + chevronFontSize
-
-  // No margin for show only favicons
-  const margin = onlyFavicon ? 0 : bookmarkItemMargin
-
-  // Toolbar padding is only on the left
-  const toolbarPadding = parseInt(globalStyles.spacing.bookmarksToolbarPadding)
-
-  const overflowButtonWidth = parseInt(globalStyles.spacing.bookmarksToolbarOverflowButtonWidth, 10)
-  const maximumBookmarksToolbarWidth = windowWidth - overflowButtonWidth
-
-  widthAccountedFor += toolbarPadding
-
-  // Loop through until we fill up the entire bookmark toolbar width
-  let i = 0
-  for (let bookmark of bookmarks) {
-    let iconWidth
-
-    if (onlyText) {
-      iconWidth = 0
-    } else if (textAndFavicon || bookmark.get('folderId')) {
-      iconWidth = iconSize + parseInt(globalStyles.spacing.bookmarksItemMargin, 10)
-    } else if (onlyFavicon) {
-      iconWidth = iconSize
-    }
-
-    const currentChevronWidth = bookmark.get('folderId') ? chevronWidth : 0
-    const text = bookmark.get('title') || bookmark.get('location')
-    let extraWidth
-
-    if (onlyText) {
-      extraWidth = padding + calculateTextWidth(text, `${fontSize} ${fontFamily}`)
-
-      if (bookmark.get('folderId')) {
-        extraWidth += currentChevronWidth
-      }
-    } else if (textAndFavicon) {
-      extraWidth = padding + iconWidth + calculateTextWidth(text, `${fontSize} ${fontFamily}`) + currentChevronWidth
-    } else if (onlyFavicon) {
-      extraWidth = padding + iconWidth + currentChevronWidth
-
-      if (bookmark.get('folderId')) {
-        extraWidth += calculateTextWidth(text, `${fontSize} ${fontFamily}`)
-      }
-    }
-
-    extraWidth = Math.min(extraWidth, maxWidth)
-    widthAccountedFor += extraWidth + margin
-
-    if (widthAccountedFor >= maximumBookmarksToolbarWidth) {
-      widthAccountedFor -= extraWidth + margin
-      i--
-
-      break
-    }
-
-    i++
-  }
-
-  lastValue = {
-    visibleBookmarks: bookmarks.take(i).map((item) => item.get('key')).toList(),
-    // Show at most 100 items in the overflow menu
-    hiddenBookmarks: bookmarks.skip(i).take(100).map((item) => item.get('key')).toList()
-  }
-
-  return lastValue
 }
 
 const getDetailFromFrame = (frame) => {
@@ -264,18 +154,87 @@ const getKey = (siteDetail) => {
   return null
 }
 
+const buildBookmark = (state, bookmarkDetail) => {
+  bookmarkDetail = makeImmutable(bookmarkDetail)
+  let location
+  if (bookmarkDetail.has('location')) {
+    location = UrlUtil.getLocationIfPDF(bookmarkDetail.get('location'))
+    bookmarkDetail = bookmarkDetail.set('location', location)
+  }
+
+  const key = getKey(bookmarkDetail)
+  const historyKey = key.slice(0, -2)
+  let dataItem = historyState.getSite(state, historyKey)
+
+  if (dataItem.isEmpty()) {
+    // check if we have data in tabs
+    const tab = tabState.getActiveTab(state) || Immutable.Map()
+    const activeLocation = tab.get('url') || tab.getIn(['frame', 'location'])
+
+    if (!tab.isEmpty() && bookmarkDetail.get('location') === activeLocation) {
+      dataItem = makeImmutable({
+        partitionNumber: tab.getIn(['frame', 'partitionNumber'], 0),
+        favicon: tab.getIn(['frame', 'icon']),
+        themeColor: tab.getIn(['frame', 'themeColor'])
+      })
+    } else {
+      // check if bookmark is in top sites
+      const topSites = Immutable.fromJS(newTabData.topSites.concat(newTabData.pinnedTopSites))
+      const topSite = topSites.find(site => site.get('location') === bookmarkDetail.get('location')) || Immutable.Map()
+
+      if (!topSite.isEmpty()) {
+        dataItem = topSite
+      }
+    }
+  }
+
+  return makeImmutable({
+    title: bookmarkDetail.get('title', ''),
+    location: bookmarkDetail.get('location'),
+    parentFolderId: ~~bookmarkDetail.get('parentFolderId', 0),
+    partitionNumber: Number(dataItem.get('partitionNumber', 0)),
+    objectId: bookmarkDetail.get('objectId', null),
+    favicon: dataItem.get('favicon'),
+    themeColor: dataItem.get('themeColor'),
+    type: siteTags.BOOKMARK,
+    key: key,
+    skipSync: bookmarkDetail.get('skipSync', null),
+    width: 0
+  })
+}
+
+const buildEditBookmark = (oldBookmark, bookmarkDetail) => {
+  let newBookmark = oldBookmark.merge(bookmarkDetail)
+
+  let location
+  if (newBookmark.has('location')) {
+    location = UrlUtil.getLocationIfPDF(newBookmark.get('location'))
+    newBookmark = newBookmark.set('location', location)
+  }
+
+  const newKey = getKey(newBookmark)
+  if (newKey === null) {
+    return oldBookmark
+  }
+
+  return newBookmark.set('key', newKey)
+}
+
 module.exports = {
   bookmarkHangerHeading,
   isBookmarkNameValid,
   showOnlyFavicon,
   showFavicon,
   getDNDBookmarkData,
-  getToolbarBookmarks,
   getDetailFromFrame,
   isLocationBookmarked,
   toCreateProperties,
   isBookmark,
   updateTabBookmarked,
   updateActiveTabBookmarked,
-  getKey
+  getKey,
+  showOnlyText,
+  showTextAndFavicon,
+  buildBookmark,
+  buildEditBookmark
 }
