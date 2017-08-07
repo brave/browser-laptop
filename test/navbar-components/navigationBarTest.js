@@ -267,6 +267,22 @@ describe('navigationBar tests', function () {
           .waitForElementCount(titleBar, 0)
         yield selectsText(this.app.client, page1Url)
       })
+
+      it('does not show emoji in title mode', function * () {
+        const emojiPage = Brave.server.url('title_with_emoji.html')
+        const emojiPageHost = urlParse(emojiPage).host
+        yield this.app.client
+          .tabByUrl(Brave.newTabUrl)
+          .loadUrl(emojiPage)
+          .windowParentByUrl(emojiPage)
+          .activateTitleMode()
+          .click(activeWebview)
+          .windowParentByUrl(emojiPage)
+          .waitForExist(titleBar)
+          .waitForTextValue(titleBar, `${emojiPageHost} | page with dragon emoji`)
+          .isExisting('🐉').then((isExisting) => assert(!isExisting))
+          .isExisting(navigatorLoadTime).then((isExisting) => assert(!isExisting))
+      })
     })
 
     describe('page without a title', function () {
