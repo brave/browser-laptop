@@ -78,6 +78,7 @@ describe('sessionStore unit tests', function () {
       useCleanCache: true
     })
     mockery.registerMock('fs-extra', fakeFileSystem)
+    mockery.registerMock('fs', fakeFileSystem)
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('./locale', fakeLocale)
     mockery.registerMock('./autofill', fakeAutofill)
