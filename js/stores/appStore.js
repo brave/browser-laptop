@@ -34,6 +34,7 @@ const profiles = require('../../app/browser/profiles')
 const {zoomLevel} = require('../../app/common/constants/toolbarUserInterfaceScale')
 const {HrtimeLogger} = require('../../app/common/lib/logUtil')
 const platformUtil = require('../../app/common/lib/platformUtil')
+const urlUtil = require('../lib/urlutil')
 
 // state helpers
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
@@ -45,7 +46,7 @@ const tabState = require('../../app/common/state/tabState')
 const bookmarksState = require('../../app/common/state/bookmarksState')
 const bookmarkFoldersState = require('../../app/common/state/bookmarkFoldersState')
 const historyState = require('../../app/common/state/historyState')
-const urlUtil = require('../lib/urlutil')
+const bookmarkToolbarState = require('../../app/common/state/bookmarkToolbarState')
 
 // Only used internally
 const CHANGE_EVENT = 'app-state-change'
@@ -152,7 +153,11 @@ function handleChangeSettingAction (state, settingKey, settingValue) {
         })
 
         state = state.setIn(['settings', settingKey], homeArray.join('|'))
+        break
       }
+    case settings.BOOKMARKS_TOOLBAR_MODE:
+      state = bookmarkToolbarState.setToolbars(state)
+      break
   }
 
   return state
@@ -196,6 +201,7 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/updatesReducer'),
       require('../../app/browser/reducers/topSitesReducer'),
       require('../../app/browser/reducers/braverySettingsReducer'),
+      require('../../app/browser/reducers/bookmarkToolbarReducer'),
       require('../../app/ledger').doAction,
       require('../../app/browser/menu')
     ]

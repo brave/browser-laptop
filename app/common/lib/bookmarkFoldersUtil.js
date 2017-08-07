@@ -2,6 +2,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const siteTags = require('../../../js/constants/siteTags')
+const {makeImmutable} = require('../state/immutableUtil')
 
 const isFolderNameValid = (title) => {
   return title != null && title.trim().length > 0
@@ -26,7 +27,7 @@ const getNextFolderIdItem = (folders) => {
 }
 
 const getNextFolderId = (folders) => {
-  const defaultFolderId = 0
+  const defaultFolderId = 1
   if (!folders) {
     return defaultFolderId
   }
@@ -117,11 +118,32 @@ const isMoveAllowed = (folderList, sourceDetail, destinationDetail) => {
   return true
 }
 
+const buildFolder = (folderDetails, folders) => {
+  folderDetails = makeImmutable(folderDetails)
+  let key = folderDetails.get('folderId')
+
+  if (!folderDetails.has('folderId')) {
+    key = getNextFolderId(folders)
+  }
+
+  return makeImmutable({
+    title: folderDetails.get('title'),
+    folderId: Number(key),
+    key: key.toString(),
+    parentFolderId: ~~folderDetails.get('parentFolderId', 0),
+    partitionNumber: Number(folderDetails.get('partitionNumber', 0)),
+    objectId: folderDetails.get('objectId', null),
+    type: siteTags.BOOKMARK_FOLDER,
+    skipSync: folderDetails.get('skipSync', null)
+  })
+}
+
 module.exports = {
   isFolderNameValid,
   getNextFolderId,
   getNextFolderName,
   isFolder,
   getKey,
-  isMoveAllowed
+  isMoveAllowed,
+  buildFolder
 }

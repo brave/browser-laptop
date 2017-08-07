@@ -6,14 +6,18 @@ const Immutable = require('immutable')
 
 // State
 const bookmarkFoldersState = require('../../common/state/bookmarkFoldersState')
+const bookmarkToolbarState = require('../../common/state/bookmarkToolbarState')
 
 // Constants
 const appConstants = require('../../../js/constants/appConstants')
+const siteTags = require('../../../js/constants/siteTags')
 const {STATE_SITES} = require('../../../js/constants/stateConstants')
 
 // Utils
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const syncUtil = require('../../../js/state/syncUtil')
+const textCalc = require('../../browser/api/textCalc')
+const bookmarkFolderUtil = require('../../common/lib/bookmarkFoldersUtil')
 
 const bookmarkFoldersReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
@@ -28,13 +32,19 @@ const bookmarkFoldersReducer = (state, action, immutableAction) => {
         }
 
         if (Immutable.List.isList(folder)) {
+          let folderList = Immutable.List()
           action.get('folderDetails', Immutable.List()).forEach((folder) => {
-            state = bookmarkFoldersState.addFolder(state, folder, closestKey)
-            state = syncUtil.updateObjectCache(state, folder, STATE_SITES.BOOKMARK_FOLDERS)
+            const folderDetails = bookmarkFolderUtil.buildFolder(folder, bookmarkFoldersState.getFolders(state))
+            state = bookmarkFoldersState.addFolder(state, folderDetails, closestKey)
+            state = syncUtil.updateObjectCache(state, folderDetails, STATE_SITES.BOOKMARK_FOLDERS)
+            folderList = folderList.push(folderDetails)
           })
+          textCalc.calcTextList(folderList)
         } else {
-          state = bookmarkFoldersState.addFolder(state, folder, closestKey)
-          state = syncUtil.updateObjectCache(state, folder, STATE_SITES.BOOKMARK_FOLDERS)
+          const folderDetails = bookmarkFolderUtil.buildFolder(folder, bookmarkFoldersState.getFolders(state))
+          state = bookmarkFoldersState.addFolder(state, folderDetails, closestKey)
+          state = syncUtil.updateObjectCache(state, folderDetails, STATE_SITES.BOOKMARK_FOLDERS)
+          textCalc.calcText(folderDetails, siteTags.BOOKMARK_FOLDER)
         }
         break
       }
@@ -49,7 +59,8 @@ const bookmarkFoldersReducer = (state, action, immutableAction) => {
 
         state = bookmarkFoldersState.editFolder(state, key, folder)
         state = syncUtil.updateObjectCache(state, folder, STATE_SITES.BOOKMARK_FOLDERS)
-
+        const folderDetails = bookmarkFoldersState.getFolder(state, key)
+        textCalc.calcText(folderDetails, siteTags.BOOKMARK_FOLDER)
         break
       }
     case appConstants.APP_MOVE_BOOKMARK_FOLDER:
@@ -70,6 +81,9 @@ const bookmarkFoldersReducer = (state, action, immutableAction) => {
 
         const destinationDetail = bookmarkFoldersState.getFolder(state, action.get('destinationKey'))
         state = syncUtil.updateObjectCache(state, destinationDetail, STATE_SITES.BOOKMARK_FOLDERS)
+        if (destinationDetail.get('parentFolderId') === 0 || action.get('destinationKey') === 0) {
+          state = bookmarkToolbarState.setToolbars(state)
+        }
         break
       }
     case appConstants.APP_REMOVE_BOOKMARK_FOLDER:
@@ -82,16 +96,38 @@ const bookmarkFoldersReducer = (state, action, immutableAction) => {
 
         if (Immutable.List.isList(folderKey)) {
           action.get('folderKey', Immutable.List()).forEach((key) => {
-            const folder = state.getIn([STATE_SITES.BOOKMARK_FOLDERS, key])
+            const folder = bookmarkFoldersState.getFolder(state, key)
             state = bookmarkFoldersState.removeFolder(state, key)
             state = syncUtil.updateObjectCache(state, folder, STATE_SITES.BOOKMARK_FOLDERS)
           })
+          state = bookmarkToolbarState.setToolbars(state)
         } else {
-          const folder = state.getIn([STATE_SITES.BOOKMARK_FOLDERS, folderKey])
+          const folder = bookmarkFoldersState.getFolder(state, folderKey)
           state = bookmarkFoldersState.removeFolder(state, folderKey)
           state = syncUtil.updateObjectCache(state, folder, STATE_SITES.BOOKMARK_FOLDERS)
+          if (folder.get('parentFolderId') === 0) {
+            state = bookmarkToolbarState.setToolbars(state)
+          }
+        }
+        break
+      }
+    case appConstants.APP_ON_BOOKMARK_FOLDER_WIDTH_CHANGED:
+      {
+        if (action.get('folderList', Immutable.List()).isEmpty()) {
+          break
         }
 
+        let updateToolbar = false
+        action.get('folderList').forEach(item => {
+          state = bookmarkFoldersState.setWidth(state, item.get('key'), item.get('width'))
+          if (item.get('parentFolderId') === 0) {
+            updateToolbar = true
+          }
+        })
+
+        if (updateToolbar) {
+          state = bookmarkToolbarState.setToolbars(state)
+        }
         break
       }
   }

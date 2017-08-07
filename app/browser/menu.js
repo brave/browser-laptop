@@ -705,8 +705,10 @@ const doAction = (state, action) => {
       }
     case appConstants.APP_ADD_BOOKMARK:
     case appConstants.APP_EDIT_BOOKMARK:
+    case appConstants.APP_MOVE_BOOKMARK:
     case appConstants.APP_REMOVE_BOOKMARK:
     case appConstants.APP_ADD_BOOKMARK_FOLDER:
+    case appConstants.APP_MOVE_BOOKMARK_FOLDER:
     case appConstants.APP_EDIT_BOOKMARK_FOLDER:
     case appConstants.APP_REMOVE_BOOKMARK_FOLDER:
       createMenu(state)

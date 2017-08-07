@@ -62,18 +62,24 @@ const appActions = {
     })
   },
 
-  windowCreated: function (windowValue) {
+  windowCreated: function (windowValue, windowId) {
     dispatch({
       actionType: appConstants.APP_WINDOW_CREATED,
-      windowValue
+      windowValue,
+      queryInfo: {
+        windowId
+      }
     })
   },
 
-  windowUpdated: function (windowValue, updateDefault) {
+  windowUpdated: function (windowValue, updateDefault, windowId) {
     dispatch({
       actionType: appConstants.APP_WINDOW_UPDATED,
       windowValue,
-      updateDefault
+      updateDefault,
+      queryInfo: {
+        windowId
+      }
     })
   },
 
@@ -1645,6 +1651,43 @@ const appActions = {
       siteKey,
       destinationKey,
       prepend
+    })
+  },
+
+  /**
+   * Dispatches a message that bookmark calculation was done
+   * @param bookmarkList {Object} - Object is a list of bookmarks with key, width and parentFolderId as a property
+   */
+  onBookmarkWidthChanged: function (bookmarkList) {
+    dispatch({
+      actionType: appConstants.APP_ON_BOOKMARK_WIDTH_CHANGED,
+      bookmarkList
+    })
+  },
+
+  /**
+   * Dispatches a message that bookmark calculation was done
+   * @param folderList {Object} - Object is a list of folders with key, width and parentFolderId as a property
+   */
+  onBookmarkFolderWidthChanged: function (folderList) {
+    dispatch({
+      actionType: appConstants.APP_ON_BOOKMARK_FOLDER_WIDTH_CHANGED,
+      folderList
+    })
+  },
+
+  /**
+   * Dispatches a message that window was resized
+   * @param windowValue - window properties
+   * @param windowId - id of the window that we want to update
+   */
+  onWindowResize: function (windowValue, windowId) {
+    dispatch({
+      actionType: appConstants.APP_WINDOW_RESIZED,
+      windowValue,
+      queryInfo: {
+        windowId
+      }
     })
   }
 }

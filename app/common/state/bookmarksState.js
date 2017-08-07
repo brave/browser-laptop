@@ -9,13 +9,10 @@ const Immutable = require('immutable')
 const settings = require('../../../js/constants/settings')
 const siteTags = require('../../../js/constants/siteTags')
 const {STATE_SITES} = require('../../../js/constants/stateConstants')
-const newTabData = require('../../../js/data/newTabData')
 
 // State
-const historyState = require('./historyState')
 const bookmarkOrderCache = require('../cache/bookmarkOrderCache')
 const bookmarkFoldersState = require('./bookmarkFoldersState')
-const tabState = require('./tabState')
 
 // Actions
 const syncActions = require('../../../js/actions/syncActions')
@@ -82,99 +79,36 @@ const bookmarksState = {
 
   addBookmark: (state, bookmarkDetail, destinationKey) => {
     state = validateState(state)
-    const bookmarkUtil = require('../lib/bookmarkUtil')
-
-    bookmarkDetail = makeImmutable(bookmarkDetail)
-    let location
-    if (bookmarkDetail.has('location')) {
-      location = UrlUtil.getLocationIfPDF(bookmarkDetail.get('location'))
-      bookmarkDetail = bookmarkDetail.set('location', location)
-    }
-
-    const key = bookmarkUtil.getKey(bookmarkDetail)
-    const historyKey = key.slice(0, -2)
-    let dataItem = historyState.getSite(state, historyKey)
-
-    if (dataItem.isEmpty()) {
-      // check if we have data in tabs
-      const tab = tabState.getActiveTab(state) || Immutable.Map()
-      const activeLocation = tab.get('url') || tab.getIn(['frame', 'location'])
-
-      if (!tab.isEmpty() && bookmarkDetail.get('location') === activeLocation) {
-        dataItem = makeImmutable({
-          partitionNumber: tab.getIn(['frame', 'partitionNumber'], 0),
-          favicon: tab.getIn(['frame', 'icon']),
-          themeColor: tab.getIn(['frame', 'themeColor'])
-        })
-      } else {
-        // check if bookmark is in top sites
-        const topSites = Immutable.fromJS(newTabData.topSites.concat(newTabData.pinnedTopSites))
-        const topSite = topSites.find(site => site.get('location') === bookmarkDetail.get('location')) || Immutable.Map()
-
-        if (!topSite.isEmpty()) {
-          dataItem = topSite
-        }
-      }
-    }
-
-    let bookmark = makeImmutable({
-      title: bookmarkDetail.get('title', ''),
-      location: bookmarkDetail.get('location'),
-      parentFolderId: ~~bookmarkDetail.get('parentFolderId', 0),
-      partitionNumber: ~~dataItem.get('partitionNumber', 0),
-      objectId: bookmarkDetail.get('objectId', null),
-      favicon: dataItem.get('favicon'),
-      themeColor: dataItem.get('themeColor'),
-      type: siteTags.BOOKMARK,
-      key: key,
-      skipSync: bookmarkDetail.get('skipSync', null)
-    })
-
+    const key = bookmarkDetail.get('key')
     if (key === null) {
       return state
     }
 
     if (!state.hasIn([STATE_SITES.BOOKMARKS, key])) {
-      state = bookmarkLocationCache.addCacheKey(state, location, key)
-      state = bookmarkOrderCache.addBookmarkToCache(state, bookmark.get('parentFolderId'), key, destinationKey)
+      state = bookmarkLocationCache.addCacheKey(state, bookmarkDetail.get('location'), key)
+      state = bookmarkOrderCache.addBookmarkToCache(state, bookmarkDetail.get('parentFolderId'), key, destinationKey)
     }
 
-    state = state.setIn([STATE_SITES.BOOKMARKS, key], bookmark)
+    state = state.setIn([STATE_SITES.BOOKMARKS, key], bookmarkDetail)
     return state
   },
 
-  editBookmark: (state, editKey, bookmarkDetail) => {
+  editBookmark: (state, oldBookmark, bookmarkDetail) => {
     state = validateState(state)
-    const bookmarkUtil = require('../lib/bookmarkUtil')
 
-    const oldBookmark = bookmarksState.getBookmark(state, editKey)
-
-    if (oldBookmark.isEmpty()) {
-      return state
-    }
-
-    let newBookmark = oldBookmark.merge(bookmarkDetail)
-
-    let location
-    if (newBookmark.has('location')) {
-      location = UrlUtil.getLocationIfPDF(newBookmark.get('location'))
-      newBookmark = newBookmark.set('location', location)
-    }
-    const newKey = bookmarkUtil.getKey(newBookmark)
-    if (newKey === null) {
-      return state
-    }
+    const newKey = bookmarkDetail.get('key')
+    const editKey = oldBookmark.get('key')
 
     if (editKey !== newKey) {
       state = state.deleteIn([STATE_SITES.BOOKMARKS, editKey])
       state = bookmarkOrderCache.removeCacheKey(state, oldBookmark.get('parentFolderId'), editKey)
-      state = bookmarkOrderCache.addBookmarkToCache(state, newBookmark.get('parentFolderId'), newKey)
-      newBookmark = newBookmark.set('key', newKey)
+      state = bookmarkOrderCache.addBookmarkToCache(state, bookmarkDetail.get('parentFolderId'), newKey)
+      bookmarkDetail = bookmarkDetail.set('key', newKey)
     }
 
-    state = state.setIn([STATE_SITES.BOOKMARKS, newKey], newBookmark)
+    state = state.setIn([STATE_SITES.BOOKMARKS, newKey], bookmarkDetail)
     state = bookmarkLocationCache.removeCacheKey(state, oldBookmark.get('location'), editKey)
-    state = bookmarkLocationCache.addCacheKey(state, location, newKey)
+    state = bookmarkLocationCache.addCacheKey(state, bookmarkDetail.get('location'), newKey)
     return state
   },
 
@@ -313,6 +247,10 @@ const bookmarksState = {
 
     const cache = bookmarkOrderCache.getBookmarksByParentId(state, folderKey)
     return cache.map((item) => bookmarksState.getBookmark(state, item.get('key')))
+  },
+
+  setWidth: (state, key, width) => {
+    return state.setIn([STATE_SITES.BOOKMARKS, key, 'width'], parseFloat(width))
   }
 }
 

@@ -772,6 +772,10 @@ const doAction = (action) => {
         windowState = windowState.set('windowInfo', oldInfo.merge(windowValue))
         break
       }
+    case appConstants.APP_WINDOW_UPDATED:
+    case appConstants.APP_WINDOW_RESIZED:
+      windowState = windowState.set('windowInfo', action.windowValue)
+      break
     default:
       break
   }
