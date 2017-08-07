@@ -43,7 +43,7 @@ module.exports.localStorageExceptions = [
   ['https://mail.google.com', 'https://hangouts.google.com']
 ]
 
-const braveUAWhitelist = ['adobe.com', 'duckduckgo.com']
+const braveUAWhitelist = ['adobe.com', 'duckduckgo.com', 'brave.com']
 
 module.exports.siteHacks = {
   'sp1.nypost.com': emptyDataURI,
