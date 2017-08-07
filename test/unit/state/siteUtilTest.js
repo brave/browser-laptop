@@ -711,7 +711,7 @@ describe('siteUtil', function () {
           lastAccessedTime: 123
         }
         const expectedSites = {
-          'https://brave.com/|0|0': {
+          'https://brave.com|0|0': {
             tags: [],
             location: testUrl1,
             lastAccessedTime: undefined
