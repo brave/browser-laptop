@@ -12,7 +12,6 @@
 // - NODE_ENV of ‘test’ bypassing session state or else they all fail.
 
 const Immutable = require('immutable')
-const fs = require('fs-extra')
 const path = require('path')
 const electron = require('electron')
 const os = require('os')
@@ -544,7 +543,10 @@ module.exports.runImportDefaultSettings = (data) => {
  */
 module.exports.loadAppState = () => {
   return new Promise((resolve, reject) => {
+    const fs = require('fs')
+
     let data
+
     try {
       data = fs.readFileSync(getStoragePath())
     } catch (e) {}
@@ -607,6 +609,7 @@ module.exports.loadAppState = () => {
  * Called when session is suspected for corruption; this will move it out of the way
  */
 module.exports.backupSession = () => {
+  const fs = require('fs-extra')
   const src = getStoragePath()
   const dest = getTempStoragePath('backup')
 
