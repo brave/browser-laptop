@@ -76,6 +76,9 @@ module.exports.getSiteKey = function (siteDetail) {
     return folderId.toString()
   } else if (location) {
     location = UrlUtil.getLocationIfPDF(location)
+    if (location && location[location.length - 1] === '/') {
+      location = location.slice(0, -1)
+    }
     return location + '|' +
       (siteDetail.get('partitionNumber') || 0) + '|' +
       (siteDetail.get('parentFolderId') || 0)
@@ -578,6 +581,23 @@ module.exports.getDetailFromTab = function (tab, tag, sites) {
       if (provisionalLocation && provisionalLocation !== location) {
         siteKey = module.exports.getSiteKey(makeImmutable({
           location: provisionalLocation,
+          partitionNumber
+        }))
+        results = results.merge(getSitesBySubkey(sites, siteKey, tag))
+      }
+    }
+
+    if (results.size === 0 && tag === siteTags.PINNED) {
+      let pinnedLocation = tab.getIn(['frame', 'pinnedLocation'])
+      if (!pinnedLocation) {
+        const history = tab.getIn(['frame', 'history'])
+        if (history && history.size !== 0) {
+          pinnedLocation = history.first()
+        }
+      }
+      if (pinnedLocation && pinnedLocation !== location) {
+        siteKey = module.exports.getSiteKey(makeImmutable({
+          location: pinnedLocation,
           partitionNumber
         }))
         results = results.merge(getSitesBySubkey(sites, siteKey, tag))
