@@ -96,35 +96,40 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     return (possiblePropDesc && !possiblePropDesc.configurable)
   })
 
-  defaultFunc.valueOf = function (hint) {
-    if (hint === 'number') {
-      return 0
-    }
+  var valueOfCoercionFunc = function (hint) {
     if (hint === 'string') {
       return ''
+    }
+    if (hint === 'number' || hint === 'default') {
+      return 0
     }
     return undefined
   }
 
   var allPurposeProxy = new Proxy(defaultFunc, {
-    get: function (target, property, receiver) {
-      if (property === 'valueOf') {
-        return target[property]
-      }
+    get: function (target, property) {
 
       if (property === Symbol.toPrimitive) {
-        return defaultFunc.valueOf
+        return valueOfCoercionFunc
+      }
+
+      if (property === 'toString') {
+        return ""
+      }
+
+      if (property === "valueOf") {
+        return 0
       }
 
       return allPurposeProxy
     },
-    set: function (target, property, value, receiver) {
+    set: function () {
       return allPurposeProxy
     },
-    apply: function (target, thisArg, argumentsList) {
+    apply: function () {
       return allPurposeProxy
     },
-    ownKeys: function (target) {
+    ownKeys: function () {
       return unconfigurablePropNames
     },
     has: function (target, property) {
@@ -134,7 +139,7 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
       if (unconfigurablePropNames.indexOf(property) === -1) {
         return undefined
       }
-      return Object.getOwnPropertyDescriptor(defaultFunc, property);
+      return Object.getOwnPropertyDescriptor(defaultFunc, property)
     }
   })
 
