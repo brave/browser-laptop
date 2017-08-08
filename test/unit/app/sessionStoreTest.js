@@ -913,25 +913,63 @@ describe('sessionStore unit tests', function () {
   })
 
   describe('runPostMigrations', function () {
-    it('sites trailing slash migration', function () {
-      const data = {
-        sites: {
-          'https://brave.com/|0|0': {
-            location: 'https://brave.com/',
-            partitionNumber: 0
+    describe('sites trailing slash migration', function () {
+      it('site with trailing slash', function () {
+        const data = {
+          sites: {
+            'https://brave.com/|0|0': {
+              location: 'https://brave.com/',
+              partitionNumber: 0
+            }
           }
         }
-      }
-      const expectedResult = {
-        sites: {
-          'https://brave.com|0|0': {
-            location: 'https://brave.com/',
-            partitionNumber: 0
+        const expectedResult = {
+          sites: {
+            'https://brave.com|0|0': {
+              location: 'https://brave.com/',
+              partitionNumber: 0
+            }
           }
         }
-      }
-      const result = sessionStore.runPostMigrations(data)
-      assert.deepEqual(result, expectedResult)
+        const result = sessionStore.runPostMigrations(data)
+        assert.deepEqual(result, expectedResult)
+      })
+      it('site without trailing slash', function () {
+        const data = {
+          sites: {
+            'https://brave.com|0|0': {
+              location: 'https://brave.com',
+              partitionNumber: 0
+            }
+          }
+        }
+        const result = sessionStore.runPostMigrations(data)
+        assert.deepEqual(result, data)
+      })
+      it('site is folder', function () {
+        const data = {
+          sites: {
+            '2': {
+              title: 'Brave',
+              folderId: 2,
+              order: 10
+            }
+          }
+        }
+        const result = sessionStore.runPostMigrations(data)
+        assert.deepEqual(result, data)
+      })
+      it('invalid site entry', function () {
+        const data = {
+          sites: {
+            'https://brave.com/|0|0': {
+              favicon: 'https://brave.com/bat.ico'
+            }
+          }
+        }
+        const result = sessionStore.runPostMigrations(data)
+        assert.deepEqual(result, data)
+      })
     })
   })
 })
