@@ -672,8 +672,15 @@ const doAction = (state, action) => {
       }
     case windowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
       {
-        closedFrames = new Immutable.OrderedMap()
-        lastClosedUrl = null
+        if (!action.location) {
+          closedFrames = new Immutable.OrderedMap()
+          lastClosedUrl = null
+        } else {
+          closedFrames = closedFrames.delete(action.location)
+          if (lastClosedUrl === action.location) {
+            lastClosedUrl = null
+          }
+        }
         updateRecentlyClosedMenuItems(state)
         break
       }
