@@ -17,7 +17,41 @@ if (isWindows) {
     widevineCdmArch = 'win_x86'
   }
 }
-const buildDir = 'Brave-' + process.platform + '-' + arch
+
+const channel = process.env.CHANNEL
+
+var channels = { nightly: true, developer: true, beta: true, dev: true }
+if (!channels[channel]) {
+  throw new Error('CHANNEL environment variable must be set to nightly, developer, beta or dev')
+}
+
+var appName
+switch (channel) {
+  case 'nightly':
+    appName = 'Brave-Nightly'
+    break
+  case 'developer':
+    appName = 'Brave-Developer'
+    break
+  case 'beta':
+    appName = 'Brave-Beta'
+    break
+  case 'dev':
+    appName = 'Brave'
+    break
+  default:
+    throw new Error('CHANNEL environment variable must be set to nightly, developer, beta or dev')
+}
+
+if (isLinux) {
+  appName = appName.toLowerCase()
+}
+
+if (isWindows) {
+  appName = appName.replace(/-/, '')
+}
+
+const buildDir = appName + '-' + process.platform + '-' + arch
 
 console.log('Building install and update for version ' + VersionInfo.braveVersion + ' in ' + buildDir + ' with Electron ' + VersionInfo.electronVersion)
 
@@ -51,39 +85,39 @@ if (isDarwin) {
     raiseError('IDENTIFIER needs to be set to the certificate organization')
   }
 
-  const wvBundle = buildDir + '/Brave.app/Contents/Frameworks/Brave Framework.framework/Brave Framework'
-  const wvBundleDir = buildDir + '/Brave.app/Contents/Frameworks/Widevine Resources.bundle'
+  const wvBundle = buildDir + `/${appName}.app/Contents/Frameworks/Brave Framework.framework/Brave Framework`
+  const wvBundleDir = buildDir + `/${appName}.app/Contents/Frameworks/Widevine Resources.bundle`
   const wvContents = wvBundleDir + '/Contents'
   const wvResources = wvContents + '/Resources'
   const wvBundleSig = wvResources + '/Brave Framework.sig'
-  const wvPlugin = buildDir + '/Brave.app/Contents/Frameworks/Brave Framework.framework/Libraries/WidevineCdm/_platform_specific/mac_x64/widevinecdmadapter.plugin'
+  const wvPlugin = buildDir + `/${appName}.app/Contents/Frameworks/Brave Framework.framework/Libraries/WidevineCdm/_platform_specific/mac_x64/widevinecdmadapter.plugin`
   cmds = [
     // Remove old
-    'rm -f ' + outDir + '/Brave.dmg',
+    'rm -f ' + outDir + `/${appName}.dmg`,
 
     // sign for widevine
     'mkdir -p "' + wvResources + '"',
-    'cp ' + buildDir + '/Brave.app/Contents/Info.plist "' + wvContents + '"',
+    'cp ' + buildDir + `/${appName}.app/Contents/Info.plist "` + wvContents + '"',
     'codesign --deep --force --strict --verbose --sign $IDENTIFIER "' + wvBundle + '"',
     'codesign --deep --force --strict --verbose --sign $IDENTIFIER "' + wvPlugin + '"',
     'python tools/signature_generator.py --input_file "' + wvBundle + '" --output_file "' + wvBundleSig + '" --flag 1',
     'python tools/signature_generator.py --input_file "' + wvPlugin + '"',
 
     // Sign it
-    'cd ' + buildDir + '/Brave.app/Contents/Frameworks',
+    'cd ' + buildDir + `/${appName}.app/Contents/Frameworks`,
     'codesign --deep --force --strict --verbose --sign $IDENTIFIER *',
     'cd ../../..',
-    'codesign --deep --force --strict --verbose --sign $IDENTIFIER Brave.app/',
+    `codesign --deep --force --strict --verbose --sign $IDENTIFIER ${appName}.app/`,
 
     // Package it into a dmg
     'cd ..',
     'build ' +
-      '--prepackaged="' + buildDir + '/Brave.app" ' +
+      '--prepackaged="' + buildDir + `/${appName}.app" ` +
       '--mac=dmg ' +
-      ' --config=res/builderConfig.json ',
+      ` --config=res/${channel}/builderConfig.json `,
 
     // Create an update zip
-    'ditto -c -k --sequesterRsrc --keepParent ' + buildDir + '/Brave.app dist/Brave-' + VersionInfo.braveVersion + '.zip'
+    'ditto -c -k --sequesterRsrc --keepParent ' + buildDir + `/${appName}.app dist/${appName}-` + VersionInfo.braveVersion + '.zip'
   ]
   execute(cmds, {}, (err) => {
     if (err) {
@@ -110,7 +144,7 @@ if (isDarwin) {
   }
 
   // sign for widevine
-  const wvExe = buildDir + '/Brave.exe'
+  const wvExe = buildDir + `/${appName}.exe`
   const wvPlugin = buildDir + '/WidevineCdm/_platform_specific/' + widevineCdmArch + '/widevinecdmadapter.dll'
   cmds = [
     getSignCmd(wvExe),
@@ -132,46 +166,47 @@ if (isDarwin) {
     var resultPromise = muonInstaller.createWindowsInstaller({
       appDirectory: buildDir,
       outputDirectory: outDir,
-      title: 'Brave',
+      title: appName,
+      name: appName,
       authors: 'Brave Software',
       loadingGif: 'res/brave_splash_installing.gif',
-      setupIcon: 'res/brave_installer.ico',
-      iconUrl: 'https://brave.com/favicon.ico',
+      setupIcon: `res/${channel}/brave_installer.ico`,
+      iconUrl: `https://raw.githubusercontent.com/brave/browser-laptop/coexisted-channels/res/${channel}/app.ico`,
       signWithParams: format('-a -fd sha256 -f "%s" -p "%s"', path.resolve(cert), certPassword),
       noMsi: true,
-      exe: 'Brave.exe'
+      exe: `${appName}.exe`,
+      setupExe: `${appName}-Setup-${arch}.exe`
     })
     resultPromise.then(() => {
       cmds = [
-        `mv ${outDir}/Setup.exe ${outDir}/BraveSetup-${arch}.exe`
       ]
       execute(cmds, {}, console.log.bind(null, 'done'))
     }, (e) => console.log(`No dice: ${e.message}`))
   })
 } else if (isLinux) {
-  console.log('Install with sudo dpkg -i dist/brave_' + VersionInfo.braveVersion + '_amd64.deb')
-  console.log('Or install with sudo dnf install dist/brave_' + VersionInfo.braveVersion + '.x86_64.rpm')
+  console.log(`Install with sudo dpkg -i dist/${appName}_` + VersionInfo.braveVersion + '_amd64.deb')
+  console.log(`Or install with sudo dnf install dist/${appName}_` + VersionInfo.braveVersion + '.x86_64.rpm')
   cmds = [
     // .deb file
     'electron-installer-debian' +
-      ' --src Brave-linux-x64/' +
-      ' --dest dist/deb' +
+      ` --src ${appName}-linux-x64/` +
+      ' --dest dist/' +
       ' --arch amd64' +
-      ' --config res/linuxPackaging.json',
+      ` --config res/${channel}/linuxPackaging.json`,
     // .rpm file
     'electron-installer-redhat' +
-      ' --src Brave-linux-x64/' +
-      ' --dest dist/redhat/' +
+      ` --src ${appName}-linux-x64/` +
+      ' --dest dist/' +
       ' --arch x86_64' +
-      ' --config res/linuxPackaging.json',
+      ` --config res/${channel}/linuxPackaging.json`,
     // OpenSuse .rpm file
     'electron-installer-redhat' +
-      ' --src Brave-linux-x64/' +
+      ` --src ${appName}-linux-x64/` +
       ' --dest dist/suse/' +
       ' --arch x86_64' +
-      ' --config res/suse.json',
+      ` --config res/${channel}/suse.json`,
     // .tar.bz2 file
-    'tar -jcvf dist/Brave.tar.bz2 ./Brave-linux-x64'
+    `tar -jcvf dist/${appName}.tar.bz2 ./${appName}-linux-x64`
   ]
   execute(cmds, {}, (err) => {
     if (err) {

@@ -1,9 +1,9 @@
 !include "MUI2.nsh"
 !include "LogicLib.nsh"
-!include "Win8WinVer.nsh"
-!include "GetParameters.nsh"
-!include "GetParent.nsh"
-!include "StrStr.nsh"
+!include "..\Win8WinVer.nsh"
+!include "..\GetParameters.nsh"
+!include "..\GetParent.nsh"
+!include "..\StrStr.nsh"
 
 !addplugindir "."
 !include "UAC.nsh"
@@ -14,7 +14,7 @@
 SilentInstall silent
 
 Name "Brave"
-OutFile "../Brave-win32-${ARCH}/resources/BraveDefaults.exe"
+OutFile "../../Brave-win32-${ARCH}/resources/BraveDefaults.exe"
 RequestExecutionLevel user
 Var BraveEXEPath
 Var BraveIconPath
@@ -118,7 +118,7 @@ Section "Defaults Section" SecDummy
     WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\Brave\Capabilities" "ApplicationDescription" "Brave is the new and fast web browser that protects your privacy and security by blocking intrusive ads and trackers."
     WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\Brave\Capabilities" "ApplicationName" "Brave"
     WriteRegDWORD SHCTX "SOFTWARE\Clients\StartMenuInternet\Brave\InstallInfo" "IconsVisible" 1
-    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\Brave\shell\open\command" "" ""
+    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\Brave\shell\open\command" "" "$BraveEXEPath"
     ; File associations
     WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\Brave\Capabilities\FileAssociations" ".htm" "BraveHTML"
     WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\Brave\Capabilities\FileAssociations" ".html" "BraveHTML"

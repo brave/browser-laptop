@@ -37,6 +37,7 @@ const filtering = require('./filtering')
 const autofill = require('./autofill')
 const {navigatableTypes} = require('../js/lib/appUrlUtil')
 const Channel = require('./channel')
+const BuildConfig = require('./buildConfig')
 const {isImmutable, makeImmutable, deleteImmutablePaths} = require('./common/state/immutableUtil')
 const {getSetting} = require('../js/settings')
 const platformUtil = require('./common/lib/platformUtil')
@@ -470,7 +471,7 @@ const safeGetVersion = (fieldName, getFieldVersion) => {
 const setVersionInformation = (immutableData) => {
   const versionFields = [
     ['Brave', app.getVersion],
-    ['rev', Channel.browserLaptopRev],
+    ['rev', BuildConfig.browserLaptopRev],
     ['Muon', () => { return process.versions['atom-shell'] }],
     ['libchromiumcontent', () => { return process.versions['chrome'] }],
     ['V8', () => { return process.versions.v8 }],
