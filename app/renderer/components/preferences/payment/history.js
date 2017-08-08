@@ -88,7 +88,7 @@ class HistoryRow extends ImmutableComponent {
       <td className={css(styles.flexAlignCenter, styles.column, styles.leftRow, styles.column__narrow)} data-sort={this.timestamp}>{this.formattedDate}</td>
       <td className={css(styles.flexAlignCenter, styles.column, styles.column__amount, styles.column__narrow)} data-sort={this.satoshis}>{this.totalAmountStr}</td>
       <td className={css(styles.flexAlignCenter, styles.column, styles.column__wide)}>
-        <a href={`${aboutContributionsUrl}#${this.viewingId}`} target='_blank'>{this.receiptFileName}</a>
+        <a href={`${aboutContributionsUrl}#${this.viewingId}`} rel='noopener' target='_blank'>{this.receiptFileName}</a>
       </td>
     </tr>
   }
