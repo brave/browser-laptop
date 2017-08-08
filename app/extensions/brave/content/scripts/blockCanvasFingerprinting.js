@@ -114,10 +114,10 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
       }
 
       if (property === 'toString') {
-        return ""
+        return ''
       }
 
-      if (property === "valueOf") {
+      if (property === 'valueOf') {
         return 0
       }
 
