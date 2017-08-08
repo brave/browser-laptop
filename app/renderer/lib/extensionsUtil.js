@@ -29,12 +29,19 @@ const pinterest = config.pinterestExtensionId
  * Properties such as name and description are referenced like keys for proper l10n
  */
 const dummyData = [
+  // {
+  //   id: bitwarden,
+  //   name: 'bitwarden',
+  //   description: 'bitwardenDesc',
+  //   icon: 'img/extensions/bitwarden-128.png'
+  // },
+  // {
+  //   id: pinterest,
+  //   name: 'Pinterest Save',
+  //   description: 'pinterestDesc',
+  //   icon: 'img/extensions/pinterest-128.png'
+  // }
   {
-    id: bitwarden,
-    name: 'bitwarden',
-    description: 'bitwardenDesc',
-    icon: 'img/extensions/bitwarden-128.png'
-  }, {
     id: dashlane,
     name: 'dashlane',
     description: 'dashlaneDesc',
@@ -61,12 +68,6 @@ const dummyData = [
     name: 'honey',
     description: 'honeyDesc',
     icon: 'img/extensions/honey-128.png'
-  },
-  {
-    id: pinterest,
-    name: 'Pinterest Save',
-    description: 'pinterestDesc',
-    icon: 'img/extensions/pinterest-128.png'
   }
   // { id: 'vimium' // TBD }
 ]
