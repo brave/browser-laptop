@@ -58,7 +58,8 @@ const isFolder = (folder) => {
     return false
   }
 
-  return folder.get('type') === siteTags.BOOKMARK_FOLDER
+  return (folder.get('type') === siteTags.BOOKMARK_FOLDER) ||
+    (typeof folder.get('folderId') === 'number')
 }
 
 const getKey = (folderDetails) => {

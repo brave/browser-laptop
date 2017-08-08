@@ -25,9 +25,11 @@ const settings = require('../js/constants/settings')
 
 // Actions
 const appActions = require('../js/actions/appActions')
+const syncActions = require('../js/actions/syncActions')
 
 // Utils
 const {getSetting} = require('../js/settings')
+const {syncEnabled} = require('../js/state/syncUtil')
 const locale = require('./locale')
 const tabMessageBox = require('./browser/tabMessageBox')
 const {makeImmutable} = require('./common/state/immutableUtil')
@@ -104,11 +106,12 @@ const getParentFolderId = (path, pathMap, addFolderFunction, topLevelFolderId, n
   if (parentFolderId === undefined) {
     parentFolderId = nextFolderIdObject.id++
     pathMap[parentFolder] = parentFolderId
-    addFolderFunction({
+    const folder = {
       title: parentFolder,
       folderId: parentFolderId,
       parentFolderId: getParentFolderId(path, pathMap, addFolderFunction, topLevelFolderId, nextFolderIdObject)
-    })
+    }
+    addFolderFunction(folder)
   }
   return parentFolderId
 }
@@ -122,8 +125,22 @@ importer.on('add-bookmarks', (e, importedBookmarks, topLevelFolder) => {
   let folders = []
   let bookmarks = []
   let topLevelFolderId = nextFolderIdObject.id++
+  const isSyncEnabled = syncEnabled()
+  const syncRecords = []
   const functionBuffer = new FunctionBuffer((args) => makeImmutable(args), this)
+  const bufferedAddBookmark = (bookmark) => {
+    if (isSyncEnabled) {
+      bookmark.skipSync = true
+      syncRecords.push(bookmark)
+    }
+    functionBuffer.buffer(appActions.addBookmark, bookmark)
+    bookmarks.push(bookmark)
+  }
   const bufferedAddFolder = (folder) => {
+    if (isSyncEnabled) {
+      folder.skipSync = true
+      syncRecords.push(folder)
+    }
     functionBuffer.buffer(appActions.addBookmarkFolder, folder)
     folders.push(folder)
   }
@@ -148,8 +165,7 @@ importer.on('add-bookmarks', (e, importedBookmarks, topLevelFolder) => {
         folderId,
         parentFolderId
       }
-      functionBuffer.buffer(appActions.addBookmarkFolder, folder)
-      folders.push(folder)
+      bufferedAddFolder(folder)
     } else {
       const location = importedBookmark.url
       const bookmark = {
@@ -157,12 +173,14 @@ importer.on('add-bookmarks', (e, importedBookmarks, topLevelFolder) => {
         location,
         parentFolderId
       }
-      functionBuffer.buffer(appActions.addBookmark, bookmark)
-      bookmarks.push(bookmark)
+      bufferedAddBookmark(bookmark)
     }
   }
   functionBuffer.flush()
   bookmarkList = makeImmutable(bookmarks)
+  if (isSyncEnabled && syncRecords.length) {
+    syncActions.addSites(syncRecords)
+  }
 })
 
 importer.on('add-favicons', (e, detail) => {

@@ -6,7 +6,8 @@ const mapValuesByKeys = require('../lib/functional').mapValuesByKeys
 
 const _ = null
 const syncConstants = {
-  SYNC_REMOVE_SITE: _,  /** @param {Immutable.Map} item */
+  SYNC_ADD_SITES: _,  /** @param {Array.<Object>} items */
+  SYNC_REMOVE_SITES: _,  /** @param {Array.<Object>} items */
   SYNC_CLEAR_HISTORY: _,
   SYNC_CLEAR_SITE_SETTINGS: _
 }

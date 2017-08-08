@@ -7,10 +7,17 @@ const AppDispatcher = require('../dispatcher/appDispatcher')
 const syncConstants = require('../constants/syncConstants')
 
 const syncActions = {
-  removeSite: function (item) {
+  addSites: function (items) {
     AppDispatcher.dispatch({
-      actionType: syncConstants.SYNC_REMOVE_SITE,
-      item
+      actionType: syncConstants.SYNC_ADD_SITES,
+      items
+    })
+  },
+
+  removeSites: function (items) {
+    AppDispatcher.dispatch({
+      actionType: syncConstants.SYNC_REMOVE_SITES,
+      items
     })
   },
 

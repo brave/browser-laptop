@@ -105,7 +105,7 @@ const bookmarkFoldersState = {
     }
 
     if (getSetting(settings.SYNC_ENABLED) === true) {
-      syncActions.removeSite(folder)
+      syncActions.removeSites([folder.toJS()])
     }
 
     folders.filter(folder => folder.get('parentFolderId') === ~~folderKey)

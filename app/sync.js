@@ -52,10 +52,6 @@ const log = (message) => {
   console.log(`sync ${new Date().getTime()}:`, message)
 }
 
-const syncEnabled = () => {
-  return getSetting(settings.SYNC_ENABLED) === true
-}
-
 let deviceId = null /** @type {Array|null} */
 let pollIntervalId = null
 
@@ -189,15 +185,10 @@ const validateAction = (action) => {
     return false
   }
 
-  // If the action requires an item, validate the item.
+  // If the action requires items, validate the items.
   if (SYNC_ACTIONS_WITHOUT_ITEMS.includes(action.actionType) !== true) {
-    if (!action.item || !action.item.toJS) {
-      log('Missing item!')
-      return false
-    }
-    // Only accept items who have an objectId set already
-    if (!action.item.get('objectId')) {
-      log(`Missing object ID! ${action.item.toJS()}`)
+    if (!action.items || !action.items.length) {
+      log('Missing items!')
       return false
     }
   }
@@ -215,14 +206,29 @@ const dispatcherCallback = (action) => {
     }
   }
   // If sync is not enabled, the following actions should be ignored.
-  if (!syncEnabled() || validateAction(action) !== true || backgroundSender.isDestroyed()) {
+  if (!syncUtil.syncEnabled() || validateAction(action) !== true || backgroundSender.isDestroyed()) {
     return
   }
   switch (action.actionType) {
+    // NOTE: Most sites are actually added via the AppStore change listener.
+    // The bookmarks importer uses this because the it creates jumbled site
+    // diffs.
+    case syncConstants.SYNC_ADD_SITES:
+      sendSyncRecords(backgroundSender, writeActions.CREATE,
+        action.items.map(item => syncUtil.createBookmarkData(item)))
+      break
     // Currently triggered only by bookmarksState and bookmarkFoldersState.
-    case syncConstants.SYNC_REMOVE_SITE:
+    case syncConstants.SYNC_REMOVE_SITES:
+      // Only accept items who have an objectId set already
+      const validItems = action.items.filter(item => {
+        if (item.objectId) {
+          return true
+        }
+        log(`Missing object ID! ${JSON.stringify(item)}`)
+        return false
+      })
       sendSyncRecords(backgroundSender, writeActions.DELETE,
-        [syncUtil.createBookmarkData(action.item.toJS())])
+        validItems.map(item => syncUtil.createBookmarkData(item)))
       break
     case syncConstants.SYNC_CLEAR_HISTORY:
       backgroundSender.send(syncMessages.DELETE_SYNC_CATEGORY, CATEGORY_MAP.historySite.categoryName)
@@ -241,7 +247,7 @@ const dispatcherCallback = (action) => {
  */
 module.exports.onSyncReady = (isFirstRun, e) => {
   appActions.setSyncSetupError(null)
-  if (!syncEnabled()) {
+  if (!syncUtil.syncEnabled()) {
     return
   }
   AppStore.addChangeListener(appStoreChangeCallback)
@@ -423,7 +429,7 @@ module.exports.init = function (appState) {
     // Register the dispatcher callback now that we have a valid sender
     appDispatcher.register(dispatcherCallback)
     // Send the initial data
-    if (syncEnabled()) {
+    if (syncUtil.syncEnabled()) {
       const appState = AppStore.getState().get('sync')
       const seed = appState.get('seed') ? Array.from(appState.get('seed')) : null
       deviceId = appState.get('deviceId') ? Array.from(appState.get('deviceId')) : null
@@ -485,7 +491,7 @@ module.exports.init = function (appState) {
     if (records.length > 0) {
       appActions.pendingSyncRecordsRemoved(records)
     }
-    if (!syncEnabled()) {
+    if (!syncUtil.syncEnabled()) {
       return
     }
     let devices = {}

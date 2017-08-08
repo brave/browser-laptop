@@ -184,7 +184,7 @@ const bookmarksState = {
     }
 
     if (getSetting(settings.SYNC_ENABLED) === true) {
-      syncActions.removeSite(bookmark)
+      syncActions.removeSites([bookmark.toJS()])
     }
 
     state = bookmarkLocationCache.removeCacheKey(state, bookmark.get('location'), bookmarkKey)
@@ -207,17 +207,21 @@ const bookmarksState = {
     }
 
     const syncEnabled = getSetting(settings.SYNC_ENABLED) === true
+    const removedBookmarks = []
     const bookmarks = bookmarksState.getBookmarks(state)
       .filter(bookmark => {
         if (bookmark.get('parentFolderId') !== ~~parentFolderId) {
           return true
         }
         if (syncEnabled) {
-          syncActions.removeSite(bookmark)
+          removedBookmarks.push(bookmark.toJS())
         }
         return false
       })
 
+    if (syncEnabled && removedBookmarks.length) {
+      syncActions.removeSites(removedBookmarks)
+    }
     return state.set(STATE_SITES.BOOKMARKS, bookmarks)
   },
 
