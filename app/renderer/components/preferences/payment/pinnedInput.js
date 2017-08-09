@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // components
 const ImmutableComponent = require('../../immutableComponent')
@@ -43,26 +43,25 @@ class PinnedInput extends ImmutableComponent {
       defaultValue={this.props.defaultValue}
       onBlur={this.pinPercentage.bind(this, this.props.patern)}
       onKeyPress={this.keyPress.bind(this)}
-      className={css(styles.percInput)}
+      className={css(styles.pinnedInput)}
     />
   }
 }
 
 const styles = StyleSheet.create({
-  percInput: {
-    height: '22px',
-    width: '50px',
+  // Ref: tableTd_percentage on ledgetTable.js
+  pinnedInput: {
+    width: 'calc(100% + 1ch)',
+    border: `1px solid #c4c5c5`,
     borderRadius: globalStyles.radius.borderRadius,
     textAlign: 'right',
-    backgroundColor: 'transparent',
+    background: 'transparent',
     outline: 'none',
-    border: `1px solid #c4c5c5`,
-    padding: '0 9px',
+    padding: '0 1ch',
     fontSize: '16px',
-    marginRight: '-10px',
 
     ':focus': {
-      backgroundColor: '#fff',
+      background: '#fff',
       borderColor: globalStyles.color.highlightBlue
     }
   }
