@@ -136,7 +136,7 @@ describe('Window store unit tests', function () {
 
     describe('APP_NEW_WEB_CONTENTS_ADDED', function () {
       let windowState
-      let tabIndexChangedStub
+      let tabMovedStub
       const demoWindowState = {
         frames: [{
           security: {
@@ -231,7 +231,7 @@ describe('Window store unit tests', function () {
       }
 
       beforeEach(function () {
-        tabIndexChangedStub = sinon.stub(appActions, 'tabIndexChanged')
+        tabMovedStub = sinon.stub(appActions, 'tabMoved')
       })
 
       afterEach(function () {
@@ -239,7 +239,7 @@ describe('Window store unit tests', function () {
           mockery.deregisterMock(reducer)
         })
 
-        tabIndexChangedStub.restore()
+        tabMovedStub.restore()
       })
 
       describe('when tab being opened is active', function () {
