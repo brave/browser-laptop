@@ -2,6 +2,7 @@
 const mockery = require('mockery')
 const assert = require('assert')
 const sinon = require('sinon')
+const Immutable = require('immutable')
 const settings = require('../../../js/constants/settings')
 const {makeImmutable} = require('../../../app/common/state/immutableUtil')
 const downloadStates = require('../../../js/constants/downloadStates')
@@ -102,7 +103,7 @@ describe('sessionStore unit tests', function () {
     let cleanSessionDataOnShutdownStub
 
     before(function () {
-      cleanAppDataStub = sinon.stub(sessionStore, 'cleanAppData').returns({})
+      cleanAppDataStub = sinon.stub(sessionStore, 'cleanAppData').returns(Immutable.Map())
       cleanSessionDataOnShutdownStub = sinon.stub(sessionStore, 'cleanSessionDataOnShutdown')
     })
 
@@ -113,7 +114,7 @@ describe('sessionStore unit tests', function () {
 
     it('calls cleanAppData', function () {
       cleanAppDataStub.reset()
-      return sessionStore.saveAppState({})
+      return sessionStore.saveAppState(Immutable.Map())
         .then(function (result) {
           assert.equal(cleanAppDataStub.calledOnce, true)
         }, function (err) {
@@ -124,7 +125,7 @@ describe('sessionStore unit tests', function () {
     describe('with isShutdown', function () {
       it('calls cleanSessionDataOnShutdown if true', function () {
         cleanSessionDataOnShutdownStub.reset()
-        return sessionStore.saveAppState({}, true)
+        return sessionStore.saveAppState(Immutable.Map(), true)
           .then(() => {
             assert.equal(cleanSessionDataOnShutdownStub.calledOnce, true)
           }, function (err) {
@@ -134,7 +135,7 @@ describe('sessionStore unit tests', function () {
 
       it('does not call cleanSessionDataOnShutdown if false', function () {
         cleanSessionDataOnShutdownStub.reset()
-        return sessionStore.saveAppState({}, false)
+        return sessionStore.saveAppState(Immutable.Map(), false)
           .then(() => {
             assert.equal(cleanSessionDataOnShutdownStub.notCalled, true)
           }, function (err) {
@@ -149,58 +150,59 @@ describe('sessionStore unit tests', function () {
 
   describe('cleanAppData', function () {
     it('clears notifications from the last session', function () {
-      const data = {notifications: ['message 1', 'message 2']}
+      const data = Immutable.fromJS({notifications: ['message 1', 'message 2']})
       const result = sessionStore.cleanAppData(data)
-      assert.deepEqual(result.notifications, [])
+      assert.deepEqual(result.get('notifications').toJS(), [])
     })
 
     it('deletes temp site settings', function () {
-      const data = {temporarySiteSettings: {site1: {setting1: 'value1'}}}
+      const data = Immutable.fromJS({temporarySiteSettings: {site1: {setting1: 'value1'}}})
       const result = sessionStore.cleanAppData(data)
-      assert.deepEqual(result.temporarySiteSettings, {})
+      assert.deepEqual(result.get('temporarySiteSettings').toJS(), {})
     })
 
     describe('when CHECK_DEFAULT_ON_STARTUP is true', function () {
       it('clears defaultBrowserCheckComplete', function () {
-        const data = {
-          settings: {},
+        const data = Immutable.fromJS({
+          settings: {
+            [settings.CHECK_DEFAULT_ON_STARTUP]: true
+          },
           defaultBrowserCheckComplete: 'test_value'
-        }
-        data.settings[settings.CHECK_DEFAULT_ON_STARTUP] = true
+        })
         const result = sessionStore.cleanAppData(data)
-        assert.equal(result.defaultBrowserCheckComplete, undefined)
+        assert.equal(result.get('defaultBrowserCheckComplete'), undefined)
       })
     })
 
     describe('with recovery status', function () {
       it('deletes status if present', function () {
-        const data = {
+        const data = Immutable.fromJS({
           ui: {
             about: {
               preferences: { recoverySucceeded: true }
             }
           }
-        }
+        })
         const result = sessionStore.cleanAppData(data)
-        assert.deepEqual(result.ui.about.preferences.recoverySucceeded, undefined)
-        assert.deepEqual(result.ui.about.preferences, {})
+        assert.deepEqual(result.getIn(['ui', 'about', 'preferences', 'recoverySucceeded']), undefined)
+        assert.deepEqual(result.getIn(['ui', 'about', 'preferences']).toJS(), {})
       })
 
       it('does not throw an exception if not present', function () {
-        const data = {
+        const data = Immutable.fromJS({
           ui: {}
-        }
+        })
         const result = sessionStore.cleanAppData(data)
-        assert.deepEqual(result.ui, {})
+        assert.deepEqual(result.get('ui').toJS(), {})
       })
     })
 
     describe('if perWindowState is present', function () {
       it('calls cleanPerWindowData for each item', function () {
         const cleanPerWindowDataStub = sinon.stub(sessionStore, 'cleanPerWindowData')
-        const data = {
+        const data = Immutable.fromJS({
           perWindowState: ['window1', 'window2']
-        }
+        })
         sessionStore.cleanAppData(data, 'IS_SHUTDOWN_VALUE')
         assert.equal(cleanPerWindowDataStub.withArgs('window1', 'IS_SHUTDOWN_VALUE').calledOnce, true)
         assert.equal(cleanPerWindowDataStub.withArgs('window2', 'IS_SHUTDOWN_VALUE').calledOnce, true)
@@ -211,7 +213,7 @@ describe('sessionStore unit tests', function () {
     describe('when clearAutocompleteData is true', function () {
       it('calls autofill.clearAutocompleteData', function () {
         const clearAutocompleteDataSpy = sinon.spy(fakeAutofill, 'clearAutocompleteData')
-        const data = {}
+        const data = Immutable.Map()
         sessionStore.cleanAppData(data, true)
         assert.equal(clearAutocompleteDataSpy.calledOnce, true)
         clearAutocompleteDataSpy.restore()
@@ -227,7 +229,7 @@ describe('sessionStore unit tests', function () {
         })
 
         it('swallows exception', function () {
-          const data = {}
+          const data = Immutable.Map()
           sessionStore.cleanAppData(data, true)
           assert.ok(true)
         })
@@ -245,7 +247,7 @@ describe('sessionStore unit tests', function () {
           clearAutofillDataSpy = sinon.spy(fakeAutofill, 'clearAutofillData')
           clock = sinon.useFakeTimers()
           now = new Date(0)
-          const data = {
+          const data = Immutable.fromJS({
             autofill: {
               addresses: {
                 guid: ['value1', 'value2'],
@@ -256,7 +258,7 @@ describe('sessionStore unit tests', function () {
                 timestamp: 'time2'
               }
             }
-          }
+          })
           result = sessionStore.cleanAppData(data, true)
         })
 
@@ -270,189 +272,189 @@ describe('sessionStore unit tests', function () {
         })
 
         it('sets the guid for addresses to []', function () {
-          assert.deepEqual(result.autofill.addresses.guid, [])
+          assert.deepEqual(result.getIn(['autofill', 'addresses', 'guid']).toJS(), [])
         })
 
         it('sets the timestamp for addresses to now', function () {
-          assert.equal(result.autofill.addresses.timestamp, now.getTime())
+          assert.equal(result.getIn(['autofill', 'addresses', 'timestamp']), now.getTime())
         })
 
         it('sets the guid for creditCards to []', function () {
-          assert.deepEqual(result.autofill.creditCards.guid, [])
+          assert.deepEqual(result.getIn(['autofill', 'creditCards', 'guid']).toJS(), [])
         })
 
         it('sets the timestamp for creditCards to now', function () {
-          assert.equal(result.autofill.creditCards.timestamp, now.getTime())
+          assert.equal(result.getIn(['autofill', 'creditCards', 'timestamp']), now.getTime())
         })
       })
 
       describe('malformed input', function () {
         it('does not throw an exception', function () {
-          sessionStore.cleanAppData({}, true)
-          sessionStore.cleanAppData({autofill: 'stringValue'}, true)
-          sessionStore.cleanAppData({autofill: {}}, true)
-          sessionStore.cleanAppData({autofill: {addresses: 'stringValue'}}, true)
-          sessionStore.cleanAppData({autofill: {creditCards: 'stringValue'}}, true)
+          sessionStore.cleanAppData(Immutable.Map(), true)
+          sessionStore.cleanAppData(Immutable.fromJS({autofill: 'stringValue'}), true)
+          sessionStore.cleanAppData(Immutable.fromJS({autofill: {}}), true)
+          sessionStore.cleanAppData(Immutable.fromJS({autofill: {addresses: 'stringValue'}}), true)
+          sessionStore.cleanAppData(Immutable.fromJS({autofill: {creditCards: 'stringValue'}}), true)
         })
       })
     })
 
     describe('when clearSiteSettings is true', function () {
       it('clears siteSettings', function () {
-        const data = {siteSettings: {site1: {setting1: 'value1'}}}
+        const data = Immutable.fromJS({siteSettings: {site1: {setting1: 'value1'}}})
         const result = sessionStore.cleanAppData(data, true)
-        assert.deepEqual(result.siteSettings, {})
+        assert.deepEqual(result.get('siteSettings').toJS(), {})
       })
     })
 
     describe('with siteSettings', function () {
       it('deletes Flash approval if expired', function () {
-        const data = {
+        const data = Immutable.fromJS({
           siteSettings: {
             site1: {flash: 1, test: 2}
           }
-        }
+        })
         const result = sessionStore.cleanAppData(data, false)
-        assert.equal(result.siteSettings.site1.flash, undefined)
+        assert.equal(result.getIn(['siteSettings', 'site1', 'flash']), undefined)
       })
 
       it('leaves Flash approval alone if not expired', function () {
-        const data = {
+        const data = Immutable.fromJS({
           siteSettings: {
             site1: {flash: Infinity, test: 2}
           }
-        }
+        })
         const result = sessionStore.cleanAppData(data, false)
-        assert.equal(result.siteSettings.site1.flash, Infinity)
+        assert.equal(result.getIn(['siteSettings', 'site1', 'flash']), Infinity)
       })
 
       it('deletes NoScript approval if set', function () {
-        const data = {
+        const data = Immutable.fromJS({
           siteSettings: {
             site1: {noScript: 1, test: 2}
           }
-        }
+        })
         const result = sessionStore.cleanAppData(data, false)
-        assert.equal(result.siteSettings.noScript, undefined)
+        assert.equal(result.getIn(['siteSettings', 'noScript']), undefined)
       })
 
       it('deletes NoScript exceptions', function () {
-        const data = {
+        const data = Immutable.fromJS({
           siteSettings: {
             site1: {noScriptExceptions: true, test: 2}
           }
-        }
+        })
         const result = sessionStore.cleanAppData(data, false)
-        assert.equal(result.siteSettings.site1.noScriptExceptions, undefined)
+        assert.equal(result.getIn(['siteSettings', 'site1', 'noScriptExceptions']), undefined)
       })
 
       it('deletes runInsecureContent', function () {
-        const data = {
+        const data = Immutable.fromJS({
           siteSettings: {
             site1: {runInsecureContent: true, test: 2}
           }
-        }
+        })
         const result = sessionStore.cleanAppData(data, false)
-        assert.equal(result.siteSettings.site1.runInsecureContent, undefined)
+        assert.equal(result.getIn(['siteSettings', 'site1', 'runInsecureContent']), undefined)
       })
 
       it('deletes entry if empty', function () {
-        const data = {
+        const data = Immutable.fromJS({
           siteSettings: {
             site1: {}
           }
-        }
+        })
         const result = sessionStore.cleanAppData(data, false)
-        assert.equal(result.siteSettings.site1, undefined)
+        assert.equal(result.getIn(['siteSettings', 'site1']), undefined)
       })
     })
 
     describe('when sites and clearHistory are truthy', function () {
       it('deletes temporary entries used in about:history', function () {
-        const data = {
+        const data = Immutable.fromJS({
           about: {history: true},
           sites: {entry1: {}}
-        }
+        })
         const result = sessionStore.cleanAppData(data, true)
-        assert.equal(result.about.history, undefined)
+        assert.equal(result.getIn(['about', 'history']), undefined)
       })
       it('deletes top site entries used in about:newtab', function () {
-        const data = {
+        const data = Immutable.fromJS({
           about: {newtab: true},
           sites: {entry1: {}}
-        }
+        })
         const result = sessionStore.cleanAppData(data, true)
-        assert.equal(result.about.newtab, undefined)
+        assert.equal(result.getIn(['about', 'newtab']), undefined)
       })
     })
 
     describe('when downloads is truthy', function () {
       describe('when clearDownloads is true', function () {
         it('deletes downloads', function () {
-          const data = {
+          const data = Immutable.fromJS({
             downloads: {
               entry1: {}
             }
-          }
+          })
           const result = sessionStore.cleanAppData(data, true)
-          assert.equal(result.downloads, undefined)
+          assert.equal(result.get('downloads'), undefined)
         })
       })
 
       describe('when clearDownloads is falsey', function () {
         it('deletes entries which are more than a week old', function () {
-          const data = {
+          const data = Immutable.fromJS({
             downloads: {
               entry1: {startTime: 1}
             }
-          }
+          })
           const result = sessionStore.cleanAppData(data, false)
-          assert.deepEqual(result.downloads, {})
+          assert.deepEqual(result.get('downloads').toJS(), {})
         })
 
         it('leaves entries which are less than a week old', function () {
-          const data = {
+          const data = Immutable.fromJS({
             downloads: {
               entry1: {startTime: new Date().getTime()}
             }
-          }
+          })
           const result = sessionStore.cleanAppData(data, false)
-          assert.deepEqual(result.downloads, data.downloads)
+          assert.deepEqual(result.get('downloads').toJS(), data.get('downloads').toJS())
         })
 
         describe('with download state', function () {
           const getEntry = (state) => {
-            return {
+            return Immutable.fromJS({
               downloads: {
-                entry1: {startTime: new Date().getTime(), state: state}
+                entry1: {startTime: new Date().getTime(), state}
               }
-            }
+            })
           }
 
           it('sets IN_PROGRESS to INTERRUPTED', function () {
             const data = getEntry(downloadStates.IN_PROGRESS)
             const result = sessionStore.cleanAppData(data, false)
-            assert.equal(result.downloads.entry1.state, downloadStates.INTERRUPTED)
+            assert.equal(result.getIn(['downloads', 'entry1', 'state']), downloadStates.INTERRUPTED)
           })
 
           it('sets PAUSED to INTERRUPTED', function () {
             const data = getEntry(downloadStates.PAUSED)
             const result = sessionStore.cleanAppData(data, false)
-            assert.equal(result.downloads.entry1.state, downloadStates.INTERRUPTED)
+            assert.equal(result.getIn(['downloads', 'entry1', 'state']), downloadStates.INTERRUPTED)
           })
 
           it('leaves other states alone', function () {
             let data = getEntry(downloadStates.COMPLETED)
             let result = sessionStore.cleanAppData(data, false)
-            assert.equal(result.downloads.entry1.state, downloadStates.COMPLETED)
+            assert.equal(result.getIn(['downloads', 'entry1', 'state']), downloadStates.COMPLETED)
 
             data = getEntry(downloadStates.CANCELLED)
             result = sessionStore.cleanAppData(data, false)
-            assert.equal(result.downloads.entry1.state, downloadStates.CANCELLED)
+            assert.equal(result.getIn(['downloads', 'entry1', 'state']), downloadStates.CANCELLED)
 
             data = getEntry(downloadStates.PENDING)
             result = sessionStore.cleanAppData(data, false)
-            assert.equal(result.downloads.entry1.state, downloadStates.PENDING)
+            assert.equal(result.getIn(['downloads', 'entry1', 'state']), downloadStates.PENDING)
           })
         })
       })
@@ -461,7 +463,7 @@ describe('sessionStore unit tests', function () {
     describe('with tabState', function () {
       it('calls getPersistentState', function () {
         const getPersistentStateSpy = sinon.spy(fakeTabState, 'getPersistentState')
-        const data = {}
+        const data = Immutable.Map()
         sessionStore.cleanAppData(data)
         assert.equal(getPersistentStateSpy.calledOnce, true)
         getPersistentStateSpy.restore()
@@ -469,9 +471,9 @@ describe('sessionStore unit tests', function () {
 
       it('deletes tabState if an exception is thrown', function () {
         const getPersistentStateSpy = sinon.stub(fakeTabState, 'getPersistentState').throws('oh noes')
-        const data = {tabs: true}
+        const data = Immutable.fromJS({tabs: true})
         const result = sessionStore.cleanAppData(data)
-        assert.equal(result.tabs, undefined)
+        assert.deepEqual(result.get('tabs').toJS(), [])
         getPersistentStateSpy.restore()
       })
     })
@@ -479,7 +481,7 @@ describe('sessionStore unit tests', function () {
     describe('with windowState', function () {
       it('calls getPersistentState', function () {
         const getPersistentStateSpy = sinon.spy(fakeWindowState, 'getPersistentState')
-        const data = {}
+        const data = Immutable.Map()
         sessionStore.cleanAppData(data)
         assert.equal(getPersistentStateSpy.calledOnce, true)
         getPersistentStateSpy.restore()
@@ -487,7 +489,7 @@ describe('sessionStore unit tests', function () {
 
       it('deletes windowState if an exception is thrown', function () {
         const getPersistentStateSpy = sinon.stub(fakeWindowState, 'getPersistentState').throws('oh noes')
-        const data = {windows: true}
+        const data = Immutable.fromJS({windows: true})
         const result = sessionStore.cleanAppData(data)
         assert.equal(result.windows, undefined)
         getPersistentStateSpy.restore()
@@ -512,7 +514,7 @@ describe('sessionStore unit tests', function () {
 
     before(function () {
       runPreMigrationsSpy = sinon.spy(sessionStore, 'runPreMigrations')
-      cleanAppDataStub = sinon.stub(sessionStore, 'cleanAppData')
+      cleanAppDataStub = sinon.stub(sessionStore, 'cleanAppData', (data) => data)
       defaultAppStateSpy = sinon.spy(sessionStore, 'defaultAppState')
       runPostMigrationsSpy = sinon.spy(sessionStore, 'runPostMigrations')
       localeInitSpy = sinon.spy(fakeLocale, 'init')
@@ -565,7 +567,7 @@ describe('sessionStore unit tests', function () {
         it('does not crash when exception thrown during read', function () {
           return sessionStore.loadAppState()
             .then(function (result) {
-              assert.ok(result.firstRunTimestamp)
+              assert.ok(result.get('firstRunTimestamp'))
             }, function (result) {
               assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
             })
@@ -653,7 +655,7 @@ describe('sessionStore unit tests', function () {
         .then(function (result) {
           assert.equal(runPreMigrationsSpy.calledOnce, true)
         }, function (result) {
-          assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+          assert.ok(false, 'promise was rejected: ' + result)
         })
     })
 

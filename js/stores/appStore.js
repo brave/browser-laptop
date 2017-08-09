@@ -39,7 +39,7 @@ const {zoomLevel} = require('../../app/common/constants/toolbarUserInterfaceScal
 const {initWindowCacheState} = require('../../app/sessionStoreShutdown')
 
 // state helpers
-const {makeImmutable} = require('../../app/common/state/immutableUtil')
+const {isImmutable, makeImmutable} = require('../../app/common/state/immutableUtil')
 const basicAuthState = require('../../app/common/state/basicAuthState')
 const extensionState = require('../../app/common/state/extensionState')
 const aboutNewTabState = require('../../app/common/state/aboutNewTabState')
@@ -76,10 +76,11 @@ const navbarHeight = () => {
 /**
  * Determine window dimensions (width / height)
  */
-const setWindowDimensions = (browserOpts, defaults, windowState) => {
-  if (windowState.ui && windowState.ui.size) {
-    browserOpts.width = firstDefinedValue(browserOpts.width, windowState.ui.size[0])
-    browserOpts.height = firstDefinedValue(browserOpts.height, windowState.ui.size[1])
+const setWindowDimensions = (browserOpts, defaults, immutableWindowState) => {
+  assert(isImmutable(immutableWindowState))
+  if (immutableWindowState.getIn(['ui', 'size'])) {
+    browserOpts.width = firstDefinedValue(browserOpts.width, immutableWindowState.getIn(['ui', 'size', 0]))
+    browserOpts.height = firstDefinedValue(browserOpts.height, immutableWindowState.getIn(['ui', 'size', 1]))
   }
   browserOpts.width = firstDefinedValue(browserOpts.width, browserOpts.innerWidth, defaults.width)
   // height and innerHeight are the frame webview size
@@ -97,15 +98,15 @@ const setWindowDimensions = (browserOpts, defaults, windowState) => {
 /**
  * Determine window position (x / y)
  */
-const setWindowPosition = (browserOpts, defaults, windowState) => {
+const setWindowPosition = (browserOpts, defaults, immutableWindowState) => {
   if (browserOpts.positionByMouseCursor) {
     const screenPos = electron.screen.getCursorScreenPoint()
     browserOpts.x = screenPos.x
     browserOpts.y = screenPos.y
-  } else if (windowState.ui && windowState.ui.position) {
+  } else if (immutableWindowState.getIn(['ui', 'position'])) {
     // Position comes from window state
-    browserOpts.x = firstDefinedValue(browserOpts.x, windowState.ui.position[0])
-    browserOpts.y = firstDefinedValue(browserOpts.y, windowState.ui.position[1])
+    browserOpts.x = firstDefinedValue(browserOpts.x, immutableWindowState.getIn(['ui', 'position', 0]))
+    browserOpts.y = firstDefinedValue(browserOpts.y, immutableWindowState.getIn(['ui', 'position', 1]))
   } else if (typeof defaults.x === 'number' && typeof defaults.y === 'number') {
     // Position comes from the default position
     browserOpts.x = firstDefinedValue(browserOpts.x, defaults.x)
@@ -121,11 +122,11 @@ const setWindowPosition = (browserOpts, defaults, windowState) => {
 const createWindow = (action) => {
   const frameOpts = (action.frameOpts && action.frameOpts.toJS()) || {}
   let browserOpts = (action.browserOpts && action.browserOpts.toJS()) || {}
-  const windowState = action.restoredState || {}
+  const immutableWindowState = action.restoredState || Immutable.Map()
   const defaults = windowDefaults()
 
-  browserOpts = setWindowDimensions(browserOpts, defaults, windowState)
-  browserOpts = setWindowPosition(browserOpts, defaults, windowState)
+  browserOpts = setWindowDimensions(browserOpts, defaults, immutableWindowState)
+  browserOpts = setWindowPosition(browserOpts, defaults, immutableWindowState)
 
   delete browserOpts.left
   delete browserOpts.top
@@ -203,39 +204,40 @@ const createWindow = (action) => {
 
   setImmediate(() => {
     let mainWindow = new BrowserWindow(Object.assign(windowProps, browserOpts, {disposition: frameOpts.disposition}))
-    initWindowCacheState(mainWindow.id, action.restoredState)
+    let restoredImmutableWindowState = action.restoredState
+    initWindowCacheState(mainWindow.id, restoredImmutableWindowState)
 
     // initialize frames state
-    let frames = []
-    if (action.restoredState) {
-      frames = action.restoredState.frames
-      action.restoredState.frames = []
-      action.restoredState.tabs = []
+    let frames = Immutable.List()
+    if (restoredImmutableWindowState) {
+      frames = restoredImmutableWindowState.get('frames')
+      restoredImmutableWindowState = restoredImmutableWindowState.set('frames', Immutable.List())
+      restoredImmutableWindowState = restoredImmutableWindowState.set('tabs', Immutable.List())
     } else {
       if (frameOpts && Object.keys(frameOpts).length > 0) {
         if (frameOpts.forEach) {
-          frames = frameOpts
+          frames = Immutable.toJS(frameOpts)
         } else {
           frames.push(frameOpts)
         }
       } else if (startupSetting === 'homePage' && homepageSetting) {
-        frames = homepageSetting.split('|').map((homepage) => {
+        frames = Immutable.fromJS(homepageSetting.split('|').map((homepage) => {
           return {
             location: homepage
           }
-        })
+        }))
       }
     }
 
-    if (frames.length === 0) {
-      frames = [{}]
+    if (frames.size === 0) {
+      frames = Immutable.fromJS([{}])
     }
 
-    if (windowState.ui && windowState.ui.isMaximized) {
+    if (immutableWindowState.getIn(['ui', 'isMaximized'])) {
       mainWindow.maximize()
     }
 
-    if (windowState.ui && windowState.ui.isFullScreen) {
+    if (immutableWindowState.getIn(['ui', 'isFullScreen'])) {
       mainWindow.setFullScreen(true)
     }
 
@@ -249,8 +251,8 @@ const createWindow = (action) => {
           id: mainWindow.id
         },
         appState: appState.toJS(),
-        frames,
-        windowState: action.restoredState})
+        frames: frames.toJS(),
+        windowState: (restoredImmutableWindowState && restoredImmutableWindowState.toJS()) || undefined})
 
       e.sender.sendShared(messages.INITIALIZE_WINDOW, mem)
       if (action.cb) {
@@ -269,11 +271,6 @@ const createWindow = (action) => {
 class AppStore extends EventEmitter {
   getState () {
     return appState
-  }
-
-  emitFullWindowState (wnd) {
-    wnd.webContents.send(messages.APP_STATE_CHANGE, { state: appState.toJS() })
-    lastEmittedState = appState
   }
 
   emitChanges (emitFullState) {

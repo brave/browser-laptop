@@ -610,7 +610,7 @@ const tabState = {
     state = tabState.removeTabField(state, 'messageBoxDetail')
     state = tabState.removeTabField(state, 'frame')
     state = state.delete('tabsInternal')
-    return state.delete('tabs')
+    return state.set('tabs', Immutable.List())
   },
 
   setNavigationState: (state, tabId, navigationState) => {
