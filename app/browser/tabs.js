@@ -139,11 +139,13 @@ const getBookmarksData = function (state) {
   let bookmarkFolderSites = new Immutable.OrderedMap()
   state.get('sites').forEach((site, siteKey) => {
     const tags = site.get('tags')
-    if (tags.includes(siteTags.BOOKMARK)) {
-      bookmarkSites = bookmarkSites.set(siteKey, site)
-    }
-    if (tags.includes(siteTags.BOOKMARK_FOLDER)) {
-      bookmarkFolderSites = bookmarkFolderSites.set(siteKey, site)
+    if (tags) {
+      if (tags.includes(siteTags.BOOKMARK)) {
+        bookmarkSites = bookmarkSites.set(siteKey, site)
+      }
+      if (tags.includes(siteTags.BOOKMARK_FOLDER)) {
+        bookmarkFolderSites = bookmarkFolderSites.set(siteKey, site)
+      }
     }
   })
   const bookmarks = bookmarkSites.toList().toJS()
