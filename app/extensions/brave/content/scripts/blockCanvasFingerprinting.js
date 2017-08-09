@@ -73,6 +73,76 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     return script_url.replace(/:\d+:\d+$/, '')
   }
 
+  // To avoid throwing hard errors on code that expects a fingerprinting feature
+  // to be in place, create a method that can be called as if it were most
+  // other types of objects (ie can be called like a function, can be indexed
+  // into like an array, can have properties looked up, etc).
+  //
+  // This is done in two steps.  First, create a default, no-op function
+  // (`defaultFunc` below), and then second, wrap it in a Proxy that traps
+  // on all these operations, and yields itself.  This allows for long
+  // chains of no-op operations like
+  //    AnalyserNode.prototype.getFloatFrequencyData().bort.alsoBort,
+  // even though AnalyserNode.prototype.getFloatFrequencyData has been replaced.
+  var defaultFunc = function () {}
+
+  // In order to avoid deeply borking things, we need to make sure we don't
+  // prevent access to builtin object properties and functions (things
+  // like (Object.prototype.constructor).  So, build a list of those below,
+  // and then special case those in the allPurposeProxy object's traps.
+  var funcPropNames = Object.getOwnPropertyNames(defaultFunc)
+  var unconfigurablePropNames = funcPropNames.filter(function (propName) {
+    var possiblePropDesc = Object.getOwnPropertyDescriptor(defaultFunc, propName)
+    return (possiblePropDesc && !possiblePropDesc.configurable)
+  })
+
+  var valueOfCoercionFunc = function (hint) {
+    if (hint === 'string') {
+      return ''
+    }
+    if (hint === 'number' || hint === 'default') {
+      return 0
+    }
+    return undefined
+  }
+
+  var allPurposeProxy = new Proxy(defaultFunc, {
+    get: function (target, property) {
+
+      if (property === Symbol.toPrimitive) {
+        return valueOfCoercionFunc
+      }
+
+      if (property === 'toString') {
+        return ''
+      }
+
+      if (property === 'valueOf') {
+        return 0
+      }
+
+      return allPurposeProxy
+    },
+    set: function () {
+      return allPurposeProxy
+    },
+    apply: function () {
+      return allPurposeProxy
+    },
+    ownKeys: function () {
+      return unconfigurablePropNames
+    },
+    has: function (target, property) {
+      return (unconfigurablePropNames.indexOf(property) > -1)
+    },
+    getOwnPropertyDescriptor: function (target, property) {
+      if (unconfigurablePropNames.indexOf(property) === -1) {
+        return undefined
+      }
+      return Object.getOwnPropertyDescriptor(defaultFunc, property)
+    }
+  })
+
   function reportBlock (type) {
     var script_url = getOriginatingScriptUrl()
     var msg = {
@@ -82,6 +152,8 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
 
     // Block the read from occuring; send info to background page instead
     chrome.ipcRenderer.sendToHost('got-canvas-fingerprinting', msg)
+
+    return allPurposeProxy
   }
 
   /**
