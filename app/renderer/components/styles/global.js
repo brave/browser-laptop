@@ -349,6 +349,18 @@ const globalStyles = {
     fontSize: {
       regular: '14.5px'
     }
+  },
+
+  sortableTable: {
+    cell: {
+      normal: {
+        padding: '.6rem'
+      },
+
+      small: {
+        padding: '.5rem'
+      }
+    }
   }
 }
 

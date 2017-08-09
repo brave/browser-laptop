@@ -429,7 +429,7 @@ class SortableTable extends React.Component {
           data-test-id={this.stateOwner.state.selection.includes(this.getGlobalIndex(currentIndex)) ? 'selected' : null}
           data-row-index={`${currentIndex}`}
           className={cx({
-            [css(styles.table__tbody__tr, this.props.largeRow && styles.table__tbody__tr_largeRow)]: true,
+            [css(styles.table__tbody__tr, this.props.smallRow && styles.table__tbody__tr_smallRow, this.props.largeRow && styles.table__tbody__tr_largeRow)]: true,
             [classes.join(' ')]: classes
           })}>{entry}</tr>
         : null
@@ -482,7 +482,7 @@ class SortableTable extends React.Component {
             const headerClasses = {
               'sort-header': true,
               'sort-default': this.sortingDisabled || heading === this.props.defaultHeading,
-              [css(styles.table__th)]: true
+              [css(styles.table__th, this.props.smallRow && styles.table__th_smallRow)]: true
             }
             const isString = typeof heading === 'string'
             const sortMethod = this.sortingDisabled ? 'none' : (dataType === 'number' ? 'number' : undefined)
@@ -532,12 +532,13 @@ const styles = StyleSheet.create({
   },
 
   table__th: {
+    boxSizing: 'border-box',
     background: `linear-gradient(to bottom, ${globalStyles.color.lightGray}, ${globalStyles.color.veryLightGray})`,
     borderTop: `1px solid ${globalStyles.color.gray}`,
     borderLeft: `1px solid ${globalStyles.color.braveOrange}`,
     textAlign: 'left',
     fontWeight: 300,
-    padding: '1ch',
+    padding: globalStyles.sortableTable.cell.normal.padding,
     whiteSpace: 'nowrap',
 
     // Up/down arrow
@@ -554,6 +555,10 @@ const styles = StyleSheet.create({
     }
   },
 
+  table__th_smallRow: {
+    padding: globalStyles.sortableTable.cell.small.padding
+  },
+
   table__th__inner: {
     display: 'inline-block',
     userSelect: 'none'
@@ -565,7 +570,12 @@ const styles = StyleSheet.create({
   },
 
   table__tbody__tr: {
-    height: '1rem'
+    boxSizing: 'border-box',
+    height: '1.75rem'
+  },
+
+  table__tbody__tr_smallRow: {
+    height: '1.5rem'
   },
 
   // Add 'largeRow' to SortableTable to increase the height of tr.
@@ -574,13 +584,14 @@ const styles = StyleSheet.create({
   },
 
   table__tbody__tr__td: {
-    padding: '.5ch 1ch'
+    boxSizing: 'border-box',
+    padding: `calc(${globalStyles.sortableTable.cell.normal.padding} / 2.25) ${globalStyles.sortableTable.cell.normal.padding}`
   },
 
-  // Add 'smallRow' to SortableTable to decrease padding-top and padding-bottom of td.
+  // Add 'smallRow' to SortableTable to decrease padding values.
   table__tbody__tr_smallRow__td: {
-    paddingTop: '.3ch',
-    paddingBottom: '.3ch'
+    padding: `calc(${globalStyles.sortableTable.cell.small.padding} / 2.25) ${globalStyles.sortableTable.cell.small.padding}`,
+    height: '1.5rem'
   }
 })
 

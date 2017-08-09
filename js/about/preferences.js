@@ -251,18 +251,18 @@ class SearchSelectEntry extends ImmutableComponent {
 
 class SearchEntry extends ImmutableComponent {
   render () {
-    return <div>
-      <span style={this.props.iconStyle} />
-      <span style={{paddingLeft: '5px', verticalAlign: 'middle'}}>{this.props.name}</span>
+    return <div className={css(styles.searchEntry)}>
+      <span className={css(styles.searchEntry__icon)} style={this.props.iconStyle} />
+      <span className={css(styles.searchEntry__name)}>{this.props.name}</span>
     </div>
   }
 }
 
 class SearchShortcutEntry extends ImmutableComponent {
   render () {
-    return <div style={{paddingLeft: '5px', verticalAlign: 'middle'}}>
+    return <span className={css(styles.searchShortcutEntry)}>
       {this.props.shortcut}
-    </div>
+    </span>
   }
 }
 
@@ -270,17 +270,10 @@ class SearchTab extends ImmutableComponent {
   get searchProviders () {
     let entries = searchProviders.providers
     let array = []
-    const iconSize = 16
+
     entries.forEach((entry) => {
-      let iconStyle = {
-        backgroundImage: `url(${entry.image})`,
-        minWidth: iconSize,
-        width: iconSize,
-        backgroundSize: iconSize,
-        height: iconSize,
-        display: 'inline-block',
-        verticalAlign: 'middle'
-      }
+      let iconStyle = {backgroundImage: `url(${entry.image})`}
+
       array.push([
         {
           html: <SearchSelectEntry name={entry.name} settings={this.props.settings} />,
@@ -311,7 +304,6 @@ class SearchTab extends ImmutableComponent {
         addHoverClass
         onClick={this.hoverCallback.bind(this)}
         tableClassNames={css(styles.sortableTable_searchTab)}
-        columnClassNames={['default', 'searchEngine', 'engineGoKey']}
       />
       <DefaultSectionTitle data-l10n-id='locationBarSettings' />
       <SettingsList>
@@ -1038,6 +1030,28 @@ const styles = StyleSheet.create({
   sortableTable_searchTab: {
     width: '704px',
     marginBottom: globalStyles.spacing.settingsListContainerMargin // See syncTab.js for use cases
+  },
+
+  searchEntry: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+
+  searchEntry__icon: {
+    height: '1rem',
+    width: '1rem',
+    backgroundSize: '1rem',
+
+    // See table__tbody__tr__td on sortableTable.js
+    marginRight: globalStyles.sortableTable.cell.normal.padding
+  },
+
+  searchEntry__name: {
+    fontSize: '1rem'
+  },
+
+  searchShortcutEntry: {
+    fontSize: '1rem'
   }
 })
 
