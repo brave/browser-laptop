@@ -31,6 +31,7 @@ Also, note that this style guide was re-made after some code has being refactore
   * [Styles are the last thing](#styles-are-the-last-thing)
   * [Important is evil](#important-is-evil)
 * [Best practices](#best-practices)
+  * [Write a comment](#write-a-comment)
   * [Always add space between styles](#always-add-space-between-styles)
   * [Dealing with pseudo-states](#dealing-with-pseudo-states)
   * [Dealing with media-queries](#dealing-with-media-queries)
@@ -235,6 +236,44 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 ```
 
 ## Best practices
+
+### Write a comment
+
+With the current test code, you cannot detect visual regressions, which often happen when the thing gets complicated. Therefore it is important to write a comment on the styles you are going to add/modify/remove.
+
+By leaving a comment, it will be much easier for future contributors to understand why the style is defined so, and to modify it when they find a better way, without being anxious about regressions.
+
+When leaving a comment on modified styles, please do not forget to include the number of the issue and/or pull request related with the change, in order to make it possible for other contributors to follow the context.
+
+**Bad**
+
+```js
+const styles = StyleSheet.create({
+  style1: {
+    background: 'purple'
+  },
+
+  style1_orange:
+    background: 'orange'
+  }
+})
+```
+
+**Good**
+
+```js
+const styles = StyleSheet.create({
+  style1: {
+    background: 'purple'
+  },
+
+  // Change the background from purple to orange based on some conditions.
+  // Please refer #00000 for the discussion.
+  style1_orange:
+    background: 'orange'
+  }
+})
+```
 
 ### Always add space between styles objects
 
