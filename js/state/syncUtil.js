@@ -572,6 +572,8 @@ module.exports.newObjectId = (objectPath) => {
  */
 const findOrCreateFolderObjectId = (folderId, appState) => {
   if (typeof folderId !== 'number' || folderId < 0) { return undefined }
+  const cachedObjectId = folderToObjectMap[folderId]
+  if (cachedObjectId) { return cachedObjectId }
   if (!appState) {
     const AppStore = require('../stores/appStore')
     appState = AppStore.getState()
@@ -582,7 +584,9 @@ const findOrCreateFolderObjectId = (folderId, appState) => {
   if (objectId) {
     return objectId.toJS()
   } else {
-    return module.exports.newObjectId([STATE_SITES.BOOKMARK_FOLDERS, folder.get('key')])
+    const newObjectId = module.exports.newObjectId([STATE_SITES.BOOKMARK_FOLDERS, folder.get('key')])
+    folderToObjectMap[folderId] = newObjectId
+    return newObjectId
   }
 }
 
@@ -624,14 +628,13 @@ module.exports.createBookmarkData = (site, appState) => {
 
   const sitesCollection = isFolder ? STATE_SITES.BOOKMARK_FOLDERS : STATE_SITES.BOOKMARKS
   const objectId = site.objectId ||
-    folderToObjectMap[site.folderId] ||
-    module.exports.newObjectId([sitesCollection, siteKey])
+      findOrCreateFolderObjectId(site.folderId, appState) ||
+      module.exports.newObjectId([sitesCollection, siteKey])
   if (!objectId) {
     console.log(`Warning: createBookmarkData can't create site data: ${JSON.stringify(site)}`)
   }
 
   const parentFolderObjectId = site.parentFolderObjectId ||
-    folderToObjectMap[site.parentFolderId] ||
     findOrCreateFolderObjectId(site.parentFolderId, appState)
   const value = {
     site: siteData,
