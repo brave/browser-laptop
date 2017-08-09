@@ -5,17 +5,17 @@
 const React = require('react')
 
 // Components
-const ImmutableComponent = require('../immutableComponent')
+const ImmutableComponent = require('../../immutableComponent')
 
 // Actions
-const appActions = require('../../../../js/actions/appActions')
+const appActions = require('../../../../../js/actions/appActions')
 
 // Constants
-const settings = require('../../../../js/constants/settings')
+const settings = require('../../../../../js/constants/settings')
 
 // Utils
-const {getSetting} = require('../../../../js/settings')
-const eventUtil = require('../../../../js/lib/eventUtil')
+const {getSetting} = require('../../../../../js/settings')
+const eventUtil = require('../../../../../js/lib/eventUtil')
 
 class HomeButton extends ImmutableComponent {
   constructor (props) {
