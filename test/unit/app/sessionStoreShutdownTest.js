@@ -20,13 +20,6 @@ const makeSender = (fakeWindow) => ({
   }
 })
 
-const getMemory = (windowState, requestId) => ({
-  memory: () => ({
-    windowState,
-    requestId
-  })
-})
-
 describe('sessionStoreShutdown unit tests', function () {
   let sessionStore
   let sessionStoreShutdown
@@ -248,9 +241,7 @@ describe('sessionStoreShutdown unit tests', function () {
       it('saves when all windows responds without the clock moving forward', function (cb) {
         this.fakeWindow1.webContents.on(messages.REQUEST_WINDOW_STATE, () => {
           setImmediate(() => {
-            const mem = getMemory(this.fakeWindow1, this.requestId)
-            fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE,
-              makeSender(this.fakeWindow1), mem)
+            fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE, makeSender(this.fakeWindow1), this.fakeWindow1, this.requestId)
           })
         })
         const saveAppStateStub = sinon.stub(sessionStore, 'saveAppState', (state) => {
@@ -273,9 +264,7 @@ describe('sessionStoreShutdown unit tests', function () {
           return Promise.resolve()
         })
 
-        const mem = getMemory({a: 1}, 0)
-        fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE,
-          makeSender(this.fakeWindow1), mem)
+        fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE, makeSender(this.fakeWindow1), {a: 1}, 0)
         fakeElectron.app.emit('before-quit', { preventDefault: () => {} })
         assert.equal(saveAppStateStub.notCalled, true)
         this.clock.tick(100000)
@@ -301,21 +290,18 @@ describe('sessionStoreShutdown unit tests', function () {
       })
       it('saves when all windows responds without the clock moving forward', function (cb) {
         this.fakeWindow1.webContents.on(messages.REQUEST_WINDOW_STATE, () => {
-          const mem = getMemory(this.fakeWindow1, this.requestId)
           setImmediate(() => {
-            fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE, makeSender(this.fakeWindow1), mem)
+            fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE, makeSender(this.fakeWindow1), this.fakeWindow1, this.requestId)
           })
         })
         this.fakeWindow2.webContents.on(messages.REQUEST_WINDOW_STATE, () => {
-          const mem = getMemory(this.fakeWindow2, this.requestId)
           setImmediate(() => {
-            fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE, makeSender(this.fakeWindow2), mem)
+            fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE, makeSender(this.fakeWindow2), this.fakeWindow2, this.requestId)
           })
         })
         this.fakeWindow3.webContents.on(messages.REQUEST_WINDOW_STATE, () => {
-          const mem = getMemory(this.fakeWindow3, this.requestId)
           setImmediate(() => {
-            fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE, makeSender(this.fakeWindow3), mem)
+            fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE, makeSender(this.fakeWindow3), this.fakeWindow3, this.requestId)
           })
         })
         const saveAppStateStub = sinon.stub(sessionStore, 'saveAppState', (state) => {
@@ -337,10 +323,9 @@ describe('sessionStoreShutdown unit tests', function () {
           cb()
           return Promise.resolve()
         })
-
-        fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE, makeSender(this.fakeWindow1), getMemory({a: 1}, 0))
-        fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE, makeSender(this.fakeWindow2), getMemory({b: 2}, 0))
-        fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE, makeSender(this.fakeWindow3), getMemory({c: 3}, 0))
+        fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE, makeSender(this.fakeWindow1), {a: 1}, 0)
+        fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE, makeSender(this.fakeWindow2), {b: 2}, 0)
+        fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE, makeSender(this.fakeWindow3), {c: 3}, 0)
         fakeElectron.app.emit('before-quit', { preventDefault: () => {} })
         assert.equal(saveAppStateStub.notCalled, true)
         this.clock.tick(100000)
@@ -354,13 +339,13 @@ describe('sessionStoreShutdown unit tests', function () {
           return Promise.resolve()
         })
 
-        fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE, makeSender(this.fakeWindow1), getMemory({a: 1}, 0))
-        fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE, makeSender(this.fakeWindow2), getMemory({b: 2}, 0))
+        fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE, makeSender(this.fakeWindow1), {a: 1}, 0)
+        fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE, makeSender(this.fakeWindow2), {b: 2}, 0)
         const requestId = 1
 
         this.fakeWindow1.webContents.on(messages.REQUEST_WINDOW_STATE, () => {
           setImmediate(() => {
-            fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE, makeSender(this.fakeWindow1), getMemory({a: 5}, requestId))
+            fakeElectron.ipcMain.send(messages.RESPONSE_WINDOW_STATE, makeSender(this.fakeWindow1), {a: 5}, requestId)
           })
         })
 
