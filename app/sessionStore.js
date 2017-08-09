@@ -15,6 +15,7 @@ const Immutable = require('immutable')
 const path = require('path')
 const electron = require('electron')
 const os = require('os')
+const assert = require('assert')
 const app = electron.app
 const locale = require('./locale')
 const UpdateStatus = require('../js/constants/updateStatus')
@@ -28,7 +29,7 @@ const filtering = require('./filtering')
 const autofill = require('./autofill')
 const {navigatableTypes} = require('../js/lib/appUrlUtil')
 const Channel = require('./channel')
-const { makeImmutable } = require('./common/state/immutableUtil')
+const {isList, isMap, isImmutable, makeImmutable, deleteImmutablePaths} = require('./common/state/immutableUtil')
 const tabState = require('./common/state/tabState')
 const windowState = require('./common/state/windowState')
 
@@ -64,38 +65,44 @@ const getStoragePath = () => {
 /**
  * Saves the specified immutable browser state to storage.
  *
- * @param {object} payload - Application state as per
+ * @param {object} immutablePayload - Application immutable state as per
  *   https://github.com/brave/browser/wiki/Application-State
  *   (not immutable data)
  * @return a promise which resolves when the state is saved
  */
-module.exports.saveAppState = (payload, isShutdown) => {
+module.exports.saveAppState = (immutablePayload, isShutdown) => {
+  assert(isImmutable(immutablePayload))
+
   return new Promise((resolve, reject) => {
     // Don't persist private frames
     let startupModeSettingValue = getSetting(settings.STARTUP_MODE)
     const savePerWindowState = startupModeSettingValue == null ||
       startupModeSettingValue === 'lastTime'
-    if (payload.perWindowState && savePerWindowState) {
-      payload.perWindowState.forEach((wndPayload) => {
-        wndPayload.frames = wndPayload.frames.filter((frame) => !frame.isPrivate)
+    if (immutablePayload.get('perWindowState') && savePerWindowState) {
+      immutablePayload.get('perWindowState').forEach((immutableWndPayload, i) => {
+        const frames = immutableWndPayload.get('frames').filter((frame) => !frame.get('isPrivate'))
+        immutableWndPayload = immutableWndPayload.set('frames', frames)
+        immutablePayload = immutablePayload.setIn(['perWindowState', i], immutableWndPayload)
       })
     } else {
-      delete payload.perWindowState
+      immutablePayload = immutablePayload.delete('perWindowState')
     }
 
     try {
-      payload = module.exports.cleanAppData(payload, isShutdown)
-      payload.cleanedOnShutdown = isShutdown
+      immutablePayload = module.exports.cleanAppData(immutablePayload, isShutdown)
+      immutablePayload.set('cleanedOnShutdown', isShutdown)
     } catch (e) {
-      payload.cleanedOnShutdown = false
+      immutablePayload.set('cleanedOnShutdown', false)
     }
-    payload.lastAppVersion = app.getVersion()
+    immutablePayload.set('lastAppVersion', app.getVersion())
 
     if (isShutdown) {
       module.exports.cleanSessionDataOnShutdown()
     }
 
-    muon.file.writeImportant(getStoragePath(), JSON.stringify(payload), (success) => {
+    const storagePath = getStoragePath()
+    const json = JSON.stringify(immutablePayload)
+    muon.file.writeImportant(storagePath, json, (success) => {
       if (success) {
         resolve()
       } else {
@@ -107,169 +114,186 @@ module.exports.saveAppState = (payload, isShutdown) => {
 
 /**
  * Cleans session data from unwanted values.
+ * @param immutablePerWindowData - Per window data in ImmutableJS format
+ * @return ImmutableJS cleaned window data
  */
-module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
-  if (!perWindowData) {
-    perWindowData = {}
+module.exports.cleanPerWindowData = (immutablePerWindowData, isShutdown) => {
+  if (!immutablePerWindowData) {
+    immutablePerWindowData = Immutable.Map()
   }
+
+  assert(isImmutable(immutablePerWindowData))
+
   // delete the frame index because tabId is per-session
-  delete perWindowData.framesInternal
-  // Hide the context menu when we restore.
-  delete perWindowData.contextMenuDetail
-  // Don't save preview frame since they are only related to hovering on a tab
-  delete perWindowData.previewFrameKey
-  // Don't save widevine panel detail
-  delete perWindowData.widevinePanelDetail
-  // Don't save preview tab pages
-  if (perWindowData.ui && perWindowData.ui.tabs) {
-    delete perWindowData.ui.tabs.previewTabPageIndex
-  }
-  // Don't restore add/edit dialog
-  delete perWindowData.bookmarkDetail
-  // Don't restore bravery panel
-  delete perWindowData.braveryPanelDetail
-  // Don't restore drag data and clearBrowsingDataPanel's visibility
-  if (perWindowData.ui) {
+  immutablePerWindowData = immutablePerWindowData.delete('framesInternal')
+
+  immutablePerWindowData = deleteImmutablePaths(immutablePerWindowData, [
+    // Hide the context menu when we restore.
+    'contextMenuDetail',
+    // Don't save preview frame since they are only related to hovering on a tab
+    'previewFrameKey',
+    // Don't save widevine panel detail
+    'widevinePanelDetail',
+    // Don't save preview tab pages
+    ['ui', 'tabs', 'previewTabPageIndex'],
+    // Don't restore add/edit dialog
+    'bookmarkDetail',
+    // Don't restore bravery panel
+    'braveryPanelDetail',
+    // Don't restore drag data and clearBrowsingDataPanel's visibility
     // This is no longer stored, we can remove this line eventually
-    delete perWindowData.ui.isFocused
-    delete perWindowData.ui.mouseInTitlebar
-    delete perWindowData.ui.mouseInFrame
-    delete perWindowData.ui.dragging
-    delete perWindowData.ui.isClearBrowsingDataPanelVisible
+    ['ui', 'isFocused'],
+    ['ui', 'mouseInTitlebar'],
+    ['ui', 'mouseInFrame'],
+    ['ui', 'dragging'],
+    ['ui', 'isClearBrowsingDataPanelVisible']
+  ])
+
+  if (!immutablePerWindowData.get('frames')) {
+    immutablePerWindowData = immutablePerWindowData.set('frames', Immutable.List())
   }
-  perWindowData.frames = perWindowData.frames || []
+
   let newKey = 0
-  const cleanFrame = (frame) => {
+  const cleanFrame = (immutableFrame) => {
     newKey++
     // Reset the ids back to sequential numbers
-    if (frame.key === perWindowData.activeFrameKey) {
-      perWindowData.activeFrameKey = newKey
+    if (immutableFrame.get('key') === immutablePerWindowData.get('activeFrameKey')) {
+      immutablePerWindowData = immutablePerWindowData.set('activeFrameKey', newKey)
     } else {
       // For now just set everything to unloaded unless it's the active frame
-      frame.unloaded = true
+      immutableFrame = immutableFrame.set('unloaded', true)
     }
-    frame.key = newKey
+    immutableFrame = immutableFrame.set('key', newKey)
 
     // Set the frame src to the last visited location
     // or else users will see the first visited URL.
     // Pinned location always get reset to what they are
-    frame.src = frame.pinnedLocation || frame.location
+    immutableFrame = immutableFrame.set('src', immutableFrame.get('pinnedLocation') || immutableFrame.get('location'))
 
     // If a blob is present for the thumbnail, create the object URL
-    if (frame.thumbnailBlob) {
+    if (immutableFrame.get('thumbnailBlob')) {
       try {
-        frame.thumbnailUrl = window.URL.createObjectURL(frame.thumbnailBlob)
+        immutableFrame.set('thumbnailUrl', window.URL.createObjectURL(immutableFrame.get('thumbnailBlob')))
       } catch (e) {
-        delete frame.thumbnailUrl
+        immutableFrame = immutableFrame.delete('thumbnailUrl')
       }
     }
 
-    // Delete lists of blocked sites
-    delete frame.trackingProtection
-    delete frame.httpsEverywhere
-    delete frame.adblock
-    delete frame.noScript
+    immutableFrame = deleteImmutablePaths(immutableFrame, [
+      // Delete lists of blocked sites
+      'trackingProtection',
+      'httpsEverywhere',
+      'adblock',
+      'noScript',
+      // clean up any legacy frame opening props
+      'openInForeground',
+      'disposition',
+      // Guest instance ID's are not valid after restarting.
+      // Electron won't know about them.
+      'guestInstanceId',
+      // Tab ids are per-session and should not be persisted
+      'tabId',
+      // Do not show the audio indicator until audio starts playing
+      'audioMuted',
+      'audioPlaybackActive',
+      // Let's not assume wknow anything about loading
+      'loading',
+      // Always re-determine the security data
+      'security',
+      // Value is only used for local storage
+      'isActive',
+      // Hide modal prompts.
+      'modalPromptDetail',
+      // Remove HTTP basic authentication requests.
+      'basicAuthDetail',
+      // Remove open search details
+      'searchDetail',
+      // Remove find in page details
+      ['findDetail', 'numberOfMatches'],
+      ['findDetail', 'activeMatchOrdinal'],
+      ['findDetail', 'internalFindStatePresent'],
+      'findbarShown',
+      // Don't restore full screen state
+      'isFullScreen',
+      'showFullScreenWarning',
+      // Don't store child tab open ordering since keys
+      // currently get re-generated when session store is
+      // restored.  We will be able to keep this once we
+      // don't regenerate new frame keys when opening storage.
+      'parentFrameKey',
+      // Delete the active shortcut details
+      'activeShortcut',
+      'activeShortcutDetails'
+    ])
 
-    // clean up any legacy frame opening props
-    delete frame.openInForeground
-    delete frame.disposition
-
-    // Guest instance ID's are not valid after restarting.
-    // Electron won't know about them.
-    delete frame.guestInstanceId
-
-    // Tab ids are per-session and should not be persisted
-    delete frame.tabId
-
-    // Do not show the audio indicator until audio starts playing
-    delete frame.audioMuted
-    delete frame.audioPlaybackActive
-    // Let's not assume wknow anything about loading
-    delete frame.loading
-    // Always re-determine the security data
-    delete frame.security
-    // Value is only used for local storage
-    delete frame.isActive
-    // Hide modal prompts.
-    delete frame.modalPromptDetail
-    // Remove HTTP basic authentication requests.
-    delete frame.basicAuthDetail
-    // Remove open search details
-    delete frame.searchDetail
-    // Remove find in page details
-    if (frame.findDetail) {
-      delete frame.findDetail.numberOfMatches
-      delete frame.findDetail.activeMatchOrdinal
-      delete frame.findDetail.internalFindStatePresent
-    }
-    delete frame.findbarShown
-    // Don't restore full screen state
-    delete frame.isFullScreen
-    delete frame.showFullScreenWarning
-    // Don't store child tab open ordering since keys
-    // currently get re-generated when session store is
-    // restored.  We will be able to keep this once we
-    // don't regenerate new frame keys when opening storage.
-    delete frame.parentFrameKey
-    // Delete the active shortcut details
-    delete frame.activeShortcut
-    delete frame.activeShortcutDetails
-
-    if (frame.navbar && frame.navbar.urlbar) {
-      if (frame.navbar.urlbar.suggestions) {
-        frame.navbar.urlbar.suggestions.selectedIndex = null
-        frame.navbar.urlbar.suggestions.suggestionList = null
+    if (immutableFrame.get('navbar') && immutableFrame.getIn(['navbar', 'urlbar'])) {
+      if (immutableFrame.getIn(['navbar', 'urlbar', 'suggestions'])) {
+        immutableFrame = immutableFrame.setIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'], null)
+        immutableFrame = immutableFrame.setIn(['navbar', 'urlbar', 'suggestions', 'suggestionList'], null)
       }
-      delete frame.navbar.urlbar.searchDetail
+      immutableFrame = immutableFrame.deleteIn(['navbar', 'urlbar', 'searchDetail'])
     }
+    return immutableFrame
   }
   const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY) === true
   if (clearHistory) {
-    perWindowData.closedFrames = []
+    immutablePerWindowData = immutablePerWindowData.set('closedFrames', Immutable.List())
   }
 
   // Clean closed frame data before frames because the keys are re-ordered
   // and the new next key is calculated in windowStore.js based on
   // the max frame key ID.
-  if (perWindowData.closedFrames) {
-    perWindowData.closedFrames.forEach(cleanFrame)
+  if (immutablePerWindowData.get('closedFrames')) {
+    immutablePerWindowData =
+      immutablePerWindowData.get('closedFrames').reduce((immutablePerWindowData, immutableFrame, index) => {
+        const cleanImmutableFrame = cleanFrame(immutableFrame)
+        return immutablePerWindowData.setIn(['closedFrames', index], cleanImmutableFrame)
+      }, immutablePerWindowData)
   }
-  if (perWindowData.frames) {
+  if (immutablePerWindowData.get('frames')) {
     // Don't restore pinned locations because they will be auto created by the app state change event
-    perWindowData.frames = perWindowData.frames
-      .filter((frame) => !frame.pinnedLocation)
-    perWindowData.frames.forEach(cleanFrame)
+    immutablePerWindowData.set('frames',
+      immutablePerWindowData.get('frames')
+        .filter((frame) => !frame.get('pinnedLocation')))
+    immutablePerWindowData =
+      immutablePerWindowData.get('frames').reduce((immutablePerWindowData, immutableFrame, index) => {
+        const cleanImmutableFrame = cleanFrame(immutableFrame)
+        return immutablePerWindowData.setIn(['frames', index], cleanImmutableFrame)
+      }, immutablePerWindowData)
   }
+  return immutablePerWindowData
 }
 
 /**
  * Cleans app data before it's written to disk.
- * @param {Object} data - top-level app data
+ * @param {Object} data - top-level app data in ImmutableJS format
  * @param {Object} isShutdown - true if the data is being cleared for a shutdown
  * WARNING: getPrefs is only available in this function when isShutdown is true
+ * @return Immutable JS cleaned up data
  */
-module.exports.cleanAppData = (data, isShutdown) => {
-  // make a copy
-  // TODO(bridiver) use immutable
-  data = makeImmutable(data).toJS()
+module.exports.cleanAppData = (immutableData, isShutdown) => {
+  assert(isImmutable(immutableData))
 
   // Don't show notifications from the last session
-  data.notifications = []
+  immutableData = immutableData.set('notifications', Immutable.List())
   // Delete temp site settings
-  data.temporarySiteSettings = {}
+  immutableData = immutableData.set('temporarySiteSettings', Immutable.Map())
 
-  if (data.settings && data.settings[settings.CHECK_DEFAULT_ON_STARTUP] === true) {
+  if (immutableData.getIn(['settings', settings.CHECK_DEFAULT_ON_STARTUP]) === true) {
     // Delete defaultBrowserCheckComplete state since this is checked on startup
-    delete data.defaultBrowserCheckComplete
+    immutableData = immutableData.delete('defaultBrowserCheckComplete')
   }
   // Delete Recovery status on shut down
   try {
-    delete data.ui.about.preferences.recoverySucceeded
+    immutableData = immutableData.deleteIn(['ui', 'about', 'preferences', 'recoverySucceeded'])
   } catch (e) {}
 
-  if (data.perWindowState) {
-    data.perWindowState.forEach((perWindowState) =>
-      module.exports.cleanPerWindowData(perWindowState, isShutdown))
+  const perWindowStateList = immutableData.get('perWindowState')
+  if (perWindowStateList) {
+    perWindowStateList.forEach((immutablePerWindowState, i) => {
+      const cleanedImmutablePerWindowState = module.exports.cleanPerWindowData(immutablePerWindowState, isShutdown)
+      immutableData = immutableData.setIn(['perWindowState', i], cleanedImmutablePerWindowState)
+    })
   }
   const clearAutocompleteData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOCOMPLETE_DATA) === true
   if (clearAutocompleteData) {
@@ -283,7 +307,7 @@ module.exports.cleanAppData = (data, isShutdown) => {
   if (clearAutofillData) {
     autofill.clearAutofillData()
     const date = new Date().getTime()
-    data.autofill = {
+    immutableData = immutableData.set('autofill', Immutable.fromJS({
       addresses: {
         guid: [],
         timestamp: date
@@ -292,94 +316,96 @@ module.exports.cleanAppData = (data, isShutdown) => {
         guid: [],
         timestamp: date
       }
-    }
+    }))
   }
-  if (data.dragData) {
-    delete data.dragData
-  }
-  if (data.sync) {
+  immutableData = immutableData.delete('dragData')
+
+  if (immutableData.get('sync')) {
     // clear sync site cache
-    data.sync.objectsById = {}
+    immutableData = immutableData.deleteIn(['sync', 'objectsById'], Immutable.Map())
   }
   const clearSiteSettings = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_SITE_SETTINGS) === true
   if (clearSiteSettings) {
-    data.siteSettings = {}
+    immutableData = immutableData.set('siteSettings', Immutable.Map())
   }
   // Delete expired Flash and NoScript allow-once approvals
   let now = Date.now()
-  for (var host in data.siteSettings) {
-    let expireTime = data.siteSettings[host].flash
+
+  immutableData.get('siteSettings', Immutable.Map()).forEach((value, host) => {
+    let expireTime = value.get('flash')
     if (typeof expireTime === 'number' && expireTime < now) {
-      delete data.siteSettings[host].flash
+      immutableData = immutableData.deleteIn(['siteSettings', host, 'flash'])
     }
-    let noScript = data.siteSettings[host].noScript
+    let noScript = immutableData.getIn(['siteSettings', host, 'noScript'])
     if (typeof noScript === 'number') {
-      delete data.siteSettings[host].noScript
+      immutableData = immutableData.deleteIn(['siteSettings', host, 'noScript'])
     }
     // Don't persist any noScript exceptions
-    delete data.siteSettings[host].noScriptExceptions
+    immutableData = immutableData.deleteIn(['siteSettings', host, 'noScriptExceptions'])
     // Don't write runInsecureContent to session
-    delete data.siteSettings[host].runInsecureContent
+    immutableData = immutableData.deleteIn(['siteSettings', host, 'runInsecureContent'])
     // If the site setting is empty, delete it for privacy
-    if (Object.keys(data.siteSettings[host]).length === 0) {
-      delete data.siteSettings[host]
+    if (Array.from(immutableData.getIn(['siteSettings', host]).keys()).length === 0) {
+      immutableData = immutableData.deleteIn(['siteSettings', host])
     }
-  }
-  if (data.sites) {
+  })
+
+  if (immutableData.get('sites')) {
     const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY) === true
     if (clearHistory) {
-      data.sites = siteUtil.clearHistory(Immutable.fromJS(data.sites)).toJS()
-      if (data.about) {
-        delete data.about.history
-        delete data.about.newtab
-      }
+      const sitesAfterClearHistory = siteUtil.clearHistory(immutableData.get('sites'))
+      immutableData = immutableData.set('sites', sitesAfterClearHistory)
+      immutableData = immutableData.set('historySites', Immutable.Map())
+      immutableData = deleteImmutablePaths(immutableData, [
+        ['about', 'history'],
+        ['about', 'newtab']
+      ])
     }
   }
-  if (data.downloads) {
+
+  if (immutableData.get('downloads')) {
     const clearDownloads = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_DOWNLOADS) === true
     if (clearDownloads) {
-      delete data.downloads
+      immutableData = immutableData.delete('downloads')
     } else {
       // Always at least delete downloaded items older than a week
       const dateOffset = 7 * 24 * 60 * 60 * 1000
       const lastWeek = new Date().getTime() - dateOffset
-      Object.keys(data.downloads).forEach((downloadId) => {
-        if (data.downloads[downloadId].startTime < lastWeek) {
-          delete data.downloads[downloadId]
+      Array.from(immutableData.get('downloads').keys()).forEach((downloadId) => {
+        if (immutableData.getIn(['downloads', downloadId, 'startTime']) < lastWeek) {
+          immutableData = immutableData.deleteIn(['downloads', downloadId])
         } else {
-          const state = data.downloads[downloadId].state
+          const state = immutableData.getIn(['downloads', downloadId, 'state'])
           if (state === downloadStates.IN_PROGRESS || state === downloadStates.PAUSED) {
-            data.downloads[downloadId].state = downloadStates.INTERRUPTED
+            immutableData = immutableData.setIn(['downloads', downloadId, 'state'], downloadStates.INTERRUPTED)
           }
         }
       })
     }
   }
 
-  if (data.menu) {
-    delete data.menu
-  }
+  immutableData = immutableData.delete('menu')
 
   try {
-    data = tabState.getPersistentState(data).toJS()
+    immutableData = tabState.getPersistentState(immutableData)
   } catch (e) {
-    delete data.tabs
     console.log('cleanAppData: error calling tabState.getPersistentState: ', e)
+    immutableData = immutableData.set('tabs', Immutable.List())
   }
 
   try {
-    data = windowState.getPersistentState(data).toJS()
+    immutableData = windowState.getPersistentState(immutableData)
   } catch (e) {
-    delete data.windows
     console.log('cleanAppData: error calling windowState.getPersistentState: ', e)
+    immutableData = immutableData.set('windows', Immutable.List())
   }
 
-  if (data.extensions) {
-    Object.keys(data.extensions).forEach((extensionId) => {
-      delete data.extensions[extensionId].tabs
+  if (immutableData.get('extensions')) {
+    Array.from(immutableData.get('extensions').keys()).forEach((extensionId) => {
+      immutableData = immutableData.delete('extensions', extensionId, 'tabs')
     })
   }
-  return data
+  return immutableData
 }
 
 /**
@@ -418,7 +444,7 @@ const safeGetVersion = (fieldName, getFieldVersion) => {
 /**
  * version information (shown on about:brave)
  */
-const setVersionInformation = (data) => {
+const setVersionInformation = (immutableData) => {
   const versionFields = [
     ['Brave', app.getVersion],
     ['rev', Channel.browserLaptopRev],
@@ -437,11 +463,11 @@ const setVersionInformation = (data) => {
     versionInformation.push(safeGetVersion(field[0], field[1]))
   })
 
-  data.about = data.about || {}
-  data.about.brave = {
-    versionInformation: versionInformation
+  if (!immutableData.get('about')) {
+    immutableData = immutableData.set('about', Immutable.Map())
   }
-  return data
+  immutableData = immutableData.setIn(['about', 'brave', 'versionInformation'], Immutable.fromJS(versionInformation))
+  return immutableData
 }
 
 module.exports.runPreMigrations = (data) => {
@@ -499,35 +525,39 @@ module.exports.runPreMigrations = (data) => {
   return data
 }
 
-module.exports.runPostMigrations = (data) => {
+module.exports.runPostMigrations = (immutableData) => {
   // sites refactoring migration
-  if (Array.isArray(data.sites) && data.sites.length) {
-    let sites = {}
+  let oldSites = immutableData.get('sites')
+  if (isList(oldSites) && oldSites.size) {
+    let newSites = Immutable.List()
     let order = 0
-    data.sites.forEach((site) => {
-      let key = siteUtil.getSiteKey(Immutable.fromJS(site))
+    oldSites.forEach((site) => {
+      let key = siteUtil.getSiteKey(site)
       site.order = order++
-      sites[key] = site
+      newSites = newSites.set(key, site)
     })
-    data.sites = sites
+    immutableData = immutableData.set('sites', newSites)
   }
 
   // sites trailing slash migration
-  if (typeof data.sites === 'object') {
-    for (let key in data.sites) {
+  oldSites = immutableData.get('sites')
+
+  if (isMap(oldSites)) {
+    const keys = Array.from(oldSites.keys())
+    for (let key of keys) {
       if (/^http.+\/\|\d+\|\d+/.test(key)) {
-        const site = data.sites[key]
-        const newKey = siteUtil.getSiteKey(Immutable.fromJS(site))
+        const site = oldSites.get(key)
+        const newKey = siteUtil.getSiteKey(site)
         if (!newKey) {
           continue
         }
-        data.sites[newKey] = site
-        delete data.sites[key]
+        immutableData = immutableData.setIn(['sites', newKey], site)
+        immutableData = immutableData.deleteIn(['sites', key])
       }
     }
   }
 
-  return data
+  return immutableData
 }
 
 module.exports.runImportDefaultSettings = (data) => {
@@ -576,28 +606,32 @@ module.exports.loadAppState = () => {
       if (data) {
         console.log('could not parse data: ', data, e)
       }
-      data = exports.defaultAppState()
-      data = module.exports.runImportDefaultSettings(data)
+      data = {}
     }
 
+    data = Object.assign({}, module.exports.defaultAppState(), data)
+    data = module.exports.runImportDefaultSettings(data)
     if (loaded) {
       data = module.exports.runPreMigrations(data)
+    }
 
+    let immutableData = makeImmutable(data)
+    if (loaded) {
       // Clean app data here if it wasn't cleared on shutdown
-      if (data.cleanedOnShutdown !== true || data.lastAppVersion !== app.getVersion()) {
-        data = module.exports.cleanAppData(data, false)
+      if (immutableData.get('cleanedOnShutdown') !== true || immutableData.get('lastAppVersion') !== app.getVersion()) {
+        immutableData = module.exports.cleanAppData(immutableData, false)
       }
-      data = Object.assign(module.exports.defaultAppState(), data)
-      data.cleanedOnShutdown = false
+
+      immutableData = immutableData.set('cleanedOnShutdown', false)
 
       // Always recalculate the update status
-      if (data.updates) {
-        const updateStatus = data.updates.status
-        delete data.updates.status
+      if (immutableData.get('updates')) {
+        const updateStatus = immutableData.getIn(['updates', 'status'])
+        immutableData = immutableData.deleteIn(['updates', 'status'])
         // The process always restarts after an update so if the state
         // indicates that a restart isn't wanted, close right away.
         if (updateStatus === UpdateStatus.UPDATE_APPLYING_NO_RESTART) {
-          module.exports.saveAppState(data, true).then(() => {
+          module.exports.saveAppState(immutableData, true).then(() => {
             // Exit immediately without doing the session store saving stuff
             // since we want the same state saved except for the update status
             app.exit(0)
@@ -606,15 +640,12 @@ module.exports.loadAppState = () => {
         }
       }
 
-      data = module.exports.runPostMigrations(data)
-      data = module.exports.runImportDefaultSettings(data)
+      immutableData = module.exports.runPostMigrations(immutableData)
     }
-
-    data = setVersionInformation(data)
-
-    locale.init(data.settings[settings.LANGUAGE]).then((locale) => {
+    immutableData = setVersionInformation(immutableData)
+    locale.init(immutableData.getIn(['settings', settings.LANGUAGE])).then((locale) => {
       app.setLocale(locale)
-      resolve(data)
+      resolve(immutableData)
     })
   })
 }
