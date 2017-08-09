@@ -48,11 +48,7 @@ webFrame.setPageScaleLimits(1, 1)
 l10n.init()
 
 ipc.on(messages.REQUEST_WINDOW_STATE, (evt, requestId) => {
-  const mem = muon.shared_memory.create({
-    windowState: windowStore.getState().toJS(),
-    requestId
-  })
-  ipc.sendShared(messages.RESPONSE_WINDOW_STATE, mem)
+  ipc.send(messages.RESPONSE_WINDOW_STATE, windowStore.getState().toJS(), requestId)
 })
 
 if (process.env.NODE_ENV === 'test') {
