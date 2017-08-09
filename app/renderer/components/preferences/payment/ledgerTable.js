@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // components
 const ImmutableComponent = require('../../immutableComponent')
@@ -115,12 +115,12 @@ class LedgerTable extends ImmutableComponent {
   get columnClassNames () {
     return [
       css(styles.alignRight, styles.verifiedTd), // verified
-      css(styles.alignRight), // sites
-      css(styles.alignLeft),  // include
+      css(styles.column_sites), // sites
+      css(styles.alignCenter),  // include
       css(styles.alignRight), // views
       css(styles.alignRight), // time spent
-      css(styles.alignRight, styles.percTd), // percentage
-      css(styles.alignLeft)   // actions
+      css(styles.alignRight, styles.column_percentage), // percentage
+      css(styles.alignCenter)   // actions
     ]
   }
 
@@ -203,7 +203,7 @@ class LedgerTable extends ImmutableComponent {
         value: duration
       },
       {
-        html: <span data-test-id='percentageValue'>
+        html: <span className={css(styles.percentageValue)} data-test-id='percentageValue'>
           {
             pinned
             ? <PinnedInput
@@ -216,15 +216,22 @@ class LedgerTable extends ImmutableComponent {
         value: percentage
       },
       {
-        html: <span>
-          <span className={css(styles.mainIcon, styles.pinIcon, pinned && styles.pinnedIcon)}
+        html: <div className={css(styles.actionIcons)}>
+          <span className={css(
+            styles.actionIcons__icon,
+            styles.actionIcons__icon_pin,
+            pinned && styles.actionIcons__icon_pin_isPinned
+          )}
             onClick={this.togglePinSite.bind(this, this.getHostPattern(synopsis), !pinned, percentage)}
             data-test-pinned={pinned}
           />
-          <span className={css(styles.mainIcon, styles.removeIcon)}
+          <span className={css(
+            styles.actionIcons__icon,
+            styles.actionIcons__icon_remove
+          )}
             onClick={this.banSite.bind(this, this.getHostPattern(synopsis))}
           />
-        </span>,
+        </div>,
         value: ''
       }
     ]
@@ -326,9 +333,9 @@ class LedgerTable extends ImmutableComponent {
 const verifiedBadge = (icon) => ({
   height: '20px',
   width: '20px',
-  marginRight: '-10px',
   display: 'block',
-  background: `url(${icon}) center no-repeat`
+  background: `url(${icon}) center no-repeat`,
+  margin: 'auto'
 })
 
 const gridStyles = StyleSheet.create({
@@ -367,11 +374,18 @@ const styles = StyleSheet.create({
   },
 
   verifiedTd: {
-    padding: '0 0 0 15px'
+    // Set the same padding with the padding-top and padding-bottom
+    paddingRight: `calc(${globalStyles.sortableTable.cell.small.padding} / 2) !important`,
+    paddingLeft: `calc(${globalStyles.sortableTable.cell.small.padding} / 2) !important`
   },
 
-  percTd: {
-    width: '45px'
+  column_sites: {
+    // TODO: Refactor sortableTable.less to remove !important
+    width: '100% !important'
+  },
+
+  column_percentage: {
+    minWidth: '3ch'
   },
 
   hideTd: {
@@ -425,28 +439,44 @@ const styles = StyleSheet.create({
     textAlign: 'left'
   },
 
+  alignCenter: {
+    display: 'flex',
+    justifyContent: 'center'
+  },
+
   paymentsDisabled: {
     opacity: 0.6
   },
 
-  mainIcon: {
+  percentageValue: {
+    // To cancel the global color setting
+    color: '#656565'
+  },
+
+  actionIcons: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    width: '50px',
+    margin: 'auto'
+  },
+
+  actionIcons__icon: {
     backgroundColor: '#c4c5c5',
-    width: '15px',
-    height: '16px',
+    width: '1rem',
+    height: '1rem',
     display: 'inline-block',
-    marginRight: '10px',
-    marginTop: '6px',
 
     ':hover': {
       backgroundColor: globalStyles.color.buttonColor
     }
   },
 
-  pinIcon: {
+  actionIcons__icon_pin: {
     '-webkit-mask-image': `url(${pinIcon})`
   },
 
-  pinnedIcon: {
+  actionIcons__icon_pin_isPinned: {
     backgroundColor: globalStyles.color.braveOrange,
 
     ':hover': {
@@ -454,7 +484,7 @@ const styles = StyleSheet.create({
     }
   },
 
-  removeIcon: {
+  actionIcons__icon_remove: {
     '-webkit-mask-image': `url(${removeIcon})`
   },
 
