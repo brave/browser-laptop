@@ -188,13 +188,12 @@ app.on('before-quit', (e) => {
   if (sessionStateSaveInterval !== undefined) {
     clearInterval(sessionStateSaveInterval)
   }
-  initiateSessionStateSave()
+  module.exports.initiateSessionStateSave()
 })
 
 const startSessionSaveInterval = () => {
   // save app state every 5 minutes regardless of update frequency
-  initiateSessionStateSave()
-  sessionStateSaveInterval = setInterval(initiateSessionStateSave, appConfig.sessionSaveInterval)
+  sessionStateSaveInterval = setInterval(module.exports.initiateSessionStateSave, appConfig.sessionSaveInterval)
 }
 
 // User initiated exit using File->Quit
