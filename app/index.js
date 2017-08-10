@@ -97,7 +97,7 @@ let loadAppStatePromise = SessionStore.loadAppState()
 loadAppStatePromise.then((initialImmutableState) => {
   telemetry.setCheckpointAndReport('state-loaded')
   const {HARDWARE_ACCELERATION_ENABLED, SMOOTH_SCROLL_ENABLED, SEND_CRASH_REPORTS} = require('../js/constants/settings')
-  if (initialImmutableState.getIn('settings', HARDWARE_ACCELERATION_ENABLED) === false) {
+  if (initialImmutableState.getIn(['settings', HARDWARE_ACCELERATION_ENABLED]) === false) {
     app.disableHardwareAcceleration()
   }
   if (initialImmutableState.getIn(['settings', SEND_CRASH_REPORTS]) !== false) {
@@ -308,7 +308,7 @@ app.on('ready', () => {
         process.platform,
         process.arch,
         process.env.BRAVE_UPDATE_VERSION || app.getVersion(),
-        initialImmutableState.getIn('settings', settings.UPDATE_TO_PREVIEW_RELEASES)
+        initialImmutableState.getIn(['settings', settings.UPDATE_TO_PREVIEW_RELEASES])
       )
 
       // This is fired by a menu entry
