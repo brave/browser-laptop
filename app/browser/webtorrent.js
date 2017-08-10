@@ -4,7 +4,7 @@ const appUrlUtil = require('../../js/lib/appUrlUtil')
 const appActions = require('../../js/actions/appActions')
 const messages = require('../../js/constants/messages')
 const Filtering = require('../filtering')
-const urlParse = require('url').parse
+const urlParse = require('../common/urlParse')
 
 // Set to see communication between WebTorrent and torrent viewer tabs
 const DEBUG_IPC = false

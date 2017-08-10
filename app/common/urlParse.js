@@ -3,8 +3,17 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const LRUCache = require('lru-cache')
-const urlParse = require('url').parse
 const config = require('../../js/constants/config')
+
+// muon.url.parse is not available in all environments (ex: unittests)
+let urlParse
+try {
+  urlParse = muon.url.parse
+} catch (e) {
+  // TODO: move to the new node URL API: https://nodejs.org/api/url.html#url_url
+  urlParse = require('url').parse
+}
+
 let cachedUrlParse = new LRUCache(config.cache.urlParse)
 
 module.exports = (url, ...args) => {
