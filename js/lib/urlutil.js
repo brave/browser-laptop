@@ -429,11 +429,14 @@ const UrlUtil = {
     }
 
     let parsed = urlParse(location)
+    if (parsed.origin) {
+      // parsed.origin is specific to muon.url.parse
+      return parsed.origin.replace(/\/+$/, '')
+    }
     if (parsed.host && parsed.protocol) {
       return parsed.slashes ? [parsed.protocol, parsed.host].join('//') : [parsed.protocol, parsed.host].join('')
-    } else {
-      return null
     }
+    return null
   }
 }
 
