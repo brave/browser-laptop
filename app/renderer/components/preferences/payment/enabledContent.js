@@ -84,7 +84,7 @@ class EnabledContent extends ImmutableComponent {
 
     return <section className={css(styles.balance)}>
       <FormTextbox data-test-id='fundsAmount' readOnly value={btcToCurrencyString(value, ledgerData)} />
-      <a className={css(styles.iconLink)} href='https://brave.com/Payments_FAQ.html' target='_blank'>
+      <a className={css(styles.iconLink)} href='https://brave.com/Payments_FAQ.html' rel='noopener' target='_blank'>
         <span className={cx({
           fa: true,
           'fa-question-circle': true,

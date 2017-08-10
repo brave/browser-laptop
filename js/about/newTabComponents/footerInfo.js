@@ -15,7 +15,7 @@ class FooterInfo extends ImmutableComponent {
           this.props.backgroundImage && this.props.backgroundImage.name
           ? <div>
             <div className='copyrightCredits'>
-              <span className='photoBy' data-l10n-id='photoBy' /> <a className='copyrightOwner' href={this.props.backgroundImage.link} rel='noopner' target='_blank'>{this.props.backgroundImage.author}</a>
+              <span className='photoBy' data-l10n-id='photoBy' /> <a className='copyrightOwner' href={this.props.backgroundImage.link} rel='noopener' target='_blank'>{this.props.backgroundImage.author}</a>
             </div>
             <span className='photoName'>{this.props.backgroundImage.name}</span>
           </div>

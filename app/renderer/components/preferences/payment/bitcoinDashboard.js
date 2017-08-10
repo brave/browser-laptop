@@ -140,7 +140,7 @@ class BitcoinDashboard extends ImmutableComponent {
             <div data-l10n-id='fundingDisabled1' />
             <div>
               <span data-l10n-id='fundingDisabled2' />&nbsp;
-              <a href='https://community.brave.com/c/payments' target='_blank' data-l10n-id='fundingDisabled3' />
+              <a href='https://community.brave.com/c/payments' data-l10n-id='fundingDisabled3' rel='noopener' target='_blank' />
             </div>
           </div>
           : <div className={css(
@@ -194,7 +194,7 @@ class BitcoinDashboard extends ImmutableComponent {
           </div>
         </div>
         <div className={css(styles.panel__divider, styles.panel__divider_right)}>
-          <a target='_blank' rel='noopener' href={url}>
+          <a href={url} rel='noopener' target='_blank'>
             <BrowserButton
               primaryColor
               panelItem
@@ -219,7 +219,7 @@ class BitcoinDashboard extends ImmutableComponent {
         </div>
       </div>
       <div className={css(styles.panel__divider, styles.panel__divider_right)}>
-        <a target='_blank' rel='noopener' href='https://www.buybitcoinworldwide.com/'>
+        <a href='https://www.buybitcoinworldwide.com/' rel='noopener' target='_blank'>
           <BrowserButton
             primaryColor
             panelItem
@@ -325,19 +325,19 @@ class BitcoinDashboard extends ImmutableComponent {
     if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
       return <section className={css(styles.modalOverlay__qrcodeOverlay__footerWrapper__footer)}>
         <div className={css(styles.coinbaseLogo)} />
-        <a rel='noopener' target='_blank'
-          className={css(
-            styles.modalOverlay__qrcodeOverlay__footerWrapper__footer__qrcodeLogo,
-            styles.modalOverlay__qrcodeOverlay__footerWrapper__footer__appstoreLogo
-          )}
+        <a className={css(
+          styles.modalOverlay__qrcodeOverlay__footerWrapper__footer__qrcodeLogo,
+          styles.modalOverlay__qrcodeOverlay__footerWrapper__footer__appstoreLogo
+        )}
           href='https://itunes.apple.com/us/app/coinbase-bitcoin-wallet/id886427730?mt=8'
+          rel='noopener' target='_blank'
         />
-        <a rel='noopener' target='_blank'
-          className={css(
-            styles.modalOverlay__qrcodeOverlay__footerWrapper__footer__qrcodeLogo,
-            styles.modalOverlay__qrcodeOverlay__footerWrapper__footer__playstoreLogo
-          )}
+        <a className={css(
+          styles.modalOverlay__qrcodeOverlay__footerWrapper__footer__qrcodeLogo,
+          styles.modalOverlay__qrcodeOverlay__footerWrapper__footer__playstoreLogo
+        )}
           href='https://play.google.com/store/apps/details?id=com.coinbase.android'
+          rel='noopener' target='_blank'
         />
       </section>
     }

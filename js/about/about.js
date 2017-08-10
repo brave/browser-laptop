@@ -36,7 +36,7 @@ class AboutAbout extends ImmutableComponent {
           {
             aboutUrls.keySeq().sort().filter((aboutSourceUrl) => isNavigatableAboutPage(aboutSourceUrl)).map((aboutSourceUrl) =>
               <li>
-                <a href={aboutUrls.get(aboutSourceUrl)} target='_blank'>
+                <a href={aboutUrls.get(aboutSourceUrl)} rel='noopener' target='_blank'>
                   {aboutSourceUrl}
                 </a>
               </li>)

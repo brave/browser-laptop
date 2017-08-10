@@ -60,7 +60,11 @@ class AboutBrave extends React.Component {
         <div>
           <span data-l10n-id='relNotesInfo1' />
           &nbsp;
-          <a className={css(commonStyles.linkText)} href={`https://github.com/brave/browser-laptop/releases/tag/v${this.state.versionInformation.get('Brave')}dev`} rel='noopener' target='_blank' data-l10n-id='relNotesInfo2' />
+          <a className={css(commonStyles.linkText)}
+            href={`https://github.com/brave/browser-laptop/releases/tag/v${this.state.versionInformation.get('Brave')}dev`}
+            data-l10n-id='relNotesInfo2'
+            rel='noopener' target='_blank'
+          />
           &nbsp;
           <span data-l10n-id='relNotesInfo3' />
         </div>
@@ -83,7 +87,7 @@ class AboutBrave extends React.Component {
             },
             {
               html: name === 'rev'
-                ? <a rel='noopener' target='_blank' className={css(commonStyles.linkText)} href={`https://github.com/brave/browser-laptop/commit/${version}`}>{(version && version.substring(0, 7)) || ''}</a>
+                ? <a className={css(commonStyles.linkText)} href={`https://github.com/brave/browser-laptop/commit/${version}`} rel='noopener' target='_blank'>{(version && version.substring(0, 7)) || ''}</a>
                 : version,
               value: version
             }
