@@ -7,7 +7,8 @@ const React = require('react')
 const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
 const Immutable = require('immutable')
 const UrlUtil = require('../lib/urlutil')
-const {css} = require('aphrodite/no-important')
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../app/renderer/components/styles/global')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
 
 // Components
@@ -323,8 +324,11 @@ class SearchTab extends ImmutableComponent {
       <DefaultSectionTitle data-test-id='searchSettings' data-l10n-id='searchSettings' />
       <SortableTable headings={['default', 'searchEngine', 'engineGoKey']} rows={this.searchProviders}
         defaultHeading='searchEngine'
-        addHoverClass onClick={this.hoverCallback.bind(this)}
-        columnClassNames={['default', 'searchEngine', 'engineGoKey']} />
+        addHoverClass
+        onClick={this.hoverCallback.bind(this)}
+        tableClassNames={css(styles.sortableTable_searchTab)}
+        columnClassNames={['default', 'searchEngine', 'engineGoKey']}
+      />
       <DefaultSectionTitle data-l10n-id='locationBarSettings' />
       <SettingsList>
         <SettingCheckbox dataL10nId='showOpenedTabMatches' prefKey={settings.OPENED_TAB_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
@@ -940,6 +944,13 @@ class AboutPreferences extends React.Component {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  sortableTable_searchTab: {
+    width: '704px',
+    marginBottom: globalStyles.spacing.settingsListContainerMargin // See syncTab.js for use cases
+  }
+})
 
 module.exports = {
   AboutPreferences: <AboutPreferences />

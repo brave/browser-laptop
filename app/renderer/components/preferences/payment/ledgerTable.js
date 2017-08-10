@@ -273,7 +273,7 @@ class LedgerTable extends ImmutableComponent {
         </div>
       </div>
       <SortableTable
-        tableClassNames={css(styles.tableClass)}
+        fillAvailable
         headings={['', 'publisher', 'include', 'views', 'timeSpent', 'percentage', 'actions']}
         defaultHeading='percentage'
         defaultHeadingSortOrder='desc'
@@ -337,13 +337,6 @@ const styles = StyleSheet.create({
     ':hover': {
       opacity: 1
     }
-  },
-
-  tableClass: {
-    width: '100%',
-    borderCollapse: 'collapse',
-    border: 'none',
-    margin: '0 auto'
   },
 
   tableTh: {

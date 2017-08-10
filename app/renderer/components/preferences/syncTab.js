@@ -159,8 +159,8 @@ class SyncTab extends ImmutableComponent {
         defaultHeading='syncDeviceLastActive'
         defaultHeadingSortOrder='desc'
         rows={this.devicesTableRows}
-        customCellClasses={css(styles.devices__devicesListCell)}
         tableClassNames={css(styles.devices__devicesList)}
+        customCellClasses={css(styles.devices__devicesListCell)}
       />
     </section>
   }
@@ -590,10 +590,8 @@ const styles = StyleSheet.create({
   },
 
   devices__devicesList: {
-    // TODO: refactor sortableTable to remove !important
-    marginBottom: `${globalStyles.spacing.dialogInsideMargin} !important`,
-    boxSizing: 'border-box',
-    width: '600px !important'
+    marginBottom: globalStyles.spacing.dialogInsideMargin,
+    width: '600px'
   },
   devices__devicesListCell: {
     padding: '4px 8px'

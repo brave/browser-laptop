@@ -56,7 +56,7 @@ class ExtensionsTab extends ImmutableComponent {
 
     return [
       { // Icon
-        html: <img className={css(styles.table__row__column__icon)} src={this.getIcon(extension)} />
+        html: <img className={css(styles.tableRow__column__icon)} src={this.getIcon(extension)} />
       },
       { // Name
         html: <span data-extension-id={extension.get('id')}
@@ -91,12 +91,12 @@ class ExtensionsTab extends ImmutableComponent {
 
   get columnClassNames () {
     return [
-      css(styles.table__row__column, styles.table__row__column_center),
-      css(styles.table__row__column),
-      css(styles.table__row__column),
-      css(styles.table__row__column),
-      css(styles.table__row__column, styles.table__row__column_center)
-      // css(styles.table__row__column, styles.table__row__column_center)
+      css(styles.tableRow__column, styles.tableRow__column_center),
+      css(styles.tableRow__column),
+      css(styles.tableRow__column),
+      css(styles.tableRow__column),
+      css(styles.tableRow__column, styles.tableRow__column_center)
+      // css(styles.tableRow__column, styles.tableRow__column_center)
     ]
   }
 
@@ -107,12 +107,12 @@ class ExtensionsTab extends ImmutableComponent {
     return <section>
       <DefaultSectionTitle data-l10n-id='extensions' />
       <SortableTable
+        fillAvailable
         sortingDisabled
-        tableClassNames={css(styles.table)}
         headings={['icon', 'name', 'description', 'version', 'enabled'] /* 'exclude' */}
         columnClassNames={this.columnClassNames}
         rowClassNames={
-          this.props.extensions.map(entry => css(styles.table__row)).toJS()
+          this.props.extensions.map(entry => css(styles.tableRow)).toJS()
         }
         rows={this.props.extensions.map(entry => this.getRow(entry))} />
       <footer className={css(styles.moreInfo)}>
@@ -129,13 +129,7 @@ class ExtensionsTab extends ImmutableComponent {
 }
 
 const styles = StyleSheet.create({
-  table: {
-    // TODO (Suguru): refactor sortableTable.js to remove !important
-    width: '100% !important',
-    marginBottom: '0 !important'
-  },
-
-  table__row: {
+  tableRow: {
     fontSize: '15px',
     background: '#fff',
 
@@ -151,15 +145,15 @@ const styles = StyleSheet.create({
     }
   },
 
-  table__row__column: {
+  tableRow__column: {
     padding: '0 8px'
   },
 
-  table__row__column_center: {
+  tableRow__column_center: {
     textAlign: 'center'
   },
 
-  table__row__column__icon: {
+  tableRow__column__icon: {
     display: 'flex',
     margin: 'auto',
     width: '32px',
