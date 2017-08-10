@@ -216,9 +216,9 @@ const createWindow = (action) => {
     } else {
       if (frameOpts && Object.keys(frameOpts).length > 0) {
         if (frameOpts.forEach) {
-          frames = Immutable.toJS(frameOpts)
+          frames = Immutable.fromJS(frameOpts)
         } else {
-          frames.push(frameOpts)
+          frames = frames.push(Immutable.fromJS(frameOpts))
         }
       } else if (startupSetting === 'homePage' && homepageSetting) {
         frames = Immutable.fromJS(homepageSetting.split('|').map((homepage) => {
