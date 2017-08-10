@@ -17,7 +17,11 @@ if (!channels.has(channel)) {
 }
 
 exports.channel = () => {
-  return channel
+  let channelMapping = {
+    'dev': 'Release',
+    'beta': 'Beta'
+  }
+  return Object.keys(channelMapping).includes(channel) ? channelMapping[channel] : channel
 }
 
 exports.browserLaptopRev = () => process.env.NODE_ENV === 'development'
