@@ -101,9 +101,9 @@ const saveAppState = (forceSave = false) => {
           // In this case on win32, the process doesn't try to auto restart, so avoid the user
           // having to open the app twice.  Maybe squirrel detects the app is already shutting down.
           if (platformUtil.isWindows()) {
-            immutableAppState.setIn(['updates', 'status'], updateStatus.UPDATE_APPLYING_RESTART)
+            immutableAppState = immutableAppState.setIn(['updates', 'status'], updateStatus.UPDATE_APPLYING_RESTART)
           } else {
-            immutableAppState.setIn(['updates', 'status'], updateStatus.UPDATE_APPLYING_NO_RESTART)
+            immutableAppState = immutableAppState.setIn(['updates', 'status'], updateStatus.UPDATE_APPLYING_NO_RESTART)
           }
         }
 
