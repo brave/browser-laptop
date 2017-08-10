@@ -413,8 +413,9 @@ const UrlUtil = {
   },
 
   /**
-   * Gets a site origin (scheme + hostname + port) from a URL or null if not
-   * available.
+   * Gets a site origin (scheme + hostname + port) from a URL or null if not available.
+   * Warning: For unit tests, this currently runs as node without the parsed.origin
+   * branch of code, but in muon this runs through the parsed.origin branch of code.
    * @param {string} location
    * @return {string|null}
    */
@@ -429,8 +430,11 @@ const UrlUtil = {
     }
 
     let parsed = urlParse(location)
-    if (parsed.origin) {
-      // parsed.origin is specific to muon.url.parse
+    // parsed.origin is specific to muon.url.parse
+    if (parsed.origin !== undefined) {
+      if (parsed.protocol === 'about:') {
+        return [parsed.protocol, parsed.path].join('')
+      }
       return parsed.origin.replace(/\/+$/, '')
     }
     if (parsed.host && parsed.protocol) {
