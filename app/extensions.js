@@ -499,17 +499,17 @@ module.exports.init = () => {
       disableExtension(extensionIds[passwordManagers.LAST_PASS])
     }
 
-    if (activePasswordManager === passwordManagers.ENPASS) {
-      registerComponent(extensionIds[passwordManagers.ENPASS], publicKeys[passwordManagers.ENPASS])
-    } else {
-      disableExtension(extensionIds[passwordManagers.ENPASS])
-    }
+    // if (activePasswordManager === passwordManagers.ENPASS) {
+    //   registerComponent(extensionIds[passwordManagers.ENPASS], publicKeys[passwordManagers.ENPASS])
+    // } else {
+    //   disableExtension(extensionIds[passwordManagers.ENPASS])
+    // }
 
-    if (activePasswordManager === passwordManagers.BITWARDEN) {
-      registerComponent(extensionIds[passwordManagers.BITWARDEN], publicKeys[passwordManagers.BITWARDEN])
-    } else {
-      disableExtension(extensionIds[passwordManagers.BITWARDEN])
-    }
+    // if (activePasswordManager === passwordManagers.BITWARDEN) {
+    //   registerComponent(extensionIds[passwordManagers.BITWARDEN], publicKeys[passwordManagers.BITWARDEN])
+    // } else {
+    //   disableExtension(extensionIds[passwordManagers.BITWARDEN])
+    // }
 
     if (getSetting(settings.POCKET_ENABLED)) {
       registerComponent(config.PocketExtensionId, config.PocketExtensionPublicKey)
@@ -517,11 +517,11 @@ module.exports.init = () => {
       disableExtension(config.PocketExtensionId)
     }
 
-    if (getSetting(settings.VIMIUM_ENABLED)) {
-      registerComponent(config.vimiumExtensionId, config.vimiumExtensionPublicKey)
-    } else {
-      disableExtension(config.vimiumExtensionId)
-    }
+    // if (getSetting(settings.VIMIUM_ENABLED)) {
+    //   registerComponent(config.vimiumExtensionId, config.vimiumExtensionPublicKey)
+    // } else {
+    //   disableExtension(config.vimiumExtensionId)
+    // }
 
     if (getSetting(settings.HONEY_ENABLED)) {
       registerComponent(config.honeyExtensionId, config.honeyExtensionPublicKey)
@@ -529,11 +529,11 @@ module.exports.init = () => {
       disableExtension(config.honeyExtensionId)
     }
 
-    if (getSetting(settings.PINTEREST_ENABLED)) {
-      registerComponent(config.pinterestExtensionId, config.pinterestExtensionPublicKey)
-    } else {
-      disableExtension(config.pinterestExtensionId)
-    }
+    // if (getSetting(settings.PINTEREST_ENABLED)) {
+    //   registerComponent(config.pinterestExtensionId, config.pinterestExtensionPublicKey)
+    // } else {
+    //   disableExtension(config.pinterestExtensionId)
+    // }
 
     if (appStore.getState().getIn(['widevine', 'enabled'])) {
       registerComponent(config.widevineComponentId, config.widevineComponentPublicKey)
