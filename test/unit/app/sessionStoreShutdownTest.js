@@ -355,4 +355,18 @@ describe('sessionStoreShutdown unit tests', function () {
       })
     })
   })
+  describe('startSessionSaveInterval', function () {
+    before(function () {
+      this.initiateSessionStateSave = sinon.spy(sessionStoreShutdown, 'initiateSessionStateSave')
+    })
+    after(function () {
+      this.initiateSessionStateSave.restore()
+    })
+    // We only care that initiateSessionStateSave is not called sync.
+    // Windows will be initialized for the non sync case.
+    it('does not call initiateSessionStateSave', function () {
+      sessionStoreShutdown.startSessionSaveInterval()
+      assert.equal(this.initiateSessionStateSave.notCalled, true)
+    })
+  })
 })
