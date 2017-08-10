@@ -83,11 +83,11 @@ module.exports.saveAppState = (immutablePayload, isShutdown) => {
 
     try {
       immutablePayload = module.exports.cleanAppData(immutablePayload, isShutdown)
-      immutablePayload.set('cleanedOnShutdown', isShutdown)
+      immutablePayload = immutablePayload.set('cleanedOnShutdown', isShutdown)
     } catch (e) {
-      immutablePayload.set('cleanedOnShutdown', false)
+      immutablePayload = immutablePayload.set('cleanedOnShutdown', false)
     }
-    immutablePayload.set('lastAppVersion', app.getVersion())
+    immutablePayload = immutablePayload.set('lastAppVersion', app.getVersion())
 
     if (isShutdown) {
       module.exports.cleanSessionDataOnShutdown()
@@ -166,7 +166,7 @@ module.exports.cleanPerWindowData = (immutablePerWindowData, isShutdown) => {
     // If a blob is present for the thumbnail, create the object URL
     if (immutableFrame.get('thumbnailBlob')) {
       try {
-        immutableFrame.set('thumbnailUrl', window.URL.createObjectURL(immutableFrame.get('thumbnailBlob')))
+        immutableFrame = immutableFrame.set('thumbnailUrl', window.URL.createObjectURL(immutableFrame.get('thumbnailBlob')))
       } catch (e) {
         immutableFrame = immutableFrame.delete('thumbnailUrl')
       }
@@ -245,7 +245,7 @@ module.exports.cleanPerWindowData = (immutablePerWindowData, isShutdown) => {
   }
   if (immutablePerWindowData.get('frames')) {
     // Don't restore pinned locations because they will be auto created by the app state change event
-    immutablePerWindowData.set('frames',
+    immutablePerWindowData = immutablePerWindowData.set('frames',
       immutablePerWindowData.get('frames')
         .filter((frame) => !frame.get('pinnedLocation')))
     immutablePerWindowData =

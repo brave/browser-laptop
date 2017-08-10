@@ -112,32 +112,61 @@ describe('sessionStore unit tests', function () {
       cleanSessionDataOnShutdownStub.restore()
     })
 
-    it('calls cleanAppData', function () {
+    it('calls cleanAppData', function (cb) {
       cleanAppDataStub.reset()
       return sessionStore.saveAppState(Immutable.Map())
         .then(function (result) {
           assert.equal(cleanAppDataStub.calledOnce, true)
+          cb()
         }, function (err) {
           assert(!err)
         })
     })
 
     describe('with isShutdown', function () {
-      it('calls cleanSessionDataOnShutdown if true', function () {
+      before(function () {
+        this.writeImportantSpy = sinon.spy(muon.file, 'writeImportant')
+      })
+      after(function () {
+        this.writeImportantSpy.restore()
+      })
+      it('calls cleanSessionDataOnShutdown if true', function (cb) {
         cleanSessionDataOnShutdownStub.reset()
         return sessionStore.saveAppState(Immutable.Map(), true)
           .then(() => {
             assert.equal(cleanSessionDataOnShutdownStub.calledOnce, true)
+            cb()
           }, function (err) {
             assert(!err)
           })
       })
 
-      it('does not call cleanSessionDataOnShutdown if false', function () {
+      it('does not call cleanSessionDataOnShutdown if false', function (cb) {
         cleanSessionDataOnShutdownStub.reset()
         return sessionStore.saveAppState(Immutable.Map(), false)
           .then(() => {
             assert.equal(cleanSessionDataOnShutdownStub.notCalled, true)
+            cb()
+          }, function (err) {
+            assert(!err)
+          })
+      })
+
+      it('sets cleanedOnShutdown for saveAppState', function (cb) {
+        sessionStore.saveAppState(Immutable.Map(), true)
+          .then(() => {
+            assert.equal(JSON.parse(this.writeImportantSpy.getCall(0).args[1]).cleanedOnShutdown, true)
+            cb()
+          }, function (err) {
+            assert(!err)
+          })
+      })
+
+      it('sets lastAppVersion for saveAppState', function (cb) {
+        sessionStore.saveAppState(Immutable.Map(), true)
+          .then(() => {
+            assert.equal(JSON.parse(this.writeImportantSpy.getCall(0).args[1]).lastAppVersion, '0.14.0')
+            cb()
           }, function (err) {
             assert(!err)
           })
@@ -146,6 +175,26 @@ describe('sessionStore unit tests', function () {
   })
 
   describe('cleanPerWindowData', function () {
+    it('clears pinned frames', function () {
+      const data = Immutable.fromJS({frames: [
+        {
+          location: 'https://brave.com/cezar/master/ken/fight',
+          pinnedLocation: 'https://brave.com/cezar/master/ken/fight'
+        }, {
+          key: 1,
+          location: 'https://brave.com/cezar/monkey/fights/dragon',
+          src: 'https://brave.com/cezar/monkey/fights/dragon',
+          unloaded: true
+        }
+      ]})
+      const result = sessionStore.cleanPerWindowData(data, true)
+      assert.deepEqual(result.get('frames').toJS(), [{
+        key: 1,
+        location: 'https://brave.com/cezar/monkey/fights/dragon',
+        src: 'https://brave.com/cezar/monkey/fights/dragon',
+        unloaded: true
+      }])
+    })
   })
 
   describe('cleanAppData', function () {
