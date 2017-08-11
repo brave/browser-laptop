@@ -117,7 +117,7 @@ class LedgerTable extends ImmutableComponent {
       css(styles.tableTd),                    // include
       css(styles.tableTd, styles.alignRight), // views
       css(styles.tableTd, styles.alignRight), // time spent
-      css(styles.tableTd, styles.alignRight, styles.percTd), // percentage
+      css(styles.tableTd, styles.alignRight, styles.tableTd_percentage), // percentage
       css(styles.tableTd, styles.alignLeft)   // actions
     ]
   }
@@ -362,9 +362,10 @@ const styles = StyleSheet.create({
     padding: '0 0 0 15px'
   },
 
-  percTd: {
-    width: '45px',
-    paddingLeft: '5px'
+  // Ref: pinnedInput on pinnedInput.js
+  tableTd_percentage: {
+    width: '4ch', // 3ch (for '100') + 1ch (padding)
+    padding: '0 2ch 0 1ch'
   },
 
   hideTd: {
