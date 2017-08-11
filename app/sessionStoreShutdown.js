@@ -197,7 +197,10 @@ const startSessionSaveInterval = () => {
 }
 
 // User initiated exit using File->Quit
-ipcMain.on(messages.RESPONSE_WINDOW_STATE, (evt, data, id) => {
+ipcMain.on(messages.RESPONSE_WINDOW_STATE, (evt, mem) => {
+  const memory = mem.memory()
+  const data = memory.windowState
+  const id = memory.requestId
   const immutableWindowState = makeImmutable(data)
   const senderWindowId = evt.sender.getOwnerBrowserWindow().id
   if (id !== windowCloseRequestId) {
