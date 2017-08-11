@@ -14,6 +14,7 @@ const windowActions = require('../../../../../js/actions/windowActions')
 // Utils
 const cx = require('../../../../../js/lib/classSet')
 const {formatAccelerator} = require('../../../../common/lib/formatUtil')
+const {elementHasDataset} = require('../../../../../js/lib/eventUtil')
 
 class ContextMenuItem extends ImmutableComponent {
   componentDidMount () {
@@ -94,11 +95,11 @@ class ContextMenuItem extends ImmutableComponent {
 
     if (this.hasSubmenu) {
       let node = e.target
-      while (node && node.classList && !node.classList.contains('contextMenuItem')) {
+      while (node && !elementHasDataset(node, 'contextMenuItem')) {
         node = node.parentNode
       }
       let parentNode = node.parentNode
-      while (parentNode && parentNode.classList && !parentNode.classList.contains('contextMenu')) {
+      while (parentNode && !elementHasDataset(parentNode, 'contextMenu')) {
         parentNode = parentNode.parentNode
       }
       const parentBoundingRect = parentNode.getBoundingClientRect()
@@ -166,6 +167,7 @@ class ContextMenuItem extends ImmutableComponent {
     }
 
     return <div {...props}
+      data-context-menu-item
       ref={(node) => { this.node = node }}
       draggable={this.props.contextMenuItem.get('draggable')}
       onDragStart={this.onDragStart.bind(this)}
