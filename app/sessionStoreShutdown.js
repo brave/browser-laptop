@@ -23,7 +23,7 @@ let sessionStateStoreCompleteCallback
 let saveAppStateTimeout
 let windowCloseRequestId
 let shuttingDown
-let lastWindowThatWasClosedState
+let immutableLastWindowClosedState
 let isAllWindowsClosed
 let sessionStateSaveInterval
 // Stores the last window state for each requested window in case a hung window happens,
@@ -42,7 +42,7 @@ const reset = () => {
   saveAppStateTimeout = null
   windowCloseRequestId = 0
   shuttingDown = false
-  lastWindowThatWasClosedState = undefined
+  immutableLastWindowClosedState = undefined
   isAllWindowsClosed = false
   sessionStateSaveInterval = null
   immutableWindowStateCache = Immutable.Map()
@@ -135,8 +135,8 @@ const initiateSessionStateSave = () => {
     immutablePerWindowState = Immutable.List()
 
     // quit triggered by window-all-closed should save last window state
-    if (isAllWindowsClosed && lastWindowThatWasClosedState) {
-      immutablePerWindowState = immutablePerWindowState.push(lastWindowThatWasClosedState)
+    if (isAllWindowsClosed && immutableLastWindowClosedState) {
+      immutablePerWindowState = immutablePerWindowState.push(immutableLastWindowClosedState)
       saveAppState(true)
     } else if (BrowserWindow.getAllWindows().length > 0) {
       ++windowCloseRequestId
@@ -213,15 +213,15 @@ ipcMain.on(messages.RESPONSE_WINDOW_STATE, (evt, data, id) => {
 
 ipcMain.on(messages.LAST_WINDOW_STATE, (evt, data) => {
   if (data) {
-    lastWindowThatWasClosedState = data
+    immutableLastWindowClosedState = Immutable.fromJS(data)
   }
 })
 
 process.on(messages.UNDO_CLOSED_WINDOW, () => {
-  if (lastWindowThatWasClosedState) {
-    sessionStore.cleanPerWindowData(lastWindowThatWasClosedState)
-    appActions.newWindow(undefined, undefined, lastWindowThatWasClosedState)
-    lastWindowThatWasClosedState = undefined
+  if (immutableLastWindowClosedState) {
+    immutableLastWindowClosedState = sessionStore.cleanPerWindowData(immutableLastWindowClosedState)
+    appActions.newWindow(undefined, undefined, immutableLastWindowClosedState)
+    immutableLastWindowClosedState = undefined
   }
 })
 
