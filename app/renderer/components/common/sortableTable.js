@@ -481,7 +481,10 @@ const styles = StyleSheet.create({
   table: {
     boxSizing: 'border-box',
     cursor: 'default',
-    borderSpacing: 0
+    borderSpacing: 0,
+
+    // #10434: Enable border on the table by default
+    borderCollapse: 'collapse'
   },
 
   // Setting 'fillAvailable' maximizes the width of the table.
