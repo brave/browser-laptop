@@ -32,6 +32,7 @@ const dndData = require('../../../../js/dndData')
 const isWindows = require('../../../common/lib/platformUtil').isWindows()
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const bookmarkUtil = require('../../../common/lib/bookmarkUtil')
+const {elementHasDataset} = require('../../../../js/lib/eventUtil')
 
 // Styles
 const globalStyles = require('../styles/global')
@@ -106,7 +107,7 @@ class BookmarksToolbar extends React.Component {
 
   onDragEnter (e) {
     if (dndData.hasDragData(e.dataTransfer, dragTypes.BOOKMARK)) {
-      if (Array.from(e.target.classList).includes('overflowIndicator')) {
+      if (elementHasDataset(e.target, 'overflowIndicator')) {
         this.onMoreBookmarksMenu(e)
       }
     }
@@ -192,6 +193,7 @@ class BookmarksToolbar extends React.Component {
       {
         this.props.hiddenBookmarks.size !== 0
         ? <BrowserButton
+          bookmarksOverflowIndicator
           iconClass={globalStyles.appIcons.angleDoubleRight}
           onClick={this.onMoreBookmarksMenu}
           custom={[
