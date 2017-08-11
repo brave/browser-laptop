@@ -943,4 +943,56 @@ describe('sessionStore unit tests', function () {
       }
     })
   })
+
+  describe('runPreMigrations', function () {
+    let data = {
+      settings: {
+        [settings.AUTO_SUGGEST_SITES]: 'sure thing',
+        [settings.MINIMUM_VISIT_TIME]: 'almost instantly',
+        [settings.MINIMUM_VISITS]: 'a million',
+        [settings.HIDE_LOWER_SITES]: 'pls do it',
+        [settings.HIDE_EXCLUDED_SITES]: 'no thanks',
+        'payments.notificationTryPaymentsDismissed': 'why would I?'
+      }
+    }
+
+    describe('if data.settings exist', function () {
+      it('PAYMENTS_SITES_AUTO_SUGGEST inherits data from AUTO_SUGGEST_SITES', function () {
+        const runPreMigrations = sessionStore.runPreMigrations(data)
+        const newValue = runPreMigrations.settings[settings.PAYMENTS_SITES_AUTO_SUGGEST]
+        const oldValue = runPreMigrations.settings[settings.AUTO_SUGGEST_SITES]
+        assert.equal(newValue, oldValue)
+      })
+      it('PAYMENTS_MINIMUM_VISIT_TIME inherits data from MINIMUM_VISIT_TIME', function () {
+        const runPreMigrations = sessionStore.runPreMigrations(data)
+        const newValue = runPreMigrations.settings[settings.PAYMENTS_MINIMUM_VISIT_TIME]
+        const oldValue = runPreMigrations.settings[settings.MINIMUM_VISIT_TIME]
+        assert.equal(newValue, oldValue)
+      })
+      it('PAYMENTS_MINIMUM_VISITS inherits data from MINIMUM_VISITS', function () {
+        const runPreMigrations = sessionStore.runPreMigrations(data)
+        const newValue = runPreMigrations.settings[settings.PAYMENTS_MINIMUM_VISITS]
+        const oldValue = runPreMigrations.settings[settings.MINIMUM_VISITS]
+        assert.equal(newValue, oldValue)
+      })
+      it('PAYMENTS_SITES_SHOW_LESS inherits data from HIDE_LOWER_SITES', function () {
+        const runPreMigrations = sessionStore.runPreMigrations(data)
+        const newValue = runPreMigrations.settings[settings.PAYMENTS_SITES_SHOW_LESS]
+        const oldValue = runPreMigrations.settings[settings.HIDE_LOWER_SITES]
+        assert.equal(newValue, oldValue)
+      })
+      it('PAYMENTS_SITES_HIDE_EXCLUDED inherits data from HIDE_EXCLUDED_SITES', function () {
+        const runPreMigrations = sessionStore.runPreMigrations(data)
+        const newValue = runPreMigrations.settings[settings.PAYMENTS_SITES_HIDE_EXCLUDED]
+        const oldValue = runPreMigrations.settings[settings.HIDE_EXCLUDED_SITES]
+        assert.equal(newValue, oldValue)
+      })
+      it('PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED inherits data from payments.notificationTryPaymentsDismissed', function () {
+        const runPreMigrations = sessionStore.runPreMigrations(data)
+        const newValue = runPreMigrations.settings[settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED]
+        const oldValue = runPreMigrations.settings['payments.notificationTryPaymentsDismissed']
+        assert.equal(newValue, oldValue)
+      })
+    })
+  })
 })
