@@ -1,6 +1,6 @@
 {
   "name": "brave",
-  "version": "0.18.21",
+  "version": "0.18.22",
   "description": "Brave laptop and desktop browser",
   "main": "./app/index.js",
   "config": {
