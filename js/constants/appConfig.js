@@ -221,7 +221,17 @@ module.exports = {
     'general.bookmarks-toolbar-mode': null,
     'general.is-default-browser': null,
     'notification-add-funds-timestamp': null,
-    'notification-reconcile-soon-timestamp': null
+    'notification-reconcile-soon-timestamp': null,
+    // ---> payments -- payments-deprecated
+    // DO NOT CHANGE THESE VALUES
+    // these are handled by sessionStore and replaced with their new values.
+    // They're not used anywhere else other than unit tests.
+    'advanced.hide-excluded-sites': false,
+    'advanced.minimum-visit-time': 8000,
+    'advanced.minimum-visits': 1,
+    'advanced.auto-suggest-sites': true,
+    'advanced.hide-lower-sites': true
+    // ---> end payments-deprecated
   },
   defaultFavicon: 'img/empty_favicon.png'
 }

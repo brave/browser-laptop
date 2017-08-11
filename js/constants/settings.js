@@ -105,7 +105,13 @@ const settings = {
   VIMIUM_ENABLED: 'extensions.vimium.enabled',
   HONEY_ENABLED: 'extensions.honey.enabled',
   PINTEREST_ENABLED: 'extensions.pinterest.enabled',
-  METAMASK_ENABLED: 'extensions.metamask.enabled'
+  METAMASK_ENABLED: 'extensions.metamask.enabled',
+  // > phased out with 0.21.0
+  HIDE_EXCLUDED_SITES: 'advanced.hide-excluded-sites',
+  HIDE_LOWER_SITES: 'advanced.hide-lower-sites',
+  MINIMUM_VISIT_TIME: 'advanced.minimum-visit-time',
+  MINIMUM_VISITS: 'advanced.minimum-visits',
+  AUTO_SUGGEST_SITES: 'advanced.auto-suggest-sites'
 }
 
 module.exports = settings
