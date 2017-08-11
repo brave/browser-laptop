@@ -114,20 +114,20 @@ describe('sessionStoreShutdown unit tests', function () {
     })
 
     it('works for first closed window', function () {
-      const windowState = Immutable.fromJS({ a: 1 })
+      const windowState = { a: 1, frames: [] }
       fakeElectron.ipcMain.send(messages.LAST_WINDOW_STATE, {}, windowState)
       process.emit(messages.UNDO_CLOSED_WINDOW)
       assert(this.newWindowStub.calledOnce)
-      assert.deepEqual(this.newWindowStub.getCall(0).args[2], windowState)
+      assert.deepEqual(this.newWindowStub.getCall(0).args[2].toJS(), windowState)
     })
     it('works for subsequent windows', function () {
-      const windowState1 = Immutable.fromJS({ b: 1 })
-      const windowState2 = Immutable.fromJS({ x: 2 })
+      const windowState1 = { b: 1, frames: [] }
+      const windowState2 = { x: 2, frames: [] }
       fakeElectron.ipcMain.send(messages.LAST_WINDOW_STATE, {}, windowState1)
       fakeElectron.ipcMain.send(messages.LAST_WINDOW_STATE, {}, windowState2)
       process.emit(messages.UNDO_CLOSED_WINDOW)
       assert(this.newWindowStub.calledOnce)
-      assert.deepEqual(this.newWindowStub.getCall(0).args[2], windowState2)
+      assert.deepEqual(this.newWindowStub.getCall(0).args[2].toJS(), windowState2)
     })
   })
 
