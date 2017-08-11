@@ -127,7 +127,8 @@ var app = {
   target: 'web',
   entry: {
     app: [ path.resolve(__dirname, 'js', 'entry.js') ],
-    aboutPages: [ path.resolve(__dirname, 'js', 'about', 'entry.js') ]
+    aboutPages: [ path.resolve(__dirname, 'js', 'about', 'entry.js') ],
+    muonTest: [ path.resolve(__dirname, 'js', 'muonTest.entry.js') ]
   },
   output: {
     path: path.resolve(__dirname, 'app', 'extensions', 'brave', 'gen'),
