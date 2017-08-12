@@ -103,6 +103,7 @@ class BookmarksList extends ImmutableComponent {
     }
     return <div>
       <SortableTable
+        fillAvailable
         ref='bookmarkTable'
         headings={[
           <BookmarkTitleHeader heading='title' selectedFolderId={this.props.selectedFolderId} />

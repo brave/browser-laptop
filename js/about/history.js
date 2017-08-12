@@ -78,7 +78,9 @@ class HistoryDay extends ImmutableComponent {
       <div className={css(styles.subTitleMargin)}>
         <AboutPageSectionSubTitle>{this.props.date}</AboutPageSectionSubTitle>
       </div>
-      <SortableTable headings={['time', 'title', 'domain']}
+      <SortableTable
+        fillAvailable
+        headings={['time', 'title', 'domain']}
         defaultHeading='time'
         defaultHeadingSortOrder='desc'
         rows={this.props.entries.map((entry) => [
