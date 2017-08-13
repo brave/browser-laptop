@@ -638,18 +638,6 @@ const appActions = {
   },
 
   /**
-   * Dispatches a message when windowId gains focus
-   *
-   * @param {Number} windowId - the unique id of the window
-   */
-  windowFocused: function (windowId) {
-    dispatch({
-      actionType: appConstants.APP_WINDOW_FOCUSED,
-      windowId: windowId
-    })
-  },
-
-  /**
    * Saves current menubar template for use w/ Windows titlebar
    * @param {Object} menubarTemplate - JSON used to build the menu
    */

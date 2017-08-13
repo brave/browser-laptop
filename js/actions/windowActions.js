@@ -1075,20 +1075,6 @@ const windowActions = {
     })
   },
 
-  onMaximize: function (windowId) {
-    dispatch({
-      actionType: windowConstants.WINDOW_ON_MAXIMIZE,
-      windowId
-    })
-  },
-
-  onMinimize: function (windowId) {
-    dispatch({
-      actionType: windowConstants.WINDOW_ON_MINIMIZE,
-      windowId
-    })
-  },
-
   // TODO(bridiver) - refactor these as declarative
   shouldSetTitle: function (windowId, title) {
     dispatch({
@@ -1129,34 +1115,6 @@ const windowActions = {
   shouldOpenDevTools: function (windowId) {
     dispatch({
       actionType: windowConstants.WINDOW_SHOULD_OPEN_DEV_TOOLS,
-      windowId
-    })
-  },
-
-  onFocus: function (windowId) {
-    dispatch({
-      actionType: windowConstants.WINDOW_ON_FOCUS,
-      windowId
-    })
-  },
-
-  onBlur: function (windowId) {
-    dispatch({
-      actionType: windowConstants.WINDOW_ON_BLUR,
-      windowId
-    })
-  },
-
-  onEnterFullScreen: function (windowId) {
-    dispatch({
-      actionType: windowConstants.WINDOW_ON_ENTER_FULL_SCREEN,
-      windowId
-    })
-  },
-
-  onExitFullScreen: function (windowId) {
-    dispatch({
-      actionType: windowConstants.WINDOW_ON_EXIT_FULL_SCREEN,
       windowId
     })
   },

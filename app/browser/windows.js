@@ -198,7 +198,6 @@ const api = {
         updateWindowDebounce(windowId)
       })
       win.on('focus', () => {
-        appActions.windowFocused(windowId)
         updateWindowDebounce(windowId)
       })
       win.on('show', () => {

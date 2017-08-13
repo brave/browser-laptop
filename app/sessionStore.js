@@ -135,7 +135,6 @@ module.exports.cleanPerWindowData = (immutablePerWindowData, isShutdown) => {
     'braveryPanelDetail',
     // Don't restore drag data and clearBrowsingDataPanel's visibility
     // This is no longer stored, we can remove this line eventually
-    ['ui', 'isFocused'],
     ['ui', 'mouseInTitlebar'],
     ['ui', 'mouseInFrame'],
     ['ui', 'dragging'],
