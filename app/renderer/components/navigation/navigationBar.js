@@ -4,22 +4,17 @@
 
 const React = require('react')
 const Immutable = require('immutable')
-const ipc = require('electron').ipcRenderer
 
 // Components
 const ReduxComponent = require('../reduxComponent')
 const UrlBar = require('./urlBar')
 const AddEditBookmarkHanger = require('../bookmarks/addEditBookmarkHanger')
 const PublisherToggle = require('./publisherToggle')
-const LongPressButton = require('../common/longPressButton')
-const HomeButton = require('./homeButton')
+const HomeButton = require('./buttons/homeButton')
+const BookmarkButton = require('./buttons/bookmarkButton')
+const ReloadButton = require('./buttons/reloadButton')
+const StopButton = require('./buttons/stopButton')
 
-// Actions
-const windowActions = require('../../../../js/actions/windowActions')
-const appActions = require('../../../../js/actions/appActions')
-
-// Constants
-const messages = require('../../../../js/constants/messages')
 const settings = require('../../../../js/constants/settings')
 
 // State
@@ -30,53 +25,12 @@ const frameStateUtil = require('../../../../js/state/frameStateUtil')
 // Utils
 const cx = require('../../../../js/lib/classSet')
 const {getBaseUrl} = require('../../../../js/lib/appUrlUtil')
-const eventUtil = require('../../../../js/lib/eventUtil')
 const {getSetting} = require('../../../../js/settings')
-const contextMenus = require('../../../../js/contextMenus')
 const bookmarkLocationCache = require('../../../common/cache/bookmarkLocationCache')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 class NavigationBar extends React.Component {
-  constructor (props) {
-    super(props)
-    this.onToggleBookmark = this.onToggleBookmark.bind(this)
-    this.onStop = this.onStop.bind(this)
-    this.onReload = this.onReload.bind(this)
-    this.onReloadLongPress = this.onReloadLongPress.bind(this)
-  }
-
-  onToggleBookmark () {
-    if (this.props.isBookmarked) {
-      windowActions.editBookmark(this.props.bookmarkKey, true)
-    } else {
-      windowActions.onBookmarkAdded(true)
-    }
-  }
-
-  onReload (e) {
-    if (eventUtil.isForSecondaryAction(e)) {
-      appActions.tabCloned(this.props.activeTabId, {active: !!e.shiftKey})
-    } else {
-      ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
-    }
-  }
-
-  onReloadLongPress (target) {
-    contextMenus.onReloadContextMenu(target)
-  }
-
-  onStop () {
-    // TODO (bridiver) - remove shortcut
-    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_STOP)
-    windowActions.onStop(this.props.isFocused, this.props.shouldRenderSuggestions)
-  }
-
-  componentDidMount () {
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, () => this.onToggleBookmark())
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark())
-  }
-
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
@@ -93,7 +47,6 @@ class NavigationBar extends React.Component {
     const publisherId = state.getIn(['locationInfo', locationId, 'publisher'])
     const navbar = activeFrame.get('navbar', Immutable.Map())
     const locationCache = bookmarkLocationCache.getCacheKey(state, location)
-    const bookmarkKey = locationCache.get(0, false)
 
     const hasTitle = title && location && title !== location.replace(/^https?:\/\//, '')
     const titleMode = activeTabShowingMessageBox ||
@@ -112,28 +65,20 @@ class NavigationBar extends React.Component {
     // used in renderer
     props.activeFrameKey = activeFrameKey
     props.titleMode = titleMode
-    props.isBookmarked = !!bookmarkKey
     props.isWideUrlBarEnabled = getSetting(settings.WIDE_URL_BAR)
     props.showBookmarkHanger = bookmarkDetail.get('isBookmarkHanger', false)
     props.isLoading = loading
-    props.showPublisherToggle = publisherState.shouldShowAddPublisherButton(state, location, publisherId)
-    props.showHomeButton = !props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
-
-    // used in other functions
     props.isFocused = navbar.getIn(['urlbar', 'focused'], false)
     props.shouldRenderSuggestions = navbar.getIn(['urlbar', 'suggestions', 'shouldRender']) === true
-    props.activeTabId = activeTabId
-    props.bookmarkKey = bookmarkKey
     props.showHomeButton = !props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
+    props.showPublisherToggle = publisherState.shouldShowAddPublisherButton(state, location, publisherId)
+    props.activeTabId = activeTabId
+    props.bookmarkKey = locationCache.get(0, false)
 
     return props
   }
 
   render () {
-    if (this.props.dontRender) {
-      return null
-    }
-
     return <div
       id='navigator'
       data-frame-key={this.props.activeFrameKey}
@@ -150,41 +95,15 @@ class NavigationBar extends React.Component {
         this.props.titleMode
         ? null
         : this.props.isLoading
-          ? <span className='navigationButtonContainer'>
-            <button data-l10n-id='stopButton'
-              className='normalizeButton navigationButton stopButton'
-              onClick={this.onStop} />
-          </span>
-          : <span className='navigationButtonContainer'>
-            <LongPressButton
-              l10nId='reloadButton'
-              className='normalizeButton navigationButton reloadButton'
-              onClick={this.onReload}
-              onLongPress={this.onReloadLongPress} />
-          </span>
+          ? <StopButton isFocused={this.props.isFocused} shouldRenderSuggestions={this.props.shouldRenderSuggestions} />
+          : <ReloadButton activeTabId={this.props.activeTabId} />
       }
       {
         this.props.showHomeButton
         ? <HomeButton activeTabId={this.props.activeTabId} />
         : null
       }
-      <div className='startButtons'>
-        {
-          !this.props.titleMode
-          ? <span className='bookmarkButtonContainer'>
-            <button data-l10n-id={this.props.isBookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
-              className={cx({
-                navigationButton: true,
-                bookmarkButton: true,
-                removeBookmarkButton: this.props.isBookmarked,
-                withHomeButton: getSetting(settings.SHOW_HOME_BUTTON),
-                normalizeButton: true
-              })}
-              onClick={this.onToggleBookmark} />
-          </span>
-          : null
-        }
-      </div>
+      <BookmarkButton bookmarkKey={this.props.bookmarkKey} />
       <UrlBar titleMode={this.props.titleMode} />
       {
         this.props.showPublisherToggle

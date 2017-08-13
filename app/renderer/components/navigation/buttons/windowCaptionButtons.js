@@ -5,16 +5,16 @@
 const React = require('react')
 
 // Components
-const ImmutableComponent = require('../immutableComponent')
+const ImmutableComponent = require('../../immutableComponent')
 
 // Actions
-const appActions = require('../../../../js/actions/appActions')
-const windowActions = require('../../../../js/actions/windowActions')
+const appActions = require('../../../../../js/actions/appActions')
+const windowActions = require('../../../../../js/actions/windowActions')
 
 // Utils
-const locale = require('../../../../js/l10n')
-const {getCurrentWindowId, isMaximized, isFullScreen} = require('../../currentWindow')
-const cx = require('../../../../js/lib/classSet')
+const locale = require('../../../../../js/l10n')
+const {getCurrentWindowId, isMaximized, isFullScreen} = require('../../../currentWindow')
+const cx = require('../../../../../js/lib/classSet')
 
 class WindowCaptionButtons extends ImmutableComponent {
   constructor () {
