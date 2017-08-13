@@ -440,7 +440,6 @@ class Main extends React.Component {
       }
     }, { passive: true })
 
-
     // disable dnd by default
     window.addEventListener('dragover', function (event) {
       // allow webviews to handle dnd

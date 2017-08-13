@@ -1,13 +1,42 @@
-/* global describe, it, before, after */
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/* global describe, it, before, beforeEach, after, afterEach */
 
 const Brave = require('../lib/brave')
 const {urlInput, navigatorBookmarked, navigatorNotBookmarked, pinnedTabsTabs, tabsTabs} = require('../lib/selectors')
 const siteTags = require('../../js/constants/siteTags')
 const settings = require('../../js/constants/settings')
+const {startsWithOption} = require('../../app/common/constants/settingsEnums')
 
 describe('sessionStore test', function () {
-  function * setup () {
+  function * setup (client) {
+    yield client
+      .waitForBrowserWindow()
+      .waitForVisible(urlInput)
+  }
+
+  function * setupBrave () {
     Brave.addCommands()
+  }
+
+  function * checkWindow (client, width, height, x, y) {
+    yield client.app.client
+      .windowByIndex(0)
+      .browserWindow.getBounds().should.eventually.have.property('width').should.become(width)
+
+    yield client.app.client
+      .windowByIndex(0)
+      .browserWindow.getBounds().should.eventually.have.property('height').should.become(height)
+
+    yield client.app.client
+      .windowByIndex(0)
+      .browserWindow.getBounds().then((res) => res.x).should.eventually.be.equal(x)
+
+    yield client.app.client
+      .windowByIndex(0)
+      .browserWindow.getBounds().then((res) => res.y).should.eventually.be.equal(y)
   }
 
   describe('state is preserved with a normal shutdown', function () {
@@ -20,7 +49,7 @@ describe('sessionStore test', function () {
         type: siteTags.BOOKMARK
       }
       yield Brave.startApp()
-      yield setup(Brave.app.client)
+      yield setupBrave(Brave.app.client)
       yield Brave.app.client
         .waitForBrowserWindow()
         .changeSetting(settings.DISABLE_TITLE_MODE, false)
@@ -33,7 +62,7 @@ describe('sessionStore test', function () {
         .waitForExist(navigatorBookmarked)
       yield Brave.stopApp(false)
       yield Brave.startApp()
-      yield setup(Brave.app.client)
+      yield setupBrave(Brave.app.client)
     })
 
     after(function * () {
@@ -67,7 +96,7 @@ describe('sessionStore test', function () {
         type: siteTags.BOOKMARK
       }
       yield Brave.startApp()
-      yield setup(Brave.app.client)
+      yield setupBrave(Brave.app.client)
       yield Brave.app.client
         .waitForBrowserWindow()
         .changeSetting(settings.DISABLE_TITLE_MODE, false)
@@ -81,7 +110,7 @@ describe('sessionStore test', function () {
 
       yield Brave.stopApp(false)
       yield Brave.startApp()
-      yield setup(Brave.app.client)
+      yield setupBrave(Brave.app.client)
 
       yield Brave.app.client
         .windowByUrl(Brave.browserWindowUrl)
@@ -95,7 +124,7 @@ describe('sessionStore test', function () {
 
       yield Brave.stopApp(false, 10000)
       yield Brave.startApp()
-      yield setup(Brave.app.client)
+      yield setupBrave(Brave.app.client)
     })
 
     after(function * () {
@@ -132,7 +161,7 @@ describe('sessionStore test', function () {
         this.page2Url = Brave.server.url('page2.html')
         this.activeTabSelector = '.frameWrapper.isActive webview[data-frame-key="1"][src="' + this.page1Url + '"]'
         yield Brave.startApp()
-        yield setup(Brave.app.client)
+        yield setupBrave(Brave.app.client)
         yield Brave.app.client
           .waitForBrowserWindow()
           .waitForUrl(Brave.newTabUrl)
@@ -153,7 +182,7 @@ describe('sessionStore test', function () {
           .waitForExist(this.activeTabSelector)
         yield Brave.stopApp(false)
         yield Brave.startApp()
-        yield setup(Brave.app.client)
+        yield setupBrave(Brave.app.client)
       })
 
       after(function * () {
@@ -176,7 +205,7 @@ describe('sessionStore test', function () {
         this.page2Url = Brave.server.url('page2.html')
         this.activeTabSelector = '.frameWrapper.isActive webview[data-frame-key="2"][src="' + this.page2Url + '"]'
         yield Brave.startApp()
-        yield setup(Brave.app.client)
+        yield setupBrave(Brave.app.client)
         yield Brave.app.client
           .waitForBrowserWindow()
           .waitForUrl(Brave.newTabUrl)
@@ -192,7 +221,7 @@ describe('sessionStore test', function () {
           .waitForExist(this.activeTabSelector)
         yield Brave.stopApp(false)
         yield Brave.startApp()
-        yield setup(Brave.app.client)
+        yield setupBrave(Brave.app.client)
       })
 
       after(function * () {
@@ -213,7 +242,7 @@ describe('sessionStore test', function () {
     Brave.beforeAllServerSetup(this)
     before(function * () {
       yield Brave.startApp()
-      yield setup(Brave.app.client)
+      yield setupBrave(Brave.app.client)
     })
 
     after(function * () {
@@ -238,7 +267,7 @@ describe('sessionStore test', function () {
 
       yield Brave.stopApp(false)
       yield Brave.startApp()
-      yield setup(Brave.app.client)
+      yield setupBrave(Brave.app.client)
       yield Brave.app.client
         .waitForUrl(Brave.newTabUrl)
         .waitForBrowserWindow()
@@ -247,6 +276,73 @@ describe('sessionStore test', function () {
             return (val.value.firstRunTimestamp === firstRunTimestamp)
           })
         })
+    })
+  })
+
+  describe('window position and size are restored correctly', function () {
+    Brave.beforeAllServerSetup(this)
+    const width = 600
+    const height = 700
+    const x = 100
+    const y = 200
+
+    beforeEach(function * () {
+      yield Brave.startApp()
+      yield setupBrave(Brave.app.client)
+      yield setup(Brave.app.client)
+
+      yield Brave.app.client
+        .waitForUrl(Brave.newTabUrl)
+        .waitForBrowserWindow()
+        .unmaximize()
+        .resizeWindow(width, height)
+        .setWindowPosition(x, y)
+    })
+
+    afterEach(function * () {
+      yield Brave.stopApp()
+    })
+
+    it('brave starts with windows from last time', function * () {
+      yield Brave.app.client
+        .waitForUrl(Brave.newTabUrl)
+        .waitForBrowserWindow()
+        .changeSetting(settings.STARTUP_MODE, startsWithOption.WINDOWS_TABS_FROM_LAST_TIME)
+
+      yield Brave.stopApp(false)
+      yield Brave.startApp()
+      yield setupBrave(Brave.app.client)
+      yield setup(Brave.app.client)
+
+      yield checkWindow(Brave, width, height, x, y)
+    })
+
+    it('brave starts with home page', function * () {
+      yield Brave.app.client
+        .waitForUrl(Brave.newTabUrl)
+        .waitForBrowserWindow()
+        .changeSetting(settings.STARTUP_MODE, startsWithOption.HOMEPAGE)
+
+      yield Brave.stopApp(false)
+      yield Brave.startApp()
+      yield setupBrave(Brave.app.client)
+      yield setup(Brave.app.client)
+
+      yield checkWindow(Brave, width, height, x, y)
+    })
+
+    it('brave starts with new tab page', function * () {
+      yield Brave.app.client
+        .waitForUrl(Brave.newTabUrl)
+        .waitForBrowserWindow()
+        .changeSetting(settings.STARTUP_MODE, startsWithOption.NEW_TAB_PAGE)
+
+      yield Brave.stopApp(false)
+      yield Brave.startApp()
+      yield setupBrave(Brave.app.client)
+      yield setup(Brave.app.client)
+
+      yield checkWindow(Brave, width, height, x, y)
     })
   })
 })

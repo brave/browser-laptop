@@ -815,6 +815,9 @@ const doAction = (action) => {
         }
         break
       }
+    case windowConstants.WINDOW_ON_WINDOW_UPDATE:
+      windowState = windowState.set('windowInfo', action.windowValue)
+      break
     default:
       break
   }

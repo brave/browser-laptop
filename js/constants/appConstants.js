@@ -18,7 +18,6 @@ const appConstants = {
   APP_REMOVE_HISTORY_SITE: _,
   APP_MERGE_DOWNLOAD_DETAIL: _, // Sets an individual download detail
   APP_CLEAR_COMPLETED_DOWNLOADS: _, // Removes all completed downloads
-  APP_DEFAULT_WINDOW_PARAMS_CHANGED: _,
   APP_SET_DATA_FILE_ETAG: _,
   APP_SET_DATA_FILE_LAST_CHECK: _,
   APP_SET_RESOURCE_ENABLED: _,

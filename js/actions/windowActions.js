@@ -1201,6 +1201,16 @@ const windowActions = {
       bookmarkKey,
       type
     })
+  },
+
+  onWindowUpdate: function (windowId, windowValue) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_WINDOW_UPDATE,
+      queryInfo: {
+        windowId
+      },
+      windowValue
+    })
   }
 }
 
