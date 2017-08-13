@@ -870,11 +870,14 @@ frameShortcuts.forEach((shortcut) => {
     if (shortcut === 'toggle-dev-tools') {
       appActions.toggleDevTools(frameStateUtil.getActiveFrameTabId(windowState))
     } else {
-      windowState = windowState.mergeIn(frameStateUtil.activeFrameStatePath(windowState), {
-        activeShortcut: shortcut,
-        activeShortcutDetails: args
-      })
-      emitChanges()
+      const framePath = frameStateUtil.activeFrameStatePath(windowState)
+      if (framePath) {
+        windowState = windowState.mergeIn(framePath, {
+          activeShortcut: shortcut,
+          activeShortcutDetails: args
+        })
+        emitChanges()
+      }
     }
   })
   // Listen for actions on frame N
