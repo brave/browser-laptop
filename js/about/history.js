@@ -12,7 +12,7 @@ const settings = require('../constants/settings')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../../app/renderer/components/common/sortableTable')
-const Button = require('../../app/renderer/components/common/button')
+const BrowserButton = require('../../app/renderer/components/common/browserButton')
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
 const historyUtil = require('../../app/common/lib/historyUtil')
 
@@ -210,6 +210,11 @@ class AboutHistory extends React.Component {
         <AboutPageSectionTitle data-l10n-id='history' />
         <div className='headerActions'>
           <div className='searchWrapper'>
+            <BrowserButton primaryColor
+              l10nId='clearBrowsingDataNow'
+              testId='clearBrowsingDataButton'
+              onClick={this.clearBrowsingDataNow}
+            />
             <input type='text' className='searchInput' ref='historySearch' id='historySearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='historySearch' />
             {
               this.state.search
@@ -217,11 +222,6 @@ class AboutHistory extends React.Component {
               : <span className='fa fa-search searchInputPlaceholder' />
             }
           </div>
-          <Button className='primaryButton'
-            l10nId='clearBrowsingDataNow'
-            testId='clearBrowsingDataButton'
-            onClick={this.clearBrowsingDataNow}
-          />
         </div>
       </div>
 
