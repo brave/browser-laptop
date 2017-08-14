@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Immutable = require('immutable')
+const BrowserWindow = require('electron').BrowserWindow
 
 // State
 const historyState = require('../../common/state/historyState')
@@ -11,12 +12,27 @@ const aboutHistoryState = require('../../common/state/aboutHistoryState')
 // Constants
 const appConstants = require('../../../js/constants/appConstants')
 const {STATE_SITES} = require('../../../js/constants/stateConstants')
+const messages = require('../../../js/constants/messages')
 
 // Utils
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const syncUtil = require('../../../js/state/syncUtil')
 const filtering = require('../../filtering')
 const {calculateTopSites} = require('../api/topSites')
+
+/**
+ * Helper to pass message to windows to clear closed frames
+ * @param {Array.BrowserWindow} windows
+ * @param {string} historyKey
+ */
+const clearClosedFrames = (windows, historyKey) => {
+  windows.forEach((wnd) => {
+    if (!wnd.webContents) {
+      return
+    }
+    wnd.webContents.send(messages.CLEAR_CLOSED_FRAMES, historyKey.split('|')[0])
+  })
+}
 
 const historyReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
@@ -62,15 +78,18 @@ const historyReducer = (state, action, immutableAction) => {
         if (historyKey == null) {
           break
         }
+        const windows = BrowserWindow.getAllWindows()
 
         if (Immutable.List.isList(historyKey)) {
           action.get('historyKey', Immutable.List()).forEach((key) => {
             state = historyState.removeSite(state, key)
+            clearClosedFrames(windows, key)
             // TODO: Implement Sync history site removal
             // state = syncUtil.updateObjectCache(state, action.get('siteDetail'), STATE_SITES.HISTORY_SITES)
           })
         } else {
           state = historyState.removeSite(state, historyKey)
+          clearClosedFrames(windows, historyKey)
           // TODO: Implement Sync history site removal
           // state = syncUtil.updateObjectCache(state, action.get('siteDetail'), STATE_SITES.HISTORY_SITES)
         }
