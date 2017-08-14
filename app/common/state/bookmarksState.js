@@ -256,25 +256,28 @@ const bookmarksState = {
     state = validateState(state)
 
     const bookmarkUtil = require('../lib/bookmarkUtil')
+    // Get bookmark.
     let bookmark = bookmarksState.getBookmark(state, bookmarkKey)
+    // Create the new bookmark.
     let destinationItem = bookmarksState.findBookmark(state, destinationKey)
 
     if (bookmark.isEmpty()) {
       return state
     }
 
-    // move bookmark into a new folder
+    // Move bookmark to destination folder.
     if (moveIntoParent || destinationItem.get('parentFolderId') !== bookmark.get('parentFolderId')) {
-      const parentFolderId = destinationItem.get('type') === siteTags.BOOKMARK
-        ? destinationItem.get('parentFolderId')
-        : destinationItem.get('folderId')
-
+      // Remove bookmark from cache.
       state = bookmarkOrderCache.removeCacheKey(state, bookmark.get('parentFolderId'), bookmarkKey)
-      bookmark = bookmark.set('parentFolderId', ~~parentFolderId)
+      // Update parent folder ID to new folder.
+      bookmark = bookmark.set('parentFolderId', destinationKey)
+      // Create the updated bookmark.
       const newKey = bookmarkUtil.getKey(bookmark)
+      // Delete old bookmark.
       state = state.deleteIn([STATE_SITES.BOOKMARKS, bookmarkKey])
+      // Add new bookmark to cache.
       state = bookmarkOrderCache.addBookmarkToCache(state, bookmark.get('parentFolderId'), newKey)
-      bookmark = bookmark.set('key', newKey)
+      // Save the bookmark to the destination folder.
       return state.setIn([STATE_SITES.BOOKMARKS, newKey], bookmark)
     }
 

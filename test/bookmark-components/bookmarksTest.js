@@ -442,5 +442,11 @@ describe('bookmark tests', function () {
           })
         })
     })
+
+    // @TODO Create the following tests.
+    describe.skip('moves bookmark in & out of Other Bookmarks', () => {
+      it('via drag')
+      it('via edit form')
+    })
   })
 })
