@@ -123,6 +123,7 @@ module.exports = {
   downloadPause: '[data-test-id="pauseButton"]',
   downloadResume: '[data-test-id="resumeButton"]',
   downloadCancel: '[data-test-id="cancelButton"]',
+  downloadComplete: '.downloadItem.completed',
   downloadReDownload: '[data-test-id="redownloadButton"]',
   downloadDelete: '[data-test-id="deleteButton"]',
   downloadDeleteConfirm: '[data-test-id="confirmDeleteButton"]',

@@ -27,6 +27,7 @@ const dialog = electron.dialog
 const app = electron.app
 const uuid = require('uuid')
 const path = require('path')
+const fs = require('fs')
 const getOrigin = require('../js/lib/urlutil').getOrigin
 const {adBlockResourceName} = require('./adBlock')
 const {updateElectronDownloadItem} = require('./browser/electronDownloadItem')
@@ -541,8 +542,22 @@ function registerForDownloadListener (session) {
       itemFilename = item.getFilename()
     }
 
-    const defaultPath = path.join(getSetting(settings.DOWNLOAD_DEFAULT_PATH) || getSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH) || app.getPath('downloads'), itemFilename)
-    const savePath = ((process.env.SPECTRON || (!getSetting(settings.DOWNLOAD_ALWAYS_ASK) && !item.promptForSaveLocation())) ? defaultPath : dialog.showSaveDialog(win, { defaultPath }))
+    const defaultDir = (getSetting(settings.DOWNLOAD_DEFAULT_PATH) || getSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH) || app.getPath('downloads'))
+    let savePath
+    if (process.env.SPECTRON || (!getSetting(settings.DOWNLOAD_ALWAYS_ASK) && !item.promptForSaveLocation())) {
+      let willOverwrite = true
+      let matchedFilenames = 0
+      while (willOverwrite) {
+        savePath = path.join(defaultDir, (matchedFilenames ? `${itemFilename.replace(new RegExp(`${path.extname(itemFilename)}$`), '')} (${matchedFilenames})${path.extname(itemFilename)}` : itemFilename))
+        if (!fs.existsSync(savePath)) {
+          willOverwrite = false
+        } else {
+          matchedFilenames++
+        }
+      }
+    } else {
+      savePath = dialog.showSaveDialog(win, { defaultPath: path.join(defaultDir, itemFilename) })
+    }
 
     // User cancelled out of save dialog prompt
     if (!savePath) {
