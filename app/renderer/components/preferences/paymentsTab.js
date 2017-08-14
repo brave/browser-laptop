@@ -198,21 +198,20 @@ class PaymentsTab extends ImmutableComponent {
             gridStyles.row1col2,
             styles.titleWrapper__switchWrap
           )}>
-            <span className={css(styles.switchWrap__switchSpan)} data-l10n-id='off' />
             <SettingCheckbox
-              compact
               dataL10nId='on'
+              dataL10nIdLeft='off'
               prefKey={settings.PAYMENTS_ENABLED}
               settings={this.props.settings}
               onChangeSetting={this.props.onChangeSetting}
               switchClassName={css(styles.switchWrap__switchControl)}
-              labelClassName={css(styles.switchWrap__label)}
+              leftLabelClassName={css(styles.switchWrap__label, styles.switchWrap__label_left)}
+              rightLabelClassName={css(styles.switchWrap__label, styles.switchWrap__label_right)}
             />
             <a className={cx({
               fa: true,
               'fa-question-circle': true,
-              [css(styles.autoSuggestSwitch__moreInfo)]: true,
-              [css(styles.autoSuggestSwitch__moreInfoBtnSuggest)]: true
+              [css(styles.autoSuggestSwitch__moreInfo, styles.autoSuggestSwitch__moreInfoBtnSuggest)]: true
             })}
               href='https://brave.com/Payments_FAQ.html'
               data-l10n-id='paymentsFAQLink'
@@ -230,7 +229,6 @@ class PaymentsTab extends ImmutableComponent {
                 <div className={css(styles.switchWrap__autoSuggestSwitch)}>
                   <div className={css(styles.flexAlignCenter, styles.autoSuggestSwitch__subtext)}>
                     <SettingCheckbox
-                      compact
                       dataL10nId='autoSuggestSites'
                       prefKey={settings.PAYMENTS_SITES_AUTO_SUGGEST}
                       settings={this.props.settings}
@@ -329,14 +327,21 @@ const styles = StyleSheet.create({
     width: '100%'
   },
 
-  switchWrap__switchSpan: {
+  switchWrap__label: {
     color: '#999',
     fontWeight: 'bold'
   },
-  switchWrap__label: {
-    fontWeight: 'bold',
+
+  switchWrap__label_left: {
+    paddingRight: '.75ch !important'
+  },
+
+  switchWrap__label_right: {
+    // TODO: Add 'position: relative' and 'bottom: 1px' for macOS (en_US) only.
+    paddingLeft: '.75ch !important',
     color: globalStyles.color.braveOrange
   },
+
   switchWrap__right: {
     display: 'flex',
     alignItems: 'center',
@@ -358,11 +363,6 @@ const styles = StyleSheet.create({
     color: globalStyles.color.commonTextColor
   },
   autoSuggestSwitch__moreInfoBtnSuggest: {
-    position: 'relative',
-    left: '3px',
-    cursor: 'pointer',
-    fontSize: globalStyles.payments.fontSize.regular,
-
     // TODO: refactor preferences.less to remove !important
     ':hover': {
       textDecoration: 'none !important'
