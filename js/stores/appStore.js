@@ -58,24 +58,28 @@ const CHANGE_EVENT = 'app-state-change'
 const defaultProtocols = ['https', 'http']
 
 let appState = null
-let lastEmittedState
 let initialized = false
 
 class AppStore extends EventEmitter {
+  constructor () {
+    super()
+    this.lastEmittedState = null
+  }
+
   getState () {
     return appState
   }
 
   emitChanges () {
-    if (lastEmittedState) {
-      const d = diff(lastEmittedState, appState)
+    if (this.lastEmittedState) {
+      const d = diff(this.lastEmittedState, appState)
       if (!d.isEmpty()) {
         BrowserWindow.getAllWindows().forEach((wnd) => {
           if (wnd.webContents && !wnd.webContents.isDestroyed()) {
             wnd.webContents.send(messages.APP_STATE_CHANGE, { stateDiff: d.toJS() })
           }
         })
-        lastEmittedState = appState
+        this.lastEmittedState = appState
         this.emit(CHANGE_EVENT, d.toJS())
       }
     } else {
@@ -89,6 +93,14 @@ class AppStore extends EventEmitter {
 
   removeChangeListener (callback) {
     this.removeListener(CHANGE_EVENT, callback)
+  }
+
+  getLastEmmitedState () {
+    if (!this.lastEmittedState) {
+      this.lastEmittedState = appState
+    }
+
+    return this.lastEmittedState
   }
 }
 

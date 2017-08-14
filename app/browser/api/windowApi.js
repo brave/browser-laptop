@@ -248,7 +248,7 @@ const createWindow = (action, state) => {
     }
 
     mainWindow.webContents.on('did-finish-load', (e) => {
-      // lastEmittedState = state TODO what to do here?
+      const appStore = require('../../../js/stores/appStore')
       mainWindow.webContents.setZoomLevel(zoomLevel[toolbarUserInterfaceScale] || 0.0)
 
       const mem = muon.shared_memory.create({
@@ -256,7 +256,7 @@ const createWindow = (action, state) => {
           disposition: frameOpts.disposition,
           id: mainWindow.id
         },
-        appState: state.toJS(),
+        appState: appStore.getLastEmmitedState().toJS(),
         frames: frames.toJS(),
         windowState: (restoredImmutableWindowState && restoredImmutableWindowState.toJS()) || undefined})
 
