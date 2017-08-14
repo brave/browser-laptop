@@ -4,6 +4,7 @@
 
 const React = require('react')
 const Immutable = require('immutable')
+const {StyleSheet, css} = require('aphrodite')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
@@ -24,6 +25,7 @@ const {getTextColorForBackground} = require('../../../../js/lib/color')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {getSetting} = require('../../../../js/settings')
 const debounce = require('../../../../js/lib/debounce')
+const cx = require('../../../../js/lib/classSet')
 
 // Styles
 const globalStyles = require('../styles/global')
@@ -224,14 +226,16 @@ class FindBar extends React.Component {
 
   render () {
     let findBarStyle = {}
-    let findBarTextStyle = {}
+    let findBarTextStyles = {}
 
     if (this.props.backgroundColor) {
+      findBarTextStyles = StyleSheet.create({
+        matchingTextColor: {
+          color: this.props.textColor
+        }
+      })
       findBarStyle = {
         background: this.props.backgroundColor,
-        color: this.props.textColor
-      }
-      findBarTextStyle = {
         color: this.props.textColor
       }
     }
@@ -275,16 +279,15 @@ class FindBar extends React.Component {
           id='caseSensitivityCheckbox'
           checkedOn={this.props.isCaseSensitive}
           onClick={this.onCaseSensitivityChange}
-        />
-        <label
-          htmlFor='caseSensitivityCheckbox'
-          data-l10n-id='caseSensitivity'
-          style={findBarTextStyle}
+          customRightTextClassName={css(findBarTextStyles.matchingTextColor)}
+          rightl10nId='caseSensitivity'
         />
       </div>
       <span
-        className='closeButton'
-        style={findBarTextStyle}
+        className={cx({
+          closeButton: true,
+          [css(findBarTextStyles.matchingTextColor)]: true
+        })}
         onClick={this.onFindHide}
       >+</span>
     </div>
