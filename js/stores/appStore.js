@@ -37,6 +37,7 @@ const assert = require('assert')
 const profiles = require('../../app/browser/profiles')
 const {zoomLevel} = require('../../app/common/constants/toolbarUserInterfaceScale')
 const {initWindowCacheState} = require('../../app/sessionStoreShutdown')
+const {HrtimeLogger} = require('../../app/common/lib/logUtil')
 
 // state helpers
 const {isImmutable, makeImmutable} = require('../../app/common/state/immutableUtil')
@@ -72,6 +73,19 @@ const navbarHeight = () => {
   // TODO there has to be a better way to get this or at least add a test
   return 75
 }
+
+/**
+ * Enable reducer logging with env var REDUCER_TIME_LOG_THRESHOLD={time in ns}
+ * Log format: `{unix timestamp (ms)},{label},{run time (ns)}`
+ */
+const TIME_LOG_PATH = process.env.REDUCER_TIME_LOG_PATH ||
+  path.join(app.getPath('userData'), `reducer-time-${new Date().toISOString()}.log`)
+const TIME_LOG_THRESHOLD = parseInt(process.env.REDUCER_TIME_LOG_THRESHOLD)
+const SHOULD_LOG_TIME = (TIME_LOG_THRESHOLD > 0)
+if (SHOULD_LOG_TIME) {
+  console.log(`Logging reducer runtimes above ${TIME_LOG_THRESHOLD} ms to ${TIME_LOG_PATH}`)
+}
+const timeLogger = new HrtimeLogger(TIME_LOG_PATH, TIME_LOG_THRESHOLD)
 
 /**
  * Determine window dimensions (width / height)
@@ -380,6 +394,7 @@ const applyReducers = (state, action, immutableAction) => reducers.reduce(
     }, appState)
 
 const handleAppAction = (action) => {
+  const timeStart = process.hrtime()
   if (action.actionType === appConstants.APP_SET_STATE) {
     reducers = [
       require('../../app/browser/reducers/downloadsReducer'),
@@ -893,6 +908,9 @@ const handleAppAction = (action) => {
     default:
   }
 
+  if (SHOULD_LOG_TIME) {
+    timeLogger.log(timeStart, action.actionType)
+  }
   emitChanges()
 }
 
