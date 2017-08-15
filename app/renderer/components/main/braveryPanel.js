@@ -514,7 +514,7 @@ class BraveryPanel extends React.Component {
                 </div>
 
                 <SwitchControl className={css(
-                  !this.props.isCompactBraveryPanel && gridStyles.row3col1,
+                  !this.props.isCompactBraveryPanel && gridStyles.row5col1,
                   this.props.isCompactBraveryPanel && gridStyles.row7col1,
                   this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
                 )}
@@ -526,7 +526,7 @@ class BraveryPanel extends React.Component {
                 />
 
                 <SwitchControl className={css(
-                  !this.props.isCompactBraveryPanel && gridStyles.row4col1,
+                  !this.props.isCompactBraveryPanel && gridStyles.row6col1,
                   this.props.isCompactBraveryPanel && gridStyles.row8col1,
                   this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
                 )}
@@ -560,7 +560,7 @@ class BraveryPanel extends React.Component {
 
                 <div className={css(
                   !this.props.shieldsUp && styles.braveryPanel__body__advanced__control__forms__title_disabled,
-                  !this.props.isCompactBraveryPanel && gridStyles.row3col2,
+                  !this.props.isCompactBraveryPanel && gridStyles.row3col1,
                   this.props.isCompactBraveryPanel && gridStyles.row5col1,
                   styles.braveryPanel__body__advanced__control__fpWrapper,
                   styles.braveryPanel__body__advanced__control__forms__title
@@ -574,7 +574,7 @@ class BraveryPanel extends React.Component {
 
                 <div className={css(
                   !this.props.shieldsUp && styles.braveryPanel__body__advanced__control__forms__dropdown_disabled,
-                  !this.props.isCompactBraveryPanel && gridStyles.row4col2,
+                  !this.props.isCompactBraveryPanel && gridStyles.row4col1,
                   !this.props.isCompactBraveryPanel && styles.braveryPanel__body__advanced__control__forms__dropdown,
                   this.props.isCompactBraveryPanel && gridStyles.row6col1,
                   this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__dropdown
@@ -591,7 +591,7 @@ class BraveryPanel extends React.Component {
                 </div>
 
                 <SwitchControl className={css(
-                  !this.props.isCompactBraveryPanel && gridStyles.row5col1,
+                  !this.props.isCompactBraveryPanel && gridStyles.row5col2,
                   this.props.isCompactBraveryPanel && gridStyles.row9col1,
                   this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
                 )}
@@ -699,6 +699,10 @@ const gridStyles = StyleSheet.create({
   row5col1: {
     gridRow: 5,
     gridColumn: 1
+  },
+  row5col2: {
+    gridRow: 5,
+    gridColumn: 2
   },
   row6col1: {
     gridRow: 6,
