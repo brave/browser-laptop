@@ -7,9 +7,6 @@ const ImmutableComponent = require('../../app/renderer/components/immutableCompo
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../../app/renderer/components/styles/global')
 
-// Stylesheets go here
-require('../../less/button.less')
-require('../../less/forms.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 const {Textbox, FormTextbox, SettingTextbox, RecoveryKeyTextbox} = require('../../app/renderer/components/common/textbox')
