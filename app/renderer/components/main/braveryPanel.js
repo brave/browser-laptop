@@ -528,6 +528,7 @@ class BraveryPanel extends React.Component {
                 <SwitchControl className={css(
                   !this.props.isCompactBraveryPanel && gridStyles.row6col1,
                   this.props.isCompactBraveryPanel && gridStyles.row8col1,
+                  !this.props.isCompactBraveryPanel && styles.braveryPanel__body__advanced__control__switchControl_noScript,
                   this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
                 )}
                   onClick={this.onToggleNoScript}
@@ -727,13 +728,13 @@ const buttonSize = '13px'
 const styles = StyleSheet.create({
   braveryPanel: {
     padding: 0,
-    width: '500px',
     right: '20px',
     userSelect: 'none',
     cursor: 'default',
     color: globalStyles.braveryPanel.color,
     overflowY: 'auto',
-    maxHeight: `calc(100% - ${globalStyles.spacing.dialogTopOffset})`
+    maxHeight: `calc(100% - ${globalStyles.spacing.dialogTopOffset})`,
+    maxWidth: 'calc(100% - 40px)'
   },
   braveryPanel_compact: {
     width: 'auto',
@@ -993,6 +994,7 @@ const styles = StyleSheet.create({
   braveryPanel__body__advanced__control: {
     display: 'grid',
     gridColumnGap: '1rem',
+    gridTemplateColumns: 'max-content max-content',
     margin: '15px 10px'
   },
   braveryPanel__body__advanced__control__forms__title: {
@@ -1009,6 +1011,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between'
   },
+  braveryPanel__body__advanced__control__switchControl_noScript: {
+    marginTop: '2.5px'
+  },
   braveryPanel__body__advanced__control__switchControl__infoButton: {
     display: 'inline',
     cursor: 'pointer',
@@ -1018,12 +1023,13 @@ const styles = StyleSheet.create({
 
   // controlWrapper - Normal Panel
   braveryPanel__body__advanced__control__forms__dropdown: {
-    marginBottom: '25px'
+    marginBottom: '1rem'
   },
 
   // controlWrapper - Compact Panel
   braveryPanel_compact__body__advanced__control: {
     gridColumnGap: 0,
+    gridTemplateColumns: 'initial',
     margin: 0,
 
     // Align the advanced control wrapper with the counters
