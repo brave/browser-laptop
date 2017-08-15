@@ -83,7 +83,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     display: 'flex',
     flex: '1',
-    minWidth: '0' // @see https://bugzilla.mozilla.org/show_bug.cgi?id=1108514#c5
+    minWidth: '0', // @see https://bugzilla.mozilla.org/show_bug.cgi?id=1108514#c5
+    // prevent the icons wrapper from being the target of mouse events.
+    pointerEvents: 'none'
   },
 
   isPinned: {

@@ -10,7 +10,7 @@ const {SettingsList, SettingItem, SettingCheckbox} = require('../common/settings
 
 const {SettingDropdown} = require('../common/dropdown')
 
-const {tabCloseAction} = require('../../../common/constants/settingsEnums')
+const {tabCloseAction, tabPreviewTiming} = require('../../../common/constants/settingsEnums')
 const {changeSetting} = require('../../lib/settingsUtil')
 const getSetting = require('../../../../js/settings').getSetting
 const settings = require('../../../../js/constants/settings')
@@ -33,6 +33,22 @@ class TabsTab extends ImmutableComponent {
       {
         id: 'tabCloseActionParent',
         action: tabCloseAction.PARENT
+      }
+    ]
+  }
+  get tabPreviewTimingOptions () {
+    return [
+      {
+        id: 'long',
+        action: tabPreviewTiming.LONG
+      },
+      {
+        id: 'normal',
+        action: tabPreviewTiming.NORMAL
+      },
+      {
+        id: 'short',
+        action: tabPreviewTiming.SHORT
       }
     ]
   }
@@ -107,6 +123,26 @@ class TabsTab extends ImmutableComponent {
             settings={this.props.settings}
             onChangeSetting={this.props.onChangeSetting}
           />
+          {
+            getSetting(settings.SHOW_TAB_PREVIEWS, this.props.settings)
+              ? <SettingItem dataL10nId='tabPreviewTiming'>
+                <SettingDropdown
+                  value={getSetting(settings.TAB_PREVIEW_TIMING, this.props.settings)}
+                  onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TAB_PREVIEW_TIMING)}>
+                  {this.tabPreviewTimingOptions.map(option =>
+                    <option
+                      data-l10n-id={option.id}
+                      data-test-id='tabPreviewTimingOption'
+                      data-test-active={
+                        getSetting(settings.TAB_PREVIEW_TIMING, this.props.settings) === option.action
+                      }
+                      value={option.action}
+                    />
+                  )}
+                </SettingDropdown>
+              </SettingItem>
+              : null
+          }
           <SettingItem dataL10nId='dashboardSettingsTitle'>
             <SettingCheckbox
               dataL10nId='dashboardShowImages'

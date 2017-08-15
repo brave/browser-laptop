@@ -137,5 +137,6 @@ module.exports = {
 
   // about:preferences#tabs
   tabsPerTabPageActiveOption: '[data-test-id="tabsPerTabPageOption"][data-test-active="true"]',
-  tabCloseActionActiveOption: '[data-test-id="tabCloseActionActiveOption"][data-test-active="true"]'
+  tabCloseActionActiveOption: '[data-test-id="tabCloseActionActiveOption"][data-test-active="true"]',
+  tabPreviewTimingActiveOption: '[data-test-id="tabPreviewTimingOption"][data-test-active="true"]'
 }

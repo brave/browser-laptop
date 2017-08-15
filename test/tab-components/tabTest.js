@@ -3,6 +3,7 @@
 const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
+const {tabPreviewTiming} = require('../../app/common/constants/settingsEnums')
 const {urlInput, backButton, forwardButton, activeTab, activeTabTitle, activeTabFavicon, newFrameButton, notificationBar, contextMenu, pinnedTabsTabs, tabsTabs} = require('../lib/selectors')
 
 const newTabUrl = 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-newtab.html'
@@ -374,6 +375,8 @@ describe('tab tests', function () {
       const page2 = Brave.server.url('page2.html')
       yield setup(this.app.client)
       yield this.app.client
+        .changeSetting(settings.TAB_PREVIEW_TIMING, tabPreviewTiming.SHORT)
+      yield this.app.client
         .newTab({ url: page1 })
         .waitForUrl(page1)
         .windowByUrl(Brave.browserWindowUrl)
@@ -383,11 +386,11 @@ describe('tab tests', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('[data-test-id="tab"][data-frame-key="3"]')
     })
-    it('shows a tab preview', function * () {
+    it('shows a tab preview when TAB_PREVIEW_TIMING is set as SHORT', function * () {
       yield this.app.client
         .moveToObject('[data-test-id="tab"][data-frame-key="2"]')
         .moveToObject('[data-test-id="tab"][data-frame-key="2"]', 3, 3)
-        .waitForExist('.frameWrapper.isPreview webview[data-frame-key="2"]')
+        .waitForElementCount('.frameWrapper.isPreview webview[data-frame-key="2"]', 1)
         .moveToObject(urlInput)
     })
     it('does not show preview in the active tab', function * () {
@@ -424,6 +427,8 @@ describe('tab tests', function () {
       const page5 = Brave.server.url('page1.html')
       const page6 = Brave.server.url('page2.html')
       yield setup(this.app.client)
+      // Set to minimum preview timing to avoid timeout
+      yield this.app.client.changeSetting(settings.TAB_PREVIEW_TIMING, tabPreviewTiming.SHORT)
       yield this.app.client
         .newTab({ url: page1 })
         .waitForUrl(page1)
@@ -454,30 +459,36 @@ describe('tab tests', function () {
     it('show active tab content if next tab does not exist', function * () {
       yield this.app.client
         .moveToObject('[data-test-id="tab"][data-frame-key="2"]')
+        .moveToObject('[data-test-id="tab"][data-frame-key="2"]', 3, 3)
         .click('[data-test-id="tab"][data-frame-key="2"]')
         .moveToObject('[data-test-id="tab"][data-frame-key="7"]')
+        .moveToObject('[data-test-id="tab"][data-frame-key="7"]', 3, 3)
         .middleClick('[data-test-id="tab"][data-frame-key="7"]')
         // no preview should be shown
-        .waitForVisible('.frameWrapper.isPreview webview', 500, true)
+        .waitForElementCount('.frameWrapper.isPreview webview', 0)
     })
     it('preview the next tab if preview option is on', function * () {
       yield this.app.client
         .moveToObject('[data-test-id="tab"][data-frame-key="2"]')
+        .moveToObject('[data-test-id="tab"][data-frame-key="2"]', 3, 3)
         .click('[data-test-id="tab"][data-frame-key="2"]')
         .moveToObject('[data-test-id="tab"][data-frame-key="4"]')
+        .moveToObject('[data-test-id="tab"][data-frame-key="4"]', 3, 3)
         .middleClick('[data-test-id="tab"][data-frame-key="4"]')
         .waitForExist('.frameWrapper.isPreview webview[data-frame-key="5"]')
-        .waitForVisible('.frameWrapper.isPreview webview[data-frame-key="5"]')
+        .waitForElementCount('.frameWrapper.isPreview webview[data-frame-key="5"]', 1)
     })
     it('do not preview the next tab if preview option is off', function * () {
       yield this.app.client.changeSetting(settings.SHOW_TAB_PREVIEWS, false)
       yield this.app.client
+        .moveToObject('[data-test-id="tab"][data-frame-key="2"]', 3, 3)
         .moveToObject('[data-test-id="tab"][data-frame-key="2"]')
         .click('[data-test-id="tab"][data-frame-key="2"]')
+        .moveToObject('[data-test-id="tab"][data-frame-key="5"]', 3, 3)
         .moveToObject('[data-test-id="tab"][data-frame-key="5"]')
         .middleClick('[data-test-id="tab"][data-frame-key="5"]')
         // no preview should be shown
-        .waitForVisible('.frameWrapper.isPreview webview', 500, true)
+        .waitForElementCount('.frameWrapper.isPreview webview', 0)
     })
   })
 
