@@ -20,6 +20,7 @@ describe('muon tests', function () {
     yield this.app.client
       .waitForTextValue('#urlParseSimple', 'success')
       .waitForTextValue('#urlParseComplex', 'success')
+      .waitForTextValue('#urlParseIssue10270', 'success')
   })
   it('urlUtil.getOrigin', function * () {
     yield this.app.client

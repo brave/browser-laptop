@@ -54,6 +54,14 @@ const runTests = () => {
       href: 'https://brave.com:333/test?abc=123&def#fff'
     }, 'urlParseComplex')
 
+  assertEqual(urlParse('http://brave.com%60x.code-fu.org/'),
+    Object.assign(defaultParsedUrl, {
+      host: 'brave.com%60x.code-fu.org',
+      hostname: 'brave.com%60x.code-fu.org',
+      href: 'http://brave.com%60x.code-fu.org/',
+      origin: 'http://brave.com%60x.code-fu.org/'
+    }), 'urlParseIssue10270')
+
   assertEqual(urlUtil.getOrigin('http://www.brave.com/foo'), 'http://www.brave.com', 'getOriginSimple')
   assertEqual(urlUtil.getOrigin('file:///aaa'), 'file:///', 'getOriginFile')
   assertEqual(urlUtil.getOrigin('http://brave.com:333/foo'), 'http://brave.com:333', 'getOriginWithPort')
