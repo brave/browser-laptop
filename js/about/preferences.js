@@ -47,6 +47,8 @@ const searchProviders = require('../data/searchProviders')
 const adblock = appConfig.resourceNames.ADBLOCK
 const cookieblock = appConfig.resourceNames.COOKIEBLOCK
 const cookieblockAll = appConfig.resourceNames.COOKIEBLOCK_ALL
+const fingerprintingProtection = appConfig.resourceNames.FINGERPRINTING_PROTECTION
+const fingerprintingProtectionAll = appConfig.resourceNames.FINGERPRINTING_PROTECTION_ALL
 const adInsertion = appConfig.resourceNames.AD_INSERTION
 const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
 const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
@@ -89,7 +91,7 @@ const braveryPermissionNames = {
   'cookieControl': ['string'],
   'safeBrowsing': ['boolean'],
   'httpsEverywhere': ['boolean'],
-  'fingerprintingProtection': ['boolean'],
+  'fingerprintingProtection': ['string'],
   'noScript': ['boolean', 'number']
 }
 
@@ -492,6 +494,10 @@ class ShieldsTab extends ImmutableComponent {
     aboutActions.setResourceEnabled(cookieblock, e.target.value === 'block3rdPartyCookie')
     aboutActions.setResourceEnabled(cookieblockAll, e.target.value === 'blockAllCookies')
   }
+  onChangeFingerprintingProtection (e) {
+    aboutActions.setResourceEnabled(fingerprintingProtection, e.target.value === 'block3rdPartyFingerprinting')
+    aboutActions.setResourceEnabled(fingerprintingProtectionAll, e.target.value === 'blockAllFingerprinting')
+  }
   onToggleSetting (setting, e) {
     aboutActions.setResourceEnabled(setting, e.target.value)
   }
@@ -517,10 +523,18 @@ class ShieldsTab extends ImmutableComponent {
             <option data-l10n-id='blockAllCookies' value='blockAllCookies' />
           </SettingDropdown>
         </SettingItem>
+        <SettingItem dataL10nId='fingerprintingProtection'>
+          <SettingDropdown
+            value={this.props.braveryDefaults.get('fingerprintingProtection')}
+            onChange={this.onChangeFingerprintingProtection}>
+            <option data-l10n-id='block3rdPartyFingerprinting' value='block3rdPartyFingerprinting' />
+            <option data-l10n-id='allowAllFingerprinting' value='allowAllFingerprinting' />
+            <option data-l10n-id='blockAllFingerprinting' value='blockAllFingerprinting' />
+          </SettingDropdown>
+        </SettingItem>
         <SettingCheckbox checked={this.props.braveryDefaults.get('httpsEverywhere')} dataL10nId='httpsEverywhere' onChange={this.onToggleHTTPSE} />
         <SettingCheckbox checked={this.props.braveryDefaults.get('safeBrowsing')} dataL10nId='safeBrowsing' onChange={this.onToggleSafeBrowsing} />
         <SettingCheckbox checked={this.props.braveryDefaults.get('noScript')} dataL10nId='noScriptPref' onChange={this.onToggleNoScript} />
-        <SettingCheckbox dataL10nId='blockCanvasFingerprinting' prefKey={settings.BLOCK_CANVAS_FINGERPRINTING} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         {/* TODO: move this inline style to Aphrodite once refactored */}
         <div style={{marginTop: '15px'}}>
           <BrowserButton

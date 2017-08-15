@@ -699,6 +699,28 @@ module.exports.runPreMigrations = (data) => {
 }
 
 module.exports.runPostMigrations = (immutableData) => {
+  const globalFpSetting = immutableData.getIn(['settings', 'privacy.block-canvas-fingerprinting'])
+  // fingerprinting protection migration
+  if (typeof globalFpSetting !== 'boolean') {
+    return immutableData
+  }
+  try {
+    const siteSettings = immutableData.get('siteSettings', Immutable.Map())
+      .map((setting) => {
+        const fpSetting = setting.get('fingerprintingProtection')
+        if (fpSetting === true) {
+          return setting.set('fingerprintingProtection', 'blockAllFingerprinting')
+        } else if (fpSetting === false) {
+          return setting.set('fingerprintingProtection', 'allowAllFingerprinting')
+        }
+        return setting
+      })
+    immutableData = immutableData.set('siteSettings', siteSettings)
+    immutableData = immutableData.setIn(['fingerprintingProtectionAll', 'enabled'],
+      globalFpSetting).deleteIn(['settings', 'privacy.block-canvas-fingerprinting'])
+  } catch (e) {
+    console.log('fingerprinting protection migration failed', e)
+  }
   return immutableData
 }
 

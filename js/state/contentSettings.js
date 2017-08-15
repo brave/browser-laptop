@@ -75,6 +75,7 @@ const getDefaultUserPrefContentSettings = (braveryDefaults, appSettings, appConf
       primaryPattern: '*'
     }],
     cookies: getDefault3rdPartyStorageSettings(braveryDefaults, appSettings, appConfig),
+    canvasFingerprinting: getDefaultFingerprintingSetting(braveryDefaults),
     referer: [{
       setting: braveryDefaults.get('cookieControl') !== 'allowAllCookies' ? 'block' : 'allow',
       primaryPattern: '*'
@@ -99,10 +100,6 @@ const getDefaultUserPrefContentSettings = (braveryDefaults, appSettings, appConf
       setting: 'allow',
       secondaryPattern: '*',
       primaryPattern: 'chrome-extension://*'
-    }],
-    canvasFingerprinting: [{
-      setting: braveryDefaults.get('fingerprintingProtection') ? 'block' : 'allow',
-      primaryPattern: '*'
     }],
     runInsecureContent: [{
       setting: 'block',
@@ -168,6 +165,40 @@ const getDefaultPluginSettings = (braveryDefaults, appSettings, appConfig) => {
       primaryPattern: '[*.]macromedia.com'
     }
   ]
+}
+
+const getDefaultFingerprintingSetting = (braveryDefaults, appSettings, appConfig) => {
+  braveryDefaults = makeImmutable(braveryDefaults)
+  if (braveryDefaults.get('fingerprintingProtection') === 'block3rdPartyFingerprinting') {
+    return [
+      {
+        setting: 'block',
+        primaryPattern: '*',
+        secondaryPattern: '*'
+      },
+      {
+        setting: 'allow',
+        primaryPattern: '*',
+        secondaryPattern: '[firstParty]'
+      }
+    ]
+  } else if (braveryDefaults.get('fingerprintingProtection') === 'blockAllFingerprinting') {
+    return [
+      {
+        setting: 'block',
+        primaryPattern: '*',
+        secondaryPattern: '*'
+      }
+    ]
+  } else {
+    return [
+      {
+        setting: 'allow',
+        primaryPattern: '*',
+        secondaryPattern: '*'
+      }
+    ]
+  }
 }
 
 const getDefault3rdPartyStorageSettings = (braveryDefaults, appSettings, appConfig) => {
@@ -278,8 +309,15 @@ const siteSettingsToContentSettings = (currentSiteSettings, defaultContentSettin
         contentSettings = addContentSettings(contentSettings, 'referer', primaryPattern, '*', 'allow')
       }
     }
-    if (typeof siteSetting.get('fingerprintingProtection') === 'boolean') {
-      contentSettings = addContentSettings(contentSettings, 'canvasFingerprinting', primaryPattern, '*', siteSetting.get('fingerprintingProtection') ? 'block' : 'allow')
+    if (siteSetting.get('fingerprintingProtection')) {
+      if (siteSetting.get('fingerprintingProtection') === 'block3rdPartyFingerprinting') {
+        contentSettings = addContentSettings(contentSettings, 'canvasFingerprinting', primaryPattern, '*', 'block')
+        contentSettings = addContentSettings(contentSettings, 'canvasFingerprinting', primaryPattern, '[firstParty]', 'allow')
+      } else if (siteSetting.get('fingerprintingProtection') === 'blockAllFingerprinting') {
+        contentSettings = addContentSettings(contentSettings, 'canvasFingerprinting', primaryPattern, '*', 'block')
+      } else {
+        contentSettings = addContentSettings(contentSettings, 'canvasFingerprinting', primaryPattern, '*', 'allow')
+      }
     }
     if (siteSetting.get('adControl')) {
       contentSettings = addContentSettings(contentSettings, 'adInsertion', primaryPattern, '*', siteSetting.get('adControl') === 'showBraveAds' ? 'allow' : 'block')

@@ -212,7 +212,8 @@ class BraveryPanel extends React.Component {
     props.noScriptEnabled = braverySettings.noScript
     props.httpsEnabled = braverySettings.httpsEverywhere
     props.adControl = braverySettings.adControl
-    props.isFpEnabled = braverySettings.fingerprintingProtection
+    props.isFpEnabled = braverySettings.fingerprintingProtection !== 'allowAllFingerprinting'
+    props.fingerprintingProtection = braverySettings.fingerprintingProtection
     props.cookieControl = braverySettings.cookieControl
     props.safeBrowsing = braverySettings.safeBrowsing
     props.isCompactBraveryPanel = getSetting(settings.COMPACT_BRAVERY_PANEL)
@@ -496,8 +497,7 @@ class BraveryPanel extends React.Component {
                 <div data-l10n-id='adControl' className={css(
                   !this.props.shieldsUp && styles.braveryPanel__body__advanced__control__forms__title_disabled,
                   gridStyles.row1col1,
-                  !this.props.isCompactBraveryPanel && styles.braveryPanel__body__advanced__control__forms__title,
-                  this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__title
+                  styles.braveryPanel__body__advanced__control__forms__title
                 )} />
 
                 <div className={css(
@@ -514,8 +514,8 @@ class BraveryPanel extends React.Component {
                 </div>
 
                 <SwitchControl className={css(
-                  !this.props.isCompactBraveryPanel && gridStyles.row3col1,
-                  this.props.isCompactBraveryPanel && gridStyles.row5col1,
+                  !this.props.isCompactBraveryPanel && gridStyles.row5col1,
+                  this.props.isCompactBraveryPanel && gridStyles.row7col1,
                   this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
                 )}
                   onClick={this.onToggleHTTPSE}
@@ -526,8 +526,8 @@ class BraveryPanel extends React.Component {
                 />
 
                 <SwitchControl className={css(
-                  !this.props.isCompactBraveryPanel && gridStyles.row4col1,
-                  this.props.isCompactBraveryPanel && gridStyles.row6col1,
+                  !this.props.isCompactBraveryPanel && gridStyles.row6col1,
+                  this.props.isCompactBraveryPanel && gridStyles.row8col1,
                   this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
                 )}
                   onClick={this.onToggleNoScript}
@@ -540,9 +540,8 @@ class BraveryPanel extends React.Component {
                 <div data-l10n-id='cookieControl' className={css(
                   !this.props.shieldsUp && styles.braveryPanel__body__advanced__control__forms__title_disabled,
                   !this.props.isCompactBraveryPanel && gridStyles.row1col2,
-                  !this.props.isCompactBraveryPanel && styles.braveryPanel__body__advanced__control__forms__title,
                   this.props.isCompactBraveryPanel && gridStyles.row3col1,
-                  this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__title
+                  styles.braveryPanel__body__advanced__control__forms__title
                 )} />
 
                 <div className={css(
@@ -559,24 +558,41 @@ class BraveryPanel extends React.Component {
                   </BraveryPanelDropdown>
                 </div>
 
-                <SwitchControl className={css(
-                  !this.props.isCompactBraveryPanel && gridStyles.row3col2,
-                  this.props.isCompactBraveryPanel && gridStyles.row7col1,
-                  this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
-                )}
-                  customInfoButtonClassName={css(styles.braveryPanel__body__advanced__control__switchControl__infoButton)}
-                  onClick={this.onToggleFp}
-                  rightl10nId='fingerprintingProtection'
-                  checkedOn={this.props.isFpEnabled}
-                  disabled={!this.props.shieldsUp}
-                  onInfoClick={this.onInfoClick}
-                  infoTitle={config.fingerprintingInfoUrl}
-                  testId='fingerprintingProtectionSwitch'
-                />
+                <div className={css(
+                  !this.props.shieldsUp && styles.braveryPanel__body__advanced__control__forms__title_disabled,
+                  !this.props.isCompactBraveryPanel && gridStyles.row3col1,
+                  this.props.isCompactBraveryPanel && gridStyles.row5col1,
+                  styles.braveryPanel__body__advanced__control__fpWrapper,
+                  styles.braveryPanel__body__advanced__control__forms__title
+                )}>
+                  <span data-l10n-id='fingerprintingProtection' />
+                  <span className={globalStyles.appIcons.question}
+                    title={config.fingerprintingInfoUrl}
+                    onClick={this.onInfoClick}
+                  />
+                </div>
+
+                <div className={css(
+                  !this.props.shieldsUp && styles.braveryPanel__body__advanced__control__forms__dropdown_disabled,
+                  !this.props.isCompactBraveryPanel && gridStyles.row4col1,
+                  !this.props.isCompactBraveryPanel && styles.braveryPanel__body__advanced__control__forms__dropdown,
+                  this.props.isCompactBraveryPanel && gridStyles.row6col1,
+                  this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__dropdown
+                )}>
+                  <BraveryPanelDropdown
+                    data-test-id='fpControl'
+                    value={this.props.fingerprintingProtection}
+                    onChange={this.onToggleFp}
+                    disabled={!this.props.shieldsUp}>
+                    <option data-l10n-id='block3rdPartyFingerprinting' data-test-id='block3rdPartyFingerprinting' value='block3rdPartyFingerprinting' />
+                    <option data-l10n-id='allowAllFingerprinting' data-test-id='allowAllFingerprinting' value='allowAllFingerprinting' />
+                    <option data-l10n-id='blockAllFingerprinting' data-test-id='blockAllFingerprinting' value='blockAllFingerprinting' />
+                  </BraveryPanelDropdown>
+                </div>
 
                 <SwitchControl className={css(
-                  !this.props.isCompactBraveryPanel && gridStyles.row4col2,
-                  this.props.isCompactBraveryPanel && gridStyles.row8col1,
+                  !this.props.isCompactBraveryPanel && gridStyles.row5col2,
+                  this.props.isCompactBraveryPanel && gridStyles.row9col1,
                   this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
                 )}
                   onClick={this.onToggleSafeBrowsing}
@@ -591,7 +607,6 @@ class BraveryPanel extends React.Component {
           }
           <hr className={css(
             styles.braveryPanel__body__hr,
-            styles.braveryPanel__body__hr_splitter,
             this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__hr
           )} />
           <div className={css(
@@ -685,6 +700,10 @@ const gridStyles = StyleSheet.create({
     gridRow: 5,
     gridColumn: 1
   },
+  row5col2: {
+    gridRow: 5,
+    gridColumn: 2
+  },
   row6col1: {
     gridRow: 6,
     gridColumn: 1
@@ -695,6 +714,10 @@ const gridStyles = StyleSheet.create({
   },
   row8col1: {
     gridRow: 8,
+    gridColumn: 1
+  },
+  row9col1: {
+    gridRow: 9,
     gridColumn: 1
   }
 })
@@ -891,10 +914,7 @@ const styles = StyleSheet.create({
     background: globalStyles.braveryPanel.body.hr.background,
     border: 0,
     height: '1px',
-    margin: '10px 0'
-  },
-  braveryPanel__body__hr_splitter: {
-    marginTop: '30px'
+    margin: '1rem 0'
   },
   braveryPanel__body__footer: {
     display: 'flex',
@@ -956,14 +976,11 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexFlow: 'column nowrap'
   },
-  braveryPanel_compact__body__advanced__control__forms__title: {
-    margin: '0 0 .25rem .25rem'
-  },
   braveryPanel_compact__body__advanced__control__forms__dropdown: {
     marginBottom: '.75rem'
   },
   braveryPanel_compact__body__advanced__control__switchControl: {
-    padding: '5px 0 5px .25rem'
+    padding: '5px .25rem'
   },
   braveryPanel_compact__body__footer: {
     padding: '0 .25rem'
@@ -979,14 +996,18 @@ const styles = StyleSheet.create({
     margin: '15px 10px'
   },
   braveryPanel__body__advanced__control__forms__title: {
-    marginBottom: '4px',
-    marginLeft: '8px'
+    margin: '0 .25rem .25rem .25rem'
   },
   braveryPanel__body__advanced__control__forms__title_disabled: {
     opacity: 0.3
   },
   braveryPanel__body__advanced__control__forms__dropdown_disabled: {
     opacity: 0.3
+  },
+  braveryPanel__body__advanced__control__fpWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between'
   },
   braveryPanel__body__advanced__control__switchControl__infoButton: {
     display: 'inline',
