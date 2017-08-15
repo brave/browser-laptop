@@ -59,13 +59,13 @@ For other platforms (macOS, Linux) You'll need certain packages installed before
 #### On Debian / Ubuntu /Mint
 
 ````
-apt-get install libgnome-keyring-dev build-essential rpm ninja-build
+apt-get install build-essential rpm ninja-build
 ````
 
 #### On Fedora
 
 ````
-dnf install libgnome-keyring-devel rpm-build
+dnf install rpm-build
 dnf group install "Development Tools" "C Development Tools and Libraries"
 ````
 
